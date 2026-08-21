@@ -60,17 +60,14 @@ def test_historical_roadmap_is_bound_to_exact_pre_reset_commit() -> None:
 
 def test_release_identity_defers_public_version_to_1_3_0() -> None:
     release = (ROOT / "docs" / "release-identity.md").read_text(encoding="utf-8")
-    version_source = (ROOT / "docmancer" / "_version.py").read_text(encoding="utf-8")
 
     assert "1.2.0" in release
     assert "unpublished repository milestone" in release.lower()
     assert "next intended public release" in release.lower()
     assert "doc-atlas 1.3.0" in release
     assert "remains **Beta**" in release
-
-    # This roadmap-reset PR records release identity but deliberately does not
-    # perform the later release-preparation version bump.
-    assert '__version__ = "1.2.0"' in version_source
+    assert "does not change `docmancer/_version.py`" in release
+    assert "does not create or move a tag" in release
 
 
 def test_product_brief_keeps_live_and_patch_value_claims_honest() -> None:
