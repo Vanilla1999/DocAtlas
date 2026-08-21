@@ -14,7 +14,6 @@ from docmancer.docs.application.evidence_selection import (
 )
 from docmancer.docs.registry import LibraryRecord
 from docmancer.docs.resolver import normalize_library_name
-from docmancer.mcp import paths
 from docmancer.retrieval.runtime import dispatcher_for_agent, effective_retrieval_mode
 from docmancer.retrieval.contracts import canonical_hash
 
