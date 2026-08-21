@@ -73,8 +73,7 @@ def _write_project_install_agents(agents: set[str]) -> None:
         return
     _PROJECT_INSTALL_STATE.parent.mkdir(parents=True, exist_ok=True)
     _PROJECT_INSTALL_STATE.write_text(
-        json.dumps({"agents": sorted(agents)}, indent=2) + "
-", encoding="utf-8"
+        json.dumps({"agents": sorted(agents)}, indent=2) + "\n", encoding="utf-8"
     )
 
 
@@ -171,8 +170,7 @@ def _remove_managed_instruction_block(dest: Path) -> bool:
     if owned_skill_file and front_matter and not cleaned_body.strip():
         dest.unlink()
     elif updated:
-        dest.write_text(updated + "
-", encoding="utf-8")
+        dest.write_text(updated + "\n", encoding="utf-8")
     else:
         dest.unlink()
     return True

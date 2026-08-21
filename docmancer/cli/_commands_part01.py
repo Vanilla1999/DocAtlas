@@ -638,14 +638,10 @@ def _install_skill_file(content: str, dest: Path) -> None:
         raise click.ClickException(str(exc)) from exc
 
     front_matter, body = _split_front_matter(content)
-    marker_block = f"{_AGENTS_MD_START}
-{body.strip()}
-{_AGENTS_MD_END}
-"
+    marker_block = f"{_AGENTS_MD_START}\n{body.strip()}\n{_AGENTS_MD_END}\n"
     if not dest.exists():
         dest.parent.mkdir(parents=True, exist_ok=True)
-        dest.write_text(front_matter + _SKILL_FILE_OWNER + "
-" + marker_block, encoding="utf-8")
+        dest.write_text(front_matter + _SKILL_FILE_OWNER + "\n" + marker_block, encoding="utf-8")
         return
 
     existing = dest.read_text(encoding="utf-8")
@@ -660,8 +656,7 @@ def _install_skill_file(content: str, dest: Path) -> None:
                 old_front_matter, _ = _split_front_matter(managed)
                 if old_front_matter and _is_proven_docatlas_text(managed):
                     suffix = existing[end_idx + len(end_marker):]
-                    dest.write_text(front_matter + _SKILL_FILE_OWNER + "
-" + marker_block + suffix, encoding="utf-8")
+                    dest.write_text(front_matter + _SKILL_FILE_OWNER + "\n" + marker_block + suffix, encoding="utf-8")
                     return
 
     try:
@@ -672,8 +667,7 @@ def _install_skill_file(content: str, dest: Path) -> None:
         start_idx, end_idx = legacy
         existing = (
             existing[:start_idx]
-            + marker_block.rstrip("
-")
+            + marker_block.rstrip("\n")
             + existing[end_idx + len(_LEGACY_AGENTS_MD_END):]
         )
         existing = existing.replace(_LEGACY_SKILL_FILE_OWNER, _SKILL_FILE_OWNER, 1)
@@ -689,8 +683,7 @@ def _install_skill_file(content: str, dest: Path) -> None:
             raise click.ClickException(f"Could not update {display_path(dest)} because its DocAtlas markers are missing.")
         start_idx, end_idx = block
         suffix = existing[end_idx + len(_AGENTS_MD_END):]
-        dest.write_text(front_matter + _SKILL_FILE_OWNER + "
-" + marker_block + suffix, encoding="utf-8")
+        dest.write_text(front_matter + _SKILL_FILE_OWNER + "\n" + marker_block + suffix, encoding="utf-8")
         return
     if front_matter and not existing_front_matter:
         _install_or_append_agents_md(dest, content)
@@ -710,14 +703,11 @@ def _split_front_matter(content: str) -> tuple[str, str]:
 
 
 def _install_or_append_agents_md(dest: Path, content_body: str) -> None:
-    marker_block = f"{_AGENTS_MD_START}
-{content_body.strip()}
-{_AGENTS_MD_END}"
+    marker_block = f"{_AGENTS_MD_START}\n{content_body.strip()}\n{_AGENTS_MD_END}"
     dest.parent.mkdir(parents=True, exist_ok=True)
 
     if not dest.exists():
-        dest.write_text(marker_block + "
-", encoding="utf-8")
+        dest.write_text(marker_block + "\n", encoding="utf-8")
         return
 
     existing = dest.read_text(encoding="utf-8")
@@ -736,13 +726,8 @@ def _install_or_append_agents_md(dest: Path, content_body: str) -> None:
         new_content = new_content.replace(_LEGACY_SKILL_FILE_OWNER, _SKILL_FILE_OWNER, 1)
         dest.write_text(new_content, encoding="utf-8")
     else:
-        separator = "
-
-" if existing and not existing.endswith("
-
-") else ""
-        dest.write_text(existing + separator + marker_block + "
-", encoding="utf-8")
+        separator = "\n\n" if existing and not existing.endswith("\n\n") else ""
+        dest.write_text(existing + separator + marker_block + "\n", encoding="utf-8")
 
 
 def _format_size(n: int) -> str:
