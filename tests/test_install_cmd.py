@@ -13,7 +13,7 @@ from docmancer.cli.__main__ import cli
 class FakeDocmancerConfig:
     def __init__(self, data=None):
         self._data = data or {
-            "index": {"provider": "sqlite", "db_path": ".docmancer/docmancer.db", "extracted_dir": ".docmancer/extracted"},
+            "index": {"provider": "sqlite", "db_path": ".docatlas/docatlas.db", "extracted_dir": ".docatlas/extracted"},
             "query": {"default_budget": 1200},
             "web_fetch": {"workers": 8, "default_page_cap": 500},
         }
@@ -47,10 +47,10 @@ def test_install_claude_code_creates_rebooted_skill_file():
              patch("docmancer.cli.commands._get_config_class", return_value=FakeDocmancerConfig):
             result = runner.invoke(cli, ["install", "claude-code"])
         assert result.exit_code == 0, result.output
-        skill_file = fake_home / ".claude" / "skills" / "docmancer" / "SKILL.md"
+        skill_file = fake_home / ".claude" / "skills" / "docatlas" / "SKILL.md"
         content = skill_file.read_text()
         assert content.startswith("---\n")
-        assert content.index("<!-- docmancer:start -->") > content.index("\n---\n")
+        assert content.index("<!-- docatlas:start -->") > content.index("\n---\n")
         assert "allowed-tools" in content
         assert "get_docs_context" in content
         assert "prepare_docs" in content
@@ -66,8 +66,8 @@ def test_install_codex_creates_native_and_shared_skills():
              patch("docmancer.cli.commands._get_config_class", return_value=FakeDocmancerConfig):
             result = runner.invoke(cli, ["install", "codex"])
         assert result.exit_code == 0, result.output
-        assert (fake_home / ".codex" / "skills" / "docmancer" / "SKILL.md").exists()
-        assert (fake_home / ".agents" / "skills" / "docmancer" / "SKILL.md").exists()
+        assert (fake_home / ".codex" / "skills" / "docatlas" / "SKILL.md").exists()
+        assert (fake_home / ".agents" / "skills" / "docatlas" / "SKILL.md").exists()
 
 
 def test_install_cursor_creates_agents_md_fallback():
@@ -105,7 +105,7 @@ def test_install_github_copilot_project_creates_repo_instructions():
         assert "prepare_docs" in copilot_content
         assert "docs_status" in copilot_content
         assert len(copilot_content.split()) < 250
-        assert "docmancer:start" in agents_md.read_text()
+        assert "docatlas:start" in agents_md.read_text()
         assert "github.copilot.chat.codeGeneration.useInstructionFiles" in vscode_settings.read_text()
 
 
@@ -130,7 +130,7 @@ def test_project_install_writes_compact_docs_mcp_bootstrap(agent: str, instructi
             result = runner.invoke(cli, ["install", agent, "--project"])
         assert result.exit_code == 0, result.output
         content = Path(instruction_path).read_text(encoding="utf-8")
-        assert "<!-- docmancer:start -->" in content
+        assert "<!-- docatlas:start -->" in content
         assert "get_docs_context" in content
         assert "prepare_docs" in content
         assert "docs_status" in content
@@ -143,7 +143,7 @@ def test_project_install_replaces_only_its_managed_bootstrap_block():
         fake_home = _home(tmp_dir)
         instruction_path = Path("AGENTS.md")
         instruction_path.write_text(
-            "# Team instructions\n\n<!-- docmancer:start -->\nold bootstrap\n<!-- docmancer:end -->\n\nKeep this text.\n",
+            "# Team instructions\n\n<!-- docmancer:start -->\nold bootstrap\ndoc-atlas mcp docs-serve\n<!-- docmancer:end -->\n\nKeep this text.\n",
             encoding="utf-8",
         )
         with patch("docmancer.cli.commands.Path.home", return_value=fake_home), \
@@ -157,7 +157,8 @@ def test_project_install_replaces_only_its_managed_bootstrap_block():
         assert "# Team instructions" in first_content
         assert "Keep this text." in first_content
         assert "old bootstrap" not in first_content
-        assert first_content.count("<!-- docmancer:start -->") == 1
+        assert first_content.count("<!-- docatlas:start -->") == 1
+        assert "<!-- docmancer:start -->" not in first_content
 
 
 def test_project_install_preserves_user_text_when_appending_bootstrap():
@@ -235,7 +236,14 @@ def test_project_uninstall_detects_legacy_shared_bootstrap_owners_from_mcp_confi
              patch("docmancer.cli.commands._get_config_class", return_value=FakeDocmancerConfig):
             assert runner.invoke(cli, ["install", "codex", "--project"]).exit_code == 0
             assert runner.invoke(cli, ["install", "opencode", "--project"]).exit_code == 0
-            Path(".docmancer/agent-installs.json").unlink()
+            Path(".docatlas/agent-installs.json").unlink()
+            legacy_state = Path(".docmancer/agent-installs.json")
+            legacy_state.parent.mkdir(parents=True, exist_ok=True)
+            legacy_state.write_text("{broken", encoding="utf-8")
+            blocked = runner.invoke(cli, ["install", "codex", "--project", "--uninstall"])
+            assert blocked.exit_code != 0
+            assert "get_docs_context" in Path("AGENTS.md").read_text(encoding="utf-8")
+            legacy_state.unlink()
             uninstall = runner.invoke(cli, ["install", "codex", "--project", "--uninstall"])
         assert uninstall.exit_code == 0, uninstall.output
         assert "get_docs_context" in Path("AGENTS.md").read_text(encoding="utf-8")
@@ -247,22 +255,22 @@ def test_failed_project_install_does_not_record_agent_state():
         fake_home = _home(tmp_dir)
         skill = Path(".gemini/skills/docmancer/SKILL.md")
         skill.parent.mkdir(parents=True)
-        skill.write_text("---\nname: custom\n---\n<!-- docmancer:start -->\nbroken\n", encoding="utf-8")
+        skill.write_text("<!-- docmancer:managed-skill-file -->\n---\nname: custom\n---\n<!-- docmancer:start -->\ndoc-atlas mcp docs-serve\n", encoding="utf-8")
         with patch("docmancer.cli.commands.Path.home", return_value=fake_home), \
              patch("docmancer.mcp.agent_config.Path.home", return_value=fake_home), \
              patch("docmancer.cli.commands._get_config_class", return_value=FakeDocmancerConfig):
             result = runner.invoke(cli, ["install", "gemini", "--project"])
         assert result.exit_code != 0
-        assert not Path(".docmancer/agent-installs.json").exists()
+        assert not Path(".docatlas/agent-installs.json").exists()
 
 
 @pytest.mark.parametrize(
     ("agent", "skill_path"),
     [
-        ("claude-code", ".claude/skills/docmancer/SKILL.md"),
-        ("cursor", ".cursor/skills/docmancer/SKILL.md"),
-        ("cline", ".cline/skills/docmancer/SKILL.md"),
-        ("gemini", ".gemini/skills/docmancer/SKILL.md"),
+        ("claude-code", ".claude/skills/docatlas/SKILL.md"),
+        ("cursor", ".cursor/skills/docatlas/SKILL.md"),
+        ("cline", ".cline/skills/docatlas/SKILL.md"),
+        ("gemini", ".gemini/skills/docatlas/SKILL.md"),
     ],
 )
 def test_project_uninstall_removes_managed_project_skill(agent: str, skill_path: str):
@@ -345,30 +353,36 @@ def test_gemini_uninstall_does_not_remove_codex_shared_skill():
         assert codex.exit_code == 0, codex.output
         assert gemini.exit_code == 0, gemini.output
         assert uninstall.exit_code == 0, uninstall.output
-        assert (fake_home / ".agents/skills/docmancer/SKILL.md").exists()
+        assert (fake_home / ".agents/skills/docatlas/SKILL.md").exists()
 
 
 def test_reinstall_migrates_marker_before_front_matter():
     runner = CliRunner()
     with runner.isolated_filesystem() as tmp_dir:
         fake_home = _home(tmp_dir)
-        skill = fake_home / ".claude/skills/docmancer/SKILL.md"
-        skill.parent.mkdir(parents=True)
-        skill.write_text("<!-- docmancer:start -->\n---\nname: old\n---\nold\n<!-- docmancer:end -->\n")
+        legacy_skill = fake_home / ".claude/skills/docmancer/SKILL.md"
+        legacy_skill.parent.mkdir(parents=True)
+        legacy_skill.write_text(
+            "<!-- docmancer:managed-skill-file -->\n<!-- docmancer:start -->\n"
+            "---\nname: old\n---\ndoc-atlas mcp docs-serve\n<!-- docmancer:end -->\n"
+        )
         with patch("docmancer.cli.commands.Path.home", return_value=fake_home), \
              patch("docmancer.cli.commands._get_config_class", return_value=FakeDocmancerConfig):
             result = runner.invoke(cli, ["install", "claude-code"])
         assert result.exit_code == 0, result.output
+        skill = fake_home / ".claude/skills/docatlas/SKILL.md"
+        assert skill.exists()
+        assert not legacy_skill.exists()
         content = skill.read_text(encoding="utf-8")
         assert content.startswith("---\n")
-        assert content.count("<!-- docmancer:start -->") == 1
+        assert content.count("<!-- docatlas:start -->") == 1
 
 
 def test_global_uninstall_removes_fully_managed_skill_file():
     runner = CliRunner()
     with runner.isolated_filesystem() as tmp_dir:
         fake_home = _home(tmp_dir)
-        skill = fake_home / ".claude/skills/docmancer/SKILL.md"
+        skill = fake_home / ".claude/skills/docatlas/SKILL.md"
         with patch("docmancer.cli.commands.Path.home", return_value=fake_home), \
              patch("docmancer.mcp.agent_config.Path.home", return_value=fake_home), \
              patch("docmancer.cli.commands._get_config_class", return_value=FakeDocmancerConfig):
@@ -401,7 +415,7 @@ def test_reinstall_updates_owned_skill_front_matter():
     runner = CliRunner()
     with runner.isolated_filesystem() as tmp_dir:
         fake_home = _home(tmp_dir)
-        skill = fake_home / ".claude/skills/docmancer/SKILL.md"
+        skill = fake_home / ".claude/skills/docatlas/SKILL.md"
         with patch("docmancer.cli.commands.Path.home", return_value=fake_home), \
              patch("docmancer.cli.commands._get_config_class", return_value=FakeDocmancerConfig):
             first = runner.invoke(cli, ["install", "claude-code"])
@@ -462,7 +476,8 @@ def test_legacy_skill_migration_preserves_user_suffix():
         skill = fake_home / ".claude/skills/docmancer/SKILL.md"
         skill.parent.mkdir(parents=True)
         skill.write_text(
-            "<!-- docmancer:start -->\n---\nname: docmancer\n---\nold\n"
+            "<!-- docmancer:managed-skill-file -->\n<!-- docmancer:start -->\n"
+            "---\nname: docmancer\n---\ndoc-atlas mcp docs-serve\n"
             "<!-- docmancer:end -->\n\n# My local notes\nDo not delete this.\n",
             encoding="utf-8",
         )
@@ -470,8 +485,9 @@ def test_legacy_skill_migration_preserves_user_suffix():
              patch("docmancer.mcp.agent_config.Path.home", return_value=fake_home), \
              patch("docmancer.cli.commands._get_config_class", return_value=FakeDocmancerConfig):
             result = runner.invoke(cli, ["install", "claude-code"])
-        assert result.exit_code == 0, result.output
+        assert result.exit_code != 0
         assert "# My local notes\nDo not delete this." in skill.read_text(encoding="utf-8")
+        assert not (fake_home / ".claude/skills/docatlas/SKILL.md").exists()
 
 
 @pytest.mark.parametrize(
@@ -528,14 +544,29 @@ def test_install_claude_desktop_creates_zip():
              patch("docmancer.cli.commands._get_config_class", return_value=FakeDocmancerConfig):
             result = runner.invoke(cli, ["install", "claude-desktop"])
         assert result.exit_code == 0, result.output
-        zip_path = fake_home / ".docmancer" / "exports" / "claude-desktop" / "docmancer.zip"
+        zip_path = fake_home / ".docatlas" / "exports" / "claude-desktop" / "docatlas.zip"
         assert zip_path.exists()
         with zipfile.ZipFile(zip_path) as zf:
-                assert "docmancer/Skill.md" in zf.namelist()
-                content = zf.read("docmancer/Skill.md").decode()
+                assert "docatlas/Skill.md" in zf.namelist()
+                content = zf.read("docatlas/Skill.md").decode()
                 assert "get_docs_context" in content
                 assert "prepare_docs" in content
                 assert "docs_status" in content
+
+        foreign_home = Path(tmp_dir) / "foreign-home"
+        foreign_home.mkdir()
+        (foreign_home / "foreign.txt").write_text("not DocAtlas state", encoding="utf-8")
+        explicit_config = Path(tmp_dir) / "explicit.yaml"
+        explicit_config.write_text("index: {}\n", encoding="utf-8")
+        with patch("docmancer.cli.commands.Path.home", return_value=fake_home), \
+             patch("docmancer.cli.commands._get_config_class", return_value=FakeDocmancerConfig):
+            blocked = runner.invoke(
+                cli,
+                ["install", "claude-desktop", "--config", str(explicit_config)],
+                env={"DOCATLAS_HOME": str(foreign_home)},
+            )
+        assert blocked.exit_code != 0
+        assert not (foreign_home / "exports" / "claude-desktop" / "docatlas.zip").exists()
 
 
 def test_setup_all_creates_config_db_and_installs_skills():
@@ -549,9 +580,9 @@ def test_setup_all_creates_config_db_and_installs_skills():
              patch("docmancer.cli.commands._get_agent_class", return_value=lambda config: fake_agent):
             result = runner.invoke(cli, ["setup", "--all"])
         assert result.exit_code == 0, result.output
-        assert (fake_home / ".docmancer" / "docmancer.yaml").exists()
-        assert (fake_home / ".codex" / "skills" / "docmancer" / "SKILL.md").exists()
-        assert (fake_home / ".docmancer" / "exports" / "claude-desktop" / "docmancer.zip").exists()
+        assert (fake_home / ".docatlas" / "docatlas.yaml").exists()
+        assert (fake_home / ".codex" / "skills" / "docatlas" / "SKILL.md").exists()
+        assert (fake_home / ".docatlas" / "exports" / "claude-desktop" / "docatlas.zip").exists()
 
 
 def test_setup_yes_offline_project_local_prints_readiness_summary():
@@ -566,7 +597,7 @@ def test_setup_yes_offline_project_local_prints_readiness_summary():
             result = runner.invoke(cli, ["setup", "--yes", "--offline", "--vectors", "off", "--project-local"])
 
         assert result.exit_code == 0, result.output
-        assert Path("docmancer.yaml").exists()
+        assert Path("docatlas.yaml").exists()
         assert "Ready now" in result.output
         assert "Next best command" in result.output
         assert "doc-atlas ingest ./docs" in result.output

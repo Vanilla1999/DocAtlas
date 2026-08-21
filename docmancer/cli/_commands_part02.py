@@ -7,11 +7,12 @@ from ._commands_part01 import _build_skill_content, _configure_ingest_logging, _
 
 def _create_claude_desktop_zip(config_path: str | Path | None) -> Path:
     content = _build_skill_content("claude_desktop_skill.md", config_path)
-    export_dir = _get_user_config_dir() / "exports" / "claude-desktop"
+    owned_home = _ensure_user_home(home_dir=Path.home())
+    export_dir = owned_home / "exports" / "claude-desktop"
     export_dir.mkdir(parents=True, exist_ok=True)
-    zip_path = export_dir / "docmancer.zip"
+    zip_path = export_dir / "docatlas.zip"
     with zipfile.ZipFile(zip_path, "w", zipfile.ZIP_DEFLATED) as zf:
-        zf.writestr("docmancer/Skill.md", content)
+        zf.writestr("docatlas/Skill.md", content)
     return zip_path
 
 
@@ -36,7 +37,14 @@ def _project_bootstrap_dest(agent: str) -> Path | None:
 
 
 def _project_install_agents() -> set[str]:
-    if not _PROJECT_INSTALL_STATE.exists():
+    state_path = (
+        _PROJECT_INSTALL_STATE
+        if _PROJECT_INSTALL_STATE.exists()
+        else _LEGACY_PROJECT_INSTALL_STATE
+        if _LEGACY_PROJECT_INSTALL_STATE.exists()
+        else None
+    )
+    if state_path is None:
         try:
             from docmancer.mcp.agent_config import known_agents, target_has_current_server_entry
 
@@ -47,22 +55,39 @@ def _project_install_agents() -> set[str]:
                 and target_has_current_server_entry(target)
             }
         except (OSError, ValueError):
-            # A malformed legacy MCP config makes ownership unknowable. Prefer
-            # retaining shared guidance over deleting another agent's contract.
             return {
                 "claude-code", "codex", "cursor", "opencode",
                 "cline", "gemini", "github-copilot",
             }
     try:
-        payload = json.loads(_PROJECT_INSTALL_STATE.read_text(encoding="utf-8"))
-        agents = payload.get("agents", [])
-        return {str(agent) for agent in agents if str(agent) in INSTALL_TARGETS}
-    except (json.JSONDecodeError, OSError, AttributeError):
-        return set()
+        payload = json.loads(state_path.read_text(encoding="utf-8"))
+    except (json.JSONDecodeError, OSError) as exc:
+        raise click.ClickException(
+            f"Could not read project install state at {display_path(state_path)}; "
+            "refusing to modify shared project guidance."
+        ) from exc
+    if not isinstance(payload, dict):
+        raise click.ClickException(
+            f"Project install state at {display_path(state_path)} must be a JSON object; "
+            "refusing to modify shared project guidance."
+        )
+    agents = payload.get("agents")
+    if not isinstance(agents, list) or any(not isinstance(agent, str) for agent in agents):
+        raise click.ClickException(
+            f"Project install state at {display_path(state_path)} has an invalid agents list; "
+            "refusing to modify shared project guidance."
+        )
+    unknown = sorted(set(agents) - set(INSTALL_TARGETS))
+    if unknown:
+        raise click.ClickException(
+            f"Project install state at {display_path(state_path)} contains unknown agent ids; "
+            "refusing to modify shared project guidance."
+        )
+    return set(agents)
 
 
 def _write_project_install_agents(agents: set[str]) -> None:
-    if not agents:
+    if not agents and not _LEGACY_PROJECT_INSTALL_STATE.exists():
         if _PROJECT_INSTALL_STATE.exists():
             _PROJECT_INSTALL_STATE.unlink()
         return
@@ -104,52 +129,65 @@ def _remove_project_bootstrap(agent: str) -> bool:
 
 
 def _managed_instruction_paths(agent: str, *, project: bool) -> list[Path]:
+    def include_legacy(paths: list[Path]) -> list[Path]:
+        expanded: list[Path] = []
+        for path in paths:
+            expanded.append(path)
+            legacy = _legacy_skill_path(path)
+            if legacy is not None:
+                expanded.append(legacy)
+        return list(dict.fromkeys(expanded))
+
     if project:
         normalized = agent.lower()
         if normalized == "github-copilot":
             return [Path(".github") / "copilot-instructions.md", Path("AGENTS.md")]
         bootstrap = _project_bootstrap_dest(agent)
         skill_paths = {
-            "claude-code": Path(".claude") / "skills" / "docmancer" / "SKILL.md",
-            "cursor": Path(".cursor") / "skills" / "docmancer" / "SKILL.md",
-            "cline": Path(".cline") / "skills" / "docmancer" / "SKILL.md",
-            "gemini": Path(".gemini") / "skills" / "docmancer" / "SKILL.md",
+            "claude-code": Path(".claude") / "skills" / SKILL_ID / "SKILL.md",
+            "cursor": Path(".cursor") / "skills" / SKILL_ID / "SKILL.md",
+            "cline": Path(".cline") / "skills" / SKILL_ID / "SKILL.md",
+            "gemini": Path(".gemini") / "skills" / SKILL_ID / "SKILL.md",
         }
         paths = [path for path in (skill_paths.get(normalized), bootstrap) if path is not None]
-        return list(dict.fromkeys(paths))
+        return include_legacy(paths)
     home = Path.home()
     normalized = agent.lower()
     paths = {
-        "claude-code": [home / ".claude" / "skills" / "docmancer" / "SKILL.md"],
-        "cursor": [home / ".cursor" / "skills" / "docmancer" / "SKILL.md", home / ".cursor" / "AGENTS.md"],
+        "claude-code": [home / ".claude" / "skills" / SKILL_ID / "SKILL.md"],
+        "cursor": [home / ".cursor" / "skills" / SKILL_ID / "SKILL.md", home / ".cursor" / "AGENTS.md"],
         "codex": [_get_codex_skill_path(), _get_shared_agent_skill_path()],
         "codex-app": [_get_codex_skill_path(), _get_shared_agent_skill_path()],
         "codex-desktop": [_get_codex_skill_path(), _get_shared_agent_skill_path()],
-        "cline": [home / ".cline" / "skills" / "docmancer" / "SKILL.md"],
-        "gemini": [home / ".gemini" / "skills" / "docmancer" / "SKILL.md"],
+        "cline": [home / ".cline" / "skills" / SKILL_ID / "SKILL.md"],
+        "gemini": [home / ".gemini" / "skills" / SKILL_ID / "SKILL.md"],
         "github-copilot": [_get_copilot_user_instructions_path()],
-        "opencode": [home / ".config" / "opencode" / "skills" / "docmancer" / "SKILL.md"],
+        "opencode": [home / ".config" / "opencode" / "skills" / SKILL_ID / "SKILL.md"],
     }
-    return paths.get(normalized, [])
+    return include_legacy(paths.get(normalized, []))
 
 
 def _remove_managed_instruction_block(dest: Path) -> bool:
     if not dest.exists():
         return False
     existing = dest.read_text(encoding="utf-8")
-    start_idx = existing.find(_AGENTS_MD_START)
-    end_idx = existing.find(_AGENTS_MD_END)
-    if start_idx == -1 and end_idx == -1:
+    try:
+        block = _current_managed_block(existing)
+        marker_end = _AGENTS_MD_END
+        if block is None:
+            block = _legacy_managed_block(existing)
+            marker_end = _LEGACY_AGENTS_MD_END
+    except ValueError as exc:
+        raise click.ClickException(f"Could not uninstall from {display_path(dest)} because {exc}.") from exc
+    if block is None:
         return False
-    if start_idx == -1 or end_idx == -1 or start_idx > end_idx:
-        raise click.ClickException(
-            f"Could not uninstall from {display_path(dest)} because its DocAtlas markers are incomplete or out of order."
-        )
-    remaining = existing[:start_idx] + existing[end_idx + len(_AGENTS_MD_END):]
+    start_idx, end_idx = block
+    remaining = existing[:start_idx] + existing[end_idx + len(marker_end):]
     updated = remaining.strip()
     front_matter, body = _split_front_matter(remaining.lstrip())
-    owned_skill_file = _SKILL_FILE_OWNER in remaining
-    if owned_skill_file and front_matter and not body.replace(_SKILL_FILE_OWNER, "").strip():
+    owned_skill_file = _SKILL_FILE_OWNER in remaining or _LEGACY_SKILL_FILE_OWNER in remaining
+    cleaned_body = body.replace(_SKILL_FILE_OWNER, "").replace(_LEGACY_SKILL_FILE_OWNER, "")
+    if owned_skill_file and front_matter and not cleaned_body.strip():
         dest.unlink()
     elif updated:
         dest.write_text(updated + "\n", encoding="utf-8")
@@ -208,24 +246,31 @@ def _install_vscode_copilot_settings(dest: Path) -> bool:
 )
 @click.option("--dir", "directory", default=None, help="Target directory for the config file.")
 def init_cmd(directory: str | None):
-    """Initialize a docmancer project with a config file."""
+    """Initialize a DocAtlas project with the primary config identity."""
     import yaml as _yaml
 
     dir_path = Path(directory or ".")
     dir_path.mkdir(parents=True, exist_ok=True)
-    config_path = dir_path / "docmancer.yaml"
+    config_path = dir_path / PRIMARY_CONFIG_NAME
+    legacy_path = dir_path / LEGACY_CONFIG_NAME
     if config_path.exists():
         click.echo(f"Config already exists at {display_path(config_path)}")
         return
+    if legacy_path.exists():
+        click.echo(
+            f"Legacy config already exists at {display_path(legacy_path)}; "
+            f"refusing to create parallel {PRIMARY_CONFIG_NAME}. Rename it explicitly after review."
+        )
+        return
     DocmancerConfig = _get_config_class()
     config = DocmancerConfig()
-    config.index.db_path = ".docmancer/docmancer.db"
-    config.index.extracted_dir = ".docmancer/extracted"
+    config.index.db_path = ".docatlas/docatlas.db"
+    config.index.extracted_dir = ".docatlas/extracted"
     data = config.model_dump()
-    with open(config_path, "w") as f:
-        _yaml.dump(data, f, default_flow_style=False, sort_keys=False)
+    with open(config_path, "w", encoding="utf-8") as handle:
+        _yaml.dump(data, handle, default_flow_style=False, sort_keys=False)
     click.echo(f"Created config at {display_path(config_path)}")
-    click.echo("Local SQLite FTS5 index configured at .docmancer/docmancer.db")
+    click.echo("Local SQLite FTS5 index configured at .docatlas/docatlas.db")
 
 
 @click.command(
@@ -243,7 +288,7 @@ def init_cmd(directory: str | None):
 @click.option("--provider", default="auto", show_default=True,
               type=click.Choice(["auto", "gitbook", "mintlify", "web", "github", "crawl4ai"], case_sensitive=False),
               help="Docs platform. auto tries llms.txt then sitemap.xml. web uses generic pipeline.")
-@click.option("--config", "config_path", default=None, help="Path to docmancer.yaml.")
+@click.option("--config", "config_path", default=None, help="Path to DocAtlas YAML config.")
 @click.option("--max-pages", default=500, show_default=True, type=int,
               help="Maximum pages to fetch (web provider).")
 @click.option("--strategy", default=None, type=str,
@@ -315,7 +360,7 @@ def add_cmd(
     ),
 )
 @click.argument("source", required=False, default=None)
-@click.option("--config", "config_path", default=None, help="Path to docmancer.yaml.")
+@click.option("--config", "config_path", default=None, help="Path to DocAtlas YAML config.")
 @click.option("--max-pages", default=500, show_default=True, type=int,
               help="Maximum pages to fetch (web sources).")
 @click.option("--browser", is_flag=True, default=False,
@@ -420,7 +465,7 @@ def update_cmd(
 @click.option("--recursive/--no-recursive", default=True, show_default=True, help="Recurse through directories.")
 @click.option("--skip-known", is_flag=True, help="Skip files whose content hash is already indexed.")
 @click.option("--no-vectors", is_flag=True, help="Index FTS5 only; skip embedding/vector upsert.")
-@click.option("--config", "config_path", default=None, help="Path to docmancer.yaml.")
+@click.option("--config", "config_path", default=None, help="Path to DocAtlas YAML config.")
 def ingest_cmd(
     path: str,
     recreate: bool,
@@ -556,7 +601,7 @@ def fetch_cmd(url: str, output_dir: str):
 @click.option("--no-vectors", is_flag=True, help="Skip embedding/vector upsert; index FTS5 only.")
 @click.option("--batch-size", default=1000, type=int, show_default=True, help="Commit batch size for streaming ingest.")
 @click.option("--limit", default=None, type=int, help="Stop after N records (smoke testing).")
-@click.option("--config", "config_path", default=None, help="Path to docmancer.yaml.")
+@click.option("--config", "config_path", default=None, help="Path to DocAtlas YAML config.")
 def ingest_uspto_cmd(
     path: str,
     recreate: bool,

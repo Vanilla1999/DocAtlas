@@ -1,5 +1,5 @@
 ---
-name: docmancer
+name: docatlas
 description: Source-grounded documentation workflow for coding agents.
 allowed-tools:
   - Bash(doc-atlas mcp *)
