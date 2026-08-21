@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import inspect
+import sys
 import textwrap
 
 import click
@@ -13,6 +14,15 @@ HELP_CONTEXT_SETTINGS = {
     "max_content_width": TERM_WIDTH,
     "terminal_width": TERM_WIDTH,
 }
+
+
+def _unicode_help_supported() -> bool:
+    encoding = getattr(sys.stdout, "encoding", None) or "utf-8"
+    try:
+        "█─◆".encode(encoding)
+    except (LookupError, UnicodeEncodeError):
+        return False
+    return True
 
 
 def format_examples(*lines: str) -> str:
@@ -31,6 +41,8 @@ class _FormattedHelpMixin:
         return style(text, **styles)
 
     def _rule(self, ctx: click.Context, char: str = "─") -> str:
+        if not _unicode_help_supported():
+            char = "-"
         text = char * self._rule_width
         if self._color_enabled():
             return click.style(text, fg="bright_black")
@@ -38,14 +50,15 @@ class _FormattedHelpMixin:
 
     def _write_banner(self, ctx: click.Context, formatter: click.HelpFormatter) -> None:
         formatter.write(f"{self._rule(ctx)}\n")
-        for line in BANNER_LINES:
+        banner_lines = BANNER_LINES if _unicode_help_supported() else ["  DOCATLAS"]
+        for line in banner_lines:
             formatter.write(f"{self._style(ctx, line, fg=BANNER_COLOR, bold=True)}\n")
         formatter.write(f"{self._style(ctx, TAGLINE, fg='bright_black', italic=True)}\n")
         formatter.write(f"{self._rule(ctx)}\n")
 
     def _write_section(self, ctx: click.Context, formatter: click.HelpFormatter, heading: str) -> None:
         formatter.write_paragraph()
-        label = f"◆ {heading}"
+        label = f"{'◆' if _unicode_help_supported() else '>'} {heading}"
         formatter.write(f"{self._style(ctx, label, fg='cyan', bold=True)}\n")
 
     def _write_definition_rows(
@@ -101,7 +114,8 @@ class _FormattedHelpMixin:
             lines = self.epilog.rstrip().splitlines()
             if not lines:
                 return
-            formatter.write(f"{self._style(ctx, f'◆ {lines[0]}', fg='yellow', bold=True)}\n")
+            prefix = "◆" if _unicode_help_supported() else ">"
+            formatter.write(f"{self._style(ctx, f'{prefix} {lines[0]}', fg='yellow', bold=True)}\n")
             for line in lines[1:]:
                 formatter.write(f"{self._style(ctx, line, fg='bright_yellow')}\n")
 

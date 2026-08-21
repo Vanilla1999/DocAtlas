@@ -79,6 +79,12 @@ def test_cli_help():
     assert "setup" in result.output
     assert "mcp" in result.output
 
+    with patch("docmancer.cli.help._unicode_help_supported", return_value=False):
+        ascii_result = CliRunner().invoke(cli, ["--help"])
+    assert ascii_result.exit_code == 0
+    assert "DOCATLAS" in ascii_result.output
+    assert "█" not in ascii_result.output
+
 
 def test_fetch_command_uses_secure_fetcher_factory(tmp_path):
     document = MagicMock(source="https://docs.example.com/guide", content="# Guide")
@@ -275,9 +281,9 @@ def test_ingest_url_points_to_add():
 def test_cli_init_creates_project_sqlite_config(tmp_path):
     result = CliRunner().invoke(cli, ["init", "--dir", str(tmp_path)])
     assert result.exit_code == 0
-    config_file = tmp_path / "docmancer.yaml"
+    config_file = tmp_path / "docatlas.yaml"
     data = yaml.safe_load(config_file.read_text())
-    assert data["index"]["db_path"] == ".docmancer/docmancer.db"
+    assert data["index"]["db_path"] == ".docatlas/docatlas.db"
     assert "SQLite FTS5" in result.output
 
 
@@ -297,9 +303,9 @@ def test_load_config_bootstraps_user_config_when_no_local_config(tmp_path):
         finally:
             os.chdir(cwd)
 
-    user_config = fake_home / ".docmancer" / "docmancer.yaml"
+    user_config = fake_home / ".docatlas" / "docatlas.yaml"
     assert user_config.exists()
-    assert config.index.db_path == str((fake_home / ".docmancer" / "docmancer.db").resolve())
+    assert config.index.db_path == str((fake_home / ".docatlas" / "docatlas.db").resolve())
 
 
 def test_context_cli_uses_project_local_storage_topology(tmp_path):

@@ -7,7 +7,8 @@ from ._commands_part01 import _build_skill_content, _configure_ingest_logging, _
 
 def _create_claude_desktop_zip(config_path: str | Path | None) -> Path:
     content = _build_skill_content("claude_desktop_skill.md", config_path)
-    export_dir = _get_user_config_dir() / "exports" / "claude-desktop"
+    owned_home = _ensure_user_home(home_dir=Path.home())
+    export_dir = owned_home / "exports" / "claude-desktop"
     export_dir.mkdir(parents=True, exist_ok=True)
     zip_path = export_dir / "docatlas.zip"
     with zipfile.ZipFile(zip_path, "w", zipfile.ZIP_DEFLATED) as zf:
@@ -60,10 +61,29 @@ def _project_install_agents() -> set[str]:
             }
     try:
         payload = json.loads(state_path.read_text(encoding="utf-8"))
-        agents = payload.get("agents", [])
-        return {str(agent) for agent in agents if str(agent) in INSTALL_TARGETS}
-    except (json.JSONDecodeError, OSError, AttributeError):
-        return set()
+    except (json.JSONDecodeError, OSError) as exc:
+        raise click.ClickException(
+            f"Could not read project install state at {display_path(state_path)}; "
+            "refusing to modify shared project guidance."
+        ) from exc
+    if not isinstance(payload, dict):
+        raise click.ClickException(
+            f"Project install state at {display_path(state_path)} must be a JSON object; "
+            "refusing to modify shared project guidance."
+        )
+    agents = payload.get("agents")
+    if not isinstance(agents, list) or any(not isinstance(agent, str) for agent in agents):
+        raise click.ClickException(
+            f"Project install state at {display_path(state_path)} has an invalid agents list; "
+            "refusing to modify shared project guidance."
+        )
+    unknown = sorted(set(agents) - set(INSTALL_TARGETS))
+    if unknown:
+        raise click.ClickException(
+            f"Project install state at {display_path(state_path)} contains unknown agent ids; "
+            "refusing to modify shared project guidance."
+        )
+    return set(agents)
 
 
 def _write_project_install_agents(agents: set[str]) -> None:

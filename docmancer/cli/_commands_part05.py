@@ -369,7 +369,7 @@ def _emit_setup_readiness_summary(config, *, selected_agents: list[str], profile
 @click.command(
     cls=DocmancerCommand,
     context_settings=HELP_CONTEXT_SETTINGS,
-    short_help="Set up docmancer for local agent docs retrieval.",
+    short_help="Set up DocAtlas for local agent docs retrieval.",
     epilog=format_examples(
         "doc-atlas setup",
         "doc-atlas setup --yes",
@@ -388,7 +388,7 @@ def _emit_setup_readiness_summary(config, *, selected_agents: list[str], profile
 @click.option("--yes", "assume_yes", is_flag=True, default=False, help="Non-interactive defaults; never prompt.")
 @click.option("--offline", is_flag=True, default=False, help="Avoid network/model setup and prefer lexical retrieval.")
 @click.option("--vectors", type=click.Choice(["auto", "on", "off"], case_sensitive=False), default="auto", show_default=True, help="Vector setup policy.")
-@click.option("--project-local", is_flag=True, default=False, help="Create/use ./docmancer.yaml and project-local state.")
+@click.option("--project-local", is_flag=True, default=False, help="Create/use ./docatlas.yaml and project-local state.")
 @click.option("--config", "config_path", default=None, help="Path to DocAtlas YAML config.")
 def setup_cmd(
     install_all: bool,

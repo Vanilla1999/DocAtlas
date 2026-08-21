@@ -35,7 +35,11 @@ def resolved_user_home(*, home_dir: str | Path | None = None) -> Path:
 def ensure_user_home(*, home_dir: str | Path | None = None) -> Path:
     """Establish ownership before creating new user-level DocAtlas state."""
 
-    return ensure_owned_home(resolved_user_home(home_dir=home_dir))
+    resolution = resolve_home(home_dir=home_dir)
+    return ensure_owned_home(
+        resolution.path,
+        allow_legacy_claim=resolution.compatibility_legacy,
+    )
 
 
 def primary_user_config_path(*, home_dir: str | Path | None = None) -> Path:

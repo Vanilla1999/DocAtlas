@@ -665,6 +665,23 @@ def _install_skill_file(content: str, dest: Path) -> None:
         raise click.ClickException(f"Could not update {display_path(dest)} because {exc}.") from exc
     if legacy is not None:
         start_idx, end_idx = legacy
+        legacy_managed = existing[
+            start_idx + len(_LEGACY_AGENTS_MD_START):end_idx
+        ].strip()
+        old_front_matter, _ = _split_front_matter(legacy_managed)
+        legacy_prefix = (
+            existing[:start_idx]
+            .replace(_LEGACY_SKILL_FILE_OWNER, "")
+            .replace(_SKILL_FILE_OWNER, "")
+            .strip()
+        )
+        if old_front_matter and not legacy_prefix and _is_proven_docatlas_text(legacy_managed):
+            suffix = existing[end_idx + len(_LEGACY_AGENTS_MD_END):]
+            dest.write_text(
+                front_matter + _SKILL_FILE_OWNER + "\n" + marker_block + suffix,
+                encoding="utf-8",
+            )
+            return
         existing = (
             existing[:start_idx]
             + marker_block.rstrip("\n")
