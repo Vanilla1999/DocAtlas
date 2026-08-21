@@ -22,201 +22,68 @@ jobs:
           from pathlib import Path
           import ast
 
-          def replace_between(path: str, start_marker: str, end_marker: str, replacement: str) -> None:
+          NL = "\n"
+
+          def exact(path: str, old: str, new: str, expected: int) -> None:
               target = Path(path)
               text = target.read_text(encoding="utf-8")
-              start = text.index(start_marker)
-              end = text.index(end_marker, start)
-              updated = text[:start] + replacement + text[end:]
-              target.write_text(updated, encoding="utf-8")
+              count = text.count(old)
+              if count != expected:
+                  raise SystemExit(
+                      f"{path}: expected {expected} matches, got {count}: {old!r}"
+                  )
+              target.write_text(text.replace(old, new), encoding="utf-8")
 
           p1 = "docmancer/cli/_commands_part01.py"
-          replace_between(
+          exact(
               p1,
-              "def _install_skill_file",
-              "def _split_front_matter",
-              r'''def _install_skill_file(content: str, dest: Path) -> None:
-              try:
-                  _migrate_legacy_skill_file(dest)
-              except ValueError as exc:
-                  raise click.ClickException(str(exc)) from exc
-
-              front_matter, body = _split_front_matter(content)
-              marker_block = f"{_AGENTS_MD_START}\n{body.strip()}\n{_AGENTS_MD_END}\n"
-              if not dest.exists():
-                  dest.parent.mkdir(parents=True, exist_ok=True)
-                  dest.write_text(front_matter + _SKILL_FILE_OWNER + "\n" + marker_block, encoding="utf-8")
-                  return
-
-              existing = dest.read_text(encoding="utf-8")
-              for start_marker, end_marker in (
-                  (_AGENTS_MD_START, _AGENTS_MD_END),
-                  (_LEGACY_AGENTS_MD_START, _LEGACY_AGENTS_MD_END),
-              ):
-                  if existing.startswith(start_marker):
-                      end_idx = existing.find(end_marker)
-                      if end_idx != -1:
-                          managed = existing[len(start_marker):end_idx].strip()
-                          old_front_matter, _ = _split_front_matter(managed)
-                          if old_front_matter and _is_proven_docatlas_text(managed):
-                              suffix = existing[end_idx + len(end_marker):]
-                              dest.write_text(
-                                  front_matter + _SKILL_FILE_OWNER + "\n" + marker_block + suffix,
-                                  encoding="utf-8",
-                              )
-                              return
-
-              try:
-                  legacy = _legacy_managed_block(existing)
-              except ValueError as exc:
-                  raise click.ClickException(
-                      f"Could not update {display_path(dest)} because {exc}."
-                  ) from exc
-              if legacy is not None:
-                  start_idx, end_idx = legacy
-                  existing = (
-                      existing[:start_idx]
-                      + marker_block.rstrip("\n")
-                      + existing[end_idx + len(_LEGACY_AGENTS_MD_END):]
-                  )
-                  existing = existing.replace(_LEGACY_SKILL_FILE_OWNER, _SKILL_FILE_OWNER, 1)
-                  dest.write_text(existing, encoding="utf-8")
-
-              existing_front_matter, _ = _split_front_matter(existing)
-              if _SKILL_FILE_OWNER in existing and existing_front_matter:
-                  try:
-                      block = _current_managed_block(existing)
-                  except ValueError as exc:
-                      raise click.ClickException(
-                          f"Could not update {display_path(dest)} because {exc}."
-                      ) from exc
-                  if block is None:
-                      raise click.ClickException(
-                          f"Could not update {display_path(dest)} because its DocAtlas markers are missing."
-                      )
-                  start_idx, end_idx = block
-                  suffix = existing[end_idx + len(_AGENTS_MD_END):]
-                  dest.write_text(
-                      front_matter + _SKILL_FILE_OWNER + "\n" + marker_block + suffix,
-                      encoding="utf-8",
-                  )
-                  return
-              if front_matter and not existing_front_matter:
-                  _install_or_append_agents_md(dest, content)
-                  return
-              _install_or_append_agents_md(dest, body if existing_front_matter else content)
-
-
-              ''',
+              'marker_block = f"{_AGENTS_MD_START}' + NL + '{body.strip()}' + NL + '{_AGENTS_MD_END}' + NL + '"',
+              r'marker_block = f"{_AGENTS_MD_START}\n{body.strip()}\n{_AGENTS_MD_END}\n"',
+              1,
           )
-          replace_between(
+          exact(
               p1,
-              "def _install_or_append_agents_md",
-              "def _format_size",
-              r'''def _install_or_append_agents_md(dest: Path, content_body: str) -> None:
-              marker_block = f"{_AGENTS_MD_START}\n{content_body.strip()}\n{_AGENTS_MD_END}"
-              dest.parent.mkdir(parents=True, exist_ok=True)
-
-              if not dest.exists():
-                  dest.write_text(marker_block + "\n", encoding="utf-8")
-                  return
-
-              existing = dest.read_text(encoding="utf-8")
-              try:
-                  current = _current_managed_block(existing)
-                  legacy = None if current is not None else _legacy_managed_block(existing)
-              except ValueError as exc:
-                  raise click.ClickException(
-                      f"Could not update {display_path(dest)} because {exc}."
-                  ) from exc
-              if current is not None:
-                  start_idx, end_idx = current
-                  new_content = (
-                      existing[:start_idx]
-                      + marker_block
-                      + existing[end_idx + len(_AGENTS_MD_END):]
-                  )
-                  dest.write_text(new_content, encoding="utf-8")
-              elif legacy is not None:
-                  start_idx, end_idx = legacy
-                  new_content = (
-                      existing[:start_idx]
-                      + marker_block
-                      + existing[end_idx + len(_LEGACY_AGENTS_MD_END):]
-                  )
-                  new_content = new_content.replace(
-                      _LEGACY_SKILL_FILE_OWNER, _SKILL_FILE_OWNER, 1
-                  )
-                  dest.write_text(new_content, encoding="utf-8")
-              else:
-                  separator = "\n\n" if existing and not existing.endswith("\n\n") else ""
-                  dest.write_text(
-                      existing + separator + marker_block + "\n", encoding="utf-8"
-                  )
-
-
-              ''',
+              '_SKILL_FILE_OWNER + "' + NL + '" + marker_block',
+              r'_SKILL_FILE_OWNER + "\n" + marker_block',
+              3,
+          )
+          exact(
+              p1,
+              'marker_block.rstrip("' + NL + '")',
+              r'marker_block.rstrip("\n")',
+              1,
+          )
+          exact(
+              p1,
+              'marker_block = f"{_AGENTS_MD_START}' + NL + '{content_body.strip()}' + NL + '{_AGENTS_MD_END}"',
+              r'marker_block = f"{_AGENTS_MD_START}\n{content_body.strip()}\n{_AGENTS_MD_END}"',
+              1,
+          )
+          exact(
+              p1,
+              'marker_block + "' + NL + '"',
+              r'marker_block + "\n"',
+              2,
+          )
+          exact(
+              p1,
+              'separator = "' + NL + NL + '" if existing and not existing.endswith("' + NL + NL + '") else ""',
+              r'separator = "\n\n" if existing and not existing.endswith("\n\n") else ""',
+              1,
           )
 
           p2 = "docmancer/cli/_commands_part02.py"
-          replace_between(
+          exact(
               p2,
-              "def _write_project_install_agents",
-              "def _record_project_install",
-              r'''def _write_project_install_agents(agents: set[str]) -> None:
-              if not agents and not _LEGACY_PROJECT_INSTALL_STATE.exists():
-                  if _PROJECT_INSTALL_STATE.exists():
-                      _PROJECT_INSTALL_STATE.unlink()
-                  return
-              _PROJECT_INSTALL_STATE.parent.mkdir(parents=True, exist_ok=True)
-              _PROJECT_INSTALL_STATE.write_text(
-                  json.dumps({"agents": sorted(agents)}, indent=2) + "\n",
-                  encoding="utf-8",
-              )
-
-
-              ''',
+              'json.dumps({"agents": sorted(agents)}, indent=2) + "' + NL + '"',
+              r'json.dumps({"agents": sorted(agents)}, indent=2) + "\n"',
+              1,
           )
-          replace_between(
+          exact(
               p2,
-              "def _remove_managed_instruction_block",
-              "def _register_mcp_for_agent",
-              r'''def _remove_managed_instruction_block(dest: Path) -> bool:
-              if not dest.exists():
-                  return False
-              existing = dest.read_text(encoding="utf-8")
-              try:
-                  block = _current_managed_block(existing)
-                  marker_end = _AGENTS_MD_END
-                  if block is None:
-                      block = _legacy_managed_block(existing)
-                      marker_end = _LEGACY_AGENTS_MD_END
-              except ValueError as exc:
-                  raise click.ClickException(
-                      f"Could not uninstall from {display_path(dest)} because {exc}."
-                  ) from exc
-              if block is None:
-                  return False
-              start_idx, end_idx = block
-              remaining = existing[:start_idx] + existing[end_idx + len(marker_end):]
-              updated = remaining.strip()
-              front_matter, body = _split_front_matter(remaining.lstrip())
-              owned_skill_file = (
-                  _SKILL_FILE_OWNER in remaining or _LEGACY_SKILL_FILE_OWNER in remaining
-              )
-              cleaned_body = body.replace(_SKILL_FILE_OWNER, "").replace(
-                  _LEGACY_SKILL_FILE_OWNER, ""
-              )
-              if owned_skill_file and front_matter and not cleaned_body.strip():
-                  dest.unlink()
-              elif updated:
-                  dest.write_text(updated + "\n", encoding="utf-8")
-              else:
-                  dest.unlink()
-              return True
-
-
-              ''',
+              'dest.write_text(updated + "' + NL + '", encoding="utf-8")',
+              r'dest.write_text(updated + "\n", encoding="utf-8")',
+              1,
           )
 
           for path in (
