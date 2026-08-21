@@ -17,6 +17,7 @@ from docmancer.cli.commands import (
     inspect_cmd,
     install_cmd,
     list_cmd,
+    migrate_home_cmd,
     patch_review_cmd,
     query_cmd,
     remove_cmd,
@@ -63,7 +64,7 @@ def _show_version(ctx: click.Context, param: click.Parameter, value: bool) -> No
     callback=_show_version,
     help="Show the version and exit.",
 )
-@click.option("--config", "config_path", default=None, hidden=True, help="Path to docmancer.yaml.")
+@click.option("--config", "config_path", default=None, hidden=True, help="Path to docatlas.yaml.")
 @click.pass_context
 def cli(ctx, config_path: str | None):
     """Compress documentation context so agents spend tokens on code."""
@@ -85,6 +86,7 @@ cli.add_command(list_cmd, "list")
 cli.add_command(remove_cmd, "remove")
 cli.add_command(clear_cmd, "clear")
 cli.add_command(clear_index_cmd, "clear-index")
+cli.add_command(migrate_home_cmd, "migrate-home")
 cli.add_command(doctor_cmd, "doctor")
 cli.add_command(init_cmd, "init")
 cli.add_command(fetch_cmd, "fetch")
