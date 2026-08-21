@@ -1,8 +1,8 @@
 name: PR111 focused diagnostic
 
 on:
-  push:
-    branches: [p0/docatlas-state-identity]
+  pull_request:
+    branches: [main]
 
 permissions:
   contents: read
