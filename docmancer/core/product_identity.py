@@ -60,6 +60,12 @@ _LEGACY_STRONG_PATHS = (
 )
 
 
+def _absolute(path: str | Path) -> Path:
+    """Make a path absolute without dereferencing its final symlink."""
+
+    return Path(os.path.abspath(str(Path(path).expanduser())))
+
+
 def resolve_home(
     *,
     explicit_path: str | Path | None = None,
@@ -71,23 +77,27 @@ def resolve_home(
     ``DOCATLAS_HOME`` is authoritative. ``DOCMANCER_HOME`` is retained only as
     an explicit one-major compatibility input. The legacy default
     ``~/.docmancer`` is never consulted implicitly.
+
+    Resolution deliberately does not dereference the final path component.
+    Ownership inspection must see a symlink root as a symlink and fail closed
+    rather than normalizing it away before the safety check.
     """
 
     if explicit_path is not None:
-        return HomeResolution(Path(explicit_path).expanduser().resolve(), "explicit")
+        return HomeResolution(_absolute(explicit_path), "explicit")
     values = os.environ if env is None else env
     primary = str(values.get(PRODUCT_HOME_ENV) or "").strip()
     if primary:
-        return HomeResolution(Path(primary).expanduser().resolve(), "docatlas_env")
+        return HomeResolution(_absolute(primary), "docatlas_env")
     legacy = str(values.get(LEGACY_HOME_ENV) or "").strip()
     if legacy:
         return HomeResolution(
-            Path(legacy).expanduser().resolve(),
+            _absolute(legacy),
             "legacy_env",
             compatibility_legacy=True,
         )
     base = Path(home_dir).expanduser() if home_dir is not None else Path.home()
-    return HomeResolution((base / DEFAULT_HOME_NAME).resolve(), "default")
+    return HomeResolution(_absolute(base / DEFAULT_HOME_NAME), "default")
 
 
 def docatlas_home() -> Path:
@@ -96,7 +106,7 @@ def docatlas_home() -> Path:
 
 def legacy_default_home(*, home_dir: str | Path | None = None) -> Path:
     base = Path(home_dir).expanduser() if home_dir is not None else Path.home()
-    return (base / LEGACY_HOME_NAME).resolve()
+    return _absolute(base / LEGACY_HOME_NAME)
 
 
 def warn_if_legacy_home(resolution: HomeResolution) -> None:
@@ -115,6 +125,8 @@ def _owner_path(path: Path) -> Path:
 
 def _read_owner(path: Path) -> tuple[dict[str, object] | None, str | None]:
     marker = _owner_path(path)
+    if marker.is_symlink():
+        return None, "invalid ownership marker: marker is a symlink"
     if not marker.is_file():
         return None, None
     try:
@@ -127,9 +139,9 @@ def _read_owner(path: Path) -> tuple[dict[str, object] | None, str | None]:
 
 
 def inspect_state(path: str | Path) -> StateInspection:
-    raw = Path(path).expanduser()
+    raw = _absolute(path)
     if raw.is_symlink():
-        return StateInspection(raw.absolute(), "ambiguous", ("state root is a symlink",))
+        return StateInspection(raw, "ambiguous", ("state root is a symlink",))
     root = raw.resolve()
     if not root.exists():
         return StateInspection(root, "missing")
@@ -197,8 +209,9 @@ def ensure_owned_home(
     Foreign and ambiguous roots always fail closed.
     """
 
-    root = Path(path).expanduser().resolve() if path is not None else docatlas_home()
-    inspection = inspect_state(root)
+    raw = Path(path).expanduser() if path is not None else docatlas_home()
+    inspection = inspect_state(raw)
+    root = inspection.path
     if inspection.classification == "owned_docatlas":
         return root
     if inspection.classification in {"foreign", "ambiguous"}:
