@@ -16,6 +16,9 @@ import release_request as rr
 
 ROOT = Path(__file__).resolve().parents[1]
 REQUEST_PATH = Path(".github/release-requests/v1.3.1.json")
+DECISION_PATH = Path(
+    "docs/decisions/2026-08-22-defer-public-release-and-open-p1-harness.md"
+)
 
 
 def payload(base_sha: str, *, delta: list[str] | None = None) -> dict:
@@ -102,11 +105,16 @@ def synthetic_repo() -> Iterator[tuple[Path, str, str]]:
 
 def test_committed_contract() -> None:
     request = rr.load_request(ROOT / REQUEST_PATH)
-    assert request.execute is True
+    assert request.execute is False
     assert request.version == "1.3.1"
     assert request.tag == "v1.3.1"
     assert request.publisher == rr.EXPECTED_PUBLISHER
     assert request.public_tools == rr.EXPECTED_PUBLIC_TOOLS
+
+    decision = (ROOT / DECISION_PATH).read_text(encoding="utf-8")
+    assert "execute_on_merge=false" in decision
+    assert "remains active until a later reviewed change explicitly re-enables" in decision
+    assert "P0.6 closure" in decision
 
     workflow = (ROOT / ".github/workflows/release-request.yml").read_text(
         encoding="utf-8"
