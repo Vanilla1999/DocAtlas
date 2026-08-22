@@ -1,0 +1,164 @@
+name: TEMP repair DocAtlas 1.3.1 release state
+
+on:
+  push:
+    branches: [p0/repair-release-state-1.3.1]
+    paths:
+      - .github/workflows/repair-release-state-1.3.1.yml
+
+permissions:
+  contents: write
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
+  DOCMANCER_OFFLINE: "1"
+  UV_VERSION: "0.9.25"
+
+jobs:
+  repair:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with:
+          ref: p0/repair-release-state-1.3.1
+          fetch-depth: 0
+
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: "3.12"
+
+      - name: Materialize the reviewed 1.3.1 source candidate
+        run: python scripts/materialize_release_1_3_1.py
+
+      - name: Remove leaked one-shot carriers and add the permanent repair contract
+        shell: bash
+        run: |
+          rm -f .github/workflows/materialize-*.yml
+          rm -f scripts/materialize_*.py
+          rm -f .github/workflows/repair-release-state-1.3.1.yml
+          rm -f tests/test_tagged_release_state.py
+          rm -f docs/release-evidence/v1.3.1-tag.json
+
+          cat > tests/test_release_state_repair.py <<'PY'
+          from __future__ import annotations
+
+          import json
+          from pathlib import Path
+
+          from docmancer._version import __version__
+
+          ROOT = Path(__file__).resolve().parents[1]
+
+
+          def test_release_state_is_semantic_clean_and_consistent() -> None:
+              assert __version__ == "1.3.1"
+
+              leaked_workflows = sorted(
+                  path.name
+                  for path in (ROOT / ".github/workflows").glob("materialize-*.yml")
+              )
+              leaked_scripts = sorted(
+                  path.name for path in (ROOT / "scripts").glob("materialize_*.py")
+              )
+              assert leaked_workflows == []
+              assert leaked_scripts == []
+
+              changelog = (ROOT / "CHANGELOG.md").read_text(encoding="utf-8")
+              assert changelog.index("## 1.3.1") < changelog.index("## 1.3.0")
+              assert "invalid-publisher" in changelog
+
+              workflow = (ROOT / ".github/workflows/publish.yml").read_text(
+                  encoding="utf-8"
+              )
+              assert "for example v1.3.1" in workflow
+              assert "    environment: release-current" in workflow
+              assert "    environment: release\n" not in workflow
+
+              identity = (ROOT / "docs/release-identity.md").read_text(
+                  encoding="utf-8"
+              )
+              assert "current source release candidate is **DocAtlas 1.3.1**" in identity
+              assert "v1.3.0" in identity
+              assert "must not be moved, replaced, or reused" in identity
+              assert "environment: release-current" in identity
+
+              scorecard = (ROOT / "docs/public-truth-scorecard.md").read_text(
+                  encoding="utf-8"
+              )
+              assert "Status: **INCOMPLETE**" in scorecard
+              assert "Trusted Publisher identity | `pending`" in scorecard
+              assert "Exact public artifact identity | `pending`" in scorecard
+              assert "Exact public MCP behavior | `pending`" in scorecard
+              assert "Cross-platform public install | `pending`" in scorecard
+              assert "doc-atlas==1.3.1" in scorecard
+
+              roadmap = (ROOT / "roadmap/README.md").read_text(encoding="utf-8")
+              assert "P0.5 — Publish and verify public `1.3.1`" in roadmap
+              assert "superseded pre-public attempt" in roadmap
+
+
+          def test_tag_evidence_cannot_be_confused_with_public_release_closure() -> None:
+              evidence_path = ROOT / "docs/release-evidence/v1.3.1-tag.json"
+              if not evidence_path.exists():
+                  identity = (ROOT / "docs/release-identity.md").read_text(
+                      encoding="utf-8"
+                  )
+                  assert "The tag is created only after" in identity
+                  return
+
+              evidence = json.loads(evidence_path.read_text(encoding="utf-8"))
+              assert evidence["tag"] == "v1.3.1"
+              assert evidence["target_commit_sha"] == evidence["peeled_commit_sha"]
+              assert evidence["public_artifact_status"] in {"pending", "green"}
+          PY
+
+      - name: Refresh lockfile from the single source version
+        run: |
+          python -m pip install "uv==$UV_VERSION"
+          uv lock
+
+      - name: Install release validation dependencies
+        run: |
+          python -m pip install -e ".[dev]"
+          python -m pip install build "hatchling<1.27"
+
+      - name: Validate the repaired semantic tree
+        shell: bash
+        run: |
+          pytest -q \
+            tests/test_release_state_repair.py \
+            tests/test_patch_release_identity.py \
+            tests/test_release_gate.py \
+            tests/docs/test_user_facing_docs_branding.py \
+            tests/docs/test_python_module_policy_and_manifest.py \
+            tests/docs/test_source_search_edit_readiness.py
+          python scripts/run_recovery_contract_gate.py
+          python scripts/run_recovery_mutation_gate.py
+          python scripts/check_python_module_size.py
+          python -m compileall -q docmancer scripts tests
+          git diff --check
+
+          test "$(find .github/workflows -maxdepth 1 -type f -name 'materialize-*.yml' | wc -l)" -eq 0
+          test "$(find scripts -maxdepth 1 -type f -name 'materialize_*.py' | wc -l)" -eq 0
+          grep -qx '__version__ = "1.3.1"' docmancer/_version.py
+          grep -q 'environment: release-current' .github/workflows/publish.yml
+
+      - name: Build and gate the exact source candidate
+        run: |
+          rm -rf dist
+          python -m build
+          python scripts/release_gate.py --manifest dist/release-manifest.json
+
+      - name: Commit only the final semantic repair tree
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          if git diff --cached --quiet; then
+            echo "::error::repair produced no semantic diff"
+            exit 1
+          fi
+          git commit -m "fix: repair and clean the DocAtlas 1.3.1 release state"
+          git push origin HEAD:p0/repair-release-state-1.3.1
