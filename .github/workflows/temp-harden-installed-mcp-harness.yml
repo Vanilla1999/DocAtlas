@@ -1,0 +1,220 @@
+name: TEMP harden installed MCP harness
+
+on:
+  push:
+    branches: [p1/installed-mcp-live-harness]
+    paths:
+      - .github/workflows/temp-harden-installed-mcp-harness.yml
+
+permissions:
+  contents: write
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with:
+          ref: p1/installed-mcp-live-harness
+          fetch-depth: 0
+
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: "3.12"
+
+      - name: Apply exact reviewed hardening edits
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          from pathlib import Path
+
+          benchmark_path = Path("eval/agent_developer_v1/installed_mcp_benchmark.py")
+          text = benchmark_path.read_text(encoding="utf-8")
+
+          old_env = '''        env = dict(os.environ)
+          env.pop("PYTHONPATH", None)
+          env.pop("DOCMANCER_HOME", None)
+          env.update(
+              {
+                  "HOME": str(user_home),
+                  "USERPROFILE": str(user_home),
+                  "DOCATLAS_HOME": str(home),
+                  "DOCMANCER_OFFLINE": "1",
+                  "NO_PROXY": "*",
+              }
+          )
+          '''
+          new_env = '''        env = {
+              key: value
+              for key in (
+                  "PATH",
+                  "SYSTEMROOT",
+                  "WINDIR",
+                  "TMPDIR",
+                  "TEMP",
+                  "TMP",
+                  "LANG",
+                  "LC_ALL",
+                  "PYTHONUTF8",
+              )
+              if (value := os.environ.get(key))
+          }
+          env.update(
+              {
+                  "HOME": str(user_home),
+                  "USERPROFILE": str(user_home),
+                  "DOCATLAS_HOME": str(home),
+                  "DOCMANCER_OFFLINE": "1",
+                  "NO_PROXY": "*",
+              }
+          )
+          '''
+          if text.count(old_env) != 1:
+              raise SystemExit("expected exactly one inherited environment block")
+          text = text.replace(old_env, new_env, 1)
+
+          old_finish = '''                                "action": {
+                                      "action": "finish",
+                                      "reason": str(action["reason"]),
+                                  },
+          '''
+          new_finish = '''                                "action": {
+                                      "action": "finish",
+                                      "reason_sha256": hashlib.sha256(
+                                          str(action["reason"]).encode("utf-8")
+                                      ).hexdigest(),
+                                  },
+          '''
+          if text.count(old_finish) != 1:
+              raise SystemExit("expected exactly one raw finish reason block")
+          text = text.replace(old_finish, new_finish, 1)
+
+          marker = '''\n\ndef _aggregate(\n'''
+          helper = '''\n\ndef _evaluator_failure_stages(score: dict[str, Any]) -> set[str]:
+              errors = [str(value).lower() for value in score.get("errors") or ()]
+              stages: set[str] = set()
+              if (
+                  score.get("scope_contract_ok") is False
+                  or any(
+                      token in error
+                      for error in errors
+                      for token in (
+                          "source",
+                          "scope",
+                          "module candidate",
+                          "module_path",
+                      )
+                  )
+              ):
+                  stages.add("retrieval")
+              if (
+                  int(score.get("false_supported") or 0) > 0
+                  or any(
+                      token in error
+                      for error in errors
+                      for token in (
+                          "supported result",
+                          "support",
+                          "expected status",
+                          "answer_available",
+                      )
+                  )
+              ):
+                  stages.add("support")
+              if (
+                  score.get("recovery_contract_ok") is False
+                  or any(
+                      token in error
+                      for error in errors
+                      for token in (
+                          "recovery",
+                          "docs_status",
+                          "next action",
+                          "recommended action",
+                      )
+                  )
+              ):
+                  stages.add("recovery")
+              return stages
+          \n\ndef _aggregate(\n'''
+          if text.count(marker) != 1:
+              raise SystemExit("aggregate insertion marker not found exactly once")
+          text = text.replace(marker, helper, 1)
+
+          old_score = '''                score["passed"] = bool(
+                      score["passed"] and not planning_errors
+                  )
+                  score = redact(score, project)
+          '''
+          new_score = '''                score["passed"] = bool(
+                      score["passed"] and not planning_errors
+                  )
+                  failure_stages.extend(_evaluator_failure_stages(score))
+                  score = redact(score, project)
+          '''
+          if text.count(old_score) != 1:
+              raise SystemExit("score classification marker not found exactly once")
+          text = text.replace(old_score, new_score, 1)
+          benchmark_path.write_text(text, encoding="utf-8")
+
+          self_test_path = Path("scripts/installed_mcp_contract_self_test.py")
+          self_test = self_test_path.read_text(encoding="utf-8")
+          self_test = self_test.replace(
+              "import copy\n",
+              "from pathlib import Path\n",
+              1,
+          )
+          insertion = '''\n\ndef test_server_environment_and_finish_output_are_allowlisted() -> None:
+              source = Path(
+                  "eval/agent_developer_v1/installed_mcp_benchmark.py"
+              ).read_text(encoding="utf-8")
+              assert "env = dict(os.environ)" not in source
+              assert '"OPENAI_API_KEY"' not in source
+              assert '"GH_TOKEN"' not in source
+              assert '"reason": str(action["reason"])' not in source
+              assert '"reason_sha256": hashlib.sha256(' in source
+              assert "_evaluator_failure_stages(score)" in source
+          '''
+          main_marker = '''\n\ndef main() -> int:\n'''
+          if self_test.count(main_marker) != 1:
+              raise SystemExit("self-test main marker not found exactly once")
+          self_test = self_test.replace(main_marker, insertion + main_marker, 1)
+          tuple_marker = '''        test_unknown_origin_and_failure_stage_fail_closed,
+              )
+          '''
+          tuple_replacement = '''        test_unknown_origin_and_failure_stage_fail_closed,
+                  test_server_environment_and_finish_output_are_allowlisted,
+              )
+          '''
+          if self_test.count(tuple_marker) != 1:
+              raise SystemExit("self-test tuple marker not found exactly once")
+          self_test = self_test.replace(tuple_marker, tuple_replacement, 1)
+          self_test_path.write_text(self_test, encoding="utf-8")
+          PY
+
+          rm .github/workflows/temp-harden-installed-mcp-harness.yml
+          python -m compileall -q eval/agent_developer_v1 scripts/installed_mcp_contract_self_test.py
+          python scripts/installed_mcp_contract_self_test.py
+          git diff --check
+
+      - name: Commit only final reviewable files
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          changed="$(git diff --cached --name-only)"
+          expected="$(printf '%s\n' \
+            eval/agent_developer_v1/installed_mcp_benchmark.py \
+            scripts/installed_mcp_contract_self_test.py)"
+          test "$changed" = "$expected" || {
+            echo "::error::unexpected hardening diff"
+            printf 'actual:\n%s\nexpected:\n%s\n' "$changed" "$expected"
+            exit 1
+          }
+          git commit -m "fix(p1): isolate provider secrets from installed MCP"
+          git push origin HEAD:p1/installed-mcp-live-harness
