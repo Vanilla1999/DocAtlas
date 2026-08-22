@@ -1,5 +1,11 @@
 import json
+import os
+import tempfile
+import textwrap
 from pathlib import Path
+from unittest.mock import patch
+
+import pytest
 
 from docmancer._version import __version__
 
@@ -34,6 +40,21 @@ def test_patch_release_identity_is_single_source_and_preserves_failed_tag_audit(
     assert "Trusted Publisher identity | `pending`" in scorecard
     assert "doc-atlas==1.3.1" in scorecard
     assert "rerun only the failed jobs" in scorecard
+
+    tag_evidence = json.loads(
+        (ROOT / "docs/release-evidence/v1.3.1-tag.json").read_text(
+            encoding="utf-8"
+        )
+    )
+    assert tag_evidence["tag"] == "v1.3.1"
+    assert tag_evidence["tag_object_sha"] == (
+        "77bced8c530c88c57d2e6c5f58cb717bfe837a9f"
+    )
+    assert tag_evidence["target_commit_sha"] == tag_evidence["peeled_commit_sha"]
+    assert tag_evidence["target_commit_sha"] == (
+        "cfa9ab5c365a28d1a4af63afe9f1d53b19532d89"
+    )
+    assert tag_evidence["public_artifact_status"] == "pending"
 
     evidence = json.loads(
         (ROOT / "docs/release-evidence/v1.3.1-publish-attempt-1.json").read_text(
@@ -83,3 +104,45 @@ def test_publish_workflow_uses_replacement_identity_not_failed_environment():
     assert "### `invalid-publisher` recovery" in checklist
     assert "Retry only the failed jobs of the original canonical run" in checklist
     assert "do not introduce `PYPI_API_TOKEN` as a fallback" in checklist
+
+    publisher_section = workflow.split(
+        "      - name: Record expected Trusted Publisher identity\n", 1
+    )[1]
+    embedded = publisher_section.split("          python - <<'PY'\n", 1)[1].split(
+        "\n          PY\n", 1
+    )[0]
+    code = textwrap.dedent(embedded)
+    compile(code, "publish.yml:publisher-context", "exec")
+
+    good_env = {
+        "EVENT_NAME": "workflow_dispatch",
+        "REF_VALUE": "refs/heads/main",
+        "RELEASE_TAG": "v1.3.1",
+        "REPOSITORY": "Vanilla1999/DocAtlas",
+        "REPOSITORY_OWNER": "Vanilla1999",
+        "RUN_ATTEMPT": "2",
+        "RUN_ID": "32587903026",
+        "WORKFLOW_REF": (
+            "Vanilla1999/DocAtlas/.github/workflows/publish.yml@refs/heads/main"
+        ),
+    }
+    with tempfile.TemporaryDirectory() as raw, patch.dict(
+        os.environ, {**good_env, "RUNNER_TEMP": raw}, clear=False
+    ):
+        exec(compile(code, "publish.yml:publisher-context", "exec"), {})
+        payload = json.loads(
+            (Path(raw) / "docatlas-publisher-context.json").read_text(
+                encoding="utf-8"
+            )
+        )
+    assert payload["secret_material_recorded"] is False
+    assert payload["expected_publisher_claims"]["environment"] == "release-current"
+    assert payload["github_context"]["release_tag"] == "v1.3.1"
+
+    with tempfile.TemporaryDirectory() as raw, patch.dict(
+        os.environ,
+        {**good_env, "REPOSITORY": "Wrong/Repo", "RUNNER_TEMP": raw},
+        clear=False,
+    ):
+        with pytest.raises(SystemExit, match="Trusted Publisher context mismatch"):
+            exec(compile(code, "publish.yml:publisher-context", "exec"), {})
