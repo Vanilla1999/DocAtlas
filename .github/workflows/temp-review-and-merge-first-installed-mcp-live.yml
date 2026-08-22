@@ -1,0 +1,252 @@
+name: TEMP review and merge first installed MCP live capture
+
+on:
+  push:
+    branches: [p1/installed-mcp-real-model-capture-clean]
+    paths:
+      - .github/workflows/temp-review-and-merge-first-installed-mcp-live.yml
+
+permissions:
+  contents: write
+  actions: read
+  checks: read
+  pull-requests: write
+
+concurrency:
+  group: temp-review-and-merge-first-installed-mcp-live
+  cancel-in-progress: false
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
+  PR_NUMBER: "137"
+
+jobs:
+  review-and-merge:
+    runs-on: ubuntu-latest
+    timeout-minutes: 110
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with:
+          ref: p1/installed-mcp-real-model-capture-clean
+          fetch-depth: 0
+
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: "3.12"
+
+      - name: Resolve exact semantic head and PR base
+        id: identity
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          carrier_head="$(git rev-parse HEAD)"
+          tested_head="$(git rev-parse HEAD^)"
+          tested_tree="$(git rev-parse "$tested_head^{tree}")"
+          test "$(git diff --name-only "$tested_head" "$carrier_head")" = ".github/workflows/temp-review-and-merge-first-installed-mcp-live.yml"
+          gh api "repos/${GITHUB_REPOSITORY}/pulls/${PR_NUMBER}" > /tmp/pr.json
+          base_sha="$(python - <<'PY'
+          import json
+          row=json.load(open('/tmp/pr.json',encoding='utf-8'))
+          assert row['state']=='open',row
+          assert row['base']['ref']=='main',row
+          assert row['head']['ref']=='p1/installed-mcp-real-model-capture-clean',row
+          print(row['base']['sha'])
+          PY
+          )"
+          git fetch origin main --force
+          test "$(git rev-parse origin/main)" = "$base_sha"
+          echo "carrier_head=$carrier_head" >> "$GITHUB_OUTPUT"
+          echo "tested_head=$tested_head" >> "$GITHUB_OUTPUT"
+          echo "tested_tree=$tested_tree" >> "$GITHUB_OUTPUT"
+          echo "base_sha=$base_sha" >> "$GITHUB_OUTPUT"
+
+      - name: Verify exact final semantic allowlist and claim boundary
+        env:
+          TESTED_HEAD: ${{ steps.identity.outputs.tested_head }}
+          BASE_SHA: ${{ steps.identity.outputs.base_sha }}
+        run: |
+          set -euo pipefail
+          expected="$(printf '%s\n' \
+            .github/workflows/installed-mcp-agent-live-v1.yml \
+            .github/workflows/installed-mcp-agent-v1.yml \
+            eval/installed_mcp_agent_v1/README.md \
+            eval/installed_mcp_agent_v1/github_models_driver.py \
+            eval/installed_mcp_agent_v1/provider_free_command_driver.py \
+            eval/installed_mcp_agent_v1/results/pre_public_github_models_project_docs_round_trip.json \
+            eval/installed_mcp_agent_v1/results/pre_public_github_models_project_docs_round_trip.summary.json \
+            roadmap/README.md \
+            scripts/run_installed_mcp_agent_harness.py \
+            scripts/verify_installed_mcp_agent_report.py)"
+          actual="$(git diff --name-only "$BASE_SHA" "$TESTED_HEAD")"
+          test "$actual" = "$expected" || {
+            echo "::error::unexpected final live-capture diff"
+            printf 'actual:\n%s\nexpected:\n%s\n' "$actual" "$expected"
+            exit 1
+          }
+          test "$(git ls-tree -r --name-only "$TESTED_HEAD" | grep -c '^.github/workflows/temp-' || true)" -eq 0
+          git show "$TESTED_HEAD:.github/release-requests/v1.3.1.json" | python -c 'import json,sys; assert json.load(sys.stdin)["execute_on_merge"] is False'
+          ! git grep -n 'PYPI_API_TOKEN' "$TESTED_HEAD" -- .github scripts docs eval roadmap
+          git show "$TESTED_HEAD:.github/workflows/installed-mcp-agent-live-v1.yml" | grep -q '^  workflow_dispatch:'
+          ! git show "$TESTED_HEAD:.github/workflows/installed-mcp-agent-live-v1.yml" | grep -q '^  push:'
+          git show "$TESTED_HEAD:.github/workflows/installed-mcp-agent-live-v1.yml" | grep -q '^  models: read$'
+          git show "$TESTED_HEAD:scripts/run_installed_mcp_agent_harness.py" | grep -q 'PROJECT_ROOT_TOKEN'
+          git show "$TESTED_HEAD:scripts/run_installed_mcp_agent_harness.py" | grep -q 'driver_environment_allowlisted'
+          git show "$TESTED_HEAD:scripts/run_installed_mcp_agent_harness.py" | grep -q '"model_turns": state.model_turns'
+          git show "$TESTED_HEAD:scripts/run_installed_mcp_agent_harness.py" | grep -q '"agent_truth_closed": False'
+          git show "$TESTED_HEAD:scripts/run_installed_mcp_agent_harness.py" | grep -q '"public_release_truth_closed": False'
+          git show "$TESTED_HEAD:roadmap/README.md" | grep -q 'P1.1.*Installed-MCP live benchmark harness'
+          git show "$TESTED_HEAD:roadmap/README.md" | grep -q 'Status:.*in_progress.*sequencing exception'
+          git diff --check "$BASE_SHA" "$TESTED_HEAD"
+
+      - name: Wait for all exact semantic-head gates
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TESTED_HEAD: ${{ steps.identity.outputs.tested_head }}
+        run: |
+          set -euo pipefail
+          for attempt in $(seq 1 540); do
+            gh api \
+              -H 'Accept: application/vnd.github+json' \
+              "repos/${GITHUB_REPOSITORY}/commits/${TESTED_HEAD}/check-runs?per_page=100" \
+              > /tmp/check-runs.json
+            status="$(python - <<'PY'
+          import json
+          rows=json.load(open('/tmp/check-runs.json',encoding='utf-8')).get('check_runs',[])
+          required={'required-ci','required-release','provider-free-positive-control'}
+          latest={}
+          for row in rows:
+              name=row.get('name')
+              if name not in required: continue
+              old=latest.get(name)
+              if old is None or str(row.get('started_at') or '')>str(old.get('started_at') or ''):
+                  latest[name]=row
+          if not required<=latest.keys():
+              print('pending')
+          else:
+              conclusions={name:latest[name].get('conclusion') for name in sorted(required)}
+              failed={name:value for name,value in conclusions.items() if value not in {None,'','success'}}
+              if failed: print('failed:'+json.dumps(failed,sort_keys=True))
+              elif all(value=='success' for value in conclusions.values()): print('success')
+              else: print('pending')
+          PY
+            )"
+            case "$status" in
+              success) echo 'Exact live-capture gates: PASS'; break ;;
+              failed:*) echo "::error::$status"; cat /tmp/check-runs.json; exit 1 ;;
+            esac
+            if [ "$attempt" -eq 540 ]; then
+              echo '::error::required exact-head checks did not become green'
+              cat /tmp/check-runs.json
+              exit 1
+            fi
+            sleep 10
+          done
+
+      - name: Re-verify committed real-model evidence on tested bytes
+        env:
+          TESTED_HEAD: ${{ steps.identity.outputs.tested_head }}
+        run: |
+          set -euo pipefail
+          git checkout --detach "$TESTED_HEAD"
+          python -m py_compile \
+            scripts/run_installed_mcp_agent_harness.py \
+            scripts/verify_installed_mcp_agent_report.py \
+            eval/installed_mcp_agent_v1/provider_free_command_driver.py \
+            eval/installed_mcp_agent_v1/github_models_driver.py
+          python scripts/verify_installed_mcp_agent_report.py --self-test
+          report=eval/installed_mcp_agent_v1/results/pre_public_github_models_project_docs_round_trip.json
+          summary=eval/installed_mcp_agent_v1/results/pre_public_github_models_project_docs_round_trip.summary.json
+          python scripts/verify_installed_mcp_agent_report.py "$report"
+          python - "$report" "$summary" <<'PY'
+          import json,sys
+          report=json.load(open(sys.argv[1],encoding='utf-8'))
+          summary=json.load(open(sys.argv[2],encoding='utf-8'))
+          assert report['outcome']['success'] is True
+          assert report['first_divergence']['stage']=='none'
+          assert report['model']['real_model'] is True
+          assert report['model']['provider']=='github-models'
+          assert report['model']['request_ids']
+          assert report['model_turns'] and report['trajectory']
+          assert report['privacy']['provider_payload_absolute_path_scan']=='pass'
+          assert report['privacy']['provider_payload_credential_scan']=='pass'
+          assert report['privacy']['driver_environment_allowlisted'] is True
+          assert report['claim_boundary']['agent_truth_closed'] is False
+          assert report['claim_boundary']['public_release_truth_closed'] is False
+          assert summary['semantic_commit_sha']==report['source']['commit_sha']
+          assert summary['success'] is True
+          assert summary['first_divergence']==report['first_divergence']
+          assert summary['request_count']==len(report['model']['request_ids'])
+          assert summary['model_turn_count']==len(report['model_turns'])
+          assert summary['tool_calls']==report['budgets']['tool_calls_used']
+          assert summary['repairs']==report['budgets']['repairs_used']
+          assert summary['wheel_sha256']==report['package']['artifact_sha256']
+          assert summary['schema_sha256']==report['mcp']['tool_schemas_sha256']
+          PY
+          git checkout p1/installed-mcp-real-model-capture-clean
+
+      - name: Remove carrier and prove tree identity
+        id: cleanup
+        env:
+          TESTED_TREE: ${{ steps.identity.outputs.tested_tree }}
+        run: |
+          set -euo pipefail
+          rm .github/workflows/temp-review-and-merge-first-installed-mcp-live.yml
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          test "$(git diff --cached --name-only)" = ".github/workflows/temp-review-and-merge-first-installed-mcp-live.yml"
+          git commit -m "chore: remove temporary live-capture review carrier"
+          final_head="$(git rev-parse HEAD)"
+          final_tree="$(git rev-parse HEAD^{tree})"
+          test "$final_tree" = "$TESTED_TREE"
+          git push origin HEAD:p1/installed-mcp-real-model-capture-clean
+          echo "final_head=$final_head" >> "$GITHUB_OUTPUT"
+          echo "final_tree=$final_tree" >> "$GITHUB_OUTPUT"
+
+      - name: Merge the exact reviewed tree
+        env:
+          GH_TOKEN: ${{ github.token }}
+          FINAL_HEAD: ${{ steps.cleanup.outputs.final_head }}
+          FINAL_TREE: ${{ steps.cleanup.outputs.final_tree }}
+          TESTED_TREE: ${{ steps.identity.outputs.tested_tree }}
+          BASE_SHA: ${{ steps.identity.outputs.base_sha }}
+        run: |
+          set -euo pipefail
+          test "$FINAL_TREE" = "$TESTED_TREE"
+          for attempt in $(seq 1 30); do
+            remote_head="$(gh api "repos/${GITHUB_REPOSITORY}/pulls/${PR_NUMBER}" --jq .head.sha)"
+            if [ "$remote_head" = "$FINAL_HEAD" ]; then break; fi
+            if [ "$attempt" -eq 30 ]; then echo '::error::PR head did not reach cleanup commit'; exit 1; fi
+            sleep 2
+          done
+          test "$(gh api "repos/${GITHUB_REPOSITORY}/pulls/${PR_NUMBER}" --jq .base.sha)" = "$BASE_SHA"
+          gh pr ready "$PR_NUMBER" --repo "$GITHUB_REPOSITORY"
+          gh api --method PUT \
+            "repos/${GITHUB_REPOSITORY}/pulls/${PR_NUMBER}/merge" \
+            -f "sha=$FINAL_HEAD" \
+            -f "merge_method=merge" \
+            -f "commit_title=Capture the first privacy-safe real-model installed-MCP trajectory (#${PR_NUMBER})" \
+            -f "commit_message=Add a path-tokenized and environment-allowlisted GitHub Models adapter, a complete model-turn ledger, a successful pre-public installed-wheel trajectory, and permanent evidence gates without closing Public Truth or Agent Truth." \
+            > /tmp/merge.json
+          python - <<'PY'
+          import json
+          row=json.load(open('/tmp/merge.json',encoding='utf-8'))
+          assert row.get('merged') is True,row
+          print('Merged:',row.get('sha'))
+          PY
+
+      - name: Verify clean final main
+        env:
+          TESTED_TREE: ${{ steps.identity.outputs.tested_tree }}
+        run: |
+          set -euo pipefail
+          for attempt in $(seq 1 30); do
+            git fetch origin main --force
+            if [ "$(git rev-parse origin/main^{tree})" = "$TESTED_TREE" ]; then break; fi
+            if [ "$attempt" -eq 30 ]; then echo '::error::main tree does not match tested live tree'; exit 1; fi
+            sleep 2
+          done
+          test "$(git ls-tree -r --name-only origin/main | grep -c '^.github/workflows/temp-' || true)" -eq 0
+          git show origin/main:.github/release-requests/v1.3.1.json | python -c 'import json,sys; assert json.load(sys.stdin)["execute_on_merge"] is False'
+          echo 'Final real-model installed-MCP tree: PASS'
