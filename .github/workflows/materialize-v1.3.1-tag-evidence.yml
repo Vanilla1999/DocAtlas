@@ -1,0 +1,146 @@
+name: TEMP materialize v1.3.1 tag evidence
+
+on:
+  push:
+    branches: [ops/tag-v1.3.1]
+    paths:
+      - .github/workflows/materialize-v1.3.1-tag-evidence.yml
+
+permissions:
+  contents: write
+  actions: read
+  checks: read
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
+
+jobs:
+  tag-and-record:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with:
+          ref: ops/tag-v1.3.1
+          fetch-depth: 0
+
+      - name: Resolve and validate the exact release commit
+        id: target
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          git fetch origin main --tags --force
+          target="$(git rev-parse origin/main)"
+          version="$(git show "$target:docmancer/_version.py" | sed -n 's/^__version__ = "\([^"]*\)"/\1/p')"
+          test "$version" = "1.3.1"
+          git show "$target:CHANGELOG.md" | grep -q '^## 1\.3\.1'
+          git show "$target:.github/workflows/publish.yml" | grep -q '^    environment: release-current$'
+          printf 'target=%s\n' "$target" >> "$GITHUB_OUTPUT"
+
+      - name: Require post-merge main gates
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TARGET: ${{ steps.target.outputs.target }}
+        run: |
+          set -euo pipefail
+          for attempt in $(seq 1 180); do
+            gh api \
+              -H 'Accept: application/vnd.github+json' \
+              "repos/${GITHUB_REPOSITORY}/commits/${TARGET}/check-runs?per_page=100" \
+              > /tmp/check-runs.json
+            if python - <<'PY'
+          import json
+          rows = json.load(open('/tmp/check-runs.json', encoding='utf-8')).get('check_runs', [])
+          latest = {}
+          for row in rows:
+              name = row.get('name')
+              if name in {'required-ci', 'required-release'}:
+                  previous = latest.get(name)
+                  if previous is None or str(row.get('started_at') or '') > str(previous.get('started_at') or ''):
+                      latest[name] = row
+          required = {'required-ci', 'required-release'}
+          ok = required <= latest.keys() and all(latest[name].get('conclusion') == 'success' for name in required)
+          raise SystemExit(0 if ok else 1)
+          PY
+            then
+              break
+            fi
+            if [ "$attempt" -eq 180 ]; then
+              echo '::error::required main checks did not become green'
+              cat /tmp/check-runs.json
+              exit 1
+            fi
+            sleep 10
+          done
+
+      - name: Create immutable annotated tag
+        id: tag
+        env:
+          TARGET: ${{ steps.target.outputs.target }}
+        run: |
+          set -euo pipefail
+          git fetch origin --tags --force
+          if git rev-parse -q --verify refs/tags/v1.3.1 >/dev/null; then
+            existing="$(git rev-parse 'v1.3.1^{}')"
+            test "$existing" = "$TARGET" || {
+              echo "::error::v1.3.1 already points to $existing, expected $TARGET"
+              exit 1
+            }
+          else
+            git config user.name 'github-actions[bot]'
+            git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+            git tag -a v1.3.1 "$TARGET" -m 'DocAtlas 1.3.1'
+            git push origin refs/tags/v1.3.1
+          fi
+          printf 'tag_object=%s\n' "$(git rev-parse v1.3.1)" >> "$GITHUB_OUTPUT"
+          printf 'peeled_commit=%s\n' "$(git rev-parse 'v1.3.1^{}')" >> "$GITHUB_OUTPUT"
+
+      - name: Write bounded tag evidence and remove carrier
+        env:
+          TARGET: ${{ steps.target.outputs.target }}
+          TAG_OBJECT: ${{ steps.tag.outputs.tag_object }}
+          PEELED_COMMIT: ${{ steps.tag.outputs.peeled_commit }}
+        run: |
+          set -euo pipefail
+          mkdir -p docs/release-evidence
+          python - <<'PY'
+          import json, os
+          from pathlib import Path
+          payload = {
+              'schema_version': 1,
+              'product': 'DocAtlas',
+              'distribution': 'doc-atlas',
+              'version': '1.3.1',
+              'tag': 'v1.3.1',
+              'tag_object_sha': os.environ['TAG_OBJECT'],
+              'target_commit_sha': os.environ['TARGET'],
+              'peeled_commit_sha': os.environ['PEELED_COMMIT'],
+              'required_checks': {
+                  'required-ci': 'success',
+                  'required-release': 'success',
+              },
+              'source_version_verified': True,
+              'publish_environment': 'release-current',
+              'public_artifact_status': 'pending',
+              'workflow_run_id': os.environ['GITHUB_RUN_ID'],
+          }
+          assert payload['target_commit_sha'] == payload['peeled_commit_sha']
+          Path('docs/release-evidence/v1.3.1-tag.json').write_text(
+              json.dumps(payload, indent=2, sort_keys=True) + '\n', encoding='utf-8'
+          )
+          PY
+          rm .github/workflows/materialize-v1.3.1-tag-evidence.yml
+
+      - name: Validate and commit evidence-only diff
+        run: |
+          set -euo pipefail
+          python -m json.tool docs/release-evidence/v1.3.1-tag.json >/dev/null
+          git diff --check
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -A
+          changed="$(git diff --cached --name-only)"
+          test "$changed" = 'docs/release-evidence/v1.3.1-tag.json'
+          git commit -m 'docs: record immutable v1.3.1 tag evidence'
+          git push origin HEAD:ops/tag-v1.3.1
