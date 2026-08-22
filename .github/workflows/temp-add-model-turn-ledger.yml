@@ -1,0 +1,275 @@
+name: TEMP add installed MCP model-turn ledger
+
+on:
+  push:
+    branches: [p1/installed-mcp-real-model-capture]
+    paths:
+      - .github/workflows/temp-add-model-turn-ledger.yml
+
+permissions:
+  contents: write
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
+
+jobs:
+  ledger:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with:
+          ref: p1/installed-mcp-real-model-capture
+          fetch-depth: 0
+
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: "3.12"
+
+      - name: Record every provider turn, including pre-tool failures
+        run: |
+          set -euo pipefail
+          # The provider-boundary hardening may be committing concurrently.
+          for attempt in $(seq 1 60); do
+            git fetch origin p1/installed-mcp-real-model-capture --force
+            git reset --hard origin/p1/installed-mcp-real-model-capture
+            if grep -q 'provider_payload_absolute_path_scan' scripts/run_installed_mcp_agent_harness.py; then
+              break
+            fi
+            if [ "$attempt" -eq 60 ]; then
+              echo '::error::provider-boundary hardening did not land'
+              exit 1
+            fi
+            sleep 2
+          done
+          # Restore this workflow after reset if a concurrent commit did not contain it.
+          test -f .github/workflows/temp-add-model-turn-ledger.yml || {
+            echo '::error::ledger workflow was lost during branch synchronization'
+            exit 1
+          }
+          python - <<'PY'
+          from pathlib import Path
+
+          def replace_once(path: str, old: str, new: str) -> None:
+              target = Path(path)
+              text = target.read_text(encoding='utf-8')
+              count = text.count(old)
+              if count != 1:
+                  raise SystemExit(f'{path}: expected one replacement, found {count}: {old[:100]!r}')
+              target.write_text(text.replace(old, new, 1), encoding='utf-8')
+
+          harness = 'scripts/run_installed_mcp_agent_harness.py'
+          replace_once(
+              harness,
+              '''    trajectory: list[dict[str, Any]] = field(default_factory=list)
+    ephemeral_history: list[dict[str, Any]] = field(default_factory=list)
+''',
+              '''    trajectory: list[dict[str, Any]] = field(default_factory=list)
+    model_turns: list[dict[str, Any]] = field(default_factory=list)
+    ephemeral_history: list[dict[str, Any]] = field(default_factory=list)
+''',
+          )
+          replace_once(
+              harness,
+              '''                try:
+                    if driver == "command":
+                        provider_payload_sizes.append(
+                            _assert_provider_payload_safe(
+                                turn_payload,
+                                secret_values=provider_secret_values,
+                            )
+                        )
+                    response = (
+''',
+              '''                provider_payload_bytes = len(canonical_json(turn_payload).encode("utf-8"))
+                if driver == "command":
+                    provider_payload_bytes = _assert_provider_payload_safe(
+                        turn_payload,
+                        secret_values=provider_secret_values,
+                    )
+                    provider_payload_sizes.append(provider_payload_bytes)
+                turn_record: dict[str, Any] = {
+                    "turn": turn,
+                    "provider_payload_sha256": sha256_json(turn_payload),
+                    "provider_payload_bytes": provider_payload_bytes,
+                    "status": "pending",
+                }
+                try:
+                    response = (
+''',
+          )
+          replace_once(
+              harness,
+              '''                    record_model_provenance(response, provenance)
+                    message_type, message = validate_driver_response(response)
+                except HarnessError as exc:
+                    state.divergence("adapter_protocol", str(exc))
+''',
+              '''                    record_model_provenance(response, provenance)
+                    message_type, message = validate_driver_response(response)
+                    request_id = response.get("request_id")
+                    turn_record.update({
+                        "status": "valid",
+                        "response_type": message_type,
+                        "provider": provenance.provider,
+                        "model": provenance.model,
+                        "request_id": (
+                            str(request_id)[:200]
+                            if isinstance(request_id, str)
+                            else ""
+                        ),
+                        "failure_stage": "none",
+                        "reason": "",
+                    })
+                    state.model_turns.append(turn_record)
+                except HarnessError as exc:
+                    safe_reason = str(
+                        _provider_safe_value(
+                            str(exc), provider_path_replacements
+                        )
+                    )[:240]
+                    turn_record.update({
+                        "status": "error",
+                        "response_type": "none",
+                        "provider": provenance.provider,
+                        "model": provenance.model,
+                        "request_id": "",
+                        "failure_stage": "adapter_protocol",
+                        "reason": safe_reason,
+                    })
+                    state.model_turns.append(turn_record)
+                    state.divergence("adapter_protocol", safe_reason)
+''',
+          )
+          replace_once(
+              harness,
+              '''        "trajectory": state.trajectory,
+        "budgets": {
+''',
+              '''        "model_turns": state.model_turns,
+        "trajectory": state.trajectory,
+        "budgets": {
+''',
+          )
+
+          verifier = 'scripts/verify_installed_mcp_agent_report.py'
+          replace_once(
+              verifier,
+              '''    trajectory = report.get("trajectory")
+    require(isinstance(trajectory, list) and trajectory, "trajectory must contain tool attempts")
+''',
+              '''    model_turns = report.get("model_turns")
+    require(isinstance(model_turns, list) and model_turns, "model_turns must contain every provider turn")
+    for index, turn_value in enumerate(model_turns):
+        turn = object_value(turn_value, f"model_turns[{index}]")
+        require(turn.get("turn") == index, "model turn indices are not contiguous")
+        require(
+            isinstance(turn.get("provider_payload_sha256"), str)
+            and SHA256_RE.fullmatch(turn["provider_payload_sha256"]),
+            "model turn payload SHA-256 is invalid",
+        )
+        require(
+            isinstance(turn.get("provider_payload_bytes"), int)
+            and 0 <= turn["provider_payload_bytes"] <= 64_000,
+            "model turn payload size is invalid",
+        )
+        require(turn.get("status") in {"valid", "error"}, "model turn status is invalid")
+        require(turn.get("failure_stage") in FAILURE_STAGES, "model turn failure stage is invalid")
+        require(isinstance(turn.get("reason"), str) and len(turn["reason"]) <= 240, "model turn reason is invalid")
+        if turn.get("status") == "valid":
+            require(turn.get("response_type") in {"tool_call", "final"}, "valid model turn response type is invalid")
+            require(turn.get("failure_stage") == "none", "valid model turn has a failure stage")
+        else:
+            require(turn.get("response_type") == "none", "error model turn response type is invalid")
+            require(turn.get("failure_stage") == "adapter_protocol", "error model turn stage is invalid")
+
+    trajectory = report.get("trajectory")
+    require(isinstance(trajectory, list), "trajectory must be a list")
+''',
+          )
+          replace_once(
+              verifier,
+              '''    if success:
+        require(source_found and marker_found and final_marker, "success lacks expected evidence/final marker")
+''',
+              '''    if success:
+        require(source_found and marker_found and final_marker, "success lacks expected evidence/final marker")
+        require(bool(trajectory), "successful outcome has no tool attempts")
+''',
+          )
+          replace_once(
+              verifier,
+              '''        "trajectory": [
+''',
+              '''        "model_turns": [
+            {
+                "turn": 0,
+                "provider_payload_sha256": "9" * 64,
+                "provider_payload_bytes": 1024,
+                "status": "valid",
+                "response_type": "tool_call",
+                "provider": "scripted",
+                "model": "deterministic-positive-control",
+                "request_id": "scripted-turn-0",
+                "failure_stage": "none",
+                "reason": "",
+            }
+        ],
+        "trajectory": [
+''',
+          )
+          replace_once(
+              verifier,
+              '''    raw_result = copy.deepcopy(sample)
+    raw_result["trajectory"][0]["raw_result"] = {"secret": "x"}
+    expect_invalid(raw_result, "forbidden evidence fields")
+
+    print("Installed MCP Agent v1 report verifier: SELF-TEST PASS (7/7)")
+''',
+              '''    raw_result = copy.deepcopy(sample)
+    raw_result["trajectory"][0]["raw_result"] = {"secret": "x"}
+    expect_invalid(raw_result, "forbidden evidence fields")
+
+    missing_turn = copy.deepcopy(sample)
+    missing_turn["model_turns"] = []
+    expect_invalid(missing_turn, "model_turns")
+
+    print("Installed MCP Agent v1 report verifier: SELF-TEST PASS (8/8)")
+''',
+          )
+
+          readme = 'eval/installed_mcp_agent_v1/README.md'
+          replace_once(
+              readme,
+              '''- every attempted tool call with argument/result hashes and failure stage;
+''',
+              '''- every provider/model turn, including adapter failures and final-before-tool responses;
+- every attempted tool call with argument/result hashes and failure stage;
+''',
+          )
+          PY
+          rm .github/workflows/temp-add-model-turn-ledger.yml
+          python -m py_compile \
+            scripts/run_installed_mcp_agent_harness.py \
+            scripts/verify_installed_mcp_agent_report.py
+          python scripts/verify_installed_mcp_agent_report.py --self-test
+          git diff --check
+
+      - name: Commit model-turn evidence ledger
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          changed="$(git diff --cached --name-only)"
+          expected="$(printf '%s\n' \
+            eval/installed_mcp_agent_v1/README.md \
+            scripts/run_installed_mcp_agent_harness.py \
+            scripts/verify_installed_mcp_agent_report.py)"
+          test "$changed" = "$expected" || {
+            echo "::error::unexpected model-turn ledger diff"
+            printf 'actual:\n%s\nexpected:\n%s\n' "$changed" "$expected"
+            exit 1
+          }
+          git commit -m "feat(p1): record every real-model turn before MCP execution"
+          git push origin HEAD:p1/installed-mcp-real-model-capture
