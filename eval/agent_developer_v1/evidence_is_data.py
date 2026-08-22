@@ -83,11 +83,37 @@ def _candidate(case: dict[str, Any]) -> dict[str, Any]:
     }
 
 
-def evaluate_case(case: dict[str, Any]) -> dict[str, Any]:
-    requirements = build_requirements(
-        str(case["question"]),
-        public_requirements=list(case.get("public_requirements") or ()),
+def _case_requirements(case: dict[str, Any]) -> tuple[Any, str]:
+    base = [dict(row) for row in case.get("public_requirements") or ()]
+    variants = [("native", base)]
+    for key in ("id", "requirement_id"):
+        variants.append((
+            key,
+            [
+                {**row, key: f"{case['id']}:{index}"}
+                for index, row in enumerate(base, start=1)
+            ],
+        ))
+    errors: list[str] = []
+    for shape, rows in variants:
+        try:
+            return (
+                build_requirements(
+                    str(case["question"]),
+                    public_requirements=rows,
+                ),
+                shape,
+            )
+        except (TypeError, ValueError, KeyError) as exc:
+            errors.append(f"{shape}:{exc.__class__.__name__}")
+    raise ValueError(
+        "no reviewed public-requirement row shape was accepted: "
+        + ",".join(errors)
     )
+
+
+def evaluate_case(case: dict[str, Any]) -> dict[str, Any]:
+    requirements, public_requirement_shape = _case_requirements(case)
     decision = select_evidence(
         [_candidate(case)],
         question=str(case["question"]),
@@ -122,6 +148,7 @@ def evaluate_case(case: dict[str, Any]) -> dict[str, Any]:
             str(value) for value in case.get("expected_assignment_sources") or ()
         }),
         "assignments": assignments,
+        "public_requirement_shape": public_requirement_shape,
         "requirements_hash": str(decision.support_decision.requirements_hash),
         "assignment_hash": str(decision.support_decision.assignment_hash),
         "decision_hash": str(decision.support_decision.decision_hash),
