@@ -57,7 +57,13 @@ def _installed_mcp_files(repo_root: Path) -> list[Path]:
     for path in repo_root.rglob("*"):
         if not path.is_file():
             continue
-        relative = path.relative_to(repo_root).as_posix().casefold()
+        relative_path = path.relative_to(repo_root)
+        if any(
+            part in {".git", ".venv", "__pycache__", ".pytest_cache"}
+            for part in relative_path.parts
+        ):
+            continue
+        relative = relative_path.as_posix().casefold()
         if "temp-p1" in relative:
             continue
         if "installed_mcp" in relative or "installed-mcp" in relative:
