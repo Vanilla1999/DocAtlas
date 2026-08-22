@@ -117,10 +117,13 @@ def test_committed_contract() -> None:
     assert "checks: read" in workflow
     assert "required-ci" in workflow
     assert "require-pypi-absent" in workflow
+    assert "python scripts/release_gate.py --manifest dist/release-manifest.json" in workflow
     assert 'git tag -a "$RELEASE_TAG"' in workflow
+    assert 'git cat-file -t "$RELEASE_TAG"' in workflow
     assert "git tag -f" not in workflow
     assert "gh workflow run publish.yml" in workflow
     assert "PYPI_API_TOKEN" not in workflow
+    assert 'test "${{ steps.pretag.outcome }}" = "success"' in workflow
     assert "P0.6 remains unchanged in Git" in workflow
 
     checklist = (ROOT / "docs/RELEASE_CHECKLIST.md").read_text(encoding="utf-8")
