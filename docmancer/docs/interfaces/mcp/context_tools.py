@@ -157,9 +157,8 @@ def _bound_module_recovery_projection(
     if payload["estimated_tokens"] <= limit:
         return
 
-    # Module ambiguity is itself the recovery contract: preserve every complete
-    # candidate path and compact surrounding diagnostics before sacrificing the
-    # ambiguity set. A caller cannot choose safely from a truncated candidate list.
+    # Preserve the complete ambiguity set whenever the requested budget allows it.
+    # Compact surrounding diagnostics before sacrificing candidate coverage.
     for key in (
         "operational_status", "context_available", "disposition", "edit_ready",
         "source_search_status", "requires_confirmation", "decision_hash", "reason_code",
@@ -169,6 +168,16 @@ def _bound_module_recovery_projection(
         payload.pop(key, None)
     payload["missing"] = [_MODULE_RECOVERY_MISSING]
     payload["module_candidates"] = candidates
+    _refresh_projection_estimate(payload)
+    if payload["estimated_tokens"] <= limit:
+        return
+
+    # Under a tighter budget, retain one complete exact locator rather than
+    # truncating a path or failing the entire recovery projection.
+    candidates.sort(
+        key=lambda row: (len(str(row["module_path"])), str(row["module_path"]))
+    )
+    payload["module_candidates"] = [candidates[0]]
     _refresh_projection_estimate(payload)
     if payload["estimated_tokens"] <= limit:
         return
@@ -190,14 +199,14 @@ def _bound_module_recovery_projection(
         "answer_available": False,
         "support_status": "insufficient_evidence",
         "operational_reason_code": reason,
-        "module_candidates": candidates,
+        "module_candidates": [candidates[0]],
         "estimated_tokens": 0,
     })
     if minimal_action:
         payload["recommended_next_action"] = minimal_action
     _refresh_projection_estimate(payload)
     if payload["estimated_tokens"] > limit:
-        raise ValueError("complete module-recovery projection exceeds the requested budget")
+        raise ValueError("minimum module-recovery projection exceeds the requested budget")
 
 
 def context_tools(tools: list[dict[str, Any]]) -> list[dict[str, Any]]:
