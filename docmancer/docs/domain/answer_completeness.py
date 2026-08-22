@@ -293,7 +293,10 @@ def evaluate_project_answer_completeness(
         "source_search_required": source_search_required,
         "source_search_status": source_search_status,
         "disposition": "search_local_source" if source_search_required else "use_context",
-        "edit_ready": not source_search_required and status == "exact",
+        # Missing documentation delegates proof to local source search; it does
+        # not block the edit workflow. Index/preflight failures are handled by
+        # their separate recovery payloads and remain non-edit-ready.
+        "edit_ready": status == "exact" or source_search_required,
         "reason_codes": reason_codes,
     }
     return {
@@ -346,7 +349,7 @@ def derive_project_answer_completeness(
         "source_search_required": not supported,
         "source_search_status": "not_required" if supported else "required",
         "disposition": "answer" if supported else "search_local_source",
-        "edit_ready": supported,
+        "edit_ready": supported or bool(result["recommended_next_actions"]),
         "legacy_diagnostics": legacy_diagnostics,
     })
     if supported:

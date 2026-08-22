@@ -575,7 +575,7 @@ def test_partial_navigational_docs_result_fails_closed():
     assert payload["status"] == "insufficient_evidence"
     assert "answer" not in payload
     assert payload["disposition"] == "search_local_source"
-    assert payload["edit_ready"] is False
+    assert payload["edit_ready"] is True
     assert payload["source_search_status"] == "required"
     assert payload["requires_confirmation"] is False
     assert payload["recommended_next_action"]["tool"] == "code_search"

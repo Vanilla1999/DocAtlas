@@ -302,7 +302,7 @@ def _annotate_recovery_handoff(
     elif recovery.get("tool") == "code_search":
         projection.update({
             "disposition": "search_local_source",
-            "edit_ready": False,
+            "edit_ready": True,
             "source_search_status": "required",
             "requires_confirmation": False,
         })

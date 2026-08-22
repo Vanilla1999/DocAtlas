@@ -269,7 +269,7 @@ new_help_request_screen, ToastUtils, and routes.
     assert result.answer_completeness["source_search_required"] is True
     assert result.answer_completeness["source_search_status"] == "required"
     assert result.answer_completeness["disposition"] == "search_local_source"
-    assert result.answer_completeness["edit_ready"] is False
+    assert result.answer_completeness["edit_ready"] is True
     assert "Вернуть в работу" in result.answer_completeness["missing_terms"]
     assert "Активная" in result.answer_completeness["missing_terms"]
     source_action = result.recommended_next_actions[-1]

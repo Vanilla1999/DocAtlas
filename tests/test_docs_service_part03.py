@@ -139,7 +139,7 @@ roots:
     assert index_witness_payload is not None
     assert index_witness_payload["status"] == "insufficient_evidence"
     assert index_witness_payload["kind"] == "patch_context"
-    assert index_witness_payload["edit_ready"] is False
+    assert index_witness_payload["edit_ready"] is True
     assert index_witness_payload["recommended_next_action"]["tool"] == "code_search"
     assert "library_docs_service.py" in index_witness_payload["recommended_next_action"]["suggested_doc_paths"]
 
@@ -161,7 +161,7 @@ roots:
     assert novel_index_witness_payload is not None
     assert novel_index_witness_payload["status"] == "insufficient_evidence"
     assert novel_index_witness_payload["kind"] == "patch_context"
-    assert novel_index_witness_payload["edit_ready"] is False
+    assert novel_index_witness_payload["edit_ready"] is True
     assert novel_index_witness_payload["recommended_next_action"]["tool"] == "code_search"
     assert "library_docs_service.py" in novel_index_witness_payload["recommended_next_action"]["suggested_doc_paths"]
 
