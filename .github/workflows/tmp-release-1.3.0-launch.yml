@@ -1,0 +1,117 @@
+name: TEMP launch DocAtlas 1.3.0 release
+
+on:
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  actions: write
+  contents: write
+
+concurrency:
+  group: temp-release-1.3.0-launch
+  cancel-in-progress: false
+
+jobs:
+  launch:
+    if: github.event.pull_request.head.ref == 'ops/release-1.3.0-launch' && github.actor == 'Vanilla1999'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    env:
+      EXPECTED_SHA: 42c3bf1fccc839dad4be4077b0b2c6a203f9bbac
+      EXPECTED_TREE: 43ab91a69d73c5aa3a6ea0ba50917530e8fb7bc9
+      RELEASE_TAG: v1.3.0
+      RELEASE_VERSION: 1.3.0
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+        with:
+          ref: main
+          fetch-depth: 0
+          persist-credentials: true
+
+      - name: Fail-closed release preflight
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          actual_sha="$(git rev-parse HEAD)"
+          actual_tree="$(git rev-parse 'HEAD^{tree}')"
+          test "$actual_sha" = "$EXPECTED_SHA"
+          test "$actual_tree" = "$EXPECTED_TREE"
+          test -z "$(git status --porcelain)"
+
+          source_version="$(python -c 'from docmancer._version import __version__; print(__version__)')"
+          test "$source_version" = "$RELEASE_VERSION"
+          grep -Fq "## [$RELEASE_VERSION]" CHANGELOG.md
+          grep -Fq "Development Status :: 4 - Beta" pyproject.toml
+
+          remote_tag="$(git ls-remote --tags origin "refs/tags/$RELEASE_TAG" | awk '{print $1}')"
+          if [ -n "$remote_tag" ] && [ "$remote_tag" != "$EXPECTED_SHA" ]; then
+            echo "::error::$RELEASE_TAG already points to $remote_tag instead of $EXPECTED_SHA"
+            exit 1
+          fi
+
+          pypi_status="$(python - <<'PY'
+          import urllib.error
+          import urllib.request
+
+          url = "https://pypi.org/pypi/doc-atlas/1.3.0/json"
+          request = urllib.request.Request(
+              url,
+              headers={"Cache-Control": "no-cache", "User-Agent": "DocAtlas-release-launcher/1"},
+          )
+          try:
+              with urllib.request.urlopen(request, timeout=30) as response:
+                  print(response.status)
+          except urllib.error.HTTPError as exc:
+              print(exc.code)
+          PY
+          )"
+          test "$pypi_status" = "404"
+
+          echo "Release preflight: PASS"
+          echo "main=$actual_sha tree=$actual_tree tag=$RELEASE_TAG pypi_status=$pypi_status"
+
+      - name: Create immutable release tag
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          remote_tag="$(git ls-remote --tags origin "refs/tags/$RELEASE_TAG" | awk '{print $1}')"
+          if [ -z "$remote_tag" ]; then
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git tag "$RELEASE_TAG" "$EXPECTED_SHA"
+            git push origin "refs/tags/$RELEASE_TAG"
+          fi
+
+          actual_tag="$(git ls-remote --tags origin "refs/tags/$RELEASE_TAG" | awk '{print $1}')"
+          test "$actual_tag" = "$EXPECTED_SHA"
+          echo "$RELEASE_TAG -> $actual_tag"
+
+      - name: Dispatch canonical publish workflow
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+
+          payload="$(printf '{\"ref\":\"main\",\"inputs\":{\"tag\":\"%s\"}}' "$RELEASE_TAG")"
+          status="$(curl --silent --show-error \
+            --output "$RUNNER_TEMP/dispatch-response.json" \
+            --write-out '%{http_code}' \
+            --request POST \
+            --header 'Accept: application/vnd.github+json' \
+            --header "Authorization: Bearer $GH_TOKEN" \
+            --header 'X-GitHub-Api-Version: 2022-11-28' \
+            "https://api.github.com/repos/$GITHUB_REPOSITORY/actions/workflows/publish.yml/dispatches" \
+            --data "$payload")"
+
+          if [ "$status" != "204" ]; then
+            cat "$RUNNER_TEMP/dispatch-response.json" || true
+            echo "::error::publish workflow dispatch returned HTTP $status"
+            exit 1
+          fi
+
+          echo "Canonical publish workflow dispatched for $RELEASE_TAG from main."
