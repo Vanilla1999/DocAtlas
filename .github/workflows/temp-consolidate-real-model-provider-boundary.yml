@@ -1,0 +1,583 @@
+name: TEMP consolidate real-model provider boundary
+
+on:
+  push:
+    branches: [p1/installed-mcp-real-model-capture-clean]
+    paths:
+      - .github/workflows/temp-consolidate-real-model-provider-boundary.yml
+
+permissions:
+  contents: write
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
+
+jobs:
+  consolidate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with:
+          ref: p1/installed-mcp-real-model-capture-clean
+          fetch-depth: 0
+
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: "3.12"
+
+      - name: Materialize one coherent provider boundary
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          from pathlib import Path
+
+          def replace_once(path: str, old: str, new: str) -> None:
+              target = Path(path)
+              text = target.read_text(encoding='utf-8')
+              count = text.count(old)
+              if count != 1:
+                  raise SystemExit(f'{path}: expected one replacement, found {count}: {old[:100]!r}')
+              target.write_text(text.replace(old, new, 1), encoding='utf-8')
+
+          harness = 'scripts/run_installed_mcp_agent_harness.py'
+          verifier = 'scripts/verify_installed_mcp_agent_report.py'
+          readme = 'eval/installed_mcp_agent_v1/README.md'
+          control_driver = 'eval/installed_mcp_agent_v1/provider_free_command_driver.py'
+
+          harness_text = Path(harness).read_text(encoding='utf-8')
+          if 'PROJECT_ROOT_TOKEN = "$DOCATLAS_PROJECT_ROOT"' not in harness_text:
+              replace_once(
+                  harness,
+                  'SENSITIVE_KEY_RE = re.compile(r"(?i)(authorization|api[_-]?key|token|password|secret)")\n',
+                  '''SENSITIVE_KEY_RE = re.compile(r"(?i)(authorization|api[_-]?key|token|password|secret)")
+PROJECT_ROOT_TOKEN = "$DOCATLAS_PROJECT_ROOT"
+RUN_ROOT_TOKEN = "$DOCATLAS_RUN_ROOT"
+USER_HOME_TOKEN = "$DOCATLAS_USER_HOME"
+STATE_HOME_TOKEN = "$DOCATLAS_STATE_HOME"
+HARNESS_ROOT_TOKEN = "$DOCATLAS_HARNESS_ROOT"
+BASE_DRIVER_ENV_NAMES = {
+    "PATH", "PATHEXT", "SYSTEMROOT", "WINDIR", "COMSPEC",
+    "HOME", "USERPROFILE", "TMPDIR", "TMP", "TEMP",
+    "LANG", "LC_ALL", "PYTHONIOENCODING",
+}
+''',
+              )
+              replace_once(
+                  harness,
+                  '''def adapter_message(
+    *,
+    command: str,
+    turn_payload: dict[str, Any],
+    cwd: Path,
+) -> dict[str, Any]:
+''',
+                  '''def _provider_safe_value(value: Any, replacements: Mapping[str, str]) -> Any:
+    if isinstance(value, dict):
+        return {
+            str(key): _provider_safe_value(child, replacements)
+            for key, child in value.items()
+        }
+    if isinstance(value, list):
+        return [_provider_safe_value(child, replacements) for child in value]
+    if isinstance(value, tuple):
+        return [_provider_safe_value(child, replacements) for child in value]
+    if isinstance(value, str):
+        result = value
+        for raw, token in sorted(replacements.items(), key=lambda item: len(item[0]), reverse=True):
+            if not raw:
+                continue
+            result = result.replace(raw, token)
+            result = result.replace(raw.replace("/", "\\\\"), token)
+        return result
+    return value
+
+
+def _restore_provider_tokens(value: Any, replacements: Mapping[str, str]) -> Any:
+    inverse = {token: raw for raw, token in replacements.items()}
+    if isinstance(value, dict):
+        return {
+            str(key): _restore_provider_tokens(child, replacements)
+            for key, child in value.items()
+        }
+    if isinstance(value, list):
+        return [_restore_provider_tokens(child, replacements) for child in value]
+    if isinstance(value, str):
+        result = value
+        for token, raw in inverse.items():
+            result = result.replace(token, raw)
+        return result
+    return value
+
+
+def _driver_environment(names: Sequence[str]) -> dict[str, str]:
+    allowed = set(BASE_DRIVER_ENV_NAMES)
+    for name in names:
+        if not re.fullmatch(r"[A-Z][A-Z0-9_]{0,127}", name):
+            raise HarnessError(f"invalid --driver-env name: {name!r}")
+        allowed.add(name)
+    return {name: os.environ[name] for name in sorted(allowed) if name in os.environ}
+
+
+def _assert_provider_payload_safe(payload: dict[str, Any], *, secret_values: Sequence[str]) -> int:
+    rendered = canonical_json(payload)
+    encoded = rendered.encode("utf-8")
+    if len(encoded) > 64_000:
+        raise HarnessError("provider-visible turn exceeds 64 KiB")
+    for pattern in ABSOLUTE_PATH_PATTERNS:
+        match = pattern.search(rendered)
+        if match:
+            raise HarnessError(
+                f"provider-visible turn contains an absolute path: {match.group(0)[:160]}"
+            )
+    for value in secret_values:
+        if len(value) >= 8 and value in rendered:
+            raise HarnessError("provider-visible turn contains a credential value")
+    return len(encoded)
+
+
+def adapter_message(
+    *,
+    command: str,
+    turn_payload: dict[str, Any],
+    cwd: Path,
+    driver_env_names: Sequence[str],
+) -> dict[str, Any]:
+''',
+              )
+              replace_once(harness, '        env=dict(os.environ),\n', '        env=_driver_environment(driver_env_names),\n')
+              replace_once(
+                  harness,
+                  '    real_model: bool,\n) -> dict[str, Any]:\n',
+                  '    real_model: bool,\n    driver_env_names: Sequence[str],\n) -> dict[str, Any]:\n',
+              )
+              replace_once(
+                  harness,
+                  '''    tool_rows: list[dict[str, Any]] = []
+
+    async with stdio_client(params) as streams:
+''',
+                  '''    tool_rows: list[dict[str, Any]] = []
+    provider_path_replacements = {
+        str(project): PROJECT_ROOT_TOKEN,
+        str(work): RUN_ROOT_TOKEN,
+        str(user_home): USER_HOME_TOKEN,
+        str(docatlas_home): STATE_HOME_TOKEN,
+        str(root): HARNESS_ROOT_TOKEN,
+    }
+    provider_payload_sizes: list[int] = []
+    provider_secret_values = secret_environment_values()
+
+    async with stdio_client(params) as streams:
+''',
+              )
+              replace_once(
+                  harness,
+                  '''                    "host_context": {
+                        "project_path": str(project),
+                        "working_directory": str(project),
+                    },
+                    "history": state.ephemeral_history[-12:],
+''',
+                  '''                    "host_context": {
+                        "project_path": PROJECT_ROOT_TOKEN,
+                        "working_directory": PROJECT_ROOT_TOKEN,
+                    },
+                    "history": _provider_safe_value(
+                        state.ephemeral_history[-12:], provider_path_replacements
+                    ),
+''',
+              )
+              replace_once(
+                  harness,
+                  '''                try:
+                    response = (
+''',
+                  '''                try:
+                    if driver == "command":
+                        provider_payload_sizes.append(
+                            _assert_provider_payload_safe(
+                                turn_payload,
+                                secret_values=provider_secret_values,
+                            )
+                        )
+                    response = (
+''',
+              )
+              replace_once(
+                  harness,
+                  '''                            turn_payload=turn_payload,
+                            cwd=root,
+                        )
+''',
+                  '''                            turn_payload=turn_payload,
+                            cwd=root,
+                            driver_env_names=driver_env_names,
+                        )
+''',
+              )
+              replace_once(
+                  harness,
+                  '''                arguments = message["arguments"]
+                state.tool_calls += 1
+''',
+                  '''                provider_arguments = message["arguments"]
+                arguments = (
+                    _restore_provider_tokens(
+                        provider_arguments, provider_path_replacements
+                    )
+                    if driver == "command"
+                    else provider_arguments
+                )
+                if not isinstance(arguments, dict):
+                    state.divergence(
+                        "adapter_protocol",
+                        "restored tool arguments are not an object",
+                    )
+                    break
+                state.tool_calls += 1
+''',
+              )
+              replace_once(
+                  harness,
+                  '''            "credential_value_scan": "pass",
+        },
+''',
+                  '''            "credential_value_scan": "pass",
+            "provider_payload_absolute_path_scan": "pass",
+            "provider_payload_credential_scan": "pass",
+            "driver_environment_allowlisted": True,
+            "provider_payload_max_bytes": max(provider_payload_sizes, default=0),
+        },
+''',
+              )
+              replace_once(
+                  harness,
+                  '''    parser.add_argument(
+        "--real-model",
+        action="store_true",
+        help="Mark command-driver responses as a real provider run; requires --driver=command.",
+    )
+''',
+                  '''    parser.add_argument(
+        "--real-model",
+        action="store_true",
+        help="Mark command-driver responses as a real provider run; requires --driver=command.",
+    )
+    parser.add_argument(
+        "--driver-env",
+        action="append",
+        default=[],
+        metavar="NAME",
+        help="Allow one named environment variable into the command adapter.",
+    )
+''',
+              )
+              replace_once(
+                  harness,
+                  '''                model=args.model,
+                real_model=args.real_model,
+            )
+''',
+                  '''                model=args.model,
+                real_model=args.real_model,
+                driver_env_names=tuple(args.driver_env),
+            )
+''',
+              )
+
+          harness_text = Path(harness).read_text(encoding='utf-8')
+          if 'model_turns: list[dict[str, Any]]' not in harness_text:
+              replace_once(
+                  harness,
+                  '''    trajectory: list[dict[str, Any]] = field(default_factory=list)
+    ephemeral_history: list[dict[str, Any]] = field(default_factory=list)
+''',
+                  '''    trajectory: list[dict[str, Any]] = field(default_factory=list)
+    model_turns: list[dict[str, Any]] = field(default_factory=list)
+    ephemeral_history: list[dict[str, Any]] = field(default_factory=list)
+''',
+              )
+              # Replace the provider-size/response block created above.
+              replace_once(
+                  harness,
+                  '''                try:
+                    if driver == "command":
+                        provider_payload_sizes.append(
+                            _assert_provider_payload_safe(
+                                turn_payload,
+                                secret_values=provider_secret_values,
+                            )
+                        )
+                    response = (
+''',
+                  '''                provider_payload_bytes = len(canonical_json(turn_payload).encode("utf-8"))
+                if driver == "command":
+                    provider_payload_bytes = _assert_provider_payload_safe(
+                        turn_payload,
+                        secret_values=provider_secret_values,
+                    )
+                    provider_payload_sizes.append(provider_payload_bytes)
+                turn_record: dict[str, Any] = {
+                    "turn": turn,
+                    "provider_payload_sha256": sha256_json(turn_payload),
+                    "provider_payload_bytes": provider_payload_bytes,
+                    "status": "pending",
+                }
+                try:
+                    response = (
+''',
+              )
+              replace_once(
+                  harness,
+                  '''                    record_model_provenance(response, provenance)
+                    message_type, message = validate_driver_response(response)
+                except HarnessError as exc:
+                    state.divergence("adapter_protocol", str(exc))
+''',
+                  '''                    record_model_provenance(response, provenance)
+                    message_type, message = validate_driver_response(response)
+                    request_id = response.get("request_id")
+                    turn_record.update({
+                        "status": "valid",
+                        "response_type": message_type,
+                        "provider": provenance.provider,
+                        "model": provenance.model,
+                        "request_id": (
+                            str(request_id)[:200]
+                            if isinstance(request_id, str)
+                            else ""
+                        ),
+                        "failure_stage": "none",
+                        "reason": "",
+                    })
+                    state.model_turns.append(turn_record)
+                except HarnessError as exc:
+                    safe_reason = str(
+                        _provider_safe_value(
+                            str(exc), provider_path_replacements
+                        )
+                    )[:240]
+                    turn_record.update({
+                        "status": "error",
+                        "response_type": "none",
+                        "provider": provenance.provider,
+                        "model": provenance.model,
+                        "request_id": "",
+                        "failure_stage": "adapter_protocol",
+                        "reason": safe_reason,
+                    })
+                    state.model_turns.append(turn_record)
+                    state.divergence("adapter_protocol", safe_reason)
+''',
+              )
+              replace_once(
+                  harness,
+                  '''        "trajectory": state.trajectory,
+        "budgets": {
+''',
+                  '''        "model_turns": state.model_turns,
+        "trajectory": state.trajectory,
+        "budgets": {
+''',
+              )
+
+          verifier_text = Path(verifier).read_text(encoding='utf-8')
+          if 'provider_payload_absolute_path_scan' not in verifier_text:
+              replace_once(
+                  verifier,
+                  '''    require(privacy == {
+        "raw_prompt_stored": False,
+        "raw_tool_result_stored": False,
+        "raw_environment_stored": False,
+        "absolute_path_scan": "pass",
+        "credential_value_scan": "pass",
+    }, "privacy contract mismatch")
+''',
+                  '''    require(
+        privacy.get("raw_prompt_stored") is False
+        and privacy.get("raw_tool_result_stored") is False
+        and privacy.get("raw_environment_stored") is False
+        and privacy.get("absolute_path_scan") == "pass"
+        and privacy.get("credential_value_scan") == "pass"
+        and privacy.get("provider_payload_absolute_path_scan") == "pass"
+        and privacy.get("provider_payload_credential_scan") == "pass"
+        and privacy.get("driver_environment_allowlisted") is True,
+        "privacy contract mismatch",
+    )
+    provider_bytes = privacy.get("provider_payload_max_bytes")
+    require(
+        isinstance(provider_bytes, int) and 0 <= provider_bytes <= 64_000,
+        "provider payload byte bound is invalid",
+    )
+''',
+              )
+              replace_once(
+                  verifier,
+                  '''            "credential_value_scan": "pass",
+        },
+''',
+                  '''            "credential_value_scan": "pass",
+            "provider_payload_absolute_path_scan": "pass",
+            "provider_payload_credential_scan": "pass",
+            "driver_environment_allowlisted": True,
+            "provider_payload_max_bytes": 1024,
+        },
+''',
+              )
+
+          verifier_text = Path(verifier).read_text(encoding='utf-8')
+          if 'model_turns must contain every provider turn' not in verifier_text:
+              replace_once(
+                  verifier,
+                  '''    trajectory = report.get("trajectory")
+    require(isinstance(trajectory, list) and trajectory, "trajectory must contain tool attempts")
+''',
+                  '''    model_turns = report.get("model_turns")
+    require(isinstance(model_turns, list) and model_turns, "model_turns must contain every provider turn")
+    for index, turn_value in enumerate(model_turns):
+        turn = object_value(turn_value, f"model_turns[{index}]")
+        require(turn.get("turn") == index, "model turn indices are not contiguous")
+        require(
+            isinstance(turn.get("provider_payload_sha256"), str)
+            and SHA256_RE.fullmatch(turn["provider_payload_sha256"]),
+            "model turn payload SHA-256 is invalid",
+        )
+        require(
+            isinstance(turn.get("provider_payload_bytes"), int)
+            and 0 <= turn["provider_payload_bytes"] <= 64_000,
+            "model turn payload size is invalid",
+        )
+        require(turn.get("status") in {"valid", "error"}, "model turn status is invalid")
+        require(turn.get("failure_stage") in FAILURE_STAGES, "model turn failure stage is invalid")
+        require(isinstance(turn.get("reason"), str) and len(turn["reason"]) <= 240, "model turn reason is invalid")
+        if turn.get("status") == "valid":
+            require(turn.get("response_type") in {"tool_call", "final"}, "valid model turn response type is invalid")
+            require(turn.get("failure_stage") == "none", "valid model turn has a failure stage")
+        else:
+            require(turn.get("response_type") == "none", "error model turn response type is invalid")
+            require(turn.get("failure_stage") == "adapter_protocol", "error model turn stage is invalid")
+
+    trajectory = report.get("trajectory")
+    require(isinstance(trajectory, list), "trajectory must be a list")
+''',
+              )
+              replace_once(
+                  verifier,
+                  '''    if success:
+        require(source_found and marker_found and final_marker, "success lacks expected evidence/final marker")
+''',
+                  '''    if success:
+        require(source_found and marker_found and final_marker, "success lacks expected evidence/final marker")
+        require(bool(trajectory), "successful outcome has no tool attempts")
+''',
+              )
+              replace_once(
+                  verifier,
+                  '''        "trajectory": [
+''',
+                  '''        "model_turns": [
+            {
+                "turn": 0,
+                "provider_payload_sha256": "9" * 64,
+                "provider_payload_bytes": 1024,
+                "status": "valid",
+                "response_type": "tool_call",
+                "provider": "scripted",
+                "model": "deterministic-positive-control",
+                "request_id": "scripted-turn-0",
+                "failure_stage": "none",
+                "reason": "",
+            }
+        ],
+        "trajectory": [
+''',
+              )
+              replace_once(
+                  verifier,
+                  '''    raw_result = copy.deepcopy(sample)
+    raw_result["trajectory"][0]["raw_result"] = {"secret": "x"}
+    expect_invalid(raw_result, "forbidden evidence fields")
+
+    print("Installed MCP Agent v1 report verifier: SELF-TEST PASS (7/7)")
+''',
+                  '''    raw_result = copy.deepcopy(sample)
+    raw_result["trajectory"][0]["raw_result"] = {"secret": "x"}
+    expect_invalid(raw_result, "forbidden evidence fields")
+
+    missing_turn = copy.deepcopy(sample)
+    missing_turn["model_turns"] = []
+    expect_invalid(missing_turn, "model_turns")
+
+    print("Installed MCP Agent v1 report verifier: SELF-TEST PASS (8/8)")
+''',
+              )
+
+          control_text = Path(control_driver).read_text(encoding='utf-8')
+          if 'assert project_path == "$DOCATLAS_PROJECT_ROOT"' not in control_text:
+              replace_once(
+                  control_driver,
+                  '''    project_path = payload["host_context"]["project_path"]
+''',
+                  '''    project_path = payload["host_context"]["project_path"]
+    assert project_path == "$DOCATLAS_PROJECT_ROOT", project_path
+    rendered = json.dumps(payload, ensure_ascii=False, sort_keys=True)
+    for fragment in ("/tmp/", "/home/", "/Users/", "\\\\\\\\"):
+        assert fragment not in rendered, fragment
+''',
+              )
+
+          readme_text = Path(readme).read_text(encoding='utf-8')
+          old = 'The turn payload contains the case question, the exact installed tool schemas, bounded in-memory history, and an ephemeral host-owned `host_context.project_path`. That path is execution context rather than a public MCP field and is never written to the report. Raw payloads and raw tool results are never persisted.\n'
+          if old in readme_text:
+              replace_once(
+                  readme,
+                  old,
+                  'The turn payload contains the case question, the exact installed tool schemas, bounded in-memory history, and an ephemeral host-owned project token. Absolute workspace/home paths are replaced by `$DOCATLAS_*` tokens before the adapter is invoked and restored only inside the harness immediately before MCP schema validation and execution. The command adapter receives only a small platform environment plus names explicitly allowlisted with `--driver-env`. Raw payloads and raw tool results are never persisted.\n',
+              )
+          readme_text = Path(readme).read_text(encoding='utf-8')
+          old = '- every attempted tool call with argument/result hashes and failure stage;\n'
+          if old in readme_text and '- every provider/model turn' not in readme_text:
+              replace_once(
+                  readme,
+                  old,
+                  '- every provider/model turn, including adapter failures and final-before-tool responses;\n- every attempted tool call with argument/result hashes and failure stage;\n',
+              )
+          PY
+          rm -f \
+            .github/workflows/temp-harden-provider-boundary.yml \
+            .github/workflows/temp-add-model-turn-ledger.yml \
+            .github/workflows/temp-consolidate-real-model-provider-boundary.yml
+          test -f eval/installed_mcp_agent_v1/github_models_driver.py
+          test -f .github/workflows/installed-mcp-agent-live-v1.yml
+          python -m py_compile \
+            scripts/run_installed_mcp_agent_harness.py \
+            scripts/verify_installed_mcp_agent_report.py \
+            eval/installed_mcp_agent_v1/provider_free_command_driver.py \
+            eval/installed_mcp_agent_v1/github_models_driver.py
+          python scripts/verify_installed_mcp_agent_report.py --self-test
+          git diff --check
+
+      - name: Commit the consolidated provider boundary
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          mapfile -t changed < <(git diff --cached --name-only)
+          allowed="$(printf '%s\n' \
+            .github/workflows/temp-add-model-turn-ledger.yml \
+            .github/workflows/temp-consolidate-real-model-provider-boundary.yml \
+            .github/workflows/temp-harden-provider-boundary.yml \
+            eval/installed_mcp_agent_v1/README.md \
+            eval/installed_mcp_agent_v1/provider_free_command_driver.py \
+            scripts/run_installed_mcp_agent_harness.py \
+            scripts/verify_installed_mcp_agent_report.py)"
+          for path in "${changed[@]}"; do
+            grep -Fxq "$path" <<< "$allowed" || {
+              echo "::error::unexpected consolidation path: $path"
+              exit 1
+            }
+          done
+          git commit -m "fix(p1): consolidate privacy-safe real-model evidence"
+          git push origin HEAD:p1/installed-mcp-real-model-capture-clean
