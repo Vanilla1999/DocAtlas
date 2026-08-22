@@ -5,7 +5,7 @@ on:
   workflow_dispatch:
     inputs:
       tag:
-        description: Existing release tag (for example v1.3.0)
+        description: Existing release tag (for example v1.3.1)
         required: true
         type: string
 
@@ -141,7 +141,7 @@ jobs:
     needs: [required-release]
     runs-on: ubuntu-latest
     timeout-minutes: 25
-    environment: release
+    environment: release-current
     permissions:
       contents: read
       id-token: write

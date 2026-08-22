@@ -48,7 +48,7 @@ P0 establishes one trustworthy public product before further R&D. During P0, ret
 
 ## P0.1 — Remote `main` ruleset: accepted risk
 
-**Status:** `accepted_risk` for the `1.3.0` P0 closure.
+**Status:** `accepted_risk` for the `1.3.1` P0 closure.
 
 On 2026-08-21 the maintainer explicitly chose not to activate remote branch protection for `main`. This is recorded as an operational risk, not misreported as a green protection control.
 
@@ -72,7 +72,7 @@ Deliverables:
 
 - accepted ADR for the documentation-authority/evidence-delivery direction;
 - this short active roadmap;
-- explicit release identity: repository `1.2.0` is an unpublished milestone and the next intended public release is `1.3.0`;
+- explicit release identity: repository `1.2.0` is an unpublished milestone and the next intended public release is `1.3.1`;
 - product brief aligned with the new claim boundary;
 - regression tests for the direction/release claims.
 
@@ -144,13 +144,16 @@ Acceptance:
 - normal-agent docs do not advertise server-owned compatibility arguments;
 - installed guidance carries a reproducible contract/schema identity.
 
-## P0.5 — Publish and verify public `1.3.0`
+## P0.5 — Publish and verify public `1.3.1`
 
-Do not reuse or move a historical `1.2.0` identity. Prepare a new public `1.3.0` release only after P0.3/P0.4 are complete.
+
+The immutable `v1.3.0` tag records a superseded pre-public attempt whose OIDC upload failed before publication. It must not be moved or rerun. `1.3.1` is the replacement public candidate because current `main` contains reviewed recovery fixes that are not part of that old tag.
+
+Do not reuse or move a historical `1.2.0` identity. Prepare a new public `1.3.1` release only after P0.3/P0.4 are complete.
 
 Acceptance:
 
-- source version, tag, changelog, wheel, and sdist agree on `1.3.0`;
+- source version, tag, changelog, wheel, and sdist agree on `1.3.1`;
 - PyPI metadata says Beta;
 - publication uses the existing OIDC/Trusted Publishing path;
 - downloaded public wheel/sdist bytes match gated SHA-256 values;
@@ -162,7 +165,7 @@ Acceptance:
 
 Maintain [`docs/public-truth-scorecard.md`](../docs/public-truth-scorecard.md) as the single closure record for P0.
 
-Scorecard states are `green`, `pending`, and `accepted_risk`. Branch protection is the one explicitly accepted residual risk for `1.3.0`; it must never be rendered as green. Artifact/public-install rows remain pending until the exact PyPI release exists and post-publish verification completes.
+Scorecard states are `green`, `pending`, and `accepted_risk`. Branch protection is the one explicitly accepted residual risk for `1.3.1`; it must never be rendered as green. Artifact/public-install rows remain pending until the exact PyPI release exists and post-publish verification completes.
 
 P0 exits when every row is `green` or an explicitly documented `accepted_risk`, no row is `pending`, and product maturity remains honestly **Beta**. An accepted risk does not become evidence that the missing control exists.
 

@@ -6,6 +6,20 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 
+## [1.3.1] - 2026-08-22
+
+### Fixed
+
+- Made project-specific documentation failures recoverable without converting them into documentary support: one bounded rephrase is allowed, then the coding agent may inspect local source/tests when no authoritative hard stop exists.
+- Added exact named-document recovery from the active SQLite generation when ordinary lexical retrieval misses the explicitly selected source.
+- Hardened `edit_ready` so only a complete, coding-agent-owned, non-automatic local `code_search` handoff can continue editing while the documentation claim remains unsupported.
+- Preserved fail-closed behavior for authoritative conflicts, stale/wrong-scope evidence, confirmation boundaries, unsafe actions, and incomplete source-search handoffs.
+
+### Release identity
+
+- `v1.3.0` remains an immutable pre-public attempt. Its gated build passed, but PyPI rejected OIDC before upload with `invalid-publisher`; no public `doc-atlas==1.3.0` artifact is claimed.
+- `1.3.1` is the replacement public candidate. Publication uses the canonical `publish.yml` workflow with the new `release-current` environment so the failed `v1.3.0` run cannot be accidentally resumed under the new Trusted Publisher identity.
+
 ## [1.3.0] - 2026-08-21
 
 ### Added

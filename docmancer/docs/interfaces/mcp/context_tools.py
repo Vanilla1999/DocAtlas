@@ -373,6 +373,12 @@ def handle_context_tool(name: str, args: dict[str, Any], service: LibraryDocsSer
             args, "packet_tokens", default=1_500, min_value=256, max_value=2_000
         ) or 1_500
         recovery = _bounded_recovery_action(raw)
+        source_search_edit_authorized = bool(
+            mutation_intent.operation != "none"
+            and not raw.get("hard_stop")
+            and not raw.get("requires_confirmation")
+            and not is_operational_recovery_action(recovery)
+        )
         kind = projection_kind(question)
         if kind == "docs_answer":
             selection_trace: dict[str, Any] = {}
@@ -406,14 +412,22 @@ def handle_context_tool(name: str, args: dict[str, Any], service: LibraryDocsSer
                 )
                 projection.update(support_projection)
                 projection.update(_recovery_summary(raw))
-                _annotate_recovery_handoff(projection, recovery)
+                _annotate_recovery_handoff(
+                    projection,
+                    recovery,
+                    edit_authorized=source_search_edit_authorized,
+                )
                 _prioritize_module_recovery_projection(projection)
                 _bound_recoverable_insufficient_projection(
                     projection, max_tokens=output_budget,
                 )
             if projection.get("status") == "insufficient_evidence":
                 projection.update(_recovery_summary(raw))
-                _annotate_recovery_handoff(projection, recovery)
+                _annotate_recovery_handoff(
+                    projection,
+                    recovery,
+                    edit_authorized=source_search_edit_authorized,
+                )
                 _prioritize_module_recovery_projection(projection)
                 _bound_recoverable_insufficient_projection(
                     projection, max_tokens=output_budget,
@@ -461,7 +475,7 @@ def handle_context_tool(name: str, args: dict[str, Any], service: LibraryDocsSer
             mutation_intent_contract=mutation_intent,
         )
         mutation = packet.get("mutation_intent") if isinstance(packet.get("mutation_intent"), dict) else {}
-        if mutation.get("operation") != "none" and mutation.get("ready") is not True:
+        if source_search_edit_authorized and mutation.get("ready") is not True:
             requested = mutation.get("requested_targets") if isinstance(mutation.get("requested_targets"), list) else []
             query_terms = [
                 str(item.get("value") or "")[:160]
@@ -474,6 +488,7 @@ def handle_context_tool(name: str, args: dict[str, Any], service: LibraryDocsSer
             recovery = {
                 "tool": "code_search",
                 "type": "search_local_source",
+                "handled_by": "coding_agent",
                 "reason": "Resolve the requested mutation target before editing.",
                 "query_terms": query_terms or [question[:160]],
                 "suggested_doc_paths": [
@@ -487,6 +502,7 @@ def handle_context_tool(name: str, args: dict[str, Any], service: LibraryDocsSer
                     if isinstance(item, dict) and item.get("kind") == "symbol"
                 ],
                 "requires_confirmation": False,
+                "repeat_docs_context": False,
                 "auto_execute": False,
             }
         raw.setdefault("retrieval_diagnostics", {})["evidence_selection"] = selection_trace
@@ -514,13 +530,21 @@ def handle_context_tool(name: str, args: dict[str, Any], service: LibraryDocsSer
                 max_tokens=min(INSUFFICIENT_EVIDENCE_MAX_TOKENS, output_budget),
             )
             projection.update(_recovery_summary(raw))
-            _annotate_recovery_handoff(projection, recovery)
+            _annotate_recovery_handoff(
+                projection,
+                recovery,
+                edit_authorized=source_search_edit_authorized,
+            )
         # Recovery/source-search metadata is appended after projection.  Bound
         # the *final* object unconditionally so no post-format mutation can
         # reintroduce an oversized insufficient response.
         if projection.get("status") == "insufficient_evidence":
             projection.update(_recovery_summary(raw))
-            _annotate_recovery_handoff(projection, recovery)
+            _annotate_recovery_handoff(
+                projection,
+                recovery,
+                edit_authorized=source_search_edit_authorized,
+            )
             _bound_recoverable_insufficient_projection(
                 projection, max_tokens=output_budget,
             )

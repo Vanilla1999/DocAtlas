@@ -16,6 +16,7 @@ from docmancer.docs.application.model_visible_projection import (
     estimate_projection_tokens,
 )
 from docmancer.docs.application.recovery import build_recovery_diagnosis, recovery_action
+from docmancer.docs.domain.recovery_handoff import is_safe_local_source_handoff
 
 _RECOVERY_SUMMARY_KEYS = (
     "documentation_supported", "investigation_allowed", "hard_stop",
@@ -280,7 +281,10 @@ def _recovery_summary(payload: dict[str, Any]) -> dict[str, Any]:
 
 
 def _annotate_recovery_handoff(
-    projection: dict[str, Any], recovery: dict[str, Any] | None
+    projection: dict[str, Any],
+    recovery: dict[str, Any] | None,
+    *,
+    edit_authorized: bool = False,
 ) -> None:
     if bool(projection.get("hard_stop")):
         projection.update({
@@ -299,10 +303,13 @@ def _annotate_recovery_handoff(
             "source_search_status": "not_required",
             "requires_confirmation": False,
         })
-    elif recovery.get("tool") == "code_search":
+    elif is_safe_local_source_handoff(recovery):
+        # Source investigation and edit authorization are separate decisions.
+        # Only the host-owned request classifier may authorize continuation of
+        # an explicit mutation workflow; the recovery action cannot self-grant it.
         projection.update({
             "disposition": "search_local_source",
-            "edit_ready": True,
+            "edit_ready": bool(edit_authorized),
             "source_search_status": "required",
             "requires_confirmation": False,
         })

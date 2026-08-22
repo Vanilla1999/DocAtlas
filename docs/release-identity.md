@@ -1,55 +1,61 @@
-# Release identity during P0
+# Release identity
 
-Status: active release-candidate truth note for P0.5.
+## Current public candidate
 
-## Current identity
+The current source release candidate is **DocAtlas 1.3.1**.
 
-As of 2026-08-21:
-
-- the latest public PyPI release remains `doc-atlas==1.1.1`;
-- repository source now reports release-candidate version `1.3.0`;
-- repository `1.2.0` remains an unpublished historical milestone and must not be reused or retroactively published;
-- no `v1.3.0` tag or public `1.3.0` artifact is evidence until the reviewed release flow creates and verifies them.
-
-The existing changelog heading `## [1.2.0] - 2026-07-12` records the repository milestone date; it is **not** evidence that a matching PyPI artifact was published. P0.5 cuts a new `1.3.0` identity from current reviewed work rather than rewriting that historical milestone.
-
-## 1.3.0 release candidate
-
-The intended next public release is:
+Canonical identity:
 
 ```text
-doc-atlas 1.3.0
+product: DocAtlas
+distribution: doc-atlas
+source version: 1.3.1
+intended tag: v1.3.1
+maturity: Beta
 ```
 
-The source version and changelog are prepared in the P0.5 release PR. Tag creation and publication remain separate post-merge repository operations. For `1.3.0`, the maintainer explicitly accepts the residual risk of an unprotected `main`; [`public-truth-scorecard.md`](./public-truth-scorecard.md) records that decision. The manual release workflow still fails closed unless the tagged commit is reachable from remote `main`.
+The tag is created only after the release-preparation PR is merged and all required CI/release gates are green. It must point to that exact reviewed `main` commit and must never be moved.
 
-Before `1.3.0` is published, all of the following must be true:
+No public `doc-atlas==1.3.1` release is claimed until the immutable tag, PyPI artifact bytes, and post-publish platform smokes exist.
 
-1. the release commit is reviewed on `main` with `required-ci` and `required-release` evidence green before merge;
-2. a maintainer creates immutable tag `v1.3.0` from a commit reachable from remote `main`;
-3. `Release artifact gate and publish` is manually dispatched for exactly `v1.3.0` and authorized through the `release` environment;
-4. publication uses the repository OIDC/Trusted Publishing path, not a long-lived PyPI token;
-5. public wheel and sdist bytes match the gated SHA-256 values;
-6. a no-cache install of exact public `doc-atlas==1.3.0` passes the three-tool Docs MCP stdio smoke on Linux, macOS, and Windows;
-7. the P0.6 scorecard records the final public artifact/install evidence and retains branch protection as `accepted_risk`, not green.
+## Historical repository milestone
 
-Until those conditions are satisfied, `1.3.0` is a **release candidate in source**, not a completed public release.
+Repository version `1.2.0` remains an unpublished historical milestone. It is retained only as repository history and is not reused as public release evidence.
 
-## Release claim boundary
+## Superseded pre-public `v1.3.0` attempt
 
-The next release remains **Beta**.
+`v1.3.0` is retained as an immutable audit identity at commit `42c3bf1fccc839dad4be4077b0b2c6a203f9bbac`. Canonical workflow run `32541487735` built and validated the wheel/sdist, but PyPI rejected the OIDC publisher with `invalid-publisher` before upload. Therefore:
 
-Publishing `1.3.0` may establish public artifact/install truth. It must not, by itself, create claims that:
+- no public `doc-atlas==1.3.0` release is claimed;
+- the tag must not be moved, replaced, or reused;
+- the failed publish job must not be rerun after configuring the replacement publisher;
+- its artifact hashes are pre-public engineering evidence only, not public-release evidence.
 
-- DocAtlas has Context7 parity;
-- autonomous live evidence planning is solved;
-- DocAtlas improves real coding-task correctness;
-- the product is Stable/Production.
+Recorded gated artifacts from that failed attempt:
 
-Those remain later agent-truth and product-truth decisions in P1/P2.
+```text
+doc_atlas-1.3.0-py3-none-any.whl
+sha256 2e1a0f58e34ea9c175b8d93839a6dcc8a54a7e36d4329157f9378791a0341e26
 
-## Historical identity rule
+doc_atlas-1.3.0.tar.gz
+sha256 e5bb4eb1f2b3221bcd3e8e9db719fe8f11596a88bd000e3d922bd6826c6683ab
+```
 
-Existing release tags are immutable evidence. Never move or reuse an existing release tag to make repository history match a later artifact.
+## Trusted Publisher identity for 1.3.1+
 
-If a `v1.2.0` tag exists, preserve it as historical identity and do not publish a different artifact under that version. If it does not exist, do not create one merely to fill the public-version gap. In both cases, `1.3.0` is the next public release candidate after the P0 prerequisites are satisfied.
+Configure the PyPI project `doc-atlas` with exactly:
+
+```text
+owner: Vanilla1999
+repository: DocAtlas
+workflow filename: publish.yml
+environment: release-current
+```
+
+The new environment name intentionally differs from the failed `v1.3.0` run (`release`). Publication still uses GitHub OIDC/Trusted Publishing and no long-lived PyPI token.
+
+## Claim boundary
+
+Until the exact public version is downloadable and passes the post-publish Linux/macOS/Windows MCP smoke, release truth remains incomplete and product maturity remains **Beta**.
+
+For clarity, no public `doc-atlas==1.3.1` release is claimed at this pre-public stage.

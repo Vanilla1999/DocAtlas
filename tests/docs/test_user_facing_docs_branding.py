@@ -181,7 +181,7 @@ def test_maturity_docs_name_the_remaining_stable_release_gates():
     historical_commit = "d565d8e75af2cbc56bc00fdc9df19dd1ae66863a"
 
     assert source_version is not None
-    assert source_version.group(1) == "1.3.0"
+    assert source_version.group(1) == "1.3.1"
     assert "Task 15" in brief
     assert "Task 14" in brief
     assert "post-publish" in brief
@@ -195,10 +195,10 @@ def test_maturity_docs_name_the_remaining_stable_release_gates():
     assert historical_commit in history
     assert f"git show {historical_commit}:roadmap/README.md" in history
     assert "unpublished historical milestone" in release_identity.lower()
-    assert f"doc-atlas {source_version.group(1)}" in release_identity
-    assert "release candidate in source" in release_identity
-    assert "no `v1.3.0` tag or public `1.3.0` artifact is evidence" in release_identity
-    assert f"## [{source_version.group(1)}] - 2026-08-21" in changelog
+    assert f"DocAtlas {source_version.group(1)}" in release_identity
+    assert "current source release candidate" in release_identity.lower()
+    assert "no public `doc-atlas==1.3.1` release is claimed" in release_identity.lower()
+    assert f"## [{source_version.group(1)}] - 2026-08-22" in changelog
     assert "P0 public truth" in checklist
     assert "P1 agent truth" in checklist
     assert "P2 product truth" in checklist
