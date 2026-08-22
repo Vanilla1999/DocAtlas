@@ -118,9 +118,14 @@ def test_committed_contract() -> None:
     assert "required-ci" in workflow
     assert "require-pypi-absent" in workflow
     assert "python scripts/release_gate.py --manifest dist/release-manifest.json" in workflow
-    assert 'git tag -a "$RELEASE_TAG"' in workflow
-    assert 'git cat-file -t "$RELEASE_TAG"' in workflow
+    assert "persist-credentials: false" in workflow
+    assert "persist-credentials: true" not in workflow
+    assert '"repos/${GITHUB_REPOSITORY}/git/tags"' in workflow
+    assert '"repos/${GITHUB_REPOSITORY}/git/refs"' in workflow
+    assert "not an annotated tag" in workflow
     assert "git tag -f" not in workflow
+    assert "git push" not in workflow
+    assert workflow.count("main moved from release request SHA") == 2
     assert "gh workflow run publish.yml" in workflow
     assert "PYPI_API_TOKEN" not in workflow
     assert 'test "${{ steps.pretag.outcome }}" = "success"' in workflow
