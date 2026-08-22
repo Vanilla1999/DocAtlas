@@ -1,0 +1,51 @@
+name: TEMP materialize P1.2 atlas
+
+on:
+  push:
+    branches: [p1/p1.2-first-divergence-atlas]
+    paths:
+      - .github/workflows/temp-p1.2-materialize-atlas.yml
+
+permissions:
+  contents: write
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
+
+jobs:
+  materialize:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with:
+          ref: p1/p1.2-first-divergence-atlas
+          fetch-depth: 0
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: "3.12"
+      - name: Derive, verify and retain only the reviewable atlas
+        run: |
+          set -euo pipefail
+          python scripts/run_agent_developer_first_divergence_gate.py --write
+          python scripts/run_agent_developer_first_divergence_gate.py
+          python scripts/first_divergence_contract_self_test.py
+          rm .github/workflows/temp-p1.2-materialize-atlas.yml
+          git diff --check
+      - name: Commit the exact derived evidence
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          changed="$(git diff --cached --name-only)"
+          expected="$(printf '%s\n' \
+            .github/workflows/temp-p1.2-materialize-atlas.yml \
+            eval/agent_developer_v1/results/first-divergence-atlas.json)"
+          test "$changed" = "$expected" || {
+            echo "::error::unexpected materialization diff"
+            printf 'actual:\n%s\nexpected:\n%s\n' "$changed" "$expected"
+            exit 1
+          }
+          git commit -m "docs(p1): materialize the exact first-divergence atlas"
+          git push origin HEAD:p1/p1.2-first-divergence-atlas
