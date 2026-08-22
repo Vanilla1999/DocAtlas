@@ -495,7 +495,7 @@ def validate_atlas(atlas: dict[str, Any]) -> None:
         raise ValueError("P1.2 cannot claim a public API decision")
     boundary = atlas.get("claim_boundary") or {}
     if boundary.get("autonomous_agent_truth_closed") is not False:
-        raise ValueError("P1.2 cannot close autonomous Agent Truth")
+        raise ValueError("P1.2 cannot close Autonomous Agent Truth")
 
 
 def render_markdown(atlas: dict[str, Any]) -> str:
