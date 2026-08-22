@@ -54,15 +54,18 @@ def git_blob_sha(path: Path, *, repo_root: Path) -> str:
 
 def _installed_mcp_files(repo_root: Path) -> list[Path]:
     candidates: set[Path] = set()
-    for pattern in (
-        ".github/workflows/*installed*mcp*.yml",
-        "eval/**/*installed*mcp*",
-        "scripts/*installed*mcp*.py",
-    ):
-        for path in repo_root.glob(pattern):
-            if path.is_file() and "temp-" not in path.name:
-                candidates.add(path)
-    return sorted(candidates, key=lambda path: path.relative_to(repo_root).as_posix())
+    for path in repo_root.rglob("*"):
+        if not path.is_file():
+            continue
+        relative = path.relative_to(repo_root).as_posix().casefold()
+        if "temp-p1" in relative:
+            continue
+        if "installed_mcp" in relative or "installed-mcp" in relative:
+            candidates.add(path)
+    return sorted(
+        candidates,
+        key=lambda path: path.relative_to(repo_root).as_posix(),
+    )
 
 
 def _installed_reports(paths: list[Path]) -> list[dict[str, Any]]:
