@@ -137,7 +137,7 @@ jobs:
             tests/test_release_gate.py \
             tests/docs/test_user_facing_docs_branding.py \
             tests/docs/test_python_module_policy_and_manifest.py \
-            tests/docs/test_source_search_edit_readiness.py
+            tests/test_source_search_edit_readiness.py
           python scripts/run_recovery_contract_gate.py
           python scripts/run_recovery_mutation_gate.py
           python scripts/check_python_module_size.py
