@@ -1,0 +1,64 @@
+name: TEMP finalize P1.2 branch
+
+on:
+  push:
+    branches: [p1/p1.2-first-divergence-atlas]
+    paths:
+      - .github/workflows/temp-p1.2-finalize-stack.yml
+
+permissions:
+  contents: write
+
+concurrency:
+  group: temp-finalize-p1-2
+  cancel-in-progress: false
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
+
+jobs:
+  finalize:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with:
+          ref: p1/p1.2-first-divergence-atlas
+          fetch-depth: 0
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: "3.12"
+      - name: Materialize and verify final P1.2 evidence
+        run: |
+          set -euo pipefail
+          python scripts/run_agent_developer_first_divergence_gate.py --write
+          python scripts/run_agent_developer_first_divergence_gate.py
+          python scripts/first_divergence_contract_self_test.py
+          find .github/workflows -maxdepth 1 -type f -name 'temp-p1.2-*.yml' -delete
+          git diff --check
+      - name: Commit a carrier-free branch
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          python - <<'PY'
+          import subprocess
+          allowed = {"eval/agent_developer_v1/results/first-divergence-atlas.json"}
+          changed = subprocess.check_output(
+              ["git", "diff", "--cached", "--name-only"], text=True
+          ).splitlines()
+          bad = [
+              path for path in changed
+              if path not in allowed
+              and not path.startswith(".github/workflows/temp-p1.2-")
+          ]
+          if bad:
+              raise SystemExit(f"unexpected P1.2 finalization paths: {bad}")
+          PY
+          if git diff --cached --quiet; then
+            echo "P1.2 branch already finalized"
+            exit 0
+          fi
+          git commit -m "chore(p1): finalize the P1.2 evidence branch"
+          git push origin HEAD:p1/p1.2-first-divergence-atlas
