@@ -1,0 +1,50 @@
+name: TEMP materialize tagged release state
+
+on:
+  push:
+    branches: [p0/record-v1.3.1-tagged-state]
+    paths:
+      - .github/workflows/materialize-tagged-release-state.yml
+
+permissions:
+  contents: write
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
+  DOCMANCER_OFFLINE: "1"
+
+jobs:
+  materialize:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with:
+          ref: p0/record-v1.3.1-tagged-state
+          fetch-depth: 0
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: "3.12"
+      - name: Materialize tagged state
+        run: python scripts/materialize_tagged_release_state.py
+      - name: Remove carrier and validate
+        run: |
+          rm scripts/materialize_tagged_release_state.py
+          rm .github/workflows/materialize-tagged-release-state.yml
+          python -m pip install -e ".[dev]"
+          pytest -q \
+            tests/test_tagged_release_state.py \
+            tests/test_patch_release_identity.py \
+            tests/test_release_gate.py \
+            tests/docs/test_user_facing_docs_branding.py
+          python scripts/check_python_module_size.py
+          python -m compileall -q docmancer tests
+          git diff --check
+      - name: Commit semantic tagged-state tree
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git diff --cached --quiet && { echo '::error::no tagged-state diff'; exit 1; }
+          git commit -m "docs: record tagged 1.3.1 release state"
+          git push origin HEAD:p0/record-v1.3.1-tagged-state
