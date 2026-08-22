@@ -47,20 +47,12 @@ new_env = '''        env = {
 assert text.count(old_env) == 1, text.count(old_env)
 text = text.replace(old_env, new_env, 1)
 
-old_finish = '''                            "action": {
-                                "action": "finish",
-                                "reason": str(action["reason"]),
-                            },
-'''
-new_finish = '''                            "action": {
-                                "action": "finish",
-                                "reason_sha256": hashlib.sha256(
+old_reason = '"reason": str(action["reason"]),'
+new_reason = '''"reason_sha256": hashlib.sha256(
                                     str(action["reason"]).encode("utf-8")
-                                ).hexdigest(),
-                            },
-'''
-assert text.count(old_finish) == 1, text.count(old_finish)
-text = text.replace(old_finish, new_finish, 1)
+                                ).hexdigest(),'''
+assert text.count(old_reason) == 1, text.count(old_reason)
+text = text.replace(old_reason, new_reason, 1)
 
 marker = "\n\ndef _aggregate(\n"
 helper = '''
