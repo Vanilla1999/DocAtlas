@@ -1,0 +1,39 @@
+name: P1 Agent Truth evidence
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: p1-agent-truth-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
+
+jobs:
+  p1-evidence:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: "3.12"
+      - name: Verify P1.2 first-divergence atlas
+        run: |
+          python scripts/run_agent_developer_first_divergence_gate.py
+          python scripts/first_divergence_contract_self_test.py
+          python -m compileall -q \
+            eval/agent_developer_v1/first_divergence.py \
+            scripts/run_agent_developer_first_divergence_gate.py \
+            scripts/first_divergence_contract_self_test.py
+          git diff --check
