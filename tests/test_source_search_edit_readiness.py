@@ -1,59 +1,5 @@
 from __future__ import annotations
 
-from pathlib import Path
-
-ROOT = Path(__file__).resolve().parents[1]
-
-
-def replace_once(path: Path, old: str, new: str) -> None:
-    text = path.read_text(encoding="utf-8")
-    if text.count(old) != 1:
-        raise SystemExit(f"expected one replacement in {path}: {old!r}")
-    path.write_text(text.replace(old, new, 1), encoding="utf-8")
-
-
-answer = ROOT / "docmancer/docs/domain/answer_completeness.py"
-replace_once(
-    answer,
-    "from docmancer.docs.domain.project_doc_ranking import normalize_doc_path\n",
-    "from docmancer.docs.domain.project_doc_ranking import normalize_doc_path\n"
-    "from docmancer.docs.domain.recovery_handoff import has_safe_local_source_handoff\n",
-)
-replace_once(
-    answer,
-    '        "repeat_docs_context": False,\n        "reason": "Selected docs are partial/navigational; exact story-specific terms are missing from source-backed snippets.",\n',
-    '        "repeat_docs_context": False,\n        "auto_execute": False,\n        "reason": "Selected docs are partial/navigational; exact story-specific terms are missing from source-backed snippets.",\n',
-)
-replace_once(
-    answer,
-    '        "edit_ready": status == "exact" or source_search_required,\n',
-    '        "edit_ready": status == "exact" or has_safe_local_source_handoff(recommended_next_actions),\n',
-)
-replace_once(
-    answer,
-    '        "edit_ready": supported or bool(result["recommended_next_actions"]),\n',
-    '        "edit_ready": supported or has_safe_local_source_handoff(\n'
-    '            result["recommended_next_actions"]\n'
-    '        ),\n',
-)
-
-projection = ROOT / "docmancer/docs/interfaces/mcp/recovery_projection.py"
-replace_once(
-    projection,
-    "from docmancer.docs.application.recovery import build_recovery_diagnosis, recovery_action\n",
-    "from docmancer.docs.application.recovery import build_recovery_diagnosis, recovery_action\n"
-    "from docmancer.docs.domain.recovery_handoff import is_safe_local_source_handoff\n",
-)
-replace_once(
-    projection,
-    '    elif recovery.get("tool") == "code_search":\n',
-    '    elif is_safe_local_source_handoff(recovery):\n',
-)
-
-test_path = ROOT / "tests/docs/test_source_search_edit_readiness.py"
-test_path.write_text(
-    '''from __future__ import annotations
-
 from copy import deepcopy
 from types import SimpleNamespace
 
@@ -197,6 +143,3 @@ def test_authoritative_hard_stop_cannot_be_bypassed_by_source_handoff() -> None:
     assert projection["disposition"] == "resolve_authoritative_conflict"
     assert projection["edit_ready"] is False
     assert projection["source_search_status"] == "blocked"
-''',
-    encoding="utf-8",
-)

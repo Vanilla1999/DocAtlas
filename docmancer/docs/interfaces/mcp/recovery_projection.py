@@ -16,6 +16,7 @@ from docmancer.docs.application.model_visible_projection import (
     estimate_projection_tokens,
 )
 from docmancer.docs.application.recovery import build_recovery_diagnosis, recovery_action
+from docmancer.docs.domain.recovery_handoff import is_safe_local_source_handoff
 
 _RECOVERY_SUMMARY_KEYS = (
     "documentation_supported", "investigation_allowed", "hard_stop",
@@ -299,7 +300,7 @@ def _annotate_recovery_handoff(
             "source_search_status": "not_required",
             "requires_confirmation": False,
         })
-    elif recovery.get("tool") == "code_search":
+    elif is_safe_local_source_handoff(recovery):
         projection.update({
             "disposition": "search_local_source",
             "edit_ready": True,

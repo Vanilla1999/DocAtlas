@@ -23,7 +23,7 @@ Before the next public release candidate:
 - [ ] New DocAtlas state/integration identity is isolated from the active `docmancer` product namespace; clean installs do not implicitly write to foreign `~/.docmancer` state.
 - [ ] Legacy state/config migration is ownership-checked, preview-first, fail-closed on ambiguous/foreign state, and covered by installed tests.
 - [ ] Installed agent guidance and examples validate against the real three-tool public MCP schema.
-- [ ] The active release identity note and changelog agree on the intended public version. Repository `1.2.0` is an unpublished milestone; the next intended public release is `1.3.0` unless a later reviewed release-preparation change supersedes it.
+- [ ] The active release identity note and changelog agree on the intended public version. Repository `1.2.0` is an unpublished milestone; the next intended public release is `1.3.1` unless a later reviewed release-preparation change supersedes it.
 
 ## Built artifact
 
