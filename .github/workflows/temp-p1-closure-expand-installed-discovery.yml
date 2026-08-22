@@ -1,0 +1,66 @@
+name: TEMP expand installed MCP evidence discovery
+
+on:
+  push:
+    branches: [p1/p1-agent-truth-closure]
+    paths:
+      - .github/workflows/temp-p1-closure-expand-installed-discovery.yml
+
+permissions:
+  contents: write
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with:
+          ref: p1/p1-agent-truth-closure
+          fetch-depth: 0
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: "3.12"
+      - name: Discover all files inside installed-MCP evidence roots
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          from pathlib import Path
+
+          path = Path("eval/agent_developer_v1/p1_closure.py")
+          text = path.read_text(encoding="utf-8")
+          start = text.find("def _installed_mcp_files(repo_root: Path) -> list[Path]:")
+          end = text.find("\n\ndef _installed_reports", start)
+          if start < 0 or end < 0:
+              raise SystemExit("installed-MCP discovery function anchors missing")
+          replacement = '''def _installed_mcp_files(repo_root: Path) -> list[Path]:
+              candidates: set[Path] = set()
+              for path in repo_root.rglob("*"):
+                  if not path.is_file():
+                      continue
+                  relative = path.relative_to(repo_root).as_posix().casefold()
+                  if "temp-p1" in relative:
+                      continue
+                  if "installed_mcp" in relative or "installed-mcp" in relative:
+                      candidates.add(path)
+              return sorted(
+                  candidates,
+                  key=lambda path: path.relative_to(repo_root).as_posix(),
+              )
+          '''
+          path.write_text(text[:start] + replacement + text[end:], encoding="utf-8")
+          PY
+          rm .github/workflows/temp-p1-closure-expand-installed-discovery.yml
+          python -m compileall -q eval/agent_developer_v1/p1_closure.py
+          git diff --check
+      - name: Commit ordinary source only
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "fix(p1): bind the complete installed-MCP evidence root"
+          git push origin HEAD:p1/p1-agent-truth-closure
