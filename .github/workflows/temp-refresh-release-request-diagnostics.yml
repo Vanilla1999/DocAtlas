@@ -1,0 +1,99 @@
+name: TEMP refresh release-request diagnostic inventory
+
+on:
+  push:
+    branches: [release/reviewed-request-v1.3.1]
+    paths:
+      - .github/workflows/temp-refresh-release-request-diagnostics.yml
+
+permissions:
+  contents: write
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with:
+          ref: release/reviewed-request-v1.3.1
+          fetch-depth: 0
+
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: "3.12"
+
+      - name: Refresh the reviewed diagnostic inventory and release delta
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          from __future__ import annotations
+
+          import ast
+          import hashlib
+          import json
+          from pathlib import Path
+
+          module = "tests/test_release_request.py"
+          tree = ast.parse(Path(module).read_text(encoding="utf-8"))
+          nodeids = sorted(
+              f"{module}::{node.name}"
+              for node in tree.body
+              if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef))
+              and node.name.startswith("test_")
+          )
+          if len(nodeids) != 5:
+              raise SystemExit(f"expected 5 release request tests, found {nodeids}")
+          digest = hashlib.sha256("\n".join(nodeids).encode()).hexdigest()
+
+          manifest_path = Path("tests/diagnostic_labels.json")
+          manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+          manifest["module_labels"][module] = "behavioral"
+          manifest["module_node_hashes"][module] = digest
+          manifest_path.write_text(
+              json.dumps(manifest, indent=2, sort_keys=True) + "\n",
+              encoding="utf-8",
+          )
+
+          request_path = Path(".github/release-requests/v1.3.1.json")
+          request = json.loads(request_path.read_text(encoding="utf-8"))
+          expected = {
+              ".github/release-requests/v1.3.1.json",
+              ".github/workflows/release-request.yml",
+              "docs/RELEASE_CHECKLIST.md",
+              "scripts/release_request.py",
+              "tests/diagnostic_labels.json",
+              "tests/test_release_request.py",
+          }
+          request["allowed_release_delta"] = sorted(expected)
+          request_path.write_text(
+              json.dumps(request, indent=2, sort_keys=True) + "\n",
+              encoding="utf-8",
+          )
+          print(f"diagnostic hash: {digest}")
+          PY
+          rm .github/workflows/temp-refresh-release-request-diagnostics.yml
+          python -m json.tool tests/diagnostic_labels.json >/dev/null
+          python -m json.tool .github/release-requests/v1.3.1.json >/dev/null
+          git diff --check
+
+      - name: Commit the reviewed inventory update
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          changed="$(git diff --cached --name-only)"
+          expected="$(printf '%s\n' \
+            .github/release-requests/v1.3.1.json \
+            tests/diagnostic_labels.json)"
+          test "$changed" = "$expected" || {
+            echo "::error::unexpected refresh diff"
+            printf 'actual:\n%s\nexpected:\n%s\n' "$changed" "$expected"
+            exit 1
+          }
+          git commit -m "test(release): classify reviewed release request diagnostics"
+          git push origin HEAD:release/reviewed-request-v1.3.1
