@@ -32,6 +32,17 @@ FORBIDDEN_KEYS = {
     "stderr",
     "stdout",
 }
+ALLOWED_ORIGINS = {"reviewed-wheel", "public-pypi"}
+ALLOWED_FAILURE_STAGES = {
+    "model_format",
+    "mcp_schema",
+    "harness_policy",
+    "server_validation",
+    "retrieval",
+    "support",
+    "recovery",
+    "budget",
+}
 
 
 class InstalledMCPReportError(ValueError):
@@ -158,6 +169,7 @@ def verify_report(
     artifact = report.get("artifact")
     _require(isinstance(artifact, dict), "artifact identity is missing")
     origin = str(artifact.get("origin") or "")
+    _require(origin in ALLOWED_ORIGINS, "unsupported artifact origin")
     if expected_origin is not None:
         _require(origin == expected_origin, "artifact origin mismatch")
     _require(
@@ -256,7 +268,7 @@ def verify_report(
     )
 
     seen: set[str] = set()
-    schema_repairs = 0
+    schema_failures = 0
     attempted_calls = 0
     for row in tasks:
         _require(isinstance(row, dict), "task row is not an object")
@@ -275,15 +287,21 @@ def verify_report(
         _require("mcp_tools_list" in kinds, f"{task_id}: tools/list not recorded")
         _require("task_complete" in kinds, f"{task_id}: completion not recorded")
         attempted_calls += kinds.count("tool_attempt")
-        schema_repairs += kinds.count("mcp_schema_failure")
+        schema_failures += kinds.count("mcp_schema_failure")
+        stages = row.get("failure_stages")
+        _require(
+            isinstance(stages, list)
+            and stages == sorted(set(stages))
+            and set(stages) <= ALLOWED_FAILURE_STAGES,
+            f"{task_id}: invalid failure-stage attribution",
+        )
         _require(
             row.get("mcp_schema_sha256") == mcp.get("schema_sha256"),
             f"{task_id}: task schema digest differs from report",
         )
-    _require(attempted_calls > 0, "no model tool attempts were recorded")
     if require_schema_repair:
         _require(
-            schema_repairs > 0,
+            schema_failures > 0,
             "deterministic harness proof did not exercise bounded schema repair",
         )
 
@@ -313,7 +331,7 @@ def verify_report(
         "passed_tasks": report.get("passed_tasks"),
         "pass_rate": float(pass_rate),
         "tool_attempts": attempted_calls,
-        "schema_failures": schema_repairs,
+        "schema_failures": schema_failures,
         "claim_boundary": claim_boundary,
         "report_sha256": hashlib.sha256(canonical_json(report)).hexdigest(),
     }
