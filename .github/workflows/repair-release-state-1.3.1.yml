@@ -1,13 +1,17 @@
 name: TEMP repair DocAtlas 1.3.1 release state
 
 on:
-  push:
-    branches: [p0/repair-release-state-1.3.1]
-    paths:
-      - .github/workflows/repair-release-state-1.3.1.yml
+  pull_request:
+    branches: [main]
+    types: [opened, synchronize, reopened]
 
 permissions:
   contents: write
+  pull-requests: read
+
+concurrency:
+  group: repair-release-state-1.3.1-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
 
 env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
@@ -16,6 +20,7 @@ env:
 
 jobs:
   repair:
+    if: github.event.pull_request.head.ref == 'p0/repair-release-state-1.3.1'
     runs-on: ubuntu-latest
     timeout-minutes: 45
     steps:
