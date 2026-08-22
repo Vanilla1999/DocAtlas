@@ -35,6 +35,14 @@ jobs:
           import json
           from pathlib import Path
 
+          analyzer = Path("eval/agent_developer_v1/first_divergence.py")
+          text = analyzer.read_text(encoding="utf-8")
+          old = 'raise ValueError("P1.2 cannot close autonomous Agent Truth")'
+          new = 'raise ValueError("P1.2 cannot close Autonomous Agent Truth")'
+          if text.count(old) != 1:
+              raise SystemExit(f"unexpected Agent Truth message count: {text.count(old)}")
+          analyzer.write_text(text.replace(old, new, 1), encoding="utf-8")
+
           path = Path("tests/diagnostic_labels.json")
           manifest = json.loads(path.read_text(encoding="utf-8"))
           module = "tests/test_agent_developer_first_divergence.py"
@@ -64,6 +72,7 @@ jobs:
           expected="$(printf '%s\n' \
             .github/workflows/temp-materialize-p1.2-atlas.yml \
             docs/analysis/p1.2-agent-developer-first-divergence.md \
+            eval/agent_developer_v1/first_divergence.py \
             eval/agent_developer_v1/results/first-divergence-atlas.json \
             tests/diagnostic_labels.json)"
           test "$changed" = "$expected" || {
