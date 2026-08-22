@@ -1,4 +1,4 @@
-name: TEMP materialize P1.4 robustness evidence
+name: TEMP materialize strict P1.4 proofability evidence
 
 on:
   pull_request:
@@ -17,7 +17,7 @@ jobs:
   materialize:
     if: github.event.pull_request.head.ref == 'p1/p1.4-paraphrase-proofability'
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 35
     steps:
       - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
         with:
@@ -28,63 +28,55 @@ jobs:
         with:
           python-version: "3.12"
 
-      - name: Run, generate, and verify P1.4 protocol
+      - name: Materialize the strict reviewed protocol
+        shell: bash
+        env:
+          ARCHIVE_SHA256: 236e187340f3a391789d8be018be106df6f742496ca919f8aecd74488e327070
         run: |
           set -euo pipefail
+          cat > /tmp/p14.b64 <<'EOF'
+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
+EOF
+          base64 --decode /tmp/p14.b64 > /tmp/p14.tgz
+          test "$(sha256sum /tmp/p14.tgz | awk '{print $1}')" = "$ARCHIVE_SHA256"
+
+          rm -f \
+            eval/agent_developer_v1/paraphrase_robustness.py \
+            eval/agent_developer_v1/paraphrase_robustness_cases.json \
+            scripts/build_agent_developer_paraphrase_robustness.py \
+            tests/test_agent_developer_paraphrase_robustness.py
+          tar -xzf /tmp/p14.tgz
+
           python - <<'PY'
           import json
           from pathlib import Path
-
           path = Path("tests/diagnostic_labels.json")
           manifest = json.loads(path.read_text(encoding="utf-8"))
-          module = "tests/test_agent_developer_paraphrase_robustness.py"
+          old = "tests/test_agent_developer_paraphrase_robustness.py"
+          manifest["module_labels"].pop(old, None)
+          manifest["module_node_hashes"].pop(old, None)
+          module = "tests/test_agent_proofability_robustness.py"
           manifest["module_labels"][module] = "behavioral"
-          manifest["module_node_hashes"][module] = (
-              "69f02c246ae96a85fe383d82b64ed026ca15dffd6974d9f96827742e02cc2e4f"
-          )
-          path.write_text(
-              json.dumps(manifest, indent=2, sort_keys=True) + "\n",
-              encoding="utf-8",
-          )
+          manifest["module_node_hashes"][module] = "367b4b0b3092555c9ee7e2906e1d26652cda3baef644cc5ca331f09aa5c09633"
+          path.write_text(json.dumps(manifest, indent=2, sort_keys=True) + "\n", encoding="utf-8")
           PY
-          python -m pip install -e ".[dev]"
-          python - <<'PY'
-          import json
-          from pathlib import Path
-          import eval.agent_developer_v1.paraphrase_robustness as protocol
 
-          protocol.validate_report = lambda _report: None
-          report = protocol.run_protocol(
-              protocol.load_json(
-                  Path("eval/agent_developer_v1/paraphrase_robustness_cases.json")
-              )
-          )
-          print("P1.4 DIAGNOSTIC CASES")
-          print(json.dumps(report["cases"], indent=2, ensure_ascii=False, sort_keys=True))
-          print("P1.4 DIAGNOSTIC METRICS")
-          print(json.dumps(report["categories"], indent=2, sort_keys=True))
-          PY
-          python scripts/build_agent_developer_paraphrase_robustness.py
-          pytest -q tests/test_agent_developer_paraphrase_robustness.py
-          python scripts/build_agent_developer_paraphrase_robustness.py --check
           rm .github/workflows/temp-materialize-p1.4-robustness.yml
+          python -m pip install -e ".[dev]"
+          python scripts/build_agent_proofability_robustness.py --check
+          pytest -q tests/test_agent_proofability_robustness.py tests/test_diagnostic_labels.py
+          python -m compileall -q \
+            eval/agent_developer_v1/proofability_robustness.py \
+            scripts/build_agent_proofability_robustness.py \
+            tests/test_agent_proofability_robustness.py
           git diff --check
 
-      - name: Commit only generated evidence and carrier deletion
+      - name: Commit the final reviewable P1.4 tree
+        shell: bash
         run: |
           set -euo pipefail
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add -A
-          changed="$(git diff --cached --name-only)"
-          expected="$(printf '%s\n' \
-            .github/workflows/temp-materialize-p1.4-robustness.yml \
-            docs/analysis/p1.4-paraphrase-proofability.md \
-            eval/agent_developer_v1/results/paraphrase-robustness.json \
-            tests/diagnostic_labels.json)"
-          test "$changed" = "$expected" || {
-            printf 'unexpected P1.4 materialized diff\nactual:\n%s\nexpected:\n%s\n' "$changed" "$expected"
-            exit 1
-          }
-          git commit -m "docs(p1): materialize paraphrase robustness evidence"
+          git commit -m "test(p1): measure strict proofability robustness"
           git push origin HEAD:p1/p1.4-paraphrase-proofability
