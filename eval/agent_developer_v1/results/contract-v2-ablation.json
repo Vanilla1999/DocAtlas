@@ -1,0 +1,170 @@
+{
+  "candidates": [
+    {
+      "addressed_primary_classes": [],
+      "contamination_delta_measured": false,
+      "context_owner": "unchanged",
+      "counterfactual_primary_divergences_addressed": 0,
+      "counterfactual_residual_primary_divergences": 11,
+      "decision": "baseline",
+      "decision_reason": "Reference condition; retains all observed primary divergences.",
+      "description": "Historical model-visible contract and planner behavior.",
+      "false_support_delta_measured": false,
+      "id": "current_contract",
+      "live_model_effect_measured": false,
+      "new_state_surface": false,
+      "public_contract_change": false,
+      "same_call_budgets": true,
+      "same_frozen_tasks": true,
+      "same_historical_model_report": true,
+      "server_authority_expansion": false
+    },
+    {
+      "addressed_primary_classes": [],
+      "contamination_delta_measured": false,
+      "context_owner": "host",
+      "counterfactual_primary_divergences_addressed": 0,
+      "counterfactual_residual_primary_divergences": 11,
+      "decision": "reject_as_redundant",
+      "decision_reason": "The historical public tasks already exposed working_path, so this candidate has zero incremental evidence coverage.",
+      "description": "Expose working_path to the model without adding any selector normalization or server inference.",
+      "false_support_delta_measured": false,
+      "id": "working_path_visible",
+      "live_model_effect_measured": false,
+      "new_state_surface": false,
+      "public_contract_change": false,
+      "same_call_budgets": true,
+      "same_frozen_tasks": true,
+      "same_historical_model_report": true,
+      "server_authority_expansion": false
+    },
+    {
+      "addressed_primary_classes": [
+        "selector_cardinality_invalid"
+      ],
+      "contamination_delta_measured": false,
+      "context_owner": "host",
+      "counterfactual_primary_divergences_addressed": 8,
+      "counterfactual_residual_primary_divergences": 3,
+      "decision": "accept_for_next_live_ablation",
+      "decision_reason": "It targets the dominant 8/11 pre-MCP failure without granting the server new scope authority or changing the public three-tool schema.",
+      "description": "The host derives an exact module_path from the already supplied working_path, clears module, and validates the normalized call.",
+      "false_support_delta_measured": false,
+      "id": "host_selector_normalization",
+      "live_model_effect_measured": false,
+      "new_state_surface": false,
+      "public_contract_change": false,
+      "same_call_budgets": true,
+      "same_frozen_tasks": true,
+      "same_historical_model_report": true,
+      "server_authority_expansion": false
+    },
+    {
+      "addressed_primary_classes": [
+        "selector_cardinality_invalid"
+      ],
+      "contamination_delta_measured": false,
+      "context_owner": "server",
+      "counterfactual_primary_divergences_addressed": 8,
+      "counterfactual_residual_primary_divergences": 3,
+      "decision": "reject",
+      "decision_reason": "It has no broader counterfactual coverage than host normalization but can silently choose scope before evidence adjudication.",
+      "description": "The server infers module scope/module_path when the model supplies an incomplete or contradictory selector.",
+      "false_support_delta_measured": false,
+      "id": "server_owned_scope_module_inference",
+      "live_model_effect_measured": false,
+      "new_state_surface": false,
+      "public_contract_change": true,
+      "same_call_budgets": true,
+      "same_frozen_tasks": true,
+      "same_historical_model_report": true,
+      "server_authority_expansion": true
+    },
+    {
+      "addressed_primary_classes": [],
+      "contamination_delta_measured": false,
+      "context_owner": "server",
+      "counterfactual_primary_divergences_addressed": 0,
+      "counterfactual_residual_primary_divergences": 11,
+      "decision": "reject",
+      "decision_reason": "All observed first divergences occur before a successful lifecycle handoff could issue a continuation token.",
+      "description": "Return an opaque lifecycle token that the model replays on a later tool call.",
+      "false_support_delta_measured": false,
+      "id": "opaque_continuation_token",
+      "live_model_effect_measured": false,
+      "new_state_surface": true,
+      "public_contract_change": true,
+      "same_call_budgets": true,
+      "same_frozen_tasks": true,
+      "same_historical_model_report": true,
+      "server_authority_expansion": false
+    }
+  ],
+  "claim_boundary": {
+    "autonomous_agent_truth_closed": false,
+    "p1_3_ablation_complete": true,
+    "product_maturity": "Beta",
+    "provider_backed_candidate_effect_proven": false,
+    "public_api_change_authorized": false
+  },
+  "composite_controls": [
+    {
+      "addressed_primary_classes": [
+        "question_specificity_mismatch",
+        "required_scope_sequence_mismatch",
+        "selector_cardinality_invalid"
+      ],
+      "counterfactual_primary_divergences_addressed": 11,
+      "counterfactual_residual_primary_divergences": 0,
+      "description": "Selector normalization plus exact-identity question guidance plus the frozen module-before-dependency sequence.",
+      "id": "host_planning_profile_control",
+      "production_feature_approved": false,
+      "public_contract_change": false,
+      "purpose": "Positive-control profile for a future provider-backed run; not a claim that the historical model would follow the repaired plan."
+    }
+  ],
+  "decision": {
+    "accepted_for_next_live_ablation": [
+      "host_selector_normalization"
+    ],
+    "accepted_public_contract_changes": [],
+    "public_agent_contract_v2": "no_change",
+    "reason": "P1.2 supports a host-owned normalization experiment, not a public working_path field, server-owned inference, or continuation state.",
+    "rejected": [
+      "working_path_visible",
+      "server_owned_scope_module_inference",
+      "opaque_continuation_token"
+    ]
+  },
+  "method": {
+    "kind": "first-divergence counterfactual ablation",
+    "live_model_effect_measured": false,
+    "runtime_or_public_schema_modified": false,
+    "same_call_budgets": true,
+    "same_frozen_tasks": true,
+    "same_historical_model_report": true
+  },
+  "observed_primary_failure_counts": {
+    "question_specificity_mismatch": 2,
+    "required_scope_sequence_mismatch": 1,
+    "selector_cardinality_invalid": 8
+  },
+  "protocol": "agent-contract-v2-ablation-v1",
+  "safety": {
+    "candidate_contamination_delta_claimed": false,
+    "candidate_false_support_delta_claimed": false,
+    "historical_false_supported": 0,
+    "historical_forbidden_source_contamination": 0,
+    "live_confirmation_required_before_product_change": true
+  },
+  "schema_version": 1,
+  "source": {
+    "fresh_provider_blocker": "repository OPENAI_API_KEY is not configured",
+    "fresh_provider_run_available": false,
+    "historical_model_report_sha256": "ebc6da0de44ead15f4da7205a7b4bc20c01f0125877f178026fd6293a69308fa",
+    "model": "gpt-5.6-luna",
+    "p1_2_atlas_sha256": "b4af12b3201b1d0077f8f102d50956c5f480a783d6ada8c3ffcc7281b25b3421",
+    "provider_id": "opencode-chat",
+    "task_count": 11
+  }
+}
