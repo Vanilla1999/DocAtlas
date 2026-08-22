@@ -178,6 +178,11 @@ jobs:
           python -m build
           python scripts/release_gate.py --manifest dist/release-manifest.json
           cp dist/release-manifest.json /tmp/pretag-release-manifest.json
+          git diff --exit-code
+          git reset --hard "$GITHUB_SHA"
+          git clean -fdx
+          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+          test -z "$(git status --porcelain)"
 
       - name: Require the public version to be absent
         if: steps.request.outputs.execute == 'true'
