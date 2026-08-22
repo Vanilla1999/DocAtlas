@@ -168,6 +168,17 @@ jobs:
             exit 1
           }
 
+      - name: Rebuild and gate the exact main tree before tagging
+        id: pretag
+        if: steps.request.outputs.execute == 'true'
+        run: |
+          set -euo pipefail
+          python -m pip install build "hatchling<1.27"
+          rm -rf dist
+          python -m build
+          python scripts/release_gate.py --manifest dist/release-manifest.json
+          cp dist/release-manifest.json /tmp/pretag-release-manifest.json
+
       - name: Require the public version to be absent
         if: steps.request.outputs.execute == 'true'
         run: |
@@ -185,6 +196,11 @@ jobs:
           git fetch origin --tags --force
           if git ls-remote --exit-code --tags origin "refs/tags/$RELEASE_TAG" >/dev/null 2>&1; then
             git fetch origin "refs/tags/$RELEASE_TAG:refs/tags/$RELEASE_TAG" --force
+            object_type="$(git cat-file -t "$RELEASE_TAG")"
+            test "$object_type" = "tag" || {
+              echo "::error::$RELEASE_TAG exists but is not an annotated tag"
+              exit 1
+            }
             existing="$(git rev-parse "$RELEASE_TAG^{}")"
             test "$existing" = "$GITHUB_SHA" || {
               echo "::error::$RELEASE_TAG already points to $existing, expected $GITHUB_SHA"
@@ -196,8 +212,12 @@ jobs:
             git tag -a "$RELEASE_TAG" "$GITHUB_SHA" -m "DocAtlas ${{ steps.request.outputs.version }}"
             git push origin "refs/tags/$RELEASE_TAG"
           fi
+          object_type="$(git cat-file -t "$RELEASE_TAG")"
+          peeled="$(git rev-parse "$RELEASE_TAG^{}")"
+          test "$object_type" = "tag"
+          test "$peeled" = "$GITHUB_SHA"
           echo "tag_object_sha=$(git rev-parse "$RELEASE_TAG")" >> "$GITHUB_OUTPUT"
-          echo "peeled_commit_sha=$(git rev-parse "$RELEASE_TAG^{}")" >> "$GITHUB_OUTPUT"
+          echo "peeled_commit_sha=$peeled" >> "$GITHUB_OUTPUT"
 
       - name: Dispatch the canonical OIDC publish workflow
         id: dispatch
@@ -324,6 +344,7 @@ jobs:
             /tmp/release-request-inspect.json
             /tmp/release-preflight.json
             /tmp/main-check-runs.json
+            /tmp/pretag-release-manifest.json
             /tmp/publish-run.json
             /tmp/publish-jobs.json
             /tmp/v${{ steps.request.outputs.version }}-public.json
@@ -336,6 +357,7 @@ jobs:
           set -euo pipefail
           test "${{ steps.preflight.outcome }}" = "success"
           test "${{ steps.main_ci.outcome }}" = "success"
+          test "${{ steps.pretag.outcome }}" = "success"
           test "${{ steps.tag.outcome }}" = "success"
           test "${{ steps.dispatch.outcome }}" = "success"
           test "${{ steps.publication.outcome }}" = "success"
