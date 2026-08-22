@@ -194,6 +194,49 @@ jobs:
           if-no-files-found: warn
           retention-days: 14
 
+  installed-mcp-harness:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Set up Python
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: "3.12"
+
+      - name: Build exact reviewed wheel and install evaluator dependencies
+        run: |
+          python -m pip install build "hatchling<1.27" -e ".[dev]"
+          rm -rf dist/installed-mcp
+          python -m build --wheel --outdir dist/installed-mcp
+
+      - name: Exercise real stdio MCP and bounded schema repair
+        run: |
+          wheel="$(find dist/installed-mcp -maxdepth 1 -name '*.whl' -print -quit)"
+          test -n "$wheel"
+          python scripts/run_installed_mcp_agent_benchmark.py \
+            --wheel "$wheel" \
+            --source-commit "$GITHUB_SHA" \
+            --planner scripted \
+            --task module_definition_supported \
+            --max-schema-repairs 1 \
+            --min-pass-rate 1.0 \
+            --output eval/agent_developer_v1/results/installed-mcp-ci.json
+
+      - name: Verify evidence attribution, hash chain, and privacy
+        run: |
+          python scripts/verify_installed_mcp_agent_report.py \
+            eval/agent_developer_v1/results/installed-mcp-ci.json \
+            --expected-origin reviewed-wheel \
+            --min-task-count 1 \
+            --min-pass-rate 1.0 \
+            --require-schema-repair
+
   static-contract:
     runs-on: ubuntu-latest
     timeout-minutes: 15
@@ -222,7 +265,7 @@ jobs:
   required-ci:
     name: required-ci
     if: always()
-    needs: [docs-contract, installer-smoke, platform-smoke, test, advanced-contract, static-contract]
+    needs: [docs-contract, installer-smoke, platform-smoke, test, advanced-contract, installed-mcp-harness, static-contract]
     runs-on: ubuntu-latest
     timeout-minutes: 5
 
@@ -234,8 +277,9 @@ jobs:
           PLATFORM_SMOKE: ${{ needs.platform-smoke.result }}
           CORE_TESTS: ${{ needs.test.result }}
           ADVANCED_CONTRACT: ${{ needs.advanced-contract.result }}
+          INSTALLED_MCP_HARNESS: ${{ needs.installed-mcp-harness.result }}
           STATIC_CONTRACT: ${{ needs.static-contract.result }}
         run: |
-          for result in "$DOCS_CONTRACT" "$INSTALLER_SMOKE" "$PLATFORM_SMOKE" "$CORE_TESTS" "$ADVANCED_CONTRACT" "$STATIC_CONTRACT"; do
+          for result in "$DOCS_CONTRACT" "$INSTALLER_SMOKE" "$PLATFORM_SMOKE" "$CORE_TESTS" "$ADVANCED_CONTRACT" "$INSTALLED_MCP_HARNESS" "$STATIC_CONTRACT"; do
             test "$result" = "success"
           done
