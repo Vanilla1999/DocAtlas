@@ -58,7 +58,7 @@ Compensating release controls:
 
 - a release tag must resolve to a commit reachable from remote `main`;
 - PR/release CI remains the reviewed engineering evidence before merge;
-- publication remains manual through the `release` environment;
+- publication remains manual through the `release-current` environment;
 - PyPI publication uses OIDC/Trusted Publishing with no long-lived PyPI token;
 - exact public artifacts and installed behavior are verified after publication.
 
