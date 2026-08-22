@@ -1,0 +1,74 @@
+name: TEMP materialize P1.4 robustness evidence
+
+on:
+  pull_request:
+    branches: [main]
+    types: [opened, synchronize, reopened]
+
+permissions:
+  contents: write
+  pull-requests: read
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
+  DOCMANCER_OFFLINE: "1"
+
+jobs:
+  materialize:
+    if: github.event.pull_request.head.ref == 'p1/p1.4-paraphrase-proofability'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with:
+          ref: p1/p1.4-paraphrase-proofability
+          fetch-depth: 0
+
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: "3.12"
+
+      - name: Run, generate, and verify P1.4 protocol
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          path = Path("tests/diagnostic_labels.json")
+          manifest = json.loads(path.read_text(encoding="utf-8"))
+          module = "tests/test_agent_developer_paraphrase_robustness.py"
+          manifest["module_labels"][module] = "behavioral"
+          manifest["module_node_hashes"][module] = (
+              "69f02c246ae96a85fe383d82b64ed026ca15dffd6974d9f96827742e02cc2e4f"
+          )
+          path.write_text(
+              json.dumps(manifest, indent=2, sort_keys=True) + "\n",
+              encoding="utf-8",
+          )
+          PY
+          python -m pip install -e ".[dev]"
+          python scripts/build_agent_developer_paraphrase_robustness.py
+          pytest -q tests/test_agent_developer_paraphrase_robustness.py
+          python scripts/build_agent_developer_paraphrase_robustness.py --check
+          rm .github/workflows/temp-materialize-p1.4-robustness.yml
+          git diff --check
+
+      - name: Commit only generated evidence and carrier deletion
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          changed="$(git diff --cached --name-only)"
+          expected="$(printf '%s\n' \
+            .github/workflows/temp-materialize-p1.4-robustness.yml \
+            docs/analysis/p1.4-paraphrase-proofability.md \
+            eval/agent_developer_v1/results/paraphrase-robustness.json \
+            tests/diagnostic_labels.json)"
+          test "$changed" = "$expected" || {
+            printf 'unexpected P1.4 materialized diff\nactual:\n%s\nexpected:\n%s\n' "$changed" "$expected"
+            exit 1
+          }
+          git commit -m "docs(p1): materialize paraphrase robustness evidence"
+          git push origin HEAD:p1/p1.4-paraphrase-proofability
