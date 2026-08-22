@@ -1,0 +1,85 @@
+name: TEMP finalize P1.5 branch
+
+on:
+  push:
+    branches: [p1/p1.5-mixed-evidence-provenance]
+    paths:
+      - .github/workflows/temp-p1.5-finalize-stack.yml
+
+permissions:
+  contents: write
+
+concurrency:
+  group: temp-finalize-p1-5
+  cancel-in-progress: false
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
+
+jobs:
+  finalize:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with:
+          ref: p1/p1.5-mixed-evidence-provenance
+          fetch-depth: 0
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: "3.12"
+      - name: Install evaluator dependencies
+        run: python -m pip install -e ".[dev]"
+      - name: Materialize inherited and P1.5 evidence
+        run: |
+          set -euo pipefail
+          python scripts/run_agent_developer_first_divergence_gate.py --write
+          python scripts/run_agent_developer_first_divergence_gate.py
+          python scripts/run_agent_contract_v2_ablation_gate.py --write
+          python scripts/run_agent_contract_v2_ablation_gate.py
+          python scripts/run_paraphrase_proofability_gate.py --write
+          python scripts/run_paraphrase_proofability_gate.py
+          python scripts/run_mixed_evidence_provenance_gate.py --write
+          python scripts/run_mixed_evidence_provenance_gate.py
+          python scripts/first_divergence_contract_self_test.py
+          python scripts/agent_contract_v2_ablation_self_test.py
+          python scripts/paraphrase_proofability_self_test.py
+          python scripts/mixed_evidence_provenance_self_test.py
+          find .github/workflows -maxdepth 1 -type f \( \
+            -name 'temp-p1.2-*.yml' -o \
+            -name 'temp-p1.3-*.yml' -o \
+            -name 'temp-p1.4-*.yml' -o \
+            -name 'temp-p1.5-*.yml' \
+          \) -delete
+          git diff --check
+      - name: Commit a carrier-free branch
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          python - <<'PY'
+          import subprocess
+          allowed = {
+              "eval/agent_developer_v1/results/first-divergence-atlas.json",
+              "eval/agent_developer_v1/results/contract-v2-ablation.json",
+              "eval/agent_developer_v1/results/paraphrase-proofability.json",
+              "eval/agent_developer_v1/results/mixed-evidence-provenance.json",
+          }
+          changed = subprocess.check_output(
+              ["git", "diff", "--cached", "--name-only"], text=True
+          ).splitlines()
+          bad = [
+              path for path in changed
+              if path not in allowed
+              and not path.startswith(".github/workflows/temp-p1.")
+          ]
+          if bad:
+              raise SystemExit(f"unexpected P1.5 finalization paths: {bad}")
+          PY
+          if git diff --cached --quiet; then
+            echo "P1.5 branch already finalized"
+            exit 0
+          fi
+          git commit -m "chore(p1): finalize the P1.5 evidence branch"
+          git push origin HEAD:p1/p1.5-mixed-evidence-provenance
