@@ -37,7 +37,7 @@ jobs:
       - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
         with:
           fetch-depth: 0
-          persist-credentials: true
+          persist-credentials: false
 
       - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
         with:
@@ -190,33 +190,61 @@ jobs:
         if: steps.request.outputs.execute == 'true'
         shell: bash
         env:
+          GH_TOKEN: ${{ github.token }}
           RELEASE_TAG: ${{ steps.request.outputs.tag }}
         run: |
           set -euo pipefail
-          git fetch origin --tags --force
-          if git ls-remote --exit-code --tags origin "refs/tags/$RELEASE_TAG" >/dev/null 2>&1; then
-            git fetch origin "refs/tags/$RELEASE_TAG:refs/tags/$RELEASE_TAG" --force
-            object_type="$(git cat-file -t "$RELEASE_TAG")"
-            test "$object_type" = "tag" || {
+          git fetch origin main --force
+          current_main="$(git rev-parse origin/main)"
+          test "$current_main" = "$GITHUB_SHA" || {
+            echo "::error::main moved from release request SHA $GITHUB_SHA to $current_main before tagging"
+            exit 1
+          }
+
+          ref_endpoint="repos/${GITHUB_REPOSITORY}/git/ref/tags/${RELEASE_TAG}"
+          if existing_ref="$(
+            gh api "$ref_endpoint" \
+              --jq '.object.type + " " + .object.sha' \
+              2>/tmp/tag-ref-error
+          )"; then
+            read -r ref_type tag_object_sha <<< "$existing_ref"
+            test "$ref_type" = "tag" || {
               echo "::error::$RELEASE_TAG exists but is not an annotated tag"
               exit 1
             }
-            existing="$(git rev-parse "$RELEASE_TAG^{}")"
-            test "$existing" = "$GITHUB_SHA" || {
-              echo "::error::$RELEASE_TAG already points to $existing, expected $GITHUB_SHA"
-              exit 1
-            }
           else
-            git config user.name "github-actions[bot]"
-            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-            git tag -a "$RELEASE_TAG" "$GITHUB_SHA" -m "DocAtlas ${{ steps.request.outputs.version }}"
-            git push origin "refs/tags/$RELEASE_TAG"
+            if ! grep -q 'HTTP 404' /tmp/tag-ref-error; then
+              cat /tmp/tag-ref-error
+              exit 1
+            fi
+            tag_object_sha="$(
+              gh api --method POST \
+                "repos/${GITHUB_REPOSITORY}/git/tags" \
+                -f "tag=$RELEASE_TAG" \
+                -f "message=DocAtlas ${{ steps.request.outputs.version }}" \
+                -f "object=$GITHUB_SHA" \
+                -f "type=commit" \
+                --jq .sha
+            )"
+            gh api --method POST \
+              "repos/${GITHUB_REPOSITORY}/git/refs" \
+              -f "ref=refs/tags/$RELEASE_TAG" \
+              -f "sha=$tag_object_sha" \
+              > /tmp/tag-ref-created.json
           fi
-          object_type="$(git cat-file -t "$RELEASE_TAG")"
-          peeled="$(git rev-parse "$RELEASE_TAG^{}")"
-          test "$object_type" = "tag"
+
+          verified_ref="$(gh api "$ref_endpoint" --jq '.object.type + " " + .object.sha')"
+          read -r ref_type verified_tag_object_sha <<< "$verified_ref"
+          test "$ref_type" = "tag"
+          test "$verified_tag_object_sha" = "$tag_object_sha"
+          verified_target="$(
+            gh api "repos/${GITHUB_REPOSITORY}/git/tags/$tag_object_sha" \
+              --jq '.object.type + " " + .object.sha'
+          )"
+          read -r target_type peeled <<< "$verified_target"
+          test "$target_type" = "commit"
           test "$peeled" = "$GITHUB_SHA"
-          echo "tag_object_sha=$(git rev-parse "$RELEASE_TAG")" >> "$GITHUB_OUTPUT"
+          echo "tag_object_sha=$tag_object_sha" >> "$GITHUB_OUTPUT"
           echo "peeled_commit_sha=$peeled" >> "$GITHUB_OUTPUT"
 
       - name: Dispatch the canonical OIDC publish workflow
@@ -345,6 +373,8 @@ jobs:
             /tmp/release-preflight.json
             /tmp/main-check-runs.json
             /tmp/pretag-release-manifest.json
+            /tmp/tag-ref-error
+            /tmp/tag-ref-created.json
             /tmp/publish-run.json
             /tmp/publish-jobs.json
             /tmp/v${{ steps.request.outputs.version }}-public.json
