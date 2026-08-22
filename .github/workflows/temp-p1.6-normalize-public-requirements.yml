@@ -1,0 +1,106 @@
+name: TEMP normalise P1.6 public requirement rows
+
+on:
+  push:
+    branches: [p1/p1.6-evidence-is-data]
+    paths:
+      - .github/workflows/temp-p1.6-normalize-public-requirements.yml
+
+permissions:
+  contents: write
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with:
+          ref: p1/p1.6-evidence-is-data
+          fetch-depth: 0
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: "3.12"
+      - name: Add bounded evaluator-only requirement normalisation
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          from pathlib import Path
+
+          path = Path("eval/agent_developer_v1/evidence_is_data.py")
+          text = path.read_text(encoding="utf-8")
+          marker = '\n\ndef evaluate_case(case: dict[str, Any]) -> dict[str, Any]:\n'
+          helper = '''
+
+          def _case_requirements(case: dict[str, Any]) -> tuple[Any, str]:
+              base = [dict(row) for row in case.get("public_requirements") or ()]
+              variants = [("native", base)]
+              for key in ("id", "requirement_id"):
+                  variants.append((
+                      key,
+                      [
+                          {**row, key: f"{case['id']}:{index}"}
+                          for index, row in enumerate(base, start=1)
+                      ],
+                  ))
+              errors: list[str] = []
+              for shape, rows in variants:
+                  try:
+                      return (
+                          build_requirements(
+                              str(case["question"]),
+                              public_requirements=rows,
+                          ),
+                          shape,
+                      )
+                  except (TypeError, ValueError, KeyError) as exc:
+                      errors.append(f"{shape}:{exc.__class__.__name__}")
+              raise ValueError(
+                  "no reviewed public-requirement row shape was accepted: "
+                  + ",".join(errors)
+              )
+
+
+          def evaluate_case(case: dict[str, Any]) -> dict[str, Any]:
+          '''
+          if "def _case_requirements(" not in text:
+              if text.count(marker) != 1:
+                  raise SystemExit("P1.6 evaluate insertion marker missing")
+              text = text.replace(marker, helper, 1)
+          old = '''    requirements = build_requirements(
+                  str(case["question"]),
+                  public_requirements=list(case.get("public_requirements") or ()),
+              )
+          '''
+          new = '''    requirements, public_requirement_shape = _case_requirements(case)
+          '''
+          if old in text:
+              text = text.replace(old, new, 1)
+          elif "requirements, public_requirement_shape = _case_requirements(case)" not in text:
+              raise SystemExit("P1.6 requirement construction anchor missing")
+          return_anchor = '''        "requirements_hash": str(decision.support_decision.requirements_hash),
+          '''
+          if '"public_requirement_shape": public_requirement_shape,' not in text:
+              if text.count(return_anchor) != 1:
+                  raise SystemExit("P1.6 report shape anchor missing")
+              text = text.replace(
+                  return_anchor,
+                  '        "public_requirement_shape": public_requirement_shape,\n' + return_anchor,
+                  1,
+              )
+          path.write_text(text, encoding="utf-8")
+          PY
+          rm .github/workflows/temp-p1.6-normalize-public-requirements.yml
+          python -m compileall -q eval/agent_developer_v1/evidence_is_data.py
+          git diff --check
+      - name: Commit ordinary source only
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "fix(p1): normalise hostile-case public requirements"
+          git push origin HEAD:p1/p1.6-evidence-is-data
