@@ -20,6 +20,7 @@ DEFAULT_MARKDOWN = ROOT / "docs/analysis/p1.3-agent-contract-v2-ablation.md"
 
 
 def _json_text(value: object) -> str:
+    """Use one stable representation for generation and drift checking."""
     return json.dumps(value, indent=2, ensure_ascii=False, sort_keys=True) + "\n"
 
 
