@@ -1,0 +1,68 @@
+{
+  "artifacts": {
+    "sdist": {
+      "filename": "doc_atlas-1.3.1.tar.gz",
+      "gated_sha256": "6cbcdf8d947ca4f494fa3052d5012703c29386ec3e8f8629d7cabba58bb62aff"
+    },
+    "wheel": {
+      "filename": "doc_atlas-1.3.1-py3-none-any.whl",
+      "gated_sha256": "6b82e37ec8ac2a3d415f30aa51e48830afecd04386d34dab694ee6b6c697b6b0"
+    }
+  },
+  "failure": {
+    "code": "invalid-publisher",
+    "oidc_token_valid": true,
+    "public_upload_status": "rejected_before_upload",
+    "stage": "pypa/gh-action-pypi-publish"
+  },
+  "git": {
+    "tag": "v1.3.1",
+    "tag_object_sha": "77bced8c530c88c57d2e6c5f58cb717bfe837a9f",
+    "target_commit_sha": "cfa9ab5c365a28d1a4af63afe9f1d53b19532d89"
+  },
+  "publisher_claims": {
+    "environment": "release-current",
+    "job_workflow_ref": "Vanilla1999/DocAtlas/.github/workflows/publish.yml@refs/heads/main",
+    "ref": "refs/heads/main",
+    "repository": "Vanilla1999/DocAtlas",
+    "repository_owner": "Vanilla1999",
+    "sub": "repo:Vanilla1999/DocAtlas:environment:release-current",
+    "workflow_ref": "Vanilla1999/DocAtlas/.github/workflows/publish.yml@refs/heads/main"
+  },
+  "pypi_observation": {
+    "latest_public_version": "1.1.1",
+    "version_1_3_1_exists": false,
+    "version_1_3_1_http_status": 404
+  },
+  "release": {
+    "distribution": "doc-atlas",
+    "maturity": "Beta",
+    "product": "DocAtlas",
+    "version": "1.3.1"
+  },
+  "retry_contract": {
+    "allowed_after_external_publisher_match": true,
+    "expected_publisher": {
+      "environment": "release-current",
+      "owner": "Vanilla1999",
+      "repository": "DocAtlas",
+      "workflow": "publish.yml"
+    },
+    "public_version_must_remain_absent": true,
+    "rerun_mode": "rerun_failed_jobs",
+    "source_workflow_run_id": 32587903026,
+    "tag_must_remain_immutable": true
+  },
+  "schema_version": 1,
+  "workflow": {
+    "event": "workflow_dispatch",
+    "job_id": 97067125249,
+    "job_name": "publish",
+    "required_release_conclusion": "success",
+    "run_attempt": 1,
+    "run_conclusion": "failure",
+    "run_id": 32587903026,
+    "run_url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/32587903026",
+    "workflow_name": "Release artifact gate and publish"
+  }
+}
