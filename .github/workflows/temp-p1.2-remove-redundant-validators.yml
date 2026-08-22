@@ -1,0 +1,39 @@
+name: TEMP remove redundant P1 validators
+
+on:
+  push:
+    branches: [p1/p1.2-first-divergence-atlas]
+    paths:
+      - .github/workflows/temp-p1.2-remove-redundant-validators.yml
+
+permissions:
+  contents: write
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
+
+jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with:
+          ref: p1/p1.2-first-divergence-atlas
+          fetch-depth: 0
+      - name: Keep only the bootstrapped exact stacked validator
+        run: |
+          set -euo pipefail
+          rm -f \
+            .github/workflows/p1-exact-head-validation.yml \
+            .github/workflows/p1-exact-release-validation.yml \
+            .github/workflows/temp-p1.2-remove-redundant-validators.yml
+          git diff --check
+      - name: Commit the workflow cleanup
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "chore(p1): keep one exact-head validator"
+          git push origin HEAD:p1/p1.2-first-divergence-atlas
