@@ -76,12 +76,13 @@ jobs:
           python -m build
           python scripts/release_gate.py --manifest dist/release-manifest.json
 
-      - name: Commit only the clean semantic repair
+      - name: Commit validated non-workflow semantic repair
         shell: bash
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add -A
-          git diff --cached --quiet && { echo '::error::no semantic repair diff'; exit 1; }
-          git commit -m "fix: repair and clean the DocAtlas 1.3.1 release state"
+          git restore --staged .github/workflows
+          git diff --cached --quiet && { echo '::error::no non-workflow semantic repair diff'; exit 1; }
+          git commit -m "fix: materialize the DocAtlas 1.3.1 semantic repair"
           git push origin HEAD:p0/repair-release-state-1.3.1
