@@ -1,0 +1,167 @@
+name: TEMP refine installed MCP command driver
+
+on:
+  push:
+    branches: [p1/installed-mcp-live-harness]
+    paths:
+      - .github/workflows/temp-refine-installed-mcp-command-driver.yml
+
+permissions:
+  contents: write
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
+
+jobs:
+  refine:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with:
+          ref: p1/installed-mcp-live-harness
+          fetch-depth: 0
+
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: "3.12"
+
+      - name: Refine command-driver and claim boundaries
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          from pathlib import Path
+
+          def replace_once(path: str, old: str, new: str) -> None:
+              target = Path(path)
+              text = target.read_text(encoding="utf-8")
+              count = text.count(old)
+              if count != 1:
+                  raise SystemExit(f"{path}: expected one replacement, found {count}: {old[:80]!r}")
+              target.write_text(text.replace(old, new, 1), encoding="utf-8")
+
+          harness = "scripts/run_installed_mcp_agent_harness.py"
+          replace_once(
+              harness,
+              '    usage: list[dict[str, Any]] = field(default_factory=list)\n',
+              '    usage: list[dict[str, Any]] = field(default_factory=list)\n    real_model: bool = False\n',
+          )
+          replace_once(
+              harness,
+              '    provider: str,\n    model: str,\n) -> dict[str, Any]:\n',
+              '    provider: str,\n    model: str,\n    real_model: bool,\n) -> dict[str, Any]:\n',
+          )
+          replace_once(
+              harness,
+              '        model=("deterministic-positive-control" if driver == "scripted" else model),\n    )\n',
+              '        model=("deterministic-positive-control" if driver == "scripted" else model),\n        real_model=real_model,\n    )\n',
+          )
+          replace_once(
+              harness,
+              '                    "tools": schemas,\n                    "history": state.ephemeral_history[-12:],\n',
+              '                    "tools": schemas,\n                    # Host-owned execution context is ephemeral adapter input, not a\n                    # public MCP schema field and never part of the persisted report.\n                    "host_context": {\n                        "project_path": str(project),\n                        "working_directory": str(project),\n                    },\n                    "history": state.ephemeral_history[-12:],\n',
+          )
+          replace_once(
+              harness,
+              '            "real_model": provenance.driver == "command",\n',
+              '            "real_model": provenance.real_model,\n',
+          )
+          replace_once(
+              harness,
+              '            "scripted_positive_control": driver == "scripted",\n',
+              '            "scripted_positive_control": driver == "scripted",\n            "provider_free_positive_control": not provenance.real_model,\n',
+          )
+          replace_once(
+              harness,
+              '    parser.add_argument("--model", default="unspecified")\n',
+              '    parser.add_argument("--model", default="unspecified")\n    parser.add_argument(\n        "--real-model",\n        action="store_true",\n        help="Mark command-driver responses as a real provider run; requires --driver=command.",\n    )\n',
+          )
+          replace_once(
+              harness,
+              '    if args.driver == "scripted" and args.driver_command:\n        raise SystemExit("--driver-command is only valid with --driver=command")\n',
+              '    if args.driver == "scripted" and args.driver_command:\n        raise SystemExit("--driver-command is only valid with --driver=command")\n    if args.real_model and args.driver != "command":\n        raise SystemExit("--real-model requires --driver=command")\n',
+          )
+          replace_once(
+              harness,
+              '                provider=args.provider,\n                model=args.model,\n            )\n',
+              '                provider=args.provider,\n                model=args.model,\n                real_model=args.real_model,\n            )\n',
+          )
+
+          verifier = "scripts/verify_installed_mcp_agent_report.py"
+          replace_once(
+              verifier,
+              '    require(real_model == (model.get("driver") == "command"), "real_model/driver mismatch")\n    if real_model:\n',
+              '    require(not real_model or model.get("driver") == "command", "real_model requires command driver")\n    if real_model:\n',
+          )
+          replace_once(
+              verifier,
+              '    require(claims.get("scripted_positive_control") == (model.get("driver") == "scripted"), "scripted claim mismatch")\n    public_proven = claims.get("public_release_proven")\n',
+              '    require(claims.get("scripted_positive_control") == (model.get("driver") == "scripted"), "scripted claim mismatch")\n    require(claims.get("provider_free_positive_control") == (not real_model), "provider-free claim mismatch")\n    public_proven = claims.get("public_release_proven")\n',
+          )
+          replace_once(
+              verifier,
+              '            "scripted_positive_control": True,\n',
+              '            "scripted_positive_control": True,\n            "provider_free_positive_control": True,\n',
+          )
+          replace_once(
+              verifier,
+              '    missing_request["claim_boundary"]["scripted_positive_control"] = False\n',
+              '    missing_request["claim_boundary"]["scripted_positive_control"] = False\n    missing_request["claim_boundary"]["provider_free_positive_control"] = False\n',
+          )
+
+          readme = "eval/installed_mcp_agent_v1/README.md"
+          replace_once(
+              readme,
+              'The turn payload contains the case question, the exact installed tool schemas, and bounded in-memory history. Raw payloads and raw tool results are never written to the report.\n',
+              'The turn payload contains the case question, the exact installed tool schemas, bounded in-memory history, and an ephemeral host-owned `host_context.project_path`. That path is execution context rather than a public MCP field and is never written to the report. Raw payloads and raw tool results are never persisted.\n\nA command adapter is still a provider-free positive control unless the harness is explicitly invoked with `--real-model` and the adapter supplies non-placeholder provider, model and request identities.\n',
+          )
+
+          driver = Path("eval/installed_mcp_agent_v1/provider_free_command_driver.py")
+          driver.write_text('''#!/usr/bin/env python3\n"""Provider-free command-adapter control with one bounded schema repair."""\nfrom __future__ import annotations\n\nimport json\nimport sys\n\nMARKER = "The cobalt lighthouse invariant requires deterministic installed-MCP evidence."\n\n\ndef main() -> int:\n    payload = json.load(sys.stdin)\n    turn = int(payload["turn"])\n    case = payload["case"]\n    project_path = payload["host_context"]["project_path"]\n    metadata = {\n        "provider": "provider-free",\n        "model": "deterministic-command-positive-control",\n        "request_id": f"provider-free-turn-{turn}",\n        "usage": {"source": "not_applicable"},\n    }\n    if turn == 0:\n        # Deliberately omit project_path so the real installed schema rejects\n        # the call and the harness proves one bounded repair.\n        response = {\n            **metadata,\n            "type": "tool_call",\n            "name": "get_docs_context",\n            "arguments": {"question": case["question"], "mode": case["mode"]},\n        }\n    elif turn == 1:\n        response = {\n            **metadata,\n            "type": "tool_call",\n            "name": "get_docs_context",\n            "arguments": {\n                "question": case["question"],\n                "project_path": project_path,\n                "mode": case["mode"],\n            },\n        }\n    elif turn == 2:\n        response = {\n            **metadata,\n            "type": "tool_call",\n            "name": "prepare_docs",\n            "arguments": {\n                "action": "sync_project_docs",\n                "project_path": project_path,\n                "with_vectors": False,\n            },\n        }\n    elif turn == 3:\n        response = {\n            **metadata,\n            "type": "tool_call",\n            "name": "get_docs_context",\n            "arguments": {\n                "question": case["question"],\n                "project_path": project_path,\n                "mode": case["mode"],\n            },\n        }\n    else:\n        response = {**metadata, "type": "final", "text": MARKER}\n    json.dump(response, sys.stdout, ensure_ascii=False, sort_keys=True)\n    return 0\n\n\nif __name__ == "__main__":\n    raise SystemExit(main())\n''', encoding="utf-8")
+
+          workflow = ".github/workflows/installed-mcp-agent-v1.yml"
+          replace_once(
+              workflow,
+              '      - "eval/installed_mcp_agent_v1/**"\n',
+              '      - "eval/installed_mcp_agent_v1/**"\n',
+          )
+          replace_once(
+              workflow,
+              '      - name: Upload bounded evidence\n',
+              '''      - name: Exercise the external command-driver and bounded repair\n        if: inputs.package_spec == ''\n        run: |\n          python scripts/run_installed_mcp_agent_harness.py \\\n            --wheel "$(find dist -maxdepth 1 -name '*.whl' -print -quit)" \\\n            --case eval/installed_mcp_agent_v1/cases/project_docs_round_trip.json \\\n            --driver command \\\n            --driver-command "python eval/installed_mcp_agent_v1/provider_free_command_driver.py" \\\n            --provider provider-free \\\n            --model deterministic-command-positive-control \\\n            --output "$RUNNER_TEMP/installed-mcp-agent-v1-command.json"\n          python scripts/verify_installed_mcp_agent_report.py \\\n            "$RUNNER_TEMP/installed-mcp-agent-v1-command.json"\n          python - <<'PY2'\n          import json\n          import os\n          from pathlib import Path\n\n          report = json.loads(\n              (Path(os.environ["RUNNER_TEMP"]) / "installed-mcp-agent-v1-command.json").read_text(\n                  encoding="utf-8"\n              )\n          )\n          assert report["outcome"]["success"] is True\n          assert report["model"]["driver"] == "command"\n          assert report["model"]["real_model"] is False\n          assert report["budgets"]["repairs_used"] == 1\n          assert report["first_divergence"]["stage"] == "mcp_schema"\n          assert report["claim_boundary"]["provider_free_positive_control"] is True\n          PY2\n\n      - name: Upload bounded evidence\n''',
+          )
+          replace_once(
+              workflow,
+              '          path: ${{ runner.temp }}/installed-mcp-agent-v1.json\n',
+              '          path: |\n            ${{ runner.temp }}/installed-mcp-agent-v1.json\n            ${{ runner.temp }}/installed-mcp-agent-v1-command.json\n',
+          )
+          PY
+
+          rm .github/workflows/temp-refine-installed-mcp-command-driver.yml
+          python -m py_compile \
+            scripts/run_installed_mcp_agent_harness.py \
+            scripts/verify_installed_mcp_agent_report.py \
+            eval/installed_mcp_agent_v1/provider_free_command_driver.py
+          python scripts/verify_installed_mcp_agent_report.py --self-test
+          git diff --check
+
+      - name: Commit refined provider-free controls
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          changed="$(git diff --cached --name-only)"
+          expected="$(printf '%s\n' \
+            .github/workflows/installed-mcp-agent-v1.yml \
+            eval/installed_mcp_agent_v1/README.md \
+            eval/installed_mcp_agent_v1/provider_free_command_driver.py \
+            scripts/run_installed_mcp_agent_harness.py \
+            scripts/verify_installed_mcp_agent_report.py)"
+          test "$changed" = "$expected" || {
+            echo "::error::unexpected refinement diff"
+            printf 'actual:\n%s\nexpected:\n%s\n' "$changed" "$expected"
+            exit 1
+          }
+          git commit -m "test(p1): exercise the bounded command-driver repair path"
+          git push origin HEAD:p1/installed-mcp-live-harness
