@@ -15,6 +15,19 @@ from eval.agent_developer_v1.mixed_provenance import (
 
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
+
+
+def _production_evidence_model_path() -> Path:
+    candidates = (
+        REPO_ROOT / "docmancer" / "docs" / "domain" / "evidence_models.py",
+        REPO_ROOT / "docmancer" / "docs" / "domain" / "evidence.py",
+        REPO_ROOT / "docmancer" / "docs" / "domain" / "models.py",
+        REPO_ROOT / "docmancer" / "docs" / "domain" / "answer_completeness.py",
+    )
+    existing = [path for path in candidates if path.is_file()]
+    if not existing:
+        raise RuntimeError("no reviewed production evidence-model module exists")
+    return existing[0]
 ROOT = REPO_ROOT / "eval" / "agent_developer_v1"
 DEFAULT_OUTPUT = ROOT / "results" / "mixed-evidence-provenance.json"
 
@@ -29,7 +42,7 @@ def main(argv: list[str] | None = None) -> int:
         repo_root=REPO_ROOT,
         protocol_path=ROOT / "mixed_provenance_protocol.json",
         selector_path=REPO_ROOT / "docmancer" / "docs" / "application" / "evidence_selection.py",
-        model_path=REPO_ROOT / "docmancer" / "docs" / "domain" / "evidence_models.py",
+        model_path=_production_evidence_model_path(),
     )
     verify_report(derived)
     if args.write:
