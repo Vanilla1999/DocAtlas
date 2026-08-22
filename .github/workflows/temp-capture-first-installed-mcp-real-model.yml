@@ -1,0 +1,185 @@
+name: TEMP capture first installed MCP real-model trajectory
+
+on:
+  push:
+    branches: [p1/installed-mcp-real-model-capture-clean]
+    paths:
+      - .github/workflows/temp-capture-first-installed-mcp-real-model.yml
+
+permissions:
+  contents: write
+  models: read
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
+  DOCMANCER_OFFLINE: "1"
+  GITHUB_MODELS_ENDPOINT: https://models.github.ai/inference/chat/completions
+  GITHUB_MODELS_API_VERSION: "2022-11-28"
+  GITHUB_MODELS_MODEL: ${{ vars.DOCATLAS_GITHUB_MODELS_MODEL || 'openai/gpt-4.1-mini' }}
+
+jobs:
+  capture:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    env:
+      GITHUB_MODELS_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with:
+          ref: p1/installed-mcp-real-model-capture-clean
+          fetch-depth: 0
+
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: "3.12"
+
+      - name: Bind the capture to the exact semantic parent
+        id: identity
+        run: |
+          set -euo pipefail
+          carrier_head="$(git rev-parse HEAD)"
+          semantic_head="$(git rev-parse HEAD^)"
+          test "$(git diff --name-only "$semantic_head" "$carrier_head")" = ".github/workflows/temp-capture-first-installed-mcp-real-model.yml"
+          test "$(git ls-tree -r --name-only "$semantic_head" | grep -c '^.github/workflows/temp-' || true)" -eq 0
+          git show "$semantic_head:scripts/run_installed_mcp_agent_harness.py" | grep -q 'PROJECT_ROOT_TOKEN'
+          git show "$semantic_head:scripts/run_installed_mcp_agent_harness.py" | grep -q 'model_turns'
+          git show "$semantic_head:scripts/run_installed_mcp_agent_harness.py" | grep -q '"public_release_truth_closed": False'
+          git show "$semantic_head:eval/installed_mcp_agent_v1/github_models_driver.py" | grep -q 'evidence planner'
+          echo "semantic_head=$semantic_head" >> "$GITHUB_OUTPUT"
+
+      - name: Build and run the semantic parent with a real provider
+        id: live
+        continue-on-error: true
+        env:
+          SEMANTIC_HEAD: ${{ steps.identity.outputs.semantic_head }}
+        run: |
+          set -euo pipefail
+          git checkout --detach "$SEMANTIC_HEAD"
+          python -m pip install -e ".[dev]" build
+          rm -rf dist
+          python -m build --wheel
+          wheel="$(find dist -maxdepth 1 -name '*.whl' -print -quit)"
+          test -n "$wheel"
+          set +e
+          python scripts/run_installed_mcp_agent_harness.py \
+            --wheel "$wheel" \
+            --case eval/installed_mcp_agent_v1/cases/project_docs_round_trip.json \
+            --driver command \
+            --driver-command "python eval/installed_mcp_agent_v1/github_models_driver.py" \
+            --driver-env GITHUB_MODELS_TOKEN \
+            --driver-env GITHUB_MODELS_MODEL \
+            --driver-env GITHUB_MODELS_ENDPOINT \
+            --driver-env GITHUB_MODELS_API_VERSION \
+            --provider github-models \
+            --model "$GITHUB_MODELS_MODEL" \
+            --real-model \
+            --output "$RUNNER_TEMP/installed-mcp-agent-v1-live.json"
+          code=$?
+          set -e
+          echo "harness_exit=$code" >> "$GITHUB_OUTPUT"
+          test -f "$RUNNER_TEMP/installed-mcp-agent-v1-live.json"
+
+      - name: Verify the causal and privacy evidence contract
+        id: evidence
+        env:
+          SEMANTIC_HEAD: ${{ steps.identity.outputs.semantic_head }}
+        run: |
+          set -euo pipefail
+          report="$RUNNER_TEMP/installed-mcp-agent-v1-live.json"
+          python scripts/verify_installed_mcp_agent_report.py "$report"
+          python - "$report" "$SEMANTIC_HEAD" > "$RUNNER_TEMP/installed-mcp-agent-v1-live-summary.json" <<'PY'
+          import json, sys
+          path, semantic_head = sys.argv[1:]
+          report = json.load(open(path, encoding='utf-8'))
+          assert report['source']['commit_sha'] == semantic_head
+          assert report['source']['dirty'] is False
+          assert report['package']['install_mode'] == 'built_wheel'
+          assert report['model']['real_model'] is True
+          assert report['model']['provider'] == 'github-models'
+          assert report['model']['request_ids']
+          assert report['model_turns']
+          assert report['privacy']['provider_payload_absolute_path_scan'] == 'pass'
+          assert report['privacy']['provider_payload_credential_scan'] == 'pass'
+          assert report['privacy']['driver_environment_allowlisted'] is True
+          assert report['claim_boundary']['agent_truth_closed'] is False
+          assert report['claim_boundary']['public_release_truth_closed'] is False
+          summary = {
+              'schema_version': 1,
+              'case_id': report['case']['case_id'],
+              'semantic_commit_sha': semantic_head,
+              'model': report['model']['model'],
+              'provider': report['model']['provider'],
+              'request_count': len(report['model']['request_ids']),
+              'success': report['outcome']['success'],
+              'first_divergence': report['first_divergence'],
+              'model_turn_count': len(report['model_turns']),
+              'tool_calls': report['budgets']['tool_calls_used'],
+              'repairs': report['budgets']['repairs_used'],
+              'wheel_sha256': report['package']['artifact_sha256'],
+              'schema_sha256': report['mcp']['tool_schemas_sha256'],
+              'agent_truth_closed': False,
+              'public_release_truth_closed': False,
+          }
+          print(json.dumps(summary, indent=2, sort_keys=True))
+          PY
+          cat "$RUNNER_TEMP/installed-mcp-agent-v1-live-summary.json"
+
+      - name: Commit the sanitized capture and remove the carrier
+        env:
+          SEMANTIC_HEAD: ${{ steps.identity.outputs.semantic_head }}
+        run: |
+          set -euo pipefail
+          git checkout p1/installed-mcp-real-model-capture-clean
+          mkdir -p eval/installed_mcp_agent_v1/results
+          cp "$RUNNER_TEMP/installed-mcp-agent-v1-live.json" \
+            eval/installed_mcp_agent_v1/results/pre_public_github_models_project_docs_round_trip.json
+          cp "$RUNNER_TEMP/installed-mcp-agent-v1-live-summary.json" \
+            eval/installed_mcp_agent_v1/results/pre_public_github_models_project_docs_round_trip.summary.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          readme = Path('eval/installed_mcp_agent_v1/README.md')
+          text = readme.read_text(encoding='utf-8')
+          marker = '\n## First pre-public real-model capture\n'
+          if marker not in text:
+              summary = json.loads(
+                  Path('eval/installed_mcp_agent_v1/results/pre_public_github_models_project_docs_round_trip.summary.json').read_text(
+                      encoding='utf-8'
+                  )
+              )
+              block = marker + f'''\nA first GitHub Models trajectory is retained under `results/`. It used a fresh venv and a wheel built from `{summary['semantic_commit_sha']}`. Outcome success is `{str(summary['success']).lower()}`; first divergence is `{summary['first_divergence']['stage']}`. This is pre-public single-case evidence only: `agent_truth_closed=false` and `public_release_truth_closed=false`.\n'''
+              readme.write_text(text.rstrip() + block + '\n', encoding='utf-8')
+          PY
+          rm .github/workflows/temp-capture-first-installed-mcp-real-model.yml
+          python -m json.tool \
+            eval/installed_mcp_agent_v1/results/pre_public_github_models_project_docs_round_trip.json >/dev/null
+          python -m json.tool \
+            eval/installed_mcp_agent_v1/results/pre_public_github_models_project_docs_round_trip.summary.json >/dev/null
+          git diff --check
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          changed="$(git diff --cached --name-only)"
+          expected="$(printf '%s\n' \
+            .github/workflows/temp-capture-first-installed-mcp-real-model.yml \
+            eval/installed_mcp_agent_v1/README.md \
+            eval/installed_mcp_agent_v1/results/pre_public_github_models_project_docs_round_trip.json \
+            eval/installed_mcp_agent_v1/results/pre_public_github_models_project_docs_round_trip.summary.json)"
+          test "$changed" = "$expected" || {
+            echo "::error::unexpected live-capture diff"
+            printf 'actual:\n%s\nexpected:\n%s\n' "$changed" "$expected"
+            exit 1
+          }
+          git commit -m "eval(p1): record the first pre-public installed-MCP model trajectory"
+          git push origin HEAD:p1/installed-mcp-real-model-capture-clean
+
+      - name: Upload live evidence even when the model misses the case
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: first-installed-mcp-real-model-${{ github.run_id }}
+          path: |
+            ${{ runner.temp }}/installed-mcp-agent-v1-live.json
+            ${{ runner.temp }}/installed-mcp-agent-v1-live-summary.json
+          if-no-files-found: warn
+          retention-days: 30
