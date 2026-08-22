@@ -417,7 +417,14 @@ def test_agent_templates_include_three_tool_selection_guidance():
     assert workflow["first_call"]["before_first_edit"] is True
     assert workflow["prepare_docs"]["speculative"] is False
     assert workflow["docs_status"]["discovery"] is False
-    assert workflow["recovery"]["stop_before_edit_status"] == "insufficient_evidence"
+    recovery = workflow["recovery"]
+    assert recovery["after_prepare"] == "retry_original_get_docs_context_unchanged"
+    assert recovery["rephrase_retry_limit"] == 1
+    assert recovery["rephrase_auto_execute"] is False
+    assert recovery["investigation_allowed_when_hard_stop_false"] is True
+    assert recovery["source_search_after_rephrase_exhausted"] is True
+    assert recovery["documentation_claim_requires_support"] is True
+    assert recovery["stop_before_edit_when"] == "hard_stop"
 
     canonical_raw = files("docmancer.templates").joinpath("agent_contract.md").read_text(encoding="utf-8").strip()
     assert canonical_raw.count("{{DOCATLAS_AGENT_CONTRACT_ID}}") == 1

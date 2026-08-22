@@ -26,6 +26,11 @@ from docmancer.docs.application.evidence_selection import (
 )
 from docmancer.docs.domain.answer_units import materialize_answer_units
 from docmancer.docs.domain.request_intent import model_projection_kind
+from docmancer.docs.application.insufficient_projection import (
+    apply_terminal_insufficient_projection,
+    bounded_missing_value,
+    compact_recovery_action_for_budget,
+)
 
 
 DOCS_ANSWER_MAX_TOKENS = 800
@@ -365,10 +370,10 @@ def project_docs_answer(
             payload["reason_code"] = "support_assignment_not_materialized"
             return payload, snapshot
     if decision.status != "ok" or not sources or retrieval_issues:
-        missing = [str(retrieval.get("message") or "No complete source-backed documentation answer is available.")]
-        missing.extend(decision.missing_requirements)
+        missing = list(decision.missing_requirements)
         missing.extend(decision.unresolved_conflicts)
         missing.extend(retrieval_issues)
+        missing.append(str(retrieval.get("message") or "No complete source-backed documentation answer is available."))
         payload = project_insufficient(
             kind="docs_answer", missing=missing,
             recommended_next_action=retrieval.get("next_action"), max_tokens=INSUFFICIENT_EVIDENCE_MAX_TOKENS,
@@ -454,17 +459,16 @@ def bound_insufficient_projection(payload: dict[str, Any], *, max_tokens: int) -
             _refresh_estimate(payload)
         return
     action = payload.get("recommended_next_action")
-    if isinstance(action, dict):
-        for key in (
-            "type", "reason", "confirmation_reason", "agent_question", "observations",
-            "security_scope", "decision_options",
-        ):
-            action.pop(key, None)
-            _refresh_estimate(payload)
-            if estimate_projection_tokens(payload) <= limit:
-                return
-    payload.pop("recommended_next_action", None)
+    original_action = deepcopy(action) if isinstance(action, dict) else None
+    action_fits, protected_confirmation = compact_recovery_action_for_budget(
+        payload, limit, estimate_tokens=estimate_projection_tokens, refresh_estimate=_refresh_estimate
+    )
+    if action_fits:
+        return
+    if not protected_confirmation:
+        payload.pop("recommended_next_action", None)
     missing = payload.get("missing")
+    bounded_missing = bounded_missing_value(missing, default=_MINIMAL_MISSING)
     while (
         estimate_projection_tokens(payload) > limit
         and isinstance(missing, list)
@@ -479,32 +483,26 @@ def bound_insufficient_projection(payload: dict[str, Any], *, max_tokens: int) -
         _refresh_estimate(payload)
         if estimate_projection_tokens(payload) <= limit:
             return
-    payload["missing"] = [_MINIMAL_MISSING]
+    payload["missing"] = [bounded_missing]
     _refresh_estimate(payload)
     if estimate_projection_tokens(payload) <= limit:
         return
-    # The terminal fallback contains no unbounded caller data.
-    kind = payload.get("kind")
-    support = {
-        key: payload[key]
-        for key in _INSUFFICIENT_SUPPORT_KEYS
-        if key in payload and key != "reason_code"
-    }
-    payload.clear()
-    payload.update({
-        "status": "insufficient_evidence",
-        "kind": "docs_answer" if kind == "docs_answer" else "patch_context",
-        "missing": [_MINIMAL_MISSING],
-        "answer_supported": False,
-        "answer_available": False,
-        "support_status": "insufficient_evidence",
-        "estimated_tokens": 0,
-    })
-    payload.update(support)
-    payload["answer_supported"] = False
-    payload["answer_available"] = False
-    payload["support_status"] = "insufficient_evidence"
+    # Terminal fallback retains only bounded support/recovery metadata and, when
+    # it fits, one compact machine-readable missing requirement id.
+    apply_terminal_insufficient_projection(
+        payload,
+        kind=payload.get("kind"),
+        missing=bounded_missing,
+        original_action=original_action,
+        support_keys=_INSUFFICIENT_SUPPORT_KEYS,
+    )
     _refresh_estimate(payload)
+    if estimate_projection_tokens(payload) > limit:
+        payload.pop("recommended_next_action", None)
+        _refresh_estimate(payload)
+    if estimate_projection_tokens(payload) > limit and bounded_missing != _MINIMAL_MISSING:
+        payload["missing"] = [_MINIMAL_MISSING]
+        _refresh_estimate(payload)
     if estimate_projection_tokens(payload) > limit:
         raise ValueError("minimum insufficient-evidence projection exceeds the requested budget")
 

@@ -253,6 +253,13 @@ def build_requirements(
     existing_exact_values = {
         item.value.casefold() for item in requirements if item.kind == "exact_term"
     }
+    evidence_path_aliases: set[str] = set()
+    for raw_path in required_evidence_paths:
+        normalized_path = str(raw_path).strip().replace("\\", "/").casefold()
+        if not normalized_path:
+            continue
+        evidence_path_aliases.add(normalized_path)
+        evidence_path_aliases.add(normalized_path.rsplit("/", 1)[-1])
     identifier_values = sorted({
         token
         for token in re.findall(r"\b[A-Za-z_][A-Za-z0-9_]*(?:(?:::|\.)[A-Za-z_]\w*)*\b", question)
@@ -261,6 +268,7 @@ def build_requirements(
             or (any(char.isupper() for char in token[1:]) and any(char.islower() for char in token))
         )
         and token.casefold() not in existing_exact_values
+        and token.casefold().replace("\\", "/") not in evidence_path_aliases
     }, key=str.casefold)
     if len(identifier_values) > MAX_REQUIREMENT_IDENTIFIERS:
         input_limits.add("identifiers")

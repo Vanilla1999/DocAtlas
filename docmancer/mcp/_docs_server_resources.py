@@ -49,7 +49,7 @@ The default public surface has exactly three tools:
 4. Interpret the bounded result:
    - `status="ok"`: use the single canonical `docs_answer` or `patch_context` evidence.
    - `status="truncated"`: honor `omitted_counts`; only non-critical material was omitted.
-   - `status="insufficient_evidence"`: do not edit. Follow only a typed `recommended_next_action` after required confirmation.
+   - `status="insufficient_evidence"`: do not claim documentation support. Follow one typed recovery; a server-suggested rephrase is never automatic. If recovery is exhausted and `hard_stop=false`, investigate local source/tests while keeping documentary claims unproved. Stop before editing on `hard_stop=true` or when the task explicitly requires the still-unproved documentary contract.
 
 Broader unbounded exploration may expose `answer_type`, `answer_completeness`, `trust_contract`, and raw context fields; these are intentionally absent from bounded delivery.
 In that unbounded mode, treat `navigation_only` and `partial_navigational` as source-search guidance, not complete evidence.
@@ -110,7 +110,7 @@ Always separate:
 1. For coding and patch tasks, call `get_docs_context(project_path=..., question=..., mode="auto")` once before the first edit. The server returns bounded structured context; use broader compatibility output only for explicit documentation exploration.
 2. If the response explicitly returns `prepare_docs` as `recommended_next_action`, follow it and retry the same bounded request.
 3. Inspect canonical `status`, `kind`, `sources`, `missing`, and `omitted_counts`.
-4. Do not edit on `insufficient_evidence`; follow only the bounded typed recovery action after confirmation.
+4. On `insufficient_evidence`, do not claim documentation support. Follow the bounded typed recovery; retry at most one server-suggested rephrase. If it still fails and `hard_stop=false`, use local source/tests for investigation. Stop before editing on `hard_stop=true` or when the task requires the unproved documentary contract.
 5. Only unbounded exploration exposes `trust_contract.sources`; do not expect it in bounded delivery.
 6. Use dependency/public network fetches only with explicit approval (`allow_network=true`).
 """,

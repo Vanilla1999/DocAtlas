@@ -30,7 +30,12 @@ WORKFLOW_POLICY: dict[str, Any] = {
     },
     "recovery": {
         "after_prepare": "retry_original_get_docs_context_unchanged",
-        "stop_before_edit_status": "insufficient_evidence",
+        "rephrase_retry_limit": 1,
+        "rephrase_auto_execute": False,
+        "investigation_allowed_when_hard_stop_false": True,
+        "source_search_after_rephrase_exhausted": True,
+        "documentation_claim_requires_support": True,
+        "stop_before_edit_when": "hard_stop",
     },
 }
 

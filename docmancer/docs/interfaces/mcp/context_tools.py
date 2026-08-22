@@ -8,6 +8,14 @@ from typing import Any
 
 from docmancer.docs.application.action_packet import build_action_packet, validate_action_packet
 from docmancer.docs.application.evidence_selection import AggregateMixedSelectionDecision, SelectionDecision
+from docmancer.docs.interfaces.mcp.recovery_projection import (
+    _MODULE_RECOVERY_REASON_CODES,
+    _annotate_recovery_handoff,
+    _attach_recovery_diagnosis,
+    _bound_recoverable_insufficient_projection,
+    _recovery_summary,
+    is_operational_recovery_action,
+)
 from docmancer.docs.application.model_visible_projection import (
     DOCS_ANSWER_MAX_TOKENS,
     INSUFFICIENT_EVIDENCE_MAX_TOKENS,
@@ -36,15 +44,6 @@ DOCUMENT_CONTENT_POLICY = {
     "actions_source": "typed_top_level_fields_only",
 }
 BOUNDED_STRUCTURED_CONTENT_MARKER = "Structured DocAtlas result attached in structuredContent."
-_MODULE_RECOVERY_REASON_CODES = frozenset({
-    "module_ambiguous", "module_not_found", "no_module_docs",
-})
-_MODULE_RECOVERY_MISSING = "Select an exact module_path and retry."
-_MODULE_RECOVERY_SUPPORT_SUMMARY_KEYS = frozenset({
-    "answer_supported", "answer_available", "support_status", "reason_code",
-    "decision_hash",
-})
-
 
 def _bounded_project_operational_diagnostics(payload: dict[str, Any]) -> dict[str, Any]:
     """Expose only bounded, agent-actionable Project Docs recovery metadata."""
@@ -99,101 +98,6 @@ def _refresh_projection_estimate(payload: dict[str, Any]) -> None:
         if payload.get("estimated_tokens") == estimate:
             return
         payload["estimated_tokens"] = estimate
-
-
-def _bound_module_recovery_projection(
-    payload: dict[str, Any],
-    *,
-    max_tokens: int,
-) -> None:
-    """Keep an executable recovery action and one complete exact module path."""
-
-    reason = str(payload.get("operational_reason_code") or "")
-    if reason not in _MODULE_RECOVERY_REASON_CODES:
-        return
-    rows = payload.get("module_candidates")
-    candidates = [
-        deepcopy(row)
-        for row in rows or []
-        if isinstance(row, dict) and str(row.get("module_path") or "").strip()
-    ]
-    if not candidates:
-        return
-
-    limit = min(INSUFFICIENT_EVIDENCE_MAX_TOKENS, max(1, int(max_tokens)))
-    for key in SUPPORT_ENVELOPE_KEYS:
-        if key not in _MODULE_RECOVERY_SUPPORT_SUMMARY_KEYS:
-            payload.pop(key, None)
-    payload.pop("support_envelope", None)
-    _refresh_projection_estimate(payload)
-    if payload["estimated_tokens"] <= limit:
-        return
-
-    missing = payload.get("missing")
-    if isinstance(missing, list):
-        payload["missing"] = missing[:1] or [_MODULE_RECOVERY_MISSING]
-    action = payload.get("recommended_next_action")
-    if isinstance(action, dict):
-        for key in (
-            "type", "reason", "message", "confirmation_reason", "agent_question",
-            "observations", "security_scope", "decision_options",
-        ):
-            action.pop(key, None)
-    _refresh_projection_estimate(payload)
-    if payload["estimated_tokens"] <= limit:
-        return
-
-    for row in candidates:
-        row.pop("module_name", None)
-        row.pop("module_type", None)
-    payload["module_candidates"] = candidates
-    _refresh_projection_estimate(payload)
-    if payload["estimated_tokens"] <= limit:
-        return
-
-    # Never truncate an exact locator. Prefer the shortest complete candidate
-    # when the full ambiguity set cannot fit the model-visible budget.
-    candidates.sort(key=lambda row: (len(str(row["module_path"])), str(row["module_path"])))
-    payload["module_candidates"] = [candidates[0]]
-    _refresh_projection_estimate(payload)
-    if payload["estimated_tokens"] <= limit:
-        return
-
-    for key in (
-        "operational_status", "context_available", "disposition", "edit_ready",
-        "source_search_status", "requires_confirmation", "decision_hash", "reason_code",
-    ):
-        payload.pop(key, None)
-    payload["missing"] = [_MODULE_RECOVERY_MISSING]
-    _refresh_projection_estimate(payload)
-    if payload["estimated_tokens"] <= limit:
-        return
-
-    minimal_action = payload.get("recommended_next_action")
-    if isinstance(minimal_action, dict):
-        minimal_action = {
-            key: deepcopy(minimal_action[key])
-            for key in ("tool", "arguments_patch", "requires_confirmation", "auto_execute")
-            if key in minimal_action
-        }
-    kind = payload.get("kind")
-    payload.clear()
-    payload.update({
-        "status": "insufficient_evidence",
-        "kind": "docs_answer" if kind == "docs_answer" else "patch_context",
-        "missing": [_MODULE_RECOVERY_MISSING],
-        "answer_supported": False,
-        "answer_available": False,
-        "support_status": "insufficient_evidence",
-        "operational_reason_code": reason,
-        "module_candidates": [candidates[0]],
-        "estimated_tokens": 0,
-    })
-    if minimal_action:
-        payload["recommended_next_action"] = minimal_action
-    _refresh_projection_estimate(payload)
-    if payload["estimated_tokens"] > limit:
-        raise ValueError("minimum module-recovery projection exceeds the requested budget")
 
 
 def context_tools(tools: list[dict[str, Any]]) -> list[dict[str, Any]]:
@@ -457,6 +361,13 @@ def handle_context_tool(name: str, args: dict[str, Any], service: LibraryDocsSer
     raw = normalize_public_docs_actions(raw)
     raw.update(_bounded_project_operational_diagnostics(raw))
     raw = _replace_network_retries_with_prepare_actions(raw, args)
+    raw = _attach_recovery_diagnosis(
+        raw,
+        question=question,
+        request=args,
+        canonical_selection=canonical_selection,
+        operational_reason_code=operational_reason_code,
+    )
     if args.get("delivery_strategy") == "bounded_direct":
         output_budget = _bounded_int_arg(
             args, "packet_tokens", default=1_500, min_value=256, max_value=2_000
@@ -475,6 +386,7 @@ def handle_context_tool(name: str, args: dict[str, Any], service: LibraryDocsSer
             raw.setdefault("retrieval_diagnostics", {})["evidence_selection"] = selection_trace
             if projection.get("status") == "insufficient_evidence":
                 projection.update(_bounded_project_operational_diagnostics(raw))
+                projection.update(_recovery_summary(raw))
             if projection.get("status") == "insufficient_evidence" and recovery:
                 support_projection = {
                     key: projection[key]
@@ -493,18 +405,17 @@ def handle_context_tool(name: str, args: dict[str, Any], service: LibraryDocsSer
                     max_tokens=min(INSUFFICIENT_EVIDENCE_MAX_TOKENS, output_budget),
                 )
                 projection.update(support_projection)
-                _annotate_source_search_handoff(projection, recovery)
+                projection.update(_recovery_summary(raw))
+                _annotate_recovery_handoff(projection, recovery)
                 _prioritize_module_recovery_projection(projection)
-                _bound_module_recovery_projection(
+                _bound_recoverable_insufficient_projection(
                     projection, max_tokens=output_budget,
                 )
-                bound_insufficient_projection(projection, max_tokens=output_budget)
             if projection.get("status") == "insufficient_evidence":
+                projection.update(_recovery_summary(raw))
+                _annotate_recovery_handoff(projection, recovery)
                 _prioritize_module_recovery_projection(projection)
-                _bound_module_recovery_projection(
-                    projection, max_tokens=output_budget,
-                )
-                bound_insufficient_projection(
+                _bound_recoverable_insufficient_projection(
                     projection, max_tokens=output_budget,
                 )
             _omit_nullable_reason_code(projection)
@@ -602,15 +513,17 @@ def handle_context_tool(name: str, args: dict[str, Any], service: LibraryDocsSer
                 recommended_next_action=recovery,
                 max_tokens=min(INSUFFICIENT_EVIDENCE_MAX_TOKENS, output_budget),
             )
-            _annotate_source_search_handoff(projection, recovery)
+            projection.update(_recovery_summary(raw))
+            _annotate_recovery_handoff(projection, recovery)
         # Recovery/source-search metadata is appended after projection.  Bound
         # the *final* object unconditionally so no post-format mutation can
         # reintroduce an oversized insufficient response.
         if projection.get("status") == "insufficient_evidence":
-            _bound_module_recovery_projection(
+            projection.update(_recovery_summary(raw))
+            _annotate_recovery_handoff(projection, recovery)
+            _bound_recoverable_insufficient_projection(
                 projection, max_tokens=output_budget,
             )
-            bound_insufficient_projection(projection, max_tokens=output_budget)
         _omit_nullable_reason_code(projection)
         _refresh_projection_estimate(projection)
         projection_errors = validate_model_visible_projection(
@@ -643,6 +556,7 @@ def _omit_nullable_reason_code(payload: dict[str, Any]) -> None:
         payload.pop("reason_code", None)
 
 
+
 def _bounded_recovery_action(payload: dict[str, Any]) -> dict[str, Any] | None:
     candidates = [payload.get("next_action"), *(payload.get("next_actions") or [])]
     completeness = (
@@ -656,6 +570,13 @@ def _bounded_recovery_action(payload: dict[str, Any]) -> dict[str, Any] | None:
             key=lambda action: 0
             if isinstance(action, dict) and action.get("tool") == "docs_status" else 1
         )
+    elif any(is_operational_recovery_action(action) for action in candidates):
+        candidates.sort(
+            key=lambda action: 0
+            if is_operational_recovery_action(action) else 1
+        )
+    elif payload.get("recovery_disposition") == "rephrase_question":
+        candidates.sort(key=lambda action: 0 if isinstance(action, dict) and action.get("type") == "rephrase_question" else 1)
     elif source_search_required:
         candidates.sort(key=lambda action: 0 if isinstance(action, dict) and action.get("tool") == "code_search" else 1)
     for action in candidates:
@@ -663,7 +584,12 @@ def _bounded_recovery_action(payload: dict[str, Any]) -> dict[str, Any] | None:
             continue
         action_type = str(action.get("type") or "")
         tool = action.get("tool")
-        if tool not in {"prepare_docs", "code_search", "docs_status"} and action_type != "ask_user_for_library_docs_source":
+        rephrase = tool == "get_docs_context" and action_type == "rephrase_question"
+        if (
+            tool not in {"prepare_docs", "code_search", "docs_status"}
+            and action_type != "ask_user_for_library_docs_source"
+            and not rephrase
+        ):
             continue
         if tool == "prepare_docs" and source_search_required and not payload.get("requires_confirmation"):
             arguments = action.get("arguments_patch") if isinstance(action.get("arguments_patch"), dict) else {}
@@ -692,20 +618,6 @@ def _bounded_recovery_action(payload: dict[str, Any]) -> dict[str, Any] | None:
         bounded["auto_execute"] = False
         return bounded
     return None
-
-
-def _annotate_source_search_handoff(
-    projection: dict[str, Any], recovery: dict[str, Any]
-) -> None:
-    if recovery.get("tool") != "code_search":
-        return
-    projection.update({
-        "disposition": "search_local_source",
-        "edit_ready": False,
-        "source_search_status": "required",
-        "requires_confirmation": False,
-    })
-    _refresh_projection_estimate(projection)
 
 
 def _bounded_action_mapping(value: dict[str, Any], *, depth: int = 0) -> dict[str, Any]:
@@ -882,7 +794,12 @@ def _replace_network_retries_with_prepare_actions(payload: dict[str, Any], reque
             arguments.pop("allow_network", None)
             if arguments.get("action") == "prefetch_library_docs" and not arguments.get("question"):
                 arguments["question"] = request.get("question")
-            return {**action, "arguments_patch": arguments}
+            prepared = {**action, "arguments_patch": arguments}
+            if payload.get("requires_confirmation") and "requires_confirmation" not in prepared:
+                prepared["requires_confirmation"] = True
+            if payload.get("confirmation_reason") and not prepared.get("confirmation_reason"):
+                prepared["confirmation_reason"] = payload["confirmation_reason"]
+            return prepared
         if action.get("tool") != "get_docs_context" or not arguments.get("allow_network"):
             return action
         if request.get("mode") == "project":
@@ -906,7 +823,14 @@ def _replace_network_retries_with_prepare_actions(payload: dict[str, Any], reque
             }
         else:
             return action
-        return {**action, "type": "prepare_docs", "tool": "prepare_docs", "arguments_patch": patch}
+        return {
+            **action,
+            "type": "prepare_docs",
+            "tool": "prepare_docs",
+            "arguments_patch": patch,
+            **({"requires_confirmation": True} if payload.get("requires_confirmation") else {}),
+            **({"confirmation_reason": payload["confirmation_reason"]} if payload.get("confirmation_reason") else {}),
+        }
 
     updated = dict(payload)
     actions = []

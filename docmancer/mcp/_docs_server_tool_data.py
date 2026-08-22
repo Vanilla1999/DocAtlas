@@ -14,7 +14,7 @@ Agent workflow:
 - In bounded delivery call prepare_docs only from recommended_next_action; unbounded compatibility output may use next_action.
 - Use docs_status only for explicit health, freshness, source-state, or job-status requests, or when get_docs_context returns it as recommended_next_action.
 - Scope planning: for one known module use scope="module" plus exact module_path; module_path always implies module scope. For project-wide policy use scope="project" and omit module/module_path. If a task needs both module-local and project-wide evidence, make two bounded calls (module then project) rather than widening one module call. For cross-module questions use scope="all" without module filters, or separate exact module calls. On module_ambiguous, follow docs_status and retry with an exact returned module_path.
-- In bounded delivery, stop before editing when action_packet.status is insufficient_evidence. In unbounded exploration, navigation_only or partial_navigational requires source search before answering.
+- In bounded delivery, insufficient_evidence never proves a documentary claim. Follow one typed recovery: one non-automatic rephrase for parser/retrieval uncertainty, then local source/tests when hard_stop=false; stop before an edit when hard_stop=true or the task explicitly requires a still-unproved documentary contract. In unbounded exploration, navigation_only or partial_navigational requires source search before answering.
 - This tool provides source-grounded context, not a full code audit or test substitute.
 - For change-aware documentation maintenance, pass maintenance with either base/head or explicit changed_paths; obey its fail-closed authoring brief.
 """,

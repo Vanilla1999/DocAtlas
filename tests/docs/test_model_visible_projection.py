@@ -1,7 +1,7 @@
 """Split test module; helpers live in _shared_test_model_visible_projection.py."""
 from tests.docs import _shared_test_model_visible_projection as _shared
 globals().update({k: v for k, v in vars(_shared).items() if not k.startswith("__")})
-from docmancer.docs.interfaces.mcp.context_tools import _bound_module_recovery_projection
+from docmancer.docs.interfaces.mcp.recovery_projection import _bound_recoverable_insufficient_projection
 
 def test_docs_answer_is_deterministic_deduplicated_hashed_and_bounded():
     snippet = {
@@ -390,11 +390,10 @@ def test_module_recovery_keeps_action_and_one_complete_exact_path_at_tiny_budget
         "estimated_tokens": 0,
     }
 
-    _bound_module_recovery_projection(payload, max_tokens=256)
-    bound_insufficient_projection(payload, max_tokens=256)
+    _bound_recoverable_insufficient_projection(payload, max_tokens=256)
 
     visible_paths = [row["module_path"] for row in payload["module_candidates"]]
-    assert visible_paths
+    assert len(visible_paths) == 1
     assert set(visible_paths) <= set(paths)
     assert all(not path.endswith("…") for path in visible_paths)
     assert payload["operational_reason_code"] == "module_ambiguous"

@@ -136,7 +136,7 @@ For repository-specific architecture, conventions, runbooks, roadmap, README/wik
 1. For coding and patch tasks, call `get_docs_context(project_path=..., question=..., mode="project")` first; bounded delivery is server-owned policy.
 2. Follow bounded `recommended_next_action`: ask its source-choice question, or obtain confirmation, call its exact typed action, and retry the same bounded request.
 3. Use `docs_status` only when the user explicitly asks about health, freshness, index state, or a background job.
-4. For bounded responses, inspect `action_packet.status`, `missing_evidence`, and `omitted_counts`; do not edit when status is `insufficient_evidence`.
+4. For bounded `insufficient_evidence`, do not claim documentation support. Follow at most one non-automatic `rephrase_question`; after that, investigate local source/tests when `hard_stop=false`. Stop before editing when `hard_stop=true` or when the requested change explicitly depends on a documentary contract that remains unproved.
 5. Cite `action_packet.source_of_truth` through each factual item's `evidence_ids`. Treat `CHANGELOG.md` as primary only for release-history/change questions.
 6. Only unbounded exploration exposes `answer_outline`, `trust_contract`, and `context_pack`; there, prefer nested source and section metadata.
 7. If the user asks vaguely about "the MCP server", distinguish `doc-atlas mcp docs-serve` (the three-tool documentation surface) from `doc-atlas mcp packs-serve` (advanced installed API-action packs).
