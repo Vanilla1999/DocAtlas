@@ -1,0 +1,47 @@
+name: TEMP materialize P1.2 from PR
+
+on:
+  pull_request:
+    branches: [main]
+    types: [opened, synchronize, reopened]
+
+permissions:
+  contents: write
+
+jobs:
+  materialize:
+    if: github.event.pull_request.head.ref == 'p1/p1.2-first-divergence-atlas'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with:
+          ref: p1/p1.2-first-divergence-atlas
+          fetch-depth: 0
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: '3.12'
+      - name: Extract and verify the hash-bound payload
+        shell: bash
+        run: |
+          set -euo pipefail
+          awk '/^H4sI/{capture=1} capture{if ($0=="EOF") exit; print}' \
+            .github/workflows/temp-materialize-p1.2.yml > /tmp/p12.b64
+          base64 --decode /tmp/p12.b64 > /tmp/p12.tgz
+          test "$(sha256sum /tmp/p12.tgz | awk '{print $1}')" = \
+            '4e555ef6cdd3528717189292faae70d7cf262aef4e9f8ea56e037781347e177e'
+          tar -xzf /tmp/p12.tgz
+          rm .github/workflows/temp-materialize-p1.2.yml
+          rm .github/workflows/temp-materialize-p1.2-pr.yml
+          python scripts/run_agent_developer_first_divergence_gate.py
+          python scripts/first_divergence_contract_self_test.py
+          git diff --check
+      - name: Commit the final reviewable tree
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -A
+          git commit -m 'test(p1): add the 0-of-11 first-divergence atlas'
+          git push origin HEAD:p1/p1.2-first-divergence-atlas
