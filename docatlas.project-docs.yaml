@@ -40,6 +40,14 @@ documents:
     status: active
     impact: track
 
+  - path: docs/analysis/docatlas-readiness-evidence-review-2026-08-22.md
+    role: development
+    scope: project
+    description: Corrected evidence review separating fixed defects, open operational blockers, evidence gaps, and unproven hypotheses.
+    authority: supporting
+    status: active
+    impact: search_only
+
   - path: eval/project_answer_quality_v1/README.md
     role: development
     scope: project
