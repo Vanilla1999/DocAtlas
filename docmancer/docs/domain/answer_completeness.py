@@ -4,6 +4,7 @@ import re
 from typing import Any
 
 from docmancer.docs.domain.project_doc_ranking import normalize_doc_path
+from docmancer.docs.domain.recovery_handoff import has_safe_local_source_handoff
 
 SCHEMA_VERSION = "answer-completeness-1.0"
 _PROOF_SOURCE_CLASSES = {"project_doc", "dependency_doc", "source_evidence"}
@@ -296,7 +297,9 @@ def evaluate_project_answer_completeness(
         # Missing documentation delegates proof to local source search; it does
         # not block the edit workflow. Index/preflight failures are handled by
         # their separate recovery payloads and remain non-edit-ready.
-        "edit_ready": status == "exact" or source_search_required,
+        "edit_ready": status == "exact" or has_safe_local_source_handoff(
+            recommended_next_actions
+        ),
         "reason_codes": reason_codes,
     }
     return {
@@ -349,7 +352,9 @@ def derive_project_answer_completeness(
         "source_search_required": not supported,
         "source_search_status": "not_required" if supported else "required",
         "disposition": "answer" if supported else "search_local_source",
-        "edit_ready": supported or bool(result["recommended_next_actions"]),
+        "edit_ready": supported or has_safe_local_source_handoff(
+            result["recommended_next_actions"]
+        ),
         "legacy_diagnostics": legacy_diagnostics,
     })
     if supported:
@@ -577,6 +582,7 @@ def _source_search_action(*, missing_terms: list[str], context_pack: list[dict[s
         "handled_by": "coding_agent",
         "requires_confirmation": False,
         "repeat_docs_context": False,
+        "auto_execute": False,
         "reason": "Selected docs are partial/navigational; exact story-specific terms are missing from source-backed snippets.",
         "query_terms": missing_terms[:8],
         "suggested_doc_paths": suggested_paths[:8],
