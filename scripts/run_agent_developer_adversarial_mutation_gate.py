@@ -84,7 +84,7 @@ MUTANTS = (
     ),
     Mutant(
         "module_recovery_reason_projection_guard",
-        "docmancer/docs/interfaces/mcp/context_tools.py",
+        "docmancer/docs/interfaces/mcp/recovery_projection.py",
         "_MODULE_RECOVERY_REASON_CODES = frozenset({\n    \"module_ambiguous\", \"module_not_found\", \"no_module_docs\",\n})",
         "_MODULE_RECOVERY_REASON_CODES = frozenset({\n    \"module_not_found\", \"no_module_docs\",\n})  # mutation: hide ambiguous-module recovery metadata",
         FULL_GATE,
