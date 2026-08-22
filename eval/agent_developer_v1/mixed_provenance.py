@@ -76,14 +76,41 @@ def _candidate(row: dict[str, Any]) -> dict[str, Any]:
     }
 
 
-def evaluate_case(case: dict[str, Any]) -> dict[str, Any]:
-    requirements = build_requirements(
-        str(case["question"]),
-        required_evidence_paths=[
-            str(value) for value in case.get("required_evidence_paths") or ()
-        ],
-        public_requirements=list(case.get("public_requirements") or ()),
+def _case_requirements(case: dict[str, Any]) -> tuple[Any, str]:
+    base = [dict(row) for row in case.get("public_requirements") or ()]
+    variants = [("native", base)]
+    for key in ("id", "requirement_id"):
+        variants.append((
+            key,
+            [
+                {**row, key: f"{case['id']}:{index}"}
+                for index, row in enumerate(base, start=1)
+            ],
+        ))
+    errors: list[str] = []
+    for shape, rows in variants:
+        try:
+            return (
+                build_requirements(
+                    str(case["question"]),
+                    required_evidence_paths=[
+                        str(value)
+                        for value in case.get("required_evidence_paths") or ()
+                    ],
+                    public_requirements=rows,
+                ),
+                shape,
+            )
+        except (TypeError, ValueError, KeyError) as exc:
+            errors.append(f"{shape}:{exc.__class__.__name__}")
+    raise ValueError(
+        "no reviewed public-requirement row shape was accepted: "
+        + ",".join(errors)
     )
+
+
+def evaluate_case(case: dict[str, Any]) -> dict[str, Any]:
+    requirements, public_requirement_shape = _case_requirements(case)
     decision = select_evidence(
         [_candidate(row) for row in case.get("candidates") or ()],
         question=str(case["question"]),
@@ -114,6 +141,7 @@ def evaluate_case(case: dict[str, Any]) -> dict[str, Any]:
         "selected_sources": sorted({
             str(item.path_or_url) for item in decision.selected_candidates
         }),
+        "public_requirement_shape": public_requirement_shape,
         "requirements_hash": str(decision.support_decision.requirements_hash),
         "assignment_hash": str(decision.support_decision.assignment_hash),
         "decision_hash": str(decision.support_decision.decision_hash),
