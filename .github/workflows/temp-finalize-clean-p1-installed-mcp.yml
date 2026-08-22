@@ -1,0 +1,253 @@
+name: TEMP finalize clean P1 installed MCP tree
+
+on:
+  push:
+    branches: [p1/installed-mcp-live-harness-clean]
+    paths:
+      - .github/workflows/temp-finalize-clean-p1-installed-mcp.yml
+
+permissions:
+  contents: write
+  actions: read
+  checks: read
+  pull-requests: write
+
+concurrency:
+  group: temp-finalize-clean-p1-installed-mcp
+  cancel-in-progress: false
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
+  HEAD_BRANCH: p1/installed-mcp-live-harness-clean
+  HISTORICAL_BASE: cfa9ab5c365a28d1a4af63afe9f1d53b19532d89
+
+jobs:
+  finalize:
+    runs-on: ubuntu-latest
+    timeout-minutes: 110
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with:
+          ref: p1/installed-mcp-live-harness-clean
+          fetch-depth: 0
+
+      - name: Resolve semantic tree and current main
+        id: identity
+        run: |
+          set -euo pipefail
+          carrier_head="$(git rev-parse HEAD)"
+          semantic_head="$(git rev-parse HEAD^)"
+          semantic_tree="$(git rev-parse "$semantic_head^{tree}")"
+          test "$(git diff --name-only "$semantic_head" "$carrier_head")" = ".github/workflows/temp-finalize-clean-p1-installed-mcp.yml"
+          git fetch origin main --force
+          main_head="$(git rev-parse origin/main)"
+          main_tree="$(git rev-parse origin/main^{tree})"
+          echo "carrier_head=$carrier_head" >> "$GITHUB_OUTPUT"
+          echo "semantic_head=$semantic_head" >> "$GITHUB_OUTPUT"
+          echo "semantic_tree=$semantic_tree" >> "$GITHUB_OUTPUT"
+          echo "main_head=$main_head" >> "$GITHUB_OUTPUT"
+          echo "main_tree=$main_tree" >> "$GITHUB_OUTPUT"
+          if [ "$semantic_tree" = "$main_tree" ]; then
+            echo "needs_merge=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "needs_merge=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Validate exact clean semantic tree
+        env:
+          SEMANTIC_HEAD: ${{ steps.identity.outputs.semantic_head }}
+        run: |
+          set -euo pipefail
+          expected="$(printf '%s\n' \
+            .github/release-requests/v1.3.1.json \
+            .github/workflows/installed-mcp-agent-v1.yml \
+            docs/decisions/2026-08-22-defer-public-release-and-open-p1-harness.md \
+            eval/installed_mcp_agent_v1/README.md \
+            eval/installed_mcp_agent_v1/cases/project_docs_round_trip.json \
+            eval/installed_mcp_agent_v1/provider_free_command_driver.py \
+            scripts/run_installed_mcp_agent_harness.py \
+            scripts/verify_installed_mcp_agent_report.py)"
+          actual="$(git diff --name-only "$HISTORICAL_BASE" "$SEMANTIC_HEAD")"
+          test "$actual" = "$expected" || {
+            echo "::error::semantic tree differs from reviewed eight-file allowlist"
+            printf 'actual:\n%s\nexpected:\n%s\n' "$actual" "$expected"
+            exit 1
+          }
+          test "$(python -c 'import json; print(str(json.load(open(".github/release-requests/v1.3.1.json"))["execute_on_merge"]).lower())')" = false
+          test "$(find .github/workflows -maxdepth 1 -type f -name 'temp-*' ! -name 'temp-finalize-clean-p1-installed-mcp.yml' | wc -l)" -eq 0
+          ! git grep -n 'PYPI_API_TOKEN' "$SEMANTIC_HEAD" -- .github scripts docs eval
+          git show "$SEMANTIC_HEAD:scripts/run_installed_mcp_agent_harness.py" | grep -q '"agent_truth_closed": False'
+          git show "$SEMANTIC_HEAD:scripts/run_installed_mcp_agent_harness.py" | grep -q '"public_release_truth_closed": False'
+          git show "$SEMANTIC_HEAD:scripts/run_installed_mcp_agent_harness.py" | grep -q '"public_package_installed"'
+          git show "$SEMANTIC_HEAD:scripts/run_installed_mcp_agent_harness.py" | grep -q '"provider_free_positive_control"'
+          git show "$SEMANTIC_HEAD:scripts/run_installed_mcp_agent_harness.py" | grep -q '"--real-model"'
+          git show "$SEMANTIC_HEAD:scripts/verify_installed_mcp_agent_report.py" | grep -q 'harness report cannot close Public Truth'
+          git diff --check "$HISTORICAL_BASE" "$SEMANTIC_HEAD"
+
+      - name: Ensure one pull request exists when a merge is needed
+        id: pr
+        if: steps.identity.outputs.needs_merge == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          owner="${GITHUB_REPOSITORY%%/*}"
+          gh api \
+            "repos/${GITHUB_REPOSITORY}/pulls?state=open&head=${owner}:${HEAD_BRANCH}&base=main&per_page=10" \
+            > /tmp/open-prs.json
+          count="$(python - <<'PY'
+          import json
+          rows = json.load(open('/tmp/open-prs.json', encoding='utf-8'))
+          print(len(rows))
+          PY
+          )"
+          if [ "$count" -eq 0 ]; then
+            gh pr create \
+              --repo "$GITHUB_REPOSITORY" \
+              --base main \
+              --head "$HEAD_BRANCH" \
+              --draft \
+              --title "Finalize the clean P1.1 installed-MCP harness tree" \
+              --body "Idempotent clean-tree boundary for the reviewed P1.1 installed-MCP harness. It removes all temporary carrier residue, keeps release execution disabled, and preserves the eight-file semantic allowlist."
+            sleep 3
+            gh api \
+              "repos/${GITHUB_REPOSITORY}/pulls?state=open&head=${owner}:${HEAD_BRANCH}&base=main&per_page=10" \
+              > /tmp/open-prs.json
+          fi
+          pr_number="$(python - <<'PY'
+          import json
+          rows = json.load(open('/tmp/open-prs.json', encoding='utf-8'))
+          assert len(rows) == 1, rows
+          print(rows[0]['number'])
+          PY
+          )"
+          echo "pr_number=$pr_number" >> "$GITHUB_OUTPUT"
+
+      - name: Wait for exact carrier-head gates
+        if: steps.identity.outputs.needs_merge == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          CARRIER_HEAD: ${{ steps.identity.outputs.carrier_head }}
+        run: |
+          set -euo pipefail
+          for attempt in $(seq 1 540); do
+            gh api \
+              -H 'Accept: application/vnd.github+json' \
+              "repos/${GITHUB_REPOSITORY}/commits/${CARRIER_HEAD}/check-runs?per_page=100" \
+              > /tmp/check-runs.json
+            status="$(python - <<'PY'
+          import json
+          rows = json.load(open('/tmp/check-runs.json', encoding='utf-8')).get('check_runs', [])
+          required = {'required-ci', 'required-release', 'provider-free-positive-control'}
+          latest = {}
+          for row in rows:
+              name = row.get('name')
+              if name not in required:
+                  continue
+              previous = latest.get(name)
+              if previous is None or str(row.get('started_at') or '') > str(previous.get('started_at') or ''):
+                  latest[name] = row
+          if not required <= latest.keys():
+              print('pending')
+          else:
+              conclusions = {name: latest[name].get('conclusion') for name in sorted(required)}
+              failed = {name: value for name, value in conclusions.items() if value not in {None, '', 'success'}}
+              if failed:
+                  print('failed:' + json.dumps(failed, sort_keys=True))
+              elif all(value == 'success' for value in conclusions.values()):
+                  print('success')
+              else:
+                  print('pending')
+          PY
+            )"
+            case "$status" in
+              success) echo "Final clean-tree gates: PASS"; break ;;
+              failed:*) echo "::error::$status"; cat /tmp/check-runs.json; exit 1 ;;
+            esac
+            if [ "$attempt" -eq 540 ]; then
+              echo "::error::final checks did not become green"
+              cat /tmp/check-runs.json
+              exit 1
+            fi
+            sleep 10
+          done
+
+      - name: Run focused verifier review
+        run: |
+          set -euo pipefail
+          python -m py_compile \
+            scripts/run_installed_mcp_agent_harness.py \
+            scripts/verify_installed_mcp_agent_report.py \
+            eval/installed_mcp_agent_v1/provider_free_command_driver.py
+          python scripts/verify_installed_mcp_agent_report.py --self-test
+          python -m json.tool .github/release-requests/v1.3.1.json >/dev/null
+          python -m json.tool eval/installed_mcp_agent_v1/cases/project_docs_round_trip.json >/dev/null
+          git diff --check
+
+      - name: Remove final carrier and prove semantic tree identity
+        id: cleanup
+        env:
+          SEMANTIC_TREE: ${{ steps.identity.outputs.semantic_tree }}
+        run: |
+          set -euo pipefail
+          rm .github/workflows/temp-finalize-clean-p1-installed-mcp.yml
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          test "$(git diff --cached --name-only)" = ".github/workflows/temp-finalize-clean-p1-installed-mcp.yml"
+          git commit -m "chore: remove final P1 clean-tree carrier"
+          final_head="$(git rev-parse HEAD)"
+          final_tree="$(git rev-parse HEAD^{tree})"
+          test "$final_tree" = "$SEMANTIC_TREE"
+          git push origin HEAD:p1/installed-mcp-live-harness-clean
+          echo "final_head=$final_head" >> "$GITHUB_OUTPUT"
+          echo "final_tree=$final_tree" >> "$GITHUB_OUTPUT"
+
+      - name: Merge when current main does not already equal the semantic tree
+        if: steps.identity.outputs.needs_merge == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ steps.pr.outputs.pr_number }}
+          FINAL_HEAD: ${{ steps.cleanup.outputs.final_head }}
+          SEMANTIC_TREE: ${{ steps.identity.outputs.semantic_tree }}
+        run: |
+          set -euo pipefail
+          for attempt in $(seq 1 30); do
+            remote_head="$(gh api "repos/${GITHUB_REPOSITORY}/pulls/${PR_NUMBER}" --jq .head.sha)"
+            if [ "$remote_head" = "$FINAL_HEAD" ]; then break; fi
+            if [ "$attempt" -eq 30 ]; then echo "::error::PR head did not reach cleanup commit"; exit 1; fi
+            sleep 2
+          done
+          git fetch origin main --force
+          current_main="$(git rev-parse origin/main)"
+          gh pr ready "$PR_NUMBER" --repo "$GITHUB_REPOSITORY"
+          gh api --method PUT \
+            "repos/${GITHUB_REPOSITORY}/pulls/${PR_NUMBER}/merge" \
+            -f "sha=$FINAL_HEAD" \
+            -f "merge_method=merge" \
+            -f "commit_title=Finalize the clean P1.1 installed-MCP harness tree (#${PR_NUMBER})" \
+            -f "commit_message=Merge the exact reviewed eight-file P1.1 harness tree with release execution disabled and no temporary carrier residue." \
+            > /tmp/merge.json
+          python - <<'PY'
+          import json
+          row = json.load(open('/tmp/merge.json', encoding='utf-8'))
+          assert row.get('merged') is True, row
+          print('Merged:', row.get('sha'))
+          PY
+
+      - name: Prove final remote main is carrier-free
+        env:
+          SEMANTIC_TREE: ${{ steps.identity.outputs.semantic_tree }}
+        run: |
+          set -euo pipefail
+          for attempt in $(seq 1 30); do
+            git fetch origin main --force
+            if [ "$(git rev-parse origin/main^{tree})" = "$SEMANTIC_TREE" ]; then break; fi
+            if [ "$attempt" -eq 30 ]; then echo "::error::main tree is not the reviewed semantic tree"; exit 1; fi
+            sleep 2
+          done
+          test "$(git ls-tree -r --name-only origin/main | grep -c '^.github/workflows/temp-' || true)" -eq 0
+          test "$(git show origin/main:.github/release-requests/v1.3.1.json | python -c 'import json,sys; print(str(json.load(sys.stdin)["execute_on_merge"]).lower())')" = false
+          git show origin/main:scripts/run_installed_mcp_agent_harness.py | grep -q '"public_release_truth_closed": False'
+          git show origin/main:scripts/run_installed_mcp_agent_harness.py | grep -q '"agent_truth_closed": False'
+          echo "Final main carrier-free semantic tree: PASS"
