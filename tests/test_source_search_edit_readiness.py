@@ -120,7 +120,7 @@ def test_projection_does_not_authorize_partial_code_search_shape() -> None:
     action = _safe_action()
     action.pop("auto_execute")
 
-    _annotate_recovery_handoff(projection, action)
+    _annotate_recovery_handoff(projection, action, edit_authorized=True)
 
     assert projection.get("edit_ready") is not True
 
@@ -128,17 +128,27 @@ def test_projection_does_not_authorize_partial_code_search_shape() -> None:
 def test_projection_authorizes_complete_safe_source_handoff() -> None:
     projection = {"hard_stop": False}
 
-    _annotate_recovery_handoff(projection, _safe_action())
+    _annotate_recovery_handoff(
+        projection, _safe_action(), edit_authorized=True
+    )
 
     assert projection["disposition"] == "search_local_source"
     assert projection["edit_ready"] is True
     assert projection["source_search_status"] == "required"
 
+    investigation_only = {"hard_stop": False}
+    _annotate_recovery_handoff(investigation_only, _safe_action())
+    assert investigation_only["disposition"] == "search_local_source"
+    assert investigation_only["edit_ready"] is False
+    assert investigation_only["source_search_status"] == "required"
+
 
 def test_authoritative_hard_stop_cannot_be_bypassed_by_source_handoff() -> None:
     projection = {"hard_stop": True}
 
-    _annotate_recovery_handoff(projection, _safe_action())
+    _annotate_recovery_handoff(
+        projection, _safe_action(), edit_authorized=True
+    )
 
     assert projection["disposition"] == "resolve_authoritative_conflict"
     assert projection["edit_ready"] is False
