@@ -1,0 +1,128 @@
+name: TEMP strengthen clean P1 finalizer
+
+on:
+  push:
+    branches: [p1/installed-mcp-live-harness-clean]
+    paths:
+      - .github/workflows/temp-strengthen-clean-p1-finalizer.yml
+
+permissions:
+  contents: write
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
+
+jobs:
+  strengthen:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with:
+          ref: p1/installed-mcp-live-harness-clean
+          fetch-depth: 0
+
+      - name: Make finalization independent of PR path filters
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          from pathlib import Path
+
+          path = Path('.github/workflows/temp-finalize-clean-p1-installed-mcp.yml')
+          if not path.exists():
+              print('Finalizer already removed; only cleaning this patch carrier.')
+          else:
+              text = path.read_text(encoding='utf-8')
+
+              old = '''      - name: Resolve semantic tree and current main
+'''
+              new = '''      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: "3.12"
+
+      - name: Resolve semantic tree and current main
+'''
+              if text.count(old) != 1:
+                  raise SystemExit('setup-python insertion anchor mismatch')
+              text = text.replace(old, new, 1)
+
+              old = "          required = {'required-ci', 'required-release', 'provider-free-positive-control'}\n"
+              new = "          required = {'required-ci', 'required-release'}\n"
+              if text.count(old) != 1:
+                  raise SystemExit('required-check set anchor mismatch')
+              text = text.replace(old, new, 1)
+
+              old = '''      - name: Remove final carrier and prove semantic tree identity
+'''
+              new = '''      - name: Re-run both installed-MCP positive controls on semantic bytes
+        env:
+          SEMANTIC_HEAD: ${{ steps.identity.outputs.semantic_head }}
+        run: |
+          set -euo pipefail
+          git checkout --detach "$SEMANTIC_HEAD"
+          python -m pip install -e ".[dev]" build
+          rm -rf dist
+          python -m build --wheel
+          wheel="$(find dist -maxdepth 1 -name '*.whl' -print -quit)"
+          test -n "$wheel"
+          python scripts/run_installed_mcp_agent_harness.py \\
+            --wheel "$wheel" \\
+            --case eval/installed_mcp_agent_v1/cases/project_docs_round_trip.json \\
+            --driver scripted \\
+            --output "$RUNNER_TEMP/installed-mcp-scripted.json"
+          python scripts/verify_installed_mcp_agent_report.py \\
+            "$RUNNER_TEMP/installed-mcp-scripted.json"
+          python scripts/run_installed_mcp_agent_harness.py \\
+            --wheel "$wheel" \\
+            --case eval/installed_mcp_agent_v1/cases/project_docs_round_trip.json \\
+            --driver command \\
+            --driver-command "python eval/installed_mcp_agent_v1/provider_free_command_driver.py" \\
+            --provider provider-free \\
+            --model deterministic-command-positive-control \\
+            --output "$RUNNER_TEMP/installed-mcp-command.json"
+          python scripts/verify_installed_mcp_agent_report.py \\
+            "$RUNNER_TEMP/installed-mcp-command.json"
+          python - <<'PY2'
+          import json, os
+          from pathlib import Path
+          root = Path(os.environ['RUNNER_TEMP'])
+          scripted = json.loads((root / 'installed-mcp-scripted.json').read_text(encoding='utf-8'))
+          command = json.loads((root / 'installed-mcp-command.json').read_text(encoding='utf-8'))
+          assert scripted['outcome']['success'] is True
+          assert command['outcome']['success'] is True
+          assert command['budgets']['repairs_used'] == 1
+          assert command['first_divergence']['stage'] == 'mcp_schema'
+          for report in (scripted, command):
+              assert report['source']['dirty'] is False
+              assert report['claim_boundary']['agent_truth_closed'] is False
+              assert report['claim_boundary']['public_release_truth_closed'] is False
+          PY2
+          git checkout p1/installed-mcp-live-harness-clean
+
+      - name: Remove final carrier and prove semantic tree identity
+'''
+              if text.count(old) != 1:
+                  raise SystemExit('positive-control insertion anchor mismatch')
+              text = text.replace(old, new, 1)
+              path.write_text(text, encoding='utf-8')
+          PY
+          rm .github/workflows/temp-strengthen-clean-p1-finalizer.yml
+          git diff --check
+
+      - name: Commit strengthened finalizer or cleanup-only state
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          mapfile -t changed < <(git diff --cached --name-only)
+          for path in "${changed[@]}"; do
+            case "$path" in
+              .github/workflows/temp-finalize-clean-p1-installed-mcp.yml|\
+              .github/workflows/temp-strengthen-clean-p1-finalizer.yml) ;;
+              *) echo "::error::unexpected patch path: $path"; exit 1 ;;
+            esac
+          done
+          test "${#changed[@]}" -ge 1
+          git commit -m "ci: make P1 finalization path-filter independent"
+          git push origin HEAD:p1/installed-mcp-live-harness-clean
