@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import copy
+from pathlib import Path
 
 from eval.agent_developer_v1.installed_mcp_contract import EventLog, EXPECTED_TOOLS
 from eval.agent_developer_v1.installed_mcp_report import (
@@ -208,6 +209,18 @@ def test_unknown_origin_and_failure_stage_fail_closed() -> None:
     _expect_error("invalid failure-stage attribution", report)
 
 
+def test_server_environment_finish_and_stage_logic_are_hardened() -> None:
+    source = Path(
+        "eval/agent_developer_v1/installed_mcp_benchmark.py"
+    ).read_text(encoding="utf-8")
+    assert "env = dict(os.environ)" not in source
+    assert '"OPENAI_API_KEY"' not in source
+    assert '"GH_TOKEN"' not in source
+    assert '"reason": str(action["reason"])' not in source
+    assert '"reason_sha256": hashlib.sha256(' in source
+    assert "_evaluator_failure_stages(score)" in source
+
+
 def main() -> int:
     checks = (
         test_zero_call_model_failure_is_valid_agent_evidence,
@@ -216,6 +229,7 @@ def main() -> int:
         test_public_claim_requires_public_origin_and_verification,
         test_live_usage_requires_provider_identity,
         test_unknown_origin_and_failure_stage_fail_closed,
+        test_server_environment_finish_and_stage_logic_are_hardened,
     )
     for check in checks:
         check()

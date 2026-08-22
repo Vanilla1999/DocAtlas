@@ -84,9 +84,21 @@ async def _run_task(
         home.mkdir()
         user_home.mkdir()
 
-        env = dict(os.environ)
-        env.pop("PYTHONPATH", None)
-        env.pop("DOCMANCER_HOME", None)
+        env = {
+            key: value
+            for key in (
+                "PATH",
+                "SYSTEMROOT",
+                "WINDIR",
+                "TMPDIR",
+                "TEMP",
+                "TMP",
+                "LANG",
+                "LC_ALL",
+                "PYTHONUTF8",
+            )
+            if (value := os.environ.get(key))
+        }
         env.update(
             {
                 "HOME": str(user_home),
@@ -280,7 +292,9 @@ async def _run_task(
                                 "tool": "finish",
                                 "action": {
                                     "action": "finish",
-                                    "reason": str(action["reason"]),
+                                    "reason_sha256": hashlib.sha256(
+                                    str(action["reason"]).encode("utf-8")
+                                ).hexdigest(),
                                 },
                                 "payload": None,
                                 "project_path": str(project),
@@ -499,6 +513,7 @@ async def _run_task(
                 score["passed"] = bool(
                     score["passed"] and not planning_errors
                 )
+                failure_stages.extend(_evaluator_failure_stages(score))
                 score = redact(score, project)
                 events.add(
                     "task_complete",
@@ -532,6 +547,58 @@ async def _run_task(
                     "schema_repair_count": schema_repairs,
                     "mcp_schema_sha256": schema_sha,
                 }
+
+
+def _evaluator_failure_stages(score: dict[str, Any]) -> set[str]:
+    # Empty trajectories already carry model-format/adapter attribution. Do not
+    # convert the scorer's necessarily-false scope flag into a retrieval claim.
+    if int(score.get("context_call_count") or 0) == 0:
+        return set()
+    errors = [str(value).lower() for value in score.get("errors") or ()]
+    stages: set[str] = set()
+    if (
+        score.get("scope_contract_ok") is False
+        or any(
+            token in error
+            for error in errors
+            for token in (
+                "source",
+                "scope",
+                "module candidate",
+                "module_path",
+            )
+        )
+    ):
+        stages.add("retrieval")
+    if (
+        int(score.get("false_supported") or 0) > 0
+        or any(
+            token in error
+            for error in errors
+            for token in (
+                "supported result",
+                "support",
+                "expected status",
+                "answer_available",
+            )
+        )
+    ):
+        stages.add("support")
+    if (
+        score.get("recovery_contract_ok") is False
+        or any(
+            token in error
+            for error in errors
+            for token in (
+                "recovery",
+                "docs_status",
+                "next action",
+                "recommended action",
+            )
+        )
+    ):
+        stages.add("recovery")
+    return stages
 
 
 def _aggregate(
