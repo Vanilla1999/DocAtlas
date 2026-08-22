@@ -43,6 +43,7 @@ Before the next public release candidate:
 - [ ] The `release-current` environment approval is granted only after all artifact jobs pass; this is the explicit human publication authorization when environment protection is enabled.
 - [ ] Publish has one explicit publication trigger (`workflow_dispatch`); neither tag pushes nor pull requests publish.
 - [ ] Trusted Publishing is configured for owner `Vanilla1999`, repository `DocAtlas`, workflow `publish.yml`, environment `release-current`; no long-lived PyPI token is stored.
+- [ ] For an existing PyPI project, add the publisher under **Your projects → doc-atlas → Manage → Publishing**. Do not configure only an account-level pending publisher, which is intended to create a project that does not yet exist.
 - [ ] Download `release-manifest.json` and retain its wheel/sdist SHA-256 values with the release record.
 - [ ] Public artifacts, tag, changelog, release metadata, and installed `doc-atlas --version` agree after publishing.
 - [ ] Download the public wheel and sdist and verify their bytes/SHA-256 values match the gated artifacts before accepting the publication.
@@ -56,9 +57,11 @@ When PyPI returns `invalid-publisher` after `required-release` succeeds:
 
 - [ ] Record the exact workflow run/job, immutable tag object and target, non-secret OIDC claims, gated artifact hashes, and the fact that upload did not start.
 - [ ] Do not move, delete, or recreate the release tag and do not introduce `PYPI_API_TOKEN` as a fallback.
-- [ ] Verify in PyPI project settings that owner, repository, workflow filename, and environment exactly match the claims printed by the failed action.
+- [ ] Open the **Publishing** page for the existing `doc-atlas` project and verify that owner, repository, workflow filename, and environment exactly match the claims printed by the failed action.
+- [ ] Remove or replace stale/wrong publisher entries rather than adding another speculative workflow identity.
 - [ ] Re-check that the public version is still absent and that the original run's tag target and artifacts remain exact.
 - [ ] Retry only the failed jobs of the original canonical run so its source/provenance context remains unchanged; do not replace it with a dispatch from a newer `main` commit and call that the same reviewed release.
+- [ ] Treat a second identical rejection as evidence that the external publisher still does not match; do not keep retrying without a visible configuration correction.
 - [ ] If the public version appears before retry, stop publication and use verify-only handling; PyPI files are immutable and must never be overwritten.
 - [ ] Keep P0.6 `INCOMPLETE` until exact public hashes, installed MCP behavior, and all three public platform smokes are green.
 
