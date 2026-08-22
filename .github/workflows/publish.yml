@@ -180,11 +180,82 @@ jobs:
           target.write_text(json.dumps(expected, sort_keys=True), encoding="utf-8")
           print(json.dumps(expected, indent=2, sort_keys=True))
           PY
+      - name: Record expected Trusted Publisher identity
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          REF_VALUE: ${{ github.ref }}
+          RELEASE_TAG: ${{ inputs.tag }}
+          REPOSITORY: ${{ github.repository }}
+          REPOSITORY_OWNER: ${{ github.repository_owner }}
+          RUN_ATTEMPT: ${{ github.run_attempt }}
+          RUN_ID: ${{ github.run_id }}
+          WORKFLOW_REF: ${{ github.workflow_ref }}
+        run: |
+          python - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+
+          expected = {
+              "repository": "Vanilla1999/DocAtlas",
+              "repository_owner": "Vanilla1999",
+              "workflow_ref": "Vanilla1999/DocAtlas/.github/workflows/publish.yml@refs/heads/main",
+              "job_workflow_ref": "Vanilla1999/DocAtlas/.github/workflows/publish.yml@refs/heads/main",
+              "ref": "refs/heads/main",
+              "environment": "release-current",
+              "sub": "repo:Vanilla1999/DocAtlas:environment:release-current",
+          }
+          actual_context = {
+              "repository": os.environ["REPOSITORY"],
+              "repository_owner": os.environ["REPOSITORY_OWNER"],
+              "workflow_ref": os.environ["WORKFLOW_REF"],
+              "ref": os.environ["REF_VALUE"],
+              "event_name": os.environ["EVENT_NAME"],
+              "release_tag": os.environ["RELEASE_TAG"],
+              "run_id": os.environ["RUN_ID"],
+              "run_attempt": os.environ["RUN_ATTEMPT"],
+          }
+          for key in ("repository", "repository_owner", "workflow_ref", "ref"):
+              if actual_context[key] != expected[key]:
+                  raise SystemExit(
+                      f"Trusted Publisher context mismatch for {key}: "
+                      f"expected={expected[key]!r} actual={actual_context[key]!r}"
+                  )
+          if actual_context["event_name"] != "workflow_dispatch":
+              raise SystemExit("publication must use workflow_dispatch")
+          payload = {
+              "schema_version": 1,
+              "expected_publisher_claims": expected,
+              "github_context": actual_context,
+              "secret_material_recorded": False,
+          }
+          path = Path(os.environ["RUNNER_TEMP"]) / "docatlas-publisher-context.json"
+          path.write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+          print(json.dumps(payload, indent=2, sort_keys=True))
+          PY
       - run: rm dist/release-manifest.json
       - uses: actions/attest-build-provenance@e8998f949152b193b063cb0ec769d69d929409be # v2.4.0
         with:
           subject-path: "dist/*"
-      - uses: pypa/gh-action-pypi-publish@ed0c53931b1dc9bd32cbe73a98c7f6766f8a527e # release/v1
+      - name: Publish through PyPI Trusted Publishing
+        id: pypi_publish
+        uses: pypa/gh-action-pypi-publish@ed0c53931b1dc9bd32cbe73a98c7f6766f8a527e # release/v1
+      - name: Explain the publisher failure boundary
+        if: steps.pypi_publish.outcome == 'failure'
+        run: |
+          echo "::error::PyPI publication failed after repository-side claim validation."
+          echo "::error::Verify the PyPI project publisher tuple: Vanilla1999 / DocAtlas / publish.yml / release-current."
+          echo "::error::Do not move the tag or add a long-lived token fallback; retain and retry the exact failed run after the external publisher is corrected."
+      - name: Upload publisher diagnostics
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: publisher-diagnostics-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            ${{ runner.temp }}/docatlas-expected-public-artifacts.json
+            ${{ runner.temp }}/docatlas-publisher-context.json
+          if-no-files-found: error
+          retention-days: 90
       - name: Verify exact public wheel and sdist bytes
         env:
           RELEASE_TAG: ${{ inputs.tag }}
