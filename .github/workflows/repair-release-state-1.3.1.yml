@@ -118,6 +118,61 @@ jobs:
               assert evidence["public_artifact_status"] in {"pending", "green"}
           PY
 
+      - name: Repair the generated test and refresh diagnostic classifications
+        run: |
+          python - <<'PY'
+          from __future__ import annotations
+
+          import ast
+          import hashlib
+          import json
+          from pathlib import Path
+
+          generated = Path("tests/test_patch_release_identity.py")
+          text = generated.read_text(encoding="utf-8")
+          broken = 'assert "    environment: release\n" not in workflow'
+          fixed = r'assert "    environment: release\n" not in workflow'
+          if broken not in text:
+              raise SystemExit("generated release assertion repair anchor not found")
+          generated.write_text(text.replace(broken, fixed, 1), encoding="utf-8")
+
+          manifest_path = Path("tests/diagnostic_labels.json")
+          manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+          modules = {
+              "tests/test_patch_release_identity.py": "behavioral",
+              "tests/test_release_state_repair.py": "behavioral",
+              "tests/test_source_search_edit_readiness.py": "behavioral",
+          }
+
+          def nodeids(relative: str) -> list[str]:
+              tree = ast.parse(Path(relative).read_text(encoding="utf-8"), filename=relative)
+              result: list[str] = []
+              for node in tree.body:
+                  if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
+                      if node.name.startswith("test_"):
+                          result.append(f"{relative}::{node.name}")
+                  elif isinstance(node, ast.ClassDef) and node.name.startswith("Test"):
+                      for child in node.body:
+                          if isinstance(child, (ast.FunctionDef, ast.AsyncFunctionDef)) and child.name.startswith("test_"):
+                              result.append(f"{relative}::{node.name}::{child.name}")
+              if not result:
+                  raise SystemExit(f"no diagnostic test nodes found in {relative}")
+              return sorted(result)
+
+          for relative, label in modules.items():
+              manifest["module_labels"][relative] = label
+              digest = hashlib.sha256("\n".join(nodeids(relative)).encode()).hexdigest()
+              manifest["module_node_hashes"][relative] = digest
+              for nodeid in list(manifest["node_overrides"]):
+                  if nodeid.split("::", 1)[0] == relative:
+                      del manifest["node_overrides"][nodeid]
+
+          manifest_path.write_text(
+              json.dumps(manifest, ensure_ascii=False, indent=2) + "\n",
+              encoding="utf-8",
+          )
+          PY
+
       - name: Refresh lockfile from the single source version
         run: |
           python -m pip install "uv==$UV_VERSION"
