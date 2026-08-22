@@ -9,8 +9,10 @@ from typing import Any
 from docmancer.docs.application.action_packet import build_action_packet, validate_action_packet
 from docmancer.docs.application.evidence_selection import AggregateMixedSelectionDecision, SelectionDecision
 from docmancer.docs.interfaces.mcp.recovery_projection import (
+    _MODULE_RECOVERY_REASON_CODES,
     _annotate_recovery_handoff,
     _attach_recovery_diagnosis,
+    _bound_recoverable_insufficient_projection,
     _recovery_summary,
     is_operational_recovery_action,
 )
@@ -42,15 +44,6 @@ DOCUMENT_CONTENT_POLICY = {
     "actions_source": "typed_top_level_fields_only",
 }
 BOUNDED_STRUCTURED_CONTENT_MARKER = "Structured DocAtlas result attached in structuredContent."
-_MODULE_RECOVERY_REASON_CODES = frozenset({
-    "module_ambiguous", "module_not_found", "no_module_docs",
-})
-_MODULE_RECOVERY_MISSING = "Select an exact module_path and retry."
-_MODULE_RECOVERY_SUPPORT_SUMMARY_KEYS = frozenset({
-    "answer_supported", "answer_available", "support_status", "reason_code",
-    "decision_hash",
-})
-
 
 def _bounded_project_operational_diagnostics(payload: dict[str, Any]) -> dict[str, Any]:
     """Expose only bounded, agent-actionable Project Docs recovery metadata."""
@@ -105,108 +98,6 @@ def _refresh_projection_estimate(payload: dict[str, Any]) -> None:
         if payload.get("estimated_tokens") == estimate:
             return
         payload["estimated_tokens"] = estimate
-
-
-def _bound_module_recovery_projection(
-    payload: dict[str, Any],
-    *,
-    max_tokens: int,
-) -> None:
-    """Keep an executable recovery action and one complete exact module path."""
-
-    reason = str(payload.get("operational_reason_code") or "")
-    if reason not in _MODULE_RECOVERY_REASON_CODES:
-        return
-    rows = payload.get("module_candidates")
-    candidates = [
-        deepcopy(row)
-        for row in rows or []
-        if isinstance(row, dict) and str(row.get("module_path") or "").strip()
-    ]
-    if not candidates:
-        return
-
-    limit = min(INSUFFICIENT_EVIDENCE_MAX_TOKENS, max(1, int(max_tokens)))
-    for key in SUPPORT_ENVELOPE_KEYS:
-        if key not in _MODULE_RECOVERY_SUPPORT_SUMMARY_KEYS:
-            payload.pop(key, None)
-    payload.pop("support_envelope", None)
-    _refresh_projection_estimate(payload)
-    if payload["estimated_tokens"] <= limit:
-        return
-
-    missing = payload.get("missing")
-    if isinstance(missing, list):
-        payload["missing"] = missing[:1] or [_MODULE_RECOVERY_MISSING]
-    action = payload.get("recommended_next_action")
-    if isinstance(action, dict):
-        for key in (
-            "type", "reason", "message", "confirmation_reason", "agent_question",
-            "observations", "security_scope", "decision_options",
-        ):
-            action.pop(key, None)
-    _refresh_projection_estimate(payload)
-    if payload["estimated_tokens"] <= limit:
-        return
-
-    for row in candidates:
-        row.pop("module_name", None)
-        row.pop("module_type", None)
-    payload["module_candidates"] = candidates
-    _refresh_projection_estimate(payload)
-    if payload["estimated_tokens"] <= limit:
-        return
-
-    # Preserve the complete ambiguity set whenever the requested budget allows it.
-    # Compact surrounding diagnostics before sacrificing candidate coverage.
-    for key in (
-        "operational_status", "context_available", "disposition", "edit_ready",
-        "source_search_status", "requires_confirmation", "decision_hash", "reason_code",
-        "documentation_supported", "investigation_allowed", "hard_stop",
-        "recovery_origin", "recovery_reason_code", "recovery_disposition",
-    ):
-        payload.pop(key, None)
-    payload["missing"] = [_MODULE_RECOVERY_MISSING]
-    payload["module_candidates"] = candidates
-    _refresh_projection_estimate(payload)
-    if payload["estimated_tokens"] <= limit:
-        return
-
-    # Under a tighter budget, retain one complete exact locator rather than
-    # truncating a path or failing the entire recovery projection.
-    candidates.sort(
-        key=lambda row: (len(str(row["module_path"])), str(row["module_path"]))
-    )
-    payload["module_candidates"] = [candidates[0]]
-    _refresh_projection_estimate(payload)
-    if payload["estimated_tokens"] <= limit:
-        return
-
-    minimal_action = payload.get("recommended_next_action")
-    if isinstance(minimal_action, dict):
-        minimal_action = {
-            key: deepcopy(minimal_action[key])
-            for key in ("tool", "arguments_patch", "requires_confirmation", "auto_execute")
-            if key in minimal_action
-        }
-    kind = payload.get("kind")
-    payload.clear()
-    payload.update({
-        "status": "insufficient_evidence",
-        "kind": "docs_answer" if kind == "docs_answer" else "patch_context",
-        "missing": [_MODULE_RECOVERY_MISSING],
-        "answer_supported": False,
-        "answer_available": False,
-        "support_status": "insufficient_evidence",
-        "operational_reason_code": reason,
-        "module_candidates": [candidates[0]],
-        "estimated_tokens": 0,
-    })
-    if minimal_action:
-        payload["recommended_next_action"] = minimal_action
-    _refresh_projection_estimate(payload)
-    if payload["estimated_tokens"] > limit:
-        raise ValueError("minimum module-recovery projection exceeds the requested budget")
 
 
 def context_tools(tools: list[dict[str, Any]]) -> list[dict[str, Any]]:
@@ -517,18 +408,14 @@ def handle_context_tool(name: str, args: dict[str, Any], service: LibraryDocsSer
                 projection.update(_recovery_summary(raw))
                 _annotate_recovery_handoff(projection, recovery)
                 _prioritize_module_recovery_projection(projection)
-                _bound_module_recovery_projection(
+                _bound_recoverable_insufficient_projection(
                     projection, max_tokens=output_budget,
                 )
-                bound_insufficient_projection(projection, max_tokens=output_budget)
             if projection.get("status") == "insufficient_evidence":
                 projection.update(_recovery_summary(raw))
                 _annotate_recovery_handoff(projection, recovery)
                 _prioritize_module_recovery_projection(projection)
-                _bound_module_recovery_projection(
-                    projection, max_tokens=output_budget,
-                )
-                bound_insufficient_projection(
+                _bound_recoverable_insufficient_projection(
                     projection, max_tokens=output_budget,
                 )
             _omit_nullable_reason_code(projection)
@@ -634,10 +521,9 @@ def handle_context_tool(name: str, args: dict[str, Any], service: LibraryDocsSer
         if projection.get("status") == "insufficient_evidence":
             projection.update(_recovery_summary(raw))
             _annotate_recovery_handoff(projection, recovery)
-            _bound_module_recovery_projection(
+            _bound_recoverable_insufficient_projection(
                 projection, max_tokens=output_budget,
             )
-            bound_insufficient_projection(projection, max_tokens=output_budget)
         _omit_nullable_reason_code(projection)
         _refresh_projection_estimate(projection)
         projection_errors = validate_model_visible_projection(
