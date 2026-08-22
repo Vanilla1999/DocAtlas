@@ -1,10 +1,11 @@
 {
   "allowed_release_delta": [
     ".github/release-requests/v1.3.1.json",
+    ".github/workflows/ci.yml",
     ".github/workflows/release-request.yml",
     "docs/RELEASE_CHECKLIST.md",
     "scripts/release_request.py",
-    "tests/test_release_request.py"
+    "scripts/release_request_self_test.py"
   ],
   "distribution": "doc-atlas",
   "execute_on_merge": true,
