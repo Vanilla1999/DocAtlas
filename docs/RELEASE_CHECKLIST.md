@@ -24,6 +24,7 @@ Before the next public release candidate:
 - [ ] Legacy state/config migration is ownership-checked, preview-first, fail-closed on ambiguous/foreign state, and covered by installed tests.
 - [ ] Installed agent guidance and examples validate against the real three-tool public MCP schema.
 - [ ] The active release identity note and changelog agree on the intended public version. Repository `1.2.0` is an unpublished milestone; the next intended public release is `1.3.1` unless a later reviewed release-preparation change supersedes it.
+- [ ] The executable release decision is reviewable in `.github/release-requests/v1.3.1.json`; its exact base commit, allowed release delta, tag, publisher identity, and public tool inventory are validated before any tag is created.
 
 ## Built artifact
 
@@ -38,15 +39,16 @@ Before the next public release candidate:
 ## Release controls
 
 - [ ] CI is green for every claimed Python version.
-- [ ] A maintainer creates the immutable version tag from the reviewed release commit, then manually dispatches `Release artifact gate and publish` with that exact tag.
-- [ ] The protected `release` environment approval is granted only after all artifact jobs pass; this is the explicit human publication authorization.
+- [ ] Merge one reviewed release-request PR. The controller waits for `required-ci` on the exact resulting `main` commit, verifies that `main` has not moved, creates or idempotently verifies the immutable annotated tag, and then dispatches the canonical `publish.yml`.
+- [ ] The `release-current` environment approval is granted only after all artifact jobs pass; this is the explicit human publication authorization when environment protection is enabled.
 - [ ] Publish has one explicit publication trigger (`workflow_dispatch`); neither tag pushes nor pull requests publish.
-- [ ] Trusted Publishing is configured for the repository/environment in PyPI; no long-lived PyPI token is stored.
+- [ ] Trusted Publishing is configured for owner `Vanilla1999`, repository `DocAtlas`, workflow `publish.yml`, environment `release-current`; no long-lived PyPI token is stored.
 - [ ] Download `release-manifest.json` and retain its wheel/sdist SHA-256 values with the release record.
 - [ ] Public artifacts, tag, changelog, release metadata, and installed `doc-atlas --version` agree after publishing.
 - [ ] Download the public wheel and sdist and verify their bytes/SHA-256 values match the gated artifacts before accepting the publication.
 - [ ] Reinstall the exact public version with pip cache disabled and rerun the installed Docs MCP stdio smoke.
 - [ ] Verify the exact public package on Linux, macOS, and Windows for the claimed primary MCP/install surface.
+- [ ] Retain the controller's `reviewed-public-release-<version>-<run_id>` evidence artifact and move scorecard rows to green only through a separate reviewed closure PR.
 
 ## Technical release evidence retained from the infrastructure roadmap
 
