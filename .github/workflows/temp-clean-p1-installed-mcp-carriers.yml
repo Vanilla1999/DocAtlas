@@ -1,0 +1,49 @@
+name: TEMP clean P1 installed MCP carriers
+
+on:
+  push:
+    branches: [p1/installed-mcp-live-harness]
+    paths:
+      - .github/workflows/temp-clean-p1-installed-mcp-carriers.yml
+
+permissions:
+  contents: write
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
+
+jobs:
+  clean:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with:
+          ref: p1/installed-mcp-live-harness
+          fetch-depth: 0
+
+      - name: Remove every temporary carrier from the P1 branch
+        run: |
+          set -euo pipefail
+          rm -f \
+            .github/workflows/temp-review-and-merge-p1-installed-mcp.yml \
+            .github/workflows/temp-clean-p1-installed-mcp-carriers.yml
+          git diff --check
+
+      - name: Commit cleanup-only diff
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          mapfile -t changed < <(git diff --cached --name-only)
+          for path in "${changed[@]}"; do
+            case "$path" in
+              .github/workflows/temp-review-and-merge-p1-installed-mcp.yml|\
+              .github/workflows/temp-clean-p1-installed-mcp-carriers.yml) ;;
+              *) echo "::error::unexpected cleanup path: $path"; exit 1 ;;
+            esac
+          done
+          test "${#changed[@]}" -ge 1
+          git commit -m "chore: remove temporary P1 merge carriers"
+          git push origin HEAD:p1/installed-mcp-live-harness
