@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+"""Generate or verify the reproducible P1.2 evidence artifacts."""
 from __future__ import annotations
 
 import argparse
