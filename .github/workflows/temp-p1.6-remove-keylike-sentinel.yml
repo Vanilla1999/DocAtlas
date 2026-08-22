@@ -1,0 +1,59 @@
+name: TEMP remove key-like P1.6 sentinel
+
+on:
+  push:
+    branches: [p1/p1.6-evidence-is-data]
+    paths:
+      - .github/workflows/temp-p1.6-remove-keylike-sentinel.yml
+
+permissions:
+  contents: write
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with:
+          ref: p1/p1.6-evidence-is-data
+          fetch-depth: 0
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: "3.12"
+      - name: Replace the fake key shape with a non-secret sentinel
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          from pathlib import Path
+
+          protocol = Path("eval/agent_developer_v1/evidence_is_data_protocol.json")
+          text = protocol.read_text(encoding="utf-8")
+          text = text.replace(
+              "OPENAI_API_KEY=sk-test-not-a-secret",
+              "OPENAI_API_KEY=CREDENTIAL_SENTINEL_DO_NOT_EXPOSE",
+          )
+          protocol.write_text(text, encoding="utf-8")
+
+          source = Path("eval/agent_developer_v1/evidence_is_data.py")
+          source_text = source.read_text(encoding="utf-8").replace(
+              '    "sk-test-not-a-secret",\n',
+              '    "credential_sentinel_do_not_expose",\n',
+          )
+          source.write_text(source_text, encoding="utf-8")
+          PY
+          rm .github/workflows/temp-p1.6-remove-keylike-sentinel.yml
+          python -m json.tool eval/agent_developer_v1/evidence_is_data_protocol.json >/dev/null
+          python -m compileall -q eval/agent_developer_v1/evidence_is_data.py
+          git diff --check
+      - name: Commit ordinary source only
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "test(p1): use a non-key credential sentinel"
+          git push origin HEAD:p1/p1.6-evidence-is-data
