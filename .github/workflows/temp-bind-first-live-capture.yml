@@ -1,0 +1,126 @@
+name: TEMP bind first installed MCP live capture
+
+on:
+  push:
+    branches: [p1/installed-mcp-real-model-capture-clean]
+    paths:
+      - .github/workflows/temp-bind-first-live-capture.yml
+
+permissions:
+  contents: write
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
+
+jobs:
+  bind:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with:
+          ref: p1/installed-mcp-real-model-capture-clean
+          fetch-depth: 0
+
+      - name: Bind the committed live evidence into permanent gates
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          from pathlib import Path
+
+          def replace_once(path: str, old: str, new: str) -> None:
+              target = Path(path)
+              text = target.read_text(encoding='utf-8')
+              if text.count(old) != 1:
+                  raise SystemExit(f'{path}: insertion anchor mismatch: {old[:100]!r}')
+              target.write_text(text.replace(old, new, 1), encoding='utf-8')
+
+          workflow = '.github/workflows/installed-mcp-agent-v1.yml'
+          marker = '      - name: Verify committed pre-public live evidence\n'
+          if marker not in Path(workflow).read_text(encoding='utf-8'):
+              replace_once(
+                  workflow,
+                  '''      - name: Build the exact reviewed wheel
+''',
+                  '''      - name: Verify committed pre-public live evidence
+        run: |
+          report=eval/installed_mcp_agent_v1/results/pre_public_github_models_project_docs_round_trip.json
+          summary=eval/installed_mcp_agent_v1/results/pre_public_github_models_project_docs_round_trip.summary.json
+          if [ -f "$report" ] || [ -f "$summary" ]; then
+            test -f "$report"
+            test -f "$summary"
+            test "$(wc -c < "$report")" -le 100000
+            python scripts/verify_installed_mcp_agent_report.py "$report"
+            python - "$report" "$summary" <<'PY2'
+          import json, sys
+          report = json.load(open(sys.argv[1], encoding='utf-8'))
+          summary = json.load(open(sys.argv[2], encoding='utf-8'))
+          assert report['outcome']['success'] is True
+          assert report['first_divergence']['stage'] == 'none'
+          assert report['model']['real_model'] is True
+          assert report['model']['provider'] == 'github-models'
+          assert report['model']['request_ids']
+          assert report['model_turns']
+          assert report['trajectory']
+          assert report['privacy']['provider_payload_absolute_path_scan'] == 'pass'
+          assert report['privacy']['provider_payload_credential_scan'] == 'pass'
+          assert report['privacy']['driver_environment_allowlisted'] is True
+          assert report['claim_boundary']['agent_truth_closed'] is False
+          assert report['claim_boundary']['public_release_truth_closed'] is False
+          assert summary['semantic_commit_sha'] == report['source']['commit_sha']
+          assert summary['success'] == report['outcome']['success']
+          assert summary['first_divergence'] == report['first_divergence']
+          assert summary['model'] == report['model']['model']
+          assert summary['provider'] == report['model']['provider']
+          assert summary['request_count'] == len(report['model']['request_ids'])
+          assert summary['model_turn_count'] == len(report['model_turns'])
+          assert summary['tool_calls'] == report['budgets']['tool_calls_used']
+          assert summary['repairs'] == report['budgets']['repairs_used']
+          assert summary['wheel_sha256'] == report['package']['artifact_sha256']
+          assert summary['schema_sha256'] == report['mcp']['tool_schemas_sha256']
+          assert summary['agent_truth_closed'] is False
+          assert summary['public_release_truth_closed'] is False
+          PY2
+          fi
+
+      - name: Build the exact reviewed wheel
+''',
+              )
+
+          roadmap = 'roadmap/README.md'
+          text = Path(roadmap).read_text(encoding='utf-8')
+          heading = '## P1.1 — Installed-MCP live benchmark harness\n'
+          status = '''## P1.1 — Installed-MCP live benchmark harness
+
+**Status:** `in_progress` under the accepted 2026-08-22 sequencing exception. The installed-wheel harness and one privacy-safe pre-public GitHub Models smoke are now reproducible, but this does not close P0 public artifacts or Agent Truth. Public-package runs and the frozen multi-case evidence set remain outstanding.
+'''
+          if '**Status:** `in_progress` under the accepted 2026-08-22 sequencing exception.' not in text:
+              if text.count(heading) != 1:
+                  raise SystemExit('P1.1 roadmap heading mismatch')
+              Path(roadmap).write_text(text.replace(heading, status, 1), encoding='utf-8')
+          PY
+          rm .github/workflows/temp-bind-first-live-capture.yml
+          python -m json.tool eval/installed_mcp_agent_v1/results/pre_public_github_models_project_docs_round_trip.json >/dev/null
+          python -m json.tool eval/installed_mcp_agent_v1/results/pre_public_github_models_project_docs_round_trip.summary.json >/dev/null
+          python scripts/verify_installed_mcp_agent_report.py \
+            eval/installed_mcp_agent_v1/results/pre_public_github_models_project_docs_round_trip.json
+          git diff --check
+
+      - name: Commit permanent evidence gates
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          changed="$(git diff --cached --name-only)"
+          expected="$(printf '%s\n' \
+            .github/workflows/installed-mcp-agent-v1.yml \
+            .github/workflows/temp-bind-first-live-capture.yml \
+            roadmap/README.md)"
+          test "$changed" = "$expected" || {
+            echo "::error::unexpected live-evidence binding diff"
+            printf 'actual:\n%s\nexpected:\n%s\n' "$changed" "$expected"
+            exit 1
+          }
+          git commit -m "test(p1): gate the first installed-MCP live capture"
+          git push origin HEAD:p1/installed-mcp-real-model-capture-clean
