@@ -1,0 +1,60 @@
+name: TEMP finalize P1.1 on PR
+
+on:
+  pull_request:
+    branches: [main]
+    types: [opened, synchronize, reopened]
+
+permissions:
+  contents: write
+  pull-requests: read
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
+
+jobs:
+  finalize:
+    if: github.event.pull_request.head.ref == 'p1/p1.1-final'
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with:
+          ref: p1/p1.1-final
+          fetch-depth: 0
+
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: "3.12"
+
+      - name: Apply and validate exact finalization
+        run: |
+          set -euo pipefail
+          python scripts/temp_finalize_p11.py
+          rm .github/workflows/temp-finalize-p1.1.yml
+          rm .github/workflows/temp-finalize-p1.1-pr.yml
+          rm scripts/temp_finalize_p11.py
+          python -m pip install -e ".[dev]"
+          python -m compileall -q eval/agent_developer_v1 scripts/installed_mcp_contract_self_test.py
+          python scripts/installed_mcp_contract_self_test.py
+          git diff --check
+
+      - name: Commit only the final semantic hardening
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          changed="$(git diff --cached --name-only)"
+          expected="$(printf '%s\n' \
+            .github/workflows/temp-finalize-p1.1-pr.yml \
+            .github/workflows/temp-finalize-p1.1.yml \
+            eval/agent_developer_v1/installed_mcp_benchmark.py \
+            scripts/installed_mcp_contract_self_test.py \
+            scripts/temp_finalize_p11.py)"
+          test "$changed" = "$expected" || {
+            printf 'unexpected finalization diff\nactual:\n%s\nexpected:\n%s\n' "$changed" "$expected"
+            exit 1
+          }
+          git commit -m "fix(p1): isolate installed MCP evidence and classify divergence"
+          git push origin HEAD:p1/p1.1-final
