@@ -97,7 +97,7 @@ jobs:
         run: |
           set -euo pipefail
 
-          payload="$(printf '{\"ref\":\"main\",\"inputs\":{\"tag\":\"%s\"}}' "$RELEASE_TAG")"
+          payload="$(printf '{"ref":"main","inputs":{"tag":"%s"}}' "$RELEASE_TAG")"
           status="$(curl --silent --show-error \
             --output "$RUNNER_TEMP/dispatch-response.json" \
             --write-out '%{http_code}' \
