@@ -413,10 +413,10 @@ def handle_context_tool(name: str, args: dict[str, Any], service: LibraryDocsSer
                 projection.update(support_projection)
                 projection.update(_recovery_summary(raw))
                 _annotate_recovery_handoff(
-                projection,
-                recovery,
-                edit_authorized=source_search_edit_authorized,
-            )
+                    projection,
+                    recovery,
+                    edit_authorized=source_search_edit_authorized,
+                )
                 _prioritize_module_recovery_projection(projection)
                 _bound_recoverable_insufficient_projection(
                     projection, max_tokens=output_budget,
@@ -424,10 +424,10 @@ def handle_context_tool(name: str, args: dict[str, Any], service: LibraryDocsSer
             if projection.get("status") == "insufficient_evidence":
                 projection.update(_recovery_summary(raw))
                 _annotate_recovery_handoff(
-                projection,
-                recovery,
-                edit_authorized=source_search_edit_authorized,
-            )
+                    projection,
+                    recovery,
+                    edit_authorized=source_search_edit_authorized,
+                )
                 _prioritize_module_recovery_projection(projection)
                 _bound_recoverable_insufficient_projection(
                     projection, max_tokens=output_budget,
