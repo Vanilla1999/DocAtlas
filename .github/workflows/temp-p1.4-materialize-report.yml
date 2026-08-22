@@ -1,0 +1,52 @@
+name: TEMP materialize P1.4 report
+
+on:
+  push:
+    branches: [p1/p1.4-paraphrase-proofability]
+    paths:
+      - .github/workflows/temp-p1.4-materialize-report.yml
+
+permissions:
+  contents: write
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
+
+jobs:
+  materialize:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with:
+          ref: p1/p1.4-paraphrase-proofability
+          fetch-depth: 0
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: "3.12"
+      - name: Install and derive the exact P1.4 report
+        run: |
+          set -euo pipefail
+          python -m pip install -e ".[dev]"
+          python scripts/run_paraphrase_proofability_gate.py --write
+          python scripts/run_paraphrase_proofability_gate.py
+          python scripts/paraphrase_proofability_self_test.py
+          rm .github/workflows/temp-p1.4-materialize-report.yml
+          git diff --check
+      - name: Commit only reviewable evidence
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          changed="$(git diff --cached --name-only)"
+          expected="$(printf '%s\n' \
+            .github/workflows/temp-p1.4-materialize-report.yml \
+            eval/agent_developer_v1/results/paraphrase-proofability.json)"
+          test "$changed" = "$expected" || {
+            echo "::error::unexpected P1.4 materialization diff"
+            printf 'actual:\n%s\nexpected:\n%s\n' "$changed" "$expected"
+            exit 1
+          }
+          git commit -m "docs(p1): materialize paraphrase proofability evidence"
+          git push origin HEAD:p1/p1.4-paraphrase-proofability
