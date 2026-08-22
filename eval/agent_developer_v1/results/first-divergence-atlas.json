@@ -1,0 +1,883 @@
+{
+  "claim_boundary": {
+    "autonomous_agent_truth_closed": false,
+    "fresh_installed_live_report_analyzed": false,
+    "historical_live_report_analyzed": true,
+    "p1_3_candidates_remain_hypotheses": true
+  },
+  "findings": {
+    "missing_working_path_is_established_root_cause": false,
+    "public_api_change_is_justified_by_p1_2": false,
+    "repeated_primary_class": "selector_cardinality_invalid",
+    "repeated_primary_class_task_count": 8,
+    "working_path_was_model_visible": true
+  },
+  "protocol": "agent-developer-first-divergence-v1",
+  "schema_version": 1,
+  "source": {
+    "fresh_installed_provider_run_available": false,
+    "fresh_run_blocker": "repository OPENAI_API_KEY is not configured",
+    "model": "gpt-5.6-luna",
+    "oracle_sha256": "e7bba83f624d9f382486275a8b9f8ab50bf63b301a18bc3fd78530626d21854c",
+    "provider_id": "opencode-chat",
+    "public_tasks_sha256": "517853c15d0a234307199ccd4dfdbd8cb8f8dee56f7a1e12bee247a02634a9b8",
+    "report_protocol": "agent-developer-model-v1",
+    "report_sha256": "ebc6da0de44ead15f4da7205a7b4bc20c01f0125877f178026fd6293a69308fa"
+  },
+  "summary": {
+    "failure_class_counts": {
+      "question_specificity_mismatch": 2,
+      "required_scope_sequence_mismatch": 1,
+      "selector_cardinality_invalid": 8
+    },
+    "false_supported": 0,
+    "forbidden_source_contamination": 0,
+    "passed_tasks": 0,
+    "stage_counts": {
+      "model_format": 8,
+      "planning": 1,
+      "retrieval": 2
+    },
+    "task_count": 11
+  },
+  "tasks": [
+    {
+      "actual_trajectory": [],
+      "developer_task": "Inspect the orders draft storage contract before changing order submission code.",
+      "expected_trajectory": [
+        {
+          "expected_status": "ok",
+          "question": "What is OrdersDraftStore?",
+          "required_sources": [
+            "packages/orders/README.md"
+          ],
+          "signature": {
+            "module_path": "packages/orders",
+            "scope": "module"
+          },
+          "tool": "get_docs_context"
+        }
+      ],
+      "first_divergence": {
+        "actual_step_index": null,
+        "evidence": {
+          "report_errors": [
+            "module retrieval requires exactly one of module or module_path",
+            "missing required scope: {'scope': 'module', 'module_path': 'packages/orders'}"
+          ],
+          "required_scopes": [
+            {
+              "module_path": "packages/orders",
+              "scope": "module"
+            }
+          ],
+          "working_path": "packages/orders/src/submission.py"
+        },
+        "expected_step_index": 0,
+        "failure_class": "selector_cardinality_invalid",
+        "minimal_successful_repair": "Derive the exact module root from the supplied working path, send only `module_path`, leave `module` empty, and retry the same first evidence question without widening scope.",
+        "model_visible_reason": "The model-visible contract required exactly one of `module` or `module_path`, and the task already exposed working_path='packages/orders/src/submission.py'. The retained report records a selector cardinality error, but the rejected action body was not persisted, so it cannot prove whether both selectors or neither selector was sent.",
+        "public_api_change_required": false,
+        "repair_surface": "agent_or_host_argument_normalization",
+        "server_side_reason": "The planner action failed host-side validation before any MCP call; the installed/server retrieval path was never reached.",
+        "stage": "model_format"
+      },
+      "passed": false,
+      "request_evidence": {
+        "input_tokens": 2480,
+        "output_tokens": 65,
+        "reasoning_tokens": 157,
+        "request_ids": [
+          "ses_fe05a64c3ffegWTHGF45oX2G2Y"
+        ],
+        "turn_count": 1
+      },
+      "secondary_failures": [
+        {
+          "detail": "module retrieval requires exactly one of module or module_path",
+          "stage": "validation"
+        },
+        {
+          "detail": "missing required scope: {'scope': 'module', 'module_path': 'packages/orders'}",
+          "stage": "planning"
+        }
+      ],
+      "task_class": "module_only",
+      "task_id": "module_definition_supported",
+      "working_path": "packages/orders/src/submission.py"
+    },
+    {
+      "actual_trajectory": [],
+      "developer_task": "Understand what OrdersDraftStore does before changing persistence code.",
+      "expected_trajectory": [
+        {
+          "expected_status": "ok",
+          "question": "What does OrdersDraftStore do?",
+          "required_sources": [
+            "packages/orders/README.md"
+          ],
+          "signature": {
+            "module_path": "packages/orders",
+            "scope": "module"
+          },
+          "tool": "get_docs_context"
+        }
+      ],
+      "first_divergence": {
+        "actual_step_index": null,
+        "evidence": {
+          "report_errors": [
+            "module retrieval requires exactly one of module or module_path",
+            "missing required scope: {'scope': 'module', 'module_path': 'packages/orders'}"
+          ],
+          "required_scopes": [
+            {
+              "module_path": "packages/orders",
+              "scope": "module"
+            }
+          ],
+          "working_path": "packages/orders/src/submission.py"
+        },
+        "expected_step_index": 0,
+        "failure_class": "selector_cardinality_invalid",
+        "minimal_successful_repair": "Derive the exact module root from the supplied working path, send only `module_path`, leave `module` empty, and retry the same first evidence question without widening scope.",
+        "model_visible_reason": "The model-visible contract required exactly one of `module` or `module_path`, and the task already exposed working_path='packages/orders/src/submission.py'. The retained report records a selector cardinality error, but the rejected action body was not persisted, so it cannot prove whether both selectors or neither selector was sent.",
+        "public_api_change_required": false,
+        "repair_surface": "agent_or_host_argument_normalization",
+        "server_side_reason": "The planner action failed host-side validation before any MCP call; the installed/server retrieval path was never reached.",
+        "stage": "model_format"
+      },
+      "passed": false,
+      "request_evidence": {
+        "input_tokens": 2480,
+        "output_tokens": 81,
+        "reasoning_tokens": 167,
+        "request_ids": [
+          "ses_fe05a3faaffe85grZAWz1qAitU"
+        ],
+        "turn_count": 1
+      },
+      "secondary_failures": [
+        {
+          "detail": "module retrieval requires exactly one of module or module_path",
+          "stage": "validation"
+        },
+        {
+          "detail": "missing required scope: {'scope': 'module', 'module_path': 'packages/orders'}",
+          "stage": "planning"
+        }
+      ],
+      "task_class": "module_only",
+      "task_id": "module_behavior_named_gap",
+      "working_path": "packages/orders/src/submission.py"
+    },
+    {
+      "actual_trajectory": [],
+      "developer_task": "Read the validation contract before modifying order validation.",
+      "expected_trajectory": [
+        {
+          "expected_status": "ok",
+          "question": "What does OrderValidationContract require?",
+          "required_sources": [
+            "packages/orders/README.md"
+          ],
+          "signature": {
+            "module_path": "packages/orders",
+            "scope": "module"
+          },
+          "tool": "get_docs_context"
+        }
+      ],
+      "first_divergence": {
+        "actual_step_index": null,
+        "evidence": {
+          "report_errors": [
+            "module retrieval requires exactly one of module or module_path",
+            "missing required scope: {'scope': 'module', 'module_path': 'packages/orders'}"
+          ],
+          "required_scopes": [
+            {
+              "module_path": "packages/orders",
+              "scope": "module"
+            }
+          ],
+          "working_path": "packages/orders/src/submission.py"
+        },
+        "expected_step_index": 0,
+        "failure_class": "selector_cardinality_invalid",
+        "minimal_successful_repair": "Derive the exact module root from the supplied working path, send only `module_path`, leave `module` empty, and retry the same first evidence question without widening scope.",
+        "model_visible_reason": "The model-visible contract required exactly one of `module` or `module_path`, and the task already exposed working_path='packages/orders/src/submission.py'. The retained report records a selector cardinality error, but the rejected action body was not persisted, so it cannot prove whether both selectors or neither selector was sent.",
+        "public_api_change_required": false,
+        "repair_surface": "agent_or_host_argument_normalization",
+        "server_side_reason": "The planner action failed host-side validation before any MCP call; the installed/server retrieval path was never reached.",
+        "stage": "model_format"
+      },
+      "passed": false,
+      "request_evidence": {
+        "input_tokens": 3194,
+        "output_tokens": 129,
+        "reasoning_tokens": 242,
+        "request_ids": [
+          "ses_fe059f2c7ffe7wZ8p9P4qet4PD",
+          "ses_fe05a1581ffekIYZV8wDuaoKcf"
+        ],
+        "turn_count": 1
+      },
+      "secondary_failures": [
+        {
+          "detail": "module retrieval requires exactly one of module or module_path",
+          "stage": "validation"
+        },
+        {
+          "detail": "missing required scope: {'scope': 'module', 'module_path': 'packages/orders'}",
+          "stage": "planning"
+        }
+      ],
+      "task_class": "module_only",
+      "task_id": "module_requirements_named_gap",
+      "working_path": "packages/orders/src/submission.py"
+    },
+    {
+      "actual_trajectory": [
+        {
+          "next_action_tool": "code_search",
+          "operational_reason_code": null,
+          "question": "What is the project-wide retry policy that must be followed when adding retries to orders?",
+          "signature": {
+            "scope": "project"
+          },
+          "sources": [],
+          "status": "insufficient_evidence",
+          "tool": "get_docs_context"
+        }
+      ],
+      "developer_task": "Resolve the project-wide retry policy before adding retries to orders.",
+      "expected_trajectory": [
+        {
+          "expected_status": "ok",
+          "question": "What is ProjectRetryPolicy?",
+          "required_sources": [
+            "ARCHITECTURE.md"
+          ],
+          "signature": {
+            "scope": "project"
+          },
+          "tool": "get_docs_context"
+        }
+      ],
+      "first_divergence": {
+        "actual_step_index": 0,
+        "evidence": {
+          "actual_question": "What is the project-wide retry policy that must be followed when adding retries to orders?",
+          "actual_sources": [],
+          "actual_status": "insufficient_evidence",
+          "expected_question": "What is ProjectRetryPolicy?",
+          "report_errors": [
+            "call {'scope': 'project'}: status='insufficient_evidence' expected='ok'",
+            "call {'scope': 'project'}: required sources missing from ()"
+          ]
+        },
+        "expected_step_index": 0,
+        "failure_class": "question_specificity_mismatch",
+        "minimal_successful_repair": "Keep the same scope and ask the frozen exact-identifier question shown by the evaluator. No new tool or relaxed support rule is required.",
+        "model_visible_reason": "The model selected the correct scope but replaced the frozen exact technical-identity question with a broader prose request. The result contained no sources and remained insufficient.",
+        "public_api_change_required": false,
+        "repair_surface": "agent_question_formulation",
+        "server_side_reason": "DocAtlas executed the schema-valid request. Candidate discovery/support did not establish the required exact source for the broader wording, so the server correctly failed closed instead of fabricating support.",
+        "stage": "retrieval"
+      },
+      "passed": false,
+      "request_evidence": {
+        "input_tokens": 3197,
+        "output_tokens": 126,
+        "reasoning_tokens": 77,
+        "request_ids": [
+          "ses_fe059af67ffe0h1A5Gk3oXv3Zv",
+          "ses_fe059cc69ffeITrNrRK5HMEmGK"
+        ],
+        "turn_count": 1
+      },
+      "secondary_failures": [
+        {
+          "detail": "call {'scope': 'project'}: status='insufficient_evidence' expected='ok'",
+          "stage": "retrieval"
+        },
+        {
+          "detail": "call {'scope': 'project'}: required sources missing from ()",
+          "stage": "retrieval"
+        }
+      ],
+      "task_class": "project_only",
+      "task_id": "project_policy_supported",
+      "working_path": "packages/orders/src/submission.py"
+    },
+    {
+      "actual_trajectory": [],
+      "developer_task": "Add retry handling to orders without violating the project-wide retry policy.",
+      "expected_trajectory": [
+        {
+          "expected_status": "ok",
+          "question": "What is OrdersDraftStore?",
+          "required_sources": [
+            "packages/orders/README.md"
+          ],
+          "signature": {
+            "module_path": "packages/orders",
+            "scope": "module"
+          },
+          "tool": "get_docs_context"
+        },
+        {
+          "expected_status": "ok",
+          "question": "What is ProjectRetryPolicy?",
+          "required_sources": [
+            "ARCHITECTURE.md"
+          ],
+          "signature": {
+            "scope": "project"
+          },
+          "tool": "get_docs_context"
+        }
+      ],
+      "first_divergence": {
+        "actual_step_index": null,
+        "evidence": {
+          "report_errors": [
+            "module retrieval requires exactly one of module or module_path",
+            "missing required scope: {'scope': 'module', 'module_path': 'packages/orders'}",
+            "missing required scope: {'scope': 'project'}"
+          ],
+          "required_scopes": [
+            {
+              "module_path": "packages/orders",
+              "scope": "module"
+            },
+            {
+              "scope": "project"
+            }
+          ],
+          "working_path": "packages/orders/src/submission.py"
+        },
+        "expected_step_index": 0,
+        "failure_class": "selector_cardinality_invalid",
+        "minimal_successful_repair": "Derive the exact module root from the supplied working path, send only `module_path`, leave `module` empty, and retry the same first evidence question without widening scope.",
+        "model_visible_reason": "The model-visible contract required exactly one of `module` or `module_path`, and the task already exposed working_path='packages/orders/src/submission.py'. The retained report records a selector cardinality error, but the rejected action body was not persisted, so it cannot prove whether both selectors or neither selector was sent.",
+        "public_api_change_required": false,
+        "repair_surface": "agent_or_host_argument_normalization",
+        "server_side_reason": "The planner action failed host-side validation before any MCP call; the installed/server retrieval path was never reached.",
+        "stage": "model_format"
+      },
+      "passed": false,
+      "request_evidence": {
+        "input_tokens": 3204,
+        "output_tokens": 163,
+        "reasoning_tokens": 129,
+        "request_ids": [
+          "ses_fe0597255ffePOdSgnE8W0xyxq",
+          "ses_fe059900cffeHVZ4joTaMc31z4"
+        ],
+        "turn_count": 1
+      },
+      "secondary_failures": [
+        {
+          "detail": "module retrieval requires exactly one of module or module_path",
+          "stage": "validation"
+        },
+        {
+          "detail": "missing required scope: {'scope': 'module', 'module_path': 'packages/orders'}",
+          "stage": "planning"
+        },
+        {
+          "detail": "missing required scope: {'scope': 'project'}",
+          "stage": "planning"
+        }
+      ],
+      "task_class": "module_plus_project",
+      "task_id": "module_plus_project_two_call_trajectory",
+      "working_path": "packages/orders/src/submission.py"
+    },
+    {
+      "actual_trajectory": [
+        {
+          "next_action_tool": "code_search",
+          "operational_reason_code": null,
+          "question": "Compare the persistence boundaries, invariants, and integration points for the orders and payments modules before introducing a shared abstraction.",
+          "signature": {
+            "scope": "all"
+          },
+          "sources": [],
+          "status": "insufficient_evidence",
+          "tool": "get_docs_context"
+        }
+      ],
+      "developer_task": "Compare orders and payments persistence boundaries before introducing a shared abstraction.",
+      "expected_trajectory": [
+        {
+          "expected_status": "ok",
+          "question": "How does OrdersDraftStore differ from PaymentOutbox?",
+          "required_sources": [
+            "ARCHITECTURE.md"
+          ],
+          "signature": {
+            "scope": "all"
+          },
+          "tool": "get_docs_context"
+        }
+      ],
+      "first_divergence": {
+        "actual_step_index": 0,
+        "evidence": {
+          "actual_question": "Compare the persistence boundaries, invariants, and integration points for the orders and payments modules before introducing a shared abstraction.",
+          "actual_sources": [],
+          "actual_status": "insufficient_evidence",
+          "expected_question": "How does OrdersDraftStore differ from PaymentOutbox?",
+          "report_errors": [
+            "call {'scope': 'all'}: status='insufficient_evidence' expected='ok'",
+            "call {'scope': 'all'}: required sources missing from ()"
+          ]
+        },
+        "expected_step_index": 0,
+        "failure_class": "question_specificity_mismatch",
+        "minimal_successful_repair": "Keep the same scope and ask the frozen exact-identifier question shown by the evaluator. No new tool or relaxed support rule is required.",
+        "model_visible_reason": "The model selected the correct scope but replaced the frozen exact technical-identity question with a broader prose request. The result contained no sources and remained insufficient.",
+        "public_api_change_required": false,
+        "repair_surface": "agent_question_formulation",
+        "server_side_reason": "DocAtlas executed the schema-valid request. Candidate discovery/support did not establish the required exact source for the broader wording, so the server correctly failed closed instead of fabricating support.",
+        "stage": "retrieval"
+      },
+      "passed": false,
+      "request_evidence": {
+        "input_tokens": 2482,
+        "output_tokens": 70,
+        "reasoning_tokens": 97,
+        "request_ids": [
+          "ses_fe059517effeLw5zFWY59tm14C"
+        ],
+        "turn_count": 1
+      },
+      "secondary_failures": [
+        {
+          "detail": "call {'scope': 'all'}: status='insufficient_evidence' expected='ok'",
+          "stage": "retrieval"
+        },
+        {
+          "detail": "call {'scope': 'all'}: required sources missing from ()",
+          "stage": "retrieval"
+        }
+      ],
+      "task_class": "cross_module",
+      "task_id": "cross_module_comparison_supported",
+      "working_path": "packages/orders/src/submission.py"
+    },
+    {
+      "actual_trajectory": [],
+      "developer_task": "Ensure an orders-scoped retrieval cannot silently answer from payments docs.",
+      "expected_trajectory": [
+        {
+          "expected_status": "insufficient_evidence",
+          "question": "What is PaymentOutbox?",
+          "required_sources": [],
+          "signature": {
+            "module_path": "packages/orders",
+            "scope": "module"
+          },
+          "tool": "get_docs_context"
+        }
+      ],
+      "first_divergence": {
+        "actual_step_index": null,
+        "evidence": {
+          "report_errors": [
+            "module retrieval requires exactly one of module or module_path",
+            "missing required scope: {'scope': 'module', 'module_path': 'packages/orders'}"
+          ],
+          "required_scopes": [
+            {
+              "module_path": "packages/orders",
+              "scope": "module"
+            }
+          ],
+          "working_path": "packages/orders/src/submission.py"
+        },
+        "expected_step_index": 0,
+        "failure_class": "selector_cardinality_invalid",
+        "minimal_successful_repair": "Derive the exact module root from the supplied working path, send only `module_path`, leave `module` empty, and retry the same first evidence question without widening scope.",
+        "model_visible_reason": "The model-visible contract required exactly one of `module` or `module_path`, and the task already exposed working_path='packages/orders/src/submission.py'. The retained report records a selector cardinality error, but the rejected action body was not persisted, so it cannot prove whether both selectors or neither selector was sent.",
+        "public_api_change_required": false,
+        "repair_surface": "agent_or_host_argument_normalization",
+        "server_side_reason": "The planner action failed host-side validation before any MCP call; the installed/server retrieval path was never reached.",
+        "stage": "model_format"
+      },
+      "passed": false,
+      "request_evidence": {
+        "input_tokens": 691,
+        "output_tokens": 83,
+        "reasoning_tokens": 139,
+        "request_ids": [
+          "ses_fe0592fcaffeiAczrzbcGeb6Qo"
+        ],
+        "turn_count": 1
+      },
+      "secondary_failures": [
+        {
+          "detail": "module retrieval requires exactly one of module or module_path",
+          "stage": "validation"
+        },
+        {
+          "detail": "missing required scope: {'scope': 'module', 'module_path': 'packages/orders'}",
+          "stage": "planning"
+        }
+      ],
+      "task_class": "negative_contamination",
+      "task_id": "wrong_module_isolation",
+      "working_path": "packages/orders/src/submission.py"
+    },
+    {
+      "actual_trajectory": [],
+      "developer_task": "Use module docs discovered without an explicit catalog.",
+      "expected_trajectory": [
+        {
+          "expected_status": "ok",
+          "question": "What does CatalogReader do?",
+          "required_sources": [
+            "services/catalog/README.md"
+          ],
+          "signature": {
+            "module_path": "services/catalog",
+            "scope": "module"
+          },
+          "tool": "get_docs_context"
+        }
+      ],
+      "first_divergence": {
+        "actual_step_index": null,
+        "evidence": {
+          "report_errors": [
+            "module retrieval requires exactly one of module or module_path",
+            "missing required scope: {'scope': 'module', 'module_path': 'services/catalog'}"
+          ],
+          "required_scopes": [
+            {
+              "module_path": "services/catalog",
+              "scope": "module"
+            }
+          ],
+          "working_path": "services/catalog/src/reader.py"
+        },
+        "expected_step_index": 0,
+        "failure_class": "selector_cardinality_invalid",
+        "minimal_successful_repair": "Derive the exact module root from the supplied working path, send only `module_path`, leave `module` empty, and retry the same first evidence question without widening scope.",
+        "model_visible_reason": "The model-visible contract required exactly one of `module` or `module_path`, and the task already exposed working_path='services/catalog/src/reader.py'. The retained report records a selector cardinality error, but the rejected action body was not persisted, so it cannot prove whether both selectors or neither selector was sent.",
+        "public_api_change_required": false,
+        "repair_surface": "agent_or_host_argument_normalization",
+        "server_side_reason": "The planner action failed host-side validation before any MCP call; the installed/server retrieval path was never reached.",
+        "stage": "model_format"
+      },
+      "passed": false,
+      "request_evidence": {
+        "input_tokens": 686,
+        "output_tokens": 71,
+        "reasoning_tokens": 226,
+        "request_ids": [
+          "ses_fe0590906ffesoST6lI2nWi616"
+        ],
+        "turn_count": 1
+      },
+      "secondary_failures": [
+        {
+          "detail": "module retrieval requires exactly one of module or module_path",
+          "stage": "validation"
+        },
+        {
+          "detail": "missing required scope: {'scope': 'module', 'module_path': 'services/catalog'}",
+          "stage": "planning"
+        }
+      ],
+      "task_class": "module_only",
+      "task_id": "autodiscovery_module_supported",
+      "working_path": "services/catalog/src/reader.py"
+    },
+    {
+      "actual_trajectory": [],
+      "developer_task": "Resolve an ambiguous auth module name without choosing silently.",
+      "expected_trajectory": [
+        {
+          "expected_next_action_tool": "docs_status",
+          "expected_operational_reason_code": "module_ambiguous",
+          "expected_status": "insufficient_evidence",
+          "question": "What is PackageAuthBoundary?",
+          "required_sources": [],
+          "signature": {
+            "module": "auth",
+            "scope": "module"
+          },
+          "tool": "get_docs_context"
+        },
+        {
+          "action": "project",
+          "details": true,
+          "tool": "docs_status"
+        },
+        {
+          "expected_status": "ok",
+          "question": "What is PackageAuthBoundary?",
+          "required_sources": [
+            "packages/auth/README.md"
+          ],
+          "signature": {
+            "module_path": "packages/auth",
+            "scope": "module"
+          },
+          "tool": "get_docs_context"
+        }
+      ],
+      "first_divergence": {
+        "actual_step_index": null,
+        "evidence": {
+          "report_errors": [
+            "module retrieval requires exactly one of module or module_path",
+            "missing required scope: {'scope': 'module', 'module': 'auth'}",
+            "missing required scope: {'scope': 'module', 'module_path': 'packages/auth'}"
+          ],
+          "required_scopes": [
+            {
+              "module": "auth",
+              "scope": "module"
+            },
+            {
+              "module_path": "packages/auth",
+              "scope": "module"
+            }
+          ],
+          "working_path": "packages/auth/src/auth.py"
+        },
+        "expected_step_index": 0,
+        "failure_class": "selector_cardinality_invalid",
+        "minimal_successful_repair": "Derive the exact module root from the supplied working path, send only `module_path`, leave `module` empty, and retry the same first evidence question without widening scope.",
+        "model_visible_reason": "The model-visible contract required exactly one of `module` or `module_path`, and the task already exposed working_path='packages/auth/src/auth.py'. The retained report records a selector cardinality error, but the rejected action body was not persisted, so it cannot prove whether both selectors or neither selector was sent.",
+        "public_api_change_required": false,
+        "repair_surface": "agent_or_host_argument_normalization",
+        "server_side_reason": "The planner action failed host-side validation before any MCP call; the installed/server retrieval path was never reached.",
+        "stage": "model_format"
+      },
+      "passed": false,
+      "request_evidence": {
+        "input_tokens": 2483,
+        "output_tokens": 85,
+        "reasoning_tokens": 149,
+        "request_ids": [
+          "ses_fe058dbeaffemQQ52XoWrvsdZO"
+        ],
+        "turn_count": 1
+      },
+      "secondary_failures": [
+        {
+          "detail": "module retrieval requires exactly one of module or module_path",
+          "stage": "validation"
+        },
+        {
+          "detail": "missing required scope: {'scope': 'module', 'module': 'auth'}",
+          "stage": "planning"
+        },
+        {
+          "detail": "missing required scope: {'scope': 'module', 'module_path': 'packages/auth'}",
+          "stage": "planning"
+        }
+      ],
+      "task_class": "recovery",
+      "task_id": "ambiguous_module_recovery_named_gap",
+      "working_path": "packages/auth/src/auth.py"
+    },
+    {
+      "actual_trajectory": [],
+      "developer_task": "Refuse stale module evidence and request a reviewed project-doc sync.",
+      "expected_trajectory": [
+        {
+          "expected_next_action_tool": "prepare_docs",
+          "expected_status": "insufficient_evidence",
+          "question": "What is OrdersDraftStore?",
+          "required_sources": [],
+          "signature": {
+            "module_path": "packages/orders",
+            "scope": "module"
+          },
+          "tool": "get_docs_context"
+        }
+      ],
+      "first_divergence": {
+        "actual_step_index": null,
+        "evidence": {
+          "report_errors": [
+            "module retrieval requires exactly one of module or module_path",
+            "missing required scope: {'scope': 'module', 'module_path': 'packages/orders'}"
+          ],
+          "required_scopes": [
+            {
+              "module_path": "packages/orders",
+              "scope": "module"
+            }
+          ],
+          "working_path": "packages/orders/src/submission.py"
+        },
+        "expected_step_index": 0,
+        "failure_class": "selector_cardinality_invalid",
+        "minimal_successful_repair": "Derive the exact module root from the supplied working path, send only `module_path`, leave `module` empty, and retry the same first evidence question without widening scope.",
+        "model_visible_reason": "The model-visible contract required exactly one of `module` or `module_path`, and the task already exposed working_path='packages/orders/src/submission.py'. The retained report records a selector cardinality error, but the rejected action body was not persisted, so it cannot prove whether both selectors or neither selector was sent.",
+        "public_api_change_required": false,
+        "repair_surface": "agent_or_host_argument_normalization",
+        "server_side_reason": "The planner action failed host-side validation before any MCP call; the installed/server retrieval path was never reached.",
+        "stage": "model_format"
+      },
+      "passed": false,
+      "request_evidence": {
+        "input_tokens": 1414,
+        "output_tokens": 166,
+        "reasoning_tokens": 308,
+        "request_ids": [
+          "ses_fe058888affeNQUbkEZGOqnNyq",
+          "ses_fe058b4c5ffeme36enU02U6Kfm"
+        ],
+        "turn_count": 1
+      },
+      "secondary_failures": [
+        {
+          "detail": "module retrieval requires exactly one of module or module_path",
+          "stage": "validation"
+        },
+        {
+          "detail": "missing required scope: {'scope': 'module', 'module_path': 'packages/orders'}",
+          "stage": "planning"
+        }
+      ],
+      "task_class": "recovery",
+      "task_id": "stale_module_docs_recovery",
+      "working_path": "packages/orders/src/submission.py"
+    },
+    {
+      "actual_trajectory": [
+        {
+          "next_action_tool": "code_search",
+          "operational_reason_code": null,
+          "question": "Retrieve the exact pinned dependency documentation for tenacity before using it.",
+          "signature": {
+            "scope": "dependency"
+          },
+          "sources": [],
+          "status": "insufficient_evidence",
+          "tool": "get_docs_context"
+        },
+        {
+          "next_action_tool": null,
+          "operational_reason_code": null,
+          "sources": [],
+          "status": null,
+          "tool": "finish"
+        }
+      ],
+      "developer_task": "Use the pinned tenacity dependency only after exact dependency docs are available.",
+      "expected_trajectory": [
+        {
+          "expected_status": "ok",
+          "question": "What is OrdersDraftStore?",
+          "required_sources": [
+            "packages/orders/README.md"
+          ],
+          "signature": {
+            "module_path": "packages/orders",
+            "scope": "module"
+          },
+          "tool": "get_docs_context"
+        },
+        {
+          "expected_next_action_tool": "prepare_docs",
+          "expected_status": "insufficient_evidence",
+          "question": "What is tenacity.Retrying?",
+          "required_sources": [],
+          "signature": {
+            "scope": "dependency"
+          },
+          "tool": "get_docs_context"
+        }
+      ],
+      "first_divergence": {
+        "actual_step_index": 0,
+        "evidence": {
+          "actual_first_step": {
+            "next_action_tool": "code_search",
+            "operational_reason_code": null,
+            "question": "Retrieve the exact pinned dependency documentation for tenacity before using it.",
+            "signature": {
+              "scope": "dependency"
+            },
+            "sources": [],
+            "status": "insufficient_evidence",
+            "tool": "get_docs_context"
+          },
+          "expected_first_step": {
+            "expected_status": "ok",
+            "question": "What is OrdersDraftStore?",
+            "required_sources": [
+              "packages/orders/README.md"
+            ],
+            "signature": {
+              "module_path": "packages/orders",
+              "scope": "module"
+            },
+            "tool": "get_docs_context"
+          },
+          "report_errors": [
+            "missing required scope: {'scope': 'module', 'module_path': 'packages/orders'}",
+            "call {'scope': 'dependency'}: next action tool='code_search' expected='prepare_docs'",
+            "call {'scope': 'dependency'}: next action arguments=None expected={'action': 'prefetch_project_dependency_docs', 'project_path': '/tmp/docatlas-agent-model-dependency_prefetch_recovery-32lmj67y/project'}",
+            "call {'scope': 'dependency'}: confirmation reason does not match 'network_fetch'",
+            "call {'scope': 'dependency'}: requires_confirmation=False expected=True"
+          ]
+        },
+        "expected_step_index": 0,
+        "failure_class": "required_scope_sequence_mismatch",
+        "minimal_successful_repair": "Use the first call for the exact module path, then make the dependency call. If dependency evidence is absent, follow the returned `prepare_docs(prefetch_project_dependency_docs)` confirmation boundary.",
+        "model_visible_reason": "The task required both module-owned evidence and pinned dependency evidence within the published call budget, but the model began with dependency retrieval and omitted the required module step.",
+        "public_api_change_required": false,
+        "repair_surface": "agent_planning_sequence",
+        "server_side_reason": "The dependency call reached DocAtlas, but the evaluator rejected the trajectory before considering later recovery because the first required scope was absent. The returned recovery also differed from the frozen dependency-prefetch contract.",
+        "stage": "planning"
+      },
+      "passed": false,
+      "request_evidence": {
+        "input_tokens": 1674,
+        "output_tokens": 124,
+        "reasoning_tokens": 334,
+        "request_ids": [
+          "ses_fe0583979ffe3E2dXSKPsEJ1sH",
+          "ses_fe058587affeSmZ7itKvcrdUgG"
+        ],
+        "turn_count": 2
+      },
+      "secondary_failures": [
+        {
+          "detail": "missing required scope: {'scope': 'module', 'module_path': 'packages/orders'}",
+          "stage": "planning"
+        },
+        {
+          "detail": "call {'scope': 'dependency'}: next action tool='code_search' expected='prepare_docs'",
+          "stage": "recovery"
+        },
+        {
+          "detail": "call {'scope': 'dependency'}: next action arguments=None expected={'action': 'prefetch_project_dependency_docs', 'project_path': '/tmp/docatlas-agent-model-dependency_prefetch_recovery-32lmj67y/project'}",
+          "stage": "recovery"
+        },
+        {
+          "detail": "call {'scope': 'dependency'}: confirmation reason does not match 'network_fetch'",
+          "stage": "recovery"
+        },
+        {
+          "detail": "call {'scope': 'dependency'}: requires_confirmation=False expected=True",
+          "stage": "recovery"
+        }
+      ],
+      "task_class": "module_plus_dependency",
+      "task_id": "dependency_prefetch_recovery",
+      "working_path": "packages/orders/src/submission.py"
+    }
+  ]
+}
