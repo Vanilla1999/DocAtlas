@@ -1,6 +1,6 @@
 # P0 public-truth closure scorecard
 
-Status: **INCOMPLETE** — the reviewed `1.3.1` source candidate is being prepared, but the exact public PyPI release and post-publish verification do not exist yet.
+Status: **INCOMPLETE** — the reviewed `1.3.1` source candidate is merged into `main`, but the immutable tag, exact public PyPI release, and post-publish verification do not exist yet.
 
 This document is the P0.6 closure record. It distinguishes proven public truth, pending public evidence, and explicitly accepted operational risk. `accepted_risk` never means that the missing control exists.
 

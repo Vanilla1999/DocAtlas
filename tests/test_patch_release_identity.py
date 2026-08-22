@@ -20,9 +20,12 @@ def test_patch_release_identity_is_single_source_and_preserves_failed_tag_audit(
     roadmap = (ROOT / "roadmap/README.md").read_text(encoding="utf-8")
     assert "P0.5 — Publish and verify public `1.3.1`" in roadmap
     assert "superseded pre-public attempt" in roadmap
+    assert "publication remains manual through the `release-current` environment" in roadmap
+    assert "publication remains manual through the `release` environment" not in roadmap
 
     scorecard = (ROOT / "docs/public-truth-scorecard.md").read_text(encoding="utf-8")
     assert "Status: **INCOMPLETE**" in scorecard
+    assert "reviewed `1.3.1` source candidate is merged into `main`" in scorecard
     assert "Trusted Publisher identity | `pending`" in scorecard
     assert "doc-atlas==1.3.1" in scorecard
 
