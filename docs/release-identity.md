@@ -34,15 +34,16 @@ The OIDC token exposed these exact non-secret claims:
 sub: repo:Vanilla1999/DocAtlas:environment:release-current
 repository: Vanilla1999/DocAtlas
 repository_owner: Vanilla1999
+repository_owner_id: 41183994
 workflow_ref: Vanilla1999/DocAtlas/.github/workflows/publish.yml@refs/heads/main
 job_workflow_ref: Vanilla1999/DocAtlas/.github/workflows/publish.yml@refs/heads/main
 ref: refs/heads/main
 environment: release-current
 ```
 
-This proves the repository-side GitHub identity and narrows the remaining blocker to the external PyPI project configuration (or a transient PyPI identity lookup failure). It does not prove which PyPI publisher field is currently stored, because project publisher settings are not public.
+This proves the repository-side GitHub identity and narrows the remaining blocker to the external PyPI project configuration. Private project publisher settings are not exposed by PyPI, so the repository cannot prove which stored field is wrong.
 
-Recorded gated artifacts from this attempt:
+Recorded gated artifacts:
 
 ```text
 doc_atlas-1.3.1-py3-none-any.whl
@@ -52,11 +53,49 @@ doc_atlas-1.3.1.tar.gz
 sha256 6cbcdf8d947ca4f494fa3052d5012703c29386ec3e8f8629d7cabba58bb62aff
 ```
 
-The bounded machine-readable record is [`release-evidence/v1.3.1-publish-attempt-1.json`](./release-evidence/v1.3.1-publish-attempt-1.json).
+The first bounded machine-readable failure record is [`release-evidence/v1.3.1-publish-attempt-1.json`](./release-evidence/v1.3.1-publish-attempt-1.json).
+
+### Controlled retry result
+
+After confirming that public `1.3.1` was absent and that the immutable tag and original artifacts were unchanged, only the failed jobs of run `32587903026` were retried.
+
+Run attempt 2:
+
+```text
+source commit: cfa9ab5c365a28d1a4af63afe9f1d53b19532d89
+publish job: 97075492467
+attestation: success
+PyPI exchange: invalid-publisher
+upload: rejected before upload
+claims: identical to attempt 1
+```
+
+The second attestation is `42346600`, with Rekor log index `2567983694`. The repeated failure with identical claims weakens the transient lookup hypothesis and confirms that the external publisher still does not match.
+
+The bounded second-attempt record is [`release-evidence/v1.3.1-publish-attempt-2.json`](./release-evidence/v1.3.1-publish-attempt-2.json).
+
+### Required external correction
+
+Because `doc-atlas` is an **existing PyPI project**, configure the publisher inside that project:
+
+```text
+PyPI → Your projects → doc-atlas → Manage → Publishing
+```
+
+Do not rely on an account-level **pending publisher** intended to create a new project. Add or replace the GitHub Actions publisher with exactly:
+
+```text
+owner: Vanilla1999
+repository: DocAtlas
+workflow filename: publish.yml
+environment: release-current
+```
+
+Environment is optional in PyPI generally, but this workflow deliberately uses `release-current`; a publisher configured with a different environment does not match these claims.
 
 ### Safe retry boundary
 
-After the external PyPI Trusted Publisher is verified to match the exact tuple below, retry only the failed jobs of canonical run `32587903026`. Before retrying, require that:
+After the existing-project publisher is visibly registered with the exact tuple above, retry only the failed jobs of canonical run `32587903026`. Before another retry, require that:
 
 - public `doc-atlas==1.3.1` is still absent;
 - `v1.3.1` remains an annotated tag targeting `cfa9ab5c365a28d1a4af63afe9f1d53b19532d89`;
@@ -87,19 +126,6 @@ sha256 2e1a0f58e34ea9c175b8d93839a6dcc8a54a7e36d4329157f9378791a0341e26
 doc_atlas-1.3.0.tar.gz
 sha256 e5bb4eb1f2b3221bcd3e8e9db719fe8f11596a88bd000e3d922bd6826c6683ab
 ```
-
-## Trusted Publisher identity for 1.3.1+
-
-Configure the PyPI project `doc-atlas` with exactly:
-
-```text
-owner: Vanilla1999
-repository: DocAtlas
-workflow filename: publish.yml
-environment: release-current
-```
-
-The new environment name intentionally differs from the failed `v1.3.0` run (`release`). Publication still uses GitHub OIDC/Trusted Publishing and no long-lived PyPI token.
 
 ## Claim boundary
 
