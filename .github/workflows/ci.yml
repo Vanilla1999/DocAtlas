@@ -212,6 +212,7 @@ jobs:
       - name: Build exact reviewed wheel and install evaluator dependencies
         run: |
           python -m pip install build "hatchling<1.27" -e ".[dev]"
+          python scripts/installed_mcp_contract_self_test.py
           rm -rf dist/installed-mcp
           python -m build --wheel --outdir dist/installed-mcp
 
