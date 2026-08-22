@@ -1,0 +1,230 @@
+name: P0 one-shot public 1.3.0 release
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/p0-release-1.3.0.yml
+
+permissions:
+  actions: write
+  contents: read
+  statuses: write
+
+concurrency:
+  group: p0-public-release-v1.3.0
+  cancel-in-progress: false
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
+  RELEASE_TAG: v1.3.0
+  EXPECTED_RELEASE_SHA: 42c3bf1fccc839dad4be4077b0b2c6a203f9bbac
+  TARGET_WORKFLOW: publish.yml
+  TARGET_REF: main
+  STATUS_CONTEXT: p0/public-release-v1.3.0
+
+jobs:
+  dispatch-and-observe:
+    if: github.repository == 'Vanilla1999/DocAtlas'
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Verify immutable release tag and main ancestry
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch --force --tags origin
+          tag_sha="$(git rev-list -n 1 "$RELEASE_TAG")"
+          test "$tag_sha" = "$EXPECTED_RELEASE_SHA"
+          git merge-base --is-ancestor "$tag_sha" "$GITHUB_SHA"
+          echo "release_tag_sha=$tag_sha" >> "$GITHUB_OUTPUT"
+          echo "Release identity: PASS ($RELEASE_TAG -> $tag_sha)"
+
+      - name: Dispatch canonical publisher and wait for terminal result
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          from __future__ import annotations
+
+          import json
+          import os
+          import sys
+          import time
+          import urllib.error
+          import urllib.parse
+          import urllib.request
+          from pathlib import Path
+          from typing import Any
+
+          repository = os.environ["GITHUB_REPOSITORY"]
+          token = os.environ["GITHUB_TOKEN"]
+          release_tag = os.environ["RELEASE_TAG"]
+          expected_release_sha = os.environ["EXPECTED_RELEASE_SHA"]
+          target_workflow = os.environ["TARGET_WORKFLOW"]
+          target_ref = os.environ["TARGET_REF"]
+          status_sha = os.environ["GITHUB_SHA"]
+          status_context = os.environ["STATUS_CONTEXT"]
+          api_root = "https://api.github.com"
+          api_version = "2026-03-10"
+
+          def api(
+              method: str,
+              path: str,
+              payload: dict[str, Any] | None = None,
+          ) -> tuple[int, dict[str, Any]]:
+              body = None if payload is None else json.dumps(payload).encode("utf-8")
+              request = urllib.request.Request(
+                  f"{api_root}{path}",
+                  data=body,
+                  method=method,
+                  headers={
+                      "Accept": "application/vnd.github+json",
+                      "Authorization": f"Bearer {token}",
+                      "X-GitHub-Api-Version": api_version,
+                      "User-Agent": "DocAtlas-P0-release-dispatcher/1",
+                  },
+              )
+              with urllib.request.urlopen(request, timeout=60) as response:
+                  raw = response.read()
+                  decoded = json.loads(raw) if raw else {}
+                  if not isinstance(decoded, dict):
+                      raise RuntimeError("GitHub API returned a non-object response")
+                  return int(response.status), decoded
+
+          def set_status(state: str, description: str, target_url: str | None = None) -> None:
+              payload: dict[str, Any] = {
+                  "state": state,
+                  "context": status_context,
+                  "description": description[:140],
+              }
+              if target_url:
+                  payload["target_url"] = target_url
+              api("POST", f"/repos/{repository}/statuses/{status_sha}", payload)
+
+          def pypi_version_exists() -> bool:
+              version = release_tag.removeprefix("v")
+              request = urllib.request.Request(
+                  f"https://pypi.org/pypi/doc-atlas/{version}/json",
+                  headers={
+                      "Cache-Control": "no-cache",
+                      "User-Agent": "DocAtlas-P0-release-dispatcher/1",
+                  },
+              )
+              try:
+                  with urllib.request.urlopen(request, timeout=30) as response:
+                      metadata = json.load(response)
+              except urllib.error.HTTPError as exc:
+                  if exc.code == 404:
+                      return False
+                  raise
+              info = metadata.get("info") if isinstance(metadata, dict) else None
+              return isinstance(info, dict) and str(info.get("version") or "") == version
+
+          def list_dispatch_runs() -> list[dict[str, Any]]:
+              query = urllib.parse.urlencode({"event": "workflow_dispatch", "per_page": 30})
+              _, response = api(
+                  "GET",
+                  f"/repos/{repository}/actions/workflows/{target_workflow}/runs?{query}",
+              )
+              rows = response.get("workflow_runs")
+              return [row for row in rows or [] if isinstance(row, dict)]
+
+          def dispatch(before_ids: set[int]) -> tuple[int, str]:
+              status, response = api(
+                  "POST",
+                  f"/repos/{repository}/actions/workflows/{target_workflow}/dispatches",
+                  {"ref": target_ref, "inputs": {"tag": release_tag}},
+              )
+              if status not in {200, 204}:
+                  raise RuntimeError(f"unexpected workflow dispatch status: {status}")
+
+              run_id = response.get("workflow_run_id")
+              html_url = response.get("html_url")
+              if isinstance(run_id, int) and run_id > 0:
+                  return run_id, str(html_url or "")
+
+              discovery_deadline = time.monotonic() + 90
+              while time.monotonic() < discovery_deadline:
+                  candidates = [
+                      row
+                      for row in list_dispatch_runs()
+                      if isinstance(row.get("id"), int)
+                      and int(row["id"]) not in before_ids
+                      and str(row.get("head_branch") or "") == target_ref
+                  ]
+                  if candidates:
+                      row = max(candidates, key=lambda item: int(item["id"]))
+                      return int(row["id"]), str(row.get("html_url") or "")
+                  time.sleep(3)
+              raise RuntimeError("workflow dispatch succeeded but the new run could not be identified")
+
+          summary_path = Path(os.environ["GITHUB_STEP_SUMMARY"])
+          run_url = ""
+          try:
+              set_status("pending", f"validating and publishing {release_tag}")
+
+              if pypi_version_exists():
+                  message = f"doc-atlas {release_tag.removeprefix('v')} is already public"
+                  set_status("success", message)
+                  summary_path.write_text(
+                      f"## P0 public release\n\n{message}. No duplicate publish was dispatched.\n",
+                      encoding="utf-8",
+                  )
+                  print(message)
+                  raise SystemExit(0)
+
+              before_ids = {
+                  int(row["id"])
+                  for row in list_dispatch_runs()
+                  if isinstance(row.get("id"), int)
+              }
+              run_id, run_url = dispatch(before_ids)
+              if not run_url:
+                  run_url = f"https://github.com/{repository}/actions/runs/{run_id}"
+              set_status("pending", f"release workflow {run_id} is running", run_url)
+
+              terminal_deadline = time.monotonic() + 80 * 60
+              last_status = ""
+              while time.monotonic() < terminal_deadline:
+                  _, run = api("GET", f"/repos/{repository}/actions/runs/{run_id}")
+                  current = str(run.get("status") or "")
+                  conclusion = str(run.get("conclusion") or "")
+                  if current != last_status:
+                      print(f"release workflow {run_id}: status={current} conclusion={conclusion or '-'}")
+                      last_status = current
+                  if current == "completed":
+                      if conclusion == "success":
+                          set_status("success", f"release workflow {run_id} succeeded", run_url)
+                          summary_path.write_text(
+                              "## P0 public release\n\n"
+                              f"- Tag: `{release_tag}`\n"
+                              f"- Release commit: `{expected_release_sha}`\n"
+                              f"- Publish workflow: [{run_id}]({run_url})\n"
+                              "- Conclusion: `success`\n",
+                              encoding="utf-8",
+                          )
+                          raise SystemExit(0)
+                      set_status("failure", f"release workflow {run_id}: {conclusion or 'failed'}", run_url)
+                      raise RuntimeError(
+                          f"release workflow {run_id} completed with conclusion={conclusion or 'unknown'}"
+                      )
+                  time.sleep(15)
+              set_status("failure", f"release workflow {run_id} did not finish in the bounded observer window", run_url)
+              raise RuntimeError("release workflow did not reach a terminal state in the bounded observer window")
+          except SystemExit:
+              raise
+          except Exception as exc:
+              try:
+                  set_status("failure", f"release dispatch failed: {type(exc).__name__}", run_url or None)
+              except Exception as status_exc:
+                  print(f"failed to publish terminal commit status: {status_exc}", file=sys.stderr)
+              raise
+          PY
