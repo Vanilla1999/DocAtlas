@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import hashlib
+import importlib
 import json
 import re
 import subprocess
@@ -8,10 +9,29 @@ from pathlib import Path
 from typing import Any
 
 from docmancer.docs.application.evidence_selection import (
-    build_requirements,
     docs_selection_config,
     select_evidence,
 )
+
+
+def _resolve_build_requirements():
+    for module_name in (
+        "docmancer.docs.application.evidence_selection",
+        "docmancer.docs.domain.answer_completeness",
+        "docmancer.docs.domain.project_answer_contract",
+        "docmancer.docs.domain.question_planning",
+    ):
+        try:
+            module = importlib.import_module(module_name)
+        except ModuleNotFoundError:
+            continue
+        value = getattr(module, "build_requirements", None)
+        if callable(value):
+            return value
+    raise RuntimeError("reviewed production build_requirements function is missing")
+
+
+build_requirements = _resolve_build_requirements()
 
 
 PROTOCOL = "mixed-evidence-provenance-report-v1"
