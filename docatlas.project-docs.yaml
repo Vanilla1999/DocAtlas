@@ -48,6 +48,14 @@ documents:
     status: active
     impact: search_only
 
+  - path: eval/agent_developer_v1/INSTALLED_MCP.md
+    role: development
+    scope: project
+    description: P1.1 installed-wheel and public-package live MCP benchmark contract, provenance, stage attribution, privacy, and claim boundaries.
+    authority: source_of_truth
+    status: active
+    impact: search_only
+
   - path: eval/project_answer_quality_v1/README.md
     role: development
     scope: project

@@ -1,0 +1,147 @@
+name: Installed MCP Agent benchmark
+
+on:
+  workflow_dispatch:
+    inputs:
+      artifact_origin:
+        description: Install an exact reviewed wheel now or a public PyPI version later
+        required: true
+        default: reviewed-wheel
+        type: choice
+        options:
+          - reviewed-wheel
+          - public-pypi
+      pypi_version:
+        description: Exact public version when artifact_origin=public-pypi
+        required: false
+        default: ""
+        type: string
+      public_release_verified:
+        description: Assert separate exact-public release evidence already exists
+        required: true
+        default: false
+        type: boolean
+      min_pass_rate:
+        description: Model-quality threshold; initial evidence normally keeps 0.0
+        required: true
+        default: "0.0"
+        type: string
+      max_schema_repairs:
+        description: Bounded MCP-schema repair count
+        required: true
+        default: "1"
+        type: choice
+        options:
+          - "0"
+          - "1"
+          - "2"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: installed-mcp-agent-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
+  DOCMANCER_OFFLINE: "1"
+
+jobs:
+  benchmark:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: "3.12"
+
+      - name: Install evaluator dependencies
+        run: python -m pip install build "hatchling<1.27" -e ".[dev]"
+
+      - name: Resolve exact artifact arguments
+        id: artifact
+        shell: bash
+        env:
+          ORIGIN: ${{ inputs.artifact_origin }}
+          PYPI_VERSION: ${{ inputs.pypi_version }}
+          PUBLIC_VERIFIED: ${{ inputs.public_release_verified }}
+        run: |
+          set -euo pipefail
+          if [ "$ORIGIN" = "reviewed-wheel" ]; then
+            test "$PUBLIC_VERIFIED" = "false" || {
+              echo "::error::a reviewed wheel cannot be marked public-release-verified"
+              exit 1
+            }
+            rm -rf dist/installed-mcp
+            python -m build --wheel --outdir dist/installed-mcp
+            wheel="$(find dist/installed-mcp -maxdepth 1 -name '*.whl' -print -quit)"
+            test -n "$wheel"
+            echo "arguments=--wheel $wheel" >> "$GITHUB_OUTPUT"
+            echo "expected_origin=reviewed-wheel" >> "$GITHUB_OUTPUT"
+            echo "require_public=false" >> "$GITHUB_OUTPUT"
+          else
+            test -n "$PYPI_VERSION" || {
+              echo "::error::pypi_version is required for public-pypi mode"
+              exit 1
+            }
+            echo "arguments=--pypi-version $PYPI_VERSION" >> "$GITHUB_OUTPUT"
+            echo "expected_origin=public-pypi" >> "$GITHUB_OUTPUT"
+            if [ "$PUBLIC_VERIFIED" = "true" ]; then
+              echo "arguments=--pypi-version $PYPI_VERSION --public-release-verified" >> "$GITHUB_OUTPUT"
+              echo "require_public=true" >> "$GITHUB_OUTPUT"
+            else
+              echo "require_public=false" >> "$GITHUB_OUTPUT"
+            fi
+          fi
+
+      - name: Run real model against installed stdio MCP
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          ARTIFACT_ARGUMENTS: ${{ steps.artifact.outputs.arguments }}
+          MIN_PASS_RATE: ${{ inputs.min_pass_rate }}
+          MAX_SCHEMA_REPAIRS: ${{ inputs.max_schema_repairs }}
+        run: |
+          set -euo pipefail
+          read -r -a artifact_args <<< "$ARTIFACT_ARGUMENTS"
+          python scripts/run_installed_mcp_agent_benchmark.py \
+            "${artifact_args[@]}" \
+            --source-commit "$GITHUB_SHA" \
+            --planner openai \
+            --openai-model gpt-5.6-luna \
+            --max-schema-repairs "$MAX_SCHEMA_REPAIRS" \
+            --min-pass-rate 0.0 \
+            --output eval/agent_developer_v1/results/installed-mcp-benchmark.json
+
+      - name: Verify evidence, attribution, and privacy
+        shell: bash
+        env:
+          EXPECTED_ORIGIN: ${{ steps.artifact.outputs.expected_origin }}
+          REQUIRE_PUBLIC: ${{ steps.artifact.outputs.require_public }}
+          MIN_PASS_RATE: ${{ inputs.min_pass_rate }}
+        run: |
+          set -euo pipefail
+          public_args=()
+          if [ "$REQUIRE_PUBLIC" = "true" ]; then
+            public_args+=(--require-public)
+          fi
+          python scripts/verify_installed_mcp_agent_report.py \
+            eval/agent_developer_v1/results/installed-mcp-benchmark.json \
+            --expected-origin "$EXPECTED_ORIGIN" \
+            --min-task-count 11 \
+            --min-pass-rate "$MIN_PASS_RATE" \
+            "${public_args[@]}"
+
+      - name: Upload installed-MCP evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: installed-mcp-agent-${{ github.run_id }}
+          path: eval/agent_developer_v1/results/installed-mcp-benchmark.json
+          if-no-files-found: warn
+          retention-days: 90

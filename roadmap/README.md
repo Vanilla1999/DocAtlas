@@ -187,6 +187,10 @@ Required evidence:
 - provider/model/request/token provenance;
 - separation of model-format, MCP-schema, server-validation, retrieval, support, and recovery failures.
 
+**Implementation sequencing (2026-08-22):** the maintainer explicitly deferred public `1.3.1` publication and post-publish release verification, while authorizing the non-API P1.1 measurement harness to proceed. The harness may therefore be implemented and deterministically gated against an exact reviewed wheel installed in a fresh environment. Such evidence must be labelled `pre-public-installed-harness`; it does not close P0, does not prove a public-package trajectory, and does not change the current 0/11 Agent Truth claim. Final P1.1 closure still requires all frozen tasks to run through the independently verified public-PyPI mode with a real model.
+
+This sequencing exception does not relax the P0 freeze: it adds no public MCP tool, retrieval/reranking behavior, code graph, or benchmark-driven API change. It creates the causal measurement boundary required before P1.2/P1.3 can justify any contract change.
+
 ## P1.2 — Agent Developer 0/11 first-divergence atlas
 
 For each frozen task record:

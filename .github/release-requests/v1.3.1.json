@@ -8,7 +8,7 @@
     "scripts/release_request_self_test.py"
   ],
   "distribution": "doc-atlas",
-  "execute_on_merge": true,
+  "execute_on_merge": false,
   "expected_base_commit": "277e3677625d4177d7cbba842b290806fbae73b6",
   "product": "DocAtlas",
   "public_tools": [
