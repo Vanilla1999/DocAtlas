@@ -24,9 +24,13 @@ def test_patch_release_identity_is_single_source_and_preserves_failed_tag_audit(
     assert "invalid-publisher" in identity
     assert "environment: release-current" in identity
     assert "32587903026" in identity
+    assert "97075492467" in identity
+    assert "42346600" in identity
     assert "cfa9ab5c365a28d1a4af63afe9f1d53b19532d89" in identity
     assert "6b82e37ec8ac2a3d415f30aa51e48830afecd04386d34dab694ee6b6c697b6b0" in identity
     assert "6cbcdf8d947ca4f494fa3052d5012703c29386ec3e8f8629d7cabba58bb62aff" in identity
+    assert "Your projects → doc-atlas → Manage → Publishing" in identity
+    assert "account-level **pending publisher**" in identity
 
     roadmap = (ROOT / "roadmap/README.md").read_text(encoding="utf-8")
     assert "P0.5 — Publish and verify public `1.3.1`" in roadmap
@@ -36,10 +40,11 @@ def test_patch_release_identity_is_single_source_and_preserves_failed_tag_audit(
 
     scorecard = (ROOT / "docs/public-truth-scorecard.md").read_text(encoding="utf-8")
     assert "Status: **INCOMPLETE**" in scorecard
-    assert "reviewed `1.3.1` source and immutable tag exist" in scorecard
+    assert "two canonical PyPI exchanges were rejected before upload" in scorecard
     assert "Trusted Publisher identity | `pending`" in scorecard
     assert "doc-atlas==1.3.1" in scorecard
-    assert "rerun only the failed jobs" in scorecard
+    assert "Attempts 1 and 2" in scorecard
+    assert "Manage → Publishing" in scorecard
 
     tag_evidence = json.loads(
         (ROOT / "docs/release-evidence/v1.3.1-tag.json").read_text(
@@ -56,37 +61,70 @@ def test_patch_release_identity_is_single_source_and_preserves_failed_tag_audit(
     )
     assert tag_evidence["public_artifact_status"] == "pending"
 
-    evidence = json.loads(
+    evidence_1 = json.loads(
         (ROOT / "docs/release-evidence/v1.3.1-publish-attempt-1.json").read_text(
             encoding="utf-8"
         )
     )
-    assert evidence["schema_version"] == 1
-    assert evidence["release"] == {
+    assert evidence_1["schema_version"] == 1
+    assert evidence_1["release"] == {
         "distribution": "doc-atlas",
         "maturity": "Beta",
         "product": "DocAtlas",
         "version": "1.3.1",
     }
-    assert evidence["git"] == {
+    assert evidence_1["git"] == {
         "tag": "v1.3.1",
         "tag_object_sha": "77bced8c530c88c57d2e6c5f58cb717bfe837a9f",
         "target_commit_sha": "cfa9ab5c365a28d1a4af63afe9f1d53b19532d89",
     }
-    assert evidence["failure"] == {
+    assert evidence_1["failure"] == {
         "code": "invalid-publisher",
         "oidc_token_valid": True,
         "public_upload_status": "rejected_before_upload",
         "stage": "pypa/gh-action-pypi-publish",
     }
-    assert evidence["pypi_observation"]["version_1_3_1_exists"] is False
-    assert evidence["workflow"]["run_id"] == 32587903026
-    assert evidence["workflow"]["required_release_conclusion"] == "success"
-    assert evidence["retry_contract"]["rerun_mode"] == "rerun_failed_jobs"
-    assert evidence["retry_contract"]["tag_must_remain_immutable"] is True
-    assert evidence["publisher_claims"]["sub"] == (
+    assert evidence_1["pypi_observation"]["version_1_3_1_exists"] is False
+    assert evidence_1["workflow"]["run_id"] == 32587903026
+    assert evidence_1["workflow"]["required_release_conclusion"] == "success"
+    assert evidence_1["retry_contract"]["rerun_mode"] == "rerun_failed_jobs"
+    assert evidence_1["retry_contract"]["tag_must_remain_immutable"] is True
+    assert evidence_1["publisher_claims"]["sub"] == (
         "repo:Vanilla1999/DocAtlas:environment:release-current"
     )
+
+    evidence_2 = json.loads(
+        (ROOT / "docs/release-evidence/v1.3.1-publish-attempt-2.json").read_text(
+            encoding="utf-8"
+        )
+    )
+    assert evidence_2["schema_version"] == 1
+    assert evidence_2["workflow"]["run_id"] == evidence_1["workflow"]["run_id"]
+    assert evidence_2["workflow"]["run_attempt"] == 2
+    assert evidence_2["workflow"]["job_id"] == 97075492467
+    assert evidence_2["workflow"]["source_commit_sha"] == (
+        "cfa9ab5c365a28d1a4af63afe9f1d53b19532d89"
+    )
+    assert evidence_2["failure"]["same_claims_as_attempt_1"] is True
+    assert evidence_2["failure"]["public_upload_status"] == (
+        "rejected_before_upload"
+    )
+    assert evidence_2["attestation"] == {
+        "github_attestation_id": 42346600,
+        "github_attestation_url": (
+            "https://github.com/Vanilla1999/DocAtlas/attestations/42346600"
+        ),
+        "rekor_log_index": 2567983694,
+        "status": "success",
+    }
+    assert evidence_2["git"] == evidence_1["git"]
+    assert evidence_2["artifacts"] == evidence_1["artifacts"]
+    assert evidence_2["publisher_claims"]["sub"] == (
+        "repo:Vanilla1999/DocAtlas:environment:release-current"
+    )
+    assert evidence_2["result"]["external_publisher_match_demonstrated"] is False
+    assert evidence_2["result"]["transient_failure_hypothesis_weakened"] is True
+    assert evidence_2["result"]["p0_status"] == "INCOMPLETE"
 
 
 def test_publish_workflow_uses_replacement_identity_not_failed_environment():
@@ -105,6 +143,9 @@ def test_publish_workflow_uses_replacement_identity_not_failed_environment():
     assert "### `invalid-publisher` recovery" in checklist
     assert "Retry only the failed jobs of the original canonical run" in checklist
     assert "do not introduce `PYPI_API_TOKEN` as a fallback" in checklist
+    assert "Your projects → doc-atlas → Manage → Publishing" in checklist
+    assert "account-level pending publisher" in checklist
+    assert "second identical rejection" in checklist
 
     publisher_section = workflow.split(
         "      - name: Record expected Trusted Publisher identity\n", 1
