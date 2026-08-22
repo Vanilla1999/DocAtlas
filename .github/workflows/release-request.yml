@@ -1,0 +1,411 @@
+name: Execute reviewed release request
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - ".github/release-requests/*.json"
+  workflow_dispatch:
+    inputs:
+      request_path:
+        description: Reviewed request path under .github/release-requests/
+        required: true
+        default: .github/release-requests/v1.3.1.json
+        type: string
+      confirm:
+        description: Type RELEASE to execute an approved request
+        required: true
+        type: string
+
+permissions:
+  contents: write
+  actions: write
+  checks: read
+
+concurrency:
+  group: reviewed-public-release-${{ github.repository }}
+  cancel-in-progress: false
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    timeout-minutes: 150
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: "3.12"
+
+      - name: Resolve the reviewed release request
+        id: request
+        shell: bash
+        env:
+          BEFORE_SHA: ${{ github.event.before }}
+          DISPATCH_PATH: ${{ inputs.request_path }}
+          DISPATCH_CONFIRM: ${{ inputs.confirm }}
+        run: |
+          set -euo pipefail
+          if [ "${GITHUB_EVENT_NAME}" = "workflow_dispatch" ]; then
+            test "$DISPATCH_CONFIRM" = "RELEASE" || {
+              echo "::error::manual execution requires confirm=RELEASE"
+              exit 1
+            }
+            request_path="$DISPATCH_PATH"
+          else
+            mapfile -t requests < <(
+              git diff --name-only "$BEFORE_SHA" "$GITHUB_SHA" -- .github/release-requests |
+                grep -E '^\.github/release-requests/[A-Za-z0-9._-]+\.json$' || true
+            )
+            test "${#requests[@]}" -eq 1 || {
+              echo "::error::expected exactly one changed release request, found ${#requests[@]}"
+              printf '%s\n' "${requests[@]}"
+              exit 1
+            }
+            request_path="${requests[0]}"
+          fi
+          [[ "$request_path" =~ ^\.github/release-requests/[A-Za-z0-9._-]+\.json$ ]] || {
+            echo "::error::unsafe release request path: $request_path"
+            exit 1
+          }
+          test -f "$request_path"
+          python scripts/release_request.py inspect --request "$request_path" > /tmp/release-request-inspect.json
+          python - "$request_path" >> "$GITHUB_OUTPUT" <<'PY'
+          import json
+          import sys
+
+          payload = json.load(open("/tmp/release-request-inspect.json", encoding="utf-8"))
+          print(f"request_path={sys.argv[1]}")
+          print(f"execute={'true' if payload['execute'] else 'false'}")
+          print(f"state={payload['state']}")
+          print(f"version={payload['version']}")
+          print(f"tag={payload['tag']}")
+          PY
+          cat /tmp/release-request-inspect.json
+
+      - name: Record a non-executable request transition
+        if: steps.request.outputs.execute != 'true'
+        run: |
+          {
+            echo "## Reviewed release request"
+            echo
+            echo "Request \`${{ steps.request.outputs.request_path }}\` is in state \`${{ steps.request.outputs.state }}\`; no tag or publication action was executed."
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Validate the exact release commit and reviewed delta
+        id: preflight
+        if: steps.request.outputs.execute == 'true'
+        run: |
+          set -euo pipefail
+          python scripts/release_request.py preflight \
+            --request "${{ steps.request.outputs.request_path }}" \
+            --repo-root . \
+            --target-sha "$GITHUB_SHA" \
+            --output /tmp/release-preflight.json
+          cat /tmp/release-preflight.json
+
+      - name: Wait for exact-main required-ci
+        id: main_ci
+        if: steps.request.outputs.execute == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          for attempt in $(seq 1 360); do
+            gh api \
+              -H "Accept: application/vnd.github+json" \
+              "repos/${GITHUB_REPOSITORY}/commits/${GITHUB_SHA}/check-runs?per_page=100" \
+              > /tmp/main-check-runs.json
+            status="$(
+              python - <<'PY'
+          import json
+
+          rows = json.load(open("/tmp/main-check-runs.json", encoding="utf-8")).get("check_runs", [])
+          candidates = [row for row in rows if row.get("name") == "required-ci"]
+          candidates.sort(key=lambda row: str(row.get("started_at") or ""), reverse=True)
+          if not candidates:
+              print("pending")
+          else:
+              row = candidates[0]
+              conclusion = row.get("conclusion")
+              if conclusion == "success":
+                  print("success")
+              elif conclusion in {None, ""}:
+                  print("pending")
+              else:
+                  print(f"failed:{conclusion}")
+          PY
+            )"
+            case "$status" in
+              success)
+                echo "required-ci on $GITHUB_SHA: PASS"
+                break
+                ;;
+              failed:*)
+                echo "::error::required-ci on $GITHUB_SHA is terminal: $status"
+                cat /tmp/main-check-runs.json
+                exit 1
+                ;;
+            esac
+            if [ "$attempt" -eq 360 ]; then
+              echo "::error::required-ci did not become green"
+              cat /tmp/main-check-runs.json
+              exit 1
+            fi
+            sleep 10
+          done
+
+          git fetch origin main --tags --force
+          current_main="$(git rev-parse origin/main)"
+          test "$current_main" = "$GITHUB_SHA" || {
+            echo "::error::main moved from release request SHA $GITHUB_SHA to $current_main"
+            exit 1
+          }
+
+      - name: Rebuild and gate the exact main tree before tagging
+        id: pretag
+        if: steps.request.outputs.execute == 'true'
+        run: |
+          set -euo pipefail
+          python -m pip install build "hatchling<1.27"
+          rm -rf dist
+          python -m build
+          python scripts/release_gate.py --manifest dist/release-manifest.json
+          cp dist/release-manifest.json /tmp/pretag-release-manifest.json
+          git diff --exit-code
+          git reset --hard "$GITHUB_SHA"
+          git clean -fdx
+          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+          test -z "$(git status --porcelain)"
+
+      - name: Require the public version to be absent
+        if: steps.request.outputs.execute == 'true'
+        run: |
+          python scripts/release_request.py require-pypi-absent \
+            --request "${{ steps.request.outputs.request_path }}"
+
+      - name: Create or verify the immutable annotated tag
+        id: tag
+        if: steps.request.outputs.execute == 'true'
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ steps.request.outputs.tag }}
+        run: |
+          set -euo pipefail
+          git fetch origin main --force
+          current_main="$(git rev-parse origin/main)"
+          test "$current_main" = "$GITHUB_SHA" || {
+            echo "::error::main moved from release request SHA $GITHUB_SHA to $current_main before tagging"
+            exit 1
+          }
+
+          ref_endpoint="repos/${GITHUB_REPOSITORY}/git/ref/tags/${RELEASE_TAG}"
+          if existing_ref="$(
+            gh api "$ref_endpoint" \
+              --jq '.object.type + " " + .object.sha' \
+              2>/tmp/tag-ref-error
+          )"; then
+            read -r ref_type tag_object_sha <<< "$existing_ref"
+            test "$ref_type" = "tag" || {
+              echo "::error::$RELEASE_TAG exists but is not an annotated tag"
+              exit 1
+            }
+          else
+            if ! grep -q 'HTTP 404' /tmp/tag-ref-error; then
+              cat /tmp/tag-ref-error
+              exit 1
+            fi
+            tag_object_sha="$(
+              gh api --method POST \
+                "repos/${GITHUB_REPOSITORY}/git/tags" \
+                -f "tag=$RELEASE_TAG" \
+                -f "message=DocAtlas ${{ steps.request.outputs.version }}" \
+                -f "object=$GITHUB_SHA" \
+                -f "type=commit" \
+                --jq .sha
+            )"
+            gh api --method POST \
+              "repos/${GITHUB_REPOSITORY}/git/refs" \
+              -f "ref=refs/tags/$RELEASE_TAG" \
+              -f "sha=$tag_object_sha" \
+              > /tmp/tag-ref-created.json
+          fi
+
+          verified_ref="$(gh api "$ref_endpoint" --jq '.object.type + " " + .object.sha')"
+          read -r ref_type verified_tag_object_sha <<< "$verified_ref"
+          test "$ref_type" = "tag"
+          test "$verified_tag_object_sha" = "$tag_object_sha"
+          verified_target="$(
+            gh api "repos/${GITHUB_REPOSITORY}/git/tags/$tag_object_sha" \
+              --jq '.object.type + " " + .object.sha'
+          )"
+          read -r target_type peeled <<< "$verified_target"
+          test "$target_type" = "commit"
+          test "$peeled" = "$GITHUB_SHA"
+          echo "tag_object_sha=$tag_object_sha" >> "$GITHUB_OUTPUT"
+          echo "peeled_commit_sha=$peeled" >> "$GITHUB_OUTPUT"
+
+      - name: Dispatch the canonical OIDC publish workflow
+        id: dispatch
+        if: steps.request.outputs.execute == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ steps.request.outputs.tag }}
+        run: |
+          set -euo pipefail
+          started_at="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+          gh workflow run publish.yml --ref main -f "tag=$RELEASE_TAG"
+
+          run_id=""
+          run_url=""
+          for attempt in $(seq 1 60); do
+            gh run list \
+              --workflow publish.yml \
+              --event workflow_dispatch \
+              --branch main \
+              --limit 30 \
+              --json databaseId,headSha,createdAt,url,status,conclusion \
+              > /tmp/publish-runs.json
+            match="$(
+              python - "$GITHUB_SHA" "$started_at" <<'PY'
+          import json
+          import sys
+
+          target, started_at = sys.argv[1:]
+          rows = json.load(open("/tmp/publish-runs.json", encoding="utf-8"))
+          matches = [
+              row for row in rows
+              if row.get("headSha") == target and str(row.get("createdAt") or "") >= started_at
+          ]
+          matches.sort(key=lambda row: str(row.get("createdAt") or ""), reverse=True)
+          if matches:
+              print(matches[0]["databaseId"], matches[0]["url"])
+          PY
+            )"
+            if [ -n "$match" ]; then
+              read -r run_id run_url <<< "$match"
+              break
+            fi
+            sleep 5
+          done
+          test -n "$run_id" || {
+            echo "::error::dispatched publish workflow run was not found"
+            cat /tmp/publish-runs.json
+            exit 1
+          }
+          echo "run_id=$run_id" >> "$GITHUB_OUTPUT"
+          echo "run_url=$run_url" >> "$GITHUB_OUTPUT"
+          echo "Canonical publish run: $run_url"
+
+      - name: Wait for canonical publication and public platform verification
+        id: publication
+        if: steps.request.outputs.execute == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RUN_ID: ${{ steps.dispatch.outputs.run_id }}
+        run: |
+          set -euo pipefail
+          conclusion=""
+          for attempt in $(seq 1 360); do
+            gh run view "$RUN_ID" --json status,conclusion,url > /tmp/publish-run.json
+            read -r status conclusion < <(
+              python - <<'PY'
+          import json
+          row = json.load(open("/tmp/publish-run.json", encoding="utf-8"))
+          print(row.get("status") or "", row.get("conclusion") or "")
+          PY
+            )
+            if [ "$status" = "completed" ]; then
+              break
+            fi
+            if [ "$attempt" -eq 360 ]; then
+              echo "::error::publish workflow did not complete"
+              cat /tmp/publish-run.json
+              exit 1
+            fi
+            sleep 20
+          done
+          echo "conclusion=$conclusion" >> "$GITHUB_OUTPUT"
+          gh api \
+            -H "Accept: application/vnd.github+json" \
+            "repos/${GITHUB_REPOSITORY}/actions/runs/${RUN_ID}/jobs?per_page=100" \
+            > /tmp/publish-jobs.json
+          cat /tmp/publish-run.json
+
+      - name: Download the exact gated distribution
+        if: steps.request.outputs.execute == 'true' && steps.publication.outputs.conclusion == 'success'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RUN_ID: ${{ steps.dispatch.outputs.run_id }}
+        run: |
+          set -euo pipefail
+          rm -rf /tmp/release-dist
+          gh run download "$RUN_ID" --name release-dist --dir /tmp/release-dist
+          find /tmp/release-dist -maxdepth 2 -type f -print
+
+      - name: Build byte-for-byte public evidence
+        id: evidence
+        if: steps.request.outputs.execute == 'true' && steps.publication.outputs.conclusion == 'success'
+        run: |
+          set -euo pipefail
+          evidence="/tmp/v${{ steps.request.outputs.version }}-public.json"
+          python scripts/release_request.py build-evidence \
+            --request "${{ steps.request.outputs.request_path }}" \
+            --target-sha "$GITHUB_SHA" \
+            --tag-object-sha "${{ steps.tag.outputs.tag_object_sha }}" \
+            --dist-dir /tmp/release-dist \
+            --jobs-json /tmp/publish-jobs.json \
+            --run-id "${{ steps.dispatch.outputs.run_id }}" \
+            --run-url "${{ steps.dispatch.outputs.run_url }}" \
+            --output "$evidence"
+          echo "path=$evidence" >> "$GITHUB_OUTPUT"
+          cat "$evidence"
+
+      - name: Upload release evidence and diagnostics
+        if: always() && steps.request.outputs.execute == 'true'
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: reviewed-public-release-${{ steps.request.outputs.version }}-${{ github.run_id }}
+          path: |
+            /tmp/release-request-inspect.json
+            /tmp/release-preflight.json
+            /tmp/main-check-runs.json
+            /tmp/pretag-release-manifest.json
+            /tmp/tag-ref-error
+            /tmp/tag-ref-created.json
+            /tmp/publish-run.json
+            /tmp/publish-jobs.json
+            /tmp/v${{ steps.request.outputs.version }}-public.json
+          if-no-files-found: warn
+          retention-days: 90
+
+      - name: Enforce final release result
+        if: always() && steps.request.outputs.execute == 'true'
+        run: |
+          set -euo pipefail
+          test "${{ steps.preflight.outcome }}" = "success"
+          test "${{ steps.main_ci.outcome }}" = "success"
+          test "${{ steps.pretag.outcome }}" = "success"
+          test "${{ steps.tag.outcome }}" = "success"
+          test "${{ steps.dispatch.outcome }}" = "success"
+          test "${{ steps.publication.outcome }}" = "success"
+          test "${{ steps.publication.outputs.conclusion }}" = "success"
+          test "${{ steps.evidence.outcome }}" = "success"
+          test -f "/tmp/v${{ steps.request.outputs.version }}-public.json"
+          {
+            echo "## Public release completed"
+            echo
+            echo "- Tag: \`${{ steps.request.outputs.tag }}\`"
+            echo "- Source: \`$GITHUB_SHA\`"
+            echo "- Publish run: ${{ steps.dispatch.outputs.run_url }}"
+            echo "- Public evidence artifact: \`reviewed-public-release-${{ steps.request.outputs.version }}-${{ github.run_id }}\`"
+            echo
+            echo "P0.6 remains unchanged in Git until this evidence is reviewed in a separate closure PR."
+          } >> "$GITHUB_STEP_SUMMARY"
