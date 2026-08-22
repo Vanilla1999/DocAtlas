@@ -50,6 +50,18 @@ Before the next public release candidate:
 - [ ] Verify the exact public package on Linux, macOS, and Windows for the claimed primary MCP/install surface.
 - [ ] Retain the controller's `reviewed-public-release-<version>-<run_id>` evidence artifact and move scorecard rows to green only through a separate reviewed closure PR.
 
+### `invalid-publisher` recovery
+
+When PyPI returns `invalid-publisher` after `required-release` succeeds:
+
+- [ ] Record the exact workflow run/job, immutable tag object and target, non-secret OIDC claims, gated artifact hashes, and the fact that upload did not start.
+- [ ] Do not move, delete, or recreate the release tag and do not introduce `PYPI_API_TOKEN` as a fallback.
+- [ ] Verify in PyPI project settings that owner, repository, workflow filename, and environment exactly match the claims printed by the failed action.
+- [ ] Re-check that the public version is still absent and that the original run's tag target and artifacts remain exact.
+- [ ] Retry only the failed jobs of the original canonical run so its source/provenance context remains unchanged; do not replace it with a dispatch from a newer `main` commit and call that the same reviewed release.
+- [ ] If the public version appears before retry, stop publication and use verify-only handling; PyPI files are immutable and must never be overwritten.
+- [ ] Keep P0.6 `INCOMPLETE` until exact public hashes, installed MCP behavior, and all three public platform smokes are green.
+
 ## Technical release evidence retained from the infrastructure roadmap
 
 - [ ] Task 15 artifact-level evidence remains green for wheel/sdist/installer/MCP packaging.
