@@ -97,6 +97,7 @@ def test_publish_workflow_uses_replacement_identity_not_failed_environment():
     assert "Record expected Trusted Publisher identity" in workflow
     assert "docatlas-publisher-context.json" in workflow
     assert "publisher-diagnostics-${{ github.run_id }}-${{ github.run_attempt }}" in workflow
+    assert "if: steps.pypi_publish.outcome == 'failure'" in workflow
     assert "repo:Vanilla1999/DocAtlas:environment:release-current" in workflow
     assert "PYPI_API_TOKEN" not in workflow
 
