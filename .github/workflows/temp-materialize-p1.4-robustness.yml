@@ -48,6 +48,22 @@ jobs:
           )
           PY
           python -m pip install -e ".[dev]"
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          import eval.agent_developer_v1.paraphrase_robustness as protocol
+
+          protocol.validate_report = lambda _report: None
+          report = protocol.run_protocol(
+              protocol.load_json(
+                  Path("eval/agent_developer_v1/paraphrase_robustness_cases.json")
+              )
+          )
+          print("P1.4 DIAGNOSTIC CASES")
+          print(json.dumps(report["cases"], indent=2, ensure_ascii=False, sort_keys=True))
+          print("P1.4 DIAGNOSTIC METRICS")
+          print(json.dumps(report["categories"], indent=2, sort_keys=True))
+          PY
           python scripts/build_agent_developer_paraphrase_robustness.py
           pytest -q tests/test_agent_developer_paraphrase_robustness.py
           python scripts/build_agent_developer_paraphrase_robustness.py --check
