@@ -114,10 +114,10 @@ def _aggregate(
 assert text.count(marker) == 1, text.count(marker)
 text = text.replace(marker, helper, 1)
 
-score_line = "            score = redact(score, project)"
+score_line = "                score = redact(score, project)"
 score_replacement = (
-    "            failure_stages.extend(_evaluator_failure_stages(score))\n"
-    "            score = redact(score, project)"
+    "                failure_stages.extend(_evaluator_failure_stages(score))\n"
+    "                score = redact(score, project)"
 )
 assert text.count(score_line) == 1, text.count(score_line)
 text = text.replace(score_line, score_replacement, 1)
