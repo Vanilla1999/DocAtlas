@@ -118,6 +118,10 @@ def test_committed_contract() -> None:
     assert "required-ci" in workflow
     assert "require-pypi-absent" in workflow
     assert "python scripts/release_gate.py --manifest dist/release-manifest.json" in workflow
+    assert 'git diff --exit-code' in workflow
+    assert 'git reset --hard "$GITHUB_SHA"' in workflow
+    assert "git clean -fdx" in workflow
+    assert 'test -z "$(git status --porcelain)"' in workflow
     assert "persist-credentials: false" in workflow
     assert "persist-credentials: true" not in workflow
     assert '"repos/${GITHUB_REPOSITORY}/git/tags"' in workflow
