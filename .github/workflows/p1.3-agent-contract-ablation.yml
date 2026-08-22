@@ -1,0 +1,37 @@
+name: P1.3 Agent Contract ablation
+
+on:
+  pull_request:
+    branches: [main, p1/p1.2-first-divergence-atlas]
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
+
+jobs:
+  p1-3-ablation:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: "3.12"
+      - name: Verify P1.2 and P1.3 evidence
+        run: |
+          python scripts/run_agent_developer_first_divergence_gate.py
+          python scripts/first_divergence_contract_self_test.py
+          python scripts/run_agent_contract_v2_ablation_gate.py
+          python scripts/agent_contract_v2_ablation_self_test.py
+          python -m compileall -q \
+            eval/agent_developer_v1/contract_v2_ablation.py \
+            scripts/run_agent_contract_v2_ablation_gate.py \
+            scripts/agent_contract_v2_ablation_self_test.py
+          git diff --check
