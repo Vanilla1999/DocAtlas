@@ -141,7 +141,7 @@ jobs:
     needs: [required-release]
     runs-on: ubuntu-latest
     timeout-minutes: 25
-    environment: release
+    environment: release-current
     permissions:
       contents: read
       id-token: write
