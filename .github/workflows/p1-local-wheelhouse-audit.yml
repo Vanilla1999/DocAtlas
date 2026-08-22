@@ -25,7 +25,7 @@ jobs:
           persist-credentials: false
       - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
         with:
-          python-version: "3.12"
+          python-version: "3.13"
       - name: Build exact offline wheelhouse for the checked-out candidate
         run: |
           python -m pip install --upgrade pip build "hatchling<1.27"
@@ -61,7 +61,7 @@ jobs:
           PY
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
-          name: p1-local-wheelhouse-${{ github.event.pull_request.head.sha || github.sha }}
+          name: p1-local-wheelhouse-py313-${{ github.event.pull_request.head.sha || github.sha }}
           path: |
             wheelhouse/
             wheelhouse-manifest.json
