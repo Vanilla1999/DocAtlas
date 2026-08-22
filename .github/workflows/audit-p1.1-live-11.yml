@@ -3,6 +3,8 @@ name: AUDIT P1.1 installed MCP live 11
 on:
   push:
     branches: [audit/p1.1-live-11]
+  pull_request:
+    branches: [main]
 
 permissions:
   contents: read
@@ -13,6 +15,7 @@ env:
 
 jobs:
   benchmark:
+    if: github.event_name == 'push' || github.event.pull_request.head.ref == 'audit/p1.1-live-11'
     # Audit-only evidence capture; this branch is never merged.
     runs-on: ubuntu-latest
     timeout-minutes: 90
