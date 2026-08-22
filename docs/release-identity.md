@@ -10,13 +10,60 @@ Canonical identity:
 product: DocAtlas
 distribution: doc-atlas
 source version: 1.3.1
-intended tag: v1.3.1
+immutable tag: v1.3.1
+tag object: 77bced8c530c88c57d2e6c5f58cb717bfe837a9f
+tag target: cfa9ab5c365a28d1a4af63afe9f1d53b19532d89
 maturity: Beta
 ```
 
-The tag is created only after the release-preparation PR is merged and all required CI/release gates are green. It must point to that exact reviewed `main` commit and must never be moved.
+The annotated `v1.3.1` tag exists and resolves to the exact reviewed merge of PR #133. It must never be moved, replaced, or reused.
 
-No public `doc-atlas==1.3.1` release is claimed until the immutable tag, PyPI artifact bytes, and post-publish platform smokes exist.
+No public `doc-atlas==1.3.1` release is claimed until the PyPI artifact bytes and post-publish platform smokes exist.
+
+## Current `v1.3.1` publication blocker
+
+Canonical workflow run `32587903026` used the immutable `v1.3.1` source. Build, wheel tests on Python 3.11–3.13, sdist/installer validation, `required-release`, and build-provenance attestation passed. The publish job then failed before upload at `pypa/gh-action-pypi-publish` with:
+
+```text
+invalid-publisher: valid token, but no corresponding publisher
+```
+
+The OIDC token exposed these exact non-secret claims:
+
+```text
+sub: repo:Vanilla1999/DocAtlas:environment:release-current
+repository: Vanilla1999/DocAtlas
+repository_owner: Vanilla1999
+workflow_ref: Vanilla1999/DocAtlas/.github/workflows/publish.yml@refs/heads/main
+job_workflow_ref: Vanilla1999/DocAtlas/.github/workflows/publish.yml@refs/heads/main
+ref: refs/heads/main
+environment: release-current
+```
+
+This proves the repository-side GitHub identity and narrows the remaining blocker to the external PyPI project configuration (or a transient PyPI identity lookup failure). It does not prove which PyPI publisher field is currently stored, because project publisher settings are not public.
+
+Recorded gated artifacts from this attempt:
+
+```text
+doc_atlas-1.3.1-py3-none-any.whl
+sha256 6b82e37ec8ac2a3d415f30aa51e48830afecd04386d34dab694ee6b6c697b6b0
+
+doc_atlas-1.3.1.tar.gz
+sha256 6cbcdf8d947ca4f494fa3052d5012703c29386ec3e8f8629d7cabba58bb62aff
+```
+
+The bounded machine-readable record is [`release-evidence/v1.3.1-publish-attempt-1.json`](./release-evidence/v1.3.1-publish-attempt-1.json).
+
+### Safe retry boundary
+
+After the external PyPI Trusted Publisher is verified to match the exact tuple below, retry only the failed jobs of canonical run `32587903026`. Before retrying, require that:
+
+- public `doc-atlas==1.3.1` is still absent;
+- `v1.3.1` remains an annotated tag targeting `cfa9ab5c365a28d1a4af63afe9f1d53b19532d89`;
+- the original run's gated wheel and sdist artifacts remain available;
+- no token fallback is introduced.
+
+Do not move or recreate the tag. Do not start a replacement workflow from a newer `main` commit and present its provenance as the tagged source. If the public version appears before the retry, switch to verify-only handling and never overwrite it.
 
 ## Historical repository milestone
 
