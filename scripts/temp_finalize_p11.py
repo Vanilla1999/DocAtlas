@@ -114,19 +114,13 @@ def _aggregate(
 assert text.count(marker) == 1, text.count(marker)
 text = text.replace(marker, helper, 1)
 
-old_score = '''            score["passed"] = bool(
-                score["passed"] and not planning_errors
-            )
-            score = redact(score, project)
-'''
-new_score = '''            score["passed"] = bool(
-                score["passed"] and not planning_errors
-            )
-            failure_stages.extend(_evaluator_failure_stages(score))
-            score = redact(score, project)
-'''
-assert text.count(old_score) == 1, text.count(old_score)
-text = text.replace(old_score, new_score, 1)
+score_line = "            score = redact(score, project)"
+score_replacement = (
+    "            failure_stages.extend(_evaluator_failure_stages(score))\n"
+    "            score = redact(score, project)"
+)
+assert text.count(score_line) == 1, text.count(score_line)
+text = text.replace(score_line, score_replacement, 1)
 benchmark_path.write_text(text, encoding="utf-8")
 
 self_test_path = Path("scripts/installed_mcp_contract_self_test.py")
