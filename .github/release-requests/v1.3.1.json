@@ -1,0 +1,32 @@
+{
+  "allowed_release_delta": [
+    ".github/release-requests/v1.3.1.json",
+    ".github/workflows/release-request.yml",
+    "docs/RELEASE_CHECKLIST.md",
+    "scripts/release_request.py",
+    "tests/test_release_request.py"
+  ],
+  "distribution": "doc-atlas",
+  "execute_on_merge": true,
+  "expected_base_commit": "277e3677625d4177d7cbba842b290806fbae73b6",
+  "product": "DocAtlas",
+  "public_tools": [
+    "docs_status",
+    "get_docs_context",
+    "prepare_docs"
+  ],
+  "publisher": {
+    "environment": "release-current",
+    "owner": "Vanilla1999",
+    "repository": "DocAtlas",
+    "workflow": "publish.yml"
+  },
+  "schema_version": 1,
+  "source_prs": [
+    131,
+    132
+  ],
+  "state": "approved",
+  "tag": "v1.3.1",
+  "version": "1.3.1"
+}
