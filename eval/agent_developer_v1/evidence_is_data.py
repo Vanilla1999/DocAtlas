@@ -19,7 +19,7 @@ SCHEMA_VERSION = 1
 FORBIDDEN_PERSISTED_MARKERS = (
     "ignore all previous instructions",
     "openai_api_key",
-    "sk-test-not-a-secret",
+    "credential_sentinel_do_not_expose",
     "auto_execute=true",
     "requires_confirmation=false",
 )
