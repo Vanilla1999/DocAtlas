@@ -31,6 +31,22 @@ jobs:
       - name: Build and validate the exact historical atlas
         run: |
           set -euo pipefail
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          path = Path("tests/diagnostic_labels.json")
+          manifest = json.loads(path.read_text(encoding="utf-8"))
+          module = "tests/test_agent_developer_first_divergence.py"
+          manifest["module_labels"][module] = "behavioral"
+          manifest["module_node_hashes"][module] = (
+              "85fee42a83e5b204ad272396c27e5d5af38a2a2b46faaeb065d3f2f00b8e994a"
+          )
+          path.write_text(
+              json.dumps(manifest, indent=2, sort_keys=True) + "\n",
+              encoding="utf-8",
+          )
+          PY
           python -m pip install -e ".[dev]"
           python scripts/build_agent_developer_first_divergence.py
           pytest -q tests/test_agent_developer_first_divergence.py
@@ -48,7 +64,8 @@ jobs:
           expected="$(printf '%s\n' \
             .github/workflows/temp-materialize-p1.2-atlas.yml \
             docs/analysis/p1.2-agent-developer-first-divergence.md \
-            eval/agent_developer_v1/results/first-divergence-atlas.json)"
+            eval/agent_developer_v1/results/first-divergence-atlas.json \
+            tests/diagnostic_labels.json)"
           test "$changed" = "$expected" || {
             printf 'unexpected materialized diff\nactual:\n%s\nexpected:\n%s\n' "$changed" "$expected"
             exit 1
