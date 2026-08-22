@@ -1,0 +1,169 @@
+{
+  "schema_version": 1,
+  "protocol": "agent-developer-paraphrase-robustness-v1",
+  "fixture": "explicit_manifest_monorepo",
+  "thresholds": {
+    "alias": 0.5,
+    "behavior": 1.0,
+    "exact_identifier": 1.0,
+    "negative_control": 1.0,
+    "policy": 1.0,
+    "requirements": 1.0,
+    "typo": 0.5
+  },
+  "cases": [
+    {
+      "id": "exact_orders_store",
+      "category": "exact_identifier",
+      "question": "What is OrdersDraftStore?",
+      "scope": "module",
+      "module_path": "packages/orders",
+      "positive": true,
+      "required_source": "packages/orders/README.md",
+      "required_fragment": "module-local draft storage component",
+      "forbidden_sources": ["packages/payments/README.md", "ARCHITECTURE.md"]
+    },
+    {
+      "id": "exact_retry_policy",
+      "category": "exact_identifier",
+      "question": "What is ProjectRetryPolicy?",
+      "scope": "project",
+      "positive": true,
+      "required_source": "ARCHITECTURE.md",
+      "required_fragment": "project-wide retry policy",
+      "forbidden_sources": ["packages/orders/README.md", "packages/payments/README.md"]
+    },
+    {
+      "id": "behavior_orders_store",
+      "category": "behavior",
+      "question": "What does OrdersDraftStore do?",
+      "scope": "module",
+      "module_path": "packages/orders",
+      "positive": true,
+      "required_source": "packages/orders/README.md",
+      "required_fragment": "stores draft orders",
+      "forbidden_sources": ["packages/payments/README.md", "ARCHITECTURE.md"]
+    },
+    {
+      "id": "behavior_retry_policy",
+      "category": "behavior",
+      "question": "What does ProjectRetryPolicy govern?",
+      "scope": "project",
+      "positive": true,
+      "required_source": "ARCHITECTURE.md",
+      "required_fragment": "network submission retries",
+      "forbidden_sources": ["packages/orders/README.md", "packages/payments/README.md"]
+    },
+    {
+      "id": "requirements_validation_contract",
+      "category": "requirements",
+      "question": "What does OrderValidationContract require?",
+      "scope": "module",
+      "module_path": "packages/orders",
+      "positive": true,
+      "required_source": "packages/orders/README.md",
+      "required_fragment": "non-empty customer id",
+      "forbidden_sources": ["packages/payments/README.md", "ARCHITECTURE.md"]
+    },
+    {
+      "id": "requirements_validation_contract_passive",
+      "category": "requirements",
+      "question": "What is required by OrderValidationContract?",
+      "scope": "module",
+      "module_path": "packages/orders",
+      "positive": true,
+      "required_source": "packages/orders/README.md",
+      "required_fragment": "positive total",
+      "forbidden_sources": ["packages/payments/README.md", "ARCHITECTURE.md"]
+    },
+    {
+      "id": "policy_retry_attempts",
+      "category": "policy",
+      "question": "How many retry attempts does ProjectRetryPolicy allow?",
+      "scope": "project",
+      "positive": true,
+      "required_source": "ARCHITECTURE.md",
+      "required_fragment": "two retry attempts",
+      "forbidden_sources": ["packages/orders/README.md", "packages/payments/README.md"]
+    },
+    {
+      "id": "policy_retry_governance",
+      "category": "policy",
+      "question": "Which policy governs network submission retries?",
+      "scope": "project",
+      "positive": true,
+      "required_source": "ARCHITECTURE.md",
+      "required_fragment": "ProjectRetryPolicy",
+      "forbidden_sources": ["packages/orders/README.md", "packages/payments/README.md"]
+    },
+    {
+      "id": "typo_behavior_filler",
+      "category": "typo",
+      "question": "What does OrdersDraftStore do befor upload?",
+      "scope": "module",
+      "module_path": "packages/orders",
+      "positive": true,
+      "required_source": "packages/orders/README.md",
+      "required_fragment": "JSON records",
+      "forbidden_sources": ["packages/payments/README.md", "ARCHITECTURE.md"]
+    },
+    {
+      "id": "typo_require_verb",
+      "category": "typo",
+      "question": "What does OrderValidationContract requrie?",
+      "scope": "module",
+      "module_path": "packages/orders",
+      "positive": true,
+      "required_source": "packages/orders/README.md",
+      "required_fragment": "line item",
+      "forbidden_sources": ["packages/payments/README.md", "ARCHITECTURE.md"]
+    },
+    {
+      "id": "alias_orders_store",
+      "category": "alias",
+      "question": "What does the orders draft store do?",
+      "scope": "module",
+      "module_path": "packages/orders",
+      "positive": true,
+      "required_source": "packages/orders/README.md",
+      "required_fragment": "draft orders",
+      "forbidden_sources": ["packages/payments/README.md", "ARCHITECTURE.md"]
+    },
+    {
+      "id": "alias_retry_policy",
+      "category": "alias",
+      "question": "What does the project retry policy allow?",
+      "scope": "project",
+      "positive": true,
+      "required_source": "ARCHITECTURE.md",
+      "required_fragment": "bounded exponential backoff",
+      "forbidden_sources": ["packages/orders/README.md", "packages/payments/README.md"]
+    },
+    {
+      "id": "negative_wrong_module",
+      "category": "negative_control",
+      "question": "What is PaymentOutbox?",
+      "scope": "module",
+      "module_path": "packages/orders",
+      "positive": false,
+      "forbidden_sources": ["packages/payments/README.md"]
+    },
+    {
+      "id": "negative_external_price",
+      "category": "negative_control",
+      "question": "What is the current Bitcoin price?",
+      "scope": "project",
+      "positive": false,
+      "forbidden_sources": ["ARCHITECTURE.md", "packages/orders/README.md", "packages/payments/README.md"]
+    },
+    {
+      "id": "negative_compound_external",
+      "category": "negative_control",
+      "question": "What does OrdersDraftStore do and what is the current Bitcoin price?",
+      "scope": "module",
+      "module_path": "packages/orders",
+      "positive": false,
+      "forbidden_sources": ["packages/payments/README.md"]
+    }
+  ]
+}
