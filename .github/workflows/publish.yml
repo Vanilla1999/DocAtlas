@@ -241,7 +241,7 @@ jobs:
         id: pypi_publish
         uses: pypa/gh-action-pypi-publish@ed0c53931b1dc9bd32cbe73a98c7f6766f8a527e # release/v1
       - name: Explain the publisher failure boundary
-        if: failure()
+        if: steps.pypi_publish.outcome == 'failure'
         run: |
           echo "::error::PyPI publication failed after repository-side claim validation."
           echo "::error::Verify the PyPI project publisher tuple: Vanilla1999 / DocAtlas / publish.yml / release-current."
