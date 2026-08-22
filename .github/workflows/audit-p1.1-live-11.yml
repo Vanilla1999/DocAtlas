@@ -1,0 +1,72 @@
+name: AUDIT P1.1 installed MCP live 11
+
+on:
+  push:
+    branches: [audit/p1.1-live-11]
+
+permissions:
+  contents: read
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
+  DOCMANCER_OFFLINE: "1"
+
+jobs:
+  benchmark:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: "3.12"
+
+      - name: Build exact wheel and install evaluator
+        run: |
+          python -m pip install build "hatchling<1.27" -e ".[dev]"
+          rm -rf dist/installed-mcp
+          python -m build --wheel --outdir dist/installed-mcp
+
+      - name: Run all frozen tasks through a real model and installed MCP
+        id: live
+        continue-on-error: true
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        run: |
+          wheel="$(find dist/installed-mcp -maxdepth 1 -name '*.whl' -print -quit)"
+          test -n "$wheel"
+          python scripts/run_installed_mcp_agent_benchmark.py \
+            --wheel "$wheel" \
+            --source-commit "$GITHUB_SHA" \
+            --planner openai \
+            --openai-model gpt-5.6-luna \
+            --max-schema-repairs 1 \
+            --min-pass-rate 0.0 \
+            --output eval/agent_developer_v1/results/installed-mcp-benchmark.json
+
+      - name: Verify retained evidence when a report exists
+        if: always()
+        run: |
+          if [ -f eval/agent_developer_v1/results/installed-mcp-benchmark.json ]; then
+            python scripts/verify_installed_mcp_agent_report.py \
+              eval/agent_developer_v1/results/installed-mcp-benchmark.json \
+              --expected-origin reviewed-wheel \
+              --min-task-count 11 \
+              --min-pass-rate 0.0
+          else
+            echo "::error::live runner produced no report"
+            exit 1
+          fi
+
+      - name: Upload exact live evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: p1.1-live-11-${{ github.run_id }}
+          path: eval/agent_developer_v1/results/installed-mcp-benchmark.json
+          if-no-files-found: warn
+          retention-days: 30
