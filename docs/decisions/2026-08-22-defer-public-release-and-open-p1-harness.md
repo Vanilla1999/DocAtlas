@@ -8,7 +8,7 @@
 
 Public publication of `doc-atlas==1.3.1` and the post-public artifact/install checks are deferred. The reviewed release request remains in the repository but is changed to `execute_on_merge=false` so ordinary merges cannot publish it.
 
-Work may proceed on the P1.1 installed-MCP harness before P0 public-artifact closure, subject to the restrictions below.
+Work may proceed on the P1.1 installed-MCP harness before P0 public-artifact closure, subject to the restrictions below. This deferral remains active until a later reviewed change explicitly re-enables release execution; completing or merging P1 work does not re-enable it implicitly.
 
 ## What remains open
 
