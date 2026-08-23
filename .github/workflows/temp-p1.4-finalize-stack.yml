@@ -1,5 +1,6 @@
 name: TEMP finalize P1.4 branch
 
+# One-shot carrier for the unified 14-case discovery/proofability protocol.
 on:
   push:
     branches: [p1/p1.4-paraphrase-proofability]
