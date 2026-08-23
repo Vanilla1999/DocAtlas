@@ -1,0 +1,140 @@
+{
+  "claim_boundary": {
+    "comparative_experiment_executed": false,
+    "correct_patch_comparison_available": false,
+    "p2_work_items_complete": true,
+    "p3_conditional_expansion_authorized": false,
+    "product_failure_proven": false,
+    "product_truth_proven": false,
+    "production_runtime_changed": false,
+    "public_api_changed": false,
+    "public_release_truth_closed": false,
+    "real_coding_outcome_improvement_proven": false,
+    "retrieval_expansion_authorized": false,
+    "safety_comparison_available": false,
+    "stable_claim_allowed": false
+  },
+  "decision": {
+    "accepted_production_changes": [],
+    "conditional_expansion_decision": "NOT_AUTHORIZED",
+    "interpretation": "Product Truth is not proven because the preregistered eligibility gate prevented the comparative experiment; product failure is also not proven.",
+    "next_step": "Reopen Product Truth only after constructing a preregistered valid task pack and passing real-model oracle controls.",
+    "retrieval_expansion_decision": "PAUSE",
+    "stable_decision": "DO_NOT_PROMOTE"
+  },
+  "evidence_disposition": "preregistered_eligibility_block",
+  "execution_status": "CLOSED",
+  "measured_facts": {
+    "canary_executed_runs": 0,
+    "canary_planned_runs": 0,
+    "comparative_metrics_available": false,
+    "full_pilot_executed_runs": 0,
+    "full_pilot_planned_runs": 0,
+    "gold_reproducible_tasks": 3,
+    "materialized_fixture_tasks": 15,
+    "oracle_evidence_tasks": 1,
+    "positive_control_tasks": 3,
+    "real_model_oracle_passed_tasks": 0,
+    "required_repositories": 3,
+    "required_tasks_per_repository": 8,
+    "required_valid_tasks": 24,
+    "structurally_complete_tasks": 12,
+    "task_specs_total": 21,
+    "two_clean_gold_tasks": 3,
+    "valid_tasks": 0
+  },
+  "outcome": "PRODUCT_TRUTH_NOT_PROVEN",
+  "phase": "P2_PRODUCT_TRUTH",
+  "product_maturity": "Beta",
+  "protocol": "product-truth-product-decision-v1",
+  "protocol_sha256": "78521ab7dfae4f51cc55d4225054a1b38375a80be1d76d894ba74d9c851cc367",
+  "reopening_conditions": {
+    "canary_can_support_product_claim": false,
+    "canary_runs_after_eligibility": 16,
+    "clean_gold_repetitions_per_task": 2,
+    "full_pilot_maximum_runs_after_green_canary": 720,
+    "full_pilot_minimum_runs_after_green_canary": 576,
+    "gold_oracle_and_hidden_artifacts_model_visible": false,
+    "minimum_repositories": 3,
+    "minimum_valid_tasks": 24,
+    "minimum_valid_tasks_per_repository": 8,
+    "oracle_uses_same_model_tools_and_budgets": true,
+    "protocol_preregistered_before_scored_runs": true,
+    "real_model_oracle_pass_required_per_task": true
+  },
+  "schema_version": 1,
+  "scorecard": [
+    {
+      "decision": "The causal protocol, schemas, budgets, conditions and decision thresholds are frozen before scored execution.",
+      "evidence_status": "green_preregistered_protocol",
+      "execution_status": "closed",
+      "id": "P2.1A",
+      "title": "Preregister Product Truth protocol and schemas"
+    },
+    {
+      "decision": "Gold controls reproduce for three tasks, but no task has a passing real-model oracle control.",
+      "evidence_status": "negative_zero_valid_tasks",
+      "execution_status": "closed",
+      "id": "P2.1B",
+      "title": "Gold-patch and oracle-evidence positive controls"
+    },
+    {
+      "decision": "The repository has zero valid tasks and insufficient cross-repository structural capacity for the frozen 24-task gate.",
+      "evidence_status": "blocked_task_pack_not_ready",
+      "execution_status": "closed",
+      "id": "P2.1C",
+      "title": "Preregistered valid task pack"
+    },
+    {
+      "decision": "A/B/C/D isolation and randomization are implemented, but no executable run identities are emitted while eligibility is closed.",
+      "evidence_status": "green_harness_execution_blocked",
+      "execution_status": "closed",
+      "id": "P2.2A",
+      "title": "Isolated four-condition comparative harness"
+    },
+    {
+      "decision": "The canary was not authorized or run; this is not a model failure and cannot support a product claim.",
+      "evidence_status": "not_executed_by_preregistered_gate",
+      "execution_status": "closed",
+      "id": "P2.2B",
+      "title": "Sixteen-run canary"
+    },
+    {
+      "decision": "The full pilot was not authorized or run; no comparative correctness, safety, cost or latency metric exists.",
+      "evidence_status": "not_executed_by_preregistered_gate",
+      "execution_status": "closed",
+      "id": "P2.2C",
+      "title": "Full 576-720-run pilot"
+    },
+    {
+      "decision": "Do not promote to Stable, do not authorize conditional expansion, and retain Beta until a valid preregistered experiment is executed.",
+      "evidence_status": "product_truth_not_proven",
+      "execution_status": "closed",
+      "id": "P2.3",
+      "title": "Product and Stable decision"
+    }
+  ],
+  "source_report_set_sha256": "aabb03261601f33d120f0cbdb3f05398a58b9f673c27bb76525a38c1b5de6b30",
+  "source_reports": {
+    "comparative_harness": {
+      "git_blob_sha1": "04f91dff5fa8bc3fec3be06b2c61eb58f63a391e",
+      "path": "eval/product_truth_v1/results/comparative-harness.json"
+    },
+    "execution_gate": {
+      "git_blob_sha1": "8ba03a6ebc07b0858ca295f8acd22680c16c6d8c",
+      "path": "eval/product_truth_v1/results/execution-gate.json"
+    },
+    "positive_controls": {
+      "git_blob_sha1": "651f3d1f371c9cf3148a520e4c1505b4affc8f7f",
+      "path": "eval/product_truth_v1/results/positive-controls.json"
+    },
+    "protocol": {
+      "git_blob_sha1": "c0919554cfa9b1b38278a66400d9cb35583d2ee0",
+      "path": "eval/product_truth_v1/protocol.lock.json"
+    },
+    "task_pack": {
+      "git_blob_sha1": "0b9a6ba66ef2fc2a239ba0c239123968a53ac4d2",
+      "path": "eval/product_truth_v1/results/task-pack.json"
+    }
+  }
+}
