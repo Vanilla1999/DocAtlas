@@ -1,0 +1,28 @@
+{
+  "events": [
+    {
+      "event_sha256": "8daed3f9a3d4b2545b17c3e24667c88863befa571d779cb6aed10c5e6a795080",
+      "index": 0,
+      "kind": "run_started",
+      "payload": {
+        "run_id": "sample:docatlas.sample-task:a:0",
+        "status": "started"
+      },
+      "payload_sha256": "2d415f1586b6fa2190f77e2c7a4258d19373c1926673bd33e6faeec696d3bd50",
+      "previous_event_sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+    },
+    {
+      "event_sha256": "11eccf26f82e24cabe288d7c2db8c66b63d58128673d0733ff93606a3517e311",
+      "index": 1,
+      "kind": "run_scored",
+      "payload": {
+        "correct_patch": true,
+        "run_id": "sample:docatlas.sample-task:a:0"
+      },
+      "payload_sha256": "2aa6996c3ff1e6336619c906ed330ca4f6e2f46831dbc0c696c4e7d9ce4e34e5",
+      "previous_event_sha256": "8daed3f9a3d4b2545b17c3e24667c88863befa571d779cb6aed10c5e6a795080"
+    }
+  ],
+  "protocol_sha256": "78521ab7dfae4f51cc55d4225054a1b38375a80be1d76d894ba74d9c851cc367",
+  "schema_version": 1
+}
