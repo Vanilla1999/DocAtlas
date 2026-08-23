@@ -1,0 +1,45 @@
+name: P2 federated task-pack reopening
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
+  DOCMANCER_OFFLINE: "1"
+
+jobs:
+  p2-federated-task-pack:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: "3.12"
+      - name: Verify the source-local federated candidate boundary
+        run: |
+          set -euo pipefail
+          python scripts/verify_federated_task_pack.py \
+            --output _artifacts/federated-candidate-pack.json
+          python scripts/federated_task_pack_self_test.py
+          python -m compileall -q \
+            eval/product_truth_v2 \
+            scripts/verify_federated_task_pack.py \
+            scripts/federated_task_pack_self_test.py
+          python scripts/check_python_module_size.py
+          git diff --check
+          test "$(find .github/workflows -maxdepth 1 -type f -name 'temp-*' | wc -l)" -eq 0
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: p2-federated-candidate-pack
+          path: _artifacts/federated-candidate-pack.json
+          if-no-files-found: error
