@@ -1,10 +1,6 @@
 name: TEMP finalize complete P1 closure
 
-on:
-  push:
-    branches: [p1/p1-agent-truth-closure-clean]
-    paths:
-      - .github/workflows/temp-p1-finalize-closure.yml
+on: push
 
 permissions:
   contents: write
