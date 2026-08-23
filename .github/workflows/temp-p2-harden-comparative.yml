@@ -1,0 +1,72 @@
+name: TEMP harden P2.2A verifier
+
+on:
+  push:
+    branches: [p2/p2.2a-comparative-harness]
+    paths:
+      - .github/workflows/temp-p2-harden-comparative.yml
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with:
+          ref: p2/p2.2a-comparative-harness
+          fetch-depth: 0
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: "3.12"
+      - name: Make blocked reports validate the full cell contract
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          path = Path("eval/product_truth_v1/comparative.py")
+          text = path.read_text(encoding="utf-8")
+          old = '''    conditions = report.get("conditions")
+    if not isinstance(conditions, list) or tuple(row.get("id") for row in conditions) != EXPECTED_CONDITIONS:
+        raise ValueError("P2.2A condition contract mismatch")
+    authorization = report.get("authorization")
+'''
+          new = '''    conditions = report.get("conditions")
+    if not isinstance(conditions, list) or tuple(row.get("id") for row in conditions) != EXPECTED_CONDITIONS:
+        raise ValueError("P2.2A condition contract mismatch")
+    expected_flags = {
+        "A_repo_only": {"docatlas": False, "external_docs": False, "code_context_engine": False},
+        "B_repo_plus_docatlas": {"docatlas": True, "external_docs": False, "code_context_engine": False},
+        "C_repo_plus_external_docs": {"docatlas": False, "external_docs": True, "code_context_engine": False},
+        "D_code_context_plus_docatlas": {"docatlas": True, "external_docs": False, "code_context_engine": True},
+    }
+    for row in conditions:
+        actual = {key: row.get(key) for key in ("docatlas", "external_docs", "code_context_engine")}
+        if actual != expected_flags[str(row["id"])]:
+            raise ValueError(f"P2.2A condition capability drift: {row['id']}")
+    randomization = report.get("randomization")
+    if randomization != {
+        "blinding": "hidden tests and gold/oracle artifacts remain evaluator-only",
+        "condition_order": "deterministic_balanced_permutation",
+        "seed": "docatlas-product-truth-v1",
+        "unit": "task_model_repeat_block",
+    }:
+        raise ValueError("P2.2A randomization contract mismatch")
+    authorization = report.get("authorization")
+'''
+          if old not in text:
+              raise SystemExit("comparative verifier insertion anchor not found")
+          path.write_text(text.replace(old, new, 1), encoding="utf-8")
+          PY
+          python -m compileall -q eval/product_truth_v1/comparative.py
+          rm .github/workflows/temp-p2-harden-comparative.yml
+          git diff --check
+      - name: Commit carrier-free hardening
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add eval/product_truth_v1/comparative.py .github/workflows/temp-p2-harden-comparative.yml
+          git commit -m "fix(p2): verify blocked comparative cell capabilities"
+          git push origin HEAD:p2/p2.2a-comparative-harness
