@@ -1,0 +1,296 @@
+{
+  "cases": [
+    {
+      "all_assignment_sources": [
+        "ARCHITECTURE.md"
+      ],
+      "answer_supported": true,
+      "assignment_hash": "cc5e4e74007ba1cf0e8864e49cbe09cd7ef5633edb372e9bab05dc781dd73ff6",
+      "assignment_sources": [
+        "ARCHITECTURE.md"
+      ],
+      "assignments": [
+        {
+          "proof_role": "project_rule",
+          "qualifiers": [],
+          "requirement_id": "public:0:0f582ff9a733",
+          "source": "ARCHITECTURE.md"
+        },
+        {
+          "proof_role": "generic_fact",
+          "qualifiers": [],
+          "requirement_id": "query_symbol:0:retrypolicylimit",
+          "source": "ARCHITECTURE.md"
+        }
+      ],
+      "decision_hash": "bc54356abc794a596d6a71e6f71b3e064506de734eca264d89099fc111a502f6",
+      "expected_assignment_sources": [
+        "ARCHITECTURE.md"
+      ],
+      "expected_supported": true,
+      "id": "project_rule_prefers_canonical_policy",
+      "public_requirement_shape": "native",
+      "reason_code": null,
+      "requirements_hash": "8bc2433edd5afab76c457a9305c392ba8397911dd624cd096ef5e020f411b093",
+      "selected_sources": [
+        "ARCHITECTURE.md"
+      ],
+      "support_status": "supported"
+    },
+    {
+      "all_assignment_sources": [
+        "https://advisory.example/retries"
+      ],
+      "answer_supported": false,
+      "assignment_hash": "2b015b27bc48430b43352bbe27250225f94915ad3bd7f01bcf57d5c440d787ac",
+      "assignment_sources": [],
+      "assignments": [
+        {
+          "proof_role": "generic_fact",
+          "qualifiers": [],
+          "requirement_id": "query_symbol:0:retrypolicylimit",
+          "source": "https://advisory.example/retries"
+        }
+      ],
+      "decision_hash": "eb36a5d59df9e44d2c1b3964b939872ce67cad7deb71b00f652ee2cff2ccf94d",
+      "expected_assignment_sources": [],
+      "expected_supported": false,
+      "id": "project_rule_rejects_advisory_only",
+      "public_requirement_shape": "native",
+      "reason_code": "required_evidence_missing",
+      "requirements_hash": "8bc2433edd5afab76c457a9305c392ba8397911dd624cd096ef5e020f411b093",
+      "selected_sources": [
+        "https://advisory.example/retries"
+      ],
+      "support_status": "insufficient_evidence"
+    },
+    {
+      "all_assignment_sources": [
+        "packages/orders/README.md"
+      ],
+      "answer_supported": true,
+      "assignment_hash": "2667fb42e897ce183389e1840a9a7d806f016a0f1345e4c8ccd3322f32518fa9",
+      "assignment_sources": [
+        "packages/orders/README.md"
+      ],
+      "assignments": [
+        {
+          "proof_role": "implementation_fact",
+          "qualifiers": [],
+          "requirement_id": "public:0:28fe45f2b1d5",
+          "source": "packages/orders/README.md"
+        },
+        {
+          "proof_role": "generic_fact",
+          "qualifiers": [],
+          "requirement_id": "query_symbol:0:ordersdraftpersistence",
+          "source": "packages/orders/README.md"
+        }
+      ],
+      "decision_hash": "44a9882e54e5e8734489bf7d0da135b858fee6b270c746fead66b3284ac4c2ef",
+      "expected_assignment_sources": [
+        "packages/orders/README.md"
+      ],
+      "expected_supported": true,
+      "id": "implementation_fact_rejects_external_claim",
+      "public_requirement_shape": "native",
+      "reason_code": null,
+      "requirements_hash": "c187992b6d5065b33a8cc120feeb3cfe339eff1a7c8821b24816ef13d98df740",
+      "selected_sources": [
+        "packages/orders/README.md"
+      ],
+      "support_status": "supported"
+    },
+    {
+      "all_assignment_sources": [
+        "https://tenacity.readthedocs.io/en/8.2.3/"
+      ],
+      "answer_supported": true,
+      "assignment_hash": "ee2731d4f1a967f9ce4438abccd48054742507573ab6479a7cec412fd45fcebf",
+      "assignment_sources": [
+        "https://tenacity.readthedocs.io/en/8.2.3/"
+      ],
+      "assignments": [
+        {
+          "proof_role": "dependency_fact",
+          "qualifiers": [],
+          "requirement_id": "public:0:d7fc9da40f7c",
+          "source": "https://tenacity.readthedocs.io/en/8.2.3/"
+        },
+        {
+          "proof_role": "generic_fact",
+          "qualifiers": [],
+          "requirement_id": "query_symbol:0:tenacityretryingcontract",
+          "source": "https://tenacity.readthedocs.io/en/8.2.3/"
+        }
+      ],
+      "decision_hash": "9711dc1c3943df736ae90c700f8d568e065cef390408dc4b568ce603bebabd3f",
+      "expected_assignment_sources": [
+        "https://tenacity.readthedocs.io/en/8.2.3/"
+      ],
+      "expected_supported": true,
+      "id": "dependency_fact_prefers_dependency_docs",
+      "public_requirement_shape": "native",
+      "reason_code": null,
+      "requirements_hash": "1fb5949268fec9ea557124c1274c2c3fd2ab0fa09e088c9dfd8a5744899ce972",
+      "selected_sources": [
+        "https://tenacity.readthedocs.io/en/8.2.3/"
+      ],
+      "support_status": "supported"
+    },
+    {
+      "all_assignment_sources": [
+        "docs/tenacity-notes.md"
+      ],
+      "answer_supported": false,
+      "assignment_hash": "11f4cdb5da3cad77935b5b98b0acf6a37982037873c0ae78c71f5f43bb0724ed",
+      "assignment_sources": [],
+      "assignments": [
+        {
+          "proof_role": "generic_fact",
+          "qualifiers": [],
+          "requirement_id": "query_symbol:0:tenacityretryingcontract",
+          "source": "docs/tenacity-notes.md"
+        }
+      ],
+      "decision_hash": "e8015032864789fc533e8be60c0443c9d77d7788da3d5e301eca50521b5d5332",
+      "expected_assignment_sources": [],
+      "expected_supported": false,
+      "id": "dependency_fact_rejects_project_guess_only",
+      "public_requirement_shape": "native",
+      "reason_code": "required_evidence_missing",
+      "requirements_hash": "1fb5949268fec9ea557124c1274c2c3fd2ab0fa09e088c9dfd8a5744899ce972",
+      "selected_sources": [
+        "docs/tenacity-notes.md"
+      ],
+      "support_status": "insufficient_evidence"
+    },
+    {
+      "all_assignment_sources": [
+        "docs/release-policy.md"
+      ],
+      "answer_supported": true,
+      "assignment_hash": "421f8650c1a870828e11239be1cab14a1c99d405c058ae9b89e2567e94a8e870",
+      "assignment_sources": [
+        "docs/release-policy.md"
+      ],
+      "assignments": [
+        {
+          "proof_role": "document_identity",
+          "qualifiers": [
+            "negated"
+          ],
+          "requirement_id": "evidence_path:0:docs/release-policy.md",
+          "source": "docs/release-policy.md"
+        },
+        {
+          "proof_role": "document_statement",
+          "qualifiers": [
+            "negated"
+          ],
+          "requirement_id": "public:0:47a7c6eaad13",
+          "source": "docs/release-policy.md"
+        },
+        {
+          "proof_role": "generic_fact",
+          "qualifiers": [
+            "negated"
+          ],
+          "requirement_id": "query_symbol:0:immutablereleasetag",
+          "source": "docs/release-policy.md"
+        }
+      ],
+      "decision_hash": "d53aee9a12aef54b45f8f5748c51f72167b3e82f28f1f363847e714be728af4d",
+      "expected_assignment_sources": [
+        "docs/release-policy.md"
+      ],
+      "expected_supported": true,
+      "id": "document_statement_binds_exact_path",
+      "public_requirement_shape": "native",
+      "reason_code": null,
+      "requirements_hash": "bb1a821cc78b10a4a4936724efac83e03f497f01ace5d88861af0816eb795b34",
+      "selected_sources": [
+        "docs/release-policy.md"
+      ],
+      "support_status": "supported"
+    },
+    {
+      "all_assignment_sources": [
+        "ARCHITECTURE.md",
+        "https://tenacity.readthedocs.io/en/8.2.3/"
+      ],
+      "answer_supported": true,
+      "assignment_hash": "0434cfc3196f05f35d1d94163a2a3196e56c7dd8039ba53b6b95a2efe84c2b4a",
+      "assignment_sources": [
+        "ARCHITECTURE.md",
+        "https://tenacity.readthedocs.io/en/8.2.3/"
+      ],
+      "assignments": [
+        {
+          "proof_role": "dependency_fact",
+          "qualifiers": [],
+          "requirement_id": "public:0:d7fc9da40f7c",
+          "source": "https://tenacity.readthedocs.io/en/8.2.3/"
+        },
+        {
+          "proof_role": "project_rule",
+          "qualifiers": [],
+          "requirement_id": "public:1:df80222c88b2",
+          "source": "ARCHITECTURE.md"
+        },
+        {
+          "proof_role": "generic_fact",
+          "qualifiers": [],
+          "requirement_id": "query_symbol:0:projectretryrule",
+          "source": "ARCHITECTURE.md"
+        },
+        {
+          "proof_role": "generic_fact",
+          "qualifiers": [],
+          "requirement_id": "query_symbol:1:tenacityretryingcontract",
+          "source": "https://tenacity.readthedocs.io/en/8.2.3/"
+        }
+      ],
+      "decision_hash": "0980846399c250f310e34968ef03d641eff93f681d874eec52fd3f575244d09e",
+      "expected_assignment_sources": [
+        "ARCHITECTURE.md",
+        "https://tenacity.readthedocs.io/en/8.2.3/"
+      ],
+      "expected_supported": true,
+      "id": "two_claims_require_two_allowed_roles",
+      "public_requirement_shape": "native",
+      "reason_code": null,
+      "requirements_hash": "2e06aae761c5854c6450b4465276ea9dc9db86d1d230eb16b63f66b85f71c090",
+      "selected_sources": [
+        "ARCHITECTURE.md",
+        "https://tenacity.readthedocs.io/en/8.2.3/"
+      ],
+      "support_status": "supported"
+    }
+  ],
+  "claim_boundary": {
+    "autonomous_agent_truth_proven": false,
+    "production_runtime_changed": false,
+    "provider_free": true
+  },
+  "decision": {
+    "accepted_production_changes": [],
+    "claim_local_provenance": "accepted",
+    "next_step": "P1.6 evidence-is-data adversarial gate",
+    "p1_5": "closed"
+  },
+  "protocol": "mixed-evidence-provenance-report-v1",
+  "schema_version": 1,
+  "source_identities": {
+    "evidence_model_git_blob_sha1": "ccf4398b49ae46ebaffe850fbb81b7ce16a28f6b",
+    "protocol_git_blob_sha1": "63a8ff66c1e1fd933af2cca1e888c19fbdf2126b",
+    "selector_git_blob_sha1": "68cb3e222d860e7bdf2b0435129b70fa6793836d"
+  },
+  "status": "closed_with_claim_local_provenance",
+  "summary": {
+    "advisory_assignments": [],
+    "case_count": 7,
+    "matched_cases": 7,
+    "mismatches": []
+  }
+}
