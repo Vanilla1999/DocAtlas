@@ -4,6 +4,7 @@ from __future__ import annotations
 from pathlib import Path
 
 from eval.agent_developer_v1.evidence_is_data import (
+    PROTECTED_PROOF_ROLES,
     derive_from_paths,
     verify_report,
 )
@@ -52,8 +53,34 @@ def test_support_and_assignment_override_fail_closed() -> None:
 
     report = _report()
     row = next(item for item in report["cases"] if item["expected_supported"])
+    protected = next(
+        item for item in row["assignments"]
+        if item["proof_role"] in PROTECTED_PROOF_ROLES
+    )
+    protected["source"] = "https://advisory.example/forged"
     row["assignment_sources"] = ["https://advisory.example/forged"]
+    row["all_assignment_sources"] = sorted({
+        item["source"] for item in row["assignments"]
+    })
     _expect_error("assignment mismatch", report)
+
+
+def test_assignment_source_ledgers_fail_closed() -> None:
+    report = _report()
+    row = next(item for item in report["cases"] if item["assignments"])
+    row["all_assignment_sources"] = []
+    _expect_error("full assignment sources are hidden or invented", report)
+
+    report = _report()
+    row = next(
+        item for item in report["cases"]
+        if any(
+            assignment["proof_role"] in PROTECTED_PROOF_ROLES
+            for assignment in item["assignments"]
+        )
+    )
+    row["assignment_sources"] = []
+    _expect_error("protected assignment sources are hidden or invented", report)
 
 
 def test_content_control_and_raw_marker_fail_closed() -> None:
@@ -80,6 +107,7 @@ def main() -> int:
     checks = (
         test_exact_hostile_document_boundary,
         test_support_and_assignment_override_fail_closed,
+        test_assignment_source_ledgers_fail_closed,
         test_content_control_and_raw_marker_fail_closed,
         test_claim_and_path_leak_fail_closed,
     )
