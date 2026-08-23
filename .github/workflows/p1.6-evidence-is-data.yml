@@ -2,7 +2,7 @@ name: P1.6 evidence is data
 
 on:
   pull_request:
-    branches: [main, p1/p1.5-mixed-evidence-provenance]
+    branches: [main]
   push:
     branches: [main]
 
