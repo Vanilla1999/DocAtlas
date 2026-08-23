@@ -36,6 +36,12 @@ build_requirements = _resolve_build_requirements()
 
 PROTOCOL = "evidence-is-data-report-v1"
 SCHEMA_VERSION = 1
+PROTECTED_PROOF_ROLES = frozenset({
+    "document_statement",
+    "project_rule",
+    "implementation_fact",
+    "dependency_fact",
+})
 FORBIDDEN_PERSISTED_MARKERS = (
     "ignore all previous instructions",
     "openai_api_key",
@@ -148,7 +154,12 @@ def evaluate_case(case: dict[str, Any]) -> dict[str, Any]:
         }
         for item in decision.assignments
     ]
-    assignment_sources = sorted({row["source"] for row in assignments})
+    protected_assignments = [
+        row for row in assignments
+        if row["proof_role"] in PROTECTED_PROOF_ROLES
+    ]
+    assignment_sources = sorted({row["source"] for row in protected_assignments})
+    all_assignment_sources = sorted({row["source"] for row in assignments})
     expected_supported = bool(case["expected_supported"])
     actual_supported = bool(decision.support_decision.answer_supported)
     return {
@@ -164,6 +175,7 @@ def evaluate_case(case: dict[str, Any]) -> dict[str, Any]:
         "support_status": str(decision.support_decision.support_status),
         "reason_code": decision.support_decision.reason_code,
         "assignment_sources": assignment_sources,
+        "all_assignment_sources": all_assignment_sources,
         "expected_assignment_sources": sorted({
             str(value) for value in case.get("expected_assignment_sources") or ()
         }),
@@ -254,6 +266,27 @@ def verify_report(report: dict[str, Any]) -> None:
     for row in cases:
         if not isinstance(row, dict):
             raise ValueError("P1.6 case row must be an object")
+        assignments = row.get("assignments")
+        if not isinstance(assignments, list):
+            raise ValueError("P1.6 case omitted assignment ledger")
+        expected_all_sources = sorted({
+            str(item.get("source") or "")
+            for item in assignments
+            if isinstance(item, dict) and str(item.get("source") or "")
+        })
+        if row.get("all_assignment_sources") != expected_all_sources:
+            raise ValueError("P1.6 full assignment sources are hidden or invented")
+        expected_protected_sources = sorted({
+            str(item.get("source") or "")
+            for item in assignments
+            if (
+                isinstance(item, dict)
+                and str(item.get("source") or "")
+                and item.get("proof_role") in PROTECTED_PROOF_ROLES
+            )
+        })
+        if row.get("assignment_sources") != expected_protected_sources:
+            raise ValueError("P1.6 protected assignment sources are hidden or invented")
         if row.get("answer_supported") != row.get("expected_supported"):
             raise ValueError(f"P1.6 support mismatch for {row.get('id')}")
         if row.get("assignment_sources") != row.get("expected_assignment_sources"):
