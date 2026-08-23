@@ -1,0 +1,191 @@
+{
+  "claim_boundary": {
+    "minimum_valid_tasks_for_pilot": 24,
+    "product_maturity": "Beta",
+    "product_truth_proven": false,
+    "provider_free_run_counts_as_oracle_control": false,
+    "single_task_claim_allowed": false
+  },
+  "decision": {
+    "next_step": "P2.1C task-pack eligibility and real-model oracle controls",
+    "p2_1b_execution": "complete",
+    "task_pack_ready": false
+  },
+  "protocol": "product-truth-positive-controls-v1",
+  "protocol_sha256": "78521ab7dfae4f51cc55d4225054a1b38375a80be1d76d894ba74d9c851cc367",
+  "schema_version": 1,
+  "summary": {
+    "gold_reproducible": 3,
+    "oracle_evidence_present": 1,
+    "real_model_oracle_passed": 0,
+    "task_count": 3,
+    "valid_tasks": 0
+  },
+  "tasks": [
+    {
+      "ecosystem": "python",
+      "gold_attempts": [
+        {
+          "attempt": 1,
+          "base_expected_tests_failed": true,
+          "base_setup_success": true,
+          "compile_success": true,
+          "contract_status": "legacy_unfrozen",
+          "fixture_hash": "4557676c8312c476631fa3a04d2d2bc75b257bda9515f94499299e3c94dad205",
+          "hidden_tests_passed": true,
+          "oracle_isolated": true,
+          "passed": true,
+          "patch_applied": true,
+          "patch_surface_status": "legacy",
+          "public_tests_passed": true,
+          "status": "validated"
+        },
+        {
+          "attempt": 2,
+          "base_expected_tests_failed": true,
+          "base_setup_success": true,
+          "compile_success": true,
+          "contract_status": "legacy_unfrozen",
+          "fixture_hash": "4557676c8312c476631fa3a04d2d2bc75b257bda9515f94499299e3c94dad205",
+          "hidden_tests_passed": true,
+          "oracle_isolated": true,
+          "passed": true,
+          "patch_applied": true,
+          "patch_surface_status": "legacy",
+          "public_tests_passed": true,
+          "status": "validated"
+        }
+      ],
+      "gold_reproducible": true,
+      "invalid_reason": "real_model_oracle_control_missing_or_failed",
+      "oracle_evidence": {
+        "present": true,
+        "sha256": "ab155f9ee254e5e8123493198495d92c76f3706daa44b800bd3d87f5e9a4c6db"
+      },
+      "oracle_model_control": {
+        "correct_patch": false,
+        "model_snapshot": null,
+        "provider_id": null,
+        "real_model": false,
+        "report_sha256": null,
+        "request_ids": [],
+        "same_budgets": false,
+        "same_tools": false,
+        "status": "not_run"
+      },
+      "source_project": "docmancer",
+      "task_id": "decisive_docmancer_vector_timeout_fallback_001",
+      "task_valid": false
+    },
+    {
+      "ecosystem": "dart",
+      "gold_attempts": [
+        {
+          "attempt": 1,
+          "base_expected_tests_failed": true,
+          "base_setup_success": true,
+          "compile_success": null,
+          "contract_status": "valid",
+          "fixture_hash": "4927f5a90f638d7362f66f66b5da954d96135fbe767a8f8135ea9a9ac9a6feef",
+          "hidden_tests_passed": true,
+          "oracle_isolated": true,
+          "passed": true,
+          "patch_applied": true,
+          "patch_surface_status": "passed",
+          "public_tests_passed": true,
+          "status": "validated"
+        },
+        {
+          "attempt": 2,
+          "base_expected_tests_failed": true,
+          "base_setup_success": true,
+          "compile_success": null,
+          "contract_status": "valid",
+          "fixture_hash": "4927f5a90f638d7362f66f66b5da954d96135fbe767a8f8135ea9a9ac9a6feef",
+          "hidden_tests_passed": true,
+          "oracle_isolated": true,
+          "passed": true,
+          "patch_applied": true,
+          "patch_surface_status": "passed",
+          "public_tests_passed": true,
+          "status": "validated"
+        }
+      ],
+      "gold_reproducible": true,
+      "invalid_reason": "oracle_evidence_missing",
+      "oracle_evidence": {
+        "present": false,
+        "sha256": null
+      },
+      "oracle_model_control": {
+        "correct_patch": false,
+        "model_snapshot": null,
+        "provider_id": null,
+        "real_model": false,
+        "report_sha256": null,
+        "request_ids": [],
+        "same_budgets": false,
+        "same_tools": false,
+        "status": "not_run"
+      },
+      "source_project": "help_chat",
+      "task_id": "real_project_help_chat_linearizable_module_lifecycle_001",
+      "task_valid": false
+    },
+    {
+      "ecosystem": "android",
+      "gold_attempts": [
+        {
+          "attempt": 1,
+          "base_expected_tests_failed": true,
+          "base_setup_success": true,
+          "compile_success": null,
+          "contract_status": "valid",
+          "fixture_hash": "98b1115b26e8990d762702c3e216d1a212a7c32578aa8928e3e4de727c96d44f",
+          "hidden_tests_passed": true,
+          "oracle_isolated": true,
+          "passed": true,
+          "patch_applied": true,
+          "patch_surface_status": "passed",
+          "public_tests_passed": true,
+          "status": "validated"
+        },
+        {
+          "attempt": 2,
+          "base_expected_tests_failed": true,
+          "base_setup_success": true,
+          "compile_success": null,
+          "contract_status": "valid",
+          "fixture_hash": "98b1115b26e8990d762702c3e216d1a212a7c32578aa8928e3e4de727c96d44f",
+          "hidden_tests_passed": true,
+          "oracle_isolated": true,
+          "passed": true,
+          "patch_applied": true,
+          "patch_surface_status": "passed",
+          "public_tests_passed": true,
+          "status": "validated"
+        }
+      ],
+      "gold_reproducible": true,
+      "invalid_reason": "oracle_evidence_missing",
+      "oracle_evidence": {
+        "present": false,
+        "sha256": null
+      },
+      "oracle_model_control": {
+        "correct_patch": false,
+        "model_snapshot": null,
+        "provider_id": null,
+        "real_model": false,
+        "report_sha256": null,
+        "request_ids": [],
+        "same_budgets": false,
+        "same_tools": false,
+        "status": "not_run"
+      },
+      "source_project": "viscanner",
+      "task_id": "real_project_viscanner_client_owned_disable_signal_001",
+      "task_valid": false
+    }
+  ]
+}
