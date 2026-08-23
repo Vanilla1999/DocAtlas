@@ -15,11 +15,11 @@ into a positive result.
 
 | Item | Execution | Evidence outcome | Decision |
 |---|---|---|---|
-| P1.1 Installed-MCP harness | closed | installed transport/reviewer replay green; complete fresh same-model autonomous 11-task run absent | harness retained, autonomy unproven |
+| P1.1 Installed-MCP harness | closed | exact-wheel/CLI/MCP stdio, runtime schemas, bounded schema repair, attribution and privacy contract green; no committed complete fresh same-model autonomous 11-task run | harness retained, autonomy unproven |
 | P1.2 First-divergence atlas | closed | historical 0/11 classified as 8 selector-cardinality, 2 query-drift, 1 trajectory-order | diagnosis accepted, API freeze retained |
 | P1.3 Contract v2 ablation | closed | working-path duplication and continuation token prevent 0 first divergences; conservative inference covers 8 counterfactually | no runtime change; inference deferred |
 | P1.4 Paraphrase/proofability | closed | candidate discovery and final support measured separately; gaps retained explicitly; negative false support zero | measured accepted/rejected result is authoritative |
-| P1.5 Mixed provenance | closed | support/assignment mismatches and advisory assignments retained explicitly | measured accepted/rejected provenance result is authoritative |
+| P1.5 Mixed provenance | closed | protected claims use claim-local allowed-role provenance; auxiliary generic assignments remain separately audited | measured provenance result accepted |
 | P1.6 Evidence is data | closed | hostile document contents cannot control protected agent state | trust boundary accepted |
 
 ## Claim boundary
@@ -33,10 +33,11 @@ public_release_truth_closed
 stable_claim_allowed
 ```
 
-The absence of `OPENAI_API_KEY` and the intentionally deferred public release
-mean the original positive P1 question cannot be answered affirmatively from
-current evidence. The correct outcome is therefore a completed research phase
-with a non-positive Agent Truth result.
+The absence of a committed complete fresh same-model autonomous 11-task run and
+the intentionally deferred public release mean the original positive P1
+question cannot be answered affirmatively from current evidence. The correct
+outcome is therefore a completed research phase with a non-positive Agent Truth
+result.
 
 ## Product decision
 
