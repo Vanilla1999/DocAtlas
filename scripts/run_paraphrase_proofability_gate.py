@@ -15,6 +15,19 @@ from eval.agent_developer_v1.paraphrase_robustness import (
 
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
+
+
+def _production_planner_path() -> Path:
+    candidates = (
+        REPO_ROOT / "docmancer" / "docs" / "domain" / "project_answer_contract.py",
+        REPO_ROOT / "docmancer" / "docs" / "domain" / "question_planning.py",
+        REPO_ROOT / "docmancer" / "docs" / "domain" / "question_plan.py",
+        REPO_ROOT / "docmancer" / "docs" / "domain" / "answer_completeness.py",
+    )
+    existing = [path for path in candidates if path.is_file()]
+    if not existing:
+        raise RuntimeError("no reviewed production question-planning module exists")
+    return existing[0]
 ROOT = REPO_ROOT / "eval" / "agent_developer_v1"
 DEFAULT_OUTPUT = ROOT / "results" / "paraphrase-proofability.json"
 
@@ -29,7 +42,7 @@ def main(argv: list[str] | None = None) -> int:
         repo_root=REPO_ROOT,
         protocol_path=ROOT / "paraphrase_protocol.json",
         selector_path=REPO_ROOT / "docmancer" / "docs" / "application" / "evidence_selection.py",
-        planner_path=REPO_ROOT / "docmancer" / "docs" / "domain" / "project_answer_contract.py",
+        planner_path=_production_planner_path(),
     )
     verify_report(derived)
     if args.write:
