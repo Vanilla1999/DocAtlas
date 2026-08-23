@@ -1,0 +1,180 @@
+{
+  "schema_version": 1,
+  "protocol": "mixed-evidence-provenance-v1",
+  "description": "P1.5 claim-local provenance cases with conflicting source roles.",
+  "cases": [
+    {
+      "id": "project_rule_prefers_canonical_policy",
+      "question": "What is RetryPolicyLimit?",
+      "public_requirements": [
+        {"value": "RetryPolicyLimit", "proof_role": "project_rule"}
+      ],
+      "candidates": [
+        {
+          "id": "canonical-policy",
+          "source": "ARCHITECTURE.md",
+          "text": "RetryPolicyLimit is two attempts.",
+          "authority": "source_of_truth",
+          "source_class": "project_file"
+        },
+        {
+          "id": "external-advisory",
+          "source": "https://advisory.example/retries",
+          "text": "RetryPolicyLimit is five attempts.",
+          "authority": "supporting",
+          "source_class": "external_advisory"
+        }
+      ],
+      "expected_supported": true,
+      "expected_assignment_sources": ["ARCHITECTURE.md"]
+    },
+    {
+      "id": "project_rule_rejects_advisory_only",
+      "question": "What is RetryPolicyLimit?",
+      "public_requirements": [
+        {"value": "RetryPolicyLimit", "proof_role": "project_rule"}
+      ],
+      "candidates": [
+        {
+          "id": "external-advisory-only",
+          "source": "https://advisory.example/retries",
+          "text": "RetryPolicyLimit is five attempts.",
+          "authority": "supporting",
+          "source_class": "external_advisory"
+        }
+      ],
+      "expected_supported": false,
+      "expected_assignment_sources": []
+    },
+    {
+      "id": "implementation_fact_rejects_external_claim",
+      "question": "What is OrdersDraftPersistence?",
+      "public_requirements": [
+        {"value": "OrdersDraftPersistence", "proof_role": "implementation_fact"}
+      ],
+      "candidates": [
+        {
+          "id": "module-fact",
+          "source": "packages/orders/README.md",
+          "text": "OrdersDraftPersistence stores JSON records keyed by order id.",
+          "authority": "source_of_truth",
+          "source_class": "project_file"
+        },
+        {
+          "id": "external-implementation-claim",
+          "source": "https://blog.example/orders",
+          "text": "OrdersDraftPersistence stores XML files.",
+          "authority": "supporting",
+          "source_class": "external_advisory"
+        }
+      ],
+      "expected_supported": true,
+      "expected_assignment_sources": ["packages/orders/README.md"]
+    },
+    {
+      "id": "dependency_fact_prefers_dependency_docs",
+      "question": "What is TenacityRetryingContract?",
+      "public_requirements": [
+        {"value": "TenacityRetryingContract", "proof_role": "dependency_fact"}
+      ],
+      "candidates": [
+        {
+          "id": "dependency-docs",
+          "source": "https://tenacity.readthedocs.io/en/8.2.3/",
+          "text": "TenacityRetryingContract is the exact 8.2.3 retry controller API.",
+          "authority": "official",
+          "source_class": "dependency_docs"
+        },
+        {
+          "id": "project-guess",
+          "source": "docs/tenacity-notes.md",
+          "text": "TenacityRetryingContract is a project-local helper.",
+          "authority": "source_of_truth",
+          "source_class": "project_file"
+        }
+      ],
+      "expected_supported": true,
+      "expected_assignment_sources": ["https://tenacity.readthedocs.io/en/8.2.3/"]
+    },
+    {
+      "id": "dependency_fact_rejects_project_guess_only",
+      "question": "What is TenacityRetryingContract?",
+      "public_requirements": [
+        {"value": "TenacityRetryingContract", "proof_role": "dependency_fact"}
+      ],
+      "candidates": [
+        {
+          "id": "project-guess-only",
+          "source": "docs/tenacity-notes.md",
+          "text": "TenacityRetryingContract is a project-local helper.",
+          "authority": "source_of_truth",
+          "source_class": "project_file"
+        }
+      ],
+      "expected_supported": false,
+      "expected_assignment_sources": []
+    },
+    {
+      "id": "document_statement_binds_exact_path",
+      "question": "What does the release policy say about ImmutableReleaseTag?",
+      "required_evidence_paths": ["docs/release-policy.md"],
+      "public_requirements": [
+        {"value": "ImmutableReleaseTag", "proof_role": "document_statement"}
+      ],
+      "candidates": [
+        {
+          "id": "required-document",
+          "source": "docs/release-policy.md",
+          "text": "ImmutableReleaseTag must never be moved.",
+          "authority": "source_of_truth",
+          "source_class": "project_file"
+        },
+        {
+          "id": "other-document",
+          "source": "docs/release-notes.md",
+          "text": "ImmutableReleaseTag may be moved after review.",
+          "authority": "source_of_truth",
+          "source_class": "project_file"
+        }
+      ],
+      "expected_supported": true,
+      "expected_assignment_sources": ["docs/release-policy.md"]
+    },
+    {
+      "id": "two_claims_require_two_allowed_roles",
+      "question": "Explain ProjectRetryRule and TenacityRetryingContract.",
+      "public_requirements": [
+        {"value": "ProjectRetryRule", "proof_role": "project_rule"},
+        {"value": "TenacityRetryingContract", "proof_role": "dependency_fact"}
+      ],
+      "candidates": [
+        {
+          "id": "project-rule",
+          "source": "ARCHITECTURE.md",
+          "text": "ProjectRetryRule allows two attempts.",
+          "authority": "source_of_truth",
+          "source_class": "project_file"
+        },
+        {
+          "id": "dependency-api",
+          "source": "https://tenacity.readthedocs.io/en/8.2.3/",
+          "text": "TenacityRetryingContract is the exact 8.2.3 retry controller API.",
+          "authority": "official",
+          "source_class": "dependency_docs"
+        },
+        {
+          "id": "advisory-conflict",
+          "source": "https://advisory.example/mixed",
+          "text": "ProjectRetryRule allows ten attempts and TenacityRetryingContract is unversioned.",
+          "authority": "supporting",
+          "source_class": "external_advisory"
+        }
+      ],
+      "expected_supported": true,
+      "expected_assignment_sources": [
+        "ARCHITECTURE.md",
+        "https://tenacity.readthedocs.io/en/8.2.3/"
+      ]
+    }
+  ]
+}

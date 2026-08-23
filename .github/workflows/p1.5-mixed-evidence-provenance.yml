@@ -1,0 +1,37 @@
+name: P1.5 mixed-evidence provenance
+
+on:
+  pull_request:
+    branches: [main, p1/p1.4-paraphrase-proofability]
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
+
+jobs:
+  p1-5-provenance:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: "3.12"
+      - name: Install DocAtlas evaluator dependencies
+        run: python -m pip install -e ".[dev]"
+      - name: Verify claim-local provenance under conflict
+        run: |
+          python scripts/run_mixed_evidence_provenance_gate.py
+          python scripts/mixed_evidence_provenance_self_test.py
+          python -m compileall -q \
+            eval/agent_developer_v1/mixed_provenance.py \
+            scripts/run_mixed_evidence_provenance_gate.py \
+            scripts/mixed_evidence_provenance_self_test.py
+          git diff --check
