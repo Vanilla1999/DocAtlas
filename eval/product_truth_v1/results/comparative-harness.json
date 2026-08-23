@@ -1,0 +1,81 @@
+{
+  "authorization": {
+    "blocked_reason": "task_pack_not_ready",
+    "canary_authorized": false,
+    "full_pilot_authorized": false,
+    "task_pack_ready": false
+  },
+  "claim_boundary": {
+    "canary_product_claim_allowed": false,
+    "harness_infrastructure_only": true,
+    "product_maturity": "Beta",
+    "product_truth_proven": false,
+    "production_runtime_changed": false,
+    "public_api_changed": false,
+    "zero_runs_when_unauthorized": true
+  },
+  "conditions": [
+    {
+      "code_context_engine": false,
+      "docatlas": false,
+      "evidence": "repository and coding tools only",
+      "external_docs": false,
+      "id": "A_repo_only",
+      "label": "Repository only"
+    },
+    {
+      "code_context_engine": false,
+      "docatlas": true,
+      "evidence": "installed DocAtlas bounded evidence",
+      "external_docs": false,
+      "id": "B_repo_plus_docatlas",
+      "label": "Repository plus DocAtlas"
+    },
+    {
+      "code_context_engine": false,
+      "docatlas": false,
+      "evidence": "frozen audited external documentation snapshot",
+      "external_docs": true,
+      "id": "C_repo_plus_external_docs",
+      "label": "Repository plus frozen external docs"
+    },
+    {
+      "code_context_engine": true,
+      "docatlas": true,
+      "evidence": "host code context plus installed DocAtlas bounded evidence",
+      "external_docs": false,
+      "id": "D_code_context_plus_docatlas",
+      "label": "Code-context engine plus DocAtlas"
+    }
+  ],
+  "decision": {
+    "comparative_execution_authorized": false,
+    "harness_ready": true,
+    "next_step": "P2.2B/C execution gate",
+    "p2_2a_execution": "complete"
+  },
+  "plans": {
+    "canary": {
+      "expected_scored_runs": 16,
+      "planned_runs": 0,
+      "runs": []
+    },
+    "full_pilot": {
+      "maximum_scored_runs": 720,
+      "minimum_scored_runs": 576,
+      "model_snapshots": [],
+      "planned_runs": 0,
+      "runs": [],
+      "selected_tasks": []
+    }
+  },
+  "protocol": "product-truth-comparative-harness-v1",
+  "protocol_sha256": "78521ab7dfae4f51cc55d4225054a1b38375a80be1d76d894ba74d9c851cc367",
+  "randomization": {
+    "blinding": "hidden tests and gold/oracle artifacts remain evaluator-only",
+    "condition_order": "deterministic_balanced_permutation",
+    "seed": "docatlas-product-truth-v1",
+    "unit": "task_model_repeat_block"
+  },
+  "schema_version": 1
+}
