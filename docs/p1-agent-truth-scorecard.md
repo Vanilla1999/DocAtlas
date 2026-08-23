@@ -18,8 +18,8 @@ into a positive result.
 | P1.1 Installed-MCP harness | closed | installed transport/reviewer replay green; complete fresh same-model autonomous 11-task run absent | harness retained, autonomy unproven |
 | P1.2 First-divergence atlas | closed | historical 0/11 classified as 8 selector-cardinality, 2 query-drift, 1 trajectory-order | diagnosis accepted, API freeze retained |
 | P1.3 Contract v2 ablation | closed | working-path duplication and continuation token prevent 0 first divergences; conservative inference covers 8 counterfactually | no runtime change; inference deferred |
-| P1.4 Paraphrase/proofability | closed | candidate discovery and final support measured separately; negative false support zero | provider-free robustness evidence accepted |
-| P1.5 Mixed provenance | closed | protected claims assigned only to allowed roles under conflict | claim-local provenance accepted |
+| P1.4 Paraphrase/proofability | closed | candidate discovery and final support measured separately; gaps retained explicitly; negative false support zero | measured accepted/rejected result is authoritative |
+| P1.5 Mixed provenance | closed | support/assignment mismatches and advisory assignments retained explicitly | measured accepted/rejected provenance result is authoritative |
 | P1.6 Evidence is data | closed | hostile document contents cannot control protected agent state | trust boundary accepted |
 
 ## Claim boundary

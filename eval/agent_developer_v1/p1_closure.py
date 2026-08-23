@@ -201,17 +201,32 @@ def derive_closure(
             "id": "P1.4",
             "title": "Paraphrase/proofability robustness",
             "execution_status": "closed",
-            "evidence_status": "green_provider_free",
+            "evidence_status": (
+                "provider_free_measured_"
+                + str(p14["decision"]["core_exact_proofability"])
+            ),
             "facts": p14["summary"],
-            "decision": "Candidate discovery is measured separately from support; negative false support remains zero.",
+            "decision": (
+                "Candidate discovery is measured separately from support; "
+                "core_exact_proofability="
+                + str(p14["decision"]["core_exact_proofability"])
+                + "; negative false support remains zero."
+            ),
         },
         {
             "id": "P1.5",
             "title": "Mixed-evidence provenance",
             "execution_status": "closed",
-            "evidence_status": "green_provider_free",
+            "evidence_status": (
+                "provider_free_measured_"
+                + str(p15["decision"]["claim_local_provenance"])
+            ),
             "facts": p15["summary"],
-            "decision": "Protected claims are assigned only to allowed source roles under conflict.",
+            "decision": (
+                "claim_local_provenance="
+                + str(p15["decision"]["claim_local_provenance"])
+                + "; all mismatches/advisory assignments remain visible."
+            ),
         },
         {
             "id": "P1.6",
