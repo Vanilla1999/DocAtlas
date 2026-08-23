@@ -1,0 +1,120 @@
+name: TEMP preserve measured P1.4 gaps
+
+on:
+  push:
+    branches: [p1/p1.4-paraphrase-proofability]
+    paths:
+      - .github/workflows/temp-p1.4-preserve-measured-gaps.yml
+
+permissions:
+  contents: write
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with:
+          ref: p1/p1.4-paraphrase-proofability
+          fetch-depth: 0
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: "3.12"
+      - name: Make recall/proofability gaps evidence instead of infrastructure failure
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          from pathlib import Path
+
+          source = Path("eval/agent_developer_v1/paraphrase_robustness.py")
+          text = source.read_text(encoding="utf-8")
+          hard = '''        if row.get("require_discovery") and not row.get("candidate_discovered"):
+                      raise ValueError(f"required candidate discovery failed for {row.get('id')}")
+                  if row.get("require_support") and not row.get("answer_supported"):
+                      raise ValueError(f"required support failed for {row.get('id')}")
+          '''
+          text = text.replace(hard, "", 1)
+          old_summary = '''    if summary.get("required_discovery_failures") != []:
+                  raise ValueError("P1.4 required discovery failures are hidden")
+              if summary.get("required_support_failures") != []:
+                  raise ValueError("P1.4 required support failures are hidden")
+          '''
+          new_summary = '''    expected_discovery_failures = [
+                  row["id"] for row in cases
+                  if row.get("require_discovery") and not row.get("candidate_discovered")
+              ]
+              expected_support_failures = [
+                  row["id"] for row in cases
+                  if row.get("require_support") and not row.get("answer_supported")
+              ]
+              if summary.get("required_discovery_failures") != expected_discovery_failures:
+                  raise ValueError("P1.4 discovery gaps are hidden or invented")
+              if summary.get("required_support_failures") != expected_support_failures:
+                  raise ValueError("P1.4 support gaps are hidden or invented")
+          '''
+          if old_summary in text:
+              text = text.replace(old_summary, new_summary, 1)
+          elif "P1.4 discovery gaps are hidden or invented" not in text:
+              raise SystemExit("P1.4 summary verification anchor missing")
+          decision_anchor = '''    decision = report.get("decision")
+              if not isinstance(decision, dict) or decision.get("accepted_production_changes") != []:
+                  raise ValueError("P1.4 accepted an unreviewed runtime change")
+          '''
+          decision_replacement = '''    decision = report.get("decision")
+              if not isinstance(decision, dict) or decision.get("accepted_production_changes") != []:
+                  raise ValueError("P1.4 accepted an unreviewed runtime change")
+              expected_core = (
+                  "accepted"
+                  if not expected_discovery_failures and not expected_support_failures
+                  else "rejected"
+              )
+              if decision.get("core_exact_proofability") != expected_core:
+                  raise ValueError("P1.4 core decision does not match measured gaps")
+          '''
+          if decision_anchor in text:
+              text = text.replace(decision_anchor, decision_replacement, 1)
+          elif "P1.4 core decision does not match measured gaps" not in text:
+              raise SystemExit("P1.4 decision verification anchor missing")
+          source.write_text(text, encoding="utf-8")
+
+          test = Path("scripts/paraphrase_proofability_self_test.py")
+          test_text = test.read_text(encoding="utf-8")
+          start = test_text.find("def test_required_discovery_and_support_fail_closed() -> None:")
+          end = test_text.find("\n\ndef test_claim_and_path_leak_fail_closed", start)
+          if start < 0 or end < 0:
+              raise SystemExit("P1.4 measured-gap self-test anchors missing")
+          replacement = '''def test_measured_gaps_are_retained_but_not_hidden() -> None:
+              report = _report()
+              row = next(item for item in report["cases"] if item["require_discovery"])
+              row["candidate_discovered"] = False
+              report["summary"]["required_discovery_failures"] = [row["id"]]
+              report["decision"]["core_exact_proofability"] = "rejected"
+              verify_report(report)
+
+              report["summary"]["required_discovery_failures"] = []
+              _expect_error("discovery gaps are hidden or invented", report)
+          '''
+          test_text = test_text[:start] + replacement + test_text[end:]
+          test_text = test_text.replace(
+              "test_required_discovery_and_support_fail_closed,",
+              "test_measured_gaps_are_retained_but_not_hidden,",
+          )
+          test.write_text(test_text, encoding="utf-8")
+          PY
+          rm .github/workflows/temp-p1.4-preserve-measured-gaps.yml
+          python -m compileall -q \
+            eval/agent_developer_v1/paraphrase_robustness.py \
+            scripts/paraphrase_proofability_self_test.py
+          git diff --check
+      - name: Commit ordinary evidence code only
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "fix(p1): retain measured paraphrase gaps without weakening precision"
+          git push origin HEAD:p1/p1.4-paraphrase-proofability
