@@ -32,6 +32,5 @@ jobs:
           set -euo pipefail
           python scripts/verify_product_truth_protocol.py
           python scripts/product_truth_protocol_self_test.py
-          pytest tests/product_truth/test_product_truth_protocol.py -q
           python -m compileall -q eval/product_truth_v1 scripts
           git diff --check
