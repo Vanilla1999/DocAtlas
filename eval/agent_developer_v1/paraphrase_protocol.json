@@ -1,0 +1,161 @@
+{
+  "schema_version": 1,
+  "protocol": "paraphrase-proofability-v1",
+  "description": "Provider-free P1.4 corpus separating query-plan candidate discovery from final support adjudication.",
+  "cases": [
+    {
+      "id": "exact_orders_identity",
+      "family": "exact_identifier",
+      "question": "What is OrdersDraftStore?",
+      "candidate_source": "packages/orders/README.md",
+      "candidate_text": "OrdersDraftStore is the module-local draft storage component.",
+      "discovery_terms": ["OrdersDraftStore"],
+      "require_discovery": true,
+      "require_support": true,
+      "negative_control": false
+    },
+    {
+      "id": "exact_retry_policy",
+      "family": "exact_identifier",
+      "question": "What is ProjectRetryPolicy?",
+      "candidate_source": "ARCHITECTURE.md",
+      "candidate_text": "ProjectRetryPolicy is the project-wide retry policy.",
+      "discovery_terms": ["ProjectRetryPolicy"],
+      "require_discovery": true,
+      "require_support": true,
+      "negative_control": false
+    },
+    {
+      "id": "behavior_orders_store",
+      "family": "behavior",
+      "question": "What does OrdersDraftStore do?",
+      "candidate_source": "packages/orders/README.md",
+      "candidate_text": "OrdersDraftStore stores draft orders as JSON records keyed by order id before upload.",
+      "discovery_terms": ["OrdersDraftStore", "draft orders"],
+      "require_discovery": true,
+      "require_support": true,
+      "negative_control": false
+    },
+    {
+      "id": "behavior_payment_outbox",
+      "family": "behavior",
+      "question": "What does PaymentOutbox do?",
+      "candidate_source": "packages/payments/README.md",
+      "candidate_text": "PaymentOutbox writes pending payment events until confirmation.",
+      "discovery_terms": ["PaymentOutbox", "pending payment events"],
+      "require_discovery": true,
+      "require_support": true,
+      "negative_control": false
+    },
+    {
+      "id": "requirements_validation_contract",
+      "family": "requirements",
+      "question": "What does OrderValidationContract require?",
+      "candidate_source": "packages/orders/README.md",
+      "candidate_text": "OrderValidationContract requires a non-empty customer id, at least one line item, and a positive total.",
+      "discovery_terms": ["OrderValidationContract"],
+      "require_discovery": true,
+      "require_support": true,
+      "negative_control": false
+    },
+    {
+      "id": "requirements_validation_conditions",
+      "family": "requirements",
+      "question": "Which conditions are required by OrderValidationContract?",
+      "candidate_source": "packages/orders/README.md",
+      "candidate_text": "OrderValidationContract requires a non-empty customer id, at least one line item, and a positive total.",
+      "discovery_terms": ["OrderValidationContract", "conditions"],
+      "require_discovery": true,
+      "require_support": false,
+      "negative_control": false
+    },
+    {
+      "id": "policy_retry_count",
+      "family": "policy",
+      "question": "How many retry attempts does ProjectRetryPolicy allow?",
+      "candidate_source": "ARCHITECTURE.md",
+      "candidate_text": "ProjectRetryPolicy allows at most two retry attempts with bounded exponential backoff.",
+      "discovery_terms": ["ProjectRetryPolicy", "retry attempts"],
+      "require_discovery": true,
+      "require_support": false,
+      "negative_control": false
+    },
+    {
+      "id": "policy_retry_backoff",
+      "family": "policy",
+      "question": "What retry backoff does ProjectRetryPolicy require?",
+      "candidate_source": "ARCHITECTURE.md",
+      "candidate_text": "ProjectRetryPolicy allows at most two retry attempts with bounded exponential backoff.",
+      "discovery_terms": ["ProjectRetryPolicy", "backoff"],
+      "require_discovery": true,
+      "require_support": false,
+      "negative_control": false
+    },
+    {
+      "id": "typo_orders_symbol",
+      "family": "typo",
+      "question": "What does OrdersDrafStore do?",
+      "candidate_source": "packages/orders/README.md",
+      "candidate_text": "OrdersDraftStore stores draft orders as JSON records keyed by order id before upload.",
+      "discovery_terms": ["OrdersDraftStore", "draft orders"],
+      "require_discovery": false,
+      "require_support": false,
+      "negative_control": false
+    },
+    {
+      "id": "typo_policy_symbol",
+      "family": "typo",
+      "question": "What is ProjectRetryPolcy?",
+      "candidate_source": "ARCHITECTURE.md",
+      "candidate_text": "ProjectRetryPolicy is the project-wide retry policy.",
+      "discovery_terms": ["ProjectRetryPolicy", "retry policy"],
+      "require_discovery": false,
+      "require_support": false,
+      "negative_control": false
+    },
+    {
+      "id": "alias_order_drafts",
+      "family": "alias",
+      "question": "How are order drafts stored before upload?",
+      "candidate_source": "packages/orders/README.md",
+      "candidate_text": "OrdersDraftStore stores draft orders as JSON records keyed by order id before upload.",
+      "discovery_terms": ["draft orders", "before upload"],
+      "require_discovery": true,
+      "require_support": false,
+      "negative_control": false
+    },
+    {
+      "id": "alias_project_retry_rule",
+      "family": "alias",
+      "question": "What is the project-wide rule for network retries?",
+      "candidate_source": "ARCHITECTURE.md",
+      "candidate_text": "ProjectRetryPolicy governs network submission retries and allows at most two retry attempts with bounded exponential backoff.",
+      "discovery_terms": ["project-wide", "network", "retries"],
+      "require_discovery": true,
+      "require_support": false,
+      "negative_control": false
+    },
+    {
+      "id": "negative_wrong_module_fact",
+      "family": "negative_control",
+      "question": "What does PaymentOutbox do?",
+      "candidate_source": "packages/orders/README.md",
+      "candidate_text": "OrdersDraftStore stores draft orders before upload.",
+      "discovery_terms": ["PaymentOutbox"],
+      "require_discovery": false,
+      "require_support": false,
+      "negative_control": true
+    },
+    {
+      "id": "negative_unrelated_policy",
+      "family": "negative_control",
+      "question": "What is ProjectRetryPolicy?",
+      "candidate_source": "docs/theme.md",
+      "candidate_text": "The user interface uses a dark theme by default.",
+      "discovery_terms": ["ProjectRetryPolicy"],
+      "require_discovery": false,
+      "require_support": false,
+      "negative_control": true
+    }
+  ]
+}
