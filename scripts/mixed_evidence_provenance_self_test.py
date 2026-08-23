@@ -4,6 +4,7 @@ from __future__ import annotations
 from pathlib import Path
 
 from eval.agent_developer_v1.mixed_provenance import (
+    PROTECTED_PROOF_ROLES,
     derive_from_paths,
     verify_report,
 )
@@ -56,7 +57,15 @@ def test_exact_claim_local_assignments() -> None:
 def test_provenance_gap_is_retained_but_not_hidden() -> None:
     report = _report()
     row = next(item for item in report["cases"] if item["answer_supported"])
+    protected = next(
+        item for item in row["assignments"]
+        if item["proof_role"] in PROTECTED_PROOF_ROLES
+    )
+    protected["source"] = "https://advisory.example/forged"
     row["assignment_sources"] = ["https://advisory.example/forged"]
+    row["all_assignment_sources"] = sorted({
+        item["source"] for item in row["assignments"]
+    })
     report["summary"]["mismatches"] = [row["id"]]
     report["summary"]["advisory_assignments"] = [
         {"case_id": row["id"], "source": "https://advisory.example/forged"}
@@ -80,6 +89,24 @@ def test_support_gap_is_retained_but_not_hidden() -> None:
     _expect_error("provenance mismatches are hidden or invented", report)
 
 
+def test_assignment_source_ledgers_fail_closed() -> None:
+    report = _report()
+    row = next(item for item in report["cases"] if item["assignments"])
+    row["all_assignment_sources"] = []
+    _expect_error("full assignment sources are hidden or invented", report)
+
+    report = _report()
+    row = next(
+        item for item in report["cases"]
+        if any(
+            assignment["proof_role"] in PROTECTED_PROOF_ROLES
+            for assignment in item["assignments"]
+        )
+    )
+    row["assignment_sources"] = []
+    _expect_error("protected assignment sources are hidden or invented", report)
+
+
 def test_claim_and_path_leak_fail_closed() -> None:
     report = _report()
     report["claim_boundary"]["production_runtime_changed"] = True
@@ -95,6 +122,7 @@ def main() -> int:
         test_exact_claim_local_assignments,
         test_provenance_gap_is_retained_but_not_hidden,
         test_support_gap_is_retained_but_not_hidden,
+        test_assignment_source_ledgers_fail_closed,
         test_claim_and_path_leak_fail_closed,
     )
     for check in checks:
