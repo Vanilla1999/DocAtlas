@@ -1,0 +1,198 @@
+{
+  "$id": "https://docatlas.local/product-truth/task.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "allowed_paths": {
+      "items": {
+        "minLength": 1,
+        "type": "string"
+      },
+      "minItems": 1,
+      "type": "array",
+      "uniqueItems": true
+    },
+    "budgets": {
+      "additionalProperties": false,
+      "properties": {
+        "hard_enforcement_required": {
+          "const": true
+        },
+        "max_edit_calls": {
+          "minimum": 1,
+          "type": "integer"
+        },
+        "max_input_tokens": {
+          "minimum": 1,
+          "type": "integer"
+        },
+        "max_output_tokens": {
+          "minimum": 1,
+          "type": "integer"
+        },
+        "max_requests": {
+          "minimum": 1,
+          "type": "integer"
+        },
+        "max_test_runs": {
+          "minimum": 1,
+          "type": "integer"
+        },
+        "max_turns": {
+          "minimum": 1,
+          "type": "integer"
+        },
+        "max_wall_seconds": {
+          "minimum": 1,
+          "type": "integer"
+        }
+      },
+      "required": [
+        "max_turns",
+        "max_requests",
+        "max_input_tokens",
+        "max_output_tokens",
+        "max_wall_seconds",
+        "max_edit_calls",
+        "max_test_runs",
+        "hard_enforcement_required"
+      ],
+      "type": "object"
+    },
+    "claim_boundary": {
+      "additionalProperties": false,
+      "properties": {
+        "gold_hidden_from_agent": {
+          "const": true
+        },
+        "oracle_hidden_from_agent": {
+          "const": true
+        },
+        "task_valid_only_after_both_controls": {
+          "const": true
+        }
+      },
+      "required": [
+        "gold_hidden_from_agent",
+        "oracle_hidden_from_agent",
+        "task_valid_only_after_both_controls"
+      ],
+      "type": "object"
+    },
+    "ecosystem": {
+      "maxLength": 40,
+      "minLength": 1,
+      "type": "string"
+    },
+    "fixture_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "forbidden_paths": {
+      "items": {
+        "minLength": 1,
+        "type": "string"
+      },
+      "type": "array",
+      "uniqueItems": true
+    },
+    "gold_patch_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "hidden_tests_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "hidden_validation_ids": {
+      "items": {
+        "minLength": 1,
+        "type": "string"
+      },
+      "minItems": 1,
+      "type": "array",
+      "uniqueItems": true
+    },
+    "issue_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "oracle_evidence_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "protocol_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "public_tests_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "public_validation_commands": {
+      "items": {
+        "minLength": 1,
+        "type": "string"
+      },
+      "minItems": 1,
+      "type": "array",
+      "uniqueItems": true
+    },
+    "repository_id": {
+      "maxLength": 200,
+      "minLength": 1,
+      "type": "string"
+    },
+    "repository_revision": {
+      "pattern": "^[0-9a-f]{40}$",
+      "type": "string"
+    },
+    "schema_version": {
+      "const": 1
+    },
+    "semantic_assertions_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "source_project": {
+      "maxLength": 100,
+      "minLength": 1,
+      "type": "string"
+    },
+    "task_id": {
+      "pattern": "^[a-z0-9][a-z0-9_.-]{2,127}$",
+      "type": "string"
+    },
+    "task_origin": {
+      "enum": [
+        "real_repository",
+        "curated_fixture"
+      ]
+    }
+  },
+  "required": [
+    "schema_version",
+    "protocol_sha256",
+    "task_id",
+    "task_origin",
+    "repository_id",
+    "repository_revision",
+    "source_project",
+    "ecosystem",
+    "issue_sha256",
+    "fixture_sha256",
+    "public_tests_sha256",
+    "hidden_tests_sha256",
+    "semantic_assertions_sha256",
+    "gold_patch_sha256",
+    "oracle_evidence_sha256",
+    "allowed_paths",
+    "forbidden_paths",
+    "public_validation_commands",
+    "hidden_validation_ids",
+    "budgets",
+    "claim_boundary"
+  ],
+  "title": "DocAtlas Product Truth task",
+  "type": "object"
+}

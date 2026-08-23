@@ -1,0 +1,62 @@
+{
+  "$id": "https://docatlas.local/product-truth/ledger.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "events": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "event_sha256": {
+            "pattern": "^[0-9a-f]{64}$",
+            "type": "string"
+          },
+          "index": {
+            "minimum": 0,
+            "type": "integer"
+          },
+          "kind": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "payload": {
+            "type": "object"
+          },
+          "payload_sha256": {
+            "pattern": "^[0-9a-f]{64}$",
+            "type": "string"
+          },
+          "previous_event_sha256": {
+            "pattern": "^[0-9a-f]{64}$",
+            "type": "string"
+          }
+        },
+        "required": [
+          "index",
+          "kind",
+          "previous_event_sha256",
+          "payload",
+          "payload_sha256",
+          "event_sha256"
+        ],
+        "type": "object"
+      },
+      "minItems": 1,
+      "type": "array"
+    },
+    "protocol_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "schema_version": {
+      "const": 1
+    }
+  },
+  "required": [
+    "schema_version",
+    "protocol_sha256",
+    "events"
+  ],
+  "title": "DocAtlas Product Truth append-only ledger",
+  "type": "object"
+}

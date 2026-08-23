@@ -1,0 +1,221 @@
+{
+  "$id": "https://docatlas.local/product-truth/result.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "claim_boundary": {
+      "additionalProperties": false,
+      "properties": {
+        "single_run_product_truth_claim": {
+          "const": false
+        }
+      },
+      "required": [
+        "single_run_product_truth_claim"
+      ],
+      "type": "object"
+    },
+    "condition_id": {
+      "enum": [
+        "A_repo_only",
+        "B_repo_plus_docatlas",
+        "C_repo_plus_external_docs",
+        "D_code_context_plus_docatlas"
+      ]
+    },
+    "correct_patch": {
+      "type": "boolean"
+    },
+    "cost": {
+      "additionalProperties": false,
+      "properties": {
+        "coding_tool_calls": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "edit_test_iterations": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "evidence_tool_calls": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "model_visible_tokens": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "provider_input_tokens": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "provider_output_tokens": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "provider_reasoning_tokens": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "time_to_first_edit_seconds": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "total_attributable_tokens": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "wall_seconds": {
+          "minimum": 0,
+          "type": "number"
+        }
+      },
+      "required": [
+        "model_visible_tokens",
+        "provider_input_tokens",
+        "provider_output_tokens",
+        "provider_reasoning_tokens",
+        "total_attributable_tokens",
+        "evidence_tool_calls",
+        "coding_tool_calls",
+        "wall_seconds",
+        "time_to_first_edit_seconds",
+        "edit_test_iterations"
+      ],
+      "type": "object"
+    },
+    "failure_class": {
+      "enum": [
+        "none",
+        "retrieval_miss",
+        "low_salience",
+        "wrong_source_of_truth",
+        "incorrect_reasoning",
+        "incomplete_propagation",
+        "missing_verification",
+        "task_ambiguity",
+        "budget_exhausted",
+        "infrastructure_incomplete"
+      ]
+    },
+    "gates": {
+      "additionalProperties": false,
+      "properties": {
+        "allowed_surface_only": {
+          "type": "boolean"
+        },
+        "forbidden_surface_clean": {
+          "type": "boolean"
+        },
+        "hidden_tests_passed": {
+          "type": "boolean"
+        },
+        "patch_applied": {
+          "type": "boolean"
+        },
+        "public_tests_passed": {
+          "type": "boolean"
+        },
+        "semantic_assertions_passed": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "patch_applied",
+        "public_tests_passed",
+        "hidden_tests_passed",
+        "semantic_assertions_passed",
+        "allowed_surface_only",
+        "forbidden_surface_clean"
+      ],
+      "type": "object"
+    },
+    "protocol_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "run_id": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "safety": {
+      "additionalProperties": false,
+      "properties": {
+        "cross_source_attribution_errors": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "forbidden_file_touches": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "forbidden_source_contamination": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "privacy_violations": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "unauthorized_lifecycle_actions": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "unsupported_claims": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "wrong_version_claims": {
+          "minimum": 0,
+          "type": "integer"
+        }
+      },
+      "required": [
+        "unsupported_claims",
+        "wrong_version_claims",
+        "cross_source_attribution_errors",
+        "forbidden_source_contamination",
+        "unauthorized_lifecycle_actions",
+        "forbidden_file_touches",
+        "privacy_violations"
+      ],
+      "type": "object"
+    },
+    "schema_version": {
+      "const": 1
+    },
+    "task_id": {
+      "minLength": 1,
+      "type": "string"
+    }
+  },
+  "required": [
+    "schema_version",
+    "protocol_sha256",
+    "run_id",
+    "task_id",
+    "condition_id",
+    "correct_patch",
+    "gates",
+    "safety",
+    "cost",
+    "failure_class",
+    "claim_boundary"
+  ],
+  "title": "DocAtlas Product Truth scored result",
+  "type": "object"
+}
