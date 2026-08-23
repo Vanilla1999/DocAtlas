@@ -1,0 +1,164 @@
+{
+  "claim_boundary": {
+    "autonomous_agent_truth_proven": false,
+    "p1_work_items_complete": true,
+    "public_release_truth_closed": false,
+    "real_coding_outcome_improvement_proven": false,
+    "stable_claim_allowed": false
+  },
+  "decision": {
+    "accepted_production_changes": [],
+    "deferred_hypothesis": "host_selector_normalization_live_ablation",
+    "next_step": "P2.1 repair Task 23 methodology",
+    "p2_allowed_scope": "methodology, positive controls and real-outcome measurement only; P1 is not positive proof of autonomous agent efficacy",
+    "public_api_freeze": true
+  },
+  "execution_status": "CLOSED",
+  "outcome": "AUTONOMOUS_AGENT_TRUTH_NOT_PROVEN",
+  "p1_1_installed_evidence_identities": [
+    {
+      "git_blob_sha1": "dea05bbb60872e736a4a25481ff4651f834a9e2d",
+      "path": ".github/workflows/installed-mcp-agent-benchmark.yml"
+    },
+    {
+      "git_blob_sha1": "2d0a4f88b103010d72d3899b62f32c4c34178b98",
+      "path": "eval/agent_developer_v1/installed_mcp_benchmark.py"
+    },
+    {
+      "git_blob_sha1": "1270547fbfb50d57d4f36aa36024634d7051a9f8",
+      "path": "eval/agent_developer_v1/installed_mcp_contract.py"
+    },
+    {
+      "git_blob_sha1": "ff2c2b7211db16f7cebaa579c091f3bb5ccbe5fb",
+      "path": "eval/agent_developer_v1/installed_mcp_report.py"
+    },
+    {
+      "git_blob_sha1": "dee0443e2e26f071d893b4518a68dcaa65cad6f7",
+      "path": "scripts/installed_mcp_contract_self_test.py"
+    },
+    {
+      "git_blob_sha1": "3a6bdee265e2bf00b7a16d4fcf6a445e81fb214b",
+      "path": "scripts/run_installed_mcp_agent_benchmark.py"
+    },
+    {
+      "git_blob_sha1": "3ea61d05bd229f9600a9f7eda89479416bbc8c81",
+      "path": "scripts/verify_installed_mcp_agent_report.py"
+    }
+  ],
+  "phase": "P1_AGENT_TRUTH",
+  "product_maturity": "Beta",
+  "protocol": "p1-agent-truth-closure-v1",
+  "schema_version": 1,
+  "scorecard": [
+    {
+      "decision": "The installed wheel/CLI/MCP stdio, schema-repair, attribution and privacy measurement boundary is proven. No committed complete fresh same-model autonomous 11-task result is present.",
+      "evidence_status": "green_transport_autonomy_unproven",
+      "execution_status": "closed",
+      "facts": {
+        "complete_fresh_autonomous_run": false,
+        "installed_transport_contract_green": true,
+        "installed_transport_file_count": 7,
+        "reviewer_replay_11_of_11_committed": false
+      },
+      "id": "P1.1",
+      "title": "Installed-MCP live benchmark harness"
+    },
+    {
+      "decision": "Three first-divergence classes are frozen; API changes remain gated by ablation evidence.",
+      "evidence_status": "green_historical_diagnosis",
+      "execution_status": "closed",
+      "facts": {
+        "failure_class_counts": {
+          "question_specificity_mismatch": 2,
+          "required_scope_sequence_mismatch": 1,
+          "selector_cardinality_invalid": 8
+        },
+        "false_supported": 0,
+        "forbidden_source_contamination": 0,
+        "task_count": 11
+      },
+      "id": "P1.2",
+      "title": "0/11 first-divergence atlas"
+    },
+    {
+      "decision": "working_path duplication and continuation token are rejected; host normalization remains only a future live ablation.",
+      "evidence_status": "green_decision_no_runtime_change",
+      "execution_status": "closed",
+      "facts": {
+        "accepted_for_next_live_ablation": [
+          "host_selector_normalization"
+        ],
+        "accepted_public_contract_changes": [],
+        "public_agent_contract_v2": "no_change"
+      },
+      "id": "P1.3",
+      "title": "Agent Contract v2 ablation"
+    },
+    {
+      "decision": "Candidate discovery is measured separately from support; core_exact_proofability=accepted; negative false support remains zero.",
+      "evidence_status": "provider_free_measured_accepted",
+      "execution_status": "closed",
+      "facts": {
+        "answer_supported": 6,
+        "candidate_discovered": 10,
+        "case_count": 14,
+        "false_supported_negative_controls": 0,
+        "negative_control_count": 2,
+        "required_discovery": 10,
+        "required_discovery_passed": 10,
+        "required_support": 5,
+        "required_support_passed": 5
+      },
+      "id": "P1.4",
+      "title": "Paraphrase/proofability robustness"
+    },
+    {
+      "decision": "Protected claims retain allowed-role provenance; auxiliary generic assignments remain separately audited.",
+      "evidence_status": "provider_free_measured_accepted",
+      "execution_status": "closed",
+      "facts": {
+        "advisory_assignments": [],
+        "case_count": 7,
+        "matched_cases": 7,
+        "mismatches": []
+      },
+      "id": "P1.5",
+      "title": "Mixed-evidence provenance"
+    },
+    {
+      "decision": "Hostile document content cannot control tools, lifecycle, authority, credentials or support state.",
+      "evidence_status": "green_provider_free_and_production_gates",
+      "execution_status": "closed",
+      "facts": {
+        "case_count": 6,
+        "content_control_failures": [],
+        "matched_cases": 6,
+        "mismatches": []
+      },
+      "id": "P1.6",
+      "title": "Evidence-is-data adversarial boundary"
+    }
+  ],
+  "source_identities": {
+    "p1_2": {
+      "git_blob_sha1": "68ce0ec3fd9c7419ab658341e7a721d8df6749d1",
+      "path": "eval/agent_developer_v1/results/first-divergence-atlas.json"
+    },
+    "p1_3": {
+      "git_blob_sha1": "be84870597764ac48a6bfc90c19ff4e26e20942c",
+      "path": "eval/agent_developer_v1/results/contract-v2-ablation.json"
+    },
+    "p1_4": {
+      "git_blob_sha1": "fe80c34f70adf8f2c22795349f006a909cd120c0",
+      "path": "eval/agent_developer_v1/results/paraphrase-proofability.json"
+    },
+    "p1_5": {
+      "git_blob_sha1": "50b56f15f719149b26b8eba534495ccdbdc3a02f",
+      "path": "eval/agent_developer_v1/results/mixed-evidence-provenance.json"
+    },
+    "p1_6": {
+      "git_blob_sha1": "a9cec8c7042e678aced742ec5a635b695e92846a",
+      "path": "eval/agent_developer_v1/results/evidence-is-data.json"
+    }
+  }
+}
