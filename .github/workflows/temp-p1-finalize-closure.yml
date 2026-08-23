@@ -1,16 +1,16 @@
 name: TEMP finalize complete P1 closure
 
 on:
-  pull_request:
-    branches: [main]
-    types: [opened, synchronize, reopened, edited]
+  push:
+    branches: [p1/p1-agent-truth-closure-clean]
+    paths:
+      - .github/workflows/temp-p1-finalize-closure.yml
 
 permissions:
   contents: write
-  pull-requests: read
 
 concurrency:
-  group: temp-finalize-p1-closure
+  group: temp-finalize-p1-closure-clean
   cancel-in-progress: false
 
 env:
@@ -19,13 +19,12 @@ env:
 
 jobs:
   finalize:
-    if: github.event.pull_request.head.ref == 'p1/p1-agent-truth-closure'
     runs-on: ubuntu-latest
     timeout-minutes: 60
     steps:
       - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
         with:
-          ref: p1/p1-agent-truth-closure
+          ref: p1/p1-agent-truth-closure-clean
           fetch-depth: 0
       - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
         with:
@@ -96,7 +95,7 @@ or Product Truth claim. See
           python scripts/run_agent_developer_adversarial_gate.py
           python scripts/run_agent_developer_adversarial_mutation_gate.py
           python -m compileall -q eval/agent_developer_v1 scripts
-          find .github/workflows -maxdepth 1 -type f -name 'temp-p1*.yml' -delete
+          rm .github/workflows/temp-p1-finalize-closure.yml
           git diff --check
       - name: Commit a carrier-free closure branch
         run: |
@@ -105,6 +104,7 @@ or Product Truth claim. See
           python - <<'PY'
           import subprocess
           allowed = {
+              ".github/workflows/temp-p1-finalize-closure.yml",
               "eval/agent_developer_v1/results/first-divergence-atlas.json",
               "docs/analysis/p1.2-agent-developer-first-divergence.md",
               "eval/agent_developer_v1/results/contract-v2-ablation.json",
@@ -118,15 +118,9 @@ or Product Truth claim. See
           changed = subprocess.check_output(
               ["git", "diff", "--cached", "--name-only"], text=True
           ).splitlines()
-          bad = [
-              path for path in changed
-              if path not in allowed
-              and not path.startswith(".github/workflows/temp-p1")
-          ]
+          bad = [path for path in changed if path not in allowed]
           if bad:
               raise SystemExit(f"unexpected P1 closure paths: {bad}")
           PY
-          if ! git diff --cached --quiet; then
-            git commit -m "docs(p1): close the Agent Truth worklist without overclaim"
-          fi
-          git push origin HEAD:p1/p1-agent-truth-closure
+          git commit -m "docs(p1): close the Agent Truth worklist without overclaim"
+          git push origin HEAD:p1/p1-agent-truth-closure-clean
