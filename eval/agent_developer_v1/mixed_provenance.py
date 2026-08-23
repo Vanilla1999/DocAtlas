@@ -235,10 +235,6 @@ def verify_report(report: dict[str, Any]) -> None:
     for row in cases:
         if not isinstance(row, dict):
             raise ValueError("P1.5 case row must be an object")
-        if row.get("answer_supported") != row.get("expected_supported"):
-            raise ValueError(f"P1.5 support mismatch for {row.get('id')}")
-        if row.get("assignment_sources") != row.get("expected_assignment_sources"):
-            raise ValueError(f"P1.5 assignment-source mismatch for {row.get('id')}")
         if not str(row.get("requirements_hash") or ""):
             raise ValueError("P1.5 case omitted requirements identity")
         if not str(row.get("assignment_hash") or ""):
@@ -246,10 +242,26 @@ def verify_report(report: dict[str, Any]) -> None:
         if not str(row.get("decision_hash") or ""):
             raise ValueError("P1.5 case omitted decision identity")
     summary = report.get("summary")
-    if not isinstance(summary, dict) or summary.get("mismatches") != []:
-        raise ValueError("P1.5 hides a support or assignment mismatch")
-    if summary.get("advisory_assignments") != []:
-        raise ValueError("P1.5 assigned an advisory source to a protected claim")
+    if not isinstance(summary, dict):
+        raise ValueError("P1.5 report omitted summary")
+    expected_mismatches = [
+        row["id"] for row in cases
+        if (
+            row.get("answer_supported") != row.get("expected_supported")
+            or row.get("assignment_sources")
+            != row.get("expected_assignment_sources")
+        )
+    ]
+    expected_advisory = [
+        {"case_id": row["id"], "source": source}
+        for row in cases
+        for source in row.get("assignment_sources") or ()
+        if "advisory.example" in source or "blog.example" in source
+    ]
+    if summary.get("mismatches") != expected_mismatches:
+        raise ValueError("P1.5 provenance mismatches are hidden or invented")
+    if summary.get("advisory_assignments") != expected_advisory:
+        raise ValueError("P1.5 advisory assignments are hidden or invented")
     boundary = report.get("claim_boundary")
     if not isinstance(boundary, dict) or any(
         boundary.get(key) is not False
@@ -259,8 +271,13 @@ def verify_report(report: dict[str, Any]) -> None:
     decision = report.get("decision")
     if not isinstance(decision, dict):
         raise ValueError("P1.5 report omitted decision")
-    if decision.get("claim_local_provenance") != "accepted":
-        raise ValueError("P1.5 claim-local provenance is not accepted")
+    expected_decision = (
+        "accepted"
+        if not expected_mismatches and not expected_advisory
+        else "rejected"
+    )
+    if decision.get("claim_local_provenance") != expected_decision:
+        raise ValueError("P1.5 decision does not match measured provenance")
     if decision.get("accepted_production_changes") != []:
         raise ValueError("P1.5 accepted an unreviewed production change")
     if ABSOLUTE_PATH_RE.search(canonical_json(report)):

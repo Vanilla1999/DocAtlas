@@ -55,18 +55,31 @@ def test_exact_claim_local_assignments() -> None:
     assert report["decision"]["claim_local_provenance"] == "accepted"
 
 
-def test_wrong_assignment_source_fails_closed() -> None:
+def test_provenance_gap_is_retained_but_not_hidden() -> None:
     report = _report()
     row = next(item for item in report["cases"] if item["answer_supported"])
     row["assignment_sources"] = ["https://advisory.example/forged"]
-    _expect_error("assignment-source mismatch", report)
+    report["summary"]["mismatches"] = [row["id"]]
+    report["summary"]["advisory_assignments"] = [
+        {"case_id": row["id"], "source": "https://advisory.example/forged"}
+    ]
+    report["decision"]["claim_local_provenance"] = "rejected"
+    verify_report(report)
+
+    report["summary"]["mismatches"] = []
+    _expect_error("provenance mismatches are hidden or invented", report)
 
 
-def test_false_support_fails_closed() -> None:
+def test_support_gap_is_retained_but_not_hidden() -> None:
     report = _report()
     row = next(item for item in report["cases"] if not item["expected_supported"])
     row["answer_supported"] = True
-    _expect_error("support mismatch", report)
+    report["summary"]["mismatches"] = [row["id"]]
+    report["decision"]["claim_local_provenance"] = "rejected"
+    verify_report(report)
+
+    report["summary"]["mismatches"] = []
+    _expect_error("provenance mismatches are hidden or invented", report)
 
 
 def test_claim_and_path_leak_fail_closed() -> None:
@@ -82,8 +95,8 @@ def test_claim_and_path_leak_fail_closed() -> None:
 def main() -> int:
     checks = (
         test_exact_claim_local_assignments,
-        test_wrong_assignment_source_fails_closed,
-        test_false_support_fails_closed,
+        test_provenance_gap_is_retained_but_not_hidden,
+        test_support_gap_is_retained_but_not_hidden,
         test_claim_and_path_leak_fail_closed,
     )
     for check in checks:
