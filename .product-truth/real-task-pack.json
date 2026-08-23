@@ -1,0 +1,74 @@
+{
+  "schema_version": 1,
+  "protocol": "docatlas-source-real-task-pack-v1",
+  "repository": "Vanilla1999/DocAtlas",
+  "frozen_inventory_head": "95b42167693547f515f096df27c1af91592badaa",
+  "working_directory": ".",
+  "pythonpath": [],
+  "tasks": [
+    {
+      "id": "docatlas-real-001",
+      "fix_commit": "059e7668f03f3e9e2030e14c6c467e1bd5272fc0",
+      "issue_text": "Orphan extraction cleanup is treating unrelated lone .json/.md files and symlink-shaped artifacts as generated pairs. Make orphan detection conservative so only complete unreferenced extraction artifact pairs are eligible.",
+      "hidden_test_path": "tests/test_parent_child_index.py",
+      "public_nodeid": "tests/test_parent_child_index.py::test_orphaned_extraction_artifacts_are_reported_without_mutation",
+      "hidden_nodeid": "tests/test_parent_child_index.py::test_orphaned_extraction_artifacts_are_reported_without_mutation"
+    },
+    {
+      "id": "docatlas-real-002",
+      "fix_commit": "e7e905095b436e028b42a93538fa6a3467d4a63a",
+      "issue_text": "Bulk source cleanup can unlink a persisted artifact path even when that path points outside the extraction directory. Contain deletion so repository/source cleanup cannot remove an unrelated external file.",
+      "hidden_test_path": "tests/test_parent_child_index.py",
+      "public_nodeid": "tests/test_parent_child_index.py::test_delete_source_prunes_parent_rows_and_allows_same_source_reingest",
+      "hidden_nodeid": "tests/test_parent_child_index.py::test_bulk_delete_does_not_unlink_persisted_artifact_outside_extracted_dir"
+    },
+    {
+      "id": "docatlas-real-003",
+      "fix_commit": "eba658c2b8994eca04b2fac3b7bad72072fa3b50",
+      "issue_text": "Project documentation analysis is misclassifying syntactically valid Python declarations/imports containing words such as required or forbidden as normative prose. Preserve prose detection without turning Python declarations into policy facts.",
+      "hidden_test_path": "tests/docs/test_normative_language.py",
+      "public_nodeid": "tests/docs/test_normative_language.py::test_normative_modality_is_deterministic_and_preserves_legacy_cases",
+      "hidden_nodeid": "tests/docs/test_normative_language.py::test_parenthesized_import_lines_are_one_python_declaration"
+    },
+    {
+      "id": "docatlas-real-004",
+      "fix_commit": "b61a16258ab720ec96ef7e9b7071a28c1ed97d90",
+      "issue_text": "The public remove-library-docs operation can be invoked without proving a project-owned storage topology. Make destructive removal require an explicit project scope and fail closed for configless or non-owned storage.",
+      "hidden_test_path": "tests/docs/test_mcp_docs_tools_registration.py",
+      "public_nodeid": "tests/docs/test_mcp_docs_tools_registration.py::test_mcp_public_prepare_docs_advertises_project_local_library_removal",
+      "hidden_nodeid": "tests/docs/test_mcp_docs_tools_registration.py::test_mcp_public_prepare_docs_schema_requires_removal_scope_and_target"
+    },
+    {
+      "id": "docatlas-real-005",
+      "fix_commit": "daa15c755ed14f081f1a7f3f1ed8070d7d18dbc0",
+      "issue_text": "Cancelling a documentation job is not routed through the selected project's local storage topology. Make project-scoped cancellation find and mutate the job in the project-owned job store rather than the fallback store.",
+      "hidden_test_path": "tests/test_docs_service.py",
+      "public_nodeid": "tests/test_docs_service.py::test_mcp_docs_status_uses_project_local_storage_topology",
+      "hidden_nodeid": "tests/test_docs_service.py::test_prepare_docs_cancels_project_local_job_using_project_topology"
+    },
+    {
+      "id": "docatlas-real-006",
+      "fix_commit": "51312dd9fb1dfc5743e77c60d552f1cebb4f45f6",
+      "issue_text": "Durable failure diagnostics can persist a sensitive value embedded in a syntactically valid exception class name. Ensure exception type identity is safe for durable/public diagnostics instead of trusting identifier-shaped type names.",
+      "hidden_test_path": "tests/test_docs_service.py",
+      "public_nodeid": "tests/test_docs_service.py::test_vector_sync_failure_keeps_fts_index_and_returns_partial",
+      "hidden_nodeid": "tests/test_docs_service.py::test_vector_sync_failure_redacts_valid_identifier_secret_from_durable_status"
+    },
+    {
+      "id": "docatlas-real-007",
+      "fix_commit": "0018344a667843577c3d5aaaaad23a434d262d49",
+      "issue_text": "When vector indexing fails, the durable job result loses the failure operation/type/message/traceback needed for safe diagnosis. Preserve bounded redacted failure evidence while retaining the previous searchable corpus.",
+      "hidden_test_path": "tests/test_docs_service.py",
+      "public_nodeid": "tests/test_docs_service.py::test_vector_sync_failure_keeps_fts_index_and_returns_partial",
+      "hidden_nodeid": "tests/test_docs_service.py::test_vector_sync_failure_keeps_fts_index_and_returns_partial"
+    },
+    {
+      "id": "docatlas-real-008",
+      "fix_commit": "b576307857e264175341e76b3316ddc58d7282fe",
+      "issue_text": "Project source-boundary matching mishandles anchored gitignore patterns/negations and an invalid project manifest can silently fall back to a permissive boundary. Match anchored paths correctly and fail closed when project boundary configuration is invalid.",
+      "hidden_test_path": "tests/docs/test_source_map.py",
+      "public_nodeid": "tests/docs/test_source_map.py::test_source_boundary_applies_excludes_and_gitignore",
+      "hidden_nodeid": "tests/docs/test_source_map.py::test_source_boundary_gitignore_anchored_negation_only_reincludes_root_path"
+    }
+  ]
+}
