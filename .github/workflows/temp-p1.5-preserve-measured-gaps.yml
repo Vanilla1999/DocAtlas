@@ -1,0 +1,150 @@
+name: TEMP preserve measured P1.5 provenance gaps
+
+on:
+  push:
+    branches: [p1/p1.5-mixed-evidence-provenance]
+    paths:
+      - .github/workflows/temp-p1.5-preserve-measured-gaps.yml
+
+permissions:
+  contents: write
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with:
+          ref: p1/p1.5-mixed-evidence-provenance
+          fetch-depth: 0
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: "3.12"
+      - name: Treat provenance gaps as measured outcomes
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          from pathlib import Path
+
+          source = Path("eval/agent_developer_v1/mixed_provenance.py")
+          text = source.read_text(encoding="utf-8")
+          hard = '''        if row.get("answer_supported") != row.get("expected_supported"):
+                      raise ValueError(f"P1.5 support mismatch for {row.get('id')}")
+                  if row.get("assignment_sources") != row.get("expected_assignment_sources"):
+                      raise ValueError(f"P1.5 assignment-source mismatch for {row.get('id')}")
+          '''
+          text = text.replace(hard, "", 1)
+          old_summary = '''    summary = report.get("summary")
+              if not isinstance(summary, dict) or summary.get("mismatches") != []:
+                  raise ValueError("P1.5 hides a support or assignment mismatch")
+              if summary.get("advisory_assignments") != []:
+                  raise ValueError("P1.5 assigned an advisory source to a protected claim")
+          '''
+          new_summary = '''    summary = report.get("summary")
+              if not isinstance(summary, dict):
+                  raise ValueError("P1.5 report omitted summary")
+              expected_mismatches = [
+                  row["id"] for row in cases
+                  if (
+                      row.get("answer_supported") != row.get("expected_supported")
+                      or row.get("assignment_sources")
+                      != row.get("expected_assignment_sources")
+                  )
+              ]
+              expected_advisory = [
+                  {"case_id": row["id"], "source": source}
+                  for row in cases
+                  for source in row.get("assignment_sources") or ()
+                  if "advisory.example" in source or "blog.example" in source
+              ]
+              if summary.get("mismatches") != expected_mismatches:
+                  raise ValueError("P1.5 provenance mismatches are hidden or invented")
+              if summary.get("advisory_assignments") != expected_advisory:
+                  raise ValueError("P1.5 advisory assignments are hidden or invented")
+          '''
+          if old_summary in text:
+              text = text.replace(old_summary, new_summary, 1)
+          elif "P1.5 provenance mismatches are hidden or invented" not in text:
+              raise SystemExit("P1.5 summary verification anchor missing")
+          old_decision = '''    if decision.get("claim_local_provenance") != "accepted":
+                  raise ValueError("P1.5 claim-local provenance is not accepted")
+          '''
+          new_decision = '''    expected_decision = (
+                  "accepted"
+                  if not expected_mismatches and not expected_advisory
+                  else "rejected"
+              )
+              if decision.get("claim_local_provenance") != expected_decision:
+                  raise ValueError("P1.5 decision does not match measured provenance")
+          '''
+          if old_decision in text:
+              text = text.replace(old_decision, new_decision, 1)
+          elif "P1.5 decision does not match measured provenance" not in text:
+              raise SystemExit("P1.5 decision verification anchor missing")
+          source.write_text(text, encoding="utf-8")
+
+          test = Path("scripts/mixed_evidence_provenance_self_test.py")
+          test_text = test.read_text(encoding="utf-8")
+          start = test_text.find("def test_wrong_assignment_source_fails_closed() -> None:")
+          end = test_text.find("\n\ndef test_false_support_fails_closed", start)
+          if start < 0 or end < 0:
+              raise SystemExit("P1.5 measured-gap self-test anchors missing")
+          replacement = '''def test_provenance_gap_is_retained_but_not_hidden() -> None:
+              report = _report()
+              row = next(item for item in report["cases"] if item["answer_supported"])
+              row["assignment_sources"] = ["https://advisory.example/forged"]
+              report["summary"]["mismatches"] = [row["id"]]
+              report["summary"]["advisory_assignments"] = [
+                  {"case_id": row["id"], "source": "https://advisory.example/forged"}
+              ]
+              report["decision"]["claim_local_provenance"] = "rejected"
+              verify_report(report)
+
+              report["summary"]["mismatches"] = []
+              _expect_error("provenance mismatches are hidden or invented", report)
+          '''
+          test_text = test_text[:start] + replacement + test_text[end:]
+          test_text = test_text.replace(
+              "test_wrong_assignment_source_fails_closed,",
+              "test_provenance_gap_is_retained_but_not_hidden,",
+          )
+          # A support mismatch is also evidence; the report must list it.
+          start = test_text.find("def test_false_support_fails_closed() -> None:")
+          end = test_text.find("\n\ndef test_claim_and_path_leak_fail_closed", start)
+          if start < 0 or end < 0:
+              raise SystemExit("P1.5 support-gap self-test anchors missing")
+          replacement = '''def test_support_gap_is_retained_but_not_hidden() -> None:
+              report = _report()
+              row = next(item for item in report["cases"] if not item["expected_supported"])
+              row["answer_supported"] = True
+              report["summary"]["mismatches"] = [row["id"]]
+              report["decision"]["claim_local_provenance"] = "rejected"
+              verify_report(report)
+
+              report["summary"]["mismatches"] = []
+              _expect_error("provenance mismatches are hidden or invented", report)
+          '''
+          test_text = test_text[:start] + replacement + test_text[end:]
+          test_text = test_text.replace(
+              "test_false_support_fails_closed,",
+              "test_support_gap_is_retained_but_not_hidden,",
+          )
+          test.write_text(test_text, encoding="utf-8")
+          PY
+          rm .github/workflows/temp-p1.5-preserve-measured-gaps.yml
+          python -m compileall -q \
+            eval/agent_developer_v1/mixed_provenance.py \
+            scripts/mixed_evidence_provenance_self_test.py
+          git diff --check
+      - name: Commit ordinary evidence code only
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "fix(p1): retain measured provenance gaps without hiding them"
+          git push origin HEAD:p1/p1.5-mixed-evidence-provenance
