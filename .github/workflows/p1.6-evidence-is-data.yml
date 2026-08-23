@@ -1,0 +1,40 @@
+name: P1.6 evidence is data
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
+  DOCMANCER_OFFLINE: "1"
+
+jobs:
+  p1-6-adversarial:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: "3.12"
+      - name: Install DocAtlas evaluator dependencies
+        run: python -m pip install -e ".[dev]"
+      - name: Verify hostile documents cannot control the agent boundary
+        run: |
+          python scripts/run_evidence_is_data_gate.py
+          python scripts/evidence_is_data_self_test.py
+          python scripts/run_agent_developer_adversarial_gate.py
+          python scripts/run_agent_developer_adversarial_mutation_gate.py
+          python -m compileall -q \
+            eval/agent_developer_v1/evidence_is_data.py \
+            scripts/run_evidence_is_data_gate.py \
+            scripts/evidence_is_data_self_test.py
+          git diff --check
