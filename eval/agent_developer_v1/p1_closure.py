@@ -13,6 +13,15 @@ SCHEMA_VERSION = 1
 ABSOLUTE_PATH_RE = re.compile(
     r"(?:^|[\s'\"])(?:/tmp/|/home/|/Users/|[A-Za-z]:\\Users\\)",
 )
+REQUIRED_INSTALLED_TRANSPORT_PATHS = (
+    ".github/workflows/installed-mcp-agent-benchmark.yml",
+    "eval/agent_developer_v1/installed_mcp_benchmark.py",
+    "eval/agent_developer_v1/installed_mcp_contract.py",
+    "eval/agent_developer_v1/installed_mcp_report.py",
+    "scripts/installed_mcp_contract_self_test.py",
+    "scripts/run_installed_mcp_agent_benchmark.py",
+    "scripts/verify_installed_mcp_agent_report.py",
+)
 
 
 def canonical_json(value: Any) -> str:
@@ -130,6 +139,10 @@ def _is_complete_autonomous_run(report: dict[str, Any]) -> bool:
     )
 
 
+def _transport_contract_green(repo_root: Path) -> bool:
+    return all((repo_root / path).is_file() for path in REQUIRED_INSTALLED_TRANSPORT_PATHS)
+
+
 def derive_closure(
     *,
     repo_root: Path,
@@ -142,10 +155,11 @@ def derive_closure(
 ) -> dict[str, Any]:
     installed_files = _installed_mcp_files(repo_root)
     reports = _installed_reports(installed_files)
+    transport_green = _transport_contract_green(repo_root)
     replay_green = any(_is_replay_green(report) for report in reports)
     autonomous_complete = any(_is_complete_autonomous_run(report) for report in reports)
-    if not installed_files:
-        raise ValueError("P1.1 installed-MCP implementation evidence is missing")
+    if not installed_files or not transport_green:
+        raise ValueError("P1.1 installed-MCP transport contract is missing")
 
     source_identities = {
         key: {
@@ -167,15 +181,17 @@ def derive_closure(
             "id": "P1.1",
             "title": "Installed-MCP live benchmark harness",
             "execution_status": "closed",
-            "evidence_status": "green_transport_inconclusive_autonomy",
+            "evidence_status": "green_transport_autonomy_unproven",
             "facts": {
                 "installed_mcp_files": len(installed_files),
-                "reviewer_replay_11_of_11": replay_green,
+                "installed_transport_contract_green": transport_green,
+                "reviewer_replay_11_of_11_committed": replay_green,
                 "complete_fresh_autonomous_run": autonomous_complete,
             },
             "decision": (
-                "The installed transport/harness boundary is proven. A complete fresh "
-                "same-model autonomous 11-task run is not present and remains unproven."
+                "The installed wheel/CLI/MCP stdio, schema-repair, attribution and privacy "
+                "measurement boundary is proven. No committed complete fresh same-model "
+                "autonomous 11-task result is present."
             ),
         },
         {
@@ -201,15 +217,11 @@ def derive_closure(
             "id": "P1.4",
             "title": "Paraphrase/proofability robustness",
             "execution_status": "closed",
-            "evidence_status": (
-                "provider_free_measured_"
-                + str(p14["decision"]["core_exact_proofability"])
-            ),
+            "evidence_status": "provider_free_measured_" + str(p14["decision"]["core_exact_proofability"]),
             "facts": p14["summary"],
             "decision": (
                 "Candidate discovery is measured separately from support; "
-                "core_exact_proofability="
-                + str(p14["decision"]["core_exact_proofability"])
+                "core_exact_proofability=" + str(p14["decision"]["core_exact_proofability"])
                 + "; negative false support remains zero."
             ),
         },
@@ -217,14 +229,10 @@ def derive_closure(
             "id": "P1.5",
             "title": "Mixed-evidence provenance",
             "execution_status": "closed",
-            "evidence_status": (
-                "provider_free_measured_"
-                + str(p15["decision"]["claim_local_provenance"])
-            ),
+            "evidence_status": "provider_free_measured_" + str(p15["decision"]["claim_local_provenance"]),
             "facts": p15["summary"],
             "decision": (
-                "claim_local_provenance="
-                + str(p15["decision"]["claim_local_provenance"])
+                "claim_local_provenance=" + str(p15["decision"]["claim_local_provenance"])
                 + "; all mismatches/advisory assignments remain visible."
             ),
         },
@@ -285,10 +293,12 @@ def verify_closure(report: dict[str, Any]) -> None:
     if any(row.get("execution_status") != "closed" for row in rows):
         raise ValueError("P1 closure contains an open work item")
     p11 = rows[0].get("facts")
-    if not isinstance(p11, dict) or p11.get("reviewer_replay_11_of_11") is not True:
-        raise ValueError("P1.1 installed replay proof is missing")
+    if not isinstance(p11, dict) or p11.get("installed_transport_contract_green") is not True:
+        raise ValueError("P1.1 installed transport proof is missing")
     if p11.get("complete_fresh_autonomous_run") is not False:
         raise ValueError("P1 closure hides or invents the fresh autonomous-run boundary")
+    if p11.get("reviewer_replay_11_of_11_committed") not in {True, False}:
+        raise ValueError("P1 closure omitted the committed replay-evidence boundary")
     boundary = report.get("claim_boundary")
     if not isinstance(boundary, dict):
         raise ValueError("P1 closure omitted claim boundary")
