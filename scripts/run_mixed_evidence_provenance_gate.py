@@ -43,6 +43,12 @@ def main(argv: list[str] | None = None) -> int:
         model_path=_production_evidence_model_path(),
     )
     verify_report(derived)
+    if derived["decision"]["claim_local_provenance"] != "accepted":
+        raise SystemExit(
+            "P1.5 claim-local provenance is not accepted: "
+            f"mismatches={derived['summary']['mismatches']!r}; "
+            f"advisory_assignments={derived['summary']['advisory_assignments']!r}"
+        )
     if args.write:
         args.output.parent.mkdir(parents=True, exist_ok=True)
         args.output.write_text(
