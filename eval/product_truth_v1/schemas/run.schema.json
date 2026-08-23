@@ -1,0 +1,158 @@
+{
+  "$id": "https://docatlas.local/product-truth/run.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "artifact_digests": {
+      "additionalProperties": false,
+      "properties": {
+        "patch_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "scoring_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "trajectory_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        }
+      },
+      "required": [
+        "patch_sha256",
+        "trajectory_sha256",
+        "scoring_sha256"
+      ],
+      "type": "object"
+    },
+    "budget_enforcement": {
+      "additionalProperties": false,
+      "properties": {
+        "edit_calls_hard": {"const": true},
+        "input_tokens_hard": {"const": true},
+        "observed_edit_calls": {"minimum": 0, "type": "integer"},
+        "observed_input_tokens": {"minimum": 0, "type": "integer"},
+        "observed_output_tokens": {"minimum": 0, "type": "integer"},
+        "observed_requests": {"minimum": 0, "type": "integer"},
+        "observed_test_runs": {"minimum": 0, "type": "integer"},
+        "observed_turns": {"minimum": 0, "type": "integer"},
+        "observed_wall_seconds": {"minimum": 0, "type": "number"},
+        "output_tokens_hard": {"const": true},
+        "requests_hard": {"const": true},
+        "test_runs_hard": {"const": true},
+        "turns_hard": {"const": true},
+        "wall_time_hard": {"const": true}
+      },
+      "required": [
+        "turns_hard",
+        "requests_hard",
+        "input_tokens_hard",
+        "output_tokens_hard",
+        "wall_time_hard",
+        "edit_calls_hard",
+        "test_runs_hard",
+        "observed_turns",
+        "observed_requests",
+        "observed_input_tokens",
+        "observed_output_tokens",
+        "observed_wall_seconds",
+        "observed_edit_calls",
+        "observed_test_runs"
+      ],
+      "type": "object"
+    },
+    "budgets": {
+      "additionalProperties": false,
+      "properties": {
+        "hard_enforcement_required": {"const": true},
+        "max_edit_calls": {"minimum": 1, "type": "integer"},
+        "max_input_tokens": {"minimum": 1, "type": "integer"},
+        "max_output_tokens": {"minimum": 1, "type": "integer"},
+        "max_requests": {"minimum": 1, "type": "integer"},
+        "max_test_runs": {"minimum": 1, "type": "integer"},
+        "max_turns": {"minimum": 1, "type": "integer"},
+        "max_wall_seconds": {"minimum": 1, "type": "integer"}
+      },
+      "required": [
+        "max_turns",
+        "max_requests",
+        "max_input_tokens",
+        "max_output_tokens",
+        "max_wall_seconds",
+        "max_edit_calls",
+        "max_test_runs",
+        "hard_enforcement_required"
+      ],
+      "type": "object"
+    },
+    "claim_boundary": {
+      "additionalProperties": false,
+      "properties": {
+        "canary_product_claim": {"const": false},
+        "single_run_product_truth_claim": {"const": false}
+      },
+      "required": [
+        "single_run_product_truth_claim",
+        "canary_product_claim"
+      ],
+      "type": "object"
+    },
+    "condition_id": {
+      "enum": [
+        "A_repo_only",
+        "B_repo_plus_docatlas",
+        "C_repo_plus_external_docs",
+        "D_code_context_plus_docatlas"
+      ]
+    },
+    "condition_order_index": {"maximum": 3, "minimum": 0, "type": "integer"},
+    "fixture_sha256": {"pattern": "^[0-9a-f]{64}$", "type": "string"},
+    "model_snapshot": {"minLength": 1, "type": "string"},
+    "protocol_sha256": {"pattern": "^[0-9a-f]{64}$", "type": "string"},
+    "provider_id": {"minLength": 1, "type": "string"},
+    "randomization_block_id": {"minLength": 1, "type": "string"},
+    "repeat": {"maximum": 2, "minimum": 0, "type": "integer"},
+    "repository_id": {"minLength": 1, "type": "string"},
+    "repository_revision": {"pattern": "^[0-9a-f]{40}$", "type": "string"},
+    "request_ids": {
+      "items": {"minLength": 1, "type": "string"},
+      "type": "array",
+      "uniqueItems": true
+    },
+    "run_id": {"pattern": "^[a-z0-9][a-z0-9_.:-]{2,199}$", "type": "string"},
+    "schema_version": {"const": 1},
+    "status": {
+      "enum": [
+        "completed",
+        "model_failure",
+        "infrastructure_incomplete",
+        "invalid_task"
+      ]
+    },
+    "task_id": {"minLength": 1, "type": "string"}
+  },
+  "required": [
+    "schema_version",
+    "protocol_sha256",
+    "run_id",
+    "task_id",
+    "repository_id",
+    "repository_revision",
+    "fixture_sha256",
+    "condition_id",
+    "repeat",
+    "randomization_block_id",
+    "condition_order_index",
+    "provider_id",
+    "model_snapshot",
+    "budgets",
+    "budget_enforcement",
+    "status",
+    "request_ids",
+    "artifact_digests",
+    "claim_boundary"
+  ],
+  "title": "DocAtlas Product Truth run",
+  "type": "object"
+}
