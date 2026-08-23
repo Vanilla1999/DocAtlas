@@ -2,7 +2,7 @@ name: P1 Agent Truth closure
 
 on:
   pull_request:
-    branches: [main, p1/p1.6-evidence-is-data]
+    branches: [main]
   push:
     branches: [main]
 
@@ -29,10 +29,11 @@ jobs:
         run: python -m pip install -e ".[dev]"
       - name: Verify every P1 evidence slice and final claim boundary
         run: |
-          python scripts/run_agent_developer_first_divergence_gate.py
-          python scripts/first_divergence_contract_self_test.py
-          python scripts/run_agent_contract_v2_ablation_gate.py
-          python scripts/agent_contract_v2_ablation_self_test.py
+          python scripts/build_agent_developer_first_divergence.py --check
+          python scripts/build_agent_contract_v2_ablation.py --check
+          pytest -q \
+            tests/test_agent_developer_first_divergence.py \
+            tests/test_agent_developer_contract_v2_ablation.py
           python scripts/run_paraphrase_proofability_gate.py
           python scripts/paraphrase_proofability_self_test.py
           python scripts/run_mixed_evidence_provenance_gate.py
