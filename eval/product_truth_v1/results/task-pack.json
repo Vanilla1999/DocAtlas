@@ -1,0 +1,398 @@
+{
+  "claim_boundary": {
+    "canary_allowed": false,
+    "candidate_count_is_not_valid_task_count": true,
+    "full_pilot_allowed": false,
+    "missing_oracle_control_cannot_be_imputed": true,
+    "product_maturity": "Beta",
+    "product_truth_proven": false
+  },
+  "decision": {
+    "blocking_reasons": [
+      "structural_capacity_below_preregistered_minimum"
+    ],
+    "next_step": "P2.2A comparative harness; execution remains fail-closed when task_pack_ready=false",
+    "outcome": "task_pack_not_ready",
+    "p2_1c_execution": "complete"
+  },
+  "protocol": "product-truth-task-pack-v1",
+  "protocol_sha256": "78521ab7dfae4f51cc55d4225054a1b38375a80be1d76d894ba74d9c851cc367",
+  "requirements": {
+    "minimum_repositories": 3,
+    "minimum_tasks_per_repository": 8,
+    "minimum_valid_tasks": 24
+  },
+  "schema_version": 1,
+  "summary": {
+    "all_tasks_by_project": {
+      "docmancer": 1,
+      "fixture://fastapi_depends_001": 1,
+      "fixture://mixed_fastapi_project_001": 1,
+      "help_chat": 1,
+      "nbo": 10,
+      "viscanner": 1
+    },
+    "materialized_fixture_tasks": 15,
+    "real_model_oracle_tasks": 0,
+    "structural_capacity_met": false,
+    "structural_tasks_by_project": {
+      "docmancer": 1,
+      "fixture://fastapi_depends_001": 1,
+      "fixture://mixed_fastapi_project_001": 1,
+      "nbo": 9
+    },
+    "structurally_complete_tasks": 12,
+    "task_pack_ready": false,
+    "task_specs_total": 21,
+    "two_clean_gold_tasks": 3,
+    "valid_tasks": 0,
+    "valid_tasks_by_project": {}
+  },
+  "tasks": [
+    {
+      "assets": {
+        "gold_patch": true,
+        "hidden_tests": true,
+        "materialized_fixture": true,
+        "oracle_evidence": true,
+        "oracle_model_control_file": false,
+        "validated_gold_baseline": true
+      },
+      "ecosystem": "python",
+      "fixture_hash": "7a846585152a8251951754a567e8613609c10b2d76f88e69513e80fc5eeda1a3",
+      "missing_requirements": [
+        "real_model_oracle_control"
+      ],
+      "real_model_oracle_control": false,
+      "source_project": "docmancer",
+      "structurally_complete": true,
+      "task_id": "decisive_docmancer_vector_timeout_fallback_001",
+      "task_type": "real",
+      "task_valid": false,
+      "two_clean_gold_control": true
+    },
+    {
+      "assets": {
+        "gold_patch": true,
+        "hidden_tests": true,
+        "materialized_fixture": true,
+        "oracle_evidence": true,
+        "oracle_model_control_file": false,
+        "validated_gold_baseline": true
+      },
+      "ecosystem": "dart",
+      "fixture_hash": "e13c7d90e863d5ad420795fef2f7fc054b375f65eef4c3b20a3cf42878dfe3f6",
+      "missing_requirements": [
+        "two_clean_gold_control",
+        "real_model_oracle_control"
+      ],
+      "real_model_oracle_control": false,
+      "source_project": "nbo",
+      "structurally_complete": true,
+      "task_id": "decisive_nbo_browser_scan_policy_001",
+      "task_type": "real",
+      "task_valid": false,
+      "two_clean_gold_control": false
+    },
+    {
+      "assets": {
+        "gold_patch": true,
+        "hidden_tests": true,
+        "materialized_fixture": true,
+        "oracle_evidence": true,
+        "oracle_model_control_file": false,
+        "validated_gold_baseline": true
+      },
+      "ecosystem": "dart",
+      "fixture_hash": "59bcf243cb35eb622c2b313648fc64dc7201155fa5b8026735cf307a4b3b9bc6",
+      "missing_requirements": [
+        "two_clean_gold_control",
+        "real_model_oracle_control"
+      ],
+      "real_model_oracle_control": false,
+      "source_project": "nbo",
+      "structurally_complete": true,
+      "task_id": "decisive_nbo_cross_module_gate_large_001",
+      "task_type": "real",
+      "task_valid": false,
+      "two_clean_gold_control": false
+    },
+    {
+      "assets": {
+        "gold_patch": true,
+        "hidden_tests": true,
+        "materialized_fixture": true,
+        "oracle_evidence": true,
+        "oracle_model_control_file": false,
+        "validated_gold_baseline": true
+      },
+      "ecosystem": "dart",
+      "fixture_hash": "e6aa93c116c9ef9d34c97b0b2e10faa6b72511fb5dca0f8f7156e1c45f0f572c",
+      "missing_requirements": [
+        "two_clean_gold_control",
+        "real_model_oracle_control"
+      ],
+      "real_model_oracle_control": false,
+      "source_project": "nbo",
+      "structurally_complete": true,
+      "task_id": "decisive_nbo_generated_policy_source_001",
+      "task_type": "real",
+      "task_valid": false,
+      "two_clean_gold_control": false
+    },
+    {
+      "assets": {
+        "gold_patch": true,
+        "hidden_tests": true,
+        "materialized_fixture": true,
+        "oracle_evidence": true,
+        "oracle_model_control_file": false,
+        "validated_gold_baseline": true
+      },
+      "ecosystem": "dart",
+      "fixture_hash": "f350de7ff9cb875d4513da3325db41628d1052d41d3b4e323d1858a32ba266ba",
+      "missing_requirements": [
+        "two_clean_gold_control",
+        "real_model_oracle_control"
+      ],
+      "real_model_oracle_control": false,
+      "source_project": "nbo",
+      "structurally_complete": true,
+      "task_id": "decisive_nbo_permission_handler_version_001",
+      "task_type": "real",
+      "task_valid": false,
+      "two_clean_gold_control": false
+    },
+    {
+      "assets": {
+        "gold_patch": true,
+        "hidden_tests": true,
+        "materialized_fixture": true,
+        "oracle_evidence": true,
+        "oracle_model_control_file": false,
+        "validated_gold_baseline": true
+      },
+      "ecosystem": "python",
+      "fixture_hash": "d8294d2b73daeba6b7e28bd549a1492518996e80f6a39eb25dd0c2c846bce78a",
+      "missing_requirements": [
+        "two_clean_gold_control",
+        "real_model_oracle_control"
+      ],
+      "real_model_oracle_control": false,
+      "source_project": "fixture://fastapi_depends_001",
+      "structurally_complete": true,
+      "task_id": "fastapi_depends_001",
+      "task_type": "curated",
+      "task_valid": false,
+      "two_clean_gold_control": false
+    },
+    {
+      "assets": {
+        "gold_patch": true,
+        "hidden_tests": true,
+        "materialized_fixture": true,
+        "oracle_evidence": true,
+        "oracle_model_control_file": false,
+        "validated_gold_baseline": true
+      },
+      "ecosystem": "python",
+      "fixture_hash": "403ed624283c0e052f5cf22e4afb7120074fc4e8a59ec0f7b4b441727d3547b5",
+      "missing_requirements": [
+        "two_clean_gold_control",
+        "real_model_oracle_control"
+      ],
+      "real_model_oracle_control": false,
+      "source_project": "fixture://mixed_fastapi_project_001",
+      "structurally_complete": true,
+      "task_id": "mixed_fastapi_project_001",
+      "task_type": "curated",
+      "task_valid": false,
+      "two_clean_gold_control": false
+    },
+    {
+      "assets": {
+        "gold_patch": true,
+        "hidden_tests": true,
+        "materialized_fixture": true,
+        "oracle_evidence": false,
+        "oracle_model_control_file": false,
+        "validated_gold_baseline": true
+      },
+      "ecosystem": "dart",
+      "fixture_hash": "b27644625f104feb1c96a923b43a72c0200307123bf0a7041f1d8376788bf8c5",
+      "missing_requirements": [
+        "oracle_evidence",
+        "real_model_oracle_control"
+      ],
+      "real_model_oracle_control": false,
+      "source_project": "help_chat",
+      "structurally_complete": false,
+      "task_id": "real_project_help_chat_linearizable_module_lifecycle_001",
+      "task_type": "real",
+      "task_valid": false,
+      "two_clean_gold_control": true
+    },
+    {
+      "assets": {
+        "gold_patch": true,
+        "hidden_tests": true,
+        "materialized_fixture": true,
+        "oracle_evidence": true,
+        "oracle_model_control_file": false,
+        "validated_gold_baseline": true
+      },
+      "ecosystem": "dart",
+      "fixture_hash": "75f92d25148c32f8bb565d67a701d005898607ac0d4c8ebff9e1d8e5e738a50c",
+      "missing_requirements": [
+        "two_clean_gold_control",
+        "real_model_oracle_control"
+      ],
+      "real_model_oracle_control": false,
+      "source_project": "nbo",
+      "structurally_complete": true,
+      "task_id": "real_project_nbo_001",
+      "task_type": "real",
+      "task_valid": false,
+      "two_clean_gold_control": false
+    },
+    {
+      "assets": {
+        "gold_patch": true,
+        "hidden_tests": true,
+        "materialized_fixture": true,
+        "oracle_evidence": true,
+        "oracle_model_control_file": false,
+        "validated_gold_baseline": true
+      },
+      "ecosystem": "dart",
+      "fixture_hash": "0748e7438ca4555be68ae270329426f3382267059b72bf3d1b04ba6e16c21579",
+      "missing_requirements": [
+        "two_clean_gold_control",
+        "real_model_oracle_control"
+      ],
+      "real_model_oracle_control": false,
+      "source_project": "nbo",
+      "structurally_complete": true,
+      "task_id": "real_project_nbo_cross_module_permission_contract_001",
+      "task_type": "real",
+      "task_valid": false,
+      "two_clean_gold_control": false
+    },
+    {
+      "assets": {
+        "gold_patch": true,
+        "hidden_tests": true,
+        "materialized_fixture": true,
+        "oracle_evidence": true,
+        "oracle_model_control_file": false,
+        "validated_gold_baseline": true
+      },
+      "ecosystem": "dart",
+      "fixture_hash": "6e11052a4a40f6fc09c0a2400bd80944b64de50443013b6b834f7f56384d350f",
+      "missing_requirements": [
+        "two_clean_gold_control",
+        "real_model_oracle_control"
+      ],
+      "real_model_oracle_control": false,
+      "source_project": "nbo",
+      "structurally_complete": true,
+      "task_id": "real_project_nbo_distributed_permission_policy_001",
+      "task_type": "real",
+      "task_valid": false,
+      "two_clean_gold_control": false
+    },
+    {
+      "assets": {
+        "gold_patch": true,
+        "hidden_tests": true,
+        "materialized_fixture": true,
+        "oracle_evidence": false,
+        "oracle_model_control_file": false,
+        "validated_gold_baseline": true
+      },
+      "ecosystem": "dart",
+      "fixture_hash": "73e67cae89d080e5022f639adec0a2591370ff2b8b9011d70d4da1604928ad7c",
+      "missing_requirements": [
+        "oracle_evidence",
+        "two_clean_gold_control",
+        "real_model_oracle_control"
+      ],
+      "real_model_oracle_control": false,
+      "source_project": "nbo",
+      "structurally_complete": false,
+      "task_id": "real_project_nbo_flavor_scoped_external_links_001",
+      "task_type": "real",
+      "task_valid": false,
+      "two_clean_gold_control": false
+    },
+    {
+      "assets": {
+        "gold_patch": true,
+        "hidden_tests": true,
+        "materialized_fixture": true,
+        "oracle_evidence": true,
+        "oracle_model_control_file": false,
+        "validated_gold_baseline": true
+      },
+      "ecosystem": "dart",
+      "fixture_hash": "521918ef4153f6a26651df5b9f891d31465c407d0efa8d8c41e4d817a8296bf9",
+      "missing_requirements": [
+        "two_clean_gold_control",
+        "real_model_oracle_control"
+      ],
+      "real_model_oracle_control": false,
+      "source_project": "nbo",
+      "structurally_complete": true,
+      "task_id": "real_project_nbo_generated_source_001",
+      "task_type": "real",
+      "task_valid": false,
+      "two_clean_gold_control": false
+    },
+    {
+      "assets": {
+        "gold_patch": true,
+        "hidden_tests": true,
+        "materialized_fixture": true,
+        "oracle_evidence": true,
+        "oracle_model_control_file": false,
+        "validated_gold_baseline": true
+      },
+      "ecosystem": "dart",
+      "fixture_hash": "c464e40ae5ba2dff32a2dda85486e8eb290f97bb47be01ec755d3c4e45dff67f",
+      "missing_requirements": [
+        "two_clean_gold_control",
+        "real_model_oracle_control"
+      ],
+      "real_model_oracle_control": false,
+      "source_project": "nbo",
+      "structurally_complete": true,
+      "task_id": "real_project_nbo_permission_002",
+      "task_type": "real",
+      "task_valid": false,
+      "two_clean_gold_control": false
+    },
+    {
+      "assets": {
+        "gold_patch": true,
+        "hidden_tests": true,
+        "materialized_fixture": true,
+        "oracle_evidence": false,
+        "oracle_model_control_file": false,
+        "validated_gold_baseline": true
+      },
+      "ecosystem": "android",
+      "fixture_hash": "88fc356240c55621546b2ddba2437684d9d72e74b6064df949a45ba4394a36dd",
+      "missing_requirements": [
+        "oracle_evidence",
+        "real_model_oracle_control"
+      ],
+      "real_model_oracle_control": false,
+      "source_project": "viscanner",
+      "structurally_complete": false,
+      "task_id": "real_project_viscanner_client_owned_disable_signal_001",
+      "task_type": "real",
+      "task_valid": false,
+      "two_clean_gold_control": true
+    }
+  ]
+}
