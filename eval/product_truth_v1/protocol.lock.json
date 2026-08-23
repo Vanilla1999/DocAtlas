@@ -1,0 +1,200 @@
+{
+  "artifacts": {
+    "append_only_hash_chain_required": true,
+    "ledger_schema": "schemas/ledger.schema.json",
+    "raw_prompts_or_secrets_persisted": false,
+    "result_schema": "schemas/result.schema.json",
+    "run_schema": "schemas/run.schema.json",
+    "task_schema": "schemas/task.schema.json"
+  },
+  "benchmark_design": {
+    "bootstrap_unit": "task_cluster",
+    "conditions": 4,
+    "confidence_level": 0.95,
+    "maximum_scored_runs": 720,
+    "minimum_models": 2,
+    "minimum_scored_runs": 576,
+    "paired_analysis": true,
+    "randomization": {
+      "blinding": "hidden tests and gold/oracle artifacts remain evaluator-only",
+      "condition_order": "deterministic_balanced_permutation",
+      "seed": "docatlas-product-truth-v1",
+      "unit": "task_model_repeat_block"
+    },
+    "repeats": 3,
+    "repositories": 3,
+    "tasks_per_repository": {
+      "maximum": 10,
+      "minimum": 8
+    }
+  },
+  "budgets": {
+    "hard_enforcement_required": true,
+    "post_hoc_usage_only_is_insufficient": true,
+    "required_fields": [
+      "max_turns",
+      "max_requests",
+      "max_input_tokens",
+      "max_output_tokens",
+      "max_wall_seconds",
+      "max_edit_calls",
+      "max_test_runs"
+    ],
+    "same_within_task_model_repeat_block": true
+  },
+  "canary": {
+    "conditions": 4,
+    "models": 2,
+    "product_claim_allowed": false,
+    "purpose": "infrastructure_and_scoring_only",
+    "repeats": 1,
+    "repositories": 1,
+    "scored_runs": 16,
+    "tasks": 2
+  },
+  "claim_boundary": {
+    "canary_can_support_product_claim": false,
+    "product_maturity": "Beta",
+    "product_truth_proven": false,
+    "production_runtime_changed": false,
+    "public_api_change_authorized": false,
+    "stable_claim_allowed": false
+  },
+  "conditions": [
+    {
+      "code_context_engine": false,
+      "docatlas": false,
+      "evidence": "repository and coding tools only",
+      "external_docs": false,
+      "id": "A_repo_only",
+      "label": "Repository only"
+    },
+    {
+      "code_context_engine": false,
+      "docatlas": true,
+      "evidence": "installed DocAtlas bounded evidence",
+      "external_docs": false,
+      "id": "B_repo_plus_docatlas",
+      "label": "Repository plus DocAtlas"
+    },
+    {
+      "code_context_engine": false,
+      "docatlas": false,
+      "evidence": "frozen audited external documentation snapshot",
+      "external_docs": true,
+      "id": "C_repo_plus_external_docs",
+      "label": "Repository plus frozen external docs"
+    },
+    {
+      "code_context_engine": true,
+      "docatlas": true,
+      "evidence": "host code context plus installed DocAtlas bounded evidence",
+      "external_docs": false,
+      "id": "D_code_context_plus_docatlas",
+      "label": "Code-context engine plus DocAtlas"
+    }
+  ],
+  "decision_rules": {
+    "condition_c_is_comparator_not_required_loss": true,
+    "condition_d_separate_decision": true,
+    "correctness_path": {
+      "comparison": "B_repo_plus_docatlas minus A_repo_only",
+      "maximum_median_total_token_ratio": 1.5,
+      "maximum_p95_latency_ratio": 2.0,
+      "minimum_absolute_correct_patch_gain": 0.1,
+      "paired_task_cluster_bootstrap_ci_must_exclude": 0.0,
+      "safety_critical_regression_allowed": false
+    },
+    "no_positive_path": "pause retrieval expansion and retain Beta",
+    "safety_path": {
+      "comparison": "B_repo_plus_docatlas versus A_repo_only",
+      "maximum_median_total_token_ratio": 1.5,
+      "maximum_p95_latency_ratio": 2.0,
+      "minimum_correct_patch_noninferiority": -0.03,
+      "minimum_relative_unsupported_or_wrong_version_reduction": 0.25,
+      "paired_task_cluster_bootstrap_ci_must_exclude_no_improvement": true,
+      "safety_critical_regression_allowed": false
+    }
+  },
+  "missing_data_policy": {
+    "infrastructure_failure": "infrastructure_incomplete, never model failure",
+    "provider_usage_unavailable": "retain null only where schema permits and exclude claim requiring that metric",
+    "result_mutation": "fail_closed",
+    "task_control_failure": "invalid_task, excluded before condition comparison"
+  },
+  "phase": "P2_PRODUCT_TRUTH",
+  "primary_outcome": {
+    "aggregation": "task-level paired success rate",
+    "definition": [
+      "patch applies cleanly",
+      "public tests pass",
+      "hidden tests pass",
+      "task-specific semantic assertions pass",
+      "only allowed paths are changed",
+      "no forbidden path is changed"
+    ],
+    "id": "correct_patch"
+  },
+  "protocol": "docatlas-product-truth-v1",
+  "protocol_sha256": "78521ab7dfae4f51cc55d4225054a1b38375a80be1d76d894ba74d9c851cc367",
+  "schema_files": {
+    "ledger.schema.json": "9fb26ad74df3966d053e4730f4d9bec78255e5491957d4c845787c7b0e93813d",
+    "result.schema.json": "7de3e68bb4ae8697c6303498557e818ad69a2de5889734c349a9ecff07bd8879",
+    "run.schema.json": "6981d463250e94e574e258d59ec23c963c62d88a81d8b8e51667ff45b0838de2",
+    "task.schema.json": "8999c35228d50904b231373d7e657d419cfd475dd7faeb6a9ace93b977d0e857"
+  },
+  "schema_version": 1,
+  "secondary_metrics": {
+    "cost": [
+      "model_visible_tokens",
+      "provider_input_tokens",
+      "provider_output_tokens",
+      "provider_reasoning_tokens",
+      "total_attributable_tokens",
+      "evidence_tool_calls",
+      "coding_tool_calls",
+      "wall_seconds",
+      "time_to_first_edit_seconds",
+      "edit_test_iterations"
+    ],
+    "safety": [
+      "unsupported_claims",
+      "wrong_version_claims",
+      "cross_source_attribution_errors",
+      "forbidden_source_contamination",
+      "unauthorized_lifecycle_actions",
+      "forbidden_file_touches",
+      "privacy_violations"
+    ]
+  },
+  "status": "preregistered",
+  "task_validity": {
+    "gold_patch": {
+      "allowed_surface_only": true,
+      "clean_repetitions": 2,
+      "hidden_tests_must_pass": true,
+      "must_apply": true,
+      "public_tests_must_pass": true,
+      "semantic_assertions_must_pass": true
+    },
+    "invalidity_reasons": [
+      "gold_patch_control_failed",
+      "oracle_evidence_control_failed",
+      "budget_enforcement_unproven",
+      "identity_incomplete",
+      "public_hidden_separation_breached"
+    ],
+    "oracle_evidence": {
+      "failure_disposition": "model_or_task_invalid",
+      "minimum_successful_repetitions": 1,
+      "same_budgets": true,
+      "same_coding_tools": true,
+      "same_model_snapshot": true
+    },
+    "public_hidden_separation": "hidden tests, gold patch and oracle evidence are never model-visible",
+    "required_positive_controls": [
+      "gold_patch",
+      "oracle_evidence"
+    ]
+  }
+}
