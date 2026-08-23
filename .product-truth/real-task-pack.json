@@ -28,7 +28,7 @@
       "issue_text": "Project documentation analysis is misclassifying syntactically valid Python declarations/imports containing words such as required or forbidden as normative prose. Preserve prose detection without turning Python declarations into policy facts.",
       "hidden_test_path": "tests/docs/test_normative_language.py",
       "public_nodeid": "tests/docs/test_normative_language.py::test_query_symbol_visibility_handles_acronym_camel_case_source_paths",
-      "hidden_nodeid": "tests/docs/test_normative_language.py"
+      "hidden_nodeid": "tests/docs/test_normative_language.py::test_parenthesized_import_lines_are_one_python_declaration"
     },
     {
       "id": "docatlas-real-004",
