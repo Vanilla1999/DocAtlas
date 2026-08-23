@@ -36,6 +36,12 @@ build_requirements = _resolve_build_requirements()
 
 PROTOCOL = "mixed-evidence-provenance-report-v1"
 SCHEMA_VERSION = 1
+PROTECTED_PROOF_ROLES = frozenset({
+    "document_statement",
+    "project_rule",
+    "implementation_fact",
+    "dependency_fact",
+})
 ABSOLUTE_PATH_RE = re.compile(
     r"(?:^|[\s'\"])(?:/tmp/|/home/|/Users/|[A-Za-z]:\\Users\\)",
 )
@@ -146,7 +152,19 @@ def evaluate_case(case: dict[str, Any]) -> dict[str, Any]:
         }
         for item in decision.assignments
     ]
-    assignment_sources = sorted({row["source"] for row in assignments})
+    protected_assignments = [
+        row for row in assignments
+        if row["proof_role"] in PROTECTED_PROOF_ROLES
+    ]
+    # Query-derived generic_fact requirements may retain a useful candidate in
+    # an overall fail-closed result. P1.5 is specifically about whether each
+    # protected claim is assigned to an allowed source role, so the acceptance
+    # comparison must not conflate those auxiliary generic assignments with a
+    # project-rule, implementation, dependency, or path-bound statement proof.
+    assignment_sources = sorted({
+        row["source"] for row in protected_assignments
+    })
+    all_assignment_sources = sorted({row["source"] for row in assignments})
     return {
         "id": str(case["id"]),
         "answer_supported": bool(decision.support_decision.answer_supported),
@@ -157,6 +175,7 @@ def evaluate_case(case: dict[str, Any]) -> dict[str, Any]:
             str(value) for value in case.get("expected_assignment_sources") or ()
         }),
         "assignment_sources": assignment_sources,
+        "all_assignment_sources": all_assignment_sources,
         "assignments": assignments,
         "selected_sources": sorted({
             str(item.path_or_url) for item in decision.selected_candidates
@@ -241,6 +260,27 @@ def verify_report(report: dict[str, Any]) -> None:
             raise ValueError("P1.5 case omitted assignment identity")
         if not str(row.get("decision_hash") or ""):
             raise ValueError("P1.5 case omitted decision identity")
+        assignments = row.get("assignments")
+        if not isinstance(assignments, list):
+            raise ValueError("P1.5 case omitted assignment ledger")
+        expected_all_sources = sorted({
+            str(item.get("source") or "")
+            for item in assignments
+            if isinstance(item, dict) and str(item.get("source") or "")
+        })
+        if row.get("all_assignment_sources") != expected_all_sources:
+            raise ValueError("P1.5 full assignment sources are hidden or invented")
+        expected_protected_sources = sorted({
+            str(item.get("source") or "")
+            for item in assignments
+            if (
+                isinstance(item, dict)
+                and str(item.get("source") or "")
+                and item.get("proof_role") in PROTECTED_PROOF_ROLES
+            )
+        })
+        if row.get("assignment_sources") != expected_protected_sources:
+            raise ValueError("P1.5 protected assignment sources are hidden or invented")
     summary = report.get("summary")
     if not isinstance(summary, dict):
         raise ValueError("P1.5 report omitted summary")
