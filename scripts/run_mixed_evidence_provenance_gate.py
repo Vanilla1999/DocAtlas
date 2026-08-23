@@ -19,6 +19,17 @@ ROOT = REPO_ROOT / "eval" / "agent_developer_v1"
 DEFAULT_OUTPUT = ROOT / "results" / "mixed-evidence-provenance.json"
 
 
+def _production_evidence_model_path() -> Path:
+    candidates = (
+        REPO_ROOT / "docmancer" / "docs" / "application" / "evidence_models.py",
+        REPO_ROOT / "docmancer" / "docs" / "domain" / "answer_completeness.py",
+    )
+    existing = [path for path in candidates if path.is_file()]
+    if not existing:
+        raise RuntimeError("no reviewed production evidence-model module exists")
+    return existing[0]
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="Verify P1.5 mixed-evidence provenance")
     parser.add_argument("--output", type=Path, default=DEFAULT_OUTPUT)
@@ -29,9 +40,15 @@ def main(argv: list[str] | None = None) -> int:
         repo_root=REPO_ROOT,
         protocol_path=ROOT / "mixed_provenance_protocol.json",
         selector_path=REPO_ROOT / "docmancer" / "docs" / "application" / "evidence_selection.py",
-        model_path=REPO_ROOT / "docmancer" / "docs" / "domain" / "evidence_models.py",
+        model_path=_production_evidence_model_path(),
     )
     verify_report(derived)
+    if derived["decision"]["claim_local_provenance"] != "accepted":
+        raise SystemExit(
+            "P1.5 claim-local provenance is not accepted: "
+            f"mismatches={derived['summary']['mismatches']!r}; "
+            f"advisory_assignments={derived['summary']['advisory_assignments']!r}"
+        )
     if args.write:
         args.output.parent.mkdir(parents=True, exist_ok=True)
         args.output.write_text(

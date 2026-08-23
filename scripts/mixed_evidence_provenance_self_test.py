@@ -4,6 +4,7 @@ from __future__ import annotations
 from pathlib import Path
 
 from eval.agent_developer_v1.mixed_provenance import (
+    PROTECTED_PROOF_ROLES,
     derive_from_paths,
     verify_report,
 )
@@ -13,12 +14,23 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 ROOT = REPO_ROOT / "eval" / "agent_developer_v1"
 
 
+def _production_evidence_model_path() -> Path:
+    candidates = (
+        REPO_ROOT / "docmancer" / "docs" / "application" / "evidence_models.py",
+        REPO_ROOT / "docmancer" / "docs" / "domain" / "answer_completeness.py",
+    )
+    existing = [path for path in candidates if path.is_file()]
+    if not existing:
+        raise RuntimeError("no reviewed production evidence-model module exists")
+    return existing[0]
+
+
 def _report() -> dict:
     return derive_from_paths(
         repo_root=REPO_ROOT,
         protocol_path=ROOT / "mixed_provenance_protocol.json",
         selector_path=REPO_ROOT / "docmancer" / "docs" / "application" / "evidence_selection.py",
-        model_path=REPO_ROOT / "docmancer" / "docs" / "domain" / "evidence_models.py",
+        model_path=_production_evidence_model_path(),
     )
 
 
@@ -42,18 +54,57 @@ def test_exact_claim_local_assignments() -> None:
     assert report["decision"]["claim_local_provenance"] == "accepted"
 
 
-def test_wrong_assignment_source_fails_closed() -> None:
+def test_provenance_gap_is_retained_but_not_hidden() -> None:
     report = _report()
     row = next(item for item in report["cases"] if item["answer_supported"])
+    protected = next(
+        item for item in row["assignments"]
+        if item["proof_role"] in PROTECTED_PROOF_ROLES
+    )
+    protected["source"] = "https://advisory.example/forged"
     row["assignment_sources"] = ["https://advisory.example/forged"]
-    _expect_error("assignment-source mismatch", report)
+    row["all_assignment_sources"] = sorted({
+        item["source"] for item in row["assignments"]
+    })
+    report["summary"]["mismatches"] = [row["id"]]
+    report["summary"]["advisory_assignments"] = [
+        {"case_id": row["id"], "source": "https://advisory.example/forged"}
+    ]
+    report["decision"]["claim_local_provenance"] = "rejected"
+    verify_report(report)
+
+    report["summary"]["mismatches"] = []
+    _expect_error("provenance mismatches are hidden or invented", report)
 
 
-def test_false_support_fails_closed() -> None:
+def test_support_gap_is_retained_but_not_hidden() -> None:
     report = _report()
     row = next(item for item in report["cases"] if not item["expected_supported"])
     row["answer_supported"] = True
-    _expect_error("support mismatch", report)
+    report["summary"]["mismatches"] = [row["id"]]
+    report["decision"]["claim_local_provenance"] = "rejected"
+    verify_report(report)
+
+    report["summary"]["mismatches"] = []
+    _expect_error("provenance mismatches are hidden or invented", report)
+
+
+def test_assignment_source_ledgers_fail_closed() -> None:
+    report = _report()
+    row = next(item for item in report["cases"] if item["assignments"])
+    row["all_assignment_sources"] = []
+    _expect_error("full assignment sources are hidden or invented", report)
+
+    report = _report()
+    row = next(
+        item for item in report["cases"]
+        if any(
+            assignment["proof_role"] in PROTECTED_PROOF_ROLES
+            for assignment in item["assignments"]
+        )
+    )
+    row["assignment_sources"] = []
+    _expect_error("protected assignment sources are hidden or invented", report)
 
 
 def test_claim_and_path_leak_fail_closed() -> None:
@@ -69,8 +120,9 @@ def test_claim_and_path_leak_fail_closed() -> None:
 def main() -> int:
     checks = (
         test_exact_claim_local_assignments,
-        test_wrong_assignment_source_fails_closed,
-        test_false_support_fails_closed,
+        test_provenance_gap_is_retained_but_not_hidden,
+        test_support_gap_is_retained_but_not_hidden,
+        test_assignment_source_ledgers_fail_closed,
         test_claim_and_path_leak_fail_closed,
     )
     for check in checks:
