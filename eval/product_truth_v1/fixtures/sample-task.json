@@ -1,0 +1,44 @@
+{
+  "allowed_paths": [
+    "docmancer/**"
+  ],
+  "budgets": {
+    "hard_enforcement_required": true,
+    "max_edit_calls": 20,
+    "max_input_tokens": 20000,
+    "max_output_tokens": 4000,
+    "max_requests": 8,
+    "max_test_runs": 5,
+    "max_turns": 8,
+    "max_wall_seconds": 900
+  },
+  "claim_boundary": {
+    "gold_hidden_from_agent": true,
+    "oracle_hidden_from_agent": true,
+    "task_valid_only_after_both_controls": true
+  },
+  "ecosystem": "python",
+  "fixture_sha256": "2222222222222222222222222222222222222222222222222222222222222222",
+  "forbidden_paths": [
+    ".github/**"
+  ],
+  "gold_patch_sha256": "6666666666666666666666666666666666666666666666666666666666666666",
+  "hidden_tests_sha256": "4444444444444444444444444444444444444444444444444444444444444444",
+  "hidden_validation_ids": [
+    "hidden.sample"
+  ],
+  "issue_sha256": "1111111111111111111111111111111111111111111111111111111111111111",
+  "oracle_evidence_sha256": "7777777777777777777777777777777777777777777777777777777777777777",
+  "protocol_sha256": "78521ab7dfae4f51cc55d4225054a1b38375a80be1d76d894ba74d9c851cc367",
+  "public_tests_sha256": "3333333333333333333333333333333333333333333333333333333333333333",
+  "public_validation_commands": [
+    "pytest -q"
+  ],
+  "repository_id": "Vanilla1999/DocAtlas",
+  "repository_revision": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "schema_version": 1,
+  "semantic_assertions_sha256": "5555555555555555555555555555555555555555555555555555555555555555",
+  "source_project": "DocAtlas",
+  "task_id": "docatlas.sample-task",
+  "task_origin": "curated_fixture"
+}
