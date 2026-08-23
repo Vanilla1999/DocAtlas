@@ -5,7 +5,8 @@ import argparse
 import json
 from pathlib import Path
 
-from eval.product_truth_v1.comparative import build_report, canonical_json, verify_report
+from eval.product_truth_v1.comparative import build_report, canonical_json
+from eval.product_truth_v1.comparative_contract import verify_report
 from eval.product_truth_v1.positive_controls import load_json
 
 
