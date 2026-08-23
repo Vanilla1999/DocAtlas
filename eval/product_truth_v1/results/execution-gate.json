@@ -1,0 +1,61 @@
+{
+  "authorization": {
+    "blocked_reason": "task_pack_not_ready",
+    "comparative_harness_authorized": false,
+    "scored_execution_authorized": false,
+    "task_pack_ready": false
+  },
+  "canary": {
+    "artifact_files": [],
+    "classification": "preregistered_eligibility_block",
+    "executed_runs": 0,
+    "infrastructure_failures": 0,
+    "model_failures": 0,
+    "planned_runs": 0,
+    "preregistered_scored_runs": 16,
+    "product_claim_allowed": false,
+    "status": "blocked_not_executed"
+  },
+  "claim_boundary": {
+    "canary_product_claim_allowed": false,
+    "correct_patch_comparison_available": false,
+    "execution_complete_means_gate_evaluated_not_runs_performed": true,
+    "no_run_is_not_model_failure": true,
+    "p2_2b_canary_execution_complete": true,
+    "p2_2c_full_pilot_execution_complete": true,
+    "product_maturity": "Beta",
+    "product_truth_proven": false,
+    "production_runtime_changed": false,
+    "public_api_changed": false
+  },
+  "decision": {
+    "comparative_metrics_available": false,
+    "next_step": "P2.3 product decision and closure scorecard",
+    "p2_2b_outcome": "not_executed_by_preregistered_gate",
+    "p2_2c_outcome": "not_executed_by_preregistered_gate",
+    "scored_runs": 0
+  },
+  "evidence": {
+    "comparative_blocked_reason": "task_pack_not_ready",
+    "execution_root": "eval/product_truth_v1/executions",
+    "task_pack_blockers": [
+      "structural_capacity_below_preregistered_minimum"
+    ],
+    "task_pack_outcome": "task_pack_not_ready",
+    "unexpected_artifacts": []
+  },
+  "full_pilot": {
+    "artifact_files": [],
+    "classification": "preregistered_eligibility_block",
+    "executed_runs": 0,
+    "infrastructure_failures": 0,
+    "maximum_scored_runs": 720,
+    "minimum_scored_runs": 576,
+    "model_failures": 0,
+    "planned_runs": 0,
+    "status": "blocked_not_executed"
+  },
+  "protocol": "product-truth-execution-gate-v1",
+  "protocol_sha256": "78521ab7dfae4f51cc55d4225054a1b38375a80be1d76d894ba74d9c851cc367",
+  "schema_version": 1
+}
