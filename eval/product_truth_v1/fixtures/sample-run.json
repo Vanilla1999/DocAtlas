@@ -1,0 +1,52 @@
+{
+  "artifact_digests": {
+    "patch_sha256": "8888888888888888888888888888888888888888888888888888888888888888",
+    "scoring_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "trajectory_sha256": "9999999999999999999999999999999999999999999999999999999999999999"
+  },
+  "budget_enforcement": {
+    "edit_calls_hard": true,
+    "input_tokens_hard": true,
+    "observed_edit_calls": 1,
+    "observed_input_tokens": 1200,
+    "observed_output_tokens": 300,
+    "observed_requests": 2,
+    "observed_test_runs": 1,
+    "observed_turns": 2,
+    "observed_wall_seconds": 12.5,
+    "output_tokens_hard": true,
+    "requests_hard": true,
+    "test_runs_hard": true,
+    "turns_hard": true,
+    "wall_time_hard": true
+  },
+  "budgets": {
+    "hard_enforcement_required": true,
+    "max_edit_calls": 20,
+    "max_input_tokens": 20000,
+    "max_output_tokens": 4000,
+    "max_requests": 8,
+    "max_test_runs": 5,
+    "max_turns": 8,
+    "max_wall_seconds": 900
+  },
+  "claim_boundary": {
+    "canary_product_claim": false,
+    "single_run_product_truth_claim": false
+  },
+  "condition_id": "A_repo_only",
+  "condition_order_index": 0,
+  "fixture_sha256": "2222222222222222222222222222222222222222222222222222222222222222",
+  "model_snapshot": "reviewer-oracle-v1",
+  "protocol_sha256": "78521ab7dfae4f51cc55d4225054a1b38375a80be1d76d894ba74d9c851cc367",
+  "provider_id": "provider-free-control",
+  "randomization_block_id": "docatlas.sample-task:model-a:0",
+  "repeat": 0,
+  "repository_id": "Vanilla1999/DocAtlas",
+  "repository_revision": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "request_ids": [],
+  "run_id": "sample:docatlas.sample-task:a:0",
+  "schema_version": 1,
+  "status": "completed",
+  "task_id": "docatlas.sample-task"
+}
