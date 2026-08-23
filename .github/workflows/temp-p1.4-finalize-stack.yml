@@ -2,13 +2,13 @@ name: TEMP finalize P1.4 branch
 
 # One-shot carrier for the unified 14-case discovery/proofability protocol.
 on:
-  push:
-    branches: [p1/p1.4-paraphrase-proofability]
-    paths:
-      - .github/workflows/temp-p1.4-finalize-stack.yml
+  pull_request:
+    branches: [main]
+    types: [opened, synchronize, reopened]
 
 permissions:
   contents: write
+  pull-requests: read
 
 concurrency:
   group: temp-finalize-p1-4
@@ -19,6 +19,7 @@ env:
 
 jobs:
   finalize:
+    if: github.event.pull_request.head.ref == 'p1/p1.4-paraphrase-proofability'
     runs-on: ubuntu-latest
     timeout-minutes: 25
     steps:
