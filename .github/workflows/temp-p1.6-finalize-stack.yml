@@ -42,18 +42,19 @@ jobs:
       - name: Materialize inherited and P1.6 evidence
         run: |
           set -euo pipefail
-          python scripts/run_agent_developer_first_divergence_gate.py --write
-          python scripts/run_agent_developer_first_divergence_gate.py
-          python scripts/run_agent_contract_v2_ablation_gate.py --write
-          python scripts/run_agent_contract_v2_ablation_gate.py
+          python scripts/build_agent_developer_first_divergence.py
+          python scripts/build_agent_developer_first_divergence.py --check
+          python scripts/build_agent_contract_v2_ablation.py
+          python scripts/build_agent_contract_v2_ablation.py --check
+          pytest -q \
+            tests/test_agent_developer_first_divergence.py \
+            tests/test_agent_developer_contract_v2_ablation.py
           python scripts/run_paraphrase_proofability_gate.py --write
           python scripts/run_paraphrase_proofability_gate.py
           python scripts/run_mixed_evidence_provenance_gate.py --write
           python scripts/run_mixed_evidence_provenance_gate.py
           python scripts/run_evidence_is_data_gate.py --write
           python scripts/run_evidence_is_data_gate.py
-          python scripts/first_divergence_contract_self_test.py
-          python scripts/agent_contract_v2_ablation_self_test.py
           python scripts/paraphrase_proofability_self_test.py
           python scripts/mixed_evidence_provenance_self_test.py
           python scripts/evidence_is_data_self_test.py
@@ -67,7 +68,9 @@ jobs:
           import subprocess
           allowed = {
               "eval/agent_developer_v1/results/first-divergence-atlas.json",
+              "docs/analysis/p1.2-agent-developer-first-divergence.md",
               "eval/agent_developer_v1/results/contract-v2-ablation.json",
+              "docs/analysis/p1.3-agent-contract-v2-ablation.md",
               "eval/agent_developer_v1/results/paraphrase-proofability.json",
               "eval/agent_developer_v1/results/mixed-evidence-provenance.json",
               "eval/agent_developer_v1/results/evidence-is-data.json",
