@@ -1,0 +1,940 @@
+{
+  "cases": [
+    {
+      "answer_supported": true,
+      "assignment_count": 1,
+      "candidate_content_sha256": "dc716190aa7aa63875d541fb48a89b11110566a8596fd5f0723d44fa564cc1c7",
+      "candidate_discovered": true,
+      "candidate_source": "packages/orders/README.md",
+      "decision_hash": "3fc7b1b9c69b394b53490cb66ab37b5175f479efb885a2aeae5c4e9f6d80b547",
+      "family": "exact_identifier",
+      "id": "exact_orders_identity",
+      "matched_discovery_terms": [
+        "OrdersDraftStore"
+      ],
+      "missing_requirement_ids": [],
+      "negative_control": false,
+      "planner": {
+        "concept_queries": [
+          "OrdersDraftStore"
+        ],
+        "parse_trace": [],
+        "proof_obligation_count": 1,
+        "requirement_probe_count": 2,
+        "retrieval_hints": [
+          "OrdersDraftStore"
+        ],
+        "subjects": [
+          "OrdersDraftStore"
+        ],
+        "unresolved_parts": []
+      },
+      "proofability": {
+        "documentation_issue": false,
+        "origin": "none",
+        "reason_codes": [],
+        "schema_version": 1,
+        "status": "provable"
+      },
+      "question": "What is OrdersDraftStore?",
+      "require_discovery": true,
+      "require_support": true,
+      "requirements_hash": "55a85687769d042b5246ac1a52a196fb41dded55b1e62d191ed477ad736a79b9",
+      "selected_evidence_ids": [
+        "p1.4:exact_orders_identity"
+      ],
+      "selected_sources": [
+        "packages/orders/README.md"
+      ],
+      "support_reason_code": null,
+      "support_status": "supported"
+    },
+    {
+      "answer_supported": true,
+      "assignment_count": 1,
+      "candidate_content_sha256": "230724769e762f14bfb2eb469e4b1d371e761216006e46ff386eb52458fe5e1f",
+      "candidate_discovered": true,
+      "candidate_source": "ARCHITECTURE.md",
+      "decision_hash": "018e8d22adfaf13b9663b8dc2f35f4ec9abffe8787608cf0082aab49e00f1a14",
+      "family": "exact_identifier",
+      "id": "exact_retry_policy",
+      "matched_discovery_terms": [
+        "ProjectRetryPolicy"
+      ],
+      "missing_requirement_ids": [],
+      "negative_control": false,
+      "planner": {
+        "concept_queries": [
+          "ProjectRetryPolicy"
+        ],
+        "parse_trace": [],
+        "proof_obligation_count": 1,
+        "requirement_probe_count": 2,
+        "retrieval_hints": [
+          "ProjectRetryPolicy"
+        ],
+        "subjects": [
+          "ProjectRetryPolicy"
+        ],
+        "unresolved_parts": []
+      },
+      "proofability": {
+        "documentation_issue": false,
+        "origin": "none",
+        "reason_codes": [],
+        "schema_version": 1,
+        "status": "provable"
+      },
+      "question": "What is ProjectRetryPolicy?",
+      "require_discovery": true,
+      "require_support": true,
+      "requirements_hash": "73f7cccdb748f296a75a18989e60893b1f549fc93f116409f7c5c089ec8de230",
+      "selected_evidence_ids": [
+        "p1.4:exact_retry_policy"
+      ],
+      "selected_sources": [
+        "ARCHITECTURE.md"
+      ],
+      "support_reason_code": null,
+      "support_status": "supported"
+    },
+    {
+      "answer_supported": true,
+      "assignment_count": 1,
+      "candidate_content_sha256": "6f13aec3ccc8d596f1552421aa7f4e0f2f2738b6e9654eeab1621e4a07f704a1",
+      "candidate_discovered": true,
+      "candidate_source": "packages/orders/README.md",
+      "decision_hash": "8241fb6ed4e3052dc215e01bfa34493c6306a77bb6c53c00a040293ccf6ab00a",
+      "family": "behavior",
+      "id": "behavior_orders_store",
+      "matched_discovery_terms": [
+        "OrdersDraftStore"
+      ],
+      "missing_requirement_ids": [],
+      "negative_control": false,
+      "planner": {
+        "concept_queries": [
+          "OrdersDraftStore behavior",
+          "do"
+        ],
+        "parse_trace": [],
+        "proof_obligation_count": 1,
+        "requirement_probe_count": 2,
+        "retrieval_hints": [
+          "OrdersDraftStore"
+        ],
+        "subjects": [
+          "OrdersDraftStore"
+        ],
+        "unresolved_parts": []
+      },
+      "proofability": {
+        "documentation_issue": false,
+        "origin": "none",
+        "reason_codes": [],
+        "schema_version": 1,
+        "status": "provable"
+      },
+      "question": "What does OrdersDraftStore do?",
+      "require_discovery": true,
+      "require_support": true,
+      "requirements_hash": "43050c704db56be5da92f92f60576dc024ab73805b0994a0fbed92e165ab09df",
+      "selected_evidence_ids": [
+        "p1.4:behavior_orders_store"
+      ],
+      "selected_sources": [
+        "packages/orders/README.md"
+      ],
+      "support_reason_code": null,
+      "support_status": "supported"
+    },
+    {
+      "answer_supported": true,
+      "assignment_count": 1,
+      "candidate_content_sha256": "3527c823cb3f5229686eead8f332cdf0bf8e90aaf1df7abc2079e28b3db342cc",
+      "candidate_discovered": true,
+      "candidate_source": "packages/payments/README.md",
+      "decision_hash": "f5d75108b4369f81b9bfce74ce8d380f5907651261af032f54bc6d5e0ee9a036",
+      "family": "behavior",
+      "id": "behavior_payment_outbox",
+      "matched_discovery_terms": [
+        "PaymentOutbox"
+      ],
+      "missing_requirement_ids": [],
+      "negative_control": false,
+      "planner": {
+        "concept_queries": [
+          "PaymentOutbox behavior",
+          "do"
+        ],
+        "parse_trace": [],
+        "proof_obligation_count": 1,
+        "requirement_probe_count": 2,
+        "retrieval_hints": [
+          "PaymentOutbox"
+        ],
+        "subjects": [
+          "PaymentOutbox"
+        ],
+        "unresolved_parts": []
+      },
+      "proofability": {
+        "documentation_issue": false,
+        "origin": "none",
+        "reason_codes": [],
+        "schema_version": 1,
+        "status": "provable"
+      },
+      "question": "What does PaymentOutbox do?",
+      "require_discovery": true,
+      "require_support": true,
+      "requirements_hash": "b6c7784482708c4f14c5ce1039690e8bdfb94ad1c002042c96f03c3be0445c1e",
+      "selected_evidence_ids": [
+        "p1.4:behavior_payment_outbox"
+      ],
+      "selected_sources": [
+        "packages/payments/README.md"
+      ],
+      "support_reason_code": null,
+      "support_status": "supported"
+    },
+    {
+      "answer_supported": true,
+      "assignment_count": 1,
+      "candidate_content_sha256": "26b6ded80e7603476322177b36d2476b7db494fc1d01bb702a053c6345aee245",
+      "candidate_discovered": true,
+      "candidate_source": "packages/orders/README.md",
+      "decision_hash": "7ba7a44f7bff8dd263b450362ade023a8ede3228407d68c57a6efdf9579ea733",
+      "family": "requirements",
+      "id": "requirements_validation_contract",
+      "matched_discovery_terms": [
+        "OrderValidationContract"
+      ],
+      "missing_requirement_ids": [],
+      "negative_control": false,
+      "planner": {
+        "concept_queries": [
+          "OrderValidationContract requirements"
+        ],
+        "parse_trace": [
+          "frame:requirements"
+        ],
+        "proof_obligation_count": 1,
+        "requirement_probe_count": 2,
+        "retrieval_hints": [
+          "OrderValidationContract",
+          "require"
+        ],
+        "subjects": [
+          "OrderValidationContract"
+        ],
+        "unresolved_parts": []
+      },
+      "proofability": {
+        "documentation_issue": false,
+        "origin": "none",
+        "reason_codes": [],
+        "schema_version": 1,
+        "status": "provable"
+      },
+      "question": "What does OrderValidationContract require?",
+      "require_discovery": true,
+      "require_support": true,
+      "requirements_hash": "32ceee0f05a00a5d017fc191883a0da80e8372e5acf994bca4227e0afff2bd76",
+      "selected_evidence_ids": [
+        "p1.4:requirements_validation_contract"
+      ],
+      "selected_sources": [
+        "packages/orders/README.md"
+      ],
+      "support_reason_code": null,
+      "support_status": "supported"
+    },
+    {
+      "answer_supported": false,
+      "assignment_count": 1,
+      "candidate_content_sha256": "26b6ded80e7603476322177b36d2476b7db494fc1d01bb702a053c6345aee245",
+      "candidate_discovered": true,
+      "candidate_source": "packages/orders/README.md",
+      "decision_hash": "4982288caefd0abaae59f0900649ae7682856ca2bbe76862d01bedf61e5e29eb",
+      "family": "requirements",
+      "id": "requirements_validation_conditions",
+      "matched_discovery_terms": [
+        "OrderValidationContract"
+      ],
+      "missing_requirement_ids": [
+        "project_answer:generic:1:exact_fact:27ad591647c77384",
+        "project_answer:generic:2:exact_fact:312cc75644ee2a8d"
+      ],
+      "negative_control": false,
+      "planner": {
+        "concept_queries": [
+          "by"
+        ],
+        "parse_trace": [
+          "fallback:generic_project_terms"
+        ],
+        "proof_obligation_count": 3,
+        "requirement_probe_count": 4,
+        "retrieval_hints": [
+          "OrderValidationContract",
+          "conditions",
+          "required"
+        ],
+        "subjects": [
+          "OrderValidationContract",
+          "conditions",
+          "required"
+        ],
+        "unresolved_parts": []
+      },
+      "proofability": {
+        "assignment_count": 1,
+        "candidate_count": 1,
+        "decision_hash": "4982288caefd0abaae59f0900649ae7682856ca2bbe76862d01bedf61e5e29eb",
+        "documentation_issue": true,
+        "eligible_count": 1,
+        "missing_requirement_ids": [
+          "project_answer:generic:1:exact_fact:27ad591647c77384",
+          "project_answer:generic:2:exact_fact:312cc75644ee2a8d"
+        ],
+        "omission_counts": {},
+        "origin": "source_documentation",
+        "reason_codes": [
+          "mandatory_support_not_localized"
+        ],
+        "recommended_doc_action": "add_explicit_proposition",
+        "schema_version": 1,
+        "selected_count": 1,
+        "status": "blocked"
+      },
+      "question": "Which conditions are required by OrderValidationContract?",
+      "require_discovery": true,
+      "require_support": false,
+      "requirements_hash": "74a031f88dc259e6e2627b654aa19df9c5c1f44d49fb6558fa9858c42157eeb9",
+      "selected_evidence_ids": [
+        "p1.4:requirements_validation_conditions"
+      ],
+      "selected_sources": [
+        "packages/orders/README.md"
+      ],
+      "support_reason_code": "required_evidence_missing",
+      "support_status": "insufficient_evidence"
+    },
+    {
+      "answer_supported": false,
+      "assignment_count": 3,
+      "candidate_content_sha256": "f7c0c2a91e2909fcf59ed31284c24d07191d67c6a958f6cd103615e1c88c412a",
+      "candidate_discovered": true,
+      "candidate_source": "ARCHITECTURE.md",
+      "decision_hash": "339e41fb90d2974dfcfdb9794e8aa30b625cf057d731cb1971e34d3d713848b0",
+      "family": "policy",
+      "id": "policy_retry_count",
+      "matched_discovery_terms": [
+        "ProjectRetryPolicy",
+        "retry attempts"
+      ],
+      "missing_requirement_ids": [
+        "project_answer:generic:1:exact_fact:1369c34c1da03b28",
+        "project_answer:generic:4:exact_fact:b171c5360827db8d"
+      ],
+      "negative_control": false,
+      "planner": {
+        "concept_queries": [],
+        "parse_trace": [
+          "fallback:generic_project_terms"
+        ],
+        "proof_obligation_count": 5,
+        "requirement_probe_count": 6,
+        "retrieval_hints": [
+          "ProjectRetryPolicy",
+          "many",
+          "retry",
+          "attempts",
+          "allow"
+        ],
+        "subjects": [
+          "ProjectRetryPolicy",
+          "many",
+          "retry",
+          "attempts",
+          "allow"
+        ],
+        "unresolved_parts": []
+      },
+      "proofability": {
+        "assignment_count": 3,
+        "candidate_count": 1,
+        "decision_hash": "339e41fb90d2974dfcfdb9794e8aa30b625cf057d731cb1971e34d3d713848b0",
+        "documentation_issue": true,
+        "eligible_count": 1,
+        "missing_requirement_ids": [
+          "project_answer:generic:1:exact_fact:1369c34c1da03b28",
+          "project_answer:generic:4:exact_fact:b171c5360827db8d"
+        ],
+        "omission_counts": {},
+        "origin": "source_documentation",
+        "reason_codes": [
+          "mandatory_support_not_localized"
+        ],
+        "recommended_doc_action": "add_explicit_proposition",
+        "schema_version": 1,
+        "selected_count": 1,
+        "status": "blocked"
+      },
+      "question": "How many retry attempts does ProjectRetryPolicy allow?",
+      "require_discovery": true,
+      "require_support": false,
+      "requirements_hash": "f5ee5cbac5204e32f19930598a32cbdfa38f760bb5deb1bde58176cf90bd5beb",
+      "selected_evidence_ids": [
+        "p1.4:policy_retry_count"
+      ],
+      "selected_sources": [
+        "ARCHITECTURE.md"
+      ],
+      "support_reason_code": "required_evidence_missing",
+      "support_status": "insufficient_evidence"
+    },
+    {
+      "answer_supported": true,
+      "assignment_count": 1,
+      "candidate_content_sha256": "f7c0c2a91e2909fcf59ed31284c24d07191d67c6a958f6cd103615e1c88c412a",
+      "candidate_discovered": true,
+      "candidate_source": "ARCHITECTURE.md",
+      "decision_hash": "1eb7571bdc00e8cb569760c6699b79e1b17deca8abc6f67de655cb9d6dcf2fac",
+      "family": "policy",
+      "id": "policy_retry_backoff",
+      "matched_discovery_terms": [
+        "ProjectRetryPolicy",
+        "backoff"
+      ],
+      "missing_requirement_ids": [],
+      "negative_control": false,
+      "planner": {
+        "concept_queries": [
+          "ProjectRetryPolicy requirement rule contract"
+        ],
+        "parse_trace": [],
+        "proof_obligation_count": 1,
+        "requirement_probe_count": 2,
+        "retrieval_hints": [
+          "ProjectRetryPolicy",
+          "retry",
+          "backoff",
+          "require"
+        ],
+        "subjects": [
+          "ProjectRetryPolicy"
+        ],
+        "unresolved_parts": []
+      },
+      "proofability": {
+        "documentation_issue": false,
+        "origin": "none",
+        "reason_codes": [],
+        "schema_version": 1,
+        "status": "provable"
+      },
+      "question": "What retry backoff does ProjectRetryPolicy require?",
+      "require_discovery": true,
+      "require_support": false,
+      "requirements_hash": "c42c64c11ebf006d23d9d216eb2013e4a7a3fb406f0250acfcfd05e8f7ce7b76",
+      "selected_evidence_ids": [
+        "p1.4:policy_retry_backoff"
+      ],
+      "selected_sources": [
+        "ARCHITECTURE.md"
+      ],
+      "support_reason_code": null,
+      "support_status": "supported"
+    },
+    {
+      "answer_supported": false,
+      "assignment_count": 0,
+      "candidate_content_sha256": "6f13aec3ccc8d596f1552421aa7f4e0f2f2738b6e9654eeab1621e4a07f704a1",
+      "candidate_discovered": false,
+      "candidate_source": "packages/orders/README.md",
+      "decision_hash": "b839e58cd957b5d6a89fb1cace44a4e828e6057f5eaca6d0ff1739fde5132ed9",
+      "family": "typo",
+      "id": "typo_orders_symbol",
+      "matched_discovery_terms": [],
+      "missing_requirement_ids": [
+        "project_answer:0:behavior:ac9b71ba2019358c"
+      ],
+      "negative_control": false,
+      "planner": {
+        "concept_queries": [
+          "OrdersDrafStore behavior",
+          "do"
+        ],
+        "parse_trace": [],
+        "proof_obligation_count": 1,
+        "requirement_probe_count": 2,
+        "retrieval_hints": [
+          "OrdersDrafStore"
+        ],
+        "subjects": [
+          "OrdersDrafStore"
+        ],
+        "unresolved_parts": []
+      },
+      "proofability": {
+        "assignment_count": 0,
+        "candidate_count": 1,
+        "decision_hash": "b839e58cd957b5d6a89fb1cace44a4e828e6057f5eaca6d0ff1739fde5132ed9",
+        "documentation_issue": true,
+        "eligible_count": 1,
+        "missing_requirement_ids": [
+          "project_answer:0:behavior:ac9b71ba2019358c"
+        ],
+        "omission_counts": {},
+        "origin": "source_documentation",
+        "reason_codes": [
+          "mandatory_support_not_localized"
+        ],
+        "recommended_doc_action": "add_explicit_proposition",
+        "schema_version": 1,
+        "selected_count": 1,
+        "status": "blocked"
+      },
+      "question": "What does OrdersDrafStore do?",
+      "require_discovery": false,
+      "require_support": false,
+      "requirements_hash": "e07ca227ddc97acf7a16880c84cf81863affca3d3334ff4893f1d1c670ec89d4",
+      "selected_evidence_ids": [],
+      "selected_sources": [
+        "packages/orders/README.md"
+      ],
+      "support_reason_code": "required_evidence_missing",
+      "support_status": "insufficient_evidence"
+    },
+    {
+      "answer_supported": false,
+      "assignment_count": 0,
+      "candidate_content_sha256": "230724769e762f14bfb2eb469e4b1d371e761216006e46ff386eb52458fe5e1f",
+      "candidate_discovered": false,
+      "candidate_source": "ARCHITECTURE.md",
+      "decision_hash": "1010c0a8cebd002b63804ac6becb1cab744b710e0dcaa35d7448f2b1538d6eba",
+      "family": "typo",
+      "id": "typo_policy_symbol",
+      "matched_discovery_terms": [],
+      "missing_requirement_ids": [
+        "project_answer:0:definition:96d2a89879751f7b"
+      ],
+      "negative_control": false,
+      "planner": {
+        "concept_queries": [
+          "ProjectRetryPolcy"
+        ],
+        "parse_trace": [],
+        "proof_obligation_count": 1,
+        "requirement_probe_count": 2,
+        "retrieval_hints": [
+          "ProjectRetryPolcy"
+        ],
+        "subjects": [
+          "ProjectRetryPolcy"
+        ],
+        "unresolved_parts": []
+      },
+      "proofability": {
+        "assignment_count": 0,
+        "candidate_count": 1,
+        "decision_hash": "1010c0a8cebd002b63804ac6becb1cab744b710e0dcaa35d7448f2b1538d6eba",
+        "documentation_issue": true,
+        "eligible_count": 1,
+        "missing_requirement_ids": [
+          "project_answer:0:definition:96d2a89879751f7b"
+        ],
+        "omission_counts": {},
+        "origin": "source_documentation",
+        "reason_codes": [
+          "mandatory_support_not_localized"
+        ],
+        "recommended_doc_action": "add_explicit_proposition",
+        "schema_version": 1,
+        "selected_count": 1,
+        "status": "blocked"
+      },
+      "question": "What is ProjectRetryPolcy?",
+      "require_discovery": false,
+      "require_support": false,
+      "requirements_hash": "f873174d2bb5b48f72d7902e2d3260ceab7fe88ee9e5bff7f025f280eca1f50d",
+      "selected_evidence_ids": [],
+      "selected_sources": [
+        "ARCHITECTURE.md"
+      ],
+      "support_reason_code": "required_evidence_missing",
+      "support_status": "insufficient_evidence"
+    },
+    {
+      "answer_supported": false,
+      "assignment_count": 2,
+      "candidate_content_sha256": "6f13aec3ccc8d596f1552421aa7f4e0f2f2738b6e9654eeab1621e4a07f704a1",
+      "candidate_discovered": true,
+      "candidate_source": "packages/orders/README.md",
+      "decision_hash": "53382012d8a8dee3c3d0e76358ed4f76c50dda1055004287c74436e3a9b1cf3d",
+      "family": "alias",
+      "id": "alias_order_drafts",
+      "matched_discovery_terms": [
+        "before upload",
+        "draft orders"
+      ],
+      "missing_requirement_ids": [
+        "project_answer:generic:1:exact_fact:34d6c5e00ed7713a",
+        "project_answer:generic:2:exact_fact:f761a24e6ee6017e"
+      ],
+      "negative_control": false,
+      "planner": {
+        "concept_queries": [],
+        "parse_trace": [
+          "fallback:generic_project_terms"
+        ],
+        "proof_obligation_count": 4,
+        "requirement_probe_count": 4,
+        "retrieval_hints": [
+          "order",
+          "drafts",
+          "stored",
+          "before",
+          "upload"
+        ],
+        "subjects": [
+          "order",
+          "drafts",
+          "stored",
+          "upload"
+        ],
+        "unresolved_parts": []
+      },
+      "proofability": {
+        "assignment_count": 2,
+        "candidate_count": 1,
+        "decision_hash": "53382012d8a8dee3c3d0e76358ed4f76c50dda1055004287c74436e3a9b1cf3d",
+        "documentation_issue": true,
+        "eligible_count": 1,
+        "missing_requirement_ids": [
+          "project_answer:generic:1:exact_fact:34d6c5e00ed7713a",
+          "project_answer:generic:2:exact_fact:f761a24e6ee6017e"
+        ],
+        "omission_counts": {},
+        "origin": "source_documentation",
+        "reason_codes": [
+          "mandatory_support_not_localized"
+        ],
+        "recommended_doc_action": "add_explicit_proposition",
+        "schema_version": 1,
+        "selected_count": 1,
+        "status": "blocked"
+      },
+      "question": "How are order drafts stored before upload?",
+      "require_discovery": true,
+      "require_support": false,
+      "requirements_hash": "f2a5b0bd6886902b44cab40fd8cbdc367d1e5ae5d1db5f16cd9899d7dc3da75b",
+      "selected_evidence_ids": [
+        "p1.4:alias_order_drafts"
+      ],
+      "selected_sources": [
+        "packages/orders/README.md"
+      ],
+      "support_reason_code": "required_evidence_missing",
+      "support_status": "insufficient_evidence"
+    },
+    {
+      "answer_supported": false,
+      "assignment_count": 0,
+      "candidate_content_sha256": "5a6583754d6ed2f7c294a4334f47ecacdb7087abe1116ec20d97d6373dbef32a",
+      "candidate_discovered": true,
+      "candidate_source": "ARCHITECTURE.md",
+      "decision_hash": "12ac8e582210eb86dd753542cc5a11fa7b19cfd4c4b5b666abc50b9a8ef35342",
+      "family": "alias",
+      "id": "alias_project_retry_rule",
+      "matched_discovery_terms": [
+        "network",
+        "retries"
+      ],
+      "missing_requirement_ids": [
+        "project_answer:0:definition:24550fed0bb942af"
+      ],
+      "negative_control": false,
+      "planner": {
+        "concept_queries": [
+          "the project-wide rule for network retries"
+        ],
+        "parse_trace": [],
+        "proof_obligation_count": 1,
+        "requirement_probe_count": 1,
+        "retrieval_hints": [
+          "project-wide",
+          "rule",
+          "for",
+          "network",
+          "retries"
+        ],
+        "subjects": [],
+        "unresolved_parts": []
+      },
+      "proofability": {
+        "assignment_count": 0,
+        "candidate_count": 1,
+        "decision_hash": "12ac8e582210eb86dd753542cc5a11fa7b19cfd4c4b5b666abc50b9a8ef35342",
+        "documentation_issue": true,
+        "eligible_count": 1,
+        "missing_requirement_ids": [
+          "project_answer:0:definition:24550fed0bb942af"
+        ],
+        "omission_counts": {},
+        "origin": "source_documentation",
+        "reason_codes": [
+          "mandatory_support_not_localized"
+        ],
+        "recommended_doc_action": "add_explicit_proposition",
+        "schema_version": 1,
+        "selected_count": 1,
+        "status": "blocked"
+      },
+      "question": "What is the project-wide rule for network retries?",
+      "require_discovery": true,
+      "require_support": false,
+      "requirements_hash": "4ed8bd7af93865f2026dbcc29c51cf8c57a951f195420d020fd503845452f5d5",
+      "selected_evidence_ids": [],
+      "selected_sources": [
+        "ARCHITECTURE.md"
+      ],
+      "support_reason_code": "required_evidence_missing",
+      "support_status": "insufficient_evidence"
+    },
+    {
+      "answer_supported": false,
+      "assignment_count": 0,
+      "candidate_content_sha256": "e12672bfafa99e46097a63931942e035afd97361fb18e4891eea64be002f902d",
+      "candidate_discovered": false,
+      "candidate_source": "packages/orders/README.md",
+      "decision_hash": "92706c79c0bc5fbfdff5d58a2b04ab647beadfc32b96e282aac8e9c96627b967",
+      "family": "negative_control",
+      "id": "negative_wrong_module_fact",
+      "matched_discovery_terms": [],
+      "missing_requirement_ids": [
+        "project_answer:0:behavior:d59f1bd6d15a0dc3"
+      ],
+      "negative_control": true,
+      "planner": {
+        "concept_queries": [
+          "PaymentOutbox behavior",
+          "do"
+        ],
+        "parse_trace": [],
+        "proof_obligation_count": 1,
+        "requirement_probe_count": 2,
+        "retrieval_hints": [
+          "PaymentOutbox"
+        ],
+        "subjects": [
+          "PaymentOutbox"
+        ],
+        "unresolved_parts": []
+      },
+      "proofability": {
+        "assignment_count": 0,
+        "candidate_count": 1,
+        "decision_hash": "92706c79c0bc5fbfdff5d58a2b04ab647beadfc32b96e282aac8e9c96627b967",
+        "documentation_issue": true,
+        "eligible_count": 1,
+        "missing_requirement_ids": [
+          "project_answer:0:behavior:d59f1bd6d15a0dc3"
+        ],
+        "omission_counts": {},
+        "origin": "source_documentation",
+        "reason_codes": [
+          "mandatory_support_not_localized"
+        ],
+        "recommended_doc_action": "add_explicit_proposition",
+        "schema_version": 1,
+        "selected_count": 1,
+        "status": "blocked"
+      },
+      "question": "What does PaymentOutbox do?",
+      "require_discovery": false,
+      "require_support": false,
+      "requirements_hash": "b6c7784482708c4f14c5ce1039690e8bdfb94ad1c002042c96f03c3be0445c1e",
+      "selected_evidence_ids": [],
+      "selected_sources": [
+        "packages/orders/README.md"
+      ],
+      "support_reason_code": "required_evidence_missing",
+      "support_status": "insufficient_evidence"
+    },
+    {
+      "answer_supported": false,
+      "assignment_count": 0,
+      "candidate_content_sha256": "590abccc988afb5d7380e8ac2375b0877e39723c0496a4ee9e6e116c43e19c0f",
+      "candidate_discovered": false,
+      "candidate_source": "docs/theme.md",
+      "decision_hash": "93d8831944cd4e1b28b4014c2fbab0ea398fe5e6d6bd191026596fc5c9503ed6",
+      "family": "negative_control",
+      "id": "negative_unrelated_policy",
+      "matched_discovery_terms": [],
+      "missing_requirement_ids": [
+        "project_answer:0:definition:54dcb18434b7f308"
+      ],
+      "negative_control": true,
+      "planner": {
+        "concept_queries": [
+          "ProjectRetryPolicy"
+        ],
+        "parse_trace": [],
+        "proof_obligation_count": 1,
+        "requirement_probe_count": 2,
+        "retrieval_hints": [
+          "ProjectRetryPolicy"
+        ],
+        "subjects": [
+          "ProjectRetryPolicy"
+        ],
+        "unresolved_parts": []
+      },
+      "proofability": {
+        "assignment_count": 0,
+        "candidate_count": 1,
+        "decision_hash": "93d8831944cd4e1b28b4014c2fbab0ea398fe5e6d6bd191026596fc5c9503ed6",
+        "documentation_issue": true,
+        "eligible_count": 1,
+        "missing_requirement_ids": [
+          "project_answer:0:definition:54dcb18434b7f308"
+        ],
+        "omission_counts": {},
+        "origin": "source_documentation",
+        "reason_codes": [
+          "mandatory_support_not_localized"
+        ],
+        "recommended_doc_action": "add_explicit_proposition",
+        "schema_version": 1,
+        "selected_count": 1,
+        "status": "blocked"
+      },
+      "question": "What is ProjectRetryPolicy?",
+      "require_discovery": false,
+      "require_support": false,
+      "requirements_hash": "73f7cccdb748f296a75a18989e60893b1f549fc93f116409f7c5c089ec8de230",
+      "selected_evidence_ids": [],
+      "selected_sources": [
+        "docs/theme.md"
+      ],
+      "support_reason_code": "required_evidence_missing",
+      "support_status": "insufficient_evidence"
+    }
+  ],
+  "claim_boundary": {
+    "autonomous_agent_truth_proven": false,
+    "candidate_discovery_separate_from_support": true,
+    "product_maturity": "Beta",
+    "production_runtime_changed": false,
+    "public_api_changed": false,
+    "support_semantics_relaxed": false
+  },
+  "decision": {
+    "core_exact_proofability": "accepted",
+    "negative_control_precision": "accepted",
+    "production_change_authorized": false,
+    "typo_and_alias_results_are_measurement_only": true
+  },
+  "families": {
+    "alias": {
+      "answer_supported": 0,
+      "candidate_discovered": 2,
+      "case_count": 2,
+      "negative_false_support": 0,
+      "required_discovery": 2,
+      "required_discovery_passed": 2,
+      "required_support": 0,
+      "required_support_passed": 0
+    },
+    "behavior": {
+      "answer_supported": 2,
+      "candidate_discovered": 2,
+      "case_count": 2,
+      "negative_false_support": 0,
+      "required_discovery": 2,
+      "required_discovery_passed": 2,
+      "required_support": 2,
+      "required_support_passed": 2
+    },
+    "exact_identifier": {
+      "answer_supported": 2,
+      "candidate_discovered": 2,
+      "case_count": 2,
+      "negative_false_support": 0,
+      "required_discovery": 2,
+      "required_discovery_passed": 2,
+      "required_support": 2,
+      "required_support_passed": 2
+    },
+    "negative_control": {
+      "answer_supported": 0,
+      "candidate_discovered": 0,
+      "case_count": 2,
+      "negative_false_support": 0,
+      "required_discovery": 0,
+      "required_discovery_passed": 0,
+      "required_support": 0,
+      "required_support_passed": 0
+    },
+    "policy": {
+      "answer_supported": 1,
+      "candidate_discovered": 2,
+      "case_count": 2,
+      "negative_false_support": 0,
+      "required_discovery": 2,
+      "required_discovery_passed": 2,
+      "required_support": 0,
+      "required_support_passed": 0
+    },
+    "requirements": {
+      "answer_supported": 1,
+      "candidate_discovered": 2,
+      "case_count": 2,
+      "negative_false_support": 0,
+      "required_discovery": 2,
+      "required_discovery_passed": 2,
+      "required_support": 1,
+      "required_support_passed": 1
+    },
+    "typo": {
+      "answer_supported": 0,
+      "candidate_discovered": 0,
+      "case_count": 2,
+      "negative_false_support": 0,
+      "required_discovery": 0,
+      "required_discovery_passed": 0,
+      "required_support": 0,
+      "required_support_passed": 0
+    }
+  },
+  "protocol": "paraphrase-proofability-report-v1",
+  "schema_version": 1,
+  "source_identities": {
+    "planner": {
+      "git_blob_sha1": "92c0879c3f80d3ab7f12e61474c0793cc9863c76",
+      "path": "docmancer/docs/domain/project_answer_contract.py"
+    },
+    "protocol": {
+      "git_blob_sha1": "43cd3b77175205d72092ab768907b6f82259a0a6",
+      "path": "eval/agent_developer_v1/paraphrase_protocol.json"
+    },
+    "selector": {
+      "git_blob_sha1": "68cb3e222d860e7bdf2b0435129b70fa6793836d",
+      "path": "docmancer/docs/application/evidence_selection.py"
+    }
+  },
+  "summary": {
+    "answer_supported": 6,
+    "candidate_discovered": 10,
+    "case_count": 14,
+    "false_supported_negative_controls": 0,
+    "negative_control_count": 2,
+    "required_discovery": 10,
+    "required_discovery_passed": 10,
+    "required_support": 5,
+    "required_support_passed": 5
+  }
+}
