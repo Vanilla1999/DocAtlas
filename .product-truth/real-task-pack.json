@@ -24,11 +24,11 @@
     },
     {
       "id": "docatlas-real-003",
-      "fix_commit": "eba658c2b8994eca04b2fac3b7bad72072fa3b50",
-      "issue_text": "Project documentation analysis is misclassifying syntactically valid Python declarations/imports containing words such as required or forbidden as normative prose. Preserve prose detection without turning Python declarations into policy facts.",
-      "hidden_test_path": "tests/docs/test_normative_language.py",
-      "public_nodeid": "tests/docs/test_normative_language.py::test_query_symbol_visibility_handles_acronym_camel_case_source_paths",
-      "hidden_nodeid": "tests/docs/test_normative_language.py::test_parenthesized_import_lines_are_one_python_declaration"
+      "fix_commit": "538236d01375f0f3afa4da19d1c3a69966b39004",
+      "issue_text": "A safe local-source recovery handoff can accidentally self-authorize an edit even when the host request did not express mutation intent. Separate source investigation from edit authorization so only host-owned mutation intent can make the workflow edit-ready.",
+      "hidden_test_path": "tests/test_source_search_edit_readiness.py",
+      "public_nodeid": "tests/test_source_search_edit_readiness.py::test_safe_source_handoff_accepts_only_complete_nonautomatic_code_search",
+      "hidden_nodeid": "tests/test_source_search_edit_readiness.py::test_projection_authorizes_complete_safe_source_handoff"
     },
     {
       "id": "docatlas-real-004",
