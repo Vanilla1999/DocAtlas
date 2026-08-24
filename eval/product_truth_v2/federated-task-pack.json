@@ -1,6 +1,6 @@
 {
-  "schema_version": 1,
-  "protocol": "docatlas-federated-product-truth-reopening-v1",
+  "schema_version": 2,
+  "protocol": "docatlas-federated-product-truth-reopening-v2",
   "phase": "P2_PRODUCT_TRUTH_REOPENING",
   "selection_policy": {
     "repository_count": 3,
@@ -8,11 +8,16 @@
     "candidate_task_count": 24,
     "task_origin": "single-parent historical fix candidate",
     "broken_base": "first parent of fix_commit",
-    "gold_patch": "exact first-parent diff of fix_commit",
+    "gold_patch": "exact historical production-only diff of fix_commit or reviewed historical projection",
     "base_must_fail_regression": true,
+    "hidden_red_requires_pytest_assertion_failure": true,
     "clean_gold_repetitions": 2,
     "real_model_oracle_required": true,
     "same_model_tools_and_hard_budgets": true,
+    "model_workspace_exact_broken_snapshot": true,
+    "model_git_and_benchmark_metadata_forbidden": true,
+    "model_network_access_forbidden": true,
+    "candidate_diff_scored_in_fresh_evaluator_worktree": true,
     "private_source_must_remain_in_source_repository": true
   },
   "repositories": [
@@ -20,59 +25,61 @@
       "id": "docatlas",
       "repository": "Vanilla1999/DocAtlas",
       "visibility": "public",
-      "frozen_inventory_head": "e7d523ab1943c05d7b7fafe36eaf59fe589d428e",
+      "frozen_inventory_head": "95b42167693547f515f096df27c1af91592badaa",
       "worker_attestation": "pending",
       "tasks": [
-        {"id": "docatlas-hf-001", "fix_commit": "059e7668f03f3e9e2030e14c6c467e1bd5272fc0", "stage": "candidate_history_audit", "valid": false},
-        {"id": "docatlas-hf-002", "fix_commit": "e7e905095b436e028b42a93538fa6a3467d4a63a", "stage": "candidate_history_audit", "valid": false},
-        {"id": "docatlas-hf-003", "fix_commit": "eba658c2b8994eca04b2fac3b7bad72072fa3b50", "stage": "candidate_history_audit", "valid": false},
-        {"id": "docatlas-hf-004", "fix_commit": "b61a16258ab720ec96ef7e9b7071a28c1ed97d90", "stage": "candidate_history_audit", "valid": false},
-        {"id": "docatlas-hf-005", "fix_commit": "daa15c755ed14f081f1a7f3f1ed8070d7d18dbc0", "stage": "candidate_history_audit", "valid": false},
-        {"id": "docatlas-hf-006", "fix_commit": "51312dd9fb1dfc5743e77c60d552f1cebb4f45f6", "stage": "candidate_history_audit", "valid": false},
-        {"id": "docatlas-hf-007", "fix_commit": "0018344a667843577c3d5aaaaad23a434d262d49", "stage": "candidate_history_audit", "valid": false},
-        {"id": "docatlas-hf-008", "fix_commit": "b576307857e264175341e76b3316ddc58d7282fe", "stage": "candidate_history_audit", "valid": false}
+        {"id": "docatlas-hf-001", "fix_commit": "059e7668f03f3e9e2030e14c6c467e1bd5272fc0", "stage": "source_control_pending", "valid": false},
+        {"id": "docatlas-hf-002", "fix_commit": "e7e905095b436e028b42a93538fa6a3467d4a63a", "stage": "source_control_pending", "valid": false},
+        {"id": "docatlas-hf-003", "fix_commit": "538236d01375f0f3afa4da19d1c3a69966b39004", "stage": "source_control_pending", "valid": false},
+        {"id": "docatlas-hf-004", "fix_commit": "b61a16258ab720ec96ef7e9b7071a28c1ed97d90", "stage": "source_control_pending", "valid": false},
+        {"id": "docatlas-hf-005", "fix_commit": "daa15c755ed14f081f1a7f3f1ed8070d7d18dbc0", "stage": "source_control_pending", "valid": false},
+        {"id": "docatlas-hf-006", "fix_commit": "51312dd9fb1dfc5743e77c60d552f1cebb4f45f6", "stage": "source_control_pending", "valid": false},
+        {"id": "docatlas-hf-007", "fix_commit": "0018344a667843577c3d5aaaaad23a434d262d49", "stage": "source_control_pending", "valid": false},
+        {"id": "docatlas-hf-008", "fix_commit": "b576307857e264175341e76b3316ddc58d7282fe", "stage": "source_control_pending", "valid": false}
+      ]
+    },
+    {
+      "id": "hermes",
+      "repository": "Vanilla1999/hermes-agent",
+      "visibility": "public",
+      "frozen_inventory_head": "65b83fa7b21a42c3aafd14cd45230ef80355b418",
+      "worker_attestation": "pending",
+      "tasks": [
+        {"id": "hermes-hf-001", "fix_commit": "2f32092b38dce4c3ade0c48897c6fab0edecb893", "stage": "source_control_pending", "valid": false},
+        {"id": "hermes-hf-002", "fix_commit": "687dd632a12b952c141c5820c8c7be552d35c108", "stage": "source_control_pending", "valid": false},
+        {"id": "hermes-hf-003", "fix_commit": "4c2d473a80097b87c903ff659a56ef7a4d62a216", "stage": "source_control_pending", "valid": false},
+        {"id": "hermes-hf-004", "fix_commit": "105aba6705c1dc61fbbc7b5ea69bdfedf76764e5", "stage": "source_control_pending", "valid": false},
+        {"id": "hermes-hf-005", "fix_commit": "2000278874040f65959a99e9d850a8d59916d4af", "stage": "source_control_pending", "valid": false},
+        {"id": "hermes-hf-006", "fix_commit": "9645ea8d52aefd0b270786ac16f7b0278ca8175d", "stage": "source_control_pending", "valid": false},
+        {"id": "hermes-hf-007", "fix_commit": "0de8c32f52f73462be13806eca88caf580bdfe41", "stage": "source_control_pending", "valid": false},
+        {"id": "hermes-hf-008", "fix_commit": "1f1acc0e4ddd8a39ca10a6aaf832a8029232ecaf", "stage": "source_control_pending", "valid": false}
       ]
     },
     {
       "id": "lov",
       "repository": "Vanilla1999/lov",
       "visibility": "private",
-      "frozen_inventory_head": "a4ffbb5d47b8bdfc7851ab2040b06984012ba264",
+      "frozen_inventory_head": "03b9818aa96b5b1d37ed6117de9226b30c7852b2",
       "worker_attestation": "pending",
       "tasks": [
-        {"id": "lov-hf-001", "fix_commit": "702b613b1ad00be5c7e7bf3e6f11aa824a69f671", "stage": "candidate_history_audit", "valid": false},
-        {"id": "lov-hf-002", "fix_commit": "f4210c21d7f26015a1dc4de524ce18689ae26a3b", "stage": "candidate_history_audit", "valid": false},
-        {"id": "lov-hf-003", "fix_commit": "b4cba1ce5b829d962000a9fa859751750a7c3836", "stage": "candidate_history_audit", "valid": false},
-        {"id": "lov-hf-004", "fix_commit": "7bd1560f6e4d536fa9d8b0a8405d70c6fd014b90", "stage": "candidate_history_audit", "valid": false},
-        {"id": "lov-hf-005", "fix_commit": "1131a26cfad90b0b6d196919e8a63d591d357e55", "stage": "candidate_history_audit", "valid": false},
-        {"id": "lov-hf-006", "fix_commit": "a4ebb6a9aa158fb8c792c4359e7e379ed40e19ee", "stage": "candidate_history_audit", "valid": false},
-        {"id": "lov-hf-007", "fix_commit": "c03bc874f3dfc8d3ac107675faf3d1363eee5e93", "stage": "candidate_history_audit", "valid": false},
-        {"id": "lov-hf-008", "fix_commit": "cb1a9660c7f85eab249613ed89b50c59130d65ae", "stage": "candidate_history_audit", "valid": false}
-      ]
-    },
-    {
-      "id": "smart_glass",
-      "repository": "Vanilla1999/smart_glass",
-      "visibility": "public",
-      "frozen_inventory_head": "a9fbf5dd859e71579bbe24fb67d0495cc492af74",
-      "worker_attestation": "pending",
-      "tasks": [
-        {"id": "smart-glass-hf-001", "fix_commit": "42313d5a634887c421d308ffa525f5f74d207fb2", "stage": "candidate_history_audit", "valid": false},
-        {"id": "smart-glass-hf-002", "fix_commit": "5440d0328b99926c3348ef5ae0c599a96039e868", "stage": "candidate_history_audit", "valid": false},
-        {"id": "smart-glass-hf-003", "fix_commit": "bedb91d75b2f01a3c55667bbcd1b623fb7d92bcd", "stage": "candidate_history_audit", "valid": false},
-        {"id": "smart-glass-hf-004", "fix_commit": "14899f0bd1467766c314b8a962863039923346c7", "stage": "candidate_history_audit", "valid": false},
-        {"id": "smart-glass-hf-005", "fix_commit": "d4101815234382d88260647e1c55cfc54fce9bee", "stage": "candidate_history_audit", "valid": false},
-        {"id": "smart-glass-hf-006", "fix_commit": "f9e8032859aab6b4531009776558486c43cb3fe6", "stage": "candidate_history_audit", "valid": false},
-        {"id": "smart-glass-hf-007", "fix_commit": "2398bc4d7b3c0ed6e7f83e10a47df039d6b862eb", "stage": "candidate_history_audit", "valid": false},
-        {"id": "smart-glass-hf-008", "fix_commit": "75c1f7168d2e4d9efd206ae9dc7508379db380ab", "stage": "candidate_history_audit", "valid": false}
+        {"id": "lov-hf-001", "fix_commit": "b4cba1ce5b829d962000a9fa859751750a7c3836", "stage": "source_control_pending", "valid": false},
+        {"id": "lov-hf-002", "fix_commit": "6e0abcfc27a5cc37995691ce54b56248c87b1ae1", "stage": "source_control_pending", "valid": false},
+        {"id": "lov-hf-003", "fix_commit": "ba8c7f692d89ba46bea881ee7f6505c4da982b0c", "stage": "source_control_pending", "valid": false},
+        {"id": "lov-hf-004", "fix_commit": "ff854aa2f08fed44f49635ae39e3517b0eded77d", "stage": "source_control_pending", "valid": false},
+        {"id": "lov-hf-005", "fix_commit": "2370c2775459f22ca998306f25d61c798f23f659", "stage": "source_control_pending", "valid": false},
+        {"id": "lov-hf-006", "fix_commit": "e1608fc1dfeb496c0b229d1479d230571f187afb", "stage": "source_control_pending", "valid": false},
+        {"id": "lov-hf-007", "fix_commit": "a57792f944fbb1769bb8266ab0fd0c76276e6f05", "stage": "source_control_pending", "valid": false},
+        {"id": "lov-hf-008", "fix_commit": "f77ab50395be4e8724c328ea7da3cf438fb3a795", "stage": "source_control_pending", "valid": false}
       ]
     }
   ],
   "claim_boundary": {
     "source_repository_workers_required": true,
     "private_source_embedded": false,
+    "model_execution_config_frozen": false,
     "valid_tasks": 0,
     "task_pack_ready": false,
+    "real_model_oracle_authorized": false,
     "canary_authorized": false,
     "full_pilot_authorized": false,
     "product_truth_proven": false,
