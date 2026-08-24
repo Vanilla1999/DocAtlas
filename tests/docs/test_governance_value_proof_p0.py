@@ -100,27 +100,68 @@ def test_governance_question_plan_uses_typed_value_relations():
     assert all(item.response_mode == "value" for item in obligations)
     assert {item.proof_role for item in obligations} == {"project_rule"}
 
+    def isolated_decision(relation: str, stable_id: str, text: str):
+        requirement_only = type(requirements)((by_relation[relation],))
+        return select_evidence(
+            [
+                _candidate(
+                    stable_id,
+                    text,
+                    source="docs/permission-policy.md",
+                    authority="official",
+                )
+            ],
+            question=QUESTION,
+            config=project_docs_selection_config(800),
+            requirements=requirement_only,
+        )
+
     # Direction is part of the value contract: a permission depending on
     # Android 13 is not proof that Android 13 requires that permission.
-    reversed_requirement = _candidate(
+    reversed_requirement = isolated_decision(
+        "governance_requirement",
         "reversed-notification-rule",
         "Notification permission requires Android 13 compatibility before browser startup.",
-        source="docs/permission-policy.md",
-        authority="official",
     )
-    requirement_only = type(requirements)((by_relation["governance_requirement"],))
-    reversed_decision = select_evidence(
-        [reversed_requirement],
-        question=QUESTION,
-        config=project_docs_selection_config(800),
-        requirements=requirement_only,
+    assert reversed_requirement.support_decision.answer_supported is False
+
+    # A predicate elsewhere in the same sentence must not discharge a facet.
+    cross_scope = isolated_decision(
+        "governed_scope",
+        "cross-scope-rule",
+        (
+            "Browser and scan Android permission preflight architecture is discussed throughout "
+            "a long migration review with many unrelated implementation notes and historical "
+            "compatibility details, while cache workers use the same retry policy."
+        ),
     )
-    assert reversed_decision.support_decision.answer_supported is False
+    cross_owner = isolated_decision(
+        "governance_ownership",
+        "cross-owner-rule",
+        (
+            "Policy ownership for browser and scan preflight is under architecture review with "
+            "many unrelated migration notes and historical compatibility details, while "
+            "PermissionService owns retry scheduling."
+        ),
+    )
+    cross_state = isolated_decision(
+        "governance_state",
+        "cross-state-rule",
+        (
+            "Background location behavior is reviewed for browser and scan preflight with many "
+            "unrelated migration notes and historical compatibility details, while notification "
+            "permission remains deferred."
+        ),
+    )
+    assert cross_scope.support_decision.answer_supported is False
+    assert cross_owner.support_decision.answer_supported is False
+    assert cross_state.support_decision.answer_supported is False
 
 
 def test_permission_scope_is_not_overclassified_as_a_requirement():
+    question = "What project rules govern auth policy, including permission scope and logging policy?"
     requirements = build_requirements(
-        "What project rules govern auth policy, including permission scope and logging policy?",
+        question,
         profile="project_docs_answer",
     )
     obligation = next(
@@ -129,6 +170,26 @@ def test_permission_scope_is_not_overclassified_as_a_requirement():
     )
     assert obligation.relation == "governance_facet"
     assert obligation.proof_role == "project_rule"
+
+    # Generic governance still needs a predicate locally bound to its target.
+    unrelated_predicate = _candidate(
+        "cross-generic-rule",
+        (
+            "Permission scope is discussed throughout auth architecture migration notes with "
+            "many unrelated configuration constraints and historical compatibility details, "
+            "while logging policy requires redaction."
+        ),
+        source="docs/auth-policy.md",
+        authority="official",
+    )
+    generic_only = type(requirements)((obligation,))
+    decision = select_evidence(
+        [unrelated_predicate],
+        question=question,
+        config=project_docs_selection_config(800),
+        requirements=generic_only,
+    )
+    assert decision.support_decision.answer_supported is False
 
 
 def test_navigation_summary_cannot_prove_governance_values():
