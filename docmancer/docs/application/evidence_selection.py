@@ -7,9 +7,9 @@ not for deciding which source facts are important.
 
 from __future__ import annotations
 
-from dataclasses import replace
-from functools import wraps
-from typing import Any, Iterable, Mapping, Sequence
+from dataclasses import replace as _replace
+from functools import wraps as _wraps
+from typing import Any as _Any, Iterable as _Iterable, Mapping as _Mapping, Sequence as _Sequence
 
 from ._evidence_selection_shared import *  # noqa: F401,F403
 from ._evidence_selection_shared import build_requirements as _build_requirements_impl
@@ -37,7 +37,7 @@ _GOVERNANCE_PROJECT_RULE_RELATIONS = frozenset({
 
 
 def _bind_governance_project_rule_roles(
-    requirements: EvidenceRequirementSet | Sequence[EvidenceRequirement],
+    requirements: EvidenceRequirementSet | _Sequence[EvidenceRequirement],
 ) -> EvidenceRequirementSet | tuple[EvidenceRequirement, ...]:
     """Bind governance obligations to project-rule authority in the canonical facade."""
 
@@ -47,38 +47,39 @@ def _bind_governance_project_rule_roles(
             and item.relation in _GOVERNANCE_PROJECT_RULE_RELATIONS
             and item.proof_role != "project_rule"
         ):
-            return replace(item, proof_role="project_rule")
+            return _replace(item, proof_role="project_rule")
         return item
 
     if isinstance(requirements, EvidenceRequirementSet):
         rebound = tuple(bind(item) for item in requirements.requirements)
         if rebound == requirements.requirements:
             return requirements
-        return replace(requirements, requirements=rebound)
+        return _replace(requirements, requirements=rebound)
     return tuple(bind(item) for item in requirements)
 
 
-@wraps(_build_requirements_impl)
-def build_requirements(*args: Any, **kwargs: Any) -> EvidenceRequirementSet:
+@_wraps(_build_requirements_impl)
+def build_requirements(*args: _Any, **kwargs: _Any) -> EvidenceRequirementSet:
     """Build canonical requirements and attach governance authority semantics."""
 
     requirements = _build_requirements_impl(*args, **kwargs)
     bound = _bind_governance_project_rule_roles(requirements)
-    assert isinstance(bound, EvidenceRequirementSet)
+    if not isinstance(bound, EvidenceRequirementSet):
+        raise RuntimeError("canonical requirement binding returned an invalid requirement set")
     return bound
 
 
 def select_evidence(
-    items: Iterable[Mapping[str, Any]],
+    items: _Iterable[_Mapping[str, _Any]],
     *,
     question: str,
     config: SelectionConfig,
-    trust_contract: Mapping[str, Any] | None = None,
-    requirements: EvidenceRequirementSet | Sequence[EvidenceRequirement] | None = None,
-    required_evidence_paths: Iterable[str] = (),
-    required_target_paths: Iterable[str] = (),
-    public_requirements: Iterable[Mapping[str, Any] | str] = (),
-    library_requirement_contract: Mapping[str, Iterable[str]] | None = None,
+    trust_contract: _Mapping[str, _Any] | None = None,
+    requirements: EvidenceRequirementSet | _Sequence[EvidenceRequirement] | None = None,
+    required_evidence_paths: _Iterable[str] = (),
+    required_target_paths: _Iterable[str] = (),
+    public_requirements: _Iterable[_Mapping[str, _Any] | str] = (),
+    library_requirement_contract: _Mapping[str, _Iterable[str]] | None = None,
     exact_version: str | None = None,
     project_identity: str | None = None,
     module_id: str | None = None,
@@ -112,4 +113,4 @@ def select_evidence(
     )
 
 
-__all__ = [n for n in globals() if not n.startswith("__")]
+__all__ = [n for n in globals() if not n.startswith("__") and not n.startswith("_")]
