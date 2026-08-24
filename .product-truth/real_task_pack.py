@@ -9,6 +9,7 @@ import re
 import subprocess
 import sys
 import tempfile
+import xml.etree.ElementTree as ET
 from pathlib import Path
 from typing import Any, Mapping
 
@@ -79,16 +80,16 @@ def changed_paths(base: str, fix: str) -> list[str]:
 
 
 def changed_worktree_paths(worktree: Path) -> list[str]:
-    """Return every changed path, including untracked files created by a patch."""
     tracked = require_git("diff", "--name-only", "-z", "HEAD", cwd=worktree)
     untracked = require_git("ls-files", "--others", "--exclude-standard", "-z", cwd=worktree)
-    values = {
-        item.decode("utf-8", errors="strict")
-        for payload in (tracked, untracked)
-        for item in payload.split(b"\0")
-        if item
-    }
-    return sorted(values)
+    return sorted(
+        {
+            item.decode("utf-8", errors="strict")
+            for payload in (tracked, untracked)
+            for item in payload.split(b"\0")
+            if item
+        }
+    )
 
 
 def is_test_path(path: str) -> bool:
@@ -100,13 +101,9 @@ def production_paths(paths: list[str]) -> list[str]:
     result: list[str] = []
     for path in paths:
         normalized = path.replace("\\", "/")
-        if normalized in EXCLUDED_NAMES:
+        if normalized in EXCLUDED_NAMES or normalized.startswith(EXCLUDED_PREFIXES):
             continue
-        if normalized.startswith(EXCLUDED_PREFIXES):
-            continue
-        if is_test_path(normalized):
-            continue
-        if normalized.endswith((".md", ".rst")):
+        if is_test_path(normalized) or normalized.endswith((".md", ".rst")):
             continue
         result.append(normalized)
     return sorted(result)
@@ -149,10 +146,8 @@ def validate_manifest(manifest: Mapping[str, Any]) -> None:
             if not isinstance(value, str) or not value.strip():
                 raise ValueError(f"{task_id}: {field} is required")
         hidden_path = str(task["hidden_test_path"])
-        if not is_test_path(hidden_path):
-            raise ValueError(f"{task_id}: hidden path is not a repository test")
-        if ".." in Path(hidden_path).parts or Path(hidden_path).is_absolute():
-            raise ValueError(f"{task_id}: hidden test path escapes repository")
+        if not is_test_path(hidden_path) or Path(hidden_path).is_absolute() or ".." in Path(hidden_path).parts:
+            raise ValueError(f"{task_id}: hidden test path invalid")
         if len(str(task["issue_text"])) > 1200:
             raise ValueError(f"{task_id}: issue text is not bounded")
 
@@ -169,6 +164,32 @@ def test_environment(worktree: Path, manifest: Mapping[str, Any]) -> dict[str, s
     return env
 
 
+def _junit_evidence(path: Path) -> dict[str, Any]:
+    raw = path.read_bytes() if path.exists() else b""
+    evidence: dict[str, Any] = {
+        "junit_sha256": sha256_bytes(raw),
+        "junit_parsed": False,
+        "testcases": 0,
+        "test_failures": 0,
+        "test_errors": 0,
+    }
+    if not raw:
+        return evidence
+    try:
+        root = ET.fromstring(raw)
+    except ET.ParseError:
+        return evidence
+    evidence.update(
+        {
+            "junit_parsed": True,
+            "testcases": sum(1 for _ in root.iter("testcase")),
+            "test_failures": sum(1 for _ in root.iter("failure")),
+            "test_errors": sum(1 for _ in root.iter("error")),
+        }
+    )
+    return evidence
+
+
 def run_test(
     worktree: Path,
     manifest: Mapping[str, Any],
@@ -177,20 +198,26 @@ def run_test(
     timeout_seconds: int,
 ) -> dict[str, Any]:
     working = worktree / str(manifest.get("working_directory") or ".")
-    result = subprocess.run(
-        [sys.executable, "-m", "pytest", "-q", nodeid],
-        cwd=working,
-        env=test_environment(worktree, manifest),
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE,
-        timeout=timeout_seconds,
-        check=False,
-    )
-    return {
-        "returncode": result.returncode,
-        "stdout_sha256": sha256_bytes(result.stdout),
-        "stderr_sha256": sha256_bytes(result.stderr),
-    }
+    with tempfile.NamedTemporaryFile(prefix="product-truth-pytest-", suffix=".xml", delete=False) as handle:
+        junit_path = Path(handle.name)
+    try:
+        result = subprocess.run(
+            [sys.executable, "-m", "pytest", "-q", f"--junitxml={junit_path}", nodeid],
+            cwd=working,
+            env=test_environment(worktree, manifest),
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            timeout=timeout_seconds,
+            check=False,
+        )
+        return {
+            "returncode": result.returncode,
+            "stdout_sha256": sha256_bytes(result.stdout),
+            "stderr_sha256": sha256_bytes(result.stderr),
+            **_junit_evidence(junit_path),
+        }
+    finally:
+        junit_path.unlink(missing_ok=True)
 
 
 def overlay_hidden_test(worktree: Path, fix: str, path: str) -> tuple[bytes | None, bool]:
@@ -211,14 +238,26 @@ def restore_hidden_test(worktree: Path, path: str, previous: bytes | None, exist
         target.unlink(missing_ok=True)
 
 
+def hidden_red_valid(stage: Mapping[str, Any] | None) -> bool:
+    return bool(
+        isinstance(stage, Mapping)
+        and stage.get("returncode") == 1
+        and stage.get("junit_parsed") is True
+        and isinstance(stage.get("test_failures"), int)
+        and stage.get("test_failures", 0) >= 1
+        and stage.get("test_errors") == 0
+    )
+
+
 def attempt_stage_valid(item: Mapping[str, Any]) -> bool:
     def returncode(field: str) -> object:
         stage = item.get(field)
         return stage.get("returncode") if isinstance(stage, Mapping) else None
 
+    hidden = item.get("hidden_base")
     return bool(
         returncode("public_base") == 0
-        and returncode("hidden_base") == 1
+        and hidden_red_valid(hidden if isinstance(hidden, Mapping) else None)
         and item.get("patch_applied") is True
         and item.get("gold_surface_exact") is True
         and returncode("public_gold") == 0
@@ -242,48 +281,28 @@ def run_attempt(
         worktree = Path(raw) / "workspace"
         require_git("worktree", "add", "--detach", str(worktree), base)
         try:
-            public_base = run_test(
-                worktree,
-                manifest,
-                str(task["public_nodeid"]),
-                timeout_seconds=timeout_seconds,
-            )
+            public_base = run_test(worktree, manifest, str(task["public_nodeid"]), timeout_seconds=timeout_seconds)
             previous, existed = overlay_hidden_test(worktree, fix, hidden_path)
             try:
-                hidden_base = run_test(
-                    worktree,
-                    manifest,
-                    str(task["hidden_nodeid"]),
-                    timeout_seconds=timeout_seconds,
-                )
+                hidden_base = run_test(worktree, manifest, str(task["hidden_nodeid"]), timeout_seconds=timeout_seconds)
             finally:
                 restore_hidden_test(worktree, hidden_path, previous, existed)
 
             apply_result = run_git("apply", "--whitespace=nowarn", "-", cwd=worktree, input_bytes=gold_patch)
             patch_applied = apply_result.returncode == 0
             changed_after_gold: list[str] = []
-            public_gold = {"returncode": 99, "stdout_sha256": "", "stderr_sha256": ""}
-            hidden_gold = dict(public_gold)
+            public_gold: dict[str, Any] = {"returncode": 99}
+            hidden_gold: dict[str, Any] = {"returncode": 99}
             if patch_applied:
                 changed_after_gold = changed_worktree_paths(worktree)
-                public_gold = run_test(
-                    worktree,
-                    manifest,
-                    str(task["public_nodeid"]),
-                    timeout_seconds=timeout_seconds,
-                )
+                public_gold = run_test(worktree, manifest, str(task["public_nodeid"]), timeout_seconds=timeout_seconds)
                 previous, existed = overlay_hidden_test(worktree, fix, hidden_path)
                 try:
-                    hidden_gold = run_test(
-                        worktree,
-                        manifest,
-                        str(task["hidden_nodeid"]),
-                        timeout_seconds=timeout_seconds,
-                    )
+                    hidden_gold = run_test(worktree, manifest, str(task["hidden_nodeid"]), timeout_seconds=timeout_seconds)
                 finally:
                     restore_hidden_test(worktree, hidden_path, previous, existed)
 
-            row = {
+            row: dict[str, Any] = {
                 "attempt": attempt,
                 "public_base": public_base,
                 "hidden_base": hidden_base,
@@ -342,24 +361,20 @@ def run_task(manifest: Mapping[str, Any], task: Mapping[str, Any]) -> dict[str, 
         )
         for index in (1, 2)
     ]
-    return {
-        key: value
-        for key, value in provenance.items()
-        if key != "gold_patch"
-    } | {
-        "attempts": attempts,
-        "gold_reproducible": all(attempt_stage_valid(row) for row in attempts),
-        "real_model_oracle_executed": False,
-        "real_model_oracle_passed": False,
-        "valid": False,
-    }
+    result = {key: value for key, value in provenance.items() if key != "gold_patch"}
+    result.update(
+        {
+            "attempts": attempts,
+            "gold_reproducible": all(attempt_stage_valid(row) for row in attempts),
+            "real_model_oracle_executed": False,
+            "real_model_oracle_passed": False,
+            "valid": False,
+        }
+    )
+    return result
 
 
-def verify_task_provenance(
-    manifest: Mapping[str, Any],
-    manifest_task: Mapping[str, Any],
-    row: Mapping[str, Any],
-) -> None:
+def verify_task_provenance(manifest: Mapping[str, Any], manifest_task: Mapping[str, Any], row: Mapping[str, Any]) -> None:
     expected = task_provenance(manifest, manifest_task)
     expected.pop("gold_patch")
     for field, value in expected.items():
@@ -392,16 +407,15 @@ def verify_report(report: Mapping[str, Any], manifest: Mapping[str, Any]) -> Non
             raise ValueError("real-task result row must be an object")
         verify_task_provenance(manifest, manifest_task, row)
         attempts = row.get("attempts")
-        if not isinstance(attempts, list) or [item.get("attempt") for item in attempts if isinstance(item, Mapping)] != [1, 2]:
+        if not isinstance(attempts, list) or len(attempts) != 2 or [item.get("attempt") for item in attempts if isinstance(item, Mapping)] != [1, 2]:
             raise ValueError("each task requires exactly two clean gold attempts")
         attempt_results: list[bool] = []
         for item in attempts:
             if not isinstance(item, Mapping):
                 raise ValueError("attempt row must be an object")
             hidden = item.get("hidden_base")
-            hidden_rc = hidden.get("returncode") if isinstance(hidden, Mapping) else None
-            if hidden_rc != 1:
-                raise ValueError("hidden-base test must fail with pytest assertion code 1")
+            if not hidden_red_valid(hidden if isinstance(hidden, Mapping) else None):
+                raise ValueError("hidden-base test must be a pytest test failure with code 1 and no setup errors")
             actual_passed = attempt_stage_valid(item)
             if item.get("passed") is not actual_passed:
                 raise ValueError("attempt pass claim drift")
@@ -490,8 +504,7 @@ def main() -> int:
     output_path.write_text(json.dumps(report, ensure_ascii=False, indent=2, sort_keys=True) + "\n", encoding="utf-8")
     print(
         "Real-task gold control: "
-        f"{report['summary']['gold_reproducible_tasks']}/8 reproducible; "
-        "oracle=0/8; valid=0/8"
+        f"{report['summary']['gold_reproducible_tasks']}/8 reproducible; oracle=0/8; valid=0/8"
     )
     return 0 if report["summary"]["gold_reproducible_tasks"] == 8 else 1
 
