@@ -19,7 +19,7 @@ def _governance_facet_plan(value: str, *, scope: str) -> PlannedFacet:
     """Classify governance nouns into value-bearing proof families.
 
     The relation remains an internal QuestionPlan detail; the public question
-    surface is unchanged.  These typed relations prevent a generic policy
+    surface is unchanged. These typed relations prevent a generic policy
     mention from satisfying ownership, state, requirement, or version facets.
     """
 
@@ -30,7 +30,11 @@ def _governance_facet_plan(value: str, *, scope: str) -> PlannedFacet:
         relation, value_kind, expected = "governance_version", "version_range", None
     elif re.search(r"\b(?:defer|deferred|background\s+location|отлож)\w*\b", normalized):
         relation, value_kind, expected = "governance_state", "text", "deferred"
-    elif re.search(r"\b(?:notification\s+permission|permission|разрешени)\w*\b", normalized):
+    elif re.search(
+        r"\b(?:notification\s+permission|permission\s+(?:requirement|request)|"
+        r"required\s+permission|уведом\w*\s+разрешени\w*|разрешени\w*\s+уведом\w*)\b",
+        normalized,
+    ):
         relation, value_kind, expected = "governance_requirement", "text", None
     else:
         relation, value_kind, expected = "governance_facet", "text", None
