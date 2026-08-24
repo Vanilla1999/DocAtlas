@@ -175,7 +175,7 @@ def _tail_has_value(match: re.Match[str], clause: str, *, max_chars: int = 96) -
         return False
     words = [
         word.casefold()
-        for word in re.findall(r"[A-Za-zА-Яа-яЁё0-9_.:/+-]+", tail)
+        for word in re.findall(r"[A-Za-zА-Яа-яЁё0-9][A-Za-zА-Яа-яЁё0-9_.:/+-]*", tail)
         if word.casefold() not in {"to", "by", "for", "as", "with", "и", "для"}
     ]
     return bool(words)
