@@ -116,14 +116,43 @@ def test_governance_question_plan_uses_typed_value_relations():
             requirements=requirement_only,
         )
 
-    # Direction is part of the value contract: a permission depending on
-    # Android 13 is not proof that Android 13 requires that permission.
+    # Direction and polarity are part of the required value contract.
     reversed_requirement = isolated_decision(
         "governance_requirement",
         "reversed-notification-rule",
         "Notification permission requires Android 13 compatibility before browser startup.",
     )
+    negated_requirement = isolated_decision(
+        "governance_requirement",
+        "negated-notification-rule",
+        "Android 13 does not require notification permission before browser startup.",
+    )
+    negated_owner = isolated_decision(
+        "governance_ownership",
+        "negated-owner-rule",
+        "PermissionService does not own platform permission policy for browser/scan preflight.",
+    )
+    placeholder_owner = isolated_decision(
+        "governance_ownership",
+        "placeholder-owner-rule",
+        "The permission policy owner is TBD for browser and scan preflight.",
+    )
+    negated_state = isolated_decision(
+        "governance_state",
+        "negated-state-rule",
+        "Background location does not remain deferred from browser/scan preflight.",
+    )
+    separate_scope = isolated_decision(
+        "governed_scope",
+        "separate-scope-rule",
+        "Browser and scan Android permission preflight are governed by separate policies.",
+    )
     assert reversed_requirement.support_decision.answer_supported is False
+    assert negated_requirement.support_decision.answer_supported is False
+    assert negated_owner.support_decision.answer_supported is False
+    assert placeholder_owner.support_decision.answer_supported is False
+    assert negated_state.support_decision.answer_supported is False
+    assert separate_scope.support_decision.answer_supported is False
 
     # A predicate elsewhere in the same sentence must not discharge a facet.
     cross_scope = isolated_decision(
@@ -171,25 +200,45 @@ def test_permission_scope_is_not_overclassified_as_a_requirement():
     assert obligation.relation == "governance_facet"
     assert obligation.proof_role == "project_rule"
 
-    # Generic governance still needs a predicate locally bound to its target.
-    unrelated_predicate = _candidate(
+    def generic_decision(stable_id: str, text: str):
+        return select_evidence(
+            [
+                _candidate(
+                    stable_id,
+                    text,
+                    source="docs/auth-policy.md",
+                    authority="official",
+                )
+            ],
+            question=question,
+            config=project_docs_selection_config(800),
+            requirements=type(requirements)((obligation,)),
+        )
+
+    # Generic governance needs a concrete, non-negated complement.
+    assert generic_decision(
+        "bare-generic-rule",
+        "Permission scope applies.",
+    ).support_decision.answer_supported is False
+    assert generic_decision(
+        "negated-generic-rule",
+        "Permission scope does not govern admin routes.",
+    ).support_decision.answer_supported is False
+    assert generic_decision(
+        "positive-generic-rule",
+        "Permission scope governs admin routes.",
+    ).support_decision.answer_supported is True
+
+    # A valid-looking predicate for a different facet cannot be borrowed.
+    unrelated_predicate = generic_decision(
         "cross-generic-rule",
         (
             "Permission scope is discussed throughout auth architecture migration notes with "
             "many unrelated configuration constraints and historical compatibility details, "
             "while logging policy requires redaction."
         ),
-        source="docs/auth-policy.md",
-        authority="official",
     )
-    generic_only = type(requirements)((obligation,))
-    decision = select_evidence(
-        [unrelated_predicate],
-        question=question,
-        config=project_docs_selection_config(800),
-        requirements=generic_only,
-    )
-    assert decision.support_decision.answer_supported is False
+    assert unrelated_predicate.support_decision.answer_supported is False
 
 
 def test_navigation_summary_cannot_prove_governance_values():
@@ -249,6 +298,11 @@ def test_version_location_statement_requires_the_actual_version_value():
         "permission_handler version compatibility requires Android 13.0.",
         source="pubspec.lock",
     )
+    negated_value = _candidate(
+        "negated-version-value",
+        "The permission_handler version is not 11.4.0.",
+        source="pubspec.lock",
+    )
     with_value = _candidate(
         "version-value",
         "The pinned permission_handler version is 11.4.0 in pubspec.lock.",
@@ -265,35 +319,19 @@ def test_version_location_statement_requires_the_actual_version_value():
     )
     version_only = type(requirements)((version_requirement,))
 
-    missing = select_evidence(
-        [missing_value],
-        question=QUESTION,
-        config=project_docs_selection_config(800),
-        requirements=version_only,
-    )
-    unbound = select_evidence(
-        [wrong_value],
-        question=QUESTION,
-        config=project_docs_selection_config(800),
-        requirements=version_only,
-    )
-    present = select_evidence(
-        [with_value],
-        question=QUESTION,
-        config=project_docs_selection_config(800),
-        requirements=version_only,
-    )
-    lock_present = select_evidence(
-        [lock_value],
-        question=QUESTION,
-        config=project_docs_selection_config(800),
-        requirements=version_only,
-    )
+    def version_decision(candidate):
+        return select_evidence(
+            [candidate],
+            question=QUESTION,
+            config=project_docs_selection_config(800),
+            requirements=version_only,
+        )
 
-    assert missing.support_decision.answer_supported is False
-    assert unbound.support_decision.answer_supported is False
-    assert present.support_decision.answer_supported is True
-    assert lock_present.support_decision.answer_supported is True
+    assert version_decision(missing_value).support_decision.answer_supported is False
+    assert version_decision(wrong_value).support_decision.answer_supported is False
+    assert version_decision(negated_value).support_decision.answer_supported is False
+    assert version_decision(with_value).support_decision.answer_supported is True
+    assert version_decision(lock_value).support_decision.answer_supported is True
 
 
 def test_navigation_governance_cannot_become_a_model_visible_supported_answer():
