@@ -41,7 +41,7 @@ from docmancer.docs.application.evidence_candidates import (
     symbols as _symbols,
     version_rank as _version_rank,
 )
-from docmancer.docs.application.evidence_requirements import build_requirements
+from docmancer.docs.application.evidence_requirements import build_requirements as _build_requirements_impl
 
 from docmancer.docs.domain.project_answer_contract import (
     LifecycleIntent,
@@ -114,155 +114,33 @@ _QUALIFIER_PATTERNS = {
     "deprecated": re.compile(r"\bdeprecated\b", re.I),
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+_GOVERNANCE_PROJECT_RULE_RELATIONS = frozenset({
+    "governed_scope",
+    "governance_facet",
+    "governance_ownership",
+    "governance_requirement",
+    "governance_state",
+    "governance_version",
+})
+
+
+def build_requirements(*args: Any, **kwargs: Any) -> EvidenceRequirementSet:
+    """Bind typed governance obligations to canonical project-rule authority."""
+
+    requirements = _build_requirements_impl(*args, **kwargs)
+    rebound = tuple(
+        replace(item, proof_role="project_rule")
+        if (
+            item.kind == "proof_obligation"
+            and item.relation in _GOVERNANCE_PROJECT_RULE_RELATIONS
+            and item.proof_role != "project_rule"
+        )
+        else item
+        for item in requirements.requirements
+    )
+    if rebound == requirements.requirements:
+        return requirements
+    return replace(requirements, requirements=rebound)
 
 
 __all__ = [
