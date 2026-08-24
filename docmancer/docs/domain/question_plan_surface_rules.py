@@ -15,6 +15,37 @@ from docmancer.docs.domain.question_plan_core import (
 _PUBLIC_TOOLS = ("get_docs_context", "prepare_docs", "docs_status")
 
 
+def _governance_facet_plan(value: str, *, scope: str) -> PlannedFacet:
+    """Classify governance nouns into value-bearing proof families.
+
+    The relation remains an internal QuestionPlan detail; the public question
+    surface is unchanged.  These typed relations prevent a generic policy
+    mention from satisfying ownership, state, requirement, or version facets.
+    """
+
+    normalized = value.casefold().replace("_", " ")
+    if re.search(r"\b(?:owner|ownership|владел|принадлеж)\w*\b", normalized):
+        relation, value_kind, expected = "governance_ownership", "text", None
+    elif re.search(r"\b(?:version|pinned?|pinning|верси|закреп)\w*\b", normalized):
+        relation, value_kind, expected = "governance_version", "version_range", None
+    elif re.search(r"\b(?:defer|deferred|background\s+location|отлож)\w*\b", normalized):
+        relation, value_kind, expected = "governance_state", "text", "deferred"
+    elif re.search(r"\b(?:notification\s+permission|permission|разрешени)\w*\b", normalized):
+        relation, value_kind, expected = "governance_requirement", "text", None
+    else:
+        relation, value_kind, expected = "governance_facet", "text", None
+    return PlannedFacet(
+        "relation",
+        value,
+        relation=relation,
+        value_kind=value_kind,
+        expected_value=expected,
+        context=scope,
+        response_mode="value",
+        span_text=value,
+    )
+
+
 def governance_facets(q: str) -> QuestionPlan | None:
     match = re.fullmatch(
         r"\s*(?:"
@@ -50,13 +81,7 @@ def governance_facets(q: str) -> QuestionPlan | None:
             response_mode="value", span_text=scope,
         )
     ]
-    planned.extend(
-        PlannedFacet(
-            "relation", value, relation="governance_facet",
-            context=scope, response_mode="value", span_text=value,
-        )
-        for value in facets
-    )
+    planned.extend(_governance_facet_plan(value, scope=scope) for value in facets)
     return QuestionPlan(
         facets=tuple(planned),
         clauses=(q,),
@@ -148,6 +173,6 @@ def provider_request_timeout(q: str) -> QuestionPlan | None:
 
 
 __all__ = [
-    "mcp_request_handling", "provider_request_timeout", "public_tool_usage",
-    "public_tools_with_purposes", "python_version_support",
+    "governance_facets", "mcp_request_handling", "provider_request_timeout",
+    "public_tool_usage", "public_tools_with_purposes", "python_version_support",
 ]
