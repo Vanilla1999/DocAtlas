@@ -1,0 +1,10 @@
+{
+  "module_labels": {
+    "tests/docs/test_governance_value_proof_p0.py": "behavioral"
+  },
+  "module_node_hashes": {
+    "tests/docs/test_governance_value_proof_p0.py": "6f7d98c23db9ed7cdb3dbdcfb1407c72b91f01de332c27b395fab91888257e7d"
+  },
+  "node_overrides": {},
+  "schema_version": 1
+}
