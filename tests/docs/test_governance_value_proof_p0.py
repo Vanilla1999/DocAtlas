@@ -5,6 +5,7 @@ from docmancer.docs.application.evidence_selection import (
     project_docs_selection_config,
     select_evidence,
 )
+from docmancer.docs.application.model_visible_projection import project_docs_answer
 from tests.docs._shared_test_evidence_selection import _candidate
 
 
@@ -65,6 +66,36 @@ def _substantive_candidates(*, authority: str = "official"):
     ]
 
 
+def _navigation_candidates():
+    return [
+        _candidate(
+            "scope-nav",
+            "Shared browser and scan Android permission preflight policy is documented in ARCHITECTURE.md.",
+            source="README.md",
+        ),
+        _candidate(
+            "ownership-nav",
+            "Policy ownership is documented in ARCHITECTURE.md.",
+            source="README.md",
+        ),
+        _candidate(
+            "notification-nav",
+            "Notification permission requirements are documented in permission-notifications.md.",
+            source="README.md",
+        ),
+        _candidate(
+            "location-nav",
+            "Background location policy is documented in permission-notifications.md.",
+            source="README.md",
+        ),
+        _candidate(
+            "version-nav",
+            "The permission_handler version pin is recorded in pubspec.lock.",
+            source="README.md",
+        ),
+    ]
+
+
 def test_governance_question_plan_uses_typed_value_relations():
     requirements = _requirements()
     obligations = [item for item in requirements if item.kind == "proof_obligation"]
@@ -95,34 +126,7 @@ def test_permission_scope_is_not_overclassified_as_a_requirement():
 
 
 def test_navigation_summary_cannot_prove_governance_values():
-    navigation = [
-        _candidate(
-            "scope-nav",
-            "Shared browser and scan Android permission preflight policy is documented in ARCHITECTURE.md.",
-            source="README.md",
-        ),
-        _candidate(
-            "ownership-nav",
-            "Policy ownership is documented in ARCHITECTURE.md.",
-            source="README.md",
-        ),
-        _candidate(
-            "notification-nav",
-            "Notification permission requirements are documented in permission-notifications.md.",
-            source="README.md",
-        ),
-        _candidate(
-            "location-nav",
-            "Background location policy is documented in permission-notifications.md.",
-            source="README.md",
-        ),
-        _candidate(
-            "version-nav",
-            "The permission_handler version pin is recorded in pubspec.lock.",
-            source="README.md",
-        ),
-    ]
-    decision = _select(navigation)
+    decision = _select(_navigation_candidates())
 
     assert decision.support_decision.answer_supported is False
     assert decision.support_decision.mandatory_coverage < 1.0
@@ -197,3 +201,45 @@ def test_version_location_statement_requires_the_actual_version_value():
 
     assert missing.support_decision.answer_supported is False
     assert present.support_decision.answer_supported is True
+
+
+def test_navigation_governance_cannot_become_a_model_visible_supported_answer():
+    candidates = _navigation_candidates()
+    decision = _select(candidates)
+
+    projection, _ = project_docs_answer(
+        question=QUESTION,
+        retrieval={
+            "status": "success",
+            "context_pack": candidates,
+            "selection_profile": "project_docs_answer",
+        },
+        canonical_selection=decision,
+    )
+
+    assert projection["status"] == "insufficient_evidence"
+    assert projection["answer_supported"] is False
+    assert projection.get("answer_available") is False
+    assert not projection.get("answer")
+
+
+def test_substantive_governance_survives_model_visible_revalidation():
+    candidates = _substantive_candidates()
+    decision = _select(candidates)
+
+    projection, _ = project_docs_answer(
+        question=QUESTION,
+        retrieval={
+            "status": "success",
+            "context_pack": candidates,
+            "selection_profile": "project_docs_answer",
+        },
+        canonical_selection=decision,
+    )
+
+    assert projection["status"] == "ok"
+    assert projection["answer_supported"] is True
+    assert projection["mandatory_coverage"] == 1.0
+    assert "11.4.0" in projection["answer"]
+    assert "PermissionService owns" in projection["answer"]
+    assert "remains deferred" in projection["answer"]
