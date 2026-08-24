@@ -1,0 +1,405 @@
+from __future__ import annotations
+
+from docmancer.docs.application.evidence_selection import (
+    build_requirements,
+    project_docs_selection_config,
+    select_evidence,
+)
+from docmancer.docs.application.model_visible_projection import project_docs_answer
+from tests.docs._shared_test_evidence_selection import _candidate
+
+
+QUESTION = (
+    "What project rules govern the shared browser and scan Android permission "
+    "preflight on Android 13+, including policy ownership, notification "
+    "permission, deferred background location, and the pinned "
+    "permission_handler version?"
+)
+
+
+def _requirements():
+    return build_requirements(QUESTION, profile="project_docs_answer")
+
+
+def _select(candidates):
+    requirements = _requirements()
+    return select_evidence(
+        candidates,
+        question=QUESTION,
+        config=project_docs_selection_config(800),
+        requirements=requirements,
+    )
+
+
+def _substantive_candidates(*, authority: str = "official"):
+    return [
+        _candidate(
+            "permission-policy",
+            (
+                "Browser and scan use the same Android permission preflight policy. "
+                "PermissionService owns platform permission policy for browser/scan preflight. "
+                "Android 13 requires notification permission before browser or scan startup. "
+                "Background location remains deferred from browser/scan preflight."
+            ),
+            source="docs/permission-policy.md",
+            authority=authority,
+        ),
+        _candidate(
+            "pin",
+            "The pinned permission_handler version is 11.4.0.",
+            source="pubspec.lock",
+            authority=authority,
+        ),
+    ]
+
+
+def _navigation_candidates():
+    return [
+        _candidate(
+            "scope-nav",
+            "Shared browser and scan Android permission preflight policy is documented in ARCHITECTURE.md.",
+            source="README.md",
+        ),
+        _candidate(
+            "ownership-nav",
+            "Policy ownership is documented in ARCHITECTURE.md.",
+            source="README.md",
+        ),
+        _candidate(
+            "notification-nav",
+            "Notification permission requirements are documented in permission-notifications.md.",
+            source="README.md",
+        ),
+        _candidate(
+            "location-nav",
+            "Background location policy is documented in permission-notifications.md.",
+            source="README.md",
+        ),
+        _candidate(
+            "version-nav",
+            "The permission_handler version pin is recorded in pubspec.lock.",
+            source="README.md",
+        ),
+    ]
+
+
+def test_governance_question_plan_uses_typed_value_relations():
+    requirements = _requirements()
+    obligations = [item for item in requirements if item.kind == "proof_obligation"]
+    assert len(obligations) == 5
+    by_relation = {item.relation: item for item in obligations}
+    assert set(by_relation) == {
+        "governed_scope",
+        "governance_ownership",
+        "governance_requirement",
+        "governance_state",
+        "governance_version",
+    }
+    assert by_relation["governance_version"].value_kind == "version_range"
+    assert by_relation["governance_state"].expected_value == "deferred"
+    assert all(item.response_mode == "value" for item in obligations)
+    assert {item.proof_role for item in obligations} == {"project_rule"}
+
+    def isolated_decision(relation: str, stable_id: str, text: str):
+        requirement_only = type(requirements)((by_relation[relation],))
+        return select_evidence(
+            [
+                _candidate(
+                    stable_id,
+                    text,
+                    source="docs/permission-policy.md",
+                    authority="official",
+                )
+            ],
+            question=QUESTION,
+            config=project_docs_selection_config(800),
+            requirements=requirement_only,
+        )
+
+    # Direction and polarity are part of the required value contract.
+    reversed_requirement = isolated_decision(
+        "governance_requirement",
+        "reversed-notification-rule",
+        "Notification permission requires Android 13 compatibility before browser startup.",
+    )
+    negated_requirement = isolated_decision(
+        "governance_requirement",
+        "negated-notification-rule",
+        "Android 13 does not require notification permission before browser startup.",
+    )
+    negated_owner = isolated_decision(
+        "governance_ownership",
+        "negated-owner-rule",
+        "PermissionService does not own platform permission policy for browser/scan preflight.",
+    )
+    placeholder_owner = isolated_decision(
+        "governance_ownership",
+        "placeholder-owner-rule",
+        "The permission policy owner is TBD for browser and scan preflight.",
+    )
+    negated_state = isolated_decision(
+        "governance_state",
+        "negated-state-rule",
+        "Background location does not remain deferred from browser/scan preflight.",
+    )
+    separate_scope = isolated_decision(
+        "governed_scope",
+        "separate-scope-rule",
+        "Browser and scan Android permission preflight are governed by separate policies.",
+    )
+    assert reversed_requirement.support_decision.answer_supported is False
+    assert negated_requirement.support_decision.answer_supported is False
+    assert negated_owner.support_decision.answer_supported is False
+    assert placeholder_owner.support_decision.answer_supported is False
+    assert negated_state.support_decision.answer_supported is False
+    assert separate_scope.support_decision.answer_supported is False
+
+    # A predicate elsewhere in the same sentence must not discharge a facet.
+    cross_scope = isolated_decision(
+        "governed_scope",
+        "cross-scope-rule",
+        (
+            "Browser and scan Android permission preflight architecture is discussed throughout "
+            "a long migration review with many unrelated implementation notes and historical "
+            "compatibility details, while cache workers use the same retry policy."
+        ),
+    )
+    cross_owner = isolated_decision(
+        "governance_ownership",
+        "cross-owner-rule",
+        (
+            "Policy ownership for browser and scan preflight is under architecture review with "
+            "many unrelated migration notes and historical compatibility details, while "
+            "PermissionService owns retry scheduling."
+        ),
+    )
+    cross_state = isolated_decision(
+        "governance_state",
+        "cross-state-rule",
+        (
+            "Background location behavior is reviewed for browser and scan preflight with many "
+            "unrelated migration notes and historical compatibility details, while notification "
+            "permission remains deferred."
+        ),
+    )
+    assert cross_scope.support_decision.answer_supported is False
+    assert cross_owner.support_decision.answer_supported is False
+    assert cross_state.support_decision.answer_supported is False
+
+
+def test_permission_scope_is_not_overclassified_as_a_requirement():
+    question = "What project rules govern auth policy, including permission scope and logging policy?"
+    requirements = build_requirements(
+        question,
+        profile="project_docs_answer",
+    )
+    obligation = next(
+        item for item in requirements
+        if item.kind == "proof_obligation" and item.subject == "permission scope"
+    )
+    assert obligation.relation == "governance_facet"
+    assert obligation.proof_role == "project_rule"
+
+    # Topical nouns must not cause the planner to invent a concrete value type.
+    neutral_facets = (
+        (
+            "What project rules govern auth policy, including background location scope and logging policy?",
+            "background location scope",
+        ),
+        (
+            "What project rules govern auth policy, including notification permission scope and logging policy?",
+            "notification permission scope",
+        ),
+        (
+            "What project rules govern auth policy, including versioning policy and logging policy?",
+            "versioning policy",
+        ),
+    )
+    for neutral_question, subject in neutral_facets:
+        neutral_requirements = build_requirements(
+            neutral_question,
+            profile="project_docs_answer",
+        )
+        neutral = next(
+            item for item in neutral_requirements
+            if item.kind == "proof_obligation" and item.subject == subject
+        )
+        assert neutral.relation == "governance_facet"
+        assert neutral.expected_value is None
+        assert neutral.value_kind == "text"
+        assert neutral.proof_role == "project_rule"
+
+    def generic_decision(stable_id: str, text: str):
+        return select_evidence(
+            [
+                _candidate(
+                    stable_id,
+                    text,
+                    source="docs/auth-policy.md",
+                    authority="official",
+                )
+            ],
+            question=question,
+            config=project_docs_selection_config(800),
+            requirements=type(requirements)((obligation,)),
+        )
+
+    # Generic governance needs a concrete, non-negated complement.
+    assert generic_decision(
+        "bare-generic-rule",
+        "Permission scope applies.",
+    ).support_decision.answer_supported is False
+    assert generic_decision(
+        "negated-generic-rule",
+        "Permission scope does not govern admin routes.",
+    ).support_decision.answer_supported is False
+    assert generic_decision(
+        "positive-generic-rule",
+        "Permission scope governs admin routes.",
+    ).support_decision.answer_supported is True
+
+    # A valid-looking predicate for a different facet cannot be borrowed.
+    unrelated_predicate = generic_decision(
+        "cross-generic-rule",
+        (
+            "Permission scope is discussed throughout auth architecture migration notes with "
+            "many unrelated configuration constraints and historical compatibility details, "
+            "while logging policy requires redaction."
+        ),
+    )
+    assert unrelated_predicate.support_decision.answer_supported is False
+
+
+def test_navigation_summary_cannot_prove_governance_values():
+    decision = _select(_navigation_candidates())
+
+    assert decision.support_decision.answer_supported is False
+    assert decision.support_decision.mandatory_coverage < 1.0
+    assert decision.support_decision.missing_requirement_ids
+    assert len(decision.assignments) < 5
+
+
+def test_one_readme_navigation_paragraph_cannot_claim_full_coverage():
+    summary = _candidate(
+        "readme-summary",
+        (
+            "The shared browser and scan Android permission preflight policy is documented in "
+            "ARCHITECTURE.md. Policy ownership is explained in the architecture guide. "
+            "Notification permission requirements and background location policy are documented "
+            "in permission-notifications.md. The permission_handler version pin is recorded in "
+            "pubspec.lock."
+        ),
+        source="README.md",
+    )
+    decision = _select([summary])
+
+    assert decision.support_decision.answer_supported is False
+    assert decision.support_decision.mandatory_coverage < 1.0
+    assert decision.status == "insufficient_evidence"
+
+
+def test_supporting_overview_cannot_authorize_project_governance_even_with_values():
+    decision = _select(_substantive_candidates(authority="supporting"))
+
+    assert decision.support_decision.answer_supported is False
+    assert decision.support_decision.mandatory_coverage < 1.0
+    assert decision.support_decision.missing_requirement_ids
+
+
+def test_canonical_substantive_governance_values_remain_supported():
+    decision = _select(_substantive_candidates())
+
+    assert decision.support_decision.answer_supported is True
+    assert decision.support_decision.mandatory_coverage == 1.0
+    assert decision.support_decision.missing_requirement_ids == ()
+    assert len(decision.assignments) == 5
+    assert {item.proof_role for item in decision.assignments} == {"project_rule"}
+
+
+def test_version_location_statement_requires_the_actual_version_value():
+    missing_value = _candidate(
+        "version-location",
+        "The permission_handler version pin is recorded in pubspec.lock.",
+        source="pubspec.lock",
+    )
+    wrong_value = _candidate(
+        "unbound-platform-version",
+        "permission_handler version compatibility requires Android 13.0.",
+        source="pubspec.lock",
+    )
+    negated_value = _candidate(
+        "negated-version-value",
+        "The permission_handler version is not 11.4.0.",
+        source="pubspec.lock",
+    )
+    with_value = _candidate(
+        "version-value",
+        "The pinned permission_handler version is 11.4.0 in pubspec.lock.",
+        source="pubspec.lock",
+    )
+    lock_value = _candidate(
+        "lock-version-value",
+        "permission_handler: 11.4.0",
+        source="pubspec.lock",
+    )
+    requirements = _requirements()
+    version_requirement = next(
+        item for item in requirements if item.relation == "governance_version"
+    )
+    version_only = type(requirements)((version_requirement,))
+
+    def version_decision(candidate):
+        return select_evidence(
+            [candidate],
+            question=QUESTION,
+            config=project_docs_selection_config(800),
+            requirements=version_only,
+        )
+
+    assert version_decision(missing_value).support_decision.answer_supported is False
+    assert version_decision(wrong_value).support_decision.answer_supported is False
+    assert version_decision(negated_value).support_decision.answer_supported is False
+    assert version_decision(with_value).support_decision.answer_supported is True
+    assert version_decision(lock_value).support_decision.answer_supported is True
+
+
+def test_navigation_governance_cannot_become_a_model_visible_supported_answer():
+    candidates = _navigation_candidates()
+    decision = _select(candidates)
+
+    projection, _ = project_docs_answer(
+        question=QUESTION,
+        retrieval={
+            "status": "success",
+            "context_pack": candidates,
+            "selection_profile": "project_docs_answer",
+        },
+        canonical_selection=decision,
+    )
+
+    assert projection["status"] == "insufficient_evidence"
+    assert projection["answer_supported"] is False
+    assert projection.get("answer_available") is False
+    assert not projection.get("answer")
+
+
+def test_substantive_governance_survives_model_visible_revalidation():
+    candidates = _substantive_candidates()
+    decision = _select(candidates)
+
+    projection, _ = project_docs_answer(
+        question=QUESTION,
+        retrieval={
+            "status": "success",
+            "context_pack": candidates,
+            "selection_profile": "project_docs_answer",
+        },
+        canonical_selection=decision,
+    )
+
+    assert projection["status"] == "ok"
+    assert projection["answer_supported"] is True
+    assert projection["mandatory_coverage"] == 1.0
+    assert "11.4.0" in projection["answer"]
+    assert "PermissionService owns" in projection["answer"]
+    assert "remains deferred" in projection["answer"]

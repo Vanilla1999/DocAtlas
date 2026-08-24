@@ -15,6 +15,45 @@ from docmancer.docs.domain.question_plan_core import (
 _PUBLIC_TOOLS = ("get_docs_context", "prepare_docs", "docs_status")
 
 
+def _governance_facet_plan(value: str, *, scope: str) -> PlannedFacet:
+    """Classify only explicit governance value cues into typed proof families.
+
+    The relation remains an internal QuestionPlan detail; the public question
+    surface is unchanged. Typing must never invent an expected value from a
+    topical noun alone: e.g. ``background location scope`` is not implicitly
+    ``deferred`` and ``versioning policy`` is not a concrete version request.
+    """
+
+    normalized = " ".join(value.casefold().replace("_", " ").split())
+    if re.search(r"\b(?:owner|ownership|владел|принадлеж)\w*\b", normalized):
+        relation, value_kind, expected = "governance_ownership", "text", None
+    elif re.search(r"\bversion\b|\bpinned?\b|\bверси(?:я|ю|и|ей|е)\b|\bзакреп\w*\b", normalized):
+        relation, value_kind, expected = "governance_version", "version_range", None
+    elif re.search(r"\b(?:defer(?:red|ral)?|отлож\w*)\b", normalized):
+        relation, value_kind, expected = "governance_state", "text", "deferred"
+    elif (
+        re.fullmatch(r"notification\s+permission|разрешени\w*\s+уведом\w*", normalized)
+        or re.search(
+            r"\b(?:permission\s+(?:requirement|request)|required\s+permission|"
+            r"уведом\w*\s+разрешени\w*\s+(?:треб\w*|запраш\w*))\b",
+            normalized,
+        )
+    ):
+        relation, value_kind, expected = "governance_requirement", "text", None
+    else:
+        relation, value_kind, expected = "governance_facet", "text", None
+    return PlannedFacet(
+        "relation",
+        value,
+        relation=relation,
+        value_kind=value_kind,
+        expected_value=expected,
+        context=scope,
+        response_mode="value",
+        span_text=value,
+    )
+
+
 def governance_facets(q: str) -> QuestionPlan | None:
     match = re.fullmatch(
         r"\s*(?:"
@@ -50,13 +89,7 @@ def governance_facets(q: str) -> QuestionPlan | None:
             response_mode="value", span_text=scope,
         )
     ]
-    planned.extend(
-        PlannedFacet(
-            "relation", value, relation="governance_facet",
-            context=scope, response_mode="value", span_text=value,
-        )
-        for value in facets
-    )
+    planned.extend(_governance_facet_plan(value, scope=scope) for value in facets)
     return QuestionPlan(
         facets=tuple(planned),
         clauses=(q,),
@@ -100,7 +133,7 @@ def public_tools_with_purposes(q: str) -> QuestionPlan | None:
             for tool in _PUBLIC_TOOLS
         ),
         clauses=(q,),
-        parse_trace=("surface_rule:public_tools_purposes",),
+        parse_trace=("surface_rule:public_tools_with_purposes",),
     )
 
 
@@ -123,7 +156,11 @@ def python_version_support(q: str) -> QuestionPlan | None:
 
 
 def mcp_request_handling(q: str) -> QuestionPlan | None:
-    if re.fullmatch(r"how\s+does\s+(?:the\s+)?mcp\s+server\s+handle\s+requests", _clean(q), re.I) is None:
+    if re.fullmatch(
+        r"how\s+does\s+(?:the\s+)?mcp\s+server\s+handle\s+requests",
+        _clean(q),
+        re.I,
+    ) is None:
         return None
     return QuestionPlan(
         facets=(PlannedFacet(
@@ -135,7 +172,11 @@ def mcp_request_handling(q: str) -> QuestionPlan | None:
 
 
 def provider_request_timeout(q: str) -> QuestionPlan | None:
-    if re.fullmatch(r"what\s+is\s+the\s+timeout\s+for\s+provider\s+requests", _clean(q), re.I) is None:
+    if re.fullmatch(
+        r"what\s+is\s+the\s+timeout\s+for\s+provider\s+requests",
+        _clean(q),
+        re.I,
+    ) is None:
         return None
     return QuestionPlan(
         facets=(PlannedFacet(
@@ -148,6 +189,6 @@ def provider_request_timeout(q: str) -> QuestionPlan | None:
 
 
 __all__ = [
-    "mcp_request_handling", "provider_request_timeout", "public_tool_usage",
-    "public_tools_with_purposes", "python_version_support",
+    "governance_facets", "mcp_request_handling", "provider_request_timeout",
+    "public_tool_usage", "public_tools_with_purposes", "python_version_support",
 ]
