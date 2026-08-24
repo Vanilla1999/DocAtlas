@@ -200,6 +200,35 @@ def test_permission_scope_is_not_overclassified_as_a_requirement():
     assert obligation.relation == "governance_facet"
     assert obligation.proof_role == "project_rule"
 
+    # Topical nouns must not cause the planner to invent a concrete value type.
+    neutral_facets = (
+        (
+            "What project rules govern auth policy, including background location scope and logging policy?",
+            "background location scope",
+        ),
+        (
+            "What project rules govern auth policy, including notification permission scope and logging policy?",
+            "notification permission scope",
+        ),
+        (
+            "What project rules govern auth policy, including versioning policy and logging policy?",
+            "versioning policy",
+        ),
+    )
+    for neutral_question, subject in neutral_facets:
+        neutral_requirements = build_requirements(
+            neutral_question,
+            profile="project_docs_answer",
+        )
+        neutral = next(
+            item for item in neutral_requirements
+            if item.kind == "proof_obligation" and item.subject == subject
+        )
+        assert neutral.relation == "governance_facet"
+        assert neutral.expected_value is None
+        assert neutral.value_kind == "text"
+        assert neutral.proof_role == "project_rule"
+
     def generic_decision(stable_id: str, text: str):
         return select_evidence(
             [
