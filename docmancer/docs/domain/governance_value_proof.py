@@ -38,6 +38,11 @@ _NAVIGATION_META_RE = re.compile(
     r"(?:in|at|under|by)\b|\b(?:see|refer\s+to|consult)\b",
     re.I,
 )
+_PLACEHOLDER_VALUE_RE = re.compile(
+    r"^\s*(?:unknown|unspecified|undefined|unclear|tbd|todo|none|n/?a|"
+    r"not\s+(?:specified|defined|decided)|неизвест\w*|не\s+определ\w*)\b",
+    re.I,
+)
 _VERSION_VALUE = r"v?\d+(?:\.\d+){1,3}(?:[-+][0-9A-Za-z.-]+)?"
 _OWNER_RE = re.compile(
     r"\b(?:owns?|owned\s+by|owner\s+(?:is|=|:)|belongs?\s+to|"
@@ -150,7 +155,7 @@ def _clauses(text: str) -> tuple[str, ...]:
 
 
 def _predicate_is_negated(match: re.Match[str], clause: str) -> bool:
-    """Mirror the answer-unit local polarity rule for governance predicates."""
+    """Mirror the existing answer-unit local polarity rule."""
 
     prefix = clause[max(0, match.start() - 48):match.start()]
     return bool(re.search(
@@ -162,6 +167,20 @@ def _predicate_is_negated(match: re.Match[str], clause: str) -> bool:
     ))
 
 
+def _tail_has_value(match: re.Match[str], clause: str, *, max_chars: int = 96) -> bool:
+    """Require a non-placeholder complement after a generic governance predicate."""
+
+    tail = clause[match.end():match.end() + max_chars].strip(" \t,:=-")
+    if not tail or _PLACEHOLDER_VALUE_RE.search(tail):
+        return False
+    words = [
+        word.casefold()
+        for word in re.findall(r"[A-Za-zА-Яа-яЁё0-9_.:/+-]+", tail)
+        if word.casefold() not in {"to", "by", "for", "as", "with", "и", "для"}
+    ]
+    return bool(words)
+
+
 def _relation_value_is_bound(
     obligation: ProofObligation,
     clause: str,
@@ -169,22 +188,49 @@ def _relation_value_is_bound(
     *,
     relation_tokens: frozenset[str],
     radius: int = 48,
-    allow_intrinsic_negative: bool = False,
+    require_tail_value: bool = False,
 ) -> bool:
-    """Require one non-contradictory relation predicate near its requested target."""
+    """Require one non-negated relation predicate near its requested target."""
 
     target_tokens = _tokens(obligation.subject) - relation_tokens
     if not target_tokens:
         return False
     required = min(3, len(target_tokens))
     for match in pattern.finditer(clause):
-        if not allow_intrinsic_negative and _predicate_is_negated(match, clause):
+        if _predicate_is_negated(match, clause):
             continue
         window = clause[
             max(0, match.start() - radius):
             min(len(clause), match.end() + radius)
         ]
-        if len(target_tokens & _tokens(window)) >= required:
+        if len(target_tokens & _tokens(window)) < required:
+            continue
+        if require_tail_value and not _tail_has_value(match, clause):
+            continue
+        return True
+    return False
+
+
+def _ownership_value_is_bound(obligation: ProofObligation, clause: str) -> bool:
+    """Require both the ownership target and a concrete local owner value."""
+
+    target_tokens = _tokens(obligation.subject) - {"own"}
+    for match in _OWNER_RE.finditer(clause):
+        if _predicate_is_negated(match, clause):
+            continue
+        window = clause[max(0, match.start() - 48):min(len(clause), match.end() + 64)]
+        if not target_tokens or not (target_tokens & _tokens(window)):
+            continue
+        relation = _norm(match.group(0))
+        if relation.startswith(("owner ", "owned by", "belongs to", "принадлеж")):
+            value = clause[match.end():match.end() + 64].strip(" \t,:=-")
+            if value and not _PLACEHOLDER_VALUE_RE.search(value):
+                return True
+            continue
+        # Active ownership forms put the owner immediately before the predicate.
+        prefix = clause[max(0, match.start() - 64):match.start()].strip(" \t,:=-")
+        prefix_tokens = _tokens(prefix) - target_tokens - {"own"}
+        if prefix_tokens and not _PLACEHOLDER_VALUE_RE.search(prefix):
             return True
     return False
 
@@ -233,6 +279,7 @@ def _android_requirement_is_bound(obligation: ProofObligation, clause: str) -> b
     if "android 13" not in context:
         return any(
             abs(match.start() - subject.start()) <= 80
+            and _tail_has_value(match, clause)
             for match in requirement_matches
             for subject in subject_matches
         )
@@ -244,7 +291,7 @@ def _android_requirement_is_bound(obligation: ProofObligation, clause: str) -> b
             for subject in subject_matches:
                 # Active platform rule: Android 13 requires/needs/requests X.
                 if (
-                    word.startswith(("require", "need", "request"))
+                    word in {"require", "requires", "need", "needs", "request", "requests"}
                     and android.end() <= requirement.start() <= subject.start()
                     and requirement.start() - android.end() <= 80
                     and subject.start() - requirement.end() <= 80
@@ -253,7 +300,7 @@ def _android_requirement_is_bound(obligation: ProofObligation, clause: str) -> b
                     return True
                 # Passive/modal rule: X is required / must be requested on Android 13.
                 if (
-                    (word.startswith("required") or word == "must" or word.startswith("requested"))
+                    (word == "required" or word == "must" or word == "requested")
                     and subject.end() <= requirement.start() <= android.start()
                     and requirement.start() - subject.end() <= 80
                     and android.start() - requirement.end() <= 80
@@ -261,7 +308,7 @@ def _android_requirement_is_bound(obligation: ProofObligation, clause: str) -> b
                     return True
                 # Android 13 X is required is also a valid platform-scoped proposition.
                 if (
-                    word.startswith("required")
+                    word == "required"
                     and android.end() <= subject.start() <= requirement.start()
                     and subject.start() - android.end() <= 80
                     and requirement.start() - subject.end() <= 80
@@ -286,12 +333,7 @@ def _ownership_proof(obligation: ProofObligation, clause: str) -> tuple[bool, in
     subject, hits = _subject_match(obligation.subject, clause)
     if not subject or _NAVIGATION_META_RE.search(clause):
         return False, hits
-    return _relation_value_is_bound(
-        obligation,
-        clause,
-        _OWNER_RE,
-        relation_tokens=frozenset({"own"}),
-    ), hits
+    return _ownership_value_is_bound(obligation, clause), hits
 
 
 def _version_proof(obligation: ProofObligation, clause: str) -> tuple[bool, int]:
@@ -310,9 +352,6 @@ def _state_proof(obligation: ProofObligation, clause: str) -> tuple[bool, int]:
         clause,
         _DEFERRED_STATE_RE,
         relation_tokens=frozenset({"defer", "remain", "stay", "request", "include", "preflight"}),
-        # "does not request/include" is itself a positive deferred-state value;
-        # negation before a separate "remain deferred" predicate is still rejected.
-        allow_intrinsic_negative=True,
     ), hits
 
 
@@ -338,6 +377,7 @@ def _generic_governance_proof(obligation: ProofObligation, clause: str) -> tuple
             "own", "require", "must", "remain", "defer", "use", "apply",
             "govern", "control", "set", "pin",
         }),
+        require_tail_value=True,
     ), hits
 
 
