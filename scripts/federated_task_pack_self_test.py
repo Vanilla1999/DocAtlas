@@ -51,10 +51,7 @@ def main() -> int:
     expect_error("private task metadata exceeds", lambda: validate_manifest(private_leak))
 
     stale_repository = copy.deepcopy(manifest)
-    stale_repository["repositories"][1].update(
-        id="smart_glass",
-        repository="Vanilla1999/smart_glass",
-    )
+    stale_repository["repositories"][1]["repository"] = "Vanilla1999/smart_glass"
     expect_error("repository identity/order drift", lambda: validate_manifest(stale_repository))
 
     premature_valid = copy.deepcopy(manifest)
