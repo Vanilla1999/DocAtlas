@@ -2,8 +2,8 @@
 
 Governance questions are unusually vulnerable to topical/navigation prose:
 "the policy is documented in X" mentions the right nouns but does not expose
-an owner, state, requirement, or version.  This module is the P0 semantic gate
-between QuestionPlan and the generic relation prover.  Non-governance
+an owner, state, requirement, or version. This module is the P0 semantic gate
+between QuestionPlan and the generic relation prover. Non-governance
 relations retain their existing implementation unchanged.
 """
 from __future__ import annotations
@@ -38,10 +38,7 @@ _NAVIGATION_META_RE = re.compile(
     r"(?:in|at|under|by)\b|\b(?:see|refer\s+to|consult)\b",
     re.I,
 )
-_VERSION_RE = re.compile(
-    r"(?<!\w)v?\d+(?:\.\d+){1,3}(?:[-+][0-9A-Za-z.-]+)?(?!\w)",
-    re.I,
-)
+_VERSION_VALUE = r"v?\d+(?:\.\d+){1,3}(?:[-+][0-9A-Za-z.-]+)?"
 _OWNER_RE = re.compile(
     r"\b(?:owns?|owned\s+by|owner\s+(?:is|=|:)|belongs?\s+to|"
     r"responsible\s+for|владе\w*|принадлеж\w*)\b",
@@ -101,6 +98,20 @@ def _subject_match(subject: object, clause: str) -> tuple[bool, int]:
     return bool(expected) and hits >= required, hits
 
 
+def _ordered_subject_pattern(subject: object, *, drop: frozenset[str] = frozenset()) -> str:
+    words: list[str] = []
+    for raw in re.findall(r"[A-Za-zА-Яа-яЁё0-9]+", _norm(subject)):
+        if raw in _STOP_WORDS or len(raw) < 2:
+            continue
+        canonical = "pin" if raw.startswith("pin") else raw
+        if canonical in drop:
+            continue
+        words.append(re.escape(raw))
+    if not words:
+        return ""
+    return r"[\s_.:/-]+".join(words)
+
+
 def _canonical_source(source: Mapping[str, object] | None) -> bool:
     if not source:
         return False
@@ -130,11 +141,51 @@ def _clauses(text: str) -> tuple[str, ...]:
     return tuple(rows)
 
 
-def _android_context_matches(obligation: ProofObligation, clause: str) -> bool:
+def _version_value_is_bound(obligation: ProofObligation, clause: str) -> bool:
+    """Require the version value to bind to the requested dependency identity.
+
+    Merely placing another version-like number in the same sentence is not
+    enough. This blocks, for example, Android 13.0 from satisfying the requested
+    permission_handler version facet.
+    """
+
+    identity = _ordered_subject_pattern(
+        obligation.subject,
+        drop=frozenset({"version", "pin"}),
+    )
+    if not identity:
+        return False
+    value = _VERSION_VALUE
+    patterns = (
+        rf"\b{identity}\b\s+(?:(?:current|resolved|locked|pinned)\s+)?version\b"
+        rf"(?:\s+(?:in|from)\s+\S+)?\s*(?:is|=|:|at|to|resolves?\s+to|resolved\s+to)?\s*{value}(?!\w)",
+        rf"\b{identity}\b\s+(?:is\s+)?pin(?:ned|s)?\b\s*(?:to|at|=|:)?\s*{value}(?!\w)",
+        rf"\b(?:version|pin(?:ned|s)?)\b\s+(?:of|for)\s+{identity}\b"
+        rf"\s*(?:is|=|:|at|to)?\s*{value}(?!\w)",
+        rf"\b{identity}\b\s*[:=]\s*{value}(?!\w)",
+    )
+    return any(re.search(pattern, clause, re.I) for pattern in patterns)
+
+
+def _android_requirement_is_bound(obligation: ProofObligation, clause: str) -> bool:
+    """Preserve the direction of an Android-13 requirement proposition."""
+
     context = _norm(obligation.context)
     if "android 13" not in context:
-        return True
-    return bool(re.search(r"\bandroid\s*13(?:\+|\s*plus)?\b", clause, re.I))
+        return bool(_REQUIREMENT_RE.search(clause))
+
+    subject = _ordered_subject_pattern(obligation.subject)
+    if not subject:
+        return False
+    android = r"\bandroid\s*13(?:\+|\s*plus)?\b"
+    active_requirement = r"\b(?:requires?|needs?|must|requests?)\b"
+    passive_requirement = r"\b(?:is\s+|are\s+)?required\b"
+    patterns = (
+        rf"{android}.{{0,80}}{active_requirement}.{{0,80}}\b{subject}\b",
+        rf"{android}.{{0,80}}\b{subject}\b.{{0,40}}{passive_requirement}",
+        rf"\b{subject}\b.{{0,40}}{passive_requirement}.{{0,40}}{android}",
+    )
+    return any(re.search(pattern, clause, re.I) for pattern in patterns)
 
 
 def _scope_proof(obligation: ProofObligation, clause: str) -> tuple[bool, int]:
@@ -156,10 +207,7 @@ def _version_proof(obligation: ProofObligation, clause: str) -> tuple[bool, int]
     subject, hits = _subject_match(obligation.subject, clause)
     if not subject:
         return False, hits
-    has_value = bool(_VERSION_RE.search(clause))
-    has_binding = bool(re.search(r"\b(?:version|pin(?:s|ned|ning)?)\b", clause, re.I))
-    # A location statement is acceptable only when it also exposes the actual version.
-    return bool(has_value and has_binding), hits
+    return _version_value_is_bound(obligation, clause), hits
 
 
 def _state_proof(obligation: ProofObligation, clause: str) -> tuple[bool, int]:
@@ -174,8 +222,7 @@ def _requirement_proof(obligation: ProofObligation, clause: str) -> tuple[bool, 
     if not subject:
         return False, hits
     return bool(
-        _REQUIREMENT_RE.search(clause)
-        and _android_context_matches(obligation, clause)
+        _android_requirement_is_bound(obligation, clause)
         and not _NAVIGATION_META_RE.search(clause)
     ), hits
 
@@ -213,10 +260,8 @@ def relation_proof(
         "governance_facet": _generic_governance_proof,
     }[relation]
 
-    best_hits = 0
     for clause in _clauses(text):
         valid, hits = prover(obligation, clause)
-        best_hits = max(best_hits, hits)
         if valid:
             return PlannedProof(
                 True,
