@@ -98,6 +98,7 @@ def test_governance_question_plan_uses_typed_value_relations():
     assert by_relation["governance_version"].value_kind == "version_range"
     assert by_relation["governance_state"].expected_value == "deferred"
     assert all(item.response_mode == "value" for item in obligations)
+    assert {item.proof_role for item in obligations} == {"project_rule"}
 
 
 def test_permission_scope_is_not_overclassified_as_a_requirement():
@@ -110,6 +111,7 @@ def test_permission_scope_is_not_overclassified_as_a_requirement():
         if item.kind == "proof_obligation" and item.subject == "permission scope"
     )
     assert obligation.relation == "governance_facet"
+    assert obligation.proof_role == "project_rule"
 
 
 def test_navigation_summary_cannot_prove_governance_values():
@@ -155,6 +157,7 @@ def test_canonical_substantive_governance_values_remain_supported():
     assert decision.support_decision.mandatory_coverage == 1.0
     assert decision.support_decision.missing_requirement_ids == ()
     assert len(decision.assignments) == 5
+    assert {item.proof_role for item in decision.assignments} == {"project_rule"}
 
 
 def test_version_location_statement_requires_the_actual_version_value():
