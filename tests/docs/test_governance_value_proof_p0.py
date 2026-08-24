@@ -82,6 +82,18 @@ def test_governance_question_plan_uses_typed_value_relations():
     assert all(item.response_mode == "value" for item in obligations)
 
 
+def test_permission_scope_is_not_overclassified_as_a_requirement():
+    requirements = build_requirements(
+        "What project rules govern auth policy, including permission scope and logging policy?",
+        profile="project_docs_answer",
+    )
+    obligation = next(
+        item for item in requirements
+        if item.kind == "proof_obligation" and item.subject == "permission scope"
+    )
+    assert obligation.relation == "governance_facet"
+
+
 def test_navigation_summary_cannot_prove_governance_values():
     navigation = [
         _candidate(
