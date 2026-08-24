@@ -9,9 +9,11 @@ from typing import Any, Iterable, Mapping
 from docmancer.docs.domain.project_answer_contract import ProofObligation
 from docmancer.docs.domain.question_plan_proof import (
     behavior_proof as planned_behavior_proof,
-    relation_proof as planned_relation_proof,
     usage_proof as planned_usage_proof,
     workflow_proof as planned_workflow_proof,
+)
+from docmancer.docs.domain.governance_value_proof import (
+    relation_proof as planned_relation_proof,
 )
 from docmancer.docs.domain.technical_terms import (
     TechnicalTerm,
@@ -184,23 +186,12 @@ _ARCH_RELATION_RE = re.compile(
 
 
 
-
-
-
-
-
-
-
-
-
 _NUMBER_WORD_VALUES = {
     "one": 1, "two": 2, "three": 3, "four": 4, "five": 5, "six": 6,
     "seven": 7, "eight": 8, "nine": 9, "ten": 10,
     "один": 1, "одна": 1, "два": 2, "две": 2, "три": 3, "четыре": 4,
     "пять": 5, "шесть": 6, "семь": 7, "восемь": 8, "девять": 9, "десять": 10,
 }
-
-
 
 
 
