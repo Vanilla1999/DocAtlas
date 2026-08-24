@@ -28,7 +28,13 @@ def _attempt(number: int) -> dict:
     return {
         "attempt": number,
         "public_base": {"returncode": 0},
-        "hidden_base": {"returncode": 1},
+        "hidden_base": {
+            "returncode": 1,
+            "junit_parsed": True,
+            "testcases": 1,
+            "test_failures": 1,
+            "test_errors": 0,
+        },
         "patch_applied": True,
         "gold_surface_exact": True,
         "public_gold": {"returncode": 0},
@@ -95,11 +101,21 @@ def test_attempt_requires_assertion_red_exactly() -> None:
         assert runner.attempt_stage_valid(mutated) is False
 
 
+def test_setup_error_is_not_hidden_red() -> None:
+    item = _attempt(1)
+    item["hidden_base"].update(test_failures=0, test_errors=1)
+    assert runner.attempt_stage_valid(item) is False
+    item = _attempt(1)
+    item["hidden_base"]["junit_parsed"] = False
+    assert runner.attempt_stage_valid(item) is False
+
+
 @pytest.mark.parametrize(
     "mutate",
     [
         lambda r: r["tasks"][0]["attempts"][0]["public_base"].update(returncode=1),
         lambda r: r["tasks"][0]["attempts"][0]["hidden_base"].update(returncode=2),
+        lambda r: r["tasks"][0]["attempts"][0]["hidden_base"].update(test_failures=0, test_errors=1),
         lambda r: r["tasks"][0]["attempts"][0].update(patch_applied=False),
         lambda r: r["tasks"][0]["attempts"][0].update(gold_surface_exact=False),
         lambda r: r["tasks"][0]["attempts"][0]["public_gold"].update(returncode=1),
