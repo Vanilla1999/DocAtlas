@@ -29,7 +29,7 @@ MUTANTS = (
     (
         "rephrase-invents-domain-fact",
         "docmancer/docs/application/recovery.py",
-        'fragment = _clean_fragment(fragment, max_chars=140)',
+        'fragment = _rephrase_subject_fragment(fragment)',
         'fragment = "INVENTED_DOMAIN_FACT"',
     ),
     (
