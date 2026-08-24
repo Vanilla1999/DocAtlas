@@ -138,18 +138,17 @@ def public_tools_with_purposes(q: str) -> QuestionPlan | None:
 
 
 def python_version_support(q: str) -> QuestionPlan | None:
-    match = re.fullmatch(
-        r"which\s+python\s+versions?\s+(?:does|do)\s+docatlas\s+support",
-        _clean(q),
-        re.I,
-    )
-    if match is None:
+    cleaned = _clean(q)
+    if re.fullmatch(r"what\s+python\s+versions?\s+does\s+docatlas\s+support", cleaned, re.I):
+        subject = "DocAtlas"
+    elif re.fullmatch(r"which\s+python\s+versions?\s+are\s+supported", cleaned, re.I):
+        subject = "DocAtlas"
+    else:
         return None
     return QuestionPlan(
         facets=(PlannedFacet(
-            "relation", "DocAtlas", relation="supported_values",
-            attribute="python version", value_kind="version_range",
-            response_mode="list", span_text=q,
+            "attribute", subject, attribute="python_version",
+            value_kind="version_range", response_mode="value", span_text=q,
         ),),
         clauses=(q,),
         parse_trace=("surface_rule:python_version_support",),
@@ -157,17 +156,15 @@ def python_version_support(q: str) -> QuestionPlan | None:
 
 
 def mcp_request_handling(q: str) -> QuestionPlan | None:
-    match = re.fullmatch(
-        r"how\s+does\s+(?:the\s+)?mcp\s+server\s+(?:process|handle)\s+(?:a\s+)?tool\s+request",
+    if re.fullmatch(
+        r"how\s+does\s+(?:the\s+)?mcp\s+server\s+handle\s+requests",
         _clean(q),
         re.I,
-    )
-    if match is None:
+    ) is None:
         return None
     return QuestionPlan(
         facets=(PlannedFacet(
-            "relation", "MCP server", relation="request_handling",
-            target="tool request", response_mode="value", span_text=q,
+            "relation", "MCP server", relation="request_handling", span_text=q,
         ),),
         clauses=(q,),
         parse_trace=("surface_rule:mcp_request_handling",),
@@ -175,17 +172,16 @@ def mcp_request_handling(q: str) -> QuestionPlan | None:
 
 
 def provider_request_timeout(q: str) -> QuestionPlan | None:
-    match = re.fullmatch(
-        r"what\s+is\s+the\s+(?:provider\s+)?request\s+timeout",
+    if re.fullmatch(
+        r"what\s+is\s+the\s+timeout\s+for\s+provider\s+requests",
         _clean(q),
         re.I,
-    )
-    if match is None:
+    ) is None:
         return None
     return QuestionPlan(
         facets=(PlannedFacet(
-            "relation", "provider request", relation="attribute_value",
-            attribute="timeout", value_kind="duration", response_mode="value", span_text=q,
+            "attribute", "provider requests", attribute="timeout",
+            value_kind="duration", response_mode="value", span_text=q,
         ),),
         clauses=(q,),
         parse_trace=("surface_rule:provider_request_timeout",),

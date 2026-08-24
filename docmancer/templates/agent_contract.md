@@ -10,7 +10,7 @@ Use the three-tool Docs MCP workflow:
 3. Call `docs_status` only for explicit status/health/freshness/job requests or when returned as `recommended_next_action`; never use it for discovery.
 4. After preparation, retry the original `get_docs_context` question unchanged; follow at most one returned non-automatic `rephrase_question`.
 
-On `insufficient_evidence`, do not claim documentation support. When `hard_stop=false`, use a returned local source-search handoff and repository source/tests. When `hard_stop=true`, stop before editing.
+On `insufficient_evidence`, do not claim documentation support. When `hard_stop=false`, use a returned local source-search handoff and repository source/tests. Stop before editing only when `hard_stop=true`.
 
 Project docs prove repository conventions and decisions; dependency docs prove external APIs; repository code proves current implementation facts. Do not use legacy direct documentation tools or server-owned compatibility arguments.
 
