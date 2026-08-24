@@ -16,24 +16,28 @@ _PUBLIC_TOOLS = ("get_docs_context", "prepare_docs", "docs_status")
 
 
 def _governance_facet_plan(value: str, *, scope: str) -> PlannedFacet:
-    """Classify governance nouns into value-bearing proof families.
+    """Classify only explicit governance value cues into typed proof families.
 
     The relation remains an internal QuestionPlan detail; the public question
-    surface is unchanged. These typed relations prevent a generic policy
-    mention from satisfying ownership, state, requirement, or version facets.
+    surface is unchanged. Typing must never invent an expected value from a
+    topical noun alone: e.g. ``background location scope`` is not implicitly
+    ``deferred`` and ``versioning policy`` is not a concrete version request.
     """
 
-    normalized = value.casefold().replace("_", " ")
+    normalized = " ".join(value.casefold().replace("_", " ").split())
     if re.search(r"\b(?:owner|ownership|владел|принадлеж)\w*\b", normalized):
         relation, value_kind, expected = "governance_ownership", "text", None
-    elif re.search(r"\b(?:version|pinned?|pinning|верси|закреп)\w*\b", normalized):
+    elif re.search(r"\bversion\b|\bpinned?\b|\bверси(?:я|ю|и|ей|е)\b|\bзакреп\w*\b", normalized):
         relation, value_kind, expected = "governance_version", "version_range", None
-    elif re.search(r"\b(?:defer|deferred|background\s+location|отлож)\w*\b", normalized):
+    elif re.search(r"\b(?:defer(?:red|ral)?|отлож\w*)\b", normalized):
         relation, value_kind, expected = "governance_state", "text", "deferred"
-    elif re.search(
-        r"\b(?:notification\s+permission|permission\s+(?:requirement|request)|"
-        r"required\s+permission|уведом\w*\s+разрешени\w*|разрешени\w*\s+уведом\w*)\b",
-        normalized,
+    elif (
+        re.fullmatch(r"notification\s+permission|разрешени\w*\s+уведом\w*", normalized)
+        or re.search(
+            r"\b(?:permission\s+(?:requirement|request)|required\s+permission|"
+            r"уведом\w*\s+разрешени\w*\s+(?:треб\w*|запраш\w*))\b",
+            normalized,
+        )
     ):
         relation, value_kind, expected = "governance_requirement", "text", None
     else:
@@ -129,22 +133,23 @@ def public_tools_with_purposes(q: str) -> QuestionPlan | None:
             for tool in _PUBLIC_TOOLS
         ),
         clauses=(q,),
-        parse_trace=("surface_rule:public_tools_purposes",),
+        parse_trace=("surface_rule:public_tools_with_purposes",),
     )
 
 
 def python_version_support(q: str) -> QuestionPlan | None:
-    cleaned = _clean(q)
-    if re.fullmatch(r"what\s+python\s+versions?\s+does\s+docatlas\s+support", cleaned, re.I):
-        subject = "DocAtlas"
-    elif re.fullmatch(r"which\s+python\s+versions?\s+are\s+supported", cleaned, re.I):
-        subject = "DocAtlas"
-    else:
+    match = re.fullmatch(
+        r"which\s+python\s+versions?\s+(?:does|do)\s+docatlas\s+support",
+        _clean(q),
+        re.I,
+    )
+    if match is None:
         return None
     return QuestionPlan(
         facets=(PlannedFacet(
-            "attribute", subject, attribute="python_version",
-            value_kind="version_range", response_mode="value", span_text=q,
+            "relation", "DocAtlas", relation="supported_values",
+            attribute="python version", value_kind="version_range",
+            response_mode="list", span_text=q,
         ),),
         clauses=(q,),
         parse_trace=("surface_rule:python_version_support",),
@@ -152,11 +157,17 @@ def python_version_support(q: str) -> QuestionPlan | None:
 
 
 def mcp_request_handling(q: str) -> QuestionPlan | None:
-    if re.fullmatch(r"how\s+does\s+(?:the\s+)?mcp\s+server\s+handle\s+requests", _clean(q), re.I) is None:
+    match = re.fullmatch(
+        r"how\s+does\s+(?:the\s+)?mcp\s+server\s+(?:process|handle)\s+(?:a\s+)?tool\s+request",
+        _clean(q),
+        re.I,
+    )
+    if match is None:
         return None
     return QuestionPlan(
         facets=(PlannedFacet(
-            "relation", "MCP server", relation="request_handling", span_text=q,
+            "relation", "MCP server", relation="request_handling",
+            target="tool request", response_mode="value", span_text=q,
         ),),
         clauses=(q,),
         parse_trace=("surface_rule:mcp_request_handling",),
@@ -164,12 +175,17 @@ def mcp_request_handling(q: str) -> QuestionPlan | None:
 
 
 def provider_request_timeout(q: str) -> QuestionPlan | None:
-    if re.fullmatch(r"what\s+is\s+the\s+timeout\s+for\s+provider\s+requests", _clean(q), re.I) is None:
+    match = re.fullmatch(
+        r"what\s+is\s+the\s+(?:provider\s+)?request\s+timeout",
+        _clean(q),
+        re.I,
+    )
+    if match is None:
         return None
     return QuestionPlan(
         facets=(PlannedFacet(
-            "attribute", "provider requests", attribute="timeout",
-            value_kind="duration", response_mode="value", span_text=q,
+            "relation", "provider request", relation="attribute_value",
+            attribute="timeout", value_kind="duration", response_mode="value", span_text=q,
         ),),
         clauses=(q,),
         parse_trace=("surface_rule:provider_request_timeout",),
