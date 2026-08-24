@@ -33,12 +33,18 @@ jobs:
       - name: Install exact source-test dependencies
         run: python -m pip install --disable-pip-version-check -e '.[dev]'
 
+      - name: Falsify verifier and snapshot boundary
+        run: python -m pytest -q .product-truth/tests/test_benchmark_foundation.py
+
       - name: Run two clean gold controls for all eight tasks
         run: |
           set -euo pipefail
           python .product-truth/real_task_pack.py \
             --manifest .product-truth/real-task-pack.json \
             --output _artifacts/docatlas-real-task-gold.json
+          python .product-truth/real_task_pack.py \
+            --manifest .product-truth/real-task-pack.json \
+            --verify-report _artifacts/docatlas-real-task-gold.json
           git diff --check
 
       - name: Upload bounded gold-control evidence

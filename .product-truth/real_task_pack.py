@@ -6,16 +6,17 @@ import hashlib
 import json
 import os
 import re
-import shutil
 import subprocess
 import sys
 import tempfile
+import xml.etree.ElementTree as ET
 from pathlib import Path
 from typing import Any, Mapping
 
 ROOT = Path(__file__).resolve().parents[1]
 SHA_RE = re.compile(r"[0-9a-f]{40}")
-REPORT_PROTOCOL = "docatlas-source-real-task-gold-v1"
+MANIFEST_PROTOCOL = "docatlas-source-real-task-pack-v1"
+REPORT_PROTOCOL = "docatlas-source-real-task-gold-v2"
 EXCLUDED_PREFIXES = (
     ".github/",
     ".product-truth/",
@@ -24,11 +25,7 @@ EXCLUDED_PREFIXES = (
     "tests/",
     "test/",
 )
-EXCLUDED_NAMES = {
-    "README.md",
-    "CHANGELOG.md",
-    "LICENSE",
-}
+EXCLUDED_NAMES = {"README.md", "CHANGELOG.md", "LICENSE"}
 TEST_MARKERS = ("/tests/", "/test/", "_test.py", ".test.", ".spec.")
 
 
@@ -38,6 +35,10 @@ def canonical_json(value: Any) -> str:
 
 def sha256_bytes(value: bytes) -> str:
     return hashlib.sha256(value).hexdigest()
+
+
+def manifest_sha256(manifest: Mapping[str, Any]) -> str:
+    return sha256_bytes(canonical_json(manifest).encode("utf-8"))
 
 
 def load_json(path: Path) -> dict[str, Any]:
@@ -74,8 +75,21 @@ def first_parent(fix_commit: str) -> str:
 
 
 def changed_paths(base: str, fix: str) -> list[str]:
-    raw = require_git("diff", "--name-only", base, fix).decode("utf-8", errors="strict")
-    return [line for line in raw.splitlines() if line]
+    raw = require_git("diff", "--name-only", "-z", base, fix)
+    return [item.decode("utf-8", errors="strict") for item in raw.split(b"\0") if item]
+
+
+def changed_worktree_paths(worktree: Path) -> list[str]:
+    tracked = require_git("diff", "--name-only", "-z", "HEAD", cwd=worktree)
+    untracked = require_git("ls-files", "--others", "--exclude-standard", "-z", cwd=worktree)
+    return sorted(
+        {
+            item.decode("utf-8", errors="strict")
+            for payload in (tracked, untracked)
+            for item in payload.split(b"\0")
+            if item
+        }
+    )
 
 
 def is_test_path(path: str) -> bool:
@@ -87,16 +101,12 @@ def production_paths(paths: list[str]) -> list[str]:
     result: list[str] = []
     for path in paths:
         normalized = path.replace("\\", "/")
-        if normalized in EXCLUDED_NAMES:
+        if normalized in EXCLUDED_NAMES or normalized.startswith(EXCLUDED_PREFIXES):
             continue
-        if normalized.startswith(EXCLUDED_PREFIXES):
-            continue
-        if is_test_path(normalized):
-            continue
-        if normalized.endswith((".md", ".rst")):
+        if is_test_path(normalized) or normalized.endswith((".md", ".rst")):
             continue
         result.append(normalized)
-    return result
+    return sorted(result)
 
 
 def git_blob(commit: str, path: str) -> bytes:
@@ -108,8 +118,10 @@ def path_exists(commit: str, path: str) -> bool:
 
 
 def validate_manifest(manifest: Mapping[str, Any]) -> None:
-    if manifest.get("schema_version") != 1 or manifest.get("protocol") != "docatlas-source-real-task-pack-v1":
+    if manifest.get("schema_version") != 1 or manifest.get("protocol") != MANIFEST_PROTOCOL:
         raise ValueError("real-task manifest identity mismatch")
+    if not isinstance(manifest.get("repository"), str) or not str(manifest["repository"]).strip():
+        raise ValueError("manifest repository is required")
     frozen = str(manifest.get("frozen_inventory_head") or "")
     if SHA_RE.fullmatch(frozen) is None:
         raise ValueError("frozen inventory head must be a full Git SHA")
@@ -134,10 +146,8 @@ def validate_manifest(manifest: Mapping[str, Any]) -> None:
             if not isinstance(value, str) or not value.strip():
                 raise ValueError(f"{task_id}: {field} is required")
         hidden_path = str(task["hidden_test_path"])
-        if not is_test_path(hidden_path):
-            raise ValueError(f"{task_id}: hidden path is not a repository test")
-        if ".." in Path(hidden_path).parts or Path(hidden_path).is_absolute():
-            raise ValueError(f"{task_id}: hidden test path escapes repository")
+        if not is_test_path(hidden_path) or Path(hidden_path).is_absolute() or ".." in Path(hidden_path).parts:
+            raise ValueError(f"{task_id}: hidden test path invalid")
         if len(str(task["issue_text"])) > 1200:
             raise ValueError(f"{task_id}: issue text is not bounded")
 
@@ -154,6 +164,32 @@ def test_environment(worktree: Path, manifest: Mapping[str, Any]) -> dict[str, s
     return env
 
 
+def _junit_evidence(path: Path) -> dict[str, Any]:
+    raw = path.read_bytes() if path.exists() else b""
+    evidence: dict[str, Any] = {
+        "junit_sha256": sha256_bytes(raw),
+        "junit_parsed": False,
+        "testcases": 0,
+        "test_failures": 0,
+        "test_errors": 0,
+    }
+    if not raw:
+        return evidence
+    try:
+        root = ET.fromstring(raw)
+    except ET.ParseError:
+        return evidence
+    evidence.update(
+        {
+            "junit_parsed": True,
+            "testcases": sum(1 for _ in root.iter("testcase")),
+            "test_failures": sum(1 for _ in root.iter("failure")),
+            "test_errors": sum(1 for _ in root.iter("error")),
+        }
+    )
+    return evidence
+
+
 def run_test(
     worktree: Path,
     manifest: Mapping[str, Any],
@@ -162,20 +198,26 @@ def run_test(
     timeout_seconds: int,
 ) -> dict[str, Any]:
     working = worktree / str(manifest.get("working_directory") or ".")
-    result = subprocess.run(
-        [sys.executable, "-m", "pytest", "-q", nodeid],
-        cwd=working,
-        env=test_environment(worktree, manifest),
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE,
-        timeout=timeout_seconds,
-        check=False,
-    )
-    return {
-        "returncode": result.returncode,
-        "stdout_sha256": sha256_bytes(result.stdout),
-        "stderr_sha256": sha256_bytes(result.stderr),
-    }
+    with tempfile.NamedTemporaryFile(prefix="product-truth-pytest-", suffix=".xml", delete=False) as handle:
+        junit_path = Path(handle.name)
+    try:
+        result = subprocess.run(
+            [sys.executable, "-m", "pytest", "-q", f"--junitxml={junit_path}", nodeid],
+            cwd=working,
+            env=test_environment(worktree, manifest),
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            timeout=timeout_seconds,
+            check=False,
+        )
+        return {
+            "returncode": result.returncode,
+            "stdout_sha256": sha256_bytes(result.stdout),
+            "stderr_sha256": sha256_bytes(result.stderr),
+            **_junit_evidence(junit_path),
+        }
+    finally:
+        junit_path.unlink(missing_ok=True)
 
 
 def overlay_hidden_test(worktree: Path, fix: str, path: str) -> tuple[bytes | None, bool]:
@@ -196,6 +238,33 @@ def restore_hidden_test(worktree: Path, path: str, previous: bytes | None, exist
         target.unlink(missing_ok=True)
 
 
+def hidden_red_valid(stage: Mapping[str, Any] | None) -> bool:
+    return bool(
+        isinstance(stage, Mapping)
+        and stage.get("returncode") == 1
+        and stage.get("junit_parsed") is True
+        and isinstance(stage.get("test_failures"), int)
+        and stage.get("test_failures", 0) >= 1
+        and stage.get("test_errors") == 0
+    )
+
+
+def attempt_stage_valid(item: Mapping[str, Any]) -> bool:
+    def returncode(field: str) -> object:
+        stage = item.get(field)
+        return stage.get("returncode") if isinstance(stage, Mapping) else None
+
+    hidden = item.get("hidden_base")
+    return bool(
+        returncode("public_base") == 0
+        and hidden_red_valid(hidden if isinstance(hidden, Mapping) else None)
+        and item.get("patch_applied") is True
+        and item.get("gold_surface_exact") is True
+        and returncode("public_gold") == 0
+        and returncode("hidden_gold") == 0
+    )
+
+
 def run_attempt(
     manifest: Mapping[str, Any],
     task: Mapping[str, Any],
@@ -212,76 +281,47 @@ def run_attempt(
         worktree = Path(raw) / "workspace"
         require_git("worktree", "add", "--detach", str(worktree), base)
         try:
-            public_base = run_test(
-                worktree,
-                manifest,
-                str(task["public_nodeid"]),
-                timeout_seconds=timeout_seconds,
-            )
+            public_base = run_test(worktree, manifest, str(task["public_nodeid"]), timeout_seconds=timeout_seconds)
             previous, existed = overlay_hidden_test(worktree, fix, hidden_path)
             try:
-                hidden_base = run_test(
-                    worktree,
-                    manifest,
-                    str(task["hidden_nodeid"]),
-                    timeout_seconds=timeout_seconds,
-                )
+                hidden_base = run_test(worktree, manifest, str(task["hidden_nodeid"]), timeout_seconds=timeout_seconds)
             finally:
                 restore_hidden_test(worktree, hidden_path, previous, existed)
 
             apply_result = run_git("apply", "--whitespace=nowarn", "-", cwd=worktree, input_bytes=gold_patch)
             patch_applied = apply_result.returncode == 0
-            changed_after_gold = []
-            public_gold = {"returncode": 99, "stdout_sha256": "", "stderr_sha256": ""}
-            hidden_gold = dict(public_gold)
+            changed_after_gold: list[str] = []
+            public_gold: dict[str, Any] = {"returncode": 99}
+            hidden_gold: dict[str, Any] = {"returncode": 99}
             if patch_applied:
-                changed_after_gold = require_git("diff", "--name-only", cwd=worktree).decode().splitlines()
-                public_gold = run_test(
-                    worktree,
-                    manifest,
-                    str(task["public_nodeid"]),
-                    timeout_seconds=timeout_seconds,
-                )
+                changed_after_gold = changed_worktree_paths(worktree)
+                public_gold = run_test(worktree, manifest, str(task["public_nodeid"]), timeout_seconds=timeout_seconds)
                 previous, existed = overlay_hidden_test(worktree, fix, hidden_path)
                 try:
-                    hidden_gold = run_test(
-                        worktree,
-                        manifest,
-                        str(task["hidden_nodeid"]),
-                        timeout_seconds=timeout_seconds,
-                    )
+                    hidden_gold = run_test(worktree, manifest, str(task["hidden_nodeid"]), timeout_seconds=timeout_seconds)
                 finally:
                     restore_hidden_test(worktree, hidden_path, previous, existed)
 
-            surface_ok = sorted(changed_after_gold) == sorted(prod_paths)
-            passed = bool(
-                public_base["returncode"] == 0
-                and hidden_base["returncode"] in {1, 2}
-                and patch_applied
-                and surface_ok
-                and public_gold["returncode"] == 0
-                and hidden_gold["returncode"] == 0
-            )
-            return {
+            row: dict[str, Any] = {
                 "attempt": attempt,
                 "public_base": public_base,
                 "hidden_base": hidden_base,
                 "patch_applied": patch_applied,
-                "gold_surface_exact": surface_ok,
+                "gold_surface_exact": sorted(changed_after_gold) == sorted(prod_paths),
                 "public_gold": public_gold,
                 "hidden_gold": hidden_gold,
-                "passed": passed,
             }
+            row["passed"] = attempt_stage_valid(row)
+            return row
         finally:
             run_git("worktree", "remove", "--force", str(worktree))
             run_git("worktree", "prune")
 
 
-def run_task(manifest: Mapping[str, Any], task: Mapping[str, Any]) -> dict[str, Any]:
+def task_provenance(manifest: Mapping[str, Any], task: Mapping[str, Any]) -> dict[str, Any]:
     fix = str(task["fix_commit"])
     frozen = str(manifest["frozen_inventory_head"])
-    ancestor = run_git("merge-base", "--is-ancestor", fix, frozen).returncode == 0
-    if not ancestor:
+    if run_git("merge-base", "--is-ancestor", fix, frozen).returncode != 0:
         raise ValueError(f"{task['id']}: fix is not reachable from frozen inventory head")
     base = first_parent(fix)
     paths = changed_paths(base, fix)
@@ -294,19 +334,6 @@ def run_task(manifest: Mapping[str, Any], task: Mapping[str, Any]) -> dict[str, 
     patch = require_git("diff", "--binary", base, fix, "--", *prod_paths)
     if not patch.strip():
         raise ValueError(f"{task['id']}: production-only gold patch is empty")
-    attempts = [
-        run_attempt(
-            manifest,
-            task,
-            base=base,
-            fix=fix,
-            prod_paths=prod_paths,
-            gold_patch=patch,
-            attempt=index,
-        )
-        for index in (1, 2)
-    ]
-    gold_reproducible = all(row["passed"] for row in attempts)
     return {
         "id": task["id"],
         "fix_commit": fix,
@@ -316,12 +343,112 @@ def run_task(manifest: Mapping[str, Any], task: Mapping[str, Any]) -> dict[str, 
         "hidden_test_sha256": sha256_bytes(git_blob(fix, hidden_path)),
         "production_paths": prod_paths,
         "gold_patch_sha256": sha256_bytes(patch),
-        "attempts": attempts,
-        "gold_reproducible": gold_reproducible,
-        "real_model_oracle_executed": False,
-        "real_model_oracle_passed": False,
-        "valid": False,
+        "gold_patch": patch,
     }
+
+
+def run_task(manifest: Mapping[str, Any], task: Mapping[str, Any]) -> dict[str, Any]:
+    provenance = task_provenance(manifest, task)
+    attempts = [
+        run_attempt(
+            manifest,
+            task,
+            base=str(provenance["base_commit"]),
+            fix=str(provenance["fix_commit"]),
+            prod_paths=list(provenance["production_paths"]),
+            gold_patch=bytes(provenance["gold_patch"]),
+            attempt=index,
+        )
+        for index in (1, 2)
+    ]
+    result = {key: value for key, value in provenance.items() if key != "gold_patch"}
+    result.update(
+        {
+            "attempts": attempts,
+            "gold_reproducible": all(attempt_stage_valid(row) for row in attempts),
+            "real_model_oracle_executed": False,
+            "real_model_oracle_passed": False,
+            "valid": False,
+        }
+    )
+    return result
+
+
+def verify_task_provenance(manifest: Mapping[str, Any], manifest_task: Mapping[str, Any], row: Mapping[str, Any]) -> None:
+    expected = task_provenance(manifest, manifest_task)
+    expected.pop("gold_patch")
+    for field, value in expected.items():
+        actual = row.get(field)
+        if field == "production_paths":
+            if not isinstance(actual, list) or sorted(actual) != sorted(value):
+                raise ValueError(f"{manifest_task['id']}: production provenance drift")
+        elif actual != value:
+            raise ValueError(f"{manifest_task['id']}: provenance drift for {field}")
+
+
+def verify_report(report: Mapping[str, Any], manifest: Mapping[str, Any]) -> None:
+    validate_manifest(manifest)
+    tasks = report.get("tasks")
+    if report.get("schema_version") != 1 or report.get("protocol") != REPORT_PROTOCOL:
+        raise ValueError("real-task report identity mismatch")
+    if report.get("repository") != manifest.get("repository"):
+        raise ValueError("report repository does not match manifest")
+    if report.get("frozen_inventory_head") != manifest.get("frozen_inventory_head"):
+        raise ValueError("report frozen inventory head does not match manifest")
+    if report.get("manifest_sha256") != manifest_sha256(manifest):
+        raise ValueError("report manifest digest mismatch")
+    manifest_tasks = manifest.get("tasks")
+    if not isinstance(tasks, list) or not isinstance(manifest_tasks, list) or len(tasks) != 8:
+        raise ValueError("real-task report requires eight tasks")
+
+    gold_count = 0
+    for manifest_task, row in zip(manifest_tasks, tasks, strict=True):
+        if not isinstance(manifest_task, Mapping) or not isinstance(row, Mapping):
+            raise ValueError("real-task result row must be an object")
+        verify_task_provenance(manifest, manifest_task, row)
+        attempts = row.get("attempts")
+        if not isinstance(attempts, list) or len(attempts) != 2 or [item.get("attempt") for item in attempts if isinstance(item, Mapping)] != [1, 2]:
+            raise ValueError("each task requires exactly two clean gold attempts")
+        attempt_results: list[bool] = []
+        for item in attempts:
+            if not isinstance(item, Mapping):
+                raise ValueError("attempt row must be an object")
+            hidden = item.get("hidden_base")
+            if not hidden_red_valid(hidden if isinstance(hidden, Mapping) else None):
+                raise ValueError("hidden-base test must be a pytest test failure with code 1 and no setup errors")
+            actual_passed = attempt_stage_valid(item)
+            if item.get("passed") is not actual_passed:
+                raise ValueError("attempt pass claim drift")
+            attempt_results.append(actual_passed)
+        expected_gold = all(attempt_results)
+        if row.get("gold_reproducible") is not expected_gold:
+            raise ValueError("gold reproducibility claim drift")
+        gold_count += int(expected_gold)
+        if (
+            row.get("real_model_oracle_executed") is not False
+            or row.get("real_model_oracle_passed") is not False
+            or row.get("valid") is not False
+        ):
+            raise ValueError("gold control cannot self-authorize model-oracle validity")
+
+    expected_summary = {
+        "task_count": 8,
+        "gold_reproducible_tasks": gold_count,
+        "real_model_oracle_tasks": 0,
+        "valid_tasks": 0,
+    }
+    if report.get("summary") != expected_summary:
+        raise ValueError("real-task summary drift")
+    boundary = report.get("claim_boundary")
+    if not isinstance(boundary, Mapping):
+        raise ValueError("real-task claim boundary missing")
+    if boundary.get("gold_control_complete") is not (gold_count == 8):
+        raise ValueError("gold-control completion drift")
+    for key in ("real_model_oracle_complete", "task_pack_ready", "product_truth_proven", "product_failure_proven"):
+        if boundary.get(key) is not False:
+            raise ValueError(f"gold control overclaims {key}")
+    if boundary.get("product_maturity") != "Beta":
+        raise ValueError("gold control cannot promote product maturity")
 
 
 def build_report(manifest: Mapping[str, Any]) -> dict[str, Any]:
@@ -333,7 +460,7 @@ def build_report(manifest: Mapping[str, Any]) -> dict[str, Any]:
         "protocol": REPORT_PROTOCOL,
         "repository": manifest["repository"],
         "frozen_inventory_head": manifest["frozen_inventory_head"],
-        "manifest_sha256": sha256_bytes(canonical_json(manifest).encode("utf-8")),
+        "manifest_sha256": manifest_sha256(manifest),
         "tasks": tasks,
         "summary": {
             "task_count": len(tasks),
@@ -350,68 +477,36 @@ def build_report(manifest: Mapping[str, Any]) -> dict[str, Any]:
             "product_maturity": "Beta",
         },
     }
-    verify_report(report)
+    verify_report(report, manifest)
     return report
-
-
-def verify_report(report: Mapping[str, Any]) -> None:
-    tasks = report.get("tasks")
-    if report.get("schema_version") != 1 or report.get("protocol") != REPORT_PROTOCOL:
-        raise ValueError("real-task report identity mismatch")
-    if not isinstance(tasks, list) or len(tasks) != 8:
-        raise ValueError("real-task report requires eight tasks")
-    gold_count = 0
-    for row in tasks:
-        if not isinstance(row, Mapping):
-            raise ValueError("real-task result row must be an object")
-        attempts = row.get("attempts")
-        if not isinstance(attempts, list) or [item.get("attempt") for item in attempts] != [1, 2]:
-            raise ValueError("each task requires exactly two clean gold attempts")
-        expected_gold = all(item.get("passed") is True for item in attempts)
-        if row.get("gold_reproducible") is not expected_gold:
-            raise ValueError("gold reproducibility claim drift")
-        gold_count += int(expected_gold)
-        if row.get("real_model_oracle_executed") is not False or row.get("valid") is not False:
-            raise ValueError("gold control cannot self-authorize model-oracle validity")
-    summary = report.get("summary")
-    expected_summary = {
-        "task_count": 8,
-        "gold_reproducible_tasks": gold_count,
-        "real_model_oracle_tasks": 0,
-        "valid_tasks": 0,
-    }
-    if summary != expected_summary:
-        raise ValueError("real-task summary drift")
-    boundary = report.get("claim_boundary")
-    if not isinstance(boundary, Mapping):
-        raise ValueError("real-task claim boundary missing")
-    if boundary.get("gold_control_complete") is not (gold_count == 8):
-        raise ValueError("gold-control completion drift")
-    for key in ("real_model_oracle_complete", "task_pack_ready", "product_truth_proven", "product_failure_proven"):
-        if boundary.get(key) is not False:
-            raise ValueError(f"gold control overclaims {key}")
-    if boundary.get("product_maturity") != "Beta":
-        raise ValueError("gold control cannot promote product maturity")
 
 
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--manifest", type=Path, required=True)
-    parser.add_argument("--output", type=Path, required=True)
+    parser.add_argument("--output", type=Path)
+    parser.add_argument("--verify-report", type=Path)
     args = parser.parse_args()
+    if (args.output is None) == (args.verify_report is None):
+        parser.error("provide exactly one of --output or --verify-report")
     manifest_path = args.manifest if args.manifest.is_absolute() else ROOT / args.manifest
+    manifest = load_json(manifest_path)
+    if args.verify_report is not None:
+        report_path = args.verify_report if args.verify_report.is_absolute() else ROOT / args.verify_report
+        verify_report(load_json(report_path), manifest)
+        print("Real-task report verification: PASS")
+        return 0
+
+    assert args.output is not None
     output_path = args.output if args.output.is_absolute() else ROOT / args.output
-    report = build_report(load_json(manifest_path))
+    report = build_report(manifest)
     output_path.parent.mkdir(parents=True, exist_ok=True)
     output_path.write_text(json.dumps(report, ensure_ascii=False, indent=2, sort_keys=True) + "\n", encoding="utf-8")
     print(
         "Real-task gold control: "
-        f"{report['summary']['gold_reproducible_tasks']}/8 reproducible; "
-        "oracle=0/8; valid=0/8"
+        f"{report['summary']['gold_reproducible_tasks']}/8 reproducible; oracle=0/8; valid=0/8"
     )
-    if report["summary"]["gold_reproducible_tasks"] != 8:
-        return 1
-    return 0
+    return 0 if report["summary"]["gold_reproducible_tasks"] == 8 else 1
 
 
 if __name__ == "__main__":
