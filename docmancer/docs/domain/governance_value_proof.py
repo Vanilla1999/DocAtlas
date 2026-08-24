@@ -55,10 +55,17 @@ _DEFERRED_STATE_RE = re.compile(
     r"|\b(?:остае\w*|явля\w*)\s+отлож\w*\b",
     re.I,
 )
+# governed_scope means the requested surfaces actually share one policy. A bare
+# "governed by" or "applies to" is not enough because it can describe separate
+# policies and still contain every topic word.
 _SCOPE_RELATION_RE = re.compile(
-    r"\b(?:use[sd]?\s+(?:the\s+)?same|share[sd]?|"
-    r"govern(?:s|ed)?\s+by|appl(?:y|ies)\s+to|"
-    r"same\s+.*\bpolicy\b|еди\w*\s+политик\w*)\b",
+    r"\b(?:"
+    r"use[sd]?\s+(?:the\s+)?same|"
+    r"share[sd]?\s+(?:(?:a|the|one|same|common|shared)\s+)?(?:\w+\s+){0,3}policy|"
+    r"govern(?:s|ed)?\s+by\s+(?:the\s+)?same|"
+    r"(?:same|one|common|shared)\s+(?:\w+\s+){0,3}policy|"
+    r"еди\w*\s+политик\w*"
+    r")\b",
     re.I,
 )
 _GENERIC_VALUE_RE = re.compile(
@@ -66,6 +73,7 @@ _GENERIC_VALUE_RE = re.compile(
     r"controls?|sets?|pins?|владе\w*|треб\w*|отлож\w*|примен\w*)\b",
     re.I,
 )
+_ANDROID_13_RE = re.compile(r"\bandroid\s*13(?:\+|\s*plus)?\b", re.I)
 
 
 def _norm(value: object) -> str:
@@ -141,6 +149,19 @@ def _clauses(text: str) -> tuple[str, ...]:
     return tuple(rows)
 
 
+def _predicate_is_negated(match: re.Match[str], clause: str) -> bool:
+    """Mirror the answer-unit local polarity rule for governance predicates."""
+
+    prefix = clause[max(0, match.start() - 48):match.start()]
+    return bool(re.search(
+        r"\b(?:not|never|no|cannot|can't|does\s+not|do\s+not|did\s+not|"
+        r"must\s+not|should\s+not|will\s+not|не|никогда\s+не|нельзя)\s+"
+        r"(?:\w+\s+){0,2}$",
+        prefix,
+        re.I,
+    ))
+
+
 def _relation_value_is_bound(
     obligation: ProofObligation,
     clause: str,
@@ -148,14 +169,17 @@ def _relation_value_is_bound(
     *,
     relation_tokens: frozenset[str],
     radius: int = 48,
+    allow_intrinsic_negative: bool = False,
 ) -> bool:
-    """Require the relation predicate to be locally bound to its requested target."""
+    """Require one non-contradictory relation predicate near its requested target."""
 
     target_tokens = _tokens(obligation.subject) - relation_tokens
     if not target_tokens:
         return False
     required = min(3, len(target_tokens))
     for match in pattern.finditer(clause):
+        if not allow_intrinsic_negative and _predicate_is_negated(match, clause):
+            continue
         window = clause[
             max(0, match.start() - radius):
             min(len(clause), match.end() + radius)
@@ -192,24 +216,58 @@ def _version_value_is_bound(obligation: ProofObligation, clause: str) -> bool:
 
 
 def _android_requirement_is_bound(obligation: ProofObligation, clause: str) -> bool:
-    """Preserve the direction of an Android-13 requirement proposition."""
+    """Preserve both direction and polarity of an Android-13 requirement."""
 
     context = _norm(obligation.context)
-    if "android 13" not in context:
-        return bool(_REQUIREMENT_RE.search(clause))
-
-    subject = _ordered_subject_pattern(obligation.subject)
-    if not subject:
+    subject_pattern = _ordered_subject_pattern(obligation.subject)
+    if not subject_pattern:
         return False
-    android = r"\bandroid\s*13(?:\+|\s*plus)?\b"
-    active_requirement = r"\b(?:requires?|needs?|must|requests?)\b"
-    passive_requirement = r"\b(?:is\s+|are\s+)?required\b"
-    patterns = (
-        rf"{android}.{{0,80}}{active_requirement}.{{0,80}}\b{subject}\b",
-        rf"{android}.{{0,80}}\b{subject}\b.{{0,40}}{passive_requirement}",
-        rf"\b{subject}\b.{{0,40}}{passive_requirement}.{{0,40}}{android}",
+    subject_matches = tuple(re.finditer(rf"\b{subject_pattern}\b", clause, re.I))
+    if not subject_matches:
+        return False
+
+    requirement_matches = tuple(
+        match for match in _REQUIREMENT_RE.finditer(clause)
+        if not _predicate_is_negated(match, clause)
     )
-    return any(re.search(pattern, clause, re.I) for pattern in patterns)
+    if "android 13" not in context:
+        return any(
+            abs(match.start() - subject.start()) <= 80
+            for match in requirement_matches
+            for subject in subject_matches
+        )
+
+    android_matches = tuple(_ANDROID_13_RE.finditer(clause))
+    for requirement in requirement_matches:
+        word = _norm(requirement.group(0))
+        for android in android_matches:
+            for subject in subject_matches:
+                # Active platform rule: Android 13 requires/needs/requests X.
+                if (
+                    word.startswith(("require", "need", "request"))
+                    and android.end() <= requirement.start() <= subject.start()
+                    and requirement.start() - android.end() <= 80
+                    and subject.start() - requirement.end() <= 80
+                    and not re.search(r"\b(?:no|not)\b", clause[requirement.end():subject.start()], re.I)
+                ):
+                    return True
+                # Passive/modal rule: X is required / must be requested on Android 13.
+                if (
+                    (word.startswith("required") or word == "must" or word.startswith("requested"))
+                    and subject.end() <= requirement.start() <= android.start()
+                    and requirement.start() - subject.end() <= 80
+                    and android.start() - requirement.end() <= 80
+                ):
+                    return True
+                # Android 13 X is required is also a valid platform-scoped proposition.
+                if (
+                    word.startswith("required")
+                    and android.end() <= subject.start() <= requirement.start()
+                    and subject.start() - android.end() <= 80
+                    and requirement.start() - subject.end() <= 80
+                ):
+                    return True
+    return False
 
 
 def _scope_proof(obligation: ProofObligation, clause: str) -> tuple[bool, int]:
@@ -220,7 +278,7 @@ def _scope_proof(obligation: ProofObligation, clause: str) -> tuple[bool, int]:
         obligation,
         clause,
         _SCOPE_RELATION_RE,
-        relation_tokens=frozenset({"same", "share", "use", "govern", "apply", "policy"}),
+        relation_tokens=frozenset({"same", "share", "use", "govern", "policy"}),
     ), hits
 
 
@@ -252,6 +310,9 @@ def _state_proof(obligation: ProofObligation, clause: str) -> tuple[bool, int]:
         clause,
         _DEFERRED_STATE_RE,
         relation_tokens=frozenset({"defer", "remain", "stay", "request", "include", "preflight"}),
+        # "does not request/include" is itself a positive deferred-state value;
+        # negation before a separate "remain deferred" predicate is still rejected.
+        allow_intrinsic_negative=True,
     ), hits
 
 
