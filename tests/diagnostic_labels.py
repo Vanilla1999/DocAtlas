@@ -16,8 +16,7 @@ DIAGNOSTIC_LABELS = frozenset({
 })
 
 
-def load_diagnostic_manifest(path: Path) -> dict[str, Any]:
-    manifest = json.loads(path.read_text(encoding="utf-8"))
+def _validate_manifest_maps(manifest: dict[str, Any]) -> None:
     module_labels = manifest.get("module_labels")
     node_overrides = manifest.get("node_overrides")
     node_hashes = manifest.get("module_node_hashes")
@@ -30,6 +29,49 @@ def load_diagnostic_manifest(path: Path) -> dict[str, Any]:
     }
     if invalid:
         raise pytest.UsageError(f"invalid diagnostic labels: {sorted(invalid)}")
+
+
+def _merge_manifest_extension(
+    manifest: dict[str, Any],
+    extension: dict[str, Any],
+    *,
+    extension_path: Path,
+) -> None:
+    """Merge one reviewed hash-bound shard without weakening collision checks."""
+
+    _validate_manifest_maps(extension)
+    if extension.get("schema_version") != manifest.get("schema_version"):
+        raise pytest.UsageError(
+            f"diagnostic label extension schema mismatch: {extension_path.name}"
+        )
+    for key in ("module_labels", "node_overrides", "module_node_hashes"):
+        base = manifest[key]
+        extra = extension[key]
+        overlap = sorted(set(base).intersection(extra))
+        if overlap:
+            raise pytest.UsageError(
+                f"diagnostic label extension collision in {extension_path.name}: {overlap}"
+            )
+        base.update(extra)
+
+
+def load_diagnostic_manifest(path: Path) -> dict[str, Any]:
+    manifest = json.loads(path.read_text(encoding="utf-8"))
+    _validate_manifest_maps(manifest)
+
+    # Large reviewed inventories may be extended by small explicit shards.
+    # Shards carry the same label/hash contract as the primary manifest and
+    # cannot override existing entries. This preserves fail-closed review while
+    # avoiding unrelated whole-file churn for a newly introduced test module.
+    for extension_path in sorted(path.parent.glob("diagnostic_labels.*.json")):
+        if extension_path == path:
+            continue
+        extension = json.loads(extension_path.read_text(encoding="utf-8"))
+        _merge_manifest_extension(
+            manifest,
+            extension,
+            extension_path=extension_path,
+        )
     return manifest
 
 
