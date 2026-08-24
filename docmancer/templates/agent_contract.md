@@ -5,7 +5,7 @@ Agent workflow contract identity: `{{DOCATLAS_AGENT_CONTRACT_ID}}`
 
 Use the three-tool Docs MCP workflow:
 
-1. Call `get_docs_context` for documentation, coding, or patch tasks before the first edit. Pass the original coding request as `question`; never replace it with a documentation-governance meta-question.
+1. Call `get_docs_context` for documentation, coding, or patch tasks before the first edit; it returns bounded structured evidence. Pass the original coding request as `question`; never replace it with a documentation-governance meta-question.
 2. Call `prepare_docs` only from `recommended_next_action` or for an explicit documentation lifecycle request.
 3. Call `docs_status` only for explicit status/health/freshness/job requests or when returned as `recommended_next_action`; never use it for discovery.
 4. After preparation, retry the original `get_docs_context` question unchanged. Follow at most one returned non-automatic `rephrase_question`.
