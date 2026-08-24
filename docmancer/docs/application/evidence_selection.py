@@ -113,4 +113,12 @@ def select_evidence(
     )
 
 
-__all__ = [n for n in globals() if not n.startswith("__") and not n.startswith("_")]
+_FACADE_PRIVATE_NAMES = {
+    "_replace", "_wraps", "_Any", "_Iterable", "_Mapping", "_Sequence",
+    "_build_requirements_impl", "_select_evidence_impl",
+    "_GOVERNANCE_PROJECT_RULE_RELATIONS", "_bind_governance_project_rule_roles",
+}
+__all__ = [
+    n for n in globals()
+    if not n.startswith("__") and n not in _FACADE_PRIVATE_NAMES
+]
