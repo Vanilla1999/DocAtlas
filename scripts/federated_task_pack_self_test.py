@@ -41,17 +41,21 @@ def main() -> int:
     expect_error("exactly eight candidates", lambda: validate_manifest(short_pack))
 
     duplicate = copy.deepcopy(manifest)
-    duplicate["repositories"][1]["tasks"][0]["fix_commit"] = (
-        duplicate["repositories"][0]["tasks"][0]["fix_commit"]
-    )
+    duplicate["repositories"][1]["tasks"][0]["fix_commit"] = duplicate["repositories"][0]["tasks"][0]["fix_commit"]
     expect_error("duplicate historical fix commit", lambda: validate_manifest(duplicate))
 
+    private_repo = next(repo for repo in manifest["repositories"] if repo["visibility"] == "private")
+    private_index = manifest["repositories"].index(private_repo)
     private_leak = copy.deepcopy(manifest)
-    private_leak["repositories"][1]["tasks"][0]["source_path"] = "private/source.py"
+    private_leak["repositories"][private_index]["tasks"][0]["source_path"] = "private/source.py"
     expect_error("private task metadata exceeds", lambda: validate_manifest(private_leak))
 
+    stale_repository = copy.deepcopy(manifest)
+    stale_repository["repositories"][1]["repository"] = "Vanilla1999/smart_glass"
+    expect_error("repository identity/order drift", lambda: validate_manifest(stale_repository))
+
     premature_valid = copy.deepcopy(manifest)
-    premature_valid["repositories"][2]["tasks"][0]["valid"] = True
+    premature_valid["repositories"][0]["tasks"][0]["valid"] = True
     expect_error("marked valid before controls", lambda: validate_manifest(premature_valid))
 
     attestation_forgery = copy.deepcopy(manifest)
@@ -66,25 +70,27 @@ def main() -> int:
     canary_claim["claim_boundary"]["canary_authorized"] = True
     expect_error("claim boundary drift", lambda: validate_manifest(canary_claim))
 
+    oracle_claim = copy.deepcopy(manifest)
+    oracle_claim["claim_boundary"]["real_model_oracle_authorized"] = True
+    expect_error("claim boundary drift", lambda: validate_manifest(oracle_claim))
+
     stable_claim = copy.deepcopy(manifest)
     stable_claim["claim_boundary"]["product_maturity"] = "Stable"
     expect_error("claim boundary drift", lambda: validate_manifest(stable_claim))
 
     report_claim = copy.deepcopy(report)
     report_claim["decision"]["product_truth_proven"] = True
-    expect_error(
-        "overclaims product_truth_proven",
-        lambda: verify_report(report_claim, manifest=manifest),
-    )
+    expect_error("overclaims product_truth_proven", lambda: verify_report(report_claim, manifest=manifest))
+
+    isolation_claim = copy.deepcopy(report)
+    isolation_claim["isolation"]["network_access_forbidden"] = False
+    expect_error("isolation contract drift", lambda: verify_report(isolation_claim, manifest=manifest))
 
     report_digest = copy.deepcopy(report)
     report_digest["manifest_sha256"] = "0" * 64
-    expect_error(
-        "manifest digest mismatch",
-        lambda: verify_report(report_digest, manifest=manifest),
-    )
+    expect_error("manifest digest mismatch", lambda: verify_report(report_digest, manifest=manifest))
 
-    print("Federated Product Truth candidate-pack self-test: PASS (10 mutations)")
+    print("Federated Product Truth candidate-pack self-test: PASS (13 mutations)")
     return 0
 
 
