@@ -100,6 +100,23 @@ def test_governance_question_plan_uses_typed_value_relations():
     assert all(item.response_mode == "value" for item in obligations)
     assert {item.proof_role for item in obligations} == {"project_rule"}
 
+    # Direction is part of the value contract: a permission depending on
+    # Android 13 is not proof that Android 13 requires that permission.
+    reversed_requirement = _candidate(
+        "reversed-notification-rule",
+        "Notification permission requires Android 13 compatibility before browser startup.",
+        source="docs/permission-policy.md",
+        authority="official",
+    )
+    requirement_only = type(requirements)((by_relation["governance_requirement"],))
+    reversed_decision = select_evidence(
+        [reversed_requirement],
+        question=QUESTION,
+        config=project_docs_selection_config(800),
+        requirements=requirement_only,
+    )
+    assert reversed_decision.support_decision.answer_supported is False
+
 
 def test_permission_scope_is_not_overclassified_as_a_requirement():
     requirements = build_requirements(
@@ -166,31 +183,56 @@ def test_version_location_statement_requires_the_actual_version_value():
         "The permission_handler version pin is recorded in pubspec.lock.",
         source="pubspec.lock",
     )
+    wrong_value = _candidate(
+        "unbound-platform-version",
+        "permission_handler version compatibility requires Android 13.0.",
+        source="pubspec.lock",
+    )
     with_value = _candidate(
         "version-value",
         "The pinned permission_handler version is 11.4.0 in pubspec.lock.",
+        source="pubspec.lock",
+    )
+    lock_value = _candidate(
+        "lock-version-value",
+        "permission_handler: 11.4.0",
         source="pubspec.lock",
     )
     requirements = _requirements()
     version_requirement = next(
         item for item in requirements if item.relation == "governance_version"
     )
+    version_only = type(requirements)((version_requirement,))
 
     missing = select_evidence(
         [missing_value],
         question=QUESTION,
         config=project_docs_selection_config(800),
-        requirements=type(requirements)((version_requirement,)),
+        requirements=version_only,
+    )
+    unbound = select_evidence(
+        [wrong_value],
+        question=QUESTION,
+        config=project_docs_selection_config(800),
+        requirements=version_only,
     )
     present = select_evidence(
         [with_value],
         question=QUESTION,
         config=project_docs_selection_config(800),
-        requirements=type(requirements)((version_requirement,)),
+        requirements=version_only,
+    )
+    lock_present = select_evidence(
+        [lock_value],
+        question=QUESTION,
+        config=project_docs_selection_config(800),
+        requirements=version_only,
     )
 
     assert missing.support_decision.answer_supported is False
+    assert unbound.support_decision.answer_supported is False
     assert present.support_decision.answer_supported is True
+    assert lock_present.support_decision.answer_supported is True
 
 
 def test_navigation_governance_cannot_become_a_model_visible_supported_answer():
