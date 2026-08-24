@@ -689,7 +689,10 @@ PUBLIC_ADVERTISED_DESCRIPTIONS: dict[str, str] = {
         "For project-wide policy use scope=project without module filters. If a task needs both module-local and "
         "project-wide evidence, make two bounded calls (module then project). For cross-module questions use "
         "scope=all without module filters. On module ambiguity follow the returned docs_status recovery and retry "
-        "with an exact module_path. Stop before editing on insufficient_evidence."
+        "with an exact module_path. Pass the original coding request as question instead of replacing it with a "
+        "documentation-governance meta-question. On insufficient_evidence, keep documentation claims unproved; "
+        "continue with a returned local source-search handoff when hard_stop=false, and stop before editing when "
+        "hard_stop=true or the change explicitly depends on the unproved documentary contract."
     ),
     "prepare_docs": (
         "Confirmation-first documentation preparation. Call only from get_docs_context "

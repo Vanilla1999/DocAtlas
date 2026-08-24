@@ -430,6 +430,14 @@ def test_agent_templates_include_three_tool_selection_guidance():
     assert canonical_raw.count("{{DOCATLAS_AGENT_CONTRACT_ID}}") == 1
     assert "delivery_strategy" not in canonical_raw
     assert "output_mode" not in canonical_raw
+    assert "stop before editing on `insufficient_evidence`" not in canonical_raw
+    assert "hard_stop=true" in canonical_raw
+    assert "documentation-governance meta-question" in canonical_raw
+
+    advertised = runtime_tools["get_docs_context"]["description"]
+    assert "Stop before editing on insufficient_evidence" not in advertised
+    assert "hard_stop=true" in advertised
+    assert "documentation-governance meta-question" in advertised
 
     for name in (
         "skill.md", "claude_code_skill.md", "claude_desktop_skill.md",

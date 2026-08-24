@@ -1,6 +1,34 @@
 """Split test module; helpers live in _shared_test_action_packet.py."""
 from tests.docs import _shared_test_action_packet as _shared
 globals().update({k: v for k, v in vars(_shared).items() if not k.startswith("__")})
+from docmancer.docs.domain.request_intent import model_projection_kind
+
+
+@pytest.mark.parametrize(
+    "question",
+    [
+        "Build FooHandler",
+        "Write FooHandler",
+        "Develop FooHandler",
+        "Introduce FooHandler",
+        "Replace FooHandler",
+        "Edit FooHandler",
+        "Migrate FooHandler",
+        "Code FooHandler",
+        "Напиши FooHandler",
+        "Разработай FooHandler",
+    ],
+)
+def test_every_routed_change_request_has_mutation_intent(question):
+    assert model_projection_kind(question) == "patch_context"
+    assert build_mutation_intent(question).operation != "none"
+
+
+def test_documentation_governance_meta_question_is_not_mutation_intent():
+    question = "What documentation governs changes to FooHandler?"
+
+    assert model_projection_kind(question) == "docs_answer"
+    assert build_mutation_intent(question).operation == "none"
 
 def test_post_format_sufficiency_fails_closed_when_public_fact_is_not_rendered():
     text = "OpaqueContractValue-739 is the selected contract value."
@@ -282,7 +310,8 @@ def test_bounded_direct_is_one_existing_tool_call_and_returns_only_action_packet
     installed_contract = _get_template_content("project_bootstrap.md")
     assert 'delivery_strategy="bounded_direct"' not in installed_contract
     assert "bounded structured" in installed_contract
-    assert "Otherwise do not repeat before the first edit" in installed_contract
+    assert "follow at most one returned non-automatic `rephrase_question`" in installed_contract
+    assert "Stop before editing only when `hard_stop=true`" in installed_contract
     project_workflow = next(item for item in MCP_RESOURCES if item["uri"] == "docmancer://workflow/project-docs")
     library_workflow = next(item for item in MCP_RESOURCES if item["uri"] == "docmancer://workflow/library-docs")
     quickstart = next(item for item in MCP_RESOURCES if item["uri"] == "docmancer://agent/quickstart")

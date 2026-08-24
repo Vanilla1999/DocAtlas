@@ -6,6 +6,7 @@ from pathlib import PurePosixPath
 import re
 from typing import Any, Iterable, Literal, Mapping
 
+from docmancer.docs.domain.request_intent import is_change_request
 from docmancer.retrieval.contracts import canonical_hash
 
 
@@ -157,6 +158,11 @@ def build_mutation_intent(question: str) -> MutationIntentContract:
     elif _CREATE_RE.search(raw):
         operation = "create"
     elif _MODIFY_RE.search(raw):
+        operation = "modify"
+    elif is_change_request(raw):
+        # Routing recognizes a broader imperative vocabulary than the
+        # operation-specific patterns. Keep every routed patch mutable even
+        # when its verb only has generic modify semantics here.
         operation = "modify"
     else:
         operation = "none"

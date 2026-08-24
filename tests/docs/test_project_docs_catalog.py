@@ -213,6 +213,14 @@ def test_invalid_catalog_is_explicit_and_invalid_in_agent_contract(tmp_path):
     assert "`explicit` (valid: no)" in format_agent_contract_markdown(contract)
 
 
+def test_agent_contract_does_not_turn_all_insufficient_evidence_into_a_hard_stop(tmp_path):
+    rules = "\n".join(build_agent_contract(tmp_path)["evidence_rules"])
+
+    assert "stop before editing on status=insufficient_evidence" not in rules
+    assert "hard_stop=true" in rules
+    assert "documentation-governance meta-question" in rules
+
+
 def test_catalog_rejects_inconsistent_role_scope_and_lifecycle(tmp_path):
     (tmp_path / "doc.md").write_text("# Doc\n", encoding="utf-8")
     _catalog(tmp_path, """  - path: doc.md

@@ -261,7 +261,7 @@
     "tests/test_web_fetcher.py": "behavioral"
   },
   "module_node_hashes": {
-    "tests/docs/test_action_packet.py": "6878993aca63375e986516644fbca97947c56e27112147de7c45a820b585b02f",
+    "tests/docs/test_action_packet.py": "571c21c81636248d849583a88cfd3ae53a31e532fd599bc1596a6e5f6e90462e",
     "tests/docs/test_action_packet_part02.py": "ae2b47ba9e7d05172af1bb19f786b90f4db006fc5fd8c63ed58bd3d997fd14ac",
     "tests/docs/test_agent_index_gateway.py": "1e630e3d0942da93e520df76a7ce0dff87cbe843704eb284be88a8bbf8b9db5d",
     "tests/docs/test_answer_units_v2.py": "ce5169d399cbd07d1e6b564c166a6539d555c255054253d9a9fef2979ace5da8",
@@ -316,7 +316,7 @@
     "tests/docs/test_project_context_service.py": "c00deb23d04360eeac7c31ae138b7f3ec550d8e9befc5dacfec757931c892c45",
     "tests/docs/test_project_context_service_part02.py": "d9a55ce2c495124d90dcce7703f98a7af9bf55908cf03f82b136f90d427e27fe",
     "tests/docs/test_project_doc_ranking.py": "de73d3469cff01bfd613ba0de7a5e0fa8e947015283d23cb2c6a8b514041bf98",
-    "tests/docs/test_project_docs_catalog.py": "8c3cd087a943b121c5d31d88a6c544bf0fdf8144034ed8d282a54f74efb26aae",
+    "tests/docs/test_project_docs_catalog.py": "82fc7ae240a36169f92d087d5a6efdb333f34dbe1416fb4f89c56579b2bf2b23",
     "tests/docs/test_project_docs_service.py": "272af3feb3e948ac440a691afda05a483a572f3e4176e616c34d35f68c985846",
     "tests/docs/test_project_evidence_production.py": "d6495a762c9e4aaaf4d3807d0d4fa45c829ce6e75c4ad3cc51ef60a9d97f8882",
     "tests/docs/test_project_metadata_reader.py": "d7171b8e4234a3e7dfc347411a9aeb09839b6cb10e087f8ea7c6437e43ba1032",

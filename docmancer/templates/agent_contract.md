@@ -8,9 +8,11 @@ Use the three-tool Docs MCP router. `get_docs_context` returns bounded structure
 1. For documentation questions and coding or patch tasks, call `get_docs_context` before the first edit.
 2. Call `prepare_docs` only from `recommended_next_action` or when the user explicitly requests documentation lifecycle work such as sync, refresh, index, or prefetch.
 3. Use `docs_status` only for an explicit health, freshness, index, or job-status request, or when `get_docs_context` returns it as `recommended_next_action`; never use it as discovery.
-4. After preparation succeeds, retry the original `get_docs_context` question unchanged. Otherwise do not repeat before the first edit.
+4. After preparation succeeds, retry the original `get_docs_context` question unchanged. For parser or retrieval uncertainty, follow at most one returned non-automatic `rephrase_question`.
 
-Inspect the returned status and stop before editing on `insufficient_evidence`.
+Pass the original coding request as `question`; do not replace an explicit change request with a documentation-governance meta-question.
+
+On `insufficient_evidence`, do not claim documentation support. If `hard_stop=false`, follow a returned local source-search handoff and continue with repository source/tests. Stop before editing only when `hard_stop=true` or when the requested change explicitly depends on a documentary contract that remains unproved.
 
 Project documentation proves repository conventions and decisions. Dependency documentation proves external APIs. For current implementation facts, prefer repository code search. Do not use legacy direct documentation tools or server-owned compatibility arguments in this workflow.
 
