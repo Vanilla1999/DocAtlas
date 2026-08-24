@@ -34,26 +34,13 @@ def _select(candidates):
 def _substantive_candidates(*, authority: str = "official"):
     return [
         _candidate(
-            "scope",
-            "Browser and scan use the same Android permission preflight policy.",
-            source="docs/permission-policy.md",
-            authority=authority,
-        ),
-        _candidate(
-            "ownership",
-            "PermissionService owns platform permission policy for browser/scan preflight.",
-            source="docs/permission-policy.md",
-            authority=authority,
-        ),
-        _candidate(
-            "notification",
-            "Android 13 requires notification permission before browser or scan startup.",
-            source="docs/permission-policy.md",
-            authority=authority,
-        ),
-        _candidate(
-            "location",
-            "Background location remains deferred from browser/scan preflight.",
+            "permission-policy",
+            (
+                "Browser and scan use the same Android permission preflight policy. "
+                "PermissionService owns platform permission policy for browser/scan preflight. "
+                "Android 13 requires notification permission before browser or scan startup. "
+                "Background location remains deferred from browser/scan preflight."
+            ),
             source="docs/permission-policy.md",
             authority=authority,
         ),
