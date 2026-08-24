@@ -2,6 +2,78 @@
 from tests.docs import _shared_test_evidence_selection as _shared
 globals().update({k: v for k, v in vars(_shared).items() if not k.startswith("__")})
 
+
+def test_governance_facets_cannot_be_proved_by_dependency_pin_alone():
+    question = (
+        "What project rules govern the shared browser and scan Android permission "
+        "preflight on Android 13+, including policy ownership, notification "
+        "permission, deferred background location, and the pinned "
+        "permission_handler version?"
+    )
+    requirements = build_requirements(question, profile="project_docs_answer")
+    decision = select_evidence(
+        [_candidate(
+            "permission-lock",
+            "The pinned permission_handler version is 11.4.0.",
+            title="pubspec.lock",
+        )],
+        question=question,
+        config=project_docs_selection_config(800),
+        requirements=requirements,
+    )
+
+    assert len(decision.support_decision.mandatory_requirement_ids) == 5
+    assert decision.support_decision.answer_supported is False
+    assert decision.support_decision.mandatory_coverage <= 0.2
+    assert len(decision.missing_requirements) >= 4
+
+
+def test_governance_facets_are_proved_by_project_document_propositions():
+    question = (
+        "What project rules govern the shared browser and scan Android permission "
+        "preflight on Android 13+, including policy ownership, notification "
+        "permission, deferred background location, and the pinned "
+        "permission_handler version?"
+    )
+    requirements = build_requirements(question, profile="project_docs_answer")
+    decision = select_evidence(
+        [
+            _candidate(
+                "scope",
+                "Browser and scan use the same Android permission preflight policy.",
+                source="docs/permission-policy.md",
+            ),
+            _candidate(
+                "ownership",
+                "PermissionService owns platform permission policy for browser/scan preflight.",
+                source="docs/permission-policy.md",
+            ),
+            _candidate(
+                "notification",
+                "Android 13 requires notification permission before browser or scan startup.",
+                source="docs/permission-policy.md",
+            ),
+            _candidate(
+                "location",
+                "Background location remains deferred from browser/scan preflight.",
+                source="docs/permission-policy.md",
+            ),
+            _candidate(
+                "pin",
+                "The pinned permission_handler version is 11.4.0.",
+                source="pubspec.lock",
+            ),
+        ],
+        question=question,
+        config=project_docs_selection_config(800),
+        requirements=requirements,
+    )
+
+    assert len(decision.support_decision.mandatory_requirement_ids) == 5
+    assert decision.support_decision.answer_supported is True
+    assert decision.missing_requirements == ()
+    assert len(decision.assignments) == 5
+
 def test_project_document_profile_and_explicit_bounds_are_validated():
     config = replace(
         docs_selection_config(800),

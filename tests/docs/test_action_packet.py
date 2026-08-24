@@ -24,6 +24,17 @@ def test_every_routed_change_request_has_mutation_intent(question):
     assert build_mutation_intent(question).operation != "none"
 
 
+def test_mutation_readiness_does_not_infer_constraints_from_user_wording():
+    contract = build_mutation_intent(
+        "Fix PermissionService without changing public behavior"
+    )
+
+    readiness = evaluate_mutation_readiness(contract)
+
+    assert contract.acceptance_conditions
+    assert readiness.constraints_only is False
+
+
 def test_documentation_governance_meta_question_is_not_mutation_intent():
     question = "What documentation governs changes to FooHandler?"
 
@@ -127,6 +138,113 @@ def test_selected_document_terms_survive_action_packet_formatting():
     assert create_readiness.ready is True
     assert resolved_create.resolved_targets[0].binding_kind == "parent_context"
     assert resolved_create.resolved_targets[0].exists is False
+
+
+def test_patch_handler_uses_action_packet_completeness_for_explicit_target():
+    guidance_text = "PermissionService keeps browser and scan preflight policy shared."
+    guidance = {
+        "stable_chunk_id": "permission-guidance",
+        "parent_logical_id": "parent:permission-guidance",
+        "source": "docs/permission-policy.md",
+        "path": "docs/permission-policy.md",
+        "display_text": guidance_text,
+        "display_content_hash": hashlib.sha256(guidance_text.encode()).hexdigest(),
+        "content": guidance_text,
+        "authority": "official",
+    }
+    target_text = (
+        "lib/modules/permission/application/permission_service.dart "
+        "class PermissionService {}"
+    )
+    target = {
+        "stable_chunk_id": "permission-target",
+        "parent_logical_id": "parent:permission-target",
+        "source": "lib/modules/permission/application/permission_service.dart",
+        "path": "lib/modules/permission/application/permission_service.dart",
+        "display_text": target_text,
+        "display_content_hash": hashlib.sha256(target_text.encode()).hexdigest(),
+        "content": target_text,
+        "authority": "official",
+        "source_class": "code_graph",
+        "symbols": ["PermissionService"],
+    }
+
+    class Facade:
+        def get_docs_context(self, question, **kwargs):
+            return ProjectContextResult(
+                project_path="/repo",
+                question=question,
+                answer_available=False,
+                answer_type="navigation_only",
+                answer_completeness={
+                    "status": "partial",
+                    "source_search_required": True,
+                    "source_search_status": "required",
+                },
+                context_pack=[guidance, target],
+                trust_contract={"selected": [], "rejected": [], "risky": []},
+            )
+
+    result = handle_context_tool(
+        "get_docs_context",
+        {
+            "question": (
+                "Update lib/modules/permission/application/permission_service.dart "
+                "for shared browser and scan preflight policy"
+            ),
+            "project_path": "/repo",
+            "delivery_strategy": "bounded_direct",
+        },
+        Facade(),
+    )
+
+    assert result["status"] == "ok", result["missing"]
+    assert result["kind"] == "patch_context"
+    assert result["mutation_intent"]["ready"] is True
+
+
+def test_untargeted_patch_recovery_includes_safe_document_navigation():
+    document = {
+        "stable_chunk_id": "permission-policy",
+        "parent_logical_id": "parent:permission-policy",
+        "source": "docs/permission-policy.md",
+        "path": "docs/permission-policy.md",
+        "display_text": "PermissionService owns shared permission policy.",
+        "content": "PermissionService owns shared permission policy.",
+        "authority": "official",
+        "symbols": ["PermissionService"],
+    }
+
+    class Facade:
+        def get_docs_context(self, question, **kwargs):
+            return ProjectContextResult(
+                project_path="/repo",
+                question=question,
+                answer_available=False,
+                answer_type="navigation_only",
+                answer_completeness={"status": "partial"},
+                context_pack=[document],
+                trust_contract={"selected": [], "rejected": [], "risky": []},
+            )
+
+    result = handle_context_tool(
+        "get_docs_context",
+        {
+            "question": "Fix shared permission preflight policy",
+            "project_path": "/repo",
+            "delivery_strategy": "bounded_direct",
+        },
+        Facade(),
+    )
+
+    assert result["status"] == "insufficient_evidence"
+    assert result["recommended_next_action"]["suggested_doc_paths"] == [
+        "docs/permission-policy.md"
+    ]
+    assert result["recommended_next_action"]["repeat_docs_context"] is False
+    assert "targets" not in result
+    assert "implementation_guidance" not in result
+    assert "invariants" not in result
 
 
 def test_selected_exact_terms_keep_protected_witness_during_budget_fitting():
@@ -468,7 +586,9 @@ def test_bounded_direct_is_one_existing_tool_call_and_returns_only_action_packet
         "delivery_strategy": "bounded_direct",
     }, PartialFacade())
     assert partial["status"] == "insufficient_evidence"
-    assert any("navigational" in item for item in partial["missing"])
+    assert any("status=partial_success" in item for item in partial["missing"])
+    assert any("project" in item for item in partial["missing"])
+    assert not any("navigational" in item for item in partial["missing"])
 
     class LegacyProjectFacade:
         def get_docs_context(self, question, **kwargs):
@@ -486,7 +606,8 @@ def test_bounded_direct_is_one_existing_tool_call_and_returns_only_action_packet
         "question": "Change legacy", "project_path": "/repo", "delivery_strategy": "bounded_direct",
     }, LegacyProjectFacade())
     assert legacy["status"] == "insufficient_evidence"
-    assert "Project answer completeness metadata is missing." in legacy["missing"]
+    assert any("mutation_target_not_requested" in item for item in legacy["missing"])
+    assert "Project answer completeness metadata is missing." not in legacy["missing"]
 
     class MultiChunkBackend:
         def get_project_context(self, project_path, question, **kwargs):

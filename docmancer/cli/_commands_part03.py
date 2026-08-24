@@ -5,6 +5,12 @@ from ._commands_shared import *  # noqa: F401,F403
 
 from ._commands_part01 import _collect_doctor_report, _create_agent_or_raise_lock_error, _effective_config, _effective_retrieval_mode, _emit_doctor_report, _get_agent_class, _load_config, _operational_source_card, _run_dispatch_query, _source_rows
 
+
+def _json_collection_default(value: object) -> object:
+    if isinstance(value, (set, frozenset)):
+        return sorted(value, key=str)
+    raise TypeError(f"Object of type {type(value).__name__} is not JSON serializable")
+
 @click.command(
     cls=DocmancerCommand,
     context_settings=HELP_CONTEXT_SETTINGS,
@@ -483,7 +489,12 @@ def context_cmd(
     )
     payload = asdict(result)
     if output_format == "json":
-        click.echo(json.dumps(payload, ensure_ascii=False, indent=2))
+        click.echo(json.dumps(
+            payload,
+            ensure_ascii=False,
+            indent=2,
+            default=_json_collection_default,
+        ))
         return
     click.echo(f"Project context: {result.status}")
     sources = result.trust_contract.get("sources") if isinstance(result.trust_contract, dict) else {}

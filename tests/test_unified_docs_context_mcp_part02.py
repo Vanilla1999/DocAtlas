@@ -2,6 +2,43 @@
 from tests import _shared_test_unified_docs_context_mcp as _shared
 globals().update({k: v for k, v in vars(_shared).items() if not k.startswith("__")})
 
+
+def test_patch_retrieval_issues_ignore_docs_answer_completeness():
+    from docmancer.docs.interfaces.mcp.context_tools import bounded_patch_retrieval_issues
+
+    payload = {
+        "status": "success",
+        "answer_available": False,
+        "answer_type": "navigation_only",
+        "answer_completeness": {
+            "status": "partial",
+            "source_search_required": True,
+            "source_search_status": "required",
+        },
+        "lanes": {"project": {"status": "success"}},
+    }
+
+    assert bounded_patch_retrieval_issues(payload) == []
+
+
+def test_patch_retrieval_issues_keep_operational_failures():
+    from docmancer.docs.interfaces.mcp.context_tools import bounded_patch_retrieval_issues
+
+    payload = {
+        "status": "partial",
+        "requires_confirmation": True,
+        "lanes": {
+            "project": {"status": "failed"},
+            "dependency": {"status": "success"},
+        },
+    }
+
+    assert bounded_patch_retrieval_issues(payload) == [
+        "Documentation retrieval is incomplete (status=partial).",
+        "Documentation retrieval requires explicit user confirmation before editing.",
+        "Required documentation lanes are incomplete: project.",
+    ]
+
 def test_bounded_delivery_updates_original_unified_result_telemetry_record():
     from docmancer.docs.domain.retrieval_routing import new_routing_record, route_initial_stages
     from docmancer.docs.models import UnifiedDocsContextResult

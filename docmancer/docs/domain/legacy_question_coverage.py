@@ -148,12 +148,21 @@ def _contract_scope_tokens(question: str) -> tuple[str, ...]:
         re.I,
     )
     if match is None:
+        match = re.search(
+            r"\bwhat\s+(?:project\s+)?(?:rules|policies)\s+govern\s+"
+            r"(.{1,180}?)(?:,\s*including\b|[?!.]*$)",
+            question,
+            re.I,
+        )
+    if match is None:
         return ()
     return _tokens(match.group(1))
 
 
 def _requirement_items(question: str) -> tuple[str, ...]:
     match = re.search(r"\brequire(?:s|d)?\s+for\s+(.+?)[?!.]*$", question, re.I)
+    if match is None:
+        match = re.search(r"\bincluding\s+(.+?)[?!.]*$", question, re.I)
     if match is None:
         return ()
     tail = match.group(1).strip()

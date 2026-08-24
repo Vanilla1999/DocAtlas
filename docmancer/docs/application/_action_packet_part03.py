@@ -246,6 +246,18 @@ def build_action_packet(
         elif snippet:
             guidance.append({"text": snippet, "evidence_ids": [evidence_id]})
 
+    has_source_backed_constraints = bool(acceptance_conditions or required or forbidden)
+    has_resolved_edit_target = any(
+        target.binding_kind == "target" and target.exists
+        for target in resolved_mutation.resolved_targets
+    )
+    constraints_only = bool(
+        resolved_mutation.operation != "none"
+        and not mutation_readiness.ready
+        and not has_resolved_edit_target
+        and has_source_backed_constraints
+    )
+
     symbols: list[dict[str, Any]] = []
     for item in items:
         evidence_id = _evidence_id(item) if _source_path(item) else None
@@ -288,7 +300,7 @@ def build_action_packet(
             "destination": resolved_mutation.destination,
             "acceptance_conditions": list(resolved_mutation.acceptance_conditions),
             "ready": mutation_readiness.ready,
-            "constraints_only": mutation_readiness.constraints_only,
+            "constraints_only": constraints_only,
             "missing": list(mutation_readiness.missing),
             "contract_hash": mutation_readiness.contract_hash,
         },
@@ -355,7 +367,7 @@ def build_action_packet(
             message = f"Mutation target readiness is incomplete: {reason}."
             if message not in packet["missing_evidence"]:
                 packet["missing_evidence"].append(message)
-        if mutation_readiness.constraints_only:
+        if constraints_only:
             message = "Documentation constraints do not authorize or identify the requested edit target."
             if message not in packet["missing_evidence"]:
                 packet["missing_evidence"].append(message)

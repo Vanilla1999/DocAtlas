@@ -72,6 +72,45 @@ _REQUIREMENT_STOP_WORDS = {
     "и", "или", "а", "в", "на", "для", "из",
 }
 
+_GOVERNANCE_STOP_WORDS = {
+    "a", "an", "and", "are", "for", "in", "is", "of", "on", "the", "this",
+    "и", "в", "на", "для", "это",
+}
+_GOVERNANCE_PREDICATE_RE = re.compile(
+    r"\b(?:govern\w*|polic(?:y|ies)|own(?:s|ed|ership)?|belong\w*|"
+    r"require\w*|must|defer\w*|request\w*|pin(?:s|ned|ning)?|"
+    r"use[sd]?|remain\w*|rule[sd]?|"
+    r"регулир\w*|политик\w*|правил\w*|принадлеж\w*|треб\w*|"
+    r"отлож\w*|запраш\w*|закреп\w*)\b",
+    re.I,
+)
+
+
+def _governance_tokens(value: object) -> set[str]:
+    tokens: set[str] = set()
+    for raw in re.findall(r"[A-Za-zА-Яа-яЁё0-9]+", _norm(value)):
+        if raw in _GOVERNANCE_STOP_WORDS or len(raw) < 2:
+            continue
+        token = raw
+        if raw in {"own", "owns", "owned", "owner", "ownership"}:
+            token = "own"
+        elif raw.startswith("defer"):
+            token = "defer"
+        elif raw.startswith("pin"):
+            token = "pin"
+        elif raw.endswith("s") and len(raw) > 4:
+            token = raw[:-1]
+        tokens.add(token)
+    return tokens
+
+
+def _governance_subject_match(subject: object, clause: str) -> tuple[bool, int]:
+    expected = _governance_tokens(subject)
+    actual = _governance_tokens(clause)
+    hits = len(expected & actual)
+    required = max(2, min(4, (len(expected) + 1) // 2))
+    return bool(expected) and hits >= required, hits
+
 
 def _requirement_item_count(value: str) -> int:
     """Count reviewable requirement items without domain-specific vocabulary."""
@@ -172,13 +211,28 @@ def relation_proof(
         "conditional_behavior", "release_line_limit", "storage_coordination",
         "conditional_library_removal", "requirements", "conditional_outcome",
         "blocking_conditions", "premise_check", "premise_cardinality",
-        "public_tool_usage",
+        "public_tool_usage", "governed_scope", "governance_facet",
     }:
         return None
     normalized = _norm(text)
     source_text = _norm(" ".join(str((source or {}).get(key) or "") for key in (
         "path", "source", "title", "heading_path", "project_doc_path",
     )))
+
+    if relation in {"governed_scope", "governance_facet"}:
+        best_hits = 0
+        valid = False
+        for clause in _proposition_clauses(text):
+            subject, hits = _governance_subject_match(obligation.subject, clause)
+            predicate = bool(_GOVERNANCE_PREDICATE_RE.search(clause))
+            if subject and predicate:
+                valid = True
+                best_hits = max(best_hits, hits)
+        return PlannedProof(
+            valid, 4 if valid else 0, best_hits if valid else 0,
+            relation if valid else f"{relation}_missing",
+            3 if valid else 0,
+        )
 
     if relation == "public_tool_usage":
         subject = _has(obligation.subject, text)

@@ -28,6 +28,19 @@ _GENERATED_EXACT_REPHRASE_RE = re.compile(
     r"what\s+does\s+it\s+say\s+about\s+",
     re.I,
 )
+_IMPERATIVE_PREFIX_RE = re.compile(
+    r"^(?:implement|create|build|write|develop|introduce|replace|add|change|edit|"
+    r"modify|fix|refactor|remove|rename|update|patch|migrate|code|"
+    r"реализ\w*|созда\w*|сдела\w*|напиш\w*|разработ\w*|добав\w*|измен\w*|"
+    r"исправ\w*|рефактор\w*|замен\w*|удал\w*|переимен\w*|обнов\w*)\b\s*",
+    re.I,
+)
+_LEADING_CODE_PATH_RE = re.compile(
+    r"^(?:\.?\.?/)?(?:[A-Za-z0-9_.-]+/)+[A-Za-z0-9_.-]+\."
+    r"(?:py|dart|js|jsx|ts|tsx|go|rs|java|kt|swift|c|cc|cpp|h|hpp)"
+    r"(?:\s+(?:so|to|for|чтобы|для)\s+|\s+)",
+    re.I,
+)
 
 # These are operational states with a concrete recovery that is more precise
 # than changing the wording of the question.
@@ -123,6 +136,13 @@ def _already_rephrased(question: str) -> bool:
     )
 
 
+def _rephrase_subject_fragment(value: object) -> str:
+    fragment = _clean_fragment(value, max_chars=220)
+    fragment = _IMPERATIVE_PREFIX_RE.sub("", fragment, count=1)
+    fragment = _LEADING_CODE_PATH_RE.sub("", fragment, count=1)
+    return _clean_fragment(fragment, max_chars=140)
+
+
 def _suggested_questions(
     question: str,
     requirements: Any,
@@ -145,20 +165,26 @@ def _suggested_questions(
         ]
 
     result: list[str] = []
-    for fragment in candidates:
-        fragment = _clean_fragment(fragment, max_chars=140)
-        if not fragment:
-            continue
-        if evidence_path:
-            suggestion = f"According to {evidence_path}, what does it say about {fragment}?"
-        else:
-            suggestion = f"{_GENERIC_REPHRASE_PREFIX}{fragment}?"
-        if suggestion.casefold() == question.strip().casefold():
-            continue
-        result.append(suggestion[:320])
-        if len(result) >= MAX_SUGGESTED_QUESTIONS:
+    attempted_problem_fallback = False
+    while True:
+        for fragment in candidates:
+            fragment = _rephrase_subject_fragment(fragment)
+            if not fragment:
+                continue
+            if evidence_path:
+                suggestion = f"According to {evidence_path}, what does it say about {fragment}?"
+            else:
+                suggestion = f"{_GENERIC_REPHRASE_PREFIX}{fragment}?"
+            if suggestion.casefold() == question.strip().casefold():
+                continue
+            result.append(suggestion[:320])
+            if len(result) >= MAX_SUGGESTED_QUESTIONS:
+                break
+        if result or attempted_problem_fallback:
             break
-    return result
+        candidates = _problem_spans(question, requirements)
+        attempted_problem_fallback = True
+    return list(dict.fromkeys(result))[:MAX_SUGGESTED_QUESTIONS]
 
 
 def build_recovery_diagnosis(

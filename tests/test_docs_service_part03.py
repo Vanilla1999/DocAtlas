@@ -653,6 +653,36 @@ def test_context_cli_outputs_json_and_explain(tmp_path):
     assert service_cls.return_value.get_project_context.call_args.kwargs["mode"] == "project-only"
 
 
+def test_context_cli_json_serializes_nested_frozen_sets(tmp_path):
+    project = tmp_path / "project"
+    project.mkdir()
+    fake_result = ProjectContextResult(
+        project_path=str(project),
+        question="How?",
+        trust_contract={
+            "sources": {"selected": [], "rejected": [], "risky": []},
+            "warnings": [],
+            "next_actions": [],
+            "covered_requirement_ids": frozenset({"requirement:b", "requirement:a"}),
+        },
+    )
+
+    with patch("docmancer.cli.commands._load_config", return_value=DocmancerConfig()), \
+         patch("docmancer.docs.service.LibraryDocsService") as service_cls:
+        service_cls.return_value.get_project_context.return_value = fake_result
+        result = CliRunner().invoke(
+            cli,
+            ["context", str(project), "How?", "--format", "json", "--mode", "project-only"],
+        )
+
+    assert result.exit_code == 0, result.output
+    payload = json.loads(result.output)
+    assert payload["trust_contract"]["covered_requirement_ids"] == [
+        "requirement:a",
+        "requirement:b",
+    ]
+
+
 def test_context_cli_explain_outputs_human_readable_trust_contract(tmp_path):
     project = tmp_path / "project"
     project.mkdir()

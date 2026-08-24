@@ -3,10 +3,65 @@ from __future__ import annotations
 
 import re
 
-from docmancer.docs.domain.question_plan_core import PlannedFacet, QuestionPlan, _clean, _technical
+from docmancer.docs.domain.question_plan_core import (
+    PlannedFacet,
+    QuestionPlan,
+    _clean,
+    _technical,
+    _unsafe_free_text,
+)
 
 
 _PUBLIC_TOOLS = ("get_docs_context", "prepare_docs", "docs_status")
+
+
+def governance_facets(q: str) -> QuestionPlan | None:
+    match = re.fullmatch(
+        r"\s*(?:"
+        r"what\s+(?:project\s+)?(?:rules|policies)\s+govern\s+(.+?)\s*,\s*including\s+(.+?)|"
+        r"какие\s+(?:проектные\s+)?(?:правила|политики)\s+определяют\s+(.+?)\s*,\s*включая\s+(.+?)"
+        r")\s*[?!.]*\s*",
+        q,
+        re.I,
+    )
+    if match is None:
+        return None
+    scope = _clean(match.group(1) or match.group(3))
+    raw_facets = match.group(2) or match.group(4) or ""
+    facets = [
+        _clean(re.sub(r"^(?:and|и)\s+", "", value, flags=re.I))
+        for value in re.split(r"\s*,\s*|\s+(?:and|и)\s+", raw_facets, flags=re.I)
+        if _clean(re.sub(r"^(?:and|и)\s+", "", value, flags=re.I))
+    ]
+    if (
+        not scope
+        or _unsafe_free_text(scope)
+        or not 2 <= len(facets) <= 6
+        or any(len(value) < 3 or _unsafe_free_text(value) for value in facets)
+    ):
+        return QuestionPlan(
+            clauses=(q,),
+            unresolved_parts=("unresolved_governance_facets",),
+            parse_trace=("fail_closed:governance_facets",),
+        )
+    planned = [
+        PlannedFacet(
+            "relation", scope, relation="governed_scope",
+            response_mode="value", span_text=scope,
+        )
+    ]
+    planned.extend(
+        PlannedFacet(
+            "relation", value, relation="governance_facet",
+            context=scope, response_mode="value", span_text=value,
+        )
+        for value in facets
+    )
+    return QuestionPlan(
+        facets=tuple(planned),
+        clauses=(q,),
+        parse_trace=("frame:governance_facets",),
+    )
 
 
 def public_tool_usage(q: str) -> QuestionPlan | None:

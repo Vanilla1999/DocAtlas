@@ -353,8 +353,6 @@ def evaluate_mutation_readiness(contract: MutationIntentContract) -> MutationRea
     requested_values = {item.value.casefold() for item in contract.requested_targets}
     resolved_values = {item.requested_value.casefold() for item in contract.resolved_targets if item.exists}
     missing: list[str] = []
-    constraints_only = contract.operation != "none" and not contract.resolved_targets
-
     if contract.operation in {"modify", "delete"}:
         if not requested_values:
             missing.append("mutation_target_not_requested")
@@ -408,7 +406,9 @@ def evaluate_mutation_readiness(contract: MutationIntentContract) -> MutationRea
 
     return MutationReadiness(
         ready=not missing,
-        constraints_only=constraints_only and bool(contract.acceptance_conditions),
+        # Evidence-backed constraint availability is computed by ActionPacket
+        # assembly; mutation intent alone cannot prove documentation facts.
+        constraints_only=False,
         missing=tuple(sorted(set(missing))),
         resolved_target_ids=tuple(sorted({item.evidence_id for item in contract.resolved_targets})),
         contract_hash=contract.contract_hash,

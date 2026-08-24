@@ -153,3 +153,36 @@ def test_authoritative_hard_stop_cannot_be_bypassed_by_source_handoff() -> None:
     assert projection["disposition"] == "resolve_authoritative_conflict"
     assert projection["edit_ready"] is False
     assert projection["source_search_status"] == "blocked"
+
+
+def test_rephrase_drops_imperative_and_code_path_from_subject() -> None:
+    from docmancer.docs.application.recovery import _suggested_questions
+
+    question = (
+        "Fix lib/modules/permission/application/permission_service.dart so browser "
+        "and scan flows share permission preflight policy."
+    )
+
+    class Requirements(list):
+        retrieval_hints = ("Fix",)
+        query_requirement_spans = (("fix", 0, 3, "Fix"),)
+
+    requirements = Requirements([
+        SimpleNamespace(
+            mandatory=True,
+            kind="relation",
+            query_span_start=0,
+            query_span_end=3,
+            query_span_text="Fix",
+        )
+    ])
+
+    suggestions = _suggested_questions(
+        question,
+        requirements,
+        evidence_path=None,
+    )
+
+    assert suggestions
+    assert "about Fix" not in suggestions[0]
+    assert "browser and scan flows" in suggestions[0]

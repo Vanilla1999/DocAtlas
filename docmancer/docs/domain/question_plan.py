@@ -47,6 +47,7 @@ from docmancer.docs.domain.question_plan_command_rules import (
     _two_cell_cardinality,
 )
 from docmancer.docs.domain.question_plan_surface_rules import (
+    governance_facets,
     mcp_request_handling,
     provider_request_timeout,
     public_tool_usage,
@@ -535,6 +536,7 @@ def _semantic_premise(q: str) -> QuestionPlan | None:
 
 
 _SPECIFIC_RULES: tuple[Rule, ...] = (
+    governance_facets,
     _semantic_premise,
     _semantic_comparison,
     _semantic_location,

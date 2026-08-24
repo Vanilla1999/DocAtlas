@@ -527,3 +527,38 @@ def test_required_evidence_and_targets_survive_packet_budget():
     assert packet["forbidden_changes"]
     assert packet["validation"]["tests"]
     assert packet["validation"]["semantic_checks"]
+
+
+def test_constraints_only_requires_canonical_source_backed_constraints():
+    canonical = {
+        "path": "docs/permission-policy.md",
+        "heading_path": "Policy",
+        "authority": "canonical",
+        "source_class": "project_doc",
+        "content": "Must preserve shared permission policy.",
+    }
+    supporting = {
+        **canonical,
+        "path": "docs/permission-notes.md",
+        "authority": "supporting",
+    }
+
+    canonical_packet = build_action_packet(
+        question="Fix shared permission policy",
+        context_pack=[canonical],
+        project_path="/repo",
+        required_evidence_paths=("docs/permission-policy.md",),
+    )
+    supporting_packet = build_action_packet(
+        question="Fix shared permission policy",
+        context_pack=[supporting],
+        project_path="/repo",
+        required_evidence_paths=("docs/permission-notes.md",),
+    )
+
+    assert canonical_packet["mutation_intent"]["constraints_only"] is True
+    assert any(
+        "Documentation constraints do not authorize" in row
+        for row in canonical_packet["missing_evidence"]
+    )
+    assert supporting_packet["mutation_intent"]["constraints_only"] is False

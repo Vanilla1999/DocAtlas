@@ -44,6 +44,58 @@ def _unit(text: str) -> AnswerUnit:
     )
 
 
+def test_governance_question_models_scope_and_every_including_facet() -> None:
+    question = (
+        "What project rules govern the shared browser and scan Android permission "
+        "preflight on Android 13+, including policy ownership, notification "
+        "permission, deferred background location, and the pinned "
+        "permission_handler version?"
+    )
+
+    plan = compile_question_plan(question)
+    contract = build_project_answer_contract(question)
+
+    assert not plan.unresolved_parts
+    assert plan.parse_trace == ("frame:governance_facets",)
+    assert [row.subject for row in contract.proof_obligations] == [
+        "shared browser and scan Android permission preflight on Android 13+",
+        "policy ownership",
+        "notification permission",
+        "deferred background location",
+        "pinned permission_handler version",
+    ]
+    assert not contract.unresolved_parts
+    assert all(row.query_span_text for row in contract.proof_obligations)
+
+
+def test_governance_question_supports_bounded_russian_surface() -> None:
+    question = (
+        "Какие проектные правила определяют общий preflight разрешений, включая "
+        "владение политикой, разрешение уведомлений и отложенную геолокацию?"
+    )
+
+    plan = compile_question_plan(question)
+
+    assert not plan.unresolved_parts
+    assert [row.subject for row in plan.facets] == [
+        "общий preflight разрешений",
+        "владение политикой",
+        "разрешение уведомлений",
+        "отложенную геолокацию",
+    ]
+
+
+def test_governance_question_rejects_nested_request_tail() -> None:
+    question = (
+        "What project rules govern permission preflight, including ownership, "
+        "notification permission, and what is the Bitcoin price?"
+    )
+
+    plan = compile_question_plan(question)
+
+    assert plan.unresolved_parts
+
+
 @pytest.mark.parametrize(
     "prefix",
     (
@@ -245,4 +297,3 @@ def test_legacy_fallback_questions_remain_unclaimed_by_question_plan(question: s
     plan = compile_question_plan(question)
     assert not plan.handled, (question, plan)
     assert not frozen_ownership_mismatches()
-

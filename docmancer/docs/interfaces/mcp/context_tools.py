@@ -451,9 +451,7 @@ def handle_context_tool(name: str, args: dict[str, Any], service: LibraryDocsSer
 
         packet_budget = min(PATCH_CONTEXT_HARD_TOKENS, output_budget)
         selection_trace = {}
-        retrieval_issues = bounded_retrieval_issues(
-            raw, project_evidence_required=bool(_clean_string(args.get("project_path")))
-        )
+        retrieval_issues = bounded_patch_retrieval_issues(raw)
         packet = build_action_packet(
             question=question,
             context_pack=raw.get("context_pack") or [],
@@ -477,6 +475,7 @@ def handle_context_tool(name: str, args: dict[str, Any], service: LibraryDocsSer
         mutation = packet.get("mutation_intent") if isinstance(packet.get("mutation_intent"), dict) else {}
         if source_search_edit_authorized and mutation.get("ready") is not True:
             requested = mutation.get("requested_targets") if isinstance(mutation.get("requested_targets"), list) else []
+            navigation_paths, navigation_symbols = _patch_navigation_hints(packet, raw)
             query_terms = [
                 str(item.get("value") or "")[:160]
                 for item in requested[:8]
@@ -495,12 +494,12 @@ def handle_context_tool(name: str, args: dict[str, Any], service: LibraryDocsSer
                     str(item.get("value") or "")[:300]
                     for item in requested[:8]
                     if isinstance(item, dict) and item.get("kind") == "path"
-                ],
+                ] or navigation_paths,
                 "suggested_symbols": [
                     str(item.get("value") or "")[:160]
                     for item in requested[:8]
                     if isinstance(item, dict) and item.get("kind") == "symbol"
-                ],
+                ] or navigation_symbols,
                 "requires_confirmation": False,
                 "repeat_docs_context": False,
                 "auto_execute": False,
@@ -699,6 +698,59 @@ def bounded_retrieval_issues(
     if failed:
         issues.append(f"Required documentation lanes are incomplete: {', '.join(failed[:5])}.")
     return issues
+
+
+def bounded_patch_retrieval_issues(payload: dict[str, Any]) -> list[str]:
+    """Return operational retrieval failures relevant to an ActionPacket.
+
+    Docs-answer availability and semantic completeness belong to the answer
+    projection. Patch contexts independently prove requirements, authority, and
+    mutation readiness while building the ActionPacket.
+    """
+
+    issues: list[str] = []
+    status = str(payload.get("status") or "").strip().lower()
+    if status and status not in {"success"}:
+        issues.append(f"Documentation retrieval is incomplete (status={status}).")
+    if payload.get("requires_confirmation"):
+        issues.append("Documentation retrieval requires explicit user confirmation before editing.")
+    lanes = payload.get("lanes") if isinstance(payload.get("lanes"), dict) else {}
+    accepted = {"not_requested", "success"}
+    failed = sorted(
+        str(name) for name, lane in lanes.items()
+        if isinstance(lane, dict) and str(lane.get("status") or "") not in accepted
+    )
+    if failed:
+        issues.append(f"Required documentation lanes are incomplete: {', '.join(failed[:5])}.")
+    return issues
+
+
+def _patch_navigation_hints(
+    packet: dict[str, Any], payload: dict[str, Any],
+) -> tuple[list[str], list[str]]:
+    paths: list[str] = []
+    source_rows = packet.get("source_of_truth")
+    candidates = source_rows if isinstance(source_rows, list) and source_rows else payload.get("context_pack")
+    for row in candidates if isinstance(candidates, list) else []:
+        if not isinstance(row, dict):
+            continue
+        path = str(row.get("path") or row.get("source") or "").strip()[:300]
+        if path.casefold().endswith((".md", ".mdx", ".rst", ".txt", ".adoc")) and path not in paths:
+            paths.append(path)
+        if len(paths) == 5:
+            break
+
+    symbols: list[str] = []
+    target_surface = packet.get("target_surface") if isinstance(packet.get("target_surface"), dict) else {}
+    for row in target_surface.get("symbols") if isinstance(target_surface.get("symbols"), list) else []:
+        if not isinstance(row, dict):
+            continue
+        symbol = str(row.get("name") or "").strip()[:160]
+        if symbol and symbol not in symbols:
+            symbols.append(symbol)
+        if len(symbols) == 5:
+            break
+    return paths, symbols
 
 
 def _record_model_visible_bytes(result: Any, raw: dict[str, Any], projection: dict[str, Any]) -> None:
