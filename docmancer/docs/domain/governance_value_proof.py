@@ -9,7 +9,7 @@ relations retain their existing implementation unchanged.
 from __future__ import annotations
 
 import re
-from typing import Mapping
+from typing import Mapping, Pattern
 
 from docmancer.docs.domain.project_answer_contract import ProofObligation
 from docmancer.docs.domain.question_plan_proof import (
@@ -141,6 +141,30 @@ def _clauses(text: str) -> tuple[str, ...]:
     return tuple(rows)
 
 
+def _relation_value_is_bound(
+    obligation: ProofObligation,
+    clause: str,
+    pattern: Pattern[str],
+    *,
+    relation_tokens: frozenset[str],
+    radius: int = 48,
+) -> bool:
+    """Require the relation predicate to be locally bound to its requested target."""
+
+    target_tokens = _tokens(obligation.subject) - relation_tokens
+    if not target_tokens:
+        return False
+    required = min(3, len(target_tokens))
+    for match in pattern.finditer(clause):
+        window = clause[
+            max(0, match.start() - radius):
+            min(len(clause), match.end() + radius)
+        ]
+        if len(target_tokens & _tokens(window)) >= required:
+            return True
+    return False
+
+
 def _version_value_is_bound(obligation: ProofObligation, clause: str) -> bool:
     """Require the version value to bind to the requested dependency identity.
 
@@ -192,15 +216,24 @@ def _scope_proof(obligation: ProofObligation, clause: str) -> tuple[bool, int]:
     subject, hits = _subject_match(obligation.subject, clause)
     if not subject or _NAVIGATION_META_RE.search(clause):
         return False, hits
-    return bool(_SCOPE_RELATION_RE.search(clause)), hits
+    return _relation_value_is_bound(
+        obligation,
+        clause,
+        _SCOPE_RELATION_RE,
+        relation_tokens=frozenset({"same", "share", "use", "govern", "apply", "policy"}),
+    ), hits
 
 
 def _ownership_proof(obligation: ProofObligation, clause: str) -> tuple[bool, int]:
     subject, hits = _subject_match(obligation.subject, clause)
-    if not subject:
+    if not subject or _NAVIGATION_META_RE.search(clause):
         return False, hits
-    # "ownership is documented in X" is topical metadata, not an owner value.
-    return bool(_OWNER_RE.search(clause) and not _NAVIGATION_META_RE.search(clause)), hits
+    return _relation_value_is_bound(
+        obligation,
+        clause,
+        _OWNER_RE,
+        relation_tokens=frozenset({"own"}),
+    ), hits
 
 
 def _version_proof(obligation: ProofObligation, clause: str) -> tuple[bool, int]:
@@ -212,9 +245,14 @@ def _version_proof(obligation: ProofObligation, clause: str) -> tuple[bool, int]
 
 def _state_proof(obligation: ProofObligation, clause: str) -> tuple[bool, int]:
     subject, hits = _subject_match(obligation.subject, clause)
-    if not subject:
+    if not subject or _NAVIGATION_META_RE.search(clause):
         return False, hits
-    return bool(_DEFERRED_STATE_RE.search(clause) and not _NAVIGATION_META_RE.search(clause)), hits
+    return _relation_value_is_bound(
+        obligation,
+        clause,
+        _DEFERRED_STATE_RE,
+        relation_tokens=frozenset({"defer", "remain", "stay", "request", "include", "preflight"}),
+    ), hits
 
 
 def _requirement_proof(obligation: ProofObligation, clause: str) -> tuple[bool, int]:
@@ -231,7 +269,15 @@ def _generic_governance_proof(obligation: ProofObligation, clause: str) -> tuple
     subject, hits = _subject_match(obligation.subject, clause)
     if not subject or _NAVIGATION_META_RE.search(clause):
         return False, hits
-    return bool(_GENERIC_VALUE_RE.search(clause)), hits
+    return _relation_value_is_bound(
+        obligation,
+        clause,
+        _GENERIC_VALUE_RE,
+        relation_tokens=frozenset({
+            "own", "require", "must", "remain", "defer", "use", "apply",
+            "govern", "control", "set", "pin",
+        }),
+    ), hits
 
 
 def relation_proof(
