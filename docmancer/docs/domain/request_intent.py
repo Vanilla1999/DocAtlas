@@ -18,6 +18,15 @@ _ACTION_HEAD = re.compile(
     re.IGNORECASE,
 )
 _FENCE_LINE = re.compile(r"(?m)^[ \t]*(?P<fence>```|~~~)[^\n]*(?:\n|$)")
+_RUSSIAN_INFINITIVE_ACTION = re.compile(r"[А-Яа-яЁё]+(?:ть|ться)$", re.IGNORECASE)
+_RUSSIAN_NARRATIVE_PREDICATE = re.compile(
+    r"^[^,;:]{1,120}\b(?:"
+    r"открывает|показывает|отправляет|возвращает|переводит|перемещает|"
+    r"запускает|вызывает|использует|ведет|ведёт|создает|создаёт|"
+    r"обновляет|удаляет|сохраняет|закрывает|переоткрывает|проверяет"
+    r")\b",
+    re.IGNORECASE,
+)
 
 
 @dataclass(frozen=True, slots=True)
@@ -107,13 +116,36 @@ def _top_level_clause_spans(masked: str) -> tuple[tuple[int, int], ...]:
     return tuple(spans)
 
 
+def _looks_like_narrative_action_label(
+    source: str,
+    *,
+    verb_start: int,
+    verb_end: int,
+    clause_end: int,
+) -> bool:
+    """Reject Russian use-case labels that look imperative only at the first word.
+
+    Product stories commonly use an infinitive as a UI/action label, e.g.
+    ``Создать новый запрос открывает экран ...``.  The later third-person
+    predicate makes the clause descriptive rather than an instruction to edit
+    the repository.  Restricting this check to Russian infinitives avoids
+    weakening real imperative forms such as ``Создай`` / ``Исправь``.
+    """
+
+    verb = source[verb_start:verb_end]
+    if _RUSSIAN_INFINITIVE_ACTION.fullmatch(verb) is None:
+        return False
+    tail = source[verb_end:clause_end].strip()
+    return bool(_RUSSIAN_NARRATIVE_PREDICATE.search(tail))
+
+
 def find_change_clause(question: str) -> ChangeIntentClause | None:
     """Find a real top-level change imperative, including after a short preamble.
 
     The scanner is deliberately clause-aware instead of searching arbitrary
     substrings: a request may describe a defect in sentence one and say
-    ``Fix ...`` in sentence two, while quoted/code examples must never create
-    mutation authority.
+    ``Fix ...`` in sentence two, while quoted/code examples and narrative
+    use-case labels must never create mutation authority.
     """
 
     source = str(question or "")[:MAX_INTENT_SCAN_CHARS]
@@ -125,6 +157,13 @@ def find_change_clause(question: str) -> ChangeIntentClause | None:
         if match is None:
             continue
         verb_start, verb_end = match.span("verb")
+        if _looks_like_narrative_action_label(
+            source,
+            verb_start=verb_start,
+            verb_end=verb_end,
+            clause_end=end,
+        ):
+            continue
         return ChangeIntentClause(
             start=match.start(),
             end=end,
