@@ -23,6 +23,10 @@ _TRUSTED_PROJECT_RULE_AUTHORITIES = frozenset({
 _GENERIC_PATH_TOKENS = frozenset({
     "application", "architecture", "contract", "docs", "flow", "gate", "lib", "module", "modules",
 })
+_DESTRUCTIVE_UNRESOLVED_RE = re.compile(
+    r"\b(?:delete|drop|erase|purge|remove|truncate|удал(?:и|ить|яй))\b",
+    re.IGNORECASE,
+)
 
 
 def _path_token_sequence(value: str) -> tuple[str, ...]:
@@ -162,12 +166,18 @@ def _explicit_mutation_contract(
         and not plan.preserve_targets
         and plan.destination is None
         and plan.parent_context is None
-        and not any(item.startswith("input_limit:") for item in plan.unresolved_parts)
+        and all(
+            item == "mutation_target_not_requested"
+            or (
+                item.startswith("unresolved_patch_clause:")
+                and not _DESTRUCTIVE_UNRESOLVED_RE.search(item)
+            )
+            for item in plan.unresolved_parts
+        )
     ):
         # The evaluator-owned task contract supplies the complete mutation
-        # surface. Do not let parser uncertainty about a narrative issue body
-        # override those explicit targets; preserve/input-limit constraints
-        # remain fail-closed above.
+        # surface. Only a fully parsed narrative may inherit those targets;
+        # unresolved clauses remain fail-closed.
         bound = replace(bound, request_plan=None)
     return bound
 

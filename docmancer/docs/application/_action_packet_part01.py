@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 from ._action_packet_shared import *  # noqa: F401,F403
+from docmancer.docs.project_docs_catalog import read_project_docs_catalog
 
 def estimate_action_packet_tokens(value: Any) -> int:
     """Estimate tokens deterministically as ceil(serialized UTF-8 bytes / 4)."""
@@ -53,7 +54,10 @@ def _ensure_selection_survives_packet(
             and (assignment.unit_id is None or witness.unit_id == assignment.unit_id)
         ), None)
         if assigned_unit is not None:
-            assigned_survived = assigned_survived and assigned_unit.unit_text.casefold() in visible_text
+            assigned_survived = assigned_survived and (
+                _normalized_fact_text(assigned_unit.unit_text)
+                in _normalized_fact_text(visible_text)
+            )
         if requirement.proof_role == "target_identity":
             mutation = packet.get("mutation_intent") or {}
             resolved_bindings = {
@@ -149,6 +153,34 @@ def _effective_authority(
         return "supporting"
     if item.get("repository_authority") == "explicit_agent_policy":
         return "canonical" if _scope_applies(item, project_path=project_path, target_paths=target_paths) else "supporting"
+    if str(item.get("source_class") or "").casefold() == "project_doc" and project_path:
+        root = Path(project_path).expanduser()
+        if root.is_dir():
+            catalog = read_project_docs_catalog(root)
+            if not catalog.present:
+                # Legacy benchmark contracts use the explicit project_rule
+                # classification. A bare source_of_truth claim is not enough
+                # without a catalog declaration.
+                return "canonical" if "project_rule" in declared else "supporting"
+            source = _normalized_source_key(_source_path(item))
+            catalog_authority = next((
+                entry.authority
+                for entry in catalog.entries
+                if _normalized_source_key(entry.path) == source
+                and entry.status == "active"
+            ), None)
+            if catalog_authority is None:
+                catalog_authority = next((
+                    catalog_root.authority
+                    for catalog_root in catalog.roots
+                    if catalog_root.status == "active"
+                    and (
+                        source == _normalized_source_key(catalog_root.path)
+                        or source.startswith(_normalized_source_key(catalog_root.path) + "/")
+                    )
+                ), None)
+            if not catalog.valid or catalog_authority != "source_of_truth":
+                return "supporting"
     if str(item.get("doc_scope") or "") == "module" or item.get("module_path"):
         return "canonical" if _scope_applies(item, project_path=project_path, target_paths=target_paths) else "supporting"
     return "canonical"
@@ -531,20 +563,10 @@ def _add_mandatory_requirement_witnesses(
             )
         ]
         canonical_requirement_id = f"canonical_policy:{candidate.stable_id}"
-        if canonical_requirement_id in candidate.covered_requirement_ids and not custom_witnesses:
-            for _, fact in _extract_facts(_content_text(evidence))[0]:
-                if not fact or _content_instruction_risk_flags(fact):
-                    continue
-                if fact.casefold() in visible_text:
-                    continue
-                packet["implementation_guidance"].append({
-                    "text": fact,
-                    "evidence_ids": [evidence_id],
-                })
-                mandatory_rows.add((fact, evidence_id))
-                break
         for witness in custom_witnesses:
             if not witness.unit_text or _content_instruction_risk_flags(witness.unit_text):
+                continue
+            if _normalized_fact_text(witness.unit_text) in _normalized_fact_text(visible_text):
                 continue
             requirement = requirements[witness.requirement_id]
             field = (
@@ -578,6 +600,22 @@ def _add_mandatory_requirement_witnesses(
             })
             mandatory_rows.add((witness.unit_text, evidence_id))
             visible_text += "\n" + witness.unit_text.casefold()
+        if canonical_requirement_id in candidate.covered_requirement_ids:
+            missing_facts = [
+                fact
+                for _, fact in _extract_facts(_content_text(evidence))[0]
+                if fact
+                and not _content_instruction_risk_flags(fact)
+                and _normalized_fact_text(fact) not in _normalized_fact_text(visible_text)
+            ]
+            if missing_facts:
+                text = "\n".join(missing_facts)
+                packet["implementation_guidance"].append({
+                    "text": text,
+                    "evidence_ids": [evidence_id],
+                })
+                mandatory_rows.add((text, evidence_id))
+                visible_text += "\n" + text.casefold()
         remaining = [
             requirements[requirement_id]
             for requirement_id in sorted(candidate.covered_requirement_ids)
@@ -642,6 +680,10 @@ def _packet_visible_text(packet: dict[str, Any]) -> str:
             str(row.get("text") or "") for row in rows or [] if isinstance(row, dict)
         )
     return "\n".join(values).casefold()
+
+
+def _normalized_fact_text(value: str) -> str:
+    return " ".join(value.replace("`", "").lstrip("-* ").casefold().split())
 
 
 def _requirement_witness(content: str, values: list[str]) -> str:
@@ -811,13 +853,17 @@ def _policy_witness_survived(
         for _, fact in _extract_facts(_content_text(dict(candidate.original)))[0]
         if fact and not _content_instruction_risk_flags(fact)
     }
-    return any(
-        isinstance(row, dict)
-        and str(row.get("text") or "") in safe_facts
+    witnessed = [
+        _normalized_fact_text(str(row.get("text") or ""))
+        for row in rows
+        if isinstance(row, dict)
         and evidence_id in {
             str(ref) for ref in row.get("evidence_ids") or [] if ref
         }
-        for row in rows
+    ]
+    return bool(safe_facts) and all(
+        any(_normalized_fact_text(fact) in text for text in witnessed)
+        for fact in safe_facts
     )
 
 

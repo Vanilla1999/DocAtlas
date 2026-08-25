@@ -360,19 +360,17 @@ def _projection_metrics(
         for row in _dict_rows(projection.get("sources"))
     }
     targets = projection.get("targets") if isinstance(projection.get("targets"), dict) else {}
-    target_paths = {
-        str(row.get("path") or "") for row in _dict_rows(targets.get("likely_files"))
-    }
     covered_sources = [
         req for req in requirements
-        if any(path in source_paths or path in target_paths for path in req.expected_files)
+        if any(path in source_paths for path in req.expected_files)
     ]
 
-    valid_source_ids = {
-        str(row.get("evidence_id") or "")
+    source_path_by_id = {
+        str(row.get("evidence_id") or ""): str(row.get("path_or_url") or row.get("path") or "")
         for row in _dict_rows(projection.get("sources"))
         if str(row.get("evidence_id") or "")
     }
+    valid_source_ids = set(source_path_by_id)
     behavioral_covered: list[ContractRequirement] = []
     all_refs: list[str] = []
     valid_refs: list[str] = []
@@ -384,7 +382,13 @@ def _projection_metrics(
         for row in behavioral_rows:
             row_text = json.dumps(row, sort_keys=True, ensure_ascii=False)
             refs = [str(value) for value in row.get("evidence_ids") or [] if str(value)]
-            if _requirement_in_text(req, row_text) and refs and all(ref in valid_source_ids for ref in refs):
+            expected_sources = set(req.expected_files) & source_paths
+            cited_sources = {source_path_by_id[ref] for ref in refs if ref in source_path_by_id}
+            if (
+                _requirement_in_text(req, row_text)
+                and expected_sources
+                and cited_sources & expected_sources
+            ):
                 behavioral_covered.append(req)
                 break
 

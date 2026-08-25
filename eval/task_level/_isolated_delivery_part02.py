@@ -468,6 +468,8 @@ def _deliver_with_worker(
             evidence_items=evidence.evidence_items,
             max_tokens=HARD_ACTION_PACKET_TOKENS,
         )
+        if projection.get("status") == "insufficient_evidence":
+            raise IsolatedDeliveryError("isolated_model_visible_projection_insufficient")
         projection_errors = validate_model_visible_projection(
             projection,
             snapshot=projection_snapshot,

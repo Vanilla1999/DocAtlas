@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import re
+import shlex
 from pathlib import Path
 from typing import Any
 
@@ -75,27 +76,25 @@ def _repair_count(
     events: list[dict[str, Any]],
     tests: list[tuple[int, str, str, bool | None]],
 ) -> int:
-    failed_test_indexes = {
-        index for index, _, _, outcome in tests if outcome is False
-    }
     repairs = 0
-    failed_pending = False
-    repair_started = False
+    pending: set[str] = set()
+    repair_started: set[str] = set()
+    tests_by_index = {row[0]: row for row in tests}
     for index, event in enumerate(events):
-        if index in failed_test_indexes:
-            failed_pending = True
-            repair_started = False
+        if _is_edit_event(event):
+            newly_repaired = pending - repair_started
+            repairs += len(newly_repaired)
+            repair_started.update(newly_repaired)
+        test = tests_by_index.get(index)
+        if test is None or test[3] is None:
             continue
-        if _is_edit_event(event) and failed_pending and not repair_started:
-            repairs += 1
-            repair_started = True
-        test = next((row for row in tests if row[0] == index), None)
-        if test is not None and test[3] is True:
-            failed_pending = False
-            repair_started = False
-        elif test is not None and test[3] is False:
-            failed_pending = True
-            repair_started = False
+        identity = _test_identity(test[1], test[2])
+        if test[3] is True:
+            pending.discard(identity)
+            repair_started.discard(identity)
+        else:
+            pending.add(identity)
+            repair_started.discard(identity)
     return repairs
 
 
@@ -115,14 +114,28 @@ def _first_edit_correctness(
     ]
     if not validations:
         return None, "not_observed:no_validation_before_next_edit"
-    return validations[0], "observed"
+    return all(validations), "observed"
+
+
+def _test_identity(command: str, runner: str) -> str:
+    """Identify the exercised test surface while ignoring presentation flags."""
+
+    try:
+        tokens = shlex.split(_unwrap_shell_command(command))
+    except ValueError:
+        return _command_fingerprint(command)
+    selectors = sorted(
+        token for token in tokens[1:]
+        if not token.startswith("-") and token not in {"true", "false"}
+    )
+    return json.dumps([runner, selectors], separators=(",", ":"))
 
 
 def _regression_count(tests: list[tuple[int, str, str, bool | None]]) -> int:
     previous_outcomes: dict[str, bool] = {}
     regressions = 0
     for _, command, runner, outcome in tests:
-        identity = _command_fingerprint(command) if command else runner
+        identity = _test_identity(command, runner) if command else runner
         if outcome is None:
             continue
         if outcome is False and previous_outcomes.get(identity) is True:

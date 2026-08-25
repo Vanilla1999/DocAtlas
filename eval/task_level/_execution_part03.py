@@ -421,8 +421,8 @@ def build_bounded_direct_packet(
         question=task.issue_text,
         context_pack=packet_evidence,
         trust_contract=evidence.trust_contract,
-        # Reserve space for the flattened model-visible projection envelope.
-        max_tokens=1_980,
+        # Leave headroom, then enforce the authoritative serialized limit below.
+        max_tokens=1_960,
         project_path=str(workspace),
         retrieval_issues=evidence.retrieval_issues,
         required_evidence_paths=(

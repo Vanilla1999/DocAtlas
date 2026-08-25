@@ -98,3 +98,37 @@ def test_process_quality_counts_only_a_pass_to_fail_transition_for_the_same_chec
     )
 
     assert quality["regression_count"] == 1
+
+
+def test_process_quality_keeps_failed_check_pending_until_that_check_passes(tmp_path: Path):
+    trajectory = tmp_path / "trajectory.normalized.json"
+    trajectory.write_text(json.dumps([
+        {"tool_name": "Bash", "arguments": {"command": "pytest tests/a.py -q"}, "exit_code": 1},
+        {"tool_name": "Edit", "arguments": {"changes": [{"path": "a.py"}]}},
+        {"tool_name": "Bash", "arguments": {"command": "pytest tests/b.py"}, "exit_code": 0},
+        {"tool_name": "Edit", "arguments": {"changes": [{"path": "a.py"}]}},
+        {"tool_name": "Bash", "arguments": {"command": "pytest -q tests/a.py"}, "exit_code": 0},
+    ]), encoding="utf-8")
+
+    quality = evaluate_process_quality(
+        {"resolved": False, "forbidden_changes": [], "metrics": {}},
+        trajectory_path=trajectory,
+    )
+
+    assert quality["repair_count"] == 1
+
+
+def test_first_edit_correctness_requires_every_preceding_validation_to_pass(tmp_path: Path):
+    trajectory = tmp_path / "trajectory.normalized.json"
+    trajectory.write_text(json.dumps([
+        {"tool_name": "Edit", "arguments": {"changes": [{"path": "a.py"}]}},
+        {"tool_name": "Bash", "arguments": {"command": "pytest tests/a.py"}, "exit_code": 0},
+        {"tool_name": "Bash", "arguments": {"command": "pytest tests/b.py"}, "exit_code": 1},
+    ]), encoding="utf-8")
+
+    quality = evaluate_process_quality(
+        {"resolved": False, "forbidden_changes": [], "metrics": {}},
+        trajectory_path=trajectory,
+    )
+
+    assert quality["first_edit_correctness"] is False

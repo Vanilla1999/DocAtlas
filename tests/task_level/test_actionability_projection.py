@@ -5,7 +5,11 @@ from pathlib import Path
 
 from docmancer.docs.application.action_packet import build_action_packet
 from docmancer.docs.application.model_visible_projection import project_patch_context
-from eval.task_level.evaluators.actionability import evaluate_actionability
+from eval.task_level.evaluators.actionability import (
+    ContractRequirement,
+    _projection_metrics,
+    evaluate_actionability,
+)
 from eval.task_level.evaluators.contract import ContractEvaluation
 from eval.task_level.schemas import TaskSpec
 from eval.task_level.task33_pilot import TASK33C_PILOT_TASK_ID, TASK33C_REQUIRED_TARGET_PATHS
@@ -149,3 +153,24 @@ def test_unvalidated_projection_is_rejected_instead_of_scored(tmp_path: Path):
         warning.startswith("invalid_model_visible_projection:")
         for warning in result.warnings
     )
+
+
+def test_source_and_behavior_coverage_require_the_expected_cited_source():
+    requirement = ContractRequirement(
+        "task", "rule", "BrowserGate must delegate.", "project_doc", True,
+        expected_files=["docs/browser.md"],
+    )
+    metrics = _projection_metrics({
+        "sources": [{"path": "docs/other.md", "evidence_id": "other"}],
+        "targets": {"likely_files": [{"path": "docs/browser.md"}]},
+        "invariants": [{
+            "text": "BrowserGate must delegate.",
+            "evidence_ids": ["other"],
+        }],
+        "implementation_guidance": [],
+        "acceptance_conditions": [],
+        "checks": {},
+    }, [requirement])
+
+    assert metrics["source_coverage"] == 0.0
+    assert metrics["behavioral_scope_coverage"] == 0.0

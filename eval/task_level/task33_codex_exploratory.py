@@ -400,6 +400,7 @@ def main(argv: list[str] | None = None) -> int:
                 args.model,
                 args.worker_timeout_seconds,
                 sandbox_mode=selector_sandbox,
+                reasoning_effort=args.reasoning_effort,
             )
         )
         preflight["checks"]["codex_oauth_selector"] = selector
@@ -655,6 +656,7 @@ def _probe_codex_selector(
     timeout_seconds: int,
     *,
     sandbox_mode: str = "read-only",
+    reasoning_effort: str | None = None,
 ) -> dict[str, Any]:
     objective = "Preserve permission permission architecture and offline sync boundaries."
     envelope = DelegationEnvelope(
@@ -695,7 +697,11 @@ def _probe_codex_selector(
         raw_retrieval_tokens=30,
         retrieval_wall_time_seconds=0.0,
     )
-    output = CodexExploratoryWorker(model=model, sandbox_mode=sandbox_mode).run(
+    output = CodexExploratoryWorker(
+        model=model,
+        sandbox_mode=sandbox_mode,
+        reasoning_effort=reasoning_effort,
+    ).run(
         envelope, evidence, timeout_seconds=timeout_seconds
     )
     return {

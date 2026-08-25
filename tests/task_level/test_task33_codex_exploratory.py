@@ -333,10 +333,16 @@ def test_host_preflight_does_not_require_or_probe_docker(
         "_probe_retrieval",
         lambda output: {"status": "verified"},
     )
+    selector_options = {}
+
+    def fake_selector(*args, **kwargs):
+        selector_options.update(kwargs)
+        return {"status": "exploratory_verified"}
+
     monkeypatch.setattr(
         task33_codex_exploratory,
         "_probe_codex_selector",
-        lambda *args, **kwargs: {"status": "exploratory_verified"},
+        fake_selector,
     )
     monkeypatch.setattr(
         task33_codex_exploratory.DockerCommandSandbox,
@@ -352,6 +358,7 @@ def test_host_preflight_does_not_require_or_probe_docker(
         (tmp_path / "host-preflight_preflight" / "preflight-summary.json").read_text()
     )
     assert rc == 0
+    assert selector_options["reasoning_effort"] == "medium"
     assert summary["checks"]["execution_backend"]["status"] == "exploratory_unisolated"
     assert "docker" not in summary["checks"]
 

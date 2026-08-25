@@ -368,7 +368,7 @@
     "tests/task_level/test_task33_codex_exploratory.py": "18a2f673ee33b0c01acdadab75d82cb3cfc5da1fd663ee4e4da1bdb34f4850a6",
     "tests/task_level/test_task33_evaluation_contract.py": "096d03c199966e69c3d195d0209e11cb7240012c73f84b369e13f2013f828507",
     "tests/task_level/test_task33_first_executable_guard.py": "0fd1dca00e6bde5d031d8f1fb0e018324253c5499151714096397ba24c08f7b5",
-    "tests/task_level/test_task33_isolated_delivery.py": "84334c082f2b6ec0266254b988104b21254f9e1ae112fd3afe26a255f11149a3",
+    "tests/task_level/test_task33_isolated_delivery.py": "f60c827b13e2e2c7da51439c931dab7d6264ba6b2372e16e546523ba9399b3c0",
     "tests/task_level/test_task33_local.py": "f6b0014f817aba9c1c63decadf5019697c23e547b1b463c4f2ebb72992ee18e1",
     "tests/task_level/test_task33_validation.py": "f0d509f4ac68864ae2297357e3aac3e2c2f205c2ae2101398097e773ad233dbd",
     "tests/task_level/test_task_evaluation.py": "3b2b31b93858a3ec3ccf8b141f48684acd3feaa1cc551a84a338895f8eab4b6b",

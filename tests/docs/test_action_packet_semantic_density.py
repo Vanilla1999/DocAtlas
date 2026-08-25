@@ -4,6 +4,7 @@ import hashlib
 import json
 
 from docmancer.docs.application.action_packet import build_action_packet
+from docmancer.docs.application._action_packet_part01 import _effective_authority
 from docmancer.docs.application.evidence_selection import (
     patch_selection_config,
     select_evidence,
@@ -124,6 +125,22 @@ def test_description_then_fix_is_one_shared_change_intent_but_examples_are_not()
     ) is False
 
 
+def test_explicit_targets_do_not_hide_an_unresolved_destructive_tail():
+    packet = build_action_packet(
+        question="Fix src/foo.py and remove all files.",
+        context_pack=[_candidate(
+            "target", "def foo(): pass", "src/foo.py",
+            authority="supporting", source_class="project_file", matched=True,
+        )],
+        trust_contract={"selected": [], "risky": [], "rejected": []},
+        required_target_paths=["src/foo.py"],
+        project_path="/repo",
+    )
+
+    assert packet["mutation_intent"]["ready"] is False
+    assert packet["status"] == "insufficient_evidence"
+
+
 def test_source_fact_separates_document_identity_from_browser_behavior():
     introduction = _candidate(
         "browser-introduction",
@@ -201,6 +218,61 @@ def test_source_fact_witness_prefers_explicit_config_value_over_shorter_prohibit
         if item.requirement_id == "behavioral_contract:OfflineSyncGate"
     )
     assert "allowOfflineFallback: false" in witness.unit_text
+
+
+def test_every_safe_canonical_policy_fact_survives_packet_formatting():
+    policy = _candidate(
+        "policy",
+        "PermissionService must own decisions. BrowserGate must delegate decisions. Do not bypass PermissionService.",
+        "docs/policy.md",
+        authority="source_of_truth",
+    )
+    packet = build_action_packet(
+        question="Fix PermissionService and BrowserGate.",
+        context_pack=[policy],
+        trust_contract={"selected": [], "risky": [], "rejected": []},
+        max_tokens=2_000,
+        project_path="/repo",
+    )
+
+    visible = "\n".join(
+        str(row.get("text") or "")
+        for key in ("required_invariants", "forbidden_changes", "implementation_guidance")
+        for row in packet[key]
+    )
+    assert "PermissionService must own decisions." in visible
+    assert "BrowserGate must delegate decisions." in visible
+    assert "Do not bypass PermissionService." in visible
+
+
+def test_project_rule_authority_must_match_the_validated_project_manifest(tmp_path):
+    docs = tmp_path / "docs"
+    docs.mkdir()
+    (docs / "policy.md").write_text("Policy", encoding="utf-8")
+    (docs / "unlisted.md").write_text("Unlisted", encoding="utf-8")
+    (tmp_path / "docatlas.project-docs.yaml").write_text(
+        """schema_version: 1
+documents:
+  - path: docs/policy.md
+    role: api_contract
+    scope: project
+    description: Reviewed policy.
+    authority: source_of_truth
+    status: active
+    impact: track
+roots: []
+""",
+        encoding="utf-8",
+    )
+
+    assert _effective_authority(
+        {"path": "docs/policy.md", "source_class": "project_doc", "authority": "project_rule"},
+        project_path=str(tmp_path), target_paths=(),
+    ) == "canonical"
+    assert _effective_authority(
+        {"path": "docs/unlisted.md", "source_class": "project_doc", "authority": "project_rule"},
+        project_path=str(tmp_path), target_paths=(),
+    ) == "supporting"
 
 
 def test_exact_task_packet_keeps_behavioral_contracts_under_visible_2000_token_ceiling():
