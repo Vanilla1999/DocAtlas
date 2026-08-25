@@ -142,7 +142,7 @@ def _effective_authority(
         for value in (item.get("authority"), item.get("repository_authority"))
         if value
     }
-    if not declared & {"canonical", "source_of_truth", "explicit_agent_policy", "primary"}:
+    if not declared & {"canonical", "source_of_truth", "explicit_agent_policy", "primary", "project_rule"}:
         return "supporting"
     if _instruction_risk_flags(item):
         return "supporting"
@@ -159,7 +159,7 @@ def _declares_canonical_authority(item: dict[str, Any]) -> bool:
         for value in (item.get("authority"), item.get("repository_authority"))
         if value
     }
-    return bool(declared & {"canonical", "source_of_truth", "explicit_agent_policy", "primary"})
+    return bool(declared & {"canonical", "source_of_truth", "explicit_agent_policy", "primary", "project_rule"})
 
 
 def _critical_fact_count(item: dict[str, Any]) -> int:
@@ -382,7 +382,7 @@ def _authority(item: dict[str, Any]) -> str:
         for value in (item.get("authority"), item.get("repository_authority"))
         if value
     }
-    if declared & {"canonical", "source_of_truth", "explicit_agent_policy", "primary"}:
+    if declared & {"canonical", "source_of_truth", "explicit_agent_policy", "primary", "project_rule"}:
         return "canonical"
     return "supporting"
 
