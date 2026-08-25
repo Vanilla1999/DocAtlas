@@ -12,7 +12,11 @@ import itertools
 import re
 from typing import Any, Sequence
 
-from docmancer.docs.application.evidence_models import EvidenceCandidate, EvidenceRequirement
+from docmancer.docs.application.evidence_models import (
+    EvidenceCandidate,
+    EvidenceRequirement,
+    RequirementWitness,
+)
 
 
 _BEHAVIORAL_FACT_RE = re.compile(
@@ -83,20 +87,29 @@ def _source_scoped_behavioral_match(
     return bool(scope_tokens & (unit_tokens | symbol_tokens | source_tokens))
 
 
+def _unit_semantic_score(text: str) -> int:
+    """Rank local witnesses by contract density, not by shortest byte length."""
+
+    if not _BEHAVIORAL_FACT_RE.search(text):
+        return 0
+    score = 2
+    if _HARD_NORMATIVE_RE.search(text):
+        score += 2
+    # Exact boolean/numeric configuration values are especially useful to a
+    # patching model and must survive over a shorter prose prohibition.
+    if _CONFIG_VALUE_RE.search(text):
+        score += 4
+    return score
+
+
 def critical_normative_fact_score(candidate: EvidenceCandidate) -> int:
     """Score semantic contract density without rewarding ordinary prose length."""
 
-    score = 0
-    for segment in re.split(r"(?<=[.!?])\s+|\n+", candidate.display_text):
-        text = segment.strip()
-        if not text or not _BEHAVIORAL_FACT_RE.search(text):
-            continue
-        score += 2
-        if _HARD_NORMATIVE_RE.search(text):
-            score += 2
-        if _CONFIG_VALUE_RE.search(text):
-            score += 1
-    return score
+    return sum(
+        _unit_semantic_score(segment.strip())
+        for segment in re.split(r"(?<=[.!?])\s+|\n+", candidate.display_text)
+        if segment.strip()
+    )
 
 
 def semantic_candidate_preference(candidate: EvidenceCandidate) -> tuple[Any, ...]:
@@ -210,6 +223,7 @@ def bind_semantic_density_policy() -> None:
     from docmancer.docs.application import _evidence_selection_part03 as part03
 
     original_legacy_match = part02._legacy_requirement_matches_unit
+    original_witness = part02._witness_for_requirement
 
     def source_aware_legacy_match(requirement, unit, candidate):
         if (
@@ -227,6 +241,42 @@ def bind_semantic_density_policy() -> None:
             return bool(matches)
         return original_legacy_match(requirement, unit, candidate)
 
+    def source_aware_witness(requirement, candidate):
+        if not (
+            requirement.kind == "behavioral_contract"
+            and requirement.query_extraction_kind == "source_fact"
+        ):
+            return original_witness(requirement, candidate)
+        matching_units = [
+            unit
+            for unit in candidate.answer_units
+            if unit.proposition
+            and source_aware_legacy_match(requirement, unit, candidate)
+        ]
+        if not matching_units:
+            return None
+        matching_units.sort(key=lambda unit: (
+            -_unit_semantic_score(unit.text),
+            unit.char_start if unit.char_start is not None else 10**9,
+            len(unit.text),
+            unit.unit_id,
+        ))
+        unit = matching_units[0]
+        semantic_score = _unit_semantic_score(unit.text)
+        return RequirementWitness(
+            requirement_id=requirement.requirement_id,
+            unit_id=unit.unit_id,
+            unit_kind=unit.kind,
+            unit_text=unit.text,
+            unit_char_start=unit.char_start,
+            unit_char_end=unit.char_end,
+            unit_content_hash=unit.content_sha256,
+            subject_score=1,
+            relation_score=2,
+            value_score=max(1, semantic_score),
+            completeness_score=3 + semantic_score,
+        )
+
     part01._candidate_preference = semantic_candidate_preference
     part01._repair_mandatory_selection = semantic_repair_mandatory_selection
     part01._marginal_utility = semantic_marginal_utility
@@ -234,7 +284,9 @@ def bind_semantic_density_policy() -> None:
     part02._repair_mandatory_selection = semantic_repair_mandatory_selection
     part02._marginal_utility = semantic_marginal_utility
     part02._legacy_requirement_matches_unit = source_aware_legacy_match
+    part02._witness_for_requirement = source_aware_witness
     part03._candidate_preference = semantic_candidate_preference
+    part03._witness_for_requirement = source_aware_witness
 
 
 def _version_rank(value: str) -> int:
