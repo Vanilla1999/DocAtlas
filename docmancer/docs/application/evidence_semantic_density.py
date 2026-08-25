@@ -3,7 +3,7 @@
 The selector shards intentionally split normalization, coverage, and fitting.
 This module binds one shared policy into those shards after they are imported so
 candidate-cap ranking, mandatory repair, and marginal fitting use the same
-ordering.  It adds no benchmark sentence literals: source-scoped obligations
+ordering. It adds no benchmark sentence literals: source-scoped obligations
 are proved from source identity, behavioral scope, and normative local text.
 """
 from __future__ import annotations
@@ -12,10 +12,7 @@ import itertools
 import re
 from typing import Any, Sequence
 
-from docmancer.docs.application.evidence_models import (
-    EvidenceCandidate,
-    EvidenceRequirement,
-)
+from docmancer.docs.application.evidence_models import EvidenceCandidate, EvidenceRequirement
 
 
 _BEHAVIORAL_FACT_RE = re.compile(
@@ -37,6 +34,7 @@ _CONFIG_VALUE_RE = re.compile(
 _GENERIC_SCOPE_TOKENS = frozenset({
     "application", "contract", "flow", "gate", "module", "policy",
 })
+_TOKEN_RE = re.compile(r"[\w.+:/-]+", re.UNICODE)
 
 
 def _normalized_path(value: str) -> str:
@@ -125,7 +123,7 @@ def semantic_marginal_utility(
 ) -> int:
     terms = {
         token.casefold()
-        for token in _token_re().findall(candidate.display_text)
+        for token in _TOKEN_RE.findall(candidate.display_text)
         if len(token) > 2
     }
     novelty = min(80, len(terms - selected_terms) * 4)
@@ -204,7 +202,7 @@ def semantic_repair_mandatory_selection(
     return best
 
 
-def install_semantic_density_policy() -> None:
+def bind_semantic_density_policy() -> None:
     """Bind policy into all selector shards that resolve helpers at runtime."""
 
     from docmancer.docs.application import _evidence_selection_part01 as part01
@@ -248,13 +246,9 @@ def _version_rank(value: str) -> int:
     return 1
 
 
-def _token_re() -> re.Pattern[str]:
-    return re.compile(r"[\w.+:/-]+", re.UNICODE)
-
-
 __all__ = [
+    "bind_semantic_density_policy",
     "critical_normative_fact_score",
-    "install_semantic_density_policy",
     "semantic_candidate_preference",
     "semantic_marginal_utility",
     "semantic_repair_mandatory_selection",
