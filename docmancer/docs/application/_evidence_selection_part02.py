@@ -4,6 +4,7 @@ from __future__ import annotations
 from ._evidence_selection_shared import *  # noqa: F401,F403
 
 from ._evidence_selection_part01 import _candidate_preference, _candidate_source_view, _jaccard_millis, _marginal_utility, _repair_mandatory_selection, _selection_terms
+from .evidence_semantic_density import source_fact_unit_semantic_score, source_scoped_behavioral_match
 
 def _scope_requirement_value(
     requirements: Sequence[EvidenceRequirement], kind: str,
@@ -168,11 +169,14 @@ def _legacy_requirement_matches_unit(
             or source.endswith("/" + wanted)
         )
     elif requirement.kind == "behavioral_contract":
-        terms = {
-            token for token in re.findall(r"[a-z0-9_]+", requirement.value.casefold())
-            if token not in {"a", "an", "and", "for", "in", "of", "the", "to"}
-        }
-        matches = candidate.authority == "canonical" and len(terms & set(re.findall(r"[a-z0-9_]+", text))) >= min(3, len(terms))
+        if requirement.query_extraction_kind == "source_fact":
+            matches = source_scoped_behavioral_match(requirement, unit.text, candidate)
+        else:
+            terms = {
+                token for token in re.findall(r"[a-z0-9_]+", requirement.value.casefold())
+                if token not in {"a", "an", "and", "for", "in", "of", "the", "to"}
+            }
+            matches = candidate.authority == "canonical" and len(terms & set(re.findall(r"[a-z0-9_]+", text))) >= min(3, len(terms))
     elif requirement.kind == "cross_module_invariant":
         targets = [value.casefold() for value in requirement.value.splitlines() if value]
         matches = candidate.authority == "canonical" and any(
@@ -224,20 +228,26 @@ def _witness_for_requirement(
         ]
         if not matching_units:
             return None
+        source_fact = (
+            requirement.kind == "behavioral_contract"
+            and requirement.query_extraction_kind == "source_fact"
+        )
         matching_units.sort(key=lambda unit: (
+            -source_fact_unit_semantic_score(unit.text) if source_fact else 0,
             0 if unit.proposition else 1,
             len(unit.text),
             unit.char_start if unit.char_start is not None else 10**9,
             unit.unit_id,
         ))
         unit = matching_units[0]
+        semantic_score = source_fact_unit_semantic_score(unit.text) if source_fact else 0
         proof = LocalProof(
             True,
             subject_score=1,
-            relation_score=1,
-            value_score=1,
-            completeness_score=3,
-            reason="legacy_local_unit",
+            relation_score=2 if source_fact else 1,
+            value_score=max(1, semantic_score) if source_fact else 1,
+            completeness_score=3 + semantic_score if source_fact else 3,
+            reason="source_scoped_behavioral_fact" if source_fact else "legacy_local_unit",
         )
     return RequirementWitness(
         requirement_id=requirement.requirement_id,
