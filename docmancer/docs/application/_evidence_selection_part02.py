@@ -159,7 +159,25 @@ def _legacy_requirement_matches_unit(
     text = unit.text.casefold()
     if not unit.proposition and requirement.kind not in {"code_group"}:
         return False
-    if requirement.kind in {"exact_term", "entity"}:
+    if requirement.kind in {"target_declaration", "preserve_declaration"}:
+        wanted = requirement.value.casefold().replace("\\", "/")
+        source = candidate.source_identity.casefold().replace("\\", "/")
+        matches = (
+            any(symbol.casefold() == wanted for symbol in candidate.symbols)
+            or source == wanted
+            or source.endswith("/" + wanted)
+        )
+    elif requirement.kind == "behavioral_contract":
+        terms = {
+            token for token in re.findall(r"[a-z0-9_]+", requirement.value.casefold())
+            if token not in {"a", "an", "and", "for", "in", "of", "the", "to"}
+        }
+        matches = candidate.authority == "canonical" and len(terms & set(re.findall(r"[a-z0-9_]+", text))) >= min(3, len(terms))
+    elif requirement.kind == "cross_module_invariant":
+        matches = candidate.authority == "canonical" and all(
+            value.casefold() in text for value in requirement.value.splitlines() if value
+        )
+    elif requirement.kind in {"exact_term", "entity"}:
         matches = requirement_value_visible(requirement.value, unit.text)
     elif requirement.kind == "facet":
         matches = _facet_requirement_matches(requirement.value, text)
@@ -253,6 +271,11 @@ def _with_canonical_policy_requirements(
             "source_of_truth", "project_rule", "explicit_agent_policy",
         }
         and _PATCH_FACT_RE.search(candidate.display_text)
+        and any(
+            requirement.kind != "canonical_policy"
+            and _witness_for_requirement(requirement, candidate) is not None
+            for requirement in requirements
+        )
     ]
     unique = {item.requirement_id: item for item in (*requirements, *additions)}
     return tuple(unique[key] for key in sorted(unique))

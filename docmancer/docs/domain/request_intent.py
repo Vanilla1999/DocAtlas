@@ -6,8 +6,8 @@ import re
 
 
 _CHANGE_WORDS = re.compile(
-    r"\b(implement|create|build|write|develop|introduce|replace|add|change|edit|modify|fix|"
-    r"refactor|remove|rename|update|patch|migrate|code|"
+    r"^\s*(?:(?:please|пожалуйста)\s+)?(implement|create|build|write|develop|introduce|replace|add|change|edit|modify|fix|"
+    r"refactor|delete|remove|rename|update|patch|migrate|code|"
     r"реализ\w*|созда\w*|сдела\w*|напиш\w*|разработ\w*|добав\w*|измен\w*|"
     r"исправ\w*|рефактор\w*|замен\w*|удал\w*|переимен\w*|обнов\w*)\b",
     re.IGNORECASE,

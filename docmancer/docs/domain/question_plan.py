@@ -30,7 +30,10 @@ from docmancer.docs.domain.question_semantic_frames import (
     match_premise_frame,
     match_purpose_behavior_frame,
 )
-from docmancer.docs.domain.question_surface_normalization import normalize_question_surface
+from docmancer.docs.domain.question_surface_normalization import (
+    normalize_question_surface,
+    rebind_surface_plan,
+)
 from docmancer.docs.domain.technical_terms import TechnicalTermKind
 
 from docmancer.docs.domain.question_plan_core import (
@@ -972,46 +975,17 @@ def _compile_question_plan_core(raw: str) -> QuestionPlan:
     return QuestionPlan()
 
 
-def _bind_surface_plan(
-    plan: QuestionPlan,
-    *,
-    raw: str,
-    rule: str,
-) -> QuestionPlan:
-    """Rebind a canonical surface plan to the complete original user span."""
-
-    if plan.unresolved_parts:
-        return QuestionPlan(
-            clauses=(raw,),
-            unresolved_parts=plan.unresolved_parts,
-            parse_trace=(f"surface:{rule}", *plan.parse_trace),
-        )
-    clauses = split_question_clause_spans(raw)
-    if not plan.facets or not clauses:
-        return plan
-    rebound = replace(
-        plan,
-        facets=tuple(replace(facet, span_text=raw) for facet in plan.facets),
-    )
-    rebound = _bind_whole_plan(rebound, raw, clauses)
-    return _finalize_full_span_coverage(
-        raw,
-        replace(
-            rebound,
-            clauses=tuple(_normalized_clause(clause, compound=True) for clause in clauses),
-            parse_trace=(f"surface:{rule}", *plan.parse_trace),
-        ),
-    )
-
-
 def compile_question_plan(question: str) -> QuestionPlan:
     raw = str(question or "")[:4000]
     surface = normalize_question_surface(raw)
     if surface is not None:
         normalized_plan = _compile_question_plan_core(surface.text)
         if normalized_plan.handled:
-            return _guard_plan_subjects(_bind_surface_plan(
-                normalized_plan, raw=raw, rule=surface.rule,
+            return _guard_plan_subjects(rebind_surface_plan(
+                normalized_plan,
+                raw=raw,
+                rule=surface.rule,
+                finalize=_finalize_full_span_coverage,
             ))
     return _compile_question_plan_core(raw)
 

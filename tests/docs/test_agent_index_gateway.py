@@ -81,6 +81,7 @@ def _record_with_canonical_id(library_id, canonical_id):
 
 
 def test_index_config_for_preserves_library_specific_paths(tmp_path, monkeypatch):
+    monkeypatch.delenv("DOCATLAS_HOME", raising=False)
     monkeypatch.setenv("DOCMANCER_HOME", str(tmp_path / "home"))
     config = DocmancerConfig()
     gateway = AgentIndexGateway(config, agent_factory=FakeAgent)
@@ -118,6 +119,7 @@ def test_project_query_uses_default_agent(tmp_path, monkeypatch):
 
 
 def test_library_query_uses_per_library_agent(tmp_path, monkeypatch):
+    monkeypatch.delenv("DOCATLAS_HOME", raising=False)
     monkeypatch.setenv("DOCMANCER_HOME", str(tmp_path / "home"))
     default = FakeAgent(config=DocmancerConfig())
     gateway = AgentIndexGateway(DocmancerConfig(), default_agent=default, agent_factory=FakeAgent)
@@ -206,7 +208,8 @@ def test_dispatcher_is_reused_until_library_agent_is_dropped(tmp_path, monkeypat
     assert len(builds) == 3
 
 
-def test_dispatcher_cache_tracks_store_and_generation_identity(monkeypatch):
+def test_dispatcher_cache_tracks_store_and_generation_identity(tmp_path, monkeypatch):
+    monkeypatch.setenv("DOCATLAS_HOME", str(tmp_path / "home"))
     builds = []
 
     def build_dispatcher(agent, *, mode):

@@ -7,10 +7,20 @@ is retained by ``compile_question_plan`` when a normalized surface is accepted.
 """
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 import re
+from typing import Callable
 
-from docmancer.docs.domain.question_frame_core import clean_phrase, strip_request_wrapper
+from docmancer.docs.domain.question_frame_core import (
+    clean_phrase,
+    split_question_clause_spans,
+    strip_request_wrapper,
+)
+from docmancer.docs.domain.question_plan_core import (
+    QuestionPlan,
+    _bind_whole_plan,
+    _normalized_clause,
+)
 
 
 @dataclass(frozen=True, slots=True)
@@ -52,6 +62,39 @@ _RU_SEMANTIC_ALIASES = {
 def _ru_semantic_value(value: str) -> str:
     cleaned = clean_phrase(value)
     return _RU_SEMANTIC_ALIASES.get(cleaned.casefold(), cleaned)
+
+
+def rebind_surface_plan(
+    plan: QuestionPlan,
+    *,
+    raw: str,
+    rule: str,
+    finalize: Callable[[str, QuestionPlan], QuestionPlan],
+) -> QuestionPlan:
+    """Rebind a canonical surface plan to the complete original user span."""
+
+    if plan.unresolved_parts:
+        return QuestionPlan(
+            clauses=(raw,),
+            unresolved_parts=plan.unresolved_parts,
+            parse_trace=(f"surface:{rule}", *plan.parse_trace),
+        )
+    clauses = split_question_clause_spans(raw)
+    if not plan.facets or not clauses:
+        return plan
+    rebound = replace(
+        plan,
+        facets=tuple(replace(facet, span_text=raw) for facet in plan.facets),
+    )
+    rebound = _bind_whole_plan(rebound, raw, clauses)
+    return finalize(
+        raw,
+        replace(
+            rebound,
+            clauses=tuple(_normalized_clause(clause, compound=True) for clause in clauses),
+            parse_trace=(f"surface:{rule}", *plan.parse_trace),
+        ),
+    )
 
 
 def normalize_question_surface(question: str) -> SurfaceNormalization | None:

@@ -310,6 +310,7 @@ def _annotate_recovery_handoff(
         projection.update({
             "disposition": "search_local_source",
             "edit_ready": bool(edit_authorized),
+            "investigation_allowed": True,
             "source_search_status": "required",
             "requires_confirmation": False,
         })

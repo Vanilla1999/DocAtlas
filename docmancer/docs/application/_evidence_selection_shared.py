@@ -103,6 +103,7 @@ _ALLOWED_REQUIREMENT_PROVENANCE = frozenset({
     "selector_scope_requirement",
     "canonical_policy_requirement",
     "disclosed_authority_version_conflict",
+    "patch_request_plan",
 })
 
 _QUALIFIER_PATTERNS = {

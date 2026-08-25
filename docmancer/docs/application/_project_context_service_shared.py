@@ -11,6 +11,8 @@ from docmancer.docs.application.evidence_selection import (
     project_docs_selection_config,
     select_evidence,
 )
+from docmancer.docs.application.evidence_requirements import build_patch_evidence_requirements
+from docmancer.docs.domain.request_intent import is_change_request
 from docmancer.docs.domain.answer_completeness import (
     derive_project_answer_completeness,
     extract_project_answer_requirements,

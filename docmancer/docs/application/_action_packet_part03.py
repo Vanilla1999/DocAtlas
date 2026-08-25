@@ -100,11 +100,34 @@ def build_action_packet(
         )
         scoped_items.append(item)
     scoped_items = _drop_superseded_fallbacks(scoped_items)
+    patch_requirements = (
+        build_patch_evidence_requirements(mutation_intent.request_plan)
+        if mutation_intent.request_plan is not None else None
+    )
+    if patch_requirements is not None and any((
+        required_evidence_paths, required_target_paths, public_requirements,
+        exact_version, project_identity, module_id,
+    )):
+        explicit_requirements = build_requirements(
+            question,
+            required_evidence_paths=required_evidence_paths,
+            required_target_paths=required_target_paths,
+            public_requirements=public_requirements,
+            exact_version=exact_version,
+            project_identity=project_identity,
+            module_id=module_id,
+            profile="generic",
+        )
+        patch_requirements = EvidenceRequirementSet(tuple((
+            *patch_requirements.requirements,
+            *explicit_requirements.requirements,
+        )))
     selection = select_evidence(
         scoped_items,
         question=question,
         config=patch_selection_config(budget),
         trust_contract=trust_contract or {},
+        requirements=patch_requirements,
         required_evidence_paths=required_evidence_paths,
         required_target_paths=required_target_paths,
         public_requirements=public_requirements,
@@ -137,10 +160,32 @@ def build_action_packet(
         if omission.reason_code in {"budget", "zero_marginal_utility"}
     }
     if budget_omission_ids:
-        selection_budget_critical_facts = sum(
-            _critical_fact_count(dict(candidate.original))
+        selected_critical_facts = {
+            (fact_type, fact)
+            for candidate in selection.selected_candidates
+            if str(dict(candidate.original).get("source_class") or "") not in _CODE_SOURCE_CLASSES
+            for fact_type, fact in _extract_facts(candidate.projected_text)[0]
+            if fact_type in {"required", "forbidden", "validation"}
+        }
+        omitted_critical_facts = {
+            (fact_type, fact)
             for candidate in normalized_scoped
             if candidate.stable_id in budget_omission_ids and candidate.authority == "canonical"
+            and str(dict(candidate.original).get("source_class") or "") not in _CODE_SOURCE_CLASSES
+            for fact_type, fact in _extract_facts(candidate.projected_text)[0]
+            if fact_type in {"required", "forbidden", "validation"}
+            and (fact_type, fact) not in selected_critical_facts
+        }
+        omitted_oversized_sources = {
+            candidate.stable_id
+            for candidate in normalized_scoped
+            if candidate.stable_id in budget_omission_ids
+            and candidate.authority == "canonical"
+            and str(dict(candidate.original).get("source_class") or "") not in _CODE_SOURCE_CLASSES
+            and _extract_facts(_content_text(dict(candidate.original)))[1]
+        }
+        selection_budget_critical_facts = (
+            len(omitted_critical_facts) + len(omitted_oversized_sources)
         )
     if selection.status == "insufficient_evidence":
         retrieval_issue_list.extend(
@@ -192,6 +237,10 @@ def build_action_packet(
         if not evidence_id:
             continue
         facts, omitted_facts = _extract_facts(_content_text(item))
+        if str(item.get("source_class") or "") in _CODE_SOURCE_CLASSES:
+            # Code declarations prove target identity. They do not become
+            # repository policy merely because the source file is authoritative.
+            facts, omitted_facts = [], 0
         if _instruction_risk_flags(item):
             risky_content_omissions += len(facts) + (1 if item.get("snippet") else 0)
             if _declares_canonical_authority(item):
@@ -266,6 +315,27 @@ def build_action_packet(
         for symbol in _explicit_symbols(item):
             symbols.append({"name": symbol, "evidence_ids": [evidence_id]})
 
+    if resolved_mutation.request_plan is not None and resolved_mutation.requested_targets:
+        likely_file_rows = [
+            {"path": target.path, "evidence_ids": [target.evidence_id]}
+            for target in resolved_mutation.resolved_targets
+            if target.binding_kind == "target" and target.exists
+        ]
+        symbol_rows = [
+            {"name": target.symbol, "evidence_ids": [target.evidence_id]}
+            for target in resolved_mutation.resolved_targets
+            if target.binding_kind == "target" and target.exists and target.symbol
+        ]
+    else:
+        likely_file_rows = [
+            {"path": _source_path(item), "evidence_ids": [_evidence_id(item)]}
+            for item in items
+            if str(item.get("source_class") or "") in _CODE_SOURCE_CLASSES
+            and _source_path(item)
+            and _editable_target_path(_source_path(item))
+        ]
+        symbol_rows = symbols
+
     packet: dict[str, Any] = {
         "schema_version": ACTION_PACKET_SCHEMA_VERSION,
         "status": "ok",
@@ -275,14 +345,8 @@ def build_action_packet(
         },
         "source_of_truth": source_rows,
         "target_surface": {
-            "likely_files": _dedupe_cited([
-                {"path": _source_path(item), "evidence_ids": [_evidence_id(item)]}
-                for item in items
-                if str(item.get("source_class") or "") in _CODE_SOURCE_CLASSES
-                and _source_path(item)
-                and _editable_target_path(_source_path(item))
-            ], "path"),
-            "symbols": _dedupe_cited(symbols, "name"),
+            "likely_files": _dedupe_cited(likely_file_rows, "path"),
+            "symbols": _dedupe_cited(symbol_rows, "name"),
         },
         "required_invariants": _dedupe_cited(required, "text"),
         "forbidden_changes": _dedupe_cited(forbidden, "text"),
@@ -305,10 +369,7 @@ def build_action_packet(
                     **resolved_mutation.request_plan.hash_payload,
                     "plan_hash": resolved_mutation.request_plan.plan_hash,
                 }
-                if (
-                    resolved_mutation.request_plan is not None
-                    and resolved_mutation.request_plan.preserve_targets
-                ) else None
+                if resolved_mutation.request_plan is not None else None
             ),
             "ready": mutation_readiness.ready,
             "constraints_only": constraints_only,
@@ -320,6 +381,17 @@ def build_action_packet(
         "omitted_counts": {},
         "estimated_tokens": 0,
     }
+    if resolved_mutation.request_plan is not None:
+        for requirement in build_patch_requirements(resolved_mutation.request_plan):
+            if requirement.kind != "preserve_constraint":
+                continue
+            packet["forbidden_changes"].append({
+                "text": f"Do not change {requirement.value}",
+                "provenance": "user_request",
+                "request_plan_hash": resolved_mutation.request_plan.plan_hash,
+                "query_span_start": requirement.query_span_start,
+                "query_span_end": requirement.query_span_end,
+            })
     mandatory_guidance = _add_mandatory_requirement_witnesses(packet, selection)
     if objective_omitted:
         packet["status"] = "insufficient_evidence"
@@ -372,7 +444,12 @@ def build_action_packet(
     if packet["missing_evidence"]:
         packet["status"] = "insufficient_evidence"
 
-    if resolved_mutation.operation != "none" and not mutation_readiness.ready:
+    if is_change_request(question) and resolved_mutation.operation == "none":
+        packet["status"] = "insufficient_evidence"
+        packet["missing_evidence"].append(
+            "Mutation target readiness is incomplete: patch_surface_not_supported."
+        )
+    elif resolved_mutation.operation != "none" and not mutation_readiness.ready:
         packet["status"] = "insufficient_evidence"
         for reason in mutation_readiness.missing:
             message = f"Mutation target readiness is incomplete: {reason}."
@@ -466,6 +543,26 @@ def _validate_cited_items(value: Any, field: str, text_key: str, errors: list[st
     expected = {text_key, "evidence_ids"}
     seen: set[tuple[str, tuple[str, ...]]] = set()
     for index, item in enumerate(value):
+        if (
+            field == "forbidden_changes"
+            and isinstance(item, dict)
+            and item.get("provenance") == "user_request"
+        ):
+            request_fields = {
+                "text", "provenance", "request_plan_hash",
+                "query_span_start", "query_span_end",
+            }
+            if (
+                set(item) != request_fields
+                or not isinstance(item.get("text"), str)
+                or not item["text"].strip()
+                or not re.fullmatch(r"[0-9a-f]{64}", str(item.get("request_plan_hash") or ""))
+                or not isinstance(item.get("query_span_start"), int)
+                or not isinstance(item.get("query_span_end"), int)
+                or item["query_span_end"] <= item["query_span_start"]
+            ):
+                errors.append(f"{field}[{index}] has an invalid request-backed constraint")
+            continue
         if not isinstance(item, dict) or set(item) != expected:
             errors.append(f"{field}[{index}] fields must be {sorted(expected)}")
             continue
@@ -498,7 +595,10 @@ def _all_cited_items(
         validation.get("tests"),
         validation.get("semantic_checks"),
     ]
-    return [item for value in values if isinstance(value, list) for item in value if isinstance(item, dict)]
+    return [
+        item for value in values if isinstance(value, list)
+        for item in value if isinstance(item, dict) and "evidence_ids" in item
+    ]
 
 
 def _cited_dict_items(value: Any) -> list[dict[str, Any]]:
@@ -540,6 +640,8 @@ def _validate_evidence_fidelity(
     for field in ("required_invariants", "forbidden_changes"):
         expected_type = "required" if field == "required_invariants" else "forbidden"
         for item in _cited_dict_items(packet.get(field)):
+            if item.get("provenance") == "user_request":
+                continue
             text = str(item.get("text") or "")
             refs = _string_refs(item)
             if any(

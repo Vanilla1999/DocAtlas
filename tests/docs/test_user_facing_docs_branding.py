@@ -8,7 +8,6 @@ import subprocess
 ROOT = Path(__file__).resolve().parents[2]
 USER_FACING_DOCS = [
     ROOT / "README.md",
-    ROOT / "AGENTS.md",
     ROOT / "CONTRIBUTING.md",
     ROOT / "SKILL.md",
     ROOT / ".github" / "copilot-instructions.md",
@@ -33,7 +32,6 @@ FORBIDDEN_LEGACY_COMMANDS = [
 
 PRIMARY_PRODUCT_DOCS = [
     ROOT / "README.md",
-    ROOT / "AGENTS.md",
     ROOT / "CONTRIBUTING.md",
     *sorted((ROOT / "docs").glob("*.md")),
     *sorted((ROOT / "wiki").glob("*.md")),

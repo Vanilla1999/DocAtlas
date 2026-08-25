@@ -14,6 +14,10 @@ The module must fail closed when it cannot resolve a subject or requested operat
 
 The durable output is the project-answer requirement contract: resolved subjects, intents, mandatory facets, conditions, technical identities, parse trace, and unresolved parts. Retrieval ranking is not owned here.
 
+Imperative edits are outside this boundary. They are owned by
+`PatchRequestPlan` and the patch-specific requirement pipeline documented in
+`patch-request-planning.md`; one request must never pass through both systems.
+
 ## Relationship to evidence-selection
 
 Question planning defines **what must be proven**, whereas evidence selection determines **whether the available evidence proves it**. **Evidence selection may prove or reject an obligation, but it must not reinterpret the user's question or silently create replacement obligations.** This one-way contract is the architectural seam between the two modules.
@@ -35,4 +39,6 @@ Question planning defines **what must be proven**, whereas evidence selection de
 
 ## Tests
 
-`tests/docs/test_question_plan_v4.py`, project-answer protocol v1–v4 tests, `scripts/run_question_surface_gate.py`, and real MCP/self-hosting probing protect this boundary.
+`tests/docs/test_question_plan_v4.py`, project-answer protocol v1–v4 tests,
+`scripts/run_question_surface_gate.py`, `scripts/run_question_surface_v2_gate.py`,
+and real MCP/self-hosting probing protect this boundary.

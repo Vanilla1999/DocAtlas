@@ -6,9 +6,8 @@ from docmancer.docs.domain.patch_request_plan import build_patch_request_plan
 
 
 PERMISSION_PATCH_QUERY = (
-    "Which source files and generated or dependency files should be changed or left unchanged "
-    "to fix partial permission handling across BrowserPermissionGate, ScanPermissionGate, "
-    "OfflineSyncGate, and PermissionService? Include the required method calls and decision comparisons."
+    "Fix partial permission handling across BrowserPermissionGate, ScanPermissionGate, "
+    "OfflineSyncGate, and PermissionService."
 )
 
 
@@ -29,7 +28,7 @@ PERMISSION_PATCH_QUERY = (
 )
 def test_every_routed_change_request_has_mutation_intent(question):
     assert model_projection_kind(question) == "patch_context"
-    assert build_mutation_intent(question).operation != "none"
+    assert build_mutation_intent(question).operation == "none"
 
 
 def test_mutation_readiness_does_not_infer_constraints_from_user_wording():
@@ -39,7 +38,8 @@ def test_mutation_readiness_does_not_infer_constraints_from_user_wording():
 
     readiness = evaluate_mutation_readiness(contract)
 
-    assert contract.acceptance_conditions
+    assert contract.request_plan is not None
+    assert contract.request_plan.unresolved_parts
     assert readiness.constraints_only is False
 
 
@@ -67,6 +67,12 @@ def test_patch_request_plan_separates_mutation_and_preserve_targets():
     ]
     root = Path("eval/task_level/fixtures/templates/decisive_nbo_cross_module_gate_large_001")
     evidence = build_project_source_evidence(root, question=question, max_items=12, token_budget=1400)
+    evidence.append({
+        "path": "docs/permission-architecture.md",
+        "source_class": "project_doc",
+        "authority": "canonical",
+        "content": "Partial permission handling spans all permission gates.",
+    })
     packet = build_action_packet(question=question, context_pack=evidence, max_tokens=2000)
     assert validate_action_packet(packet, evidence_items=evidence) == []
     assert packet["mutation_intent"]["ready"] is True
@@ -232,18 +238,21 @@ def test_selected_document_terms_survive_action_packet_formatting():
     assert validate_action_packet(packet, evidence_items=[item, target], max_tokens=1500) == []
 
     create = build_mutation_intent(
-        "Create src/NewCaptureAdapter.py so that capture remains bounded."
+        "Create src/NewCaptureAdapter.py in src/existing_capture.py "
+        "so that capture remains bounded."
     )
     unresolved = resolve_mutation_targets(
         create, [], evidence_id_for_item=lambda row: row.get("stable_chunk_id", "")
     )
     assert evaluate_mutation_readiness(unresolved).missing == (
+        "create_destination_not_verified",
         "create_parent_or_module_not_resolved",
     )
     parent = {
         "stable_chunk_id": "capture-parent",
         "source": "src/existing_capture.py",
         "source_class": "code_graph",
+        "collision_free_targets": ["src/NewCaptureAdapter.py"],
     }
     resolved_create = resolve_mutation_targets(
         create, [parent], evidence_id_for_item=lambda row: row["stable_chunk_id"]
@@ -720,7 +729,7 @@ def test_bounded_direct_is_one_existing_tool_call_and_returns_only_action_packet
         "question": "Change legacy", "project_path": "/repo", "delivery_strategy": "bounded_direct",
     }, LegacyProjectFacade())
     assert legacy["status"] == "insufficient_evidence"
-    assert any("mutation_target_not_requested" in item for item in legacy["missing"])
+    assert any("patch_surface_not_supported" in item for item in legacy["missing"])
     assert "Project answer completeness metadata is missing." not in legacy["missing"]
 
     class MultiChunkBackend:

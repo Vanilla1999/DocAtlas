@@ -9,6 +9,7 @@ _SAFE_MISSING_ID_RE = re.compile(r"^[A-Za-z0-9_.:/=-]{1,180}$")
 _RECOVERY_SUMMARY_KEYS = (
     "documentation_supported", "investigation_allowed", "hard_stop",
     "recovery_origin", "recovery_reason_code", "recovery_disposition",
+    "edit_ready", "source_search_status", "requires_confirmation",
 )
 
 

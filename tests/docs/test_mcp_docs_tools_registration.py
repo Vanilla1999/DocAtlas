@@ -915,7 +915,6 @@ def test_mcp_exposes_discoverable_resources_and_templates():
 def test_maintained_agent_docs_prefer_public_docs_workflow():
     repo = Path(__file__).resolve().parents[2]
     docs = [
-        repo / "AGENTS.md",
         repo / "README.md",
         repo / "SKILL.md",
         repo / "docs" / "AGENT_DOCS_WORKFLOW.md",

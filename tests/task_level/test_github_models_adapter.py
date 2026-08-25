@@ -214,7 +214,7 @@ def test_required_once_runner_uses_bounded_direct_docs_delivery(
     module = workspace / "module.py"
     module.write_text("VALUE = 1\n", encoding="utf-8")
     actions = iter([
-        _action("get_docs_context", query="Fix module.py permission gate."),
+        _action("get_docs_context", query="Fix module.py."),
         _action("replace_text", path="module.py", old="VALUE = 1", new="VALUE = 2"),
         _action("finish", summary="used documentation"),
     ])
@@ -226,7 +226,7 @@ def test_required_once_runner_uses_bounded_direct_docs_delivery(
 
     def fake_handle(name, args, service):
         packet = build_action_packet(
-            question="Fix module.py permission gate.",
+            question="Fix module.py.",
             context_pack=[{
                 "doc_scope": "project",
                 "path": "AGENTS.md",
@@ -286,7 +286,7 @@ def test_required_once_runner_uses_bounded_direct_docs_delivery(
         task_id="task",
         condition_id="docatlas_tool_required_once",
         workspace=workspace,
-        prompt="Fix module.py permission gate.",
+        prompt="Fix module.py.",
         model="openai/gpt-4.1-mini",
         timeout_seconds=30,
         max_turns=3,
@@ -295,7 +295,7 @@ def test_required_once_runner_uses_bounded_direct_docs_delivery(
         tool_policy_path=tmp_path / "policy.json",
         output_dir=output_dir,
         allowed_write_paths=("module.py",),
-        task_objective="Fix module.py permission gate.",
+        task_objective="Fix module.py.",
     )
 
     sandbox = cast(DockerCommandSandbox, _TestSandbox())
@@ -309,7 +309,7 @@ def test_required_once_runner_uses_bounded_direct_docs_delivery(
     assert captured["service"] is sentinel_service
     args = captured["args"]
     assert isinstance(args, dict)
-    assert args["question"] == "Fix module.py permission gate."
+    assert args["question"] == "Fix module.py."
     assert args["project_path"] == str(workspace)
     assert args["delivery_strategy"] == "bounded_direct"
     assert args["prepare_project_docs"] is False

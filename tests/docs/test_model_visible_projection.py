@@ -99,6 +99,17 @@ def test_patch_projection_retains_validated_citations_without_raw_evidence():
         )
 
 
+def test_patch_projection_rejects_factual_item_without_citations():
+    packet, evidence = _ready_patch_fixture()
+    projection, snapshot = project_patch_context(packet=packet, evidence_items=evidence)
+    projection["invariants"][0].pop("evidence_ids")
+    projection["estimated_tokens"] = estimate_projection_tokens(projection)
+
+    assert "factual patch item has missing or unknown evidence_ids" in validate_model_visible_projection(
+        projection, snapshot=snapshot, max_tokens=1_500,
+    )
+
+
 @pytest.mark.parametrize(
     ("field", "value"),
     [
@@ -497,6 +508,33 @@ def test_projection_intent_distinguishes_change_from_documentation_question():
     assert projection_kind("Исправь обработку ошибок") == "patch_context"
     assert projection_kind("How do I use FooClient.create?") == "docs_answer"
     assert projection_kind("What is the retry policy?") == "docs_answer"
+    assert projection_kind("Delete src/obsolete.py.") == "patch_context"
+
+
+def test_terminal_insufficient_projection_preserves_recovery_state():
+    payload = project_insufficient(
+        kind="patch_context",
+        missing=["x" * 2_000],
+        recommended_next_action={
+            "tool": "prepare_docs",
+            "type": "prepare_docs",
+            "arguments_patch": {"action": "sync_project_docs", "project_path": "/repo"},
+            "requires_confirmation": True,
+            "confirmation_reason": "project_docs_preflight",
+        },
+        max_tokens=1_500,
+    )
+    payload.update({
+        "edit_ready": False,
+        "source_search_status": "required",
+        "requires_confirmation": True,
+    })
+
+    bound_insufficient_projection(payload, max_tokens=256)
+
+    assert payload["edit_ready"] is False
+    assert payload["source_search_status"] == "required"
+    assert payload["requires_confirmation"] is True
 
 
 def test_library_public_call_without_canonical_decision_fails_closed():
@@ -575,7 +613,7 @@ def test_partial_navigational_docs_result_fails_closed():
     assert payload["status"] == "insufficient_evidence"
     assert "answer" not in payload
     assert payload["disposition"] == "search_local_source"
-    assert payload["edit_ready"] is True
+    assert payload["edit_ready"] is False
     assert payload["source_search_status"] == "required"
     assert payload["requires_confirmation"] is False
     assert payload["recommended_next_action"]["tool"] == "code_search"

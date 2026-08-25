@@ -78,13 +78,20 @@ def validate_action_packet(
         if request_plan is not None:
             required_plan_fields = {
                 "schema_version", "operation", "mutation_targets", "preserve_targets",
-                "scope_terms", "behavioral_requirements", "acceptance_conditions",
-                "unresolved_parts", "language", "surface_id", "plan_hash",
+                "destination", "parent_context", "scope_terms", "behavioral_requirements",
+                "acceptance_conditions", "consumed_spans", "unresolved_parts",
+                "language", "surface_id", "plan_hash",
             }
             if not isinstance(request_plan, dict) or set(request_plan) != required_plan_fields:
                 errors.append("mutation_intent.request_plan is incomplete")
             elif (
-                request_plan.get("operation") != mutation.get("operation")
+                not (
+                    request_plan.get("operation") == mutation.get("operation")
+                    or (
+                        mutation.get("operation") == "none"
+                        and bool(request_plan.get("unresolved_parts"))
+                    )
+                )
                 or request_plan.get("language") not in {"en", "ru"}
                 or not re.fullmatch(r"[0-9a-f]{64}", str(request_plan.get("plan_hash") or ""))
             ):
@@ -102,6 +109,7 @@ def validate_action_packet(
                     str(item.get("value") or "").casefold()
                     for item in mutation.get("requested_targets") or []
                     if isinstance(item, dict)
+                    and str(item.get("provenance") or "user_request") == "user_request"
                 ]
                 preserve_values = {
                     str(item.get("value") or "").casefold()
@@ -166,6 +174,8 @@ def validate_action_packet(
     }
     for field, value in canonical_fields.items():
         for item in _cited_dict_items(value):
+            if item.get("provenance") == "user_request":
+                continue
             refs = _string_refs(item)
             if refs and any(source_by_evidence.get(ref, {}).get("authority") != "canonical" for ref in refs):
                 errors.append(f"{field} may cite only canonical evidence")

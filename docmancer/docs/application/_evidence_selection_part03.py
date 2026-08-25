@@ -565,6 +565,12 @@ def _with_coverage(
             matches = candidate.project_identity == requirement.value
         elif requirement.kind == "module_id":
             matches = candidate.module_id == requirement.value
+        elif requirement.kind in {
+            "target_declaration", "preserve_declaration",
+            "behavioral_contract", "cross_module_invariant",
+        }:
+            witness = _witness_for_requirement(requirement, candidate)
+            matches = witness is not None
         elif requirement.kind == "exact_term":
             matches = requirement_value_visible(requirement.value, haystack)
         elif requirement.kind == "entity":

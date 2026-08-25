@@ -41,7 +41,7 @@ def test_action_packet_is_deterministic_deduplicated_authority_filtered_and_cite
         "get_docs_context", "ActionPacketWorker",
     ]
     assert not any("supporting evidence" in item["text"] for item in first["required_invariants"])
-    assert any("supporting evidence" in item["text"] for item in first["implementation_guidance"])
+    assert not any("supporting evidence" in item["text"] for item in first["implementation_guidance"])
     evidence_ids = {row["evidence_id"] for row in first["source_of_truth"]}
     for fact in [
         *first["required_invariants"], *first["forbidden_changes"],
@@ -351,7 +351,7 @@ def test_action_packet_truncates_whole_items_and_fails_closed_without_evidence()
         assert validate_action_packet(variant)
 
     long_critical = build_action_packet(
-        question="Change crypto",
+        question="Change src/crypto.py",
         context_pack=[
             {
                 "path": "AGENTS.md", "heading_path": "Policy", "authority": "canonical",
@@ -556,9 +556,10 @@ def test_constraints_only_requires_canonical_source_backed_constraints():
         required_evidence_paths=("docs/permission-notes.md",),
     )
 
-    assert canonical_packet["mutation_intent"]["constraints_only"] is True
+    assert canonical_packet["mutation_intent"]["constraints_only"] is False
+    assert canonical_packet["status"] == "insufficient_evidence"
     assert any(
-        "Documentation constraints do not authorize" in row
+        "patch_surface_not_supported" in row
         for row in canonical_packet["missing_evidence"]
     )
     assert supporting_packet["mutation_intent"]["constraints_only"] is False

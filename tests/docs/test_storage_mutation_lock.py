@@ -71,7 +71,9 @@ def test_clear_index_refuses_while_the_same_database_is_being_mutated(tmp_path):
 
     with storage_mutation_lock(db, operation="test writer"):
         with pytest.raises(StorageMutationBusy, match="index cleanup blocked"):
-            cleanup.apply(plan, expected_plan_digest=plan.plan_digest)
+            cleanup.apply(
+                plan, expected_plan_digest=plan.plan_digest, allow_incomplete=True,
+            )
     assert db.exists()
 
 
@@ -147,7 +149,9 @@ def test_cleanup_refuses_while_writer_lease_is_active(tmp_path):
 
     with storage_writer_lease(db, operation="library docs refresh"):
         with pytest.raises(StorageMutationBusy, match="active index writer lease"):
-            cleanup.apply(plan, expected_plan_digest=plan.plan_digest)
+            cleanup.apply(
+                plan, expected_plan_digest=plan.plan_digest, allow_incomplete=True,
+            )
     assert db.exists()
 
 

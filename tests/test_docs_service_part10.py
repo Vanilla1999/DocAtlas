@@ -356,7 +356,8 @@ def test_project_service_cache_concurrent_first_use_and_config_replacement(tmp_p
     assert len(fallback._project_service_cache) == 1
 
 
-def test_prepare_docs_removes_project_local_library_target(tmp_path):
+def test_prepare_docs_removes_project_local_library_target(tmp_path, monkeypatch):
+    monkeypatch.setenv("DOCATLAS_HOME", str(tmp_path / "home"))
     project = tmp_path / "project"
     project.mkdir()
     (project / "docmancer.yaml").write_text(

@@ -299,7 +299,7 @@
     "tests/docs/test_mcp_error_contract.py": "a0f7f9fe37934b5b6a528e6d6b1ba9bad42b0349a9f901ee50a318308f015ca8",
     "tests/docs/test_mcp_output_contract.py": "3c3d49013141661658cb5b008a3ae59f336523cf1b1f1ee01f2b9c0b62995b6b",
     "tests/docs/test_mcp_token_footprint.py": "34b40986931303bc312678f8e64bb6b3f31129baa6b402508b5181f7e4518833",
-    "tests/docs/test_model_visible_projection.py": "1fb63e36e627564587b147189dad4c46d70a534f0df793be9d5b67f7517da042",
+    "tests/docs/test_model_visible_projection.py": "f2f9d7acfdfdd239c924ed9275636093a16b7ef29b0b0c2d83e46e0bb41eefe8",
     "tests/docs/test_model_visible_projection_part02.py": "b633a63ea4c3997204eaf1679a89c57fb8a1c80c75738f217c61ffa2542191bb",
     "tests/docs/test_module_docs_manifest_e2e.py": "f51942789f78aa9ac9b5573bfc4d6b03d7e84213d499004a305c5490ae1b599b",
     "tests/docs/test_normative_language.py": "5b25646db89c8cb2e5d1db290f4b1878628366cf87ed455d8cbd76f6b934bba8",

@@ -139,15 +139,9 @@ roots:
     assert index_witness_payload is not None
     assert index_witness_payload["status"] == "insufficient_evidence"
     assert index_witness_payload["kind"] == "patch_context"
-    assert index_witness_payload["edit_ready"] is True
-    source_handoff = index_witness_payload["recommended_next_action"]
-    assert source_handoff["tool"] == "code_search"
-    assert source_handoff["type"] == "search_local_source"
-    assert source_handoff["handled_by"] == "coding_agent"
-    assert source_handoff["requires_confirmation"] is False
-    assert source_handoff["repeat_docs_context"] is False
-    assert source_handoff["auto_execute"] is False
-    assert "library_docs_service.py" in source_handoff["suggested_doc_paths"]
+    assert index_witness_payload["investigation_allowed"] is True
+    assert index_witness_payload["edit_ready"] is False
+    assert index_witness_payload["source_search_status"] == "required"
 
 
     novel_index_witness_payload = handle_context_tool(
@@ -167,9 +161,9 @@ roots:
     assert novel_index_witness_payload is not None
     assert novel_index_witness_payload["status"] == "insufficient_evidence"
     assert novel_index_witness_payload["kind"] == "patch_context"
-    assert novel_index_witness_payload["edit_ready"] is True
-    assert novel_index_witness_payload["recommended_next_action"]["tool"] == "code_search"
-    assert "library_docs_service.py" in novel_index_witness_payload["recommended_next_action"]["suggested_doc_paths"]
+    assert novel_index_witness_payload["investigation_allowed"] is True
+    assert novel_index_witness_payload["edit_ready"] is False
+    assert novel_index_witness_payload["source_search_status"] == "required"
 
 
     absent = handle_context_tool(

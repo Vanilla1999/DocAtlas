@@ -14,6 +14,8 @@ from typing import Any, Iterable, Literal, Mapping, Sequence
 from docmancer.docs.application.evidence_candidates import normalized_source as _normalized_source
 from docmancer.docs.application.evidence_models import EvidenceRequirement, EvidenceRequirementSet
 from docmancer.docs.domain.project_answer_contract import ProofObligation, ProjectAnswerContract, build_project_answer_contract
+from docmancer.docs.domain.patch_requirements import PatchRequirement, build_patch_requirements
+from docmancer.docs.domain.patch_request_plan import PatchRequestPlan
 from docmancer.retrieval.contracts import canonical_hash
 from docmancer.retrieval.query_planning import extract_exact_terms
 
@@ -44,7 +46,37 @@ _ALLOWED_REQUIREMENT_PROVENANCE = frozenset({
     "query_exact_term", "public_task_contract", "required_evidence_paths",
     "required_target_paths", "exact_dependency_binding", "selector_scope_requirement",
     "canonical_policy_requirement", "disclosed_authority_version_conflict",
+    "patch_request_plan",
 })
+
+
+def build_patch_evidence_requirements(plan: PatchRequestPlan) -> EvidenceRequirementSet:
+    """Convert patch requirements into selector obligations without QuestionPlan."""
+
+    evidence_requirements: list[EvidenceRequirement] = []
+    for requirement in build_patch_requirements(plan):
+        if requirement.kind in {"preserve_constraint", "generated_file_constraint"}:
+            continue
+        evidence_requirements.append(EvidenceRequirement(
+            requirement_id=requirement.requirement_id,
+            kind=requirement.kind,
+            value=requirement.value,
+            mandatory=requirement.mandatory,
+            public_provenance="patch_request_plan",
+            query_extraction_kind=requirement.kind,
+            query_span_start=requirement.query_span_start,
+            query_span_end=requirement.query_span_end,
+            query_span_text=(
+                requirement.value
+                if requirement.query_span_start is not None else None
+            ),
+            proof_role=(
+                "target_identity"
+                if requirement.kind in {"target_declaration", "preserve_declaration"}
+                else "project_rule"
+            ),
+        ))
+    return EvidenceRequirementSet(tuple(evidence_requirements))
 
 def _extract_requirement_entities_and_facets(question: str) -> tuple[tuple[str, ...], tuple[str, ...]]:
     entities: set[str] = set()
@@ -493,4 +525,4 @@ def build_requirements(
 
 
 
-__all__ = ["build_requirements"]
+__all__ = ["build_patch_evidence_requirements", "build_requirements"]

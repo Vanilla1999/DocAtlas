@@ -31,6 +31,10 @@ from docmancer.docs.application.insufficient_projection import (
     bounded_missing_value,
     compact_recovery_action_for_budget,
 )
+from docmancer.docs.application.model_visible_projection_helpers import (
+    bounded_action as _bounded_action,
+    cited_patch_items as _cited_patch_items,
+)
 
 
 DOCS_ANSWER_MAX_TOKENS = 800
@@ -83,8 +87,7 @@ _INSUFFICIENT_SUPPORT_KEYS = (
     "decision_hash",
 )
 _OPTIONAL_INSUFFICIENT_KEYS = (
-    "operational_status", "context_available", "disposition", "edit_ready",
-    "source_search_status", "requires_confirmation",
+    "operational_status", "context_available", "disposition",
 )
 
 def canonical_projection_bytes(value: Any) -> bytes:
@@ -584,6 +587,10 @@ def project_patch_context(
         "implementation_guidance": deepcopy(packet.get("implementation_guidance") or []),
         "checks": deepcopy(packet.get("validation") or {"compile": [], "tests": [], "semantic_checks": []}),
         "mutation_intent": deepcopy(packet.get("mutation_intent") or {}),
+        "mutation_ready": bool((packet.get("mutation_intent") or {}).get("ready")),
+        "edit_ready": bool((packet.get("mutation_intent") or {}).get("ready")),
+        "investigation_allowed": True,
+        "source_search_status": "not_required",
         "uncertainties": deepcopy(packet.get("uncertainties") or []),
         "omitted_counts": deepcopy(packet.get("omitted_counts") or {}),
         "estimated_tokens": 0,
@@ -956,20 +963,6 @@ def _docs_retrieval_issues(
     return issues
 
 
-def _bounded_action(value: Any) -> dict[str, Any] | None:
-    if not isinstance(value, dict):
-        return None
-    allowed = (
-        "tool", "type", "action", "handled_by", "arguments_patch", "question", "requires_confirmation",
-        "confirmation_reason", "reason", "observations", "security_scope",
-        "decision_options", "agent_question", "query_terms", "suggested_doc_paths",
-        "suggested_symbols", "suggested_layers", "repeat_docs_context",
-    )
-    result = {key: deepcopy(value[key]) for key in allowed if value.get(key) not in (None, {}, [])}
-    result["auto_execute"] = False
-    return result
-
-
 def _find_forbidden_keys(value: Any) -> set[str]:
     found: set[str] = set()
     if isinstance(value, dict):
@@ -981,15 +974,6 @@ def _find_forbidden_keys(value: Any) -> set[str]:
         for child in value:
             found.update(_find_forbidden_keys(child))
     return found
-
-
-def _cited_patch_items(payload: dict[str, Any]) -> list[dict[str, Any]]:
-    values: list[Any] = [
-        payload.get("acceptance_conditions"), payload.get("invariants"), payload.get("forbidden_changes"),
-        payload.get("implementation_guidance"), (payload.get("targets") or {}).get("likely_files"),
-        (payload.get("targets") or {}).get("symbols"), *((payload.get("checks") or {}).values()),
-    ]
-    return [item for value in values if isinstance(value, list) for item in value if isinstance(item, dict)]
 
 
 def _refresh_estimate(payload: dict[str, Any]) -> None:

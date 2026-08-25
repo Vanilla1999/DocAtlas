@@ -296,6 +296,7 @@ def handle_context_tool(name: str, args: dict[str, Any], service: LibraryDocsSer
     if args.get("packet_tokens") is not None and args.get("delivery_strategy") != "bounded_direct":
         return _bad_request("packet_tokens_requires_bounded_delivery", "packet_tokens requires delivery_strategy='bounded_direct'")
     mutation_intent = build_mutation_intent(question)
+    kind = projection_kind(question)
     maintenance = args.get("maintenance")
     if maintenance is not None:
         return _handle_maintenance_context(args, maintenance, service)
@@ -373,13 +374,12 @@ def handle_context_tool(name: str, args: dict[str, Any], service: LibraryDocsSer
             args, "packet_tokens", default=1_500, min_value=256, max_value=2_000
         ) or 1_500
         recovery = _bounded_recovery_action(raw)
-        source_search_edit_authorized = bool(
-            mutation_intent.operation != "none"
+        source_search_allowed = bool(
+            kind == "patch_context"
             and not raw.get("hard_stop")
             and not raw.get("requires_confirmation")
             and not is_operational_recovery_action(recovery)
         )
-        kind = projection_kind(question)
         if kind == "docs_answer":
             selection_trace: dict[str, Any] = {}
             projection, snapshot = project_docs_answer(
@@ -415,7 +415,7 @@ def handle_context_tool(name: str, args: dict[str, Any], service: LibraryDocsSer
                 _annotate_recovery_handoff(
                     projection,
                     recovery,
-                    edit_authorized=source_search_edit_authorized,
+                    edit_authorized=False,
                 )
                 _prioritize_module_recovery_projection(projection)
                 _bound_recoverable_insufficient_projection(
@@ -426,7 +426,7 @@ def handle_context_tool(name: str, args: dict[str, Any], service: LibraryDocsSer
                 _annotate_recovery_handoff(
                     projection,
                     recovery,
-                    edit_authorized=source_search_edit_authorized,
+                    edit_authorized=False,
                 )
                 _prioritize_module_recovery_projection(projection)
                 _bound_recoverable_insufficient_projection(
@@ -473,12 +473,36 @@ def handle_context_tool(name: str, args: dict[str, Any], service: LibraryDocsSer
             mutation_intent_contract=mutation_intent,
         )
         mutation = packet.get("mutation_intent") if isinstance(packet.get("mutation_intent"), dict) else {}
-        if source_search_edit_authorized and mutation.get("ready") is not True:
+        if source_search_allowed and mutation.get("ready") is not True:
             requested = mutation.get("requested_targets") if isinstance(mutation.get("requested_targets"), list) else []
+            resolved_values = {
+                str(item.get("requested_value") or "").casefold()
+                for item in mutation.get("resolved_targets") or []
+                if isinstance(item, dict) and item.get("exists") is True
+            }
+            for item in raw.get("context_pack") or []:
+                if not isinstance(item, dict) or str(item.get("source_class") or "").casefold() not in {
+                    "code_graph", "repo_map", "project_file", "source_evidence", "test_evidence",
+                }:
+                    continue
+                path = str(item.get("path") or item.get("source_path") or "").replace("\\", "/").casefold()
+                if path:
+                    resolved_values.add(path)
+                metadata = item.get("metadata") if isinstance(item.get("metadata"), dict) else {}
+                for source in (item, metadata):
+                    for key in ("symbols", "matched_symbols", "symbol_names"):
+                        resolved_values.update(
+                            str(value.get("name") if isinstance(value, dict) else value).casefold()
+                            for value in source.get(key) or []
+                        )
+            prioritized = sorted(
+                (item for item in requested if isinstance(item, dict)),
+                key=lambda item: str(item.get("value") or "").casefold() in resolved_values,
+            )[:8]
             navigation_paths, navigation_symbols = _patch_navigation_hints(packet, raw)
             query_terms = [
                 str(item.get("value") or "")[:160]
-                for item in requested[:8]
+                for item in prioritized
                 if isinstance(item, dict) and str(item.get("value") or "").strip()
             ]
             # Project documentation can constrain an edit, but it cannot clear
@@ -492,12 +516,12 @@ def handle_context_tool(name: str, args: dict[str, Any], service: LibraryDocsSer
                 "query_terms": query_terms or [question[:160]],
                 "suggested_doc_paths": [
                     str(item.get("value") or "")[:300]
-                    for item in requested[:8]
+                    for item in prioritized
                     if isinstance(item, dict) and item.get("kind") == "path"
                 ] or navigation_paths,
                 "suggested_symbols": [
                     str(item.get("value") or "")[:160]
-                    for item in requested[:8]
+                    for item in prioritized
                     if isinstance(item, dict) and item.get("kind") == "symbol"
                 ] or navigation_symbols,
                 "requires_confirmation": False,
@@ -532,7 +556,7 @@ def handle_context_tool(name: str, args: dict[str, Any], service: LibraryDocsSer
             _annotate_recovery_handoff(
                 projection,
                 recovery,
-                edit_authorized=source_search_edit_authorized,
+                edit_authorized=False,
             )
         # Recovery/source-search metadata is appended after projection.  Bound
         # the *final* object unconditionally so no post-format mutation can
@@ -542,7 +566,7 @@ def handle_context_tool(name: str, args: dict[str, Any], service: LibraryDocsSer
             _annotate_recovery_handoff(
                 projection,
                 recovery,
-                edit_authorized=source_search_edit_authorized,
+                edit_authorized=False,
             )
             _bound_recoverable_insufficient_projection(
                 projection, max_tokens=output_budget,

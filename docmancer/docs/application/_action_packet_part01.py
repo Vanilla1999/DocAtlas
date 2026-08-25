@@ -54,7 +54,23 @@ def _ensure_selection_survives_packet(
         ), None)
         if assigned_unit is not None:
             assigned_survived = assigned_survived and assigned_unit.unit_text.casefold() in visible_text
-        if requirement.kind == "evidence_path":
+        if requirement.proof_role == "target_identity":
+            mutation = packet.get("mutation_intent") or {}
+            resolved_bindings = {
+                (
+                    str(target.get("requested_value") or "").casefold(),
+                    str(target.get("evidence_id") or ""),
+                )
+                for key in ("resolved_targets", "preserved_targets")
+                for target in mutation.get(key) or []
+                if isinstance(target, dict)
+            }
+            satisfied = any(
+                requested == requirement.value.casefold()
+                and evidence_id in retained_evidence_ids
+                for requested, evidence_id in resolved_bindings
+            )
+        elif requirement.kind == "evidence_path":
             paths = {
                 _normalized_source_key(row.get("path"))
                 for row in packet.get("source_of_truth") or [] if isinstance(row, dict)
@@ -65,7 +81,7 @@ def _ensure_selection_survives_packet(
                 _normalized_source_key(row.get("path"))
                 for row in target.get("likely_files") or [] if isinstance(row, dict)
             }
-            satisfied = assigned_survived and _normalized_source_key(requirement.value) in paths
+            satisfied = _normalized_source_key(requirement.value) in paths
         elif requirement.kind == "exact_version":
             satisfied = assigned_survived and any(
                 _evidence_id(dict(item.original)) in retained_evidence_ids
@@ -147,6 +163,8 @@ def _declares_canonical_authority(item: dict[str, Any]) -> bool:
 
 
 def _critical_fact_count(item: dict[str, Any]) -> int:
+    if str(item.get("source_class") or "") in _CODE_SOURCE_CLASSES:
+        return 0
     facts, oversized = _extract_facts(_content_text(item))
     return oversized + sum(
         1 for fact_type, _ in facts if fact_type in {"required", "forbidden", "validation"}
@@ -475,7 +493,11 @@ def _add_mandatory_requirement_witnesses(
         requirement.requirement_id: requirement
         for requirement in selection.requirements
         if requirement.mandatory
-        and requirement.kind in {"exact_term", "entity", "canonical_policy"}
+        and requirement.kind in {
+            "exact_term", "entity", "canonical_policy",
+            "behavioral_contract", "cross_module_invariant",
+        }
+        and requirement.proof_role != "target_identity"
     }
     source_ids = {
         str(row.get("evidence_id") or "")
@@ -498,6 +520,22 @@ def _add_mandatory_requirement_witnesses(
                     "evidence_ids": [evidence_id],
                 })
                 mandatory_rows.add((fact, evidence_id))
+        custom_witnesses = [
+            witness for witness in candidate.requirement_witnesses
+            if witness.requirement_id in requirements
+            and requirements[witness.requirement_id].kind in {
+                "behavioral_contract", "cross_module_invariant",
+            }
+        ]
+        for witness in custom_witnesses:
+            if not witness.unit_text or _content_instruction_risk_flags(witness.unit_text):
+                continue
+            packet["implementation_guidance"].append({
+                "text": witness.unit_text,
+                "evidence_ids": [evidence_id],
+            })
+            mandatory_rows.add((witness.unit_text, evidence_id))
+            visible_text += "\n" + witness.unit_text.casefold()
         remaining = [
             requirements[requirement_id]
             for requirement_id in sorted(candidate.covered_requirement_ids)
@@ -674,6 +712,7 @@ def _dedupe_cited(rows: Iterable[dict[str, Any]], key: str) -> list[dict[str, An
 
 
 def _cited_evidence_ids(packet: dict[str, Any]) -> set[str]:
+    mutation = packet.get("mutation_intent") or {}
     rows = [
         *(packet["task_interpretation"].get("acceptance_conditions") or []),
         *packet["target_surface"]["likely_files"],
@@ -684,11 +723,16 @@ def _cited_evidence_ids(packet: dict[str, Any]) -> set[str]:
         *packet["validation"]["compile"],
         *packet["validation"]["tests"],
         *packet["validation"]["semantic_checks"],
+        *(mutation.get("resolved_targets") or []),
+        *(mutation.get("preserved_targets") or []),
     ]
     return {
         str(ref)
         for row in rows
-        for ref in (row.get("evidence_ids") or [])
+        for ref in (
+            row.get("evidence_ids")
+            or ([row.get("evidence_id")] if row.get("evidence_id") else [])
+        )
         if isinstance(row, dict) and ref
     }
 

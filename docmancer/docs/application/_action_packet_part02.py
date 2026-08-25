@@ -183,19 +183,18 @@ def _remove_one_budget_item(
         _prune_orphan_sources(packet, required_source_keys)
         return True
 
+    symbols = packet["target_surface"]["symbols"]
+    if symbols:
+        symbols.pop()
+        _record_omission(packet, "target_surface.symbols")
+        _prune_orphan_sources(packet, required_source_keys)
+        return True
     objective = str(packet["task_interpretation"].get("objective") or "")
     if len(objective) > 32:
         target = max(32, len(objective) - max(32, len(objective) // 4))
         shortened, removed = _bounded_text(objective, target)
         packet["task_interpretation"]["objective"] = shortened
         _record_omission(packet, "task_interpretation.objective_characters", removed)
-        return True
-
-    symbols = packet["target_surface"]["symbols"]
-    if symbols:
-        symbols.pop()
-        _record_omission(packet, "target_surface.symbols")
-        _prune_orphan_sources(packet, required_source_keys)
         return True
 
     likely_files = packet["target_surface"]["likely_files"]
