@@ -119,6 +119,9 @@ def test_description_then_fix_is_one_shared_change_intent_but_examples_are_not()
 
     assert is_change_request('The guide says "Fix the browser gate." This is only an example.') is False
     assert is_change_request("Example:\n```text\nFix the browser gate.\n```\nExplain the example.") is False
+    assert is_change_request(
+        "Use Case: Возврат запроса в HELP. Создать новый запрос открывает экран создания новой заявки."
+    ) is False
 
 
 def test_source_fact_separates_document_identity_from_browser_behavior():
@@ -214,7 +217,7 @@ def test_exact_task_packet_keeps_behavioral_contracts_under_visible_2000_token_c
     )
 
     assert packet["status"] != "insufficient_evidence"
-    assert packet["estimated_tokens"] <= 1_952
+    assert packet["estimated_tokens"] <= 2_000
     assert packet["mutation_intent"]["operation"] == "modify"
     assert packet["mutation_intent"]["ready"] is True
     assert {
