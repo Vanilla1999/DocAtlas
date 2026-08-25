@@ -6,6 +6,11 @@ import subprocess
 import sys
 from dataclasses import replace
 
+from eval.task_level.benchmark_integrity import (
+    collect_public_pytest_inventory,
+    validate_captured_final_patch,
+    validate_declared_public_tests,
+)
 from eval.task_level.analysis import task23_report
 from eval.task_level.analysis.task23_decision import apply_protocol_amendment
 from eval.task_level.analysis.task23_report import _failure_reason, build_task23_report
@@ -67,7 +72,7 @@ def _run_task33_oracles(workspace):
     )
 
 
-def test_task33_contracts_cover_exactly_the_three_effective_tasks():
+def test_task33_contracts_cover_exactly_the_three_effective_tasks(tmp_path):
     tasks = {task.task_id: task for task in load_tasks(TASKS_PATH)}
     effective = _effective_protocol()
     expected = {entry["task_id"] for entry in effective["tasks"]}
@@ -91,6 +96,88 @@ def test_task33_contracts_cover_exactly_the_three_effective_tasks():
         protocol_tasks[broken.task_id],
     ).errors
     assert len(evaluation_contract_registry_sha256()) == 64
+
+    task = tasks["decisive_nbo_cross_module_gate_large_001"]
+    inventory_workspace = tmp_path / "inventory"
+    materialize_fixture(task, inventory_workspace)
+    inventory = validate_declared_public_tests(
+        task, collect_public_pytest_inventory(task, inventory_workspace)
+    )
+    assert inventory["missing"] == [
+        "tests/test_browser_permission_gate.py::test_scan_source_still_exposes_gate_for_cross_module_contract"
+    ]
+    assert inventory["requires_versioned_correction"] is True
+
+    gold = TASK_LEVEL_ROOT / "oracles" / f"{task.task_id}.patch"
+    valid = validate_captured_final_patch(task, gold)
+    assert valid["status"] == "valid"
+    assert valid["declared_public_tests"] == inventory
+    assert valid["changed_files"] == valid["patch_surface"]["changed_files"]
+    assert valid["contract_valid"] is True
+    assert valid["semantic_contract"]["missing_requirements"] == []
+
+    mutation_workspace = tmp_path / "mutation"
+    materialize_fixture(task, mutation_workspace)
+    subprocess.run(["git", "apply", str(gold)], cwd=mutation_workspace, check=True)
+    sync = mutation_workspace / "lib/modules/sync/application/offline_sync_gate.dart"
+    sync_text = sync.read_text(encoding="utf-8")
+    sync.write_text(
+        sync_text.replace(
+            "    return _permissionService.evaluateFlowEntry(\n"
+            "      result,\n"
+            "      allowOfflineFallback: false,\n"
+            "    ) == PermissionDecision.allow;",
+            "    final decision = _permissionService.evaluateFlowEntry(\n"
+            "      result,\n"
+            "      allowOfflineFallback: false,\n"
+            "    );\n"
+            "    return decision != PermissionDecision.block;",
+            1,
+        ),
+        encoding="utf-8",
+    )
+    mutation = subprocess.run(
+        ["git", "diff", "--binary", "HEAD", "--"],
+        cwd=mutation_workspace,
+        text=True,
+        stdout=subprocess.PIPE,
+        check=True,
+    ).stdout
+    assert "decision != PermissionDecision.block" in mutation
+    mutation_patch = tmp_path / "offline-sync-mutation.patch"
+    mutation_patch.write_text(mutation, encoding="utf-8")
+    mutated = validate_captured_final_patch(task, mutation_patch)
+    assert mutated["public_tests_passed"] is True
+    assert mutated["hidden_tests_passed"] is False
+    assert {
+        "offline_sync_uses_shared_gate",
+        "no_duplicate_flow_interpretation",
+    }.issubset(mutated["semantic_contract"]["missing_requirements"])
+    assert mutated["status"] == "invalid"
+
+    outside_workspace = tmp_path / "outside"
+    materialize_fixture(task, outside_workspace)
+    (outside_workspace / "README.md").write_text("tampered\n", encoding="utf-8")
+    outside_patch = tmp_path / "outside.patch"
+    outside_patch.write_text(
+        subprocess.run(
+            ["git", "diff", "--binary", "HEAD", "--"],
+            cwd=outside_workspace,
+            text=True,
+            stdout=subprocess.PIPE,
+            check=True,
+        ).stdout,
+        encoding="utf-8",
+    )
+    rejected = validate_captured_final_patch(task, outside_patch)
+    assert rejected["patch_surface"]["status"] == "failed"
+    assert rejected["status"] == "invalid"
+
+    broken_patch = tmp_path / "broken.patch"
+    broken_patch.write_text("not a patch\n", encoding="utf-8")
+    broken = validate_captured_final_patch(task, broken_patch)
+    assert broken["patch_applied"] is False
+    assert broken["reason"] == "patch_apply_failed"
 
 
 def test_scan_gate_oracle_requires_exact_shared_entry_call_semantics():

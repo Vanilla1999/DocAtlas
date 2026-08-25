@@ -530,8 +530,34 @@ def _add_mandatory_requirement_witnesses(
         for witness in custom_witnesses:
             if not witness.unit_text or _content_instruction_risk_flags(witness.unit_text):
                 continue
-            packet["implementation_guidance"].append({
-                "text": witness.unit_text,
+            requirement = requirements[witness.requirement_id]
+            field = (
+                "required_invariants"
+                if requirement.kind == "cross_module_invariant"
+                else "implementation_guidance"
+            )
+            text = witness.unit_text
+            if requirement.kind == "cross_module_invariant":
+                targets = [
+                    value.casefold()
+                    for value in requirement.value.splitlines()
+                    if value
+                ]
+                text = next((
+                    fact
+                    for modality, fact in _extract_facts(witness.unit_text)[0]
+                    if modality == "required"
+                    and all(target in fact.casefold() for target in targets)
+                ), "")
+                if not text:
+                    continue
+                packet["implementation_guidance"] = [
+                    row
+                    for row in packet["implementation_guidance"]
+                    if row.get("text") != text
+                ]
+            packet[field].append({
+                "text": text,
                 "evidence_ids": [evidence_id],
             })
             mandatory_rows.add((witness.unit_text, evidence_id))
@@ -561,6 +587,22 @@ def _add_mandatory_requirement_witnesses(
     packet["implementation_guidance"] = _dedupe_cited(
         packet["implementation_guidance"], "text"
     )
+    packet["required_invariants"] = _dedupe_cited(
+        packet["required_invariants"], "text"
+    )
+    invariant_texts = [
+        str(row.get("text") or "")
+        for row in packet["required_invariants"]
+        if row.get("text")
+    ]
+    packet["implementation_guidance"] = [
+        row
+        for row in packet["implementation_guidance"]
+        if not any(
+            invariant in str(row.get("text") or "")
+            for invariant in invariant_texts
+        )
+    ]
     return mandatory_rows
 
 

@@ -62,3 +62,21 @@ def test_acceptance_conditions_are_mandatory_validation_requirements() -> None:
         item.query_extraction_kind == "validation_requirement"
         for item in build_patch_evidence_requirements(plan)
     )
+
+
+def test_coordinated_multi_target_behavior_requires_cross_module_proof() -> None:
+    coordinated = build_patch_request_plan(
+        "Fix partial permission handling in BrowserPermissionGate and PermissionService."
+    )
+    targets_only = build_patch_request_plan(
+        "Update BrowserPermissionGate and PermissionService."
+    )
+
+    assert any(
+        item.kind == "cross_module_invariant"
+        for item in build_patch_requirements(coordinated)
+    )
+    assert not any(
+        item.kind == "cross_module_invariant"
+        for item in build_patch_requirements(targets_only)
+    )

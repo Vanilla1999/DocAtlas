@@ -58,7 +58,7 @@ def test_exact_permission_patch_is_publicly_edit_ready() -> None:
             "authority": "canonical",
             "content": (
                 "BrowserPermissionGate, ScanPermissionGate, OfflineSyncGate, and "
-                "PermissionService share the partial permission handling contract."
+                "PermissionService must share the partial permission handling contract."
             ),
         },
     ]
@@ -79,6 +79,12 @@ def test_exact_permission_patch_is_publicly_edit_ready() -> None:
     assert payload["mutation_ready"] is True
     assert payload["edit_ready"] is True
     assert payload["mutation_intent"]["ready"] is True
+    cross_module = next(
+        item for item in payload["invariants"]
+        if "BrowserPermissionGate" in item["text"]
+        and "PermissionService" in item["text"]
+    )
+    assert cross_module["evidence_ids"]
     assert {
         target["requested_value"]
         for target in payload["mutation_intent"]["resolved_targets"]
@@ -114,6 +120,26 @@ def test_source_search_recovery_never_authorizes_editing() -> None:
     assert payload["investigation_allowed"] is True
     assert payload["edit_ready"] is False
     assert payload["source_search_status"] == "required"
+
+
+def test_missing_cross_module_proof_requires_source_search_despite_resolved_targets() -> None:
+    payload = handle_context_tool(
+        "get_docs_context",
+        {
+            "question": "Fix partial permission handling in BrowserPermissionGate and PermissionService.",
+            "project_path": "/repo",
+            "delivery_strategy": "bounded_direct",
+        },
+        _Facade([
+            _source("lib/browser_permission_gate.dart", "class BrowserPermissionGate"),
+            _source("lib/permission_service.dart", "class PermissionService"),
+        ]),
+    )
+
+    assert payload["status"] == "insufficient_evidence"
+    assert payload["edit_ready"] is False
+    assert payload["source_search_status"] == "required"
+    assert "cross-module invariant" in payload["recommended_next_action"]["reason"]
 
 
 def test_project_docs_cannot_authorize_source_mutation_target() -> None:
@@ -159,7 +185,7 @@ def test_source_recovery_prioritizes_unresolved_target_after_first_eight() -> No
     assert paths[8] in action["query_terms"]
 
 
-def test_exact_permission_patch_passes_real_project_service(
+def test_real_project_service_fails_closed_when_mandatory_proof_exceeds_budget(
     tmp_path, monkeypatch,
 ) -> None:
     template = (
@@ -223,6 +249,7 @@ must not be edited directly.
     )
 
     assert payload["kind"] == "patch_context"
-    assert payload["status"] in {"ok", "truncated"}, payload.get("missing")
-    assert payload["mutation_ready"] is True
-    assert payload["edit_ready"] is True
+    assert payload["status"] == "insufficient_evidence"
+    assert payload["edit_ready"] is False
+    assert payload["source_search_status"] == "required"
+    assert "packet budget" in payload["missing"][0]

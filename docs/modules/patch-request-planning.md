@@ -24,7 +24,8 @@ operation-specific parent, existence, and collision contracts.
 Patch selection uses only the typed requirements produced from the patch plan:
 
 - `target_declaration` and `preserve_declaration` bind requested identities;
-- `behavioral_contract` and `cross_module_invariant` bind requested behavior;
+- `behavioral_contract` and assignment-bound `cross_module_invariant` entries
+  bind coordinated behavior across multiple mutation targets;
 - `preserve_constraint` retains explicit negative polarity;
 - `generated_file_constraint` prevents direct edits to generated artifacts;
 - `validation_requirement` binds explicit validation expectations.
@@ -45,6 +46,12 @@ A successful public `patch_context` may set `edit_ready=true` only when:
 3. the ActionPacket preserves every mandatory evidence assignment;
 4. packet and public projection validation succeed within their token bounds;
 5. top-level and nested mutation readiness agree.
+
+Cross-module witnesses must be canonical normative statements and remain cited
+in `required_invariants`. Missing proof or loss of a mandatory assignment during
+budget fitting returns `insufficient_evidence`, requires local source search,
+and keeps `edit_ready=false`. Ordinary truncation may remain edit-ready only
+when every mandatory assignment survives.
 
 Preserve targets remain cited constraints and never enter the editable target
 surface.

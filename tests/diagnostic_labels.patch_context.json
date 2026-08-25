@@ -7,8 +7,8 @@
   },
   "node_overrides": {},
   "module_node_hashes": {
-    "tests/docs/test_patch_context_public.py": "389cf8176d86069b009e557e67f5ef95a73d5dddeeb5529ef60412e0a353aa4e",
-    "tests/docs/test_patch_requirements.py": "971ee9588bc166a3a39cdf84957293f8cdc2a0a874bd354f5f5ddf338a2ad700",
+    "tests/docs/test_patch_context_public.py": "bda816d36d0deebcbedc208ba498010ba3facbbc0530265e6d35b8d0cbd07f5f",
+    "tests/docs/test_patch_requirements.py": "66d5987bcc6a69bced6b63af683d85e9b37238e2795b93b481d073cb894c85cf",
     "tests/docs/test_patch_request_plan.py": "70c040542b75f1cadce7caf218c917c757fc53713cd63ea3279b5ecd6d2d096a"
   }
 }

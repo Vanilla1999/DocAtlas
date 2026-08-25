@@ -574,6 +574,11 @@ def project_patch_context(
         sources.append(projected)
         snapshot[evidence_id] = _snapshot_entry(item, projected)
 
+    mutation_ready = bool((packet.get("mutation_intent") or {}).get("ready"))
+    mandatory_assignments_survived = not bool(
+        (packet.get("omitted_counts") or {}).get("mandatory_requirements")
+    )
+    packet_valid = packet.get("status") in {"ok", "truncated"}
     payload: dict[str, Any] = {
         "status": packet.get("status"),
         "kind": "patch_context",
@@ -587,8 +592,8 @@ def project_patch_context(
         "implementation_guidance": deepcopy(packet.get("implementation_guidance") or []),
         "checks": deepcopy(packet.get("validation") or {"compile": [], "tests": [], "semantic_checks": []}),
         "mutation_intent": deepcopy(packet.get("mutation_intent") or {}),
-        "mutation_ready": bool((packet.get("mutation_intent") or {}).get("ready")),
-        "edit_ready": bool((packet.get("mutation_intent") or {}).get("ready")),
+        "mutation_ready": mutation_ready,
+        "edit_ready": packet_valid and mutation_ready and mandatory_assignments_survived,
         "investigation_allowed": True,
         "source_search_status": "not_required",
         "uncertainties": deepcopy(packet.get("uncertainties") or []),
@@ -797,6 +802,13 @@ def validate_model_visible_projection(
             errors.append("patch context requires a mutation intent contract")
         elif mutation.get("operation") != "none" and mutation.get("ready") is not True:
             errors.append("successful patch context requires operation-aware target readiness")
+        if payload.get("edit_ready") is not bool(
+            status in {"ok", "truncated"}
+            and payload.get("mutation_ready") is True
+            and not (payload.get("omitted_counts") or {}).get("mandatory_requirements")
+            and payload.get("source_search_status") != "required"
+        ):
+            errors.append("patch context edit readiness is inconsistent with validated support")
         for item in _cited_patch_items(payload):
             refs = item.get("evidence_ids")
             if not isinstance(refs, list) or not refs or any(ref not in ids for ref in refs):

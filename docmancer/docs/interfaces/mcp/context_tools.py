@@ -14,6 +14,7 @@ from docmancer.docs.interfaces.mcp.recovery_projection import (
     _attach_recovery_diagnosis,
     _bound_recoverable_insufficient_projection,
     _recovery_summary,
+    cross_module_proof_missing,
     is_operational_recovery_action,
 )
 from docmancer.docs.application.model_visible_projection import (
@@ -473,7 +474,8 @@ def handle_context_tool(name: str, args: dict[str, Any], service: LibraryDocsSer
             mutation_intent_contract=mutation_intent,
         )
         mutation = packet.get("mutation_intent") if isinstance(packet.get("mutation_intent"), dict) else {}
-        if source_search_allowed and mutation.get("ready") is not True:
+        coordinated_proof_missing = cross_module_proof_missing(packet)
+        if source_search_allowed and (mutation.get("ready") is not True or coordinated_proof_missing):
             requested = mutation.get("requested_targets") if isinstance(mutation.get("requested_targets"), list) else []
             resolved_values = {
                 str(item.get("requested_value") or "").casefold()
@@ -508,11 +510,18 @@ def handle_context_tool(name: str, args: dict[str, Any], service: LibraryDocsSer
             # Project documentation can constrain an edit, but it cannot clear
             # the code-search obligation until the requested mutation target is
             # locally resolved.
+            recovery_reason = (
+                "Find canonical normative proof for the coordinated cross-module invariant before editing."
+                if coordinated_proof_missing
+                else "Resolve the requested mutation target before editing."
+            )
+            if "retrieval_stage_budget_exceeded" in (raw.get("warnings") or []):
+                recovery_reason += " The relevant retrieval stage exceeded its budget."
             recovery = {
                 "tool": "code_search",
                 "type": "search_local_source",
                 "handled_by": "coding_agent",
-                "reason": "Resolve the requested mutation target before editing.",
+                "reason": recovery_reason,
                 "query_terms": query_terms or [question[:160]],
                 "suggested_doc_paths": [
                     str(item.get("value") or "")[:300]
@@ -545,6 +554,13 @@ def handle_context_tool(name: str, args: dict[str, Any], service: LibraryDocsSer
             evidence_items=raw.get("context_pack") or [],
             max_tokens=output_budget,
         )
+        if (
+            isinstance(recovery, dict)
+            and recovery.get("type") == "search_local_source"
+            and projection.get("status") in {"ok", "truncated"}
+        ):
+            projection["source_search_status"] = "required"
+            projection["edit_ready"] = False
         if projection.get("status") == "insufficient_evidence" and recovery:
             projection = project_insufficient(
                 kind="patch_context",

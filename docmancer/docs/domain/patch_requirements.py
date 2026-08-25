@@ -75,7 +75,7 @@ def build_patch_requirements(plan: PatchRequestPlan) -> tuple[PatchRequirement, 
             "validation_requirement", clause.text, True, "user_request",
             "acceptance_condition", clause.query_span_start, clause.query_span_end,
         ))
-    if len(plan.mutation_targets) > 1 and ":across" in plan.surface_id:
+    if len(plan.mutation_targets) > 1 and plan.behavioral_requirements:
         value = "\n".join(target.value for target in plan.mutation_targets)
         requirements.append(PatchRequirement(
             _requirement_id("cross_module_invariant", value, 0),

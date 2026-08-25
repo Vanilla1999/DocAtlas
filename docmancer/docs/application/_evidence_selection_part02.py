@@ -174,8 +174,11 @@ def _legacy_requirement_matches_unit(
         }
         matches = candidate.authority == "canonical" and len(terms & set(re.findall(r"[a-z0-9_]+", text))) >= min(3, len(terms))
     elif requirement.kind == "cross_module_invariant":
-        matches = candidate.authority == "canonical" and all(
-            value.casefold() in text for value in requirement.value.splitlines() if value
+        targets = [value.casefold() for value in requirement.value.splitlines() if value]
+        matches = candidate.authority == "canonical" and any(
+            _PATCH_FACT_RE.search(segment)
+            and all(target in segment.casefold() for target in targets)
+            for segment in re.split(r"(?<=[.!?])\s+", unit.text)
         )
     elif requirement.kind in {"exact_term", "entity"}:
         matches = requirement_value_visible(requirement.value, unit.text)
