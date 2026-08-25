@@ -166,6 +166,27 @@ def test_project_docs_cannot_authorize_source_mutation_target() -> None:
     assert payload["source_search_status"] == "required"
 
 
+def test_project_doc_source_filename_alias_cannot_authorize_mutation() -> None:
+    payload = handle_context_tool(
+        "get_docs_context",
+        {
+            "question": "Fix BrowserPermissionGate.",
+            "project_path": "/repo",
+            "delivery_strategy": "bounded_direct",
+        },
+        _Facade([{
+            "path": "src/browser_permission_gate.py",
+            "source": "src/browser_permission_gate.py",
+            "source_class": "project_doc",
+            "authority": "canonical",
+            "content": "BrowserPermissionGate must remain documented.",
+        }]),
+    )
+
+    assert payload["status"] == "insufficient_evidence"
+    assert payload["edit_ready"] is False
+
+
 def test_source_recovery_prioritizes_unresolved_target_after_first_eight() -> None:
     paths = [f"src/target_{index}.py" for index in range(1, 10)]
     payload = handle_context_tool(

@@ -5,13 +5,21 @@ from dataclasses import asdict, dataclass, field
 from pathlib import Path
 from typing import Any, Literal
 
+from docmancer.docs.application.model_visible_projection import (
+    validate_model_visible_projection,
+)
+
 from eval.task_level.evaluators.contract import ContractEvaluation
 from eval.task_level.schemas import TaskSpec
 from eval.task_level.task33_pilot import TASK33C_PILOT_TASK_ID
 
 
 SourceType = Literal["issue", "project_doc", "code_symbol", "library_doc", "hidden_test"]
-MetricSource = Literal["model_visible_action_packet", "legacy_action_checklist"]
+MetricSource = Literal[
+    "model_visible_action_packet",
+    "invalid_model_visible_projection",
+    "legacy_action_checklist",
+]
 
 
 @dataclass(frozen=True)
@@ -176,26 +184,39 @@ def evaluate_actionability(
     contract: ContractEvaluation,
 ) -> ActionabilityEvaluation:
     items = _load_checklist(run_output_dir / "action_checklist.json")
-    projection = _load_projection(run_output_dir / "model_visible_patch_context.json")
+    projection, projection_error = _load_projection(
+        run_output_dir / "model_visible_patch_context.json",
+        run_output_dir / "model_visible_evidence_snapshot.json",
+    )
     requirements = requirements_for_task(task.task_id)
     allowed = [req for req in requirements if req.allowed_for_agent]
     hidden = [req.requirement_id for req in requirements if not req.allowed_for_agent]
     warnings: list[str] = []
+    if projection_error is not None:
+        warnings.append(f"invalid_model_visible_projection:{projection_error}")
 
     if projection is not None:
         metrics = _projection_metrics(projection, allowed)
+        item_text = "\n".join(json.dumps(item, sort_keys=True) for item in items)
+        recalled = [req for req in allowed if _requirement_in_text(req, item_text)]
+        top_item_text = "\n".join(json.dumps(item, sort_keys=True) for item in items[:3])
+        salient = [req for req in recalled if _requirement_in_text(req, top_item_text)]
+        precise = [item for item in items if _item_has_visible_source(item)]
+        used_count = _checklist_used_count(items, patch_path, trajectory_path)
         result = ActionabilityEvaluation(
             task_id=task.task_id,
             condition_id=condition_id,
             checklist_items=items,
-            # Compatibility fields intentionally mirror the model-visible
-            # metrics when ActionPacket artifacts exist. Downstream reports
-            # therefore cannot keep emitting false zeroes merely because the
-            # old action_checklist.json was not produced.
-            critical_contract_recall=metrics["requirement_recall"],
-            critical_contract_salience=metrics["critical_invariant_recall"],
-            action_checklist_precision=metrics["requirement_precision"],
-            action_checklist_used=True,
+            critical_contract_recall=(
+                round(len(recalled) / len(allowed), 4) if allowed else 0.0
+            ),
+            critical_contract_salience=(
+                round(len(salient) / len(allowed), 4) if allowed else 0.0
+            ),
+            action_checklist_precision=(
+                round(len(precise) / len(items), 4) if items else 0.0
+            ),
+            action_checklist_used=used_count > 0,
             patch_contract_satisfaction=contract.to_json(),
             hidden_only_requirements_excluded=hidden,
             metric_source="model_visible_action_packet",
@@ -218,6 +239,21 @@ def evaluate_actionability(
         if result.projection_status in {"ok", "truncated"} and result.mutation_ready is not True:
             warnings.append("successful_projection_without_mutation_readiness")
             result = ActionabilityEvaluation(**{**result.to_json(), "warnings": warnings})
+    elif projection_error is not None:
+        result = ActionabilityEvaluation(
+            task_id=task.task_id,
+            condition_id=condition_id,
+            checklist_items=items,
+            critical_contract_recall=0.0,
+            critical_contract_salience=0.0,
+            action_checklist_precision=0.0,
+            action_checklist_used=False,
+            patch_contract_satisfaction=contract.to_json(),
+            hidden_only_requirements_excluded=hidden,
+            metric_source="invalid_model_visible_projection",
+            projection_status="invalid",
+            warnings=warnings,
+        )
     else:
         item_text = "\n".join(json.dumps(item, sort_keys=True) for item in items)
         recalled = [req for req in allowed if _requirement_in_text(req, item_text)]
@@ -264,23 +300,33 @@ def _load_checklist(path: Path) -> list[dict[str, Any]]:
     return data if isinstance(data, list) else []
 
 
-def _load_projection(path: Path) -> dict[str, Any] | None:
+def _load_projection(
+    path: Path,
+    snapshot_path: Path,
+) -> tuple[dict[str, Any] | None, str | None]:
     if not path.exists():
-        return None
+        return None, None
     try:
         data = json.loads(path.read_text(encoding="utf-8"))
+        snapshot = json.loads(snapshot_path.read_text(encoding="utf-8"))
     except (OSError, json.JSONDecodeError):
-        return None
-    return data if isinstance(data, dict) else None
+        return None, "artifact_or_snapshot_unreadable"
+    if not isinstance(data, dict) or not isinstance(snapshot, dict):
+        return None, "artifact_or_snapshot_not_object"
+    errors = validate_model_visible_projection(
+        data,
+        snapshot=snapshot,
+        max_tokens=2_000,
+    )
+    if errors:
+        return None, ";".join(errors)
+    return data, None
 
 
 def _projection_metrics(
     projection: dict[str, Any],
     requirements: list[ContractRequirement],
 ) -> dict[str, Any]:
-    visible_text = json.dumps(projection, sort_keys=True, ensure_ascii=False)
-    recalled = [req for req in requirements if _requirement_in_text(req, visible_text)]
-
     invariants = _dict_rows(projection.get("invariants"))
     guidance = _dict_rows(projection.get("implementation_guidance"))
     acceptance = _dict_rows(projection.get("acceptance_conditions"))
@@ -293,6 +339,10 @@ def _projection_metrics(
     behavioral_rows = [*invariants, *guidance]
     requirement_rows = [*invariants, *guidance, *acceptance]
     requirement_row_texts = [json.dumps(row, sort_keys=True, ensure_ascii=False) for row in requirement_rows]
+    recalled = [
+        req for req in requirements
+        if any(_requirement_in_text(req, text) for text in requirement_row_texts)
+    ]
     matched_rows = [
         text for text in requirement_row_texts
         if any(_requirement_in_text(req, text) for req in requirements)

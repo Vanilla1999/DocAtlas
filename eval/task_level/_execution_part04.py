@@ -182,7 +182,19 @@ def execute_pilot(
                                     })
                                 else:
                                     _persist_delivery_prompt_sources(run_output_dir, handoff["packet"])
-                                    prompt += "\nDocAtlas ActionPacket (isolated worker):\n" + json.dumps(handoff["packet"], sort_keys=True) + "\n"
+                                    projection = handoff.get("projection")
+                                    if not isinstance(projection, dict):
+                                        setup_failed = True
+                                        _write_json_atomic(run_output_dir / "isolated_delivery_error.json", {
+                                            "status": "condition_setup_failed",
+                                            "reason": "isolated_model_visible_projection_missing",
+                                        })
+                                    else:
+                                        prompt += (
+                                            "\nDocAtlas source-backed Patch Contract (isolated worker):\n"
+                                            + json.dumps(projection, sort_keys=True)
+                                            + "\n"
+                                        )
                     if CONDITIONS[condition_id].tool_policy.inject_external_context:
                         external = inject_audited_external_context(task, run_output_dir)
                         if external.get("status") == "condition_setup_failed":

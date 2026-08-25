@@ -160,7 +160,11 @@ def _target_list(
             return tuple(targets), f"unresolved_patch_clause:{text[cursor:].strip()[:160]}"
         token = match.group(0)
         value = token[1:-1] if match.group("quoted") else token.removeprefix("./")
-        kind: Literal["path", "symbol"] = "path" if match.group("path") else "symbol"
+        kind: Literal["path", "symbol"] = (
+            "path"
+            if match.group("path") or (match.group("quoted") and re.fullmatch(_PATH_PATTERN, value))
+            else "symbol"
+        )
         polarity: Literal["mutate", "preserve"] = "preserve" if role == "preserve" else "mutate"
         targets.append(PatchTarget(
             value=value,

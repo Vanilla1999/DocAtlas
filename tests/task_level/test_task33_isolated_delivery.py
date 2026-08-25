@@ -220,6 +220,8 @@ def test_isolated_broker_persists_recomputable_evidence_and_bounded_handoff(tmp_
         "isolated_delegation_envelope.json",
         "isolated_delivery_attempt.json",
         "isolated_delivery_metrics.json",
+        "model_visible_evidence_snapshot.json",
+        "model_visible_patch_context.json",
         "worker_usage_proof.json",
     }
     manifest = json.loads((tmp_path / "host_evidence_manifest.json").read_text(encoding="utf-8"))

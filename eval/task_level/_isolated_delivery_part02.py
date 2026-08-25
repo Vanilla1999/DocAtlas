@@ -460,6 +460,23 @@ def _deliver_with_worker(
         raise IsolatedDeliveryError("action_packet_ignored_host_retrieval_issues")
 
     packet_payload = dict(packet)
+    projection: dict[str, Any] | None = None
+    projection_snapshot: dict[str, dict[str, Any]] | None = None
+    if packet_payload["status"] != "insufficient_evidence":
+        projection, projection_snapshot = project_patch_context(
+            packet=packet_payload,
+            evidence_items=evidence.evidence_items,
+            max_tokens=HARD_ACTION_PACKET_TOKENS,
+        )
+        projection_errors = validate_model_visible_projection(
+            projection,
+            snapshot=projection_snapshot,
+            max_tokens=HARD_ACTION_PACKET_TOKENS,
+        )
+        if projection_errors:
+            raise IsolatedDeliveryError(
+                "invalid_isolated_model_visible_projection:" + ";".join(projection_errors)
+            )
     usage = output.usage
     usage.validate()
     metrics = {
@@ -486,6 +503,9 @@ def _deliver_with_worker(
         "index_revision": evidence.index_revision,
         "parent_visible_raw_retrieval": False,
         "parent_packet_tokens": packet_payload["estimated_tokens"],
+        "model_visible_projection_tokens": (
+            projection.get("estimated_tokens") if projection is not None else None
+        ),
         "worker_provider": usage.provider,
         "worker_model": usage.model,
         "worker_request_id": usage.request_id,
@@ -501,6 +521,9 @@ def _deliver_with_worker(
     _write_json(output_dir / "worker_usage_proof.json", usage.proof or {})
     _write_json(output_dir / "isolated_delegation_envelope.json", envelope.to_json())
     _write_json(output_dir / "action_packet.json", packet_payload)
+    if projection is not None and projection_snapshot is not None:
+        _write_json(output_dir / "model_visible_patch_context.json", projection)
+        _write_json(output_dir / "model_visible_evidence_snapshot.json", projection_snapshot)
     _write_json(output_dir / "isolated_delivery_metrics.json", metrics)
     _write_json(attempt_path, {
         "schema_version": 2,
@@ -510,7 +533,12 @@ def _deliver_with_worker(
         "envelope_fingerprint": envelope.fingerprint,
         "evidence_fingerprint": evidence.fingerprint,
     })
-    return {"status": packet_payload["status"], "packet": packet_payload, "metrics": metrics}
+    return {
+        "status": packet_payload["status"],
+        "packet": packet_payload,
+        "projection": projection,
+        "metrics": metrics,
+    }
 
 
 def persist_host_evidence(evidence: HostEvidenceSnapshot, output_dir: Path) -> None:

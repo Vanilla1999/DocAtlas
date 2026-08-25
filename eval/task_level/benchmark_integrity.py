@@ -90,6 +90,7 @@ def validate_captured_final_patch(task: TaskSpec, patch: Path) -> dict[str, Any]
         valid = (
             public.returncode == 0
             and semantic.returncode == 0
+            and declared_tests["status"] == "valid"
             and contract_valid
             and surface["status"] == "passed"
             and not semantic_contract.missing_requirements

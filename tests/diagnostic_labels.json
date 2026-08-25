@@ -365,7 +365,7 @@
     "tests/task_level/test_task23_decision.py": "5a407573cdf77b5ce38a92114700b3a5b99b2d79f172ea5d0e0ac21a887a60d4",
     "tests/task_level/test_task23_external_context.py": "88f38476b71c43f5f4c5133d1c035a183a4d46e776e58b274df124187ee24648",
     "tests/task_level/test_task23_report.py": "94b22be933941b2951828f1a001692873739c5f95e4fc826b41c29dac96d6301",
-    "tests/task_level/test_task33_codex_exploratory.py": "1510d85a60e7c7bd946e63e206862f11382c81a3472ebe4c1c2c2262fce3335e",
+    "tests/task_level/test_task33_codex_exploratory.py": "18a2f673ee33b0c01acdadab75d82cb3cfc5da1fd663ee4e4da1bdb34f4850a6",
     "tests/task_level/test_task33_evaluation_contract.py": "096d03c199966e69c3d195d0209e11cb7240012c73f84b369e13f2013f828507",
     "tests/task_level/test_task33_first_executable_guard.py": "0fd1dca00e6bde5d031d8f1fb0e018324253c5499151714096397ba24c08f7b5",
     "tests/task_level/test_task33_isolated_delivery.py": "84334c082f2b6ec0266254b988104b21254f9e1ae112fd3afe26a255f11149a3",

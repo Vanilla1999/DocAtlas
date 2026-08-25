@@ -44,13 +44,20 @@ def _target_scope(path: str) -> str:
     return "".join(part[:1].upper() + part[1:] for part in parts) or stem
 
 
-def _declared_authority_by_path(context_pack: Iterable[Mapping[str, Any]]) -> dict[str, str]:
+def _declared_authority_by_path(
+    context_pack: Iterable[Mapping[str, Any]],
+    *,
+    project_path: str | None,
+    target_paths: Iterable[str],
+) -> dict[str, str]:
     values: dict[str, str] = {}
     for item in context_pack:
         if not isinstance(item, Mapping):
             continue
         path = str(item.get("path") or item.get("source") or "").strip().replace("\\", "/").casefold()
-        authority = str(item.get("authority") or item.get("repository_authority") or "").strip().casefold()
+        authority = _effective_authority(
+            dict(item), project_path=project_path, target_paths=target_paths,
+        )
         if path and authority:
             values[path] = authority
     return values
@@ -61,6 +68,7 @@ def _behavioral_source_fact_contracts(
     required_evidence_paths: Iterable[str],
     required_target_paths: Iterable[str],
     context_pack: Iterable[Mapping[str, Any]],
+    project_path: str | None = None,
 ) -> tuple[dict[str, Any], ...]:
     """Derive one bounded source-scoped behavior obligation per affected flow.
 
@@ -82,9 +90,11 @@ def _behavioral_source_fact_contracts(
     ]
     if not docs or not targets:
         return ()
-    authority_by_path = _declared_authority_by_path(context_pack)
+    authority_by_path = _declared_authority_by_path(
+        context_pack, project_path=project_path, target_paths=targets,
+    )
     rows: list[dict[str, Any]] = []
-    used_scopes: set[str] = set()
+    scope_counts: dict[str, int] = {}
     for source_path in docs:
         source_sequence = _path_token_sequence(source_path)
         source_terms = set(source_sequence)
@@ -113,16 +123,21 @@ def _behavioral_source_fact_contracts(
             continue
         target = min(ranked, key=lambda row: row[0])[1]
         scope = _target_scope(target)
-        if not scope or scope in used_scopes:
+        if not scope:
             continue
-        used_scopes.add(scope)
+        scope_index = scope_counts.get(scope, 0)
+        scope_counts[scope] = scope_index + 1
+        requirement_id = f"behavioral_contract:{scope}"
+        if scope_index:
+            source_identity = "-".join(_path_token_sequence(source_path)) or str(scope_index + 1)
+            requirement_id += f":{source_identity}"
         declared = authority_by_path.get(source_path.casefold(), "")
         rows.append({
             "kind": "source_fact",
             "source_path": source_path,
             "scope": scope,
             "modality": "required",
-            "requirement_id": f"behavioral_contract:{scope}",
+            "requirement_id": requirement_id,
             "public_provenance": "public_task_contract",
             "proof_role": "project_rule" if declared in _TRUSTED_PROJECT_RULE_AUTHORITIES else "generic_fact",
         })
@@ -140,6 +155,20 @@ def _explicit_mutation_contract(
     plan = bound.request_plan
     if bound.operation == "none" and plan is not None and plan.operation != "none":
         bound = replace(bound, operation=plan.operation)
+    if (
+        provenance == "explicit_task_contract"
+        and bound.operation == "modify"
+        and plan is not None
+        and not plan.preserve_targets
+        and plan.destination is None
+        and plan.parent_context is None
+        and not any(item.startswith("input_limit:") for item in plan.unresolved_parts)
+    ):
+        # The evaluator-owned task contract supplies the complete mutation
+        # surface. Do not let parser uncertainty about a narrative issue body
+        # override those explicit targets; preserve/input-limit constraints
+        # remain fail-closed above.
+        bound = replace(bound, request_plan=None)
     return bound
 
 
@@ -163,6 +192,7 @@ def _promote_trusted_behavioral_witnesses(
         for row in packet.get("source_of_truth") or []
         if isinstance(row, Mapping)
         and str(row.get("path") or "").strip().replace("\\", "/").casefold() in trusted_paths
+        and str(row.get("authority") or "").casefold() == "canonical"
     }
     if not trusted_ids:
         return
@@ -206,6 +236,7 @@ def build_action_packet(*args: Any, **kwargs: Any) -> dict[str, Any]:
             required_evidence_paths=required_evidence_paths,
             required_target_paths=required_target_paths,
             context_pack=raw_context,
+            project_path=kwargs.get("project_path"),
         ))
     if public_requirements:
         by_identity: dict[str, Any] = {}

@@ -119,13 +119,15 @@ def _first_edit_correctness(
 
 
 def _regression_count(tests: list[tuple[int, str, str, bool | None]]) -> int:
-    seen_pass = False
+    previous_outcomes: dict[str, bool] = {}
     regressions = 0
-    for _, _, _, outcome in tests:
-        if outcome is True:
-            seen_pass = True
-        elif outcome is False and seen_pass:
+    for _, command, runner, outcome in tests:
+        identity = _command_fingerprint(command) if command else runner
+        if outcome is None:
+            continue
+        if outcome is False and previous_outcomes.get(identity) is True:
             regressions += 1
+        previous_outcomes[identity] = outcome
     return regressions
 
 

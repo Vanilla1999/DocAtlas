@@ -77,6 +77,22 @@ _DANGEROUS_CONTENT_PATTERNS = (
             re.IGNORECASE,
         ),
     ),
+    (
+        "instruction_override",
+        re.compile(
+            r"\b(?:ignore|disregard|override)\b.{0,80}"
+            r"\b(?:previous|prior|system|developer|agent)\s+(?:instructions?|messages?|rules?)\b",
+            re.IGNORECASE,
+        ),
+    ),
+    (
+        "system_prompt_disclosure",
+        re.compile(
+            r"\b(?:reveal|show|print|expose|disclose)\b.{0,80}"
+            r"\b(?:system|developer)\s+(?:prompt|message|instructions?)\b",
+            re.IGNORECASE,
+        ),
+    ),
 )
 
 

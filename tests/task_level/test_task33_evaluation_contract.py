@@ -110,7 +110,7 @@ def test_task33_contracts_cover_exactly_the_three_effective_tasks(tmp_path):
 
     gold = TASK_LEVEL_ROOT / "oracles" / f"{task.task_id}.patch"
     valid = validate_captured_final_patch(task, gold)
-    assert valid["status"] == "valid"
+    assert valid["status"] == "invalid"
     assert valid["declared_public_tests"] == inventory
     assert valid["changed_files"] == valid["patch_surface"]["changed_files"]
     assert valid["contract_valid"] is True

@@ -232,11 +232,25 @@ def build_action_packet(
     risky_content_omissions = 0
     risky_critical_omissions = selector_risky_critical_facts
     untrusted_validation_omissions = 0
+    selected_text_by_evidence_id: dict[str, str] = {}
+    for candidate in selection.selected_candidates:
+        behavioral_witnesses = [
+            witness.unit_text
+            for witness in candidate.requirement_witnesses
+            if witness.requirement_id.startswith("behavioral_contract:")
+            and witness.unit_text
+        ]
+        if behavioral_witnesses:
+            selected_text_by_evidence_id[_evidence_id(dict(candidate.original))] = (
+                "\n".join(dict.fromkeys(behavioral_witnesses))
+            )
     for item in items:
         evidence_id = _evidence_id(item) if _source_path(item) else None
         if not evidence_id:
             continue
-        facts, omitted_facts = _extract_facts(_content_text(item))
+        facts, omitted_facts = _extract_facts(
+            selected_text_by_evidence_id.get(evidence_id, _content_text(item))
+        )
         if str(item.get("source_class") or "") in _CODE_SOURCE_CLASSES:
             # Code declarations prove target identity. They do not become
             # repository policy merely because the source file is authoritative.
@@ -315,7 +329,7 @@ def build_action_packet(
         for symbol in _explicit_symbols(item):
             symbols.append({"name": symbol, "evidence_ids": [evidence_id]})
 
-    if resolved_mutation.request_plan is not None and resolved_mutation.requested_targets:
+    if resolved_mutation.requested_targets:
         likely_file_rows = [
             {"path": target.path, "evidence_ids": [target.evidence_id]}
             for target in resolved_mutation.resolved_targets

@@ -77,6 +77,26 @@ def test_target_limit_overflow_is_reported_without_silent_truncation() -> None:
     assert "input_limit:mutation_targets" in plan.unresolved_parts
 
 
+def test_question_limit_reaches_mutation_intent_without_losing_trailing_constraints() -> None:
+    question = "Fix FooService." + " " * 4_000 + "without changing CriticalService."
+
+    intent = build_mutation_intent(question)
+
+    assert intent.operation == "none"
+    assert intent.request_plan is not None
+    assert "input_limit:question" in intent.request_plan.unresolved_parts
+    assert not evaluate_mutation_readiness(intent).ready
+
+
+def test_backtick_quoted_path_remains_a_path_target() -> None:
+    plan = build_patch_request_plan("Fix `src/foo.py`.")
+
+    assert [(item.value, item.kind) for item in plan.mutation_targets] == [
+        ("src/foo.py", "path")
+    ]
+    assert not plan.unresolved_parts
+
+
 def test_unsupported_surface_cannot_use_legacy_symbol_fallback() -> None:
     plan = build_patch_request_plan("Kindly fix BrowserPermissionGate.")
     intent = build_mutation_intent("Kindly fix BrowserPermissionGate.")
@@ -217,6 +237,33 @@ def test_rename_requires_explicit_collision_free_destination_witness() -> None:
     )
 
     assert "rename_destination_not_verified" in evaluate_mutation_readiness(resolved).missing
+
+
+def test_project_docs_cannot_resolve_source_symbol_filename_alias() -> None:
+    intent = build_mutation_intent("Fix BrowserPermissionGate.")
+    resolved = resolve_mutation_targets(
+        intent,
+        [{"path": "src/browser_permission_gate.py", "source_class": "project_doc"}],
+        evidence_id_for_item=lambda item: f"ev:{item['path']}",
+    )
+
+    assert not resolved.resolved_targets
+    assert "mutation_target_not_resolved" in evaluate_mutation_readiness(resolved).missing
+
+
+def test_project_docs_cannot_resolve_preserve_targets() -> None:
+    intent = build_mutation_intent("Fix FooService without changing BarService.")
+    resolved = resolve_mutation_targets(
+        intent,
+        [
+            {"path": "src/foo_service.py", "symbols": ["FooService"], "source_class": "code_graph"},
+            {"path": "docs/bar.md", "symbols": ["BarService"], "source_class": "project_doc"},
+        ],
+        evidence_id_for_item=lambda item: f"ev:{item['path']}",
+    )
+
+    assert not resolved.preserved_targets
+    assert "preserve_target_not_resolved" in evaluate_mutation_readiness(resolved).missing
 
 
 @pytest.mark.parametrize(

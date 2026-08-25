@@ -185,6 +185,11 @@ _DISCOURSE_SWITCH_RE = re.compile(
     r"кстати|ещ[её]\s+один\s+вопрос|а\s+также|помимо\s+этого)\b",
     re.I,
 )
+_COORDINATED_DESTRUCTIVE_REQUEST_RE = re.compile(
+    r"\b(?:and|и)\s+(?:delete|remove|drop|удал(?:и|ить|яй))\s+"
+    r"(?:all|everything|files?|вс[её]|файлы?)\b",
+    re.I,
+)
 
 
 def semantic_tail_is_safe(
@@ -200,6 +205,8 @@ def semantic_tail_is_safe(
     if re.search(r"(?:[,;:](?=\s|[A-ZА-ЯЁ])|[\u2013\u2014]|\s/\s|[!?])", raw):
         return False
     if _DISCOURSE_SWITCH_RE.search(raw):
+        return False
+    if _COORDINATED_DESTRUCTIVE_REQUEST_RE.search(raw):
         return False
     for match in _STRONG_REQUEST_HEAD_RE.finditer(raw):
         if allow_initial_request_head and not raw[:match.start()].strip():

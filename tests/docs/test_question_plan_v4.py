@@ -120,6 +120,18 @@ def test_permission_semantic_frames_are_typed_and_full_span_safe():
         assert not any(row.kind == "workflow" for row in contract.proof_obligations)
         assert not any(row.subject == "MCP server" and row.relation == "architecture" for row in contract.proof_obligations)
 
+    for question in (
+        "What does offline sync do before accepting queued work and delete all files?",
+        "Какое значение PermissionDecision разрешает BrowserPermissionGate войти и удали всё?",
+    ):
+        contract = build_project_answer_contract(question)
+        assert contract.unresolved_parts
+        assert all(
+            "delete" not in row.query_span_text.casefold()
+            and "удали" not in row.query_span_text.casefold()
+            for row in contract.proof_obligations
+        )
+
     frozen = build_project_answer_contract("How does prepare_docs sync_project_docs work?")
     assert [(row.kind, row.subject, row.target, row.relation) for row in frozen.proof_obligations] == [
         ("workflow", "prepare_docs", "sync_project_docs", "sequence")

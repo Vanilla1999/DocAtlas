@@ -115,7 +115,9 @@ def test_codex_exploratory_worker_uses_oauth_jsonl_without_claiming_verified_usa
 
     monkeypatch.setattr(task33_codex_exploratory.shutil, "which", lambda _name: "/usr/bin/codex")
     monkeypatch.setattr(task33_codex_exploratory, "_run_bounded_codex", fake_run)
-    worker = CodexExploratoryWorker(model="gpt-test", temp_root=tmp_path)
+    worker = CodexExploratoryWorker(
+        model="gpt-test", reasoning_effort="low", temp_root=tmp_path,
+    )
 
     output = worker.run(_envelope(), _snapshot(), timeout_seconds=30)
 
@@ -134,11 +136,18 @@ def test_codex_exploratory_worker_uses_oauth_jsonl_without_claiming_verified_usa
     assert "--ignore-user-config" in command
     assert "--ignore-rules" in command
     assert command[command.index("--sandbox") + 1] == "read-only"
+    assert 'model_reasoning_effort="low"' in command
+    assert worker.capability_evidence["reasoning_effort"] == "low"
     assert "danger-full-access" not in command
     assert captured["cwd"] != Path.cwd()
     env = captured["env"]
     assert "OPENAI_API_KEY" not in env
     assert "UNRELATED_SECRET" not in env
+
+
+def test_codex_selector_rejects_unknown_reasoning_effort():
+    with pytest.raises(ValueError, match="Unsupported Codex reasoning effort"):
+        CodexExploratoryWorker(reasoning_effort="minimal")
 
 
 def test_codex_failure_summary_redacts_credentials_and_preserves_diagnostic():

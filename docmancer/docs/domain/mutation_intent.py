@@ -169,8 +169,9 @@ class MutationReadiness:
 
 
 def build_mutation_intent(question: str) -> MutationIntentContract:
-    raw = str(question or "")[:4_000]
-    request_plan = build_patch_request_plan(raw)
+    source = str(question or "")
+    raw = source[:4_000]
+    request_plan = build_patch_request_plan(source)
     if request_plan.operation != "none" and (
         request_plan.mutation_targets
         or request_plan.operation in {"create", "rename"}
@@ -320,7 +321,7 @@ def resolve_mutation_targets(
             aliases: list[tuple[Mapping[str, Any], str, str | None]] = []
             for item in items:
                 path = str(item.get("path") or item.get("source") or item.get("source_path") or "").replace("\\", "/")
-                if _artifact_for_target(path) != "source":
+                if not is_positive_local_item(item, path) or _artifact_for_target(path) != "source":
                     continue
                 stem = PurePosixPath(path).stem
                 alias = "".join(part[:1].upper() + part[1:] for part in stem.split("_") if part)
@@ -481,6 +482,8 @@ def resolve_mutation_targets(
         matches: list[tuple[Mapping[str, Any], str, str | None]] = []
         for item in items:
             path = str(item.get("path") or item.get("source") or item.get("source_path") or "").replace("\\", "/")
+            if not is_positive_local_item(item, path):
+                continue
             metadata = item.get("metadata") if isinstance(item.get("metadata"), Mapping) else {}
             symbols = [
                 str(value.get("name") if isinstance(value, Mapping) else value)

@@ -3,6 +3,8 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
+from docmancer.docs.application.action_packet import build_action_packet
+from docmancer.docs.application.model_visible_projection import project_patch_context
 from eval.task_level.evaluators.actionability import evaluate_actionability
 from eval.task_level.evaluators.contract import ContractEvaluation
 from eval.task_level.schemas import TaskSpec
@@ -25,37 +27,62 @@ def _task() -> TaskSpec:
     )
 
 
-def test_actionability_uses_model_visible_packet_instead_of_missing_legacy_checklist(tmp_path: Path):
-    run_dir = tmp_path / "run"
-    run_dir.mkdir()
-    sources = [
-        {"evidence_id": "permission", "path": "docs/permission-architecture.md"},
-        {"evidence_id": "browser", "path": "docs/browser-flow.md"},
-        {"evidence_id": "scan", "path": "docs/scan-flow.md"},
-        {"evidence_id": "sync", "path": "docs/offline-sync.md"},
+def _write_valid_projection(run_dir: Path) -> dict:
+    doc_rows = [
+        (
+            "docs/permission-architecture.md",
+            "PermissionService.evaluateFlowEntry must return a PermissionDecision.",
+        ),
+        ("docs/browser-flow.md", "BrowserPermissionGate must delegate to evaluateFlowEntry."),
+        ("docs/scan-flow.md", "ScanPermissionGate must delegate to evaluateFlowEntry."),
+        ("docs/offline-sync.md", "OfflineSyncGate must use evaluateFlowEntry before accepting work."),
     ]
-    projection = {
-        "status": "ok",
-        "kind": "patch_context",
-        "estimated_tokens": 1_944,
-        "mutation_ready": True,
-        "edit_ready": True,
-        "sources": sources,
-        "targets": {"likely_files": [{"path": path} for path in TASK33C_REQUIRED_TARGET_PATHS], "symbols": []},
-        "invariants": [
-            {"text": "PermissionService evaluateFlowEntry returns PermissionDecision.", "evidence_ids": ["permission"]},
-            {"text": "BrowserPermissionGate delegates to evaluateFlowEntry.", "evidence_ids": ["browser"]},
-            {"text": "ScanPermissionGate delegates to evaluateFlowEntry.", "evidence_ids": ["scan"]},
-            {"text": "OfflineSyncGate uses evaluateFlowEntry before accepting work.", "evidence_ids": ["sync"]},
-        ],
-        "implementation_guidance": [],
-        "acceptance_conditions": [],
-        "checks": {"compile": [], "tests": [], "semantic_checks": []},
-        "omitted_counts": {},
-    }
+    evidence = [
+        {
+            "path": path,
+            "source": path,
+            "source_class": "project_doc",
+            "authority": "project_rule",
+            "content": text,
+        }
+        for path, text in doc_rows
+    ]
+    evidence.extend({
+        "path": path,
+        "source": path,
+        "source_class": "project_file",
+        "authority": "supporting",
+        "content": f"class {Path(path).stem} {{}}",
+        "matched": True,
+    } for path in TASK33C_REQUIRED_TARGET_PATHS)
+    packet = build_action_packet(
+        question="Problem first. Fix the shared permission gate.",
+        context_pack=evidence,
+        trust_contract={"selected": [], "risky": [], "rejected": []},
+        max_tokens=2_000,
+        project_path="/repo",
+        required_evidence_paths=[path for path, _ in doc_rows],
+        required_target_paths=TASK33C_REQUIRED_TARGET_PATHS,
+        behavioral_contract_required=True,
+    )
+    projection, snapshot = project_patch_context(
+        packet=packet,
+        evidence_items=evidence,
+        max_tokens=2_000,
+    )
     (run_dir / "model_visible_patch_context.json").write_text(
         json.dumps(projection), encoding="utf-8"
     )
+    (run_dir / "model_visible_evidence_snapshot.json").write_text(
+        json.dumps(snapshot), encoding="utf-8"
+    )
+    return projection
+
+
+def test_actionability_uses_model_visible_packet_instead_of_missing_legacy_checklist(tmp_path: Path):
+    run_dir = tmp_path / "run"
+    run_dir.mkdir()
+    projection = _write_valid_projection(run_dir)
     (run_dir / "patch.diff").write_text("", encoding="utf-8")
 
     result = evaluate_actionability(
@@ -75,18 +102,16 @@ def test_actionability_uses_model_visible_packet_instead_of_missing_legacy_check
     assert result.behavioral_scope_coverage == 1.0
     assert result.citation_fidelity == 1.0
     assert result.projection_status == "ok"
-    assert result.projection_tokens == 1_944
+    assert result.projection_tokens == projection["estimated_tokens"]
     assert result.mutation_ready is True
     assert result.model_visible_omissions == 0
-    # Compatibility metrics must no longer become zero merely because the
-    # obsolete action_checklist.json artifact was not written.
-    assert result.critical_contract_recall == 1.0
-    assert result.critical_contract_salience == 1.0
-    assert result.action_checklist_precision == 1.0
-    assert result.action_checklist_used is True
+    assert result.critical_contract_recall == 0.0
+    assert result.critical_contract_salience == 0.0
+    assert result.action_checklist_precision == 0.0
+    assert result.action_checklist_used is False
 
 
-def test_successful_projection_without_mutation_readiness_is_explicitly_flagged(tmp_path: Path):
+def test_unvalidated_projection_is_rejected_instead_of_scored(tmp_path: Path):
     run_dir = tmp_path / "run"
     run_dir.mkdir()
     (run_dir / "model_visible_patch_context.json").write_text(
@@ -117,6 +142,10 @@ def test_successful_projection_without_mutation_readiness_is_explicitly_flagged(
         contract=ContractEvaluation(0.0, 0.0, 0.0),
     )
 
-    assert result.mutation_ready is False
-    assert result.model_visible_omissions == 1
-    assert "successful_projection_without_mutation_readiness" in result.warnings
+    assert result.metric_source == "invalid_model_visible_projection"
+    assert result.projection_status == "invalid"
+    assert result.mutation_ready is None
+    assert any(
+        warning.startswith("invalid_model_visible_projection:")
+        for warning in result.warnings
+    )

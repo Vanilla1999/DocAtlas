@@ -56,10 +56,45 @@ def test_process_quality_observes_repairs_without_inventing_first_edit_correctne
     assert quality["first_edit_correctness"] is None
     assert quality["first_edit_correctness_status"] == "not_observed:no_validation_before_next_edit"
     assert quality["repair_count"] == 1
-    assert quality["regression_count"] == 1
+    assert quality["regression_count"] == 0
     assert quality["validation_breadth"]["test_runs_observed"] == 3
     assert quality["validation_breadth"]["distinct_test_commands"] == 2
     assert quality["search_efficiency"]["required_evidence_recall"] == 0.75
     assert quality["search_efficiency"]["exploration_calls"] == 1
     assert quality["provider_efficiency"]["correct_runs_per_100k_uncached_tokens"] == 0.0
     assert quality["patch_robustness"]["robust"] is False
+
+
+def test_process_quality_counts_only_a_pass_to_fail_transition_for_the_same_check(
+    tmp_path: Path,
+):
+    trajectory = tmp_path / "trajectory.normalized.json"
+    trajectory.write_text(json.dumps([
+        {
+            "tool_name": "Bash",
+            "arguments": {"command": "pytest tests/a.py"},
+            "exit_code": 0,
+        },
+        {
+            "tool_name": "Bash",
+            "arguments": {"command": "pytest tests/b.py"},
+            "exit_code": 1,
+        },
+        {
+            "tool_name": "Bash",
+            "arguments": {"command": "pytest tests/a.py"},
+            "exit_code": 1,
+        },
+        {
+            "tool_name": "Bash",
+            "arguments": {"command": "pytest tests/a.py"},
+            "exit_code": 1,
+        },
+    ]), encoding="utf-8")
+
+    quality = evaluate_process_quality(
+        {"resolved": False, "forbidden_changes": [], "metrics": {}},
+        trajectory_path=trajectory,
+    )
+
+    assert quality["regression_count"] == 1

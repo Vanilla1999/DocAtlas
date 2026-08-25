@@ -68,11 +68,18 @@ class CodexExploratoryWorker:
     """One-shot Codex OAuth selector for explicitly non-causal local experiments."""
 
     model: str = DEFAULT_CODEX_MODEL
+    reasoning_effort: str = "medium"
     executable: str = "codex"
     temp_root: Path | None = None
     sandbox_mode: str = "read-only"
     compressor_identity: str = "codex-cli-exploratory-selector-v1"
     usage_verifier_identity: str = "codex-cli-jsonl-self-report-unverified-v1"
+
+    def __post_init__(self) -> None:
+        if self.reasoning_effort not in {"low", "medium", "high", "xhigh"}:
+            raise ValueError(
+                f"Unsupported Codex reasoning effort: {self.reasoning_effort}"
+            )
 
     @property
     def capabilities(self) -> IsolatedWorkerCapabilities:
@@ -95,6 +102,7 @@ class CodexExploratoryWorker:
             "boundary_type": "empty_temporary_workspace_codex_cli",
             "provider": "codex-oauth",
             "model": self.model,
+            "reasoning_effort": self.reasoning_effort,
             "fresh_context": "one ephemeral Codex exec invocation",
             "host_evidence_only": False,
             "server_request_id_verified": False,
@@ -110,6 +118,7 @@ class CodexExploratoryWorker:
         return _json_sha256({
             "executable": shutil.which(self.executable) or self.executable,
             "model": self.model,
+            "reasoning_effort": self.reasoning_effort,
             "prompt_revision": self.compressor_identity,
         })
 
@@ -193,6 +202,8 @@ class CodexExploratoryWorker:
                 str(workspace),
                 "--model",
                 self.model,
+                "-c",
+                f'model_reasoning_effort="{self.reasoning_effort}"',
                 "--output-schema",
                 str(schema_path),
                 prompt,
@@ -511,6 +522,7 @@ def main(argv: list[str] | None = None) -> int:
                 if args.two_cell_smoke
                 else CodexExploratoryWorker(
                     model=args.model,
+                    reasoning_effort=args.reasoning_effort,
                     sandbox_mode=selector_sandbox,
                 )
             ),
@@ -735,6 +747,14 @@ def summarize_exploratory_results(
         )
         raw_indexing = attribution.get("indexing")
         indexing: dict[str, Any] = raw_indexing if isinstance(raw_indexing, dict) else {}
+        raw_actionability = result.get("actionability")
+        actionability: dict[str, Any] = (
+            raw_actionability if isinstance(raw_actionability, dict) else {}
+        )
+        raw_process_quality = result.get("process_quality")
+        process_quality: dict[str, Any] = (
+            raw_process_quality if isinstance(raw_process_quality, dict) else {}
+        )
         provider_input_tokens = indexing.get("provider_input_tokens")
         provider_output_tokens = indexing.get("provider_output_tokens")
         if (
@@ -770,6 +790,13 @@ def summarize_exploratory_results(
             "time_to_first_edit_reason": "codex_jsonl_not_stream_timed",
             "total_latency": metrics.get("total_latency"),
             "action_packet_tokens": metrics.get("action_packet_tokens"),
+            "model_visible_projection_tokens": actionability.get("projection_tokens"),
+            "requirement_recall": actionability.get("requirement_recall"),
+            "critical_invariant_recall": actionability.get("critical_invariant_recall"),
+            "behavioral_scope_coverage": actionability.get("behavioral_scope_coverage"),
+            "first_edit_correctness": process_quality.get("first_edit_correctness"),
+            "repair_count": process_quality.get("repair_count"),
+            "regression_count": process_quality.get("regression_count"),
             "evidence_fingerprint": metrics.get("evidence_fingerprint"),
         }
     expected_order = list(expected_conditions or load_protocol()["conditions"])

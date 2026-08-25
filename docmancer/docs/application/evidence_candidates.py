@@ -166,10 +166,12 @@ def projected_text(item: Mapping[str, Any], raw_display_text: str, result_kind: 
 
 
 def authority(item: Mapping[str, Any]) -> str:
+    packet_authority = str(item.get("_packet_authority") or "").casefold()
+    if packet_authority:
+        return "canonical" if packet_authority == "canonical" else "supporting"
     values = {
         str(item.get("authority") or "").casefold(),
         str(item.get("repository_authority") or "").casefold(),
-        str(item.get("_packet_authority") or "").casefold(),
     }
     return "canonical" if values & {
         "canonical", "source_of_truth", "explicit_agent_policy", "primary",

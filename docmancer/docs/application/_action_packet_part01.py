@@ -90,10 +90,10 @@ def _ensure_selection_survives_packet(
             )
         elif requirement.kind == "canonical_policy":
             candidate = selected_by_stable.get(requirement.value)
-            facts = _extract_facts(_content_text(candidate.original))[0] if candidate else []
-            satisfied = assigned_survived and bool(candidate) and (
-                all(fact.casefold() in visible_text for _, fact in facts)
-                if facts else _evidence_id(dict(candidate.original)) in retained_evidence_ids
+            satisfied = (
+                assigned_survived
+                and candidate is not None
+                and _policy_witness_survived(packet, assigned_id, candidate)
             )
         else:
             satisfied = assigned_survived and (
@@ -142,9 +142,10 @@ def _effective_authority(
         for value in (item.get("authority"), item.get("repository_authority"))
         if value
     }
-    if not declared & {"canonical", "source_of_truth", "explicit_agent_policy", "primary", "project_rule"}:
-        return "supporting"
-    if _instruction_risk_flags(item):
+    if not declared & {
+        "canonical", "source_of_truth", "explicit_agent_policy", "primary",
+        "project_rule", "official", "project_owned",
+    }:
         return "supporting"
     if item.get("repository_authority") == "explicit_agent_policy":
         return "canonical" if _scope_applies(item, project_path=project_path, target_paths=target_paths) else "supporting"
@@ -493,10 +494,16 @@ def _add_mandatory_requirement_witnesses(
         requirement.requirement_id: requirement
         for requirement in selection.requirements
         if requirement.mandatory
-        and requirement.kind in {
-            "exact_term", "entity", "canonical_policy",
-            "behavioral_contract", "cross_module_invariant",
-        }
+        and (
+            requirement.kind in {
+                "exact_term", "entity", "canonical_policy",
+                "behavioral_contract", "cross_module_invariant",
+            }
+            or (
+                requirement.kind == "source_fact"
+                and requirement.requirement_id.startswith("behavioral_contract:")
+            )
+        )
         and requirement.proof_role != "target_identity"
     }
     source_ids = {
@@ -510,23 +517,32 @@ def _add_mandatory_requirement_witnesses(
         evidence_id = _evidence_id(evidence)
         if evidence_id not in source_ids or _instruction_risk_flags(evidence):
             continue
+        custom_witnesses = [
+            witness for witness in candidate.requirement_witnesses
+            if witness.requirement_id in requirements
+            and (
+                requirements[witness.requirement_id].kind in {
+                    "behavioral_contract", "cross_module_invariant",
+                }
+                or (
+                    requirements[witness.requirement_id].kind == "source_fact"
+                    and witness.requirement_id.startswith("behavioral_contract:")
+                )
+            )
+        ]
         canonical_requirement_id = f"canonical_policy:{candidate.stable_id}"
-        if canonical_requirement_id in candidate.covered_requirement_ids:
+        if canonical_requirement_id in candidate.covered_requirement_ids and not custom_witnesses:
             for _, fact in _extract_facts(_content_text(evidence))[0]:
                 if not fact or _content_instruction_risk_flags(fact):
+                    continue
+                if fact.casefold() in visible_text:
                     continue
                 packet["implementation_guidance"].append({
                     "text": fact,
                     "evidence_ids": [evidence_id],
                 })
                 mandatory_rows.add((fact, evidence_id))
-        custom_witnesses = [
-            witness for witness in candidate.requirement_witnesses
-            if witness.requirement_id in requirements
-            and requirements[witness.requirement_id].kind in {
-                "behavioral_contract", "cross_module_invariant",
-            }
-        ]
+                break
         for witness in custom_witnesses:
             if not witness.unit_text or _content_instruction_risk_flags(witness.unit_text):
                 continue
@@ -598,10 +614,7 @@ def _add_mandatory_requirement_witnesses(
     packet["implementation_guidance"] = [
         row
         for row in packet["implementation_guidance"]
-        if not any(
-            invariant in str(row.get("text") or "")
-            for invariant in invariant_texts
-        )
+        if str(row.get("text") or "") not in invariant_texts
     ]
     return mandatory_rows
 
@@ -777,6 +790,35 @@ def _cited_evidence_ids(packet: dict[str, Any]) -> set[str]:
         )
         if isinstance(row, dict) and ref
     }
+
+
+def _policy_witness_survived(
+    packet: dict[str, Any],
+    evidence_id: str,
+    candidate: Any,
+) -> bool:
+    validation = packet.get("validation") or {}
+    rows = [
+        *packet.get("required_invariants", []),
+        *packet.get("forbidden_changes", []),
+        *packet.get("implementation_guidance", []),
+        *(validation.get("compile") or []),
+        *(validation.get("tests") or []),
+        *(validation.get("semantic_checks") or []),
+    ]
+    safe_facts = {
+        fact
+        for _, fact in _extract_facts(_content_text(dict(candidate.original)))[0]
+        if fact and not _content_instruction_risk_flags(fact)
+    }
+    return any(
+        isinstance(row, dict)
+        and str(row.get("text") or "") in safe_facts
+        and evidence_id in {
+            str(ref) for ref in row.get("evidence_ids") or [] if ref
+        }
+        for row in rows
+    )
 
 
 def _has_actionable_items(packet: dict[str, Any]) -> bool:

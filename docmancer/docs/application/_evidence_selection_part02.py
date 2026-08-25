@@ -176,7 +176,7 @@ def _legacy_requirement_matches_unit(
                 token for token in re.findall(r"[a-z0-9_]+", requirement.value.casefold())
                 if token not in {"a", "an", "and", "for", "in", "of", "the", "to"}
             }
-            matches = candidate.authority == "canonical" and len(terms & set(re.findall(r"[a-z0-9_]+", text))) >= min(3, len(terms))
+            matches = len(terms & set(re.findall(r"[a-z0-9_]+", text))) >= min(3, len(terms))
     elif requirement.kind == "cross_module_invariant":
         targets = [value.casefold() for value in requirement.value.splitlines() if value]
         matches = candidate.authority == "canonical" and any(
