@@ -26,13 +26,17 @@ _GENERIC_PATH_TOKENS = frozenset({
 })
 
 
-def _path_tokens(value: str) -> set[str]:
+def _path_token_sequence(value: str) -> tuple[str, ...]:
     stem = PurePosixPath(str(value or "").replace("\\", "/")).stem
-    return {
+    return tuple(
         token.casefold()
         for token in re.findall(r"[A-Za-z0-9]+", stem.replace("_", "-").replace("-", " "))
         if len(token) >= 3 and token.casefold() not in _GENERIC_PATH_TOKENS
-    }
+    )
+
+
+def _path_tokens(value: str) -> set[str]:
+    return set(_path_token_sequence(value))
 
 
 def _target_scope(path: str) -> str:
@@ -83,15 +87,29 @@ def _behavioral_source_fact_contracts(
     rows: list[dict[str, Any]] = []
     used_scopes: set[str] = set()
     for source_path in docs:
-        source_terms = _path_tokens(source_path)
+        source_sequence = _path_token_sequence(source_path)
+        source_terms = set(source_sequence)
         ranked: list[tuple[tuple[Any, ...], str]] = []
         for target in targets:
-            target_terms = _path_tokens(target)
+            target_sequence = _path_token_sequence(target)
+            target_terms = set(target_sequence)
             overlap = len(source_terms & target_terms)
             if not overlap:
                 continue
+            # Prefer the target whose leading domain noun matches the source
+            # document before using generic lexical density. This prevents a
+            # broad permission architecture document from stealing the browser
+            # flow scope merely because both target names contain "permission".
+            leading_domain_match = int(bool(
+                source_sequence
+                and target_sequence
+                and source_sequence[0] == target_sequence[0]
+            ))
             density = int(overlap * 1000 / max(1, len(target_terms)))
-            ranked.append(((-overlap, -density, len(target_terms), target.casefold()), target))
+            ranked.append((
+                (-overlap, -leading_domain_match, -density, len(target_terms), target.casefold()),
+                target,
+            ))
         if not ranked:
             continue
         target = min(ranked, key=lambda row: row[0])[1]
