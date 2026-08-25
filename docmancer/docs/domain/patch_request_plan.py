@@ -18,6 +18,13 @@ PatchOperation = Literal["modify", "create", "delete", "rename", "none"]
 PatchLanguage = Literal["en", "ru"]
 PatchTargetRole = Literal["mutate", "preserve", "destination", "parent"]
 
+_PATCH_PLAN_VERB = re.compile(
+    r"^(?:fix|update|modify|change|patch|implement|refactor|make|create|add|delete|remove|rename|"
+    r"исправ(?:ить|ь)|обнов(?:ить|и)|измен(?:ить|и)|реализова(?:ть|ть)|"
+    r"(?:от)?рефактор(?:ить|и)?|созда(?:ть|й)|добав(?:ить|ь)|удал(?:ить|и)|"
+    r"переименова(?:ть|й))$",
+    re.I,
+)
 _PRESERVE_HEAD = re.compile(
     r"\b(?:without\s+(?:changing|modifying|editing|touching)|"
     r"but\s+do\s+not\s+(?:change|modify|edit|touch)|"
@@ -200,7 +207,7 @@ def build_patch_request_plan(question: str) -> PatchRequestPlan:
     if len(source) > len(raw):
         return _unsupported(raw, language, "input_limit:question")
     action = find_change_clause(raw)
-    if action is None:
+    if action is None or _PATCH_PLAN_VERB.fullmatch(action.verb) is None:
         return _unsupported(raw, language, "unsupported_patch_surface")
     operation = _operation(action.verb)
     root_start = action.start
