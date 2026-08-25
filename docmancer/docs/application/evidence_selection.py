@@ -16,10 +16,6 @@ from ._evidence_selection_part03 import *  # noqa: F401,F403
 
 from ._evidence_selection_part04 import *  # noqa: F401,F403
 
-from .evidence_semantic_density import bind_semantic_density_policy
-
-bind_semantic_density_policy()
-
 from .proofability import *  # noqa: F401,F403
 
 __all__=[n for n in globals() if not n.startswith("__")]
