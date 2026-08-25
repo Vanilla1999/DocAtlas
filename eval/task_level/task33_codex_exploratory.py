@@ -291,6 +291,11 @@ def main(argv: list[str] | None = None) -> int:
         help="Skip Docker and run Codex plus evaluator commands on the host; never causal or VALID.",
     )
     parser.add_argument("--model", default=DEFAULT_CODEX_MODEL)
+    parser.add_argument(
+        "--reasoning-effort",
+        choices=("low", "medium", "high", "xhigh"),
+        default="medium",
+    )
     parser.add_argument("--image", default="docatlas-task33c-evaluator:local")
     parser.add_argument("--skip-image-build", action="store_true")
     parser.add_argument("--timeout-seconds", type=int, default=900)
@@ -333,6 +338,7 @@ def main(argv: list[str] | None = None) -> int:
         "causal_claim_allowed": False,
         "execution_backend": "host_exploratory" if args.host_exploratory else "docker",
         "model": args.model,
+        "reasoning_effort": args.reasoning_effort,
         "protocol_sha256": hashlib.sha256(PROTOCOL_PATH.read_bytes()).hexdigest(),
         "frozen_protocol_modified": False,
         "checks": {},
@@ -436,6 +442,7 @@ def main(argv: list[str] | None = None) -> int:
             "two_cell_smoke": args.two_cell_smoke,
             "provider_call_cap": 3 if args.two_cell_smoke else None,
             "model": args.model,
+            "reasoning_effort": args.reasoning_effort,
             "protocol_sha256_before": protocol_sha256_before,
             "execution_backend": "host_exploratory" if args.host_exploratory else "docker",
             "host_execution_unisolated": args.host_exploratory,
@@ -450,6 +457,7 @@ def main(argv: list[str] | None = None) -> int:
                 "danger-full-access" if args.host_exploratory else "workspace-write"
             ),
             inherit_environment=False,
+            reasoning_effort=args.reasoning_effort,
         )
         runner_canary = run_canary(
             runner, args.model, args.timeout_seconds, run_dir / "runner_canary"
@@ -530,6 +538,7 @@ def main(argv: list[str] | None = None) -> int:
             "environment": {
                 "runner": "codex-cli-oauth",
                 "model": args.model,
+                "reasoning_effort": args.reasoning_effort,
                 "evidence_tier": "exploratory",
                 "execution_backend": (
                     "host_exploratory" if args.host_exploratory else "docker"

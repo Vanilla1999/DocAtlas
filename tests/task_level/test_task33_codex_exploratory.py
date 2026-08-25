@@ -421,7 +421,13 @@ def test_two_cell_smoke_uses_one_canary_and_exactly_two_provider_cells(
         "CodexExploratoryWorker",
         lambda *args, **kwargs: pytest.fail("worker must not be created for two-cell smoke"),
     )
-    monkeypatch.setattr(task33_codex_exploratory, "CodexRunner", lambda **kwargs: object())
+    runner_options = {}
+
+    def fake_runner(**kwargs):
+        runner_options.update(kwargs)
+        return object()
+
+    monkeypatch.setattr(task33_codex_exploratory, "CodexRunner", fake_runner)
     canary_calls = []
 
     def fake_canary(*args, **kwargs):
@@ -462,6 +468,8 @@ def test_two_cell_smoke_uses_one_canary_and_exactly_two_provider_cells(
         "--run-exploratory-pilot",
         "--run-id",
         "two-cell-smoke",
+        "--reasoning-effort",
+        "low",
     ])
 
     manifest = json.loads((tmp_path / "two-cell-smoke" / "exploratory_manifest.json").read_text())
@@ -474,6 +482,8 @@ def test_two_cell_smoke_uses_one_canary_and_exactly_two_provider_cells(
     assert manifest["conditions"] == captured_conditions
     assert manifest["provider_call_cap"] == 3
     assert manifest["two_cell_smoke"] is True
+    assert manifest["reasoning_effort"] == "low"
+    assert runner_options["reasoning_effort"] == "low"
 
 
 def test_exploratory_summary_reports_metrics_without_valid_verdict():

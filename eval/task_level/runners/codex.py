@@ -33,12 +33,16 @@ class CodexRunner:
         *,
         sandbox_mode: str = "workspace-write",
         inherit_environment: bool = True,
+        reasoning_effort: str = "medium",
     ) -> None:
         if sandbox_mode not in {"workspace-write", "danger-full-access"}:
             raise ValueError(f"Unsupported Codex sandbox mode: {sandbox_mode}")
+        if reasoning_effort not in {"low", "medium", "high", "xhigh"}:
+            raise ValueError(f"Unsupported Codex reasoning effort: {reasoning_effort}")
         self.executable = executable
         self.sandbox_mode = sandbox_mode
         self.inherit_environment = inherit_environment
+        self.reasoning_effort = reasoning_effort
 
     def _version(self) -> str:
         if not shutil.which(self.executable):
@@ -90,7 +94,7 @@ class CodexRunner:
             }
         )
         env.update(request.environment)
-        codex_home = _prepare_codex_home(request)
+        codex_home = _prepare_codex_home(request, self.reasoning_effort)
         notes: list[str] = []
         exit_code: int | None = None
         stdout = ""
@@ -210,7 +214,7 @@ def _is_provider_failure(stdout: str, stderr: str) -> bool:
     return provider_marker and (not stdout.strip() or "turn.failed" in event_types)
 
 
-def _prepare_codex_home(request: AgentRunRequest) -> Path:
+def _prepare_codex_home(request: AgentRunRequest, reasoning_effort: str = "medium") -> Path:
     codex_home = (request.output_dir / "env" / "codex_home").resolve()
     codex_home.mkdir(parents=True, exist_ok=True)
     source_home = Path(os.environ.get("CODEX_HOME", str(Path.home() / ".codex")))
@@ -219,7 +223,7 @@ def _prepare_codex_home(request: AgentRunRequest) -> Path:
     try:
         if auth.exists():
             shutil.copy2(auth, copied_auth)
-        config = _codex_config(request)
+        config = _codex_config(request, reasoning_effort)
         (codex_home / "config.toml").write_text(config, encoding="utf-8")
         return codex_home
     except Exception:
@@ -238,11 +242,11 @@ def _prepare_blocked_network_tools(request: AgentRunRequest) -> Path:
     return bin_dir
 
 
-def _codex_config(request: AgentRunRequest) -> str:
+def _codex_config(request: AgentRunRequest, reasoning_effort: str = "medium") -> str:
     project = str(request.workspace).replace('"', '\\"')
     lines = [
         f'model = "{request.model}"',
-        "model_reasoning_effort = \"medium\"",
+        f'model_reasoning_effort = "{reasoning_effort}"',
         "",
         f'[projects."{project}"]',
         'trust_level = "trusted"',
