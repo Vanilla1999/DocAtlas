@@ -5,6 +5,7 @@ from dataclasses import asdict, dataclass
 import re
 from typing import Any, Literal
 
+from docmancer.docs.domain.request_intent import find_change_clause
 from docmancer.retrieval.contracts import canonical_hash
 
 
@@ -17,14 +18,6 @@ PatchOperation = Literal["modify", "create", "delete", "rename", "none"]
 PatchLanguage = Literal["en", "ru"]
 PatchTargetRole = Literal["mutate", "preserve", "destination", "parent"]
 
-_ROOT_ACTION = re.compile(
-    r"^\s*(?:(?P<wrapper>please)\s+)?(?P<verb>"
-    r"fix|update|modify|change|patch|implement|refactor|make|create|add|delete|remove|rename|"
-    r"исправ(?:ить|ь)|обнов(?:ить|и)|измен(?:ить|и)|реализова(?:ть|ть)|"
-    r"(?:от)?рефактор(?:ить|и)?|"
-    r"созда(?:ть|й)|добав(?:ить|ь)|удал(?:ить|и)|переименова(?:ть|й))\b",
-    re.I,
-)
 _PRESERVE_HEAD = re.compile(
     r"\b(?:without\s+(?:changing|modifying|editing|touching)|"
     r"but\s+do\s+not\s+(?:change|modify|edit|touch)|"
@@ -206,26 +199,28 @@ def build_patch_request_plan(question: str) -> PatchRequestPlan:
     language: PatchLanguage = "ru" if re.search(r"[А-Яа-яЁё]", raw) else "en"
     if len(source) > len(raw):
         return _unsupported(raw, language, "input_limit:question")
-    root = _ROOT_ACTION.match(raw)
-    if root is None:
+    action = find_change_clause(raw)
+    if action is None:
         return _unsupported(raw, language, "unsupported_patch_surface")
-    operation = _operation(root.group("verb"))
-    preserve_match = _PRESERVE_HEAD.search(raw, root.end())
+    operation = _operation(action.verb)
+    root_start = action.start
+    root_end = action.verb_end
+    preserve_match = _PRESERVE_HEAD.search(raw, root_end)
     main_end = preserve_match.start() if preserve_match else len(raw)
-    acceptance_match = _ACCEPTANCE_HEAD.search(raw, root.end(), main_end)
+    acceptance_match = _ACCEPTANCE_HEAD.search(raw, root_end, main_end)
     target_region_end = acceptance_match.start() if acceptance_match else main_end
-    body_start = root.end()
+    body_start = root_end
     while body_start < target_region_end and raw[body_start].isspace():
         body_start += 1
     unresolved: list[str] = []
-    consumed: list[tuple[int, int]] = [(root.start(), root.end())]
+    consumed: list[tuple[int, int]] = [(root_start, root_end)]
     behavior: list[PatchClause] = []
     acceptance: list[PatchClause] = []
     mutation_targets: tuple[PatchTarget, ...] = ()
     preserve_targets: tuple[PatchTarget, ...] = ()
     destination: PatchTarget | None = None
     parent_context: PatchTarget | None = None
-    surface = f"imperative:{operation}:{language}"
+    surface = f"imperative:{operation}:{language}:clause_aware"
 
     if operation == "rename":
         separator = _RENAME_HEAD.search(raw, body_start, target_region_end)
