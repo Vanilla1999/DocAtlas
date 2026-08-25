@@ -1,32 +1,131 @@
-"""Shared deterministic request-intent predicates for routing and projection."""
+"""Shared deterministic request-intent predicates for routing and patch planning."""
 
 from __future__ import annotations
 
+from dataclasses import dataclass
 import re
 
 
-_CHANGE_WORDS = re.compile(
-    r"^\s*(?:(?:please|пожалуйста)\s+)?(implement|create|build|write|develop|introduce|replace|add|change|edit|modify|fix|"
-    r"refactor|delete|remove|rename|update|patch|migrate|code|"
+MAX_INTENT_SCAN_CHARS = 4_000
+MAX_INTENT_CLAUSES = 12
+
+_ACTION_HEAD = re.compile(
+    r"\s*(?:[-*]\s+)?(?:(?:please|пожалуйста)\s+)?(?P<verb>"
+    r"implement|create|build|write|develop|introduce|replace|add|change|edit|modify|fix|"
+    r"refactor|delete|remove|rename|update|patch|migrate|code|make|"
     r"реализ\w*|созда\w*|сдела\w*|напиш\w*|разработ\w*|добав\w*|измен\w*|"
     r"исправ\w*|рефактор\w*|замен\w*|удал\w*|переимен\w*|обнов\w*)\b",
     re.IGNORECASE,
 )
-_DOCUMENTATION_PREFIX = re.compile(
-    r"^\s*(how|what|why|where|when|show|explain|describe|как|что|почему|где|когда|"
-    r"покажи|объясни|опиши)\b",
-    re.IGNORECASE,
-)
+
+
+@dataclass(frozen=True, slots=True)
+class ChangeIntentClause:
+    """One top-level imperative clause with offsets into the original request."""
+
+    start: int
+    end: int
+    verb: str
+    verb_start: int
+    verb_end: int
+
+
+def _mask_non_top_level_text(text: str) -> str:
+    """Mask quoted/code content while preserving offsets.
+
+    Commands shown as examples in fenced code, inline code, or quoted prose are
+    data rather than user mutation intent.  Replacing their bytes with spaces
+    lets the sentence scanner keep exact offsets without accidentally routing
+    on those examples.
+    """
+
+    chars = list(text)
+    masked = [False] * len(chars)
+
+    def hide(start: int, end: int) -> None:
+        for index in range(max(0, start), min(len(chars), end)):
+            if chars[index] not in "\r\n":
+                chars[index] = " "
+            masked[index] = True
+
+    for match in re.finditer(r"(?s)(```|~~~).*?\1", text):
+        hide(match.start(), match.end())
+    for match in re.finditer(r"`[^`\n]*`", text):
+        if not any(masked[match.start():match.end()]):
+            hide(match.start(), match.end())
+    for match in re.finditer(r'"(?:\\.|[^"\\])*"|\'(?:\\.|[^\'\\])*\'', text):
+        if not any(masked[match.start():match.end()]):
+            hide(match.start(), match.end())
+    return "".join(chars)
+
+
+def _top_level_clause_spans(masked: str) -> tuple[tuple[int, int], ...]:
+    spans: list[tuple[int, int]] = []
+    start = 0
+    index = 0
+    while index < len(masked):
+        char = masked[index]
+        boundary = char in "\r\n"
+        if char in ".!?":
+            boundary = index + 1 == len(masked) or masked[index + 1].isspace()
+        if boundary:
+            end = index + 1
+            if masked[start:end].strip():
+                spans.append((start, end))
+                if len(spans) >= MAX_INTENT_CLAUSES:
+                    return tuple(spans)
+            while end < len(masked) and masked[end].isspace():
+                end += 1
+            start = end
+            index = end
+            continue
+        index += 1
+    if start < len(masked) and masked[start:].strip() and len(spans) < MAX_INTENT_CLAUSES:
+        spans.append((start, len(masked)))
+    return tuple(spans)
+
+
+def find_change_clause(question: str) -> ChangeIntentClause | None:
+    """Find a real top-level change imperative, including after a short preamble.
+
+    The scanner is deliberately clause-aware instead of searching arbitrary
+    substrings: a request may describe a defect in sentence one and say
+    ``Fix ...`` in sentence two, while quoted/code examples must never create
+    mutation authority.
+    """
+
+    source = str(question or "")[:MAX_INTENT_SCAN_CHARS]
+    if not source.strip():
+        return None
+    masked = _mask_non_top_level_text(source)
+    for start, end in _top_level_clause_spans(masked):
+        match = _ACTION_HEAD.match(masked, start, end)
+        if match is None:
+            continue
+        verb_start, verb_end = match.span("verb")
+        return ChangeIntentClause(
+            start=match.start(),
+            end=end,
+            verb=source[verb_start:verb_end],
+            verb_start=verb_start,
+            verb_end=verb_end,
+        )
+    return None
 
 
 def is_change_request(question: str) -> bool:
-    """Return true only for an explicit change imperative, not a how-to question."""
+    """Return true only for an explicit top-level change imperative."""
 
-    text = str(question or "").strip()
-    if not text or _DOCUMENTATION_PREFIX.search(text):
-        return False
-    return bool(_CHANGE_WORDS.search(text))
+    return find_change_clause(question) is not None
 
 
 def model_projection_kind(question: str) -> str:
     return "patch_context" if is_change_request(question) else "docs_answer"
+
+
+__all__ = [
+    "ChangeIntentClause",
+    "find_change_clause",
+    "is_change_request",
+    "model_projection_kind",
+]
