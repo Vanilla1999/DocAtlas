@@ -216,7 +216,7 @@ def test_exact_task_packet_keeps_behavioral_contracts_under_visible_2000_token_c
         behavioral_contract_required=True,
     )
 
-    assert packet["status"] != "insufficient_evidence"
+    assert packet["status"] != "insufficient_evidence", packet
     assert packet["estimated_tokens"] <= 2_000
     assert packet["mutation_intent"]["operation"] == "modify"
     assert packet["mutation_intent"]["ready"] is True
@@ -235,7 +235,7 @@ def test_exact_task_packet_keeps_behavioral_contracts_under_visible_2000_token_c
         max_tokens=2_000,
     )
     visible = json.dumps(projection, ensure_ascii=False, sort_keys=True)
-    assert projection["status"] != "insufficient_evidence"
+    assert projection["status"] != "insufficient_evidence", projection
     assert projection["estimated_tokens"] <= 2_000
     assert projection["mutation_ready"] is True
     assert "Browser entry is allowed only for PermissionDecision.allow" in visible
