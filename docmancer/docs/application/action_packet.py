@@ -17,7 +17,6 @@ from ._action_packet_part03 import build_action_packet as _build_action_packet_i
 from ._action_packet_part04 import *  # noqa: F401,F403
 
 
-PATCH_PROJECTION_RESERVE_TOKENS = 48
 _TRUSTED_PROJECT_RULE_AUTHORITIES = frozenset({
     "canonical", "primary", "project_rule", "source_of_truth",
 })
@@ -188,7 +187,7 @@ def _promote_trusted_behavioral_witnesses(
 
 
 def build_action_packet(*args: Any, **kwargs: Any) -> dict[str, Any]:
-    """Build a packet whose internal fit budget includes projection overhead."""
+    """Build a packet while preserving the caller's semantic selection budget."""
 
     question = str(kwargs.get("question") or (args[0] if args else ""))
     required_evidence_paths = tuple(kwargs.get("required_evidence_paths") or ())
@@ -225,11 +224,6 @@ def build_action_packet(*args: Any, **kwargs: Any) -> dict[str, Any]:
             required_target_paths,
             provenance="explicit_task_contract" if behavioral_required else "explicit_required_target",
         )
-
-    if behavioral_required and "max_tokens" in kwargs:
-        requested = max(MIN_ACTION_PACKET_TOKENS, int(kwargs["max_tokens"]))
-        if requested > MIN_ACTION_PACKET_TOKENS + PATCH_PROJECTION_RESERVE_TOKENS:
-            kwargs["max_tokens"] = requested - PATCH_PROJECTION_RESERVE_TOKENS
 
     packet = _build_action_packet_impl(*args, **kwargs)
     if packet.get("status") != "insufficient_evidence":
