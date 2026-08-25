@@ -29,28 +29,45 @@ def _ensure_selection_survives_packet(
         if isinstance(row, dict)
     }
     selected_by_stable = {item.stable_id: item for item in selection.selected_candidates}
+    assignments = {item.requirement_id: item for item in selection.assignments}
     missing: list[str] = []
     for requirement in selection.requirements:
         if not requirement.mandatory:
+            continue
+        assignment = assignments.get(requirement.requirement_id)
+        if assignment is None:
             continue
         covering = [
             item for item in selection.selected_candidates
             if requirement.requirement_id in item.covered_requirement_ids
         ]
+        assigned_candidate = selected_by_stable.get(assignment.evidence_id)
+        assigned_id = (
+            _evidence_id(dict(assigned_candidate.original))
+            if assigned_candidate is not None else assignment.evidence_id
+        )
+        assigned_survived = assigned_id in retained_evidence_ids
+        assigned_unit = next((
+            witness for witness in (assigned_candidate.requirement_witnesses if assigned_candidate else ())
+            if witness.requirement_id == requirement.requirement_id
+            and (assignment.unit_id is None or witness.unit_id == assignment.unit_id)
+        ), None)
+        if assigned_unit is not None:
+            assigned_survived = assigned_survived and assigned_unit.unit_text.casefold() in visible_text
         if requirement.kind == "evidence_path":
             paths = {
                 _normalized_source_key(row.get("path"))
                 for row in packet.get("source_of_truth") or [] if isinstance(row, dict)
             }
-            satisfied = _normalized_source_key(requirement.value) in paths
+            satisfied = assigned_survived and _normalized_source_key(requirement.value) in paths
         elif requirement.kind == "target_path":
             paths = {
                 _normalized_source_key(row.get("path"))
                 for row in target.get("likely_files") or [] if isinstance(row, dict)
             }
-            satisfied = _normalized_source_key(requirement.value) in paths
+            satisfied = assigned_survived and _normalized_source_key(requirement.value) in paths
         elif requirement.kind == "exact_version":
-            satisfied = any(
+            satisfied = assigned_survived and any(
                 _evidence_id(dict(item.original)) in retained_evidence_ids
                 and item.resolved_version.casefold() == requirement.value.casefold()
                 for item in covering
@@ -58,12 +75,15 @@ def _ensure_selection_survives_packet(
         elif requirement.kind == "canonical_policy":
             candidate = selected_by_stable.get(requirement.value)
             facts = _extract_facts(_content_text(candidate.original))[0] if candidate else []
-            satisfied = bool(candidate) and (
+            satisfied = assigned_survived and bool(candidate) and (
                 all(fact.casefold() in visible_text for _, fact in facts)
                 if facts else _evidence_id(dict(candidate.original)) in retained_evidence_ids
             )
         else:
-            satisfied = requirement_value_visible(requirement.value, visible_text)
+            satisfied = assigned_survived and (
+                assigned_unit is not None
+                or requirement_value_visible(requirement.value, visible_text)
+            )
         if not satisfied:
             missing.append(requirement.requirement_id)
     if not missing:

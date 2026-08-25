@@ -729,6 +729,29 @@ def test_empty_assignment_canonical_selection_cannot_override_partial_retrieval(
     assert projection["status"] == "insufficient_evidence"
 
 
+def test_patch_projection_fails_closed_instead_of_dropping_selected_guidance():
+    from docmancer.docs.application.model_visible_projection import project_patch_context
+
+    item = {
+        "stable_id": "large-guidance",
+        "source": "lib/permission_gate.dart",
+        "source_class": "source_evidence",
+        "content": "class PermissionGate {}",
+        "symbols": ["PermissionGate"],
+    }
+    packet = build_action_packet(
+        question="Fix PermissionGate", context_pack=[item], max_tokens=1500,
+    )
+    packet["implementation_guidance"] = [
+        {"text": "required-witness " * 200, "evidence_ids": [packet["source_of_truth"][0]["evidence_id"]]}
+    ]
+
+    projection, _ = project_patch_context(packet=packet, evidence_items=[item], max_tokens=256)
+
+    assert projection["status"] == "insufficient_evidence"
+    assert "cannot be preserved" in projection["missing"][0]
+
+
 def test_docs_selector_accounts_for_serialized_projection_cost():
     from docmancer.docs.application.evidence_selection import docs_selection_config, select_evidence
 

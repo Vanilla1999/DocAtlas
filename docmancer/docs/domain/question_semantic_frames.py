@@ -37,6 +37,39 @@ class PremiseFrame:
     expected_value: str | None = None
 
 
+@dataclass(frozen=True, slots=True)
+class DecisionFrame:
+    decision_kind: str
+    subject: str
+    action: str
+
+
+@dataclass(frozen=True, slots=True)
+class ArgumentValueFrame:
+    argument: str
+    actor: str
+    callee: str
+
+
+@dataclass(frozen=True, slots=True)
+class ContractScopeFrame:
+    contract: str
+    subject: str
+    condition: str
+
+
+@dataclass(frozen=True, slots=True)
+class PurposeBehaviorFrame:
+    subject: str
+    purpose: str
+
+
+@dataclass(frozen=True, slots=True)
+class BeforeBehaviorFrame:
+    subject: str
+    action: str
+
+
 def _entity(value: str) -> str:
     value = clean_phrase(value).strip("`\"'")
     return value[:160] if semantic_tail_is_safe(value, allow_initial_request_head=True) else ""
@@ -188,8 +221,70 @@ def match_premise_frame(question: str) -> PremiseFrame | None:
     return None
 
 
+def match_decision_frame(question: str) -> DecisionFrame | None:
+    match = re.fullmatch(r"which\s+([A-Za-z_][\w.]*)\s+permits\s+(.+?)\s+to\s+(.+)", clean_phrase(question), re.I)
+    if match is None:
+        return None
+    kind, subject, action = (_entity(match.group(i)) for i in range(1, 4))
+    return DecisionFrame(kind, subject, action) if kind and subject and action else None
+
+
+def match_argument_value_frame(question: str) -> ArgumentValueFrame | None:
+    match = re.fullmatch(
+        r"what\s+([A-Za-z_][\w.]*)\s+value\s+must\s+(.+?)\s+pass\s+to\s+([A-Za-z_][\w.]*)",
+        clean_phrase(question), re.I,
+    )
+    if match is None:
+        return None
+    argument, actor, callee = (_entity(match.group(i)) for i in range(1, 4))
+    return ArgumentValueFrame(argument, actor, callee) if argument and actor and callee else None
+
+
+def match_contract_scope_frame(question: str) -> ContractScopeFrame | None:
+    match = re.fullmatch(
+        r"what\s+(?:project\s+)?(.+?\s+contract)\s+applies\s+to\s+(.+?)\s+when\s+(.+)",
+        clean_phrase(question), re.I,
+    )
+    if match is None:
+        return None
+    contract = _entity(match.group(1))
+    contract_words = contract.casefold().split()
+    if (
+        not 2 <= len(contract_words) <= 5
+        or contract_words[-1] != "contract"
+        or contract_words[0] in {"what", "which", "project", "system", "generic"}
+    ):
+        return None
+    subject = clean_phrase(match.group(2))
+    if re.fullmatch(r"[A-Za-z][\w.-]*(?:\s*,\s*[A-Za-z][\w.-]*)*(?:,?\s+and\s+[A-Za-z][\w.-]*)?", subject, re.I) is None:
+        return None
+    condition = _entity(match.group(3))
+    return ContractScopeFrame(contract, subject, condition) if subject and condition else None
+
+
+def match_purpose_behavior_frame(question: str) -> PurposeBehaviorFrame | None:
+    q = clean_phrase(question)
+    match = re.fullmatch(r"what\s+does\s+(.+?)\s+do\s+to\s+(.+)", q, re.I)
+    if match is None:
+        match = re.fullmatch(r"how\s+does\s+(.+?)\s+determine\s+(.+)", q, re.I)
+    if match is None:
+        return None
+    subject, purpose = _entity(match.group(1)), _entity(match.group(2))
+    return PurposeBehaviorFrame(subject, purpose) if subject and purpose else None
+
+
+def match_before_behavior_frame(question: str) -> BeforeBehaviorFrame | None:
+    match = re.fullmatch(r"what\s+does\s+(.+?)\s+do\s+before\s+(.+)", clean_phrase(question), re.I)
+    if match is None:
+        return None
+    subject, action = _entity(match.group(1)), _entity(match.group(2))
+    return BeforeBehaviorFrame(subject, action) if subject and action else None
+
+
 __all__ = [
-    "ComparisonFrame", "ConditionFrame", "LocationFrame", "PremiseFrame",
+    "ArgumentValueFrame", "BeforeBehaviorFrame", "ComparisonFrame", "ConditionFrame",
+    "ContractScopeFrame", "DecisionFrame", "LocationFrame", "PremiseFrame", "PurposeBehaviorFrame",
+    "match_argument_value_frame", "match_before_behavior_frame", "match_contract_scope_frame",
     "match_comparison_frame", "match_condition_frame", "match_location_frame",
-    "match_premise_frame",
+    "match_decision_frame", "match_premise_frame", "match_purpose_behavior_frame",
 ]

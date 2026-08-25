@@ -328,10 +328,12 @@ def _compact_failure_packet(packet: dict[str, Any], budget: int) -> None:
         packet["mutation_intent"] = {
             "operation": mutation.get("operation", "none"),
             "artifact_kind": mutation.get("artifact_kind", "unknown"),
-            "requested_targets": [],
+            "requested_targets": list(mutation.get("requested_targets") or [])[:12],
             "resolved_targets": [],
+            "preserved_targets": list(mutation.get("preserved_targets") or [])[:12],
             "destination": mutation.get("destination"),
             "acceptance_conditions": [],
+            "request_plan": mutation.get("request_plan"),
             "ready": False,
             "constraints_only": bool(mutation.get("constraints_only")),
             "missing": list(mutation.get("missing") or [])[:3],
@@ -343,7 +345,6 @@ def _compact_failure_packet(packet: dict[str, Any], budget: int) -> None:
     _refresh_estimated_tokens(packet)
     if packet["estimated_tokens"] > budget:
         packet["task_interpretation"]["objective"] = "task"
-        packet["missing_evidence"] = ["Evidence did not fit the packet budget."]
         _refresh_estimated_tokens(packet)
 
 

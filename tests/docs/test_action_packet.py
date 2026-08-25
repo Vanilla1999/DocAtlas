@@ -2,6 +2,14 @@
 from tests.docs import _shared_test_action_packet as _shared
 globals().update({k: v for k, v in vars(_shared).items() if not k.startswith("__")})
 from docmancer.docs.domain.request_intent import model_projection_kind
+from docmancer.docs.domain.patch_request_plan import build_patch_request_plan
+
+
+PERMISSION_PATCH_QUERY = (
+    "Which source files and generated or dependency files should be changed or left unchanged "
+    "to fix partial permission handling across BrowserPermissionGate, ScanPermissionGate, "
+    "OfflineSyncGate, and PermissionService? Include the required method calls and decision comparisons."
+)
 
 
 @pytest.mark.parametrize(
@@ -33,6 +41,112 @@ def test_mutation_readiness_does_not_infer_constraints_from_user_wording():
 
     assert contract.acceptance_conditions
     assert readiness.constraints_only is False
+
+
+def test_patch_request_plan_separates_mutation_and_preserve_targets():
+    from pathlib import Path
+    from docmancer.docs.domain.source_map import build_project_source_evidence
+
+    question = (
+        "Fix partial permission handling in BrowserPermissionGate, ScanPermissionGate, "
+        "OfflineSyncGate, and PermissionService without changing permission_result.freezed.dart."
+    )
+
+    plan = build_patch_request_plan(question)
+    contract = build_mutation_intent(question)
+
+    assert plan.operation == "modify"
+    assert [target.value for target in plan.mutation_targets] == [
+        "BrowserPermissionGate", "ScanPermissionGate", "OfflineSyncGate", "PermissionService",
+    ]
+    assert [target.value for target in plan.preserve_targets] == ["permission_result.freezed.dart"]
+    assert not plan.unresolved_parts
+    assert contract.request_plan == plan
+    assert [target.value for target in contract.requested_targets] == [
+        "BrowserPermissionGate", "ScanPermissionGate", "OfflineSyncGate", "PermissionService",
+    ]
+    root = Path("eval/task_level/fixtures/templates/decisive_nbo_cross_module_gate_large_001")
+    evidence = build_project_source_evidence(root, question=question, max_items=12, token_budget=1400)
+    packet = build_action_packet(question=question, context_pack=evidence, max_tokens=2000)
+    assert validate_action_packet(packet, evidence_items=evidence) == []
+    assert packet["mutation_intent"]["ready"] is True
+    assert packet["mutation_intent"]["request_plan"]["preserve_targets"][0]["value"] == "permission_result.freezed.dart"
+    assert packet["mutation_intent"]["preserved_targets"][0]["path"].endswith(
+        "permission_result.freezed.dart"
+    )
+
+    unresolved = build_action_packet(
+        question="Fix BrowserPermissionGate without changing missing_result.freezed.dart.",
+        context_pack=evidence,
+        max_tokens=2000,
+    )
+    assert unresolved["mutation_intent"]["ready"] is False
+    assert "preserve_target_not_resolved" in unresolved["mutation_intent"]["missing"]
+
+
+@pytest.mark.parametrize(
+    "question",
+    [
+        "Fix the permission architecture.",
+        "Update the relevant files.",
+        "Исправь связанные модули.",
+    ],
+)
+def test_patch_request_plan_keeps_implicit_targets_fail_closed(question):
+    plan = build_patch_request_plan(question)
+
+    assert not plan.mutation_targets
+    assert "mutation_target_not_requested" in plan.unresolved_parts
+
+
+def test_named_permission_patch_resolves_all_decisive_fixture_targets_without_formatter_loss():
+    from pathlib import Path
+    from docmancer.docs.domain.source_map import build_project_source_evidence
+
+    root = Path("eval/task_level/fixtures/templates/decisive_nbo_cross_module_gate_large_001")
+    evidence = build_project_source_evidence(
+        root, question=PERMISSION_PATCH_QUERY, max_items=12, token_budget=1400,
+    )
+    packet = build_action_packet(
+        question=PERMISSION_PATCH_QUERY, context_pack=evidence, max_tokens=2000,
+    )
+
+    resolved = {
+        target["requested_value"]: target["path"]
+        for target in packet["mutation_intent"]["resolved_targets"]
+    }
+    assert packet["mutation_intent"]["ready"] is True
+    assert resolved["OfflineSyncGate"].endswith("offline_sync_gate.dart")
+    assert not any("OfflineSyncGate" in message for message in packet["missing_evidence"])
+    assert not any("selected evidence was not preserved" in message for message in packet["missing_evidence"])
+
+
+def test_selector_missing_requirement_does_not_report_formatter_loss():
+    packet = build_action_packet(
+        question="Fix MissingPermissionGate",
+        context_pack=[{
+            "stable_id": "other-gate",
+            "source": "lib/other_gate.dart",
+            "source_class": "source_evidence",
+            "content": "class OtherGate {}",
+            "symbols": ["OtherGate"],
+        }],
+        max_tokens=1500,
+    )
+
+    assert any(message.startswith("Missing required evidence:") for message in packet["missing_evidence"])
+    assert not any("selected evidence was not preserved" in message for message in packet["missing_evidence"])
+
+
+def test_unique_source_path_alias_resolves_but_ambiguous_alias_does_not():
+    contract = build_mutation_intent("Fix OfflineSyncGate")
+    one = {"path": "lib/sync/offline_sync_gate.dart", "source_class": "repo_map"}
+    resolved = resolve_mutation_targets(contract, [one], evidence_id_for_item=lambda item: item["path"])
+    assert resolved.resolved_targets[0].symbol == "OfflineSyncGate"
+
+    other = {"path": "packages/sync/offline_sync_gate.dart", "source_class": "repo_map"}
+    ambiguous = resolve_mutation_targets(contract, [one, other], evidence_id_for_item=lambda item: item["path"])
+    assert ambiguous.resolved_targets == ()
 
 
 def test_documentation_governance_meta_question_is_not_mutation_intent():

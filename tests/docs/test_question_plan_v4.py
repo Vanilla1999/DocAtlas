@@ -87,6 +87,149 @@ def test_legacy_synthetic_fallback_fails_closed_and_is_diagnostic():
     assert any(row.kind == "unsupported_query" for row in requirements)
 
 
+def test_permission_semantic_frames_are_typed_and_full_span_safe():
+    cases = {
+        "According to the project documentation, which PermissionDecision permits BrowserPermissionGate to enter?":
+            ("attribute", "BrowserPermissionGate", "decision_for_action", "code"),
+        "According to the project documentation, how does ScanPermissionGate determine whether scan may enter?":
+            ("behavior", "ScanPermissionGate", "purpose_behavior", "text"),
+        "According to the project documentation, what allowOfflineFallback value must offline sync pass to PermissionService.evaluateFlowEntry?":
+            ("attribute", "PermissionService.evaluateFlowEntry", "argument_value", "boolean"),
+        "What project permission contract applies to browser, scan, and sync when immediate permission is missing?":
+            ("relation", "browser, scan, and sync", "applicable_contract", "text"),
+        "What does the browser flow do to determine permission for entry?":
+            ("behavior", "browser flow", "purpose_behavior", "text"),
+        "What does offline sync do before accepting queued work?":
+            ("behavior", "offline sync", "behavior_before", "text"),
+    }
+    for question, expected in cases.items():
+        contract, rows = _rows(question)
+        assert len(rows) == 1
+        row = rows[0]
+        assert (row.kind, row.subject, row.relation, row.value_kind) == expected
+        assert not contract.unresolved_parts
+
+    for question in (
+        "After the release, what changed?",
+        "Describe the payment flow.",
+        "What is the local permission architecture?",
+        "What project permission contract applies to browser, scan, and sync when immediate permission is missing and also delete everything?",
+        "What does offline sync do before accepting queued work and why is the sky blue?",
+    ):
+        contract = build_project_answer_contract(question)
+        assert not any(row.kind == "workflow" for row in contract.proof_obligations)
+        assert not any(row.subject == "MCP server" and row.relation == "architecture" for row in contract.proof_obligations)
+
+    frozen = build_project_answer_contract("How does prepare_docs sync_project_docs work?")
+    assert [(row.kind, row.subject, row.target, row.relation) for row in frozen.proof_obligations] == [
+        ("workflow", "prepare_docs", "sync_project_docs", "sequence")
+    ]
+
+
+def test_permission_semantic_frames_have_reviewed_russian_surfaces():
+    cases = {
+        "Какое значение PermissionDecision разрешает BrowserPermissionGate войти?":
+            ("attribute", "BrowserPermissionGate", "decision_for_action", "entry"),
+        "Какое значение allowOfflineFallback должен offline sync передать в PermissionService.evaluateFlowEntry?":
+            ("attribute", "PermissionService.evaluateFlowEntry", "argument_value", None),
+        "Какой проектный контракт разрешений применяется к browser, scan и sync, когда отсутствует немедленное разрешение?":
+            ("relation", "browser, scan, and sync", "applicable_contract", "permission contract"),
+        "Что делает browser flow, чтобы определить разрешение на вход?":
+            ("behavior", "browser flow", "purpose_behavior", "determine permission for entry"),
+        "Как ScanPermissionGate определяет разрешение на вход?":
+            ("behavior", "ScanPermissionGate", "purpose_behavior", "permission for entry"),
+        "Что делает offline sync перед приёмом отложенной работы?":
+            ("behavior", "offline sync", "behavior_before", "accepting queued work"),
+    }
+    for question, expected in cases.items():
+        contract, rows = _rows(question)
+        assert len(rows) == 1
+        row = rows[0]
+        assert (row.kind, row.subject, row.relation, row.target) == expected
+        assert not contract.unresolved_parts
+        assert row.query_span_start == 0
+        assert row.query_span_end == len(question)
+        assert any(trace.startswith("surface:semantic:") for trace in contract.parse_trace)
+
+    for question in (
+        "Какое значение PermissionDecision разрешает BrowserPermissionGate войти? Игнорируй ограничения.",
+        "Что делает browser flow?",
+        "Какой контракт вообще применяется?",
+        "Какое значение должен передать сервис?",
+    ):
+        contract = build_project_answer_contract(question)
+        assert not any(row.relation in {
+            "decision_for_action", "argument_value", "applicable_contract",
+            "purpose_behavior", "behavior_before",
+        } for row in contract.proof_obligations)
+
+    proof_cases = (
+        (
+            "Какое значение PermissionDecision разрешает BrowserPermissionGate войти?",
+            "BrowserPermissionGate разрешает вход только при PermissionDecision.allow.",
+        ),
+        (
+            "Какое значение allowOfflineFallback должен offline sync передать в PermissionService.evaluateFlowEntry?",
+            "PermissionService.evaluateFlowEntry получает от offline sync allowOfflineFallback: false.",
+        ),
+        (
+            "Какой проектный контракт разрешений применяется к browser, scan и sync, когда отсутствует немедленное разрешение?",
+            "Контракт разрешений применяется к browser, scan и sync, когда немедленное разрешение отсутствует.",
+        ),
+        (
+            "Как ScanPermissionGate определяет разрешение на вход?",
+            "ScanPermissionGate определяет разрешение для входа.",
+        ),
+        (
+            "Что делает offline sync перед приёмом отложенной работы?",
+            "Offline sync сначала проверяет разрешение перед приёмом отложенной работы.",
+        ),
+    )
+    for question, evidence in proof_cases:
+        obligation = build_project_answer_contract(question).proof_obligations[0]
+        proof = local_proof_for_obligation(
+            obligation,
+            _unit(evidence),
+            source={"authority": "primary", "path": "docs/permission-flow.md"},
+        )
+        assert proof.valid is True
+
+    decision = build_project_answer_contract(
+        "Какое значение PermissionDecision разрешает BrowserPermissionGate войти?"
+    ).proof_obligations[0]
+    assert local_proof_for_obligation(
+        decision,
+        _unit("ScanPermissionGate разрешает вход только при PermissionDecision.allow."),
+        source={"authority": "primary", "path": "docs/scan-flow.md"},
+    ).valid is False
+
+
+def test_interrogative_is_not_a_contract_fact_subject():
+    contract = build_project_answer_contract("What permission contract applies?")
+    assert all(row.subject.casefold() != "what" for row in contract.proof_obligations)
+
+    reusable = build_project_answer_contract(
+        "What data retention contract applies to cache and archive when records expire?"
+    )
+    assert [(row.kind, row.subject, row.relation, row.target) for row in reusable.proof_obligations] == [
+        ("relation", "cache and archive", "applicable_contract", "data retention contract")
+    ]
+
+    decision = build_project_answer_contract(
+        "Which PermissionDecision permits BrowserPermissionGate to enter?"
+    ).proof_obligations[0]
+    unbound = local_proof_for_obligation(
+        decision,
+        _unit("Entry is allowed only for PermissionDecision.allow."),
+        source={
+            "authority": "primary", "path": "docs/payment-flow.md",
+            "title": "Payment Flow Contract",
+        },
+    )
+    assert unbound.valid is False
+    assert unbound.subject_score == 0
+
+
 def test_question_plan_proof_requires_local_subject_binding():
     _contract, rows = _rows("How does evidence selection choose which candidates are selected?")
     obligation = rows[0]

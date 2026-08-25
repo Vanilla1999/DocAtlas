@@ -165,8 +165,8 @@ ACTION_PACKET_OUTPUT_SCHEMA: dict[str, Any] = {
             "type": "object",
             "additionalProperties": False,
             "required": [
-                "operation", "artifact_kind", "requested_targets", "resolved_targets",
-                "destination", "acceptance_conditions", "ready", "constraints_only",
+                "operation", "artifact_kind", "requested_targets", "resolved_targets", "preserved_targets",
+                "destination", "acceptance_conditions", "request_plan", "ready", "constraints_only",
                 "missing", "contract_hash",
             ],
             "properties": {
@@ -174,8 +174,12 @@ ACTION_PACKET_OUTPUT_SCHEMA: dict[str, Any] = {
                 "artifact_kind": {"enum": ["source", "docs", "config", "test", "generated_answer", "unknown"]},
                 "requested_targets": {"type": "array", "maxItems": 12, "items": {"type": "object"}},
                 "resolved_targets": {"type": "array", "maxItems": 12, "items": {"type": "object"}},
+                "preserved_targets": {"type": "array", "maxItems": 12, "items": {"type": "object"}},
                 "destination": {"type": ["string", "null"], "maxLength": 500},
                 "acceptance_conditions": {"type": "array", "maxItems": 8, "items": {"type": "string", "maxLength": 500}},
+                "request_plan": {
+                    "type": ["object", "null"],
+                },
                 "ready": {"type": "boolean"},
                 "constraints_only": {"type": "boolean"},
                 "missing": {"type": "array", "maxItems": 12, "items": {"type": "string", "maxLength": 120}},

@@ -297,8 +297,19 @@ def build_action_packet(
             "artifact_kind": resolved_mutation.artifact_kind,
             "requested_targets": [asdict(item) for item in resolved_mutation.requested_targets],
             "resolved_targets": [asdict(item) for item in resolved_mutation.resolved_targets],
+            "preserved_targets": [asdict(item) for item in resolved_mutation.preserved_targets],
             "destination": resolved_mutation.destination,
             "acceptance_conditions": list(resolved_mutation.acceptance_conditions),
+            "request_plan": (
+                {
+                    **resolved_mutation.request_plan.hash_payload,
+                    "plan_hash": resolved_mutation.request_plan.plan_hash,
+                }
+                if (
+                    resolved_mutation.request_plan is not None
+                    and resolved_mutation.request_plan.preserve_targets
+                ) else None
+            ),
             "ready": mutation_readiness.ready,
             "constraints_only": constraints_only,
             "missing": list(mutation_readiness.missing),

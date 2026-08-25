@@ -35,6 +35,83 @@ def _has(value: str, text: str) -> bool:
     return term_sequence_present(value, text)
 
 
+_AUTHORITATIVE = frozenset({
+    "canonical", "source_of_truth", "official", "project_owned",
+    "project_rule", "primary",
+})
+
+
+def _source_identity(source: Mapping[str, object] | None) -> str:
+    return " ".join(str((source or {}).get(key) or "") for key in (
+        "path", "source", "title", "heading_path", "project_doc_path",
+    ))
+
+
+def _bounded_subject_aliases(subject: str) -> tuple[str, ...]:
+    match = re.fullmatch(r"([A-Z][A-Za-z0-9]*)PermissionGate", str(subject or ""))
+    if match is None:
+        return ()
+    stem = re.sub(r"(?<!^)(?=[A-Z])", " ", match.group(1)).casefold()
+    return (f"{stem} gate", f"{stem} entry", f"{stem} flow")
+
+
+def _planned_subject_score(
+    obligation: ProofObligation,
+    clause: str,
+    source: Mapping[str, object] | None,
+) -> int:
+    if _has(obligation.subject, clause):
+        return 3
+    aliases = _bounded_subject_aliases(obligation.subject)
+    if any(_has(alias, clause) for alias in aliases):
+        return 3
+    authority = str(
+        (source or {}).get("authority")
+        or (source or {}).get("project_doc_authority")
+        or ""
+    ).casefold()
+    if authority not in _AUTHORITATIVE:
+        return 0
+    identity = _source_identity(source)
+    if _has(obligation.subject, identity) or any(_has(alias, identity) for alias in aliases):
+        return 2
+    subject = _norm(obligation.subject)
+    if subject in {"offline sync", "browser flow", "scan flow"} and _has(subject, identity):
+        return 2
+    return 0
+
+
+def _semantic_terms(value: object) -> set[str]:
+    words = set(re.findall(r"[^\W]+", _norm(value), re.UNICODE))
+    words -= {
+        "a", "an", "the", "is", "are", "be", "being", "to", "for",
+        "whether", "may", "when", "does", "do", "from", "and",
+        "а", "в", "во", "для", "до", "и", "из", "к", "как", "когда",
+        "ли", "на", "перед", "по", "при", "с", "со", "что", "чтобы",
+    }
+    canonical = {
+        "enter": "entry", "enters": "entry", "accepting": "accept",
+        "accepted": "accept", "missing": "missing", "permissions": "permission",
+        "войти": "entry", "вход": "entry", "входа": "entry",
+        "принимать": "accept", "принимает": "accept", "приём": "accept", "прием": "accept",
+        "приёмом": "accept", "приемом": "accept",
+        "определяет": "determine", "определить": "determine",
+        "отложенной": "queued", "отложенную": "queued", "работы": "work", "работу": "work",
+        "немедленное": "immediate", "немедленный": "immediate",
+        "разрешение": "permission", "разрешения": "permission", "разрешений": "permission",
+        "отсутствует": "missing", "отсутствующий": "missing", "отсутствующее": "missing",
+    }
+    return {canonical.get(word, word) for word in words}
+
+
+def _scope_actors(value: object) -> tuple[str, ...]:
+    return tuple(
+        re.sub(r"^(?:and|и)\s+", "", part.strip())
+        for part in re.split(r"\s*,\s*|\s*,?\s+(?:and|и)\s+", _norm(value))
+        if re.sub(r"^(?:and|и)\s+", "", part.strip())
+    )
+
+
 def _proposition_clauses(text: str) -> tuple[str, ...]:
     """Split one visible unit into conservative proposition-local clauses.
 
@@ -212,12 +289,75 @@ def relation_proof(
         "conditional_library_removal", "requirements", "conditional_outcome",
         "blocking_conditions", "premise_check", "premise_cardinality",
         "public_tool_usage", "governed_scope", "governance_facet",
+        "decision_for_action", "argument_value", "applicable_contract",
+        "purpose_behavior", "behavior_before",
     }:
         return None
     normalized = _norm(text)
     source_text = _norm(" ".join(str((source or {}).get(key) or "") for key in (
         "path", "source", "title", "heading_path", "project_doc_path",
     )))
+
+    if relation in {
+        "decision_for_action", "argument_value", "applicable_contract",
+        "purpose_behavior", "behavior_before",
+    }:
+        if relation == "applicable_contract":
+            actors = _scope_actors(obligation.subject)
+            scope = bool(actors) and all(_has(actor, text) for actor in actors)
+            text_terms = _semantic_terms(text)
+            contract_terms = _semantic_terms(obligation.target)
+            context_terms = _semantic_terms(obligation.context)
+            contract = len(contract_terms & text_terms) >= min(1, len(contract_terms))
+            context = len(context_terms & text_terms) >= min(2, len(context_terms))
+            predicate = bool(re.search(
+                r"\b(?:contract|rule|must|blocks?|allow(?:s|ed)?|share[sd]?|контракт|правило|должен|блокирует|разрешает)\b",
+                text, re.I,
+            ))
+            valid = scope and contract and context and predicate
+            return PlannedProof(
+                valid, 4 if valid else 0, 4 if valid else 0,
+                relation if valid else f"{relation}_missing",
+                3 if valid else 0,
+            )
+        for clause in _proposition_clauses(text):
+            subject_score = _planned_subject_score(obligation, clause, source)
+            target_terms = _semantic_terms(obligation.target)
+            context_terms = _semantic_terms(obligation.context)
+            clause_terms = _semantic_terms(clause)
+            target_hits = len(target_terms & clause_terms)
+            context_hits = len(context_terms & clause_terms)
+            target = not target_terms or target_hits >= min(2, len(target_terms))
+            context = not context_terms or context_hits >= min(2, len(context_terms))
+            if relation == "decision_for_action":
+                predicate = bool(re.search(r"\b(?:permit(?:s|ted)?|allow(?:s|ed)?|enter|entry|разрешает|войти|вход|==|returns?)\b", clause, re.I)) and target
+                value = bool(re.search(r"\b[A-Za-z_][\w.]*Decision\.[A-Za-z_]\w*\b|\bPermissionDecision\.[A-Za-z_]\w*\b", clause))
+            elif relation == "argument_value":
+                predicate = _has(obligation.attribute or "", clause)
+                value = bool(re.search(rf"\b{re.escape(str(obligation.attribute or ''))}\s*:\s*(?:true|false)\b", clause, re.I))
+            elif relation == "behavior_before":
+                target = bool(target_terms) and target_terms <= clause_terms
+                predicate = bool(re.search(r"\b(?:before|first|prior\s+to|must|calls?|checks?|evaluates?|перед|сначала|должен|вызывает|проверяет|оценивает)\b", clause, re.I))
+                value = target
+            else:
+                purpose_tokens = [token for token in _semantic_terms(obligation.target) if len(token) > 2]
+                purpose_hits = sum(token in clause_terms for token in set(purpose_tokens))
+                predicate = bool(re.search(r"\b(?:asks?|calls?|delegates?|checks?|evaluates?|determines?|запрашивает|вызывает|делегирует|проверяет|оценивает|определяет)\b", clause, re.I))
+                permission_entry = bool(
+                    re.search(r"permission", clause, re.I)
+                    and re.search(r"\b(?:entry|enter|decision)\b", clause, re.I)
+                    and (
+                        re.search(r"permission", str(obligation.target), re.I)
+                        or str(obligation.subject).endswith("PermissionGate")
+                    )
+                )
+                value = permission_entry or (
+                    bool(purpose_tokens)
+                    and purpose_hits >= min(2, len(set(purpose_tokens)))
+                )
+            if predicate and value:
+                return PlannedProof(True, 4, 4, relation, subject_score)
+        return PlannedProof(False, reason=f"{relation}_missing")
 
     if relation in {"governed_scope", "governance_facet"}:
         best_hits = 0
@@ -575,6 +715,8 @@ def behavior_proof(
     source: Mapping[str, object] | None = None,
 ) -> PlannedProof | None:
     relation = str(obligation.relation or "")
+    if relation in {"purpose_behavior", "behavior_before"}:
+        return relation_proof(obligation, text, source=source)
     if relation not in {"chunking", "selection_policy"}:
         return None
     normalized = _norm(text)

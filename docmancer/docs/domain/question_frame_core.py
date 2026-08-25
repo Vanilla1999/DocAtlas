@@ -70,6 +70,7 @@ _ACTION_START = (
 )
 _REQUEST_WRAPPER_RE = re.compile(
     r"^\s*(?:"
+    r"according\s+to\s+the\s+project\s+documentation\s*[,;:]?\s*|"
     r"(?:please|пожалуйста)\s*[,;:]?\s*|"
     r"(?:(?:could|can|would)\s+you(?:\s+please)?|"
     r"(?:можешь|могли\s+бы\s+вы)(?:\s+пожалуйста)?)"

@@ -7,10 +7,11 @@ import re
 from typing import Any, Iterable, Literal, Mapping
 
 from docmancer.docs.domain.request_intent import is_change_request
+from docmancer.docs.domain.patch_request_plan import PatchRequestPlan, build_patch_request_plan
 from docmancer.retrieval.contracts import canonical_hash
 
 
-MUTATION_INTENT_SCHEMA = "mutation-intent-v1"
+MUTATION_INTENT_SCHEMA = "mutation-intent-v2"
 MAX_MUTATION_TARGETS = 12
 MAX_ACCEPTANCE_CONDITIONS = 12
 
@@ -101,12 +102,18 @@ class MutationIntentContract:
     artifact_kind: ArtifactKind
     requested_targets: tuple[RequestedTarget, ...]
     resolved_targets: tuple[ResolvedTarget, ...] = ()
+    preserved_targets: tuple[ResolvedTarget, ...] = ()
     destination: str | None = None
     acceptance_conditions: tuple[str, ...] = ()
+    request_plan: PatchRequestPlan | None = None
     schema_version: str = MUTATION_INTENT_SCHEMA
 
     def __post_init__(self) -> None:
-        if len(self.requested_targets) > MAX_MUTATION_TARGETS or len(self.resolved_targets) > MAX_MUTATION_TARGETS:
+        if (
+            len(self.requested_targets) > MAX_MUTATION_TARGETS
+            or len(self.resolved_targets) > MAX_MUTATION_TARGETS
+            or len(self.preserved_targets) > MAX_MUTATION_TARGETS
+        ):
             raise ValueError("mutation target contract exceeds bounds")
         if len(self.acceptance_conditions) > MAX_ACCEPTANCE_CONDITIONS:
             raise ValueError("mutation acceptance contract exceeds bounds")
@@ -121,22 +128,34 @@ class MutationIntentContract:
             "artifact_kind": self.artifact_kind,
             "requested_targets": [asdict(item) for item in self.requested_targets],
             "resolved_targets": [asdict(item) for item in self.resolved_targets],
+            "preserved_targets": [asdict(item) for item in self.preserved_targets],
             "destination": self.destination,
             "acceptance_conditions": list(self.acceptance_conditions),
+            "request_plan": self.request_plan.hash_payload if self.request_plan is not None else None,
         }
 
     @property
     def contract_hash(self) -> str:
         return canonical_hash(self.hash_payload)
 
-    def with_resolved_targets(self, targets: Iterable[ResolvedTarget]) -> "MutationIntentContract":
+    def with_resolved_targets(
+        self,
+        targets: Iterable[ResolvedTarget],
+        *,
+        preserved_targets: Iterable[ResolvedTarget] | None = None,
+    ) -> "MutationIntentContract":
         return MutationIntentContract(
             operation=self.operation,
             artifact_kind=self.artifact_kind,
             requested_targets=self.requested_targets,
             resolved_targets=tuple(targets),
+            preserved_targets=(
+                tuple(preserved_targets)
+                if preserved_targets is not None else self.preserved_targets
+            ),
             destination=self.destination,
             acceptance_conditions=self.acceptance_conditions,
+            request_plan=self.request_plan,
         )
 
 
@@ -151,8 +170,11 @@ class MutationReadiness:
 
 def build_mutation_intent(question: str) -> MutationIntentContract:
     raw = str(question or "")[:4_000]
-    if _RENAME_RE.search(raw):
-        operation: MutationOperation = "rename"
+    request_plan = build_patch_request_plan(raw)
+    if request_plan.operation != "none":
+        operation: MutationOperation = request_plan.operation
+    elif _RENAME_RE.search(raw):
+        operation = "rename"
     elif _DELETE_RE.search(raw):
         operation = "delete"
     elif _CREATE_RE.search(raw):
@@ -167,34 +189,35 @@ def build_mutation_intent(question: str) -> MutationIntentContract:
     else:
         operation = "none"
 
-    requested: list[RequestedTarget] = []
-    path_spans: list[tuple[int, int]] = []
-    for match in _PATH_RE.finditer(raw):
-        path_spans.append((match.start(), match.end()))
-        requested.append(RequestedTarget(
-            value=_normal_path(match.group(0)), kind="path",
-            query_span_start=match.start(), query_span_end=match.end(),
-        ))
-    for match in _SYMBOL_RE.finditer(raw):
-        if any(start < match.end() and match.start() < end for start, end in path_spans):
-            continue
-        value = next((group for group in match.groups() if group), "")
-        # Plain all-uppercase acronyms (SDK, PCM, HTTP, MCP) are domain
-        # vocabulary, not stable edit targets unless the user quotes them or
-        # supplies a qualified/snake-case identity.
-        if (
-            value
-            and match.group(1) is None
-            and value.isupper()
-            and not re.search(r"[_:.]", value)
-        ):
-            continue
-        if value and not any(item.value.casefold() == value.casefold() for item in requested):
+    requested = [RequestedTarget(
+        value=_normal_path(item.value) if item.kind == "path" else item.value,
+        kind=item.kind,
+        query_span_start=item.query_span_start,
+        query_span_end=item.query_span_end,
+    ) for item in request_plan.mutation_targets]
+    if request_plan.operation == "none":
+        path_spans: list[tuple[int, int]] = []
+        for match in _PATH_RE.finditer(raw):
+            path_spans.append((match.start(), match.end()))
+            requested.append(RequestedTarget(
+                value=_normal_path(match.group(0)), kind="path",
+                query_span_start=match.start(), query_span_end=match.end(),
+            ))
+        for match in _SYMBOL_RE.finditer(raw):
+            if any(start < match.end() and match.start() < end for start, end in path_spans):
+                continue
+            value = next((group for group in match.groups() if group), "")
+            if (
+                not value
+                or (match.group(1) is None and value.isupper() and not re.search(r"[_:.]", value))
+                or any(item.value.casefold() == value.casefold() for item in requested)
+            ):
+                continue
             requested.append(RequestedTarget(
                 value=value[:240], kind="symbol",
                 query_span_start=match.start(), query_span_end=match.end(),
             ))
-    requested = requested[:MAX_MUTATION_TARGETS]
+        requested = requested[:MAX_MUTATION_TARGETS]
     path_targets = tuple(item.value for item in requested if item.kind == "path")
     artifact = _artifact_from_question(raw, path_targets)
 
@@ -215,6 +238,7 @@ def build_mutation_intent(question: str) -> MutationIntentContract:
         requested_targets=tuple(requested),
         destination=destination,
         acceptance_conditions=tuple(dict.fromkeys(acceptance))[:MAX_ACCEPTANCE_CONDITIONS],
+        request_plan=request_plan if request_plan.operation != "none" else None,
     )
 
 
@@ -267,8 +291,10 @@ def with_explicit_path_targets(
         artifact_kind=artifact,
         requested_targets=tuple(requested),
         resolved_targets=contract.resolved_targets,
+        preserved_targets=contract.preserved_targets,
         destination=destination,
         acceptance_conditions=contract.acceptance_conditions,
+        request_plan=contract.request_plan,
     )
 
 
@@ -282,6 +308,7 @@ def resolve_mutation_targets(
     items = [item for item in evidence_items if isinstance(item, Mapping)]
     for requested in contract.requested_targets:
         wanted = requested.value.casefold().replace("\\", "/")
+        matches: list[tuple[Mapping[str, Any], str, str | None]] = []
         for item in items:
             path = str(item.get("path") or item.get("source") or item.get("source_path") or "").replace("\\", "/")
             metadata = item.get("metadata") if isinstance(item.get("metadata"), Mapping) else {}
@@ -295,18 +322,33 @@ def resolve_mutation_targets(
                 path.casefold() == wanted or path.casefold().endswith("/" + wanted)
             )
             symbol_match = requested.kind == "symbol" and any(value.casefold() == wanted for value in symbols)
-            if not (path_match or symbol_match):
-                continue
+            if path_match or symbol_match:
+                matches.append((item, path, requested.value if symbol_match else None))
+        if not matches and requested.kind == "symbol":
+            aliases: list[tuple[Mapping[str, Any], str, str | None]] = []
+            for item in items:
+                path = str(item.get("path") or item.get("source") or item.get("source_path") or "").replace("\\", "/")
+                if _artifact_for_target(path) != "source":
+                    continue
+                stem = PurePosixPath(path).stem
+                alias = "".join(part[:1].upper() + part[1:] for part in stem.split("_") if part)
+                if alias.casefold() == wanted:
+                    aliases.append((item, path, requested.value))
+            if len({path.casefold() for _, path, _ in aliases}) == 1:
+                matches = aliases[:1]
+        if requested.kind == "symbol" and len({path.casefold() for _, path, _ in matches}) > 1:
+            matches = []
+        if matches:
+            item, path, symbol = matches[0]
             evidence_id = str(evidence_id_for_item(dict(item)))
             resolved.append(ResolvedTarget(
                 requested_value=requested.value,
                 path=path,
-                symbol=requested.value if requested.kind == "symbol" else None,
+                symbol=symbol,
                 evidence_id=evidence_id,
                 artifact_kind=_artifact_for_target(path),
                 exists=True,
             ))
-            break
 
     # Creating a new path must be authorized by real local parent/module
     # context.  The absent destination itself can never be a retrieval hit, so
@@ -345,7 +387,36 @@ def resolve_mutation_targets(
                 collision_free=True,
                 binding_kind="parent_context",
             ))
-    return contract.with_resolved_targets(resolved)
+    preserved: list[ResolvedTarget] = []
+    for requested in (contract.request_plan.preserve_targets if contract.request_plan else ()):
+        wanted = requested.value.casefold()
+        matches: list[tuple[Mapping[str, Any], str, str | None]] = []
+        for item in items:
+            path = str(item.get("path") or item.get("source") or item.get("source_path") or "").replace("\\", "/")
+            metadata = item.get("metadata") if isinstance(item.get("metadata"), Mapping) else {}
+            symbols = [
+                str(value.get("name") if isinstance(value, Mapping) else value)
+                for source in (item, metadata)
+                for key in ("symbols", "matched_symbols", "symbol_names")
+                for value in (source.get(key) or [])
+            ]
+            path_match = requested.kind == "path" and (
+                path.casefold() == wanted or path.casefold().endswith("/" + wanted)
+            )
+            symbol_match = requested.kind == "symbol" and any(value.casefold() == wanted for value in symbols)
+            if path_match or symbol_match:
+                matches.append((item, path, requested.value if symbol_match else None))
+        if len({path.casefold() for _, path, _ in matches}) == 1:
+            item, path, symbol = matches[0]
+            preserved.append(ResolvedTarget(
+                requested_value=requested.value,
+                path=path,
+                symbol=symbol,
+                evidence_id=str(evidence_id_for_item(dict(item))),
+                artifact_kind=_artifact_for_target(path),
+                exists=True,
+            ))
+    return contract.with_resolved_targets(resolved, preserved_targets=preserved)
 
 
 def evaluate_mutation_readiness(contract: MutationIntentContract) -> MutationReadiness:
@@ -353,6 +424,12 @@ def evaluate_mutation_readiness(contract: MutationIntentContract) -> MutationRea
     requested_values = {item.value.casefold() for item in contract.requested_targets}
     resolved_values = {item.requested_value.casefold() for item in contract.resolved_targets if item.exists}
     missing: list[str] = []
+    if contract.request_plan is not None:
+        missing.extend(contract.request_plan.unresolved_parts)
+        preserve_values = {item.value.casefold() for item in contract.request_plan.preserve_targets}
+        preserved_values = {item.requested_value.casefold() for item in contract.preserved_targets}
+        if not preserve_values.issubset(preserved_values):
+            missing.append("preserve_target_not_resolved")
     if contract.operation in {"modify", "delete"}:
         if not requested_values:
             missing.append("mutation_target_not_requested")

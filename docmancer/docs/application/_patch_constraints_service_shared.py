@@ -118,7 +118,7 @@ NON_ACTIONABLE_CONSTRAINT_HEADING_RE = re.compile(
 )
 TREE_GLYPH_RE = re.compile(r"[│├└┬┴┼─]{2,}|^[│├└┬┴┼─]")
 OWNER_SUFFIX_RE = re.compile(
-    r"(Service|Repository|Controller|Notifier|Bloc|Cubit|Provider|Adapter|Manager|"
+    r"(Service|Repository|Controller|Notifier|Bloc|Cubit|Provider|Adapter|Manager|Gate|"
     r"UseCase|Store|Module|Screen|Route|Router|Policy|Gateway|Client|Api|API|"
     r"Dao|DAO|DataSource|HttpServer|Server)$"
 )
