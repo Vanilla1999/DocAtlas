@@ -2,11 +2,13 @@
   "schema_version": 1,
   "module_labels": {
     "tests/docs/test_action_packet_semantic_density.py": "behavioral",
+    "tests/task_level/test_actionability_projection.py": "behavioral",
     "tests/task_level/test_task33_semantic_density.py": "behavioral"
   },
   "node_overrides": {},
   "module_node_hashes": {
     "tests/docs/test_action_packet_semantic_density.py": "79bda7096d938ce0a66c5a54cee5460bfbaa92b1c64ed3247c50eebd08e5f468",
+    "tests/task_level/test_actionability_projection.py": "af66b550e3438bcb235b9949db80d9bf7c4b4bf8db92f98a23822d7babdd303a",
     "tests/task_level/test_task33_semantic_density.py": "2c327d70fbd6bbbc3a2e4fd443f36f37c49d5869ccd60870a72c1db9531b7b20"
   }
 }
