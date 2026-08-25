@@ -130,29 +130,6 @@ def _behavioral_source_fact_contracts(
     return tuple(rows)
 
 
-def _normalize_explicit_project_rule_authority(
-    context_pack: Iterable[Mapping[str, Any]],
-) -> tuple[dict[str, Any], ...]:
-    """Align selector and packet authority without widening trust.
-
-    Only an already-explicit ``project_rule`` declaration is normalized to the
-    packet builder's existing trusted ``source_of_truth`` vocabulary. Ordinary
-    Markdown/README sources remain untouched and cannot gain authority here.
-    """
-
-    rows: list[dict[str, Any]] = []
-    for raw in context_pack:
-        if not isinstance(raw, Mapping):
-            continue
-        item = dict(raw)
-        if str(item.get("authority") or "").casefold() == "project_rule":
-            item["authority"] = "source_of_truth"
-        if str(item.get("repository_authority") or "").casefold() == "project_rule":
-            item["repository_authority"] = "source_of_truth"
-        rows.append(item)
-    return tuple(rows)
-
-
 def _explicit_mutation_contract(
     question: str,
     required_target_paths: Iterable[str],
@@ -221,16 +198,15 @@ def build_action_packet(*args: Any, **kwargs: Any) -> dict[str, Any]:
         item for item in (kwargs.get("context_pack") or ())
         if isinstance(item, Mapping)
     )
-    normalized_context = _normalize_explicit_project_rule_authority(raw_context)
     if raw_context:
-        kwargs["context_pack"] = normalized_context
+        kwargs["context_pack"] = raw_context
 
     public_requirements = list(kwargs.get("public_requirements") or ())
     if behavioral_required:
         public_requirements.extend(_behavioral_source_fact_contracts(
             required_evidence_paths=required_evidence_paths,
             required_target_paths=required_target_paths,
-            context_pack=normalized_context,
+            context_pack=raw_context,
         ))
     if public_requirements:
         by_identity: dict[str, Any] = {}
