@@ -14,9 +14,10 @@ _ACTION_HEAD = re.compile(
     r"implement|create|build|write|develop|introduce|replace|add|change|edit|modify|fix|"
     r"refactor|delete|remove|rename|update|patch|migrate|code|make|"
     r"реализ\w*|созда\w*|сдела\w*|напиш\w*|разработ\w*|добав\w*|измен\w*|"
-    r"исправ\w*|рефактор\w*|замен\w*|удал\w*|переимен\w*|обнов\w*)\b",
+    r"исправ\w*|(?:от)?рефактор\w*|замен\w*|удал\w*|переимен\w*|обнов\w*)\b",
     re.IGNORECASE,
 )
+_FENCE_LINE = re.compile(r"(?m)^[ \t]*(?P<fence>```|~~~)[^\n]*(?:\n|$)")
 
 
 @dataclass(frozen=True, slots=True)
@@ -34,9 +35,10 @@ def _mask_non_top_level_text(text: str) -> str:
     """Mask quoted/code content while preserving offsets.
 
     Commands shown as examples in fenced code, inline code, or quoted prose are
-    data rather than user mutation intent.  Replacing their bytes with spaces
+    data rather than user mutation intent. Replacing their bytes with spaces
     lets the sentence scanner keep exact offsets without accidentally routing
-    on those examples.
+    on those examples. An unclosed fenced block is masked to end-of-input so a
+    malformed example cannot manufacture mutation authority.
     """
 
     chars = list(text)
@@ -48,8 +50,28 @@ def _mask_non_top_level_text(text: str) -> str:
                 chars[index] = " "
             masked[index] = True
 
-    for match in re.finditer(r"(?s)(```|~~~).*?\1", text):
-        hide(match.start(), match.end())
+    fence_matches = list(_FENCE_LINE.finditer(text))
+    index = 0
+    while index < len(fence_matches):
+        opener = fence_matches[index]
+        if any(masked[opener.start():opener.end()]):
+            index += 1
+            continue
+        fence = opener.group("fence")
+        closer = next(
+            (
+                candidate
+                for candidate in fence_matches[index + 1:]
+                if candidate.group("fence") == fence
+            ),
+            None,
+        )
+        if closer is None:
+            hide(opener.start(), len(text))
+            break
+        hide(opener.start(), closer.end())
+        index = fence_matches.index(closer) + 1
+
     for match in re.finditer(r"`[^`\n]*`", text):
         if not any(masked[match.start():match.end()]):
             hide(match.start(), match.end())
