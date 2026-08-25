@@ -167,6 +167,49 @@ def _explicit_mutation_contract(
     return bound
 
 
+def _promote_trusted_behavioral_witnesses(
+    packet: dict[str, Any],
+    public_requirements: Iterable[Any],
+) -> None:
+    """Route trusted project-rule witnesses to invariants after selector fitting."""
+
+    trusted_paths = {
+        str(row.get("source_path") or "").strip().replace("\\", "/").casefold()
+        for row in public_requirements
+        if isinstance(row, Mapping)
+        and str(row.get("kind") or "").casefold() == "source_fact"
+        and str(row.get("proof_role") or "").casefold() == "project_rule"
+    }
+    if not trusted_paths:
+        return
+    trusted_ids = {
+        str(row.get("evidence_id") or "")
+        for row in packet.get("source_of_truth") or []
+        if isinstance(row, Mapping)
+        and str(row.get("path") or "").strip().replace("\\", "/").casefold() in trusted_paths
+    }
+    if not trusted_ids:
+        return
+    retained_guidance: list[dict[str, Any]] = []
+    promoted: list[dict[str, Any]] = []
+    for row in packet.get("implementation_guidance") or []:
+        if not isinstance(row, dict):
+            continue
+        evidence_ids = {str(value) for value in row.get("evidence_ids") or []}
+        if evidence_ids & trusted_ids and classify_normative_modality(str(row.get("text") or "")) is not None:
+            promoted.append(row)
+        else:
+            retained_guidance.append(row)
+    if not promoted:
+        return
+    packet["implementation_guidance"] = retained_guidance
+    packet["required_invariants"] = _dedupe_dicts(
+        [*(packet.get("required_invariants") or []), *promoted],
+        ("text",),
+    )
+    _refresh_estimated_tokens(packet)
+
+
 def build_action_packet(*args: Any, **kwargs: Any) -> dict[str, Any]:
     """Build a packet whose internal fit budget includes projection overhead."""
 
@@ -197,7 +240,8 @@ def build_action_packet(*args: Any, **kwargs: Any) -> dict[str, Any]:
             else:
                 identity = str(row)
             by_identity.setdefault(identity, row)
-        kwargs["public_requirements"] = tuple(by_identity.values())
+        public_requirements = list(by_identity.values())
+        kwargs["public_requirements"] = tuple(public_requirements)
 
     if kwargs.get("mutation_intent_contract") is None and required_target_paths:
         kwargs["mutation_intent_contract"] = _explicit_mutation_contract(
@@ -211,7 +255,10 @@ def build_action_packet(*args: Any, **kwargs: Any) -> dict[str, Any]:
         if requested > MIN_ACTION_PACKET_TOKENS + PATCH_PROJECTION_RESERVE_TOKENS:
             kwargs["max_tokens"] = requested - PATCH_PROJECTION_RESERVE_TOKENS
 
-    return _build_action_packet_impl(*args, **kwargs)
+    packet = _build_action_packet_impl(*args, **kwargs)
+    if packet.get("status") != "insufficient_evidence":
+        _promote_trusted_behavioral_witnesses(packet, public_requirements)
+    return packet
 
 
 __all__=[n for n in globals() if not n.startswith("__")]
