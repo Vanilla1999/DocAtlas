@@ -22,6 +22,10 @@ from docmancer.docs.application.action_packet import (
     HARD_ACTION_PACKET_TOKENS,
     validate_action_packet,
 )
+from docmancer.docs.application.model_visible_projection import (
+    project_patch_context,
+    validate_model_visible_projection,
+)
 
 
 

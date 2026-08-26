@@ -22,7 +22,7 @@ from eval.task_level.conditions import CONDITIONS, TOOL_REQUIRED_ONCE_INSTRUCTIO
 from eval.task_level.artifact_hygiene import diff_stats_from_patch, is_runtime_artifact, write_patch_hygiene_artifacts
 from eval.task_level.context.action_checklist import build_action_checklist, save_action_checklist
 from eval.task_level.context.patch_constraints import build_patch_constraint_packet, save_patch_constraint_packet
-from docmancer.docs.interfaces.mcp.context_tools import bounded_retrieval_issues
+from docmancer.docs.interfaces.mcp.context_tools import bounded_patch_retrieval_issues
 from eval.task_level.evaluators.actionability import evaluate_actionability
 from eval.task_level.evaluators.constraint_validation import validate_patch_against_constraints
 from eval.task_level.evaluators.contract import evaluate_contract

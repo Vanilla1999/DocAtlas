@@ -31,6 +31,10 @@ from docmancer.docs.application.insufficient_projection import (
     bounded_missing_value,
     compact_recovery_action_for_budget,
 )
+from docmancer.docs.application.model_visible_projection_helpers import (
+    bounded_action as _bounded_action,
+    cited_patch_items as _cited_patch_items,
+)
 
 
 DOCS_ANSWER_MAX_TOKENS = 800
@@ -83,8 +87,7 @@ _INSUFFICIENT_SUPPORT_KEYS = (
     "decision_hash",
 )
 _OPTIONAL_INSUFFICIENT_KEYS = (
-    "operational_status", "context_available", "disposition", "edit_ready",
-    "source_search_status", "requires_confirmation",
+    "operational_status", "context_available", "disposition",
 )
 
 def canonical_projection_bytes(value: Any) -> bytes:
@@ -571,6 +574,11 @@ def project_patch_context(
         sources.append(projected)
         snapshot[evidence_id] = _snapshot_entry(item, projected)
 
+    mutation_ready = bool((packet.get("mutation_intent") or {}).get("ready"))
+    mandatory_assignments_survived = not bool(
+        (packet.get("omitted_counts") or {}).get("mandatory_requirements")
+    )
+    packet_valid = packet.get("status") in {"ok", "truncated"}
     payload: dict[str, Any] = {
         "status": packet.get("status"),
         "kind": "patch_context",
@@ -584,6 +592,10 @@ def project_patch_context(
         "implementation_guidance": deepcopy(packet.get("implementation_guidance") or []),
         "checks": deepcopy(packet.get("validation") or {"compile": [], "tests": [], "semantic_checks": []}),
         "mutation_intent": deepcopy(packet.get("mutation_intent") or {}),
+        "mutation_ready": mutation_ready,
+        "edit_ready": packet_valid and mutation_ready and mandatory_assignments_survived,
+        "investigation_allowed": True,
+        "source_search_status": "not_required",
         "uncertainties": deepcopy(packet.get("uncertainties") or []),
         "omitted_counts": deepcopy(packet.get("omitted_counts") or {}),
         "estimated_tokens": 0,
@@ -591,19 +603,23 @@ def project_patch_context(
     _refresh_estimate(payload)
     limit = min(PATCH_CONTEXT_HARD_TOKENS, max(256, int(max_tokens)))
     estimated_tokens = estimate_projection_tokens(payload)
-    while estimated_tokens > limit and payload["implementation_guidance"]:
-        payload["implementation_guidance"].pop()
+    for optional_key in ("objective", "uncertainties", "omitted_counts"):
+        if estimated_tokens <= limit:
+            break
+        if optional_key not in payload:
+            continue
+        if optional_key == "uncertainties" and payload.get(optional_key):
+            continue
+        payload.pop(optional_key, None)
         payload["status"] = "truncated"
-        payload["omitted_counts"]["implementation_guidance"] = (
-            payload["omitted_counts"].get("implementation_guidance", 0) + 1
-        )
         _refresh_estimate(payload)
         estimated_tokens = estimate_projection_tokens(payload)
     if estimated_tokens > limit:
         return project_insufficient(
             kind="patch_context",
             missing=[
-                "The validated patch context exceeds the model-visible budget "
+                "The validated patch context, including selected evidence guidance, "
+                "cannot be preserved within the model-visible budget "
                 f"({estimated_tokens} > {limit})."
             ],
             recommended_next_action=None, max_tokens=INSUFFICIENT_EVIDENCE_MAX_TOKENS,
@@ -786,6 +802,13 @@ def validate_model_visible_projection(
             errors.append("patch context requires a mutation intent contract")
         elif mutation.get("operation") != "none" and mutation.get("ready") is not True:
             errors.append("successful patch context requires operation-aware target readiness")
+        if payload.get("edit_ready") is not bool(
+            status in {"ok", "truncated"}
+            and payload.get("mutation_ready") is True
+            and not (payload.get("omitted_counts") or {}).get("mandatory_requirements")
+            and payload.get("source_search_status") != "required"
+        ):
+            errors.append("patch context edit readiness is inconsistent with validated support")
         for item in _cited_patch_items(payload):
             refs = item.get("evidence_ids")
             if not isinstance(refs, list) or not refs or any(ref not in ids for ref in refs):
@@ -952,20 +975,6 @@ def _docs_retrieval_issues(
     return issues
 
 
-def _bounded_action(value: Any) -> dict[str, Any] | None:
-    if not isinstance(value, dict):
-        return None
-    allowed = (
-        "tool", "type", "action", "handled_by", "arguments_patch", "question", "requires_confirmation",
-        "confirmation_reason", "reason", "observations", "security_scope",
-        "decision_options", "agent_question", "query_terms", "suggested_doc_paths",
-        "suggested_symbols", "suggested_layers", "repeat_docs_context",
-    )
-    result = {key: deepcopy(value[key]) for key in allowed if value.get(key) not in (None, {}, [])}
-    result["auto_execute"] = False
-    return result
-
-
 def _find_forbidden_keys(value: Any) -> set[str]:
     found: set[str] = set()
     if isinstance(value, dict):
@@ -977,15 +986,6 @@ def _find_forbidden_keys(value: Any) -> set[str]:
         for child in value:
             found.update(_find_forbidden_keys(child))
     return found
-
-
-def _cited_patch_items(payload: dict[str, Any]) -> list[dict[str, Any]]:
-    values: list[Any] = [
-        payload.get("acceptance_conditions"), payload.get("invariants"), payload.get("forbidden_changes"),
-        payload.get("implementation_guidance"), (payload.get("targets") or {}).get("likely_files"),
-        (payload.get("targets") or {}).get("symbols"), *((payload.get("checks") or {}).values()),
-    ]
-    return [item for value in values if isinstance(value, list) for item in value if isinstance(item, dict)]
 
 
 def _refresh_estimate(payload: dict[str, Any]) -> None:

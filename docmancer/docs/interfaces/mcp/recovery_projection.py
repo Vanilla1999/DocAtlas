@@ -310,6 +310,7 @@ def _annotate_recovery_handoff(
         projection.update({
             "disposition": "search_local_source",
             "edit_ready": bool(edit_authorized),
+            "investigation_allowed": True,
             "source_search_status": "required",
             "requires_confirmation": False,
         })
@@ -325,3 +326,18 @@ __all__ = [
     "_recovery_summary",
     "is_operational_recovery_action",
 ]
+
+def cross_module_proof_missing(packet: dict[str, Any]) -> bool:
+    mutation = packet.get("mutation_intent")
+    mutation = mutation if isinstance(mutation, dict) else {}
+    plan = mutation.get("request_plan")
+    plan = plan if isinstance(plan, dict) else {}
+    return bool(
+        packet.get("status") == "insufficient_evidence"
+        and len(plan.get("mutation_targets") or []) > 1
+        and plan.get("behavioral_requirements")
+        and any(
+            "cross_module_invariant" in str(item)
+            for item in packet.get("missing_evidence") or []
+        )
+    )

@@ -7,10 +7,20 @@ is retained by ``compile_question_plan`` when a normalized surface is accepted.
 """
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 import re
+from typing import Callable
 
-from docmancer.docs.domain.question_frame_core import clean_phrase, strip_request_wrapper
+from docmancer.docs.domain.question_frame_core import (
+    clean_phrase,
+    split_question_clause_spans,
+    strip_request_wrapper,
+)
+from docmancer.docs.domain.question_plan_core import (
+    QuestionPlan,
+    _bind_whole_plan,
+    _normalized_clause,
+)
 
 
 @dataclass(frozen=True, slots=True)
@@ -37,12 +47,117 @@ def _semantic_identity(value: str) -> str:
     return _SEMANTIC_IDENTITIES.get(cleaned.casefold(), cleaned)
 
 
+_RU_SEMANTIC_ALIASES = {
+    "войти": "entry",
+    "вход": "entry",
+    "разрешение на вход": "permission for entry",
+    "определить разрешение на вход": "determine permission for entry",
+    "приёмом отложенной работы": "accepting queued work",
+    "приемом отложенной работы": "accepting queued work",
+    "отсутствует немедленное разрешение": "immediate permission is missing",
+    "контракт разрешений": "permission contract",
+}
+
+
+def _ru_semantic_value(value: str) -> str:
+    cleaned = clean_phrase(value)
+    return _RU_SEMANTIC_ALIASES.get(cleaned.casefold(), cleaned)
+
+
+def rebind_surface_plan(
+    plan: QuestionPlan,
+    *,
+    raw: str,
+    rule: str,
+    finalize: Callable[[str, QuestionPlan], QuestionPlan],
+) -> QuestionPlan:
+    """Rebind a canonical surface plan to the complete original user span."""
+
+    if plan.unresolved_parts:
+        return QuestionPlan(
+            clauses=(raw,),
+            unresolved_parts=plan.unresolved_parts,
+            parse_trace=(f"surface:{rule}", *plan.parse_trace),
+        )
+    clauses = split_question_clause_spans(raw)
+    if not plan.facets or not clauses:
+        return plan
+    rebound = replace(
+        plan,
+        facets=tuple(replace(facet, span_text=raw) for facet in plan.facets),
+    )
+    rebound = _bind_whole_plan(rebound, raw, clauses)
+    return finalize(
+        raw,
+        replace(
+            rebound,
+            clauses=tuple(_normalized_clause(clause, compound=True) for clause in clauses),
+            parse_trace=(f"surface:{rule}", *plan.parse_trace),
+        ),
+    )
+
+
 def normalize_question_surface(question: str) -> SurfaceNormalization | None:
     """Return a semantics-preserving canonical surface for a complete question."""
 
     q = clean_phrase(strip_request_wrapper(question))
     if not q:
         return None
+
+    # Reviewed Russian variants of the reusable semantic frames. Captured
+    # technical identities are preserved; only closed relation vocabulary is
+    # canonicalized so this adapter cannot become a general translator.
+    match = re.fullmatch(
+        r"какое\s+значение\s+([A-Za-z_][\w.]*)\s+разрешает\s+(.+?)\s+(.+)", q, re.I,
+    )
+    if match is not None:
+        kind, subject, action = (_ru_semantic_value(match.group(i)) for i in range(1, 4))
+        return _result(
+            f"Which {kind} permits {subject} to {action}?",
+            "semantic:decision_for_action_ru",
+        )
+    match = re.fullmatch(
+        r"какое\s+значение\s+([A-Za-z_][\w.]*)\s+должен\s+(.+?)\s+передать\s+в\s+([A-Za-z_][\w.]*)",
+        q, re.I,
+    )
+    if match is not None:
+        argument, actor, callee = (_ru_semantic_value(match.group(i)) for i in range(1, 4))
+        return _result(
+            f"What {argument} value must {actor} pass to {callee}?",
+            "semantic:argument_value_ru",
+        )
+    match = re.fullmatch(
+        r"какой\s+проектный\s+(.+?)\s+применяется\s+к\s+(.+?)[, ]+когда\s+(.+)", q, re.I,
+    )
+    if match is not None:
+        contract, actors, condition = (_ru_semantic_value(match.group(i)) for i in range(1, 4))
+        if contract.casefold().endswith("contract"):
+            actors = re.sub(r"\s*,?\s+и\s+", ", and ", actors, flags=re.I)
+            return _result(
+                f"What project {contract} applies to {actors} when {condition}?",
+                "semantic:applicable_contract_ru",
+            )
+    match = re.fullmatch(r"что\s+делает\s+(.+?)[, ]+чтобы\s+(.+)", q, re.I)
+    if match is not None:
+        subject, purpose = (_ru_semantic_value(match.group(i)) for i in range(1, 3))
+        return _result(
+            f"What does {subject} do to {purpose}?",
+            "semantic:purpose_behavior_ru",
+        )
+    match = re.fullmatch(r"как\s+(.+?)\s+определяет\s+(.+)", q, re.I)
+    if match is not None:
+        subject, purpose = (_ru_semantic_value(match.group(i)) for i in range(1, 3))
+        return _result(
+            f"How does {subject} determine {purpose}?",
+            "semantic:purpose_determine_ru",
+        )
+    match = re.fullmatch(r"что\s+делает\s+(.+?)\s+перед\s+(.+)", q, re.I)
+    if match is not None:
+        subject, action = (_ru_semantic_value(match.group(i)) for i in range(1, 3))
+        return _result(
+            f"What does {subject} do before {action}?",
+            "semantic:behavior_before_ru",
+        )
 
     # Closed inventory families.  These normalize voice/modifier order and
     # product-local wording without changing the requested inventory.

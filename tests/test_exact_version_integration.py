@@ -73,11 +73,12 @@ class TestExactVersionServiceIntegration:
         assert "fallback" in exact_version
         assert "reason_code" in exact_version
 
-    def test_existing_latest_library_docs_queries_unchanged(self, tmp_path):
+    def test_existing_latest_library_docs_queries_unchanged(self, tmp_path, monkeypatch):
         """Normal latest queries should not trigger exact-version logic."""
         from docmancer.core.config import DocmancerConfig
         from docmancer.docs.service import LibraryDocsService
         
+        monkeypatch.setenv("DOCATLAS_HOME", str(tmp_path / "home"))
         config = DocmancerConfig()
         config.index.db_path = str(tmp_path / "test.db")
         service = LibraryDocsService(config=config)
@@ -132,11 +133,12 @@ class TestExactVersionServiceIntegration:
         assert exact_version["reason_code"] == "patch_version_docs_unavailable"
         assert "docs.pydantic.dev" in exact_version["fallback_docs_url"]
 
-    def test_non_python_ecosystem_skips_exact_version_resolver(self, tmp_path):
+    def test_non_python_ecosystem_skips_exact_version_resolver(self, tmp_path, monkeypatch):
         """Non-Python ecosystems should not trigger Python exact-version resolver."""
         from docmancer.core.config import DocmancerConfig
         from docmancer.docs.service import LibraryDocsService
         
+        monkeypatch.setenv("DOCATLAS_HOME", str(tmp_path / "home"))
         config = DocmancerConfig()
         config.index.db_path = str(tmp_path / "test.db")
         service = LibraryDocsService(config=config)
@@ -219,7 +221,9 @@ class TestExactVersionServiceIntegration:
 class TestExactVersionSupportedPath:
     """Test the supported exact-version path (when docs are available)."""
 
-    def test_explicit_docs_url_exact_version_flow_does_not_return_unsupported(self, tmp_path):
+    def test_explicit_docs_url_exact_version_flow_does_not_return_unsupported(
+        self, tmp_path, monkeypatch,
+    ):
         """When explicit docs_url is provided with version, should not return unsupported.
         
         Note: This test uses explicit docs_url, so the resolver is not actually called.
@@ -228,6 +232,7 @@ class TestExactVersionSupportedPath:
         from docmancer.core.config import DocmancerConfig
         from docmancer.docs.service import LibraryDocsService
         
+        monkeypatch.setenv("DOCATLAS_HOME", str(tmp_path / "home"))
         config = DocmancerConfig()
         config.index.db_path = str(tmp_path / "test.db")
         service = LibraryDocsService(config=config)

@@ -6,17 +6,18 @@ from pathlib import PurePosixPath
 import re
 from typing import Any, Iterable, Literal, Mapping
 
+from docmancer.docs.domain.patch_request_plan import PatchRequestPlan, build_patch_request_plan
 from docmancer.docs.domain.request_intent import is_change_request
 from docmancer.retrieval.contracts import canonical_hash
 
 
-MUTATION_INTENT_SCHEMA = "mutation-intent-v1"
+MUTATION_INTENT_SCHEMA = "mutation-intent-v2"
 MAX_MUTATION_TARGETS = 12
 MAX_ACCEPTANCE_CONDITIONS = 12
 
 MutationOperation = Literal["modify", "create", "delete", "rename", "none"]
 ArtifactKind = Literal["source", "docs", "config", "test", "generated_answer", "unknown"]
-TargetBindingKind = Literal["target", "parent_context"]
+TargetBindingKind = Literal["target", "destination_context", "parent_context"]
 
 _PATH_RE = re.compile(
     r"(?<![\w/])(?:\.?\.?/)?(?:[A-Za-z0-9_.-]+/)*[A-Za-z0-9_.-]+\.(?:py|dart|js|jsx|ts|tsx|go|rs|java|kt|swift|c|cc|cpp|h|hpp|md|mdx|rst|txt|adoc|toml|yaml|yml|json|ini|cfg|xml)(?![\w/])",
@@ -101,12 +102,18 @@ class MutationIntentContract:
     artifact_kind: ArtifactKind
     requested_targets: tuple[RequestedTarget, ...]
     resolved_targets: tuple[ResolvedTarget, ...] = ()
+    preserved_targets: tuple[ResolvedTarget, ...] = ()
     destination: str | None = None
     acceptance_conditions: tuple[str, ...] = ()
+    request_plan: PatchRequestPlan | None = None
     schema_version: str = MUTATION_INTENT_SCHEMA
 
     def __post_init__(self) -> None:
-        if len(self.requested_targets) > MAX_MUTATION_TARGETS or len(self.resolved_targets) > MAX_MUTATION_TARGETS:
+        if (
+            len(self.requested_targets) > MAX_MUTATION_TARGETS
+            or len(self.resolved_targets) > MAX_MUTATION_TARGETS
+            or len(self.preserved_targets) > MAX_MUTATION_TARGETS
+        ):
             raise ValueError("mutation target contract exceeds bounds")
         if len(self.acceptance_conditions) > MAX_ACCEPTANCE_CONDITIONS:
             raise ValueError("mutation acceptance contract exceeds bounds")
@@ -121,22 +128,34 @@ class MutationIntentContract:
             "artifact_kind": self.artifact_kind,
             "requested_targets": [asdict(item) for item in self.requested_targets],
             "resolved_targets": [asdict(item) for item in self.resolved_targets],
+            "preserved_targets": [asdict(item) for item in self.preserved_targets],
             "destination": self.destination,
             "acceptance_conditions": list(self.acceptance_conditions),
+            "request_plan": self.request_plan.hash_payload if self.request_plan is not None else None,
         }
 
     @property
     def contract_hash(self) -> str:
         return canonical_hash(self.hash_payload)
 
-    def with_resolved_targets(self, targets: Iterable[ResolvedTarget]) -> "MutationIntentContract":
+    def with_resolved_targets(
+        self,
+        targets: Iterable[ResolvedTarget],
+        *,
+        preserved_targets: Iterable[ResolvedTarget] | None = None,
+    ) -> "MutationIntentContract":
         return MutationIntentContract(
             operation=self.operation,
             artifact_kind=self.artifact_kind,
             requested_targets=self.requested_targets,
             resolved_targets=tuple(targets),
+            preserved_targets=(
+                tuple(preserved_targets)
+                if preserved_targets is not None else self.preserved_targets
+            ),
             destination=self.destination,
             acceptance_conditions=self.acceptance_conditions,
+            request_plan=self.request_plan,
         )
 
 
@@ -150,59 +169,29 @@ class MutationReadiness:
 
 
 def build_mutation_intent(question: str) -> MutationIntentContract:
-    raw = str(question or "")[:4_000]
-    if _RENAME_RE.search(raw):
-        operation: MutationOperation = "rename"
-    elif _DELETE_RE.search(raw):
-        operation = "delete"
-    elif _CREATE_RE.search(raw):
-        operation = "create"
-    elif _MODIFY_RE.search(raw):
-        operation = "modify"
-    elif is_change_request(raw):
-        # Routing recognizes a broader imperative vocabulary than the
-        # operation-specific patterns. Keep every routed patch mutable even
-        # when its verb only has generic modify semantics here.
-        operation = "modify"
+    source = str(question or "")
+    raw = source[:4_000]
+    request_plan = build_patch_request_plan(source)
+    if request_plan.operation != "none" and (
+        request_plan.mutation_targets
+        or request_plan.operation in {"create", "rename"}
+    ):
+        operation: MutationOperation = request_plan.operation
     else:
         operation = "none"
 
-    requested: list[RequestedTarget] = []
-    path_spans: list[tuple[int, int]] = []
-    for match in _PATH_RE.finditer(raw):
-        path_spans.append((match.start(), match.end()))
-        requested.append(RequestedTarget(
-            value=_normal_path(match.group(0)), kind="path",
-            query_span_start=match.start(), query_span_end=match.end(),
-        ))
-    for match in _SYMBOL_RE.finditer(raw):
-        if any(start < match.end() and match.start() < end for start, end in path_spans):
-            continue
-        value = next((group for group in match.groups() if group), "")
-        # Plain all-uppercase acronyms (SDK, PCM, HTTP, MCP) are domain
-        # vocabulary, not stable edit targets unless the user quotes them or
-        # supplies a qualified/snake-case identity.
-        if (
-            value
-            and match.group(1) is None
-            and value.isupper()
-            and not re.search(r"[_:.]", value)
-        ):
-            continue
-        if value and not any(item.value.casefold() == value.casefold() for item in requested):
-            requested.append(RequestedTarget(
-                value=value[:240], kind="symbol",
-                query_span_start=match.start(), query_span_end=match.end(),
-            ))
-    requested = requested[:MAX_MUTATION_TARGETS]
+    requested = [RequestedTarget(
+        value=_normal_path(item.value) if item.kind == "path" else item.value,
+        kind=item.kind,
+        query_span_start=item.query_span_start,
+        query_span_end=item.query_span_end,
+    ) for item in request_plan.mutation_targets]
     path_targets = tuple(item.value for item in requested if item.kind == "path")
     artifact = _artifact_from_question(raw, path_targets)
 
     destination: str | None = None
-    if operation == "rename" and len(path_targets) >= 2:
-        destination = path_targets[-1]
-    elif operation == "create" and path_targets:
-        destination = path_targets[-1]
+    if request_plan.destination is not None:
+        destination = request_plan.destination.value
 
     acceptance: list[str] = []
     for clause in _ACCEPTANCE_SPLIT_RE.split(raw):
@@ -214,7 +203,12 @@ def build_mutation_intent(question: str) -> MutationIntentContract:
         artifact_kind=artifact,
         requested_targets=tuple(requested),
         destination=destination,
-        acceptance_conditions=tuple(dict.fromkeys(acceptance))[:MAX_ACCEPTANCE_CONDITIONS],
+        acceptance_conditions=(
+            tuple(item.text for item in request_plan.acceptance_conditions)
+            if request_plan.operation != "none"
+            else tuple(dict.fromkeys(acceptance))[:MAX_ACCEPTANCE_CONDITIONS]
+        ),
+        request_plan=request_plan if is_change_request(raw) else None,
     )
 
 
@@ -267,8 +261,10 @@ def with_explicit_path_targets(
         artifact_kind=artifact,
         requested_targets=tuple(requested),
         resolved_targets=contract.resolved_targets,
+        preserved_targets=contract.preserved_targets,
         destination=destination,
         acceptance_conditions=contract.acceptance_conditions,
+        request_plan=contract.request_plan,
     )
 
 
@@ -280,10 +276,34 @@ def resolve_mutation_targets(
 ) -> MutationIntentContract:
     resolved: list[ResolvedTarget] = []
     items = [item for item in evidence_items if isinstance(item, Mapping)]
+
+    def source_class(item: Mapping[str, Any]) -> str:
+        metadata = item.get("metadata") if isinstance(item.get("metadata"), Mapping) else {}
+        return str(item.get("source_class") or metadata.get("source_class") or "").casefold()
+
+    def is_positive_local_item(item: Mapping[str, Any], path: str) -> bool:
+        evidence_class = str(item.get("evidence_class") or "").casefold()
+        if item.get("matched") is False or evidence_class in {"absent_in_source", "missing_source_evidence"}:
+            return False
+        return (
+            source_class(item) in {"code_graph", "repo_map", "project_file", "source_evidence", "test_evidence"}
+            and _artifact_for_target(path) in {"source", "config", "test"}
+        )
+
+    def collision_asserted(item: Mapping[str, Any], destination: str) -> bool:
+        metadata = item.get("metadata") if isinstance(item.get("metadata"), Mapping) else {}
+        values = item.get("collision_free_targets") or metadata.get("collision_free_targets") or ()
+        return source_class(item) in {"code_graph", "repo_map"} and any(
+            _normal_path(str(value)).casefold() == _normal_path(destination).casefold()
+            for value in values
+        )
     for requested in contract.requested_targets:
         wanted = requested.value.casefold().replace("\\", "/")
+        matches: list[tuple[Mapping[str, Any], str, str | None]] = []
         for item in items:
             path = str(item.get("path") or item.get("source") or item.get("source_path") or "").replace("\\", "/")
+            if contract.artifact_kind in {"source", "config", "test", "unknown"} and not is_positive_local_item(item, path):
+                continue
             metadata = item.get("metadata") if isinstance(item.get("metadata"), Mapping) else {}
             symbols = [
                 str(value.get("name") if isinstance(value, Mapping) else value)
@@ -295,18 +315,33 @@ def resolve_mutation_targets(
                 path.casefold() == wanted or path.casefold().endswith("/" + wanted)
             )
             symbol_match = requested.kind == "symbol" and any(value.casefold() == wanted for value in symbols)
-            if not (path_match or symbol_match):
-                continue
+            if path_match or symbol_match:
+                matches.append((item, path, requested.value if symbol_match else None))
+        if not matches and requested.kind == "symbol":
+            aliases: list[tuple[Mapping[str, Any], str, str | None]] = []
+            for item in items:
+                path = str(item.get("path") or item.get("source") or item.get("source_path") or "").replace("\\", "/")
+                if not is_positive_local_item(item, path) or _artifact_for_target(path) != "source":
+                    continue
+                stem = PurePosixPath(path).stem
+                alias = "".join(part[:1].upper() + part[1:] for part in stem.split("_") if part)
+                if alias.casefold() == wanted:
+                    aliases.append((item, path, requested.value))
+            if len({path.casefold() for _, path, _ in aliases}) == 1:
+                matches = aliases[:1]
+        if requested.kind == "symbol" and len({path.casefold() for _, path, _ in matches}) > 1:
+            matches = []
+        if matches:
+            item, path, symbol = matches[0]
             evidence_id = str(evidence_id_for_item(dict(item)))
             resolved.append(ResolvedTarget(
                 requested_value=requested.value,
                 path=path,
-                symbol=requested.value if requested.kind == "symbol" else None,
+                symbol=symbol,
                 evidence_id=evidence_id,
                 artifact_kind=_artifact_for_target(path),
                 exists=True,
             ))
-            break
 
     # Creating a new path must be authorized by real local parent/module
     # context.  The absent destination itself can never be a retrieval hit, so
@@ -315,22 +350,49 @@ def resolve_mutation_targets(
     if contract.operation == "create" and contract.destination:
         destination = PurePosixPath(_normal_path(contract.destination))
         parent = destination.parent
+        existing_destinations = []
+        for item in items:
+            item_path = str(item.get("path") or item.get("source") or item.get("source_path") or "").replace("\\", "/")
+            if (
+                item_path
+                and _normal_path(item_path).casefold() == _normal_path(contract.destination).casefold()
+                and is_positive_local_item(item, item_path)
+            ):
+                existing_destinations.append((item_path, item))
+        if existing_destinations:
+            path, item = existing_destinations[0]
+            resolved.append(ResolvedTarget(
+                requested_value=contract.destination,
+                path=path,
+                symbol=None,
+                evidence_id=str(evidence_id_for_item(dict(item))),
+                artifact_kind=_artifact_for_target(path),
+                exists=True,
+                collision_free=False,
+                binding_kind="target",
+            ))
         parent_candidates: list[tuple[str, Mapping[str, Any]]] = []
         for item in items:
             path = str(item.get("path") or item.get("source") or item.get("source_path") or "").replace("\\", "/")
             if not path:
                 continue
-            normalized = PurePosixPath(_normal_path(path))
             metadata = item.get("metadata") if isinstance(item.get("metadata"), Mapping) else {}
-            source_class = str(item.get("source_class") or metadata.get("source_class") or "").casefold()
+            item_source_class = str(item.get("source_class") or metadata.get("source_class") or "").casefold()
             module_path = str(item.get("module_path") or metadata.get("module_path") or "").replace("\\", "/").strip("/")
-            same_parent = normalized.parent == parent
+            requested_parent = (
+                contract.request_plan.parent_context.value
+                if contract.request_plan is not None and contract.request_plan.parent_context is not None
+                else str(parent)
+            )
+            same_parent = (
+                _normal_path(path).casefold() == _normal_path(requested_parent).casefold()
+                and is_positive_local_item(item, path)
+            )
             module_parent = bool(module_path) and (
                 str(parent) == module_path or str(parent).startswith(module_path + "/")
             )
-            local_structure = source_class in {"code_graph", "repo_map", "project_file"}
-            concrete_sibling = _artifact_for_target(path) in {"source", "config", "test"}
-            if same_parent and concrete_sibling or module_parent and local_structure:
+            local_structure = item_source_class in {"code_graph", "repo_map", "project_file"}
+            if same_parent or module_parent and local_structure:
                 parent_candidates.append((path.casefold(), item))
         if parent_candidates:
             _, item = min(parent_candidates, key=lambda pair: pair[0])
@@ -345,7 +407,107 @@ def resolve_mutation_targets(
                 collision_free=True,
                 binding_kind="parent_context",
             ))
-    return contract.with_resolved_targets(resolved)
+        collision_witnesses = [item for item in items if collision_asserted(item, contract.destination)]
+        if collision_witnesses:
+            item = collision_witnesses[0]
+            resolved.append(ResolvedTarget(
+                requested_value=contract.destination,
+                path=contract.destination,
+                symbol=None,
+                evidence_id=str(evidence_id_for_item(dict(item))),
+                artifact_kind=_artifact_for_target(contract.destination),
+                exists=False,
+                collision_free=True,
+                binding_kind="destination_context",
+            ))
+    if contract.operation == "rename" and contract.destination:
+        destination = contract.destination.casefold().replace("\\", "/")
+        destination_kind = (
+            contract.request_plan.destination.kind
+            if contract.request_plan is not None
+            and contract.request_plan.destination is not None
+            else "path"
+        )
+        destination_matches: list[tuple[Mapping[str, Any], str, str | None]] = []
+        for item in items:
+            path = str(
+                item.get("path") or item.get("source") or item.get("source_path") or ""
+            ).replace("\\", "/")
+            metadata = item.get("metadata") if isinstance(item.get("metadata"), Mapping) else {}
+            symbols = [
+                str(value.get("name") if isinstance(value, Mapping) else value)
+                for source in (item, metadata)
+                for key in ("symbols", "matched_symbols", "symbol_names")
+                for value in (source.get(key) or [])
+            ]
+            path_match = destination_kind == "path" and (
+                path.casefold() == destination or path.casefold().endswith("/" + destination)
+            )
+            symbol_match = destination_kind == "symbol" and any(
+                value.casefold() == destination for value in symbols
+            )
+            if path_match or symbol_match:
+                destination_matches.append((
+                    item, path, contract.destination if symbol_match else None,
+                ))
+        if len({path.casefold() for _, path, _ in destination_matches}) == 1:
+            item, path, symbol = destination_matches[0]
+            resolved.append(ResolvedTarget(
+                requested_value=contract.destination,
+                path=path,
+                symbol=symbol,
+                evidence_id=str(evidence_id_for_item(dict(item))),
+                artifact_kind=_artifact_for_target(path),
+                exists=True,
+                collision_free=False,
+                binding_kind="destination_context",
+            ))
+        elif not destination_matches:
+            collision_witnesses = [item for item in items if collision_asserted(item, contract.destination)]
+            if collision_witnesses:
+                item = collision_witnesses[0]
+                resolved.append(ResolvedTarget(
+                    requested_value=contract.destination,
+                    path=contract.destination,
+                    symbol=contract.destination if destination_kind == "symbol" else None,
+                    evidence_id=str(evidence_id_for_item(dict(item))),
+                    artifact_kind=contract.artifact_kind,
+                    exists=False,
+                    collision_free=True,
+                    binding_kind="destination_context",
+                ))
+    preserved: list[ResolvedTarget] = []
+    for requested in (contract.request_plan.preserve_targets if contract.request_plan else ()):
+        wanted = requested.value.casefold()
+        matches: list[tuple[Mapping[str, Any], str, str | None]] = []
+        for item in items:
+            path = str(item.get("path") or item.get("source") or item.get("source_path") or "").replace("\\", "/")
+            if not is_positive_local_item(item, path):
+                continue
+            metadata = item.get("metadata") if isinstance(item.get("metadata"), Mapping) else {}
+            symbols = [
+                str(value.get("name") if isinstance(value, Mapping) else value)
+                for source in (item, metadata)
+                for key in ("symbols", "matched_symbols", "symbol_names")
+                for value in (source.get(key) or [])
+            ]
+            path_match = requested.kind == "path" and (
+                path.casefold() == wanted or path.casefold().endswith("/" + wanted)
+            )
+            symbol_match = requested.kind == "symbol" and any(value.casefold() == wanted for value in symbols)
+            if path_match or symbol_match:
+                matches.append((item, path, requested.value if symbol_match else None))
+        if len({path.casefold() for _, path, _ in matches}) == 1:
+            item, path, symbol = matches[0]
+            preserved.append(ResolvedTarget(
+                requested_value=requested.value,
+                path=path,
+                symbol=symbol,
+                evidence_id=str(evidence_id_for_item(dict(item))),
+                artifact_kind=_artifact_for_target(path),
+                exists=True,
+            ))
+    return contract.with_resolved_targets(resolved, preserved_targets=preserved)
 
 
 def evaluate_mutation_readiness(contract: MutationIntentContract) -> MutationReadiness:
@@ -353,6 +515,12 @@ def evaluate_mutation_readiness(contract: MutationIntentContract) -> MutationRea
     requested_values = {item.value.casefold() for item in contract.requested_targets}
     resolved_values = {item.requested_value.casefold() for item in contract.resolved_targets if item.exists}
     missing: list[str] = []
+    if contract.request_plan is not None:
+        missing.extend(contract.request_plan.unresolved_parts)
+        preserve_values = {item.value.casefold() for item in contract.request_plan.preserve_targets}
+        preserved_values = {item.requested_value.casefold() for item in contract.preserved_targets}
+        if not preserve_values.issubset(preserved_values):
+            missing.append("preserve_target_not_resolved")
     if contract.operation in {"modify", "delete"}:
         if not requested_values:
             missing.append("mutation_target_not_requested")
@@ -368,8 +536,16 @@ def evaluate_mutation_readiness(contract: MutationIntentContract) -> MutationRea
             missing.append("rename_source_not_resolved")
         if not contract.destination:
             missing.append("rename_destination_not_requested")
-        if any(item.path.casefold() == str(contract.destination or "").casefold() for item in contract.resolved_targets):
+        if any(
+            item.binding_kind == "destination_context" and item.exists
+            for item in contract.resolved_targets
+        ):
             missing.append("rename_destination_collision")
+        if contract.destination and not any(
+            item.binding_kind == "destination_context" and item.collision_free is True
+            for item in contract.resolved_targets
+        ):
+            missing.append("rename_destination_not_verified")
     elif contract.operation == "create":
         if not contract.destination and not requested_paths:
             missing.append("create_target_not_requested")
@@ -388,6 +564,11 @@ def evaluate_mutation_readiness(contract: MutationIntentContract) -> MutationRea
         ]
         if destination and not parent_context:
             missing.append("create_parent_or_module_not_resolved")
+        if destination and not any(
+            item.binding_kind == "destination_context" and item.collision_free is True
+            for item in contract.resolved_targets
+        ):
+            missing.append("create_destination_not_verified")
     elif contract.operation == "none":
         return MutationReadiness(
             ready=False, constraints_only=False,
@@ -401,7 +582,11 @@ def evaluate_mutation_readiness(contract: MutationIntentContract) -> MutationRea
     }
     if contract.operation in {"modify", "delete", "rename"} and contract.resolved_targets:
         allowed = compatible.get(contract.artifact_kind, {contract.artifact_kind})
-        if not all(item.artifact_kind in allowed for item in contract.resolved_targets):
+        mutation_bindings = [
+            item for item in contract.resolved_targets
+            if item.binding_kind == "target"
+        ]
+        if not all(item.artifact_kind in allowed for item in mutation_bindings):
             missing.append("mutation_target_artifact_kind_mismatch")
 
     return MutationReadiness(

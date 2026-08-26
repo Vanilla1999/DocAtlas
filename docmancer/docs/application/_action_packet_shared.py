@@ -10,12 +10,15 @@ from pathlib import Path
 from typing import Any, Iterable
 
 from docmancer.docs.application.evidence_selection import (
+    EvidenceRequirementSet,
     SelectionDecision,
+    build_requirements,
     normalize_candidates,
     patch_selection_config,
     requirement_value_visible,
     select_evidence,
 )
+from docmancer.docs.application.evidence_requirements import build_patch_evidence_requirements
 from docmancer.docs.domain.normative_language import (
     classify_normative_modality,
     python_declaration_line_indexes,
@@ -27,9 +30,11 @@ from docmancer.docs.domain.mutation_intent import (
     resolve_mutation_targets,
     with_explicit_path_targets,
 )
+from docmancer.docs.domain.patch_requirements import build_patch_requirements
+from docmancer.docs.domain.request_intent import is_change_request
 
 
-ACTION_PACKET_SCHEMA_VERSION = 2
+ACTION_PACKET_SCHEMA_VERSION = 3
 DEFAULT_ACTION_PACKET_TOKENS = 1_500
 HARD_ACTION_PACKET_TOKENS = 2_000
 MIN_ACTION_PACKET_TOKENS = 128
@@ -72,6 +77,22 @@ _DANGEROUS_CONTENT_PATTERNS = (
             re.IGNORECASE,
         ),
     ),
+    (
+        "instruction_override",
+        re.compile(
+            r"\b(?:ignore|disregard|override)\b.{0,80}"
+            r"\b(?:previous|prior|system|developer|agent)\s+(?:instructions?|messages?|rules?)\b",
+            re.IGNORECASE,
+        ),
+    ),
+    (
+        "system_prompt_disclosure",
+        re.compile(
+            r"\b(?:reveal|show|print|expose|disclose)\b.{0,80}"
+            r"\b(?:system|developer)\s+(?:prompt|message|instructions?)\b",
+            re.IGNORECASE,
+        ),
+    ),
 )
 
 
@@ -95,6 +116,24 @@ def _cited_item_schema(value_key: str) -> dict[str, Any]:
                 "uniqueItems": True,
                 "items": {"type": "string", "pattern": r"^ev-[0-9a-f]{16}$"},
             },
+        },
+    }
+
+
+def _request_constraint_schema() -> dict[str, Any]:
+    return {
+        "type": "object",
+        "additionalProperties": False,
+        "required": [
+            "text", "provenance", "request_plan_hash",
+            "query_span_start", "query_span_end",
+        ],
+        "properties": {
+            "text": _non_empty_string_schema(max_length=500),
+            "provenance": {"const": "user_request"},
+            "request_plan_hash": {"type": "string", "pattern": r"^[0-9a-f]{64}$"},
+            "query_span_start": {"type": "integer", "minimum": 0},
+            "query_span_end": {"type": "integer", "minimum": 1},
         },
     }
 
@@ -149,7 +188,10 @@ ACTION_PACKET_OUTPUT_SCHEMA: dict[str, Any] = {
             },
         },
         "required_invariants": {"type": "array", "items": _cited_item_schema("text")},
-        "forbidden_changes": {"type": "array", "items": _cited_item_schema("text")},
+        "forbidden_changes": {
+            "type": "array",
+            "items": {"oneOf": [_cited_item_schema("text"), _request_constraint_schema()]},
+        },
         "implementation_guidance": {"type": "array", "items": _cited_item_schema("text")},
         "validation": {
             "type": "object",
@@ -165,8 +207,8 @@ ACTION_PACKET_OUTPUT_SCHEMA: dict[str, Any] = {
             "type": "object",
             "additionalProperties": False,
             "required": [
-                "operation", "artifact_kind", "requested_targets", "resolved_targets",
-                "destination", "acceptance_conditions", "ready", "constraints_only",
+                "operation", "artifact_kind", "requested_targets", "resolved_targets", "preserved_targets",
+                "destination", "acceptance_conditions", "request_plan", "ready", "constraints_only",
                 "missing", "contract_hash",
             ],
             "properties": {
@@ -174,8 +216,12 @@ ACTION_PACKET_OUTPUT_SCHEMA: dict[str, Any] = {
                 "artifact_kind": {"enum": ["source", "docs", "config", "test", "generated_answer", "unknown"]},
                 "requested_targets": {"type": "array", "maxItems": 12, "items": {"type": "object"}},
                 "resolved_targets": {"type": "array", "maxItems": 12, "items": {"type": "object"}},
+                "preserved_targets": {"type": "array", "maxItems": 12, "items": {"type": "object"}},
                 "destination": {"type": ["string", "null"], "maxLength": 500},
                 "acceptance_conditions": {"type": "array", "maxItems": 8, "items": {"type": "string", "maxLength": 500}},
+                "request_plan": {
+                    "type": ["object", "null"],
+                },
                 "ready": {"type": "boolean"},
                 "constraints_only": {"type": "boolean"},
                 "missing": {"type": "array", "maxItems": 12, "items": {"type": "string", "maxLength": 120}},

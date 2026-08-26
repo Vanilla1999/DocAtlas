@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 from ._action_packet_shared import *  # noqa: F401,F403
+from docmancer.retrieval.contracts import canonical_hash
 
 from ._action_packet_part01 import _effective_authority, _evidence_id, _has_actionable_items, _source_path, estimate_action_packet_tokens
 from ._action_packet_part03 import _all_cited_items, _cited_dict_items, _object_field, _string_refs, _validate_cited_items, _validate_evidence_fidelity
@@ -53,8 +54,8 @@ def validate_action_packet(
 
     mutation = packet.get("mutation_intent")
     mutation_fields = {
-        "operation", "artifact_kind", "requested_targets", "resolved_targets",
-        "destination", "acceptance_conditions", "ready", "constraints_only",
+        "operation", "artifact_kind", "requested_targets", "resolved_targets", "preserved_targets",
+        "destination", "acceptance_conditions", "request_plan", "ready", "constraints_only",
         "missing", "contract_hash",
     }
     if not isinstance(mutation, dict) or set(mutation) != mutation_fields:
@@ -69,10 +70,54 @@ def validate_action_packet(
             errors.append("mutation_intent readiness flags must be booleans")
         if not re.fullmatch(r"[0-9a-f]{64}", str(mutation.get("contract_hash") or "")):
             errors.append("mutation_intent.contract_hash is invalid")
-        for key, limit in (("requested_targets", 12), ("resolved_targets", 12), ("acceptance_conditions", 8), ("missing", 12)):
+        for key, limit in (("requested_targets", 12), ("resolved_targets", 12), ("preserved_targets", 12), ("acceptance_conditions", 8), ("missing", 12)):
             value = mutation.get(key)
             if not isinstance(value, list) or len(value) > limit:
                 errors.append(f"mutation_intent.{key} exceeds its bounded contract")
+        request_plan = mutation.get("request_plan")
+        if request_plan is not None:
+            required_plan_fields = {
+                "schema_version", "operation", "mutation_targets", "preserve_targets",
+                "destination", "parent_context", "scope_terms", "behavioral_requirements",
+                "acceptance_conditions", "consumed_spans", "unresolved_parts",
+                "language", "surface_id", "plan_hash",
+            }
+            if not isinstance(request_plan, dict) or set(request_plan) != required_plan_fields:
+                errors.append("mutation_intent.request_plan is incomplete")
+            elif (
+                not (
+                    request_plan.get("operation") == mutation.get("operation")
+                    or (
+                        mutation.get("operation") == "none"
+                        and bool(request_plan.get("unresolved_parts"))
+                    )
+                )
+                or request_plan.get("language") not in {"en", "ru"}
+                or not re.fullmatch(r"[0-9a-f]{64}", str(request_plan.get("plan_hash") or ""))
+            ):
+                errors.append("mutation_intent.request_plan is inconsistent")
+            else:
+                plan_payload = {key: value for key, value in request_plan.items() if key != "plan_hash"}
+                if canonical_hash(plan_payload) != request_plan["plan_hash"]:
+                    errors.append("mutation_intent.request_plan hash is invalid")
+                mutate_values = [
+                    str(item.get("value") or "").casefold()
+                    for item in request_plan.get("mutation_targets") or []
+                    if isinstance(item, dict)
+                ]
+                requested_values = [
+                    str(item.get("value") or "").casefold()
+                    for item in mutation.get("requested_targets") or []
+                    if isinstance(item, dict)
+                    and str(item.get("provenance") or "user_request") == "user_request"
+                ]
+                preserve_values = {
+                    str(item.get("value") or "").casefold()
+                    for item in request_plan.get("preserve_targets") or []
+                    if isinstance(item, dict)
+                }
+                if mutate_values != requested_values or preserve_values.intersection(mutate_values):
+                    errors.append("mutation_intent.request_plan target polarity is inconsistent")
 
     sources = packet.get("source_of_truth") if isinstance(packet.get("source_of_truth"), list) else []
     if not isinstance(packet.get("source_of_truth"), list):
@@ -129,6 +174,8 @@ def validate_action_packet(
     }
     for field, value in canonical_fields.items():
         for item in _cited_dict_items(value):
+            if item.get("provenance") == "user_request":
+                continue
             refs = _string_refs(item)
             if refs and any(source_by_evidence.get(ref, {}).get("authority") != "canonical" for ref in refs):
                 errors.append(f"{field} may cite only canonical evidence")

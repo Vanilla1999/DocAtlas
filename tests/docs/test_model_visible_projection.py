@@ -99,6 +99,17 @@ def test_patch_projection_retains_validated_citations_without_raw_evidence():
         )
 
 
+def test_patch_projection_rejects_factual_item_without_citations():
+    packet, evidence = _ready_patch_fixture()
+    projection, snapshot = project_patch_context(packet=packet, evidence_items=evidence)
+    projection["invariants"][0].pop("evidence_ids")
+    projection["estimated_tokens"] = estimate_projection_tokens(projection)
+
+    assert "factual patch item has missing or unknown evidence_ids" in validate_model_visible_projection(
+        projection, snapshot=snapshot, max_tokens=1_500,
+    )
+
+
 @pytest.mark.parametrize(
     ("field", "value"),
     [
@@ -497,6 +508,33 @@ def test_projection_intent_distinguishes_change_from_documentation_question():
     assert projection_kind("Исправь обработку ошибок") == "patch_context"
     assert projection_kind("How do I use FooClient.create?") == "docs_answer"
     assert projection_kind("What is the retry policy?") == "docs_answer"
+    assert projection_kind("Delete src/obsolete.py.") == "patch_context"
+
+
+def test_terminal_insufficient_projection_preserves_recovery_state():
+    payload = project_insufficient(
+        kind="patch_context",
+        missing=["x" * 2_000],
+        recommended_next_action={
+            "tool": "prepare_docs",
+            "type": "prepare_docs",
+            "arguments_patch": {"action": "sync_project_docs", "project_path": "/repo"},
+            "requires_confirmation": True,
+            "confirmation_reason": "project_docs_preflight",
+        },
+        max_tokens=1_500,
+    )
+    payload.update({
+        "edit_ready": False,
+        "source_search_status": "required",
+        "requires_confirmation": True,
+    })
+
+    bound_insufficient_projection(payload, max_tokens=256)
+
+    assert payload["edit_ready"] is False
+    assert payload["source_search_status"] == "required"
+    assert payload["requires_confirmation"] is True
 
 
 def test_library_public_call_without_canonical_decision_fails_closed():
@@ -575,7 +613,7 @@ def test_partial_navigational_docs_result_fails_closed():
     assert payload["status"] == "insufficient_evidence"
     assert "answer" not in payload
     assert payload["disposition"] == "search_local_source"
-    assert payload["edit_ready"] is True
+    assert payload["edit_ready"] is False
     assert payload["source_search_status"] == "required"
     assert payload["requires_confirmation"] is False
     assert payload["recommended_next_action"]["tool"] == "code_search"
@@ -727,6 +765,29 @@ def test_empty_assignment_canonical_selection_cannot_override_partial_retrieval(
 
     assert selection.assignments == ()
     assert projection["status"] == "insufficient_evidence"
+
+
+def test_patch_projection_fails_closed_instead_of_dropping_selected_guidance():
+    from docmancer.docs.application.model_visible_projection import project_patch_context
+
+    item = {
+        "stable_id": "large-guidance",
+        "source": "lib/permission_gate.dart",
+        "source_class": "source_evidence",
+        "content": "class PermissionGate {}",
+        "symbols": ["PermissionGate"],
+    }
+    packet = build_action_packet(
+        question="Fix PermissionGate", context_pack=[item], max_tokens=1500,
+    )
+    packet["implementation_guidance"] = [
+        {"text": "required-witness " * 200, "evidence_ids": [packet["source_of_truth"][0]["evidence_id"]]}
+    ]
+
+    projection, _ = project_patch_context(packet=packet, evidence_items=[item], max_tokens=256)
+
+    assert projection["status"] == "insufficient_evidence"
+    assert "cannot be preserved" in projection["missing"][0]
 
 
 def test_docs_selector_accounts_for_serialized_projection_cost():

@@ -45,11 +45,16 @@ class _ProjectContextServicePart01:
             and mutation_intent.operation in {"modify", "delete", "rename"}
             and target.value.casefold() != str(mutation_intent.destination or "").casefold()
         )
-        canonical_requirements = build_requirements(
-            question,
-            required_evidence_paths=(evidence_path,) if evidence_path else (),
-            required_target_paths=mutation_target_paths,
-            profile="project_document_answer" if evidence_path else "project_docs_answer",
+        patch_request = is_change_request(question)
+        canonical_requirements = (
+            build_patch_evidence_requirements(mutation_intent.request_plan)
+            if patch_request and mutation_intent.request_plan is not None
+            else build_requirements(
+                question,
+                required_evidence_paths=(evidence_path,) if evidence_path else (),
+                required_target_paths=mutation_target_paths,
+                profile="project_document_answer" if evidence_path else "project_docs_answer",
+            )
         )
         metadata = self.facade.read_project_metadata(str(root))
         project_docs = None
@@ -177,7 +182,15 @@ class _ProjectContextServicePart01:
                 if gap_action:
                     next_actions.append(gap_action)
         context_pack = project_context_pack(question=question, project_docs=project_docs, dependency_docs=dependency_docs)
-        requirements = extract_project_answer_requirements(question)
+        requirements = (
+            [
+                *[target.value for target in mutation_intent.request_plan.mutation_targets],
+                *[target.value for target in mutation_intent.request_plan.preserve_targets],
+                *mutation_intent.request_plan.scope_terms,
+            ]
+            if patch_request and mutation_intent.request_plan is not None
+            else extract_project_answer_requirements(question)
+        )
         retrieval_route = route_initial_stages(
             question=question,
             mode=mode,

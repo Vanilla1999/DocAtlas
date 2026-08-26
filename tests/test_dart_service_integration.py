@@ -191,11 +191,12 @@ def test_go_router_still_needs_docs_url(tmp_path):
     assert info.status == "needs_docs_url"
 
 
-def test_riverpod_auto_registers_and_get_docs_returns_result(tmp_path):
+def test_riverpod_auto_registers_and_get_docs_returns_result(tmp_path, monkeypatch):
     """get_docs for riverpod should register and return a result (may need refresh)."""
     from docmancer.core.config import DocmancerConfig
     from docmancer.docs.service import LibraryDocsService
     
+    monkeypatch.setenv("DOCATLAS_HOME", str(tmp_path / "home"))
     config = DocmancerConfig()
     config.index.db_path = str(tmp_path / "test.db")
     service = LibraryDocsService(config=config)
@@ -232,6 +233,7 @@ def test_refresh_receives_auto_registered_seed_urls(tmp_path, monkeypatch):
     from docmancer.core.config import DocmancerConfig
     from docmancer.docs.service import LibraryDocsService
 
+    monkeypatch.setenv("DOCATLAS_HOME", str(tmp_path / "home"))
     config = DocmancerConfig()
     config.index.db_path = str(tmp_path / "test.db")
     service = LibraryDocsService(config=config)

@@ -114,6 +114,22 @@ def test_build_project_source_evidence_includes_match_type_and_confidence(tmp_pa
     assert ev.get("match_type") in ("exact_substring", "symbol")
     assert ev.get("confidence") in ("high", "medium")
     assert ev.get("confidence_score", 0) > 0
+    assert ev["symbols"] == [
+        {"kind": "class", "name": "PermissionService", "line_start": 1, "line_end": 1}
+    ]
+
+
+def test_named_gate_source_evidence_exposes_declaration_metadata(tmp_path):
+    source = tmp_path / "lib/modules/sync/application/offline_sync_gate.dart"
+    source.parent.mkdir(parents=True)
+    source.write_text("class OfflineSyncGate {}\n", encoding="utf-8")
+
+    items = build_project_source_evidence(
+        tmp_path, question="OfflineSyncGate", max_items=4, token_budget=700,
+    )
+
+    match = next(item for item in items if item.get("path") == source.relative_to(tmp_path).as_posix())
+    assert match["symbols"][0]["name"] == "OfflineSyncGate"
 
 
 def test_build_project_source_evidence_finds_camel_case_from_nl(tmp_path):

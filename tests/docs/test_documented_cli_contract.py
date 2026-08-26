@@ -14,7 +14,6 @@ from docmancer.cli.__main__ import cli
 ROOT = Path(__file__).resolve().parents[2]
 ACTIVE_COMMAND_DOCS = (
     ROOT / "README.md",
-    ROOT / "AGENTS.md",
     ROOT / "CONTRIBUTING.md",
     ROOT / "SKILL.md",
     ROOT / ".github" / "copilot-instructions.md",

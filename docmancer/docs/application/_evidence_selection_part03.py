@@ -6,6 +6,29 @@ from ._evidence_selection_shared import *  # noqa: F401,F403
 from ._evidence_selection_part01 import SelectionDecision, _assignment_preference, _candidate_preference, _candidate_requirement_witness, _candidate_source_view, _count_reasons, _eligible_candidates, _redundant_token_ratio_millis, _selected_identity
 from ._evidence_selection_part02 import _authority_conflicts, _code_group_requirement_matches, _deduplicate, _facet_requirement_matches, _raw_candidate_binding, _reserve_and_select, _scope_requirement_value, _selected_feature_trace, _with_canonical_policy_requirements, _witness_for_requirement
 
+
+def _hydrate_cohesive_contract_paragraphs(
+    items: list[dict[str, Any]],
+    requirements: EvidenceRequirementSet,
+) -> None:
+    """Expose one indexed paragraph when a typed contract facet spans its sentences."""
+
+    if not any(item.relation == "applicable_contract" for item in requirements):
+        return
+    for item in items:
+        display = str(item.get("display_text") or "").strip()
+        content = str(item.get("content") or "").strip()
+        if (
+            not display
+            or display == content
+            or display not in content
+            or len(content) > 4_000
+            or "\n\n" in content
+        ):
+            continue
+        item["display_text"] = content
+        item["display_content_hash"] = hashlib.sha256(content.encode("utf-8")).hexdigest()
+
 def select_evidence(
     items: Iterable[Mapping[str, Any]],
     *,
@@ -53,8 +76,11 @@ def select_evidence(
         raise ValueError(
             "unsupported evidence requirement provenance: " + ", ".join(invalid_provenance)
         )
+    if config.result_kind == "docs_answer" and isinstance(requirements, EvidenceRequirementSet):
+        _hydrate_cohesive_contract_paragraphs(materialized_items, requirements)
     v3_answer_units = any(
         item.obligation_kind in {"purpose", "effect"}
+        or item.relation == "applicable_contract"
         or item.subject_kind is not None
         or (item.obligation_kind == "inventory" and item.item_kind not in {None, "public_tool"})
         for item in requirements
@@ -539,6 +565,12 @@ def _with_coverage(
             matches = candidate.project_identity == requirement.value
         elif requirement.kind == "module_id":
             matches = candidate.module_id == requirement.value
+        elif requirement.kind in {
+            "target_declaration", "preserve_declaration",
+            "behavioral_contract", "cross_module_invariant",
+        }:
+            witness = _witness_for_requirement(requirement, candidate)
+            matches = witness is not None
         elif requirement.kind == "exact_term":
             matches = requirement_value_visible(requirement.value, haystack)
         elif requirement.kind == "entity":

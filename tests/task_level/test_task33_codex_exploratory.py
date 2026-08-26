@@ -115,7 +115,9 @@ def test_codex_exploratory_worker_uses_oauth_jsonl_without_claiming_verified_usa
 
     monkeypatch.setattr(task33_codex_exploratory.shutil, "which", lambda _name: "/usr/bin/codex")
     monkeypatch.setattr(task33_codex_exploratory, "_run_bounded_codex", fake_run)
-    worker = CodexExploratoryWorker(model="gpt-test", temp_root=tmp_path)
+    worker = CodexExploratoryWorker(
+        model="gpt-test", reasoning_effort="low", temp_root=tmp_path,
+    )
 
     output = worker.run(_envelope(), _snapshot(), timeout_seconds=30)
 
@@ -134,11 +136,18 @@ def test_codex_exploratory_worker_uses_oauth_jsonl_without_claiming_verified_usa
     assert "--ignore-user-config" in command
     assert "--ignore-rules" in command
     assert command[command.index("--sandbox") + 1] == "read-only"
+    assert 'model_reasoning_effort="low"' in command
+    assert worker.capability_evidence["reasoning_effort"] == "low"
     assert "danger-full-access" not in command
     assert captured["cwd"] != Path.cwd()
     env = captured["env"]
     assert "OPENAI_API_KEY" not in env
     assert "UNRELATED_SECRET" not in env
+
+
+def test_codex_selector_rejects_unknown_reasoning_effort():
+    with pytest.raises(ValueError, match="Unsupported Codex reasoning effort"):
+        CodexExploratoryWorker(reasoning_effort="minimal")
 
 
 def test_codex_failure_summary_redacts_credentials_and_preserves_diagnostic():
@@ -324,10 +333,16 @@ def test_host_preflight_does_not_require_or_probe_docker(
         "_probe_retrieval",
         lambda output: {"status": "verified"},
     )
+    selector_options = {}
+
+    def fake_selector(*args, **kwargs):
+        selector_options.update(kwargs)
+        return {"status": "exploratory_verified"}
+
     monkeypatch.setattr(
         task33_codex_exploratory,
         "_probe_codex_selector",
-        lambda *args, **kwargs: {"status": "exploratory_verified"},
+        fake_selector,
     )
     monkeypatch.setattr(
         task33_codex_exploratory.DockerCommandSandbox,
@@ -343,6 +358,7 @@ def test_host_preflight_does_not_require_or_probe_docker(
         (tmp_path / "host-preflight_preflight" / "preflight-summary.json").read_text()
     )
     assert rc == 0
+    assert selector_options["reasoning_effort"] == "medium"
     assert summary["checks"]["execution_backend"]["status"] == "exploratory_unisolated"
     assert "docker" not in summary["checks"]
 
@@ -421,7 +437,13 @@ def test_two_cell_smoke_uses_one_canary_and_exactly_two_provider_cells(
         "CodexExploratoryWorker",
         lambda *args, **kwargs: pytest.fail("worker must not be created for two-cell smoke"),
     )
-    monkeypatch.setattr(task33_codex_exploratory, "CodexRunner", lambda **kwargs: object())
+    runner_options = {}
+
+    def fake_runner(**kwargs):
+        runner_options.update(kwargs)
+        return object()
+
+    monkeypatch.setattr(task33_codex_exploratory, "CodexRunner", fake_runner)
     canary_calls = []
 
     def fake_canary(*args, **kwargs):
@@ -462,6 +484,8 @@ def test_two_cell_smoke_uses_one_canary_and_exactly_two_provider_cells(
         "--run-exploratory-pilot",
         "--run-id",
         "two-cell-smoke",
+        "--reasoning-effort",
+        "low",
     ])
 
     manifest = json.loads((tmp_path / "two-cell-smoke" / "exploratory_manifest.json").read_text())
@@ -474,6 +498,8 @@ def test_two_cell_smoke_uses_one_canary_and_exactly_two_provider_cells(
     assert manifest["conditions"] == captured_conditions
     assert manifest["provider_call_cap"] == 3
     assert manifest["two_cell_smoke"] is True
+    assert manifest["reasoning_effort"] == "low"
+    assert runner_options["reasoning_effort"] == "low"
 
 
 def test_exploratory_summary_reports_metrics_without_valid_verdict():

@@ -7,7 +7,6 @@ This is the canonical map of maintained DocAtlas project-owned documentation. Ag
 - [README](../README.md) — product overview, quickstart, core commands, and high-level MCP docs-server workflow.
 - [Project Map](./PROJECT_MAP.md) — repository map, product surfaces, code areas, docs map, core workflows, data flow, and safety boundaries.
 - [Agent Docs Workflow](./AGENT_DOCS_WORKFLOW.md) — operational playbook for agents using DocAtlas to build, sync, and query documentation context.
-- [Agent instructions](../AGENTS.md) — compact workflow summary that coding agents should follow inside this repository.
 
 ## MCP and project-docs workflows
 
@@ -21,6 +20,8 @@ This is the canonical map of maintained DocAtlas project-owned documentation. Ag
 - [Context7 comparison](./context7-docmancer-comparison.md) — comparison with Context7-style hosted documentation lookup.
 - [Product brief](./DOCMANCER_PRODUCT_BRIEF.md) — product positioning and scope.
 - [Architecture](../wiki/Architecture.md) — architecture narrative for indexing, retrieval, Docs MCP, Packs runtime, registry, and version provenance.
+- [Question planning](./modules/question-planning.md) — fail-closed documentation-question and proof-obligation boundary.
+- [Patch request planning](./modules/patch-request-planning.md) — reviewed imperative grammar, mutation readiness, and edit authorization.
 
 ## User-facing reference
 

@@ -523,9 +523,18 @@ def _assignment_preference(
     candidate: EvidenceCandidate,
     witness: RequirementWitness | None,
 ) -> tuple[Any, ...]:
+    target_identity_rank = 0
+    if requirement.proof_role == "target_identity":
+        wanted = requirement.value.casefold().replace("\\", "/")
+        target_identity_rank = 0 if (
+            any(symbol.casefold() == wanted for symbol in candidate.symbols)
+            or candidate.source_identity.casefold().replace("\\", "/").endswith("/" + wanted)
+            or candidate.source_identity.casefold().replace("\\", "/") == wanted
+        ) else 1
     return (
         0 if witness is not None else 1,
         -(witness.completeness_score if witness else 0),
+        target_identity_rank,
         0 if candidate.authority == "canonical" else 1,
         _lifecycle_assignment_rank(requirement, candidate),
         _version_rank(candidate.version_binding),

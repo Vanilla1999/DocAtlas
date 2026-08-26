@@ -249,8 +249,13 @@ def build_project_answer_contract(question: str) -> ProjectAnswerContract:
         special_relations.append(("authority scope", "authority_invariant", _AUTHORITY_INVARIANT_RE.search(raw_question).group(0)))
     if _REQUEST_HANDLING_RE.search(raw_question):
         special_relations.append(("MCP server", "request_handling", _REQUEST_HANDLING_RE.search(raw_question).group(0)))
-    if _ARCHITECTURE_RE.search(raw_question):
-        special_relations.append(("MCP server", "architecture", _ARCHITECTURE_RE.search(raw_question).group(0)))
+    architecture_match = _ARCHITECTURE_RE.search(raw_question)
+    if architecture_match and re.search(r"\bMCP\b", raw_question, re.I):
+        special_relations.append(("MCP server", "architecture", architecture_match.group(0)))
+    elif architecture_match and re.fullmatch(r"\s*архитектур[а-я]*[?.!]*\s*", raw_question, re.I):
+        # Preserve the frozen one-word Russian architecture surface while
+        # rejecting broader non-MCP architecture guesses.
+        special_relations.append(("MCP server", "architecture", architecture_match.group(0)))
     if _RESPONSIVENESS_RE.search(raw_question):
         special_relations.append(("MCP server", "responsiveness", _RESPONSIVENESS_RE.search(raw_question).group(0)))
     for subject, relation, span_value in special_relations:
@@ -293,7 +298,9 @@ def build_project_answer_contract(question: str) -> ProjectAnswerContract:
                 re.I,
             )
             if contract_match:
-                contract_subjects.append(contract_match.group(1))
+                candidate = contract_match.group(1).strip()
+                if candidate.casefold() not in {"what", "which", "who", "how"}:
+                    contract_subjects.append(candidate)
         for subject in list(dict.fromkeys(contract_subjects))[:4]:
             obligations.append(_obligation(
                 question=raw_question, index=len(obligations), kind="exact_fact",

@@ -11,6 +11,8 @@ from pathlib import Path
 
 import pytest
 
+import eval.task_level._isolated_delivery_part02 as isolated_delivery_part02
+
 from docmancer.docs.application.action_packet import build_action_packet, estimate_action_packet_tokens
 from eval.task_level.conditions import CONDITIONS, TOOL_REQUIRED_ONCE_INSTRUCTION
 from eval.task_level.evaluators.policy import audit_trajectory
@@ -220,6 +222,8 @@ def test_isolated_broker_persists_recomputable_evidence_and_bounded_handoff(tmp_
         "isolated_delegation_envelope.json",
         "isolated_delivery_attempt.json",
         "isolated_delivery_metrics.json",
+        "model_visible_evidence_snapshot.json",
+        "model_visible_patch_context.json",
         "worker_usage_proof.json",
     }
     manifest = json.loads((tmp_path / "host_evidence_manifest.json").read_text(encoding="utf-8"))
@@ -235,6 +239,27 @@ def test_isolated_broker_persists_recomputable_evidence_and_bounded_handoff(tmp_
     assert metrics["worker_usage_proof_fingerprint"]
     assert metrics["raw_retrieval_tokens"] == 2_400
     assert "evidence_items" not in result and "trust_contract" not in result
+
+
+def test_isolated_broker_rejects_an_insufficient_model_visible_projection(
+    tmp_path, monkeypatch,
+):
+    monkeypatch.setattr(
+        isolated_delivery_part02,
+        "project_patch_context",
+        lambda **kwargs: ({
+            "status": "insufficient_evidence",
+            "kind": "patch_context",
+            "missing": ["projection exceeds budget"],
+            "estimated_tokens": 20,
+        }, {}),
+    )
+
+    with pytest.raises(
+        IsolatedDeliveryError,
+        match="isolated_model_visible_projection_insufficient",
+    ):
+        _deliver(Worker(), tmp_path)
 
 
 def test_subprocess_worker_is_fail_closed_and_bounds_both_output_streams(tmp_path):

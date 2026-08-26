@@ -47,3 +47,8 @@ At minimum, unknown-tail tests must permute comma, colon, semicolon, period,
 question mark, newline, em dash, slash, `and also`, `while also`, discourse
 switches such as `by the way`, and a suffix without an explicit question word.
 Known compound questions and noun coordination must remain supported.
+
+`PatchRequestPlan` applies the same fail-closed span principle independently:
+target extraction is limited to parsed target-list clauses, preserve and
+acceptance clauses are never rescanned as mutable regions, and any unknown
+imperative residue prevents mutation readiness.

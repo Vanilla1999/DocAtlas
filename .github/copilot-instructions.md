@@ -12,5 +12,5 @@ DocAtlas provides local-first, source-attributed documentation context for codin
 
 Repository files are the source of truth. DocAtlas may index accepted documentation but must not silently author, commit, or push it. Use code search for implementation facts and DocAtlas for documentation context.
 
-For command details, use `doc-atlas --help`, `doc-atlas mcp --help`, [AGENTS.md](../AGENTS.md), and [the Docs MCP reference](../docs/mcp-docs-server.md). MCP Packs and patch constraints are advanced/advisory surfaces, not the default workflow.
+For command details, use `doc-atlas --help`, `doc-atlas mcp --help`, and [the Docs MCP reference](../docs/mcp-docs-server.md). MCP Packs and patch constraints are advanced/advisory surfaces, not the default workflow.
 <!-- docmancer:end -->

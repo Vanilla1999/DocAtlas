@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from pathlib import Path
+
 from docmancer.docs.application.evidence_selection import (
     build_requirements,
     diagnose_proofability,
@@ -10,6 +12,7 @@ from docmancer.docs.application.model_visible_projection import (
     project_docs_answer,
     validate_model_visible_projection,
 )
+from tests.docs.test_question_frame_paraphrase_e2e import _service
 
 
 def _select(question: str, candidates: list[dict], *, budget: int = 800):
@@ -163,6 +166,120 @@ def test_location_and_workflow_materialize_valid_canonical_projection():
             max_tokens=800,
             canonical_selection=decision,
         ) == []
+
+
+def test_permission_frames_select_and_project_decisive_local_evidence(tmp_path, monkeypatch):
+    fixture_docs = (
+        Path(__file__).parents[2]
+        / "eval/task_level/fixtures/templates/decisive_nbo_cross_module_gate_large_001/docs"
+    )
+    candidates = []
+    for name in ("browser-flow.md", "scan-flow.md", "offline-sync.md", "permission-architecture.md"):
+        content = (fixture_docs / name).read_text(encoding="utf-8")
+        candidates.append({
+            "stable_id": f"permission-{name}",
+            "source": f"docs/{name}",
+            "path": f"docs/{name}",
+            "title": content.splitlines()[0].removeprefix("# "),
+            "authority": "primary",
+            "lifecycle_status": "active",
+            "content": content,
+        })
+    architecture = candidates[3]
+    architecture_paragraph = (
+        "Browser and scan flows both share the same immediate-entry contract. "
+        "Browser may set `allowOfflineFallback` when it can queue work for later, but offline fallback still cannot bypass missing immediate-entry permissions. "
+        "Offline sync must also delegate to the same permission service before accepting work created by either flow."
+    )
+    architecture["content"] = architecture_paragraph
+    architecture["display_text"] = "Browser and scan flows both share the same immediate-entry contract."
+    architecture["authority"] = "supporting"
+    cases = [
+        (
+            "According to the project documentation, which PermissionDecision permits BrowserPermissionGate to enter?",
+            "PermissionDecision.allow",
+        ),
+        (
+            "According to the project documentation, how does ScanPermissionGate determine whether scan may enter?",
+            "evaluateFlowEntry",
+        ),
+        (
+            "According to the project documentation, what allowOfflineFallback value must offline sync pass to PermissionService.evaluateFlowEntry?",
+            "allowOfflineFallback: false",
+        ),
+        (
+            "What project permission contract applies to browser, scan, and sync when immediate permission is missing?",
+            "cannot bypass missing immediate-entry permissions",
+        ),
+        (
+            "What does the browser flow do to determine permission for entry?",
+            "evaluateFlowEntry",
+        ),
+        (
+            "What does offline sync do before accepting queued work?",
+            "before accepting queued work",
+        ),
+    ]
+    for question, expected in cases:
+        decision = _select(question, candidates)
+        assert decision.status == "ok", decision.missing_requirements
+        projection, _snapshot = project_docs_answer(
+            question=question,
+            retrieval={
+                "status": "success", "answer_available": True,
+                "selection_profile": "project_docs_answer", "context_pack": candidates,
+            },
+            canonical_selection=decision,
+        )
+        assert projection["status"] == "ok"
+        assert expected in projection["answer"]
+        assert validate_model_visible_projection(
+            projection,
+            snapshot=_snapshot,
+            max_tokens=800,
+            canonical_selection=decision,
+        ) == []
+
+    project = tmp_path / "permission-project"
+    docs = project / "docs"
+    docs.mkdir(parents=True)
+    (project / "README.md").write_text("# Permission fixture\n", encoding="utf-8")
+    for name in ("browser-flow.md", "scan-flow.md", "offline-sync.md", "permission-architecture.md"):
+        (docs / name).write_text((fixture_docs / name).read_text(encoding="utf-8"), encoding="utf-8")
+    manifest = [
+        "schema_version: 1", "documents:",
+        "  - path: README.md", "    role: overview", "    scope: project",
+        "    description: Permission fixture overview.",
+        "    authority: source_of_truth", "    status: active", "    impact: track",
+    ]
+    for name in ("browser-flow.md", "scan-flow.md", "offline-sync.md", "permission-architecture.md"):
+        manifest.extend((
+            f"  - path: docs/{name}",
+            "    role: other",
+            "    scope: project",
+            f"    description: Permission fixture evidence from docs/{name}.",
+            "    authority: source_of_truth",
+            "    status: active",
+            "    impact: track",
+        ))
+    (project / "docatlas.project-docs.yaml").write_text(
+        "\n".join(manifest) + "\n", encoding="utf-8",
+    )
+    service = _service(tmp_path, monkeypatch)
+    assert service.sync_project_docs(str(project), with_vectors=False).status == "success"
+    for question, _expected in cases:
+        result = service.get_docs_context(
+            question,
+            project_path=str(project),
+            mode="project",
+            scope="project",
+            tokens=4_000,
+            limit=12,
+        )
+        assert result.answer_available is True, (
+            question, result.status, result.reason_code, result.message,
+            result.next_action, result.missing_requirement_ids,
+        )
 
     navigation_failure = _select(
         "What are the public tools of the Docs MCP server?",

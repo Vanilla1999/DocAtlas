@@ -206,9 +206,11 @@ def test_task33_host_evidence_augments_project_docs_with_deterministic_local_evi
 
     service_response = {
         "status": "success",
-        "answer_available": True,
-        "answer_type": "exact",
-        "answer_completeness": {"status": "complete", "source_search_required": False},
+        # The frozen host query is a lexical retrieval probe, not a question.
+        # Answer completeness must not block the independently validated packet.
+        "answer_available": False,
+        "answer_type": "partial_navigational",
+        "answer_completeness": {"status": "partial", "source_search_required": True},
         "lanes": {"project": {"status": "success"}},
         "context_pack": [{
             "stable_chunk_id": "fixture-readme",

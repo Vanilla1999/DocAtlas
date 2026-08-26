@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 from ._action_packet_shared import *  # noqa: F401,F403
+from docmancer.docs.project_docs_catalog import read_project_docs_catalog
 
 def estimate_action_packet_tokens(value: Any) -> int:
     """Estimate tokens deterministically as ceil(serialized UTF-8 bytes / 4)."""
@@ -29,20 +30,56 @@ def _ensure_selection_survives_packet(
         if isinstance(row, dict)
     }
     selected_by_stable = {item.stable_id: item for item in selection.selected_candidates}
+    assignments = {item.requirement_id: item for item in selection.assignments}
     missing: list[str] = []
     for requirement in selection.requirements:
         if not requirement.mandatory:
+            continue
+        assignment = assignments.get(requirement.requirement_id)
+        if assignment is None:
             continue
         covering = [
             item for item in selection.selected_candidates
             if requirement.requirement_id in item.covered_requirement_ids
         ]
-        if requirement.kind == "evidence_path":
+        assigned_candidate = selected_by_stable.get(assignment.evidence_id)
+        assigned_id = (
+            _evidence_id(dict(assigned_candidate.original))
+            if assigned_candidate is not None else assignment.evidence_id
+        )
+        assigned_survived = assigned_id in retained_evidence_ids
+        assigned_unit = next((
+            witness for witness in (assigned_candidate.requirement_witnesses if assigned_candidate else ())
+            if witness.requirement_id == requirement.requirement_id
+            and (assignment.unit_id is None or witness.unit_id == assignment.unit_id)
+        ), None)
+        if assigned_unit is not None:
+            assigned_survived = assigned_survived and (
+                _normalized_fact_text(assigned_unit.unit_text)
+                in _normalized_fact_text(visible_text)
+            )
+        if requirement.proof_role == "target_identity":
+            mutation = packet.get("mutation_intent") or {}
+            resolved_bindings = {
+                (
+                    str(target.get("requested_value") or "").casefold(),
+                    str(target.get("evidence_id") or ""),
+                )
+                for key in ("resolved_targets", "preserved_targets")
+                for target in mutation.get(key) or []
+                if isinstance(target, dict)
+            }
+            satisfied = any(
+                requested == requirement.value.casefold()
+                and evidence_id in retained_evidence_ids
+                for requested, evidence_id in resolved_bindings
+            )
+        elif requirement.kind == "evidence_path":
             paths = {
                 _normalized_source_key(row.get("path"))
                 for row in packet.get("source_of_truth") or [] if isinstance(row, dict)
             }
-            satisfied = _normalized_source_key(requirement.value) in paths
+            satisfied = assigned_survived and _normalized_source_key(requirement.value) in paths
         elif requirement.kind == "target_path":
             paths = {
                 _normalized_source_key(row.get("path"))
@@ -50,20 +87,23 @@ def _ensure_selection_survives_packet(
             }
             satisfied = _normalized_source_key(requirement.value) in paths
         elif requirement.kind == "exact_version":
-            satisfied = any(
+            satisfied = assigned_survived and any(
                 _evidence_id(dict(item.original)) in retained_evidence_ids
                 and item.resolved_version.casefold() == requirement.value.casefold()
                 for item in covering
             )
         elif requirement.kind == "canonical_policy":
             candidate = selected_by_stable.get(requirement.value)
-            facts = _extract_facts(_content_text(candidate.original))[0] if candidate else []
-            satisfied = bool(candidate) and (
-                all(fact.casefold() in visible_text for _, fact in facts)
-                if facts else _evidence_id(dict(candidate.original)) in retained_evidence_ids
+            satisfied = (
+                assigned_survived
+                and candidate is not None
+                and _policy_witness_survived(packet, assigned_id, candidate)
             )
         else:
-            satisfied = requirement_value_visible(requirement.value, visible_text)
+            satisfied = assigned_survived and (
+                assigned_unit is not None
+                or requirement_value_visible(requirement.value, visible_text)
+            )
         if not satisfied:
             missing.append(requirement.requirement_id)
     if not missing:
@@ -106,12 +146,41 @@ def _effective_authority(
         for value in (item.get("authority"), item.get("repository_authority"))
         if value
     }
-    if not declared & {"canonical", "source_of_truth", "explicit_agent_policy", "primary"}:
-        return "supporting"
-    if _instruction_risk_flags(item):
+    if not declared & {
+        "canonical", "source_of_truth", "explicit_agent_policy", "primary",
+        "project_rule", "official", "project_owned",
+    }:
         return "supporting"
     if item.get("repository_authority") == "explicit_agent_policy":
         return "canonical" if _scope_applies(item, project_path=project_path, target_paths=target_paths) else "supporting"
+    if str(item.get("source_class") or "").casefold() == "project_doc" and project_path:
+        root = Path(project_path).expanduser()
+        if root.is_dir():
+            catalog = read_project_docs_catalog(root)
+            if not catalog.present:
+                # Legacy benchmark contracts use the explicit project_rule
+                # classification. A bare source_of_truth claim is not enough
+                # without a catalog declaration.
+                return "canonical" if "project_rule" in declared else "supporting"
+            source = _normalized_source_key(_source_path(item))
+            catalog_authority = next((
+                entry.authority
+                for entry in catalog.entries
+                if _normalized_source_key(entry.path) == source
+                and entry.status == "active"
+            ), None)
+            if catalog_authority is None:
+                catalog_authority = next((
+                    catalog_root.authority
+                    for catalog_root in catalog.roots
+                    if catalog_root.status == "active"
+                    and (
+                        source == _normalized_source_key(catalog_root.path)
+                        or source.startswith(_normalized_source_key(catalog_root.path) + "/")
+                    )
+                ), None)
+            if not catalog.valid or catalog_authority != "source_of_truth":
+                return "supporting"
     if str(item.get("doc_scope") or "") == "module" or item.get("module_path"):
         return "canonical" if _scope_applies(item, project_path=project_path, target_paths=target_paths) else "supporting"
     return "canonical"
@@ -123,10 +192,12 @@ def _declares_canonical_authority(item: dict[str, Any]) -> bool:
         for value in (item.get("authority"), item.get("repository_authority"))
         if value
     }
-    return bool(declared & {"canonical", "source_of_truth", "explicit_agent_policy", "primary"})
+    return bool(declared & {"canonical", "source_of_truth", "explicit_agent_policy", "primary", "project_rule"})
 
 
 def _critical_fact_count(item: dict[str, Any]) -> int:
+    if str(item.get("source_class") or "") in _CODE_SOURCE_CLASSES:
+        return 0
     facts, oversized = _extract_facts(_content_text(item))
     return oversized + sum(
         1 for fact_type, _ in facts if fact_type in {"required", "forbidden", "validation"}
@@ -344,7 +415,7 @@ def _authority(item: dict[str, Any]) -> str:
         for value in (item.get("authority"), item.get("repository_authority"))
         if value
     }
-    if declared & {"canonical", "source_of_truth", "explicit_agent_policy", "primary"}:
+    if declared & {"canonical", "source_of_truth", "explicit_agent_policy", "primary", "project_rule"}:
         return "canonical"
     return "supporting"
 
@@ -455,7 +526,17 @@ def _add_mandatory_requirement_witnesses(
         requirement.requirement_id: requirement
         for requirement in selection.requirements
         if requirement.mandatory
-        and requirement.kind in {"exact_term", "entity", "canonical_policy"}
+        and (
+            requirement.kind in {
+                "exact_term", "entity", "canonical_policy",
+                "behavioral_contract", "cross_module_invariant",
+            }
+            or (
+                requirement.kind == "source_fact"
+                and requirement.requirement_id.startswith("behavioral_contract:")
+            )
+        )
+        and requirement.proof_role != "target_identity"
     }
     source_ids = {
         str(row.get("evidence_id") or "")
@@ -468,16 +549,73 @@ def _add_mandatory_requirement_witnesses(
         evidence_id = _evidence_id(evidence)
         if evidence_id not in source_ids or _instruction_risk_flags(evidence):
             continue
+        custom_witnesses = [
+            witness for witness in candidate.requirement_witnesses
+            if witness.requirement_id in requirements
+            and (
+                requirements[witness.requirement_id].kind in {
+                    "behavioral_contract", "cross_module_invariant",
+                }
+                or (
+                    requirements[witness.requirement_id].kind == "source_fact"
+                    and witness.requirement_id.startswith("behavioral_contract:")
+                )
+            )
+        ]
         canonical_requirement_id = f"canonical_policy:{candidate.stable_id}"
-        if canonical_requirement_id in candidate.covered_requirement_ids:
-            for _, fact in _extract_facts(_content_text(evidence))[0]:
-                if not fact or _content_instruction_risk_flags(fact):
+        for witness in custom_witnesses:
+            if not witness.unit_text or _content_instruction_risk_flags(witness.unit_text):
+                continue
+            if _normalized_fact_text(witness.unit_text) in _normalized_fact_text(visible_text):
+                continue
+            requirement = requirements[witness.requirement_id]
+            field = (
+                "required_invariants"
+                if requirement.kind == "cross_module_invariant"
+                else "implementation_guidance"
+            )
+            text = witness.unit_text
+            if requirement.kind == "cross_module_invariant":
+                targets = [
+                    value.casefold()
+                    for value in requirement.value.splitlines()
+                    if value
+                ]
+                text = next((
+                    fact
+                    for modality, fact in _extract_facts(witness.unit_text)[0]
+                    if modality == "required"
+                    and all(target in fact.casefold() for target in targets)
+                ), "")
+                if not text:
                     continue
+                packet["implementation_guidance"] = [
+                    row
+                    for row in packet["implementation_guidance"]
+                    if row.get("text") != text
+                ]
+            packet[field].append({
+                "text": text,
+                "evidence_ids": [evidence_id],
+            })
+            mandatory_rows.add((witness.unit_text, evidence_id))
+            visible_text += "\n" + witness.unit_text.casefold()
+        if canonical_requirement_id in candidate.covered_requirement_ids:
+            missing_facts = [
+                fact
+                for _, fact in _extract_facts(_content_text(evidence))[0]
+                if fact
+                and not _content_instruction_risk_flags(fact)
+                and _normalized_fact_text(fact) not in _normalized_fact_text(visible_text)
+            ]
+            if missing_facts:
+                text = "\n".join(missing_facts)
                 packet["implementation_guidance"].append({
-                    "text": fact,
+                    "text": text,
                     "evidence_ids": [evidence_id],
                 })
-                mandatory_rows.add((fact, evidence_id))
+                mandatory_rows.add((text, evidence_id))
+                visible_text += "\n" + text.casefold()
         remaining = [
             requirements[requirement_id]
             for requirement_id in sorted(candidate.covered_requirement_ids)
@@ -503,6 +641,19 @@ def _add_mandatory_requirement_witnesses(
     packet["implementation_guidance"] = _dedupe_cited(
         packet["implementation_guidance"], "text"
     )
+    packet["required_invariants"] = _dedupe_cited(
+        packet["required_invariants"], "text"
+    )
+    invariant_texts = [
+        str(row.get("text") or "")
+        for row in packet["required_invariants"]
+        if row.get("text")
+    ]
+    packet["implementation_guidance"] = [
+        row
+        for row in packet["implementation_guidance"]
+        if str(row.get("text") or "") not in invariant_texts
+    ]
     return mandatory_rows
 
 
@@ -529,6 +680,10 @@ def _packet_visible_text(packet: dict[str, Any]) -> str:
             str(row.get("text") or "") for row in rows or [] if isinstance(row, dict)
         )
     return "\n".join(values).casefold()
+
+
+def _normalized_fact_text(value: str) -> str:
+    return " ".join(value.replace("`", "").lstrip("-* ").casefold().split())
 
 
 def _requirement_witness(content: str, values: list[str]) -> str:
@@ -654,6 +809,7 @@ def _dedupe_cited(rows: Iterable[dict[str, Any]], key: str) -> list[dict[str, An
 
 
 def _cited_evidence_ids(packet: dict[str, Any]) -> set[str]:
+    mutation = packet.get("mutation_intent") or {}
     rows = [
         *(packet["task_interpretation"].get("acceptance_conditions") or []),
         *packet["target_surface"]["likely_files"],
@@ -664,13 +820,51 @@ def _cited_evidence_ids(packet: dict[str, Any]) -> set[str]:
         *packet["validation"]["compile"],
         *packet["validation"]["tests"],
         *packet["validation"]["semantic_checks"],
+        *(mutation.get("resolved_targets") or []),
+        *(mutation.get("preserved_targets") or []),
     ]
     return {
         str(ref)
         for row in rows
-        for ref in (row.get("evidence_ids") or [])
+        for ref in (
+            row.get("evidence_ids")
+            or ([row.get("evidence_id")] if row.get("evidence_id") else [])
+        )
         if isinstance(row, dict) and ref
     }
+
+
+def _policy_witness_survived(
+    packet: dict[str, Any],
+    evidence_id: str,
+    candidate: Any,
+) -> bool:
+    validation = packet.get("validation") or {}
+    rows = [
+        *packet.get("required_invariants", []),
+        *packet.get("forbidden_changes", []),
+        *packet.get("implementation_guidance", []),
+        *(validation.get("compile") or []),
+        *(validation.get("tests") or []),
+        *(validation.get("semantic_checks") or []),
+    ]
+    safe_facts = {
+        fact
+        for _, fact in _extract_facts(_content_text(dict(candidate.original)))[0]
+        if fact and not _content_instruction_risk_flags(fact)
+    }
+    witnessed = [
+        _normalized_fact_text(str(row.get("text") or ""))
+        for row in rows
+        if isinstance(row, dict)
+        and evidence_id in {
+            str(ref) for ref in row.get("evidence_ids") or [] if ref
+        }
+    ]
+    return bool(safe_facts) and all(
+        any(_normalized_fact_text(fact) in text for text in witnessed)
+        for fact in safe_facts
+    )
 
 
 def _has_actionable_items(packet: dict[str, Any]) -> bool:

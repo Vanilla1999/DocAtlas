@@ -35,6 +35,11 @@ _GENERIC_SYMBOL_RE = re.compile(
 _STRING_RE = re.compile(r"(['\"])((?:\\.|(?!\1).){2,120})\1")
 _WORD_RE = re.compile(r"[A-Za-zА-Яа-яЁё][A-Za-zА-Яа-яЁё0-9_\-]{2,}")
 _IDENTIFIER_RE = re.compile(r"\b[A-Za-z_][A-Za-z0-9_]{2,}\b")
+_QUERY_PATH_RE = re.compile(
+    r"(?<![\w/])(?:\.?\.?/)?(?:[A-Za-z0-9_.-]+/)*[A-Za-z0-9_.-]+\."
+    r"(?:py|dart|js|jsx|ts|tsx|go|rs|java|kt|swift|c|cc|cpp|h|hpp)(?![\w/])",
+    re.I,
+)
 _STATUS_TOKEN_RE = re.compile(r"\b(?:active|inactive|closed|open|pending|success|error|failed|done|reopen|status|created|updated|deleted)\b", re.IGNORECASE)
 _SECRET_ASSIGNMENT_RE = re.compile(
     r"(?i)\b(api[_-]?key|auth[_-]?token|password|passwd|secret|token)(\s*[:=]\s*)(['\"]?)[^'\"\s,;)]+"
@@ -227,12 +232,27 @@ def build_project_source_evidence(
             continue
         relative = path.relative_to(root).as_posix()
         language = SOURCE_FILE_LANGUAGES[path.suffix.lower()]
-        for line_number, line in enumerate(text.splitlines(), start=1):
+        source_lines = text.splitlines()
+        for term in terms:
+            if "." not in term or not relative.casefold().endswith(term.removeprefix("./").casefold()):
+                continue
+            first = next(((index, line) for index, line in enumerate(source_lines, start=1) if line.strip()), None)
+            if first is None:
+                continue
+            line_number, line = first
+            matches.append(_source_snippet_evidence_item(
+                path=relative, language=language, line_number=line_number,
+                line=line, term=term, match_type="exact_path",
+                confidence="high", confidence_score=1.0,
+                symbols=_extract_generic_symbols(line),
+            ))
+            match_counts[term] = match_counts.get(term, 0) + 1
+        for line_number, line in enumerate(source_lines, start=1):
             normalized_line = _normalize(line)
             if not normalized_line:
                 continue
             for term in terms:
-                if match_counts.get(term, 0) >= 2:
+                if match_counts.get(term, 0) >= 8:
                     continue
                 normalized_term = term_keys.get(term) or ""
                 if not normalized_term:
@@ -241,6 +261,7 @@ def build_project_source_evidence(
                 if match_type is None:
                     continue
                 confidence_label = _confidence_for_line(line, match_type)
+                declarations = _extract_generic_symbols(line)
                 matches.append(_source_snippet_evidence_item(
                     path=relative,
                     language=language,
@@ -250,27 +271,56 @@ def build_project_source_evidence(
                     match_type=match_type,
                     confidence=confidence_label,
                     confidence_score=confidence_score,
+                    symbols=declarations,
                 ))
                 match_counts[term] = match_counts.get(term, 0) + 1
 
     selected: list[dict[str, Any]] = []
     spent = 0
+    selected_term_counts: dict[str, int] = {}
     term_order = {term: index for index, term in enumerate(terms)}
-    for item in sorted(
+    ordered_matches = sorted(
         matches,
         key=lambda value: (
             term_order.get((value.get("matched_terms") or [""])[0], 999),
+            0 if value.get("match_type") == "exact_path" else 1,
+            0 if any(
+                str(symbol.get("name") or "").casefold()
+                == str((value.get("matched_terms") or [""])[0]).casefold()
+                for symbol in value.get("symbols") or []
+            ) else 1,
             value.get("path") or "",
             int(value.get("line_start") or 0),
         ),
-    ):
+    )
+
+    def select_item(item: dict[str, Any]) -> bool:
+        nonlocal spent
         if len(selected) >= max_items:
-            break
+            return False
+        selected_term = str((item.get("matched_terms") or [""])[0])
+        if selected_term_counts.get(selected_term, 0) >= 2:
+            return False
         estimate = int(item.get("token_estimate") or 1)
         if selected and spent + estimate > token_budget:
-            continue
+            return False
         selected.append(item)
+        selected_term_counts[selected_term] = selected_term_counts.get(selected_term, 0) + 1
         spent += estimate
+        return True
+
+    # Reserve one witness for every requested term before any term receives a
+    # second snippet. This is declaration coverage, not a generic score boost.
+    for term in terms:
+        for item in ordered_matches:
+            if str((item.get("matched_terms") or [""])[0]) == term and select_item(item):
+                break
+    for item in ordered_matches:
+        if len(selected) >= max_items:
+            break
+        if item in selected:
+            continue
+        select_item(item)
 
     for term in terms:
         if match_counts.get(term):
@@ -336,7 +386,19 @@ def source_evidence_diagnostics(items: list[dict[str, Any]]) -> dict[str, Any]:
 
 def _source_evidence_terms(*, question: str, requirements: list[str] | None) -> list[str]:
     raw_terms = requirements if requirements is not None else _query_terms(question)
-    return _dedupe_normalized_terms(str(term) for term in raw_terms if str(term or "").strip())[:16]
+    if requirements is None:
+        raw_terms = [*_QUERY_PATH_RE.findall(question), *raw_terms]
+    terms = _dedupe_normalized_terms(str(term) for term in raw_terms if str(term or "").strip())
+    # Named declarations are mutation targets, while ordinary words are recall
+    # hints. Search the bounded declaration surface first so generic snippets do
+    # not consume the source-evidence budget before requested symbols.
+    terms.sort(key=lambda value: (
+        0 if re.fullmatch(
+            r"[A-Z][A-Za-z0-9_]*(?:Gate|Service|Repository|Controller|Manager|Policy|Adapter)",
+            value,
+        ) else 1,
+    ))
+    return terms[:16]
 
 
 def _source_snippet_evidence_item(
@@ -349,6 +411,7 @@ def _source_snippet_evidence_item(
     match_type: str = "exact_substring",
     confidence: str = "high",
     confidence_score: float = 1.0,
+    symbols: list[dict[str, Any]] | None = None,
 ) -> dict[str, Any]:
     snippet = _sanitize_source_line(line.strip())
     content = f"{path}:{line_number}: {snippet}"
@@ -361,6 +424,7 @@ def _source_snippet_evidence_item(
         "confidence_score": round(confidence_score, 2),
         "matched": True,
         "matched_terms": [term],
+        "symbols": list(symbols or ()),
         "missing_terms": [],
         "path": path,
         "title": title,
@@ -381,6 +445,7 @@ def _source_snippet_evidence_item(
             "line_start": line_number,
             "line_end": line_number,
             "title": title,
+            "symbols": list(symbols or ()),
         },
         "section": {"title": title, "heading_path": "source_evidence", "freshness": "current"},
     }
@@ -443,7 +508,7 @@ def _iter_source_files(
 
 def _question_requests_generated_artifacts(question: str) -> bool:
     normalized = _normalize(question)
-    return any(phrase in normalized for phrase in (
+    return bool(re.search(r"\.(?:g|freezed)\.dart\b|\.pb\.go\b", question, re.I)) or any(phrase in normalized for phrase in (
         "generated artifact", "generated code", "generated file", "generated source",
         "сгенерированн артефакт", "сгенерированн код", "сгенерированн файл",
     ))

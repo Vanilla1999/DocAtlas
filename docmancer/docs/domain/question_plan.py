@@ -20,12 +20,20 @@ from docmancer.docs.domain.question_frame_core import (
     split_question_clause_spans,
 )
 from docmancer.docs.domain.question_semantic_frames import (
+    match_argument_value_frame,
+    match_before_behavior_frame,
     match_comparison_frame,
     match_condition_frame,
+    match_contract_scope_frame,
+    match_decision_frame,
     match_location_frame,
     match_premise_frame,
+    match_purpose_behavior_frame,
 )
-from docmancer.docs.domain.question_surface_normalization import normalize_question_surface
+from docmancer.docs.domain.question_surface_normalization import (
+    normalize_question_surface,
+    rebind_surface_plan,
+)
 from docmancer.docs.domain.technical_terms import TechnicalTermKind
 
 from docmancer.docs.domain.question_plan_core import (
@@ -575,6 +583,44 @@ _GENERIC_RULES: tuple[Rule, ...] = (
 
 
 def _reusable_frame_plan(q: str) -> QuestionPlan | None:
+    decision = match_decision_frame(q)
+    if decision is not None:
+        return QuestionPlan(facets=(PlannedFacet(
+            "attribute", decision.subject, relation="decision_for_action",
+            attribute=decision.decision_kind, target=decision.action,
+            value_kind="code", response_mode="value", span_text=q,
+        ),), clauses=(q,), parse_trace=("frame:decision_for_action",))
+
+    argument = match_argument_value_frame(q)
+    if argument is not None:
+        return QuestionPlan(facets=(PlannedFacet(
+            "attribute", argument.callee, relation="argument_value",
+            attribute=argument.argument, context=argument.actor,
+            value_kind="boolean", response_mode="value", span_text=q,
+        ),), clauses=(q,), parse_trace=("frame:argument_value",))
+
+    contract = match_contract_scope_frame(q)
+    if contract is not None:
+        return QuestionPlan(facets=(PlannedFacet(
+            "relation", contract.subject, relation="applicable_contract",
+            target=contract.contract, context=contract.condition,
+            value_kind="text", response_mode="value", span_text=q,
+        ),), clauses=(q,), parse_trace=("frame:applicable_contract",))
+
+    before = match_before_behavior_frame(q)
+    if before is not None:
+        return QuestionPlan(facets=(PlannedFacet(
+            "behavior", before.subject, relation="behavior_before",
+            target=before.action, response_mode="value", span_text=q,
+        ),), clauses=(q,), parse_trace=("frame:behavior_before",))
+
+    purpose = match_purpose_behavior_frame(q)
+    if purpose is not None:
+        return QuestionPlan(facets=(PlannedFacet(
+            "behavior", purpose.subject, relation="purpose_behavior",
+            target=purpose.purpose, response_mode="value", span_text=q,
+        ),), clauses=(q,), parse_trace=("frame:purpose_behavior",))
+
     # Exact typed frames take precedence over broad ambiguity sentinels.  A
     # phrase such as "file formats" or "pytest markers" is already a closed
     # category; only bare "formats"/"markers" remain ambiguous.
@@ -884,6 +930,20 @@ def _finalize_full_span_coverage(question: str, plan: QuestionPlan) -> QuestionP
 
 def _compile_question_plan_core(raw: str) -> QuestionPlan:
     normalized = " ".join(raw.split())
+    whole_clause = QuestionClause(raw, 0, len(raw)) if raw else None
+    if whole_clause is not None:
+        full_span = _reusable_frame_plan(_normalized_clause(whole_clause))
+        if full_span is not None and any(
+            row in {
+                "frame:decision_for_action", "frame:argument_value",
+                "frame:applicable_contract", "frame:purpose_behavior",
+                "frame:behavior_before",
+            }
+            for row in full_span.parse_trace
+        ):
+            return _finalize_full_span_coverage(
+                raw, _bind_plan_to_clause(full_span, whole_clause),
+            )
     clauses = split_question_clause_spans(raw)
     if not clauses:
         return QuestionPlan()
@@ -915,46 +975,17 @@ def _compile_question_plan_core(raw: str) -> QuestionPlan:
     return QuestionPlan()
 
 
-def _bind_surface_plan(
-    plan: QuestionPlan,
-    *,
-    raw: str,
-    rule: str,
-) -> QuestionPlan:
-    """Rebind a canonical surface plan to the complete original user span."""
-
-    if plan.unresolved_parts:
-        return QuestionPlan(
-            clauses=(raw,),
-            unresolved_parts=plan.unresolved_parts,
-            parse_trace=(f"surface:{rule}", *plan.parse_trace),
-        )
-    clauses = split_question_clause_spans(raw)
-    if not plan.facets or not clauses:
-        return plan
-    rebound = replace(
-        plan,
-        facets=tuple(replace(facet, span_text=raw) for facet in plan.facets),
-    )
-    rebound = _bind_whole_plan(rebound, raw, clauses)
-    return _finalize_full_span_coverage(
-        raw,
-        replace(
-            rebound,
-            clauses=tuple(_normalized_clause(clause, compound=True) for clause in clauses),
-            parse_trace=(f"surface:{rule}", *plan.parse_trace),
-        ),
-    )
-
-
 def compile_question_plan(question: str) -> QuestionPlan:
     raw = str(question or "")[:4000]
     surface = normalize_question_surface(raw)
     if surface is not None:
         normalized_plan = _compile_question_plan_core(surface.text)
         if normalized_plan.handled:
-            return _guard_plan_subjects(_bind_surface_plan(
-                normalized_plan, raw=raw, rule=surface.rule,
+            return _guard_plan_subjects(rebind_surface_plan(
+                normalized_plan,
+                raw=raw,
+                rule=surface.rule,
+                finalize=_finalize_full_span_coverage,
             ))
     return _compile_question_plan_core(raw)
 

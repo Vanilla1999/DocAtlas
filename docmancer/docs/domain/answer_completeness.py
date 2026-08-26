@@ -16,7 +16,7 @@ _QUOTED_TERM_RE = re.compile(r"[\"'`“”‘’«»„]+([^\"'`“”‘’«»
 _CODE_TERM_RE = re.compile(
     r"\b[A-Za-z_][A-Za-z0-9_]*(?:\.[A-Za-z_][A-Za-z0-9_]*)+\b"
     r"|\b[a-z][a-z0-9]+(?:_[a-z0-9]+)+\b"
-    r"|\b[A-Za-z][A-Za-z0-9_]*(?:Cubit|Service|Repository|Screen|Controller|Route|Router|Navigator|Module|Utils|Api|API)\b"
+    r"|\b[A-Za-z][A-Za-z0-9_]*(?:Cubit|Service|Repository|Screen|Controller|Route|Router|Navigator|Module|Gate|Utils|Api|API)\b"
 )
 _PRODUCT_TERM_RE = re.compile(r"\b[A-Z][A-Za-z0-9]*(?:[A-Z][A-Za-z0-9]*)+\b|\b[A-Z][a-z][A-Za-z0-9]{3,}\b")
 _SLASH_TERM_RE = re.compile(r"\b([A-Za-z][A-Za-z0-9_-]{2,})/([A-Za-z][A-Za-z0-9_-]{2,})\b")

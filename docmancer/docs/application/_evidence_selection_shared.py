@@ -103,6 +103,7 @@ _ALLOWED_REQUIREMENT_PROVENANCE = frozenset({
     "selector_scope_requirement",
     "canonical_policy_requirement",
     "disclosed_authority_version_conflict",
+    "patch_request_plan",
 })
 
 _QUALIFIER_PATTERNS = {
@@ -124,10 +125,57 @@ _GOVERNANCE_PROJECT_RULE_RELATIONS = frozenset({
 })
 
 
+def _source_fact_requirements(
+    public_requirements: Iterable[Mapping[str, Any] | str],
+) -> tuple[EvidenceRequirement, ...]:
+    """Normalize public ``source_fact`` rows into source-scoped behavior obligations.
+
+    The public contract names the source and behavioral scope, not an expected
+    benchmark sentence.  The selector must still locate a substantive local
+    witness inside that source.  Internally these use the existing
+    ``behavioral_contract`` proof path so packet formatting keeps the assigned
+    witness visible and cited.
+    """
+
+    rows: list[EvidenceRequirement] = []
+    for raw in public_requirements:
+        if not isinstance(raw, Mapping) or str(raw.get("kind") or "").casefold() != "source_fact":
+            continue
+        source_path = str(raw.get("source_path") or "").strip().replace("\\", "/")
+        scope = str(raw.get("scope") or raw.get("subject") or "").strip()
+        modality = str(raw.get("modality") or "required").strip().casefold()
+        if not source_path or not scope:
+            raise ValueError("source_fact requires source_path and scope")
+        if modality not in {"required", "advisory"}:
+            raise ValueError(f"unsupported source_fact modality: {modality}")
+        provenance = str(raw.get("public_provenance") or "public_task_contract")
+        if provenance not in _ALLOWED_REQUIREMENT_PROVENANCE:
+            raise ValueError(f"unsupported evidence requirement provenance: {provenance}")
+        proof_role = str(raw.get("proof_role") or "generic_fact")
+        requirement_id = str(raw.get("requirement_id") or "").strip() or (
+            "behavioral_contract:" + scope
+        )
+        rows.append(EvidenceRequirement(
+            requirement_id=requirement_id,
+            kind="behavioral_contract",
+            value=scope,
+            mandatory=modality == "required",
+            public_provenance=provenance,
+            query_extraction_kind="source_fact",
+            proof_role=proof_role,
+            source_path=source_path,
+            subject=scope,
+            relation="source_fact",
+            response_mode="value",
+        ))
+    return tuple(rows)
+
+
 def build_requirements(*args: Any, **kwargs: Any) -> EvidenceRequirementSet:
-    """Bind typed governance obligations to canonical project-rule authority."""
+    """Bind typed governance and source-scoped obligations to selector policy."""
 
     requirements = _build_requirements_impl(*args, **kwargs)
+    source_facts = _source_fact_requirements(kwargs.get("public_requirements") or ())
     rebound = tuple(
         replace(item, proof_role="project_rule")
         if (
@@ -138,6 +186,10 @@ def build_requirements(*args: Any, **kwargs: Any) -> EvidenceRequirementSet:
         else item
         for item in requirements.requirements
     )
+    if source_facts:
+        source_fact_ids = {item.requirement_id for item in source_facts}
+        rebound = tuple(item for item in rebound if item.requirement_id not in source_fact_ids)
+        rebound = tuple(sorted((*rebound, *source_facts), key=lambda item: item.requirement_id))
     if rebound == requirements.requirements:
         return requirements
     return replace(requirements, requirements=rebound)

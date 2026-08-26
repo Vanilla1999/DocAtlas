@@ -65,6 +65,49 @@ def write_report(run_dir: Path, metadata: dict[str, Any], results: list[dict[str
             f"{result.get('constraint_packet_tokens', metrics.get('constraint_packet_tokens', ''))} |"
         )
 
+    if any(isinstance(result.get("actionability"), dict) for result in results):
+        lines.extend([
+            "",
+            "## Model-visible actionability",
+            "| task | condition | source | status | tokens | mutation_ready | requirement_recall | precision | invariant_recall | source_coverage | behavioral_coverage | citation_fidelity | omissions |",
+            "|---|---|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|",
+        ])
+        for result in results:
+            actionability = result.get("actionability")
+            if not isinstance(actionability, dict):
+                continue
+            lines.append(
+                f"| {result.get('task_id', '')} | {result.get('condition_id', '')} | "
+                f"{actionability.get('metric_source', '')} | {actionability.get('projection_status', '')} | "
+                f"{actionability.get('projection_tokens', '')} | {actionability.get('mutation_ready', '')} | "
+                f"{actionability.get('requirement_recall', '')} | {actionability.get('requirement_precision', '')} | "
+                f"{actionability.get('critical_invariant_recall', '')} | {actionability.get('source_coverage', '')} | "
+                f"{actionability.get('behavioral_scope_coverage', '')} | {actionability.get('citation_fidelity', '')} | "
+                f"{actionability.get('model_visible_omissions', '')} |"
+            )
+
+    if any(isinstance(result.get("process_quality"), dict) for result in results):
+        lines.extend([
+            "",
+            "## Process quality",
+            "| task | condition | first_edit_correct | repairs | regressions | test_runs | distinct_checks | patch_robust | exploration_calls | evidence_recall |",
+            "|---|---|---:|---:|---:|---:|---:|---:|---:|---:|",
+        ])
+        for result in results:
+            quality = result.get("process_quality")
+            if not isinstance(quality, dict):
+                continue
+            breadth = quality.get("validation_breadth") if isinstance(quality.get("validation_breadth"), dict) else {}
+            robustness = quality.get("patch_robustness") if isinstance(quality.get("patch_robustness"), dict) else {}
+            search = quality.get("search_efficiency") if isinstance(quality.get("search_efficiency"), dict) else {}
+            lines.append(
+                f"| {result.get('task_id', '')} | {result.get('condition_id', '')} | "
+                f"{quality.get('first_edit_correctness', '')} | {quality.get('repair_count', '')} | "
+                f"{quality.get('regression_count', '')} | {breadth.get('test_runs_observed', '')} | "
+                f"{breadth.get('distinct_test_commands', '')} | {robustness.get('robust', '')} | "
+                f"{search.get('exploration_calls', '')} | {search.get('required_evidence_recall', '')} |"
+            )
+
     if any(isinstance(result.get("evaluation_execution"), dict) for result in results):
         lines.extend([
             "",

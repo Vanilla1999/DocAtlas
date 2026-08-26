@@ -560,7 +560,11 @@ class _UnifiedDocsContextServicePart01:
                 project_diagnostics.get("retrieval_routing")
                 if isinstance(project_diagnostics, dict) else None
             ),
-            requirements=(library_results[0].requirements if len(library_results) == 1 else None),
+            requirements=(
+                getattr(project_result, "requirements", None)
+                if project_result and not library_results else
+                library_results[0].requirements if len(library_results) == 1 else None
+            ),
         )
         return payload
 

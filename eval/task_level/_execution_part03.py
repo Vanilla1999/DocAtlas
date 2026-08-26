@@ -175,7 +175,7 @@ def capture_task33_host_evidence(
 
     status = str(response.get("status") or "unknown")
     trust_contract = response.get("trust_contract") if isinstance(response.get("trust_contract"), dict) else {}
-    retrieval_issues = list(bounded_retrieval_issues(response, project_evidence_required=True))
+    retrieval_issues = list(bounded_patch_retrieval_issues(response))
     available_paths = {
         str(item.get("path") or "").strip().replace("\\", "/") for item in context_pack
     }
@@ -421,7 +421,8 @@ def build_bounded_direct_packet(
         question=task.issue_text,
         context_pack=packet_evidence,
         trust_contract=evidence.trust_contract,
-        max_tokens=2_000,
+        # Leave headroom, then enforce the authoritative serialized limit below.
+        max_tokens=1_960,
         project_path=str(workspace),
         retrieval_issues=evidence.retrieval_issues,
         required_evidence_paths=(

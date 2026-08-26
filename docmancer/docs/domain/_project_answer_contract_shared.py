@@ -118,7 +118,7 @@ _USAGE_RE = re.compile(
     re.I,
 )
 _WORKFLOW_RE = re.compile(
-    r"\b(?:workflow|flow|sequence|steps?|after|then|lifecycle)\b"
+    r"\b(?:workflow|sequence|steps?|lifecycle)\b"
     r"|\b(?:процесс|поток|последовательност|шаг(?:и|ов)?|после|затем|жизненн(?:ый|ого)\s+цикл)\b",
     re.I,
 )

@@ -1,5 +1,10 @@
 from __future__ import annotations
 
+from dataclasses import replace
+from pathlib import PurePosixPath
+import re
+from typing import Any, Iterable, Mapping
+
 from ._action_packet_shared import *  # noqa: F401,F403
 
 from ._action_packet_part01 import *  # noqa: F401,F403
@@ -7,7 +12,264 @@ from ._action_packet_part01 import *  # noqa: F401,F403
 from ._action_packet_part02 import *  # noqa: F401,F403
 
 from ._action_packet_part03 import *  # noqa: F401,F403
+from ._action_packet_part03 import build_action_packet as _build_action_packet_impl
 
 from ._action_packet_part04 import *  # noqa: F401,F403
+
+
+_TRUSTED_PROJECT_RULE_AUTHORITIES = frozenset({
+    "canonical", "primary", "project_rule", "source_of_truth",
+})
+_GENERIC_PATH_TOKENS = frozenset({
+    "application", "architecture", "contract", "docs", "flow", "gate", "lib", "module", "modules",
+})
+_DESTRUCTIVE_UNRESOLVED_RE = re.compile(
+    r"\b(?:delete|drop|erase|purge|remove|truncate|удал(?:и|ить|яй))\b",
+    re.IGNORECASE,
+)
+
+
+def _path_token_sequence(value: str) -> tuple[str, ...]:
+    stem = PurePosixPath(str(value or "").replace("\\", "/")).stem
+    return tuple(
+        token.casefold()
+        for token in re.findall(r"[A-Za-z0-9]+", stem.replace("_", "-").replace("-", " "))
+        if len(token) >= 3 and token.casefold() not in _GENERIC_PATH_TOKENS
+    )
+
+
+def _path_tokens(value: str) -> set[str]:
+    return set(_path_token_sequence(value))
+
+
+def _target_scope(path: str) -> str:
+    stem = PurePosixPath(path.replace("\\", "/")).stem
+    parts = [part for part in re.split(r"[_\-]+", stem) if part]
+    return "".join(part[:1].upper() + part[1:] for part in parts) or stem
+
+
+def _declared_authority_by_path(
+    context_pack: Iterable[Mapping[str, Any]],
+    *,
+    project_path: str | None,
+    target_paths: Iterable[str],
+) -> dict[str, str]:
+    values: dict[str, str] = {}
+    for item in context_pack:
+        if not isinstance(item, Mapping):
+            continue
+        path = str(item.get("path") or item.get("source") or "").strip().replace("\\", "/").casefold()
+        authority = _effective_authority(
+            dict(item), project_path=project_path, target_paths=target_paths,
+        )
+        if path and authority:
+            values[path] = authority
+    return values
+
+
+def _behavioral_source_fact_contracts(
+    *,
+    required_evidence_paths: Iterable[str],
+    required_target_paths: Iterable[str],
+    context_pack: Iterable[Mapping[str, Any]],
+    project_path: str | None = None,
+) -> tuple[dict[str, Any], ...]:
+    """Derive one bounded source-scoped behavior obligation per affected flow.
+
+    Matching is based only on public source/target identities. It never embeds a
+    benchmark answer string. A document path proves identity separately; this
+    extra obligation requires substantive behavioral text from the same source.
+    """
+
+    docs = [
+        str(path).strip().replace("\\", "/")
+        for path in required_evidence_paths
+        if str(path).strip().replace("\\", "/").casefold().startswith("docs/")
+        and PurePosixPath(str(path)).suffix.casefold() in {".md", ".mdx", ".rst", ".adoc"}
+    ]
+    targets = [
+        str(path).strip().replace("\\", "/")
+        for path in required_target_paths
+        if str(path).strip()
+    ]
+    if not docs or not targets:
+        return ()
+    authority_by_path = _declared_authority_by_path(
+        context_pack, project_path=project_path, target_paths=targets,
+    )
+    rows: list[dict[str, Any]] = []
+    scope_counts: dict[str, int] = {}
+    for source_path in docs:
+        source_sequence = _path_token_sequence(source_path)
+        source_terms = set(source_sequence)
+        ranked: list[tuple[tuple[Any, ...], str]] = []
+        for target in targets:
+            target_sequence = _path_token_sequence(target)
+            target_terms = set(target_sequence)
+            overlap = len(source_terms & target_terms)
+            if not overlap:
+                continue
+            # Prefer the target whose leading domain noun matches the source
+            # document before using generic lexical density. This prevents a
+            # broad permission architecture document from stealing the browser
+            # flow scope merely because both target names contain "permission".
+            leading_domain_match = int(bool(
+                source_sequence
+                and target_sequence
+                and source_sequence[0] == target_sequence[0]
+            ))
+            density = int(overlap * 1000 / max(1, len(target_terms)))
+            ranked.append((
+                (-overlap, -leading_domain_match, -density, len(target_terms), target.casefold()),
+                target,
+            ))
+        if not ranked:
+            continue
+        target = min(ranked, key=lambda row: row[0])[1]
+        scope = _target_scope(target)
+        if not scope:
+            continue
+        scope_index = scope_counts.get(scope, 0)
+        scope_counts[scope] = scope_index + 1
+        requirement_id = f"behavioral_contract:{scope}"
+        if scope_index:
+            source_identity = "-".join(_path_token_sequence(source_path)) or str(scope_index + 1)
+            requirement_id += f":{source_identity}"
+        declared = authority_by_path.get(source_path.casefold(), "")
+        rows.append({
+            "kind": "source_fact",
+            "source_path": source_path,
+            "scope": scope,
+            "modality": "required",
+            "requirement_id": requirement_id,
+            "public_provenance": "public_task_contract",
+            "proof_role": "project_rule" if declared in _TRUSTED_PROJECT_RULE_AUTHORITIES else "generic_fact",
+        })
+    return tuple(rows)
+
+
+def _explicit_mutation_contract(
+    question: str,
+    required_target_paths: Iterable[str],
+    *,
+    provenance: str,
+):
+    contract = build_mutation_intent(question)
+    bound = with_explicit_path_targets(contract, required_target_paths, provenance=provenance)
+    plan = bound.request_plan
+    if bound.operation == "none" and plan is not None and plan.operation != "none":
+        bound = replace(bound, operation=plan.operation)
+    if (
+        provenance == "explicit_task_contract"
+        and bound.operation == "modify"
+        and plan is not None
+        and not plan.preserve_targets
+        and plan.destination is None
+        and plan.parent_context is None
+        and all(
+            item == "mutation_target_not_requested"
+            or (
+                item.startswith("unresolved_patch_clause:")
+                and not _DESTRUCTIVE_UNRESOLVED_RE.search(item)
+            )
+            for item in plan.unresolved_parts
+        )
+    ):
+        # The evaluator-owned task contract supplies the complete mutation
+        # surface. Only a fully parsed narrative may inherit those targets;
+        # unresolved clauses remain fail-closed.
+        bound = replace(bound, request_plan=None)
+    return bound
+
+
+def _promote_trusted_behavioral_witnesses(
+    packet: dict[str, Any],
+    public_requirements: Iterable[Any],
+) -> None:
+    """Route trusted project-rule witnesses to invariants after selector fitting."""
+
+    trusted_paths = {
+        str(row.get("source_path") or "").strip().replace("\\", "/").casefold()
+        for row in public_requirements
+        if isinstance(row, Mapping)
+        and str(row.get("kind") or "").casefold() == "source_fact"
+        and str(row.get("proof_role") or "").casefold() == "project_rule"
+    }
+    if not trusted_paths:
+        return
+    trusted_ids = {
+        str(row.get("evidence_id") or "")
+        for row in packet.get("source_of_truth") or []
+        if isinstance(row, Mapping)
+        and str(row.get("path") or "").strip().replace("\\", "/").casefold() in trusted_paths
+        and str(row.get("authority") or "").casefold() == "canonical"
+    }
+    if not trusted_ids:
+        return
+    retained_guidance: list[dict[str, Any]] = []
+    promoted: list[dict[str, Any]] = []
+    for row in packet.get("implementation_guidance") or []:
+        if not isinstance(row, dict):
+            continue
+        evidence_ids = {str(value) for value in row.get("evidence_ids") or []}
+        if evidence_ids & trusted_ids and classify_normative_modality(str(row.get("text") or "")) is not None:
+            promoted.append(row)
+        else:
+            retained_guidance.append(row)
+    if not promoted:
+        return
+    packet["implementation_guidance"] = retained_guidance
+    packet["required_invariants"] = _dedupe_dicts(
+        [*(packet.get("required_invariants") or []), *promoted],
+        ("text",),
+    )
+    _refresh_estimated_tokens(packet)
+
+
+def build_action_packet(*args: Any, **kwargs: Any) -> dict[str, Any]:
+    """Build a packet while preserving the caller's semantic selection budget."""
+
+    question = str(kwargs.get("question") or (args[0] if args else ""))
+    required_evidence_paths = tuple(kwargs.get("required_evidence_paths") or ())
+    required_target_paths = tuple(kwargs.get("required_target_paths") or ())
+    behavioral_required = bool(kwargs.get("behavioral_contract_required"))
+    raw_context = tuple(
+        item for item in (kwargs.get("context_pack") or ())
+        if isinstance(item, Mapping)
+    )
+    if raw_context:
+        kwargs["context_pack"] = raw_context
+
+    public_requirements = list(kwargs.get("public_requirements") or ())
+    if behavioral_required:
+        public_requirements.extend(_behavioral_source_fact_contracts(
+            required_evidence_paths=required_evidence_paths,
+            required_target_paths=required_target_paths,
+            context_pack=raw_context,
+            project_path=kwargs.get("project_path"),
+        ))
+    if public_requirements:
+        by_identity: dict[str, Any] = {}
+        for row in public_requirements:
+            if isinstance(row, Mapping):
+                identity = str(row.get("requirement_id") or "") or repr(sorted(row.items()))
+            else:
+                identity = str(row)
+            by_identity.setdefault(identity, row)
+        public_requirements = list(by_identity.values())
+        kwargs["public_requirements"] = tuple(public_requirements)
+
+    if kwargs.get("mutation_intent_contract") is None and required_target_paths:
+        kwargs["mutation_intent_contract"] = _explicit_mutation_contract(
+            question,
+            required_target_paths,
+            provenance="explicit_task_contract" if behavioral_required else "explicit_required_target",
+        )
+
+    packet = _build_action_packet_impl(*args, **kwargs)
+    if packet.get("status") != "insufficient_evidence":
+        _promote_trusted_behavioral_witnesses(packet, public_requirements)
+    return packet
+
 
 __all__=[n for n in globals() if not n.startswith("__")]

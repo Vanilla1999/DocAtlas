@@ -66,7 +66,7 @@ def _ready_patch_fixture(*, policy_content: str | None = None):
     }
     evidence = [policy, target]
     packet = build_action_packet(
-        question="Update src/projection.py canonical projection",
+        question="Update src/projection.py",
         context_pack=evidence,
         project_path="/project",
     )

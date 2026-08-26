@@ -453,6 +453,20 @@ def local_proof_for_obligation(
         )
 
     if obligation.kind == "attribute":
+        if obligation.relation in {"decision_for_action", "argument_value"}:
+            planned = planned_relation_proof(obligation, text, source=source)
+            if planned is not None:
+                effective_subject_score = max(subject_score, planned.subject_score)
+                valid = planned.valid and effective_subject_score > 0 and unit.proposition
+                return LocalProof(
+                    valid, effective_subject_score,
+                    planned.relation_score if valid else 0,
+                    planned.value_score if valid else 0,
+                    effective_subject_score
+                    + (planned.relation_score if valid else 0)
+                    + (planned.value_score if valid else 0),
+                    planned.reason,
+                )
         attribute = 3 if _attribute_present(obligation.attribute, text) else 0
         value = _value_score(obligation.value_kind, text)
         local_binding = bool(attribute and value and (subject_local or authoritative_identity))

@@ -8,7 +8,7 @@ from pathlib import Path
 DEFAULT_MAX_LINES = 1000
 IGNORED_PARTS = {
     ".git", ".venv", "venv", "build", "dist", "site-packages",
-    "__pycache__", ".pytest_cache", ".mypy_cache", ".ruff_cache",
+    "__pycache__", ".pytest_cache", ".mypy_cache", ".ruff_cache", "uv-cache",
 }
 
 
