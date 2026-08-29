@@ -1,0 +1,10 @@
+{
+  "schema_version": "multilingual-retrieval-quality-cases-v1",
+  "cases": [
+    {"id":"hold-en-context","project_id":"docatlas","language_pair":"en-en","query":"When may an unresolved question return docs_context, and what can that result authorize?","taxonomy":"constraints","semantic_family":"unresolved-context-en","expected_source_spans":["docatlas:docs/modules/question-planning.md:3-27"]},
+    {"id":"hold-en-absent","project_id":"docatlas","language_pair":"en-en","query":"Which mandatory cryptocurrency wallet does DocAtlas configure?","taxonomy":"unknown_fact","semantic_family":"crypto-wallet-absent-en","expected_source_spans":[],"absent_fact":true},
+    {"id":"hold-ruen-boundary","project_id":"docatlas","language_pair":"ru-en","query":"Где проходит односторонняя граница между QuestionPlan и evidence selection?","taxonomy":"ownership","semantic_family":"planning-selection-boundary-ruen","expected_source_spans":["docatlas:docs/modules/question-planning.md:3-27"]},
+    {"id":"hold-ruru-projection","project_id":"docatlas","language_pair":"ru-ru","query":"Какие четыре канонические проекции может вернуть ограниченный MCP-ответ?","taxonomy":"architecture","semantic_family":"canonical-projections-ruru","expected_source_spans":["docatlas:docs/mcp-docs-server.md:18-43"]},
+    {"id":"hold-ruru-status","project_id":"docatlas","language_pair":"ru-ru","query":"Когда следует использовать docs_status вместо первого поискового вызова?","taxonomy":"workflow","semantic_family":"status-use-ruru","expected_source_spans":["docatlas:docs/mcp-docs-server.md:18-43"]}
+  ]
+}

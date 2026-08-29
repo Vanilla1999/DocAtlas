@@ -27,6 +27,7 @@ class _ProjectContextServicePart01:
         response_style: str | None = None,
         allow_network: bool = False,
         mutation_intent: MutationIntentContract | None = None,
+        lookup_queries: tuple[str, ...] = (),
     ) -> ProjectContextResult:
         response_style = validate_response_style(response_style)
         mutation_intent = mutation_intent or build_mutation_intent(question)
@@ -38,6 +39,9 @@ class _ProjectContextServicePart01:
         root = Path(project_path).expanduser().resolve()
         intent = classify_project_query_intent(question)
         evidence_path = extract_document_locator(question)
+        documentation_query_plan = build_documentation_query_plan(
+            question, lookup_queries=lookup_queries, explicit_path=evidence_path,
+        )
         mutation_target_paths = tuple(
             target.value
             for target in mutation_intent.requested_targets
@@ -65,6 +69,8 @@ class _ProjectContextServicePart01:
                 "module": module, "module_path": module_path, "scope": scope,
                 "requirements": canonical_requirements,
             }
+            if lookup_queries:
+                project_docs_kwargs["lookup_queries"] = lookup_queries
             if evidence_path:
                 project_docs_kwargs["evidence_path"] = evidence_path
             project_docs = self.facade.get_project_docs(str(root), question, **project_docs_kwargs)
@@ -603,6 +609,7 @@ class _ProjectContextServicePart01:
             delivery_decision=delivery_decision,
             mode=mode,
             reason=reason,
+            documentation_query_plan=documentation_query_plan.as_payload(),
             context_pack=context_pack,
             project_docs=project_docs,
             dependency_docs=dependency_docs,

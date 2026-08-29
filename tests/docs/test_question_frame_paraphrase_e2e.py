@@ -102,20 +102,17 @@ def test_reusable_question_frames_survive_real_manifest_sync_and_public_mcp(tmp_
                 service,
             )
             assert payload["status"] == "ok", (mode, question, payload)
+            assert payload["kind"] == "docs_answer", (mode, question, payload)
             assert expected in str(payload), (mode, question, payload)
 
-    rejected = (
+    open_context = (
         "What markers are available?",
         "Which formats are supported?",
         "How do I update the docs index?",
         "What does the project require?",
-        "Which source types are supported for indexing; what is the Bitcoin price?",
-        "Which source types are supported for indexing. What is the Bitcoin price?",
-        "Which source types are supported for indexing plus tell me the Bitcoin price?",
-        "How do I sync project docs after changing a file and rebuild vectors?",
     )
     for mode in (None, "project"):
-        for question in rejected:
+        for question in open_context:
             arguments = {"question": question, "project_path": str(project)}
             if mode is not None:
                 arguments["mode"] = mode
@@ -124,4 +121,49 @@ def test_reusable_question_frames_survive_real_manifest_sync_and_public_mcp(tmp_
                 arguments,
                 service,
             )
-            assert payload["status"] != "ok", (mode, question, payload)
+            assert payload["status"] == "ok", (mode, question, payload)
+            assert payload["kind"] == "docs_context", (mode, question, payload)
+            assert payload["answer_supported"] is False
+            assert payload["answer_available"] is False
+            assert payload["edit_ready"] is False
+
+    lookup_payload = call_docs_tool_payload(
+        "get_docs_context",
+        {
+            "question": "How does this project work?",
+            "lookup_queries": ["supported source types for indexing"],
+            "project_path": str(project),
+        },
+        service,
+    )
+    assert lookup_payload["status"] == "ok", lookup_payload
+    assert lookup_payload["kind"] == "docs_context"
+    assert "GitBook sites" in str(lookup_payload)
+    assert lookup_payload["query_coverage"] == "full"
+    assert lookup_payload["covered_query_ids"] == ["query-original", "query-lookup-1"]
+    assert lookup_payload["missing_query_ids"] == []
+    assert any(
+        "query-lookup-1" in source["retrieval_query_ids"]
+        for source in lookup_payload["sources"]
+    )
+
+    untrusted_for_answer = (
+        "Which source types are supported for indexing; what is the Bitcoin price?",
+        "Which source types are supported for indexing. What is the Bitcoin price?",
+        "Which source types are supported for indexing plus tell me the Bitcoin price?",
+        "How do I sync project docs after changing a file and rebuild vectors?",
+    )
+    for mode in (None, "project"):
+        for question in untrusted_for_answer:
+            arguments = {"question": question, "project_path": str(project)}
+            if mode is not None:
+                arguments["mode"] = mode
+            payload = call_docs_tool_payload(
+                "get_docs_context",
+                arguments,
+                service,
+            )
+            assert payload.get("answer_supported") is not True, (mode, question, payload)
+            assert payload.get("edit_ready") is not True, (mode, question, payload)
+            if payload["status"] == "ok":
+                assert payload["kind"] == "docs_context", (mode, question, payload)

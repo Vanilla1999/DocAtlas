@@ -1,6 +1,7 @@
 """Split test module; helpers live in _shared_test_unified_docs_context_mcp.py."""
 from tests import _shared_test_unified_docs_context_mcp as _shared
 globals().update({k: v for k, v in vars(_shared).items() if not k.startswith("__")})
+import pytest
 
 def test_get_docs_context_registered_in_mcp_tool_list():
     names = [tool["name"] for tool in TOOLS]
@@ -15,7 +16,7 @@ def test_get_docs_context_schema():
     assert set(schema["properties"]) == {
         "question", "project_path", "library", "libraries", "ecosystem",
         "version", "source_type", "docs_url", "module", "module_path",
-        "scope", "mode",
+        "scope", "mode", "lookup_queries",
     }
     assert schema["properties"]["scope"]["enum"] == ["project", "module", "all"]
     assert schema["properties"]["mode"]["enum"] == [
@@ -156,12 +157,31 @@ def test_get_docs_context_handler_calls_facade():
             assert question == "How?"
             assert kwargs["library"] == "fastapi"
             assert kwargs["prepare_project_docs"] is False
+            assert kwargs["lookup_queries"] == ("dependency injection lifecycle",)
             return type("Result", (), {"tool": "get_docs_context", "status": "success"})()
 
     facade = Facade()
-    result = handle_context_tool("get_docs_context", {"question": "How?", "library": "fastapi"}, facade)
+    result = handle_context_tool("get_docs_context", {
+        "question": "How?", "library": "fastapi",
+        "lookup_queries": [" dependency injection lifecycle "],
+    }, facade)
     assert facade.called is True
     assert result["tool"] == "get_docs_context"
+
+
+@pytest.mark.parametrize("lookup_queries", [
+    ["   "],
+    ["same", "SAME"],
+    ["one", "two", "three", "four", "five", "six"],
+])
+def test_get_docs_context_rejects_invalid_lookup_queries(lookup_queries):
+    result = handle_context_tool(
+        "get_docs_context",
+        {"question": "How?", "project_path": "/repo", "lookup_queries": lookup_queries},
+        object(),
+    )
+
+    assert result["reason_code"] == "invalid_lookup_queries"
 
 
 def test_get_docs_context_rejects_legacy_mutation_flags_on_public_surface():

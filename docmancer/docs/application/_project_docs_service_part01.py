@@ -1,10 +1,17 @@
 """ProjectDocsService implementation shard 1."""
 from __future__ import annotations
 
+import hashlib
+
 from ._project_docs_service_shared import *  # noqa: F401,F403
+from docmancer.docs.impact import git_worktree_state
 
 
 class _ProjectDocsServicePart01:
+    @staticmethod
+    def _clean_git_sync_digest(head: str) -> str:
+        return hashlib.sha256(f"clean_git_auto:{head.lower()}".encode()).hexdigest()
+
     @staticmethod
     def _canonical_git_remote(remote: str) -> str:
         value = remote.strip().rstrip("/")
@@ -313,6 +320,8 @@ class _ProjectDocsServicePart01:
         active_index: dict[str, Any],
     ) -> dict[str, Any]:
         risks: list[dict[str, Any]] = []
+        lifecycle_conditions: list[dict[str, Any]] = []
+        git_state = git_worktree_state(root)
         for candidate in candidate_sources:
             candidate_path = str(candidate.get("path") or "")
             if not candidate_path:
@@ -337,14 +346,18 @@ class _ProjectDocsServicePart01:
         risks.extend(self._unsupported_root_doc_files(root, candidate_sources))
 
         if stale_sources:
-            risks.append({
+            stale_condition = {
                 "code": "stale_project_doc_sources",
                 "severity": "major",
                 "count": len(stale_sources),
                 "paths": [str(item.get("path")) for item in stale_sources[:5] if item.get("path")],
                 "message": "Indexed project docs differ from the current files on disk.",
                 "recommended_action": "Ask before reconciling stale indexed docs with the current repository snapshot.",
-            })
+            }
+            if git_state.get("status") == "clean":
+                lifecycle_conditions.append(stale_condition)
+            else:
+                risks.append(stale_condition)
         if ignored_sources:
             risks.append({
                 "code": "orphaned_project_doc_sources",
@@ -364,14 +377,27 @@ class _ProjectDocsServicePart01:
                     "active_db_path": warning.get("active_db_path"),
                     "project_config_db_path": warning.get("project_config_db_path"),
                 })
+        needs_sync = base_reason_code in {"project_docs_found_not_indexed", "project_docs_stale"}
+        if needs_sync and git_state.get("status") in {"dirty", "indeterminate"}:
+            risks.append({
+                "code": "git_worktree_not_clean",
+                "severity": "major",
+                "git_status": git_state.get("status"),
+                "message": "Automatic project-doc synchronization requires a clean, committed Git snapshot.",
+                "recommended_action": "Commit or discard worktree changes, or explicitly confirm synchronization of the current snapshot.",
+            })
+        auto_sync_eligible = bool(needs_sync and git_state.get("status") == "clean" and not risks)
         return {
             "status": "confirmation_required" if risks else "ok",
             "requires_confirmation": bool(risks),
             "confirmation_reason": "project_docs_preflight" if risks else None,
             "safe_to_sync_without_confirmation": not risks,
+            "auto_sync_eligible": auto_sync_eligible,
+            "git": git_state,
             "base_reason_code": base_reason_code,
             "risk_count": len(risks),
             "risks": risks,
+            "lifecycle_conditions": lifecycle_conditions,
         }
 
     def inspect_project_docs(self, project_path: str) -> ProjectDocsInspectResult:
@@ -446,18 +472,34 @@ class _ProjectDocsServicePart01:
         elif preflight["requires_confirmation"]:
             recommended_next_actions.append(self._project_docs_preflight_recommended_action(root, preflight))
         elif stale_sources or ignored_sources:
+            sync_arguments = self._project_sync_arguments(root)
+            if preflight.get("auto_sync_eligible"):
+                sync_arguments.update({
+                    "plan_digest": self._clean_git_sync_digest(preflight["git"]["head"]),
+                })
             recommended_next_actions.append({
-                "tool": "sync_project_docs",
+                "tool": "prepare_docs" if preflight.get("auto_sync_eligible") else "sync_project_docs",
                 "requires_confirmation": False,
                 "reason": "Project docs index has stale or orphaned entries; reconcile it with the current repository docs snapshot.",
-                "arguments_patch": self._project_sync_arguments(root),
+                "arguments_patch": (
+                    {"action": "sync_project_docs", **sync_arguments}
+                    if preflight.get("auto_sync_eligible") else sync_arguments
+                ),
             })
         elif candidate_sources and missing_candidate_count:
+            sync_arguments = self._project_sync_arguments(root)
+            if preflight.get("auto_sync_eligible"):
+                sync_arguments.update({
+                    "plan_digest": self._clean_git_sync_digest(preflight["git"]["head"]),
+                })
             recommended_next_actions.append({
-                "tool": "sync_project_docs",
+                "tool": "prepare_docs" if preflight.get("auto_sync_eligible") else "sync_project_docs",
                 "requires_confirmation": False,
                 "reason": "Project docs found but not indexed; reconcile the index with current docs.",
-                "arguments_patch": self._project_sync_arguments(root),
+                "arguments_patch": (
+                    {"action": "sync_project_docs", **sync_arguments}
+                    if preflight.get("auto_sync_eligible") else sync_arguments
+                ),
             })
         if exact_versions_available:
             recommended_next_actions.append({
@@ -491,6 +533,18 @@ class _ProjectDocsServicePart01:
                 reason_code=reason_code,
                 root=root,
             )
+            if preflight.get("auto_sync_eligible") and reason_code in {"project_docs_found_not_indexed", "project_docs_stale"}:
+                arguments_patch = {
+                    "action": "sync_project_docs",
+                    **self._project_sync_arguments(root),
+                    "plan_digest": self._clean_git_sync_digest(preflight["git"]["head"]),
+                }
+                next_action = {
+                    "type": "prepare_docs",
+                    "tool": "prepare_docs",
+                    "requires_confirmation": False,
+                    "arguments_patch": arguments_patch,
+                }
         project_docs = {
             "found": candidate_sources,
             "indexed": indexed_sources,

@@ -478,7 +478,9 @@ class _ProjectDocsServicePart02:
             message=message,
         )
 
-    def bootstrap_project_docs(self, project_path: str, question: str | None = None) -> ProjectDocsBootstrapResult:
+    def bootstrap_project_docs(
+        self, project_path: str, question: str | None = None, *, allow_sync: bool = True,
+    ) -> ProjectDocsBootstrapResult:
         root = validate_project_path(project_path).path
         actions_taken: list[dict[str, Any]] = []
         initial = self.inspect_project_docs(str(root))
@@ -508,7 +510,7 @@ class _ProjectDocsServicePart02:
                 warnings=warnings,
             )
 
-        if initial.reason_code in {"project_docs_found_not_indexed", "project_docs_stale"}:
+        if allow_sync and initial.reason_code in {"project_docs_found_not_indexed", "project_docs_stale"}:
             with_vectors = self._vector_sync_enabled()
             sync_result = self.sync_project_docs(str(root), with_vectors=with_vectors)
             actions_taken.append({

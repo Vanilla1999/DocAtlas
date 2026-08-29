@@ -264,7 +264,11 @@ class _SQLiteStorePart03:
 
         for row in rows:
             expanded = self._expand_row(row, expand_mode)
-            for candidate in expanded:
+            for raw_candidate in expanded:
+                candidate = dict(raw_candidate)
+                candidate.setdefault("rank", row["rank"])
+                candidate.setdefault("_lexical_query_mode", row.get("_lexical_query_mode", "and"))
+                candidate.setdefault("_ranking_trace", row.get("_ranking_trace"))
                 row_id = int(candidate["id"])
                 if row_id in used_ids:
                     continue
@@ -308,6 +312,13 @@ class _SQLiteStorePart03:
             )
             if isinstance(row, dict) and isinstance(row.get("_ranking_trace"), dict):
                 metadata["ranking"] = dict(row["_ranking_trace"])
+            metadata["lexical_match"] = self._lexical_match_trace(
+                text,
+                title=str(row["title"]),
+                body=str(row["text"]),
+                mode=str(row.get("_lexical_query_mode") or "and"),
+                bm25_cost=float(row["rank"]),
+            )
             # FTS5 bm25 is lower-is-better. Present a positive rank-like score.
             score = max(0.0, 1.0 - (index * 0.05))
             results.append(
@@ -320,6 +331,35 @@ class _SQLiteStorePart03:
                 )
             )
         return results
+
+    @classmethod
+    def _lexical_match_trace(
+        cls, query: str, *, title: str, body: str, mode: str, bm25_cost: float,
+    ) -> dict[str, Any]:
+        terms = tuple(dict.fromkeys(
+            token.casefold() for token in re.findall(r"\w+", cls._strip_stopwords(query))
+            if token
+        ))
+        haystack = f"{title}\n{body}".casefold()
+        matched = tuple(term for term in terms if re.search(rf"(?<!\w){re.escape(term)}(?!\w)", haystack))
+        ratio = len(matched) / len(terms) if terms else 0.0
+        required_ratio = 0.25 if len(terms) <= 4 else 0.5
+        qualified = bool(matched) and (
+            mode == "and"
+            or len(terms) == 1
+            or ratio >= required_ratio
+        )
+        return {
+            "mode": mode,
+            "query_terms": list(terms),
+            "matched_terms": list(matched),
+            "query_term_count": len(terms),
+            "matched_term_count": len(matched),
+            "match_ratio": round(ratio, 4),
+            "bm25_cost": bm25_cost,
+            "lexical_score": -bm25_cost,
+            "qualified": qualified,
+        }
 
     @classmethod
     def _ranking_candidate(
@@ -497,7 +537,7 @@ class _SQLiteStorePart03:
         limit: int,
         *,
         filters: dict[str, Any] | None = None,
-    ) -> list[sqlite3.Row]:
+    ) -> list[dict[str, Any]]:
         cleaned = self._strip_stopwords(query)
         terms = [token for token in re.findall(r"\w+", cleaned) if token]
         filter_sql, filter_params = self._metadata_filter_sql(filters, promoted=True)
@@ -553,7 +593,7 @@ class _SQLiteStorePart03:
                         ),
                     )[:limit]
                     if combined or len(terms) <= 1:
-                        return combined
+                        return self._mark_lexical_mode(combined, "and")
                 except sqlite3.OperationalError:
                     pass
                 fallback_query = " OR ".join(terms)
@@ -598,13 +638,13 @@ class _SQLiteStorePart03:
                         (fallback_query, active_generation, *legacy_filter_params, limit),
                     )
                 )
-                return sorted(
+                return self._mark_lexical_mode(sorted(
                     [*child_fallback, *legacy_fallback],
                     key=lambda item: (
                         float(item["rank"]), str(item["source"]),
                         int(item["chunk_index"]),
                     ),
-                )[:limit]
+                )[:limit], "or_fallback")
             try:
                 rows = list(
                     conn.execute(
@@ -621,14 +661,14 @@ class _SQLiteStorePart03:
                     )
                 )
                 if rows or len(terms) <= 1:
-                    return rows
+                    return self._mark_lexical_mode(rows, "and")
             except sqlite3.OperationalError:
                 pass
 
             fallback_query = " OR ".join(terms)
             if not fallback_query:
                 return []
-            return list(
+            return self._mark_lexical_mode(list(
                 conn.execute(
                     f"""
                     SELECT sections.*, bm25(sections_fts) AS rank
@@ -641,7 +681,11 @@ class _SQLiteStorePart03:
                     """,
                     (fallback_query, *legacy_filter_params, limit),
                 )
-            )
+            ), "or_fallback")
+
+    @staticmethod
+    def _mark_lexical_mode(rows: list[Any], mode: str) -> list[dict[str, Any]]:
+        return [{**dict(row), "_lexical_query_mode": mode} for row in rows]
 
     @staticmethod
     def _metadata_filter_sql(

@@ -34,6 +34,7 @@ from docmancer.docs.domain.source_map import build_project_repo_map, build_proje
 from docmancer.docs.domain.code_graph import build_code_graph_context_items, build_project_code_graph, code_graph_context_diagnostics, code_graph_diagnostics
 from docmancer.docs.domain.trust_contract import build_project_context_trust_contract
 from docmancer.docs.domain.content_trust import annotate_context_pack
+from docmancer.docs.domain.documentation_query_plan import build_documentation_query_plan
 from docmancer.docs.domain.retrieval_routing import (
     fit_stage_items,
     new_routing_record,
@@ -209,6 +210,9 @@ def project_context_pack(*, question: str = "", project_docs: ProjectDocsResult 
                 "temporal_relevance": temporal_relevance_for_status(item.lifecycle_status),
                 "index_freshness": "stale" if item.stale else "synchronized",
                 "impact_policy": item.impact_policy,
+                "project_identity": item.project_identity,
+                "retrieval_query_ids": list(item.metadata.get("retrieval_query_ids") or ()),
+                "retrieval_query_matches": dict(item.metadata.get("retrieval_query_matches") or {}),
                 "path": item.path,
                 "url": item.url,
                 "title": item.title,
@@ -234,6 +238,7 @@ def project_context_pack(*, question: str = "", project_docs: ProjectDocsResult 
                     "temporal_relevance": temporal_relevance_for_status(item.lifecycle_status),
                     "index_freshness": "stale" if item.stale else "synchronized",
                     "impact_policy": item.impact_policy,
+                    "project_identity": item.project_identity,
                     "path": item.path,
                     "url": item.url,
                     "title": item.title,

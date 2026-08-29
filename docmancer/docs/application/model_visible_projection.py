@@ -12,6 +12,7 @@ from copy import deepcopy
 from typing import Any, Iterable
 
 from docmancer.docs.application.action_packet import evidence_identity_for_item
+from docmancer.docs.application.context_selection import validate_context_selection_payload
 from docmancer.docs.application.evidence_selection import (
     AggregateMixedSelectionDecision,
     EvidenceAssignment,
@@ -34,10 +35,12 @@ from docmancer.docs.application.insufficient_projection import (
 from docmancer.docs.application.model_visible_projection_helpers import (
     bounded_action as _bounded_action,
     cited_patch_items as _cited_patch_items,
+    sanitized_projection_manifest,
 )
 
 
 DOCS_ANSWER_MAX_TOKENS = 800
+DOCS_CONTEXT_MAX_TOKENS = 800
 PATCH_CONTEXT_TARGET_TOKENS = 1_500
 PATCH_CONTEXT_HARD_TOKENS = 2_000
 INSUFFICIENT_EVIDENCE_MAX_TOKENS = 300
@@ -45,6 +48,11 @@ MAX_DOCS_SOURCES = 3
 DOCS_SOURCE_FIELDS = frozenset({
     "evidence_id", "path_or_url", "section", "snippet", "version_binding",
     "content_sha256",
+})
+DOCS_CONTEXT_SOURCE_FIELDS = frozenset({
+    "evidence_id", "path_or_url", "section", "snippet", "version_binding",
+    "content_sha256", "project_identity", "line_start", "line_end",
+    "authority", "scope", "retrieval_query_ids", "retrieval_query_matches",
 })
 PATCH_SOURCE_FIELDS = frozenset({
     "evidence_id", "path", "symbol_or_section", "authority",
@@ -660,7 +668,7 @@ def validate_model_visible_projection(
     if forbidden:
         errors.append("forbidden model-visible keys: " + ", ".join(forbidden))
     status, kind = payload.get("status"), payload.get("kind")
-    if kind not in {"docs_answer", "patch_context"}:
+    if kind not in {"docs_answer", "docs_context", "patch_context"}:
         errors.append("invalid projection kind")
     if status not in {"ok", "truncated", "insufficient_evidence"}:
         errors.append("invalid projection status")
@@ -713,11 +721,13 @@ def validate_model_visible_projection(
     if not isinstance(sources, list) or not sources:
         errors.append("successful projections require sources")
         return errors
-    if kind == "docs_answer" and len(sources) > MAX_DOCS_SOURCES:
-        errors.append("docs_answer exceeds source limit")
+    if kind in {"docs_answer", "docs_context"} and len(sources) > MAX_DOCS_SOURCES:
+        errors.append(f"{kind} exceeds source limit")
     ids: set[str] = set()
     allowed_fields = (
-        DOCS_SOURCE_FIELDS if kind == "docs_answer" else PATCH_SOURCE_FIELDS
+        DOCS_SOURCE_FIELDS if kind == "docs_answer" else
+        DOCS_CONTEXT_SOURCE_FIELDS if kind == "docs_context" else
+        PATCH_SOURCE_FIELDS
     )
     for source in sources:
         if not isinstance(source, dict):
@@ -796,6 +806,16 @@ def validate_model_visible_projection(
                 unit = resolve_assignment_unit(candidate, assignment)
                 if unit is not None and unit.text not in str(visible.get("snippet") or ""):
                     errors.append("model-visible assignment unit is absent from its cited source")
+    if kind == "docs_context":
+        if payload.get("answer_supported") is not False or payload.get("answer_available") is not False:
+            errors.append("docs_context must not claim a supported answer")
+        if payload.get("edit_ready") is not False:
+            errors.append("docs_context must not authorize edits")
+        if payload.get("implementation_guidance") or payload.get("invariants") or payload.get("targets"):
+            errors.append("docs_context must not contain edit guidance")
+        if any(not str(source.get("project_identity") or "").strip() for source in sources):
+            errors.append("docs_context sources require project identity")
+        errors.extend(validate_context_selection_payload(payload, sources))
     if kind == "patch_context":
         mutation = payload.get("mutation_intent")
         if not isinstance(mutation, dict):
@@ -815,26 +835,6 @@ def validate_model_visible_projection(
                 errors.append("factual patch item has missing or unknown evidence_ids")
                 break
     return errors
-
-
-def sanitized_projection_manifest(snapshot: dict[str, dict[str, Any]]) -> list[dict[str, Any]]:
-    """Return deterministic audit metadata without full source text."""
-
-    allowed = (
-        "evidence_id", "path_or_url", "path", "section", "symbol_or_section",
-        "authority", "instruction_trust", "scope", "version_binding",
-        "content_sha256",
-    )
-    rows = [
-        {
-            key: deepcopy(projected[key])
-            for key in allowed
-            if projected.get(key) not in (None, "")
-        }
-        for _, value in sorted(snapshot.items())
-        for projected in [value.get("projected_source") or value]
-    ]
-    return rows
 
 
 def _docs_candidates(retrieval: dict[str, Any]) -> list[dict[str, Any]]:

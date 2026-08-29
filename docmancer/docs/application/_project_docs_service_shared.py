@@ -24,6 +24,7 @@ from docmancer.docs.domain.lifecycle_policy import (
     lifecycle_intent,
     temporal_relevance_for_status,
 )
+from docmancer.docs.domain.documentation_query_plan import build_documentation_query_plan
 from docmancer.docs.domain.policies import docs_policy, is_stale
 from docmancer.docs.domain.project_path_validation import validate_project_path
 from docmancer.docs.domain.project_doc_ranking import normalize_doc_path

@@ -37,7 +37,7 @@ get_docs_context(project_path=..., question=..., mode="project")
 -> retry get_docs_context
 ```
 
-The default surface has exactly three tools: `get_docs_context`, `prepare_docs`, and `docs_status`. `prepare_docs(action="sync_project_docs")` reconciles the local project-docs index with the current filesystem discovery snapshot when context returns it or the user explicitly requests synchronization:
+The default surface has exactly three tools: `get_docs_context`, `prepare_docs`, and `docs_status`. `get_docs_context` only inspects lifecycle state and never performs an implicit sync. For a clean committed Git snapshot it may return `prepare_docs(action="sync_project_docs", plan_digest=...)`; preparation revalidates the whole worktree and `HEAD` before reconciling. Dirty or indeterminate state and semantic preflight risks require confirmation. An explicit user-requested sync remains available without the automatic-policy digest:
 
 - discovers current reviewable project-doc candidates;
 - removes orphaned indexed docs whose files were deleted or are no longer discovered;

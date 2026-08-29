@@ -1,0 +1,67 @@
+{
+  "schema_version": "multilingual-retrieval-quality-corpus-v1",
+  "projects": [
+    {
+      "id": "docatlas",
+      "project_identity": "git:github.com/Vanilla1999/DocAtlas",
+      "revision": "c9d009dffba11a3a19a4afe9b31b5061d09409d9",
+      "self_hosting_control": true,
+      "documents": [
+        {
+          "span_id": "docatlas:README.md:15-25",
+          "path": "README.md",
+          "section": "Primary journey",
+          "content": "---\n\nLocal-first documentation context remains the runtime foundation: DocAtlas turns reviewable project docs, lockfiles, and approved dependency documentation into compact, source-attributed evidence for coding agents. It keeps authority, scope, and version binding explicit and fails closed when mandatory evidence is unavailable. Its default MCP surface is deliberately small so agents select the correct operation reliably.\n\nThe primary journey is:\n\n```text\ninstall → get_docs_context → follow a returned prepare_docs action when needed → answer with sources\n```\n\nFor a normal repository question, the agent starts with `get_docs_context`. If it returns a `prepare_docs` next action, the agent follows it, retries the question, and cites the selected project or dependency sources. This is the product's default workflow.",
+          "content_sha256": "9f8f918a44af8a60d1a66bd08b04b1334331ca5ddd4cb9d99e3387615895834e",
+          "line_start": 15,
+          "line_end": 25
+        },
+        {
+          "span_id": "docatlas:docs/mcp-docs-server.md:18-43",
+          "path": "docs/mcp-docs-server.md",
+          "section": "Public tool contract",
+          "content": "## Public tool contract\n\nThe Docs MCP server exposes exactly three public tools. Retrieval is read-only; lifecycle and network work require the explicit `prepare_docs` boundary. The advertised runtime ToolSpec objects are the source of truth for names, descriptions, and schemas; `docatlas-agent-contract-v1` fingerprints those specs together with the workflow policy.\n\n| Tool | Default use | Must not be used for |\n|---|---|---|\n| `get_docs_context` | First documentation question about a repository, dependency, library, or a mix. | Speculative compatibility flags for indexing, crawling, or job polling. |\n| `prepare_docs` | The exact lifecycle action returned by `get_docs_context`, or an explicit user-approved sync/refresh request. | Normal discovery or implementation-code search. |\n| `docs_status` | A returned job id, index health, freshness, or status request. | The first discovery call. |\n\nThe normal flow is:\n\n```text\nget_docs_context(question, project_path)\n→ returned recommended_next_action? obtain confirmation and call that exact action\n→ if a job was returned, poll docs_status(job_id)\n→ retry the original bounded get_docs_context question\n```\n\nThe bounded model-visible result is exactly one canonical projection: `docs_answer` for a typed documentation question whose mandatory proof obligations are satisfied, `docs_context` for safe retrieval-only project context when a complete answer is not proven, `patch_context` for explicit change tasks, or `insufficient_evidence` when no safe context is available. `docs_context` always has `answer_supported=false`, `answer_available=false`, and `edit_ready=false`; the host may synthesize only claims directly grounded in its sources and must not claim completeness. Authoritative conflicts remain `hard_stop=true`. Successful results expose one deduplicated `sources` array with immutable evidence IDs and hashes. Raw `context_pack`, full document content, overlapping primary/supporting lists, and retrieval diagnostics remain internal. An explicit compatibility request may still return the older broad shape during the transition.\n\nThe project answer contract requires explicit proof obligations for each supported user question before evidence can authorize an answer. A retrieval hit alone is never proof: evidence selection requires locally bound subject/relation/value evidence for every mandatory facet, and complete exact proof outranks compact generic text. Questions whose subject or requested operation cannot be resolved fail closed instead of using a synthetic `project` or `requested operation` subject.\nEvidence selection chooses candidates by requiring locally bound subject, relation, and value proof for every mandatory facet; complete exact proof outranks compact generic text.\n\nFree-form lookup is a separate read-only lane. The optional `lookup_queries` argument accepts up to five bounded, single-concept documentation lookups. These queries can improve retrieval recall but cannot add proof obligations, mark an answer supported, or authorize an edit. The original `question` remains authoritative.\n",
+          "content_sha256": "dd7ce22169e28e65015a8f91733d771ff7f1f909bc84d21715be6ae50b59ea89",
+          "line_start": 18,
+          "line_end": 43
+        },
+        {
+          "span_id": "docatlas:docs/modules/question-planning.md:3-27",
+          "path": "docs/modules/question-planning.md",
+          "section": "Question planning responsibility",
+          "content": "`QuestionPlan` is the bounded question-analysis contract that resolves clauses, subjects, intents, mandatory facets, conditions, and unresolved parts before project evidence may authorize an answer.\n\n`ProjectAnswerRequirementContract` is the one-way boundary that carries those resolved proof obligations from question planning to evidence selection.\n\n## Responsibility\n\nThe question-planning module converts a bounded natural-language project-doc question into explicit clauses and proof facets before retrieval evidence is allowed to authorize an answer. Its implementation boundary is `docmancer/docs/domain/question_plan.py` plus the reusable frame/rule modules and `question_surface_normalization.py`. `question_plan.py` composes clauses and proof facets, reusable frames own semantic intent families, and the surface-normalization layer maps only audited complete EN/RU surface families to already-owned canonical questions. The project-answer contract remains the downstream compatibility boundary in `docmancer/docs/domain/`.\n\nThe module must fail closed when it cannot resolve a subject or requested operation. It must not invent generic identities such as `project` or `requested operation` that could later be proven by unrelated text.\n\nThis fail-closed rule governs `docs_answer`, not read-only discovery. An unresolved or unproved question may still produce a bounded `docs_context` projection from current project-scoped retrieval results. That projection is not a replacement `QuestionPlan`, carries no support verdict, and cannot authorize an edit.\n\n## Public boundary\n\nThe durable output is the project-answer requirement contract: resolved subjects, intents, mandatory facets, conditions, technical identities, parse trace, and unresolved parts. Retrieval ranking is not owned here.\n\nImperative edits are outside this boundary. They are owned by\n`PatchRequestPlan` and the patch-specific requirement pipeline documented in\n`patch-request-planning.md`; one request must never pass through both systems.\n\n## Relationship to evidence-selection\n\nQuestion planning defines **what must be proven**, whereas evidence selection determines **whether the available evidence proves it**. **Evidence selection may prove or reject an obligation, but it must not reinterpret the user's question or silently create replacement obligations.** This one-way contract is the architectural seam between the two modules.\n\nOptional host-provided `lookup_queries` bypass question planning and enter only the supplemental retrieval lane. They never mutate this proof contract.",
+          "content_sha256": "631e63b80b2eadcb6ece212fdffb3acf4a4760097bd847d19beacea876ea746a",
+          "line_start": 3,
+          "line_end": 27
+        },
+        {
+          "span_id": "docatlas:README.md:1-13",
+          "path": "README.md",
+          "section": "Project identity",
+          "content": "<img width=\"1448\" height=\"1086\" alt=\"68c5f033-e8f3-4331-a88e-cc64bf28fb62\" src=\"https://github.com/user-attachments/assets/78458fed-22c5-4e78-bbb0-67a902948f9c\" />\n<div align=\"center\">\n\n# DocAtlas\n\n**Local-first, version-bound documentation authority and evidence delivery for coding agents.**\n\n[![License: MIT](https://img.shields.io/github/license/Vanilla1999/DocAtlas?style=for-the-badge)](https://github.com/Vanilla1999/DocAtlas/blob/main/LICENSE)\n[![Python 3.11 | 3.12 | 3.13](https://img.shields.io/badge/python-3.11%20|%203.12%20|%203.13-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://pypi.org/project/doc-atlas/)\n\n[Install](#one-line-install) | [Docs MCP](#project-docs-mcp-server) | [Advanced surfaces](#advanced-surfaces) | [CLI reference](./docs/capabilities.md#end-to-end-examples-of-current-behavior)\n\n</div>",
+          "content_sha256": "6bea455cb3779b908494cbf78d79ddf0fa15b563aae1aa95cd649c1b2cada20d",
+          "line_start": 1,
+          "line_end": 13
+        },
+        {
+          "span_id": "docatlas:docs/mcp-docs-server.md:1-16",
+          "path": "docs/mcp-docs-server.md",
+          "section": "Server startup",
+          "content": "# Docs MCP server\n\nThis is the canonical detailed workflow reference for DocAtlas.\n\nStart the local stdio server with:\n\n```bash\ndoc-atlas mcp docs-serve\n```\n\nFind this command from the root CLI help:\n\n```bash\ndoc-atlas --help\ndoc-atlas mcp --help\n```",
+          "content_sha256": "172607132f86e4d90dff6e1172f8a09ffd218fb5b4ee0287b9e7608f03db11ab",
+          "line_start": 1,
+          "line_end": 16
+        },
+        {
+          "span_id": "docatlas:docs/modules/question-planning.md:29-42",
+          "path": "docs/modules/question-planning.md",
+          "section": "Invariants",
+          "content": "## Invariants\n\n- unresolved subjects and operations cannot authorize `supported`;\n- compound questions expose every mandatory facet and any unparsed independent clause becomes `unresolved_question_clause`, including punctuation- and action-delimited tails;\n- equivalent surface forms such as `What`/`Which`, standalone/compound inventory, `Which command`/`How do I`, and reviewed EN/RU variants resolve to compatible canonical intents; bounded surface normalization must rebind the canonical plan to the complete original user span and may not hide an unresolved tail;\n- inventory categories stay typed: source types, file formats, and test markers are never interchangeable proof subjects;\n- ambiguous surface nouns such as bare `markers` or `formats`, generic subjects such as `project`, and unqualified `docs index` actions fail closed instead of being guessed;\n- technical aliases are bounded and kind-aware;\n- parser ownership is explicit: a new QuestionPlan frame may replace a legacy surface only through a reviewed ownership migration with canonical-contract parity; the 100-case surface corpus freezes owner, full proof signature, and unresolved diagnostics so same-owner semantic drift also fails CI;\n- comparison, location, condition, and premise frames are complete-surface parsers and therefore inherit full-span fail-closed coverage;\n- premise questions are discharged only by a locally bound contradiction/correction or by a matching premise with an explicit causal explanation; a bare premise restatement cannot authorize `supported`;\n- semantic evidence is proposition-local: condition, blocking-condition, requirements, and comparison proof cannot union unrelated neighboring clauses; multi-line requirements are accepted only as an explicitly subject-bound structured list;\n- compound facts may be decomposed into atomic mandatory facets so the selector can use bounded witnesses from different candidates without merging unrelated evidence;\n- frozen v1–v3 contracts remain compatibility inputs until explicitly migrated.",
+          "content_sha256": "0c5a430631a5cbf2b55b3477e7bad46d720dbfd183c31e939f22d749f5ac9bcd",
+          "line_start": 29,
+          "line_end": 42
+        }
+      ]
+    }
+  ]
+}

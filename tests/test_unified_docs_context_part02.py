@@ -25,7 +25,7 @@ def test_library_question_does_not_recommend_patch_constraints():
 
 def test_placeholder_preflight_returns_partial_project_context_without_blind_sync():
     class PlaceholderPreflightFacade(FakeFacade):
-        def bootstrap_project_docs(self, project_path, question=None) -> Any:
+        def bootstrap_project_docs(self, project_path, question=None, *, allow_sync=True) -> Any:
             self.calls.append(("bootstrap_project_docs", {"project_path": project_path, "question": question}))
             return type("Bootstrap", (), {
                 "requires_confirmation": True,
@@ -61,7 +61,7 @@ def test_placeholder_preflight_returns_partial_project_context_without_blind_syn
 
 def test_project_mode_prioritizes_confirmed_sync_for_discovered_unindexed_docs():
     class UnindexedPreflightFacade(FakeFacade):
-        def bootstrap_project_docs(self, project_path, question=None) -> Any:
+        def bootstrap_project_docs(self, project_path, question=None, *, allow_sync=True) -> Any:
             self.calls.append(("bootstrap_project_docs", {"project_path": project_path, "question": question}))
             inspect_result = type("Inspect", (), {
                 "project_docs": {"found": [{"path": "README.md"}], "indexed": []},

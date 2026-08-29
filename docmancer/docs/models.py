@@ -79,6 +79,7 @@ class ProjectDocsChunk(DocsChunk):
     authority: str | None = None
     lifecycle_status: str | None = None
     impact_policy: str | None = None
+    project_identity: str | None = None
 
 
 @dataclass(frozen=True)
@@ -641,6 +642,7 @@ class ProjectContextResult:
     delivery_decision: DeliveryDecision | None = None
     mode: str = "auto"
     reason: str | None = None
+    documentation_query_plan: dict[str, Any] = field(default_factory=dict)
     context_pack: list[dict[str, Any]] = field(default_factory=list)
     project_docs: ProjectDocsResult | None = None
     dependency_docs: DocsResult | None = None
@@ -693,6 +695,7 @@ class UnifiedDocsContextResult:
     disposition: str | None = None
     edit_ready: bool = False
     source_search_status: str = "not_required"
+    documentation_query_plan: dict[str, Any] = field(default_factory=dict)
     context_pack: list[dict[str, Any]] = field(default_factory=list)
     lanes: dict[str, Any] = field(default_factory=dict)
     source_summary: dict[str, int] = field(default_factory=dict)

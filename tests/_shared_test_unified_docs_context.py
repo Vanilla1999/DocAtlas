@@ -51,7 +51,7 @@ class FakeFacade:
         self.bootstrap_requires_confirmation = False
         self.bootstrap_reason_code = "project_docs_ready"
 
-    def bootstrap_project_docs(self, project_path, question=None):
+    def bootstrap_project_docs(self, project_path, question=None, *, allow_sync=True):
         self.calls.append(("bootstrap_project_docs", {"project_path": project_path, "question": question}))
         return type("Bootstrap", (), {
             "requires_confirmation": self.bootstrap_requires_confirmation,

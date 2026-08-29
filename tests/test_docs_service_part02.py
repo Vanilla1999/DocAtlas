@@ -655,3 +655,40 @@ def test_query_project_docs_skips_oversized_first_authoritative_page(tmp_path):
 
     assert [chunk.source for chunk in chunks] == ["docs/PATROL_TESTING.md"]
     assert sum(chunk.metadata["token_estimate"] for chunk in chunks) <= 800
+
+
+def test_query_project_docs_runs_lookup_queries_as_retrieval_only_supplements(tmp_path):
+    project = tmp_path / "lookup"
+    project.mkdir()
+    observed: list[str] = []
+
+    class Agent:
+        config = SimpleNamespace(query=SimpleNamespace(default_limit=5))
+
+        def query(self, query, *, limit, budget, expand, filters):
+            observed.append(query)
+            return [RetrievedChunk(
+                source="docs/architecture.md",
+                chunk_index=0,
+                text="Request routing and retrieval lifecycle share one bounded architecture.",
+                score=1.0,
+                metadata={"token_estimate": 20},
+            )]
+
+    class Facade:
+        def _agent_instance(self):
+            return Agent()
+
+    chunks = ProjectDocsService(Facade()).query_project_docs(
+        str(project),
+        "How does it work?",
+        lookup_queries=("request routing architecture", "retrieval lifecycle"),
+    )
+
+    assert observed.count("How does it work?") == 2
+    assert observed.count("request routing architecture") == 1
+    assert observed.count("retrieval lifecycle") == 1
+    assert len(chunks) == 1
+    assert chunks[0].metadata["retrieval_query_ids"] == (
+        "query-lookup-1", "query-lookup-2", "query-original",
+    )

@@ -417,6 +417,12 @@ def test_agent_templates_include_three_tool_selection_guidance():
     assert workflow["first_call"]["before_first_edit"] is True
     assert workflow["prepare_docs"]["speculative"] is False
     assert workflow["docs_status"]["discovery"] is False
+    lookup = workflow["free_form_lookup"]
+    assert lookup["one_concept_per_lookup"] is True
+    assert lookup["maximum_lookup_queries"] == 5
+    assert lookup["answer_only_from_returned_sources"] is True
+    assert lookup["partial_coverage_is_not_completeness"] is True
+    assert lookup["authorizes_answer_or_edit"] is False
     recovery = workflow["recovery"]
     assert recovery["after_prepare"] == "retry_original_get_docs_context_unchanged"
     assert recovery["rephrase_retry_limit"] == 1

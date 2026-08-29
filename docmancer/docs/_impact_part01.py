@@ -146,6 +146,53 @@ def unaccepted_worktree_changes(
     return sorted(dirty)
 
 
+def git_worktree_state(project_path: str | Path) -> dict[str, Any]:
+    """Return a bounded whole-worktree cleanliness witness for sync policy."""
+    root = Path(project_path).expanduser().resolve()
+    inside, _, inside_code, inside_truncated, inside_timed_out = _run_process_bounded(
+        ["git", "-C", str(root), "rev-parse", "--is-inside-work-tree"],
+        max_stdout_bytes=64,
+    )
+    if inside_timed_out or inside_truncated:
+        return {"status": "indeterminate", "reason_code": "git_inspection_incomplete"}
+    if inside_code != 0 or inside.strip() != b"true":
+        return {"status": "not_git", "reason_code": "git_repository_required"}
+
+    head, _, head_code, head_truncated, head_timed_out = _run_process_bounded(
+        ["git", "-C", str(root), "rev-parse", "--verify", "HEAD"],
+        max_stdout_bytes=128,
+    )
+    if head_timed_out or head_truncated or head_code != 0:
+        return {"status": "indeterminate", "reason_code": "git_head_unavailable"}
+    head_value = head.decode("ascii", errors="ignore").strip()
+    if len(head_value) != 40 or any(character not in "0123456789abcdefABCDEF" for character in head_value):
+        return {"status": "indeterminate", "reason_code": "git_head_unavailable"}
+
+    status, _, status_code, status_truncated, status_timed_out = _run_process_bounded(
+        ["git", "-C", str(root), "status", "--porcelain=v1", "-z", "--untracked-files=all"],
+        max_stdout_bytes=_MAX_GIT_STATUS_BYTES,
+    )
+    if status_timed_out or status_truncated or status_code != 0:
+        return {
+            "status": "indeterminate",
+            "reason_code": "git_status_unavailable",
+            "head": head_value.lower(),
+        }
+    if status:
+        return {
+            "status": "dirty",
+            "reason_code": "git_worktree_dirty",
+            "head": head_value.lower(),
+            "dirty": True,
+        }
+    return {
+        "status": "clean",
+        "reason_code": "git_worktree_clean",
+        "head": head_value.lower(),
+        "dirty": False,
+    }
+
+
 def _parse_name_status_z(output: bytes) -> list[dict[str, Any]]:
     changes: list[dict[str, Any]] = []
     fields = output.split(b"\0")
@@ -633,4 +680,4 @@ def _normalized_paths(paths: list[str]) -> list[str]:
 def _normalized_symbols(symbols: list[str]) -> list[str]:
     return sorted({str(symbol).strip() for symbol in symbols if str(symbol).strip()})
 
-__all__=['changed_files_from_git', 'changed_evidence_from_git', 'unaccepted_worktree_changes', '_parse_name_status_z', '_bounded_git_patch', '_run_process_bounded', '_symbols_from_patch', '_decode_patch_path', '_ordered_unique', '_safe_git_text', '_safe_git_change', '_impact_candidate_priority', '_fallback_doc_candidates', '_continuation_command', '_bounded_text', '_build_documentation_update_brief', '_add_impact', '_add_section_impacts', '_module_path', '_is_project_authority_candidate', '_is_test_path', '_normalized_paths', '_normalized_symbols']
+__all__=['changed_files_from_git', 'changed_evidence_from_git', 'unaccepted_worktree_changes', 'git_worktree_state', '_parse_name_status_z', '_bounded_git_patch', '_run_process_bounded', '_symbols_from_patch', '_decode_patch_path', '_ordered_unique', '_safe_git_text', '_safe_git_change', '_impact_candidate_priority', '_fallback_doc_candidates', '_continuation_command', '_bounded_text', '_build_documentation_update_brief', '_add_impact', '_add_section_impacts', '_module_path', '_is_project_authority_candidate', '_is_test_path', '_normalized_paths', '_normalized_symbols']

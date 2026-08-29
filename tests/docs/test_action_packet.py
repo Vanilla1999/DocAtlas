@@ -543,10 +543,12 @@ def test_bounded_direct_is_one_existing_tool_call_and_returns_only_action_packet
     assert set(tool["inputSchema"]["properties"]) == {
         "question", "project_path", "library", "libraries", "ecosystem",
         "version", "source_type", "docs_url", "module", "module_path",
-        "scope", "mode",
+        "scope", "mode", "lookup_queries",
     }
     assert "delivery_strategy" not in tool["inputSchema"]["properties"]
-    assert tool["outputSchema"]["properties"]["kind"]["enum"] == ["docs_answer", "patch_context"]
+    assert tool["outputSchema"]["properties"]["kind"]["enum"] == [
+        "docs_answer", "docs_context", "patch_context",
+    ]
     assert len(TOOLS) == 3
     installed_contract = _get_template_content("project_bootstrap.md")
     assert 'delivery_strategy="bounded_direct"' not in installed_contract

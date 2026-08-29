@@ -43,4 +43,25 @@ def cited_patch_items(payload: dict[str, Any]) -> list[dict[str, Any]]:
     ]
 
 
-__all__ = ["bounded_action", "cited_patch_items"]
+def sanitized_projection_manifest(
+    snapshot: dict[str, dict[str, Any]],
+) -> list[dict[str, Any]]:
+    """Return deterministic audit metadata without full source text."""
+
+    allowed = (
+        "evidence_id", "path_or_url", "path", "section", "symbol_or_section",
+        "authority", "instruction_trust", "scope", "version_binding",
+        "content_sha256",
+    )
+    return [
+        {
+            key: deepcopy(projected[key])
+            for key in allowed
+            if projected.get(key) not in (None, "")
+        }
+        for _, value in sorted(snapshot.items())
+        for projected in [value.get("projected_source") or value]
+    ]
+
+
+__all__ = ["bounded_action", "cited_patch_items", "sanitized_projection_manifest"]

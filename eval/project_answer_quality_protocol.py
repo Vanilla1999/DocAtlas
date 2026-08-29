@@ -17,6 +17,7 @@ from docmancer.agent import DocmancerAgent
 from docmancer.core.config import DocmancerConfig
 from docmancer.docs.application.docs_job_service import DocsJobTracker
 from docmancer.docs.application.evidence_selection import build_requirements
+from docmancer.docs.interfaces.mcp import context_tools
 from docmancer.docs.registry import LibraryRegistry
 from docmancer.docs.service import LibraryDocsService
 from docmancer.mcp.docs_server import call_docs_tool_payload
@@ -153,6 +154,20 @@ def _isolated_home(path: Path) -> Iterator[None]:
             os.environ["DOCMANCER_HOME"] = previous
 
 
+@contextmanager
+def _frozen_answer_projection() -> Iterator[None]:
+    """Keep the v1-v4 answer oracle separate from retrieval-only projection."""
+
+    original = context_tools.maybe_project_docs_context
+    context_tools.maybe_project_docs_context = lambda **kwargs: (
+        kwargs["projection"], kwargs["snapshot"]
+    )
+    try:
+        yield
+    finally:
+        context_tools.maybe_project_docs_context = original
+
+
 def _write_repository(root: Path, case: QualityCase) -> None:
     for relative, text in case.files:
         target = root / relative
@@ -274,9 +289,10 @@ def run_case(case: QualityCase, workspace: Path) -> CaseResult:
             "project_path": str(repository),
             "mode": "project",
         }
-        payload = call_docs_tool_payload(
-            "get_docs_context", public_arguments, service,
-        )
+        with _frozen_answer_projection():
+            payload = call_docs_tool_payload(
+                "get_docs_context", public_arguments, service,
+            )
 
     expected = case.expected
     expected_paths = set(expected.evidence_paths)
@@ -287,7 +303,17 @@ def run_case(case: QualityCase, workspace: Path) -> CaseResult:
     visible_text = json.dumps(payload, ensure_ascii=False, sort_keys=True)
     visible_folded = visible_text.casefold()
     supported = expected.status == "ok"
-    token_limit = SUPPORTED_TOKEN_LIMIT if payload.get("status") == "ok" else INSUFFICIENT_TOKEN_LIMIT
+    retrieval_only = bool(
+        payload.get("status") == "ok"
+        and payload.get("kind") == "docs_context"
+        and payload.get("answer_supported") is False
+        and payload.get("answer_available") is False
+        and payload.get("edit_ready") is False
+    )
+    token_limit = (
+        SUPPORTED_TOKEN_LIMIT
+        if supported or retrieval_only else INSUFFICIENT_TOKEN_LIMIT
+    )
     visible_tokens = int(payload.get("estimated_tokens") or token_limit + 1)
 
     acquisition_recall = (
@@ -316,24 +342,22 @@ def run_case(case: QualityCase, workspace: Path) -> CaseResult:
         for fragment in expected.required_fragments
     )
     citation_integrity = _citation_integrity(payload, indexed)
-    abstention_correctness = (
-        payload.get("status") == expected.status
-        and (
-            supported
+    abstention_correctness = bool(
+        payload.get("status") == expected.status if supported else (
+            retrieval_only
             or (
-                not payload.get("answer")
+                payload.get("status") == "insufficient_evidence"
+                and not payload.get("answer")
                 and not payload.get("sources")
                 and not payload.get("answer_supported", False)
             )
         )
     )
-    contamination_free = (
+    contamination_free = bool(
         all(fragment.casefold() not in visible_folded for fragment in expected.forbidden_fragments)
         and not set(selected_paths).intersection(expected.forbidden_paths)
     )
-    correct_evidence = (
-        set(selected_paths) == expected_paths if supported else not selected_paths
-    )
+    correct_evidence = set(selected_paths) == expected_paths
     public_surface = tuple(sorted(public_arguments)) == PUBLIC_ARGUMENT_FIELDS
     token_ceiling = visible_tokens <= token_limit
     sync_success = sync.status == "success"

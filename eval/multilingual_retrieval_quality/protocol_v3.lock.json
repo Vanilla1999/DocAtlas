@@ -1,0 +1,68 @@
+{
+  "schema_version": "multilingual-retrieval-quality-protocol-v3",
+  "language_pairs": ["en-en", "ru-en", "ru-ru"],
+  "taxonomies": [
+    "architecture",
+    "comparison",
+    "constraints",
+    "location",
+    "ownership",
+    "purpose",
+    "setup",
+    "unknown_fact",
+    "workflow"
+  ],
+  "splits": ["development", "holdout", "adversarial"],
+  "systems": [
+    {"id": "open-lexical", "requested_mode": "lexical", "reranker": "none"},
+    {"id": "open-multilingual-dense", "requested_mode": "dense", "reranker": "none"},
+    {"id": "open-hybrid-rrf", "requested_mode": "hybrid", "reranker": "none"}
+  ],
+  "corpus_gates": {
+    "project_scope": "self_hosting_only",
+    "required_project_count": 1,
+    "minimum_cases_per_language_pair": 5,
+    "minimum_cases_per_language_pair_per_split": 1,
+    "require_multi_concept_gold_spans": true,
+    "require_absent_fact_cases": true
+  },
+  "quality_gates": {
+    "recall_at_5_overall_min": 0.9,
+    "recall_at_5_per_language_pair_min": 0.85,
+    "improvement_percentage_points_min": 10.0,
+    "paired_bootstrap_iterations": 10000,
+    "paired_bootstrap_seed": 73129,
+    "paired_bootstrap_confidence": 0.95,
+    "wrong_project_evidence_accepted_max": 0,
+    "degraded_or_fallback_runs_max": 0,
+    "visible_source_provenance_required": [
+      "project_identity",
+      "content_sha256",
+      "line_start",
+      "line_end",
+      "span_id",
+      "path",
+      "section"
+    ]
+  },
+  "model_configuration": {
+    "dense_provider": "fastembed",
+    "dense_model": "sentence-transformers/paraphrase-multilingual-mpnet-base-v2",
+    "dense_dimensions": 768,
+    "sparse_model": "prithivida/Splade_PP_en_v1",
+    "fusion": "rrf",
+    "rrf_k": 60,
+    "allow_degraded": false
+  },
+  "frozen_artifacts": {
+    "repository_revision": "c9d009dffba11a3a19a4afe9b31b5061d09409d9",
+    "corpus_digest_manifest_sha256": "5fa94d739899924bfbed5b9a7c3bb42eb4a846d2423b38b792d80c7c5ce9cea6",
+    "runner_sha256": "c89c287d4d6cc52120456a3c5a06e1a62630f82a30759db68262d344377f0c6c",
+    "adapter_sha256": "c87a31c3e05ace0da7ddf2871738c1c7df9e1b8fb7881648a1b2c934b2caba5e"
+  },
+  "activation_policy": {
+    "change_default_retrieval": false,
+    "profile_requires_passing_holdout": true,
+    "self_hosting_proves_external_generalization": false
+  }
+}

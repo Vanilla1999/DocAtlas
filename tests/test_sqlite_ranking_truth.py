@@ -106,3 +106,24 @@ def test_ranking_trace_exposes_named_components_without_document_text(tmp_path):
     assert isinstance(trace["final_rank"], int)
     assert "text" not in trace
     assert "content" not in trace
+
+
+def test_lexical_match_trace_distinguishes_strict_and_weak_or_fallback(tmp_path):
+    store = _store(
+        tmp_path,
+        [
+            _doc("docs/workflow.md", "DocAtlas workflow", "DocAtlas indexing workflow setup"),
+            _doc("docs/generic.md", "Configuration", "Generic configuration reference"),
+        ],
+    )
+
+    strict = store.query("DocAtlas indexing workflow", limit=2, budget=2_000)[0]
+    fallback = store.query(
+        "Telegram notifications after indexing DocAtlas", limit=2, budget=2_000,
+    )
+
+    assert strict.metadata["lexical_match"]["mode"] == "and"
+    assert strict.metadata["lexical_match"]["qualified"] is True
+    assert any(item.metadata["lexical_match"]["mode"] == "or_fallback" for item in fallback)
+    assert all(item.metadata["lexical_match"]["qualified"] is False for item in fallback)
+    assert "text" not in strict.metadata["lexical_match"]

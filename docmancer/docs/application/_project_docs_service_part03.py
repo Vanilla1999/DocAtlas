@@ -124,6 +124,28 @@ def _exact_document_index_chunks(
     return candidates[:_EXACT_DOCUMENT_FALLBACK_LIMIT]
 
 
+def _tag_retrieval_query(chunks: Any, query_id: str | None) -> list[Any]:
+    if not query_id:
+        return list(chunks)
+    tagged = []
+    for chunk in chunks:
+        metadata = dict(chunk.metadata or {})
+        trace = dict(metadata.get("lexical_match") or {})
+        # Dense/hybrid candidates have already passed their retrieval lane;
+        # lexical candidates carry the stricter AND/OR qualification trace.
+        trace.setdefault("qualified", "lexical_match" not in metadata)
+        trace.setdefault("lexical_score", float(chunk.score))
+        matches = dict(metadata.get("retrieval_query_matches") or {})
+        matches[query_id] = trace
+        qualified_ids = tuple(key for key, value in matches.items() if value.get("qualified") is True)
+        metadata.update({
+            "retrieval_query_matches": matches,
+            "retrieval_query_ids": qualified_ids,
+        })
+        tagged.append(chunk.model_copy(update={"metadata": metadata}))
+    return tagged
+
+
 class _ProjectDocsServicePart03:
     def query_project_docs(
         self,
@@ -138,6 +160,7 @@ class _ProjectDocsServicePart03:
         module_path: str | None = None,
         evidence_path: str | None = None,
         requirements: Any | None = None,
+        lookup_queries: tuple[str, ...] = (),
     ):
         root = validate_project_path(project_path).path
         answer_lifecycle_intent = str(
@@ -159,6 +182,18 @@ class _ProjectDocsServicePart03:
         effective_limit = limit or agent.config.query.default_limit
         budget = tokens or DEFAULT_DOC_TOKENS
         effective_expand = (expand or "none") if requirements is not None else expand
+        documentation_query_plan = build_documentation_query_plan(
+            query, lookup_queries=lookup_queries, explicit_path=evidence_path,
+        )
+        lookup_query_ids = {
+            item.text: item.query_id
+            for item in documentation_query_plan.queries
+            if item.origin == "host_lookup"
+        }
+        exact_path_query_id = next((
+            item.query_id for item in documentation_query_plan.queries
+            if item.origin == "exact_path"
+        ), None)
         retrieval = getattr(agent.config, "retrieval", None)
         mode = str(getattr(retrieval, "default_mode", "lexical") or "lexical").lower()
 
@@ -183,6 +218,7 @@ class _ProjectDocsServicePart03:
             if str(value).strip()
         ))[:4]
         supplemental_queries = tuple(dict.fromkeys((
+            *lookup_queries,
             *probe_queries,
             *contract_concepts,
             *retrieval_hints,
@@ -237,6 +273,8 @@ class _ProjectDocsServicePart03:
             query_expand=effective_expand,
             query_filters=filters,
         )
+        chunks = _tag_retrieval_query(chunks, "query-original")
+        chunks = _tag_retrieval_query(chunks, exact_path_query_id)
         authoritative_chunks = _run(
             query,
             query_limit=max(effective_limit, 20),
@@ -244,15 +282,20 @@ class _ProjectDocsServicePart03:
             query_expand=effective_expand or "page",
             query_filters={**filters, "authority": "source_of_truth"},
         )
+        authoritative_chunks = _tag_retrieval_query(authoritative_chunks, "query-original")
+        authoritative_chunks = _tag_retrieval_query(authoritative_chunks, exact_path_query_id)
         supplemental_chunks = [
             chunk
             for supplemental_query in supplemental_queries
-            for chunk in _run(
+            for chunk in _tag_retrieval_query(
+                _run(
                 supplemental_query,
                 query_limit=4,
                 query_budget=supplemental_budget,
                 query_expand="none",
                 query_filters=filters,
+                ),
+                lookup_query_ids.get(supplemental_query),
             )
         ]
 
@@ -270,6 +313,11 @@ class _ProjectDocsServicePart03:
                         candidates.append(lane.pop(0))
         else:
             candidates = [*supplemental_chunks, *authoritative_chunks, *chunks]
+            candidates.sort(
+                key=lambda chunk: not bool(
+                    (chunk.metadata or {}).get("retrieval_query_ids")
+                )
+            )
         if probe_queries:
             probe_terms = tuple({
                 term.casefold()
@@ -290,6 +338,25 @@ class _ProjectDocsServicePart03:
                 continue
             key = (chunk.source, chunk.chunk_index)
             if key in seen:
+                existing_index = next(
+                    index for index, item in enumerate(selected)
+                    if (item.source, item.chunk_index) == key
+                )
+                from docmancer.docs.application.context_selection import merge_query_matches
+                merged_matches = merge_query_matches(
+                    (selected[existing_index].metadata or {}).get("retrieval_query_matches"),
+                    (chunk.metadata or {}).get("retrieval_query_matches"),
+                )
+                merged_ids = tuple(
+                    key for key, value in merged_matches.items() if value.get("qualified") is True
+                )
+                selected[existing_index] = selected[existing_index].model_copy(update={
+                    "metadata": {
+                        **(selected[existing_index].metadata or {}),
+                        "retrieval_query_matches": merged_matches,
+                        "retrieval_query_ids": merged_ids,
+                    },
+                })
                 continue
             if len(selected) >= effective_limit:
                 anchor = selected[0]
@@ -320,6 +387,7 @@ class _ProjectDocsServicePart03:
         scope: str | None = None,
         evidence_path: str | None = None,
         requirements: Any | None = None,
+        lookup_queries: tuple[str, ...] = (),
     ) -> ProjectDocsResult:
         root = validate_project_path(project_path).path
         if hasattr(self.facade, "_project_get_project_docs_impl"):
@@ -329,6 +397,8 @@ class _ProjectDocsServicePart03:
             }
             if requirements is not None:
                 kwargs["requirements"] = requirements
+            if lookup_queries:
+                kwargs["lookup_queries"] = lookup_queries
             if evidence_path:
                 kwargs["evidence_path"] = evidence_path
             return self.facade._project_get_project_docs_impl(str(root), query, **kwargs)
@@ -533,6 +603,7 @@ class _ProjectDocsServicePart03:
             str(root), query, tokens=tokens, limit=limit, expand=expand,
             scope=query_scope, module_path=resolved_module_path, evidence_path=evidence_path,
             requirements=requirements,
+            lookup_queries=lookup_queries,
         )
         current_by_path = {
             normalize_doc_path(item.get("path")): item
@@ -553,6 +624,7 @@ class _ProjectDocsServicePart03:
                 indexed_source=str(exact_source.get("source") or ""),
                 requirements=requirements,
             )
+            chunks = _tag_retrieval_query(chunks, "query-path-1")
             exact_document_fallback_used = bool(chunks)
         safe_chunks = []
         dropped_placeholder_chunks = 0
@@ -647,6 +719,7 @@ class _ProjectDocsServicePart03:
                 authority=(chunk.metadata or {}).get("project_doc_authority"),
                 lifecycle_status=(chunk.metadata or {}).get("project_doc_lifecycle_status"),
                 impact_policy=(chunk.metadata or {}).get("project_doc_impact_policy"),
+                project_identity=(chunk.metadata or {}).get("project_identity"),
             )
             for chunk in chunks
         ]

@@ -9,6 +9,7 @@ Use the three-tool Docs MCP workflow:
 2. Call `prepare_docs` only from `recommended_next_action` or for an explicit documentation lifecycle request.
 3. Call `docs_status` only for explicit status/health/freshness/job requests or when returned as `recommended_next_action`; never use it for discovery.
 4. After preparation, retry the original `get_docs_context` question unchanged; follow at most one returned non-automatic `rephrase_question`.
+5. For free-form requests, pass at most five single-concept `lookup_queries`. Partial `docs_context` permits only source-grounded claims, never completeness or edits.
 
 On `insufficient_evidence`, do not claim documentation support. When `hard_stop=false`, use a returned local source-search handoff and repository source/tests. Stop before editing only when `hard_stop=true`.
 

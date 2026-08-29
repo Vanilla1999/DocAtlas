@@ -124,7 +124,7 @@ PUBLIC_GET_DOCS_CONTEXT_OUTPUT_SCHEMA: dict[str, Any] = {
             "success", "partial_success", "confirmation_required",
             "not_found", "invalid_request",
         ]},
-        "kind": {"enum": ["docs_answer", "patch_context"]},
+        "kind": {"enum": ["docs_answer", "docs_context", "patch_context"]},
         "estimated_tokens": {"type": "integer"},
         "reason_code": {"type": "string"},
         "operational_reason_code": {"type": "string"},

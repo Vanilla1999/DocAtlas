@@ -6,6 +6,7 @@ from typing import Any
 from urllib.parse import urlparse
 
 from docmancer.docs.service import LibraryDocsService
+from docmancer.docs.impact import git_worktree_state
 from docmancer.docs.application.docs_job_service import bound_job_diagnostics, project_job_diagnostic
 from docmancer.docs.interfaces.mcp.project_tools import _bounded_int_arg, _compact_mcp_payload, handle_project_tool
 
@@ -25,6 +26,7 @@ PREFETCH_TOOL_NAMES = {
 _PREPARE_ACTION_FIELDS = {
     "sync_project_docs": {
         "action", "project_path", "with_vectors", "changed_paths", "deleted_paths", "renamed_paths",
+        "plan_digest",
     },
     "prefetch_project_dependency_docs": {"action", "project_path", "include_flutter", "include_dart", "include_rust", "include_go", "include_packages", "force_refresh", "continue_on_error", "async"},
     "prefetch_library_docs": {"action", "library", "ecosystem", "version", "source_type", "docs_url", "docs_url_template", "force_refresh", "continue_on_error", "async", "question"},
@@ -190,6 +192,13 @@ def validate_prepare_docs_arguments(args: dict[str, Any]) -> dict[str, Any] | No
     if action == "clear_index" and args.get("scope") != "project-local":
         return _prepare_validation_error(action, "only scope='project-local' is supported in this release")
     if action == "sync_project_docs":
+        plan_digest = args.get("plan_digest")
+        if plan_digest is not None and (
+            not isinstance(plan_digest, str)
+            or len(plan_digest) != 64
+            or any(character not in "0123456789abcdefABCDEF" for character in plan_digest)
+        ):
+            return _prepare_validation_error(action, "plan_digest must be a 64-character hexadecimal digest")
         for field in ("changed_paths", "deleted_paths", "renamed_paths"):
             value = args.get(field)
             if value is not None and not isinstance(value, list):
@@ -394,13 +403,43 @@ def handle_prefetch_tool(name: str, args: dict[str, Any], service: LibraryDocsSe
             target = _bounded_inspection_target(args["target"])
             payload = asdict(service.inspect_docs_target(target, max_pages=int(args.get("max_pages") or 3)))
         elif action == "sync_project_docs":
-            payload = _compact_project_sync(project_docs_app.sync_project_docs(
-                args["project_path"],
-                with_vectors=bool(args.get("with_vectors") if args.get("with_vectors") is not None else False),
-                changed_paths=args.get("changed_paths"),
-                deleted_paths=args.get("deleted_paths"),
-                renamed_paths=args.get("renamed_paths"),
-            ))
+            if args.get("plan_digest"):
+                git_state = git_worktree_state(args["project_path"])
+                inspection = project_docs_app.inspect_project_docs(args["project_path"])
+                preflight = (inspection.diagnostics or {}).get("preflight") or {}
+                actual_digest = (
+                    project_docs_app._clean_git_sync_digest(git_state["head"])
+                    if git_state.get("status") == "clean" and git_state.get("head") else None
+                )
+                if (
+                    git_state.get("status") != "clean"
+                    or actual_digest != str(args["plan_digest"]).lower()
+                    or not preflight.get("auto_sync_eligible")
+                ):
+                    payload = {
+                        "status": "precondition_failed",
+                        "reason_code": "clean_git_auto_sync_precondition_failed",
+                        "requires_confirmation": True,
+                        "confirmation_reason": "project_docs_preflight",
+                        "git_status": git_state.get("status"),
+                        "message": "Git HEAD, worktree cleanliness, or project-doc preflight changed before synchronization; no index mutation was performed.",
+                    }
+                else:
+                    payload = _compact_project_sync(project_docs_app.sync_project_docs(
+                        args["project_path"],
+                        with_vectors=bool(args.get("with_vectors") if args.get("with_vectors") is not None else False),
+                        changed_paths=args.get("changed_paths"),
+                        deleted_paths=args.get("deleted_paths"),
+                        renamed_paths=args.get("renamed_paths"),
+                    ))
+            else:
+                payload = _compact_project_sync(project_docs_app.sync_project_docs(
+                    args["project_path"],
+                    with_vectors=bool(args.get("with_vectors") if args.get("with_vectors") is not None else False),
+                    changed_paths=args.get("changed_paths"),
+                    deleted_paths=args.get("deleted_paths"),
+                    renamed_paths=args.get("renamed_paths"),
+                ))
         elif action == "prefetch_project_dependency_docs":
             payload = asdict(dependency_docs_app.prefetch_project_dependency_docs(args["project_path"], include_flutter=bool(args.get("include_flutter") if args.get("include_flutter") is not None else True), include_dart=bool(args.get("include_dart") or False), include_rust=bool(args.get("include_rust") if args.get("include_rust") is not None else True), include_go=bool(args.get("include_go") if args.get("include_go") is not None else True), include_packages=args.get("include_packages") or [], force_refresh=bool(args.get("force_refresh") or False), continue_on_error=bool(args.get("continue_on_error") if args.get("continue_on_error") is not None else True), async_=True))
         elif action == "prefetch_library_docs":

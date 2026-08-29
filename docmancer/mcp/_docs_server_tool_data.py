@@ -17,11 +17,13 @@ Agent workflow:
 - In bounded delivery, insufficient_evidence never proves a documentary claim. Follow one typed recovery: one non-automatic rephrase for parser/retrieval uncertainty, then local source/tests when hard_stop=false; stop before an edit when hard_stop=true or the task explicitly requires a still-unproved documentary contract. In unbounded exploration, navigation_only or partial_navigational requires source search before answering.
 - This tool provides source-grounded context, not a full code audit or test substitute.
 - For change-aware documentation maintenance, pass maintenance with either base/head or explicit changed_paths; obey its fail-closed authoring brief.
+- For a free-form or multi-concept documentation request, optionally pass up to five narrow lookup_queries. They improve retrieval only; the original question remains authoritative and lookup queries never authorize an answer or edit.
 """,
         "inputSchema": {
             "type": "object",
             "properties": {
                 "question": {"type": "string"},
+                "lookup_queries": {"type": ["array", "null"], "maxItems": 5, "uniqueItems": True, "items": {"type": "string", "minLength": 1, "maxLength": 500}, "description": "Optional bounded single-concept project-documentation lookups used only to improve retrieval recall."},
                 "project_path": {"type": ["string", "null"]},
                 "response_style": {"type": ["string", "null"], "enum": ["auto", "snippet-first", "evidence-first", None], "default": "auto", "description": "Choose snippet-first presentation for coding tasks or preserve evidence-first context."},
                 "delivery_strategy": {"type": ["string", "null"], "enum": ["bounded_direct", None], "description": "Return one deterministic, source-attributed ActionPacket without exposing raw retrieval content."},
@@ -710,6 +712,7 @@ PUBLIC_ADVERTISED_INPUT_SCHEMAS: dict[str, dict[str, Any]] = {
         "type": "object",
         "properties": {
             "question": {"type": "string", "minLength": 1},
+            "lookup_queries": {"type": ["array", "null"], "maxItems": 5, "uniqueItems": True, "items": {"type": "string", "minLength": 1, "maxLength": 500}},
             "project_path": {"type": ["string", "null"]},
             "library": {"type": ["string", "null"]},
             "libraries": {"type": ["array", "null"], "items": {"type": "string"}},
@@ -723,12 +726,12 @@ PUBLIC_ADVERTISED_INPUT_SCHEMAS: dict[str, dict[str, Any]] = {
             },
             "module_path": {
                 "type": ["string", "null"],
-                "description": "Exact discovered module path. Supplying it always implies module scope.",
+                "description": "Exact path; always implies module scope.",
             },
             "scope": {
                 "type": ["string", "null"],
                 "enum": ["project", "module", "all", None],
-                "description": "project = repo-level docs only; module = one module; all = repo-level plus modules only without a module filter. Use two calls for module + project obligations.",
+                "description": "Project: repo-level docs only; module/all.",
             },
             "mode": {
                 "type": ["string", "null"],

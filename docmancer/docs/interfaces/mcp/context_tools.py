@@ -30,6 +30,12 @@ from docmancer.docs.application.model_visible_projection import (
     projection_kind,
     validate_model_visible_projection,
 )
+from docmancer.docs.interfaces.mcp.docs_context_routing import (
+    maybe_project_docs_context,
+    normalize_lookup_queries,
+    refresh_projection_estimate as _refresh_projection_estimate,
+    tuple_value as _tuple_value,
+)
 from docmancer.docs.domain.mutation_intent import build_mutation_intent
 from docmancer.docs.domain.tool_selection import normalize_public_docs_actions
 from docmancer.docs.domain.retrieval_routing import validate_routing_record
@@ -85,20 +91,6 @@ def _prioritize_module_recovery_projection(payload: dict[str, Any]) -> None:
     missing = payload.get("missing")
     if isinstance(missing, list) and len(missing) > 2:
         payload["missing"] = missing[:2]
-
-
-def _tuple_value(value: Any) -> tuple[Any, ...]:
-    if isinstance(value, (list, tuple)):
-        return tuple(value)
-    return (value,) if value not in (None, "") else ()
-
-
-def _refresh_projection_estimate(payload: dict[str, Any]) -> None:
-    for _ in range(4):
-        estimate = max(1, math.ceil(len(canonical_projection_bytes(payload)) / 4))
-        if payload.get("estimated_tokens") == estimate:
-            return
-        payload["estimated_tokens"] = estimate
 
 
 def context_tools(tools: list[dict[str, Any]]) -> list[dict[str, Any]]:
@@ -294,6 +286,9 @@ def handle_context_tool(name: str, args: dict[str, Any], service: LibraryDocsSer
     question = _clean_string(args.get("question"))
     if not question:
         return _bad_request("empty_question", "question must not be empty. Examples: 'Flutter Riverpod providers', 'Firebase Auth signIn', 'How to use go_router redirect', 'FastAPI dependency injection', 'patch_constraints for adding a service'")
+    lookup_queries, lookup_error = normalize_lookup_queries(args.get("lookup_queries"))
+    if lookup_error:
+        return _bad_request("invalid_lookup_queries", lookup_error)
     if args.get("packet_tokens") is not None and args.get("delivery_strategy") != "bounded_direct":
         return _bad_request("packet_tokens_requires_bounded_delivery", "packet_tokens requires delivery_strategy='bounded_direct'")
     mutation_intent = build_mutation_intent(question)
@@ -329,6 +324,7 @@ def handle_context_tool(name: str, args: dict[str, Any], service: LibraryDocsSer
         details=args.get("details"),
         response_style=args.get("response_style"),
         mutation_intent=mutation_intent,
+        lookup_queries=lookup_queries,
     )
     canonical_selection = (
         result.get("selection_decision")
@@ -391,6 +387,10 @@ def handle_context_tool(name: str, args: dict[str, Any], service: LibraryDocsSer
                 canonical_selection=canonical_selection,
             )
             raw.setdefault("retrieval_diagnostics", {})["evidence_selection"] = selection_trace
+            projection, snapshot = maybe_project_docs_context(
+                projection=projection, snapshot=snapshot, raw=raw, args=args,
+                recovery=recovery, output_budget=output_budget,
+            )
             if projection.get("status") == "insufficient_evidence":
                 projection.update(_bounded_project_operational_diagnostics(raw))
                 projection.update(_recovery_summary(raw))

@@ -28,6 +28,14 @@ WORKFLOW_POLICY: dict[str, Any] = {
         "allowed_when": ["explicit_status_request", "recommended_next_action"],
         "discovery": False,
     },
+    "free_form_lookup": {
+        "host_formulates_lookup_queries": True,
+        "one_concept_per_lookup": True,
+        "maximum_lookup_queries": 5,
+        "answer_only_from_returned_sources": True,
+        "partial_coverage_is_not_completeness": True,
+        "authorizes_answer_or_edit": False,
+    },
     "recovery": {
         "after_prepare": "retry_original_get_docs_context_unchanged",
         "rephrase_retry_limit": 1,

@@ -357,7 +357,7 @@ class _UnifiedDocsContextServicePart02:
         return items
 
     def _dedupe_and_guard(self, items: list[dict[str, Any]], libs: list[str], project_path: str | None) -> tuple[list[dict[str, Any]], dict[str, Any], dict[str, Any]]:
-        seen = set()
+        seen: dict[Any, int] = {}
         out = []
         contamination_dropped = 0
         contamination_reasons: list[str] = []
@@ -419,10 +419,25 @@ class _UnifiedDocsContextServicePart02:
                 evidence_payload if payload_distinguishes_evidence else None,
             )
             if stable in seen:
+                existing_index = seen[stable]
+                from docmancer.docs.application.context_selection import merge_query_matches
+                merged_matches = merge_query_matches(
+                    out[existing_index].get("retrieval_query_matches"),
+                    item.get("retrieval_query_matches"),
+                )
+                merged_query_ids = [
+                    key for key, value in merged_matches.items() if value.get("qualified") is True
+                ]
+                if merged_query_ids:
+                    out[existing_index] = {
+                        **out[existing_index],
+                        "retrieval_query_matches": merged_matches,
+                        "retrieval_query_ids": merged_query_ids,
+                    }
                 dedup_dropped += 1
                 dedup_reasons.append("duplicate_source")
                 continue
-            seen.add(stable)
+            seen[stable] = len(out)
             out.append(item)
         return out, {"detected": bool(contamination_dropped), "dropped_count": contamination_dropped, "reason_codes": sorted(set(contamination_reasons))}, {"dropped_count": dedup_dropped, "reason_codes": sorted(set(dedup_reasons))}
 

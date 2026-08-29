@@ -2,6 +2,143 @@
 from tests.docs import _shared_test_model_visible_projection as _shared
 globals().update({k: v for k, v in vars(_shared).items() if not k.startswith("__")})
 from docmancer.docs.interfaces.mcp.recovery_projection import _bound_recoverable_insufficient_projection
+from docmancer.docs.application.docs_context_projection import project_docs_context
+
+
+def test_docs_context_is_retrieval_only_snapshot_bound_and_not_edit_ready():
+    retrieval = {
+        "context_pack": [{
+            "source_class": "project_doc",
+            "path": "docs/architecture.md",
+            "heading_path": "Request flow",
+            "content": "Requests enter through the MCP router and then reach the project retrieval service.",
+            "project_identity": "git:example/project",
+            "line_start": 12,
+            "line_end": 14,
+            "authority": "source_of_truth",
+            "doc_scope": "project",
+            "lifecycle_status": "active",
+            "freshness": "current",
+            "index_freshness": "synchronized",
+            "risk_flags": [],
+            "retrieval_query_ids": ["query-original"],
+            "retrieval_query_matches": {
+                "query-original": {"qualified": True, "mode": "and"},
+            },
+        }],
+        "documentation_query_plan": {
+            "query_ids": ["query-original", "query-lookup-1"],
+        },
+    }
+
+    projection, snapshot = project_docs_context(retrieval=retrieval)
+
+    assert projection["status"] == "ok"
+    assert projection["kind"] == "docs_context"
+    assert projection["answer_supported"] is False
+    assert projection["answer_available"] is False
+    assert projection["edit_ready"] is False
+    assert projection["safe_to_answer_from_sources"] is True
+    assert projection["sources"][0]["project_identity"] == "git:example/project"
+    assert projection["sources"][0]["line_start"] == 12
+    assert projection["sources"][0]["retrieval_query_ids"] == ["query-original"]
+    assert projection["query_coverage"] == "partial"
+    assert projection["covered_query_ids"] == ["query-original"]
+    assert projection["missing_query_ids"] == ["query-lookup-1"]
+    assert validate_model_visible_projection(
+        projection, snapshot=snapshot, max_tokens=800,
+    ) == []
+
+    tampered = deepcopy(projection)
+    tampered["edit_ready"] = True
+    tampered["estimated_tokens"] = estimate_projection_tokens(tampered)
+    assert "docs_context must not authorize edits" in validate_model_visible_projection(
+        tampered, snapshot=snapshot, max_tokens=800,
+    )
+
+
+def test_docs_context_merges_query_attribution_for_duplicate_evidence():
+    source = {
+        "source_class": "project_doc",
+        "path": "docs/architecture.md",
+        "heading_path": "Request flow",
+        "content": "Requests enter through the MCP router and then reach the project retrieval service.",
+        "project_identity": "git:example/project",
+        "line_start": 12,
+        "line_end": 14,
+        "authority": "source_of_truth",
+        "doc_scope": "project",
+        "lifecycle_status": "active",
+        "freshness": "current",
+        "index_freshness": "synchronized",
+        "risk_flags": [],
+    }
+    projection, _ = project_docs_context(retrieval={
+        "context_pack": [
+            {**source, "retrieval_query_ids": ["query-original"], "retrieval_query_matches": {
+                "query-original": {"qualified": True, "mode": "and"},
+            }},
+            {**source, "retrieval_query_ids": ["query-lookup-1"], "retrieval_query_matches": {
+                "query-lookup-1": {"qualified": True, "mode": "and"},
+            }},
+        ],
+        "documentation_query_plan": {
+            "query_ids": ["query-original", "query-lookup-1"],
+        },
+    })
+
+    assert projection["query_coverage"] == "full"
+    assert projection["sources"][0]["retrieval_query_ids"] == [
+        "query-original", "query-lookup-1",
+    ]
+
+
+def test_docs_context_rejects_weak_or_only_source():
+    projection, snapshot = project_docs_context(retrieval={
+        "context_pack": [{
+            "source_class": "project_doc",
+            "path": "docs/indexing.md",
+            "content": "Generic indexing configuration guidance that does not mention Telegram.",
+            "project_identity": "git:example/project",
+            "lifecycle_status": "active",
+            "freshness": "current",
+            "index_freshness": "synchronized",
+            "risk_flags": [],
+            "retrieval_query_ids": [],
+            "retrieval_query_matches": {
+                "query-original": {
+                    "qualified": False,
+                    "mode": "or_fallback",
+                    "match_ratio": 0.25,
+                },
+            },
+        }],
+        "documentation_query_plan": {"query_ids": ["query-original"]},
+    })
+
+    assert projection["status"] == "insufficient_evidence"
+    assert snapshot == {}
+
+
+def test_docs_context_rejects_unscoped_or_risky_sources():
+    base = {
+        "source_class": "project_doc",
+        "path": "README.md",
+        "content": "This project documentation contains enough substantive context for retrieval.",
+        "lifecycle_status": "active",
+        "freshness": "current",
+        "index_freshness": "synchronized",
+    }
+    projection, snapshot = project_docs_context(retrieval={
+        "context_pack": [
+            {**base, "risk_flags": [], "project_identity": ""},
+            {**base, "risk_flags": ["instruction_risk"], "project_identity": "git:example/project"},
+        ],
+    })
+
+    assert projection["status"] == "insufficient_evidence"
+    assert projection["kind"] == "docs_context"
+    assert snapshot == {}
 
 def test_docs_answer_is_deterministic_deduplicated_hashed_and_bounded():
     snippet = {

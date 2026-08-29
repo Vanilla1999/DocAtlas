@@ -1,0 +1,10 @@
+{
+  "schema_version": "multilingual-retrieval-quality-cases-v1",
+  "cases": [
+    {"id":"adv-en-readonly","project_id":"docatlas","language_pair":"en-en","query":"Does retrieval itself permit lifecycle work or editing?","taxonomy":"constraints","semantic_family":"retrieval-readonly-en","expected_source_spans":["docatlas:docs/mcp-docs-server.md:18-43"]},
+    {"id":"adv-ruen-failclosed","project_id":"docatlas","language_pair":"ru-en","query":"Почему планировщик не должен выдумывать generic project identity для неизвестного subject?","taxonomy":"purpose","semantic_family":"invented-identity-ruen","expected_source_spans":["docatlas:docs/modules/question-planning.md:3-27"]},
+    {"id":"adv-ruen-absent","project_id":"docatlas","language_pair":"ru-en","query":"Какую гарантию доходности акций обещает документация DocAtlas?","taxonomy":"unknown_fact","semantic_family":"stock-return-absent-ruen","expected_source_spans":[],"absent_fact":true},
+    {"id":"adv-ruru-authority","project_id":"docatlas","language_pair":"ru-ru","query":"Может ли retrieval hit сам по себе доказать полный docs_answer?","taxonomy":"constraints","semantic_family":"retrieval-proof-ruru","expected_source_spans":["docatlas:docs/mcp-docs-server.md:18-43","docatlas:docs/modules/question-planning.md:3-27"]},
+    {"id":"adv-ruru-localfirst","project_id":"docatlas","language_pair":"ru-ru","query":"На каких локальных источниках основан контекст DocAtlas для coding agents?","taxonomy":"setup","semantic_family":"local-sources-ruru","expected_source_spans":["docatlas:README.md:15-25"]}
+  ]
+}

@@ -115,11 +115,10 @@ roots:
         service,
     )
     assert dispatcher_payload is not None
-    assert dispatcher_payload["status"] == "insufficient_evidence"
-    assert (
-        "unresolved:0:legacy_unresolved:requirement_items"
-        in dispatcher_payload.get("missing", [])
-    )
+    assert dispatcher_payload["status"] == "ok"
+    assert dispatcher_payload["kind"] == "docs_context"
+    assert dispatcher_payload["answer_supported"] is False
+    assert dispatcher_payload["edit_ready"] is False
 
     index_witness_question = (
         "Fix library_docs_service.py Phase 3.1 retrieval_miss classification for the "
@@ -177,7 +176,10 @@ roots:
         service,
     )
     assert absent is not None
-    assert absent["status"] == "insufficient_evidence"
+    assert absent["status"] == "ok"
+    assert absent["kind"] == "docs_context"
+    assert absent["answer_supported"] is False
+    assert absent["edit_ready"] is False
 
     foreign_root = tmp_path / "foreign"
     foreign_root.mkdir()
@@ -201,6 +203,9 @@ roots:
     )
     assert isolated is not None
     assert isolated["status"] == "insufficient_evidence"
+    assert isolated["kind"] == "docs_answer"
+    assert isolated["answer_supported"] is False
+    assert isolated.get("sources") in (None, [])
     assert all(
         not source.get("path_or_url", "").startswith(str(foreign))
         for source in isolated.get("sources", [])

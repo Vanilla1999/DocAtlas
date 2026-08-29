@@ -81,6 +81,7 @@ class _UnifiedDocsContextServicePart01:
         details: bool | None = None,
         response_style: str | None = None,
         mutation_intent: MutationIntentContract | None = None,
+        lookup_queries: tuple[str, ...] = (),
     ) -> UnifiedDocsContextResult:
         response_style = validate_response_style(response_style)
         mutation_intent = mutation_intent or build_mutation_intent(question)
@@ -120,7 +121,9 @@ class _UnifiedDocsContextServicePart01:
         bootstrap = None
         project_preflight_pending = None
         if prepare_project_docs and project_path and mode_selected in {"project", "mixed", "dependency"}:
-            bootstrap = self.service.bootstrap_project_docs(project_path, question=question)
+            bootstrap = self.service.bootstrap_project_docs(
+                project_path, question=question, allow_sync=False,
+            )
             lane_details["project_bootstrap"] = self._to_dict(bootstrap)
             bootstrap_reason = getattr(bootstrap, "reason_code", None) or "project_docs_confirmation_required"
             if getattr(bootstrap, "requires_confirmation", False) and "dependency_docs" not in bootstrap_reason:
@@ -168,7 +171,7 @@ class _UnifiedDocsContextServicePart01:
         if mode_selected == "project":
             delegated_mode = "auto" if project_auto else "project-only"
             routing["delegated_mode"] = delegated_mode
-            project_result = self.service.get_project_context(project_path, question, tokens=tokens, limit=limit, expand=expand, module=module, module_path=module_path, scope=scope, mode=delegated_mode, response_style=response_style, allow_network=effective_allow_network, mutation_intent=mutation_intent)
+            project_result = self.service.get_project_context(project_path, question, tokens=tokens, limit=limit, expand=expand, module=module, module_path=module_path, scope=scope, mode=delegated_mode, response_style=response_style, allow_network=effective_allow_network, mutation_intent=mutation_intent, lookup_queries=lookup_queries)
         elif mode_selected == "dependency":
             if not effective_allow_network and self._dependency_prefetch_needed(project_path):
                 lanes["dependency"] = {"status": "confirmation_required", "source_count": 0}
@@ -184,9 +187,9 @@ class _UnifiedDocsContextServicePart01:
                     lanes=lanes,
                     lane_details=lane_details if details else {},
                 )
-            project_result = self.service.get_project_context(project_path, question, tokens=tokens, limit=limit, expand=expand, library=library, libraries=libraries, ecosystem=ecosystem, version=version, module=module, module_path=module_path, scope=scope, mode="deps-only", response_style=response_style, allow_network=effective_allow_network, mutation_intent=mutation_intent)
+            project_result = self.service.get_project_context(project_path, question, tokens=tokens, limit=limit, expand=expand, library=library, libraries=libraries, ecosystem=ecosystem, version=version, module=module, module_path=module_path, scope=scope, mode="deps-only", response_style=response_style, allow_network=effective_allow_network, mutation_intent=mutation_intent, lookup_queries=lookup_queries)
         elif mode_selected == "mixed":
-            project_result = self.service.get_project_context(project_path, question, tokens=tokens, limit=limit, expand=expand, library=library, libraries=libraries, ecosystem=ecosystem, version=version, module=module, module_path=module_path, scope=scope, mode="auto", response_style=response_style, allow_network=effective_allow_network, mutation_intent=mutation_intent)
+            project_result = self.service.get_project_context(project_path, question, tokens=tokens, limit=limit, expand=expand, library=library, libraries=libraries, ecosystem=ecosystem, version=version, module=module, module_path=module_path, scope=scope, mode="auto", response_style=response_style, allow_network=effective_allow_network, mutation_intent=mutation_intent, lookup_queries=lookup_queries)
             routing["dependency_detected"] = bool(getattr(project_result, "dependency_docs", None))
             explicit_library_results = []
             for lib in libs:
@@ -525,6 +528,9 @@ class _UnifiedDocsContextServicePart01:
                     "source_search_status", "not_required"
                 ) if project_result else "not_required"
             ),
+            documentation_query_plan=dict(
+                getattr(project_result, "documentation_query_plan", None) or {}
+            ) if project_result else {},
             context_pack=context_pack,
             lanes=lanes,
             source_summary=source_summary,

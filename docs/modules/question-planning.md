@@ -10,6 +10,8 @@ The question-planning module converts a bounded natural-language project-doc que
 
 The module must fail closed when it cannot resolve a subject or requested operation. It must not invent generic identities such as `project` or `requested operation` that could later be proven by unrelated text.
 
+This fail-closed rule governs `docs_answer`, not read-only discovery. An unresolved or unproved question may still produce a bounded `docs_context` projection from current project-scoped retrieval results. That projection is not a replacement `QuestionPlan`, carries no support verdict, and cannot authorize an edit.
+
 ## Public boundary
 
 The durable output is the project-answer requirement contract: resolved subjects, intents, mandatory facets, conditions, technical identities, parse trace, and unresolved parts. Retrieval ranking is not owned here.
@@ -21,6 +23,8 @@ Imperative edits are outside this boundary. They are owned by
 ## Relationship to evidence-selection
 
 Question planning defines **what must be proven**, whereas evidence selection determines **whether the available evidence proves it**. **Evidence selection may prove or reject an obligation, but it must not reinterpret the user's question or silently create replacement obligations.** This one-way contract is the architectural seam between the two modules.
+
+Optional host-provided `lookup_queries` bypass question planning and enter only the supplemental retrieval lane. `DocumentationQueryPlan` assigns stable IDs to the original question, those explicit lookups, and any exact path; it does not parse arbitrary new intent or create proof obligations. `ContextSelectionDecision` reports covered and missing retrieval-query IDs without producing a support verdict. Neither contract can mutate the project-answer proof contract or authorize an edit.
 
 ## Invariants
 
