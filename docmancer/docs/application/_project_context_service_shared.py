@@ -543,12 +543,12 @@ def _make_context_trust_decision(
     if _is_low_signal_single_token_query(question):
         return ContextTrustDecision(False, "no_reliable_context", "low", passed, max_project_score, matched_terms, missing_terms)
 
-    # The typed selector has already revalidated a bounded, model-visible answer
-    # unit for every mandatory obligation.  Legacy lexical relevance remains a
-    # diagnostic, but cannot veto that stronger proof contract merely because
-    # an interrogative word such as ``value`` is not repeated in the answer.
+    # Typed proof and query relevance are independent requirements. A locally
+    # valid generic proposition must not authorize an answer to a different
+    # operation merely because both mention the same subject.
     if (
         bool(getattr(support_decision, "answer_supported", False))
+        and passed
         and context_pack
         and project_docs
         and project_docs.answer_available

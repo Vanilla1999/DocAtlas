@@ -27,6 +27,25 @@ def _source_document_behavior_context(question: str, subject: str) -> str | None
     return _clean_phrase(match.group(1)) or None
 
 
+def _generic_behavior_qualifiers(
+    question: str, subject: str,
+) -> tuple[str | None, str | None]:
+    """Preserve the requested action and object for generic mechanism questions."""
+
+    subject_pattern = re.escape(subject).replace(r"\ ", r"[\s_]+")
+    match = re.match(
+        rf"^\s*how\s+does\s+(?:the\s+)?{subject_pattern}\s+"
+        r"([A-Za-z][A-Za-z0-9_-]*)\s*(.*?)[?!.]*\s*$",
+        question,
+        re.I,
+    )
+    if match is None or match.group(1).casefold() == "work":
+        return None, None
+    action = _clean_phrase(match.group(1)) or None
+    target = _clean_phrase(match.group(2)) or None
+    return action, target
+
+
 def build_project_answer_contract(question: str) -> ProjectAnswerContract:
     """Build a bounded deterministic answer contract from the public question."""
 
@@ -338,9 +357,11 @@ def build_project_answer_contract(question: str) -> ProjectAnswerContract:
     ):
         behavior_subjects = explicit_subjects or [_best_subject(raw_question, subjects, fallback="project")]
         for subject in behavior_subjects:
+            operation, operation_target = _generic_behavior_qualifiers(raw_question, subject)
             obligations.append(_obligation(
                 question=raw_question, index=len(obligations), kind="behavior",
-                subject=subject, relation="behavior", value_kind="text",
+                subject=subject, relation="behavior", target=operation_target,
+                expected_value=operation, value_kind="text",
                 context=_source_document_behavior_context(raw_question, subject),
                 lifecycle_intent=lifecycle,
                 span_value=subject if subject.casefold() in raw_question.casefold() else (behavior.group(0) if behavior else _EXPLAIN_RE.search(raw_question).group(0)),

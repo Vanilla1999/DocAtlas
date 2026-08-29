@@ -29,7 +29,8 @@ Reference for the main DocAtlas documentation runtime commands, vector lifecycle
 | `--expand page` | Include the full matching page, subject to the token budget. |
 | `--format json` | Return the context pack as JSON instead of markdown. |
 | `--limit <n>` | Maximum number of sections to return. |
-| `--mode {lexical,dense,sparse,hybrid}` | Retrieval mode. Defaults to `hybrid` when vectors are populated; falls back to `lexical` otherwise (or when no API key is available for the configured cloud embeddings provider). |
+| `--mode {lexical,dense,sparse,hybrid}` | Retrieval mode. Defaults to `retrieval.default_mode`, which is `lexical` in a fresh configuration. |
+| `--allow-degraded` | In a requested non-lexical mode, fall back to the remaining available signals when a retriever is unavailable or fails. Without this flag, non-lexical capability and retrieval failures are errors. |
 | `--explain` | Show per-source rank contributions (`lexical#1, dense#2, sparse#1`) under each result so you can see which signal placed it. |
 
 ## Ingest options

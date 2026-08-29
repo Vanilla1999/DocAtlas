@@ -527,7 +527,25 @@ def test_inspect_project_docs_reports_prefetched_dependency_docs(tmp_path, monke
     assert result.dependency_sources["dependency_docs_prefetched"] is True
     assert result.dependency_sources["dependency_docs_prefetched_count"] == 2
     assert result.dependency_sources["dependency_docs_missing_count"] == 0
+    assert result.dependency_sources["dependency_docs_stale_count"] == 0
+    assert result.dependency_sources["missing"] == []
+    assert result.dependency_sources["stale"] == []
     assert result.dependency_sources["dependency_next_action"] == {}
+
+    service.registry.upsert(
+        library="riverpod",
+        ecosystem="pub",
+        version="2.6.1",
+        source_type="api",
+        docs_url="https://pub.dev/documentation/riverpod/2.6.1/",
+        now=now,
+        status="available",
+        last_refreshed_at="2000-01-01T00:00:00+00:00",
+    )
+    stale_result = service.inspect_project_docs(str(project))
+    assert stale_result.dependency_sources["dependency_docs_prefetched"] is False
+    assert stale_result.dependency_sources["stale"] == ["riverpod"]
+    assert stale_result.dependency_sources["dependency_next_action"]["arguments_patch"]["include_packages"] == ["riverpod"]
 
 
 def test_bootstrap_project_docs_ingests_existing_docs_and_returns_ready(tmp_path, monkeypatch):

@@ -30,7 +30,7 @@ Results are sections, not whole pages. The query respects a configurable token b
 
 ## Hybrid retrieval
 
-A fresh install runs hybrid retrieval out of the box: each section gets a dense FastEmbed vector and a SPLADE sparse vector in Qdrant, alongside the FTS5 index. Set `DOCMANCER_AUTO_VECTORS=0` (or run `ingest --no-vectors`) to stay on FTS5 only.
+A fresh configuration queries the FTS5 index in `lexical` mode by default. Ingest may also populate dense FastEmbed and SPLADE sparse vectors in Qdrant; select `dense`, `sparse`, or `hybrid` explicitly or set `retrieval.default_mode`. Non-lexical retrieval fails closed when a required capability is unavailable unless the caller opts into degraded fallback with `--allow-degraded`.
 
 Components:
 

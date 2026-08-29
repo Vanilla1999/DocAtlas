@@ -60,6 +60,8 @@ def test_inspect_project_docs_returns_candidates_dependency_sources_and_next_act
     assert result.dependency_sources["dependency_docs_available"] is True
     assert result.dependency_sources["dependency_docs_prefetched"] is False
     assert result.dependency_sources["dependency_docs_missing_count"] >= 2
+    assert result.dependency_sources["missing"] == ["go_router", "riverpod"]
+    assert result.dependency_sources["stale"] == []
     dependency_action = result.dependency_sources["dependency_next_action"]
     assert dependency_action["type"] == "ask_user_to_prefetch_dependency_docs"
     assert dependency_action["tool_after_confirmation"] == "prepare_docs"

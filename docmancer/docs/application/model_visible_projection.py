@@ -844,10 +844,11 @@ def _docs_candidates(retrieval: dict[str, Any]) -> list[dict[str, Any]]:
 
 def _docs_source(
     item: dict[str, Any], *, evidence_id: str | None = None,
+    display_snippet: str | None = None,
 ) -> dict[str, Any] | None:
     path = str(item.get("source_url") or item.get("url") or item.get("path") or item.get("source") or "").strip()
     section = str(item.get("heading_path") or item.get("title") or "document").strip()
-    snippet = (
+    snippet = display_snippet if display_snippet is not None else (
         item.get("code") or item.get("snippet") or item.get("content")
         or item.get("display_text")
     )

@@ -49,6 +49,27 @@ def test_docs_context_is_retrieval_only_snapshot_bound_and_not_edit_ready():
         projection, snapshot=snapshot, max_tokens=800,
     ) == []
 
+    focused, _focused_snapshot = project_docs_context(retrieval={
+        "context_pack": [{
+            **retrieval["context_pack"][0],
+            "content": (
+                "Generic project background. " * 50
+                + "The MCP router dispatches requests to the project retrieval service. "
+                + "Unrelated implementation notes. " * 50
+            ),
+        }],
+        "documentation_query_plan": {
+            "query_ids": ["query-original"],
+            "queries": [{
+                "query_id": "query-original",
+                "text": "How does the MCP router dispatch requests?",
+                "origin": "original",
+            }],
+        },
+    })
+    assert "MCP router dispatches requests" in focused["sources"][0]["snippet"]
+    assert len(focused["sources"][0]["snippet"]) <= 420
+
     tampered = deepcopy(projection)
     tampered["edit_ready"] = True
     tampered["estimated_tokens"] = estimate_projection_tokens(tampered)

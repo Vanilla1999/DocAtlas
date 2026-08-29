@@ -106,3 +106,11 @@ def test_behavior_proof_accepts_explicit_replacement_relation():
 
     assert match is not None
     assert match[1].reason == "behavior"
+
+
+def test_behavior_proof_rejects_a_negative_only_witness():
+    obligation = _obligation("What does OrderSubmission do?")
+
+    units = extract_answer_units("OrderSubmission does not validate drafts.")
+
+    assert best_local_proof(obligation, units) is None

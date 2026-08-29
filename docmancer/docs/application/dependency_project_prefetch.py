@@ -67,7 +67,12 @@ class DependencyProjectPrefetch:
         if include_dart:
             warnings.append("Dart SDK documentation version detection is not implemented.")
 
-        for package in include_packages or []:
+        packages = include_packages or sorted({
+            dependency.package_name
+            for dependency in metadata.dependencies
+            if dependency.resolved_version and dependency.source_kind == "registry"
+        })
+        for package in dict.fromkeys(packages):
             go_version = metadata.packages.get(f"go:{package}")
             if go_version and include_go:
                 targets.append(DocsTarget(
@@ -85,6 +90,8 @@ class DependencyProjectPrefetch:
                     version_binding="exact",
                     coverage="bounded",
                 ))
+                continue
+            if go_version:
                 continue
             maven_version = metadata.packages.get(f"maven:{package}")
             if maven_version:
@@ -117,6 +124,8 @@ class DependencyProjectPrefetch:
                     allowed_domains=["docs.rs"],
                     path_prefixes=[f"/{package}/{rust_version}/"],
                 ))
+                continue
+            if rust_version:
                 continue
             npm_version = metadata.packages.get(f"npm:{package}")
             if npm_version:

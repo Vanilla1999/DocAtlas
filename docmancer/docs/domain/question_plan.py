@@ -426,7 +426,13 @@ def _named_behavior(q: str) -> QuestionPlan | None:
     elif action == "choose":
         relation = "selection_policy"
     return QuestionPlan(
-        facets=(PlannedFacet("behavior", subject, relation=relation, span_text=match.group(1)),),
+        facets=(PlannedFacet(
+            "behavior",
+            subject,
+            relation=relation,
+            target=tail or None,
+            span_text=match.group(1),
+        ),),
         clauses=(q,),
         parse_trace=(f"behavior:{relation}:{subject}",),
     )

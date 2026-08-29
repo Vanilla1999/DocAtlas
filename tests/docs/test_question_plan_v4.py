@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from docmancer.docs.application.evidence_selection import build_requirements
 from docmancer.docs.domain.answer_units import AnswerUnit, local_proof_for_obligation
+from docmancer.docs.domain.documentation_query_plan import build_documentation_query_plan
 from docmancer.docs.domain.project_answer_contract import (
     PROJECT_ANSWER_CONTRACT_SCHEMA_V4,
     build_project_answer_contract,
@@ -53,6 +54,15 @@ def test_question_plan_compiles_previously_unrepresentable_queries_without_gener
 
 
 def test_question_plan_splits_compound_questions_into_mandatory_facets():
+    retrieval_plan = build_documentation_query_plan(
+        "What are the public tools and when should each tool be used?"
+    )
+    assert [(query.text, query.origin) for query in retrieval_plan.queries] == [
+        ("What are the public tools and when should each tool be used?", "original"),
+        ("What are the public tools", "auto_clause"),
+        ("when should each tool be used", "auto_clause"),
+    ]
+
     contract, rows = _rows("What is the release checklist and what gates block release?")
     assert [(r.kind, r.subject, r.relation) for r in rows] == [
         ("purpose", "release checklist", "purpose"),
@@ -85,6 +95,18 @@ def test_legacy_synthetic_fallback_fails_closed_and_is_diagnostic():
     requirements = build_requirements("How does the project work?", profile="project_docs_answer")
     assert requirements.unresolved_parts == ("unresolved_query_subject",)
     assert any(row.kind == "unsupported_query" for row in requirements)
+
+    operation = build_project_answer_contract(
+        "How does DocAtlas bind dependency documentation to exact manifest versions?"
+    )
+    assert not operation.unresolved_parts
+    assert operation.proof_obligations[0].expected_value == "bind"
+    assert operation.proof_obligations[0].target == "dependency documentation to exact manifest versions"
+
+    unknown_policy = build_project_answer_contract(
+        "What lunar quantum retention policy does DocAtlas use?"
+    )
+    assert unknown_policy.unresolved_parts == ("legacy_unresolved:contract_scope",)
 
 
 def test_permission_semantic_frames_are_typed_and_full_span_safe():
@@ -399,6 +421,7 @@ def test_code_symbol_aliases_may_widen_retrieval_but_not_proof_shape():
 def test_selection_policy_and_chunking_require_complete_local_semantics():
     _contract, rows = _rows("How does evidence selection choose which candidates are selected?")
     selection = rows[0]
+    assert selection.target == "which candidates are selected"
     exact = _unit("Evidence selection chooses candidates by requiring locally bound subject, relation, and value proof; complete exact proof outranks generic text.")
     distractor = _unit("The project selects a configuration candidate for each module.")
     assert local_proof_for_obligation(selection, exact).valid is True
@@ -406,6 +429,7 @@ def test_selection_policy_and_chunking_require_complete_local_semantics():
 
     _contract, rows = _rows("How does indexing split documents into sections and chunks?")
     chunking = rows[0]
+    assert chunking.target == "documents into sections and chunks"
     exact = _unit("Markdown indexing groups text into heading-scoped parent sections, then splits each parent section into token-bounded child chunks.")
     old_changelog = _unit("Indexing and retrieval use SQLite FTS5 over heading-normalized sections instead of Qdrant.")
     assert local_proof_for_obligation(chunking, exact).valid is True

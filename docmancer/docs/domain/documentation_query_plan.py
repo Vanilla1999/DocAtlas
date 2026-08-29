@@ -4,6 +4,8 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
+from docmancer.docs.domain.question_frame_core import split_question_clauses
+
 
 @dataclass(frozen=True, slots=True)
 class DocumentationLookup:
@@ -23,6 +25,10 @@ class DocumentationQueryPlan:
         return {
             "schema_version": self.schema_version,
             "query_ids": [query.query_id for query in self.queries],
+            "queries": [
+                {"query_id": query.query_id, "text": query.text, "origin": query.origin}
+                for query in self.queries
+            ],
             "explicit_paths": list(self.explicit_paths),
         }
 
@@ -36,6 +42,17 @@ def build_documentation_query_plan(
         for index, text in enumerate(lookup_queries, start=1)
         if text.strip()
     )
+    seen = {query.text.casefold() for query in queries}
+    clauses = split_question_clauses(question)
+    if len(clauses) > 1:
+        for clause in clauses:
+            text = clause.strip()
+            if not text or text.casefold() in seen or len(queries) >= 5:
+                continue
+            queries.append(DocumentationLookup(
+                f"query-clause-{len(queries)}", text, "auto_clause",
+            ))
+            seen.add(text.casefold())
     if explicit_path:
         queries.append(DocumentationLookup("query-path-1", explicit_path, "exact_path"))
     return DocumentationQueryPlan(

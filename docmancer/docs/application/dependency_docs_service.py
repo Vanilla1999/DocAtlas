@@ -78,18 +78,20 @@ class DependencyDocsService:
         include_flutter: bool = True,
         include_dart: bool = False,
         include_rust: bool = True,
+        include_go: bool = True,
         include_packages: list[str] | None = None,
         force_refresh: bool = False,
         continue_on_error: bool = True,
         async_: bool = False,
     ) -> ProjectPrefetchResult | DocsJobStartResult:
         if hasattr(self.facade, "_dependency_prefetch_project_docs_impl"):
-            return self.facade._dependency_prefetch_project_docs_impl(project_path, include_flutter=include_flutter, include_dart=include_dart, include_rust=include_rust, include_packages=include_packages, force_refresh=force_refresh, continue_on_error=continue_on_error, async_=async_)
+            return self.facade._dependency_prefetch_project_docs_impl(project_path, include_flutter=include_flutter, include_dart=include_dart, include_rust=include_rust, include_go=include_go, include_packages=include_packages, force_refresh=force_refresh, continue_on_error=continue_on_error, async_=async_)
         return self.project_prefetch.prefetch_project_docs(
             project_path,
             include_flutter=include_flutter,
             include_dart=include_dart,
             include_rust=include_rust,
+            include_go=include_go,
             include_packages=include_packages,
             force_refresh=force_refresh,
             continue_on_error=continue_on_error,
@@ -97,6 +99,6 @@ class DependencyDocsService:
         )
 
     def prefetch_project_dependency_docs(
-        self, project_path: str, include_flutter: bool = True, include_dart: bool = False, include_rust: bool = True, include_packages: list[str] | None = None, force_refresh: bool = False, continue_on_error: bool = True, async_: bool = False,
+        self, project_path: str, include_flutter: bool = True, include_dart: bool = False, include_rust: bool = True, include_go: bool = True, include_packages: list[str] | None = None, force_refresh: bool = False, continue_on_error: bool = True, async_: bool = False,
     ) -> ProjectPrefetchResult | DocsJobStartResult:
-        return self.prefetch_project_docs(project_path, include_flutter=include_flutter, include_dart=include_dart, include_rust=include_rust, include_packages=include_packages, force_refresh=force_refresh, continue_on_error=continue_on_error, async_=async_)
+        return self.prefetch_project_docs(project_path, include_flutter=include_flutter, include_dart=include_dart, include_rust=include_rust, include_go=include_go, include_packages=include_packages, force_refresh=force_refresh, continue_on_error=continue_on_error, async_=async_)

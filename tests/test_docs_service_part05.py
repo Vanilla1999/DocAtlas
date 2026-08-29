@@ -371,6 +371,16 @@ def test_prefetch_project_docs_counts_partial_target_as_completed(tmp_path, monk
     assert result.results[0].targets_completed == 1
     assert result.results[0].targets_failed == 0
 
+    default_agent = FakeAgent()
+    default_service = _service(tmp_path / "default", monkeypatch, default_agent)
+    monkeypatch.setattr(default_service, "_discover_pub_dartdoc_target", lambda target, warnings, job_id=None, canonical_id=None: target)
+    default_result = default_service.prefetch_project_docs(
+        str(project), include_flutter=False, include_packages=[],
+    )
+    assert {item.library_id for item in default_result.results} == {
+        "pub:go_router@14.8.1:api", "pub:riverpod@2.6.1:api",
+    }
+
 
 def test_prefetch_project_docs_prefetches_rust_docs_rs(tmp_path, monkeypatch):
     project = _rust_project(tmp_path)

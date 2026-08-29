@@ -189,7 +189,7 @@ class _ProjectDocsServicePart03:
         lookup_query_ids = {
             item.text: item.query_id
             for item in documentation_query_plan.queries
-            if item.origin == "host_lookup"
+            if item.origin in {"host_lookup", "auto_clause"}
         }
         exact_path_query_id = next((
             item.query_id for item in documentation_query_plan.queries
@@ -218,8 +218,12 @@ class _ProjectDocsServicePart03:
             for value in getattr(requirements, "concept_queries", ())
             if str(value).strip()
         ))[:4]
+        planned_lookup_queries = tuple(
+            item.text for item in documentation_query_plan.queries
+            if item.origin in {"host_lookup", "auto_clause"}
+        )
         supplemental_queries = tuple(dict.fromkeys((
-            *lookup_queries,
+            *planned_lookup_queries,
             *probe_queries,
             *contract_concepts,
             *retrieval_hints,

@@ -4,17 +4,17 @@ documents:
     role: development
     scope: project
     description: Implementation plan for Russian semantic surfaces and fail-closed patch-context authorization.
-    authority: source_of_truth
+    authority: supporting
     status: active
-    impact: track
+    impact: search_only
 
   - path: .hermes/plans/2026-07-20-natural-language-library-retrieval.md
     role: development
     scope: project
     description: Approved implementation plan for natural-language library retrieval, immutable manifests, support semantics, and rollout gates.
-    authority: source_of_truth
+    authority: supporting
     status: active
-    impact: track
+    impact: search_only
 
   - path: README.md
     role: overview
@@ -149,9 +149,41 @@ documents:
     impact: track
 
   - path: docs/index-cleanup.md
-    role: development
+    role: operations
     scope: project
     description: Preview-first clear-index contract, stale-plan rejection, local ownership limits, and live-process blockers.
+    authority: source_of_truth
+    status: active
+    impact: track
+
+  - path: docs/mcp-docs-server.md
+    role: api_contract
+    scope: project
+    description: Public three-tool Docs MCP contract, context-first lifecycle, routing, and quality gates.
+    authority: source_of_truth
+    status: active
+    impact: track
+
+  - path: docs/project-docs-mcp-workflow.md
+    role: runbook
+    scope: project
+    description: Project documentation sync, query, and exact dependency prefetch workflow.
+    authority: source_of_truth
+    status: active
+    impact: track
+
+  - path: wiki/Commands.md
+    role: api_contract
+    scope: project
+    description: Current CLI command and option reference.
+    authority: source_of_truth
+    status: active
+    impact: track
+
+  - path: wiki/Configuration.md
+    role: api_contract
+    scope: project
+    description: Current configuration keys, defaults, and retrieval behavior.
     authority: source_of_truth
     status: active
     impact: track

@@ -43,7 +43,7 @@ These settings control the SQLite FTS5 index described in [Architecture](./Archi
 
 ### Vector store
 
-A fresh install runs hybrid retrieval by default: ingest auto-starts a managed Qdrant and embeds chunks with FastEmbed. The `vector_store:` block tunes how that store is configured. Set `DOCMANCER_AUTO_VECTORS=0` (or run `doc-atlas ingest --no-vectors`) for FTS5-only behaviour.
+A fresh configuration uses `retrieval.default_mode: lexical` for queries. Ingest can auto-start managed Qdrant and embed chunks with FastEmbed; the `vector_store:` block tunes that optional vector store. Select `dense`, `sparse`, or `hybrid` explicitly when vector retrieval is required. Those modes fail closed when required capabilities are unavailable unless the caller explicitly enables degraded fallback. Set `DOCMANCER_AUTO_VECTORS=0` (or run `doc-atlas ingest --no-vectors`) for FTS5-only ingestion.
 
 | Key | Default | What it controls |
 |-----|---------|------------------|

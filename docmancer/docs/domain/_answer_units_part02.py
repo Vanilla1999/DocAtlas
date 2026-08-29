@@ -226,7 +226,7 @@ def _explicit_comparison_is_local(
 
 _GENERIC_BEHAVIOR_RE = re.compile(
     r"\b(?:returns?|reports?|shows?|reads?|writes?|loads?|indexes?|retrieves?|selects?|"
-    r"validates?|handles?|processes?|dispatches?|routes?|creates?|updates?|deletes?|use(?:s|d)?|exposes?|"
+    r"validates?|handles?|processes?|dispatches?|routes?|binds?|creates?|updates?|deletes?|use(?:s|d)?|exposes?|"
     r"invokes?|supplies?|calls?|replaces?|preserves?|keeps?|sets?|configures?|requires?|governs?|"
     r"owns?|manages?|controls?|stores?|persists?|saves?|delegates?|maps?|emits?|publishes?|enqueues?|"
     r"accepts?|rejects?|allows?|denies?|coordinates?|schedules?|forwards?|assigns?|applies?|resolves?|"
@@ -299,6 +299,20 @@ def _behavior_clause(
             ):
                 return clause, _predicate_is_negated(match, clause)
     return None
+
+
+def _behavior_qualifiers_present(obligation: ProofObligation, clause: str) -> bool:
+    """Keep requested behavior qualifiers bound to the same proposition."""
+
+    operation = str(obligation.expected_value or "").strip()
+    operation_present = not operation or re.search(
+        rf"(?<!\w){re.escape(operation)}(?:s|es|ed|ing)?(?!\w)", clause, re.I,
+    ) is not None
+    return (
+        operation_present
+        and (not obligation.target or _contains_term(obligation.target, clause))
+        and (not obligation.context or _contains_term(obligation.context, clause))
+    )
 
 
 _SOURCE_DOCUMENT_SUBJECT_RE = re.compile(
@@ -569,19 +583,24 @@ def local_proof_for_obligation(
             else None
         )
         proof_behavior = bound_behavior or source_document_behavior
-        relation = 3 if proof_behavior is not None else 0
+        negated = bool(proof_behavior and proof_behavior[1])
+        qualifiers_present = bool(
+            proof_behavior
+            and _behavior_qualifiers_present(obligation, proof_behavior[0])
+        )
+        relation = 3 if proof_behavior is not None and not negated and qualifiers_present else 0
         local_subject_score = (
             3 if bound_behavior is not None else
             2 if source_document_behavior is not None else
             0
         )
         valid = local_subject_score > 0 and relation > 0 and unit.proposition
-        negated = bool(proof_behavior and proof_behavior[1])
         return LocalProof(
             valid, local_subject_score, relation, 1 if unit.proposition and valid else 0,
             local_subject_score + relation + int(unit.proposition and valid),
             (
-                "behavior_negative_constraint" if valid and negated else
+                "behavior_negated" if negated else
+                "behavior_qualifier_missing" if proof_behavior is not None and not qualifiers_present else
                 "behavior_source_document" if valid and source_document_behavior is not None else
                 "behavior" if valid else
                 "behavior_not_locally_bound"

@@ -142,6 +142,14 @@ def _comparison_requested(question: str) -> bool:
 
 def _contract_scope_tokens(question: str) -> tuple[str, ...]:
     match = re.search(
+        r"\bwhat\s+(.{1,180}?\b(?:contract|policy|rule|invariant))\s+"
+        r"does\s+.+?\s+use\b",
+        question,
+        re.I,
+    )
+    if match is not None:
+        return _tokens(match.group(1))
+    match = re.search(
         r"\b(?:what\s+is|explain|describe)\s+(?:the\s+)?(.{1,180}?)\s+"
         r"(?:contract|policy|rule|invariant)\b",
         question,
@@ -174,6 +182,31 @@ def _requirement_items(question: str) -> tuple[str, ...]:
         if part.strip(" `\"'.,:;!?()")
     ]
     return tuple(parts) if len(parts) >= 2 else ()
+
+
+def _behavior_qualifier_tokens(
+    question: str,
+    obligations: tuple[_ObligationLike, ...],
+) -> tuple[str, ...]:
+    """Return operation terms that a generic ``how does`` contract must retain."""
+
+    behavior = next((row for row in obligations if row.kind == "behavior"), None)
+    if behavior is None or not behavior.subject:
+        return ()
+    subject_pattern = re.escape(behavior.subject).replace(r"\ ", r"[\s_]+")
+    match = re.match(
+        rf"^\s*how\s+does\s+(?:the\s+)?{subject_pattern}\s+(.+?)[?!.]*\s*$",
+        question,
+        re.I,
+    )
+    if match is None:
+        return ()
+    tail = match.group(1).strip()
+    if re.fullmatch(r"work", tail, re.I):
+        return ()
+    if re.match(r"^(?:choose|split)\b", tail, re.I):
+        tail = re.sub(r"^(?:choose|split)\s+", "", tail, count=1, flags=re.I)
+    return _tokens(tail)
 
 
 def _item_is_covered(item: str, semantic_tokens: set[str]) -> bool:
@@ -212,6 +245,9 @@ def legacy_coverage_gaps(
         gaps.append("legacy_unresolved:comparison")
 
     semantic_tokens = _semantic_token_set(rows)
+    behavior_tokens = set(_behavior_qualifier_tokens(question, rows))
+    if behavior_tokens and not behavior_tokens.issubset(semantic_tokens):
+        gaps.append("legacy_unresolved:behavior_operation")
     contract_tokens = set(_contract_scope_tokens(question))
     if contract_tokens and not contract_tokens.issubset(semantic_tokens):
         gaps.append("legacy_unresolved:contract_scope")

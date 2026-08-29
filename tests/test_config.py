@@ -159,6 +159,10 @@ def test_embeddings_and_retrieval_defaults():
     assert config.retrieval.fusion.rrf_k == 60
     assert config.retrieval.fusion.weights == {}
     assert config.retrieval.max_sections_per_source == 2
+    commands = Path("wiki/Commands.md").read_text(encoding="utf-8")
+    configuration = Path("wiki/Configuration.md").read_text(encoding="utf-8")
+    assert "which is `lexical` in a fresh configuration" in commands
+    assert "`retrieval.default_mode: lexical`" in configuration
 
 
 def test_bare_yaml_keeps_default_mode_lexical(tmp_path):

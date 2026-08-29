@@ -156,7 +156,7 @@ def _isolated_home(path: Path) -> Iterator[None]:
 
 @contextmanager
 def _frozen_answer_projection() -> Iterator[None]:
-    """Keep the v1-v4 answer oracle separate from retrieval-only projection."""
+    """Keep the hermetic v1-v4 proof oracle separate from live final routing."""
 
     original = context_tools.maybe_project_docs_context
     context_tools.maybe_project_docs_context = lambda **kwargs: (

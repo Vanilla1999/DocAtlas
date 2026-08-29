@@ -92,6 +92,7 @@ class ProjectDocsState:
         exact_dependencies = [item for item in metadata.dependencies if item.resolved_version and item.source_kind == "registry"]
         prefetched = []
         missing = []
+        stale = []
         for dependency in exact_dependencies:
             record = self.registry.get(
                 dependency.package_name,
@@ -105,14 +106,16 @@ class ProjectDocsState:
                 "version": dependency.resolved_version,
                 "version_source": dependency.version_source,
             }
-            if record and record.status == "available":
+            if record and record.status == "available" and self._is_stale(record.last_refreshed_at):
+                stale.append({**item, "canonical_id": record.canonical_id})
+            elif record and record.status == "available":
                 prefetched.append({**item, "canonical_id": record.canonical_id})
             else:
                 missing.append(item)
         available = bool(exact_dependencies)
         dependency_next_action: dict[str, Any] = {}
-        if missing:
-            missing_packages = sorted({item["library"] for item in missing})
+        if missing or stale:
+            missing_packages = sorted({item["library"] for item in (*missing, *stale)})
             dependency_next_action = {
                 "type": "ask_user_to_prefetch_dependency_docs",
                 "tool_after_confirmation": "prepare_docs",
@@ -128,11 +131,15 @@ class ProjectDocsState:
             }
         return {
             "dependency_docs_available": available,
-            "dependency_docs_prefetched": available and not missing,
+            "dependency_docs_prefetched": available and not missing and not stale,
             "dependency_docs_prefetched_count": len(prefetched),
             "dependency_docs_missing_count": len(missing),
+            "dependency_docs_stale_count": len(stale),
             "dependency_docs_prefetched_sources": prefetched,
             "dependency_docs_missing_sources": missing,
+            "dependency_docs_stale_sources": stale,
+            "missing": sorted({item["library"] for item in missing}),
+            "stale": sorted({item["library"] for item in stale}),
             "dependency_next_action": dependency_next_action,
         }
 
