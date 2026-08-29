@@ -72,7 +72,7 @@ After sync, proceed to:
 get_docs_context(project_path=..., question=..., mode="project")
 ```
 
-`get_docs_context(mode="project")` returns a compact Trust Contract with selected, rejected, and risky sources, plus `next_actions` for missing, stale, non-exact, or unmatched docs.
+`get_docs_context(mode="project")` returns one bounded public result: a strictly proven `docs_answer`, retrieval-only `docs_context` with `answer_policy="cite_only"`, or fail-closed `insufficient_evidence` with a typed recommended action.
 
 For module-specific queries, use exact module filters:
 
@@ -86,7 +86,7 @@ get_docs_context(
 )
 ```
 
-`inspect_project_docs` exposes `project_docs.modules` for discovered module docs and `project_docs.indexed_modules` for indexed module docs. Each module summary includes `module_id`, `module_name`, `module_path`, `module_type`, `doc_count`, and `docs`.
+The advanced compatibility-only `inspect_project_docs` surface exposes discovered and indexed module summaries. Normal agents recover module ambiguity through the `docs_status` action returned by `get_docs_context`, then retry with the exact `module_path`.
 
 ## Module docs workflow
 
@@ -135,7 +135,7 @@ When `requires_confirmation` is `true`, the agent should explain the proposed ac
 
 ## Creating `ARCHITECTURE.md`
 
-DocAtlas does not create architecture docs itself. If `inspect_project_docs` or `bootstrap_project_docs` returns `no_project_docs` or `architecture_doc_creation_recommended`, the coding agent should ask:
+DocAtlas does not create architecture docs itself. If `get_docs_context` returns `no_project_docs` or an `architecture_doc_creation_recommended` recovery action, the coding agent should ask:
 
 ```text
 I could inspect the repository and create ARCHITECTURE.md as a reviewable project doc. Should I do that?
@@ -145,9 +145,9 @@ If approved, the coding agent should:
 
 1. inspect the codebase;
 2. write `ARCHITECTURE.md` as a normal repository file;
-3. call `inspect_project_docs`;
-4. call `prepare_docs(action="sync_project_docs")`;
-5. answer future repo-specific questions from `get_docs_context(mode="project")`.
+3. call `get_docs_context` for the original question;
+4. run its returned `prepare_docs(action="sync_project_docs")` action when requested;
+5. retry the original `get_docs_context(mode="project")` question unchanged.
 
 Do not store generated architecture only in hidden memory. Official project knowledge should remain a file humans can review and edit.
 

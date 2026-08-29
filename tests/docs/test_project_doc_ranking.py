@@ -100,15 +100,22 @@ def test_exact_heading_outranks_unrelated_source_of_truth():
         0.10,
     )
     exact.authority = "supporting"
+    evaluation = fake_chunk(
+        "eval/project_answer_quality_v4/README.md",
+        "MCP boundary transport contract benchmark",
+        0.99,
+    )
+    evaluation.authority = "source_of_truth"
 
     ranked = rerank_project_doc_chunks(
-        [unrelated, exact],
+        [unrelated, evaluation, exact],
         question="MCP boundary owns transport contracts",
         intent=intent,
         limit=2,
     )
 
     assert ranked[0].path == "docs/adr/0001-mcp-boundary-contracts.md"
+    assert ranked[-1].path == "eval/project_answer_quality_v4/README.md"
 
 
 def test_packs_mcp_query_boosts_packs():

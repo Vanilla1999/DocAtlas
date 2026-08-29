@@ -715,6 +715,79 @@ def test_query_project_docs_runs_lookup_queries_as_retrieval_only_supplements(tm
     )
 
 
+def test_query_project_docs_executes_and_attributes_concept_aliases(tmp_path):
+    project = tmp_path / "concept-alias"
+    project.mkdir()
+    observed: list[str] = []
+
+    class Agent:
+        config = SimpleNamespace(query=SimpleNamespace(default_limit=5))
+
+        def query(self, query, *, limit, budget, expand, filters):
+            observed.append(query)
+            return [RetrievedChunk(
+                source="docs/mcp-docs-server.md",
+                chunk_index=0,
+                text="The project answer contract is documented here.",
+                score=1.0,
+                metadata={
+                    "token_estimate": 20,
+                    "lexical_match": {"qualified": True, "mode": "and"},
+                },
+            )]
+
+    class Facade:
+        def _agent_instance(self):
+            return Agent()
+
+    chunks = ProjectDocsService(Facade()).query_project_docs(
+        str(project), "Where is the project answer contract documented?",
+    )
+
+    alias = "project answer contract documentation docs/mcp-docs-server.md"
+    assert observed.count(alias) == 1
+    assert "query-concept-1" in chunks[0].metadata["retrieval_query_ids"]
+
+
+def test_query_project_docs_attributes_generic_retrieval_hints_without_covering_original(tmp_path):
+    from docmancer.docs.application.evidence_selection import build_requirements
+
+    project = tmp_path / "generic-hint"
+    project.mkdir()
+    question = "How are NebulaLedger orbital telemetry snapshots persisted?"
+
+    class Agent:
+        config = SimpleNamespace(query=SimpleNamespace(default_limit=5))
+
+        def query(self, query, *, limit, budget, expand, filters):
+            if query == "NebulaLedger":
+                return [RetrievedChunk(
+                    source="docs/nebula.md",
+                    chunk_index=0,
+                    text="NebulaLedger persists orbital telemetry snapshots in SQLite.",
+                    score=1.0,
+                    metadata={
+                        "token_estimate": 20,
+                        "lexical_match": {"qualified": True, "mode": "and"},
+                    },
+                )]
+            return []
+
+    class Facade:
+        def _agent_instance(self):
+            return Agent()
+
+    chunks = ProjectDocsService(Facade()).query_project_docs(
+        str(project),
+        question,
+        requirements=build_requirements(question, profile="project_docs_answer"),
+    )
+
+    assert len(chunks) == 1
+    assert "query-supplemental-1" in chunks[0].metadata["retrieval_query_ids"]
+    assert "query-original" not in chunks[0].metadata["retrieval_query_ids"]
+
+
 def test_query_project_docs_does_not_qualify_trace_less_candidates(tmp_path):
     project = tmp_path / "trace-less"
     project.mkdir()

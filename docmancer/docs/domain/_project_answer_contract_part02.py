@@ -321,9 +321,15 @@ def build_project_answer_contract(question: str) -> ProjectAnswerContract:
                 if candidate.casefold() not in {"what", "which", "who", "how"}:
                     contract_subjects.append(candidate)
         for subject in list(dict.fromkeys(contract_subjects))[:4]:
+            attribute = (
+                "response contract"
+                if re.search(r"\bresponse\s+contract\b", raw_question, re.I)
+                else None
+            )
             obligations.append(_obligation(
                 question=raw_question, index=len(obligations), kind="exact_fact",
-                subject=subject, relation="contract_fact", value_kind="text",
+                subject=subject, attribute=attribute,
+                relation="contract_fact", value_kind="text",
                 lifecycle_intent=lifecycle,
                 span_value=subject if subject.casefold() in raw_question.casefold() else _CONTRACT_FACT_RE.search(raw_question).group(0),
             ))

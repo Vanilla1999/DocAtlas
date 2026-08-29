@@ -37,9 +37,11 @@ def project_docs_context(
         for item in query_plan.get("queries") or ()
         if isinstance(item, dict)
     }
+    required_query_ids = _required_query_ids(query_plan)
+    required_query_id_set = set(required_query_ids)
     candidates = sorted(
         retrieval.get("context_pack") or (),
-        key=lambda item: _context_rank(item, query_text),
+        key=lambda item: _context_rank(item, query_text, required_query_id_set),
         reverse=True,
     )
     for original in candidates:
@@ -65,9 +67,18 @@ def project_docs_context(
             original.get("code") or original.get("snippet") or original.get("content")
             or original.get("display_text") or ""
         )
+        required_matches = tuple(
+            query_text.get(query_id, "")
+            for query_id in qualified_ids if query_id in required_query_id_set
+        )
+        supplemental_matches = tuple(
+            str(((original.get("retrieval_query_matches") or {}).get(query_id) or {}).get("query_text") or "")
+            for query_id in qualified_ids if query_id.startswith("query-supplemental-")
+        )
         focused_snippet = _focused_snippet(
             raw_snippet,
-            tuple(query_text.get(query_id, "") for query_id in qualified_ids),
+            tuple(value for value in (*required_matches, *supplemental_matches) if value)
+            or tuple(query_text.get(query_id, "") for query_id in qualified_ids),
         )
         normalized = _docs_source(original, display_snippet=focused_snippet)
         if normalized is None or len(normalized["snippet"]) < 40:
@@ -98,10 +109,10 @@ def project_docs_context(
             candidate_sources[existing_index]["retrieval_query_ids"] = merged_query_ids
             candidate_sources[existing_index]["retrieval_query_matches"] = merged_matches
             candidate_decision = context_selection_decision(
-                candidate_sources, query_plan.get("query_ids") or (),
+                candidate_sources, required_query_ids,
             )
             if estimate_projection_tokens(
-                _payload(candidate_sources, decision=candidate_decision)
+                    _payload(candidate_sources, decision=candidate_decision, query_plan=query_plan)
             ) <= max_tokens:
                 sources = candidate_sources
                 snapshot[evidence_id] = _snapshot_entry(
@@ -110,9 +121,11 @@ def project_docs_context(
             continue
         candidate_sources = [*sources, normalized]
         candidate_decision = context_selection_decision(
-            candidate_sources, query_plan.get("query_ids") or (),
+            candidate_sources, required_query_ids,
         )
-        candidate_payload = _payload(candidate_sources, decision=candidate_decision)
+        candidate_payload = _payload(
+            candidate_sources, decision=candidate_decision, query_plan=query_plan,
+        )
         if estimate_projection_tokens(candidate_payload) > max_tokens:
             continue
         sources = candidate_sources
@@ -129,8 +142,14 @@ def project_docs_context(
             recommended_next_action=None,
             max_tokens=min(INSUFFICIENT_EVIDENCE_MAX_TOKENS, max_tokens),
         ), {}
-    decision = context_selection_decision(sources, query_plan.get("query_ids") or ())
-    return _payload(sources, decision=decision), snapshot
+    decision = context_selection_decision(sources, required_query_ids)
+    return _payload(sources, decision=decision, query_plan=query_plan), snapshot
+
+
+def _required_query_ids(query_plan: dict[str, Any]) -> tuple[str, ...]:
+    explicit = query_plan.get("required_query_ids")
+    values = explicit if isinstance(explicit, list) else query_plan.get("query_ids") or ()
+    return tuple(str(value) for value in values if value)
 
 
 _QUERY_STOP_WORDS = frozenset({
@@ -161,20 +180,28 @@ def _focused_snippet(text: str, queries: tuple[str, ...], *, limit: int = 420) -
         range(len(spans)),
         key=lambda index: sum(term in spans[index].casefold() for term in terms),
     )
+    start = best_index
+    end = best_index
     selected = spans[best_index]
     for distance in range(1, len(spans)):
         for index in (best_index - distance, best_index + distance):
             if index < 0 or index >= len(spans):
                 continue
-            candidate = f"{selected} {spans[index]}"
+            candidate_start = min(start, index)
+            candidate_end = max(end, index)
+            candidate = " ".join(spans[candidate_start:candidate_end + 1])
             if len(candidate) <= limit:
                 selected = candidate
+                start = candidate_start
+                end = candidate_end
         if len(selected) >= limit * 0.7:
             break
     return selected[:limit].rstrip()
 
 
-def _context_rank(source: Any, query_text: dict[str, str]) -> tuple[float, ...]:
+def _context_rank(
+    source: Any, query_text: dict[str, str], required_query_ids: set[str],
+) -> tuple[float, ...]:
     if not isinstance(source, dict):
         return (-1.0,)
     matches = source.get("retrieval_query_matches") or {}
@@ -186,23 +213,62 @@ def _context_rank(source: Any, query_text: dict[str, str]) -> tuple[float, ...]:
         float((matches.get(query_id) or {}).get("lexical_score") or 0.0)
         for query_id in qualified
     )
+    required = [query_id for query_id in qualified if query_id in required_query_ids]
+    required_lexical = sum(
+        float((matches.get(query_id) or {}).get("lexical_score") or 0.0)
+        for query_id in required
+    )
     authority = str(source.get("authority") or "supporting").casefold()
     authority_score = 2.0 if authority == "source_of_truth" else 1.0
     path = str(source.get("path") or source.get("source") or "").casefold()
     question = " ".join(query_text.values()).casefold()
     plan_penalty = 0.0
+    evaluation_intent = bool(re.search(
+        r"\b(?:eval(?:uation)?|benchmarks?|protocols?|metrics?|quality gates?|"
+        r"test results?|оценк\w*|бенчмарк\w*|протокол\w*|метрик\w*)\b",
+        question,
+        re.I,
+    ))
+    planning_intent = bool(re.search(
+        r"\b(?:plans?|roadmap|milestones?|task\s+\d+|task status|"
+        r"план\w*|дорожн\w+\s+карт\w*|статус\w*\s+задач\w*)\b",
+        question,
+        re.I,
+    ))
+    if path.startswith("eval/") and not evaluation_intent:
+        plan_penalty -= 3.0
     if ("/.hermes/plans/" in f"/{path}" or "roadmap" in path) and not re.search(
-        r"\b(?:plan|roadmap|histor|status)\b", question,
+        r"\b(?:histor|history)\b", question,
     ):
-        plan_penalty = -3.0
+        if not planning_intent:
+            plan_penalty -= 3.0
     reference_score = 1.0 if path.startswith(("docs/", "wiki/")) else 0.0
     return (
-        float(len(qualified)), authority_score + reference_score + plan_penalty,
-        lexical, float(source.get("score") or 0.0),
+        float(len(required)), required_lexical,
+        authority_score + reference_score + plan_penalty,
+        float(len(qualified) - len(required)), lexical,
+        float((source.get("project_ranking") or {}).get("final_score") or 0.0),
+        float(source.get("score") or 0.0),
     )
 
 
-def _payload(sources: list[dict[str, Any]], *, decision: Any = None) -> dict[str, Any]:
+def _payload(
+    sources: list[dict[str, Any]], *, decision: Any = None,
+    query_plan: dict[str, Any] | None = None,
+) -> dict[str, Any]:
+    plan_queries = {
+        str(item.get("query_id") or ""): item
+        for item in (query_plan or {}).get("queries") or ()
+        if isinstance(item, dict)
+    }
+    missing_facets = [
+        {
+            "query_id": query_id,
+            "text": str((plan_queries.get(query_id) or {}).get("text") or query_id),
+            "origin": str((plan_queries.get(query_id) or {}).get("origin") or "unknown"),
+        }
+        for query_id in (decision.missing_query_ids if decision else ())
+    ]
     payload = {
         "status": "ok",
         "kind": "docs_context",
@@ -211,9 +277,14 @@ def _payload(sources: list[dict[str, Any]], *, decision: Any = None) -> dict[str
         "answer_supported": False,
         "answer_available": False,
         "support_status": "retrieval_only",
+        "answer_policy": "cite_only",
+        "coverage_policy": "retrieval_attribution_only",
         "query_coverage": decision.query_coverage if decision else "partial",
+        "retrieval_coverage": decision.query_coverage if decision else "partial",
+        "facet_coverage": "unverified",
         "covered_query_ids": list(decision.covered_query_ids) if decision else [],
         "missing_query_ids": list(decision.missing_query_ids) if decision else [],
+        "missing_facets": missing_facets,
         "sources": sources,
         "edit_ready": False,
         "investigation_allowed": True,

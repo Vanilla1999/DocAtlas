@@ -1,6 +1,46 @@
 """Split tests from test_model_visible_projection.py; shared helpers remain in the façade module."""
 from tests.docs import _shared_test_model_visible_projection as _shared
 globals().update({k: v for k, v in vars(_shared).items() if not k.startswith("__")})
+from docmancer.docs.application.docs_context_projection import project_docs_context
+
+
+def test_docs_context_prioritizes_required_query_over_optional_aliases():
+    base = {
+        "source_class": "project_doc", "heading_path": "Contract",
+        "project_identity": "git:example/project", "lifecycle_status": "active",
+        "freshness": "current", "index_freshness": "synchronized",
+        "risk_flags": [], "doc_scope": "project",
+    }
+    projection, _snapshot = project_docs_context(retrieval={
+        "context_pack": [
+            {
+                **base, "path": "roadmap/README.md", "authority": "source_of_truth",
+                "content": "Optional aliases describe project contract documentation in planning notes.",
+                "retrieval_query_matches": {
+                    "query-concept-1": {"qualified": True, "lexical_score": 20.0},
+                    "query-concept-2": {"qualified": True, "lexical_score": 20.0},
+                },
+            },
+            {
+                **base, "path": "docs/mcp-docs-server.md", "authority": "supporting",
+                "content": "The response contract returns docs_answer or docs_context according to evidence support.",
+                "retrieval_query_matches": {
+                    "query-original": {"qualified": True, "lexical_score": 1.0},
+                },
+            },
+        ],
+        "documentation_query_plan": {
+            "required_query_ids": ["query-original"],
+            "query_ids": ["query-original", "query-concept-1", "query-concept-2"],
+            "queries": [
+                {"query_id": "query-original", "text": "What response contract is returned?", "origin": "original"},
+                {"query_id": "query-concept-1", "text": "contract docs", "origin": "concept_alias"},
+                {"query_id": "query-concept-2", "text": "answer protocol", "origin": "concept_alias"},
+            ],
+        },
+    })
+    assert projection["sources"][0]["path_or_url"] == "docs/mcp-docs-server.md"
+    assert projection["query_coverage"] == "full"
 
 def test_project_projection_materializes_every_selected_mandatory_witness():
     from docmancer.docs.application.evidence_selection import docs_selection_config, select_evidence

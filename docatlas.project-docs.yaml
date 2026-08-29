@@ -46,7 +46,7 @@ documents:
     description: Current execution roadmap, active task status, sequencing, and implementation policy.
     authority: source_of_truth
     status: active
-    impact: track
+    impact: search_only
 
   - path: docs/analysis/docatlas-readiness-evidence-review-2026-08-22.md
     role: development
@@ -92,6 +92,14 @@ documents:
     role: development
     scope: project
     description: QuestionPlan safety protocol covering fail-closed parsing, compound facets, proof specificity, and paraphrase invariants.
+    authority: source_of_truth
+    status: active
+    impact: search_only
+
+  - path: eval/project_chat_quality_v1/README.md
+    role: development
+    scope: project
+    description: Novel adversarial project-chat gate for false support, predicate specificity, closed inventories, and contamination.
     authority: source_of_truth
     status: active
     impact: search_only
@@ -163,6 +171,38 @@ documents:
     authority: source_of_truth
     status: active
     impact: track
+
+  - path: docs/testing.md
+    role: runbook
+    scope: project
+    description: Provider-free test commands, pytest markers, and live-test boundaries.
+    authority: source_of_truth
+    status: active
+    impact: track
+
+  - path: wiki/Supported-Sources.md
+    role: api_contract
+    scope: project
+    description: Supported documentation source types and local file formats.
+    authority: source_of_truth
+    status: active
+    impact: track
+
+  - path: docs/adr/0001-mcp-boundary-contracts.md
+    role: project_architecture
+    scope: project
+    description: MCP transport boundary, response, and compatibility decisions.
+    authority: source_of_truth
+    status: active
+    impact: track
+
+  - path: eval/results/live/README.md
+    role: development
+    scope: project
+    description: Live evaluation result provenance, metrics, and claim boundaries.
+    authority: source_of_truth
+    status: active
+    impact: search_only
 
   - path: docs/project-docs-mcp-workflow.md
     role: runbook

@@ -12,12 +12,9 @@ from __future__ import annotations
 from dataclasses import replace as _replace
 import re as _re
 
-from docmancer.retrieval.contracts import canonical_hash as _canonical_hash
-
 from ._project_answer_contract_shared import *  # noqa: F401,F403
 
 from ._project_answer_contract_part01 import *  # noqa: F401,F403
-from ._project_answer_contract_part01 import ProofObligation as _ProofObligation
 
 from ._project_answer_contract_part02 import *  # noqa: F401,F403
 from ._project_answer_contract_part02 import (
@@ -170,35 +167,6 @@ def _generic_project_terms(
     return tuple(rows) if len(rows) >= (1 if technical else 3) else ()
 
 
-def _generic_term_obligations(
-    question: str,
-    terms: tuple[str, ...],
-) -> tuple[_ProofObligation, ...]:
-    obligations: list[_ProofObligation] = []
-    for index, term in enumerate(terms):
-        match = _re.search(_re.escape(term), question, _re.I)
-        start = match.start() if match else None
-        end = match.end() if match else None
-        raw = question[start:end] if start is not None and end is not None else None
-        identity = _canonical_hash({
-            "kind": "exact_fact",
-            "subject": term.casefold(),
-            "relation": "generic_project_fact",
-            "value_kind": "text",
-        })[:16]
-        obligations.append(_ProofObligation(
-            obligation_id=f"project_answer:generic:{index}:exact_fact:{identity}",
-            kind="exact_fact",
-            subject=term,
-            relation="generic_project_fact",
-            value_kind="text",
-            query_span_start=start,
-            query_span_end=end,
-            query_span_text=raw,
-        ))
-    return tuple(obligations)
-
-
 def _merge_bounded(existing: tuple[str, ...], additions: tuple[str, ...], limit: int) -> tuple[str, ...]:
     """Append fallback identity without breaking the contract's existing hard bounds."""
 
@@ -211,7 +179,22 @@ def build_project_answer_contract(question: str) -> ProjectAnswerContract:
     contract = _build_project_answer_contract_legacy(question)
     raw_question = str(question or "")[:4_000]
     plan = _compile_question_plan(raw_question)
-    if plan.handled or contract.unresolved_parts:
+    if plan.handled:
+        return contract
+
+    if contract.unresolved_parts:
+        generic_terms = _generic_project_terms(raw_question, contract)
+        if generic_terms:
+            contract = _replace(
+                contract,
+                subjects=_merge_bounded(
+                    contract.subjects, generic_terms, MAX_SUBJECTS,
+                ),
+                retrieval_hints=_merge_bounded(
+                    contract.retrieval_hints, generic_terms, MAX_RETRIEVAL_HINTS,
+                ),
+                parse_trace=(*contract.parse_trace, "fallback:generic_project_terms"),
+            )
         return contract
 
     if not contract.proof_obligations:
@@ -223,10 +206,12 @@ def build_project_answer_contract(question: str) -> ProjectAnswerContract:
                 retrieval_hints=_merge_bounded(
                     contract.retrieval_hints, generic_terms, MAX_RETRIEVAL_HINTS,
                 ),
-                proof_obligations=_generic_term_obligations(raw_question, generic_terms),
                 parse_trace=(*contract.parse_trace, "fallback:generic_project_terms"),
+                unresolved_parts=("unsupported_query:generic_free_form_relation",),
             )
 
+    if contract.unresolved_parts:
+        return contract
     gaps = _legacy_coverage_gaps(raw_question, contract.proof_obligations)
     if not gaps:
         return contract

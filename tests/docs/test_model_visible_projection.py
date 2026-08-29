@@ -3,8 +3,6 @@ from tests.docs import _shared_test_model_visible_projection as _shared
 globals().update({k: v for k, v in vars(_shared).items() if not k.startswith("__")})
 from docmancer.docs.interfaces.mcp.recovery_projection import _bound_recoverable_insufficient_projection
 from docmancer.docs.application.docs_context_projection import project_docs_context
-
-
 def test_docs_context_is_retrieval_only_snapshot_bound_and_not_edit_ready():
     retrieval = {
         "context_pack": [{
@@ -26,9 +24,10 @@ def test_docs_context_is_retrieval_only_snapshot_bound_and_not_edit_ready():
                 "query-original": {"qualified": True, "mode": "and"},
             },
         }],
-        "documentation_query_plan": {
-            "query_ids": ["query-original", "query-lookup-1"],
-        },
+        "documentation_query_plan": {"query_ids": ["query-original", "query-lookup-1"], "queries": [
+            {"query_id": "query-original", "text": "How does routing work?", "origin": "original"},
+            {"query_id": "query-lookup-1", "text": "retrieval lifecycle", "origin": "host_lookup"},
+        ]},
     }
 
     projection, snapshot = project_docs_context(retrieval=retrieval)
@@ -39,15 +38,15 @@ def test_docs_context_is_retrieval_only_snapshot_bound_and_not_edit_ready():
     assert projection["answer_available"] is False
     assert projection["edit_ready"] is False
     assert projection["safe_to_answer_from_sources"] is True
+    assert projection["answer_policy"] == "cite_only"
     assert projection["sources"][0]["project_identity"] == "git:example/project"
     assert projection["sources"][0]["line_start"] == 12
     assert projection["sources"][0]["retrieval_query_ids"] == ["query-original"]
     assert projection["query_coverage"] == "partial"
     assert projection["covered_query_ids"] == ["query-original"]
     assert projection["missing_query_ids"] == ["query-lookup-1"]
-    assert validate_model_visible_projection(
-        projection, snapshot=snapshot, max_tokens=800,
-    ) == []
+    assert projection["missing_facets"] == [{"query_id": "query-lookup-1", "text": "retrieval lifecycle", "origin": "host_lookup"}]
+    assert validate_model_visible_projection(projection, snapshot=snapshot, max_tokens=800) == []
 
     focused, _focused_snapshot = project_docs_context(retrieval={
         "context_pack": [{
@@ -58,24 +57,35 @@ def test_docs_context_is_retrieval_only_snapshot_bound_and_not_edit_ready():
                 + "Unrelated implementation notes. " * 50
             ),
         }],
-        "documentation_query_plan": {
-            "query_ids": ["query-original"],
-            "queries": [{
-                "query_id": "query-original",
-                "text": "How does the MCP router dispatch requests?",
-                "origin": "original",
-            }],
-        },
+        "documentation_query_plan": {"query_ids": ["query-original"], "queries": [{
+            "query_id": "query-original", "text": "How does the MCP router dispatch requests?", "origin": "original",
+        }]},
     })
     assert "MCP router dispatches requests" in focused["sources"][0]["snippet"]
     assert len(focused["sources"][0]["snippet"]) <= 420
+    focused_text = focused["sources"][0]["snippet"]
+    if "Generic project background" in focused_text:
+        assert focused_text.index("Generic project background") < focused_text.index(
+            "MCP router dispatches requests"
+        )
+    if "Unrelated implementation notes" in focused_text:
+        assert focused_text.index("MCP router dispatches requests") < focused_text.index(
+            "Unrelated implementation notes"
+        )
 
     tampered = deepcopy(projection)
     tampered["edit_ready"] = True
     tampered["estimated_tokens"] = estimate_projection_tokens(tampered)
-    assert "docs_context must not authorize edits" in validate_model_visible_projection(
-        tampered, snapshot=snapshot, max_tokens=800,
-    )
+    assert "docs_context must not authorize edits" in validate_model_visible_projection(tampered, snapshot=snapshot, max_tokens=800)
+
+    for field, value, error in (
+        ("answer_policy", "free_form", "docs_context answer policy must be cite_only"),
+        ("missing_facets", [], "docs_context query coverage is inconsistent"),
+    ):
+        tampered = deepcopy(projection)
+        tampered[field] = value
+        tampered["estimated_tokens"] = estimate_projection_tokens(tampered)
+        assert error in validate_model_visible_projection(tampered, snapshot=snapshot, max_tokens=800)
 
 
 def test_docs_context_merges_query_attribution_for_duplicate_evidence():

@@ -102,6 +102,7 @@ class _ProjectContextServicePart01:
                         intent=intent,
                         limit=limit,
                         broad_max_per_source=4 if evidence_path else 2,
+                        lifecycle_intent_value=canonical_requirements.lifecycle_intent,
                     ),
                 )
                 routing_stage_observed["project_docs"] = list(project_docs.results)

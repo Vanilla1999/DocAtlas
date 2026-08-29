@@ -137,22 +137,23 @@ def _remove_library_during_refresh(q: str) -> QuestionPlan | None:
 
 
 def _source_type_inventory(q: str) -> QuestionPlan | None:
-    if re.match(r"^\s*what\s+source\s+types?\s+are\s+supported\s+for\s+indexing\s*[?!.]*\s*$", q, re.I) is None:
+    match = re.match(
+        r"^\s*(?:what|which)\s+(source\s+types?|(?:local\s+)?file\s+formats?)\s+are\s+supported\s+for\s+indexing\s*[?!.]*\s*$",
+        q, re.I,
+    )
+    if match is None:
         return None
+    file_formats = "file format" in match.group(1).casefold()
     return QuestionPlan(
         facets=(PlannedFacet(
-            kind="inventory",
-            subject="source types",
-            attribute="source",
-            item_kind="source",
-            value_kind="identifier_list",
-            response_mode="names",
-            span_text="source types",
+            "inventory", "file formats" if file_formats else "source types",
+            attribute="file format" if file_formats else "source",
+            item_kind="format" if file_formats else "source",
+            value_kind="identifier_list", response_mode="names", span_text=match.group(1),
         ),),
         clauses=(q,),
-        parse_trace=("inventory:source_types",),
+        parse_trace=("inventory:file_formats" if file_formats else "inventory:source_types",),
     )
-
 
 def _release_checklist_compound(q: str) -> QuestionPlan | None:
     match = re.match(r"^\s*what\s+is\s+(.+?)\s+and\s+what\s+(.+?)\s*[?!.]*\s*$", q, re.I)

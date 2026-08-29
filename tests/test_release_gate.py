@@ -176,6 +176,7 @@ def test_stdio_smoke_accepts_structured_content_and_legacy_json_text() -> None:
         "answer_available": False,
         "edit_ready": False,
         "safe_to_answer_from_sources": True,
+        "answer_policy": "cite_only",
         "sources": [{"snippet": "grounded", "content_sha256": "z" * 64}],
     }
     assert _validate_context_result(invalid_citation) == "source lacks a grounded snippet or content hash"

@@ -50,4 +50,4 @@ This is the canonical map of maintained DocAtlas project-owned documentation. Ag
 - Keep this index limited to maintained, reviewable documentation.
 - Prefer links to repository-owned docs over generated hidden summaries.
 - Update this file when adding architecture docs, runbooks, ADRs, workflow docs, or new user-facing references.
-- After documentation changes, run the project-docs workflow: `inspect_project_docs`, `sync_project_docs`, then `get_project_context` for a question that should select the new docs.
+- After documentation changes, call `get_docs_context`; when it recommends synchronization, run the returned `prepare_docs(action="sync_project_docs")` action and retry the original question unchanged.

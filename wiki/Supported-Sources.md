@@ -19,7 +19,7 @@ DocAtlas Docs supports exactly five source types: `GitBook sites`, `Mintlify sit
 | GitHub repos | `--provider github`: fetches README and docs markdown | `doc-atlas add <github-url>` |
 | Local Markdown, text, HTML, PDF, DOCX, or RTF | Read from disk and index | `doc-atlas ingest ./path/to/files` |
 
-When using `auto` (the default), docmancer detects the provider automatically based on the site's response headers and content.
+When using `auto` (the default), DocAtlas detects the provider automatically based on the site's response headers and content.
 
 ### Local file formats
 
@@ -69,7 +69,7 @@ All sources follow the same indexing path regardless of origin:
 2. Pages are normalized into semantic sections based on heading structure.
 3. Sections are stored in SQLite with metadata (source URL, title, heading hierarchy, token estimate).
 4. A FTS5 virtual table indexes titles and section text for retrieval.
-5. Extracted markdown and JSON files are written to `.docmancer/extracted/` for inspection.
+5. Extracted markdown and JSON files are written under the configured DocAtlas home (`DOCATLAS_HOME`, default `~/.docatlas`) for inspection.
 
 For configuration options that control query budget and retrieval behavior, see [Configuration](./Configuration.md).
 

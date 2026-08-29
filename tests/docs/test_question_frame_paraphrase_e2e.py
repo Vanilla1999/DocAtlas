@@ -139,9 +139,11 @@ def test_reusable_question_frames_survive_real_manifest_sync_and_public_mcp(tmp_
     assert lookup_payload["status"] == "ok", lookup_payload
     assert lookup_payload["kind"] == "docs_context"
     assert "GitBook sites" in str(lookup_payload)
-    assert lookup_payload["query_coverage"] == "full"
-    assert lookup_payload["covered_query_ids"] == ["query-original", "query-lookup-1"]
-    assert lookup_payload["missing_query_ids"] == []
+    assert lookup_payload["query_coverage"] == "partial"
+    assert lookup_payload["retrieval_coverage"] == "partial"
+    assert lookup_payload["facet_coverage"] == "unverified"
+    assert lookup_payload["covered_query_ids"] == ["query-lookup-1"]
+    assert lookup_payload["missing_query_ids"] == ["query-original"]
     assert any(
         "query-lookup-1" in source["retrieval_query_ids"]
         for source in lookup_payload["sources"]

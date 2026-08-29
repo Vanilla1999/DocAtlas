@@ -69,12 +69,27 @@ def validate_context_selection_payload(
     coverage = payload.get("query_coverage")
     covered = payload.get("covered_query_ids")
     missing = payload.get("missing_query_ids")
+    missing_facets = payload.get("missing_facets")
+    facet_ids = [
+        str(item.get("query_id") or "")
+        for item in missing_facets or () if isinstance(item, Mapping)
+    ]
     if (
         coverage not in {"full", "partial"}
         or not isinstance(covered, list)
         or not isinstance(missing, list)
         or set(covered).intersection(missing)
         or (coverage == "full") != bool(covered and not missing)
+        or not isinstance(missing_facets, list)
+        or len(facet_ids) != len(missing_facets)
+        or facet_ids != missing
+        or payload.get("coverage_policy") != "retrieval_attribution_only"
+        or payload.get("retrieval_coverage") != coverage
+        or payload.get("facet_coverage") != "unverified"
+        or any(
+            not str(item.get("text") or "").strip()
+            for item in missing_facets if isinstance(item, Mapping)
+        )
     ):
         return ["docs_context query coverage is inconsistent"]
     source_query_ids = qualified_query_ids(sources)

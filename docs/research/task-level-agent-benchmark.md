@@ -22,8 +22,8 @@ Environment observed during setup:
 
 Current DocAtlas checks performed:
 
-- `inspect_project_docs` reported stale project docs; `sync_project_docs` reconciled without repo writes.
-- `get_project_context` returned project context with Trust Contract and selected source attribution.
+- `get_docs_context` reported stale project docs; its returned `prepare_docs(action="sync_project_docs")` action reconciled without repo writes.
+- Retrying `get_docs_context` returned a bounded answer-or-context result with selected source attribution.
 - `get_library_docs` for FastAPI returned snippet-first output and exact-version diagnostics warning that no project-pinned version was found, so latest/default docs were used.
 - `get_docs_context` route was exercised with snippet-first style; output was large but successful.
 
@@ -264,4 +264,3 @@ Final constraint-compiler recommendation:
 - Scope should be narrow and read-only: compile visible project docs/source/manifests/lockfiles into source-attributed constraints with token budget and warnings.
 - `validate_patch_against_constraints` should stay behind the compiler API until the constraint shape is stable.
 - The recommendation does not claim patch constraints improve task success; current evidence supports an experimental API direction, not a broad superiority claim.
-

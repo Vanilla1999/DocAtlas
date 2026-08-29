@@ -13,6 +13,7 @@ class DocumentationLookup:
     query_id: str
     text: str
     origin: str
+    coverage_required: bool = True
 
 
 @dataclass(frozen=True, slots=True)
@@ -20,14 +21,22 @@ class DocumentationQueryPlan:
     original_question: str
     queries: tuple[DocumentationLookup, ...]
     explicit_paths: tuple[str, ...] = ()
-    schema_version: str = "documentation-query-plan-v1"
+    schema_version: str = "documentation-query-plan-v2"
 
     def as_payload(self) -> dict[str, object]:
         return {
             "schema_version": self.schema_version,
             "query_ids": [query.query_id for query in self.queries],
+            "required_query_ids": [
+                query.query_id for query in self.queries if query.coverage_required
+            ],
             "queries": [
-                {"query_id": query.query_id, "text": query.text, "origin": query.origin}
+                {
+                    "query_id": query.query_id,
+                    "text": query.text,
+                    "origin": query.origin,
+                    "coverage_required": query.coverage_required,
+                }
                 for query in self.queries
             ],
             "explicit_paths": list(self.explicit_paths),
@@ -69,7 +78,7 @@ def build_documentation_query_plan(
         if not applies or text.casefold() in seen or len(queries) >= 5:
             continue
         queries.append(DocumentationLookup(
-            f"query-concept-{len(queries)}", text, "concept_alias",
+            f"query-concept-{len(queries)}", text, "concept_alias", False,
         ))
         seen.add(text.casefold())
     if explicit_path:

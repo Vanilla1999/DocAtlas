@@ -213,6 +213,7 @@ def project_context_pack(*, question: str = "", project_docs: ProjectDocsResult 
                 "project_identity": item.project_identity,
                 "retrieval_query_ids": list(item.metadata.get("retrieval_query_ids") or ()),
                 "retrieval_query_matches": dict(item.metadata.get("retrieval_query_matches") or {}),
+                "project_ranking": dict(item.metadata.get("project_ranking") or {}),
                 "path": item.path,
                 "url": item.url,
                 "title": item.title,

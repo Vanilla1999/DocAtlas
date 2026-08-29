@@ -102,7 +102,7 @@ roots:
         "cannot determine support" in source["snippet"]
         and "mandatory-facet witness" in source["snippet"]
         for source in payload["sources"]
-    )
+    ), [source["snippet"] for source in payload["sources"]]
 
     dispatcher_payload = handle_context_tool(
         "get_docs_context",
@@ -118,8 +118,7 @@ roots:
         service,
     )
     assert dispatcher_payload is not None
-    assert dispatcher_payload["status"] == "ok"
-    assert dispatcher_payload["kind"] == "docs_context"
+    assert dispatcher_payload["status"] == "insufficient_evidence"
     assert dispatcher_payload["answer_supported"] is False
     assert dispatcher_payload["edit_ready"] is False
 
@@ -179,7 +178,9 @@ roots:
         service,
     )
     assert absent is not None
-    assert absent["status"] == "insufficient_evidence"
+    assert absent["status"] == "ok"
+    assert absent["kind"] == "docs_context"
+    assert absent["answer_policy"] == "cite_only"
     assert absent["answer_supported"] is False
     assert absent["edit_ready"] is False
 

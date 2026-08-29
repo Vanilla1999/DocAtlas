@@ -154,6 +154,7 @@ def _validate_context_result(payload: dict[str, object]) -> str | None:
             and payload.get("answer_available") is False
             and payload.get("edit_ready") is False
             and payload.get("safe_to_answer_from_sources") is True
+            and payload.get("answer_policy") == "cite_only"
         ):
             return "docs_context violates the context-first safety contract"
     else:
@@ -232,7 +233,12 @@ def run(output: Path | None = None) -> dict[str, object]:
                 status = str(payload.get("status") or "")
                 paths = _source_paths(payload)
                 contract_error = _validate_context_result(payload)
-                visible = json.dumps(payload.get("sources") or (), ensure_ascii=False).casefold()
+                relevant_sources = [
+                    row for row in payload.get("sources") or ()
+                    if isinstance(row, dict)
+                    and str(row.get("path_or_url") or "") in case.relevant_paths
+                ]
+                visible = json.dumps(relevant_sources, ensure_ascii=False).casefold()
                 fact_checks = {
                     fragment: fragment.casefold() in visible
                     for fragment in case.required_fragments

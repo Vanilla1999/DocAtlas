@@ -502,10 +502,14 @@ def ensure_broad_query_sources(selected: list[Any], candidates: list[Any], *, qu
     return selected[:limit] if limit else selected
 
 
-def rerank_project_doc_chunks(chunks: list[Any], *, question: str, intent: Any, limit: int | None = None, broad_max_per_source: int = 2, narrow_max_per_source: int = 4) -> list[Any]:
+def rerank_project_doc_chunks(
+    chunks: list[Any], *, question: str, intent: Any, limit: int | None = None,
+    broad_max_per_source: int = 2, narrow_max_per_source: int = 4,
+    lifecycle_intent_value: str | None = None,
+) -> list[Any]:
     if not chunks:
         return []
-    answer_lifecycle_intent = lifecycle_intent(question)
+    answer_lifecycle_intent = lifecycle_intent_value or lifecycle_intent(question)
     chunks = [
         chunk
         for chunk in chunks
@@ -519,6 +523,18 @@ def rerank_project_doc_chunks(chunks: list[Any], *, question: str, intent: Any, 
         return []
     scored = []
     score_by_id: dict[int, tuple[float, float, int]] = {}
+    evaluation_intent = bool(re.search(
+        r"\b(?:eval(?:uation)?|benchmarks?|protocols?|metrics?|quality gates?|"
+        r"test results?|оценк\w*|бенчмарк\w*|протокол\w*|метрик\w*)\b",
+        question,
+        re.I,
+    ))
+    planning_intent = bool(re.search(
+        r"\b(?:plans?|roadmap|milestones?|task\s+\d+|task status|"
+        r"план\w*|дорожн\w+\s+карт\w*|статус\w*\s+задач\w*)\b",
+        question,
+        re.I,
+    ))
     for index, chunk in enumerate(chunks):
         path = getattr(chunk, "path", None)
         base = chunk_base_score(chunk, index)
@@ -548,6 +564,14 @@ def rerank_project_doc_chunks(chunks: list[Any], *, question: str, intent: Any, 
             "historical": 0.45,
             "generated": 0.3,
         }.get(authority, 1.0)
+        normalized_path = normalize_doc_path(path)
+        if normalized_path.startswith("eval/") and not evaluation_intent:
+            score *= 0.15
+        if (
+            normalized_path.startswith((".hermes/plans/", "roadmap/"))
+            and not planning_intent
+        ):
+            score *= 0.1
         if getattr(intent, "wants_code_symbols", False):
             if has_code_symbol_evidence(getattr(chunk, "content", ""), getattr(chunk, "title", None), getattr(chunk, "heading_path", None), path):
                 score *= 2.5
