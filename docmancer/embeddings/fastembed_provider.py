@@ -33,6 +33,7 @@ class FastEmbedProvider(EmbeddingsProvider):
     def __init__(self, config: "EmbeddingsConfig") -> None:
         self._config = config
         self.model_name = config.model
+        self._model_cache_dir = _fastembed_cache_dir()
         # Treat the config dimension as a *hint* only. The real dimension
         # comes from probing the loaded ONNX model on first use, because
         # FastEmbed's model registry can resolve a configured name to a
@@ -59,7 +60,7 @@ class FastEmbedProvider(EmbeddingsProvider):
                     "fastembed is required for the FastEmbed provider; "
                     "reinstall docmancer; this dependency ships in core."
                 ) from exc
-            cache_dir = _fastembed_cache_dir()
+            cache_dir = self._model_cache_dir
             if cache_dir and not Path(cache_dir).exists() and not os.environ.get("HF_TOKEN"):
                 logger.warning(
                     "FastEmbed first run may download dense and sparse models from Hugging Face. "
@@ -98,7 +99,7 @@ class FastEmbedProvider(EmbeddingsProvider):
                     "fastembed[sparse] / SparseTextEmbedding is required for sparse embeddings"
                 ) from exc
             model = self._config.sparse_model or "prithivida/Splade_PP_en_v1"
-            self._sparse = SparseTextEmbedding(model_name=model, cache_dir=_fastembed_cache_dir())
+            self._sparse = SparseTextEmbedding(model_name=model, cache_dir=self._model_cache_dir)
         return self._sparse
 
     def embed(self, texts: list[str]) -> list[list[float]]:

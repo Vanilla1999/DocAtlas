@@ -106,12 +106,19 @@ class ProductionMultilingualMatrixAdapter:
                 os.environ["DOCMANCER_FASTEMBED_CACHE_DIR"] = previous_model_cache
 
     def close(self) -> None:
-        self._cleanup_candidate(preserve_error=False)
-        self._agent = None
-        self._dispatcher = None
-        if self._temporary is not None:
-            self._temporary.cleanup()
-            self._temporary = None
+        cleanup_error: Exception | None = None
+        try:
+            self._cleanup_candidate(preserve_error=False)
+        except Exception as exc:
+            cleanup_error = exc
+        finally:
+            self._agent = None
+            self._dispatcher = None
+            if self._temporary is not None:
+                self._temporary.cleanup()
+                self._temporary = None
+        if cleanup_error is not None:
+            raise cleanup_error
 
     def _cleanup_candidate(self, *, preserve_error: bool) -> None:
         if self._agent is not None and self._candidate_collection:
@@ -177,6 +184,17 @@ def _matrix_documents(corpus: FrozenCorpus) -> list[Document]:
 
 def _matrix_result(case: Mapping[str, Any], result: Any) -> dict[str, Any]:
     chunks = list(result.chunks)
+    contributions = {
+        str(section_id): dict(component_ranks)
+        for section_id, component_ranks in result.contributions.items()
+    }
+    returned_contributions = {
+        str(chunk.metadata.get("section_id")): contributions.get(
+            str(chunk.metadata.get("section_id")), {}
+        )
+        for chunk in chunks
+        if chunk.metadata.get("section_id") is not None
+    }
     span_ids = list(dict.fromkeys(
         str(chunk.metadata.get("span_id") or "") for chunk in chunks
         if chunk.metadata.get("span_id")
@@ -199,6 +217,12 @@ def _matrix_result(case: Mapping[str, Any], result: Any) -> dict[str, Any]:
         "retrieved_chunks": [chunk.model_dump(mode="json") for chunk in chunks],
         "mode_used": result.mode_used,
         "failures": dict(result.failures),
+        "candidate_counts": dict(result.candidate_counts),
+        "retrieval_contributions": returned_contributions,
+        "dense_contributed": any(
+            "dense" in component_ranks
+            for component_ranks in returned_contributions.values()
+        ),
         "visible_sources": visible_sources,
     }
 

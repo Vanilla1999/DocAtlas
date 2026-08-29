@@ -47,11 +47,19 @@ _BOILERPLATE_KEYWORDS = frozenset({
 _QUERY_STOPWORDS = frozenset({
     "how", "do", "i", "a", "an", "the", "to", "is", "it", "in", "on",
     "of", "for", "my", "can", "what", "where", "when", "why", "does",
-    "should", "would", "could", "with", "this", "that", "are", "was",
+    "should", "would", "could", "which", "with", "this", "that", "are", "was",
     "be", "have", "has", "will", "we", "you", "your", "me",
     "как", "каково", "на", "для", "и", "или", "что", "это", "его",
     "ответь", "только", "основании", "проектной", "документации", "укажи",
     "утверждений", "модуль", "модуля", "модуле", "модулю", "модули", "модулей",
+})
+
+_GENERIC_QUERY_TERMS = frozenset({
+    "add", "build", "configure", "configuration", "create", "docs",
+    "documentation", "enable", "generate", "guide", "index", "indexing",
+    "install", "overview", "reference", "request", "setup", "start", "use",
+    "which", "workflow", "где", "какая", "какие", "какой", "когда", "может",
+    "почему",
 })
 
 INDEX_SCHEMA_VERSION = "sqlite-sections-v1"

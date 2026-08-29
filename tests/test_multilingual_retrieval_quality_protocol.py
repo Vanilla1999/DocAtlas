@@ -7,8 +7,11 @@ from pathlib import Path
 import pytest
 
 from docmancer.core.models import RetrievedChunk
+from docmancer.core.config import EmbeddingsConfig
 from docmancer.core._sqlite_store_shared import _stable_source_identity
+from docmancer.embeddings.fastembed_provider import FastEmbedProvider
 from eval.multilingual_retrieval_matrix_adapter import (
+    ProductionMultilingualMatrixAdapter,
     _matrix_documents,
     _matrix_result,
     _preflight_dense_model,
@@ -37,6 +40,7 @@ def _corpus() -> list[dict[str, object]]:
                 "self_hosting_control": True,
             })
     rows[0]["multi_concept_gold_spans"] = ["a:1-2", "b:3-4"]
+    rows[0]["expected_source_spans"] = ["a:1-2", "b:3-4"]
     rows[1]["wrong_project_distractor"] = True
     rows[2]["absent_fact"] = True
     return rows
@@ -53,6 +57,8 @@ def _result_rows(*, candidate: bool = True) -> list[dict[str, object]]:
             "requested_mode": "hybrid",
             "mode_used": "hybrid",
             "fallback_used": False,
+            "candidate_counts": {"dense": 5},
+            "dense_contributed": True,
             "answer_kind": "insufficient_evidence" if row.get("absent_fact") else "docs_context",
             "wrong_project_evidence_accepted": 0,
             "visible_sources": [] if absent or not candidate else [{
@@ -73,7 +79,7 @@ def _write_frozen_corpus(root: Path) -> None:
     projects = [{
         "id": "docatlas",
         "project_identity": "git:github.com/Vanilla1999/DocAtlas",
-        "revision": "c9d009dffba11a3a19a4afe9b31b5061d09409d9",
+        "revision": "5da60e24cacebf6350411087eb4983597774895a",
         "self_hosting_control": True,
         "documents": [
             {
@@ -113,7 +119,12 @@ def _write_frozen_corpus(root: Path) -> None:
             "cases": cases,
         }
     development = payloads["development.json"]["cases"]  # type: ignore[index]
-    development[0]["multi_concept_gold_spans"] = ["concept-a", "concept-b"]
+    development[0]["expected_source_spans"] = [
+        "docatlas:fixture-0.md:1-1", "docatlas:fixture-1.md:1-1",
+    ]
+    development[0]["multi_concept_gold_spans"] = list(
+        development[0]["expected_source_spans"]
+    )
     development[1]["wrong_project_distractor"] = True
     development[2]["absent_fact"] = True
     development[2]["query"] = "Unknown fact that is absent"
@@ -188,6 +199,19 @@ def test_absent_fact_retrieval_is_scored_separately_from_recall():
     report = evaluate_results(candidate, _result_rows(candidate=False))
     assert report["metrics"]["recall_at_5_overall"] == 1.0
     assert report["metrics"]["absent_fact_candidate_source_spans"] == 1
+    assert report["checks"]["absent_fact_free"] is False
+    assert report["verdict"] == "FAIL"
+
+
+def test_missing_ru_dense_contribution_fails_gate():
+    candidate = _result_rows()
+    ru_row = next(row for row in candidate if row["language_pair"] == "ru-en" and not row.get("absent_fact"))
+    ru_row["candidate_counts"] = {"dense": 0}
+    ru_row["dense_contributed"] = False
+
+    report = evaluate_results(candidate, _result_rows(candidate=False))
+
+    assert report["checks"]["ru_dense_contribution"] is False
 
 
 def test_every_retrieved_span_requires_visible_provenance():
@@ -232,6 +256,8 @@ def test_matrix_executes_locked_systems_without_changing_default(tmp_path):
             "retrieved_source_spans": retrieved,
             "mode_used": system["requested_mode"],
             "fallback_used": False,
+            "candidate_counts": {"dense": 5},
+            "dense_contributed": True,
             "answer_kind": "docs_context",
             "wrong_project_evidence_accepted": 0,
             "visible_sources": [] if not retrieved else [{
@@ -262,6 +288,16 @@ def test_matrix_executes_locked_systems_without_changing_default(tmp_path):
     assert report["corpus_bound_to_protocol"] is False
     assert report["profile_activation_eligible"] is False
 
+    development_report = run_matrix(adapter, tmp_path, splits=("development",))
+    assert development_report["executed_splits"] == ["development"]
+    assert development_report["holdout_evaluations_against_open_lexical"] == {}
+    assert all(
+        row["split"] == "development"
+        for rows in development_report["systems"].values()
+        for row in rows
+    )
+    assert development_report["profile_activation_eligible"] is False
+
 
 def test_activation_requires_full_and_holdout_verdicts():
     passing = {"dense": {"verdict": "PASS"}}
@@ -277,6 +313,8 @@ def test_production_adapter_serializes_real_chunks_and_provenance():
     class Result:
         mode_used = "dense"
         failures = {}
+        candidate_counts = {"dense": 1}
+        contributions = {7: {"dense": 1}}
         chunks = [RetrievedChunk(
             source="docatlas::span-1",
             chunk_index=0,
@@ -290,6 +328,7 @@ def test_production_adapter_serializes_real_chunks_and_provenance():
                 "line_end": 7,
                 "project_doc_path": "docs/guide.md",
                 "section": "Guide",
+                "section_id": 7,
             },
         )]
 
@@ -305,10 +344,13 @@ def test_production_adapter_serializes_real_chunks_and_provenance():
         "path": "docs/guide.md",
         "section": "Guide",
     }]
+    assert row["candidate_counts"] == {"dense": 1}
+    assert row["dense_contributed"] is True
 
 
 def test_protocol_freezes_supported_multilingual_mpnet_model():
     model = validate_protocol_lock()["model_configuration"]
+    assert model["fastembed_version"] == "0.8.0"
     assert model["dense_model"] == "sentence-transformers/paraphrase-multilingual-mpnet-base-v2"
     assert model["dense_dimensions"] == 768
 
@@ -324,3 +366,49 @@ def test_dense_model_preflight_rejects_unsupported_registry_entry(monkeypatch, t
 
     with pytest.raises(ValueError, match="not supported"):
         _preflight_dense_model("missing/model", 768, str(tmp_path))
+
+
+def test_fastembed_provider_keeps_creation_time_model_cache(monkeypatch, tmp_path):
+    observed: list[str | None] = []
+
+    class FakeEmbedding:
+        def __init__(self, *, model_name, cache_dir):
+            observed.append(cache_dir)
+
+        def embed(self, texts, batch_size=None):
+            return iter([[0.0, 1.0]])
+
+        def query_embed(self, query):
+            return iter([[0.0, 1.0]])
+
+    import fastembed
+    monkeypatch.setattr(fastembed, "TextEmbedding", FakeEmbedding)
+    first = tmp_path / "first"
+    second = tmp_path / "second"
+    monkeypatch.setenv("DOCMANCER_FASTEMBED_CACHE_DIR", str(first))
+    provider = FastEmbedProvider(EmbeddingsConfig(dimensions=2))
+    monkeypatch.setenv("DOCMANCER_FASTEMBED_CACHE_DIR", str(second))
+
+    assert provider.embed_query("query") == [0.0, 1.0]
+    assert observed == [str(first)]
+
+
+def test_adapter_close_cleans_temporary_directory_after_qdrant_error():
+    adapter = ProductionMultilingualMatrixAdapter(qdrant_url="http://127.0.0.1:6333")
+    cleaned: list[bool] = []
+
+    class Temporary:
+        def cleanup(self):
+            cleaned.append(True)
+
+    adapter._temporary = Temporary()  # type: ignore[assignment]
+
+    def fail_cleanup(*, preserve_error):
+        raise RuntimeError("qdrant cleanup failed")
+
+    adapter._cleanup_candidate = fail_cleanup  # type: ignore[method-assign]
+
+    with pytest.raises(RuntimeError, match="qdrant cleanup failed"):
+        adapter.close()
+    assert cleaned == [True]
+    assert adapter._temporary is None

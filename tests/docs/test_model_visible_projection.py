@@ -73,7 +73,7 @@ def test_docs_context_merges_query_attribution_for_duplicate_evidence():
         "index_freshness": "synchronized",
         "risk_flags": [],
     }
-    projection, _ = project_docs_context(retrieval={
+    projection, snapshot = project_docs_context(retrieval={
         "context_pack": [
             {**source, "retrieval_query_ids": ["query-original"], "retrieval_query_matches": {
                 "query-original": {"qualified": True, "mode": "and"},
@@ -91,6 +91,9 @@ def test_docs_context_merges_query_attribution_for_duplicate_evidence():
     assert projection["sources"][0]["retrieval_query_ids"] == [
         "query-original", "query-lookup-1",
     ]
+    assert validate_model_visible_projection(
+        projection, snapshot=snapshot, max_tokens=800,
+    ) == []
 
 
 def test_docs_context_rejects_weak_or_only_source():

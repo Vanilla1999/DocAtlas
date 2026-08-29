@@ -85,6 +85,9 @@ def project_docs_context(
                 _payload(candidate_sources, decision=candidate_decision)
             ) <= max_tokens:
                 sources = candidate_sources
+                snapshot[evidence_id] = _snapshot_entry(
+                    snapshot[evidence_id]["source"], sources[existing_index],
+                )
             continue
         candidate_sources = [*sources, normalized]
         query_plan = retrieval.get("documentation_query_plan") or {}

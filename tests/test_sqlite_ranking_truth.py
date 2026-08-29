@@ -127,3 +127,20 @@ def test_lexical_match_trace_distinguishes_strict_and_weak_or_fallback(tmp_path)
     assert any(item.metadata["lexical_match"]["mode"] == "or_fallback" for item in fallback)
     assert all(item.metadata["lexical_match"]["qualified"] is False for item in fallback)
     assert "text" not in strict.metadata["lexical_match"]
+
+
+def test_or_fallback_requires_exact_terms_and_half_the_query(tmp_path):
+    store = _store(
+        tmp_path,
+        [_doc("docs/generic.md", "Configuration", "Generic indexing configuration reference")],
+    )
+
+    result = store.query(
+        "Telegram alerts indexing configuration", limit=1, budget=1_000,
+    )[0]
+    trace = result.metadata["lexical_match"]
+
+    assert trace["mode"] == "or_fallback"
+    assert trace["match_ratio"] == 0.5
+    assert trace["missing_exact_terms"] == ["telegram"]
+    assert trace["qualified"] is False

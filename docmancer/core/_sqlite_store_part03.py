@@ -336,23 +336,36 @@ class _SQLiteStorePart03:
     def _lexical_match_trace(
         cls, query: str, *, title: str, body: str, mode: str, bm25_cost: float,
     ) -> dict[str, Any]:
-        terms = tuple(dict.fromkeys(
-            token.casefold() for token in re.findall(r"\w+", cls._strip_stopwords(query))
+        raw_terms = tuple(
+            token for token in re.findall(r"[\w./:+-]+", cls._strip_stopwords(query))
             if token
+        )
+        terms = tuple(dict.fromkeys(token.casefold() for token in raw_terms))
+        exact_terms = tuple(dict.fromkeys(
+            token.casefold()
+            for token in raw_terms
+            if token.casefold() not in _GENERIC_QUERY_TERMS
+            and (
+                any(char in token for char in "._/:+-")
+                or any(char.isupper() for char in token[1:])
+                or (token[:1].isupper() and len(token) > 2)
+            )
         ))
         haystack = f"{title}\n{body}".casefold()
         matched = tuple(term for term in terms if re.search(rf"(?<!\w){re.escape(term)}(?!\w)", haystack))
+        missing_exact = tuple(term for term in exact_terms if term not in matched)
         ratio = len(matched) / len(terms) if terms else 0.0
-        required_ratio = 0.25 if len(terms) <= 4 else 0.5
+        required_ratio = 1.0 if len(terms) == 1 else 0.5
         qualified = bool(matched) and (
             mode == "and"
-            or len(terms) == 1
-            or ratio >= required_ratio
+            or (ratio >= required_ratio and not missing_exact)
         )
         return {
             "mode": mode,
             "query_terms": list(terms),
             "matched_terms": list(matched),
+            "exact_terms": list(exact_terms),
+            "missing_exact_terms": list(missing_exact),
             "query_term_count": len(terms),
             "matched_term_count": len(matched),
             "match_ratio": round(ratio, 4),

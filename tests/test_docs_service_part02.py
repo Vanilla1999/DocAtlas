@@ -672,7 +672,10 @@ def test_query_project_docs_runs_lookup_queries_as_retrieval_only_supplements(tm
                 chunk_index=0,
                 text="Request routing and retrieval lifecycle share one bounded architecture.",
                 score=1.0,
-                metadata={"token_estimate": 20},
+                metadata={
+                    "token_estimate": 20,
+                    "lexical_match": {"qualified": True, "mode": "and"},
+                },
             )]
 
     class Facade:
@@ -692,3 +695,64 @@ def test_query_project_docs_runs_lookup_queries_as_retrieval_only_supplements(tm
     assert chunks[0].metadata["retrieval_query_ids"] == (
         "query-lookup-1", "query-lookup-2", "query-original",
     )
+
+
+def test_query_project_docs_does_not_qualify_trace_less_candidates(tmp_path):
+    project = tmp_path / "trace-less"
+    project.mkdir()
+
+    class Agent:
+        config = SimpleNamespace(query=SimpleNamespace(default_limit=5))
+
+        def query(self, query, *, limit, budget, expand, filters):
+            return [RetrievedChunk(
+                source="docs/generic.md",
+                chunk_index=0,
+                text="Generic candidate without a relevance trace.",
+                score=0.9,
+                metadata={"token_estimate": 20},
+            )]
+
+    class Facade:
+        def _agent_instance(self):
+            return Agent()
+
+    chunks = ProjectDocsService(Facade()).query_project_docs(
+        str(project), "Telegram notifications", limit=3,
+    )
+
+    assert len(chunks) == 1
+    assert chunks[0].metadata["retrieval_query_ids"] == ()
+    assert chunks[0].metadata["retrieval_query_matches"]["query-original"]["qualified"] is False
+
+
+def test_query_project_docs_keeps_best_duplicate_score(tmp_path):
+    project = tmp_path / "scores"
+    project.mkdir()
+
+    class Agent:
+        config = SimpleNamespace(query=SimpleNamespace(default_limit=5))
+
+        def query(self, query, *, limit, budget, expand, filters):
+            score = 0.95 if filters.get("authority") == "source_of_truth" else 0.4
+            return [RetrievedChunk(
+                source="docs/architecture.md",
+                chunk_index=0,
+                text="Qualified architecture evidence.",
+                score=score,
+                metadata={
+                    "token_estimate": 20,
+                    "lexical_match": {"qualified": True, "mode": "and"},
+                },
+            )]
+
+    class Facade:
+        def _agent_instance(self):
+            return Agent()
+
+    chunks = ProjectDocsService(Facade()).query_project_docs(
+        str(project), "Architecture evidence", limit=3,
+    )
+
+    assert len(chunks) == 1
+    assert chunks[0].score == 0.95

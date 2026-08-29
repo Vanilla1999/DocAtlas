@@ -39,10 +39,6 @@ def qualified_query_ids(sources: Iterable[Mapping[str, Any]]) -> set[str]:
             for query_id, trace in matches.items()
             if isinstance(trace, Mapping) and trace.get("qualified") is True
         )
-        # Older projection boundaries may retain the already-qualified IDs
-        # while omitting diagnostics. Weak new OR hits carry neither.
-        if not matches:
-            qualified.update(str(value) for value in source.get("retrieval_query_ids") or ())
     return qualified
 
 

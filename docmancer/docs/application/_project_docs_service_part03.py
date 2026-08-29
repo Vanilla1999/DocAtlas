@@ -108,6 +108,7 @@ def _exact_document_index_chunks(
             "token_estimate": int(row.get("token_estimate") or 0),
             "stable_chunk_id": row.get("stable_chunk_id"),
             "parent_logical_id": row.get("parent_logical_id"),
+            "exact_path_match": True,
         })
         start, end = row.get("char_start"), row.get("char_end")
         if isinstance(start, int) and isinstance(end, int) and 0 <= start < end:
@@ -131,9 +132,9 @@ def _tag_retrieval_query(chunks: Any, query_id: str | None) -> list[Any]:
     for chunk in chunks:
         metadata = dict(chunk.metadata or {})
         trace = dict(metadata.get("lexical_match") or {})
-        # Dense/hybrid candidates have already passed their retrieval lane;
-        # lexical candidates carry the stricter AND/OR qualification trace.
-        trace.setdefault("qualified", "lexical_match" not in metadata)
+        # Retrieval is candidate generation. Only a lexical relevance trace or
+        # an explicitly resolved exact path may qualify model-visible context.
+        trace.setdefault("qualified", bool(metadata.get("exact_path_match")))
         trace.setdefault("lexical_score", float(chunk.score))
         matches = dict(metadata.get("retrieval_query_matches") or {})
         matches[query_id] = trace
@@ -350,9 +351,11 @@ class _ProjectDocsServicePart03:
                 merged_ids = tuple(
                     key for key, value in merged_matches.items() if value.get("qualified") is True
                 )
-                selected[existing_index] = selected[existing_index].model_copy(update={
+                existing = selected[existing_index]
+                preferred = chunk if chunk.score > existing.score else existing
+                selected[existing_index] = preferred.model_copy(update={
                     "metadata": {
-                        **(selected[existing_index].metadata or {}),
+                        **(preferred.metadata or {}),
                         "retrieval_query_matches": merged_matches,
                         "retrieval_query_ids": merged_ids,
                     },
@@ -693,7 +696,7 @@ class _ProjectDocsServicePart03:
                 content=chunk.text,
                 source=chunk.source,
                 url=None,
-                metadata=chunk.metadata or {},
+                metadata={**(chunk.metadata or {}), "score": float(chunk.score)},
                 stable_chunk_id=(chunk.metadata or {}).get("stable_chunk_id"),
                 parent_logical_id=(chunk.metadata or {}).get("parent_logical_id"),
                 display_content_hash=hashlib.sha256(chunk.text.encode("utf-8")).hexdigest(),

@@ -1,8 +1,8 @@
 {
   "schema_version": "multilingual-retrieval-quality-digests-v1",
   "files": {
-    "corpus.json": "24599ccb5bd41fb32dac4bb2640b7e458aaba89fedd0a1fc1bf264f7ea34ed5f",
-    "development.json": "8cdd8e2b8f295470d545ce8c1deb481d9117a7d52318857d1f59acee3f1ccd5a",
+    "corpus.json": "e02b5433e09c0aeaeb032005ad91fa960c4f9fb7d871407c199bf90661961c38",
+    "development.json": "b42f2eb0bc6a948031edd7aad573861b71a016671ab35213fcc6c35b873eb936",
     "holdout.json": "7df3075449622c13311ab110edd399c336424cfd01cffbc9949415cf83e85ac1",
     "adversarial.json": "f5da11a43501f345796c3b09f01d5ab79bc2f6742b896b065a54ab8336f34e8e"
   }

@@ -94,7 +94,10 @@ roots:
 
     assert payload is not None
     assert payload["status"] == "ok", payload.get("missing")
-    assert any(source["path_or_url"].endswith("zz-authoritative-plan.md") for source in payload["sources"])
+    assert any(
+        source["path_or_url"].endswith("zz-authoritative-plan.md")
+        for source in payload["sources"][:3]
+    )
     assert any(
         "cannot determine support" in source["snippet"]
         and "mandatory-facet witness" in source["snippet"]
@@ -176,10 +179,23 @@ roots:
         service,
     )
     assert absent is not None
-    assert absent["status"] == "ok"
-    assert absent["kind"] == "docs_context"
+    assert absent["status"] == "insufficient_evidence"
     assert absent["answer_supported"] is False
     assert absent["edit_ready"] is False
+
+    telegram = handle_context_tool(
+        "get_docs_context",
+        {
+            "question": "How are Telegram notifications configured after indexing?",
+            "project_path": str(project),
+            "mode": "project",
+            "delivery_strategy": "bounded_direct",
+        },
+        service,
+    )
+    assert telegram is not None
+    assert telegram["status"] == "insufficient_evidence"
+    assert not telegram.get("sources")
 
     foreign_root = tmp_path / "foreign"
     foreign_root.mkdir()

@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import argparse
 import hashlib
+import importlib.metadata
 import json
 import random
 import subprocess
@@ -84,12 +85,17 @@ def validate_protocol_lock() -> dict[str, Any]:
         errors.append("recall_at_5_per_language_pair_min")
     if quality.get("degraded_or_fallback_runs_max") != 0:
         errors.append("degraded_or_fallback_runs_max")
+    if quality.get("absent_fact_candidate_source_spans_max") != 0:
+        errors.append("absent_fact_candidate_source_spans_max")
+    if quality.get("ru_dense_contribution_required") is not True:
+        errors.append("ru_dense_contribution_required")
     if activation.get("change_default_retrieval") is not False:
         errors.append("change_default_retrieval")
     if activation.get("self_hosting_proves_external_generalization") is not False:
         errors.append("self_hosting_proves_external_generalization")
     if model != {
         "dense_provider": "fastembed",
+        "fastembed_version": "0.8.0",
         "dense_model": "sentence-transformers/paraphrase-multilingual-mpnet-base-v2",
         "dense_dimensions": 768,
         "sparse_model": "prithivida/Splade_PP_en_v1",
@@ -98,8 +104,18 @@ def validate_protocol_lock() -> dict[str, Any]:
         "allow_degraded": False,
     }:
         errors.append("model_configuration")
-    if len(str(artifacts.get("repository_revision") or "")) != 40:
+    elif importlib.metadata.version("fastembed") != model["fastembed_version"]:
+        errors.append("fastembed_version")
+    repository_revision = str(artifacts.get("repository_revision") or "")
+    if len(repository_revision) != 40:
         errors.append("repository_revision")
+    elif subprocess.run(
+        ["git", "merge-base", "--is-ancestor", repository_revision, "HEAD"],
+        cwd=ROOT,
+        check=False,
+        capture_output=True,
+    ).returncode != 0:
+        errors.append("repository_revision_reachability")
     digest_manifest = DATA_ROOT / "digests.json"
     if not digest_manifest.is_file() or artifacts.get("corpus_digest_manifest_sha256") != file_sha256(digest_manifest):
         errors.append("corpus_digest_manifest_sha256")
@@ -149,7 +165,13 @@ def validate_corpus(cases: Iterable[dict[str, Any]]) -> dict[str, Any]:
         semantic_splits.setdefault(family, set()).add(str(row.get("split") or ""))
     if any(len(splits) != 1 for splits in semantic_splits.values()):
         errors.append("semantic_family_split_isolation")
-    if not any(row.get("multi_concept_gold_spans") for row in rows):
+    if not any(
+        len(set(row.get("multi_concept_gold_spans") or ())) >= 2
+        and set(row.get("multi_concept_gold_spans") or ()).issubset(
+            set(row.get("expected_source_spans") or ())
+        )
+        for row in rows
+    ):
         errors.append("multi_concept_gold_spans")
     if not any(row.get("absent_fact") for row in rows):
         errors.append("absent_fact")
@@ -264,8 +286,21 @@ def _execution_corpus(corpus: FrozenCorpus) -> FrozenCorpus:
     )
 
 
-def run_matrix(adapter: MatrixAdapter, data_root: Path = DATA_ROOT) -> dict[str, Any]:
-    corpus = load_frozen_corpus(data_root)
+def run_matrix(
+    adapter: MatrixAdapter,
+    data_root: Path = DATA_ROOT,
+    *,
+    splits: tuple[str, ...] | None = None,
+) -> dict[str, Any]:
+    frozen_corpus = load_frozen_corpus(data_root)
+    selected_splits = tuple(dict.fromkeys(splits or EXPECTED_SPLITS))
+    if not selected_splits or any(split not in EXPECTED_SPLITS for split in selected_splits):
+        raise ValueError("matrix splits must be a non-empty subset of the frozen protocol splits")
+    corpus = FrozenCorpus(
+        projects=frozen_corpus.projects,
+        cases=tuple(case for case in frozen_corpus.cases if case.get("split") in selected_splits),
+        digests=frozen_corpus.digests,
+    )
     execution_corpus = _execution_corpus(corpus)
     lock = validate_protocol_lock()
     corpus_manifest_sha256 = file_sha256(data_root / "digests.json")
@@ -316,20 +351,28 @@ def run_matrix(adapter: MatrixAdapter, data_root: Path = DATA_ROOT) -> dict[str,
             corpus=corpus,
         )
         for system_id in EXPECTED_SYSTEMS[1:]
-    }
+    } if holdout_baseline else {}
+    from docmancer.core.config import RetrievalConfig
+
+    default_retrieval_changed = (
+        RetrievalConfig.model_fields["default_mode"].default != "lexical"
+    )
     return {
         "schema_version": "multilingual-retrieval-quality-matrix-v2",
         "protocol_sha256": protocol_sha256(),
         "corpus_digests": dict(corpus.digests),
         "systems": rows_by_system,
+        "executed_splits": list(selected_splits),
         "evaluations_against_open_lexical": evaluations,
         "holdout_evaluations_against_open_lexical": holdout_evaluations,
         "corpus_bound_to_protocol": corpus_bound,
         "corpus_digest_manifest_sha256": corpus_manifest_sha256,
         "profile_activation_eligible": _profile_activation_eligible(
             corpus_bound, evaluations, holdout_evaluations,
+            holdout_present="holdout" in selected_splits,
+            default_retrieval_changed=default_retrieval_changed,
         ),
-        "default_retrieval_changed": False,
+        "default_retrieval_changed": default_retrieval_changed,
         "external_generalization_claimed": False,
     }
 
@@ -338,11 +381,20 @@ def _profile_activation_eligible(
     corpus_bound: bool,
     evaluations: Mapping[str, Mapping[str, Any]],
     holdout_evaluations: Mapping[str, Mapping[str, Any]],
+    *,
+    holdout_present: bool = True,
+    default_retrieval_changed: bool = False,
 ) -> bool:
-    return corpus_bound and all(
-        report.get("verdict") == "PASS"
-        for reports in (evaluations, holdout_evaluations)
-        for report in reports.values()
+    return (
+        corpus_bound
+        and not default_retrieval_changed
+        and holdout_present
+        and bool(holdout_evaluations)
+        and all(
+            report.get("verdict") == "PASS"
+            for reports in (evaluations, holdout_evaluations)
+            for report in reports.values()
+        )
     )
 
 
@@ -450,6 +502,16 @@ def evaluate_results(
         1 for row in candidate
         if row.get("fallback_used") or row.get("mode_used") != row.get("requested_mode")
     )
+    ru_positive = [
+        row for row in candidate
+        if str(row.get("language_pair") or "").startswith("ru-")
+        and not row.get("absent_fact")
+    ]
+    ru_dense_contribution = bool(ru_positive) and all(
+        int((row.get("candidate_counts") or {}).get("dense") or 0) > 0
+        and row.get("dense_contributed") is True
+        for row in ru_positive
+    )
     required_provenance = set(lock["quality_gates"]["visible_source_provenance_required"])
     provenance_failures = _provenance_failures(
         candidate, required_provenance, _source_catalog(corpus) if corpus else None,
@@ -471,7 +533,9 @@ def evaluate_results(
         "minimum_improvement": improvement_points >= quality["improvement_percentage_points_min"],
         "positive_bootstrap_lower_bound": lower_bound > 0,
         "wrong_project_free": wrong_project == 0,
+        "absent_fact_free": absent_candidates <= quality["absent_fact_candidate_source_spans_max"],
         "no_degraded_or_fallback_runs": degraded == 0,
+        "ru_dense_contribution": ru_dense_contribution,
         "source_provenance_complete": provenance_failures == 0,
     }
     return {
@@ -485,6 +549,14 @@ def evaluate_results(
             "wrong_project_evidence_accepted": wrong_project,
             "absent_fact_candidate_source_spans": absent_candidates,
             "degraded_or_fallback_runs": degraded,
+            "ru_dense_contribution_rate": round(
+                sum(
+                    int((row.get("candidate_counts") or {}).get("dense") or 0) > 0
+                    and row.get("dense_contributed") is True
+                    for row in ru_positive
+                ) / len(ru_positive),
+                6,
+            ) if ru_positive else 0.0,
             "source_provenance_failures": provenance_failures,
         },
         "checks": checks,
@@ -497,6 +569,7 @@ def main() -> int:
     parser.add_argument("--validate-protocol", action="store_true")
     parser.add_argument("--validate-corpus", action="store_true")
     parser.add_argument("--run-production-matrix", action="store_true")
+    parser.add_argument("--split", action="append", choices=EXPECTED_SPLITS)
     parser.add_argument("--data-root", type=Path, default=DATA_ROOT)
     parser.add_argument("--output", type=Path)
     args = parser.parse_args()
@@ -513,7 +586,10 @@ def main() -> int:
 
         adapter = ProductionMultilingualMatrixAdapter()
         try:
-            report = run_matrix(adapter, args.data_root)
+            report = run_matrix(
+                adapter, args.data_root,
+                splits=tuple(args.split) if args.split else None,
+            )
         finally:
             adapter.close()
         rendered = json.dumps(report, ensure_ascii=False, indent=2) + "\n"
