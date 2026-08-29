@@ -16,5 +16,13 @@ python eval/project_answer_quality_v4_protocol.py --validate-protocol
 Run the hermetic provider-free v4 protocol and write its deterministic report with:
 
 ```bash
-python eval/project_answer_quality_v4_protocol.py --output /tmp/project-answer-quality-v4.json
+python eval/project_answer_quality_v4_protocol.py --output /tmp/project-answer-quality-v4-hermetic.json
 ```
+
+Run the unpatched current-repository context-first gate separately:
+
+```bash
+python scripts/run_project_docs_self_host_gate.py --output /tmp/project-answer-quality-v4-live.json
+```
+
+The live report records Top-3 relevance, MRR, distractor and historical-source rates, query coverage, citation hashes, expected fact checks, and false abstentions.

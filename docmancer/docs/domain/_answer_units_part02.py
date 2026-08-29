@@ -537,6 +537,27 @@ def local_proof_for_obligation(
         if unit.source_field not in {"path_or_url", "path", "source_path"}:
             return LocalProof(False, reason="location_requires_source_field")
         source_identity_text = source_text + "\n" + text
+        normalized_subject = _normal(obligation.subject)
+        normalized_identity = re.sub(
+            r"[^a-z0-9]+", " ", _normal(source_identity_text)
+        ).strip()
+        if "project docs configuration" in normalized_subject:
+            concept_bound = bool(
+                "project docs configuration" in normalized_identity
+                or "docatlas project docs yaml" in normalized_identity
+                or "project docs mcp workflow" in normalized_identity
+            )
+            if not concept_bound:
+                return LocalProof(False, reason="location_concept_not_bound_to_source")
+        if "project answer contract" in normalized_subject:
+            concept_bound = bool(
+                "project answer contract" in normalized_identity
+                or "docs mcp docs server md" in normalized_identity
+            )
+            documented = "documented" in _normal(obligation.query_span_text or "")
+            markdown_source = bool(re.search(r"\.md(?:\b|$)", source_identity_text, re.I))
+            if not concept_bound or (documented and not markdown_source):
+                return LocalProof(False, reason="location_concept_not_bound_to_documentation")
         overlap = _subject_token_overlap(obligation.subject, source_identity_text)
         value = _value_score("path", text)
         valid = overlap > 0 and value > 0

@@ -211,8 +211,21 @@ jobs:
       - name: Run recoverable documentation failure mutation gate
         run: python scripts/run_recovery_mutation_gate.py
 
+      - name: Run hermetic Project Docs answer-quality gate
+        run: python eval/project_answer_quality_v4_protocol.py --output "$RUNNER_TEMP/project-answer-quality-v4-hermetic.json"
+
       - name: Run Project Docs self-hosting closure gate
-        run: python scripts/run_project_docs_self_host_gate.py
+        run: python scripts/run_project_docs_self_host_gate.py --output "$RUNNER_TEMP/project-answer-quality-v4-live.json"
+
+      - name: Upload Project Docs quality reports
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: project-docs-quality-${{ github.run_id }}
+          path: |
+            ${{ runner.temp }}/project-answer-quality-v4-hermetic.json
+            ${{ runner.temp }}/project-answer-quality-v4-live.json
+          if-no-files-found: error
+          retention-days: 14
 
       - name: Run question surface regression gate
         run: python scripts/run_question_surface_gate.py

@@ -121,6 +121,7 @@ def test_stdio_smoke_requires_cited_content() -> None:
     ]
     assert "output_mode" not in canonical_block
     assert 'compatibility_query = {**canonical_query, "output_mode": "compact"}' in text
+    assert "validate_context_payload(answer, required_fragment=NEEDLE)" in text
 
 
 def test_stdio_smoke_uses_primary_docatlas_home_without_legacy_writes() -> None:
@@ -133,7 +134,8 @@ def test_stdio_smoke_uses_primary_docatlas_home_without_legacy_writes() -> None:
 
 
 def test_stdio_smoke_accepts_structured_content_and_legacy_json_text() -> None:
-    from scripts.docs_mcp_stdio_smoke import payload, text_payload
+    from scripts.docs_mcp_stdio_smoke import payload, text_payload, validate_context_payload
+    from scripts.run_project_docs_self_host_gate import GOLD_CASES, _validate_context_result
 
     class Text:
         def __init__(self, text: str) -> None:
@@ -151,6 +153,32 @@ def test_stdio_smoke_accepts_structured_content_and_legacy_json_text() -> None:
     assert text_payload(Result(text='{"status": "ok", "kind": "docs_answer"}')) == expected
     with pytest.raises(AssertionError, match="included structuredContent"):
         text_payload(Result(structured=expected, text='{"status": "ok"}'))
+    validate_context_payload({
+        "status": "ok",
+        "kind": "docs_context",
+        "support_status": "retrieval_only",
+        "context_status": "ready",
+        "answer_supported": False,
+        "answer_available": False,
+        "sources": [{
+            "path_or_url": "README.md",
+            "snippet": "needle",
+            "content_sha256": "a" * 64,
+        }],
+    }, required_fragment="needle")
+    by_id = {case.surface_case_id: case for case in GOLD_CASES if case.surface_case_id is not None}
+    assert set(by_id) == set(range(1, 21))
+    assert all(case.relevant_paths and case.required_fragments for case in by_id.values())
+    invalid_citation = {
+        "kind": "docs_context",
+        "context_status": "ready",
+        "answer_supported": False,
+        "answer_available": False,
+        "edit_ready": False,
+        "safe_to_answer_from_sources": True,
+        "sources": [{"snippet": "grounded", "content_sha256": "z" * 64}],
+    }
+    assert _validate_context_result(invalid_citation) == "source lacks a grounded snippet or content hash"
 
 
 def test_opencode_installer_enables_text_fallback_without_overwriting_other_environment() -> None:

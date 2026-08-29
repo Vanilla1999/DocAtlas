@@ -387,18 +387,47 @@ def test_prefetch_project_docs_prefetches_rust_docs_rs(tmp_path, monkeypatch):
     agent = FakeAgent()
     service = _service(tmp_path, monkeypatch, agent)
 
-    result = service.prefetch_project_docs(
-        str(project),
-        include_flutter=False,
-        include_packages=["serde"],
+    class InlineThread:
+        def __init__(self, *, target, args=(), kwargs=None, daemon=None):
+            self.target = target
+            self.args = args
+            self.kwargs = kwargs or {}
+
+        def start(self):
+            self.target(*self.args, **self.kwargs)
+
+    monkeypatch.setattr(
+        "docmancer.docs.application.dependency_project_prefetch.threading.Thread",
+        InlineThread,
+    )
+    payload = call_docs_tool_payload(
+        "prepare_docs",
+        {
+            "action": "prefetch_project_dependency_docs",
+            "project_path": str(project),
+            "include_flutter": False,
+            "include_dart": False,
+            "include_rust": True,
+            "include_go": False,
+            "include_packages": ["serde"],
+            "force_refresh": True,
+            "continue_on_error": False,
+        },
+        service,
     )
 
-    assert len(result.results) == 1
-    assert result.results[0].library_id == "rust:serde@1.0.228:api"
-    assert result.results[0].docs_url == "https://docs.rs/serde/1.0.228/"
+    assert payload["tool"] == "prepare_docs"
+    assert payload["action"] == "prefetch_project_dependency_docs"
+    assert payload["status"] == "running"
+    job = service.jobs.get(payload["job_id"])
+    assert job is not None
+    assert job.status == "succeeded"
+    assert job.total_targets == job.completed_targets == 1
+    assert job.failed_targets == 0
     assert agent.add_calls == ["https://docs.rs/serde/1.0.228/"]
-    assert result.detected_ecosystems == ["rust"]
-    assert result.resolution_summary["exact_versions"] == 2
+    record = service.registry.get("serde", ecosystem="rust", version="1.0.228", source_type="api")
+    assert record is not None
+    assert record.docs_url == "https://docs.rs/serde/1.0.228/"
 
 
 def test_prefetch_project_docs_does_not_treat_unregistered_npm_package_as_pub(tmp_path, monkeypatch):

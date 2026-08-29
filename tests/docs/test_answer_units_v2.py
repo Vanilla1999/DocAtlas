@@ -68,6 +68,29 @@ def test_location_uses_source_field_not_fake_content_offsets():
     assert unit.kind == "source_field"
     assert unit.char_start is None and unit.char_end is None
     assert proof.reason == "location"
+    project_docs = _obligation("Where is project docs configuration defined?")
+    cleanup = extract_answer_units(
+        "docs/index-cleanup.md",
+        source_fields={"path_or_url": "docs/index-cleanup.md"},
+    )
+    catalog = extract_answer_units(
+        "docs/project-docs-mcp-workflow.md",
+        source_fields={"path_or_url": "docs/project-docs-mcp-workflow.md"},
+    )
+    assert best_local_proof(project_docs, cleanup) is None
+    assert best_local_proof(project_docs, catalog) is not None
+
+    answer_contract = _obligation("Where is the project answer contract documented?")
+    python_source = extract_answer_units(
+        "docmancer/docs/domain/_project_answer_contract_part01.py",
+        source_fields={"path_or_url": "docmancer/docs/domain/_project_answer_contract_part01.py"},
+    )
+    markdown_source = extract_answer_units(
+        "docs/project-answer-contract.md",
+        source_fields={"path_or_url": "docs/project-answer-contract.md"},
+    )
+    assert best_local_proof(answer_contract, python_source) is None
+    assert best_local_proof(answer_contract, markdown_source) is not None
 
 
 def test_workflow_requires_one_bounded_contiguous_group():

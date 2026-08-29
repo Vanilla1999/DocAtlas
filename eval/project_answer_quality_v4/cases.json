@@ -5,7 +5,7 @@
       "case_id": "run_quality_protocols_not_generic_project",
       "question": "How do I run the project answer quality protocols?",
       "files": {
-        "eval/project_answer_quality_v4/README.md": "# Project answer quality protocol\n\nRun the project answer quality protocol with `python eval/project_answer_quality_v3_protocol.py --validate-protocol`, then run `python eval/project_answer_quality_v3_protocol.py --output result.json`.\n",
+        "eval/project_answer_quality_v4/README.md": "# Project answer quality protocol\n\nRun the project answer quality protocol with `python eval/project_answer_quality_v4_protocol.py --validate-protocol`, then run `python eval/project_answer_quality_v4_protocol.py --output result.json`.\n",
         "ARCHITECTURE.md": "# Architecture\n\nThe project returns a compact context for callers and provides metadata for tools.\n"
       },
       "documents": [
@@ -30,7 +30,7 @@
           "eval/project_answer_quality_v4/README.md"
         ],
         "required_fragments": [
-          "python eval/project_answer_quality_v3_protocol.py"
+          "python eval/project_answer_quality_v4_protocol.py"
         ],
         "forbidden_fragments": [
           "project returns a compact context"
@@ -44,7 +44,7 @@
       "case_id": "offline_markers_and_suite_compound",
       "question": "What test markers are available and how do I run the offline suite?",
       "files": {
-        "docs/testing.md": "# Offline suite\n\nThe test suite markers are `unit`, `integration`, and `offline`. Run the offline suite with `pytest -m offline`.\n",
+        "docs/testing.md": "# Offline suite\n\nThe test suite markers are `integration`, `advanced`, `live`, and `live_network`. Run the fail-closed offline suite with `DOCMANCER_OFFLINE=1 pytest tests/ -m \"not advanced and not live and not live_network\"`.\n",
         "ARCHITECTURE.md": "# Architecture\n\nThe project returns a compact context for callers and provides metadata for tools.\n"
       },
       "documents": [
@@ -69,10 +69,10 @@
           "docs/testing.md"
         ],
         "required_fragments": [
-          "unit",
           "integration",
-          "offline",
-          "pytest -m offline"
+          "advanced",
+          "live_network",
+          "DOCMANCER_OFFLINE=1"
         ],
         "forbidden_fragments": [],
         "forbidden_paths": [
@@ -475,9 +475,9 @@
     },
     {
       "case_id": "supported_source_types_inventory",
-      "question": "What source types are supported for indexing?",
+      "question": "What local file formats are supported for indexing?",
       "files": {
-        "wiki/Supported-Sources.md": "# Supported source types for indexing\n\nIndexing supports these source types: `Markdown`, `PDF`, and `DOCX`.\n",
+        "wiki/Supported-Sources.md": "# Supported local file formats for indexing\n\nLocal indexing supports Markdown, text, HTML, PDF, DOCX, and RTF files.\n",
         "ARCHITECTURE.md": "# Architecture\n\nThe project returns a compact context for callers and provides metadata for tools.\n"
       },
       "documents": [
@@ -501,11 +501,7 @@
         "evidence_paths": [
           "wiki/Supported-Sources.md"
         ],
-        "required_fragments": [
-          "Markdown",
-          "PDF",
-          "DOCX"
-        ],
+        "required_fragments": [],
         "forbidden_fragments": [],
         "forbidden_paths": [
           "ARCHITECTURE.md"

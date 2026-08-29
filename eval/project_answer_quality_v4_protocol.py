@@ -91,6 +91,7 @@ def run(output: Path | None = None) -> dict[str, Any]:
     supported = [row for row, case in zip(results, cases) if case.expected.status == "ok"]
     report = {
         "schema_version": "project-answer-quality-result-v4",
+        "run_mode": "hermetic",
         "provider_free": True,
         "protocol_sha256": v1.file_sha256(LOCK_PATH),
         "case_file_sha256": lock["case_file_sha256"],
@@ -107,6 +108,16 @@ def run(output: Path | None = None) -> dict[str, Any]:
             "abstention_correctness": v1._mean(results, "abstention_correctness"),
             "contamination_free": v1._mean(results, "contamination_free"),
             "maximum_visible_tokens": max(row.visible_tokens for row in results),
+            "mrr": sum(
+                1.0 / (row.candidate_paths.index(case.expected.evidence_paths[0]) + 1)
+                if case.expected.evidence_paths and case.expected.evidence_paths[0] in row.candidate_paths else 0.0
+                for row, case in zip(results, cases)
+                if case.expected.status == "ok"
+            ) / max(len(supported), 1),
+            "false_abstention_count": sum(
+                row.status != "ok" for row, case in zip(results, cases)
+                if case.expected.status == "ok"
+            ),
         },
         "verdict": "PASS" if all(row.passed for row in results) else "FAIL",
         "results": [
@@ -122,6 +133,11 @@ def run(output: Path | None = None) -> dict[str, Any]:
                 "candidate_paths": list(row.candidate_paths),
                 "visible_tokens": row.visible_tokens,
                 "decision_hash": row.decision_hash,
+                "kind": row.kind,
+                "support_status": row.support_status,
+                "answer_supported": row.answer_supported,
+                "query_coverage": row.query_coverage,
+                "citations": list(row.citations),
             }
             for row in results
         ],

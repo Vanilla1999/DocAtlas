@@ -63,6 +63,11 @@ class CaseResult:
     candidate_paths: tuple[str, ...]
     visible_tokens: int
     decision_hash: str | None
+    kind: str
+    support_status: str
+    answer_supported: bool
+    query_coverage: float
+    citations: tuple[Mapping[str, Any], ...]
 
 
 def canonical_bytes(value: Any) -> bytes:
@@ -399,6 +404,15 @@ def run_case(case: QualityCase, workspace: Path) -> CaseResult:
         candidate_paths=candidate_paths,
         visible_tokens=visible_tokens,
         decision_hash=str(payload.get("decision_hash") or "") or None,
+        kind=str(payload.get("kind") or ""),
+        support_status=str(payload.get("support_status") or ""),
+        answer_supported=bool(payload.get("answer_supported")),
+        query_coverage=float(payload.get("query_coverage") or 0.0),
+        citations=tuple({
+            "path": str(row.get("path_or_url") or ""),
+            "evidence_id": str(row.get("evidence_id") or ""),
+            "content_sha256": str(row.get("content_sha256") or ""),
+        } for row in payload.get("sources") or ()),
     )
 
 

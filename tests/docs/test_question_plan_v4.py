@@ -71,6 +71,21 @@ def test_question_plan_splits_compound_questions_into_mandatory_facets():
     assert all(r.mandatory for r in rows)
     assert len(contract.clauses) if hasattr(contract, "clauses") else True
 
+    project_docs_location = build_documentation_query_plan(
+        "Where is project docs configuration defined?"
+    )
+    assert project_docs_location.queries[-1].text == (
+        "docatlas.project-docs.yaml project docs catalog configuration"
+    )
+    assert project_docs_location.queries[-1].origin == "concept_alias"
+
+    contract_location = build_documentation_query_plan(
+        "Where is the project answer contract documented?"
+    )
+    assert contract_location.queries[-1].text == (
+        "project answer contract documentation docs/mcp-docs-server.md"
+    )
+
     _contract, rows = _rows("What is the model-visible projection and how is the answer token-bounded?")
     assert [(r.kind, r.subject, r.relation) for r in rows] == [
         ("definition", "model-visible projection", None),

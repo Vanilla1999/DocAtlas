@@ -7,6 +7,7 @@ import json
 import os
 import sys
 import tempfile
+import string
 from pathlib import Path
 
 from docmancer.mcp.agent_config import AgentTarget, register_server
@@ -33,6 +34,30 @@ def text_payload(result: object) -> dict:
     if not content or not hasattr(content[0], "text"):
         raise AssertionError(f"missing JSON text-only tool response: {result!r}")
     return json.loads(content[0].text)
+
+
+def validate_context_payload(answer: dict, *, required_fragment: str) -> None:
+    assert answer.get("status") == "ok", answer
+    kind = answer.get("kind")
+    assert kind in {"docs_answer", "docs_context"}, answer
+    if kind == "docs_answer":
+        assert answer.get("support_status") == "supported", answer
+        assert answer.get("answer_supported") is True, answer
+        assert answer.get("answer_available") is True, answer
+    else:
+        assert answer.get("support_status") == "retrieval_only", answer
+        assert answer.get("context_status") == "ready", answer
+        assert answer.get("answer_supported") is False, answer
+        assert answer.get("answer_available") is False, answer
+    rendered = json.dumps(answer, sort_keys=True)
+    assert required_fragment in rendered, answer
+    sources = answer.get("sources") or []
+    assert sources, answer
+    for source in sources:
+        digest = str(source.get("content_sha256") or "")
+        assert source.get("path_or_url"), source
+        assert source.get("snippet"), source
+        assert len(digest) == 64 and all(char in string.hexdigits.lower()[:16] for char in digest), source
 
 
 async def smoke() -> None:
@@ -82,6 +107,7 @@ async def smoke() -> None:
                 }))
                 assert sync.get("status") not in {"error", "failed"}, sync
                 answer = payload(await session.call_tool("get_docs_context", canonical_query))
+                validate_context_payload(answer, required_fragment=NEEDLE)
                 rendered = json.dumps(answer, sort_keys=True)
                 assert "README.md" in rendered, answer
                 assert NEEDLE in rendered, answer
