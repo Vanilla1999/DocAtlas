@@ -1,0 +1,190 @@
+name: Rebuild PR 173 into reviewed source
+
+on:
+  push:
+    branches:
+      - fix/context7-style-project-chat-v2
+    paths:
+      - .github/workflows/_rebuild-pr-173.yml
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: rebuild-pr-173-reviewed-source
+  cancel-in-progress: false
+
+jobs:
+  rebuild:
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    env:
+      BRANCH: fix/context7-style-project-chat-v2
+      BASE_BRANCH: feat/weak-model-project-chat-safety
+      ORIGINAL_HEAD: ${{ github.sha }}
+      DOCATLAS_OFFLINE: "1"
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: fix/context7-style-project-chat-v2
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Preserve deterministic patch scripts and reset to the PR base
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/pr173-patches
+          cp scripts/_apply_context7_project_chat_v2.py /tmp/pr173-patches/
+          cp scripts/_repair_context7_project_chat_v2.py /tmp/pr173-patches/
+          cp scripts/_finalize_context7_project_chat_v2.py /tmp/pr173-patches/
+          cp scripts/_fix_context7_live_gate_v2.py /tmp/pr173-patches/
+          cp scripts/_fix_context7_ru_test_stem.py /tmp/pr173-patches/
+          git fetch origin "$BASE_BRANCH"
+          git reset --hard "origin/$BASE_BRANCH"
+          mkdir -p scripts
+          cp /tmp/pr173-patches/*.py scripts/
+
+      - name: Reconstruct the final production tree
+        shell: bash
+        run: |
+          set -euo pipefail
+          python scripts/_apply_context7_project_chat_v2.py
+          python scripts/_repair_context7_project_chat_v2.py
+          python scripts/_finalize_context7_project_chat_v2.py
+          python scripts/_fix_context7_live_gate_v2.py
+          python scripts/_fix_context7_ru_test_stem.py
+
+          rm -f scripts/_apply_context7_project_chat_v2.py
+          rm -f scripts/_repair_context7_project_chat_v2.py
+          rm -f scripts/_finalize_context7_project_chat_v2.py
+          rm -f scripts/_fix_context7_live_gate_v2.py
+          rm -f scripts/_fix_context7_ru_test_stem.py
+          rm -f .github/workflows/_apply-context7-project-chat-v2.yml
+          rm -f .github/workflows/_repair-context7-project-chat-v2.yml
+          rm -f .github/workflows/_validate-context7-project-chat-v2.yml
+          rm -f .github/workflows/_finalize-context7-project-chat-v2.yml
+          rm -f .github/workflows/_fix-context7-live-gate-v2.yml
+          rm -f .github/workflows/_fix-context7-ru-test-stem.yml
+          rm -f .github/workflows/_workspace-export.yml
+          rm -f .github/workflows/_rebuild-pr-173.yml
+
+          python -m compileall -q docmancer eval tests
+          git diff --check
+
+      - name: Install exact locked environment
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m pip install --disable-pip-version-check "uv==0.9.25"
+          uv sync --frozen
+
+      - name: Run focused regression gates
+        shell: bash
+        run: |
+          set -euo pipefail
+          uv run pytest -q \
+            tests/docs/test_context7_style_project_chat.py \
+            tests/docs/test_question_plan_v4.py \
+            tests/docs/test_model_visible_projection.py \
+            tests/docs/test_model_visible_projection_part02.py \
+            tests/docs/test_mcp_docs_tools_registration.py \
+            tests/test_project_chat_quality_v1_protocol.py \
+            tests/test_config_resolution.py \
+            tests/test_source_isolation_regression.py \
+            | tee /tmp/pr173-focused-tests.txt
+          uv run python -m eval.project_chat_quality_v1_protocol \
+            | tee /tmp/pr173-existing-project-chat.json
+          uv run python -m eval.project_chat_context7_v1_protocol \
+            | tee /tmp/pr173-context7-contract.json
+          uv run python scripts/run_question_surface_gate.py \
+            | tee /tmp/pr173-question-surface.txt
+          uv run python scripts/run_recovery_contract_gate.py \
+            | tee /tmp/pr173-recovery-contract.txt
+
+      - name: Run self-hosted public RU and EN project-chat questions
+        shell: bash
+        run: |
+          set -euo pipefail
+          uv run python -m eval.project_chat_context7_v1_protocol --live \
+            | tee /tmp/pr173-context7-live.json
+
+      - name: Run full offline regression suite
+        shell: bash
+        run: |
+          set -euo pipefail
+          uv run pytest -q --maxfail=1 | tee /tmp/pr173-full-pytest.txt
+
+      - name: Upload exact validation evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: pr-173-reviewed-validation-${{ github.sha }}
+          path: |
+            /tmp/pr173-focused-tests.txt
+            /tmp/pr173-existing-project-chat.json
+            /tmp/pr173-context7-contract.json
+            /tmp/pr173-question-surface.txt
+            /tmp/pr173-recovery-contract.txt
+            /tmp/pr173-context7-live.json
+            /tmp/pr173-full-pytest.txt
+          retention-days: 2
+
+      - name: Commit only reviewed production and test changes
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add -A
+          test -n "$(git diff --cached --name-only)"
+          if git diff --cached --name-only | grep -E '(^|/)(_[a-z-]*context7.*\.yml|_[a-z_]*context7.*\.py|_workspace-export\.yml)$'; then
+            echo "Temporary workflow or patch machinery remains in the final diff" >&2
+            exit 1
+          fi
+          git commit -m "feat: make project chat retrieval-first for weak models"
+          git push --force-with-lease="refs/heads/$BRANCH:$ORIGINAL_HEAD" origin "HEAD:refs/heads/$BRANCH"
+
+      - name: Update PR description but keep it in draft for manual review
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          final_sha="$(git rev-parse HEAD)"
+          cat > /tmp/pr-body.md <<EOF
+          ## Goal
+
+          Make project chat retrieve bounded project documentation from ordinary natural-language questions, similarly to Context7, while preserving DocAtlas proof and edit safety.
+
+          ## Reconstructed implementation
+
+          - project-scoped retrieval is separated from strict answer certification;
+          - broad or incompletely parsed questions may return non-authoritative \`docs_context\`;
+          - only complete local proposition proof may upgrade the result to \`docs_answer\`;
+          - explicit mutation requests continue through strict \`patch_context\`;
+          - bounded EN/RU retrieval aliases cover newcomer, setup, configuration, storage, architecture, testing, offline, sync and troubleshooting questions;
+          - generic CLI-command wording is not treated as the Docs MCP public-tool inventory;
+          - generated recovery does not mix English wrappers with Russian fragments;
+          - semantic retrieval provenance may qualify context but cannot independently prove an answer;
+          - legacy \`.docmancer\` state is diagnosed without reading or migrating it implicitly;
+          - temporary self-applying workflows and patch scripts are absent from the final diff.
+
+          ## Validation performed before the clean force-push
+
+          - focused parser, projection, MCP-surface, config and isolation tests;
+          - existing project-chat quality protocol;
+          - Context7-style frozen RU/EN contract protocol;
+          - frozen question-surface and recovery-contract gates;
+          - self-hosted public \`get_docs_context\` RU/EN run;
+          - full offline pytest suite.
+
+          Reconstructed source commit: \`$final_sha\`.
+
+          The PR intentionally remains draft until a separate diff review and qualitative question-answer audit are complete.
+          EOF
+          gh pr edit 173 --repo Vanilla1999/DocAtlas --body-file /tmp/pr-body.md
+          gh pr ready 173 --repo Vanilla1999/DocAtlas >/dev/null 2>&1 && gh pr ready 173 --repo Vanilla1999/DocAtlas --undo >/dev/null 2>&1 || true
