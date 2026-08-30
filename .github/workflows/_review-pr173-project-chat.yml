@@ -1,0 +1,360 @@
+name: Review PR 173 project chat
+
+on:
+  push:
+    branches:
+      - fix/context7-style-project-chat-v2
+    paths:
+      - .github/workflows/_review-pr173-project-chat.yml
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: review-pr173-project-chat
+  cancel-in-progress: false
+
+jobs:
+  review:
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: fix/context7-style-project-chat-v2
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Verify PR contains real implementation, not temporary machinery
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch origin feat/weak-model-project-chat-safety fix/context7-style-project-chat-v2
+          git checkout -B fix/context7-style-project-chat-v2 origin/fix/context7-style-project-chat-v2
+          required=(
+            docmancer/docs/domain/project_retrieval_intent.py
+            eval/project_chat_context7_v1_protocol.py
+            eval/project_chat_context7_v1/cases.json
+            tests/docs/test_context7_style_project_chat.py
+            docs/adr/0002-retrieval-first-project-chat.md
+          )
+          for path in "${required[@]}"; do
+            test -f "$path" || { echo "Missing required implementation file: $path" >&2; exit 1; }
+          done
+          leftovers="$(git diff --name-only origin/feat/weak-model-project-chat-safety...HEAD | grep -E '(^|/)_.*context7.*(yml|py)$|_workspace-export' || true)"
+          leftovers="$(printf '%s\n' "$leftovers" | grep -v '^.github/workflows/_review-pr173-project-chat.yml$' || true)"
+          if [[ -n "$leftovers" ]]; then
+            echo "Temporary machinery remains in PR diff:" >&2
+            echo "$leftovers" >&2
+            exit 1
+          fi
+
+      - name: Install locked environment
+        run: |
+          python -m pip install --disable-pip-version-check 'uv==0.9.25'
+          uv sync --frozen
+
+      - name: Run code-review regression suite
+        id: regression
+        continue-on-error: true
+        env:
+          DOCATLAS_OFFLINE: '1'
+        shell: bash
+        run: |
+          set -o pipefail
+          mkdir -p /tmp/pr173-review
+          {
+            uv run pytest -q --maxfail=1 \
+              tests/docs/test_context7_style_project_chat.py \
+              tests/docs/test_question_plan_v4.py \
+              tests/docs/test_model_visible_projection.py \
+              tests/docs/test_model_visible_projection_part02.py \
+              tests/docs/test_mcp_docs_tools_registration.py \
+              tests/test_project_chat_quality_v1_protocol.py \
+              tests/test_config_resolution.py \
+              tests/test_source_isolation_regression.py \
+              tests/test_unified_docs_context_mcp.py \
+              tests/test_docs_service_part02.py
+            uv run python -m eval.project_chat_quality_v1_protocol
+            uv run python -m eval.project_chat_context7_v1_protocol
+            uv run python scripts/run_question_surface_gate.py
+            uv run python scripts/run_recovery_contract_gate.py
+            python -m compileall -q docmancer eval tests
+            git diff --check
+          } 2>&1 | tee /tmp/pr173-review/regression.log
+
+      - name: Run unseen RU/EN public-path questions
+        id: holdout
+        continue-on-error: true
+        env:
+          DOCATLAS_OFFLINE: '1'
+        shell: bash
+        run: |
+          set -o pipefail
+          cat > /tmp/pr173-review/run_holdout.py <<'PY'
+          from __future__ import annotations
+
+          import json
+          from pathlib import Path
+
+          from scripts.run_project_docs_self_host_gate import LiveCase, run as run_live
+
+          BLOCKED = ("eval/", ".hermes/plans/", "roadmap/")
+          CASES = (
+              LiveCase(
+                  question="Я установил DocAtlas. Как убедиться, что он вообще работает?",
+                  relevant_paths=("README.md", "CONTRIBUTING.md", "wiki/Install-Targets.md"),
+                  expected_kind="docs_context",
+                  forbidden_source_prefixes=BLOCKED,
+              ),
+              LiveCase(
+                  question="С какого файла новичку лучше начать знакомство с репозиторием?",
+                  relevant_paths=("README.md", "CONTRIBUTING.md", "docs/INDEX.md", "docs/PROJECT_MAP.md"),
+                  expected_kind="docs_context",
+                  forbidden_source_prefixes=BLOCKED,
+              ),
+              LiveCase(
+                  question="Какие команды выполнить сразу после установки DocAtlas?",
+                  relevant_paths=("README.md", "wiki/Commands.md", "wiki/Install-Targets.md"),
+                  expected_kind="docs_context",
+                  forbidden_source_prefixes=BLOCKED,
+                  forbidden_answer_fragments=("three public Docs MCP tools", "три публичных инструмента"),
+              ),
+              LiveCase(
+                  question="Где перечислить документы, которым проект доверяет при ответах?",
+                  relevant_paths=("wiki/Configuration.md", "docs/project-docs-mcp-workflow.md", "docs/mcp-docs-server.md"),
+                  expected_kind="docs_context",
+                  forbidden_source_prefixes=BLOCKED,
+              ),
+              LiveCase(
+                  question="Можно ли пользоваться DocAtlas полностью без доступа к интернету?",
+                  relevant_paths=("README.md", "docs/testing.md", "wiki/Architecture.md", "wiki/Configuration.md"),
+                  expected_kind="docs_context",
+                  forbidden_source_prefixes=BLOCKED,
+              ),
+              LiveCase(
+                  question="Куда сохраняется индекс и как не смешиваются данные разных репозиториев?",
+                  relevant_paths=("wiki/Architecture.md", "docs/index-cleanup.md", "docs/modules/storage-mutation-coordination.md"),
+                  expected_kind="docs_context",
+                  forbidden_source_prefixes=BLOCKED,
+              ),
+              LiveCase(
+                  question="На какие части режется большой Markdown-файл во время индексации?",
+                  relevant_paths=("wiki/Architecture.md",),
+                  expected_kind="docs_context",
+                  forbidden_source_prefixes=BLOCKED,
+              ),
+              LiveCase(
+                  question="Что обязательно проверить перед открытием pull request?",
+                  relevant_paths=("CONTRIBUTING.md", "docs/testing.md", "docs/RELEASE_CHECKLIST.md"),
+                  expected_kind="docs_context",
+                  forbidden_source_prefixes=BLOCKED,
+              ),
+              LiveCase(
+                  question="Я изменил проектную документацию. Как обновить локальный индекс?",
+                  relevant_paths=("README.md", "docs/project-docs-mcp-workflow.md", "docs/capabilities.md"),
+                  expected_kind="docs_context",
+                  required_facts_by_path=(("docs/project-docs-mcp-workflow.md", "sync_project_docs"),),
+                  forbidden_source_prefixes=BLOCKED,
+              ),
+              LiveCase(
+                  question="Почему поиск может перестать видеть свежие изменения документации и что тогда проверить?",
+                  relevant_paths=("wiki/Troubleshooting.md", "docs/project-docs-mcp-workflow.md"),
+                  expected_kind="docs_context",
+                  forbidden_source_prefixes=BLOCKED,
+              ),
+              LiveCase(
+                  question="Расскажи простыми словами, как в целом устроена архитектура DocAtlas.",
+                  relevant_paths=("wiki/Architecture.md", "docs/PROJECT_MAP.md"),
+                  expected_kind="docs_context",
+                  forbidden_source_prefixes=BLOCKED,
+                  forbidden_answer_fragments=("Legacy direct library/project tools",),
+              ),
+              LiveCase(
+                  question="Какой точной командой поднять сервер Docs MCP?",
+                  relevant_paths=("README.md", "wiki/Commands.md", "docs/mcp-docs-server.md", "docs/project-docs-demo.md"),
+                  expected_kind="docs_answer",
+                  required_facts_by_path=(("docs/mcp-docs-server.md", "docs-serve"),),
+                  forbidden_source_prefixes=BLOCKED,
+              ),
+              LiveCase(
+                  question="Перечисли публичные инструменты Docs MCP и не путай их с CLI-командами.",
+                  relevant_paths=("README.md", "docs/mcp-docs-server.md"),
+                  expected_kind="docs_answer",
+                  required_facts_by_path=(("docs/mcp-docs-server.md", "get_docs_context"),),
+                  forbidden_source_prefixes=BLOCKED,
+              ),
+              LiveCase(
+                  question="Как система выбирает доказательства из найденных разделов документации?",
+                  relevant_paths=("docs/modules/evidence-selection.md", "docs/mcp-docs-server.md"),
+                  expected_kind="docs_context",
+                  forbidden_source_prefixes=BLOCKED,
+              ),
+              LiveCase(
+                  question="Что делает clear-index и какие данные он обязан сохранить?",
+                  relevant_paths=("docs/index-cleanup.md", "wiki/Commands.md"),
+                  expected_kind="docs_context",
+                  forbidden_source_prefixes=BLOCKED,
+              ),
+              LiveCase(
+                  question="Доказывает ли README полный контракт координации writer lease?",
+                  relevant_paths=("docs/modules/storage-mutation-coordination.md", "docs/index-cleanup.md"),
+                  expected_kind="docs_context",
+                  forbidden_source_prefixes=BLOCKED,
+                  forbidden_answer_fragments=("README proves", "README доказывает"),
+              ),
+              LiveCase(
+                  question="What should I read first after cloning DocAtlas, and how do I verify the installation?",
+                  relevant_paths=("README.md", "CONTRIBUTING.md", "docs/INDEX.md", "wiki/Install-Targets.md"),
+                  expected_kind="docs_context",
+                  forbidden_source_prefixes=BLOCKED,
+              ),
+              LiveCase(
+                  question="Какую лунную квантовую политику удержания использует DocAtlas?",
+                  relevant_paths=(),
+                  expected_kind="insufficient_evidence",
+                  forbidden_source_prefixes=BLOCKED,
+              ),
+          )
+
+          report = run_live(cases=CASES, negative_cases=())
+          Path("/tmp/pr173-review/holdout.json").write_text(
+              json.dumps(report, ensure_ascii=False, indent=2), encoding="utf-8"
+          )
+          print(json.dumps(report, ensure_ascii=False, indent=2))
+          raise SystemExit(0 if report.get("verdict") == "PASS" else 1)
+          PY
+          uv run python /tmp/pr173-review/run_holdout.py 2>&1 | tee /tmp/pr173-review/holdout.log
+
+      - name: Build durable review report
+        if: always()
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p docs/analysis
+          python - <<'PY'
+          from __future__ import annotations
+
+          import json
+          import os
+          from pathlib import Path
+
+          root = Path("/tmp/pr173-review")
+          holdout_path = root / "holdout.json"
+          report = json.loads(holdout_path.read_text(encoding="utf-8")) if holdout_path.exists() else {}
+          regression_ok = os.environ.get("REGRESSION_OUTCOME") == "success"
+          holdout_ok = os.environ.get("HOLDOUT_OUTCOME") == "success"
+
+          metrics = report.get("metrics") if isinstance(report.get("metrics"), dict) else {}
+          production = report.get("production_gate") if isinstance(report.get("production_gate"), dict) else {}
+          for key, value in production.items():
+              if key not in metrics and not isinstance(value, (dict, list)):
+                  metrics[key] = value
+
+          rows = None
+          def visit(value):
+              nonlocal rows
+              if rows is not None:
+                  return
+              if isinstance(value, list) and value and all(isinstance(item, dict) for item in value):
+                  keys = set().union(*(item.keys() for item in value))
+                  if {"question", "case_id"} & keys and {"passed", "score", "observed_kind", "kind"} & keys:
+                      rows = value
+                      return
+              if isinstance(value, dict):
+                  for child in value.values():
+                      visit(child)
+              elif isinstance(value, list):
+                  for child in value:
+                      visit(child)
+          visit(report)
+
+          lines = [
+              "# PR #173 exact-head live review",
+              "",
+              f"- Regression suite: {'PASS' if regression_ok else 'FAIL'}",
+              f"- Unseen public-path questions: {'PASS' if holdout_ok else 'FAIL'}",
+              f"- Holdout protocol verdict: `{report.get('verdict', 'unavailable')}`",
+              "",
+              "## Reported metrics",
+              "",
+          ]
+          if metrics:
+              for key in sorted(metrics):
+                  value = metrics[key]
+                  if not isinstance(value, (dict, list)):
+                      lines.append(f"- `{key}`: `{value}`")
+          else:
+              lines.append("No structured metrics were emitted.")
+
+          lines.extend(["", "## Holdout cases", ""])
+          if rows:
+              lines.append("| Case | Expected | Observed | Passed | Sources |")
+              lines.append("|---|---|---|---:|---|")
+              for index, item in enumerate(rows, 1):
+                  case = str(item.get("case_id") or item.get("question") or index).replace("|", "\\|")
+                  expected = str(item.get("expected_kind") or item.get("expected") or "")
+                  observed = str(item.get("observed_kind") or item.get("kind") or item.get("answer_type") or "")
+                  passed = item.get("passed")
+                  sources = item.get("source_paths") or item.get("selected_paths") or item.get("paths") or []
+                  if isinstance(sources, list):
+                      sources = ", ".join(str(value) for value in sources[:3])
+                  lines.append(f"| {case[:120]} | {expected} | {observed} | {passed} | {str(sources)[:180]} |")
+          else:
+              lines.append("The complete machine-readable case report is embedded below.")
+
+          raw = json.dumps(report, ensure_ascii=False, indent=2)
+          if len(raw) > 30000:
+              raw = raw[:30000] + "\n... truncated in markdown report ..."
+          lines.extend([
+              "",
+              "## Machine-readable holdout result",
+              "",
+              "```json",
+              raw,
+              "```",
+              "",
+              "## Review conclusion",
+              "",
+              (
+                  "The exact implementation HEAD passed both the regression suite and the unseen natural-language public-path gate."
+                  if regression_ok and holdout_ok
+                  else "The PR is not ready: at least one exact-head regression or unseen public-path gate failed."
+              ),
+              "",
+          ])
+          Path("docs/analysis/pr-173-exact-head-live-review-2026-08-30.md").write_text(
+              "\n".join(lines), encoding="utf-8"
+          )
+          PY
+        env:
+          REGRESSION_OUTCOME: ${{ steps.regression.outcome }}
+          HOLDOUT_OUTCOME: ${{ steps.holdout.outcome }}
+
+      - name: Remove temporary workflow, commit report, and publish review status
+        if: always()
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REGRESSION_OUTCOME: ${{ steps.regression.outcome }}
+          HOLDOUT_OUTCOME: ${{ steps.holdout.outcome }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          git rm -f .github/workflows/_review-pr173-project-chat.yml
+          git add docs/analysis/pr-173-exact-head-live-review-2026-08-30.md
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git commit -m "test: review project chat on unseen public questions"
+          git push origin HEAD:fix/context7-style-project-chat-v2
+          if [[ "$REGRESSION_OUTCOME" == "success" && "$HOLDOUT_OUTCOME" == "success" ]]; then
+            gh pr ready 173 --repo Vanilla1999/DocAtlas || true
+            gh pr comment 173 --repo Vanilla1999/DocAtlas --body "Exact-head review passed: regression gates and 18 unseen RU/EN public-path questions succeeded. Detailed report: docs/analysis/pr-173-exact-head-live-review-2026-08-30.md"
+          else
+            gh pr ready 173 --repo Vanilla1999/DocAtlas || true
+            gh pr comment 173 --repo Vanilla1999/DocAtlas --body "Exact-head review found a blocker. Detailed machine-readable results are committed in docs/analysis/pr-173-exact-head-live-review-2026-08-30.md. The PR must not be merged until the failed regression/holdout cases are fixed and rerun."
+            exit 1
+          fi
