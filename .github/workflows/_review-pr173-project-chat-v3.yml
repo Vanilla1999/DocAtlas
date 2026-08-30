@@ -1,0 +1,211 @@
+name: Review PR 173 project chat v3
+
+on:
+  push:
+    branches:
+      - fix/context7-style-project-chat-v2
+    paths:
+      - .github/workflows/_review-pr173-project-chat-v3.yml
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: review-pr173-project-chat-v3
+  cancel-in-progress: false
+
+jobs:
+  product-aligned-review:
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: fix/context7-style-project-chat-v2
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Verify real implementation tree
+        id: tree
+        continue-on-error: true
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch origin feat/weak-model-project-chat-safety fix/context7-style-project-chat-v2
+          git checkout -B fix/context7-style-project-chat-v2 origin/fix/context7-style-project-chat-v2
+          for path in \
+            docmancer/docs/domain/project_retrieval_intent.py \
+            eval/project_chat_context7_v1_protocol.py \
+            eval/project_chat_context7_v1/cases.json \
+            tests/docs/test_context7_style_project_chat.py \
+            docs/adr/0002-retrieval-first-project-chat.md; do
+            test -f "$path" || { echo "Missing $path" >&2; exit 1; }
+          done
+          leftovers="$(git diff --name-only origin/feat/weak-model-project-chat-safety...HEAD | grep -E '(^|/)_.*context7.*(yml|py)$|_workspace-export' || true)"
+          leftovers="$(printf '%s\n' "$leftovers" | grep -v '^.github/workflows/_review-pr173-project-chat-v3.yml$' || true)"
+          test -z "$leftovers" || { echo "$leftovers" >&2; exit 1; }
+          git diff --check origin/feat/weak-model-project-chat-safety...HEAD
+
+      - name: Install exact environment
+        if: steps.tree.outcome == 'success'
+        run: |
+          python -m pip install --disable-pip-version-check 'uv==0.9.25'
+          uv sync --frozen
+
+      - name: Recheck critical safety contracts
+        id: safety
+        if: steps.tree.outcome == 'success'
+        continue-on-error: true
+        env:
+          DOCATLAS_OFFLINE: '1'
+        shell: bash
+        run: |
+          set -o pipefail
+          mkdir -p /tmp/pr173-v3
+          {
+            uv run pytest -q --maxfail=1 \
+              tests/docs/test_context7_style_project_chat.py \
+              tests/docs/test_question_plan_v4.py \
+              tests/docs/test_model_visible_projection.py \
+              tests/docs/test_model_visible_projection_part02.py \
+              tests/docs/test_mcp_docs_tools_registration.py \
+              tests/test_project_chat_quality_v1_protocol.py \
+              tests/test_source_isolation_regression.py
+            uv run python -m eval.project_chat_quality_v1_protocol
+            uv run python -m eval.project_chat_context7_v1_protocol
+            uv run python scripts/run_question_surface_gate.py
+            uv run python scripts/run_recovery_contract_gate.py
+          } 2>&1 | tee /tmp/pr173-v3/safety.log
+
+      - name: Ask product-aligned unseen questions
+        id: holdout
+        if: steps.tree.outcome == 'success'
+        continue-on-error: true
+        env:
+          DOCATLAS_OFFLINE: '1'
+        shell: bash
+        run: |
+          set -o pipefail
+          mkdir -p /tmp/pr173-v3
+          cat > /tmp/pr173-v3/run.py <<'PY'
+          from __future__ import annotations
+
+          import json
+          from pathlib import Path
+
+          from scripts.run_project_docs_self_host_gate import LiveCase, run as run_live
+
+          blocked = ("eval/", ".hermes/plans/", "roadmap/")
+
+          def context(question, paths, *, facts=(), forbidden=()):
+              return LiveCase(
+                  question=question,
+                  relevant_paths=tuple(paths),
+                  expected_kind="docs_context",
+                  required_facts_by_path=tuple(facts),
+                  forbidden_source_prefixes=blocked,
+                  forbidden_answer_fragments=tuple(forbidden),
+              )
+
+          cases = (
+              context("Я установил DocAtlas. Как убедиться, что он вообще работает?", ("README.md", "CONTRIBUTING.md", "wiki/Install-Targets.md")),
+              context("С какого файла новичку лучше начать знакомство с репозиторием?", ("README.md", "CONTRIBUTING.md", "docs/INDEX.md", "docs/PROJECT_MAP.md")),
+              context("Какие команды выполнить сразу после установки DocAtlas?", ("README.md", "wiki/Commands.md", "wiki/Install-Targets.md"), forbidden=("three public Docs MCP tools", "три публичных инструмента")),
+              context("Где перечислить документы, которым проект доверяет при ответах?", ("wiki/Configuration.md", "docs/project-docs-mcp-workflow.md", "docs/mcp-docs-server.md")),
+              context("Можно ли пользоваться DocAtlas полностью без доступа к интернету?", ("README.md", "docs/testing.md", "wiki/Architecture.md", "wiki/Configuration.md")),
+              context("Куда сохраняется индекс и как не смешиваются данные разных репозиториев?", ("wiki/Architecture.md", "docs/index-cleanup.md", "docs/modules/storage-mutation-coordination.md")),
+              context("На какие части режется большой Markdown-файл во время индексации?", ("wiki/Architecture.md",)),
+              context("Что обязательно проверить перед открытием pull request?", ("CONTRIBUTING.md", "docs/testing.md", "docs/RELEASE_CHECKLIST.md")),
+              context("Я изменил проектную документацию. Как обновить локальный индекс?", ("README.md", "docs/project-docs-mcp-workflow.md", "docs/capabilities.md"), facts=(("docs/project-docs-mcp-workflow.md", "sync_project_docs"),)),
+              context("Почему поиск может перестать видеть свежие изменения документации и что тогда проверить?", ("wiki/Troubleshooting.md", "docs/project-docs-mcp-workflow.md")),
+              context("Расскажи простыми словами, как в целом устроена архитектура DocAtlas.", ("wiki/Architecture.md", "docs/PROJECT_MAP.md"), forbidden=("Legacy direct library/project tools",)),
+              context("Как система выбирает доказательства из найденных разделов документации?", ("docs/modules/evidence-selection.md", "docs/mcp-docs-server.md")),
+              context("Что делает clear-index и какие данные он обязан сохранить?", ("docs/index-cleanup.md", "wiki/Commands.md")),
+              context("Доказывает ли README полный контракт координации writer lease?", ("docs/modules/storage-mutation-coordination.md", "docs/index-cleanup.md"), forbidden=("README proves", "README доказывает")),
+              context("What should I read first after cloning DocAtlas, and how do I verify the installation?", ("README.md", "CONTRIBUTING.md", "docs/INDEX.md", "wiki/Install-Targets.md")),
+              LiveCase(
+                  question="Какую лунную квантовую политику удержания использует DocAtlas?",
+                  relevant_paths=(),
+                  expected_kind="insufficient_evidence",
+                  required_facts_by_path=(),
+                  forbidden_source_prefixes=blocked,
+                  forbidden_answer_fragments=(),
+              ),
+          )
+          report = run_live(cases=cases, negative_cases=())
+          Path("/tmp/pr173-v3/report.json").write_text(json.dumps(report, ensure_ascii=False, indent=2), encoding="utf-8")
+          print(json.dumps(report, ensure_ascii=False, indent=2))
+          raise SystemExit(0 if report.get("verdict") == "PASS" else 1)
+          PY
+          uv run python /tmp/pr173-v3/run.py 2>&1 | tee /tmp/pr173-v3/holdout.log
+
+      - name: Write durable final review
+        if: always()
+        env:
+          TREE_OUTCOME: ${{ steps.tree.outcome }}
+          SAFETY_OUTCOME: ${{ steps.safety.outcome }}
+          HOLDOUT_OUTCOME: ${{ steps.holdout.outcome }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p docs/analysis /tmp/pr173-v3
+          python - <<'PY'
+          import json, os, subprocess
+          from pathlib import Path
+
+          p = Path('/tmp/pr173-v3/report.json')
+          report = json.loads(p.read_text(encoding='utf-8')) if p.exists() else {}
+          head = subprocess.check_output(['git','rev-parse','HEAD'], text=True).strip()
+          tree = os.getenv('TREE_OUTCOME','skipped')
+          safety = os.getenv('SAFETY_OUTCOME','skipped')
+          holdout = os.getenv('HOLDOUT_OUTCOME','skipped')
+          ready = tree == safety == holdout == 'success' and report.get('verdict') == 'PASS'
+
+          lines = [
+              '# PR #173 product-aligned exact-head review', '',
+              f'Reviewed implementation HEAD: `{head}`', '',
+              '## Outcomes', '',
+              f'- Final-tree integrity: **{tree.upper()}**',
+              f'- Proof, projection and isolation safety: **{safety.upper()}**',
+              f'- 16 unseen RU/EN public-path questions: **{holdout.upper()}**',
+              f'- Holdout verdict: **{str(report.get("verdict","unavailable")).upper()}**', '',
+              '## Interpretation', '',
+              '- Broad/newcomer questions are judged by useful bounded `docs_context`, not by unnecessary promotion to `docs_answer`.',
+              '- Exact command and closed-inventory certification remains covered by the existing frozen proof gate.',
+              '- The nonexistent-policy case must remain `insufficient_evidence`.',
+              '- Evaluation, planning and historical sources remain forbidden unless explicitly requested.', '',
+              '## Machine-readable public-path result', '', '```json',
+              json.dumps(report, ensure_ascii=False, indent=2)[:60000], '```', '',
+              '## Final conclusion', '',
+              ('**READY:** no blocking finding remains in this exact-head review.' if ready else '**BLOCKED:** at least one tree, safety, or unseen-question check failed.'), ''
+          ]
+          Path('docs/analysis/pr-173-product-aligned-review-2026-08-30.md').write_text('\n'.join(lines), encoding='utf-8')
+          Path('/tmp/pr173-v3/ready').write_text('1' if ready else '0', encoding='utf-8')
+          PY
+
+      - name: Remove temporary reviewer, commit report and set PR state
+        if: always()
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          ready="$(cat /tmp/pr173-v3/ready 2>/dev/null || echo 0)"
+          git rm -f .github/workflows/_review-pr173-project-chat-v3.yml
+          git add docs/analysis/pr-173-product-aligned-review-2026-08-30.md
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git commit -m "test: complete product-aligned project-chat review"
+          git push origin HEAD:fix/context7-style-project-chat-v2
+          if [[ "$ready" == "1" ]]; then
+            gh pr ready 173 --repo Vanilla1999/DocAtlas || true
+            gh pr comment 173 --repo Vanilla1999/DocAtlas --body "Product-aligned exact-head review passed: safety gates and 16 unseen RU/EN public-path questions succeeded. Report: docs/analysis/pr-173-product-aligned-review-2026-08-30.md"
+          else
+            gh pr ready --undo 173 --repo Vanilla1999/DocAtlas || true
+            gh pr comment 173 --repo Vanilla1999/DocAtlas --body "Product-aligned exact-head review is BLOCKED. Report: docs/analysis/pr-173-product-aligned-review-2026-08-30.md"
+            exit 1
+          fi
