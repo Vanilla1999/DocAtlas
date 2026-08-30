@@ -1,0 +1,160 @@
+name: Validate Context7-style project chat v2
+
+on:
+  push:
+    branches:
+      - fix/context7-style-project-chat-v2
+    paths:
+      - .github/workflows/_validate-context7-project-chat-v2.yml
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: validate-context7-project-chat-v2
+  cancel-in-progress: false
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: fix/context7-style-project-chat-v2
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Recover staged edits and apply final review fixes
+        run: |
+          if [ -f scripts/_repair_context7_project_chat_v2.py ]; then
+            python scripts/_repair_context7_project_chat_v2.py
+          elif [ ! -f docmancer/docs/domain/project_retrieval_intent.py ] && [ -f scripts/_apply_context7_project_chat_v2.py ]; then
+            python scripts/_apply_context7_project_chat_v2.py
+          fi
+          python - <<'PY'
+          from pathlib import Path
+
+          root = Path('.')
+
+          # Keep the existing retrieval-query match schema stable.  The
+          # calibrated semantic_match remains source metadata and only affects
+          # the boolean context qualification.
+          service = root / 'docmancer/docs/application/_project_docs_service_part03.py'
+          text = service.read_text(encoding='utf-8')
+          verbose = '''        if semantic:\n            trace["semantic_match"] = {\n                key: semantic[key]\n                for key in (\n                    "qualified_for_context", "qualified", "channel",\n                    "score", "threshold", "model",\n                )\n                if semantic.get(key) is not None\n            }\n'''
+          if verbose in text:
+              text = text.replace(verbose, '', 1)
+              service.write_text(text, encoding='utf-8')
+
+          tests = root / 'tests/docs/test_context7_style_project_chat.py'
+          test_text = tests.read_text(encoding='utf-8')
+          test_text = test_text.replace(
+              '    assert match["semantic_match"]["qualified_for_context"] is True\n',
+              '    assert tagged[0].metadata["semantic_match"]["qualified_for_context"] is True\n',
+          )
+          tests.write_text(test_text, encoding='utf-8')
+
+          # Preserve the useful narrow docs_answer case in both languages.
+          surface = root / 'docmancer/docs/domain/question_surface_normalization.py'
+          surface_text = surface.read_text(encoding='utf-8')
+          marker = '    # Compound inventory/action surfaces are normalized as a whole so clause\n'
+          rule = '''    if re.fullmatch(\n        r"какая\\s+команда\\s+запускает\\s+(?:docs\\s+)?mcp\\s+(?:сервер|server)",\n        q,\n        re.I,\n    ):\n        return _result(\n            "Which command starts the Docs MCP server?",\n            "action:docs_mcp_server_command_ru",\n        )\n\n'''
+          if rule not in surface_text:
+              if marker not in surface_text:
+                  raise RuntimeError('question-surface insertion marker not found')
+              surface_text = surface_text.replace(marker, rule + marker, 1)
+              surface.write_text(surface_text, encoding='utf-8')
+          PY
+          rm -f scripts/_apply_context7_project_chat_v2.py
+          rm -f scripts/_repair_context7_project_chat_v2.py
+          rm -f .github/workflows/_workspace-export.yml
+          rm -f .github/workflows/_apply-context7-project-chat-v2.yml
+          rm -f .github/workflows/_repair-context7-project-chat-v2.yml
+          python -m compileall -q docmancer eval tests/docs/test_context7_style_project_chat.py
+          git diff --check
+
+      - name: Commit recovered or reviewed source changes
+        run: |
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add -A
+          if ! git diff --cached --quiet; then
+            git commit -m "fix: complete Context7-style project chat delivery"
+            git push origin HEAD:fix/context7-style-project-chat-v2
+          fi
+
+      - name: Install exact locked environment
+        run: |
+          python -m pip install --disable-pip-version-check 'uv==0.9.25'
+          uv sync --frozen
+
+      - name: Run focused unit and regression suites
+        env:
+          DOCATLAS_OFFLINE: '1'
+        run: |
+          uv run pytest -q \
+            tests/docs/test_context7_style_project_chat.py \
+            tests/docs/test_question_plan_v4.py \
+            tests/docs/test_model_visible_projection.py \
+            tests/docs/test_model_visible_projection_part02.py \
+            tests/docs/test_mcp_docs_tools_registration.py \
+            tests/test_project_chat_quality_v1_protocol.py \
+            tests/test_config_resolution.py \
+            tests/test_source_isolation_regression.py
+          uv run python -m eval.project_chat_context7_v1_protocol
+          uv run python scripts/run_question_surface_gate.py
+
+      - name: Run public self-hosted RU/EN project-chat gate
+        env:
+          DOCATLAS_OFFLINE: '1'
+        run: |
+          uv run python -m eval.project_chat_context7_v1_protocol --live | tee /tmp/context7-project-chat-live.json
+
+      - name: Remove validator and publish validated HEAD
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git rm .github/workflows/_validate-context7-project-chat-v2.yml
+          git commit -m "chore: remove temporary project-chat validator"
+          git push origin HEAD:fix/context7-style-project-chat-v2
+          final_sha="$(git rev-parse HEAD)"
+          cat > /tmp/pr-body.md <<EOF
+          ## Goal
+
+          Implement a Context7-style project-chat path while preserving DocAtlas safety.
+
+          ## Implemented
+
+          - natural-language project retrieval runs independently of strict answer proof;
+          - Russian and English newcomer wording receives bounded retrieval-only aliases;
+          - broad installation, architecture, storage, testing, troubleshooting, and workflow questions are forced to non-authoritative \`docs_context\`;
+          - narrow locally proved facts may still become \`docs_answer\`;
+          - generic CLI commands no longer become the Docs MCP public-tool inventory;
+          - Russian parser failures no longer generate mixed English/Russian rephrases;
+          - explicit calibrated semantic provenance may qualify context but cannot prove an answer;
+          - legacy \`.docmancer\` state is diagnosed without implicit reading or migration;
+          - temporary workspace/export/apply workflows were removed.
+
+          ## Validation
+
+          Validated source HEAD before the workflow-only cleanup commit with:
+
+          - focused retrieval-first unit tests;
+          - QuestionPlan and model-visible projection regressions;
+          - MCP public-surface tests;
+          - project-chat safety protocol;
+          - config-resolution and project-isolation regressions;
+          - frozen question-surface gate;
+          - self-hosted public \`get_docs_context\` RU/EN corpus.
+
+          Final PR HEAD: \`${final_sha}\` (differs from tested source only by removal of this temporary validator workflow).
+
+          This PR targets \`feat/weak-model-project-chat-safety\` and does not restore legacy public tools, legacy state discovery, or unbounded payloads.
+          EOF
+          gh pr edit 173 --repo Vanilla1999/DocAtlas --body-file /tmp/pr-body.md
+          gh pr ready 173 --repo Vanilla1999/DocAtlas
