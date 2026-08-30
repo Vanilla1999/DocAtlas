@@ -1,0 +1,446 @@
+name: Rebuild, review and holdout-test PR 173
+
+on:
+  push:
+    branches:
+      - fix/context7-style-project-chat-v2
+    paths:
+      - .github/workflows/_rebuild-pr-173-v3.yml
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: rebuild-pr-173-reviewed-source
+  cancel-in-progress: true
+
+jobs:
+  rebuild-review-holdout:
+    runs-on: ubuntu-latest
+    timeout-minutes: 240
+    env:
+      BRANCH: fix/context7-style-project-chat-v2
+      BASE_BRANCH: feat/weak-model-project-chat-safety
+      ORIGINAL_HEAD: ${{ github.sha }}
+      DOCATLAS_OFFLINE: "1"
+      DOCATLAS_AUTO_VECTORS: "0"
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: fix/context7-style-project-chat-v2
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Reconstruct production source if temporary patch machinery is still present
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [[ -f scripts/_apply_context7_project_chat_v2.py ]]; then
+            mkdir -p /tmp/pr173-patches
+            for file in \
+              _apply_context7_project_chat_v2.py \
+              _repair_context7_project_chat_v2.py \
+              _finalize_context7_project_chat_v2.py \
+              _fix_context7_live_gate_v2.py \
+              _fix_context7_ru_test_stem.py; do
+              cp "scripts/$file" /tmp/pr173-patches/
+            done
+            git fetch origin "$BASE_BRANCH"
+            git reset --hard "origin/$BASE_BRANCH"
+            mkdir -p scripts
+            cp /tmp/pr173-patches/*.py scripts/
+            python scripts/_apply_context7_project_chat_v2.py
+            python scripts/_repair_context7_project_chat_v2.py
+            python scripts/_finalize_context7_project_chat_v2.py
+            python scripts/_fix_context7_live_gate_v2.py
+            python scripts/_fix_context7_ru_test_stem.py
+          elif [[ ! -f docmancer/docs/domain/project_retrieval_intent.py ]]; then
+            echo "Missing both reconstruction scripts and production implementation" >&2
+            exit 1
+          fi
+
+      - name: Apply independent code-review corrections
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          from pathlib import Path
+
+          intent_path = Path("docmancer/docs/domain/project_retrieval_intent.py")
+          text = intent_path.read_text(encoding="utf-8")
+
+          blacklist = '''_UNSUPPORTED_FANTASY_RE = re.compile(
+              r"\\b(?:lunar|quantum|квант\\w*|лунн\\w*)\\b", re.IGNORECASE,
+          )
+          '''
+          text = text.replace(blacklist, "")
+          text = text.replace(
+              "    if not source or _UNSUPPORTED_FANTASY_RE.search(source):\n        return ()\n",
+              "    if not source:\n        return ()\n",
+          )
+
+          old_overview = '''    if _has_phrase(normalized, "что такое", "для чего", "зачем", "what is") or _has(
+              tokens, "назначен", "purpose", "overview",
+          ):
+              emit(
+                  "product_overview",
+                  True,
+                  "DocAtlas overview purpose problem local documentation runtime coding agents",
+              )
+          '''
+          new_overview = '''    asks_product_overview = _has_phrase(
+              normalized,
+              "что такое",
+              "для чего",
+              "зачем",
+              "what is",
+              "what problem",
+          ) or _has(tokens, "назначен", "purpose", "overview")
+          identifies_project_subject = bool(
+              mentions_docatlas
+              or mentions_project
+              or mentions_docs
+              or _has_phrase(
+                  normalized,
+                  "этот проект",
+                  "данный проект",
+                  "this project",
+                  "this repository",
+              )
+          )
+          if asks_product_overview and identifies_project_subject:
+              emit(
+                  "product_overview",
+                  True,
+                  "DocAtlas overview purpose problem local documentation runtime coding agents",
+              )
+          '''
+          if old_overview in text:
+              text = text.replace(old_overview, new_overview, 1)
+          elif "asks_product_overview =" not in text:
+              raise RuntimeError("Unexpected product-overview implementation")
+
+          text = text.replace(
+              'mentions_docs = _has(tokens, "документ", "док", "docs", "documentation")',
+              'mentions_docs = _has(tokens, "документ", "документац", "docs", "documentation")',
+          )
+          if "_UNSUPPORTED_FANTASY_RE" in text:
+              raise RuntimeError("Test-specific vocabulary blacklist still exists")
+          intent_path.write_text(text, encoding="utf-8")
+
+          tests_path = Path("tests/docs/test_context7_style_project_chat.py")
+          tests = tests_path.read_text(encoding="utf-8")
+          if "def test_retrieval_aliases_do_not_memorize_negative_case_vocabulary" not in tests:
+              tests += '''\n\ndef test_retrieval_aliases_do_not_memorize_negative_case_vocabulary():\n    import inspect\n\n    from docmancer.docs.domain import project_retrieval_intent as module\n    from docmancer.docs.domain.project_retrieval_intent import build_project_retrieval_aliases\n\n    source = inspect.getsource(module).casefold()\n    assert "lunar|quantum" not in source\n    assert "квант\\\\w" not in source\n    assert build_project_retrieval_aliases(\n        "What lunar quantum retention policy does this repository use?"\n    ) == ()\n    assert build_project_retrieval_aliases(\n        "Какая политика хранения лунных квантов используется?"\n    ) == ()\n\n\ndef test_generic_definition_does_not_become_docatlas_overview_without_subject():\n    from docmancer.docs.domain.project_retrieval_intent import build_project_retrieval_aliases\n\n    assert build_project_retrieval_aliases("What is a lunar retention policy?") == ()\n    assert build_project_retrieval_aliases("Что такое политика хранения квантов?") == ()\n    aliases = build_project_retrieval_aliases("Что такое DocAtlas и зачем он нужен?")\n    assert any(item.intent_id == "product_overview" for item in aliases)\n'''
+              tests_path.write_text(tests, encoding="utf-8")
+          PY
+
+      - name: Remove every temporary branch-mutating workflow and patch script
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -f scripts/_apply_context7_project_chat_v2.py
+          rm -f scripts/_repair_context7_project_chat_v2.py
+          rm -f scripts/_finalize_context7_project_chat_v2.py
+          rm -f scripts/_fix_context7_live_gate_v2.py
+          rm -f scripts/_fix_context7_ru_test_stem.py
+          rm -f .github/workflows/_apply-context7-project-chat-v2.yml
+          rm -f .github/workflows/_repair-context7-project-chat-v2.yml
+          rm -f .github/workflows/_validate-context7-project-chat-v2.yml
+          rm -f .github/workflows/_finalize-context7-project-chat-v2.yml
+          rm -f .github/workflows/_fix-context7-live-gate-v2.yml
+          rm -f .github/workflows/_fix-context7-ru-test-stem.yml
+          rm -f .github/workflows/_workspace-export.yml
+          rm -f .github/workflows/_rebuild-pr-173.yml
+          rm -f .github/workflows/_rebuild-pr-173-v2.yml
+          rm -f .github/workflows/_rebuild-pr-173-v3.yml
+          python -m compileall -q docmancer eval tests
+          git diff --check
+
+      - name: Install exact locked environment
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m pip install --disable-pip-version-check "uv==0.9.25"
+          uv sync --frozen
+
+      - name: Run focused regression and frozen safety gates
+        shell: bash
+        run: |
+          set -euo pipefail
+          uv run pytest -q \
+            tests/docs/test_context7_style_project_chat.py \
+            tests/docs/test_question_plan_v4.py \
+            tests/docs/test_model_visible_projection.py \
+            tests/docs/test_model_visible_projection_part02.py \
+            tests/docs/test_mcp_docs_tools_registration.py \
+            tests/test_project_chat_quality_v1_protocol.py \
+            tests/test_config_resolution.py \
+            tests/test_source_isolation_regression.py \
+            | tee /tmp/pr173-focused-tests.txt
+          uv run python -m eval.project_chat_quality_v1_protocol \
+            | tee /tmp/pr173-existing-project-chat.json
+          uv run python -m eval.project_chat_context7_v1_protocol \
+            | tee /tmp/pr173-context7-contract.json
+          uv run python scripts/run_question_surface_gate.py \
+            | tee /tmp/pr173-question-surface.txt
+          uv run python scripts/run_recovery_contract_gate.py \
+            | tee /tmp/pr173-recovery-contract.txt
+
+      - name: Run frozen self-hosted public RU and EN project-chat gate
+        shell: bash
+        run: |
+          set -euo pipefail
+          uv run python -m eval.project_chat_context7_v1_protocol --live \
+            | tee /tmp/pr173-context7-live.json
+
+      - name: Ask independent holdout questions through the public tool handler
+        shell: bash
+        run: |
+          set -euo pipefail
+          uv run python - <<'PY'
+          from __future__ import annotations
+
+          import json
+          import os
+          import tempfile
+          from pathlib import Path
+          from typing import Any
+
+          from docmancer.docs.service import LibraryDocsService
+          from docmancer.mcp.docs_server import call_docs_tool_payload
+
+          root = Path.cwd().resolve()
+          service = LibraryDocsService()
+          project_docs = getattr(service, "project_docs", service)
+          project_docs.sync_project_docs(str(root), with_vectors=False)
+
+          cases = [
+              {
+                  "id": "ru-install-holdout",
+                  "question": "Я только установил DocAtlas. С чего начать и какие команды выполнить, чтобы проверить работу?",
+                  "paths": ["readme.md", "wiki/commands.md", "wiki/install-targets.md"],
+              },
+              {
+                  "id": "ru-storage-holdout",
+                  "question": "Где на диске хранится индекс этого репозитория и почему данные другого проекта в него не попадают?",
+                  "paths": ["wiki/architecture.md", "docs/index-cleanup.md", "storage-mutation-coordination"],
+              },
+              {
+                  "id": "ru-offline-holdout",
+                  "question": "Можно ли полноценно пользоваться DocAtlas без сети и что должно быть подготовлено заранее?",
+                  "paths": ["docs/testing.md", "wiki/configuration.md", "readme.md"],
+              },
+              {
+                  "id": "ru-stale-holdout",
+                  "question": "Я изменил проектную документацию, но поиск показывает старый текст. Что проверить и обновить?",
+                  "paths": ["wiki/troubleshooting.md", "docs/project-docs-mcp-workflow.md"],
+              },
+              {
+                  "id": "ru-config-holdout",
+                  "question": "В каком файле перечислить документы, которые считаются документацией этого репозитория?",
+                  "paths": ["wiki/configuration.md", "docs/project-docs-mcp-workflow.md", "contributing.md"],
+              },
+              {
+                  "id": "ru-architecture-holdout",
+                  "question": "Объясни общую архитектуру: как файл превращается во фрагмент контекста для агента?",
+                  "paths": ["wiki/architecture.md", "docs/project_map.md"],
+              },
+              {
+                  "id": "ru-tests-holdout",
+                  "question": "Какие проверки и тесты нужно запустить перед тем, как открыть pull request?",
+                  "paths": ["contributing.md", "docs/testing.md", "docs/release_checklist.md"],
+              },
+              {
+                  "id": "ru-mcp-workflow-holdout",
+                  "question": "Как связаны три публичных инструмента Docs MCP и в каком порядке агент должен их вызывать?",
+                  "paths": ["docs/mcp-docs-server.md", "docs/project-docs-mcp-workflow.md", "readme.md"],
+              },
+              {
+                  "id": "ru-mcp-command-holdout",
+                  "question": "Какой командой запускается сервер документации Docs MCP?",
+                  "paths": ["docs/mcp-docs-server.md", "wiki/commands.md", "readme.md"],
+              },
+              {
+                  "id": "ru-architecture-short-holdout",
+                  "question": "Архитектура?",
+                  "paths": ["wiki/architecture.md", "docs/project_map.md"],
+              },
+              {
+                  "id": "negative-telepathy",
+                  "question": "Какая политика телепатической синхронизации мыслей используется в DocAtlas?",
+                  "negative": True,
+              },
+              {
+                  "id": "negative-lunar-payments",
+                  "question": "Поддерживает ли этот репозиторий оплату криптовалютой на Луне?",
+                  "negative": True,
+              },
+              {
+                  "id": "negative-magic-flag",
+                  "question": "Что делает `nonexistent_magic_flag`?",
+                  "negative": True,
+              },
+          ]
+
+          def walk(value: Any):
+              if isinstance(value, dict):
+                  yield value
+                  for child in value.values():
+                      yield from walk(child)
+              elif isinstance(value, list):
+                  for child in value:
+                      yield from walk(child)
+
+          rows = []
+          failures = []
+          for case in cases:
+              payload = call_docs_tool_payload(
+                  "get_docs_context",
+                  {
+                      "question": case["question"],
+                      "project_path": str(root),
+                      "mode": "project",
+                  },
+                  service,
+              )
+              objects = list(walk(payload))
+              kinds = {
+                  str(obj.get(key) or "").casefold()
+                  for obj in objects
+                  for key in ("kind", "answer_type", "support_status", "status")
+                  if obj.get(key) is not None
+              }
+              paths = sorted({
+                  str(obj.get(key) or "").replace("\\", "/")
+                  for obj in objects
+                  for key in ("path", "path_or_url", "source_path", "project_doc_path")
+                  if obj.get(key)
+              })
+              folded_paths = "\n".join(paths).casefold()
+              source_count = sum(
+                  1 for obj in objects
+                  if obj.get("snippet") and any(obj.get(key) for key in ("path", "path_or_url"))
+              )
+              answer_supported = any(obj.get("answer_supported") is True for obj in objects)
+              edit_ready = any(obj.get("edit_ready") is True for obj in objects)
+              rendered = json.dumps(payload, ensure_ascii=False).casefold()
+
+              if case.get("negative"):
+                  passed = (
+                      "insufficient_evidence" in kinds
+                      and source_count == 0
+                      and not answer_supported
+                      and not edit_ready
+                  )
+                  reason = "expected no supported project documentation"
+              else:
+                  relevant = any(fragment in folded_paths for fragment in case["paths"])
+                  useful_kind = bool({"docs_context", "docs_answer", "ok", "success", "truncated"} & kinds)
+                  passed = relevant and useful_kind and not edit_ready
+                  reason = "expected bounded relevant project documentation"
+                  if case["id"] == "ru-install-holdout" and "public_tools" in rendered:
+                      passed = False
+                      reason = "generic first commands were misclassified as public_tools"
+                  if case["id"] == "ru-architecture-short-holdout" and "wiki/architecture.md" not in folded_paths:
+                      passed = False
+                      reason = "short architecture question did not retrieve project architecture"
+
+              row = {
+                  "id": case["id"],
+                  "question": case["question"],
+                  "passed": passed,
+                  "reason": reason,
+                  "kinds": sorted(kinds),
+                  "paths": paths,
+                  "source_count": source_count,
+                  "answer_supported": answer_supported,
+                  "edit_ready": edit_ready,
+              }
+              rows.append(row)
+              if not passed:
+                  failures.append(row)
+
+          Path("/tmp/pr173-holdout.json").write_text(
+              json.dumps({"rows": rows, "failures": failures}, ensure_ascii=False, indent=2),
+              encoding="utf-8",
+          )
+          lines = [
+              "# PR 173 independent project-chat holdout",
+              "",
+              f"Passed: {len(rows) - len(failures)}/{len(rows)}",
+              "",
+              "| Case | Result | Kinds | Sources |",
+              "|---|---:|---|---|",
+          ]
+          for row in rows:
+              lines.append(
+                  f"| {row['id']} | {'PASS' if row['passed'] else 'FAIL'} | "
+                  f"{', '.join(row['kinds']) or '-'} | "
+                  f"{'<br>'.join(row['paths'][:4]) or '-'} |"
+              )
+          if failures:
+              lines.extend(["", "## Failures", ""])
+              for row in failures:
+                  lines.append(f"- **{row['id']}**: {row['reason']}")
+          Path("/tmp/pr173-holdout.md").write_text("\n".join(lines) + "\n", encoding="utf-8")
+          Path("/tmp/pr173-holdout-failures.txt").write_text(
+              "\n".join(row["id"] for row in failures), encoding="utf-8"
+          )
+          print(json.dumps({"passed": len(rows) - len(failures), "total": len(rows)}, ensure_ascii=False))
+          PY
+
+      - name: Run full offline regression suite
+        shell: bash
+        run: |
+          set -euo pipefail
+          uv run pytest -q --maxfail=1 | tee /tmp/pr173-full-pytest.txt
+
+      - name: Upload exact review and question evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: pr-173-reviewed-holdout-${{ github.sha }}
+          path: |
+            /tmp/pr173-focused-tests.txt
+            /tmp/pr173-existing-project-chat.json
+            /tmp/pr173-context7-contract.json
+            /tmp/pr173-question-surface.txt
+            /tmp/pr173-recovery-contract.txt
+            /tmp/pr173-context7-live.json
+            /tmp/pr173-holdout.json
+            /tmp/pr173-holdout.md
+            /tmp/pr173-holdout-failures.txt
+            /tmp/pr173-full-pytest.txt
+          retention-days: 2
+
+      - name: Require the independent holdout to pass
+        shell: bash
+        run: |
+          set -euo pipefail
+          test ! -s /tmp/pr173-holdout-failures.txt
+
+      - name: Commit only clean reviewed source
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add -A
+          test -n "$(git diff --cached --name-only)"
+          if git diff --cached --name-only | grep -E '(^|/)(_[a-z-]*context7.*\.yml|_[a-z_]*context7.*\.py|_workspace-export\.yml)$'; then
+            echo "Temporary workflow or patch machinery remains in final diff" >&2
+            exit 1
+          fi
+          git commit -m "feat: make project chat retrieval-first for weak models"
+          git push --force-with-lease="refs/heads/$BRANCH:$ORIGINAL_HEAD" origin "HEAD:refs/heads/$BRANCH"
+
+      - name: Leave PR in draft for final human-readable review
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        shell: bash
+        run: |
+          gh pr ready 173 --repo Vanilla1999/DocAtlas --undo >/dev/null 2>&1 || true
