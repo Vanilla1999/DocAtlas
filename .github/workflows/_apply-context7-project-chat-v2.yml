@@ -1,0 +1,70 @@
+name: Apply Context7-style project chat v2
+
+on:
+  push:
+    branches:
+      - fix/context7-style-project-chat-v2
+    paths:
+      - scripts/_apply_context7_project_chat_v2.py
+      - .github/workflows/_apply-context7-project-chat-v2.yml
+
+permissions:
+  contents: write
+
+concurrency:
+  group: apply-context7-project-chat-v2
+  cancel-in-progress: false
+
+jobs:
+  apply-and-test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: fix/context7-style-project-chat-v2
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Apply deterministic patch
+        run: |
+          python scripts/_apply_context7_project_chat_v2.py
+          python -m compileall -q \
+            docmancer/docs/domain/project_retrieval_intent.py \
+            docmancer/docs/domain/state_cutover.py \
+            eval/project_chat_context7_v1_protocol.py \
+            tests/docs/test_context7_style_project_chat.py
+          git diff --check
+
+      - name: Commit implementation and remove temporary machinery
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git rm -f scripts/_apply_context7_project_chat_v2.py
+          git rm -f .github/workflows/_apply-context7-project-chat-v2.yml
+          git rm -f .github/workflows/_workspace-export.yml
+          git add -A
+          git commit -m "feat: make project chat retrieval-first for weak models"
+          git push origin HEAD:fix/context7-style-project-chat-v2
+
+      - name: Install locked environment
+        run: |
+          python -m pip install --disable-pip-version-check 'uv==0.9.25'
+          uv sync --frozen
+
+      - name: Run targeted retrieval-first gates
+        env:
+          DOCATLAS_OFFLINE: '1'
+        run: |
+          uv run pytest -q \
+            tests/docs/test_context7_style_project_chat.py \
+            tests/docs/test_question_plan_v4.py \
+            tests/docs/test_model_visible_projection.py \
+            tests/docs/test_model_visible_projection_part02.py \
+            tests/test_project_chat_quality_v1_protocol.py
+          uv run python -m eval.project_chat_context7_v1_protocol
