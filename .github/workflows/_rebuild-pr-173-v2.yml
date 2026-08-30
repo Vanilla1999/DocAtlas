@@ -1,0 +1,242 @@
+name: Rebuild and review PR 173 v2
+
+on:
+  push:
+    branches:
+      - fix/context7-style-project-chat-v2
+    paths:
+      - .github/workflows/_rebuild-pr-173-v2.yml
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: rebuild-pr-173-reviewed-source
+  cancel-in-progress: false
+
+jobs:
+  rebuild-review-and-test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 210
+    env:
+      BRANCH: fix/context7-style-project-chat-v2
+      BASE_BRANCH: feat/weak-model-project-chat-safety
+      ORIGINAL_HEAD: ${{ github.sha }}
+      DOCATLAS_OFFLINE: "1"
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: fix/context7-style-project-chat-v2
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Reconstruct source when the branch still contains patch machinery
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [[ -f scripts/_apply_context7_project_chat_v2.py ]]; then
+            mkdir -p /tmp/pr173-patches
+            cp scripts/_apply_context7_project_chat_v2.py /tmp/pr173-patches/
+            cp scripts/_repair_context7_project_chat_v2.py /tmp/pr173-patches/
+            cp scripts/_finalize_context7_project_chat_v2.py /tmp/pr173-patches/
+            cp scripts/_fix_context7_live_gate_v2.py /tmp/pr173-patches/
+            cp scripts/_fix_context7_ru_test_stem.py /tmp/pr173-patches/
+            git fetch origin "$BASE_BRANCH"
+            git reset --hard "origin/$BASE_BRANCH"
+            mkdir -p scripts
+            cp /tmp/pr173-patches/*.py scripts/
+            python scripts/_apply_context7_project_chat_v2.py
+            python scripts/_repair_context7_project_chat_v2.py
+            python scripts/_finalize_context7_project_chat_v2.py
+            python scripts/_fix_context7_live_gate_v2.py
+            python scripts/_fix_context7_ru_test_stem.py
+          elif [[ ! -f docmancer/docs/domain/project_retrieval_intent.py ]]; then
+            echo "Neither reconstruction scripts nor reconstructed production source exist" >&2
+            exit 1
+          fi
+
+      - name: Apply manual review fixes
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          from pathlib import Path
+
+          path = Path("docmancer/docs/domain/project_retrieval_intent.py")
+          text = path.read_text(encoding="utf-8")
+
+          # A literal fantasy-word blacklist merely memorizes the frozen negative
+          # example. Unknown questions must fail because no bounded intent and no
+          # relevant project evidence exist, not because particular nouns are banned.
+          blacklist = '''_UNSUPPORTED_FANTASY_RE = re.compile(
+              r"\\b(?:lunar|quantum|квант\\w*|лунн\\w*)\\b", re.IGNORECASE,
+          )
+          '''
+          text = text.replace(blacklist, "")
+          text = text.replace(
+              "    if not source or _UNSUPPORTED_FANTASY_RE.search(source):\n        return ()\n",
+              "    if not source:\n        return ()\n",
+          )
+
+          # Avoid treating every English `what is ...` or Russian `что такое ...`
+          # question as a DocAtlas product overview. The user must identify the
+          # project/product/docs corpus explicitly or use a project-local deictic.
+          old = '''    if _has_phrase(normalized, "что такое", "для чего", "зачем", "what is") or _has(
+              tokens, "назначен", "purpose", "overview",
+          ):
+              emit(
+                  "product_overview",
+                  True,
+                  "DocAtlas overview purpose problem local documentation runtime coding agents",
+              )
+          '''
+          new = '''    asks_product_overview = _has_phrase(
+              normalized,
+              "что такое",
+              "для чего",
+              "зачем",
+              "what is",
+              "what problem",
+          ) or _has(tokens, "назначен", "purpose", "overview")
+          identifies_project_subject = bool(
+              mentions_docatlas
+              or mentions_project
+              or mentions_docs
+              or _has_phrase(
+                  normalized,
+                  "этот проект",
+                  "данный проект",
+                  "this project",
+                  "this repository",
+              )
+          )
+          if asks_product_overview and identifies_project_subject:
+              emit(
+                  "product_overview",
+                  True,
+                  "DocAtlas overview purpose problem local documentation runtime coding agents",
+              )
+          '''
+          if old in text:
+              text = text.replace(old, new, 1)
+          elif "asks_product_overview =" not in text:
+              raise RuntimeError("product-overview block has an unexpected shape")
+
+          text = text.replace(
+              'mentions_docs = _has(tokens, "документ", "док", "docs", "documentation")',
+              'mentions_docs = _has(tokens, "документ", "документац", "docs", "documentation")',
+          )
+          path.write_text(text, encoding="utf-8")
+
+          test_path = Path("tests/docs/test_context7_style_project_chat.py")
+          tests = test_path.read_text(encoding="utf-8")
+          marker = "def test_retrieval_aliases_do_not_memorize_negative_case_vocabulary"
+          if marker not in tests:
+              tests += '''\n\ndef test_retrieval_aliases_do_not_memorize_negative_case_vocabulary():\n    import inspect\n\n    from docmancer.docs.domain import project_retrieval_intent as module\n    from docmancer.docs.domain.project_retrieval_intent import (\n        build_project_retrieval_aliases,\n    )\n\n    source = inspect.getsource(module).casefold()\n    assert "lunar|quantum" not in source\n    assert "квант\\\\w" not in source\n    assert build_project_retrieval_aliases(\n        "What lunar quantum retention policy does this repository use?"\n    ) == ()\n    assert build_project_retrieval_aliases(\n        "Какая политика хранения лунных квантов используется?"\n    ) == ()\n\n\ndef test_generic_definition_does_not_become_docatlas_overview_without_subject():\n    from docmancer.docs.domain.project_retrieval_intent import (\n        build_project_retrieval_aliases,\n    )\n\n    assert build_project_retrieval_aliases("What is a lunar retention policy?") == ()\n    assert build_project_retrieval_aliases("Что такое политика хранения квантов?") == ()\n    aliases = build_project_retrieval_aliases("Что такое DocAtlas и зачем он нужен?")\n    assert any(item.intent_id == "product_overview" for item in aliases)\n'''
+              test_path.write_text(tests, encoding="utf-8")
+          PY
+
+      - name: Remove all temporary branch-mutating machinery
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -f scripts/_apply_context7_project_chat_v2.py
+          rm -f scripts/_repair_context7_project_chat_v2.py
+          rm -f scripts/_finalize_context7_project_chat_v2.py
+          rm -f scripts/_fix_context7_live_gate_v2.py
+          rm -f scripts/_fix_context7_ru_test_stem.py
+          rm -f .github/workflows/_apply-context7-project-chat-v2.yml
+          rm -f .github/workflows/_repair-context7-project-chat-v2.yml
+          rm -f .github/workflows/_validate-context7-project-chat-v2.yml
+          rm -f .github/workflows/_finalize-context7-project-chat-v2.yml
+          rm -f .github/workflows/_fix-context7-live-gate-v2.yml
+          rm -f .github/workflows/_fix-context7-ru-test-stem.yml
+          rm -f .github/workflows/_workspace-export.yml
+          rm -f .github/workflows/_rebuild-pr-173.yml
+          rm -f .github/workflows/_rebuild-pr-173-v2.yml
+          python -m compileall -q docmancer eval tests
+          git diff --check
+
+      - name: Install exact locked environment
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m pip install --disable-pip-version-check "uv==0.9.25"
+          uv sync --frozen
+
+      - name: Run focused review gates
+        shell: bash
+        run: |
+          set -euo pipefail
+          uv run pytest -q \
+            tests/docs/test_context7_style_project_chat.py \
+            tests/docs/test_question_plan_v4.py \
+            tests/docs/test_model_visible_projection.py \
+            tests/docs/test_model_visible_projection_part02.py \
+            tests/docs/test_mcp_docs_tools_registration.py \
+            tests/test_project_chat_quality_v1_protocol.py \
+            tests/test_config_resolution.py \
+            tests/test_source_isolation_regression.py \
+            | tee /tmp/pr173-focused-tests.txt
+          uv run python -m eval.project_chat_quality_v1_protocol \
+            | tee /tmp/pr173-existing-project-chat.json
+          uv run python -m eval.project_chat_context7_v1_protocol \
+            | tee /tmp/pr173-context7-contract.json
+          uv run python scripts/run_question_surface_gate.py \
+            | tee /tmp/pr173-question-surface.txt
+          uv run python scripts/run_recovery_contract_gate.py \
+            | tee /tmp/pr173-recovery-contract.txt
+
+      - name: Run self-hosted public RU and EN question audit
+        shell: bash
+        run: |
+          set -euo pipefail
+          uv run python -m eval.project_chat_context7_v1_protocol --live \
+            | tee /tmp/pr173-context7-live.json
+
+      - name: Run full offline regression suite
+        shell: bash
+        run: |
+          set -euo pipefail
+          uv run pytest -q --maxfail=1 | tee /tmp/pr173-full-pytest.txt
+
+      - name: Upload exact review evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: pr-173-reviewed-validation-v2-${{ github.sha }}
+          path: |
+            /tmp/pr173-focused-tests.txt
+            /tmp/pr173-existing-project-chat.json
+            /tmp/pr173-context7-contract.json
+            /tmp/pr173-question-surface.txt
+            /tmp/pr173-recovery-contract.txt
+            /tmp/pr173-context7-live.json
+            /tmp/pr173-full-pytest.txt
+          retention-days: 2
+
+      - name: Commit clean reviewed source and force-update the dedicated branch
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add -A
+          test -n "$(git diff --cached --name-only)"
+          if git diff --cached --name-only | grep -E '(^|/)(_[a-z-]*context7.*\.yml|_[a-z_]*context7.*\.py|_workspace-export\.yml)$'; then
+            echo "Temporary workflow or patch machinery remains in final diff" >&2
+            exit 1
+          fi
+          git commit -m "feat: make project chat retrieval-first for weak models"
+          git push --force-with-lease="refs/heads/$BRANCH:$ORIGINAL_HEAD" origin "HEAD:refs/heads/$BRANCH"
+
+      - name: Keep PR draft until independent review is complete
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          gh pr ready 173 --repo Vanilla1999/DocAtlas --undo >/dev/null 2>&1 || true
