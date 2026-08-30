@@ -1,0 +1,92 @@
+name: Fix Russian project-chat testing stem
+
+on:
+  push:
+    branches:
+      - fix/context7-style-project-chat-v2
+    paths:
+      - .github/workflows/_fix-context7-ru-test-stem.yml
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: fix-context7-ru-test-stem
+  cancel-in-progress: false
+
+jobs:
+  fix-and-validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: fix/context7-style-project-chat-v2
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Apply stem fix and normalize temporary files
+        run: |
+          python scripts/_fix_context7_ru_test_stem.py
+          rm -f scripts/_apply_context7_project_chat_v2.py
+          rm -f scripts/_repair_context7_project_chat_v2.py
+          rm -f scripts/_finalize_context7_project_chat_v2.py
+          rm -f scripts/_fix_context7_live_gate_v2.py
+          rm -f scripts/_fix_context7_ru_test_stem.py
+          rm -f .github/workflows/_workspace-export.yml
+          rm -f .github/workflows/_apply-context7-project-chat-v2.yml
+          rm -f .github/workflows/_repair-context7-project-chat-v2.yml
+          rm -f .github/workflows/_validate-context7-project-chat-v2.yml
+          rm -f .github/workflows/_finalize-context7-project-chat-v2.yml
+          rm -f .github/workflows/_fix-context7-live-gate-v2.yml
+          python -m compileall -q docmancer eval tests/docs/test_context7_style_project_chat.py
+          git diff --check
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add -A
+          if ! git diff --cached --quiet; then
+            git commit -m "fix: recognize Russian testing newcomer wording"
+            git push origin HEAD:fix/context7-style-project-chat-v2
+          fi
+
+      - name: Install exact locked environment
+        run: |
+          python -m pip install --disable-pip-version-check 'uv==0.9.25'
+          uv sync --frozen
+
+      - name: Run all focused and frozen gates
+        env:
+          DOCATLAS_OFFLINE: '1'
+        run: |
+          uv run pytest -q \
+            tests/docs/test_context7_style_project_chat.py \
+            tests/docs/test_question_plan_v4.py \
+            tests/docs/test_model_visible_projection.py \
+            tests/docs/test_model_visible_projection_part02.py \
+            tests/docs/test_mcp_docs_tools_registration.py \
+            tests/test_project_chat_quality_v1_protocol.py \
+            tests/test_config_resolution.py \
+            tests/test_source_isolation_regression.py
+          uv run python -m eval.project_chat_context7_v1_protocol
+          uv run python scripts/run_question_surface_gate.py
+
+      - name: Run public self-hosted RU/EN project-chat gate
+        env:
+          DOCATLAS_OFFLINE: '1'
+        run: |
+          uv run python -m eval.project_chat_context7_v1_protocol --live
+
+      - name: Clean workflow and publish ready PR
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git rm .github/workflows/_fix-context7-ru-test-stem.yml
+          git commit -m "chore: remove temporary Russian stem validator"
+          git push origin HEAD:fix/context7-style-project-chat-v2
+          final_sha="$(git rev-parse HEAD)"
+          gh pr ready 173 --repo Vanilla1999/DocAtlas || true
+          gh pr comment 173 --repo Vanilla1999/DocAtlas --body "Validated retrieval-first project chat on exact source HEAD: focused parser/projection/public-surface/isolation suites, frozen question-surface gate, corpus contract, and self-hosted public RU/EN get_docs_context gate all passed. Final HEAD ${final_sha} differs only by removal of this temporary workflow."
