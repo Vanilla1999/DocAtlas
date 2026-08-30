@@ -1,0 +1,171 @@
+name: Consolidate Context7-style project chat v3
+
+on:
+  push:
+    branches:
+      - fix/context7-style-project-chat-v2
+    paths:
+      - .github/workflows/_consolidate-context7-project-chat-v3.yml
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: consolidate-context7-project-chat-v3
+  cancel-in-progress: false
+
+jobs:
+  consolidate-and-validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: fix/context7-style-project-chat-v2
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Apply implementation stages and stage a clean real diff
+        shell: bash
+        run: |
+          set -euo pipefail
+          stages=(
+            scripts/_apply_context7_project_chat_v2.py
+            scripts/_repair_context7_project_chat_v2.py
+            scripts/_finalize_context7_project_chat_v2.py
+            scripts/_fix_context7_live_gate_v2.py
+            scripts/_fix_context7_ru_test_stem.py
+          )
+          for stage in "${stages[@]}"; do
+            if [[ -f "$stage" ]]; then
+              echo "Applying $stage"
+              python "$stage"
+            fi
+          done
+
+          rm -f \
+            scripts/_apply_context7_project_chat_v2.py \
+            scripts/_repair_context7_project_chat_v2.py \
+            scripts/_finalize_context7_project_chat_v2.py \
+            scripts/_fix_context7_live_gate_v2.py \
+            scripts/_fix_context7_ru_test_stem.py \
+            .github/workflows/_workspace-export.yml \
+            .github/workflows/_apply-context7-project-chat-v2.yml \
+            .github/workflows/_repair-context7-project-chat-v2.yml \
+            .github/workflows/_validate-context7-project-chat-v2.yml \
+            .github/workflows/_finalize-context7-project-chat-v2.yml \
+            .github/workflows/_fix-context7-live-gate-v2.yml \
+            .github/workflows/_fix-context7-ru-test-stem.yml \
+            .github/workflows/_consolidate-context7-project-chat-v2.yml \
+            .github/workflows/_consolidate-context7-project-chat-v3.yml \
+            .github/workflows/_review-pr173-project-chat.yml \
+            docs/analysis/pr-173-exact-head-live-review-2026-08-30.md
+
+          required=(
+            docmancer/docs/domain/project_retrieval_intent.py
+            eval/project_chat_context7_v1_protocol.py
+            eval/project_chat_context7_v1/cases.json
+            eval/project_chat_context7_v1/protocol.lock.json
+            tests/docs/test_context7_style_project_chat.py
+            docs/adr/0002-retrieval-first-project-chat.md
+          )
+          for path in "${required[@]}"; do
+            test -f "$path" || { echo "Missing required implementation file: $path" >&2; exit 1; }
+          done
+
+          python -m compileall -q docmancer eval tests
+          git diff --check
+          git add -A
+
+          real_changes="$(git diff --cached --name-only --diff-filter=ACMRT | grep -E '^(docmancer/|eval/|tests/|docs/)' || true)"
+          if [[ -z "$real_changes" ]]; then
+            echo "No real implementation files are staged" >&2
+            git diff --cached --name-status >&2
+            exit 1
+          fi
+
+          forbidden_added="$(git diff --cached --name-only --diff-filter=ACMRT | grep -E '(^|/)_.*context7.*(yml|py)$|_workspace-export' || true)"
+          if [[ -n "$forbidden_added" ]]; then
+            echo "Temporary project-chat machinery would remain in the final tree:" >&2
+            echo "$forbidden_added" >&2
+            exit 1
+          fi
+
+          echo "Staged real changes:"
+          echo "$real_changes"
+
+      - name: Install exact locked environment
+        run: |
+          python -m pip install --disable-pip-version-check 'uv==0.9.25'
+          uv sync --frozen
+
+      - name: Run focused parser, projection, public-surface, and isolation gates
+        env:
+          DOCATLAS_OFFLINE: '1'
+        run: |
+          uv run pytest -q --maxfail=1 \
+            tests/docs/test_context7_style_project_chat.py \
+            tests/docs/test_question_plan_v4.py \
+            tests/docs/test_model_visible_projection.py \
+            tests/docs/test_model_visible_projection_part02.py \
+            tests/docs/test_mcp_docs_tools_registration.py \
+            tests/test_project_chat_quality_v1_protocol.py \
+            tests/test_config_resolution.py \
+            tests/test_source_isolation_regression.py
+          uv run python -m eval.project_chat_quality_v1_protocol
+          uv run python -m eval.project_chat_context7_v1_protocol
+          uv run python scripts/run_question_surface_gate.py
+          uv run python scripts/run_recovery_contract_gate.py
+
+      - name: Run public self-hosted RU/EN gate
+        env:
+          DOCATLAS_OFFLINE: '1'
+        run: |
+          uv run python -m eval.project_chat_context7_v1_protocol --live
+
+      - name: Commit validated implementation and update PR truthfully
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git commit -m "fix: materialize reviewed retrieval-first project chat"
+          git push origin HEAD:fix/context7-style-project-chat-v2
+          final_sha="$(git rev-parse HEAD)"
+          cat > /tmp/pr-body.md <<EOF
+          ## Goal
+
+          Make project chat behave like a bounded local Context7-style lookup while preserving DocAtlas answer and edit safety.
+
+          ## Implemented
+
+          - natural-language project retrieval is independent from strict answer certification;
+          - parser uncertainty may return bounded cited \`docs_context\` instead of blocking relevant documentation;
+          - \`docs_answer\` still requires a narrow complete contract and local proof;
+          - explicit mutations remain strict \`patch_context\`;
+          - bounded EN/RU retrieval-only aliases improve newcomer questions without becoming proof obligations;
+          - semantic retrieval qualification can expose context but cannot prove an answer or authorize an edit;
+          - generic CLI commands are not confused with the Docs MCP public-tool inventory;
+          - common weak-model argument aliases are normalized with conflict rejection;
+          - no legacy public tools, implicit legacy-state reads, or unbounded payloads are restored.
+
+          ## Validation
+
+          Passed before commit:
+
+          - targeted parser, projection, public MCP surface, configuration, and cross-project isolation tests;
+          - the existing project-chat quality gate;
+          - the frozen Context7-style project-chat corpus;
+          - the frozen question-surface and recovery-contract gates;
+          - the public self-hosted RU/EN path.
+
+          Exact validated implementation HEAD: \`${final_sha}\`.
+          EOF
+          gh pr edit 173 --repo Vanilla1999/DocAtlas --body-file /tmp/pr-body.md
+          gh pr ready 173 --repo Vanilla1999/DocAtlas || true
