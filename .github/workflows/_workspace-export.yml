@@ -1,0 +1,28 @@
+name: Workspace export (temporary)
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+permissions:
+  contents: read
+
+jobs:
+  export:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Export checked-out source
+        uses: actions/upload-artifact@v4
+        with:
+          name: docatlas-workspace-${{ github.event.pull_request.head.sha }}
+          path: |
+            .
+            !.git/**
+            !.docatlas/**
+            !.venv/**
+            !**/__pycache__/**
+          include-hidden-files: true
+          retention-days: 1
