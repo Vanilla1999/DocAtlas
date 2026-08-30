@@ -83,7 +83,7 @@ class HelpRequestDetailsScreen extends StatelessWidget {
     assert "repo_map" not in result.diagnostics
     assert result.diagnostics["retrieval_routing"]["stages"]["repo_map"]["status"] == "skipped"
     assert result.diagnostics["source_evidence"]["matched_terms"] == ["Вернуть в работу"]
-    assert result.answer_type == "exact"
+    assert result.answer_type == "partial_navigational"
     assert result.answer_completeness["missing_terms"] == []
 
 

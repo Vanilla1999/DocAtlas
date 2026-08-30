@@ -13,7 +13,7 @@ from pathlib import Path
 from docmancer.mcp.agent_config import AgentTarget, register_server
 
 TOOLS = {"get_docs_context", "prepare_docs", "docs_status"}
-QUESTION = "What does the project README say about deterministic offline release checks?"
+QUESTION = "Does the project README require deterministic offline release checks?"
 NEEDLE = "The amber lighthouse invariant requires deterministic offline release checks."
 
 

@@ -5,6 +5,6 @@
   },
   "node_overrides": {},
   "module_node_hashes": {
-    "tests/test_project_chat_quality_v1_protocol.py": "f54cedd2d55046dd8123b7fc8fa778eecd117ecf22deb5ee0c5434be320222d6"
+    "tests/test_project_chat_quality_v1_protocol.py": "7830c66dbdcc5401c4ae1e34a689784bdb3cc3ae4a524a52a72d796323f88600"
   }
 }

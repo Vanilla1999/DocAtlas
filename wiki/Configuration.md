@@ -4,6 +4,11 @@
 
 A project is configured in `docmancer.yaml` by setting documented keys such as `index.provider: sqlite`, `query.default_budget: 2400`, and optional vector/retrieval settings. Relative index paths are resolved from the location of that `docmancer.yaml`.
 
+Project documentation configuration for a repository is defined by the
+repository's `docatlas.project-docs.yaml` catalog. Runtime index and retrieval
+defaults remain in `docmancer.yaml`; the project-doc catalog defines which
+reviewable files are authoritative for project questions.
+
 ## Configuration Reference
 
 ### Index

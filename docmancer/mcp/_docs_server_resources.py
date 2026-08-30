@@ -47,7 +47,7 @@ The default public surface has exactly three tools:
 3. Retry `get_docs_context` after successful preparation.
 
 4. Interpret the bounded result:
-   - `status="ok"`: use the single canonical `docs_answer` or `patch_context` evidence.
+   - `status="ok"`: use the single canonical `docs_answer`, cited `docs_context`, or `patch_context` evidence. Only narrow relation-specific proof authorizes `docs_answer`; broad questions remain `docs_context`.
    - `status="truncated"`: honor `omitted_counts`; only non-critical material was omitted.
    - `status="insufficient_evidence"`: do not claim documentation support. Follow one typed recovery; a server-suggested rephrase is never automatic. If recovery is exhausted and `hard_stop=false`, investigate local source/tests while keeping documentary claims unproved. Stop before editing on `hard_stop=true` or when the task explicitly requires the still-unproved documentary contract.
 

@@ -278,11 +278,9 @@ def test_public_project_answer_accepts_all_semantic_facets(tmp_path, monkeypatch
         service,
     )
 
-    assert result["support_status"] == "supported"
-    assert result["answer_supported"] is True
-    assert not result["missing_requirement_ids"]
-    assert result["answer_completeness"]["status"] == "exact"
-    assert result["answer_completeness"]["canonical_support"]["answer_supported"] is True
+    assert result["support_status"] == "insufficient_evidence"
+    assert result["answer_supported"] is False
+    assert "unsupported_answer_authorization:context_only_relation" in result["missing_requirement_ids"]
 
 
 def test_public_project_answer_heading_only_is_not_factual_proof(tmp_path, monkeypatch):
@@ -428,8 +426,8 @@ def test_public_project_answer_accepts_comparison_relation(tmp_path, monkeypatch
         service,
     )
 
-    assert result["support_status"] == "supported"
-    assert result["answer_supported"] is True
+    assert result["support_status"] == "insufficient_evidence"
+    assert result["answer_supported"] is False
 
 
 def test_public_project_answer_supports_russian_behavior_and_usage(tmp_path, monkeypatch):
@@ -454,8 +452,8 @@ def test_public_project_answer_supports_russian_behavior_and_usage(tmp_path, mon
         service,
     )
 
-    assert result["support_status"] == "supported"
-    assert result["answer_supported"] is True
+    assert result["support_status"] == "insufficient_evidence"
+    assert result["answer_supported"] is False
 
 
 def test_public_project_answer_rejects_incomplete_russian_usage(tmp_path, monkeypatch):

@@ -22,6 +22,15 @@ Alongside the FTS5 index, each section is embedded with FastEmbed (local dense +
 
 Each library+version has its own independent SQLite index. The `LibraryDocsService._index_config_for` method creates a separate database under `~/.docmancer/docs-indexes/<normalized_name>.db` and a separate extracted directory. This prevents cross-library contamination, enables independent refresh/recreate per target, and keeps the global `docmancer.db` registry lightweight (metadata only).
 
+## Project documentation storage and isolation
+
+Project documentation storage is organized as a derived, project-scoped index
+of repository-owned files. Each project identity receives isolated SQLite index
+state and extracted artifacts, so one repository's project docs cannot satisfy
+another repository's query. The filesystem documents remain authoritative; the
+index is a rebuildable cache coordinated by the writer lease and cleanup barrier
+described in [Index cleanup](../docs/index-cleanup.md).
+
 ## Retrieval
 
 Queries run against the FTS5 index using BM25 ranking. This is a good fit for documentation retrieval because most queries are dominated by exact API names, option flags, config keys, error strings, and code identifiers.
@@ -96,7 +105,7 @@ The resolution happens in `LibraryDocsService.get_docs()` when `project_path` is
 
 `doc-atlas mcp docs-serve` exposes the docs runtime to coding agents as MCP tools. It uses the same local ingest, index, update, and query path as the CLI, plus the persistent SQLite registry for known documentation sources.
 
-For repository coding and patch tasks, agents should call `get_docs_context(project_path=..., question=..., mode="project")` first. The server returns one bounded canonical `docs_answer`, `patch_context`, or fail-closed `insufficient_evidence` projection by default; rich retrieval evidence remains internal for validation. Follow a bounded `recommended_next_action` when reconciliation is needed, and then retry the same request. Broader compatibility output remains available only for explicit documentation exploration. `docs_status` is reserved for explicit health, freshness, index, and job-status requests. This exactly-three-tool default keeps routing unambiguous; low-level inspection and patch tools require `DOCMANCER_MCP_ADVANCED_TOOLS=1`. Agents should cite canonical projected sources and treat `CHANGELOG.md` as primary evidence only for release-history or "what changed" questions.
+For repository coding and patch tasks, agents should call `get_docs_context(project_path=..., question=..., mode="project")` first. The server returns exactly one bounded canonical `docs_answer`, `docs_context`, `patch_context`, or fail-closed `insufficient_evidence` projection. Only narrow relation-specific proof authorizes `docs_answer`; broad questions use cited `docs_context` with compact facets and no completeness claim. Operational retrieval excludes evaluation, planning, and history lanes unless the question explicitly asks for them. Follow a bounded `recommended_next_action` when reconciliation is needed, then retry the same request. `docs_status` is reserved for explicit health, freshness, index, and job-status requests.
 
 Internally, project context retrieval is staged: documentation first, then bounded source evidence, repository map, and code graph only when deterministic unresolved-target or cross-module signals require them. A versioned routing record stores stage status/reason/count/bytes outside the canonical model projection. Repository maps remain navigation evidence and never become authoritative project policy.
 

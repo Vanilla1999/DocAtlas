@@ -52,6 +52,17 @@ _GENERIC_PROJECT_STOP_TOKENS = frozenset({
 })
 _GENERIC_COMPOUND_SEPARATOR_RE = _re.compile(r"[_.:/+-]")
 _GENERIC_ANCHOR_PART_RE = _re.compile(r"[A-Za-zА-Яа-яЁё0-9]+")
+_DOCS_CONTEXT_RESULT_KINDS = (
+    "docs_answer", "docs_context", "patch_context", "insufficient_evidence",
+)
+
+# These proof families can establish a local proposition, but they are too
+# open-ended to authorize a complete answer for a weak downstream model.
+_CONTEXT_ONLY_RELATIONS = frozenset({
+    "behavior", "contrast", "implementation", "purpose", "procedure",
+    "selection_policy",
+})
+_SPECIALIZED_BEHAVIOR_RELATIONS = frozenset({"storage_coordination"})
 
 
 def _clean_term(value: object) -> str:
@@ -173,10 +184,86 @@ def _merge_bounded(existing: tuple[str, ...], additions: tuple[str, ...], limit:
     return tuple(dict.fromkeys((*existing, *additions)))[:limit]
 
 
+def obligations_can_authorize_docs_answer(
+    obligations: tuple[ProofObligation, ...],
+) -> bool:
+    """Return whether complete local proof may authorize ``docs_answer``.
+
+    Retrieval and local proposition proof remain available for broad facets;
+    this policy only controls the stronger complete-answer claim.
+    """
+
+    if not obligations:
+        return False
+    for obligation in obligations:
+        relation = str(obligation.relation or "").casefold()
+        if obligation.kind == "definition":
+            return False
+        if (
+            obligation.kind == "behavior"
+            and relation not in _SPECIALIZED_BEHAVIOR_RELATIONS
+        ):
+            return False
+        if obligation.kind == "location" and _re.search(
+            r"\b(?:and|or)\s+(?:how|why|what|when|where|which)\b",
+            obligation.subject,
+            _re.I,
+        ):
+            return False
+        if relation == "contract_fact" and not (
+            obligation.attribute or obligation.expected_value or obligation.context
+        ):
+            return False
+        if relation in _CONTEXT_ONLY_RELATIONS:
+            return False
+        if relation == "usage" and obligation.subject_kind != "env_var":
+            return False
+        if obligation.kind in {"behavior", "purpose", "usage", "workflow"} and not relation:
+            return False
+    return True
+
+
+def can_authorize_docs_answer(contract: ProjectAnswerContract) -> bool:
+    """Return whether a complete project-answer contract is narrow enough."""
+
+    return (
+        not contract.unresolved_parts
+        and obligations_can_authorize_docs_answer(contract.proof_obligations)
+    )
+
+
+def _expand_exact_response_contract(contract: ProjectAnswerContract) -> ProjectAnswerContract:
+    candidates = tuple(
+        obligation
+        for obligation in contract.proof_obligations
+        if obligation.subject == "get_docs_context"
+        and obligation.relation == "contract_fact"
+        and obligation.attribute == "response contract"
+    )
+    if len(candidates) != 1 or len(contract.proof_obligations) != 1:
+        return contract
+    base = candidates[0]
+    return _replace(
+        contract,
+        proof_obligations=tuple(
+            _replace(
+                base,
+                obligation_id=f"{base.obligation_id}:{kind}",
+                target=kind,
+                expected_value=kind,
+            )
+            for kind in _DOCS_CONTEXT_RESULT_KINDS
+        ),
+        parse_trace=(*contract.parse_trace, "contract:get_docs_context_result_union"),
+    )
+
+
 def build_project_answer_contract(question: str) -> ProjectAnswerContract:
     """Build the contract and fail closed when legacy semantics are incomplete."""
 
-    contract = _build_project_answer_contract_legacy(question)
+    contract = _expand_exact_response_contract(
+        _build_project_answer_contract_legacy(question)
+    )
     raw_question = str(question or "")[:4_000]
     plan = _compile_question_plan(raw_question)
     if plan.handled:

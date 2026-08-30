@@ -16,6 +16,10 @@ Use project-docs MCP tools when the user asks about:
 
 ## Canonical lifecycle: sync
 
+After editing project documentation files, refresh the repository index with the
+returned `prepare_docs(action="sync_project_docs")` action. This is the canonical
+workflow for reconciling changed files before retrying `get_docs_context`.
+
 `sync_project_docs` is the recommended lifecycle action. It replaces the old two-step `inspect → ingest` loop:
 
 1. **discovers** current candidates from the filesystem;
@@ -72,7 +76,7 @@ After sync, proceed to:
 get_docs_context(project_path=..., question=..., mode="project")
 ```
 
-`get_docs_context(mode="project")` returns one bounded public result: a strictly proven `docs_answer`, retrieval-only `docs_context` with `answer_policy="cite_only"`, or fail-closed `insufficient_evidence` with a typed recommended action.
+`get_docs_context(mode="project")` returns exactly one bounded public result: narrow and strictly proven `docs_answer`, retrieval-only `docs_context` with `answer_policy="cite_only"`, source-bound `patch_context` for an explicit change task, or fail-closed `insufficient_evidence`. Broad questions stay `docs_context` even when retrieval finds locally relevant prose.
 
 For module-specific queries, use exact module filters:
 

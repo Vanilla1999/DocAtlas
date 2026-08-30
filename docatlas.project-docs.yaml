@@ -20,7 +20,7 @@ documents:
     role: overview
     scope: project
     description: Project overview, capabilities, and entry points.
-    authority: supporting
+    authority: source_of_truth
     status: active
     impact: track
 
@@ -28,15 +28,47 @@ documents:
     role: other
     scope: project
     description: Released and pending project changes.
-    authority: supporting
+    authority: historical
     status: active
-    impact: track
+    impact: search_only
 
   - path: CONTRIBUTING.md
     role: development
     scope: project
     description: Development and contribution workflow.
-    authority: supporting
+    authority: source_of_truth
+    status: active
+    impact: track
+
+  - path: docs/DOCMANCER_PRODUCT_BRIEF.md
+    role: overview
+    scope: project
+    description: Product purpose, problem statement, supported workflows, and boundaries.
+    authority: source_of_truth
+    status: active
+    impact: track
+
+  - path: docs/INDEX.md
+    role: overview
+    scope: project
+    description: Canonical index of maintained project documentation.
+    authority: source_of_truth
+    status: active
+    impact: track
+
+  - path: docs/PROJECT_MAP.md
+    role: project_architecture
+    scope: project
+    description: Repository subsystem map and contributor reading entry points.
+    authority: source_of_truth
+    status: active
+    impact: track
+
+  - path: wiki/Architecture.md
+    role: project_architecture
+    scope: project
+    description: Runtime architecture, indexing, project storage, and per-project isolation.
+    authority: source_of_truth
     status: active
     impact: track
 

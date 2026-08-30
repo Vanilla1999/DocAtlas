@@ -14,7 +14,9 @@
 
 ---
 
-Local-first documentation context remains the runtime foundation: DocAtlas turns reviewable project docs, lockfiles, and approved dependency documentation into compact, source-attributed evidence for coding agents. It keeps authority, scope, and version binding explicit and fails closed when mandatory evidence is unavailable. Its default MCP surface is deliberately small so agents select the correct operation reliably.
+## What DocAtlas is and what problem it solves
+
+Local-first documentation context remains the runtime foundation: DocAtlas solves the problem of coding agents guessing from stale or generic documentation. It turns reviewable project docs, lockfiles, and approved dependency documentation into compact, source-attributed evidence for coding agents. It keeps authority, scope, and version binding explicit and fails closed when mandatory evidence is unavailable. Its default MCP surface is deliberately small so agents select the correct operation reliably.
 
 The primary journey is:
 
@@ -98,7 +100,7 @@ get_docs_context(question=..., project_path=...)
 → retry get_docs_context(...)
 ```
 
-This makes `get_docs_context` the single high-level entry point. Documentation questions receive one bounded `docs_answer`; coding and patch tasks receive one source-bound `patch_context`; missing critical evidence returns fail-closed `insufficient_evidence`. Delivery strategy, debug shape, and packet budget are server-owned policy. Broader compatibility output is reserved for explicit documentation exploration.
+This makes `get_docs_context` the single high-level entry point. Narrow typed questions with complete relation-specific proof receive `docs_answer`; broader questions receive cited retrieval-only `docs_context`; coding and patch tasks receive source-bound `patch_context`; missing safe evidence returns fail-closed `insufficient_evidence`. When completeness or the requested relation is uncertain, the server chooses `docs_context`, not `docs_answer`. Delivery strategy, debug shape, and packet budget are server-owned policy.
 
 MCP responses carry the complete payload in `structuredContent` and only a constant marker in text. OpenCode registration automatically sets `DOCATLAS_MCP_TEXT_FALLBACK=1` because current OpenCode releases do not preserve `structuredContent` in model-visible tool output; manually configured OpenCode entries need the same environment setting. Other clients retain the structured lane. Fallback switches to text-only JSON instead of sending the payload twice. Previously accepted advanced arguments remain available during the compatibility transition but are no longer advertised to normal coding agents.
 

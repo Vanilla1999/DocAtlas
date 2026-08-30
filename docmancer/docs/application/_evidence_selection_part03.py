@@ -5,6 +5,7 @@ from ._evidence_selection_shared import *  # noqa: F401,F403
 
 from ._evidence_selection_part01 import SelectionDecision, _assignment_preference, _candidate_preference, _candidate_requirement_witness, _candidate_source_view, _count_reasons, _eligible_candidates, _redundant_token_ratio_millis, _selected_identity
 from ._evidence_selection_part02 import _authority_conflicts, _code_group_requirement_matches, _deduplicate, _facet_requirement_matches, _raw_candidate_binding, _reserve_and_select, _scope_requirement_value, _selected_feature_trace, _with_canonical_policy_requirements, _witness_for_requirement
+from docmancer.docs.domain.project_answer_contract import obligations_can_authorize_docs_answer
 
 
 def _hydrate_cohesive_contract_paragraphs(
@@ -367,6 +368,20 @@ def select_evidence(
     missing.update(mandatory - assigned_requirement_ids)
     if status == "ok" and mandatory - assigned_requirement_ids:
         status = "insufficient_evidence"
+    if config.profile == "project_docs_answer":
+        proof_obligations = tuple(
+            obligation
+            for requirement in requirements
+            if requirement.mandatory
+            if (obligation := requirement.as_proof_obligation()) is not None
+        )
+        if proof_obligations and not obligations_can_authorize_docs_answer(proof_obligations):
+            missing.add("unsupported_answer_authorization:context_only_relation")
+            missing.update(
+                f"context_only:{obligation.relation or obligation.kind}"
+                for obligation in proof_obligations
+            )
+            status = "insufficient_evidence"
     assignment_hash = canonical_hash([asdict(item) for item in assignments])
     selection_hash = canonical_hash({
         "schema_version": SELECTOR_SCHEMA_VERSION,

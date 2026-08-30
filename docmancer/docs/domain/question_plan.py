@@ -388,7 +388,7 @@ _CHOICE_TAIL_RE = re.compile(
     re.I,
 )
 _SPLIT_TAIL_RE = re.compile(
-    r"(?:documents?|input|text|content|files?|pages?|questions?|queries?|"
+    r"(?:documents?|documentation|input|text|content|files?|pages?|questions?|queries?|"
     r"results?|evidence)"
     r"(?:\s+(?:into|by|across)\s+"
     r"(?:sections?|chunks?|clauses?|units?|groups?)"

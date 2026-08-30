@@ -135,7 +135,10 @@ def test_authoritative_source_identity_can_bind_behavior_subject():
         requirements=requirements,
     )
 
-    assert decision.support_decision.answer_supported is True
+    assert decision.support_decision.answer_supported is False
+    assert "unsupported_answer_authorization:context_only_relation" in (
+        decision.support_decision.missing_requirement_ids
+    )
     assert decision.assignments[0].unit_id is not None
     assert decision.assignments[0].unit_content_hash is not None
 
@@ -167,7 +170,7 @@ def test_project_term_and_query_symbol_share_one_canonical_obligation():
     ) in requirements.query_extraction_provenance
 
 
-def test_project_answer_requires_behavior_and_usage_facets_in_visible_text():
+def test_broad_behavior_and_usage_facets_are_context_only_even_when_locally_proved():
     question = "What does docs_status report and when should it be used?"
     requirements = build_requirements(question, profile="project_docs_answer")
     complete = select_evidence(
@@ -189,7 +192,8 @@ def test_project_answer_requires_behavior_and_usage_facets_in_visible_text():
         (item.obligation_kind, item.subject)
         for item in requirements if item.kind == "proof_obligation"
     } == {("behavior", "docs_status"), ("usage", "docs_status")}
-    assert complete.support_decision.answer_supported is True
+    assert complete.support_decision.answer_supported is False
+    assert "unsupported_answer_authorization:context_only_relation" in complete.missing_requirements
     assert incomplete.support_decision.answer_supported is False
 
 
@@ -218,7 +222,7 @@ def test_project_answer_requires_recall_and_authority_invariant_facets():
     assert incomplete.support_decision.answer_supported is False
 
 
-def test_project_answer_requires_relational_comparison_proof():
+def test_broad_relational_comparison_is_context_only_even_when_locally_proved():
     question = "Compare async with launch"
     requirements = build_requirements(question, profile="project_docs_answer")
     complete = select_evidence(
@@ -240,7 +244,8 @@ def test_project_answer_requires_relational_comparison_proof():
     )
     assert comparison.subject == "async"
     assert comparison.obligation_target == "launch"
-    assert complete.support_decision.answer_supported is True
+    assert complete.support_decision.answer_supported is False
+    assert "unsupported_answer_authorization:context_only_relation" in complete.missing_requirements
     assert incomplete.support_decision.answer_supported is False
 
 
@@ -711,6 +716,26 @@ def test_selection_is_byte_deterministic_under_candidate_permutation():
     assert first.audit_manifest() == second.audit_manifest()
     assert first.selection_hash == second.selection_hash
     assert validate_evidence_sufficiency(first, result_kind="docs_answer") == []
+
+
+def test_generic_behavior_local_proof_cannot_authorize_project_docs_answer():
+    question = "What does OrderSubmission do?"
+    requirements = build_requirements(question, profile="project_docs_answer")
+
+    decision = select_evidence(
+        [_candidate(
+            "order-submission",
+            "OrderSubmission validates the draft before persistence.",
+            source="docs/orders.md",
+        )],
+        question=question,
+        config=project_docs_selection_config(800),
+        requirements=requirements,
+    )
+
+    assert decision.status == "insufficient_evidence"
+    assert decision.support_decision.answer_supported is False
+    assert "unsupported_answer_authorization:context_only_relation" in decision.missing_requirements
 
 
 def test_wrong_exact_version_cannot_win_with_a_higher_score():

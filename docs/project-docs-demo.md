@@ -23,6 +23,8 @@ Preferred public MCP happy path:
 3. Use `docs_status` only when the user explicitly asks about health, freshness, index state, or a background job.
 4. Answer only from a returned `docs_answer` or from cited `docs_context` sources under its `answer_policy="cite_only"`; follow typed recovery actions for incomplete results.
 
+The complete bounded result union is `docs_answer`, `docs_context`, `patch_context`, and `insufficient_evidence`. Treat broad explanatory results as `docs_context`; only a narrow typed relation with complete proof may become `docs_answer`.
+
 Legacy compatibility note:
 
 Older docs surfaces may expose direct inspection or project-doc verbs. Treat those as advanced/legacy compatibility tools. The default surface has exactly three tools: `get_docs_context`, `prepare_docs`, and `docs_status`.

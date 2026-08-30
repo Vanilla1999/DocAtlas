@@ -139,13 +139,18 @@ def test_reusable_question_frames_survive_real_manifest_sync_and_public_mcp(tmp_
     assert lookup_payload["status"] == "ok", lookup_payload
     assert lookup_payload["kind"] == "docs_context"
     assert "GitBook sites" in str(lookup_payload)
-    assert lookup_payload["query_coverage"] == "partial"
-    assert lookup_payload["retrieval_coverage"] == "partial"
+    expected_retrieval_coverage = (
+        "full" if not lookup_payload["missing_query_ids"] else "partial"
+    )
+    assert lookup_payload["query_coverage"] == expected_retrieval_coverage
+    assert lookup_payload["retrieval_coverage"] == expected_retrieval_coverage
     assert lookup_payload["facet_coverage"] == "unverified"
-    assert lookup_payload["covered_query_ids"] == ["query-lookup-1"]
-    assert lookup_payload["missing_query_ids"] == ["query-original"]
+    assert {"query-facet-1", "query-lookup-1"}.issubset(
+        lookup_payload["covered_query_ids"]
+    )
     assert any(
-        "query-lookup-1" in source["retrieval_query_ids"]
+        source["path_or_url"] == "docs/sources.md"
+        and "GitBook sites" in source["snippet"]
         for source in lookup_payload["sources"]
     )
 

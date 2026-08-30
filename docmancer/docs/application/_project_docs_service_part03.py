@@ -185,15 +185,21 @@ class _ProjectDocsServicePart03:
             filters["project_doc_path"] = evidence_path
         agent = self._agent_instance()
         effective_limit = limit or agent.config.query.default_limit
+        if requirements is not None:
+            # Candidate generation needs enough diversity for deterministic
+            # lane/facet selection; the model-visible projection remains capped
+            # at three sources and owns the final token ceiling.
+            effective_limit = max(effective_limit, 20)
         budget = tokens or DEFAULT_DOC_TOKENS
         effective_expand = (expand or "none") if requirements is not None else expand
         documentation_query_plan = build_documentation_query_plan(
             query, lookup_queries=lookup_queries, explicit_path=evidence_path,
+            requirements=requirements,
         )
         lookup_query_ids = {
             item.text: item.query_id
             for item in documentation_query_plan.queries
-            if item.origin in {"host_lookup", "auto_clause", "concept_alias"}
+            if item.origin in {"mandatory_facet", "host_lookup", "auto_clause", "concept_alias", "retrieval_hint"}
         }
         exact_path_query_id = next((
             item.query_id for item in documentation_query_plan.queries
@@ -224,7 +230,7 @@ class _ProjectDocsServicePart03:
         ))[:4]
         planned_lookup_queries = tuple(
             item.text for item in documentation_query_plan.queries
-            if item.origin in {"host_lookup", "auto_clause", "concept_alias"}
+            if item.origin in {"mandatory_facet", "host_lookup", "auto_clause", "concept_alias", "retrieval_hint"}
         )
         supplemental_queries = tuple(dict.fromkeys((
             *planned_lookup_queries,
@@ -336,18 +342,6 @@ class _ProjectDocsServicePart03:
             candidates.sort(
                 key=lambda chunk: not bool(
                     (chunk.metadata or {}).get("retrieval_query_ids")
-                )
-            )
-        if probe_queries:
-            probe_terms = tuple({
-                term.casefold()
-                for probe in probe_queries
-                for term in re.findall(r"[A-Za-zА-Яа-я0-9_.:/+-]{3,}", probe)
-            })
-            candidates.sort(
-                key=lambda chunk: -sum(
-                    term in str(chunk.text or "").casefold()
-                    for term in probe_terms
                 )
             )
         selected = []

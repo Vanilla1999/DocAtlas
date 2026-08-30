@@ -39,9 +39,6 @@ class _ProjectContextServicePart01:
         root = Path(project_path).expanduser().resolve()
         intent = classify_project_query_intent(question)
         evidence_path = extract_document_locator(question)
-        documentation_query_plan = build_documentation_query_plan(
-            question, lookup_queries=lookup_queries, explicit_path=evidence_path,
-        )
         mutation_target_paths = tuple(
             target.value
             for target in mutation_intent.requested_targets
@@ -59,6 +56,12 @@ class _ProjectContextServicePart01:
                 required_target_paths=mutation_target_paths,
                 profile="project_document_answer" if evidence_path else "project_docs_answer",
             )
+        )
+        documentation_query_plan = build_documentation_query_plan(
+            question,
+            lookup_queries=lookup_queries,
+            explicit_path=evidence_path,
+            requirements=canonical_requirements,
         )
         metadata = self.facade.read_project_metadata(str(root))
         project_docs = None

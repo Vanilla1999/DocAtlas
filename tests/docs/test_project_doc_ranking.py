@@ -4,7 +4,14 @@ from collections import Counter
 from dataclasses import dataclass, field
 from typing import Any
 
-from docmancer.docs.domain.project_doc_ranking import rerank_project_doc_chunks, source_weight_for_intent, source_weight_reason
+from docmancer.docs.domain.project_doc_ranking import (
+    project_question_lane,
+    project_source_lane,
+    rerank_project_doc_chunks,
+    source_lane_allowed,
+    source_weight_for_intent,
+    source_weight_reason,
+)
 from docmancer.docs.domain.project_query_intent import classify_project_query_intent
 
 
@@ -35,7 +42,7 @@ def test_changelog_demoted_for_how_ingestion_question():
         limit=3,
     )
     assert ranked[0].path != "CHANGELOG.md"
-    assert ranked[-1].path == "CHANGELOG.md"
+    assert "CHANGELOG.md" not in [chunk.path for chunk in ranked]
 
 
 def test_changelog_boosted_for_release_question():
@@ -47,6 +54,37 @@ def test_changelog_boosted_for_release_question():
         limit=2,
     )
     assert ranked[0].path == "CHANGELOG.md"
+
+
+def test_source_lanes_fail_closed_for_operational_questions():
+    assert project_question_lane("How do I install the project?") == "operational"
+    assert project_question_lane("Show benchmark metrics") == "evaluation"
+    assert project_question_lane("What is the current roadmap?") == "planning"
+    assert project_question_lane("Was this deprecated in the previous version?") == "history"
+    assert project_source_lane("eval/project_chat/cases.json") == "evaluation"
+    assert project_source_lane(".hermes/plans/work.md") == "planning"
+    assert project_source_lane("CHANGELOG.md") == "history"
+    assert project_source_lane("docs/testing.md") == "operational"
+
+    ranked = rerank_project_doc_chunks(
+        [
+            fake_chunk("eval/results.md", "Install benchmark", 100.0),
+            fake_chunk(".hermes/plans/install.md", "Install plan", 100.0),
+            fake_chunk("CHANGELOG.md", "Install changed", 100.0),
+            fake_chunk("README.md", "Install", 0.1),
+        ],
+        question="How do I install the project?",
+        intent=classify_project_query_intent("How do I install the project?"),
+        limit=4,
+    )
+    assert [chunk.path for chunk in ranked] == ["README.md"]
+    for path in (
+        "eval/results.md", ".hermes/plans/work.md", "roadmap/work.md",
+        "CHANGELOG.md", "archive/old.md", "legacy/notes.md",
+    ):
+        assert not source_lane_allowed(
+            path, "How do I install the project?", impact_policy="track",
+        )
 
 
 def test_architecture_project_structure_includes_contributing_when_available():
@@ -115,7 +153,7 @@ def test_exact_heading_outranks_unrelated_source_of_truth():
     )
 
     assert ranked[0].path == "docs/adr/0001-mcp-boundary-contracts.md"
-    assert ranked[-1].path == "eval/project_answer_quality_v4/README.md"
+    assert [chunk.path for chunk in ranked] == ["docs/adr/0001-mcp-boundary-contracts.md"]
 
 
 def test_packs_mcp_query_boosts_packs():

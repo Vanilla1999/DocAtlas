@@ -51,3 +51,4 @@ This is the canonical map of maintained DocAtlas project-owned documentation. Ag
 - Prefer links to repository-owned docs over generated hidden summaries.
 - Update this file when adding architecture docs, runbooks, ADRs, workflow docs, or new user-facing references.
 - After documentation changes, call `get_docs_context`; when it recommends synchronization, run the returned `prepare_docs(action="sync_project_docs")` action and retry the original question unchanged.
+- The bounded result union is `docs_answer`, `docs_context`, `patch_context`, or `insufficient_evidence`; broad questions use cited `docs_context`, while only narrow relation-specific proof authorizes `docs_answer`.

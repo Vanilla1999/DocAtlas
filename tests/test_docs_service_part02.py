@@ -784,7 +784,7 @@ def test_query_project_docs_attributes_generic_retrieval_hints_without_covering_
     )
 
     assert len(chunks) == 1
-    assert "query-supplemental-1" in chunks[0].metadata["retrieval_query_ids"]
+    assert "query-hint-1" in chunks[0].metadata["retrieval_query_ids"]
     assert "query-original" not in chunks[0].metadata["retrieval_query_ids"]
 
 

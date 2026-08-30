@@ -17,6 +17,8 @@ from docmancer.agent import DocmancerAgent
 from docmancer.core.config import DocmancerConfig
 from docmancer.docs.application.docs_job_service import DocsJobTracker
 from docmancer.docs.application.evidence_selection import build_requirements
+from docmancer.docs.application import _evidence_selection_part03 as evidence_selection_part03
+from docmancer.docs.domain import project_doc_ranking
 from docmancer.docs.interfaces.mcp import context_tools
 from docmancer.docs.registry import LibraryRegistry
 from docmancer.docs.service import LibraryDocsService
@@ -163,14 +165,24 @@ def _isolated_home(path: Path) -> Iterator[None]:
 def _frozen_answer_projection() -> Iterator[None]:
     """Keep the hermetic v1-v4 proof oracle separate from live final routing."""
 
-    original = context_tools.maybe_project_docs_context
+    original_projection = context_tools.maybe_project_docs_context
+    original_authorization = evidence_selection_part03.obligations_can_authorize_docs_answer
+    original_lane_eligibility = project_doc_ranking.source_lane_allowed
     context_tools.maybe_project_docs_context = lambda **kwargs: (
         kwargs["projection"], kwargs["snapshot"]
+    )
+    # The frozen protocols predate production relation authorization. Their
+    # immutable oracle continues to evaluate the original proof boundary.
+    evidence_selection_part03.obligations_can_authorize_docs_answer = lambda _obligations: True
+    project_doc_ranking.source_lane_allowed = (
+        lambda _path, _question, *, impact_policy=None: True
     )
     try:
         yield
     finally:
-        context_tools.maybe_project_docs_context = original
+        context_tools.maybe_project_docs_context = original_projection
+        evidence_selection_part03.obligations_can_authorize_docs_answer = original_authorization
+        project_doc_ranking.source_lane_allowed = original_lane_eligibility
 
 
 def _write_repository(root: Path, case: QualityCase) -> None:

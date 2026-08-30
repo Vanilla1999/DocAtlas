@@ -1,0 +1,45 @@
+{
+  "schema_version": "project-chat-onboarding-protocol-v1",
+  "case_file": "onboarding_cases.json",
+  "case_file_sha256": "f1c75f21408733e3190dc4dbc503a4cff022b5b3296c833dece2c0b6f7a88a23",
+  "case_count": 20,
+  "case_ids": [
+    "onboarding-install-01",
+    "onboarding-overview-02",
+    "onboarding-map-03",
+    "onboarding-mcp-04",
+    "workflow-sync-05",
+    "workflow-config-06",
+    "workflow-cleanup-07",
+    "workflow-troubleshoot-08",
+    "architecture-storage-09",
+    "architecture-isolation-10",
+    "architecture-chunking-11",
+    "architecture-selection-12",
+    "testing-contribute-13",
+    "testing-offline-14",
+    "testing-markers-15",
+    "command-server-16",
+    "location-config-17",
+    "wrong-relation-readme-18",
+    "wrong-relation-architecture-19",
+    "nonexistent-quantum-20"
+  ],
+  "class_counts": {
+    "onboarding": 5,
+    "operational_workflow": 5,
+    "architecture_storage": 4,
+    "tests_contribution": 3,
+    "wrong_relation": 2,
+    "nonexistent": 1
+  },
+  "thresholds": {
+    "false_supported_max": 0,
+    "operational_contamination_max": 0,
+    "top1_relevance_min": 0.8,
+    "top3_relevance_min": 0.95,
+    "false_abstention_max": 2,
+    "cases_scoring_8_plus_min": 16,
+    "mean_score_min": 8.0
+  }
+}
