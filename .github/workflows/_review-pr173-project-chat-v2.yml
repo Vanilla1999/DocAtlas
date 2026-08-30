@@ -1,0 +1,289 @@
+name: Review PR 173 project chat v2
+
+on:
+  push:
+    branches:
+      - fix/context7-style-project-chat-v2
+    paths:
+      - .github/workflows/_review-pr173-project-chat-v2.yml
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: review-pr173-project-chat-v2
+  cancel-in-progress: false
+
+jobs:
+  exact-head-review:
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: fix/context7-style-project-chat-v2
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Verify final PR tree before review
+        id: tree
+        continue-on-error: true
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch origin feat/weak-model-project-chat-safety fix/context7-style-project-chat-v2
+          git checkout -B fix/context7-style-project-chat-v2 origin/fix/context7-style-project-chat-v2
+          required=(
+            docmancer/docs/domain/project_retrieval_intent.py
+            eval/project_chat_context7_v1_protocol.py
+            eval/project_chat_context7_v1/cases.json
+            eval/project_chat_context7_v1/protocol.lock.json
+            tests/docs/test_context7_style_project_chat.py
+            docs/adr/0002-retrieval-first-project-chat.md
+          )
+          for path in "${required[@]}"; do
+            test -f "$path" || { echo "Missing required implementation file: $path" >&2; exit 1; }
+          done
+          leftovers="$(git diff --name-only origin/feat/weak-model-project-chat-safety...HEAD | grep -E '(^|/)_.*context7.*(yml|py)$|_workspace-export' || true)"
+          leftovers="$(printf '%s\n' "$leftovers" | grep -v '^.github/workflows/_review-pr173-project-chat-v2.yml$' || true)"
+          if [[ -n "$leftovers" ]]; then
+            echo "Temporary implementation machinery remains:" >&2
+            echo "$leftovers" >&2
+            exit 1
+          fi
+          git diff --check origin/feat/weak-model-project-chat-safety...HEAD
+
+      - name: Install locked environment
+        if: steps.tree.outcome == 'success'
+        run: |
+          python -m pip install --disable-pip-version-check 'uv==0.9.25'
+          uv sync --frozen
+
+      - name: Run regression and safety review
+        id: regression
+        if: steps.tree.outcome == 'success'
+        continue-on-error: true
+        env:
+          DOCATLAS_OFFLINE: '1'
+        shell: bash
+        run: |
+          set -o pipefail
+          mkdir -p /tmp/pr173-review
+          {
+            uv run pytest -q --maxfail=1 \
+              tests/docs/test_context7_style_project_chat.py \
+              tests/docs/test_question_plan_v4.py \
+              tests/docs/test_model_visible_projection.py \
+              tests/docs/test_model_visible_projection_part02.py \
+              tests/docs/test_mcp_docs_tools_registration.py \
+              tests/test_project_chat_quality_v1_protocol.py \
+              tests/test_config_resolution.py \
+              tests/test_source_isolation_regression.py \
+              tests/test_unified_docs_context_mcp.py \
+              tests/test_docs_service_part02.py
+            uv run python -m eval.project_chat_quality_v1_protocol
+            uv run python -m eval.project_chat_context7_v1_protocol
+            uv run python scripts/run_question_surface_gate.py
+            uv run python scripts/run_recovery_contract_gate.py
+            python -m compileall -q docmancer eval tests
+          } 2>&1 | tee /tmp/pr173-review/regression.log
+
+      - name: Ask 18 unseen RU/EN questions through public path
+        id: holdout
+        if: steps.tree.outcome == 'success'
+        continue-on-error: true
+        env:
+          DOCATLAS_OFFLINE: '1'
+        shell: bash
+        run: |
+          set -o pipefail
+          mkdir -p /tmp/pr173-review
+          cat > /tmp/pr173-review/run_holdout.py <<'PY'
+          from __future__ import annotations
+
+          import json
+          from pathlib import Path
+
+          from scripts.run_project_docs_self_host_gate import LiveCase, run as run_live
+
+          BLOCKED = ("eval/", ".hermes/plans/", "roadmap/")
+
+          def case(
+              question: str,
+              paths: tuple[str, ...],
+              kind: str,
+              *,
+              facts: tuple[tuple[str, str], ...] = (),
+              forbidden: tuple[str, ...] = (),
+          ) -> LiveCase:
+              return LiveCase(
+                  question=question,
+                  relevant_paths=paths,
+                  expected_kind=kind,
+                  required_facts_by_path=facts,
+                  forbidden_source_prefixes=BLOCKED,
+                  forbidden_answer_fragments=forbidden,
+              )
+
+          cases = (
+              case("Я установил DocAtlas. Как убедиться, что он вообще работает?", ("README.md", "CONTRIBUTING.md", "wiki/Install-Targets.md"), "docs_context"),
+              case("С какого файла новичку лучше начать знакомство с репозиторием?", ("README.md", "CONTRIBUTING.md", "docs/INDEX.md", "docs/PROJECT_MAP.md"), "docs_context"),
+              case("Какие команды выполнить сразу после установки DocAtlas?", ("README.md", "wiki/Commands.md", "wiki/Install-Targets.md"), "docs_context", forbidden=("three public Docs MCP tools", "три публичных инструмента")),
+              case("Где перечислить документы, которым проект доверяет при ответах?", ("wiki/Configuration.md", "docs/project-docs-mcp-workflow.md", "docs/mcp-docs-server.md"), "docs_context"),
+              case("Можно ли пользоваться DocAtlas полностью без доступа к интернету?", ("README.md", "docs/testing.md", "wiki/Architecture.md", "wiki/Configuration.md"), "docs_context"),
+              case("Куда сохраняется индекс и как не смешиваются данные разных репозиториев?", ("wiki/Architecture.md", "docs/index-cleanup.md", "docs/modules/storage-mutation-coordination.md"), "docs_context"),
+              case("На какие части режется большой Markdown-файл во время индексации?", ("wiki/Architecture.md",), "docs_context"),
+              case("Что обязательно проверить перед открытием pull request?", ("CONTRIBUTING.md", "docs/testing.md", "docs/RELEASE_CHECKLIST.md"), "docs_context"),
+              case("Я изменил проектную документацию. Как обновить локальный индекс?", ("README.md", "docs/project-docs-mcp-workflow.md", "docs/capabilities.md"), "docs_context", facts=(("docs/project-docs-mcp-workflow.md", "sync_project_docs"),)),
+              case("Почему поиск может перестать видеть свежие изменения документации и что тогда проверить?", ("wiki/Troubleshooting.md", "docs/project-docs-mcp-workflow.md"), "docs_context"),
+              case("Расскажи простыми словами, как в целом устроена архитектура DocAtlas.", ("wiki/Architecture.md", "docs/PROJECT_MAP.md"), "docs_context", forbidden=("Legacy direct library/project tools",)),
+              case("Какой точной командой поднять сервер Docs MCP?", ("README.md", "wiki/Commands.md", "docs/mcp-docs-server.md", "docs/project-docs-demo.md"), "docs_answer", facts=(("docs/mcp-docs-server.md", "docs-serve"),)),
+              case("Перечисли публичные инструменты Docs MCP и не путай их с CLI-командами.", ("README.md", "docs/mcp-docs-server.md"), "docs_answer", facts=(("docs/mcp-docs-server.md", "get_docs_context"),)),
+              case("Как система выбирает доказательства из найденных разделов документации?", ("docs/modules/evidence-selection.md", "docs/mcp-docs-server.md"), "docs_context"),
+              case("Что делает clear-index и какие данные он обязан сохранить?", ("docs/index-cleanup.md", "wiki/Commands.md"), "docs_context"),
+              case("Доказывает ли README полный контракт координации writer lease?", ("docs/modules/storage-mutation-coordination.md", "docs/index-cleanup.md"), "docs_context", forbidden=("README proves", "README доказывает")),
+              case("What should I read first after cloning DocAtlas, and how do I verify the installation?", ("README.md", "CONTRIBUTING.md", "docs/INDEX.md", "wiki/Install-Targets.md"), "docs_context"),
+              case("Какую лунную квантовую политику удержания использует DocAtlas?", (), "insufficient_evidence"),
+          )
+
+          report = run_live(cases=cases, negative_cases=())
+          Path("/tmp/pr173-review/holdout.json").write_text(
+              json.dumps(report, ensure_ascii=False, indent=2), encoding="utf-8"
+          )
+          print(json.dumps(report, ensure_ascii=False, indent=2))
+          raise SystemExit(0 if report.get("verdict") == "PASS" else 1)
+          PY
+          uv run python /tmp/pr173-review/run_holdout.py 2>&1 | tee /tmp/pr173-review/holdout.log
+
+      - name: Create exact-head review report
+        if: always()
+        env:
+          TREE_OUTCOME: ${{ steps.tree.outcome }}
+          REGRESSION_OUTCOME: ${{ steps.regression.outcome }}
+          HOLDOUT_OUTCOME: ${{ steps.holdout.outcome }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p docs/analysis /tmp/pr173-review
+          python - <<'PY'
+          from __future__ import annotations
+
+          import json
+          import os
+          import subprocess
+          from pathlib import Path
+
+          raw_path = Path("/tmp/pr173-review/holdout.json")
+          data = json.loads(raw_path.read_text(encoding="utf-8")) if raw_path.exists() else {}
+          head = subprocess.check_output(["git", "rev-parse", "HEAD"], text=True).strip()
+          tree = os.environ.get("TREE_OUTCOME", "skipped")
+          regression = os.environ.get("REGRESSION_OUTCOME", "skipped")
+          holdout = os.environ.get("HOLDOUT_OUTCOME", "skipped")
+
+          scalar_metrics: dict[str, object] = {}
+          def collect_metrics(value, prefix=""):
+              if not isinstance(value, dict):
+                  return
+              for key, child in value.items():
+                  name = f"{prefix}.{key}" if prefix else key
+                  if isinstance(child, (str, int, float, bool)) and any(token in key.casefold() for token in ("count", "score", "rate", "top", "mean", "verdict", "abstention", "contamination")):
+                      scalar_metrics[name] = child
+                  elif isinstance(child, dict) and len(prefix.split(".")) < 2:
+                      collect_metrics(child, name)
+          collect_metrics(data)
+
+          rows: list[dict] = []
+          def find_rows(value):
+              if isinstance(value, list) and value and all(isinstance(item, dict) for item in value):
+                  keys = set().union(*(item.keys() for item in value))
+                  if ({"question", "case_id"} & keys) and ({"passed", "score", "observed_kind", "answer_type", "kind"} & keys):
+                      rows.extend(value)
+                      return True
+              if isinstance(value, dict):
+                  return any(find_rows(child) for child in value.values())
+              if isinstance(value, list):
+                  return any(find_rows(child) for child in value)
+              return False
+          find_rows(data)
+
+          lines = [
+              "# PR #173 exact-head review",
+              "",
+              f"Reviewed implementation HEAD: `{head}`",
+              "",
+              "## Gate outcomes",
+              "",
+              f"- Final-tree integrity: **{tree.upper()}**",
+              f"- Regression and safety suite: **{regression.upper()}**",
+              f"- 18 unseen public-path questions: **{holdout.upper()}**",
+              f"- Holdout protocol verdict: **{str(data.get('verdict', 'unavailable')).upper()}**",
+              "",
+              "## Metrics emitted by the holdout gate",
+              "",
+          ]
+          if scalar_metrics:
+              lines.extend(f"- `{key}`: `{scalar_metrics[key]}`" for key in sorted(scalar_metrics))
+          else:
+              lines.append("- No structured metrics were available because an earlier gate failed.")
+
+          lines.extend(["", "## Per-question outcomes", ""])
+          if rows:
+              lines.extend(["| Question / case | Expected | Observed | Passed | Top sources |", "|---|---|---|---:|---|"])
+              for i, row in enumerate(rows, 1):
+                  label = str(row.get("question") or row.get("case_id") or i).replace("|", "\\|").replace("\n", " ")
+                  expected = str(row.get("expected_kind") or row.get("expected") or "")
+                  observed = str(row.get("observed_kind") or row.get("answer_type") or row.get("kind") or "")
+                  passed = row.get("passed", "")
+                  sources = row.get("selected_paths") or row.get("source_paths") or row.get("paths") or row.get("top_paths") or []
+                  if isinstance(sources, list):
+                      sources = ", ".join(str(item) for item in sources[:3])
+                  lines.append(f"| {label[:150]} | {expected} | {observed} | {passed} | {str(sources)[:220]} |")
+          else:
+              lines.append("Detailed rows were not emitted; see the raw JSON below.")
+
+          raw = json.dumps(data, ensure_ascii=False, indent=2)
+          if len(raw) > 50000:
+              raw = raw[:50000] + "\n... report truncated here ..."
+          lines.extend(["", "## Raw holdout report", "", "```json", raw, "```", ""])
+
+          ready = tree == regression == holdout == "success" and data.get("verdict") == "PASS"
+          lines.extend([
+              "## Review conclusion",
+              "",
+              (
+                  "**READY FOR REVIEW:** the exact implementation tree, regression suite, and unseen public-path questions all passed."
+                  if ready
+                  else "**BLOCKED:** at least one exact-tree, regression, or unseen-question check failed. Do not merge before fixing and rerunning."
+              ),
+              "",
+          ])
+          Path("docs/analysis/pr-173-exact-head-live-review-2026-08-30.md").write_text("\n".join(lines), encoding="utf-8")
+          Path("/tmp/pr173-review/ready.txt").write_text("1" if ready else "0", encoding="utf-8")
+          PY
+
+      - name: Remove temporary workflow and publish review report
+        if: always()
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          ready="$(cat /tmp/pr173-review/ready.txt 2>/dev/null || echo 0)"
+          git rm -f .github/workflows/_review-pr173-project-chat-v2.yml
+          git add docs/analysis/pr-173-exact-head-live-review-2026-08-30.md
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git commit -m "test: review project chat on unseen public questions"
+          git push origin HEAD:fix/context7-style-project-chat-v2
+          if [[ "$ready" == "1" ]]; then
+            gh pr ready 173 --repo Vanilla1999/DocAtlas || true
+            gh pr comment 173 --repo Vanilla1999/DocAtlas --body "Exact-head review passed. Regression/safety gates and 18 unseen RU/EN public-path questions succeeded. Detailed report: docs/analysis/pr-173-exact-head-live-review-2026-08-30.md"
+          else
+            gh pr ready --undo 173 --repo Vanilla1999/DocAtlas || true
+            gh pr comment 173 --repo Vanilla1999/DocAtlas --body "Exact-head review found a blocker. Do not merge. Detailed results: docs/analysis/pr-173-exact-head-live-review-2026-08-30.md"
+            exit 1
+          fi
