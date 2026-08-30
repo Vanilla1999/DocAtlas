@@ -19,7 +19,7 @@ def _json_collection_default(value: object) -> object:
         "doc-atlas inspect",
         "doc-atlas inspect pytest --vectors",
         "doc-atlas inspect pytest --json",
-        "doc-atlas inspect --config ./docmancer.yaml",
+        "doc-atlas inspect --config ./docatlas.yaml",
     ),
 )
 @click.argument("source", required=False)
@@ -27,7 +27,7 @@ def _json_collection_default(value: object) -> object:
 @click.option("--vectors", "show_vectors", is_flag=True, default=False, help="Show retrieval/vector state for the source.")
 @click.option("--extraction", "show_extraction", is_flag=True, default=False, help="Show extraction/content state for the source.")
 @click.option("--json", "json_output", is_flag=True, default=False, help="Emit source card as JSON.")
-@click.option("--config", "config_path", default=None, help="Path to docmancer.yaml.")
+@click.option("--config", "config_path", default=None, help="Path to docatlas.yaml.")
 def inspect_cmd(source: str | None, show_failed: bool, show_vectors: bool, show_extraction: bool, json_output: bool, config_path: str | None):
     """Show collection stats or a source operational card."""
     config_path = _effective_config(config_path)
@@ -95,10 +95,10 @@ def inspect_cmd(source: str | None, show_failed: bool, show_vectors: bool, show_
         "doc-atlas doctor --json",
         "doc-atlas doctor --list-checks",
         "doc-atlas doctor --check sources",
-        "doc-atlas doctor --config ./docmancer.yaml",
+        "doc-atlas doctor --config ./docatlas.yaml",
     ),
 )
-@click.option("--config", "config_path", default=None, help="Path to docmancer.yaml.")
+@click.option("--config", "config_path", default=None, help="Path to docatlas.yaml.")
 @click.option("--profile", type=click.Choice(SETUP_PROFILES, case_sensitive=False), default="cli-docs", show_default=True, help="Goal/path to diagnose.")
 @click.option("--json", "json_output", is_flag=True, default=False, help="Emit structured doctor report as JSON.")
 @click.option("--list-checks", is_flag=True, default=False, help="List available doctor check groups and exit.")
@@ -135,7 +135,7 @@ def doctor_cmd(config_path: str | None, profile: str, json_output: bool, list_ch
     ),
 )
 @click.argument("text")
-@click.option("--config", "config_path", default=None, help="Path to docmancer.yaml.")
+@click.option("--config", "config_path", default=None, help="Path to docatlas.yaml.")
 @click.option("--limit", default=None, type=int, help="Maximum sections to return.")
 @click.option("--budget", default=None, type=int, help="Maximum estimated output tokens.")
 @click.option(
@@ -430,7 +430,7 @@ def patch_review_cmd(
 )
 @click.argument("project_path", type=click.Path(exists=True, file_okay=False, path_type=str))
 @click.argument("question")
-@click.option("--config", "config_path", default=None, help="Path to docmancer.yaml.")
+@click.option("--config", "config_path", default=None, help="Path to docatlas.yaml.")
 @click.option("--tokens", default=None, type=int, help="Maximum estimated output tokens.")
 @click.option("--limit", default=None, type=int, help="Maximum sections to return.")
 @click.option("--expand", default=None, type=click.Choice(["adjacent", "page"], case_sensitive=False), help="Expand adjacent sections or full page context.")
@@ -469,7 +469,7 @@ def context_cmd(
         # An explicit --config is an operator decision.  In particular,
         # read-only sandboxes use it to keep runtime indexes outside the
         # mounted project checkout.  Implicit discovery continues to prefer a
-        # project's own docmancer.yaml.
+        # project's own docatlas.yaml.
         prefer_fallback=effective_config_path is not None,
     ).resolve(project_path)
     result = LibraryDocsService(
@@ -533,7 +533,7 @@ def context_cmd(
     ),
 )
 @click.argument("dataset", type=click.Path(exists=True, dir_okay=False, path_type=str))
-@click.option("--config", "config_path", default=None, help="Path to docmancer.yaml.")
+@click.option("--config", "config_path", default=None, help="Path to docatlas.yaml.")
 @click.option("--mode", type=click.Choice(["lexical", "dense", "sparse", "hybrid"], case_sensitive=False), default="lexical", show_default=True)
 @click.option("--limit", default=10, type=int, show_default=True, help="Maximum sections per eval query.")
 @click.option("--budget", default=10_000, type=int, show_default=True, help="Maximum estimated output tokens per eval query.")

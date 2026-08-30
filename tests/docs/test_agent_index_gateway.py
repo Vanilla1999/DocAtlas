@@ -82,7 +82,7 @@ def _record_with_canonical_id(library_id, canonical_id):
 
 def test_index_config_for_preserves_library_specific_paths(tmp_path, monkeypatch):
     monkeypatch.delenv("DOCATLAS_HOME", raising=False)
-    monkeypatch.setenv("DOCMANCER_HOME", str(tmp_path / "home"))
+    monkeypatch.setenv("DOCATLAS_HOME", str(tmp_path / "home"))
     config = DocmancerConfig()
     gateway = AgentIndexGateway(config, agent_factory=FakeAgent)
 
@@ -94,7 +94,7 @@ def test_index_config_for_preserves_library_specific_paths(tmp_path, monkeypatch
 
 
 def test_agent_instance_caches_per_library_agents(tmp_path, monkeypatch):
-    monkeypatch.setenv("DOCMANCER_HOME", str(tmp_path / "home"))
+    monkeypatch.setenv("DOCATLAS_HOME", str(tmp_path / "home"))
     gateway = AgentIndexGateway(DocmancerConfig(), agent_factory=FakeAgent)
     record = _record()
 
@@ -111,7 +111,7 @@ def test_agent_instance_caches_per_library_agents(tmp_path, monkeypatch):
 
 
 def test_project_query_uses_default_agent(tmp_path, monkeypatch):
-    monkeypatch.setenv("DOCMANCER_HOME", str(tmp_path / "home"))
+    monkeypatch.setenv("DOCATLAS_HOME", str(tmp_path / "home"))
     default = FakeAgent(config=DocmancerConfig())
     gateway = AgentIndexGateway(DocmancerConfig(), default_agent=default, agent_factory=FakeAgent)
 
@@ -120,7 +120,7 @@ def test_project_query_uses_default_agent(tmp_path, monkeypatch):
 
 def test_library_query_uses_per_library_agent(tmp_path, monkeypatch):
     monkeypatch.delenv("DOCATLAS_HOME", raising=False)
-    monkeypatch.setenv("DOCMANCER_HOME", str(tmp_path / "home"))
+    monkeypatch.setenv("DOCATLAS_HOME", str(tmp_path / "home"))
     default = FakeAgent(config=DocmancerConfig())
     gateway = AgentIndexGateway(DocmancerConfig(), default_agent=default, agent_factory=FakeAgent)
 
@@ -131,7 +131,7 @@ def test_library_query_uses_per_library_agent(tmp_path, monkeypatch):
 
 
 def test_query_library_dispatches_raw_topic_in_lexical_mode(tmp_path, monkeypatch):
-    monkeypatch.setenv("DOCMANCER_HOME", str(tmp_path / "home"))
+    monkeypatch.setenv("DOCATLAS_HOME", str(tmp_path / "home"))
     monkeypatch.setattr(
         "docmancer.docs.infrastructure.agent_index_gateway.dispatcher_for_agent",
         lambda agent, mode: RecordingDispatcher(store=agent.store, config=agent.config),
@@ -152,7 +152,7 @@ def test_query_library_dispatches_raw_topic_in_lexical_mode(tmp_path, monkeypatc
 
 
 def test_query_library_uses_configured_vector_mode(tmp_path, monkeypatch):
-    monkeypatch.setenv("DOCMANCER_HOME", str(tmp_path / "home"))
+    monkeypatch.setenv("DOCATLAS_HOME", str(tmp_path / "home"))
     config = DocmancerConfig()
     config.retrieval.default_mode = "hybrid"
     resolved_modes = []
@@ -177,7 +177,7 @@ def test_query_library_uses_configured_vector_mode(tmp_path, monkeypatch):
 
 
 def test_dispatcher_is_reused_until_library_agent_is_dropped(tmp_path, monkeypatch):
-    monkeypatch.setenv("DOCMANCER_HOME", str(tmp_path / "home"))
+    monkeypatch.setenv("DOCATLAS_HOME", str(tmp_path / "home"))
     builds = []
 
     def build_dispatcher(agent, *, mode):
@@ -242,7 +242,7 @@ def test_dispatcher_cache_tracks_store_and_generation_identity(tmp_path, monkeyp
 
 
 def test_query_library_preserves_the_canonical_requirement_set_for_dispatch(tmp_path, monkeypatch):
-    monkeypatch.setenv("DOCMANCER_HOME", str(tmp_path / "home"))
+    monkeypatch.setenv("DOCATLAS_HOME", str(tmp_path / "home"))
     monkeypatch.setattr(
         "docmancer.docs.infrastructure.agent_index_gateway.dispatcher_for_agent",
         lambda agent, mode: RecordingDispatcher(store=agent.store, config=agent.config),
@@ -270,7 +270,7 @@ def test_query_library_preserves_the_canonical_requirement_set_for_dispatch(tmp_
 
 
 def test_library_witness_probe_is_bounded_and_uses_the_record_filters(tmp_path, monkeypatch):
-    monkeypatch.setenv("DOCMANCER_HOME", str(tmp_path / "home"))
+    monkeypatch.setenv("DOCATLAS_HOME", str(tmp_path / "home"))
     gateway = AgentIndexGateway(DocmancerConfig(), agent_factory=FakeAgent)
     record = _record()
     agent = gateway.agent_instance(record)
@@ -300,7 +300,7 @@ def test_library_witness_probe_is_bounded_and_uses_the_record_filters(tmp_path, 
 
 
 def test_library_witness_probe_is_fail_closed_when_every_store_query_fails(tmp_path, monkeypatch):
-    monkeypatch.setenv("DOCMANCER_HOME", str(tmp_path / "home"))
+    monkeypatch.setenv("DOCATLAS_HOME", str(tmp_path / "home"))
     gateway = AgentIndexGateway(DocmancerConfig(), agent_factory=FakeAgent)
     record = _record()
     agent = gateway.agent_instance(record)
@@ -322,7 +322,7 @@ def test_library_witness_probe_is_fail_closed_when_every_store_query_fails(tmp_p
 
 
 def test_default_agent_created_by_project_does_not_hijack_library_query(tmp_path, monkeypatch):
-    monkeypatch.setenv("DOCMANCER_HOME", str(tmp_path / "home"))
+    monkeypatch.setenv("DOCATLAS_HOME", str(tmp_path / "home"))
     gateway = AgentIndexGateway(DocmancerConfig(), agent_factory=FakeAgent)
 
     default = gateway.agent_instance()
@@ -333,7 +333,7 @@ def test_default_agent_created_by_project_does_not_hijack_library_query(tmp_path
 
 
 def test_agent_key_based_on_canonical_id(tmp_path, monkeypatch):
-    monkeypatch.setenv("DOCMANCER_HOME", str(tmp_path / "home"))
+    monkeypatch.setenv("DOCATLAS_HOME", str(tmp_path / "home"))
     gateway = AgentIndexGateway(DocmancerConfig(), agent_factory=FakeAgent)
 
     first = gateway.agent_instance(_record_with_canonical_id("/python/click", "python:click:8.1"))
@@ -343,7 +343,7 @@ def test_agent_key_based_on_canonical_id(tmp_path, monkeypatch):
 
 
 def test_drop_library_agent_accepts_record_with_canonical_id(tmp_path, monkeypatch):
-    monkeypatch.setenv("DOCMANCER_HOME", str(tmp_path / "home"))
+    monkeypatch.setenv("DOCATLAS_HOME", str(tmp_path / "home"))
     gateway = AgentIndexGateway(DocmancerConfig(), agent_factory=FakeAgent)
     record = _record_with_canonical_id("/python/click", "python:click:8.1")
 

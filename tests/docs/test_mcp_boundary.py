@@ -4,7 +4,6 @@ from dataclasses import dataclass, field
 from typing import Any, cast
 
 from docmancer.docs.interfaces.mcp.context_tools import handle_context_tool
-from docmancer.docs.interfaces.mcp.docs_tools import handle_library_tool
 from docmancer.docs.interfaces.mcp.project_tools import handle_project_tool
 from docmancer.docs.models import LibraryInfo
 from docmancer.docs.service import LibraryDocsService
@@ -43,9 +42,6 @@ class SubService:
 
     def validate_patch_against_constraints(self, *args: Any, **kwargs: Any) -> Any:
         return self.record("validate_patch_against_constraints", args, kwargs, _make_dataclass_result("validate_patch_against_constraints"))
-
-    def prefetch_project_docs(self, *args: Any, **kwargs: Any) -> Any:
-        return self.record("prefetch_project_docs", args, kwargs, _make_dataclass_result("prefetch_project_docs"))
 
     def prefetch_project_dependency_docs(self, *args: Any, **kwargs: Any) -> Any:
         return self.record("prefetch_project_dependency_docs", args, kwargs, _make_dataclass_result("prefetch_project_dependency_docs"))
@@ -126,18 +122,6 @@ class FakeService:
         self.docs_manifest = SubService()
 
 
-def test_resolve_library_id_accepts_library_name_alias() -> None:
-    service = FakeService()
-
-    result = handle_library_tool("resolve_library_id", {"libraryName": "flutter"}, cast(LibraryDocsService, service))
-
-    assert result is not None
-    assert result["status"] == "success"
-    assert service.library_docs.calls == [
-        ("resolve_library", ("flutter", None, None, None, None, None), {})
-    ]
-
-
 def test_project_context_rejects_whitespace_question_before_service_call() -> None:
     service = FakeService()
 
@@ -148,7 +132,7 @@ def test_project_context_rejects_whitespace_question_before_service_call() -> No
     )
 
     assert result["status"] == "failed"
-    assert result["reason_code"] == "empty_question"
+    assert result["error"]["reason_code"] == "empty_question"
     assert service.project_context.calls == []
 
 
@@ -199,58 +183,18 @@ def test_get_docs_context_rejects_whitespace_question_with_hint() -> None:
 
     assert result is not None
     assert result["status"] == "failed"
-    assert result["reason_code"] == "empty_question"
+    assert result["error"]["reason_code"] == "empty_question"
     assert result["error"]["hints"] == [
         "Provide a non-empty question, for example: 'Flutter Riverpod providers' or 'FastAPI dependency injection'."
     ]
     assert service.unified_context.calls == []
 
 
-def test_mcp_schemas_expose_hard_bounds_and_library_name_alias() -> None:
+def test_mcp_schemas_expose_hard_bounds() -> None:
     tools = {tool["name"]: tool["inputSchema"] for tool in ALL_TOOLS}
 
-    resolve_schema = tools["resolve_library_id"]
-    assert "libraryName" in resolve_schema["properties"]
-    assert {tuple(item["required"]) for item in resolve_schema["anyOf"]} == {("library",), ("libraryName",)}
-
-    assert tools["get_project_context"]["properties"]["tokens"]["maximum"] == 20_000
-    assert tools["get_project_context"]["properties"]["limit"]["maximum"] == 20
     assert tools["get_patch_constraints"]["properties"]["max_constraints"]["maximum"] == 40
     assert tools["get_patch_constraints"]["properties"]["max_tokens"]["maximum"] == 8_000
-
-    target_schema = tools["prefetch_docs_targets"]["properties"]["targets"]["items"]["properties"]
-    assert target_schema["max_pages"]["maximum"] == 500
-
-
-def test_prefetch_project_docs_deprecated_alias_returns_warning() -> None:
-    service = FakeService()
-
-    result = handle_project_tool(
-        "prefetch_project_docs",
-        {"project_path": "/tmp/test"},
-        cast(LibraryDocsService, service),
-    )
-
-    assert result is not None
-    assert result["status"] == "success"
-    warnings = result.get("warnings") or []
-    assert any(w.get("code") == "deprecated_tool_alias" for w in warnings)
-
-
-def test_prefetch_project_dependency_docs_canonical_no_warning() -> None:
-    service = FakeService()
-
-    result = handle_project_tool(
-        "prefetch_project_dependency_docs",
-        {"project_path": "/tmp/test"},
-        cast(LibraryDocsService, service),
-    )
-
-    assert result is not None
-    assert result["status"] == "success"
-    warnings = result.get("warnings") or []
-    assert not any(w.get("code") == "deprecated_tool_alias" for w in warnings)
-
 
 def test_patch_constraints_debug_compaction_preserves_contract_fields() -> None:
     class PatchSubService:
@@ -283,7 +227,7 @@ def test_patch_constraints_debug_compaction_preserves_contract_fields() -> None:
 
     result = handle_project_tool(
         "get_patch_constraints",
-        {"project_path": "/repo", "question": "fix ScanDoc camera permissions", "output_mode": "debug"},
+        {"project_path": "/repo", "question": "fix ScanDoc camera permissions"},
         cast(LibraryDocsService, Service()),
     )
 

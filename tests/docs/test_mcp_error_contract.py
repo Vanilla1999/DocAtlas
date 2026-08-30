@@ -3,7 +3,7 @@ from __future__ import annotations
 from docmancer.docs.interfaces.mcp.error_contract import build_mcp_error_payload
 
 
-def test_unknown_tool_error_contract_keeps_legacy_fields() -> None:
+def test_unknown_tool_error_contract_is_nested() -> None:
     payload = build_mcp_error_payload(
         reason_code="unknown_tool",
         message="unknown tool: missing",
@@ -12,8 +12,8 @@ def test_unknown_tool_error_contract_keeps_legacy_fields() -> None:
     )
 
     assert payload["status"] == "failed"
-    assert payload["reason_code"] == "unknown_tool"
-    assert payload["message"] == "unknown tool: missing"
+    assert "reason_code" not in payload
+    assert "message" not in payload
     assert payload["error"]["reason_code"] == "unknown_tool"
     assert payload["error"]["retryable"] is False
     assert payload["error"]["where"] == {"tool": "missing", "handler": None, "phase": "validation"}
@@ -60,8 +60,8 @@ def test_bad_request_error_contract_has_fix_arguments_hint() -> None:
         phase="validation",
     )
 
-    assert payload["reason_code"] == "empty_question"
-    assert payload["message"] == "question must not be empty"
+    assert "reason_code" not in payload
+    assert "message" not in payload
     assert payload["error"]["reason_code"] == "empty_question"
     assert payload["error"]["retryable"] is False
     assert payload["error"]["hints"] == [

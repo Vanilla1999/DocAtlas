@@ -17,73 +17,34 @@ class _SQLiteStorePart05:
             if active_generation:
                 row = conn.execute(
                     """
-                    SELECT chunk_index, parent_logical_id, atom_type, atom_id
+                    SELECT source, chunk_index, parent_logical_id, atom_type, atom_id
                     FROM retrieval_children
                     WHERE generation_id = ? AND hydration_id = ?
                     """,
                     (active_generation, int(section_id)),
                 ).fetchone()
                 if not row:
-                    legacy = conn.execute(
+                    return []
+                if mode == "adjacent":
+                    neighbors = conn.execute(
                         """
-                        SELECT source, chunk_index, parent_logical_id
-                        FROM sections
-                        WHERE id = ? AND source NOT IN (
-                            SELECT source FROM generation_sources
-                            WHERE generation_id = ?
-                        )
+                        SELECT hydration_id AS id FROM retrieval_children
+                        WHERE generation_id = ? AND source = ? AND hydration_id != ?
+                          AND chunk_index IN (?, ?)
+                        ORDER BY chunk_index LIMIT 2
                         """,
-                        (int(section_id), active_generation),
-                    ).fetchone()
-                    if not legacy:
-                        return []
-                    source = legacy["source"]
-                    chunk_index = int(legacy["chunk_index"])
-                    parent_logical_id = legacy["parent_logical_id"]
-                    if parent_logical_id:
-                        if mode == "page":
-                            rows = conn.execute(
-                                """
-                                SELECT id FROM sections
-                                WHERE parent_logical_id = ? AND id != ?
-                                ORDER BY chunk_index LIMIT 20
-                                """,
-                                (parent_logical_id, int(section_id)),
-                            )
-                        else:
-                            rows = conn.execute(
-                                """
-                                SELECT id FROM sections
-                                WHERE parent_logical_id = ?
-                                  AND chunk_index IN (?, ?)
-                                ORDER BY chunk_index
-                                """,
-                                (parent_logical_id, chunk_index - 1, chunk_index + 1),
-                            )
-                    elif mode == "page":
-                        rows = conn.execute(
-                            """
-                            SELECT id FROM sections
-                            WHERE source = ? AND id != ? ORDER BY chunk_index
-                            """,
-                            (source, int(section_id)),
-                        )
-                    else:
-                        rows = conn.execute(
-                            """
-                            SELECT id FROM sections
-                            WHERE source = ? AND chunk_index IN (?, ?)
-                            ORDER BY chunk_index
-                            """,
-                            (source, chunk_index - 1, chunk_index + 1),
-                        )
-                    return [int(item["id"]) for item in rows]
+                        (
+                            active_generation,
+                            row["source"],
+                            int(section_id),
+                            int(row["chunk_index"]) - 1,
+                            int(row["chunk_index"]) + 1,
+                        ),
+                    )
+                    return [int(item["id"]) for item in neighbors]
                 conditions = ["chunk_index IN (?, ?)"]
-                params: list[Any] = [
-                    int(row["chunk_index"]) - 1,
-                    int(row["chunk_index"]) + 1,
-                ]
-                if mode == "page" and row["atom_type"] in {"code", "table"}:
+                params: list[Any] = [int(row["chunk_index"]) - 1, int(row["chunk_index"]) + 1]
+                if row["atom_type"] in {"code", "table"}:
                     conditions.append("atom_id = ?")
                     params.append(row["atom_id"])
                 neighbors = conn.execute(
@@ -101,56 +62,7 @@ class _SQLiteStorePart05:
                     ),
                 )
                 return [int(item["id"]) for item in neighbors]
-            row = conn.execute(
-                "SELECT source, chunk_index, parent_logical_id FROM sections WHERE id = ?",
-                (int(section_id),),
-            ).fetchone()
-            if not row:
-                return []
-            source = row["source"]
-            chunk_index = int(row["chunk_index"])
-            parent_logical_id = row["parent_logical_id"]
-            if parent_logical_id:
-                if mode == "page":
-                    rows = conn.execute(
-                        """
-                        SELECT id, chunk_index FROM sections
-                        WHERE parent_logical_id = ? AND id != ?
-                        ORDER BY chunk_index
-                        LIMIT 20
-                        """,
-                        (parent_logical_id, int(section_id)),
-                    )
-                    return [int(r["id"]) for r in rows]
-                rows = conn.execute(
-                    """
-                    SELECT id, chunk_index FROM sections
-                    WHERE parent_logical_id = ? AND chunk_index IN (?, ?)
-                    ORDER BY chunk_index
-                    """,
-                    (parent_logical_id, chunk_index - 1, chunk_index + 1),
-                )
-                return [int(r["id"]) for r in rows]
-            if mode == "page":
-                rows = conn.execute(
-                    """
-                    SELECT id, chunk_index FROM sections
-                    WHERE source = ? AND id != ?
-                    ORDER BY chunk_index
-                    """,
-                    (source, int(section_id)),
-                )
-                return [int(r["id"]) for r in rows]
-            # default: adjacent (prev + next)
-            rows = conn.execute(
-                """
-                SELECT id, chunk_index FROM sections
-                WHERE source = ? AND chunk_index IN (?, ?)
-                ORDER BY chunk_index
-                """,
-                (source, chunk_index - 1, chunk_index + 1),
-            )
-            return [int(r["id"]) for r in rows]
+            return []
 
     def document_title_hashes_for(self, section_ids: list[int]) -> dict[int, str]:
         """Return ``{section_id: document_title_hash}`` for hierarchical retrieval.
@@ -166,30 +78,14 @@ class _SQLiteStorePart05:
         out: dict[int, str] = {}
         with self._connect() as conn:
             active_generation = self._active_generation_id(conn)
-            if active_generation:
-                query = f"""
-                    SELECT id, metadata_json FROM sections
-                    WHERE id IN ({placeholders})
-                      AND source NOT IN (
-                          SELECT source FROM generation_sources
-                          WHERE generation_id = ?
-                      )
-                    UNION ALL
-                    SELECT hydration_id AS id, metadata_json
-                    FROM retrieval_children
-                    WHERE generation_id = ?
-                      AND hydration_id IN ({placeholders})
-                """
-                params: tuple[Any, ...] = (
-                    *section_ids, active_generation,
-                    active_generation, *section_ids,
-                )
-            else:
-                query = (
-                    f"SELECT id, metadata_json FROM sections "
-                    f"WHERE id IN ({placeholders})"
-                )
-                params = tuple(section_ids)
+            if not active_generation:
+                return {}
+            query = f"""
+                SELECT hydration_id AS id, metadata_json
+                FROM retrieval_children
+                WHERE generation_id = ? AND hydration_id IN ({placeholders})
+            """
+            params: tuple[Any, ...] = (active_generation, *section_ids)
             for row in conn.execute(query, params):
                 try:
                     md = json.loads(row["metadata_json"] or "{}")
@@ -209,20 +105,30 @@ class _SQLiteStorePart05:
         scan through ``metadata_json``.
         """
         with self._connect() as conn:
+            active_generation = self._active_generation_id(conn)
+            if not active_generation:
+                return 0
             row = conn.execute(
                 "SELECT COUNT(DISTINCT document_title) AS n "
-                "FROM sections WHERE document_title IS NOT NULL AND document_title <> ''"
+                "FROM retrieval_children WHERE generation_id = ? "
+                "AND document_title IS NOT NULL AND document_title <> ''",
+                (active_generation,),
             ).fetchone()
             return int(row["n"]) if row else 0
 
     def section_count_grouped_by_format(self) -> dict[str, int]:
         with self._connect() as conn:
+            active_generation = self._active_generation_id(conn)
+            if not active_generation:
+                return {}
             rows = conn.execute(
                 """
                 SELECT COALESCE(NULLIF(format, ''), 'unknown') AS fmt, COUNT(*) AS n
-                FROM sections
+                FROM retrieval_children
+                WHERE generation_id = ?
                 GROUP BY fmt
-                """
+                """,
+                (active_generation,),
             )
             return {row["fmt"]: int(row["n"]) for row in rows}
 
@@ -322,96 +228,8 @@ class _SQLiteStorePart05:
                         "source_url": str(source_metadata.get("source_url") or ""),
                     }
                     embedded.append(item)
-                legacy_rows = conn.execute(
-                    """
-                    SELECT id, source, chunk_index, title, level, text,
-                           retrieval_text, token_estimate, source_path,
-                           document_title, format, anchor, content_hash,
-                           retrieval_content_hash, parent_logical_id
-                    FROM sections
-                    WHERE source NOT IN (
-                        SELECT source FROM generation_sources
-                        WHERE generation_id = ?
-                    )
-                    ORDER BY source, chunk_index
-                    """,
-                    (target_generation,),
-                )
-                for row in legacy_rows:
-                    retrieval_text = str(row["retrieval_text"] or row["text"] or "")
-                    retrieval_hash = str(
-                        row["retrieval_content_hash"]
-                        or hashlib.sha256(retrieval_text.encode("utf-8")).hexdigest()
-                    )
-                    stable_id = "legacy-" + hashlib.sha256(
-                        (
-                            f"{row['source']}\0{row['chunk_index']}\0{retrieval_hash}"
-                        ).encode("utf-8")
-                    ).hexdigest()[:40]
-                    embedded.append({
-                        "section_id": int(row["id"]),
-                        "vector_id": str(uuid.uuid5(
-                            uuid.NAMESPACE_URL, f"docatlas:legacy:{stable_id}"
-                        )),
-                        "source": str(row["source"]),
-                        "chunk_index": int(row["chunk_index"]),
-                        "title": str(row["title"] or ""),
-                        "level": int(row["level"] or 0),
-                        "text": retrieval_text,
-                        "display_text": str(row["text"] or ""),
-                        "token_estimate": int(row["token_estimate"] or 0),
-                        "retrieval_token_estimate": estimate_tokens(retrieval_text),
-                        "source_path": str(row["source_path"] or ""),
-                        "document_title": str(row["document_title"] or ""),
-                        "format": str(row["format"] or ""),
-                        "anchor": str(row["anchor"] or ""),
-                        "content_hash": retrieval_hash,
-                        "display_content_hash": str(row["content_hash"] or ""),
-                        "stable_chunk_id": stable_id,
-                        "parent_logical_id": str(row["parent_logical_id"] or ""),
-                        "generation_id": str(target_generation),
-                        "chunk_schema_version": INDEX_SCHEMA_VERSION,
-                        "chunk_config_hash": "legacy-compatibility-v1",
-                        "context_schema_version": "",
-                        "context_config_hash": "",
-                        "context_content_hash": "",
-                        "embedding_input_hash": retrieval_hash,
-                        "retrieval_config_hash": "legacy-compatibility-v1",
-                    })
                 return embedded
-            rows = conn.execute(
-                """
-                SELECT id, source, chunk_index, title, level, text, retrieval_text,
-                       token_estimate, source_path, document_title, format, anchor,
-                       content_hash, retrieval_content_hash, stable_chunk_id, parent_logical_id,
-                       chunk_schema_version, chunk_config_hash
-                FROM sections
-                ORDER BY source, chunk_index
-                """
-            )
-            return [
-                {
-                    "section_id": int(row["id"]),
-                    "source": str(row["source"]),
-                    "chunk_index": int(row["chunk_index"]),
-                    "title": str(row["title"] or ""),
-                    "level": int(row["level"] or 0),
-                    "text": str(row["retrieval_text"] or row["text"] or ""),
-                    "display_text": str(row["text"] or ""),
-                    "token_estimate": int(row["token_estimate"] or 0),
-                    "source_path": str(row["source_path"] or ""),
-                    "document_title": str(row["document_title"] or ""),
-                    "format": str(row["format"] or ""),
-                    "anchor": str(row["anchor"] or ""),
-                    "content_hash": str(row["retrieval_content_hash"] or row["content_hash"] or ""),
-                    "display_content_hash": str(row["content_hash"] or ""),
-                    "stable_chunk_id": str(row["stable_chunk_id"] or ""),
-                    "parent_logical_id": str(row["parent_logical_id"] or ""),
-                    "chunk_schema_version": str(row["chunk_schema_version"] or INDEX_SCHEMA_VERSION),
-                    "chunk_config_hash": str(row["chunk_config_hash"] or ""),
-                }
-                for row in rows
-            ]
+            return []
 
     def list_sections_for_source(
         self,
@@ -546,7 +364,7 @@ class _SQLiteStorePart05:
                 if path_value
             }
             # Active retrieval generations are immutable. Publish a validated
-            # clone without this source before removing compatibility rows.
+            # current-generation clone without this source before deleting it.
             self._build_generation_without_sources(conn, {source})
             row_ids = [r["id"] for r in conn.execute("SELECT id FROM sections WHERE source_id = ?", (source_id,))]
             for row_id in row_ids:

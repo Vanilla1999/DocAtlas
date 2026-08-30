@@ -388,7 +388,7 @@ def _run_adversarial_case(case: dict[str, Any]) -> dict[str, Any]:
     events: list[dict[str, Any]] = []
     trajectory_tokens = 0
     context_calls = 0
-    previous_home = os.environ.get("DOCMANCER_HOME")
+    previous_home = os.environ.get("DOCATLAS_HOME")
 
     if not fixture.is_dir():
         return {
@@ -414,7 +414,7 @@ def _run_adversarial_case(case: dict[str, Any]) -> dict[str, Any]:
                     "errors": ["working_path is missing or unsafe"],
                     "events": [],
                 }
-            os.environ["DOCMANCER_HOME"] = str(tmp / "home")
+            os.environ["DOCATLAS_HOME"] = str(tmp / "home")
             service = base._service(tmp)
             sync = service.sync_project_docs(str(project), with_vectors=False)
             if getattr(sync, "status", None) != "success":
@@ -597,9 +597,9 @@ def _run_adversarial_case(case: dict[str, Any]) -> dict[str, Any]:
             }
     finally:
         if previous_home is None:
-            os.environ.pop("DOCMANCER_HOME", None)
+            os.environ.pop("DOCATLAS_HOME", None)
         else:
-            os.environ["DOCMANCER_HOME"] = previous_home
+            os.environ["DOCATLAS_HOME"] = previous_home
 
 
 def run_gate() -> dict[str, Any]:

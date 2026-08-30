@@ -9,7 +9,7 @@ from docmancer.mcp.docs_server import call_docs_tool_payload
 
 
 def _service(tmp_path, monkeypatch) -> LibraryDocsService:
-    monkeypatch.setenv("DOCMANCER_HOME", str(tmp_path / "home"))
+    monkeypatch.setenv("DOCATLAS_HOME", str(tmp_path / "home"))
     config = DocmancerConfig()
     config.index.db_path = str(tmp_path / "docmancer.db")
     config.index.extracted_dir = str(tmp_path / "extracted")

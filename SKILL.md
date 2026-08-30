@@ -24,12 +24,12 @@ The default Docs MCP surface has exactly three tools:
 2. Call `prepare_docs` only from bounded `recommended_next_action`, unbounded `next_action`, or an explicit sync, refresh, index, or prefetch request.
 3. Call `docs_status` only for explicit health, freshness, index, or job-status requests.
 
-Advanced patch and inspection tools are compatibility features enabled with `DOCMANCER_MCP_ADVANCED_TOOLS=1`; new agent workflows must not depend on them.
+Advanced patch and inspection tools are not part of the public agent workflow.
 
 
-# DocAtlas / docmancer
+# DocAtlas
 
-Docmancer compresses documentation context so coding agents spend tokens on code, not on rereading raw docs. It ingests local files, fetches public docs, indexes everything locally with SQLite FTS5, and returns compact context packs with source attribution. The core retrieval path needs no API keys, vector database, hosted query API, or background daemon.
+DocAtlas compresses documentation context so coding agents spend tokens on code, not on rereading raw docs. Its Python import namespace remains `docmancer`; user-facing commands, state, configuration, and MCP identity use DocAtlas names.
 
 **MIT open source.** The CLI runs locally and is intended for source-grounded documentation lookup.
 
@@ -122,7 +122,7 @@ Returns a compact markdown context pack with source attribution and token saving
 
 ## Advanced: API Tools via MCP
 
-Only use the MCP Packs surface if the user is explicitly working with installed API packs. It is an advanced API-action layer, not an alternative documentation workflow. If the user has run `doc-atlas install-pack <pkg>@<version>`, the agent host can launch `doc-atlas mcp packs-serve` and expose two meta-tools. `doc-atlas mcp serve` is a compatibility alias:
+Only use the MCP Packs surface if the user is explicitly working with installed API packs. It is an advanced API-action layer, not an alternative documentation workflow. If the user has run `doc-atlas install-pack <pkg>@<version>`, the agent host can launch `doc-atlas mcp packs-serve` and expose two meta-tools:
 
 - `docmancer_search_tools(query, package?, limit?)`
 - `docmancer_call_tool(name, args)`

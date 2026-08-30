@@ -89,40 +89,7 @@ class _SQLiteStorePart03:
         if not str(previous["context_config_hash"] or "") or not str(
             previous["retrieval_config_hash"] or ""
         ):
-            # A pre-contextual Task 40 generation has additive columns filled
-            # with empty defaults. Cloning it would validate those legacy rows
-            # against the Task 41 context contract and fail delete-only updates.
-            config = self._chunking_config_from_generation(previous)
-            remaining: list[Document] = []
-            for row in conn.execute(
-                f"""
-                SELECT source, content, metadata_json
-                FROM generation_sources
-                WHERE generation_id = ? AND source NOT IN ({placeholders})
-                ORDER BY source
-                """,
-                (active, *sorted(excluded_sources)),
-            ):
-                try:
-                    metadata = json.loads(row["metadata_json"] or "{}")
-                except json.JSONDecodeError:
-                    metadata = {}
-                metadata.update({
-                    "chunking_schema": config.schema_version,
-                    "child_target_tokens": config.target_tokens,
-                    "child_hard_max_tokens": config.hard_max_tokens,
-                })
-                remaining.append(Document(
-                    source=str(row["source"]),
-                    content=str(row["content"]),
-                    metadata=metadata,
-                ))
-            if remaining:
-                generation_id = self._build_candidate_generation(
-                    conn, remaining, recreate=True
-                )
-                self._activate_generation(conn, generation_id)
-                return generation_id
+            raise ValueError("active generation does not satisfy the current context schema")
         generation_id = "gen-" + uuid.uuid4().hex
         now = datetime.now(timezone.utc).isoformat(timespec="seconds")
         conn.execute(
@@ -457,35 +424,17 @@ class _SQLiteStorePart03:
         placeholders = ",".join("?" * len(section_ids))
         with self._connect() as conn:
             active_generation = self._active_generation_id(conn)
-            if active_generation:
-                query = f"""
-                    SELECT s.id, s.source, s.chunk_index, s.title, s.text,
-                           s.token_estimate, s.metadata_json
-                    FROM sections s
-                    WHERE s.id IN ({placeholders})
-                      AND s.source NOT IN (
-                          SELECT source FROM generation_sources
-                          WHERE generation_id = ?
-                      )
-                    UNION ALL
-                    SELECT c.hydration_id AS id, c.source, c.chunk_index, c.title,
-                           c.display_text AS text,
-                           c.display_token_estimate AS token_estimate,
-                           c.metadata_json
-                    FROM retrieval_children c
-                    WHERE c.generation_id = ? AND c.hydration_id IN ({placeholders})
-                """
-                values: tuple[Any, ...] = (
-                    *section_ids, active_generation, active_generation, *section_ids
-                )
-            else:
-                query = f"""
-                    SELECT s.id, s.source, s.chunk_index, s.title, s.text,
-                           s.token_estimate, s.metadata_json
-                    FROM sections s
-                    WHERE s.id IN ({placeholders})
-                """
-                values = tuple(section_ids)
+            if not active_generation:
+                return []
+            query = f"""
+                SELECT c.hydration_id AS id, c.source, c.chunk_index, c.title,
+                       c.display_text AS text,
+                       c.display_token_estimate AS token_estimate,
+                       c.metadata_json
+                FROM retrieval_children c
+                WHERE c.generation_id = ? AND c.hydration_id IN ({placeholders})
+            """
+            values: tuple[Any, ...] = (active_generation, *section_ids)
             rows = {
                 int(row["id"]): row
                 for row in conn.execute(query, values)
@@ -554,9 +503,10 @@ class _SQLiteStorePart03:
         cleaned = self._strip_stopwords(query)
         terms = [token for token in re.findall(r"\w+", cleaned) if token]
         filter_sql, filter_params = self._metadata_filter_sql(filters, promoted=True)
-        legacy_filter_sql, legacy_filter_params = self._metadata_filter_sql(filters)
         with self._connect() as conn:
             active_generation = self._active_generation_id(conn)
+            if not active_generation:
+                return []
             if active_generation:
                 try:
                     rows = list(
@@ -580,33 +530,8 @@ class _SQLiteStorePart03:
                             (cleaned, active_generation, *filter_params, limit),
                         )
                     )
-                    legacy_rows = list(
-                        conn.execute(
-                            f"""
-                            SELECT sections.*, bm25(sections_fts) AS rank
-                            FROM sections_fts
-                            JOIN sections ON sections.id = sections_fts.rowid
-                            WHERE sections_fts MATCH ?
-                              AND sections.source NOT IN (
-                                  SELECT source FROM retrieval_children
-                                  WHERE generation_id = ?
-                              )
-                            {legacy_filter_sql}
-                            ORDER BY rank, sections.source, sections.chunk_index
-                            LIMIT ?
-                            """,
-                            (cleaned, active_generation, *legacy_filter_params, limit),
-                        )
-                    )
-                    combined = sorted(
-                        [*rows, *legacy_rows],
-                        key=lambda item: (
-                            float(item["rank"]), str(item["source"]),
-                            int(item["chunk_index"]),
-                        ),
-                    )[:limit]
-                    if combined or len(terms) <= 1:
-                        return self._mark_lexical_mode(combined, "and")
+                    if rows or len(terms) <= 1:
+                        return self._mark_lexical_mode(rows, "and")
                 except sqlite3.OperationalError:
                     pass
                 fallback_query = " OR ".join(terms)
@@ -633,68 +558,7 @@ class _SQLiteStorePart03:
                         (fallback_query, active_generation, *filter_params, limit),
                     )
                 )
-                legacy_fallback = list(
-                    conn.execute(
-                        f"""
-                        SELECT sections.*, bm25(sections_fts) AS rank
-                        FROM sections_fts
-                        JOIN sections ON sections.id = sections_fts.rowid
-                        WHERE sections_fts MATCH ?
-                          AND sections.source NOT IN (
-                              SELECT source FROM retrieval_children
-                              WHERE generation_id = ?
-                          )
-                        {legacy_filter_sql}
-                        ORDER BY rank, sections.source, sections.chunk_index
-                        LIMIT ?
-                        """,
-                        (fallback_query, active_generation, *legacy_filter_params, limit),
-                    )
-                )
-                return self._mark_lexical_mode(sorted(
-                    [*child_fallback, *legacy_fallback],
-                    key=lambda item: (
-                        float(item["rank"]), str(item["source"]),
-                        int(item["chunk_index"]),
-                    ),
-                )[:limit], "or_fallback")
-            try:
-                rows = list(
-                    conn.execute(
-                        f"""
-                        SELECT sections.*, bm25(sections_fts) AS rank
-                        FROM sections_fts
-                        JOIN sections ON sections.id = sections_fts.rowid
-                        WHERE sections_fts MATCH ?
-                        {legacy_filter_sql}
-                        ORDER BY rank, sections.source, sections.chunk_index, sections.content_hash
-                        LIMIT ?
-                        """,
-                        (cleaned, *legacy_filter_params, limit),
-                    )
-                )
-                if rows or len(terms) <= 1:
-                    return self._mark_lexical_mode(rows, "and")
-            except sqlite3.OperationalError:
-                pass
-
-            fallback_query = " OR ".join(terms)
-            if not fallback_query:
-                return []
-            return self._mark_lexical_mode(list(
-                conn.execute(
-                    f"""
-                    SELECT sections.*, bm25(sections_fts) AS rank
-                    FROM sections_fts
-                    JOIN sections ON sections.id = sections_fts.rowid
-                    WHERE sections_fts MATCH ?
-                    {legacy_filter_sql}
-                    ORDER BY rank, sections.source, sections.chunk_index, sections.content_hash
-                    LIMIT ?
-                    """,
-                    (fallback_query, *legacy_filter_params, limit),
-                )
-            ), "or_fallback")
+                return self._mark_lexical_mode(child_fallback, "or_fallback")
 
     @staticmethod
     def _mark_lexical_mode(rows: list[Any], mode: str) -> list[dict[str, Any]]:

@@ -20,13 +20,13 @@ from tests.diagnostic_labels import (
     validate_diagnostic_inventory,
 )
 
-os.environ.setdefault("DOCMANCER_AUTO_VECTORS", "0")
+os.environ.setdefault("DOCATLAS_AUTO_VECTORS", "0")
 
 # Unit tests must never reach the real hosted registry (docmancer.dev).
 # Point the hosted fallback at an unroutable local port so an accidental
 # network fetch fails fast instead of hanging on restricted networks.
 # Tests that exercise the hosted path mock transports or delete this var.
-os.environ.setdefault("DOCMANCER_REGISTRY_API_URL", "http://127.0.0.1:1")
+os.environ.setdefault("DOCATLAS_REGISTRY_API_URL", "http://127.0.0.1:1")
 
 
 def pytest_configure(config):
@@ -34,7 +34,7 @@ def pytest_configure(config):
     config.addinivalue_line("markers", "live: optional live provider test; never part of core CI")
     config.addinivalue_line(
         "markers",
-        "live_network: allows real network access; skipped unless DOCMANCER_RUN_LIVE_TESTS=1",
+        "live_network: allows real network access; skipped unless DOCATLAS_RUN_LIVE_TESTS=1",
     )
     config.addinivalue_line(
         "markers",
@@ -94,9 +94,9 @@ def pytest_collection_modifyitems(config, items):
             or "task_level" in item.path.parts
         ):
             item.add_marker(pytest.mark.advanced)
-    if os.getenv("DOCMANCER_RUN_LIVE_TESTS") == "1":
+    if os.getenv("DOCATLAS_RUN_LIVE_TESTS") == "1":
         return
-    skip = pytest.mark.skip(reason="live network tests require DOCMANCER_RUN_LIVE_TESTS=1")
+    skip = pytest.mark.skip(reason="live network tests require DOCATLAS_RUN_LIVE_TESTS=1")
     for item in items:
         if item.get_closest_marker("live_network"):
             item.add_marker(skip)

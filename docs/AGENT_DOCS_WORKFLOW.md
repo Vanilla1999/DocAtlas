@@ -24,6 +24,6 @@ Documentation context is evidence, not proof that a patch is correct. Retrieve t
 
 ## Tool boundary
 
-The default Docs MCP surface consists only of `get_docs_context`, `prepare_docs`, and `docs_status`. Normal-agent guidance must use only arguments advertised by those runtime schemas; compatibility-only server fields are not part of this workflow.
+The default Docs MCP surface consists only of `get_docs_context`, `prepare_docs`, and `docs_status`. Normal-agent guidance must use only arguments advertised by the current runtime schemas.
 
-Advanced inspection and patch-contract compatibility tools require `DOCMANCER_MCP_ADVANCED_TOOLS=1`. The advanced Packs gateway is a separate surface for explicitly installed API action packs. Neither surface is a static analyzer or a test runner.
+Advanced inspection and patch-contract tools require `DOCATLAS_MCP_ADVANCED_TOOLS=1`. The advanced Packs gateway is a separate surface for explicitly installed API action packs. Neither surface is a static analyzer or a test runner.

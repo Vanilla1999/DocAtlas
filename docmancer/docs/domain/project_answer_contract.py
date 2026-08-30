@@ -214,6 +214,10 @@ def obligations_can_authorize_docs_answer(
             obligation.attribute or obligation.expected_value or obligation.context
         ):
             return False
+        if relation == "applicable_contract" and _re.search(
+            r"(?:,|\b(?:and|or)\b)", obligation.subject, _re.I
+        ):
+            return False
         if relation in _CONTEXT_ONLY_RELATIONS:
             return False
         if relation == "usage" and obligation.subject_kind != "env_var":

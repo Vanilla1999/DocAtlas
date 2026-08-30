@@ -497,7 +497,7 @@ def build_tool_policy(condition_id: str, output_dir: Path) -> tuple[Path, Path]:
                 "docmancer-docs": {
                     "command": "uv",
                     "args": ["run", "--project", str(Path(__file__).resolve().parents[2]), "doc-atlas", "mcp", "docs-serve"],
-                    "env": {"DOCMANCER_TASK_LEVEL_ALLOW_NETWORK": "false"},
+                    "env": {"DOCATLAS_TASK_LEVEL_ALLOW_NETWORK": "false"},
                 }
             }
         }, indent=2), encoding="utf-8")
@@ -518,10 +518,10 @@ def fresh_run_environment(run_output_dir: Path) -> dict[str, str]:
         "HOME": str(home),
         "XDG_CONFIG_HOME": str(xdg_config),
         "XDG_CACHE_HOME": str(xdg_cache),
-        "DOCMANCER_HOME": str(docmancer_home),
-        "DOCMANCER_AUTO_VECTORS": "0",
-        "DOCMANCER_INDEX_DB_PATH": str(docmancer_home / "docmancer.db"),
-        "DOCMANCER_EMBEDDINGS_CACHE": str(docmancer_home / "embeddings-cache"),
+        "DOCATLAS_HOME": str(docmancer_home),
+        "DOCATLAS_AUTO_VECTORS": "0",
+        "DOCATLAS_INDEX_DB_PATH": str(docmancer_home / "docmancer.db"),
+        "DOCATLAS_EMBEDDINGS_CACHE": str(docmancer_home / "embeddings-cache"),
         # Keep dependency environments outside the repository so setup output
         # cannot appear in the agent patch or repository inventory.
         "UV_PROJECT_ENVIRONMENT": str(env_root / "project_venv"),

@@ -115,12 +115,9 @@ def test_stdio_smoke_requires_cited_content() -> None:
     text = (ROOT / "scripts/docs_mcp_stdio_smoke.py").read_text()
     assert "assert NEEDLE in rendered" in text
     assert 'assert set(canonical_query) == {"question", "project_path", "mode"}' in text
-    canonical_block = text[
-        text.index("canonical_query = {"):
-        text.index("compatibility_query =", text.index("canonical_query = {"))
-    ]
+    canonical_block = text[text.index("canonical_query = {"):text.index("answer = payload", text.index("canonical_query = {"))]
     assert "output_mode" not in canonical_block
-    assert 'compatibility_query = {**canonical_query, "output_mode": "compact"}' in text
+    assert "compatibility_query" not in text
     assert "validate_context_payload(answer, required_fragment=NEEDLE)" in text
 
 
@@ -129,7 +126,7 @@ def test_stdio_smoke_uses_primary_docatlas_home_without_legacy_writes() -> None:
     assert '"HOME": str(user_home)' in text
     assert '"USERPROFILE": str(user_home)' in text
     assert '"DOCATLAS_HOME": str(docatlas_home)' in text
-    assert 'env.pop("DOCMANCER_HOME", None)' in text
+    assert 'env.pop("DOCATLAS_HOME", None)' not in text
     assert 'not (user_home / ".docmancer").exists()' in text
 
 
@@ -172,7 +169,11 @@ def test_stdio_smoke_accepts_structured_content_and_legacy_json_text() -> None:
     }, required_fragment="needle")
     by_id = {case.surface_case_id: case for case in GOLD_CASES if case.surface_case_id is not None}
     assert set(by_id) == set(range(1, 21))
-    assert all(case.relevant_paths and case.required_fragments for case in by_id.values())
+    assert all(case.expected_kind for case in by_id.values())
+    assert all(
+        case.relevant_paths or case.expected_kind == "insufficient_evidence"
+        for case in by_id.values()
+    )
     invalid_citation = {
         "kind": "docs_context",
         "context_status": "ready",

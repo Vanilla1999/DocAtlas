@@ -28,7 +28,7 @@ def test_unknown_python_mcp_returns_discovery_candidates_not_dead_end(tmp_path):
 
 def test_known_riverpod_auto_registers_without_discovery_candidates(tmp_path, monkeypatch):
     home = tmp_path / "home"
-    monkeypatch.setenv("DOCMANCER_HOME", str(home))
+    monkeypatch.setenv("DOCATLAS_HOME", str(home))
 
     def fail_network(*args, **kwargs):
         raise AssertionError("network must not be used by resolver-only auto-registration")
@@ -55,7 +55,7 @@ def test_known_riverpod_auto_registers_without_discovery_candidates(tmp_path, mo
 
 def test_known_riverpod_fake_refresh_and_query_uses_isolated_home(tmp_path, monkeypatch):
     home = tmp_path / "home"
-    monkeypatch.setenv("DOCMANCER_HOME", str(home))
+    monkeypatch.setenv("DOCATLAS_HOME", str(home))
 
     def fail_network(*args, **kwargs):
         raise AssertionError("network must not be used by fake Riverpod refresh")

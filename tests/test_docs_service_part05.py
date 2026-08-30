@@ -329,13 +329,13 @@ def test_diagnostic_on_filtered_chunks(tmp_path, monkeypatch):
     assert {"code": "cross_source_contamination_filtered", "blocking": False, "dropped": 1} in result.diagnostics["warnings"]
 
 
-def test_prefetch_project_docs_prefetches_only_selected_packages(tmp_path, monkeypatch):
+def test_prefetch_project_dependency_docs_prefetches_only_selected_packages(tmp_path, monkeypatch):
     project = _flutter_project(tmp_path)
     agent = FakeAgent()
     service = _service(tmp_path, monkeypatch, agent)
     monkeypatch.setattr(service, "_discover_pub_dartdoc_target", lambda target, warnings, job_id=None, canonical_id=None: target)
 
-    result = service.prefetch_project_docs(
+    result = service.prefetch_project_dependency_docs(
         str(project),
         include_flutter=False,
         include_packages=["go_router"],
@@ -350,7 +350,7 @@ def test_prefetch_project_docs_prefetches_only_selected_packages(tmp_path, monke
     assert result.resolution_summary["exact_versions"] >= 2
 
 
-def test_prefetch_project_docs_counts_partial_target_as_completed(tmp_path, monkeypatch):
+def test_prefetch_project_dependency_docs_counts_partial_target_as_completed(tmp_path, monkeypatch):
     class PartialAgent(FakeAgent):
         def add(self, docs_url: str, recreate: bool = False, **kwargs) -> int:
             pages = super().add(docs_url, recreate=recreate, **kwargs)
@@ -361,7 +361,7 @@ def test_prefetch_project_docs_counts_partial_target_as_completed(tmp_path, monk
     service = _service(tmp_path, monkeypatch, PartialAgent())
     monkeypatch.setattr(service, "_discover_pub_dartdoc_target", lambda target, warnings, job_id=None, canonical_id=None: target)
 
-    result = service.prefetch_project_docs(
+    result = service.prefetch_project_dependency_docs(
         str(project),
         include_flutter=False,
         include_packages=["go_router"],
@@ -374,7 +374,7 @@ def test_prefetch_project_docs_counts_partial_target_as_completed(tmp_path, monk
     default_agent = FakeAgent()
     default_service = _service(tmp_path / "default", monkeypatch, default_agent)
     monkeypatch.setattr(default_service, "_discover_pub_dartdoc_target", lambda target, warnings, job_id=None, canonical_id=None: target)
-    default_result = default_service.prefetch_project_docs(
+    default_result = default_service.prefetch_project_dependency_docs(
         str(project), include_flutter=False, include_packages=[],
     )
     assert {item.library_id for item in default_result.results} == {
@@ -382,7 +382,7 @@ def test_prefetch_project_docs_counts_partial_target_as_completed(tmp_path, monk
     }
 
 
-def test_prefetch_project_docs_prefetches_rust_docs_rs(tmp_path, monkeypatch):
+def test_prefetch_project_dependency_docs_prefetches_rust_docs_rs(tmp_path, monkeypatch):
     project = _rust_project(tmp_path)
     agent = FakeAgent()
     service = _service(tmp_path, monkeypatch, agent)
@@ -430,7 +430,7 @@ def test_prefetch_project_docs_prefetches_rust_docs_rs(tmp_path, monkeypatch):
     assert record.docs_url == "https://docs.rs/serde/1.0.228/"
 
 
-def test_prefetch_project_docs_does_not_treat_unregistered_npm_package_as_pub(tmp_path, monkeypatch):
+def test_prefetch_project_dependency_docs_does_not_treat_unregistered_npm_package_as_pub(tmp_path, monkeypatch):
     project = tmp_path / "node_prefetch"
     project.mkdir()
     (project / "package.json").write_text('{"dependencies":{"react":"^18.0.0"}}', encoding="utf-8")
@@ -441,7 +441,7 @@ def test_prefetch_project_docs_does_not_treat_unregistered_npm_package_as_pub(tm
     agent = FakeAgent()
     service = _service(tmp_path, monkeypatch, agent)
 
-    result = service.prefetch_project_docs(
+    result = service.prefetch_project_dependency_docs(
         str(project),
         include_flutter=False,
         include_packages=["react"],
@@ -452,7 +452,7 @@ def test_prefetch_project_docs_does_not_treat_unregistered_npm_package_as_pub(tm
     assert agent.add_calls == []
 
 
-def test_prefetch_project_docs_reuses_registered_exact_npm_target_policy(tmp_path, monkeypatch):
+def test_prefetch_project_dependency_docs_reuses_registered_exact_npm_target_policy(tmp_path, monkeypatch):
     project = tmp_path / "registered_node_prefetch"
     project.mkdir()
     (project / "package.json").write_text('{"dependencies":{"react":"^18.0.0"}}', encoding="utf-8")
@@ -482,7 +482,7 @@ def test_prefetch_project_docs_reuses_registered_exact_npm_target_policy(tmp_pat
         },
     )
 
-    result = service.prefetch_project_docs(
+    result = service.prefetch_project_dependency_docs(
         str(project),
         include_flutter=False,
         include_packages=["react"],
@@ -494,12 +494,12 @@ def test_prefetch_project_docs_reuses_registered_exact_npm_target_policy(tmp_pat
     assert agent.add_calls == ["https://docs.example.com/react/18.3.1/"]
 
 
-def test_prefetch_project_docs_missing_package_returns_warning(tmp_path, monkeypatch):
+def test_prefetch_project_dependency_docs_missing_package_returns_warning(tmp_path, monkeypatch):
     project = _flutter_project(tmp_path)
     agent = FakeAgent()
     service = _service(tmp_path, monkeypatch, agent)
 
-    result = service.prefetch_project_docs(
+    result = service.prefetch_project_dependency_docs(
         str(project),
         include_flutter=False,
         include_packages=["missing_pkg"],
@@ -510,20 +510,20 @@ def test_prefetch_project_docs_missing_package_returns_warning(tmp_path, monkeyp
     assert agent.add_calls == []
 
 
-def test_prefetch_project_docs_async_returns_job_id(tmp_path, monkeypatch):
+def test_prefetch_project_dependency_docs_async_returns_job_id(tmp_path, monkeypatch):
     project = _flutter_project(tmp_path)
     agent = SlowAgent()
     service = _service(tmp_path, monkeypatch, agent)
     monkeypatch.setattr(service, "_discover_pub_dartdoc_target", lambda target, warnings, job_id=None, canonical_id=None: target)
 
-    result = service.prefetch_project_docs(str(project), include_flutter=False, include_packages=["go_router"], async_=True)
+    result = service.prefetch_project_dependency_docs(str(project), include_flutter=False, include_packages=["go_router"], async_=True)
 
     assert result.job_id
     assert result.status == "running"
     assert agent.entered.wait(timeout=1)
     status = service.get_docs_job_status(result.job_id)
     assert status is not None
-    assert status.kind == "prefetch_project_docs"
+    assert status.kind == "prefetch_project_dependency_docs"
     agent.release.set()
 
 

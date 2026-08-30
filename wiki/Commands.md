@@ -15,9 +15,9 @@ Reference for the main DocAtlas documentation runtime commands, vector lifecycle
 | `doc-atlas inspect` | Show SQLite index stats, source counts, and extract locations. |
 | `doc-atlas remove [source]` | Remove an indexed source or docset root. Use `--all` to clear everything. |
 | `doc-atlas doctor` | Health check: config, SQLite FTS5 availability, index stats, and installed agent skills. |
-| `doc-atlas init` | Create a project-local `docmancer.yaml` for a project-specific index. |
+| `doc-atlas init` | Create a project-local `docatlas.yaml` for a project-specific index. |
 | `doc-atlas install <agent>` | Install a skill file for a single agent manually. See [Install Targets](./Install-Targets.md). |
-| `doc-atlas fetch <url>` | Download documentation to local Markdown files (default output dir `docmancer-docs/`). Does not update the SQLite index. |
+| `doc-atlas fetch <url>` | Download documentation to local Markdown files (default output dir `docatlas-docs/`). Does not update the SQLite index. |
 | `doc-atlas qdrant {up,down,status,upgrade,logs}` | Manage the local Qdrant process used for dense + sparse + hybrid retrieval. See [Qdrant lifecycle](#qdrant-lifecycle) below. |
 
 ## Query options
@@ -72,7 +72,7 @@ Its public workflow has exactly three tools:
 - `prepare_docs` — a returned or explicitly approved sync/prefetch action;
 - `docs_status` — a returned job, health, or freshness request.
 
-The normal sequence is `get_docs_context → prepare_docs when returned → retry get_docs_context`. See [Docs MCP server](../docs/mcp-docs-server.md) for the canonical contract. Legacy direct docs APIs may exist for compatibility but are not the default agent workflow.
+The normal sequence is `get_docs_context → prepare_docs when returned → retry get_docs_context`. See [Docs MCP server](../docs/mcp-docs-server.md) for the canonical contract. Only the currently advertised three-tool surface is supported.
 
 ## MCP pack commands
 
@@ -80,10 +80,9 @@ The normal sequence is `get_docs_context → prepare_docs when returned → retr
 
 | Command | Description |
 |---------|-------------|
-| `doc-atlas install-pack <pkg>@<version>` | Install a pack from the registry. Verifies SHA-256 of every artifact and registers it in `~/.docmancer/mcp/manifest.json`. Spec parses from the rightmost `@` so npm-scoped names like `@scope/pkg@1.2.3` work. |
+| `doc-atlas install-pack <pkg>@<version>` | Install a pack from the registry. Verifies SHA-256 of every artifact and registers it in `~/.docatlas/mcp/manifest.json`. Spec parses from the rightmost `@` so npm-scoped names like `@scope/pkg@1.2.3` work. |
 | `doc-atlas uninstall <pkg>[@<version>]` | Remove an installed pack (all versions if no version given). |
 | `doc-atlas mcp packs-serve` | Run the advanced stdio MCP Packs/API-pack gateway. |
-| `doc-atlas mcp serve` | Compatibility alias for `packs-serve`. The default documentation workflow uses `doc-atlas mcp docs-serve`. |
 | `doc-atlas mcp list` | Show installed packs with mode (curated/expanded), per-pack tool counts, and destructive gate state (`block` or `ALLOW`). |
 | `doc-atlas mcp doctor` | Verify pack SHA-256s, credential resolution per scheme, and agent-config registrations. Reports actionable warnings. |
 | `doc-atlas mcp enable <pkg> [--version <v>]` | Re-enable a previously disabled pack without reinstalling. |
@@ -100,32 +99,32 @@ The normal sequence is `get_docs_context → prepare_docs when returned → retr
 
 ### MCP runtime behavior
 
-When the agent calls `docmancer_call_tool`, the dispatcher resolves the slug `package__version__operation` (D15: double-underscore field separators), validates `args` against the operation's input schema, resolves credentials, runs the safety gate, auto-injects an `Idempotency-Key` for non-idempotent operations on sources that declare an idempotency header (UUID4, reused on retry from a 24-hour SQLite fingerprint cache), merges `auth.required_headers` declared in the contract (used by keyed APIs that pin a dated wire version), and dispatches via the operation's executor. Path parameters are percent-encoded as one segment so values like `feat/x?ref=main` do not alter the URL structure. Logs at `~/.docmancer/mcp/calls.jsonl` record `arg_keys` only, never values.
+When the agent calls `docmancer_call_tool`, the dispatcher resolves the slug `package__version__operation` (D15: double-underscore field separators), validates `args` against the operation's input schema, resolves credentials, runs the safety gate, auto-injects an `Idempotency-Key` for non-idempotent operations on sources that declare an idempotency header (UUID4, reused on retry from a 24-hour SQLite fingerprint cache), merges `auth.required_headers` declared in the contract (used by keyed APIs that pin a dated wire version), and dispatches via the operation's executor. Path parameters are percent-encoded as one segment so values like `feat/x?ref=main` do not alter the URL structure. Logs at `~/.docatlas/mcp/calls.jsonl` record `arg_keys` only, never values.
 
 ## Qdrant lifecycle
 
-The `doc-atlas qdrant` group manages a docmancer-owned local Qdrant process. The default `doc-atlas ingest` runs the full hybrid path: on first ingest it downloads the pinned Qdrant binary, starts it in the background, and embeds + upserts vectors alongside FTS5. Use `ingest --no-vectors` (or set `DOCMANCER_AUTO_VECTORS=0`) for FTS5-only runs.
+The `doc-atlas qdrant` group manages a DocAtlas-owned local Qdrant process. The default `doc-atlas ingest` runs the hybrid path: on first ingest it downloads the pinned Qdrant binary, starts it in the background, and embeds + upserts vectors alongside FTS5. Use `ingest --no-vectors` (or set `DOCATLAS_AUTO_VECTORS=0`) for FTS5-only runs.
 
 | Subcommand | Description |
 |------------|-------------|
-| `doc-atlas qdrant up` | Download the pinned Qdrant binary (currently `v1.14.1`) to `~/.docmancer/qdrant/qdrant` if absent, start it in the background, write a PID + runtime metadata file, and spawn with telemetry disabled (`QDRANT__TELEMETRY_DISABLED=true`). Pass `--port` to pin a specific port, or `--docker` to print a `docker compose` snippet instead of running the managed binary. |
+| `doc-atlas qdrant up` | Download the pinned Qdrant binary (currently `v1.14.1`) to `~/.docatlas/qdrant/qdrant` if absent, start it in the background, write a PID + runtime metadata file, and spawn with telemetry disabled (`QDRANT__TELEMETRY_DISABLED=true`). Pass `--port` to pin a specific port, or `--docker` to print a `docker compose` snippet instead of running the managed binary. |
 | `doc-atlas qdrant down` | Stop a docmancer-managed process. Refuses to touch a PID file docmancer did not write. |
 | `doc-atlas qdrant status` | Report pid, port, url, alive, docmancer-ownership, healthy, and version. Add `--json` for raw JSON. |
 | `doc-atlas qdrant upgrade` | Swap the managed binary in-place against the same on-disk storage. Refuses to run against a live docmancer-owned process without `--force`. Cross-version storage migration is not automated. |
-| `doc-atlas qdrant logs` | Tail the managed binary's stdout (or stderr with `--stderr`) from `~/.docmancer/qdrant/logs/`. |
+| `doc-atlas qdrant logs` | Tail the managed binary's stdout (or stderr with `--stderr`) from `~/.docatlas/qdrant/logs/`. |
 
 Environment overrides:
 
-- `DOCMANCER_QDRANT_URL`: point docmancer at an existing Qdrant (managed elsewhere). Skips the local lifecycle entirely.
-- `DOCMANCER_QDRANT_API_KEY`: bearer token for the above.
-- `DOCMANCER_QDRANT_BINARY`: pre-staged binary path for air-gapped hosts (skips the GitHub download).
-- `DOCMANCER_AUTO_VECTORS=0`: opt out of the vector path; `ingest` and `query` stay on FTS5 only.
+- `DOCATLAS_QDRANT_URL`: point docmancer at an existing Qdrant (managed elsewhere). Skips the local lifecycle entirely.
+- `DOCATLAS_QDRANT_API_KEY`: bearer token for the above.
+- `DOCATLAS_QDRANT_BINARY`: pre-staged binary path for air-gapped hosts (skips the GitHub download).
+- `DOCATLAS_AUTO_VECTORS=0`: opt out of the vector path; `ingest` and `query` stay on FTS5 only.
 
 Safety: `QdrantStore.ensure_collection` refuses to claim a pre-existing collection that does not carry the docmancer ownership sentinel, and `delete_collection` will only operate on docmancer-owned collections. Point `vector_store.collection` at a name docmancer creates.
 
 ## Advanced retrieval
 
-Set in `docmancer.yaml`:
+Set in `docatlas.yaml`:
 
 - `retrieval.hierarchical.enabled: true` switches the dispatcher to a two-stage retrieval: cast a wide net, aggregate scores by `document_title_hash`, pick the top `documents_limit` documents, then re-retrieve sections filtered to those documents. Good for multi-product docs portals; leave off for flat corpora.
 - `retrieval.routers` is an ordered list of `{match: <regex>, filters: {...}}` entries. The first regex that matches the query has its `filters` merged into the dispatcher's filters for that call. Use it when different query patterns should narrow retrieval to known metadata, such as `source_path_prefix=api` or `format=markdown`.

@@ -35,7 +35,7 @@ def _clean_string(value: Any) -> str | None:
 
 
 def _library_arg(args: dict[str, Any]) -> str | None:
-    return _clean_string(args.get("library") or args.get("libraryName"))
+    return _clean_string(args.get("library"))
 
 
 def _bounded_int_arg(

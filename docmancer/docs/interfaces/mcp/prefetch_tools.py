@@ -327,16 +327,15 @@ def handle_prefetch_tool(name: str, args: dict[str, Any], service: LibraryDocsSe
                     "reason_code": "project_path_required",
                     "message": "project_path is required for action='project'",
                 }
-            details = bool(args.get("details") or False)
             project = handle_project_tool(
                 "inspect_project_docs",
-                {"project_path": project_path, "details": True},
+                {"project_path": project_path},
                 service,
             )
             return {
                 "tool": "docs_status",
                 "action": action,
-                "project": _bounded_project_status(project, details=details),
+                "project": _bounded_project_status(project, details=True),
             }
         if action == "library":
             canonical_id = str(args.get("canonical_id") or "").strip()

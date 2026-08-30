@@ -45,7 +45,6 @@ GENERATED_PATTERNS = (
 GENERATED_ARTIFACT_SOURCE_PATTERNS = (
     "eval/task_level/results/**",
     ".docatlas/**",
-    ".docmancer/**",
 )
 PATCH_REVIEW_DIR_NAMES = {"patch-review", "patch_review"}
 PATCH_REVIEW_ARTIFACT_NAMES = {

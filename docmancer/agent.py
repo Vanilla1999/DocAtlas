@@ -252,8 +252,8 @@ class DocmancerAgent:
 
         Opt-outs (each used by tests and FTS5-only installs):
 
-        - ``DOCMANCER_AUTO_VECTORS=0`` skips the vector path entirely.
-        - ``DOCMANCER_QDRANT_URL`` short-circuits the managed lifecycle.
+        - ``DOCATLAS_AUTO_VECTORS=0`` skips the vector path entirely.
+        - ``DOCATLAS_QDRANT_URL`` short-circuits the managed lifecycle.
         - Missing cloud-embedding API key for the configured provider:
           logs a warning and falls back to FTS5-only ingest (no vectors).
         - ``[vector]`` extras stripped from the venv: silent no-op.
@@ -263,8 +263,8 @@ class DocmancerAgent:
         started = time.monotonic()
         self.last_vector_sync_metrics = {"status": "starting"}
 
-        if _os.environ.get("DOCMANCER_AUTO_VECTORS") == "0":
-            logger.debug("vector sync disabled by DOCMANCER_AUTO_VECTORS=0")
+        if _os.environ.get("DOCATLAS_AUTO_VECTORS") == "0":
+            logger.debug("vector sync disabled by DOCATLAS_AUTO_VECTORS=0")
             self.last_vector_sync_metrics = {
                 "status": "skipped",
                 "reason": "disabled_by_environment",
@@ -543,7 +543,7 @@ class DocmancerAgent:
 
         vs_config = self.config.vector_store
         if vs_config.provider == "qdrant" and not vs_config.url:
-            explicit_url = _os.environ.get("DOCMANCER_QDRANT_URL")
+            explicit_url = _os.environ.get("DOCATLAS_QDRANT_URL")
             if explicit_url:
                 vs_config = vs_config.model_copy(update={"url": explicit_url})
             else:
@@ -708,7 +708,7 @@ class DocmancerAgent:
         return all(existing_metadata.get(key) == value for key, value in expected_metadata.items())
 
     def _write_last_ingest_report(self, root: Path, skipped: list[dict[str, str]]) -> None:
-        home = Path(os.environ.get("DOCMANCER_HOME") or Path(self.config.index.db_path).expanduser().parent)
+        home = Path(os.environ.get("DOCATLAS_HOME") or Path(self.config.index.db_path).expanduser().parent)
         home.mkdir(parents=True, exist_ok=True)
         report_path = home / "last-ingest-report.json"
         spill_path = home / "last-ingest-report.skipped.jsonl"

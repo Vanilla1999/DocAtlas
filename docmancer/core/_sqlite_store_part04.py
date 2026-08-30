@@ -38,102 +38,6 @@ class _SQLiteStorePart04:
                 return [item for item in rows if int(item["id"]) == int(row["id"])] + [
                     item for item in rows if int(item["id"]) != int(row["id"])
                 ]
-            parent_logical_id = row["parent_logical_id"] if "parent_logical_id" in row.keys() else None
-            if parent_logical_id:
-                if expand == "page":
-                    rows = list(
-                        conn.execute(
-                            """
-                            SELECT * FROM sections
-                            WHERE parent_logical_id = ?
-                            ORDER BY chunk_index
-                            LIMIT 21
-                            """,
-                            (parent_logical_id,),
-                        )
-                    )
-                    return [item for item in rows if int(item["id"]) == int(row["id"])] + [
-                        item for item in rows if int(item["id"]) != int(row["id"])
-                    ]
-                if expand == "adjacent":
-                    siblings = list(
-                        conn.execute(
-                            """
-                            SELECT * FROM sections
-                            WHERE parent_logical_id = ? AND chunk_index BETWEEN ? AND ?
-                            ORDER BY chunk_index
-                            """,
-                            (
-                                parent_logical_id,
-                                max(0, int(row["chunk_index"]) - 1),
-                                int(row["chunk_index"]) + 1,
-                            ),
-                        )
-                    )
-                    return [item for item in siblings if int(item["id"]) == int(row["id"])] + [
-                        item for item in siblings if int(item["id"]) != int(row["id"])
-                    ]
-            if expand == "page":
-                # Find sections that belong to the same logical page as the
-                # matching row.  For multi-page docsets the page boundary is
-                # the nearest preceding level-1 heading.  For single-page
-                # sources (e.g. llms-full.txt) this avoids returning the
-                # entire document from chunk_index 0 and instead anchors on
-                # the matched section's page neighbourhood.
-                anchor_idx = int(row["chunk_index"])
-                source_id = row["source_id"]
-
-                # Walk backwards to find the nearest level-1 heading.
-                prev_h1 = conn.execute(
-                    """
-                    SELECT chunk_index FROM sections
-                    WHERE source_id = ? AND chunk_index <= ? AND level = 1
-                    ORDER BY chunk_index DESC LIMIT 1
-                    """,
-                    (source_id, anchor_idx),
-                ).fetchone()
-                page_start = int(prev_h1["chunk_index"]) if prev_h1 else anchor_idx
-
-                # Walk forward to find the next level-1 heading (exclusive).
-                next_h1 = conn.execute(
-                    """
-                    SELECT chunk_index FROM sections
-                    WHERE source_id = ? AND chunk_index > ? AND level = 1
-                    ORDER BY chunk_index ASC LIMIT 1
-                    """,
-                    (source_id, anchor_idx),
-                ).fetchone()
-                page_end = int(next_h1["chunk_index"]) - 1 if next_h1 else anchor_idx + 20
-
-                # Return sections within this page, anchored section first.
-                rows = list(
-                    conn.execute(
-                        """
-                        SELECT * FROM sections
-                        WHERE source_id = ? AND chunk_index BETWEEN ? AND ?
-                        ORDER BY chunk_index
-                        """,
-                        (source_id, page_start, page_end),
-                    )
-                )
-                # Reorder so the matching section comes first (budget
-                # packing keeps early items, so this ensures the actual
-                # match is always included).
-                anchor_rows = [r for r in rows if int(r["chunk_index"]) == anchor_idx]
-                other_rows = [r for r in rows if int(r["chunk_index"]) != anchor_idx]
-                return anchor_rows + other_rows
-
-            if expand == "adjacent":
-                return list(
-                    conn.execute(
-                        """
-                        SELECT * FROM sections
-                        WHERE source_id = ? AND chunk_index BETWEEN ? AND ?
-                        ORDER BY chunk_index
-                        """,
-                        (row["source_id"], max(0, int(row["chunk_index"]) - 1), int(row["chunk_index"]) + 1),
-                    )
-                )
         return [row]
 
     def _raw_token_total(self, sources: list[str]) -> int:
@@ -220,47 +124,10 @@ class _SQLiteStorePart04:
                     (active_generation, *params),
                 ).fetchone()["count"] or 0)
 
-            legacy_conditions: list[str] = []
-            legacy_params: list[Any] = []
-            if normalized_path:
-                legacy_conditions.append("json_extract(metadata_json, '$.project_path') = ?")
-                legacy_params.append(normalized_path)
-            if normalized_identity:
-                legacy_conditions.append(
-                    "COALESCE(json_extract(metadata_json, '$.project_identity'), "
-                    "json_extract(metadata_json, '$.repository_identity')) = ?"
-                )
-                legacy_params.append(normalized_identity)
-            legacy_sql = "(" + " OR ".join(legacy_conditions) + ")"
-            exclusion = ""
-            exclusion_params: list[Any] = []
-            if active_generation:
-                exclusion = (
-                    " AND source NOT IN (SELECT source FROM retrieval_children "
-                    "WHERE generation_id = ?)"
-                )
-                exclusion_params.append(active_generation)
-            legacy_rows = conn.execute(
-                f"""
-                SELECT DISTINCT source
-                FROM sections
-                WHERE {legacy_sql}{exclusion}
-                """,
-                (*legacy_params, *exclusion_params),
-            ).fetchall()
-            legacy_sources = {str(row["source"]) for row in legacy_rows}
-            legacy_sections = int(conn.execute(
-                f"""
-                SELECT COUNT(*) AS count
-                FROM sections
-                WHERE {legacy_sql}{exclusion}
-                """,
-                (*legacy_params, *exclusion_params),
-            ).fetchone()["count"] or 0)
-        sources = child_sources | legacy_sources
+        sources = child_sources
         return {
             "sources_count": len(sources),
-            "sections_count": child_sections + legacy_sections,
+            "sections_count": child_sections,
             "active_generation_id": active_generation,
             "ownership": "project_owned" if sources else "no_project_rows",
         }
@@ -268,9 +135,6 @@ class _SQLiteStorePart04:
     def collection_stats(self) -> dict:
         with self._connect() as conn:
             sources = conn.execute("SELECT COUNT(*) AS count FROM sources").fetchone()["count"]
-            legacy_sections = int(conn.execute(
-                "SELECT COUNT(*) AS count FROM sections"
-            ).fetchone()["count"])
             active_generation = self._active_generation_id(conn)
             if active_generation:
                 children = int(conn.execute(
@@ -281,27 +145,20 @@ class _SQLiteStorePart04:
                     "SELECT COUNT(*) AS count FROM retrieval_parents WHERE generation_id = ?",
                     (active_generation,),
                 ).fetchone()["count"])
-                compatibility = int(conn.execute(
-                    """
-                    SELECT COUNT(*) AS count FROM sections
-                    WHERE source NOT IN (
-                        SELECT source FROM retrieval_children WHERE generation_id = ?
-                    )
-                    """,
-                    (active_generation,),
-                ).fetchone()["count"])
-                sections = children + compatibility
+                sections = children
             else:
                 children = 0
                 parents = 0
-                sections = legacy_sections
+                sections = 0
             format_rows = conn.execute(
                 """
                 SELECT COALESCE(NULLIF(format, ''), 'unknown') AS format, COUNT(*) AS count
-                FROM sections
+                FROM retrieval_children
+                WHERE generation_id = ?
                 GROUP BY COALESCE(NULLIF(format, ''), 'unknown')
                 ORDER BY format
-                """
+                """,
+                (active_generation or "",),
             ).fetchall()
             source_format_rows = conn.execute(
                 """
@@ -319,7 +176,6 @@ class _SQLiteStorePart04:
             "sections_count": int(sections),
             "parent_sections_count": int(parents),
             "retrieval_children_count": int(children),
-            "legacy_sections_count": int(legacy_sections),
             "active_generation_id": active_generation,
             "sources_by_format": {str(row["format"]): int(row["count"]) for row in source_format_rows},
             "sections_by_format": {str(row["format"]): int(row["count"]) for row in format_rows},
@@ -376,17 +232,6 @@ class _SQLiteStorePart04:
                     (active,),
                 ).fetchone()["count"])
                 schemas[str(generation["schema_version"])] = child_count
-                legacy_count = int(conn.execute(
-                    """
-                    SELECT COUNT(*) AS count FROM sections
-                    WHERE source NOT IN (
-                        SELECT source FROM retrieval_children WHERE generation_id = ?
-                    )
-                    """,
-                    (active,),
-                ).fetchone()["count"])
-                if legacy_count:
-                    schemas[INDEX_SCHEMA_VERSION] = legacy_count
                 missing_parents = int(conn.execute(
                     """
                     SELECT COUNT(*) AS count FROM retrieval_children c
@@ -469,12 +314,6 @@ class _SQLiteStorePart04:
                         continue
                     if content.encode("utf-8")[int(row["byte_start"]):int(row["byte_end"])] != display.encode("utf-8"):
                         invalid_spans += 1
-            else:
-                legacy_count = int(conn.execute(
-                    "SELECT COUNT(*) AS count FROM sections"
-                ).fetchone()["count"])
-                if legacy_count:
-                    schemas[INDEX_SCHEMA_VERSION] = legacy_count
             vector_drift = 0
             vector_collection_mismatch = False
             if collection:
@@ -499,28 +338,6 @@ class _SQLiteStorePart04:
                             (active,),
                         )
                     }
-                    for row in conn.execute(
-                        """
-                        SELECT source, chunk_index, text, retrieval_text,
-                               content_hash, retrieval_content_hash
-                        FROM sections
-                        WHERE source NOT IN (
-                            SELECT source FROM generation_sources
-                            WHERE generation_id = ?
-                        )
-                        """,
-                        (active,),
-                    ):
-                        retrieval_text = str(row["retrieval_text"] or row["text"] or "")
-                        retrieval_hash = str(
-                            row["retrieval_content_hash"]
-                            or hashlib.sha256(retrieval_text.encode("utf-8")).hexdigest()
-                        )
-                        current_stable_ids.add(
-                            "legacy-" + hashlib.sha256(
-                                f"{row['source']}\0{row['chunk_index']}\0{retrieval_hash}".encode("utf-8")
-                            ).hexdigest()[:40]
-                        )
                     recorded = {
                         str(row["stable_chunk_id"]): str(row["generation_id"])
                         for row in conn.execute(
@@ -695,24 +512,17 @@ class _SQLiteStorePart04:
         """Return stable chunk ids before a source is removed."""
         with self._connect() as conn:
             active = self._active_generation_id(conn)
-            if active:
-                rows = list(conn.execute(
-                    """
-                    SELECT hydration_id AS id FROM retrieval_children
-                    WHERE generation_id = ? AND source = ?
-                    ORDER BY chunk_index
-                    """,
-                    (active, source),
-                ))
-                if rows:
-                    return [int(row["id"]) for row in rows]
-            return [
-                int(row["id"])
-                for row in conn.execute(
-                    "SELECT id FROM sections WHERE source = ? ORDER BY id",
-                    (source,),
-                )
-            ]
+            if not active:
+                return []
+            rows = conn.execute(
+                """
+                SELECT hydration_id AS id FROM retrieval_children
+                WHERE generation_id = ? AND source = ?
+                ORDER BY chunk_index
+                """,
+                (active, source),
+            )
+            return [int(row["id"]) for row in rows]
 
     def record_embedding_upserts(
         self,

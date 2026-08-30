@@ -18,7 +18,7 @@ plus the live temperature reading for Central Park, NYC.
 Usage:
   ./scripts/mcp_stdio_smoke.py           # from repo docmancer/ (uses a fresh tempdir)
   python3 scripts/mcp_stdio_smoke.py     # if execute bit is off
-  DOCMANCER_HOME=/path ./scripts/mcp_stdio_smoke.py   # override storage root
+  DOCATLAS_HOME=/path ./scripts/mcp_stdio_smoke.py   # override storage root
 """
 from __future__ import annotations
 
@@ -61,7 +61,7 @@ LONGITUDE = -73.968285
 def _install_pack(home: Path) -> None:
     """Install open-meteo@v1 via the built-in known-source fallback. No registry needed."""
     cmd = [sys.executable, "-m", "docmancer", "install-pack", "open-meteo@v1"]
-    env = {**os.environ, "DOCMANCER_HOME": str(home)}
+    env = {**os.environ, "DOCATLAS_HOME": str(home)}
     subprocess.run(cmd, check=True, env=env, cwd=ROOT)
 
 
@@ -77,7 +77,7 @@ async def _smoke(home: Path) -> int:
         if not cond:
             failures.append(label)
 
-    server_env = {**os.environ, "DOCMANCER_HOME": str(home)}
+    server_env = {**os.environ, "DOCATLAS_HOME": str(home)}
     params = StdioServerParameters(
         command=sys.executable,
         args=["-m", "docmancer", "mcp", "packs-serve"],

@@ -84,7 +84,7 @@ def _environment(copy_root: Path) -> dict[str, str]:
     existing = env.get("PYTHONPATH")
     env["PYTHONPATH"] = str(copy_root) + (os.pathsep + existing if existing else "")
     env["PYTHONDONTWRITEBYTECODE"] = "1"
-    env["DOCMANCER_OFFLINE"] = "1"
+    env["DOCATLAS_OFFLINE"] = "1"
     env.pop("PYTEST_ADDOPTS", None)
     return env
 

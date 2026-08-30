@@ -16,7 +16,7 @@ from docmancer.mcp import installer, paths
 
 @pytest.fixture(autouse=True)
 def isolated_home(tmp_path, monkeypatch):
-    monkeypatch.setenv("DOCMANCER_HOME", str(tmp_path / "home"))
+    monkeypatch.setenv("DOCATLAS_HOME", str(tmp_path / "home"))
     paths.ensure_dirs()
 
 
@@ -24,22 +24,15 @@ def test_mcp_command_group_registered():
     runner = CliRunner()
     result = runner.invoke(cli, ["mcp", "--help"])
     assert result.exit_code == 0
-    for sub in ("packs-serve", "serve", "docs-serve", "doctor", "list", "enable", "disable"):
+    for sub in ("packs-serve", "docs-serve", "doctor", "list", "enable", "disable"):
         assert sub in result.output
 
 
-def test_mcp_serve_is_compatibility_alias_for_packs_serve():
+def test_mcp_serve_compatibility_alias_is_absent():
     mcp_group = cast(Group, cli.commands["mcp"])
     mcp_commands = mcp_group.commands
     assert "packs-serve" in mcp_commands
-    assert "serve" in mcp_commands
-    serve_callback = mcp_commands["serve"].callback
-    packs_serve_callback = mcp_commands["packs-serve"].callback
-    assert serve_callback is not None
-    assert packs_serve_callback is not None
-    assert serve_callback.__name__ == "mcp_serve_cmd"
-    assert packs_serve_callback.__name__ == "mcp_packs_serve_cmd"
-    assert "Compatibility alias" in (mcp_commands["serve"].help or "")
+    assert "serve" not in mcp_commands
 
 
 @pytest.mark.parametrize(
@@ -98,7 +91,7 @@ def test_uninstall_command_registered():
 
 
 def test_mcp_list_no_packs(monkeypatch, tmp_path):
-    monkeypatch.setenv("DOCMANCER_HOME", str(tmp_path / "h2"))
+    monkeypatch.setenv("DOCATLAS_HOME", str(tmp_path / "h2"))
     runner = CliRunner()
     result = runner.invoke(cli, ["mcp", "list"])
     assert result.exit_code == 0
@@ -113,10 +106,10 @@ def test_unknown_subcommand_fails_cleanly():
 
 def test_enable_disable_round_trip(monkeypatch, tmp_path):
     """Section 15: enable/disable changes manifest state without deleting files."""
-    monkeypatch.setenv("DOCMANCER_HOME", str(tmp_path / "h"))
+    monkeypatch.setenv("DOCATLAS_HOME", str(tmp_path / "h"))
     paths.ensure_dirs()
     registry_dir = tmp_path / "reg"
-    monkeypatch.setenv("DOCMANCER_REGISTRY_DIR", str(registry_dir))
+    monkeypatch.setenv("DOCATLAS_REGISTRY_DIR", str(registry_dir))
     pkg_dir = registry_dir / "demo@1"
     pkg_dir.mkdir(parents=True)
     (pkg_dir / "contract.json").write_text(json.dumps({"operations": []}))

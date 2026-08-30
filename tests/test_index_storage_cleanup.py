@@ -11,19 +11,19 @@ from docmancer.mcp.docs_server import call_docs_tool_payload
 
 
 def test_project_index_cleanup_is_preview_first_and_mcp_requires_confirmation(tmp_path, monkeypatch):
-    monkeypatch.setenv("DOCMANCER_HOME", str(tmp_path / "isolated-docmancer-home"))
+    monkeypatch.setenv("DOCATLAS_HOME", str(tmp_path / "isolated-docmancer-home"))
     project = tmp_path / "project"
-    storage = project / ".docmancer"
+    storage = project / ".docatlas"
     extracted = storage / "extracted"
     extracted.mkdir(parents=True)
     database = storage / "project.db"
     database.write_text("index", encoding="utf-8")
     (extracted / "chunk.md").write_text("extract", encoding="utf-8")
     (project / "README.md").write_text("source document", encoding="utf-8")
-    (project / "docmancer.yaml").write_text(
+    (project / "docatlas.yaml").write_text(
         "index:\n"
-        "  db_path: .docmancer/project.db\n"
-        "  extracted_dir: .docmancer/extracted\n",
+        "  db_path: .docatlas/project.db\n"
+        "  extracted_dir: .docatlas/extracted\n",
         encoding="utf-8",
     )
 
@@ -50,7 +50,7 @@ def test_project_index_cleanup_is_preview_first_and_mcp_requires_confirmation(tm
     assert database.exists()
     assert extracted.exists()
     assert (project / "README.md").exists()
-    assert (project / "docmancer.yaml").exists()
+    assert (project / "docatlas.yaml").exists()
 
     mcp_result = call_docs_tool_payload(
         "prepare_docs",
@@ -87,12 +87,12 @@ def test_project_index_cleanup_is_preview_first_and_mcp_requires_confirmation(tm
     assert not database.exists()
     assert not extracted.exists()
     assert (project / "README.md").exists()
-    assert (project / "docmancer.yaml").exists()
+    assert (project / "docatlas.yaml").exists()
 
 
 def _project_with_local_index(tmp_path: Path, name: str = "project"):
     project = tmp_path / name
-    storage = project / ".docmancer"
+    storage = project / ".docatlas"
     extracted = storage / "extracted"
     docs_indexes = storage / "docs-indexes"
     embeddings = storage / "embeddings-cache"
@@ -120,16 +120,16 @@ def _project_with_local_index(tmp_path: Path, name: str = "project"):
     (qdrant / "storage" / "collection").write_text("vectors", encoding="utf-8")
     (storage / "user-note.txt").write_text("preserve", encoding="utf-8")
     (project / "README.md").write_text("source", encoding="utf-8")
-    (project / "docmancer.yaml").write_text(
+    (project / "docatlas.yaml").write_text(
         "index:\n"
-        "  db_path: .docmancer/project.db\n"
-        "  extracted_dir: .docmancer/extracted\n"
+        "  db_path: .docatlas/project.db\n"
+        "  extracted_dir: .docatlas/extracted\n"
         "embeddings:\n"
-        "  cache: .docmancer/embeddings-cache\n"
+        "  cache: .docatlas/embeddings-cache\n"
         "vector_store:\n"
         "  provider: sqlite-vec\n"
         "  options:\n"
-        "    db_path: .docmancer/sqlite-vec.db\n",
+        "    db_path: .docatlas/sqlite-vec.db\n",
         encoding="utf-8",
     )
     return project, storage, database, sqlite_vec
@@ -156,7 +156,7 @@ def test_project_cleanup_removes_sidecars_owned_vectors_and_caches_but_not_confi
     assert not (storage / "qdrant").exists()
     assert not (storage / "docs-indexes").exists()
     assert not (storage / "embeddings-cache").exists()
-    assert (project / "docmancer.yaml").exists()
+    assert (project / "docatlas.yaml").exists()
     assert (project / "README.md").exists()
     assert (storage / "user-note.txt").read_text(encoding="utf-8") == "preserve"
 
@@ -227,10 +227,10 @@ def test_global_index_cleanup_preserves_config_mcp_and_unrelated_files(tmp_path,
     (extracted / "page").write_text("page", encoding="utf-8")
     (docs_indexes / "lib").write_text("lib", encoding="utf-8")
     (embeddings / "cache").write_text("cache", encoding="utf-8")
-    (home / "docmancer.yaml").write_text("index: {}\n", encoding="utf-8")
+    (home / "docatlas.yaml").write_text("index: {}\n", encoding="utf-8")
     (home / "mcp" / "config.json").write_text("{}", encoding="utf-8")
     (home / "user-note.txt").write_text("keep", encoding="utf-8")
-    monkeypatch.setenv("DOCMANCER_HOME", str(home))
+    monkeypatch.setenv("DOCATLAS_HOME", str(home))
     config = DocmancerConfig.model_validate({
         "index": {"db_path": str(database), "extracted_dir": str(extracted)},
         "embeddings": {"cache": str(embeddings)},
@@ -246,7 +246,7 @@ def test_global_index_cleanup_preserves_config_mcp_and_unrelated_files(tmp_path,
     assert not extracted.exists()
     assert not docs_indexes.exists()
     assert not embeddings.exists()
-    assert (home / "docmancer.yaml").exists()
+    assert (home / "docatlas.yaml").exists()
     assert (home / "mcp" / "config.json").exists()
     assert (home / "user-note.txt").read_text(encoding="utf-8") == "keep"
 
@@ -263,12 +263,12 @@ def test_project_local_cleanup_does_not_touch_another_project_root(tmp_path):
     cleanup.apply(plan, expected_plan_digest=plan.plan_digest)
 
     assert not database_a.exists()
-    assert (project_a / "docmancer.yaml").exists()
+    assert (project_a / "docatlas.yaml").exists()
     assert database_b.exists()
     assert Path(f"{database_b}-wal").exists()
     assert sqlite_vec_b.exists()
     assert (storage_b / "qdrant" / "storage" / "collection").exists()
-    assert (project_b / "docmancer.yaml").exists()
+    assert (project_b / "docatlas.yaml").exists()
     assert (storage_a / "user-note.txt").exists()
 
 
@@ -277,7 +277,7 @@ def test_missing_global_home_preview_is_side_effect_free(tmp_path, monkeypatch):
     from docmancer.docs.application.index_storage_cleanup import IndexStorageCleanup
 
     home = tmp_path / "missing-home"
-    monkeypatch.setenv("DOCMANCER_HOME", str(home))
+    monkeypatch.setenv("DOCATLAS_HOME", str(home))
     config = DocmancerConfig.model_validate({
         "index": {
             "db_path": str(home / "docmancer.db"),
@@ -342,19 +342,19 @@ def test_project_cleanup_then_sync_rebuilds_the_project_index(tmp_path, monkeypa
         "    impact: track\n",
         encoding="utf-8",
     )
-    (project / "docmancer.yaml").write_text(
+    (project / "docatlas.yaml").write_text(
         "index:\n"
-        "  db_path: .docmancer/project.db\n"
-        "  extracted_dir: .docmancer/extracted\n"
+        "  db_path: .docatlas/project.db\n"
+        "  extracted_dir: .docatlas/extracted\n"
         "embeddings:\n"
-        "  cache: .docmancer/embeddings-cache\n"
+        "  cache: .docatlas/embeddings-cache\n"
         "vector_store:\n"
         "  provider: sqlite-vec\n"
         "  options:\n"
-        "    db_path: .docmancer/sqlite-vec.db\n",
+        "    db_path: .docatlas/sqlite-vec.db\n",
         encoding="utf-8",
     )
-    monkeypatch.setenv("DOCMANCER_HOME", str(project / ".docmancer"))
+    monkeypatch.setenv("DOCATLAS_HOME", str(project / ".docatlas"))
     resolved = resolve_config(project_path=project)
     service = LibraryDocsService(
         config=resolved.config, config_source=resolved.source, config_path=resolved.path,

@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import json
 
-from docmancer.docs.interfaces.mcp.output_contract import compact_mcp_payload, normalize_output_mode, paginate_context_items
+from docmancer.docs.interfaces.mcp.output_contract import compact_mcp_payload, paginate_context_items
 
 
 def _bytes(payload: dict) -> int:
@@ -65,6 +65,6 @@ def test_paginate_context_items_returns_distinct_pages() -> None:
 
 
 def test_normalize_output_mode_shared_details_fallback() -> None:
-    assert normalize_output_mode({"details": True}, details_fallback=True) == "debug"
-    assert normalize_output_mode({"output_mode": "full"}) == "full"
-    assert normalize_output_mode({"output_mode": "wat"}) == "answer"
+    payload = compact_mcp_payload({"status": "ok"})
+
+    assert payload == {"status": "ok"}

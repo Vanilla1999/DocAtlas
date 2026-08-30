@@ -29,7 +29,6 @@ REQUIRED_SECTIONS = {
     "warnings",
     "next_actions",
     "token_estimate",
-    "output_mode",
 }
 
 
@@ -196,7 +195,7 @@ def test_get_patch_plan_context_schema_contains_required_fields():
     assert properties["max_tokens"]["default"] == 2400
     assert properties["max_tokens"]["minimum"] == 200
     assert properties["max_tokens"]["maximum"] == 12000
-    assert properties["output_mode"]["enum"] == ["compact", "debug", "full"]
+    assert "output_mode" not in properties
 
 
 def test_get_patch_plan_context_routes_through_project_tools():
@@ -221,7 +220,7 @@ def test_get_patch_plan_context_handler_accepts_minimal_question():
     assert payload["task"] == {"title": "Plan changing menu_line to bottom sheet", "project": None}
     assert payload["warnings"] == ["Patch planning source analysis is not implemented yet."]
     assert isinstance(payload["token_estimate"], int)
-    assert payload["output_mode"] == "compact"
+    assert "output_mode" not in payload
 
 
 def test_get_patch_plan_context_avoids_hardcoded_ui_risks_for_mcp_tasks(tmp_path: Path):

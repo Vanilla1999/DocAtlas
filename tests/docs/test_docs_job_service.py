@@ -38,7 +38,7 @@ def test_docs_job_service_lists_jobs_by_status_newest_first_with_limit():
     time.sleep(0.01)
     second = service.create("prefetch_docs_manifest")
     service.update(second.job_id, status="running")
-    third = service.create("prefetch_project_docs")
+    third = service.create("prefetch_project_dependency_docs")
     service.update(third.job_id, status="failed")
 
     running = service.list_docs_jobs(status="running", limit=1)

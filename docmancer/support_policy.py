@@ -1,22 +1,18 @@
 from __future__ import annotations
 
 import json
-import re
 from copy import deepcopy
 from pathlib import Path
 from typing import Any
 
-from docmancer._version import __version__
-
-
 _POLICY_PATH = Path(__file__).with_name("support_surfaces.json")
-_ALLOWED_TIERS = {"core", "advanced-supported", "maintenance-only", "deprecated", "internal"}
+_ALLOWED_TIERS = {"core", "advanced-supported", "maintenance-only", "internal"}
 _REQUIRED_NON_CORE = {
     "owner",
     "docs",
     "test_tier",
     "network_dependencies",
-    "compatibility",
+    "support_policy",
     "removal_rule",
     "failure_budget",
 }
@@ -33,12 +29,6 @@ SHIPPED_SERVICE_SURFACE_IDS = frozenset({
     "service:uspto-ingestion",
     "service:web-fetch-pipeline",
 })
-
-
-def _version_tuple(value: str) -> tuple[int, ...] | None:
-    if not re.fullmatch(r"\d+(?:\.\d+)+", value):
-        return None
-    return tuple(int(part) for part in value.split("."))
 
 
 def load_support_policy(path: str | Path | None = None) -> dict[str, Any]:
@@ -72,17 +62,8 @@ def validate_support_policy(policy: dict[str, Any]) -> list[str]:
             missing = sorted(_REQUIRED_NON_CORE - surface.keys())
             if missing:
                 errors.append(f"{surface_id}: missing {', '.join(missing)}")
-        if tier == "deprecated":
-            deprecation = surface.get("deprecation")
-            if not isinstance(deprecation, dict) or not deprecation.get("deadline") or not deprecation.get("resolution"):
-                errors.append(f"{surface_id}: deprecated surfaces require a bounded resolution")
-                continue
-            deadline = _version_tuple(str(deprecation["deadline"]))
-            current = _version_tuple(__version__)
-            if deadline is None:
-                errors.append(f"{surface_id}: deadline must be a dotted release version")
-            elif current is not None and deadline <= current:
-                errors.append(f"{surface_id}: deadline {deprecation['deadline']} has expired")
+        if "compatibility" in surface or "deprecation" in surface:
+            errors.append(f"{surface_id}: legacy compatibility metadata is not allowed")
     return errors
 
 

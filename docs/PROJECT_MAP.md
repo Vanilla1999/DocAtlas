@@ -1,8 +1,8 @@
 # Project map
 
 DocAtlas is a local-first documentation and context runtime for coding agents.
-The user-facing CLI is `doc-atlas`; the Python package retains the
-`docmancer` name for compatibility.
+The user-facing CLI is `doc-atlas`; the Python import namespace remains
+`docmancer`.
 
 ## Runtime areas
 

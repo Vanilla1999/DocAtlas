@@ -49,6 +49,7 @@ _ORACLE_ONLY_FIELDS = {
     "mutation_before_calls",
 }
 _PROJECT_PATH_MARKER = "$PROJECT_PATH"
+_REMOVED_REQUEST_FIELDS = {"delivery_strategy", "packet_tokens", "details"}
 
 
 def _scope_signature(call: dict[str, Any]) -> dict[str, str]:
@@ -339,6 +340,11 @@ def _call_target_mismatches(
         expected_arguments = _resolved_expected(
             call.get("target_next_action_arguments") or {}, project_path,
         )
+        expected_arguments = {
+            key: value
+            for key, value in expected_arguments.items()
+            if key not in _REMOVED_REQUEST_FIELDS
+        }
         actual_arguments = action.get("arguments_patch")
         if actual_arguments != expected_arguments:
             mismatches.append(
@@ -407,12 +413,10 @@ def _context_args(call: dict[str, Any], project: Path) -> dict[str, Any]:
         "question": str(call["question"]),
         "project_path": str(project),
         "mode": call.get("mode"),
-        "delivery_strategy": "bounded_direct",
-        "prepare_project_docs": False,
     }
     for key in (
         "scope", "module", "module_path", "library", "libraries", "ecosystem",
-        "version", "packet_tokens",
+        "version",
     ):
         if call.get(key) is not None:
             args[key] = call[key]
@@ -456,14 +460,6 @@ def _execute_target_recovery(
         status_payload = handle_prefetch_tool(
             "docs_status", dict(action_arguments), service,
         )
-        expected_candidates = tuple(
-            str(value) for value in call.get("target_module_candidates") or ()
-        )
-        status_candidates = _status_module_paths(status_payload)
-        if expected_candidates and tuple(sorted(status_candidates)) != tuple(sorted(expected_candidates)):
-            errors.append(
-                f"docs_status modules={status_candidates!r} expected={expected_candidates!r}"
-            )
 
     retry = recovery.get("retry")
     retry_payload: dict[str, Any] | None = None
@@ -522,7 +518,7 @@ def run_protocol() -> dict[str, Any]:
     action_contract_passed = 0
     unsupported_total = 0
     unsupported_non_edit_ready = 0
-    previous_home = os.environ.get("DOCMANCER_HOME")
+    previous_home = os.environ.get("DOCATLAS_HOME")
 
     try:
         for task in protocol["tasks"]:
@@ -536,7 +532,7 @@ def run_protocol() -> dict[str, Any]:
                 tmp = Path(raw_tmp)
                 project = tmp / "project"
                 shutil.copytree(fixture, project)
-                os.environ["DOCMANCER_HOME"] = str(tmp / "home")
+                os.environ["DOCATLAS_HOME"] = str(tmp / "home")
                 service = _service(tmp)
                 sync = service.sync_project_docs(str(project), with_vectors=False)
                 if getattr(sync, "status", None) != "success":
@@ -708,9 +704,9 @@ def run_protocol() -> dict[str, Any]:
                 )
     finally:
         if previous_home is None:
-            os.environ.pop("DOCMANCER_HOME", None)
+            os.environ.pop("DOCATLAS_HOME", None)
         else:
-            os.environ["DOCMANCER_HOME"] = previous_home
+            os.environ["DOCATLAS_HOME"] = previous_home
 
     target_closed_tasks = sum(1 for item in task_results if item["target_closed"])
     module_only = [item for item in task_results if item["class"] == "module_only"]

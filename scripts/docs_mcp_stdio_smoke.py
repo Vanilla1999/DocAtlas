@@ -13,8 +13,8 @@ from pathlib import Path
 from docmancer.mcp.agent_config import AgentTarget, register_server
 
 TOOLS = {"get_docs_context", "prepare_docs", "docs_status"}
-QUESTION = "Does the project README require deterministic offline release checks?"
-NEEDLE = "The amber lighthouse invariant requires deterministic offline release checks."
+QUESTION = "Which command starts the Docs MCP server?"
+NEEDLE = "doc-atlas mcp docs-serve"
 
 
 def payload(result: object) -> dict:
@@ -70,7 +70,9 @@ async def smoke() -> None:
         root = Path(raw)
         project = root / "project"
         project.mkdir()
-        (project / "README.md").write_text(f"# Release contract\n\n{NEEDLE}\n")
+        (project / "README.md").write_text(
+            f"# Docs MCP server\n\nThe command that starts the Docs MCP server is `{NEEDLE}`.\n"
+        )
         user_home = root / "user-home"
         user_home.mkdir()
         docatlas_home = root / "docatlas-home"
@@ -82,24 +84,17 @@ async def smoke() -> None:
             "DOCATLAS_HOME": str(docatlas_home),
             "NO_PROXY": "*",
         }
-        # A release smoke proves the primary DocAtlas identity. Do not inherit
-        # a legacy override from the runner and accidentally exercise 1.x
-        # compatibility state instead.
-        env.pop("DOCMANCER_HOME", None)
         params = StdioServerParameters(command="doc-atlas", args=["mcp", "docs-serve"], env=env, cwd=str(root))
         async with stdio_client(params) as streams:
             async with ClientSession(*streams) as session:
                 await session.initialize()
                 names = {tool.name for tool in (await session.list_tools()).tools}
                 assert names == TOOLS, f"unexpected public Docs tools: {sorted(names)}"
-                # Canonical public default: advertised fields only.  Do not
-                # accidentally exercise the hidden compatibility projection.
                 canonical_query = {
                     "question": QUESTION,
                     "project_path": str(project),
                     "mode": "project",
                 }
-                compatibility_query = {**canonical_query, "output_mode": "compact"}
                 assert set(canonical_query) == {"question", "project_path", "mode"}
                 await session.call_tool("get_docs_context", canonical_query)
                 sync = payload(await session.call_tool("prepare_docs", {
@@ -116,10 +111,6 @@ async def smoke() -> None:
                     source.get("path_or_url") == "README.md" or source.get("path") == "README.md"
                     for source in sources
                 ), answer
-                compatibility_answer = payload(
-                    await session.call_tool("get_docs_context", compatibility_query)
-                )
-                assert compatibility_answer.get("output_mode") == "compact", compatibility_answer
         config_path = user_home / "opencode.json"
         register_server(AgentTarget("opencode", config_path, "json_opencode_mcp"))
         registrations = json.loads(config_path.read_text())["mcp"]
@@ -136,15 +127,15 @@ async def smoke() -> None:
         async with stdio_client(opencode_params) as streams:
             async with ClientSession(*streams) as session:
                 await session.initialize()
-                # Text fallback remains a separate compatibility smoke.
-                compatibility_query = {
+                # OpenCode currently requires text fallback, but uses the same
+                # canonical tool arguments and payload.
+                canonical_query = {
                     "question": QUESTION,
                     "project_path": str(project),
                     "mode": "project",
-                    "output_mode": "compact",
                 }
                 text_answer = text_payload(
-                    await session.call_tool("get_docs_context", compatibility_query)
+                    await session.call_tool("get_docs_context", canonical_query)
                 )
                 rendered = json.dumps(text_answer, sort_keys=True)
                 assert "README.md" in rendered, text_answer

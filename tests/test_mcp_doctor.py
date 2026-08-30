@@ -9,9 +9,9 @@ from docmancer.mcp.installer import install_package
 
 @pytest.fixture
 def healthy_pack(tmp_path, monkeypatch):
-    monkeypatch.setenv("DOCMANCER_HOME", str(tmp_path / "home"))
+    monkeypatch.setenv("DOCATLAS_HOME", str(tmp_path / "home"))
     registry = tmp_path / "reg"
-    monkeypatch.setenv("DOCMANCER_REGISTRY_DIR", str(registry))
+    monkeypatch.setenv("DOCATLAS_REGISTRY_DIR", str(registry))
     pkg = registry / "demo@1"
     pkg.mkdir(parents=True)
     contract = {
@@ -50,9 +50,16 @@ def test_doctor_detects_corrupted_artifact(healthy_pack):
     assert "expected" in by_name["package demo@1: contract.json hash"].detail
 
 
-def test_doctor_rejects_stale_docmancer_mcp_command(healthy_pack, tmp_path, monkeypatch):
+@pytest.mark.parametrize(
+    ("command", "args"),
+    [
+        ("docmancer", ["mcp", "docs-serve"]),
+        ("doc-atlas", ["mcp", "serve"]),
+    ],
+)
+def test_doctor_rejects_stale_mcp_commands(healthy_pack, tmp_path, monkeypatch, command, args):
     cfg = tmp_path / "settings.json"
-    cfg.write_text(json.dumps({"mcpServers": {"docmancer": {"command": "docmancer", "args": ["mcp", "serve"]}}}))
+    cfg.write_text(json.dumps({"mcpServers": {"docatlas": {"command": command, "args": args}}}))
     target = agent_config.AgentTarget("test", cfg, "json_mcpServers")
     monkeypatch.setattr(agent_config, "known_agents", lambda: [target])
 

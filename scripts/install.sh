@@ -297,10 +297,7 @@ existing = servers.get(name)
 if existing is not None and not isinstance(existing, dict):
     print(f"opencode MCP server {name!r} must be an object", file=sys.stderr)
     sys.exit(2)
-if existing is not None and existing.get("command") not in (
-    ["doc-atlas", "mcp", "docs-serve"],
-    ["docmancer", "mcp", "serve"],
-):
+if existing is not None and existing.get("command") != ["doc-atlas", "mcp", "docs-serve"]:
     print(f"opencode MCP server {name!r} has a different command; refusing to overwrite it", file=sys.stderr)
     sys.exit(2)
 if existing is None or "environment" not in existing:
@@ -351,7 +348,7 @@ if [ -n "$SELECTION" ]; then
 fi
 printf '\nNext steps:\n'
 printf '  1. Start your coding agent in a project.\n'
-printf '  2. Ask it to call get_docs_context first with delivery_strategy="bounded_direct" for coding tasks.\n'
+printf '  2. Ask it to call get_docs_context first for coding tasks; response delivery is server-owned.\n'
 printf '  3. If it receives a prepare_docs next action, let it follow that action and retry.\n'
 printf '  4. Answer from the returned sources.\n'
 printf '  Docs MCP server: doc-atlas mcp docs-serve\n'

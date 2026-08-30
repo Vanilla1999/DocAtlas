@@ -44,7 +44,7 @@ class FakeAgent:
 
 
 def _service(tmp_path, monkeypatch, agent: FakeAgent | None = None) -> LibraryDocsService:
-    monkeypatch.setenv("DOCMANCER_HOME", str(tmp_path / "home"))
+    monkeypatch.setenv("DOCATLAS_HOME", str(tmp_path / "home"))
     agent = agent or FakeAgent()
     config = DocmancerConfig()
     config.index.db_path = str(tmp_path / "docmancer.db")
@@ -63,7 +63,7 @@ def _service(tmp_path, monkeypatch, agent: FakeAgent | None = None) -> LibraryDo
 
 
 def _service_with_real_agent(tmp_path, monkeypatch) -> LibraryDocsService:
-    monkeypatch.setenv("DOCMANCER_HOME", str(tmp_path / "home"))
+    monkeypatch.setenv("DOCATLAS_HOME", str(tmp_path / "home"))
     config = DocmancerConfig()
     config.index.db_path = str(tmp_path / "docmancer.db")
     config.index.extracted_dir = str(tmp_path / "extracted")
@@ -243,8 +243,8 @@ def test_characterization_target_url_security_rejects_localhost_private_networks
 
 def test_characterization_manifest_validation_errors_remain_stable(tmp_path, monkeypatch):
     service = _service(tmp_path, monkeypatch)
-    manifest = tmp_path / "docmancer.docs.yaml"
-    manifest.write_text("version: 1\ntargets:\n  - id: bad\n    library: bad\n    docs_url: https://example.com/outside\n    allowed_domains:\n      - example.com\n    path_prefixes:\n      - /docs/\n", encoding="utf-8")
+    manifest = tmp_path / "docatlas.docs.yaml"
+    manifest.write_text("version: 2\ntargets:\n  - id: bad\n    identity: {kind: product, ecosystem: web, name: bad}\n    version: {requested: rolling, policy: rolling}\n    source: {type: reference, url: https://example.com/outside, authority: official_product, version_binding: rolling, format: html}\n    scope:\n      allowed_domains: [example.com]\n      path_prefixes: [/docs/]\n      coverage: bounded\n", encoding="utf-8")
 
     result = service.validate_docs_manifest(str(manifest))
 

@@ -139,8 +139,8 @@ def test_each_run_uses_fresh_docmancer_home(tmp_path: Path):
     env_a = fresh_run_environment(tmp_path / "a")
     env_b = fresh_run_environment(tmp_path / "b")
 
-    assert env_a["DOCMANCER_HOME"] != env_b["DOCMANCER_HOME"]
-    assert Path(env_a["DOCMANCER_HOME"]).exists()
+    assert env_a["DOCATLAS_HOME"] != env_b["DOCATLAS_HOME"]
+    assert Path(env_a["DOCATLAS_HOME"]).exists()
 
 
 def test_patch_constraints_workflow_has_only_docatlas_mcp(tmp_path: Path):

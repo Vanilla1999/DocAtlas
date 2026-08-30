@@ -546,7 +546,7 @@ def test_new_probing_paraphrases_have_locally_provable_units():
     assert local_proof_for_obligation(
         rows[0],
         _unit(
-            'Run the fail-closed offline suite with `DOCMANCER_OFFLINE=1 pytest tests/ '
+            'Run the fail-closed offline suite with `DOCATLAS_OFFLINE=1 pytest tests/ '
             '-m "not advanced and not live and not live_network"`.'
         ),
         source={"title": "Test tiers and markers", "path": "docs/testing.md"},

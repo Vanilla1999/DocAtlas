@@ -35,8 +35,8 @@ class _SemanticStubProvider(EmbeddingsProvider):
 
 
 def test_public_project_docs_query_consumes_dense_vector_index(tmp_path, monkeypatch):
-    monkeypatch.setenv("DOCMANCER_HOME", str(tmp_path / "home"))
-    monkeypatch.setenv("DOCMANCER_AUTO_VECTORS", "1")
+    monkeypatch.setenv("DOCATLAS_HOME", str(tmp_path / "home"))
+    monkeypatch.setenv("DOCATLAS_AUTO_VECTORS", "1")
     provider = _SemanticStubProvider()
     monkeypatch.setattr(
         "docmancer.embeddings.get_embeddings_provider",
@@ -117,8 +117,8 @@ def test_public_project_docs_query_consumes_dense_vector_index(tmp_path, monkeyp
 
 
 def test_public_library_query_consumes_dense_vector_index(tmp_path, monkeypatch):
-    monkeypatch.setenv("DOCMANCER_HOME", str(tmp_path / "home"))
-    monkeypatch.setenv("DOCMANCER_AUTO_VECTORS", "1")
+    monkeypatch.setenv("DOCATLAS_HOME", str(tmp_path / "home"))
+    monkeypatch.setenv("DOCATLAS_AUTO_VECTORS", "1")
     monkeypatch.setattr(
         "docmancer.embeddings.get_embeddings_provider",
         lambda _config: _SemanticStubProvider(),

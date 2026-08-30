@@ -424,7 +424,7 @@ def main(argv: list[str] | None = None) -> int:
             return 0
 
         run_environment = {
-            "DOCMANCER_OFFLINE": "1",
+            "DOCATLAS_OFFLINE": "1",
             "TASK33C_BASE_IMAGE": str(container["base_image"]),
             "TASK33C_EVALUATOR_REQUIREMENTS_SHA256": str(
                 container["requirements_sha256"]

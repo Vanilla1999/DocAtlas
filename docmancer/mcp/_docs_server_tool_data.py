@@ -10,11 +10,11 @@ RAW_TOOLS: list[dict[str, Any]] = [
 Agent workflow:
 - Call get_docs_context first. It performs safe project preflight internally.
 - For coding/API questions, set response_style=\"snippet-first\".
-- For coding and patch tasks, use delivery_strategy=\"bounded_direct\" as the default pre-edit handoff; raw retrieval stays hidden and only a validated ActionPacket plus bounded recovery metadata enters model context.
-- In bounded delivery call prepare_docs only from recommended_next_action; unbounded compatibility output may use next_action.
+- The server owns bounded output selection; raw retrieval stays hidden and only a validated projection plus bounded recovery metadata enters model context.
+- Call prepare_docs only from recommended_next_action.
 - Use docs_status only for explicit health, freshness, source-state, or job-status requests, or when get_docs_context returns it as recommended_next_action.
 - Scope planning: for one known module use scope="module" plus exact module_path; module_path always implies module scope. For project-wide policy use scope="project" and omit module/module_path. If a task needs both module-local and project-wide evidence, make two bounded calls (module then project) rather than widening one module call. For cross-module questions use scope="all" without module filters, or separate exact module calls. On module_ambiguous, follow docs_status and retry with an exact returned module_path.
-- In bounded delivery, insufficient_evidence never proves a documentary claim. Follow one typed recovery: one non-automatic rephrase for parser/retrieval uncertainty, then local source/tests when hard_stop=false; stop before an edit when hard_stop=true or the task explicitly requires a still-unproved documentary contract. In unbounded exploration, navigation_only or partial_navigational requires source search before answering.
+- insufficient_evidence never proves a documentary claim. Follow one typed recovery: one non-automatic rephrase for parser/retrieval uncertainty, then local source/tests when hard_stop=false; stop before an edit when hard_stop=true or the task explicitly requires a still-unproved documentary contract.
 - This tool provides source-grounded context, not a full code audit or test substitute.
 - For change-aware documentation maintenance, pass maintenance with either base/head or explicit changed_paths; obey its fail-closed authoring brief.
 - For a free-form or multi-concept documentation request, optionally pass up to five narrow lookup_queries. They improve retrieval only; the original question remains authoritative and lookup queries never authorize an answer or edit.
@@ -26,8 +26,6 @@ Agent workflow:
                 "lookup_queries": {"type": ["array", "null"], "maxItems": 5, "uniqueItems": True, "items": {"type": "string", "minLength": 1, "maxLength": 500}, "description": "Optional bounded single-concept project-documentation lookups used only to improve retrieval recall."},
                 "project_path": {"type": ["string", "null"]},
                 "response_style": {"type": ["string", "null"], "enum": ["auto", "snippet-first", "evidence-first", None], "default": "auto", "description": "Choose snippet-first presentation for coding tasks or preserve evidence-first context."},
-                "delivery_strategy": {"type": ["string", "null"], "enum": ["bounded_direct", None], "description": "Return one deterministic, source-attributed ActionPacket without exposing raw retrieval content."},
-                "packet_tokens": {"type": ["integer", "null"], "minimum": 256, "maximum": 2000, "default": 1500, "description": "Bounded structured response budget; ActionPacket wrapper and recovery metadata are included in the 2000-token hard ceiling."},
                 "library": {"type": ["string", "null"]},
                 "libraries": {"type": ["array", "null"], "items": {"type": "string"}},
                 "ecosystem": {"type": ["string", "null"]},
@@ -44,9 +42,6 @@ Agent workflow:
                 "allow_latest_fallback": {"type": ["boolean", "null"]},
                 "page": {"type": ["integer", "null"], "minimum": 1, "default": 1},
                 "page_size": {"type": ["integer", "null"], "minimum": 1, "maximum": 20},
-                "include_sections": {"type": ["array", "null"], "items": {"type": "string", "enum": ["context_pack", "supporting_snippets", "trust_contract", "diagnostics", "metrics"]}},
-                "output_mode": {"type": ["string", "null"], "enum": ["answer", "compact", "debug", "full", None], "default": "answer", "description": "answer is the default minimal agent-friendly response; compact includes structured context; debug includes diagnostics; full returns raw output."},
-                "details": {"type": ["boolean", "null"]},
                 "maintenance": {
                     "type": ["object", "null"],
                     "properties": {
@@ -61,25 +56,15 @@ Agent workflow:
                 },
             },
             "required": ["question"],
-            "allOf": [{
-                "if": {
-                    "required": ["packet_tokens"],
-                    "properties": {"packet_tokens": {"type": "integer"}},
-                },
-                "then": {
-                    "required": ["delivery_strategy"],
-                    "properties": {"delivery_strategy": {"const": "bounded_direct"}},
-                },
-            }],
         },
-        "outputSchema": GET_DOCS_CONTEXT_OUTPUT_SCHEMA,
+        "outputSchema": PUBLIC_GET_DOCS_CONTEXT_OUTPUT_SCHEMA,
     },
     {
         "name": "prepare_docs",
         "description": """Unified confirmation-first lifecycle/admin tool for docs preparation: sync project docs, prefetch dependency/library/manifest/target docs, refresh, prune, or remove registered docs sources.
 
 Agent workflow:
-- Use prepare_docs only after get_docs_context returns bounded recommended_next_action or unbounded next_action, or when the user explicitly asks to sync, refresh, prefetch, prune, or remove docs.
+- Use prepare_docs only after get_docs_context returns recommended_next_action, or when the user explicitly asks to sync, refresh, prefetch, prune, or remove docs.
 - Use prepare_docs(action=\"prefetch_library_docs\") for public/dependency docs only after network access is approved.
 - Prefer this over separate ingest/sync/prefetch/refresh/prune/remove tools.
 """,
@@ -169,7 +154,6 @@ Use this only when the user explicitly asks whether docs are indexed/stale/healt
                 "job_id": {"type": ["string", "null"]},
                 "status": {"type": ["string", "null"]},
                 "limit": {"type": ["integer", "null"], "minimum": 1, "maximum": 200},
-                "details": {"type": ["boolean", "null"]},
             },
             "required": ["action"],
         },
@@ -209,14 +193,13 @@ Use this only when the user explicitly asks whether docs are indexed/stale/healt
             "type": "object",
             "properties": {
                 "library": {"type": ["string", "null"]},
-                "libraryName": {"type": ["string", "null"], "description": "Deprecated alias for library; accepted for older MCP clients."},
                 "ecosystem": {"type": ["string", "null"]},
                 "version": {"type": ["string", "null"]},
                 "source_type": {"type": ["string", "null"]},
                 "docs_url": {"type": ["string", "null"]},
                 "docs_url_template": {"type": ["string", "null"]},
             },
-            "anyOf": [{"required": ["library"]}, {"required": ["libraryName"]}],
+            "required": ["library"],
         },
     },
     {
@@ -281,7 +264,7 @@ Use this only when the user explicitly asks whether docs are indexed/stale/healt
 
     {
         "name": "validate_docs_manifest",
-        "description": "Validate a docmancer.docs.yaml manifest without fetching documentation.",
+        "description": "Validate a docatlas.docs.yaml manifest without fetching documentation.",
         "inputSchema": {
             "type": "object",
             "properties": {
@@ -294,7 +277,7 @@ Use this only when the user explicitly asks whether docs are indexed/stale/healt
     },
     {
         "name": "prefetch_docs_manifest",
-        "description": "Validate and prefetch documentation targets declared in docmancer.docs.yaml.",
+        "description": "Validate and prefetch documentation targets declared in docatlas.docs.yaml.",
         "inputSchema": {
             "type": "object",
             "properties": {
@@ -338,7 +321,6 @@ Agents must follow next_action before generic code search, public docs, or WebFe
             "type": "object",
             "properties": {
                 "project_path": {"type": "string"},
-                "details": {"type": ["boolean", "null"]},
             },
             "required": ["project_path"],
         },
@@ -355,7 +337,6 @@ Call inspect_project_docs first only when using this legacy tool intentionally."
                 "project_path": {"type": "string"},
                 "skip_known": {"type": ["boolean", "null"]},
                 "with_vectors": {"type": ["boolean", "null"]},
-                "details": {"type": ["boolean", "null"]},
             },
             "required": ["project_path"],
         },
@@ -369,7 +350,6 @@ Reconcile the project-docs index with the current repository discovery snapshot:
             "properties": {
                 "project_path": {"type": "string"},
                 "with_vectors": {"type": ["boolean", "null"]},
-                "details": {"type": ["boolean", "null"]},
             },
             "required": ["project_path"],
         },
@@ -385,7 +365,6 @@ If repo writes or dependency-doc network fetches are needed, it stops with confi
             "properties": {
                 "project_path": {"type": "string"},
                 "question": {"type": ["string", "null"]},
-                "details": {"type": ["boolean", "null"]},
             },
             "required": ["project_path"],
         },
@@ -404,7 +383,6 @@ If repo writes or dependency-doc network fetches are needed, it stops with confi
                 "module": {"type": ["string", "null"]},
                 "module_path": {"type": ["string", "null"]},
                 "scope": {"type": ["string", "null"], "enum": ["project", "module", "all", None]},
-                "details": {"type": ["boolean", "null"]},
             },
             "required": ["project_path", "query"],
         },
@@ -435,9 +413,6 @@ Does not use deleted, orphaned, or stale project-doc content by default.""",
                 "allow_network": {"type": ["boolean", "null"], "default": False, "description": "Permit dependency/public docs network fetches. Defaults to false and returns confirmation instead."},
                 "page": {"type": ["integer", "null"], "minimum": 1, "default": 1},
                 "page_size": {"type": ["integer", "null"], "minimum": 1, "maximum": 20},
-                "include_sections": {"type": ["array", "null"], "items": {"type": "string", "enum": ["context_pack", "supporting_snippets", "trust_contract", "diagnostics", "metrics"]}},
-                "output_mode": {"type": ["string", "null"], "enum": ["answer", "compact", "debug", "full", None], "default": "answer", "description": "answer is the default minimal agent-friendly response; compact includes structured context; debug includes diagnostics; full returns raw output."},
-                "details": {"type": ["boolean", "null"], "description": "Compatibility flag; for get_project_context it does not request full output unless output_mode='full'."},
             },
             "required": ["project_path", "question"],
         },
@@ -461,7 +436,6 @@ This is language-agnostic heuristic retrieval over local source. It is not an LS
                 "max_files": {"type": ["integer", "null"], "minimum": 1, "maximum": 50, "default": 12},
                 "max_snippets": {"type": ["integer", "null"], "minimum": 1, "maximum": 40, "default": 20},
                 "max_lines_per_snippet": {"type": ["integer", "null"], "minimum": 10, "maximum": 200, "default": 80},
-                "output_mode": {"type": ["string", "null"], "enum": ["answer", "compact", "debug", "full", None], "default": "answer"},
             },
             "required": ["question", "project_path"],
         },
@@ -486,7 +460,6 @@ This tool does not generate code, validate patches, run tests, or perform a full
                 "max_files": {"type": ["integer", "null"], "minimum": 1, "maximum": 50, "default": 12},
                 "max_snippets": {"type": ["integer", "null"], "minimum": 1, "maximum": 40, "default": 16},
                 "max_tokens": {"type": ["integer", "null"], "minimum": 200, "maximum": 12000, "default": 2400},
-                "output_mode": {"type": ["string", "null"], "enum": ["compact", "debug", "full", None], "default": "compact"},
             },
             "required": ["question"],
         },
@@ -507,7 +480,6 @@ For audits, use Docmancer for context, then run/read/search/analyze code separat
                 "max_constraints": {"type": "integer", "default": 12, "minimum": 1, "maximum": 40},
                 "max_tokens": {"type": "integer", "default": 1200, "minimum": 100, "maximum": 8000},
                 "include_sources": {"type": "boolean", "default": True},
-                "output_mode": {"type": ["string", "null"], "enum": ["compact", "debug", "full", None], "default": "compact"},
             },
             "required": ["question"],
         },
@@ -608,25 +580,6 @@ Run the relevant tests/linters after this tool.
         },
     },
     {
-        "name": "prefetch_project_docs",
-        "description": "[DEPRECATED] Use prefetch_project_dependency_docs instead. Read a Flutter/Dart/Rust project and prefetch exact dependency documentation from project manifests/lockfiles. May fetch from the network, so ask for confirmation before running.",
-        "inputSchema": {
-            "type": "object",
-            "properties": {
-                "project_path": {"type": "string"},
-                "include_flutter": {"type": ["boolean", "null"]},
-                "include_dart": {"type": ["boolean", "null"]},
-                "include_rust": {"type": ["boolean", "null"]},
-                "include_go": {"type": ["boolean", "null"]},
-                "include_packages": {"type": ["array", "null"], "items": {"type": "string"}},
-                "force_refresh": {"type": ["boolean", "null"]},
-                "continue_on_error": {"type": ["boolean", "null"]},
-                "async": {"type": ["boolean", "null"]},
-            },
-            "required": ["project_path"],
-        },
-    },
-    {
         "name": "prefetch_project_dependency_docs",
         "description": "Read a Flutter/Dart/Rust project and prefetch exact dependency documentation from project manifests/lockfiles. This is for dependency docs, not project-owned README/docs/wiki files; call inspect_project_docs first to discover local project docs. May fetch from the network, so ask for confirmation before running unless the user already approved dependency docs prefetch.",
         "inputSchema": {
@@ -647,25 +600,6 @@ Run the relevant tests/linters after this tool.
     },
 ]
 
-LEGACY_TOOL_NAMES = {
-    "resolve_library_id",
-    "get_library_docs",
-    "refresh_library_docs",
-    "prefetch_library_docs",
-    "validate_docs_manifest",
-    "prefetch_docs_manifest",
-    "prefetch_docs_targets",
-    "ingest_project_docs",
-    "sync_project_docs",
-    "bootstrap_project_docs",
-    "get_project_docs",
-    "get_project_context",
-    "get_docs_job_status",
-    "list_docs_jobs",
-    "cancel_docs_job",
-    "prefetch_project_docs",
-    "prefetch_project_dependency_docs",
-}
 ADMIN_TOOL_NAMES = {
     "inspect_library_docs",
     "remove_library_docs",
@@ -682,11 +616,12 @@ ADVANCED_TOOL_NAMES = {
     "validate_patch_against_constraints",
 }
 PUBLIC_TOOL_NAMES = {"get_docs_context", "prepare_docs", "docs_status"}
-CLASSIFIED_TOOL_NAMES = PUBLIC_TOOL_NAMES | ADVANCED_TOOL_NAMES | ADMIN_TOOL_NAMES | LEGACY_TOOL_NAMES
+CLASSIFIED_TOOL_NAMES = PUBLIC_TOOL_NAMES | ADVANCED_TOOL_NAMES | ADMIN_TOOL_NAMES
+RAW_TOOLS = [tool for tool in RAW_TOOLS if tool["name"] in CLASSIFIED_TOOL_NAMES]
 
 PUBLIC_ADVERTISED_DESCRIPTIONS: dict[str, str] = {
     "get_docs_context": (
-        "Default source-grounded documentation tool. Call before a coding edit or for a documentation/API question. "
+        "Source-grounded documentation tool. Call before a coding edit or for a documentation/API question. "
         "For one known module use scope=module with exact module_path; module_path always implies module scope. "
         "For project-wide policy use scope=project without module filters. If a task needs both module-local and "
         "project-wide evidence, make two bounded calls (module then project). For cross-module questions use "
@@ -816,10 +751,6 @@ PUBLIC_ADVERTISED_INPUT_SCHEMAS: dict[str, dict[str, Any]] = {
             "project_path": {"type": ["string", "null"]},
             "canonical_id": {"type": ["string", "null"]},
             "job_id": {"type": ["string", "null"]},
-            "details": {
-                "type": ["boolean", "null"],
-                "description": "For action=project, include discovered module identities used for exact module_path recovery.",
-            },
         },
         "required": ["action"],
     },

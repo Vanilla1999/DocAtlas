@@ -132,7 +132,6 @@ class _PatchConstraintsServicePart01:
             "adr/**/*.md",
             "ADR/**/*.md",
             ".docatlas/**/*.md",
-            ".docmancer/**/*.md",
             "**/README.md",
             "**/ARCHITECTURE.md",
         ]
@@ -368,7 +367,7 @@ class _PatchConstraintsServicePart01:
         name = parts_list[-1] if parts_list else ""
         if bool(parts & PATCH_REVIEW_DIR_NAMES):
             return "patch_review_output"
-        if parts_list[:2] in ([".docatlas", "patch-review"], [".docmancer", "patch-review"]):
+        if parts_list[:2] == [".docatlas", "patch-review"]:
             return "patch_review_output"
         in_dogfood_research = (
             "docs" in parts
@@ -385,7 +384,7 @@ class _PatchConstraintsServicePart01:
             return "dogfood_generated_artifact"
         if normalized.startswith("eval/task_level/results/"):
             return "eval_result_artifact"
-        if normalized.startswith((".docatlas/", ".docmancer/")):
+        if normalized.startswith(".docatlas/"):
             return "docatlas_internal_output"
         if any(fnmatch.fnmatch(normalized, pattern) for pattern in GENERATED_ARTIFACT_SOURCE_PATTERNS):
             return "dogfood_generated_artifact"
@@ -406,7 +405,7 @@ class _PatchConstraintsServicePart01:
             return "low"
         if any(part in normalized for part in (
             "/eval/", "eval/", "/results/", "results/", "/dogfood/", "dogfood/",
-            "/patch-review/", "/patch_review/", ".docatlas/", ".docmancer/",
+            "/patch-review/", "/patch_review/", ".docatlas/",
         )):
             return "risky"
         if normalized.startswith("docs/research/") or "/docs/research/" in f"/{normalized}":
@@ -536,7 +535,7 @@ class _PatchConstraintsServicePart01:
             return False
         artifact_parts = (
             "/generated/", "generated/", "/dist/", "dist/", "/build/", "build/", "/coverage/", "coverage/",
-            "eval/task_level/results/", ".docatlas/", ".docmancer/", "/patch-review/", "/patch_review/",
+            "eval/task_level/results/", ".docatlas/", "/patch-review/", "/patch_review/",
             "/dogfood/", "dogfood/", "/node_modules/", "node_modules/", "/vendor/", "vendor/", ".dart_tool/", "/.dart_tool/",
         )
         artifact_suffixes = (
@@ -550,7 +549,7 @@ class _PatchConstraintsServicePart01:
             return []
         examples: list[str] = []
         patterns = (
-            "eval/task_level/results/**/*", ".docatlas/**/*", ".docmancer/**/*", "**/patch-review/**/*", "**/patch_review/**/*",
+            "eval/task_level/results/**/*", ".docatlas/**/*", "**/patch-review/**/*", "**/patch_review/**/*",
             "**/generated/**", "**/dist/**", "**/coverage/**", "**/*.g.dart", "**/*.freezed.dart", "**/*.pb.go",
             "**/*.pb.dart", "**/*.generated.*", "**/*_generated.py",
         )

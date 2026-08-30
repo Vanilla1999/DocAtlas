@@ -42,7 +42,7 @@ class RecordingAgent:
 
 
 def _service(tmp_path, monkeypatch, agent: RecordingAgent | None = None) -> LibraryDocsService:
-    monkeypatch.setenv("DOCMANCER_HOME", str(tmp_path / "home"))
+    monkeypatch.setenv("DOCATLAS_HOME", str(tmp_path / "home"))
     agent = agent or RecordingAgent()
     config = DocmancerConfig()
     config.index.db_path = str(tmp_path / "docmancer.db")
@@ -756,7 +756,7 @@ def test_empty_library_index_returns_controlled_error(tmp_path, monkeypatch):
 
 
 def test_project_query_then_library_query_uses_per_library_agent(tmp_path, monkeypatch):
-    monkeypatch.setenv("DOCMANCER_HOME", str(tmp_path / "home"))
+    monkeypatch.setenv("DOCATLAS_HOME", str(tmp_path / "home"))
     default_agent = RecordingAgent([_chunk("Project README.", "/repo/README.md", {"project_path": "/repo"})])
     library_agent = RecordingAgent(
         [_chunk("Click command docs.", "https://click.palletsprojects.com/en/8.1.x/commands/", {"library_id": "python:click@8.1.7:api", "canonical_id": "python:click@8.1.7:api", "ecosystem": "python", "version": "8.1.7"})]

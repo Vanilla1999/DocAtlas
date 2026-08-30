@@ -11,7 +11,7 @@ from typing import Any
 
 from docmancer.mcp import paths
 
-EXPLICIT_KEY_ARG = "_docmancer_idempotency_key"
+EXPLICIT_KEY_ARG = "_docatlas_idempotency_key"
 DEFAULT_TTL_SECONDS = 24 * 60 * 60  # 24h matches the most common API idempotency window
 
 
@@ -48,7 +48,7 @@ def get_or_create_key(
 ) -> tuple[str, bool]:
     """Return (idempotency_key, was_reused).
 
-    Resolution order: explicit `_docmancer_idempotency_key` arg, then SQLite
+    Resolution order: explicit `_docatlas_idempotency_key` arg, then SQLite
     fingerprint cache, then a fresh UUID4.
     """
     explicit = args.get(EXPLICIT_KEY_ARG)

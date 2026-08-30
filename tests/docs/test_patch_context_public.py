@@ -33,7 +33,7 @@ def _source(path: str, declaration: str) -> dict:
     }
 
 
-def test_exact_permission_patch_is_publicly_edit_ready() -> None:
+def test_project_docs_and_source_hints_do_not_authorize_cross_module_editing() -> None:
     question = (
         "Fix partial permission handling in BrowserPermissionGate, ScanPermissionGate, "
         "OfflineSyncGate, and PermissionService without changing "
@@ -75,33 +75,8 @@ def test_exact_permission_patch_is_publicly_edit_ready() -> None:
     )
 
     assert payload["kind"] == "patch_context"
-    assert payload["status"] in {"ok", "truncated"}
-    assert payload["mutation_ready"] is True
-    assert payload["edit_ready"] is True
-    assert payload["mutation_intent"]["ready"] is True
-    cross_module = next(
-        item for item in payload["invariants"]
-        if "BrowserPermissionGate" in item["text"]
-        and "PermissionService" in item["text"]
-    )
-    assert cross_module["evidence_ids"]
-    assert {
-        target["requested_value"]
-        for target in payload["mutation_intent"]["resolved_targets"]
-    } == {
-        "BrowserPermissionGate",
-        "ScanPermissionGate",
-        "OfflineSyncGate",
-        "PermissionService",
-    }
-    assert payload["mutation_intent"]["preserved_targets"][0][
-        "requested_value"
-    ] == "permission_result.freezed.dart"
-    assert any(
-        item.get("provenance") == "user_request"
-        and "permission_result.freezed.dart" in item.get("text", "")
-        for item in payload["forbidden_changes"]
-    )
+    assert payload["status"] == "insufficient_evidence"
+    assert payload["missing"]
 
 
 def test_source_search_recovery_never_authorizes_editing() -> None:

@@ -1,7 +1,7 @@
 {
   "schema_version": "project-chat-onboarding-protocol-v1",
   "case_file": "onboarding_cases.json",
-  "case_file_sha256": "f1c75f21408733e3190dc4dbc503a4cff022b5b3296c833dece2c0b6f7a88a23",
+  "case_file_sha256": "7cc53c3b3d16c6e576d3affcf9395f4a8027a310cb958dd9f9966375a958cd3e",
   "case_count": 20,
   "case_ids": [
     "onboarding-install-01",

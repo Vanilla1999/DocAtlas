@@ -82,7 +82,7 @@ class IndexStorageCleanup:
             topology = StorageTopologyResolver().resolve(project_path)
             if topology.config_source != "project_local":
                 raise ValueError("project_path must resolve to a project-local Docmancer config")
-            root = (topology.project_path / ".docmancer").resolve(strict=False)
+            root = (topology.project_path / ".docatlas").resolve(strict=False)
             config = topology.config
             config_source = topology.config_source
             config_base = (
@@ -100,13 +100,13 @@ class IndexStorageCleanup:
             )
             raw_db = Path(global_config.index.db_path).expanduser()
             root_hint = (
-                Path(os.environ["DOCMANCER_HOME"]).expanduser()
-                if os.environ.get("DOCMANCER_HOME")
+                Path(os.environ["DOCATLAS_HOME"]).expanduser()
+                if os.environ.get("DOCATLAS_HOME")
                 else raw_config_path.parent
                 if raw_config_path is not None
                 else raw_db.parent
                 if raw_db.is_absolute()
-                else Path.home() / ".docmancer"
+                else Path.home() / ".docatlas"
             )
             root = root_hint.resolve(strict=False)
             config = global_config
@@ -158,7 +158,7 @@ class IndexStorageCleanup:
                 incomplete.append("unowned_local_qdrant_state_not_deleted")
         elif scope == "project-local" and provider == "qdrant" and not vector.url:
             shared_qdrant = (
-                Path(os.environ.get("DOCMANCER_HOME") or (Path.home() / ".docmancer"))
+                Path(os.environ.get("DOCATLAS_HOME") or (Path.home() / ".docatlas"))
                 / "qdrant"
             ).expanduser().resolve(strict=False)
             if not self._is_within(root, shared_qdrant) and shared_qdrant.exists():

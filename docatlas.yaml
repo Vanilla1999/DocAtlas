@@ -1,7 +1,7 @@
 index:
   provider: sqlite
-  db_path: .docmancer/docmancer.db
-  extracted_dir: .docmancer/extracted
+  db_path: .docatlas/docatlas.db
+  extracted_dir: .docatlas/extracted
 query:
   default_budget: 2400
   default_limit: 8
@@ -22,7 +22,7 @@ project:
     - eval/task_level/hidden_tests/**
     - "**/generated/**"
   exclude_paths:
-    - .docmancer/**
+    - .docatlas/**
     - "**/__pycache__/**"
     - "**/uv-cache/**"
   include_extensions:

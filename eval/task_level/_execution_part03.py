@@ -27,7 +27,7 @@ def _prepare_shared_task33_evidence(
     preparation = prepare_docatlas(task, workspace, output_dir, env)
     if preparation.get("status") == "condition_setup_failed":
         raise IsolatedDeliveryError("task33_shared_docatlas_preparation_failed")
-    index_revision = _directory_sha256(Path(env["DOCMANCER_HOME"]))
+    index_revision = _directory_sha256(Path(env["DOCATLAS_HOME"]))
     evidence = capture_task33_host_evidence(
         task,
         workspace,
@@ -100,7 +100,7 @@ def prepare_docatlas(task: TaskSpec, workspace: Path, output_dir: Path, env: dic
         "task_id": task.task_id,
         "status": "prepared_with_local_project_docs_only" if sync_status != "failed" else "condition_setup_failed",
         "allow_network": False,
-        "docmancer_home": env["DOCMANCER_HOME"],
+        "docmancer_home": env["DOCATLAS_HOME"],
         "project_docs_sync_status": sync_status,
         "project_docs_sync_error": sync_error,
         "index_state": index_state,

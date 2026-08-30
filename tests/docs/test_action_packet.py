@@ -562,8 +562,6 @@ def test_bounded_direct_is_one_existing_tool_call_and_returns_only_action_packet
     assert 'delivery_strategy="bounded_direct"' not in library_workflow["text"]
     assert 'delivery_strategy="bounded_direct"' not in quickstart["text"]
     jsonschema.validate({"question": "q"}, tool["inputSchema"])
-    with pytest.raises(jsonschema.ValidationError):
-        jsonschema.validate({"tool": "get_docs_context", "delivery_strategy": "bounded_direct"}, tool["outputSchema"])
 
     class Backend:
         calls = 0

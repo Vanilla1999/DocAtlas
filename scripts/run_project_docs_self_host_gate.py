@@ -49,57 +49,36 @@ class LiveCase:
     forbidden_answer_fragments: tuple[str, ...] = ()
 
 
-GOLD_CASES: tuple[LiveCase, ...] = tuple(LiveCase(*row) for row in (
-    ("Which source types are supported for indexing?", ("docs/modules/question-planning.md", "wiki/Supported-Sources.md")),
-    ("Which command syncs project docs after file changes?", ("README.md", "docs/capabilities.md", "docs/project-docs-mcp-workflow.md")),
-    ("Which command starts the Docs MCP server?", ("README.md", "docs/project-docs-demo.md", "wiki/Commands.md")),
-    ("How do I run the offline test suite for DocAtlas?", ("docs/testing.md",)),
-    ("How do I run the project answer quality v4 protocol?", ("eval/project_answer_quality_v4/README.md",)),
-    ("How does the two-cell smoke procedure verify provider-call cardinality?", ("eval/task_level/README.md",)),
-    ("Which docs files must stay under the 1000-line release limit?", ("docs/RELEASE_CHECKLIST.md",)),
-    ("What is the storage mutation coordination contract for cleanup and refresh?", ("docs/index-cleanup.md", "docs/modules/storage-mutation-coordination.md"), ("writer lease", "cleanup barrier")),
-    ("What happens if remove_library_docs runs while a library refresh is in flight?", ("docs/index-cleanup.md", "docs/modules/storage-mutation-coordination.md")),
-    ("What is the release checklist and what gates block release?", ("docs/RELEASE_CHECKLIST.md",)),
-    ("What is the model-visible projection and how is the answer token-bounded?", ("docs/mcp-docs-server.md",)),
-    ("What does clear-index do when a live process holds the index?", ("docs/index-cleanup.md",)),
-    ("How do I configure a project in docmancer.yaml?", ("wiki/Configuration.md",)),
-    ("How does evidence selection choose which candidates are selected?", ("docs/mcp-docs-server.md", "docs/modules/evidence-selection.md")),
-    ("What is contamination protection in the eval protocols?", ("eval/project_answer_quality_v4/README.md",)),
-    ("What is the two-cell smoke procedure for local Task 33 benchmarks?", ("eval/task_level/README.md",)),
-    ("What does the two-cell smoke procedure require?", ("eval/task_level/README.md",)),
-    ("How do I sync project docs after changing a file?", ("README.md", "docs/capabilities.md", "docs/modules/README.md", "docs/project-docs-mcp-workflow.md")),
-    ("How does indexing split documents into sections and chunks?", ("wiki/Architecture.md",)),
-    ("What are the three public Docs MCP tools and when do I use each one?", ("docs/mcp-docs-server.md",)),
-    ("How does evidence selection differ from question planning?", ("docs/modules/question-planning.md", "docs/modules/evidence-selection.md")),
-    ("Where is the project answer contract documented?", ("docs/mcp-docs-server.md", "docs/modules/question-planning.md")),
-    ("What happens when the preview plan is stale?", ("docs/index-cleanup.md",)),
-    ("Why does clear-index always delete remote Qdrant collections?", ("docs/index-cleanup.md",)),
-)) + tuple(LiveCase(*row) for row in (
-    ("What source types are supported for indexing?", ("wiki/Supported-Sources.md", "docs/modules/question-planning.md"), ("GitBook sites",), 1),
-    ("Which source types can DocAtlas index?", ("wiki/Supported-Sources.md", "docs/modules/question-planning.md"), ("GitBook sites",), 2),
-    ("List the supported source types.", ("wiki/Supported-Sources.md", "docs/modules/question-planning.md"), ("GitBook sites",), 3),
-    ("What file formats are supported for local files?", ("wiki/Supported-Sources.md",), (".md",), 4),
-    ("Which document formats does indexing accept?", ("wiki/Supported-Sources.md",), (".md",), 5),
-    ("List the pytest markers.", ("docs/testing.md",), ("integration",), 6),
-    ("What markers does the offline suite define?", ("docs/testing.md",), ("integration", "advanced", "live_network"), 7),
-    ("Какие типы источников можно индексировать?", ("wiki/Supported-Sources.md", "docs/modules/question-planning.md"), ("GitBook sites",), 8),
-    ("Какие форматы локальных файлов поддерживаются?", ("wiki/Supported-Sources.md",), (".md",), 9),
-    ("Какие pytest-маркеры есть в проекте?", ("docs/testing.md",), ("integration",), 10),
-    ("How do I sync project docs after editing a file?", ("README.md", "docs/project-docs-mcp-workflow.md", "docs/capabilities.md"), ("sync_project_docs",), 11),
-    ("Which command should I run after project docs change?", ("README.md", "docs/project-docs-mcp-workflow.md", "docs/capabilities.md"), ("sync_project_docs",), 12),
-    ("Refresh project documentation after a file changes.", ("README.md", "docs/project-docs-mcp-workflow.md", "docs/capabilities.md"), ("sync_project_docs",), 13),
-    ("Как обновить документацию проекта после изменения файла?", ("README.md", "docs/project-docs-mcp-workflow.md", "docs/capabilities.md"), ("sync_project_docs",), 14),
-    ("Какой командой синхронизировать документацию проекта?", ("README.md", "docs/project-docs-mcp-workflow.md", "docs/capabilities.md"), ("sync_project_docs",), 15),
-    ("How do I run the offline suite?", ("docs/testing.md",), ("DOCMANCER_OFFLINE=1", "not advanced and not live and not live_network"), 16),
-    ("How can I run the offline suite?", ("docs/testing.md",), ("DOCMANCER_OFFLINE=1",), 17),
-    ("How do I configure project docs in docmancer.yaml?", ("wiki/Configuration.md", "docs/project-docs-mcp-workflow.md"), ("docmancer.yaml",), 18),
-    ("Where is project docs configuration defined?", ("docs/project-docs-mcp-workflow.md", "wiki/Configuration.md"), ("project-docs-mcp-workflow.md",), 19),
-    ("What command starts the Docs MCP server?", ("README.md", "wiki/Commands.md", "docs/project-docs-demo.md"), ("docs-serve",), 20),
-))
+def _load_gold_cases() -> tuple[LiveCase, ...]:
+    payload = json.loads(
+        (REPO_ROOT / "eval/project_chat_quality_v1/onboarding_cases.json").read_text(
+            encoding="utf-8"
+        )
+    )
+    return tuple(
+        LiveCase(
+            question=str(case["question"]),
+            relevant_paths=tuple(str(value) for value in case.get("acceptable_sources") or ()),
+            surface_case_id=index,
+            expected_kind=str(case["expected_kind"]),
+            required_facts_by_path=tuple(
+                (str(item["source"]), str(item["text"]))
+                for item in case.get("required_facts") or ()
+            ),
+            forbidden_source_prefixes=tuple(
+                str(value) for value in case.get("forbidden_source_prefixes") or ()
+            ),
+            forbidden_answer_fragments=tuple(
+                str(value) for value in case.get("forbidden_answer_fragments") or ()
+            ),
+        )
+        for index, case in enumerate(payload.get("cases") or (), 1)
+    )
 
-NEGATIVE_CASES = (
-    "What lunar quantum retention policy does DocAtlas use?",
-)
+
+GOLD_CASES = _load_gold_cases()
+
+NEGATIVE_CASES: tuple[str, ...] = ()
 
 
 def _source_paths(payload: dict[str, object]) -> tuple[str, ...]:
@@ -232,14 +211,14 @@ def run(
     cases: tuple[LiveCase, ...] = GOLD_CASES,
     negative_cases: tuple[str, ...] = NEGATIVE_CASES,
 ) -> dict[str, object]:
-    previous_home = os.environ.get("DOCMANCER_HOME")
+    previous_home = os.environ.get("DOCATLAS_HOME")
     errors: list[str] = []
     results: list[dict[str, object]] = []
     historical_paths = _historical_paths()
     try:
         with TemporaryDirectory(prefix="docatlas-self-host-") as raw_tmp:
             tmp = Path(raw_tmp)
-            os.environ["DOCMANCER_HOME"] = str(tmp / "home")
+            os.environ["DOCATLAS_HOME"] = str(tmp / "home")
             config = DocmancerConfig()
             config.index.db_path = str(tmp / "docmancer.db")
             config.index.extracted_dir = str(tmp / "extracted")
@@ -425,9 +404,9 @@ def run(
                 })
     finally:
         if previous_home is None:
-            os.environ.pop("DOCMANCER_HOME", None)
+            os.environ.pop("DOCATLAS_HOME", None)
         else:
-            os.environ["DOCMANCER_HOME"] = previous_home
+            os.environ["DOCATLAS_HOME"] = previous_home
 
     positives = results[:len(cases)]
     source_count = sum(len(row.get("ranking", {}).get("top3_paths", ())) for row in positives)

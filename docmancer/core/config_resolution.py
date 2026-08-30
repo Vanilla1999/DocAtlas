@@ -2,16 +2,13 @@ from __future__ import annotations
 
 import hashlib
 import json
-import warnings
 from dataclasses import dataclass
 from pathlib import Path
 
 from docmancer.core.config import DocmancerConfig
 from docmancer.core.product_identity import (
-    LEGACY_CONFIG_NAME,
     PRIMARY_CONFIG_NAME,
     resolve_home,
-    warn_if_legacy_home,
 )
 
 
@@ -20,7 +17,6 @@ class ResolvedConfig:
     config: DocmancerConfig
     source: str
     path: Path | None
-    legacy_compatibility: bool = False
 
     @property
     def identity(self) -> str:
@@ -28,19 +24,6 @@ class ResolvedConfig:
         return hashlib.sha256(
             json.dumps(payload, sort_keys=True, separators=(",", ":")).encode("utf-8")
         ).hexdigest()
-
-
-def _legacy_config_warning(path: Path) -> None:
-    warnings.warn(
-        f"Legacy DocAtlas config name {LEGACY_CONFIG_NAME!r} is deprecated at {path}; "
-        f"rename it to {PRIMARY_CONFIG_NAME!r} during the 1.x compatibility window.",
-        DeprecationWarning,
-        stacklevel=3,
-    )
-
-
-def _is_legacy_config_path(path: Path) -> bool:
-    return path.name == LEGACY_CONFIG_NAME
 
 
 def resolve_config(
@@ -52,71 +35,36 @@ def resolve_config(
 ) -> ResolvedConfig:
     """Resolve configuration without creating or modifying config files.
 
-    New discovery prefers ``docatlas.yaml``. The old ``docmancer.yaml`` name is
-    accepted only as a compatibility candidate and emits a deprecation warning.
-    Global discovery resolves inside the DocAtlas home; it never falls back to
-    the legacy ``~/.docmancer`` directory unless ``DOCMANCER_HOME`` was set
-    explicitly by the caller.
+    Discovery recognizes only the current ``docatlas.yaml`` identity.
     """
 
     if explicit_path is not None:
         path = Path(explicit_path).expanduser().resolve()
         if not path.is_file():
             raise ValueError(f"explicit config path is not a file: {path}")
-        legacy = _is_legacy_config_path(path)
-        if legacy:
-            _legacy_config_warning(path)
-        return ResolvedConfig(
-            DocmancerConfig.from_yaml(path),
-            "explicit",
-            path,
-            legacy_compatibility=legacy,
-        )
+        return ResolvedConfig(DocmancerConfig.from_yaml(path), "explicit", path)
 
-    candidates: list[tuple[str, Path, bool]] = []
+    candidates: list[tuple[str, Path]] = []
     if project_path is not None:
         project = Path(project_path).expanduser().resolve()
-        candidates.extend(
-            [
-                ("project_local", project / PRIMARY_CONFIG_NAME, False),
-                ("project_local", project / LEGACY_CONFIG_NAME, True),
-            ]
-        )
+        candidates.append(("project_local", project / PRIMARY_CONFIG_NAME))
     current = Path(cwd or Path.cwd()).expanduser().resolve()
-    candidates.extend(
-        [
-            ("cwd", current / PRIMARY_CONFIG_NAME, False),
-            ("cwd", current / LEGACY_CONFIG_NAME, True),
-        ]
-    )
+    candidates.append(("cwd", current / PRIMARY_CONFIG_NAME))
     if user_config_path is not None:
         user_path = Path(user_config_path).expanduser().resolve()
-        candidates.append(("user", user_path, _is_legacy_config_path(user_path)))
+        candidates.append(("user", user_path))
     else:
         home_resolution = resolve_home()
-        warn_if_legacy_home(home_resolution)
-        candidates.extend(
-            [
-                ("user", home_resolution.path / PRIMARY_CONFIG_NAME, False),
-                ("user", home_resolution.path / LEGACY_CONFIG_NAME, True),
-            ]
-        )
+        candidates.append(("user", home_resolution.path / PRIMARY_CONFIG_NAME))
 
     seen: set[Path] = set()
-    for source, path, legacy in candidates:
+    for source, path in candidates:
         path = path.resolve()
         if path in seen:
             continue
         seen.add(path)
         if path.is_file():
-            if legacy:
-                _legacy_config_warning(path)
-            return ResolvedConfig(
-                DocmancerConfig.from_yaml(path),
-                source,
-                path,
-                legacy_compatibility=legacy,
-            )
+            return ResolvedConfig(DocmancerConfig.from_yaml(path), source, path)
     return ResolvedConfig(DocmancerConfig(), "defaults", None)
 
 

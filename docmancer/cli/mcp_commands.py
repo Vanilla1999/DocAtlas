@@ -30,14 +30,8 @@ def mcp_packs_serve_cmd() -> None:
     _run_packs_gateway()
 
 
-@mcp_group.command("serve")
-def mcp_serve_cmd() -> None:
-    """Compatibility alias for packs-serve."""
-    _run_packs_gateway()
-
-
 @mcp_group.command("docs-serve")
-@click.option("--config", "config_path", default=None, help="Path to docmancer.yaml.")
+@click.option("--config", "config_path", default=None, help="Path to docatlas.yaml.")
 @click.pass_context
 def mcp_docs_serve_cmd(ctx: click.Context, config_path: str | None) -> None:
     """Run the canonical stdio MCP documentation server."""
@@ -219,7 +213,7 @@ def _compile_from_url_or_die(package: str, version: str, url: str) -> None:
     click.echo(f"Compiled {package}@{version} from {url} into {pkg_dir}")
 
 
-def register_docmancer_mcp_in_agent(agent_name: str, *, project: bool = False) -> str | None:
+def register_docatlas_mcp_in_agent(agent_name: str, *, project: bool = False) -> str | None:
     """Helper for the existing `doc-atlas install <agent>` to also register MCP. Returns message or None."""
     target = agent_config.find_agent(agent_name, project=project)
     if target is None:

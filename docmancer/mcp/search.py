@@ -188,7 +188,7 @@ def search_with_metadata(
     lexical = _lexical_search(candidates, query, package=package, limit=limit)
     metadata: dict[str, Any] = {"mode": "lexical", "semantic": False, "lowConfidence": low_confidence(lexical)}
     source = env or os.environ
-    if source.get("DOCMANCER_MCP_SEARCH", "lexical").lower() != "hybrid" or not query:
+    if source.get("DOCATLAS_MCP_SEARCH", "lexical").lower() != "hybrid" or not query:
         return lexical, metadata
     try:
         provider = search_semantic.embedding_provider_from_env(source)

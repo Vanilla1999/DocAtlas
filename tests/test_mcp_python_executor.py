@@ -14,7 +14,7 @@ from docmancer.mcp.manifest import Manifest
 
 @pytest.fixture(autouse=True)
 def isolated(tmp_path, monkeypatch):
-    monkeypatch.setenv("DOCMANCER_HOME", str(tmp_path / "home"))
+    monkeypatch.setenv("DOCATLAS_HOME", str(tmp_path / "home"))
     paths.ensure_dirs()
 
 
@@ -61,7 +61,7 @@ def _seed_python_pack(
 def test_executor_blocked_without_allow_execute(tmp_path, monkeypatch):
     registry = tmp_path / "reg"
     _seed_python_pack(registry)
-    monkeypatch.setenv("DOCMANCER_REGISTRY_DIR", str(registry))
+    monkeypatch.setenv("DOCATLAS_REGISTRY_DIR", str(registry))
     install_package("demo", "1")
     d = Dispatcher(Manifest.load())
     out = d.call_tool("demo__1__json_loads", {"s": "{}"})
@@ -73,7 +73,7 @@ def test_executor_blocked_without_allow_execute(tmp_path, monkeypatch):
 def test_executor_runs_when_opted_in(tmp_path, monkeypatch):
     registry = tmp_path / "reg"
     _seed_python_pack(registry, via_kwargs=True)
-    monkeypatch.setenv("DOCMANCER_REGISTRY_DIR", str(registry))
+    monkeypatch.setenv("DOCATLAS_REGISTRY_DIR", str(registry))
     install_package("demo", "1", allow_execute=True)
     d = Dispatcher(Manifest.load())
     out = d.call_tool("demo__1__json_loads", {"s": '{"x": 1}'})
@@ -84,7 +84,7 @@ def test_executor_runs_when_opted_in(tmp_path, monkeypatch):
 def test_python_import_blocks_module_not_in_operation_grant(tmp_path, monkeypatch):
     registry = tmp_path / "reg"
     _seed_python_pack(registry, via_kwargs=True)
-    monkeypatch.setenv("DOCMANCER_REGISTRY_DIR", str(registry))
+    monkeypatch.setenv("DOCATLAS_REGISTRY_DIR", str(registry))
     install_package("demo", "1", allow_execute=True)
     manifest = Manifest.load()
     manifest.packages[0].operation_grants["json_loads"]["allowed_modules"] = ["math"]
@@ -103,7 +103,7 @@ def test_python_import_blocks_network_modules_without_network_grant(tmp_path, mo
         via_kwargs=True,
         args_schema={"type": "object", "properties": {"host": {"type": "string"}}, "required": ["host"]},
     )
-    monkeypatch.setenv("DOCMANCER_REGISTRY_DIR", str(registry))
+    monkeypatch.setenv("DOCATLAS_REGISTRY_DIR", str(registry))
     install_package("demo", "1", allow_execute=True)
 
     out = Dispatcher(Manifest.load()).call_tool("demo__1__json_loads", {"host": "example.com"})
@@ -115,7 +115,7 @@ def test_python_import_blocks_network_modules_without_network_grant(tmp_path, mo
 def test_python_import_blocks_dunder_callable(tmp_path, monkeypatch):
     registry = tmp_path / "reg"
     _seed_python_pack(registry, callable_name="__dict__", args_schema={"type": "object", "properties": {}})
-    monkeypatch.setenv("DOCMANCER_REGISTRY_DIR", str(registry))
+    monkeypatch.setenv("DOCATLAS_REGISTRY_DIR", str(registry))
     install_package("demo", "1", allow_execute=True)
 
     out = Dispatcher(Manifest.load()).call_tool("demo__1__json_loads", {})
@@ -136,11 +136,11 @@ def test_python_import_uses_minimal_env_unless_allowed(tmp_path, monkeypatch):
             "required": ["key"],
         },
     )
-    monkeypatch.setenv("DOCMANCER_REGISTRY_DIR", str(registry))
-    monkeypatch.setenv("DOCMANCER_TEST_SECRET", "leaked")
+    monkeypatch.setenv("DOCATLAS_REGISTRY_DIR", str(registry))
+    monkeypatch.setenv("DOCATLAS_TEST_SECRET", "leaked")
     install_package("demo", "1", allow_execute=True)
 
-    out = Dispatcher(Manifest.load()).call_tool("demo__1__json_loads", {"key": "DOCMANCER_TEST_SECRET"})
+    out = Dispatcher(Manifest.load()).call_tool("demo__1__json_loads", {"key": "DOCATLAS_TEST_SECRET"})
     assert out.ok is True
     assert out.body is None
 
@@ -170,7 +170,7 @@ def test_executor_returns_structured_error_for_missing_module():
     op = {
         "executor": "python_import",
         "python_import": {"module": "nonexistent_module_xyz_12345", "callable": "anything"},
-        "_docmancer_operation_grant": {"allowed_modules": ["nonexistent_module_xyz_12345"]},
+        "_docatlas_operation_grant": {"allowed_modules": ["nonexistent_module_xyz_12345"]},
     }
     exec_ = PythonImportExecutor(python=sys.executable)
     result = exec_.call(

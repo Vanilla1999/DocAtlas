@@ -28,12 +28,12 @@ _HINTS_BY_REASON: dict[str, list[str]] = {
     "validation_error": ["Fix the MCP tool arguments and retry."],
     "empty_question": ["Provide a non-empty question, for example: 'Flutter Riverpod providers' or 'FastAPI dependency injection'."],
     "unknown_tool": ["Use list_tools to discover available MCP tools."],
-    "config_shadowing": ["Start MCP from the repo config, set DOCMANCER_HOME, or use an explicit override if available."],
-    "project_local_config_shadowed": ["Start MCP from the repo config, set DOCMANCER_HOME, or use an explicit override if available."],
+    "config_shadowing": ["Start MCP from the repo config, set DOCATLAS_HOME, or use an explicit override if available."],
+    "project_local_config_shadowed": ["Start MCP from the repo config, set DOCATLAS_HOME, or use an explicit override if available."],
     "network_required": ["Retry only after explicit user approval for network access."],
     "confirmation_required": ["Ask the user to approve the required lifecycle/network action, then retry."],
     "transport_size_limit": ["Retry with compact output, lower limit/tokens, or pagination."],
-    "full_output_too_large": ["Retry with output_mode='compact', lower limit/tokens, page/page_size, or include_sections."],
+    "full_output_too_large": ["Narrow the request or lower its limit/token budget."],
     "unhandled_exception": ["Check diagnostics/logs; retry only after the underlying issue is fixed."],
     "handler_exception": ["Check diagnostics/logs; retry only after the underlying handler issue is fixed."],
     "permission_denied": ["Check filesystem permissions or run with access to the requested resource."],
@@ -68,8 +68,7 @@ def _hints_for(reason_code: str, hints: list[str] | None) -> list[str]:
 
 
 def debug_errors_enabled(args: dict[str, Any] | None = None) -> bool:
-    output_mode = str((args or {}).get("output_mode") or "").lower()
-    return output_mode == "debug" or os.environ.get("DOCATLAS_MCP_DEBUG_ERRORS") == "1"
+    return os.environ.get("DOCATLAS_MCP_DEBUG_ERRORS") == "1"
 
 
 def build_mcp_error_payload(
@@ -108,8 +107,6 @@ def build_mcp_error_payload(
     return {
         "status": "failed",
         "error": error,
-        "reason_code": bounded_reason,
-        "message": bounded_message,
         "warnings": [_bounded_warning(item) for item in list(warnings or [])[:MAX_ERROR_HINTS]],
     }
 

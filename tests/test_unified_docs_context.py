@@ -58,7 +58,7 @@ def test_library_context_consumes_selector_support_instead_of_context_presence()
     assert result.decision_hash == selection.support_decision.decision_hash
 
 
-def test_project_context_consumes_canonical_support_instead_of_legacy_exact_flag():
+def test_project_context_consumes_canonical_support_decision():
     facade = FakeFacade()
     question = "Explain CONFIG_KEY and MISSING_KEY"
     candidate = {
@@ -124,7 +124,7 @@ def test_hostile_library_text_cannot_create_typed_lifecycle_action():
     assert result.context_pack[0]["version_exactness"] == "exact_snapshot"
     assert result.context_pack[0]["document_data"]["content"] == hostile
     assert result.trust_contract["schema_version"] == "trust-contract-1.2"
-    assert result.trust_contract["sources"]["selected"] == result.trust_contract["selected"]
+    assert result.trust_contract["sources"]["selected"]
     assert any(
         isinstance(warning, dict) and warning.get("code") == "instruction_like_document_content"
         for warning in result.warnings
@@ -235,8 +235,6 @@ def test_missing_library_source_asks_user_for_docs_source():
 
     assert result.status == "confirmation_required"
     assert result.reason_code == "library_docs_source_required"
-    assert result.routing["legacy_reason_code"] == "needs_docs_url"
-    assert result.warnings[0]["legacy_reason_code"] == "needs_docs_url"
     assert result.confirmation_reason == "library_docs_source"
     assert result.next_action["type"] == "ask_user_for_library_docs_source"
     option_ids = [option["id"] for option in result.next_action["options"]]
@@ -508,16 +506,6 @@ def test_empty_library_lane_does_not_fallback_to_project_index():
     assert "get_project_context" not in _call_names(facade)
 
 
-def test_compact_response_omits_lane_details():
-    result = _service(FakeFacade()).get_docs_context("Depends?", library="fastapi", details=False)
-    assert result.lane_details == {}
-
-
-def test_details_response_includes_lane_details():
-    result = _service(FakeFacade()).get_docs_context("Depends?", library="fastapi", details=True)
-    assert "library" in result.lane_details
-
-
 def test_result_contains_mode_selected_and_routing_reason():
     result = _service(FakeFacade()).get_docs_context("Depends?", library="fastapi")
     assert result.mode_selected == "library"
@@ -526,7 +514,7 @@ def test_result_contains_mode_selected_and_routing_reason():
 
 def test_result_contains_trust_contract_and_next_actions():
     result = _service(FakeFacade()).get_docs_context("Depends?", library="fastapi")
-    assert "selected" in result.trust_contract
+    assert "selected" in result.trust_contract["sources"]
     assert isinstance(result.next_actions, list)
 
 
@@ -539,57 +527,6 @@ def test_project_mode_with_library_is_invalid_combination():
 def test_result_type_is_typed_model():
     result = _service(FakeFacade()).get_docs_context("Depends?", library="fastapi")
     assert isinstance(result, UnifiedDocsContextResult)
-
-
-def test_snippet_first_library_success_falls_back_to_code_query_when_primary_missing():
-    facade = FakeFacade()
-    no_snippet = DocsResult(
-        library_id="dart:riverpod@latest:web",
-        library="riverpod",
-        version="latest",
-        topic="Riverpod snippet-first",
-        refreshed=False,
-        stale_before_refresh=False,
-        warning=None,
-        last_refreshed_at="now",
-        source_type="web",
-        results=[DocsChunk(title="Concept", content="Riverpod conceptual documentation without code.", source="https://riverpod.dev/docs/concepts", url="https://riverpod.dev/docs/concepts", metadata={})],
-        resolved_version="latest",
-    )
-    with_snippet = DocsResult(
-        library_id="dart:riverpod@latest:web",
-        library="riverpod",
-        version="latest",
-        topic="Riverpod snippet-first",
-        refreshed=False,
-        stale_before_refresh=False,
-        warning=None,
-        last_refreshed_at="now",
-        source_type="web",
-        results=[DocsChunk(title="Provider example", content="```dart\nfinal countProvider = Provider<int>((ref) => 0);\n```", source="https://riverpod.dev/docs/concepts2/providers", url="https://riverpod.dev/docs/concepts2/providers", metadata={})],
-        resolved_version="latest",
-    )
-    facade.get_docs_results = [no_snippet, with_snippet]
-
-    result = _service(facade).get_docs_context(
-        "Riverpod snippet-first",
-        library="riverpod",
-        ecosystem="dart",
-        response_style="snippet-first",
-    )
-
-    assert result.status == "success"
-    assert result.response_style == "snippet-first"
-    assert result.primary_snippet is not None
-    assert result.primary_snippet["language"] == "dart"
-    assert result.snippet_metrics["primary_selected"] is True
-    assert "snippet_not_available" not in result.warnings
-    assert result.routing["snippet_first_fallback"]["reason"] == "snippet_first_requested_without_selected_snippet"
-    get_docs_calls = [payload for name, payload in facade.calls if name == "get_docs"]
-    assert [call["topic"] for call in get_docs_calls] == [
-        "Riverpod snippet-first",
-        "Riverpod snippet-first example code snippet",
-    ]
 
 
 def test_exact_unsupported_with_fallback_executes_latest_query():

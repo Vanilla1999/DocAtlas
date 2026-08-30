@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import re
-from copy import deepcopy
 from pathlib import Path
 
 import tomllib
@@ -49,7 +48,6 @@ def test_support_policy_classifies_every_shipped_cli_and_mcp_surface() -> None:
     configurations = (
         DocsServerConfig(),
         DocsServerConfig(expose_advanced=True),
-        DocsServerConfig(expose_legacy=True),
         DocsServerConfig(expose_admin=True),
     )
     for config in configurations:
@@ -111,17 +109,17 @@ def test_support_policy_classifies_every_registered_public_service() -> None:
     assert SHIPPED_SERVICE_SURFACE_IDS == _ids(load_support_policy(), "service")
 
 
-def test_add_url_is_core_while_only_local_path_compatibility_is_deprecated() -> None:
+def test_retired_compatibility_surfaces_are_not_in_the_inventory() -> None:
     policy = load_support_policy()
     tiers = {item["id"]: item["tier"] for item in policy["surfaces"]}
 
     assert tiers["cli:add"] == "core"
-    assert tiers["cli-compat:add-local-path"] == "deprecated"
+    assert "cli-compat:add-local-path" not in tiers
+    assert "cli:mcp/serve" not in tiers
 
     result = CliRunner().invoke(cli, ["add", "--help"])
     assert result.exit_code == 0
     assert "[core]" in result.output
-    assert "[deprecated]" not in result.output
 
 
 def test_non_core_surfaces_have_complete_ownership_and_release_policy() -> None:
@@ -130,7 +128,7 @@ def test_non_core_surfaces_have_complete_ownership_and_release_policy() -> None:
         "docs",
         "test_tier",
         "network_dependencies",
-        "compatibility",
+        "support_policy",
         "removal_rule",
         "failure_budget",
     }
@@ -140,25 +138,15 @@ def test_non_core_surfaces_have_complete_ownership_and_release_policy() -> None:
             assert all(surface[field] not in (None, "", []) for field in required - {"network_dependencies"}), surface["id"]
 
 
-def test_expired_deprecations_have_explicit_resolution() -> None:
-    deprecated = [item for item in load_support_policy()["surfaces"] if item["tier"] == "deprecated"]
+def test_inventory_has_only_current_support_metadata() -> None:
+    policy = load_support_policy()
 
-    assert deprecated
-    for surface in deprecated:
-        assert surface["deprecation"]["resolution"] in {"remove_in_breaking_release", "deadline_extended"}
-        assert surface["deprecation"]["deadline"]
-
-
-def test_deprecation_validator_rejects_malformed_and_expired_deadlines() -> None:
-    malformed = deepcopy(load_support_policy())
-    deprecated = next(item for item in malformed["surfaces"] if item["tier"] == "deprecated")
-    deprecated["deprecation"]["deadline"] = "someday"
-    assert any("dotted release version" in error for error in validate_support_policy(malformed))
-
-    expired = deepcopy(load_support_policy())
-    deprecated = next(item for item in expired["surfaces"] if item["tier"] == "deprecated")
-    deprecated["deprecation"]["deadline"] = "1.0.0"
-    assert any("has expired" in error for error in validate_support_policy(expired))
+    assert policy["current_version_policy"].startswith("Only surfaces shipped by the current release")
+    for surface in policy["surfaces"]:
+        assert surface["tier"] != "deprecated"
+        assert surface["support_policy"] == "current release only"
+        assert "compatibility" not in surface
+        assert "deprecation" not in surface
 
 
 def test_cli_help_labels_each_top_level_command_support_tier() -> None:
@@ -175,19 +163,20 @@ def test_cli_help_labels_each_top_level_command_support_tier() -> None:
 def test_ci_separates_offline_core_from_optional_advanced_and_live_suites() -> None:
     workflow = (ROOT / ".github" / "workflows" / "ci.yml").read_text(encoding="utf-8")
 
-    assert "DOCMANCER_OFFLINE: \"1\"" in workflow
+    assert "DOCATLAS_OFFLINE: \"1\"" in workflow
     assert "pytest tests/ -m \"not advanced and not live and not live_network\"" in workflow
     assert "advanced-contract:" in workflow
     assert "pytest tests/ -m advanced" in workflow
     assert "live:" not in workflow
 
 
-def test_support_policy_docs_define_failure_budgets_and_bounded_deprecations() -> None:
+def test_support_policy_docs_define_failure_budgets_and_current_only_support() -> None:
     text = (ROOT / "docs" / "support-surface-policy.md").read_text(encoding="utf-8")
 
     assert "Core offline CI" in text
     assert "Advanced network outage" in text
-    assert "2.0.0" in text
+    assert "current release only" in text
+    assert "compatibility window" in text
     assert "shared security and storage regressions" in text
 
 

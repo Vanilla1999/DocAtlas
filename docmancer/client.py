@@ -24,7 +24,7 @@ class DocmancerClient:
 
     Args:
         db_path: Path to the SQLite database file. Defaults to the
-            standard location under ``~/.docmancer/``.
+            standard location under ``~/.docatlas/``.
         default_budget: Maximum token budget for queries.
         default_limit: Maximum number of sections returned per query.
         style: Default output style for :meth:`get_context`

@@ -28,8 +28,6 @@ ROLLING_VERSIONS = {"latest", "stable", "main", "master", "beta", "next", "rolli
 def normalize_manifest_target(raw: dict[str, Any], *, manifest_version: int) -> dict[str, Any]:
     """Flatten one v2 target into the existing DocsTarget-compatible shape."""
 
-    if manifest_version == 1:
-        return dict(raw)
     identity = raw.get("identity") or {}
     version = raw.get("version") or {}
     source = raw.get("source") or {}
@@ -91,9 +89,6 @@ def semantic_manifest_errors(target: dict[str, Any], *, manifest_version: int) -
     doc_format = target.get("doc_format")
     if doc_format and doc_format not in MANIFEST_DOC_FORMATS:
         errors.append(f"{label}: unsupported documentation format: {doc_format}")
-    if manifest_version == 1:
-        return errors, warnings
-
     identity = target.get("identity") or {}
     kind = identity.get("kind")
     if kind not in MANIFEST_IDENTITY_KINDS:

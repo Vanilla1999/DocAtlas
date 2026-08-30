@@ -28,7 +28,7 @@ Use `doc-atlas --help` and `doc-atlas <command> --help` for the installed comman
 | `doc-atlas doctor` | Diagnose the local installation. |
 | `doc-atlas remove <source>` | Remove a locally registered/indexed source. |
 
-These commands are compatibility and diagnostic surfaces. Coding agents should use the three Docs MCP tools by default.
+These commands are direct and diagnostic surfaces. Coding agents should use the three Docs MCP tools by default.
 
 ## Dependency/version evidence
 
@@ -42,14 +42,14 @@ The following are intentionally outside the default Docs workflow:
 
 | Surface | Entry point | Notes |
 |---|---|---|
-| MCP Packs | `doc-atlas mcp packs-serve` | Version-pinned API action packs; `doc-atlas mcp serve` is a compatibility alias. |
-| Patch constraints | `DOCMANCER_MCP_ADVANCED_TOOLS=1` | Advisory evidence only; never a safe-to-merge proof. |
+| MCP Packs | `doc-atlas mcp packs-serve` | Version-pinned API action packs. |
+| Patch constraints | `DOCATLAS_MCP_ADVANCED_TOOLS=1` | Advisory evidence only; never a safe-to-merge proof. |
 | Qdrant lifecycle | `doc-atlas qdrant --help` | Optional local vector administration. |
 | USPTO and benchmark tooling | command-specific help | Maintenance/research surfaces. |
 
 ## Installation names
 
-Install the PyPI package as `doc-atlas` and use `doc-atlas` in user-facing commands. The internal Python package and some compatibility storage paths still use `docmancer`.
+Install the PyPI package as `doc-atlas` and use `doc-atlas` in user-facing commands. The Python import namespace remains `docmancer`.
 
 ```bash
 pipx install doc-atlas

@@ -114,7 +114,7 @@ def build_documentation_query_plan(
         ),
         (
             "configure" in normalized and bool({"documentation", "docs"} & set(normalized.split())),
-            "docmancer.yaml project docs configuration",
+            "docatlas.yaml project docs configuration",
         ),
     )
     requirement_concepts = tuple(

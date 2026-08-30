@@ -49,11 +49,11 @@ The default surface has exactly three tools: `get_docs_context`, `prepare_docs`,
 - indexes new and changed reviewable docs;
 - verifies the final indexed state before reporting results.
 
-`ingest_project_docs` and direct `sync_project_docs` are legacy/compatibility-surface operations. New agent instructions should prefer `prepare_docs(action="sync_project_docs")` because project docs are owned by the repository filesystem, and the index is only a cache of that current state.
+Agent instructions use `prepare_docs(action="sync_project_docs")` because project docs are owned by the repository filesystem, and the index is only a cache of that current state.
 
 ## Advanced low-level flow
 
-Agents that enable `DOCMANCER_MCP_ADVANCED_TOOLS=1` can use lower-level inspection tools:
+Agents that enable `DOCATLAS_MCP_ADVANCED_TOOLS=1` can use lower-level inspection tools:
 
 ```text
 inspect_project_docs(project_path)
@@ -90,7 +90,7 @@ get_docs_context(
 )
 ```
 
-The advanced compatibility-only `inspect_project_docs` surface exposes discovered and indexed module summaries. Normal agents recover module ambiguity through the `docs_status` action returned by `get_docs_context`, then retry with the exact `module_path`.
+The advanced `inspect_project_docs` surface exposes discovered and indexed module summaries. Normal agents recover module ambiguity through the `docs_status` action returned by `get_docs_context`, then retry with the exact `module_path`.
 
 ## Module docs workflow
 
@@ -167,21 +167,7 @@ prepare_docs(action="sync_project_docs", project_path=...)
 
 for repository files such as README/docs/wiki/ADR (discovers, reconciles, and indexes).
 
-Use:
-
-```text
-prefetch_project_dependency_docs(project_path)
-```
-
-or the existing compatible tool name:
-
-```text
-prefetch_project_docs(project_path)
-```
-
-for exact dependency documentation from manifests/lockfiles.
-
-Prefer `prefetch_project_dependency_docs` in new instructions because it makes the behavior explicit.
+Use `prepare_docs(action="prefetch_project_dependency_docs", project_path=...)` for exact dependency documentation from manifests/lockfiles.
 
 ## Maintained project-doc catalog
 
@@ -255,7 +241,7 @@ Checklist:
 5. If expected files are not cited, fix the source map instead of guessing:
    - add or correct entries in `docatlas.project-docs.yaml`;
    - move maintained docs under `docs/`, `wiki/`, ADR, roadmap, or runbook-style locations;
-   - update discovery configuration or `docmancer.docs.yaml` manifest entries if the docs are external dependency/public docs;
+   - update discovery configuration or `docatlas.docs.yaml` manifest entries if the docs are external dependency/public docs;
    - re-run sync and repeat the smoke test.
 
 Suggested smoke-test questions:
@@ -352,8 +338,10 @@ Example: dependency docs available but missing locally.
   "dependency_sources": {
     "dependency_next_action": {
       "type": "ask_user_to_prefetch_dependency_docs",
-      "tool_after_confirmation": "prefetch_project_docs",
-      "alias_tool_after_confirmation": "prefetch_project_dependency_docs",
+      "tool_after_confirmation": "prepare_docs",
+      "arguments_patch": {
+        "action": "prefetch_project_dependency_docs"
+      },
       "requires_confirmation": true,
       "confirmation_reason": "network_fetch"
     }

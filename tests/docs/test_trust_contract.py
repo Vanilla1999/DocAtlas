@@ -83,25 +83,4 @@ def test_trust_contract_requests_prefetch_when_dependency_not_resolved():
         "reason": "Requested dependency docs were not resolved.",
         "risk_level": "high",
     }]
-    assert contract["next_actions"][0]["tool"] == "prefetch_project_docs"
-
-
-def test_trust_contract_can_include_legacy_aliases_when_requested():
-    project_docs = ProjectDocsResult(
-        project_path="/repo",
-        query="architecture",
-        indexed_sources=[{"path": "README.md", "source": "/repo/README.md"}],
-    )
-
-    contract = build_project_context_trust_contract(
-        project_docs=project_docs,
-        dependency_docs=None,
-        requested_library=None,
-        mode="auto",
-        include_legacy_aliases=True,
-    )
-
-    assert contract["selected_sources"] == contract["sources"]["selected"]
-    assert contract["trusted_sources"] == contract["sources"]["selected"]
-    assert contract["rejected_sources"] == contract["sources"]["rejected"]
-    assert contract["risky_sources"] == contract["sources"]["risky"]
+    assert contract["next_actions"][0]["tool"] == "prefetch_project_dependency_docs"

@@ -43,7 +43,7 @@ This is the canonical map of maintained DocAtlas project-owned documentation. Ag
 
 ## External docs manifest
 
-- [docmancer.docs.yaml](../docmancer.docs.yaml) — repeatable manifest of external documentation targets for validation and prefetch.
+- [docatlas.docs.yaml](../docatlas.docs.yaml) — repeatable manifest of external documentation targets for validation and prefetch.
 
 ## Maintenance rules
 

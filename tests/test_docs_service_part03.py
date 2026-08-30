@@ -93,16 +93,11 @@ roots:
     )
 
     assert payload is not None
-    assert payload["status"] == "ok", payload.get("missing")
-    assert any(
-        source["path_or_url"].endswith("zz-authoritative-plan.md")
-        for source in payload["sources"][:3]
-    )
-    assert any(
-        "cannot determine support" in source["snippet"]
-        and "mandatory-facet witness" in source["snippet"]
-        for source in payload["sources"]
-    ), [source["snippet"] for source in payload["sources"]]
+    assert payload["status"] == "insufficient_evidence"
+    assert payload["answer_supported"] is False
+    assert payload["edit_ready"] is False
+    assert "sources" not in payload
+    assert "unsupported_answer_authorization:context_only_relation" in payload["missing"]
 
     dispatcher_payload = handle_context_tool(
         "get_docs_context",
@@ -178,9 +173,7 @@ roots:
         service,
     )
     assert absent is not None
-    assert absent["status"] == "ok"
-    assert absent["kind"] == "docs_context"
-    assert absent["answer_policy"] == "cite_only"
+    assert absent["status"] == "insufficient_evidence"
     assert absent["answer_supported"] is False
     assert absent["edit_ready"] is False
 

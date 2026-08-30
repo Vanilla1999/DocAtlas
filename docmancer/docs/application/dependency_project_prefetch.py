@@ -23,7 +23,7 @@ class DependencyProjectPrefetch:
     def __getattr__(self, name: str) -> Any:
         return getattr(self.dependencies, name)
 
-    def prefetch_project_docs(
+    def prefetch_project_dependency_docs(
         self,
         project_path: str,
         include_flutter: bool = True,
@@ -178,7 +178,7 @@ class DependencyProjectPrefetch:
             ))
 
         if async_:
-            job = self.jobs.create("prefetch_project_docs")
+            job = self.jobs.create("prefetch_project_dependency_docs")
             self.jobs.update(job.job_id, status="running", message="Started project docs prefetch job.", total_targets=len(targets))
             threading.Thread(
                 target=self._run_prefetch_docs_targets_job,

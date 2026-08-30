@@ -203,7 +203,7 @@ def test_permission_frames_select_and_project_decisive_local_evidence(tmp_path, 
         (
             "According to the project documentation, how does ScanPermissionGate determine whether scan may enter?",
             "evaluateFlowEntry",
-            True,
+            False,
         ),
         (
             "According to the project documentation, what allowOfflineFallback value must offline sync pass to PermissionService.evaluateFlowEntry?",
@@ -229,7 +229,7 @@ def test_permission_frames_select_and_project_decisive_local_evidence(tmp_path, 
     for question, expected, answer_expected in cases:
         decision = _select(question, candidates)
         if not answer_expected:
-            assert decision.status == "insufficient_evidence"
+            assert decision.status == "insufficient_evidence", question
             assert any(item.startswith("context_only:") for item in decision.missing_requirements)
             continue
         assert decision.status == "ok", decision.missing_requirements

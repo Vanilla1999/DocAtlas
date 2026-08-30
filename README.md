@@ -59,7 +59,7 @@ Accepted values: `claude-code`, `opencode`, `codex`, `all`, `none`. An unknown v
 
 For OpenCode, the installer honors `OPENCODE_CONFIG` (full path), falling back to `$XDG_CONFIG_HOME/opencode/opencode.json`. Existing JSONC configs (comments / trailing commas) are parsed; a `.bak` backup is kept on rewrite.
 
-## Naming and compatibility
+## Python import namespace
 
 The product name is **DocAtlas**.
 
@@ -70,9 +70,7 @@ pipx install doc-atlas
 doc-atlas --help
 ```
 
-Some internal Python modules, storage paths, and older documentation may still use the legacy name `docmancer`, for example `docmancer/` or `~/.docmancer/`. Treat those as compatibility/internal names unless this README explicitly says otherwise.
-
-Use `doc-atlas ...` for user-facing commands in new documentation. Configuration files may still be named `docmancer.yaml` for compatibility.
+The distribution and CLI are named `doc-atlas`, while the Python import namespace remains `docmancer` (for example, `from docmancer import DocmancerClient`). User-owned state and configuration use `DOCATLAS_HOME`, `~/.docatlas/`, and `docatlas.yaml`.
 
 ## Project-docs MCP server
 
@@ -102,7 +100,7 @@ get_docs_context(question=..., project_path=...)
 
 This makes `get_docs_context` the single high-level entry point. Narrow typed questions with complete relation-specific proof receive `docs_answer`; broader questions receive cited retrieval-only `docs_context`; coding and patch tasks receive source-bound `patch_context`; missing safe evidence returns fail-closed `insufficient_evidence`. When completeness or the requested relation is uncertain, the server chooses `docs_context`, not `docs_answer`. Delivery strategy, debug shape, and packet budget are server-owned policy.
 
-MCP responses carry the complete payload in `structuredContent` and only a constant marker in text. OpenCode registration automatically sets `DOCATLAS_MCP_TEXT_FALLBACK=1` because current OpenCode releases do not preserve `structuredContent` in model-visible tool output; manually configured OpenCode entries need the same environment setting. Other clients retain the structured lane. Fallback switches to text-only JSON instead of sending the payload twice. Previously accepted advanced arguments remain available during the compatibility transition but are no longer advertised to normal coding agents.
+MCP response delivery, shape, diagnostics, and packet budgets are server-owned. OpenCode registration automatically sets `DOCATLAS_MCP_TEXT_FALLBACK=1` because current OpenCode releases do not preserve `structuredContent` in model-visible tool output; manually configured OpenCode entries need the same environment setting. Other clients receive the server-selected structured lane.
 
 An optional provider-neutral [one-call host-loop contract](./docs/one-call-agent-loop.md) locally enforces cumulative request, retained-history, repair, test, and output budgets after a model initiates DocAtlas retrieval. Existing generic clients remain supported but are not labelled verified unless their host proves every required control.
 
@@ -119,9 +117,9 @@ Forced/background library refreshes are staged before publication. When the fetc
 
 ### Reproducible documentation manifests
 
-Use `docmancer.docs.yaml` version 2 when automatic discovery is not precise enough or a large product site must be scoped deliberately. Automatic discovery remains a proposal mechanism; a confirmed manifest records structured package/product identity, version policy, source authority, version binding, network scope, coverage, page limits, and discovery strategy. `prepare_docs(action="inspect_docs_target", ...)` performs a bounded inspection without indexing and returns a reviewable v2 manifest proposal. After a successful `prefetch_docs_manifest`, DocAtlas writes `.docatlas/docs.lock.json` with the manifest digest and resolved target results. A changed manifest is reported as `manifest_outdated` until it is prefetched again.
+Use `docatlas.docs.yaml` version 2 when automatic discovery is not precise enough or a large product site must be scoped deliberately. Automatic discovery remains a proposal mechanism; a confirmed manifest records structured package/product identity, version policy, source authority, version binding, network scope, coverage, page limits, and discovery strategy. `prepare_docs(action="inspect_docs_target", ...)` performs a bounded inspection without indexing and returns a reviewable v2 manifest proposal. After a successful `prefetch_docs_manifest`, DocAtlas writes `.docatlas/docs.lock.json` with the manifest digest and resolved target results. A changed manifest is reported as `manifest_outdated` until it is prefetched again.
 
-The v2 validator rejects task-specific queries, false exact-version claims, remote sources without `allowed_domains`, unsupported formats/strategies, and page limits above 500. Keep the retrieval question in the runtime `get_docs_context`/prefetch call rather than persisting it in the manifest. See [`examples/docmancer.docs.universal.yaml`](./examples/docmancer.docs.universal.yaml) for bounded Docker Compose and exact Go module targets.
+The v2 validator rejects task-specific queries, false exact-version claims, remote sources without `allowed_domains`, unsupported formats/strategies, and page limits above 500. Keep the retrieval question in the runtime `get_docs_context`/prefetch call rather than persisting it in the manifest. See [`examples/docatlas.docs.universal.yaml`](./examples/docatlas.docs.universal.yaml) for bounded Docker Compose and exact Go module targets.
 
 Go projects are detected from `go.mod` and `go.work`. A `go.mod` requirement is treated as a minimum requirement, not as proof of the selected build version. Exact automatic `pkg.go.dev` binding requires a matching vendored `vendor/modules.txt`; local or remote `replace` directives remain unbound until the source is explicitly confirmed.
 
@@ -129,9 +127,9 @@ Python and Java follow the same evidence rule. Python versions become resolved e
 
 Documentation evidence is reported separately for package identity, source authority, and version binding with a deterministic `accept`, `confirm`, or `reject` decision. DocAtlas intentionally does not collapse these dimensions into a confidence percentage: an exact version cannot compensate for an unverified source authority.
 
-### Compact MCP responses
+### MCP responses
 
-All project-docs lifecycle tools return compact responses by default:
+Project-docs lifecycle responses are bounded by the server:
 
 ```json
 {
@@ -144,8 +142,6 @@ All project-docs lifecycle tools return compact responses by default:
 }
 ```
 
-Pass `"details": true` for the full structured response.
-
 ### When to use each tool
 
 | Situation | Tool |
@@ -154,7 +150,6 @@ Pass `"details": true` for the full structured response.
 | Check what docs are relevant | `get_docs_context` |
 | Check health, freshness, or a job | `docs_status` |
 | Reconcile after file changes | `prepare_docs(action="sync_project_docs")` |
-| Low-level inspection and patch tools | advanced compatibility surface only |
 | Answer "how does this repo work?" | `get_docs_context(mode="project")` |
 
 ### Change-aware documentation review
@@ -194,11 +189,11 @@ The contract is read-only. For an explicit health, freshness, index, or job-stat
 
 ## Advanced surfaces
 
-MCP Packs are an advanced layer (**support tier: advanced-supported**) of version-pinned API action tools, exposed by `doc-atlas mcp packs-serve`. They are separate from the Docs MCP and are not needed for the workflow above. `doc-atlas mcp serve` is retained only as a deprecated compatibility alias.
+MCP Packs are an advanced layer (**support tier: advanced-supported**) of version-pinned API action tools, exposed by `doc-atlas mcp packs-serve`. They are separate from the Docs MCP and are not needed for the workflow above.
 
-Patch planning and patch constraints are **advanced-supported compatibility** tools behind `DOCMANCER_MCP_ADVANCED_TOOLS=1`. They are advisory: they help an agent gather evidence and validate a proposed edit, but never prove that a change is safe to merge or replace tests and review. Detailed usage lives in [the Docs MCP reference](./docs/mcp-docs-server.md).
+Patch planning and patch constraints are **advanced-supported compatibility** tools behind `DOCATLAS_MCP_ADVANCED_TOOLS=1`. They are advisory: they help an agent gather evidence and validate a proposed edit, but never prove that a change is safe to merge or replace tests and review. Detailed usage lives in [the Docs MCP reference](./docs/mcp-docs-server.md).
 
-Qdrant administration, USPTO ingestion, and benchmark operations are **maintenance-only**. Other compatibility CLI commands are labelled directly in `doc-atlas --help`. See the [support-surface policy and machine inventory](./docs/support-surface-policy.md) for ownership, CI tier, network boundaries, compatibility deadlines, and failure budgets; use the [capability reference](./docs/capabilities.md) for command-specific guidance.
+Qdrant administration, USPTO ingestion, and benchmark operations are **maintenance-only**. See the [support-surface policy and machine inventory](./docs/support-surface-policy.md) for ownership, CI tier, network boundaries, current-only support, and failure budgets; use the [capability reference](./docs/capabilities.md) for command-specific guidance.
 
 ## Project-aware exact dependency docs
 

@@ -8,7 +8,7 @@ This wiki is the deep-dive reference for DocAtlas's local, version-aware documen
 |------|--------------|
 | **[Commands](./Commands.md)** | Core docs runtime commands, docs MCP commands, advanced pack commands, and options |
 | **[Patch-review bot artifacts](./Patch-Review-Bot-Artifacts.md)** | Advisory PR-bot JSON artifact discovery, schema, and safe-usage contract |
-| **[Configuration](./Configuration.md)** | `docmancer.yaml` reference, env vars, **API keys**, and a tuned hybrid example |
+| **[Configuration](./Configuration.md)** | `docatlas.yaml` reference, env vars, **API keys**, and a tuned hybrid example |
 | **[Architecture](./Architecture.md)** | Indexing pipeline, hybrid retrieval, registry/source identity, version-aware resolution, project docs pipeline, docs MCP tools, job tracking, manifests, packs runtime, concurrency |
 | **[Supported Sources](./Supported-Sources.md)** | File formats, URL providers, and the MCP pack source standards |
 | **[Install Targets](./Install-Targets.md)** | Where `doc-atlas install <agent>` drops skill files for each supported agent |
@@ -17,17 +17,17 @@ This wiki is the deep-dive reference for DocAtlas's local, version-aware documen
 
 ## What lives where
 
-- **`~/.docmancer/docmancer.yaml`**: global config (auto-created on first run).
-- **`~/.docmancer/docmancer.db`**: SQLite FTS5 index.
-- **`~/.docmancer/extracted/`**: inspectable Markdown + JSON copy of every indexed section.
-- **`~/.docmancer/qdrant/`**: managed Qdrant binary, storage, runtime metadata, logs.
-- **`~/.docmancer/models/`**: FastEmbed dense and sparse model cache.
-- **`~/.docmancer/embeddings-cache/`**: content-hash-keyed cache of embedded chunks.
-- **`./docmancer.yaml`**: project-local config when present (overrides the global one).
+- **`~/.docatlas/docatlas.yaml`**: global config (auto-created on first run).
+- **`~/.docatlas/docatlas.db`**: SQLite FTS5 index.
+- **`~/.docatlas/extracted/`**: inspectable Markdown + JSON copy of every indexed section.
+- **`~/.docatlas/qdrant/`**: managed Qdrant binary, storage, runtime metadata, logs.
+- **`~/.docatlas/models/`**: FastEmbed dense and sparse model cache.
+- **`~/.docatlas/embeddings-cache/`**: content-hash-keyed cache of embedded chunks.
+- **`./docatlas.yaml`**: project-local config when present (overrides the global one).
 
-`DOCMANCER_HOME` overrides the storage root and defaults to `~/.docmancer`;
-set `DOCMANCER_HOME=/some/path` to use another local root.
+`DOCATLAS_HOME` overrides the storage root and defaults to `~/.docatlas`;
+set `DOCATLAS_HOME=/some/path` to use another local root.
 
 ## Licensing
 
-docmancer is MIT-licensed and runs entirely on your machine. The default retrieval stack (FastEmbed embeddings, local Qdrant) needs no API keys. Cloud embedding providers are opt-in; see [Configuration > API keys](./Configuration.md#api-keys).
+DocAtlas is MIT-licensed and runs entirely on your machine. The default retrieval stack (FastEmbed embeddings, local Qdrant) needs no API keys. Cloud embedding providers are opt-in; see [Configuration > API keys](./Configuration.md#api-keys).

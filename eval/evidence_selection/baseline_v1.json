@@ -1,9 +1,8 @@
 {
-  "schema_version": "task42-evidence-baseline-v1",
+  "schema_version": "task42-evidence-baseline-v2",
   "status": "PASS",
-  "selector": "legacy-top-k-fit-v1",
+  "selector": "current-generation-evidence-selection",
   "commit_sha": "9afb20d7aca6c0411b14739781dacceb292cb78f",
-  "candidate_limit": 20,
   "token_ceilings": {
     "docs_answer": 800,
     "patch_context_target": 1500,
@@ -17,16 +16,10 @@
   },
   "task41_candidate_trace_hash": "37cfcf3acd07eb4aafb06124f34ba2c07deb09e6eabcb142223fc5915342f105",
   "retrieval_config_hash": "7614071e250bef9b0d9d3170f05b9682c8a41723f742ddb8e3f69a5c9b4362c6",
-  "metrics": {
-    "docs_answer": {
-      "cases": 8,
-      "median_legacy_budgeted_tokens": 129.0
-    },
-    "patch_context": {
-      "cases": 5,
-      "median_legacy_budgeted_tokens": 487
-    }
+  "case_counts": {
+    "docs_answer": 8,
+    "patch_context": 5
   },
   "blockers": [],
-  "note": "The frozen provider-free Task 41 candidate trace is green; Task 42 must preserve correctness and not exceed the legacy median budgeted token cost."
+  "note": "The provider-free current-generation Task 41 candidate trace is green; Task 42 must preserve per-case correctness and projection token ceilings."
 }

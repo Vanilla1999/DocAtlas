@@ -131,8 +131,8 @@ def validate_curated_sources(sources: tuple[CuratedSource, ...] | list[CuratedSo
 @lru_cache(maxsize=1)
 def curated_sources() -> tuple[CuratedSource, ...]:
     data = json.loads(_MANIFEST_PATH.read_text(encoding="utf-8"))
-    if data.get("schema_version") != 1:
-        raise ValueError("curated source manifest schema_version must be 1")
+    if data.get("schema_version") != 2:
+        raise ValueError("curated source manifest schema_version must be 2")
     entries: list[CuratedSource] = []
     for raw in data.get("sources") or []:
         library = str(raw.get("library") or "<unknown>").casefold()
@@ -191,11 +191,7 @@ def curated_target_spec(source: CuratedSource, *, version: str | None) -> dict[s
         [seed.format(library=source.library, version=version or "latest") for seed in source.preferred_seeds]
         if source.verified_seeds else []
     )
-    source_manifest = deepcopy(source.source_manifest) if source.source_manifest is not None else {
-        "schema_version": 1,
-        "version_rule": source.version_rule,
-        "official": True,
-    }
+    source_manifest = deepcopy(source.source_manifest) if source.source_manifest is not None else {}
     return {
         "library": source.library,
         "ecosystem": source.ecosystem,

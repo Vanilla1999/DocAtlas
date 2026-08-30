@@ -177,7 +177,7 @@ def test_prepare_docatlas_reports_current_local_index_without_provider_tokens(
         _task("fastapi_depends_001"),
         workspace,
         output_dir,
-        {"DOCMANCER_HOME": str(tmp_path / "docmancer-home")},
+        {"DOCATLAS_HOME": str(tmp_path / "docmancer-home")},
     )
 
     assert result["index_state"] == "already_current"
@@ -249,7 +249,7 @@ def test_task33_host_evidence_augments_project_docs_with_deterministic_local_evi
         task,
         workspace,
         output_dir,
-        {"DOCMANCER_HOME": str(tmp_path / "docmancer-home")},
+        {"DOCATLAS_HOME": str(tmp_path / "docmancer-home")},
         project_revision="fixture-revision",
         index_revision="index-revision",
     )
@@ -358,7 +358,7 @@ def test_task33_deadline_remains_active_during_local_augmentation(
         task,
         workspace,
         output_dir,
-        {"DOCMANCER_HOME": str(tmp_path / "docmancer-home")},
+        {"DOCATLAS_HOME": str(tmp_path / "docmancer-home")},
         project_revision="fixture-revision",
         index_revision="index-revision",
     )
@@ -413,7 +413,7 @@ def test_task33_local_hostile_doc_remains_untrusted_document_data(
         task,
         workspace,
         output_dir,
-        {"DOCMANCER_HOME": str(tmp_path / "docmancer-home")},
+        {"DOCATLAS_HOME": str(tmp_path / "docmancer-home")},
         project_revision="fixture-revision",
         index_revision="index-revision",
     )

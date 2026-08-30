@@ -85,7 +85,7 @@ class KotlinPartialFixtureFetcher:
 
 
 def test_kotlin_good_broken_cross_domain_and_github_fixture_is_queryable_partial(tmp_path, monkeypatch):
-    monkeypatch.setenv("DOCMANCER_HOME", str(tmp_path / "home"))
+    monkeypatch.setenv("DOCATLAS_HOME", str(tmp_path / "home"))
     config = DocmancerConfig()
     config.index.db_path = str(tmp_path / "registry.db")
     config.index.extracted_dir = str(tmp_path / "extracted")
@@ -137,7 +137,7 @@ def test_kotlin_good_broken_cross_domain_and_github_fixture_is_queryable_partial
 
 
 def test_kotlin_partial_fixture_surfaces_failed_page_summary_in_job_status(tmp_path, monkeypatch):
-    monkeypatch.setenv("DOCMANCER_HOME", str(tmp_path / "home"))
+    monkeypatch.setenv("DOCATLAS_HOME", str(tmp_path / "home"))
     config = DocmancerConfig()
     config.index.db_path = str(tmp_path / "registry.db")
     config.index.extracted_dir = str(tmp_path / "extracted")

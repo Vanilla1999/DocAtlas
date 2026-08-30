@@ -47,7 +47,7 @@ class HttpExecutor(Executor):
 
         url = base_url.rstrip("/") + _render_path(path_template, path_args)
         try:
-            grant_mapping = operation.get("_docmancer_http_grant")
+            grant_mapping = operation.get("_docatlas_http_grant")
             if grant_mapping is None:
                 parsed_for_compat = urlparse(url)
                 grant_mapping = {
@@ -57,7 +57,7 @@ class HttpExecutor(Executor):
             grant = grant_from_mapping(grant_mapping)
             validated_target = validate_http_target(url, grant)
             validate_resolution_stability(
-                operation.get("_docmancer_http_resolved_ips") or (),
+                operation.get("_docatlas_http_resolved_ips") or (),
                 validated_target,
             )
         except SecurityError as exc:
@@ -185,7 +185,7 @@ def _partition_args(
     body_args: dict[str, Any] = {}
     by_name = {p.get("name"): p for p in params}
     for name, value in args.items():
-        if name.startswith("_docmancer"):
+        if name.startswith("_docatlas"):
             continue
         meta = by_name.get(name)
         location = (meta.get("in") if meta else "body") or "body"

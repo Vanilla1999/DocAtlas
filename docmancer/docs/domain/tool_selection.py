@@ -10,7 +10,6 @@ _PREPARE_ACTION_BY_TOOL = {
     "sync_project_docs": "sync_project_docs",
     "ingest_project_docs": "sync_project_docs",
     "bootstrap_project_docs": "sync_project_docs",
-    "prefetch_project_docs": "prefetch_project_dependency_docs",
     "prefetch_project_dependency_docs": "prefetch_project_dependency_docs",
     "prefetch_library_docs": "prefetch_library_docs",
     "prefetch_docs_targets": "prefetch_docs_targets",
@@ -176,8 +175,6 @@ def normalize_public_docs_action(action: Any) -> dict[str, Any] | None:
     if status_action:
         arguments = dict(normalized.get("arguments_patch") or {})
         arguments["action"] = status_action
-        if tool == "inspect_project_docs":
-            arguments.setdefault("details", True)
         normalized.update({
             "type": "docs_status",
             "tool": "docs_status",

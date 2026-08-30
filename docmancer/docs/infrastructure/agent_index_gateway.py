@@ -55,10 +55,7 @@ class AgentIndexGateway:
             root = self._library_index_root
         else:
             home_resolution = resolve_home()
-            owned_home = ensure_owned_home(
-                home_resolution.path,
-                allow_legacy_claim=home_resolution.compatibility_legacy,
-            )
+            owned_home = ensure_owned_home(home_resolution.path)
             root = owned_home / "docs-indexes"
         root.mkdir(parents=True, exist_ok=True)
         safe = normalize_library_name(record.library_id) or "library"

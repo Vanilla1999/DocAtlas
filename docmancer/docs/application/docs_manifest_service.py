@@ -106,8 +106,8 @@ class DocsManifestService:
         if not isinstance(data, dict):
             return DocsManifestValidationResult(False, str(path), errors=["manifest must be a mapping"])
         manifest_version = data.get("version")
-        if manifest_version not in {1, 2}:
-            errors.append("manifest version must be 1 or 2")
+        if manifest_version != 2:
+            errors.append("manifest version must be 2")
         defaults = data.get("defaults") or {}
         raw_targets = data.get("targets") or []
         if not isinstance(raw_targets, list):

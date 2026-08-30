@@ -22,7 +22,7 @@ RAW_TOOL_COUNT_THRESHOLD = 100
 def run() -> list[CheckResult]:
     results: list[CheckResult] = []
 
-    cli_path = shutil.which("doc-atlas") or shutil.which("docmancer")
+    cli_path = shutil.which("doc-atlas")
     results.append(CheckResult(
         "doc-atlas on PATH",
         bool(cli_path),

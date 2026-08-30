@@ -210,7 +210,7 @@ def normalize_question_surface(question: str) -> SurfaceNormalization | None:
     if re.fullmatch(r"как\s+(?:обновить|синхронизировать)\s+(?:документацию\s+проекта|проектную\s+документацию)(?:\s+после\s+изменения\s+файла)?", q, re.I):
         return _result("How do I sync project docs after editing a file?", "action:sync_ru")
     if re.fullmatch(r"how\s+do\s+i\s+configure\s+project\s+docs?\s+in\s+docmancer\.yaml", q, re.I):
-        return _result("How do I configure a project in docmancer.yaml?", "workflow:project_docs_config")
+        return _result("How do I configure a project in docatlas.yaml?", "workflow:project_docs_config")
 
     # Compound inventory/action surfaces are normalized as a whole so clause
     # splitting cannot lose the second requested facet.

@@ -1,7 +1,7 @@
 # Cleaning DocAtlas index state safely
 
 `doc-atlas clear-index` removes derived index state while preserving project
-sources, `docmancer.yaml`, configuration, and unrelated files; it never
+sources, `docatlas.yaml`, configuration, and unrelated files; it never
 silently widens the cleanup scope. The command is preview-only
 unless `--apply` is supplied.
 
@@ -12,12 +12,12 @@ moved targets can be restored if the move phase fails. In `clear-index`,
 state will remain; it never bypasses live-process blockers or authorizes remote
 deletion. `clear-index` deletes only derived SQLite, extracted-document, cache,
 and verified local vector state. `clear-index` preserves project sources,
-`docmancer.yaml`, configuration, and unrelated files.
+`docatlas.yaml`, configuration, and unrelated files.
 
 ## Clear one project-local index
 
-A project-local cleanup requires a project whose `docmancer.yaml` resolves to
-that project's `.docmancer` directory:
+A project-local cleanup requires a project whose `docatlas.yaml` resolves to
+that project's `.docatlas` directory:
 
 ```bash
 doc-atlas clear-index \
@@ -50,15 +50,15 @@ The project-local plan may include:
 - a local managed-Qdrant directory only when its ownership marker identifies it
   as DocAtlas-managed state.
 
-Project sources and `docmancer.yaml` are not cleanup targets. A later
+Project sources and `docatlas.yaml` are not cleanup targets. A later
 `prepare_docs(action="sync_project_docs")` can rebuild the index from the
 reviewable repository files.
 
 `project-local` is intentionally limited to a dedicated project-local
-`.docmancer` root. It refuses projects that resolve to the shared/global index;
+`.docatlas` root. It refuses projects that resolve to the shared/global index;
 DocAtlas does not delete one project's rows from a shared database by guessing
 ownership. Use `--scope global` to reset that shared local index, or give each
-project an explicit project-local `docmancer.yaml` when independent cleanup is
+project an explicit project-local `docatlas.yaml` when independent cleanup is
 required.
 
 ## Clear all local indexes while preserving configuration

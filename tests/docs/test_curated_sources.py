@@ -59,8 +59,7 @@ def test_curated_target_has_explicit_allowlist_and_never_invents_version_binding
 
     assert target["docs_url"] == "https://fastapi.tiangolo.com/"
     assert target["allowed_domains"] == ["fastapi.tiangolo.com"]
-    assert target["source_manifest"]["official"] is True
-    assert target["source_manifest"]["version_rule"] == "unversioned"
+    assert target["source_manifest"] == {}
     assert canonical_source_identity("https://fastapi.tiangolo.com/") == canonical_source_identity("https://FASTAPI.tiangolo.com")
 
 
@@ -141,7 +140,7 @@ def test_exact_curated_source_renders_the_requested_version(
             return 0
 
     agent = FakeAgent()
-    monkeypatch.setenv("DOCMANCER_HOME", str(tmp_path / "home"))
+    monkeypatch.setenv("DOCATLAS_HOME", str(tmp_path / "home"))
     config = DocmancerConfig()
     config.index.db_path = str(tmp_path / "docs.db")
     config.index.extracted_dir = str(tmp_path / "extracted")
@@ -201,11 +200,7 @@ def test_full_curated_manifest_passes_offline_target_validation() -> None:
             ]
             assert target_spec["path_prefixes"] == ["/3.13/_sources/library/"]
             assert target_spec["doc_format"] == "direct-text"
-            assert target_spec["source_manifest"] == {
-                "schema_version": 1,
-                "version_rule": "exact",
-                "official": True,
-            }
+            assert target_spec["source_manifest"] == {}
 
     _assert_locked_targets_cross_the_real_fetch_boundary()
 

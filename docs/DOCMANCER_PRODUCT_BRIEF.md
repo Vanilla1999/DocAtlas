@@ -82,9 +82,9 @@ The package distributed on PyPI is `doc-atlas`. The `main` branch can contain wo
 
 At the 2026-08 roadmap reset, repository version `1.2.0` is treated as an **unpublished repository milestone**, not as the next public artifact to publish from current `main`. The next intended public release is `1.3.0` after the P0 public-truth work is complete. See [release identity](./release-identity.md).
 
-## Advanced and compatibility surfaces
+## Advanced surfaces
 
-MCP Packs, patch constraints, patch planning, Qdrant administration, USPTO ingestion, and legacy direct documentation APIs are advanced compatibility surfaces. They are not part of the beginner Docs MCP workflow.
+MCP Packs, patch constraints, patch planning, Qdrant administration, and USPTO ingestion are advanced or maintenance surfaces. They are not part of the beginner Docs MCP workflow.
 
 Patch constraints are advisory/non-blocking evidence helpers. They do not prove that a patch is safe to merge and never replace tests or human review.
 
@@ -106,6 +106,6 @@ Keep active user/model documentation small and non-duplicated:
 - `docs/mcp-docs-server.md`: canonical detailed Docs MCP workflow;
 - this brief: product scope and claims;
 - `roadmap/README.md`: active validation sequence and decision gates;
-- `wiki/`: navigation and compatibility reference.
+- `wiki/`: navigation and operational reference.
 
 The canonical user-facing release set — `README.md`, this brief, the Docs MCP reference, the capability reference, and the release checklist — must not exceed 1,000 lines without a recorded exception. Add links to the canonical guide instead of copying tool tables or workflows.

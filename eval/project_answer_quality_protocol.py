@@ -150,15 +150,15 @@ def validate_protocol_lock(path: Path = LOCK_PATH) -> dict[str, Any]:
 
 @contextmanager
 def _isolated_home(path: Path) -> Iterator[None]:
-    previous = os.environ.get("DOCMANCER_HOME")
-    os.environ["DOCMANCER_HOME"] = str(path)
+    previous = os.environ.get("DOCATLAS_HOME")
+    os.environ["DOCATLAS_HOME"] = str(path)
     try:
         yield
     finally:
         if previous is None:
-            os.environ.pop("DOCMANCER_HOME", None)
+            os.environ.pop("DOCATLAS_HOME", None)
         else:
-            os.environ["DOCMANCER_HOME"] = previous
+            os.environ["DOCATLAS_HOME"] = previous
 
 
 @contextmanager

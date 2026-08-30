@@ -141,7 +141,7 @@ class PythonImportExecutor(Executor):
         auth_cookies: dict[str, str] | None = None,
     ) -> ExecutorResult:
         meta = operation.get("python_import") or {}
-        grant = operation.get("_docmancer_operation_grant") or {}
+        grant = operation.get("_docatlas_operation_grant") or {}
         validation_error = validate_python_import(meta, grant)
         if validation_error:
             return ExecutorResult(False, validation_error, None, error=validation_error)
@@ -150,7 +150,7 @@ class PythonImportExecutor(Executor):
             "module": meta["module"],
             "callable": meta["callable"],
             "via_kwargs": meta.get("via_kwargs", True),
-            "args": {k: v for k, v in args.items() if not k.startswith("_docmancer")},
+            "args": {k: v for k, v in args.items() if not k.startswith("_docatlas")},
         })
         env = minimal_env(grant)
         try:

@@ -40,11 +40,11 @@ def test_register_preserves_other_servers(tmp_path):
 
     changed, _ = agent_config.register_server(target)
 
-    assert changed is True
+    assert changed is False
     payload = json.loads(cfg.read_text())
     assert payload["mcpServers"]["other"] == {"command": "x"}
     assert payload["mcpServers"]["docatlas"] == desired
-    assert "docmancer" not in payload["mcpServers"]
+    assert payload["mcpServers"]["docmancer"] == desired
 
 
 def test_register_preserves_existing_env(tmp_path):
@@ -52,7 +52,7 @@ def test_register_preserves_existing_env(tmp_path):
     legacy = {
         "command": "docmancer",
         "args": ["mcp", "serve"],
-        "env": {"DOCMANCER_HOME": "/custom/home"},
+        "env": {"DOCATLAS_HOME": "/custom/home"},
     }
     cfg.write_text(json.dumps({"mcpServers": {"docmancer": legacy}}))
     target = agent_config.AgentTarget("test", cfg, "json_mcpServers")
@@ -163,11 +163,14 @@ def test_register_writes_codex_toml_entry(tmp_path):
 
     assert changed is True
     payload = tomllib.loads(cfg.read_text())
-    assert "docmancer" not in payload["mcp_servers"]
-    assert payload["mcp_servers"]["docatlas"] == {
+    assert payload["mcp_servers"]["docmancer"] == {
         "command": "doc-atlas",
         "args": ["mcp", "docs-serve"],
         "env": {"TOKEN": "secret"},
+    }
+    assert payload["mcp_servers"]["docatlas"] == {
+        "command": "doc-atlas",
+        "args": ["mcp", "docs-serve"],
     }
 
 
@@ -208,7 +211,7 @@ def test_register_reenables_disabled_opencode_entry(tmp_path):
 
     assert changed is True
     payload = json.loads(cfg.read_text())["mcp"]
-    assert "docmancer" not in payload
+    assert payload["docmancer"]["enabled"] is False
     assert payload["docatlas"]["enabled"] is True
 
 
@@ -222,7 +225,7 @@ def test_register_migrates_opencode_environment_without_clobbering_user_settings
                 "enabled": False,
                 "environment": {
                     "DOCATLAS_MCP_TEXT_FALLBACK": "0",
-                    "DOCMANCER_TASK_LEVEL_ALLOW_NETWORK": "1",
+                    "DOCATLAS_TASK_LEVEL_ALLOW_NETWORK": "1",
                 },
                 "timeout": 30,
             }
@@ -234,13 +237,11 @@ def test_register_migrates_opencode_environment_without_clobbering_user_settings
 
     assert changed is True
     payload = json.loads(cfg.read_text())["mcp"]
-    assert "docmancer" not in payload
+    assert payload["docmancer"]["timeout"] == 30
     entry = payload["docatlas"]
     assert entry["enabled"] is True
-    assert entry["timeout"] == 30
     assert entry["environment"] == {
         "DOCATLAS_MCP_TEXT_FALLBACK": "1",
-        "DOCMANCER_TASK_LEVEL_ALLOW_NETWORK": "1",
     }
     assert agent_config.register_server(target)[0] is False
 

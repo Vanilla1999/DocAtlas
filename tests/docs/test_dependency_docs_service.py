@@ -3,20 +3,20 @@ from __future__ import annotations
 from docmancer.docs.application.dependency_docs_service import DependencyDocsService
 
 
-class FakeDependencyFacade:
+class FakeProjectPrefetch:
     def __init__(self):
         self.calls = []
 
-    def _dependency_prefetch_project_docs_impl(self, project_path, **kwargs):
+    def prefetch_project_dependency_docs(self, project_path, **kwargs):
         self.calls.append((project_path, kwargs))
         return "prefetched"
 
 
-def test_dependency_docs_service_delegates_prefetch_project_docs_options():
-    facade = FakeDependencyFacade()
-    service = DependencyDocsService(facade)
+def test_dependency_docs_service_delegates_prefetch_project_dependency_docs_options():
+    service = DependencyDocsService(object())
+    service.project_prefetch = FakeProjectPrefetch()
 
-    result = service.prefetch_project_docs(
+    result = service.prefetch_project_dependency_docs(
         "/repo",
         include_flutter=False,
         include_dart=True,
@@ -29,7 +29,7 @@ def test_dependency_docs_service_delegates_prefetch_project_docs_options():
     )
 
     assert result == "prefetched"
-    assert facade.calls == [("/repo", {
+    assert service.project_prefetch.calls == [("/repo", {
         "include_flutter": False,
         "include_dart": True,
         "include_rust": False,
@@ -41,12 +41,12 @@ def test_dependency_docs_service_delegates_prefetch_project_docs_options():
     })]
 
 
-def test_dependency_docs_service_alias_is_equivalent():
-    facade = FakeDependencyFacade()
-    service = DependencyDocsService(facade)
+def test_dependency_docs_service_uses_dependency_prefetch_defaults():
+    service = DependencyDocsService(object())
+    service.project_prefetch = FakeProjectPrefetch()
 
     assert service.prefetch_project_dependency_docs("/repo", include_packages=["serde"]) == "prefetched"
-    assert facade.calls == [("/repo", {
+    assert service.project_prefetch.calls == [("/repo", {
         "include_flutter": True,
         "include_dart": False,
         "include_rust": True,

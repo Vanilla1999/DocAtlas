@@ -39,7 +39,9 @@ class _SQLiteStorePart01:
                     markdown_path TEXT NOT NULL DEFAULT '',
                     json_path TEXT NOT NULL DEFAULT '',
                     raw_tokens INTEGER NOT NULL DEFAULT 0,
-                    ingested_at TEXT NOT NULL
+                    ingested_at TEXT NOT NULL,
+                    content_hash TEXT,
+                    index_schema_version TEXT
                 );
 
                 CREATE TABLE IF NOT EXISTS sections (
@@ -56,6 +58,19 @@ class _SQLiteStorePart01:
                     format TEXT,
                     anchor TEXT,
                     content_hash TEXT,
+                    stable_chunk_id TEXT,
+                    parent_logical_id TEXT,
+                    retrieval_text TEXT,
+                    retrieval_content_hash TEXT,
+                    char_start INTEGER,
+                    char_end INTEGER,
+                    byte_start INTEGER,
+                    byte_end INTEGER,
+                    line_start INTEGER,
+                    line_end INTEGER,
+                    chunk_schema_version TEXT,
+                    chunk_config_hash TEXT,
+                    token_estimator_version TEXT,
                     metadata_json TEXT NOT NULL DEFAULT '{}'
                 );
 
@@ -220,82 +235,6 @@ class _SQLiteStorePart01:
 
                 """
             )
-            self._ensure_nullable_column(conn, "sections", "source_path", "TEXT")
-            self._ensure_nullable_column(conn, "sections", "document_title", "TEXT")
-            self._ensure_nullable_column(conn, "sections", "format", "TEXT")
-            self._ensure_nullable_column(conn, "sections", "anchor", "TEXT")
-            self._ensure_nullable_column(conn, "sections", "content_hash", "TEXT")
-            self._ensure_nullable_column(conn, "sections", "stable_chunk_id", "TEXT")
-            self._ensure_nullable_column(conn, "sections", "parent_logical_id", "TEXT")
-            self._ensure_nullable_column(conn, "sections", "retrieval_text", "TEXT")
-            self._ensure_nullable_column(conn, "sections", "retrieval_content_hash", "TEXT")
-            self._ensure_nullable_column(conn, "sections", "char_start", "INTEGER")
-            self._ensure_nullable_column(conn, "sections", "char_end", "INTEGER")
-            self._ensure_nullable_column(conn, "sections", "byte_start", "INTEGER")
-            self._ensure_nullable_column(conn, "sections", "byte_end", "INTEGER")
-            self._ensure_nullable_column(conn, "sections", "line_start", "INTEGER")
-            self._ensure_nullable_column(conn, "sections", "line_end", "INTEGER")
-            self._ensure_nullable_column(conn, "sections", "chunk_schema_version", "TEXT")
-            self._ensure_nullable_column(conn, "sections", "chunk_config_hash", "TEXT")
-            self._ensure_nullable_column(conn, "sections", "token_estimator_version", "TEXT")
-            self._ensure_nullable_column(conn, "sources", "content_hash", "TEXT")
-            self._ensure_nullable_column(conn, "sources", "index_schema_version", "TEXT")
-            self._ensure_nullable_column(conn, "index_generations", "config_json", "TEXT NOT NULL DEFAULT '{}'")
-            self._ensure_nullable_column(conn, "index_generations", "context_schema_version", "TEXT NOT NULL DEFAULT ''")
-            self._ensure_nullable_column(conn, "index_generations", "context_config_hash", "TEXT NOT NULL DEFAULT ''")
-            self._ensure_nullable_column(conn, "index_generations", "retrieval_config_hash", "TEXT NOT NULL DEFAULT ''")
-            self._ensure_nullable_column(conn, "index_generations", "vector_backend", "TEXT NOT NULL DEFAULT ''")
-            self._ensure_nullable_column(conn, "index_generations", "vector_backend_identity", "TEXT NOT NULL DEFAULT ''")
-            for column, declaration in (
-                ("vector_parity_schema", "TEXT NOT NULL DEFAULT ''"),
-                ("vector_parity_digest", "TEXT NOT NULL DEFAULT ''"),
-                ("vector_parity_verified_at", "TEXT"),
-                ("vector_parity_count", "INTEGER"),
-                ("vector_parity_backend_identity", "TEXT NOT NULL DEFAULT ''"),
-                ("vector_parity_collection", "TEXT NOT NULL DEFAULT ''"),
-            ):
-                self._ensure_nullable_column(conn, "index_generations", column, declaration)
-            self._ensure_nullable_column(conn, "retrieval_children", "hydration_id", "INTEGER")
-            for column, declaration in (
-                ("context_prefix", "TEXT NOT NULL DEFAULT ''"),
-                ("context_manifest_json", "TEXT NOT NULL DEFAULT '{}'"),
-                ("context_schema_version", "TEXT NOT NULL DEFAULT ''"),
-                ("context_config_hash", "TEXT NOT NULL DEFAULT ''"),
-                ("context_content_hash", "TEXT NOT NULL DEFAULT ''"),
-                ("embedding_input_hash", "TEXT NOT NULL DEFAULT ''"),
-                ("library_id", "TEXT"),
-                ("resolved_version", "TEXT"),
-                ("version_family", "TEXT"),
-                ("project_identity", "TEXT"),
-                ("project_path", "TEXT"),
-                ("module_id", "TEXT"),
-                ("doc_scope", "TEXT"),
-                ("source_class", "TEXT"),
-                ("authority", "TEXT"),
-                ("lifecycle_status", "TEXT"),
-                ("temporal_relevance", "TEXT"),
-                ("index_freshness", "TEXT"),
-                ("docs_snapshot_exact", "INTEGER"),
-            ):
-                self._ensure_nullable_column(conn, "retrieval_children", column, declaration)
-            conn.execute(
-                "UPDATE retrieval_children SET hydration_id = id WHERE hydration_id IS NULL"
-            )
-            # One-time additive backfill for databases created by early v2
-            # builds. New generations always write immutable snapshots before
-            # any child row is validated.
-            conn.execute(
-                """
-                INSERT OR IGNORE INTO generation_sources
-                    (generation_id, source, source_identity, content,
-                     content_hash, metadata_json, raw_tokens)
-                SELECT DISTINCT c.generation_id, c.source, c.source_identity,
-                       s.content, COALESCE(s.content_hash, ''),
-                       s.metadata_json, s.raw_tokens
-                FROM retrieval_children c
-                JOIN sources s ON s.id = c.source_id
-                """
-            )
             conn.executescript(
                 """
                 CREATE UNIQUE INDEX IF NOT EXISTS idx_sections_stable_chunk_id
@@ -333,6 +272,7 @@ class _SQLiteStorePart01:
                     embedding_hash TEXT,
                     upserted_at TEXT NOT NULL,
                     status TEXT NOT NULL DEFAULT 'ok',
+                    stable_chunk_id TEXT,
                     PRIMARY KEY (chunk_id, qdrant_collection)
                 );
                 CREATE INDEX IF NOT EXISTS idx_embedding_upserts_collection
@@ -352,13 +292,6 @@ class _SQLiteStorePart01:
                     ON generation_vector_upserts(qdrant_collection, vector_id);
                 """
             )
-            self._ensure_nullable_column(conn, "embedding_upserts", "stable_chunk_id", "TEXT")
-
-    @staticmethod
-    def _ensure_nullable_column(conn: sqlite3.Connection, table: str, column: str, declaration: str) -> None:
-        existing = {row["name"] for row in conn.execute(f"PRAGMA table_info({table})")}
-        if column not in existing:
-            conn.execute(f"ALTER TABLE {table} ADD COLUMN {column} {declaration}")
 
     def add_documents(
         self,
@@ -367,7 +300,19 @@ class _SQLiteStorePart01:
         *,
         activate_generation: bool = True,
     ) -> IndexResult:
-        docs = list(documents)
+        normalized = [self._current_schema_document(doc) for doc in documents]
+        docs_by_source: dict[str, Document] = {}
+        for doc in normalized:
+            existing = docs_by_source.get(doc.source)
+            if existing is None:
+                docs_by_source[doc.source] = doc
+                continue
+            docs_by_source[doc.source] = Document(
+                source=doc.source,
+                content=f"{existing.content.rstrip()}\n\n{doc.content.lstrip()}",
+                metadata={**existing.metadata, **doc.metadata},
+            )
+        docs = list(docs_by_source.values())
         staged: list[_StagedExtraction] = []
         try:
             for doc in docs:
@@ -387,15 +332,10 @@ class _SQLiteStorePart01:
             for doc in docs:
                 section_count += self._add_document(conn, doc)
             generation_id = None
-            v2_docs = [
-                doc for doc in docs
-                if str((doc.metadata or {}).get("chunking_schema") or "")
-                    == PARENT_CHILD_SCHEMA_VERSION
-            ]
-            if v2_docs:
+            if docs:
                 generation_id = self._build_candidate_generation(
                     conn,
-                    v2_docs,
+                    docs,
                     recreate=recreate,
                 )
                 if activate_generation:
@@ -417,6 +357,20 @@ class _SQLiteStorePart01:
         self._publish_staged_extractions(staged)
         return result
 
+    @staticmethod
+    def _current_schema_document(doc: Document) -> Document:
+        metadata = dict(doc.metadata or {})
+        schema = str(metadata.get("chunking_schema") or PARENT_CHILD_SCHEMA_VERSION)
+        if schema != PARENT_CHILD_SCHEMA_VERSION:
+            raise ValueError(
+                f"unsupported chunking schema {schema!r}; "
+                f"expected {PARENT_CHILD_SCHEMA_VERSION!r}"
+            )
+        metadata["chunking_schema"] = PARENT_CHILD_SCHEMA_VERSION
+        metadata.setdefault("child_target_tokens", 160)
+        metadata.setdefault("child_hard_max_tokens", 512)
+        return Document(source=doc.source, content=doc.content, metadata=metadata)
+
     def add_documents_stream(
         self,
         documents: Iterable[Document],
@@ -432,39 +386,39 @@ class _SQLiteStorePart01:
         and ``list(documents)`` would OOM. Commits every ``batch_size`` rows
         so a killed process loses at most one batch.
         """
+        if batch_size < 1:
+            raise ValueError("batch_size must be positive")
         section_count = 0
         source_count = 0
-        conn = self._connect()
-        pending_extractions: list[_StagedExtraction] = []
-        try:
-            if recreate:
-                conn.execute("DELETE FROM sections_fts")
-                conn.execute("DELETE FROM sections")
-                conn.execute("DELETE FROM parent_sections")
-                conn.execute("DELETE FROM sources")
-                self._deactivate_active_generation(conn)
-            for doc in documents:
-                pending_extractions.append(self._stage_extraction(doc))
-                section_count += self._add_document(conn, doc)
-                source_count += 1
-                if source_count % batch_size == 0:
-                    conn.commit()
-                    self._publish_staged_extractions(pending_extractions)
-                    pending_extractions = []
-                    if progress_callback is not None:
-                        progress_callback(source_count, section_count)
-            conn.commit()
-            self._publish_staged_extractions(pending_extractions)
-            pending_extractions = []
-        except Exception:
-            conn.rollback()
-            self._discard_staged_extractions(pending_extractions)
-            raise
-        finally:
-            conn.close()
+        generation_id = None
+        batch: list[Document] = []
+        first_batch = True
+        for doc in documents:
+            batch.append(doc)
+            if len(batch) < batch_size:
+                continue
+            result = self.add_documents(batch, recreate=recreate and first_batch)
+            first_batch = False
+            source_count += result.sources
+            section_count += result.sections
+            generation_id = result.generation_id
+            batch = []
+            if progress_callback is not None:
+                progress_callback(source_count, section_count)
+        if batch:
+            result = self.add_documents(batch, recreate=recreate and first_batch)
+            source_count += result.sources
+            section_count += result.sections
+            generation_id = result.generation_id
+        elif first_batch and recreate:
+            self.delete_all()
         if progress_callback is not None:
             progress_callback(source_count, section_count)
-        return IndexResult(sources=source_count, sections=section_count)
+        return IndexResult(
+            sources=source_count,
+            sections=section_count,
+            generation_id=generation_id,
+        )
 
     def _stage_extraction(self, doc: Document) -> _StagedExtraction:
         metadata = dict(doc.metadata or {})

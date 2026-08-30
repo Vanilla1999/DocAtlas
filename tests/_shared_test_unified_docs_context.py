@@ -30,7 +30,7 @@ class FakeFacade:
             status="success",
             mode="auto",
             context_pack=[{"doc_scope": "project", "source_class": "project_doc", "path": "README.md", "title": "README", "content": "project", "why_selected": "project docs"}],
-            trust_contract={"selected": [], "rejected": [], "risky": []},
+            trust_contract={"sources": {"selected": [], "rejected": [], "risky": []}},
         )
         self.library_result = DocsResult(
             library_id="python:fastapi@latest:web",

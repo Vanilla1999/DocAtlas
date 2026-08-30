@@ -144,15 +144,15 @@ def test_remove_library_docs_deletes_physical_index_files(tmp_path, monkeypatch)
 
 
 def test_remove_library_docs_preserves_other_project_library_index(tmp_path, monkeypatch):
-    monkeypatch.setenv("DOCMANCER_HOME", str(tmp_path / "home"))
+    monkeypatch.setenv("DOCATLAS_HOME", str(tmp_path / "home"))
     now = datetime.now(timezone.utc).isoformat(timespec="seconds")
     services: list[LibraryDocsService] = []
     records = []
     for name in ("project-a", "project-b"):
         project = tmp_path / name
         project.mkdir()
-        (project / "docmancer.yaml").write_text(
-            "index:\n  db_path: .docmancer/project.db\n",
+        (project / "docatlas.yaml").write_text(
+            "index:\n  db_path: .docatlas/project.db\n",
             encoding="utf-8",
         )
         topology = StorageTopologyResolver().resolve(project)
@@ -184,37 +184,33 @@ def test_remove_library_docs_preserves_other_project_library_index(tmp_path, mon
     assert other_index.read_text(encoding="utf-8") == "project-b"
 
 
-def test_legacy_record_migrates_to_new_canonical_id(tmp_path, monkeypatch):
+def test_resolve_library_reuses_current_canonical_record(tmp_path, monkeypatch):
     service = _service(tmp_path, monkeypatch)
     now = datetime.now(timezone.utc).isoformat(timespec="seconds")
     service.registry.upsert(
         library="go_router",
-        ecosystem=None,
+        ecosystem="dart",
         version="14.8.1",
         source_type="api",
         docs_url="https://pub.dev/documentation/go_router/14.8.1/",
         now=now,
         status="available",
     )
-    assert service.registry.get("go_router@14.8.1") is not None
+    assert service.registry.get("dart:go_router@14.8.1:api") is not None
 
     result = service.resolve_library("go_router", ecosystem="pub", version="14.8.1")
 
     assert result.library_id == "dart:go_router@14.8.1:api"
     assert service.registry.get("dart:go_router@14.8.1:api") is not None
-    legacy = service.registry.get("go_router@14.8.1")
-    assert legacy is not None
-    assert legacy.library_id == "dart:go_router@14.8.1:api"
-    assert legacy.source_id == "dart:go_router:api"
-    assert "go_router@14.8.1" in legacy.legacy_ids
+    assert len(service.registry.list()) == 1
 
 
-def test_prefetch_project_docs_continue_false_aborts_on_missing_package(tmp_path, monkeypatch):
+def test_prefetch_project_dependency_docs_continue_false_aborts_on_missing_package(tmp_path, monkeypatch):
     project = _flutter_project(tmp_path)
     agent = FakeAgent()
     service = _service(tmp_path, monkeypatch, agent)
 
-    result = service.prefetch_project_docs(
+    result = service.prefetch_project_dependency_docs(
         str(project),
         include_flutter=False,
         include_packages=["missing_pkg", "go_router"],
@@ -287,8 +283,8 @@ def test_mcp_docs_status_uses_project_local_storage_topology(tmp_path):
     project = tmp_path / "project"
     project.mkdir()
     (project / "README.md").write_text("# Project\n", encoding="utf-8")
-    (project / "docmancer.yaml").write_text(
-        "index:\n  db_path: .docmancer/project.db\n",
+    (project / "docatlas.yaml").write_text(
+        "index:\n  db_path: .docatlas/project.db\n",
         encoding="utf-8",
     )
     fallback_config = DocmancerConfig()
@@ -302,32 +298,32 @@ def test_mcp_docs_status_uses_project_local_storage_topology(tmp_path):
     )
 
     assert result["project"]["diagnostics"]["active_index"]["db_path"] == str(
-        (project / ".docmancer" / "project.db").resolve()
+        (project / ".docatlas" / "project.db").resolve()
     )
     active = result["project"]["diagnostics"]["active_index"]
     assert active["config_source"] == "project_local"
-    assert active["config_path"] == str((project / "docmancer.yaml").resolve())
+    assert active["config_path"] == str((project / "docatlas.yaml").resolve())
     assert active["retrieval_mode"] == "lexical"
 
 
 def test_project_service_cache_reuses_directory_config_and_invalidates_on_change(tmp_path):
     project = tmp_path / "project"
     project.mkdir()
-    config_path = project / "docmancer.yaml"
-    config_path.write_text("index:\n  db_path: .docmancer/one.db\n", encoding="utf-8")
+    config_path = project / "docatlas.yaml"
+    config_path.write_text("index:\n  db_path: .docatlas/one.db\n", encoding="utf-8")
     fallback = LibraryDocsService(config=DocmancerConfig(), job_tracker=DocsJobTracker())
     from docmancer.mcp.docs_server import _service_for_project_path
 
     first = _service_for_project_path(fallback, {"project_path": str(project)})
     second = _service_for_project_path(fallback, {"project_path": str(project / ".")})
-    config_path.write_text("index:\n  db_path: .docmancer/two.db\n", encoding="utf-8")
+    config_path.write_text("index:\n  db_path: .docatlas/two.db\n", encoding="utf-8")
     third = _service_for_project_path(fallback, {"project_path": str(project)})
 
     assert first is second
     assert Path(first.config_path) == config_path.resolve()
-    assert Path(first.config.index.db_path) == (project / ".docmancer/one.db").resolve()
+    assert Path(first.config.index.db_path) == (project / ".docatlas/one.db").resolve()
     assert third is not first
-    assert Path(third.config.index.db_path) == (project / ".docmancer/two.db").resolve()
+    assert Path(third.config.index.db_path) == (project / ".docatlas/two.db").resolve()
     assert len(fallback._project_service_cache) == 1
 
 
@@ -337,8 +333,8 @@ def test_project_service_cache_concurrent_first_use_and_config_replacement(tmp_p
 
     project = tmp_path / "project"
     project.mkdir()
-    config_path = project / "docmancer.yaml"
-    config_path.write_text("index:\n  db_path: .docmancer/one.db\n", encoding="utf-8")
+    config_path = project / "docatlas.yaml"
+    config_path.write_text("index:\n  db_path: .docatlas/one.db\n", encoding="utf-8")
     fallback = LibraryDocsService(config=DocmancerConfig(), job_tracker=DocsJobTracker())
 
     def resolve():
@@ -346,7 +342,7 @@ def test_project_service_cache_concurrent_first_use_and_config_replacement(tmp_p
 
     with ThreadPoolExecutor(max_workers=8) as executor:
         first_wave = list(executor.map(lambda _: resolve(), range(24)))
-    config_path.write_text("index:\n  db_path: .docmancer/two.db\n", encoding="utf-8")
+    config_path.write_text("index:\n  db_path: .docatlas/two.db\n", encoding="utf-8")
     with ThreadPoolExecutor(max_workers=8) as executor:
         second_wave = list(executor.map(lambda _: resolve(), range(24)))
 
@@ -360,8 +356,8 @@ def test_prepare_docs_removes_project_local_library_target(tmp_path, monkeypatch
     monkeypatch.setenv("DOCATLAS_HOME", str(tmp_path / "home"))
     project = tmp_path / "project"
     project.mkdir()
-    (project / "docmancer.yaml").write_text(
-        "index:\n  db_path: .docmancer/project.db\n",
+    (project / "docatlas.yaml").write_text(
+        "index:\n  db_path: .docatlas/project.db\n",
         encoding="utf-8",
     )
     fallback_config = DocmancerConfig()
@@ -424,19 +420,19 @@ def test_prepare_docs_removal_rejects_scope_without_project_owned_topology(tmp_p
         fallback_service,
     )
 
-    assert result["reason_code"] == "validation_error"
+    assert result["error"]["reason_code"] == "validation_error"
     assert fallback_service.registry.get(record.canonical_id) is not None
 
 
 def test_prepare_docs_cancels_project_local_job_using_project_topology(tmp_path, monkeypatch):
     project = tmp_path / "project"
     project.mkdir()
-    (project / "docmancer.yaml").write_text(
-        "index:\n  db_path: .docmancer/project.db\n",
+    (project / "docatlas.yaml").write_text(
+        "index:\n  db_path: .docatlas/project.db\n",
         encoding="utf-8",
     )
     fallback_service = _service(tmp_path, monkeypatch)
-    project_service = LibraryDocsService(config=DocmancerConfig.from_yaml(project / "docmancer.yaml"))
+    project_service = LibraryDocsService(config=DocmancerConfig.from_yaml(project / "docatlas.yaml"))
     job = project_service.jobs.create("prefetch_project_dependency_docs")
 
     result = call_docs_tool_payload(

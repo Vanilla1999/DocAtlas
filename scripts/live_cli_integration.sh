@@ -5,14 +5,14 @@ ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 WORKSPACE_ROOT="$(cd "$ROOT_DIR/.." && pwd)"
 
-# Command to run a quick smoke test: DOCMANCER_RUN_FETCH_STEP=0 DOCMANCER_RUN_GITHUB_BLOB=0 DOCMANCER_LIVE_MAX_PAGES=1 scripts/live_cli_integration.sh
+# Command to run a quick smoke test: DOCATLAS_RUN_FETCH_STEP=0 DOCATLAS_RUN_GITHUB_BLOB=0 DOCATLAS_LIVE_MAX_PAGES=1 scripts/live_cli_integration.sh
 
 # Mirror all stdout/stderr to a log file while keeping the console. Default path is
-# scripts/live_cli_integration_YYYYMMDD_HHMMSS.log. Override with DOCMANCER_LIVE_LOG_FILE.
-# Set DOCMANCER_LIVE_NO_LOG=1 to skip the log file (terminal only).
+# scripts/live_cli_integration_YYYYMMDD_HHMMSS.log. Override with DOCATLAS_LIVE_LOG_FILE.
+# Set DOCATLAS_LIVE_NO_LOG=1 to skip the log file (terminal only).
 LOG_FILE=""
-if [[ "${DOCMANCER_LIVE_NO_LOG:-0}" != "1" ]]; then
-  LOG_FILE="${DOCMANCER_LIVE_LOG_FILE:-$SCRIPT_DIR/live_cli_integration_$(date +%Y%m%d_%H%M%S).log}"
+if [[ "${DOCATLAS_LIVE_NO_LOG:-0}" != "1" ]]; then
+  LOG_FILE="${DOCATLAS_LIVE_LOG_FILE:-$SCRIPT_DIR/live_cli_integration_$(date +%Y%m%d_%H%M%S).log}"
   mkdir -p "$(dirname "$LOG_FILE")"
   exec > >(tee "$LOG_FILE") 2>&1
 fi
@@ -22,34 +22,34 @@ CLI_CMD=("$VENV_PYTHON" -m docmancer)
 export PYTHONPATH="$ROOT_DIR${PYTHONPATH:+:$PYTHONPATH}"
 export PATH="$ROOT_DIR/.venv/bin:$PATH"
 
-DOCS_URL="${DOCMANCER_LIVE_DOCS_URL:-https://docs.pytest.org}"
-MAX_PAGES="${DOCMANCER_LIVE_MAX_PAGES:-2}"
-FETCH_WORKERS="${DOCMANCER_LIVE_FETCH_WORKERS:-8}"
-ADD_PROVIDER="${DOCMANCER_LIVE_PROVIDER:-auto}"
-ADD_STRATEGY="${DOCMANCER_LIVE_STRATEGY:-}"
-RUN_WEB_VARIANTS="${DOCMANCER_RUN_WEB_VARIANTS:-0}"
-RUN_BROWSER_VARIANT="${DOCMANCER_RUN_BROWSER_VARIANT:-0}"
-RUN_CRAWL4AI_VARIANT="${DOCMANCER_RUN_CRAWL4AI_VARIANT:-0}"
-RUN_GITHUB_BLOB="${DOCMANCER_RUN_GITHUB_BLOB:-1}"
-GITHUB_BLOB_URL="${DOCMANCER_GITHUB_BLOB_URL:-https://github.com/pytest-dev/pytest/blob/main/README.rst}"
-RUN_FETCH_STEP="${DOCMANCER_RUN_FETCH_STEP:-1}"
-RUN_LOCAL_CORPUS="${DOCMANCER_RUN_LOCAL_CORPUS:-1}"
-RUN_LOCAL_PDF_CORPUS="${DOCMANCER_RUN_LOCAL_PDF_CORPUS:-1}"
-BUILD_TEST_CORPUS="${DOCMANCER_BUILD_TEST_CORPUS:-0}"
+DOCS_URL="${DOCATLAS_LIVE_DOCS_URL:-https://docs.pytest.org}"
+MAX_PAGES="${DOCATLAS_LIVE_MAX_PAGES:-2}"
+FETCH_WORKERS="${DOCATLAS_LIVE_FETCH_WORKERS:-8}"
+ADD_PROVIDER="${DOCATLAS_LIVE_PROVIDER:-auto}"
+ADD_STRATEGY="${DOCATLAS_LIVE_STRATEGY:-}"
+RUN_WEB_VARIANTS="${DOCATLAS_RUN_WEB_VARIANTS:-0}"
+RUN_BROWSER_VARIANT="${DOCATLAS_RUN_BROWSER_VARIANT:-0}"
+RUN_CRAWL4AI_VARIANT="${DOCATLAS_RUN_CRAWL4AI_VARIANT:-0}"
+RUN_GITHUB_BLOB="${DOCATLAS_RUN_GITHUB_BLOB:-1}"
+GITHUB_BLOB_URL="${DOCATLAS_GITHUB_BLOB_URL:-https://github.com/pytest-dev/pytest/blob/main/README.rst}"
+RUN_FETCH_STEP="${DOCATLAS_RUN_FETCH_STEP:-1}"
+RUN_LOCAL_CORPUS="${DOCATLAS_RUN_LOCAL_CORPUS:-1}"
+RUN_LOCAL_PDF_CORPUS="${DOCATLAS_RUN_LOCAL_PDF_CORPUS:-1}"
+BUILD_TEST_CORPUS="${DOCATLAS_BUILD_TEST_CORPUS:-0}"
 TEST_CORPUS_SCRIPT="$WORKSPACE_ROOT/scripts/build-test-corpus.py"
 TEST_CORPUS_MD_DIR="$WORKSPACE_ROOT/test-corpora/stories-md"
 TEST_CORPUS_PDF_DIR="$WORKSPACE_ROOT/test-corpora/stories-pdf"
-SKIP_NETWORK="${DOCMANCER_SKIP_NETWORK:-0}"
+SKIP_NETWORK="${DOCATLAS_SKIP_NETWORK:-0}"
 # Set to 1 to keep the temp dir for inspection; default removes it on every exit.
-KEEP_TMP="${DOCMANCER_KEEP_TMP:-0}"
-REQUIRE_REFRESH="${DOCMANCER_REQUIRE_REFRESH:-0}"
+KEEP_TMP="${DOCATLAS_KEEP_TMP:-0}"
+REQUIRE_REFRESH="${DOCATLAS_REQUIRE_REFRESH:-0}"
 # Opt-in: exercise the full vector-retrieval stack end-to-end. Off by default
 # because it downloads the pinned Qdrant binary (~60 MB) on first run and
 # pulls FastEmbed dense + SPLADE models (~500 MB) into the test HOME. The
 # default local-corpus path covers the new CLI *surface* (qdrant status,
 # help, etc.) without spawning anything. The later live add path may still
 # start managed Qdrant because URL ingestion uses vector sync by default.
-RUN_VECTOR_STACK="${DOCMANCER_RUN_VECTOR_STACK:-0}"
+RUN_VECTOR_STACK="${DOCATLAS_RUN_VECTOR_STACK:-0}"
 
 if [[ ! -x "$VENV_PYTHON" ]]; then
   echo "Missing repo venv at $VENV_PYTHON"
@@ -63,7 +63,7 @@ TMP_HOME="$TMP_ROOT/home"
 PROJECT_DIR="$TMP_ROOT/project"
 FETCH_DIR="$TMP_ROOT/fetched-docs"
 LOCAL_REGISTRY_DIR="$TMP_ROOT/local-registry"
-CONFIG_PATH="$PROJECT_DIR/docmancer.yaml"
+CONFIG_PATH="$PROJECT_DIR/docatlas.yaml"
 
 cleanup() {
   if [[ -x "$VENV_PYTHON" ]]; then
@@ -76,14 +76,14 @@ cleanup() {
   fi
   rm -rf "$TMP_ROOT" || true
 }
-# Always remove TMP_ROOT on exit unless DOCMANCER_KEEP_TMP=1 (success or failure).
+# Always remove TMP_ROOT on exit unless DOCATLAS_KEEP_TMP=1 (success or failure).
 trap 'cleanup' EXIT
 
 mkdir -p "$TMP_HOME" "$PROJECT_DIR" "$FETCH_DIR"
 export HOME="$TMP_HOME"
 export XDG_CONFIG_HOME="$TMP_HOME/.config"
 export XDG_DATA_HOME="$TMP_HOME/.local/share"
-export DOCMANCER_HOME="$TMP_HOME/.docmancer"
+export DOCATLAS_HOME="$TMP_HOME/.docatlas"
 
 print_banner() {
   echo
@@ -235,9 +235,9 @@ echo "Repo root: $ROOT_DIR"
 echo "Using venv python: $VENV_PYTHON"
 echo "Temporary HOME: $HOME"
 echo "Temporary project: $PROJECT_DIR"
-echo "Docmancer home: $DOCMANCER_HOME"
+echo "Docmancer home: $DOCATLAS_HOME"
 echo "Local registry fixture: $LOCAL_REGISTRY_DIR"
-echo "Log file: ${LOG_FILE:-disabled (DOCMANCER_LIVE_NO_LOG=1)}"
+echo "Log file: ${LOG_FILE:-disabled (DOCATLAS_LIVE_NO_LOG=1)}"
 
 print_banner "Run configuration"
 print_info "MCP walkthrough: emulates docs/api-mcp/open-meteo-walkthrough.md (Steps 0-3)"
@@ -258,7 +258,7 @@ print_info "Vector retrieval stack (Qdrant + FastEmbed): $RUN_VECTOR_STACK"
 print_info "Keep temporary files: $KEEP_TMP"
 print_info "Require editable reinstall: $REQUIRE_REFRESH"
 if [[ "$SKIP_NETWORK" == "1" ]]; then
-  print_info "MCP pack install uses a local registry fixture because DOCMANCER_SKIP_NETWORK=1."
+  print_info "MCP pack install uses a local registry fixture because DOCATLAS_SKIP_NETWORK=1."
 else
   print_info "MCP pack install uses the zero-config resolver: local cache, hosted registry, then Open-Meteo OpenAPI fallback."
 fi
@@ -270,7 +270,7 @@ if "$VENV_PYTHON" -c "import hatchling.build, editables" >/dev/null 2>&1; then
   if run "$VENV_PYTHON" -m pip install --no-build-isolation -e ".[dev]"; then
     print_ok "Editable install refreshed from the current source tree."
   elif [[ "$REQUIRE_REFRESH" == "1" ]]; then
-    print_warn "Editable reinstall failed and DOCMANCER_REQUIRE_REFRESH=1 was set."
+    print_warn "Editable reinstall failed and DOCATLAS_REQUIRE_REFRESH=1 was set."
     exit 1
   else
     print_warn "Editable reinstall failed. Continuing with the repo source tree via PYTHONPATH."
@@ -352,11 +352,11 @@ print_banner "Open-Meteo walkthrough Step 1: install the Open-Meteo pack"
 if [[ "$SKIP_NETWORK" == "1" ]]; then
   print_info "Building a fake Open-Meteo registry pack pinned at v1."
   create_fake_mcp_registry "$LOCAL_REGISTRY_DIR"
-  export DOCMANCER_REGISTRY_DIR="$LOCAL_REGISTRY_DIR"
+  export DOCATLAS_REGISTRY_DIR="$LOCAL_REGISTRY_DIR"
 else
   print_info "Installing Open-Meteo through the zero-config resolver. No registry env vars are set for users."
-  unset DOCMANCER_REGISTRY_DIR
-  unset DOCMANCER_REGISTRY_API_URL
+  unset DOCATLAS_REGISTRY_DIR
+  unset DOCATLAS_REGISTRY_API_URL
 fi
 run "${CLI_CMD[@]}" mcp list
 run "${CLI_CMD[@]}" install-pack open-meteo@v1
@@ -473,7 +473,7 @@ if [[ "$RUN_LOCAL_CORPUS" == "1" ]]; then
     exit 1
   fi
   print_info "Indexing Markdown story corpus from $TEST_CORPUS_MD_DIR via docmancer ingest --no-vectors"
-  print_info "FTS5-only here so the default fast path does not download FastEmbed models. Set DOCMANCER_RUN_VECTOR_STACK=1 to exercise the full hybrid path."
+  print_info "FTS5-only here so the default fast path does not download FastEmbed models. Set DOCATLAS_RUN_VECTOR_STACK=1 to exercise the full hybrid path."
   run "${CLI_CMD[@]}" ingest "$TEST_CORPUS_MD_DIR" --recreate --no-vectors --config "$CONFIG_PATH"
   run "${CLI_CMD[@]}" inspect --config "$CONFIG_PATH"
   run "${CLI_CMD[@]}" list --all --config "$CONFIG_PATH"
@@ -510,14 +510,14 @@ run "${CLI_CMD[@]}" qdrant down
 if [[ "$RUN_VECTOR_STACK" == "1" ]]; then
   print_banner "Vector stack end-to-end (Qdrant + FastEmbed + hybrid retrieval)"
   if [[ "$SKIP_NETWORK" == "1" ]]; then
-    print_warn "DOCMANCER_RUN_VECTOR_STACK=1 and DOCMANCER_SKIP_NETWORK=1 are incompatible (need to download the Qdrant binary and FastEmbed models). Skipping."
+    print_warn "DOCATLAS_RUN_VECTOR_STACK=1 and DOCATLAS_SKIP_NETWORK=1 are incompatible (need to download the Qdrant binary and FastEmbed models). Skipping."
   elif [[ ! -d "$TEST_CORPUS_MD_DIR" ]]; then
     print_warn "Missing Markdown story corpus at $TEST_CORPUS_MD_DIR; vector stack run requires it."
   else
-    print_info "Starting managed Qdrant in the isolated DOCMANCER_HOME ($DOCMANCER_HOME/qdrant)."
+    print_info "Starting managed Qdrant in the isolated DOCATLAS_HOME ($DOCATLAS_HOME/qdrant)."
     run "${CLI_CMD[@]}" qdrant up
     run "${CLI_CMD[@]}" qdrant status
-    print_info "Re-ingesting the story corpus with vectors enabled. First run pulls FastEmbed models into $HOME/.docmancer/models."
+    print_info "Re-ingesting the story corpus with vectors enabled. First run pulls FastEmbed models into $HOME/.docatlas/models."
     run "${CLI_CMD[@]}" ingest "$TEST_CORPUS_MD_DIR" --recreate --config "$CONFIG_PATH"
     run "${CLI_CMD[@]}" inspect --config "$CONFIG_PATH"
     print_info "Hybrid retrieval should surface contributions from at least two signals."
@@ -528,12 +528,12 @@ if [[ "$RUN_VECTOR_STACK" == "1" ]]; then
     run "${CLI_CMD[@]}" qdrant status
   fi
 else
-  print_info "Skipping the explicit vector-stack query round-trip (DOCMANCER_RUN_VECTOR_STACK=0). A later live URL add may still start managed Qdrant for vector sync."
+  print_info "Skipping the explicit vector-stack query round-trip (DOCATLAS_RUN_VECTOR_STACK=0). A later live URL add may still start managed Qdrant for vector sync."
 fi
 
 if [[ "$SKIP_NETWORK" == "1" ]]; then
   print_banner "Network steps skipped"
-  print_info "DOCMANCER_SKIP_NETWORK=1, stopping before fetch and live add."
+  print_info "DOCATLAS_SKIP_NETWORK=1, stopping before fetch and live add."
   exit 0
 fi
 

@@ -12,7 +12,7 @@ from typing import Any
 
 from docmancer.mcp import paths
 
-DOCMANCER_AUTH_KEY = "_docmancer_auth"
+DOCATLAS_AUTH_KEY = "_docatlas_auth"
 
 
 @dataclass
@@ -30,7 +30,7 @@ def resolve(
     """Resolve a credential for one auth scheme.
 
     `scheme` is the contract entry, e.g. `{"type": "bearer", "env": "EXAMPLE_API_KEY"}`.
-    Optional `args` lets the agent pass `_docmancer_auth.{name}` per call.
+    Optional `args` lets the agent pass `_docatlas_auth.{name}` per call.
     """
     env_name = scheme.get("env")
     scheme_name = scheme.get("name") or env_name or "default"
@@ -38,10 +38,10 @@ def resolve(
 
     # 1. Per-call override
     if args:
-        override = args.get(DOCMANCER_AUTH_KEY) or {}
+        override = args.get(DOCATLAS_AUTH_KEY) or {}
         if isinstance(override, dict) and scheme_name in override:
             return CredentialResult(str(override[scheme_name]), "per_call", checked)
-        checked.append(f"per_call:{DOCMANCER_AUTH_KEY}.{scheme_name}")
+        checked.append(f"per_call:{DOCATLAS_AUTH_KEY}.{scheme_name}")
 
     # 2. Process env (covers shell-launched and agent-config env block,
     # since the agent injects env into our subprocess environment)

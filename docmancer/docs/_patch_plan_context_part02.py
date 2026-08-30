@@ -16,11 +16,9 @@ def build_patch_plan_context(
     max_files: int | None = 12,
     max_snippets: int | None = 16,
     max_tokens: int | None = 2400,
-    output_mode: str | None = "compact",
 ) -> dict[str, Any]:
     """Return patch-planning response shape with lightweight source discovery."""
 
-    mode = output_mode if output_mode in {"compact", "debug", "full"} else "compact"
     relevant_files = discover_relevant_source_files(
         question,
         project_path=project_path,
@@ -29,11 +27,10 @@ def build_patch_plan_context(
         max_files=max_files or 12,
         max_snippets=max_snippets or 16,
     )
-    graph_diagnostics: dict[str, Any] = {"graph_used": False, "fallback_reason": None}
     if project_path:
         root = Path(project_path).expanduser().resolve()
         graph_requirements = [*list(symbol_queries or []), *list(changed_files or [])]
-        graph_hints, graph_diagnostics = _graph_relevant_file_hints(
+        graph_hints, _ = _graph_relevant_file_hints(
             root,
             question=question,
             requirements=graph_requirements,
@@ -96,14 +93,9 @@ def build_patch_plan_context(
         "warnings": warnings,
         "next_actions": implementation_map["next_actions"],
         "token_estimate": 0,
-        "output_mode": mode,
     }
-    if mode != "compact":
-        payload["diagnostics"] = {"code_graph": graph_diagnostics}
     payload["token_estimate"] = _estimate_tokens(payload)
-    if mode == "compact":
-        payload = _enforce_patch_plan_budget(payload, max_tokens=max_tokens or 2400)
-    return payload
+    return _enforce_patch_plan_budget(payload, max_tokens=max_tokens or 2400)
 
 
 class PatchPlanContextService:
@@ -378,7 +370,7 @@ def _enforce_patch_plan_budget(payload: dict[str, Any], *, max_tokens: int) -> d
         if isinstance(value, list):
             compact[key] = value[:limit]
     warnings = list(compact.get("warnings") or [])
-    warnings.append("Patch planning output was compacted to stay within max_tokens budget; retry with output_mode='debug' or higher max_tokens for more context.")
+    warnings.append("Patch planning output was compacted to stay within the max_tokens budget; narrow the request for more context.")
     compact["warnings"] = warnings
     compact["token_estimate"] = _estimate_tokens(compact)
     return compact

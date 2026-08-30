@@ -4,6 +4,38 @@ globals().update({k: v for k, v in vars(_shared).items() if not k.startswith("__
 from docmancer.docs.application.docs_context_projection import project_docs_context
 
 
+def test_docs_selector_accounts_for_serialized_projection_cost():
+    from docmancer.docs.application.evidence_selection import docs_selection_config, select_evidence
+
+    candidates = [
+        {
+            "stable_id": f"source-{index}",
+            "source": f"docs/source-{index}.md",
+            "title": f"Source {index}",
+            "relevance_score": 1.0 - index / 10,
+            "content": " ".join(f"documented_{index}_{word}" for word in range(24)),
+        }
+        for index in range(1, 4)
+    ]
+    selection = select_evidence(
+        candidates,
+        question="Summarize the documented facts",
+        config=docs_selection_config(800),
+    )
+
+    projection, snapshot = project_docs_answer(
+        question="Summarize the documented facts",
+        retrieval={"status": "success", "context_pack": candidates},
+        canonical_selection=selection,
+    )
+
+    assert selection.status == "ok"
+    assert len(selection.selected_candidates) < len(candidates)
+    # Generic selection has no claim assignments and cannot become a docs answer.
+    assert projection["status"] == "insufficient_evidence"
+    assert validate_model_visible_projection(projection, snapshot=snapshot, max_tokens=800) == []
+
+
 def test_docs_context_prioritizes_required_query_over_optional_aliases():
     base = {
         "source_class": "project_doc", "heading_path": "Contract",

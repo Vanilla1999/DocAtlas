@@ -9,7 +9,6 @@ from docmancer.mcp import paths
 @pytest.fixture(autouse=True)
 def isolated_home(tmp_path, monkeypatch):
     monkeypatch.setenv("DOCATLAS_HOME", str(tmp_path))
-    monkeypatch.delenv("DOCMANCER_HOME", raising=False)
     paths.ensure_dirs()
 
 
@@ -43,10 +42,10 @@ def test_package_dir_accepts_npm_scoped_name():
 def test_package_dir_accepts_plain_spec():
     p = paths.package_dir("acme", "v1")
     assert p == paths.servers_dir().resolve() / "acme@v1"
-    marker = paths.docmancer_home() / STATE_OWNER_FILENAME
+    marker = paths.docatlas_home() / STATE_OWNER_FILENAME
     payload = json.loads(marker.read_text(encoding="utf-8"))
     assert payload["product_id"] == PRODUCT_ID
-    assert paths.docmancer_home().name != ".docmancer"
+    assert paths.docatlas_home().name != ".docmancer"
 
 
 def test_secrets_env_file_rejects_traversal():

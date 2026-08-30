@@ -25,9 +25,7 @@ Preferred public MCP happy path:
 
 The complete bounded result union is `docs_answer`, `docs_context`, `patch_context`, and `insufficient_evidence`. Treat broad explanatory results as `docs_context`; only a narrow typed relation with complete proof may become `docs_answer`.
 
-Legacy compatibility note:
-
-Older docs surfaces may expose direct inspection or project-doc verbs. Treat those as advanced/legacy compatibility tools. The default surface has exactly three tools: `get_docs_context`, `prepare_docs`, and `docs_status`.
+The supported public surface has exactly three tools: `get_docs_context`, `prepare_docs`, and `docs_status`.
 
 ## Success criteria
 
@@ -55,13 +53,7 @@ If `get_docs_context` reports dependency metadata from `pubspec.lock`, `Cargo.lo
 prepare_docs(action="prefetch_project_dependency_docs", project_path=".")
 ```
 
-Legacy compatibility surfaces may also expose:
-
-```text
-prefetch_project_docs(project_path=".")
-```
-
-Despite that historical name, it prefetches dependency documentation from manifests/lockfiles. It does not ingest project-owned README/docs/wiki files. Because dependency prefetch may use the network, the agent should ask for confirmation unless the user already approved it.
+Dependency prefetch reads manifests/lockfiles; it does not ingest project-owned README/docs/wiki files. Because it may use the network, the agent should ask for confirmation unless the user already approved it.
 
 See also:
 

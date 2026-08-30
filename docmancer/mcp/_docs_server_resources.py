@@ -30,7 +30,7 @@ Use Docmancer before generic code search when the user asks about:
 
 The default public surface has exactly three tools:
 - `get_docs_context`: first tool for content and coding questions;
-- `prepare_docs`: lifecycle work only after bounded recommended_next_action, unbounded next_action, or an explicit user request;
+- `prepare_docs`: lifecycle work only after recommended_next_action or an explicit user request;
 - `docs_status`: explicit freshness, health, source-state, or job-progress checks.
 
 ## Default project workflow
@@ -38,7 +38,7 @@ The default public surface has exactly three tools:
 1. For coding and patch tasks, call once before the first edit:
    `get_docs_context(project_path=..., question=..., mode="auto")`
 
-   Use broader unbounded output only when the user explicitly asks to explore documentation. Do not repeat bounded retrieval before the first edit unless an explicit `prepare_docs` recovery action was completed.
+   The server returns one bounded projection. Cite evidence from `trust_contract.sources`. Do not repeat retrieval before the first edit unless an explicit `prepare_docs` recovery action was completed.
 
 2. If and only if the response returns `prepare_docs` as its next action, follow it with the exact returned arguments. For example, lexical retrieval returns:
    `prepare_docs(action="sync_project_docs", project_path=..., with_vectors=false)`
@@ -50,9 +50,6 @@ The default public surface has exactly three tools:
    - `status="ok"`: use the single canonical `docs_answer`, cited `docs_context`, or `patch_context` evidence. Only narrow relation-specific proof authorizes `docs_answer`; broad questions remain `docs_context`.
    - `status="truncated"`: honor `omitted_counts`; only non-critical material was omitted.
    - `status="insufficient_evidence"`: do not claim documentation support. Follow one typed recovery; a server-suggested rephrase is never automatic. If recovery is exhausted and `hard_stop=false`, investigate local source/tests while keeping documentary claims unproved. Stop before editing on `hard_stop=true` or when the task explicitly requires the still-unproved documentary contract.
-
-Broader unbounded exploration may expose `answer_type`, `answer_completeness`, `trust_contract`, and raw context fields; these are intentionally absent from bounded delivery.
-In that unbounded mode, treat `navigation_only` and `partial_navigational` as source-search guidance, not complete evidence.
 
 Use `docs_status(action="project", project_path=...)` only when the user asks
 whether documentation is indexed, stale, or healthy. Use `action="jobs"` or
@@ -79,9 +76,7 @@ Do not use WebFetch as a substitute for registered Docmancer docs until Docmance
 ## Patch workflow
 
 Before editing code, call `get_docs_context(...)` once; bounded structured delivery is the server default. Then use normal source
-read/search tools and run tests/linters. Optional code/plan/constraint tools are
-available only when the advanced surface is explicitly enabled with
-`DOCMANCER_MCP_ADVANCED_TOOLS=1`.
+read/search tools and run tests/linters.
 
 ## Audit workflow
 
@@ -107,12 +102,11 @@ Always separate:
         "mimeType": "text/markdown",
         "text": """# Project docs workflow
 
-1. For coding and patch tasks, call `get_docs_context(project_path=..., question=..., mode="auto")` once before the first edit. The server returns bounded structured context; use broader compatibility output only for explicit documentation exploration.
+1. For coding and patch tasks, call `get_docs_context(project_path=..., question=..., mode="auto")` once before the first edit. The server returns one bounded structured projection.
 2. If the response explicitly returns `prepare_docs` as `recommended_next_action`, follow it and retry the same bounded request.
 3. Inspect canonical `status`, `kind`, `sources`, `missing`, and `omitted_counts`.
 4. On `insufficient_evidence`, do not claim documentation support. Follow the bounded typed recovery; retry at most one server-suggested rephrase. If it still fails and `hard_stop=false`, use local source/tests for investigation. Stop before editing on `hard_stop=true` or when the task requires the unproved documentary contract.
-5. Only unbounded exploration exposes `trust_contract.sources`; do not expect it in bounded delivery.
-6. Use dependency/public network fetches only with explicit approval (`allow_network=true`).
+5. Use `prepare_docs` only after a typed recovery action or explicit user approval.
 """,
     },
     {
@@ -123,12 +117,12 @@ Always separate:
         "text": """# Public tool selection
 
 1. Natural documentation, API, dependency, architecture, convention, and coding questions → `get_docs_context`.
-2. Explicit sync/refresh/prefetch/prune/remove request, bounded `recommended_next_action`, or unbounded `next_action` → `prepare_docs`.
+2. Explicit sync/refresh/prefetch/prune/remove request or `recommended_next_action` → `prepare_docs`.
 3. Explicit index freshness, health, source-state, or async job-progress request → `docs_status`.
 
 For coding and patch tasks, make one pre-edit `get_docs_context` call; bounded structured delivery is the server default.
 
-Never call an advanced or legacy tool unless the corresponding environment flag exposes it.
+The public Docs MCP surface contains exactly these three tools.
 """,
     },
     {
@@ -179,12 +173,12 @@ Use the public unified tool first:
 5. Retry:
    `get_docs_context(question=..., library=..., version=..., mode="library")`
 
-5. If working inside a repository, call:
+6. If working inside a repository, call:
    `get_docs_context(project_path=..., question=..., mode="mixed")`
 
 Do not use WebFetch as a substitute for registered docs before Docmancer has returned no trusted route.
 
-Legacy tools such as `resolve_library_id` and `get_library_docs` may exist only when legacy surface is explicitly enabled. Do not assume they are available.
+Only the canonical `get_docs_context`, `prepare_docs`, and `docs_status` tools are part of this workflow.
 """,
     },
 ]

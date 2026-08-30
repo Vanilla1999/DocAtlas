@@ -11,12 +11,12 @@ from .base import VectorHit, VectorPoint, VectorStore
 # unsigned integers and UUID-shaped strings as point ids; we use 0 for the
 # sentinel so collisions with content-derived ids (UUIDs/hashes) are unlikely.
 _OWNERSHIP_POINT_ID = 0
-_OWNERSHIP_PAYLOAD_KEY = "_docmancer_owned"
-_OWNERSHIP_WORKSPACE_KEY = "_docmancer_workspace"
-_META_PROVIDER_KEY = "_docmancer_embedder_provider"
-_META_MODEL_KEY = "_docmancer_embedder_model"
-_META_DIM_KEY = "_docmancer_embedder_dim"
-_META_SPARSE_MODEL_KEY = "_docmancer_sparse_model"
+_OWNERSHIP_PAYLOAD_KEY = "_docatlas_owned"
+_OWNERSHIP_WORKSPACE_KEY = "_docatlas_workspace"
+_META_PROVIDER_KEY = "_docatlas_embedder_provider"
+_META_MODEL_KEY = "_docatlas_embedder_model"
+_META_DIM_KEY = "_docatlas_embedder_dim"
+_META_SPARSE_MODEL_KEY = "_docatlas_sparse_model"
 
 _PAYLOAD_INDEX_FIELDS = (
     "source_path",

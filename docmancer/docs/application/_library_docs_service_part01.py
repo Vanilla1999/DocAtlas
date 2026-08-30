@@ -125,11 +125,6 @@ class _LibraryDocsApplicationServicePart01:
             docs_url = self._render_docs_url(docs_url_template, library, normalized_version)
 
         record = self.registry.get(library, ecosystem, normalized_version, source_type)
-        if record is not None and ecosystem:
-            canonical_id = canonical_library_id(record.name, ecosystem, record.version, source_type or record.source_type)
-            if record.library_id != canonical_id and record.ecosystem in {None, ecosystem}:
-                migrated = self.registry.migrate_library_id(record.library_id, canonical_id)
-                record = migrated or record
         if record is None and docs_url:
             record = self.registry.upsert(
                 library=library,

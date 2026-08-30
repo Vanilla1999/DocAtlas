@@ -1,0 +1,118 @@
+version: 2
+defaults:
+  version:
+    requested: latest
+    policy: rolling
+  source:
+    authority: official_project
+    version_binding: rolling
+    format: html
+  scope:
+    max_pages: 60
+    coverage: bounded
+    discovery_strategy: auto
+targets:
+  - id: pydantic
+    identity: {kind: package, ecosystem: python, name: pydantic}
+    source: {type: reference, url: https://docs.pydantic.dev/latest/}
+    scope: {allowed_domains: [docs.pydantic.dev], path_prefixes: [/latest/]}
+  - id: pydantic-settings
+    identity: {kind: package, ecosystem: python, name: pydantic-settings}
+    source: {type: reference, url: https://docs.pydantic.dev/latest/}
+    scope: {allowed_domains: [docs.pydantic.dev], path_prefixes: [/latest/]}
+  - id: click
+    identity: {kind: package, ecosystem: python, name: click}
+    source: {type: reference, url: https://click.palletsprojects.com/en/stable/}
+    scope:
+      allowed_domains: [click.palletsprojects.com]
+      path_prefixes: [/en/stable/]
+      seed_urls:
+        - https://click.palletsprojects.com/en/stable/
+        - https://click.palletsprojects.com/en/stable/quickstart/
+        - https://click.palletsprojects.com/en/stable/parameters/
+        - https://click.palletsprojects.com/en/stable/options/
+        - https://click.palletsprojects.com/en/stable/arguments/
+        - https://click.palletsprojects.com/en/stable/commands/
+        - https://click.palletsprojects.com/en/stable/api/
+  - id: httpx
+    identity: {kind: package, ecosystem: python, name: httpx}
+    source: {type: reference, url: https://www.python-httpx.org/}
+    scope: {allowed_domains: [www.python-httpx.org], path_prefixes: ["/"]}
+  - id: trafilatura
+    identity: {kind: package, ecosystem: python, name: trafilatura}
+    source: {type: reference, url: https://trafilatura.readthedocs.io/en/latest/}
+    scope: {allowed_domains: [trafilatura.readthedocs.io], path_prefixes: [/en/latest/]}
+  - id: beautifulsoup4
+    identity: {kind: package, ecosystem: python, name: beautifulsoup4}
+    source: {type: reference, url: https://www.crummy.com/software/BeautifulSoup/bs4/doc/}
+    scope: {allowed_domains: [www.crummy.com], path_prefixes: [/software/BeautifulSoup/bs4/doc/]}
+  - id: qdrant-client
+    identity: {kind: package, ecosystem: python, name: qdrant-client}
+    source: {type: guides, url: https://qdrant.tech/documentation/}
+    scope: {allowed_domains: [qdrant.tech], path_prefixes: [/documentation/]}
+  - id: fastembed
+    identity: {kind: package, ecosystem: python, name: fastembed}
+    source: {type: reference, url: https://github.com/qdrant/fastembed}
+    scope: {allowed_domains: [github.com], path_prefixes: [/qdrant/fastembed]}
+  - id: pytest
+    identity: {kind: package, ecosystem: python, name: pytest}
+    source: {type: reference, url: https://docs.pytest.org/en/stable/}
+    scope: {allowed_domains: [docs.pytest.org], path_prefixes: [/en/stable/]}
+  # Dart/Flutter packages
+  - id: riverpod
+    identity: {kind: package, ecosystem: flutter, name: riverpod}
+    source: {type: guides, url: https://riverpod.dev/}
+    scope:
+      allowed_domains: [riverpod.dev, pub.dev]
+      path_prefixes: [/]
+      seed_urls:
+        - https://riverpod.dev/
+        - https://riverpod.dev/docs/introduction/getting_started
+        - https://riverpod.dev/docs/concepts2/providers
+        - https://riverpod.dev/docs/concepts2/auto_dispose
+        - https://riverpod.dev/docs/concepts2/family
+        - https://pub.dev/documentation/riverpod/latest/
+  - id: flutter_riverpod
+    identity: {kind: package, ecosystem: flutter, name: flutter_riverpod}
+    source: {type: guides, url: https://riverpod.dev/}
+    scope:
+      allowed_domains: [riverpod.dev, pub.dev]
+      path_prefixes: [/]
+      seed_urls:
+        - https://riverpod.dev/
+        - https://riverpod.dev/docs/introduction/getting_started
+        - https://riverpod.dev/docs/concepts2/providers
+        - https://riverpod.dev/docs/concepts2/auto_dispose
+        - https://pub.dev/documentation/flutter_riverpod/latest/
+  - id: flutter_bloc
+    identity: {kind: package, ecosystem: flutter, name: flutter_bloc}
+    source: {type: guides, url: https://bloclibrary.dev/}
+    scope:
+      allowed_domains: [bloclibrary.dev, pub.dev]
+      path_prefixes: [/]
+      seed_urls:
+        - https://bloclibrary.dev/
+        - https://bloclibrary.dev/getting-started/
+        - https://bloclibrary.dev/flutter-bloc-concepts/
+        - https://bloclibrary.dev/architecture/
+        - https://pub.dev/documentation/flutter_bloc/latest/
+  - id: bloc
+    identity: {kind: package, ecosystem: flutter, name: bloc}
+    source: {type: guides, url: https://bloclibrary.dev/}
+    scope:
+      allowed_domains: [bloclibrary.dev, pub.dev]
+      path_prefixes: [/]
+      seed_urls:
+        - https://bloclibrary.dev/
+        - https://bloclibrary.dev/bloc-concepts/
+        - https://pub.dev/documentation/bloc/latest/
+  - id: go_router
+    identity: {kind: package, ecosystem: flutter, name: go_router}
+    source: {type: api, url: https://pub.dev/documentation/go_router/latest/, authority: official_registry, format: dartdoc}
+    scope:
+      allowed_domains: [pub.dev, docs.flutter.dev]
+      path_prefixes: [/documentation/go_router/latest/, /packages/go_router, /ui/navigation]
+      seed_urls:
+        - https://pub.dev/documentation/go_router/latest/
+        - https://pub.dev/packages/go_router
+        - https://docs.flutter.dev/ui/navigation
