@@ -78,7 +78,10 @@ jobs:
           tests/diagnostic_labels.context7_project_chat.json
           tests/docs/test_context7_style_project_chat.py
           EOF
-          git diff --name-only dd3666e37a6740d2079454c601b54464faca9efe | sort > /tmp/actual-final-paths
+          {
+            git diff --name-only dd3666e37a6740d2079454c601b54464faca9efe
+            git ls-files --others --exclude-standard
+          } | sort -u > /tmp/actual-final-paths
           sort /tmp/expected-final-paths -o /tmp/expected-final-paths
           diff -u /tmp/expected-final-paths /tmp/actual-final-paths
           test ! -e .github/pr173-patch
