@@ -6,6 +6,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 
+### Changed
+
+- Project chat now retrieves bounded current project documentation before attempting strict answer certification. Natural Russian newcomer questions can use auditable retrieval-only aliases and fall back to non-authoritative `docs_context`; generic CLI commands are no longer confused with the Docs MCP tool inventory, and mixed-language recovery questions are not generated.
+
+### Fixed
+
+- Generic first CLI commands are no longer interpreted as the Docs MCP public-tool inventory, bare Russian architecture requests are not rewritten as MCP-server architecture, and Russian recovery does not generate mixed-language questions. Current `.docatlas` state remains the only supported runtime namespace.
+
 ### Removed
 
 - Purged stale support-inventory and documentation promises for local-path `add`, `doc-atlas mcp serve`, and the legacy dependency-prefetch identifier before public adoption. Support policy now describes the current release only; the Python import namespace remains `docmancer`.

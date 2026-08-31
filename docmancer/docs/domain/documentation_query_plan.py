@@ -6,6 +6,9 @@ from dataclasses import dataclass
 import re
 
 from docmancer.docs.domain.question_frame_core import split_question_clauses
+from docmancer.docs.domain.project_retrieval_intent import (
+    build_project_retrieval_aliases,
+)
 
 
 @dataclass(frozen=True, slots=True)
@@ -54,13 +57,16 @@ def build_documentation_query_plan(
     question: str, *, lookup_queries: tuple[str, ...] = (), explicit_path: str | None = None,
     requirements: object | None = None,
 ) -> DocumentationQueryPlan:
-    mandatory = tuple(
+    retrieval_aliases = build_project_retrieval_aliases(question)
+    force_context_only = any(alias.force_context_only for alias in retrieval_aliases)
+    mandatory = (() if force_context_only else tuple(
         item for item in requirements or ()
         if getattr(item, "mandatory", False)
         and getattr(item, "kind", "") == "proof_obligation"
-    )[:4]
+    )[:4])
     queries = [DocumentationLookup(
-        "query-original", question.strip(), "original", not bool(mandatory),
+        "query-original", question.strip(), "original",
+        not bool(mandatory) and not force_context_only,
     )]
     for index, requirement in enumerate(mandatory, start=1):
         text = _facet_query(requirement)
@@ -79,6 +85,18 @@ def build_documentation_query_plan(
             "query-clause-relation", relation_claim, "auto_clause", True,
             "facet-relation-claim",
         ))
+    seen_aliases = {query.text.casefold() for query in queries}
+    for index, alias in enumerate(retrieval_aliases, start=1):
+        if alias.text.casefold() in seen_aliases:
+            continue
+        queries.append(DocumentationLookup(
+            f"query-intent-{index}", alias.text, "canonical_intent", False,
+            (
+                f"intent-context:{alias.intent_id}"
+                if alias.force_context_only else f"intent:{alias.intent_id}"
+            ),
+        ))
+        seen_aliases.add(alias.text.casefold())
     queries.extend(
         DocumentationLookup(
             f"query-lookup-{index}", text.strip(), "host_lookup", False,

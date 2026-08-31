@@ -136,6 +136,8 @@ def _tag_retrieval_query(
         trace = dict(metadata.get("lexical_match") or {})
         # Retrieval is candidate generation. Only a lexical relevance trace or
         # an explicitly resolved exact path may qualify model-visible context.
+        # A future dense qualification path must carry calibrated provenance
+        # from the dispatcher; this layer must not infer it from rank alone.
         trace.setdefault("qualified", bool(metadata.get("exact_path_match")))
         trace.setdefault("lexical_score", float(chunk.score))
         if query_text:
@@ -199,7 +201,7 @@ class _ProjectDocsServicePart03:
         lookup_query_ids = {
             item.text: item.query_id
             for item in documentation_query_plan.queries
-            if item.origin in {"mandatory_facet", "host_lookup", "auto_clause", "concept_alias", "retrieval_hint"}
+            if item.origin in {"mandatory_facet", "host_lookup", "auto_clause", "canonical_intent", "concept_alias", "retrieval_hint"}
         }
         exact_path_query_id = next((
             item.query_id for item in documentation_query_plan.queries
@@ -230,7 +232,7 @@ class _ProjectDocsServicePart03:
         ))[:4]
         planned_lookup_queries = tuple(
             item.text for item in documentation_query_plan.queries
-            if item.origin in {"mandatory_facet", "host_lookup", "auto_clause", "concept_alias", "retrieval_hint"}
+            if item.origin in {"mandatory_facet", "host_lookup", "auto_clause", "canonical_intent", "concept_alias", "retrieval_hint"}
         )
         supplemental_queries = tuple(dict.fromkeys((
             *planned_lookup_queries,

@@ -297,8 +297,6 @@ def main() -> int:
                     "question": "In docs/ADAPTIVE_TREASURE_CONTRACT.md, summarize meet_type.",
                     "project_path": str(project),
                     "mode": "project",
-                    "delivery_strategy": "bounded_direct",
-                    "packet_tokens": 1500,
                 },
                 service,
             )
@@ -324,8 +322,6 @@ def main() -> int:
                 "question": TREASURE,
                 "project_path": str(project),
                 "mode": "project",
-                "delivery_strategy": "bounded_direct",
-                "packet_tokens": 1500,
             },
             service,
         )

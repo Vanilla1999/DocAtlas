@@ -60,10 +60,17 @@ def project_docs_context(
         for value in query_plan.get("missing_requirement_ids") or ()
         if str(value).startswith("context_only:")
     }
+    intent_context_only = any(
+        isinstance(item, dict)
+        and item.get("origin") == "canonical_intent"
+        and str(item.get("facet_id") or "").startswith("intent-context:")
+        for item in query_plan.get("queries") or ()
+    )
     broad_context_only = bool(context_only_relations & {
-        "behavior", "chunking", "contract_fact", "contrast", "implementation",
-        "location", "purpose", "procedure", "selection_policy", "usage", "workflow",
-    }) or bool(query_plan.get("unresolved_parts"))
+        "architecture", "behavior", "chunking", "contract_fact", "contrast",
+        "implementation", "location", "purpose", "procedure",
+        "selection_policy", "usage", "workflow",
+    }) or bool(query_plan.get("unresolved_parts")) or intent_context_only
     query_plan["broad_context_only"] = broad_context_only
     query_text = {
         str(item.get("query_id") or ""): str(item.get("text") or "")
@@ -75,6 +82,9 @@ def project_docs_context(
     public_query_ids = _public_query_ids(query_plan)
     public_query_id_set = set(public_query_ids)
     host_query_ids = _query_ids_for_origins(query_plan, {"host_lookup"})
+    canonical_intent_query_ids = _query_ids_for_origins(
+        query_plan, {"canonical_intent"},
+    )
     relation_claim_query_ids = {
         str(item.get("query_id") or "")
         for item in query_plan.get("queries") or ()
@@ -122,13 +132,15 @@ def project_docs_context(
         required_ids = qualified_ids & required_query_id_set
         original_hit = "query-original" in qualified_ids
         host_ids = qualified_ids & host_query_ids
+        canonical_intent_ids = qualified_ids & canonical_intent_query_ids
         relation_claim_ids = qualified_ids & relation_claim_query_ids
-        if not required_ids and not original_hit and not host_ids:
+        if not required_ids and not original_hit and not host_ids and not canonical_intent_ids:
             continue
         if (
             broad_context_only
             and not original_hit
             and not host_ids
+            and not canonical_intent_ids
             and not relation_claim_ids
         ):
             continue
@@ -253,13 +265,14 @@ def project_docs_context(
             max_tokens=min(INSUFFICIENT_EVIDENCE_MAX_TOKENS, max_tokens),
         ), {}
     decision = context_selection_decision(sources, public_query_ids)
+    covered_query_ids = set(decision.covered_query_ids)
+    context_fallback_ids = (
+        canonical_intent_query_ids | host_query_ids | relation_claim_query_ids
+    )
     if (
         required_query_ids
-        and not (set(decision.covered_query_ids) & required_query_id_set)
-        and (
-            bool(query_plan.get("unresolved_parts"))
-            or not broad_context_only
-        )
+        and not (covered_query_ids & required_query_id_set)
+        and not (broad_context_only and covered_query_ids & context_fallback_ids)
     ):
         return project_insufficient(
             kind="docs_context",
@@ -296,7 +309,7 @@ def _query_ids_for_origins(
 
 
 def _public_query_ids(query_plan: dict[str, Any]) -> tuple[str, ...]:
-    visible_origins = {"original", "mandatory_facet", "host_lookup", "auto_clause", "exact_path"}
+    visible_origins = {"original", "mandatory_facet", "host_lookup", "auto_clause", "canonical_intent", "exact_path"}
     values = [
         str(item.get("query_id") or "")
         for item in query_plan.get("queries") or ()

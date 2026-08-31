@@ -136,6 +136,14 @@ documents:
     status: active
     impact: search_only
 
+  - path: eval/project_chat_context7_v1/README.md
+    role: development
+    scope: project
+    description: RU/EN retrieval-first project-chat corpus and public-path gate.
+    authority: source_of_truth
+    status: active
+    impact: search_only
+
   - path: eval/project_answer_surface_v1/README.md
     role: development
     scope: project
@@ -227,6 +235,22 @@ documents:
     authority: source_of_truth
     status: active
     impact: track
+
+  - path: docs/adr/0002-context-retrieval-vs-answer-proof.md
+    role: project_architecture
+    scope: project
+    description: Retrieval-first project-chat delivery and strict answer-certification boundary.
+    authority: source_of_truth
+    status: active
+    impact: track
+
+  - path: docs/analysis/context7-style-project-chat-regression.md
+    role: development
+    scope: project
+    description: Corrected evidence assessment for bounded retrieval-first project chat.
+    authority: supporting
+    status: active
+    impact: search_only
 
   - path: eval/results/live/README.md
     role: development

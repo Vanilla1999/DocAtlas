@@ -190,6 +190,16 @@ def source_weight_for_intent(path: str | None, heading_path: str | None, intent:
     source_type = taxonomy["source_type"]
     authority = taxonomy["authority"]
 
+    if (
+        name in {"architecture", "general", "mcp_disambiguation"}
+        and any(
+            term in h
+            for term in ("legacy", "compatibility", "migration", "deprecated")
+        )
+        and not getattr(intent, "wants_release_history", False)
+    ):
+        return 0.15
+
     if authority == "artifact":
         artifact_sensitive = getattr(intent, "broad", False) or getattr(intent, "wants_architecture", False) or getattr(intent, "wants_how_to", False) or getattr(intent, "wants_docs_mcp", False)
         return 0.25 if artifact_sensitive else 0.6
@@ -263,6 +273,8 @@ def source_weight_for_intent(path: str | None, heading_path: str | None, intent:
             return 1.3
 
     if name == "troubleshooting":
+        if "troubleshooting" in p:
+            return 2.2
         if p.endswith("readme.md") or p.startswith("docs/") or "/docs/" in p:
             return 1.25
 

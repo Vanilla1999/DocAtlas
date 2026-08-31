@@ -1,0 +1,10 @@
+{
+  "module_labels": {
+    "tests/docs/test_context7_style_project_chat.py": "behavioral"
+  },
+  "module_node_hashes": {
+    "tests/docs/test_context7_style_project_chat.py": "613d79c81aca25308126b3c3cdb237a0b46a8b22aa7f4456a0d1b06745c8e654"
+  },
+  "node_overrides": {},
+  "schema_version": 1
+}

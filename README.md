@@ -98,7 +98,7 @@ get_docs_context(question=..., project_path=...)
 → retry get_docs_context(...)
 ```
 
-This makes `get_docs_context` the single high-level entry point. Narrow typed questions with complete relation-specific proof receive `docs_answer`; broader questions receive cited retrieval-only `docs_context`; coding and patch tasks receive source-bound `patch_context`; missing safe evidence returns fail-closed `insufficient_evidence`. When completeness or the requested relation is uncertain, the server chooses `docs_context`, not `docs_answer`. Delivery strategy, debug shape, and packet budget are server-owned policy.
+This makes `get_docs_context` the single high-level entry point. Natural-language project questions retrieve bounded current repository documentation first. Narrow typed questions with complete relation-specific proof receive `docs_answer`; broader questions receive cited retrieval-only `docs_context`; coding and patch tasks receive source-bound `patch_context`; missing safe evidence returns fail-closed `insufficient_evidence`. Parser uncertainty blocks answer certification, not safe project-scoped retrieval. Retrieval-only aliases never authorize an answer or edit. Delivery strategy, debug shape, and packet budget are server-owned policy.
 
 MCP response delivery, shape, diagnostics, and packet budgets are server-owned. OpenCode registration automatically sets `DOCATLAS_MCP_TEXT_FALLBACK=1` because current OpenCode releases do not preserve `structuredContent` in model-visible tool output; manually configured OpenCode entries need the same environment setting. Other clients receive the server-selected structured lane.
 

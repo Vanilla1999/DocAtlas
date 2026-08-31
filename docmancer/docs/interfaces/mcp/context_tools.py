@@ -1,5 +1,10 @@
 from __future__ import annotations
 
+from docmancer.docs.application.docs_context_projection import project_docs_context
+from docmancer.docs.domain.project_retrieval_intent import (
+    project_retrieval_requires_context_only,
+)
+
 from copy import deepcopy
 from dataclasses import asdict, is_dataclass
 import json
@@ -375,6 +380,7 @@ def handle_context_tool(name: str, args: dict[str, Any], service: LibraryDocsSer
             and not is_operational_recovery_action(recovery)
         )
         if kind == "docs_answer":
+            force_context_only = project_retrieval_requires_context_only(question)
             selection_trace: dict[str, Any] = {}
             projection, snapshot = project_docs_answer(
                 question=question,
@@ -383,6 +389,10 @@ def handle_context_tool(name: str, args: dict[str, Any], service: LibraryDocsSer
                 selection_diagnostics=selection_trace,
                 canonical_selection=canonical_selection,
             )
+            if force_context_only:
+                projection, snapshot = project_docs_context(
+                    retrieval=raw, max_tokens=min(800, output_budget),
+                )
             raw.setdefault("retrieval_diagnostics", {})["evidence_selection"] = selection_trace
             projection, snapshot = maybe_project_docs_context(
                 projection=projection, snapshot=snapshot, raw=raw, args=args,
@@ -440,7 +450,9 @@ def handle_context_tool(name: str, args: dict[str, Any], service: LibraryDocsSer
                     if projection.get("status") == "insufficient_evidence"
                     else min(DOCS_ANSWER_MAX_TOKENS, output_budget)
                 ),
-                canonical_selection=canonical_selection,
+                canonical_selection=(
+                    None if force_context_only else canonical_selection
+                ),
             )
             if validation_errors:
                 return _bad_request("invalid_model_visible_projection", "; ".join(validation_errors))
