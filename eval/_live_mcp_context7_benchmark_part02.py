@@ -20,26 +20,26 @@ class DocAtlasDirectProvider(BenchmarkProvider):
         self._project_command_fixture_path: Path | None = None
 
     def _isolated_env(self):
-        """Context manager for isolated DOCMANCER_HOME environment."""
+        """Context manager for isolated DOCATLAS_HOME environment."""
         from contextlib import contextmanager
         @contextmanager
         def _ctx():
-            old_home = os.environ.get("DOCMANCER_HOME")
-            old_auto_vectors = os.environ.get("DOCMANCER_AUTO_VECTORS")
+            old_home = os.environ.get("DOCATLAS_HOME")
+            old_auto_vectors = os.environ.get("DOCATLAS_AUTO_VECTORS")
             if self.docmancer_home:
-                os.environ["DOCMANCER_HOME"] = str(self.docmancer_home)
-                os.environ["DOCMANCER_AUTO_VECTORS"] = "0"
+                os.environ["DOCATLAS_HOME"] = str(self.docmancer_home)
+                os.environ["DOCATLAS_AUTO_VECTORS"] = "0"
             try:
                 yield
             finally:
                 if old_home is None:
-                    os.environ.pop("DOCMANCER_HOME", None)
+                    os.environ.pop("DOCATLAS_HOME", None)
                 else:
-                    os.environ["DOCMANCER_HOME"] = old_home
+                    os.environ["DOCATLAS_HOME"] = old_home
                 if old_auto_vectors is None:
-                    os.environ.pop("DOCMANCER_AUTO_VECTORS", None)
+                    os.environ.pop("DOCATLAS_AUTO_VECTORS", None)
                 else:
-                    os.environ["DOCMANCER_AUTO_VECTORS"] = old_auto_vectors
+                    os.environ["DOCATLAS_AUTO_VECTORS"] = old_auto_vectors
         return _ctx()
 
     def _get_service(self):

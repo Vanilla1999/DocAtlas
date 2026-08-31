@@ -16,10 +16,7 @@ def _manager():
     from docmancer.runtime.qdrant_manager import QdrantManager
 
     resolution = resolve_home()
-    owned_home = ensure_owned_home(
-        resolution.path,
-        allow_legacy_claim=resolution.compatibility_legacy,
-    )
+    owned_home = ensure_owned_home(resolution.path)
     return QdrantManager(home=owned_home / "qdrant")
 
 

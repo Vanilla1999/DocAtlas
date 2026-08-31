@@ -4,9 +4,9 @@ Owns binary acquisition, port selection, process start/stop, health-check,
 and fallback to ``SqliteVecStore`` when a managed Qdrant cannot be brought up.
 
 Resolution order in :func:`ensure_running`:
-    1. Explicit ``DOCMANCER_QDRANT_URL`` (caller-supplied managed Qdrant).
+    1. Explicit ``DOCATLAS_QDRANT_URL`` (caller-supplied managed Qdrant).
     2. Live docmancer-owned process listed in ``runtime.json`` and healthy.
-    3. Managed binary start (downloaded or ``DOCMANCER_QDRANT_BINARY``).
+    3. Managed binary start (downloaded or ``DOCATLAS_QDRANT_BINARY``).
     4. ``SqliteVecStore`` fallback when start fails or platform unsupported.
 
 Never reuse a foreign Qdrant on the expected port: the resolver checks for the
@@ -94,12 +94,12 @@ class _Paths:
         )
 
 
-def _docmancer_home() -> Path:
-    override = os.environ.get("DOCMANCER_HOME")
+def _docatlas_home() -> Path:
+    override = os.environ.get("DOCATLAS_HOME")
     if override:
         base = Path(override).expanduser()
     else:
-        base = Path.home() / ".docmancer"
+        base = Path.home() / ".docatlas"
     return base / "qdrant"
 
 
@@ -221,7 +221,7 @@ class QdrantManager:
     individual lifecycle steps for tests and the ``doc-atlas qdrant`` CLI.
     """
 
-    home: Path = field(default_factory=_docmancer_home)
+    home: Path = field(default_factory=_docatlas_home)
 
     def __post_init__(self) -> None:
         self.paths = _Paths.for_home(self.home)
@@ -233,15 +233,15 @@ class QdrantManager:
     def resolve_binary(self) -> Path | None:
         """Return path to a usable Qdrant binary, or None if unavailable.
 
-        Order: ``DOCMANCER_QDRANT_BINARY`` env var; pre-downloaded managed
+        Order: ``DOCATLAS_QDRANT_BINARY`` env var; pre-downloaded managed
         binary; download from GitHub release for supported platforms.
         """
-        override = os.environ.get("DOCMANCER_QDRANT_BINARY")
+        override = os.environ.get("DOCATLAS_QDRANT_BINARY")
         if override:
             p = Path(override).expanduser()
             if p.is_file():
                 return p
-            logger.warning("DOCMANCER_QDRANT_BINARY=%s does not exist", override)
+            logger.warning("DOCATLAS_QDRANT_BINARY=%s does not exist", override)
             return None
 
         if self.paths.binary.is_file():
@@ -448,7 +448,7 @@ def ensure_running(*, port: int | None = None) -> QdrantResolution:
     ``QdrantResolution.fallback`` to decide whether to switch to
     ``SqliteVecStore``.
     """
-    override_url = os.environ.get("DOCMANCER_QDRANT_URL")
+    override_url = os.environ.get("DOCATLAS_QDRANT_URL")
     if override_url:
         return QdrantResolution(
             url=override_url,

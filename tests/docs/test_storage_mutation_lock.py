@@ -56,14 +56,14 @@ def test_project_sync_and_cleanup_share_the_same_database_mutation_lock(tmp_path
 
 def test_clear_index_refuses_while_the_same_database_is_being_mutated(tmp_path):
     project = tmp_path / "project"
-    storage = project / ".docmancer"
+    storage = project / ".docatlas"
     storage.mkdir(parents=True)
     db = storage / "project.db"
     db.write_text("index", encoding="utf-8")
-    (project / "docmancer.yaml").write_text(
+    (project / "docatlas.yaml").write_text(
         "index:\n"
-        "  db_path: .docmancer/project.db\n"
-        "  extracted_dir: .docmancer/extracted\n",
+        "  db_path: .docatlas/project.db\n"
+        "  extracted_dir: .docatlas/extracted\n",
         encoding="utf-8",
     )
     cleanup = IndexStorageCleanup()
@@ -90,7 +90,7 @@ def test_storage_mutation_lock_keeps_one_persistent_inode(tmp_path):
 
 def test_missing_storage_cleanup_is_idempotent_without_creating_home(tmp_path, monkeypatch):
     home = tmp_path / "missing-home"
-    monkeypatch.setenv("DOCMANCER_HOME", str(home))
+    monkeypatch.setenv("DOCATLAS_HOME", str(home))
     config = DocmancerConfig.model_validate({
         "index": {
             "db_path": str(home / "docmancer.db"),
@@ -134,14 +134,14 @@ def test_cleanup_refuses_while_writer_lease_is_active(tmp_path):
     from docmancer.docs.infrastructure.storage_mutation_lock import storage_writer_lease
 
     project = tmp_path / "project-with-lease"
-    storage = project / ".docmancer"
+    storage = project / ".docatlas"
     storage.mkdir(parents=True)
     db = storage / "project.db"
     db.write_text("index", encoding="utf-8")
-    (project / "docmancer.yaml").write_text(
+    (project / "docatlas.yaml").write_text(
         "index:\n"
-        "  db_path: .docmancer/project.db\n"
-        "  extracted_dir: .docmancer/extracted\n",
+        "  db_path: .docatlas/project.db\n"
+        "  extracted_dir: .docatlas/extracted\n",
         encoding="utf-8",
     )
     cleanup = IndexStorageCleanup()

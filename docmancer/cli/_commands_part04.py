@@ -30,7 +30,7 @@ from ._commands_part01 import _create_agent_or_raise_lock_error, _effective_conf
     default=False,
     help="Incrementally index accepted doc changes from the exact --base/--head Git diff; never writes repository files.",
 )
-@click.option("--config", "config_path", default=None, help="Path to docmancer.yaml.")
+@click.option("--config", "config_path", default=None, help="Path to docatlas.yaml.")
 def docs_impact_cmd(
     project_path: str,
     base: str | None,
@@ -183,7 +183,7 @@ def agent_contract_cmd(project_path: str, output_format: str) -> None:
 )
 @click.argument("source", required=False)
 @click.option("--all", "remove_all", is_flag=True, default=False, help="Remove every stored source and docset.")
-@click.option("--config", "config_path", default=None, help="Path to docmancer.yaml.")
+@click.option("--config", "config_path", default=None, help="Path to docatlas.yaml.")
 def remove_cmd(source: str | None, remove_all: bool, config_path: str | None):
     """Remove an indexed source (URL or file path) from the knowledge base."""
     config_path = _effective_config(config_path)
@@ -298,10 +298,10 @@ def clear_index_cmd(
         if explicit:
             resolved = resolve_config(explicit_path=explicit)
         else:
-            home = Path(os.environ.get("DOCMANCER_HOME") or (Path.home() / ".docmancer"))
+            home = Path(os.environ.get("DOCATLAS_HOME") or (Path.home() / ".docatlas"))
             resolved = resolve_config(
                 cwd=home / ".no-project-config",
-                user_config_path=home / "docmancer.yaml",
+                user_config_path=home / "docatlas.yaml",
             )
         plan = cleanup.preview(
             scope="global",
@@ -350,7 +350,7 @@ def clear_index_cmd(
 )
 @click.option("--yes", "-y", "assume_yes", is_flag=True, help="Skip the confirmation prompt.")
 @click.option("--dry-run", is_flag=True, help="Print what would be deleted without removing anything.")
-@click.option("--keep-config", is_flag=True, help="Preserve ~/.docmancer/docmancer.yaml.")
+@click.option("--keep-config", is_flag=True, help="Preserve ~/.docatlas/docatlas.yaml.")
 @click.option(
     "--keep-models",
     is_flag=True,
@@ -362,7 +362,7 @@ def clear_cmd(assume_yes: bool, dry_run: bool, keep_config: bool, keep_models: b
     Removes (by default):
 
     \b
-    - ~/.docmancer/ (config, SQLite FTS5 index, extracted docs, embeddings cache,
+    - ~/.docatlas/ (config, SQLite FTS5 index, extracted docs, embeddings cache,
       managed Qdrant storage, MCP packs)
     - ~/.cache/fastembed/ (FastEmbed ONNX model cache)
     - ~/.cache/huggingface/hub/models--Qdrant--* (Qdrant-published models that
@@ -373,13 +373,13 @@ def clear_cmd(assume_yes: bool, dry_run: bool, keep_config: bool, keep_models: b
     """
     home = Path.home()
 
-    docmancer_home = home / ".docmancer"
+    docmancer_home = home / ".docatlas"
     targets: list[Path] = []
 
     if docmancer_home.exists():
         if keep_config:
             for child in sorted(docmancer_home.iterdir()):
-                if child.name == "docmancer.yaml":
+                if child.name == "docatlas.yaml":
                     continue
                 targets.append(child)
         else:
@@ -416,7 +416,7 @@ def clear_cmd(assume_yes: bool, dry_run: bool, keep_config: bool, keep_models: b
         click.confirm("\nRemove all of this?", abort=True)
 
     # Stop the managed Qdrant before deleting its storage so the binary
-    # is not still writing into ~/.docmancer/qdrant as we remove it.
+    # is not still writing into ~/.docatlas/qdrant as we remove it.
     try:
         from docmancer.runtime.qdrant_manager import QdrantManager
 
@@ -456,7 +456,7 @@ def clear_cmd(assume_yes: bool, dry_run: bool, keep_config: bool, keep_models: b
         "doc-atlas list --stale",
         "doc-atlas list --vectors=drift",
         "doc-atlas list --format json",
-        "doc-atlas list --config ./docmancer.yaml",
+        "doc-atlas list --config ./docatlas.yaml",
     ),
 )
 @click.option("--all", "show_all", is_flag=True, default=False, help="Show every stored page/file source.")
@@ -464,7 +464,7 @@ def clear_cmd(assume_yes: bool, dry_run: bool, keep_config: bool, keep_models: b
 @click.option("--failed", is_flag=True, default=False, help="Only show sources with failures.")
 @click.option("--vectors", type=click.Choice(["ok", "none", "drift"], case_sensitive=False), default=None, help="Filter by vector state.")
 @click.option("output_format", "--format", type=click.Choice(["table", "json"], case_sensitive=False), default="table", show_default=True)
-@click.option("--config", "config_path", default=None, help="Path to docmancer.yaml.")
+@click.option("--config", "config_path", default=None, help="Path to docatlas.yaml.")
 def list_cmd(show_all: bool, stale: bool, failed: bool, vectors: str | None, output_format: str, config_path: str | None):
     """List indexed sources with operational state and next actions."""
     config_path = _effective_config(config_path)

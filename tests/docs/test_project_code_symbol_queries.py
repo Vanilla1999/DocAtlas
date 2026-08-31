@@ -33,7 +33,8 @@ def test_code_symbol_query_boosts_docs_with_python_file_references():
 
     result = ProjectContextService(facade).get_project_context("/repo", "What classes and functions implement the MCP server?", mode="project-only")
 
-    assert result.answer_available is True
+    assert result.answer_available is False
+    assert result.selection_decision.support_decision.answer_supported is False
     assert result.context_pack[0]["title"] == "Server implementation"
 
 

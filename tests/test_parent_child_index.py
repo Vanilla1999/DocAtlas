@@ -3,6 +3,7 @@ from __future__ import annotations
 import json
 
 import sqlite3
+import pytest
 
 from docmancer.core.models import Document
 from docmancer.core.sqlite_store import SQLiteStore
@@ -151,25 +152,33 @@ def test_expansion_never_crosses_parent_boundary(tmp_path):
     assert len(results) <= 10
 
 
-def test_additive_migration_keeps_v1_rows_readable(tmp_path):
+def test_plain_document_ingestion_joins_the_current_generation(tmp_path):
     db = tmp_path / "index.db"
     store = SQLiteStore(db)
     store.add_documents([Document(source="legacy.md", content="# Legacy\nold text")])
     store.add_documents([_doc("# Current\nnew text")])
 
     assert store.query("old", limit=2, budget=100)[0].source == "legacy.md"
+    assert {row["source"] for row in store.list_sections_for_embedding()} == {
+        "legacy.md", "docs/guide.md"
+    }
     health = store.index_health()
-    assert health["schema_versions"] == {"parent-child-v1": 1, "sqlite-sections-v1": 1}
-    assert health["issues"]["mixed_schema_versions"] is True
-    assert health["ok"] is False
+    assert health["schema_versions"] == {"parent-child-v1": 2}
+    assert health["issues"]["mixed_schema_versions"] is False
+    assert health["ok"] is True
 
     with sqlite3.connect(db) as conn:
         assert conn.execute("SELECT COUNT(*) FROM parent_sections").fetchone()[0] == 0
-        assert conn.execute("SELECT COUNT(*) FROM retrieval_parents").fetchone()[0] == 1
-        assert conn.execute("SELECT COUNT(*) FROM generation_sources").fetchone()[0] == 1
+        active = store.active_generation_id()
+        assert conn.execute(
+            "SELECT COUNT(*) FROM retrieval_parents WHERE generation_id = ?", (active,)
+        ).fetchone()[0] == 2
+        assert conn.execute(
+            "SELECT COUNT(*) FROM generation_sources WHERE generation_id = ?", (active,)
+        ).fetchone()[0] == 2
 
 
-def test_legacy_promoted_filter_preserves_multi_term_fts_semantics(tmp_path):
+def test_plain_documents_create_a_queryable_current_generation(tmp_path):
     store = SQLiteStore(tmp_path / "index.db")
     store.add_documents(
         [
@@ -191,6 +200,9 @@ def test_legacy_promoted_filter_preserves_multi_term_fts_semantics(tmp_path):
     )
 
     assert [result.source for result in results] == ["both.md"]
+    assert {row["source"] for row in store.list_sections_for_embedding()} == {
+        "both.md", "alpha.md"
+    }
 
 
 def test_failed_v2_rebuild_rolls_back_to_previous_source_rows(tmp_path):
@@ -390,7 +402,7 @@ def test_stable_ids_do_not_depend_on_machine_local_project_root(tmp_path):
     }
 
 
-def test_legacy_recreate_and_delete_all_cannot_leave_stale_active_generation(tmp_path):
+def test_plain_document_recreate_and_delete_all_replace_the_active_generation(tmp_path):
     store = SQLiteStore(tmp_path / "index.db")
     store.add_documents([_doc("# Old\n\nstale v2 sentinel\n")])
 
@@ -398,7 +410,7 @@ def test_legacy_recreate_and_delete_all_cannot_leave_stale_active_generation(tmp
         [Document(source="replacement.txt", content="fresh legacy sentinel")],
         recreate=True,
     )
-    assert store.active_generation_id() is None
+    assert store.active_generation_id() is not None
     assert all(
         row.source != "docs/guide.md"
         for row in store.query("stale sentinel", limit=3, budget=100)
@@ -409,6 +421,19 @@ def test_legacy_recreate_and_delete_all_cannot_leave_stale_active_generation(tmp
     assert store.delete_all() is True
     assert store.active_generation_id() is None
     assert not store.query("active sentinel", limit=3, budget=100)
+
+
+def test_explicit_old_chunking_schema_is_rejected(tmp_path):
+    store = SQLiteStore(tmp_path / "index.db")
+
+    with pytest.raises(ValueError, match="unsupported chunking schema"):
+        store.add_documents([
+            Document(
+                source="old.md",
+                content="retired schema",
+                metadata={"chunking_schema": "legacy-v1"},
+            )
+        ])
 
 
 def test_superseded_generation_retention_is_bounded_and_cannot_delete_active(tmp_path):
@@ -427,7 +452,7 @@ def test_superseded_generation_retention_is_bounded_and_cannot_delete_active(tmp
     assert store.index_health()["ok"] is True
 
 
-def test_delete_rebuilds_pre_contextual_active_generation(tmp_path):
+def test_delete_rejects_pre_contextual_active_generation(tmp_path):
     store = SQLiteStore(tmp_path / "index.db")
     first = _doc("# Remove\n\nremove legacy sentinel\n")
     second = Document(
@@ -446,7 +471,7 @@ def test_delete_rebuilds_pre_contextual_active_generation(tmp_path):
             (active,),
         )
 
-    assert store.delete_source(first.source) is True
-    info = store.generation_info()
-    assert info and info["context_config_hash"] and info["retrieval_config_hash"]
-    assert store.query("keep legacy sentinel", limit=1, budget=100)[0].source == second.source
+    with pytest.raises(ValueError, match="current context schema"):
+        store.delete_source(first.source)
+    assert store.active_generation_id() == active
+    assert store.query("remove legacy sentinel", limit=1, budget=100)[0].source == first.source

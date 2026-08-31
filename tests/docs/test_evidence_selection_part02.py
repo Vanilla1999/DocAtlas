@@ -527,7 +527,8 @@ def test_project_mechanism_how_question_does_not_require_workflow():
         config=project_docs_selection_config(800),
         requirements=requirements,
     )
-    assert decision.support_decision.answer_supported is True
+    assert decision.support_decision.answer_supported is False
+    assert "unsupported_answer_authorization:context_only_relation" in decision.missing_requirements
 
 
 def test_requirement_set_rejects_conflicting_duplicate_ids():

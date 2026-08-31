@@ -132,7 +132,10 @@ def _assert_agent_developer_protocol_baseline() -> None:
     assert ambiguity["recovery_contract_ok"] is True
     recovery = ambiguity["calls"][0]["recovery"]
     assert recovery["errors"] == []
-    assert recovery["docs_status_modules"] == ["packages/auth", "services/auth"]
+    assert ambiguity["calls"][0]["module_candidates"] == [
+        "packages/auth", "services/auth",
+    ]
+    assert recovery["docs_status_modules"] == []
     assert recovery["retry"] == {
         "status": "ok",
         "sources": ["packages/auth/README.md"],

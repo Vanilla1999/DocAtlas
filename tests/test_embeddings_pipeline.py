@@ -68,7 +68,7 @@ def _make_parent_child_doc(source: str, content: str) -> Document:
 
 
 def test_sync_prunes_vectors_for_removed_sections(tmp_path, monkeypatch):
-    monkeypatch.setenv("DOCMANCER_HOME", str(tmp_path / "home"))
+    monkeypatch.setenv("DOCATLAS_HOME", str(tmp_path / "home"))
     config = _config(tmp_path)
     store = SQLiteStore(config.index.db_path)
     vector_store = get_vector_store(config.vector_store, embeddings_dim=DIM)
@@ -117,7 +117,7 @@ def test_sync_prunes_vectors_for_removed_sections(tmp_path, monkeypatch):
 
 
 def test_scoped_sync_writes_only_requested_sections(tmp_path, monkeypatch):
-    monkeypatch.setenv("DOCMANCER_HOME", str(tmp_path / "home"))
+    monkeypatch.setenv("DOCATLAS_HOME", str(tmp_path / "home"))
     config = _config(tmp_path)
     store = SQLiteStore(config.index.db_path)
     vector_store = get_vector_store(config.vector_store, embeddings_dim=DIM)
@@ -140,11 +140,16 @@ def test_scoped_sync_writes_only_requested_sections(tmp_path, monkeypatch):
     )
 
     assert result.upserted == len(changed_ids)
-    assert set(store.list_embedding_upserts(collection)) == changed_ids
+    records = store.list_generation_vector_upserts(collection)
+    assert {record["vector_id"] for record in records.values()} == {
+        str(row["vector_id"])
+        for row in store.list_sections_for_embedding()
+        if int(row["section_id"]) in changed_ids
+    }
 
 
 def test_real_sqlite_vec_parent_child_incremental_uuid_sync(tmp_path, monkeypatch):
-    monkeypatch.setenv("DOCMANCER_HOME", str(tmp_path / "home"))
+    monkeypatch.setenv("DOCATLAS_HOME", str(tmp_path / "home"))
     config = _config(tmp_path)
     store = SQLiteStore(config.index.db_path)
     vector_store = get_vector_store(config.vector_store, embeddings_dim=DIM)
@@ -205,8 +210,8 @@ def test_real_sqlite_vec_parent_child_incremental_uuid_sync(tmp_path, monkeypatc
 
 
 def test_agent_prunes_exact_chunks_without_embedding_unrelated_sections(tmp_path, monkeypatch):
-    monkeypatch.setenv("DOCMANCER_HOME", str(tmp_path / "home"))
-    monkeypatch.delenv("DOCMANCER_AUTO_VECTORS", raising=False)
+    monkeypatch.setenv("DOCATLAS_HOME", str(tmp_path / "home"))
+    monkeypatch.delenv("DOCATLAS_AUTO_VECTORS", raising=False)
     config = _config(tmp_path)
     collection = "dm_test_exact_prune"
     config.vector_store = config.vector_store.model_copy(update={"collection": collection})
@@ -216,6 +221,7 @@ def test_agent_prunes_exact_chunks_without_embedding_unrelated_sections(tmp_path
         _make_doc("removed.md", "# Removed\n\nold content.\n"),
         _make_doc("kept.md", "# Kept\n\ncurrent content.\n"),
     ])
+    store.set_generation_vector_collection(store.active_generation_id(), collection)
     sync_vector_store(
         store=store,
         config=config,
@@ -229,15 +235,20 @@ def test_agent_prunes_exact_chunks_without_embedding_unrelated_sections(tmp_path
     deleted = DocmancerAgent(config=config).prune_vector_chunks(removed_ids)
 
     assert deleted == len(removed_ids)
-    assert set(store.list_embedding_upserts(collection)) == kept_ids
+    remaining = store.list_generation_vector_upserts(collection)
+    assert {record["vector_id"] for record in remaining.values()} == {
+        str(row["vector_id"])
+        for row in store.list_sections_for_embedding()
+        if int(row["section_id"]) in kept_ids
+    }
     assert vector_store.count(collection) == len(kept_ids)
 
 
 def test_agent_reports_primary_vector_work_before_generation_cleanup(
     tmp_path, monkeypatch
 ):
-    monkeypatch.setenv("DOCMANCER_HOME", str(tmp_path / "home"))
-    monkeypatch.delenv("DOCMANCER_AUTO_VECTORS", raising=False)
+    monkeypatch.setenv("DOCATLAS_HOME", str(tmp_path / "home"))
+    monkeypatch.delenv("DOCATLAS_AUTO_VECTORS", raising=False)
     monkeypatch.setattr(
         "docmancer.embeddings.get_embeddings_provider",
         lambda _config: StubProvider(),
@@ -262,7 +273,7 @@ def test_agent_reports_primary_vector_work_before_generation_cleanup(
 
 
 def test_generation_activation_rejects_equal_count_wrong_ids(tmp_path, monkeypatch):
-    monkeypatch.setenv("DOCMANCER_HOME", str(tmp_path / "home"))
+    monkeypatch.setenv("DOCATLAS_HOME", str(tmp_path / "home"))
     monkeypatch.setattr(
         "docmancer.embeddings.get_embeddings_provider", lambda _config: StubProvider()
     )
@@ -294,7 +305,7 @@ def test_generation_activation_rejects_equal_count_wrong_ids(tmp_path, monkeypat
 
 
 def test_empty_generation_rejects_extra_vector_points(tmp_path, monkeypatch):
-    monkeypatch.setenv("DOCMANCER_HOME", str(tmp_path / "home"))
+    monkeypatch.setenv("DOCATLAS_HOME", str(tmp_path / "home"))
     config = _config(tmp_path)
     store = SQLiteStore(config.index.db_path)
     vector_store = get_vector_store(config.vector_store, embeddings_dim=DIM)
@@ -309,4 +320,5 @@ def test_empty_generation_rejects_extra_vector_points(tmp_path, monkeypatch):
         sync_vector_store(
             store=store, config=config, provider=StubProvider(),
             vector_store=vector_store, collection=collection,
+            generation_id="empty-current-generation",
         )

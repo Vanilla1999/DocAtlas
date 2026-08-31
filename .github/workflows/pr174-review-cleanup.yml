@@ -1,0 +1,150 @@
+name: PR 174 review cleanup
+
+on:
+  push:
+    branches: [feat/retrieval-first-project-chat-main]
+  workflow_dispatch:
+
+permissions:
+  actions: read
+  contents: write
+
+concurrency:
+  group: pr174-review-cleanup
+  cancel-in-progress: false
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
+
+jobs:
+  wait-validate-and-clean:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with:
+          ref: feat/retrieval-first-project-chat-main
+          fetch-depth: 0
+          persist-credentials: true
+
+      - name: Wait for the fix workflow and require success
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          python - <<'PY'
+          from __future__ import annotations
+
+          import json
+          import os
+          import time
+          import urllib.parse
+          import urllib.request
+
+          repo = os.environ["GITHUB_REPOSITORY"]
+          branch = "feat/retrieval-first-project-chat-main"
+          token = os.environ["GH_TOKEN"]
+          query = urllib.parse.urlencode(
+              {"branch": branch, "event": "push", "per_page": 100}
+          )
+          url = f"https://api.github.com/repos/{repo}/actions/runs?{query}"
+          headers = {
+              "Accept": "application/vnd.github+json",
+              "Authorization": f"Bearer {token}",
+              "User-Agent": "pr174-review-cleanup",
+          }
+
+          deadline = time.time() + 1500
+          while time.time() < deadline:
+              request = urllib.request.Request(url, headers=headers)
+              with urllib.request.urlopen(request, timeout=30) as response:
+                  runs = json.load(response).get("workflow_runs", [])
+              fixes = [run for run in runs if run.get("name") == "PR 174 review fixes"]
+              if fixes and all(run.get("status") == "completed" for run in fixes[:2]):
+                  latest = max(fixes, key=lambda run: run["created_at"])
+                  if latest.get("conclusion") != "success":
+                      raise SystemExit(
+                          "latest PR 174 review fix workflow did not succeed: "
+                          + str(latest.get("conclusion"))
+                      )
+                  print("fix workflow succeeded: " + latest["html_url"])
+                  break
+              time.sleep(20)
+          else:
+              raise SystemExit("timed out waiting for PR 174 review fixes")
+          PY
+
+      - name: Checkout the exact updated branch head
+        run: |
+          git fetch origin feat/retrieval-first-project-chat-main
+          git reset --hard origin/feat/retrieval-first-project-chat-main
+
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: "3.12"
+
+      - name: Install development dependencies
+        run: python -m pip install -e ".[dev]"
+
+      - name: Repeat the blocking review gates on the updated source
+        run: |
+          python scripts/run_paraphrase_proofability_gate.py
+          python scripts/paraphrase_proofability_self_test.py
+          python -m pytest -q \
+            tests/docs/test_project_code_symbol_queries.py \
+            tests/docs/test_question_plan_v4.py \
+            tests/docs/test_evidence_selection.py \
+            tests/docs/test_evidence_selection_part02.py \
+            tests/docs/test_evidence_selection_v2.py
+          python -m pytest -q tests/test_context7_parity_production_matrix.py
+          python -m compileall -q docmancer eval tests
+          git diff --check
+
+      - name: Run P1.6 exact workflow commands
+        shell: bash
+        run: |
+          python - <<'PY'
+          from __future__ import annotations
+
+          import re
+          import subprocess
+          from pathlib import Path
+
+          workflow = Path(".github/workflows/p1.6-evidence-is-data.yml")
+          lines = workflow.read_text(encoding="utf-8").splitlines()
+          blocks = []
+          index = 0
+          while index < len(lines):
+              match = re.match(r"^(\s*)run:\s*\|\s*$", lines[index])
+              if not match:
+                  index += 1
+                  continue
+              base = len(match.group(1))
+              index += 1
+              body = []
+              while index < len(lines):
+                  line = lines[index]
+                  if line.strip() and len(line) - len(line.lstrip()) <= base:
+                      break
+                  body.append(line[base + 2 :] if len(line) >= base + 2 else "")
+                  index += 1
+              block = "\n".join(body)
+              if "python" in block and "pip install" not in block:
+                  blocks.append(block)
+          if not blocks:
+              raise SystemExit("P1.6 workflow has no validation block")
+          for block in blocks:
+              subprocess.run(["bash", "-lc", block], check=True)
+          PY
+
+      - name: Remove transport workflows and commit the clean reviewed tree
+        shell: bash
+        run: |
+          git rm \
+            .github/workflows/pr174-review-fixes.yml \
+            .github/workflows/pr174-review-cleanup.yml
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "chore: remove PR review transport workflows"
+          git push origin HEAD:feat/retrieval-first-project-chat-main

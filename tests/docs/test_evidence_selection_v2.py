@@ -198,30 +198,40 @@ def test_permission_frames_select_and_project_decisive_local_evidence(tmp_path, 
         (
             "According to the project documentation, which PermissionDecision permits BrowserPermissionGate to enter?",
             "PermissionDecision.allow",
+            True,
         ),
         (
             "According to the project documentation, how does ScanPermissionGate determine whether scan may enter?",
             "evaluateFlowEntry",
+            False,
         ),
         (
             "According to the project documentation, what allowOfflineFallback value must offline sync pass to PermissionService.evaluateFlowEntry?",
             "allowOfflineFallback: false",
+            True,
         ),
         (
             "What project permission contract applies to browser, scan, and sync when immediate permission is missing?",
             "cannot bypass missing immediate-entry permissions",
+            False,
         ),
         (
             "What does the browser flow do to determine permission for entry?",
             "evaluateFlowEntry",
+            False,
         ),
         (
             "What does offline sync do before accepting queued work?",
             "before accepting queued work",
+            False,
         ),
     ]
-    for question, expected in cases:
+    for question, expected, answer_expected in cases:
         decision = _select(question, candidates)
+        if not answer_expected:
+            assert decision.status == "insufficient_evidence", question
+            assert any(item.startswith("context_only:") for item in decision.missing_requirements)
+            continue
         assert decision.status == "ok", decision.missing_requirements
         projection, _snapshot = project_docs_answer(
             question=question,
@@ -267,7 +277,7 @@ def test_permission_frames_select_and_project_decisive_local_evidence(tmp_path, 
     )
     service = _service(tmp_path, monkeypatch)
     assert service.sync_project_docs(str(project), with_vectors=False).status == "success"
-    for question, _expected in cases:
+    for question, _expected, answer_expected in cases:
         result = service.get_docs_context(
             question,
             project_path=str(project),
@@ -276,7 +286,7 @@ def test_permission_frames_select_and_project_decisive_local_evidence(tmp_path, 
             tokens=4_000,
             limit=12,
         )
-        assert result.answer_available is True, (
+        assert result.answer_available is answer_expected, (
             question, result.status, result.reason_code, result.message,
             result.next_action, result.missing_requirement_ids,
         )

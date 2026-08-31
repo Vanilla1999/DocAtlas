@@ -14,9 +14,23 @@ def test_list_sections_for_embedding_matches_fts_sections(tmp_path: Path):
         Document(
             source="docs/auth.md",
             content="# Auth\n\nUse OAuth.\n\n## Tokens\n\nTokens refresh hourly.",
-            metadata={},
+            metadata={
+                "format": "markdown",
+                "chunking_schema": "parent-child-v1",
+                "child_target_tokens": 160,
+                "child_hard_max_tokens": 512,
+            },
         ),
-        Document(source="docs/empty.md", content="", metadata={}),
+        Document(
+            source="docs/empty.md",
+            content="",
+            metadata={
+                "format": "markdown",
+                "chunking_schema": "parent-child-v1",
+                "child_target_tokens": 160,
+                "child_hard_max_tokens": 512,
+            },
+        ),
     ])
 
     sections = store.list_sections_for_embedding()

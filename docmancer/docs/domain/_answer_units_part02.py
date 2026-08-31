@@ -84,7 +84,11 @@ def _inventory_facts(
     # Closed inventories are introduced by punctuation/copula and contain
     # code-shaped or quoted names.  Ordinary identifiers elsewhere in a
     # branding sentence are deliberately ignored.
-    introduced = re.search(r"(?:\b(?:are|include|consist\s+of|namely)\b|[:=-])\s*(.+)$", tail, re.I | re.S)
+    introduced = re.search(
+        r"(?:\b(?:are|include|includes|support|supports|consist\s+of|namely)\b|[:=-])\s*(.+)$",
+        tail,
+        re.I | re.S,
+    )
     if introduced:
         material = introduced.group(1).split("\n\n", 1)[0]
         for match in re.finditer(r"`([^`\n]{2,120})`", material):
@@ -95,7 +99,11 @@ def _inventory_facts(
             candidate = re.sub(r"^(?:and|or|и|или)\s+", "", part.strip(), flags=re.I)
             candidate = candidate.strip(" `.'\"()[]")
             if re.fullmatch(r"[A-Za-z_][A-Za-z0-9_.:-]{1,80}", candidate) and (
-                "_" in candidate or "." in candidate or ":" in candidate or candidate.islower()
+                "_" in candidate
+                or "." in candidate
+                or ":" in candidate
+                or candidate.islower()
+                or item_kind == "format"
             ):
                 names.append(_normal(candidate))
     # Generic closed inventories may be documented as Markdown tables or a
@@ -120,6 +128,33 @@ def _inventory_facts(
                     names.append(_normal(candidate))
     unique = tuple(dict.fromkeys(value for value in names if value))
     return explicit_count, unique, True
+
+
+_OPEN_INVENTORY_RE = re.compile(
+    r"\b(?:and\s+)?(?:other|additional)\s+(?:file\s+)?formats?\b|"
+    r"\b(?:etc|and\s+so\s+on)\.?\b|"
+    r"\bincluding\s+but\s+not\s+limited\s+to\b",
+    re.I,
+)
+
+
+def _contract_fact_relation_valid(text: str) -> bool:
+    normalized = _normal(text)
+    if _NEGATION_RE.search(text) or re.search(
+        r"\b(?:obsolete|deprecated|documented|described|mentioned)\b", normalized,
+    ):
+        return False
+    returns_result = bool(re.search(
+        r"\b(?:return|returns|responds?\s+with|produces?|emits?|result(?:s)?\s+(?:is|are))\b",
+        normalized,
+    ))
+    contract_value = bool(re.search(
+        r"\b(?:docs[\s_]answer|docs[\s_]context|patch[\s_]context|"
+        r"insufficient[\s_]evidence|answer[\s_]supported|answer[\s_]policy|"
+        r"recommended[\s_]next[\s_]action)\b",
+        normalized,
+    ))
+    return returns_result and contract_value
 
 
 def _subject_token_overlap(subject: str, text: str) -> int:
@@ -495,7 +530,8 @@ def local_proof_for_obligation(
             or _attribute_present(obligation.attribute, text)
         )
         attribute = 3 if attribute_bound else 0
-        names_valid = len(names) >= 2 and (
+        closed_inventory = not _OPEN_INVENTORY_RE.search(text)
+        names_valid = closed_inventory and len(names) >= 2 and (
             obligation.cardinality is None or len(names) == obligation.cardinality
         )
         derived_count = explicit_count if explicit_count is not None else (len(names) if names_valid else None)
@@ -702,6 +738,11 @@ def local_proof_for_obligation(
 
     if obligation.kind == "exact_fact":
         relation = 2 if (not obligation.attribute or _attribute_present(obligation.attribute, text)) else 0
+        if (
+            obligation.relation == "contract_fact"
+            and _normal(obligation.attribute) == "response contract"
+        ):
+            relation = 3 if relation and _contract_fact_relation_valid(text) else 0
         value = _value_score(obligation.value_kind, text)
         if obligation.expected_value:
             value = max(value, 3 if _contains_term(obligation.expected_value, text) else 0)

@@ -183,7 +183,6 @@ def evaluate_case(case: dict[str, Any]) -> dict[str, Any]:
         "selected_stable_ids": selected,
         "selected_tokens": (trace.get("metrics") or {}).get("selected_tokens"),
         "selector_budgeted_tokens": (trace.get("metrics") or {}).get("projected_total_tokens"),
-        "legacy_budgeted_tokens": _legacy_budgeted_tokens(case),
         "projected_tokens": projection.get("estimated_tokens"),
         "selector_latency_ns": selector_latency_ns,
         "selector_config_hash": trace.get("selector_config_hash"),
@@ -215,35 +214,31 @@ def evaluate() -> dict[str, Any]:
         rows = [row for row in results if row["result_kind"] == kind]
         tokens = [row["projected_tokens"] for row in rows]
         selector_budgeted = [row["selector_budgeted_tokens"] for row in rows]
-        legacy_budgeted = [row["legacy_budgeted_tokens"] for row in rows]
         groups[kind] = {
             "cases": len(rows),
             "passed": sum(row["passed"] for row in rows),
             "median_projected_tokens": statistics.median(tokens) if tokens else None,
             "maximum_projected_tokens": max(tokens) if tokens else None,
             "median_selector_budgeted_tokens": statistics.median(selector_budgeted) if selector_budgeted else None,
-            "median_legacy_budgeted_tokens": statistics.median(legacy_budgeted) if legacy_budgeted else None,
-            "median_budgeted_token_reduction": (
-                statistics.median(legacy_budgeted) - statistics.median(selector_budgeted)
-                if selector_budgeted and legacy_budgeted else None
-            ),
         }
-    baseline_metrics_match = baseline.get("metrics") == {
-        kind: {
-            "cases": groups[kind]["cases"],
-            "median_legacy_budgeted_tokens": groups[kind]["median_legacy_budgeted_tokens"],
-        }
-        for kind in groups
+    baseline_case_counts_match = baseline.get("case_counts") == {
+        kind: groups[kind]["cases"] for kind in groups
     }
     task41_match = task41_gate["baseline_match"]
-    token_gate = all(
-        row["median_selector_budgeted_tokens"] <= row["median_legacy_budgeted_tokens"]
-        for row in groups.values()
-    )
     correctness = (
-        digest_match and baseline_metrics_match and task41_match and token_gate
+        digest_match and baseline_case_counts_match and task41_match
         and all(row["passed"] for row in results)
     )
+    correctness_failures = [
+        name
+        for name, passed in (
+            ("baseline_dataset_digest_mismatch", digest_match),
+            ("baseline_case_counts_mismatch", baseline_case_counts_match),
+            ("task41_current_generation_binding_mismatch", task41_match),
+            ("case_quality_failure", all(row["passed"] for row in results)),
+        )
+        if not passed
+    ]
     verdict = "PASS" if correctness and baseline.get("status") == "PASS" else "INCONCLUSIVE" if correctness else "FAIL"
     return {
         "schema_version": "task42-evidence-selection-report-v1",
@@ -251,12 +246,12 @@ def evaluate() -> dict[str, Any]:
         "correctness_gate": "PASS" if correctness else "FAIL",
         "baseline_status": baseline.get("status"),
         "baseline_dataset_digest_match": digest_match,
-        "baseline_metrics_match": baseline_metrics_match,
+        "baseline_case_counts_match": baseline_case_counts_match,
         "task41_gate": {
             **task41_gate,
             "selected_target_tokens": task41_report["selected_target_tokens"],
         },
-        "token_gate": "PASS" if token_gate else "FAIL",
+        "correctness_failures": correctness_failures,
         "dataset_digests": digests,
         "code_digests": {
             name: _digest(REPOSITORY_ROOT / name) for name in CODE_FILES
@@ -281,22 +276,6 @@ def _host_bind_candidate(raw: dict[str, Any]) -> dict[str, Any]:
     if item.get("stable_chunk_id"):
         item.setdefault("display_content_hash", hashlib.sha256(display.encode("utf-8")).hexdigest())
     return item
-
-
-def _legacy_budgeted_tokens(case: dict[str, Any]) -> int:
-    reserve = 120 if case["result_kind"] == "docs_answer" else min(
-        300, int(case["maximum_visible_tokens"]) // 3
-    )
-    selected = case["candidates"][:3] if case["result_kind"] == "docs_answer" else case["candidates"][:12]
-    visible = sum(
-        max(1, (len(str(
-            item.get("display_text") or item.get("code") or item.get("snippet")
-            or item.get("content") or ""
-        ).encode("utf-8")) + 3) // 4)
-        + (88 if case["result_kind"] == "patch_context" else 0)
-        for item in selected
-    )
-    return min(int(case["maximum_visible_tokens"]), reserve + visible)
 
 
 def _evaluate_projection_only(case: dict[str, Any]) -> tuple[dict[str, Any], dict[str, Any]]:

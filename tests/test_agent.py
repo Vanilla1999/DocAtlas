@@ -139,7 +139,7 @@ def test_ingest_filters_formats_and_non_recursive(tmp_path):
 
 
 def test_ingest_skips_bad_file_and_writes_report(tmp_path, monkeypatch):
-    monkeypatch.setenv("DOCMANCER_HOME", str(tmp_path / "home"))
+    monkeypatch.setenv("DOCATLAS_HOME", str(tmp_path / "home"))
     docs = tmp_path / "docs"
     docs.mkdir()
     (docs / "good.md").write_text("# Good\n\nToken docs.", encoding="utf-8")

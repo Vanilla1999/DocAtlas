@@ -7,7 +7,7 @@ from docmancer.mcp import credentials, paths
 
 @pytest.fixture(autouse=True)
 def isolated_home(tmp_path, monkeypatch):
-    monkeypatch.setenv("DOCMANCER_HOME", str(tmp_path))
+    monkeypatch.setenv("DOCATLAS_HOME", str(tmp_path))
     paths.ensure_dirs()
     paths.secrets_dir().mkdir(exist_ok=True)
 
@@ -15,7 +15,7 @@ def isolated_home(tmp_path, monkeypatch):
 def test_per_call_override_wins(monkeypatch):
     monkeypatch.setenv("ACME_API_KEY", "from-env")
     scheme = {"type": "bearer", "env": "ACME_API_KEY", "name": "acme"}
-    args = {credentials.DOCMANCER_AUTH_KEY: {"acme": "from-call"}}
+    args = {credentials.DOCATLAS_AUTH_KEY: {"acme": "from-call"}}
     res = credentials.resolve("acme", scheme, args)
     assert res.value == "from-call"
     assert res.source == "per_call"

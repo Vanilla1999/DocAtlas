@@ -8,7 +8,7 @@ from docmancer.mcp.installer import LocalRegistry, install_package, uninstall_pa
 
 @pytest.fixture(autouse=True)
 def isolated_home(tmp_path, monkeypatch):
-    monkeypatch.setenv("DOCMANCER_HOME", str(tmp_path / "home"))
+    monkeypatch.setenv("DOCATLAS_HOME", str(tmp_path / "home"))
     paths.ensure_dirs()
 
 
@@ -25,7 +25,7 @@ def _seed_registry(root, package, version, contract, tools_curated, tools_full=N
 
 def test_install_writes_artifacts_and_manifest(tmp_path, monkeypatch):
     registry_dir = tmp_path / "registry"
-    monkeypatch.setenv("DOCMANCER_REGISTRY_DIR", str(registry_dir))
+    monkeypatch.setenv("DOCATLAS_REGISTRY_DIR", str(registry_dir))
 
     contract = {
         "auth": {"schemes": [{"type": "bearer", "env": "ACME_API_KEY"}],
@@ -53,7 +53,7 @@ def test_install_writes_artifacts_and_manifest(tmp_path, monkeypatch):
 
 def test_uninstall_removes_files_and_manifest_entry(tmp_path, monkeypatch):
     registry_dir = tmp_path / "registry"
-    monkeypatch.setenv("DOCMANCER_REGISTRY_DIR", str(registry_dir))
+    monkeypatch.setenv("DOCATLAS_REGISTRY_DIR", str(registry_dir))
     _seed_registry(
         registry_dir, "acme", "v1",
         {"operations": []}, {"tools": []},
@@ -66,7 +66,7 @@ def test_uninstall_removes_files_and_manifest_entry(tmp_path, monkeypatch):
 
 def test_install_idempotent_reinstall(tmp_path, monkeypatch):
     registry_dir = tmp_path / "registry"
-    monkeypatch.setenv("DOCMANCER_REGISTRY_DIR", str(registry_dir))
+    monkeypatch.setenv("DOCATLAS_REGISTRY_DIR", str(registry_dir))
     _seed_registry(registry_dir, "x", "1", {"operations": []}, {"tools": []})
     install_package("x", "1")
     install_package("x", "1", allow_destructive=True)
@@ -91,7 +91,7 @@ def test_install_grants_destructive_per_operation_only_when_opted_in(tmp_path, m
         },
         {"tools": []},
     )
-    monkeypatch.setenv("DOCMANCER_REGISTRY_DIR", str(registry_dir))
+    monkeypatch.setenv("DOCATLAS_REGISTRY_DIR", str(registry_dir))
 
     result = install_package("x", "1", allow_destructive=True)
 

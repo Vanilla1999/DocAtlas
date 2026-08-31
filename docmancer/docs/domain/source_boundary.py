@@ -41,7 +41,7 @@ class SourceBoundary:
 
     @classmethod
     def from_project(cls, root: Path) -> SourceBoundary:
-        config_path = root / "docmancer.yaml"
+        config_path = root / "docatlas.yaml"
         configured = ProjectSourceBoundaryConfig()
         if config_path.is_file() and not config_path.is_symlink():
             try:

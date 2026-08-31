@@ -2,7 +2,7 @@
 
 MCP Packs are DocAtlas's advanced API-action layer. If your goal is source-grounded answers from documentation, start with the DocAtlas Docs workflow: `doc-atlas ingest`, `doc-atlas add`, `doc-atlas query`, or `doc-atlas mcp docs-serve`. Use Packs when an agent needs version-pinned API action tools.
 
-MCP packs are version-pinned tool bundles compiled from public API documentation sources such as OpenAPI, GraphQL introspection, TypeDoc, and Sphinx. Installed packs are exposed to agents through one local stdio gateway, `doc-atlas mcp packs-serve`, using two meta-tools. `doc-atlas mcp serve` remains a compatibility alias:
+MCP packs are version-pinned tool bundles compiled from public API documentation sources such as OpenAPI, GraphQL introspection, TypeDoc, and Sphinx. Installed packs are exposed to agents through one local stdio gateway, `doc-atlas mcp packs-serve`, using two meta-tools:
 
 - `docmancer_search_tools(query, package?, limit?)` searches across enabled packs and returns the best matching tool with its input schema.
 - `docmancer_call_tool(name, args)` invokes a specific fully qualified tool name returned by search.
@@ -18,7 +18,7 @@ doc-atlas install-pack open-meteo@v1
 `install-pack` resolves artifacts in this order:
 
 1. Local cache.
-2. The hosted compatibility Docmancer artifact API.
+2. The hosted DocAtlas artifact API.
 3. Built-in known-source fallback. Open-Meteo packs can be compiled locally from the public OpenAPI spec when precompiled artifacts are not available.
 
 Package specs parse from the rightmost `@`, so scoped names like `@scope/pkg@1.2.3` work.
@@ -45,7 +45,6 @@ doc-atlas uninstall open-meteo@v1
 | Command | Description |
 |---------|-------------|
 | `doc-atlas mcp packs-serve` | Run the advanced stdio MCP Packs/API-pack gateway. |
-| `doc-atlas mcp serve` | Compatibility alias for `packs-serve`. The default documentation workflow uses `doc-atlas mcp docs-serve`. |
 | `doc-atlas mcp doctor` | Verify pack artifacts, credential resolution, and agent config registrations. |
 | `doc-atlas mcp list` | Show installed packs, curated or expanded mode, tool counts, and destructive gate state. |
 | `doc-atlas mcp enable <pkg> [--version <v>]` | Re-enable a disabled pack without reinstalling it. |
@@ -62,13 +61,13 @@ Credential resolution checks these sources:
 1. Per-call credential override.
 2. Process environment variable.
 3. Agent MCP config `env` block.
-4. User-managed env file under `~/.docmancer/secrets/<package>.env`.
+4. User-managed env file under `~/.docatlas/secrets/<package>.env`.
 
 Destructive operations are blocked unless the pack was installed with `--allow-destructive`. Executor types that can run local code are blocked unless the pack was installed with `--allow-execute`.
 
-For non-idempotent operations that declare an idempotency header, docmancer injects a UUID4 idempotency key and reuses it on retry from a 24-hour SQLite fingerprint cache. Successful responses can include `_docmancer.idempotency_key`; retry with `args._docmancer_idempotency_key` to deduplicate.
+For non-idempotent operations that declare an idempotency header, DocAtlas injects a UUID4 idempotency key and reuses it on retry from a 24-hour SQLite fingerprint cache. Successful responses can include `_docatlas.idempotency_key`; retry with `args._docatlas_idempotency_key` to deduplicate.
 
-Call logs are written to `~/.docmancer/mcp/calls.jsonl`. Logs record argument keys only, not argument values.
+Call logs are written to `~/.docatlas/mcp/calls.jsonl`. Logs record argument keys only, not argument values.
 
 ## Source-Kind Support
 

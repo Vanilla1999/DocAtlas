@@ -285,7 +285,7 @@ def test_subprocess_worker_is_fail_closed_and_bounds_both_output_streams(tmp_pat
     for required in ("--unshare-all", "--die-with-parent", "--new-session", "--tmpfs", "--chdir"):
         assert required in command
     assert "/work" in command
-    assert all("DOCMANCER_HOME" not in part for part in command)
+    assert all("DOCATLAS_HOME" not in part for part in command)
     assert all(str(Path.cwd()) not in part for part in command)
 
     process = subprocess.Popen(

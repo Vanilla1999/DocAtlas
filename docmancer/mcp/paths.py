@@ -11,13 +11,8 @@ from docmancer.core.product_identity import (
 )
 
 
-def docmancer_home() -> Path:
-    """Compatibility alias for the DocAtlas machine-state root."""
-    return docatlas_home()
-
-
 def mcp_dir() -> Path:
-    return docmancer_home() / "mcp"
+    return docatlas_home() / "mcp"
 
 
 def manifest_path() -> Path:
@@ -37,15 +32,15 @@ def idempotency_db_path() -> Path:
 
 
 def servers_dir() -> Path:
-    return docmancer_home() / "servers"
+    return docatlas_home() / "servers"
 
 
 def registry_dir() -> Path:
     """Default local registry root under the DocAtlas machine-state home."""
-    override = os.environ.get("DOCATLAS_REGISTRY_DIR") or os.environ.get("DOCMANCER_REGISTRY_DIR")
+    override = os.environ.get("DOCATLAS_REGISTRY_DIR")
     if override:
         return Path(override).expanduser()
-    return docmancer_home() / "registry"
+    return docatlas_home() / "registry"
 
 
 def _validate_pack_component(value: str, *, kind: str) -> str:
@@ -84,7 +79,7 @@ def package_dir(package: str, version: str) -> Path:
 
 
 def secrets_dir() -> Path:
-    return docmancer_home() / "secrets"
+    return docatlas_home() / "secrets"
 
 
 def secrets_env_file(package: str) -> Path:
@@ -100,12 +95,9 @@ def secrets_env_file(package: str) -> Path:
 
 def ensure_dirs() -> None:
     resolution = resolve_home()
-    root = ensure_owned_home(
-        resolution.path,
-        allow_legacy_claim=resolution.compatibility_legacy,
-    )
+    root = ensure_owned_home(resolution.path)
     (root / "mcp").mkdir(parents=True, exist_ok=True)
     (root / "servers").mkdir(parents=True, exist_ok=True)
-    registry_override = os.environ.get("DOCATLAS_REGISTRY_DIR") or os.environ.get("DOCMANCER_REGISTRY_DIR")
+    registry_override = os.environ.get("DOCATLAS_REGISTRY_DIR")
     registry = Path(registry_override).expanduser() if registry_override else root / "registry"
     registry.mkdir(parents=True, exist_ok=True)

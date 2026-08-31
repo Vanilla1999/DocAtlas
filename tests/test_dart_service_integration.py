@@ -24,7 +24,7 @@ class MultiRootFakeFetcher:
 
 
 def _service_with_fake_fetcher(tmp_path, monkeypatch, documents):
-    monkeypatch.setenv("DOCMANCER_HOME", str(tmp_path / "home"))
+    monkeypatch.setenv("DOCATLAS_HOME", str(tmp_path / "home"))
     config = DocmancerConfig()
     config.index.db_path = str(tmp_path / "test.db")
 

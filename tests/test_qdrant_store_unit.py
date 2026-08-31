@@ -48,11 +48,11 @@ def test_collection_metadata_reads_ownership_sentinel_payload():
     store = object.__new__(QdrantStore)
     store._client = _FakeRetrieveClient(
         {
-            "_docmancer_owned": True,
-            "_docmancer_embedder_provider": "fastembed",
-            "_docmancer_embedder_model": "BAAI/bge-base-en-v1.5",
-            "_docmancer_embedder_dim": 768,
-            "_docmancer_sparse_model": "prithivida/Splade_PP_en_v1",
+            "_docatlas_owned": True,
+            "_docatlas_embedder_provider": "fastembed",
+            "_docatlas_embedder_model": "BAAI/bge-base-en-v1.5",
+            "_docatlas_embedder_dim": 768,
+            "_docatlas_sparse_model": "prithivida/Splade_PP_en_v1",
         }
     )
 
@@ -64,6 +64,8 @@ def test_collection_metadata_reads_ownership_sentinel_payload():
         "dim": 768,
         "sparse_model": "prithivida/Splade_PP_en_v1",
     }
+    store._client = _FakeRetrieveClient({"_docmancer_owned": True})
+    assert store._is_owned("docs") is False
 
 
 class _FakeUploadClient:

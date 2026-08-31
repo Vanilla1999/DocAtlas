@@ -42,7 +42,7 @@ def _open_meteo_spec():
 
 
 def test_build_openapi_pack_emits_installable_open_meteo_artifacts(tmp_path, monkeypatch):
-    monkeypatch.setenv("DOCMANCER_HOME", str(tmp_path / "home"))
+    monkeypatch.setenv("DOCATLAS_HOME", str(tmp_path / "home"))
     paths.ensure_dirs()
     registry_root = tmp_path / "registry"
     pkg_dir = registry_root / "open-meteo@v1"
@@ -77,7 +77,7 @@ def test_build_openapi_pack_emits_installable_open_meteo_artifacts(tmp_path, mon
 
 
 def test_default_install_falls_back_to_known_open_meteo_openapi(tmp_path, monkeypatch):
-    monkeypatch.setenv("DOCMANCER_HOME", str(tmp_path / "home"))
+    monkeypatch.setenv("DOCATLAS_HOME", str(tmp_path / "home"))
     paths.ensure_dirs()
 
     class FakeResponse:
@@ -120,7 +120,7 @@ def test_default_install_falls_back_to_known_open_meteo_openapi(tmp_path, monkey
 
 
 def test_default_registry_uses_hosted_url_without_user_env(monkeypatch):
-    monkeypatch.delenv("DOCMANCER_REGISTRY_API_URL", raising=False)
+    monkeypatch.delenv("DOCATLAS_REGISTRY_API_URL", raising=False)
 
     registry = default_registry()
     assert isinstance(registry, CompositeRegistry)

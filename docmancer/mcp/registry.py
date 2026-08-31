@@ -72,13 +72,13 @@ class HostedRegistry(RegistryClient):
     """Fetches precompiled artifacts from a hosted registry API.
 
     The default points at docmancer.dev so user installs are zero-config.
-    DOCMANCER_REGISTRY_API_URL remains as a developer override for staging.
+    DOCATLAS_REGISTRY_API_URL remains as a developer override for staging.
     """
 
     def __init__(self, base_url: str | None = None, timeout: float = 30.0):
         self._base_url = (
             base_url
-            or os.environ.get("DOCMANCER_REGISTRY_API_URL")
+            or os.environ.get("DOCATLAS_REGISTRY_API_URL")
             or DEFAULT_REGISTRY_API_URL
         ).rstrip("/")
         self._timeout = timeout
@@ -144,7 +144,7 @@ class KnownOpenAPIRegistry(RegistryClient):
         return LocalRegistry(self._cache_root).expected_sha256(package, version, artifact)
 
     def _build_open_meteo(self, version: str, pkg_dir: Path) -> None:
-        source_url = os.environ.get("DOCMANCER_OPEN_METEO_OPENAPI_URL", self.OPEN_METEO_OPENAPI_URL)
+        source_url = os.environ.get("DOCATLAS_OPEN_METEO_OPENAPI_URL", self.OPEN_METEO_OPENAPI_URL)
         with httpx.Client(timeout=self._timeout, follow_redirects=True) as client:
             response = client.get(source_url)
             response.raise_for_status()

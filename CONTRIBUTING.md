@@ -1,10 +1,14 @@
 # Contributing to DocAtlas
 
-DocAtlas still uses the internal Python package name `docmancer` in parts of the codebase for compatibility. New user-facing docs should use `DocAtlas` and the `doc-atlas` CLI command.
+The product and CLI are named DocAtlas and `doc-atlas`; the Python import namespace remains `docmancer`.
 
 Thank you for contributing! This guide covers project layout and common extension points.
 
 ## Project structure
+
+New contributors should start by reading `README.md`, this `CONTRIBUTING.md`,
+`docs/INDEX.md`, and `docs/PROJECT_MAP.md`. Together they provide the product
+overview, repository map, canonical documentation index, and contribution flow.
 
 ```text
 docmancer/
@@ -30,6 +34,8 @@ tests/                  # pytest tests (mirror docmancer/ where useful)
 ## Documentation MCP changes
 
 Keep the public Docs MCP inventory to `get_docs_context`, `prepare_docs`, and `docs_status`. Repository files are the source of truth; DocAtlas may index accepted docs but must not silently author or commit them. Read [the canonical Docs MCP reference](./docs/mcp-docs-server.md) before changing this boundary.
+
+The bounded `get_docs_context` result union is `docs_answer`, `docs_context`, `patch_context`, or `insufficient_evidence`. Preserve the conservative boundary: only narrow relation-specific proof may authorize `docs_answer`; broad onboarding, overview, and explanatory questions remain `docs_context`.
 
 ## Adding a new doc source (fetcher)
 

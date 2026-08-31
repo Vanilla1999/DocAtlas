@@ -5,7 +5,6 @@ import json
 from typing import Any
 
 DEFAULT_MCP_COMPACT_OUTPUT_MAX_BYTES = 32_000
-DEFAULT_FULL_OUTPUT_MAX_BYTES = 256_000
 _TEXT_KEYS = {"content", "snippet", "text", "primary_snippet", "surrounding_context"}
 _SUMMARY_KEYS = (
     "path",
@@ -20,22 +19,6 @@ _SUMMARY_KEYS = (
     "score",
     "ranking",
 )
-_ALLOWED_OUTPUT_MODES = {"answer", "compact", "debug", "full"}
-
-
-def normalize_output_mode(
-    args: dict[str, Any],
-    *,
-    default: str = "answer",
-    details_fallback: bool = False,
-    allowed: set[str] | None = None,
-) -> str:
-    allowed_modes = allowed or _ALLOWED_OUTPUT_MODES
-    fallback = "debug" if details_fallback and args.get("details") else default
-    mode = str(args.get("output_mode") or fallback).lower()
-    return mode if mode in allowed_modes else default
-
-
 def json_bytes(payload: Any) -> int:
     return len(json.dumps(payload, ensure_ascii=False, default=str).encode("utf-8"))
 
@@ -145,8 +128,8 @@ def _fit_payload(payload: dict[str, Any], *, max_bytes: int) -> dict[str, Any]:
     keep_keys = {
         "status", "tool", "schema_version", "answer_available", "answer_type", "answer_completeness",
         "mode", "reason", "message", "response_style", "primary_snippet", "context_pack", "supporting_snippets",
-        "next_actions", "next_action", "arguments_patch", "warnings", "mcp_compaction", "output_mode",
-        "full_output_available", "requires_confirmation", "confirmation_reason", "document_content_policy",
+        "next_actions", "next_action", "arguments_patch", "warnings", "mcp_compaction",
+        "requires_confirmation", "confirmation_reason", "document_content_policy",
     }
     omitted = [key for key in compact if key not in keep_keys]
     compact = {key: value for key, value in compact.items() if key in keep_keys}
@@ -211,19 +194,4 @@ def strip_debug_noise(payload: dict[str, Any]) -> dict[str, Any]:
     payload.pop("diagnostics", None)
     payload.pop("metrics", None)
     payload.pop("snippet_metrics", None)
-    return payload
-
-
-def attach_output_contract(payload: dict[str, Any], *, output_mode: str, max_bytes: int = DEFAULT_MCP_COMPACT_OUTPUT_MAX_BYTES) -> dict[str, Any]:
-    raw_compaction = payload.get("mcp_compaction")
-    compaction: dict[str, Any] = raw_compaction if isinstance(raw_compaction, dict) else {}
-    truncated = bool(payload.get("response_truncated") or compaction.get("truncated"))
-    payload["output_contract"] = {
-        "mode": output_mode,
-        "complete": not truncated,
-        "truncated": truncated,
-        "safe_to_use_as_complete_context": not truncated,
-        "retry_with": {"page": compaction.get("next_page"), "page_size": compaction.get("page_size")} if truncated else None,
-        "max_bytes": max_bytes,
-    }
     return payload

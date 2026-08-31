@@ -52,7 +52,7 @@ DOCS_SOURCE_FIELDS = frozenset({
 DOCS_CONTEXT_SOURCE_FIELDS = frozenset({
     "evidence_id", "path_or_url", "section", "snippet", "version_binding",
     "content_sha256", "project_identity", "line_start", "line_end",
-    "authority", "scope", "retrieval_query_ids", "retrieval_query_matches",
+    "authority", "scope",
 })
 PATCH_SOURCE_FIELDS = frozenset({
     "evidence_id", "path", "symbol_or_section", "authority",
@@ -807,6 +807,8 @@ def validate_model_visible_projection(
                 if unit is not None and unit.text not in str(visible.get("snippet") or ""):
                     errors.append("model-visible assignment unit is absent from its cited source")
     if kind == "docs_context":
+        if payload.get("answer_policy") != "cite_only":
+            errors.append("docs_context answer policy must be cite_only")
         if payload.get("answer_supported") is not False or payload.get("answer_available") is not False:
             errors.append("docs_context must not claim a supported answer")
         if payload.get("edit_ready") is not False:
@@ -815,7 +817,7 @@ def validate_model_visible_projection(
             errors.append("docs_context must not contain edit guidance")
         if any(not str(source.get("project_identity") or "").strip() for source in sources):
             errors.append("docs_context sources require project identity")
-        errors.extend(validate_context_selection_payload(payload, sources))
+        errors.extend(validate_context_selection_payload(payload, sources, snapshot=snapshot))
     if kind == "patch_context":
         mutation = payload.get("mutation_intent")
         if not isinstance(mutation, dict):

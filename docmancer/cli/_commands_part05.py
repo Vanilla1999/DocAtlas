@@ -324,11 +324,8 @@ def _ensure_config_and_db(config_path: str | None) -> Path:
 
 def _ensure_project_config() -> Path:
     primary = Path(PRIMARY_CONFIG_NAME).resolve()
-    legacy = Path(LEGACY_CONFIG_NAME).resolve()
     if primary.exists():
         config_file = primary
-    elif legacy.exists():
-        config_file = legacy
     else:
         config_file = primary
         config = _build_user_bootstrap_config()

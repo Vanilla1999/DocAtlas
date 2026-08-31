@@ -67,12 +67,18 @@ def test_config_from_yaml_keeps_absolute_db_path(tmp_path):
 
 def test_old_vector_store_path_is_translated(tmp_path):
     config_file = tmp_path / "docmancer.yaml"
-    config_file.write_text("vector_store:\n  local_path: .docmancer/old.db\n")
+    legacy_shapes = [
+        "registry: {}\n",
+        "packs: {}\n",
+        "vector_store:\n  collection_name: old\n",
+        "vector_store:\n  db_path: old.db\n",
+        "vector_store:\n  local_path: old\n",
+    ]
 
-    with pytest.warns(DeprecationWarning, match="vector_store.db_path/local_path"):
-        config = DocmancerConfig.from_yaml(config_file)
-
-    assert config.index.db_path == str((tmp_path / ".docmancer" / "old.db").resolve())
+    for yaml_text in legacy_shapes:
+        config_file.write_text(yaml_text)
+        with pytest.raises(ValidationError):
+            DocmancerConfig.from_yaml(config_file)
 
 
 def test_new_vector_store_qdrant_block_parses(tmp_path):
@@ -118,11 +124,8 @@ vector_store:
 """
     )
 
-    with pytest.warns(DeprecationWarning, match="both legacy fields .* and new fields"):
-        config = DocmancerConfig.from_yaml(config_file)
-
-    assert config.vector_store.provider == "qdrant"
-    assert config.vector_store.collection == "knowledge_base"
+    with pytest.raises(ValidationError):
+        DocmancerConfig.from_yaml(config_file)
 
 
 def test_legacy_embedding_block_is_dropped(tmp_path):
@@ -140,11 +143,8 @@ embedding:
 """
     )
 
-    config = DocmancerConfig.from_yaml(config_file)
-
-    # New defaults take effect; the legacy small model is not preserved.
-    assert config.embeddings.provider == "fastembed"
-    assert config.embeddings.model == "BAAI/bge-base-en-v1.5"
+    with pytest.raises(ValidationError):
+        DocmancerConfig.from_yaml(config_file)
 
 
 def test_embeddings_and_retrieval_defaults():
@@ -239,10 +239,8 @@ def test_old_qdrant_directory_path_uses_sqlite_default(tmp_path):
     config_file = tmp_path / "docmancer.yaml"
     config_file.write_text("vector_store:\n  local_path: .docmancer/qdrant\n")
 
-    with pytest.warns(DeprecationWarning, match="vector_store.db_path/local_path"):
-        config = DocmancerConfig.from_yaml(config_file)
-
-    assert config.index.db_path == str((tmp_path / ".docmancer" / "docmancer.db").resolve())
+    with pytest.raises(ValidationError):
+        DocmancerConfig.from_yaml(config_file)
 
 
 def test_settings_do_not_auto_load_dotenv():
@@ -266,11 +264,8 @@ index:
 """
     )
 
-    with pytest.warns(DeprecationWarning, match="bench config is obsolete"):
-        config = DocmancerConfig.from_yaml(config_file)
-
-    assert not hasattr(config, "bench")
-    assert config.index.db_path == str((tmp_path / ".docmancer" / "docmancer.db").resolve())
+    with pytest.raises(ValidationError):
+        DocmancerConfig.from_yaml(config_file)
 
 
 def test_config_from_yaml_ignores_obsolete_eval_key(tmp_path):
@@ -283,8 +278,5 @@ index:
 """
     )
 
-    with pytest.warns(DeprecationWarning, match="eval config is obsolete"):
-        config = DocmancerConfig.from_yaml(config_file)
-
-    assert not hasattr(config, "bench")
-    assert config.index.db_path == str((tmp_path / ".docmancer" / "docmancer.db").resolve())
+    with pytest.raises(ValidationError):
+        DocmancerConfig.from_yaml(config_file)

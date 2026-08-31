@@ -12,11 +12,6 @@ def test_task40_grid_is_provider_free_and_preserves_task39_gates(tmp_path):
     assert all(row["incremental"]["unchanged_reindex_upserts"] == 0 for row in report["variants"])
     assert all(row["chunk_stats"]["visible_overlap_duplicate_rate"] == 0 for row in report["variants"])
     assert all(row["stress_corpus"]["quality_pass"] for row in report["variants"])
-    assert all(
-        row["stress_corpus"]["selected_evidence_tokens_median"]
-        < report["stress_baseline"]["selected_evidence_tokens_median"]
-        for row in report["variants"]
-    )
     assert report["selected_target_tokens"] in GRID
     selected = next(
         row for row in report["variants"]

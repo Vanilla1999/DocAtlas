@@ -15,10 +15,10 @@ logger = logging.getLogger(__name__)
 
 
 def _fastembed_cache_dir() -> str | None:
-    override = os.environ.get("DOCMANCER_FASTEMBED_CACHE_DIR")
+    override = os.environ.get("DOCATLAS_FASTEMBED_CACHE_DIR")
     if override:
         return str(Path(override).expanduser())
-    return str(Path.home() / ".docmancer" / "models")
+    return str(Path.home() / ".docatlas" / "models")
 
 
 class FastEmbedProvider(EmbeddingsProvider):

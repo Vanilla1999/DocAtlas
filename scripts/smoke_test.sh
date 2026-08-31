@@ -16,9 +16,9 @@ echo "--- Checking CLI entrypoint..."
 
 echo "--- Initializing config..."
 "${CLI_CMD[@]}" init --dir "$TMP_DIR"
-test -f "$TMP_DIR/docmancer.yaml"
+test -f "$TMP_DIR/docatlas.yaml"
 
 echo "--- Running doctor..."
-"${CLI_CMD[@]}" doctor --config "$TMP_DIR/docmancer.yaml" >/dev/null
+"${CLI_CMD[@]}" doctor --config "$TMP_DIR/docatlas.yaml" >/dev/null
 
 echo "=== Smoke test PASSED ==="

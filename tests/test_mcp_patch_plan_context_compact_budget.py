@@ -17,7 +17,6 @@ def test_patch_plan_context_compact_payload_is_bounded_and_without_debug_noise()
             "max_files": 5,
             "max_snippets": 4,
             "max_tokens": 400,
-            "output_mode": "compact",
         },
         LibraryDocsService(),
     )
@@ -25,7 +24,7 @@ def test_patch_plan_context_compact_payload_is_bounded_and_without_debug_noise()
     assert payload is not None
     encoded = json.dumps(payload, ensure_ascii=False).encode("utf-8")
     assert len(encoded) <= 32_000
-    assert payload["output_mode"] == "compact"
+    assert "output_mode" not in payload
     assert "diagnostics" not in payload
     assert "debug" not in payload
     assert "schema_version" in payload

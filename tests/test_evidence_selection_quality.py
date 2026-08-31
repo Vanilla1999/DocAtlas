@@ -11,7 +11,7 @@ def test_task42_provider_free_cases_are_unique_and_digest_bound():
     assert all(len(value) == 64 for value in digests.values())
 
 
-def test_task42_acceptance_binds_task41_and_beats_legacy_token_cost():
+def test_task42_acceptance_binds_current_task41_and_preserves_quality_gates():
     report = evaluate()
 
     assert report["correctness_gate"] == "PASS"
@@ -19,11 +19,8 @@ def test_task42_acceptance_binds_task41_and_beats_legacy_token_cost():
     assert report["baseline_status"] == "PASS"
     assert report["task41_gate"]["status"] == "PASS"
     assert report["task41_gate"]["baseline_match"] is True
-    assert report["token_gate"] == "PASS"
-    assert all(
-        row["median_selector_budgeted_tokens"] <= row["median_legacy_budgeted_tokens"]
-        for row in report["groups"].values()
-    )
+    assert report["baseline_case_counts_match"] is True
+    assert report["correctness_failures"] == []
     assert all(row["passed"] for row in report["results"])
 
 

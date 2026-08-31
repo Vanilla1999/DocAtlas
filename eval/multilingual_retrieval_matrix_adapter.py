@@ -55,11 +55,11 @@ class ProductionMultilingualMatrixAdapter:
         root = Path(self._temporary.name)
         self._projects = {str(project["id"]): project for project in corpus.projects}
         documents = _matrix_documents(corpus)
-        previous_model_cache = os.environ.get("DOCMANCER_FASTEMBED_CACHE_DIR")
+        previous_model_cache = os.environ.get("DOCATLAS_FASTEMBED_CACHE_DIR")
         previous_home = os.environ.get("DOCATLAS_HOME")
         os.environ["DOCATLAS_HOME"] = str(root / "home")
         effective_cache = self.model_cache or str(root / "models")
-        os.environ["DOCMANCER_FASTEMBED_CACHE_DIR"] = effective_cache
+        os.environ["DOCATLAS_FASTEMBED_CACHE_DIR"] = effective_cache
         try:
             _preflight_dense_model(
                 str(model["dense_model"]), int(model["dense_dimensions"]), effective_cache,
@@ -101,9 +101,9 @@ class ProductionMultilingualMatrixAdapter:
             else:
                 os.environ["DOCATLAS_HOME"] = previous_home
             if previous_model_cache is None:
-                os.environ.pop("DOCMANCER_FASTEMBED_CACHE_DIR", None)
+                os.environ.pop("DOCATLAS_FASTEMBED_CACHE_DIR", None)
             else:
-                os.environ["DOCMANCER_FASTEMBED_CACHE_DIR"] = previous_model_cache
+                os.environ["DOCATLAS_FASTEMBED_CACHE_DIR"] = previous_model_cache
 
     def close(self) -> None:
         cleanup_error: Exception | None = None

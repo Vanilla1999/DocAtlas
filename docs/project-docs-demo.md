@@ -21,11 +21,11 @@ Preferred public MCP happy path:
 1. Call `get_docs_context(project_path=".", question="Context7 project-owned docs roadmap", mode="project")`.
 2. If it returns `prepare_docs` as `next_action`, call the exact returned action and retry `get_docs_context`.
 3. Use `docs_status` only when the user explicitly asks about health, freshness, index state, or a background job.
-4. Answer using the returned Trust Contract, `next_actions`, and chunks that include `source_class`, `path`, `heading_path`, freshness metadata, and stale state.
+4. Answer only from a returned `docs_answer` or from cited `docs_context` sources under its `answer_policy="cite_only"`; follow typed recovery actions for incomplete results.
 
-Legacy compatibility note:
+The complete bounded result union is `docs_answer`, `docs_context`, `patch_context`, and `insufficient_evidence`. Treat broad explanatory results as `docs_context`; only a narrow typed relation with complete proof may become `docs_answer`.
 
-Older docs surfaces may expose direct inspection or project-doc verbs. Treat those as advanced/legacy compatibility tools. The default surface has exactly three tools: `get_docs_context`, `prepare_docs`, and `docs_status`.
+The supported public surface has exactly three tools: `get_docs_context`, `prepare_docs`, and `docs_status`.
 
 ## Success criteria
 
@@ -35,31 +35,25 @@ Older docs surfaces may expose direct inspection or project-doc verbs. Treat tho
 
 ## Bootstrapping a repo with no docs
 
-If `inspect_project_docs(project_path=".")` or `get_docs_context(mode="project")` reports `no_project_docs`, DocAtlas should return `next_action.type = "ask_user_to_create_project_doc"` with `suggested_file: "ARCHITECTURE.md"`, `requires_confirmation: true`, and `confirmation_reason: "repo_write"`.
+If `get_docs_context(project_path=".", mode="project")` reports `no_project_docs`, DocAtlas should return a typed `ask_user_to_create_project_doc` action with `suggested_file: "ARCHITECTURE.md"`, `requires_confirmation: true`, and `confirmation_reason: "repo_write"`.
 
 Expected agent flow:
 
 1. Ask the user before creating documentation: "No project docs were found. May I inspect the codebase and create `ARCHITECTURE.md` as a reviewable project doc?"
 2. If approved, inspect the codebase and create `ARCHITECTURE.md` in the repository root.
-3. Call `inspect_project_docs(project_path=".")` again; `ARCHITECTURE.md` should now be discovered as an `architecture` project doc.
-4. Call `prepare_docs(action="sync_project_docs", project_path=".")`.
+3. Retry `get_docs_context(project_path=".", mode="project")` for the original question.
+4. Run the returned `prepare_docs(action="sync_project_docs", project_path=".")` action, then retry the original question unchanged.
 5. Answer future repo-specific architecture questions through `get_docs_context(mode="project")`, citing `ARCHITECTURE.md` instead of relying on hidden memory.
 
 ## Dependency docs are separate
 
-If `inspect_project_docs` reports dependency metadata from `pubspec.lock`, `Cargo.lock`, or related manifests, dependency docs should be prefetched through the public lifecycle wrapper:
+If `get_docs_context` reports dependency metadata from `pubspec.lock`, `Cargo.lock`, or related manifests, dependency docs should be prefetched through the returned public lifecycle wrapper:
 
 ```text
 prepare_docs(action="prefetch_project_dependency_docs", project_path=".")
 ```
 
-Legacy compatibility surfaces may also expose:
-
-```text
-prefetch_project_docs(project_path=".")
-```
-
-Despite that historical name, it prefetches dependency documentation from manifests/lockfiles. It does not ingest project-owned README/docs/wiki files. Because dependency prefetch may use the network, the agent should ask for confirmation unless the user already approved it.
+Dependency prefetch reads manifests/lockfiles; it does not ingest project-owned README/docs/wiki files. Because it may use the network, the agent should ask for confirmation unless the user already approved it.
 
 See also:
 

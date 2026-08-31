@@ -79,7 +79,7 @@ jobs:
 
       - name: Test latest allowed dependencies
         env:
-          DOCMANCER_OFFLINE: "1"
+          DOCATLAS_OFFLINE: "1"
         run: |
           cp dependency-drift/uv.lock uv.lock
           python -m pip install "uv==$UV_VERSION"
@@ -108,7 +108,7 @@ jobs:
 
       - name: Test advanced contracts with latest allowed dependencies
         env:
-          DOCMANCER_OFFLINE: "1"
+          DOCATLAS_OFFLINE: "1"
         run: |
           cp dependency-drift/uv.lock uv.lock
           python -m pip install "uv==$UV_VERSION"

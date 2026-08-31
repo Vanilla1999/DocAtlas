@@ -138,7 +138,7 @@ class Dispatcher:
         input_schema = operation.get("inputSchema") or _schema_from_params(operation)
 
         # Strip docmancer control fields before validation
-        validation_args = {k: v for k, v in args.items() if not k.startswith("_docmancer")}
+        validation_args = {k: v for k, v in args.items() if not k.startswith("_docatlas")}
         try:
             jsonschema.validate(validation_args, input_schema)
         except jsonschema.ValidationError as exc:
@@ -217,11 +217,11 @@ class Dispatcher:
         executor = get_executor(executor_kind)
         operation_for_executor = dict(operation)
         if executor_kind == "http":
-            operation_for_executor["_docmancer_http_grant"] = operation_grant
+            operation_for_executor["_docatlas_http_grant"] = operation_grant
             if validated_http_target is not None:
-                operation_for_executor["_docmancer_http_resolved_ips"] = list(validated_http_target.resolved_ips)
+                operation_for_executor["_docatlas_http_resolved_ips"] = list(validated_http_target.resolved_ips)
         elif executor_kind == "python_import":
-            operation_for_executor["_docmancer_operation_grant"] = operation_grant
+            operation_for_executor["_docatlas_operation_grant"] = operation_grant
         result = executor.call(
             operation=operation_for_executor,
             args=validation_args,
@@ -235,7 +235,7 @@ class Dispatcher:
 
         body: Any = result.body
         if isinstance(body, dict) and idempotency_key:
-            body = {**body, "_docmancer": {"idempotency_key": idempotency_key}}
+            body = {**body, "_docatlas": {"idempotency_key": idempotency_key}}
 
         log_call(
             tool=name,

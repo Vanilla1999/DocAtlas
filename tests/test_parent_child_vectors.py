@@ -93,7 +93,7 @@ def _doc(content: str) -> Document:
 
 
 def test_generation_vector_sync_is_stable_incremental_and_prunes(tmp_path, monkeypatch):
-    monkeypatch.setenv("DOCMANCER_HOME", str(tmp_path / "home"))
+    monkeypatch.setenv("DOCATLAS_HOME", str(tmp_path / "home"))
     config = DocmancerConfig()
     config.embeddings.cache = str(tmp_path / "cache")
     config.embeddings.dimensions = 4
@@ -187,8 +187,8 @@ def test_generation_vector_sync_is_stable_incremental_and_prunes(tmp_path, monke
     assert store.index_health(collection)["ok"] is True
 
 
-def test_generation_vectors_keep_additive_legacy_rows_hydratable(tmp_path, monkeypatch):
-    monkeypatch.setenv("DOCMANCER_HOME", str(tmp_path / "home"))
+def test_generation_vectors_include_plain_documents_as_current_rows(tmp_path, monkeypatch):
+    monkeypatch.setenv("DOCATLAS_HOME", str(tmp_path / "home"))
     config = DocmancerConfig()
     config.embeddings.cache = str(tmp_path / "cache")
     config.embeddings.dimensions = 4
@@ -214,9 +214,7 @@ def test_generation_vectors_keep_additive_legacy_rows_hydratable(tmp_path, monke
     )
     store.activate_generation(str(generation.generation_id))
     rows = store.list_sections_for_embedding(generation.generation_id)
-    legacy = next(row for row in rows if row["source"] == "legacy.txt")
 
     assert result.upserted == len(rows)
-    assert legacy["chunk_schema_version"] == "sqlite-sections-v1"
-    hydrated = store.fetch_sections_by_id([legacy["section_id"]], budget=100)
-    assert hydrated[0].text == "legacy vector sentinel"
+    assert {row["source"] for row in rows} == {"docs/guide.md", "legacy.txt"}
+    assert vectors.count(collection) == len(rows)

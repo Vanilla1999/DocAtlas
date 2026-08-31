@@ -67,15 +67,6 @@ def _ensure_user_config() -> Path:
     config_path = _get_user_config_path()
     if config_path.exists():
         return config_path
-    legacy_path = _legacy_user_config_path(home_dir=Path.home())
-    if legacy_path.exists():
-        warnings.warn(
-            f"Legacy DocAtlas config {legacy_path} is deprecated; rename it to {config_path.name!r}.",
-            DeprecationWarning,
-            stacklevel=2,
-        )
-        return legacy_path
-
     owned_home = _ensure_user_home(home_dir=Path.home())
     config_path = owned_home / PRIMARY_CONFIG_NAME
     config = _build_user_bootstrap_config()
@@ -88,26 +79,18 @@ def _load_config(config_path: str | None):
     DocmancerConfig = _get_config_class()
     if config_path:
         return DocmancerConfig.from_yaml(config_path)
-    for name in (PRIMARY_CONFIG_NAME, LEGACY_CONFIG_NAME):
-        candidate = Path(name)
-        if candidate.exists():
-            if name == LEGACY_CONFIG_NAME:
-                warnings.warn(
-                    f"Legacy DocAtlas config name {LEGACY_CONFIG_NAME!r} is deprecated; use {PRIMARY_CONFIG_NAME!r}.",
-                    DeprecationWarning,
-                    stacklevel=2,
-                )
-            return DocmancerConfig.from_yaml(candidate)
+    candidate = Path(PRIMARY_CONFIG_NAME)
+    if candidate.exists():
+        return DocmancerConfig.from_yaml(candidate)
     return DocmancerConfig.from_yaml(_ensure_user_config())
 
 
 def _resolve_config_file(config_path: str | None) -> Path:
     if config_path:
         return Path(config_path).resolve()
-    for name in (PRIMARY_CONFIG_NAME, LEGACY_CONFIG_NAME):
-        candidate = Path(name)
-        if candidate.exists():
-            return candidate.resolve()
+    candidate = Path(PRIMARY_CONFIG_NAME)
+    if candidate.exists():
+        return candidate.resolve()
     return _ensure_user_config().resolve()
 
 
@@ -281,12 +264,8 @@ def _collect_doctor_report(config, config_path: str | None, *, profile: str = "c
         effective_config = Path(config_path).resolve()
     elif Path(PRIMARY_CONFIG_NAME).exists():
         effective_config = Path(PRIMARY_CONFIG_NAME).resolve()
-    elif Path(LEGACY_CONFIG_NAME).exists():
-        effective_config = Path(LEGACY_CONFIG_NAME).resolve()
     else:
-        primary_user = _get_user_config_path()
-        legacy_user = _legacy_user_config_path(home_dir=Path.home())
-        effective_config = primary_user if primary_user.exists() or not legacy_user.exists() else legacy_user
+        effective_config = _get_user_config_path()
     issues: list[dict] = []
     checks: list[dict] = []
 
@@ -606,7 +585,7 @@ def _get_template_content(template_name: str) -> str:
     return content
 
 
-def _resolve_docmancer_executable() -> str:
+def _resolve_docatlas_executable() -> str:
     resolved = shutil.which("doc-atlas") or shutil.which("docmancer")
     if resolved:
         return str(Path(resolved).resolve())
@@ -614,7 +593,7 @@ def _resolve_docmancer_executable() -> str:
 
 
 def _resolve_skill_command(config_path: str | Path | None) -> str:
-    parts = [_resolve_docmancer_executable()]
+    parts = [_resolve_docatlas_executable()]
     if config_path is not None:
         parts.extend(["--config", str(Path(config_path).resolve())])
     return " ".join(shlex.quote(part) for part in parts)
@@ -624,10 +603,9 @@ def _resolve_install_config_path(config_path: str | None, project: bool) -> Path
     if config_path:
         return Path(config_path).resolve()
     if project:
-        for name in (PRIMARY_CONFIG_NAME, LEGACY_CONFIG_NAME):
-            candidate = Path(name)
-            if candidate.exists():
-                return candidate.resolve()
+        candidate = Path(PRIMARY_CONFIG_NAME)
+        if candidate.exists():
+            return candidate.resolve()
         return None
     return _ensure_user_config().resolve()
 
@@ -638,11 +616,6 @@ def _build_skill_content(template_name: str, config_path: str | Path | None) -> 
 
 
 def _install_skill_file(content: str, dest: Path) -> None:
-    try:
-        _migrate_legacy_skill_file(dest)
-    except ValueError as exc:
-        raise click.ClickException(str(exc)) from exc
-
     front_matter, body = _split_front_matter(content)
     marker_block = f"{_AGENTS_MD_START}\n{body.strip()}\n{_AGENTS_MD_END}\n"
     if not dest.exists():
@@ -651,10 +624,7 @@ def _install_skill_file(content: str, dest: Path) -> None:
         return
 
     existing = dest.read_text(encoding="utf-8")
-    for start_marker, end_marker in (
-        (_AGENTS_MD_START, _AGENTS_MD_END),
-        (_LEGACY_AGENTS_MD_START, _LEGACY_AGENTS_MD_END),
-    ):
+    for start_marker, end_marker in ((_AGENTS_MD_START, _AGENTS_MD_END),):
         if existing.startswith(start_marker):
             end_idx = existing.find(end_marker)
             if end_idx != -1:
@@ -664,37 +634,6 @@ def _install_skill_file(content: str, dest: Path) -> None:
                     suffix = existing[end_idx + len(end_marker):]
                     dest.write_text(front_matter + _SKILL_FILE_OWNER + "\n" + marker_block + suffix, encoding="utf-8")
                     return
-
-    try:
-        legacy = _legacy_managed_block(existing)
-    except ValueError as exc:
-        raise click.ClickException(f"Could not update {display_path(dest)} because {exc}.") from exc
-    if legacy is not None:
-        start_idx, end_idx = legacy
-        legacy_managed = existing[
-            start_idx + len(_LEGACY_AGENTS_MD_START):end_idx
-        ].strip()
-        old_front_matter, _ = _split_front_matter(legacy_managed)
-        legacy_prefix = (
-            existing[:start_idx]
-            .replace(_LEGACY_SKILL_FILE_OWNER, "")
-            .replace(_SKILL_FILE_OWNER, "")
-            .strip()
-        )
-        if old_front_matter and not legacy_prefix and _is_proven_docatlas_text(legacy_managed):
-            suffix = existing[end_idx + len(_LEGACY_AGENTS_MD_END):]
-            dest.write_text(
-                front_matter + _SKILL_FILE_OWNER + "\n" + marker_block + suffix,
-                encoding="utf-8",
-            )
-            return
-        existing = (
-            existing[:start_idx]
-            + marker_block.rstrip("\n")
-            + existing[end_idx + len(_LEGACY_AGENTS_MD_END):]
-        )
-        existing = existing.replace(_LEGACY_SKILL_FILE_OWNER, _SKILL_FILE_OWNER, 1)
-        dest.write_text(existing, encoding="utf-8")
 
     existing_front_matter, _ = _split_front_matter(existing)
     if _SKILL_FILE_OWNER in existing and existing_front_matter:
@@ -736,17 +675,11 @@ def _install_or_append_agents_md(dest: Path, content_body: str) -> None:
     existing = dest.read_text(encoding="utf-8")
     try:
         current = _current_managed_block(existing)
-        legacy = None if current is not None else _legacy_managed_block(existing)
     except ValueError as exc:
         raise click.ClickException(f"Could not update {display_path(dest)} because {exc}.") from exc
     if current is not None:
         start_idx, end_idx = current
         new_content = existing[:start_idx] + marker_block + existing[end_idx + len(_AGENTS_MD_END):]
-        dest.write_text(new_content, encoding="utf-8")
-    elif legacy is not None:
-        start_idx, end_idx = legacy
-        new_content = existing[:start_idx] + marker_block + existing[end_idx + len(_LEGACY_AGENTS_MD_END):]
-        new_content = new_content.replace(_LEGACY_SKILL_FILE_OWNER, _SKILL_FILE_OWNER, 1)
         dest.write_text(new_content, encoding="utf-8")
     else:
         separator = "\n\n" if existing and not existing.endswith("\n\n") else ""
@@ -761,4 +694,4 @@ def _format_size(n: int) -> str:
         f /= 1024
     return f"{f:.1f} TB"
 
-__all__=['_effective_config', '_get_agent_class', '_get_config_class', '_get_user_config_dir', '_get_user_config_path', '_get_codex_skill_path', '_get_shared_agent_skill_path', '_get_gemini_skill_path', '_get_cline_skill_path', '_get_copilot_user_instructions_path', '_build_user_bootstrap_config', '_ensure_user_config', '_load_config', '_resolve_config_file', '_describe_index', '_effective_retrieval_mode', '_write_config_yaml', '_apply_setup_retrieval_profile', '_agent_install_path', '_source_rows', '_parse_dt', '_freshness_label', '_operational_source_card', '_agent_installed_targets', '_doctor_issue', '_collect_doctor_report', '_emit_doctor_report', '_run_dispatch_query', '_path_size', '_emit_index_summary', '_create_agent_or_raise_lock_error', '_color_enabled', '_style', '_emit_brand_header', '_emit_status_line', '_emit_next_step', '_loader_availability', '_IngestLogFormatter', '_configure_ingest_logging', '_emit_install_summary', '_get_template_content', '_resolve_docmancer_executable', '_resolve_skill_command', '_resolve_install_config_path', '_build_skill_content', '_install_skill_file', '_split_front_matter', '_install_or_append_agents_md', '_format_size']
+__all__=['_effective_config', '_get_agent_class', '_get_config_class', '_get_user_config_dir', '_get_user_config_path', '_get_codex_skill_path', '_get_shared_agent_skill_path', '_get_gemini_skill_path', '_get_cline_skill_path', '_get_copilot_user_instructions_path', '_build_user_bootstrap_config', '_ensure_user_config', '_load_config', '_resolve_config_file', '_describe_index', '_effective_retrieval_mode', '_write_config_yaml', '_apply_setup_retrieval_profile', '_agent_install_path', '_source_rows', '_parse_dt', '_freshness_label', '_operational_source_card', '_agent_installed_targets', '_doctor_issue', '_collect_doctor_report', '_emit_doctor_report', '_run_dispatch_query', '_path_size', '_emit_index_summary', '_create_agent_or_raise_lock_error', '_color_enabled', '_style', '_emit_brand_header', '_emit_status_line', '_emit_next_step', '_loader_availability', '_IngestLogFormatter', '_configure_ingest_logging', '_emit_install_summary', '_get_template_content', '_resolve_docatlas_executable', '_resolve_skill_command', '_resolve_install_config_path', '_build_skill_content', '_install_skill_file', '_split_front_matter', '_install_or_append_agents_md', '_format_size']

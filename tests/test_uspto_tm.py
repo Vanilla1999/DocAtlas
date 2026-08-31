@@ -143,7 +143,7 @@ def test_case_file_to_document_single_section(tmp_path):
 
 
 def test_streaming_ingest_writes_one_section_per_case_file(tmp_path, monkeypatch):
-    monkeypatch.setenv("DOCMANCER_HOME", str(tmp_path / "home"))
+    monkeypatch.setenv("DOCATLAS_HOME", str(tmp_path / "home"))
     config = DocmancerConfig()
     config.index.db_path = str(tmp_path / "uspto.db")
     config.index.extracted_dir = str(tmp_path / "extracted")
@@ -173,7 +173,7 @@ def test_streaming_ingest_writes_one_section_per_case_file(tmp_path, monkeypatch
 
 def test_streaming_ingest_respects_limit_and_batches(tmp_path, monkeypatch):
     """Batched commits never reach end-of-stream is still correct."""
-    monkeypatch.setenv("DOCMANCER_HOME", str(tmp_path / "home"))
+    monkeypatch.setenv("DOCATLAS_HOME", str(tmp_path / "home"))
     config = DocmancerConfig()
     config.index.db_path = str(tmp_path / "uspto.db")
     agent = DocmancerAgent(config=config)

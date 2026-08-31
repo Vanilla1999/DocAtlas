@@ -42,7 +42,7 @@ def _operation(*, max_response_bytes: int = 2_000_000) -> dict:
             "idempotent": True,
             "requires_auth": False,
         },
-        "_docmancer_http_grant": {
+        "_docatlas_http_grant": {
             "allowed_hosts": ["example.com"],
             "max_response_bytes": max_response_bytes,
         },
@@ -119,7 +119,7 @@ def test_executor_returns_structured_invalid_grant_error(monkeypatch):
         return httpx.Response(200, json={"ok": True})
 
     operation = _operation()
-    operation["_docmancer_http_grant"]["max_response_bytes"] = "invalid"
+    operation["_docatlas_http_grant"]["max_response_bytes"] = "invalid"
     executor = HttpExecutor(
         client=httpx.Client(transport=httpx.MockTransport(handler)),
     )
@@ -144,7 +144,7 @@ def test_dns_resolution_change_is_blocked_before_request(monkeypatch):
         return httpx.Response(200, json={"ok": True})
 
     operation = _operation()
-    operation["_docmancer_http_resolved_ips"] = ["93.184.216.34"]
+    operation["_docatlas_http_resolved_ips"] = ["93.184.216.34"]
     executor = HttpExecutor(
         client=httpx.Client(transport=httpx.MockTransport(handler)),
     )

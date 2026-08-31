@@ -61,17 +61,17 @@ def build_agent_contract(project_path: str | Path) -> dict[str, Any]:
             "dependencies": dependencies,
         },
         "tool_selection": {
-            "decision_rule": "Use docs_status for an explicit health, freshness, index, or job-status request. For coding and patch tasks, call get_docs_context once before the first edit; bounded structured delivery is the server default. Call prepare_docs only from recommended_next_action, an explicit compatibility next_action, or an explicit lifecycle request.",
+            "decision_rule": "Use docs_status for an explicit health, freshness, index, or job-status request. For coding and patch tasks, call get_docs_context once before the first edit; bounded structured delivery is server-owned. Call prepare_docs only from recommended_next_action or an explicit lifecycle request.",
             "default_tool": "get_docs_context",
             "tools": [
                 {
                     "name": "get_docs_context",
-                    "use_when": "Once before the first edit for repository, dependency, or mixed coding tasks. The server returns bounded structured context; broader compatibility output is only for explicit documentation exploration.",
+                    "use_when": "Once before the first edit for repository, dependency, or mixed coding tasks. The server returns one bounded structured projection.",
                     "do_not_use_when": "The request only asks for index health, freshness, or background-job status.",
                 },
                 {
                     "name": "prepare_docs",
-                    "use_when": "Only from bounded recommended_next_action, unbounded next_action, or an explicit user request to sync, refresh, index, or prefetch.",
+                    "use_when": "Only from recommended_next_action or an explicit user request to sync, refresh, index, or prefetch.",
                     "requires_user_approval": "Network actions require approval.",
                 },
                 {
@@ -81,7 +81,7 @@ def build_agent_contract(project_path: str | Path) -> dict[str, Any]:
             ],
         },
         "evidence_rules": [
-            "For explicit health, freshness, index, or job-status requests, use docs_status; otherwise start with get_docs_context and follow bounded recommended_next_action or unbounded next_action.",
+            "For explicit health, freshness, index, or job-status requests, use docs_status; otherwise start with get_docs_context and follow recommended_next_action.",
             "Use project documentation for repository conventions and decisions; use source code for current implementation.",
             "Use dependency documentation only for external APIs, with the resolved version when available.",
             "Cite the selected sources returned by DocAtlas; do not replace local evidence with model memory.",
@@ -119,7 +119,7 @@ def format_agent_contract_markdown(contract: dict[str, Any]) -> str:
         "",
         "## Required tool selection",
         "",
-        "For an explicit health, freshness, index, or job-status request, use `docs_status`. For coding and patch tasks, call `get_docs_context` once before the first edit; bounded structured delivery is the server default. Use broader compatibility output only for explicit documentation exploration. Call `prepare_docs` only from `recommended_next_action`, an explicit compatibility `next_action`, or an explicit sync/refresh/index request.",
+        "For an explicit health, freshness, index, or job-status request, use `docs_status`. For coding and patch tasks, call `get_docs_context` once before the first edit; bounded structured delivery is server-owned. Call `prepare_docs` only from `recommended_next_action` or an explicit sync/refresh/index request.",
         "",
         "## Local documentation sources",
         "",

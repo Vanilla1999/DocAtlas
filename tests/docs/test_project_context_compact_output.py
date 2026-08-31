@@ -2,9 +2,7 @@ from __future__ import annotations
 
 import json
 from dataclasses import asdict
-from typing import Any
-
-from docmancer.docs.interfaces.mcp.project_tools import MCP_COMPACT_OUTPUT_MAX_BYTES, _compact_mcp_payload, _compact_project_context, handle_project_tool
+from docmancer.docs.interfaces.mcp.project_tools import MCP_COMPACT_OUTPUT_MAX_BYTES, _compact_mcp_payload, _compact_project_context
 from docmancer.docs.application.project_context_service import ProjectContextService
 from docmancer.docs.models import ProjectDocsChunk, ProjectDocsResult
 from tests.docs.test_project_context_service import FakeProjectContextFacade
@@ -24,79 +22,6 @@ def test_full_output_preserves_raw_project_docs_results():
     result = asdict(ProjectContextService(FakeProjectContextFacade()).get_project_context("/repo", "use go_router"))
 
     assert result["project_docs"]["results"]
-
-
-class _FakeProjectContextWrapper:
-    def __init__(self):
-        self._context_service = ProjectContextService(FakeProjectContextFacade())
-
-    def get_project_context(self, *args, **kwargs):
-        return self._context_service.get_project_context(*args, **kwargs)
-
-
-class _FakeProjectDocsService:
-    def __init__(self):
-        self._context_wrapper = _FakeProjectContextWrapper()
-        self._facade = FakeProjectContextFacade()
-
-    def get_project_docs(self, *args, **kwargs):
-        return self._facade.project_docs
-
-    def inspect_project_docs(self, *args, **kwargs):
-        return self._facade.project_docs
-
-    def sync_project_docs(self, *args, **kwargs):
-        return self._facade.project_docs
-
-    def bootstrap_project_docs(self, *args, **kwargs):
-        return self._facade.project_docs
-
-
-class _FakeLibraryDocsService:
-    def __init__(self, project_context_result=None):
-        self.project_docs = _FakeProjectDocsService()
-        if project_context_result is not None:
-            self.project_context = type("pc", (), {"get_project_context": lambda *args, **kwargs: project_context_result})()
-        else:
-            self.project_context = _FakeProjectContextWrapper()
-        self.unified_context = type("uc", (), {"get_docs_context": lambda *args, **kwargs: {}})()
-
-
-def test_mcp_project_context_details_stays_compact_without_full_output_opt_in():
-    service = _FakeLibraryDocsService()
-
-    payload = handle_project_tool("get_project_context", {"project_path": "/repo", "question": "use go_router", "details": True}, service)
-
-    assert payload is not None
-    assert payload["output_mode"] == "debug"
-    assert payload["project_docs"]["results"] == []
-    assert payload["diagnostics"] is not None
-
-
-def test_mcp_project_context_full_output_requires_explicit_output_mode():
-    service = _FakeLibraryDocsService()
-
-    payload = handle_project_tool("get_project_context", {"project_path": "/repo", "question": "use go_router", "details": True, "output_mode": "full"}, service)
-
-    assert payload is not None
-    assert payload["output_mode"] == "full"
-    assert payload["project_docs"]["results"]
-
-
-def test_mcp_project_context_debug_output_has_hard_size_cap():
-    large = "x" * 120_000
-    result = ProjectContextService(FakeProjectContextFacade()).get_project_context("/repo", "find current web API camera implementation")
-    result.context_pack.append({"doc_scope": "project", "source_class": "project_doc", "path": "docs/ScanDoc.md", "content": large})
-    result.trust_contract["sources"] = {"selected": [{"path": "docs/ScanDoc.md", "snippet": large}], "rejected": [], "risky": []}
-    service = _FakeLibraryDocsService(project_context_result=result)
-
-    payload = handle_project_tool("get_project_context", {"project_path": "/repo", "question": "find current web API camera implementation", "output_mode": "debug"}, service)
-
-    assert payload is not None
-    assert len(json.dumps(payload, ensure_ascii=False).encode("utf-8")) <= MCP_COMPACT_OUTPUT_MAX_BYTES
-    assert payload["mcp_compaction"]["truncated"] is True
-    assert payload["output_contract"]["truncated"] is True
-    assert any(isinstance(warning, dict) and warning["code"] == "mcp_compact_output_truncated" for warning in payload["warnings"])
 
 
 def test_mcp_compact_output_hard_cap_handles_many_small_mapping_fields():
@@ -161,6 +86,25 @@ class HelpRequestDetailsScreen {
     assert source_evidence[0]["path"] == "lib/help_request_details_screen.dart"
     assert source_evidence[0]["line_start"] == 2
     assert source_evidence[0]["matched_terms"] == ["Вернуть в работу"]
+
+
+def test_compact_output_summarizes_nested_dependency_sources():
+    compact = _compact_project_context({
+        "dependency_docs": {
+            "status": "success",
+            "trust_contract": {"sources": {
+                "selected": [{"source": {"url": "https://example.test/api"}}],
+                "rejected": [{"source": {"url": "https://example.test/old"}}],
+                "risky": [],
+            }},
+        },
+    })
+
+    assert compact["dependency_docs"]["source_summary"] == {
+        "selected": 1,
+        "rejected": 1,
+        "risky": 0,
+    }
 
 
 def test_compact_output_exposes_answer_completeness_contract():

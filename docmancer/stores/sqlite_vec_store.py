@@ -15,7 +15,7 @@ if TYPE_CHECKING:
 
 
 _COLLECTION_NAME_RE = re.compile(r"^[A-Za-z_][A-Za-z0-9_]*$")
-_OWNERSHIP_TABLE = "_docmancer_collections"
+_OWNERSHIP_TABLE = "_docatlas_collections"
 
 
 def _validate_collection_name(name: str) -> str:
@@ -72,7 +72,7 @@ class SqliteVecStore(VectorStore):
         self._embeddings_dim = embeddings_dim
         db_path = config.options.get("db_path") if config.options else None
         if not db_path:
-            db_path = str(Path.home() / ".docmancer" / "sqlite-vec.db")
+            db_path = str(Path.home() / ".docatlas" / "sqlite-vec.db")
         self._db_path = str(db_path)
         Path(self._db_path).parent.mkdir(parents=True, exist_ok=True)
         self._conn = self._open_connection(self._db_path)

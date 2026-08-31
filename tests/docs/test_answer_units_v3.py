@@ -40,10 +40,10 @@ def test_purpose_proof_supports_copula_forward_reverse_and_table_forms():
 
 
 def test_direct_purpose_proposition_outranks_reverse_configuration_example():
-    question = "What is DOCMANCER_HOME used for?"
+    question = "What is DOCATLAS_HOME used for?"
     text = (
-        "`DOCMANCER_HOME` overrides the storage root and defaults to `~/.docmancer`. "
-        "Set `DOCMANCER_HOME=/some/path` to use another local root."
+        "`DOCATLAS_HOME` overrides the storage root and defaults to `~/.docmancer`. "
+        "Set `DOCATLAS_HOME=/some/path` to use another local root."
     )
     contract = build_project_answer_contract(question)
     units = extract_answer_units(text, include_soft_wrapped_prose=True)
@@ -62,8 +62,8 @@ def test_direct_purpose_proposition_outranks_reverse_configuration_example():
     assert hits[0] is not None
 
     _, _, hits = _proof(
-        "What is DOCMANCER_HOME used for?",
-        "Override the storage root with `DOCMANCER_HOME` (defaults to `~/.docmancer`).",
+        "What is DOCATLAS_HOME used for?",
+        "Override the storage root with `DOCATLAS_HOME` (defaults to `~/.docmancer`).",
         path="wiki/Configuration.md",
     )
     assert hits[0] is not None
@@ -71,12 +71,12 @@ def test_direct_purpose_proposition_outranks_reverse_configuration_example():
 
 
 def test_purpose_proof_rejects_negated_or_identity_only_statements():
-    question = "What is DOCMANCER_HOME used for?"
+    question = "What is DOCATLAS_HOME used for?"
     contract = build_project_answer_contract(question)
     source = {"path": "wiki/Reference.md", "authority": "source_of_truth"}
     for text in (
-        "`DOCMANCER_HOME` is not used for the storage root.",
-        "`DOCMANCER_HOME` is listed in the environment variable reference.",
+        "`DOCATLAS_HOME` is not used for the storage root.",
+        "`DOCATLAS_HOME` is listed in the environment variable reference.",
     ):
         units = extract_answer_units(text, include_soft_wrapped_prose=True)
         assert best_local_proof(contract.proof_obligations[0], units, source=source) is None

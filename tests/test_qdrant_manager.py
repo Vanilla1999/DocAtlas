@@ -20,7 +20,7 @@ def test_detect_platform_returns_tuple_or_none():
 
 
 def test_url_override_short_circuits(monkeypatch):
-    monkeypatch.setenv("DOCMANCER_QDRANT_URL", "http://example.invalid:6333")
+    monkeypatch.setenv("DOCATLAS_QDRANT_URL", "http://example.invalid:6333")
     res = ensure_running()
     assert res.url == "http://example.invalid:6333"
     assert res.managed is False
@@ -28,7 +28,7 @@ def test_url_override_short_circuits(monkeypatch):
 
 
 def test_status_for_unstarted_home(tmp_path, monkeypatch):
-    monkeypatch.setenv("DOCMANCER_HOME", str(tmp_path / "docmancer"))
+    monkeypatch.setenv("DOCATLAS_HOME", str(tmp_path / "docmancer"))
     mgr = QdrantManager()
     st = mgr.status()
     assert st["alive"] is False
@@ -37,14 +37,14 @@ def test_status_for_unstarted_home(tmp_path, monkeypatch):
 
 
 def test_stop_when_not_running_is_noop(tmp_path, monkeypatch):
-    monkeypatch.setenv("DOCMANCER_HOME", str(tmp_path / "docmancer"))
+    monkeypatch.setenv("DOCATLAS_HOME", str(tmp_path / "docmancer"))
     mgr = QdrantManager()
     assert mgr.stop() is False
 
 
 def test_missing_binary_returns_fallback(tmp_path, monkeypatch):
     """Pointing at a nonexistent override binary triggers the fallback path."""
-    monkeypatch.setenv("DOCMANCER_HOME", str(tmp_path / "docmancer"))
-    monkeypatch.setenv("DOCMANCER_QDRANT_BINARY", str(tmp_path / "does-not-exist"))
+    monkeypatch.setenv("DOCATLAS_HOME", str(tmp_path / "docmancer"))
+    monkeypatch.setenv("DOCATLAS_QDRANT_BINARY", str(tmp_path / "does-not-exist"))
     mgr = QdrantManager()
     assert mgr.resolve_binary() is None

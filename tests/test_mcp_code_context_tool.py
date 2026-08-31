@@ -90,7 +90,7 @@ def test_get_code_context_schema_contains_agentic_source_fields():
     assert properties["max_files"]["default"] == 12
     assert properties["max_snippets"]["default"] == 20
     assert properties["max_lines_per_snippet"]["default"] == 80
-    assert properties["output_mode"]["enum"] == ["answer", "compact", "debug", "full"]
+    assert "output_mode" not in properties
 
 
 def test_get_code_context_returns_answer_ready_real_source_snippets(tmp_path: Path):
@@ -105,7 +105,6 @@ def test_get_code_context_returns_answer_ready_real_source_snippets(tmp_path: Pa
             "max_hops": 1,
             "max_files": 8,
             "max_snippets": 8,
-            "output_mode": "answer",
         },
         LibraryDocsService(),
     )

@@ -16,7 +16,7 @@ from docmancer.cli.ui import display_path
 class FakeDocmancerConfig:
     def __init__(self, data=None):
         defaults = {
-            "index": {"provider": "sqlite", "db_path": str(Path.home() / ".docmancer" / "docmancer.db"), "extracted_dir": ""},
+            "index": {"provider": "sqlite", "db_path": str(Path.home() / ".docatlas" / "docatlas.db"), "extracted_dir": ""},
             "query": {"default_budget": 1200, "default_limit": 8, "default_expand": "adjacent"},
             "web_fetch": {"workers": 8, "default_page_cap": 500, "browser_fallback": False},
         }
@@ -48,7 +48,7 @@ class FakeDocmancerConfig:
     def from_yaml(cls, path):
         with open(path) as f:
             data = yaml.safe_load(f) or {}
-        db_path = data.get("index", {}).get("db_path", ".docmancer/docmancer.db")
+        db_path = data.get("index", {}).get("db_path", ".docatlas/docatlas.db")
         if not Path(db_path).is_absolute():
             data.setdefault("index", {})["db_path"] = str((Path(path).parent / db_path).resolve())
         return cls(data)
@@ -61,8 +61,8 @@ PUBLIC_COMMAND_HELP_CASES = [
     ("query", ["doc-atlas query", "--expand", "--format json"]),
     ("list", ["doc-atlas list"]),
     ("install", ["doc-atlas install claude-code", "--project"]),
-    ("inspect", ["doc-atlas inspect --config ./docmancer.yaml"]),
-    ("doctor", ["doc-atlas doctor --config ./docmancer.yaml"]),
+    ("inspect", ["doc-atlas inspect --config ./docatlas.yaml"]),
+    ("doctor", ["doc-atlas doctor --config ./docatlas.yaml"]),
     ("docs-impact", ["doc-atlas docs-impact --base origin/main", "--changed-file"]),
     ("agent-contract", ["doc-atlas agent-contract --project-path .", "--format json"]),
     ("remove", ["doc-atlas remove"]),
@@ -197,7 +197,7 @@ def test_docs_impact_cli_incrementally_syncs_exact_committed_doc_diff(tmp_path):
     readme.write_text("# Project\n\nNew accepted docs.\n", encoding="utf-8")
     subprocess.run(["git", "-C", str(project), "add", "README.md"], check=True)
     subprocess.run(["git", "-C", str(project), "commit", "-m", "docs"], check=True, capture_output=True)
-    config = tmp_path / "docmancer.yaml"
+    config = tmp_path / "docatlas.yaml"
     config.write_text(
         "index:\n"
         "  provider: sqlite\n"
@@ -314,8 +314,8 @@ def test_context_cli_uses_project_local_storage_topology(tmp_path):
 
     project = tmp_path / "project"
     project.mkdir()
-    (project / "docmancer.yaml").write_text(
-        "index:\n  db_path: .docmancer/project.db\n",
+    (project / "docatlas.yaml").write_text(
+        "index:\n  db_path: .docatlas/project.db\n",
         encoding="utf-8",
     )
     fallback = DocmancerConfig()
@@ -339,9 +339,9 @@ def test_context_cli_uses_project_local_storage_topology(tmp_path):
         )
 
     assert result.exit_code == 0, result.output
-    assert captured["db_path"] == str((project / ".docmancer" / "project.db").resolve())
+    assert captured["db_path"] == str((project / ".docatlas" / "project.db").resolve())
     assert captured["library_index_root"] == str(
-        (project / ".docmancer" / "docs-indexes").resolve()
+        (project / ".docatlas" / "docs-indexes").resolve()
     )
 
 
@@ -354,8 +354,8 @@ def test_context_cli_explicit_config_overrides_project_local_storage_topology(
 
     project = tmp_path / "project"
     project.mkdir()
-    (project / "docmancer.yaml").write_text(
-        "index:\n  db_path: .docmancer/project.db\n",
+    (project / "docatlas.yaml").write_text(
+        "index:\n  db_path: .docatlas/project.db\n",
         encoding="utf-8",
     )
     explicit_config = tmp_path / "runtime.yaml"
@@ -399,8 +399,8 @@ def test_context_cli_explicit_config_overrides_project_local_storage_topology(
 def test_load_config_prefers_local_docmancer_yaml(tmp_path):
     fake_home = tmp_path / "home"
     fake_home.mkdir()
-    local_config = tmp_path / "docmancer.yaml"
-    local_config.write_text("index:\n  db_path: .docmancer/docmancer.db\n")
+    local_config = tmp_path / "docatlas.yaml"
+    local_config.write_text("index:\n  db_path: .docatlas/docatlas.db\n")
 
     with patch("docmancer.cli.commands.Path.home", return_value=fake_home), \
          patch("docmancer.cli.commands._get_config_class", return_value=FakeDocmancerConfig):
@@ -413,41 +413,25 @@ def test_load_config_prefers_local_docmancer_yaml(tmp_path):
         finally:
             os.chdir(cwd)
 
-    assert config.index.db_path == str((tmp_path / ".docmancer" / "docmancer.db").resolve())
-    assert not (fake_home / ".docmancer" / "docmancer.yaml").exists()
+    assert config.index.db_path == str((tmp_path / ".docatlas" / "docatlas.db").resolve())
+    assert not (fake_home / ".docatlas" / "docatlas.yaml").exists()
 
 
-def test_add_shows_total_and_calls_agent(tmp_path):
+def test_add_rejects_local_path(tmp_path):
     runner = CliRunner()
-    db_path = tmp_path / "docmancer.db"
-    db_path.write_bytes(b"x" * 2048)
-    extracted_dir = tmp_path / "extracted"
-    extracted_dir.mkdir()
-    (extracted_dir / "doc.md").write_bytes(b"y" * 1024)
     fake_config = MagicMock()
     fake_config.web_fetch = MagicMock()
     with patch("docmancer.cli.commands._load_config", return_value=fake_config), \
          patch("docmancer.cli.commands._get_agent_class") as mock_agent_cls:
         mock_agent = MagicMock()
-        mock_agent.add.return_value = 42
-        mock_agent.collection_stats.return_value = {
-            "db_path": str(db_path),
-            "extracted_dir": str(extracted_dir),
-        }
         mock_agent_cls.return_value = lambda config: mock_agent
 
         result = runner.invoke(cli, ["add", str(tmp_path)])
 
-    assert result.exit_code == 0
-    assert "Total: 42 sections indexed" in result.output
-    assert "Storage: 3.0 KB on disk" in result.output
-    assert f"Index: {display_path(db_path)} (2.0 KB)" in result.output
-    assert f"Extracted docs: {display_path(extracted_dir)} (1.0 KB)" in result.output
-    mock_agent.add.assert_called_once_with(str(tmp_path), recreate=False)
-    assert "local paths now belong to `doc-atlas ingest`" in result.output
-    assert "compatible through 1.x" in result.output
-    assert "removal in 2.0.0" in result.output
-    assert "0.4.x compatibility window" not in result.output
+    assert result.exit_code == 1
+    assert "add accepts URLs only" in result.output
+    assert "use doc-atlas ingest <path>" in result.output
+    mock_agent.add.assert_not_called()
 
 
 def test_ingest_shows_total_and_calls_agent(tmp_path):
@@ -639,8 +623,8 @@ def test_display_path_shortens_home_and_cwd(tmp_path):
 
     with patch("docmancer.cli.ui.Path.home", return_value=fake_home), \
          patch("docmancer.cli.ui.Path.cwd", return_value=project_dir):
-        assert display_path(fake_home / ".docmancer" / "docmancer.yaml") == "~/.docmancer/docmancer.yaml"
-        assert display_path(project_dir / "docmancer.yaml") == "./docmancer.yaml"
+        assert display_path(fake_home / ".docatlas" / "docatlas.yaml") == "~/.docatlas/docatlas.yaml"
+        assert display_path(project_dir / "docatlas.yaml") == "./docatlas.yaml"
 
 
 def test_doctor_runs():

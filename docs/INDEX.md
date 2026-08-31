@@ -43,11 +43,12 @@ This is the canonical map of maintained DocAtlas project-owned documentation. Ag
 
 ## External docs manifest
 
-- [docmancer.docs.yaml](../docmancer.docs.yaml) — repeatable manifest of external documentation targets for validation and prefetch.
+- [docatlas.docs.yaml](../docatlas.docs.yaml) — repeatable manifest of external documentation targets for validation and prefetch.
 
 ## Maintenance rules
 
 - Keep this index limited to maintained, reviewable documentation.
 - Prefer links to repository-owned docs over generated hidden summaries.
 - Update this file when adding architecture docs, runbooks, ADRs, workflow docs, or new user-facing references.
-- After documentation changes, run the project-docs workflow: `inspect_project_docs`, `sync_project_docs`, then `get_project_context` for a question that should select the new docs.
+- After documentation changes, call `get_docs_context`; when it recommends synchronization, run the returned `prepare_docs(action="sync_project_docs")` action and retry the original question unchanged.
+- The bounded result union is `docs_answer`, `docs_context`, `patch_context`, or `insufficient_evidence`; broad questions use cited `docs_context`, while only narrow relation-specific proof authorizes `docs_answer`.

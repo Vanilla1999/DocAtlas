@@ -18,8 +18,8 @@ def test_missing_openai_key_falls_back_to_fts5(tmp_path, monkeypatch, caplog):
     Bare ``doc-atlas ingest`` should still index FTS5; the vector path is
     skipped with a clear log line so the user knows what happened.
     """
-    monkeypatch.setenv("DOCMANCER_HOME", str(tmp_path / "home"))
-    monkeypatch.setenv("DOCMANCER_AUTO_VECTORS", "1")  # opt back into auto-vectors for this test
+    monkeypatch.setenv("DOCATLAS_HOME", str(tmp_path / "home"))
+    monkeypatch.setenv("DOCATLAS_AUTO_VECTORS", "1")  # opt back into auto-vectors for this test
     monkeypatch.delenv("OPENAI_API_KEY", raising=False)
 
     config = DocmancerConfig()
@@ -43,12 +43,12 @@ def test_missing_openai_key_falls_back_to_fts5(tmp_path, monkeypatch, caplog):
 
 
 def test_auto_vectors_zero_skips_vector_path(tmp_path, monkeypatch, caplog):
-    """``DOCMANCER_AUTO_VECTORS=0`` opts out of the vector path entirely.
+    """``DOCATLAS_AUTO_VECTORS=0`` opts out of the vector path entirely.
 
     Tests run with this flag; we assert here so the gate cannot regress.
     """
-    monkeypatch.setenv("DOCMANCER_HOME", str(tmp_path / "home"))
-    monkeypatch.setenv("DOCMANCER_AUTO_VECTORS", "0")
+    monkeypatch.setenv("DOCATLAS_HOME", str(tmp_path / "home"))
+    monkeypatch.setenv("DOCATLAS_AUTO_VECTORS", "0")
     monkeypatch.setenv("OPENAI_API_KEY", "sk-stub")  # would have triggered vectors if not for the opt-out
 
     config = DocmancerConfig()
@@ -66,8 +66,8 @@ def test_auto_vectors_zero_skips_vector_path(tmp_path, monkeypatch, caplog):
 
 
 def test_vector_mode_does_not_activate_generation_when_sync_is_skipped(tmp_path, monkeypatch):
-    monkeypatch.setenv("DOCMANCER_HOME", str(tmp_path / "home"))
-    monkeypatch.setenv("DOCMANCER_AUTO_VECTORS", "0")
+    monkeypatch.setenv("DOCATLAS_HOME", str(tmp_path / "home"))
+    monkeypatch.setenv("DOCATLAS_AUTO_VECTORS", "0")
 
     config = DocmancerConfig()
     config.index.db_path = str(tmp_path / "docs.db")
@@ -91,8 +91,8 @@ def test_vector_mode_does_not_activate_generation_when_sync_is_skipped(tmp_path,
 
 
 def test_vector_sync_failure_after_fts_ingest_raises(tmp_path, monkeypatch):
-    monkeypatch.setenv("DOCMANCER_HOME", str(tmp_path / "home"))
-    monkeypatch.setenv("DOCMANCER_AUTO_VECTORS", "1")
+    monkeypatch.setenv("DOCATLAS_HOME", str(tmp_path / "home"))
+    monkeypatch.setenv("DOCATLAS_AUTO_VECTORS", "1")
 
     config = DocmancerConfig()
     config.index.db_path = str(tmp_path / "docs.db")
@@ -111,8 +111,8 @@ def test_vector_sync_failure_after_fts_ingest_raises(tmp_path, monkeypatch):
 
 
 def test_vector_sync_failure_after_record_ingest_raises(tmp_path, monkeypatch):
-    monkeypatch.setenv("DOCMANCER_HOME", str(tmp_path / "home"))
-    monkeypatch.setenv("DOCMANCER_AUTO_VECTORS", "1")
+    monkeypatch.setenv("DOCATLAS_HOME", str(tmp_path / "home"))
+    monkeypatch.setenv("DOCATLAS_AUTO_VECTORS", "1")
 
     config = DocmancerConfig()
     config.index.db_path = str(tmp_path / "docs.db")

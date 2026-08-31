@@ -2,9 +2,11 @@
 from tests.docs import _shared_test_model_visible_projection as _shared
 globals().update({k: v for k, v in vars(_shared).items() if not k.startswith("__")})
 from docmancer.docs.interfaces.mcp.recovery_projection import _bound_recoverable_insufficient_projection
-from docmancer.docs.application.docs_context_projection import project_docs_context
-
-
+from docmancer.docs.application.docs_context_projection import (
+    _focused_line_range,
+    _focused_snippet,
+    project_docs_context,
+)
 def test_docs_context_is_retrieval_only_snapshot_bound_and_not_edit_ready():
     retrieval = {
         "context_pack": [{
@@ -26,29 +28,37 @@ def test_docs_context_is_retrieval_only_snapshot_bound_and_not_edit_ready():
                 "query-original": {"qualified": True, "mode": "and"},
             },
         }],
-        "documentation_query_plan": {
-            "query_ids": ["query-original", "query-lookup-1"],
-        },
+        "documentation_query_plan": {"query_ids": ["query-original", "query-lookup-1"], "queries": [
+            {"query_id": "query-original", "text": "How does routing work?", "origin": "original"},
+            {
+                "query_id": "query-lookup-1",
+                "text": "retrieval lifecycle",
+                "origin": "mandatory_facet",
+                "facet_id": "facet-routing-lifecycle",
+                "requirement_id": "project_answer:routing-lifecycle",
+            },
+        ]},
     }
-
     projection, snapshot = project_docs_context(retrieval=retrieval)
-
     assert projection["status"] == "ok"
     assert projection["kind"] == "docs_context"
     assert projection["answer_supported"] is False
     assert projection["answer_available"] is False
     assert projection["edit_ready"] is False
-    assert projection["safe_to_answer_from_sources"] is True
+    assert projection["answer_policy"] == "cite_only"
     assert projection["sources"][0]["project_identity"] == "git:example/project"
     assert projection["sources"][0]["line_start"] == 12
-    assert projection["sources"][0]["retrieval_query_ids"] == ["query-original"]
+    assert "retrieval_query_ids" not in projection["sources"][0]
+    assert "retrieval_query_matches" not in projection["sources"][0]
     assert projection["query_coverage"] == "partial"
     assert projection["covered_query_ids"] == ["query-original"]
     assert projection["missing_query_ids"] == ["query-lookup-1"]
-    assert validate_model_visible_projection(
-        projection, snapshot=snapshot, max_tokens=800,
-    ) == []
-
+    assert projection["facet_coverage"] == "none"
+    assert projection["missing_facets"] == [{
+        "id": "facet-routing-lifecycle", "requirement_id": "project_answer:routing-lifecycle",
+        "question": "retrieval lifecycle", "status": "missing", "evidence_ids": [],
+    }]
+    assert validate_model_visible_projection(projection, snapshot=snapshot, max_tokens=800) == []
     focused, _focused_snapshot = project_docs_context(retrieval={
         "context_pack": [{
             **retrieval["context_pack"][0],
@@ -58,25 +68,44 @@ def test_docs_context_is_retrieval_only_snapshot_bound_and_not_edit_ready():
                 + "Unrelated implementation notes. " * 50
             ),
         }],
-        "documentation_query_plan": {
-            "query_ids": ["query-original"],
-            "queries": [{
-                "query_id": "query-original",
-                "text": "How does the MCP router dispatch requests?",
-                "origin": "original",
-            }],
-        },
+        "documentation_query_plan": {"query_ids": ["query-original"], "queries": [{
+            "query_id": "query-original", "text": "How does the MCP router dispatch requests?", "origin": "original",
+        }]},
     })
     assert "MCP router dispatches requests" in focused["sources"][0]["snippet"]
     assert len(focused["sources"][0]["snippet"]) <= 420
-
+    focused_text = focused["sources"][0]["snippet"]
+    if "Generic project background" in focused_text:
+        assert focused_text.index("Generic project background") < focused_text.index(
+            "MCP router dispatches requests"
+        )
+    if "Unrelated implementation notes" in focused_text:
+        assert focused_text.index("MCP router dispatches requests") < focused_text.index(
+            "Unrelated implementation notes"
+            )
+    line_text = (
+        "Unrelated first paragraph. " * 20 + "\n\n"
+        + "Unrelated second paragraph. " * 20 + "\n\n"
+        + "The MCP router dispatches requests to project retrieval.\n\n"
+        + "```python\nrouter.dispatch(request)\n```\n"
+    )
+    line_snippet, line_start, line_end = _focused_snippet(
+        line_text, ("dispatches retrieval",),
+    )
+    assert _focused_line_range(line_text, line_start, line_end, 12) == (14, 20)
+    assert line_snippet.count("```") % 2 == 0
     tampered = deepcopy(projection)
     tampered["edit_ready"] = True
     tampered["estimated_tokens"] = estimate_projection_tokens(tampered)
-    assert "docs_context must not authorize edits" in validate_model_visible_projection(
-        tampered, snapshot=snapshot, max_tokens=800,
-    )
-
+    assert "docs_context must not authorize edits" in validate_model_visible_projection(tampered, snapshot=snapshot, max_tokens=800)
+    for field, value, error in (
+        ("answer_policy", "free_form", "docs_context answer policy must be cite_only"),
+        ("missing_facets", [], "docs_context query coverage is inconsistent"),
+    ):
+        tampered = deepcopy(projection)
+        tampered[field] = value
+        tampered["estimated_tokens"] = estimate_projection_tokens(tampered)
+        assert error in validate_model_visible_projection(tampered, snapshot=snapshot, max_tokens=800)
 
 def test_docs_context_merges_query_attribution_for_duplicate_evidence():
     source = {
@@ -109,7 +138,7 @@ def test_docs_context_merges_query_attribution_for_duplicate_evidence():
     })
 
     assert projection["query_coverage"] == "full"
-    assert projection["sources"][0]["retrieval_query_ids"] == [
+    assert projection["covered_query_ids"] == [
         "query-original", "query-lookup-1",
     ]
     assert validate_model_visible_projection(
@@ -949,37 +978,3 @@ def test_patch_projection_fails_closed_instead_of_dropping_selected_guidance():
 
     assert projection["status"] == "insufficient_evidence"
     assert "cannot be preserved" in projection["missing"][0]
-
-
-def test_docs_selector_accounts_for_serialized_projection_cost():
-    from docmancer.docs.application.evidence_selection import docs_selection_config, select_evidence
-
-    candidates = [
-        {
-            "stable_id": f"source-{index}",
-            "source": f"docs/source-{index}.md",
-            "title": f"Source {index}",
-            "relevance_score": 1.0 - index / 10,
-            "content": " ".join(
-                f"documented_{index}_{word}" for word in range(24)
-            ),
-        }
-        for index in range(1, 4)
-    ]
-    selection = select_evidence(
-        candidates,
-        question="Summarize the documented facts",
-        config=docs_selection_config(800),
-    )
-
-    projection, snapshot = project_docs_answer(
-        question="Summarize the documented facts",
-        retrieval={"status": "success", "context_pack": candidates},
-        canonical_selection=selection,
-    )
-
-    assert selection.status == "ok"
-    assert len(selection.selected_candidates) < len(candidates)
-    # Generic selection has no claim assignments and cannot become a docs answer.
-    assert projection["status"] == "insufficient_evidence"
-    assert validate_model_visible_projection(projection, snapshot=snapshot, max_tokens=800) == []

@@ -317,7 +317,7 @@ class PreindexFakeAgent:
 
 
 def _service(tmp_path, monkeypatch, agent: PreindexFakeAgent | None = None) -> LibraryDocsService:
-    monkeypatch.setenv("DOCMANCER_HOME", str(tmp_path / "home"))
+    monkeypatch.setenv("DOCATLAS_HOME", str(tmp_path / "home"))
     agent = agent or PreindexFakeAgent()
     config = DocmancerConfig()
     config.index.db_path = str(tmp_path / "docmancer.db")

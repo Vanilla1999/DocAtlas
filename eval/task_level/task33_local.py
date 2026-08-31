@@ -77,7 +77,7 @@ def main(argv: Iterable[str] | None = None) -> int:
     output.mkdir(parents=True, exist_ok=False)
     causal_environment = {
         **os.environ,
-        "DOCMANCER_OFFLINE": "1",
+        "DOCATLAS_OFFLINE": "1",
         "TASK33C_BASE_IMAGE": container["base_image"],
         "TASK33C_EVALUATOR_REQUIREMENTS_SHA256": requirement_hash,
         "TASK33C_TEST_CONTAINER_IMAGE": args.image,

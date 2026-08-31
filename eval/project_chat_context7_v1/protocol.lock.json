@@ -1,0 +1,31 @@
+{
+  "schema_version": "project-chat-context7-protocol-v1",
+  "case_file": "cases.json",
+  "case_file_sha256": "2a3b156c24c77b85f01e33931c0b263ce76e07611bc8c0604938be92278e7a75",
+  "case_count": 16,
+  "case_ids": [
+    "ru-install",
+    "ru-overview",
+    "ru-first-commands",
+    "ru-contributor",
+    "ru-mcp-flow",
+    "ru-sync",
+    "ru-config",
+    "ru-clean",
+    "ru-troubleshoot",
+    "ru-storage",
+    "ru-chunks",
+    "ru-selection",
+    "ru-tests",
+    "ru-offline",
+    "ru-server-command",
+    "negative-quantum"
+  ],
+  "thresholds": {
+    "contract_pass_rate_min": 1.0,
+    "false_public_tools_max": 0,
+    "live_useful_result_min": 13,
+    "live_top1_relevant_min": 12,
+    "live_top3_relevant_min": 15
+  }
+}

@@ -365,17 +365,11 @@ def _rejected_source_keys(trust_contract: dict[str, Any]) -> set[str]:
 def _trust_source_keys(trust_contract: dict[str, Any], field: str) -> set[str]:
     trust_sources = trust_contract.get("sources") if isinstance(trust_contract.get("sources"), dict) else {}
     rows: list[Any] = []
-    aliases = [field]
-    if field == "risky":
-        aliases.append("risky_sources")
-    elif field == "rejected":
-        aliases.append("rejected_sources")
-    for key in aliases:
-        for value in (trust_contract.get(key), trust_sources.get(key)):
-            if isinstance(value, list):
-                rows.extend(value)
-            elif isinstance(value, (str, dict)):
-                rows.append(value)
+    value = trust_sources.get(field)
+    if isinstance(value, list):
+        rows.extend(value)
+    elif isinstance(value, (str, dict)):
+        rows.append(value)
     return {
         key
         for row in rows

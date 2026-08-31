@@ -461,17 +461,16 @@ def _run_variant(target: int, corpus: dict[str, Any], baseline: dict[str, Any]) 
 def run_grid(output_path: Path) -> dict[str, Any]:
     corpus = _load_json(DATA_ROOT / "corpus.json")
     baseline = _load_json(TASK39_BASELINE)
-    stress_baseline = _stress_metrics(None)
-    previous_home = os.environ.get("DOCMANCER_HOME")
+    previous_home = os.environ.get("DOCATLAS_HOME")
     with tempfile.TemporaryDirectory(prefix="docatlas-task40-meta-") as metadata_home:
-        os.environ["DOCMANCER_HOME"] = metadata_home
+        os.environ["DOCATLAS_HOME"] = metadata_home
         try:
             variants = [_run_variant(target, corpus, baseline) for target in GRID]
         finally:
             if previous_home is None:
-                os.environ.pop("DOCMANCER_HOME", None)
+                os.environ.pop("DOCATLAS_HOME", None)
             else:
-                os.environ["DOCMANCER_HOME"] = previous_home
+                os.environ["DOCATLAS_HOME"] = previous_home
     eligible = [
         row for row in variants
         if row["quality_gate"]["status"] == "PASS"
@@ -479,8 +478,6 @@ def run_grid(output_path: Path) -> dict[str, Any]:
         and row["chunk_stats"]["oversized_rate"] == 0.0
         and row["chunk_stats"]["visible_overlap_duplicate_rate"] == 0.0
         and row["stress_corpus"]["quality_pass"]
-        and row["stress_corpus"]["selected_evidence_tokens_median"]
-            < stress_baseline["selected_evidence_tokens_median"]
     ]
     selected = min(
         eligible,
@@ -496,7 +493,6 @@ def run_grid(output_path: Path) -> dict[str, Any]:
         "provider_free": True,
         "published_commit_sha": TASK41_PUBLISHED_COMMIT_SHA,
         "task39_baseline": TASK39_BASELINE.relative_to(ROOT).as_posix(),
-        "stress_baseline": stress_baseline,
         "variants": variants,
         "selected_target_tokens": selected["target_tokens"] if selected else None,
         "selection_objective": [

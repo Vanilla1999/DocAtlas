@@ -11,7 +11,7 @@ permissions:
 
 env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
-  DOCMANCER_OFFLINE: "1"
+  DOCATLAS_OFFLINE: "1"
 
 jobs:
   p2-product-decision:

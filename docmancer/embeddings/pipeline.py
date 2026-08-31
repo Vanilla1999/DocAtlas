@@ -115,10 +115,11 @@ def sync_vector_store(
     skipped. The collection is created on the fly if needed.
     """
     effective_generation_id = generation_id or store.active_generation_id()
+    if not effective_generation_id:
+        raise ValueError("vector sync requires a current index generation")
     all_sections = store.list_sections_for_embedding(
         generation_id=effective_generation_id
     )
-    generation_mode = bool(effective_generation_id)
     sections = (
         all_sections
         if section_ids is None
@@ -187,8 +188,6 @@ def sync_vector_store(
 
     existing = (
         store.list_generation_vector_upserts(collection)
-        if generation_mode
-        else store.list_embedding_upserts(collection)
     )
     current_ids = {int(sec["section_id"]) for sec in all_sections}
     current_stable_ids = {
@@ -200,29 +199,18 @@ def sync_vector_store(
     # current sections table belongs to a deleted/recreated source. Delete the
     # vector points and the upsert bookkeeping rows so dense/hybrid retrieval
     # cannot resurrect points that have no SQLite section to hydrate.
-    if generation_mode:
-        stale_keys = [
-            stable_id for stable_id in existing
-            if stable_id not in current_stable_ids
-        ] if prune_stale else []
-        stale_ids = [existing[key]["vector_id"] for key in stale_keys]
-    else:
-        stale_keys = []
-        stale_ids = (
-            [chunk_id for chunk_id in existing if chunk_id not in current_ids]
-            if prune_ids is None
-            else [chunk_id for chunk_id in existing if chunk_id in prune_ids]
-        )
+    stale_keys = [
+        stable_id for stable_id in existing
+        if stable_id not in current_stable_ids
+    ] if prune_stale else []
+    stale_ids = [existing[key]["vector_id"] for key in stale_keys]
     pruned = 0
     if stale_ids:
         try:
             pruned = vector_store.delete_points(collection, stale_ids)
         except NotImplementedError:
             pruned = 0
-        if generation_mode:
-            store.delete_generation_vector_upserts(collection, stale_keys)
-        else:
-            store.delete_embedding_upserts(collection, stale_ids)
+        store.delete_generation_vector_upserts(collection, stale_keys)
 
     pending: list[dict] = []
     carried_records: list[dict] = []
@@ -232,7 +220,7 @@ def sync_vector_store(
     except NotImplementedError:
         backend_ids = None
     expected_vector_ids = {
-        str(sec["vector_id"] if generation_mode else sec["section_id"])
+            str(sec["vector_id"])
         for sec in sections
     }
     missing_backend_ids = (
@@ -253,26 +241,24 @@ def sync_vector_store(
         )
     for sec in sections:
         lookup_id = (
-            str(sec.get("stable_chunk_id") or "")
-            if generation_mode else int(sec["section_id"])
+            str(sec["stable_chunk_id"])
         )
         prev = existing.get(lookup_id)
-        vector_id = str(sec["vector_id"] if generation_mode else sec["section_id"])
+        vector_id = str(sec["vector_id"])
         if prev and prev.get("content_hash") == (sec.get("content_hash") or "") and vector_id not in missing_backend_ids:
             skipped_unchanged += 1
-            if generation_mode:
-                carried_records.append({
-                    "stable_chunk_id": str(sec["stable_chunk_id"]),
-                    "vector_id": str(sec["vector_id"]),
-                    "content_hash": str(sec.get("content_hash") or ""),
-                    "embedding_hash": str(prev.get("embedding_hash") or ""),
-                    "status": str(prev.get("status") or "ok"),
-                })
+            carried_records.append({
+                "stable_chunk_id": str(sec["stable_chunk_id"]),
+                "vector_id": str(sec["vector_id"]),
+                "content_hash": str(sec.get("content_hash") or ""),
+                "embedding_hash": str(prev.get("embedding_hash") or ""),
+                "status": str(prev.get("status") or "ok"),
+            })
             continue
         pending.append(sec)
 
     if not pending:
-        if generation_mode and carried_records:
+        if carried_records:
             store.record_generation_vector_upserts(
                 collection, str(effective_generation_id), carried_records
             )
@@ -280,7 +266,7 @@ def sync_vector_store(
             count_after = int(vector_store.count(collection))
         except Exception:
             count_after = 0
-        expected_total = len(current_stable_ids) if generation_mode else len(current_ids)
+        expected_total = len(current_stable_ids)
         if section_ids is None and expected_total > 0 and count_after < expected_total:
             raise RuntimeError(
                 f"vector index {collection!r} is incomplete: expected {expected_total} "
@@ -305,10 +291,10 @@ def sync_vector_store(
     cache_identity = [
         "\0".join(
             (
-                str(sec.get("chunk_schema_version") or "sqlite-sections-v1"),
-                str(sec.get("chunk_config_hash") or "legacy"),
-                str(sec.get("context_schema_version") or "legacy"),
-                str(sec.get("context_config_hash") or "legacy"),
+                str(sec["chunk_schema_version"]),
+                str(sec["chunk_config_hash"]),
+                str(sec["context_schema_version"]),
+                str(sec["context_config_hash"]),
                 sec["text"],
             )
         )
@@ -347,7 +333,7 @@ def sync_vector_store(
         # We reuse the SQLite section id directly so reconciliation is trivial.
         points.append(
             VectorPoint(
-                id=(str(sec["vector_id"]) if generation_mode else int(sec["section_id"])),
+                id=str(sec["vector_id"]),
                 vector=vectors[idx],
                 payload=_payload_for_section(sec),
                 sparse_vector=sparse_payload,
@@ -384,7 +370,7 @@ def sync_vector_store(
                 f"vector upsert into {collection!r} did not establish identity parity: "
                 f"missing_points={len(still_missing)}, extra_points={len(landed_extras)}"
             )
-    expected_total = len(current_stable_ids) if generation_mode else len(current_ids)
+    expected_total = len(current_stable_ids)
     if section_ids is None and expected_total > 0 and count_after < max(1, expected_total):
         raise RuntimeError(
             f"vector upsert into {collection!r} did not land: expected {expected_total} "
@@ -405,12 +391,9 @@ def sync_vector_store(
         }
         for idx, sec in enumerate(pending)
     ]
-    if generation_mode:
-        store.record_generation_vector_upserts(
-            collection, str(effective_generation_id), [*carried_records, *records]
-        )
-    else:
-        store.record_embedding_upserts(collection, records)
+    store.record_generation_vector_upserts(
+        collection, str(effective_generation_id), [*carried_records, *records]
+    )
 
     final_ids = landed_ids if backend_ids is not None else expected_vector_ids
     return SyncResult(

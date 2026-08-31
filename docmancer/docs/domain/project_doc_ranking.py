@@ -14,6 +14,23 @@ CHANGELOG_FILENAMES = {"changelog", "changelog.md", "changes", "changes.md", "hi
 PROJECT_MODULE_ROOTS = {"packages", "apps", "services", "modules", "libs", "crates", "plugins", "components"}
 GENERATED_REVIEW_FILENAMES = {"review_summary.md", "constraints.md", "review_summary_quality.json", "review_summary_actions.json", "review_summary_manifest.json"}
 
+_EVALUATION_INTENT_RE = re.compile(
+    r"\b(?:eval(?:uation)?|benchmarks?|protocols?|metrics?|quality gates?|"
+    r"test results?|оценк\w*|бенчмарк\w*|протокол\w*|метрик\w*)\b",
+    re.I,
+)
+_PLANNING_INTENT_RE = re.compile(
+    r"\b(?:plans?|roadmap|milestones?|task\s+\d+|task status|"
+    r"план\w*|дорожн\w+\s+карт\w*|статус\w*\s+задач\w*)\b",
+    re.I,
+)
+_HISTORY_INTENT_RE = re.compile(
+    r"\b(?:changelog|history|historical|deprecated|deprecation|compatibility|"
+    r"previous version|older version|what changed|changed recently|"
+    r"истори\w*|устаревш\w*|совместимост\w*|предыдущ\w+\s+верси\w*)\b",
+    re.I,
+)
+
 
 def normalize_doc_path(path: str | None) -> str:
     return (path or "").replace("\\", "/").lower().strip()
@@ -30,6 +47,44 @@ def basename(path: str | None) -> str:
 def is_changelog_path(path: str | None) -> bool:
     name = basename(path)
     return name in CHANGELOG_FILENAMES or name.startswith("changelog.")
+
+
+def project_question_lane(question: str) -> str:
+    """Classify the requested documentation area in one deterministic place."""
+
+    if _EVALUATION_INTENT_RE.search(question or ""):
+        return "evaluation"
+    if _PLANNING_INTENT_RE.search(question or ""):
+        return "planning"
+    if _HISTORY_INTENT_RE.search(question or "") or query_requests_history(question):
+        return "history"
+    return "operational"
+
+
+def project_source_lane(path: str | None) -> str:
+    normalized = normalize_doc_path(path)
+    if normalized.startswith("eval/"):
+        return "evaluation"
+    if normalized.startswith((".hermes/plans/", "roadmap/")) or "/roadmap/" in normalized:
+        return "planning"
+    if (
+        is_changelog_path(normalized)
+        or normalized.startswith(("archive/", "legacy/"))
+        or "/archive/" in normalized
+        or "/legacy/" in normalized
+    ):
+        return "history"
+    return "operational"
+
+
+def source_lane_allowed(
+    path: str | None, question: str, *, impact_policy: str | None = None,
+) -> bool:
+    requested = project_question_lane(question)
+    source = project_source_lane(path)
+    # Impact controls lifecycle tracking, not whether a source may answer a
+    # question from another documentation lane.
+    return source == "operational" or source == requested
 
 
 def project_source_taxonomy(path: str | None, *, doc_scope: str | None = None, module_path: str | None = None) -> dict[str, Any]:
@@ -135,6 +190,16 @@ def source_weight_for_intent(path: str | None, heading_path: str | None, intent:
     source_type = taxonomy["source_type"]
     authority = taxonomy["authority"]
 
+    if (
+        name in {"architecture", "general", "mcp_disambiguation"}
+        and any(
+            term in h
+            for term in ("legacy", "compatibility", "migration", "deprecated")
+        )
+        and not getattr(intent, "wants_release_history", False)
+    ):
+        return 0.15
+
     if authority == "artifact":
         artifact_sensitive = getattr(intent, "broad", False) or getattr(intent, "wants_architecture", False) or getattr(intent, "wants_how_to", False) or getattr(intent, "wants_docs_mcp", False)
         return 0.25 if artifact_sensitive else 0.6
@@ -208,6 +273,8 @@ def source_weight_for_intent(path: str | None, heading_path: str | None, intent:
             return 1.3
 
     if name == "troubleshooting":
+        if "troubleshooting" in p:
+            return 2.2
         if p.endswith("readme.md") or p.startswith("docs/") or "/docs/" in p:
             return 1.25
 
@@ -238,6 +305,7 @@ def source_weight_for_intent(path: str | None, heading_path: str | None, intent:
 
 def source_requirement_boost(path: str | None, question: str, intent: Any) -> float:
     p = normalize_doc_path(path)
+    q = (question or "").casefold()
     taxonomy = project_source_taxonomy(p)
     if query_requests_artifact_sources(question) and taxonomy["source_type"] in {"research", "dogfood_artifact", "patch_review_artifact"}:
         return 16.0
@@ -251,6 +319,15 @@ def source_requirement_boost(path: str | None, question: str, intent: Any) -> fl
             return 1.6
         if p.endswith("readme.md"):
             return 1.3
+    if any(term in q for term in ("configure", "configuration", "настро")):
+        if "configuration" in p:
+            return 3.0
+        if "project-docs-mcp-workflow" in p:
+            return 1.8
+    if any(term in q for term in ("pytest", "marker", "маркер")) and p == "docs/testing.md":
+        return 4.0
+    if "command" in q and p == "wiki/commands.md":
+        return 3.0
     return 1.0
 
 
@@ -419,6 +496,7 @@ def attach_project_ranking_metadata(chunk: Any, *, base_score: float, final_scor
     }
     metadata["project_ranking"] = ranking
     metadata["project_source"] = taxonomy
+    metadata["project_source_lane"] = project_source_lane(path)
 
     if hasattr(chunk, "model_copy"):
         return chunk.model_copy(update={"metadata": metadata})
@@ -502,10 +580,14 @@ def ensure_broad_query_sources(selected: list[Any], candidates: list[Any], *, qu
     return selected[:limit] if limit else selected
 
 
-def rerank_project_doc_chunks(chunks: list[Any], *, question: str, intent: Any, limit: int | None = None, broad_max_per_source: int = 2, narrow_max_per_source: int = 4) -> list[Any]:
+def rerank_project_doc_chunks(
+    chunks: list[Any], *, question: str, intent: Any, limit: int | None = None,
+    broad_max_per_source: int = 2, narrow_max_per_source: int = 4,
+    lifecycle_intent_value: str | None = None,
+) -> list[Any]:
     if not chunks:
         return []
-    answer_lifecycle_intent = lifecycle_intent(question)
+    answer_lifecycle_intent = lifecycle_intent_value or lifecycle_intent(question)
     chunks = [
         chunk
         for chunk in chunks
@@ -514,11 +596,18 @@ def rerank_project_doc_chunks(chunks: list[Any], *, question: str, intent: Any, 
             answer_lifecycle_intent,
         )
         and not bool(getattr(chunk, "stale", False))
+        and source_lane_allowed(
+            getattr(chunk, "path", None),
+            question,
+            impact_policy=getattr(chunk, "impact_policy", None),
+        )
     ]
     if not chunks:
         return []
     scored = []
     score_by_id: dict[int, tuple[float, float, int]] = {}
+    evaluation_intent = project_question_lane(question) == "evaluation"
+    planning_intent = project_question_lane(question) == "planning"
     for index, chunk in enumerate(chunks):
         path = getattr(chunk, "path", None)
         base = chunk_base_score(chunk, index)
@@ -548,6 +637,14 @@ def rerank_project_doc_chunks(chunks: list[Any], *, question: str, intent: Any, 
             "historical": 0.45,
             "generated": 0.3,
         }.get(authority, 1.0)
+        normalized_path = normalize_doc_path(path)
+        if normalized_path.startswith("eval/") and not evaluation_intent:
+            score *= 0.15
+        if (
+            normalized_path.startswith((".hermes/plans/", "roadmap/"))
+            and not planning_intent
+        ):
+            score *= 0.1
         if getattr(intent, "wants_code_symbols", False):
             if has_code_symbol_evidence(getattr(chunk, "content", ""), getattr(chunk, "title", None), getattr(chunk, "heading_path", None), path):
                 score *= 2.5

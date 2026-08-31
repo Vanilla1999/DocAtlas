@@ -37,13 +37,7 @@ def _project_bootstrap_dest(agent: str) -> Path | None:
 
 
 def _project_install_agents() -> set[str]:
-    state_path = (
-        _PROJECT_INSTALL_STATE
-        if _PROJECT_INSTALL_STATE.exists()
-        else _LEGACY_PROJECT_INSTALL_STATE
-        if _LEGACY_PROJECT_INSTALL_STATE.exists()
-        else None
-    )
+    state_path = _PROJECT_INSTALL_STATE if _PROJECT_INSTALL_STATE.exists() else None
     if state_path is None:
         try:
             from docmancer.mcp.agent_config import known_agents, target_has_current_server_entry
@@ -87,7 +81,7 @@ def _project_install_agents() -> set[str]:
 
 
 def _write_project_install_agents(agents: set[str]) -> None:
-    if not agents and not _LEGACY_PROJECT_INSTALL_STATE.exists():
+    if not agents:
         if _PROJECT_INSTALL_STATE.exists():
             _PROJECT_INSTALL_STATE.unlink()
         return
@@ -129,15 +123,6 @@ def _remove_project_bootstrap(agent: str) -> bool:
 
 
 def _managed_instruction_paths(agent: str, *, project: bool) -> list[Path]:
-    def include_legacy(paths: list[Path]) -> list[Path]:
-        expanded: list[Path] = []
-        for path in paths:
-            expanded.append(path)
-            legacy = _legacy_skill_path(path)
-            if legacy is not None:
-                expanded.append(legacy)
-        return list(dict.fromkeys(expanded))
-
     if project:
         normalized = agent.lower()
         if normalized == "github-copilot":
@@ -150,7 +135,7 @@ def _managed_instruction_paths(agent: str, *, project: bool) -> list[Path]:
             "gemini": Path(".gemini") / "skills" / SKILL_ID / "SKILL.md",
         }
         paths = [path for path in (skill_paths.get(normalized), bootstrap) if path is not None]
-        return include_legacy(paths)
+        return paths
     home = Path.home()
     normalized = agent.lower()
     paths = {
@@ -164,7 +149,7 @@ def _managed_instruction_paths(agent: str, *, project: bool) -> list[Path]:
         "github-copilot": [_get_copilot_user_instructions_path()],
         "opencode": [home / ".config" / "opencode" / "skills" / SKILL_ID / "SKILL.md"],
     }
-    return include_legacy(paths.get(normalized, []))
+    return paths.get(normalized, [])
 
 
 def _remove_managed_instruction_block(dest: Path) -> bool:
@@ -174,9 +159,6 @@ def _remove_managed_instruction_block(dest: Path) -> bool:
     try:
         block = _current_managed_block(existing)
         marker_end = _AGENTS_MD_END
-        if block is None:
-            block = _legacy_managed_block(existing)
-            marker_end = _LEGACY_AGENTS_MD_END
     except ValueError as exc:
         raise click.ClickException(f"Could not uninstall from {display_path(dest)} because {exc}.") from exc
     if block is None:
@@ -185,8 +167,8 @@ def _remove_managed_instruction_block(dest: Path) -> bool:
     remaining = existing[:start_idx] + existing[end_idx + len(marker_end):]
     updated = remaining.strip()
     front_matter, body = _split_front_matter(remaining.lstrip())
-    owned_skill_file = _SKILL_FILE_OWNER in remaining or _LEGACY_SKILL_FILE_OWNER in remaining
-    cleaned_body = body.replace(_SKILL_FILE_OWNER, "").replace(_LEGACY_SKILL_FILE_OWNER, "")
+    owned_skill_file = _SKILL_FILE_OWNER in remaining
+    cleaned_body = body.replace(_SKILL_FILE_OWNER, "")
     if owned_skill_file and front_matter and not cleaned_body.strip():
         dest.unlink()
     elif updated:
@@ -199,10 +181,10 @@ def _remove_managed_instruction_block(dest: Path) -> bool:
 def _register_mcp_for_agent(agent_name: str, *, project: bool) -> None:
     """Register `doc-atlas mcp docs-serve` into a known agent's MCP config (best-effort)."""
     try:
-        from docmancer.cli.mcp_commands import register_docmancer_mcp_in_agent
+        from docmancer.cli.mcp_commands import register_docatlas_mcp_in_agent
     except Exception:
         return
-    msg = register_docmancer_mcp_in_agent(agent_name, project=project)
+    msg = register_docatlas_mcp_in_agent(agent_name, project=project)
     if msg:
         _emit_status_line(msg, indent=0)
 
@@ -252,15 +234,8 @@ def init_cmd(directory: str | None):
     dir_path = Path(directory or ".")
     dir_path.mkdir(parents=True, exist_ok=True)
     config_path = dir_path / PRIMARY_CONFIG_NAME
-    legacy_path = dir_path / LEGACY_CONFIG_NAME
     if config_path.exists():
         click.echo(f"Config already exists at {display_path(config_path)}")
-        return
-    if legacy_path.exists():
-        click.echo(
-            f"Legacy config already exists at {display_path(legacy_path)}; "
-            f"refusing to create parallel {PRIMARY_CONFIG_NAME}. Rename it explicitly after review."
-        )
         return
     DocmancerConfig = _get_config_class()
     config = DocmancerConfig()
@@ -328,18 +303,7 @@ def add_cmd(
                 browser=browser,
             )
         else:
-            warnings.warn(
-                "doc-atlas add for local files is deprecated. Use doc-atlas ingest <path>. "
-                "The compatibility path is retained through 1.x and scheduled for removal in 2.0.0.",
-                DeprecationWarning,
-                stacklevel=2,
-            )
-            click.echo(
-                "Warning: local paths now belong to `doc-atlas ingest`. "
-                "`doc-atlas add ./path` remains compatible through 1.x and is scheduled for removal in 2.0.0.",
-                err=True,
-            )
-            total = agent.add(path, recreate=recreate)
+            raise ValueError("doc-atlas add accepts URLs only; use doc-atlas ingest <path> for local files")
         _emit_index_summary(total, agent)
         if getattr(agent, "last_ingest_skips", None):
             report_path = getattr(agent, "last_ingest_report_path", None)

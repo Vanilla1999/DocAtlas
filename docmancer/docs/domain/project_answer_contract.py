@@ -12,12 +12,9 @@ from __future__ import annotations
 from dataclasses import replace as _replace
 import re as _re
 
-from docmancer.retrieval.contracts import canonical_hash as _canonical_hash
-
 from ._project_answer_contract_shared import *  # noqa: F401,F403
 
 from ._project_answer_contract_part01 import *  # noqa: F401,F403
-from ._project_answer_contract_part01 import ProofObligation as _ProofObligation
 
 from ._project_answer_contract_part02 import *  # noqa: F401,F403
 from ._project_answer_contract_part02 import (
@@ -55,6 +52,17 @@ _GENERIC_PROJECT_STOP_TOKENS = frozenset({
 })
 _GENERIC_COMPOUND_SEPARATOR_RE = _re.compile(r"[_.:/+-]")
 _GENERIC_ANCHOR_PART_RE = _re.compile(r"[A-Za-zА-Яа-яЁё0-9]+")
+_DOCS_CONTEXT_RESULT_KINDS = (
+    "docs_answer", "docs_context", "patch_context", "insufficient_evidence",
+)
+
+# These proof families can establish a local proposition, but they are too
+# open-ended to authorize a complete answer for a weak downstream model.
+_CONTEXT_ONLY_RELATIONS = frozenset({
+    "behavior", "contrast", "implementation", "purpose", "procedure",
+    "selection_policy",
+})
+_SPECIALIZED_BEHAVIOR_RELATIONS = frozenset({"storage_coordination"})
 
 
 def _clean_term(value: object) -> str:
@@ -170,48 +178,114 @@ def _generic_project_terms(
     return tuple(rows) if len(rows) >= (1 if technical else 3) else ()
 
 
-def _generic_term_obligations(
-    question: str,
-    terms: tuple[str, ...],
-) -> tuple[_ProofObligation, ...]:
-    obligations: list[_ProofObligation] = []
-    for index, term in enumerate(terms):
-        match = _re.search(_re.escape(term), question, _re.I)
-        start = match.start() if match else None
-        end = match.end() if match else None
-        raw = question[start:end] if start is not None and end is not None else None
-        identity = _canonical_hash({
-            "kind": "exact_fact",
-            "subject": term.casefold(),
-            "relation": "generic_project_fact",
-            "value_kind": "text",
-        })[:16]
-        obligations.append(_ProofObligation(
-            obligation_id=f"project_answer:generic:{index}:exact_fact:{identity}",
-            kind="exact_fact",
-            subject=term,
-            relation="generic_project_fact",
-            value_kind="text",
-            query_span_start=start,
-            query_span_end=end,
-            query_span_text=raw,
-        ))
-    return tuple(obligations)
-
-
 def _merge_bounded(existing: tuple[str, ...], additions: tuple[str, ...], limit: int) -> tuple[str, ...]:
     """Append fallback identity without breaking the contract's existing hard bounds."""
 
     return tuple(dict.fromkeys((*existing, *additions)))[:limit]
 
 
+def obligations_can_authorize_docs_answer(
+    obligations: tuple[ProofObligation, ...],
+) -> bool:
+    """Return whether complete local proof may authorize ``docs_answer``.
+
+    Retrieval and local proposition proof remain available for broad facets;
+    this policy only controls the stronger complete-answer claim.
+    """
+
+    if not obligations:
+        return False
+    for obligation in obligations:
+        relation = str(obligation.relation or "").casefold()
+        if obligation.kind == "definition":
+            return False
+        if (
+            obligation.kind == "behavior"
+            and relation not in _SPECIALIZED_BEHAVIOR_RELATIONS
+        ):
+            return False
+        if obligation.kind == "location" and _re.search(
+            r"\b(?:and|or)\s+(?:how|why|what|when|where|which)\b",
+            obligation.subject,
+            _re.I,
+        ):
+            return False
+        if relation == "contract_fact" and not (
+            obligation.attribute or obligation.expected_value or obligation.context
+        ):
+            return False
+        if relation == "applicable_contract" and _re.search(
+            r"(?:,|\b(?:and|or)\b)", obligation.subject, _re.I
+        ):
+            return False
+        if relation in _CONTEXT_ONLY_RELATIONS:
+            return False
+        if relation == "usage" and obligation.subject_kind != "env_var":
+            return False
+        if obligation.kind in {"behavior", "purpose", "usage", "workflow"} and not relation:
+            return False
+    return True
+
+
+def can_authorize_docs_answer(contract: ProjectAnswerContract) -> bool:
+    """Return whether a complete project-answer contract is narrow enough."""
+
+    return (
+        not contract.unresolved_parts
+        and obligations_can_authorize_docs_answer(contract.proof_obligations)
+    )
+
+
+def _expand_exact_response_contract(contract: ProjectAnswerContract) -> ProjectAnswerContract:
+    candidates = tuple(
+        obligation
+        for obligation in contract.proof_obligations
+        if obligation.subject == "get_docs_context"
+        and obligation.relation == "contract_fact"
+        and obligation.attribute == "response contract"
+    )
+    if len(candidates) != 1 or len(contract.proof_obligations) != 1:
+        return contract
+    base = candidates[0]
+    return _replace(
+        contract,
+        proof_obligations=tuple(
+            _replace(
+                base,
+                obligation_id=f"{base.obligation_id}:{kind}",
+                target=kind,
+                expected_value=kind,
+            )
+            for kind in _DOCS_CONTEXT_RESULT_KINDS
+        ),
+        parse_trace=(*contract.parse_trace, "contract:get_docs_context_result_union"),
+    )
+
+
 def build_project_answer_contract(question: str) -> ProjectAnswerContract:
     """Build the contract and fail closed when legacy semantics are incomplete."""
 
-    contract = _build_project_answer_contract_legacy(question)
+    contract = _expand_exact_response_contract(
+        _build_project_answer_contract_legacy(question)
+    )
     raw_question = str(question or "")[:4_000]
     plan = _compile_question_plan(raw_question)
-    if plan.handled or contract.unresolved_parts:
+    if plan.handled:
+        return contract
+
+    if contract.unresolved_parts:
+        generic_terms = _generic_project_terms(raw_question, contract)
+        if generic_terms:
+            contract = _replace(
+                contract,
+                subjects=_merge_bounded(
+                    contract.subjects, generic_terms, MAX_SUBJECTS,
+                ),
+                retrieval_hints=_merge_bounded(
+                    contract.retrieval_hints, generic_terms, MAX_RETRIEVAL_HINTS,
+                ),
+                parse_trace=(*contract.parse_trace, "fallback:generic_project_terms"),
+            )
         return contract
 
     if not contract.proof_obligations:
@@ -223,10 +297,12 @@ def build_project_answer_contract(question: str) -> ProjectAnswerContract:
                 retrieval_hints=_merge_bounded(
                     contract.retrieval_hints, generic_terms, MAX_RETRIEVAL_HINTS,
                 ),
-                proof_obligations=_generic_term_obligations(raw_question, generic_terms),
                 parse_trace=(*contract.parse_trace, "fallback:generic_project_terms"),
+                unresolved_parts=("unsupported_query:generic_free_form_relation",),
             )
 
+    if contract.unresolved_parts:
+        return contract
     gaps = _legacy_coverage_gaps(raw_question, contract.proof_obligations)
     if not gaps:
         return contract

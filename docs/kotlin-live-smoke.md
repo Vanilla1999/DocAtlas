@@ -6,20 +6,20 @@ Task 14 provides a bounded opt-in smoke for the exact reported query. It uses th
 Run the orchestration and artifact validation offline first:
 
 ```bash
-DOCMANCER_HOME="$(mktemp -d)" python scripts/kotlin_live_smoke.py \
+DOCATLAS_HOME="$(mktemp -d)" python scripts/kotlin_live_smoke.py \
   --mode fixture --timeout 180 --output /tmp/kotlin-smoke-fixture.json
 ```
 
 With outbound access, run the real three-tool workflow in an isolated home:
 
 ```bash
-DOCMANCER_HOME="$(mktemp -d)" python scripts/kotlin_live_smoke.py \
+DOCATLAS_HOME="$(mktemp -d)" python scripts/kotlin_live_smoke.py \
   --mode live --timeout 180 --output /tmp/kotlin-smoke-live.json
 ```
 
 The script requires `prepare_docs` to return a job id within one second, polls responsive
 `docs_status`, and repeats `coroutines launch async example with code` through
-`get_docs_context`. Live mode refuses to start unless `DOCMANCER_HOME` explicitly points
+`get_docs_context`. Live mode refuses to start unless `DOCATLAS_HOME` explicitly points
 outside the default home. The runner requests full provenance internally, but accepts only
 code-bearing evidence tied to the pinned official GitHub source; an echoed question or an
 unrelated citation cannot satisfy the gate. The output remains a small sanitized artifact:

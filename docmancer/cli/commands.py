@@ -14,7 +14,7 @@ from ._commands_part05 import *  # noqa: F401,F403
 
 # P0.3 state-identity commands are kept in a focused module so filesystem
 # ownership and reviewed-plan behavior do not drift across CLI shards.
-from .state_commands import clear_index_cmd, migrate_home_cmd  # noqa: F401,E402
+from .state_commands import clear_index_cmd  # noqa: F401,E402
 
 __all__=[n for n in globals() if not n.startswith("__")]
 

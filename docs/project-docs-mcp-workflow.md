@@ -16,6 +16,10 @@ Use project-docs MCP tools when the user asks about:
 
 ## Canonical lifecycle: sync
 
+After editing project documentation files, refresh the repository index with the
+returned `prepare_docs(action="sync_project_docs")` action. This is the canonical
+workflow for reconciling changed files before retrying `get_docs_context`.
+
 `sync_project_docs` is the recommended lifecycle action. It replaces the old two-step `inspect → ingest` loop:
 
 1. **discovers** current candidates from the filesystem;
@@ -45,11 +49,11 @@ The default surface has exactly three tools: `get_docs_context`, `prepare_docs`,
 - indexes new and changed reviewable docs;
 - verifies the final indexed state before reporting results.
 
-`ingest_project_docs` and direct `sync_project_docs` are legacy/compatibility-surface operations. New agent instructions should prefer `prepare_docs(action="sync_project_docs")` because project docs are owned by the repository filesystem, and the index is only a cache of that current state.
+Agent instructions use `prepare_docs(action="sync_project_docs")` because project docs are owned by the repository filesystem, and the index is only a cache of that current state.
 
 ## Advanced low-level flow
 
-Agents that enable `DOCMANCER_MCP_ADVANCED_TOOLS=1` can use lower-level inspection tools:
+Agents that enable `DOCATLAS_MCP_ADVANCED_TOOLS=1` can use lower-level inspection tools:
 
 ```text
 inspect_project_docs(project_path)
@@ -72,7 +76,7 @@ After sync, proceed to:
 get_docs_context(project_path=..., question=..., mode="project")
 ```
 
-`get_docs_context(mode="project")` returns a compact Trust Contract with selected, rejected, and risky sources, plus `next_actions` for missing, stale, non-exact, or unmatched docs.
+`get_docs_context(mode="project")` returns exactly one bounded public result: narrow and strictly proven `docs_answer`, retrieval-only `docs_context` with `answer_policy="cite_only"`, source-bound `patch_context` for an explicit change task, or fail-closed `insufficient_evidence`. Broad questions stay `docs_context` even when retrieval finds locally relevant prose.
 
 For module-specific queries, use exact module filters:
 
@@ -86,7 +90,7 @@ get_docs_context(
 )
 ```
 
-`inspect_project_docs` exposes `project_docs.modules` for discovered module docs and `project_docs.indexed_modules` for indexed module docs. Each module summary includes `module_id`, `module_name`, `module_path`, `module_type`, `doc_count`, and `docs`.
+The advanced `inspect_project_docs` surface exposes discovered and indexed module summaries. Normal agents recover module ambiguity through the `docs_status` action returned by `get_docs_context`, then retry with the exact `module_path`.
 
 ## Module docs workflow
 
@@ -135,7 +139,7 @@ When `requires_confirmation` is `true`, the agent should explain the proposed ac
 
 ## Creating `ARCHITECTURE.md`
 
-DocAtlas does not create architecture docs itself. If `inspect_project_docs` or `bootstrap_project_docs` returns `no_project_docs` or `architecture_doc_creation_recommended`, the coding agent should ask:
+DocAtlas does not create architecture docs itself. If `get_docs_context` returns `no_project_docs` or an `architecture_doc_creation_recommended` recovery action, the coding agent should ask:
 
 ```text
 I could inspect the repository and create ARCHITECTURE.md as a reviewable project doc. Should I do that?
@@ -145,9 +149,9 @@ If approved, the coding agent should:
 
 1. inspect the codebase;
 2. write `ARCHITECTURE.md` as a normal repository file;
-3. call `inspect_project_docs`;
-4. call `prepare_docs(action="sync_project_docs")`;
-5. answer future repo-specific questions from `get_docs_context(mode="project")`.
+3. call `get_docs_context` for the original question;
+4. run its returned `prepare_docs(action="sync_project_docs")` action when requested;
+5. retry the original `get_docs_context(mode="project")` question unchanged.
 
 Do not store generated architecture only in hidden memory. Official project knowledge should remain a file humans can review and edit.
 
@@ -163,21 +167,7 @@ prepare_docs(action="sync_project_docs", project_path=...)
 
 for repository files such as README/docs/wiki/ADR (discovers, reconciles, and indexes).
 
-Use:
-
-```text
-prefetch_project_dependency_docs(project_path)
-```
-
-or the existing compatible tool name:
-
-```text
-prefetch_project_docs(project_path)
-```
-
-for exact dependency documentation from manifests/lockfiles.
-
-Prefer `prefetch_project_dependency_docs` in new instructions because it makes the behavior explicit.
+Use `prepare_docs(action="prefetch_project_dependency_docs", project_path=...)` for exact dependency documentation from manifests/lockfiles.
 
 ## Maintained project-doc catalog
 
@@ -251,7 +241,7 @@ Checklist:
 5. If expected files are not cited, fix the source map instead of guessing:
    - add or correct entries in `docatlas.project-docs.yaml`;
    - move maintained docs under `docs/`, `wiki/`, ADR, roadmap, or runbook-style locations;
-   - update discovery configuration or `docmancer.docs.yaml` manifest entries if the docs are external dependency/public docs;
+   - update discovery configuration or `docatlas.docs.yaml` manifest entries if the docs are external dependency/public docs;
    - re-run sync and repeat the smoke test.
 
 Suggested smoke-test questions:
@@ -348,8 +338,10 @@ Example: dependency docs available but missing locally.
   "dependency_sources": {
     "dependency_next_action": {
       "type": "ask_user_to_prefetch_dependency_docs",
-      "tool_after_confirmation": "prefetch_project_docs",
-      "alias_tool_after_confirmation": "prefetch_project_dependency_docs",
+      "tool_after_confirmation": "prepare_docs",
+      "arguments_patch": {
+        "action": "prefetch_project_dependency_docs"
+      },
       "requires_confirmation": true,
       "confirmation_reason": "network_fetch"
     }

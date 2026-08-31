@@ -232,7 +232,26 @@ def build_project_answer_contract(question: str) -> ProjectAnswerContract:
 
     inventory_noun = _PLURAL_TOOL_RE.search(raw_question)
     surface_inventory = re.search(r"\b(?:tool(?:s)?(?:[- ]\w+){0,5}\s+surface|three[- ]tool(?:[- ]\w+){0,5}\s+surface|public(?:[- ]\w+){0,5}\s+surface)\b", raw_question, re.I)
-    if not command_question and (inventory_noun or surface_inventory) and _INVENTORY_RE.search(raw_question):
+    generic_command_inventory = re.search(
+        r"\b(?:commands?|methods?|команд(?:ы|а|ах|у)?|метод(?:ы|а|ов)?)\b",
+        raw_question,
+        re.I,
+    )
+    explicit_public_tool_context = bool(
+        surface_inventory
+        or re.search(
+            r"\b(?:MCP|Docs\s+MCP|public\s+tools?|public\s+commands?|"
+            r"публичн\w*\s+(?:инструмент|команд)\w*)\b",
+            raw_question,
+            re.I,
+        )
+    )
+    if (
+        not command_question
+        and (inventory_noun or surface_inventory)
+        and _INVENTORY_RE.search(raw_question)
+        and (not generic_command_inventory or explicit_public_tool_context)
+    ):
         tool_match = inventory_noun or surface_inventory
         subject = _inventory_subject(raw_question, subjects)
         count_requested = bool(re.search(r"\bhow\s+many\b|\bсколько\b", raw_question, re.I))
@@ -270,10 +289,6 @@ def build_project_answer_contract(question: str) -> ProjectAnswerContract:
         special_relations.append(("MCP server", "request_handling", _REQUEST_HANDLING_RE.search(raw_question).group(0)))
     architecture_match = _ARCHITECTURE_RE.search(raw_question)
     if architecture_match and re.search(r"\bMCP\b", raw_question, re.I):
-        special_relations.append(("MCP server", "architecture", architecture_match.group(0)))
-    elif architecture_match and re.fullmatch(r"\s*архитектур[а-я]*[?.!]*\s*", raw_question, re.I):
-        # Preserve the frozen one-word Russian architecture surface while
-        # rejecting broader non-MCP architecture guesses.
         special_relations.append(("MCP server", "architecture", architecture_match.group(0)))
     if _RESPONSIVENESS_RE.search(raw_question):
         special_relations.append(("MCP server", "responsiveness", _RESPONSIVENESS_RE.search(raw_question).group(0)))
@@ -321,9 +336,15 @@ def build_project_answer_contract(question: str) -> ProjectAnswerContract:
                 if candidate.casefold() not in {"what", "which", "who", "how"}:
                     contract_subjects.append(candidate)
         for subject in list(dict.fromkeys(contract_subjects))[:4]:
+            attribute = (
+                "response contract"
+                if re.search(r"\bresponse\s+contract\b", raw_question, re.I)
+                else None
+            )
             obligations.append(_obligation(
                 question=raw_question, index=len(obligations), kind="exact_fact",
-                subject=subject, relation="contract_fact", value_kind="text",
+                subject=subject, attribute=attribute,
+                relation="contract_fact", value_kind="text",
                 lifecycle_intent=lifecycle,
                 span_value=subject if subject.casefold() in raw_question.casefold() else _CONTRACT_FACT_RE.search(raw_question).group(0),
             ))

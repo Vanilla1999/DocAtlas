@@ -11,7 +11,7 @@ def test_register_refuses_falsey_non_object_opencode_environment(tmp_path, envir
     cfg = tmp_path / "opencode.json"
     original = {
         "mcp": {
-            "docmancer": {
+            "docatlas": {
                 "type": "local",
                 "command": ["doc-atlas", "mcp", "docs-serve"],
                 "environment": environment,

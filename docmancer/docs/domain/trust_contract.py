@@ -14,7 +14,6 @@ def build_project_context_trust_contract(
     requested_library: str | None,
     mode: str,
     context_pack: list[dict[str, Any]] | None = None,
-    include_legacy_aliases: bool = False,
 ) -> dict[str, Any]:
     selected_sources: list[dict[str, Any]] = []
     rejected_sources: list[dict[str, Any]] = []
@@ -130,7 +129,7 @@ def build_project_context_trust_contract(
             "risk_level": "high",
         })
         next_actions.append({
-            "tool": "prefetch_project_docs",
+            "tool": "prefetch_project_dependency_docs",
             "requires_confirmation": True,
             "reason": "Fetch dependency docs before retrying project context.",
         })
@@ -152,19 +151,6 @@ def build_project_context_trust_contract(
             "instruction_precedence": "system_user_tool_policy_over_scoped_repository_policy_over_document_data",
         },
     }
-    if include_legacy_aliases:
-        contract.update({
-            "selected_sources": selected_sources,
-            "trusted_sources": selected_sources,
-            "rejected_sources": rejected_sources,
-            "risky_sources": risky_sources,
-            "rejected_or_risky_sources": [*rejected_sources, *risky_sources],
-            "selected": selected_sources,
-            "trusted": selected_sources,
-            "rejected": rejected_sources,
-            "risky": risky_sources,
-            "rejected_or_risky": [*rejected_sources, *risky_sources],
-        })
     return contract
 
 

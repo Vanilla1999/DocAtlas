@@ -29,7 +29,7 @@
     "eval/answer_quality/patch_cases.json": "2588fc079b58eb6c2b237f3001cb9155be8c0455ae7ce416d0bc9f43e205eed4",
     "eval/answer_quality_gate.py": "bbfe0673321e270549e89d77a04c45010f1faee953f21956357a3abf85d27eab",
     "eval/evidence_selection/adversarial_cases.json": "5b5929a4a0431797e454fca865716b9015334a82fb7c43bfd618bcfd8fb1d2a4",
-    "eval/evidence_selection/baseline_v1.json": "7ae80d49967cdf701a2bcc854bbad7145010ce94beda1d81d2fcf35354d79995",
+    "eval/evidence_selection/baseline_v1.json": "7fbaf80e073f04dfc844f276f4f5edd29e94ebe024d4c9bef8f914271eae426a",
     "eval/evidence_selection/docs_cases.json": "f74a73055673a6ca78df60ce586c36e146449027c88d664cd831f31f32815317",
     "eval/evidence_selection/patch_cases.json": "e951a4fd7bfb5eca4466a72e7a2ad6f897c503bafce236d8e1a39560fbcf4ef5",
     "eval/retrieval_quality/adversarial.json": "bb27912453799b058f486f3b00c07601636a79fd311e76b926b3c44a93163163",

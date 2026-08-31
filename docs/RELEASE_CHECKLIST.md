@@ -10,6 +10,8 @@ Artifact/release correctness is necessary for every public release. A **Stable**
 - [ ] README install text matches the version that the installer actually resolves.
 - [ ] README, product brief, [Docs MCP reference](./mcp-docs-server.md), wiki command/troubleshooting pages, and changelog agree that the public Docs MCP tools are `get_docs_context`, `prepare_docs`, and `docs_status`.
 - [ ] Advanced Packs and patch constraints are labelled advanced/advisory.
+- [ ] Current docs and the support inventory advertise only surfaces shipped by this release; no retired alias or compatibility window is promised.
+- [ ] Package metadata and import smoke confirm that the Python namespace remains `docmancer` while the distribution and CLI are `doc-atlas`.
 - [ ] New active documentation is tracked by Git and does not duplicate the canonical Docs MCP workflow.
 - [ ] The canonical user-facing release set (`README.md`, product brief, Docs MCP reference, capability reference, release checklist) is at most 1,000 lines, or this release records a reviewed exception and removal plan.
 - [ ] Product claims remain inside the current evidence boundary: no Context7 parity, proven patch-improvement, or Stable claim is introduced without its named decision gate.
@@ -20,8 +22,8 @@ Before the next public release candidate:
 
 - [ ] The release tag commit is reachable from remote `main`; the release workflow verifies this ancestry before building a dispatched release.
 - [ ] The unprotected-`main` decision is recorded as `accepted_risk` in `public-truth-scorecard.md`; release documentation must not claim that branch protection is active.
-- [ ] New DocAtlas state/integration identity is isolated from the active `docmancer` product namespace; clean installs do not implicitly write to foreign `~/.docmancer` state.
-- [ ] Legacy state/config migration is ownership-checked, preview-first, fail-closed on ambiguous/foreign state, and covered by installed tests.
+- [ ] Fresh installs use `DOCATLAS_HOME`, `~/.docatlas`, `docatlas.yaml`, and the `docatlas` MCP registration identity.
+- [ ] Any explicit state/config migration shipped in this release is ownership-checked, preview-first, fail-closed on ambiguous/foreign state, and covered by installed tests.
 - [ ] Installed agent guidance and examples validate against the real three-tool public MCP schema.
 - [ ] The active release identity note and changelog agree on the intended public version. Repository `1.2.0` is an unpublished milestone; the next intended public release is `1.3.1` unless a later reviewed release-preparation change supersedes it.
 - [ ] The executable release decision is reviewable in `.github/release-requests/v1.3.1.json`; its exact base commit, allowed release delta, tag, publisher identity, and public tool inventory are validated before any tag is created.
@@ -34,7 +36,7 @@ Before the next public release candidate:
 - [ ] Start the installed Docs MCP server through stdio and verify its public inventory is exactly `get_docs_context`, `prepare_docs`, `docs_status`.
 - [ ] Run a deterministic temporary-repository smoke: `get_docs_context → prepare_docs(sync_project_docs) → get_docs_context` with a cited local source.
 - [ ] Verify the installer resolves and health-checks the same published package version.
-- [ ] Verify the installed default state/config/integration identity is DocAtlas-owned and does not modify foreign legacy state.
+- [ ] Verify the installed default state/config/integration identity is DocAtlas-owned and does not modify foreign state.
 
 ## Release controls
 

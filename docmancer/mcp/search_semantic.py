@@ -46,8 +46,8 @@ class FastEmbedToolEmbeddingProvider:
         try:
             from fastembed import TextEmbedding  # type: ignore
         except ImportError as exc:  # pragma: no cover - dependency is optional at runtime
-            raise SemanticUnavailable("fastembed is required for DOCMANCER_MCP_SEARCH=hybrid") from exc
-        cache_dir = os.environ.get("DOCMANCER_FASTEMBED_CACHE_DIR")
+            raise SemanticUnavailable("fastembed is required for DOCATLAS_MCP_SEARCH=hybrid") from exc
+        cache_dir = os.environ.get("DOCATLAS_FASTEMBED_CACHE_DIR")
         return TextEmbedding(model_name=self.model_name, cache_dir=cache_dir)
 
     def embed_query(self, text: str) -> list[float]:
@@ -61,10 +61,10 @@ class FastEmbedToolEmbeddingProvider:
 
 def embedding_provider_from_env(env: Mapping[str, str] | None = None) -> EmbeddingProvider:
     source = env or os.environ
-    model = source.get("DOCMANCER_MCP_EMBEDDING_MODEL")
+    model = source.get("DOCATLAS_MCP_EMBEDDING_MODEL")
     if not model:
         raise SemanticUnavailable(
-            "Semantic search disabled; set DOCMANCER_MCP_SEARCH=hybrid and DOCMANCER_MCP_EMBEDDING_MODEL to a local FastEmbed model."
+            "Semantic search disabled; set DOCATLAS_MCP_SEARCH=hybrid and DOCATLAS_MCP_EMBEDDING_MODEL to a local FastEmbed model."
         )
     return FastEmbedToolEmbeddingProvider(model_name=model)
 

@@ -215,22 +215,22 @@ def test_exact_version_metrics_with_mixed_results():
 
 
 def test_docatlas_provider_sets_isolated_docmancer_home():
-    """DocAtlasDirectProvider sets isolated DOCMANCER_HOME inside _isolated_env context."""
+    """DocAtlasDirectProvider sets isolated DOCATLAS_HOME inside _isolated_env context."""
     import os
     
     p = DocAtlasDirectProvider()
     p.docmancer_home = Path("/tmp/test-isolated-home")
     
-    old_home = os.environ.get("DOCMANCER_HOME")
+    old_home = os.environ.get("DOCATLAS_HOME")
     
     with p._isolated_env():
-        assert os.environ.get("DOCMANCER_HOME") == str(p.docmancer_home)
+        assert os.environ.get("DOCATLAS_HOME") == str(p.docmancer_home)
     
     # After context manager, env should be restored
     if old_home is None:
-        assert "DOCMANCER_HOME" not in os.environ
+        assert "DOCATLAS_HOME" not in os.environ
     else:
-        assert os.environ.get("DOCMANCER_HOME") == old_home
+        assert os.environ.get("DOCATLAS_HOME") == old_home
 
 
 def test_docatlas_provider_isolates_library_index_paths():
@@ -248,12 +248,12 @@ def test_docatlas_provider_isolates_library_index_paths():
     
     # Inside zero-setup context, docmancer_home() points to zero-setup home
     with zs._isolated_env():
-        zs_home = paths.docmancer_home()
+        zs_home = paths.docatlas_home()
         assert str(zs_home) == str(zs.docmancer_home)
     
     # Inside preindexed context, docmancer_home() points to preindexed home
     with pi._isolated_env():
-        pi_home = paths.docmancer_home()
+        pi_home = paths.docatlas_home()
         assert str(pi_home) == str(pi.docmancer_home)
     
     # They must be different

@@ -98,11 +98,12 @@ class _RetrievalDispatcherPart01:
         query_plan = build_query_plan(
             query, filters=merged_filters, requested_lanes=requested_lanes, requirements=requirements,
         )
-        # Effective expand: per-call > retrieval.expand > query.default_expand.
+        # The dispatcher only expands when this retrieval call or retrieval
+        # configuration requests it. Agent callers apply query.default_expand
+        # explicitly; treating it as implicit here disables compact source caps.
         retrieval_expand = (
             expand
             or getattr(self.config.retrieval, "expand", None)
-            or self.config.query.default_expand
         )
         fusion_config_hash = canonical_hash({
             "schema_version": "stable-child-rrf-v1",

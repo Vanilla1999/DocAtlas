@@ -182,18 +182,15 @@ def test_prefetch_docs_targets_continue_false_aborts(tmp_path, monkeypatch):
 def test_validate_docs_manifest_valid_manifest(tmp_path, monkeypatch):
     service = _service(tmp_path, monkeypatch)
     manifest = _write_manifest(
-        tmp_path / "docmancer.docs.yaml",
+        tmp_path / "docatlas.docs.yaml",
         """
-version: 1
+version: 2
 targets:
   - id: flutter-api-stable
-    library: flutter-api
-    ecosystem: flutter
-    version: stable
-    source_type: api
-    docs_url: https://api.flutter.dev/
-    allowed_domains:
-      - api.flutter.dev
+    identity: {kind: sdk, ecosystem: flutter, name: flutter-api}
+    version: {requested: stable, policy: channel}
+    source: {type: api, url: https://api.flutter.dev/, authority: official_product, version_binding: channel, format: dartdoc}
+    scope: {allowed_domains: [api.flutter.dev], coverage: bounded}
 """,
     )
 
@@ -206,7 +203,7 @@ targets:
 
 def test_validate_docs_manifest_invalid_yaml(tmp_path, monkeypatch):
     service = _service(tmp_path, monkeypatch)
-    manifest = _write_manifest(tmp_path / "docmancer.docs.yaml", "version: [")
+    manifest = _write_manifest(tmp_path / "docatlas.docs.yaml", "version: [")
 
     result = service.validate_docs_manifest(str(manifest))
 
@@ -217,13 +214,15 @@ def test_validate_docs_manifest_invalid_yaml(tmp_path, monkeypatch):
 def test_validate_docs_manifest_requires_allowed_domains(tmp_path, monkeypatch):
     service = _service(tmp_path, monkeypatch)
     manifest = _write_manifest(
-        tmp_path / "docmancer.docs.yaml",
+        tmp_path / "docatlas.docs.yaml",
         """
-version: 1
+version: 2
 targets:
   - id: flutter-api-stable
-    library: flutter-api
-    docs_url: https://api.flutter.dev/
+    identity: {kind: sdk, ecosystem: flutter, name: flutter-api}
+    version: {requested: stable, policy: channel}
+    source: {type: api, url: https://api.flutter.dev/, authority: official_product, version_binding: channel, format: dartdoc}
+    scope: {coverage: bounded}
 """,
     )
 
@@ -236,17 +235,15 @@ targets:
 def test_validate_docs_manifest_warns_for_pub_package_landing_page(tmp_path, monkeypatch):
     service = _service(tmp_path, monkeypatch)
     manifest = _write_manifest(
-        tmp_path / "docmancer.docs.yaml",
+        tmp_path / "docatlas.docs.yaml",
         """
-version: 1
+version: 2
 targets:
   - id: go-router-package
-    library: go_router
-    ecosystem: pub
-    version: 14.8.1
-    docs_url: https://pub.dev/packages/go_router
-    allowed_domains:
-      - pub.dev
+    identity: {kind: package, ecosystem: pub, name: go_router}
+    version: {requested: 14.8.1, policy: rolling}
+    source: {type: api, url: https://pub.dev/packages/go_router, authority: official_registry, version_binding: rolling, format: dartdoc}
+    scope: {allowed_domains: [pub.dev], path_prefixes: [/packages/go_router], coverage: bounded}
 """,
     )
 
@@ -264,22 +261,15 @@ def test_prefetch_docs_manifest_resolves_project_version_from_pubspec_lock(tmp_p
     service = _service(tmp_path, monkeypatch, agent)
     monkeypatch.setattr(service, "_discover_pub_dartdoc_target", lambda target, warnings, job_id=None, canonical_id=None: target)
     manifest = _write_manifest(
-        project / "docmancer.docs.yaml",
+        project / "docatlas.docs.yaml",
         """
-version: 1
+version: 2
 targets:
   - id: go-router-project
-    library: go_router
-    ecosystem: pub
-    version: project-version
-    source_type: api
-    project_version:
-      from: pubspec.lock
-      package: go_router
-      fallback: latest
-    docs_url_template: https://pub.dev/documentation/{library}/{version}/
-    allowed_domains:
-      - pub.dev
+    identity: {kind: package, ecosystem: pub, name: go_router}
+    version: {requested: project-version, policy: project, package: go_router, fallback: latest}
+    source: {type: api, url_template: "https://pub.dev/documentation/{library}/{version}/", authority: official_registry, version_binding: exact, format: dartdoc}
+    scope: {allowed_domains: [pub.dev], path_prefixes: [/documentation/go_router/], coverage: bounded}
 """,
     )
 
@@ -295,22 +285,15 @@ def test_prefetch_docs_manifest_project_version_falls_back_latest(tmp_path, monk
     agent = FakeAgent()
     service = _service(tmp_path, monkeypatch, agent)
     manifest = _write_manifest(
-        project / "docmancer.docs.yaml",
+        project / "docatlas.docs.yaml",
         """
-version: 1
+version: 2
 targets:
   - id: missing-project
-    library: missing_pkg
-    ecosystem: pub
-    version: project-version
-    source_type: api
-    project_version:
-      from: pubspec.lock
-      package: missing_pkg
-      fallback: latest
-    docs_url_template: https://pub.dev/documentation/{library}/{version}/
-    allowed_domains:
-      - pub.dev
+    identity: {kind: package, ecosystem: pub, name: missing_pkg}
+    version: {requested: project-version, policy: project, package: missing_pkg, fallback: latest}
+    source: {type: api, url_template: "https://pub.dev/documentation/{library}/{version}/", authority: official_registry, version_binding: rolling, format: dartdoc}
+    scope: {allowed_domains: [pub.dev], path_prefixes: [/documentation/missing_pkg/], coverage: bounded}
 """,
     )
 
@@ -326,22 +309,20 @@ def test_prefetch_docs_manifest_target_selection_by_id(tmp_path, monkeypatch):
     service = _service(tmp_path, monkeypatch, agent)
     monkeypatch.setattr(service, "_discover_pub_dartdoc_target", lambda target, warnings, job_id=None, canonical_id=None: target)
     manifest = _write_manifest(
-        tmp_path / "docmancer.docs.yaml",
+        tmp_path / "docatlas.docs.yaml",
         """
-version: 1
+version: 2
 targets:
   - id: flutter-api-stable
-    library: flutter-api
-    ecosystem: flutter
-    version: stable
-    docs_url: https://api.flutter.dev/
-    allowed_domains: [api.flutter.dev]
+    identity: {kind: sdk, ecosystem: flutter, name: flutter-api}
+    version: {requested: stable, policy: channel}
+    source: {type: api, url: https://api.flutter.dev/, authority: official_product, version_binding: channel, format: dartdoc}
+    scope: {allowed_domains: [api.flutter.dev], coverage: bounded}
   - id: go-router-latest
-    library: go_router
-    ecosystem: pub
-    version: latest
-    docs_url_template: https://pub.dev/documentation/{library}/{version}/
-    allowed_domains: [pub.dev]
+    identity: {kind: package, ecosystem: pub, name: go_router}
+    version: {requested: latest, policy: rolling}
+    source: {type: api, url_template: "https://pub.dev/documentation/{library}/{version}/", authority: official_registry, version_binding: rolling, format: dartdoc}
+    scope: {allowed_domains: [pub.dev], path_prefixes: [/documentation/go_router/], coverage: bounded}
 """,
     )
 
@@ -355,18 +336,20 @@ targets:
 def test_validate_docs_manifest_duplicate_target_ids(tmp_path, monkeypatch):
     service = _service(tmp_path, monkeypatch)
     manifest = _write_manifest(
-        tmp_path / "docmancer.docs.yaml",
+        tmp_path / "docatlas.docs.yaml",
         """
-version: 1
+version: 2
 targets:
   - id: duplicate
-    library: one
-    docs_url: https://one.example.com/
-    allowed_domains: [one.example.com]
+    identity: {kind: product, ecosystem: web, name: one}
+    version: {requested: rolling, policy: rolling}
+    source: {type: reference, url: https://one.example.com/, authority: official_product, version_binding: rolling, format: html}
+    scope: {allowed_domains: [one.example.com], coverage: bounded}
   - id: duplicate
-    library: two
-    docs_url: https://two.example.com/
-    allowed_domains: [two.example.com]
+    identity: {kind: product, ecosystem: web, name: two}
+    version: {requested: rolling, policy: rolling}
+    source: {type: reference, url: https://two.example.com/, authority: official_product, version_binding: rolling, format: html}
+    scope: {allowed_domains: [two.example.com], coverage: bounded}
 """,
     )
 
@@ -379,15 +362,15 @@ targets:
 def test_validate_docs_manifest_invalid_source_type(tmp_path, monkeypatch):
     service = _service(tmp_path, monkeypatch)
     manifest = _write_manifest(
-        tmp_path / "docmancer.docs.yaml",
+        tmp_path / "docatlas.docs.yaml",
         """
-version: 1
+version: 2
 targets:
   - id: bad-source
-    library: flutter-api
-    source_type: blog
-    docs_url: https://api.flutter.dev/
-    allowed_domains: [api.flutter.dev]
+    identity: {kind: sdk, ecosystem: flutter, name: flutter-api}
+    version: {requested: stable, policy: channel}
+    source: {type: blog, url: https://api.flutter.dev/, authority: official_product, version_binding: channel, format: dartdoc}
+    scope: {allowed_domains: [api.flutter.dev], coverage: bounded}
 """,
     )
 
@@ -400,21 +383,19 @@ targets:
 def test_validate_docs_manifest_rejects_path_prefix_escape(tmp_path, monkeypatch):
     service = _service(tmp_path, monkeypatch)
     manifest = _write_manifest(
-        tmp_path / "docmancer.docs.yaml",
+        tmp_path / "docatlas.docs.yaml",
         """
-version: 1
+version: 2
 targets:
   - id: riverpod-guides
-    library: riverpod-guides
-    ecosystem: web
-    version: latest
-    source_type: guides
-    seed_urls:
-      - https://riverpod.dev/blog/release
-    allowed_domains:
-      - riverpod.dev
-    path_prefixes:
-      - /docs/
+    identity: {kind: product, ecosystem: web, name: riverpod-guides}
+    version: {requested: latest, policy: rolling}
+    source: {type: guides, url: https://riverpod.dev/docs/, authority: official_product, version_binding: rolling, format: html}
+    scope:
+      seed_urls: [https://riverpod.dev/blog/release]
+      allowed_domains: [riverpod.dev]
+      path_prefixes: [/docs/]
+      coverage: bounded
 """,
     )
 

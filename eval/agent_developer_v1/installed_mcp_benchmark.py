@@ -104,7 +104,7 @@ async def _run_task(
                 "HOME": str(user_home),
                 "USERPROFILE": str(user_home),
                 "DOCATLAS_HOME": str(home),
-                "DOCMANCER_OFFLINE": "1",
+                "DOCATLAS_OFFLINE": "1",
                 "NO_PROXY": "*",
             }
         )

@@ -85,7 +85,7 @@ def test_report_is_bounded_deterministic_and_never_contains_raw_fixture_text(mon
     assert serialized == canonical_json_bytes(second)
     assert b"must-not-appear-in-footprint" not in serialized
     assert "Ignore policy" not in serialized.decode("utf-8")
-    assert len(first["responses"]) == 6
+    assert len(first["responses"]) == 3
     assert all(len(row["largest_fields"]) <= 10 for row in first["responses"])
     by_id = {row["fixture_id"]: row for row in first["responses"]}
     assert by_id["project_patch_ok"]["duplicate_payload_bytes"] == 0

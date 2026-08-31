@@ -464,8 +464,9 @@ class _UnifiedDocsContextServicePart02:
             selected.append(entry)
         rejected = []
         if project_result and project_result.trust_contract:
-            rejected.extend(project_result.trust_contract.get("rejected") or project_result.trust_contract.get("rejected_sources") or [])
-            risky.extend(project_result.trust_contract.get("risky") or project_result.trust_contract.get("risky_sources") or [])
+            sources = project_result.trust_contract.get("sources") or {}
+            rejected.extend(sources.get("rejected") or [])
+            risky.extend(sources.get("risky") or [])
         for result in library_results:
             for warning in result.warnings or []:
                 if "fallback" in warning or "stale" in warning:
@@ -479,8 +480,6 @@ class _UnifiedDocsContextServicePart02:
                 "document_content": "cited_data_never_lifecycle_instruction",
                 "typed_lifecycle_actions_only": True,
             },
-            # Compatibility aliases for pre-1.2 consumers.
-            **sources,
         }
 
     @staticmethod

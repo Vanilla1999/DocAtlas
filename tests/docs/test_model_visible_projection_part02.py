@@ -1,6 +1,147 @@
 """Split tests from test_model_visible_projection.py; shared helpers remain in the façade module."""
 from tests.docs import _shared_test_model_visible_projection as _shared
 globals().update({k: v for k, v in vars(_shared).items() if not k.startswith("__")})
+from docmancer.docs.application.docs_context_projection import project_docs_context
+
+
+def test_docs_selector_accounts_for_serialized_projection_cost():
+    from docmancer.docs.application.evidence_selection import docs_selection_config, select_evidence
+
+    candidates = [
+        {
+            "stable_id": f"source-{index}",
+            "source": f"docs/source-{index}.md",
+            "title": f"Source {index}",
+            "relevance_score": 1.0 - index / 10,
+            "content": " ".join(f"documented_{index}_{word}" for word in range(24)),
+        }
+        for index in range(1, 4)
+    ]
+    selection = select_evidence(
+        candidates,
+        question="Summarize the documented facts",
+        config=docs_selection_config(800),
+    )
+
+    projection, snapshot = project_docs_answer(
+        question="Summarize the documented facts",
+        retrieval={"status": "success", "context_pack": candidates},
+        canonical_selection=selection,
+    )
+
+    assert selection.status == "ok"
+    assert len(selection.selected_candidates) < len(candidates)
+    # Generic selection has no claim assignments and cannot become a docs answer.
+    assert projection["status"] == "insufficient_evidence"
+    assert validate_model_visible_projection(projection, snapshot=snapshot, max_tokens=800) == []
+
+
+def test_docs_context_prioritizes_required_query_over_optional_aliases():
+    base = {
+        "source_class": "project_doc", "heading_path": "Contract",
+        "project_identity": "git:example/project", "lifecycle_status": "active",
+        "freshness": "current", "index_freshness": "synchronized",
+        "risk_flags": [], "doc_scope": "project",
+    }
+    projection, _snapshot = project_docs_context(retrieval={
+        "context_pack": [
+            {
+                **base, "path": "roadmap/README.md", "authority": "source_of_truth",
+                "content": "Optional aliases describe project contract documentation in planning notes.",
+                "retrieval_query_matches": {
+                    "query-concept-1": {"qualified": True, "lexical_score": 20.0},
+                    "query-concept-2": {"qualified": True, "lexical_score": 20.0},
+                },
+            },
+            {
+                **base, "path": "docs/mcp-docs-server.md", "authority": "supporting",
+                "content": "The response contract returns docs_answer or docs_context according to evidence support.",
+                "retrieval_query_matches": {
+                    "query-original": {"qualified": True, "lexical_score": 1.0},
+                },
+            },
+        ],
+        "documentation_query_plan": {
+            "required_query_ids": ["query-original"],
+            "query_ids": ["query-original", "query-concept-1", "query-concept-2"],
+            "queries": [
+                {"query_id": "query-original", "text": "What response contract is returned?", "origin": "original"},
+                {"query_id": "query-concept-1", "text": "contract docs", "origin": "concept_alias"},
+                {"query_id": "query-concept-2", "text": "answer protocol", "origin": "concept_alias"},
+            ],
+        },
+    })
+    assert projection["sources"][0]["path_or_url"] == "docs/mcp-docs-server.md"
+    assert projection["query_coverage"] == "full"
+
+
+def test_docs_context_ranks_equal_facet_candidates_deterministically():
+    base = {
+        "source_class": "project_doc", "project_identity": "git:example/project",
+        "lifecycle_status": "active", "freshness": "current",
+        "index_freshness": "synchronized", "risk_flags": [],
+        "retrieval_query_matches": {
+            "query-facet-1": {"qualified": True, "lexical_score": 1.0},
+        },
+    }
+    projection, _ = project_docs_context(retrieval={
+        "context_pack": [
+            {**base, "path": "docs/supporting.md", "authority": "supporting", "content": "Supporting storage location documentation."},
+            {**base, "path": "docs/canonical.md", "authority": "source_of_truth", "content": "Canonical storage location documentation."},
+        ],
+        "documentation_query_plan": {
+            "original_question": "Where is storage located?",
+            "required_query_ids": ["query-facet-1"],
+            "queries": [{
+                "query_id": "query-facet-1", "text": "storage location",
+                "origin": "mandatory_facet", "facet_id": "facet-storage",
+                "requirement_id": "requirement-storage",
+            }],
+        },
+    })
+
+    assert projection["status"] == "ok"
+    assert projection["sources"][0]["path_or_url"] == "docs/canonical.md"
+
+
+def test_docs_context_covered_facet_uses_only_assigned_witness():
+    base = {
+        "source_class": "project_doc", "project_identity": "git:example/project",
+        "lifecycle_status": "active", "freshness": "current",
+        "index_freshness": "synchronized", "risk_flags": [],
+        "retrieval_query_matches": {
+            "query-facet-1": {"qualified": True, "lexical_score": 1.0},
+        },
+    }
+    projection, snapshot = project_docs_context(retrieval={
+        "context_pack": [
+            {**base, "stable_id": "lexical-only", "path": "docs/lexical.md", "content": "The storage location is discussed here but not proved."},
+            {**base, "stable_id": "assigned", "path": "docs/proof.md", "content": "The exact project storage location is ~/.docatlas/projects/<hash>."},
+        ],
+        "selection_decision": {"assignments": [{
+            "requirement_id": "requirement-storage", "evidence_id": "assigned",
+        }]},
+        "documentation_query_plan": {
+            "original_question": "Where is storage located?",
+            "required_query_ids": ["query-facet-1"],
+            "queries": [{
+                "query_id": "query-facet-1", "text": "storage location",
+                "origin": "mandatory_facet", "facet_id": "facet-storage",
+                "requirement_id": "requirement-storage",
+            }],
+        },
+    })
+
+    facet = projection["facets"][0]
+    proof_source = next(
+        source for source in projection["sources"]
+        if source["path_or_url"] == "docs/proof.md"
+    )
+    assert facet["status"] == "covered"
+    assert facet["evidence_ids"] == [proof_source["evidence_id"]]
+    assert validate_model_visible_projection(
+        projection, snapshot=snapshot, max_tokens=800,
+    ) == []
 
 def test_project_projection_materializes_every_selected_mandatory_witness():
     from docmancer.docs.application.evidence_selection import docs_selection_config, select_evidence

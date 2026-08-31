@@ -88,7 +88,7 @@ CURATED_TOOLS = {
 
 @pytest.fixture
 def acme_pack(tmp_path, monkeypatch):
-    monkeypatch.setenv("DOCMANCER_HOME", str(tmp_path))
+    monkeypatch.setenv("DOCATLAS_HOME", str(tmp_path))
     pkg_dir = paths.package_dir("acme", "v1")
     pkg_dir.mkdir(parents=True, exist_ok=True)
     (pkg_dir / "contract.json").write_text(json.dumps(ACME_CONTRACT))
@@ -137,7 +137,7 @@ def test_search_tools_returns_matches_with_inlined_schema(manifest_with_acme):
 
 
 def test_search_tools_uses_synonyms_for_common_action_vocab(tmp_path, monkeypatch):
-    monkeypatch.setenv("DOCMANCER_HOME", str(tmp_path))
+    monkeypatch.setenv("DOCATLAS_HOME", str(tmp_path))
     contract = {
         "operations": [
             {
@@ -162,7 +162,7 @@ def test_search_tools_uses_synonyms_for_common_action_vocab(tmp_path, monkeypatc
 
 
 def test_search_tools_indexes_aliases_without_token_overlap(tmp_path, monkeypatch):
-    monkeypatch.setenv("DOCMANCER_HOME", str(tmp_path))
+    monkeypatch.setenv("DOCATLAS_HOME", str(tmp_path))
     contract = {
         "operations": [
             {
@@ -191,7 +191,7 @@ def test_search_tools_indexes_aliases_without_token_overlap(tmp_path, monkeypatc
 
 
 def test_search_tools_uses_schema_terms(tmp_path, monkeypatch):
-    monkeypatch.setenv("DOCMANCER_HOME", str(tmp_path))
+    monkeypatch.setenv("DOCATLAS_HOME", str(tmp_path))
     schema = {
         "type": "object",
         "properties": {
@@ -223,7 +223,7 @@ def test_search_tools_uses_schema_terms(tmp_path, monkeypatch):
 
 
 def test_search_tools_splits_snake_kebab_and_camel_case(tmp_path, monkeypatch):
-    monkeypatch.setenv("DOCMANCER_HOME", str(tmp_path))
+    monkeypatch.setenv("DOCATLAS_HOME", str(tmp_path))
     contract = {
         "operations": [
             {
@@ -249,7 +249,7 @@ def test_search_tools_splits_snake_kebab_and_camel_case(tmp_path, monkeypatch):
 
 
 def test_search_tools_marks_low_confidence_when_top_scores_are_close(tmp_path, monkeypatch):
-    monkeypatch.setenv("DOCMANCER_HOME", str(tmp_path))
+    monkeypatch.setenv("DOCATLAS_HOME", str(tmp_path))
     contract = {
         "operations": [
             {
@@ -289,8 +289,8 @@ def test_search_tools_marks_low_confidence_when_top_scores_are_close(tmp_path, m
 
 
 def test_search_tools_hybrid_merges_semantic_hits_and_caches_embeddings(tmp_path, monkeypatch):
-    monkeypatch.setenv("DOCMANCER_HOME", str(tmp_path))
-    monkeypatch.setenv("DOCMANCER_MCP_SEARCH", "hybrid")
+    monkeypatch.setenv("DOCATLAS_HOME", str(tmp_path))
+    monkeypatch.setenv("DOCATLAS_MCP_SEARCH", "hybrid")
     contract = {
         "operations": [
             {
@@ -352,7 +352,7 @@ def test_search_tools_hybrid_merges_semantic_hits_and_caches_embeddings(tmp_path
 
 
 def test_search_tools_hybrid_falls_back_to_lexical_when_semantic_unavailable(manifest_with_acme, monkeypatch):
-    monkeypatch.setenv("DOCMANCER_MCP_SEARCH", "hybrid")
+    monkeypatch.setenv("DOCATLAS_MCP_SEARCH", "hybrid")
     monkeypatch.setattr(
         search_semantic,
         "embedding_provider_from_env",
@@ -516,8 +516,8 @@ def test_call_tool_post_injects_idempotency_and_form_encoding(manifest_with_acme
     assert "amount=2500" in captured["body"]
     assert "currency=usd" in captured["body"]
     assert "idempotency-key" in captured["headers"]
-    assert "_docmancer" in out.body
-    assert out.body["_docmancer"]["idempotency_key"] == captured["headers"]["idempotency-key"]
+    assert "_docatlas" in out.body
+    assert out.body["_docatlas"]["idempotency_key"] == captured["headers"]["idempotency-key"]
 
 
 def test_call_tool_post_defaults_to_idempotency_when_safety_omits_flag(manifest_with_acme, monkeypatch):
@@ -550,7 +550,7 @@ def test_call_tool_post_defaults_to_idempotency_when_safety_omits_flag(manifest_
 
 
 def test_http_private_metadata_target_blocked_before_credentials(tmp_path, monkeypatch):
-    monkeypatch.setenv("DOCMANCER_HOME", str(tmp_path))
+    monkeypatch.setenv("DOCATLAS_HOME", str(tmp_path))
     contract = json.loads(json.dumps(ACME_CONTRACT))
     contract["operations"][0]["http"]["base_url"] = "http://169.254.169.254"
     pkg_dir = paths.package_dir("acme", "v1")
@@ -579,7 +579,7 @@ def test_http_private_metadata_target_blocked_before_credentials(tmp_path, monke
 
 
 def test_http_host_not_granted_blocks_before_credentials(tmp_path, monkeypatch):
-    monkeypatch.setenv("DOCMANCER_HOME", str(tmp_path))
+    monkeypatch.setenv("DOCATLAS_HOME", str(tmp_path))
     contract = json.loads(json.dumps(ACME_CONTRACT))
     contract["operations"][0]["http"]["base_url"] = "https://attacker.example"
     pkg_dir = paths.package_dir("acme", "v1")

@@ -12,7 +12,6 @@ from typing import Any, Callable, Mapping, cast
 import jsonschema
 
 from docmancer.core.storage_topology import StorageTopologyResolver
-from docmancer.docs.application.action_packet import ACTION_PACKET_OUTPUT_SCHEMA
 from docmancer.docs.domain.project_path_validation import validate_project_path
 from docmancer.docs.interfaces.mcp.error_contract import build_mcp_error_payload, debug_errors_enabled
 from docmancer.docs.service import LibraryDocsService
@@ -30,7 +29,6 @@ ToolHandler = Callable[[str, dict[str, Any], LibraryDocsService], dict[str, Any]
 
 @dataclass(frozen=True)
 class DocsServerConfig:
-    expose_legacy: bool = False
     expose_admin: bool = False
     expose_advanced: bool = False
     text_fallback: bool = False
@@ -38,9 +36,8 @@ class DocsServerConfig:
     @classmethod
     def from_env(cls, env: Mapping[str, str]) -> "DocsServerConfig":
         return cls(
-            expose_legacy=env.get("DOCMANCER_MCP_LEGACY_TOOLS") == "1",
-            expose_admin=env.get("DOCMANCER_MCP_ADMIN_TOOLS") == "1",
-            expose_advanced=env.get("DOCMANCER_MCP_ADVANCED_TOOLS") == "1",
+            expose_admin=env.get("DOCATLAS_MCP_ADMIN_TOOLS") == "1",
+            expose_advanced=env.get("DOCATLAS_MCP_ADVANCED_TOOLS") == "1",
             text_fallback=env.get("DOCATLAS_MCP_TEXT_FALLBACK") == "1",
         )
 
@@ -90,40 +87,11 @@ DOCS_TARGET_INPUT_SCHEMA: dict[str, Any] = {
 }
 
 
-GET_DOCS_CONTEXT_OUTPUT_SCHEMA: dict[str, Any] = {
-    "type": "object",
-    "required": ["tool"],
-    "properties": {
-        "tool": {"const": "get_docs_context"},
-        "delivery_strategy": {"enum": ["bounded_direct"]},
-        "action_packet": ACTION_PACKET_OUTPUT_SCHEMA,
-        "document_content_policy": {"type": "object"},
-        "recommended_next_action": {"type": "object"},
-    },
-    "additionalProperties": True,
-    "allOf": [{
-        "if": {
-            "required": ["delivery_strategy"],
-            "properties": {"delivery_strategy": {"const": "bounded_direct"}},
-        },
-        "then": {"required": ["action_packet", "document_content_policy"]},
-    }],
-}
-
-
 PUBLIC_GET_DOCS_CONTEXT_OUTPUT_SCHEMA: dict[str, Any] = {
     "type": "object",
     "required": ["status"],
     "properties": {
-        # The advertised tool defaults to the canonical bounded projection,
-        # but explicitly requested compatibility output keeps the underlying
-        # unified-context lifecycle status.  MCP clients validate both shapes
-        # against this one output schema before returning the tool result.
-        "status": {"enum": [
-            "ok", "truncated", "insufficient_evidence", "failed",
-            "success", "partial_success", "confirmation_required",
-            "not_found", "invalid_request",
-        ]},
+        "status": {"enum": ["ok", "truncated", "insufficient_evidence", "failed"]},
         "kind": {"enum": ["docs_answer", "docs_context", "patch_context"]},
         "estimated_tokens": {"type": "integer"},
         "reason_code": {"type": "string"},

@@ -1,0 +1,176 @@
+{
+  "schema_version": "project-chat-context7-corpus-v1",
+  "cases": [
+    {
+      "id": "ru-install",
+      "question": "Как установить DocAtlas локально и проверить, что он работает?",
+      "pair": "How do I install and verify DocAtlas locally?",
+      "intent": "installation_verification",
+      "expected_kind": "docs_context",
+      "sources": [
+        "README.md",
+        "wiki/Install-Targets.md"
+      ]
+    },
+    {
+      "id": "ru-overview",
+      "question": "Что такое DocAtlas и зачем он нужен разработчику?",
+      "pair": "What is DocAtlas and what problem does it solve?",
+      "intent": "product_overview",
+      "expected_kind": "docs_context",
+      "sources": [
+        "README.md",
+        "docs/DOCMANCER_PRODUCT_BRIEF.md"
+      ]
+    },
+    {
+      "id": "ru-first-commands",
+      "question": "Какие первые команды выполнить после установки?",
+      "pair": "Which first commands should I run after installation?",
+      "intent": "getting_started",
+      "expected_kind": "docs_context",
+      "sources": [
+        "README.md",
+        "wiki/Commands.md"
+      ]
+    },
+    {
+      "id": "ru-contributor",
+      "question": "С чего новому разработчику начать читать репозиторий?",
+      "pair": "Where should a new contributor start reading the repository?",
+      "intent": "contributor_start",
+      "expected_kind": "docs_context",
+      "sources": [
+        "CONTRIBUTING.md",
+        "docs/PROJECT_MAP.md"
+      ]
+    },
+    {
+      "id": "ru-mcp-flow",
+      "question": "Как устроен полный процесс работы Docs MCP?",
+      "pair": "How does the Docs MCP workflow fit together?",
+      "intent": "docs_mcp_workflow",
+      "expected_kind": "docs_context",
+      "sources": [
+        "docs/mcp-docs-server.md",
+        "docs/project-docs-mcp-workflow.md"
+      ]
+    },
+    {
+      "id": "ru-sync",
+      "question": "Как обновить проектную документацию после изменения файлов?",
+      "pair": "How should I refresh project documentation after editing files?",
+      "intent": "project_docs_sync",
+      "expected_kind": "docs_context",
+      "sources": [
+        "docs/project-docs-mcp-workflow.md"
+      ]
+    },
+    {
+      "id": "ru-config",
+      "question": "Как настроить проектную документацию для репозитория?",
+      "pair": "How do I configure project documentation for a repository?",
+      "intent": "project_docs_configuration",
+      "expected_kind": "docs_context",
+      "sources": [
+        "wiki/Configuration.md",
+        "docs/project-docs-mcp-workflow.md"
+      ]
+    },
+    {
+      "id": "ru-clean",
+      "question": "Как безопасно проверить и очистить локальный индекс?",
+      "pair": "How can I inspect and safely clear a local index?",
+      "intent": "index_cleanup",
+      "expected_kind": "docs_context",
+      "sources": [
+        "docs/index-cleanup.md",
+        "wiki/Commands.md"
+      ]
+    },
+    {
+      "id": "ru-troubleshoot",
+      "question": "Что проверить, если проектная документация устарела или ничего не находится?",
+      "pair": "What should I check when project documentation looks stale?",
+      "intent": "troubleshooting",
+      "expected_kind": "docs_context",
+      "sources": [
+        "wiki/Troubleshooting.md",
+        "docs/project-docs-mcp-workflow.md"
+      ]
+    },
+    {
+      "id": "ru-storage",
+      "question": "Где хранится индекс и как он изолирован для каждого проекта?",
+      "pair": "Where is the index stored and how is it isolated per project?",
+      "intent": "project_storage",
+      "expected_kind": "docs_context",
+      "sources": [
+        "wiki/Architecture.md",
+        "docs/modules/storage-mutation-coordination.md"
+      ]
+    },
+    {
+      "id": "ru-chunks",
+      "question": "Как индексирование разбивает документацию на секции и чанки?",
+      "pair": "How does indexing split documentation into sections and chunks?",
+      "intent": "index_chunking",
+      "expected_kind": "docs_context",
+      "sources": [
+        "wiki/Architecture.md"
+      ]
+    },
+    {
+      "id": "ru-selection",
+      "question": "Как выбор доказательств определяет подходящие кандидаты?",
+      "pair": "How does evidence selection choose candidates?",
+      "intent": "evidence_selection",
+      "expected_kind": "docs_context",
+      "sources": [
+        "docs/modules/evidence-selection.md"
+      ]
+    },
+    {
+      "id": "ru-tests",
+      "question": "Что нужно протестировать перед открытием pull request?",
+      "pair": "What should I test before opening a pull request?",
+      "intent": "testing_contribution",
+      "expected_kind": "docs_context",
+      "sources": [
+        "CONTRIBUTING.md",
+        "docs/testing.md"
+      ]
+    },
+    {
+      "id": "ru-offline",
+      "question": "Как пользоваться DocAtlas без интернета и запустить офлайн-тесты?",
+      "pair": "How do I use DocAtlas offline and run the provider-free suite?",
+      "intent": "offline_usage",
+      "expected_kind": "docs_context",
+      "sources": [
+        "docs/testing.md",
+        "wiki/Configuration.md"
+      ]
+    },
+    {
+      "id": "ru-server-command",
+      "question": "Какая команда запускает Docs MCP сервер?",
+      "pair": "Which command starts the Docs MCP server?",
+      "intent": "docs_mcp_server_command",
+      "expected_kind": "docs_answer",
+      "sources": [
+        "README.md",
+        "docs/mcp-docs-server.md",
+        "wiki/Commands.md"
+      ]
+    },
+    {
+      "id": "negative-quantum",
+      "question": "Какую лунную квантовую политику хранения использует DocAtlas?",
+      "pair": "What lunar quantum retention policy does DocAtlas use?",
+      "intent": null,
+      "expected_kind": "insufficient_evidence",
+      "sources": []
+    }
+  ]
+}

@@ -230,8 +230,8 @@ def test_mcp_get_project_docs_returns_compact_response_unless_details_requested(
     assert "CompactNeedle project docs." in compact["results"][0]["content"]
     assert "candidate_sources" not in compact
     assert "source_state_guidance" not in compact
-    assert "candidate_sources" in detailed
-    assert "source_state_guidance" in detailed
+    assert "candidate_sources" not in detailed
+    assert "source_state_guidance" not in detailed
 
 
 def test_mcp_project_lifecycle_tools_return_compact_response_unless_details_requested(tmp_path, monkeypatch):
@@ -252,43 +252,43 @@ def test_mcp_project_lifecycle_tools_return_compact_response_unless_details_requ
     assert inspect_detailed is not None
     assert inspect_compact["source_summary"] == {"candidates": 1, "indexed": 0, "stale": 0, "ignored": 0}
     assert "candidate_sources" not in inspect_compact
-    assert "candidate_sources" in inspect_detailed
+    assert "candidate_sources" not in inspect_detailed
 
     assert sync_compact is not None
     assert sync_detailed is not None
     assert sync_compact["summary"]["current"] == 1
     assert "indexed_sources" not in sync_compact
-    assert "indexed_sources" in sync_detailed
+    assert "indexed_sources" not in sync_detailed
 
     assert ingest_compact is not None
     assert ingest_detailed is not None
     assert ingest_compact["source_summary"]["indexed"] == 1
     assert "indexed_sources" not in ingest_compact
-    assert "indexed_sources" in ingest_detailed
+    assert "indexed_sources" not in ingest_detailed
 
     assert bootstrap_compact is not None
     assert bootstrap_detailed is not None
     assert bootstrap_compact["status"] == "ready"
     assert "inspect_result" not in bootstrap_compact
-    assert "inspect_result" in bootstrap_detailed
+    assert "inspect_result" not in bootstrap_detailed
 
 
 def test_project_docs_lifecycle_diagnostics_expose_active_index_and_shadowed_project_config(tmp_path, monkeypatch):
     project = _flutter_project(tmp_path)
     (project / "README.md").write_text("# App\n\nDiagnostics compact docs.", encoding="utf-8")
-    (project / "docmancer.yaml").write_text(
+    (project / "docatlas.yaml").write_text(
         """
 index:
-  db_path: .docmancer/project-local.db
+  db_path: .docatlas/project-local.db
 vector_store:
-  api_key_env: SUPER_SECRET_DOCMANCER_TOKEN
+  api_key_env: SUPER_SECRET_DOCATLAS_TOKEN
 """.strip(),
         encoding="utf-8",
     )
-    monkeypatch.setenv("SUPER_SECRET_DOCMANCER_TOKEN", "super-secret-token-value")
+    monkeypatch.setenv("SUPER_SECRET_DOCATLAS_TOKEN", "super-secret-token-value")
     monkeypatch.setenv("HOME", str(tmp_path / "user-home"))
-    monkeypatch.setenv("DOCMANCER_HOME", str(tmp_path / "docmancer-home"))
-    monkeypatch.delenv("DOCMANCER_INDEX_DB_PATH", raising=False)
+    monkeypatch.setenv("DOCATLAS_HOME", str(tmp_path / "docmancer-home"))
+    monkeypatch.delenv("DOCATLAS_INDEX_DB_PATH", raising=False)
     service = LibraryDocsService(job_tracker=DocsJobTracker())
 
     inspect = service.inspect_project_docs(str(project))
@@ -297,13 +297,13 @@ vector_store:
     sync_compact = handle_project_tool("sync_project_docs", {"project_path": str(project), "with_vectors": False}, service)
 
     expected_active_db = str((tmp_path / "docmancer-home" / "docmancer.db").resolve())
-    expected_project_db = str((project / ".docmancer" / "project-local.db").resolve())
+    expected_project_db = str((project / ".docatlas" / "project-local.db").resolve())
     assert inspect.diagnostics["active_index"]["db_path"] == expected_active_db
     assert inspect.diagnostics["active_index"]["project_path"] == str(project.resolve())
     assert inspect.diagnostics["active_index"]["config_source"] == "defaults"
     assert inspect.diagnostics["active_index"]["project_local_config"] == {
         "present": True,
-        "path": str((project / "docmancer.yaml").resolve()),
+        "path": str((project / "docatlas.yaml").resolve()),
         "db_path": expected_project_db,
     }
     assert any(
@@ -315,7 +315,7 @@ vector_store:
     assert inspect_compact["diagnostics"]["active_index"]["db_path"] == expected_active_db
     assert sync_compact["diagnostics"]["active_index"]["db_path"] == expected_active_db
     assert "super-secret-token-value" not in json.dumps(inspect_compact)
-    assert "SUPER_SECRET_DOCMANCER_TOKEN" not in json.dumps(inspect_compact)
+    assert "SUPER_SECRET_DOCATLAS_TOKEN" not in json.dumps(inspect_compact)
 
 
 def test_get_project_context_diagnostics_preserve_query_intent_and_active_index(tmp_path, monkeypatch):
@@ -713,6 +713,79 @@ def test_query_project_docs_runs_lookup_queries_as_retrieval_only_supplements(tm
     assert chunks[0].metadata["retrieval_query_ids"] == (
         "query-lookup-1", "query-lookup-2", "query-original",
     )
+
+
+def test_query_project_docs_executes_and_attributes_concept_aliases(tmp_path):
+    project = tmp_path / "concept-alias"
+    project.mkdir()
+    observed: list[str] = []
+
+    class Agent:
+        config = SimpleNamespace(query=SimpleNamespace(default_limit=5))
+
+        def query(self, query, *, limit, budget, expand, filters):
+            observed.append(query)
+            return [RetrievedChunk(
+                source="docs/mcp-docs-server.md",
+                chunk_index=0,
+                text="The project answer contract is documented here.",
+                score=1.0,
+                metadata={
+                    "token_estimate": 20,
+                    "lexical_match": {"qualified": True, "mode": "and"},
+                },
+            )]
+
+    class Facade:
+        def _agent_instance(self):
+            return Agent()
+
+    chunks = ProjectDocsService(Facade()).query_project_docs(
+        str(project), "Where is the project answer contract documented?",
+    )
+
+    alias = "project answer contract documentation docs/mcp-docs-server.md"
+    assert observed.count(alias) == 1
+    assert "query-concept-1" in chunks[0].metadata["retrieval_query_ids"]
+
+
+def test_query_project_docs_attributes_generic_retrieval_hints_without_covering_original(tmp_path):
+    from docmancer.docs.application.evidence_selection import build_requirements
+
+    project = tmp_path / "generic-hint"
+    project.mkdir()
+    question = "How are NebulaLedger orbital telemetry snapshots persisted?"
+
+    class Agent:
+        config = SimpleNamespace(query=SimpleNamespace(default_limit=5))
+
+        def query(self, query, *, limit, budget, expand, filters):
+            if query == "NebulaLedger":
+                return [RetrievedChunk(
+                    source="docs/nebula.md",
+                    chunk_index=0,
+                    text="NebulaLedger persists orbital telemetry snapshots in SQLite.",
+                    score=1.0,
+                    metadata={
+                        "token_estimate": 20,
+                        "lexical_match": {"qualified": True, "mode": "and"},
+                    },
+                )]
+            return []
+
+    class Facade:
+        def _agent_instance(self):
+            return Agent()
+
+    chunks = ProjectDocsService(Facade()).query_project_docs(
+        str(project),
+        question,
+        requirements=build_requirements(question, profile="project_docs_answer"),
+    )
+
+    assert len(chunks) == 1
+    assert "query-hint-1" in chunks[0].metadata["retrieval_query_ids"]
+    assert "query-original" not in chunks[0].metadata["retrieval_query_ids"]
 
 
 def test_query_project_docs_does_not_qualify_trace_less_candidates(tmp_path):

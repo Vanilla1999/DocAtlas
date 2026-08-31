@@ -81,7 +81,7 @@
     "repository_revision": "5da60e24cacebf6350411087eb4983597774895a",
     "corpus_digest_manifest_sha256": "e7616692e496a8feba3efbfbe0994ba3b0134e6137f9d00c1629b136f8b92995",
     "runner_sha256": "cfb956959add6e83d747dc2611a58747881803e5e264bec68c930d2ec54acede",
-    "adapter_sha256": "56cfa6c1b77db5cbe9645a0a7624b301caa9478d6d348feacb2a99194507c398"
+    "adapter_sha256": "b15fcc9052aaef5a978dd0f145374d805aff73ba2e6427638fde241bb9e53709"
   },
   "activation_policy": {
     "change_default_retrieval": false,

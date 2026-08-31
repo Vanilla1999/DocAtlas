@@ -6,9 +6,8 @@ from ._docs_server_shared import *  # noqa: F401,F403
 def current_docs_surface(env: Mapping[str, str] | None = None) -> DocsMcpSurface:
     """Build the docs MCP surface from the current environment.
 
-    `TOOLS` remains as an import-time compatibility snapshot for tests and
-    older integrations, but the live server calls this so env flag changes are
-    not frozen by module import order.
+    The live server calls this so environment changes are not frozen by module
+    import order.
     """
     return build_docs_surface(DocsServerConfig.from_env(os.environ if env is None else env))
 
@@ -31,13 +30,7 @@ def _exception_reason_code(exc: Exception) -> str:
 
 
 def _public_handler_arguments(name: str, args: dict[str, Any]) -> dict[str, Any]:
-    if name != "get_docs_context" or args.get("delivery_strategy") == "bounded_direct":
-        return args
-    if any(field in args and args.get(field) is not None for field in _EXPLICIT_UNBOUNDED_COMPATIBILITY_FIELDS):
-        return args
-    bounded = dict(args)
-    bounded["delivery_strategy"] = "bounded_direct"
-    return bounded
+    return args
 
 
 def _service_for_project_path(
@@ -161,6 +154,13 @@ def call_docs_tool_payload(
         return build_mcp_error_payload(
             reason_code="unknown_tool",
             message=f"unknown tool: {name}",
+            tool=name,
+            phase="validation",
+        )
+    if payload.get("status") == "error" and isinstance(payload.get("reason_code"), str):
+        return build_mcp_error_payload(
+            reason_code=payload["reason_code"],
+            message=str(payload.get("message") or "request failed"),
             tool=name,
             phase="validation",
         )
@@ -290,7 +290,7 @@ async def _run_async(service: LibraryDocsService) -> None:
     async def _call_tool(name: str, arguments: dict[str, Any]) -> mcp_types.CallToolResult:
         # Tool handlers include synchronous indexing and HTTP clients.  Keep
         # them off the MCP event loop so docs_status can report a running job
-        # while another request is still doing bounded compatibility work.
+        # while another request is still doing bounded retrieval work.
         payload = await asyncio.to_thread(call_docs_tool_payload, name, arguments, service)
         return _mcp_tool_result(
             mcp_types,

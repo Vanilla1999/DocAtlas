@@ -5,7 +5,7 @@ from copy import deepcopy
 from typing import Any
 
 from docmancer.docs.interfaces.mcp.error_contract import build_bad_request_payload
-from docmancer.docs.interfaces.mcp.output_contract import compact_mcp_payload, json_bytes, normalize_output_mode
+from docmancer.docs.interfaces.mcp.output_contract import compact_mcp_payload, json_bytes
 from docmancer.docs.code_context import build_code_context
 from docmancer.docs.patch_plan_context import build_patch_plan_context
 from docmancer.docs.service import LibraryDocsService
@@ -42,7 +42,6 @@ PROJECT_TOOL_NAMES = {
     "get_patch_plan_context",
     "get_patch_constraints",
     "validate_patch_against_constraints",
-    "prefetch_project_docs",
     "prefetch_project_dependency_docs",
 }
 
@@ -158,10 +157,8 @@ def _enforce_mcp_hard_cap(payload: dict[str, Any], *, max_bytes: int) -> dict[st
         "mode",
         "reason",
         "message",
-        "response_style",
         "primary_snippet",
         "next_action",
-        "output_mode",
         "full_output_available",
         "requires_confirmation",
         "confirmation_reason",
@@ -257,7 +254,6 @@ def _compact_project_context(result: dict[str, Any]) -> dict[str, Any]:
         "mode": result.get("mode"),
         "reason": result.get("reason"),
         "message": message,
-        "response_style": result.get("response_style"),
         "primary_snippet": result.get("primary_snippet"),
         "supporting_snippets": result.get("supporting_snippets") or [],
         "context_pack": result.get("context_pack") or [],
@@ -286,9 +282,9 @@ def _compact_project_context(result: dict[str, Any]) -> dict[str, Any]:
             "answer_available": dependency_docs.get("answer_available"),
             "results_count": len(dependency_docs.get("results") or []),
             "source_summary": {
-                "selected": len(dependency_docs.get("selected_sources") or []),
-                "rejected": len(dependency_docs.get("rejected_sources") or []),
-                "risky": len(dependency_docs.get("risky_sources") or []),
+                "selected": len((dependency_docs.get("trust_contract") or {}).get("sources", {}).get("selected") or []),
+                "rejected": len((dependency_docs.get("trust_contract") or {}).get("sources", {}).get("rejected") or []),
+                "risky": len((dependency_docs.get("trust_contract") or {}).get("sources", {}).get("risky") or []),
             },
         }
     return compact
@@ -301,9 +297,8 @@ def _answer_project_context(result: dict[str, Any]) -> dict[str, Any]:
         "answer_type": result.get("answer_type"),
         "mode": result.get("mode"),
         "reason": result.get("reason"),
-        "response_style": result.get("response_style"),
         "primary_snippet": result.get("primary_snippet"),
-        "selected_sources": _trust_sources(result.get("trust_contract"), "selected"),
+        "trust_contract": result.get("trust_contract") or {},
         "next_actions": result.get("next_actions") or [],
         "next_action": result.get("next_action") or {},
         "arguments_patch": result.get("arguments_patch") or {},
@@ -320,23 +315,16 @@ def _debug_project_context(result: dict[str, Any]) -> dict[str, Any]:
     return _compact_project_context(result)
 
 
-def _project_context_output_mode(args: dict[str, Any]) -> str:
-    return normalize_output_mode(args, details_fallback=True)
-
-
 def _trust_sources(contract: Any, lane: str) -> list[dict[str, Any]]:
     if not isinstance(contract, dict):
         return []
     sources = contract.get("sources")
     if isinstance(sources, dict) and isinstance(sources.get(lane), list):
         return sources[lane]
-    legacy_key = f"{lane}_sources"
-    value = contract.get(lane) or contract.get(legacy_key)
-    return value if isinstance(value, list) else []
+    return []
 
 
 def _strip_mcp_debug_noise(payload: dict[str, Any]) -> dict[str, Any]:
-    output_mode = str(payload.get("output_mode") or "answer")
     compaction = payload.get("mcp_compaction")
     if isinstance(compaction, dict) and compaction.get("truncated"):
         payload["response_truncated"] = True
@@ -361,10 +349,10 @@ def _strip_mcp_debug_noise(payload: dict[str, Any]) -> dict[str, Any]:
         if not any(isinstance(warning, dict) and warning.get("code") == "mcp_response_truncated" for warning in warnings):
             warnings.append({
                 "code": "mcp_response_truncated",
-                "message": "MCP response was compacted/truncated; narrow query/limit/tokens or use output_mode='full' only when necessary.",
+                "message": "MCP response was compacted/truncated; narrow the query, limit, or token budget.",
             })
         payload["warnings"] = warnings
-        return _attach_output_contract(payload, output_mode=output_mode)
+        return _attach_output_contract(payload)
 
     payload.pop("mcp_compaction", None)
     warnings = [
@@ -372,19 +360,18 @@ def _strip_mcp_debug_noise(payload: dict[str, Any]) -> dict[str, Any]:
         if not (isinstance(warning, dict) and str(warning.get("code") or "").startswith("mcp_compact_output_"))
     ]
     payload["warnings"] = warnings
-    return _attach_output_contract(payload, output_mode=output_mode)
+    return _attach_output_contract(payload)
 
 
-def _attach_output_contract(payload: dict[str, Any], *, output_mode: str) -> dict[str, Any]:
+def _attach_output_contract(payload: dict[str, Any]) -> dict[str, Any]:
     raw_compaction = payload.get("mcp_compaction")
     compaction: dict[str, Any] = raw_compaction if isinstance(raw_compaction, dict) else {}
     truncated = bool(payload.get("response_truncated") or compaction.get("truncated"))
     payload["output_contract"] = {
-        "mode": output_mode,
         "complete": not truncated,
         "truncated": truncated,
         "safe_to_use_as_complete_context": not truncated,
-        "retry_with": {"output_mode": "debug", "page_size": 5, "narrow_query": True} if truncated and output_mode != "debug" else None,
+        "retry_with": {"narrow_query": True} if truncated else None,
         "omitted": {
             "fields": compaction.get("omitted_fields", []),
             "list_items": compaction.get("omitted_list_items", 0),
@@ -392,11 +379,6 @@ def _attach_output_contract(payload: dict[str, Any], *, output_mode: str) -> dic
         },
     }
     return payload
-
-
-def _patch_constraints_output_mode(args: dict[str, Any]) -> str:
-    output_mode = str(args.get("output_mode") or "compact").lower()
-    return output_mode if output_mode in {"compact", "debug", "full"} else "compact"
 
 
 def _compact_patch_evidence(items: list[dict[str, Any]], *, limit: int = 5) -> list[dict[str, Any]]:
@@ -464,22 +446,6 @@ def _compact_patch_constraints(result: dict[str, Any]) -> dict[str, Any]:
         "token_estimate": result.get("token_estimate"),
         "confidence": result.get("confidence"),
     }
-
-
-def _add_project_context_output_warning(payload: dict[str, Any], args: dict[str, Any]) -> dict[str, Any]:
-    if not args.get("details") or _project_context_output_mode(args) in {"full", "debug"}:
-        return payload
-    warnings = list(payload.get("warnings") or [])
-    warning = {
-        "code": "project_context_full_output_requires_output_mode_full",
-        "message": "details=true no longer returns full get_project_context payloads at the MCP boundary; pass output_mode='full' only when a full dump is explicitly required.",
-    }
-    if warning not in warnings:
-        warnings.append(warning)
-    payload["warnings"] = warnings
-    payload["output_mode"] = _project_context_output_mode(args)
-    payload["full_output_available"] = True
-    return payload
 
 
 def _compact_inspect_project_docs(result: dict[str, Any]) -> dict[str, Any]:
@@ -579,38 +545,28 @@ def handle_project_tool(name: str, args: dict[str, Any], service: LibraryDocsSer
     dependency_docs_app = getattr(service, "dependency_docs", service)
     if name == "inspect_project_docs":
         result = asdict(project_docs_app.inspect_project_docs(args["project_path"]))
-        return result if args.get("details") else _compact_inspect_project_docs(result)
+        return _compact_mcp_payload(_compact_inspect_project_docs(result))
     if name == "ingest_project_docs":
         result = asdict(project_docs_app.ingest_project_docs(args["project_path"], skip_known=bool(args.get("skip_known") if args.get("skip_known") is not None else True), with_vectors=bool(args.get("with_vectors") if args.get("with_vectors") is not None else False)))
-        return result if args.get("details") else _compact_ingest_project_docs(result)
+        return _compact_mcp_payload(_compact_ingest_project_docs(result))
     if name == "sync_project_docs":
         result = asdict(project_docs_app.sync_project_docs(args["project_path"], with_vectors=bool(args.get("with_vectors") if args.get("with_vectors") is not None else False)))
-        return result if args.get("details") else _compact_sync_project_docs(result)
+        return _compact_mcp_payload(_compact_sync_project_docs(result))
     if name == "bootstrap_project_docs":
         result = asdict(project_docs_app.bootstrap_project_docs(args["project_path"], question=args.get("question")))
-        return result if args.get("details") else _compact_bootstrap_project_docs(result)
+        return _compact_mcp_payload(_compact_bootstrap_project_docs(result))
     if name == "get_project_docs":
         query = _clean_string(args.get("query"))
         if not query:
             return _bad_request("empty_query", "query must not be empty")
         result = asdict(project_docs_app.get_project_docs(args["project_path"], query, tokens=_bounded_int_arg(args, "tokens", max_value=_MCP_MAX_TOKENS), limit=_bounded_int_arg(args, "limit", default=None, max_value=_MCP_MAX_PROJECT_LIMIT), expand=args.get("expand"), module=args.get("module"), module_path=args.get("module_path"), scope=args.get("scope")))
-        return result if args.get("details") else _compact_project_docs(result)
+        return _compact_mcp_payload(_compact_project_docs(result))
     if name == "get_project_context":
         question = _clean_string(args.get("question"))
         if not question:
             return _bad_request("empty_question", "question must not be empty")
         result = asdict(project_context_app.get_project_context(args["project_path"], question, tokens=_bounded_int_arg(args, "tokens", max_value=_MCP_MAX_TOKENS), limit=_bounded_int_arg(args, "limit", default=None, max_value=_MCP_MAX_PROJECT_LIMIT), expand=args.get("expand"), library=args.get("library"), libraries=args.get("libraries"), ecosystem=args.get("ecosystem"), version=args.get("version"), module=args.get("module"), module_path=args.get("module_path"), scope=args.get("scope"), mode=args.get("mode") or "auto", response_style=args.get("response_style"), allow_network=bool(args.get("allow_network") or False)))
-        output_mode = _project_context_output_mode(args)
-        if output_mode == "full":
-            result["output_mode"] = "full"
-            return result
-        if output_mode == "debug":
-            payload = _debug_project_context(result)
-            payload["output_mode"] = "debug"
-            return _attach_output_contract(_compact_mcp_payload(payload, page=_bounded_int_arg(args, "page", default=1, max_value=10_000), page_size=_bounded_int_arg(args, "page_size", default=None, max_value=20), include_sections=args.get("include_sections")), output_mode="debug")
-        payload = _answer_project_context(result) if output_mode == "answer" else _compact_project_context(result)
-        payload["output_mode"] = output_mode
-        payload = _compact_mcp_payload(_add_project_context_output_warning(payload, args), page=_bounded_int_arg(args, "page", default=1, max_value=10_000), page_size=_bounded_int_arg(args, "page_size", default=None, max_value=20), include_sections=args.get("include_sections"))
+        payload = _compact_mcp_payload(_answer_project_context(result))
         return _strip_mcp_debug_noise(payload)
     if name == "get_code_context":
         question = _clean_string(args.get("question"))
@@ -619,7 +575,7 @@ def handle_project_tool(name: str, args: dict[str, Any], service: LibraryDocsSer
         project_path = _clean_string(args.get("project_path"))
         if not project_path:
             return _bad_request("empty_project_path", "project_path must not be empty")
-        return build_code_context(
+        return _compact_mcp_payload(build_code_context(
             question,
             project_path=project_path,
             changed_files=args.get("changed_files"),
@@ -628,14 +584,13 @@ def handle_project_tool(name: str, args: dict[str, Any], service: LibraryDocsSer
             max_files=_bounded_int_arg(args, "max_files", default=12, max_value=50),
             max_snippets=_bounded_int_arg(args, "max_snippets", default=20, max_value=40),
             max_lines_per_snippet=_bounded_int_arg(args, "max_lines_per_snippet", default=80, min_value=10, max_value=200),
-            output_mode=args.get("output_mode") or "answer",
-        )
+        ))
     if name == "get_patch_plan_context":
         question = _clean_string(args.get("question"))
         if not question:
             return _bad_request("empty_question", "question must not be empty")
         builder = getattr(patch_plan_context_app, "get_patch_plan_context", build_patch_plan_context)
-        return builder(
+        return _compact_mcp_payload(builder(
             question,
             project_path=args.get("project_path"),
             changed_files=args.get("changed_files"),
@@ -645,8 +600,7 @@ def handle_project_tool(name: str, args: dict[str, Any], service: LibraryDocsSer
             max_files=_bounded_int_arg(args, "max_files", default=12, max_value=50),
             max_snippets=_bounded_int_arg(args, "max_snippets", default=16, max_value=40),
             max_tokens=_bounded_int_arg(args, "max_tokens", default=2400, min_value=200, max_value=12000),
-            output_mode=args.get("output_mode") or "compact",
-        )
+        ))
     if name == "get_patch_constraints":
         question = _clean_string(args.get("question"))
         if not question:
@@ -663,14 +617,9 @@ def handle_project_tool(name: str, args: dict[str, Any], service: LibraryDocsSer
         result.setdefault("status", "success")
         result.setdefault("reason_code", None)
         result.setdefault("answer_available", bool(result.get("constraints")))
-        output_mode = _patch_constraints_output_mode(args)
-        if output_mode == "full":
-            result["output_mode"] = "full"
-            return result
         payload = _compact_patch_constraints(result)
-        payload["output_mode"] = output_mode
         payload = _compact_mcp_payload(payload)
-        return payload if output_mode == "debug" else _strip_mcp_debug_noise(payload)
+        return _strip_mcp_debug_noise(payload)
     if name == "validate_patch_against_constraints":
         constraints = args.get("constraints")
         if constraints is None:
@@ -682,10 +631,6 @@ def handle_project_tool(name: str, args: dict[str, Any], service: LibraryDocsSer
             patch_diff=args.get("patch_diff"),
             strict=bool(args.get("strict") or False),
         ))
-    if name in {"prefetch_project_docs", "prefetch_project_dependency_docs"}:
-        result = dependency_docs_app.prefetch_project_dependency_docs if name == "prefetch_project_dependency_docs" else dependency_docs_app.prefetch_project_docs
-        payload = asdict(result(args["project_path"], include_flutter=bool(args.get("include_flutter") if args.get("include_flutter") is not None else True), include_dart=bool(args.get("include_dart") or False), include_rust=bool(args.get("include_rust") if args.get("include_rust") is not None else True), include_go=bool(args.get("include_go") if args.get("include_go") is not None else True), include_packages=args.get("include_packages") or [], force_refresh=bool(args.get("force_refresh") or False), continue_on_error=bool(args.get("continue_on_error") if args.get("continue_on_error") is not None else True), async_=bool(args.get("async") or False)))
-        if name == "prefetch_project_docs":
-            payload.setdefault("warnings", []).append({"code": "deprecated_tool_alias", "message": "Use prefetch_project_dependency_docs instead; this compatibility alias is scheduled for removal in 2.0.0."})
-        return payload
+    if name == "prefetch_project_dependency_docs":
+        return asdict(dependency_docs_app.prefetch_project_dependency_docs(args["project_path"], include_flutter=bool(args.get("include_flutter") if args.get("include_flutter") is not None else True), include_dart=bool(args.get("include_dart") or False), include_rust=bool(args.get("include_rust") if args.get("include_rust") is not None else True), include_go=bool(args.get("include_go") if args.get("include_go") is not None else True), include_packages=args.get("include_packages") or [], force_refresh=bool(args.get("force_refresh") or False), continue_on_error=bool(args.get("continue_on_error") if args.get("continue_on_error") is not None else True), async_=bool(args.get("async") or False)))
     return None

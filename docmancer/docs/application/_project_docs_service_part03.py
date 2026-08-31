@@ -125,7 +125,9 @@ def _exact_document_index_chunks(
     return candidates[:_EXACT_DOCUMENT_FALLBACK_LIMIT]
 
 
-def _tag_retrieval_query(chunks: Any, query_id: str | None) -> list[Any]:
+def _tag_retrieval_query(
+    chunks: Any, query_id: str | None, query_text: str | None = None,
+) -> list[Any]:
     if not query_id:
         return list(chunks)
     tagged = []
@@ -134,8 +136,12 @@ def _tag_retrieval_query(chunks: Any, query_id: str | None) -> list[Any]:
         trace = dict(metadata.get("lexical_match") or {})
         # Retrieval is candidate generation. Only a lexical relevance trace or
         # an explicitly resolved exact path may qualify model-visible context.
+        # A future dense qualification path must carry calibrated provenance
+        # from the dispatcher; this layer must not infer it from rank alone.
         trace.setdefault("qualified", bool(metadata.get("exact_path_match")))
         trace.setdefault("lexical_score", float(chunk.score))
+        if query_text:
+            trace.setdefault("query_text", query_text)
         matches = dict(metadata.get("retrieval_query_matches") or {})
         matches[query_id] = trace
         qualified_ids = tuple(key for key, value in matches.items() if value.get("qualified") is True)
@@ -181,15 +187,21 @@ class _ProjectDocsServicePart03:
             filters["project_doc_path"] = evidence_path
         agent = self._agent_instance()
         effective_limit = limit or agent.config.query.default_limit
+        if requirements is not None:
+            # Candidate generation needs enough diversity for deterministic
+            # lane/facet selection; the model-visible projection remains capped
+            # at three sources and owns the final token ceiling.
+            effective_limit = max(effective_limit, 20)
         budget = tokens or DEFAULT_DOC_TOKENS
         effective_expand = (expand or "none") if requirements is not None else expand
         documentation_query_plan = build_documentation_query_plan(
             query, lookup_queries=lookup_queries, explicit_path=evidence_path,
+            requirements=requirements,
         )
         lookup_query_ids = {
             item.text: item.query_id
             for item in documentation_query_plan.queries
-            if item.origin in {"host_lookup", "auto_clause"}
+            if item.origin in {"mandatory_facet", "host_lookup", "auto_clause", "canonical_intent", "concept_alias", "retrieval_hint"}
         }
         exact_path_query_id = next((
             item.query_id for item in documentation_query_plan.queries
@@ -220,7 +232,7 @@ class _ProjectDocsServicePart03:
         ))[:4]
         planned_lookup_queries = tuple(
             item.text for item in documentation_query_plan.queries
-            if item.origin in {"host_lookup", "auto_clause"}
+            if item.origin in {"mandatory_facet", "host_lookup", "auto_clause", "canonical_intent", "concept_alias", "retrieval_hint"}
         )
         supplemental_queries = tuple(dict.fromkeys((
             *planned_lookup_queries,
@@ -228,6 +240,14 @@ class _ProjectDocsServicePart03:
             *contract_concepts,
             *retrieval_hints,
         )))[:12]
+        next_supplemental_id = 1
+        for supplemental_query in supplemental_queries:
+            if supplemental_query in lookup_query_ids:
+                continue
+            lookup_query_ids[supplemental_query] = (
+                f"query-supplemental-{next_supplemental_id}"
+            )
+            next_supplemental_id += 1
         supplemental_budget = min(budget, max(128, budget // 4))
 
         gateway = getattr(self.facade, "agent_gateway", None)
@@ -278,7 +298,7 @@ class _ProjectDocsServicePart03:
             query_expand=effective_expand,
             query_filters=filters,
         )
-        chunks = _tag_retrieval_query(chunks, "query-original")
+        chunks = _tag_retrieval_query(chunks, "query-original", query)
         chunks = _tag_retrieval_query(chunks, exact_path_query_id)
         authoritative_chunks = _run(
             query,
@@ -287,7 +307,9 @@ class _ProjectDocsServicePart03:
             query_expand=effective_expand or "page",
             query_filters={**filters, "authority": "source_of_truth"},
         )
-        authoritative_chunks = _tag_retrieval_query(authoritative_chunks, "query-original")
+        authoritative_chunks = _tag_retrieval_query(
+            authoritative_chunks, "query-original", query,
+        )
         authoritative_chunks = _tag_retrieval_query(authoritative_chunks, exact_path_query_id)
         supplemental_chunks = [
             chunk
@@ -301,6 +323,7 @@ class _ProjectDocsServicePart03:
                 query_filters=filters,
                 ),
                 lookup_query_ids.get(supplemental_query),
+                supplemental_query,
             )
         ]
 
@@ -321,18 +344,6 @@ class _ProjectDocsServicePart03:
             candidates.sort(
                 key=lambda chunk: not bool(
                     (chunk.metadata or {}).get("retrieval_query_ids")
-                )
-            )
-        if probe_queries:
-            probe_terms = tuple({
-                term.casefold()
-                for probe in probe_queries
-                for term in re.findall(r"[A-Za-zА-Яа-я0-9_.:/+-]{3,}", probe)
-            })
-            candidates.sort(
-                key=lambda chunk: -sum(
-                    term in str(chunk.text or "").casefold()
-                    for term in probe_terms
                 )
             )
         selected = []

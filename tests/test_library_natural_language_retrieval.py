@@ -96,7 +96,7 @@ def _retrieve(tmp_path: Path, monkeypatch, ecosystem: str, corpus_name: str, que
     corpus = _load_manifest(ecosystem, corpus_name)
     root = FIXTURES / ecosystem
     gateway = RecordScopedGateway(root, corpus)
-    monkeypatch.setenv("DOCMANCER_HOME", str(tmp_path / "home"))
+    monkeypatch.setenv("DOCATLAS_HOME", str(tmp_path / "home"))
     config = DocmancerConfig()
     config.index.db_path = str(tmp_path / "registry.sqlite3")
     config.index.extracted_dir = str(tmp_path / "extracted")

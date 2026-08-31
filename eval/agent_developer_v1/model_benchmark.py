@@ -196,9 +196,6 @@ def _context_arguments(action: dict[str, Any], project: Path) -> dict[str, Any]:
     args: dict[str, Any] = {
         "question": str(action["question"]),
         "project_path": str(project),
-        "delivery_strategy": "bounded_direct",
-        "prepare_project_docs": False,
-        "packet_tokens": 1000,
     }
     mode = str(action.get("mode") or "").strip()
     if mode:
@@ -437,7 +434,7 @@ def _execute_action(
     if tool == "docs_status":
         return tool, handle_prefetch_tool(
             "docs_status",
-            {"action": "project", "project_path": str(project), "details": True},
+            {"action": "project", "project_path": str(project)},
             service,
         )
     return tool, None
@@ -467,7 +464,7 @@ def run_task(
     oracle_task: dict[str, Any],
     planner: Planner,
 ) -> dict[str, Any]:
-    previous_home = os.environ.get("DOCMANCER_HOME")
+    previous_home = os.environ.get("DOCATLAS_HOME")
     records: list[dict[str, Any]] = []
     usage_rows: list[dict[str, Any]] = []
     planning_errors: list[str] = []
@@ -477,7 +474,7 @@ def run_task(
             project = tmp / "project"
             fixture = oracle_gate.PROJECTS_ROOT / str(public_task["fixture"])
             shutil.copytree(fixture, project)
-            os.environ["DOCMANCER_HOME"] = str(tmp / "home")
+            os.environ["DOCATLAS_HOME"] = str(tmp / "home")
             service = oracle_gate._service(tmp)
             sync = service.sync_project_docs(str(project), with_vectors=False)
             if getattr(sync, "status", None) != "success":
@@ -557,9 +554,9 @@ def run_task(
             }
     finally:
         if previous_home is None:
-            os.environ.pop("DOCMANCER_HOME", None)
+            os.environ.pop("DOCATLAS_HOME", None)
         else:
-            os.environ["DOCMANCER_HOME"] = previous_home
+            os.environ["DOCATLAS_HOME"] = previous_home
 
 
 def run_benchmark(

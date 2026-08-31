@@ -200,7 +200,6 @@ def _run_smoke(
             "version": VERSION,
             "mode": "library",
             "response_style": "snippet-first",
-            "output_mode": "full",
         },
     )
     citations = _cited_code_sources(context)
@@ -263,14 +262,14 @@ def _fixture_call_tool() -> Callable[[str, dict[str, Any]], dict[str, Any]]:
 
 
 def _require_isolated_home(parser: argparse.ArgumentParser) -> None:
-    configured = os.environ.get("DOCMANCER_HOME")
+    configured = os.environ.get("DOCATLAS_HOME")
     if not configured:
         parser.error(
-            "--mode live requires an explicit isolated DOCMANCER_HOME; "
-            "use DOCMANCER_HOME=\"$(mktemp -d)\""
+            "--mode live requires an explicit isolated DOCATLAS_HOME; "
+            "use DOCATLAS_HOME=\"$(mktemp -d)\""
         )
     selected = Path(configured).expanduser().resolve()
-    default_home = (Path.home() / ".docmancer").resolve()
+    default_home = (Path.home() / ".docatlas").resolve()
     if selected == default_home:
         parser.error("--mode live refuses the default DocAtlas home; use a temporary isolated directory")
 

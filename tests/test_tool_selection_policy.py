@@ -49,7 +49,7 @@ def test_returned_docs_status_next_action_has_priority():
     assert decision.reason_code == "returned_next_action"
 
 
-def test_module_inspection_recovery_requests_detailed_status():
+def test_module_inspection_recovery_uses_public_status_contract():
     action = normalize_public_docs_action({
         "tool": "inspect_project_docs",
         "arguments_patch": {"project_path": "/tmp/project"},
@@ -60,7 +60,6 @@ def test_module_inspection_recovery_requests_detailed_status():
     assert action["arguments_patch"] == {
         "project_path": "/tmp/project",
         "action": "project",
-        "details": True,
     }
 
 

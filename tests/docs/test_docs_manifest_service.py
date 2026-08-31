@@ -65,7 +65,7 @@ def test_manifest_service_resolves_project_version_from_explicit_dependency():
 
 
 def test_manifest_service_validates_and_prefetches_targets(tmp_path):
-    manifest = tmp_path / "docmancer.docs.yaml"
+    manifest = tmp_path / "docatlas.docs.yaml"
     manifest.write_text(
         """
 version: 1
@@ -83,16 +83,12 @@ targets:
     service = DocsManifestService(deps)
 
     validation = service.validate_docs_manifest(str(manifest), targets=["router"])
-    result = service.prefetch_docs_manifest(str(manifest), force_refresh=True, continue_on_error=False)
-
-    assert validation.valid is True
-    assert validation.targets[0].library == "go_router"
-    assert result.status == "ok"
-    assert deps.calls[-1][0] == "prefetch"
+    assert validation.valid is False
+    assert "manifest version must be 2" in validation.errors
 
 
 def test_manifest_v2_normalizes_product_identity_and_writes_resolved_lock(tmp_path):
-    manifest = tmp_path / "docmancer.docs.yaml"
+    manifest = tmp_path / "docatlas.docs.yaml"
     manifest.write_text(
         """
 version: 2
@@ -150,7 +146,7 @@ targets:
 
 
 def test_manifest_v2_rejects_false_exactness_and_persisted_query(tmp_path):
-    manifest = tmp_path / "docmancer.docs.yaml"
+    manifest = tmp_path / "docatlas.docs.yaml"
     manifest.write_text(
         """
 version: 2
@@ -183,7 +179,7 @@ targets:
 
 
 def test_manifest_v2_deep_merges_nested_defaults(tmp_path):
-    manifest = tmp_path / "docmancer.docs.yaml"
+    manifest = tmp_path / "docatlas.docs.yaml"
     manifest.write_text(
         """
 version: 2
@@ -208,19 +204,16 @@ targets:
 
 
 def test_resolved_lock_detects_changed_project_dependency_evidence(tmp_path):
-    manifest = tmp_path / "docmancer.docs.yaml"
+    manifest = tmp_path / "docatlas.docs.yaml"
     manifest.write_text(
         """
-version: 1
+version: 2
 targets:
   - id: sample
-    library: sample
-    ecosystem: go
-    version: project-version
-    project_version: {package: "go:example.com/sample", fallback: latest}
-    source_type: api
-    docs_url: https://pkg.go.dev/example.com/sample
-    allowed_domains: [pkg.go.dev]
+    identity: {kind: package, ecosystem: go, name: sample}
+    version: {requested: project-version, policy: project, package: "go:example.com/sample", fallback: latest}
+    source: {type: api, url: "https://pkg.go.dev/example.com/sample", authority: official_registry, version_binding: rolling, format: godoc}
+    scope: {allowed_domains: [pkg.go.dev], path_prefixes: [/example.com/sample], coverage: bounded}
 """,
         encoding="utf-8",
     )
@@ -252,13 +245,13 @@ targets:
 
 
 def test_selected_target_prefetch_preserves_other_resolved_lock_entries(tmp_path):
-    manifest = tmp_path / "docmancer.docs.yaml"
+    manifest = tmp_path / "docatlas.docs.yaml"
     manifest.write_text(
         """
-version: 1
+version: 2
 targets:
-  - {id: first, library: first, docs_url: "https://docs.example/first/", allowed_domains: [docs.example]}
-  - {id: second, library: second, docs_url: "https://docs.example/second/", allowed_domains: [docs.example]}
+  - {id: first, identity: {kind: product, ecosystem: web, name: first}, version: {requested: rolling, policy: rolling}, source: {type: reference, url: "https://docs.example/first/", authority: official_product, version_binding: rolling, format: html}, scope: {allowed_domains: [docs.example], path_prefixes: [/first/], coverage: bounded}}
+  - {id: second, identity: {kind: product, ecosystem: web, name: second}, version: {requested: rolling, policy: rolling}, source: {type: reference, url: "https://docs.example/second/", authority: official_product, version_binding: rolling, format: html}, scope: {allowed_domains: [docs.example], path_prefixes: [/second/], coverage: bounded}}
 """,
         encoding="utf-8",
     )

@@ -65,21 +65,58 @@ def merge_query_matches(*values: Any) -> dict[str, dict[str, Any]]:
 
 def validate_context_selection_payload(
     payload: Mapping[str, Any], sources: Iterable[Mapping[str, Any]],
+    *, snapshot: Mapping[str, Mapping[str, Any]] | None = None,
 ) -> list[str]:
     coverage = payload.get("query_coverage")
     covered = payload.get("covered_query_ids")
     missing = payload.get("missing_query_ids")
+    missing_facets = payload.get("missing_facets")
+    facets = payload.get("facets")
     if (
         coverage not in {"full", "partial"}
         or not isinstance(covered, list)
         or not isinstance(missing, list)
         or set(covered).intersection(missing)
         or (coverage == "full") != bool(covered and not missing)
+        or not isinstance(missing_facets, list)
+        or not isinstance(facets, list)
+        or any(
+            item.get("status") not in {"covered", "missing", "retrieval_only"}
+            or not str(item.get("id") or "").strip()
+            or not str(item.get("question") or "").strip()
+            or not isinstance(item.get("evidence_ids"), list)
+            for item in facets if isinstance(item, Mapping)
+        )
+        or any(not isinstance(item, Mapping) for item in facets)
+        or [item for item in facets if item.get("status") == "missing"] != missing_facets
+        or payload.get("coverage_policy") != "retrieval_attribution_only"
+        or payload.get("retrieval_coverage") != coverage
+        or payload.get("facet_coverage") not in {"none", "partial", "full", "unverified"}
     ):
         return ["docs_context query coverage is inconsistent"]
-    source_query_ids = qualified_query_ids(sources)
-    if not set(covered).issubset(source_query_ids):
-        return ["docs_context covered queries require visible source attribution"]
+    evidence_ids = {
+        str(source.get("evidence_id") or "") for source in sources
+        if str(source.get("evidence_id") or "")
+    }
+    if any(
+        not set(str(value) for value in item.get("evidence_ids") or ()).issubset(evidence_ids)
+        for item in facets if isinstance(item, Mapping)
+    ):
+        return ["docs_context facet evidence requires a visible source"]
+    if snapshot is not None:
+        for item in facets:
+            if not isinstance(item, Mapping) or item.get("status") != "covered":
+                continue
+            requirement_id = str(item.get("requirement_id") or "")
+            if not requirement_id or any(
+                requirement_id not in set(
+                    ((snapshot.get(str(evidence_id)) or {}).get("source") or {}).get(
+                        "_assigned_requirement_ids"
+                    ) or ()
+                )
+                for evidence_id in item.get("evidence_ids") or ()
+            ):
+                return ["docs_context covered facet requires its canonical assigned witness"]
     return []
 
 

@@ -1,0 +1,10 @@
+{
+  "module_labels": {
+    "tests/test_project_chat_quality_v1_protocol.py": "behavioral"
+  },
+  "module_node_hashes": {
+    "tests/test_project_chat_quality_v1_protocol.py": "7830c66dbdcc5401c4ae1e34a689784bdb3cc3ae4a524a52a72d796323f88600"
+  },
+  "node_overrides": {},
+  "schema_version": 1
+}

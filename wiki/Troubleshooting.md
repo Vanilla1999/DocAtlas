@@ -101,7 +101,7 @@ doc-atlas install-pack @acme/widgets@1.4.2
 
 ### `Pack <pkg>@<version> is not available locally, from the hosted registry, or from a known OpenAPI fallback`
 
-The resolver tried local cache, the hosted compatibility Docmancer artifact API, and the built-in known-source fallback, and none of them had the pack. From an interactive shell, `install-pack` then prompts you for an OpenAPI 3.x or Swagger 2.0 spec URL. Paste the URL of any public spec for the API and DocAtlas will compile a pack locally.
+The resolver tried the local cache, hosted DocAtlas artifact API, and built-in known-source fallback, and none had the pack. From an interactive shell, `install-pack` then prompts you for an OpenAPI 3.x or Swagger 2.0 spec URL. Paste the URL of a public spec for the API and DocAtlas will compile a pack locally.
 
 For non-interactive use (CI, scripts), pass the URL up front:
 
@@ -152,7 +152,7 @@ That is Qdrant's own anonymous telemetry, not docmancer. The managed lifecycle s
 
 The default ingest path embeds + upserts vectors via the managed local Qdrant. If you see FTS5-only behaviour, check:
 
-- `DOCMANCER_AUTO_VECTORS=0` is set in env (or `--no-vectors` was passed). Unset the env var to re-enable.
+- `DOCATLAS_AUTO_VECTORS=0` is set in env (or `--no-vectors` was passed). Unset the env var to re-enable.
 - The configured embeddings provider is a cloud one (`openai`, `voyage`, `cohere`) but its API key env var is missing. DocAtlas falls back to FTS5-only and logs the missing key; set the env var or switch to `embeddings.provider: fastembed`.
 - The Qdrant binary is unavailable for your platform. Run `doc-atlas doctor` to see the platform matrix decision. `SqliteVecStore` is used as a fallback when possible.
 
@@ -170,4 +170,4 @@ This should not happen: `sync_vector_store` prunes orphaned vector points and `e
 
 ### macOS Apple Silicon: managed Qdrant won't start
 
-Confirm with `file ~/.docmancer/qdrant/qdrant` that the binary is `arm64` if you are on Apple Silicon. The `qdrant_manager` selects the right artefact from the verified matrix, but a mixed-arch venv can pick the wrong path. Reinstall the binary with `doc-atlas qdrant upgrade`.
+Confirm with `file ~/.docatlas/qdrant/qdrant` that the binary is `arm64` if you are on Apple Silicon. The `qdrant_manager` selects the right artefact from the verified matrix, but a mixed-arch venv can pick the wrong path. Reinstall the binary with `doc-atlas qdrant upgrade`.

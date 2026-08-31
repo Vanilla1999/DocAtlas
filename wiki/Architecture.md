@@ -6,7 +6,7 @@ DocAtlas runs two cooperating local runtimes.
 
 The primary **DocAtlas Docs pipeline** fetches documentation with `doc-atlas add` (URL), `doc-atlas ingest` (local files), or the Docs MCP server's prefetch tools, normalizes it into sections, indexes those sections in a local SQLite FTS5 database plus a managed local Qdrant for dense and sparse vectors, and retrieves compact context packs through the CLI or Docs MCP tools. No hosted query API; the only background process is the docmancer-owned Qdrant.
 
-The advanced **DocAtlas MCP Packs runtime** installs version-pinned API packs from a registry with `doc-atlas install-pack <package>@<version>`, then exposes every installed pack to your agent through a single shared stdio MCP gateway (`doc-atlas mcp packs-serve`; `serve` remains a compatibility alias) using the Tool Search pattern: two meta-tools regardless of how many packs you install. The dispatcher enforces auth, destructive-call gating, schema validation, idempotency-key auto-injection and reuse, version pinning on the wire, and SHA-256 verification of every artifact before install.
+The advanced **DocAtlas MCP Packs runtime** installs version-pinned API packs from a registry with `doc-atlas install-pack <package>@<version>`, then exposes every installed pack to your agent through a single shared stdio MCP gateway (`doc-atlas mcp packs-serve`) using the Tool Search pattern: two meta-tools regardless of how many packs you install. The dispatcher enforces auth, destructive-call gating, schema validation, idempotency-key auto-injection and reuse, version pinning on the wire, and SHA-256 verification of every artifact before install.
 
 For the full command reference, see [Commands](./Commands.md). For configuration options, see [Configuration](./Configuration.md).
 
@@ -20,7 +20,16 @@ Alongside the FTS5 index, each section is embedded with FastEmbed (local dense +
 
 ## Per-library index isolation
 
-Each library+version has its own independent SQLite index. The `LibraryDocsService._index_config_for` method creates a separate database under `~/.docmancer/docs-indexes/<normalized_name>.db` and a separate extracted directory. This prevents cross-library contamination, enables independent refresh/recreate per target, and keeps the global `docmancer.db` registry lightweight (metadata only).
+Each library+version has its own independent SQLite index. The `LibraryDocsService._index_config_for` method creates a separate database under `~/.docatlas/docs-indexes/<normalized_name>.db` and a separate extracted directory. This prevents cross-library contamination, enables independent refresh/recreate per target, and keeps the global `docatlas.db` registry lightweight (metadata only).
+
+## Project documentation storage and isolation
+
+Project documentation storage is organized as a derived, project-scoped index
+of repository-owned files. Each project identity receives isolated SQLite index
+state and extracted artifacts, so one repository's project docs cannot satisfy
+another repository's query. The filesystem documents remain authoritative; the
+index is a rebuildable cache coordinated by the writer lease and cleanup barrier
+described in [Index cleanup](../docs/index-cleanup.md).
 
 ## Retrieval
 
@@ -35,7 +44,7 @@ A fresh configuration queries the FTS5 index in `lexical` mode by default. Inges
 Components:
 
 - **`docmancer.runtime.qdrant_manager`** owns the local Qdrant lifecycle: binary acquisition from the pinned `v1.14.1` GitHub release, port selection under `filelock`, background spawn with telemetry disabled, ownership sentinel, foreign-process refusal, and a `SqliteVecStore` fallback when the platform has no matching binary.
-- **`docmancer.embeddings`** wraps the embedding providers (`FastEmbedProvider` for local dense + sparse; cloud providers for OpenAI / Voyage / Cohere). A content-hash-keyed disk cache under `~/.docmancer/embeddings-cache/` avoids re-embedding unchanged chunks. The cloud providers retry on 429/5xx with bounded exponential backoff; when a configured cloud provider has no API key in env, ingest falls back to FTS5-only with a warning rather than aborting.
+- **`docmancer.embeddings`** is the Python import namespace for the embedding providers (`FastEmbedProvider` for local dense + sparse; cloud providers for OpenAI / Voyage / Cohere). A content-hash-keyed disk cache under `~/.docatlas/embeddings-cache/` avoids re-embedding unchanged chunks. The cloud providers retry on 429/5xx with bounded exponential backoff; when a configured cloud provider has no API key in env, ingest falls back to FTS5-only with a warning rather than aborting.
 - **`docmancer.embeddings.pipeline.sync_vector_store`** reconciles SQLite sections against existing Qdrant points: it skips unchanged content via the `embedding_upserts` bookkeeping table, prunes points whose chunk ids no longer exist in SQLite (so `ingest --recreate` cannot leave stale dense hits behind), embeds the rest in batches, and bulk-upserts.
 - **`docmancer.stores`** wraps both backends behind a `VectorStore` interface. `QdrantStore.ensure_collection` refuses to claim a pre-existing collection that lacks the docmancer ownership sentinel, and `delete_collection` will only operate on docmancer-owned collections.
 - **`docmancer.retrieval.dispatch.RetrievalDispatcher`** fans out across `lexical` (FTS5), `dense` (Qdrant or sqlite-vec), and `sparse` (SPLADE in Qdrant) via a thread pool, fuses the per-source ranks with Reciprocal Rank Fusion (vanilla or weighted), and hydrates the top-K section ids back into `RetrievedChunk` rows. Two extensions sit on this path:
@@ -96,17 +105,17 @@ The resolution happens in `LibraryDocsService.get_docs()` when `project_path` is
 
 `doc-atlas mcp docs-serve` exposes the docs runtime to coding agents as MCP tools. It uses the same local ingest, index, update, and query path as the CLI, plus the persistent SQLite registry for known documentation sources.
 
-For repository coding and patch tasks, agents should call `get_docs_context(project_path=..., question=..., mode="project")` first. The server returns one bounded canonical `docs_answer`, `patch_context`, or fail-closed `insufficient_evidence` projection by default; rich retrieval evidence remains internal for validation. Follow a bounded `recommended_next_action` when reconciliation is needed, and then retry the same request. Broader compatibility output remains available only for explicit documentation exploration. `docs_status` is reserved for explicit health, freshness, index, and job-status requests. This exactly-three-tool default keeps routing unambiguous; low-level inspection and patch tools require `DOCMANCER_MCP_ADVANCED_TOOLS=1`. Agents should cite canonical projected sources and treat `CHANGELOG.md` as primary evidence only for release-history or "what changed" questions.
+For repository coding and patch tasks, agents should call `get_docs_context(project_path=..., question=..., mode="project")` first. The server returns exactly one bounded canonical `docs_answer`, `docs_context`, `patch_context`, or fail-closed `insufficient_evidence` projection. Only narrow relation-specific proof authorizes `docs_answer`; broad questions use cited `docs_context` with compact facets and no completeness claim. Operational retrieval excludes evaluation, planning, and history lanes unless the question explicitly asks for them. Follow a bounded `recommended_next_action` when reconciliation is needed, then retry the same request. `docs_status` is reserved for explicit health, freshness, index, and job-status requests.
 
 Internally, project context retrieval is staged: documentation first, then bounded source evidence, repository map, and code graph only when deterministic unresolved-target or cross-module signals require them. A versioned routing record stores stage status/reason/count/bytes outside the canonical model projection. Repository maps remain navigation evidence and never become authoritative project policy.
 
 If the user asks broadly about "the MCP server", distinguish the two surfaces explicitly:
 
 - **Docs MCP server:** `doc-atlas mcp docs-serve` exposes exactly `get_docs_context`, `prepare_docs`, and `docs_status` for the default documentation workflow.
-- **MCP Packs runtime:** `doc-atlas mcp packs-serve` exposes installed API action packs through `docmancer_search_tools` and `docmancer_call_tool`; `serve` is a compatibility alias.
+- **MCP Packs runtime:** `doc-atlas mcp packs-serve` exposes installed API action packs through `docmancer_search_tools` and `docmancer_call_tool`. These tool names follow the Python/runtime namespace; the MCP server identity is `docatlas`.
 
 Legacy direct library/project tools remain internal compatibility paths. They are not a public routing contract for agents; see [Docs MCP server](../docs/mcp-docs-server.md) for the current tool contract.
-- **`prefetch_docs_manifest`** — Validate and prefetch all targets declared in a `docmancer.docs.yaml`.
+- **`prefetch_docs_manifest`** — Validate and prefetch all targets declared in a `docatlas.docs.yaml`.
 
 ### Prefetch and job tools
 - **`prefetch_docs_targets`** — Download and index one or more explicit documentation targets with full control over seed URLs, allowed domains, path prefixes, max pages, browser rendering, doc format, and per-target warnings.
@@ -124,7 +133,7 @@ When a template is provided without an explicit `docs_url`, the service renders 
 
 ### Async prefetch and job tracking
 
-`prefetch_library_docs`, `prefetch_docs_manifest`, `prefetch_docs_targets`, and `prefetch_project_docs` support an `async_` parameter. When `async_: true`, the service:
+The corresponding `prepare_docs` prefetch actions may start background work. When they do, the service:
 1. Creates a `DocsJob` entry with a UUID4 job ID and `pending` status
 2. Starts a daemon background thread to run the fetch/index pipeline
 3. Returns immediately with a `DocsJobStartResult` containing the `job_id`
@@ -137,30 +146,34 @@ The `DocsJobTracker` maintains an in-memory dictionary of jobs (trimmed to `MAX_
 
 Call `get_docs_job_status(job_id)` to poll progress. Jobs can be cancelled via `cancel_docs_job(job_id)`; the cancellation flag is checked between targets and between seed URLs during a target.
 
-### docmancer.docs.yaml manifest
+### docatlas.docs.yaml manifest
 
 The manifest is a YAML file that declares a batch of documentation targets:
 
 ```yaml
-version: 1
+version: 2
 defaults:
-  source_type: api
-  allowed_domains:
-    - docs.example.com
+  source:
+    authority: official_project
+    version_binding: rolling
+    format: html
+  scope:
+    allowed_domains: [docs.example.com]
+    coverage: bounded
 targets:
   - id: my-lib
-    library: my-lib
-    version: "2.1.0"
-    docs_url: https://docs.example.com/my-lib/2.1/
-    allowed_domains:
-      - docs.example.com
+    identity: {kind: package, ecosystem: python, name: my-lib}
+    version: {requested: "2.1.0", policy: exact}
+    source:
+      type: api
+      url: https://docs.example.com/my-lib/2.1.0/
+      version_binding: exact
+    scope: {path_prefixes: [/my-lib/2.1.0/]}
   - id: project-dep
-    library: some-dep
-    ecosystem: pub
-    version: project-version
-    project_version:
-      package: some-dep
-      fallback: latest
+    identity: {kind: package, ecosystem: pub, name: some-dep}
+    version: {requested: project-version, policy: project, package: some-dep, fallback: latest}
+    source: {type: api, url_template: "https://pub.dev/documentation/{library}/{version}/"}
+    scope: {allowed_domains: [pub.dev], path_prefixes: [/documentation/some-dep/]}
 ```
 
 `validate_docs_manifest` checks structure, duplicate IDs/`canonical_id`, URL security (no private/localhost URLs, allowed domain validation), source type validity, and `project-version` resolution. `prefetch_docs_manifest` runs validation then delegates to `prefetch_docs_targets`.
@@ -231,17 +244,17 @@ When project docs are missing, `get_project_docs` returns structured `next_actio
 1. **No candidates found** — suggests creating a reviewable `ARCHITECTURE.md`, then running `inspect_project_docs` -> `ingest_project_docs` -> `get_project_docs`
 2. **Candidates found but not indexed** — suggests `ingest_project_docs`
 3. **Indexed but stale** — suggests re-ingest
-4. **Exact dependency versions available** — suggests `prefetch_project_docs` (requires network, so marked `requires_confirmation: true`)
+4. **Exact dependency versions available** — suggests `prepare_docs(action="prefetch_project_dependency_docs")` (requires network, so marked `requires_confirmation: true`)
 
 This creates an agent-discoverable onboarding path where the agent guides itself through the setup steps.
 
 ## Packs MCP runtime
 
-`doc-atlas install-pack <package>@<version>` downloads the pack's five artifacts (`contract.json`, `tools.curated.json`, `tools.full.json`, `auth.schema.json`, `provenance.json`) plus a `manifest.json` with SHA-256s, verifies every artifact hash, and writes them under `~/.docmancer/servers/<package>@<version>/`. The package is added to `~/.docmancer/mcp/manifest.json` with per-package state (mode = curated/expanded, allow_destructive, allow_execute, enabled).
+`doc-atlas install-pack <package>@<version>` downloads the pack's five artifacts (`contract.json`, `tools.curated.json`, `tools.full.json`, `auth.schema.json`, `provenance.json`) plus a `manifest.json` with SHA-256s, verifies every artifact hash, and writes them under `~/.docatlas/servers/<package>@<version>/`. The package is added to `~/.docatlas/mcp/manifest.json` with per-package state (mode = curated/expanded, allow_destructive, allow_execute, enabled).
 
 When an advanced user explicitly launches or registers `doc-atlas mcp packs-serve` for installed API packs, the server exposes exactly **two** tools to the agent regardless of how many packs are installed:
 
-- `docmancer_search_tools(query, package?, limit)`: hybrid-ready search across enriched operation metadata (operation ids, summaries/descriptions, aliases, intents, tags, examples, and schema terms). The default remains dependency-light BM25-style lexical ranking with synonym expansion and snake/kebab/camel token normalization. Set `DOCMANCER_MCP_SEARCH=hybrid` plus `DOCMANCER_MCP_EMBEDDING_MODEL=<local FastEmbed model>` to add local semantic embeddings as a second signal; lexical and semantic ranks are fused with RRF, and unavailable semantic search falls back to lexical with an explicit warning. Returns name, description, safety, score/rank metadata, low-confidence search metadata, and inlined `inputSchema` for every returned match.
+- `docmancer_search_tools(query, package?, limit)`: hybrid-ready search across enriched operation metadata (operation ids, summaries/descriptions, aliases, intents, tags, examples, and schema terms). The default remains dependency-light BM25-style lexical ranking with synonym expansion and snake/kebab/camel token normalization. Set `DOCATLAS_MCP_SEARCH=hybrid` plus `DOCATLAS_MCP_EMBEDDING_MODEL=<local FastEmbed model>` to add local semantic embeddings as a second signal; lexical and semantic ranks are fused with RRF, and unavailable semantic search falls back to lexical with an explicit warning. Returns name, description, safety, score/rank metadata, low-confidence search metadata, and inlined `inputSchema` for every returned match.
 - `docmancer_call_tool(name, args)`: dispatches the resolved tool through the matching executor.
 
 Every dispatch passes through the gate chain (in order):
@@ -250,17 +263,17 @@ Every dispatch passes through the gate chain (in order):
 2. **Validate.** Run `args` through the operation's `inputSchema` with `jsonschema`. Tool Search hides per-tool schemas from the MCP `tools/list` surface, so the dispatcher must validate (spec 2.8.5).
 3. **Auth.** Resolve credentials by precedence: per-call override, process env, agent-config env, then the per-package credential fallback. For OpenAPI `apiKey` schemes, place the resolved value in the right slot per `in: header|query|cookie`.
 4. **Safety gate.** If the operation is destructive and the package was not installed with `--allow-destructive`, refuse with a remediation message naming the exact `install-pack ... --allow-destructive` command. If the executor is `python_import` or `shell` and the package was not installed with `--allow-execute`, refuse similarly.
-5. **Idempotency.** For non-idempotent operations on sources that declare an idempotency header, generate a UUID4 `Idempotency-Key`. A SQLite fingerprint cache (24 h TTL, key = tool + canonicalized args) reuses the same key on retry; the agent can also pass `args._docmancer_idempotency_key` explicitly.
+5. **Idempotency.** For non-idempotent operations on sources that declare an idempotency header, generate a UUID4 `Idempotency-Key`. A SQLite fingerprint cache (24 h TTL, key = tool + canonicalized args) reuses the same key on retry; the agent can also pass `args._docatlas_idempotency_key` explicitly.
 6. **Execute.** Hand off to the executor (`http`, `noop_doc`, `python_import`). The HTTP executor merges `auth.required_headers` declared in the contract (used by keyed APIs that pin a dated wire version), auth headers/params/cookies, and the per-operation `http.encoding` (`json | form | multipart | query_only | path_only`). Path parameters are percent-encoded as one segment, so values containing `/`, `?`, or `#` do not alter the URL structure.
-7. **Log.** Append a redacted entry to `~/.docmancer/mcp/calls.jsonl` (only `arg_keys`, never values).
+7. **Log.** Append a redacted entry to `~/.docatlas/mcp/calls.jsonl` (only `arg_keys`, never values).
 
-Pack paths are validated and resolved before use: `..` segments, NUL, backslashes, leading `@` in the version, and absolute paths are rejected, and the resolved candidate must remain inside `~/.docmancer/servers`. This keeps a malicious or malformed registry entry from escaping the storage root.
+Pack paths are validated and resolved before use: `..` segments, NUL, backslashes, leading `@` in the version, and absolute paths are rejected, and the resolved candidate must remain inside `~/.docatlas/servers`. This keeps a malicious or malformed registry entry from escaping the storage root.
 
 ## Concurrency
 
 Multiple CLI calls from parallel agents or terminals are safe. SQLite handles concurrent reads natively, and write operations are serialized by SQLite's built-in locking.
 
-Per-library locks (`filelock`-based under `~/.docmancer/locks/`) serialize refresh/ingest operations for the same library to prevent concurrent modification of a per-library index.
+Per-library locks (`filelock`-based under `~/.docatlas/locks/`) serialize refresh/ingest operations for the same library to prevent concurrent modification of a per-library index.
 
 ## Flow
 
@@ -283,7 +296,7 @@ Docs (project-aware):
     -> version-pinned docs from pub.dev Dartdoc / docs.rs / api.flutter.dev
 
 Manifest:
-  docmancer.docs.yaml
+  docatlas.docs.yaml
     -> validate_docs_manifest / prefetch_docs_manifest
     -> batch prefetch with job tracking
 

@@ -11,7 +11,7 @@ from docmancer.mcp.manifest import IntegrityError, Manifest
 
 @pytest.fixture(autouse=True)
 def isolated(tmp_path, monkeypatch):
-    monkeypatch.setenv("DOCMANCER_HOME", str(tmp_path / "home"))
+    monkeypatch.setenv("DOCATLAS_HOME", str(tmp_path / "home"))
     paths.ensure_dirs()
 
 
@@ -38,7 +38,7 @@ def test_install_succeeds_when_sha_matches(tmp_path, monkeypatch):
             "tools.curated.json": hashlib.sha256(tools_bytes := json.dumps({"tools": []}).encode()).hexdigest(),
         }},
     )
-    monkeypatch.setenv("DOCMANCER_REGISTRY_DIR", str(registry))
+    monkeypatch.setenv("DOCATLAS_REGISTRY_DIR", str(registry))
     install_package("demo", "1")
     assert paths.package_dir("demo", "1").exists()
 
@@ -52,7 +52,7 @@ def test_install_refuses_on_sha_mismatch(tmp_path, monkeypatch):
             "tools.curated.json": "0" * 64,
         }},
     )
-    monkeypatch.setenv("DOCMANCER_REGISTRY_DIR", str(registry))
+    monkeypatch.setenv("DOCATLAS_REGISTRY_DIR", str(registry))
     with pytest.raises(ValueError, match="SHA-256 mismatch"):
         install_package("demo", "1")
 
@@ -61,7 +61,7 @@ def test_install_skips_verification_when_no_manifest(tmp_path, monkeypatch):
     """No manifest.json = no expected hashes = no verification (still records actual sha)."""
     registry = tmp_path / "reg"
     _seed(registry, "demo", "1")  # no manifest
-    monkeypatch.setenv("DOCMANCER_REGISTRY_DIR", str(registry))
+    monkeypatch.setenv("DOCATLAS_REGISTRY_DIR", str(registry))
     result = install_package("demo", "1")
     assert "contract.json" in result.package.artifact_sha256
 
@@ -69,7 +69,7 @@ def test_install_skips_verification_when_no_manifest(tmp_path, monkeypatch):
 def test_runtime_refuses_tampered_contract_artifact(tmp_path, monkeypatch):
     registry = tmp_path / "reg"
     _seed(registry, "demo", "1")
-    monkeypatch.setenv("DOCMANCER_REGISTRY_DIR", str(registry))
+    monkeypatch.setenv("DOCATLAS_REGISTRY_DIR", str(registry))
     install_package("demo", "1")
 
     contract_path = paths.package_dir("demo", "1") / "contract.json"
@@ -84,7 +84,7 @@ def test_runtime_refuses_tampered_contract_artifact(tmp_path, monkeypatch):
 def test_runtime_refuses_missing_tools_artifact(tmp_path, monkeypatch):
     registry = tmp_path / "reg"
     _seed(registry, "demo", "1")
-    monkeypatch.setenv("DOCMANCER_REGISTRY_DIR", str(registry))
+    monkeypatch.setenv("DOCATLAS_REGISTRY_DIR", str(registry))
     install_package("demo", "1")
 
     (paths.package_dir("demo", "1") / "tools.curated.json").unlink()

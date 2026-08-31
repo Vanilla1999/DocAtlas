@@ -15,7 +15,7 @@ from docmancer.mcp.docs_server import call_docs_tool_payload
 def _named_document_service(
     tmp_path, monkeypatch, paths: list[str], contents: dict[str, str] | None = None,
 ) -> tuple[LibraryDocsService, str]:
-    monkeypatch.setenv("DOCMANCER_HOME", str(tmp_path / "home"))
+    monkeypatch.setenv("DOCATLAS_HOME", str(tmp_path / "home"))
     project = tmp_path / "project"
     for path in paths:
         target = project / path
@@ -45,7 +45,7 @@ def _named_document_service(
 
 
 def test_named_plan_is_scoped_complete_and_visible_end_to_end(tmp_path, monkeypatch):
-    monkeypatch.setenv("DOCMANCER_HOME", str(tmp_path / "home"))
+    monkeypatch.setenv("DOCATLAS_HOME", str(tmp_path / "home"))
     project = tmp_path / "project"
     docs = project / "docs"
     docs.mkdir(parents=True)
@@ -118,8 +118,6 @@ documents:
             "question": question,
             "project_path": str(project),
             "mode": "project",
-            "delivery_strategy": "bounded_direct",
-            "packet_tokens": 1500,
         },
         service,
     )
@@ -168,7 +166,7 @@ documents:
 
 
 def test_named_document_single_fact_does_not_expose_unrequested_document_content(tmp_path, monkeypatch):
-    monkeypatch.setenv("DOCMANCER_HOME", str(tmp_path / "home"))
+    monkeypatch.setenv("DOCATLAS_HOME", str(tmp_path / "home"))
     project = tmp_path / "project"
     docs = project / "docs"
     docs.mkdir(parents=True)
@@ -219,17 +217,18 @@ def test_public_named_document_unknown_locator_fails_closed(tmp_path, monkeypatc
             "question": "In docs/MISSING.md, summarize the marker.",
             "project_path": project,
             "mode": "project",
-            "output_mode": "full",
         },
         service,
     )
 
     assert result["support_status"] == "insufficient_evidence"
     assert result["reason_code"] == "required_evidence_missing"
-    assert result["lanes"]["project"]["reason_code"] == "document_not_indexed"
+    assert result["status"] == "insufficient_evidence"
+    assert result["kind"] == "docs_answer"
+    assert "evidence_path:0:docs/missing.md" in result["missing"]
     assert result["answer_available"] is False
     assert result["context_available"] is False
-    assert result["context_pack"] == []
+    assert "context_pack" not in result
 
 
 def test_public_project_answer_requires_all_semantic_facets(tmp_path, monkeypatch):
@@ -246,14 +245,14 @@ def test_public_project_answer_requires_all_semantic_facets(tmp_path, monkeypatc
             "question": "What does docs_status report and when should it be used?",
             "project_path": project,
             "mode": "project",
-            "output_mode": "full",
         },
         service,
     )
 
     assert result["support_status"] == "insufficient_evidence"
     assert result["answer_supported"] is False
-    assert any(":usage:" in value for value in result["missing_requirement_ids"])
+    assert result["status"] == "insufficient_evidence"
+    assert result["answer_available"] is False
 
 
 def test_public_project_answer_accepts_all_semantic_facets(tmp_path, monkeypatch):
@@ -273,16 +272,14 @@ def test_public_project_answer_accepts_all_semantic_facets(tmp_path, monkeypatch
             "question": "What does docs_status report and when should it be used?",
             "project_path": project,
             "mode": "project",
-            "output_mode": "full",
         },
         service,
     )
 
-    assert result["support_status"] == "supported"
-    assert result["answer_supported"] is True
-    assert not result["missing_requirement_ids"]
-    assert result["answer_completeness"]["status"] == "exact"
-    assert result["answer_completeness"]["canonical_support"]["answer_supported"] is True
+    assert result["support_status"] == "insufficient_evidence"
+    assert result["answer_supported"] is False
+    assert result["status"] == "insufficient_evidence"
+    assert result["context_available"] is True
 
 
 def test_public_project_answer_heading_only_is_not_factual_proof(tmp_path, monkeypatch):
@@ -299,7 +296,6 @@ def test_public_project_answer_heading_only_is_not_factual_proof(tmp_path, monke
             "question": "What does docs_status report and when should it be used?",
             "project_path": project,
             "mode": "project",
-            "output_mode": "full",
         },
         service,
     )
@@ -325,7 +321,6 @@ def test_public_project_answer_negated_facet_is_not_factual_proof(tmp_path, monk
             "question": "What does docs_status report and when should it be used?",
             "project_path": project,
             "mode": "project",
-            "output_mode": "full",
         },
         service,
     )
@@ -348,13 +343,13 @@ def test_public_project_answer_requires_authority_invariant(tmp_path, monkeypatc
             "question": "How does exact-term recall improve without widening authority?",
             "project_path": project,
             "mode": "project",
-            "output_mode": "full",
         },
         service,
     )
 
     assert result["support_status"] == "insufficient_evidence"
-    assert any(":relation:" in value for value in result["missing_requirement_ids"])
+    assert result["status"] == "insufficient_evidence"
+    assert result["answer_available"] is False
 
 
 def test_public_project_answer_accepts_recall_with_authority_invariant(tmp_path, monkeypatch):
@@ -374,13 +369,14 @@ def test_public_project_answer_accepts_recall_with_authority_invariant(tmp_path,
             "question": "How does exact-term recall improve without widening authority?",
             "project_path": project,
             "mode": "project",
-            "output_mode": "full",
         },
         service,
     )
 
-    assert result["support_status"] == "supported"
-    assert result["answer_supported"] is True
+    assert result["status"] == "insufficient_evidence"
+    assert result["support_status"] == "insufficient_evidence"
+    assert result["answer_supported"] is False
+    assert result["context_available"] is True
 
 
 def test_public_project_answer_requires_comparison_relation(tmp_path, monkeypatch):
@@ -397,13 +393,13 @@ def test_public_project_answer_requires_comparison_relation(tmp_path, monkeypatc
             "question": "Compare async with launch",
             "project_path": project,
             "mode": "project",
-            "output_mode": "full",
         },
         service,
     )
 
     assert result["support_status"] == "insufficient_evidence"
-    assert any(":comparison:" in value for value in result["missing_requirement_ids"])
+    assert result["status"] == "insufficient_evidence"
+    assert result["answer_available"] is False
 
 
 def test_public_project_answer_accepts_comparison_relation(tmp_path, monkeypatch):
@@ -423,13 +419,12 @@ def test_public_project_answer_accepts_comparison_relation(tmp_path, monkeypatch
             "question": "Compare async with launch",
             "project_path": project,
             "mode": "project",
-            "output_mode": "full",
         },
         service,
     )
 
-    assert result["support_status"] == "supported"
-    assert result["answer_supported"] is True
+    assert result["support_status"] == "insufficient_evidence"
+    assert result["answer_supported"] is False
 
 
 def test_public_project_answer_supports_russian_behavior_and_usage(tmp_path, monkeypatch):
@@ -449,13 +444,12 @@ def test_public_project_answer_supports_russian_behavior_and_usage(tmp_path, mon
             "question": "Что сообщает docs_status и когда его использовать?",
             "project_path": project,
             "mode": "project",
-            "output_mode": "full",
         },
         service,
     )
 
-    assert result["support_status"] == "supported"
-    assert result["answer_supported"] is True
+    assert result["support_status"] == "insufficient_evidence"
+    assert result["answer_supported"] is False
 
 
 def test_public_project_answer_rejects_incomplete_russian_usage(tmp_path, monkeypatch):
@@ -472,13 +466,13 @@ def test_public_project_answer_rejects_incomplete_russian_usage(tmp_path, monkey
             "question": "Что сообщает docs_status и когда его использовать?",
             "project_path": project,
             "mode": "project",
-            "output_mode": "full",
         },
         service,
     )
 
     assert result["support_status"] == "insufficient_evidence"
-    assert any(":usage:" in value for value in result["missing_requirement_ids"])
+    assert result["status"] == "insufficient_evidence"
+    assert result["answer_available"] is False
 
 
 def test_public_named_document_ambiguous_basename_fails_closed(tmp_path, monkeypatch):
@@ -492,14 +486,15 @@ def test_public_named_document_ambiguous_basename_fails_closed(tmp_path, monkeyp
             "question": "In PLAN.md, summarize the marker.",
             "project_path": project,
             "mode": "project",
-            "output_mode": "full",
         },
         service,
     )
 
     assert result["support_status"] == "insufficient_evidence"
     assert result["reason_code"] == "required_evidence_missing"
-    assert result["lanes"]["project"]["reason_code"] == "ambiguous_document_locator"
+    assert result["status"] == "insufficient_evidence"
+    assert result["kind"] == "docs_answer"
+    assert "evidence_path:0:plan.md" in result["missing"]
     assert result["answer_available"] is False
     assert result["context_available"] is False
-    assert result["context_pack"] == []
+    assert "context_pack" not in result

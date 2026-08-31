@@ -33,14 +33,12 @@ class HelpRequestScreen {
         project_path=str(root),
         max_files=8,
         max_tokens=4000,
-        output_mode="debug",
     )
 
     files = [item["file"] for item in payload["relevant_files"]]
     assert "lib/screens/help_request_screen.dart" in files
     assert "lib/cubit/help_requests_cubit.dart" in files
-    assert payload["diagnostics"]["code_graph"]["graph_used"] is True
-    assert payload["diagnostics"]["code_graph"]["selected_graph_files"]
+    assert any("code_graph" in item["why"] for item in payload["relevant_files"])
 
 
 def test_patch_plan_context_graph_depth_one_adds_direct_impacted_importer_only(tmp_path: Path):
@@ -77,7 +75,6 @@ class HelpRequestsCubit {
         changed_files=["lib/services/help_requests_service.dart"],
         max_files=8,
         max_tokens=4000,
-        output_mode="debug",
     )
 
     files = [item["file"] for item in payload["relevant_files"]]
@@ -86,7 +83,6 @@ class HelpRequestsCubit {
     assert "lib/screens/help_request_screen.dart" not in files
     cubit = next(item for item in payload["relevant_files"] if item["file"] == "lib/cubit/help_requests_cubit.dart")
     assert "code_graph" in cubit["why"]
-    assert payload["diagnostics"]["code_graph"]["max_depth"] == 1
 
 
 def test_patch_plan_context_graph_failure_falls_back_to_existing_discovery(tmp_path: Path, monkeypatch):
@@ -103,9 +99,6 @@ def test_patch_plan_context_graph_failure_falls_back_to_existing_discovery(tmp_p
         project_path=str(root),
         max_files=8,
         max_tokens=4000,
-        output_mode="debug",
     )
 
     assert [item["file"] for item in payload["relevant_files"]] == ["lib/help_requests_cubit.dart"]
-    assert payload["diagnostics"]["code_graph"]["graph_used"] is False
-    assert "RuntimeError: boom" in payload["diagnostics"]["code_graph"]["fallback_reason"]

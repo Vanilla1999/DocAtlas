@@ -103,11 +103,11 @@ def test_patch_constraints_are_labelled_advanced_or_advisory():
             )
 
 
-def test_readme_documents_naming_compatibility():
+def test_readme_documents_current_python_import_namespace():
     text = (ROOT / "README.md").read_text(encoding="utf-8")
     assert "The product name is **DocAtlas**" in text
     assert "doc-atlas --help" in text
-    assert "legacy name `docmancer`" in text
+    assert "Python import namespace remains `docmancer`" in text
 
 
 def test_readme_leads_with_three_tool_docs_runtime_happy_path():
@@ -115,12 +115,12 @@ def test_readme_leads_with_three_tool_docs_runtime_happy_path():
     assert "Local-first documentation context" in text
     assert "get_docs_context → follow a returned prepare_docs action when needed → retry get_docs_context" in text
     assert "exactly three mutually exclusive tools" in text
-    assert "DOCMANCER_MCP_ADVANCED_TOOLS=1" in text
+    assert "DOCATLAS_MCP_ADVANCED_TOOLS=1" in text
 
 
 def test_readme_keeps_mcp_packs_out_of_hero_path():
     text = (ROOT / "README.md").read_text(encoding="utf-8")
-    hero = text.split("## Naming and compatibility", maxsplit=1)[0]
+    hero = text.split("## Python import namespace", maxsplit=1)[0]
     assert "MCP Packs" not in hero
     assert "MCP Packs are an advanced layer" in text
 
@@ -131,7 +131,7 @@ def test_product_brief_positions_docs_mcp_before_advanced_patch_constraints():
     assert "local-first documentation context" in text
     assert "get_docs_context" in text
     assert "Patch constraints" in text
-    assert "advanced compatibility" in text
+    assert "## Advanced surfaces" in text
     assert "Project Patch Contract Runtime" not in text
     assert "local, version-bound documentation authority and evidence delivery layer for coding agents" in lowered
     assert "source-code search" in lowered

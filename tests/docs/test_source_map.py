@@ -295,7 +295,7 @@ def test_source_boundary_loads_project_manifest_and_limits_roots(tmp_path):
     (tmp_path / "other").mkdir()
     (tmp_path / "app/main.py").write_text("class Included: pass\n", encoding="utf-8")
     (tmp_path / "other/ignored.py").write_text("class OutsideRoot: pass\n", encoding="utf-8")
-    (tmp_path / "docmancer.yaml").write_text(
+    (tmp_path / "docatlas.yaml").write_text(
         "project:\n  source_roots: [app]\n  include_extensions: [.py]\n",
         encoding="utf-8",
     )
@@ -392,7 +392,7 @@ def test_source_boundary_invalid_project_manifest_fails_closed(tmp_path):
     source = tmp_path / "src/main.py"
     source.parent.mkdir()
     source.write_text("class MustNotLeak: pass\n", encoding="utf-8")
-    (tmp_path / "docmancer.yaml").write_text(
+    (tmp_path / "docatlas.yaml").write_text(
         "project:\n  source_roots: [src]\n  max_scanned_files: 0\n",
         encoding="utf-8",
     )

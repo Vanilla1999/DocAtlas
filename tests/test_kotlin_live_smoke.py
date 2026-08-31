@@ -37,7 +37,7 @@ def test_smoke_rejects_timeout_above_protocol_bound(tmp_path):
 
 
 def test_live_mode_requires_explicit_isolated_home(tmp_path, monkeypatch):
-    monkeypatch.delenv("DOCMANCER_HOME", raising=False)
+    monkeypatch.delenv("DOCATLAS_HOME", raising=False)
     monkeypatch.setattr(
         SMOKE,
         "LibraryDocsService",
@@ -141,7 +141,7 @@ def test_smoke_requests_full_provenance_and_rejects_missing_identity():
         )
 
     assert observed_context_arguments is not None
-    assert observed_context_arguments["output_mode"] == "full"
+    assert "output_mode" not in observed_context_arguments
 
 
 def test_smoke_reads_resolved_version_from_exact_version_contract():

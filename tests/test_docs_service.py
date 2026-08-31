@@ -74,7 +74,7 @@ def test_inspect_project_docs_returns_candidates_dependency_sources_and_next_act
         "include_packages": ["go_router", "riverpod"],
     }
     action_tools = [action["tool"] for action in result.recommended_next_actions]
-    assert action_tools == ["sync_project_docs", "prefetch_project_docs"]
+    assert action_tools == ["sync_project_docs", "prefetch_project_dependency_docs"]
     assert result.recommended_next_actions[0]["requires_confirmation"] is False
     assert result.recommended_next_actions[1]["requires_confirmation"] is True
     assert "sync_project_docs" in (result.agent_guidance or "")

@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import json
 import os
-import warnings
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Mapping
@@ -12,17 +11,10 @@ from docmancer._version import __version__
 PRODUCT_ID = "dev.vanilla1999.docatlas"
 PRODUCT_NAME = "DocAtlas"
 PRODUCT_HOME_ENV = "DOCATLAS_HOME"
-LEGACY_HOME_ENV = "DOCMANCER_HOME"
 DEFAULT_HOME_NAME = ".docatlas"
-LEGACY_HOME_NAME = ".docmancer"
 PRIMARY_CONFIG_NAME = "docatlas.yaml"
-LEGACY_CONFIG_NAME = "docmancer.yaml"
 STATE_OWNER_FILENAME = "state-owner.json"
 STATE_SCHEMA_VERSION = 1
-
-
-class LegacyHomeWarning(DeprecationWarning):
-    """Raised when an explicitly configured legacy DocAtlas home is used."""
 
 
 class StateOwnershipError(RuntimeError):
@@ -33,7 +25,6 @@ class StateOwnershipError(RuntimeError):
 class HomeResolution:
     path: Path
     source: str
-    compatibility_legacy: bool = False
 
 
 @dataclass(frozen=True)
@@ -45,7 +36,7 @@ class StateInspection:
 
     @property
     def is_safe_docatlas(self) -> bool:
-        return self.classification in {"empty", "legacy_docatlas", "owned_docatlas"}
+        return self.classification in {"empty", "owned_docatlas"}
 
 
 _FOREIGN_TOP_LEVEL = frozenset({
@@ -55,10 +46,6 @@ _FOREIGN_TOP_LEVEL = frozenset({
 # Only product-specific managed MCP state is strong enough to auto-classify
 # an unowned legacy root as DocAtlas. Generic names such as ``servers`` or
 # ``secrets`` are intentionally not ownership evidence by themselves.
-_LEGACY_STRONG_PATHS = (
-    Path("mcp") / "manifest.json",
-    Path("mcp") / "idempotency.db",
-)
 
 
 def _absolute(path: str | Path) -> Path:
@@ -75,9 +62,7 @@ def resolve_home(
 ) -> HomeResolution:
     """Resolve the DocAtlas machine-state root without touching the filesystem.
 
-    ``DOCATLAS_HOME`` is authoritative. ``DOCMANCER_HOME`` is retained only as
-    an explicit one-major compatibility input. The legacy default
-    ``~/.docmancer`` is never consulted implicitly.
+    ``DOCATLAS_HOME`` is authoritative; old product identities are ignored.
 
     Resolution deliberately does not dereference the final path component.
     Ownership inspection must see a symlink root as a symlink and fail closed
@@ -90,34 +75,12 @@ def resolve_home(
     primary = str(values.get(PRODUCT_HOME_ENV) or "").strip()
     if primary:
         return HomeResolution(_absolute(primary), "docatlas_env")
-    legacy = str(values.get(LEGACY_HOME_ENV) or "").strip()
-    if legacy:
-        return HomeResolution(
-            _absolute(legacy),
-            "legacy_env",
-            compatibility_legacy=True,
-        )
     base = Path(home_dir).expanduser() if home_dir is not None else Path.home()
     return HomeResolution(_absolute(base / DEFAULT_HOME_NAME), "default")
 
 
 def docatlas_home() -> Path:
     return resolve_home().path
-
-
-def legacy_default_home(*, home_dir: str | Path | None = None) -> Path:
-    base = Path(home_dir).expanduser() if home_dir is not None else Path.home()
-    return _absolute(base / LEGACY_HOME_NAME)
-
-
-def warn_if_legacy_home(resolution: HomeResolution) -> None:
-    if resolution.compatibility_legacy:
-        warnings.warn(
-            f"{LEGACY_HOME_ENV} is deprecated for DocAtlas; use {PRODUCT_HOME_ENV}. "
-            "The explicitly configured path is still honored during the 1.x compatibility window.",
-            LegacyHomeWarning,
-            stacklevel=2,
-        )
 
 
 def _owner_path(path: Path) -> Path:
@@ -184,7 +147,7 @@ def inspect_state(path: str | Path) -> StateInspection:
     if not entries:
         return StateInspection(root, "empty")
 
-    signature_paths = tuple(Path(name) for name in _FOREIGN_TOP_LEVEL) + _LEGACY_STRONG_PATHS
+    signature_paths = tuple(Path(name) for name in _FOREIGN_TOP_LEVEL)
     symlinked = sorted(
         relative.as_posix()
         for relative in signature_paths
@@ -198,21 +161,12 @@ def inspect_state(path: str | Path) -> StateInspection:
         )
 
     foreign = sorted(name for name in _FOREIGN_TOP_LEVEL if (root / name).exists())
-    legacy = sorted(path.as_posix() for path in _LEGACY_STRONG_PATHS if (root / path).exists())
-    if foreign and legacy:
-        return StateInspection(
-            root,
-            "ambiguous",
-            (f"foreign signatures: {', '.join(foreign)}", f"legacy DocAtlas signatures: {', '.join(legacy)}"),
-        )
     if foreign:
         return StateInspection(root, "foreign", (f"foreign signatures: {', '.join(foreign)}",))
-    if legacy:
-        return StateInspection(root, "legacy_docatlas", (f"legacy DocAtlas signatures: {', '.join(legacy)}",))
     return StateInspection(
         root,
         "ambiguous",
-        ("non-empty unowned state has no DocAtlas-specific legacy signature",),
+        ("non-empty state has no DocAtlas ownership marker",),
     )
 
 
@@ -226,13 +180,10 @@ def ownership_payload() -> dict[str, object]:
 
 def ensure_owned_home(
     path: str | Path | None = None,
-    *,
-    allow_legacy_claim: bool = False,
 ) -> Path:
     """Create/verify a DocAtlas-owned state root before a write.
 
     A non-empty directory is never claimed unless it is already DocAtlas-owned
-    or the caller explicitly allows a strongly-classified legacy DocAtlas root.
     Foreign and ambiguous roots always fail closed.
     """
 
@@ -245,10 +196,6 @@ def ensure_owned_home(
         raise StateOwnershipError(
             f"refusing to write unowned state root {root}: {inspection.classification}; "
             + "; ".join(inspection.reasons)
-        )
-    if inspection.classification == "legacy_docatlas" and not allow_legacy_claim:
-        raise StateOwnershipError(
-            f"legacy DocAtlas state at {root} requires explicit migration/compatibility handling before writes"
         )
     root.mkdir(parents=True, exist_ok=True)
     marker = _owner_path(root)
@@ -267,10 +214,6 @@ def ensure_owned_home(
 __all__ = [
     "DEFAULT_HOME_NAME",
     "HomeResolution",
-    "LEGACY_CONFIG_NAME",
-    "LEGACY_HOME_ENV",
-    "LEGACY_HOME_NAME",
-    "LegacyHomeWarning",
     "PRIMARY_CONFIG_NAME",
     "PRODUCT_HOME_ENV",
     "PRODUCT_ID",
@@ -282,8 +225,6 @@ __all__ = [
     "docatlas_home",
     "ensure_owned_home",
     "inspect_state",
-    "legacy_default_home",
     "ownership_payload",
     "resolve_home",
-    "warn_if_legacy_home",
 ]

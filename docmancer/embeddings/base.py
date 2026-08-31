@@ -73,7 +73,7 @@ class EmbeddingsCache:
     """
 
     def __init__(self, cache_dir: str | Path) -> None:
-        env_override = os.environ.get("DOCMANCER_FASTEMBED_CACHE_DIR")
+        env_override = os.environ.get("DOCATLAS_FASTEMBED_CACHE_DIR")
         # The fastembed cache dir is the model cache for FastEmbed; here we
         # use it only as a hint for where embeddings cache should live when
         # the caller passed no explicit path. The embeddings cache is keyed

@@ -10,7 +10,6 @@ from typing import Any
 
 
 SERVER_KEY = "docatlas"
-LEGACY_SERVER_KEY = "docmancer"
 COMMAND = "doc-atlas"
 ARGS = ["mcp", "docs-serve"]
 OPENCODE_MCP_ENVIRONMENT = {"DOCATLAS_MCP_TEXT_FALLBACK": "1"}
@@ -85,13 +84,7 @@ def find_agent(name: str, *, project: bool = False) -> AgentTarget | None:
 
 
 def register_server(target: AgentTarget) -> tuple[bool, str]:
-    """Idempotently add the primary DocAtlas MCP entry.
-
-    The old ``docmancer`` key is deliberately treated as a separate namespace.
-    It is migrated only when its command already proves that DocAtlas created it
-    (``doc-atlas mcp docs-serve``). An ambiguous or foreign ``docmancer`` entry
-    is left untouched so upstream Docmancer can coexist with DocAtlas.
-    """
+    """Idempotently add the current DocAtlas MCP entry."""
 
     if target.style == "toml_mcp_servers":
         return _register_toml_server(target)
@@ -102,15 +95,7 @@ def register_server(target: AgentTarget) -> tuple[bool, str]:
     desired = _desired_server_entry(target.style)
 
     existing = servers.get(SERVER_KEY)
-    legacy = servers.get(LEGACY_SERVER_KEY)
     if _matches_command(existing, desired):
-        # If both names point at exact installer-owned entries, converge to the
-        # primary namespace. Extra fields make the legacy entry user-modified,
-        # so leave it untouched rather than deleting user configuration.
-        if legacy == desired:
-            del servers[LEGACY_SERVER_KEY]
-            _backup_and_write(target.config_path, config)
-            return True, f"removed duplicate legacy DocAtlas MCP registration from {target.config_path}"
         return False, f"already registered in {target.config_path}"
     if existing is not None and not _has_same_command(existing, desired):
         raise ValueError(
@@ -118,13 +103,7 @@ def register_server(target: AgentTarget) -> tuple[bool, str]:
             "refusing to overwrite it."
         )
 
-    migrated = False
     source = existing
-    if source is None and _is_proven_docatlas_entry(legacy, target.style):
-        source = legacy
-        del servers[LEGACY_SERVER_KEY]
-        migrated = True
-
     merged = {**(source or {}), **desired}
     if target.style == "json_opencode_mcp":
         environment = {} if source is None or "environment" not in source else source["environment"]
@@ -136,8 +115,7 @@ def register_server(target: AgentTarget) -> tuple[bool, str]:
         merged["environment"] = {**environment, **OPENCODE_MCP_ENVIRONMENT}
     servers[SERVER_KEY] = merged
     _backup_and_write(target.config_path, config)
-    action = "migrated DocAtlas MCP registration to" if migrated else "registered docatlas in"
-    return True, f"{action} {target.config_path}"
+    return True, f"registered docatlas in {target.config_path}"
 
 
 def unregister_server(target: AgentTarget) -> bool:
@@ -154,14 +132,11 @@ def unregister_server(target: AgentTarget) -> bool:
         return False
     desired = _desired_server_entry(target.style)
 
-    for key in (SERVER_KEY, LEGACY_SERVER_KEY):
-        existing = servers.get(key)
-        # Exact equality is intentional: user-added fields make ownership of the
-        # complete entry ambiguous, so uninstall preserves it.
-        if existing == desired:
-            del servers[key]
-            _backup_and_write(target.config_path, config)
-            return True
+    existing = servers.get(SERVER_KEY)
+    if existing == desired:
+        del servers[SERVER_KEY]
+        _backup_and_write(target.config_path, config)
+        return True
     return False
 
 
@@ -201,21 +176,6 @@ def _json_server_mapping(
     if not isinstance(servers, dict):
         raise ValueError(f"Existing {key!r} in agent config must be an object")
     return servers
-
-
-def _is_proven_docatlas_entry(existing: Any, style: str) -> bool:
-    """Return True only when the command itself proves DocAtlas ownership.
-
-    ``docmancer mcp serve`` is intentionally *not* accepted: that spelling is
-    shared with the upstream Docmancer product and therefore cannot prove who
-    owns the legacy key.
-    """
-
-    if not isinstance(existing, dict):
-        return False
-    if style == "json_opencode_mcp":
-        return existing.get("command") == [COMMAND, *ARGS]
-    return existing.get("command") == COMMAND and list(existing.get("args", [])) == ARGS
 
 
 def _load_config(path: Path) -> dict[str, Any]:
@@ -259,15 +219,13 @@ def _has_same_command(existing: Any, desired: dict[str, Any]) -> bool:
 
 
 def has_current_server_entry(config: dict[str, Any], target: AgentTarget) -> bool:
-    """Accept the primary key and the bounded legacy-key compatibility form."""
+    """Return whether the current server key has the expected command."""
 
     servers = _json_server_mapping(config, target.style, create=False)
     if servers is None:
         return False
     desired = _desired_server_entry(target.style)
-    if _matches_command(servers.get(SERVER_KEY), desired):
-        return True
-    return _is_proven_docatlas_entry(servers.get(LEGACY_SERVER_KEY), target.style)
+    return _matches_command(servers.get(SERVER_KEY), desired)
 
 
 def target_has_current_server_entry(target: AgentTarget) -> bool:
@@ -282,9 +240,7 @@ def target_has_current_server_entry(target: AgentTarget) -> bool:
         if not isinstance(servers, dict):
             return False
         desired = _desired_server_entry(target.style)
-        if _matches_command(servers.get(SERVER_KEY), desired):
-            return True
-        return _is_proven_docatlas_entry(servers.get(LEGACY_SERVER_KEY), target.style)
+        return _matches_command(servers.get(SERVER_KEY), desired)
     return has_current_server_entry(_load_config(target.config_path), target)
 
 
@@ -302,30 +258,13 @@ def _register_toml_server(target: AgentTarget) -> tuple[bool, str]:
     servers = servers or {}
     desired = _desired_server_entry(target.style)
     existing = servers.get(SERVER_KEY)
-    legacy = servers.get(LEGACY_SERVER_KEY)
     if _matches_command(existing, desired):
-        if legacy == desired:
-            updated = _remove_toml_server_block(text, LEGACY_SERVER_KEY)
-            if updated != text:
-                shutil.copy2(
-                    target.config_path,
-                    target.config_path.with_suffix(target.config_path.suffix + ".bak"),
-                )
-                target.config_path.write_text(updated, encoding="utf-8")
-                return True, f"removed duplicate legacy DocAtlas MCP registration from {target.config_path}"
         return False, f"already registered in {target.config_path}"
     if existing is not None:
         raise ValueError(
             f"Existing MCP server {SERVER_KEY!r} in {target.config_path} has a different command; "
             "refusing to overwrite it."
         )
-
-    if _is_proven_docatlas_entry(legacy, target.style):
-        if target.config_path.exists():
-            shutil.copy2(target.config_path, target.config_path.with_suffix(target.config_path.suffix + ".bak"))
-        migrated = _rename_toml_server_headers(text, LEGACY_SERVER_KEY, SERVER_KEY)
-        target.config_path.write_text(migrated, encoding="utf-8")
-        return True, f"migrated DocAtlas MCP registration to {target.config_path}"
 
     if target.config_path.exists():
         shutil.copy2(target.config_path, target.config_path.with_suffix(target.config_path.suffix + ".bak"))
@@ -350,31 +289,13 @@ def _unregister_toml_server(target: AgentTarget) -> bool:
         return False
     desired = _desired_server_entry(target.style)
 
-    for key in (SERVER_KEY, LEGACY_SERVER_KEY):
-        if servers.get(key) != desired:
-            continue
-        updated = _remove_toml_server_block(text, key)
-        if updated == text:
-            return False
-        shutil.copy2(target.config_path, target.config_path.with_suffix(target.config_path.suffix + ".bak"))
-        target.config_path.write_text(updated, encoding="utf-8")
-        return True
+    if servers.get(SERVER_KEY) == desired:
+        updated = _remove_toml_server_block(text, SERVER_KEY)
+        if updated != text:
+            shutil.copy2(target.config_path, target.config_path.with_suffix(target.config_path.suffix + ".bak"))
+            target.config_path.write_text(updated, encoding="utf-8")
+            return True
     return False
-
-
-def _rename_toml_server_headers(text: str, old: str, new: str) -> str:
-    header = f"[mcp_servers.{old}]"
-    nested_prefix = f"[mcp_servers.{old}."
-    rewritten: list[str] = []
-    for line in text.splitlines(keepends=True):
-        stripped = line.strip()
-        if stripped == header:
-            rewritten.append(line.replace(header, f"[mcp_servers.{new}]", 1))
-        elif stripped.startswith(nested_prefix) and stripped.endswith("]"):
-            rewritten.append(line.replace(nested_prefix, f"[mcp_servers.{new}.", 1))
-        else:
-            rewritten.append(line)
-    return "".join(rewritten)
 
 
 def _remove_toml_server_block(text: str, key: str) -> str:

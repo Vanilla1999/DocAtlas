@@ -15,6 +15,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import math
 import os
 from dataclasses import dataclass
 from pathlib import Path
@@ -24,12 +25,17 @@ import yaml
 
 from docmancer.agent import DocmancerAgent
 from docmancer.core.config import DocmancerConfig
-from docmancer.docs.interfaces.mcp.context_tools import handle_context_tool
+from docmancer.mcp.docs_server import call_docs_tool_payload
 from docmancer.docs.registry import LibraryRegistry
 from docmancer.docs.service import DocsJobTracker, LibraryDocsService
 
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
+TOP1_RELEVANCE_MIN = 0.80
+TOP3_RELEVANCE_MIN = 0.95
+FALSE_ABSTENTION_MAX = 2
+SCORE_8_PLUS_RATE_MIN = 0.80
+MEAN_SCORE_MIN = 8.0
 
 @dataclass(frozen=True, slots=True)
 class LiveCase:
@@ -37,59 +43,42 @@ class LiveCase:
     relevant_paths: tuple[str, ...]
     required_fragments: tuple[str, ...] = ()
     surface_case_id: int | None = None
+    expected_kind: str | None = None
+    required_facts_by_path: tuple[tuple[str, str], ...] = ()
+    forbidden_source_prefixes: tuple[str, ...] = ()
+    forbidden_answer_fragments: tuple[str, ...] = ()
 
 
-GOLD_CASES: tuple[LiveCase, ...] = tuple(LiveCase(*row) for row in (
-    ("Which source types are supported for indexing?", ("docs/modules/question-planning.md", "wiki/Supported-Sources.md")),
-    ("Which command syncs project docs after file changes?", ("README.md", "docs/capabilities.md", "docs/project-docs-mcp-workflow.md")),
-    ("Which command starts the Docs MCP server?", ("README.md", "docs/project-docs-demo.md", "wiki/Commands.md")),
-    ("How do I run the offline test suite for DocAtlas?", ("docs/testing.md",)),
-    ("How do I run the project answer quality v4 protocol?", ("eval/project_answer_quality_v4/README.md",)),
-    ("How does the two-cell smoke procedure verify provider-call cardinality?", ("eval/task_level/README.md",)),
-    ("Which docs files must stay under the 1000-line release limit?", ("docs/RELEASE_CHECKLIST.md",)),
-    ("What is the storage mutation coordination contract for cleanup and refresh?", ("docs/index-cleanup.md", "docs/modules/storage-mutation-coordination.md"), ("writer lease", "cleanup barrier")),
-    ("What happens if remove_library_docs runs while a library refresh is in flight?", ("docs/index-cleanup.md", "docs/modules/storage-mutation-coordination.md")),
-    ("What is the release checklist and what gates block release?", ("docs/RELEASE_CHECKLIST.md",)),
-    ("What is the model-visible projection and how is the answer token-bounded?", ("docs/mcp-docs-server.md",)),
-    ("What does clear-index do when a live process holds the index?", ("docs/index-cleanup.md",)),
-    ("How do I configure a project in docmancer.yaml?", ("wiki/Configuration.md",)),
-    ("How does evidence selection choose which candidates are selected?", ("docs/mcp-docs-server.md", "docs/modules/evidence-selection.md")),
-    ("What is contamination protection in the eval protocols?", ("eval/project_answer_quality_v4/README.md",)),
-    ("What is the two-cell smoke procedure for local Task 33 benchmarks?", ("eval/task_level/README.md",)),
-    ("What does the two-cell smoke procedure require?", ("eval/task_level/README.md",)),
-    ("How do I sync project docs after changing a file?", ("README.md", "docs/capabilities.md", "docs/modules/README.md", "docs/project-docs-mcp-workflow.md")),
-    ("How does indexing split documents into sections and chunks?", ("wiki/Architecture.md",)),
-    ("What are the three public Docs MCP tools and when do I use each one?", ("docs/mcp-docs-server.md",)),
-    ("How does evidence selection differ from question planning?", ("docs/modules/question-planning.md", "docs/modules/evidence-selection.md")),
-    ("Where is the project answer contract documented?", ("docs/mcp-docs-server.md", "docs/modules/question-planning.md")),
-    ("What happens when the preview plan is stale?", ("docs/index-cleanup.md",)),
-    ("Why does clear-index always delete remote Qdrant collections?", ("docs/index-cleanup.md",)),
-)) + tuple(LiveCase(*row) for row in (
-    ("What source types are supported for indexing?", ("wiki/Supported-Sources.md", "docs/modules/question-planning.md"), ("GitBook sites",), 1),
-    ("Which source types can DocAtlas index?", ("wiki/Supported-Sources.md", "docs/modules/question-planning.md"), ("GitBook sites",), 2),
-    ("List the supported source types.", ("wiki/Supported-Sources.md", "docs/modules/question-planning.md"), ("GitBook sites",), 3),
-    ("What file formats are supported for local files?", ("wiki/Supported-Sources.md",), (".md",), 4),
-    ("Which document formats does indexing accept?", ("wiki/Supported-Sources.md",), (".md",), 5),
-    ("List the pytest markers.", ("docs/testing.md",), ("integration",), 6),
-    ("What markers does the offline suite define?", ("docs/testing.md",), ("integration", "advanced", "live_network"), 7),
-    ("Какие типы источников можно индексировать?", ("wiki/Supported-Sources.md", "docs/modules/question-planning.md"), ("GitBook sites",), 8),
-    ("Какие форматы локальных файлов поддерживаются?", ("wiki/Supported-Sources.md",), (".md",), 9),
-    ("Какие pytest-маркеры есть в проекте?", ("docs/testing.md",), ("integration",), 10),
-    ("How do I sync project docs after editing a file?", ("README.md", "docs/project-docs-mcp-workflow.md", "docs/capabilities.md"), ("sync_project_docs",), 11),
-    ("Which command should I run after project docs change?", ("README.md", "docs/project-docs-mcp-workflow.md", "docs/capabilities.md"), ("sync_project_docs",), 12),
-    ("Refresh project documentation after a file changes.", ("README.md", "docs/project-docs-mcp-workflow.md", "docs/capabilities.md"), ("sync_project_docs",), 13),
-    ("Как обновить документацию проекта после изменения файла?", ("README.md", "docs/project-docs-mcp-workflow.md", "docs/capabilities.md"), ("sync_project_docs",), 14),
-    ("Какой командой синхронизировать документацию проекта?", ("README.md", "docs/project-docs-mcp-workflow.md", "docs/capabilities.md"), ("sync_project_docs",), 15),
-    ("How do I run the offline suite?", ("docs/testing.md",), ("DOCMANCER_OFFLINE=1", "not advanced and not live and not live_network"), 16),
-    ("How can I run the offline suite?", ("docs/testing.md",), ("DOCMANCER_OFFLINE=1",), 17),
-    ("How do I configure project docs in docmancer.yaml?", ("wiki/Configuration.md", "docs/project-docs-mcp-workflow.md"), ("docmancer.yaml",), 18),
-    ("Where is project docs configuration defined?", ("docs/project-docs-mcp-workflow.md", "wiki/Configuration.md"), ("project-docs-mcp-workflow.md",), 19),
-    ("What command starts the Docs MCP server?", ("README.md", "wiki/Commands.md", "docs/project-docs-demo.md"), ("docs-serve",), 20),
-))
+def _load_gold_cases() -> tuple[LiveCase, ...]:
+    payload = json.loads(
+        (REPO_ROOT / "eval/project_chat_quality_v1/onboarding_cases.json").read_text(
+            encoding="utf-8"
+        )
+    )
+    return tuple(
+        LiveCase(
+            question=str(case["question"]),
+            relevant_paths=tuple(str(value) for value in case.get("acceptable_sources") or ()),
+            surface_case_id=index,
+            expected_kind=str(case["expected_kind"]),
+            required_facts_by_path=tuple(
+                (str(item["source"]), str(item["text"]))
+                for item in case.get("required_facts") or ()
+            ),
+            forbidden_source_prefixes=tuple(
+                str(value) for value in case.get("forbidden_source_prefixes") or ()
+            ),
+            forbidden_answer_fragments=tuple(
+                str(value) for value in case.get("forbidden_answer_fragments") or ()
+            ),
+        )
+        for index, case in enumerate(payload.get("cases") or (), 1)
+    )
 
-NEGATIVE_CASES = (
-    "What lunar quantum retention policy does DocAtlas use?",
-)
+
+GOLD_CASES = _load_gold_cases()
+
+NEGATIVE_CASES: tuple[str, ...] = ()
 
 
 def _source_paths(payload: dict[str, object]) -> tuple[str, ...]:
@@ -114,7 +103,6 @@ def _citations(payload: dict[str, object]) -> list[dict[str, object]]:
             "path": str(row.get("path_or_url") or ""),
             "evidence_id": str(row.get("evidence_id") or ""),
             "content_sha256": str(row.get("content_sha256") or ""),
-            "retrieval_query_ids": list(row.get("retrieval_query_ids") or ()),
         })
     return citations
 
@@ -153,7 +141,8 @@ def _validate_context_result(payload: dict[str, object]) -> str | None:
             and payload.get("answer_supported") is False
             and payload.get("answer_available") is False
             and payload.get("edit_ready") is False
-            and payload.get("safe_to_answer_from_sources") is True
+            and payload.get("answer_policy") == "cite_only"
+            and isinstance(payload.get("facets"), list)
         ):
             return "docs_context violates the context-first safety contract"
     else:
@@ -171,27 +160,78 @@ def _validate_context_result(payload: dict[str, object]) -> str | None:
     return None
 
 
-def run(output: Path | None = None) -> dict[str, object]:
-    previous_home = os.environ.get("DOCMANCER_HOME")
+def _citation_integrity(payload: dict[str, object]) -> bool:
+    answer_ids = {str(value) for value in payload.get("answer_evidence_ids") or ()}
+    source_ids: set[str] = set()
+    for source in payload.get("sources") or ():
+        if not isinstance(source, dict):
+            return False
+        evidence_id = str(source.get("evidence_id") or "")
+        path = str(source.get("path_or_url") or "")
+        snippet = str(source.get("snippet") or "").strip()
+        target = (REPO_ROOT / path).resolve()
+        if (
+            not evidence_id
+            or not path
+            or not target.is_relative_to(REPO_ROOT)
+            or not target.is_file()
+            or (
+                snippet != path
+                and snippet not in target.read_text(encoding="utf-8", errors="replace")
+            )
+        ):
+            return False
+        source_ids.add(evidence_id)
+    return answer_ids.issubset(source_ids) and (not answer_ids or bool(source_ids))
+
+
+def _threshold_failures(metrics: dict[str, object], case_count: int) -> list[str]:
+    failures: list[str] = []
+    if int(metrics["false_supported_count"]):
+        failures.append("false-supported answers must be zero")
+    if int(metrics["operational_contamination_count"]):
+        failures.append("forbidden source contamination must be zero")
+    if float(metrics["top1_relevance"]) < TOP1_RELEVANCE_MIN:
+        failures.append("acceptable source must appear Top-1 for at least 80% of cases")
+    if float(metrics["top3_relevance"]) < TOP3_RELEVANCE_MIN:
+        failures.append("acceptable source must appear in Top-3 for at least 95% of cases")
+    if int(metrics["false_abstention_count"]) > FALSE_ABSTENTION_MAX:
+        failures.append("false abstentions exceed two")
+    required_high_scores = math.ceil(case_count * SCORE_8_PLUS_RATE_MIN)
+    if int(metrics["cases_scoring_8_plus"]) < required_high_scores:
+        failures.append("fewer than 80% of cases scored at least 8")
+    if float(metrics["mean_score"]) < MEAN_SCORE_MIN:
+        failures.append("mean behavioral score is below 8")
+    return failures
+
+
+def run(
+    output: Path | None = None,
+    *,
+    cases: tuple[LiveCase, ...] = GOLD_CASES,
+    negative_cases: tuple[str, ...] = NEGATIVE_CASES,
+) -> dict[str, object]:
+    previous_home = os.environ.get("DOCATLAS_HOME")
     errors: list[str] = []
     results: list[dict[str, object]] = []
     historical_paths = _historical_paths()
     try:
         with TemporaryDirectory(prefix="docatlas-self-host-") as raw_tmp:
             tmp = Path(raw_tmp)
-            os.environ["DOCMANCER_HOME"] = str(tmp / "home")
+            os.environ["DOCATLAS_HOME"] = str(tmp / "home")
             config = DocmancerConfig()
             config.index.db_path = str(tmp / "docmancer.db")
             config.index.extracted_dir = str(tmp / "extracted")
             service = LibraryDocsService(
                 config=config,
+                config_source="explicit",
                 registry=LibraryRegistry(config.index.db_path),
                 agent=DocmancerAgent(config=config),
                 job_tracker=DocsJobTracker(),
             )
 
-            preflight_question = GOLD_CASES[0].question
-            preflight = handle_context_tool(
+            preflight_question = cases[0].question
+            preflight = call_docs_tool_payload(
                 "get_docs_context",
                 {
                     "question": preflight_question,
@@ -213,16 +253,14 @@ def run(output: Path | None = None) -> dict[str, object]:
             if getattr(sync, "status", None) != "success":
                 errors.append(f"self-host sync status={getattr(sync, 'status', None)!r}")
 
-            for index, case in enumerate(GOLD_CASES, 1):
+            for index, case in enumerate(cases, 1):
                 question = case.question
-                payload = handle_context_tool(
+                payload = call_docs_tool_payload(
                     "get_docs_context",
                     {
                         "question": question,
                         "project_path": str(REPO_ROOT),
                         "mode": "project",
-                        "delivery_strategy": "bounded_direct",
-                        "prepare_project_docs": False,
                     },
                     service,
                 )
@@ -230,34 +268,78 @@ def run(output: Path | None = None) -> dict[str, object]:
                     errors.append(f"{index:02d}: no payload: {question}")
                     continue
                 status = str(payload.get("status") or "")
+                observed_kind = str(payload.get("kind") or "")
                 paths = _source_paths(payload)
-                contract_error = _validate_context_result(payload)
-                visible = json.dumps(payload.get("sources") or (), ensure_ascii=False).casefold()
+                contract_error = (
+                    None if case.expected_kind == "insufficient_evidence"
+                    else _validate_context_result(payload)
+                )
+                relevant_sources = [
+                    row for row in payload.get("sources") or ()
+                    if isinstance(row, dict)
+                    and str(row.get("path_or_url") or "") in case.relevant_paths
+                ]
+                visible = json.dumps(relevant_sources, ensure_ascii=False).casefold()
                 fact_checks = {
                     fragment: fragment.casefold() in visible
                     for fragment in case.required_fragments
+                }
+                path_fact_checks = {
+                    f"{path}:{fragment}": any(
+                        str(row.get("path_or_url") or "") == path
+                        and fragment.casefold() in json.dumps(row, ensure_ascii=False).casefold()
+                        for row in payload.get("sources") or () if isinstance(row, dict)
+                    )
+                    for path, fragment in case.required_facts_by_path
+                }
+                answer_text = str(payload.get("answer") or "").casefold()
+                answer_fact_checks = {
+                    fragment: fragment.casefold() in answer_text
+                    for fragment in case.required_fragments
+                }
+                answer_path_fact_checks = {
+                    f"{path}:{fragment}": fragment.casefold() in answer_text
+                    for path, fragment in case.required_facts_by_path
                 }
                 top3 = paths[:3]
                 relevant_ranks = [rank for rank, path in enumerate(paths, 1) if path in case.relevant_paths]
                 reciprocal_rank = 1.0 / relevant_ranks[0] if relevant_ranks else 0.0
                 distractors = [
                     path for path in top3
-                    if path.startswith((".hermes/plans/", "roadmap/"))
-                    and not any(token in question.casefold() for token in ("plan", "roadmap", "status"))
+                    if any(path.startswith(prefix) for prefix in case.forbidden_source_prefixes)
                 ]
-                checks = {
-                    "status_ok": status == "ok",
-                    "source_backed": bool(paths),
-                    "context_contract": contract_error is None,
-                    "relevant_source_in_top3": any(path in case.relevant_paths for path in top3),
-                    "required_facts": all(fact_checks.values()),
-                    "no_top3_distractor": not distractors,
-                }
+                forbidden_visible = json.dumps(payload, ensure_ascii=False).casefold()
+                if case.expected_kind == "insufficient_evidence":
+                    checks = {
+                        "correct_abstention": status == "insufficient_evidence",
+                        "not_false_supported": payload.get("answer_supported") is not True,
+                    }
+                else:
+                    checks = {
+                        "status_ok": status == "ok",
+                        "kind_matches": case.expected_kind is None or observed_kind == case.expected_kind,
+                        "source_backed": bool(paths),
+                        "context_contract": contract_error is None,
+                        "relevant_source_in_top3": any(path in case.relevant_paths for path in top3),
+                        "required_facts": all((*fact_checks.values(), *path_fact_checks.values())),
+                        "answer_contains_required_facts": (
+                            observed_kind != "docs_answer"
+                            or all((*answer_fact_checks.values(), *answer_path_fact_checks.values()))
+                        ),
+                        "citation_integrity": _citation_integrity(payload),
+                        "no_forbidden_source": not distractors,
+                        "no_forbidden_answer_fragment": not any(
+                            fragment.casefold() in forbidden_visible
+                            for fragment in case.forbidden_answer_fragments
+                        ),
+                    }
+                score = round(10 * sum(checks.values()) / max(len(checks), 1), 2)
                 result = {
                     "case_id": f"live_{index:02d}",
                     "surface_case_id": case.surface_case_id,
                     "question": question,
                     "expected": {
+                        "kind": case.expected_kind,
                         "relevant_paths": list(case.relevant_paths),
                         "required_fragments": list(case.required_fragments),
                     },
@@ -276,20 +358,31 @@ def run(output: Path | None = None) -> dict[str, object]:
                         "historical_paths": [path for path in top3 if path in historical_paths],
                     },
                     "fact_checks": fact_checks,
+                    "path_fact_checks": path_fact_checks,
+                    "answer_fact_checks": answer_fact_checks,
                     "citations": _citations(payload),
+                    "payload": payload,
                     "checks": checks,
                     "decision_hash": payload.get("decision_hash"),
                     "passed": all(checks.values()),
+                    "score": score,
                 }
                 results.append(result)
-                if not result["passed"]:
-                    errors.append(f"{index:02d}: failed checks={checks!r}: {question}")
+                if (
+                    case.expected_kind not in {None, "docs_answer"}
+                    and payload.get("answer_supported") is True
+                ):
+                    errors.append(f"{index:02d}: false-supported answer: {question}")
+                if distractors:
+                    errors.append(f"{index:02d}: forbidden source contamination={distractors!r}: {question}")
+                if case.expected_kind == "insufficient_evidence" and status != "insufficient_evidence":
+                    errors.append(f"{index:02d}: nonexistent fact did not abstain: {question}")
                 if paths and paths[0].startswith((".hermes/plans/", "roadmap/")) and not any(
                     token in question.casefold() for token in ("plan", "roadmap", "status")
                 ):
                     errors.append(f"{index:02d}: operational query ranked a plan first: {paths[0]!r}: {question}")
-            for question in NEGATIVE_CASES:
-                payload = handle_context_tool(
+            for question in negative_cases:
+                payload = call_docs_tool_payload(
                     "get_docs_context",
                     {"question": question, "project_path": str(REPO_ROOT), "mode": "project"},
                     service,
@@ -311,14 +404,23 @@ def run(output: Path | None = None) -> dict[str, object]:
                 })
     finally:
         if previous_home is None:
-            os.environ.pop("DOCMANCER_HOME", None)
+            os.environ.pop("DOCATLAS_HOME", None)
         else:
-            os.environ["DOCMANCER_HOME"] = previous_home
+            os.environ["DOCATLAS_HOME"] = previous_home
 
-    positives = results[:len(GOLD_CASES)]
+    positives = results[:len(cases)]
     source_count = sum(len(row.get("ranking", {}).get("top3_paths", ())) for row in positives)
     distractor_count = sum(len(row.get("ranking", {}).get("distractor_paths", ())) for row in positives)
     historical_count = sum(len(row.get("ranking", {}).get("historical_paths", ())) for row in positives)
+    false_supported_count = sum(
+        row.get("expected", {}).get("kind") not in {None, "docs_answer"}
+        and row.get("observed", {}).get("answer_supported") is True
+        for row in positives
+    )
+    scores = [float(row.get("score", 10.0 if row.get("passed") else 0.0)) for row in positives]
+    failed_cases = [str(row.get("case_id")) for row in results if not row.get("passed")]
+    if failed_cases:
+        errors.append(f"failed cases: {failed_cases!r}")
     report: dict[str, object] = {
         "schema_version": "project-answer-quality-live-result-v1",
         "run_mode": "live_self_host",
@@ -326,17 +428,34 @@ def run(output: Path | None = None) -> dict[str, object]:
         "case_count": len(results),
         "passed_count": sum(bool(row.get("passed")) for row in results),
         "metrics": {
+            "top1_relevance": sum(
+                bool(row.get("ranking", {}).get("first_relevant_rank") == 1)
+                for row in positives
+            ) / max(len(positives), 1),
             "top3_relevance": sum(bool(row.get("checks", {}).get("relevant_source_in_top3")) for row in positives) / max(len(positives), 1),
             "mrr": sum(float(row.get("ranking", {}).get("reciprocal_rank", 0.0)) for row in positives) / max(len(positives), 1),
             "distractor_rate": distractor_count / max(source_count, 1),
             "historical_source_rate": historical_count / max(source_count, 1),
             "mean_query_coverage": sum(float(row.get("observed", {}).get("query_coverage", 0.0)) for row in positives) / max(len(positives), 1),
-            "false_abstention_count": sum(not bool(row.get("checks", {}).get("status_ok")) for row in positives),
+            "false_abstention_count": sum(
+                row.get("expected", {}).get("kind") != "insufficient_evidence"
+                and not bool(row.get("checks", {}).get("status_ok"))
+                for row in positives
+            ),
+            "false_supported_count": false_supported_count,
+            "operational_contamination_count": distractor_count,
+            "cases_scoring_8_plus": sum(score >= 8.0 for score in scores),
+            "mean_score": sum(scores) / max(len(scores), 1),
         },
         "verdict": "FAIL" if errors else "PASS",
         "errors": errors,
         "results": results,
     }
+    threshold_failures = _threshold_failures(report["metrics"], len(cases))
+    if threshold_failures:
+        errors.extend(threshold_failures)
+        report["errors"] = errors
+        report["verdict"] = "FAIL"
     digest_payload = json.dumps(report, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
     report["deterministic_result_digest"] = hashlib.sha256(digest_payload.encode()).hexdigest()
     if output is not None:

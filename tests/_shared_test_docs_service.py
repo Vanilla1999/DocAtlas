@@ -325,7 +325,7 @@ def _service(
     *,
     durable_jobs: bool = False,
 ) -> LibraryDocsService:
-    monkeypatch.setenv("DOCMANCER_HOME", str(tmp_path / "home"))
+    monkeypatch.setenv("DOCATLAS_HOME", str(tmp_path / "home"))
     agent = agent or FakeAgent()
     config = DocmancerConfig()
     config.index.db_path = str(tmp_path / "docmancer.db")
@@ -344,7 +344,7 @@ def _service(
 
 
 def _service_with_real_agent(tmp_path, monkeypatch) -> LibraryDocsService:
-    monkeypatch.setenv("DOCMANCER_HOME", str(tmp_path / "home"))
+    monkeypatch.setenv("DOCATLAS_HOME", str(tmp_path / "home"))
     config = DocmancerConfig()
     config.index.db_path = str(tmp_path / "docmancer.db")
     config.index.extracted_dir = str(tmp_path / "extracted")

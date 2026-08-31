@@ -17,7 +17,6 @@ from docmancer.cli.commands import (
     inspect_cmd,
     install_cmd,
     list_cmd,
-    migrate_home_cmd,
     patch_review_cmd,
     query_cmd,
     remove_cmd,
@@ -52,7 +51,7 @@ def _show_version(ctx: click.Context, param: click.Parameter, value: bool) -> No
         'doc-atlas query "How do I authenticate?"',
         "doc-atlas install claude-code",
         "doc-atlas install github-copilot --project",
-    ) + "\n\nSupport tiers and compatibility deadlines: docs/support-surface-policy.md",
+    ) + "\n\nCurrent support tiers: docs/support-surface-policy.md",
 )
 @click.option(
     "--version",
@@ -86,7 +85,6 @@ cli.add_command(list_cmd, "list")
 cli.add_command(remove_cmd, "remove")
 cli.add_command(clear_cmd, "clear")
 cli.add_command(clear_index_cmd, "clear-index")
-cli.add_command(migrate_home_cmd, "migrate-home")
 cli.add_command(doctor_cmd, "doctor")
 cli.add_command(init_cmd, "init")
 cli.add_command(fetch_cmd, "fetch")

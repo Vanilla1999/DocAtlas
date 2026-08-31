@@ -110,9 +110,9 @@ def test_relative_result_root_produces_absolute_subprocess_runtime_paths(
         "HOME",
         "XDG_CONFIG_HOME",
         "XDG_CACHE_HOME",
-        "DOCMANCER_HOME",
-        "DOCMANCER_INDEX_DB_PATH",
-        "DOCMANCER_EMBEDDINGS_CACHE",
+        "DOCATLAS_HOME",
+        "DOCATLAS_INDEX_DB_PATH",
+        "DOCATLAS_EMBEDDINGS_CACHE",
         "UV_PROJECT_ENVIRONMENT",
     ):
         assert Path(environment[name]).is_absolute(), name
@@ -528,7 +528,7 @@ def test_opencode_config_uses_condition_mcp_only(tmp_path: Path):
             "docmancer-docs": {
                 "command": "uv",
                 "args": ["run", "doc-atlas", "mcp", "docs-serve"],
-                "env": {"DOCMANCER_TASK_LEVEL_ALLOW_NETWORK": "false"},
+                "env": {"DOCATLAS_TASK_LEVEL_ALLOW_NETWORK": "false"},
             }
         }
     }), encoding="utf-8")

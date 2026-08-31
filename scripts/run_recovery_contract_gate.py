@@ -51,7 +51,7 @@ def _assert_suggestion_integrity(original: str, suggestion: str) -> None:
 
 
 def _service(root: Path) -> tuple[LibraryDocsService, Path]:
-    os.environ["DOCMANCER_HOME"] = str(root / "home")
+    os.environ["DOCATLAS_HOME"] = str(root / "home")
     project = root / "project"
     docs = project / "docs"
     docs.mkdir(parents=True)
@@ -297,8 +297,6 @@ def main() -> int:
                     "question": "In docs/ADAPTIVE_TREASURE_CONTRACT.md, summarize meet_type.",
                     "project_path": str(project),
                     "mode": "project",
-                    "delivery_strategy": "bounded_direct",
-                    "packet_tokens": 1500,
                 },
                 service,
             )
@@ -324,8 +322,6 @@ def main() -> int:
                 "question": TREASURE,
                 "project_path": str(project),
                 "mode": "project",
-                "delivery_strategy": "bounded_direct",
-                "packet_tokens": 1500,
             },
             service,
         )

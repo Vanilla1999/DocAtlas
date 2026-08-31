@@ -30,13 +30,13 @@ def test_v3_purpose_contracts_extract_bounded_subject_context_and_technical_alia
     assert {"--allow-incomplete", "allow_incomplete"}.issubset(rows[0].subject_aliases)
     assert rows[0].context == "clear-index"
 
-    home, rows = _obligations("What is DOCMANCER_HOME used for?")
+    home, rows = _obligations("What is DOCATLAS_HOME used for?")
     assert home.schema_version == PROJECT_ANSWER_CONTRACT_SCHEMA
     assert len(rows) == 1
     assert (rows[0].kind, rows[0].subject_kind, rows[0].response_mode) == (
         "purpose", "env_var", "purpose",
     )
-    assert rows[0].subject == "DOCMANCER_HOME"
+    assert rows[0].subject == "DOCATLAS_HOME"
 
 
 def test_v3_supported_values_and_coordinated_effects_are_explicit_mandatory_facets():

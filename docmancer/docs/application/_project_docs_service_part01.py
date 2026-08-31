@@ -372,7 +372,7 @@ class _ProjectDocsServicePart01:
                 risks.append({
                     "code": "project_local_config_shadowed",
                     "severity": "major",
-                    "message": warning.get("message") or "Repo-local docmancer.yaml is shadowed by the active service config.",
+                    "message": warning.get("message") or "Repo-local docatlas.yaml is shadowed by the active service config.",
                     "recommended_action": "Ask the user to confirm which Docmancer DB/config should be used before indexing.",
                     "active_db_path": warning.get("active_db_path"),
                     "project_config_db_path": warning.get("project_config_db_path"),
@@ -503,7 +503,7 @@ class _ProjectDocsServicePart01:
             })
         if exact_versions_available:
             recommended_next_actions.append({
-                "tool": "prefetch_project_docs",
+                "tool": "prefetch_project_dependency_docs",
                 "requires_confirmation": True,
                 "reason": "Exact dependency versions found in project lockfiles; fetching docs may use network.",
             })

@@ -6,20 +6,20 @@
 
 | Command | Where the skill lands |
 |---------|-----------------------|
-| `doc-atlas install claude-code` | `~/.claude/skills/docmancer/SKILL.md` |
-| `doc-atlas install cline` | `~/.cline/skills/docmancer/SKILL.md` |
-| `doc-atlas install codex` | `~/.codex/skills/docmancer/SKILL.md` (also mirrors to `~/.agents/skills/docmancer/SKILL.md`) |
-| `doc-atlas install codex-app` | `~/.codex/skills/docmancer/SKILL.md` (Codex app variant) |
-| `doc-atlas install codex-desktop` | `~/.codex/skills/docmancer/SKILL.md` (Codex desktop variant) |
-| `doc-atlas install cursor` | `~/.cursor/skills/docmancer/SKILL.md` + marked block in `~/.cursor/AGENTS.md` when needed |
-| `doc-atlas install opencode` | `~/.config/opencode/skills/docmancer/SKILL.md` |
-| `doc-atlas install gemini` | `~/.gemini/skills/docmancer/SKILL.md` |
-| `doc-atlas install claude-desktop` | `~/.docmancer/exports/claude-desktop/docmancer.zip`: upload via **Customize > Skills** |
+| `doc-atlas install claude-code` | `~/.claude/skills/docatlas/SKILL.md` |
+| `doc-atlas install cline` | `~/.cline/skills/docatlas/SKILL.md` |
+| `doc-atlas install codex` | `~/.codex/skills/docatlas/SKILL.md` (also mirrors to `~/.agents/skills/docatlas/SKILL.md`) |
+| `doc-atlas install codex-app` | `~/.codex/skills/docatlas/SKILL.md` (Codex app variant) |
+| `doc-atlas install codex-desktop` | `~/.codex/skills/docatlas/SKILL.md` (Codex desktop variant) |
+| `doc-atlas install cursor` | `~/.cursor/skills/docatlas/SKILL.md` + marked block in `~/.cursor/AGENTS.md` when needed |
+| `doc-atlas install opencode` | `~/.config/opencode/skills/docatlas/SKILL.md` |
+| `doc-atlas install gemini` | `~/.gemini/skills/docatlas/SKILL.md` |
+| `doc-atlas install claude-desktop` | `~/.docatlas/exports/claude-desktop/docatlas.zip`: upload via **Customize > Skills** |
 | `doc-atlas install github-copilot` | `~/.copilot/copilot-instructions.md` (user) or `.github/copilot-instructions.md` (with `--project`) |
 
 ## Project-local installs
 
-Use `--project` with `claude-code`, `gemini`, `cline`, or `github-copilot` to install under the current working directory (`.claude/skills/...`, `.gemini/skills/...`, `.cline/skills/...`, or `.github/copilot-instructions.md`). This is useful when different projects need different docmancer configurations.
+Use `--project` with `claude-code`, `gemini`, `cline`, or `github-copilot` to install under the current working directory (`.claude/skills/...`, `.gemini/skills/...`, `.cline/skills/...`, or `.github/copilot-instructions.md`). This is useful when different projects need different DocAtlas configurations.
 
 ## Advanced MCP Server Registration
 
@@ -56,14 +56,14 @@ Installed skills cover the core workflow:
 - `doc-atlas update` to refresh existing sources
 - `doc-atlas query` to get compact context packs with token savings
 - `doc-atlas list`, `doc-atlas inspect`, `doc-atlas remove`, `doc-atlas doctor` for index management
-- Advanced only: `doc-atlas install-pack <pkg>@<version>` installs API MCP packs. If you explicitly register/run `doc-atlas mcp packs-serve`, it exposes them through the Tool Search pattern (`docmancer_search_tools`, `docmancer_call_tool`). `doc-atlas mcp serve` remains a compatibility alias. The default installer registers `doc-atlas mcp docs-serve` for documentation workflows.
+- Advanced only: `doc-atlas install-pack <pkg>@<version>` installs API MCP packs. If you explicitly register/run `doc-atlas mcp packs-serve`, it exposes them through the Tool Search pattern (`docmancer_search_tools`, `docmancer_call_tool`). The default installer registers `doc-atlas mcp docs-serve` for documentation workflows. The `docmancer_*` names here are Python/runtime tool identifiers, not the server registration identity.
 - Advanced only: `doc-atlas mcp doctor` and `doc-atlas mcp list` verify pack state and credentials
 
 Agents learn to call `doc-atlas query` for grounded answers instead of relying on stale training data. If API packs are installed, agents can also call MCP packs through the resolved tool name (for example `open_meteo__v1__forecast`) for live API work without losing track of the pinned version.
 
 ## Shared index
 
-All installed agent skills call the same docmancer CLI. If multiple agents on the same machine use the same SQLite database, they see the same indexed content. Ingest from Claude Code, query from Cursor, update from Gemini. The cross-agent property is a natural consequence of the shared local database.
+All installed agent skills call the same `doc-atlas` CLI. If multiple agents on the same machine use the same SQLite database, they see the same indexed content. Ingest from Claude Code, query from Cursor, update from Gemini. The cross-agent property is a natural consequence of the shared local database.
 
 ## Troubleshooting
 

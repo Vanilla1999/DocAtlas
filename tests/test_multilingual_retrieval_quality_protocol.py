@@ -385,9 +385,9 @@ def test_fastembed_provider_keeps_creation_time_model_cache(monkeypatch, tmp_pat
     monkeypatch.setattr(fastembed, "TextEmbedding", FakeEmbedding)
     first = tmp_path / "first"
     second = tmp_path / "second"
-    monkeypatch.setenv("DOCMANCER_FASTEMBED_CACHE_DIR", str(first))
+    monkeypatch.setenv("DOCATLAS_FASTEMBED_CACHE_DIR", str(first))
     provider = FastEmbedProvider(EmbeddingsConfig(dimensions=2))
-    monkeypatch.setenv("DOCMANCER_FASTEMBED_CACHE_DIR", str(second))
+    monkeypatch.setenv("DOCATLAS_FASTEMBED_CACHE_DIR", str(second))
 
     assert provider.embed_query("query") == [0.0, 1.0]
     assert observed == [str(first)]

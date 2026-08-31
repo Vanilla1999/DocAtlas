@@ -6,6 +6,18 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 
+### Changed
+
+- Project chat now retrieves bounded current project documentation before attempting strict answer certification. Natural Russian newcomer questions can use auditable retrieval-only aliases and fall back to non-authoritative `docs_context`; generic CLI commands are no longer confused with the Docs MCP tool inventory, and mixed-language recovery questions are not generated.
+
+### Fixed
+
+- Generic first CLI commands are no longer interpreted as the Docs MCP public-tool inventory, bare Russian architecture requests are not rewritten as MCP-server architecture, and Russian recovery does not generate mixed-language questions. Current `.docatlas` state remains the only supported runtime namespace.
+
+### Removed
+
+- Purged stale support-inventory and documentation promises for local-path `add`, `doc-atlas mcp serve`, and the legacy dependency-prefetch identifier before public adoption. Support policy now describes the current release only; the Python import namespace remains `docmancer`.
+
 ## [1.3.1] - 2026-08-22
 
 ### Fixed
@@ -42,7 +54,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - **Release maturity truth:** clarify that artifact-level Task 15 evidence is complete while a Stable claim still requires Task 14 live external-ingest evidence and an approved post-publish verification of the exact public release.
 - **Section-impact roadmap truth:** reconcile the active roadmap with the merged hash-bound section index, automatic base/head symbol extraction, conservative fallback, and bounded evidence-bearing ranking gates.
 - **Change-aware maintenance roadmap truth:** record the merged evidence-bounded authoring handoff, hash-idempotent incremental sync, exact-diff acceptance guard, scoped derived work, and three-tool MCP boundary as complete for local scope.
-- **Maintenance-surface roadmap truth:** revalidate and close the machine-classified support inventory, offline CI separation, bounded deprecations, tier-labelled help, and Task 24 dependency-placement handoff after the compact retrieval stack landed.
+- **Maintenance-surface roadmap truth:** revalidate and close the machine-classified current-only support inventory, offline CI separation, tier-labelled help, and Task 24 dependency-placement handoff after the compact retrieval stack landed.
 
 ### Fixed
 
@@ -138,9 +150,9 @@ Stable release. The project- and library-aware documentation stack is now produc
 - **Project-aware docs stack:** new `docmancer/docs/` package with domain models, trust contracts, library docs service, project docs service, and dependency docs orchestration.
 - **MCP tools for project docs:** `inspect_project_docs`, `sync_project_docs`, `get_project_context`, `bootstrap_project_docs` — read, reconcile, retrieve, and bootstrap project-owned documentation via MCP.
 - **MCP tools for library docs:** `resolve_library_id`, `get_library_docs`, `inspect_library_docs`, `refresh_library_docs`, `list_library_docs` — find, query, inspect, and refresh registered library documentation.
-- **Dependency docs prefetch:** `prefetch_project_dependency_docs` / `prefetch_project_docs` — read Flutter/Dart/Rust manifests and prefetch exact dependency docs.
+- **Dependency docs prefetch:** `prefetch_project_dependency_docs` reads Flutter/Dart/Rust manifests and prefetches exact dependency docs.
 - **Docs manifest system:** `docmancer.docs.yaml` manifest support with `validate_docs_manifest`, `prefetch_docs_manifest` MCP tools.
-- **DocAtlas branding:** project renamed to DocAtlas; `docmancer` retained as Python package name for compatibility.
+- **DocAtlas branding:** project renamed to DocAtlas; the Python import namespace is `docmancer`.
 - **Async docs job system:** `get_docs_job_status`, `list_docs_jobs`, `cancel_docs_job` — persistent progress tracking for indexing and prefetch jobs.
 - **Dartdoc-aware extraction** for Flutter and pub.dev docs.
 - **Public docs quality metrics and reranking** in the retrieval pipeline.

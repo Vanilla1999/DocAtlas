@@ -17,11 +17,11 @@ The following surfaces are supported but are not part of beginner onboarding and
 | Surface | Position | Reason |
 |---|---|---|
 | MCP Packs and pack installation | Advanced | API action tools, not documentation retrieval. |
-| Patch planning, constraints, and validation | Advanced compatibility | Advisory implementation evidence; never a merge-safety proof. |
+| Patch planning, constraints, and validation | Advanced | Advisory implementation evidence; never a merge-safety proof. |
 | Qdrant management and hybrid retrieval tuning | Maintenance-only | Storage and retrieval operations, not the user journey. |
 | USPTO ingestion | Maintenance-only | A specialized ingestion pipeline. |
 | Benchmark runners and task-level harness | Maintenance-only | Product evidence infrastructure, not end-user functionality. |
-| Low-level and legacy CLI commands | Compatibility | Retained for scripts and existing users; hidden from beginner docs. |
+| Low-level CLI commands | Maintenance-only | Operational surfaces hidden from beginner docs. |
 
 ## Evidence and claims
 

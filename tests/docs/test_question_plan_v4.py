@@ -6,6 +6,7 @@ from docmancer.docs.domain.documentation_query_plan import build_documentation_q
 from docmancer.docs.domain.project_answer_contract import (
     PROJECT_ANSWER_CONTRACT_SCHEMA_V4,
     build_project_answer_contract,
+    can_authorize_docs_answer,
 )
 from docmancer.docs.domain.technical_terms import coerce_technical_term, technical_term_present
 
@@ -35,6 +36,7 @@ def test_question_plan_compiles_previously_unrepresentable_queries_without_gener
         "Which command starts the Docs MCP server?": [("command", "docs-serve", "invocation")],
         "Which docs files must stay under the 1000-line release limit?": [("relation", "canonical user-facing release set", "release_line_limit")],
         "What source types are supported for indexing?": [("inventory", "source types", None)],
+        "What local file formats are supported for indexing?": [("inventory", "file formats", None)],
         "How do I configure a project in docmancer.yaml?": [("workflow", "docmancer.yaml", "configuration")],
         "How do I run the offline test suite for DocAtlas?": [("workflow", "offline suite", "procedure")],
         "How do I run the project answer quality v4 protocol?": [("workflow", "project answer quality v4 protocol", "protocol_run")],
@@ -78,6 +80,8 @@ def test_question_plan_splits_compound_questions_into_mandatory_facets():
         "docatlas.project-docs.yaml project docs catalog configuration"
     )
     assert project_docs_location.queries[-1].origin == "concept_alias"
+    assert project_docs_location.queries[-1].coverage_required is False
+    assert project_docs_location.as_payload()["required_query_ids"] == ["query-original"]
 
     contract_location = build_documentation_query_plan(
         "Where is the project answer contract documented?"
@@ -353,6 +357,15 @@ def test_question_plan_proof_requires_local_subject_binding():
         for row, unit, _expected in probes
     ] == [expected for _row, _unit_value, expected in probes]
 
+    assert can_authorize_docs_answer(
+        build_project_answer_contract("What does OrderSubmission do?")
+    ) is False
+    assert can_authorize_docs_answer(
+        build_project_answer_contract(
+            "How does evidence selection choose which candidates are selected?"
+        )
+    ) is False
+
     readme_behavior = build_project_answer_contract(
         "What does the project README say about deterministic offline release checks?"
     ).proof_obligations[0]
@@ -416,6 +429,51 @@ def test_generic_requirements_accept_one_meaningful_object_or_list_item():
         obligation,
         _unit("OrderValidationContract requires."),
     ).valid is False
+
+
+def test_response_contract_requires_the_requested_relation_not_an_invocation():
+    contract = build_project_answer_contract(
+        "What exact response contract does get_docs_context return?"
+    )
+    assert len(contract.proof_obligations) == 4
+    assert {item.expected_value for item in contract.proof_obligations} == {
+        "docs_answer", "docs_context", "patch_context", "insufficient_evidence",
+    }
+    obligation = contract.proof_obligations[0]
+    assert (obligation.subject, obligation.relation, obligation.attribute) == (
+        "get_docs_context", "contract_fact", "response contract",
+    )
+
+    assert local_proof_for_obligation(
+        obligation,
+        _unit("Use get_docs_context before editing project files."),
+    ).valid is False
+    assert local_proof_for_obligation(
+        obligation,
+        _unit(
+            "The get_docs_context response contract returns docs_answer, docs_context, "
+            "patch_context, or insufficient_evidence."
+        ),
+    ).valid is True
+    for unsupported in (
+        "The get_docs_context response contract is documented here.",
+        "The get_docs_context response contract is obsolete.",
+        "The get_docs_context response contract is not returned anymore.",
+    ):
+        assert local_proof_for_obligation(
+            obligation, _unit(unsupported),
+        ).valid is False
+
+
+def test_generic_free_form_terms_are_retrieval_hints_not_answer_proof():
+    contract = build_project_answer_contract(
+        "How are NebulaLedger orbital telemetry snapshots persisted?"
+    )
+
+    assert not contract.proof_obligations
+    assert contract.unresolved_parts == ("unsupported_query:generic_free_form_relation",)
+    assert "NebulaLedger" in contract.retrieval_hints
+    assert "fallback:generic_project_terms" in contract.parse_trace
 
 
 def test_conditional_behavior_requires_requested_condition_and_blocking_effect():
@@ -488,7 +546,7 @@ def test_new_probing_paraphrases_have_locally_provable_units():
     assert local_proof_for_obligation(
         rows[0],
         _unit(
-            'Run the fail-closed offline suite with `DOCMANCER_OFFLINE=1 pytest tests/ '
+            'Run the fail-closed offline suite with `DOCATLAS_OFFLINE=1 pytest tests/ '
             '-m "not advanced and not live and not live_network"`.'
         ),
         source={"title": "Test tiers and markers", "path": "docs/testing.md"},
@@ -723,6 +781,32 @@ def test_inventory_categories_are_typed_and_do_not_conflate_sources_formats_or_m
         source_unit,
         source={"authority": "source_of_truth", "heading_path": "Docs Source Types"},
     ).valid is False
+    assert local_proof_for_obligation(
+        format_row,
+        _unit("Local file formats support Markdown, PDF, DOCX, and HTML."),
+    ).valid is True
+    for open_inventory in (
+        "Local file formats support Markdown, PDF, and other formats.",
+        "Local file formats support Markdown, PDF, etc.",
+        "Local file formats include but are not limited to Markdown and PDF.",
+    ):
+        assert local_proof_for_obligation(
+            format_row, _unit(open_inventory),
+        ).valid is False
+
+
+def test_documentation_query_plan_v2_separates_required_queries_from_aliases():
+    plan = build_documentation_query_plan(
+        "Where is the project answer contract documented?"
+    ).as_payload()
+
+    assert plan["schema_version"] == "documentation-query-plan-v2"
+    assert "query-original" in plan["required_query_ids"]
+    assert any(item["origin"] == "concept_alias" for item in plan["queries"])
+    assert all(
+        item["query_id"] not in plan["required_query_ids"]
+        for item in plan["queries"] if item["origin"] == "concept_alias"
+    )
 
 
 

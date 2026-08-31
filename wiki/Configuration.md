@@ -1,8 +1,13 @@
 # Configuration
 
-**Resolution order:** `--config` flag, then `./docmancer.yaml` in the current directory, then `~/.docmancer/docmancer.yaml` (auto-created by `doc-atlas setup`). For details on what each command does, see [Commands](./Commands.md).
+**Resolution order:** `--config` flag, then `./docatlas.yaml` in the current directory, then `~/.docatlas/docatlas.yaml` (auto-created by `doc-atlas setup`). For details on what each command does, see [Commands](./Commands.md).
 
-A project is configured in `docmancer.yaml` by setting documented keys such as `index.provider: sqlite`, `query.default_budget: 2400`, and optional vector/retrieval settings. Relative index paths are resolved from the location of that `docmancer.yaml`.
+A project is configured in `docatlas.yaml` by setting documented keys such as `index.provider: sqlite`, `query.default_budget: 2400`, and optional vector/retrieval settings. Relative index paths are resolved from the location of that `docatlas.yaml`.
+
+Project documentation configuration for a repository is defined by the
+repository's `docatlas.project-docs.yaml` catalog. Runtime index and retrieval
+defaults remain in `docatlas.yaml`; the project-doc catalog defines which
+reviewable files are authoritative for project questions.
 
 ## Configuration Reference
 
@@ -13,8 +18,8 @@ These settings control the SQLite FTS5 index described in [Architecture](./Archi
 | Key | Default | What it controls |
 |-----|---------|------------------|
 | `index.provider` | `sqlite` | Index backend (only `sqlite` is supported) |
-| `index.db_path` | `~/.docmancer/docmancer.db` | Path to the SQLite database |
-| `index.extracted_dir` | `~/.docmancer/extracted` | Directory for extracted markdown/json inspection files |
+| `index.db_path` | `~/.docatlas/docatlas.db` | Path to the SQLite database |
+| `index.extracted_dir` | `~/.docatlas/extracted` | Directory for extracted markdown/json inspection files |
 
 ### Query
 
@@ -43,7 +48,7 @@ These settings control the SQLite FTS5 index described in [Architecture](./Archi
 
 ### Vector store
 
-A fresh configuration uses `retrieval.default_mode: lexical` for queries. Ingest can auto-start managed Qdrant and embed chunks with FastEmbed; the `vector_store:` block tunes that optional vector store. Select `dense`, `sparse`, or `hybrid` explicitly when vector retrieval is required. Those modes fail closed when required capabilities are unavailable unless the caller explicitly enables degraded fallback. Set `DOCMANCER_AUTO_VECTORS=0` (or run `doc-atlas ingest --no-vectors`) for FTS5-only ingestion.
+A fresh configuration uses `retrieval.default_mode: lexical` for queries. Ingest can auto-start managed Qdrant and embed chunks with FastEmbed; the `vector_store:` block tunes that optional vector store. Select `dense`, `sparse`, or `hybrid` explicitly when vector retrieval is required. Those modes fail closed when required capabilities are unavailable unless the caller explicitly enables degraded fallback. Set `DOCATLAS_AUTO_VECTORS=0` (or run `doc-atlas ingest --no-vectors`) for FTS5-only ingestion.
 
 | Key | Default | What it controls |
 |-----|---------|------------------|
@@ -55,7 +60,7 @@ A fresh configuration uses `retrieval.default_mode: lexical` for queries. Ingest
 | `vector_store.options.hnsw_m` | `16` | HNSW graph degree |
 | `vector_store.options.hnsw_ef_construct` | `128` | HNSW build-time accuracy/speed tradeoff |
 | `vector_store.options.quantization` | unset | Set to `scalar` for INT8 scalar quantization |
-| `vector_store.options.db_path` | `~/.docmancer/sqlite-vec.db` | Storage path for the `sqlite-vec` provider only |
+| `vector_store.options.db_path` | `~/.docatlas/sqlite-vec.db` | Storage path for the `sqlite-vec` provider only |
 
 ### Embeddings
 
@@ -66,7 +71,7 @@ A fresh configuration uses `retrieval.default_mode: lexical` for queries. Ingest
 | `embeddings.dimensions` | `768` | Dense vector dimensions; must match the model |
 | `embeddings.sparse_model` | unset (defaults to `prithivida/Splade_PP_en_v1` when sparse is needed) | SPLADE-family sparse model id |
 | `embeddings.batch_size` | `64` | Provider batch size for `embed(texts)` |
-| `embeddings.cache` | `~/.docmancer/embeddings-cache/` | Disk cache for embedded chunks; keyed by content + provider + model |
+| `embeddings.cache` | `~/.docatlas/embeddings-cache/` | Disk cache for embedded chunks; keyed by content + provider + model |
 
 ### Retrieval
 
@@ -87,45 +92,45 @@ A fresh configuration uses `retrieval.default_mode: lexical` for queries. Ingest
 
 ### MCP runtime
 
-The MCP runtime (see [Architecture > MCP runtime](./Architecture.md#mcp-runtime)) does not require entries in `docmancer.yaml`. State is managed through dedicated files under `~/.docmancer/`:
+The MCP runtime (see [Architecture > MCP runtime](./Architecture.md#mcp-runtime)) does not require entries in `docatlas.yaml`. State is managed through dedicated files under `~/.docatlas/`:
 
 | Path | Role |
 |------|------|
-| `~/.docmancer/mcp/manifest.json` | Installed packs and per-pack state (mode, allow_destructive, allow_execute, enabled) |
-| `~/.docmancer/mcp/calls.jsonl` | Append-only call log; records `arg_keys` only, never values |
-| `~/.docmancer/mcp/idempotency.db` | SQLite fingerprint cache for `Idempotency-Key` reuse on retry (24-hour TTL) |
-| `~/.docmancer/servers/<package>@<version>/` | Pack artifacts (`contract.json`, `tools.curated.json`, `tools.full.json`, `auth.schema.json`, `provenance.json`, `manifest.json` with SHA-256s) |
-| `~/.docmancer/secrets/<package>.env` | Per-package credential fallback used by the MCP runtime |
+| `~/.docatlas/mcp/manifest.json` | Installed packs and per-pack state (mode, allow_destructive, allow_execute, enabled) |
+| `~/.docatlas/mcp/calls.jsonl` | Append-only call log; records `arg_keys` only, never values |
+| `~/.docatlas/mcp/idempotency.db` | SQLite fingerprint cache for `Idempotency-Key` reuse on retry (24-hour TTL) |
+| `~/.docatlas/servers/<package>@<version>/` | Pack artifacts (`contract.json`, `tools.curated.json`, `tools.full.json`, `auth.schema.json`, `provenance.json`, `manifest.json` with SHA-256s) |
+| `~/.docatlas/secrets/<package>.env` | Per-package credential fallback used by the MCP runtime |
 
-Override the storage root with `DOCMANCER_HOME` (defaults to `~/.docmancer`). Override the registry source for `install-pack` with `DOCMANCER_REGISTRY_DIR` (defaults to `~/.docmancer/registry/`; the hosted Supabase registry client is not yet wired into the CLI).
+Override the storage root with `DOCATLAS_HOME` (defaults to `~/.docatlas`). Override the registry source for `install-pack` with `DOCATLAS_REGISTRY_DIR` (defaults to `~/.docatlas/registry/`; the hosted Supabase registry client is not yet wired into the CLI).
 
-Credentials are resolved per call, first hit wins: per-call `args._docmancer_auth.<scheme>` override, process env (`<PACKAGE>_API_KEY`, etc.), agent-config env (the `env: {}` block in `~/.cursor/mcp.json` or `~/.claude/mcp_servers.json`), then the per-package credential fallback under `~/.docmancer/secrets/`. Keyless packs (e.g. `open-meteo`) skip every step and resolve to no auth.
+Credentials are resolved per call, first hit wins: per-call `args._docatlas_auth.<scheme>` override, process env (`<PACKAGE>_API_KEY`, etc.), agent-config env (the `env: {}` block in `~/.cursor/mcp.json` or `~/.claude/mcp_servers.json`), then the per-package credential fallback under `~/.docatlas/secrets/`. Keyless packs (e.g. `open-meteo`) skip every step and resolve to no auth.
 
 ### Environment variables
 
 | Variable | What it does |
 |----------|--------------|
-| `DOCMANCER_INDEX_*` | Override any `index.*` field (for example `DOCMANCER_INDEX_DB_PATH`) |
-| `DOCMANCER_QUERY_*` | Override any `query.*` field |
-| `DOCMANCER_WEB_FETCH_*` | Override any `web_fetch.*` field |
-| `DOCMANCER_HOME` | Override the storage root (defaults to `~/.docmancer`) |
-| `DOCMANCER_REGISTRY_DIR` | Override the registry directory used by `install-pack` (defaults to `~/.docmancer/registry/`) |
-| `DOCMANCER_VECTOR_STORE_*` | Override any `vector_store.*` field (for example `DOCMANCER_VECTOR_STORE_PROVIDER=sqlite-vec`) |
-| `DOCMANCER_EMBEDDINGS_*` | Override any `embeddings.*` field (for example `DOCMANCER_EMBEDDINGS_MODEL`) |
-| `DOCMANCER_RETRIEVAL_*` | Override any `retrieval.*` field (for example `DOCMANCER_RETRIEVAL_DEFAULT_MODE=hybrid`) |
-| `DOCMANCER_QDRANT_URL` | Point at an existing Qdrant; short-circuits the managed lifecycle |
-| `DOCMANCER_QDRANT_API_KEY` | API key for the above |
-| `DOCMANCER_QDRANT_BINARY` | Pre-staged Qdrant binary path for air-gapped hosts |
-| `DOCMANCER_AUTO_VECTORS` | Set to `0` to skip vector indexing and keep ingest/query on FTS5 only |
-| `DOCMANCER_FASTEMBED_CACHE_DIR` | Pre-staged FastEmbed model cache for offline installs |
+| `DOCATLAS_INDEX_*` | Override any `index.*` field (for example `DOCATLAS_INDEX_DB_PATH`) |
+| `DOCATLAS_QUERY_*` | Override any `query.*` field |
+| `DOCATLAS_WEB_FETCH_*` | Override any `web_fetch.*` field |
+| `DOCATLAS_HOME` | Override the storage root (defaults to `~/.docatlas`) |
+| `DOCATLAS_REGISTRY_DIR` | Override the registry directory used by `install-pack` (defaults to `~/.docatlas/registry/`) |
+| `DOCATLAS_VECTOR_STORE_*` | Override any `vector_store.*` field (for example `DOCATLAS_VECTOR_STORE_PROVIDER=sqlite-vec`) |
+| `DOCATLAS_EMBEDDINGS_*` | Override any `embeddings.*` field (for example `DOCATLAS_EMBEDDINGS_MODEL`) |
+| `DOCATLAS_RETRIEVAL_*` | Override any `retrieval.*` field (for example `DOCATLAS_RETRIEVAL_DEFAULT_MODE=hybrid`) |
+| `DOCATLAS_QDRANT_URL` | Point at an existing Qdrant; short-circuits the managed lifecycle |
+| `DOCATLAS_QDRANT_API_KEY` | API key for the above |
+| `DOCATLAS_QDRANT_BINARY` | Pre-staged Qdrant binary path for air-gapped hosts |
+| `DOCATLAS_AUTO_VECTORS` | Set to `0` to skip vector indexing and keep ingest/query on FTS5 only |
+| `DOCATLAS_FASTEMBED_CACHE_DIR` | Pre-staged FastEmbed model cache for offline installs |
 
-## Example `docmancer.yaml`
+## Example `docatlas.yaml`
 
 ```yaml
 index:
   provider: sqlite
-  db_path: ~/.docmancer/docmancer.db
-  extracted_dir: ~/.docmancer/extracted
+  db_path: ~/.docatlas/docatlas.db
+  extracted_dir: ~/.docatlas/extracted
 
 query:
   default_budget: 2400
@@ -142,7 +147,7 @@ web_fetch:
 ```yaml
 index:
   provider: sqlite
-  db_path: ~/.docmancer/docmancer.db
+  db_path: ~/.docatlas/docatlas.db
 
 vector_store:
   provider: qdrant
@@ -216,7 +221,7 @@ If `embeddings.provider` is a cloud provider and the matching env var is unset, 
 
 ### Switching to local embeddings instead
 
-Edit `~/.docmancer/docmancer.yaml`:
+Edit `~/.docatlas/docatlas.yaml`:
 
 ```yaml
 embeddings:
@@ -246,5 +251,5 @@ Set `OPENAI_API_KEY` (see [API keys](#api-keys) above).
 
 ## Notes
 
-- Relative `index.db_path` values are resolved relative to the location of `docmancer.yaml`, not the current shell directory.
-- Project-local configs are created by `doc-atlas init` and point to `.docmancer/docmancer.db` inside the project.
+- Relative `index.db_path` values are resolved relative to the location of `docatlas.yaml`, not the current shell directory.
+- Project-local configs are created by `doc-atlas init` and point to `.docatlas/docatlas.db` inside the project.

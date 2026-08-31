@@ -215,6 +215,12 @@ class _SQLiteStorePart02:
             source_path = str(metadata.get("source_path") or doc.source)
             document_title = str(metadata.get("title") or Path(doc.source).stem or "Document")
             format_name = str(metadata.get("format") or "markdown")
+            project_doc_description = metadata.get("project_doc_description")
+            description = (
+                project_doc_description.strip()
+                if isinstance(project_doc_description, str)
+                else ""
+            )
             for global_index, child in enumerate(children):
                 parent = parent_by_id[child.parent_logical_id]
                 anchor = " > ".join(parent.heading_path) or parent.title
@@ -229,10 +235,16 @@ class _SQLiteStorePart02:
                     display_text=child.display_text,
                     config=context_config,
                     available_tokens=max(
-                        0, config.hard_max_tokens - child.token_estimate - 2
+                        0,
+                        config.hard_max_tokens
+                        - child.token_estimate
+                        - estimate_utf8_tokens(description)
+                        - 3,
                     ),
                 )
                 retrieval_text = embedding_input(context_prefix, child.display_text)
+                if description:
+                    retrieval_text = f"{retrieval_text}\n{description}"
                 retrieval_hash = _chunk_hash(retrieval_text)
                 filter_metadata = normalized_filter_metadata({
                     **metadata,
@@ -505,6 +517,9 @@ class _SQLiteStorePart02:
                     if row["context_prefix"] else display
                 )
                 metadata = json.loads(str(row["metadata_json"] or "{}"))
+                project_doc_description = metadata.get("project_doc_description")
+                if isinstance(project_doc_description, str) and project_doc_description.strip():
+                    expected_retrieval = f"{expected_retrieval}\n{project_doc_description.strip()}"
                 promoted = normalized_filter_metadata(metadata)
                 promoted_matches = all(
                     row[name] == value

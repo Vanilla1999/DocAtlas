@@ -149,6 +149,11 @@ def _suggested_questions(
     *,
     evidence_path: str | None,
 ) -> list[str]:
+    # The fixed English wrapper cannot preserve Russian grammar or semantics.
+    # Prefer the typed local-source recovery until a reviewed same-language
+    # rephrase family exists.
+    if re.search(r"[А-Яа-яЁё]", question):
+        return []
     candidates = _requirement_spans(requirements, question)
     for hint in _exact_question_hints(requirements, question):
         if hint.casefold() not in {item.casefold() for item in candidates}:

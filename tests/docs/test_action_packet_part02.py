@@ -143,7 +143,7 @@ def test_action_packet_is_deterministic_deduplicated_authority_filtered_and_cite
             "source": "https://docs.example/demo", "library": "demo", "source_class": "library_doc",
             "authority": "canonical", "content": "Must use the stable API.",
         }],
-        trust_contract={"rejected_sources": [{"library": "demo"}]},
+        trust_contract={"sources": {"rejected": [{"library": "demo"}]}},
     )
     assert rejected_library["source_of_truth"] == []
     assert rejected_library["status"] == "insufficient_evidence"

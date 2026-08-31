@@ -41,7 +41,9 @@ def _tool_spec(raw: dict[str, Any], *, text_fallback: bool = False) -> ToolSpec:
             if text_fallback
             else copy.deepcopy(PUBLIC_ADVERTISED_OUTPUT_SCHEMAS.get(name, raw.get("outputSchema")))
         ),
-        validation_schema=validation_schema,
+        validation_schema=_strip_null_enum_values(copy.deepcopy(
+            PUBLIC_ADVERTISED_INPUT_SCHEMAS.get(name, validation_schema)
+        )),
     )
 
 
@@ -51,8 +53,6 @@ def build_docs_surface(config: DocsServerConfig) -> DocsMcpSurface:
         name = str(raw.get("name") or "")
         if name not in CLASSIFIED_TOOL_NAMES:
             raise ValueError(f"Unclassified MCP docs tool: {name}")
-        if name in LEGACY_TOOL_NAMES and not config.expose_legacy:
-            continue
         if name in ADMIN_TOOL_NAMES and not config.expose_admin:
             continue
         if name in ADVANCED_TOOL_NAMES and not config.expose_advanced:
@@ -64,7 +64,7 @@ def build_docs_surface(config: DocsServerConfig) -> DocsMcpSurface:
     )
 
 
-ALL_SURFACE = build_docs_surface(DocsServerConfig(expose_legacy=True, expose_admin=True, expose_advanced=True))
+ALL_SURFACE = build_docs_surface(DocsServerConfig(expose_admin=True, expose_advanced=True))
 DOCS_SURFACE = build_docs_surface(DocsServerConfig.from_env(os.environ))
 
 ALL_TOOLS = [spec.to_tool_dict() for spec in ALL_SURFACE.tools]
@@ -81,10 +81,6 @@ PREFETCH_TOOLS = prefetch_tools(TOOLS)
 
 
 
-
-_EXPLICIT_UNBOUNDED_COMPATIBILITY_FIELDS = frozenset({
-    "output_mode", "details", "include_sections", "page", "page_size", "maintenance",
-})
 
 from ._docs_server_resources import *  # noqa: F401,F403
 

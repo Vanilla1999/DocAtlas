@@ -28,7 +28,6 @@ def build_code_context(
     max_files: int | None = 12,
     max_snippets: int | None = 20,
     max_lines_per_snippet: int | None = 80,
-    output_mode: str | None = "answer",
 ) -> dict[str, Any]:
     """Build an answer-ready, source-snippet context pack for local project code.
 
@@ -37,7 +36,6 @@ def build_code_context(
     hops. It does not claim AST/LSP/call-graph precision.
     """
 
-    mode = output_mode if output_mode in {"answer", "compact", "debug", "full"} else "answer"
     max_hops_value = _clamp(max_hops, default=2, minimum=0, maximum=4)
     max_files_value = _clamp(max_files, default=12, minimum=1, maximum=50)
     max_snippets_value = _clamp(max_snippets, default=20, minimum=1, maximum=40)
@@ -50,7 +48,6 @@ def build_code_context(
             question=question,
             project_path=project_path,
             query_terms=query_terms,
-            mode=mode,
             reason="project_path is missing or is not a directory",
         )
 
@@ -70,7 +67,6 @@ def build_code_context(
             question=question,
             project_path=str(root),
             query_terms=query_terms,
-            mode=mode,
             reason="No concrete source snippets matched the query terms.",
             facts=selected_facts,
         )
@@ -105,16 +101,7 @@ def build_code_context(
             "reason": f"Found {len(snippets)} source snippet(s) across {len(snippet_paths)} connected file(s).",
         },
         "required_next_step": None,
-        "output_mode": mode,
     }
-    if mode in {"debug", "full"}:
-        payload["diagnostics"] = {
-            "max_hops": max_hops_value,
-            "facts_considered": len(facts),
-            "facts_selected": len(selected_facts),
-            "query_terms": query_terms,
-            "limitations": ["heuristic_symbol_index", "name_based_reference_expansion", "not_lsp_or_call_graph"],
-        }
     return payload
 
 
@@ -123,7 +110,6 @@ def _navigation_only_payload(
     question: str,
     project_path: str | None,
     query_terms: list[str],
-    mode: str,
     reason: str,
     facts: list[dict[str, Any]] | None = None,
 ) -> dict[str, Any]:
@@ -157,7 +143,6 @@ def _navigation_only_payload(
         "files_to_read": files_to_read,
         "search_queries": query_terms[:12],
         "required_next_step": "read_or_search_suggested_sources",
-        "output_mode": mode,
     }
 
 

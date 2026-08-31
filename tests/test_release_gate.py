@@ -115,12 +115,9 @@ def test_stdio_smoke_requires_cited_content() -> None:
     text = (ROOT / "scripts/docs_mcp_stdio_smoke.py").read_text()
     assert "assert NEEDLE in rendered" in text
     assert 'assert set(canonical_query) == {"question", "project_path", "mode"}' in text
-    canonical_block = text[
-        text.index("canonical_query = {"):
-        text.index("compatibility_query =", text.index("canonical_query = {"))
-    ]
+    canonical_block = text[text.index("canonical_query = {"):text.index("answer = payload", text.index("canonical_query = {"))]
     assert "output_mode" not in canonical_block
-    assert 'compatibility_query = {**canonical_query, "output_mode": "compact"}' in text
+    assert "compatibility_query" not in text
     assert "validate_context_payload(answer, required_fragment=NEEDLE)" in text
 
 
@@ -129,13 +126,17 @@ def test_stdio_smoke_uses_primary_docatlas_home_without_legacy_writes() -> None:
     assert '"HOME": str(user_home)' in text
     assert '"USERPROFILE": str(user_home)' in text
     assert '"DOCATLAS_HOME": str(docatlas_home)' in text
-    assert 'env.pop("DOCMANCER_HOME", None)' in text
+    assert 'env.pop("DOCATLAS_HOME", None)' not in text
     assert 'not (user_home / ".docmancer").exists()' in text
 
 
 def test_stdio_smoke_accepts_structured_content_and_legacy_json_text() -> None:
     from scripts.docs_mcp_stdio_smoke import payload, text_payload, validate_context_payload
-    from scripts.run_project_docs_self_host_gate import GOLD_CASES, _validate_context_result
+    from scripts.run_project_docs_self_host_gate import (
+        GOLD_CASES,
+        _threshold_failures,
+        _validate_context_result,
+    )
 
     class Text:
         def __init__(self, text: str) -> None:
@@ -168,17 +169,60 @@ def test_stdio_smoke_accepts_structured_content_and_legacy_json_text() -> None:
     }, required_fragment="needle")
     by_id = {case.surface_case_id: case for case in GOLD_CASES if case.surface_case_id is not None}
     assert set(by_id) == set(range(1, 21))
-    assert all(case.relevant_paths and case.required_fragments for case in by_id.values())
+    assert all(case.expected_kind for case in by_id.values())
+    assert all(
+        case.relevant_paths or case.expected_kind == "insufficient_evidence"
+        for case in by_id.values()
+    )
     invalid_citation = {
         "kind": "docs_context",
         "context_status": "ready",
-        "answer_supported": False,
-        "answer_available": False,
-        "edit_ready": False,
-        "safe_to_answer_from_sources": True,
+            "answer_supported": False,
+            "answer_available": False,
+            "edit_ready": False,
+            "answer_policy": "cite_only",
+            "facets": [],
         "sources": [{"snippet": "grounded", "content_sha256": "z" * 64}],
     }
     assert _validate_context_result(invalid_citation) == "source lacks a grounded snippet or content hash"
+
+    passing_metrics = {
+        "false_supported_count": 0,
+        "operational_contamination_count": 0,
+        "top1_relevance": 0.8,
+        "top3_relevance": 0.95,
+        "false_abstention_count": 2,
+        "cases_scoring_8_plus": 16,
+        "mean_score": 8.0,
+    }
+    assert _threshold_failures(passing_metrics, 20) == []
+    for key, value in (
+        ("false_supported_count", 1),
+        ("operational_contamination_count", 1),
+        ("top1_relevance", 0.79),
+        ("top3_relevance", 0.94),
+        ("false_abstention_count", 3),
+        ("cases_scoring_8_plus", 15),
+        ("mean_score", 7.99),
+    ):
+        assert _threshold_failures({**passing_metrics, key: value}, 20)
+
+    maintained_contracts = (
+        ROOT / "README.md",
+        ROOT / "CONTRIBUTING.md",
+        ROOT / "docs/mcp-docs-server.md",
+        ROOT / "docs/project-docs-mcp-workflow.md",
+        ROOT / "docs/project-docs-demo.md",
+        ROOT / "docs/INDEX.md",
+        ROOT / "wiki/Architecture.md",
+        ROOT / "docmancer/mcp/_docs_server_resources.py",
+    )
+    for contract_path in maintained_contracts:
+        contract_text = contract_path.read_text(encoding="utf-8")
+        for result_kind in (
+            "docs_answer", "docs_context", "patch_context", "insufficient_evidence",
+        ):
+            assert result_kind in contract_text, (contract_path, result_kind)
 
 
 def test_opencode_installer_enables_text_fallback_without_overwriting_other_environment() -> None:

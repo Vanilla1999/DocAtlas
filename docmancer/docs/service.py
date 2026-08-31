@@ -148,7 +148,7 @@ class LibraryDocsService:
             "config_source": self.config_source,
             "config_path": self.config_path,
             "retrieval_mode": self.config.retrieval.default_mode,
-            "docmancer_home": os.environ.get("DOCMANCER_HOME"),
+            "docatlas_home": os.environ.get("DOCATLAS_HOME"),
             "index_counts": index_counts,
             "project_index_counts": project_index_counts if root else None,
             "shared_index_counts": shared_index_counts,
@@ -183,7 +183,7 @@ class LibraryDocsService:
                 }
 
         if root:
-            local_config_path = root / "docmancer.yaml"
+            local_config_path = root / "docatlas.yaml"
             local_config: dict[str, Any] = {"present": local_config_path.is_file()}
             if local_config_path.is_file():
                 local_config["path"] = str(local_config_path.resolve())
@@ -198,7 +198,7 @@ class LibraryDocsService:
                             "code": "project_local_config_shadowed",
                             "blocking": False,
                             "message": (
-                                "A repo-local docmancer.yaml exists, but this service is using "
+                                "A repo-local docatlas.yaml exists, but this service is using "
                                 "a different active SQLite index path."
                             ),
                             "active_db_path": str(db_path),
@@ -355,9 +355,6 @@ class LibraryDocsService:
 
     def _dependency_mentioned_in_question(self, *args: Any, **kwargs: Any):
         return self.project_context.dependency_mentioned_in_question(*args, **kwargs)
-
-    def prefetch_project_docs(self, *args: Any, **kwargs: Any):
-        return self.dependency_docs.prefetch_project_docs(*args, **kwargs)
 
     def prefetch_project_dependency_docs(self, *args: Any, **kwargs: Any):
         return self.dependency_docs.prefetch_project_dependency_docs(*args, **kwargs)
