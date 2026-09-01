@@ -248,6 +248,22 @@ def test_broad_relational_comparison_is_context_only_even_when_locally_proved():
     assert "unsupported_answer_authorization:context_only_relation" in complete.missing_requirements
     assert incomplete.support_decision.answer_supported is False
 
+    named_question = "How does OrdersDraftStore differ from PaymentOutbox?"
+    named_requirements = build_requirements(
+        named_question, profile="project_docs_answer",
+    )
+    named = select_evidence(
+        [_candidate(
+            "named-comparison",
+            "OrdersDraftStore writes drafts, whereas PaymentOutbox writes pending payment events.",
+            source="ARCHITECTURE.md",
+        )],
+        question=named_question,
+        config=project_docs_selection_config(800),
+        requirements=named_requirements,
+    )
+    assert named.support_decision.answer_supported is True
+
 
 def test_proof_roles_and_qualifiers_are_bound_into_assignments():
     requirements = build_requirements(
@@ -718,7 +734,7 @@ def test_selection_is_byte_deterministic_under_candidate_permutation():
     assert validate_evidence_sufficiency(first, result_kind="docs_answer") == []
 
 
-def test_generic_behavior_local_proof_cannot_authorize_project_docs_answer():
+def test_named_symbol_behavior_local_proof_can_authorize_project_docs_answer():
     question = "What does OrderSubmission do?"
     requirements = build_requirements(question, profile="project_docs_answer")
 
@@ -733,9 +749,9 @@ def test_generic_behavior_local_proof_cannot_authorize_project_docs_answer():
         requirements=requirements,
     )
 
-    assert decision.status == "insufficient_evidence"
-    assert decision.support_decision.answer_supported is False
-    assert "unsupported_answer_authorization:context_only_relation" in decision.missing_requirements
+    assert decision.status == "ok"
+    assert decision.support_decision.answer_supported is True
+    assert decision.missing_requirements == ()
 
 
 def test_wrong_exact_version_cannot_win_with_a_higher_score():

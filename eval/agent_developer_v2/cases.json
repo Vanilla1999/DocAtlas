@@ -248,6 +248,7 @@
           "target_next_action_arguments": {
             "action": "project",
             "details": true,
+            "module": "auth",
             "project_path": "$PROJECT_PATH"
           },
           "target_requires_confirmation": false,
@@ -740,6 +741,7 @@
           "target_next_action_arguments": {
             "action": "project",
             "details": true,
+            "module": "auth",
             "project_path": "$PROJECT_PATH"
           },
           "target_requires_confirmation": false,

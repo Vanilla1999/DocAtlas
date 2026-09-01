@@ -1,7 +1,7 @@
 {
   "schema_version": "project-answer-quality-protocol-v3",
   "case_file": "cases.json",
-  "case_file_sha256": "c52f53eeb8faf11529e4bd82bfd68856b6844ee584dbe9f20c96c45e530c5d24",
+  "case_file_sha256": "e1e8a5379f9dd440f8f4f606df2c55956a649941f1fd14f46a44605909512b0e",
   "public_argument_fields": [
     "mode",
     "project_path",

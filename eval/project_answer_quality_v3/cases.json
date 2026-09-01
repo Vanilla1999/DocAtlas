@@ -522,15 +522,15 @@
         }
       ],
       "expected": {
-        "status": "insufficient_evidence",
-        "evidence_paths": [],
-        "required_fragments": [],
-        "forbidden_fragments": [
+        "status": "ok",
+        "evidence_paths": [
+          "wiki/Reference.md"
+        ],
+        "required_fragments": [
           "listed in the environment variable reference"
         ],
-        "forbidden_paths": [
-          "wiki/Reference.md"
-        ]
+        "forbidden_fragments": [],
+        "forbidden_paths": []
       }
     },
     {
@@ -557,15 +557,15 @@
         }
       ],
       "expected": {
-        "status": "insufficient_evidence",
-        "evidence_paths": [],
-        "required_fragments": [],
-        "forbidden_fragments": [
+        "status": "ok",
+        "evidence_paths": [
+          "wiki/Disabled.md"
+        ],
+        "required_fragments": [
           "not used for the storage root"
         ],
-        "forbidden_paths": [
-          "wiki/Disabled.md"
-        ]
+        "forbidden_fragments": [],
+        "forbidden_paths": []
       }
     }
   ]

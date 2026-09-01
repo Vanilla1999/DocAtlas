@@ -1,16 +1,27 @@
 from __future__ import annotations
 
 from docmancer.docs.application.evidence_selection import build_requirements
+from docmancer.docs.domain.answer_units import AnswerUnit, local_proof_for_obligation
 from docmancer.docs.domain.project_answer_contract import (
     PROJECT_ANSWER_CONTRACT_SCHEMA,
     PROJECT_ANSWER_CONTRACT_SCHEMA_V2,
     build_project_answer_contract,
+    can_authorize_docs_answer,
 )
 
 
 def _obligations(question: str):
     contract = build_project_answer_contract(question)
     return contract, contract.proof_obligations
+
+
+def _unit(text: str) -> AnswerUnit:
+    import hashlib
+    return AnswerUnit(
+        unit_id="contract-v3", kind="sentence", text=text,
+        char_start=0, char_end=len(text),
+        content_sha256=hashlib.sha256(text.encode()).hexdigest(), proposition=True,
+    )
 
 
 def test_v3_purpose_contracts_extract_bounded_subject_context_and_technical_aliases():
@@ -83,3 +94,27 @@ def test_v3_does_not_reclassify_frozen_v2_config_questions():
         assert contract.schema_version == PROJECT_ANSWER_CONTRACT_SCHEMA_V2
         assert contract.contract_hash == contract_hash
         assert requirements.requirements_hash == requirements_hash
+
+
+def test_answer_authorization_requires_a_query_bound_pascal_identity():
+    assert can_authorize_docs_answer(
+        build_project_answer_contract("What is OrdersDraftStore?")
+    ) is True
+    for broad_subject in ("Storage", "Project", "Architecture", "Readme"):
+        assert can_authorize_docs_answer(
+            build_project_answer_contract(f"What is {broad_subject}?")
+        ) is False
+
+
+def test_named_behavior_preserves_requested_operation_qualifier():
+    obligation = build_project_answer_contract(
+        "What does OrderSubmission return?"
+    ).proof_obligations[0]
+    assert obligation.expected_value == "return"
+    assert obligation.target is None
+    assert local_proof_for_obligation(
+        obligation, _unit("OrderSubmission validates drafts."),
+    ).valid is False
+    assert local_proof_for_obligation(
+        obligation, _unit("OrderSubmission returns a submission ID."),
+    ).valid is True

@@ -249,10 +249,12 @@ def test_public_project_answer_requires_all_semantic_facets(tmp_path, monkeypatc
         service,
     )
 
-    assert result["support_status"] == "insufficient_evidence"
+    assert result["status"] == "ok"
+    assert result["kind"] == "docs_context"
+    assert result["support_status"] == "retrieval_only"
     assert result["answer_supported"] is False
-    assert result["status"] == "insufficient_evidence"
     assert result["answer_available"] is False
+    assert result["context_available"] is True
 
 
 def test_public_project_answer_accepts_all_semantic_facets(tmp_path, monkeypatch):
@@ -276,9 +278,11 @@ def test_public_project_answer_accepts_all_semantic_facets(tmp_path, monkeypatch
         service,
     )
 
-    assert result["support_status"] == "insufficient_evidence"
+    assert result["status"] == "ok"
+    assert result["kind"] == "docs_context"
+    assert result["support_status"] == "retrieval_only"
     assert result["answer_supported"] is False
-    assert result["status"] == "insufficient_evidence"
+    assert result["answer_available"] is False
     assert result["context_available"] is True
 
 
@@ -300,8 +304,11 @@ def test_public_project_answer_heading_only_is_not_factual_proof(tmp_path, monke
         service,
     )
 
+    assert result["status"] == "insufficient_evidence"
+    assert result["kind"] == "docs_context"
     assert result["support_status"] == "insufficient_evidence"
     assert result["answer_supported"] is False
+    assert result["answer_available"] is False
 
 
 def test_public_project_answer_negated_facet_is_not_factual_proof(tmp_path, monkeypatch):
@@ -325,8 +332,11 @@ def test_public_project_answer_negated_facet_is_not_factual_proof(tmp_path, monk
         service,
     )
 
-    assert result["support_status"] == "insufficient_evidence"
+    assert result["status"] == "ok"
+    assert result["kind"] == "docs_context"
+    assert result["support_status"] == "retrieval_only"
     assert result["answer_supported"] is False
+    assert result["answer_available"] is False
 
 
 def test_public_project_answer_requires_authority_invariant(tmp_path, monkeypatch):
@@ -374,8 +384,10 @@ def test_public_project_answer_accepts_recall_with_authority_invariant(tmp_path,
     )
 
     assert result["status"] == "insufficient_evidence"
+    assert result["kind"] == "docs_answer"
     assert result["support_status"] == "insufficient_evidence"
     assert result["answer_supported"] is False
+    assert result["answer_available"] is False
     assert result["context_available"] is True
 
 
@@ -448,8 +460,11 @@ def test_public_project_answer_supports_russian_behavior_and_usage(tmp_path, mon
         service,
     )
 
-    assert result["support_status"] == "insufficient_evidence"
+    assert result["status"] == "ok"
+    assert result["kind"] == "docs_context"
+    assert result["support_status"] == "retrieval_only"
     assert result["answer_supported"] is False
+    assert result["answer_available"] is False
 
 
 def test_public_project_answer_rejects_incomplete_russian_usage(tmp_path, monkeypatch):
@@ -470,8 +485,10 @@ def test_public_project_answer_rejects_incomplete_russian_usage(tmp_path, monkey
         service,
     )
 
-    assert result["support_status"] == "insufficient_evidence"
-    assert result["status"] == "insufficient_evidence"
+    assert result["status"] == "ok"
+    assert result["kind"] == "docs_context"
+    assert result["support_status"] == "retrieval_only"
+    assert result["answer_supported"] is False
     assert result["answer_available"] is False
 
 

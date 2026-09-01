@@ -358,7 +358,17 @@ def test_question_plan_proof_requires_local_subject_binding():
     ] == [expected for _row, _unit_value, expected in probes]
 
     assert can_authorize_docs_answer(
+        build_project_answer_contract("What is ErrorCodeRegistry?")
+    ) is True
+    assert can_authorize_docs_answer(
         build_project_answer_contract("What does OrderSubmission do?")
+    ) is True
+    assert can_authorize_docs_answer(build_project_answer_contract(
+        "According to the project documentation, how does ScanPermissionGate "
+        "determine whether scan may enter?"
+    )) is False
+    assert can_authorize_docs_answer(
+        build_project_answer_contract("What is the model-visible projection?")
     ) is False
     assert can_authorize_docs_answer(
         build_project_answer_contract(

@@ -8,6 +8,7 @@ import re
 from docmancer.docs.domain.question_frame_core import split_question_clauses
 from docmancer.docs.domain.project_retrieval_intent import (
     build_project_retrieval_aliases,
+    project_retrieval_disposition,
 )
 
 
@@ -58,7 +59,10 @@ def build_documentation_query_plan(
     requirements: object | None = None,
 ) -> DocumentationQueryPlan:
     retrieval_aliases = build_project_retrieval_aliases(question)
-    force_context_only = any(alias.force_context_only for alias in retrieval_aliases)
+    force_context_only = (
+        project_retrieval_disposition(question) == "context_only"
+        and any(alias.force_context_only for alias in retrieval_aliases)
+    )
     mandatory = (() if force_context_only else tuple(
         item for item in requirements or ()
         if getattr(item, "mandatory", False)

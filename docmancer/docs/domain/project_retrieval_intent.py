@@ -9,6 +9,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 import re
+from typing import Literal
 
 
 _MAX_ALIASES = 4
@@ -17,6 +18,23 @@ _CYRILLIC_RE = re.compile(r"[А-Яа-яЁё]")
 _PRODUCT_NAME_RE = re.compile(
     r"(?<![\w])(?:docatlas|doc[ -]atlas|docmancer)(?![\w])", re.I,
 )
+_PROJECT_SCOPE_TOKEN_RE = re.compile(
+    r"(?:projects?|repos?|repositor(?:y|ies)|systems?|products?)", re.I,
+)
+_SPECIFIC_RELATION_TOKEN_RE = re.compile(
+    r"(?:polic(?:y|ies)|contracts?|rules?|invariants?|governance|retention)", re.I,
+)
+_CODE_IDENTITY_RE = re.compile(
+    r"^(?=.{2,160}$)(?=.*[a-z])(?=(?:.*[A-Z]){2})[A-Z][A-Za-z0-9]*$",
+)
+_RETRIEVAL_ONLY_UNRESOLVED_PREFIXES = (
+    "unresolved_inventory_category:",
+    "unresolved_query_subject",
+    "unresolved_requested_operation",
+)
+ProjectRetrievalDisposition = Literal[
+    "strict_answer", "context_only", "fail_closed",
+]
 
 
 @dataclass(frozen=True, slots=True)
@@ -48,6 +66,12 @@ def _has(tokens: tuple[str, ...], *stems: str) -> bool:
 
 def _has_phrase(text: str, *phrases: str) -> bool:
     return any(phrase in text for phrase in phrases)
+
+
+def _specific_contract_request(tokens: tuple[str, ...]) -> bool:
+    return any(_SPECIFIC_RELATION_TOKEN_RE.fullmatch(token) for token in tokens) or _has(
+        tokens, "политик", "контракт", "правил", "инвариант",
+    )
 
 
 def build_project_retrieval_aliases(
@@ -90,18 +114,12 @@ def build_project_retrieval_aliases(
 
     mentions_docs = _has(tokens, "документ", "док", "docs", "documentation")
     mentions_project = _has(
-        tokens,
-        "проект", "репозитор", "систем", "продукт",
-        "project", "repo", "repository", "system", "product",
-    )
+        tokens, "проект", "репозитор", "систем", "продукт",
+    ) or any(_PROJECT_SCOPE_TOKEN_RE.fullmatch(token) for token in tokens)
     mentions_mcp = _has(tokens, "mcp")
     mentions_command = _has(tokens, "команд", "command", "cli")
     mentions_start = _has(tokens, "запуст", "запуск", "старт", "start", "serve", "run")
-    specific_contract_request = _has(
-        tokens,
-        "политик", "policy", "contract", "контракт", "правил", "rule",
-        "инвариант", "invariant", "governance", "retention",
-    )
+    specific_contract_request = _specific_contract_request(tokens)
 
     # Narrow, reviewed facts remain eligible for strict proof and docs_answer.
     if _has(tokens, "маркер", "marker") and _has(tokens, "pytest"):
@@ -347,17 +365,87 @@ def build_project_retrieval_aliases(
     return tuple(rows)
 
 
+def project_retrieval_disposition(question: str) -> ProjectRetrievalDisposition:
+    """Classify answer certification and retrieval-only fallback once."""
+
+    from docmancer.docs.domain.project_answer_contract import (
+        build_project_answer_contract,
+        can_authorize_docs_answer,
+    )
+
+    aliases = build_project_retrieval_aliases(question)
+    force_context_only = any(alias.force_context_only for alias in aliases)
+    contract = build_project_answer_contract(question)
+    if can_authorize_docs_answer(contract):
+        closed_contract = all(
+            obligation.kind == "inventory"
+            or (obligation.kind == "command" and obligation.relation == "invocation")
+            for obligation in contract.proof_obligations
+        )
+        return (
+            "context_only"
+            if force_context_only and not closed_contract
+            else "strict_answer"
+        )
+    if force_context_only:
+        return "context_only"
+    if contract.proof_obligations:
+        return "fail_closed" if contract.unresolved_parts else "context_only"
+
+    tokens = _tokens(question)
+    if any(
+        part.startswith("unresolved_question_clause:")
+        or part.startswith("legacy_unresolved:")
+        for part in contract.unresolved_parts
+    ):
+        return "fail_closed"
+    if _specific_contract_request(tokens) or any(
+        _CODE_IDENTITY_RE.fullmatch(token)
+        for token in _TOKEN_RE.findall(str(question or ""))
+    ):
+        return "fail_closed"
+
+    exact_generic_fallback = (
+        not contract.proof_obligations
+        and "fallback:generic_project_terms" in contract.parse_trace
+        and contract.unresolved_parts
+        == ("unsupported_query:generic_free_form_relation",)
+    )
+    retrieval_only_ambiguity = bool(contract.unresolved_parts) and all(
+        part.startswith(_RETRIEVAL_ONLY_UNRESOLVED_PREFIXES)
+        for part in contract.unresolved_parts
+    )
+    return (
+        "context_only"
+        if exact_generic_fallback or retrieval_only_ambiguity
+        else "fail_closed"
+    )
+
+
 def project_retrieval_requires_context_only(question: str) -> bool:
     """Return whether retrieval is useful but certification is too strong."""
 
-    return any(
-        alias.force_context_only
-        for alias in build_project_retrieval_aliases(question)
-    )
+    return project_retrieval_disposition(question) == "context_only"
+
+
+def project_retrieval_allows_context_fallback(question: str) -> bool:
+    """Allow retrieval-only context when no strict answer can be certified."""
+
+    return project_retrieval_disposition(question) == "context_only"
+
+
+def project_retrieval_allows_certified_answer(question: str) -> bool:
+    """Allow a closed strict answer to survive an overlapping broad alias."""
+
+    return project_retrieval_disposition(question) == "strict_answer"
 
 
 __all__ = [
     "ProjectRetrievalAlias",
+    "ProjectRetrievalDisposition",
     "build_project_retrieval_aliases",
+    "project_retrieval_allows_certified_answer",
+    "project_retrieval_allows_context_fallback",
+    "project_retrieval_disposition",
     "project_retrieval_requires_context_only",
 ]

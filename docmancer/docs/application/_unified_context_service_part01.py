@@ -245,6 +245,7 @@ class _UnifiedDocsContextServicePart01:
                 "source_count": len([i for i in project_items if i.get("doc_scope") in {"project", "module"}]),
                 "reason_code": operational_reason_code or project_result.reason,
                 **({"module_candidates": module_candidates} if module_candidates else {}),
+                **({"module_selector": module} if operational_reason_code and module and not module_path else {}),
             }
             dep_count = len([i for i in project_items if i.get("doc_scope") == "dependency"])
             if dep_count:

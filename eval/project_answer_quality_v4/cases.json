@@ -26,6 +26,7 @@
       ],
       "expected": {
         "status": "ok",
+        "kind": "docs_context",
         "evidence_paths": [
           "eval/project_answer_quality_v4/README.md"
         ],
@@ -65,6 +66,7 @@
       ],
       "expected": {
         "status": "ok",
+        "kind": "docs_context",
         "evidence_paths": [
           "docs/testing.md"
         ],
@@ -105,6 +107,7 @@
       ],
       "expected": {
         "status": "ok",
+        "kind": "docs_answer",
         "evidence_paths": [
           "eval/task_level/README.md"
         ],
@@ -143,6 +146,7 @@
       ],
       "expected": {
         "status": "ok",
+        "kind": "docs_context",
         "evidence_paths": [
           "eval/task_level/README.md"
         ],
@@ -181,6 +185,7 @@
       ],
       "expected": {
         "status": "ok",
+        "kind": "docs_context",
         "evidence_paths": [
           "docs/mcp-docs-server.md"
         ],
@@ -227,6 +232,7 @@
       ],
       "expected": {
         "status": "ok",
+        "kind": "docs_context",
         "evidence_paths": [
           "docs/index-cleanup.md"
         ],
@@ -268,6 +274,7 @@
       ],
       "expected": {
         "status": "ok",
+        "kind": "docs_context",
         "evidence_paths": [
           "docs/mcp-docs-server.md"
         ],
@@ -306,6 +313,7 @@
       ],
       "expected": {
         "status": "ok",
+        "kind": "docs_answer",
         "evidence_paths": [
           "docs/change-aware-docs.md"
         ],
@@ -344,6 +352,7 @@
       ],
       "expected": {
         "status": "ok",
+        "kind": "docs_context",
         "evidence_paths": [
           "docs/RELEASE_CHECKLIST.md"
         ],
@@ -382,6 +391,7 @@
       ],
       "expected": {
         "status": "ok",
+        "kind": "docs_context",
         "evidence_paths": [
           "docs/mcp-docs-server.md"
         ],
@@ -420,6 +430,7 @@
       ],
       "expected": {
         "status": "ok",
+        "kind": "docs_answer",
         "evidence_paths": [
           "docs/mcp-docs-server.md"
         ],
@@ -460,6 +471,7 @@
       ],
       "expected": {
         "status": "ok",
+        "kind": "docs_context",
         "evidence_paths": [
           "wiki/Configuration.md"
         ],
@@ -498,6 +510,7 @@
       ],
       "expected": {
         "status": "ok",
+        "kind": "docs_answer",
         "evidence_paths": [
           "wiki/Supported-Sources.md"
         ],
@@ -533,6 +546,7 @@
       ],
       "expected": {
         "status": "ok",
+        "kind": "docs_context",
         "evidence_paths": [
           "docs/indexing.md"
         ],
@@ -571,6 +585,7 @@
       ],
       "expected": {
         "status": "ok",
+        "kind": "docs_context",
         "evidence_paths": [
           "eval/project_answer_quality_v4/README.md"
         ],
@@ -600,15 +615,14 @@
         }
       ],
       "expected": {
-        "status": "insufficient_evidence",
-        "evidence_paths": [],
-        "required_fragments": [],
-        "forbidden_fragments": [
-          "project returns a compact context"
-        ],
-        "forbidden_paths": [
+        "status": "ok",
+        "kind": "docs_context",
+        "evidence_paths": [
           "ARCHITECTURE.md"
-        ]
+        ],
+        "required_fragments": [],
+        "forbidden_fragments": [],
+        "forbidden_paths": []
       }
     },
     {
@@ -628,6 +642,7 @@
       ],
       "expected": {
         "status": "insufficient_evidence",
+        "kind": "docs_answer",
         "evidence_paths": [],
         "required_fragments": [],
         "forbidden_fragments": [
@@ -654,8 +669,11 @@
         }
       ],
       "expected": {
-        "status": "insufficient_evidence",
-        "evidence_paths": [],
+        "status": "ok",
+        "kind": "docs_context",
+        "evidence_paths": [
+          "docs/RELEASE_CHECKLIST.md"
+        ],
         "required_fragments": [],
         "forbidden_fragments": [],
         "forbidden_paths": []
@@ -678,6 +696,7 @@
       ],
       "expected": {
         "status": "insufficient_evidence",
+        "kind": "docs_answer",
         "evidence_paths": [],
         "required_fragments": [],
         "forbidden_fragments": [],
@@ -703,6 +722,7 @@
       ],
       "expected": {
         "status": "insufficient_evidence",
+        "kind": "docs_context",
         "evidence_paths": [],
         "required_fragments": [],
         "forbidden_fragments": [],

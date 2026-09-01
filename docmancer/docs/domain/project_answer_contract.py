@@ -63,6 +63,29 @@ _CONTEXT_ONLY_RELATIONS = frozenset({
     "selection_policy",
 })
 _SPECIALIZED_BEHAVIOR_RELATIONS = frozenset({"storage_coordination"})
+_NAMED_SYMBOL_RE = _re.compile(
+    r"^(?=.{2,160}$)(?=.*[a-z])(?=(?:.*[A-Z]){2})[A-Z][A-Za-z0-9]*$"
+)
+
+
+def _is_query_bound_named_symbol(
+    obligation: ProofObligation,
+    value: object,
+) -> bool:
+    """Recognize class/type identities that are bound to the query span."""
+
+    term = _clean_term(value)
+    span = str(obligation.query_span_text or "")
+    return bool(
+        term
+        and _NAMED_SYMBOL_RE.fullmatch(term)
+        and obligation.query_span_start is not None
+        and obligation.query_span_end is not None
+        and obligation.query_span_start >= 0
+        and obligation.query_span_end > obligation.query_span_start
+        and len(span) == obligation.query_span_end - obligation.query_span_start
+        and _re.search(rf"(?<![A-Za-z0-9]){_re.escape(term)}(?![A-Za-z0-9])", span)
+    )
 
 
 def _clean_term(value: object) -> str:
@@ -197,11 +220,26 @@ def obligations_can_authorize_docs_answer(
         return False
     for obligation in obligations:
         relation = str(obligation.relation or "").casefold()
-        if obligation.kind == "definition":
+        narrow_named_behavior = (
+            obligation.kind == "behavior"
+            and relation == "behavior"
+            and _is_query_bound_named_symbol(obligation, obligation.subject)
+        )
+        narrow_named_comparison = (
+            obligation.kind == "comparison"
+            and relation == "contrast"
+            and _is_query_bound_named_symbol(obligation, obligation.subject)
+            and _is_query_bound_named_symbol(obligation, obligation.target)
+        )
+        if (
+            obligation.kind == "definition"
+            and not _is_query_bound_named_symbol(obligation, obligation.subject)
+        ):
             return False
         if (
             obligation.kind == "behavior"
             and relation not in _SPECIALIZED_BEHAVIOR_RELATIONS
+            and not narrow_named_behavior
         ):
             return False
         if obligation.kind == "location" and _re.search(
@@ -218,9 +256,20 @@ def obligations_can_authorize_docs_answer(
             r"(?:,|\b(?:and|or)\b)", obligation.subject, _re.I
         ):
             return False
-        if relation in _CONTEXT_ONLY_RELATIONS:
+        if (
+            relation in _CONTEXT_ONLY_RELATIONS
+            and not narrow_named_behavior
+            and not narrow_named_comparison
+        ):
             return False
         if relation == "usage" and obligation.subject_kind != "env_var":
+            return False
+        if (
+            obligation.kind == "workflow"
+            and relation == "sequence"
+            and not obligation.target
+            and not obligation.context
+        ):
             return False
         if obligation.kind in {"behavior", "purpose", "usage", "workflow"} and not relation:
             return False

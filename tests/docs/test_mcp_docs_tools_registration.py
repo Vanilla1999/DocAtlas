@@ -637,6 +637,9 @@ def test_mcp_exposes_three_public_tools_with_mutually_exclusive_guidance():
         "jobs",
         "job",
     ]
+    assert {"module", "details", "status", "limit"}.issubset(
+        tools["docs_status"]["inputSchema"]["properties"]
+    )
 
 
 def test_docs_status_validates_required_action_arguments():

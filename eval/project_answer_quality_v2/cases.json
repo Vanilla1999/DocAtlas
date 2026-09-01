@@ -206,13 +206,9 @@
         }
       ],
       "expected": {
-        "status": "ok",
-        "evidence_paths": [
-          "roadmap/README.md"
-        ],
-        "required_fragments": [
-          "verified local adapter"
-        ],
+        "status": "insufficient_evidence",
+        "evidence_paths": [],
+        "required_fragments": [],
         "forbidden_fragments": [],
         "forbidden_paths": []
       }

@@ -458,7 +458,16 @@ def build_requirements(
         # mandatory unsupported-query requirement that would override the
         # caller's concrete obligations.
         explicit_support_contract = bool(public_requirements or required_evidence_paths)
-        if answer_contract.unresolved_parts and not explicit_support_contract:
+        context_only_retrieval = bool(
+            "fallback:generic_project_terms" in answer_contract.parse_trace
+            and "unsupported_query:generic_free_form_relation"
+            in answer_contract.unresolved_parts
+        )
+        if (
+            answer_contract.unresolved_parts
+            and not explicit_support_contract
+            and not context_only_retrieval
+        ):
             for index, reason in enumerate(answer_contract.unresolved_parts):
                 unique[f"unresolved:{index}:{reason}"] = EvidenceRequirement(
                     requirement_id=f"unresolved:{index}:{reason}",
@@ -466,7 +475,10 @@ def build_requirements(
                     public_provenance="query_exact_term",
                     query_extraction_kind=reason,
                 )
-        if not any(item.mandatory for item in unique.values()):
+        if (
+            not any(item.mandatory for item in unique.values())
+            and not context_only_retrieval
+        ):
             unique["project_answer_requirement"] = EvidenceRequirement(
                 requirement_id="project_answer_requirement", kind="unsupported_query", value="",
                 public_provenance="query_exact_term",

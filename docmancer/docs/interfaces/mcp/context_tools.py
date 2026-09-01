@@ -1,16 +1,12 @@
 from __future__ import annotations
 
 from docmancer.docs.application.docs_context_projection import project_docs_context
-from docmancer.docs.domain.project_retrieval_intent import (
-    project_retrieval_requires_context_only,
-)
-
+from docmancer.docs.domain.project_retrieval_intent import project_retrieval_disposition
 from copy import deepcopy
 from dataclasses import asdict, is_dataclass
 import json
 import math
 from typing import Any
-
 from docmancer.docs.application.action_packet import build_action_packet, validate_action_packet
 from docmancer.docs.application.evidence_selection import AggregateMixedSelectionDecision, SelectionDecision
 from docmancer.docs.interfaces.mcp.recovery_projection import (
@@ -19,6 +15,7 @@ from docmancer.docs.interfaces.mcp.recovery_projection import (
     _attach_recovery_diagnosis,
     _bound_recoverable_insufficient_projection,
     _recovery_summary,
+    bind_module_recovery_selector,
     cross_module_proof_missing,
     is_operational_recovery_action,
 )
@@ -47,7 +44,6 @@ from docmancer.docs.domain.retrieval_routing import validate_routing_record
 from docmancer.docs.service import LibraryDocsService
 from docmancer.docs.interfaces.mcp.project_tools import _bad_request, _bounded_int_arg, _clean_string
 
-
 CONTEXT_TOOL_NAMES = {"get_docs_context"}
 DOCUMENT_CONTENT_POLICY = {
     "role": "cited_untrusted_document_data",
@@ -69,7 +65,7 @@ def _bounded_project_operational_diagnostics(payload: dict[str, Any]) -> dict[st
     if isinstance(rows, list):
         candidates: list[dict[str, str]] = []
         seen: set[str] = set()
-        for row in rows[:8]:
+        for row in rows:
             if not isinstance(row, dict):
                 continue
             module_path = str(row.get("module_path") or "").strip()
@@ -82,6 +78,8 @@ def _bounded_project_operational_diagnostics(payload: dict[str, Any]) -> dict[st
                 if value:
                     item[key] = value[:120]
             candidates.append(item)
+            if len(candidates) >= 8:
+                break
         if candidates:
             result["module_candidates"] = candidates
     return result
@@ -372,7 +370,7 @@ def handle_context_tool(name: str, args: dict[str, Any], service: LibraryDocsSer
     )
     if kind in {"docs_answer", "patch_context"}:
         output_budget = 1_500
-        recovery = _bounded_recovery_action(raw)
+        recovery = bind_module_recovery_selector(_bounded_recovery_action(raw), raw)
         source_search_allowed = bool(
             kind == "patch_context"
             and not raw.get("hard_stop")
@@ -380,7 +378,8 @@ def handle_context_tool(name: str, args: dict[str, Any], service: LibraryDocsSer
             and not is_operational_recovery_action(recovery)
         )
         if kind == "docs_answer":
-            force_context_only = project_retrieval_requires_context_only(question)
+            retrieval_disposition = project_retrieval_disposition(question)
+            force_context_only = retrieval_disposition == "context_only"
             selection_trace: dict[str, Any] = {}
             projection, snapshot = project_docs_answer(
                 question=question,
@@ -389,14 +388,21 @@ def handle_context_tool(name: str, args: dict[str, Any], service: LibraryDocsSer
                 selection_diagnostics=selection_trace,
                 canonical_selection=canonical_selection,
             )
-            if force_context_only:
+            preserve_certified = bool(
+                projection.get("status") == "ok"
+                and projection.get("kind") == "docs_answer"
+                and projection.get("answer_supported") is True
+                and retrieval_disposition == "strict_answer"
+            )
+            if force_context_only and not preserve_certified:
                 projection, snapshot = project_docs_context(
                     retrieval=raw, max_tokens=min(800, output_budget),
                 )
             raw.setdefault("retrieval_diagnostics", {})["evidence_selection"] = selection_trace
             projection, snapshot = maybe_project_docs_context(
                 projection=projection, snapshot=snapshot, raw=raw, args=args,
-                recovery=recovery, output_budget=output_budget,
+                recovery=recovery, output_budget=output_budget, allow_fallback=(
+                    retrieval_disposition == "context_only"),
             )
             if projection.get("status") == "insufficient_evidence":
                 projection.update(_bounded_project_operational_diagnostics(raw))
@@ -450,9 +456,7 @@ def handle_context_tool(name: str, args: dict[str, Any], service: LibraryDocsSer
                     if projection.get("status") == "insufficient_evidence"
                     else min(DOCS_ANSWER_MAX_TOKENS, output_budget)
                 ),
-                canonical_selection=(
-                    None if force_context_only else canonical_selection
-                ),
+                canonical_selection=(None if force_context_only and not preserve_certified else canonical_selection),
             )
             if validation_errors:
                 return _bad_request("invalid_model_visible_projection", "; ".join(validation_errors))

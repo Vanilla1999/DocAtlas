@@ -161,9 +161,9 @@
   "source": {
     "fresh_provider_blocker": "repository OPENAI_API_KEY is not configured",
     "fresh_provider_run_available": false,
-    "historical_model_report_sha256": "ebc6da0de44ead15f4da7205a7b4bc20c01f0125877f178026fd6293a69308fa",
+    "historical_model_report_sha256": "c31cdc7e83281e9553fefeac4704576f8fcd0a651ea4c928e34207826d1838a3",
     "model": "gpt-5.6-luna",
-    "p1_2_atlas_sha256": "b4af12b3201b1d0077f8f102d50956c5f480a783d6ada8c3ffcc7281b25b3421",
+    "p1_2_atlas_sha256": "55c895810f52f5be3ae5c71a3db6b398b7a6e06fd439ee536faa18dd0ebf9ef9",
     "provider_id": "opencode-chat",
     "task_count": 11
   }
