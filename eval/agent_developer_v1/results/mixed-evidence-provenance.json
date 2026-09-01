@@ -283,8 +283,85 @@
   "schema_version": 1,
   "source_identities": {
     "evidence_model_git_blob_sha1": "ccf4398b49ae46ebaffe850fbb81b7ce16a28f6b",
-    "protocol_git_blob_sha1": "63a8ff66c1e1fd933af2cca1e888c19fbdf2126b",
-    "selector_git_blob_sha1": "68cb3e222d860e7bdf2b0435129b70fa6793836d"
+    "proof_runtime": {
+      "algorithm": "ordered-git-blob-sha1-manifest-v1",
+      "files": [
+        {
+          "git_blob_sha1": "8f658f454cc68528cc857d5aec3e0be602cabef3",
+          "path": "docmancer/docs/application/_evidence_selection_part01.py"
+        },
+        {
+          "git_blob_sha1": "1145e3745b835d000b4d9d0a193565bd82c08f23",
+          "path": "docmancer/docs/application/_evidence_selection_part02.py"
+        },
+        {
+          "git_blob_sha1": "75af1de57d88d8148aa637609dea54cb16873bca",
+          "path": "docmancer/docs/application/_evidence_selection_part03.py"
+        },
+        {
+          "git_blob_sha1": "2ef6b0a4a31e24344dd1cea58f89ff5609a9d031",
+          "path": "docmancer/docs/application/_evidence_selection_part04.py"
+        },
+        {
+          "git_blob_sha1": "73f710ae9d1c3c808d89add38629d44d56dd76a1",
+          "path": "docmancer/docs/application/_evidence_selection_shared.py"
+        },
+        {
+          "git_blob_sha1": "3ce21090afc44dc12b5e52a243aac6e4e21d8b3f",
+          "path": "docmancer/docs/application/evidence_candidates.py"
+        },
+        {
+          "git_blob_sha1": "ccf4398b49ae46ebaffe850fbb81b7ce16a28f6b",
+          "path": "docmancer/docs/application/evidence_models.py"
+        },
+        {
+          "git_blob_sha1": "a1021ce32721b71d76a542b5814a17908b6e26cb",
+          "path": "docmancer/docs/application/evidence_requirements.py"
+        },
+        {
+          "git_blob_sha1": "68cb3e222d860e7bdf2b0435129b70fa6793836d",
+          "path": "docmancer/docs/application/evidence_selection.py"
+        },
+        {
+          "git_blob_sha1": "34514a4930ec01f37f9a36fc5824cb9ee3c400e1",
+          "path": "docmancer/docs/application/proofability.py"
+        },
+        {
+          "git_blob_sha1": "1598d1d6b56a079bfdcc0452939c628aa694638b",
+          "path": "docmancer/docs/domain/_answer_units_part01.py"
+        },
+        {
+          "git_blob_sha1": "ba47b10f1435f40cd54741d64f8f5f4866aff196",
+          "path": "docmancer/docs/domain/_answer_units_part02.py"
+        },
+        {
+          "git_blob_sha1": "47d8146f7d3f9caadf3156ec40d6f663d8601d5d",
+          "path": "docmancer/docs/domain/_answer_units_shared.py"
+        },
+        {
+          "git_blob_sha1": "79e239974d34725a07889d0bebb84e6a606476b6",
+          "path": "docmancer/docs/domain/_project_answer_contract_part01.py"
+        },
+        {
+          "git_blob_sha1": "e592bb8aba66d2c8c27e4526a96019ae9224b4d1",
+          "path": "docmancer/docs/domain/_project_answer_contract_part02.py"
+        },
+        {
+          "git_blob_sha1": "a61ec61149c110b919f97ccc912911af5eac0598",
+          "path": "docmancer/docs/domain/_project_answer_contract_shared.py"
+        },
+        {
+          "git_blob_sha1": "8c439e456a377f2fb0aaf2af8f6d55e3f81f5445",
+          "path": "docmancer/docs/domain/answer_units.py"
+        },
+        {
+          "git_blob_sha1": "d6c9b67f48e0c22af51040e2ed5f8581c7a70906",
+          "path": "docmancer/docs/domain/project_answer_contract.py"
+        }
+      ],
+      "sha256": "765594745cdf4179cdfa391cabb2f159259cd597c50a816149e1d85230133c2c"
+    },
+    "protocol_git_blob_sha1": "63a8ff66c1e1fd933af2cca1e888c19fbdf2126b"
   },
   "status": "closed_with_claim_local_provenance",
   "summary": {

@@ -43,6 +43,29 @@ def is_operational_recovery_action(value: Any) -> bool:
     )
 
 
+def bind_module_recovery_selector(
+    action: dict[str, Any] | None,
+    payload: dict[str, Any],
+) -> dict[str, Any] | None:
+    """Keep the ambiguous module selector in the returned status action."""
+
+    if not isinstance(action, dict) or action.get("tool") != "docs_status":
+        return action
+    lanes = payload.get("lanes") if isinstance(payload.get("lanes"), dict) else {}
+    project = lanes.get("project") if isinstance(lanes.get("project"), dict) else {}
+    selector = str(project.get("module_selector") or "").strip()
+    if not selector or project.get("reason_code") != "module_ambiguous":
+        return action
+    updated = deepcopy(action)
+    arguments = (
+        deepcopy(updated.get("arguments_patch"))
+        if isinstance(updated.get("arguments_patch"), dict) else {}
+    )
+    arguments["module"] = selector
+    updated["arguments_patch"] = arguments
+    return updated
+
+
 def _first_operational_action(payload: dict[str, Any]) -> dict[str, Any] | None:
     candidates = [payload.get("next_action"), *(payload.get("next_actions") or [])]
     return next(
@@ -84,7 +107,7 @@ def _bound_module_recovery_projection(
     if not candidates:
         return
 
-    limit = min(INSUFFICIENT_EVIDENCE_MAX_TOKENS, max(1, int(max_tokens)))
+    limit = min(256, INSUFFICIENT_EVIDENCE_MAX_TOKENS, max(1, int(max_tokens)))
     for key in SUPPORT_ENVELOPE_KEYS:
         if key not in _MODULE_RECOVERY_SUPPORT_SUMMARY_KEYS:
             payload.pop(key, None)
@@ -162,8 +185,17 @@ def _bound_module_recovery_projection(
     if minimal_action:
         payload["recommended_next_action"] = minimal_action
     _refresh_estimate(payload)
-    if estimate_projection_tokens(payload) > limit:
-        raise ValueError("minimum module-recovery projection exceeds the requested budget")
+    if estimate_projection_tokens(payload) <= limit:
+        return
+
+    # An exact locator is useful only when it survives intact. Drop the row
+    # rather than returning a misleading truncated path or failing the handler.
+    payload.pop("module_candidates", None)
+    _refresh_estimate(payload)
+    if estimate_projection_tokens(payload) <= limit:
+        return
+    payload.pop("recommended_next_action", None)
+    _refresh_estimate(payload)
 
 
 def _bound_recoverable_insufficient_projection(
@@ -324,6 +356,7 @@ __all__ = [
     "_bound_module_recovery_projection",
     "_bound_recoverable_insufficient_projection",
     "_recovery_summary",
+    "bind_module_recovery_selector",
     "is_operational_recovery_action",
 ]
 

@@ -66,9 +66,12 @@ def docs_context_fallback_allowed(
 def maybe_project_docs_context(
     *, projection: dict[str, Any], snapshot: dict[str, dict[str, Any]],
     raw: dict[str, Any], args: dict[str, Any], recovery: Any, output_budget: int,
+    allow_fallback: bool,
 ) -> tuple[dict[str, Any], dict[str, dict[str, Any]]]:
-    if projection.get("status") != "insufficient_evidence" or not docs_context_fallback_allowed(
-        raw=raw, args=args, recovery=recovery,
+    if (
+        not allow_fallback
+        or projection.get("status") != "insufficient_evidence"
+        or not docs_context_fallback_allowed(raw=raw, args=args, recovery=recovery)
     ):
         return projection, snapshot
     context_projection, context_snapshot = project_docs_context(

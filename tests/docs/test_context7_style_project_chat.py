@@ -11,6 +11,8 @@ from docmancer.docs.domain.project_answer_contract import (
 )
 from docmancer.docs.domain.project_retrieval_intent import (
     build_project_retrieval_aliases,
+    project_retrieval_allows_certified_answer,
+    project_retrieval_disposition,
     project_retrieval_requires_context_only,
 )
 from docmancer.docs.application.recovery import _suggested_questions
@@ -75,6 +77,10 @@ def test_russian_docs_mcp_start_command_builds_a_command_obligation():
 
 def test_exact_symbol_question_is_not_misclassified_as_product_overview():
     aliases = build_project_retrieval_aliases("What is DOCATLAS_HOME?")
+
+    assert "product_overview" not in {alias.intent_id for alias in aliases}
+
+    aliases = build_project_retrieval_aliases("What is the model-visible projection?")
 
     assert "product_overview" not in {alias.intent_id for alias in aliases}
 
@@ -227,6 +233,67 @@ def test_broad_retrieval_intent_requires_context_only_delivery():
     assert project_retrieval_requires_context_only(
         "Какая команда запускает Docs MCP сервер?"
     ) is False
+
+
+def test_certified_answer_preservation_requires_a_complete_question_contract():
+    narrow = "Which command syncs project docs after file changes?"
+    mixed = (
+        "Which command syncs project docs after file changes and "
+        "how is the project architecture organized?"
+    )
+
+    assert project_retrieval_requires_context_only(narrow) is False
+    assert project_retrieval_allows_certified_answer(narrow) is True
+    assert project_retrieval_requires_context_only(mixed) is True
+    assert project_retrieval_allows_certified_answer(mixed) is False
+    assert project_retrieval_allows_certified_answer(
+        "How do I install and verify DocAtlas locally?"
+    ) is False
+    assert project_retrieval_allows_certified_answer(
+        "What is DocAtlas and what problem does it solve?"
+    ) is False
+    assert project_retrieval_allows_certified_answer(
+        "What test markers are available?"
+    ) is True
+
+
+@pytest.mark.parametrize(
+    ("question", "expected"),
+    [
+        ("What is OrdersDraftStore?", "strict_answer"),
+        ("What is Storage?", "context_only"),
+        ("What markers are available?", "context_only"),
+        ("What test markers are available?", "strict_answer"),
+        ("Which imaginary contract governs this repository?", "fail_closed"),
+        ("How many attempts does ProjectRetryPolicy allow?", "fail_closed"),
+        ("Does README prove the storage writer-lease contract?", "context_only"),
+        ("What lunar quantum retention policy does DocAtlas use?", "fail_closed"),
+        ("What problem do projects solve?", "context_only"),
+        ("What is the model-visible projection?", "context_only"),
+    ],
+)
+def test_project_retrieval_disposition_is_structural(question: str, expected: str):
+    assert project_retrieval_disposition(question) == expected
+
+
+@pytest.mark.parametrize(
+    "question",
+    [
+        "What problem does a project solve?",
+        "What problem do projects solve?",
+        "What problem does a repository solve?",
+        "What problem do repositories solve?",
+        "What problem do systems solve?",
+        "What problem do products solve?",
+    ],
+)
+def test_project_scope_aliases_accept_bounded_plural_forms(question: str):
+    assert project_retrieval_disposition(question) == "context_only"
+
+
+@pytest.mark.parametrize("term", ["projection", "projector", "projective"])
+def test_project_scope_aliases_reject_prefix_collisions(term: str):
+    assert build_project_retrieval_aliases(f"What is the model-visible {term}?") == ()
 
 
 def test_current_docatlas_index_persists_across_service_restart_without_resync(

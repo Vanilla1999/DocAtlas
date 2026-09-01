@@ -167,53 +167,39 @@ def main() -> int:
         requirements = _requirements(question)
         if plan.handled:
             errors.append(f"generic project case unexpectedly became QuestionPlan-owned: {question!r}")
-        if contract.unresolved_parts:
+        if "unsupported_query:generic_free_form_relation" not in contract.unresolved_parts:
             errors.append(
-                f"generic project case remained unresolved: {question!r}; "
+                f"generic project case lost retrieval-only diagnostic: {question!r}; "
                 f"unresolved={contract.unresolved_parts!r}"
             )
         if "fallback:generic_project_terms" not in contract.parse_trace:
             errors.append(f"generic project case did not use bounded fallback: {question!r}")
-        if len(contract.proof_obligations) < 3:
+        if contract.proof_obligations:
             errors.append(
-                f"generic project case produced too little proof surface: {question!r}; "
+                f"generic project retrieval terms became answer proof: {question!r}; "
                 f"obligations={contract.proof_obligations!r}"
             )
-        if any(row.kind != "exact_fact" for row in contract.proof_obligations):
-            errors.append(f"generic project fallback produced a non-exact-fact obligation: {question!r}")
 
-        subjects = {row.subject.casefold() for row in contract.proof_obligations}
-        missing_anchors = GENERIC_REQUIRED_ANCHORS[question] - subjects
+        anchors = {value.casefold() for value in contract.subjects}
+        missing_anchors = GENERIC_REQUIRED_ANCHORS[question] - anchors
         if missing_anchors:
             errors.append(
-                f"generic project fallback lost required anchors: {question!r}; "
-                f"missing={sorted(missing_anchors)!r}; subjects={sorted(subjects)!r}"
+                f"generic project fallback lost required retrieval anchors: {question!r}; "
+                f"missing={sorted(missing_anchors)!r}; anchors={sorted(anchors)!r}"
             )
-        leaked_scaffold = subjects & GENERIC_FORBIDDEN_SCAFFOLD
+        leaked_scaffold = anchors & GENERIC_FORBIDDEN_SCAFFOLD
         if leaked_scaffold:
             errors.append(
-                f"generic project fallback promoted query scaffolding to proof: {question!r}; "
+                f"generic project fallback promoted query scaffolding: {question!r}; "
                 f"leaked={sorted(leaked_scaffold)!r}"
             )
-        for row in contract.proof_obligations:
-            if (
-                row.query_span_start is None
-                or row.query_span_end is None
-                or row.query_span_text is None
-                or row.query_span_text.casefold() != row.subject.casefold()
-            ):
-                errors.append(
-                    f"generic project obligation is not bound to its exact query span: "
-                    f"{question!r}; obligation={row!r}"
-                )
-
         if any(row.kind == "unsupported_query" for row in requirements):
-            errors.append(f"generic project case still reached unsupported requirement gate: {question!r}")
-        mandatory = [row for row in requirements if row.mandatory]
-        if len(mandatory) != len(contract.proof_obligations):
             errors.append(
-                f"generic project requirements are not all mandatory: {question!r}; "
-                f"mandatory={len(mandatory)} obligations={len(contract.proof_obligations)}"
+                f"retrieval-only generic case manufactured unsupported proof: {question!r}"
+            )
+        if any(row.mandatory for row in requirements):
+            errors.append(
+                f"retrieval-only generic case manufactured mandatory proof: {question!r}"
             )
 
         witness = _generic_witness_candidate(index, GENERIC_PROJECT_WITNESSES[question])
@@ -223,13 +209,15 @@ def main() -> int:
             config=project_docs_selection_config(800),
             requirements=requirements,
         )
-        if decision.status != "ok" or not decision.support_decision.answer_supported:
+        if decision.status == "ok" or decision.support_decision.answer_supported:
             errors.append(
-                f"generic project contract is not satisfiable by natural project documentation: "
-                f"{question!r}; missing={decision.missing_requirements!r}; "
-                f"subjects={sorted(subjects)!r}"
+                f"generic retrieval-only context incorrectly authorized docs_answer: {question!r}"
             )
-
+        if "unsupported_answer_authorization:unresolved_query" not in decision.missing_requirements:
+            errors.append(
+                f"generic retrieval-only abstention lost its causal reason: {question!r}; "
+                f"missing={decision.missing_requirements!r}"
+            )
     adversarial_contract = build_project_answer_contract(GENERIC_ADVERSARIAL_TAIL)
     if not adversarial_contract.unresolved_parts:
         guarded_terms = " ".join(
@@ -281,8 +269,8 @@ def main() -> int:
     print(
         "PASS: reviewed QuestionPlan migrations remain stable; partial legacy semantics fail "
         "closed; complete legacy controls remain supported; 3 novel project-specific questions "
-        "receive bounded mandatory anchor contracts with exact query spans and natural-doc "
-        "witnesses; unrelated tails are represented or rejected; silent-empty and causal-why "
+        "retain bounded retrieval anchors without answer authority; unrelated tails are "
+        "represented or rejected; silent-empty and causal-why "
         "probes remain unsupported; canonical ownership signatures stable"
     )
     return 0

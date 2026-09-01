@@ -28,7 +28,6 @@ def main(argv: list[str] | None = None) -> int:
     derived = derive_from_paths(
         repo_root=REPO_ROOT,
         protocol_path=ROOT / "evidence_is_data_protocol.json",
-        selector_path=REPO_ROOT / "docmancer" / "docs" / "application" / "evidence_selection.py",
         recovery_path=REPO_ROOT / "docmancer" / "docs" / "interfaces" / "mcp" / "recovery_projection.py",
         adversarial_gate_path=REPO_ROOT / "scripts" / "run_agent_developer_adversarial_gate.py",
         mutation_gate_path=REPO_ROOT / "scripts" / "run_agent_developer_adversarial_mutation_gate.py",

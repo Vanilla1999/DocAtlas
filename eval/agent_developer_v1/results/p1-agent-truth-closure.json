@@ -17,11 +17,11 @@
   "outcome": "AUTONOMOUS_AGENT_TRUTH_NOT_PROVEN",
   "p1_1_installed_evidence_identities": [
     {
-      "git_blob_sha1": "dea05bbb60872e736a4a25481ff4651f834a9e2d",
+      "git_blob_sha1": "001e26b3bad171d3cedc80a3f7d7d942e02d288f",
       "path": ".github/workflows/installed-mcp-agent-benchmark.yml"
     },
     {
-      "git_blob_sha1": "2d0a4f88b103010d72d3899b62f32c4c34178b98",
+      "git_blob_sha1": "cbf4d115eb51079a45b395a659134a732fea8979",
       "path": "eval/agent_developer_v1/installed_mcp_benchmark.py"
     },
     {
@@ -99,7 +99,7 @@
       "evidence_status": "provider_free_measured_accepted",
       "execution_status": "closed",
       "facts": {
-        "answer_supported": 6,
+        "answer_supported": 5,
         "candidate_discovered": 10,
         "case_count": 14,
         "false_supported_negative_controls": 0,
@@ -141,23 +141,23 @@
   ],
   "source_identities": {
     "p1_2": {
-      "git_blob_sha1": "68ce0ec3fd9c7419ab658341e7a721d8df6749d1",
+      "git_blob_sha1": "997ce4458afd4ec7e48f2a87d39925a33e7709fe",
       "path": "eval/agent_developer_v1/results/first-divergence-atlas.json"
     },
     "p1_3": {
-      "git_blob_sha1": "be84870597764ac48a6bfc90c19ff4e26e20942c",
+      "git_blob_sha1": "def78168e0f1d7f11ae4c272714dd3ef10a7b9b5",
       "path": "eval/agent_developer_v1/results/contract-v2-ablation.json"
     },
     "p1_4": {
-      "git_blob_sha1": "fe80c34f70adf8f2c22795349f006a909cd120c0",
+      "git_blob_sha1": "c98bd35cc9fd71053fc02c16635c26e54468600d",
       "path": "eval/agent_developer_v1/results/paraphrase-proofability.json"
     },
     "p1_5": {
-      "git_blob_sha1": "50b56f15f719149b26b8eba534495ccdbdc3a02f",
+      "git_blob_sha1": "f2e24cdb286bc2213558503dd6d7a5fb6fc7499f",
       "path": "eval/agent_developer_v1/results/mixed-evidence-provenance.json"
     },
     "p1_6": {
-      "git_blob_sha1": "a9cec8c7042e678aced742ec5a635b695e92846a",
+      "git_blob_sha1": "c73a8c4767c0e21dd78e8f5f641855f39ae2a6cd",
       "path": "eval/agent_developer_v1/results/evidence-is-data.json"
     }
   }

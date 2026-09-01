@@ -17,7 +17,6 @@ from docmancer.agent import DocmancerAgent
 from docmancer.core.config import DocmancerConfig
 from docmancer.docs.application.docs_job_service import DocsJobTracker
 from docmancer.docs.application.evidence_selection import build_requirements
-from docmancer.docs.application import _evidence_selection_part03 as evidence_selection_part03
 from docmancer.docs.domain import project_doc_ranking
 from docmancer.docs.interfaces.mcp import context_tools
 from docmancer.docs.registry import LibraryRegistry
@@ -41,6 +40,7 @@ class ExpectedOutcome:
     required_fragments: tuple[str, ...]
     forbidden_fragments: tuple[str, ...]
     forbidden_paths: tuple[str, ...]
+    kind: str = "docs_answer"
 
 
 @dataclass(frozen=True, slots=True)
@@ -166,14 +166,10 @@ def _frozen_answer_projection() -> Iterator[None]:
     """Keep the hermetic v1-v4 proof oracle separate from live final routing."""
 
     original_projection = context_tools.maybe_project_docs_context
-    original_authorization = evidence_selection_part03.obligations_can_authorize_docs_answer
     original_lane_eligibility = project_doc_ranking.source_lane_allowed
     context_tools.maybe_project_docs_context = lambda **kwargs: (
         kwargs["projection"], kwargs["snapshot"]
     )
-    # The frozen protocols predate production relation authorization. Their
-    # immutable oracle continues to evaluate the original proof boundary.
-    evidence_selection_part03.obligations_can_authorize_docs_answer = lambda _obligations: True
     project_doc_ranking.source_lane_allowed = (
         lambda _path, _question, *, impact_policy=None: True
     )
@@ -181,7 +177,6 @@ def _frozen_answer_projection() -> Iterator[None]:
         yield
     finally:
         context_tools.maybe_project_docs_context = original_projection
-        evidence_selection_part03.obligations_can_authorize_docs_answer = original_authorization
         project_doc_ranking.source_lane_allowed = original_lane_eligibility
 
 
@@ -230,6 +225,23 @@ def _indexed_text_by_path(db_path: str) -> dict[str, str]:
     return {path: "\n".join(values) for path, values in grouped.items()}
 
 
+def _query_coverage(payload: dict[str, Any]) -> float:
+    value = payload.get("query_coverage")
+    if (
+        value is None
+        and payload.get("kind") == "docs_answer"
+        and payload.get("answer_supported") is True
+    ):
+        mandatory_coverage = payload.get("mandatory_coverage")
+        return 1.0 if mandatory_coverage is None else float(mandatory_coverage)
+    if value in {"full", "complete"}:
+        return 1.0
+    if value == "partial":
+        return 0.5
+    try:
+        return float(value or 0.0)
+    except (TypeError, ValueError):
+        return 0.0
 def _chunk_path(chunk: Any) -> str:
     metadata = dict(getattr(chunk, "metadata", None) or {})
     return str(
@@ -278,7 +290,41 @@ def _citation_integrity(
     )
 
 
-def run_case(case: QualityCase, workspace: Path) -> CaseResult:
+def _expected_projection_contract(
+    expected: ExpectedOutcome,
+    payload: Mapping[str, Any],
+) -> tuple[bool, bool]:
+    status_matches = payload.get("status") == expected.status
+    kind_matches = payload.get("kind") == expected.kind
+    if expected.status == "insufficient_evidence":
+        return status_matches, bool(
+            kind_matches
+            and not payload.get("answer")
+            and not payload.get("sources")
+            and not payload.get("answer_supported")
+            and not payload.get("answer_available")
+        )
+    if expected.kind == "docs_answer":
+        return status_matches and kind_matches, bool(
+            payload.get("answer_supported") is True
+            and payload.get("answer_available") is True
+            and float(payload.get("mandatory_coverage") or 0.0) == 1.0
+        )
+    if expected.kind == "docs_context":
+        return status_matches and kind_matches, bool(
+            payload.get("answer_supported") is False
+            and not payload.get("answer_available")
+            and payload.get("edit_ready") is False
+        )
+    return False, False
+
+
+def run_case(
+    case: QualityCase,
+    workspace: Path,
+    *,
+    enforce_expected_kind: bool = False,
+) -> CaseResult:
     repository = workspace / "repository"
     repository.mkdir(parents=True, exist_ok=True)
     _write_repository(repository, case)
@@ -329,7 +375,8 @@ def run_case(case: QualityCase, workspace: Path) -> CaseResult:
     )
     token_limit = (
         SUPPORTED_TOKEN_LIMIT
-        if supported or retrieval_only else INSUFFICIENT_TOKEN_LIMIT
+        if supported or (retrieval_only and not enforce_expected_kind)
+        else INSUFFICIENT_TOKEN_LIMIT
     )
     visible_tokens = int(payload.get("estimated_tokens") or token_limit + 1)
 
@@ -350,26 +397,40 @@ def run_case(case: QualityCase, workspace: Path) -> CaseResult:
     candidate_recall = (
         not expected_paths or expected_paths.issubset(set(candidate_paths))
     )
-    selected_coverage = (
-        float(payload.get("mandatory_coverage") or 0.0) == 1.0
-        if supported else not payload.get("answer_supported", False)
-    )
+    if retrieval_only:
+        selected_coverage = _query_coverage(payload) >= 0.5
+    elif enforce_expected_kind and expected.status == "insufficient_evidence":
+        selected_coverage = not payload.get("answer_supported", False)
+    elif enforce_expected_kind and expected.kind == "docs_context":
+        selected_coverage = _query_coverage(payload) >= 0.5
+    else:
+        selected_coverage = (
+            float(payload.get("mandatory_coverage") or 0.0) == 1.0
+            if supported else not payload.get("answer_supported", False)
+        )
     projected_coverage = all(
         fragment.casefold() in visible_folded
         for fragment in expected.required_fragments
     )
     citation_integrity = _citation_integrity(payload, indexed)
-    abstention_correctness = bool(
-        payload.get("status") == expected.status if supported else (
-            retrieval_only
-            or (
-                payload.get("status") == "insufficient_evidence"
-                and not payload.get("answer")
-                and not payload.get("sources")
-                and not payload.get("answer_supported", False)
+    if enforce_expected_kind:
+        status_kind_correct, authorization_correct = _expected_projection_contract(
+            expected, payload,
+        )
+        abstention_correctness = status_kind_correct
+    else:
+        authorization_correct = True
+        abstention_correctness = bool(
+            payload.get("status") == expected.status if supported else (
+                retrieval_only
+                or (
+                    payload.get("status") == "insufficient_evidence"
+                    and not payload.get("answer")
+                    and not payload.get("sources")
+                    and not payload.get("answer_supported", False)
+                )
             )
         )
-    )
     contamination_free = bool(
         all(fragment.casefold() not in visible_folded for fragment in expected.forbidden_fragments)
         and not set(selected_paths).intersection(expected.forbidden_paths)
@@ -389,6 +450,7 @@ def run_case(case: QualityCase, workspace: Path) -> CaseResult:
         "projected_answer_coverage": projected_coverage,
         "citation_integrity": citation_integrity,
         "abstention_correctness": abstention_correctness,
+        "authorization_contract": authorization_correct,
         "correct_evidence": correct_evidence,
         "contamination_free": contamination_free,
         "visible_token_ceiling": token_ceiling,
@@ -419,7 +481,7 @@ def run_case(case: QualityCase, workspace: Path) -> CaseResult:
         kind=str(payload.get("kind") or ""),
         support_status=str(payload.get("support_status") or ""),
         answer_supported=bool(payload.get("answer_supported")),
-        query_coverage=float(payload.get("query_coverage") or 0.0),
+        query_coverage=_query_coverage(payload),
         citations=tuple({
             "path": str(row.get("path_or_url") or ""),
             "evidence_id": str(row.get("evidence_id") or ""),

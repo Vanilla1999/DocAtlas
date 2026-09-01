@@ -97,7 +97,9 @@ roots:
     assert payload["answer_supported"] is False
     assert payload["edit_ready"] is False
     assert "sources" not in payload
-    assert "unsupported_answer_authorization:context_only_relation" in payload["missing"]
+    assert payload["missing"] == [
+        "No safe, current, project-scoped documentation context was retrieved."
+    ]
 
     dispatcher_payload = handle_context_tool(
         "get_docs_context",

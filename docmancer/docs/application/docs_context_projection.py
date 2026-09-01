@@ -138,6 +138,7 @@ def project_docs_context(
             continue
         if (
             broad_context_only
+            and not required_ids
             and not original_hit
             and not host_ids
             and not canonical_intent_ids
@@ -251,35 +252,54 @@ def project_docs_context(
             break
         if (
             required_query_id_set
-            and not broad_context_only
             and required_query_id_set.issubset(selected_required_ids)
             and (not host_query_ids or selected_host_lookup)
         ):
             break
 
     if not sources:
-        return project_insufficient(
+        projection = project_insufficient(
             kind="docs_context",
             missing=["No safe, current, project-scoped documentation context was retrieved."],
             recommended_next_action=None,
             max_tokens=min(INSUFFICIENT_EVIDENCE_MAX_TOKENS, max_tokens),
-        ), {}
+        )
+        projection.update({
+            "answer_supported": False,
+            "answer_available": False,
+            "support_status": "insufficient_evidence",
+            "context_available": False,
+            "edit_ready": False,
+        })
+        _refresh_estimate(projection)
+        return projection, {}
     decision = context_selection_decision(sources, public_query_ids)
     covered_query_ids = set(decision.covered_query_ids)
     context_fallback_ids = (
         canonical_intent_query_ids | host_query_ids | relation_claim_query_ids
     )
+    if broad_context_only:
+        context_fallback_ids.add("query-original")
     if (
         required_query_ids
         and not (covered_query_ids & required_query_id_set)
         and not (broad_context_only and covered_query_ids & context_fallback_ids)
     ):
-        return project_insufficient(
+        projection = project_insufficient(
             kind="docs_context",
             missing=["No required documentation facet was retrieved."],
             recommended_next_action=None,
             max_tokens=min(INSUFFICIENT_EVIDENCE_MAX_TOKENS, max_tokens),
-        ), {}
+        )
+        projection.update({
+            "answer_supported": False,
+            "answer_available": False,
+            "support_status": "insufficient_evidence",
+            "context_available": False,
+            "edit_ready": False,
+        })
+        _refresh_estimate(projection)
+        return projection, {}
     payload = _payload(sources, decision=decision, query_plan=query_plan)
     snapshot = {
         source["evidence_id"]: _snapshot_entry(

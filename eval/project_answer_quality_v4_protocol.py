@@ -46,9 +46,12 @@ def load_cases() -> tuple[v1.QualityCase, ...]:
             required_fragments=tuple(str(value) for value in expected_raw.get("required_fragments") or ()),
             forbidden_fragments=tuple(str(value) for value in expected_raw.get("forbidden_fragments") or ()),
             forbidden_paths=tuple(str(value) for value in expected_raw.get("forbidden_paths") or ()),
+            kind=str(expected_raw.get("kind") or ""),
         )
         if expected.status not in {"ok", "insufficient_evidence"}:
             raise ValueError(f"{case_id}: unsupported expected status")
+        if expected.kind not in {"docs_answer", "docs_context", "patch_context"}:
+            raise ValueError(f"{case_id}: unsupported expected kind")
         if not set(expected.evidence_paths).issubset(document_paths):
             raise ValueError(f"{case_id}: expected evidence path is not cataloged")
         rows.append(v1.QualityCase(
@@ -61,7 +64,7 @@ def load_cases() -> tuple[v1.QualityCase, ...]:
 def validate_protocol_lock() -> dict[str, Any]:
     lock = json.loads(LOCK_PATH.read_text(encoding="utf-8"))
     errors: list[str] = []
-    if lock.get("schema_version") != "project-answer-quality-protocol-v4":
+    if lock.get("schema_version") != "project-answer-quality-protocol-v4.1":
         errors.append("schema_version")
     if lock.get("case_file") != "cases.json":
         errors.append("case_file")
@@ -87,7 +90,9 @@ def run(output: Path | None = None) -> dict[str, Any]:
     with tempfile.TemporaryDirectory(prefix="docatlas-project-answer-quality-v4-") as temporary:
         root = Path(temporary)
         for case in cases:
-            results.append(v1.run_case(case, root / case.case_id))
+            results.append(v1.run_case(
+                case, root / case.case_id, enforce_expected_kind=True,
+            ))
     supported = [row for row, case in zip(results, cases) if case.expected.status == "ok"]
     report = {
         "schema_version": "project-answer-quality-result-v4",

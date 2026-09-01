@@ -12,6 +12,10 @@ from docmancer.docs.application.evidence_selection import (
     docs_selection_config,
     select_evidence,
 )
+from eval.agent_developer_v1.proof_runtime_provenance import (
+    build_proof_runtime_manifest,
+    verify_proof_runtime_manifest,
+)
 
 
 def _resolve_build_requirements():
@@ -197,7 +201,7 @@ def evaluate_case(case: dict[str, Any]) -> dict[str, Any]:
 def derive_report(
     *,
     protocol: dict[str, Any],
-    source_identities: dict[str, str],
+    source_identities: dict[str, Any],
 ) -> dict[str, Any]:
     if protocol.get("schema_version") != 1 or protocol.get("protocol") != "evidence-is-data-v1":
         raise ValueError("P1.6 protocol identity mismatch")
@@ -263,6 +267,10 @@ def verify_report(report: dict[str, Any]) -> None:
     ids = [str(row.get("id") or "") for row in cases if isinstance(row, dict)]
     if len(ids) != len(set(ids)) or any(not value for value in ids):
         raise ValueError("P1.6 case identities are invalid")
+    identities = report.get("source_identities")
+    if not isinstance(identities, dict) or "proof_runtime" not in identities:
+        raise ValueError("P1.6 report source identities are incomplete")
+    verify_proof_runtime_manifest(identities["proof_runtime"])
     for row in cases:
         if not isinstance(row, dict):
             raise ValueError("P1.6 case row must be an object")
@@ -330,7 +338,6 @@ def derive_from_paths(
     *,
     repo_root: Path,
     protocol_path: Path,
-    selector_path: Path,
     recovery_path: Path,
     adversarial_gate_path: Path,
     mutation_gate_path: Path,
@@ -339,7 +346,7 @@ def derive_from_paths(
         protocol=load_json(protocol_path),
         source_identities={
             "protocol_git_blob_sha1": git_blob_sha(protocol_path, repo_root=repo_root),
-            "selector_git_blob_sha1": git_blob_sha(selector_path, repo_root=repo_root),
+            "proof_runtime": build_proof_runtime_manifest(repo_root),
             "recovery_projection_git_blob_sha1": git_blob_sha(recovery_path, repo_root=repo_root),
             "adversarial_gate_git_blob_sha1": git_blob_sha(adversarial_gate_path, repo_root=repo_root),
             "adversarial_mutation_gate_git_blob_sha1": git_blob_sha(mutation_gate_path, repo_root=repo_root),

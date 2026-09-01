@@ -30,7 +30,6 @@ def _report() -> dict:
     return derive_from_paths(
         repo_root=REPO_ROOT,
         protocol_path=ROOT / "paraphrase_protocol.json",
-        selector_path=REPO_ROOT / "docmancer" / "docs" / "application" / "evidence_selection.py",
         planner_path=_production_planner_path(),
     )
 
@@ -93,12 +92,19 @@ def test_claim_and_path_leak_fail_closed() -> None:
     _expect_error("absolute local path", report)
 
 
+def test_proof_runtime_shard_identity_fails_closed() -> None:
+    report = _report()
+    report["source_identities"]["proof_runtime"]["files"][2]["git_blob_sha1"] = "0" * 40
+    _expect_error("manifest digest", report)
+
+
 def main() -> int:
     checks = (
         test_exact_report_and_family_separation,
         test_negative_false_support_fails_closed,
         test_required_discovery_and_support_fail_closed,
         test_claim_and_path_leak_fail_closed,
+        test_proof_runtime_shard_identity_fails_closed,
     )
     for check in checks:
         check()

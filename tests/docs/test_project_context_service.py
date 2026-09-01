@@ -499,7 +499,7 @@ def test_russian_architecture_query_prefers_architecture_docs_over_feature_plans
 
     assert result.diagnostics["query_intent"] == "architecture"
     assert result.context_pack[0]["path"] == "ARCHITECTURE.md"
-    assert result.diagnostics["trust_decision"]["reason"] == "typed_evidence_contract_satisfied"
+    assert result.diagnostics["trust_decision"]["reason"] == "partial_navigational_context"
     assert result.diagnostics["trust_decision"]["query_terms_missing"] == []
 
 

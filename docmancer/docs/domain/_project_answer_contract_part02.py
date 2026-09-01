@@ -34,15 +34,17 @@ def _generic_behavior_qualifiers(
 
     subject_pattern = re.escape(subject).replace(r"\ ", r"[\s_]+")
     match = re.match(
-        rf"^\s*how\s+does\s+(?:the\s+)?{subject_pattern}\s+"
+        rf"^\s*(?:how|what)\s+does\s+(?:the\s+)?{subject_pattern}\s+"
         r"([A-Za-z][A-Za-z0-9_-]*)\s*(.*?)[?!.]*\s*$",
         question,
         re.I,
     )
-    if match is None or match.group(1).casefold() == "work":
+    if match is None or match.group(1).casefold() in {"do", "work"}:
         return None, None
     action = _clean_phrase(match.group(1)) or None
     target = _clean_phrase(match.group(2)) or None
+    if target and re.match(r"^(?:and|or)\b", target, re.I):
+        return None, None
     return action, target
 
 

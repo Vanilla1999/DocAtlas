@@ -252,19 +252,19 @@
     },
     {
       "answer_supported": false,
-      "assignment_count": 1,
+      "assignment_count": 0,
       "candidate_content_sha256": "26b6ded80e7603476322177b36d2476b7db494fc1d01bb702a053c6345aee245",
       "candidate_discovered": true,
       "candidate_source": "packages/orders/README.md",
-      "decision_hash": "4982288caefd0abaae59f0900649ae7682856ca2bbe76862d01bedf61e5e29eb",
+      "decision_hash": "476c8c698eacfda2a73642c7891828f854b6eafe31af35ac1e19d563200ad5a4",
       "family": "requirements",
       "id": "requirements_validation_conditions",
       "matched_discovery_terms": [
         "OrderValidationContract"
       ],
       "missing_requirement_ids": [
-        "project_answer:generic:1:exact_fact:27ad591647c77384",
-        "project_answer:generic:2:exact_fact:312cc75644ee2a8d"
+        "project_answer_requirement",
+        "unsupported_answer_authorization:unresolved_query"
       ],
       "negative_control": false,
       "planner": {
@@ -274,8 +274,8 @@
         "parse_trace": [
           "fallback:generic_project_terms"
         ],
-        "proof_obligation_count": 3,
-        "requirement_probe_count": 4,
+        "proof_obligation_count": 0,
+        "requirement_probe_count": 1,
         "retrieval_hints": [
           "OrderValidationContract",
           "conditions",
@@ -286,24 +286,26 @@
           "conditions",
           "required"
         ],
-        "unresolved_parts": []
+        "unresolved_parts": [
+          "unsupported_query:generic_free_form_relation"
+        ]
       },
       "proofability": {
-        "assignment_count": 1,
+        "assignment_count": 0,
         "candidate_count": 1,
-        "decision_hash": "4982288caefd0abaae59f0900649ae7682856ca2bbe76862d01bedf61e5e29eb",
+        "decision_hash": "476c8c698eacfda2a73642c7891828f854b6eafe31af35ac1e19d563200ad5a4",
         "documentation_issue": true,
         "eligible_count": 1,
         "missing_requirement_ids": [
-          "project_answer:generic:1:exact_fact:27ad591647c77384",
-          "project_answer:generic:2:exact_fact:312cc75644ee2a8d"
+          "project_answer_requirement",
+          "unsupported_answer_authorization:unresolved_query"
         ],
         "omission_counts": {},
         "origin": "source_documentation",
         "reason_codes": [
-          "mandatory_support_not_localized"
+          "mandatory_requirement_uncovered"
         ],
-        "recommended_doc_action": "add_explicit_proposition",
+        "recommended_doc_action": "document_missing_requirement",
         "schema_version": 1,
         "selected_count": 1,
         "status": "blocked"
@@ -311,10 +313,8 @@
       "question": "Which conditions are required by OrderValidationContract?",
       "require_discovery": true,
       "require_support": false,
-      "requirements_hash": "74a031f88dc259e6e2627b654aa19df9c5c1f44d49fb6558fa9858c42157eeb9",
-      "selected_evidence_ids": [
-        "p1.4:requirements_validation_conditions"
-      ],
+      "requirements_hash": "372a62d54253691c2f01aafa0a4b80f1d08289361db6181d15c4fc9fe28ec6da",
+      "selected_evidence_ids": [],
       "selected_sources": [
         "packages/orders/README.md"
       ],
@@ -323,11 +323,11 @@
     },
     {
       "answer_supported": false,
-      "assignment_count": 3,
+      "assignment_count": 0,
       "candidate_content_sha256": "f7c0c2a91e2909fcf59ed31284c24d07191d67c6a958f6cd103615e1c88c412a",
       "candidate_discovered": true,
       "candidate_source": "ARCHITECTURE.md",
-      "decision_hash": "339e41fb90d2974dfcfdb9794e8aa30b625cf057d731cb1971e34d3d713848b0",
+      "decision_hash": "1155e66c045a056c312848b0679cc887febd0412e7aae0aa9e6c4826281e1210",
       "family": "policy",
       "id": "policy_retry_count",
       "matched_discovery_terms": [
@@ -335,8 +335,8 @@
         "retry attempts"
       ],
       "missing_requirement_ids": [
-        "project_answer:generic:1:exact_fact:1369c34c1da03b28",
-        "project_answer:generic:4:exact_fact:b171c5360827db8d"
+        "project_answer_requirement",
+        "unsupported_answer_authorization:unresolved_query"
       ],
       "negative_control": false,
       "planner": {
@@ -344,8 +344,8 @@
         "parse_trace": [
           "fallback:generic_project_terms"
         ],
-        "proof_obligation_count": 5,
-        "requirement_probe_count": 6,
+        "proof_obligation_count": 0,
+        "requirement_probe_count": 1,
         "retrieval_hints": [
           "ProjectRetryPolicy",
           "many",
@@ -360,24 +360,26 @@
           "attempts",
           "allow"
         ],
-        "unresolved_parts": []
+        "unresolved_parts": [
+          "unsupported_query:generic_free_form_relation"
+        ]
       },
       "proofability": {
-        "assignment_count": 3,
+        "assignment_count": 0,
         "candidate_count": 1,
-        "decision_hash": "339e41fb90d2974dfcfdb9794e8aa30b625cf057d731cb1971e34d3d713848b0",
+        "decision_hash": "1155e66c045a056c312848b0679cc887febd0412e7aae0aa9e6c4826281e1210",
         "documentation_issue": true,
         "eligible_count": 1,
         "missing_requirement_ids": [
-          "project_answer:generic:1:exact_fact:1369c34c1da03b28",
-          "project_answer:generic:4:exact_fact:b171c5360827db8d"
+          "project_answer_requirement",
+          "unsupported_answer_authorization:unresolved_query"
         ],
         "omission_counts": {},
         "origin": "source_documentation",
         "reason_codes": [
-          "mandatory_support_not_localized"
+          "mandatory_requirement_uncovered"
         ],
-        "recommended_doc_action": "add_explicit_proposition",
+        "recommended_doc_action": "document_missing_requirement",
         "schema_version": 1,
         "selected_count": 1,
         "status": "blocked"
@@ -385,10 +387,8 @@
       "question": "How many retry attempts does ProjectRetryPolicy allow?",
       "require_discovery": true,
       "require_support": false,
-      "requirements_hash": "f5ee5cbac5204e32f19930598a32cbdfa38f760bb5deb1bde58176cf90bd5beb",
-      "selected_evidence_ids": [
-        "p1.4:policy_retry_count"
-      ],
+      "requirements_hash": "4dd1b6c58b6e38af258c60572456c9b3cca1d4b93c8a41774ced89de818eb1e8",
+      "selected_evidence_ids": [],
       "selected_sources": [
         "ARCHITECTURE.md"
       ],
@@ -396,19 +396,22 @@
       "support_status": "insufficient_evidence"
     },
     {
-      "answer_supported": true,
+      "answer_supported": false,
       "assignment_count": 1,
       "candidate_content_sha256": "f7c0c2a91e2909fcf59ed31284c24d07191d67c6a958f6cd103615e1c88c412a",
       "candidate_discovered": true,
       "candidate_source": "ARCHITECTURE.md",
-      "decision_hash": "1eb7571bdc00e8cb569760c6699b79e1b17deca8abc6f67de655cb9d6dcf2fac",
+      "decision_hash": "da46ce1814a78fb2a616bd144bfe7c57253c9e0f4cbe0df8f1aebcbbad0cfe56",
       "family": "policy",
       "id": "policy_retry_backoff",
       "matched_discovery_terms": [
         "ProjectRetryPolicy",
         "backoff"
       ],
-      "missing_requirement_ids": [],
+      "missing_requirement_ids": [
+        "context_only:contract_fact",
+        "unsupported_answer_authorization:context_only_relation"
+      ],
       "negative_control": false,
       "planner": {
         "concept_queries": [
@@ -429,11 +432,24 @@
         "unresolved_parts": []
       },
       "proofability": {
-        "documentation_issue": false,
-        "origin": "none",
-        "reason_codes": [],
+        "assignment_count": 1,
+        "candidate_count": 1,
+        "decision_hash": "da46ce1814a78fb2a616bd144bfe7c57253c9e0f4cbe0df8f1aebcbbad0cfe56",
+        "documentation_issue": true,
+        "eligible_count": 1,
+        "missing_requirement_ids": [
+          "context_only:contract_fact",
+          "unsupported_answer_authorization:context_only_relation"
+        ],
+        "omission_counts": {},
+        "origin": "source_documentation",
+        "reason_codes": [
+          "mandatory_requirement_uncovered"
+        ],
+        "recommended_doc_action": "document_missing_requirement",
         "schema_version": 1,
-        "status": "provable"
+        "selected_count": 1,
+        "status": "blocked"
       },
       "question": "What retry backoff does ProjectRetryPolicy require?",
       "require_discovery": true,
@@ -445,8 +461,8 @@
       "selected_sources": [
         "ARCHITECTURE.md"
       ],
-      "support_reason_code": null,
-      "support_status": "supported"
+      "support_reason_code": "required_evidence_missing",
+      "support_status": "insufficient_evidence"
     },
     {
       "answer_supported": false,
@@ -569,11 +585,11 @@
     },
     {
       "answer_supported": false,
-      "assignment_count": 2,
+      "assignment_count": 0,
       "candidate_content_sha256": "6f13aec3ccc8d596f1552421aa7f4e0f2f2738b6e9654eeab1621e4a07f704a1",
       "candidate_discovered": true,
       "candidate_source": "packages/orders/README.md",
-      "decision_hash": "53382012d8a8dee3c3d0e76358ed4f76c50dda1055004287c74436e3a9b1cf3d",
+      "decision_hash": "8bac63123acd7673a325e2a07365acc90a2bd8c529f02c951c6a25a97ca7bada",
       "family": "alias",
       "id": "alias_order_drafts",
       "matched_discovery_terms": [
@@ -581,8 +597,8 @@
         "draft orders"
       ],
       "missing_requirement_ids": [
-        "project_answer:generic:1:exact_fact:34d6c5e00ed7713a",
-        "project_answer:generic:2:exact_fact:f761a24e6ee6017e"
+        "project_answer_requirement",
+        "unsupported_answer_authorization:unresolved_query"
       ],
       "negative_control": false,
       "planner": {
@@ -590,8 +606,8 @@
         "parse_trace": [
           "fallback:generic_project_terms"
         ],
-        "proof_obligation_count": 4,
-        "requirement_probe_count": 4,
+        "proof_obligation_count": 0,
+        "requirement_probe_count": 0,
         "retrieval_hints": [
           "order",
           "drafts",
@@ -605,24 +621,26 @@
           "stored",
           "upload"
         ],
-        "unresolved_parts": []
+        "unresolved_parts": [
+          "unsupported_query:generic_free_form_relation"
+        ]
       },
       "proofability": {
-        "assignment_count": 2,
+        "assignment_count": 0,
         "candidate_count": 1,
-        "decision_hash": "53382012d8a8dee3c3d0e76358ed4f76c50dda1055004287c74436e3a9b1cf3d",
+        "decision_hash": "8bac63123acd7673a325e2a07365acc90a2bd8c529f02c951c6a25a97ca7bada",
         "documentation_issue": true,
         "eligible_count": 1,
         "missing_requirement_ids": [
-          "project_answer:generic:1:exact_fact:34d6c5e00ed7713a",
-          "project_answer:generic:2:exact_fact:f761a24e6ee6017e"
+          "project_answer_requirement",
+          "unsupported_answer_authorization:unresolved_query"
         ],
         "omission_counts": {},
         "origin": "source_documentation",
         "reason_codes": [
-          "mandatory_support_not_localized"
+          "mandatory_requirement_uncovered"
         ],
-        "recommended_doc_action": "add_explicit_proposition",
+        "recommended_doc_action": "document_missing_requirement",
         "schema_version": 1,
         "selected_count": 1,
         "status": "blocked"
@@ -630,10 +648,8 @@
       "question": "How are order drafts stored before upload?",
       "require_discovery": true,
       "require_support": false,
-      "requirements_hash": "f2a5b0bd6886902b44cab40fd8cbdc367d1e5ae5d1db5f16cd9899d7dc3da75b",
-      "selected_evidence_ids": [
-        "p1.4:alias_order_drafts"
-      ],
+      "requirements_hash": "2f08580cc78b613d203217d5767a64f08e44b906b3410c99e171280581d37fd8",
+      "selected_evidence_ids": [],
       "selected_sources": [
         "packages/orders/README.md"
       ],
@@ -646,7 +662,7 @@
       "candidate_content_sha256": "5a6583754d6ed2f7c294a4334f47ecacdb7087abe1116ec20d97d6373dbef32a",
       "candidate_discovered": true,
       "candidate_source": "ARCHITECTURE.md",
-      "decision_hash": "12ac8e582210eb86dd753542cc5a11fa7b19cfd4c4b5b666abc50b9a8ef35342",
+      "decision_hash": "f3989cb804e51f3812aef0b671804d8ccfc3ed3c869af263123f5e4b0a9399e9",
       "family": "alias",
       "id": "alias_project_retry_rule",
       "matched_discovery_terms": [
@@ -654,7 +670,9 @@
         "retries"
       ],
       "missing_requirement_ids": [
-        "project_answer:0:definition:24550fed0bb942af"
+        "context_only:definition",
+        "project_answer:0:definition:24550fed0bb942af",
+        "unsupported_answer_authorization:context_only_relation"
       ],
       "negative_control": false,
       "planner": {
@@ -677,11 +695,13 @@
       "proofability": {
         "assignment_count": 0,
         "candidate_count": 1,
-        "decision_hash": "12ac8e582210eb86dd753542cc5a11fa7b19cfd4c4b5b666abc50b9a8ef35342",
+        "decision_hash": "f3989cb804e51f3812aef0b671804d8ccfc3ed3c869af263123f5e4b0a9399e9",
         "documentation_issue": true,
         "eligible_count": 1,
         "missing_requirement_ids": [
-          "project_answer:0:definition:24550fed0bb942af"
+          "context_only:definition",
+          "project_answer:0:definition:24550fed0bb942af",
+          "unsupported_answer_authorization:context_only_relation"
         ],
         "omission_counts": {},
         "origin": "source_documentation",
@@ -880,7 +900,7 @@
       "required_support_passed": 0
     },
     "policy": {
-      "answer_supported": 1,
+      "answer_supported": 0,
       "candidate_discovered": 2,
       "case_count": 2,
       "negative_false_support": 0,
@@ -914,20 +934,94 @@
   "schema_version": 1,
   "source_identities": {
     "planner": {
-      "git_blob_sha1": "92c0879c3f80d3ab7f12e61474c0793cc9863c76",
+      "git_blob_sha1": "d6c9b67f48e0c22af51040e2ed5f8581c7a70906",
       "path": "docmancer/docs/domain/project_answer_contract.py"
+    },
+    "proof_runtime": {
+      "algorithm": "ordered-git-blob-sha1-manifest-v1",
+      "files": [
+        {
+          "git_blob_sha1": "8f658f454cc68528cc857d5aec3e0be602cabef3",
+          "path": "docmancer/docs/application/_evidence_selection_part01.py"
+        },
+        {
+          "git_blob_sha1": "1145e3745b835d000b4d9d0a193565bd82c08f23",
+          "path": "docmancer/docs/application/_evidence_selection_part02.py"
+        },
+        {
+          "git_blob_sha1": "75af1de57d88d8148aa637609dea54cb16873bca",
+          "path": "docmancer/docs/application/_evidence_selection_part03.py"
+        },
+        {
+          "git_blob_sha1": "2ef6b0a4a31e24344dd1cea58f89ff5609a9d031",
+          "path": "docmancer/docs/application/_evidence_selection_part04.py"
+        },
+        {
+          "git_blob_sha1": "73f710ae9d1c3c808d89add38629d44d56dd76a1",
+          "path": "docmancer/docs/application/_evidence_selection_shared.py"
+        },
+        {
+          "git_blob_sha1": "3ce21090afc44dc12b5e52a243aac6e4e21d8b3f",
+          "path": "docmancer/docs/application/evidence_candidates.py"
+        },
+        {
+          "git_blob_sha1": "ccf4398b49ae46ebaffe850fbb81b7ce16a28f6b",
+          "path": "docmancer/docs/application/evidence_models.py"
+        },
+        {
+          "git_blob_sha1": "a1021ce32721b71d76a542b5814a17908b6e26cb",
+          "path": "docmancer/docs/application/evidence_requirements.py"
+        },
+        {
+          "git_blob_sha1": "68cb3e222d860e7bdf2b0435129b70fa6793836d",
+          "path": "docmancer/docs/application/evidence_selection.py"
+        },
+        {
+          "git_blob_sha1": "34514a4930ec01f37f9a36fc5824cb9ee3c400e1",
+          "path": "docmancer/docs/application/proofability.py"
+        },
+        {
+          "git_blob_sha1": "1598d1d6b56a079bfdcc0452939c628aa694638b",
+          "path": "docmancer/docs/domain/_answer_units_part01.py"
+        },
+        {
+          "git_blob_sha1": "ba47b10f1435f40cd54741d64f8f5f4866aff196",
+          "path": "docmancer/docs/domain/_answer_units_part02.py"
+        },
+        {
+          "git_blob_sha1": "47d8146f7d3f9caadf3156ec40d6f663d8601d5d",
+          "path": "docmancer/docs/domain/_answer_units_shared.py"
+        },
+        {
+          "git_blob_sha1": "79e239974d34725a07889d0bebb84e6a606476b6",
+          "path": "docmancer/docs/domain/_project_answer_contract_part01.py"
+        },
+        {
+          "git_blob_sha1": "e592bb8aba66d2c8c27e4526a96019ae9224b4d1",
+          "path": "docmancer/docs/domain/_project_answer_contract_part02.py"
+        },
+        {
+          "git_blob_sha1": "a61ec61149c110b919f97ccc912911af5eac0598",
+          "path": "docmancer/docs/domain/_project_answer_contract_shared.py"
+        },
+        {
+          "git_blob_sha1": "8c439e456a377f2fb0aaf2af8f6d55e3f81f5445",
+          "path": "docmancer/docs/domain/answer_units.py"
+        },
+        {
+          "git_blob_sha1": "d6c9b67f48e0c22af51040e2ed5f8581c7a70906",
+          "path": "docmancer/docs/domain/project_answer_contract.py"
+        }
+      ],
+      "sha256": "765594745cdf4179cdfa391cabb2f159259cd597c50a816149e1d85230133c2c"
     },
     "protocol": {
       "git_blob_sha1": "43cd3b77175205d72092ab768907b6f82259a0a6",
       "path": "eval/agent_developer_v1/paraphrase_protocol.json"
-    },
-    "selector": {
-      "git_blob_sha1": "68cb3e222d860e7bdf2b0435129b70fa6793836d",
-      "path": "docmancer/docs/application/evidence_selection.py"
     }
   },
   "summary": {
-    "answer_supported": 6,
+    "answer_supported": 5,
     "candidate_discovered": 10,
     "case_count": 14,
     "false_supported_negative_controls": 0,
