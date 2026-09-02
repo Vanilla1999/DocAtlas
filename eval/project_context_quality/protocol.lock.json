@@ -1,7 +1,7 @@
 {
-  "schema_version": "project-chat-context7-protocol-v1",
+  "schema_version": "project-context-quality-protocol-v1",
   "case_file": "cases.json",
-  "case_file_sha256": "2a3b156c24c77b85f01e33931c0b263ce76e07611bc8c0604938be92278e7a75",
+  "case_file_sha256": "347bfb1522dc7f92f7b09de00fef1490af38182eaa920c79bbe43c3920241aad",
   "case_count": 16,
   "case_ids": [
     "ru-install",

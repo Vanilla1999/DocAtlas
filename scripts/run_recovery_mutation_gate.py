@@ -41,8 +41,8 @@ MUTANTS = (
     (
         "exact-document-fallback-disabled",
         "docmancer/docs/application/_project_docs_service_part03.py",
-        'if (\n            evidence_path\n            and not chunks\n            and current_by_path.get(normalize_doc_path(evidence_path))\n        ):',
-        'if (\n            False\n            and evidence_path\n            and not chunks\n            and current_by_path.get(normalize_doc_path(evidence_path))\n        ):',
+        'if (\n            evidence_path\n            and current_by_path.get(normalize_doc_path(evidence_path))\n        ):',
+        'if (\n            False\n            and evidence_path\n            and current_by_path.get(normalize_doc_path(evidence_path))\n        ):',
     ),
 )
 

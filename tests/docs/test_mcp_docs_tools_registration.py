@@ -621,10 +621,14 @@ def test_mcp_exposes_three_public_tools_with_mutually_exclusive_guidance():
     assert {"output_mode", "delivery_strategy", "packet_tokens"}.isdisjoint(
         context_properties
     )
-    assert "ambiguous names fail closed" in context_properties["module"]["description"]
+    assert set(context_properties) == {
+        "question", "lookup_queries", "project_path", "library", "version",
+        "module_path", "scope",
+    }
     assert "always implies module scope" in context_properties["module_path"]["description"]
     assert "repo-level docs only" in context_properties["scope"]["description"]
-    assert "project-pinned dependency docs" in context_properties["mode"]["description"]
+    assert "original request unchanged" in context_tool["description"]
+    assert "never authorize an answer or edit" in context_tool["description"]
     output_properties = context_tool["outputSchema"]["properties"]
     assert output_properties["module_candidates"]["maxItems"] == 8
     assert output_properties["module_candidates"]["items"]["required"] == ["module_path"]

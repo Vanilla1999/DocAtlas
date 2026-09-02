@@ -14,14 +14,10 @@ def test_get_docs_context_schema():
     assert schema["required"] == ["question"]
     assert {"allow_network", "force_refresh", "prefetch_auto", "prepare_project_docs"}.isdisjoint(schema["properties"])
     assert set(schema["properties"]) == {
-        "question", "project_path", "library", "libraries", "ecosystem",
-        "version", "source_type", "docs_url", "module", "module_path",
-        "scope", "mode", "lookup_queries",
+        "question", "project_path", "library", "version", "module_path",
+        "scope", "lookup_queries",
     }
     assert schema["properties"]["scope"]["enum"] == ["project", "module", "all"]
-    assert schema["properties"]["mode"]["enum"] == [
-        "auto", "project", "library", "dependency", "mixed",
-    ]
 
 
 def test_get_docs_context_output_schema_accepts_only_current_statuses():
@@ -32,6 +28,64 @@ def test_get_docs_context_output_schema_accepts_only_current_statuses():
 
     with pytest.raises(jsonschema.ValidationError):
         jsonschema.validate({"status": "success"}, tool["outputSchema"])
+
+
+def test_project_read_uses_docs_context_even_for_certifiable_question():
+    class Facade:
+        def get_docs_context(self, question, **kwargs):
+            return {
+                "status": "success",
+                "mode_selected": "project",
+                "answer_available": True,
+                "documentation_query_plan": {
+                    "original_question": question,
+                    "queries": [{
+                        "query_id": "query-original",
+                        "text": question,
+                        "origin": "original",
+                        "coverage_required": True,
+                    }],
+                },
+                "context_pack": [{
+                    "source_class": "project_doc",
+                    "path": "docs/mcp-docs-server.md",
+                    "content": (
+                        "Use `prepare_docs` with action `sync_project_docs` to "
+                        "synchronize project documentation after file changes."
+                    ),
+                    "project_identity": "git:example/project",
+                    "authority": "source_of_truth",
+                    "doc_scope": "project",
+                    "lifecycle_status": "active",
+                    "freshness": "current",
+                    "index_freshness": "synchronized",
+                    "risk_flags": [],
+                    "retrieval_query_matches": {
+                        "query-original": {
+                            "qualified": True,
+                            "mode": "and",
+                            "query_text": question,
+                        },
+                    },
+                }],
+            }
+
+    result = handle_context_tool(
+        "get_docs_context",
+        {
+            "question": "Which command syncs project docs after file changes?",
+            "project_path": "/repo",
+        },
+        cast(Any, Facade()),
+    )
+
+    assert result["status"] == "ok"
+    assert result["kind"] == "docs_context"
+    assert result["support_status"] == "retrieval_only"
+    assert result["answer_supported"] is False
+    assert result["answer_available"] is False
+    assert result["context_available"] is True
+    assert result["edit_ready"] is False
 
 
 def test_multi_library_context_requires_every_library_support_decision():
@@ -157,7 +211,7 @@ def test_missing_kotlin_corpus_uses_prepare_docs_through_real_application_bounda
 
     payload = call_docs_tool_payload(
         "get_docs_context",
-        {"question": "coroutines", "library": "kotlin", "ecosystem": "kotlin", "version": "1.8.1"},
+        {"question": "coroutines", "library": "kotlin", "version": "1.8.1"},
         UnifiedDocsContextService(Facade()),
     )
 
@@ -168,7 +222,6 @@ def test_missing_kotlin_corpus_uses_prepare_docs_through_real_application_bounda
         "action": "prefetch_library_docs",
         "library": "kotlin",
         "question": "coroutines",
-        "ecosystem": "kotlin",
         "version": "1.8.1",
     }
 

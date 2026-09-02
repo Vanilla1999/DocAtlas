@@ -7,7 +7,7 @@ def test_project_context_service_returns_selected_project_and_dependency_section
     result = ProjectContextService(facade).get_project_context("/repo", "use go_router", tokens=1200, limit=3, allow_network=True)
 
     assert result.status == "success"
-    assert result.tool == "get_project_context"
+    assert result.tool == "get_docs_context"
     assert {item["source_class"] for item in result.context_pack} == {"project_doc", "dependency_doc"}
     dependency_item = next(item for item in result.context_pack if item["source_class"] == "dependency_doc")
     assert dependency_item["source"]["source_class"] == "dependency_doc"
@@ -22,7 +22,11 @@ def test_project_context_service_returns_selected_project_and_dependency_section
     project_call = next(call for call in facade.calls if call[0] == "project")
     assert project_call[:3] == ("project", "/repo", "use go_router")
     assert project_call[3]["requirements"] is result.requirements
-    assert {key: value for key, value in project_call[3].items() if key != "requirements"} == {
+    assert project_call[3]["documentation_query_plan"].original_question == "use go_router"
+    assert {
+        key: value for key, value in project_call[3].items()
+        if key not in {"requirements", "documentation_query_plan"}
+    } == {
         "tokens": 1200, "limit": 12, "expand": None, "module": None,
         "module_path": None, "scope": None,
     }

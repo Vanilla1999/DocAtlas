@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Provider-free and optional live gate for Context7-style project chat."""
+"""Provider-free and optional live gate for project context quality."""
 from __future__ import annotations
 
 import argparse
@@ -13,21 +13,21 @@ from docmancer.docs.domain.project_answer_contract import build_project_answer_c
 from docmancer.docs.domain.project_retrieval_intent import build_project_retrieval_aliases
 
 ROOT = Path(__file__).resolve().parents[1]
-CASES_PATH = ROOT / "eval/project_chat_context7_v1/cases.json"
-LOCK_PATH = ROOT / "eval/project_chat_context7_v1/protocol.lock.json"
+CASES_PATH = ROOT / "eval/project_context_quality/cases.json"
+LOCK_PATH = ROOT / "eval/project_context_quality/protocol.lock.json"
 
 
 def load_cases() -> tuple[dict[str, Any], ...]:
     raw = CASES_PATH.read_bytes()
     payload = json.loads(raw.decode("utf-8"))
     lock = json.loads(LOCK_PATH.read_text(encoding="utf-8"))
-    if payload.get("schema_version") != "project-chat-context7-corpus-v1":
-        raise ValueError("unsupported project-chat Context7 corpus schema")
-    if lock.get("schema_version") != "project-chat-context7-protocol-v1":
-        raise ValueError("unsupported project-chat Context7 protocol lock")
+    if payload.get("schema_version") != "project-context-quality-corpus-v1":
+        raise ValueError("unsupported project context quality corpus schema")
+    if lock.get("schema_version") != "project-context-quality-protocol-v1":
+        raise ValueError("unsupported project context quality protocol lock")
     digest = hashlib.sha256(raw).hexdigest()
     if lock.get("case_file_sha256") != digest:
-        raise ValueError("project-chat Context7 corpus hash does not match protocol lock")
+        raise ValueError("project context quality corpus hash does not match protocol lock")
     rows = tuple(dict(item) for item in payload.get("cases") or ())
     ids = [str(item.get("id") or "") for item in rows]
     if (
@@ -36,7 +36,7 @@ def load_cases() -> tuple[dict[str, Any], ...]:
         or len(set(ids)) != len(ids)
         or not all(ids)
     ):
-        raise ValueError("Context7-style project-chat corpus inventory mismatch")
+        raise ValueError("project context quality corpus inventory mismatch")
     return rows
 
 
@@ -78,7 +78,7 @@ def run_contract() -> dict[str, Any]:
             "passed": passed,
         })
     report = {
-        "schema_version": "project-chat-context7-contract-result-v1",
+        "schema_version": "project-context-quality-contract-result-v1",
         "case_count": len(results),
         "passed_count": sum(row["passed"] for row in results),
         "results": results,

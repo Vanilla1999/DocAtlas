@@ -13,7 +13,6 @@ from docmancer.docs.application.model_visible_projection import (
     project_docs_answer,
     project_insufficient,
     project_patch_context,
-    projection_kind,
     sanitized_projection_manifest,
     validate_model_visible_projection,
 )

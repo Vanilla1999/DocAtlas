@@ -188,12 +188,11 @@ def test_broad_behavior_and_usage_facets_are_context_only_even_when_locally_prov
         requirements=requirements,
     )
 
-    assert {
-        (item.obligation_kind, item.subject)
-        for item in requirements if item.kind == "proof_obligation"
-    } == {("behavior", "docs_status"), ("usage", "docs_status")}
+    assert not [item for item in requirements if item.kind == "proof_obligation"]
     assert complete.support_decision.answer_supported is False
-    assert "unsupported_answer_authorization:context_only_relation" in complete.missing_requirements
+    assert all(
+        item.startswith("unresolved:") for item in complete.missing_requirements
+    )
     assert incomplete.support_decision.answer_supported is False
 
 

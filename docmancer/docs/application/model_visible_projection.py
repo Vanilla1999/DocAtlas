@@ -26,7 +26,6 @@ from docmancer.docs.application.evidence_selection import (
     validate_assignment_binding,
 )
 from docmancer.docs.domain.answer_units import materialize_answer_units
-from docmancer.docs.domain.request_intent import model_projection_kind
 from docmancer.docs.application.insufficient_projection import (
     apply_terminal_insufficient_projection,
     bounded_missing_value,
@@ -141,12 +140,6 @@ def decode_support_envelope(value: Any) -> dict[str, Any]:
     if set(decoded) != set(SUPPORT_ENVELOPE_KEYS):
         raise ValueError("incomplete support envelope payload")
     return decoded
-
-
-def projection_kind(question: str) -> str:
-    """Classify explicit change requests without treating how-to questions as edits."""
-
-    return model_projection_kind(question)
 
 
 def _unit_materialized_item(

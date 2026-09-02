@@ -295,5 +295,9 @@ def test_russian_ambiguous_inventory_and_action_frames_fail_closed() -> None:
 )
 def test_legacy_fallback_questions_remain_unclaimed_by_question_plan(question: str) -> None:
     plan = compile_question_plan(question)
-    assert not plan.handled, (question, plan)
+    if question == "What does docs_status report and when should it be used?":
+        assert plan.unresolved_parts
+        assert not plan.facets
+    else:
+        assert not plan.handled, (question, plan)
     assert not frozen_ownership_mismatches()

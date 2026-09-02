@@ -319,7 +319,13 @@ def build_query_plan(
     requested_lanes: tuple[str, ...] = ("lexical",),
     requirements: Any | None = None,
 ) -> QueryPlan:
-    exact_terms = _requirement_exact_terms(requirements) if requirements is not None else extract_exact_terms(query)
+    requirement_terms = (
+        _requirement_exact_terms(requirements) if requirements is not None else ()
+    )
+    exact_terms = tuple({
+        term.normalized_value: term
+        for term in (*requirement_terms, *extract_exact_terms(query))
+    }.values())[:MAX_EXACT_TERMS]
     concepts = _concept_queries(query, exact_terms)[:MAX_CONCEPT_QUERIES]
     filter_spec = _filter_spec(filters)
     executed_filters_hash = canonical_hash(_canonical_filter_value(filters or {}))

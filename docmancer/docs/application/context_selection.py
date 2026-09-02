@@ -30,6 +30,17 @@ def context_selection_decision(
     )
 
 
+def select_context_candidates(priority_groups: Iterable[Iterable[Iterable[Any]]]) -> list[Any]:
+    """Give each query lane one opportunity before taking second candidates."""
+    lanes = [list(lane) for group in priority_groups for lane in group if lane]
+    selected: list[Any] = []
+    while any(lanes):
+        for lane in lanes:
+            if lane:
+                selected.append(lane.pop(0))
+    return selected
+
+
 def qualified_query_ids(sources: Iterable[Mapping[str, Any]]) -> set[str]:
     qualified: set[str] = set()
     for source in sources:
@@ -125,5 +136,6 @@ __all__ = [
     "context_selection_decision",
     "merge_query_matches",
     "qualified_query_ids",
+    "select_context_candidates",
     "validate_context_selection_payload",
 ]

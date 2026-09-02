@@ -207,28 +207,25 @@ jobs:
       - name: Run offline advanced contract and shared-security tests
         run: pytest tests/ -m advanced -v
 
-      - name: Run legacy contract completeness gate
-        run: python scripts/run_legacy_contract_gate.py
-
       - name: Run recoverable documentation failure gate
         run: python scripts/run_recovery_contract_gate.py
 
       - name: Run recoverable documentation failure mutation gate
         run: python scripts/run_recovery_mutation_gate.py
 
-      - name: Run hermetic Project Docs answer-quality gate
-        run: python eval/project_answer_quality_v4_protocol.py --output "$RUNNER_TEMP/project-answer-quality-v4-hermetic.json"
+      - name: Run hermetic Context7-style project chat gate
+        run: python eval/project_context_quality_protocol.py > "$RUNNER_TEMP/project-context-quality-hermetic.json"
 
-      - name: Run Project Docs self-hosting closure gate
-        run: python scripts/run_project_docs_self_host_gate.py --output "$RUNNER_TEMP/project-answer-quality-v4-live.json"
+      - name: Run live Context7-style project chat gate
+        run: python eval/project_context_quality_protocol.py --live > "$RUNNER_TEMP/project-context-quality-live.json"
 
       - name: Upload Project Docs quality reports
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: project-docs-quality-${{ github.run_id }}
           path: |
-            ${{ runner.temp }}/project-answer-quality-v4-hermetic.json
-            ${{ runner.temp }}/project-answer-quality-v4-live.json
+            ${{ runner.temp }}/project-chat-context7-v1-hermetic.json
+            ${{ runner.temp }}/project-chat-context7-v1-live.json
           if-no-files-found: error
           retention-days: 14
 

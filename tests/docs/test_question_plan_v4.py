@@ -61,8 +61,6 @@ def test_question_plan_splits_compound_questions_into_mandatory_facets():
     )
     assert [(query.text, query.origin) for query in retrieval_plan.queries] == [
         ("What are the public tools and when should each tool be used?", "original"),
-        ("What are the public tools", "auto_clause"),
-        ("when should each tool be used", "auto_clause"),
     ]
 
     contract, rows = _rows("What is the release checklist and what gates block release?")
@@ -607,18 +605,18 @@ def test_new_probing_paraphrases_have_locally_provable_units():
         ),
     ).valid is True
 
-    _contract, rows = _rows("How do I run the project answer quality v4 protocol?")
-    validation_only = _unit(
-        "python eval/project_answer_quality_v4_protocol.py --validate-protocol"
+    _contract, rows = _rows("How do I run the project context quality protocol?")
+    obsolete_command = _unit(
+        "python eval/project_context_answer_protocol.py"
     )
     full_run = _unit(
-        "python eval/project_answer_quality_v4_protocol.py --output /tmp/project-answer-quality-v4.json"
+        "python eval/project_context_quality_protocol.py"
     )
     source = {
-        "title": "Project answer quality protocol v4",
-        "path": "eval/project_answer_quality_v4/README.md",
+        "title": "Project context quality protocol",
+        "path": "eval/project_context_quality/README.md",
     }
-    assert local_proof_for_obligation(rows[0], validation_only, source=source).valid is False
+    assert local_proof_for_obligation(rows[0], obsolete_command, source=source).valid is False
     assert local_proof_for_obligation(rows[0], full_run, source=source).valid is True
 
 

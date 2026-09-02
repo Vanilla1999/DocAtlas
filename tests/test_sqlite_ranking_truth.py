@@ -151,3 +151,31 @@ def test_or_fallback_requires_exact_terms_and_half_the_query(tmp_path):
     assert trace["match_ratio"] == 0.5
     assert trace["missing_exact_terms"] == ["telegram"]
     assert trace["qualified"] is False
+
+
+def test_exact_filename_qualification_uses_the_same_corpus_as_fts(tmp_path):
+    requested = _doc(
+        "docatlas.project-docs.yaml",
+        "Project documentation catalog",
+        "Registered project documentation entries.",
+    )
+    similar = _doc(
+        "docatlas.docs.yaml",
+        "External documentation catalog",
+        "Registered external documentation entries.",
+    )
+    store = _store(tmp_path, [similar, requested])
+
+    results = store.query("docatlas.project-docs.yaml", limit=2, budget=2_000)
+
+    assert results
+    assert results[0].source == "docatlas.project-docs.yaml"
+    assert results[0].metadata["lexical_match"]["exact_terms"] == [
+        "docatlas.project-docs.yaml",
+    ]
+    assert results[0].metadata["lexical_match"]["qualified"] is True
+    assert all(
+        result.metadata["lexical_match"]["qualified"] is False
+        for result in results
+        if result.source == "docatlas.docs.yaml"
+    )

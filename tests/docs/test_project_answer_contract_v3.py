@@ -5,6 +5,7 @@ from docmancer.docs.domain.answer_units import AnswerUnit, local_proof_for_oblig
 from docmancer.docs.domain.project_answer_contract import (
     PROJECT_ANSWER_CONTRACT_SCHEMA,
     PROJECT_ANSWER_CONTRACT_SCHEMA_V2,
+    ProofObligation,
     build_project_answer_contract,
     can_authorize_docs_answer,
 )
@@ -118,3 +119,18 @@ def test_named_behavior_preserves_requested_operation_qualifier():
     assert local_proof_for_obligation(
         obligation, _unit("OrderSubmission returns a submission ID."),
     ).valid is True
+
+
+def test_filesystem_path_tokens_cannot_supply_behavior_subject_predicate_or_value():
+    obligation = ProofObligation(
+        obligation_id="behavior:docatlas",
+        kind="behavior",
+        subject="DocAtlas",
+    )
+
+    proof = local_proof_for_obligation(
+        obligation,
+        _unit("Call logs are written to ~/.docatlas/mcp/calls.jsonl."),
+    )
+
+    assert proof.valid is False

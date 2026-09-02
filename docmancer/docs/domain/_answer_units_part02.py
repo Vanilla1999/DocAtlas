@@ -17,6 +17,18 @@ from ._answer_units_part01 import (
     _word_distance,
 )
 
+_CERTIFICATION_PATH_RE = re.compile(
+    r"(?<![A-Za-z0-9_])(?:~|\.{0,2})?/(?:[^\s`'\"<>]+)|"
+    r"(?<![A-Za-z0-9_])(?:[A-Za-z]:\\)(?:[^\s`'\"<>]+)",
+)
+
+
+def _certification_semantic_text(text: str) -> str:
+    """Exclude filesystem identity from semantic proof without hiding context."""
+
+    return _CERTIFICATION_PATH_RE.sub(" ", text)
+
+
 def _attribute_aliases(attribute: str | None) -> tuple[str, ...]:
     normalized = _normal(attribute)
     aliases = {
@@ -422,7 +434,8 @@ def local_proof_for_obligation(
 ) -> LocalProof:
     """Validate one obligation against exactly one model-visible answer unit."""
 
-    text = unit.text
+    raw_text = unit.text
+    text = _certification_semantic_text(raw_text)
     source = source or {}
     source_text = "\n".join(str(source.get(key) or "") for key in (
         "path", "source", "title", "heading_path", "project_identity", "module_id",
@@ -570,6 +583,7 @@ def local_proof_for_obligation(
         return LocalProof(valid, 3 if expected_present else 0, relation, 3 if call_shape else 0, relation + (3 if expected_present else 0) + (3 if call_shape else 0), "command" if valid else "command_operation_not_locally_bound")
 
     if obligation.kind == "location":
+        text = raw_text
         if unit.source_field not in {"path_or_url", "path", "source_path"}:
             return LocalProof(False, reason="location_requires_source_field")
         source_identity_text = source_text + "\n" + text

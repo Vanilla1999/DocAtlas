@@ -51,15 +51,14 @@ class LiveCase:
 
 def _load_gold_cases() -> tuple[LiveCase, ...]:
     payload = json.loads(
-        (REPO_ROOT / "eval/project_chat_quality_v1/onboarding_cases.json").read_text(
+        (REPO_ROOT / "eval/project_context_quality/cases.json").read_text(
             encoding="utf-8"
         )
     )
     return tuple(
         LiveCase(
             question=str(case["question"]),
-            relevant_paths=tuple(str(value) for value in case.get("acceptable_sources") or ()),
-            surface_case_id=index,
+            relevant_paths=tuple(str(value) for value in case.get("sources") or ()),
             expected_kind=str(case["expected_kind"]),
             required_facts_by_path=tuple(
                 (str(item["source"]), str(item["text"]))
@@ -72,7 +71,7 @@ def _load_gold_cases() -> tuple[LiveCase, ...]:
                 str(value) for value in case.get("forbidden_answer_fragments") or ()
             ),
         )
-        for index, case in enumerate(payload.get("cases") or (), 1)
+        for case in payload.get("cases") or () if case.get("intent")
     )
 
 
@@ -236,7 +235,6 @@ def run(
                 {
                     "question": preflight_question,
                     "project_path": str(REPO_ROOT),
-                    "mode": "project",
                 },
                 service,
             )
@@ -260,7 +258,6 @@ def run(
                     {
                         "question": question,
                         "project_path": str(REPO_ROOT),
-                        "mode": "project",
                     },
                     service,
                 )
@@ -384,7 +381,7 @@ def run(
             for question in negative_cases:
                 payload = call_docs_tool_payload(
                     "get_docs_context",
-                    {"question": question, "project_path": str(REPO_ROOT), "mode": "project"},
+                    {"question": question, "project_path": str(REPO_ROOT)},
                     service,
                 )
                 if not payload or payload.get("status") != "insufficient_evidence":

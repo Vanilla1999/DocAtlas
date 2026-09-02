@@ -330,23 +330,12 @@ def test_get_project_context_diagnostics_preserve_query_intent_and_active_index(
         tokens=1200,
         limit=5,
     )
-    compact = handle_project_tool(
-        "get_project_context",
-        {"project_path": str(project), "question": "Where is ContextDiagnosticsNeedle documented?", "tokens": 1200, "limit": 5},
-        service,
-    )
-
     assert result.answer_available is False
     assert result.context_pack
     assert result.reason == "partial_navigational_context"
     assert result.diagnostics["query_intent"]
     assert result.diagnostics["active_index"]["project_path"] == str(project.resolve())
     assert result.diagnostics["active_index"]["db_path"] == str((tmp_path / "docmancer.db").resolve())
-    assert compact is not None
-    assert compact["diagnostics"]["query_intent"] == result.diagnostics["query_intent"]
-    assert compact["diagnostics"]["active_index"]["db_path"] == str((tmp_path / "docmancer.db").resolve())
-
-
 def test_get_project_context_answers_dart_symbol_docs_with_snippet_evidence(tmp_path, monkeypatch):
     project = _flutter_project(tmp_path)
     (project / "lib" / "src").mkdir(parents=True)
@@ -565,7 +554,7 @@ def test_bootstrap_project_docs_ingests_existing_docs_and_returns_ready(tmp_path
     assert result.ingest_result is None
     assert result.sync_result is not None
     assert result.sync_result.status == "success"
-    assert result.next_action == {"type": "get_project_context", "tool": "get_project_context"}
+    assert result.next_action is None
     assert result.requires_confirmation is False
     assert result.arguments_patch == {"project_path": str(project.resolve()), "question": "How is the app organized?"}
 
@@ -711,7 +700,7 @@ def test_query_project_docs_runs_lookup_queries_as_retrieval_only_supplements(tm
     assert observed.count("retrieval lifecycle") == 1
     assert len(chunks) == 1
     assert chunks[0].metadata["retrieval_query_ids"] == (
-        "query-lookup-1", "query-lookup-2", "query-original",
+        "query-original", "query-lookup-1", "query-lookup-2",
     )
 
 

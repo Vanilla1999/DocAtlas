@@ -834,7 +834,7 @@ def _combine_clause_plans(
             unresolved_parts=tuple(dict.fromkeys(unresolved)),
             parse_trace=("fail_closed:unresolved_compound",),
         )
-    return None
+    return _unresolved_compound(clause_texts, trace="fail_closed:unresolved_compound")
 
 
 def _prefix_plan_is_owned(plan: QuestionPlan) -> bool:

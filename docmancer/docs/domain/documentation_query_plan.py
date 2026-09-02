@@ -10,6 +10,7 @@ from docmancer.docs.domain.project_retrieval_intent import (
     build_project_retrieval_aliases,
     project_retrieval_disposition,
 )
+from docmancer.retrieval.query_planning import extract_exact_terms
 
 
 @dataclass(frozen=True, slots=True)
@@ -60,38 +61,36 @@ def build_documentation_query_plan(
 ) -> DocumentationQueryPlan:
     retrieval_aliases = build_project_retrieval_aliases(question)
     force_context_only = (
-        project_retrieval_disposition(question) == "context_only"
+        project_retrieval_disposition(question) == "broad_context"
         and any(alias.force_context_only for alias in retrieval_aliases)
     )
-    mandatory = (() if force_context_only else tuple(
-        item for item in requirements or ()
-        if getattr(item, "mandatory", False)
-        and getattr(item, "kind", "") == "proof_obligation"
-    )[:4])
     queries = [DocumentationLookup(
         "query-original", question.strip(), "original",
-        not bool(mandatory) and not force_context_only,
+        not force_context_only,
     )]
-    for index, requirement in enumerate(mandatory, start=1):
-        text = _facet_query(requirement)
-        requirement_id = str(getattr(requirement, "requirement_id", "") or "")
-        if not text or not requirement_id:
+    seen = {query.text.casefold() for query in queries}
+    if explicit_path and explicit_path.casefold() not in seen:
+        queries.append(DocumentationLookup(
+            "query-path-1", explicit_path, "exact_path", False,
+        ))
+        seen.add(explicit_path.casefold())
+    for index, anchor in enumerate(technical_anchors(question), start=1):
+        if anchor.casefold() in seen:
             continue
         queries.append(DocumentationLookup(
-            f"query-facet-{index}", text, "mandatory_facet", True,
-            f"facet-{index}", requirement_id,
+            f"query-anchor-{index}", anchor, "exact_anchor", False,
         ))
-    relation_claim = _relation_claim_query(question)
-    if relation_claim and relation_claim.casefold() not in {
-        query.text.casefold() for query in queries
-    }:
+        seen.add(anchor.casefold())
+    for index, text in enumerate(lookup_queries[:5], start=1):
+        cleaned = text.strip()
+        if not cleaned or cleaned.casefold() in seen:
+            continue
         queries.append(DocumentationLookup(
-            "query-clause-relation", relation_claim, "auto_clause", True,
-            "facet-relation-claim",
+            f"query-lookup-{index}", cleaned, "host_lookup", False,
         ))
-    seen_aliases = {query.text.casefold() for query in queries}
+        seen.add(cleaned.casefold())
     for index, alias in enumerate(retrieval_aliases, start=1):
-        if alias.text.casefold() in seen_aliases:
+        if alias.text.casefold() in seen:
             continue
         queries.append(DocumentationLookup(
             f"query-intent-{index}", alias.text, "canonical_intent", False,
@@ -100,26 +99,7 @@ def build_documentation_query_plan(
                 if alias.force_context_only else f"intent:{alias.intent_id}"
             ),
         ))
-        seen_aliases.add(alias.text.casefold())
-    queries.extend(
-        DocumentationLookup(
-            f"query-lookup-{index}", text.strip(), "host_lookup", False,
-        )
-        for index, text in enumerate(lookup_queries[:5], start=1)
-        if text.strip()
-    )
-    seen = {query.text.casefold() for query in queries}
-    clauses = split_question_clauses(question)
-    if len(clauses) > 1 and not mandatory:
-        for clause in clauses:
-            text = clause.strip()
-            if not text or text.casefold() in seen or len(queries) >= 5:
-                continue
-            queries.append(DocumentationLookup(
-                f"query-clause-{len(queries)}", text, "auto_clause", True,
-                f"facet-clause-{len(queries)}",
-            ))
-            seen.add(text.casefold())
+        seen.add(alias.text.casefold())
     normalized = re.sub(r"[^a-z0-9]+", " ", question.casefold()).strip()
     concept_queries = (
         (
@@ -168,8 +148,6 @@ def build_documentation_query_plan(
         ))
         optional_count += 1
         seen.add(text.casefold())
-    if explicit_path:
-        queries.append(DocumentationLookup("query-path-1", explicit_path, "exact_path"))
     return DocumentationQueryPlan(
         original_question=question,
         queries=tuple(queries),
@@ -180,25 +158,27 @@ def build_documentation_query_plan(
     )
 
 
-def _facet_query(requirement: object) -> str:
-    values = (
-        getattr(requirement, "subject", None),
-        getattr(requirement, "attribute", None) or getattr(requirement, "relation", None),
-        getattr(requirement, "obligation_target", None),
-        getattr(requirement, "context", None),
-        getattr(requirement, "query_span_text", None),
-    )
-    return " ".join(dict.fromkeys(
-        str(value).strip() for value in values if str(value or "").strip()
-    ))[:500]
-
-
 _SOURCE_RELATION_QUESTION_RE = re.compile(
     r"^\s*(?:does|do|is|are)\s+.+?\s+"
     r"(?:prove|proves|define|defines|document|documents|establish|establishes)\s+"
     r"(?P<claim>.+?)\s*[?.!]*$",
     re.I,
 )
+
+_STANDALONE_TECHNICAL_RE = re.compile(
+    r"(?<![\w/])(?:~?/|\.{1,2}/)?(?:[A-Za-z0-9_.-]+/)*"
+    r"[A-Za-z0-9_-]+(?:\.[A-Za-z0-9_-]+)+(?![\w/])"
+    r"|\b[a-z][a-z0-9]*(?:_[a-z0-9]+)+\b"
+)
+
+
+def technical_anchors(question: str) -> tuple[str, ...]:
+    values = [match.group(0) for match in _STANDALONE_TECHNICAL_RE.finditer(question)]
+    values.extend(
+        term.value for term in extract_exact_terms(question)
+        if not any(term.value in value for value in values)
+    )
+    return tuple(dict.fromkeys(value for value in values if value))[:12]
 
 
 def _relation_claim_query(question: str) -> str | None:
@@ -213,4 +193,5 @@ __all__ = [
     "DocumentationLookup",
     "DocumentationQueryPlan",
     "build_documentation_query_plan",
+    "technical_anchors",
 ]

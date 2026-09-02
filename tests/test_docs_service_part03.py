@@ -93,13 +93,14 @@ roots:
     )
 
     assert payload is not None
-    assert payload["status"] == "insufficient_evidence"
+    assert payload["status"] == "ok"
+    assert payload["kind"] == "docs_context"
     assert payload["answer_supported"] is False
     assert payload["edit_ready"] is False
-    assert "sources" not in payload
-    assert payload["missing"] == [
-        "No safe, current, project-scoped documentation context was retrieved."
-    ]
+    assert all(
+        source["path_or_url"] != "docs/note-00.md"
+        for source in payload["sources"]
+    )
 
     dispatcher_payload = handle_context_tool(
         "get_docs_context",
@@ -115,7 +116,8 @@ roots:
         service,
     )
     assert dispatcher_payload is not None
-    assert dispatcher_payload["status"] == "insufficient_evidence"
+    assert dispatcher_payload["status"] == "ok"
+    assert dispatcher_payload["kind"] == "docs_context"
     assert dispatcher_payload["answer_supported"] is False
     assert dispatcher_payload["edit_ready"] is False
 
@@ -215,7 +217,7 @@ roots:
     )
     assert isolated is not None
     assert isolated["status"] == "insufficient_evidence"
-    assert isolated["kind"] == "docs_answer"
+    assert isolated["kind"] == "docs_context"
     assert isolated["answer_supported"] is False
     assert isolated.get("sources") in (None, [])
     assert all(
@@ -426,7 +428,7 @@ def test_get_project_context_returns_trust_contract_for_project_docs(tmp_path, m
     result = service.get_project_context(str(project), "ProjectContextAnswer ADR", tokens=1200, limit=3)
 
     assert result.status == "success"
-    assert result.tool == "get_project_context"
+    assert result.tool == "get_docs_context"
     assert result.project_docs is not None
     assert result.project_docs.results
     assert result.context_pack[0]["source_class"] == "project_doc"
@@ -487,9 +489,13 @@ def test_get_project_context_before_ingest_returns_actionable_remediation(tmp_pa
     assert result.answer_available is False
     assert result.project_docs is not None
     assert result.project_docs.reason_code == "project_docs_found_not_indexed"
-    assert result.next_actions[0]["tool"] == "sync_project_docs"
-    assert result.next_actions[0]["arguments_patch"] == {"project_path": str(project.resolve()), "with_vectors": False}
-    assert result.trust_contract["next_actions"][0]["tool"] == "sync_project_docs"
+    assert result.next_actions[0]["tool"] == "prepare_docs"
+    assert result.next_actions[0]["arguments_patch"] == {
+        "action": "sync_project_docs",
+        "project_path": str(project.resolve()),
+        "with_vectors": False,
+    }
+    assert result.trust_contract["next_actions"][0]["tool"] == "prepare_docs"
     assert "not indexed" in (result.message or "")
 
 
@@ -580,9 +586,10 @@ def test_public_context_fails_closed_when_flutter_dependency_docs_are_missing(tm
         service,
     )
 
-    assert payload["status"] == "insufficient_evidence"
+    assert payload["status"] == "ok"
+    assert payload["kind"] == "docs_context"
+    assert payload["answer_supported"] is False
     assert "answer" not in payload
-    assert payload["missing"]
 
 
 def test_get_project_context_includes_snippet_object_when_metadata_has_code(tmp_path, monkeypatch):
@@ -733,13 +740,18 @@ def test_get_project_docs_returns_sync_next_action_when_candidates_not_indexed(t
     assert result.answer_available is False
     assert result.reason == "project_docs_not_indexed"
     assert result.reason_code == "project_docs_found_not_indexed"
-    assert result.next_action == {"type": "sync_project_docs", "tool": "sync_project_docs"}
+    assert result.next_action["tool"] == "prepare_docs"
+    assert result.next_action["arguments_patch"]["action"] == "sync_project_docs"
     assert result.requires_confirmation is False
     assert result.arguments_patch == {"project_path": str(project.resolve()), "with_vectors": False}
     assert result.results == []
     assert result.candidate_sources[0]["path"] == "README.md"
-    assert result.next_actions[0]["tool"] == "sync_project_docs"
-    assert result.next_actions[0]["arguments_patch"] == {"project_path": str(project.resolve()), "with_vectors": False}
+    assert result.next_actions[0]["tool"] == "prepare_docs"
+    assert result.next_actions[0]["arguments_patch"] == {
+        "action": "sync_project_docs",
+        "project_path": str(project.resolve()),
+        "with_vectors": False,
+    }
 
 
 def test_get_project_docs_distinguishes_indexed_no_results_from_not_indexed(tmp_path, monkeypatch):

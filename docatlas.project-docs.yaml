@@ -96,53 +96,30 @@ documents:
     status: active
     impact: search_only
 
-  - path: eval/project_answer_quality_v1/README.md
-    role: development
-    scope: project
-    description: Provider-free project-answer quality protocol, execution command, metrics, and contamination gate.
-    authority: source_of_truth
-    status: active
-    impact: search_only
-
-  - path: eval/project_answer_quality_v2/README.md
-    role: development
-    scope: project
-    description: Frozen project-answer v2 protocol and production-path failure classes.
-    authority: source_of_truth
-    status: active
-    impact: search_only
-
-  - path: eval/project_answer_quality_v3/README.md
-    role: development
-    scope: project
-    description: Frozen project-answer v3 protocol for technical terms and operational questions.
-    authority: source_of_truth
-    status: active
-    impact: search_only
-
-  - path: eval/project_answer_quality_v4/README.md
-    role: development
-    scope: project
-    description: QuestionPlan safety protocol covering fail-closed parsing, compound facets, proof specificity, and paraphrase invariants.
-    authority: source_of_truth
-    status: active
-    impact: search_only
-
-  - path: eval/project_chat_quality_v1/README.md
-    role: development
-    scope: project
-    description: Novel adversarial project-chat gate for false support, predicate specificity, closed inventories, and contamination.
-    authority: source_of_truth
-    status: active
-    impact: search_only
-
-  - path: eval/project_chat_context7_v1/README.md
+  - path: eval/project_context_quality/README.md
     role: development
     scope: project
     description: RU/EN retrieval-first project-chat corpus and public-path gate.
     authority: source_of_truth
     status: active
     impact: search_only
+
+  - path: docs/adr/0003-context-first-project-reads.md
+    role: development
+    scope: project
+    description: Decision record for retrieval-only project reads, host synthesis, and the three-tool public MCP surface.
+    authority: source_of_truth
+    status: active
+    impact: track
+
+  - path: docs/modules/project-context-retrieval.md
+    role: development
+    scope: module
+    module_path: docmancer/docs/application
+    description: Project context retrieval bounded context, application allocation, infrastructure port, and MCP invariants.
+    authority: source_of_truth
+    status: active
+    impact: track
 
   - path: eval/project_answer_surface_v1/README.md
     role: development

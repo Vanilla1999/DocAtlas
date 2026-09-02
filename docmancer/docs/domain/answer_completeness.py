@@ -199,7 +199,7 @@ def evaluate_project_answer_completeness(
     answer_available: bool,
     intent: Any,
 ) -> dict[str, Any]:
-    """Return a backward-compatible completeness contract for get_project_context."""
+    """Return the internal project-context completeness contract."""
 
     explicit_requirements = extract_project_answer_requirements(question)
     requirements = explicit_requirements or extract_query_relevance_terms(question, intent=intent)

@@ -1,12 +1,12 @@
 # Evidence selection module
 
-`EvidenceSelection` is the project-document proof module that assigns retrieved answer units to mandatory requirements and authorizes support only when every required facet is locally proven.
+`EvidenceSelection` assigns retrieved answer units to mandatory requirements and authorizes certified library, dependency, or mixed answers only when every required facet is locally proven.
 
 `ProjectAnswerRequirementContract` is the input boundary emitted by question planning and consumed unchanged by evidence selection.
 
 ## Responsibility
 
-The evidence-selection module turns retrieved project-document candidates into an auditable support decision. Its implementation boundary is `docmancer/docs/application/evidence_selection.py`, `evidence_candidates.py`, `evidence_models.py`, `evidence_requirements.py`, and the private selection shards.
+The evidence-selection module turns bounded candidates into an auditable certification decision. Project-only reads bypass answer certification and use `ContextSelectionDecision`, which reports retrieval coverage without a support verdict.
 
 Candidate normalization, requirement compilation, proof matching, ranking, budget fitting, and projection identity are separate responsibilities even though they cooperate in one pipeline.
 

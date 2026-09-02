@@ -3,6 +3,8 @@ from __future__ import annotations
 
 from ._project_docs_service_shared import *  # noqa: F401,F403
 from docmancer.core.models import RetrievedChunk
+from docmancer.docs.application.context_selection import select_context_candidates
+from docmancer.docs.domain.documentation_query_plan import DocumentationQueryPlan
 
 
 _EXACT_DOCUMENT_FALLBACK_LIMIT = 12
@@ -82,6 +84,8 @@ def _exact_document_index_chunks(
             display_text,
         )).casefold()
         hit_count = sum(term in searchable for term in terms)
+        if terms and hit_count == 0:
+            continue
         metadata = {**source_metadata}
         metadata.update({
             "project_doc_path": row_path,
@@ -105,6 +109,8 @@ def _exact_document_index_chunks(
             ),
             "title": row.get("title"),
             "anchor": row.get("anchor"),
+            "line_start": row.get("line_start"),
+            "line_end": row.get("line_end"),
             "token_estimate": int(row.get("token_estimate") or 0),
             "stable_chunk_id": row.get("stable_chunk_id"),
             "parent_logical_id": row.get("parent_logical_id"),
@@ -134,11 +140,21 @@ def _tag_retrieval_query(
     for chunk in chunks:
         metadata = dict(chunk.metadata or {})
         trace = dict(metadata.get("lexical_match") or {})
+        exact_path_match = bool(metadata.get("exact_path_match"))
+        if query_id.startswith("query-path-") and query_text:
+            candidate_path = str(
+                metadata.get("project_doc_path")
+                or metadata.get("path")
+                or chunk.source
+            )
+            exact_path_match = (
+                normalize_doc_path(candidate_path) == normalize_doc_path(query_text)
+            )
         # Retrieval is candidate generation. Only a lexical relevance trace or
         # an explicitly resolved exact path may qualify model-visible context.
         # A future dense qualification path must carry calibrated provenance
         # from the dispatcher; this layer must not infer it from rank alone.
-        trace.setdefault("qualified", bool(metadata.get("exact_path_match")))
+        trace["qualified"] = bool(trace.get("qualified") or exact_path_match)
         trace.setdefault("lexical_score", float(chunk.score))
         if query_text:
             trace.setdefault("query_text", query_text)
@@ -168,6 +184,7 @@ class _ProjectDocsServicePart03:
         evidence_path: str | None = None,
         requirements: Any | None = None,
         lookup_queries: tuple[str, ...] = (),
+        documentation_query_plan: DocumentationQueryPlan | None = None,
     ):
         root = validate_project_path(project_path).path
         answer_lifecycle_intent = str(
@@ -194,14 +211,14 @@ class _ProjectDocsServicePart03:
             effective_limit = max(effective_limit, 20)
         budget = tokens or DEFAULT_DOC_TOKENS
         effective_expand = (expand or "none") if requirements is not None else expand
-        documentation_query_plan = build_documentation_query_plan(
+        documentation_query_plan = documentation_query_plan or build_documentation_query_plan(
             query, lookup_queries=lookup_queries, explicit_path=evidence_path,
             requirements=requirements,
         )
         lookup_query_ids = {
             item.text: item.query_id
             for item in documentation_query_plan.queries
-            if item.origin in {"mandatory_facet", "host_lookup", "auto_clause", "canonical_intent", "concept_alias", "retrieval_hint"}
+            if item.origin in {"exact_anchor", "exact_path", "host_lookup", "canonical_intent", "concept_alias", "retrieval_hint"}
         }
         exact_path_query_id = next((
             item.query_id for item in documentation_query_plan.queries
@@ -232,7 +249,7 @@ class _ProjectDocsServicePart03:
         ))[:4]
         planned_lookup_queries = tuple(
             item.text for item in documentation_query_plan.queries
-            if item.origin in {"mandatory_facet", "host_lookup", "auto_clause", "canonical_intent", "concept_alias", "retrieval_hint"}
+            if item.origin in {"exact_anchor", "exact_path", "host_lookup", "canonical_intent", "concept_alias", "retrieval_hint"}
         )
         supplemental_queries = tuple(dict.fromkeys((
             *planned_lookup_queries,
@@ -299,7 +316,7 @@ class _ProjectDocsServicePart03:
             query_filters=filters,
         )
         chunks = _tag_retrieval_query(chunks, "query-original", query)
-        chunks = _tag_retrieval_query(chunks, exact_path_query_id)
+        chunks = _tag_retrieval_query(chunks, exact_path_query_id, evidence_path)
         authoritative_chunks = _run(
             query,
             query_limit=max(effective_limit, 20),
@@ -310,42 +327,41 @@ class _ProjectDocsServicePart03:
         authoritative_chunks = _tag_retrieval_query(
             authoritative_chunks, "query-original", query,
         )
-        authoritative_chunks = _tag_retrieval_query(authoritative_chunks, exact_path_query_id)
-        supplemental_chunks = [
-            chunk
-            for supplemental_query in supplemental_queries
-            for chunk in _tag_retrieval_query(
+        authoritative_chunks = _tag_retrieval_query(
+            authoritative_chunks, exact_path_query_id, evidence_path,
+        )
+        supplemental_chunks_by_query = {
+            supplemental_query: _tag_retrieval_query(
                 _run(
-                supplemental_query,
-                query_limit=4,
-                query_budget=supplemental_budget,
-                query_expand="none",
-                query_filters=filters,
+                    supplemental_query,
+                    query_limit=4,
+                    query_budget=supplemental_budget,
+                    query_expand="none",
+                    query_filters=filters,
                 ),
                 lookup_query_ids.get(supplemental_query),
                 supplemental_query,
             )
-        ]
-
-        # Compositional QuestionPlan queries need candidate diversity before
-        # proof selection.  Do not let an authority-only lane consume the
-        # entire bounded pool before the original question or obligation probes
-        # can contribute candidates.  Legacy v1-v3 queries retain their frozen
-        # ordering and hashes.
-        if requirements is not None and getattr(requirements, "parse_trace", ()):
-            lanes = [list(chunks), list(supplemental_chunks), list(authoritative_chunks)]
-            candidates = []
-            while any(lanes):
-                for lane in lanes:
-                    if lane:
-                        candidates.append(lane.pop(0))
-        else:
-            candidates = [*supplemental_chunks, *authoritative_chunks, *chunks]
-            candidates.sort(
-                key=lambda chunk: not bool(
-                    (chunk.metadata or {}).get("retrieval_query_ids")
-                )
-            )
+            for supplemental_query in supplemental_queries
+        }
+        queries_by_origin: dict[str, list[list[Any]]] = {}
+        for item in documentation_query_plan.queries:
+            lane = supplemental_chunks_by_query.get(item.text)
+            if lane:
+                queries_by_origin.setdefault(item.origin, []).append(lane)
+        candidates = select_context_candidates([
+            [
+                *queries_by_origin.get("exact_path", []),
+                *queries_by_origin.get("exact_anchor", []),
+            ],
+            [[*authoritative_chunks, *chunks]],
+            queries_by_origin.get("host_lookup", []),
+            [
+                *queries_by_origin.get("canonical_intent", []),
+                *queries_by_origin.get("concept_alias", []),
+                *queries_by_origin.get("retrieval_hint", []),
+            ],
+        ])
         selected = []
         seen: set[tuple[str, int]] = set()
         token_total = 0
@@ -406,6 +422,7 @@ class _ProjectDocsServicePart03:
         evidence_path: str | None = None,
         requirements: Any | None = None,
         lookup_queries: tuple[str, ...] = (),
+        documentation_query_plan: DocumentationQueryPlan | None = None,
     ) -> ProjectDocsResult:
         root = validate_project_path(project_path).path
         if hasattr(self.facade, "_project_get_project_docs_impl"):
@@ -417,6 +434,8 @@ class _ProjectDocsServicePart03:
                 kwargs["requirements"] = requirements
             if lookup_queries:
                 kwargs["lookup_queries"] = lookup_queries
+            if documentation_query_plan is not None:
+                kwargs["documentation_query_plan"] = documentation_query_plan
             if evidence_path:
                 kwargs["evidence_path"] = evidence_path
             return self.facade._project_get_project_docs_impl(str(root), query, **kwargs)
@@ -609,9 +628,12 @@ class _ProjectDocsServicePart03:
                 warnings=metadata.warnings,
                 candidate_sources=candidate_sources,
                 next_actions=[{
-                    "tool": "sync_project_docs",
+                    "tool": "prepare_docs",
                     "requires_confirmation": False,
-                    "arguments_patch": self._project_sync_arguments(root),
+                    "arguments_patch": {
+                        "action": "sync_project_docs",
+                        **self._project_sync_arguments(root),
+                    },
                     "reason": "Project docs candidates were discovered but have not been indexed; reconcile the index.",
                 }],
                 message="Project docs candidates exist but are not indexed. Run sync_project_docs, then retry get_project_docs.",
@@ -622,6 +644,7 @@ class _ProjectDocsServicePart03:
             scope=query_scope, module_path=resolved_module_path, evidence_path=evidence_path,
             requirements=requirements,
             lookup_queries=lookup_queries,
+            documentation_query_plan=documentation_query_plan,
         )
         current_by_path = {
             normalize_doc_path(item.get("path")): item
@@ -631,19 +654,25 @@ class _ProjectDocsServicePart03:
         exact_document_fallback_used = False
         if (
             evidence_path
-            and not chunks
             and current_by_path.get(normalize_doc_path(evidence_path))
         ):
             exact_source = current_by_path[normalize_doc_path(evidence_path)]
-            chunks = _exact_document_index_chunks(
+            exact_chunks = _exact_document_index_chunks(
                 self._agent_instance(),
                 root=root,
                 evidence_path=str(exact_source.get("path") or evidence_path),
                 indexed_source=str(exact_source.get("source") or ""),
                 requirements=requirements,
             )
-            chunks = _tag_retrieval_query(chunks, "query-path-1")
-            exact_document_fallback_used = bool(chunks)
+            exact_query_id = next((
+                item.query_id for item in (documentation_query_plan.queries if documentation_query_plan else ())
+                if item.origin == "exact_path"
+            ), "query-path-1")
+            exact_chunks = _tag_retrieval_query(
+                exact_chunks, exact_query_id, evidence_path,
+            )
+            chunks = [*exact_chunks, *chunks]
+            exact_document_fallback_used = bool(exact_chunks)
         safe_chunks = []
         dropped_placeholder_chunks = 0
         answer_lifecycle_intent = str(

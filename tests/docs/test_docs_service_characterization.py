@@ -204,7 +204,7 @@ def test_characterization_get_project_context_returns_context_pack_and_trust_con
     result = service.get_project_context(str(project), "ContextNeedle", tokens=1200, limit=3)
 
     assert result.status == "success"
-    assert result.tool == "get_project_context"
+    assert result.tool == "get_docs_context"
     assert result.context_pack
     assert result.context_pack[0]["source_class"] == "project_doc"
     assert result.trust_contract["schema_version"] == "trust-contract-1.2"

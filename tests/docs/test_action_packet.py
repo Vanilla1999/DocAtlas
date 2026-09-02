@@ -1,7 +1,7 @@
 """Split test module; helpers live in _shared_test_action_packet.py."""
 from tests.docs import _shared_test_action_packet as _shared
 globals().update({k: v for k, v in vars(_shared).items() if not k.startswith("__")})
-from docmancer.docs.domain.request_intent import model_projection_kind
+from docmancer.docs.domain.request_intent import is_change_request
 from docmancer.docs.domain.patch_request_plan import build_patch_request_plan
 
 
@@ -27,7 +27,7 @@ PERMISSION_PATCH_QUERY = (
     ],
 )
 def test_every_routed_change_request_has_mutation_intent(question):
-    assert model_projection_kind(question) == "patch_context"
+    assert is_change_request(question) is True
     assert build_mutation_intent(question).operation == "none"
 
 
@@ -158,7 +158,7 @@ def test_unique_source_path_alias_resolves_but_ambiguous_alias_does_not():
 def test_documentation_governance_meta_question_is_not_mutation_intent():
     question = "What documentation governs changes to FooHandler?"
 
-    assert model_projection_kind(question) == "docs_answer"
+    assert is_change_request(question) is False
     assert build_mutation_intent(question).operation == "none"
 
 def test_post_format_sufficiency_fails_closed_when_public_fact_is_not_rendered():
@@ -541,9 +541,8 @@ def test_public_mcp_errors_are_bounded_and_match_the_advertised_schema():
 def test_bounded_direct_is_one_existing_tool_call_and_returns_only_action_packet():
     tool = next(item for item in TOOLS if item["name"] == "get_docs_context")
     assert set(tool["inputSchema"]["properties"]) == {
-        "question", "project_path", "library", "libraries", "ecosystem",
-        "version", "source_type", "docs_url", "module", "module_path",
-        "scope", "mode", "lookup_queries",
+        "question", "project_path", "library", "version", "module_path",
+        "scope", "lookup_queries",
     }
     assert "delivery_strategy" not in tool["inputSchema"]["properties"]
     assert tool["outputSchema"]["properties"]["kind"]["enum"] == [

@@ -23,7 +23,6 @@ from docmancer.docs.application.model_visible_projection import (
 from docmancer.docs.domain.project_doc_ranking import (
     project_question_lane,
     project_source_lane,
-    source_lane_allowed,
 )
 
 
@@ -82,6 +81,9 @@ def project_docs_context(
     public_query_ids = _public_query_ids(query_plan)
     public_query_id_set = set(public_query_ids)
     host_query_ids = _query_ids_for_origins(query_plan, {"host_lookup"})
+    exact_anchor_query_ids = _query_ids_for_origins(
+        query_plan, {"exact_anchor", "exact_path"},
+    )
     canonical_intent_query_ids = _query_ids_for_origins(
         query_plan, {"canonical_intent"},
     )
@@ -93,10 +95,18 @@ def project_docs_context(
         and item.get("query_id")
     }
     original_question = str(query_plan.get("original_question") or "")
+    explicit_paths = {
+        _normalized_path(value) for value in query_plan.get("explicit_paths") or ()
+        if str(value).strip()
+    }
     candidates = _facet_aware_candidates(
         list(retrieval.get("context_pack") or ()),
         query_text=query_text,
-        required_query_ids=set() if broad_context_only else required_query_id_set,
+        required_query_ids=(
+            exact_anchor_query_ids | host_query_ids
+            if broad_context_only
+            else required_query_id_set | exact_anchor_query_ids | host_query_ids
+        ),
         assigned_evidence_ids=set(assigned_evidence_by_requirement.values()),
     )
     selected_host_lookup = False
@@ -104,13 +114,8 @@ def project_docs_context(
     for original in candidates:
         if not isinstance(original, dict):
             continue
+        original = dict(original)
         if str(original.get("source_class") or "") != "project_doc":
-            continue
-        if not source_lane_allowed(
-            str(original.get("path") or original.get("source") or ""),
-            original_question,
-            impact_policy=str(original.get("impact_policy") or "") or None,
-        ):
             continue
         if str(original.get("lifecycle_status") or "active") != "active":
             continue
@@ -123,6 +128,18 @@ def project_docs_context(
         project_identity = str(original.get("project_identity") or "").strip()
         if not project_identity:
             continue
+        if explicit_paths and _normalized_path(
+            original.get("path") or original.get("source") or ""
+        ) in explicit_paths:
+            matches = merge_query_matches(original.get("retrieval_query_matches"))
+            for query_id in exact_anchor_query_ids:
+                if query_id.startswith("query-path-"):
+                    matches[query_id] = {
+                        "qualified": True,
+                        "mode": "exact_path",
+                        "query_text": query_text.get(query_id, ""),
+                    }
+            original["retrieval_query_matches"] = matches
         qualified_ids = qualified_query_ids((original,))
         if not qualified_ids:
             continue
@@ -132,13 +149,15 @@ def project_docs_context(
         required_ids = qualified_ids & required_query_id_set
         original_hit = "query-original" in qualified_ids
         host_ids = qualified_ids & host_query_ids
+        exact_anchor_ids = qualified_ids & exact_anchor_query_ids
         canonical_intent_ids = qualified_ids & canonical_intent_query_ids
         relation_claim_ids = qualified_ids & relation_claim_query_ids
-        if not required_ids and not original_hit and not host_ids and not canonical_intent_ids:
+        if not required_ids and not exact_anchor_ids and not original_hit and not host_ids and not canonical_intent_ids:
             continue
         if (
             broad_context_only
             and not required_ids
+            and not exact_anchor_ids
             and not original_hit
             and not host_ids
             and not canonical_intent_ids
@@ -274,32 +293,6 @@ def project_docs_context(
         _refresh_estimate(projection)
         return projection, {}
     decision = context_selection_decision(sources, public_query_ids)
-    covered_query_ids = set(decision.covered_query_ids)
-    context_fallback_ids = (
-        canonical_intent_query_ids | host_query_ids | relation_claim_query_ids
-    )
-    if broad_context_only:
-        context_fallback_ids.add("query-original")
-    if (
-        required_query_ids
-        and not (covered_query_ids & required_query_id_set)
-        and not (broad_context_only and covered_query_ids & context_fallback_ids)
-    ):
-        projection = project_insufficient(
-            kind="docs_context",
-            missing=["No required documentation facet was retrieved."],
-            recommended_next_action=None,
-            max_tokens=min(INSUFFICIENT_EVIDENCE_MAX_TOKENS, max_tokens),
-        )
-        projection.update({
-            "answer_supported": False,
-            "answer_available": False,
-            "support_status": "insufficient_evidence",
-            "context_available": False,
-            "edit_ready": False,
-        })
-        _refresh_estimate(projection)
-        return projection, {}
     payload = _payload(sources, decision=decision, query_plan=query_plan)
     snapshot = {
         source["evidence_id"]: _snapshot_entry(
@@ -328,8 +321,12 @@ def _query_ids_for_origins(
     }
 
 
+def _normalized_path(value: Any) -> str:
+    return str(value or "").replace("\\", "/").removeprefix("./").casefold()
+
+
 def _public_query_ids(query_plan: dict[str, Any]) -> tuple[str, ...]:
-    visible_origins = {"original", "mandatory_facet", "host_lookup", "auto_clause", "canonical_intent", "exact_path"}
+    visible_origins = {"original", "host_lookup", "canonical_intent", "exact_anchor", "exact_path"}
     values = [
         str(item.get("query_id") or "")
         for item in query_plan.get("queries") or ()

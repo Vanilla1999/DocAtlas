@@ -1,6 +1,6 @@
 # ADR 0002: Retrieve project documentation before certifying an answer
 
-- Status: accepted
+- Status: superseded by ADR 0003
 - Date: 2026-08-30
 
 ## Context

@@ -1,5 +1,5 @@
 {
-  "schema_version": "project-chat-context7-corpus-v1",
+  "schema_version": "project-context-quality-corpus-v1",
   "cases": [
     {
       "id": "ru-install",
@@ -157,7 +157,7 @@
       "question": "Какая команда запускает Docs MCP сервер?",
       "pair": "Which command starts the Docs MCP server?",
       "intent": "docs_mcp_server_command",
-      "expected_kind": "docs_answer",
+      "expected_kind": "docs_context",
       "sources": [
         "README.md",
         "docs/mcp-docs-server.md",

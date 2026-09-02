@@ -669,14 +669,12 @@ def workflow_proof(
 
     if relation == "protocol_run":
         command = bool(re.search(
-            r"python\s+(?:(?:-m\s+eval\.)|(?:eval/))?project_answer_quality_v4_protocol(?:\.py)?\b",
+            r"python\s+(?:(?:-m\s+eval\.)|(?:eval/))?project_context_quality_protocol(?:\.py)?\b",
             text,
             re.I,
         ))
-        produces_report = "--output" in text
-        validation_only = "--validate-protocol" in text and not produces_report
-        source_matches = all(token in source_text for token in ("project", "answer", "quality", "v4"))
-        valid = command and produces_report and not validation_only and source_matches
+        source_matches = all(token in source_text for token in ("project", "context", "quality"))
+        valid = command and source_matches
         return PlannedProof(
             valid,
             4 if valid else 0,

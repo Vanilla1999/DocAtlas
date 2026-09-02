@@ -37,7 +37,6 @@ PROJECT_TOOL_NAMES = {
     "sync_project_docs",
     "bootstrap_project_docs",
     "get_project_docs",
-    "get_project_context",
     "get_code_context",
     "get_patch_plan_context",
     "get_patch_constraints",
@@ -538,7 +537,6 @@ def _compact_bootstrap_project_docs(result: dict[str, Any]) -> dict[str, Any]:
 
 def handle_project_tool(name: str, args: dict[str, Any], service: LibraryDocsService) -> dict[str, Any] | None:
     project_docs_app = getattr(service, "project_docs", service)
-    project_context_app = getattr(service, "project_context", service)
     patch_plan_context_app = getattr(service, "patch_plan_context", service)
     patch_constraints_app = getattr(service, "patch_constraints", service)
     patch_validation_app = getattr(service, "patch_constraint_validation", service)
@@ -561,13 +559,6 @@ def handle_project_tool(name: str, args: dict[str, Any], service: LibraryDocsSer
             return _bad_request("empty_query", "query must not be empty")
         result = asdict(project_docs_app.get_project_docs(args["project_path"], query, tokens=_bounded_int_arg(args, "tokens", max_value=_MCP_MAX_TOKENS), limit=_bounded_int_arg(args, "limit", default=None, max_value=_MCP_MAX_PROJECT_LIMIT), expand=args.get("expand"), module=args.get("module"), module_path=args.get("module_path"), scope=args.get("scope")))
         return _compact_mcp_payload(_compact_project_docs(result))
-    if name == "get_project_context":
-        question = _clean_string(args.get("question"))
-        if not question:
-            return _bad_request("empty_question", "question must not be empty")
-        result = asdict(project_context_app.get_project_context(args["project_path"], question, tokens=_bounded_int_arg(args, "tokens", max_value=_MCP_MAX_TOKENS), limit=_bounded_int_arg(args, "limit", default=None, max_value=_MCP_MAX_PROJECT_LIMIT), expand=args.get("expand"), library=args.get("library"), libraries=args.get("libraries"), ecosystem=args.get("ecosystem"), version=args.get("version"), module=args.get("module"), module_path=args.get("module_path"), scope=args.get("scope"), mode=args.get("mode") or "auto", response_style=args.get("response_style"), allow_network=bool(args.get("allow_network") or False)))
-        payload = _compact_mcp_payload(_answer_project_context(result))
-        return _strip_mcp_debug_noise(payload)
     if name == "get_code_context":
         question = _clean_string(args.get("question"))
         if not question:

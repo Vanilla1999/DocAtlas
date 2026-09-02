@@ -79,7 +79,7 @@ jobs:
       - name: Run production-path contracts
         run: |
           pytest tests/ -m advanced -q
-          python scripts/run_legacy_contract_gate.py
+          python eval/project_context_quality_protocol.py
           python scripts/run_recovery_contract_gate.py
           python scripts/run_recovery_mutation_gate.py
           python scripts/run_project_docs_self_host_gate.py

@@ -3,7 +3,6 @@ from __future__ import annotations
 import pytest
 
 from docmancer.docs.application.docs_context_projection import project_docs_context
-from docmancer.docs.interfaces.mcp.docs_context_routing import docs_context_fallback_allowed
 from docmancer.docs.domain.documentation_query_plan import build_documentation_query_plan
 from docmancer.docs.domain.project_answer_contract import (
     build_project_answer_contract,
@@ -108,21 +107,13 @@ def test_broad_intent_suppresses_mandatory_proof_queries_for_retrieval():
     assert original.coverage_required is False
     assert any(item.facet_id == "intent-context:getting_started" for item in canonical)
 
-
-@pytest.mark.parametrize(
-    "raw",
-    [
-        {"mode_selected": "project", "status": "success", "hard_stop": True},
-        {"mode_selected": "project", "status": "success", "requires_confirmation": True},
-        {"mode_selected": "project", "status": "failed"},
-    ],
-)
-def test_context_only_intent_cannot_bypass_operational_or_hard_stop(raw: dict):
-    assert docs_context_fallback_allowed(
-        raw=raw,
-        args={"project_path": "/project"},
-        recovery=None,
-    ) is False
+    technical = build_documentation_query_plan(
+        "Compare docatlas.project-docs.yaml with docatlas.docs.yaml via get_docs_context"
+    )
+    anchors = [item.text for item in technical.queries if item.origin == "exact_anchor"]
+    assert anchors == [
+        "docatlas.project-docs.yaml", "docatlas.docs.yaml", "get_docs_context",
+    ]
 
 
 def test_canonical_intent_can_carry_bounded_context_without_answer_proof():
@@ -260,16 +251,16 @@ def test_certified_answer_preservation_requires_a_complete_question_contract():
 @pytest.mark.parametrize(
     ("question", "expected"),
     [
-        ("What is OrdersDraftStore?", "strict_answer"),
-        ("What is Storage?", "context_only"),
-        ("What markers are available?", "context_only"),
-        ("What test markers are available?", "strict_answer"),
+        ("What is OrdersDraftStore?", "typed_context"),
+        ("What is Storage?", "broad_context"),
+        ("What markers are available?", "broad_context"),
+        ("What test markers are available?", "typed_context"),
         ("Which imaginary contract governs this repository?", "fail_closed"),
         ("How many attempts does ProjectRetryPolicy allow?", "fail_closed"),
-        ("Does README prove the storage writer-lease contract?", "context_only"),
+        ("Does README prove the storage writer-lease contract?", "broad_context"),
         ("What lunar quantum retention policy does DocAtlas use?", "fail_closed"),
-        ("What problem do projects solve?", "context_only"),
-        ("What is the model-visible projection?", "context_only"),
+        ("What problem do projects solve?", "broad_context"),
+        ("What is the model-visible projection?", "broad_context"),
     ],
 )
 def test_project_retrieval_disposition_is_structural(question: str, expected: str):
@@ -288,7 +279,7 @@ def test_project_retrieval_disposition_is_structural(question: str, expected: st
     ],
 )
 def test_project_scope_aliases_accept_bounded_plural_forms(question: str):
-    assert project_retrieval_disposition(question) == "context_only"
+    assert project_retrieval_disposition(question) == "broad_context"
 
 
 @pytest.mark.parametrize("term", ["projection", "projector", "projective"])
@@ -383,7 +374,6 @@ project:
         {
             "question": "Как установить проект локально и проверить запуск?",
             "project_path": str(project),
-            "mode": "project",
         },
         second,
     )

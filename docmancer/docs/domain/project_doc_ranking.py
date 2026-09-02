@@ -8,6 +8,7 @@ from typing import Any
 
 from docmancer.docs.domain.lifecycle_policy import lifecycle_allows, lifecycle_intent
 from docmancer.docs.domain.quality import has_code_symbol_evidence, internal_noise_score
+from docmancer.docs.domain.documentation_query_plan import technical_anchors
 
 
 CHANGELOG_FILENAMES = {"changelog", "changelog.md", "changes", "changes.md", "history", "history.md"}
@@ -606,12 +607,29 @@ def rerank_project_doc_chunks(
         return []
     scored = []
     score_by_id: dict[int, tuple[float, float, int]] = {}
+    exact_anchors = {
+        normalize_doc_path(value)
+        for value in technical_anchors(question)
+        if value
+    }
     evaluation_intent = project_question_lane(question) == "evaluation"
     planning_intent = project_question_lane(question) == "planning"
     for index, chunk in enumerate(chunks):
         path = getattr(chunk, "path", None)
         base = chunk_base_score(chunk, index)
         score = base * source_weight_for_intent(path, getattr(chunk, "heading_path", None), intent) * source_requirement_boost(path, question, intent)
+        metadata = getattr(chunk, "metadata", None) or {}
+        query_matches = metadata.get("retrieval_query_matches") or {}
+        qualified_query_ids = {
+            str(query_id) for query_id, trace in query_matches.items()
+            if isinstance(trace, dict) and trace.get("qualified") is True
+        }
+        if any(query_id.startswith("query-path-") for query_id in qualified_query_ids):
+            score *= 100.0
+        elif any(query_id.startswith("query-anchor-") for query_id in qualified_query_ids):
+            score *= 50.0
+        elif any(query_id.startswith("query-lookup-") for query_id in qualified_query_ids):
+            score *= 10.0
         description = str(getattr(chunk, "description", None) or "")
         query_terms = set(re.findall(r"[\w-]+", question.lower()))
         description_terms = set(re.findall(r"[\w-]+", description.lower()))
@@ -638,6 +656,10 @@ def rerank_project_doc_chunks(
             "generated": 0.3,
         }.get(authority, 1.0)
         normalized_path = normalize_doc_path(path)
+        exact_compatible = int(
+            normalized_path in exact_anchors
+            or basename(normalized_path) in exact_anchors
+        )
         if normalized_path.startswith("eval/") and not evaluation_intent:
             score *= 0.15
         if (
@@ -653,14 +675,14 @@ def rerank_project_doc_chunks(
         noise = internal_noise_score(getattr(chunk, "content", ""))
         if noise >= 0.5 and getattr(intent, "wants_how_to", False) and not _query_allows_internal_noise(question, intent):
             score *= 0.2
-        scored.append((score, index, chunk))
+        scored.append((exact_compatible, score, index, chunk))
         score_by_id[id(chunk)] = (base, score, index)
-    scored.sort(key=lambda row: (-row[0], row[1]))
+    scored.sort(key=lambda row: (-row[0], -row[1], row[2]))
 
     max_per_source = broad_max_per_source if getattr(intent, "broad", False) else narrow_max_per_source
     selected: list[Any] = []
     per_source_count: dict[str, int] = {}
-    for _, index, chunk in scored:
+    for _, _, index, chunk in scored:
         path = _source_key(chunk, index)
         if per_source_count.get(path, 0) >= max_per_source:
             continue
@@ -669,12 +691,12 @@ def rerank_project_doc_chunks(
         if limit and len(selected) >= limit:
             break
     pre_injection_ids = {id(c) for c in selected}
-    selected = ensure_broad_query_sources(selected, [chunk for _, _, chunk in scored], question=question, intent=intent, limit=limit)
+    selected = ensure_broad_query_sources(selected, [chunk for _, _, _, chunk in scored], question=question, intent=intent, limit=limit)
     diversity_relaxed_ids: set[int] = set()
     if limit and len(selected) < limit:
         selected_ids = {id(c) for c in selected}
         selected_counts = Counter(_source_key(c) for c in selected)
-        for _, index, chunk in scored:
+        for _, _, index, chunk in scored:
             if len(selected) >= limit:
                 break
             if id(chunk) not in selected_ids:
@@ -684,10 +706,10 @@ def rerank_project_doc_chunks(
                 selected.append(chunk)
                 selected_ids.add(id(chunk))
                 selected_counts[source_key] += 1
-        unique_candidate_sources = {_source_key(chunk, index) for _, index, chunk in scored}
+        unique_candidate_sources = {_source_key(chunk, index) for _, _, index, chunk in scored}
         may_relax_diversity = not getattr(intent, "broad", False) or len(unique_candidate_sources) <= 1
         if len(selected) < limit and may_relax_diversity:
-            for _, _, chunk in scored:
+            for _, _, _, chunk in scored:
                 if len(selected) >= limit:
                     break
                 if id(chunk) not in selected_ids:

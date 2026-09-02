@@ -283,6 +283,7 @@ class _SQLiteStorePart03:
                 text,
                 title=str(row["title"]),
                 body=str(row["text"]),
+                retrieval_text=str(row.get("retrieval_text") or ""),
                 mode=str(row.get("_lexical_query_mode") or "and"),
                 bm25_cost=float(row["rank"]),
             )
@@ -301,26 +302,31 @@ class _SQLiteStorePart03:
 
     @classmethod
     def _lexical_match_trace(
-        cls, query: str, *, title: str, body: str, mode: str, bm25_cost: float,
+        cls, query: str, *, title: str, body: str, retrieval_text: str = "",
+        mode: str, bm25_cost: float,
     ) -> dict[str, Any]:
         raw_terms = tuple(
-            token for token in re.findall(r"[\w./:+-]+", cls._strip_stopwords(query))
+            token for token in re.findall(r"\w+", cls._strip_stopwords(query))
             if token
         )
         terms = tuple(dict.fromkeys(token.casefold() for token in raw_terms))
         exact_terms = tuple(dict.fromkeys(
             token.casefold()
-            for token in raw_terms
+            for token in re.findall(r"[\w~./:+-]+", query)
             if token.casefold() not in _GENERIC_QUERY_TERMS
+            and token.casefold() not in _QUERY_STOPWORDS
             and (
                 any(char in token for char in "._/:+-")
                 or any(char.isupper() for char in token[1:])
                 or (token[:1].isupper() and len(token) > 2)
             )
         ))
-        haystack = f"{title}\n{body}".casefold()
+        haystack = (retrieval_text or f"{title}\n{body}").casefold()
         matched = tuple(term for term in terms if re.search(rf"(?<!\w){re.escape(term)}(?!\w)", haystack))
-        missing_exact = tuple(term for term in exact_terms if term not in matched)
+        missing_exact = tuple(
+            term for term in exact_terms
+            if re.search(rf"(?<!\w){re.escape(term)}(?!\w)", haystack) is None
+        )
         ratio = len(matched) / len(terms) if terms else 0.0
         required_ratio = 1.0 if len(terms) == 1 else 0.5
         qualified = bool(matched) and (

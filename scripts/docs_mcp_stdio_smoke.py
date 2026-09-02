@@ -93,9 +93,8 @@ async def smoke() -> None:
                 canonical_query = {
                     "question": QUESTION,
                     "project_path": str(project),
-                    "mode": "project",
                 }
-                assert set(canonical_query) == {"question", "project_path", "mode"}
+                assert set(canonical_query) == {"question", "project_path"}
                 await session.call_tool("get_docs_context", canonical_query)
                 sync = payload(await session.call_tool("prepare_docs", {
                     "action": "sync_project_docs", "project_path": str(project), "with_vectors": False,
@@ -132,7 +131,6 @@ async def smoke() -> None:
                 canonical_query = {
                     "question": QUESTION,
                     "project_path": str(project),
-                    "mode": "project",
                 }
                 text_answer = text_payload(
                     await session.call_tool("get_docs_context", canonical_query)

@@ -32,6 +32,9 @@ WORKFLOW_POLICY: dict[str, Any] = {
         "host_formulates_lookup_queries": True,
         "one_concept_per_lookup": True,
         "maximum_lookup_queries": 5,
+        "original_question_unchanged": True,
+        "preserve_exact_technical_anchors": True,
+        "compound_or_cross_language_decomposition_required": True,
         "answer_only_from_returned_sources": True,
         "partial_coverage_is_not_completeness": True,
         "authorizes_answer_or_edit": False,
@@ -55,7 +58,6 @@ PUBLIC_EXAMPLES: tuple[dict[str, Any], ...] = (
         "arguments": {
             "question": "How is authentication configured?",
             "project_path": "/repo",
-            "mode": "project",
         },
     },
     {

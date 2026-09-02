@@ -76,7 +76,7 @@ After sync, proceed to:
 get_docs_context(project_path=..., question=..., mode="project")
 ```
 
-`get_docs_context(mode="project")` returns exactly one bounded public result: narrow and strictly proven `docs_answer`, retrieval-only `docs_context` with `answer_policy="cite_only"`, source-bound `patch_context` for an explicit change task, or fail-closed `insufficient_evidence`. Broad questions stay `docs_context` even when retrieval finds locally relevant prose.
+`get_docs_context(project_path=...)` returns retrieval-only `docs_context` for project reads, source-bound `patch_context` for an explicit change task, or fail-closed `insufficient_evidence` when no safe project source exists. Certified `docs_answer` remains limited to library, dependency, and mixed evidence lanes.
 
 For module-specific queries, use exact module filters:
 

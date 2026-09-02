@@ -296,7 +296,6 @@ def main() -> int:
                 {
                     "question": "In docs/ADAPTIVE_TREASURE_CONTRACT.md, summarize meet_type.",
                     "project_path": str(project),
-                    "mode": "project",
                 },
                 service,
             )
@@ -304,7 +303,8 @@ def main() -> int:
             service.project_docs.query_project_docs = original_query
             store.list_sections_for_embedding = original_full_scan
         assert result["status"] == "ok", json.dumps(result, indent=2, default=str)
-        assert result["answer_supported"] is True
+        assert result["kind"] == "docs_context"
+        assert result["answer_supported"] is False
         assert result.get("recovery_reason_code") in (None, "")
         assert {row["path_or_url"] for row in result["sources"]} == {
             "docs/ADAPTIVE_TREASURE_CONTRACT.md"
@@ -313,35 +313,30 @@ def main() -> int:
             "docs/adaptive_treasure_contract.md" not in row["path_or_url"]
             for row in result["sources"]
         )
-        assert "meet_type" in result["answer"]
+        assert any("meet_type" in row["snippet"] for row in result["sources"])
 
-        # 9. Public parser recovery is bounded to the insufficient-evidence budget.
+        # 9. Exact anchors recover context without authorizing an answer.
         parser_result = call_docs_tool_payload(
             "get_docs_context",
             {
                 "question": TREASURE,
                 "project_path": str(project),
-                "mode": "project",
             },
             service,
         )
-        assert parser_result["status"] == "insufficient_evidence", parser_result
-        assert parser_result["documentation_supported"] is False
+        assert parser_result["status"] == "ok", parser_result
+        assert parser_result["kind"] == "docs_context"
+        assert parser_result["answer_supported"] is False
         assert parser_result["investigation_allowed"] is True
-        assert parser_result["hard_stop"] is False
-        assert parser_result["recovery_origin"] == "parsing", parser_result
-        recovery = parser_result.get("recommended_next_action") or {}
-        assert recovery.get("type") == "rephrase_question", parser_result
-        assert recovery.get("auto_execute") is False
-        assert recovery.get("arguments_patch", {}).get("question")
-        assert estimate_projection_tokens(parser_result) <= 300
+        assert parser_result["context_available"] is True
+        assert estimate_projection_tokens(parser_result) <= 800
 
     print(
         "PASS: parser/retrieval failures expose bounded non-automatic recovery; "
         "100 unknown contract modifiers do not create hard stops; rephrase is limited "
         "to one retry; eligibility/documentation/conflict classes remain distinct; "
-        "exact indexed documents recover canonical stored sections when lexical retrieval misses; "
-        "public insufficient projection stays <=300 tokens"
+        "exact indexed documents recover bounded retrieval-only context; "
+        "public context projection stays <=800 tokens"
     )
     return 0
 

@@ -71,6 +71,7 @@ class _ProjectContextServicePart01:
                 "tokens": tokens, "limit": candidate_limit, "expand": expand,
                 "module": module, "module_path": module_path, "scope": scope,
                 "requirements": canonical_requirements,
+                "documentation_query_plan": documentation_query_plan,
             }
             if lookup_queries:
                 project_docs_kwargs["lookup_queries"] = lookup_queries
@@ -124,17 +125,15 @@ class _ProjectContextServicePart01:
             if not allow_network:
                 dependency_confirmation = {
                     "type": "ask_user_to_fetch_dependency_docs",
-                    "tool": "get_project_context",
+                    "tool": "prepare_docs",
+                    "action": "prefetch_project_dependency_docs",
                     "reason": "dependency_docs_network_fetch_required",
                     "dependency": selected_dependency,
                     "requires_confirmation": True,
                     "confirmation_reason": "network_fetch",
                     "arguments_patch": {
+                        "action": "prefetch_project_dependency_docs",
                         "project_path": str(root),
-                        "question": question,
-                        "library": selected_dependency,
-                        "mode": "deps-only" if mode in {"deps-only", "public-docs"} else "auto",
-                        "allow_network": True,
                     },
                     "user_message": "Dependency/public documentation may require network fetch. Proceed?",
                 }

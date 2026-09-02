@@ -1,6 +1,6 @@
 # Question planning module
 
-`QuestionPlan` is the bounded question-analysis contract that resolves clauses, subjects, intents, mandatory facets, conditions, and unresolved parts before project evidence may authorize an answer.
+`QuestionPlan` is the bounded question-analysis contract that resolves clauses, subjects, intents, mandatory facets, conditions, and unresolved parts for certification lanes.
 
 `ProjectAnswerRequirementContract` is the one-way boundary that carries those resolved proof obligations from question planning to evidence selection.
 
@@ -8,7 +8,7 @@
 
 The question-planning module converts a bounded natural-language project-doc question into explicit clauses and proof facets before retrieval evidence is allowed to authorize an answer. Its implementation boundary is `docmancer/docs/domain/question_plan.py` plus the reusable frame/rule modules and `question_surface_normalization.py`. `question_plan.py` composes clauses and proof facets, reusable frames own semantic intent families, and the surface-normalization layer maps only audited complete EN/RU surface families to already-owned canonical questions. The project-answer contract remains the downstream compatibility boundary in `docmancer/docs/domain/`.
 
-The module must fail closed when it cannot resolve a subject or requested operation. It must not invent generic identities such as `project` or `requested operation` that could later be proven by unrelated text.
+The module must fail closed when it cannot resolve a subject or requested operation. It must not invent generic identities such as `project` or `requested operation` that could later be proven by unrelated text. Project-only read retrieval does not require a supported `QuestionPlan`.
 
 This fail-closed rule governs `docs_answer`, not read-only discovery. An unresolved or unproved question may still produce a bounded `docs_context` projection from current project-scoped retrieval results. That projection is not a replacement `QuestionPlan`, carries no support verdict, and cannot authorize an edit.
 
@@ -39,10 +39,10 @@ Optional host-provided `lookup_queries` bypass question planning and enter only 
 - premise questions are discharged only by a locally bound contradiction/correction or by a matching premise with an explicit causal explanation; a bare premise restatement cannot authorize `supported`;
 - semantic evidence is proposition-local: condition, blocking-condition, requirements, and comparison proof cannot union unrelated neighboring clauses; multi-line requirements are accepted only as an explicitly subject-bound structured list;
 - compound facts may be decomposed into atomic mandatory facets so the selector can use bounded witnesses from different candidates without merging unrelated evidence;
-- frozen v1–v3 contracts remain compatibility inputs until explicitly migrated.
+- project retrieval plans remain independent of answer proof obligations.
 
 ## Tests
 
-`tests/docs/test_question_plan_v4.py`, project-answer protocol v1–v4 tests,
+`tests/docs/test_question_plan_v4.py`, the Context7 project-chat protocol,
 `scripts/run_question_surface_gate.py`, `scripts/run_question_surface_v2_gate.py`,
 and real MCP/self-hosting probing protect this boundary.

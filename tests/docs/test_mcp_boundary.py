@@ -122,38 +122,6 @@ class FakeService:
         self.docs_manifest = SubService()
 
 
-def test_project_context_rejects_whitespace_question_before_service_call() -> None:
-    service = FakeService()
-
-    result = handle_project_tool(
-        "get_project_context",
-        {"project_path": "/repo", "question": "   ", "tokens": 9_999_999, "limit": 100_000},
-        cast(LibraryDocsService, service),
-    )
-
-    assert result["status"] == "failed"
-    assert result["error"]["reason_code"] == "empty_question"
-    assert service.project_context.calls == []
-
-
-def test_project_context_clamps_tokens_and_limit_at_mcp_boundary() -> None:
-    service = FakeService()
-
-    result = handle_project_tool(
-        "get_project_context",
-        {"project_path": "/repo", "question": "architecture", "tokens": 9_999_999, "limit": 100_000},
-        cast(LibraryDocsService, service),
-    )
-
-    assert result is not None
-    assert result["status"] == "success"
-    name, args, kwargs = service.project_context.calls[0]
-    assert name == "get_project_context"
-    assert args[:2] == ("/repo", "architecture")
-    assert kwargs["tokens"] == 20_000
-    assert kwargs["limit"] == 20
-
-
 def test_get_docs_context_clamps_tokens_and_limit_at_mcp_boundary() -> None:
     service = FakeService()
 

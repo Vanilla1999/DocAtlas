@@ -9,15 +9,16 @@ RAW_TOOLS: list[dict[str, Any]] = [
 
 Agent workflow:
 - Call get_docs_context first. It performs safe project preflight internally.
-- For coding/API questions, set response_style=\"snippet-first\".
 - The server owns bounded output selection; raw retrieval stays hidden and only a validated projection plus bounded recovery metadata enters model context.
 - Call prepare_docs only from recommended_next_action.
 - Use docs_status only for explicit health, freshness, source-state, or job-status requests, or when get_docs_context returns it as recommended_next_action.
 - Scope planning: for one known module use scope="module" plus exact module_path; module_path always implies module scope. For project-wide policy use scope="project" and omit module/module_path. If a task needs both module-local and project-wide evidence, make two bounded calls (module then project) rather than widening one module call. For cross-module questions use scope="all" without module filters, or separate exact module calls. On module_ambiguous, follow docs_status and retry with an exact returned module_path.
 - insufficient_evidence never proves a documentary claim. Follow one typed recovery: one non-automatic rephrase for parser/retrieval uncertainty, then local source/tests when hard_stop=false; stop before an edit when hard_stop=true or the task explicitly requires a still-unproved documentary contract.
 - This tool provides source-grounded context, not a full code audit or test substitute.
-- For change-aware documentation maintenance, pass maintenance with either base/head or explicit changed_paths; obey its fail-closed authoring brief.
-- For a free-form or multi-concept documentation request, optionally pass up to five narrow lookup_queries. They improve retrieval only; the original question remains authoritative and lookup queries never authorize an answer or edit.
+- Pass the user's original request unchanged as question.
+- For compound or cross-language requests, add up to five single-concept lookup_queries.
+- Preserve exact identifiers, filenames, commands, and versions verbatim.
+- lookup_queries improve retrieval only; they never authorize an answer or edit.
 """,
         "inputSchema": {
             "type": "object",
@@ -25,35 +26,10 @@ Agent workflow:
                 "question": {"type": "string"},
                 "lookup_queries": {"type": ["array", "null"], "maxItems": 5, "uniqueItems": True, "items": {"type": "string", "minLength": 1, "maxLength": 500}, "description": "Optional bounded single-concept project-documentation lookups used only to improve retrieval recall."},
                 "project_path": {"type": ["string", "null"]},
-                "response_style": {"type": ["string", "null"], "enum": ["auto", "snippet-first", "evidence-first", None], "default": "auto", "description": "Choose snippet-first presentation for coding tasks or preserve evidence-first context."},
                 "library": {"type": ["string", "null"]},
-                "libraries": {"type": ["array", "null"], "items": {"type": "string"}},
-                "ecosystem": {"type": ["string", "null"]},
                 "version": {"type": ["string", "null"]},
-                "source_type": {"type": ["string", "null"]},
-                "docs_url": {"type": ["string", "null"]},
-                "module": {"type": ["string", "null"], "description": "Module id/name lookup for module-scoped project docs. Prefer exact module_path when known; an ambiguous name fails closed instead of being guessed."},
                 "module_path": {"type": ["string", "null"], "description": "Exact discovered module path such as packages/orders. Supplying module_path always implies module scope and never widens into project or sibling modules."},
                 "scope": {"type": ["string", "null"], "enum": ["project", "module", "all", None], "description": "Project-doc scope: project = repo-level docs only; module = one module (use exact module_path); all = repo-level plus modules only when no module filter is supplied. For module + project obligations prefer two bounded calls."},
-                "mode": {"type": ["string", "null"], "enum": ["auto", "project", "library", "dependency", "mixed", None], "description": "Evidence lane selection: project for repository/module documentation, dependency for project-pinned dependency docs, library for an explicit external library, mixed only when both project and library evidence are intentionally required."},
-                "tokens": {"type": ["integer", "null"], "minimum": 1, "maximum": 20000},
-                "limit": {"type": ["integer", "null"], "minimum": 1, "maximum": 20},
-                "expand": {"type": ["string", "null"]},
-                "allow_latest_fallback": {"type": ["boolean", "null"]},
-                "page": {"type": ["integer", "null"], "minimum": 1, "default": 1},
-                "page_size": {"type": ["integer", "null"], "minimum": 1, "maximum": 20},
-                "maintenance": {
-                    "type": ["object", "null"],
-                    "properties": {
-                        "base": {"type": ["string", "null"]},
-                        "head": {"type": ["string", "null"], "default": "HEAD"},
-                        "changed_paths": {"type": ["array", "null"], "maxItems": 200, "items": {"type": "string"}},
-                        "changed_symbols": {"type": ["array", "null"], "maxItems": 200, "items": {"type": "string"}},
-                        "candidate_offset": {"type": ["integer", "null"], "minimum": 0},
-                        "candidate_limit": {"type": ["integer", "null"], "minimum": 1, "maximum": 200},
-                    },
-                    "additionalProperties": False,
-                },
             },
             "required": ["question"],
         },
@@ -390,36 +366,6 @@ If repo writes or dependency-doc network fetches are needed, it stops with confi
         },
     },
     {
-        "name": "get_project_context",
-        "description": """Return one repo-grounded context pack for a coding question after inspect_project_docs, bootstrap_project_docs, or any required sync_project_docs step.
-Combines indexed project-owned docs with exact dependency-doc evidence when requested or detectable, and always returns a compact Trust Contract with selected, rejected, and risky sources plus next_actions.
-For story-specific implementation questions, inspect answer_type and answer_completeness: partial_navigational means the docs are useful for architecture/source navigation but exact requested terms are missing, so follow recommended_next_actions/code_search before treating the context as a complete answer.
-Does not use deleted, orphaned, or stale project-doc content by default.""",
-        "inputSchema": {
-            "type": "object",
-            "properties": {
-                "project_path": {"type": "string"},
-                "question": {"type": "string"},
-                "tokens": {"type": ["integer", "null"], "minimum": 1, "maximum": 20000},
-                "limit": {"type": ["integer", "null"], "minimum": 1, "maximum": 20},
-                "expand": {"type": ["string", "null"]},
-                "library": {"type": ["string", "null"]},
-                "libraries": {"type": ["array", "null"], "items": {"type": "string"}},
-                "ecosystem": {"type": ["string", "null"]},
-                "version": {"type": ["string", "null"]},
-                "module": {"type": ["string", "null"]},
-                "module_path": {"type": ["string", "null"]},
-                "scope": {"type": ["string", "null"], "enum": ["project", "module", "all", None]},
-                "mode": {"type": ["string", "null"], "enum": ["auto", "project-only", "deps-only", "public-docs", None]},
-                "response_style": {"type": ["string", "null"], "enum": ["auto", "snippet-first", "evidence-first", None], "default": "auto", "description": "Choose snippet-first presentation for coding tasks or preserve evidence-first context."},
-                "allow_network": {"type": ["boolean", "null"], "default": False, "description": "Permit dependency/public docs network fetches. Defaults to false and returns confirmation instead."},
-                "page": {"type": ["integer", "null"], "minimum": 1, "default": 1},
-                "page_size": {"type": ["integer", "null"], "minimum": 1, "maximum": 20},
-            },
-            "required": ["project_path", "question"],
-        },
-    },
-    {
         "name": "get_code_context",
         "description": """Find relevant local source files, extract real code snippets, follow name-based references for a few hops, and return an answer-ready source context pack.
 
@@ -624,6 +570,9 @@ RAW_TOOLS = [tool for tool in RAW_TOOLS if tool["name"] in CLASSIFIED_TOOL_NAMES
 PUBLIC_ADVERTISED_DESCRIPTIONS: dict[str, str] = {
     "get_docs_context": (
         "Source-grounded documentation tool. Call before a coding edit or for a documentation/API question. "
+        "Pass the user's original request unchanged as question. For compound or cross-language requests, add up "
+        "to five single-concept lookup_queries. Preserve exact identifiers, filenames, commands, and versions "
+        "verbatim. lookup_queries improve retrieval only; they never authorize an answer or edit. "
         "For one known module use scope=module with exact module_path; module_path always implies module scope. "
         "For project-wide policy use scope=project without module filters. If a task needs both module-local and "
         "project-wide evidence, make two bounded calls (module then project). For cross-module questions use "
@@ -652,15 +601,7 @@ PUBLIC_ADVERTISED_INPUT_SCHEMAS: dict[str, dict[str, Any]] = {
             "lookup_queries": {"type": ["array", "null"], "maxItems": 5, "uniqueItems": True, "items": {"type": "string", "minLength": 1, "maxLength": 500}},
             "project_path": {"type": ["string", "null"]},
             "library": {"type": ["string", "null"]},
-            "libraries": {"type": ["array", "null"], "items": {"type": "string"}},
-            "ecosystem": {"type": ["string", "null"]},
             "version": {"type": ["string", "null"]},
-            "source_type": {"type": ["string", "null"]},
-            "docs_url": {"type": ["string", "null"]},
-            "module": {
-                "type": ["string", "null"],
-                "description": "Module id/name lookup. Prefer exact module_path; ambiguous names fail closed.",
-            },
             "module_path": {
                 "type": ["string", "null"],
                 "description": "Exact path; always implies module scope.",
@@ -669,11 +610,6 @@ PUBLIC_ADVERTISED_INPUT_SCHEMAS: dict[str, dict[str, Any]] = {
                 "type": ["string", "null"],
                 "enum": ["project", "module", "all", None],
                 "description": "Project: repo-level docs only; module/all.",
-            },
-            "mode": {
-                "type": ["string", "null"],
-                "enum": ["auto", "project", "library", "dependency", "mixed", None],
-                "description": "Select project/module docs, explicit library docs, project-pinned dependency docs, or intentional mixed evidence.",
             },
         },
         "required": ["question"],

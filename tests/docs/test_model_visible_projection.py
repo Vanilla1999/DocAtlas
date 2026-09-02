@@ -7,6 +7,26 @@ from docmancer.docs.application.docs_context_projection import (
     _focused_snippet,
     project_docs_context,
 )
+from docmancer.docs.application.context_selection import select_context_candidates
+from docmancer.docs.domain.request_intent import is_change_request
+
+
+def test_context_candidate_allocation_gives_every_required_lane_first_chance():
+    candidates = select_context_candidates([
+        [["anchor-1", "anchor-2"]],
+        [["original-1", "original-2"]],
+        [["host-a-1", "host-a-2"], ["host-b-1", "host-b-2"]],
+        [["alias-1", "alias-2"]],
+    ])
+
+    assert candidates[:5] == [
+        "anchor-1", "original-1", "host-a-1", "host-b-1", "alias-1",
+    ]
+    assert candidates[5:] == [
+        "anchor-2", "original-2", "host-a-2", "host-b-2", "alias-2",
+    ]
+
+
 def test_docs_context_is_retrieval_only_snapshot_bound_and_not_edit_ready():
     retrieval = {
         "context_pack": [{
@@ -50,9 +70,9 @@ def test_docs_context_is_retrieval_only_snapshot_bound_and_not_edit_ready():
     assert projection["sources"][0]["line_start"] == 12
     assert "retrieval_query_ids" not in projection["sources"][0]
     assert "retrieval_query_matches" not in projection["sources"][0]
-    assert projection["query_coverage"] == "partial"
+    assert projection["query_coverage"] == "full"
     assert projection["covered_query_ids"] == ["query-original"]
-    assert projection["missing_query_ids"] == ["query-lookup-1"]
+    assert projection["missing_query_ids"] == []
     assert projection["facet_coverage"] == "none"
     assert projection["missing_facets"] == [{
         "id": "facet-routing-lifecycle", "requirement_id": "project_answer:routing-lifecycle",
@@ -691,14 +711,14 @@ def test_insufficient_projection_preserves_bounded_inspection_decision_context()
     assert validate_model_visible_projection(payload, snapshot={}, max_tokens=300) == []
 
 
-def test_projection_intent_distinguishes_change_from_documentation_question():
-    assert projection_kind("Implement the FooClient factory") == "patch_context"
-    assert projection_kind("Create FooService") == "patch_context"
-    assert projection_kind("Напиши новый обработчик") == "patch_context"
-    assert projection_kind("Исправь обработку ошибок") == "patch_context"
-    assert projection_kind("How do I use FooClient.create?") == "docs_answer"
-    assert projection_kind("What is the retry policy?") == "docs_answer"
-    assert projection_kind("Delete src/obsolete.py.") == "patch_context"
+def test_change_intent_is_independent_from_read_delivery_mode():
+    assert is_change_request("Implement the FooClient factory") is True
+    assert is_change_request("Create FooService") is True
+    assert is_change_request("Напиши новый обработчик") is True
+    assert is_change_request("Исправь обработку ошибок") is True
+    assert is_change_request("How do I use FooClient.create?") is False
+    assert is_change_request("What is the retry policy?") is False
+    assert is_change_request("Delete src/obsolete.py.") is True
 
 
 def test_terminal_insufficient_projection_preserves_recovery_state():

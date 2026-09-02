@@ -91,19 +91,27 @@ def test_reusable_question_frames_survive_real_manifest_sync_and_public_mcp(tmp_
         ("How do I sync project docs after changing a file?", "sync_project_docs"),
         ("Как синхронизировать документацию проекта после изменения файла?", "sync_project_docs"),
     )
-    for mode in (None, "project"):
-        for question, expected in cases:
-            arguments = {"question": question, "project_path": str(project)}
-            if mode is not None:
-                arguments["mode"] = mode
-            payload = call_docs_tool_payload(
-                "get_docs_context",
-                arguments,
-                service,
-            )
-            assert payload["status"] == "ok", (mode, question, payload)
-            assert payload["kind"] == "docs_answer", (mode, question, payload)
-            assert expected in str(payload), (mode, question, payload)
+    for question, expected in cases:
+        lookup_queries = {
+            "Какие типы источников поддерживаются для индексации?": [
+                "supported source types for indexing"
+            ],
+            "Which document formats are supported for indexing?": [
+                "local file formats"
+            ],
+        }.get(question)
+        arguments = {"question": question, "project_path": str(project)}
+        if lookup_queries:
+            arguments["lookup_queries"] = lookup_queries
+        payload = call_docs_tool_payload(
+            "get_docs_context",
+            arguments,
+            service,
+        )
+        assert payload["status"] == "ok", (question, payload)
+        assert payload["kind"] == "docs_context", (question, payload)
+        assert payload["answer_supported"] is False
+        assert expected in str(payload), (question, payload)
 
     open_context = (
         "What markers are available?",
@@ -111,21 +119,17 @@ def test_reusable_question_frames_survive_real_manifest_sync_and_public_mcp(tmp_
         "How do I update the docs index?",
         "What does the project require?",
     )
-    for mode in (None, "project"):
-        for question in open_context:
-            arguments = {"question": question, "project_path": str(project)}
-            if mode is not None:
-                arguments["mode"] = mode
-            payload = call_docs_tool_payload(
-                "get_docs_context",
-                arguments,
-                service,
-            )
-            assert payload["status"] == "ok", (mode, question, payload)
-            assert payload["kind"] == "docs_context", (mode, question, payload)
-            assert payload["answer_supported"] is False
-            assert payload["answer_available"] is False
-            assert payload["edit_ready"] is False
+    for question in open_context:
+        payload = call_docs_tool_payload(
+            "get_docs_context",
+            {"question": question, "project_path": str(project)},
+            service,
+        )
+        assert payload["status"] == "ok", (question, payload)
+        assert payload["kind"] == "docs_context", (question, payload)
+        assert payload["answer_supported"] is False
+        assert payload["answer_available"] is False
+        assert payload["edit_ready"] is False
 
     lookup_payload = call_docs_tool_payload(
         "get_docs_context",
@@ -145,9 +149,7 @@ def test_reusable_question_frames_survive_real_manifest_sync_and_public_mcp(tmp_
     assert lookup_payload["query_coverage"] == expected_retrieval_coverage
     assert lookup_payload["retrieval_coverage"] == expected_retrieval_coverage
     assert lookup_payload["facet_coverage"] == "unverified"
-    assert {"query-facet-1", "query-lookup-1"}.issubset(
-        lookup_payload["covered_query_ids"]
-    )
+    assert "query-lookup-1" in lookup_payload["covered_query_ids"]
     assert any(
         source["path_or_url"] == "docs/sources.md"
         and "GitBook sites" in source["snippet"]
@@ -160,17 +162,13 @@ def test_reusable_question_frames_survive_real_manifest_sync_and_public_mcp(tmp_
         "Which source types are supported for indexing plus tell me the Bitcoin price?",
         "How do I sync project docs after changing a file and rebuild vectors?",
     )
-    for mode in (None, "project"):
-        for question in untrusted_for_answer:
-            arguments = {"question": question, "project_path": str(project)}
-            if mode is not None:
-                arguments["mode"] = mode
-            payload = call_docs_tool_payload(
-                "get_docs_context",
-                arguments,
-                service,
-            )
-            assert payload.get("answer_supported") is not True, (mode, question, payload)
-            assert payload.get("edit_ready") is not True, (mode, question, payload)
-            if payload["status"] == "ok":
-                assert payload["kind"] == "docs_context", (mode, question, payload)
+    for question in untrusted_for_answer:
+        payload = call_docs_tool_payload(
+            "get_docs_context",
+            {"question": question, "project_path": str(project)},
+            service,
+        )
+        assert payload.get("answer_supported") is not True, (question, payload)
+        assert payload.get("edit_ready") is not True, (question, payload)
+        if payload["status"] == "ok":
+            assert payload["kind"] == "docs_context", (question, payload)

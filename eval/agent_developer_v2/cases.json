@@ -343,14 +343,14 @@
       "fixture": "explicit_manifest_monorepo",
       "working_path": "packages/orders/src/submission.py",
       "max_get_docs_context_calls": 1,
-      "max_trajectory_tokens": 300,
+      "max_trajectory_tokens": 800,
       "calls": [
         {
           "question": "What is OrdersDraftStore?",
           "mode": "project",
-          "packet_tokens": 300,
-          "max_projection_tokens": 300,
-          "target_expected_status": "insufficient_evidence",
+          "packet_tokens": 800,
+          "max_projection_tokens": 800,
+          "target_expected_status": "ok",
           "forbidden_sources": [
             "packages/orders/README.md",
             "packages/payments/README.md"
@@ -897,15 +897,15 @@
       "fixture": "explicit_manifest_monorepo",
       "working_path": "packages/orders/src/submission.py",
       "max_get_docs_context_calls": 1,
-      "max_trajectory_tokens": 300,
+      "max_trajectory_tokens": 800,
       "calls": [
         {
           "question": "How many retry attempts does ProjectRetryPolicy allow?",
           "mode": "project",
           "scope": "project",
-          "packet_tokens": 300,
-          "max_projection_tokens": 300,
-          "target_expected_status": "insufficient_evidence",
+          "packet_tokens": 800,
+          "max_projection_tokens": 800,
+          "target_expected_status": "ok",
           "forbidden_sources": [
             "packages/orders/README.md",
             "packages/payments/README.md"

@@ -33,7 +33,7 @@ _RETRIEVAL_ONLY_UNRESOLVED_PREFIXES = (
     "unresolved_requested_operation",
 )
 ProjectRetrievalDisposition = Literal[
-    "strict_answer", "context_only", "fail_closed",
+    "typed_context", "broad_context", "fail_closed",
 ]
 
 
@@ -383,14 +383,14 @@ def project_retrieval_disposition(question: str) -> ProjectRetrievalDisposition:
             for obligation in contract.proof_obligations
         )
         return (
-            "context_only"
+            "broad_context"
             if force_context_only and not closed_contract
-            else "strict_answer"
+            else "typed_context"
         )
     if force_context_only:
-        return "context_only"
+        return "broad_context"
     if contract.proof_obligations:
-        return "fail_closed" if contract.unresolved_parts else "context_only"
+        return "fail_closed" if contract.unresolved_parts else "broad_context"
 
     tokens = _tokens(question)
     if any(
@@ -416,7 +416,7 @@ def project_retrieval_disposition(question: str) -> ProjectRetrievalDisposition:
         for part in contract.unresolved_parts
     )
     return (
-        "context_only"
+        "broad_context"
         if exact_generic_fallback or retrieval_only_ambiguity
         else "fail_closed"
     )
@@ -425,19 +425,19 @@ def project_retrieval_disposition(question: str) -> ProjectRetrievalDisposition:
 def project_retrieval_requires_context_only(question: str) -> bool:
     """Return whether retrieval is useful but certification is too strong."""
 
-    return project_retrieval_disposition(question) == "context_only"
+    return project_retrieval_disposition(question) == "broad_context"
 
 
 def project_retrieval_allows_context_fallback(question: str) -> bool:
     """Allow retrieval-only context when no strict answer can be certified."""
 
-    return project_retrieval_disposition(question) == "context_only"
+    return project_retrieval_disposition(question) == "broad_context"
 
 
 def project_retrieval_allows_certified_answer(question: str) -> bool:
     """Allow a closed strict answer to survive an overlapping broad alias."""
 
-    return project_retrieval_disposition(question) == "strict_answer"
+    return project_retrieval_disposition(question) == "typed_context"
 
 
 __all__ = [

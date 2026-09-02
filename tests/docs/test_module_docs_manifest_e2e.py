@@ -95,7 +95,6 @@ def test_two_module_docs_manifest_sync_filter_and_public_mcp(tmp_path, monkeypat
         {
             "question": "What does OrionRouter do?",
             "project_path": str(project),
-            "mode": "project",
             "module_path": "modules/orion",
             "scope": "module",
         },
@@ -106,7 +105,6 @@ def test_two_module_docs_manifest_sync_filter_and_public_mcp(tmp_path, monkeypat
         {
             "question": "What does VegaProof do?",
             "project_path": str(project),
-            "mode": "project",
             "module_path": "modules/vega",
             "scope": "module",
         },
@@ -122,7 +120,6 @@ def test_two_module_docs_manifest_sync_filter_and_public_mcp(tmp_path, monkeypat
         {
             "question": "What is ModuleEvidenceContract?",
             "project_path": str(project),
-            "mode": "project",
         },
         service,
     )

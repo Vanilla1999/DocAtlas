@@ -114,7 +114,7 @@ def test_public_release_smoke_is_exact_public_and_no_cache() -> None:
 def test_stdio_smoke_requires_cited_content() -> None:
     text = (ROOT / "scripts/docs_mcp_stdio_smoke.py").read_text()
     assert "assert NEEDLE in rendered" in text
-    assert 'assert set(canonical_query) == {"question", "project_path", "mode"}' in text
+    assert 'assert set(canonical_query) == {"question", "project_path"}' in text
     canonical_block = text[text.index("canonical_query = {"):text.index("answer = payload", text.index("canonical_query = {"))]
     assert "output_mode" not in canonical_block
     assert "compatibility_query" not in text
@@ -167,12 +167,11 @@ def test_stdio_smoke_accepts_structured_content_and_legacy_json_text() -> None:
             "content_sha256": "a" * 64,
         }],
     }, required_fragment="needle")
-    by_id = {case.surface_case_id: case for case in GOLD_CASES if case.surface_case_id is not None}
-    assert set(by_id) == set(range(1, 21))
-    assert all(case.expected_kind for case in by_id.values())
+    assert len(GOLD_CASES) == 15
+    assert all(case.expected_kind == "docs_context" for case in GOLD_CASES)
     assert all(
         case.relevant_paths or case.expected_kind == "insufficient_evidence"
-        for case in by_id.values()
+        for case in GOLD_CASES
     )
     invalid_citation = {
         "kind": "docs_context",
