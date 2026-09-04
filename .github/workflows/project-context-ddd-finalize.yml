@@ -1,0 +1,241 @@
+name: Project Context DDD Finalize
+
+on:
+  push:
+    branches:
+      - fix/project-docs-ddd-acceptance-closure
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
+
+concurrency:
+  group: project-context-ddd-finalize
+  cancel-in-progress: false
+
+jobs:
+  validate-and-finalize:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@f43a0e5ff2bd294095638e18286ca9a3d1956744 # v3.6.0
+        with:
+          ref: fix/project-docs-ddd-acceptance-closure
+          fetch-depth: 0
+          persist-credentials: true
+
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5.6.0
+        with:
+          python-version: "3.12"
+
+      - name: Install locked development environment
+        run: |
+          python -m pip install "uv==0.8.17"
+          uv sync --locked --extra dev --python 3.12
+
+      - name: Verify delivery topology
+        run: |
+          test "$(git branch --show-current)" = "fix/project-docs-ddd-acceptance-closure"
+          test "$(git merge-base HEAD origin/fix/context-first-project-reads)" = "$(git rev-parse origin/fix/context-first-project-reads)"
+          changed="$(git diff --name-only origin/fix/context-first-project-reads...HEAD | grep -v '^\.github/workflows/project-context-ddd-finalize.yml$' || true)"
+          test -n "$changed"
+
+      - name: Run targeted red-to-green contracts
+        run: |
+          uv run pytest tests/docs/test_documentation_query_plan.py -q
+          uv run pytest tests/docs/test_model_visible_projection.py -q
+          uv run pytest tests/test_named_document_context_integration.py -q
+          uv run pytest tests/test_sqlite_ranking_truth.py -q
+          uv run pytest tests/test_release_gate.py -q
+          uv run pytest tests/docs/test_docs_context_compound_projection.py -q
+
+      - name: Verify DDD dependency direction
+        shell: bash
+        run: |
+          if rg -n 'docmancer\.(retrieval|core|mcp|docs\.application|docs\.infrastructure)' \
+            docmancer/docs/domain/documentation_query_plan.py \
+            docmancer/docs/domain/project_retrieval_intent.py \
+            docmancer/docs/domain/evidence_qualification.py \
+            docmancer/docs/domain/context_budget.py \
+            docmancer/docs/domain/query_terms.py \
+            docmancer/docs/domain/project_doc_ranking.py; then
+            echo 'Domain imports an outer layer.' >&2
+            exit 1
+          fi
+
+      - name: Verify static acceptance invariants
+        run: |
+          uv run python - <<'PY'
+          from __future__ import annotations
+          import json
+          import re
+          from pathlib import Path
+
+          errors: list[str] = []
+
+          def text(path: str) -> str:
+              p = Path(path)
+              if not p.is_file():
+                  errors.append(f"missing file: {path}")
+                  return ""
+              return p.read_text(encoding="utf-8")
+
+          raw = json.loads(text("eval/project_context_quality/cases.json"))
+          cases = raw.get("cases", raw) if isinstance(raw, dict) else raw
+          positives = [
+              case for case in cases
+              if not case.get("negative_control", False)
+              and case.get("expected_result", "positive") != "negative"
+              and case.get("positive", True)
+          ]
+          if len(positives) != 15:
+              errors.append(f"expected 15 positive cases, got {len(positives)}")
+          for case in positives:
+              cid = case.get("id", "<unknown>")
+              for key in (
+                  "question",
+                  "lookup_queries",
+                  "required_facts",
+                  "allowed_paths",
+                  "minimum_lookup_coverage",
+                  "expected_covered_query_ids",
+                  "expected_missing_query_ids",
+              ):
+                  if key not in case:
+                      errors.append(f"{cid}: missing {key}")
+              if not case.get("lookup_queries"):
+                  errors.append(f"{cid}: lookup_queries is empty")
+              if int(case.get("minimum_lookup_coverage", 0)) <= 0:
+                  errors.append(f"{cid}: lookup coverage is not gated")
+              if not case.get("required_facts"):
+                  errors.append(f"{cid}: required_facts is empty")
+
+          runner = text("scripts/run_project_docs_self_host_gate.py")
+          for name in (
+              "passed_positive",
+              "positive_count",
+              "direct_only_coverage_count",
+              "derived_only_coverage_count",
+              "direct_and_derived_coverage_count",
+              "lookup_coverage_count",
+              "zero_coverage_count",
+          ):
+              if name not in runner:
+                  errors.append(f"runner does not expose {name}")
+          if "question_only" not in runner and "question-only" not in runner:
+              errors.append("runner has no diagnostic question-only lane")
+
+          ranking = text("docmancer/docs/domain/project_doc_ranking.py")
+          for match in re.finditer(r"query-lookup", ranking):
+              vicinity = ranking[max(0, match.start() - 220):match.end() + 260]
+              if re.search(r"(?:\*\s*10|10\s*\*|10\.0)", vicinity):
+                  errors.append("unconditional query-lookup 10x privilege remains")
+                  break
+
+          terms = text("docmancer/docs/domain/query_terms.py")
+          for word in ("и", "или", "and", "or", "the"):
+              if f'"{word}"' not in terms and f"'{word}'" not in terms:
+                  errors.append(f"low-signal lookup filter misses {word!r}")
+
+          catalog = text("docatlas.project-docs.yaml")
+          match = re.search(
+              r"(?ms)^\s*-?\s*path:\s*docs/adr/0002-context-retrieval-vs-answer-proof\.md\s*"
+              r"(.*?)(?=^\s*-?\s*path:|\Z)",
+              catalog,
+          )
+          block = match.group(0) if match else ""
+          for expected in ("role: adr", "authority: historical", "status: superseded"):
+              if expected not in block:
+                  errors.append(f"ADR 0002 catalog truth misses {expected}")
+          if "docs/decisions/2026-08-22-defer-public-release-and-open-p1-harness.md" not in catalog:
+              errors.append("2026-08-22 decision is not explicitly catalogued")
+
+          sqlite = text("docmancer/core/_sqlite_store_part03.py")
+          if re.search(r"[\"']qualified[\"']\s*:", sqlite):
+              errors.append("SQLite still emits qualified")
+          for field in (
+              "query_terms", "matched_terms", "missing_terms", "exact_terms",
+              "missing_exact_terms", "field_matches", "lexical_score",
+              "bm25_cost", "exact_match",
+          ):
+              if field not in sqlite:
+                  errors.append(f"SQLite retrieval facts miss {field}")
+
+          projection = text("docmancer/docs/application/docs_context_projection.py")
+          for size in ("160", "320", "520"):
+              if size not in projection:
+                  errors.append(f"adaptive fragment ladder misses {size}")
+
+          recovery = text("docmancer/docs/application/recovery.py")
+          if not ({"visible_evidence_lost", "bounded_selection_failed"} & set(re.findall(r"[a-z_]+", recovery))):
+              errors.append("recovery has no projection-loss diagnosis")
+
+          mcp = text("docmancer/mcp/_docs_server_tool_data.py") + "\n" + text("docs/mcp-docs-server.md")
+          for token in ("lookup_queries", "scope=all", "get_docs_context", "prepare_docs", "docs_status"):
+              if token not in mcp:
+                  errors.append(f"MCP instruction misses {token}")
+
+          if errors:
+              raise SystemExit("\n".join(f"- {item}" for item in errors))
+          print("Static DDD acceptance invariants: PASS")
+          PY
+
+      - name: Run hermetic and live project-context protocols
+        run: |
+          uv run python eval/project_context_quality_protocol.py | tee "$RUNNER_TEMP/project-context-hermetic.json"
+          uv run python eval/project_context_quality_protocol.py --live | tee "$RUNNER_TEMP/project-context-live.json"
+
+      - name: Run offline and advanced suites
+        run: |
+          DOCATLAS_OFFLINE=1 uv run pytest -m 'not advanced and not live and not live_network' -q
+          uv run pytest -m advanced -q
+
+      - name: Run compilation and repository checks
+        run: |
+          uv run python -m compileall -q docmancer eval scripts tests
+          git diff --check origin/fix/context-first-project-reads...HEAD
+
+      - name: Run explicit self-host acceptance gate
+        run: |
+          uv run python scripts/run_project_docs_self_host_gate.py --output "$RUNNER_TEMP/project-docs-self-host.json"
+
+      - name: Upload acceptance reports
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: project-context-ddd-${{ github.sha }}
+          path: |
+            ${{ runner.temp }}/project-context-hermetic.json
+            ${{ runner.temp }}/project-context-live.json
+            ${{ runner.temp }}/project-docs-self-host.json
+          if-no-files-found: error
+          retention-days: 14
+
+      - name: Remove one-shot workflow and push validated head
+        run: |
+          rm .github/workflows/project-context-ddd-finalize.yml
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add .github/workflows/project-context-ddd-finalize.yml
+          git commit -m "chore: remove completed DDD finalization workflow"
+          git push origin HEAD:fix/project-docs-ddd-acceptance-closure
+
+      - name: Mark PR 176 ready and publish result
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh pr ready 176 --repo Vanilla1999/DocAtlas
+          gh pr comment 176 --repo Vanilla1999/DocAtlas --body "Project Documentation Context DDD closure passed targeted, hermetic, live, offline, advanced, compileall, diff, dependency-direction and explicit self-host gates on ${GITHUB_SHA}. The one-shot workflow removed itself; PR #176 is the sole delivery PR."
+
+      - name: Comment failure while keeping PR draft
+        if: failure()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh pr ready 176 --undo --repo Vanilla1999/DocAtlas || true
+          gh pr comment 176 --repo Vanilla1999/DocAtlas --body "Project Documentation Context DDD finalization failed on ${GITHUB_SHA}. PR #176 remains draft. See workflow run: ${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}. No new branch or PR was created."

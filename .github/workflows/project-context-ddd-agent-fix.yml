@@ -1,0 +1,427 @@
+name: Finish Project Context DDD Closure
+
+on:
+  push:
+    branches:
+      - fix/project-docs-ddd-acceptance-closure
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+  models: read
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
+
+concurrency:
+  group: finish-project-context-ddd-closure
+  cancel-in-progress: false
+
+jobs:
+  implement-review-validate:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 150
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with:
+          ref: fix/project-docs-ddd-acceptance-closure
+          fetch-depth: 0
+          persist-credentials: true
+
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: "3.12"
+
+      - name: Install locked environment
+        run: |
+          python -m pip install uv
+          uv sync --locked --extra dev --python 3.12
+
+      - name: Remove superseded one-shot delivery attempts from worktree
+        run: |
+          rm -f scripts/apply_project_context_ddd_closure.py
+          rm -f .github/workflows/project-context-ddd-apply.yml
+          rm -f .github/workflows/project-context-ddd-finalize.yml
+
+      - name: Implement from real source and failing contracts
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          cat > /tmp/ddd_fix_agent.py <<'PY'
+          from __future__ import annotations
+
+          import json
+          import os
+          import re
+          import subprocess
+          import sys
+          import time
+          import urllib.error
+          import urllib.request
+          from pathlib import Path
+
+          ROOT = Path.cwd()
+          TARGET_TESTS = [
+              "tests/docs/test_documentation_query_plan.py",
+              "tests/docs/test_model_visible_projection.py",
+              "tests/test_named_document_context_integration.py",
+              "tests/test_sqlite_ranking_truth.py",
+              "tests/test_release_gate.py",
+              "tests/docs/test_docs_context_compound_projection.py",
+          ]
+          CORE_FILES = [
+              "eval/project_context_quality/cases.json",
+              "eval/project_context_quality/protocol.lock.json",
+              "eval/project_context_quality_protocol.py",
+              "scripts/run_project_docs_self_host_gate.py",
+              "docmancer/docs/domain/project_retrieval_intent.py",
+              "docmancer/docs/domain/documentation_query_plan.py",
+              "docmancer/docs/domain/project_doc_ranking.py",
+              "docmancer/docs/domain/query_terms.py",
+              "docmancer/docs/domain/evidence_qualification.py",
+              "docmancer/docs/domain/context_budget.py",
+              "docmancer/docs/application/docs_context_projection.py",
+              "docmancer/docs/application/recovery.py",
+              "docmancer/docs/application/_project_docs_service_part03.py",
+              "docmancer/core/_sqlite_store_part03.py",
+              "docatlas.project-docs.yaml",
+              "docmancer/mcp/_docs_server_tool_data.py",
+              "docs/mcp-docs-server.md",
+          ]
+          PLAN = r'''
+          Implement the existing Project Documentation Context bounded context cleanly using DDD.
+          Do not create a new bounded context, aggregate, application service, NLP/multilingual subsystem,
+          retrieval port, transport, serializer, or public MCP field. Do not use monkey patches, module-bottom
+          wrappers, runtime reassignment, file-name-specific ranking rules, or test weakening.
+
+          Acceptance requirements:
+          1. The frozen acceptance corpus contains 15 natural Russian onboarding questions from the real run.
+             Use unchanged Russian originals and single-concept English lookup_queries. Architecture, request
+             flow, and evidence-selection cross-module questions use scope=all; all others scope=project.
+             Give every independent question part its own required_fact. Search facts only in visible snippet.
+             Define allowed_paths, forbidden paths/source prefixes, forbidden snippet facts, exact expected
+             covered/missing public query IDs, and minimum_lookup_coverage > 0. Every failed positive makes the
+             aggregate gate fail. Report actual passed_positive/positive_count. Add non-blocking question-only
+             diagnostics. Remove unsupported security_parse_uncertain baseline or add a real security case.
+          2. Natural facet detection recognizes: "что это за проект", "какую проблему он решает",
+             "проходит запрос", "выбор источников", "публичные инструменты Docs MCP", "выбирает
+             доказательства", and "ограничивает размер контекста". Problem-solved is not troubleshooting;
+             where+modules is not contributor-start without read/start/contributor cue. Docs MCP public tools
+             map to docs_mcp_workflow. Evidence selection with budget also gets bounded alias
+             "context budget three sources 800 tokens". Tests assert exact facet sets.
+          3. Role policies:
+             installation_verification/getting_started preferred overview,api_contract,development,runbook;
+             index_cleanup preferred operations,runbook,api_contract; troubleshooting preferred
+             runbook,operations; offline_usage preferred runbook,api_contract,development; evidence_selection
+             preferred module_architecture,project_architecture,development. All forbid adr,roadmap.
+          4. Host lookup inherits original facet_id when unambiguous plus preferred_catalog_roles,
+             forbidden_catalog_roles, forbidden_evidence_terms. It keeps relation=host_lookup,
+             public_parent_query_id=None, and covers only its own query-lookup-N; never derived original coverage.
+          5. Eligibility precedes ranking. Remove unconditional query-lookup 10x. Ranking order is authority,
+             preferred role, visible title/body overlap, new public coverage, original/lookup match, retrieval
+             score, stable identity. Keep strong boosts only for exact path and exact identifiers. Bare MCP is
+             not a strong exact anchor; get_docs_context, prepare_docs, docs_status and paths remain exact.
+          6. Catalog: docs/adr/0002-context-retrieval-vs-answer-proof.md is role adr, authority historical,
+             status superseded. Explicitly catalog docs/decisions/2026-08-22-defer-public-release-and-open-p1-harness.md
+             as adr with lifecycle matching its document. Superseded ADR is absent from onboarding allowed_paths.
+          7. SQLite returns only query_terms, matched_terms, missing_terms, exact_terms, missing_exact_terms,
+             field_matches, lexical_score, bm25_cost, exact_match. It never creates qualified or
+             qualification_reason. The domain qualify_evidence owns that decision. Do not add a typed port.
+          8. Domain qualify_evidence checks project identity, active lifecycle, current freshness,
+             synchronized index, risk flags, catalog role, forbidden evidence terms, and visible body evidence.
+             Application passes candidate facts and only orchestrates/produces DTOs; remove duplicated semantic
+             eligibility from Application.
+          9. For each multi-lookup candidate try real fragments of 160, 320, 520 characters and select the
+             shortest fragment preserving the maximum qualified query IDs. Apply shared ContextBudget after
+             fragment choice. Do not return insufficient_evidence while a qualifying same-source fragment fits.
+             Tests use realistic long sections, not nonce words.
+          10. Drop one-word low-signal internal hints: и, или, and, or, the. No NLP/stemming dependency.
+          11. Report direct_only_coverage_count, derived_only_coverage_count,
+             direct_and_derived_coverage_count, lookup_coverage_count, zero_coverage_count. Join raw/public
+             evidence by immutable evidence identity plus content hash and line range, not path alone.
+             question_parse_uncertain is only for no qualified retrieval; projection loss is
+             visible_evidence_lost or existing bounded_selection_failed. Public MCP schema is unchanged.
+          12. MCP instruction keeps the original question unchanged, permits up to five single-concept lookups
+             in documentation language, preserves identifiers/commands/paths, splits >3 topics, and uses
+             scope=all cross-module. Do not add semantic ranking to MCP.
+          13. DoD: 15/15 positive pass; useful>=13; direct or audited-derived original attribution>=12;
+             fact-bearing top1>=12; metadata/Packs/docs-analysis/superseded-ADR contamination=0;
+             false docs_answer=0; sources<=3; tokens<=800; no raw-qualified evidence lost in projection;
+             aggregate can never pass a failed positive; domain imports no core/retrieval/MCP/application/infra.
+          Preserve existing public compatibility unless explicitly contradicted above.
+          '''
+
+          def run(command: list[str], timeout: int = 900) -> subprocess.CompletedProcess[str]:
+              return subprocess.run(
+                  command,
+                  cwd=ROOT,
+                  text=True,
+                  stdout=subprocess.PIPE,
+                  stderr=subprocess.STDOUT,
+                  timeout=timeout,
+              )
+
+          def targeted() -> subprocess.CompletedProcess[str]:
+              return run(["uv", "run", "pytest", *TARGET_TESTS, "-q"], timeout=1200)
+
+          def selected_files(failure: str) -> list[str]:
+              files = list(dict.fromkeys(CORE_FILES + TARGET_TESTS))
+              mentions = re.findall(r"(?:docmancer|tests|eval|scripts|docs)/[A-Za-z0-9_./-]+\.(?:py|json|md|yaml)", failure)
+              for item in mentions:
+                  if item not in files and (ROOT / item).is_file():
+                      files.append(item)
+              return files
+
+          def source_context(paths: list[str], limit: int = 420_000) -> str:
+              chunks: list[str] = []
+              used = 0
+              for path in paths:
+                  file = ROOT / path
+                  if not file.is_file():
+                      continue
+                  text = file.read_text(encoding="utf-8", errors="replace")
+                  block = f"\n===== FILE: {path} =====\n{text}\n"
+                  if used + len(block) > limit:
+                      remaining = limit - used
+                      if remaining > 2000:
+                          chunks.append(block[:remaining])
+                      break
+                  chunks.append(block)
+                  used += len(block)
+              return "".join(chunks)
+
+          def current_diff() -> str:
+              result = run(["git", "diff", "--", ".", ":(exclude).github/workflows/project-context-ddd-agent-fix.yml"])
+              return result.stdout[-120_000:]
+
+          def github_model(prompt: str) -> str:
+              token = os.environ["GITHUB_TOKEN"]
+              endpoint = "https://models.github.ai/inference/chat/completions"
+              models = (
+                  "openai/gpt-5-mini",
+                  "openai/gpt-4.1",
+                  "openai/gpt-4.1-mini",
+                  "openai/gpt-4o",
+              )
+              last_error = ""
+              for model in models:
+                  payload = {
+                      "model": model,
+                      "messages": [
+                          {
+                              "role": "system",
+                              "content": (
+                                  "You are the senior maintainer of a Python DDD codebase. Read the supplied "
+                                  "real files and pytest output. Return only a valid git unified diff beginning "
+                                  "with 'diff --git'. Make minimal production-quality changes. Never weaken or "
+                                  "delete meaningful tests/gates, never fabricate results, never monkey-patch, "
+                                  "and never change the public MCP schema."
+                              ),
+                          },
+                          {"role": "user", "content": prompt},
+                      ],
+                      "temperature": 0.1,
+                      "max_tokens": 16000,
+                  }
+                  request = urllib.request.Request(
+                      endpoint,
+                      data=json.dumps(payload).encode("utf-8"),
+                      headers={
+                          "Authorization": f"Bearer {token}",
+                          "Content-Type": "application/json",
+                          "Accept": "application/vnd.github+json",
+                          "X-GitHub-Api-Version": "2022-11-28",
+                      },
+                      method="POST",
+                  )
+                  try:
+                      with urllib.request.urlopen(request, timeout=240) as response:
+                          data = json.loads(response.read().decode("utf-8"))
+                      return data["choices"][0]["message"]["content"]
+                  except Exception as exc:
+                      last_error = f"{model}: {exc}"
+                      time.sleep(2)
+              raise RuntimeError(f"GitHub Models unavailable: {last_error}")
+
+          def extract_patch(text: str) -> str:
+              fenced = re.search(r"```(?:diff|patch)?\s*(diff --git .*?)```", text, re.S)
+              if fenced:
+                  return fenced.group(1).strip() + "\n"
+              start = text.find("diff --git ")
+              if start >= 0:
+                  return text[start:].strip() + "\n"
+              return ""
+
+          def apply_patch(patch: str) -> tuple[bool, str]:
+              path = Path("/tmp/ddd-model.patch")
+              path.write_text(patch, encoding="utf-8")
+              check = run(["git", "apply", "--check", "--whitespace=fix", str(path)])
+              if check.returncode:
+                  return False, check.stdout
+              applied = run(["git", "apply", "--whitespace=fix", str(path)])
+              return applied.returncode == 0, applied.stdout
+
+          failure = targeted()
+          notes = ""
+          for iteration in range(1, 13):
+              if failure.returncode == 0:
+                  print(f"Targeted contracts passed after {iteration - 1} repair iterations")
+                  break
+              paths = selected_files(failure.stdout)
+              prompt = (
+                  PLAN
+                  + "\n\nThis is repair iteration " + str(iteration) + ".\n"
+                  + "CURRENT PYTEST OUTPUT:\n" + failure.stdout[-55_000:]
+                  + "\n\nCURRENT DIFF:\n" + current_diff()
+                  + "\n\nPREVIOUS APPLY NOTE:\n" + notes[-10_000:]
+                  + "\n\nREAL REPOSITORY FILES:\n" + source_context(paths)
+                  + "\nReturn one minimal unified diff. Fix root causes in the existing DDD layers."
+              )
+              answer = github_model(prompt)
+              patch = extract_patch(answer)
+              if not patch:
+                  notes = "Model returned no unified diff: " + answer[-5000:]
+                  failure = targeted()
+                  continue
+              ok, notes = apply_patch(patch)
+              if not ok:
+                  notes = "git apply failed:\n" + notes + "\nMODEL OUTPUT:\n" + answer[-6000:]
+                  failure = targeted()
+                  continue
+              compile_result = run(["uv", "run", "python", "-m", "compileall", "-q", "docmancer", "eval", "scripts", "tests"])
+              if compile_result.returncode:
+                  failure = compile_result
+              else:
+                  failure = targeted()
+          else:
+              print(failure.stdout)
+              raise SystemExit("Targeted contracts did not pass after 12 repair iterations")
+
+          if failure.returncode:
+              print(failure.stdout)
+              raise SystemExit(failure.returncode)
+
+          # Independent model review of the complete diff. It may return an empty/no-op answer when clean.
+          review_prompt = (
+              PLAN
+              + "\n\nAct as an independent PR reviewer. Inspect the complete diff and relevant sources below. "
+                "Look for test gaming, monkey patches, wrong DDD dependency direction, false-green gates, "
+                "path-only evidence joins, public schema changes, and regressions. If any issue exists, return "
+                "only a corrective unified diff. If clean, return exactly CLEAN.\n\nDIFF:\n"
+              + current_diff()
+              + "\n\nSOURCES:\n"
+              + source_context(list(dict.fromkeys(CORE_FILES + TARGET_TESTS)), limit=500_000)
+          )
+          review = github_model(review_prompt)
+          patch = extract_patch(review)
+          if patch:
+              ok, note = apply_patch(patch)
+              if not ok:
+                  raise SystemExit("Review patch failed to apply:\n" + note)
+              check = targeted()
+              if check.returncode:
+                  print(check.stdout)
+                  raise SystemExit("Independent review patch broke targeted contracts")
+
+          # Reject the exact shortcut patterns that the task explicitly forbids.
+          forbidden = run([
+              "rg", "-n",
+              "BEGIN PROJECT CONTEXT DDD CLOSURE|_ddd_wrap_|runtime reassignment|monkey.?patch",
+              "docmancer", "eval", "scripts", "tests",
+          ])
+          if forbidden.returncode == 0:
+              print(forbidden.stdout)
+              raise SystemExit("Forbidden runtime-wrapper implementation remains")
+
+          print("Implementation and independent review: PASS")
+          PY
+          uv run python /tmp/ddd_fix_agent.py | tee "$RUNNER_TEMP/ddd-agent.log"
+
+      - name: Run exact targeted contracts separately
+        run: |
+          uv run pytest tests/docs/test_documentation_query_plan.py -q
+          uv run pytest tests/docs/test_model_visible_projection.py -q
+          uv run pytest tests/test_named_document_context_integration.py -q
+          uv run pytest tests/test_sqlite_ranking_truth.py -q
+          uv run pytest tests/test_release_gate.py -q
+          uv run pytest tests/docs/test_docs_context_compound_projection.py -q
+
+      - name: Verify DDD dependency direction
+        shell: bash
+        run: |
+          if rg -n 'docmancer\.(retrieval|core|mcp|docs\.application|docs\.infrastructure)' \
+            docmancer/docs/domain/documentation_query_plan.py \
+            docmancer/docs/domain/project_retrieval_intent.py \
+            docmancer/docs/domain/evidence_qualification.py \
+            docmancer/docs/domain/context_budget.py \
+            docmancer/docs/domain/query_terms.py \
+            docmancer/docs/domain/project_doc_ranking.py; then
+            echo 'Domain imports an outer layer.' >&2
+            exit 1
+          fi
+
+      - name: Run hermetic and live acceptance protocols
+        run: |
+          uv run python eval/project_context_quality_protocol.py | tee "$RUNNER_TEMP/project-context-hermetic.json"
+          uv run python eval/project_context_quality_protocol.py --live | tee "$RUNNER_TEMP/project-context-live.json"
+
+      - name: Run explicit public self-host gate
+        run: |
+          uv run python scripts/run_project_docs_self_host_gate.py --output "$RUNNER_TEMP/project-docs-self-host.json"
+
+      - name: Run offline and advanced suites
+        run: |
+          DOCATLAS_OFFLINE=1 uv run pytest -m 'not advanced and not live and not live_network' -q
+          uv run pytest -m advanced -q
+
+      - name: Run compilation, whitespace and DDD checks
+        run: |
+          uv run python -m compileall -q docmancer eval scripts tests
+          git diff --check
+          test -z "$(rg -l 'BEGIN PROJECT CONTEXT DDD CLOSURE|_ddd_wrap_' docmancer eval scripts tests || true)"
+
+      - name: Upload reports
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: project-context-ddd-final-${{ github.sha }}
+          path: |
+            ${{ runner.temp }}/ddd-agent.log
+            ${{ runner.temp }}/project-context-hermetic.json
+            ${{ runner.temp }}/project-context-live.json
+            ${{ runner.temp }}/project-docs-self-host.json
+          if-no-files-found: warn
+          retention-days: 14
+
+      - name: Remove every one-shot delivery file, commit and push
+        run: |
+          rm -f scripts/apply_project_context_ddd_closure.py
+          rm -f .github/workflows/project-context-ddd-apply.yml
+          rm -f .github/workflows/project-context-ddd-finalize.yml
+          rm -f .github/workflows/project-context-ddd-agent-fix.yml
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          test -n "$(git diff --cached --name-only)"
+          git commit -m "fix: complete project context DDD acceptance closure"
+          git push origin HEAD:fix/project-docs-ddd-acceptance-closure
+
+      - name: Mark the existing PR ready and post verified summary
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          validated_head="$(git rev-parse HEAD)"
+          gh pr ready 176 --repo Vanilla1999/DocAtlas
+          gh pr comment 176 --repo Vanilla1999/DocAtlas --body "Project Documentation Context DDD closure completed on ${validated_head}. Passed independent implementation review, targeted planner/projection/integration/SQLite/release contracts, hermetic and live protocols, public self-host gate, offline and advanced suites, compileall, diff checks, and domain dependency-direction checks. All one-shot delivery files removed. PR #176 is the only delivery PR."
+
+      - name: Keep PR draft and report exact workflow run on failure
+        if: failure()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh pr ready 176 --undo --repo Vanilla1999/DocAtlas || true
+          gh pr comment 176 --repo Vanilla1999/DocAtlas --body "DDD implementation/review/final gates failed on ${GITHUB_SHA}. PR #176 remains draft and no new branch or PR was created. Exact logs: ${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}."

@@ -1,0 +1,355 @@
+name: Project Context DDD Final Transaction
+
+on:
+  push:
+    branches:
+      - fix/project-docs-ddd-acceptance-closure
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+  actions: read
+  models: read
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
+
+concurrency:
+  group: finish-project-context-ddd-closure
+  cancel-in-progress: true
+
+jobs:
+  close-ddd-plan:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 240
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with:
+          ref: fix/project-docs-ddd-acceptance-closure
+          fetch-depth: 0
+          persist-credentials: true
+
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: "3.12"
+
+      - name: Install locked environment
+        run: |
+          python -m pip install uv
+          uv sync --locked --extra dev --python 3.12
+
+      - name: Remove previous delivery helpers from the working copy
+        run: |
+          rm -f scripts/apply_project_context_ddd_closure.py
+          rm -f .github/workflows/project-context-ddd-apply.yml
+          rm -f .github/workflows/project-context-ddd-finalize.yml
+          rm -f .github/workflows/project-context-ddd-agent-fix.yml
+          rm -f .github/workflows/project-context-ddd-second-pass.yml
+
+      - name: Implement, checkpoint, review and validate until green
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          cat > /tmp/final_transaction.py <<'PY'
+          from __future__ import annotations
+
+          import json
+          import os
+          import re
+          import subprocess
+          import time
+          import urllib.request
+          from pathlib import Path
+
+          ROOT = Path.cwd()
+          TARGETS = [
+              "tests/docs/test_documentation_query_plan.py",
+              "tests/docs/test_model_visible_projection.py",
+              "tests/test_named_document_context_integration.py",
+              "tests/test_sqlite_ranking_truth.py",
+              "tests/test_release_gate.py",
+              "tests/docs/test_docs_context_compound_projection.py",
+          ]
+          CORE = [
+              "eval/project_context_quality/cases.json",
+              "eval/project_context_quality/protocol.lock.json",
+              "eval/project_context_quality_protocol.py",
+              "scripts/run_project_docs_self_host_gate.py",
+              "docmancer/docs/domain/project_retrieval_intent.py",
+              "docmancer/docs/domain/documentation_query_plan.py",
+              "docmancer/docs/domain/project_doc_ranking.py",
+              "docmancer/docs/domain/query_terms.py",
+              "docmancer/docs/domain/evidence_qualification.py",
+              "docmancer/docs/domain/context_budget.py",
+              "docmancer/docs/application/docs_context_projection.py",
+              "docmancer/docs/application/recovery.py",
+              "docmancer/docs/application/_project_docs_service_part03.py",
+              "docmancer/core/_sqlite_store_part03.py",
+              "docatlas.project-docs.yaml",
+              "docmancer/mcp/_docs_server_tool_data.py",
+              "docs/mcp-docs-server.md",
+              *TARGETS,
+          ]
+          PLAN = r'''
+          Work only inside the existing Project Documentation Context bounded context. Produce direct,
+          maintainable source edits. Forbidden: another bounded context, aggregate, application service,
+          multilingual/NLP subsystem, stemming dependency, typed retrieval port, transport/serializer,
+          public MCP field, module-bottom wrapper, runtime function reassignment, monkey patch, test weakening,
+          fabricated metrics, or path-specific ranking policy.
+
+          Complete every requirement:
+          - Honest fail-closed gate: exactly 15 natural Russian positive onboarding questions from the real run,
+            unchanged originals, <=5 single-concept English lookup queries, architecture/request-flow/evidence
+            selection scope=all and all others project; one visible-snippet required fact per independent part;
+            allowed/forbidden sources and forbidden snippet facts; exact expected covered/missing public query IDs;
+            nonzero minimum lookup coverage; any failed positive makes aggregate red; actual
+            passed_positive/positive_count; nonblocking question-only diagnostics; remove unsupported security
+            baseline or add a genuine case.
+          - Natural facet phrases: что это за проект; какую проблему он решает; проходит запрос; выбор источников;
+            публичные инструменты Docs MCP; выбирает доказательства; ограничивает размер контекста. Problem solved
+            is not troubleshooting. where+modules is not contributor_start without read/start/contributor cue.
+            Docs MCP public tools => docs_mcp_workflow. Evidence-selection plus budget adds exactly bounded alias
+            'context budget three sources 800 tokens'. Tests assert exact facet sets.
+          - Role policy: installation_verification/getting_started prefer overview,api_contract,development,runbook;
+            index_cleanup prefer operations,runbook,api_contract; troubleshooting runbook,operations; offline_usage
+            runbook,api_contract,development; evidence_selection module_architecture,project_architecture,development;
+            all forbid adr,roadmap.
+          - Host lookup inherits unambiguous facet_id and preferred/forbidden roles/terms, keeps host_lookup,
+            parent None, covers only own query-lookup-N, never derives original coverage.
+          - Eligibility before ranking. Remove query-lookup 10x. Order authority, preferred role, visible title/body
+            overlap, new public coverage, original/lookup match, retrieval score, stable identity. Strong boost only
+            exact path or actual exact identifier. Bare MCP is ambiguous; get_docs_context/prepare_docs/docs_status
+            and exact paths remain anchors.
+          - Catalog ADR 0002 is role adr, authority historical, status superseded; explicitly catalog the 2026-08-22
+            decision as adr with lifecycle derived from its current text; no superseded ADR in onboarding allowed paths.
+          - SQLite emits only query_terms, matched_terms, missing_terms, exact_terms, missing_exact_terms,
+            field_matches, lexical_score, bm25_cost, exact_match. It never decides qualified/reason. Existing domain
+            qualify_evidence alone checks project identity, active lifecycle, freshness, synchronized index, risks,
+            catalog role, forbidden terms, visible body. Application supplies facts and only orchestrates/projects.
+          - Multi-lookup revalidation tries 160,320,520 using realistic sections and chooses the shortest fragment
+            preserving maximum qualified query IDs, then applies ContextBudget. Never emit insufficient evidence if a
+            qualifying same-source fragment fits remaining budget.
+          - Drop bare low-signal и,или,and,or,the without NLP. Coverage separately counts direct-only, derived-only,
+            direct-and-derived, lookup, zero. Join raw/public evidence by immutable identity + content hash + line
+            range, never only path. Parse uncertainty only when retrieval found no qualified candidate; projection
+            loss is visible_evidence_lost or bounded_selection_failed.
+          - MCP instruction: original unchanged, <=5 one-concept lookups in documentation language, preserve
+            identifiers/commands/paths, split >3 topics, scope=all cross-module; public schema and ranking stay out.
+          - DoD: all 15 pass; useful>=13; direct/audited-derived original attribution>=12; fact-bearing Top-1>=12;
+            metadata/Packs/docs-analysis/superseded-ADR contamination and false docs_answer are zero; <=3 sources;
+            <=800 tokens; no qualified evidence lost in projection; aggregate cannot be green with failed positive;
+            domain imports no retrieval/core/MCP/application/infrastructure.
+          Preserve compatible public behavior not contradicted by this specification.
+          '''
+
+          def run(command: list[str], timeout: int = 3600):
+              return subprocess.run(command, cwd=ROOT, text=True, stdout=subprocess.PIPE,
+                                    stderr=subprocess.STDOUT, timeout=timeout)
+
+          def steps():
+              return [
+                  ("targeted", ["uv", "run", "pytest", *TARGETS, "-q"], 1800),
+                  ("hermetic", ["uv", "run", "python", "eval/project_context_quality_protocol.py"], 1200),
+                  ("live", ["uv", "run", "python", "eval/project_context_quality_protocol.py", "--live"], 2400),
+                  ("self_host", ["uv", "run", "python", "scripts/run_project_docs_self_host_gate.py", "--output", "/tmp/final-self-host.json"], 2400),
+                  ("offline", ["bash", "-lc", "DOCATLAS_OFFLINE=1 uv run pytest -m 'not advanced and not live and not live_network' -q"], 5400),
+                  ("advanced", ["uv", "run", "pytest", "-m", "advanced", "-q"], 5400),
+                  ("compile", ["uv", "run", "python", "-m", "compileall", "-q", "docmancer", "eval", "scripts", "tests"], 900),
+                  ("diff_check", ["git", "diff", "--check"], 300),
+                  ("domain_direction", ["bash", "-lc", "! rg -n 'docmancer\\.(retrieval|core|mcp|docs\\.application|docs\\.infrastructure)' docmancer/docs/domain/documentation_query_plan.py docmancer/docs/domain/project_retrieval_intent.py docmancer/docs/domain/evidence_qualification.py docmancer/docs/domain/context_budget.py docmancer/docs/domain/query_terms.py docmancer/docs/domain/project_doc_ranking.py"], 300),
+                  ("no_shortcuts", ["bash", "-lc", "test -z \"$(rg -l 'BEGIN PROJECT CONTEXT DDD CLOSURE|_ddd_wrap_|runtime function reassignment|monkey.?patch' docmancer eval scripts tests || true)\""], 300),
+              ]
+
+          def validate():
+              all_text = []
+              for name, command, timeout in steps():
+                  result = run(command, timeout)
+                  all_text.append(f"===== {name} rc={result.returncode} =====\n{result.stdout}")
+                  if result.returncode:
+                      return name, result.stdout, "\n".join(all_text)
+              return None, "", "\n".join(all_text)
+
+          def gather(failure: str, limit: int = 320_000):
+              paths = list(CORE)
+              for path in re.findall(r"(?:docmancer|tests|eval|scripts|docs)/[A-Za-z0-9_./-]+\.(?:py|json|md|yaml)", failure):
+                  if path not in paths and (ROOT / path).is_file():
+                      paths.append(path)
+              parts = []
+              used = 0
+              for path in paths:
+                  file = ROOT / path
+                  if not file.is_file():
+                      continue
+                  text = file.read_text(encoding="utf-8", errors="replace")
+                  block = f"\n===== FILE {path} =====\n{text}\n"
+                  if used + len(block) > limit:
+                      left = limit - used
+                      if left > 3000:
+                          parts.append(block[:left])
+                      break
+                  parts.append(block)
+                  used += len(block)
+              return "".join(parts)
+
+          def current_diff(limit: int = 140_000):
+              result = run(["git", "diff", "origin/fix/context-first-project-reads...HEAD"])
+              unstaged = run(["git", "diff", "--", ".", ":(exclude).github/workflows/project-context-ddd-final-transaction.yml"])
+              return (result.stdout + "\n" + unstaged.stdout)[-limit:]
+
+          def model(prompt: str):
+              endpoint = "https://models.github.ai/inference/chat/completions"
+              token = os.environ["GITHUB_TOKEN"]
+              failures = []
+              for model_id in ("openai/gpt-5-mini", "openai/gpt-4.1", "openai/gpt-4.1-mini", "openai/gpt-4o"):
+                  body = {
+                      "model": model_id,
+                      "messages": [
+                          {"role": "system", "content": "You are a senior Python DDD maintainer. Return only an applicable git unified diff beginning with diff --git. Fix root causes directly and minimally. Never weaken tests/gates, fake outcomes, monkey-patch, add architecture, or change public MCP schema."},
+                          {"role": "user", "content": prompt},
+                      ],
+                      "temperature": 0.1,
+                      "max_tokens": 18000,
+                  }
+                  req = urllib.request.Request(endpoint, data=json.dumps(body).encode(), method="POST",
+                      headers={"Authorization": f"Bearer {token}", "Content-Type": "application/json",
+                               "Accept": "application/vnd.github+json", "X-GitHub-Api-Version": "2022-11-28"})
+                  try:
+                      with urllib.request.urlopen(req, timeout=360) as response:
+                          return json.loads(response.read().decode())["choices"][0]["message"]["content"]
+                  except Exception as exc:
+                      failures.append(f"{model_id}: {exc}")
+                      time.sleep(3)
+              raise RuntimeError("GitHub Models calls failed: " + "; ".join(failures))
+
+          def patch_from(answer: str):
+              fenced = re.search(r"```(?:diff|patch)?\s*(diff --git .*?)```", answer, re.S)
+              if fenced:
+                  return fenced.group(1).strip() + "\n"
+              pos = answer.find("diff --git ")
+              return answer[pos:].strip() + "\n" if pos >= 0 else ""
+
+          def apply(patch: str):
+              file = Path("/tmp/model.patch")
+              file.write_text(patch, encoding="utf-8")
+              check = run(["git", "apply", "--check", "--whitespace=fix", str(file)])
+              if check.returncode:
+                  return False, check.stdout
+              result = run(["git", "apply", "--whitespace=fix", str(file)])
+              return result.returncode == 0, result.stdout
+
+          def checkpoint(iteration: int, label: str):
+              run(["git", "add", "docmancer", "eval", "tests", "docs", "scripts", "docatlas.project-docs.yaml"])
+              run(["git", "reset", "--", "scripts/apply_project_context_ddd_closure.py"])
+              staged = run(["git", "diff", "--cached", "--quiet"])
+              if staged.returncode == 0:
+                  return
+              compile_result = run(["uv", "run", "python", "-m", "compileall", "-q", "docmancer", "eval", "scripts", "tests"])
+              if compile_result.returncode:
+                  raise SystemExit(compile_result.stdout)
+              message = f"fix: advance project context DDD closure ({iteration}: {label})"
+              commit = run(["git", "commit", "-m", message])
+              if commit.returncode:
+                  raise SystemExit(commit.stdout)
+              pushed = run(["git", "push", "origin", "HEAD:fix/project-docs-ddd-acceptance-closure"], 900)
+              if pushed.returncode:
+                  raise SystemExit(pushed.stdout)
+
+          transcript = []
+          note = ""
+          for iteration in range(1, 19):
+              failed_step, failure, output = validate()
+              transcript.append(output)
+              if failed_step is None:
+                  break
+              prompt = (PLAN + f"\n\nIteration {iteration}; first failed mandatory step={failed_step}.\nFAILURE:\n"
+                        + failure[-70000:] + "\nCURRENT PR DIFF:\n" + current_diff()
+                        + "\nPREVIOUS PATCH NOTE:\n" + note[-10000:] + "\nREAL FILES:\n" + gather(failure)
+                        + "\nReturn exactly one minimal direct unified diff fixing this first failure and its root cause.")
+              answer = model(prompt)
+              patch = patch_from(answer)
+              if not patch:
+                  note = "No diff returned: " + answer[-6000:]
+                  continue
+              ok, note = apply(patch)
+              if not ok:
+                  note += "\nMODEL TAIL:\n" + answer[-6000:]
+                  continue
+              checkpoint(iteration, failed_step)
+          else:
+              Path("/tmp/final-transaction.log").write_text("\n\n".join(transcript), encoding="utf-8")
+              raise SystemExit("DDD closure remained red after 18 checkpointed repair iterations")
+
+          failed_step, failure, output = validate()
+          transcript.append(output)
+          if failed_step is not None:
+              Path("/tmp/final-transaction.log").write_text("\n\n".join(transcript), encoding="utf-8")
+              raise SystemExit(f"Final gate still failed at {failed_step}:\n{failure}")
+
+          review_prompt = (PLAN + "\n\nIndependently review the completed PR diff for correctness, DDD direction, test gaming,"
+              " false-green acceptance, path-only joins, lost evidence, ranking before eligibility, public schema"
+              " changes, runtime wrappers, and compatibility regressions. Return exactly CLEAN when no issue;"
+              " otherwise return only a corrective git unified diff.\nDIFF:\n" + current_diff(220_000)
+              + "\nREAL FILES:\n" + gather("", 430_000))
+          review = model(review_prompt)
+          review_patch = patch_from(review)
+          if review_patch:
+              ok, note = apply(review_patch)
+              if not ok:
+                  raise SystemExit("Independent review diff did not apply: " + note)
+              checkpoint(19, "independent-review")
+              failed_step, failure, output = validate()
+              transcript.append(output)
+              if failed_step is not None:
+                  raise SystemExit(f"Review correction failed {failed_step}:\n{failure}")
+
+          Path("/tmp/final-transaction.log").write_text("\n\n".join(transcript), encoding="utf-8")
+          print("DDD implementation, independent review and all final gates: PASS")
+          PY
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          uv run python /tmp/final_transaction.py
+
+      - name: Upload transaction evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: project-context-ddd-transaction-${{ github.sha }}
+          path: |
+            /tmp/final-transaction.log
+            /tmp/final-self-host.json
+          if-no-files-found: warn
+          retention-days: 14
+
+      - name: Remove all temporary delivery files and push the validated head
+        run: |
+          rm -f scripts/apply_project_context_ddd_closure.py
+          rm -f .github/workflows/project-context-ddd-apply.yml
+          rm -f .github/workflows/project-context-ddd-finalize.yml
+          rm -f .github/workflows/project-context-ddd-agent-fix.yml
+          rm -f .github/workflows/project-context-ddd-second-pass.yml
+          rm -f .github/workflows/project-context-ddd-final-transaction.yml
+          git add -A
+          if ! git diff --cached --quiet; then
+            git commit -m "chore: remove completed DDD delivery automation"
+            git push origin HEAD:fix/project-docs-ddd-acceptance-closure
+          fi
+
+      - name: Mark existing PR 176 ready with verified result
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          sha="$(git rev-parse HEAD)"
+          gh pr ready 176 --repo Vanilla1999/DocAtlas
+          gh pr comment 176 --repo Vanilla1999/DocAtlas --body "Project Documentation Context DDD plan completed on ${sha}. The transaction checkpointed real fixes in the existing branch, then passed targeted contracts, hermetic/live protocols, public self-host, offline/advanced suites, compileall, diff, no-shortcut and dependency-direction gates plus an independent final review. All temporary delivery automation was removed. PR #176 remains the single delivery PR."
+
+      - name: Keep PR draft and retain checkpointed progress on failure
+        if: failure()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh pr ready 176 --undo --repo Vanilla1999/DocAtlas || true
+          gh pr comment 176 --repo Vanilla1999/DocAtlas --body "The transactional DDD pass is still red on ${GITHUB_SHA}. Any compile-checked repair iterations were checkpointed to the same branch; PR #176 remains draft. No new branch or PR was created. Run: ${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}."

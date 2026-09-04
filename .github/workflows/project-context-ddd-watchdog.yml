@@ -1,0 +1,63 @@
+name: Project Context DDD Transaction Watchdog
+
+on:
+  workflow_run:
+    workflows:
+      - Project Context DDD Final Transaction
+    types:
+      - completed
+
+permissions:
+  actions: write
+  contents: write
+  pull-requests: write
+  issues: write
+
+jobs:
+  retry-or-clean:
+    if: github.event.workflow_run.head_branch == 'fix/project-docs-ddd-acceptance-closure'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Retry a failed transaction a bounded number of times
+        if: github.event.workflow_run.conclusion != 'success' && github.event.workflow_run.run_number < 5
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          sleep 30
+          gh workflow run project-context-ddd-final-transaction.yml \
+            --repo Vanilla1999/DocAtlas \
+            --ref fix/project-docs-ddd-acceptance-closure
+          gh pr comment 176 --repo Vanilla1999/DocAtlas --body "Retrying the same fail-closed DDD transaction after run ${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${{ github.event.workflow_run.id }}. This is bounded retry ${{ github.event.workflow_run.run_number }}/4; PR #176 remains draft."
+
+      - name: Report exhausted retries without changing PR state
+        if: github.event.workflow_run.conclusion != 'success' && github.event.workflow_run.run_number >= 5
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh pr ready 176 --undo --repo Vanilla1999/DocAtlas || true
+          gh pr comment 176 --repo Vanilla1999/DocAtlas --body "The bounded DDD transaction retries are exhausted after run ${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${{ github.event.workflow_run.id }}. PR #176 stays draft; checkpointed source changes remain in its single branch for direct review."
+
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        if: github.event.workflow_run.conclusion == 'success'
+        with:
+          ref: fix/project-docs-ddd-acceptance-closure
+          fetch-depth: 0
+          persist-credentials: true
+
+      - name: Remove watchdog after a successful validated transaction
+        if: github.event.workflow_run.conclusion == 'success'
+        run: |
+          rm -f .github/workflows/project-context-ddd-watchdog.yml
+          rm -f .github/workflows/project-context-ddd-final-transaction.yml
+          rm -f .github/workflows/project-context-ddd-agent-fix.yml
+          rm -f .github/workflows/project-context-ddd-second-pass.yml
+          rm -f .github/workflows/project-context-ddd-apply.yml
+          rm -f .github/workflows/project-context-ddd-finalize.yml
+          rm -f scripts/apply_project_context_ddd_closure.py
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          if ! git diff --cached --quiet; then
+            git commit -m "chore: remove completed DDD transaction watchdog"
+            git push origin HEAD:fix/project-docs-ddd-acceptance-closure
+          fi
