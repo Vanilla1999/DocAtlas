@@ -42,6 +42,26 @@ jobs:
       - name: Apply idempotent DDD closure
         run: uv run python scripts/apply_project_context_ddd_closure.py
 
+      - name: Package patched sources for regression repair
+        run: |
+          tar -czf "$RUNNER_TEMP/project-context-patched-source.tar.gz" \
+            docmancer/docs/application/_project_docs_service_part03.py \
+            docmancer/docs/application/docs_context_projection.py \
+            docmancer/docs/domain/evidence_qualification.py \
+            docmancer/docs/domain/project_doc_ranking.py \
+            docmancer/docs/domain/documentation_query_plan.py \
+            tests/docs/test_context7_style_project_chat.py \
+            tests/test_docs_service_part02.py \
+            tests/test_public_vector_retrieval.py
+
+      - name: Upload patched sources for regression repair
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: project-context-patched-source-${{ github.sha }}
+          path: ${{ runner.temp }}/project-context-patched-source.tar.gz
+          if-no-files-found: error
+          retention-days: 1
+
       - name: Run targeted red-to-green contracts
         run: |
           uv run pytest tests/docs/test_documentation_query_plan.py -q
