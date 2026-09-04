@@ -1,0 +1,127 @@
+name: Project Context DDD Apply and Validate
+
+on:
+  push:
+    branches:
+      - fix/project-docs-ddd-acceptance-closure
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
+
+concurrency:
+  group: project-context-ddd-apply
+  cancel-in-progress: false
+
+jobs:
+  apply-validate-finalize:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with:
+          ref: fix/project-docs-ddd-acceptance-closure
+          fetch-depth: 0
+          persist-credentials: true
+
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: "3.12"
+
+      - name: Install locked development environment
+        run: |
+          python -m pip install uv
+          uv sync --locked --extra dev --python 3.12
+
+      - name: Apply idempotent DDD closure
+        run: uv run python scripts/apply_project_context_ddd_closure.py
+
+      - name: Run targeted red-to-green contracts
+        run: |
+          uv run pytest tests/docs/test_documentation_query_plan.py -q
+          uv run pytest tests/docs/test_model_visible_projection.py -q
+          uv run pytest tests/test_named_document_context_integration.py -q
+          uv run pytest tests/test_sqlite_ranking_truth.py -q
+          uv run pytest tests/test_release_gate.py -q
+          uv run pytest tests/docs/test_docs_context_compound_projection.py -q
+
+      - name: Verify DDD dependency direction
+        shell: bash
+        run: |
+          if rg -n 'docmancer\.(retrieval|core|mcp|docs\.application|docs\.infrastructure)' \
+            docmancer/docs/domain/documentation_query_plan.py \
+            docmancer/docs/domain/project_retrieval_intent.py \
+            docmancer/docs/domain/evidence_qualification.py \
+            docmancer/docs/domain/context_budget.py \
+            docmancer/docs/domain/query_terms.py \
+            docmancer/docs/domain/project_doc_ranking.py; then
+            echo 'Domain imports an outer layer.' >&2
+            exit 1
+          fi
+
+      - name: Run hermetic and live project-context protocols
+        run: |
+          uv run python eval/project_context_quality_protocol.py | tee "$RUNNER_TEMP/project-context-hermetic.json"
+          uv run python eval/project_context_quality_protocol.py --live | tee "$RUNNER_TEMP/project-context-live.json"
+
+      - name: Run explicit self-host acceptance gate
+        run: |
+          uv run python scripts/run_project_docs_self_host_gate.py --output "$RUNNER_TEMP/project-docs-self-host.json"
+
+      - name: Run offline and advanced suites
+        run: |
+          DOCATLAS_OFFLINE=1 uv run pytest -m 'not advanced and not live and not live_network' -q
+          uv run pytest -m advanced -q
+
+      - name: Run compilation, diff and DDD checks
+        run: |
+          uv run python -m compileall -q docmancer eval scripts tests
+          git diff --check
+
+      - name: Upload acceptance reports
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: project-context-ddd-apply-${{ github.sha }}
+          path: |
+            ${{ runner.temp }}/project-context-hermetic.json
+            ${{ runner.temp }}/project-context-live.json
+            ${{ runner.temp }}/project-docs-self-host.json
+          if-no-files-found: warn
+          retention-days: 14
+
+      - name: Remove one-shot delivery files, commit and push
+        run: |
+          rm -f scripts/apply_project_context_ddd_closure.py
+          rm -f .github/workflows/project-context-ddd-apply.yml
+          rm -f .github/workflows/project-context-ddd-finalize.yml
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          if ! git diff --cached --quiet; then
+            git commit -m "fix: complete project context DDD acceptance closure"
+          fi
+          git push origin HEAD:fix/project-docs-ddd-acceptance-closure
+          git rev-parse HEAD > "$RUNNER_TEMP/validated-head.txt"
+
+      - name: Mark only PR 176 ready
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          head_sha="$(git rev-parse HEAD)"
+          gh pr ready 176 --repo Vanilla1999/DocAtlas
+          gh pr comment 176 --repo Vanilla1999/DocAtlas --body "DDD closure completed on ${head_sha}. Passed targeted planner/projection/integration/SQLite/release tests, hermetic and live protocols, explicit self-host gate, offline and advanced suites, compileall, diff check, and domain dependency-direction check. The one-shot migration/workflows removed themselves. PR #176 remains the only delivery PR."
+
+      - name: Keep PR draft and publish failure
+        if: failure()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh pr ready 176 --undo --repo Vanilla1999/DocAtlas || true
+          gh pr comment 176 --repo Vanilla1999/DocAtlas --body "DDD apply/validation failed on ${GITHUB_SHA}; PR #176 remains draft. Inspect ${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}. No new branch or PR was created."
