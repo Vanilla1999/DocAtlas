@@ -360,7 +360,7 @@ def test_public_project_answer_accepts_recall_with_authority_invariant(tmp_path,
     assert result["context_available"] is True
 
 
-def test_public_project_answer_requires_comparison_relation(tmp_path, monkeypatch):
+def test_public_project_context_keeps_comparison_subjects_without_certifying_relation(tmp_path, monkeypatch):
     service, project = _named_document_service(
         tmp_path,
         monkeypatch,
@@ -377,12 +377,15 @@ def test_public_project_answer_requires_comparison_relation(tmp_path, monkeypatc
         service,
     )
 
-    assert result["support_status"] == "insufficient_evidence"
-    assert result["status"] == "insufficient_evidence"
+    assert result["support_status"] == "retrieval_only"
+    assert result["status"] == "ok"
+    assert result["answer_supported"] is False
+    assert result["edit_ready"] is False
+    assert "async and launch are available APIs" in result["sources"][0]["snippet"]
     assert result["answer_available"] is False
 
 
-def test_public_project_answer_accepts_comparison_relation(tmp_path, monkeypatch):
+def test_public_project_context_returns_documented_comparison_without_authorization(tmp_path, monkeypatch):
     service, project = _named_document_service(
         tmp_path,
         monkeypatch,
@@ -402,8 +405,11 @@ def test_public_project_answer_accepts_comparison_relation(tmp_path, monkeypatch
         service,
     )
 
-    assert result["support_status"] == "insufficient_evidence"
+    assert result["support_status"] == "retrieval_only"
+    assert result["status"] == "ok"
     assert result["answer_supported"] is False
+    assert result["edit_ready"] is False
+    assert "whereas launch schedules background work" in result["sources"][0]["snippet"]
 
 
 def test_public_project_answer_supports_russian_behavior_and_usage(tmp_path, monkeypatch):

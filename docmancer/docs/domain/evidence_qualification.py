@@ -6,6 +6,9 @@ from dataclasses import dataclass
 import re
 from typing import Any, Literal, Mapping
 
+from docmancer.docs.domain.lifecycle_policy import lifecycle_allows
+from docmancer.docs.domain.project_answer_contract import LifecycleIntent
+
 CoverageKind = Literal["direct", "derived"]
 
 
@@ -23,13 +26,28 @@ def qualify_evidence(
     evidence_text: str | None = None,
     catalog_role: str = "", forbidden_catalog_roles: tuple[str, ...] = (),
     forbidden_evidence_terms: tuple[str, ...] = (),
+    candidate: Mapping[str, Any] | None = None,
+    expected_project_identity: str | None = None,
+    lifecycle_intent: LifecycleIntent = "current",
 ) -> EvidenceQualification:
     """Qualify one retrieval probe against evidence visible to the model."""
     result = dict(probe)
+    if candidate is not None or expected_project_identity:
+        candidate = candidate or {}
+        identity = str(candidate.get("project_identity") or "").strip()
+        if (expected_project_identity or candidate.get("source_class") == "project_doc") and not identity:
+            return _rejected(result, "missing_project_identity")
+        if expected_project_identity and identity != expected_project_identity:
+            return _rejected(result, "wrong_project_identity")
+        if candidate.get("stale") or str(candidate.get("freshness") or "current") != "current":
+            return _rejected(result, "stale_evidence")
+        if str(candidate.get("index_freshness") or "synchronized") != "synchronized":
+            return _rejected(result, "unsynchronized_index")
+        if candidate.get("risk_flags"):
+            return _rejected(result, "unsafe_evidence")
+        if not lifecycle_allows(candidate, lifecycle_intent):
+            return _rejected(result, "lifecycle_not_allowed")
     normalized_visible = visible_text.casefold()
-    normalized_evidence = (
-        evidence_text if evidence_text is not None else visible_text
-    ).casefold()
     forbidden_terms = tuple(dict.fromkeys((
         *(str(value) for value in probe.get("forbidden_evidence_terms") or ()),
         *forbidden_evidence_terms,
@@ -42,11 +60,48 @@ def qualify_evidence(
         return _rejected(result, "forbidden_evidence_term")
     if catalog_role and catalog_role in forbidden_roles:
         return _rejected(result, "forbidden_catalog_role")
-    if not any(
-        line.strip() and not line.lstrip().startswith("#")
-        for line in (evidence_text if evidence_text is not None else visible_text).splitlines()
-    ):
+    body = evidence_text if evidence_text is not None else visible_text
+    lines = body.splitlines()
+    substantive_lines = []
+    heading_lines = []
+    fence = ""
+    for index, line in enumerate(lines):
+        fence_match = re.match(r"^ {0,3}(`{3,}|~{3,})(.*)$", line)
+        if fence:
+            if (
+                fence_match and fence_match[1][0] == fence[0]
+                and len(fence_match[1]) >= len(fence) and not fence_match[2].strip()
+            ):
+                fence = ""
+            elif line.strip():
+                substantive_lines.append(line)
+            continue
+        if fence_match:
+            fence = fence_match[1]
+            continue
+        if line.lstrip().startswith("#"):
+            heading_lines.append(line.lstrip().lstrip("#").strip())
+            continue
+        next_line = lines[index + 1].strip() if index + 1 < len(lines) else ""
+        if re.fullmatch(r"[=-]{3,}", next_line):
+            heading_lines.append(line.strip())
+            continue
+        if (
+            "|" in line and re.fullmatch(
+                r"\|?\s*:?-{3,}:?\s*(?:\|\s*:?-{3,}:?\s*)*\|?", next_line,
+            )
+        ):
+            continue
+        line = re.sub(r"!?\[[^\]]*\](?:\([^)]*\)|\[[^\]]*\])", "", line)
+        line = re.sub(r"https?://\S+", "", line)
+        if line.strip(" \t-*+0123456789.)|:<>_="):
+            substantive_lines.append(line)
+    if not substantive_lines:
         return _rejected(result, "metadata_only_evidence")
+    # A heading may identify the subject of an already relevant body, but cannot
+    # turn unrelated prose or a single generic match into factual evidence.
+    normalized_evidence = "\n".join(substantive_lines).casefold()
+    normalized_headings = "\n".join(heading_lines).casefold()
 
     if str(probe.get("mode") or "") == "exact_path":
         query_text = str(probe.get("query_text") or "").replace("\\", "/").casefold()
@@ -79,22 +134,35 @@ def qualify_evidence(
     exact_terms = tuple(
         str(value).casefold() for value in probe.get("exact_terms") or () if value
     )
-    matched = tuple(
+    body_matched = tuple(
         term for term in terms
         if _visible_term_present(
             term, normalized_evidence, exact=term in exact_terms,
         )
     )
+    heading_context_allowed = len(body_matched) >= 2
+    matched = tuple(dict.fromkeys((
+        *body_matched,
+        *(
+            term for term in terms
+            if heading_context_allowed
+            and _visible_term_present(term, normalized_headings, exact=term in exact_terms)
+        ),
+    )))
+    exact_evidence = (
+        f"{normalized_evidence}\n{normalized_headings}"
+        if heading_context_allowed else normalized_evidence
+    )
     missing_exact = tuple(
         term for term in exact_terms
-        if re.search(rf"(?<!\w){re.escape(term)}(?!\w)", normalized_evidence) is None
+        if re.search(rf"(?<!\w){re.escape(term)}(?!\w)", exact_evidence) is None
     )
     missing_parent_exact = tuple(
         str(value).casefold()
         for value in probe.get("parent_exact_terms") or ()
         if re.search(
             rf"(?<!\w){re.escape(str(value).casefold())}(?!\w)",
-            normalized_evidence,
+            exact_evidence,
         ) is None
     )
     ratio = len(matched) / len(terms)
@@ -103,6 +171,8 @@ def qualify_evidence(
     reason = "visible_fields" if qualified else "insufficient_visible_match"
     result.update({
         "matched_terms": list(matched),
+        "body_matched_terms": list(body_matched),
+        "heading_context_used": heading_context_allowed and len(matched) > len(body_matched),
         "missing_exact_terms": list(missing_exact),
         "missing_parent_exact_terms": list(missing_parent_exact),
         "matched_term_count": len(matched),

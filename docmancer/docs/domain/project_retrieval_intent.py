@@ -22,7 +22,8 @@ _PROJECT_SCOPE_TOKEN_RE = re.compile(
     r"(?:projects?|repos?|repositor(?:y|ies)|systems?|products?)", re.I,
 )
 _SPECIFIC_RELATION_TOKEN_RE = re.compile(
-    r"(?:polic(?:y|ies)|contracts?|rules?|invariants?|governance|retention)", re.I,
+    r"(?:polic(?:y|ies)|contracts?|rules?|invariants?|governance|retention|"
+    r"regulations?|govern(?:s|ed|ing)?|prescrib(?:e|es|ed|ing))", re.I,
 )
 _CODE_IDENTITY_RE = re.compile(
     r"^(?=.{2,160}$)(?=.*[a-z])(?=(?:.*[A-Z]){2})[A-Z][A-Za-z0-9]*$",
@@ -33,6 +34,15 @@ _RETRIEVAL_ONLY_UNRESOLVED_PREFIXES = (
     "unresolved_requested_operation",
 )
 _INTENT_ROLE_POLICY: dict[str, tuple[tuple[str, ...], tuple[str, ...]]] = {
+    "pytest_markers": (("development", "runbook"), ("adr", "roadmap")),
+    "project_docs_config_location": (("runbook", "development", "api_contract"), ("roadmap",)),
+    "state_home_variable": (("runbook", "api_contract", "development"), ("adr", "roadmap")),
+    "offline_usage": (("runbook", "development", "api_contract"), ("adr", "roadmap")),
+    "index_cleanup": (("runbook", "api_contract"), ("adr", "roadmap")),
+    "troubleshooting": (("runbook", "development"), ("adr", "roadmap")),
+    "context_budget": (("api_contract", "module_architecture"), ("adr", "roadmap")),
+    "docs_mcp_public_tools": (("api_contract", "runbook"), ("adr", "roadmap")),
+    "packs_mcp_workflow": (("api_contract", "runbook"), ("adr", "roadmap")),
     "product_overview": (("overview", "project_architecture"), ("adr", "roadmap")),
     "getting_started": (("overview", "development", "runbook"), ("adr", "roadmap")),
     "installation_verification": (("development", "runbook", "overview"), ("adr", "roadmap")),
@@ -93,6 +103,7 @@ def _has_phrase(text: str, *phrases: str) -> bool:
 def _specific_contract_request(tokens: tuple[str, ...]) -> bool:
     return any(_SPECIFIC_RELATION_TOKEN_RE.fullmatch(token) for token in tokens) or _has(
         tokens, "политик", "контракт", "правил", "инвариант",
+        "регламент", "предпис", "регулиру",
     )
 
 
@@ -126,7 +137,7 @@ def build_project_retrieval_aliases(
         for query in queries:
             text = " ".join(query.split())[:500]
             key = text.casefold()
-            if not text or key in seen or len(rows) >= _MAX_ALIASES:
+            if not text or key in seen:
                 continue
             seen.add(key)
             rows.append(ProjectRetrievalAlias(
@@ -139,7 +150,7 @@ def build_project_retrieval_aliases(
                 forbidden_evidence_terms=(
                     "docs/adr/", "mcp pack commands", "packs mcp runtime",
                     "install-pack", "packs-serve",
-                ) if intent_id in {"docs_mcp_workflow", "docs_mcp_server_command"} else (),
+                ) if intent_id in {"docs_mcp_workflow", "docs_mcp_server_command", "docs_mcp_public_tools"} else (),
             ))
 
     mentions_docs = _has(tokens, "документ", "док", "docs", "documentation")
@@ -147,9 +158,12 @@ def build_project_retrieval_aliases(
         tokens, "проект", "репозитор", "систем", "продукт",
     ) or any(_PROJECT_SCOPE_TOKEN_RE.fullmatch(token) for token in tokens)
     mentions_mcp = _has(tokens, "mcp")
+    mentions_packs = _has(tokens, "packs", "pack", "пакет")
     mentions_command = _has(tokens, "команд", "command", "cli")
     mentions_start = _has(tokens, "запуст", "запуск", "старт", "start", "serve", "run")
     specific_contract_request = _specific_contract_request(tokens)
+    if specific_contract_request:
+        return ()
     specific_technical_request = (
         any(_CODE_IDENTITY_RE.fullmatch(token) for token in raw_tokens)
         and _has(tokens, "require", "govern", "contract", "rule", "инвариант")
@@ -188,8 +202,16 @@ def build_project_retrieval_aliases(
             "DOCATLAS_HOME state root environment variable",
         )
 
-    if specific_contract_request:
-        return tuple(rows)
+    contributor_start = (
+        _has(tokens, "контриб", "вклад", "contribut", "разработчик", "developer", "карт", "map", "модул", "module", "код", "codebase", "репозитор", "repository")
+        and _has(tokens, "читать", "read", "нач", "start")
+    )
+    product_purpose = (mentions_product or mentions_project) and (
+        _has_phrase(normalized, "что такое", "что это за", "для чего", "зачем")
+        or re.search(r"\bwhat\s+is\b|\bwhat\s+problems?\b.+\bsolves?\b", normalized)
+        or _has(tokens, "назначен", "purpose", "overview")
+        or (_has(tokens, "проблем") and _has(tokens, "решает", "решающ"))
+    )
 
     # Broad newcomer/workflow questions deliberately return docs_context.
     if _has(tokens, "офлайн", "offline") or _has_phrase(
@@ -209,10 +231,11 @@ def build_project_retrieval_aliases(
             "installation_verification",
             True,
             f"{product_prefix}local installation setup verification getting started",
-            f"{product_prefix}install quickstart command line help",
+            f"{product_prefix}install command line help",
         )
     if (
         not any(row.intent_id == "docs_mcp_server_command" for row in rows)
+        and not contributor_start
         and (
             (
                 _has(tokens, "перв", "нач", "quickstart", "getting", "start")
@@ -233,14 +256,7 @@ def build_project_retrieval_aliases(
             f"{product_prefix}getting started first commands first steps quickstart",
             f"{product_prefix}command line help setup initialization workflow",
         )
-    if (
-        (mentions_product or mentions_project)
-        and (
-            _has_phrase(normalized, "что такое", "для чего", "зачем")
-            or re.search(r"\bwhat\s+is\b|\bwhat\s+problem\b", normalized)
-            or _has(tokens, "назначен", "purpose", "overview")
-        )
-    ):
+    if product_purpose:
         emit(
             "product_overview",
             True,
@@ -248,22 +264,13 @@ def build_project_retrieval_aliases(
             f"{product_prefix}project purpose",
             f"{product_prefix}problem statement",
         )
-    if (
-        (
-            _has(tokens, "контриб", "вклад", "contribut", "разработчик", "developer")
-            and _has(tokens, "репозитор", "читать", "read", "start", "project", "нач")
-        )
-        or (
-            _has(tokens, "карт", "map", "модул", "module", "код", "codebase")
-            and _has(tokens, "где", "where", "читать", "read", "нач", "start")
-        )
-    ):
+    if contributor_start:
         emit(
             "contributor_start",
             True,
             f"{product_prefix}new contributor repository reading order contributing project map",
         )
-    if mentions_mcp and _has(
+    if mentions_mcp and (mentions_docs or not mentions_packs) and _has(
         tokens, "работ", "устро", "процесс", "поток", "workflow", "fit",
     ):
         emit(
@@ -273,6 +280,12 @@ def build_project_retrieval_aliases(
             "get_docs_context prepare_docs docs_status",
             "docs/mcp-docs-server.md",
         )
+    if mentions_mcp and mentions_packs and _has(tokens, "workflow", "работ", "процесс", "поток"):
+        emit("packs_mcp_workflow", True, "Packs MCP runtime workflow action packs")
+    if mentions_mcp and mentions_docs and _has(tokens, "публичн", "public") and _has(tokens, "инструмент", "tool"):
+        emit("docs_mcp_public_tools", True, "Docs MCP public tools get_docs_context prepare_docs docs_status")
+    if _has(tokens, "бюджет", "budget", "лимит", "limit") and _has(tokens, "контекст", "context", "токен", "token", "output", "response", "ответ", "источник"):
+        emit("context_budget", True, f"{product_prefix}context response token and source budgets")
     if (
         (_has(tokens, "синхрон", "обнов", "refresh", "sync") and (
             mentions_docs or mentions_project
@@ -303,9 +316,9 @@ def build_project_retrieval_aliases(
             True,
             f"{product_prefix}inspect safely clear local index preview cleanup plan",
         )
-    if _has(
+    if (not product_purpose and _has(tokens, "проблем", "problem")) or _has(
         tokens,
-        "ошиб", "проблем", "диагност", "troubleshoot", "fail", "stale",
+        "ошиб", "диагност", "troubleshoot", "fail", "stale",
         "insufficient_evidence",
     ) or _has_phrase(
         normalized,
@@ -326,6 +339,7 @@ def build_project_retrieval_aliases(
         and (
             _has(tokens, "индекс", "index", "проект", "project", "документ", "docs")
             or mentions_product
+            or mentions_project
         )
     ):
         emit(
@@ -341,7 +355,7 @@ def build_project_retrieval_aliases(
             f"{product_prefix}indexing split documentation sections parent child chunks",
         )
     if _has(tokens, "доказател", "evidence") and _has(
-        tokens, "выбор", "кандидат", "select", "candidate",
+        tokens, "выбор", "выбира", "кандидат", "select", "candidate",
     ):
         emit(
             "evidence_selection",
@@ -385,8 +399,9 @@ def build_project_retrieval_aliases(
             f"{product_prefix}library documentation source discovery version indexing",
             f"{product_prefix}curated sources library docs quality",
         )
-    if not specific_technical_request and _has(tokens, "retrieval", "поиск") and _has(
-        tokens, "pipeline", "поток", "query", "evidence", "ranking", "ранж",
+    if not specific_technical_request and (
+        (_has(tokens, "retrieval", "поиск") and _has(tokens, "pipeline", "поток", "query", "evidence", "ranking", "ранж"))
+        or (_has(tokens, "get_docs_context") and _has(tokens, "запрос", "request") and _has(tokens, "проход", "поток", "flow", "route"))
     ):
         emit(
             "retrieval_pipeline",
@@ -433,7 +448,14 @@ def build_project_retrieval_aliases(
                 " ".join((product_prefix.strip() or "project", *concepts[:5])),
             )
 
-    return tuple(rows)
+    # Give every requested facet a first probe before spending slots on synonyms.
+    facets = tuple(dict.fromkeys(row.intent_id for row in rows))
+    lanes = [[row for row in rows if row.intent_id == facet] for facet in facets]
+    return tuple(
+        lane[index]
+        for index in range(max((len(lane) for lane in lanes), default=0))
+        for lane in lanes if index < len(lane)
+    )[:_MAX_ALIASES]
 
 
 def project_retrieval_disposition(question: str) -> ProjectRetrievalDisposition:

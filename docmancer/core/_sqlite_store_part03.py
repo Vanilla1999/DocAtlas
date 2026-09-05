@@ -329,10 +329,6 @@ class _SQLiteStorePart03:
             if re.search(rf"(?<!\w){re.escape(term)}(?!\w)", haystack) is None
         )
         ratio = len(matched) / len(terms) if terms else 0.0
-        required_ratio = 1.0 if len(terms) == 1 else 0.5
-        qualified = bool(matched) and not missing_exact and (
-            mode == "and" or ratio >= required_ratio
-        )
         field_matches = {
             field: [
                 term for term in terms
@@ -351,7 +347,6 @@ class _SQLiteStorePart03:
             "match_ratio": round(ratio, 4),
             "bm25_cost": bm25_cost,
             "lexical_score": -bm25_cost,
-            "qualified": qualified,
             "field_matches": field_matches,
         }
 

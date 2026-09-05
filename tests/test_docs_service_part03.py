@@ -177,7 +177,14 @@ roots:
         service,
     )
     assert absent is not None
-    assert absent["status"] == "insufficient_evidence"
+    assert absent["status"] == "ok"
+    assert absent["support_status"] == "retrieval_only"
+    assert "query-original" in absent["missing_query_ids"]
+    assert any(value.startswith("query-anchor-") for value in absent["missing_query_ids"])
+    assert all(
+        "missing_decision_audit_symbol" not in source["snippet"]
+        for source in absent["sources"]
+    )
     assert absent["answer_supported"] is False
     assert absent["edit_ready"] is False
 

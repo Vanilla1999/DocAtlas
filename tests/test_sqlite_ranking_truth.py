@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from docmancer.core.models import Document
 from docmancer.core.sqlite_store import SQLiteStore
+from docmancer.docs.domain.evidence_qualification import qualify_evidence
 
 
 def _store(tmp_path, documents: list[Document], name: str = "ranking.db") -> SQLiteStore:
@@ -130,9 +131,10 @@ def test_lexical_match_trace_distinguishes_strict_and_weak_or_fallback(tmp_path)
     )
 
     assert strict.metadata["lexical_match"]["mode"] == "and"
-    assert strict.metadata["lexical_match"]["qualified"] is True
+    assert "qualified" not in strict.metadata["lexical_match"]
+    assert qualify_evidence(strict.metadata["lexical_match"], query_id="q", visible_text=strict.text).qualified
     assert any(item.metadata["lexical_match"]["mode"] == "or_fallback" for item in fallback)
-    assert all(item.metadata["lexical_match"]["qualified"] is False for item in fallback)
+    assert all(not qualify_evidence(item.metadata["lexical_match"], query_id="q", visible_text=item.text).qualified for item in fallback)
     assert "text" not in strict.metadata["lexical_match"]
 
 
@@ -150,7 +152,8 @@ def test_or_fallback_requires_exact_terms_and_half_the_query(tmp_path):
     assert trace["mode"] == "or_fallback"
     assert trace["match_ratio"] == 0.5
     assert trace["missing_exact_terms"] == ["telegram"]
-    assert trace["qualified"] is False
+    assert "qualified" not in trace
+    assert not qualify_evidence(trace, query_id="q", visible_text=result.text).qualified
 
 
 def test_sentence_initial_politeness_is_not_an_exact_technical_term(tmp_path):
@@ -171,7 +174,8 @@ def test_sentence_initial_politeness_is_not_an_exact_technical_term(tmp_path):
     assert "please" not in trace["exact_terms"]
     assert "please" not in trace["missing_exact_terms"]
     assert "docatlas" in trace["exact_terms"]
-    assert trace["qualified"] is True
+    assert "qualified" not in trace
+    assert qualify_evidence(trace, query_id="q", visible_text=result.text).qualified
 
 
 def test_exact_filename_qualification_uses_the_same_corpus_as_fts(tmp_path):
@@ -194,9 +198,10 @@ def test_exact_filename_qualification_uses_the_same_corpus_as_fts(tmp_path):
     assert results[0].metadata["lexical_match"]["exact_terms"] == [
         "docatlas.project-docs.yaml",
     ]
-    assert results[0].metadata["lexical_match"]["qualified"] is True
+    assert "qualified" not in results[0].metadata["lexical_match"]
+    assert results[0].metadata["lexical_match"]["missing_exact_terms"] == []
     assert all(
-        result.metadata["lexical_match"]["qualified"] is False
+        result.metadata["lexical_match"]["missing_exact_terms"]
         for result in results
         if result.source == "docatlas.docs.yaml"
     )

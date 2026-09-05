@@ -220,6 +220,7 @@ jobs:
         run: python eval/project_context_quality_protocol.py --live > "$RUNNER_TEMP/project-context-quality-live.json"
 
       - name: Upload Project Docs quality reports
+        if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: project-docs-quality-${{ github.run_id }}

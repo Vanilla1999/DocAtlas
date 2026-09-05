@@ -119,7 +119,6 @@ def test_reusable_question_frames_survive_real_manifest_sync_and_public_mcp(tmp_
         "What markers are available?",
         "Which formats are supported?",
         "How do I update the docs index?",
-        "What does the project require?",
     )
     for question in open_context:
         payload = call_docs_tool_payload(
@@ -130,6 +129,18 @@ def test_reusable_question_frames_survive_real_manifest_sync_and_public_mcp(tmp_
         assert payload["status"] == "ok", (question, payload)
         assert payload["kind"] == "docs_context", (question, payload)
         assert payload["answer_supported"] is False
+
+    # No fixture documents general project requirements; a nearby smoke
+    # procedure must not be substituted for the missing subject.
+    unknown_payload = call_docs_tool_payload(
+        "get_docs_context",
+        {"question": "What does the project require?", "project_path": str(project)},
+        service,
+    )
+    assert unknown_payload["status"] == "insufficient_evidence"
+    assert unknown_payload["answer_supported"] is False
+    assert unknown_payload["edit_ready"] is False
+    assert not unknown_payload.get("sources")
 
     lookup_payload = call_docs_tool_payload(
         "get_docs_context",

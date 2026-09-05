@@ -30,6 +30,7 @@ from docmancer.docs.domain.evidence_qualification import (
     qualify_evidence,
 )
 from docmancer.docs.domain.query_terms import documentation_exact_terms
+from docmancer.docs.domain.lifecycle_policy import lifecycle_intent
 
 
 def project_docs_context(
@@ -38,11 +39,14 @@ def project_docs_context(
     """Project trusted retrieval as context without claiming answer support."""
 
     max_tokens = PROJECT_CONTEXT_BUDGET.bounded_tokens(max_tokens)
+    projection_diagnostics = {"qualified_variants": 0, "budget_rejections": 0}
+    if not isinstance(retrieval.get("retrieval_diagnostics"), dict):
+        retrieval["retrieval_diagnostics"] = {}
+    retrieval.setdefault("retrieval_diagnostics", {})["docs_context_projection"] = projection_diagnostics
     sources: list[dict[str, Any]] = []
     snapshot: dict[str, dict[str, Any]] = {}
     projection_inputs: dict[str, tuple[str, tuple[str, ...], Any]] = {}
     seen_ids: dict[str, int] = {}
-    per_path: dict[str, int] = {}
     query_plan = dict(retrieval.get("documentation_query_plan") or {})
     selection = retrieval.get("selection_decision") or {}
     assignments = (
@@ -103,40 +107,37 @@ def project_docs_context(
         and item.get("facet_id") == "facet-relation-claim"
         and item.get("query_id")
     }
-    original_question = str(query_plan.get("original_question") or "")
+    original_question = str(query_plan.get("original_question") or retrieval.get("question") or query_text.get("query-original") or "")
+    requirements = retrieval.get("requirements") or {}
+    requirement_items = requirements.get("requirements", ()) if isinstance(requirements, dict) else ()
+    expected_project_identity = retrieval.get("project_identity") or next((
+        item.get("value") for item in requirement_items
+        if isinstance(item, dict) and item.get("kind") == "project_identity"
+    ), None)
+    request_lifecycle_intent = (
+        requirements.get("lifecycle_intent") if isinstance(requirements, dict) else None
+    ) or lifecycle_intent(original_question)
     explicit_paths = {
         _normalized_path(value) for value in query_plan.get("explicit_paths") or ()
         if str(value).strip()
     }
-    candidates = _facet_aware_candidates(
-        list(retrieval.get("context_pack") or ()),
-        query_text=query_text,
-        required_query_ids=(
-            exact_anchor_query_ids | host_query_ids
-            if broad_context_only
-            else required_query_id_set | exact_anchor_query_ids | host_query_ids
-        ),
-        assigned_evidence_ids=set(assigned_evidence_by_requirement.values()),
-    )
+    candidates = list(retrieval.get("context_pack") or ())
     selected_host_query_ids: set[str] = set()
     selected_required_ids: set[str] = set()
-    for original in candidates:
+    while candidates:
+        selected_public_ids = qualified_query_ids(sources) & public_query_id_set
+        candidates = _facet_aware_candidates(
+            candidates, query_text=query_text,
+            required_query_ids=public_query_id_set - selected_public_ids,
+            assigned_evidence_ids=set(assigned_evidence_by_requirement.values()),
+        )
+        original = candidates.pop(0)
         if not isinstance(original, dict):
             continue
         original = dict(original)
         if str(original.get("source_class") or "") != "project_doc":
             continue
-        if str(original.get("lifecycle_status") or "active") != "active":
-            continue
-        if str(original.get("freshness") or "current") != "current":
-            continue
-        if str(original.get("index_freshness") or "synchronized") != "synchronized":
-            continue
-        if original.get("risk_flags"):
-            continue
         project_identity = str(original.get("project_identity") or "").strip()
-        if not project_identity:
-            continue
         if explicit_paths and _normalized_path(
             original.get("path") or original.get("source") or ""
         ) in explicit_paths:
@@ -144,11 +145,20 @@ def project_docs_context(
             for query_id in exact_anchor_query_ids:
                 if query_id.startswith("query-path-"):
                     matches[query_id] = {
-                        "qualified": True,
                         "mode": "exact_path",
                         "query_text": query_text.get(query_id, ""),
                     }
             original["retrieval_query_matches"] = matches
+        original["_qualification_candidate"] = dict(original)
+        original["_expected_project_identity"] = expected_project_identity
+        original["_lifecycle_intent"] = request_lifecycle_intent
+        qualified_original = _requalify_visible_source({
+            **original,
+            "path_or_url": original.get("path") or "",
+            "snippet": original.get("content") or original.get("display_text") or original.get("snippet") or "",
+        }, query_text=query_text)
+        original["retrieval_query_matches"] = qualified_original["retrieval_query_matches"]
+        original["retrieval_query_ids"] = qualified_original["retrieval_query_ids"]
         qualified_ids = qualified_query_ids((original,))
         if not qualified_ids:
             continue
@@ -232,48 +242,71 @@ def project_docs_context(
             tuple(value for value in (*required_matches, *supplemental_matches) if value)
             or tuple(query_text.get(query_id, "") for query_id in qualified_ids)
         )
-        focused_snippet, snippet_start, snippet_end = _focused_snippet(
-            raw_snippet,
-            focus_queries,
-            limit=160 if len(host_query_ids) > 1 else 520,
-        )
-        normalized = _docs_source(original, display_snippet=focused_snippet)
-        if normalized is None or not normalized["snippet"].strip():
-            continue
-        path = normalized["path_or_url"]
-        if per_path.get(path, 0) >= 2:
+        # Establish source identity first; only qualified complete variants cross
+        # the projection boundary below.
+        normalized = _docs_source(original, display_snippet=raw_snippet[:520])
+        if normalized is None:
             continue
         assigned_requirement_ids = _assigned_requirements_for_source(
             original, assigned_evidence_by_requirement,
         )
-        line_start, line_end = _focused_line_range(
-            raw_snippet,
-            snippet_start,
-            snippet_end,
-            original.get("line_start"),
-        )
         normalized.update({
             "project_identity": project_identity,
-            "line_start": line_start,
-            "line_end": line_end,
             "authority": str(original.get("authority") or "supporting"),
             "scope": str(original.get("doc_scope") or "project"),
             "catalog_role": str(original.get("catalog_role") or ""),
             "retrieval_query_ids": list(original.get("retrieval_query_ids") or ()),
             "retrieval_query_matches": dict(original.get("retrieval_query_matches") or {}),
             "_assigned_requirement_ids": list(assigned_requirement_ids),
+            "_qualification_candidate": original["_qualification_candidate"],
+            "_expected_project_identity": original["_expected_project_identity"],
+            "_lifecycle_intent": original["_lifecycle_intent"],
         })
-        normalized = _requalify_visible_source(normalized, query_text=query_text)
-        normalized = _best_qualified_fragment(
+        variants = _qualified_fragments(
             normalized,
             raw_snippet=raw_snippet,
             query_ids=qualified_ids & eligible_query_ids,
             query_text=query_text,
             source_line_start=original.get("line_start"),
-            limit=160 if len(host_query_ids) > 1 else 520,
         )
+        projection_diagnostics["qualified_variants"] += len(variants)
+        fitting = []
+        for variant in variants:
+            existing_index = seen_ids.get(variant["evidence_id"])
+            candidate_sources = [*sources, variant]
+            if existing_index is not None:
+                existing = sources[existing_index]
+                # Merge attribution, never disconnected text with a fabricated range.
+                variant = _requalify_visible_source({
+                    **variant,
+                    "retrieval_query_matches": merge_query_matches(
+                        existing.get("retrieval_query_matches"),
+                        variant.get("retrieval_query_matches"),
+                    ),
+                }, query_text=query_text)
+                if not (qualified_query_ids((existing,)) & public_query_id_set) <= qualified_query_ids((variant,)):
+                    continue
+                candidate_sources = [*sources[:existing_index], variant, *sources[existing_index + 1:]]
+            decision = context_selection_decision(candidate_sources, public_query_ids)
+            if estimate_projection_tokens(_payload(
+                candidate_sources, decision=decision, query_plan=query_plan,
+            )) <= max_tokens:
+                fitting.append(variant)
+            else:
+                projection_diagnostics["budget_rejections"] += 1
+        if not fitting:
+            continue
+        normalized = max(fitting, key=lambda item: (
+            len(qualified_query_ids((item,)) & public_query_id_set - selected_public_ids),
+            len(qualified_query_ids((item,)) & public_query_id_set),
+            -len(item["snippet"]),
+        ))
         qualified_ids = qualified_query_ids((normalized,))
         if not qualified_ids or not (qualified_ids & eligible_query_ids):
+            continue
+        if qualified_ids & public_query_id_set and not (
+            qualified_ids & public_query_id_set - selected_public_ids
+        ):
             continue
         required_ids = qualified_ids & required_query_id_set
         original_hit = "query-original" in qualified_ids
@@ -305,47 +338,19 @@ def project_docs_context(
         evidence_id = normalized["evidence_id"]
         if evidence_id in seen_ids:
             existing_index = seen_ids[evidence_id]
-            merged_matches = merge_query_matches(
-                sources[existing_index].get("retrieval_query_matches"),
-                normalized.get("retrieval_query_matches"),
-            )
-            merged_query_ids = [
-                key for key, value in merged_matches.items() if value.get("qualified") is True
-            ]
             candidate_sources = [dict(source) for source in sources]
-            existing_snippet = str(candidate_sources[existing_index].get("snippet") or "")
-            additional_snippet = str(normalized.get("snippet") or "")
-            if additional_snippet and additional_snippet not in existing_snippet:
-                candidate_sources[existing_index]["snippet"] = (
-                    f"{existing_snippet}\n\n{additional_snippet}".strip()
-                )
-                starts = [
-                    value for value in (
-                        candidate_sources[existing_index].get("line_start"),
-                        normalized.get("line_start"),
-                    ) if isinstance(value, int)
-                ]
-                ends = [
-                    value for value in (
-                        candidate_sources[existing_index].get("line_end"),
-                        normalized.get("line_end"),
-                    ) if isinstance(value, int)
-                ]
-                candidate_sources[existing_index]["line_start"] = min(starts) if starts else None
-                candidate_sources[existing_index]["line_end"] = max(ends) if ends else None
-            candidate_sources[existing_index]["retrieval_query_ids"] = merged_query_ids
-            candidate_sources[existing_index]["retrieval_query_matches"] = merged_matches
-            candidate_sources[existing_index] = _requalify_visible_source(
-                candidate_sources[existing_index], query_text=query_text,
-            )
+            candidate_sources[existing_index] = normalized
             candidate_decision = context_selection_decision(candidate_sources, public_query_ids)
             if estimate_projection_tokens(
                     _payload(candidate_sources, decision=candidate_decision, query_plan=query_plan)
             ) <= max_tokens:
                 sources = candidate_sources
                 snapshot[evidence_id] = _snapshot_entry(
-                    snapshot[evidence_id]["source"], sources[existing_index],
+                    original, sources[existing_index],
                 )
+                projection_inputs[evidence_id] = (raw_snippet, focus_queries, original.get("line_start"))
+                selected_required_ids.update(required_ids)
+                selected_host_query_ids.update(host_ids)
             continue
         candidate_sources = [*sources, normalized]
         candidate_decision = context_selection_decision(candidate_sources, public_query_ids)
@@ -364,16 +369,11 @@ def project_docs_context(
             raw_snippet, focus_queries, original.get("line_start"),
         )
         seen_ids[evidence_id] = len(sources) - 1
-        per_path[path] = per_path.get(path, 0) + 1
         selected_required_ids.update(required_ids)
         selected_host_query_ids.update(host_ids)
         if len(sources) >= MAX_DOCS_SOURCES:
             break
-        if (
-            required_query_id_set
-            and required_query_id_set.issubset(selected_required_ids)
-            and host_query_ids.issubset(selected_host_query_ids)
-        ):
+        if public_query_id_set and public_query_id_set.issubset(qualified_query_ids(sources)):
             break
 
     if not sources:
@@ -400,27 +400,6 @@ def project_docs_context(
         max_tokens=max_tokens,
     )
     decision = context_selection_decision(sources, public_query_ids)
-    if (
-        "query-original" in required_query_id_set
-        and (documentation_exact_terms(original_question) or exact_anchor_query_ids)
-        and re.search(r"(?<![\w-])exact(?![\w-])", original_question, re.IGNORECASE)
-        and bool(exact_anchor_query_ids - set(decision.covered_query_ids))
-    ):
-        projection = project_insufficient(
-            kind="docs_context",
-            missing=["Required exact terms were not found in visible project documentation."],
-            recommended_next_action=None,
-            max_tokens=min(INSUFFICIENT_EVIDENCE_MAX_TOKENS, max_tokens),
-        )
-        projection.update({
-            "answer_supported": False,
-            "answer_available": False,
-            "support_status": "insufficient_evidence",
-            "context_available": False,
-            "edit_ready": False,
-        })
-        _refresh_estimate(projection)
-        return projection, {}
     payload = _payload(sources, decision=decision, query_plan=query_plan)
     snapshot = {
         source["evidence_id"]: _snapshot_entry(
@@ -460,6 +439,9 @@ def _expand_selected_snippets(
                     for item in query_plan.get("queries") or () if isinstance(item, dict)
                 },
             )
+            candidate_ids = qualified_query_ids((candidate,))
+            if not candidate_ids or not (qualified_query_ids((source,)) & set(public_query_ids)) <= candidate_ids:
+                continue
             candidate_sources = [*expanded[:index], candidate, *expanded[index + 1:]]
             decision = context_selection_decision(candidate_sources, public_query_ids)
             if estimate_projection_tokens(_payload(
@@ -469,33 +451,27 @@ def _expand_selected_snippets(
     return expanded
 
 
-def _best_qualified_fragment(
+def _qualified_fragments(
     source: dict[str, Any], *, raw_snippet: str, query_ids: set[str],
-    query_text: dict[str, str], source_line_start: Any, limit: int,
-) -> dict[str, Any]:
-    """Try alternate source fragments before dropping visible query coverage."""
-    best = source
-    best_coverage = qualified_query_ids((best,)) & query_ids
-    for query_id in sorted(query_ids - best_coverage):
-        focus = query_text.get(query_id, "")
-        if not focus:
-            continue
-        snippet, snippet_start, snippet_end = _focused_snippet(
-            raw_snippet, (focus,), limit=limit,
-        )
-        candidate = dict(source)
-        candidate["snippet"] = snippet
-        candidate["line_start"], candidate["line_end"] = _focused_line_range(
-            raw_snippet, snippet_start, snippet_end, source_line_start,
-        )
-        candidate = _requalify_visible_source(candidate, query_text=query_text)
-        candidate_coverage = qualified_query_ids((candidate,)) & query_ids
-        if (len(candidate_coverage), -len(snippet)) > (
-            len(best_coverage), -len(str(best.get("snippet") or "")),
-        ):
-            best = candidate
-            best_coverage = candidate_coverage
-    return best
+    query_text: dict[str, str], source_line_start: Any,
+) -> list[dict[str, Any]]:
+    """Retain small qualified alternatives until the actual payload is measured."""
+    variants = []
+    focuses = tuple(query_text.get(query_id, "") for query_id in sorted(query_ids))
+    for limit in (160, 320, 520):
+        for focus in (focuses, *((value,) for value in focuses if value)):
+            snippet, snippet_start, snippet_end = _focused_snippet(
+                raw_snippet, focus, limit=limit,
+            )
+            candidate = dict(source)
+            candidate["snippet"] = snippet
+            candidate["line_start"], candidate["line_end"] = _focused_line_range(
+                raw_snippet, snippet_start, snippet_end, source_line_start,
+            )
+            candidate = _requalify_visible_source(candidate, query_text=query_text)
+            if snippet and qualified_query_ids((candidate,)) & query_ids:
+                variants.append(candidate)
+    return variants
 
 
 def _requalify_visible_source(
@@ -510,6 +486,11 @@ def _requalify_visible_source(
         if not isinstance(trace, dict) or trace.get("derived_from_query_id"):
             continue
         probe = dict(trace)
+        if query_id == "query-original":
+            probe["exact_terms"] = list(dict.fromkeys((
+                *(probe.get("exact_terms") or ()),
+                *documentation_exact_terms(query_text.get(str(query_id), "")),
+            )))
         if not probe.get("query_terms") and not probe.get("query_text"):
             planned_text = query_text.get(str(query_id), "")
             if planned_text:
@@ -521,6 +502,9 @@ def _requalify_visible_source(
             visible_text=visible_text,
             evidence_text=str(source.get("snippet") or ""),
             catalog_role=catalog_role,
+            candidate=source.get("_qualification_candidate", source),
+            expected_project_identity=source.get("_expected_project_identity"),
+            lifecycle_intent=source.get("_lifecycle_intent", "current"),
         )
         matches[str(query_id)] = dict(qualification.trace)
         parent_trace = derived_parent_trace(
@@ -620,8 +604,6 @@ def _focused_snippet(
     leading = len(text) - len(text.lstrip())
     value = text.strip()
     terms = _query_terms(queries)
-    if len(value) <= limit and not terms:
-        return value, leading, leading + len(value)
     spans = [
         (match.start(), match.end())
         for match in re.finditer(r"\S(?:.*?\S)?(?=(?:\n{2,}|(?<=[.!?])\s+|$))", value, re.S)
@@ -646,6 +628,9 @@ def _focused_snippet(
     selected_start, selected_end = spans[best_index]
     if selected_end - selected_start > limit:
         selected_start, selected_end = _bounded_text_window(
+            value, selected_start, selected_end, terms=terms, limit=limit,
+        )
+        selected_start, selected_end = _include_complete_table_row(
             value, selected_start, selected_end, terms=terms, limit=limit,
         )
     for distance in range(1, len(spans)):
@@ -673,6 +658,30 @@ def _focused_snippet(
     return snippet, leading + adjusted_start, leading + adjusted_start + len(snippet)
 
 
+def _include_complete_table_row(
+    text: str, start: int, end: int, *, terms: set[str], limit: int,
+) -> tuple[int, int]:
+    matched = [
+        text.casefold().find(term, start, end)
+        for term in terms
+        if text.casefold().find(term, start, end) >= 0
+    ]
+    if not matched:
+        return start, end
+    anchor = min(matched)
+    row_start = text.rfind("\n", 0, anchor) + 1
+    row_end_match = text.find("\n", anchor)
+    row_end = len(text) if row_end_match < 0 else row_end_match
+    row = text[row_start:row_end]
+    if "|" not in row or row_end - row_start > limit:
+        return start, end
+    expanded_start = min(start, row_start)
+    expanded_end = max(end, row_end)
+    if expanded_end - expanded_start <= limit:
+        return expanded_start, expanded_end
+    return row_start, row_end
+
+
 def _bounded_text_window(
     text: str, start: int, end: int, *, terms: set[str], limit: int,
 ) -> tuple[int, int]:
@@ -690,21 +699,39 @@ def _bounded_text_window(
 def _include_complete_code_fence(
     text: str, start: int, end: int, *, limit: int,
 ) -> tuple[int, int]:
-    fences = [match.start() for match in re.finditer(r"^\s*```", text, re.M)]
-    for index in range(0, len(fences) - 1, 2):
-        fence_start = fences[index]
-        closing_line_end = text.find("\n", fences[index + 1])
-        fence_end = len(text) if closing_line_end < 0 else closing_line_end
+    blocks = []
+    opening = None
+    for match in re.finditer(r"^[ \t]*(`{3,}|~{3,})([^\n]*)", text, re.M):
+        if opening is None:
+            opening = match
+        elif (
+            match.group(1)[0] == opening.group(1)[0]
+            and len(match.group(1)) >= len(opening.group(1))
+            and not match.group(2).strip()
+        ):
+            blocks.append((opening.start(), match.end(), True))
+            opening = None
+    if opening is not None:
+        blocks.append((opening.start(), len(text), False))
+    for fence_start, fence_end, closed in blocks:
+        if (
+            closed and end <= fence_start and not text[end:fence_start].strip()
+            and re.search(r"\b(?:following|command|example)\b", text[start:end], re.I)
+            and fence_end - start <= limit
+        ):
+            end = fence_end
         if start < fence_end and end > fence_start:
             expanded_start = min(start, fence_start)
             expanded_end = max(end, fence_end)
-            if expanded_end - expanded_start <= limit:
-                return expanded_start, expanded_end
+            if closed and expanded_end - expanded_start <= limit:
+                start, end = expanded_start, expanded_end
+                continue
             # A bounded payload must not expose a syntactically broken fence.
             before = text.rfind("\n\n", 0, fence_start)
             safe_start = 0 if before < 0 else before + 2
             if fence_start - safe_start <= limit and fence_start > safe_start:
                 return safe_start, fence_start
+            return start, start
     return start, end
 
 
@@ -798,28 +825,11 @@ def _facet_aware_candidates(
     candidates: list[Any], *, query_text: dict[str, str], required_query_ids: set[str],
     assigned_evidence_ids: set[str] | None = None,
 ) -> list[Any]:
-    remaining = list(candidates)
-    ordered: list[Any] = []
-    covered: set[str] = set()
-    while remaining:
-        best_index = max(
-            range(len(remaining)),
-            key=lambda index: (
-                len(
-                    qualified_query_ids((remaining[index],))
-                    & required_query_ids
-                    - covered
-                ),
-                _context_rank(
-                    remaining[index], query_text, required_query_ids,
-                    assigned_evidence_ids,
-                ),
-            ),
-        )
-        selected = remaining.pop(best_index)
-        ordered.append(selected)
-        covered.update(qualified_query_ids((selected,)) & required_query_ids)
-    return ordered
+    # Only the caller's accepted visible witnesses remove coverage needs.
+    return sorted(candidates, key=lambda source: (
+        len(qualified_query_ids((source,)) & required_query_ids),
+        _context_rank(source, query_text, required_query_ids, assigned_evidence_ids),
+    ), reverse=True)
 
 
 def _payload(
@@ -900,6 +910,7 @@ def _payload(
             if key not in {
                 "retrieval_query_ids", "retrieval_query_matches",
                 "_assigned_requirement_ids", "catalog_role",
+                "_qualification_candidate", "_expected_project_identity", "_lifecycle_intent",
             }
         }
         for source in sources

@@ -680,6 +680,7 @@ def test_query_project_docs_runs_lookup_queries_as_retrieval_only_supplements(tm
                 text="Request routing and retrieval lifecycle share one bounded architecture.",
                 score=1.0,
                 metadata={
+                    "project_identity": filters["project_identity"],
                     "token_estimate": 20,
                     "lexical_match": {"qualified": True, "mode": "and"},
                 },
@@ -720,6 +721,7 @@ def test_query_project_docs_executes_and_attributes_concept_aliases(tmp_path):
                 text="The project answer contract is documented here.",
                 score=1.0,
                 metadata={
+                    "project_identity": filters["project_identity"],
                     "token_estimate": 20,
                     "lexical_match": {"qualified": True, "mode": "and"},
                 },
@@ -735,7 +737,10 @@ def test_query_project_docs_executes_and_attributes_concept_aliases(tmp_path):
 
     alias = "project answer contract documentation docs/mcp-docs-server.md"
     assert observed.count(alias) == 1
-    assert "query-concept-1" in chunks[0].metadata["retrieval_query_ids"]
+    trace = chunks[0].metadata["retrieval_query_matches"]["query-concept-1"]
+    assert trace["query_text"] == alias
+    assert trace["qualified"] is False
+    assert "docs/mcp-docs-server.md" in trace["missing_exact_terms"]
 
 
 def test_query_project_docs_attributes_generic_retrieval_hints_without_covering_original(tmp_path):
@@ -756,6 +761,7 @@ def test_query_project_docs_attributes_generic_retrieval_hints_without_covering_
                     text="NebulaLedger persists orbital telemetry snapshots in SQLite.",
                     score=1.0,
                     metadata={
+                        "project_identity": filters["project_identity"],
                         "token_estimate": 20,
                         "lexical_match": {"qualified": True, "mode": "and"},
                     },
@@ -806,6 +812,53 @@ def test_query_project_docs_does_not_qualify_trace_less_candidates(tmp_path):
     assert chunks[0].metadata["retrieval_query_matches"]["query-original"]["qualified"] is False
 
 
+def test_query_project_docs_admits_late_qualified_lookup_before_unqualified_candidate(tmp_path):
+    project = tmp_path / "late-qualified"
+    project.mkdir()
+
+    class Agent:
+        config = SimpleNamespace(query=SimpleNamespace(default_limit=1))
+
+        def query(self, query, *, limit, budget, expand, filters):
+            if query == "qualified witness":
+                return [RetrievedChunk(
+                    source="docs/witness.md",
+                    chunk_index=0,
+                    text="Qualified witness documents the required behavior.",
+                    score=0.5,
+                    metadata={
+                        "project_identity": filters["project_identity"],
+                        "token_estimate": 20,
+                        "lexical_match": {"qualified": True, "mode": "and"},
+                    },
+                )]
+            return [RetrievedChunk(
+                source="docs/unrelated.md",
+                chunk_index=0,
+                text="Unrelated candidate.",
+                score=1.0,
+                metadata={
+                    "project_identity": filters["project_identity"],
+                    "token_estimate": 20,
+                    "lexical_match": {"qualified": True, "mode": "and"},
+                },
+            )]
+
+    class Facade:
+        def _agent_instance(self):
+            return Agent()
+
+    chunks = ProjectDocsService(Facade()).query_project_docs(
+        str(project),
+        "missing original terms",
+        lookup_queries=("qualified witness",),
+        limit=1,
+    )
+
+    assert [chunk.source for chunk in chunks] == ["docs/witness.md"]
+    assert chunks[0].metadata["retrieval_query_ids"] == ("query-lookup-1",)
+
+
 def test_query_project_docs_keeps_best_duplicate_score(tmp_path):
     project = tmp_path / "scores"
     project.mkdir()
@@ -836,3 +889,82 @@ def test_query_project_docs_keeps_best_duplicate_score(tmp_path):
 
     assert len(chunks) == 1
     assert chunks[0].score == 0.95
+
+
+def test_same_text_probe_identities_share_one_backend_call(tmp_path):
+    from docmancer.docs.domain.documentation_query_plan import DocumentationLookup, DocumentationQueryPlan
+
+    observed = []
+    class Agent:
+        config = SimpleNamespace(query=SimpleNamespace(default_limit=5))
+
+        def query(self, query, **kwargs):
+            observed.append(query)
+            return [RetrievedChunk(
+                source="docs/architecture.md", chunk_index=0,
+                text="get_docs_context routes requests.", score=1.0,
+                metadata={
+                    "project_identity": kwargs["filters"]["project_identity"],
+                    "lexical_match": {"mode": "and"},
+                },
+            )]
+
+    class Facade:
+        def _agent_instance(self):
+            return Agent()
+
+    plan = DocumentationQueryPlan("original question", (
+        DocumentationLookup("query-original", "original question", "original"),
+        DocumentationLookup("query-anchor-1", "get_docs_context", "exact_anchor", False, relation="exact_anchor"),
+        DocumentationLookup("query-hint-1", "get_docs_context", "retrieval_hint", False, relation="host_lookup"),
+        DocumentationLookup("query-lookup-1", "get_docs_context", "host_lookup", False, relation="host_lookup"),
+        DocumentationLookup("query-lookup-2", "get_docs_context", "host_lookup", False, relation="host_lookup"),
+        DocumentationLookup("query-intent-1", "get_docs_context", "canonical_intent", False, relation="host_lookup"),
+    ))
+    chunks = ProjectDocsService(Facade()).query_project_docs(
+        str(tmp_path), plan.original_question, documentation_query_plan=plan,
+    )
+    assert observed.count("get_docs_context") == 1
+    assert set(chunks[0].metadata["retrieval_query_ids"]) == {
+        q.query_id for q in plan.queries if q.query_id != "query-original"
+    }
+
+
+def test_tagging_uses_each_probe_own_terms_and_exact_terms():
+    from docmancer.docs.application._project_docs_service_part03 import _tag_retrieval_query
+    from docmancer.docs.domain.documentation_query_plan import DocumentationLookup
+
+    chunk = RetrievedChunk(
+        source="docs/architecture.md", chunk_index=0, text="Project architecture boundaries.", score=1.0,
+        metadata={"lexical_match": {
+            "qualified": True, "query_text": "project architecture",
+            "query_terms": ["project", "architecture"], "exact_terms": [],
+        }},
+    )
+    lookup = DocumentationLookup("query-anchor-1", "missing_symbol", "exact_anchor", False, relation="exact_anchor")
+    tagged = _tag_retrieval_query([chunk], lookup.query_id, lookup.text, lookup)[0]
+    trace = tagged.metadata["retrieval_query_matches"][lookup.query_id]
+    assert trace["query_text"] == "missing_symbol"
+    assert trace["query_terms"] == ["missing_symbol"]
+    assert trace["exact_terms"] == ["missing_symbol"]
+    assert trace["qualified"] is False
+
+
+def test_tagging_audited_probe_preserves_existing_direct_parent_trace():
+    from docmancer.docs.application._project_docs_service_part03 import _tag_retrieval_query
+    from docmancer.docs.domain.documentation_query_plan import DocumentationLookup
+
+    chunk = RetrievedChunk(
+        source="docs/architecture.md", chunk_index=0, text="Project architecture boundaries.", score=1.0,
+        metadata={"lexical_match": {"qualified": True}, "retrieval_query_matches": {
+            "query-original": {"qualified": True, "coverage_kind": "direct", "query_text": "project architecture"},
+        }},
+    )
+    lookup = DocumentationLookup(
+        "query-intent-1", "project architecture", "canonical_intent", False,
+        relation="audited_rewrite", public_parent_query_id="query-original",
+    )
+    tagged = _tag_retrieval_query([chunk], lookup.query_id, lookup.text, lookup)[0]
+    parent = tagged.metadata["retrieval_query_matches"]["query-original"]
+    assert parent["coverage_kind"] == "direct"
+    assert set(parent["coverage_kinds"]) == {"direct", "derived"}

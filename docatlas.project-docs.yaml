@@ -214,12 +214,20 @@ documents:
     impact: track
 
   - path: docs/adr/0002-context-retrieval-vs-answer-proof.md
-    role: project_architecture
+    role: adr
     scope: project
     description: Retrieval-first project-chat delivery and strict answer-certification boundary.
+    authority: historical
+    status: superseded
+    impact: search_only
+
+  - path: docs/decisions/2026-08-22-defer-public-release-and-open-p1-harness.md
+    role: adr
+    scope: project
+    description: Active public-release deferral and P1.1 harness sequencing exception until reviewed release re-enablement.
     authority: source_of_truth
     status: active
-    impact: track
+    impact: search_only
 
   - path: docs/analysis/context7-style-project-chat-regression.md
     role: development

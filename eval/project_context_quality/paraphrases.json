@@ -1,0 +1,42 @@
+{
+  "schema_version": "project-context-quality-paraphrases-v1",
+  "provenance": "Separately authored English workflow probes, frozen before retrieval execution. Not translations, historic user inputs, or an installed-agent benchmark.",
+  "facts_file": "natural.json",
+  "cases": [
+    {
+      "id": "paraphrase-local-trial", "question": "Can I try this on my own documents without fetching embedding models, and check the change without network tests?",
+      "scope": "project", "expected_kind": "docs_context", "fact_groups": ["offline_ingest", "offline_test"],
+      "lookup_queries": ["Can local file ingestion skip embeddings?", "How should a contributor run tests with networking disabled?"],
+      "minimum_lookup_coverage": 2, "expected_public_query_ids": ["query-original", "query-lookup-1", "query-lookup-2"]
+    },
+    {
+      "id": "paraphrase-review-ready", "question": "Before I send my first fix for review, which reading will orient me and what testing does the contribution guide expect?",
+      "scope": "project", "expected_kind": "docs_context", "fact_groups": ["reading", "test"],
+      "lookup_queries": ["What reading is recommended to first-time contributors?", "What tests should precede a contribution review?"],
+      "minimum_lookup_coverage": 2, "expected_public_query_ids": ["query-original", "query-lookup-1", "query-lookup-2"]
+    },
+    {
+      "id": "paraphrase-cache-reset", "question": "I want a dry look at what an index reset would remove, with my source tree and configuration left alone. What is the documented process?",
+      "scope": "project", "expected_kind": "docs_context", "fact_groups": ["preview", "preserve"],
+      "lookup_queries": ["Can index removal be previewed without applying it?", "Does clearing derived storage preserve source files and configuration?"],
+      "minimum_lookup_coverage": 2, "expected_public_query_ids": ["query-original", "query-lookup-1", "query-lookup-2"]
+    },
+    {
+      "id": "paraphrase-search-trust", "question": "A search returned a plausible passage. How does selection assess candidates, and does that certify an answer about this repository?",
+      "scope": "all", "expected_kind": "docs_context", "fact_groups": ["selection", "not_proof", "project_context"],
+      "lookup_queries": ["What decision does evidence selection make from search candidates?", "Is retrieved text sufficient proof?", "What support guarantee accompanies project read context?"],
+      "minimum_lookup_coverage": 3, "expected_public_query_ids": ["query-original", "query-lookup-1", "query-lookup-2", "query-lookup-3"]
+    },
+    {
+      "id": "paraphrase-reconcile-files", "question": "The search cache still knows about a removed guide and an earlier revision. How do I bring both back in line with the working files?",
+      "scope": "project", "expected_kind": "docs_context", "fact_groups": ["sync", "stale", "orphans"],
+      "lookup_queries": ["How do repository files and the documentation index get reconciled?", "How are changed documentation sections replaced?", "What removes orphaned documentation sources from the index?"],
+      "minimum_lookup_coverage": 3, "expected_public_query_ids": ["query-original", "query-lookup-1", "query-lookup-2", "query-lookup-3"]
+    },
+    {
+      "id": "paraphrase-negative-martian", "question": "Which Martian telepathic retention standard governs this documentation runtime?",
+      "scope": "project", "expected_kind": "insufficient_evidence", "fact_groups": [], "lookup_queries": [],
+      "minimum_lookup_coverage": 0, "expected_public_query_ids": ["query-original"]
+    }
+  ]
+}

@@ -3,7 +3,7 @@ from __future__ import annotations
 
 from ._project_docs_service_shared import *  # noqa: F401,F403
 from docmancer.core.models import RetrievedChunk
-from docmancer.docs.application.context_selection import select_context_candidates
+from docmancer.docs.application.context_selection import merge_query_matches, select_context_candidates
 from docmancer.docs.domain.documentation_query_plan import (
     DocumentationLookup,
     DocumentationQueryPlan,
@@ -11,6 +11,11 @@ from docmancer.docs.domain.documentation_query_plan import (
 from docmancer.docs.domain.evidence_qualification import (
     derived_parent_trace,
     qualify_evidence,
+)
+from docmancer.docs.domain.query_terms import (
+    documentation_exact_terms,
+    documentation_query_terms,
+    documentation_technical_anchors,
 )
 
 
@@ -141,6 +146,8 @@ def _exact_document_index_chunks(
 def _tag_retrieval_query(
     chunks: Any, query_id: str | None, query_text: str | None = None,
     lookup: DocumentationLookup | None = None,
+    *, expected_project_identity: str | None = None,
+    lifecycle_intent: str = "current",
 ) -> list[Any]:
     if not query_id:
         return list(chunks)
@@ -158,14 +165,19 @@ def _tag_retrieval_query(
             exact_path_match = (
                 normalize_doc_path(candidate_path) == normalize_doc_path(query_text)
             )
-        # Retrieval is candidate generation. Only a lexical relevance trace or
-        # an explicitly resolved exact path may qualify model-visible context.
-        # A future dense qualification path must carry calibrated provenance
-        # from the dispatcher; this layer must not infer it from rank alone.
-        trace["qualified"] = bool(trace.get("qualified") or exact_path_match)
+        if exact_path_match and query_id.startswith("query-path-"):
+            trace["mode"] = "exact_path"
+        elif trace.get("mode") == "exact_path":
+            trace.pop("mode")
         trace.setdefault("lexical_score", float(chunk.score))
         if query_text:
-            trace.setdefault("query_text", query_text)
+            if trace.get("query_text") != query_text:
+                trace["query_terms"] = list(documentation_query_terms(query_text))
+                trace["exact_terms"] = list(dict.fromkeys((
+                    *(term.normalized_value for term in documentation_exact_terms(query_text)),
+                    *(term.casefold() for term in documentation_technical_anchors(query_text)),
+                )))
+            trace["query_text"] = query_text
         if lookup is not None:
             trace.update({
                 "query_origin": lookup.origin,
@@ -176,19 +188,18 @@ def _tag_retrieval_query(
                 "forbidden_evidence_terms": list(lookup.forbidden_evidence_terms),
                 "parent_exact_terms": list(lookup.parent_exact_terms),
             })
-            visible_text = "\n".join(str(value or "") for value in (
-                chunk.source,
-                metadata.get("title"),
-                metadata.get("heading_path"),
-                chunk.text,
-            ))
-            trace = dict(qualify_evidence(
-                trace,
-                query_id=query_id,
-                visible_text=visible_text,
-                evidence_text=chunk.text,
-                catalog_role=str(metadata.get("project_doc_reason") or ""),
-            ).trace)
+        visible_text = "\n".join(str(value or "") for value in (
+            metadata.get("project_doc_path") or chunk.source,
+            metadata.get("title"), metadata.get("heading_path"), chunk.text,
+        ))
+        trace = dict(qualify_evidence(
+            trace, query_id=query_id, visible_text=visible_text,
+            evidence_text=chunk.text,
+            catalog_role=str(metadata.get("project_doc_reason") or ""),
+            candidate=metadata,
+            expected_project_identity=expected_project_identity,
+            lifecycle_intent=lifecycle_intent,
+        ).trace)
         matches = dict(metadata.get("retrieval_query_matches") or {})
         matches[query_id] = trace
         parent_trace = (
@@ -200,7 +211,7 @@ def _tag_retrieval_query(
             if lookup is not None else None
         )
         if parent_trace is not None:
-            matches[lookup.public_parent_query_id] = parent_trace
+            matches = merge_query_matches(matches, {lookup.public_parent_query_id: parent_trace})
         qualified_ids = tuple(key for key, value in matches.items() if value.get("qualified") is True)
         metadata.update({
             "retrieval_query_matches": matches,
@@ -258,9 +269,6 @@ class _ProjectDocsServicePart03:
         )
         lookup_by_id = {
             item.query_id: item for item in documentation_query_plan.queries
-        }
-        lookup_by_text = {
-            item.text: item for item in documentation_query_plan.queries
         }
         lookup_query_ids = {
             item.text: item.query_id
@@ -364,10 +372,12 @@ class _ProjectDocsServicePart03:
         )
         chunks = _tag_retrieval_query(
             chunks, "query-original", query, lookup_by_id.get("query-original"),
+            expected_project_identity=filters["project_identity"], lifecycle_intent=answer_lifecycle_intent,
         )
         chunks = _tag_retrieval_query(
             chunks, exact_path_query_id, evidence_path,
             lookup_by_id.get(exact_path_query_id or ""),
+            expected_project_identity=filters["project_identity"], lifecycle_intent=answer_lifecycle_intent,
         )
         if exact_path_query_id:
             for anchor_lookup in documentation_query_plan.queries:
@@ -377,6 +387,7 @@ class _ProjectDocsServicePart03:
                         anchor_lookup.query_id,
                         anchor_lookup.text,
                         anchor_lookup,
+                        expected_project_identity=filters["project_identity"], lifecycle_intent=answer_lifecycle_intent,
                     )
         authoritative_chunks = _run(
             query,
@@ -388,10 +399,12 @@ class _ProjectDocsServicePart03:
         authoritative_chunks = _tag_retrieval_query(
             authoritative_chunks, "query-original", query,
             lookup_by_id.get("query-original"),
+            expected_project_identity=filters["project_identity"], lifecycle_intent=answer_lifecycle_intent,
         )
         authoritative_chunks = _tag_retrieval_query(
             authoritative_chunks, exact_path_query_id, evidence_path,
             lookup_by_id.get(exact_path_query_id or ""),
+            expected_project_identity=filters["project_identity"], lifecycle_intent=answer_lifecycle_intent,
         )
         if exact_path_query_id:
             for anchor_lookup in documentation_query_plan.queries:
@@ -401,22 +414,29 @@ class _ProjectDocsServicePart03:
                         anchor_lookup.query_id,
                         anchor_lookup.text,
                         anchor_lookup,
+                        expected_project_identity=filters["project_identity"], lifecycle_intent=answer_lifecycle_intent,
                     )
-        supplemental_chunks_by_query = {
-            supplemental_query: _tag_retrieval_query(
-                _run(
-                    supplemental_query,
-                    query_limit=4,
-                    query_budget=supplemental_budget,
-                    query_expand="none",
-                    query_filters=filters,
-                ),
-                lookup_query_ids.get(supplemental_query),
+        supplemental_chunks_by_query = {}
+        for supplemental_query in supplemental_queries:
+            lane = _run(
                 supplemental_query,
-                lookup_by_text.get(supplemental_query),
+                query_limit=4,
+                query_budget=supplemental_budget,
+                query_expand="none",
+                query_filters=filters,
             )
-            for supplemental_query in supplemental_queries
-        }
+            lookups = [item for item in documentation_query_plan.queries if item.text == supplemental_query]
+            if not lookups:
+                lane = _tag_retrieval_query(
+                    lane, lookup_query_ids.get(supplemental_query), supplemental_query,
+                    expected_project_identity=filters["project_identity"], lifecycle_intent=answer_lifecycle_intent,
+                )
+            for lookup in lookups:
+                lane = _tag_retrieval_query(
+                    lane, lookup.query_id, lookup.text, lookup,
+                    expected_project_identity=filters["project_identity"], lifecycle_intent=answer_lifecycle_intent,
+                )
+            supplemental_chunks_by_query[supplemental_query] = lane
         queries_by_origin: dict[str, list[list[Any]]] = {}
         for item in documentation_query_plan.queries:
             lane = supplemental_chunks_by_query.get(item.text)
@@ -435,6 +455,11 @@ class _ProjectDocsServicePart03:
                 *queries_by_origin.get("retrieval_hint", []),
             ],
         ])
+        candidates.sort(
+            key=lambda chunk: not bool(
+                (chunk.metadata or {}).get("retrieval_query_ids")
+            )
+        )
         selected = []
         seen: set[tuple[str, int]] = set()
         token_total = 0
@@ -447,7 +472,6 @@ class _ProjectDocsServicePart03:
                     index for index, item in enumerate(selected)
                     if (item.source, item.chunk_index) == key
                 )
-                from docmancer.docs.application.context_selection import merge_query_matches
                 merged_matches = merge_query_matches(
                     (selected[existing_index].metadata or {}).get("retrieval_query_matches"),
                     (chunk.metadata or {}).get("retrieval_query_matches"),
@@ -743,6 +767,8 @@ class _ProjectDocsServicePart03:
             ), "query-path-1")
             exact_chunks = _tag_retrieval_query(
                 exact_chunks, exact_query_id, evidence_path,
+                expected_project_identity=self._repository_identity(root),
+                lifecycle_intent=str(getattr(requirements, "lifecycle_intent", "") or lifecycle_intent(query)),
             )
             chunks = [*exact_chunks, *chunks]
             exact_document_fallback_used = bool(exact_chunks)
@@ -776,6 +802,10 @@ class _ProjectDocsServicePart03:
                 **metadata_for_chunk,
                 "project_doc_path": canonical_path,
                 "source_path": canonical_path,
+                "freshness": metadata_for_chunk.get("freshness") or "current",
+                "index_freshness": metadata_for_chunk.get("index_freshness") or "synchronized",
+                "lifecycle_status": metadata_for_chunk.get("project_doc_lifecycle_status") or metadata_for_chunk.get("lifecycle_status") or "active",
+                "risk_flags": list(metadata_for_chunk.get("risk_flags") or ()),
             }
             safe_chunks.append(chunk.model_copy(update={"metadata": canonical_metadata}))
         chunks = safe_chunks

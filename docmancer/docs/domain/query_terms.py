@@ -9,6 +9,7 @@ from pathlib import Path
 
 _REQUEST_FRAMING_TERMS = frozenset({
     "describe", "explain", "how", "please", "show", "tell", "what", "which",
+    "compare", "summarize", "расскажи", "mcp", "and", "or", "the", "и", "или",
 })
 _TECHNICAL_TERM_PATTERNS = (
     re.compile(r"[`\"]([^`\"\n]{2,160})[`\"]"),
@@ -62,12 +63,23 @@ def documentation_technical_anchors(question: str, *, limit: int = 12) -> tuple[
             if (
                 value
                 and value.casefold() not in {"docatlas", "docmancer"}
+                and (pattern is _TECHNICAL_TERM_PATTERNS[0] or value.casefold() not in _REQUEST_FRAMING_TERMS)
                 and value not in values
             ):
                 values.append(value)
             if len(values) >= limit:
                 return tuple(values)
     return tuple(values)
+
+
+def documentation_query_terms(question: str) -> tuple[str, ...]:
+    """Bounded lexical probe terms, excluding standalone request connectors."""
+    return tuple(dict.fromkeys(
+        token.casefold()
+        for token in re.findall(r"[A-Za-zА-Яа-яЁё0-9_.:/+-]+", question)
+        if token.casefold() not in _REQUEST_FRAMING_TERMS
+        and (len(token) >= 4 or is_exact_technical_token(token))
+    ))[:32]
 
 
 def documentation_exact_terms(
@@ -119,6 +131,7 @@ def _looks_like_source_path(value: str) -> bool:
 __all__ = [
     "DocumentationExactTerm",
     "documentation_exact_terms",
+    "documentation_query_terms",
     "documentation_technical_anchors",
     "is_exact_technical_token",
 ]

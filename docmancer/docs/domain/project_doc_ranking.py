@@ -167,7 +167,7 @@ def is_specific_packs_mcp_source(chunk: Any) -> bool:
         or "action packs" in h
         or "install-pack" in h
         or "packs-serve" in content[:500]
-        or "mcp serve" in content[:500]
+        or re.search(r"\bmcp\s+serve\b", content[:500]) is not None
     )
 
 
@@ -482,7 +482,7 @@ def attach_project_ranking_metadata(chunk: Any, *, base_score: float, final_scor
     if selected_by == "broad_source_injection":
         reasons.append("included to satisfy broad-query source coverage")
     if diversity_relaxed:
-        reasons.append("source diversity cap relaxed only after strict backfill could not fill the requested limit")
+        reasons.append("source diversity cap relaxed for qualified public-query coverage or bounded backfill")
     ranking = {
         "query_intent": getattr(intent, "name", "general"),
         "base_score": base_score,
@@ -602,11 +602,17 @@ def rerank_project_doc_chunks(
             question,
             impact_policy=getattr(chunk, "impact_policy", None),
         )
+        and not (
+            getattr(intent, "wants_docs_mcp", False)
+            and not getattr(intent, "wants_packs_mcp", False)
+            and is_specific_packs_mcp_source(chunk)
+        )
     ]
     if not chunks:
         return []
     scored = []
     score_by_id: dict[int, tuple[float, float, int]] = {}
+    public_queries_by_id: dict[int, set[str]] = {}
     exact_anchors = {
         normalize_doc_path(value)
         for value in technical_anchors(question)
@@ -616,20 +622,27 @@ def rerank_project_doc_chunks(
     planning_intent = project_question_lane(question) == "planning"
     for index, chunk in enumerate(chunks):
         path = getattr(chunk, "path", None)
-        base = chunk_base_score(chunk, index)
-        score = base * source_weight_for_intent(path, getattr(chunk, "heading_path", None), intent) * source_requirement_boost(path, question, intent)
         metadata = getattr(chunk, "metadata", None) or {}
         query_matches = metadata.get("retrieval_query_matches") or {}
         qualified_query_ids = {
             str(query_id) for query_id, trace in query_matches.items()
             if isinstance(trace, dict) and trace.get("qualified") is True
         }
+        # Explicit qualification failures must not survive boosts or backfill.
+        if "retrieval_query_matches" in metadata and not qualified_query_ids:
+            continue
+        public_queries_by_id[id(chunk)] = {
+            query_id for query_id in qualified_query_ids
+            if query_matches[query_id].get("query_origin") in {
+                "original", "host_lookup", "exact_anchor", "exact_path",
+            }
+        } if not exact_anchors else set()
+        base = chunk_base_score(chunk, index)
+        score = base * source_weight_for_intent(path, getattr(chunk, "heading_path", None), intent) * source_requirement_boost(path, question, intent)
         if any(query_id.startswith("query-path-") for query_id in qualified_query_ids):
             score *= 100.0
         elif any(query_id.startswith("query-anchor-") for query_id in qualified_query_ids):
             score *= 50.0
-        elif any(query_id.startswith("query-lookup-") for query_id in qualified_query_ids):
-            score *= 10.0
         description = str(getattr(chunk, "description", None) or "")
         query_terms = set(re.findall(r"[\w-]+", question.lower()))
         description_terms = set(re.findall(r"[\w-]+", description.lower()))
@@ -648,13 +661,6 @@ def rerank_project_doc_chunks(
             score *= 20.0
         elif heading_overlap:
             score *= 1.0 + min(2.0, 0.5 * len(heading_overlap))
-        authority = str(getattr(chunk, "authority", None) or "")
-        score *= {
-            "source_of_truth": 1.5,
-            "supporting": 1.0,
-            "historical": 0.45,
-            "generated": 0.3,
-        }.get(authority, 1.0)
         normalized_path = normalize_doc_path(path)
         exact_compatible = int(
             normalized_path in exact_anchors
@@ -677,22 +683,42 @@ def rerank_project_doc_chunks(
             score *= 0.2
         scored.append((exact_compatible, score, index, chunk))
         score_by_id[id(chunk)] = (base, score, index)
-    scored.sort(key=lambda row: (-row[0], -row[1], row[2]))
+    # Authority breaks relevance ties; it cannot outweigh a better match.
+    scored.sort(key=lambda row: (
+        -row[0], -row[1],
+        -{"source_of_truth": 3, "supporting": 2, "historical": 1, "generated": 0}.get(
+            getattr(row[3], "authority", None), 2,
+        ),
+        row[2],
+    ))
 
     max_per_source = broad_max_per_source if getattr(intent, "broad", False) else narrow_max_per_source
     selected: list[Any] = []
     per_source_count: dict[str, int] = {}
-    for _, _, index, chunk in scored:
+    covered_public_queries: set[str] = set()
+    diversity_relaxed_ids: set[int] = set()
+    remaining = list(scored)
+    while remaining:
+        # Spend bounded slots on new public lookups, not repeated or alias hits.
+        next_index = max(range(len(remaining)), key=lambda i: (
+            remaining[i][0],
+            len(public_queries_by_id[id(remaining[i][3])] - covered_public_queries),
+            -i,
+        ))
+        _, _, index, chunk = remaining.pop(next_index)
         path = _source_key(chunk, index)
+        new_public_queries = public_queries_by_id[id(chunk)] - covered_public_queries
         if per_source_count.get(path, 0) >= max_per_source:
-            continue
+            if not new_public_queries:
+                continue
+            diversity_relaxed_ids.add(id(chunk))
         selected.append(chunk)
+        covered_public_queries.update(new_public_queries)
         per_source_count[path] = per_source_count.get(path, 0) + 1
         if limit and len(selected) >= limit:
             break
     pre_injection_ids = {id(c) for c in selected}
     selected = ensure_broad_query_sources(selected, [chunk for _, _, _, chunk in scored], question=question, intent=intent, limit=limit)
-    diversity_relaxed_ids: set[int] = set()
     if limit and len(selected) < limit:
         selected_ids = {id(c) for c in selected}
         selected_counts = Counter(_source_key(c) for c in selected)

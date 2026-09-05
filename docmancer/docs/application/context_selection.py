@@ -76,19 +76,21 @@ def merge_query_matches(*values: Any) -> dict[str, dict[str, Any]]:
             if current is None or candidate_key > current_key:
                 merged[str(query_id)] = trace
             selected = merged[str(query_id)]
-            selected_kind = str(selected.get("coverage_kind") or "direct")
-            selected["coverage_kinds"] = list(dict.fromkeys((
-                *(selected.get("coverage_kinds") or (selected_kind,)),
-                *(trace.get("coverage_kinds") or (trace_kind,)),
-                *((current or {}).get("coverage_kinds") or (current_kind,)),
-            )))
-            derived_from = tuple(dict.fromkeys((
-                *(selected.get("derived_from_query_ids") or ()),
-                *(trace.get("derived_from_query_ids") or ()),
-                *((current or {}).get("derived_from_query_ids") or ()),
-                *([trace["derived_from_query_id"]] if trace.get("derived_from_query_id") else []),
-                *([current["derived_from_query_id"]] if current and current.get("derived_from_query_id") else []),
-            )))
+            selected["coverage_kinds"] = list(dict.fromkeys(
+                kind
+                for item in (selected, trace, current)
+                if item and item.get("qualified") is True
+                for kind in (item.get("coverage_kinds") or (item.get("coverage_kind") or "direct",))
+            ))
+            derived_from = tuple(dict.fromkeys(
+                source_id
+                for item in (selected, trace, current)
+                if item and item.get("qualified") is True
+                for source_id in (
+                    *(item.get("derived_from_query_ids") or ()),
+                    *([item["derived_from_query_id"]] if item.get("derived_from_query_id") else []),
+                )
+            ))
             if derived_from:
                 selected["derived_from_query_ids"] = list(derived_from)
     return merged

@@ -14,6 +14,7 @@ from docmancer.docs.domain.project_retrieval_intent import (
 from docmancer.docs.domain.query_terms import (
     documentation_exact_terms,
     documentation_technical_anchors,
+    is_exact_technical_token,
 )
 from docmancer.docs.domain.technical_terms import extract_technical_terms
 
@@ -98,6 +99,7 @@ def build_documentation_query_plan(
     requirements: object | None = None,
 ) -> DocumentationQueryPlan:
     retrieval_aliases = build_project_retrieval_aliases(question)
+    single_facet = len({alias.intent_id for alias in retrieval_aliases}) == 1
     parent_exact_terms = tuple(dict.fromkeys((
         *(term.normalized_value for term in documentation_exact_terms(question)),
         *(value.casefold() for value in documentation_technical_anchors(question)),
@@ -106,10 +108,10 @@ def build_documentation_query_plan(
         role for alias in retrieval_aliases for role in alias.preferred_catalog_roles
     ))
     forbidden_roles = tuple(dict.fromkeys(
-        role for alias in retrieval_aliases for role in alias.forbidden_catalog_roles
+        role for alias in retrieval_aliases if single_facet for role in alias.forbidden_catalog_roles
     ))
     forbidden_evidence_terms = tuple(dict.fromkeys(
-        term for alias in retrieval_aliases for term in alias.forbidden_evidence_terms
+        term for alias in retrieval_aliases if single_facet for term in alias.forbidden_evidence_terms
     ))
     force_context_only = (
         project_retrieval_disposition(question) == "broad_context"
@@ -124,6 +126,21 @@ def build_documentation_query_plan(
         forbidden_evidence_terms=() if explicit_path else forbidden_evidence_terms,
     )]
     seen = {query.text.casefold() for query in queries}
+
+    def host_policies(text: str) -> dict[str, tuple[str, ...]]:
+        aliases = build_project_retrieval_aliases(text)
+        if not aliases and single_facet:
+            aliases = retrieval_aliases
+        one_facet = len({alias.intent_id for alias in aliases}) == 1
+        return {
+            field: tuple(dict.fromkeys(
+                value for alias in aliases
+                if one_facet or field == "preferred_catalog_roles"
+                for value in getattr(alias, field)
+            ))
+            for field in ("preferred_catalog_roles", "forbidden_catalog_roles", "forbidden_evidence_terms")
+        }
+
     requirement_hints = tuple(
         str(value).strip()
         for value in getattr(requirements, "retrieval_hints", ())
@@ -148,24 +165,32 @@ def build_documentation_query_plan(
         seen.add(anchor.casefold())
     for index, text in enumerate(lookup_queries[:5], start=1):
         cleaned = text.strip()
-        if not cleaned or cleaned.casefold() in seen:
+        if not cleaned:
             continue
         queries.append(DocumentationLookup(
             f"query-lookup-{index}", cleaned, "host_lookup", False,
             relation="host_lookup",
+            **host_policies(cleaned),
         ))
         seen.add(cleaned.casefold())
     for index, alias in enumerate(retrieval_aliases, start=1):
-        if alias.text.casefold() in seen:
-            continue
+        # Topic overlap, even for one facet, is not a complete equivalence audit.
+        equivalent = alias.text.casefold() == question.strip().casefold() or (
+            alias.intent_id == "installation_verification"
+            and alias.text.endswith("local installation setup verification getting started")
+            and re.fullmatch(
+                r"как установить (?:docatlas|docmancer|проект) локально и проверить,? что он работает\??",
+                " ".join(question.casefold().split()),
+            ) is not None
+        )
         queries.append(DocumentationLookup(
             f"query-intent-{index}", alias.text, "canonical_intent", False,
             (
                 f"intent-context:{alias.intent_id}"
                 if alias.force_context_only else f"intent:{alias.intent_id}"
             ),
-            relation="audited_rewrite",
-            public_parent_query_id="query-original",
+            relation="audited_rewrite" if equivalent else "host_lookup",
+            public_parent_query_id="query-original" if equivalent else None,
             preferred_catalog_roles=alias.preferred_catalog_roles,
             forbidden_catalog_roles=alias.forbidden_catalog_roles,
             forbidden_evidence_terms=alias.forbidden_evidence_terms,
@@ -216,6 +241,7 @@ def build_documentation_query_plan(
             origin,
             False,
             relation="host_lookup",
+            **host_policies(text),
         ))
         optional_count += 1
         seen.add(text.casefold())
@@ -252,6 +278,7 @@ def technical_anchors(question: str) -> tuple[str, ...]:
     values.extend(
         term.raw for term in extract_technical_terms(question)
         if term.raw.casefold() not in {"docatlas", "docmancer"}
+        and is_exact_technical_token(term.raw)
         and not any(term.raw in existing for existing in values)
     )
     return tuple(dict.fromkeys(value for value in values if value))[:12]
