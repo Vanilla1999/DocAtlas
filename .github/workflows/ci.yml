@@ -224,8 +224,8 @@ jobs:
         with:
           name: project-docs-quality-${{ github.run_id }}
           path: |
-            ${{ runner.temp }}/project-chat-context7-v1-hermetic.json
-            ${{ runner.temp }}/project-chat-context7-v1-live.json
+            ${{ runner.temp }}/project-context-quality-hermetic.json
+            ${{ runner.temp }}/project-context-quality-live.json
           if-no-files-found: error
           retention-days: 14
 

@@ -188,21 +188,31 @@ def test_stdio_smoke_accepts_structured_content_and_legacy_json_text() -> None:
     passing_metrics = {
         "false_supported_count": 0,
         "operational_contamination_count": 0,
-        "top1_relevance": 0.8,
-        "top3_relevance": 0.95,
-        "false_abstention_count": 2,
-        "cases_scoring_8_plus": 16,
-        "mean_score": 8.0,
+        "useful_result_count": 13,
+        "top1_fact_bearing_count": 12,
+        "top3_relevant_count": 15,
+        "original_query_covered_count": 12,
+        "metadata_only_evidence_count": 0,
+        "packs_contamination_count": 0,
+        "docs_analysis_contamination_count": 0,
+        "false_docs_answer_count": 0,
+        "source_budget_violation_count": 0,
+        "token_budget_violation_count": 0,
     }
     assert _threshold_failures(passing_metrics, 20) == []
     for key, value in (
         ("false_supported_count", 1),
         ("operational_contamination_count", 1),
-        ("top1_relevance", 0.79),
-        ("top3_relevance", 0.94),
-        ("false_abstention_count", 3),
-        ("cases_scoring_8_plus", 15),
-        ("mean_score", 7.99),
+        ("useful_result_count", 12),
+        ("top1_fact_bearing_count", 11),
+        ("top3_relevant_count", 14),
+        ("original_query_covered_count", 11),
+        ("metadata_only_evidence_count", 1),
+        ("packs_contamination_count", 1),
+        ("docs_analysis_contamination_count", 1),
+        ("false_docs_answer_count", 1),
+        ("source_budget_violation_count", 1),
+        ("token_budget_violation_count", 1),
     ):
         assert _threshold_failures({**passing_metrics, key: value}, 20)
 

@@ -4,13 +4,21 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 import re
+from typing import Literal
 
 from docmancer.docs.domain.question_frame_core import split_question_clauses
 from docmancer.docs.domain.project_retrieval_intent import (
     build_project_retrieval_aliases,
     project_retrieval_disposition,
 )
-from docmancer.retrieval.query_planning import extract_exact_terms
+from docmancer.docs.domain.query_terms import (
+    documentation_exact_terms,
+    documentation_technical_anchors,
+)
+from docmancer.docs.domain.technical_terms import extract_technical_terms
+
+
+QueryRelation = Literal["direct", "audited_rewrite", "host_lookup", "exact_anchor"]
 
 
 @dataclass(frozen=True, slots=True)
@@ -21,6 +29,25 @@ class DocumentationLookup:
     coverage_required: bool = True
     facet_id: str | None = None
     requirement_id: str | None = None
+    relation: QueryRelation = "direct"
+    public_parent_query_id: str | None = None
+    preferred_catalog_roles: tuple[str, ...] = ()
+    forbidden_catalog_roles: tuple[str, ...] = ()
+    forbidden_evidence_terms: tuple[str, ...] = ()
+    parent_exact_terms: tuple[str, ...] = ()
+
+    def __post_init__(self) -> None:
+        if self.relation not in {"direct", "audited_rewrite", "host_lookup", "exact_anchor"}:
+            raise ValueError(f"unsupported documentation query relation: {self.relation}")
+        if self.relation == "audited_rewrite" and not self.public_parent_query_id:
+            raise ValueError("audited rewrites require a public parent query")
+        if self.relation in {"direct", "host_lookup"} and self.public_parent_query_id:
+            raise ValueError(f"{self.relation} queries cannot derive parent coverage")
+        for field in (
+            "preferred_catalog_roles", "forbidden_catalog_roles", "forbidden_evidence_terms",
+            "parent_exact_terms",
+        ):
+            object.__setattr__(self, field, tuple(getattr(self, field)))
 
 
 @dataclass(frozen=True, slots=True)
@@ -32,12 +59,17 @@ class DocumentationQueryPlan:
     schema_version: str = "documentation-query-plan-v2"
 
     def as_payload(self) -> dict[str, object]:
+        public_origins = {"original", "host_lookup", "exact_anchor", "exact_path"}
         return {
             "schema_version": self.schema_version,
             "original_question": self.original_question,
             "query_ids": [query.query_id for query in self.queries],
             "required_query_ids": [
                 query.query_id for query in self.queries if query.coverage_required
+            ],
+            "public_query_ids": [
+                query.query_id for query in self.queries
+                if query.origin in public_origins
             ],
             "queries": [
                 {
@@ -47,6 +79,12 @@ class DocumentationQueryPlan:
                     "coverage_required": query.coverage_required,
                     "facet_id": query.facet_id,
                     "requirement_id": query.requirement_id,
+                    "relation": query.relation,
+                    "public_parent_query_id": query.public_parent_query_id,
+                    "preferred_catalog_roles": list(query.preferred_catalog_roles),
+                    "forbidden_catalog_roles": list(query.forbidden_catalog_roles),
+                    "forbidden_evidence_terms": list(query.forbidden_evidence_terms),
+                    "parent_exact_terms": list(query.parent_exact_terms),
                 }
                 for query in self.queries
             ],
@@ -60,6 +98,19 @@ def build_documentation_query_plan(
     requirements: object | None = None,
 ) -> DocumentationQueryPlan:
     retrieval_aliases = build_project_retrieval_aliases(question)
+    parent_exact_terms = tuple(dict.fromkeys((
+        *(term.normalized_value for term in documentation_exact_terms(question)),
+        *(value.casefold() for value in documentation_technical_anchors(question)),
+    )))
+    preferred_roles = tuple(dict.fromkeys(
+        role for alias in retrieval_aliases for role in alias.preferred_catalog_roles
+    ))
+    forbidden_roles = tuple(dict.fromkeys(
+        role for alias in retrieval_aliases for role in alias.forbidden_catalog_roles
+    ))
+    forbidden_evidence_terms = tuple(dict.fromkeys(
+        term for alias in retrieval_aliases for term in alias.forbidden_evidence_terms
+    ))
     force_context_only = (
         project_retrieval_disposition(question) == "broad_context"
         and any(alias.force_context_only for alias in retrieval_aliases)
@@ -67,11 +118,21 @@ def build_documentation_query_plan(
     queries = [DocumentationLookup(
         "query-original", question.strip(), "original",
         not force_context_only,
+        relation="direct",
+        preferred_catalog_roles=() if explicit_path else preferred_roles,
+        forbidden_catalog_roles=() if explicit_path else forbidden_roles,
+        forbidden_evidence_terms=() if explicit_path else forbidden_evidence_terms,
     )]
     seen = {query.text.casefold() for query in queries}
+    requirement_hints = tuple(
+        str(value).strip()
+        for value in getattr(requirements, "retrieval_hints", ())
+        if str(value).strip()
+    )
     if explicit_path and explicit_path.casefold() not in seen:
         queries.append(DocumentationLookup(
             "query-path-1", explicit_path, "exact_path", False,
+            relation="exact_anchor", public_parent_query_id="query-original",
         ))
         seen.add(explicit_path.casefold())
     for index, anchor in enumerate(technical_anchors(question), start=1):
@@ -79,6 +140,10 @@ def build_documentation_query_plan(
             continue
         queries.append(DocumentationLookup(
             f"query-anchor-{index}", anchor, "exact_anchor", False,
+            relation="exact_anchor", public_parent_query_id="query-original",
+            preferred_catalog_roles=() if explicit_path else preferred_roles,
+            forbidden_catalog_roles=() if explicit_path else forbidden_roles,
+            forbidden_evidence_terms=() if explicit_path else forbidden_evidence_terms,
         ))
         seen.add(anchor.casefold())
     for index, text in enumerate(lookup_queries[:5], start=1):
@@ -87,6 +152,7 @@ def build_documentation_query_plan(
             continue
         queries.append(DocumentationLookup(
             f"query-lookup-{index}", cleaned, "host_lookup", False,
+            relation="host_lookup",
         ))
         seen.add(cleaned.casefold())
     for index, alias in enumerate(retrieval_aliases, start=1):
@@ -98,6 +164,12 @@ def build_documentation_query_plan(
                 f"intent-context:{alias.intent_id}"
                 if alias.force_context_only else f"intent:{alias.intent_id}"
             ),
+            relation="audited_rewrite",
+            public_parent_query_id="query-original",
+            preferred_catalog_roles=alias.preferred_catalog_roles,
+            forbidden_catalog_roles=alias.forbidden_catalog_roles,
+            forbidden_evidence_terms=alias.forbidden_evidence_terms,
+            parent_exact_terms=parent_exact_terms,
         ))
         seen.add(alias.text.casefold())
     normalized = re.sub(r"[^a-z0-9]+", " ", question.casefold()).strip()
@@ -124,11 +196,6 @@ def build_documentation_query_plan(
         for value in getattr(requirements, "concept_queries", ())
         if str(value).strip()
     )
-    requirement_hints = tuple(
-        str(value).strip()
-        for value in getattr(requirements, "retrieval_hints", ())
-        if str(value).strip()
-    )
     optional_queries = [
         *((text, "concept_alias") for applies, text in concept_queries if applies),
         *((text, "concept_alias") for text in requirement_concepts),
@@ -137,7 +204,10 @@ def build_documentation_query_plan(
     optional_count = 0
     origin_counts = {"concept_alias": 0, "retrieval_hint": 0}
     for text, origin in optional_queries:
-        if text.casefold() in seen or optional_count >= 4:
+        if (
+            (text.casefold() in seen and origin != "retrieval_hint")
+            or optional_count >= 4
+        ):
             continue
         origin_counts[origin] += 1
         queries.append(DocumentationLookup(
@@ -145,6 +215,7 @@ def build_documentation_query_plan(
             text,
             origin,
             False,
+            relation="host_lookup",
         ))
         optional_count += 1
         seen.add(text.casefold())
@@ -175,8 +246,13 @@ _STANDALONE_TECHNICAL_RE = re.compile(
 def technical_anchors(question: str) -> tuple[str, ...]:
     values = [match.group(0) for match in _STANDALONE_TECHNICAL_RE.finditer(question)]
     values.extend(
-        term.value for term in extract_exact_terms(question)
-        if not any(term.value in value for value in values)
+        value for value in documentation_technical_anchors(question)
+        if not any(value in existing for existing in values)
+    )
+    values.extend(
+        term.raw for term in extract_technical_terms(question)
+        if term.raw.casefold() not in {"docatlas", "docmancer"}
+        and not any(term.raw in existing for existing in values)
     )
     return tuple(dict.fromkeys(value for value in values if value))[:12]
 
@@ -192,6 +268,7 @@ def _relation_claim_query(question: str) -> str | None:
 __all__ = [
     "DocumentationLookup",
     "DocumentationQueryPlan",
+    "QueryRelation",
     "build_documentation_query_plan",
     "technical_anchors",
 ]

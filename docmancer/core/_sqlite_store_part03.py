@@ -315,12 +315,13 @@ class _SQLiteStorePart03:
             for token in re.findall(r"[\w~./:+-]+", query)
             if token.casefold() not in _GENERIC_QUERY_TERMS
             and token.casefold() not in _QUERY_STOPWORDS
-            and (
-                any(char in token for char in "._/:+-")
-                or any(char.isupper() for char in token[1:])
-                or (token[:1].isupper() and len(token) > 2)
-            )
+            and is_exact_technical_token(token)
         ))
+        fields = {
+            "title": title.casefold(),
+            "body": body.casefold(),
+            "retrieval_text": retrieval_text.casefold(),
+        }
         haystack = (retrieval_text or f"{title}\n{body}").casefold()
         matched = tuple(term for term in terms if re.search(rf"(?<!\w){re.escape(term)}(?!\w)", haystack))
         missing_exact = tuple(
@@ -329,10 +330,16 @@ class _SQLiteStorePart03:
         )
         ratio = len(matched) / len(terms) if terms else 0.0
         required_ratio = 1.0 if len(terms) == 1 else 0.5
-        qualified = bool(matched) and (
-            mode == "and"
-            or (ratio >= required_ratio and not missing_exact)
+        qualified = bool(matched) and not missing_exact and (
+            mode == "and" or ratio >= required_ratio
         )
+        field_matches = {
+            field: [
+                term for term in terms
+                if re.search(rf"(?<!\w){re.escape(term)}(?!\w)", value)
+            ]
+            for field, value in fields.items()
+        }
         return {
             "mode": mode,
             "query_terms": list(terms),
@@ -345,6 +352,7 @@ class _SQLiteStorePart03:
             "bm25_cost": bm25_cost,
             "lexical_score": -bm25_cost,
             "qualified": qualified,
+            "field_matches": field_matches,
         }
 
     @classmethod

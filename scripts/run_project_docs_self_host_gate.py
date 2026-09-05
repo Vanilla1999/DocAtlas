@@ -15,8 +15,8 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
-import math
 import os
+import re
 from dataclasses import dataclass
 from pathlib import Path
 from tempfile import TemporaryDirectory
@@ -31,11 +31,12 @@ from docmancer.docs.service import DocsJobTracker, LibraryDocsService
 
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
-TOP1_RELEVANCE_MIN = 0.80
-TOP3_RELEVANCE_MIN = 0.95
-FALSE_ABSTENTION_MAX = 2
-SCORE_8_PLUS_RATE_MIN = 0.80
-MEAN_SCORE_MIN = 8.0
+PROTOCOL_LOCK = json.loads(
+    (REPO_ROOT / "eval/project_context_quality/protocol.lock.json").read_text(
+        encoding="utf-8"
+    )
+)
+PROTOCOL_THRESHOLDS = dict(PROTOCOL_LOCK.get("thresholds") or {})
 
 @dataclass(frozen=True, slots=True)
 class LiveCase:
@@ -47,6 +48,10 @@ class LiveCase:
     required_facts_by_path: tuple[tuple[str, str], ...] = ()
     forbidden_source_prefixes: tuple[str, ...] = ()
     forbidden_answer_fragments: tuple[str, ...] = ()
+    lookup_queries: tuple[str, ...] = ()
+    minimum_lookup_coverage: int = 0
+    allowed_paths: tuple[str, ...] = ()
+    expected_public_query_ids: tuple[str, ...] = ()
 
 
 def _load_gold_cases() -> tuple[LiveCase, ...]:
@@ -70,6 +75,16 @@ def _load_gold_cases() -> tuple[LiveCase, ...]:
             forbidden_answer_fragments=tuple(
                 str(value) for value in case.get("forbidden_answer_fragments") or ()
             ),
+            lookup_queries=tuple(
+                str(value) for value in case.get("lookup_queries") or ()
+            ),
+            minimum_lookup_coverage=int(case.get("minimum_lookup_coverage") or 0),
+            allowed_paths=tuple(
+                str(value) for value in case.get("allowed_paths") or case.get("sources") or ()
+            ),
+            expected_public_query_ids=tuple(
+                str(value) for value in case.get("expected_public_query_ids") or ()
+            ),
         )
         for case in payload.get("cases") or () if case.get("intent")
     )
@@ -77,7 +92,20 @@ def _load_gold_cases() -> tuple[LiveCase, ...]:
 
 GOLD_CASES = _load_gold_cases()
 
-NEGATIVE_CASES: tuple[str, ...] = ()
+
+def _load_negative_cases() -> tuple[str, ...]:
+    payload = json.loads(
+        (REPO_ROOT / "eval/project_context_quality/cases.json").read_text(
+            encoding="utf-8"
+        )
+    )
+    return tuple(
+        str(case["question"])
+        for case in payload.get("cases") or () if not case.get("intent")
+    )
+
+
+NEGATIVE_CASES = _load_negative_cases()
 
 
 def _source_paths(payload: dict[str, object]) -> tuple[str, ...]:
@@ -116,13 +144,19 @@ def _historical_paths() -> set[str]:
 
 
 def _query_coverage(payload: dict[str, object]) -> float:
+    covered = {
+        str(value) for value in payload.get("covered_query_ids") or () if value
+    }
+    missing = {
+        str(value) for value in payload.get("missing_query_ids") or () if value
+    }
+    if covered or missing:
+        return len(covered) / len(covered | missing)
     value = payload.get("query_coverage")
     if value is None and payload.get("kind") == "docs_answer" and payload.get("answer_supported") is True:
         return float(payload.get("mandatory_coverage") or 1.0)
     if value in {"full", "complete"}:
         return 1.0
-    if value in {"partial"}:
-        return 0.5
     try:
         return float(value or 0.0)
     except (TypeError, ValueError):
@@ -144,6 +178,10 @@ def _validate_context_result(payload: dict[str, object]) -> str | None:
             and isinstance(payload.get("facets"), list)
         ):
             return "docs_context violates the context-first safety contract"
+        if len(payload.get("sources") or ()) > 3:
+            return "docs_context exceeds the three-source budget"
+        if int(payload.get("estimated_tokens") or 0) > 800:
+            return "docs_context exceeds the 800-token budget"
     else:
         return f"unexpected result kind={kind!r}"
     for source in payload.get("sources") or ():
@@ -190,18 +228,48 @@ def _threshold_failures(metrics: dict[str, object], case_count: int) -> list[str
         failures.append("false-supported answers must be zero")
     if int(metrics["operational_contamination_count"]):
         failures.append("forbidden source contamination must be zero")
-    if float(metrics["top1_relevance"]) < TOP1_RELEVANCE_MIN:
-        failures.append("acceptable source must appear Top-1 for at least 80% of cases")
-    if float(metrics["top3_relevance"]) < TOP3_RELEVANCE_MIN:
-        failures.append("acceptable source must appear in Top-3 for at least 95% of cases")
-    if int(metrics["false_abstention_count"]) > FALSE_ABSTENTION_MAX:
-        failures.append("false abstentions exceed two")
-    required_high_scores = math.ceil(case_count * SCORE_8_PLUS_RATE_MIN)
-    if int(metrics["cases_scoring_8_plus"]) < required_high_scores:
-        failures.append("fewer than 80% of cases scored at least 8")
-    if float(metrics["mean_score"]) < MEAN_SCORE_MIN:
-        failures.append("mean behavioral score is below 8")
+    if int(metrics["useful_result_count"]) < int(PROTOCOL_THRESHOLDS["live_useful_result_min"]):
+        failures.append("useful onboarding context is below the frozen minimum")
+    if int(metrics["top1_fact_bearing_count"]) < int(PROTOCOL_THRESHOLDS["live_top1_fact_bearing_min"]):
+        failures.append("Top-1 fact-bearing context is below the frozen minimum")
+    if int(metrics["top3_relevant_count"]) < int(PROTOCOL_THRESHOLDS["live_top3_relevant_min"]):
+        failures.append("relevant context is missing from Top-3 too often")
+    if int(metrics["original_query_covered_count"]) < int(PROTOCOL_THRESHOLDS["original_query_coverage_min"]):
+        failures.append("direct or audited-derived original coverage is below the frozen minimum")
+    for name in (
+        "metadata_only_evidence_count", "packs_contamination_count",
+        "docs_analysis_contamination_count", "false_docs_answer_count",
+        "source_budget_violation_count", "token_budget_violation_count",
+    ):
+        if int(metrics[name]):
+            failures.append(f"{name} must be zero")
     return failures
+
+
+def _is_metadata_only_source(source: object) -> bool:
+    if not isinstance(source, dict):
+        return True
+    snippet = str(source.get("snippet") or "")
+    for line in snippet.splitlines():
+        stripped = line.strip()
+        if not stripped or stripped.startswith("#") or re.fullmatch(r"[|:\- ]+", stripped):
+            continue
+        without_links = re.sub(r"\[[^]]+\]\([^)]*\)", "", stripped)
+        if len(re.findall(r"[A-Za-zА-Яа-яЁё0-9_.-]+", without_links)) >= 3:
+            return False
+    return True
+
+
+def _coverage_attribution(raw_result: object, selected_paths: tuple[str, ...]) -> set[str]:
+    kinds: set[str] = set()
+    for source in getattr(raw_result, "context_pack", ()) or ():
+        if str(source.get("path") or "") not in selected_paths:
+            continue
+        trace = (source.get("retrieval_query_matches") or {}).get("query-original") or {}
+        if trace.get("qualified") is True:
+            kinds.update(str(value) for value in trace.get("coverage_kinds") or ())
+            kinds.add(str(trace.get("coverage_kind") or "direct"))
+    return kinds
 
 
 def run(
@@ -253,11 +321,19 @@ def run(
 
             for index, case in enumerate(cases, 1):
                 question = case.question
+                raw_result = service.get_docs_context(
+                    question,
+                    project_path=str(REPO_ROOT),
+                    mode="project",
+                    prepare_project_docs=False,
+                    lookup_queries=case.lookup_queries,
+                )
                 payload = call_docs_tool_payload(
                     "get_docs_context",
                     {
                         "question": question,
                         "project_path": str(REPO_ROOT),
+                        "lookup_queries": list(case.lookup_queries),
                     },
                     service,
                 )
@@ -299,6 +375,8 @@ def run(
                     for path, fragment in case.required_facts_by_path
                 }
                 top3 = paths[:3]
+                allowed_paths = set(case.allowed_paths or case.relevant_paths)
+                unexpected_paths = [path for path in top3 if path not in allowed_paths]
                 relevant_ranks = [rank for rank, path in enumerate(paths, 1) if path in case.relevant_paths]
                 reciprocal_rank = 1.0 / relevant_ranks[0] if relevant_ranks else 0.0
                 distractors = [
@@ -306,6 +384,36 @@ def run(
                     if any(path.startswith(prefix) for prefix in case.forbidden_source_prefixes)
                 ]
                 forbidden_visible = json.dumps(payload, ensure_ascii=False).casefold()
+                covered_lookup_ids = {
+                    str(value) for value in payload.get("covered_query_ids") or ()
+                    if str(value).startswith("query-lookup-")
+                }
+                original_query_covered = "query-original" in {
+                    str(value) for value in payload.get("covered_query_ids") or ()
+                }
+                expected_public_ids = set(case.expected_public_query_ids) or {
+                    "query-original",
+                    *(f"query-lookup-{item}" for item in range(1, len(case.lookup_queries) + 1)),
+                }
+                actual_public_ids = {
+                    str(value) for value in (
+                        *(payload.get("covered_query_ids") or ()),
+                        *(payload.get("missing_query_ids") or ()),
+                    )
+                }
+                attribution = _coverage_attribution(raw_result, paths)
+                top1_visible = json.dumps(
+                    (payload.get("sources") or [None])[0], ensure_ascii=False,
+                ).casefold()
+                top1_fact_bearing = bool(case.required_facts_by_path) and any(
+                    path == (paths[0] if paths else "") and fragment.casefold() in top1_visible
+                    for path, fragment in case.required_facts_by_path
+                )
+                metadata_only_sources = [
+                    str(row.get("path_or_url") or "")
+                    for row in payload.get("sources") or () if isinstance(row, dict)
+                    and _is_metadata_only_source(row)
+                ]
                 if case.expected_kind == "insufficient_evidence":
                     checks = {
                         "correct_abstention": status == "insufficient_evidence",
@@ -325,10 +433,15 @@ def run(
                         ),
                         "citation_integrity": _citation_integrity(payload),
                         "no_forbidden_source": not distractors,
+                        "only_allowed_sources": not unexpected_paths,
                         "no_forbidden_answer_fragment": not any(
                             fragment.casefold() in forbidden_visible
                             for fragment in case.forbidden_answer_fragments
                         ),
+                        "minimum_lookup_coverage": (
+                            len(covered_lookup_ids) >= case.minimum_lookup_coverage
+                        ),
+                        "public_query_inventory": expected_public_ids.issubset(actual_public_ids),
                     }
                 score = round(10 * sum(checks.values()) / max(len(checks), 1), 2)
                 result = {
@@ -339,6 +452,7 @@ def run(
                         "kind": case.expected_kind,
                         "relevant_paths": list(case.relevant_paths),
                         "required_fragments": list(case.required_fragments),
+                        "minimum_lookup_coverage": case.minimum_lookup_coverage,
                     },
                     "observed": {
                         "status": status,
@@ -346,16 +460,22 @@ def run(
                         "support_status": payload.get("support_status"),
                         "answer_supported": payload.get("answer_supported"),
                         "query_coverage": _query_coverage(payload),
+                        "covered_lookup_ids": sorted(covered_lookup_ids),
+                        "original_query_covered": original_query_covered,
+                        "coverage_attribution": sorted(attribution),
+                        "metadata_only_sources": metadata_only_sources,
                     },
                     "ranking": {
                         "top3_paths": list(top3),
                         "first_relevant_rank": relevant_ranks[0] if relevant_ranks else None,
                         "reciprocal_rank": reciprocal_rank,
                         "distractor_paths": distractors,
+                        "unexpected_paths": unexpected_paths,
                         "historical_paths": [path for path in top3 if path in historical_paths],
                     },
                     "fact_checks": fact_checks,
                     "path_fact_checks": path_fact_checks,
+                    "top1_fact_bearing": top1_fact_bearing,
                     "answer_fact_checks": answer_fact_checks,
                     "citations": _citations(payload),
                     "payload": payload,
@@ -415,9 +535,11 @@ def run(
         for row in positives
     )
     scores = [float(row.get("score", 10.0 if row.get("passed") else 0.0)) for row in positives]
-    failed_cases = [str(row.get("case_id")) for row in results if not row.get("passed")]
-    if failed_cases:
-        errors.append(f"failed cases: {failed_cases!r}")
+    failed_negative_cases = [
+        str(row.get("case_id")) for row in results[len(cases):] if not row.get("passed")
+    ]
+    if failed_negative_cases:
+        errors.append(f"failed negative cases: {failed_negative_cases!r}")
     report: dict[str, object] = {
         "schema_version": "project-answer-quality-live-result-v1",
         "run_mode": "live_self_host",
@@ -430,10 +552,40 @@ def run(
                 for row in positives
             ) / max(len(positives), 1),
             "top3_relevance": sum(bool(row.get("checks", {}).get("relevant_source_in_top3")) for row in positives) / max(len(positives), 1),
+            "top3_relevant_count": sum(bool(row.get("checks", {}).get("relevant_source_in_top3")) for row in positives),
             "mrr": sum(float(row.get("ranking", {}).get("reciprocal_rank", 0.0)) for row in positives) / max(len(positives), 1),
             "distractor_rate": distractor_count / max(source_count, 1),
             "historical_source_rate": historical_count / max(source_count, 1),
             "mean_query_coverage": sum(float(row.get("observed", {}).get("query_coverage", 0.0)) for row in positives) / max(len(positives), 1),
+            "original_query_covered_count": sum(
+                bool(row.get("observed", {}).get("original_query_covered"))
+                for row in positives
+            ),
+            "direct_coverage_count": sum("direct" in row.get("observed", {}).get("coverage_attribution", ()) for row in positives),
+            "derived_coverage_count": sum("derived" in row.get("observed", {}).get("coverage_attribution", ()) for row in positives),
+            "lookup_coverage_count": sum(len(row.get("observed", {}).get("covered_lookup_ids", ())) for row in positives),
+            "zero_coverage_count": sum(float(row.get("observed", {}).get("query_coverage", 0.0)) == 0.0 for row in positives),
+            "useful_result_count": sum(
+                bool(row.get("checks", {}).get("status_ok"))
+                and bool(row.get("checks", {}).get("relevant_source_in_top3"))
+                and bool(row.get("checks", {}).get("required_facts"))
+                for row in positives
+            ),
+            "top1_fact_bearing_count": sum(bool(row.get("top1_fact_bearing")) for row in positives),
+            "metadata_only_evidence_count": sum(len(row.get("observed", {}).get("metadata_only_sources", ())) for row in positives),
+            "packs_contamination_count": sum(
+                any("pack" in str(path).casefold() for path in row.get("ranking", {}).get("top3_paths", ()))
+                for row in positives
+            ),
+            "docs_analysis_contamination_count": sum(
+                any(str(path).startswith("docs/analysis/") for path in row.get("ranking", {}).get("top3_paths", ()))
+                for row in positives
+            ),
+            "false_docs_answer_count": sum(row.get("observed", {}).get("kind") == "docs_answer" for row in positives),
+            "max_source_count": max((len(row.get("ranking", {}).get("top3_paths", ())) for row in positives), default=0),
+            "max_estimated_tokens": max((int(row.get("payload", {}).get("estimated_tokens") or 0) for row in positives), default=0),
+            "source_budget_violation_count": sum(len(row.get("ranking", {}).get("top3_paths", ())) > 3 for row in positives),
+            "token_budget_violation_count": sum(int(row.get("payload", {}).get("estimated_tokens") or 0) > 800 for row in positives),
             "false_abstention_count": sum(
                 row.get("expected", {}).get("kind") != "insufficient_evidence"
                 and not bool(row.get("checks", {}).get("status_ok"))

@@ -127,7 +127,10 @@ def test_canonical_intent_can_carry_bounded_context_without_answer_proof():
             "source_class": "project_doc",
             "path": "README.md",
             "heading_path": "Installation",
-            "content": "Install the package locally, run command-line help, and verify the server starts.",
+            "content": (
+                "Local installation setup verification: install the package, run command-line "
+                "help, and verify the server starts."
+            ),
             "project_identity": "git:example/project",
             "authority": "source_of_truth",
             "doc_scope": "project",
@@ -153,7 +156,11 @@ def test_canonical_intent_can_carry_bounded_context_without_answer_proof():
     assert projection["answer_supported"] is False
     assert projection["edit_ready"] is False
     assert projection["sources"][0]["path_or_url"] == "README.md"
-    assert canonical.query_id in projection["covered_query_ids"]
+    assert canonical.query_id not in projection["covered_query_ids"]
+    assert projection["missing_query_ids"] == ["query-original"]
+    assert any(
+        facet["status"] == "retrieval_only" for facet in projection["facets"]
+    )
 
 
 def test_generic_first_commands_are_not_docs_mcp_public_tool_inventory():

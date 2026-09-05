@@ -32,6 +32,25 @@ _RETRIEVAL_ONLY_UNRESOLVED_PREFIXES = (
     "unresolved_query_subject",
     "unresolved_requested_operation",
 )
+_INTENT_ROLE_POLICY: dict[str, tuple[tuple[str, ...], tuple[str, ...]]] = {
+    "product_overview": (("overview", "project_architecture"), ("adr", "roadmap")),
+    "getting_started": (("overview", "development", "runbook"), ("adr", "roadmap")),
+    "installation_verification": (("development", "runbook", "overview"), ("adr", "roadmap")),
+    "contributor_start": (("development", "overview", "project_architecture"), ("roadmap",)),
+    "local_development": (("development", "runbook"), ("adr", "roadmap")),
+    "testing_contribution": (("development", "runbook"), ("adr", "roadmap")),
+    "docs_mcp_workflow": (("api_contract", "runbook", "development"), ("adr", "roadmap")),
+    "docs_mcp_server_command": (("api_contract", "runbook"), ("adr", "roadmap")),
+    "project_docs_sync": (("runbook", "development"), ("roadmap",)),
+    "project_docs_configuration": (("runbook", "development", "api_contract"), ("roadmap",)),
+    "project_architecture": (("project_architecture", "overview"), ("roadmap",)),
+    "retrieval_pipeline": (("project_architecture", "api_contract"), ("roadmap",)),
+    "project_storage": (("project_architecture", "module_architecture"), ("roadmap",)),
+    "index_chunking": (("project_architecture", "module_architecture"), ("roadmap",)),
+    "evidence_selection": (("module_architecture", "project_architecture"), ("roadmap",)),
+    "security": (("api_contract", "project_architecture", "runbook"), ("roadmap",)),
+    "library_discovery": (("runbook", "api_contract", "development"), ("roadmap",)),
+}
 ProjectRetrievalDisposition = Literal[
     "typed_context", "broad_context", "fail_closed",
 ]
@@ -45,6 +64,9 @@ class ProjectRetrievalAlias:
     text: str
     force_context_only: bool
     source_language: str
+    preferred_catalog_roles: tuple[str, ...] = ()
+    forbidden_catalog_roles: tuple[str, ...] = ()
+    forbidden_evidence_terms: tuple[str, ...] = ()
 
 
 def _normal(value: str) -> str:
@@ -91,6 +113,7 @@ def build_project_retrieval_aliases(
         return ()
 
     normalized = _normal(source)
+    raw_tokens = tuple(_TOKEN_RE.findall(source))
     tokens = _tokens(source)
     language = "ru" if _CYRILLIC_RE.search(source) else "en"
     mentions_product = bool(_PRODUCT_NAME_RE.search(source))
@@ -99,6 +122,7 @@ def build_project_retrieval_aliases(
     seen: set[str] = set()
 
     def emit(intent_id: str, force_context_only: bool, *queries: str) -> None:
+        preferred_roles, forbidden_roles = _INTENT_ROLE_POLICY.get(intent_id, ((), ()))
         for query in queries:
             text = " ".join(query.split())[:500]
             key = text.casefold()
@@ -110,6 +134,12 @@ def build_project_retrieval_aliases(
                 text=text,
                 force_context_only=force_context_only,
                 source_language=language,
+                preferred_catalog_roles=preferred_roles,
+                forbidden_catalog_roles=forbidden_roles,
+                forbidden_evidence_terms=(
+                    "docs/adr/", "mcp pack commands", "packs mcp runtime",
+                    "install-pack", "packs-serve",
+                ) if intent_id in {"docs_mcp_workflow", "docs_mcp_server_command"} else (),
             ))
 
     mentions_docs = _has(tokens, "документ", "док", "docs", "documentation")
@@ -120,6 +150,10 @@ def build_project_retrieval_aliases(
     mentions_command = _has(tokens, "команд", "command", "cli")
     mentions_start = _has(tokens, "запуст", "запуск", "старт", "start", "serve", "run")
     specific_contract_request = _specific_contract_request(tokens)
+    specific_technical_request = (
+        any(_CODE_IDENTITY_RE.fullmatch(token) for token in raw_tokens)
+        and _has(tokens, "require", "govern", "contract", "rule", "инвариант")
+    )
 
     # Narrow, reviewed facts remain eligible for strict proof and docs_answer.
     if _has(tokens, "маркер", "marker") and _has(tokens, "pytest"):
@@ -297,7 +331,8 @@ def build_project_retrieval_aliases(
         emit(
             "project_storage",
             True,
-            f"{product_prefix}project documentation storage index path per-project isolation",
+            f"{product_prefix}project documentation storage and isolation",
+            f"{product_prefix}per-project SQLite index storage",
         )
     if _has(tokens, "чанк", "секци", "разбив", "chunk", "section", "split"):
         emit(
@@ -322,6 +357,42 @@ def build_project_retrieval_aliases(
             "tests before pull request",
             "CONTRIBUTING.md tests",
             "docs/testing.md pytest",
+        )
+    if _has(tokens, "локальн", "local", "develop", "разработ") and _has(
+        tokens, "запуст", "setup", "install", "окруж", "environment", "dependency",
+    ):
+        emit(
+            "local_development",
+            True,
+            f"{product_prefix}local development setup dependencies environment",
+            "CONTRIBUTING.md development setup",
+        )
+    if _has(tokens, "безопас", "security", "secure", "symlink", "path") and _has(
+        tokens, "путь", "path", "файл", "file", "чтен", "read", "репозитор", "repository",
+    ):
+        emit(
+            "security",
+            True,
+            f"{product_prefix}project path validation safe file reads repository boundary",
+            f"{product_prefix}symlink absolute path security",
+        )
+    if _has(tokens, "библиотек", "library", "ecosystem", "экосистем") and _has(
+        tokens, "добав", "support", "поддерж", "discover", "источник", "source",
+    ):
+        emit(
+            "library_discovery",
+            True,
+            f"{product_prefix}library documentation source discovery version indexing",
+            f"{product_prefix}curated sources library docs quality",
+        )
+    if not specific_technical_request and _has(tokens, "retrieval", "поиск") and _has(
+        tokens, "pipeline", "поток", "query", "evidence", "ranking", "ранж",
+    ):
+        emit(
+            "retrieval_pipeline",
+            True,
+            f"{product_prefix}retrieval pipeline query planning ranking evidence selection",
+            f"{product_prefix}lexical vector retrieval data flow",
         )
     if _has(tokens, "архитект", "architecture", "устройств", "components"):
         emit(

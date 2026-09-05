@@ -153,6 +153,27 @@ def test_or_fallback_requires_exact_terms_and_half_the_query(tmp_path):
     assert trace["qualified"] is False
 
 
+def test_sentence_initial_politeness_is_not_an_exact_technical_term(tmp_path):
+    store = _store(
+        tmp_path,
+        [_doc(
+            "docs/architecture.md",
+            "DocAtlas architecture",
+            "DocAtlas architecture describes the retrieval runtime.",
+        )],
+    )
+
+    result = store.query(
+        "Please explain the DocAtlas architecture", limit=1, budget=1_000,
+    )[0]
+    trace = result.metadata["lexical_match"]
+
+    assert "please" not in trace["exact_terms"]
+    assert "please" not in trace["missing_exact_terms"]
+    assert "docatlas" in trace["exact_terms"]
+    assert trace["qualified"] is True
+
+
 def test_exact_filename_qualification_uses_the_same_corpus_as_fts(tmp_path):
     requested = _doc(
         "docatlas.project-docs.yaml",
@@ -179,3 +200,20 @@ def test_exact_filename_qualification_uses_the_same_corpus_as_fts(tmp_path):
         for result in results
         if result.source == "docatlas.docs.yaml"
     )
+
+
+def test_lexical_trace_reports_field_level_provenance():
+    trace = SQLiteStore._lexical_match_trace(
+        "architecture storage retrieval",
+        title="Architecture",
+        body="Storage details",
+        retrieval_text="Architecture Storage Retrieval catalog metadata",
+        mode="and",
+        bm25_cost=-1.0,
+    )
+
+    assert trace["field_matches"]["title"] == ["architecture"]
+    assert trace["field_matches"]["body"] == ["storage"]
+    assert trace["field_matches"]["retrieval_text"] == [
+        "architecture", "storage", "retrieval",
+    ]

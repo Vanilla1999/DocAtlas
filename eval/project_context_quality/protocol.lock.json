@@ -1,7 +1,7 @@
 {
   "schema_version": "project-context-quality-protocol-v1",
   "case_file": "cases.json",
-  "case_file_sha256": "347bfb1522dc7f92f7b09de00fef1490af38182eaa920c79bbe43c3920241aad",
+  "case_file_sha256": "b77ae44e8fb41bc53a6aa6cf584d886ee884ba337302285e4de9af2e4a5d829a",
   "case_count": 16,
   "case_ids": [
     "ru-install",
@@ -25,7 +25,18 @@
     "contract_pass_rate_min": 1.0,
     "false_public_tools_max": 0,
     "live_useful_result_min": 13,
-    "live_top1_relevant_min": 12,
-    "live_top3_relevant_min": 15
+    "live_top1_fact_bearing_min": 12,
+    "live_top3_relevant_min": 15,
+    "original_query_coverage_min": 12
+  },
+  "red_baseline": {
+    "positive_case_count": 15,
+    "query_original_covered_count": 0,
+    "useful_result_count": 5,
+    "known_failures": [
+      "cli_wrong_source",
+      "docs_mcp_packs_contamination",
+      "security_parse_uncertain"
+    ]
   }
 }

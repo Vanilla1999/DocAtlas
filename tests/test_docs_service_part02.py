@@ -700,7 +700,7 @@ def test_query_project_docs_runs_lookup_queries_as_retrieval_only_supplements(tm
     assert observed.count("retrieval lifecycle") == 1
     assert len(chunks) == 1
     assert chunks[0].metadata["retrieval_query_ids"] == (
-        "query-original", "query-lookup-1", "query-lookup-2",
+        "query-lookup-1", "query-lookup-2",
     )
 
 

@@ -7,7 +7,10 @@ project-documentation path.  The primary success is useful bounded
 The corpus contains Russian questions, English semantic pairs, and a nonexistent
 premise.  Contract tests verify that broad queries receive retrieval-only
 aliases, generic CLI commands are not rewritten as the Docs MCP tool inventory,
-and an unknown premise receives no canonical alias.
+and an unknown premise receives no canonical alias. The compound onboarding case
+also verifies five optional lookup queries, stable public IDs, optional-only
+semantics, and at least three covered lookup directions through the live public
+MCP path.
 
 Run the provider-free contract gate with:
 

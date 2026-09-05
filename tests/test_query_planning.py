@@ -6,6 +6,7 @@ from docmancer.retrieval.query_planning import (
     build_query_plan,
     extract_document_locator,
     extract_exact_terms,
+    is_exact_technical_token,
     compile_backend_filters,
     metadata_matches_filters,
 )
@@ -54,6 +55,16 @@ def test_exact_term_extraction_does_not_treat_prose_as_config_or_path():
     assert "MCP" not in values
     assert "fetch/index" not in values
     assert {"CONFIG_KEY", "docs/setup.md"} <= values
+
+
+def test_lexical_exact_token_policy_excludes_request_framing():
+    assert not any(
+        is_exact_technical_token(value) for value in ("Please", "Explain", "Which")
+    )
+    assert all(
+        is_exact_technical_token(value)
+        for value in ("Telegram", "DocAtlas", "README.md", "DOCATLAS_HOME")
+    )
 
 
 def test_path_term_suppresses_overlapping_symbol_and_config_terms():

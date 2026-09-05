@@ -17,6 +17,8 @@ Agent workflow:
 - This tool provides source-grounded context, not a full code audit or test substitute.
 - Pass the user's original request unchanged as question.
 - For compound or cross-language requests, add up to five single-concept lookup_queries.
+- Write each lookup in the documentation language, keep it to one concept, and split
+  requests with more than three major topics across multiple bounded calls.
 - Preserve exact identifiers, filenames, commands, and versions verbatim.
 - lookup_queries improve retrieval only; they never authorize an answer or edit.
 """,
@@ -24,7 +26,7 @@ Agent workflow:
             "type": "object",
             "properties": {
                 "question": {"type": "string"},
-                "lookup_queries": {"type": ["array", "null"], "maxItems": 5, "uniqueItems": True, "items": {"type": "string", "minLength": 1, "maxLength": 500}, "description": "Optional bounded single-concept project-documentation lookups used only to improve retrieval recall."},
+                "lookup_queries": {"type": ["array", "null"], "maxItems": 5, "uniqueItems": True, "items": {"type": "string", "minLength": 1, "maxLength": 500}, "description": "Optional bounded single-concept project-documentation lookups used only to improve retrieval recall. Use the documentation language, preserve exact identifiers, and put only one topic in each lookup."},
                 "project_path": {"type": ["string", "null"]},
                 "library": {"type": ["string", "null"]},
                 "version": {"type": ["string", "null"]},
@@ -571,8 +573,10 @@ PUBLIC_ADVERTISED_DESCRIPTIONS: dict[str, str] = {
     "get_docs_context": (
         "Source-grounded documentation tool. Call before a coding edit or for a documentation/API question. "
         "Pass the user's original request unchanged as question. For compound or cross-language requests, add up "
-        "to five single-concept lookup_queries. Preserve exact identifiers, filenames, commands, and versions "
+        "to five single-concept lookup_queries in the documentation language. Preserve exact identifiers, "
+        "filenames, commands, and versions "
         "verbatim. lookup_queries improve retrieval only; they never authorize an answer or edit. "
+        "Use one topic per lookup; split requests with over three topics across bounded calls. "
         "For one known module use scope=module with exact module_path; module_path always implies module scope. "
         "For project-wide policy use scope=project without module filters. If a task needs both module-local and "
         "project-wide evidence, make two bounded calls (module then project). For cross-module questions use "
@@ -598,7 +602,7 @@ PUBLIC_ADVERTISED_INPUT_SCHEMAS: dict[str, dict[str, Any]] = {
         "type": "object",
         "properties": {
             "question": {"type": "string", "minLength": 1},
-            "lookup_queries": {"type": ["array", "null"], "maxItems": 5, "uniqueItems": True, "items": {"type": "string", "minLength": 1, "maxLength": 500}},
+            "lookup_queries": {"type": ["array", "null"], "maxItems": 5, "uniqueItems": True, "items": {"type": "string", "minLength": 1, "maxLength": 500}, "description": "Retrieval-only, single-concept lookups in the documentation language. Preserve identifiers and split requests with more than three major topics across calls."},
             "project_path": {"type": ["string", "null"]},
             "library": {"type": ["string", "null"]},
             "version": {"type": ["string", "null"]},

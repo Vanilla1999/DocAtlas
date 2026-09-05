@@ -7,6 +7,10 @@ from dataclasses import asdict
 from pathlib import Path
 from typing import Any, Mapping
 
+from docmancer.docs.domain.query_terms import (
+    documentation_exact_terms,
+    is_exact_technical_token,
+)
 from docmancer.retrieval.contracts import (
     ExactTerm,
     FilterSpec,
@@ -93,34 +97,14 @@ def _canonical_filter_value(value: Any) -> Any:
 
 
 def extract_exact_terms(query: str) -> tuple[ExactTerm, ...]:
-    found: list[ExactTerm] = []
-    seen: set[str] = set()
-    path_spans = [
-        match.span()
-        for match in dict(_TERM_PATTERNS)["path"].finditer(query)
-        if _looks_like_source_path(match.group(0))
-    ]
-    for kind, pattern in _TERM_PATTERNS:
-        for match in pattern.finditer(query):
-            if kind != "path" and any(
-                start <= match.start() and match.end() <= end
-                for start, end in path_spans
-            ):
-                continue
-            value = match.group(1) if match.lastindex else match.group(0)
-            value = " ".join(value.split())[:160]
-            if kind == "config_key" and "_" not in value:
-                continue
-            if kind == "path" and not _looks_like_source_path(value):
-                continue
-            normalized = _normalize_term(value)
-            if not normalized or normalized in seen:
-                continue
-            found.append(ExactTerm(value=value, normalized_value=normalized, kind=kind))
-            seen.add(normalized)
-            if len(found) >= MAX_EXACT_TERMS:
-                return tuple(found)
-    return tuple(found)
+    return tuple(
+        ExactTerm(
+            value=term.value,
+            normalized_value=term.normalized_value,
+            kind=term.kind,
+        )
+        for term in documentation_exact_terms(query, limit=MAX_EXACT_TERMS)
+    )
 
 
 def extract_document_locator(query: str) -> str | None:

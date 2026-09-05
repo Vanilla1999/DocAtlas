@@ -49,7 +49,7 @@ def test_docs_context_is_retrieval_only_snapshot_bound_and_not_edit_ready():
             },
         }],
         "documentation_query_plan": {"query_ids": ["query-original", "query-lookup-1"], "queries": [
-            {"query_id": "query-original", "text": "How does routing work?", "origin": "original"},
+            {"query_id": "query-original", "text": "How does the MCP router work?", "origin": "original"},
             {
                 "query_id": "query-lookup-1",
                 "text": "retrieval lifecycle",
@@ -112,7 +112,7 @@ def test_docs_context_is_retrieval_only_snapshot_bound_and_not_edit_ready():
     line_snippet, line_start, line_end = _focused_snippet(
         line_text, ("dispatches retrieval",),
     )
-    assert _focused_line_range(line_text, line_start, line_end, 12) == (14, 20)
+    assert _focused_line_range(line_text, line_start, line_end, 12) == (16, 16)
     assert line_snippet.count("```") % 2 == 0
     tampered = deepcopy(projection)
     tampered["edit_ready"] = True
@@ -152,9 +152,9 @@ def test_docs_context_merges_query_attribution_for_duplicate_evidence():
                 "query-lookup-1": {"qualified": True, "mode": "and"},
             }},
         ],
-        "documentation_query_plan": {
-            "query_ids": ["query-original", "query-lookup-1"],
-        },
+        "documentation_query_plan": {"query_ids": ["query-original", "query-lookup-1"], "queries": [
+            {"query_id": "query-original", "text": "routing retrieval service", "origin": "original"},
+            {"query_id": "query-lookup-1", "text": "project retrieval service", "origin": "host_lookup"}]},
     })
 
     assert projection["query_coverage"] == "full"

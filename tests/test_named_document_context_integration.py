@@ -15,6 +15,7 @@ from docmancer.mcp.docs_server import call_docs_tool_payload
 
 def _named_document_service(
     tmp_path, monkeypatch, paths: list[str], contents: dict[str, str] | None = None,
+    roles: dict[str, str] | None = None,
 ) -> tuple[LibraryDocsService, str]:
     monkeypatch.setenv("DOCATLAS_HOME", str(tmp_path / "home"))
     project = tmp_path / "project"
@@ -26,7 +27,7 @@ def _named_document_service(
             encoding="utf-8",
         )
     catalog = "schema_version: 1\ndocuments:\n" + "".join(
-            f"  - path: {path}\n    role: other\n    scope: project\n"
+            f"  - path: {path}\n    role: {(roles or {}).get(path, 'other')}\n    scope: project\n"
         "    description: Named document fixture.\n    authority: source_of_truth\n"
         "    status: active\n    impact: track\n"
         for path in paths
@@ -538,3 +539,126 @@ def test_real_sqlite_newcomer_topics_reach_expected_project_docs(
     paths = [source["path_or_url"] for source in result["sources"]]
     assert expected_path in paths[:3]
     assert expected_text in str(result)
+
+
+def test_real_sqlite_compound_onboarding_maximizes_host_lookup_coverage(
+    tmp_path, monkeypatch,
+):
+    contents = {
+        "docs/product.md": "# Product\n\nPurposeword newcomerword explains the product goal.\n",
+        "docs/architecture.md": "# Architecture\n\nBoundaryword runtimeword explains architecture.\n",
+        "docs/data-flow.md": "# Data flow\n\nFlowword pipelineword explains request flow.\n",
+        "docs/development.md": "# Development\n\nBootstrapword localword explains local setup.\n",
+        "docs/testing.md": "# Testing\n\nTestword pytestword explains test commands.\n",
+    }
+    service, project = _named_document_service(
+        tmp_path, monkeypatch, list(contents), contents,
+    )
+    lookup_queries = [
+        "purposeword newcomerword",
+        "boundaryword runtimeword",
+        "flowword pipelineword",
+        "bootstrapword localword",
+        "testword pytestword",
+    ]
+
+    result = call_docs_tool_payload(
+        "get_docs_context",
+        {
+            "question": "I just joined this project. Help me understand it.",
+            "lookup_queries": lookup_queries,
+            "project_path": project,
+            "scope": "project",
+        },
+        service,
+    )
+
+    assert result["status"] == "ok", result
+    assert result["kind"] == "docs_context"
+    assert result["support_status"] == "retrieval_only"
+    assert result["answer_supported"] is False
+    assert result["answer_available"] is False
+    assert result["edit_ready"] is False
+    assert len(result["sources"]) == 3
+    lookup_ids = {f"query-lookup-{index}" for index in range(1, 6)}
+    covered_lookup_ids = set(result["covered_query_ids"]) & lookup_ids
+    missing_lookup_ids = set(result["missing_query_ids"]) & lookup_ids
+    assert len(covered_lookup_ids) == 3
+    assert len(missing_lookup_ids) == 2
+    assert covered_lookup_ids | missing_lookup_ids == lookup_ids
+    assert "query-original" in result["missing_query_ids"]
+    assert not any(
+        query_id.startswith("query-intent-")
+        for query_id in result["missing_query_ids"]
+    )
+    assert result["estimated_tokens"] <= 800
+
+
+def test_real_sqlite_audited_russian_alias_covers_original_question(
+    tmp_path, monkeypatch,
+):
+    service, project = _named_document_service(
+        tmp_path,
+        monkeypatch,
+        ["README.md"],
+        {"README.md": (
+            "# Local installation setup verification\n\n"
+            "Install DocAtlas locally and run command-line help to verify the setup.\n"
+        )},
+        {"README.md": "overview"},
+    )
+    result = call_docs_tool_payload(
+        "get_docs_context",
+        {
+            "question": "Как установить DocAtlas локально и проверить, что он работает?",
+            "project_path": project,
+        },
+        service,
+    )
+
+    assert result["status"] == "ok", result
+    assert result["sources"][0]["path_or_url"] == "README.md"
+    assert "query-original" in result["covered_query_ids"]
+    assert result["answer_supported"] is False
+
+
+def test_real_sqlite_docs_mcp_intent_excludes_packs_and_adrs(
+    tmp_path, monkeypatch,
+):
+    contents = {
+        "docs/mcp-docs-server.md": (
+            "# Docs MCP server workflow\n\n"
+            "Use get_docs_context, prepare_docs, and docs_status for documentation context.\n"
+        ),
+        "docs/mcp-packs.md": (
+            "# MCP pack commands\n\nUse install-pack and packs-serve for API action packs.\n"
+        ),
+        "docs/adr/mcp.md": "# MCP boundary\n\nHistorical MCP transport decision.\n",
+    }
+    service, project = _named_document_service(
+        tmp_path,
+        monkeypatch,
+        list(contents),
+        contents,
+        {
+            "docs/mcp-docs-server.md": "api_contract",
+            "docs/mcp-packs.md": "api_contract",
+            "docs/adr/mcp.md": "project_architecture",
+        },
+    )
+    result = call_docs_tool_payload(
+        "get_docs_context",
+        {
+            "question": "Как устроен полный процесс работы Docs MCP?",
+            "project_path": project,
+        },
+        service,
+    )
+
+    assert result["status"] == "ok", result
+    paths = {source["path_or_url"] for source in result["sources"]}
+    visible = "\n".join(source["snippet"] for source in result["sources"])
+    assert "docs/mcp-docs-server.md" in paths
+    assert "docs/mcp-packs.md" not in paths
+    assert "docs/adr/mcp.md" not in paths
+    assert "packs-serve" not in visible

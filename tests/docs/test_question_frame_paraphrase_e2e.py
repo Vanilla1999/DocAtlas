@@ -111,6 +111,8 @@ def test_reusable_question_frames_survive_real_manifest_sync_and_public_mcp(tmp_
         assert payload["status"] == "ok", (question, payload)
         assert payload["kind"] == "docs_context", (question, payload)
         assert payload["answer_supported"] is False
+        assert payload["answer_available"] is False
+        assert payload["edit_ready"] is False
         assert expected in str(payload), (question, payload)
 
     open_context = (
@@ -128,8 +130,6 @@ def test_reusable_question_frames_survive_real_manifest_sync_and_public_mcp(tmp_
         assert payload["status"] == "ok", (question, payload)
         assert payload["kind"] == "docs_context", (question, payload)
         assert payload["answer_supported"] is False
-        assert payload["answer_available"] is False
-        assert payload["edit_ready"] is False
 
     lookup_payload = call_docs_tool_payload(
         "get_docs_context",

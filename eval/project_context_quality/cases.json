@@ -5,164 +5,205 @@
       "id": "ru-install",
       "question": "Как установить DocAtlas локально и проверить, что он работает?",
       "pair": "How do I install and verify DocAtlas locally?",
+      "lookup_queries": ["local installation setup verification"],
       "intent": "installation_verification",
       "expected_kind": "docs_context",
       "sources": [
         "README.md",
         "wiki/Install-Targets.md"
-      ]
+      ],
+      "allowed_paths": ["README.md", "wiki/Install-Targets.md", "wiki/Commands.md"],
+      "required_facts": [{"source": "wiki/Commands.md", "text": "doc-atlas setup"}]
     },
     {
       "id": "ru-overview",
       "question": "Что такое DocAtlas и зачем он нужен разработчику?",
       "pair": "What is DocAtlas and what problem does it solve?",
+      "lookup_queries": ["local-first documentation context for coding agents"],
       "intent": "product_overview",
       "expected_kind": "docs_context",
       "sources": [
         "README.md",
         "docs/DOCMANCER_PRODUCT_BRIEF.md"
-      ]
+      ],
+      "allowed_paths": ["README.md", "docs/DOCMANCER_PRODUCT_BRIEF.md", "wiki/Home.md"],
+      "required_facts": [{"source": "README.md", "text": "guessing from stale or generic documentation"}]
     },
     {
       "id": "ru-first-commands",
       "question": "Какие первые команды выполнить после установки?",
       "pair": "Which first commands should I run after installation?",
+      "lookup_queries": ["getting started first DocAtlas commands"],
       "intent": "getting_started",
       "expected_kind": "docs_context",
       "sources": [
         "README.md",
         "wiki/Commands.md"
-      ]
+      ],
+      "required_facts": [{"source": "wiki/Commands.md", "text": "doc-atlas ingest"}]
     },
     {
       "id": "ru-contributor",
       "question": "С чего новому разработчику начать читать репозиторий?",
       "pair": "Where should a new contributor start reading the repository?",
+      "lookup_queries": ["new contributor repository project map"],
       "intent": "contributor_start",
       "expected_kind": "docs_context",
       "sources": [
         "CONTRIBUTING.md",
         "docs/PROJECT_MAP.md"
-      ]
+      ],
+      "allowed_paths": ["CONTRIBUTING.md", "docs/PROJECT_MAP.md", "wiki/Commands.md", "docs/mcp-docs-server.md"],
+      "required_facts": [{"source": "CONTRIBUTING.md", "text": "New contributors should start"}]
     },
     {
       "id": "ru-mcp-flow",
       "question": "Как устроен полный процесс работы Docs MCP?",
       "pair": "How does the Docs MCP workflow fit together?",
+      "lookup_queries": ["Docs MCP public tools get_docs_context prepare_docs docs_status"],
       "intent": "docs_mcp_workflow",
       "expected_kind": "docs_context",
       "sources": [
         "docs/mcp-docs-server.md",
         "docs/project-docs-mcp-workflow.md"
-      ]
+      ],
+      "allowed_paths": ["docs/mcp-docs-server.md", "docs/project-docs-mcp-workflow.md", "wiki/Commands.md"],
+      "required_facts": [{"source": "docs/mcp-docs-server.md", "text": "get_docs_context"}],
+      "forbidden_answer_fragments": ["packs-serve", "install-pack"]
     },
     {
       "id": "ru-sync",
       "question": "Как обновить проектную документацию после изменения файлов?",
       "pair": "How should I refresh project documentation after editing files?",
+      "lookup_queries": ["sync project documentation after changed files"],
       "intent": "project_docs_sync",
       "expected_kind": "docs_context",
       "sources": [
         "docs/project-docs-mcp-workflow.md"
-      ]
+      ],
+      "allowed_paths": ["docs/project-docs-mcp-workflow.md", "docs/mcp-docs-server.md"],
+      "required_facts": [{"source": "docs/project-docs-mcp-workflow.md", "text": "sync_project_docs"}]
     },
     {
       "id": "ru-config",
       "question": "Как настроить проектную документацию для репозитория?",
       "pair": "How do I configure project documentation for a repository?",
+      "lookup_queries": ["project documentation catalog configuration"],
       "intent": "project_docs_configuration",
       "expected_kind": "docs_context",
       "sources": [
         "wiki/Configuration.md",
         "docs/project-docs-mcp-workflow.md"
-      ]
+      ],
+      "allowed_paths": ["wiki/Configuration.md", "docs/project-docs-mcp-workflow.md", "wiki/Architecture.md"],
+      "required_facts": [{"source": "wiki/Configuration.md", "text": "docatlas.project-docs.yaml"}]
     },
     {
       "id": "ru-clean",
       "question": "Как безопасно проверить и очистить локальный индекс?",
       "pair": "How can I inspect and safely clear a local index?",
+      "lookup_queries": ["safely inspect clear local index preview"],
       "intent": "index_cleanup",
       "expected_kind": "docs_context",
       "sources": [
         "docs/index-cleanup.md",
         "wiki/Commands.md"
-      ]
+      ],
+      "required_facts": [{"source": "docs/index-cleanup.md", "text": "preview-only"}]
     },
     {
       "id": "ru-troubleshoot",
       "question": "Что проверить, если проектная документация устарела или ничего не находится?",
       "pair": "What should I check when project documentation looks stale?",
+      "lookup_queries": ["troubleshooting stale project documentation no results"],
       "intent": "troubleshooting",
       "expected_kind": "docs_context",
       "sources": [
         "wiki/Troubleshooting.md",
         "docs/project-docs-mcp-workflow.md"
-      ]
+      ],
+      "allowed_paths": ["wiki/Troubleshooting.md", "docs/project-docs-mcp-workflow.md", "docs/adr/0002-context-retrieval-vs-answer-proof.md"],
+      "required_facts": [{"source": "docs/project-docs-mcp-workflow.md", "text": "removes stale indexed sections"}]
     },
     {
       "id": "ru-storage",
       "question": "Где хранится индекс и как он изолирован для каждого проекта?",
       "pair": "Where is the index stored and how is it isolated per project?",
+      "lookup_queries": ["project documentation storage index isolation"],
       "intent": "project_storage",
       "expected_kind": "docs_context",
       "sources": [
         "wiki/Architecture.md",
         "docs/modules/storage-mutation-coordination.md"
-      ]
+      ],
+      "required_facts": [{"source": "wiki/Architecture.md", "text": "Each project identity receives isolated SQLite index"}]
     },
     {
       "id": "ru-chunks",
       "question": "Как индексирование разбивает документацию на секции и чанки?",
       "pair": "How does indexing split documentation into sections and chunks?",
+      "lookup_queries": ["indexing semantic sections parent child chunks"],
       "intent": "index_chunking",
       "expected_kind": "docs_context",
       "sources": [
         "wiki/Architecture.md"
-      ]
+      ],
+      "required_facts": [{"source": "wiki/Architecture.md", "text": "parent-child-v1"}]
     },
     {
       "id": "ru-selection",
       "question": "Как выбор доказательств определяет подходящие кандидаты?",
       "pair": "How does evidence selection choose candidates?",
+      "lookup_queries": ["evidence selection candidate qualification ranking"],
       "intent": "evidence_selection",
       "expected_kind": "docs_context",
       "sources": [
         "docs/modules/evidence-selection.md"
-      ]
+      ],
+      "required_facts": [{"source": "docs/modules/evidence-selection.md", "text": "bounded candidates"}]
     },
     {
       "id": "ru-tests",
       "question": "Что нужно протестировать перед открытием pull request?",
       "pair": "What should I test before opening a pull request?",
+      "lookup_queries": ["tests before opening pull request"],
       "intent": "testing_contribution",
       "expected_kind": "docs_context",
       "sources": [
         "CONTRIBUTING.md",
         "docs/testing.md"
-      ]
+      ],
+      "allowed_paths": ["CONTRIBUTING.md", "docs/testing.md", "README.md", "docs/change-aware-docs.md"],
+      "required_facts": [{"source": "CONTRIBUTING.md", "text": "Run the full test suite"}]
     },
     {
       "id": "ru-offline",
       "question": "Как пользоваться DocAtlas без интернета и запустить офлайн-тесты?",
       "pair": "How do I use DocAtlas offline and run the provider-free suite?",
+      "lookup_queries": ["provider-free offline pytest suite"],
       "intent": "offline_usage",
       "expected_kind": "docs_context",
       "sources": [
         "docs/testing.md",
         "wiki/Configuration.md"
-      ]
+      ],
+      "allowed_paths": ["docs/testing.md", "wiki/Configuration.md", "docs/design/test-suite-diagnostic-hardening.md", "docs/support-surface-policy.md"],
+      "required_facts": [{"source": "docs/testing.md", "text": "DOCATLAS_OFFLINE=1"}]
     },
     {
       "id": "ru-server-command",
       "question": "Какая команда запускает Docs MCP сервер?",
       "pair": "Which command starts the Docs MCP server?",
+      "lookup_queries": ["public documentation server command invocation"],
       "intent": "docs_mcp_server_command",
       "expected_kind": "docs_context",
       "sources": [
         "README.md",
         "docs/mcp-docs-server.md",
         "wiki/Commands.md"
-      ]
+      ],
+      "required_facts": [{"source": "docs/mcp-docs-server.md", "text": "doc-atlas mcp docs-serve"}],
+      "forbidden_answer_fragments": ["packs-serve"]
     },
     {
       "id": "negative-quantum",

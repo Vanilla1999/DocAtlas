@@ -50,8 +50,13 @@ def run_contract() -> dict[str, Any]:
             ("ru", str(case["question"])),
             ("en", str(case["pair"])),
         ):
+            lookup_key = "lookup_queries" if language == "ru" else "pair_lookup_queries"
+            lookup_queries = tuple(str(value) for value in case.get(lookup_key) or ())
             aliases = build_project_retrieval_aliases(question)
-            plan = build_documentation_query_plan(question, requirements=())
+            plan = build_documentation_query_plan(
+                question, lookup_queries=lookup_queries, requirements=(),
+            )
+            plan_payload = plan.as_payload()
             contract = build_project_answer_contract(question)
             intent_ids = {alias.intent_id for alias in aliases}
             public_tools = any(
@@ -65,11 +70,24 @@ def run_contract() -> dict[str, Any]:
                     == bool(expected)
                 )
                 and not (case["id"] == "ru-first-commands" and public_tools)
+                and all(
+                    f"query-lookup-{index}" in plan_payload["public_query_ids"]
+                    for index in range(1, len(lookup_queries) + 1)
+                )
+                and not any(
+                    query_id.startswith("query-lookup-")
+                    for query_id in plan_payload["required_query_ids"]
+                )
+                and not any(
+                    query_id.startswith("query-intent-")
+                    for query_id in plan_payload["public_query_ids"]
+                )
             )
             passed = passed and language_passed
             language_results[language] = {
                 "intent_ids": sorted(intent_ids),
                 "public_tools": public_tools,
+                "public_query_ids": plan_payload["public_query_ids"],
                 "passed": language_passed,
             }
         results.append({
@@ -98,11 +116,27 @@ def run_live() -> dict[str, Any]:
             question=str(item["question"]),
             relevant_paths=tuple(str(value) for value in item.get("sources") or ()),
             expected_kind=str(item["expected_kind"]),
-            required_facts_by_path=(),
-            forbidden_source_prefixes=("eval/", ".hermes/plans/", "roadmap/"),
-            # Semantic substitution is checked in the contract gate. Relevant
-            # source snippets may legitimately mention public tool names.
-            forbidden_answer_fragments=(),
+            required_facts_by_path=tuple(
+                (str(value["source"]), str(value["text"]))
+                for value in item.get("required_facts") or ()
+            ),
+            forbidden_source_prefixes=(
+                "eval/", "docs/analysis/", ".hermes/plans/", "roadmap/",
+                *(str(value) for value in item.get("forbidden_source_prefixes") or ()),
+            ),
+            forbidden_answer_fragments=tuple(
+                str(value) for value in item.get("forbidden_answer_fragments") or ()
+            ),
+            lookup_queries=tuple(
+                str(value) for value in item.get("lookup_queries") or ()
+            ),
+            minimum_lookup_coverage=int(item.get("minimum_lookup_coverage") or 0),
+            allowed_paths=tuple(
+                str(value) for value in item.get("allowed_paths") or item.get("sources") or ()
+            ),
+            expected_public_query_ids=tuple(
+                str(value) for value in item.get("expected_public_query_ids") or ()
+            ),
         )
         for item in positives
     )

@@ -28,6 +28,17 @@ budgets and raw search controls remain server-owned.
   `edit_ready=false`.
 - Partial retrieval coverage is reported honestly and does not prevent useful
   context from being returned.
+- Public retrieval coverage contains only the original question and explicit
+  host/path/anchor lookups. Generated canonical intents may retrieve eligible
+  context and report retrieval-only facets, but are not public missing queries.
+- Audited domain-owned rewrites may attribute derived retrieval coverage to the
+  original question. Arbitrary host lookups cannot, and derived coverage never
+  becomes answer proof or edit authorization.
+- Candidate metadata may improve recall, but public coverage is recalculated
+  from the final visible path, section, and snippet.
+- Compound projection maximizes distinct lookup coverage within 800 estimated
+  tokens and three sources by selecting compact witnesses before expanding
+  their contiguous snippets.
 - Stale or missing project indexes recommend
   `prepare_docs(action="sync_project_docs")`; ready indexes recommend no action.
 - Cross-project, stale, historical, unowned, or otherwise disallowed sources are
@@ -39,6 +50,10 @@ The agent, rather than the server, owns conversational synthesis for project
 questions. This removes the duplicate answer-generation pipeline and its false
 abstentions while retaining provenance, source isolation, bounded output, and
 fail-closed mutation safety.
+
+Five host lookups therefore do not imply five returned sources. The projection
+returns at most three sources and preserves every uncovered user-visible lookup
+in `missing_query_ids`.
 
 The frozen project-answer v1-v4 evaluators and direct `get_project_context` MCP
 surface are retired. The committed RU/EN Context7-style corpus is the project

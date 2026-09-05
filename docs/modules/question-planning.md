@@ -24,7 +24,7 @@ Imperative edits are outside this boundary. They are owned by
 
 Question planning defines **what must be proven**, whereas evidence selection determines **whether the available evidence proves it**. **Evidence selection may prove or reject an obligation, but it must not reinterpret the user's question or silently create replacement obligations.** This one-way contract is the architectural seam between the two modules.
 
-Optional host-provided `lookup_queries` bypass question planning and enter only the supplemental retrieval lane. `DocumentationQueryPlan` assigns stable IDs to the original question, those explicit lookups, and any exact path; it does not parse arbitrary new intent or create proof obligations. `ContextSelectionDecision` reports covered and missing retrieval-query IDs without producing a support verdict. Neither contract can mutate the project-answer proof contract or authorize an edit.
+Optional host-provided `lookup_queries` bypass answer-proof planning and enter only the supplemental retrieval lane. `DocumentationQueryPlan` assigns stable IDs to the original question, those explicit lookups, and any exact path. A bounded set of domain-owned aliases records audited lineage to the original question for multilingual retrieval; arbitrary host lookups have no such lineage. This retrieval attribution creates no proof obligation and cannot authorize an answer or edit. `ContextSelectionDecision` reports covered and missing retrieval-query IDs without producing a support verdict.
 
 ## Invariants
 

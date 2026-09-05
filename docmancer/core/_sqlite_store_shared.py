@@ -20,6 +20,7 @@ from docmancer.core.structured_chunking import (
     estimate_utf8_tokens,
 )
 from docmancer.docs.domain.quality import looks_like_code_or_command
+from docmancer.docs.domain.query_terms import is_exact_technical_token
 from docmancer.retrieval.contextual_indexing import (
     build_context_prefix,
     embedding_input,

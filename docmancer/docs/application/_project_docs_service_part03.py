@@ -4,7 +4,14 @@ from __future__ import annotations
 from ._project_docs_service_shared import *  # noqa: F401,F403
 from docmancer.core.models import RetrievedChunk
 from docmancer.docs.application.context_selection import select_context_candidates
-from docmancer.docs.domain.documentation_query_plan import DocumentationQueryPlan
+from docmancer.docs.domain.documentation_query_plan import (
+    DocumentationLookup,
+    DocumentationQueryPlan,
+)
+from docmancer.docs.domain.evidence_qualification import (
+    derived_parent_trace,
+    qualify_evidence,
+)
 
 
 _EXACT_DOCUMENT_FALLBACK_LIMIT = 12
@@ -133,6 +140,7 @@ def _exact_document_index_chunks(
 
 def _tag_retrieval_query(
     chunks: Any, query_id: str | None, query_text: str | None = None,
+    lookup: DocumentationLookup | None = None,
 ) -> list[Any]:
     if not query_id:
         return list(chunks)
@@ -158,8 +166,41 @@ def _tag_retrieval_query(
         trace.setdefault("lexical_score", float(chunk.score))
         if query_text:
             trace.setdefault("query_text", query_text)
+        if lookup is not None:
+            trace.update({
+                "query_origin": lookup.origin,
+                "relation": lookup.relation,
+                "public_parent_query_id": lookup.public_parent_query_id,
+                "preferred_catalog_roles": list(lookup.preferred_catalog_roles),
+                "forbidden_catalog_roles": list(lookup.forbidden_catalog_roles),
+                "forbidden_evidence_terms": list(lookup.forbidden_evidence_terms),
+                "parent_exact_terms": list(lookup.parent_exact_terms),
+            })
+            visible_text = "\n".join(str(value or "") for value in (
+                chunk.source,
+                metadata.get("title"),
+                metadata.get("heading_path"),
+                chunk.text,
+            ))
+            trace = dict(qualify_evidence(
+                trace,
+                query_id=query_id,
+                visible_text=visible_text,
+                evidence_text=chunk.text,
+                catalog_role=str(metadata.get("project_doc_reason") or ""),
+            ).trace)
         matches = dict(metadata.get("retrieval_query_matches") or {})
         matches[query_id] = trace
+        parent_trace = (
+            derived_parent_trace(
+                trace,
+                source_query_id=query_id,
+                parent_query_id=str(lookup.public_parent_query_id or ""),
+            )
+            if lookup is not None else None
+        )
+        if parent_trace is not None:
+            matches[lookup.public_parent_query_id] = parent_trace
         qualified_ids = tuple(key for key, value in matches.items() if value.get("qualified") is True)
         metadata.update({
             "retrieval_query_matches": matches,
@@ -215,6 +256,12 @@ class _ProjectDocsServicePart03:
             query, lookup_queries=lookup_queries, explicit_path=evidence_path,
             requirements=requirements,
         )
+        lookup_by_id = {
+            item.query_id: item for item in documentation_query_plan.queries
+        }
+        lookup_by_text = {
+            item.text: item for item in documentation_query_plan.queries
+        }
         lookup_query_ids = {
             item.text: item.query_id
             for item in documentation_query_plan.queries
@@ -315,8 +362,22 @@ class _ProjectDocsServicePart03:
             query_expand=effective_expand,
             query_filters=filters,
         )
-        chunks = _tag_retrieval_query(chunks, "query-original", query)
-        chunks = _tag_retrieval_query(chunks, exact_path_query_id, evidence_path)
+        chunks = _tag_retrieval_query(
+            chunks, "query-original", query, lookup_by_id.get("query-original"),
+        )
+        chunks = _tag_retrieval_query(
+            chunks, exact_path_query_id, evidence_path,
+            lookup_by_id.get(exact_path_query_id or ""),
+        )
+        if exact_path_query_id:
+            for anchor_lookup in documentation_query_plan.queries:
+                if anchor_lookup.origin == "exact_anchor":
+                    chunks = _tag_retrieval_query(
+                        chunks,
+                        anchor_lookup.query_id,
+                        anchor_lookup.text,
+                        anchor_lookup,
+                    )
         authoritative_chunks = _run(
             query,
             query_limit=max(effective_limit, 20),
@@ -326,10 +387,21 @@ class _ProjectDocsServicePart03:
         )
         authoritative_chunks = _tag_retrieval_query(
             authoritative_chunks, "query-original", query,
+            lookup_by_id.get("query-original"),
         )
         authoritative_chunks = _tag_retrieval_query(
             authoritative_chunks, exact_path_query_id, evidence_path,
+            lookup_by_id.get(exact_path_query_id or ""),
         )
+        if exact_path_query_id:
+            for anchor_lookup in documentation_query_plan.queries:
+                if anchor_lookup.origin == "exact_anchor":
+                    authoritative_chunks = _tag_retrieval_query(
+                        authoritative_chunks,
+                        anchor_lookup.query_id,
+                        anchor_lookup.text,
+                        anchor_lookup,
+                    )
         supplemental_chunks_by_query = {
             supplemental_query: _tag_retrieval_query(
                 _run(
@@ -341,6 +413,7 @@ class _ProjectDocsServicePart03:
                 ),
                 lookup_query_ids.get(supplemental_query),
                 supplemental_query,
+                lookup_by_text.get(supplemental_query),
             )
             for supplemental_query in supplemental_queries
         }

@@ -63,14 +63,34 @@ def merge_query_matches(*values: Any) -> dict[str, dict[str, Any]]:
                 continue
             trace = dict(raw_trace)
             current = merged.get(str(query_id))
+            trace_kind = str(trace.get("coverage_kind") or "direct")
+            current_kind = str((current or {}).get("coverage_kind") or "direct")
             candidate_key = (
-                bool(trace.get("qualified")), float(trace.get("lexical_score") or 0.0),
+                bool(trace.get("qualified")), trace_kind == "direct",
+                float(trace.get("lexical_score") or 0.0),
             )
             current_key = (
-                bool((current or {}).get("qualified")), float((current or {}).get("lexical_score") or 0.0),
+                bool((current or {}).get("qualified")), current_kind == "direct",
+                float((current or {}).get("lexical_score") or 0.0),
             )
             if current is None or candidate_key > current_key:
                 merged[str(query_id)] = trace
+            selected = merged[str(query_id)]
+            selected_kind = str(selected.get("coverage_kind") or "direct")
+            selected["coverage_kinds"] = list(dict.fromkeys((
+                *(selected.get("coverage_kinds") or (selected_kind,)),
+                *(trace.get("coverage_kinds") or (trace_kind,)),
+                *((current or {}).get("coverage_kinds") or (current_kind,)),
+            )))
+            derived_from = tuple(dict.fromkeys((
+                *(selected.get("derived_from_query_ids") or ()),
+                *(trace.get("derived_from_query_ids") or ()),
+                *((current or {}).get("derived_from_query_ids") or ()),
+                *([trace["derived_from_query_id"]] if trace.get("derived_from_query_id") else []),
+                *([current["derived_from_query_id"]] if current and current.get("derived_from_query_id") else []),
+            )))
+            if derived_from:
+                selected["derived_from_query_ids"] = list(derived_from)
     return merged
 
 

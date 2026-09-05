@@ -91,13 +91,6 @@ class _ProjectContextServicePart01:
                             if normalize_doc_path(chunk.path) == normalized_evidence_path
                         ],
                     )
-                project_docs = _inject_broad_architecture_docs(
-                    project_docs, root=root, intent=intent, evidence_path=evidence_path,
-                    lifecycle_intent_value=canonical_requirements.lifecycle_intent,
-                    # The mere presence of an explicit catalog disables guessed
-                    # architecture sources. An invalid catalog must fail closed.
-                    catalog_authoritative=metadata.docs_catalog_present,
-                )
                 project_docs = replace(
                     project_docs,
                     results=rerank_project_doc_chunks(

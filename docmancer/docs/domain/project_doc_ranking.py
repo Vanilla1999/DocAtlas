@@ -64,7 +64,7 @@ def project_question_lane(question: str) -> str:
 
 def project_source_lane(path: str | None) -> str:
     normalized = normalize_doc_path(path)
-    if normalized.startswith("eval/"):
+    if normalized.startswith(("eval/", "docs/analysis/")):
         return "evaluation"
     if normalized.startswith((".hermes/plans/", "roadmap/")) or "/roadmap/" in normalized:
         return "planning"

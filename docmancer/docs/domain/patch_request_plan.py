@@ -6,7 +6,7 @@ import re
 from typing import Any, Literal
 
 from docmancer.docs.domain.request_intent import find_change_clause
-from docmancer.retrieval.contracts import canonical_hash
+from docmancer.docs.domain.canonical import canonical_hash
 
 
 PATCH_REQUEST_PLAN_SCHEMA = "patch-request-plan-v2"
