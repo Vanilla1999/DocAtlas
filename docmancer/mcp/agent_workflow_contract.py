@@ -28,6 +28,16 @@ WORKFLOW_POLICY: dict[str, Any] = {
         "allowed_when": ["explicit_status_request", "recommended_next_action"],
         "discovery": False,
     },
+    "scope_planning": {
+        "explicit_scope_is_authoritative": True,
+        "repo_level_policy_scope": "project",
+        "known_module_scope": "module",
+        "cross_module_scope": "all",
+        "module_path_implies_scope": "module",
+        "all_requires_no_module_filter": True,
+        "mixed_module_and_project_prefer_two_calls": True,
+        "never_widen_project_to_all": True,
+    },
     "free_form_lookup": {
         "host_formulates_lookup_queries": True,
         "one_concept_per_lookup": True,
