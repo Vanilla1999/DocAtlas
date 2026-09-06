@@ -41,24 +41,30 @@ jobs:
           body = textwrap.dedent(workflow[start:end])
           exec(compile(body, '<pr178-reviewed-base-patch>', 'exec'), {})
           PY
-      - name: Apply semantic authority closure and strengthen regression
+      - name: Apply contract-fact disclaimer proof and strengthen regression
         shell: bash
         run: |
           set -euo pipefail
           python - <<'PY'
           from pathlib import Path
 
-          path = Path('docmancer/docs/application/docs_context_projection.py')
+          path = Path('docmancer/docs/domain/_answer_units_part02.py')
           text = path.read_text()
-          old = '''    while prepared:\n        selected_public_ids = _fully_matched_query_ids(sources) & public_query_id_set\n        selected_canonical_ids = qualified_query_ids(sources) & canonical_intent_query_ids\n        selected_components = {key for source in sources for key in component_witnesses(source, obligations)}\n'''
-          new = '''    while prepared:\n        selected_qualified_public_ids = qualified_query_ids(sources) & public_query_id_set\n        selected_public_ids = _fully_matched_query_ids(sources) & public_query_id_set\n        selected_canonical_ids = qualified_query_ids(sources) & canonical_intent_query_ids\n        selected_authoritative_public_ids = {\n            query_id\n            for source in sources\n            if str(source.get("authority") or "supporting").casefold() == "source_of_truth"\n            for query_id in qualified_query_ids((source,))\n            if query_id in public_query_id_set\n        }\n        selected_components = {key for source in sources for key in component_witnesses(source, obligations)}\n'''
-          assert text.count(old) == 1, f'while setup drifted: {text.count(old)}'
+          old = '''def _contract_fact_relation_valid(text: str) -> bool:\n    normalized = _normal(text)\n    if _NEGATION_RE.search(text) or re.search(\n        r"\\b(?:obsolete|deprecated|documented|described|mentioned)\\b", normalized,\n    ):\n        return False\n'''
+          new = '''def _contract_fact_disclaimer(text: str) -> bool:\n    normalized = _normal(text)\n    return bool(\n        _NEGATION_RE.search(text)\n        or re.search(\n            r"\\b(?:obsolete|deprecated|document(?:ed|s)?|describ(?:ed|es)?|mention(?:ed|s)?)\\b",\n            normalized,\n        )\n    )\n\n\ndef _contract_fact_relation_valid(text: str) -> bool:\n    normalized = _normal(text)\n    if _contract_fact_disclaimer(text):\n        return False\n'''
+          assert text.count(old) == 1, f'contract fact helper drifted: {text.count(old)}'
           text = text.replace(old, new, 1)
 
-          old = '''        component_ids = set(component_witnesses(normalized, obligations))\n        new_components = component_ids - selected_components\n        if not (qualified_ids & eligible_query_ids) and not component_ids:\n            continue\n        if sources and not (new_components or\n            qualified_ids & public_query_id_set - selected_public_ids or\n            qualified_ids & canonical_intent_query_ids - selected_canonical_ids\n        ):\n            continue\n'''
-          new = '''        component_ids = set(component_witnesses(normalized, obligations))\n        new_components = component_ids - selected_components\n        if not (qualified_ids & eligible_query_ids) and not component_ids:\n            continue\n        # Once a source-of-truth document already qualifies a fully parsed semantic\n        # question, a lower-authority source may still add a new public direction or\n        # a missing semantic component. It may not become visible merely because its\n        # wording raises lexical match_ratio for a query that is already qualified.\n        # This prevents disclaimer/mention-only notes from masquerading as contract\n        # evidence without globally suppressing honest partial multi-document reads.\n        if (\n            sources\n            and obligations\n            and query_plan.get("component_scope_complete", True)\n            and selected_authoritative_public_ids\n            and str(normalized.get("authority") or "supporting").casefold() != "source_of_truth"\n            and not new_components\n            and not (qualified_ids & public_query_id_set - selected_qualified_public_ids)\n            and not (qualified_ids & canonical_intent_query_ids - selected_canonical_ids)\n        ):\n            continue\n        if sources and not (new_components or\n            qualified_ids & public_query_id_set - selected_public_ids or\n            qualified_ids & canonical_intent_query_ids - selected_canonical_ids\n        ):\n            continue\n'''
-          assert text.count(old) == 1, f'admission block drifted: {text.count(old)}'
+          old = '''    if obligation.kind == "exact_fact":\n        relation = 2 if (not obligation.attribute or _attribute_present(obligation.attribute, text)) else 0\n        if (\n            obligation.relation == "contract_fact"\n            and _normal(obligation.attribute) == "response contract"\n        ):\n            relation = 3 if relation and _contract_fact_relation_valid(text) else 0\n'''
+          new = '''    if obligation.kind == "exact_fact":\n        relation = 2 if (not obligation.attribute or _attribute_present(obligation.attribute, text)) else 0\n        if obligation.relation == "contract_fact":\n            if _contract_fact_disclaimer(text):\n                relation = 0\n            elif _normal(obligation.attribute) == "response contract":\n                relation = 3 if relation and _contract_fact_relation_valid(text) else 0\n'''
+          assert text.count(old) == 1, f'exact contract proof drifted: {text.count(old)}'
           path.write_text(text.replace(old, new, 1))
+
+          path = Path('tests/docs/test_answer_units_v3.py')
+          text = path.read_text()
+          addition = '''\n\ndef test_generic_contract_fact_rejects_disclaimer_mentions_and_negation():\n    question = "What contract governs EvidenceRequirementSet?"\n    contract = build_project_answer_contract(question)\n    obligation = next(\n        row for row in contract.proof_obligations\n        if row.relation == "contract_fact" and row.subject == "EvidenceRequirementSet"\n    )\n    source = {"path": "docs/contract.md", "authority": "source_of_truth"}\n\n    valid_units = extract_answer_units(\n        "EvidenceRequirementSet is a canonical selector input.",\n        include_soft_wrapped_prose=True,\n    )\n    assert best_local_proof(obligation, valid_units, source=source) is not None\n\n    for text in (\n        "Presentation notes mention EvidenceRequirementSet, but this note does not define the acceptance contract.",\n        "EvidenceRequirementSet is mentioned in an obsolete presentation note.",\n    ):\n        units = extract_answer_units(text, include_soft_wrapped_prose=True)\n        assert best_local_proof(obligation, units, source=source) is None\n'''
+          assert 'test_generic_contract_fact_rejects_disclaimer_mentions_and_negation' not in text
+          path.write_text(text.rstrip() + addition + '\n')
 
           path = Path('tests/test_docs_service_part03.py')
           text = path.read_text()
@@ -69,7 +75,7 @@ jobs:
           PY
           python -m compileall -q docmancer tests scripts eval
           git diff --check
-      - name: Prove distractor rejection across process variation
+      - name: Prove distractor rejection across isolated processes
         shell: bash
         run: |
           set -euo pipefail
