@@ -1,0 +1,51 @@
+name: PR178 architecture and request flow TDD
+
+on:
+  push:
+    branches: [fix/context-first-project-reads]
+    paths: [.github/workflows/pr178-arch-flow-tdd.yml]
+
+permissions:
+  contents: read
+
+env:
+  DOCATLAS_OFFLINE: "1"
+  DOCATLAS_AUTO_VECTORS: "0"
+  HF_HUB_OFFLINE: "1"
+  TRANSFORMERS_OFFLINE: "1"
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
+
+jobs:
+  red:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+        with:
+          ref: fix/context-first-project-reads
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1
+        with:
+          python-version: '3.12'
+      - run: python -m pip install -e ".[dev]"
+      - name: Architecture candidate recall is RED
+        shell: bash
+        run: |
+          set +e
+          pytest -q tests/docs/test_context_projection_boundaries.py::test_frozen_architecture_infrastructure_boundary_enters_retrieval_candidates
+          rc=$?
+          set -e
+          if [ "$rc" -eq 0 ]; then
+            echo "Expected architecture regression to be RED on current runtime"
+            exit 1
+          fi
+      - name: Request flow selection is RED
+        shell: bash
+        run: |
+          set +e
+          pytest -q tests/docs/test_context_projection_boundaries.py::test_frozen_request_flow_prefers_project_context_module_witnesses
+          rc=$?
+          set -e
+          if [ "$rc" -eq 0 ]; then
+            echo "Expected request-flow regression to be RED on current runtime"
+            exit 1
+          fi
