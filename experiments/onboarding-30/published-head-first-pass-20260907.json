@@ -1,0 +1,1631 @@
+{
+  "schema": "docatlas-onboarding-first-pass-v2",
+  "runtime_anchor": "01f7b43afb00ead4a151099b9b11c0a27b94eafe",
+  "questions_source": "experiments/onboarding-30/questions.json",
+  "scope_plan": "experiments/onboarding-30/host-scope-plan-20260907.json",
+  "lookup_hints_used": false,
+  "summary": {
+    "count": 30,
+    "ok": 16,
+    "insufficient": 14,
+    "max_tokens": 721,
+    "max_sources": 2,
+    "safety_violations": []
+  },
+  "rows": [
+    {
+      "id": "newcomer-01",
+      "question": "Для чего нужен DocAtlas и какую работу он снимает с coding-агента?",
+      "scope": "all",
+      "request_lookup_queries": [],
+      "payload": {
+        "status": "insufficient_evidence",
+        "kind": "docs_context",
+        "missing": [
+          "No safe, current, project-scoped documentation context was retrieved."
+        ],
+        "estimated_tokens": 234,
+        "recommended_next_action": {
+          "tool": "code_search",
+          "type": "search_local_source",
+          "handled_by": "coding_agent",
+          "requires_confirmation": false,
+          "reason": "evidence_rejected",
+          "query_terms": [
+            "Для чего нужен DocAtlas и какую работу он снимает с coding-агента"
+          ],
+          "repeat_docs_context": false,
+          "auto_execute": false
+        },
+        "context_available": false,
+        "documentation_supported": false,
+        "investigation_allowed": true,
+        "hard_stop": false,
+        "recovery_origin": "eligibility",
+        "recovery_reason_code": "evidence_rejected",
+        "recovery_disposition": "search_local_source",
+        "disposition": "search_local_source",
+        "edit_ready": false,
+        "source_search_status": "required",
+        "requires_confirmation": false,
+        "answer_supported": false,
+        "answer_available": false,
+        "support_status": "insufficient_evidence"
+      },
+      "safety_checks": {
+        "source_count_le_3": true,
+        "estimated_tokens_le_800": true,
+        "answer_supported_not_true": true,
+        "edit_ready_not_true": true
+      },
+      "failed_safety_checks": []
+    },
+    {
+      "id": "newcomer-02",
+      "question": "Что здесь работает локально, а в каких ситуациях потребуется сеть?",
+      "scope": "all",
+      "request_lookup_queries": [],
+      "payload": {
+        "status": "insufficient_evidence",
+        "kind": "docs_context",
+        "missing": [
+          "No safe, current, project-scoped documentation context was retrieved."
+        ],
+        "estimated_tokens": 236,
+        "recommended_next_action": {
+          "tool": "code_search",
+          "type": "search_local_source",
+          "handled_by": "coding_agent",
+          "requires_confirmation": false,
+          "reason": "no_candidates",
+          "query_terms": [
+            "Что здесь работает локально, а в каких ситуациях потребуется сеть"
+          ],
+          "repeat_docs_context": false,
+          "auto_execute": false
+        },
+        "context_available": false,
+        "documentation_supported": false,
+        "investigation_allowed": true,
+        "hard_stop": false,
+        "recovery_origin": "retrieval",
+        "recovery_reason_code": "no_candidates",
+        "recovery_disposition": "search_local_source",
+        "disposition": "search_local_source",
+        "edit_ready": false,
+        "source_search_status": "required",
+        "requires_confirmation": false,
+        "answer_supported": false,
+        "answer_available": false,
+        "support_status": "insufficient_evidence"
+      },
+      "safety_checks": {
+        "source_count_le_3": true,
+        "estimated_tokens_le_800": true,
+        "answer_supported_not_true": true,
+        "edit_ready_not_true": true
+      },
+      "failed_safety_checks": []
+    },
+    {
+      "id": "newcomer-03",
+      "question": "Как установить проект и убедиться, что запущен правильный CLI?",
+      "scope": "project",
+      "request_lookup_queries": [],
+      "payload": {
+        "status": "ok",
+        "kind": "docs_context",
+        "context_status": "ready",
+        "context_available": true,
+        "answer_supported": false,
+        "answer_available": false,
+        "support_status": "retrieval_only",
+        "answer_policy": "cite_only",
+        "coverage_policy": "retrieval_attribution_only",
+        "query_coverage": "partial",
+        "retrieval_coverage": "partial",
+        "facet_coverage": "unverified",
+        "covered_query_ids": [
+          "query-anchor-1"
+        ],
+        "missing_query_ids": [
+          "query-original"
+        ],
+        "missing_facets": [],
+        "facets": [],
+        "sources": [
+          {
+            "evidence_id": "ev-1c912cff1cdd8298",
+            "path_or_url": "CONTRIBUTING.md",
+            "section": "Contributing to DocAtlas > Adding a new doc source (fetcher)",
+            "snippet": "## Adding a new doc source (fetcher)\n\n1. Subclass `BaseFetcher` in `docmancer/connectors/fetchers/`.\n2. Wire the new source into the CLI `fetch` / `ingest` paths in `docmancer/cli/commands.py` (and any agent helpers) following the GitBook pattern.",
+            "version_binding": "unversioned",
+            "content_sha256": "eb2d32e83e60f797287c88906d79e582f619b4dd2b5b2247e83ce3488f401f34",
+            "project_identity": "git:github.com/Vanilla1999/DocAtlas",
+            "authority": "source_of_truth",
+            "scope": "project",
+            "line_start": 40,
+            "line_end": 43
+          }
+        ],
+        "edit_ready": false,
+        "investigation_allowed": true,
+        "instruction": "Answer only claims directly grounded in the returned sources, cite their paths, and do not claim that the context is complete. Never use this retrieval-only result to authorize an edit.",
+        "estimated_tokens": 347
+      },
+      "safety_checks": {
+        "source_count_le_3": true,
+        "estimated_tokens_le_800": true,
+        "answer_supported_not_true": true,
+        "edit_ready_not_true": true
+      },
+      "failed_safety_checks": []
+    },
+    {
+      "id": "newcomer-04",
+      "question": "С каких документов и каталогов начать знакомство с этим репозиторием?",
+      "scope": "all",
+      "request_lookup_queries": [],
+      "payload": {
+        "status": "ok",
+        "kind": "docs_context",
+        "context_status": "ready",
+        "context_available": true,
+        "answer_supported": false,
+        "answer_available": false,
+        "support_status": "retrieval_only",
+        "answer_policy": "cite_only",
+        "coverage_policy": "retrieval_attribution_only",
+        "query_coverage": "partial",
+        "retrieval_coverage": "partial",
+        "facet_coverage": "unverified",
+        "covered_query_ids": [],
+        "missing_query_ids": [
+          "query-original"
+        ],
+        "missing_facets": [],
+        "facets": [
+          {
+            "id": "intent-context:contributor_start",
+            "requirement_id": null,
+            "question": "new contributor repository reading order contributing project map",
+            "status": "retrieval_only",
+            "evidence_ids": [
+              "ev-6d394bce5150ded4"
+            ]
+          }
+        ],
+        "sources": [
+          {
+            "evidence_id": "ev-6d394bce5150ded4",
+            "path_or_url": "CONTRIBUTING.md",
+            "section": "Contributing to DocAtlas > Project structure",
+            "snippet": "## Project structure\n\nNew contributors should start by reading `README.md`, this `CONTRIBUTING.md`,\n`docs/INDEX.md`, and `docs/PROJECT_MAP.md`. Together they provide the product\noverview, repository map, canonical documentation index, and contribution flow.",
+            "version_binding": "unversioned",
+            "content_sha256": "cd00a3920ffa8b27c2d806aa6da6fa18b5c9a69de8008eb323045445c872e00b",
+            "project_identity": "git:github.com/Vanilla1999/DocAtlas",
+            "authority": "source_of_truth",
+            "scope": "project",
+            "line_start": 7,
+            "line_end": 11
+          }
+        ],
+        "edit_ready": false,
+        "investigation_allowed": true,
+        "instruction": "Answer only claims directly grounded in the returned sources, cite their paths, and do not claim that the context is complete. Never use this retrieval-only result to authorize an edit.",
+        "estimated_tokens": 393
+      },
+      "safety_checks": {
+        "source_count_le_3": true,
+        "estimated_tokens_le_800": true,
+        "answer_supported_not_true": true,
+        "edit_ready_not_true": true
+      },
+      "failed_safety_checks": []
+    },
+    {
+      "id": "newcomer-05",
+      "question": "Как подготовить документацию текущего репозитория для первого обращения агента?",
+      "scope": "project",
+      "request_lookup_queries": [],
+      "payload": {
+        "status": "ok",
+        "kind": "docs_context",
+        "context_status": "ready",
+        "context_available": true,
+        "answer_supported": false,
+        "answer_available": false,
+        "support_status": "retrieval_only",
+        "answer_policy": "cite_only",
+        "coverage_policy": "retrieval_attribution_only",
+        "query_coverage": "partial",
+        "retrieval_coverage": "partial",
+        "facet_coverage": "unverified",
+        "covered_query_ids": [],
+        "missing_query_ids": [
+          "query-original"
+        ],
+        "missing_facets": [],
+        "facets": [
+          {
+            "id": "intent-context:getting_started",
+            "requirement_id": null,
+            "question": "command line help setup initialization workflow",
+            "status": "retrieval_only",
+            "evidence_ids": [
+              "ev-b96657827b8741a6"
+            ]
+          }
+        ],
+        "sources": [
+          {
+            "evidence_id": "ev-b96657827b8741a6",
+            "path_or_url": "wiki/Commands.md",
+            "section": "Commands > Docs MCP server",
+            "snippet": "## Docs MCP server\n\n`doc-atlas mcp docs-serve` runs the local Docs MCP server. Find the command with `doc-atlas --help` followed by `doc-atlas mcp --help`.\n\nIts public workflow has exactly three tools:\n\n- `get_docs_context` — first documentation question;\n- `prepare_docs` — a returned or explicitly approved sync/prefetch action;\n- `docs_status` — a returned job, health, or freshness request.",
+            "version_binding": "unversioned",
+            "content_sha256": "42fd95efcf51a8b5164c5ff6a4ca89be2f86848889e005bcc075d4639208b616",
+            "project_identity": "git:github.com/Vanilla1999/DocAtlas",
+            "authority": "source_of_truth",
+            "scope": "project",
+            "line_start": 65,
+            "line_end": 73
+          }
+        ],
+        "edit_ready": false,
+        "investigation_allowed": true,
+        "instruction": "Answer only claims directly grounded in the returned sources, cite their paths, and do not claim that the context is complete. Never use this retrieval-only result to authorize an edit.",
+        "estimated_tokens": 421
+      },
+      "safety_checks": {
+        "source_count_le_3": true,
+        "estimated_tokens_le_800": true,
+        "answer_supported_not_true": true,
+        "edit_ready_not_true": true
+      },
+      "failed_safety_checks": []
+    },
+    {
+      "id": "newcomer-06",
+      "question": "Какие инструменты входят в стандартный Docs MCP и для чего каждый нужен?",
+      "scope": "project",
+      "request_lookup_queries": [],
+      "payload": {
+        "status": "ok",
+        "kind": "docs_context",
+        "context_status": "ready",
+        "context_available": true,
+        "answer_supported": false,
+        "answer_available": false,
+        "support_status": "retrieval_only",
+        "answer_policy": "cite_only",
+        "coverage_policy": "retrieval_attribution_only",
+        "query_coverage": "partial",
+        "retrieval_coverage": "partial",
+        "facet_coverage": "unverified",
+        "covered_query_ids": [],
+        "missing_query_ids": [
+          "query-original"
+        ],
+        "missing_facets": [],
+        "facets": [],
+        "sources": [
+          {
+            "evidence_id": "ev-29991f84ece835bb",
+            "path_or_url": "docs/mcp-docs-server.md",
+            "section": "Docs MCP server > Public tool contract",
+            "snippet": "The three Docs MCP public tools are `get_docs_context`, `prepare_docs`, and `docs_status`. Use `get_docs_context` for bounded documentation questions, use `prepare_docs` for synchronization/prefetch lifecycle operations, and use `docs_status` for asynchronous job status.",
+            "version_binding": "unversioned",
+            "content_sha256": "410afd6cb13b0db5ca1cb6a8a1b5ee7893b847306f810df431189ae9f6c442e2",
+            "project_identity": "git:github.com/Vanilla1999/DocAtlas",
+            "authority": "source_of_truth",
+            "scope": "project",
+            "line_start": 53,
+            "line_end": 53
+          }
+        ],
+        "edit_ready": false,
+        "investigation_allowed": true,
+        "instruction": "Answer only claims directly grounded in the returned sources, cite their paths, and do not claim that the context is complete. Never use this retrieval-only result to authorize an edit.",
+        "estimated_tokens": 345
+      },
+      "safety_checks": {
+        "source_count_le_3": true,
+        "estimated_tokens_le_800": true,
+        "answer_supported_not_true": true,
+        "edit_ready_not_true": true
+      },
+      "failed_safety_checks": []
+    },
+    {
+      "id": "newcomer-07",
+      "question": "Какой первый вызов должен сделать агент в незнакомом репозитории?",
+      "scope": "project",
+      "request_lookup_queries": [],
+      "payload": {
+        "status": "ok",
+        "kind": "docs_context",
+        "context_status": "ready",
+        "context_available": true,
+        "answer_supported": false,
+        "answer_available": false,
+        "support_status": "retrieval_only",
+        "answer_policy": "cite_only",
+        "coverage_policy": "retrieval_attribution_only",
+        "query_coverage": "partial",
+        "retrieval_coverage": "partial",
+        "facet_coverage": "unverified",
+        "covered_query_ids": [],
+        "missing_query_ids": [
+          "query-original"
+        ],
+        "missing_facets": [],
+        "facets": [
+          {
+            "id": "intent-context:getting_started",
+            "requirement_id": null,
+            "question": "command line help setup initialization workflow",
+            "status": "retrieval_only",
+            "evidence_ids": [
+              "ev-b96657827b8741a6"
+            ]
+          }
+        ],
+        "sources": [
+          {
+            "evidence_id": "ev-b96657827b8741a6",
+            "path_or_url": "wiki/Commands.md",
+            "section": "Commands > Docs MCP server",
+            "snippet": "## Docs MCP server\n\n`doc-atlas mcp docs-serve` runs the local Docs MCP server. Find the command with `doc-atlas --help` followed by `doc-atlas mcp --help`.\n\nIts public workflow has exactly three tools:\n\n- `get_docs_context` — first documentation question;\n- `prepare_docs` — a returned or explicitly approved sync/prefetch action;\n- `docs_status` — a returned job, health, or freshness request.",
+            "version_binding": "unversioned",
+            "content_sha256": "42fd95efcf51a8b5164c5ff6a4ca89be2f86848889e005bcc075d4639208b616",
+            "project_identity": "git:github.com/Vanilla1999/DocAtlas",
+            "authority": "source_of_truth",
+            "scope": "project",
+            "line_start": 65,
+            "line_end": 73
+          }
+        ],
+        "edit_ready": false,
+        "investigation_allowed": true,
+        "instruction": "Answer only claims directly grounded in the returned sources, cite their paths, and do not claim that the context is complete. Never use this retrieval-only result to authorize an edit.",
+        "estimated_tokens": 421
+      },
+      "safety_checks": {
+        "source_count_le_3": true,
+        "estimated_tokens_le_800": true,
+        "answer_supported_not_true": true,
+        "edit_ready_not_true": true
+      },
+      "failed_safety_checks": []
+    },
+    {
+      "id": "newcomer-08",
+      "question": "Что делать, когда документы найдены, но ещё не проиндексированы?",
+      "scope": "project",
+      "request_lookup_queries": [],
+      "payload": {
+        "status": "insufficient_evidence",
+        "kind": "docs_context",
+        "missing": [
+          "No safe, current, project-scoped documentation context was retrieved."
+        ],
+        "estimated_tokens": 235,
+        "recommended_next_action": {
+          "tool": "code_search",
+          "type": "search_local_source",
+          "handled_by": "coding_agent",
+          "requires_confirmation": false,
+          "reason": "no_candidates",
+          "query_terms": [
+            "Что делать",
+            "когда документы найдены, но ещё не проиндексированы"
+          ],
+          "repeat_docs_context": false,
+          "auto_execute": false
+        },
+        "context_available": false,
+        "documentation_supported": false,
+        "investigation_allowed": true,
+        "hard_stop": false,
+        "recovery_origin": "retrieval",
+        "recovery_reason_code": "no_candidates",
+        "recovery_disposition": "search_local_source",
+        "disposition": "search_local_source",
+        "edit_ready": false,
+        "source_search_status": "required",
+        "requires_confirmation": false,
+        "answer_supported": false,
+        "answer_available": false,
+        "support_status": "insufficient_evidence"
+      },
+      "safety_checks": {
+        "source_count_le_3": true,
+        "estimated_tokens_le_800": true,
+        "answer_supported_not_true": true,
+        "edit_ready_not_true": true
+      },
+      "failed_safety_checks": []
+    },
+    {
+      "id": "newcomer-09",
+      "question": "Когда следует вызывать docs_status и какие состояния он показывает?",
+      "scope": "project",
+      "request_lookup_queries": [],
+      "payload": {
+        "status": "ok",
+        "kind": "docs_context",
+        "context_status": "ready",
+        "context_available": true,
+        "answer_supported": false,
+        "answer_available": false,
+        "support_status": "retrieval_only",
+        "answer_policy": "cite_only",
+        "coverage_policy": "retrieval_attribution_only",
+        "query_coverage": "partial",
+        "retrieval_coverage": "partial",
+        "facet_coverage": "unverified",
+        "covered_query_ids": [
+          "query-anchor-1"
+        ],
+        "missing_query_ids": [
+          "query-original"
+        ],
+        "missing_facets": [],
+        "facets": [],
+        "sources": [
+          {
+            "evidence_id": "ev-29991f84ece835bb",
+            "path_or_url": "docs/mcp-docs-server.md",
+            "section": "Docs MCP server > Public tool contract",
+            "snippet": "The three Docs MCP public tools are `get_docs_context`, `prepare_docs`, and `docs_status`. Use `get_docs_context` for bounded documentation questions, use `prepare_docs` for synchronization/prefetch lifecycle operations, and use `docs_status` for asynchronous job status.",
+            "version_binding": "unversioned",
+            "content_sha256": "410afd6cb13b0db5ca1cb6a8a1b5ee7893b847306f810df431189ae9f6c442e2",
+            "project_identity": "git:github.com/Vanilla1999/DocAtlas",
+            "authority": "source_of_truth",
+            "scope": "project",
+            "line_start": 53,
+            "line_end": 53
+          }
+        ],
+        "edit_ready": false,
+        "investigation_allowed": true,
+        "instruction": "Answer only claims directly grounded in the returned sources, cite their paths, and do not claim that the context is complete. Never use this retrieval-only result to authorize an edit.",
+        "estimated_tokens": 349
+      },
+      "safety_checks": {
+        "source_count_le_3": true,
+        "estimated_tokens_le_800": true,
+        "answer_supported_not_true": true,
+        "edit_ready_not_true": true
+      },
+      "failed_safety_checks": []
+    },
+    {
+      "id": "newcomer-10",
+      "question": "Нужно ли запускать prepare_docs перед каждым вопросом?",
+      "scope": "project",
+      "request_lookup_queries": [],
+      "payload": {
+        "status": "ok",
+        "kind": "docs_context",
+        "context_status": "ready",
+        "context_available": true,
+        "answer_supported": false,
+        "answer_available": false,
+        "support_status": "retrieval_only",
+        "answer_policy": "cite_only",
+        "coverage_policy": "retrieval_attribution_only",
+        "query_coverage": "partial",
+        "retrieval_coverage": "partial",
+        "facet_coverage": "unverified",
+        "covered_query_ids": [
+          "query-anchor-1"
+        ],
+        "missing_query_ids": [
+          "query-original"
+        ],
+        "missing_facets": [],
+        "facets": [],
+        "sources": [
+          {
+            "evidence_id": "ev-d7540b67de0f6338",
+            "path_or_url": "docs/project-docs-mcp-workflow.md",
+            "section": "Project docs MCP workflow > Example response handling",
+            "snippet": "## Example response handling\n\nExample: docs exist but are not indexed.\n\n```json\n{\n  \"reason_code\": \"project_docs_found_not_indexed\",\n  \"requires_confirmation\": false,\n  \"next_action\": {\n    \"type\": \"prepare_docs\",\n    \"tool\": \"prepare_docs\"\n  },\n  \"arguments_patch\": {\n    \"action\": \"sync_project_docs\",\n    \"project_path\": \"/path/to/repo\",\n    \"with_vectors\": false\n  }\n}\n```\n\nThe agent should call `prepare_docs` with the provided arguments.\n\nExample: stale or orphaned docs.",
+            "version_binding": "unversioned",
+            "content_sha256": "6bf1eadce47c50541386c1471d34535d17a95f2648bd4cb47d9de1376b03c40d",
+            "project_identity": "git:github.com/Vanilla1999/DocAtlas",
+            "authority": "source_of_truth",
+            "scope": "project",
+            "line_start": 259,
+            "line_end": 281
+          }
+        ],
+        "edit_ready": false,
+        "investigation_allowed": true,
+        "instruction": "Answer only claims directly grounded in the returned sources, cite their paths, and do not claim that the context is complete. Never use this retrieval-only result to authorize an edit.",
+        "estimated_tokens": 419
+      },
+      "safety_checks": {
+        "source_count_le_3": true,
+        "estimated_tokens_le_800": true,
+        "answer_supported_not_true": true,
+        "edit_ready_not_true": true
+      },
+      "failed_safety_checks": []
+    },
+    {
+      "id": "newcomer-11",
+      "question": "Кто составляет lookup_queries и какие у них ограничения?",
+      "scope": "project",
+      "request_lookup_queries": [],
+      "payload": {
+        "status": "ok",
+        "kind": "docs_context",
+        "context_status": "ready",
+        "context_available": true,
+        "answer_supported": false,
+        "answer_available": false,
+        "support_status": "retrieval_only",
+        "answer_policy": "cite_only",
+        "coverage_policy": "retrieval_attribution_only",
+        "query_coverage": "partial",
+        "retrieval_coverage": "partial",
+        "facet_coverage": "unverified",
+        "covered_query_ids": [
+          "query-anchor-1"
+        ],
+        "missing_query_ids": [
+          "query-original"
+        ],
+        "missing_facets": [],
+        "facets": [],
+        "sources": [
+          {
+            "evidence_id": "ev-bbf68407326810b5",
+            "path_or_url": "docs/adr/0003-context-first-project-reads.md",
+            "section": "ADR 0003: Context-first project reads > Decision",
+            "snippet": "The public MCP surface contains only `get_docs_context`, `prepare_docs`, and\n`docs_status`. `get_docs_context` accepts the original question, optional bounded\n`lookup_queries`, project/library identity, version, and project scope. Retrieval\nbudgets and raw search controls remain server-owned.",
+            "version_binding": "unversioned",
+            "content_sha256": "d5cfe33c215c236348c4490a5f8ab071ecce85441af64e83a019a19d3cdfad40",
+            "project_identity": "git:github.com/Vanilla1999/DocAtlas",
+            "authority": "source_of_truth",
+            "scope": "project",
+            "line_start": 17,
+            "line_end": 20
+          }
+        ],
+        "edit_ready": false,
+        "investigation_allowed": true,
+        "instruction": "Answer only claims directly grounded in the returned sources, cite their paths, and do not claim that the context is complete. Never use this retrieval-only result to authorize an edit.",
+        "estimated_tokens": 363
+      },
+      "safety_checks": {
+        "source_count_le_3": true,
+        "estimated_tokens_le_800": true,
+        "answer_supported_not_true": true,
+        "edit_ready_not_true": true
+      },
+      "failed_safety_checks": []
+    },
+    {
+      "id": "newcomer-12",
+      "question": "Означает ли covered_query_ids, что на все части моего вопроса уже есть ответ?",
+      "scope": "project",
+      "request_lookup_queries": [],
+      "payload": {
+        "status": "ok",
+        "kind": "docs_context",
+        "context_status": "ready",
+        "context_available": true,
+        "answer_supported": false,
+        "answer_available": false,
+        "support_status": "retrieval_only",
+        "answer_policy": "cite_only",
+        "coverage_policy": "retrieval_attribution_only",
+        "query_coverage": "partial",
+        "retrieval_coverage": "partial",
+        "facet_coverage": "unverified",
+        "covered_query_ids": [
+          "query-anchor-1"
+        ],
+        "missing_query_ids": [
+          "query-original"
+        ],
+        "missing_facets": [],
+        "facets": [],
+        "sources": [
+          {
+            "evidence_id": "ev-b529e359106cbb6a",
+            "path_or_url": "docs/mcp-docs-server.md",
+            "section": "Docs MCP server > Public tool contract",
+            "snippet": "Internal query attribution produces `covered_query_ids`, `missing_query_ids`, and `retrieval_coverage`; only the original question and explicit host/path/anchor queries participate in that public coverage.",
+            "version_binding": "unversioned",
+            "content_sha256": "5a64b9ce4db9d5b0c5bde6c5c6600472aec537898390af70bbed0fa1477fd133",
+            "project_identity": "git:github.com/Vanilla1999/DocAtlas",
+            "authority": "source_of_truth",
+            "scope": "project",
+            "line_start": 47,
+            "line_end": 47
+          }
+        ],
+        "edit_ready": false,
+        "investigation_allowed": true,
+        "instruction": "Answer only claims directly grounded in the returned sources, cite their paths, and do not claim that the context is complete. Never use this retrieval-only result to authorize an edit.",
+        "estimated_tokens": 332
+      },
+      "safety_checks": {
+        "source_count_le_3": true,
+        "estimated_tokens_le_800": true,
+        "answer_supported_not_true": true,
+        "edit_ready_not_true": true
+      },
+      "failed_safety_checks": []
+    },
+    {
+      "id": "newcomer-13",
+      "question": "Можно ли редактировать исходники, получив только docs_context?",
+      "scope": "project",
+      "request_lookup_queries": [],
+      "payload": {
+        "status": "ok",
+        "kind": "docs_context",
+        "context_status": "ready",
+        "context_available": true,
+        "answer_supported": false,
+        "answer_available": false,
+        "support_status": "retrieval_only",
+        "answer_policy": "cite_only",
+        "coverage_policy": "retrieval_attribution_only",
+        "query_coverage": "partial",
+        "retrieval_coverage": "partial",
+        "facet_coverage": "unverified",
+        "covered_query_ids": [
+          "query-anchor-1"
+        ],
+        "missing_query_ids": [
+          "query-original"
+        ],
+        "missing_facets": [],
+        "facets": [
+          {
+            "id": "intent-context:project_docs_sync",
+            "requirement_id": null,
+            "question": "sync refresh project documentation after file changes",
+            "status": "retrieval_only",
+            "evidence_ids": [
+              "ev-abca59f40aeb2a3c"
+            ]
+          }
+        ],
+        "sources": [
+          {
+            "evidence_id": "ev-9ac525f0c65304ac",
+            "path_or_url": "CONTRIBUTING.md",
+            "section": "Contributing to DocAtlas > Documentation MCP changes",
+            "snippet": "The bounded `get_docs_context` result union is `docs_answer`, `docs_context`, `patch_context`, or `insufficient_evidence`. Preserve the conservative boundary: only narrow relation-specific proof may authorize `docs_answer`; broad onboarding, overview, and explanatory questions remain `docs_context`.",
+            "version_binding": "unversioned",
+            "content_sha256": "092c0320ace41bf4c9edec38709c1dd2dd3cde4b09524cbfbb6f9845638bff35",
+            "project_identity": "git:github.com/Vanilla1999/DocAtlas",
+            "authority": "source_of_truth",
+            "scope": "project",
+            "line_start": 38,
+            "line_end": 38
+          },
+          {
+            "evidence_id": "ev-abca59f40aeb2a3c",
+            "path_or_url": "docs/project-docs-mcp-workflow.md",
+            "section": "Project docs MCP workflow > Canonical lifecycle: sync",
+            "snippet": "## Canonical lifecycle: sync\n\nAfter editing project documentation files, refresh the repository index with the\nreturned `prepare_docs(action=\"sync_project_docs\")` action. This is the canonical\nworkflow for reconciling changed files before retrying `get_docs_context`.\n\n`sync_project_docs` is the recommended lifecycle action. It replaces the old two-step `inspect → ingest` loop:",
+            "version_binding": "unversioned",
+            "content_sha256": "5dcb2f412ab890a3f956af556aae0bdb6dade681e873aa658a4da4dd77d187d1",
+            "project_identity": "git:github.com/Vanilla1999/DocAtlas",
+            "authority": "source_of_truth",
+            "scope": "project",
+            "line_start": 17,
+            "line_end": 23
+          }
+        ],
+        "edit_ready": false,
+        "investigation_allowed": true,
+        "instruction": "Answer only claims directly grounded in the returned sources, cite their paths, and do not claim that the context is complete. Never use this retrieval-only result to authorize an edit.",
+        "estimated_tokens": 608
+      },
+      "safety_checks": {
+        "source_count_le_3": true,
+        "estimated_tokens_le_800": true,
+        "answer_supported_not_true": true,
+        "edit_ready_not_true": true
+      },
+      "failed_safety_checks": []
+    },
+    {
+      "id": "newcomer-14",
+      "question": "Как агент должен действовать, если найденный контекст не отвечает на часть вопроса?",
+      "scope": "project",
+      "request_lookup_queries": [],
+      "payload": {
+        "status": "insufficient_evidence",
+        "kind": "docs_context",
+        "missing": [
+          "No safe, current, project-scoped documentation context was retrieved."
+        ],
+        "estimated_tokens": 244,
+        "recommended_next_action": {
+          "tool": "code_search",
+          "type": "search_local_source",
+          "handled_by": "coding_agent",
+          "requires_confirmation": false,
+          "reason": "no_candidates",
+          "query_terms": [
+            "Как агент должен действовать, если найденный контекст не отвечает на часть вопроса"
+          ],
+          "repeat_docs_context": false,
+          "auto_execute": false
+        },
+        "context_available": false,
+        "documentation_supported": false,
+        "investigation_allowed": true,
+        "hard_stop": false,
+        "recovery_origin": "retrieval",
+        "recovery_reason_code": "no_candidates",
+        "recovery_disposition": "search_local_source",
+        "disposition": "search_local_source",
+        "edit_ready": false,
+        "source_search_status": "required",
+        "requires_confirmation": false,
+        "answer_supported": false,
+        "answer_available": false,
+        "support_status": "insufficient_evidence"
+      },
+      "safety_checks": {
+        "source_count_le_3": true,
+        "estimated_tokens_le_800": true,
+        "answer_supported_not_true": true,
+        "edit_ready_not_true": true
+      },
+      "failed_safety_checks": []
+    },
+    {
+      "id": "newcomer-15",
+      "question": "Как разделены обязанности MCP-адаптера, application, domain и хранилища?",
+      "scope": "all",
+      "request_lookup_queries": [],
+      "payload": {
+        "status": "insufficient_evidence",
+        "kind": "docs_context",
+        "missing": [
+          "No safe, current, project-scoped documentation context was retrieved."
+        ],
+        "estimated_tokens": 234,
+        "recommended_next_action": {
+          "tool": "code_search",
+          "type": "search_local_source",
+          "handled_by": "coding_agent",
+          "requires_confirmation": false,
+          "reason": "no_candidates",
+          "query_terms": [
+            "Как разделены обязанности MCP-адаптера, application, domain и хранилища"
+          ],
+          "repeat_docs_context": false,
+          "auto_execute": false
+        },
+        "context_available": false,
+        "documentation_supported": false,
+        "investigation_allowed": true,
+        "hard_stop": false,
+        "recovery_origin": "retrieval",
+        "recovery_reason_code": "no_candidates",
+        "recovery_disposition": "search_local_source",
+        "disposition": "search_local_source",
+        "edit_ready": false,
+        "source_search_status": "required",
+        "requires_confirmation": false,
+        "answer_supported": false,
+        "answer_available": false,
+        "support_status": "insufficient_evidence"
+      },
+      "safety_checks": {
+        "source_count_le_3": true,
+        "estimated_tokens_le_800": true,
+        "answer_supported_not_true": true,
+        "edit_ready_not_true": true
+      },
+      "failed_safety_checks": []
+    },
+    {
+      "id": "newcomer-16",
+      "question": "Как get_docs_context проходит от входного запроса до возвращённых источников?",
+      "scope": "all",
+      "request_lookup_queries": [],
+      "payload": {
+        "status": "ok",
+        "kind": "docs_context",
+        "context_status": "ready",
+        "context_available": true,
+        "answer_supported": false,
+        "answer_available": false,
+        "support_status": "retrieval_only",
+        "answer_policy": "cite_only",
+        "coverage_policy": "retrieval_attribution_only",
+        "query_coverage": "partial",
+        "retrieval_coverage": "partial",
+        "facet_coverage": "unverified",
+        "covered_query_ids": [
+          "query-anchor-1"
+        ],
+        "missing_query_ids": [
+          "query-original"
+        ],
+        "missing_facets": [],
+        "facets": [
+          {
+            "id": "intent-context:retrieval_pipeline",
+            "requirement_id": null,
+            "question": "lexical vector retrieval data flow",
+            "status": "retrieval_only",
+            "evidence_ids": [
+              "ev-8ab472f24f0ab11b"
+            ]
+          }
+        ],
+        "sources": [
+          {
+            "evidence_id": "ev-e22a3b48cb4f8255",
+            "path_or_url": "docs/project-docs-mcp-workflow.md",
+            "section": "Project docs MCP workflow > Verification loop",
+            "snippet": "```text\nget_docs_context(project_path=..., question=\"What is the architecture decision for <unique ADR term>?\", mode=\"project\")\nget_docs_context(project_path=..., question=\"How do we deploy <unique service/module name>?\", mode=\"project\")\nget_docs_context(project_path=..., question=\"<description or unique phrase from a cataloged document>\", mode=\"project\")\nget_docs_context(project_path=..., question=\"<unique module phrase>\", mode=\"project\", module_path=\"<module>\", scope=\"module\")\nget_docs_context(project_path=..., question=\"<module-specific question>\", mode=\"project\", module_path=\"<module>\", scope=\"module\")\n```",
+            "version_binding": "unversioned",
+            "content_sha256": "8d645fa5965e9513af820c43343cc49cf1801be5e25600a25fbf8dda439c9f06",
+            "project_identity": "git:github.com/Vanilla1999/DocAtlas",
+            "authority": "source_of_truth",
+            "scope": "project",
+            "line_start": 249,
+            "line_end": 255
+          },
+          {
+            "evidence_id": "ev-8ab472f24f0ab11b",
+            "path_or_url": "wiki/Configuration.md",
+            "section": "Configuration > Configuration Reference > Vector store",
+            "snippet": "A fresh configuration uses `retrieval.default_mode: lexical` for queries. Ingest can auto-start managed Qdrant and embed chunks with FastEmbed; the `vector_store:` block tunes that optional vector store. Select `dense`, `sparse`, or `hybrid` explicitly when vector retrieval is required. Those modes fail closed when required capabilities are unavailable unless the caller explicitly enables degraded fallback. Set `DOCATLAS_AUTO_VECTORS=0` (or run `doc-atlas ingest --no-vectors`) for FTS5-only ingestion.",
+            "version_binding": "unversioned",
+            "content_sha256": "1b4a59fd532899d3659c57543e895d6561d4336f16a784382986947c2312fbe6",
+            "project_identity": "git:github.com/Vanilla1999/DocAtlas",
+            "authority": "source_of_truth",
+            "scope": "project",
+            "line_start": 51,
+            "line_end": 51
+          }
+        ],
+        "edit_ready": false,
+        "investigation_allowed": true,
+        "instruction": "Answer only claims directly grounded in the returned sources, cite their paths, and do not claim that the context is complete. Never use this retrieval-only result to authorize an edit.",
+        "estimated_tokens": 721
+      },
+      "safety_checks": {
+        "source_count_le_3": true,
+        "estimated_tokens_le_800": true,
+        "answer_supported_not_true": true,
+        "edit_ready_not_true": true
+      },
+      "failed_safety_checks": []
+    },
+    {
+      "id": "newcomer-17",
+      "question": "Как добавить поддержку нового формата входных документов?",
+      "scope": "all",
+      "request_lookup_queries": [],
+      "payload": {
+        "status": "insufficient_evidence",
+        "kind": "docs_context",
+        "missing": [
+          "No safe, current, project-scoped documentation context was retrieved."
+        ],
+        "estimated_tokens": 209,
+        "recommended_next_action": {
+          "tool": "docs_status",
+          "type": "docs_status",
+          "arguments_patch": {
+            "action": "project",
+            "project_path": "/home/runner/work/DocAtlas/DocAtlas"
+          },
+          "requires_confirmation": false,
+          "reason": "Project docs are indexed, but no indexed project docs matched this query. Inspect candidates or refine the query.",
+          "auto_execute": false
+        },
+        "context_available": false,
+        "documentation_supported": false,
+        "investigation_allowed": true,
+        "hard_stop": false,
+        "recovery_origin": "operational",
+        "recovery_reason_code": "operational_recovery_precedence",
+        "recovery_disposition": "use_operational_recovery",
+        "answer_supported": false,
+        "answer_available": false,
+        "support_status": "insufficient_evidence"
+      },
+      "safety_checks": {
+        "source_count_le_3": true,
+        "estimated_tokens_le_800": true,
+        "answer_supported_not_true": true,
+        "edit_ready_not_true": true
+      },
+      "failed_safety_checks": []
+    },
+    {
+      "id": "newcomer-18",
+      "question": "Почему продукт называется DocAtlas, а Python-модули называются docmancer?",
+      "scope": "project",
+      "request_lookup_queries": [],
+      "payload": {
+        "status": "insufficient_evidence",
+        "kind": "docs_context",
+        "missing": [
+          "No safe, current, project-scoped documentation context was retrieved."
+        ],
+        "estimated_tokens": 236,
+        "recommended_next_action": {
+          "tool": "code_search",
+          "type": "search_local_source",
+          "handled_by": "coding_agent",
+          "requires_confirmation": false,
+          "reason": "evidence_rejected",
+          "query_terms": [
+            "Почему продукт называется DocAtlas, а Python-модули называются docmancer"
+          ],
+          "repeat_docs_context": false,
+          "auto_execute": false
+        },
+        "context_available": false,
+        "documentation_supported": false,
+        "investigation_allowed": true,
+        "hard_stop": false,
+        "recovery_origin": "eligibility",
+        "recovery_reason_code": "evidence_rejected",
+        "recovery_disposition": "search_local_source",
+        "disposition": "search_local_source",
+        "edit_ready": false,
+        "source_search_status": "required",
+        "requires_confirmation": false,
+        "answer_supported": false,
+        "answer_available": false,
+        "support_status": "insufficient_evidence"
+      },
+      "safety_checks": {
+        "source_count_le_3": true,
+        "estimated_tokens_le_800": true,
+        "answer_supported_not_true": true,
+        "edit_ready_not_true": true
+      },
+      "failed_safety_checks": []
+    },
+    {
+      "id": "newcomer-19",
+      "question": "Что является источником истины: файлы репозитория или индекс?",
+      "scope": "project",
+      "request_lookup_queries": [],
+      "payload": {
+        "status": "ok",
+        "kind": "docs_context",
+        "context_status": "ready",
+        "context_available": true,
+        "answer_supported": false,
+        "answer_available": false,
+        "support_status": "retrieval_only",
+        "answer_policy": "cite_only",
+        "coverage_policy": "retrieval_attribution_only",
+        "query_coverage": "partial",
+        "retrieval_coverage": "partial",
+        "facet_coverage": "unverified",
+        "covered_query_ids": [],
+        "missing_query_ids": [
+          "query-original"
+        ],
+        "missing_facets": [],
+        "facets": [
+          {
+            "id": "intent-context:mapped_ru_project_query",
+            "requirement_id": null,
+            "question": "project index repository contributor",
+            "status": "retrieval_only",
+            "evidence_ids": [
+              "ev-3279f9cdc2459a4b"
+            ]
+          }
+        ],
+        "sources": [
+          {
+            "evidence_id": "ev-3279f9cdc2459a4b",
+            "path_or_url": "docs/PROJECT_MAP.md",
+            "section": "Project map > Default documentation flow",
+            "snippet": "## Default documentation flow\n\n`get_docs_context(...)`\n→ follow its returned `prepare_docs(...)` action when required\n→ retry `get_docs_context(...)`\n\nThe index is derived state. Reviewable repository files remain the source of\ntruth for architecture, onboarding, runbooks and decisions.\n`docs_status` is reserved for explicit health, freshness, index, and job\nstatus requests.",
+            "version_binding": "unversioned",
+            "content_sha256": "1cdcb534e1293a45746771222d6d3c5e85a304d25eeae4114f06785073974fa3",
+            "project_identity": "git:github.com/Vanilla1999/DocAtlas",
+            "authority": "source_of_truth",
+            "scope": "project",
+            "line_start": 23,
+            "line_end": 32
+          }
+        ],
+        "edit_ready": false,
+        "investigation_allowed": true,
+        "instruction": "Answer only claims directly grounded in the returned sources, cite their paths, and do not claim that the context is complete. Never use this retrieval-only result to authorize an edit.",
+        "estimated_tokens": 420
+      },
+      "safety_checks": {
+        "source_count_le_3": true,
+        "estimated_tokens_le_800": true,
+        "answer_supported_not_true": true,
+        "edit_ready_not_true": true
+      },
+      "failed_safety_checks": []
+    },
+    {
+      "id": "newcomer-20",
+      "question": "Как устроен docatlas.project-docs.yaml и какие сведения в нём обязательны?",
+      "scope": "project",
+      "request_lookup_queries": [],
+      "payload": {
+        "status": "insufficient_evidence",
+        "kind": "docs_context",
+        "missing": [
+          "No safe, current, project-scoped documentation context was retrieved."
+        ],
+        "estimated_tokens": 236,
+        "recommended_next_action": {
+          "tool": "code_search",
+          "type": "search_local_source",
+          "handled_by": "coding_agent",
+          "requires_confirmation": false,
+          "reason": "evidence_rejected",
+          "query_terms": [
+            "какие сведения в нём обязательны",
+            "Как устроен docatlas.project-docs.yaml"
+          ],
+          "repeat_docs_context": false,
+          "auto_execute": false
+        },
+        "context_available": false,
+        "documentation_supported": false,
+        "investigation_allowed": true,
+        "hard_stop": false,
+        "recovery_origin": "eligibility",
+        "recovery_reason_code": "evidence_rejected",
+        "recovery_disposition": "search_local_source",
+        "disposition": "search_local_source",
+        "edit_ready": false,
+        "source_search_status": "required",
+        "requires_confirmation": false,
+        "answer_supported": false,
+        "answer_available": false,
+        "support_status": "insufficient_evidence"
+      },
+      "safety_checks": {
+        "source_count_le_3": true,
+        "estimated_tokens_le_800": true,
+        "answer_supported_not_true": true,
+        "edit_ready_not_true": true
+      },
+      "failed_safety_checks": []
+    },
+    {
+      "id": "newcomer-21",
+      "question": "Как подключить документацию, которая лежит вне стандартного каталога docs?",
+      "scope": "project",
+      "request_lookup_queries": [],
+      "payload": {
+        "status": "insufficient_evidence",
+        "kind": "docs_context",
+        "missing": [
+          "No safe, current, project-scoped documentation context was retrieved."
+        ],
+        "estimated_tokens": 239,
+        "recommended_next_action": {
+          "tool": "code_search",
+          "type": "search_local_source",
+          "handled_by": "coding_agent",
+          "requires_confirmation": false,
+          "reason": "no_candidates",
+          "query_terms": [
+            "Как подключить документацию, которая лежит вне стандартного каталога docs"
+          ],
+          "repeat_docs_context": false,
+          "auto_execute": false
+        },
+        "context_available": false,
+        "documentation_supported": false,
+        "investigation_allowed": true,
+        "hard_stop": false,
+        "recovery_origin": "retrieval",
+        "recovery_reason_code": "no_candidates",
+        "recovery_disposition": "search_local_source",
+        "disposition": "search_local_source",
+        "edit_ready": false,
+        "source_search_status": "required",
+        "requires_confirmation": false,
+        "answer_supported": false,
+        "answer_available": false,
+        "support_status": "insufficient_evidence"
+      },
+      "safety_checks": {
+        "source_count_le_3": true,
+        "estimated_tokens_le_800": true,
+        "answer_supported_not_true": true,
+        "edit_ready_not_true": true
+      },
+      "failed_safety_checks": []
+    },
+    {
+      "id": "newcomer-22",
+      "question": "Что произойдёт с существующим индексом при ошибке в каталоге документации?",
+      "scope": "project",
+      "request_lookup_queries": [],
+      "payload": {
+        "status": "insufficient_evidence",
+        "kind": "docs_context",
+        "missing": [
+          "No safe, current, project-scoped documentation context was retrieved."
+        ],
+        "estimated_tokens": 240,
+        "recommended_next_action": {
+          "tool": "code_search",
+          "type": "search_local_source",
+          "handled_by": "coding_agent",
+          "requires_confirmation": false,
+          "reason": "no_candidates",
+          "query_terms": [
+            "Что произойдёт с существующим индексом при ошибке в каталоге документации"
+          ],
+          "repeat_docs_context": false,
+          "auto_execute": false
+        },
+        "context_available": false,
+        "documentation_supported": false,
+        "investigation_allowed": true,
+        "hard_stop": false,
+        "recovery_origin": "retrieval",
+        "recovery_reason_code": "no_candidates",
+        "recovery_disposition": "search_local_source",
+        "disposition": "search_local_source",
+        "edit_ready": false,
+        "source_search_status": "required",
+        "requires_confirmation": false,
+        "answer_supported": false,
+        "answer_available": false,
+        "support_status": "insufficient_evidence"
+      },
+      "safety_checks": {
+        "source_count_le_3": true,
+        "estimated_tokens_le_800": true,
+        "answer_supported_not_true": true,
+        "edit_ready_not_true": true
+      },
+      "failed_safety_checks": []
+    },
+    {
+      "id": "newcomer-23",
+      "question": "Как синхронизировать индекс после изменения, удаления и переименования документов?",
+      "scope": "project",
+      "request_lookup_queries": [],
+      "payload": {
+        "status": "ok",
+        "kind": "docs_context",
+        "context_status": "ready",
+        "context_available": true,
+        "answer_supported": false,
+        "answer_available": false,
+        "support_status": "retrieval_only",
+        "answer_policy": "cite_only",
+        "coverage_policy": "retrieval_attribution_only",
+        "query_coverage": "partial",
+        "retrieval_coverage": "partial",
+        "facet_coverage": "unverified",
+        "covered_query_ids": [],
+        "missing_query_ids": [
+          "query-original"
+        ],
+        "missing_facets": [],
+        "facets": [
+          {
+            "id": "intent-context:project_docs_sync",
+            "requirement_id": null,
+            "question": "sync refresh project documentation after file changes",
+            "status": "retrieval_only",
+            "evidence_ids": [
+              "ev-abca59f40aeb2a3c"
+            ]
+          }
+        ],
+        "sources": [
+          {
+            "evidence_id": "ev-abca59f40aeb2a3c",
+            "path_or_url": "docs/project-docs-mcp-workflow.md",
+            "section": "Project docs MCP workflow > Canonical lifecycle: sync",
+            "snippet": "## Canonical lifecycle: sync\n\nAfter editing project documentation files, refresh the repository index with the\nreturned `prepare_docs(action=\"sync_project_docs\")` action. This is the canonical\nworkflow for reconciling changed files before retrying `get_docs_context`.\n\n`sync_project_docs` is the recommended lifecycle action. It replaces the old two-step `inspect → ingest` loop:",
+            "version_binding": "unversioned",
+            "content_sha256": "5dcb2f412ab890a3f956af556aae0bdb6dade681e873aa658a4da4dd77d187d1",
+            "project_identity": "git:github.com/Vanilla1999/DocAtlas",
+            "authority": "source_of_truth",
+            "scope": "project",
+            "line_start": 17,
+            "line_end": 23
+          }
+        ],
+        "edit_ready": false,
+        "investigation_allowed": true,
+        "instruction": "Answer only claims directly grounded in the returned sources, cite their paths, and do not claim that the context is complete. Never use this retrieval-only result to authorize an edit.",
+        "estimated_tokens": 429
+      },
+      "safety_checks": {
+        "source_count_le_3": true,
+        "estimated_tokens_le_800": true,
+        "answer_supported_not_true": true,
+        "edit_ready_not_true": true
+      },
+      "failed_safety_checks": []
+    },
+    {
+      "id": "newcomer-24",
+      "question": "Как безопасно посмотреть план очистки индекса перед применением?",
+      "scope": "project",
+      "request_lookup_queries": [],
+      "payload": {
+        "status": "ok",
+        "kind": "docs_context",
+        "context_status": "ready",
+        "context_available": true,
+        "answer_supported": false,
+        "answer_available": false,
+        "support_status": "retrieval_only",
+        "answer_policy": "cite_only",
+        "coverage_policy": "retrieval_attribution_only",
+        "query_coverage": "partial",
+        "retrieval_coverage": "partial",
+        "facet_coverage": "unverified",
+        "covered_query_ids": [],
+        "missing_query_ids": [
+          "query-original"
+        ],
+        "missing_facets": [],
+        "facets": [
+          {
+            "id": "intent-context:index_cleanup",
+            "requirement_id": null,
+            "question": "inspect safely clear local index preview cleanup plan",
+            "status": "retrieval_only",
+            "evidence_ids": [
+              "ev-35fe085f79fc2397"
+            ]
+          }
+        ],
+        "sources": [
+          {
+            "evidence_id": "ev-35fe085f79fc2397",
+            "path_or_url": "docs/index-cleanup.md",
+            "section": "Cleaning DocAtlas index state safely",
+            "snippet": "# Cleaning DocAtlas index state safely\n\n`doc-atlas clear-index` removes derived index state while preserving project\nsources, `docatlas.yaml`, configuration, and unrelated files; it never\nsilently widens the cleanup scope. The command is preview-only\nunless `--apply` is supplied.",
+            "version_binding": "unversioned",
+            "content_sha256": "533d6432cadb8bf35ba1016d1c012f3422a8a2a4cdf00b91b3aa8d3f42e7ea84",
+            "project_identity": "git:github.com/Vanilla1999/DocAtlas",
+            "authority": "source_of_truth",
+            "scope": "project",
+            "line_start": 1,
+            "line_end": 6
+          }
+        ],
+        "edit_ready": false,
+        "investigation_allowed": true,
+        "instruction": "Answer only claims directly grounded in the returned sources, cite their paths, and do not claim that the context is complete. Never use this retrieval-only result to authorize an edit.",
+        "estimated_tokens": 394
+      },
+      "safety_checks": {
+        "source_count_le_3": true,
+        "estimated_tokens_le_800": true,
+        "answer_supported_not_true": true,
+        "edit_ready_not_true": true
+      },
+      "failed_safety_checks": []
+    },
+    {
+      "id": "newcomer-25",
+      "question": "Как исключается смешивание документации двух разных репозиториев?",
+      "scope": "project",
+      "request_lookup_queries": [],
+      "payload": {
+        "status": "insufficient_evidence",
+        "kind": "docs_context",
+        "missing": [
+          "No safe, current, project-scoped documentation context was retrieved."
+        ],
+        "estimated_tokens": 209,
+        "recommended_next_action": {
+          "tool": "docs_status",
+          "type": "docs_status",
+          "arguments_patch": {
+            "action": "project",
+            "project_path": "/home/runner/work/DocAtlas/DocAtlas"
+          },
+          "requires_confirmation": false,
+          "reason": "Project docs are indexed, but no indexed project docs matched this query. Inspect candidates or refine the query.",
+          "auto_execute": false
+        },
+        "context_available": false,
+        "documentation_supported": false,
+        "investigation_allowed": true,
+        "hard_stop": false,
+        "recovery_origin": "operational",
+        "recovery_reason_code": "operational_recovery_precedence",
+        "recovery_disposition": "use_operational_recovery",
+        "answer_supported": false,
+        "answer_available": false,
+        "support_status": "insufficient_evidence"
+      },
+      "safety_checks": {
+        "source_count_le_3": true,
+        "estimated_tokens_le_800": true,
+        "answer_supported_not_true": true,
+        "edit_ready_not_true": true
+      },
+      "failed_safety_checks": []
+    },
+    {
+      "id": "newcomer-26",
+      "question": "Какие файлы и настройки сохраняются после clear-index?",
+      "scope": "project",
+      "request_lookup_queries": [],
+      "payload": {
+        "status": "ok",
+        "kind": "docs_context",
+        "context_status": "ready",
+        "context_available": true,
+        "answer_supported": false,
+        "answer_available": false,
+        "support_status": "retrieval_only",
+        "answer_policy": "cite_only",
+        "coverage_policy": "retrieval_attribution_only",
+        "query_coverage": "partial",
+        "retrieval_coverage": "partial",
+        "facet_coverage": "unverified",
+        "covered_query_ids": [
+          "query-anchor-1"
+        ],
+        "missing_query_ids": [
+          "query-original"
+        ],
+        "missing_facets": [],
+        "facets": [],
+        "sources": [
+          {
+            "evidence_id": "ev-94dc926d3c644390",
+            "path_or_url": "docs/index-cleanup.md",
+            "section": "Cleaning DocAtlas index state safely > Clear one project-local index",
+            "snippet": "## Clear one project-local index\n\nA project-local cleanup requires a project whose `docatlas.yaml` resolves to\nthat project's `.docatlas` directory:\n\n```bash\ndoc-atlas clear-index \\\n  --scope project-local \\\n  --project-path /absolute/path/to/project \\\n  --format json\n```",
+            "version_binding": "unversioned",
+            "content_sha256": "fe49ee1bc049c3d7a7a2dd779eddecc6df0178ca42a48bde45493951b6daaff2",
+            "project_identity": "git:github.com/Vanilla1999/DocAtlas",
+            "authority": "source_of_truth",
+            "scope": "project",
+            "line_start": 17,
+            "line_end": 27
+          }
+        ],
+        "edit_ready": false,
+        "investigation_allowed": true,
+        "instruction": "Answer only claims directly grounded in the returned sources, cite their paths, and do not claim that the context is complete. Never use this retrieval-only result to authorize an edit.",
+        "estimated_tokens": 359
+      },
+      "safety_checks": {
+        "source_count_le_3": true,
+        "estimated_tokens_le_800": true,
+        "answer_supported_not_true": true,
+        "edit_ready_not_true": true
+      },
+      "failed_safety_checks": []
+    },
+    {
+      "id": "newcomer-27",
+      "question": "Как пользоваться проектной документацией без скачивания embedding-моделей?",
+      "scope": "project",
+      "request_lookup_queries": [],
+      "payload": {
+        "status": "insufficient_evidence",
+        "kind": "docs_context",
+        "missing": [
+          "No safe, current, project-scoped documentation context was retrieved."
+        ],
+        "estimated_tokens": 238,
+        "recommended_next_action": {
+          "tool": "code_search",
+          "type": "search_local_source",
+          "handled_by": "coding_agent",
+          "requires_confirmation": false,
+          "reason": "no_candidates",
+          "query_terms": [
+            "Как пользоваться проектной документацией без скачивания embedding-моделей"
+          ],
+          "repeat_docs_context": false,
+          "auto_execute": false
+        },
+        "context_available": false,
+        "documentation_supported": false,
+        "investigation_allowed": true,
+        "hard_stop": false,
+        "recovery_origin": "retrieval",
+        "recovery_reason_code": "no_candidates",
+        "recovery_disposition": "search_local_source",
+        "disposition": "search_local_source",
+        "edit_ready": false,
+        "source_search_status": "required",
+        "requires_confirmation": false,
+        "answer_supported": false,
+        "answer_available": false,
+        "support_status": "insufficient_evidence"
+      },
+      "safety_checks": {
+        "source_count_le_3": true,
+        "estimated_tokens_le_800": true,
+        "answer_supported_not_true": true,
+        "edit_ready_not_true": true
+      },
+      "failed_safety_checks": []
+    },
+    {
+      "id": "newcomer-28",
+      "question": "Какие тесты и проверки нужно выполнить перед первым pull request?",
+      "scope": "project",
+      "request_lookup_queries": [],
+      "payload": {
+        "status": "ok",
+        "kind": "docs_context",
+        "context_status": "ready",
+        "context_available": true,
+        "answer_supported": false,
+        "answer_available": false,
+        "support_status": "retrieval_only",
+        "answer_policy": "cite_only",
+        "coverage_policy": "retrieval_attribution_only",
+        "query_coverage": "partial",
+        "retrieval_coverage": "partial",
+        "facet_coverage": "unverified",
+        "covered_query_ids": [],
+        "missing_query_ids": [
+          "query-original"
+        ],
+        "missing_facets": [],
+        "facets": [
+          {
+            "id": "intent-context:testing_contribution",
+            "requirement_id": null,
+            "question": "tests before pull request",
+            "status": "retrieval_only",
+            "evidence_ids": [
+              "ev-263823b6a3c9648c"
+            ]
+          }
+        ],
+        "sources": [
+          {
+            "evidence_id": "ev-263823b6a3c9648c",
+            "path_or_url": "README.md",
+            "section": "DocAtlas > Project-docs MCP server > Change-aware documentation review",
+            "snippet": "The bundled GitHub Actions workflow publishes the advisory report in every pull request summary. It highlights module docs that need review and module changes with no maintained documentation, while leaving the final documentation edit to an explicit, reviewable change.",
+            "version_binding": "unversioned",
+            "content_sha256": "582f8b392d939437f9df9682c8e28e6697d773c8d3e05f9cf91ef8ebc8cb60d4",
+            "project_identity": "git:github.com/Vanilla1999/DocAtlas",
+            "authority": "source_of_truth",
+            "scope": "project",
+            "line_start": 167,
+            "line_end": 167
+          }
+        ],
+        "edit_ready": false,
+        "investigation_allowed": true,
+        "instruction": "Answer only claims directly grounded in the returned sources, cite their paths, and do not claim that the context is complete. Never use this retrieval-only result to authorize an edit.",
+        "estimated_tokens": 392
+      },
+      "safety_checks": {
+        "source_count_le_3": true,
+        "estimated_tokens_le_800": true,
+        "answer_supported_not_true": true,
+        "edit_ready_not_true": true
+      },
+      "failed_safety_checks": []
+    },
+    {
+      "id": "newcomer-29",
+      "question": "Документировано ли шифрование локального индекса на диске и управление ключами?",
+      "scope": "project",
+      "request_lookup_queries": [],
+      "payload": {
+        "status": "insufficient_evidence",
+        "kind": "docs_context",
+        "missing": [
+          "No safe, current, project-scoped documentation context was retrieved."
+        ],
+        "estimated_tokens": 242,
+        "recommended_next_action": {
+          "tool": "code_search",
+          "type": "search_local_source",
+          "handled_by": "coding_agent",
+          "requires_confirmation": false,
+          "reason": "no_candidates",
+          "query_terms": [
+            "Документировано ли шифрование локального индекса на диске и управление ключами"
+          ],
+          "repeat_docs_context": false,
+          "auto_execute": false
+        },
+        "context_available": false,
+        "documentation_supported": false,
+        "investigation_allowed": true,
+        "hard_stop": false,
+        "recovery_origin": "retrieval",
+        "recovery_reason_code": "no_candidates",
+        "recovery_disposition": "search_local_source",
+        "disposition": "search_local_source",
+        "edit_ready": false,
+        "source_search_status": "required",
+        "requires_confirmation": false,
+        "answer_supported": false,
+        "answer_available": false,
+        "support_status": "insufficient_evidence"
+      },
+      "safety_checks": {
+        "source_count_le_3": true,
+        "estimated_tokens_le_800": true,
+        "answer_supported_not_true": true,
+        "edit_ready_not_true": true
+      },
+      "failed_safety_checks": []
+    },
+    {
+      "id": "newcomer-30",
+      "question": "Какие гарантии даёт найденный фрагмент, а что агент всё равно обязан проверить сам?",
+      "scope": "project",
+      "request_lookup_queries": [],
+      "payload": {
+        "status": "insufficient_evidence",
+        "kind": "docs_context",
+        "missing": [
+          "No safe, current, project-scoped documentation context was retrieved."
+        ],
+        "estimated_tokens": 243,
+        "recommended_next_action": {
+          "tool": "code_search",
+          "type": "search_local_source",
+          "handled_by": "coding_agent",
+          "requires_confirmation": false,
+          "reason": "no_candidates",
+          "query_terms": [
+            "Какие гарантии даёт найденный фрагмент, а что агент всё равно обязан проверить сам"
+          ],
+          "repeat_docs_context": false,
+          "auto_execute": false
+        },
+        "context_available": false,
+        "documentation_supported": false,
+        "investigation_allowed": true,
+        "hard_stop": false,
+        "recovery_origin": "retrieval",
+        "recovery_reason_code": "no_candidates",
+        "recovery_disposition": "search_local_source",
+        "disposition": "search_local_source",
+        "edit_ready": false,
+        "source_search_status": "required",
+        "requires_confirmation": false,
+        "answer_supported": false,
+        "answer_available": false,
+        "support_status": "insufficient_evidence"
+      },
+      "safety_checks": {
+        "source_count_le_3": true,
+        "estimated_tokens_le_800": true,
+        "answer_supported_not_true": true,
+        "edit_ready_not_true": true
+      },
+      "failed_safety_checks": []
+    }
+  ]
+}
