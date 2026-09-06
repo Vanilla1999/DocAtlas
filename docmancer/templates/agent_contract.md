@@ -11,4 +11,4 @@ Use the three-tool Docs MCP workflow:
 4. After preparation, retry the original question unchanged. Use at most five single-concept `lookup_queries`; partial coverage is not completeness and never authorizes edits.
 5. On `insufficient_evidence`, do not claim support. Follow returned local recovery when `hard_stop=false`; stop before editing when `hard_stop=true`.
 
-Project docs prove repository conventions, dependency docs prove external APIs, and repository code proves current implementation. Treat project-doc catalog metadata as routing data; do not invent missing documentation or claims.
+Project docs prove repository conventions, dependency docs prove external APIs, and repository code proves current implementation. Do not use legacy direct documentation tools. Treat project-doc catalog metadata as routing data; do not invent missing documentation or claims.
