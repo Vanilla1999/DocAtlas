@@ -61,8 +61,15 @@ jobs:
           new = '''        emit(\n            "project_architecture",\n            True,\n            f"{product_prefix}project architecture overview components indexing retrieval storage",\n            f"{product_prefix}SQLite persistence candidate generation metadata evidence qualification",\n        )\n'''
           assert text.count(old) == 1, 'project architecture aliases drifted'
           path.write_text(text.replace(old, new, 1))
+
+          path = Path('docmancer/docs/application/_project_docs_service_part03.py')
+          text = path.read_text()
+          old = '''            public_lookup = requirements is not None and any(item.origin == "host_lookup" for item in lookups)\n            # Public lookups need the same pre-qualification candidate window\n            # as the original question; projection owns the public budget.\n            lane = _run(\n                supplemental_query,\n                query_limit=effective_limit if public_lookup else 4,\n                query_budget=budget if public_lookup else supplemental_budget,\n                query_expand="none",\n                query_filters=filters,\n            )\n'''
+          new = '''            public_lookup = requirements is not None and any(item.origin == "host_lookup" for item in lookups)\n            module_architecture_intent = any(\n                item.origin == "canonical_intent"\n                and "module_architecture" in tuple(item.preferred_catalog_roles or ())\n                for item in lookups\n            )\n            # Public lookups keep the full pre-qualification window. Canonical\n            # module-architecture lanes may inspect a few more internal sections\n            # without increasing the model-visible 3-source / 800-token budget.\n            lane = _run(\n                supplemental_query,\n                query_limit=(\n                    effective_limit if public_lookup\n                    else min(effective_limit, 8) if module_architecture_intent\n                    else 4\n                ),\n                query_budget=(\n                    budget if public_lookup\n                    else min(budget, max(512, budget // 2)) if module_architecture_intent\n                    else supplemental_budget\n                ),\n                query_expand="none",\n                query_filters=filters,\n            )\n'''
+          assert text.count(old) == 1, 'supplemental lane window drifted'
+          path.write_text(text.replace(old, new, 1))
           PY
-          python -m compileall -q docmancer/docs/domain/project_retrieval_intent.py
+          python -m compileall -q docmancer/docs/domain/project_retrieval_intent.py docmancer/docs/application/_project_docs_service_part03.py
           git diff --check
       - name: Verify architecture and request flow RED cases are GREEN
         shell: bash
@@ -79,7 +86,8 @@ jobs:
             tests/docs/test_context_projection_boundaries.py \
             tests/docs/test_context7_style_project_chat.py \
             tests/docs/test_generic_context_workflows.py \
-            tests/docs/test_project_docs_catalog.py
+            tests/docs/test_project_docs_catalog.py \
+            tests/test_docs_service_part03.py
           python scripts/run_agent_developer_adversarial_gate.py
       - name: Verify full repository suite
         shell: bash
