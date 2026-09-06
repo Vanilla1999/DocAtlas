@@ -47,8 +47,14 @@ def _focused_snippet(
         start, end = _include_complete_code_fence(value, 0, len(value), limit=limit)
         return value[start:end], leading + start, leading + end
     terms = _query_terms(queries)
+    # A numbered list marker is not a sentence. Keep each list item together
+    # so its subject/step number cannot be separated from the returned body.
     spans = [(match.start(), match.end())
-        for match in re.finditer(r"\S(?:.*?\S)?(?=(?:\n{2,}|(?<=[.!?])\s+|(?<=\|)\n(?=\s*\|)|$))", value, re.S)
+        for match in re.finditer(
+            r"\S(?:.*?\S)?(?=(?:\n{2,}|(?<!\d\.)(?<=[.!?])\s+|"
+            r"\n(?=[ \t]*(?:\d+[.)]|[-*+])\s)|(?<=\|)\n(?=\s*\|)|$))",
+            value, re.S,
+        )
     ]
     if not spans:
         return "", leading, leading
@@ -91,8 +97,10 @@ def _focused_snippet(
         row_end = value.find("\n", boundary)
         boundary = (len(value) if row_end < 0 else row_end) if "|" in value[value.rfind("\n", 0, boundary) + 1:boundary] else boundary
         start_at = max(0, boundary - limit)
-        if start_at and not value[start_at - 1].isspace():
-            start_at += len(re.match(r"\S*\s*", value[start_at:])[0])
+        # A richer rolling window must not start in the middle of a short
+        # sentence/list item and silently remove who a statement is about.
+        # Overlong individual spans retain the bounded initial-window policy.
+        start_at = next((left for left, _ in spans if start_at <= left < boundary), boundary)
         start_at, boundary = _include_complete_table_row(
             value, start_at, boundary, terms=terms, limit=limit,
         )
