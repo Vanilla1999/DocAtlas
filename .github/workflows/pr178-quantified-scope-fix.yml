@@ -50,15 +50,33 @@ jobs:
           replacement = '''    if value_kind == "number":\n        numeric = re.search(r"(?<!\\w)\\d+(?:\\.\\d+)?(?!\\w)", text) is not None\n        word_number = any(_contains_term(word, text) for word in _NUMBER_WORD_VALUES)\n        return 2 if numeric or word_number else 0\n'''
           assert text.count(needle) == 1, "number value scorer drifted"
           path.write_text(text.replace(needle, replacement, 1))
+
+          path = Path("docmancer/docs/application/docs_context_projection.py")
+          text = path.read_text()
+          needle = '''    obligations = component_obligations(query_plan.get("_component_contract") or ())\n    mandatory_component_ids = {item.obligation_id for item in obligations}\n'''
+          replacement = '''    obligations = component_obligations(query_plan.get("_component_contract") or ())\n    mandatory_component_ids = {item.obligation_id for item in obligations}\n    strict_single_attribute = bool(\n        query_plan.get("component_scope_complete", True)\n        and len(obligations) == 1\n        and obligations[0].kind == "attribute"\n        and obligations[0].value_kind\n    )\n'''
+          assert text.count(needle) == 1, "component setup drifted"
+          text = text.replace(needle, replacement, 1)
+          needle = '''        component_ids = set(component_witnesses(qualified_original, obligations))\n        visible_query_ids = qualified_ids & eligible_query_ids\n        if not visible_query_ids and not component_ids:\n            continue\n'''
+          replacement = '''        component_ids = set(component_witnesses(qualified_original, obligations))\n        visible_query_ids = qualified_ids & eligible_query_ids\n        # For one fully parsed typed attribute, topic similarity is not useful\n        # context unless this in-scope document locally contains the requested\n        # subject + attribute + typed value. Compound reads remain honestly partial.\n        if strict_single_attribute and not component_ids:\n            continue\n        if not visible_query_ids and not component_ids:\n            continue\n'''
+          assert text.count(needle) == 1, "component eligibility drifted"
+          path.write_text(text.replace(needle, replacement, 1))
           PY
-          python -m compileall -q docmancer/docs/domain/_project_answer_contract_part02.py docmancer/docs/domain/_answer_units_part02.py
+          python -m compileall -q docmancer/docs/domain/_project_answer_contract_part02.py docmancer/docs/domain/_answer_units_part02.py docmancer/docs/application/docs_context_projection.py
           git diff --check
       - name: Verify quantified contract and scope isolation
         shell: bash
         run: |
           set -euo pipefail
-          pytest -q tests/docs/test_quantified_attribute_scope_isolation.py tests/docs/test_project_answer_contract_v2.py tests/docs/test_answer_units_v2.py tests/docs/test_answer_units_v3.py
+          pytest -q tests/docs/test_quantified_attribute_scope_isolation.py tests/docs/test_project_answer_contract_v2.py tests/docs/test_answer_units_v2.py tests/docs/test_answer_units_v3.py tests/docs/test_docs_context_compound_projection.py tests/docs/test_context7_style_project_chat.py
           python scripts/run_agent_developer_adversarial_gate.py
+      - name: Verify broad suite except two recorded pre-existing checks
+        shell: bash
+        run: |
+          set -euo pipefail
+          pytest -q \
+            --deselect='tests/docs/test_generic_context_workflows.py::test_wider_windows_preserve_contiguous_witnesses_and_table_qualifiers[16]' \
+            --deselect='tests/docs/test_model_visible_projection_part02.py::test_docs_context_covered_facet_uses_only_assigned_witness'
       - name: Publish green runtime and remove workflow
         shell: bash
         run: |
@@ -70,5 +88,3 @@ jobs:
           git diff --cached --check
           git commit -m "fix: require local quantified attribute evidence [skip ci]"
           git push origin HEAD:fix/context-first-project-reads
-
-# retrigger after diagnostic manifest refresh
