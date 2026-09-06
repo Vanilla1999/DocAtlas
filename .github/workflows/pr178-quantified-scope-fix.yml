@@ -1,0 +1,72 @@
+name: PR178 quantified scope fix
+
+on:
+  push:
+    branches: [fix/context-first-project-reads]
+    paths: [.github/workflows/pr178-quantified-scope-fix.yml]
+
+permissions:
+  contents: write
+
+env:
+  DOCATLAS_OFFLINE: "1"
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
+
+jobs:
+  apply:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+        with:
+          ref: fix/context-first-project-reads
+          fetch-depth: 0
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1
+        with:
+          python-version: '3.12'
+      - name: Verify parent and install
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD^)" = "7606362446705f8047dfdb2710039f0811b5cfe8"
+          python -m pip install -e ".[dev]"
+      - name: Apply quantified attribute contract
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          from pathlib import Path
+
+          path = Path("docmancer/docs/domain/_project_answer_contract_part02.py")
+          text = path.read_text()
+          needle = """    technical_terms = _technical_terms(raw_question)\n    subjects = _subjects(raw_question)\n    obligations: list[ProofObligation] = []\n\n"""
+          replacement = """    technical_terms = _technical_terms(raw_question)\n    subjects = _subjects(raw_question)\n    obligations: list[ProofObligation] = []\n\n    # Quantified property questions need the requested value in the same local\n    # proposition as the subject and attribute. A bare subject mention is not\n    # enough evidence for `How many X does Subject allow?`.\n    quantified_attribute = re.match(\n        r\"^\\s*how\\s+many\\s+([A-Za-z][A-Za-z0-9 _-]{1,80}?)\\s+does\\s+\"\n        r\"`?([A-Za-z_][A-Za-z0-9_.:-]*)`?\\s+\"\n        r\"(?:allow|permit|support|have|use)\\b\",\n        raw_question,\n        re.I,\n    )\n    if quantified_attribute:\n        attribute = _clean_phrase(quantified_attribute.group(1))\n        subject = quantified_attribute.group(2).strip(\"`\")\n        obligations.append(_obligation(\n            question=raw_question, index=len(obligations), kind=\"attribute\",\n            subject=subject, attribute=attribute, value_kind=\"number\",\n            response_mode=\"count\", lifecycle_intent=lifecycle,\n            span_value=quantified_attribute.group(0).strip(),\n        ))\n\n"""
+          assert text.count(needle) == 1, "project answer contract insertion point drifted"
+          path.write_text(text.replace(needle, replacement, 1))
+
+          path = Path("docmancer/docs/domain/_answer_units_part02.py")
+          text = path.read_text()
+          needle = '''    if value_kind == "number":\n        return 2 if re.search(r"(?<!\\w)\\d+(?:\\.\\d+)?(?!\\w)", text) else 0\n'''
+          replacement = '''    if value_kind == "number":\n        numeric = re.search(r"(?<!\\w)\\d+(?:\\.\\d+)?(?!\\w)", text) is not None\n        word_number = any(_contains_term(word, text) for word in _NUMBER_WORD_VALUES)\n        return 2 if numeric or word_number else 0\n'''
+          assert text.count(needle) == 1, "number value scorer drifted"
+          path.write_text(text.replace(needle, replacement, 1))
+          PY
+          python -m compileall -q docmancer/docs/domain/_project_answer_contract_part02.py docmancer/docs/domain/_answer_units_part02.py
+          git diff --check
+      - name: Verify quantified contract and scope isolation
+        shell: bash
+        run: |
+          set -euo pipefail
+          pytest -q tests/docs/test_quantified_attribute_scope_isolation.py tests/docs/test_project_answer_contract_v2.py tests/docs/test_answer_units.py
+          python scripts/run_agent_developer_adversarial_gate.py
+      - name: Publish green runtime and remove workflow
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm .github/workflows/pr178-quantified-scope-fix.yml
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git diff --cached --check
+          git commit -m "fix: require local quantified attribute evidence [skip ci]"
+          git push origin HEAD:fix/context-first-project-reads
