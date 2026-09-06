@@ -1,0 +1,53 @@
+name: PR178 hashseed diagnostic
+
+on:
+  push:
+    branches: [fix/context-first-project-reads]
+    paths: [.github/workflows/pr178-hashseed-diagnostic.yml]
+
+permissions:
+  contents: read
+
+env:
+  DOCATLAS_OFFLINE: "1"
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
+
+jobs:
+  diagnose:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+        with:
+          ref: fix/context-first-project-reads
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1
+        with:
+          python-version: '3.12'
+      - name: Install
+        run: python -m pip install -e ".[dev]"
+      - name: Apply the already-reviewed transient runtime patch
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import textwrap
+          workflow = Path('.github/workflows/pr178-quantified-scope-fix.yml').read_text()
+          marker = "          python - <<'PY'\n"
+          start = workflow.index(marker) + len(marker)
+          end = workflow.index("\n          PY\n", start)
+          body = textwrap.dedent(workflow[start:end])
+          exec(compile(body, '<pr178-runtime-patch>', 'exec'), {})
+          PY
+      - name: Probe hash-seed determinism
+        shell: bash
+        run: |
+          set -u
+          failed=""
+          for seed in $(seq 0 31); do
+            echo "=== PYTHONHASHSEED=$seed ==="
+            if ! PYTHONHASHSEED="$seed" pytest -q --showlocals tests/test_docs_service_part03.py::test_project_query_does_not_return_non_project_docs_with_same_terms; then
+              failed="$failed $seed"
+            fi
+          done
+          echo "FAILED_SEEDS:${failed:- none}"
+          test -z "$failed"
