@@ -78,6 +78,13 @@ jobs:
           assert 'test_generic_contract_fact_rejects_disclaimer_mentions_and_negation' not in text
           path.write_text(text.rstrip() + addition.rstrip() + '\n')
 
+          path = Path('tests/diagnostic_labels.json')
+          text = path.read_text()
+          old = '    "tests/docs/test_answer_units_v3.py": "d67f1a055607ea21286ca42886327d7f60a39a5cff99f5f677f22bb2da0a253c",'
+          new = '    "tests/docs/test_answer_units_v3.py": "c7538c5646ed60e0e626f46d5be0a7a48700e8e7e320e48a8db01621b38c6215",'
+          assert text.count(old) == 1, f'diagnostic manifest hash drifted: {text.count(old)}'
+          path.write_text(text.replace(old, new, 1))
+
           path = Path('tests/test_docs_service_part03.py')
           text = path.read_text()
           old = '''    assert all(\n        source["path_or_url"] != "docs/note-00.md"\n        for source in payload["sources"]\n    )\n'''
