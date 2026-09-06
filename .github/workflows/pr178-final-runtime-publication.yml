@@ -1,0 +1,187 @@
+name: PR178 final runtime publication
+
+on:
+  push:
+    branches: [fix/context-first-project-reads]
+    paths: [.github/workflows/pr178-final-runtime-publication.yml]
+
+permissions:
+  contents: write
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
+  DOCATLAS_OFFLINE: "1"
+
+jobs:
+  publish:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+        with:
+          ref: fix/context-first-project-reads
+          fetch-depth: 0
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1
+        with:
+          python-version: '3.12'
+      - name: Verify expected parent and install test dependencies
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD^)" = "866f65e48f4aafb3039da4f765396ddf38f85e0d"
+          python -m pip install -e ".[dev]"
+      - name: Apply reviewed bounded-projection patch
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          from pathlib import Path
+
+          path = Path("docmancer/docs/application/docs_context_projection.py")
+          text = path.read_text()
+
+          old = '''from docmancer.docs.domain.context_windows import (
+              _focused_line_range, _focused_snippet, _query_terms,
+          )'''
+          new = '''from docmancer.docs.domain.context_windows import (
+              _focused_line_range, _focused_snippet, _projection_limits, _query_terms,
+          )'''
+          if text.count(old) != 1:
+              raise SystemExit("unexpected context_windows import shape")
+          text = text.replace(old, new)
+
+          old = '''    for limit in (160, 320, 520):
+              for index, source in enumerate(tuple(expanded)):
+                  values = projection_inputs.get(str(source.get("evidence_id") or ""))
+                  if values is None:
+                      continue
+                  raw_snippet, focus_queries, source_line_start = values
+                  snippet, snippet_start, snippet_end = _focused_snippet(
+                      raw_snippet, focus_queries, limit=limit,
+                  )'''
+          new = '''    for index, source in enumerate(tuple(expanded)):
+              values = projection_inputs.get(str(source.get("evidence_id") or ""))
+              if values is None:
+                  continue
+              raw_snippet, focus_queries, source_line_start = values
+              for limit in _projection_limits(raw_snippet):
+                  snippet, snippet_start, snippet_end = _focused_snippet(
+                      raw_snippet, focus_queries, limit=limit,
+                  )'''
+          if text.count(old) != 1:
+              raise SystemExit("unexpected expansion loop shape")
+          text = text.replace(old, new)
+
+          old = '''            if source["snippet"] not in snippet and (_REQUIRED_RE.search(source["snippet"]) or _FORBIDDEN_RE.search(source["snippet"])):
+                      retained_start = raw_snippet.find(source["snippet"])
+                      if retained_start < 0 or raw_snippet.find(source["snippet"], retained_start + 1) >= 0:
+                          continue
+                      snippet_start = min(snippet_start, retained_start)
+                      snippet_end = max(snippet_end, retained_start + len(source["snippet"]))
+                      if snippet_end - snippet_start > limit:
+                          continue
+                      snippet = raw_snippet[snippet_start:snippet_end]'''
+          new = '''            # Exact-identifier witnesses need retention even without a normative
+                      # keyword. Optional fuzzy alias fragments may still be reselected;
+                      # public attribution, component and assignment guards below apply.
+                      preserve_span = any(
+                          trace.get("qualified") is True and trace.get("exact_terms")
+                          for trace in (source.get("retrieval_query_matches") or {}).values()
+                      ) or _REQUIRED_RE.search(source["snippet"]) or _FORBIDDEN_RE.search(source["snippet"])
+                      retained_start = raw_snippet.find(source["snippet"])
+                      if preserve_span and (retained_start < 0
+                              or raw_snippet.find(source["snippet"], retained_start + 1) >= 0):
+                          continue
+                      if preserve_span and not (snippet_start <= retained_start
+                              and retained_start + len(source["snippet"]) <= snippet_end):
+                          snippet_start = min(snippet_start, retained_start)
+                          snippet_end = max(snippet_end, retained_start + len(source["snippet"]))
+                          if snippet_end - snippet_start > limit:
+                              continue
+                          snippet = raw_snippet[snippet_start:snippet_end]'''
+          if text.count(old) != 1:
+              raise SystemExit("unexpected preserve-span block")
+          text = text.replace(old, new)
+
+          old = '''    for limit in (160, 320, 520):
+              for focus in (focuses, *((value,) for value in focuses if value)):
+                  snippet, snippet_start, snippet_end = _focused_snippet(
+                      raw_snippet, focus, limit=limit,
+                  )'''
+          new = '''    for limit in _projection_limits(raw_snippet):
+              for focus in (focuses, *((value,) for value in focuses if value)):
+                  snippet, snippet_start, snippet_end = _focused_snippet(
+                      raw_snippet, focus, limit=limit,
+                  )'''
+          if text.count(old) != 1:
+              raise SystemExit("unexpected qualified-fragment loop")
+          text = text.replace(old, new)
+
+          start = text.index("def _facet_aware_candidates(")
+          end = text.index("\n\ndef _fully_matched_query_ids", start)
+          replacement = '''def _facet_aware_candidates(
+              candidates: list[Any], *, query_text: dict[str, str], required_query_ids: set[str],
+              canonical_query_ids: set[str] | None = None,
+              assigned_evidence_ids: set[str] | None = None,
+              exact_query_ids: set[str] | None = None,
+              obligations: tuple[Any, ...] = (), missing_component_ids: set[str] | None = None,
+          ) -> list[Any]:
+              # Exact-anchor lanes are identity-sensitive: when two candidates both
+              # visibly qualify, preserve the upstream assigned witness before rewarding
+              # extra lexical mentions. General host/original lanes keep action and
+              # relevance ranking first so assignments cannot crowd out procedural facts.
+              def candidate_key(source: Any) -> tuple[Any, ...]:
+                  qualified_ids = qualified_query_ids((source,))
+                  exact_count = len(qualified_ids & (exact_query_ids or set()))
+                  component_count = len(
+                      set(component_witnesses(source, obligations)) & (missing_component_ids or set())
+                  )
+                  rank = _context_rank(source, query_text, required_query_ids, assigned_evidence_ids)
+                  match_ratio = sum(
+                      float(trace.get("match_ratio") or 0.0)
+                      for key, trace in (source.get("retrieval_query_matches") or {}).items()
+                      if key in required_query_ids and trace.get("qualified") is True
+                  )
+                  return (
+                      int(exact_count > 0),
+                      component_count,
+                      rank[3] if exact_count else 0.0,
+                      exact_count,
+                      len(_fully_matched_query_ids((source,)) & required_query_ids),
+                      len(qualified_ids & required_query_ids),
+                      rank[0],
+                      match_ratio,
+                      len(qualified_ids & (canonical_query_ids or set())),
+                      rank[1:3] + rank[4:],
+                  )
+
+              return sorted(candidates, key=candidate_key, reverse=True)
+          '''
+          text = text[:start] + replacement + text[end:]
+          path.write_text(text)
+          PY
+          python -m compileall -q docmancer/docs/application/docs_context_projection.py docmancer/docs/domain/context_windows.py docmancer/docs/domain/query_terms.py
+          git diff --check
+      - name: Verify regression and existing contracts
+        shell: bash
+        run: |
+          set -euo pipefail
+          pytest -q \
+            tests/docs/test_context_preservation.py \
+            tests/docs/test_context_projection_boundaries.py \
+            tests/docs/test_exact_document_fallback_context.py \
+            tests/test_docs_service_part03.py \
+            tests/docs/test_docs_context_compound_projection.py \
+            tests/docs/test_context7_style_project_chat.py
+          pytest -q tests/docs/test_generic_context_workflows.py -k 'generic_workflow_facts or stale_health'
+      - name: Publish runtime fix and remove transient workflow
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm .github/workflows/pr178-final-runtime-publication.yml
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git diff --cached --check
+          git commit -m "fix: preserve exact witnesses during bounded projection [skip ci]"
+          git push origin HEAD:fix/context-first-project-reads
