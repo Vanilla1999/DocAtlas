@@ -4,14 +4,29 @@ from __future__ import annotations
 import re
 from typing import Any
 
-from docmancer.docs.domain.normative_language import _FORBIDDEN_RE, _REQUIRED_RE
-
 
 _QUERY_STOP_WORDS = frozenset({
     "about", "after", "does", "from", "have", "into", "project", "that",
     "their", "then", "these", "this", "what", "when", "where", "which",
     "with", "работает", "какие", "когда", "проект", "этот",
 })
+
+
+_BASE_WINDOW_LIMITS = (160, 320, 520)
+_SHORT_COMPLETE_SOURCE_MAX_CHARS = 640
+
+
+def _projection_limits(text: str) -> tuple[int, ...]:
+    """Return bounded window sizes, preserving a short source whole when safe.
+
+    The public 800-token payload budget remains authoritative. This extra
+    source-local window avoids chopping a compact table merely because it is a
+    little larger than the ordinary 520-character expansion ceiling.
+    """
+    compact_length = len(text.strip())
+    if _BASE_WINDOW_LIMITS[-1] < compact_length <= _SHORT_COMPLETE_SOURCE_MAX_CHARS:
+        return (*_BASE_WINDOW_LIMITS, compact_length)
+    return _BASE_WINDOW_LIMITS
 
 
 def _query_terms(queries: tuple[str, ...]) -> set[str]:
@@ -103,12 +118,11 @@ def _focused_snippet(
 def _include_complete_table_row(
     text: str, start: int, end: int, *, terms: set[str], limit: int,
 ) -> tuple[int, int]:
-    """Keep row endings intact without dropping an extra visible query concept.
+    """Keep whole table rows, including subject and restriction cells.
 
-    Prefer complete rows. A leading, non-normative cell prefix may be omitted
-    only when a whole-row boundary would lose a distinct requested term. This
-    preserves bounded cross-row witnesses without splicing separate passages.
-    It is a presentation rule, not a proof of arbitrary semantic equivalence.
+    A suffix of a row is not an independent statement even when it contains
+    more query terms. If the whole row cannot fit, omit it rather than guessing
+    whether its missing cells change the meaning. All offsets stay contiguous.
     """
     def row_at(position: int) -> tuple[int, int, bool]:
         left = text.rfind("\n", 0, position) + 1
@@ -116,10 +130,6 @@ def _include_complete_table_row(
         right = len(text) if right < 0 else right
         row = text[left:right].strip()
         return left, right, row.startswith("|") and row.endswith("|")
-
-    def matched_terms(value: str) -> set[str]:
-        return {term for term in terms
-                if re.search(rf"(?<!\w){re.escape(term)}(?!\w)", value, re.I)}
 
     # The last cells can contain restrictions; never expose their partial row.
     if start < end:
@@ -133,11 +143,7 @@ def _include_complete_table_row(
         if end - left <= limit:
             start = left
         else:
-            after_row = min(len(text), right + 1)
-            omitted = text[left:start]
-            loses_concept = matched_terms(text[start:end]) - matched_terms(text[after_row:end])
-            if not loses_concept or _REQUIRED_RE.search(omitted) or _FORBIDDEN_RE.search(omitted):
-                start = after_row
+            start = min(len(text), right + 1)
     return start, max(start, end)
 
 
@@ -202,4 +208,3 @@ def _focused_line_range(
     line_start = source_line_start + text[:start].count("\n")
     line_end = line_start + text[start:end].count("\n")
     return line_start, line_end
-
