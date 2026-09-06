@@ -1,0 +1,10 @@
+{
+  "schema_version": 1,
+  "module_labels": {
+    "tests/docs/test_context_projection_boundaries.py": "behavioral"
+  },
+  "module_node_hashes": {
+    "tests/docs/test_context_projection_boundaries.py": "f423940bc76cd445a405801d5a54f4b8dc54931a316fade209a36b45ada8350d"
+  },
+  "node_overrides": {}
+}
