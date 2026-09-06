@@ -1,4 +1,4 @@
-name: PR178 cache reset candidate trace
+name: PR178 complete span TDD
 
 on:
   push:
@@ -16,9 +16,9 @@ env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
 
 jobs:
-  trace:
+  red:
     runs-on: ubuntu-24.04
-    timeout-minutes: 10
+    timeout-minutes: 8
     steps:
       - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
         with:
@@ -26,69 +26,6 @@ jobs:
       - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1
         with:
           python-version: '3.12'
-      - name: Install
-        run: python -m pip install -e ".[dev]"
-      - name: Trace frozen cache-reset candidate spans
-        shell: bash
-        run: |
-          set -euo pipefail
-          python - <<'PY'
-          from copy import deepcopy
-          from unittest.mock import patch
-          import json
-          from eval.project_context_quality_v2_protocol import load_cases, evaluate_case
-          from scripts.run_project_docs_self_host_gate import LiveCase, run
-          from docmancer.docs.interfaces.mcp import context_tools
-          from docmancer.docs.domain.context_windows import _focused_snippet, _projection_limits
-
-          case = next(c for c in load_cases() if c['id'] == 'v2-paraphrase-cache-reset')
-          captured = []
-          project_context = context_tools.project_docs_context
-          def observe(**kwargs):
-              captured.append(deepcopy(kwargs['retrieval']))
-              return project_context(**kwargs)
-          with patch.object(context_tools, 'project_docs_context', observe):
-              result = run(cases=(LiveCase(
-                  case_id=case['id'], question=case['question'], relevant_paths=(),
-                  lookup_queries=tuple(case['lookup_queries']), scope=case['scope'],
-              ),), negative_cases=())
-          payload = result['results'][0]['payload']
-          verdict = evaluate_case(case, payload)
-          print('VERDICT', json.dumps({
-              'obligations': verdict['obligations'],
-              'semantic_useful': verdict['semantic_useful'],
-              'paths': [s.get('path_or_url') for s in payload.get('sources') or []],
-              'tokens': payload.get('estimated_tokens'),
-          }, ensure_ascii=False, sort_keys=True))
-          retrieval = captured[-1]
-          for i, row in enumerate(retrieval.get('context_pack') or []):
-              if row.get('path') != 'docs/index-cleanup.md':
-                  continue
-              content = str(row.get('content') or '')
-              print('CANDIDATE', json.dumps({
-                  'i': i,
-                  'stable_chunk_id': row.get('stable_chunk_id'),
-                  'parent_logical_id': row.get('parent_logical_id'),
-                  'line_start': row.get('line_start'),
-                  'length': len(content),
-                  'has_preview_only': 'preview-only' in content,
-                  'has_preserve_phrase': 'preserving project' in content,
-                  'query_ids': sorted((row.get('retrieval_query_matches') or {}).keys()),
-                  'qualified': {k: v.get('qualified') for k, v in (row.get('retrieval_query_matches') or {}).items()},
-                  'content': content,
-              }, ensure_ascii=False, sort_keys=True))
-              for limit in _projection_limits(content):
-                  for label, focus in (
-                      ('preview', (case['lookup_queries'][0],)),
-                      ('preserve', (case['lookup_queries'][1],)),
-                      ('both', tuple(case['lookup_queries'])),
-                  ):
-                      snippet, start, end = _focused_snippet(content, focus, limit=limit)
-                      print('WINDOW', json.dumps({
-                          'i': i, 'label': label, 'limit': limit,
-                          'start': start, 'end': end, 'length': len(snippet),
-                          'has_preview_only': 'preview-only' in snippet,
-                          'has_preserve_phrase': 'preserving project' in snippet,
-                          'snippet': snippet,
-                      }, ensure_ascii=False, sort_keys=True))
-          PY
+      - run: python -m pip install -e ".[dev]"
+      - name: Expected RED before runtime fix
+        run: pytest -q tests/docs/test_context_projection_boundaries.py::test_complete_qualified_variant_precedes_mid_sentence_prefix
