@@ -1,4 +1,4 @@
-name: PR178 complete span TDD
+name: PR178 cache reset TDD
 
 on:
   push:
@@ -18,7 +18,7 @@ env:
 jobs:
   red:
     runs-on: ubuntu-24.04
-    timeout-minutes: 8
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
         with:
@@ -28,4 +28,7 @@ jobs:
           python-version: '3.12'
       - run: python -m pip install -e ".[dev]"
       - name: Expected RED before runtime fix
-        run: pytest -q tests/docs/test_context_projection_boundaries.py::test_complete_qualified_variant_precedes_mid_sentence_prefix
+        run: |
+          pytest -q \
+            tests/docs/test_context_projection_boundaries.py::test_complete_qualified_variant_precedes_mid_sentence_prefix \
+            tests/docs/test_context_projection_boundaries.py::test_frozen_cache_reset_keeps_preview_and_preserve_in_visible_context
