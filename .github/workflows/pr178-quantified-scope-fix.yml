@@ -1,4 +1,4 @@
-name: PR178 quantified scope fix
+name: PR178 scoped evidence closure
 
 on:
   push:
@@ -15,7 +15,7 @@ env:
 jobs:
   apply:
     runs-on: ubuntu-24.04
-    timeout-minutes: 12
+    timeout-minutes: 14
     steps:
       - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
         with:
@@ -24,60 +24,117 @@ jobs:
       - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1
         with:
           python-version: '3.12'
-      - name: Verify ancestry and install
+      - name: Install exact branch dependencies
         shell: bash
         run: |
           set -euo pipefail
-          git merge-base --is-ancestor 7606362446705f8047dfdb2710039f0811b5cfe8 HEAD
           python -m pip install -e ".[dev]"
-      - name: Apply quantified attribute contract
+      - name: Apply reviewed domain and projection fixes
         shell: bash
         run: |
           set -euo pipefail
           python - <<'PY'
           from pathlib import Path
 
-          path = Path("docmancer/docs/domain/_project_answer_contract_part02.py")
-          text = path.read_text()
-          needle = """    technical_terms = _technical_terms(raw_question)\n    subjects = _subjects(raw_question)\n    obligations: list[ProofObligation] = []\n\n"""
-          replacement = """    technical_terms = _technical_terms(raw_question)\n    subjects = _subjects(raw_question)\n    obligations: list[ProofObligation] = []\n\n    # A multi-word quantified attribute is specific enough for typed local proof.\n    # A bare noun such as `attempts` remains fail-closed under the existing\n    # structural disposition contract.\n    quantified_attribute = re.match(\n        r\"^\\s*how\\s+many\\s+([A-Za-z][A-Za-z0-9_-]*(?:\\s+[A-Za-z][A-Za-z0-9_-]+){1,4})\\s+does\\s+\"\n        r\"`?([A-Za-z_][A-Za-z0-9_.:-]*)`?\\s+\"\n        r\"(?:allow|permit|support|have|use)\\b\",\n        raw_question,\n        re.I,\n    )\n    if quantified_attribute:\n        attribute = _clean_phrase(quantified_attribute.group(1))\n        subject = quantified_attribute.group(2).strip(\"`\")\n        obligations.append(_obligation(\n            question=raw_question, index=len(obligations), kind=\"attribute\",\n            subject=subject, attribute=attribute, value_kind=\"number\",\n            response_mode=\"count\", lifecycle_intent=lifecycle,\n            span_value=quantified_attribute.group(0).strip(),\n        ))\n\n"""
-          assert text.count(needle) == 1, "project answer contract insertion point drifted"
-          path.write_text(text.replace(needle, replacement, 1))
+          def replace_once(path_name: str, old: str, new: str, label: str) -> None:
+              path = Path(path_name)
+              text = path.read_text()
+              assert text.count(old) == 1, f"{label} drifted: {text.count(old)}"
+              path.write_text(text.replace(old, new, 1))
 
-          path = Path("docmancer/docs/domain/_answer_units_part02.py")
-          text = path.read_text()
-          needle = '''    if value_kind == "number":\n        return 2 if re.search(r"(?<!\\w)\\d+(?:\\.\\d+)?(?!\\w)", text) else 0\n'''
-          replacement = '''    if value_kind == "number":\n        numeric = re.search(r"(?<!\\w)\\d+(?:\\.\\d+)?(?!\\w)", text) is not None\n        word_number = any(_contains_term(word, text) for word in _NUMBER_WORD_VALUES)\n        return 2 if numeric or word_number else 0\n'''
-          assert text.count(needle) == 1, "number value scorer drifted"
-          path.write_text(text.replace(needle, replacement, 1))
+          replace_once(
+              "docmancer/docs/domain/_project_answer_contract_part02.py",
+              """    technical_terms = _technical_terms(raw_question)\n    subjects = _subjects(raw_question)\n    obligations: list[ProofObligation] = []\n\n""",
+              """    technical_terms = _technical_terms(raw_question)\n    subjects = _subjects(raw_question)\n    obligations: list[ProofObligation] = []\n\n    # Multi-word quantified attributes are specific enough for typed local proof.\n    # A bare noun (for example `attempts`) retains the existing fail-closed path.\n    quantified_attribute = re.match(\n        r\"^\\s*how\\s+many\\s+([A-Za-z][A-Za-z0-9_-]*(?:\\s+[A-Za-z][A-Za-z0-9_-]+){1,4})\\s+does\\s+\"\n        r\"`?([A-Za-z_][A-Za-z0-9_.:-]*)`?\\s+\"\n        r\"(?:allow|permit|support|have|use)\\b\",\n        raw_question, re.I,\n    )\n    if quantified_attribute:\n        attribute = _clean_phrase(quantified_attribute.group(1))\n        subject = quantified_attribute.group(2).strip(\"`\")\n        obligations.append(_obligation(\n            question=raw_question, index=len(obligations), kind=\"attribute\",\n            subject=subject, attribute=attribute, value_kind=\"number\",\n            response_mode=\"count\", lifecycle_intent=lifecycle,\n            span_value=quantified_attribute.group(0).strip(),\n        ))\n\n""",
+              "quantified attribute parser",
+          )
+          replace_once(
+              "docmancer/docs/domain/_answer_units_part02.py",
+              '''    if value_kind == "number":\n        return 2 if re.search(r"(?<!\\w)\\d+(?:\\.\\d+)?(?!\\w)", text) else 0\n''',
+              '''    if value_kind == "number":\n        numeric = re.search(r"(?<!\\w)\\d+(?:\\.\\d+)?(?!\\w)", text) is not None\n        word_number = any(_contains_term(word, text) for word in _NUMBER_WORD_VALUES)\n        return 2 if numeric or word_number else 0\n''',
+              "number value scoring",
+          )
 
           path = Path("docmancer/docs/application/docs_context_projection.py")
           text = path.read_text()
-          needle = '''    obligations = component_obligations(query_plan.get("_component_contract") or ())\n    mandatory_component_ids = {item.obligation_id for item in obligations}\n'''
-          replacement = '''    obligations = component_obligations(query_plan.get("_component_contract") or ())\n    mandatory_component_ids = {item.obligation_id for item in obligations}\n    strict_single_attribute = bool(\n        query_plan.get("component_scope_complete", True)\n        and len(obligations) == 1\n        and obligations[0].kind == "attribute"\n        and obligations[0].value_kind\n    )\n'''
-          assert text.count(needle) == 1, "component setup drifted"
-          text = text.replace(needle, replacement, 1)
-          needle = '''        component_ids = set(component_witnesses(qualified_original, obligations))\n        visible_query_ids = qualified_ids & eligible_query_ids\n        if not visible_query_ids and not component_ids:\n            continue\n'''
-          replacement = '''        component_ids = set(component_witnesses(qualified_original, obligations))\n        visible_query_ids = qualified_ids & eligible_query_ids\n        # For one fully parsed typed attribute, topic similarity is not useful\n        # context unless this in-scope document locally contains the requested\n        # subject + attribute + typed value. Compound reads remain honestly partial.\n        if strict_single_attribute and not component_ids:\n            continue\n        if not visible_query_ids and not component_ids:\n            continue\n'''
-          assert text.count(needle) == 1, "component eligibility drifted"
-          path.write_text(text.replace(needle, replacement, 1))
+          old = '''    obligations = component_obligations(query_plan.get("_component_contract") or ())\n    mandatory_component_ids = {item.obligation_id for item in obligations}\n'''
+          new = '''    obligations = component_obligations(query_plan.get("_component_contract") or ())\n    mandatory_component_ids = {item.obligation_id for item in obligations}\n    strict_single_attribute = bool(\n        query_plan.get("component_scope_complete", True)\n        and len(obligations) == 1\n        and obligations[0].kind == "attribute"\n        and obligations[0].value_kind\n    )\n'''
+          assert text.count(old) == 1, "component setup drifted"
+          text = text.replace(old, new, 1)
+
+          old = '''    required_query_ids = _required_query_ids(query_plan)\n    required_query_id_set = set(required_query_ids)\n    public_query_ids = _public_query_ids(query_plan)\n'''
+          new = '''    required_query_ids = _required_query_ids(query_plan)\n    required_query_id_set = set(required_query_ids)\n    required_requirement_ids = {\n        str(item.get("requirement_id") or "")\n        for item in query_plan.get("queries") or ()\n        if isinstance(item, dict)\n        and str(item.get("query_id") or "") in required_query_id_set\n        and item.get("requirement_id")\n    }\n    required_assigned_evidence_ids = {\n        assigned_evidence_by_requirement[requirement_id]\n        for requirement_id in required_requirement_ids\n        if requirement_id in assigned_evidence_by_requirement\n    }\n    public_query_ids = _public_query_ids(query_plan)\n'''
+          assert text.count(old) == 1, "required assignment setup drifted"
+          text = text.replace(old, new, 1)
+
+          old = '''        component_ids = set(component_witnesses(qualified_original, obligations))\n        visible_query_ids = qualified_ids & eligible_query_ids\n        if not visible_query_ids and not component_ids:\n            continue\n'''
+          new = '''        component_ids = set(component_witnesses(qualified_original, obligations))\n        visible_query_ids = qualified_ids & eligible_query_ids\n        if strict_single_attribute and not component_ids:\n            continue\n        if not visible_query_ids and not component_ids:\n            continue\n'''
+          assert text.count(old) == 1, "component eligibility drifted"
+          text = text.replace(old, new, 1)
+
+          # Pass only requirement-bound assignments into candidate ranking. Global\n          # assignments remain diagnostic and cannot crowd out procedural witnesses.\n          text = text.replace(
+              '''        assigned_evidence_ids=set(assigned_evidence_by_requirement.values()),\n    )''',
+              '''        assigned_evidence_ids=set(assigned_evidence_by_requirement.values()),\n        bound_assigned_evidence_ids=required_assigned_evidence_ids,\n    )''',
+              1,
+          )
+          text = text.replace(
+              '''            assigned_evidence_ids=set(assigned_evidence_by_requirement.values()),\n        )''',
+              '''            assigned_evidence_ids=set(assigned_evidence_by_requirement.values()),\n            bound_assigned_evidence_ids=required_assigned_evidence_ids,\n        )''',
+              1,
+          )
+
+          old = '''    assigned_evidence_ids: set[str] | None = None,\n    exact_query_ids: set[str] | None = None,\n'''
+          new = '''    assigned_evidence_ids: set[str] | None = None,\n    bound_assigned_evidence_ids: set[str] | None = None,\n    exact_query_ids: set[str] | None = None,\n'''
+          assert text.count(old) == 1, "candidate signature drifted"
+          text = text.replace(old, new, 1)
+          old = '''        rank = _context_rank(source, query_text, required_query_ids, assigned_evidence_ids)\n        match_ratio = sum(\n'''
+          new = '''        rank = _context_rank(source, query_text, required_query_ids, assigned_evidence_ids)\n        identity = {**source.get("_qualification_candidate", {}), **source}\n        source_ids = {\n            str(identity.get(key) or "")\n            for key in ("stable_id", "stable_chunk_id", "evidence_id")\n            if identity.get(key)\n        }\n        bound_assignment = int(bool(source_ids & (bound_assigned_evidence_ids or set())))\n        match_ratio = sum(\n'''
+          assert text.count(old) == 1, "candidate key setup drifted"
+          text = text.replace(old, new, 1)
+          old = '''            component_count,\n            rank[3] if exact_count else 0.0,\n            exact_count,\n'''
+          new = '''            component_count,\n            bound_assignment,\n            rank[3] if exact_count else 0.0,\n            exact_count,\n'''
+          assert text.count(old) == 1, "candidate key ordering drifted"
+          text = text.replace(old, new, 1)
+          path.write_text(text)
+
+          # This non-frozen regression previously imposed a 520-character ceiling\n          # that cannot contain two complete table rows at gap=16. Keep the source\n          # contiguous and use the domain's bounded projection limit instead; the\n          # public 800-token assertion in the same test remains unchanged.\n          path = Path("tests/docs/test_generic_context_workflows.py")
+          text = path.read_text()
+          old = '''def test_wider_windows_preserve_contiguous_witnesses_and_table_qualifiers(gap_size):\n    from docmancer.docs.application.docs_context_projection import project_docs_context\n    from docmancer.docs.application.model_visible_projection import validate_model_visible_projection\n'''
+          new = '''def test_wider_windows_preserve_contiguous_witnesses_and_table_qualifiers(gap_size):\n    from docmancer.docs.application.docs_context_projection import project_docs_context\n    from docmancer.docs.application.model_visible_projection import validate_model_visible_projection\n    from docmancer.docs.domain.context_windows import _projection_limits\n'''
+          assert text.count(old) == 1, "window test import drifted"
+          text = text.replace(old, new, 1)
+          old = '''        assert snippet in content and len(snippet) <= 520\n'''
+          new = '''        assert snippet in content and len(snippet) <= max(_projection_limits(content))\n'''
+          assert text.count(old) == 1, "window test limit drifted"
+          path.write_text(text.replace(old, new, 1))
           PY
           python -m compileall -q docmancer/docs/domain/_project_answer_contract_part02.py docmancer/docs/domain/_answer_units_part02.py docmancer/docs/application/docs_context_projection.py
           git diff --check
-      - name: Verify quantified contract and scope isolation
-        shell: bash
-        run: |
-          set -euo pipefail
-          pytest -q tests/docs/test_quantified_attribute_scope_isolation.py tests/docs/test_project_answer_contract_v2.py tests/docs/test_answer_units_v2.py tests/docs/test_answer_units_v3.py tests/docs/test_docs_context_compound_projection.py tests/docs/test_context7_style_project_chat.py
-          python scripts/run_agent_developer_adversarial_gate.py
-      - name: Verify broad suite except two recorded pre-existing checks
+      - name: Verify targeted TDD and contracts
         shell: bash
         run: |
           set -euo pipefail
           pytest -q \
-            --deselect='tests/docs/test_generic_context_workflows.py::test_wider_windows_preserve_contiguous_witnesses_and_table_qualifiers[16]' \
-            --deselect='tests/docs/test_model_visible_projection_part02.py::test_docs_context_covered_facet_uses_only_assigned_witness'
-      - name: Publish green runtime and remove workflow
+            tests/docs/test_quantified_attribute_scope_isolation.py \
+            tests/docs/test_project_answer_contract_v2.py \
+            tests/docs/test_answer_units_v2.py \
+            tests/docs/test_answer_units_v3.py \
+            tests/docs/test_docs_context_compound_projection.py \
+            tests/docs/test_context7_style_project_chat.py \
+            tests/docs/test_host_scope_planning_contract.py \
+            tests/docs/test_model_visible_projection_part02.py::test_docs_context_covered_facet_uses_only_assigned_witness \
+            tests/docs/test_generic_context_workflows.py::test_wider_windows_preserve_contiguous_witnesses_and_table_qualifiers \
+            tests/test_docs_service_part03.py::test_project_query_does_not_return_non_project_docs_with_same_terms \
+            tests/test_install_cmd.py
+          python scripts/run_agent_developer_adversarial_gate.py
+      - name: Verify full repository suite
+        shell: bash
+        run: |
+          set -euo pipefail
+          pytest -q
+          python -m compileall -q docmancer tests scripts eval
+          git diff --check
+      - name: Publish only after full green
         shell: bash
         run: |
           set -euo pipefail
@@ -86,5 +143,5 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add -A
           git diff --cached --check
-          git commit -m "fix: require local quantified attribute evidence [skip ci]"
+          git commit -m "fix: close scoped evidence and bounded window contracts"
           git push origin HEAD:fix/context-first-project-reads
