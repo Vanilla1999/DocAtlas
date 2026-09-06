@@ -1,0 +1,78 @@
+name: PR178 published v2 audit
+
+on:
+  push:
+    branches: [fix/context-first-project-reads]
+    paths: [.github/workflows/pr178-published-v2-audit.yml]
+
+permissions:
+  contents: read
+
+env:
+  DOCATLAS_OFFLINE: "1"
+  DOCATLAS_AUTO_VECTORS: "0"
+  HF_HUB_OFFLINE: "1"
+  TRANSFORMERS_OFFLINE: "1"
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
+
+jobs:
+  audit:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+        with:
+          ref: fix/context-first-project-reads
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1
+        with:
+          python-version: '3.12'
+      - run: python -m pip install -e ".[dev]"
+      - name: Run unchanged frozen v2 positive lanes
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json
+          from eval.project_context_quality_v2_protocol import load_cases, evaluate_case, validate_corpus
+          from scripts.run_project_docs_self_host_gate import LiveCase, run
+
+          validate_corpus()
+          output = {}
+          for lane in ("natural", "exposed_paraphrase"):
+              cases = tuple(
+                  case for case in load_cases(lane)
+                  if case.get("case_type", "positive" if case.get("expected_kind") == "docs_context" else "strict_negative") == "positive"
+              )
+              live = tuple(LiveCase(
+                  case_id=case["id"],
+                  question=case["question"],
+                  relevant_paths=(),
+                  lookup_queries=tuple(case["lookup_queries"]),
+                  scope=case["scope"],
+              ) for case in cases)
+              result = run(cases=live, negative_cases=())
+              rows = []
+              for case, observed in zip(cases, result["results"], strict=True):
+                  payload = observed["payload"]
+                  verdict = evaluate_case(case, payload)
+                  rows.append({
+                      "id": case["id"],
+                      "semantic_useful": verdict["semantic_useful"],
+                      "false_full_coverage": verdict["false_full_coverage"],
+                      "obligations": [{"id": row["id"], "met": row["met"]} for row in verdict["obligations"]],
+                      "paths": [source.get("path_or_url") for source in payload.get("sources") or []],
+                      "estimated_tokens": payload.get("estimated_tokens"),
+                      "source_count": len(payload.get("sources") or []),
+                      "covered_query_ids": payload.get("covered_query_ids") or [],
+                      "missing_query_ids": payload.get("missing_query_ids") or [],
+                      "answer_supported": payload.get("answer_supported"),
+                      "edit_ready": payload.get("edit_ready"),
+                  })
+              output[lane] = {
+                  "useful": sum(bool(row["semantic_useful"]) for row in rows),
+                  "total": len(rows),
+                  "false_full": sum(bool(row["false_full_coverage"]) for row in rows),
+                  "rows": rows,
+              }
+          print("V2_AUDIT=" + json.dumps(output, ensure_ascii=False, sort_keys=True))
+          PY
