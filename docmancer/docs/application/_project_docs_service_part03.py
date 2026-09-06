@@ -703,15 +703,19 @@ class _ProjectDocsServicePart03:
                 indexed_source=str(exact_source.get("source") or ""),
                 requirements=requirements,
             )
-            exact_query_id = next((
-                item.query_id for item in (documentation_query_plan.queries if documentation_query_plan else ())
-                if item.origin == "exact_path"
-            ), "query-path-1")
-            exact_chunks = _tag_retrieval_query(
-                exact_chunks, exact_query_id, evidence_path,
-                expected_project_identity=self._repository_identity(root),
-                lifecycle_intent=str(getattr(requirements, "lifecycle_intent", "") or lifecycle_intent(query)),
+            # Stored sections bypass the normal query lanes. Qualify them against
+            # the same plan rather than attributing only the document path: a path
+            # match cannot stand in for the requested topic or exact identifier.
+            exact_plan = documentation_query_plan or build_documentation_query_plan(
+                query, lookup_queries=lookup_queries, explicit_path=evidence_path,
+                requirements=requirements,
             )
+            for lookup in exact_plan.queries:
+                exact_chunks = _tag_retrieval_query(
+                    exact_chunks, lookup.query_id, lookup.text, lookup=lookup,
+                    expected_project_identity=self._repository_identity(root),
+                    lifecycle_intent=str(getattr(requirements, "lifecycle_intent", "") or lifecycle_intent(query)),
+                )
             chunks = [*exact_chunks, *chunks]
             exact_document_fallback_used = bool(exact_chunks)
         safe_chunks = []

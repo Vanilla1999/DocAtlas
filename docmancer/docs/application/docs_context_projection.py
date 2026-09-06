@@ -36,6 +36,7 @@ from docmancer.docs.domain.evidence_qualification import (
     qualify_evidence,
 )
 from docmancer.docs.domain.query_terms import documentation_exact_terms
+from docmancer.docs.domain.documentation_query_plan import technical_anchors
 from docmancer.docs.domain.lifecycle_policy import lifecycle_intent
 from docmancer.docs.domain.answer_units import extract_answer_units, _NEGATION_RE
 from docmancer.docs.domain.normative_language import _FORBIDDEN_RE
@@ -195,9 +196,8 @@ def project_docs_context(
             path_only_ids
             and qualified_ids <= path_only_ids and not component_ids
             and not _has_visible_non_path_exact_term(
-                original,
                 raw_text=str(original.get("content") or original.get("display_text") or ""),
-                original_question=original_question,
+                original_question=original_question, explicit_paths=explicit_paths,
             )
         ):
             continue
@@ -632,20 +632,23 @@ def _required_query_ids(query_plan: dict[str, Any]) -> tuple[str, ...]:
 
 
 def _has_visible_non_path_exact_term(
-    source: dict[str, Any], *, raw_text: str, original_question: str,
+    *, raw_text: str, original_question: str, explicit_paths: set[str],
 ) -> bool:
-    trace = (source.get("retrieval_query_matches") or {}).get("query-original") or {}
-    visible = raw_text.casefold()
-    trace_terms = tuple(str(value).strip() for value in trace.get("exact_terms") or ())
-    question_terms = tuple(
-        token for token in re.findall(r"\b[A-Z][A-Za-z0-9]*[A-Z][A-Za-z0-9]*\b", original_question)
-        if token.casefold() not in {"docatlas", "docmancer"}
+    # Use whole anchors, not CamelCase substrings extracted from a file path.
+    # A heading such as "Reference" is not evidence for a topic merely because
+    # the requested file is named REFERENCE.md. Apply the ordinary body qualifier
+    # here too; headings, links and identifier prefixes cannot satisfy a topic.
+    terms = (
+        term for term in technical_anchors(original_question)
+        if "/" not in term and "\\" not in term
+        and _normalized_path(term) not in explicit_paths
     )
     return any(
-        "/" not in term and "\\" not in term
-        and re.search(rf"(?<!\w){re.escape(term.strip('.,;:!?').casefold())}(?!\w)", visible)
-        for term in (*trace_terms, *question_terms)
-        if term
+        qualify_evidence(
+            {"query_text": term, "query_terms": [term], "exact_terms": [term]},
+            query_id="exact-topic", visible_text=raw_text, evidence_text=raw_text,
+        ).qualified
+        for term in terms
     )
 
 

@@ -37,7 +37,7 @@
       "path": "scripts/installed_mcp_contract_self_test.py"
     },
     {
-      "git_blob_sha1": "3a6bdee265e2bf00b7a16d4fcf6a445e81fb214b",
+      "git_blob_sha1": "42b6a56482b4f2999460002dfe5362585e981bb7",
       "path": "scripts/run_installed_mcp_agent_benchmark.py"
     },
     {
@@ -149,15 +149,15 @@
       "path": "eval/agent_developer_v1/results/contract-v2-ablation.json"
     },
     "p1_4": {
-      "git_blob_sha1": "c98bd35cc9fd71053fc02c16635c26e54468600d",
+      "git_blob_sha1": "2963d14e1c5a4aec95b194a70a781b8b52dfc40c",
       "path": "eval/agent_developer_v1/results/paraphrase-proofability.json"
     },
     "p1_5": {
-      "git_blob_sha1": "f2e24cdb286bc2213558503dd6d7a5fb6fc7499f",
+      "git_blob_sha1": "91aa782749f590586dfe34d5bceea9ec76d5f72c",
       "path": "eval/agent_developer_v1/results/mixed-evidence-provenance.json"
     },
     "p1_6": {
-      "git_blob_sha1": "c73a8c4767c0e21dd78e8f5f641855f39ae2a6cd",
+      "git_blob_sha1": "ca9057dc578b2fd70f13fd7324b8b4a532e25c83",
       "path": "eval/agent_developer_v1/results/evidence-is-data.json"
     }
   }
