@@ -129,3 +129,51 @@ def test_snippet_expansion_cannot_replace_an_already_visible_fact():
         public_query_ids=("query-lookup-1",), max_tokens=800)
     assert retained in expanded[0]["snippet"]
     assert expanded[0]["snippet"] in raw
+
+
+def test_complete_qualified_variant_precedes_mid_sentence_prefix():
+    from docmancer.docs.application.docs_context_projection import _qualified_fragments
+
+    raw = (
+        "# Cleanup\n\n"
+        "`clear-index` removes derived index state while preserving project\n"
+        "sources, configuration, and unrelated files; it never\n"
+        "silently widens the cleanup scope. The command is preview-only\n"
+        "unless `--apply` is supplied.\n"
+    )
+    query = "Does clearing derived storage preserve source files and configuration?"
+    source = {
+        "evidence_id": "ev-cleanup",
+        "path_or_url": "docs/cleanup.md",
+        "snippet": raw,
+        "project_identity": "git:example/project",
+        "authority": "source_of_truth",
+        "scope": "project",
+        "catalog_role": "runbook",
+        "retrieval_query_ids": ["query-lookup-2"],
+        "retrieval_query_matches": {"query-lookup-2": {
+            "query_text": query,
+            "query_terms": ["clearing", "derived", "storage", "preserve", "source", "files", "configuration"],
+            "qualified": True,
+        }},
+        "_qualification_candidate": {
+            "source_class": "project_doc",
+            "project_identity": "git:example/project",
+            "freshness": "current",
+            "index_freshness": "synchronized",
+            "risk_flags": [],
+            "lifecycle_status": "active",
+        },
+        "_expected_project_identity": "git:example/project",
+        "_lifecycle_intent": "current",
+    }
+    variants = _qualified_fragments(
+        source,
+        raw_snippet=raw,
+        query_ids={"query-lookup-2"},
+        query_text={"query-lookup-2": query},
+        source_line_start=1,
+    )
+    assert variants
+    assert "silently widens the cleanup scope." in variants[0]["snippet"]
+    assert variants[0]["snippet"] in raw
