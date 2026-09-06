@@ -42,7 +42,8 @@ allowed paths are active documentation; the superseded ADR remains legacy-only.
 
 ## Verification
 
-Current local verification after the runtime changes:
+Recorded verification for the runtime changes committed in `17df071` (not a
+claim about subsequent edits):
 
 | Check | Result |
 | --- | --- |
@@ -59,16 +60,24 @@ zero contamination, and no source/token budget violations. The primary natural
 lane reached relevant Top-3 sources in 15/15 positives, but only 4 useful results
 and 11 Top-1 fact-bearing results. Original coverage remained 0 because broad RU
 questions are not falsely treated as completely equivalent to English retrieval
-aliases. Consequently the frozen `original_query_coverage_min=12` threshold is
-incompatible with the fail-closed equivalence policy and remains red rather than
-being weakened or gamed.
+aliases. The current planner does not supply audited rewrites for the natural
+questions. This explains the observed zero; it does not prove that sound
+cross-language attribution is impossible or that the 12/15 target is invalid.
+The historical false-green run cannot validate that target either. Keep the
+target unchanged while separating attribution correctness from usefulness.
 
-The frozen corpus also records known expectation defects for a future version:
+The frozen corpus also records expectation limitations requiring review:
 `--no-vectors` is visible in `wiki/Supported-Sources.md` but accepted only from
 `wiki/Commands.md`; `while preserving project sources` does not satisfy the
 literal `preserves project sources`; and safe extra sources fail
-`only_allowed_sources`. These inputs remain unchanged so the measured baseline
-is reproducible.
+`only_allowed_sources`. Safe does not necessarily mean relevant, so an alternative
+path needs a reviewed factual witness, not blanket acceptance. These inputs
+remain unchanged so the measured baseline is reproducible.
+
+The five-positive paraphrase lane cannot meet absolute minima above five. It is
+explicitly report-only in v1, so this is not an impossible primary release gate.
+Its per-case failures remain meaningful even when aggregate thresholds are not
+applicable to its denominator. See `V2_DESIGN.md` for the proposed migration.
 
 The installed-agent run was explicitly cancelled and is not verified.
 

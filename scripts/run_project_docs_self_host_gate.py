@@ -177,6 +177,7 @@ def _query_coverage(payload: dict[str, object]) -> float:
 
 
 def _validate_context_result(payload: dict[str, object]) -> str | None:
+    payload = {key: value for key, value in payload.items() if key != "diagnostics"}
     if len(payload.get("sources") or ()) > 3:
         return "result exceeds the three-source budget"
     if estimate_projection_tokens(payload) > 800:
@@ -294,10 +295,32 @@ def _call_with_snapshot(arguments: dict, service: LibraryDocsService) -> tuple[d
     raw_results: list[object] = []
     qualified_sources: list[dict] = []
     snapshots: list[dict] = []
+    diagnostics: list[dict] = []
+    component_bindings: list[dict] = []
     app = getattr(service, "unified_context", service)
     retrieve = app.get_docs_context
     select = docs_context_projection.context_selection_decision
     validate = context_tools.validate_model_visible_projection
+    coverage = docs_context_projection.component_coverage_decision
+
+    def capture_coverage(contract, assignments, sources, **kwargs):
+        contract, assignments, sources = tuple(contract), tuple(assignments), tuple(sources)
+        decision = coverage(contract, assignments, sources, **kwargs)
+        component_bindings.clear()
+        for source in sources:
+            original = source.get("_qualification_candidate") or {}
+            source_ids = {original.get(key) for key in ("stable_id", "stable_chunk_id", "evidence_id") if original.get(key)}
+            local_assignments = tuple(item for item in assignments if item.get("evidence_id") in source_ids)
+            local = coverage(contract, local_assignments, (source,), **kwargs)
+            for component_id in local.covered_component_ids:
+                component_bindings.append({
+                    "component_id": component_id,
+                    "evidence_id": source.get("evidence_id"),
+                    "path_or_url": source.get("path_or_url"),
+                    "snippet_sha256": hashlib.sha256(str(source.get("snippet") or "").encode()).hexdigest(),
+                    "runtime_evidence_ids": list(local.evidence_ids),
+                })
+        return decision
 
     def capture_result(*args, **kwargs):
         result = retrieve(*args, **kwargs)
@@ -314,12 +337,21 @@ def _call_with_snapshot(arguments: dict, service: LibraryDocsService) -> tuple[d
         snapshots.append(deepcopy(snapshot))
         return validate(payload, snapshot=snapshot, **kwargs)
 
-    with (
+    service._same_call_diagnostics_observer = lambda value: diagnostics.append(deepcopy(value))
+    try:
+        with (
         patch.object(app, "get_docs_context", capture_result),
         patch.object(docs_context_projection, "context_selection_decision", capture_selection),
         patch.object(context_tools, "validate_model_visible_projection", capture_validation),
-    ):
-        payload = call_docs_tool_payload("get_docs_context", arguments, service)
+        patch.object(docs_context_projection, "component_coverage_decision", capture_coverage),
+        ):
+            payload = call_docs_tool_payload("get_docs_context", arguments, service)
+    finally:
+        del service._same_call_diagnostics_observer
+    if isinstance(payload, dict) and diagnostics:
+        diagnostics[-1]["component_evidence_bindings"] = component_bindings
+        diagnostics[-1]["observer_counts"] = {"retrieval_calls": len(raw_results), "validation_calls": len(snapshots)}
+        payload = {**payload, "diagnostics": diagnostics[-1]}
     if len(raw_results) != 1 or len(snapshots) != 1:
         return payload, {}
     snapshot = snapshots[0]
@@ -602,7 +634,7 @@ def run(
                         "original_query_covered": original_query_covered and bool(attribution),
                         "coverage_attribution": sorted(attribution),
                         "packs_contamination": packs_contamination,
-                        "actual_estimated_tokens": estimate_projection_tokens(payload),
+                        "actual_estimated_tokens": estimate_projection_tokens({key: value for key, value in payload.items() if key != "diagnostics"}),
                         "metadata_only_sources": metadata_only_sources,
                     },
                     "ranking": {
@@ -646,8 +678,7 @@ def run(
             for index, negative in enumerate(negative_cases, 1):
                 question = negative.question if isinstance(negative, LiveCase) else negative
                 scope = negative.scope if isinstance(negative, LiveCase) else "project"
-                payload = call_docs_tool_payload(
-                    "get_docs_context",
+                payload, _ = _call_with_snapshot(
                     {"question": question, "project_path": str(REPO_ROOT), "scope": scope},
                     service,
                 )
@@ -668,6 +699,7 @@ def run(
                         "support_status": (payload or {}).get("support_status"),
                         "answer_supported": (payload or {}).get("answer_supported"),
                     },
+                    "payload": dict(payload),
                     "checks": {"correct_abstention": safe_abstention},
                     "passed": safe_abstention,
                 })

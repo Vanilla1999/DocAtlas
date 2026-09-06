@@ -517,6 +517,7 @@ class _SQLiteStorePart03:
             if not active_generation:
                 return []
             if active_generation:
+                rows: list[Any] = []
                 try:
                     rows = list(
                         conn.execute(
@@ -539,10 +540,12 @@ class _SQLiteStorePart03:
                             (cleaned, active_generation, *filter_params, limit),
                         )
                     )
-                    if rows or len(terms) <= 1:
+                    if len(terms) <= 1:
                         return self._mark_lexical_mode(rows, "and")
                 except sqlite3.OperationalError:
                     pass
+                if rows and not (filters or {}).get("project_identity"):
+                    return self._mark_lexical_mode(rows, "and")
                 fallback_query = " OR ".join(terms)
                 if not fallback_query:
                     return []
@@ -567,11 +570,32 @@ class _SQLiteStorePart03:
                         (fallback_query, active_generation, *filter_params, limit),
                     )
                 )
-                return self._mark_lexical_mode(child_fallback, "or_fallback")
+                if not rows:
+                    return self._mark_lexical_mode(child_fallback, "or_fallback")
+
+                combined = self._mark_lexical_mode(rows, "and")
+                seen = {self._lexical_row_identity(row) for row in combined}
+                for row in self._mark_lexical_mode(child_fallback, "or_union"):
+                    identity = self._lexical_row_identity(row)
+                    if identity not in seen:
+                        combined.append(row)
+                        seen.add(identity)
+                return combined
 
     @staticmethod
     def _mark_lexical_mode(rows: list[Any], mode: str) -> list[dict[str, Any]]:
         return [{**dict(row), "_lexical_query_mode": mode} for row in rows]
+
+    @staticmethod
+    def _lexical_row_identity(row: dict[str, Any]) -> str:
+        stable_id = str(row.get("stable_chunk_id") or "")
+        if stable_id:
+            return stable_id
+        return "lex-" + hashlib.sha256(
+            f"{row['source']}\0{row['chunk_index']}\0{row.get('content_hash') or _chunk_hash(str(row['text']))}".encode(
+                "utf-8"
+            )
+        ).hexdigest()[:20]
 
     @staticmethod
     def _metadata_filter_sql(

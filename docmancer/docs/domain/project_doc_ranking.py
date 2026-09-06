@@ -618,6 +618,10 @@ def rerank_project_doc_chunks(
         for value in technical_anchors(question)
         if value
     }
+    exact_path_anchor = any(
+        "/" in value or value.endswith((".md", ".rst", ".txt"))
+        for value in exact_anchors
+    )
     evaluation_intent = project_question_lane(question) == "evaluation"
     planning_intent = project_question_lane(question) == "planning"
     for index, chunk in enumerate(chunks):
@@ -636,7 +640,7 @@ def rerank_project_doc_chunks(
             if query_matches[query_id].get("query_origin") in {
                 "original", "host_lookup", "exact_anchor", "exact_path",
             }
-        } if not exact_anchors else set()
+        } if not exact_path_anchor else set()
         base = chunk_base_score(chunk, index)
         score = base * source_weight_for_intent(path, getattr(chunk, "heading_path", None), intent) * source_requirement_boost(path, question, intent)
         if any(query_id.startswith("query-path-") for query_id in qualified_query_ids):

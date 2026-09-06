@@ -1,7 +1,12 @@
 """ProjectContextService implementation shard 1."""
 from __future__ import annotations
 
+import hashlib
+
 from ._project_context_service_shared import *  # noqa: F401,F403
+from docmancer.docs.application.evidence_selection import requirement_probe_query
+from docmancer.docs.application._project_docs_service_part03 import _tag_retrieval_query
+from docmancer.docs.application.project_docs_service import ProjectDocsService
 
 
 class _ProjectContextServicePart01:
@@ -375,6 +380,196 @@ class _ProjectContextServicePart01:
             trust_contract=trust_contract,
             requirements=canonical_requirements,
         )
+        assigned_ids = {
+            assignment.requirement_id for assignment in selection_decision.assignments
+        }
+        missing_component_queries = [
+            (requirement.requirement_id, probe)
+            for requirement in canonical_requirements
+            if requirement.mandatory
+            and requirement.as_proof_obligation() is not None
+            and requirement.requirement_id not in assigned_ids
+            and (probe := requirement_probe_query(requirement))
+        ][:4]
+        observed_project_identity = (
+            ProjectDocsService._repository_identity(root)
+            if missing_component_queries and project_docs else ""
+        )
+        admissible_paths = {
+            normalize_doc_path(item.get("path")) for item in context_pack
+            if item.get("source_class") == "project_doc"
+            and item.get("project_identity") == observed_project_identity
+            and item.get("freshness") == "current"
+            and item.get("index_freshness") == "synchronized"
+            and not item.get("risk_flags")
+            and not item.get("instruction_risk_flags")
+        }
+        observed_documents = {}
+        for chunk in (project_docs.results if project_docs else ()):
+            path = normalize_doc_path(chunk.path)
+            if (
+                path not in admissible_paths or not chunk.content_hash
+                or not str(chunk.content_hash).strip() or chunk.stale
+                or chunk.metadata.get("stale") or chunk.metadata.get("risk_flags")
+                or chunk.metadata.get("instruction_risk_flags")
+                or chunk.metadata.get("freshness", "current") != "current"
+                or chunk.metadata.get("index_freshness", "synchronized") != "synchronized"
+                or chunk.source_class != "project_file"
+                or chunk.project_identity != observed_project_identity
+                or not lifecycle_allows(
+                    {"lifecycle_status": chunk.lifecycle_status},
+                    canonical_requirements.lifecycle_intent,
+                )
+                or (scope in {"project", "module"} and chunk.doc_scope != scope)
+                or (module_path and chunk.module_path != module_path)
+            ):
+                continue
+            if path not in observed_documents and len(observed_documents) < 2:
+                observed_documents[path] = chunk
+        observed_paths = tuple(str(chunk.path) for chunk in observed_documents.values())
+        gateway = getattr(self.facade, "agent_gateway", None)
+        if (
+            gateway is not None and project_docs is not None
+            and not project_docs.requires_confirmation and not project_docs_blocked
+            and project_docs.status != "stale"
+            and missing_component_queries and observed_paths and observed_project_identity
+        ):
+            rescue = gateway.search_document_components(
+                observed_project_identity, root, observed_paths,
+                missing_component_queries, max_components=4, budget=min(tokens or 480, 480),
+                lifecycle_intent=canonical_requirements.lifecycle_intent,
+            )
+            component_query_text = dict(missing_component_queries)
+            seen_rescue_ids = {
+                (normalize_doc_path(chunk.path), chunk.stable_chunk_id)
+                for chunk in project_docs.results
+            }
+            rescued = []
+            rescue_pack = []
+            for candidate in rescue.candidates[:4]:
+                raw = candidate.chunk
+                candidate_metadata = dict(raw.metadata or {})
+                path = normalize_doc_path(candidate.project_doc_path)
+                observed = observed_documents.get(path)
+                char_span = candidate_metadata.get("char_span")
+                line_span = candidate_metadata.get("line_span")
+                stable_id = candidate_metadata.get("stable_chunk_id")
+                if (
+                    observed is None or candidate.component_id not in component_query_text
+                    or candidate_metadata.get("project_doc_content_hash") != observed.content_hash
+                    or candidate_metadata.get("project_identity") != observed_project_identity
+                    or candidate_metadata.get("project_path") != str(root)
+                    or candidate_metadata.get("project_doc_path") != observed.path
+                    or raw.source != observed.source
+                    or candidate_metadata.get("source_class") != observed.source_class
+                    or candidate_metadata.get("doc_scope", "project") != observed.doc_scope
+                    or (candidate_metadata.get("module_path") or "") != (observed.module_path or "")
+                    or (candidate_metadata.get("module_id") or "") != (observed.module_id or "")
+                    or candidate_metadata.get("project_doc_authority") != observed.authority
+                    or candidate_metadata.get("project_doc_lifecycle_status") != observed.lifecycle_status
+                    or candidate_metadata.get("stale")
+                    or candidate_metadata.get("freshness", "current") != "current"
+                    or candidate_metadata.get("index_freshness", "synchronized") != "synchronized"
+                    or candidate_metadata.get("risk_flags")
+                    or candidate_metadata.get("instruction_risk_flags")
+                    or candidate.stable_identity != stable_id
+                    or not isinstance(stable_id, str) or not stable_id.strip()
+                    or (path, stable_id) in seen_rescue_ids
+                    or not str(candidate_metadata.get("parent_logical_id") or "").strip()
+                    or not isinstance(char_span, (list, tuple)) or len(char_span) != 2
+                    or not all(type(value) is int for value in char_span)
+                    or char_span[0] < 0 or char_span[1] - char_span[0] != len(raw.text)
+                    or not isinstance(line_span, (list, tuple)) or len(line_span) != 2
+                    or not all(type(value) is int for value in line_span)
+                    or line_span[0] < 1 or line_span[1] < line_span[0]
+                ):
+                    continue
+                # A component probe is not an audited rewrite of the parent question.
+                for key in ("retrieval_query_matches", "retrieval_query_ids", "lexical_match"):
+                    candidate_metadata.pop(key, None)
+                tagged = _tag_retrieval_query(
+                    [raw.model_copy(update={"metadata": candidate_metadata})],
+                    candidate.component_id, component_query_text[candidate.component_id],
+                    expected_project_identity=observed_project_identity,
+                    lifecycle_intent=canonical_requirements.lifecycle_intent,
+                )[0]
+                rescued_chunk = ProjectDocsChunk(
+                    title=(tagged.metadata or {}).get("title"),
+                    content=tagged.text, source=tagged.source, url=None,
+                    metadata={**(tagged.metadata or {}), "document_local_rescue": {
+                        **candidate.provenance,
+                        "component_id": candidate.component_id,
+                        "query_text": component_query_text[candidate.component_id],
+                        "stable_chunk_id": stable_id,
+                        "parent_logical_id": candidate_metadata["parent_logical_id"],
+                        "char_span": list(char_span), "line_span": list(line_span),
+                        "project_doc_content_hash": observed.content_hash,
+                        "display_content_hash": hashlib.sha256(tagged.text.encode("utf-8")).hexdigest(),
+                    }},
+                    stable_chunk_id=(tagged.metadata or {}).get("stable_chunk_id"),
+                    parent_logical_id=(tagged.metadata or {}).get("parent_logical_id"),
+                    display_content_hash=hashlib.sha256(tagged.text.encode("utf-8")).hexdigest(),
+                    char_start=((tagged.metadata or {}).get("char_span") or [None, None])[0],
+                    char_end=((tagged.metadata or {}).get("char_span") or [None, None])[1],
+                    line_start=((tagged.metadata or {}).get("line_span") or [None, None])[0],
+                    line_end=((tagged.metadata or {}).get("line_span") or [None, None])[1],
+                    path=candidate.project_doc_path,
+                    heading_path=(tagged.metadata or {}).get("anchor") or (tagged.metadata or {}).get("title"),
+                    content_hash=(tagged.metadata or {}).get("project_doc_content_hash"),
+                    source_class=(tagged.metadata or {}).get("source_class"),
+                    authority=(tagged.metadata or {}).get("project_doc_authority"),
+                    lifecycle_status=(tagged.metadata or {}).get("project_doc_lifecycle_status"),
+                    project_identity=(tagged.metadata or {}).get("project_identity"),
+                    doc_scope=observed.doc_scope, module_path=observed.module_path,
+                    module_id=observed.module_id, module_name=observed.module_name,
+                    module_type=observed.module_type, description=observed.description,
+                    impact_policy=observed.impact_policy,
+                )
+                candidate_pack, candidate_warnings = annotate_context_pack(project_context_pack(
+                    question=question, project_docs=replace(project_docs, results=[rescued_chunk]),
+                    dependency_docs=None,
+                ), repository_root=root)
+                if any(item.get("instruction_risk_flags") or item.get("risk_flags") for item in candidate_pack):
+                    continue
+                candidate_decision = select_evidence(
+                    candidate_pack, question=question,
+                    config=project_docs_selection_config(tokens or 4000),
+                    trust_contract=build_project_context_trust_contract(
+                        project_docs=replace(project_docs, results=[rescued_chunk]),
+                        dependency_docs=None, requested_library=None, mode="project-only",
+                        context_pack=candidate_pack,
+                    ),
+                    requirements=canonical_requirements,
+                )
+                qualified_components = sorted({
+                    assignment.requirement_id
+                    for assignment in candidate_decision.assignments
+                    if assignment.requirement_id in component_query_text
+                })
+                if not qualified_components:
+                    continue
+                rescued_chunk.metadata["document_local_rescue"]["qualified_component_ids"] = qualified_components
+                for item in candidate_pack:
+                    item["document_local_rescue"] = rescued_chunk.metadata["document_local_rescue"]
+                rescue_pack.extend(candidate_pack)
+                warnings.extend(warning["code"] for warning in candidate_warnings)
+                seen_rescue_ids.add((path, stable_id))
+                rescued.append(rescued_chunk)
+            if rescued:
+                context_pack.extend(
+                    item for item in rescue_pack if not evidence_path
+                    or normalize_doc_path(item.get("path")) == normalize_doc_path(evidence_path)
+                )
+                project_docs = replace(project_docs, results=[*project_docs.results, *rescued])
+                trust_contract = build_project_context_trust_contract(
+                    project_docs=project_docs, dependency_docs=dependency_docs,
+                    requested_library=selected_dependency, mode=mode, context_pack=context_pack,
+                )
+                selection_decision = select_evidence(
+                    context_pack, question=question,
+                    config=project_docs_selection_config(tokens or 4000),
+                    trust_contract=trust_contract, requirements=canonical_requirements,
+                )
         support_decision = selection_decision.support_decision
         # An inferred dependency is an optional recall lane, not authority to
         # suppress a complete project-document answer.  Explicit dependency
@@ -407,6 +602,10 @@ class _ProjectContextServicePart01:
             "query_intent": intent.name,
             "retrieval_routing": routing_record,
         }
+        if project_docs is not None and isinstance(project_docs.diagnostics, dict):
+            same_call = project_docs.diagnostics.get("same_call_pipeline")
+            if isinstance(same_call, dict):
+                diagnostics["same_call_pipeline"] = same_call
         if repo_map_items:
             diagnostics["repo_map"] = source_map_diagnostics(repo_map_items)
         if source_evidence_items:

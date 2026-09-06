@@ -7,6 +7,7 @@ import re
 from typing import Literal
 
 from docmancer.docs.domain.question_frame_core import split_question_clauses
+from docmancer.docs.domain.question_component_rewrite import rewrite_component
 from docmancer.docs.domain.project_retrieval_intent import (
     build_project_retrieval_aliases,
     project_retrieval_disposition,
@@ -36,6 +37,7 @@ class DocumentationLookup:
     forbidden_catalog_roles: tuple[str, ...] = ()
     forbidden_evidence_terms: tuple[str, ...] = ()
     parent_exact_terms: tuple[str, ...] = ()
+    component_rewrite_audit: tuple[str, int, int, str] | None = None
 
     def __post_init__(self) -> None:
         if self.relation not in {"direct", "audited_rewrite", "host_lookup", "exact_anchor"}:
@@ -57,6 +59,8 @@ class DocumentationQueryPlan:
     queries: tuple[DocumentationLookup, ...]
     explicit_paths: tuple[str, ...] = ()
     unresolved_parts: tuple[str, ...] = ()
+    component_contract: tuple[dict[str, object], ...] = ()
+    component_scope_complete: bool = True
     schema_version: str = "documentation-query-plan-v2"
 
     def as_payload(self) -> dict[str, object]:
@@ -86,11 +90,19 @@ class DocumentationQueryPlan:
                     "forbidden_catalog_roles": list(query.forbidden_catalog_roles),
                     "forbidden_evidence_terms": list(query.forbidden_evidence_terms),
                     "parent_exact_terms": list(query.parent_exact_terms),
+                    **({"component_rewrite_audit": {
+                        "rule": query.component_rewrite_audit[0],
+                        "query_span_start": query.component_rewrite_audit[1],
+                        "query_span_end": query.component_rewrite_audit[2],
+                        "query_span_text": query.component_rewrite_audit[3],
+                    }} if query.component_rewrite_audit else {}),
                 }
                 for query in self.queries
             ],
             "explicit_paths": list(self.explicit_paths),
             "unresolved_parts": list(self.unresolved_parts),
+            "_component_contract": [dict(item) for item in self.component_contract],
+            "component_scope_complete": self.component_scope_complete,
         }
 
 
@@ -226,7 +238,35 @@ def build_documentation_query_plan(
         *((text, "concept_alias") for text in requirement_concepts),
         *((text, "retrieval_hint") for text in requirement_hints),
     ]
+    proof_obligations = getattr(requirements, "proof_obligations", None)
+    if proof_obligations is None:
+        proof_obligations = tuple(
+            obligation for requirement in getattr(requirements, "requirements", ())
+            if (obligation := requirement.as_proof_obligation()) is not None
+        )
     optional_count = 0
+    for obligation in proof_obligations:
+        start, end = getattr(obligation, "query_span_start", None), getattr(obligation, "query_span_end", None)
+        if start is None or end is None or not 0 <= start < end <= len(question):
+            continue
+        raw = question[start:end]
+        rewritten = rewrite_component(raw)
+        if rewritten is None or raw != getattr(obligation, "query_span_text", None) or optional_count >= 4:
+            continue
+        rule, facet, text = rewritten
+        if any(getattr(obligation, field, None) != getattr(facet, field, None) for field in (
+            "kind", "subject", "relation", "attribute", "item_kind", "response_mode",
+            "target", "context", "expected_value", "cardinality", "value_kind",
+            "subject_kind", "subject_aliases",
+        )):
+            continue
+        optional_count += 1
+        queries.append(DocumentationLookup(
+            f"query-component-{optional_count}", text, "component_rewrite", False,
+            requirement_id=obligation.obligation_id, relation="host_lookup",
+            component_rewrite_audit=(rule, start, end, raw),
+        ))
+        seen.add(text.casefold())
     origin_counts = {"concept_alias": 0, "retrieval_hint": 0}
     for text, origin in optional_queries:
         if (
@@ -247,10 +287,39 @@ def build_documentation_query_plan(
         seen.add(text.casefold())
     return DocumentationQueryPlan(
         original_question=question,
+        component_scope_complete=getattr(requirements, "component_scope_complete", False),
         queries=tuple(queries),
         explicit_paths=(explicit_path,) if explicit_path else (),
         unresolved_parts=tuple(
             str(value) for value in getattr(requirements, "unresolved_parts", ()) if str(value)
+        ),
+        component_contract=tuple(
+            {
+                key: value
+                for key, value in {
+                    "component_id": str(item.obligation_id),
+                    "query_span_start": getattr(item, "query_span_start", None),
+                    "query_span_end": getattr(item, "query_span_end", None),
+                    "query_span_text": getattr(item, "query_span_text", None),
+                    "obligation_kind": getattr(item, "kind", None),
+                    "subject": getattr(item, "subject", None),
+                    "subject_kind": getattr(item, "subject_kind", None),
+                    "subject_aliases": getattr(item, "subject_aliases", ()),
+                    "attribute": getattr(item, "attribute", None),
+                    "relation": getattr(item, "relation", None),
+                    "target": getattr(item, "target", None),
+                    "value_kind": getattr(item, "value_kind", None),
+                    "expected_value": getattr(item, "expected_value", None),
+                    "item_kind": getattr(item, "item_kind", None),
+                    "cardinality": getattr(item, "cardinality", None),
+                    "response_mode": getattr(item, "response_mode", None),
+                    "context": getattr(item, "context", None),
+                    "lifecycle_intent": getattr(item, "lifecycle_intent", None),
+                }.items()
+                if value is not None
+            }
+            for item in proof_obligations
+            if getattr(item, "mandatory", False)
         ),
     )
 

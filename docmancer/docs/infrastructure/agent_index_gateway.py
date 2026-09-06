@@ -3,8 +3,8 @@ from __future__ import annotations
 from dataclasses import dataclass
 import hashlib
 import threading
-from pathlib import Path
-from typing import Any, Callable, Sequence
+from pathlib import Path, PurePosixPath
+from typing import Any, Callable, Mapping, Sequence
 
 from docmancer.core.config import DocmancerConfig
 from docmancer.core.product_identity import ensure_owned_home, resolve_home
@@ -12,6 +12,8 @@ from docmancer.docs.application.evidence_selection import (
     EvidenceRequirementSet,
     requirement_probe_query,
 )
+from docmancer.docs.models import SOURCE_CLASS_PROJECT_FILE
+from docmancer.docs.domain.lifecycle_policy import lifecycle_filters_for_intent
 from docmancer.docs.registry import LibraryRecord
 from docmancer.docs.resolver import normalize_library_name
 from docmancer.retrieval.runtime import dispatcher_for_agent, effective_retrieval_mode
@@ -25,6 +27,27 @@ class LibraryWitnessProbe:
     status: str
     queried_requirement_ids: tuple[str, ...] = ()
     chunks: tuple[Any, ...] = ()
+    failure_count: int = 0
+
+
+@dataclass(frozen=True, slots=True)
+class DocumentComponentCandidate:
+    """A raw document-local hit with retrieval lineage, not a support claim."""
+
+    component_id: str
+    stable_identity: str
+    project_doc_path: str
+    chunk: Any
+    provenance: Mapping[str, Any]
+
+
+@dataclass(frozen=True, slots=True)
+class DocumentComponentSearch:
+    """Bounded infrastructure result for already-observed project documents."""
+
+    status: str
+    queried_component_ids: tuple[str, ...] = ()
+    candidates: tuple[DocumentComponentCandidate, ...] = ()
     failure_count: int = 0
 
 
@@ -204,6 +227,129 @@ class AgentIndexGateway:
             queried_requirement_ids=tuple(requirement_id for requirement_id, _ in queries),
             chunks=tuple(chunks),
             failure_count=failures,
+        )
+
+    def search_document_components(
+        self,
+        project_identity: str,
+        project_path: Path | str,
+        project_doc_paths: Sequence[str],
+        component_queries: Sequence[tuple[str, str]],
+        *,
+        max_components: int = 4,
+        budget: int = 120,
+        lifecycle_intent: str = "current",
+    ) -> DocumentComponentSearch:
+        """Return raw lexical candidates from at most two observed documents.
+
+        The caller owns observation and semantic interpretation. This gateway
+        only supplies production retrieval lineage and never qualifies a hit or
+        claims that it supports a component.
+        """
+
+        identity = str(project_identity or "").strip()
+        root = str(project_path or "").strip()
+        try:
+            component_limit = max(1, min(int(max_components), 4))
+            total_budget = max(1, min(int(budget), 480))
+        except (TypeError, ValueError):
+            return DocumentComponentSearch(status="invalid_request")
+        paths: list[str] = []
+        for value in project_doc_paths or ():
+            raw = str(value or "").strip().replace("\\", "/").removeprefix("./")
+            pure = PurePosixPath(raw)
+            if not raw or not pure.parts or pure.is_absolute() or ".." in pure.parts:
+                return DocumentComponentSearch(status="invalid_request")
+            canonical = pure.as_posix()
+            if canonical not in paths:
+                paths.append(canonical)
+        queries: list[tuple[str, str]] = []
+        for value in component_queries or ():
+            if not isinstance(value, (tuple, list)) or len(value) != 2:
+                return DocumentComponentSearch(status="invalid_request")
+            component_id, query = (str(part or "").strip() for part in value)
+            if not component_id or not query:
+                return DocumentComponentSearch(status="invalid_request")
+            if component_id not in {item[0] for item in queries}:
+                queries.append((component_id, query))
+        if (
+            lifecycle_intent not in {"current", "historical", "either"}
+            or not identity or not root or not paths or len(paths) > 2
+            or not queries or len(queries) > component_limit
+        ):
+            return DocumentComponentSearch(status="invalid_request")
+
+        try:
+            agent = self.agent_instance()
+            store = getattr(agent, "store", None)
+        except Exception:
+            return DocumentComponentSearch(status="unavailable", failure_count=1)
+        if store is None or not callable(getattr(store, "query", None)):
+            return DocumentComponentSearch(status="unavailable")
+        filters = {
+            "project_identity": identity,
+            "project_path": root,
+            "project_doc_path": {"in": paths},
+            "source_class": SOURCE_CLASS_PROJECT_FILE,
+            **lifecycle_filters_for_intent(lifecycle_intent),
+        }
+        per_query_budget = max(1, total_budget // len(queries))
+        candidates: list[DocumentComponentCandidate] = []
+        seen: set[tuple[str, str]] = set()
+        queried_ids: list[str] = []
+        try:
+            dispatcher = self.dispatcher_for(agent, mode="lexical")
+            for component_id, query in queries:
+                queried_ids.append(component_id)
+                result = dispatcher.run(
+                    query,
+                    mode="lexical",
+                    limit=4,
+                    budget=per_query_budget,
+                    expand="none",
+                    filters=filters,
+                )
+                for chunk in getattr(result, "chunks", ()) or ():
+                    metadata = getattr(chunk, "metadata", None) or {}
+                    candidate_path = str(metadata.get("project_doc_path") or "")
+                    stable_identity = str(
+                        metadata.get("stable_chunk_id")
+                        or metadata.get("section_id")
+                        or hashlib.sha256(
+                            f"{getattr(chunk, 'source', '')}\0{getattr(chunk, 'chunk_index', '')}\0{getattr(chunk, 'text', '')}".encode()
+                        ).hexdigest()
+                    )
+                    source_identity = (candidate_path, stable_identity)
+                    if candidate_path not in paths or source_identity in seen:
+                        continue
+                    seen.add(source_identity)
+                    candidates.append(DocumentComponentCandidate(
+                        component_id=component_id,
+                        stable_identity=stable_identity,
+                        project_doc_path=candidate_path,
+                        chunk=chunk,
+                        provenance={
+                            "producer": "retrieval_dispatcher",
+                            "mode": getattr(result, "mode_used", "lexical"),
+                            "query_plan_hash": getattr(result, "query_plan_hash", ""),
+                            "fusion_config_hash": getattr(result, "fusion_config_hash", ""),
+                            "retrieval_trace": dict(metadata.get("retrieval_trace") or {}),
+                        },
+                    ))
+                    if len(candidates) == 4:
+                        break
+                if len(candidates) == 4:
+                    break
+        except Exception:
+            return DocumentComponentSearch(
+                status="unavailable",
+                queried_component_ids=tuple(queried_ids),
+                failure_count=1,
+            )
+        return DocumentComponentSearch(
+            status="ok" if candidates else "no_candidates",
+            queried_component_ids=tuple(queried_ids),
+            candidates=tuple(candidates),
         )
 
     def drop_library_agent(self, record_or_library_id: LibraryRecord | str) -> None:

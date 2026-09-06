@@ -6,8 +6,8 @@
     "tests/docs/test_documentation_query_plan.py": "behavioral"
   },
   "module_node_hashes": {
-    "tests/docs/test_context_ranking_regressions.py": "99952355f943fd326479e8dd4280f447e1013e28b149f82ec91f2862a5155ac8",
-    "tests/docs/test_evidence_qualification.py": "7934e4ca1894ac5d04fcbf317275cd6e061fa9641c62dcc67766314d5bd093b7",
+    "tests/docs/test_context_ranking_regressions.py": "f05ec79354e745e77ee80077c371bb4b70db64274be92acd8892dd669d25e38a",
+    "tests/docs/test_evidence_qualification.py": "d5ad49d23372d870bea1904944cac69adfc3451820af7f7c8d7f3cc2b00f4812",
     "tests/docs/test_docs_context_compound_projection.py": "aa4a8a3bf53f3ae9e0b9cdd20386601a1bde34a08435cbfccd1d8f6d18a9eb5a",
     "tests/docs/test_documentation_query_plan.py": "c1f9a6d51005a532c2a942c311ca240660519db306d5c18dfcbfbaf4b47aa205"
   },

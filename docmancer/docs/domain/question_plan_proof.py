@@ -646,6 +646,26 @@ def workflow_proof(
     source: Mapping[str, object] | None = None,
 ) -> PlannedProof | None:
     relation = str(obligation.relation or "")
+    if relation in {"reading", "testing"}:
+        for clause in _proposition_clauses(text):
+            if not _has(obligation.subject, clause) or re.search(
+                r"\b(?:not|never|cannot|skip|не|нельзя)\b", clause, re.I,
+            ):
+                continue
+            if obligation.target and not _has(obligation.target, clause):
+                continue
+            if relation == "reading":
+                action = re.search(r"\b(?:read|review|start\s+with)\b", clause, re.I)
+                detail = re.search(r"\b[\w./-]+\.(?:md|rst|txt)\b", clause, re.I)
+            else:
+                action = re.search(r"\b(?:run|execute|test|verify|check)\b", clause, re.I)
+                detail = re.search(
+                    r"\b(?:pytest\s+\S+|(?:npm|pnpm|yarn|cargo|go|flutter)\s+test\b"
+                    r"|(?:unit|integration|widget|offline)\s+tests?\b)", clause, re.I,
+                )
+            if action and detail and action.start() <= detail.start():
+                return PlannedProof(True, 4, 3, f"{relation}_workflow", 3)
+        return PlannedProof(False, reason=f"{relation}_workflow_missing")
     if relation not in {"procedure", "configuration", "protocol_run"}:
         return None
     normalized = _norm(text)

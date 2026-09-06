@@ -3,6 +3,10 @@ from __future__ import annotations
 
 from ._project_docs_service_shared import *  # noqa: F401,F403
 from docmancer.core.models import RetrievedChunk
+from ._project_docs_exact_document import (
+    _EXACT_DOCUMENT_FALLBACK_LIMIT,
+    _exact_document_index_chunks,
+)
 from docmancer.docs.application.context_selection import merge_query_matches, select_context_candidates
 from docmancer.docs.domain.documentation_query_plan import (
     DocumentationLookup,
@@ -19,128 +23,56 @@ from docmancer.docs.domain.query_terms import (
 )
 
 
-_EXACT_DOCUMENT_FALLBACK_LIMIT = 12
+_INTERNAL_DIAGNOSTIC_LIMIT = 32
 
 
-def _exact_document_index_chunks(
-    agent: Any,
-    *,
-    root: Path,
-    evidence_path: str,
-    indexed_source: str,
-    requirements: Any | None,
-) -> list[RetrievedChunk]:
-    """Return bounded canonical stored sections for one resolved indexed document.
+def _diagnostic_candidate_id(chunk: Any) -> dict[str, str]:
+    metadata = chunk.metadata or {}
+    return {
+        key: value
+        for key, value in {
+            "stable_chunk_id": str(metadata.get("stable_chunk_id") or ""),
+            "document_id": str(metadata.get("document_id") or chunk.source or ""),
+            "parent_logical_id": str(metadata.get("parent_logical_id") or ""),
+        }.items()
+        if value
+    }
 
-    This fallback is used only after the normal retrieval lane returned no
-    candidates. It reads the active generation's already-indexed display text,
-    never reparses the working-tree file, and therefore cannot create a second
-    source of truth. Canonical evidence selection still decides support.
-    """
 
-    try:
-        rows = list(
-            agent.store.list_sections_for_source(indexed_source, limit=64)
-        )
-    except (AttributeError, OSError, RuntimeError):
-        return []
-
-    normalized_path = normalize_doc_path(evidence_path)
-    probes = tuple(dict.fromkeys(
-        probe
-        for requirement in requirements or ()
-        if getattr(requirement, "mandatory", False)
-        and (probe := requirement_probe_query(requirement))
-    ))[:8]
-    terms = tuple(dict.fromkeys(
-        token.casefold()
-        for probe in probes
-        for token in re.findall(r"[A-Za-zА-Яа-яЁё0-9_.:/=+-]{3,}", probe)
-    ))[:24]
-
-    metadata_cache: dict[str, dict[str, Any]] = {}
-    candidates: list[RetrievedChunk] = []
-    for row in rows:
-        source = str(row.get("source") or "")
-        if not source:
-            continue
-        if source not in metadata_cache:
-            try:
-                metadata_cache[source] = dict(agent.store.source_metadata(source) or {})
-            except (AttributeError, OSError, RuntimeError):
-                metadata_cache[source] = {}
-        source_metadata = metadata_cache[source]
-        row_path = normalize_doc_path(
-            source_metadata.get("project_doc_path") or row.get("source_path")
-        )
-        if row_path != normalized_path:
-            continue
-        indexed_project_path = str(
-            source_metadata.get("project_path") or row.get("project_path") or ""
-        )
-        if indexed_project_path != str(root):
-            continue
-        source_class = str(
-            source_metadata.get("source_class") or row.get("source_class") or ""
-        )
-        if source_class != "project_file":
-            continue
-        display_text = str(row.get("display_text") or row.get("text") or "").strip()
-        if not display_text:
-            continue
-
-        searchable = " ".join((
-            str(row.get("title") or ""),
-            str(row.get("anchor") or ""),
-            str(row.get("text") or ""),
-            display_text,
-        )).casefold()
-        hit_count = sum(term in searchable for term in terms)
-        if terms and hit_count == 0:
-            continue
-        metadata = {**source_metadata}
-        metadata.update({
-            "project_doc_path": row_path,
-            "source_path": row_path,
-            "source_class": source_class,
-            "project_path": indexed_project_path,
-            "project_identity": (
-                source_metadata.get("project_identity")
-                or row.get("project_identity")
-            ),
-            "doc_scope": source_metadata.get("doc_scope") or row.get("doc_scope") or "project",
-            "module_id": source_metadata.get("module_id") or row.get("module_id"),
-            "project_doc_authority": (
-                source_metadata.get("project_doc_authority")
-                or row.get("authority")
-            ),
-            "project_doc_lifecycle_status": (
-                source_metadata.get("project_doc_lifecycle_status")
-                or row.get("lifecycle_status")
-                or "active"
-            ),
-            "title": row.get("title"),
-            "anchor": row.get("anchor"),
-            "line_start": row.get("line_start"),
-            "line_end": row.get("line_end"),
-            "token_estimate": int(row.get("token_estimate") or 0),
-            "stable_chunk_id": row.get("stable_chunk_id"),
-            "parent_logical_id": row.get("parent_logical_id"),
-            "exact_path_match": True,
-        })
-        start, end = row.get("char_start"), row.get("char_end")
-        if isinstance(start, int) and isinstance(end, int) and 0 <= start < end:
-            metadata["char_span"] = [start, end]
-        candidates.append(RetrievedChunk(
-            source=source,
-            chunk_index=int(row.get("chunk_index") or 0),
-            text=display_text,
-            score=float(1000 + hit_count),
-            metadata=metadata,
-        ))
-
-    candidates.sort(key=lambda item: (-item.score, item.chunk_index, item.source))
-    return candidates[:_EXACT_DOCUMENT_FALLBACK_LIMIT]
+def _retrieval_stage_diagnostics(
+    plan: DocumentationQueryPlan, candidates: list[Any],
+) -> dict[str, Any]:
+    rows = []
+    outcomes = []
+    for chunk in candidates[:_INTERNAL_DIAGNOSTIC_LIMIT]:
+        identity = _diagnostic_candidate_id(chunk)
+        if identity:
+            rows.append(identity)
+        matches = (chunk.metadata or {}).get("retrieval_query_matches") or {}
+        for query_id, trace in matches.items():
+            if not isinstance(trace, dict):
+                continue
+            outcomes.append({
+                **identity,
+                "query_id": str(query_id),
+                "outcome": (
+                    "qualified" if trace.get("qualified") is True else
+                    "rejected" if trace.get("qualified") is False else
+                    "unclassified"
+                ),
+                "reason": str(trace.get("reason_code") or trace.get("reason") or "unclassified")[:120],
+            })
+            if len(outcomes) >= _INTERNAL_DIAGNOSTIC_LIMIT:
+                break
+        if len(outcomes) >= _INTERNAL_DIAGNOSTIC_LIMIT:
+            break
+    return {
+        "planned_query_ids": [
+            str(item.query_id) for item in plan.queries[:_INTERNAL_DIAGNOSTIC_LIMIT]
+        ],
+        "retrieved_candidates": rows,
+        "qualification_outcomes": outcomes,
+    }
 
 
 def _tag_retrieval_query(
@@ -237,6 +169,7 @@ class _ProjectDocsServicePart03:
         requirements: Any | None = None,
         lookup_queries: tuple[str, ...] = (),
         documentation_query_plan: DocumentationQueryPlan | None = None,
+        internal_diagnostics: dict[str, Any] | None = None,
     ):
         root = validate_project_path(project_path).path
         answer_lifecycle_intent = str(
@@ -418,14 +351,17 @@ class _ProjectDocsServicePart03:
                     )
         supplemental_chunks_by_query = {}
         for supplemental_query in supplemental_queries:
+            lookups = [item for item in documentation_query_plan.queries if item.text == supplemental_query]
+            public_lookup = requirements is not None and any(item.origin == "host_lookup" for item in lookups)
+            # Public lookups need the same pre-qualification candidate window
+            # as the original question; projection owns the public budget.
             lane = _run(
                 supplemental_query,
-                query_limit=4,
-                query_budget=supplemental_budget,
+                query_limit=effective_limit if public_lookup else 4,
+                query_budget=budget if public_lookup else supplemental_budget,
                 query_expand="none",
                 query_filters=filters,
             )
-            lookups = [item for item in documentation_query_plan.queries if item.text == supplemental_query]
             if not lookups:
                 lane = _tag_retrieval_query(
                     lane, lookup_query_ids.get(supplemental_query), supplemental_query,
@@ -460,6 +396,10 @@ class _ProjectDocsServicePart03:
                 (chunk.metadata or {}).get("retrieval_query_ids")
             )
         )
+        if internal_diagnostics is not None:
+            internal_diagnostics.update(
+                _retrieval_stage_diagnostics(documentation_query_plan, candidates)
+            )
         selected = []
         seen: set[tuple[str, int]] = set()
         token_total = 0
@@ -736,12 +676,14 @@ class _ProjectDocsServicePart03:
                 message="Project docs candidates exist but are not indexed. Run sync_project_docs, then retry get_project_docs.",
             )
 
+        internal_retrieval_diagnostics: dict[str, Any] = {}
         chunks = self.query_project_docs(
             str(root), query, tokens=tokens, limit=limit, expand=expand,
             scope=query_scope, module_path=resolved_module_path, evidence_path=evidence_path,
             requirements=requirements,
             lookup_queries=lookup_queries,
             documentation_query_plan=documentation_query_plan,
+            internal_diagnostics=internal_retrieval_diagnostics,
         )
         current_by_path = {
             normalize_doc_path(item.get("path")): item
@@ -879,6 +821,8 @@ class _ProjectDocsServicePart03:
         confirmation_reason = None
         arguments_patch: dict[str, Any] = {}
         preflight_diagnostics: dict[str, Any] = {}
+        if internal_retrieval_diagnostics:
+            preflight_diagnostics["same_call_pipeline"] = internal_retrieval_diagnostics
         if dropped_placeholder_chunks:
             preflight_diagnostics["dropped_placeholder_project_docs"] = dropped_placeholder_chunks
         if exact_document_fallback_used:
@@ -889,7 +833,11 @@ class _ProjectDocsServicePart03:
             confirmation_reason = preflight_inspect.confirmation_reason
             arguments_patch = preflight_inspect.arguments_patch
             next_actions.extend(preflight_inspect.recommended_next_actions)
-            preflight_diagnostics = preflight_inspect.diagnostics
+            preflight_diagnostics = {
+                **preflight_inspect.diagnostics,
+                **({"same_call_pipeline": internal_retrieval_diagnostics}
+                   if internal_retrieval_diagnostics else {}),
+            }
         elif stale_sources:
             next_action, requires_confirmation, confirmation_reason, arguments_patch, _, _ = self._project_docs_structured_next_action(
                 reason_code="project_docs_stale",

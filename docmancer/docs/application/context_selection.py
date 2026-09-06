@@ -2,8 +2,75 @@
 
 from __future__ import annotations
 
-from dataclasses import dataclass
+import hashlib
+from dataclasses import dataclass, fields
 from typing import Any, Iterable, Mapping
+
+from docmancer.docs.domain.answer_units import _subject_present, best_local_proof, extract_answer_units
+from docmancer.docs.domain.lifecycle_policy import lifecycle_allows
+from docmancer.docs.domain.project_answer_contract import ProofObligation
+
+
+def component_obligations(contract: Iterable[Mapping[str, Any]]) -> tuple[ProofObligation, ...]:
+    """Decode only semantic obligations supplied by the mandatory query contract."""
+    obligations = []
+    names = {field.name for field in fields(ProofObligation)}
+    for item in contract:
+        if not isinstance(item, Mapping) or item.get("mandatory") is False:
+            continue
+        values = {key: value for key, value in item.items() if key in names}
+        values.update(obligation_id=item.get("component_id"), kind=item.get("obligation_kind"))
+        if not values.get("obligation_id") or not values.get("kind") or not values.get("subject"):
+            continue
+        try:
+            obligations.append(ProofObligation(**values))
+        except (TypeError, ValueError):
+            continue
+    return tuple(obligations)
+
+
+def component_witnesses(
+    source: Mapping[str, Any], obligations: Iterable[ProofObligation],
+) -> dict[str, str]:
+    """Recompute local semantic witnesses, without creating query attribution."""
+    if not obligations:
+        return {}
+    original = source.get("_qualification_candidate", source)
+    identity = original.get("project_identity")
+    expected = source.get("_expected_project_identity")
+    if (
+        original.get("source_class") != "project_doc" or not identity
+        or (expected and identity != expected) or original.get("stale")
+        or original.get("freshness", "current") != "current"
+        or original.get("index_freshness", "synchronized") != "synchronized"
+        or original.get("risk_flags") or original.get("instruction_risk_flags")
+        or not lifecycle_allows(original, source.get("_lifecycle_intent", "current"))
+    ):
+        return {}
+    text = next((value for value in (
+        source.get("snippet"), source.get("content"), source.get("display_text"),
+    ) if isinstance(value, str)), "")
+    # Hidden headings, rescue tags, and prior assignments are not semantic proof.
+    visible_source = {
+        "path": source.get("path_or_url", source.get("path")),
+        "heading_path": source.get("section", source.get("heading_path")),
+        "authority": source.get("authority"), "project_identity": identity,
+        "lifecycle_status": original.get("lifecycle_status"),
+    }
+    units = extract_answer_units(text, include_soft_wrapped_prose=True)
+    # Inventory recognition cannot borrow its owner from metadata or a generic
+    # public-tool fallback. A heading alone is never an answer proposition.
+    return {
+        obligation.obligation_id: match[0].text
+        for obligation in obligations
+        if (match := best_local_proof(obligation, tuple(
+            unit for unit in units
+            if unit.proposition and (
+                obligation.kind != "inventory"
+                or _subject_present(obligation, unit.text)
+            )
+        ), source=visible_source)) is not None
+    }
 
 
 @dataclass(frozen=True, slots=True)
@@ -15,6 +82,79 @@ class ContextSelectionDecision:
     @property
     def query_coverage(self) -> str:
         return "full" if self.covered_query_ids and not self.missing_query_ids else "partial"
+
+
+@dataclass(frozen=True, slots=True)
+class ComponentCoverageDecision:
+    mandatory_component_ids: tuple[str, ...]
+    covered_component_ids: tuple[str, ...]
+    missing_component_ids: tuple[str, ...]
+    evidence_ids: tuple[str, ...]
+    unresolved_residue: tuple[str, ...]
+    status: str
+
+    def as_payload(self) -> dict[str, object]:
+        return {
+            "mandatory_component_ids": list(self.mandatory_component_ids),
+            "covered_component_ids": list(self.covered_component_ids),
+            "missing_component_ids": list(self.missing_component_ids),
+            "evidence_ids": list(self.evidence_ids),
+            "unresolved_residue": list(self.unresolved_residue),
+            "status": self.status,
+            "recognized_component_status": (
+                "full" if self.mandatory_component_ids and not self.missing_component_ids
+                else "partial" if self.covered_component_ids else "unavailable"
+            ),
+        }
+
+
+def component_coverage_decision(
+    component_contract: Iterable[Mapping[str, Any]],
+    assignments: Iterable[Mapping[str, Any]],
+    visible_sources: Iterable[Mapping[str, Any]],
+    *, unresolved_residue: Iterable[str] = (), component_scope_complete: bool = True,
+) -> ComponentCoverageDecision:
+    """Account only for canonical witnesses that survived final projection."""
+    component_contract = tuple(component_contract)
+    visible_sources = tuple(visible_sources)
+    obligations = component_obligations(component_contract)
+    semantic_ids = {
+        str(item.get("component_id") or "") for item in component_contract
+        if item.get("obligation_kind")
+    }
+    mandatory = tuple(dict.fromkeys(
+        str(item.get("component_id") or "") for item in component_contract
+        if str(item.get("component_id") or "")
+    ))
+    visible_hashes = {
+        str(value)
+        for source in visible_sources
+        for value in source.get("_visible_assignment_hashes") or ()
+        if str(value)
+    }
+    evidence_by_component: dict[str, str] = {}
+    for assignment in assignments:
+        component_id = str(assignment.get("requirement_id") or "")
+        evidence_id = str(assignment.get("evidence_id") or "")
+        projected_hash = str(assignment.get("projected_content_hash") or "")
+        if component_id in mandatory and component_id not in semantic_ids and projected_hash in visible_hashes:
+            evidence_by_component[component_id] = evidence_id
+    for source in visible_sources:
+        if not source.get("evidence_id"):
+            continue
+        for component_id in component_witnesses(source, obligations):
+            evidence_by_component[component_id] = str(source.get("evidence_id") or "")
+    covered = tuple(value for value in mandatory if value in evidence_by_component)
+    missing = tuple(value for value in mandatory if value not in evidence_by_component)
+    residue = tuple(dict.fromkeys(str(value) for value in unresolved_residue if str(value)))
+    if not component_scope_complete:
+        residue = (*residue, "unverified_original_component_scope")
+    status = "full" if mandatory and not missing and not residue else "partial" if covered else "unavailable"
+    return ComponentCoverageDecision(
+        mandatory, covered, missing,
+        tuple(dict.fromkeys(evidence_by_component[value] for value in covered)),
+        residue, status,
+    )
 
 
 def context_selection_decision(
@@ -39,6 +179,36 @@ def select_context_candidates(priority_groups: Iterable[Iterable[Iterable[Any]]]
             if lane:
                 selected.append(lane.pop(0))
     return selected
+
+
+def visible_assignment_hashes(
+    original: Mapping[str, Any], projected: Mapping[str, Any], assignments: Any,
+) -> tuple[str, ...]:
+    source_ids = {
+        str(original.get(key) or "") for key in ("stable_id", "stable_chunk_id", "evidence_id")
+        if original.get(key)
+    }
+    raw_text = next((value for value in (
+        original.get("code"), original.get("snippet"), original.get("content"),
+        original.get("display_text"),
+    ) if isinstance(value, str) and value), "")
+    visible_text = str(projected.get("snippet") or "")
+    source_start = original.get("char_start")
+    visible: list[str] = []
+    for assignment in assignments:
+        if not isinstance(assignment, Mapping) or str(assignment.get("evidence_id") or "") not in source_ids:
+            continue
+        digest = str(assignment.get("projected_content_hash") or "")
+        start, end = assignment.get("unit_char_start"), assignment.get("unit_char_end")
+        if not isinstance(start, int) or not isinstance(end, int):
+            start, end = assignment.get("char_start"), assignment.get("char_end")
+            if isinstance(source_start, int) and isinstance(start, int) and isinstance(end, int):
+                start, end = start - source_start, end - source_start
+        if digest and isinstance(start, int) and isinstance(end, int) and 0 <= start < end <= len(raw_text):
+            witness = raw_text[start:end]
+            if hashlib.sha256(witness.encode("utf-8")).hexdigest() == digest and witness in visible_text:
+                visible.append(digest)
+    return tuple(dict.fromkeys(visible))
 
 
 def qualified_query_ids(sources: Iterable[Mapping[str, Any]]) -> set[str]:
@@ -154,10 +324,15 @@ def validate_context_selection_payload(
 
 
 __all__ = [
+    "ComponentCoverageDecision",
     "ContextSelectionDecision",
+    "component_coverage_decision",
+    "component_obligations",
+    "component_witnesses",
     "context_selection_decision",
     "merge_query_matches",
     "qualified_query_ids",
     "select_context_candidates",
+    "visible_assignment_hashes",
     "validate_context_selection_payload",
 ]

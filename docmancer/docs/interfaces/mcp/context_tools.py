@@ -7,6 +7,10 @@ from dataclasses import asdict, is_dataclass
 import json
 import math
 from typing import Any
+from ._context_recovery_actions import (
+    _patch_navigation_hints,
+    _replace_network_retries_with_prepare_actions,
+)
 from docmancer.docs.application.action_packet import build_action_packet, validate_action_packet
 from docmancer.docs.application.evidence_selection import AggregateMixedSelectionDecision, SelectionDecision
 from docmancer.docs.interfaces.mcp.recovery_projection import (
@@ -387,7 +391,7 @@ def handle_context_tool(name: str, args: dict[str, Any], service: LibraryDocsSer
         if kind in {"docs_answer", "docs_context"}:
             selection_trace: dict[str, Any] = {}
             if kind == "docs_context":
-                projection, snapshot = project_docs_context(retrieval=raw, max_tokens=min(800, output_budget))
+                projection, snapshot = project_docs_context(retrieval=raw, max_tokens=min(800, output_budget), selection_diagnostics=selection_trace)
                 if not is_operational_recovery_action(recovery):
                     recovery = projection_recovery_action(
                         question, canonical_selection, projection=projection, retrieval=raw, request=args,
@@ -461,6 +465,7 @@ def handle_context_tool(name: str, args: dict[str, Any], service: LibraryDocsSer
             if validation_errors:
                 return _bad_request("invalid_model_visible_projection", "; ".join(validation_errors))
             _record_model_visible_bytes(result, raw, projection)
+            _observe_same_call_diagnostics(service, raw, projection, selection_trace)
             return projection
 
         packet_budget = min(PATCH_CONTEXT_HARD_TOKENS, output_budget)
@@ -614,12 +619,89 @@ def handle_context_tool(name: str, args: dict[str, Any], service: LibraryDocsSer
         if projection_errors:
             return _bad_request("invalid_model_visible_projection", "; ".join(projection_errors))
         _record_model_visible_bytes(result, raw, projection)
+        _observe_same_call_diagnostics(service, raw, projection, selection_trace)
         return projection
 
 
 def _omit_nullable_reason_code(payload: dict[str, Any]) -> None:
     if payload.get("reason_code") is None:
         payload.pop("reason_code", None)
+
+
+def _observe_same_call_diagnostics(
+    service: LibraryDocsService, raw: dict[str, Any], projection: dict[str, Any],
+    selection_trace: dict[str, Any],
+) -> None:
+    """Send bounded internals to an in-process observer, never the MCP payload."""
+    observer = getattr(service, "_same_call_diagnostics_observer", None)
+    if not callable(observer):
+        return
+    ingestion = raw.get("ingestion_diagnostics") or {}
+    project = ingestion.get("project") if isinstance(ingestion, dict) else {}
+    service_trace = (
+        project.get("same_call_pipeline") if isinstance(project, dict) else None
+    ) or {}
+    projection_trace = ((raw.get("retrieval_diagnostics") or {}).get(
+        "docs_context_projection"
+    ) or {})
+    coverage = selection_trace.get("component_coverage")
+    outcomes = list(service_trace.get("qualification_outcomes") or ())[:32]
+    retrieved = list(service_trace.get("retrieved_candidates") or ())[:32]
+    ranked = list(projection_trace.get("ranked_candidate_ids") or ())[:32]
+    variants = list(projection_trace.get("considered_variants") or ())[:32]
+    final_ids = list(projection_trace.get("final_visible_evidence_ids") or ())[:3]
+    diagnostics = {
+        "runtime_component_coverage": coverage if isinstance(coverage, dict) else {"status": "unclassified"},
+        "stage_status": {
+            "planning": "observed" if service_trace.get("planned_query_ids") is not None else "unclassified",
+            "retrieval": "observed" if service_trace.get("retrieved_candidates") is not None else "unclassified",
+            "qualification": "observed" if service_trace.get("qualification_outcomes") is not None else "unclassified",
+            "ranking": "observed" if projection_trace.get("ranked_candidate_ids") is not None else "unclassified",
+            "projection": "observed" if projection_trace.get("considered_variants") is not None else "unclassified",
+            "coverage": "observed" if isinstance(coverage, dict) else "unclassified",
+        },
+    }
+    if service_trace.get("planned_query_ids") is not None:
+        diagnostics["planned_query_ids"] = list(service_trace.get("planned_query_ids") or ())[:32]
+    if service_trace.get("retrieved_candidates") is not None:
+        diagnostics.update({
+            "retrieved_candidates": retrieved,
+            "retrieved_candidate_ids": [
+                str(item.get("stable_chunk_id") or item.get("document_id") or "")
+                for item in retrieved if isinstance(item, dict)
+            ],
+        })
+    if service_trace.get("qualification_outcomes") is not None:
+        diagnostics.update({
+            "qualification_outcomes": outcomes,
+            "qualification_rejections": [
+                str(item.get("stable_chunk_id") or item.get("document_id") or "")
+                for item in outcomes
+                if isinstance(item, dict) and item.get("outcome") == "rejected"
+            ],
+            "pre_projection_qualified_ids": list(dict.fromkeys(
+                str(item.get("stable_chunk_id") or item.get("document_id") or "")
+                for item in outcomes
+                if isinstance(item, dict) and item.get("outcome") == "qualified"
+            ))[:32],
+        })
+    if projection_trace.get("ranked_candidate_ids") is not None:
+        diagnostics["ranked_candidate_ids"] = ranked
+    if projection_trace.get("considered_variants") is not None:
+        diagnostics.update({
+            "selected_candidate_ids": list(dict.fromkeys(
+                str(item.get("candidate_id") or "") for item in variants
+                if isinstance(item, dict) and item.get("candidate_id")
+            ))[:32],
+            "considered_variants": variants,
+            "projection_rejections": list(projection_trace.get("projection_rejections") or ())[:32],
+            "final_visible_evidence_ids": final_ids,
+        })
+    try:
+        observer(diagnostics)
+    except Exception:
+        # Debug observers cannot alter the validated public MCP result.
+        return
 
 
 
@@ -768,34 +850,6 @@ def bounded_patch_retrieval_issues(payload: dict[str, Any]) -> list[str]:
     return issues
 
 
-def _patch_navigation_hints(
-    packet: dict[str, Any], payload: dict[str, Any],
-) -> tuple[list[str], list[str]]:
-    paths: list[str] = []
-    source_rows = packet.get("source_of_truth")
-    candidates = source_rows if isinstance(source_rows, list) and source_rows else payload.get("context_pack")
-    for row in candidates if isinstance(candidates, list) else []:
-        if not isinstance(row, dict):
-            continue
-        path = str(row.get("path") or row.get("source") or "").strip()[:300]
-        if path.casefold().endswith((".md", ".mdx", ".rst", ".txt", ".adoc")) and path not in paths:
-            paths.append(path)
-        if len(paths) == 5:
-            break
-
-    symbols: list[str] = []
-    target_surface = packet.get("target_surface") if isinstance(packet.get("target_surface"), dict) else {}
-    for row in target_surface.get("symbols") if isinstance(target_surface.get("symbols"), list) else []:
-        if not isinstance(row, dict):
-            continue
-        symbol = str(row.get("name") or "").strip()[:160]
-        if symbol and symbol not in symbols:
-            symbols.append(symbol)
-        if len(symbols) == 5:
-            break
-    return paths, symbols
-
-
 def _record_model_visible_bytes(result: Any, raw: dict[str, Any], projection: dict[str, Any]) -> None:
     """Record canonical structured projection UTF-8 bytes, excluding transport text."""
     byte_count = len(canonical_projection_bytes(projection))
@@ -897,79 +951,6 @@ def _handle_maintenance_context(
         "document_content_policy": DOCUMENT_CONTENT_POLICY,
     })
     return bound_docs_impact_report(report)
-
-
-def _replace_network_retries_with_prepare_actions(payload: dict[str, Any], request: dict[str, Any]) -> dict[str, Any]:
-    """Keep the public retrieval tool from suggesting another mutating retry."""
-
-    def rewrite(action: Any) -> Any:
-        if not isinstance(action, dict):
-            return action
-        arguments = dict(action.get("arguments_patch") or {})
-        if action.get("tool") == "prepare_docs":
-            # Network approval is a user decision, not a callable MCP field.
-            # The returned lifecycle action must pass its own public validator.
-            arguments.pop("allow_network", None)
-            if arguments.get("action") == "prefetch_library_docs" and not arguments.get("question"):
-                arguments["question"] = request.get("question")
-            prepared = {**action, "arguments_patch": arguments}
-            if payload.get("requires_confirmation") and "requires_confirmation" not in prepared:
-                prepared["requires_confirmation"] = True
-            if payload.get("confirmation_reason") and not prepared.get("confirmation_reason"):
-                prepared["confirmation_reason"] = payload["confirmation_reason"]
-            return prepared
-        if action.get("tool") != "get_docs_context" or not arguments.get("allow_network"):
-            return action
-        if request.get("mode") == "project":
-            return None
-        library = request.get("library")
-        if library:
-            patch = {
-                "action": "prefetch_library_docs",
-                "library": library,
-                "question": request.get("question"),
-                **{
-                    key: request[key]
-                    for key in ("ecosystem", "version", "source_type", "docs_url")
-                    if request.get(key) is not None
-                },
-            }
-        elif request.get("project_path"):
-            patch = {
-                "action": "prefetch_project_dependency_docs",
-                "project_path": request["project_path"],
-            }
-        else:
-            return action
-        return {
-            **action,
-            "type": "prepare_docs",
-            "tool": "prepare_docs",
-            "arguments_patch": patch,
-            **({"requires_confirmation": True} if payload.get("requires_confirmation") else {}),
-            **({"confirmation_reason": payload["confirmation_reason"]} if payload.get("confirmation_reason") else {}),
-        }
-
-    updated = dict(payload)
-    actions = []
-    for action in updated.get("next_actions") or []:
-        candidate = rewrite(action)
-        if candidate is not None and candidate not in actions:
-            actions.append(candidate)
-    primary = rewrite(updated.get("next_action"))
-    if primary is not None and primary not in actions:
-        actions.insert(0, primary)
-    updated["next_actions"] = actions
-    updated["next_action"] = primary or (actions[0] if actions else None)
-    if isinstance(updated.get("lanes"), dict):
-        updated["lanes"] = {
-            name: {**lane, "next_action": rewrite(lane.get("next_action"))}
-            if isinstance(lane, dict) else lane
-            for name, lane in updated["lanes"].items()
-        }
-    if isinstance(updated.get("arguments_patch"), dict) and updated["arguments_patch"].get("allow_network"):
-        updated["arguments_patch"] = dict(updated["next_action"].get("arguments_patch") or {}) if updated.get("next_action") else {}
-    return updated
 
 
 def _trust_sources(contract: Any, lane: str) -> list[dict[str, Any]]:

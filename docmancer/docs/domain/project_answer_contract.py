@@ -281,6 +281,7 @@ def can_authorize_docs_answer(contract: ProjectAnswerContract) -> bool:
 
     return (
         not contract.unresolved_parts
+        and contract.component_scope_complete
         and obligations_can_authorize_docs_answer(contract.proof_obligations)
     )
 

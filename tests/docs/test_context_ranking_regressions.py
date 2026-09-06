@@ -218,6 +218,25 @@ def test_exact_document_keeps_existing_source_cap_selection(competing_lookup_chu
     assert [chunk.content for chunk in ranked] == [chunk.content for chunk in competing_lookup_chunks[:2]]
 
 
+def test_exact_anchor_preserves_independent_public_lookup_diversity():
+    anchor = _lookup_chunk(
+        "get_docs_context accepts a documentation question.", 1.0,
+        "query-anchor-1", "get_docs_context", origin="exact_anchor",
+    )
+    lookups = [
+        _lookup_chunk(f"Independent workflow facet {index} has visible evidence.", 0.9 - index / 10,
+                      f"query-lookup-{index}", f"workflow facet {index} visible evidence")
+        for index in range(1, 4)
+    ]
+
+    ranked = _rank([anchor, *lookups], "Trace get_docs_context workflow", limit=4)
+
+    assert ranked[0].content == anchor.content
+    assert {next(iter(chunk.metadata["retrieval_query_matches"])) for chunk in ranked[1:]} == {
+        "query-lookup-1", "query-lookup-2", "query-lookup-3",
+    }
+
+
 def test_role_and_description_cannot_supply_public_lookup_evidence(competing_lookup_chunks):
     unrelated = _lookup_chunk(
         "The project supports a blue logo.", 100.0,

@@ -546,7 +546,7 @@ def local_proof_for_obligation(
         closed_inventory = not _OPEN_INVENTORY_RE.search(text)
         names_valid = closed_inventory and len(names) >= 2 and (
             obligation.cardinality is None or len(names) == obligation.cardinality
-        )
+        ) and (explicit_count is None or len(names) == explicit_count)
         derived_count = explicit_count if explicit_count is not None else (len(names) if names_valid else None)
         count_valid = derived_count is not None and (
             obligation.cardinality is None or derived_count == obligation.cardinality

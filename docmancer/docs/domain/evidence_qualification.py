@@ -230,7 +230,13 @@ def _coverage_kind(probe: Mapping[str, Any]) -> CoverageKind:
 
 def _visible_term_present(term: str, text: str, *, exact: bool) -> bool:
     suffix = "" if exact else r"(?:s|es|ed|ing)?"
-    return re.search(rf"(?<!\w){re.escape(term)}{suffix}(?!\w)", text) is not None
+    if re.search(rf"(?<!\w){re.escape(term)}{suffix}(?!\w)", text) is not None:
+        return True
+    if not exact and re.fullmatch(r"[a-z]+", term):
+        base = re.sub(r"(?:ing|ed|es|s)$", "", term)
+        if len(base) >= 4:
+            return re.search(rf"(?<!\w){re.escape(base)}{suffix}(?!\w)", text) is not None
+    return False
 
 
 def _rejected(trace: dict[str, Any], reason: str) -> EvidenceQualification:

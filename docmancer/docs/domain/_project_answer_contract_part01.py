@@ -141,6 +141,7 @@ class ProjectAnswerContract:
     input_limits: tuple[str, ...] = ()
     parse_trace: tuple[str, ...] = ()
     unresolved_parts: tuple[str, ...] = ()
+    component_scope_complete: bool = True
 
     def __post_init__(self) -> None:
         hints = tuple(dict.fromkeys(_bounded(value) for value in self.retrieval_hints if _bounded(value)))
@@ -179,6 +180,8 @@ class ProjectAnswerContract:
             payload["parse_trace"] = list(self.parse_trace)
         if self.unresolved_parts:
             payload["unresolved_parts"] = list(self.unresolved_parts)
+        if not self.component_scope_complete:
+            payload["component_scope_complete"] = False
         return payload
 
     @property
@@ -508,6 +511,7 @@ def _contract_from_question_plan(
         input_limits=input_limits,
         parse_trace=plan.parse_trace,
         unresolved_parts=plan.unresolved_parts,
+        component_scope_complete=plan.component_scope_complete,
     )
 
 __all__=['_bounded', '_normal', '_span', '_technical_terms', '_technical_term_for_value', '_subject_fields', '_clean_phrase', '_effect_relation', 'ProofObligation', 'ProjectAnswerContract', 'lifecycle_intent_for_question', '_subjects', '_best_subject', '_cardinality', '_obligation', '_retrieval_hints', '_concept_queries', '_explicit_subjects', '_append_relation_obligation', '_inventory_subject', '_command_operation', '_location_subject', '_compound_workflow_subjects', '_contract_from_question_plan']

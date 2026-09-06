@@ -14,6 +14,95 @@ from docmancer.docs.domain.question_plan_core import (
 
 _PUBLIC_TOOLS = ("get_docs_context", "prepare_docs", "docs_status")
 
+_GENERIC_COMPONENT_SUBJECTS = frozenset({
+    "project", "repository", "system", "product", "server", "subsystem",
+    "somewhere", "anywhere", "something",
+    "проект", "репозиторий", "система", "продукт", "сервер", "подсистема",
+    "где-то", "что-то",
+})
+
+
+def _component_subject(value: str) -> str:
+    subject = _clean(value).strip("`\"'")
+    return "" if subject.casefold() in _GENERIC_COMPONENT_SUBJECTS else subject
+
+
+def semantic_components(q: str) -> QuestionPlan | None:
+    """Compile the internal grammar used by closed EN/RU surface adapters."""
+    cleaned = _clean(q)
+
+    def unresolved() -> QuestionPlan:
+        return QuestionPlan(
+            clauses=(q,), unresolved_parts=("unresolved_query_subject",),
+            parse_trace=("fail_closed:component_subject",),
+        )
+
+    match = re.fullmatch(r"component product overview for (.+)", cleaned, re.I)
+    if match is not None:
+        if not (subject := _component_subject(match.group(1))):
+            return unresolved()
+        return QuestionPlan(facets=(
+            PlannedFacet("definition", subject, span_text=q),
+            PlannedFacet("purpose", subject, relation="purpose", response_mode="purpose", span_text=q),
+            PlannedFacet("relation", subject, relation="problem_solved", span_text=q),
+        ), clauses=(q,), parse_trace=("component:product_overview",))
+    match = re.fullmatch(r"component architecture and module boundaries for (.+)", cleaned, re.I)
+    if match is not None:
+        if not (subject := _component_subject(match.group(1))):
+            return unresolved()
+        return QuestionPlan(facets=(
+            PlannedFacet("relation", subject, relation="architecture", span_text=q),
+            PlannedFacet("relation", subject, relation="module_boundaries", span_text=q),
+        ), clauses=(q,), parse_trace=("component:architecture_boundaries",))
+    match = re.fullmatch(r"component operation flow (.+?) from (.+?) to (.+)", cleaned, re.I)
+    if match is not None:
+        operation, source, target = (_component_subject(match.group(i)) for i in range(1, 4))
+        if operation and source and target:
+            return QuestionPlan(facets=(PlannedFacet(
+                "workflow", operation, relation="sequence", target=target,
+                context=f"from {source} to {target}", response_mode="workflow", span_text=q,
+            ),), clauses=(q,), parse_trace=("component:operation_flow",))
+        return unresolved()
+    match = re.fullmatch(r"component public tool inventory for (.+)", cleaned, re.I)
+    if match is not None:
+        if _unsafe_free_text(match.group(1)) or not (subject := _component_subject(match.group(1))):
+            return unresolved()
+        # This open surface recognizes names, not an exhaustive per-member
+        # answer contract. Visible inventory proof must not close that scope.
+        return QuestionPlan(facets=(PlannedFacet(
+            "inventory", subject, attribute="public_tools", item_kind="public_tool",
+            value_kind="identifier_list", response_mode="names", span_text=q,
+        ),), clauses=(q,), parse_trace=("component:public_tool_inventory",),
+            component_scope_complete=False)
+    match = re.fullmatch(r"component selection behavior for (.+?) selecting (.+)", cleaned, re.I)
+    if match is not None:
+        subject, target = (_component_subject(match.group(i)) for i in range(1, 3))
+        if subject and target:
+            return QuestionPlan(facets=(PlannedFacet(
+                "behavior", subject, relation="selection_policy", target=target, span_text=q,
+            ),), clauses=(q,), parse_trace=("component:selection_behavior",))
+        return unresolved()
+    match = re.fullmatch(
+        r"component (install verify|read test|initialize ingest query|action consequences|configuration invalid behavior) for (.+)",
+        cleaned, re.I,
+    )
+    if match is None:
+        return None
+    if not (subject := _component_subject(match.group(2))):
+        return unresolved()
+    specifications = {
+        "install verify": (("installation", "workflow"), ("verification", "workflow")),
+        "read test": (("reading", "workflow"), ("testing", "workflow")),
+        "initialize ingest query": (("initialization", "workflow"), ("ingestion", "workflow"), ("query", "workflow")),
+        "action consequences": (("procedure", "workflow"), ("consequences", "relation")),
+        "configuration invalid behavior": (("configuration", "workflow"), ("invalid_behavior", "relation")),
+    }
+    family = match.group(1).casefold()
+    return QuestionPlan(facets=tuple(
+        PlannedFacet(kind, subject, relation=relation, response_mode="workflow" if kind == "workflow" else "value", span_text=q)
+        for relation, kind in specifications[family]
+    ), clauses=(q,), parse_trace=(f"component:{family.replace(' ', '_')}",))
+
 
 def _governance_facet_plan(value: str, *, scope: str) -> PlannedFacet:
     """Classify only explicit governance value cues into typed proof families.
@@ -191,4 +280,5 @@ def provider_request_timeout(q: str) -> QuestionPlan | None:
 __all__ = [
     "governance_facets", "mcp_request_handling", "provider_request_timeout",
     "public_tool_usage", "public_tools_with_purposes", "python_version_support",
+    "semantic_components",
 ]

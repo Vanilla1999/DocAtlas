@@ -1,5 +1,10 @@
 from __future__ import annotations
 
+from tests.docs._question_plan_clause_coverage import (
+    test_existing_compounds_and_noun_coordination_survive_stricter_clause_coverage,
+    test_full_question_coverage_rejects_unknown_tails_across_boundary_forms,
+)
+
 from docmancer.docs.application.evidence_selection import build_requirements
 from docmancer.docs.domain.answer_units import AnswerUnit, local_proof_for_obligation
 from docmancer.docs.domain.documentation_query_plan import build_documentation_query_plan
@@ -484,6 +489,57 @@ def test_generic_free_form_terms_are_retrieval_hints_not_answer_proof():
     assert "fallback:generic_project_terms" in contract.parse_trace
 
 
+def test_bounded_component_families_support_reordered_and_different_subjects():
+    cases = {
+        "What problem does NebulaDocs solve, what is it, and what is its purpose?":
+            [("definition", "NebulaDocs", None), ("purpose", "NebulaDocs", "purpose"), ("relation", "NebulaDocs", "problem_solved")],
+        "How is PaymentRuntime architected and where are its module boundaries?":
+            [("relation", "PaymentRuntime", "architecture"), ("relation", "PaymentRuntime", "module_boundaries")],
+        "How does submitOrder flow from ApiGateway to OrderStore?":
+            [("workflow", "submitOrder", "sequence")],
+        "Which public tools does Search MCP expose?": [("inventory", "Search MCP", None)],
+        "Как EvidenceQualifier выбирает кандидатов доказательств?":
+            [("behavior", "EvidenceQualifier", "selection_policy")],
+        "How do I install NebulaCLI and then verify it?":
+            [("workflow", "NebulaCLI", "installation"), ("workflow", "NebulaCLI", "verification")],
+        "What should I read in OrionRepo and what should I test?":
+            [("workflow", "OrionRepo", "reading"), ("workflow", "OrionRepo", "testing")],
+        "How do I initialize LocalCorpus, ingest files into it, and query it?":
+            [("workflow", "LocalCorpus", "initialization"), ("workflow", "LocalCorpus", "ingestion"), ("workflow", "LocalCorpus", "query")],
+        "How do I rotateIndex and what are the consequences?":
+            [("workflow", "rotateIndex", "procedure"), ("relation", "rotateIndex", "consequences")],
+        "How do I configure docs catalog and what happens if it is invalid?":
+            [("workflow", "docs catalog", "configuration"), ("relation", "docs catalog", "invalid_behavior")],
+    }
+    for question, expected in cases.items():
+        contract, rows = _rows(question)
+        assert [(row.kind, row.subject, row.relation) for row in rows] == expected
+        assert not contract.unresolved_parts
+        assert all(row.query_span_start == 0 and row.query_span_end == len(question) for row in rows)
+
+
+def test_component_families_fail_closed_for_unknown_generic_and_negated_surfaces():
+    questions = (
+        "What is NebulaDocs, what is it for, and what problem does it solve, and predict rain?",
+        "How is the system architected and where are its module boundaries?",
+        "How does submitOrder flow from somewhere to OrderStore?",
+        "Which public tools does the server expose?",
+        "How does the subsystem choose candidates?",
+        "How do I not install NebulaCLI and verify it?",
+        "How do I configure docs catalog and what happens if it is not invalid?",
+        "Как система выбирает доказательства?",
+    )
+    component_relations = {
+        "problem_solved", "architecture", "module_boundaries", "sequence",
+        "selection_policy", "installation", "reading", "initialization",
+        "ingestion", "query", "consequences", "invalid_behavior",
+    }
+    for question in questions:
+        contract = build_project_answer_contract(question)
+        assert contract.unresolved_parts
+        assert not any(row.relation in component_relations for row in contract.proof_obligations)
+
+
 def test_conditional_behavior_requires_requested_condition_and_blocking_effect():
     _contract, rows = _rows("What does clear-index do when a live process holds the index?")
     obligation = rows[0]
@@ -839,58 +895,6 @@ def test_ambiguous_inventory_action_and_generic_subjects_fail_closed():
     assert len(resolved.proof_obligations) == 1
     assert resolved.proof_obligations[0].expected_value == "sync_project_docs"
 
-
-
-def test_full_question_coverage_rejects_unknown_tails_across_boundary_forms():
-    questions = (
-        "Which command syncs project docs after file changes; what is the Bitcoin price?",
-        "Which command syncs project docs after file changes. What is the Bitcoin price?",
-        "Which command syncs project docs after file changes? What is the Bitcoin price?",
-        "Which command syncs project docs after file changes plus tell me the Bitcoin price?",
-        "Which command syncs project docs after file changes then calculate 2+2.",
-        "Which command syncs project docs after file changes as well as tell me the Bitcoin price?",
-        "Which command syncs project docs after file changes along with tell me the Bitcoin price?",
-        "How do I sync project docs after changing a file and rebuild vectors?",
-    )
-    for question in questions:
-        contract = build_project_answer_contract(question)
-        assert contract.schema_version == PROJECT_ANSWER_CONTRACT_SCHEMA_V4
-        assert contract.unresolved_parts, question
-        assert any(
-            row.startswith("unresolved_question_clause:")
-            for row in contract.unresolved_parts
-        ), (question, contract.unresolved_parts)
-        requirements = build_requirements(question, profile="project_docs_answer")
-        assert any(row.kind == "unsupported_query" for row in requirements), question
-
-
-
-def test_existing_compounds_and_noun_coordination_survive_stricter_clause_coverage():
-    public_tools = build_project_answer_contract(
-        "What are the three public Docs MCP tools and when do I use each one?"
-    )
-    assert not public_tools.unresolved_parts
-    assert len(public_tools.proof_obligations) == 3
-
-    markers = build_project_answer_contract(
-        "What test markers are available and how do I run the offline suite?"
-    )
-    assert not markers.unresolved_parts
-    assert len(markers.proof_obligations) == 2
-
-    chunking = build_project_answer_contract(
-        "How does indexing split documents into sections and chunks?"
-    )
-    assert not chunking.unresolved_parts
-    assert [(row.subject, row.relation) for row in chunking.proof_obligations] == [
-        ("indexing", "chunking")
-    ]
-
-    storage = build_project_answer_contract(
-        "What is the storage mutation coordination contract for cleanup and refresh?"
-    )
-    assert not storage.unresolved_parts
-    assert len(storage.proof_obligations) == 1
 
 
 def test_semantic_cycle_frames_compile_into_typed_obligations():

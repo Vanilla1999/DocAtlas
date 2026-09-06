@@ -189,6 +189,7 @@ class EvidenceRequirementSet(Sequence[EvidenceRequirement]):
     lifecycle_intent: LifecycleIntent = "current"
     parse_trace: tuple[str, ...] = ()
     unresolved_parts: tuple[str, ...] = ()
+    component_scope_complete: bool = True
 
     def __post_init__(self) -> None:
         requirements_by_id: dict[str, EvidenceRequirement] = {}
@@ -288,6 +289,8 @@ class EvidenceRequirementSet(Sequence[EvidenceRequirement]):
             payload["parse_trace"] = list(self.parse_trace)
         if self.unresolved_parts:
             payload["unresolved_parts"] = list(self.unresolved_parts)
+        if not self.component_scope_complete:
+            payload["component_scope_complete"] = False
         return payload
 
     @property

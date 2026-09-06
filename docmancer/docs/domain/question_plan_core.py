@@ -13,6 +13,55 @@ from docmancer.docs.domain.question_frame_core import (
 )
 from docmancer.docs.domain.technical_terms import TechnicalTermKind, coerce_technical_term
 
+def _safe_coverage_gap(value: str) -> bool:
+    residue = re.sub(
+        r"\b(?:and\s+also|while\s+also|as\s+well\s+as|along\s+with|"
+        r"and|but|plus|then|also|и\s+также|а\s+также|и|но|плюс|затем)\b",
+        "",
+        value,
+        flags=re.I,
+    )
+    residue = re.sub(r"[\s,;:.!?/\u2013\u2014]+", "", residue)
+    return not residue
+
+
+def _finalize_full_span_coverage(question: str, plan: QuestionPlan) -> QuestionPlan:
+    """Fail closed unless every non-separator source span was consumed."""
+
+    if not plan.facets or plan.unresolved_parts:
+        return plan
+    spans = sorted(set(plan.consumed_spans))
+    if not spans:
+        return replace(
+            plan,
+            unresolved_parts=("unresolved_question_clause:missing_consumed_span",),
+            parse_trace=(*plan.parse_trace, "fail_closed:missing_consumed_span"),
+        )
+
+    cursor = 0
+    gaps: list[str] = []
+    for start, end in spans:
+        if start < cursor or start < 0 or end <= start or end > len(question):
+            gaps.append("invalid_consumed_span")
+            continue
+        gap = question[cursor:start]
+        if gap and not _safe_coverage_gap(gap):
+            gaps.append(_clean(gap))
+        cursor = end
+    tail = question[cursor:]
+    if tail and not _safe_coverage_gap(tail):
+        gaps.append(_clean(tail))
+    if not gaps:
+        return plan
+    return replace(
+        plan,
+        unresolved_parts=tuple(dict.fromkeys(
+            f"unresolved_question_clause:{gap}" for gap in gaps if gap
+        )),
+        parse_trace=(*plan.parse_trace, "fail_closed:unconsumed_span"),
+    )
+
+
 PlanKind = Literal[
     "definition", "purpose", "behavior", "usage", "workflow", "inventory",
     "command", "relation", "comparison", "location", "attribute",
@@ -55,6 +104,8 @@ class QuestionPlan:
     unresolved_parts: tuple[str, ...] = ()
     parse_trace: tuple[str, ...] = ()
     consumed_spans: tuple[tuple[int, int], ...] = ()
+    # Recognizing a topical component need not exhaust the original answer scope.
+    component_scope_complete: bool = True
 
     def __post_init__(self) -> None:
         for start, end in self.consumed_spans:

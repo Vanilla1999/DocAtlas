@@ -1,0 +1,33 @@
+{
+  "schema_version": "project-context-quality-v2-lock-4",
+  "evaluator_version": "2.4.0",
+  "mode": "report_only_baseline",
+  "thresholds": null,
+  "files": {
+    "cases": "80a663d5e560fb039f6f1a30b2b1d634da7684af8b8c7d0976c7b60813370963",
+    "migration_crosswalk": "9b2b15f78ee9ba66c8f98dfb5d2f36418d568ac84351b8e49b61ec7f2be83e1a",
+    "diagnostic": "6dd895c8e635bc959291a353569b5326b07dfa9042d50a7674574ce50cea7f5d"
+  },
+  "inventory": {
+    "case_count": 25,
+    "positive_count": 20,
+    "negative_count": 3,
+    "unsupported_answer_control_count": 2,
+    "lanes": {"natural": 19, "exposed_paraphrases": 6},
+    "case_ids": ["v2-natural-install-verify","v2-natural-purpose-start","v2-natural-first-session","v2-natural-contributor","v2-natural-architecture","v2-natural-request-flow","v2-natural-sync-renames","v2-natural-catalog","v2-natural-cleanup","v2-natural-stale-health","v2-natural-storage","v2-natural-chunking","v2-natural-evidence-selection","v2-natural-offline","v2-natural-docs-server","v2-natural-negative-retention","v2-natural-negative-telepathy","v2-natural-negative-retention-policy","v2-natural-negative-encryption","v2-paraphrase-local-trial","v2-paraphrase-review-ready","v2-paraphrase-cache-reset","v2-paraphrase-search-trust","v2-paraphrase-reconcile-files","v2-paraphrase-negative-martian"]
+  },
+  "active_document_sha256": {
+    "CONTRIBUTING.md": "d919d401a3c60ca87eca1e0a596e77e78a5d6d1f4ec38a223a7a49e4a884cc29",
+    "README.md": "4509e45583f48e8516a8b23b1a18e6695ff24dd5683d14076208fb5ed62fe736",
+    "docs/PROJECT_MAP.md": "138a7bdd3159b9ac4edff6460a6defb5a8b7e18114566796e691873d3c7079e8",
+    "docs/index-cleanup.md": "aa0a4e6202a92b7e7d28c6d896f53cec6933297aee91fdb430fabb1c132d9420",
+    "docs/mcp-docs-server.md": "9a719295e395ad27c7c3de67c2286ed7695980e513b8b28dbe0be345045678a6",
+    "docs/modules/evidence-selection.md": "b4140aa497f287ea08fd4c10ff8673084383440d093aa4f38da89f7113f91dc1",
+    "docs/modules/project-context-retrieval.md": "0b2d1497f96f439fc6ccd374b0501f1b460d01e1e58d8030c2212903469c169a",
+    "docs/project-docs-mcp-workflow.md": "8900b87204a72862432f11f1f9433c6646d55663330c590044a947a5050c0f36",
+    "docs/testing.md": "06af645781e242f8b96e934c58cd91115826c77cec5d02ef8188baab54bf8ae6",
+    "wiki/Architecture.md": "52c2f45b10ab9c053d2846d6b6deada9a220495358cce66be75d63ad2ce77074",
+    "wiki/Commands.md": "8d889ac9ad8a29cb17d0101ff7722bebf9115da3055a8295c8ebf23c95e9699b",
+    "wiki/Supported-Sources.md": "d3759a0f3bc9b1b336c0a966a43e6058cae210e8a1eca703204716467f6be57e"
+  }
+}

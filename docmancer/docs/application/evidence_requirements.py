@@ -533,6 +533,7 @@ def build_requirements(
         lifecycle_intent=answer_contract.lifecycle_intent if answer_contract else "current",
         parse_trace=answer_contract.parse_trace if answer_contract else (),
         unresolved_parts=answer_contract.unresolved_parts if answer_contract else (),
+        component_scope_complete=answer_contract.component_scope_complete if answer_contract else True,
     )
 
 

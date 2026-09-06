@@ -207,3 +207,30 @@ def test_expected_identity_and_safety_do_not_require_source_class(candidate, rea
     )
     assert not result.qualified
     assert result.reason == reason
+
+
+@pytest.mark.parametrize("term", [
+    "get_docs_context", "docs/runtime.md", "--no-vectors", "DOCATLAS_HOME",
+])
+@pytest.mark.parametrize("visible", [True, False])
+def test_original_projection_normalizes_exact_terms_without_hidden_coverage(term, visible):
+    question = f'Explain "{term}" storage behavior details'
+    source = _requalify_visible_source({
+        "path_or_url": "docs/storage.md",
+        "snippet": f"{term} controls storage behavior details." if visible else "Storage behavior details are documented.",
+        "_qualification_candidate": {
+            "content": f"{term} controls storage behavior details.",
+        },
+        "retrieval_query_matches": {"query-original": {
+            "qualified": True,
+            "query_text": question,
+            "query_terms": [term, "storage", "behavior", "details"],
+            "exact_terms": [],
+        }},
+    }, query_text={"query-original": question})
+
+    trace = source["retrieval_query_matches"]["query-original"]
+    assert trace["qualified"] is visible
+    assert trace["exact_terms"] == [term.casefold()]
+    assert trace["missing_exact_terms"] == ([] if visible else [term.casefold()])
+    assert source["retrieval_query_ids"] == (["query-original"] if visible else [])
