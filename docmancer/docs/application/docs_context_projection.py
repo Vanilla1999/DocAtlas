@@ -37,6 +37,8 @@ from docmancer.docs.domain.evidence_qualification import (
 )
 from docmancer.docs.domain.query_terms import documentation_exact_terms
 from docmancer.docs.domain.lifecycle_policy import lifecycle_intent
+from docmancer.docs.domain.answer_units import extract_answer_units, _NEGATION_RE
+from docmancer.docs.domain.normative_language import _FORBIDDEN_RE
 
 
 def project_docs_context(
@@ -302,7 +304,7 @@ def project_docs_context(
         selected_components = {key for source in sources for key in component_witnesses(source, obligations)}
         prepared = _facet_aware_candidates(
             prepared, query_text=query_text,
-            required_query_ids=public_query_id_set - selected_public_ids,
+            required_query_ids=public_query_id_set - (qualified_query_ids(sources) if len(host_query_ids) > 1 else selected_public_ids),
             canonical_query_ids=canonical_intent_query_ids - selected_canonical_ids,
             exact_query_ids=exact_anchor_query_ids - selected_public_ids,
             obligations=obligations, missing_component_ids=mandatory_component_ids - selected_components,
@@ -386,15 +388,13 @@ def project_docs_context(
             )
         ):
             continue
-        if (
-            host_query_ids
-            and not new_components
-            and not (host_ids - selected_host_query_ids)
-            and not required_ids
-            and not exact_anchor_ids
-            and not original_hit
-            and not canonical_intent_ids
-        ):
+        # Compound reads may supplement a partial lead; single-direction reads retain it.
+        if (host_ids and not new_components and not (host_ids - selected_host_query_ids)
+            and not required_ids and not exact_anchor_ids and not original_hit and not canonical_intent_ids
+            and not (len(host_query_ids) > 1 and any(set(normalized["retrieval_query_matches"][key].get("matched_terms") or ()) - {
+                term for source in sources
+                for term in (source.get("retrieval_query_matches", {}).get(key, {}).get("matched_terms") or ())
+            } for key in host_ids - selected_public_ids))):
             continue
         evidence_id = normalized["evidence_id"]
         if evidence_id in seen_ids:
@@ -596,7 +596,6 @@ def _requalify_visible_source(
     visible_text = "\n".join(str(source.get(key) or "") for key in (
         "path_or_url", "section", "snippet",
     ))
-    catalog_role = str(source.get("catalog_role") or "")
     matches: dict[str, dict[str, Any]] = {}
     for query_id, trace in (source.get("retrieval_query_matches") or {}).items():
         if not isinstance(trace, dict) or trace.get("derived_from_query_id"):
@@ -619,7 +618,7 @@ def _requalify_visible_source(
             query_id=str(query_id),
             visible_text=visible_text,
             evidence_text=str(source.get("snippet") or ""),
-            catalog_role=catalog_role,
+            catalog_role=str(source.get("catalog_role") or ""),
             candidate=source.get("_qualification_candidate", source),
             expected_project_identity=source.get("_expected_project_identity"),
             lifecycle_intent=source.get("_lifecycle_intent", "current"),
@@ -721,9 +720,11 @@ def _focused_snippet(
 ) -> tuple[str, int, int]:
     leading = len(text) - len(text.lstrip())
     value = text.strip()
+    if len(value) <= limit:
+        start, end = _include_complete_code_fence(value, 0, len(value), limit=limit)
+        return value[start:end], leading + start, leading + end
     terms = _query_terms(queries)
-    spans = [
-        (match.start(), match.end())
+    spans = [(match.start(), match.end())
         for match in re.finditer(r"\S(?:.*?\S)?(?=(?:\n{2,}|(?<=[.!?])\s+|$))", value, re.S)
     ]
     if not spans:
@@ -731,18 +732,9 @@ def _focused_snippet(
         end = paragraph_end if 0 < paragraph_end <= limit else limit
         snippet = value[:end].rstrip()
         return snippet, leading, leading + len(snippet)
-    best_index = (
-        max(
-            range(len(spans)),
-            key=lambda index: sum(
-                term in value[spans[index][0]:spans[index][1]].casefold()
-                for term in terms
-            ),
-        )
-        if terms else 0
-    )
-    start = best_index
-    end = best_index
+    best_index = max(range(len(spans)), key=lambda index: sum(
+        term in value[spans[index][0]:spans[index][1]].casefold() for term in terms))
+    start = end = best_index
     selected_start, selected_end = spans[best_index]
     if selected_end - selected_start > limit:
         selected_start, selected_end = _bounded_text_window(
@@ -768,9 +760,20 @@ def _focused_snippet(
                 end = candidate_end
         if selected_end - selected_start >= limit * 0.7:
             break
-    selected_start, selected_end = _include_complete_code_fence(
-        value, selected_start, selected_end, limit=limit,
-    )
+    # A tied first sentence must not hide additional witnesses across a short gap.
+    hits = [(match.start(), match.end(), term) for term in terms
+            for match in re.finditer(rf"(?<!\w){re.escape(term)}(?!\w)", value, re.I)]
+    for _, boundary in spans:
+        row_end = value.find("\n", boundary)
+        boundary = (len(value) if row_end < 0 else row_end) if "|" in value[value.rfind("\n", 0, boundary) + 1:boundary] else boundary
+        start_at = max(0, boundary - limit)
+        if start_at and not value[start_at - 1].isspace():
+            start_at += len(re.match(r"\S*\s*", value[start_at:])[0])
+        if len({term for a, b, term in hits if start_at <= a < b <= boundary}) > len({
+            term for a, b, term in hits if selected_start <= a < b <= selected_end
+        }):
+            selected_start, selected_end = start_at, boundary
+    selected_start, selected_end = _include_complete_code_fence(value, selected_start, selected_end, limit=limit)
     snippet = value[selected_start:selected_end].strip()
     adjusted_start = value.find(snippet, selected_start, selected_end + 1)
     return snippet, leading + adjusted_start, leading + adjusted_start + len(snippet)
@@ -937,12 +940,15 @@ def _context_rank(
     action_score = 0.0
     for query_id in required:
         action = re.match(r"how\s+(?:do|can|should)\s+i\s+(\w+)\b", query_text.get(query_id, ""), re.I)
-        if action and re.search(
-            rf"(?:^|[.!?]\s+|^\s*\|[^|\n]*\|\s*){re.escape(action[1])}\b",
-            str(source.get("snippet") or source.get("content") or ""), re.I | re.M,
-        ):
+        if not action and re.match(r"(?:what|which)\b", query_text.get(query_id, ""), re.I):
+            action = re.search(r"\b(run|use|call|invoke)\b", query_text[query_id], re.I)
+        if action and not (_NEGATION_RE.search(query_text[query_id]) or _FORBIDDEN_RE.search(query_text[query_id])) and any(unit.proposition and not (_NEGATION_RE.search(unit.text) or _FORBIDDEN_RE.search(unit.text)) and re.search(
+            rf"(?:^|[.!?]\s+|^\s*\|[^|\n]*\|\s*){re.escape(action[1])}\b|\b(?:use|run|call|invoke)\s+[^.!?\n`]{{0,80}}`[^`\n]+`",
+            unit.text, re.I | re.M,
+        ) for unit in extract_answer_units(str(source.get("snippet") or source.get("content") or ""))):
             action_score += 1.0
     return (
+        action_score,
         lane_score,
         float(len(required)),
         assigned_score,
@@ -950,7 +956,6 @@ def _context_rank(
         authority_score,
         identity_score,
         float("query-original" in qualified),
-        action_score,
         required_lexical,
         float(len(qualified) - len(required)),
         lexical,
@@ -972,8 +977,9 @@ def _facet_aware_candidates(
         len(set(component_witnesses(source, obligations)) & (missing_component_ids or set())),
         len(_fully_matched_query_ids((source,)) & required_query_ids),
         len(qualified_query_ids((source,)) & required_query_ids),
+        (rank := _context_rank(source, query_text, required_query_ids, assigned_evidence_ids))[0],
         len(qualified_query_ids((source,)) & (canonical_query_ids or set())),
-        _context_rank(source, query_text, required_query_ids, assigned_evidence_ids),
+        rank[1:],
     ), reverse=True)
 
 
