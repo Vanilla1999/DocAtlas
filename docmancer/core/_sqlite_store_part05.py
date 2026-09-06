@@ -28,9 +28,9 @@ class _SQLiteStorePart05:
                 if mode == "adjacent":
                     neighbors = conn.execute(
                         """
-                        SELECT hydration_id AS id FROM retrieval_children
-                        WHERE generation_id = ? AND source = ? AND hydration_id != ?
-                          AND chunk_index IN (?, ?)
+                    SELECT hydration_id AS id FROM retrieval_children
+                    WHERE generation_id = ? AND source = ? AND hydration_id != ?
+                      AND chunk_index IN (?, ?)
                         ORDER BY chunk_index LIMIT 2
                         """,
                         (

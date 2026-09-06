@@ -509,7 +509,14 @@ class _SQLiteStorePart03:
         *,
         filters: dict[str, Any] | None = None,
     ) -> list[dict[str, Any]]:
-        cleaned = self._strip_stopwords(query)
+        # Contrast connectors can dominate an OR candidate window without
+        # identifying either subject. Keep the original query for qualification.
+        search_text = query
+        if not re.search(r'[`"]', query):
+            contrasted = re.sub(r"\brather\s+than\b", " ", query, flags=re.I).strip()
+            if re.search(r"\w", contrasted):
+                search_text = contrasted
+        cleaned = self._strip_stopwords(search_text)
         terms = [token for token in re.findall(r"\w+", cleaned) if token]
         filter_sql, filter_params = self._metadata_filter_sql(filters, promoted=True)
         with self._connect() as conn:

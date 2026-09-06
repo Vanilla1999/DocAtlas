@@ -115,13 +115,6 @@ def project_docs_context(
         query_plan, {"canonical_intent"},
     )
     eligible_query_ids = public_query_id_set | canonical_intent_query_ids
-    relation_claim_query_ids = {
-        str(item.get("query_id") or "")
-        for item in query_plan.get("queries") or ()
-        if isinstance(item, dict)
-        and item.get("facet_id") == "facet-relation-claim"
-        and item.get("query_id")
-    }
     original_question = str(query_plan.get("original_question") or retrieval.get("question") or query_text.get("query-original") or "")
     requirements = retrieval.get("requirements") or {}
     requirement_items = requirements.get("requirements", ()) if isinstance(requirements, dict) else ()
@@ -195,7 +188,6 @@ def project_docs_context(
         host_ids = qualified_ids & host_query_ids
         exact_anchor_ids = qualified_ids & exact_anchor_query_ids
         canonical_intent_ids = qualified_ids & canonical_intent_query_ids
-        relation_claim_ids = qualified_ids & relation_claim_query_ids
         path_only_ids = {
             query_id for query_id in exact_anchor_ids if query_id.startswith("query-path-")
         }
@@ -210,17 +202,6 @@ def project_docs_context(
         ):
             continue
         if not component_ids and not required_ids and not exact_anchor_ids and not original_hit and not host_ids and not canonical_intent_ids:
-            continue
-        if (
-            broad_context_only
-            and not component_ids
-            and not required_ids
-            and not exact_anchor_ids
-            and not original_hit
-            and not host_ids
-            and not canonical_intent_ids
-            and not relation_claim_ids
-        ):
             continue
         if (
             "contract_fact" in context_only_relations
@@ -773,6 +754,9 @@ def _focused_snippet(
             term for a, b, term in hits if selected_start <= a < b <= selected_end
         }):
             selected_start, selected_end = start_at, boundary
+    selected_start, selected_end = _include_complete_table_row(
+        value, selected_start, selected_end, terms=set(), limit=limit,
+    )
     selected_start, selected_end = _include_complete_code_fence(value, selected_start, selected_end, limit=limit)
     snippet = value[selected_start:selected_end].strip()
     adjusted_start = value.find(snippet, selected_start, selected_end + 1)
@@ -782,6 +766,12 @@ def _focused_snippet(
 def _include_complete_table_row(
     text: str, start: int, end: int, *, terms: set[str], limit: int,
 ) -> tuple[int, int]:
+    # Sentence windows may end inside the last row, before its restrictions.
+    last_end = text.find("\n", end)
+    last_end = len(text) if last_end < 0 else last_end
+    last_row = text[text.rfind("\n", 0, end) + 1:last_end].strip()
+    if last_row.startswith("|") and last_row.endswith("|") and last_end - start <= limit:
+        end = last_end
     matched = [
         text.casefold().find(term, start, end)
         for term in terms
