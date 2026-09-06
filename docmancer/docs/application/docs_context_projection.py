@@ -32,7 +32,7 @@ from docmancer.docs.domain.project_doc_ranking import (
 )
 from docmancer.docs.domain.context_budget import PROJECT_CONTEXT_BUDGET
 from docmancer.docs.domain.context_windows import (
-    _focused_line_range, _focused_snippet, _query_terms,
+    _focused_line_range, _focused_snippet, _projection_limits, _query_terms,
 )
 from docmancer.docs.domain.evidence_qualification import (
     derived_parent_trace,
@@ -493,21 +493,30 @@ def _expand_selected_snippets(
     assignments: Any = (),
 ) -> list[dict[str, Any]]:
     expanded = [dict(source) for source in sources]
-    for limit in (160, 320, 520):
-        for index, source in enumerate(tuple(expanded)):
-            values = projection_inputs.get(str(source.get("evidence_id") or ""))
-            if values is None:
-                continue
-            raw_snippet, focus_queries, source_line_start = values
+    for index, source in enumerate(tuple(expanded)):
+        values = projection_inputs.get(str(source.get("evidence_id") or ""))
+        if values is None:
+            continue
+        raw_snippet, focus_queries, source_line_start = values
+        for limit in _projection_limits(raw_snippet):
             snippet, snippet_start, snippet_end = _focused_snippet(
                 raw_snippet, focus_queries, limit=limit,
             )
             if len(snippet) <= len(str(source.get("snippet") or "")):
                 continue
-            if source["snippet"] not in snippet and (_REQUIRED_RE.search(source["snippet"]) or _FORBIDDEN_RE.search(source["snippet"])):
-                retained_start = raw_snippet.find(source["snippet"])
-                if retained_start < 0 or raw_snippet.find(source["snippet"], retained_start + 1) >= 0:
-                    continue
+            # Exact-identifier witnesses need retention even without a normative
+            # keyword. Optional fuzzy alias fragments may still be reselected;
+            # public attribution, component and assignment guards below apply.
+            preserve_span = any(
+                trace.get("qualified") is True and trace.get("exact_terms")
+                for trace in (source.get("retrieval_query_matches") or {}).values()
+            ) or _REQUIRED_RE.search(source["snippet"]) or _FORBIDDEN_RE.search(source["snippet"])
+            retained_start = raw_snippet.find(source["snippet"])
+            if preserve_span and (retained_start < 0
+                    or raw_snippet.find(source["snippet"], retained_start + 1) >= 0):
+                continue
+            if preserve_span and not (snippet_start <= retained_start
+                    and retained_start + len(source["snippet"]) <= snippet_end):
                 snippet_start = min(snippet_start, retained_start)
                 snippet_end = max(snippet_end, retained_start + len(source["snippet"]))
                 if snippet_end - snippet_start > limit:
@@ -556,7 +565,7 @@ def _qualified_fragments(
     seen_spans = set()
     focuses = (*tuple(query_text.get(query_id, "") for query_id in sorted(query_ids)),
                *component_witnesses({**source, "snippet": raw_snippet}, obligations).values())
-    for limit in (160, 320, 520):
+    for limit in _projection_limits(raw_snippet):
         for focus in (focuses, *((value,) for value in focuses if value)):
             snippet, snippet_start, snippet_end = _focused_snippet(
                 raw_snippet, focus, limit=limit,
@@ -801,19 +810,36 @@ def _facet_aware_candidates(
     exact_query_ids: set[str] | None = None,
     obligations: tuple[Any, ...] = (), missing_component_ids: set[str] | None = None,
 ) -> list[Any]:
-    # Only the caller's accepted visible witnesses remove coverage needs.
-    return sorted(candidates, key=lambda source: (
-        len(qualified_query_ids((source,)) & (exact_query_ids or set())),
-        len(set(component_witnesses(source, obligations)) & (missing_component_ids or set())),
-        len(_fully_matched_query_ids((source,)) & required_query_ids),
-        len(qualified_query_ids((source,)) & required_query_ids),
-        (rank := _context_rank(source, query_text, required_query_ids, assigned_evidence_ids))[0],
-        sum(float(trace.get("match_ratio") or 0.0) for key, trace in
-            (source.get("retrieval_query_matches") or {}).items()
-            if key in required_query_ids and trace.get("qualified") is True),
-        len(qualified_query_ids((source,)) & (canonical_query_ids or set())),
-        rank[1:],
-    ), reverse=True)
+    # Exact-anchor lanes are identity-sensitive: when two candidates both
+    # visibly qualify, preserve the upstream assigned witness before rewarding
+    # extra lexical mentions. General host/original lanes keep action and
+    # relevance ranking first so assignments cannot crowd out procedural facts.
+    def candidate_key(source: Any) -> tuple[Any, ...]:
+        qualified_ids = qualified_query_ids((source,))
+        exact_count = len(qualified_ids & (exact_query_ids or set()))
+        component_count = len(
+            set(component_witnesses(source, obligations)) & (missing_component_ids or set())
+        )
+        rank = _context_rank(source, query_text, required_query_ids, assigned_evidence_ids)
+        match_ratio = sum(
+            float(trace.get("match_ratio") or 0.0)
+            for key, trace in (source.get("retrieval_query_matches") or {}).items()
+            if key in required_query_ids and trace.get("qualified") is True
+        )
+        return (
+            int(exact_count > 0),
+            component_count,
+            rank[3] if exact_count else 0.0,
+            exact_count,
+            len(_fully_matched_query_ids((source,)) & required_query_ids),
+            len(qualified_ids & required_query_ids),
+            rank[0],
+            match_ratio,
+            len(qualified_ids & (canonical_query_ids or set())),
+            rank[1:3] + rank[4:],
+        )
+
+    return sorted(candidates, key=candidate_key, reverse=True)
 
 
 def _fully_matched_query_ids(sources: Any) -> set[str]:
