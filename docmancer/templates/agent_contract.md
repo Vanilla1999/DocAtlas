@@ -8,8 +8,9 @@ Use the three-tool Docs MCP workflow:
 1. Call `get_docs_context` for documentation, coding, or patch tasks before the first edit; it returns bounded structured evidence. Pass the original coding request as `question`; never replace it with a documentation-governance meta-question.
 2. Call `prepare_docs` only from `recommended_next_action` or for an explicit documentation lifecycle request.
 3. Call `docs_status` only for explicit status/health/freshness/job requests or when returned as `recommended_next_action`; never use it for discovery.
-4. After preparation, retry the original `get_docs_context` question unchanged; follow at most one returned non-automatic `rephrase_question`.
-5. For free-form requests, pass at most five single-concept `lookup_queries`. Partial `docs_context` permits only source-grounded claims, never completeness or edits.
+4. Plan project-document scope explicitly: use `scope="project"` for repo-level policy, `scope="module"` plus an exact `module_path` for one known module, and `scope="all"` without module filters only for cross-module questions. An explicit scope is authoritative: never widen `project` to `all`. If one task needs both module-local and repo-level proof, prefer two bounded calls.
+5. After preparation, retry the original `get_docs_context` question unchanged; follow at most one returned non-automatic `rephrase_question`.
+6. For free-form requests, pass at most five single-concept `lookup_queries`. Partial `docs_context` permits only source-grounded claims, never completeness or edits.
 
 On `insufficient_evidence`, do not claim documentation support. When `hard_stop=false`, use a returned local source-search handoff and repository source/tests. Stop before editing only when `hard_stop=true`.
 
