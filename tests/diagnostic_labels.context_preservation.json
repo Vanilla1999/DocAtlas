@@ -1,0 +1,10 @@
+{
+  "schema_version": 1,
+  "module_labels": {
+    "tests/docs/test_context_preservation.py": "behavioral"
+  },
+  "module_node_hashes": {
+    "tests/docs/test_context_preservation.py": "9951abc6b4388d3206bc8cb1c226a176fee42ccea599d95bf389da47168dbda9"
+  },
+  "node_overrides": {}
+}
