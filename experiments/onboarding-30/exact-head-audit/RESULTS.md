@@ -7,6 +7,7 @@ Existing PR #178 / `fix/context-first-project-reads`. **Not ready to merge.**
 - `146d7a80d25ebbcc1237075059e55a258b4cbcaa`: plan saved before measurements.
 - `48421b8980ca442c051dda4763fd32f450b9b390`: first 79-call checkpoint.
 - `bf663cb9838fe326579f258cffd05424fa003fbb`: implementation, six regression cases and diagnostic inventory published together; read back from GitHub.
+- `99557cd4eb0bdc92a3fd0993f789fe376e15e778`: full audit, all thirty manual answer reviews and fixed retries. A parallel test commit was preserved without force update.
 
 This audit starts at runtime `462fb13411cfd96ae2f1784c0a620b2601f86305`. It does not reuse earlier 13/15 results. The separate local reconstruction uses the preserved 3cae4f8 bundle plus the four published runtime files verified by Git blob identity. It is not the user's checkout or deployed server. The resulting local Git HEAD is not represented as the runtime commit.
 
@@ -45,7 +46,7 @@ Only this pure domain file plus its new test/inventory files were changed in the
 
 ## Thirty actual newcomer questions
 
-See `ONBOARDING-30.md` for each question, grounded answer and limitation. First calls had no prefilled lookups: 16 ok, 14 insufficient. After the 24 fixed single retries and six baseline retentions: 28 ok, 2 insufficient.
+See `ONBOARDING-30.md` for each question, grounded answer and limitation. First calls had no prefilled lookups: 16 ok, 14 insufficient. After the 24 fixed single retries and six baseline retentions: **27 ok, 3 insufficient**. The three insufficient selected payloads are newcomer-20, newcomer-27 and the retained encryption control newcomer-29. An earlier prose total omitted that retained control; the counts here were reconciled with all 30 saved payloads.
 
 Manual judgments of those selected final payloads:
 **12 sufficient, 10 partial, 5 off-topic, 2 no evidence, 1 unestablished capability.**
