@@ -31,6 +31,9 @@ from docmancer.docs.domain.project_doc_ranking import (
     project_source_lane,
 )
 from docmancer.docs.domain.context_budget import PROJECT_CONTEXT_BUDGET
+from docmancer.docs.domain.context_windows import (
+    _focused_line_range, _focused_snippet, _query_terms,
+)
 from docmancer.docs.domain.evidence_qualification import (
     derived_parent_trace,
     qualify_evidence,
@@ -39,7 +42,7 @@ from docmancer.docs.domain.query_terms import documentation_exact_terms
 from docmancer.docs.domain.documentation_query_plan import technical_anchors
 from docmancer.docs.domain.lifecycle_policy import lifecycle_intent
 from docmancer.docs.domain.answer_units import extract_answer_units, _NEGATION_RE
-from docmancer.docs.domain.normative_language import _FORBIDDEN_RE
+from docmancer.docs.domain.normative_language import _FORBIDDEN_RE, _REQUIRED_RE
 
 
 def project_docs_context(
@@ -363,9 +366,8 @@ def project_docs_context(
             path_only_ids
             and qualified_ids <= path_only_ids and not component_ids
             and not _has_visible_non_path_exact_term(
-                normalized,
                 raw_text=str(normalized.get("snippet") or ""),
-                original_question=original_question,
+                original_question=original_question, explicit_paths=explicit_paths,
             )
         ):
             continue
@@ -502,6 +504,15 @@ def _expand_selected_snippets(
             )
             if len(snippet) <= len(str(source.get("snippet") or "")):
                 continue
+            if source["snippet"] not in snippet and (_REQUIRED_RE.search(source["snippet"]) or _FORBIDDEN_RE.search(source["snippet"])):
+                retained_start = raw_snippet.find(source["snippet"])
+                if retained_start < 0 or raw_snippet.find(source["snippet"], retained_start + 1) >= 0:
+                    continue
+                snippet_start = min(snippet_start, retained_start)
+                snippet_end = max(snippet_end, retained_start + len(source["snippet"]))
+                if snippet_end - snippet_start > limit:
+                    continue
+                snippet = raw_snippet[snippet_start:snippet_end]
             candidate = dict(source)
             candidate["snippet"] = snippet
             candidate["line_start"], candidate["line_end"] = _focused_line_range(
@@ -683,180 +694,6 @@ def _public_query_ids(query_plan: dict[str, Any]) -> tuple[str, ...]:
     return tuple(dict.fromkeys(values or _required_query_ids(query_plan)))
 
 
-_QUERY_STOP_WORDS = frozenset({
-    "about", "after", "does", "from", "have", "into", "project", "that",
-    "their", "then", "these", "this", "what", "when", "where", "which",
-    "with", "работает", "какие", "когда", "проект", "этот",
-})
-
-
-def _query_terms(queries: tuple[str, ...]) -> set[str]:
-    return {
-        token.casefold()
-        for query in queries
-        for token in re.findall(r"[A-Za-zА-Яа-яЁё0-9_.-]{4,}", query)
-        if token.casefold() not in _QUERY_STOP_WORDS
-    }
-
-
-def _focused_snippet(
-    text: str, queries: tuple[str, ...], *, limit: int = 520,
-) -> tuple[str, int, int]:
-    leading = len(text) - len(text.lstrip())
-    value = text.strip()
-    if len(value) <= limit:
-        start, end = _include_complete_code_fence(value, 0, len(value), limit=limit)
-        return value[start:end], leading + start, leading + end
-    terms = _query_terms(queries)
-    spans = [(match.start(), match.end())
-        for match in re.finditer(r"\S(?:.*?\S)?(?=(?:\n{2,}|(?<=[.!?])\s+|$))", value, re.S)
-    ]
-    if not spans:
-        paragraph_end = value.find("\n\n")
-        end = paragraph_end if 0 < paragraph_end <= limit else limit
-        snippet = value[:end].rstrip()
-        return snippet, leading, leading + len(snippet)
-    best_index = max(range(len(spans)), key=lambda index: sum(
-        term in value[spans[index][0]:spans[index][1]].casefold() for term in terms))
-    start = end = best_index
-    selected_start, selected_end = spans[best_index]
-    if selected_end - selected_start > limit:
-        selected_start, selected_end = _bounded_text_window(
-            value, selected_start, selected_end, terms=terms, limit=limit,
-        )
-        selected_start, selected_end = _include_complete_table_row(
-            value, selected_start, selected_end, terms=terms, limit=limit,
-        )
-    for distance in range(1, len(spans)):
-        for index in (best_index - distance, best_index + distance):
-            if index < 0 or index >= len(spans):
-                continue
-            adjacent = value[spans[index][0]:spans[index][1]].casefold()
-            if terms and not any(term in adjacent for term in terms):
-                continue
-            candidate_start = min(start, index)
-            candidate_end = max(end, index)
-            char_start = spans[candidate_start][0]
-            char_end = spans[candidate_end][1]
-            if char_end - char_start <= limit:
-                selected_start, selected_end = char_start, char_end
-                start = candidate_start
-                end = candidate_end
-        if selected_end - selected_start >= limit * 0.7:
-            break
-    # A tied first sentence must not hide additional witnesses across a short gap.
-    hits = [(match.start(), match.end(), term) for term in terms
-            for match in re.finditer(rf"(?<!\w){re.escape(term)}(?!\w)", value, re.I)]
-    for _, boundary in spans:
-        row_end = value.find("\n", boundary)
-        boundary = (len(value) if row_end < 0 else row_end) if "|" in value[value.rfind("\n", 0, boundary) + 1:boundary] else boundary
-        start_at = max(0, boundary - limit)
-        if start_at and not value[start_at - 1].isspace():
-            start_at += len(re.match(r"\S*\s*", value[start_at:])[0])
-        if len({term for a, b, term in hits if start_at <= a < b <= boundary}) > len({
-            term for a, b, term in hits if selected_start <= a < b <= selected_end
-        }):
-            selected_start, selected_end = start_at, boundary
-    selected_start, selected_end = _include_complete_table_row(
-        value, selected_start, selected_end, terms=set(), limit=limit,
-    )
-    selected_start, selected_end = _include_complete_code_fence(value, selected_start, selected_end, limit=limit)
-    snippet = value[selected_start:selected_end].strip()
-    adjusted_start = value.find(snippet, selected_start, selected_end + 1)
-    return snippet, leading + adjusted_start, leading + adjusted_start + len(snippet)
-
-
-def _include_complete_table_row(
-    text: str, start: int, end: int, *, terms: set[str], limit: int,
-) -> tuple[int, int]:
-    # Sentence windows may end inside the last row, before its restrictions.
-    last_end = text.find("\n", end)
-    last_end = len(text) if last_end < 0 else last_end
-    last_row = text[text.rfind("\n", 0, end) + 1:last_end].strip()
-    if last_row.startswith("|") and last_row.endswith("|") and last_end - start <= limit:
-        end = last_end
-    matched = [
-        text.casefold().find(term, start, end)
-        for term in terms
-        if text.casefold().find(term, start, end) >= 0
-    ]
-    if not matched:
-        return start, end
-    anchor = min(matched)
-    row_start = text.rfind("\n", 0, anchor) + 1
-    row_end_match = text.find("\n", anchor)
-    row_end = len(text) if row_end_match < 0 else row_end_match
-    row = text[row_start:row_end]
-    if "|" not in row or row_end - row_start > limit:
-        return start, end
-    expanded_start = min(start, row_start)
-    expanded_end = max(end, row_end)
-    if expanded_end - expanded_start <= limit:
-        return expanded_start, expanded_end
-    return row_start, row_end
-
-
-def _bounded_text_window(
-    text: str, start: int, end: int, *, terms: set[str], limit: int,
-) -> tuple[int, int]:
-    segment = text[start:end]
-    matched_positions = [
-        segment.casefold().find(term) for term in terms if term in segment.casefold()
-    ]
-    anchor = min((position for position in matched_positions if position >= 0), default=0)
-    window_start = start + max(0, anchor - limit // 3)
-    window_end = min(end, window_start + limit)
-    window_start = max(start, window_end - limit)
-    return window_start, window_end
-
-
-def _include_complete_code_fence(
-    text: str, start: int, end: int, *, limit: int,
-) -> tuple[int, int]:
-    blocks = []
-    opening = None
-    for match in re.finditer(r"^[ \t]*(`{3,}|~{3,})([^\n]*)", text, re.M):
-        if opening is None:
-            opening = match
-        elif (
-            match.group(1)[0] == opening.group(1)[0]
-            and len(match.group(1)) >= len(opening.group(1))
-            and not match.group(2).strip()
-        ):
-            blocks.append((opening.start(), match.end(), True))
-            opening = None
-    if opening is not None:
-        blocks.append((opening.start(), len(text), False))
-    for fence_start, fence_end, closed in blocks:
-        if (
-            closed and end <= fence_start and not text[end:fence_start].strip()
-            and re.search(r"\b(?:following|command|example)\b", text[start:end], re.I)
-            and fence_end - start <= limit
-        ):
-            end = fence_end
-        if start < fence_end and end > fence_start:
-            expanded_start = min(start, fence_start)
-            expanded_end = max(end, fence_end)
-            if closed and expanded_end - expanded_start <= limit:
-                start, end = expanded_start, expanded_end
-                continue
-            # A bounded payload must not expose a syntactically broken fence.
-            before = text.rfind("\n\n", 0, fence_start)
-            safe_start = 0 if before < 0 else before + 2
-            if fence_start - safe_start <= limit and fence_start > safe_start:
-                return safe_start, fence_start
-            return start, start
-    return start, end
-
-
-def _focused_line_range(
-    text: str, start: int, end: int, source_line_start: Any,
-) -> tuple[int | None, int | None]:
-    if not isinstance(source_line_start, int) or source_line_start < 1:
-        return None, None
-    line_start = source_line_start + text[:start].count("\n")
-    line_end = line_start + text[start:end].count("\n")
-    return line_start, line_end
 
 
 def _assigned_requirements_for_source(
@@ -971,6 +808,9 @@ def _facet_aware_candidates(
         len(_fully_matched_query_ids((source,)) & required_query_ids),
         len(qualified_query_ids((source,)) & required_query_ids),
         (rank := _context_rank(source, query_text, required_query_ids, assigned_evidence_ids))[0],
+        sum(float(trace.get("match_ratio") or 0.0) for key, trace in
+            (source.get("retrieval_query_matches") or {}).items()
+            if key in required_query_ids and trace.get("qualified") is True),
         len(qualified_query_ids((source,)) & (canonical_query_ids or set())),
         rank[1:],
     ), reverse=True)
