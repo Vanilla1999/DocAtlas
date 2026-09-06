@@ -28,7 +28,7 @@ jobs:
         with:
           python-version: '3.12'
       - run: python -m pip install -e ".[dev]"
-      - name: Apply bounded routing changes
+      - name: Apply bounded staged routing changes
         shell: bash
         run: |
           set -euo pipefail
@@ -54,11 +54,11 @@ jobs:
           text = text.replace(old, new, 1)
 
           old = '''        emit(\n            "retrieval_pipeline",\n            True,\n            f"{product_prefix}retrieval pipeline query planning ranking evidence selection",\n            f"{product_prefix}lexical vector retrieval data flow",\n        )\n'''
-          new = '''        emit(\n            "retrieval_pipeline",\n            True,\n            f"{product_prefix}retrieval pipeline query planning ranking evidence selection",\n            f"{product_prefix}ProjectContextService query plan project retrieval candidate allocation context selection",\n            f"{product_prefix}lexical vector retrieval data flow",\n        )\n'''
+          new = '''        emit(\n            "retrieval_pipeline",\n            True,\n            f"{product_prefix}get_docs_context MCP adapter ProjectContextService",\n            f"{product_prefix}ProjectContextService query plan project retrieval",\n            f"{product_prefix}retrieval gateway filtered project chunks",\n            f"{product_prefix}selection maximizes distinct visible query coverage",\n        )\n'''
           assert text.count(old) == 1, 'retrieval pipeline aliases drifted'
           text = text.replace(old, new, 1)
           old = '''        emit(\n            "project_architecture",\n            True,\n            f"{product_prefix}project architecture overview components indexing retrieval storage",\n        )\n'''
-          new = '''        emit(\n            "project_architecture",\n            True,\n            f"{product_prefix}project architecture overview components indexing retrieval storage",\n            f"{product_prefix}project architecture persistence candidate generation evidence qualification",\n        )\n'''
+          new = '''        emit(\n            "project_architecture",\n            True,\n            f"{product_prefix}project architecture overview components indexing retrieval storage",\n            f"{product_prefix}SQLite persistence candidate generation metadata evidence qualification",\n        )\n'''
           assert text.count(old) == 1, 'project architecture aliases drifted'
           path.write_text(text.replace(old, new, 1))
           PY
