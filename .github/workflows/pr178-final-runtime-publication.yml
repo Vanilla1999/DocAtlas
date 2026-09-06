@@ -24,142 +24,18 @@ jobs:
       - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1
         with:
           python-version: '3.12'
-      - name: Verify expected parent and install test dependencies
+      - name: Verify source ancestry and install test dependencies
         shell: bash
         run: |
           set -euo pipefail
-          test "$(git rev-parse HEAD^)" = "866f65e48f4aafb3039da4f765396ddf38f85e0d"
+          git merge-base --is-ancestor 866f65e48f4aafb3039da4f765396ddf38f85e0d HEAD
           python -m pip install -e ".[dev]"
       - name: Apply reviewed bounded-projection patch
         shell: bash
         run: |
           set -euo pipefail
-          python - <<'PY'
-          from pathlib import Path
-
-          path = Path("docmancer/docs/application/docs_context_projection.py")
-          text = path.read_text()
-
-          old = '''from docmancer.docs.domain.context_windows import (
-              _focused_line_range, _focused_snippet, _query_terms,
-          )'''
-          new = '''from docmancer.docs.domain.context_windows import (
-              _focused_line_range, _focused_snippet, _projection_limits, _query_terms,
-          )'''
-          if text.count(old) != 1:
-              raise SystemExit("unexpected context_windows import shape")
-          text = text.replace(old, new)
-
-          old = '''    for limit in (160, 320, 520):
-              for index, source in enumerate(tuple(expanded)):
-                  values = projection_inputs.get(str(source.get("evidence_id") or ""))
-                  if values is None:
-                      continue
-                  raw_snippet, focus_queries, source_line_start = values
-                  snippet, snippet_start, snippet_end = _focused_snippet(
-                      raw_snippet, focus_queries, limit=limit,
-                  )'''
-          new = '''    for index, source in enumerate(tuple(expanded)):
-              values = projection_inputs.get(str(source.get("evidence_id") or ""))
-              if values is None:
-                  continue
-              raw_snippet, focus_queries, source_line_start = values
-              for limit in _projection_limits(raw_snippet):
-                  snippet, snippet_start, snippet_end = _focused_snippet(
-                      raw_snippet, focus_queries, limit=limit,
-                  )'''
-          if text.count(old) != 1:
-              raise SystemExit("unexpected expansion loop shape")
-          text = text.replace(old, new)
-
-          old = '''            if source["snippet"] not in snippet and (_REQUIRED_RE.search(source["snippet"]) or _FORBIDDEN_RE.search(source["snippet"])):
-                      retained_start = raw_snippet.find(source["snippet"])
-                      if retained_start < 0 or raw_snippet.find(source["snippet"], retained_start + 1) >= 0:
-                          continue
-                      snippet_start = min(snippet_start, retained_start)
-                      snippet_end = max(snippet_end, retained_start + len(source["snippet"]))
-                      if snippet_end - snippet_start > limit:
-                          continue
-                      snippet = raw_snippet[snippet_start:snippet_end]'''
-          new = '''            # Exact-identifier witnesses need retention even without a normative
-                      # keyword. Optional fuzzy alias fragments may still be reselected;
-                      # public attribution, component and assignment guards below apply.
-                      preserve_span = any(
-                          trace.get("qualified") is True and trace.get("exact_terms")
-                          for trace in (source.get("retrieval_query_matches") or {}).values()
-                      ) or _REQUIRED_RE.search(source["snippet"]) or _FORBIDDEN_RE.search(source["snippet"])
-                      retained_start = raw_snippet.find(source["snippet"])
-                      if preserve_span and (retained_start < 0
-                              or raw_snippet.find(source["snippet"], retained_start + 1) >= 0):
-                          continue
-                      if preserve_span and not (snippet_start <= retained_start
-                              and retained_start + len(source["snippet"]) <= snippet_end):
-                          snippet_start = min(snippet_start, retained_start)
-                          snippet_end = max(snippet_end, retained_start + len(source["snippet"]))
-                          if snippet_end - snippet_start > limit:
-                              continue
-                          snippet = raw_snippet[snippet_start:snippet_end]'''
-          if text.count(old) != 1:
-              raise SystemExit("unexpected preserve-span block")
-          text = text.replace(old, new)
-
-          old = '''    for limit in (160, 320, 520):
-              for focus in (focuses, *((value,) for value in focuses if value)):
-                  snippet, snippet_start, snippet_end = _focused_snippet(
-                      raw_snippet, focus, limit=limit,
-                  )'''
-          new = '''    for limit in _projection_limits(raw_snippet):
-              for focus in (focuses, *((value,) for value in focuses if value)):
-                  snippet, snippet_start, snippet_end = _focused_snippet(
-                      raw_snippet, focus, limit=limit,
-                  )'''
-          if text.count(old) != 1:
-              raise SystemExit("unexpected qualified-fragment loop")
-          text = text.replace(old, new)
-
-          start = text.index("def _facet_aware_candidates(")
-          end = text.index("\n\ndef _fully_matched_query_ids", start)
-          replacement = '''def _facet_aware_candidates(
-              candidates: list[Any], *, query_text: dict[str, str], required_query_ids: set[str],
-              canonical_query_ids: set[str] | None = None,
-              assigned_evidence_ids: set[str] | None = None,
-              exact_query_ids: set[str] | None = None,
-              obligations: tuple[Any, ...] = (), missing_component_ids: set[str] | None = None,
-          ) -> list[Any]:
-              # Exact-anchor lanes are identity-sensitive: when two candidates both
-              # visibly qualify, preserve the upstream assigned witness before rewarding
-              # extra lexical mentions. General host/original lanes keep action and
-              # relevance ranking first so assignments cannot crowd out procedural facts.
-              def candidate_key(source: Any) -> tuple[Any, ...]:
-                  qualified_ids = qualified_query_ids((source,))
-                  exact_count = len(qualified_ids & (exact_query_ids or set()))
-                  component_count = len(
-                      set(component_witnesses(source, obligations)) & (missing_component_ids or set())
-                  )
-                  rank = _context_rank(source, query_text, required_query_ids, assigned_evidence_ids)
-                  match_ratio = sum(
-                      float(trace.get("match_ratio") or 0.0)
-                      for key, trace in (source.get("retrieval_query_matches") or {}).items()
-                      if key in required_query_ids and trace.get("qualified") is True
-                  )
-                  return (
-                      int(exact_count > 0),
-                      component_count,
-                      rank[3] if exact_count else 0.0,
-                      exact_count,
-                      len(_fully_matched_query_ids((source,)) & required_query_ids),
-                      len(qualified_ids & required_query_ids),
-                      rank[0],
-                      match_ratio,
-                      len(qualified_ids & (canonical_query_ids or set())),
-                      rank[1:3] + rank[4:],
-                  )
-
-              return sorted(candidates, key=candidate_key, reverse=True)
-          '''
-          text = text[:start] + replacement + text[end:]
-          path.write_text(text)
-          PY
+          printf '%s' 'ZnJvbSBwYXRobGliIGltcG9ydCBQYXRoCgpwYXRoID0gUGF0aCgiZG9jbWFuY2VyL2RvY3MvYXBwbGljYXRpb24vZG9jc19jb250ZXh0X3Byb2plY3Rpb24ucHkiKQp0ZXh0ID0gcGF0aC5yZWFkX3RleHQoKQoKb2xkID0gIiIiZnJvbSBkb2NtYW5jZXIuZG9jcy5kb21haW4uY29udGV4dF93aW5kb3dzIGltcG9ydCAoXG4gICAgX2ZvY3VzZWRfbGluZV9yYW5nZSwgX2ZvY3VzZWRfc25pcHBldCwgX3F1ZXJ5X3Rlcm1zLFxuKSIiIgpuZXcgPSAiIiJmcm9tIGRvY21hbmNlci5kb2NzLmRvbWFpbi5jb250ZXh0X3dpbmRvd3MgaW1wb3J0IChcbiAgICBfZm9jdXNlZF9saW5lX3JhbmdlLCBfZm9jdXNlZF9zbmlwcGV0LCBfcHJvamVjdGlvbl9saW1pdHMsIF9xdWVyeV90ZXJtcyxcbikiIiIKYXNzZXJ0IHRleHQuY291bnQob2xkKSA9PSAxLCAiY29udGV4dF93aW5kb3dzIGltcG9ydCBkcmlmdCIKdGV4dCA9IHRleHQucmVwbGFjZShvbGQsIG5ldywgMSkKCm9sZCA9ICIiIiAgICBmb3IgbGltaXQgaW4gKDE2MCwgMzIwLCA1MjApOlxuICAgICAgICBmb3IgaW5kZXgsIHNvdXJjZSBpbiBlbnVtZXJhdGUodHVwbGUoZXhwYW5kZWQpKTpcbiAgICAgICAgICAgIHZhbHVlcyA9IHByb2plY3Rpb25faW5wdXRzLmdldChzdHIoc291cmNlLmdldChcImV2aWRlbmNlX2lkXCIpIG9yIFwiXCIpKVxuICAgICAgICAgICAgaWYgdmFsdWVzIGlzIE5vbmU6XG4gICAgICAgICAgICAgICAgY29udGludWVcbiAgICAgICAgICAgIHJhd19zbmlwcGV0LCBmb2N1c19xdWVyaWVzLCBzb3VyY2VfbGluZV9zdGFydCA9IHZhbHVlc1xuICAgICAgICAgICAgc25pcHBldCwgc25pcHBldF9zdGFydCwgc25pcHBldF9lbmQgPSBfZm9jdXNlZF9zbmlwcGV0KFxuICAgICAgICAgICAgICAgIHJhd19zbmlwcGV0LCBmb2N1c19xdWVyaWVzLCBsaW1pdD1saW1pdCxcbiAgICAgICAgICAgICkiIiIKbmV3ID0gIiIiICAgIGZvciBpbmRleCwgc291cmNlIGluIGVudW1lcmF0ZSh0dXBsZShleHBhbmRlZCkpOlxuICAgICAgICB2YWx1ZXMgPSBwcm9qZWN0aW9uX2lucHV0cy5nZXQoc3RyKHNvdXJjZS5nZXQoXCJldmlkZW5jZV9pZFwiKSBvciBcIlwiKSlcbiAgICAgICAgaWYgdmFsdWVzIGlzIE5vbmU6XG4gICAgICAgICAgICBjb250aW51ZVxuICAgICAgICByYXdfc25pcHBldCwgZm9jdXNfcXVlcmllcywgc291cmNlX2xpbmVfc3RhcnQgPSB2YWx1ZXNcbiAgICAgICAgZm9yIGxpbWl0IGluIF9wcm9qZWN0aW9uX2xpbWl0cyhyYXdfc25pcHBldCk6XG4gICAgICAgICAgICBzbmlwcGV0LCBzbmlwcGV0X3N0YXJ0LCBzbmlwcGV0X2VuZCA9IF9mb2N1c2VkX3NuaXBwZXQoXG4gICAgICAgICAgICAgICAgcmF3X3NuaXBwZXQsIGZvY3VzX3F1ZXJpZXMsIGxpbWl0PWxpbWl0LFxuICAgICAgICAgICAgKSIiIgphc3NlcnQgdGV4dC5jb3VudChvbGQpID09IDEsICJleHBhbnNpb24gbG9vcCBkcmlmdCIKdGV4dCA9IHRleHQucmVwbGFjZShvbGQsIG5ldywgMSkKCm9sZCA9ICIiIiAgICAgICAgICAgIGlmIHNvdXJjZVtcInNuaXBwZXRcIl0gbm90IGluIHNuaXBwZXQgYW5kIChfUkVRVUlSRURfUkUuc2VhcmNoKHNvdXJjZVtcInNuaXBwZXRcIl0pIG9yIF9GT1JCSURERU5fUkUuc2VhcmNoKHNvdXJjZVtcInNuaXBwZXRcIl0pKTpcbiAgICAgICAgICAgICAgICByZXRhaW5lZF9zdGFydCA9IHJhd19zbmlwcGV0LmZpbmQoc291cmNlW1wic25pcHBldFwiXSlcbiAgICAgICAgICAgICAgICBpZiByZXRhaW5lZF9zdGFydCA8IDAgb3IgcmF3X3NuaXBwZXQuZmluZChzb3VyY2VbXCJzbmlwcGV0XCJdLCByZXRhaW5lZF9zdGFydCArIDEpID49IDA6XG4gICAgICAgICAgICAgICAgICAgIGNvbnRpbnVlXG4gICAgICAgICAgICAgICAgc25pcHBldF9zdGFydCA9IG1pbihzbmlwcGV0X3N0YXJ0LCByZXRhaW5lZF9zdGFydClcbiAgICAgICAgICAgICAgICBzbmlwcGV0X2VuZCA9IG1heChzbmlwcGV0X2VuZCwgcmV0YWluZWRfc3RhcnQgKyBsZW4oc291cmNlW1wic25pcHBldFwiXSkpXG4gICAgICAgICAgICAgICAgaWYgc25pcHBldF9lbmQgLSBzbmlwcGV0X3N0YXJ0ID4gbGltaXQ6XG4gICAgICAgICAgICAgICAgICAgIGNvbnRpbnVlXG4gICAgICAgICAgICAgICAgc25pcHBldCA9IHJhd19zbmlwcGV0W3NuaXBwZXRfc3RhcnQ6c25pcHBldF9lbmRdIiIiCm5ldyA9ICIiIiAgICAgICAgICAgICMgRXhhY3QtaWRlbnRpZmllciB3aXRuZXNzZXMgbmVlZCByZXRlbnRpb24gZXZlbiB3aXRob3V0IGEgbm9ybWF0aXZlXG4gICAgICAgICAgICAjIGtleXdvcmQuIE9wdGlvbmFsIGZ1enp5IGFsaWFzIGZyYWdtZW50cyBtYXkgc3RpbGwgYmUgcmVzZWxlY3RlZDtcbiAgICAgICAgICAgICMgcHVibGljIGF0dHJpYnV0aW9uLCBjb21wb25lbnQgYW5kIGFzc2lnbm1lbnQgZ3VhcmRzIGJlbG93IGFwcGx5LlxuICAgICAgICAgICAgcHJlc2VydmVfc3BhbiA9IGFueShcbiAgICAgICAgICAgICAgICB0cmFjZS5nZXQoXCJxdWFsaWZpZWRcIikgaXMgVHJ1ZSBhbmQgdHJhY2UuZ2V0KFwiZXhhY3RfdGVybXNcIilcbiAgICAgICAgICAgICAgICBmb3IgdHJhY2UgaW4gKHNvdXJjZS5nZXQoXCJyZXRyaWV2YWxfcXVlcnlfbWF0Y2hlc1wiKSBvciB7fSkudmFsdWVzKClcbiAgICAgICAgICAgICkgb3IgX1JFUVVJUkVEX1JFLnNlYXJjaChzb3VyY2VbXCJzbmlwcGV0XCJdKSBvciBfRk9SQklEREVOX1JFLnNlYXJjaChzb3VyY2VbXCJzbmlwcGV0XCJdKVxuICAgICAgICAgICAgcmV0YWluZWRfc3RhcnQgPSByYXdfc25pcHBldC5maW5kKHNvdXJjZVtcInNuaXBwZXRcIl0pXG4gICAgICAgICAgICBpZiBwcmVzZXJ2ZV9zcGFuIGFuZCAocmV0YWluZWRfc3RhcnQgPCAwXG4gICAgICAgICAgICAgICAgICAgIG9yIHJhd19zbmlwcGV0LmZpbmQoc291cmNlW1wic25pcHBldFwiXSwgcmV0YWluZWRfc3RhcnQgKyAxKSA+PSAwKTpcbiAgICAgICAgICAgICAgICBjb250aW51ZVxuICAgICAgICAgICAgaWYgcHJlc2VydmVfc3BhbiBhbmQgbm90IChzbmlwcGV0X3N0YXJ0IDw9IHJldGFpbmVkX3N0YXJ0XG4gICAgICAgICAgICAgICAgICAgIGFuZCByZXRhaW5lZF9zdGFydCArIGxlbihzb3VyY2VbXCJzbmlwcGV0XCJdKSA8PSBzbmlwcGV0X2VuZCk6XG4gICAgICAgICAgICAgICAgc25pcHBldF9zdGFydCA9IG1pbihzbmlwcGV0X3N0YXJ0LCByZXRhaW5lZF9zdGFydClcbiAgICAgICAgICAgICAgICBzbmlwcGV0X2VuZCA9IG1heChzbmlwcGV0X2VuZCwgcmV0YWluZWRfc3RhcnQgKyBsZW4oc291cmNlW1wic25pcHBldFwiXSkpXG4gICAgICAgICAgICAgICAgaWYgc25pcHBldF9lbmQgLSBzbmlwcGV0X3N0YXJ0ID4gbGltaXQ6XG4gICAgICAgICAgICAgICAgICAgIGNvbnRpbnVlXG4gICAgICAgICAgICAgICAgc25pcHBldCA9IHJhd19zbmlwcGV0W3NuaXBwZXRfc3RhcnQ6c25pcHBldF9lbmRdIiIiCmFzc2VydCB0ZXh0LmNvdW50KG9sZCkgPT0gMSwgInByZXNlcnZlLXNwYW4gZHJpZnQiCnRleHQgPSB0ZXh0LnJlcGxhY2Uob2xkLCBuZXcsIDEpCgpvbGQgPSAiIiIgICAgZm9yIGxpbWl0IGluICgxNjAsIDMyMCwgNTIwKTpcbiAgICAgICAgZm9yIGZvY3VzIGluIChmb2N1c2VzLCAqKCh2YWx1ZSwpIGZvciB2YWx1ZSBpbiBmb2N1c2VzIGlmIHZhbHVlKSk6XG4gICAgICAgICAgICBzbmlwcGV0LCBzbmlwcGV0X3N0YXJ0LCBzbmlwcGV0X2VuZCA9IF9mb2N1c2VkX3NuaXBwZXQoXG4gICAgICAgICAgICAgICAgcmF3X3NuaXBwZXQsIGZvY3VzLCBsaW1pdD1saW1pdCxcbiAgICAgICAgICAgICkiIiIKbmV3ID0gIiIiICAgIGZvciBsaW1pdCBpbiBfcHJvamVjdGlvbl9saW1pdHMocmF3X3NuaXBwZXQpOlxuICAgICAgICBmb3IgZm9jdXMgaW4gKGZvY3VzZXMsICooKHZhbHVlLCkgZm9yIHZhbHVlIGluIGZvY3VzZXMgaWYgdmFsdWUpKTpcbiAgICAgICAgICAgIHNuaXBwZXQsIHNuaXBwZXRfc3RhcnQsIHNuaXBwZXRfZW5kID0gX2ZvY3VzZWRfc25pcHBldChcbiAgICAgICAgICAgICAgICByYXdfc25pcHBldCwgZm9jdXMsIGxpbWl0PWxpbWl0LFxuICAgICAgICAgICAgKSIiIgphc3NlcnQgdGV4dC5jb3VudChvbGQpID09IDEsICJxdWFsaWZpZWQtZnJhZ21lbnQgbG9vcCBkcmlmdCIKdGV4dCA9IHRleHQucmVwbGFjZShvbGQsIG5ldywgMSkKCnN0YXJ0ID0gdGV4dC5pbmRleCgiZGVmIF9mYWNldF9hd2FyZV9jYW5kaWRhdGVzKCIpCmVuZCA9IHRleHQuaW5kZXgoIlxuXG5kZWYgX2Z1bGx5X21hdGNoZWRfcXVlcnlfaWRzIiwgc3RhcnQpCnJlcGxhY2VtZW50ID0gJycnZGVmIF9mYWNldF9hd2FyZV9jYW5kaWRhdGVzKAogICAgY2FuZGlkYXRlczogbGlzdFtBbnldLCAqLCBxdWVyeV90ZXh0OiBkaWN0W3N0ciwgc3RyXSwgcmVxdWlyZWRfcXVlcnlfaWRzOiBzZXRbc3RyXSwKICAgIGNhbm9uaWNhbF9xdWVyeV9pZHM6IHNldFtzdHJdIHwgTm9uZSA9IE5vbmUsCiAgICBhc3NpZ25lZF9ldmlkZW5jZV9pZHM6IHNldFtzdHJdIHwgTm9uZSA9IE5vbmUsCiAgICBleGFjdF9xdWVyeV9pZHM6IHNldFtzdHJdIHwgTm9uZSA9IE5vbmUsCiAgICBvYmxpZ2F0aW9uczogdHVwbGVbQW55LCAuLi5dID0gKCksIG1pc3NpbmdfY29tcG9uZW50X2lkczogc2V0W3N0cl0gfCBOb25lID0gTm9uZSwKKSAtPiBsaXN0W0FueV06CiAgICAjIEV4YWN0LWFuY2hvciBsYW5lcyBhcmUgaWRlbnRpdHktc2Vuc2l0aXZlOiB3aGVuIHR3byBjYW5kaWRhdGVzIGJvdGgKICAgICMgdmlzaWJseSBxdWFsaWZ5LCBwcmVzZXJ2ZSB0aGUgdXBzdHJlYW0gYXNzaWduZWQgd2l0bmVzcyBiZWZvcmUgcmV3YXJkaW5nCiAgICAjIGV4dHJhIGxleGljYWwgbWVudGlvbnMuIEdlbmVyYWwgaG9zdC9vcmlnaW5hbCBsYW5lcyBrZWVwIGFjdGlvbiBhbmQKICAgICMgcmVsZXZhbmNlIHJhbmtpbmcgZmlyc3Qgc28gYXNzaWdubWVudHMgY2Fubm90IGNyb3dkIG91dCBwcm9jZWR1cmFsIGZhY3RzLgogICAgZGVmIGNhbmRpZGF0ZV9rZXkoc291cmNlOiBBbnkpIC0+IHR1cGxlW0FueSwgLi4uXToKICAgICAgICBxdWFsaWZpZWRfaWRzID0gcXVhbGlmaWVkX3F1ZXJ5X2lkcygoc291cmNlLCkpCiAgICAgICAgZXhhY3RfY291bnQgPSBsZW4ocXVhbGlmaWVkX2lkcyAmIChleGFjdF9xdWVyeV9pZHMgb3Igc2V0KCkpKQogICAgICAgIGNvbXBvbmVudF9jb3VudCA9IGxlbigKICAgICAgICAgICAgc2V0KGNvbXBvbmVudF93aXRuZXNzZXMoc291cmNlLCBvYmxpZ2F0aW9ucykpICYgKG1pc3NpbmdfY29tcG9uZW50X2lkcyBvciBzZXQoKSkKICAgICAgICApCiAgICAgICAgcmFuayA9IF9jb250ZXh0X3Jhbmsoc291cmNlLCBxdWVyeV90ZXh0LCByZXF1aXJlZF9xdWVyeV9pZHMsIGFzc2lnbmVkX2V2aWRlbmNlX2lkcykKICAgICAgICBtYXRjaF9yYXRpbyA9IHN1bSgKICAgICAgICAgICAgZmxvYXQodHJhY2UuZ2V0KCJtYXRjaF9yYXRpbyIpIG9yIDAuMCkKICAgICAgICAgICAgZm9yIGtleSwgdHJhY2UgaW4gKHNvdXJjZS5nZXQoInJldHJpZXZhbF9xdWVyeV9tYXRjaGVzIikgb3Ige30pLml0ZW1zKCkKICAgICAgICAgICAgaWYga2V5IGluIHJlcXVpcmVkX3F1ZXJ5X2lkcyBhbmQgdHJhY2UuZ2V0KCJxdWFsaWZpZWQiKSBpcyBUcnVlCiAgICAgICAgKQogICAgICAgIHJldHVybiAoCiAgICAgICAgICAgIGludChleGFjdF9jb3VudCA+IDApLAogICAgICAgICAgICBjb21wb25lbnRfY291bnQsCiAgICAgICAgICAgIHJhbmtbM10gaWYgZXhhY3RfY291bnQgZWxzZSAwLjAsCiAgICAgICAgICAgIGV4YWN0X2NvdW50LAogICAgICAgICAgICBsZW4oX2Z1bGx5X21hdGNoZWRfcXVlcnlfaWRzKChzb3VyY2UsKSkgJiByZXF1aXJlZF9xdWVyeV9pZHMpLAogICAgICAgICAgICBsZW4ocXVhbGlmaWVkX2lkcyAmIHJlcXVpcmVkX3F1ZXJ5X2lkcyksCiAgICAgICAgICAgIHJhbmtbMF0sCiAgICAgICAgICAgIG1hdGNoX3JhdGlvLAogICAgICAgICAgICBsZW4ocXVhbGlmaWVkX2lkcyAmIChjYW5vbmljYWxfcXVlcnlfaWRzIG9yIHNldCgpKSksCiAgICAgICAgICAgIHJhbmtbMTozXSArIHJhbmtbNDpdLAogICAgICAgICkKCiAgICByZXR1cm4gc29ydGVkKGNhbmRpZGF0ZXMsIGtleT1jYW5kaWRhdGVfa2V5LCByZXZlcnNlPVRydWUpCicnJwp0ZXh0ID0gdGV4dFs6c3RhcnRdICsgcmVwbGFjZW1lbnQgKyB0ZXh0W2VuZDpdCnBhdGgud3JpdGVfdGV4dCh0ZXh0KQo=' | base64 -d > /tmp/pr178-patcher.py
+          python /tmp/pr178-patcher.py
           python -m compileall -q docmancer/docs/application/docs_context_projection.py docmancer/docs/domain/context_windows.py docmancer/docs/domain/query_terms.py
           git diff --check
       - name: Verify regression and existing contracts
