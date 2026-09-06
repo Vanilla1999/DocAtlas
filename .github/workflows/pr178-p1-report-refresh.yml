@@ -1,0 +1,91 @@
+name: PR178 P1 report refresh review
+
+on:
+  push:
+    branches: [fix/context-first-project-reads]
+    paths: [.github/workflows/pr178-p1-report-refresh.yml]
+
+permissions:
+  contents: read
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
+  DOCATLAS_OFFLINE: "1"
+
+jobs:
+  review-refresh:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+        with:
+          ref: fix/context-first-project-reads
+          fetch-depth: 0
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1
+        with:
+          python-version: '3.12'
+      - name: Install evaluator dependencies
+        run: python -m pip install -e ".[dev]"
+      - name: Recompute P1 reports without committing
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/p1-before
+          cp eval/agent_developer_v1/results/paraphrase-proofability.json /tmp/p1-before/
+          cp eval/agent_developer_v1/results/mixed-evidence-provenance.json /tmp/p1-before/
+          cp eval/agent_developer_v1/results/evidence-is-data.json /tmp/p1-before/
+          python scripts/run_paraphrase_proofability_gate.py --write
+          python scripts/run_mixed_evidence_provenance_gate.py --write
+          python scripts/run_evidence_is_data_gate.py --write
+          python scripts/run_paraphrase_proofability_gate.py
+          python scripts/run_mixed_evidence_provenance_gate.py
+          python scripts/run_evidence_is_data_gate.py
+          python scripts/paraphrase_proofability_self_test.py
+          python scripts/mixed_evidence_provenance_self_test.py
+          python scripts/evidence_is_data_self_test.py
+          python - <<'PY'
+          from __future__ import annotations
+          import hashlib
+          import json
+          from pathlib import Path
+
+          pairs = [
+              ("P1.4", "paraphrase-proofability.json"),
+              ("P1.5", "mixed-evidence-provenance.json"),
+              ("P1.6", "evidence-is-data.json"),
+          ]
+          root = Path("eval/agent_developer_v1/results")
+          before_root = Path("/tmp/p1-before")
+          for label, name in pairs:
+              before = json.loads((before_root / name).read_text())
+              after = json.loads((root / name).read_text())
+              print(f"=== {label} {name} ===")
+              print("OLD_SHA256", hashlib.sha256(json.dumps(before, sort_keys=True, separators=(',', ':')).encode()).hexdigest())
+              print("NEW_SHA256", hashlib.sha256(json.dumps(after, sort_keys=True, separators=(',', ':')).encode()).hexdigest())
+              print("OLD_SUMMARY", json.dumps(before.get("summary"), sort_keys=True))
+              print("NEW_SUMMARY", json.dumps(after.get("summary"), sort_keys=True))
+              if before.get("decision") != after.get("decision"):
+                  print("OLD_DECISION", json.dumps(before.get("decision"), sort_keys=True))
+                  print("NEW_DECISION", json.dumps(after.get("decision"), sort_keys=True))
+              old_cases = {str(row.get("id")): row for row in before.get("cases", []) if isinstance(row, dict)}
+              new_cases = {str(row.get("id")): row for row in after.get("cases", []) if isinstance(row, dict)}
+              changed = []
+              for case_id in sorted(set(old_cases) | set(new_cases)):
+                  if old_cases.get(case_id) == new_cases.get(case_id):
+                      continue
+                  old = old_cases.get(case_id) or {}
+                  new = new_cases.get(case_id) or {}
+                  keys = sorted(key for key in set(old) | set(new) if old.get(key) != new.get(key))
+                  changed.append((case_id, keys))
+                  compact_keys = [
+                      "answer_supported", "support_status", "support_reason_code",
+                      "assignment_count", "missing_requirement_ids", "selected_sources",
+                      "selected_evidence_ids", "proofability", "planner",
+                  ]
+                  print("CASE", case_id, "CHANGED_KEYS", json.dumps(keys))
+                  print("  OLD", json.dumps({k: old.get(k) for k in compact_keys if old.get(k) != new.get(k)}, sort_keys=True))
+                  print("  NEW", json.dumps({k: new.get(k) for k in compact_keys if old.get(k) != new.get(k)}, sort_keys=True))
+              print("CHANGED_CASE_COUNT", len(changed))
+          PY
+          git diff --stat
+          git diff --check
