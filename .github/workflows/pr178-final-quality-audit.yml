@@ -1,4 +1,4 @@
-name: PR178 final quality audit
+name: PR178 cache reset quality trace
 
 on:
   push:
@@ -16,126 +16,73 @@ env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
 
 jobs:
-  audit:
+  trace:
     runs-on: ubuntu-24.04
-    timeout-minutes: 18
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
         with:
           ref: fix/context-first-project-reads
-          fetch-depth: 0
       - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1
         with:
           python-version: '3.12'
-      - name: Install exact branch dependencies
+      - name: Install
         run: python -m pip install -e ".[dev]"
-      - name: Run frozen v2 current-head quality report
-        shell: bash
-        run: |
-          set -euo pipefail
-          python eval/project_context_quality_v2_protocol.py --live --output /tmp/v2.json >/tmp/v2.stdout
-          python - <<'PY'
-          import json
-          from pathlib import Path
-          report = json.loads(Path('/tmp/v2.json').read_text())
-          print('V2_HEAD_REPORT')
-          for lane in ('natural', 'exposed_paraphrases'):
-              row = report['lanes'][lane]
-              m = row['metrics']
-              print(lane, json.dumps({
-                  'semantic_usefulness': m['semantic_usefulness'],
-                  'false_full_coverage': m['false_full_coverage'],
-                  'source_precision': m['source_precision'],
-                  'safety': m['safety'],
-                  'budget_compliance': m['budget_compliance'],
-                  'negative_correctness': m['negative_correctness'],
-                  'unsupported_answer_control_correctness': m['unsupported_answer_control_correctness'],
-                  'root_causes': row['root_cause_counts'],
-              }, sort_keys=True))
-          for result in report['results']:
-              if result.get('semantic_useful') or result.get('negative_correct') or result.get('unsupported_answer_control_correct'):
-                  continue
-              print('V2_NONPASS', result['id'], 'root=', result['root_cause'], 'obligations=', json.dumps([
-                  {'id': x['id'], 'met': x['met']} for x in result.get('obligations', [])
-              ], sort_keys=True), 'paths=', json.dumps([
-                  s.get('path_or_url') for p in report.get('production_results', [])
-                  if p.get('case_id') == result['id']
-                  for s in (p.get('payload') or {}).get('sources', [])
-              ]))
-          print('PRODUCTION_RUNNER_VERDICT', report.get('production_runner_verdict'))
-          print('PRODUCTION_RUNNER_ERRORS', json.dumps(report.get('production_runner_errors'), ensure_ascii=False))
-          PY
-      - name: Replay fixed newcomer 30 first calls and retries
+      - name: Trace frozen cache-reset case
         shell: bash
         run: |
           set -euo pipefail
           python - <<'PY'
-          from __future__ import annotations
+          from copy import deepcopy
+          from unittest.mock import patch
           import json
-          from pathlib import Path
+          from eval.project_context_quality_v2_protocol import load_cases, evaluate_case
           from scripts.run_project_docs_self_host_gate import LiveCase, run
+          from docmancer.docs.interfaces.mcp import context_tools
+          from docmancer.docs.application import docs_context_projection
 
-          q_payload = json.loads(Path('experiments/onboarding-30/questions.json').read_text())
-          retries = {row['id']: row for row in json.loads(Path('experiments/onboarding-30/exact-head-audit/FIXED-RETRIES.json').read_text())}
-          questions = q_payload['questions']
-          cases = []
-          for row in questions:
-              cases.append(LiveCase(
-                  case_id=f"{row['id']}:first", question=row['question'], relevant_paths=(),
-                  scope='project', expected_kind=None,
-              ))
-          for row in questions:
-              decision = retries[row['id']]
-              if decision['decision'] != 'retry':
+          case = next(c for c in load_cases() if c['id'] == 'v2-paraphrase-cache-reset')
+          captured = []
+          project_context = context_tools.project_docs_context
+          def observe(**kwargs):
+              captured.append(deepcopy(kwargs['retrieval']))
+              return project_context(**kwargs)
+          with patch.object(context_tools, 'project_docs_context', observe):
+              result = run(cases=(LiveCase(
+                  case_id=case['id'], question=case['question'], relevant_paths=(),
+                  lookup_queries=tuple(case['lookup_queries']), scope=case['scope'],
+              ),), negative_cases=())
+          payload = result['results'][0]['payload']
+          verdict = evaluate_case(case, payload)
+          print('CASE', json.dumps({
+              'question': case['question'], 'lookups': case['lookup_queries'],
+              'scope': case['scope'], 'obligations': verdict['obligations'],
+          }, ensure_ascii=False, sort_keys=True))
+          print('PAYLOAD', json.dumps({
+              'status': payload.get('status'), 'estimated_tokens': payload.get('estimated_tokens'),
+              'covered': payload.get('covered_query_ids'), 'missing': payload.get('missing_query_ids'),
+              'sources': payload.get('sources'), 'diagnostics': payload.get('diagnostics'),
+          }, ensure_ascii=False, sort_keys=True))
+          retrieval = captured[-1]
+          for row in retrieval.get('context_pack') or []:
+              if row.get('path') != 'docs/index-cleanup.md':
                   continue
-              cases.append(LiveCase(
-                  case_id=f"{row['id']}:retry", question=row['question'], relevant_paths=(),
-                  scope='project', expected_kind=None,
-                  lookup_queries=tuple(decision['lookup_queries']),
-              ))
-          report = run(cases=tuple(cases), negative_cases=())
-          by_id = {row['case_id']: row for row in report['results']}
-          selected = {}
-          print('NEWCOMER30_HEAD_REPORT')
-          print('PUBLIC_CALL_COUNT', len(report['results']))
-          print('RUNNER_ERRORS_IGNORED_FOR_GOLDLESS_DIAGNOSTIC', len(report.get('errors') or []))
-          for q in questions:
-              qid = q['id']
-              first = by_id[f'{qid}:first']['payload']
-              decision = retries[qid]
-              final = by_id[f'{qid}:retry']['payload'] if decision['decision'] == 'retry' else first
-              selected[qid] = final
-              def compact(payload):
-                  return {
-                      'status': payload.get('status'),
-                      'kind': payload.get('kind'),
-                      'estimated_tokens': payload.get('estimated_tokens'),
-                      'covered_query_ids': payload.get('covered_query_ids'),
-                      'missing_query_ids': payload.get('missing_query_ids'),
-                      'sources': [
-                          {'path': s.get('path_or_url'), 'snippet': s.get('snippet')}
-                          for s in payload.get('sources') or []
-                      ],
-                  }
-              print('NEWCOMER_CASE', qid)
-              print('QUESTION', q['question'])
-              print('FIXED_DECISION', json.dumps(decision, ensure_ascii=False, sort_keys=True))
-              print('FIRST', json.dumps(compact(first), ensure_ascii=False, sort_keys=True))
-              print('SELECTED', json.dumps(compact(final), ensure_ascii=False, sort_keys=True))
-          stats = {
-              'first_ok': sum((by_id[f"{q['id']}:first"]['payload'].get('status') == 'ok') for q in questions),
-              'first_insufficient': sum((by_id[f"{q['id']}:first"]['payload'].get('status') == 'insufficient_evidence') for q in questions),
-              'selected_ok': sum((selected[q['id']].get('status') == 'ok') for q in questions),
-              'selected_insufficient': sum((selected[q['id']].get('status') == 'insufficient_evidence') for q in questions),
-              'max_first_tokens': max(int(by_id[f"{q['id']}:first"]['payload'].get('estimated_tokens') or 0) for q in questions),
-              'max_selected_tokens': max(int(selected[q['id']].get('estimated_tokens') or 0) for q in questions),
-              'max_sources': max(len(selected[q['id']].get('sources') or []) for q in questions),
-          }
-          print('NEWCOMER_STATS', json.dumps(stats, sort_keys=True))
+              print('CANDIDATE', json.dumps({
+                  'path': row.get('path'), 'authority': row.get('authority'), 'line_start': row.get('line_start'),
+                  'content': row.get('content'), 'parent_content': row.get('parent_content'),
+                  'matches': row.get('retrieval_query_matches'), 'stable_chunk_id': row.get('stable_chunk_id'),
+                  'parent_logical_id': row.get('parent_logical_id'),
+              }, ensure_ascii=False, sort_keys=True))
+              query_text = {str(q.get('query_id')): str(q.get('text') or '') for q in (retrieval.get('documentation_query_plan') or {}).get('queries') or []}
+              query_ids = set((row.get('retrieval_query_matches') or {}).keys())
+              variants = docs_context_projection._focused_variants(
+                  row, queries=tuple(query_text[q] for q in query_ids if q in query_text),
+                  query_ids=query_ids, query_text=query_text, source_line_start=row.get('line_start'),
+              )
+              for variant in variants:
+                  print('VARIANT', json.dumps({
+                      'snippet': variant.get('snippet'), 'line_start': variant.get('line_start'),
+                      'line_end': variant.get('line_end'), 'qualified': variant.get('retrieval_query_ids'),
+                      'matches': variant.get('retrieval_query_matches'),
+                  }, ensure_ascii=False, sort_keys=True))
           PY
-      - name: Lightweight integrity checks
-        shell: bash
-        run: |
-          set -euo pipefail
-          python -m compileall -q docmancer tests scripts eval
-          git diff --check
