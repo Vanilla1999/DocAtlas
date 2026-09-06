@@ -64,7 +64,7 @@ jobs:
           text = path.read_text()
           addition = '''\n\ndef test_generic_contract_fact_rejects_disclaimer_mentions_and_negation():\n    question = "What contract governs EvidenceRequirementSet?"\n    contract = build_project_answer_contract(question)\n    obligation = next(\n        row for row in contract.proof_obligations\n        if row.relation == "contract_fact" and row.subject == "EvidenceRequirementSet"\n    )\n    source = {"path": "docs/contract.md", "authority": "source_of_truth"}\n\n    valid_units = extract_answer_units(\n        "EvidenceRequirementSet is a canonical selector input.",\n        include_soft_wrapped_prose=True,\n    )\n    assert best_local_proof(obligation, valid_units, source=source) is not None\n\n    for text in (\n        "Presentation notes mention EvidenceRequirementSet, but this note does not define the acceptance contract.",\n        "EvidenceRequirementSet is mentioned in an obsolete presentation note.",\n    ):\n        units = extract_answer_units(text, include_soft_wrapped_prose=True)\n        assert best_local_proof(obligation, units, source=source) is None\n'''
           assert 'test_generic_contract_fact_rejects_disclaimer_mentions_and_negation' not in text
-          path.write_text(text.rstrip() + addition + '\n')
+          path.write_text(text.rstrip() + addition.rstrip() + '\n')
 
           path = Path('tests/test_docs_service_part03.py')
           text = path.read_text()
