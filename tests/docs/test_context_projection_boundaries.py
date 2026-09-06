@@ -54,7 +54,6 @@ def test_oversized_table_row_does_not_drop_its_restriction():
     row = "| gateway | " + "bounded request " * 35 + "; never authorize edits |"
     text = "| Stage | Rule |\n| --- | --- |\n" + row
     snippet, start, end = _focused_snippet(text, ("gateway bounded request",), limit=160)
-    # No fabricated short prefix of the oversized atomic row may escape.
     assert row in snippet or "gateway" not in snippet
     assert text[start:end] == snippet
     assert len(snippet) <= 160
@@ -88,7 +87,6 @@ def test_stronger_explicit_lookup_precedes_generated_alias_bonus():
                     "query-lookup-1": {"query_text": "gateway request candidates selection"},
                     "query-intent-1": {"query_text": "internal policy"},
                 })
-    # The weak generated hit arrives first; input ordering must not decide this.
     retrieval["context_pack"] = [weak, strong]
     result, snapshot = project_docs_context(retrieval=retrieval)
     assert result["sources"][0]["path_or_url"] == "docs/strong.md"
@@ -177,3 +175,24 @@ def test_complete_qualified_variant_precedes_mid_sentence_prefix():
     assert variants
     assert "silently widens the cleanup scope." in variants[0]["snippet"]
     assert variants[0]["snippet"] in raw
+
+
+def test_frozen_cache_reset_keeps_preview_and_preserve_in_visible_context():
+    from eval.project_context_quality_v2_protocol import evaluate_case, load_cases
+    from scripts.run_project_docs_self_host_gate import LiveCase, run
+
+    case = next(row for row in load_cases() if row["id"] == "v2-paraphrase-cache-reset")
+    result = run(cases=(LiveCase(
+        case_id=case["id"],
+        question=case["question"],
+        relevant_paths=(),
+        lookup_queries=tuple(case["lookup_queries"]),
+        scope=case["scope"],
+    ),), negative_cases=())
+    payload = result["results"][0]["payload"]
+    verdict = evaluate_case(case, payload)
+    assert all(row["met"] for row in verdict["obligations"]), verdict["obligations"]
+    assert verdict["semantic_useful"] is True
+    assert verdict["false_full_coverage"] is False
+    assert payload["answer_supported"] is False and payload["edit_ready"] is False
+    assert len(payload["sources"]) <= 3 and payload["estimated_tokens"] <= 800
