@@ -70,3 +70,5 @@ jobs:
           git diff --cached --check
           git commit -m "fix: require local quantified attribute evidence [skip ci]"
           git push origin HEAD:fix/context-first-project-reads
+
+# retrigger after diagnostic manifest refresh
