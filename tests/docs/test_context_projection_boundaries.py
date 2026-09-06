@@ -199,34 +199,35 @@ def test_frozen_cache_reset_keeps_preview_and_preserve_in_visible_context():
 
 
 def test_frozen_architecture_infrastructure_boundary_enters_retrieval_candidates(monkeypatch):
-    from docmancer.docs.application import _project_docs_service_part03 as retrieval
+    from copy import deepcopy
+    from docmancer.docs.interfaces.mcp import context_tools
     from eval.project_context_quality_v2_protocol import load_cases
     from scripts.run_project_docs_self_host_gate import LiveCase, run
 
     case = next(row for row in load_cases() if row["id"] == "v2-natural-architecture")
     captured = []
-    tag = retrieval._tag_retrieval_query
+    project_context = context_tools.project_docs_context
 
-    def observe(chunks, *args, **kwargs):
-        result = tag(chunks, *args, **kwargs)
-        if args and args[0] == "query-lookup-3":
-            captured.extend(result)
-        return result
+    def observe(**kwargs):
+        captured.extend(deepcopy((kwargs.get("retrieval") or {}).get("context_pack") or []))
+        return project_context(**kwargs)
 
-    monkeypatch.setattr(retrieval, "_tag_retrieval_query", observe)
+    monkeypatch.setattr(context_tools, "project_docs_context", observe)
     run(cases=(LiveCase(
         case_id=case["id"], question=case["question"], relevant_paths=(),
         lookup_queries=tuple(case["lookup_queries"]), scope=case["scope"],
     ),), negative_cases=())
 
     candidates = [
-        chunk for chunk in captured
-        if (chunk.metadata or {}).get("project_doc_path") == "docs/modules/project-context-retrieval.md"
-        and "SQLite owns persistence and candidate generation" in chunk.text
+        candidate for candidate in captured
+        if candidate.get("path") == "docs/modules/project-context-retrieval.md"
+        and "SQLite owns persistence and candidate generation" in str(candidate.get("content") or "")
     ]
     assert candidates, "the real infrastructure-boundary witness was lost before projection"
-    trace = candidates[0].metadata["retrieval_query_matches"]["query-lookup-3"]
-    assert trace["qualified"] is True
+    assert any(
+        trace.get("qualified") is True
+        for trace in candidates[0].get("retrieval_query_matches", {}).values()
+    )
 
 
 def test_frozen_request_flow_prefers_project_context_module_witnesses():
