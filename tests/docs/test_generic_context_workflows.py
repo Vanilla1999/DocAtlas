@@ -375,6 +375,7 @@ def test_table_window_retains_trailing_row_restriction(limit):
 def test_wider_windows_preserve_contiguous_witnesses_and_table_qualifiers(gap_size):
     from docmancer.docs.application.docs_context_projection import project_docs_context
     from docmancer.docs.application.model_visible_projection import validate_model_visible_projection
+    from docmancer.docs.domain.context_windows import _projection_limits
 
     gap = "Background notes. " * gap_size
     content = ("| Tool | Purpose |\n|---|---|\n| `lumen_read` | "
@@ -405,7 +406,7 @@ def test_wider_windows_preserve_contiguous_witnesses_and_table_qualifiers(gap_si
     assert bool(witnesses) is (gap_size <= 16)
     for row in payload.get("sources", []):
         snippet = row["snippet"]
-        assert snippet in content and len(snippet) <= 520
+        assert snippet in content and len(snippet) <= max(_projection_limits(content))
         assert row["line_start"] == 17 + content[:content.index(snippet)].count("\n")
         assert row["line_end"] == row["line_start"] + snippet.count("\n")
         if "Cobalt" in snippet:

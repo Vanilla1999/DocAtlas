@@ -67,6 +67,12 @@ def project_docs_context(
     query_plan = dict(retrieval.get("documentation_query_plan") or {})
     obligations = component_obligations(query_plan.get("_component_contract") or ())
     mandatory_component_ids = {item.obligation_id for item in obligations}
+    strict_single_attribute = bool(
+        query_plan.get("component_scope_complete", True)
+        and len(obligations) == 1
+        and obligations[0].kind == "attribute"
+        and obligations[0].value_kind
+    )
     selection = retrieval.get("selection_decision") or {}
     assignments = (
         selection.get("assignments") or () if isinstance(selection, dict) else ()
@@ -109,6 +115,18 @@ def project_docs_context(
     }
     required_query_ids = _required_query_ids(query_plan)
     required_query_id_set = set(required_query_ids)
+    required_requirement_ids = {
+        str(item.get("requirement_id") or "")
+        for item in query_plan.get("queries") or ()
+        if isinstance(item, dict)
+        and str(item.get("query_id") or "") in required_query_id_set
+        and item.get("requirement_id")
+    }
+    required_assigned_evidence_ids = {
+        assigned_evidence_by_requirement[requirement_id]
+        for requirement_id in required_requirement_ids
+        if requirement_id in assigned_evidence_by_requirement
+    }
     public_query_ids = _public_query_ids(query_plan)
     public_query_id_set = set(public_query_ids)
     host_query_ids = _query_ids_for_origins(query_plan, {"host_lookup"})
@@ -145,6 +163,7 @@ def project_docs_context(
         required_query_ids=public_query_id_set,
         canonical_query_ids=canonical_intent_query_ids,
         assigned_evidence_ids=set(assigned_evidence_by_requirement.values()),
+        bound_assigned_evidence_ids=required_assigned_evidence_ids,
     )
     projection_diagnostics["ranked_candidate_ids"] = [
         _internal_candidate_id(item) for item in initially_ranked[:32]
@@ -185,6 +204,8 @@ def project_docs_context(
         qualified_ids = qualified_query_ids((original,))
         component_ids = set(component_witnesses(qualified_original, obligations))
         visible_query_ids = qualified_ids & eligible_query_ids
+        if strict_single_attribute and not component_ids:
+            continue
         if not visible_query_ids and not component_ids:
             continue
         required_ids = qualified_ids & required_query_id_set
@@ -283,8 +304,16 @@ def project_docs_context(
 
     selected_host_query_ids: set[str] = set()
     while prepared:
+        selected_qualified_public_ids = qualified_query_ids(sources) & public_query_id_set
         selected_public_ids = _fully_matched_query_ids(sources) & public_query_id_set
         selected_canonical_ids = qualified_query_ids(sources) & canonical_intent_query_ids
+        selected_authoritative_public_ids = {
+            query_id
+            for source in sources
+            if str(source.get("authority") or "supporting").casefold() == "source_of_truth"
+            for query_id in qualified_query_ids((source,))
+            if query_id in public_query_id_set
+        }
         selected_components = {key for source in sources for key in component_witnesses(source, obligations)}
         prepared = _facet_aware_candidates(
             prepared, query_text=query_text,
@@ -293,6 +322,7 @@ def project_docs_context(
             exact_query_ids=exact_anchor_query_ids - selected_public_ids,
             obligations=obligations, missing_component_ids=mandatory_component_ids - selected_components,
             assigned_evidence_ids=set(assigned_evidence_by_requirement.values()),
+            bound_assigned_evidence_ids=required_assigned_evidence_ids,
         )
         variant = prepared.pop(0)
         original, raw_snippet, focus_queries, assigned_requirement_ids = variant_inputs[id(variant)]
@@ -348,6 +378,34 @@ def project_docs_context(
         component_ids = set(component_witnesses(normalized, obligations))
         new_components = component_ids - selected_components
         if not (qualified_ids & eligible_query_ids) and not component_ids:
+            continue
+        dependent_on_covered_parent = {
+            str(item.get("query_id") or "")
+            for item in query_plan.get("queries") or ()
+            if isinstance(item, dict)
+            and str(item.get("query_id") or "") in qualified_ids
+            and str(item.get("public_parent_query_id") or "") in selected_qualified_public_ids
+        }
+        novel_independent_public_ids = (
+            (qualified_ids & public_query_id_set)
+            - selected_qualified_public_ids
+            - dependent_on_covered_parent
+        )
+        # Query coverage is retrieval attribution, not a second semantic proof.
+        # Generated exact-anchor children inherit their public parent's direction:
+        # once that parent is already qualified, those children cannot by themselves
+        # admit a lower-authority duplicate source. Explicit host lookups with no
+        # covered parent still count as genuinely new independent directions.
+        if (
+            sources
+            and obligations
+            and query_plan.get("component_scope_complete", True)
+            and selected_authoritative_public_ids
+            and str(normalized.get("authority") or "supporting").casefold() != "source_of_truth"
+            and not new_components
+            and not novel_independent_public_ids
+            and not (qualified_ids & canonical_intent_query_ids - selected_canonical_ids)
+        ):
             continue
         if sources and not (new_components or
             qualified_ids & public_query_id_set - selected_public_ids or
@@ -810,6 +868,7 @@ def _facet_aware_candidates(
     candidates: list[Any], *, query_text: dict[str, str], required_query_ids: set[str],
     canonical_query_ids: set[str] | None = None,
     assigned_evidence_ids: set[str] | None = None,
+    bound_assigned_evidence_ids: set[str] | None = None,
     exact_query_ids: set[str] | None = None,
     obligations: tuple[Any, ...] = (), missing_component_ids: set[str] | None = None,
 ) -> list[Any]:
@@ -824,6 +883,13 @@ def _facet_aware_candidates(
             set(component_witnesses(source, obligations)) & (missing_component_ids or set())
         )
         rank = _context_rank(source, query_text, required_query_ids, assigned_evidence_ids)
+        identity = {**source.get("_qualification_candidate", {}), **source}
+        source_ids = {
+            str(identity.get(key) or "")
+            for key in ("stable_id", "stable_chunk_id", "evidence_id")
+            if identity.get(key)
+        }
+        bound_assignment = int(bool(source_ids & (bound_assigned_evidence_ids or set())))
         match_ratio = sum(
             float(trace.get("match_ratio") or 0.0)
             for key, trace in (source.get("retrieval_query_matches") or {}).items()
@@ -832,6 +898,7 @@ def _facet_aware_candidates(
         return (
             int(exact_count > 0),
             component_count,
+            bound_assignment,
             rank[3] if exact_count else 0.0,
             exact_count,
             len(_fully_matched_query_ids((source,)) & required_query_ids),

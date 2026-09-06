@@ -150,11 +150,20 @@ _OPEN_INVENTORY_RE = re.compile(
 )
 
 
+def _contract_fact_disclaimer(text: str) -> bool:
+    normalized = _normal(text)
+    return bool(
+        _NEGATION_RE.search(text)
+        or re.search(
+            r"\b(?:obsolete|deprecated|document(?:ed|s)?|describ(?:ed|es)?|mention(?:ed|s)?)\b",
+            normalized,
+        )
+    )
+
+
 def _contract_fact_relation_valid(text: str) -> bool:
     normalized = _normal(text)
-    if _NEGATION_RE.search(text) or re.search(
-        r"\b(?:obsolete|deprecated|documented|described|mentioned)\b", normalized,
-    ):
+    if _contract_fact_disclaimer(text):
         return False
     returns_result = bool(re.search(
         r"\b(?:return|returns|responds?\s+with|produces?|emits?|result(?:s)?\s+(?:is|are))\b",
@@ -184,7 +193,9 @@ def _value_score(value_kind: str, text: str, *, cardinality: int | None = None) 
     if value_kind == "status":
         return 3 if _STATUS_VALUE_RE.search(text) else 0
     if value_kind == "number":
-        return 2 if re.search(r"(?<!\w)\d+(?:\.\d+)?(?!\w)", text) else 0
+        numeric = re.search(r"(?<!\w)\d+(?:\.\d+)?(?!\w)", text) is not None
+        word_number = any(_contains_term(word, text) for word in _NUMBER_WORD_VALUES)
+        return 2 if numeric or word_number else 0
     if value_kind == "boolean":
         return 2 if re.search(r"\b(?:true|false|yes|no|enabled|disabled|да|нет|включен|выключен)\b", text, re.I) else 0
     if value_kind == "path":
@@ -752,11 +763,11 @@ def local_proof_for_obligation(
 
     if obligation.kind == "exact_fact":
         relation = 2 if (not obligation.attribute or _attribute_present(obligation.attribute, text)) else 0
-        if (
-            obligation.relation == "contract_fact"
-            and _normal(obligation.attribute) == "response contract"
-        ):
-            relation = 3 if relation and _contract_fact_relation_valid(text) else 0
+        if obligation.relation == "contract_fact":
+            if _contract_fact_disclaimer(text):
+                relation = 0
+            elif _normal(obligation.attribute) == "response contract":
+                relation = 3 if relation and _contract_fact_relation_valid(text) else 0
         value = _value_score(obligation.value_kind, text)
         if obligation.expected_value:
             value = max(value, 3 if _contains_term(obligation.expected_value, text) else 0)

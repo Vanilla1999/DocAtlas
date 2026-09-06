@@ -198,3 +198,25 @@ def test_markdown_bullet_continuations_are_one_visible_answer_unit():
     assert len(bullets) == 2
     assert "will remain" in bullets[0].text
     assert "never bypasses" in bullets[0].text
+
+def test_generic_contract_fact_rejects_disclaimer_mentions_and_negation():
+    question = "What contract governs EvidenceRequirementSet?"
+    contract = build_project_answer_contract(question)
+    obligation = next(
+        row for row in contract.proof_obligations
+        if row.relation == "contract_fact" and row.subject == "EvidenceRequirementSet"
+    )
+    source = {"path": "docs/contract.md", "authority": "source_of_truth"}
+
+    valid_units = extract_answer_units(
+        "EvidenceRequirementSet is a canonical selector input.",
+        include_soft_wrapped_prose=True,
+    )
+    assert best_local_proof(obligation, valid_units, source=source) is not None
+
+    for text in (
+        "Presentation notes mention EvidenceRequirementSet, but this note does not define the acceptance contract.",
+        "EvidenceRequirementSet is mentioned in an obsolete presentation note.",
+    ):
+        units = extract_answer_units(text, include_soft_wrapped_prose=True)
+        assert best_local_proof(obligation, units, source=source) is None

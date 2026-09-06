@@ -65,6 +65,24 @@ def build_project_answer_contract(question: str) -> ProjectAnswerContract:
     subjects = _subjects(raw_question)
     obligations: list[ProofObligation] = []
 
+    # Multi-word quantified attributes are specific enough for typed local proof.
+    # A bare noun (for example `attempts`) retains the existing fail-closed path.
+    quantified_attribute = re.match(
+        r"^\s*how\s+many\s+([A-Za-z][A-Za-z0-9_-]*(?:\s+[A-Za-z][A-Za-z0-9_-]+){1,4})\s+does\s+"
+        r"`?([A-Za-z_][A-Za-z0-9_.:-]*)`?\s+"
+        r"(?:allow|permit|support|have|use)\b",
+        raw_question, re.I,
+    )
+    if quantified_attribute:
+        attribute = _clean_phrase(quantified_attribute.group(1))
+        subject = quantified_attribute.group(2).strip("`")
+        obligations.append(_obligation(
+            question=raw_question, index=len(obligations), kind="attribute",
+            subject=subject, attribute=attribute, value_kind="number",
+            response_mode="count", lifecycle_intent=lifecycle,
+            span_value=quantified_attribute.group(0).strip(),
+        ))
+
     declarative = _DECLARATIVE_RELATION_RE.match(raw_question)
     if declarative and not re.match(r"^(?:what|which|how|when|where|why|who|что|как|когда|где|почему)\b", raw_question, re.I):
         subject, relation, target = (

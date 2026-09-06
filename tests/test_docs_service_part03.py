@@ -97,10 +97,11 @@ roots:
     assert payload["kind"] == "docs_context"
     assert payload["answer_supported"] is False
     assert payload["edit_ready"] is False
+    assert payload["sources"][0]["path_or_url"] == "zz-authoritative-plan.md"
     assert all(
-        source["path_or_url"] != "docs/note-00.md"
+        not source["path_or_url"].startswith("docs/note-")
         for source in payload["sources"]
-    )
+    ), payload["sources"]
 
     dispatcher_payload = handle_context_tool(
         "get_docs_context",
