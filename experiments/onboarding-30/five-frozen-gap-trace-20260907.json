@@ -1,0 +1,3243 @@
+{
+  "schema": "docatlas-five-frozen-gap-trace-v1",
+  "runtime_anchor": "01f7b43afb00ead4a151099b9b11c0a27b94eafe",
+  "rows": [
+    {
+      "id": "v2-natural-architecture",
+      "question": "Как устроена архитектура проекта и где проходят основные границы модулей?",
+      "scope": "all",
+      "lookup_queries": [
+        "How are application workflows separated from domain rules?",
+        "Where does the documentation transport boundary live?",
+        "Which responsibilities belong to storage rather than evidence qualification?"
+      ],
+      "verdict": {
+        "semantic_useful": false,
+        "false_full_coverage": false,
+        "obligations": [
+          {
+            "id": "application",
+            "met": true
+          },
+          {
+            "id": "domain",
+            "met": true
+          },
+          {
+            "id": "mcp_boundary",
+            "met": true
+          },
+          {
+            "id": "infrastructure_boundary",
+            "met": false
+          }
+        ]
+      },
+      "query_plan": {
+        "schema_version": "documentation-query-plan-v2",
+        "original_question": "Как устроена архитектура проекта и где проходят основные границы модулей?",
+        "query_ids": [
+          "query-original",
+          "query-lookup-1",
+          "query-lookup-2",
+          "query-lookup-3",
+          "query-intent-1",
+          "query-concept-1",
+          "query-hint-1",
+          "query-hint-2",
+          "query-hint-3"
+        ],
+        "required_query_ids": [],
+        "public_query_ids": [
+          "query-original",
+          "query-lookup-1",
+          "query-lookup-2",
+          "query-lookup-3"
+        ],
+        "queries": [
+          {
+            "query_id": "query-original",
+            "text": "Как устроена архитектура проекта и где проходят основные границы модулей?",
+            "origin": "original",
+            "coverage_required": false,
+            "facet_id": null,
+            "requirement_id": null,
+            "relation": "direct",
+            "public_parent_query_id": null,
+            "preferred_catalog_roles": [
+              "project_architecture",
+              "overview"
+            ],
+            "forbidden_catalog_roles": [
+              "roadmap"
+            ],
+            "forbidden_evidence_terms": [],
+            "parent_exact_terms": []
+          },
+          {
+            "query_id": "query-lookup-1",
+            "text": "How are application workflows separated from domain rules?",
+            "origin": "host_lookup",
+            "coverage_required": false,
+            "facet_id": null,
+            "requirement_id": null,
+            "relation": "host_lookup",
+            "public_parent_query_id": null,
+            "preferred_catalog_roles": [
+              "project_architecture",
+              "overview"
+            ],
+            "forbidden_catalog_roles": [
+              "roadmap"
+            ],
+            "forbidden_evidence_terms": [],
+            "parent_exact_terms": []
+          },
+          {
+            "query_id": "query-lookup-2",
+            "text": "Where does the documentation transport boundary live?",
+            "origin": "host_lookup",
+            "coverage_required": false,
+            "facet_id": null,
+            "requirement_id": null,
+            "relation": "host_lookup",
+            "public_parent_query_id": null,
+            "preferred_catalog_roles": [
+              "project_architecture",
+              "overview"
+            ],
+            "forbidden_catalog_roles": [
+              "roadmap"
+            ],
+            "forbidden_evidence_terms": [],
+            "parent_exact_terms": []
+          },
+          {
+            "query_id": "query-lookup-3",
+            "text": "Which responsibilities belong to storage rather than evidence qualification?",
+            "origin": "host_lookup",
+            "coverage_required": false,
+            "facet_id": null,
+            "requirement_id": null,
+            "relation": "host_lookup",
+            "public_parent_query_id": null,
+            "preferred_catalog_roles": [
+              "project_architecture",
+              "overview"
+            ],
+            "forbidden_catalog_roles": [
+              "roadmap"
+            ],
+            "forbidden_evidence_terms": [],
+            "parent_exact_terms": []
+          },
+          {
+            "query_id": "query-intent-1",
+            "text": "project architecture overview components indexing retrieval storage",
+            "origin": "canonical_intent",
+            "coverage_required": false,
+            "facet_id": "intent-context:project_architecture",
+            "requirement_id": null,
+            "relation": "host_lookup",
+            "public_parent_query_id": null,
+            "preferred_catalog_roles": [
+              "project_architecture",
+              "overview"
+            ],
+            "forbidden_catalog_roles": [
+              "roadmap"
+            ],
+            "forbidden_evidence_terms": [],
+            "parent_exact_terms": []
+          },
+          {
+            "query_id": "query-concept-1",
+            "text": "и",
+            "origin": "concept_alias",
+            "coverage_required": false,
+            "facet_id": null,
+            "requirement_id": null,
+            "relation": "host_lookup",
+            "public_parent_query_id": null,
+            "preferred_catalog_roles": [
+              "project_architecture",
+              "overview"
+            ],
+            "forbidden_catalog_roles": [
+              "roadmap"
+            ],
+            "forbidden_evidence_terms": [],
+            "parent_exact_terms": []
+          },
+          {
+            "query_id": "query-hint-1",
+            "text": "устроена",
+            "origin": "retrieval_hint",
+            "coverage_required": false,
+            "facet_id": null,
+            "requirement_id": null,
+            "relation": "host_lookup",
+            "public_parent_query_id": null,
+            "preferred_catalog_roles": [
+              "project_architecture",
+              "overview"
+            ],
+            "forbidden_catalog_roles": [
+              "roadmap"
+            ],
+            "forbidden_evidence_terms": [],
+            "parent_exact_terms": []
+          },
+          {
+            "query_id": "query-hint-2",
+            "text": "архитектура",
+            "origin": "retrieval_hint",
+            "coverage_required": false,
+            "facet_id": null,
+            "requirement_id": null,
+            "relation": "host_lookup",
+            "public_parent_query_id": null,
+            "preferred_catalog_roles": [
+              "project_architecture",
+              "overview"
+            ],
+            "forbidden_catalog_roles": [
+              "roadmap"
+            ],
+            "forbidden_evidence_terms": [],
+            "parent_exact_terms": []
+          },
+          {
+            "query_id": "query-hint-3",
+            "text": "проекта",
+            "origin": "retrieval_hint",
+            "coverage_required": false,
+            "facet_id": null,
+            "requirement_id": null,
+            "relation": "host_lookup",
+            "public_parent_query_id": null,
+            "preferred_catalog_roles": [
+              "project_architecture",
+              "overview"
+            ],
+            "forbidden_catalog_roles": [
+              "roadmap"
+            ],
+            "forbidden_evidence_terms": [],
+            "parent_exact_terms": []
+          }
+        ],
+        "explicit_paths": [],
+        "unresolved_parts": [
+          "unresolved_question_clause:Как устроена архитектура проекта",
+          "unresolved_question_clause:где проходят основные границы модулей"
+        ],
+        "_component_contract": [],
+        "component_scope_complete": true
+      },
+      "candidate_count": 2,
+      "interesting_candidates": [
+        {
+          "index": 0,
+          "path": "docs/PROJECT_MAP.md",
+          "title": "Runtime areas",
+          "section": {
+            "title": "Runtime areas",
+            "heading_path": "Project map > Runtime areas",
+            "freshness": "current"
+          },
+          "line_start": 9,
+          "stable_chunk_id": "child-d727ca66d79aaa32ff4cf971749c598a366a95a8",
+          "parent_logical_id": "parent-c1d59f8708be8463bfb1093cb740186f",
+          "authority": "source_of_truth",
+          "doc_scope": "project",
+          "retrieval_query_ids": [
+            "query-lookup-1",
+            "query-lookup-2"
+          ],
+          "matches": {
+            "query-lookup-1": {
+              "query_text": "How are application workflows separated from domain rules?",
+              "query_terms": [
+                "application",
+                "workflows",
+                "separated",
+                "from",
+                "domain",
+                "rules"
+              ],
+              "exact_terms": [],
+              "matched_terms": [
+                "application",
+                "workflows",
+                "domain",
+                "rules"
+              ],
+              "missing_exact_terms": [],
+              "matched_term_count": 4,
+              "match_ratio": 0.6667,
+              "lexical_score": 20.685190252073937,
+              "qualified": true,
+              "qualification_reason": "visible_fields",
+              "relation": "host_lookup"
+            },
+            "query-lookup-2": {
+              "query_text": "Where does the documentation transport boundary live?",
+              "query_terms": [
+                "where",
+                "does",
+                "documentation",
+                "transport",
+                "boundary",
+                "live"
+              ],
+              "exact_terms": [],
+              "matched_terms": [
+                "documentation",
+                "transport",
+                "boundary"
+              ],
+              "missing_exact_terms": [],
+              "matched_term_count": 3,
+              "match_ratio": 0.5,
+              "lexical_score": 9.142705603065131,
+              "qualified": true,
+              "qualification_reason": "visible_fields",
+              "relation": "host_lookup"
+            }
+          },
+          "content": "| Area | Location | Responsibility |\n|---|---|---|\n| CLI | `docmancer/cli/` | Installation, ingest, query, lifecycle and MCP commands |\n| Documentation application | `docmancer/docs/application/` | Project, library and unified context workflows |\n| Documentation domain | `docmancer/docs/domain/` | Ranking, trust, source identity and policy rules |\n| Question planning | `docmancer/docs/domain/question_plan.py` | Fail-closed documentation questions and proof obligations |\n| Patch planning | `docmancer/docs/domain/patch_request_plan.py` | Reviewed imperative grammar, target polarity and mutation authorization inputs |\n| MCP Docs server | `docmancer/mcp/docs_server.py` | Public documentation tools, resources and transport boundary |\n| MCP Packs gateway | `docmancer/mcp/serve.py` | Advanced installed API-pack search and dispatch |\n| Executors | `docmancer/mcp/executors/` | Capability-gated HTTP and Python execution |\n| Connectors | `docmancer/connectors/` | Local and remote documentation acquisition |\n| Evaluation | `eval/` | Retrieval and task-level benchmarks |\n| Tests | `tests/` | Unit, contract, security and integration coverage |\n\n"
+        }
+      ],
+      "public": {
+        "status": "ok",
+        "paths": [
+          "docs/PROJECT_MAP.md",
+          "docs/PROJECT_MAP.md"
+        ],
+        "sources": [
+          {
+            "evidence_id": "ev-76ec88a04c8c45ea",
+            "path_or_url": "docs/PROJECT_MAP.md",
+            "section": "Project map > Runtime areas",
+            "snippet": "| Documentation application | `docmancer/docs/application/` | Project, library and unified context workflows |\n| Documentation domain | `docmancer/docs/domain/` | Ranking, trust, source identity and policy rules |\n| Question planning | `docmancer/docs/domain/question_plan.py` | Fail-closed documentation questions and proof obligations |\n| Patch planning | `docmancer/docs/domain/patch_request_plan.py` | Reviewed imperative grammar, target polarity and mutation authorization inputs |",
+            "version_binding": "unversioned",
+            "content_sha256": "3d5fb1244585fc5ba388690df5bf18b410bdbadaedd39b625d96a5ca270b1ca0",
+            "project_identity": "git:github.com/Vanilla1999/DocAtlas",
+            "authority": "source_of_truth",
+            "scope": "project",
+            "line_start": 12,
+            "line_end": 15
+          },
+          {
+            "evidence_id": "ev-07b77457a4d0ae95",
+            "path_or_url": "docs/PROJECT_MAP.md",
+            "section": "Project map > Runtime areas",
+            "snippet": "| MCP Docs server | `docmancer/mcp/docs_server.py` | Public documentation tools, resources and transport boundary |",
+            "version_binding": "unversioned",
+            "content_sha256": "3d5fb1244585fc5ba388690df5bf18b410bdbadaedd39b625d96a5ca270b1ca0",
+            "project_identity": "git:github.com/Vanilla1999/DocAtlas",
+            "authority": "source_of_truth",
+            "scope": "project",
+            "line_start": 16,
+            "line_end": 16
+          }
+        ],
+        "covered_query_ids": [
+          "query-lookup-1",
+          "query-lookup-2"
+        ],
+        "missing_query_ids": [
+          "query-original",
+          "query-lookup-3"
+        ],
+        "estimated_tokens": 623,
+        "answer_supported": false,
+        "edit_ready": false
+      }
+    },
+    {
+      "id": "v2-natural-request-flow",
+      "question": "Как проходит запрос get_docs_context от MCP-входа до выбора источников?",
+      "scope": "all",
+      "lookup_queries": [
+        "What does the documentation request boundary accept?",
+        "How does the application pass a project question to retrieval?",
+        "How do retrieved chunks become selected visible sources?"
+      ],
+      "verdict": {
+        "semantic_useful": false,
+        "false_full_coverage": false,
+        "obligations": [
+          {
+            "id": "flow_mcp",
+            "met": false
+          },
+          {
+            "id": "flow_application",
+            "met": false
+          },
+          {
+            "id": "flow_gateway",
+            "met": false
+          },
+          {
+            "id": "flow_selection",
+            "met": false
+          }
+        ]
+      },
+      "query_plan": {
+        "schema_version": "documentation-query-plan-v2",
+        "original_question": "Как проходит запрос get_docs_context от MCP-входа до выбора источников?",
+        "query_ids": [
+          "query-original",
+          "query-anchor-1",
+          "query-lookup-1",
+          "query-lookup-2",
+          "query-lookup-3",
+          "query-intent-1",
+          "query-intent-2",
+          "query-concept-1",
+          "query-concept-2",
+          "query-hint-1",
+          "query-hint-2"
+        ],
+        "required_query_ids": [],
+        "public_query_ids": [
+          "query-original",
+          "query-anchor-1",
+          "query-lookup-1",
+          "query-lookup-2",
+          "query-lookup-3"
+        ],
+        "queries": [
+          {
+            "query_id": "query-original",
+            "text": "Как проходит запрос get_docs_context от MCP-входа до выбора источников?",
+            "origin": "original",
+            "coverage_required": false,
+            "facet_id": null,
+            "requirement_id": null,
+            "relation": "direct",
+            "public_parent_query_id": null,
+            "preferred_catalog_roles": [
+              "project_architecture",
+              "api_contract"
+            ],
+            "forbidden_catalog_roles": [
+              "roadmap"
+            ],
+            "forbidden_evidence_terms": [],
+            "parent_exact_terms": []
+          },
+          {
+            "query_id": "query-anchor-1",
+            "text": "get_docs_context",
+            "origin": "exact_anchor",
+            "coverage_required": false,
+            "facet_id": null,
+            "requirement_id": null,
+            "relation": "exact_anchor",
+            "public_parent_query_id": "query-original",
+            "preferred_catalog_roles": [
+              "project_architecture",
+              "api_contract"
+            ],
+            "forbidden_catalog_roles": [
+              "roadmap"
+            ],
+            "forbidden_evidence_terms": [],
+            "parent_exact_terms": []
+          },
+          {
+            "query_id": "query-lookup-1",
+            "text": "What does the documentation request boundary accept?",
+            "origin": "host_lookup",
+            "coverage_required": false,
+            "facet_id": null,
+            "requirement_id": null,
+            "relation": "host_lookup",
+            "public_parent_query_id": null,
+            "preferred_catalog_roles": [
+              "project_architecture",
+              "api_contract"
+            ],
+            "forbidden_catalog_roles": [
+              "roadmap"
+            ],
+            "forbidden_evidence_terms": [],
+            "parent_exact_terms": []
+          },
+          {
+            "query_id": "query-lookup-2",
+            "text": "How does the application pass a project question to retrieval?",
+            "origin": "host_lookup",
+            "coverage_required": false,
+            "facet_id": null,
+            "requirement_id": null,
+            "relation": "host_lookup",
+            "public_parent_query_id": null,
+            "preferred_catalog_roles": [
+              "project_architecture",
+              "api_contract"
+            ],
+            "forbidden_catalog_roles": [
+              "roadmap"
+            ],
+            "forbidden_evidence_terms": [],
+            "parent_exact_terms": []
+          },
+          {
+            "query_id": "query-lookup-3",
+            "text": "How do retrieved chunks become selected visible sources?",
+            "origin": "host_lookup",
+            "coverage_required": false,
+            "facet_id": null,
+            "requirement_id": null,
+            "relation": "host_lookup",
+            "public_parent_query_id": null,
+            "preferred_catalog_roles": [
+              "project_architecture",
+              "module_architecture"
+            ],
+            "forbidden_catalog_roles": [
+              "roadmap"
+            ],
+            "forbidden_evidence_terms": [],
+            "parent_exact_terms": []
+          },
+          {
+            "query_id": "query-intent-1",
+            "text": "retrieval pipeline query planning ranking evidence selection",
+            "origin": "canonical_intent",
+            "coverage_required": false,
+            "facet_id": "intent-context:retrieval_pipeline",
+            "requirement_id": null,
+            "relation": "host_lookup",
+            "public_parent_query_id": null,
+            "preferred_catalog_roles": [
+              "project_architecture",
+              "api_contract"
+            ],
+            "forbidden_catalog_roles": [
+              "roadmap"
+            ],
+            "forbidden_evidence_terms": [],
+            "parent_exact_terms": [
+              "get_docs_context"
+            ]
+          },
+          {
+            "query_id": "query-intent-2",
+            "text": "lexical vector retrieval data flow",
+            "origin": "canonical_intent",
+            "coverage_required": false,
+            "facet_id": "intent-context:retrieval_pipeline",
+            "requirement_id": null,
+            "relation": "host_lookup",
+            "public_parent_query_id": null,
+            "preferred_catalog_roles": [
+              "project_architecture",
+              "api_contract"
+            ],
+            "forbidden_catalog_roles": [
+              "roadmap"
+            ],
+            "forbidden_evidence_terms": [],
+            "parent_exact_terms": [
+              "get_docs_context"
+            ]
+          },
+          {
+            "query_id": "query-concept-1",
+            "text": "запрос get_docs_context workflow steps process выбора источников from MCP-входа to выбора источников",
+            "origin": "concept_alias",
+            "coverage_required": false,
+            "facet_id": null,
+            "requirement_id": null,
+            "relation": "host_lookup",
+            "public_parent_query_id": null,
+            "preferred_catalog_roles": [
+              "api_contract",
+              "runbook",
+              "development"
+            ],
+            "forbidden_catalog_roles": [
+              "adr",
+              "roadmap"
+            ],
+            "forbidden_evidence_terms": [
+              "docs/adr/",
+              "mcp pack commands",
+              "packs mcp runtime",
+              "install-pack",
+              "packs-serve"
+            ],
+            "parent_exact_terms": []
+          },
+          {
+            "query_id": "query-concept-2",
+            "text": "от до",
+            "origin": "concept_alias",
+            "coverage_required": false,
+            "facet_id": null,
+            "requirement_id": null,
+            "relation": "host_lookup",
+            "public_parent_query_id": null,
+            "preferred_catalog_roles": [
+              "project_architecture",
+              "api_contract"
+            ],
+            "forbidden_catalog_roles": [
+              "roadmap"
+            ],
+            "forbidden_evidence_terms": [],
+            "parent_exact_terms": []
+          },
+          {
+            "query_id": "query-hint-1",
+            "text": "запрос get_docs_context",
+            "origin": "retrieval_hint",
+            "coverage_required": false,
+            "facet_id": null,
+            "requirement_id": null,
+            "relation": "host_lookup",
+            "public_parent_query_id": null,
+            "preferred_catalog_roles": [
+              "project_architecture",
+              "api_contract"
+            ],
+            "forbidden_catalog_roles": [
+              "roadmap"
+            ],
+            "forbidden_evidence_terms": [],
+            "parent_exact_terms": []
+          },
+          {
+            "query_id": "query-hint-2",
+            "text": "проходит",
+            "origin": "retrieval_hint",
+            "coverage_required": false,
+            "facet_id": null,
+            "requirement_id": null,
+            "relation": "host_lookup",
+            "public_parent_query_id": null,
+            "preferred_catalog_roles": [
+              "project_architecture",
+              "api_contract"
+            ],
+            "forbidden_catalog_roles": [
+              "roadmap"
+            ],
+            "forbidden_evidence_terms": [],
+            "parent_exact_terms": []
+          }
+        ],
+        "explicit_paths": [],
+        "unresolved_parts": [],
+        "_component_contract": [
+          {
+            "component_id": "project_answer:0:workflow:8e96e53934c8a2da",
+            "query_span_start": 0,
+            "query_span_end": 71,
+            "query_span_text": "Как проходит запрос get_docs_context от MCP-входа до выбора источников?",
+            "obligation_kind": "workflow",
+            "subject": "запрос get_docs_context",
+            "subject_aliases": [],
+            "relation": "sequence",
+            "target": "выбора источников",
+            "value_kind": "text",
+            "response_mode": "workflow",
+            "context": "from MCP-входа to выбора источников",
+            "lifecycle_intent": "current"
+          }
+        ],
+        "component_scope_complete": true
+      },
+      "candidate_count": 13,
+      "interesting_candidates": [
+        {
+          "index": 0,
+          "path": "README.md",
+          "title": "When to use each tool",
+          "section": {
+            "title": "When to use each tool",
+            "heading_path": "DocAtlas > Project-docs MCP server > When to use each tool",
+            "freshness": "current"
+          },
+          "line_start": 145,
+          "stable_chunk_id": "child-926cfc6010b6da88eb4a6a20a3faddd416930136",
+          "parent_logical_id": "parent-f23f06406f51701ea9e996a78e8bbcf0",
+          "authority": "source_of_truth",
+          "doc_scope": "project",
+          "retrieval_query_ids": [
+            "query-anchor-1",
+            "query-hint-1"
+          ],
+          "matches": {
+            "query-anchor-1": {
+              "query_text": "get_docs_context",
+              "query_terms": [
+                "get_docs_context"
+              ],
+              "exact_terms": [
+                "get_docs_context"
+              ],
+              "matched_terms": [
+                "get_docs_context"
+              ],
+              "missing_exact_terms": [],
+              "matched_term_count": 1,
+              "match_ratio": 1.0,
+              "lexical_score": 5.945063289541618,
+              "qualified": true,
+              "qualification_reason": "visible_fields",
+              "relation": "exact_anchor"
+            },
+            "query-hint-1": {
+              "query_text": "запрос get_docs_context",
+              "query_terms": [
+                "запрос",
+                "get_docs_context"
+              ],
+              "exact_terms": [
+                "get_docs_context"
+              ],
+              "matched_terms": [
+                "get_docs_context"
+              ],
+              "missing_exact_terms": [],
+              "matched_term_count": 1,
+              "match_ratio": 0.5,
+              "lexical_score": 5.945063289541618,
+              "qualified": true,
+              "qualification_reason": "visible_fields",
+              "relation": "host_lookup"
+            }
+          },
+          "content": "### When to use each tool\n\n| Situation | Tool |\n|---|---|\n| First time in a repo | `get_docs_context`; follow its `next_action` if preparation is needed |\n| Check what docs are relevant | `get_docs_context` |\n| Check health, freshness, or a job | `docs_status` |\n| Reconcile after file changes | `prepare_docs(action=\"sync_project_docs\")` |\n| Answer \"how does this repo work?\" | `get_docs_context(mode=\"project\")` |\n\n"
+        },
+        {
+          "index": 1,
+          "path": "README.md",
+          "title": "Reproducible documentation manifests",
+          "section": {
+            "title": "Reproducible documentation manifests",
+            "heading_path": "DocAtlas > Project-docs MCP server > Reproducible documentation manifests",
+            "freshness": "current"
+          },
+          "line_start": 128,
+          "stable_chunk_id": "child-5fad2c385cecb1901791ec1c5b5de2229ded3f7c",
+          "parent_logical_id": "parent-7167983dac1d05f8accd555db78b267b",
+          "authority": "source_of_truth",
+          "doc_scope": "project",
+          "retrieval_query_ids": [
+            "query-lookup-1"
+          ],
+          "matches": {
+            "query-lookup-1": {
+              "query_text": "What does the documentation request boundary accept?",
+              "query_terms": [
+                "does",
+                "documentation",
+                "request",
+                "boundary",
+                "accept"
+              ],
+              "exact_terms": [],
+              "matched_terms": [
+                "does",
+                "documentation",
+                "accept"
+              ],
+              "missing_exact_terms": [],
+              "matched_term_count": 3,
+              "match_ratio": 0.6,
+              "lexical_score": 10.00423236062895,
+              "qualified": true,
+              "qualification_reason": "visible_fields",
+              "relation": "host_lookup"
+            }
+          },
+          "content": "Documentation evidence is reported separately for package identity, source authority, and version binding with a deterministic `accept`, `confirm`, or `reject` decision. DocAtlas intentionally does not collapse these dimensions into a confidence percentage: an exact version cannot compensate for an unverified source authority.\n\n"
+        },
+        {
+          "index": 2,
+          "path": "docs/modules/project-context-retrieval.md",
+          "title": "Application orchestration",
+          "section": {
+            "title": "Application orchestration",
+            "heading_path": "Project context retrieval module > Application orchestration",
+            "freshness": "current"
+          },
+          "line_start": 29,
+          "stable_chunk_id": "child-56b4633af52e4eb3ce5e91533e9bfe028ae39d8a",
+          "parent_logical_id": "parent-6654c292ccad7f06966820b1fc79abf2",
+          "authority": "source_of_truth",
+          "doc_scope": "module",
+          "retrieval_query_ids": [
+            "query-lookup-2"
+          ],
+          "matches": {
+            "query-lookup-2": {
+              "query_text": "How does the application pass a project question to retrieval?",
+              "query_terms": [
+                "does",
+                "application",
+                "pass",
+                "project",
+                "question",
+                "retrieval"
+              ],
+              "exact_terms": [],
+              "matched_terms": [
+                "pass",
+                "project",
+                "question",
+                "retrieval"
+              ],
+              "missing_exact_terms": [],
+              "matched_term_count": 4,
+              "match_ratio": 0.6667,
+              "lexical_score": 12.57928648263205,
+              "qualified": true,
+              "qualification_reason": "visible_fields",
+              "relation": "host_lookup"
+            }
+          },
+          "content": "`ProjectContextService` builds one query plan and passes it to project retrieval.\nCandidate allocation gives one opportunity to exact-anchor, original-question,\nand host-query lanes before consuming second candidates. Generated aliases use\nthe remaining capacity. Audited domain-owned aliases may attribute derived\nretrieval coverage to their public parent query, but never authorize an answer.\nExplicit documents may hydrate bounded indexed sections,\nbut only sections matching user-visible technical terms enter context.\nFor compound reads, selection maximizes distinct user-visible query coverage\nbefore expanding snippets. It first admits compact witnesses, then spends any\nremaining token budget on deterministic snippet expansion. Generated canonical\nqueries may make a source eligible and populate facet diagnostics, but they do\nnot become public coverage IDs.\n\n"
+        },
+        {
+          "index": 3,
+          "path": "docs/modules/project-context-retrieval.md",
+          "title": "Domain vocabulary",
+          "section": {
+            "title": "Domain vocabulary",
+            "heading_path": "Project context retrieval module > Domain vocabulary",
+            "freshness": "current"
+          },
+          "line_start": 17,
+          "stable_chunk_id": "child-d238d76f85ee3423a76e2d7a9a021edde17001b1",
+          "parent_logical_id": "parent-6abc6cbf9f0c8bf14d7dc845fceded17",
+          "authority": "source_of_truth",
+          "doc_scope": "module",
+          "retrieval_query_ids": [
+            "query-lookup-3"
+          ],
+          "matches": {
+            "query-lookup-3": {
+              "query_text": "How do retrieved chunks become selected visible sources?",
+              "query_terms": [
+                "retrieved",
+                "chunks",
+                "become",
+                "selected",
+                "visible",
+                "sources"
+              ],
+              "exact_terms": [],
+              "matched_terms": [
+                "selected",
+                "visible",
+                "sources"
+              ],
+              "missing_exact_terms": [],
+              "matched_term_count": 3,
+              "match_ratio": 0.5,
+              "lexical_score": 11.82489613797793,
+              "qualified": true,
+              "qualification_reason": "visible_fields",
+              "relation": "host_lookup"
+            }
+          },
+          "content": "- `DocumentationQueryPlan` is an immutable retrieval plan.\n- `DocumentationLookup` is an original, exact-anchor, host, or generated query.\n- `Query Lineage` distinguishes direct matching, audited rewrites, host lookups,\n  and exact anchors without exposing generated query IDs.\n- `Evidence Qualification` decides whether model-visible fields support a query.\n- `Context Budget` fixes the product boundary at three sources and 800 tokens.\n- `Typed Context` and `Broad Context` describe retrieval disposition.\n- `Exact Technical Anchor` preserves a filename, path, command, symbol, or env var.\n- `ContextSelectionDecision` records selected evidence and query coverage only.\n\n"
+        },
+        {
+          "index": 4,
+          "path": "docs/project-docs-mcp-workflow.md",
+          "title": "Verification loop",
+          "section": {
+            "title": "Verification loop",
+            "heading_path": "Project docs MCP workflow > Verification loop",
+            "freshness": "current"
+          },
+          "line_start": 249,
+          "stable_chunk_id": "child-0ffb1f9e2e14ac7939bd075ce5e7b9ad45de8005",
+          "parent_logical_id": "parent-73331d17b55406ad2598a2137d4c2266",
+          "authority": "source_of_truth",
+          "doc_scope": "project",
+          "retrieval_query_ids": [
+            "query-anchor-1",
+            "query-hint-1"
+          ],
+          "matches": {
+            "query-anchor-1": {
+              "query_text": "get_docs_context",
+              "query_terms": [
+                "get_docs_context"
+              ],
+              "exact_terms": [
+                "get_docs_context"
+              ],
+              "matched_terms": [
+                "get_docs_context"
+              ],
+              "missing_exact_terms": [],
+              "matched_term_count": 1,
+              "match_ratio": 1.0,
+              "lexical_score": 6.11238230433764,
+              "qualified": true,
+              "qualification_reason": "visible_fields",
+              "relation": "exact_anchor"
+            },
+            "query-hint-1": {
+              "query_text": "запрос get_docs_context",
+              "query_terms": [
+                "запрос",
+                "get_docs_context"
+              ],
+              "exact_terms": [
+                "get_docs_context"
+              ],
+              "matched_terms": [
+                "get_docs_context"
+              ],
+              "missing_exact_terms": [],
+              "matched_term_count": 1,
+              "match_ratio": 0.5,
+              "lexical_score": 6.11238230433764,
+              "qualified": true,
+              "qualification_reason": "visible_fields",
+              "relation": "host_lookup"
+            },
+            "query-concept-1": {
+              "query_text": "запрос get_docs_context workflow steps process выбора источников from MCP-входа to выбора источников",
+              "query_terms": [
+                "запрос",
+                "get_docs_context",
+                "workflow",
+                "steps",
+                "process",
+                "выбора",
+                "источников",
+                "from",
+                "mcp-входа"
+              ],
+              "exact_terms": [
+                "get_docs_context"
+              ],
+              "matched_terms": [
+                "get_docs_context",
+                "from"
+              ],
+              "missing_exact_terms": [],
+              "matched_term_count": 2,
+              "match_ratio": 0.2222,
+              "lexical_score": 14.637609719839261,
+              "qualified": false,
+              "qualification_reason": "insufficient_visible_match",
+              "relation": "host_lookup"
+            },
+            "query-original": {
+              "query_text": "Как проходит запрос get_docs_context от MCP-входа до выбора источников?",
+              "query_terms": [
+                "как",
+                "проходит",
+                "запрос",
+                "get_docs_context",
+                "mcp-входа",
+                "выбора",
+                "источников"
+              ],
+              "exact_terms": [
+                "get_docs_context"
+              ],
+              "matched_terms": [
+                "get_docs_context"
+              ],
+              "missing_exact_terms": [],
+              "matched_term_count": 1,
+              "match_ratio": 0.1429,
+              "lexical_score": 8.192134714193358,
+              "qualified": false,
+              "qualification_reason": "insufficient_visible_match",
+              "relation": "direct"
+            }
+          },
+          "content": "```text\nget_docs_context(project_path=..., question=\"What is the architecture decision for <unique ADR term>?\", mode=\"project\")\nget_docs_context(project_path=..., question=\"How do we deploy <unique service/module name>?\", mode=\"project\")\nget_docs_context(project_path=..., question=\"<description or unique phrase from a cataloged document>\", mode=\"project\")\nget_docs_context(project_path=..., question=\"<unique module phrase>\", mode=\"project\", module_path=\"<module>\", scope=\"module\")\nget_docs_context(project_path=..., question=\"<module-specific question>\", mode=\"project\", module_path=\"<module>\", scope=\"module\")\n```\n\n"
+        },
+        {
+          "index": 7,
+          "path": "docs/modules/evidence-selection.md",
+          "title": "Responsibility",
+          "section": {
+            "title": "Responsibility",
+            "heading_path": "Evidence selection module > Responsibility",
+            "freshness": "current"
+          },
+          "line_start": 7,
+          "stable_chunk_id": "child-feaede24f61d3f67deafa5c90eb3aad0f40567c8",
+          "parent_logical_id": "parent-df5569f21f3ae165f024718a0be1099b",
+          "authority": "source_of_truth",
+          "doc_scope": "module",
+          "retrieval_query_ids": [
+            "query-intent-1"
+          ],
+          "matches": {
+            "query-intent-1": {
+              "query_text": "retrieval pipeline query planning ranking evidence selection",
+              "query_terms": [
+                "retrieval",
+                "pipeline",
+                "query",
+                "planning",
+                "ranking",
+                "evidence",
+                "selection"
+              ],
+              "exact_terms": [],
+              "matched_terms": [
+                "retrieval",
+                "pipeline",
+                "ranking",
+                "evidence",
+                "selection"
+              ],
+              "missing_exact_terms": [],
+              "matched_term_count": 5,
+              "match_ratio": 0.7143,
+              "lexical_score": 20.561485498425927,
+              "qualified": true,
+              "qualification_reason": "visible_fields",
+              "relation": "host_lookup"
+            }
+          },
+          "content": "## Responsibility\n\nThe evidence-selection module turns bounded candidates into an auditable certification decision. Project-only reads bypass answer certification and use `ContextSelectionDecision`, which reports retrieval coverage without a support verdict.\n\nCandidate normalization, requirement compilation, proof matching, ranking, budget fitting, and projection identity are separate responsibilities even though they cooperate in one pipeline.\n\n"
+        },
+        {
+          "index": 8,
+          "path": "docs/modules/question-planning.md",
+          "title": "Public boundary",
+          "section": {
+            "title": "Public boundary",
+            "heading_path": "Question planning module > Public boundary",
+            "freshness": "current"
+          },
+          "line_start": 15,
+          "stable_chunk_id": "child-a6ebdeb578113eb4b99f5cffcbd1b9f7af734f2b",
+          "parent_logical_id": "parent-dbdb54f80cf0d2f709ae329baa8b0e12",
+          "authority": "source_of_truth",
+          "doc_scope": "module",
+          "retrieval_query_ids": [
+            "query-intent-1",
+            "query-lookup-2"
+          ],
+          "matches": {
+            "query-intent-1": {
+              "query_text": "retrieval pipeline query planning ranking evidence selection",
+              "query_terms": [
+                "retrieval",
+                "pipeline",
+                "query",
+                "planning",
+                "ranking",
+                "evidence",
+                "selection"
+              ],
+              "exact_terms": [],
+              "matched_terms": [
+                "retrieval",
+                "pipeline",
+                "planning",
+                "ranking"
+              ],
+              "missing_exact_terms": [],
+              "matched_term_count": 4,
+              "match_ratio": 0.5714,
+              "lexical_score": 19.418269436211997,
+              "qualified": true,
+              "qualification_reason": "visible_fields",
+              "relation": "host_lookup"
+            },
+            "query-lookup-2": {
+              "query_text": "How does the application pass a project question to retrieval?",
+              "query_terms": [
+                "does",
+                "application",
+                "pass",
+                "project",
+                "question",
+                "retrieval"
+              ],
+              "exact_terms": [],
+              "matched_terms": [
+                "pass",
+                "project",
+                "retrieval"
+              ],
+              "missing_exact_terms": [],
+              "matched_term_count": 3,
+              "match_ratio": 0.5,
+              "lexical_score": 10.768631975763046,
+              "qualified": true,
+              "qualification_reason": "visible_fields",
+              "relation": "host_lookup"
+            },
+            "query-lookup-1": {
+              "query_text": "What does the documentation request boundary accept?",
+              "query_terms": [
+                "does",
+                "documentation",
+                "request",
+                "boundary",
+                "accept"
+              ],
+              "exact_terms": [],
+              "matched_terms": [
+                "request",
+                "boundary"
+              ],
+              "missing_exact_terms": [],
+              "matched_term_count": 2,
+              "match_ratio": 0.4,
+              "lexical_score": 9.699014207446455,
+              "qualified": false,
+              "qualification_reason": "insufficient_visible_match",
+              "relation": "host_lookup"
+            }
+          },
+          "content": "## Public boundary\n\nThe durable output is the project-answer requirement contract: resolved subjects, intents, mandatory facets, conditions, technical identities, parse trace, and unresolved parts. Retrieval ranking is not owned here.\n\nImperative edits are outside this boundary. They are owned by\n`PatchRequestPlan` and the patch-specific requirement pipeline documented in\n`patch-request-planning.md`; one request must never pass through both systems.\n\n"
+        },
+        {
+          "index": 9,
+          "path": "CONTRIBUTING.md",
+          "title": "Documentation MCP changes",
+          "section": {
+            "title": "Documentation MCP changes",
+            "heading_path": "Contributing to DocAtlas > Documentation MCP changes",
+            "freshness": "current"
+          },
+          "line_start": 34,
+          "stable_chunk_id": "child-331218d7470de2c1e5cdb211566c141377e693a7",
+          "parent_logical_id": "parent-17f61566a34051f57179c1868e207112",
+          "authority": "source_of_truth",
+          "doc_scope": "project",
+          "retrieval_query_ids": [
+            "query-lookup-1"
+          ],
+          "matches": {
+            "query-lookup-1": {
+              "query_text": "What does the documentation request boundary accept?",
+              "query_terms": [
+                "does",
+                "documentation",
+                "request",
+                "boundary",
+                "accept"
+              ],
+              "exact_terms": [],
+              "matched_terms": [
+                "boundary",
+                "accept",
+                "documentation"
+              ],
+              "missing_exact_terms": [],
+              "matched_term_count": 3,
+              "match_ratio": 0.6,
+              "lexical_score": 6.5038788060521355,
+              "qualified": true,
+              "qualification_reason": "visible_fields",
+              "relation": "host_lookup"
+            },
+            "query-original": {
+              "query_text": "Как проходит запрос get_docs_context от MCP-входа до выбора источников?",
+              "query_terms": [
+                "как",
+                "проходит",
+                "запрос",
+                "get_docs_context",
+                "mcp-входа",
+                "выбора",
+                "источников"
+              ],
+              "exact_terms": [
+                "get_docs_context"
+              ],
+              "matched_terms": [
+                "get_docs_context"
+              ],
+              "missing_exact_terms": [],
+              "matched_term_count": 1,
+              "match_ratio": 0.1429,
+              "lexical_score": 6.771559377512694,
+              "qualified": false,
+              "qualification_reason": "insufficient_visible_match",
+              "relation": "direct"
+            }
+          },
+          "content": "## Documentation MCP changes\n\nKeep the public Docs MCP inventory to `get_docs_context`, `prepare_docs`, and `docs_status`. Repository files are the source of truth; DocAtlas may index accepted docs but must not silently author or commit them. Read [the canonical Docs MCP reference](./docs/mcp-docs-server.md) before changing this boundary.\n\n"
+        },
+        {
+          "index": 10,
+          "path": "docs/modules/evidence-selection.md",
+          "title": "Contract with question planning",
+          "section": {
+            "title": "Contract with question planning",
+            "heading_path": "Evidence selection module > Contract with question planning",
+            "freshness": "current"
+          },
+          "line_start": 13,
+          "stable_chunk_id": "child-95ba021762e4d9a226b2e46f1f6ae530ec84ebfe",
+          "parent_logical_id": "parent-0c6dba22e94cef81e1711db7009e7547",
+          "authority": "source_of_truth",
+          "doc_scope": "module",
+          "retrieval_query_ids": [
+            "query-lookup-2"
+          ],
+          "matches": {
+            "query-lookup-2": {
+              "query_text": "How does the application pass a project question to retrieval?",
+              "query_terms": [
+                "does",
+                "application",
+                "pass",
+                "project",
+                "question",
+                "retrieval"
+              ],
+              "exact_terms": [],
+              "matched_terms": [
+                "does",
+                "project",
+                "question"
+              ],
+              "missing_exact_terms": [],
+              "matched_term_count": 3,
+              "match_ratio": 0.5,
+              "lexical_score": 10.47682085277371,
+              "qualified": true,
+              "qualification_reason": "visible_fields",
+              "relation": "host_lookup"
+            }
+          },
+          "content": "## Contract with question planning\n\nThe module consumes the project-answer requirement contract emitted by question planning. It may only mark a mandatory facet covered when a model-visible answer unit locally proves that exact obligation. It does not broaden subjects or replace unresolved question semantics.\n\n"
+        },
+        {
+          "index": 11,
+          "path": "docs/PROJECT_MAP.md",
+          "title": "Runtime areas",
+          "section": {
+            "title": "Runtime areas",
+            "heading_path": "Project map > Runtime areas",
+            "freshness": "current"
+          },
+          "line_start": 9,
+          "stable_chunk_id": "child-d727ca66d79aaa32ff4cf971749c598a366a95a8",
+          "parent_logical_id": "parent-c1d59f8708be8463bfb1093cb740186f",
+          "authority": "source_of_truth",
+          "doc_scope": "project",
+          "retrieval_query_ids": [
+            "query-lookup-2"
+          ],
+          "matches": {
+            "query-lookup-2": {
+              "query_text": "How does the application pass a project question to retrieval?",
+              "query_terms": [
+                "does",
+                "application",
+                "pass",
+                "project",
+                "question",
+                "retrieval"
+              ],
+              "exact_terms": [],
+              "matched_terms": [
+                "application",
+                "project",
+                "question",
+                "retrieval"
+              ],
+              "missing_exact_terms": [],
+              "matched_term_count": 4,
+              "match_ratio": 0.6667,
+              "lexical_score": 11.81245430199391,
+              "qualified": true,
+              "qualification_reason": "visible_fields",
+              "relation": "host_lookup"
+            },
+            "query-lookup-1": {
+              "query_text": "What does the documentation request boundary accept?",
+              "query_terms": [
+                "does",
+                "documentation",
+                "request",
+                "boundary",
+                "accept"
+              ],
+              "exact_terms": [],
+              "matched_terms": [
+                "documentation",
+                "boundary"
+              ],
+              "missing_exact_terms": [],
+              "matched_term_count": 2,
+              "match_ratio": 0.4,
+              "lexical_score": 9.823978748117362,
+              "qualified": false,
+              "qualification_reason": "insufficient_visible_match",
+              "relation": "host_lookup"
+            }
+          },
+          "content": "| Area | Location | Responsibility |\n|---|---|---|\n| CLI | `docmancer/cli/` | Installation, ingest, query, lifecycle and MCP commands |\n| Documentation application | `docmancer/docs/application/` | Project, library and unified context workflows |\n| Documentation domain | `docmancer/docs/domain/` | Ranking, trust, source identity and policy rules |\n| Question planning | `docmancer/docs/domain/question_plan.py` | Fail-closed documentation questions and proof obligations |\n| Patch planning | `docmancer/docs/domain/patch_request_plan.py` | Reviewed imperative grammar, target polarity and mutation authorization inputs |\n| MCP Docs server | `docmancer/mcp/docs_server.py` | Public documentation tools, resources and transport boundary |\n| MCP Packs gateway | `docmancer/mcp/serve.py` | Advanced installed API-pack search and dispatch |\n| Executors | `docmancer/mcp/executors/` | Capability-gated HTTP and Python execution |\n| Connectors | `docmancer/connectors/` | Local and remote documentation acquisition |\n| Evaluation | `eval/` | Retrieval and task-level benchmarks |\n| Tests | `tests/` | Unit, contract, security and integration coverage |\n\n"
+        }
+      ],
+      "public": {
+        "status": "ok",
+        "paths": [
+          "docs/project-docs-mcp-workflow.md",
+          "docs/adr/0001-mcp-boundary-contracts.md"
+        ],
+        "sources": [
+          {
+            "evidence_id": "ev-e22a3b48cb4f8255",
+            "path_or_url": "docs/project-docs-mcp-workflow.md",
+            "section": "Project docs MCP workflow > Verification loop",
+            "snippet": "```text\nget_docs_context(project_path=..., question=\"What is the architecture decision for <unique ADR term>?\", mode=\"project\")\nget_docs_context(project_path=..., question=\"How do we deploy <unique service/module name>?\", mode=\"project\")\nget_docs_context(project_path=..., question=\"<description or unique phrase from a cataloged document>\", mode=\"project\")\nget_docs_context(project_path=..., question=\"<unique module phrase>\", mode=\"project\", module_path=\"<module>\", scope=\"module\")\nget_docs_context(project_path=..., question=\"<module-specific question>\", mode=\"project\", module_path=\"<module>\", scope=\"module\")\n```",
+            "version_binding": "unversioned",
+            "content_sha256": "8d645fa5965e9513af820c43343cc49cf1801be5e25600a25fbf8dda439c9f06",
+            "project_identity": "git:github.com/Vanilla1999/DocAtlas",
+            "authority": "source_of_truth",
+            "scope": "project",
+            "line_start": 249,
+            "line_end": 255
+          },
+          {
+            "evidence_id": "ev-58e0a45ce4082bbc",
+            "path_or_url": "docs/adr/0001-mcp-boundary-contracts.md",
+            "section": "ADR 0001: MCP boundary owns transport contracts > Decision",
+            "snippet": "- Application services continue to own retrieval, ranking, indexing, and project-context business logic.\n- `LibraryDocsService` remains a public compatibility facade until a separate phased migration removes pass-through methods safely.",
+            "version_binding": "unversioned",
+            "content_sha256": "3a0e93b7b9872dc23fb65c7eda48f0d3f7c09dcb2550098052dd57113d651776",
+            "project_identity": "git:github.com/Vanilla1999/DocAtlas",
+            "authority": "source_of_truth",
+            "scope": "project",
+            "line_start": 16,
+            "line_end": 17
+          }
+        ],
+        "covered_query_ids": [
+          "query-anchor-1",
+          "query-lookup-2"
+        ],
+        "missing_query_ids": [
+          "query-original",
+          "query-lookup-1",
+          "query-lookup-3"
+        ],
+        "estimated_tokens": 715,
+        "answer_supported": false,
+        "edit_ready": false
+      }
+    },
+    {
+      "id": "v2-natural-sync-renames",
+      "question": "Я переписал один документ и удалил другой. Как обновить поиск, чтобы старые разделы и удалённый файл больше не выдавались?",
+      "scope": "project",
+      "lookup_queries": [
+        "How do I reconcile documentation after editing repository files?",
+        "What happens to indexed sections when their source file changes?",
+        "How are deleted documentation files removed from search?"
+      ],
+      "verdict": {
+        "semantic_useful": false,
+        "false_full_coverage": false,
+        "obligations": [
+          {
+            "id": "sync",
+            "met": false
+          },
+          {
+            "id": "stale",
+            "met": true
+          },
+          {
+            "id": "orphans",
+            "met": true
+          }
+        ]
+      },
+      "query_plan": {
+        "schema_version": "documentation-query-plan-v2",
+        "original_question": "Я переписал один документ и удалил другой. Как обновить поиск, чтобы старые разделы и удалённый файл больше не выдавались?",
+        "query_ids": [
+          "query-original",
+          "query-lookup-1",
+          "query-lookup-2",
+          "query-lookup-3",
+          "query-intent-1",
+          "query-concept-1",
+          "query-hint-1",
+          "query-hint-2",
+          "query-hint-3"
+        ],
+        "required_query_ids": [],
+        "public_query_ids": [
+          "query-original",
+          "query-lookup-1",
+          "query-lookup-2",
+          "query-lookup-3"
+        ],
+        "queries": [
+          {
+            "query_id": "query-original",
+            "text": "Я переписал один документ и удалил другой. Как обновить поиск, чтобы старые разделы и удалённый файл больше не выдавались?",
+            "origin": "original",
+            "coverage_required": false,
+            "facet_id": null,
+            "requirement_id": null,
+            "relation": "direct",
+            "public_parent_query_id": null,
+            "preferred_catalog_roles": [
+              "runbook",
+              "development"
+            ],
+            "forbidden_catalog_roles": [
+              "roadmap"
+            ],
+            "forbidden_evidence_terms": [],
+            "parent_exact_terms": []
+          },
+          {
+            "query_id": "query-lookup-1",
+            "text": "How do I reconcile documentation after editing repository files?",
+            "origin": "host_lookup",
+            "coverage_required": false,
+            "facet_id": null,
+            "requirement_id": null,
+            "relation": "host_lookup",
+            "public_parent_query_id": null,
+            "preferred_catalog_roles": [
+              "runbook",
+              "development"
+            ],
+            "forbidden_catalog_roles": [
+              "roadmap"
+            ],
+            "forbidden_evidence_terms": [],
+            "parent_exact_terms": []
+          },
+          {
+            "query_id": "query-lookup-2",
+            "text": "What happens to indexed sections when their source file changes?",
+            "origin": "host_lookup",
+            "coverage_required": false,
+            "facet_id": null,
+            "requirement_id": null,
+            "relation": "host_lookup",
+            "public_parent_query_id": null,
+            "preferred_catalog_roles": [
+              "runbook",
+              "development",
+              "project_architecture",
+              "module_architecture"
+            ],
+            "forbidden_catalog_roles": [],
+            "forbidden_evidence_terms": [],
+            "parent_exact_terms": []
+          },
+          {
+            "query_id": "query-lookup-3",
+            "text": "How are deleted documentation files removed from search?",
+            "origin": "host_lookup",
+            "coverage_required": false,
+            "facet_id": null,
+            "requirement_id": null,
+            "relation": "host_lookup",
+            "public_parent_query_id": null,
+            "preferred_catalog_roles": [
+              "runbook",
+              "development"
+            ],
+            "forbidden_catalog_roles": [
+              "roadmap"
+            ],
+            "forbidden_evidence_terms": [],
+            "parent_exact_terms": []
+          },
+          {
+            "query_id": "query-intent-1",
+            "text": "sync refresh project documentation after file changes",
+            "origin": "canonical_intent",
+            "coverage_required": false,
+            "facet_id": "intent-context:project_docs_sync",
+            "requirement_id": null,
+            "relation": "host_lookup",
+            "public_parent_query_id": null,
+            "preferred_catalog_roles": [
+              "runbook",
+              "development"
+            ],
+            "forbidden_catalog_roles": [
+              "roadmap"
+            ],
+            "forbidden_evidence_terms": [],
+            "parent_exact_terms": []
+          },
+          {
+            "query_id": "query-concept-1",
+            "text": "Я и и не",
+            "origin": "concept_alias",
+            "coverage_required": false,
+            "facet_id": null,
+            "requirement_id": null,
+            "relation": "host_lookup",
+            "public_parent_query_id": null,
+            "preferred_catalog_roles": [
+              "runbook",
+              "development"
+            ],
+            "forbidden_catalog_roles": [
+              "roadmap"
+            ],
+            "forbidden_evidence_terms": [],
+            "parent_exact_terms": []
+          },
+          {
+            "query_id": "query-hint-1",
+            "text": "переписал",
+            "origin": "retrieval_hint",
+            "coverage_required": false,
+            "facet_id": null,
+            "requirement_id": null,
+            "relation": "host_lookup",
+            "public_parent_query_id": null,
+            "preferred_catalog_roles": [
+              "runbook",
+              "development"
+            ],
+            "forbidden_catalog_roles": [
+              "roadmap"
+            ],
+            "forbidden_evidence_terms": [],
+            "parent_exact_terms": []
+          },
+          {
+            "query_id": "query-hint-2",
+            "text": "один",
+            "origin": "retrieval_hint",
+            "coverage_required": false,
+            "facet_id": null,
+            "requirement_id": null,
+            "relation": "host_lookup",
+            "public_parent_query_id": null,
+            "preferred_catalog_roles": [
+              "runbook",
+              "development"
+            ],
+            "forbidden_catalog_roles": [
+              "roadmap"
+            ],
+            "forbidden_evidence_terms": [],
+            "parent_exact_terms": []
+          },
+          {
+            "query_id": "query-hint-3",
+            "text": "документ",
+            "origin": "retrieval_hint",
+            "coverage_required": false,
+            "facet_id": null,
+            "requirement_id": null,
+            "relation": "host_lookup",
+            "public_parent_query_id": null,
+            "preferred_catalog_roles": [
+              "runbook",
+              "development"
+            ],
+            "forbidden_catalog_roles": [
+              "roadmap"
+            ],
+            "forbidden_evidence_terms": [],
+            "parent_exact_terms": []
+          }
+        ],
+        "explicit_paths": [],
+        "unresolved_parts": [
+          "unresolved_question_clause:Я переписал один документ и удалил другой",
+          "unresolved_question_clause:Как обновить поиск, чтобы старые разделы и удалённый файл больше не выдавались"
+        ],
+        "_component_contract": [],
+        "component_scope_complete": true
+      },
+      "candidate_count": 18,
+      "interesting_candidates": [
+        {
+          "index": 0,
+          "path": "README.md",
+          "title": "Recommended workflow",
+          "section": {
+            "title": "Recommended workflow",
+            "heading_path": "DocAtlas > Project-docs MCP server > Recommended workflow",
+            "freshness": "current"
+          },
+          "line_start": 108,
+          "stable_chunk_id": "child-205b2d6a65634ee063e0d9c506819435a36cdf13",
+          "parent_logical_id": "parent-75ba49b5f3b0628c51ce0e2fe4ee3253",
+          "authority": "source_of_truth",
+          "doc_scope": "project",
+          "retrieval_query_ids": [
+            "query-lookup-3",
+            "query-lookup-2"
+          ],
+          "matches": {
+            "query-lookup-3": {
+              "query_text": "How are deleted documentation files removed from search?",
+              "query_terms": [
+                "deleted",
+                "documentation",
+                "files",
+                "removed",
+                "from",
+                "search"
+              ],
+              "exact_terms": [],
+              "matched_terms": [
+                "deleted",
+                "files",
+                "removed",
+                "from"
+              ],
+              "missing_exact_terms": [],
+              "matched_term_count": 4,
+              "match_ratio": 0.6667,
+              "lexical_score": 21.44083058968907,
+              "qualified": true,
+              "qualification_reason": "visible_fields",
+              "relation": "host_lookup"
+            },
+            "query-lookup-2": {
+              "query_text": "What happens to indexed sections when their source file changes?",
+              "query_terms": [
+                "happens",
+                "indexed",
+                "sections",
+                "when",
+                "their",
+                "source",
+                "file",
+                "changes"
+              ],
+              "exact_terms": [],
+              "matched_terms": [
+                "indexed",
+                "sections",
+                "source",
+                "file",
+                "changes"
+              ],
+              "missing_exact_terms": [],
+              "matched_term_count": 5,
+              "match_ratio": 0.625,
+              "lexical_score": 12.346560605463871,
+              "qualified": true,
+              "qualification_reason": "visible_fields",
+              "relation": "host_lookup"
+            }
+          },
+          "content": "1. discovers current candidates from the filesystem;\n2. prunes orphaned indexed sources (deleted files);\n3. removes stale indexed sections (changed files);\n4. indexes new and changed candidates;\n5. returns `current_count`, `new_count`, `changed_count`, `orphaned_removed`, and `indexed_sources`.\n\n"
+        },
+        {
+          "index": 1,
+          "path": "docs/project-docs-mcp-workflow.md",
+          "title": "Canonical lifecycle: sync",
+          "section": {
+            "title": "Canonical lifecycle: sync",
+            "heading_path": "Project docs MCP workflow > Canonical lifecycle: sync",
+            "freshness": "current"
+          },
+          "line_start": 17,
+          "stable_chunk_id": "child-0a190970e1b87d4efb8a853463527b140a821993",
+          "parent_logical_id": "parent-f5e706ef1ce3a422165761b8f18ce380",
+          "authority": "source_of_truth",
+          "doc_scope": "project",
+          "retrieval_query_ids": [
+            "query-lookup-1",
+            "query-intent-1"
+          ],
+          "matches": {
+            "query-lookup-1": {
+              "query_text": "How do I reconcile documentation after editing repository files?",
+              "query_terms": [
+                "reconcile",
+                "documentation",
+                "after",
+                "editing",
+                "repository",
+                "files"
+              ],
+              "exact_terms": [],
+              "matched_terms": [
+                "documentation",
+                "after",
+                "editing",
+                "repository",
+                "files"
+              ],
+              "missing_exact_terms": [],
+              "matched_term_count": 5,
+              "match_ratio": 0.8333,
+              "lexical_score": 20.430137909216857,
+              "qualified": true,
+              "qualification_reason": "visible_fields",
+              "relation": "host_lookup"
+            },
+            "query-intent-1": {
+              "query_text": "sync refresh project documentation after file changes",
+              "query_terms": [
+                "sync",
+                "refresh",
+                "project",
+                "documentation",
+                "after",
+                "file",
+                "changes"
+              ],
+              "exact_terms": [],
+              "matched_terms": [
+                "refresh",
+                "project",
+                "documentation",
+                "after",
+                "file",
+                "changes",
+                "sync"
+              ],
+              "missing_exact_terms": [],
+              "matched_term_count": 7,
+              "match_ratio": 1.0,
+              "lexical_score": 18.055654464434546,
+              "qualified": true,
+              "qualification_reason": "visible_fields",
+              "relation": "host_lookup"
+            }
+          },
+          "content": "## Canonical lifecycle: sync\n\nAfter editing project documentation files, refresh the repository index with the\nreturned `prepare_docs(action=\"sync_project_docs\")` action. This is the canonical\nworkflow for reconciling changed files before retrying `get_docs_context`.\n\n`sync_project_docs` is the recommended lifecycle action. It replaces the old two-step `inspect → ingest` loop:\n\n"
+        },
+        {
+          "index": 2,
+          "path": "docs/project-docs-mcp-workflow.md",
+          "title": "Project docs MCP workflow",
+          "section": {
+            "title": "Project docs MCP workflow",
+            "heading_path": "Project docs MCP workflow",
+            "freshness": "current"
+          },
+          "line_start": 1,
+          "stable_chunk_id": "child-3b9fff91590bf0b05ace47741ba7cf6d358e315b",
+          "parent_logical_id": "parent-7588fabef10b741889d03b678adf9adc",
+          "authority": "source_of_truth",
+          "doc_scope": "project",
+          "retrieval_query_ids": [
+            "query-lookup-1"
+          ],
+          "matches": {
+            "query-lookup-1": {
+              "query_text": "How do I reconcile documentation after editing repository files?",
+              "query_terms": [
+                "reconcile",
+                "documentation",
+                "after",
+                "editing",
+                "repository",
+                "files"
+              ],
+              "exact_terms": [],
+              "matched_terms": [
+                "reconcile",
+                "documentation",
+                "repository",
+                "files"
+              ],
+              "missing_exact_terms": [],
+              "matched_term_count": 4,
+              "match_ratio": 0.6667,
+              "lexical_score": 18.778450928746004,
+              "qualified": true,
+              "qualification_reason": "visible_fields",
+              "relation": "host_lookup"
+            }
+          },
+          "content": "# Project docs MCP workflow\n\nProject docs are the reviewable documentation files that belong to a repository: `README.md`, `docs/`, `wiki/`, `ARCHITECTURE.md`, ADRs, runbooks, roadmap files, module/package docs, and similar files. DocAtlas can discover, index, reconcile, and query those files through MCP so coding agents answer from the repo's own docs before falling back to generic public documentation.\n\n"
+        },
+        {
+          "index": 3,
+          "path": "docs/mcp-docs-server.md",
+          "title": "Project documentation",
+          "section": {
+            "title": "Project documentation",
+            "heading_path": "Docs MCP server > Project documentation",
+            "freshness": "current"
+          },
+          "line_start": 63,
+          "stable_chunk_id": "child-337185280b59ad51fe558aa88d095101029be2a4",
+          "parent_logical_id": "parent-9baf04839ddfbb0d2fd55e6d10c98e5a",
+          "authority": "source_of_truth",
+          "doc_scope": "project",
+          "retrieval_query_ids": [
+            "query-intent-1",
+            "query-lookup-1",
+            "query-lookup-3"
+          ],
+          "matches": {
+            "query-intent-1": {
+              "query_text": "sync refresh project documentation after file changes",
+              "query_terms": [
+                "sync",
+                "refresh",
+                "project",
+                "documentation",
+                "after",
+                "file",
+                "changes"
+              ],
+              "exact_terms": [],
+              "matched_terms": [
+                "sync",
+                "documentation",
+                "after",
+                "file",
+                "changes"
+              ],
+              "missing_exact_terms": [],
+              "matched_term_count": 5,
+              "match_ratio": 0.7143,
+              "lexical_score": 13.295007617830308,
+              "qualified": true,
+              "qualification_reason": "visible_fields",
+              "relation": "host_lookup"
+            },
+            "query-lookup-1": {
+              "query_text": "How do I reconcile documentation after editing repository files?",
+              "query_terms": [
+                "reconcile",
+                "documentation",
+                "after",
+                "editing",
+                "repository",
+                "files"
+              ],
+              "exact_terms": [],
+              "matched_terms": [
+                "documentation",
+                "after",
+                "editing",
+                "repository",
+                "files"
+              ],
+              "missing_exact_terms": [],
+              "matched_term_count": 5,
+              "match_ratio": 0.8333,
+              "lexical_score": 14.664214203547983,
+              "qualified": true,
+              "qualification_reason": "visible_fields",
+              "relation": "host_lookup"
+            },
+            "query-lookup-3": {
+              "query_text": "How are deleted documentation files removed from search?",
+              "query_terms": [
+                "deleted",
+                "documentation",
+                "files",
+                "removed",
+                "from",
+                "search"
+              ],
+              "exact_terms": [],
+              "matched_terms": [
+                "documentation",
+                "files",
+                "from"
+              ],
+              "missing_exact_terms": [],
+              "matched_term_count": 3,
+              "match_ratio": 0.5,
+              "lexical_score": 9.692888569636056,
+              "qualified": true,
+              "qualification_reason": "visible_fields",
+              "relation": "host_lookup"
+            }
+          },
+          "content": "`prepare_docs` indexes existing, reviewable repository files. It does not generate or commit official documentation. A coding agent may create an ordinary Git patch from the returned evidence brief; after review, sync the accepted files.\n\nAfter code changes, use the CLI impact report to identify docs to review:\n\n```bash\ndoc-atlas docs-impact --base origin/main\n```\n\nThe report is advisory. It never edits documentation automatically.\n\n"
+        },
+        {
+          "index": 5,
+          "path": "README.md",
+          "title": "Change-aware documentation review",
+          "section": {
+            "title": "Change-aware documentation review",
+            "heading_path": "DocAtlas > Project-docs MCP server > Change-aware documentation review",
+            "freshness": "current"
+          },
+          "line_start": 165,
+          "stable_chunk_id": "child-b0c4cc590e39f97d43be16e97d267f458aaeb005",
+          "parent_logical_id": "parent-bcbf1d9f974b4f55f92b3bed0fb01580",
+          "authority": "source_of_truth",
+          "doc_scope": "project",
+          "retrieval_query_ids": [
+            "query-lookup-3",
+            "query-lookup-1"
+          ],
+          "matches": {
+            "query-lookup-3": {
+              "query_text": "How are deleted documentation files removed from search?",
+              "query_terms": [
+                "deleted",
+                "documentation",
+                "files",
+                "removed",
+                "from",
+                "search"
+              ],
+              "exact_terms": [],
+              "matched_terms": [
+                "documentation",
+                "files",
+                "from"
+              ],
+              "missing_exact_terms": [],
+              "matched_term_count": 3,
+              "match_ratio": 0.5,
+              "lexical_score": 16.819512616584703,
+              "qualified": true,
+              "qualification_reason": "visible_fields",
+              "relation": "host_lookup"
+            },
+            "query-lookup-1": {
+              "query_text": "How do I reconcile documentation after editing repository files?",
+              "query_terms": [
+                "reconcile",
+                "documentation",
+                "after",
+                "editing",
+                "repository",
+                "files"
+              ],
+              "exact_terms": [],
+              "matched_terms": [
+                "documentation",
+                "after",
+                "editing",
+                "repository",
+                "files"
+              ],
+              "missing_exact_terms": [],
+              "matched_term_count": 5,
+              "match_ratio": 0.8333,
+              "lexical_score": 13.742654318117904,
+              "qualified": true,
+              "qualification_reason": "visible_fields",
+              "relation": "host_lookup"
+            }
+          },
+          "content": "The report includes a bounded authoring brief for the host model: exact files/sections it may edit, repository facts it must verify, and claims it must not invent. After the documentation patch is reviewed and saved, `prepare_docs(action=\"sync_project_docs\", changed_paths=..., deleted_paths=..., renamed_paths=...)` updates only affected index rows. The optional `--sync-saved-docs` CI mode performs that local indexing step from an exact Git diff; it never edits, commits, comments, or fetches from the network.\n\n"
+        },
+        {
+          "index": 6,
+          "path": "docs/project-docs-mcp-workflow.md",
+          "title": "Canonical lifecycle: sync",
+          "section": {
+            "title": "Canonical lifecycle: sync",
+            "heading_path": "Project docs MCP workflow > Canonical lifecycle: sync",
+            "freshness": "current"
+          },
+          "line_start": 25,
+          "stable_chunk_id": "child-343246329ee668f30f12215c55e8993b31929c3f",
+          "parent_logical_id": "parent-f5e706ef1ce3a422165761b8f18ce380",
+          "authority": "source_of_truth",
+          "doc_scope": "project",
+          "retrieval_query_ids": [
+            "query-lookup-2",
+            "query-lookup-3"
+          ],
+          "matches": {
+            "query-lookup-2": {
+              "query_text": "What happens to indexed sections when their source file changes?",
+              "query_terms": [
+                "happens",
+                "indexed",
+                "sections",
+                "when",
+                "their",
+                "source",
+                "file",
+                "changes"
+              ],
+              "exact_terms": [],
+              "matched_terms": [
+                "indexed",
+                "sections",
+                "source",
+                "file",
+                "changes"
+              ],
+              "missing_exact_terms": [],
+              "matched_term_count": 5,
+              "match_ratio": 0.625,
+              "lexical_score": 11.830050335729322,
+              "qualified": true,
+              "qualification_reason": "visible_fields",
+              "relation": "host_lookup"
+            },
+            "query-lookup-3": {
+              "query_text": "How are deleted documentation files removed from search?",
+              "query_terms": [
+                "deleted",
+                "documentation",
+                "files",
+                "removed",
+                "from",
+                "search"
+              ],
+              "exact_terms": [],
+              "matched_terms": [
+                "files",
+                "removed",
+                "from"
+              ],
+              "missing_exact_terms": [],
+              "matched_term_count": 3,
+              "match_ratio": 0.5,
+              "lexical_score": 17.22121242888872,
+              "qualified": true,
+              "qualification_reason": "visible_fields",
+              "relation": "host_lookup"
+            }
+          },
+          "content": "1. **discovers** current candidates from the filesystem;\n2. **prunes** orphaned indexed sources (files that no longer exist);\n3. **deduplicates** duplicate indexed sources by path, keeping the most recently ingested row;\n4. **removes** stale indexed sections (files that changed on disk);\n5. **indexes** new and changed candidates;\n6. **reports** current_count, new_count, changed_count, orphaned_removed, dedup_removed, stale_removed, indexed_sources.\n\n"
+        },
+        {
+          "index": 7,
+          "path": "docs/project-docs-mcp-workflow.md",
+          "title": "Preferred happy path",
+          "section": {
+            "title": "Preferred happy path",
+            "heading_path": "Project docs MCP workflow > Preferred happy path",
+            "freshness": "current"
+          },
+          "line_start": 46,
+          "stable_chunk_id": "child-f6862d7434d9b9f9c35f4a4539b0adce420c82a9",
+          "parent_logical_id": "parent-f9f268cfd19d3bc5afda058e6d6e1e10",
+          "authority": "source_of_truth",
+          "doc_scope": "project",
+          "retrieval_query_ids": [
+            "query-lookup-2",
+            "query-lookup-3"
+          ],
+          "matches": {
+            "query-lookup-2": {
+              "query_text": "What happens to indexed sections when their source file changes?",
+              "query_terms": [
+                "happens",
+                "indexed",
+                "sections",
+                "when",
+                "their",
+                "source",
+                "file",
+                "changes"
+              ],
+              "exact_terms": [],
+              "matched_terms": [
+                "indexed",
+                "sections",
+                "file",
+                "changes"
+              ],
+              "missing_exact_terms": [],
+              "matched_term_count": 4,
+              "match_ratio": 0.5,
+              "lexical_score": 11.2954437292352,
+              "qualified": true,
+              "qualification_reason": "visible_fields",
+              "relation": "host_lookup"
+            },
+            "query-lookup-3": {
+              "query_text": "How are deleted documentation files removed from search?",
+              "query_terms": [
+                "deleted",
+                "documentation",
+                "files",
+                "removed",
+                "from",
+                "search"
+              ],
+              "exact_terms": [],
+              "matched_terms": [
+                "deleted",
+                "files",
+                "removed"
+              ],
+              "missing_exact_terms": [],
+              "matched_term_count": 3,
+              "match_ratio": 0.5,
+              "lexical_score": 13.691230180240186,
+              "qualified": true,
+              "qualification_reason": "visible_fields",
+              "relation": "host_lookup"
+            }
+          },
+          "content": "- discovers current reviewable project-doc candidates;\n- removes orphaned indexed docs whose files were deleted or are no longer discovered;\n- removes stale indexed sections for changed files;\n- indexes new and changed reviewable docs;\n- verifies the final indexed state before reporting results.\n\nAgent instructions use `prepare_docs(action=\"sync_project_docs\")` because project docs are owned by the repository filesystem, and the index is only a cache of that current state.\n\n"
+        },
+        {
+          "index": 10,
+          "path": "docs/PROJECT_MAP.md",
+          "title": "Default documentation flow",
+          "section": {
+            "title": "Default documentation flow",
+            "heading_path": "Project map > Default documentation flow",
+            "freshness": "current"
+          },
+          "line_start": 23,
+          "stable_chunk_id": "child-594f8335f28b9194dca7804dd20133a651fe2588",
+          "parent_logical_id": "parent-7dec3ff8b105acf9286ab686f9a1b114",
+          "authority": "source_of_truth",
+          "doc_scope": "project",
+          "retrieval_query_ids": [
+            "query-lookup-1"
+          ],
+          "matches": {
+            "query-lookup-1": {
+              "query_text": "How do I reconcile documentation after editing repository files?",
+              "query_terms": [
+                "reconcile",
+                "documentation",
+                "after",
+                "editing",
+                "repository",
+                "files"
+              ],
+              "exact_terms": [],
+              "matched_terms": [
+                "repository",
+                "files",
+                "documentation"
+              ],
+              "missing_exact_terms": [],
+              "matched_term_count": 3,
+              "match_ratio": 0.5,
+              "lexical_score": 11.499221354115527,
+              "qualified": true,
+              "qualification_reason": "visible_fields",
+              "relation": "host_lookup"
+            }
+          },
+          "content": "## Default documentation flow\n\n`get_docs_context(...)`\n→ follow its returned `prepare_docs(...)` action when required\n→ retry `get_docs_context(...)`\n\nThe index is derived state. Reviewable repository files remain the source of\ntruth for architecture, onboarding, runbooks and decisions.\n`docs_status` is reserved for explicit health, freshness, index, and job\nstatus requests.\n\n"
+        },
+        {
+          "index": 15,
+          "path": "CONTRIBUTING.md",
+          "title": "Documentation MCP changes",
+          "section": {
+            "title": "Documentation MCP changes",
+            "heading_path": "Contributing to DocAtlas > Documentation MCP changes",
+            "freshness": "current"
+          },
+          "line_start": 34,
+          "stable_chunk_id": "child-331218d7470de2c1e5cdb211566c141377e693a7",
+          "parent_logical_id": "parent-17f61566a34051f57179c1868e207112",
+          "authority": "source_of_truth",
+          "doc_scope": "project",
+          "retrieval_query_ids": [
+            "query-lookup-1"
+          ],
+          "matches": {
+            "query-lookup-1": {
+              "query_text": "How do I reconcile documentation after editing repository files?",
+              "query_terms": [
+                "reconcile",
+                "documentation",
+                "after",
+                "editing",
+                "repository",
+                "files"
+              ],
+              "exact_terms": [],
+              "matched_terms": [
+                "repository",
+                "files",
+                "documentation"
+              ],
+              "missing_exact_terms": [],
+              "matched_term_count": 3,
+              "match_ratio": 0.5,
+              "lexical_score": 10.423770839478953,
+              "qualified": true,
+              "qualification_reason": "visible_fields",
+              "relation": "host_lookup"
+            }
+          },
+          "content": "## Documentation MCP changes\n\nKeep the public Docs MCP inventory to `get_docs_context`, `prepare_docs`, and `docs_status`. Repository files are the source of truth; DocAtlas may index accepted docs but must not silently author or commit them. Read [the canonical Docs MCP reference](./docs/mcp-docs-server.md) before changing this boundary.\n\n"
+        }
+      ],
+      "public": {
+        "status": "ok",
+        "paths": [
+          "docs/mcp-docs-server.md",
+          "docs/project-docs-mcp-workflow.md",
+          "README.md"
+        ],
+        "sources": [
+          {
+            "evidence_id": "ev-3dcb5120efba54e2",
+            "path_or_url": "docs/mcp-docs-server.md",
+            "section": "Docs MCP server > Project documentation",
+            "snippet": "It does not generate or commit official documentation. A coding agent may create an ordinary Git patch from the returned evidence brief; after review, sync the accepted files.\n\nAfter code changes, use the CLI impact report to identify docs to review:",
+            "version_binding": "unversioned",
+            "content_sha256": "46e2744b072cfaf3e677e509aab753f56160de039ab8d956d5766df015297cc9",
+            "project_identity": "git:github.com/Vanilla1999/DocAtlas",
+            "authority": "source_of_truth",
+            "scope": "project",
+            "line_start": 63,
+            "line_end": 65
+          },
+          {
+            "evidence_id": "ev-81162d2a02431bde",
+            "path_or_url": "docs/project-docs-mcp-workflow.md",
+            "section": "Project docs MCP workflow > Canonical lifecycle: sync",
+            "snippet": "1. **discovers** current candidates from the filesystem;\n2. **prunes** orphaned indexed sources (files that no longer exist);\n3. **deduplicates** duplicate indexed sources by path, keeping the most recently ingested row;\n4. **removes** stale indexed sections (files that changed on disk);\n5. **indexes** new and changed candidates;\n6. **reports** current_count, new_count, changed_count, orphaned_removed, dedup_removed, stale_removed, indexed_sources.",
+            "version_binding": "unversioned",
+            "content_sha256": "a82de465026d677a9a6a2c83fb86255013a2c39178bee28d900984b267adea92",
+            "project_identity": "git:github.com/Vanilla1999/DocAtlas",
+            "authority": "source_of_truth",
+            "scope": "project",
+            "line_start": 25,
+            "line_end": 30
+          },
+          {
+            "evidence_id": "ev-6c006801e47f0063",
+            "path_or_url": "README.md",
+            "section": "DocAtlas > Project-docs MCP server > Recommended workflow",
+            "snippet": "1. discovers current candidates from the filesystem;\n2. prunes orphaned indexed sources (deleted files);\n3. removes stale indexed sections (changed files);\n4. indexes new and changed candidates;\n5. returns `current_count`, `new_count`, `changed_count`, `orphaned_removed`, and `indexed_sources`.",
+            "version_binding": "unversioned",
+            "content_sha256": "07ee5e3b631b84c81ed453c20d9bb4a0211fbfcfa490830634f4990a4831128d",
+            "project_identity": "git:github.com/Vanilla1999/DocAtlas",
+            "authority": "source_of_truth",
+            "scope": "project",
+            "line_start": 108,
+            "line_end": 112
+          }
+        ],
+        "covered_query_ids": [
+          "query-lookup-1",
+          "query-lookup-2",
+          "query-lookup-3"
+        ],
+        "missing_query_ids": [
+          "query-original"
+        ],
+        "estimated_tokens": 795,
+        "answer_supported": false,
+        "edit_ready": false
+      }
+    },
+    {
+      "id": "v2-paraphrase-review-ready",
+      "question": "Before I send my first fix for review, which reading will orient me and what testing does the contribution guide expect?",
+      "scope": "project",
+      "lookup_queries": [
+        "What reading is recommended to first-time contributors?",
+        "What tests should precede a contribution review?"
+      ],
+      "verdict": {
+        "semantic_useful": false,
+        "false_full_coverage": false,
+        "obligations": [
+          {
+            "id": "reading",
+            "met": true
+          },
+          {
+            "id": "test",
+            "met": false
+          }
+        ]
+      },
+      "query_plan": {
+        "schema_version": "documentation-query-plan-v2",
+        "original_question": "Before I send my first fix for review, which reading will orient me and what testing does the contribution guide expect?",
+        "query_ids": [
+          "query-original",
+          "query-lookup-1",
+          "query-lookup-2",
+          "query-intent-1",
+          "query-intent-2",
+          "query-intent-3",
+          "query-intent-4",
+          "query-concept-1",
+          "query-hint-1",
+          "query-hint-2",
+          "query-hint-3"
+        ],
+        "required_query_ids": [],
+        "public_query_ids": [
+          "query-original",
+          "query-lookup-1",
+          "query-lookup-2"
+        ],
+        "queries": [
+          {
+            "query_id": "query-original",
+            "text": "Before I send my first fix for review, which reading will orient me and what testing does the contribution guide expect?",
+            "origin": "original",
+            "coverage_required": false,
+            "facet_id": null,
+            "requirement_id": null,
+            "relation": "direct",
+            "public_parent_query_id": null,
+            "preferred_catalog_roles": [
+              "development",
+              "overview",
+              "project_architecture",
+              "runbook"
+            ],
+            "forbidden_catalog_roles": [],
+            "forbidden_evidence_terms": [],
+            "parent_exact_terms": []
+          },
+          {
+            "query_id": "query-lookup-1",
+            "text": "What reading is recommended to first-time contributors?",
+            "origin": "host_lookup",
+            "coverage_required": false,
+            "facet_id": null,
+            "requirement_id": null,
+            "relation": "host_lookup",
+            "public_parent_query_id": null,
+            "preferred_catalog_roles": [
+              "development",
+              "overview",
+              "project_architecture"
+            ],
+            "forbidden_catalog_roles": [
+              "roadmap"
+            ],
+            "forbidden_evidence_terms": [],
+            "parent_exact_terms": []
+          },
+          {
+            "query_id": "query-lookup-2",
+            "text": "What tests should precede a contribution review?",
+            "origin": "host_lookup",
+            "coverage_required": false,
+            "facet_id": null,
+            "requirement_id": null,
+            "relation": "host_lookup",
+            "public_parent_query_id": null,
+            "preferred_catalog_roles": [
+              "development",
+              "runbook"
+            ],
+            "forbidden_catalog_roles": [
+              "adr",
+              "roadmap"
+            ],
+            "forbidden_evidence_terms": [],
+            "parent_exact_terms": []
+          },
+          {
+            "query_id": "query-intent-1",
+            "text": "new contributor repository reading order contributing project map",
+            "origin": "canonical_intent",
+            "coverage_required": false,
+            "facet_id": "intent-context:contributor_start",
+            "requirement_id": null,
+            "relation": "host_lookup",
+            "public_parent_query_id": null,
+            "preferred_catalog_roles": [
+              "development",
+              "overview",
+              "project_architecture"
+            ],
+            "forbidden_catalog_roles": [
+              "roadmap"
+            ],
+            "forbidden_evidence_terms": [],
+            "parent_exact_terms": []
+          },
+          {
+            "query_id": "query-intent-2",
+            "text": "tests before pull request",
+            "origin": "canonical_intent",
+            "coverage_required": false,
+            "facet_id": "intent-context:testing_contribution",
+            "requirement_id": null,
+            "relation": "host_lookup",
+            "public_parent_query_id": null,
+            "preferred_catalog_roles": [
+              "development",
+              "runbook"
+            ],
+            "forbidden_catalog_roles": [
+              "adr",
+              "roadmap"
+            ],
+            "forbidden_evidence_terms": [],
+            "parent_exact_terms": []
+          },
+          {
+            "query_id": "query-intent-3",
+            "text": "CONTRIBUTING.md tests",
+            "origin": "canonical_intent",
+            "coverage_required": false,
+            "facet_id": "intent-context:testing_contribution",
+            "requirement_id": null,
+            "relation": "host_lookup",
+            "public_parent_query_id": null,
+            "preferred_catalog_roles": [
+              "development",
+              "runbook"
+            ],
+            "forbidden_catalog_roles": [
+              "adr",
+              "roadmap"
+            ],
+            "forbidden_evidence_terms": [],
+            "parent_exact_terms": []
+          },
+          {
+            "query_id": "query-intent-4",
+            "text": "docs/testing.md pytest",
+            "origin": "canonical_intent",
+            "coverage_required": false,
+            "facet_id": "intent-context:testing_contribution",
+            "requirement_id": null,
+            "relation": "host_lookup",
+            "public_parent_query_id": null,
+            "preferred_catalog_roles": [
+              "development",
+              "runbook"
+            ],
+            "forbidden_catalog_roles": [
+              "adr",
+              "roadmap"
+            ],
+            "forbidden_evidence_terms": [],
+            "parent_exact_terms": []
+          },
+          {
+            "query_id": "query-concept-1",
+            "text": "I my me",
+            "origin": "concept_alias",
+            "coverage_required": false,
+            "facet_id": null,
+            "requirement_id": null,
+            "relation": "host_lookup",
+            "public_parent_query_id": null,
+            "preferred_catalog_roles": [],
+            "forbidden_catalog_roles": [],
+            "forbidden_evidence_terms": [],
+            "parent_exact_terms": []
+          },
+          {
+            "query_id": "query-hint-1",
+            "text": "Before",
+            "origin": "retrieval_hint",
+            "coverage_required": false,
+            "facet_id": null,
+            "requirement_id": null,
+            "relation": "host_lookup",
+            "public_parent_query_id": null,
+            "preferred_catalog_roles": [],
+            "forbidden_catalog_roles": [],
+            "forbidden_evidence_terms": [],
+            "parent_exact_terms": []
+          },
+          {
+            "query_id": "query-hint-2",
+            "text": "send",
+            "origin": "retrieval_hint",
+            "coverage_required": false,
+            "facet_id": null,
+            "requirement_id": null,
+            "relation": "host_lookup",
+            "public_parent_query_id": null,
+            "preferred_catalog_roles": [],
+            "forbidden_catalog_roles": [],
+            "forbidden_evidence_terms": [],
+            "parent_exact_terms": []
+          },
+          {
+            "query_id": "query-hint-3",
+            "text": "first",
+            "origin": "retrieval_hint",
+            "coverage_required": false,
+            "facet_id": null,
+            "requirement_id": null,
+            "relation": "host_lookup",
+            "public_parent_query_id": null,
+            "preferred_catalog_roles": [],
+            "forbidden_catalog_roles": [],
+            "forbidden_evidence_terms": [],
+            "parent_exact_terms": []
+          }
+        ],
+        "explicit_paths": [],
+        "unresolved_parts": [
+          "unresolved_question_clause:Before I send my first fix for review",
+          "unresolved_question_clause:which reading will orient me",
+          "unresolved_question_clause:what testing does the contribution guide expect"
+        ],
+        "_component_contract": [],
+        "component_scope_complete": true
+      },
+      "candidate_count": 4,
+      "interesting_candidates": [
+        {
+          "index": 0,
+          "path": "CONTRIBUTING.md",
+          "title": "Project structure",
+          "section": {
+            "title": "Project structure",
+            "heading_path": "Contributing to DocAtlas > Project structure",
+            "freshness": "current"
+          },
+          "line_start": 7,
+          "stable_chunk_id": "child-56bc1c67add30068fb7c11a57636474326852550",
+          "parent_logical_id": "parent-a505bcba12b272035d51be0998b615a0",
+          "authority": "source_of_truth",
+          "doc_scope": "project",
+          "retrieval_query_ids": [
+            "query-lookup-1",
+            "query-intent-1"
+          ],
+          "matches": {
+            "query-lookup-1": {
+              "query_text": "What reading is recommended to first-time contributors?",
+              "query_terms": [
+                "reading",
+                "recommended",
+                "first-time",
+                "contributors"
+              ],
+              "exact_terms": [],
+              "matched_terms": [
+                "reading",
+                "contributors"
+              ],
+              "missing_exact_terms": [],
+              "matched_term_count": 2,
+              "match_ratio": 0.5,
+              "lexical_score": 17.702573469251767,
+              "qualified": true,
+              "qualification_reason": "visible_fields",
+              "relation": "host_lookup"
+            },
+            "query-intent-1": {
+              "query_text": "new contributor repository reading order contributing project map",
+              "query_terms": [
+                "contributor",
+                "repository",
+                "reading",
+                "order",
+                "contributing",
+                "project"
+              ],
+              "exact_terms": [],
+              "matched_terms": [
+                "contributor",
+                "repository",
+                "reading",
+                "contributing",
+                "project"
+              ],
+              "missing_exact_terms": [],
+              "matched_term_count": 5,
+              "match_ratio": 0.8333,
+              "lexical_score": 34.00723959303009,
+              "qualified": true,
+              "qualification_reason": "visible_fields",
+              "relation": "host_lookup"
+            },
+            "query-original": {
+              "query_text": "Before I send my first fix for review, which reading will orient me and what testing does the contribution guide expect?",
+              "query_terms": [
+                "before",
+                "send",
+                "first",
+                "review",
+                "reading",
+                "will",
+                "orient",
+                "testing",
+                "does",
+                "contribution",
+                "guide",
+                "expect"
+              ],
+              "exact_terms": [],
+              "matched_terms": [
+                "reading",
+                "contribution"
+              ],
+              "missing_exact_terms": [],
+              "matched_term_count": 2,
+              "match_ratio": 0.1667,
+              "lexical_score": 17.1049598031482,
+              "qualified": false,
+              "qualification_reason": "insufficient_visible_match",
+              "relation": "direct"
+            }
+          },
+          "content": "## Project structure\n\nNew contributors should start by reading `README.md`, this `CONTRIBUTING.md`,\n`docs/INDEX.md`, and `docs/PROJECT_MAP.md`. Together they provide the product\noverview, repository map, canonical documentation index, and contribution flow.\n\n"
+        },
+        {
+          "index": 1,
+          "path": "README.md",
+          "title": "Change-aware documentation review",
+          "section": {
+            "title": "Change-aware documentation review",
+            "heading_path": "DocAtlas > Project-docs MCP server > Change-aware documentation review",
+            "freshness": "current"
+          },
+          "line_start": 167,
+          "stable_chunk_id": "child-b4122478a1c691995c9dc5999bafe1b378650b05",
+          "parent_logical_id": "parent-bcbf1d9f974b4f55f92b3bed0fb01580",
+          "authority": "source_of_truth",
+          "doc_scope": "project",
+          "retrieval_query_ids": [
+            "query-intent-2"
+          ],
+          "matches": {
+            "query-intent-2": {
+              "query_text": "tests before pull request",
+              "query_terms": [
+                "tests",
+                "before",
+                "pull",
+                "request"
+              ],
+              "exact_terms": [],
+              "matched_terms": [
+                "pull",
+                "request"
+              ],
+              "missing_exact_terms": [],
+              "matched_term_count": 2,
+              "match_ratio": 0.5,
+              "lexical_score": 11.108307175733746,
+              "qualified": true,
+              "qualification_reason": "visible_fields",
+              "relation": "host_lookup"
+            },
+            "query-original": {
+              "query_text": "Before I send my first fix for review, which reading will orient me and what testing does the contribution guide expect?",
+              "query_terms": [
+                "before",
+                "send",
+                "first",
+                "review",
+                "reading",
+                "will",
+                "orient",
+                "testing",
+                "does",
+                "contribution",
+                "guide",
+                "expect"
+              ],
+              "exact_terms": [],
+              "matched_terms": [
+                "review"
+              ],
+              "missing_exact_terms": [],
+              "matched_term_count": 1,
+              "match_ratio": 0.0833,
+              "lexical_score": 5.087207353788084,
+              "qualified": false,
+              "qualification_reason": "insufficient_visible_match",
+              "relation": "direct"
+            },
+            "query-lookup-2": {
+              "query_text": "What tests should precede a contribution review?",
+              "query_terms": [
+                "tests",
+                "should",
+                "precede",
+                "contribution",
+                "review"
+              ],
+              "exact_terms": [],
+              "matched_terms": [
+                "review"
+              ],
+              "missing_exact_terms": [],
+              "matched_term_count": 1,
+              "match_ratio": 0.2,
+              "lexical_score": 5.0872054850331265,
+              "qualified": false,
+              "qualification_reason": "insufficient_visible_match",
+              "relation": "host_lookup"
+            }
+          },
+          "content": "The bundled GitHub Actions workflow publishes the advisory report in every pull request summary. It highlights module docs that need review and module changes with no maintained documentation, while leaving the final documentation edit to an explicit, reviewable change.\n\n"
+        }
+      ],
+      "public": {
+        "status": "ok",
+        "paths": [
+          "CONTRIBUTING.md",
+          "README.md"
+        ],
+        "sources": [
+          {
+            "evidence_id": "ev-6d394bce5150ded4",
+            "path_or_url": "CONTRIBUTING.md",
+            "section": "Contributing to DocAtlas > Project structure",
+            "snippet": "## Project structure\n\nNew contributors should start by reading `README.md`, this `CONTRIBUTING.md`,\n`docs/INDEX.md`, and `docs/PROJECT_MAP.md`. Together they provide the product\noverview, repository map, canonical documentation index, and contribution flow.",
+            "version_binding": "unversioned",
+            "content_sha256": "cd00a3920ffa8b27c2d806aa6da6fa18b5c9a69de8008eb323045445c872e00b",
+            "project_identity": "git:github.com/Vanilla1999/DocAtlas",
+            "authority": "source_of_truth",
+            "scope": "project",
+            "line_start": 7,
+            "line_end": 11
+          },
+          {
+            "evidence_id": "ev-263823b6a3c9648c",
+            "path_or_url": "README.md",
+            "section": "DocAtlas > Project-docs MCP server > Change-aware documentation review",
+            "snippet": "The bundled GitHub Actions workflow publishes the advisory report in every pull request summary. It highlights module docs that need review and module changes with no maintained documentation, while leaving the final documentation edit to an explicit, reviewable change.",
+            "version_binding": "unversioned",
+            "content_sha256": "582f8b392d939437f9df9682c8e28e6697d773c8d3e05f9cf91ef8ebc8cb60d4",
+            "project_identity": "git:github.com/Vanilla1999/DocAtlas",
+            "authority": "source_of_truth",
+            "scope": "project",
+            "line_start": 167,
+            "line_end": 167
+          }
+        ],
+        "covered_query_ids": [
+          "query-lookup-1"
+        ],
+        "missing_query_ids": [
+          "query-original",
+          "query-lookup-2"
+        ],
+        "estimated_tokens": 615,
+        "answer_supported": false,
+        "edit_ready": false
+      }
+    },
+    {
+      "id": "v2-paraphrase-search-trust",
+      "question": "A search returned a plausible passage. How does selection assess candidates, and does that certify an answer about this repository?",
+      "scope": "all",
+      "lookup_queries": [
+        "What decision does evidence selection make from search candidates?",
+        "Is retrieved text sufficient proof?",
+        "What support guarantee accompanies project read context?"
+      ],
+      "verdict": {
+        "semantic_useful": false,
+        "false_full_coverage": false,
+        "obligations": [
+          {
+            "id": "selection",
+            "met": true
+          },
+          {
+            "id": "not_proof",
+            "met": false
+          },
+          {
+            "id": "project_context",
+            "met": true
+          }
+        ]
+      },
+      "query_plan": {
+        "schema_version": "documentation-query-plan-v2",
+        "original_question": "A search returned a plausible passage. How does selection assess candidates, and does that certify an answer about this repository?",
+        "query_ids": [
+          "query-original",
+          "query-lookup-1",
+          "query-lookup-2",
+          "query-lookup-3",
+          "query-concept-1",
+          "query-hint-1",
+          "query-hint-2",
+          "query-hint-3"
+        ],
+        "required_query_ids": [
+          "query-original"
+        ],
+        "public_query_ids": [
+          "query-original",
+          "query-lookup-1",
+          "query-lookup-2",
+          "query-lookup-3"
+        ],
+        "queries": [
+          {
+            "query_id": "query-original",
+            "text": "A search returned a plausible passage. How does selection assess candidates, and does that certify an answer about this repository?",
+            "origin": "original",
+            "coverage_required": true,
+            "facet_id": null,
+            "requirement_id": null,
+            "relation": "direct",
+            "public_parent_query_id": null,
+            "preferred_catalog_roles": [],
+            "forbidden_catalog_roles": [],
+            "forbidden_evidence_terms": [],
+            "parent_exact_terms": []
+          },
+          {
+            "query_id": "query-lookup-1",
+            "text": "What decision does evidence selection make from search candidates?",
+            "origin": "host_lookup",
+            "coverage_required": false,
+            "facet_id": null,
+            "requirement_id": null,
+            "relation": "host_lookup",
+            "public_parent_query_id": null,
+            "preferred_catalog_roles": [
+              "module_architecture",
+              "project_architecture"
+            ],
+            "forbidden_catalog_roles": [
+              "roadmap"
+            ],
+            "forbidden_evidence_terms": [],
+            "parent_exact_terms": []
+          },
+          {
+            "query_id": "query-lookup-2",
+            "text": "Is retrieved text sufficient proof?",
+            "origin": "host_lookup",
+            "coverage_required": false,
+            "facet_id": null,
+            "requirement_id": null,
+            "relation": "host_lookup",
+            "public_parent_query_id": null,
+            "preferred_catalog_roles": [],
+            "forbidden_catalog_roles": [],
+            "forbidden_evidence_terms": [],
+            "parent_exact_terms": []
+          },
+          {
+            "query_id": "query-lookup-3",
+            "text": "What support guarantee accompanies project read context?",
+            "origin": "host_lookup",
+            "coverage_required": false,
+            "facet_id": null,
+            "requirement_id": null,
+            "relation": "host_lookup",
+            "public_parent_query_id": null,
+            "preferred_catalog_roles": [],
+            "forbidden_catalog_roles": [],
+            "forbidden_evidence_terms": [],
+            "parent_exact_terms": []
+          },
+          {
+            "query_id": "query-concept-1",
+            "text": "A a an",
+            "origin": "concept_alias",
+            "coverage_required": false,
+            "facet_id": null,
+            "requirement_id": null,
+            "relation": "host_lookup",
+            "public_parent_query_id": null,
+            "preferred_catalog_roles": [],
+            "forbidden_catalog_roles": [],
+            "forbidden_evidence_terms": [],
+            "parent_exact_terms": []
+          },
+          {
+            "query_id": "query-hint-1",
+            "text": "search",
+            "origin": "retrieval_hint",
+            "coverage_required": false,
+            "facet_id": null,
+            "requirement_id": null,
+            "relation": "host_lookup",
+            "public_parent_query_id": null,
+            "preferred_catalog_roles": [],
+            "forbidden_catalog_roles": [],
+            "forbidden_evidence_terms": [],
+            "parent_exact_terms": []
+          },
+          {
+            "query_id": "query-hint-2",
+            "text": "returned",
+            "origin": "retrieval_hint",
+            "coverage_required": false,
+            "facet_id": null,
+            "requirement_id": null,
+            "relation": "host_lookup",
+            "public_parent_query_id": null,
+            "preferred_catalog_roles": [],
+            "forbidden_catalog_roles": [],
+            "forbidden_evidence_terms": [],
+            "parent_exact_terms": []
+          },
+          {
+            "query_id": "query-hint-3",
+            "text": "plausible",
+            "origin": "retrieval_hint",
+            "coverage_required": false,
+            "facet_id": null,
+            "requirement_id": null,
+            "relation": "host_lookup",
+            "public_parent_query_id": null,
+            "preferred_catalog_roles": [],
+            "forbidden_catalog_roles": [],
+            "forbidden_evidence_terms": [],
+            "parent_exact_terms": []
+          }
+        ],
+        "explicit_paths": [],
+        "unresolved_parts": [
+          "unresolved_question_clause:search returned a plausible passage",
+          "unresolved_question_clause:How does selection assess candidates",
+          "unresolved_question_clause:does that certify an answer about this repository"
+        ],
+        "_component_contract": [],
+        "component_scope_complete": true
+      },
+      "candidate_count": 10,
+      "interesting_candidates": [
+        {
+          "index": 0,
+          "path": "docs/modules/evidence-selection.md",
+          "title": "Responsibility",
+          "section": {
+            "title": "Responsibility",
+            "heading_path": "Evidence selection module > Responsibility",
+            "freshness": "current"
+          },
+          "line_start": 7,
+          "stable_chunk_id": "child-feaede24f61d3f67deafa5c90eb3aad0f40567c8",
+          "parent_logical_id": "parent-df5569f21f3ae165f024718a0be1099b",
+          "authority": "source_of_truth",
+          "doc_scope": "module",
+          "retrieval_query_ids": [
+            "query-lookup-1"
+          ],
+          "matches": {
+            "query-lookup-1": {
+              "query_text": "What decision does evidence selection make from search candidates?",
+              "query_terms": [
+                "decision",
+                "does",
+                "evidence",
+                "selection",
+                "make",
+                "from",
+                "search",
+                "candidates"
+              ],
+              "exact_terms": [],
+              "matched_terms": [
+                "decision",
+                "evidence",
+                "selection",
+                "candidates"
+              ],
+              "missing_exact_terms": [],
+              "matched_term_count": 4,
+              "match_ratio": 0.5,
+              "lexical_score": 17.335966615124477,
+              "qualified": true,
+              "qualification_reason": "visible_fields",
+              "relation": "host_lookup"
+            },
+            "query-original": {
+              "query_text": "A search returned a plausible passage. How does selection assess candidates, and does that certify an answer about this repository?",
+              "query_terms": [
+                "search",
+                "returned",
+                "plausible",
+                "passage.",
+                "does",
+                "selection",
+                "assess",
+                "candidates",
+                "that",
+                "certify",
+                "answer",
+                "about",
+                "this",
+                "repository"
+              ],
+              "exact_terms": [],
+              "matched_terms": [
+                "selection",
+                "candidates",
+                "answer"
+              ],
+              "missing_exact_terms": [],
+              "matched_term_count": 3,
+              "match_ratio": 0.2143,
+              "lexical_score": 15.150336167997278,
+              "qualified": false,
+              "qualification_reason": "insufficient_visible_match",
+              "relation": "direct"
+            }
+          },
+          "content": "## Responsibility\n\nThe evidence-selection module turns bounded candidates into an auditable certification decision. Project-only reads bypass answer certification and use `ContextSelectionDecision`, which reports retrieval coverage without a support verdict.\n\nCandidate normalization, requirement compilation, proof matching, ranking, budget fitting, and projection identity are separate responsibilities even though they cooperate in one pipeline.\n\n"
+        },
+        {
+          "index": 1,
+          "path": "docs/mcp-docs-server.md",
+          "title": "Public tool contract",
+          "section": {
+            "title": "Public tool contract",
+            "heading_path": "Docs MCP server > Public tool contract",
+            "freshness": "current"
+          },
+          "line_start": 47,
+          "stable_chunk_id": "child-d091174d699d16790700c97d956b35d7b0a40b4c",
+          "parent_logical_id": "parent-055c5ddc0ec66718bcff828523f85b21",
+          "authority": "source_of_truth",
+          "doc_scope": "project",
+          "retrieval_query_ids": [
+            "query-lookup-3"
+          ],
+          "matches": {
+            "query-lookup-3": {
+              "query_text": "What support guarantee accompanies project read context?",
+              "query_terms": [
+                "support",
+                "guarantee",
+                "accompanies",
+                "project",
+                "read",
+                "context"
+              ],
+              "exact_terms": [],
+              "matched_terms": [
+                "support",
+                "guarantee",
+                "read"
+              ],
+              "missing_exact_terms": [],
+              "matched_term_count": 3,
+              "match_ratio": 0.5,
+              "lexical_score": 13.694945763134749,
+              "qualified": true,
+              "qualification_reason": "visible_fields",
+              "relation": "host_lookup"
+            }
+          },
+          "content": "Free-form lookup is a separate read-only lane. The optional `lookup_queries` argument accepts up to five bounded, single-concept documentation lookups formulated by the host. Use the documentation language, preserve exact identifiers, and split requests with more than three major topics across multiple calls. These queries can improve retrieval recall but cannot add proof obligations, mark an answer supported, or authorize an edit. The original `question` remains authoritative. Internal query attribution produces `covered_query_ids`, `missing_query_ids`, and `retrieval_coverage`; only the original question and explicit host/path/anchor queries participate in that public coverage. Audited domain-owned rewrites may provide derived retrieval coverage for the original question, but their internal IDs never appear as public covered or missing query IDs and the result remains retrieval-only. Compound projection selects compact witnesses for distinct lookup IDs before expanding snippets with remaining capacity, then requalifies coverage against the visible path, section, and snippet. Five lookups do not guarantee five sources: the response remains bounded to three sources and 800 estimated tokens, and uncovered directions remain explicit in `missing_query_ids`. Retrieval coverage is never a completeness or support verdict.\n\n"
+        },
+        {
+          "index": 2,
+          "path": "docs/mcp-docs-server.md",
+          "title": "Public tool contract",
+          "section": {
+            "title": "Public tool contract",
+            "heading_path": "Docs MCP server > Public tool contract",
+            "freshness": "current"
+          },
+          "line_start": 44,
+          "stable_chunk_id": "child-3d8f47b14d90058207ddc39a8439ec51097f37bf",
+          "parent_logical_id": "parent-055c5ddc0ec66718bcff828523f85b21",
+          "authority": "source_of_truth",
+          "doc_scope": "project",
+          "retrieval_query_ids": [
+            "query-lookup-2"
+          ],
+          "matches": {
+            "query-lookup-2": {
+              "query_text": "Is retrieved text sufficient proof?",
+              "query_terms": [
+                "retrieved",
+                "text",
+                "sufficient",
+                "proof"
+              ],
+              "exact_terms": [],
+              "matched_terms": [
+                "text",
+                "proof"
+              ],
+              "missing_exact_terms": [],
+              "matched_term_count": 2,
+              "match_ratio": 0.5,
+              "lexical_score": 9.312659253787158,
+              "qualified": true,
+              "qualification_reason": "visible_fields",
+              "relation": "host_lookup"
+            },
+            "query-original": {
+              "query_text": "A search returned a plausible passage. How does selection assess candidates, and does that certify an answer about this repository?",
+              "query_terms": [
+                "search",
+                "returned",
+                "plausible",
+                "passage.",
+                "does",
+                "selection",
+                "assess",
+                "candidates",
+                "that",
+                "certify",
+                "answer",
+                "about",
+                "this",
+                "repository"
+              ],
+              "exact_terms": [],
+              "matched_terms": [
+                "selection",
+                "candidates",
+                "answer"
+              ],
+              "missing_exact_terms": [],
+              "matched_term_count": 3,
+              "match_ratio": 0.2143,
+              "lexical_score": 13.592608654026783,
+              "qualified": false,
+              "qualification_reason": "insufficient_visible_match",
+              "relation": "direct"
+            },
+            "query-lookup-1": {
+              "query_text": "What decision does evidence selection make from search candidates?",
+              "query_terms": [
+                "decision",
+                "does",
+                "evidence",
+                "selection",
+                "make",
+                "from",
+                "search",
+                "candidates"
+              ],
+              "exact_terms": [],
+              "matched_terms": [
+                "evidence",
+                "selection",
+                "candidates"
+              ],
+              "missing_exact_terms": [],
+              "matched_term_count": 3,
+              "match_ratio": 0.375,
+              "lexical_score": 11.672122356949693,
+              "qualified": false,
+              "qualification_reason": "insufficient_visible_match",
+              "relation": "host_lookup"
+            }
+          },
+          "content": "The project answer contract requires explicit proof obligations for each supported user question before evidence can authorize an answer. A retrieval hit alone is never proof: evidence selection requires locally bound subject/relation/value evidence for every mandatory facet, and complete exact proof outranks compact generic text. Questions whose subject or requested operation cannot be resolved fail closed instead of using a synthetic `project` or `requested operation` subject.\nEvidence selection chooses candidates by requiring locally bound subject, relation, and value proof for every mandatory facet; complete exact proof outranks compact generic text.\n\n"
+        },
+        {
+          "index": 4,
+          "path": "docs/modules/question-planning.md",
+          "title": "Responsibility",
+          "section": {
+            "title": "Responsibility",
+            "heading_path": "Question planning module > Responsibility",
+            "freshness": "current"
+          },
+          "line_start": 13,
+          "stable_chunk_id": "child-a5bdbf09a4f9ddb9f2a1c07c34ff30ad73269086",
+          "parent_logical_id": "parent-bead9ba6e82a9af23c7b78381b38d3b0",
+          "authority": "source_of_truth",
+          "doc_scope": "module",
+          "retrieval_query_ids": [
+            "query-lookup-3"
+          ],
+          "matches": {
+            "query-lookup-3": {
+              "query_text": "What support guarantee accompanies project read context?",
+              "query_terms": [
+                "support",
+                "guarantee",
+                "accompanies",
+                "project",
+                "read",
+                "context"
+              ],
+              "exact_terms": [],
+              "matched_terms": [
+                "support",
+                "project",
+                "read"
+              ],
+              "missing_exact_terms": [],
+              "matched_term_count": 3,
+              "match_ratio": 0.5,
+              "lexical_score": 10.074176928485107,
+              "qualified": true,
+              "qualification_reason": "visible_fields",
+              "relation": "host_lookup"
+            }
+          },
+          "content": "This fail-closed rule governs `docs_answer`, not read-only discovery. An unresolved or unproved question may still produce a bounded `docs_context` projection from current project-scoped retrieval results. That projection is not a replacement `QuestionPlan`, carries no support verdict, and cannot authorize an edit.\n\n"
+        }
+      ],
+      "public": {
+        "status": "ok",
+        "paths": [
+          "docs/modules/evidence-selection.md",
+          "docs/mcp-docs-server.md",
+          "docs/modules/question-planning.md"
+        ],
+        "sources": [
+          {
+            "evidence_id": "ev-278e9d1d7b0db0c8",
+            "path_or_url": "docs/modules/evidence-selection.md",
+            "section": "Evidence selection module > Responsibility",
+            "snippet": "## Responsibility\n\nThe evidence-selection module turns bounded candidates into an auditable certification decision. Project-only reads bypass answer certification and use `ContextSelectionDecision`, which reports retrieval coverage without a support verdict.\n\nCandidate normalization, requirement compilation, proof matching, ranking, budget fitting, and projection identity are separate responsibilities even though they cooperate in one pipeline.",
+            "version_binding": "unversioned",
+            "content_sha256": "995bff14c06a441fc27e5e1a08e399b36a736675be0c3ed4d90649d4896c9ba0",
+            "project_identity": "git:github.com/Vanilla1999/DocAtlas",
+            "authority": "source_of_truth",
+            "scope": "module",
+            "line_start": 7,
+            "line_end": 11
+          },
+          {
+            "evidence_id": "ev-96c97d56d67021ef",
+            "path_or_url": "docs/mcp-docs-server.md",
+            "section": "Docs MCP server > Public tool contract",
+            "snippet": "The project answer contract requires explicit proof obligations for each supported user question before evidence can authorize an answer. A retrieval hit alone is never proof: evidence selection requires locally bound subject/relation/value evidence for every mandatory facet, and complete exact proof outranks compact generic text.",
+            "version_binding": "unversioned",
+            "content_sha256": "f36dfb7adff8f4e347e2f8bfdd919295d931a5afdfc842f697fd3af18ee8e70b",
+            "project_identity": "git:github.com/Vanilla1999/DocAtlas",
+            "authority": "source_of_truth",
+            "scope": "project",
+            "line_start": 44,
+            "line_end": 44
+          },
+          {
+            "evidence_id": "ev-aec4cae9ed460e92",
+            "path_or_url": "docs/modules/question-planning.md",
+            "section": "Question planning module > Responsibility",
+            "snippet": "This fail-closed rule governs `docs_answer`, not read-only discovery. An unresolved or unproved question may still produce a bounded `docs_context` projection from current project-scoped retrieval results. That projection is not a replacement `QuestionPlan`, carries no support verdict, and cannot authorize an edit.",
+            "version_binding": "unversioned",
+            "content_sha256": "cf1e15e71045cd0a303f74342035b17f7ee1d0a5ff968b5e20e885e779a9bb06",
+            "project_identity": "git:github.com/Vanilla1999/DocAtlas",
+            "authority": "source_of_truth",
+            "scope": "module",
+            "line_start": 13,
+            "line_end": 13
+          }
+        ],
+        "covered_query_ids": [
+          "query-lookup-1",
+          "query-lookup-2",
+          "query-lookup-3"
+        ],
+        "missing_query_ids": [
+          "query-original"
+        ],
+        "estimated_tokens": 767,
+        "answer_supported": false,
+        "edit_ready": false
+      }
+    }
+  ]
+}
