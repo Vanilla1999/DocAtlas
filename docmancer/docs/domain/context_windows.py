@@ -38,6 +38,31 @@ def _query_terms(queries: tuple[str, ...]) -> set[str]:
     }
 
 
+def _is_complete_source_span(text: str, snippet: str) -> bool:
+    """Return whether *snippet* ends at a source-local semantic boundary.
+
+    This is a projection preference only. It never creates query attribution or
+    answer proof; it prevents a mid-sentence prefix from outranking a bounded,
+    contiguous alternative carrying the same qualified evidence.
+    """
+    if not snippet:
+        return False
+    start = text.find(snippet)
+    if start < 0:
+        return False
+    end = start + len(snippet)
+    left = text[:start]
+    right = text[end:]
+    left_complete = not left.strip() or left.endswith("\n\n")
+    stripped = snippet.rstrip()
+    right_complete = (
+        not right.strip()
+        or right.startswith("\n\n")
+        or stripped.endswith((".", "!", "?", "|", "```", "~~~"))
+    )
+    return left_complete and right_complete
+
+
 def _focused_snippet(
     text: str, queries: tuple[str, ...], *, limit: int = 520,
 ) -> tuple[str, int, int]:

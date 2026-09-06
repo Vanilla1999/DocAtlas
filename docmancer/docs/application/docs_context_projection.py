@@ -32,7 +32,8 @@ from docmancer.docs.domain.project_doc_ranking import (
 )
 from docmancer.docs.domain.context_budget import PROJECT_CONTEXT_BUDGET
 from docmancer.docs.domain.context_windows import (
-    _focused_line_range, _focused_snippet, _projection_limits, _query_terms,
+    _focused_line_range, _focused_snippet, _is_complete_source_span,
+    _projection_limits, _query_terms,
 )
 from docmancer.docs.domain.evidence_qualification import (
     derived_parent_trace,
@@ -649,6 +650,22 @@ def _qualified_fragments(
             ]
             if snippet and (qualified_query_ids((candidate,)) & query_ids or component_witnesses(candidate, obligations)):
                 variants.append(candidate)
+    # Variants of one evidence item compete before global source selection.
+    # Prefer a bounded, structurally complete contiguous span when coverage is
+    # otherwise equivalent, so a shorter mid-sentence prefix cannot consume the
+    # slot and later block a safe expansion under the same 800-token budget.
+    variants.sort(
+        key=lambda candidate: (
+            len(qualified_query_ids((candidate,)) & query_ids),
+            len(component_witnesses(candidate, obligations)),
+            len(candidate.get("_visible_assignment_hashes") or ()),
+            int(_is_complete_source_span(
+                raw_snippet, str(candidate.get("snippet") or ""),
+            )),
+            -len(str(candidate.get("snippet") or "")),
+        ),
+        reverse=True,
+    )
     return variants
 
 
