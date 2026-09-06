@@ -196,3 +196,55 @@ def test_frozen_cache_reset_keeps_preview_and_preserve_in_visible_context():
     assert verdict["false_full_coverage"] is False
     assert payload["answer_supported"] is False and payload["edit_ready"] is False
     assert len(payload["sources"]) <= 3 and payload["estimated_tokens"] <= 800
+
+
+def test_frozen_architecture_infrastructure_boundary_enters_retrieval_candidates(monkeypatch):
+    from docmancer.docs.application import _project_docs_service_part03 as retrieval
+    from eval.project_context_quality_v2_protocol import load_cases
+    from scripts.run_project_docs_self_host_gate import LiveCase, run
+
+    case = next(row for row in load_cases() if row["id"] == "v2-natural-architecture")
+    captured = []
+    tag = retrieval._tag_retrieval_query
+
+    def observe(chunks, *args, **kwargs):
+        result = tag(chunks, *args, **kwargs)
+        if args and args[0] == "query-lookup-3":
+            captured.extend(result)
+        return result
+
+    monkeypatch.setattr(retrieval, "_tag_retrieval_query", observe)
+    run(cases=(LiveCase(
+        case_id=case["id"], question=case["question"], relevant_paths=(),
+        lookup_queries=tuple(case["lookup_queries"]), scope=case["scope"],
+    ),), negative_cases=())
+
+    candidates = [
+        chunk for chunk in captured
+        if (chunk.metadata or {}).get("project_doc_path") == "docs/modules/project-context-retrieval.md"
+        and "SQLite owns persistence and candidate generation" in chunk.text
+    ]
+    assert candidates, "the real infrastructure-boundary witness was lost before projection"
+    trace = candidates[0].metadata["retrieval_query_matches"]["query-lookup-3"]
+    assert trace["qualified"] is True
+
+
+def test_frozen_request_flow_prefers_project_context_module_witnesses():
+    from eval.project_context_quality_v2_protocol import evaluate_case, load_cases
+    from scripts.run_project_docs_self_host_gate import LiveCase, run
+
+    case = next(row for row in load_cases() if row["id"] == "v2-natural-request-flow")
+    result = run(cases=(LiveCase(
+        case_id=case["id"], question=case["question"], relevant_paths=(),
+        lookup_queries=tuple(case["lookup_queries"]), scope=case["scope"],
+    ),), negative_cases=())
+    payload = result["results"][0]["payload"]
+    verdict = evaluate_case(case, payload)
+    assert "docs/modules/project-context-retrieval.md" in {
+        source["path_or_url"] for source in payload["sources"]
+    }
+    assert all(row["met"] for row in verdict["obligations"]), verdict["obligations"]
+    assert verdict["semantic_useful"] is True
+    assert verdict["false_full_coverage"] is False
+    assert payload["answer_supported"] is False and payload["edit_ready"] is False
+    assert len(payload["sources"]) <= 3 and payload["estimated_tokens"] <= 800
