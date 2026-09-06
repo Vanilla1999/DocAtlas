@@ -1,0 +1,88 @@
+name: PR178 reviewed follow-up publication
+on:
+  push:
+    branches: [fix/context-first-project-reads]
+    paths: [.github/workflows/pr178-followup-apply.yml]
+permissions:
+  contents: write
+env:
+  DOCATLAS_OFFLINE: "1"
+  DOCATLAS_AUTO_VECTORS: "0"
+  HF_HUB_OFFLINE: "1"
+  TRANSFORMERS_OFFLINE: "1"
+  PYTHONPATH: .
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
+jobs:
+  apply-reviewed-fix:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: true
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1
+        with:
+          python-version: "3.12"
+      - name: Check exact branch and parent
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REF" = refs/heads/fix/context-first-project-reads
+          test "$(git rev-parse HEAD^)" = 56e2122fafd75e7bd1fdc01b314e8e6aa2e1e7d7
+          test -z "$(git status --porcelain)"
+          mkdir -p "$RUNNER_TEMP/pr178-followup"
+      - name: Install package dependencies (no model installation)
+        run: python -m pip install -e ".[dev]"
+      - name: Apply byte-checked reviewed source and report changes
+        run: |
+          set -euo pipefail
+          python - <<'PY_APPLY'
+          from pathlib import Path
+          import hashlib, subprocess, sys
+          before = {'docmancer/docs/application/_project_docs_service_part03.py': 'ff01c6241742f30e629350e38998e066b8a3496200d429f283d1f35d4580a034', 'docmancer/docs/application/docs_context_projection.py': '0e9fed541970913e613a726dbb792c22676204fa55f498e78e33f8124cc91c0e', 'eval/agent_developer_v1/results/evidence-is-data.json': '2fb82664b015b0e9f2edd1fc80db8fe766ab63d0605a6bbf7a821ebff39b20cf', 'eval/agent_developer_v1/results/mixed-evidence-provenance.json': 'f98db5e9b357d4591e627f647e3fff02165c3f6386d0ba77f722ea6bce24deec', 'eval/agent_developer_v1/results/p1-agent-truth-closure.json': '1a52f9243554336097044bfb967229b83d72ba0291e5aae7399a4f1e68aa5109', 'eval/agent_developer_v1/results/paraphrase-proofability.json': '685f9bfd9e77547a3a4c5d1fdaa1342cdefd1b56f3af707f99cd31e78277b3c4'}
+          after = {'docmancer/docs/application/_project_docs_service_part03.py': '77e3d7f2012d9259bc12f12e9338d2502168188ce7edb8f196740867caabbe18', 'docmancer/docs/application/docs_context_projection.py': '5ff571b4eb1f3e0b48913d7d87734462bf0b2e04a24e6ffaa8bf67a309b25ec2', 'eval/agent_developer_v1/results/evidence-is-data.json': 'ea87ec660f68aeaea77b8406503438a3ec9ef12b598857fc09597d351f4c54cb', 'eval/agent_developer_v1/results/mixed-evidence-provenance.json': '7bc4599651f891186cdffe1ee57066906fb92e96048204103e6eda42087a05d9', 'eval/agent_developer_v1/results/p1-agent-truth-closure.json': 'ecac255d51f243e6977f4cfd87a37d20ae0f9da7f87a163586b1cc7a20f23404', 'eval/agent_developer_v1/results/paraphrase-proofability.json': 'b9b329dc6d4a5e26cbf216f88b9efd734d4f18349669bae3b1c95e634ae1f91c', 'tests/diagnostic_labels.exact_document_fallback.json': '91f05c9d25e2a2d8c266887a32778a7a53a65de6fe15bce9d7d8de06999b4077', 'tests/docs/test_exact_document_fallback_context.py': '8d88361b0872f1479b994b7da0c2eb8968db29857a05787556f12a76434ba1a5'}
+          for name, expected in before.items():
+              assert hashlib.sha256(Path(name).read_bytes()).hexdigest() == expected, name
+          for name in set(after) - set(before):
+              assert not Path(name).exists(), name
+          replacements = [('docmancer/docs/application/_project_docs_service_part03.py', '            exact_query_id = next((\n                item.query_id for item in (documentation_query_plan.queries if documentation_query_plan else ())\n                if item.origin == "exact_path"\n            ), "query-path-1")\n            exact_chunks = _tag_retrieval_query(\n                exact_chunks, exact_query_id, evidence_path,\n                expected_project_identity=self._repository_identity(root),\n                lifecycle_intent=str(getattr(requirements, "lifecycle_intent", "") or lifecycle_intent(query)),\n            )\n', '            # Stored sections bypass the normal query lanes. Qualify them against\n            # the same plan rather than attributing only the document path: a path\n            # match cannot stand in for the requested topic or exact identifier.\n            exact_plan = documentation_query_plan or build_documentation_query_plan(\n                query, lookup_queries=lookup_queries, explicit_path=evidence_path,\n                requirements=requirements,\n            )\n            for lookup in exact_plan.queries:\n                exact_chunks = _tag_retrieval_query(\n                    exact_chunks, lookup.query_id, lookup.text, lookup=lookup,\n                    expected_project_identity=self._repository_identity(root),\n                    lifecycle_intent=str(getattr(requirements, "lifecycle_intent", "") or lifecycle_intent(query)),\n                )\n'), ('docmancer/docs/application/docs_context_projection.py', 'from docmancer.docs.domain.query_terms import documentation_exact_terms', 'from docmancer.docs.domain.query_terms import documentation_exact_terms\nfrom docmancer.docs.domain.documentation_query_plan import technical_anchors'), ('docmancer/docs/application/docs_context_projection.py', '                original,\n                raw_text=str(original.get("content") or original.get("display_text") or ""),\n                original_question=original_question,', '                raw_text=str(original.get("content") or original.get("display_text") or ""),\n                original_question=original_question, explicit_paths=explicit_paths,'), ('docmancer/docs/application/docs_context_projection.py', 'def _has_visible_non_path_exact_term(\n    source: dict[str, Any], *, raw_text: str, original_question: str,\n) -> bool:\n    trace = (source.get("retrieval_query_matches") or {}).get("query-original") or {}\n    visible = raw_text.casefold()\n    trace_terms = tuple(str(value).strip() for value in trace.get("exact_terms") or ())\n    question_terms = tuple(\n        token for token in re.findall(r"\\b[A-Z][A-Za-z0-9]*[A-Z][A-Za-z0-9]*\\b", original_question)\n        if token.casefold() not in {"docatlas", "docmancer"}\n    )\n    return any(\n        "/" not in term and "\\\\" not in term\n        and re.search(rf"(?<!\\w){re.escape(term.strip(\'.,;:!?\').casefold())}(?!\\w)", visible)\n        for term in (*trace_terms, *question_terms)\n        if term\n    )\n', 'def _has_visible_non_path_exact_term(\n    *, raw_text: str, original_question: str, explicit_paths: set[str],\n) -> bool:\n    # Use whole anchors, not CamelCase substrings extracted from a file path.\n    # A heading such as "Reference" is not evidence for a topic merely because\n    # the requested file is named REFERENCE.md. Apply the ordinary body qualifier\n    # here too; headings, links and identifier prefixes cannot satisfy a topic.\n    terms = (\n        term for term in technical_anchors(original_question)\n        if "/" not in term and "\\\\" not in term\n        and _normalized_path(term) not in explicit_paths\n    )\n    return any(\n        qualify_evidence(\n            {"query_text": term, "query_terms": [term], "exact_terms": [term]},\n            query_id="exact-topic", visible_text=raw_text, evidence_text=raw_text,\n        ).qualified\n        for term in terms\n    )\n')]
+          for name, old, new in replacements:
+              path = Path(name)
+              text = path.read_text()
+              assert text.count(old) == 1, name
+              path.write_text(text.replace(old, new, 1))
+          Path('tests/diagnostic_labels.exact_document_fallback.json').write_text('{\n  "schema_version": 1,\n  "module_labels": {\n    "tests/docs/test_exact_document_fallback_context.py": "behavioral"\n  },\n  "module_node_hashes": {\n    "tests/docs/test_exact_document_fallback_context.py": "1a597fa8cd13c138617f2753271deac9d7579862fee18c8c62a451d74e46c7fe"\n  },\n  "node_overrides": {}\n}\n')
+          Path('tests/docs/test_exact_document_fallback_context.py').write_text('"""Exact indexed sections retain real lookup attribution without answer proof."""\nfrom __future__ import annotations\n\nimport pytest\n\nfrom docmancer.docs.application.model_visible_projection import estimate_projection_tokens\nfrom docmancer.docs.domain.documentation_query_plan import build_documentation_query_plan\nfrom docmancer.mcp.docs_server import call_docs_tool_payload\nfrom tests.test_named_document_context_integration import _named_document_service\n\n\n@pytest.mark.parametrize("term", ["meet_type", "retry_count", "RequestHandler", "CACHE_MODE"])\ndef test_index_fallback_qualifies_existing_exact_anchor(tmp_path, monkeypatch, term):\n    path = "docs/REFERENCE.md"\n    service, project = _named_document_service(tmp_path, monkeypatch, [path], {\n        path: f"# Reference\\n\\n## Counter\\n{term} records completed progress.\\n"\n        "\\n## Other\\nOtherSetting controls something unrelated.\\n",\n    })\n    # Force the documented source-local fallback, not a global index scan.\n    monkeypatch.setattr(service.project_docs, "query_project_docs", lambda *a, **kw: [])\n    store = service.project_docs._agent_instance().store\n    def no_full_scan(*a, **kw):\n        pytest.fail("exact document fallback enumerated the whole generation")\n    monkeypatch.setattr(store, "list_sections_for_embedding", no_full_scan)\n    question = f"In {path}, summarize {term}."\n    result = call_docs_tool_payload("get_docs_context", {\n        "question": question, "project_path": project, "scope": "project",\n    }, service)\n    assert result["status"] == "ok", result\n    assert result["kind"] == "docs_context"\n    assert result["answer_supported"] is False\n    assert result["answer_available"] is False\n    assert result["edit_ready"] is False\n    assert {s["path_or_url"] for s in result["sources"]} == {path}\n    visible = "\\n".join(s["snippet"] for s in result["sources"])\n    assert f"{term} records completed progress." in visible\n    assert "OtherSetting" not in visible\n    plan = build_documentation_query_plan(question, explicit_path=path)\n    term_ids = {q.query_id for q in plan.queries if q.origin == "exact_anchor" and q.text == term}\n    assert term_ids\n    assert term_ids <= set(result["covered_query_ids"])\n    assert "query-original" not in result["covered_query_ids"]\n    assert len(result["sources"]) <= 3\n    assert estimate_projection_tokens(result) <= 800\n\n\n@pytest.mark.parametrize("content", [\n    "# Reference\\n\\nOtherSetting records completed progress.\\n",\n    "# meet_type\\n\\nOtherSetting records completed progress.\\n",\n    "# Reference\\n\\nmeet_type_extra records completed progress.\\n",\n    "# Reference\\n\\n[meet_type](other.md)\\n",\n])\ndef test_exact_path_is_not_topic_evidence(tmp_path, monkeypatch, content):\n    path = "docs/REFERENCE.md"\n    service, project = _named_document_service(tmp_path, monkeypatch, [path], {path: content})\n    monkeypatch.setattr(service.project_docs, "query_project_docs", lambda *a, **kw: [])\n    result = call_docs_tool_payload("get_docs_context", {\n        "question": f"In {path}, summarize meet_type.", "project_path": project,\n    }, service)\n    assert result["context_available"] is False, result\n    assert not result.get("sources")\n    assert result["answer_supported"] is False\n')
+          for producer in ("run_paraphrase_proofability_gate", "run_mixed_evidence_provenance_gate", "run_evidence_is_data_gate", "run_p1_agent_truth_closure_gate"):
+              subprocess.run([sys.executable, f"scripts/{producer}.py", "--write"], check=True)
+          for name, expected in after.items():
+              assert hashlib.sha256(Path(name).read_bytes()).hexdigest() == expected, name
+          PY_APPLY
+          git diff --check
+      - name: Verify offline tests and existing contracts
+        run: |
+          set -euo pipefail
+          pytest tests/ -m "not live and not live_network" -q | tee "$RUNNER_TEMP/pr178-followup/pytest.log"
+          for script in run_recovery_contract_gate run_recovery_mutation_gate run_paraphrase_proofability_gate paraphrase_proofability_self_test run_mixed_evidence_provenance_gate mixed_evidence_provenance_self_test run_evidence_is_data_gate evidence_is_data_self_test run_p1_agent_truth_closure_gate p1_agent_truth_closure_self_test check_python_module_size; do
+            python "scripts/$script.py" | tee "$RUNNER_TEMP/pr178-followup/$script.log"
+          done
+      - name: Publish only the reviewed eight-file change to the same branch
+        run: |
+          set -euo pipefail
+          test "$(git ls-remote origin refs/heads/fix/context-first-project-reads | cut -f1)" = "$GITHUB_SHA"
+          git add -- docmancer/docs/application/_project_docs_service_part03.py docmancer/docs/application/docs_context_projection.py eval/agent_developer_v1/results/evidence-is-data.json eval/agent_developer_v1/results/mixed-evidence-provenance.json eval/agent_developer_v1/results/p1-agent-truth-closure.json eval/agent_developer_v1/results/paraphrase-proofability.json tests/diagnostic_labels.exact_document_fallback.json tests/docs/test_exact_document_fallback_context.py
+          test "$(git diff --cached --name-only | wc -l)" -eq 8
+          git diff --cached --check
+          git diff --cached > "$RUNNER_TEMP/pr178-followup/reviewed.patch"
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git commit -m "fix: preserve exact-document topic evidence and refresh provenance"
+          git push origin HEAD:refs/heads/fix/context-first-project-reads
+          git rev-parse HEAD > "$RUNNER_TEMP/pr178-followup/published-head.txt"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: pr178-reviewed-followup-${{ github.run_id }}
+          path: ${{ runner.temp }}/pr178-followup/
+          if-no-files-found: warn
