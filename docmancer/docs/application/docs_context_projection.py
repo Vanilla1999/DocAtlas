@@ -499,6 +499,9 @@ def _expand_selected_snippets(
             continue
         raw_snippet, focus_queries, source_line_start = values
         for limit in _projection_limits(raw_snippet):
+            # Each round protects the latest accepted span, not the initial
+            # short snippet captured before the expansion loop.
+            source = expanded[index]
             snippet, snippet_start, snippet_end = _focused_snippet(
                 raw_snippet, focus_queries, limit=limit,
             )

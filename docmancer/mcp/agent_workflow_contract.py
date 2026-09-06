@@ -30,6 +30,7 @@ WORKFLOW_POLICY: dict[str, Any] = {
     },
     "scope_planning": {
         "explicit_scope_is_authoritative": True,
+        "repository_overview_scope": "all",
         "repo_level_policy_scope": "project",
         "known_module_scope": "module",
         "cross_module_scope": "all",
@@ -37,6 +38,7 @@ WORKFLOW_POLICY: dict[str, Any] = {
         "all_requires_no_module_filter": True,
         "mixed_module_and_project_prefer_two_calls": True,
         "never_widen_project_to_all": True,
+        "all_is_repository_local": True,
     },
     "free_form_lookup": {
         "host_formulates_lookup_queries": True,
@@ -68,6 +70,37 @@ PUBLIC_EXAMPLES: tuple[dict[str, Any], ...] = (
         "arguments": {
             "question": "How is authentication configured?",
             "project_path": "/repo",
+        },
+    },
+    {
+        "id": "repository-overview",
+        "tool": "get_docs_context",
+        "condition": "repository onboarding or architecture overview; no explicit narrower scope",
+        "arguments": {
+            "question": "Explain this repository's architecture and module responsibilities.",
+            "project_path": "/repo",
+            "scope": "all",
+        },
+    },
+    {
+        "id": "repository-policy",
+        "tool": "get_docs_context",
+        "condition": "repository-level policy only",
+        "arguments": {
+            "question": "What are the repository-wide contribution rules?",
+            "project_path": "/repo",
+            "scope": "project",
+        },
+    },
+    {
+        "id": "known-module",
+        "tool": "get_docs_context",
+        "condition": "one module identified by an exact discovered path",
+        "arguments": {
+            "question": "How does the orders module handle retries?",
+            "project_path": "/repo",
+            "scope": "module",
+            "module_path": "packages/orders",
         },
     },
     {

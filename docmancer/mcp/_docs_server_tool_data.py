@@ -12,7 +12,7 @@ Agent workflow:
 - The server owns bounded output selection; raw retrieval stays hidden and only a validated projection plus bounded recovery metadata enters model context.
 - Call prepare_docs only from recommended_next_action.
 - Use docs_status only for explicit health, freshness, source-state, or job-status requests, or when get_docs_context returns it as recommended_next_action.
-- Scope planning: for one known module use scope="module" plus exact module_path; module_path always implies module scope. For project-wide policy use scope="project" and omit module/module_path. If a task needs both module-local and project-wide evidence, make two bounded calls (module then project) rather than widening one module call. For cross-module questions use scope="all" without module filters, or separate exact module calls. On module_ambiguous, follow docs_status and retry with an exact returned module_path.
+- Scope planning: for one known module use scope="module" plus exact module_path; module_path always implies module scope. For project-wide policy use scope="project" and omit module/module_path. If a task needs both module-local and project-wide evidence, make two bounded calls (module then project) rather than widening one module call. For repository onboarding, architecture overviews, and cross-module questions use scope="all" without module filters, or separate exact module calls. project_path still restricts retrieval to the same repository. Preserve an explicit scope; never widen project to all as an automatic fallback. On module_ambiguous, follow docs_status and retry with an exact returned module_path.
 - insufficient_evidence never proves a documentary claim. Follow one typed recovery: one non-automatic rephrase for parser/retrieval uncertainty, then local source/tests when hard_stop=false; stop before an edit when hard_stop=true or the task explicitly requires a still-unproved documentary contract.
 - This tool provides source-grounded context, not a full code audit or test substitute.
 - Pass the user's original request unchanged as question.
@@ -571,20 +571,19 @@ RAW_TOOLS = [tool for tool in RAW_TOOLS if tool["name"] in CLASSIFIED_TOOL_NAMES
 
 PUBLIC_ADVERTISED_DESCRIPTIONS: dict[str, str] = {
     "get_docs_context": (
-        "Source-grounded documentation tool. Call before a coding edit or for a documentation/API question. "
-        "Pass the user's original request unchanged as question. For compound or cross-language requests, add up "
-        "to five single-concept lookup_queries in the documentation language. Preserve exact identifiers, "
-        "filenames, commands, and versions "
-        "verbatim. lookup_queries improve retrieval only; they never authorize an answer or edit. "
-        "Use one topic per lookup; split requests with over three topics across bounded calls. "
-        "For one known module use scope=module with exact module_path; module_path always implies module scope. "
-        "For project-wide policy use scope=project without module filters. If a task needs both module-local and "
-        "project-wide evidence, make two bounded calls (module then project). For cross-module questions use "
-        "scope=all without module filters. On module ambiguity follow the returned docs_status recovery and retry "
-        "with an exact module_path. Pass the original coding request as question instead of replacing it with a "
-        "documentation-governance meta-question. On insufficient_evidence, keep documentation claims unproved; "
-        "continue with a returned local source-search handoff when hard_stop=false, and stop before editing when "
-        "hard_stop=true or the change explicitly depends on the unproved documentary contract."
+        "Source-grounded documentation tool. Call before edits or for docs/API questions. "
+        "Pass the user's original request unchanged as question; never substitute a documentation-governance meta-question. "
+        "For compound or cross-language requests, add up to five single-concept lookup_queries in the documentation language. "
+        "Preserve exact identifiers, filenames, commands and versions verbatim. "
+        "lookup_queries improve retrieval only; they never authorize an answer or edit. "
+        "Split over three topics across bounded calls. "
+        "For onboarding, architecture or cross-module reads use scope=all without module filters "
+        "(scope=\"all\", same repository). For repo-level policy use scope=\"project\"; for one module use scope=\"module\" with exact module_path. "
+        "module_path always implies module scope. Preserve explicit scope, including on a miss. "
+        "For module plus repo-policy evidence, make two bounded calls (module then project). "
+        "On module ambiguity follow returned docs_status with an exact module_path. "
+        "On insufficient_evidence keep claims unproved; follow returned local source-search when hard_stop=false. "
+        "Stop before editing on hard_stop=true or a change requiring an unproved documentary contract."
     ),
     "prepare_docs": (
         "Confirmation-first documentation preparation. Call only from get_docs_context "
@@ -613,7 +612,7 @@ PUBLIC_ADVERTISED_INPUT_SCHEMAS: dict[str, dict[str, Any]] = {
             "scope": {
                 "type": ["string", "null"],
                 "enum": ["project", "module", "all", None],
-                "description": "Project: repo-level docs only; module/all.",
+                "description": "project: repo-level docs only; module: one module; all: repo-level plus modules in the same repository. module_path always limits to that module.",
             },
         },
         "required": ["question"],
