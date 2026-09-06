@@ -38,7 +38,7 @@ jobs:
 
           validate_corpus()
           output = {}
-          for lane in ("natural", "exposed_paraphrase"):
+          for lane in ("natural", "exposed"):
               cases = tuple(
                   case for case in load_cases(lane)
                   if case.get("case_type", "positive" if case.get("expected_kind") == "docs_context" else "strict_negative") == "positive"
