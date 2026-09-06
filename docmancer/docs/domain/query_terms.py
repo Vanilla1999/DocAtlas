@@ -57,8 +57,15 @@ def is_exact_technical_token(token: str) -> bool:
 def documentation_technical_anchors(question: str, *, limit: int = 12) -> tuple[str, ...]:
     """Extract bounded exact anchors without depending on retrieval infrastructure."""
     values: list[str] = []
+    # A filename/qualified symbol is one identity, not independent identifiers
+    # for each uppercase or dotted substring inside the same source span.
+    # Keep a separately mentioned token: containment is positional, not textual.
+    whole_spans = [match.span() for match in _TECHNICAL_TERM_PATTERNS[6].finditer(question)]
     for pattern in _TECHNICAL_TERM_PATTERNS:
         for match in pattern.finditer(question):
+            if any(start <= match.start() and match.end() <= end
+                   and match.span() != (start, end) for start, end in whole_spans):
+                continue
             value = (match.group(1) if match.lastindex else match.group(0)).strip()
             if (
                 value
