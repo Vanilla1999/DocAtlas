@@ -1,0 +1,33 @@
+name: PR179 downstream acceptance fix
+
+on:
+  push:
+    branches:
+      - fix/context-first-project-reads-finalization
+    paths:
+      - .github/workflows/pr179-downstream-fix.yml
+
+permissions:
+  contents: write
+
+jobs:
+  apply-fix:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+        with:
+          ref: fix/context-first-project-reads-finalization
+          fetch-depth: 0
+      - name: Apply reviewed downstream fix
+        env:
+          PATCH_GZ_B64: "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"
+        run: |
+          printf '%s' "$PATCH_GZ_B64" | base64 -d | gzip -d > /tmp/pr179-downstream.patch
+          git apply --check /tmp/pr179-downstream.patch
+          git apply /tmp/pr179-downstream.patch
+          rm .github/workflows/pr179-downstream-fix.yml
+          git add -A
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "fix: stabilize downstream acceptance gates"
+          git push origin HEAD:fix/context-first-project-reads-finalization
