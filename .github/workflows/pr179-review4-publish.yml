@@ -36,12 +36,13 @@ jobs:
       - name: Apply the reviewed patch and remove temporary infrastructure
         run: |
           set -euo pipefail
-          git diff --exit-code 832ed9a5d050bdf592d6213e77d495dbe1d83b87 HEAD -- . ':!.github/review/pr179-review4.patch' ':!.github/workflows/pr179-review4-publish.yml'
+          git diff --exit-code 832ed9a5d050bdf592d6213e77d495dbe1d83b87 HEAD -- . ':!.github/review/pr179-review4.patch' ':!.github/review/pr179-review4-observer.patch' ':!.github/workflows/pr179-review4-publish.yml'
           echo '7a565887399ec58f0711133610babe81ba230a3aa7261ca7c2c46c738f3bfc43  .github/review/pr179-review4.patch' | sha256sum -c -
+          echo '296c63fc9b6fa5ed39b9ca1961b87a2bfbeb37d2929a92359631f53e6600d120  .github/review/pr179-review4-observer.patch' | sha256sum -c -
           git ls-files -z eval scripts docatlas.project-docs.yaml | xargs -0 sha256sum > "$RUNNER_TEMP/review4-frozen.sha256"
-          git apply --check .github/review/pr179-review4.patch
-          git apply --index .github/review/pr179-review4.patch
-          git rm .github/review/pr179-review4.patch .github/workflows/pr179-review4-publish.yml .github/workflows/pr179-review4-snapshot.yml .github/review/pr179-review3.patch .github/workflows/pr179-apply-review3.yml
+          git apply --check .github/review/pr179-review4.patch .github/review/pr179-review4-observer.patch
+          git apply --index .github/review/pr179-review4.patch .github/review/pr179-review4-observer.patch
+          git rm .github/review/pr179-review4.patch .github/review/pr179-review4-observer.patch .github/workflows/pr179-review4-publish.yml .github/workflows/pr179-review4-snapshot.yml .github/review/pr179-review3.patch .github/workflows/pr179-apply-review3.yml
           git diff --cached --check
       - name: Full offline suite and static checks
         run: |
@@ -87,9 +88,10 @@ jobs:
         run: |
           set -euo pipefail
           echo '7a565887399ec58f0711133610babe81ba230a3aa7261ca7c2c46c738f3bfc43  .github/review/pr179-review4.patch' | sha256sum -c -
-          git apply --check .github/review/pr179-review4.patch
-          git apply --index .github/review/pr179-review4.patch
-          git rm .github/review/pr179-review4.patch .github/workflows/pr179-review4-publish.yml .github/workflows/pr179-review4-snapshot.yml .github/review/pr179-review3.patch .github/workflows/pr179-apply-review3.yml
+          echo '296c63fc9b6fa5ed39b9ca1961b87a2bfbeb37d2929a92359631f53e6600d120  .github/review/pr179-review4-observer.patch' | sha256sum -c -
+          git apply --check .github/review/pr179-review4.patch .github/review/pr179-review4-observer.patch
+          git apply --index .github/review/pr179-review4.patch .github/review/pr179-review4-observer.patch
+          git rm .github/review/pr179-review4.patch .github/review/pr179-review4-observer.patch .github/workflows/pr179-review4-publish.yml .github/workflows/pr179-review4-snapshot.yml .github/review/pr179-review3.patch .github/workflows/pr179-apply-review3.yml
           git diff --cached --check
           test "$(git write-tree)" = "$TESTED_TREE"
           git config user.name 'github-actions[bot]'
