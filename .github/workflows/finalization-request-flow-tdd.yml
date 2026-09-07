@@ -1,0 +1,45 @@
+name: Finalization request flow RED
+
+on:
+  push:
+    branches: [fix/context-first-project-reads-finalization]
+    paths: [.github/workflows/finalization-request-flow-tdd.yml]
+
+permissions:
+  contents: read
+
+env:
+  DOCATLAS_OFFLINE: "1"
+  DOCATLAS_AUTO_VECTORS: "0"
+  HF_HUB_OFFLINE: "1"
+  TRANSFORMERS_OFFLINE: "1"
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
+
+jobs:
+  red:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+        with:
+          ref: fix/context-first-project-reads-finalization
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1
+        with:
+          python-version: '3.12'
+      - run: python -m pip install -e ".[dev]"
+      - name: Planner audited lineage is RED
+        shell: bash
+        run: |
+          set +e
+          pytest -q tests/docs/test_request_flow_lineage.py::test_request_flow_host_lookups_gain_bounded_audited_rewrites
+          rc=$?
+          set -e
+          test "$rc" -ne 0
+      - name: Public four-fact flow is RED
+        shell: bash
+        run: |
+          set +e
+          pytest -q tests/docs/test_request_flow_lineage.py::test_request_flow_public_contract_remains_four_fact_fail_safe
+          rc=$?
+          set -e
+          test "$rc" -ne 0
