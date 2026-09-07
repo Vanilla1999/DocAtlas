@@ -164,15 +164,6 @@ new = '''        missing_compound_priority_ids = (
 '''
 assert text.count(old) == 1
 text = text.replace(old, new, 1)
-old = '''    for limit in _projection_limits(raw_snippet):
-        for focus in (focuses, *((value,) for value in focuses if value)):
-'''
-new = '''    projection_limits = _projection_limits(raw_snippet)
-    for limit in projection_limits:
-        for focus in (focuses, *((value,) for value in focuses if value)):
-'''
-assert text.count(old) == 1
-text = text.replace(old, new, 1)
 old = '''            if snippet and (qualified_query_ids((candidate,)) & query_ids or component_witnesses(candidate, obligations)):
                 variants.append(candidate)
     # Variants of one evidence item compete before global source selection.
@@ -182,9 +173,8 @@ new = '''            if snippet and (qualified_query_ids((candidate,)) & query_i
 
     # When two qualified alternatives from one source prove different requested
     # directions, offer a single contiguous union span before global selection.
-    # This never concatenates disconnected text: the gap remains verbatim from
-    # the authoritative source, the span stays <=640 chars, and visible
-    # qualification must preserve the union of both direction sets.
+    # The gap remains verbatim source text, the span stays bounded, and visible
+    # qualification must preserve both directions.
     seed_variants = tuple(variants)
     for left_index, left in enumerate(seed_variants):
         left_start = raw_snippet.find(str(left.get("snippet") or ""))
@@ -235,3 +225,21 @@ new = '''            if snippet and (qualified_query_ids((candidate,)) & query_i
 assert text.count(old) == 1
 text = text.replace(old, new, 1)
 projection.write_text(text, encoding="utf-8")
+
+payload = Path("docmancer/docs/application/_docs_context_payload.py")
+text = payload.read_text(encoding="utf-8")
+old = '''        "edit_ready": False,
+        "investigation_allowed": True,
+        "instruction": (
+            "Answer only claims directly grounded in the returned sources, cite their paths, "
+            "and do not claim that the context is complete. Never use this retrieval-only "
+            "result to authorize an edit."
+        ),
+        "estimated_tokens": 0,
+'''
+new = '''        "edit_ready": False,
+        "investigation_allowed": True,
+        "estimated_tokens": 0,
+'''
+assert text.count(old) == 1
+payload.write_text(text.replace(old, new, 1), encoding="utf-8")
