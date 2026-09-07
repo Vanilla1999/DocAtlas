@@ -93,3 +93,25 @@ new = '''    host_rows: list[tuple[str, str]] = []
 '''
 assert text.count(old) == 1
 path.write_text(text.replace(old, new, 1), encoding="utf-8")
+
+ranking = Path("docmancer/docs/domain/project_doc_ranking.py")
+ranking_text = ranking.read_text(encoding="utf-8")
+old = '''        public_queries_by_id[id(chunk)] = {
+            query_id for query_id in qualified_query_ids
+            if query_matches[query_id].get("query_origin") in {
+                "original", "host_lookup", "exact_anchor", "exact_path",
+            }
+        } if not exact_path_anchor else set()
+'''
+new = '''        # Parent coverage derived from an audited internal rewrite is stored
+        # under the public query ID while retaining the rewrite's internal
+        # origin in its trace. Public-lane diversity therefore follows the
+        # stable public ID, not the witness origin metadata.
+        public_queries_by_id[id(chunk)] = {
+            query_id for query_id in qualified_query_ids
+            if query_id == "query-original"
+            or query_id.startswith(("query-lookup-", "query-anchor-", "query-path-"))
+        } if not exact_path_anchor else set()
+'''
+assert ranking_text.count(old) == 1
+ranking.write_text(ranking_text.replace(old, new, 1), encoding="utf-8")
