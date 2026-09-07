@@ -1,0 +1,68 @@
+name: PR179 repair diagnostic node hash
+
+on:
+  push:
+    branches:
+      - fix/context-first-project-reads-finalization
+    paths:
+      - .github/workflows/pr179-fix-diagnostic-node-hash.yml
+
+permissions:
+  contents: write
+
+jobs:
+  repair:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+        with:
+          ref: fix/context-first-project-reads-finalization
+          fetch-depth: 0
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1
+        with:
+          python-version: '3.12'
+      - name: Install test dependencies
+        run: python -m pip install -e ".[dev]"
+      - name: Repair and verify reviewed node digest
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          from pathlib import Path
+          import ast, hashlib, json
+
+          module = "tests/test_docs_service_part07.py"
+          manifest_path = Path("tests/diagnostic_labels.json")
+          source = Path(module).read_text(encoding="utf-8")
+          tree = ast.parse(source)
+          nodes = []
+
+          def walk(body, prefix=""):
+              for node in body:
+                  if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)) and node.name.startswith("test_"):
+                      nodes.append(f"{module}::{prefix}{node.name}")
+                  elif isinstance(node, ast.ClassDef) and node.name.startswith("Test"):
+                      walk(node.body, prefix + node.name + "::")
+
+          walk(tree.body)
+          digest = hashlib.sha256("\n".join(sorted(nodes)).encode()).hexdigest()
+          assert len(nodes) == 15
+          assert digest == "8657db026c2d2a0ddfdb1bbe266fc807360f223ba8f0d639ffbe0fa203939813"
+
+          manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+          assert manifest["module_node_hashes"][module] == "cfbc6d2af97a6ac4bf3db7e4a7d42168bf7c8976a1aad07457b1cfb71106c9f1"
+          manifest["module_node_hashes"][module] = digest
+          manifest_path.write_text(json.dumps(manifest, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+          PY
+          test "$(git diff --name-only)" = "tests/diagnostic_labels.json"
+          pytest tests/ -m "not advanced and not live and not live_network" --collect-only -q >/tmp/collection.txt
+          pytest -q tests/test_docs_service_part07.py tests/test_diagnostic_labels.py
+          git diff --check
+      - name: Publish repair
+        run: |
+          set -euo pipefail
+          rm .github/workflows/pr179-fix-diagnostic-node-hash.yml
+          git add -A
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "test: repair diagnostic node inventory"
+          git push origin HEAD:fix/context-first-project-reads-finalization
