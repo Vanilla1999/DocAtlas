@@ -1,5 +1,5 @@
 name: Finalization projection size cleanup
-
+# final rerun after formatting-only reduction
 on:
   push:
     branches: [fix/context-first-project-reads-finalization]
