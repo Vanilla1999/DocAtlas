@@ -20,6 +20,15 @@ Inherited diagnostic progress:
 - raw dispatcher trace proved that request-flow MCP/application/gateway/selection sections are retrievable before public projection;
 - experimental routing hypotheses in transient workflow were not committed to production runtime because targeted GREEN was not established.
 
+Latest closure on PR #179:
+- request-flow lineage is GREEN: 7/7 targeted tests;
+- the frozen request-flow case visibly carries MCP boundary, application orchestration, retrieval gateway, and selection policy within the existing 3-source / 800-token limit;
+- project-context quality v2 live evaluation is GREEN on the published request-flow slice;
+- neighboring model-visible projection, ranking, context, and service contracts are GREEN;
+- `docs_context_projection.py` is back within the repository 1000-line module budget after formatting-only cleanup;
+- temporary request-flow and size-validation Actions workflows/scripts were removed after their validated production commits;
+- public answer/edit authorization remains denied and source provenance fields remain unchanged.
+
 Finalization rules:
 1. Work one proven loss at a time: source truth -> raw retrieval -> qualification/lineage -> final visible source.
 2. Change only the layer where the loss is demonstrated.
