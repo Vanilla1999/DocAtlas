@@ -731,7 +731,8 @@ def _requalify_visible_source(
     for query_id, trace in (source.get("retrieval_query_matches") or {}).items():
         if not isinstance(trace, dict) or trace.get("derived_from_query_id"):
             continue
-        probe = dict(trace)
+        # Aggregated lineage belongs to the old window; rebuild it from visible probes.
+        probe = {k: v for k, v in trace.items() if k not in {"coverage_kinds", "derived_from_query_ids"}}
         if query_id == "query-original":
             probe["exact_terms"] = list(dict.fromkeys((
                 *(probe.get("exact_terms") or ()),
@@ -754,7 +755,7 @@ def _requalify_visible_source(
             expected_project_identity=source.get("_expected_project_identity"),
             lifecycle_intent=source.get("_lifecycle_intent", "current"),
         )
-        matches[str(query_id)] = dict(qualification.trace)
+        matches = merge_query_matches(matches, {str(query_id): dict(qualification.trace)})
         parent_trace = derived_parent_trace(
             qualification.trace,
             source_query_id=str(query_id),

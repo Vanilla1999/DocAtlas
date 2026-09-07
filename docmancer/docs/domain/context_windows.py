@@ -259,3 +259,35 @@ def _focused_line_range(
     line_start = source_line_start + text[:start].count("\n")
     line_end = line_start + text[start:end].count("\n")
     return line_start, line_end
+
+
+def source_local_span(
+    text: str, snippet: str, *, source_line_start: int | None = None,
+    line_start: int | None = None, line_end: int | None = None,
+) -> tuple[int, int] | None:
+    """Resolve one exact occurrence, using line provenance when available.
+
+    Equal text at another offset is not the same witness. Without enough
+    provenance to distinguish repeated occurrences, do not guess a range.
+    """
+    if not snippet or any(
+        value is not None and (type(value) is not int or value < 1)
+        for value in (source_line_start, line_start, line_end)
+    ):
+        return None
+    if line_start is not None and line_end is not None and line_start > line_end:
+        return None
+    result = None
+    start = text.find(snippet)
+    while start >= 0:
+        actual_line = (source_line_start + text.count("\n", 0, start)
+                       if source_line_start is not None else None)
+        if actual_line is None or (
+            (line_start is None or line_start == actual_line)
+            and (line_end is None or line_end == actual_line + snippet.count("\n"))
+        ):
+            if result is not None:
+                return None
+            result = (start, start + len(snippet))
+        start = text.find(snippet, start + 1)
+    return result

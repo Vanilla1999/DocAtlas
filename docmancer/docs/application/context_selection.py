@@ -8,6 +8,7 @@ from typing import Any, Iterable, Mapping
 
 from docmancer.docs.domain.answer_units import _subject_present, best_local_proof, extract_answer_units
 from docmancer.docs.domain.lifecycle_policy import lifecycle_allows
+from docmancer.docs.domain.context_windows import source_local_span
 from docmancer.docs.domain.project_answer_contract import ProofObligation
 
 
@@ -193,6 +194,12 @@ def visible_assignment_hashes(
         original.get("display_text"),
     ) if isinstance(value, str) and value), "")
     visible_text = str(projected.get("snippet") or "")
+    visible_span = source_local_span(
+        raw_text, visible_text, source_line_start=original.get("line_start"),
+        line_start=projected.get("line_start"), line_end=projected.get("line_end"),
+    )
+    if visible_span is None:
+        return ()
     source_start = original.get("char_start")
     visible: list[str] = []
     for assignment in assignments:
@@ -206,7 +213,8 @@ def visible_assignment_hashes(
                 start, end = start - source_start, end - source_start
         if digest and isinstance(start, int) and isinstance(end, int) and 0 <= start < end <= len(raw_text):
             witness = raw_text[start:end]
-            if hashlib.sha256(witness.encode("utf-8")).hexdigest() == digest and witness in visible_text:
+            if (visible_span[0] <= start < end <= visible_span[1]
+                    and hashlib.sha256(witness.encode("utf-8")).hexdigest() == digest):
                 visible.append(digest)
     return tuple(dict.fromkeys(visible))
 
