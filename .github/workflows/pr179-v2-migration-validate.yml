@@ -42,9 +42,9 @@ jobs:
           EOF
           git diff --name-only 0ce9a6f3232726e9d64065b75bd969835b418df2 HEAD | sort > "$RUNNER_TEMP/actual-carrier.txt"
           diff -u "$RUNNER_TEMP/expected-carrier.txt" "$RUNNER_TEMP/actual-carrier.txt"
-          echo '1bd1b1249546ed6136636d62ee027505e92ce5b09c28ef75485d547460bdc627  .github/review/pr179-v2-migration.patch.gz' | sha256sum -c -
+          echo '9b28af55bb6d456fe8fb38df0f6334c5a5befeee73701b474b3184f1a3c67548  .github/review/pr179-v2-migration.patch.gz' | sha256sum -c -
           gzip -dc .github/review/pr179-v2-migration.patch.gz > "$RUNNER_TEMP/pr179-v2-migration.patch"
-          echo '3f2b81aa024935fbe5c9817c0d1f6debe1675e7f693a5c36041b681f35ed2a00  '$RUNNER_TEMP'/pr179-v2-migration.patch' | sha256sum -c -
+          echo '2ae4cbeac0478425cd148b6a9f7912ff6b1b3948df1750e791a4fea753d02d70  '$RUNNER_TEMP'/pr179-v2-migration.patch' | sha256sum -c -
           git apply --check "$RUNNER_TEMP/pr179-v2-migration.patch"
           git apply --index "$RUNNER_TEMP/pr179-v2-migration.patch"
           git rm .github/review/pr179-v2-migration.patch.gz .github/workflows/pr179-v2-migration-validate.yml
@@ -73,7 +73,9 @@ jobs:
             tests/test_project_context_quality_v2_protocol.py \
             tests/docs/test_review_span_lineage.py \
             tests/docs/test_review_assignment_identity.py \
-            tests/docs/test_review_query_lineage.py
+            tests/docs/test_review_query_lineage.py \
+            tests/docs/test_review_boundary_semantics.py \
+            tests/docs/test_request_flow_lineage.py
       - name: Full offline suite and static checks
         run: |
           set -euo pipefail
@@ -127,9 +129,9 @@ jobs:
           TESTED_TREE: ${{ needs.validate.outputs.tree }}
         run: |
           set -euo pipefail
-          echo '1bd1b1249546ed6136636d62ee027505e92ce5b09c28ef75485d547460bdc627  .github/review/pr179-v2-migration.patch.gz' | sha256sum -c -
+          echo '9b28af55bb6d456fe8fb38df0f6334c5a5befeee73701b474b3184f1a3c67548  .github/review/pr179-v2-migration.patch.gz' | sha256sum -c -
           gzip -dc .github/review/pr179-v2-migration.patch.gz > "$RUNNER_TEMP/pr179-v2-migration.patch"
-          echo '3f2b81aa024935fbe5c9817c0d1f6debe1675e7f693a5c36041b681f35ed2a00  '$RUNNER_TEMP'/pr179-v2-migration.patch' | sha256sum -c -
+          echo '2ae4cbeac0478425cd148b6a9f7912ff6b1b3948df1750e791a4fea753d02d70  '$RUNNER_TEMP'/pr179-v2-migration.patch' | sha256sum -c -
           git apply --check "$RUNNER_TEMP/pr179-v2-migration.patch"
           git apply --index "$RUNNER_TEMP/pr179-v2-migration.patch"
           git rm .github/review/pr179-v2-migration.patch.gz .github/workflows/pr179-v2-migration-validate.yml
