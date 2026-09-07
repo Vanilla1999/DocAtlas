@@ -164,19 +164,73 @@ new = '''        missing_compound_priority_ids = (
 '''
 assert text.count(old) == 1
 text = text.replace(old, new, 1)
-
 old = '''    for limit in _projection_limits(raw_snippet):
         for focus in (focuses, *((value,) for value in focuses if value)):
 '''
 new = '''    projection_limits = _projection_limits(raw_snippet)
-    if len(query_ids) > 1 and projection_limits[-1] < 640:
-        # Compound evidence can need a slightly wider contiguous source-local
-        # window to keep two nearby facts in one source slot. 640 is the same
-        # compact-source ceiling used by context_windows; the final serialized
-        # payload is still independently capped at 800 tokens.
-        projection_limits = (*projection_limits, 640)
     for limit in projection_limits:
         for focus in (focuses, *((value,) for value in focuses if value)):
+'''
+assert text.count(old) == 1
+text = text.replace(old, new, 1)
+old = '''            if snippet and (qualified_query_ids((candidate,)) & query_ids or component_witnesses(candidate, obligations)):
+                variants.append(candidate)
+    # Variants of one evidence item compete before global source selection.
+'''
+new = '''            if snippet and (qualified_query_ids((candidate,)) & query_ids or component_witnesses(candidate, obligations)):
+                variants.append(candidate)
+
+    # When two qualified alternatives from one source prove different requested
+    # directions, offer a single contiguous union span before global selection.
+    # This never concatenates disconnected text: the gap remains verbatim from
+    # the authoritative source, the span stays <=640 chars, and visible
+    # qualification must preserve the union of both direction sets.
+    seed_variants = tuple(variants)
+    for left_index, left in enumerate(seed_variants):
+        left_start = raw_snippet.find(str(left.get("snippet") or ""))
+        if left_start < 0:
+            continue
+        left_ids = qualified_query_ids((left,)) & query_ids
+        if not left_ids:
+            continue
+        for right in seed_variants[left_index + 1:]:
+            right_start = raw_snippet.find(str(right.get("snippet") or ""))
+            if right_start < 0:
+                continue
+            right_ids = qualified_query_ids((right,)) & query_ids
+            if not right_ids or left_ids == right_ids:
+                continue
+            union_ids = left_ids | right_ids
+            union_start = min(left_start, right_start)
+            union_end = max(
+                left_start + len(str(left.get("snippet") or "")),
+                right_start + len(str(right.get("snippet") or "")),
+            )
+            if union_end - union_start > 640 or (union_start, union_end) in seen_spans:
+                continue
+            union_snippet = raw_snippet[union_start:union_end].strip()
+            union_candidate = dict(source)
+            union_candidate["snippet"] = union_snippet
+            union_candidate["line_start"], union_candidate["line_end"] = _focused_line_range(
+                raw_snippet, union_start, union_end, source_line_start,
+            )
+            union_candidate = _requalify_visible_source(
+                union_candidate, query_text=query_text,
+            )
+            if not union_ids <= (qualified_query_ids((union_candidate,)) & query_ids):
+                continue
+            hashes = visible_assignment_hashes(
+                source.get("_qualification_candidate", source), union_candidate, assignments,
+            )
+            union_candidate["_visible_assignment_hashes"] = list(hashes)
+            union_candidate["_assigned_requirement_ids"] = [
+                item["requirement_id"] for item in assignments
+                if item.get("projected_content_hash") in hashes
+                and item.get("requirement_id") in set(source.get("_assigned_requirement_ids") or ())
+            ]
+            seen_spans.add((union_start, union_end))
+            variants.append(union_candidate)
+    # Variants of one evidence item compete before global source selection.
 '''
 assert text.count(old) == 1
 text = text.replace(old, new, 1)
