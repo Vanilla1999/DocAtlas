@@ -1,0 +1,137 @@
+name: PR178 rerank stage trace
+
+on:
+  push:
+    branches: [fix/context-first-project-reads]
+    paths: [.github/workflows/pr178-rerank-stage-trace.yml]
+
+permissions:
+  contents: read
+
+env:
+  DOCATLAS_OFFLINE: "1"
+  DOCATLAS_AUTO_VECTORS: "0"
+  HF_HUB_OFFLINE: "1"
+  TRANSFORMERS_OFFLINE: "1"
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+jobs:
+  trace:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 14
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+        with:
+          ref: fix/context-first-project-reads
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1
+        with:
+          python-version: '3.12'
+      - run: python -m pip install -e ".[dev]"
+      - name: Apply exact disposable production candidate
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import subprocess, yaml
+          from pathlib import Path
+          data = yaml.safe_load(Path('.github/workflows/pr178-arch-flow-tdd.yml').read_text())
+          steps = data['jobs']['green']['steps']
+          script = next(step['run'] for step in steps if step.get('name') == 'Apply bounded production candidate')
+          subprocess.run(['bash', '-c', script], check=True)
+          PY
+      - name: Trace before and after project-context rerank
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json
+          from copy import deepcopy
+          from unittest.mock import patch
+
+          from docmancer.docs.application import _project_context_service_part01 as pcs
+          from docmancer.docs.interfaces.mcp import context_tools
+          from eval.project_context_quality_v2_protocol import load_cases, evaluate_case
+          from scripts.run_project_docs_self_host_gate import LiveCase, run
+
+          def compact_chunk(chunk):
+              meta = dict(getattr(chunk, 'metadata', None) or {})
+              return {
+                  'path': getattr(chunk, 'path', None),
+                  'title': getattr(chunk, 'title', None),
+                  'heading': getattr(chunk, 'heading_path', None),
+                  'score': getattr(chunk, 'score', None),
+                  'stable_chunk_id': getattr(chunk, 'stable_chunk_id', None),
+                  'qids': list(meta.get('retrieval_query_ids') or ()),
+                  'matches': {
+                      qid: {k: trace.get(k) for k in (
+                          'query_text', 'qualified', 'query_origin', 'coverage_kind',
+                          'derived_from_query_id', 'matched_terms', 'match_ratio',
+                      )}
+                      for qid, trace in (meta.get('retrieval_query_matches') or {}).items()
+                      if qid.startswith('query-lookup') or qid.startswith('query-original')
+                  },
+                  'content': getattr(chunk, 'content', None),
+              }
+
+          cases = {case['id']: case for case in load_cases()}
+          output = []
+          for case_id in ('v2-natural-architecture', 'v2-natural-request-flow'):
+              case = cases[case_id]
+              reranks = []
+              packs = []
+              projected_inputs = []
+              original_rerank = pcs.rerank_project_doc_chunks
+              original_pack = pcs.project_context_pack
+              original_projection = context_tools.project_docs_context
+
+              def observe_rerank(chunks, **kwargs):
+                  result = original_rerank(chunks, **kwargs)
+                  reranks.append({
+                      'kwargs': {
+                          'question': kwargs.get('question'),
+                          'limit': kwargs.get('limit'),
+                          'broad_max_per_source': kwargs.get('broad_max_per_source'),
+                          'narrow_max_per_source': kwargs.get('narrow_max_per_source'),
+                          'public_query_ids': list(kwargs.get('public_query_ids') or ()),
+                      },
+                      'before': [compact_chunk(row) for row in chunks],
+                      'after': [compact_chunk(row) for row in result],
+                  })
+                  return result
+
+              def observe_pack(**kwargs):
+                  result = original_pack(**kwargs)
+                  packs.append(deepcopy(result))
+                  return result
+
+              def observe_projection(**kwargs):
+                  projected_inputs.append(deepcopy(kwargs.get('retrieval') or {}))
+                  return original_projection(**kwargs)
+
+              with patch.object(pcs, 'rerank_project_doc_chunks', observe_rerank), \
+                   patch.object(pcs, 'project_context_pack', observe_pack), \
+                   patch.object(context_tools, 'project_docs_context', observe_projection):
+                  result = run(cases=(LiveCase(
+                      case_id=case['id'], question=case['question'], relevant_paths=(),
+                      lookup_queries=tuple(case['lookup_queries']), scope=case['scope'],
+                  ),), negative_cases=())
+              payload = result['results'][0]['payload']
+              verdict = evaluate_case(case, payload)
+              output.append({
+                  'id': case_id,
+                  'reranks': reranks,
+                  'packs': packs,
+                  'projection_input_pack': (projected_inputs[-1].get('context_pack') if projected_inputs else []),
+                  'projection_query_plan': (projected_inputs[-1].get('documentation_query_plan') if projected_inputs else {}),
+                  'payload': payload,
+                  'verdict': {
+                      'semantic_useful': verdict['semantic_useful'],
+                      'false_full': verdict['false_full_coverage'],
+                      'obligations': [{
+                          'id': row['id'], 'met': row['met'],
+                          'visible_witnesses': row.get('visible_witnesses') or [],
+                      } for row in verdict['obligations']],
+                  },
+              })
+          print('RERANK_STAGE_TRACE=' + json.dumps(output, ensure_ascii=False, sort_keys=True))
+          PY
