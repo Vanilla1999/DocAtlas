@@ -23,11 +23,18 @@ def _assignment(component_id, evidence_id, content_hash):
             "projected_content_hash": content_hash}
 
 
-def _visible_source(*hashes):
+def _visible_source(text, *, evidence_id="doc"):
     return {
-        "evidence_id": "ev-public",
-        "content_sha256": hashlib.sha256(b"public source material").hexdigest(),
-        "_visible_assignment_hashes": list(hashes),
+        "evidence_id": "ev-public", "snippet": text,
+        "content_sha256": hashlib.sha256(text.encode()).hexdigest(),
+        "_qualification_candidate": {"stable_id": evidence_id, "content": text},
+    }
+
+
+def _text_assignment(component_id, evidence_id, text):
+    return {
+        **_assignment(component_id, evidence_id, hashlib.sha256(text.encode()).hexdigest()),
+        "unit_char_start": 0, "unit_char_end": len(text),
     }
 
 
@@ -37,8 +44,8 @@ def test_install_without_verify_and_architecture_without_testing_are_partial():
         (("architecture", "testing"), "architecture", "testing"),
     ):
         decision = _decision(
-            components, (_assignment(covered, "project:doc", "visible-hash"),),
-            (_visible_source("visible-hash"),),
+            components, (_text_assignment(covered, "project:doc", "visible-hash"),),
+            (_visible_source("visible-hash", evidence_id="project:doc"),),
         )
         assert decision.status == "partial"
         assert decision.covered_component_ids == (covered,)
@@ -47,7 +54,7 @@ def test_install_without_verify_and_architecture_without_testing_are_partial():
 
 def test_unresolved_extra_subsystem_prevents_full_coverage():
     decision = _decision(
-        ("architecture",), (_assignment("architecture", "doc", "hash"),),
+        ("architecture",), (_text_assignment("architecture", "doc", "hash"),),
         (_visible_source("hash"),),
         residue=("unresolved subsystem: orbital ledger",),
     )
@@ -58,7 +65,7 @@ def test_unresolved_extra_subsystem_prevents_full_coverage():
 def test_all_visible_assigned_components_are_full():
     decision = _decision(
         ("install", "verify"),
-        (_assignment("install", "doc", "hash"), _assignment("verify", "doc", "hash")),
+        (_text_assignment("install", "doc", "hash"), _text_assignment("verify", "doc", "hash")),
         (_visible_source("hash"),),
     )
     assert decision.status == "full"
@@ -67,7 +74,7 @@ def test_all_visible_assigned_components_are_full():
 
 def test_clipped_component_witness_is_unavailable():
     decision = _decision(
-        ("verify",), (_assignment("verify", "doc", "full-witness-hash"),),
+        ("verify",), (_text_assignment("verify", "doc", "full-witness-hash"),),
         (_visible_source("clipped-visible-hash"),),
     )
     assert decision.status == "unavailable"

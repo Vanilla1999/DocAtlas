@@ -118,6 +118,7 @@ def component_coverage_decision(
     """Account only for canonical witnesses that survived final projection."""
     component_contract = tuple(component_contract)
     visible_sources = tuple(visible_sources)
+    assignments = tuple(assignments)
     obligations = component_obligations(component_contract)
     semantic_ids = {
         str(item.get("component_id") or "") for item in component_contract
@@ -127,19 +128,13 @@ def component_coverage_decision(
         str(item.get("component_id") or "") for item in component_contract
         if str(item.get("component_id") or "")
     ))
-    visible_hashes = {
-        str(value)
-        for source in visible_sources
-        for value in source.get("_visible_assignment_hashes") or ()
-        if str(value)
-    }
     evidence_by_component: dict[str, str] = {}
-    for assignment in assignments:
-        component_id = str(assignment.get("requirement_id") or "")
-        evidence_id = str(assignment.get("evidence_id") or "")
-        projected_hash = str(assignment.get("projected_content_hash") or "")
-        if component_id in mandatory and component_id not in semantic_ids and projected_hash in visible_hashes:
-            evidence_by_component[component_id] = evidence_id
+    for source in visible_sources:
+        original = source.get("_qualification_candidate", source)
+        for assignment in visible_assignments(original, source, assignments):
+            component_id = str(assignment.get("requirement_id") or "")
+            if component_id in mandatory and component_id not in semantic_ids:
+                evidence_by_component[component_id] = str(assignment.get("evidence_id") or "")
     for source in visible_sources:
         if not source.get("evidence_id"):
             continue
@@ -182,9 +177,17 @@ def select_context_candidates(priority_groups: Iterable[Iterable[Iterable[Any]]]
     return selected
 
 
-def visible_assignment_hashes(
-    original: Mapping[str, Any], projected: Mapping[str, Any], assignments: Any,
-) -> tuple[str, ...]:
+def visible_assignments(
+    original: Mapping[str, Any], projected: Mapping[str, Any],
+    assignments: Iterable[Mapping[str, Any]],
+) -> tuple[Mapping[str, Any], ...]:
+    """Retain assignment identity after verifying its source-local occurrence.
+
+    Equal hashes identify equal text, not interchangeable sources, offsets or
+    requirements. Coverage must consume these verified assignments, not hashes.
+    """
+    if not isinstance(original, Mapping):
+        return ()
     source_ids = {
         str(original.get(key) or "") for key in ("stable_id", "stable_chunk_id", "evidence_id")
         if original.get(key)
@@ -201,22 +204,52 @@ def visible_assignment_hashes(
     if visible_span is None:
         return ()
     source_start = original.get("char_start")
-    visible: list[str] = []
+    visible: list[Mapping[str, Any]] = []
     for assignment in assignments:
         if not isinstance(assignment, Mapping) or str(assignment.get("evidence_id") or "") not in source_ids:
             continue
         digest = str(assignment.get("projected_content_hash") or "")
         start, end = assignment.get("unit_char_start"), assignment.get("unit_char_end")
-        if not isinstance(start, int) or not isinstance(end, int):
+        if start is None and end is None:
             start, end = assignment.get("char_start"), assignment.get("char_end")
-            if isinstance(source_start, int) and isinstance(start, int) and isinstance(end, int):
+            if source_start is not None:
+                if any(type(value) is not int for value in (source_start, start, end)):
+                    continue
                 start, end = start - source_start, end - source_start
-        if digest and isinstance(start, int) and isinstance(end, int) and 0 <= start < end <= len(raw_text):
+        if digest and type(start) is int and type(end) is int and 0 <= start < end <= len(raw_text):
             witness = raw_text[start:end]
             if (visible_span[0] <= start < end <= visible_span[1]
                     and hashlib.sha256(witness.encode("utf-8")).hexdigest() == digest):
-                visible.append(digest)
-    return tuple(dict.fromkeys(visible))
+                visible.append(assignment)
+    return tuple(visible)
+
+
+def visible_assignment_hashes(
+    original: Mapping[str, Any], projected: Mapping[str, Any],
+    assignments: Iterable[Mapping[str, Any]],
+) -> tuple[str, ...]:
+    """Diagnostic text fingerprints; never use these to recover requirement IDs."""
+    return tuple(dict.fromkeys(
+        str(item["projected_content_hash"])
+        for item in visible_assignments(original, projected, assignments)
+    ))
+
+
+def bind_visible_assignments(
+    original: Mapping[str, Any], projected: Mapping[str, Any],
+    assignments: Iterable[Mapping[str, Any]],
+) -> dict[str, Any]:
+    """Bind a projected variant to exactly the canonical assignments it retains."""
+    verified = visible_assignments(original, projected, assignments)
+    return {
+        **projected,
+        "_visible_assignment_hashes": list(dict.fromkeys(
+            str(item["projected_content_hash"]) for item in verified
+        )),
+        "_assigned_requirement_ids": list(dict.fromkeys(
+            str(item["requirement_id"]) for item in verified if item.get("requirement_id")
+        )),
+    }
 
 
 def qualified_query_ids(sources: Iterable[Mapping[str, Any]]) -> set[str]:
@@ -342,5 +375,7 @@ __all__ = [
     "qualified_query_ids",
     "select_context_candidates",
     "visible_assignment_hashes",
+    "visible_assignments",
+    "bind_visible_assignments",
     "validate_context_selection_payload",
 ]

@@ -14,7 +14,8 @@ from docmancer.docs.application.context_selection import (
     context_selection_decision,
     merge_query_matches,
     qualified_query_ids,
-    visible_assignment_hashes,
+    bind_visible_assignments,
+    visible_assignments,
 )
 from docmancer.docs.application.model_visible_projection import (
     DOCS_CONTEXT_MAX_TOKENS,
@@ -525,19 +526,7 @@ def project_docs_context(
     for source in sources:
         evidence_id = str(source.get("evidence_id") or "")
         original = snapshot.get(evidence_id, {}).get("source") or {}
-        visible_hashes = visible_assignment_hashes(
-            original, source, assignments,
-        )
-        source["_visible_assignment_hashes"] = list(visible_hashes)
-        source["_assigned_requirement_ids"] = [
-            str(assignment.get("requirement_id") or "")
-            for assignment in assignments
-            if isinstance(assignment, dict)
-            and assignment.get("requirement_id")
-            and assignment.get("projected_content_hash") in visible_hashes
-            and str(assignment.get("requirement_id"))
-            in set(source.get("_assigned_requirement_ids") or ())
-        ]
+        source.update(bind_visible_assignments(original, source, assignments))
         if isinstance(original, dict):
             original["_assigned_requirement_ids"] = list(source["_assigned_requirement_ids"])
     decision = context_selection_decision(sources, public_query_ids)
@@ -620,10 +609,11 @@ def _expand_selected_snippets(
                 continue
             if not set(component_witnesses(source, obligations)) <= set(component_witnesses(candidate, obligations)):
                 continue
-            if not set(source.get("_visible_assignment_hashes") or ()) <= set(visible_assignment_hashes(
-                source.get("_qualification_candidate", source), candidate, assignments,
-            )):
+            original = source.get("_qualification_candidate", source)
+            retained = visible_assignments(original, candidate, assignments)
+            if any(item not in retained for item in visible_assignments(original, source, assignments)):
                 continue
+            candidate = bind_visible_assignments(original, candidate, retained)
             candidate_sources = [*expanded[:index], candidate, *expanded[index + 1:]]
             decision = context_selection_decision(candidate_sources, public_query_ids)
             if estimate_projection_tokens(_payload(
@@ -658,13 +648,9 @@ def _qualified_fragments(
                 raw_snippet, snippet_start, snippet_end, source_line_start,
             )
             candidate = _requalify_visible_source(candidate, query_text=query_text)
-            hashes = visible_assignment_hashes(source.get("_qualification_candidate", source), candidate, assignments)
-            candidate["_visible_assignment_hashes"] = list(hashes)
-            candidate["_assigned_requirement_ids"] = [
-                item["requirement_id"] for item in assignments
-                if item.get("projected_content_hash") in hashes
-                and item.get("requirement_id") in set(source.get("_assigned_requirement_ids") or ())
-            ]
+            candidate = bind_visible_assignments(
+                source.get("_qualification_candidate", source), candidate, assignments,
+            )
             if snippet and (qualified_query_ids((candidate,)) & query_ids or component_witnesses(candidate, obligations)):
                 variants.append(candidate)
     # Offer one bounded verbatim union span when it preserves both directions.
@@ -697,12 +683,9 @@ def _qualified_fragments(
             union_candidate = _requalify_visible_source(union_candidate, query_text=query_text)
             if not union_ids <= (qualified_query_ids((union_candidate,)) & query_ids):
                 continue
-            hashes = visible_assignment_hashes(
-                source.get("_qualification_candidate", source), union_candidate, assignments)
-            union_candidate["_visible_assignment_hashes"] = list(hashes)
-            union_candidate["_assigned_requirement_ids"] = [
-                item["requirement_id"] for item in assignments if item.get("projected_content_hash") in hashes
-                and item.get("requirement_id") in set(source.get("_assigned_requirement_ids") or ())]
+            union_candidate = bind_visible_assignments(
+                source.get("_qualification_candidate", source), union_candidate, assignments,
+            )
             seen_spans.add((union_start, union_end))
             variants.append(union_candidate)
     # Prefer structurally complete variants when coverage is otherwise equal.
