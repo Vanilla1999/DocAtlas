@@ -1,4 +1,4 @@
-name: PR178 allocated audited rewrite trace
+name: PR178 audited rewrite dispatcher trace
 
 on:
   push:
@@ -27,7 +27,7 @@ jobs:
         with:
           python-version: '3.12'
       - run: python -m pip install -e ".[dev]"
-      - name: Apply disposable patch and trace
+      - name: Apply disposable audited rewrites and trace dispatcher lanes
         shell: bash
         run: |
           set -euo pipefail
@@ -37,52 +37,113 @@ jobs:
           p = Path('docatlas.project-docs.yaml'); t = p.read_text()
           old = '''  - path: docs/modules/project-context-retrieval.md\n    role: development\n    scope: module\n    module_path: docmancer/docs/application\n    description: Project context retrieval bounded context, application allocation, infrastructure port, and MCP invariants.\n'''
           new = '''  - path: docs/modules/project-context-retrieval.md\n    role: module_architecture\n    scope: module\n    module_path: docmancer/docs/application\n    description: Project context retrieval bounded context, application allocation, SQLite persistence and candidate generation, evidence qualification, infrastructure port, and MCP invariants.\n'''
-          assert t.count(old) == 1; p.write_text(t.replace(old,new,1))
+          assert t.count(old) == 1; p.write_text(t.replace(old, new, 1))
 
-          p = Path('docmancer/docs/domain/project_retrieval_intent.py'); t=p.read_text()
-          t=t.replace('    "project_architecture": (("project_architecture", "overview"), ("roadmap",)),\n','    "project_architecture": (("project_architecture", "module_architecture", "overview"), ("roadmap",)),\n',1)
-          t=t.replace('    "retrieval_pipeline": (("project_architecture", "api_contract"), ("roadmap",)),\n','    "retrieval_pipeline": (("module_architecture", "project_architecture", "api_contract"), ("roadmap",)),\n',1)
-          old='''        emit(\n            "project_architecture",\n            True,\n            f"{product_prefix}project architecture overview components indexing retrieval storage",\n        )\n'''
-          new='''        emit(\n            "project_architecture",\n            True,\n            f"{product_prefix}project architecture overview components indexing retrieval storage",\n            f"{product_prefix}SQLite persistence candidate generation metadata evidence qualification",\n        )\n'''
-          assert t.count(old)==1; p.write_text(t.replace(old,new,1))
+          p = Path('docmancer/docs/domain/project_retrieval_intent.py'); t = p.read_text()
+          t = t.replace('    "project_architecture": (("project_architecture", "overview"), ("roadmap",)),\n','    "project_architecture": (("project_architecture", "module_architecture", "overview"), ("roadmap",)),\n',1)
+          t = t.replace('    "retrieval_pipeline": (("project_architecture", "api_contract"), ("roadmap",)),\n','    "retrieval_pipeline": (("module_architecture", "project_architecture", "api_contract"), ("roadmap",)),\n',1)
+          old = '''        emit(\n            "project_architecture",\n            True,\n            f"{product_prefix}project architecture overview components indexing retrieval storage",\n        )\n'''
+          new = '''        emit(\n            "project_architecture",\n            True,\n            f"{product_prefix}project architecture overview components indexing retrieval storage",\n            f"{product_prefix}SQLite persistence candidate generation metadata evidence qualification",\n        )\n'''
+          assert t.count(old) == 1; p.write_text(t.replace(old, new, 1))
 
-          p=Path('docmancer/docs/domain/documentation_query_plan.py'); t=p.read_text()
-          needle='''    requirement_hints = tuple(\n        str(value).strip()\n        for value in getattr(requirements, "retrieval_hints", ())\n        if str(value).strip()\n    )\n'''
-          helper='''    def host_audited_rewrites(lookup_text: str) -> tuple[tuple[str, tuple[str, ...]], ...]:\n        normalized = " ".join(lookup_text.casefold().split())\n        if re.search(r"\\b(?:not|never|no|without|except|before|after|until|unless)\\b", normalized):\n            return ()\n        tokens = tuple(re.findall(r"[a-z0-9_]+", normalized))\n        rows: list[tuple[str, tuple[str, ...]]] = []\n        if "documentation" in tokens and "request" in tokens and "boundary" in tokens and any(token.startswith("accept") for token in tokens):\n            anchors = technical_anchors(question)\n            if len(anchors) == 1:\n                anchor = anchors[0]\n                rows.append((f"{anchor} request boundary question project_path lookup_queries module_path scope", (anchor.casefold(),)))\n        if (any(token.startswith("retriev") for token in tokens) and any(token.startswith("chunk") for token in tokens) and any(token.startswith("select") for token in tokens) and any(token.startswith("visib") for token in tokens) and any(token.startswith("source") for token in tokens)):\n            rows.extend((("retrieval gateway filtered project chunks field-level lexical match provenance exact-source indexed sections",()),("selection maximizes distinct user-visible query coverage before expanding snippets",())))\n        return tuple(rows)\n\n'''+needle
-          assert t.count(needle)==1; t=t.replace(needle,helper,1)
-          old='''    for index, text in enumerate(lookup_queries[:5], start=1):\n        cleaned = text.strip()\n        if not cleaned:\n            continue\n        queries.append(DocumentationLookup(\n            f"query-lookup-{index}", cleaned, "host_lookup", False,\n            relation="host_lookup",\n            **host_policies(cleaned),\n        ))\n        seen.add(cleaned.casefold())\n'''
-          new='''    for index, text in enumerate(lookup_queries[:5], start=1):\n        cleaned=text.strip()\n        if not cleaned:\n            continue\n        parent_query_id=f"query-lookup-{index}"; policies=host_policies(cleaned)\n        queries.append(DocumentationLookup(parent_query_id,cleaned,"host_lookup",False,relation="host_lookup",**policies)); seen.add(cleaned.casefold())\n        for rewrite_index,(rewrite_text,parent_terms) in enumerate(host_audited_rewrites(cleaned),start=1):\n            if rewrite_text.casefold() in seen:\n                continue\n            queries.append(DocumentationLookup(f"query-lookup-{index}-rewrite-{rewrite_index}",rewrite_text,"concept_alias",False,relation="audited_rewrite",public_parent_query_id=parent_query_id,parent_exact_terms=parent_terms,**policies)); seen.add(rewrite_text.casefold())\n'''
-          assert t.count(old)==1; p.write_text(t.replace(old,new,1))
-
-          p=Path('docmancer/docs/application/_project_docs_service_part03.py'); t=p.read_text()
-          old='''        queries_by_origin: dict[str, list[list[Any]]] = {}\n        for item in documentation_query_plan.queries:\n            lane = supplemental_chunks_by_query.get(item.text)\n            if lane:\n                queries_by_origin.setdefault(item.origin, []).append(lane)\n        candidates = select_context_candidates([\n            [\n                *queries_by_origin.get("exact_path", []),\n                *queries_by_origin.get("exact_anchor", []),\n            ],\n            [[*authoritative_chunks, *chunks]],\n            queries_by_origin.get("host_lookup", []),\n            [\n                *queries_by_origin.get("canonical_intent", []),\n                *queries_by_origin.get("concept_alias", []),\n                *queries_by_origin.get("retrieval_hint", []),\n            ],\n        ])\n'''
-          new='''        queries_by_origin: dict[str, list[list[Any]]] = {}\n        audited_rewrite_lanes: list[list[Any]] = []\n        for item in documentation_query_plan.queries:\n            lane=supplemental_chunks_by_query.get(item.text)\n            if not lane:\n                continue\n            if item.relation == "audited_rewrite":\n                audited_rewrite_lanes.append(lane)\n            else:\n                queries_by_origin.setdefault(item.origin,[]).append(lane)\n        candidates = select_context_candidates([\n            [*queries_by_origin.get("exact_path",[]),*queries_by_origin.get("exact_anchor",[])],\n            [[*authoritative_chunks,*chunks]],\n            queries_by_origin.get("host_lookup",[]),\n            audited_rewrite_lanes,\n            [*queries_by_origin.get("canonical_intent",[]),*queries_by_origin.get("concept_alias",[]),*queries_by_origin.get("retrieval_hint",[])],\n        ])\n'''
-          assert t.count(old)==1; p.write_text(t.replace(old,new,1))
+          p = Path('docmancer/docs/domain/documentation_query_plan.py'); t = p.read_text()
+          needle = '''    requirement_hints = tuple(\n        str(value).strip()\n        for value in getattr(requirements, "retrieval_hints", ())\n        if str(value).strip()\n    )\n'''
+          helper = '''    def host_audited_rewrites(lookup_text: str) -> tuple[tuple[str, tuple[str, ...]], ...]:\n        normalized = " ".join(lookup_text.casefold().split())\n        if re.search(r"\\b(?:not|never|no|without|except|before|after|until|unless)\\b", normalized):\n            return ()\n        tokens = tuple(re.findall(r"[a-z0-9_]+", normalized))\n        rows: list[tuple[str, tuple[str, ...]]] = []\n        if "documentation" in tokens and "request" in tokens and "boundary" in tokens and any(token.startswith("accept") for token in tokens):\n            anchors = technical_anchors(question)\n            if len(anchors) == 1:\n                anchor = anchors[0]\n                rows.append((f"{anchor} request boundary question project_path lookup_queries module_path scope", (anchor.casefold(),)))\n        if (any(token.startswith("retriev") for token in tokens) and any(token.startswith("chunk") for token in tokens) and any(token.startswith("select") for token in tokens) and any(token.startswith("visib") for token in tokens) and any(token.startswith("source") for token in tokens)):\n            rows.extend((\n                ("retrieval gateway filtered project chunks field-level lexical match provenance exact-source indexed sections", ()),\n                ("selection maximizes distinct user-visible query coverage before expanding snippets", ()),\n            ))\n        return tuple(rows)\n\n''' + needle
+          assert t.count(needle) == 1; t = t.replace(needle, helper, 1)
+          old = '''    for index, text in enumerate(lookup_queries[:5], start=1):\n        cleaned = text.strip()\n        if not cleaned:\n            continue\n        queries.append(DocumentationLookup(\n            f"query-lookup-{index}", cleaned, "host_lookup", False,\n            relation="host_lookup",\n            **host_policies(cleaned),\n        ))\n        seen.add(cleaned.casefold())\n'''
+          new = '''    for index, text in enumerate(lookup_queries[:5], start=1):\n        cleaned = text.strip()\n        if not cleaned:\n            continue\n        parent_query_id = f"query-lookup-{index}"\n        policies = host_policies(cleaned)\n        queries.append(DocumentationLookup(parent_query_id, cleaned, "host_lookup", False, relation="host_lookup", **policies))\n        seen.add(cleaned.casefold())\n        for rewrite_index, (rewrite_text, parent_terms) in enumerate(host_audited_rewrites(cleaned), start=1):\n            if rewrite_text.casefold() in seen:\n                continue\n            queries.append(DocumentationLookup(\n                f"query-lookup-{index}-rewrite-{rewrite_index}", rewrite_text, "concept_alias", False,\n                relation="audited_rewrite", public_parent_query_id=parent_query_id,\n                parent_exact_terms=parent_terms, **policies,\n            ))\n            seen.add(rewrite_text.casefold())\n'''
+          assert t.count(old) == 1; p.write_text(t.replace(old, new, 1))
           PY
 
           python - <<'PY'
           import json
           from copy import deepcopy
           from unittest.mock import patch
-          from docmancer.docs.interfaces.mcp import context_tools
-          from eval.project_context_quality_v2_protocol import load_cases,evaluate_case
-          from scripts.run_project_docs_self_host_gate import LiveCase,run
 
-          cases={c['id']:c for c in load_cases()}
-          out=[]
-          for cid in ('v2-natural-architecture','v2-natural-request-flow'):
-              case=cases[cid]; captured=[]; original=context_tools.project_docs_context
-              def observe(**kwargs):
-                  captured.append(deepcopy(kwargs.get('retrieval') or {})); return original(**kwargs)
-              with patch.object(context_tools,'project_docs_context',observe):
-                  r=run(cases=(LiveCase(case_id=cid,question=case['question'],relevant_paths=(),lookup_queries=tuple(case['lookup_queries']),scope=case['scope']),),negative_cases=())
-              payload=r['results'][0]['payload']; verdict=evaluate_case(case,payload); retrieval=captured[-1]
-              candidates=[]
-              for c in retrieval.get('context_pack') or []:
-                  matches=c.get('retrieval_query_matches') or {}
-                  interesting={qid:{k:tr.get(k) for k in ('query_text','qualified','coverage_kind','derived_from_query_id','matched_terms','relation','public_parent_query_id','match_ratio')} for qid,tr in matches.items() if qid.startswith('query-lookup')}
-                  if interesting:
-                      candidates.append({'path':c.get('path'),'section':c.get('section'),'content':c.get('content'),'ids':c.get('retrieval_query_ids') or [],'matches':interesting})
-              out.append({'id':cid,'candidate_count':len(retrieval.get('context_pack') or []),'interesting_candidates':candidates,'public_sources':payload.get('sources') or [],'covered':payload.get('covered_query_ids') or [],'missing':payload.get('missing_query_ids') or [],'obligations':[{ 'id':o['id'],'met':o['met'],'visible_witnesses':o.get('visible_witnesses') or []} for o in verdict['obligations']]})
-          print('ALLOCATED_TRACE='+json.dumps(out,ensure_ascii=False,sort_keys=True))
+          from docmancer.retrieval.dispatch import RetrievalDispatcher
+          from docmancer.docs.interfaces.mcp import context_tools
+          from eval.project_context_quality_v2_protocol import load_cases, evaluate_case
+          from scripts.run_project_docs_self_host_gate import LiveCase, run
+
+          targets = {
+              "get_docs_context request boundary question project_path lookup_queries module_path scope",
+              "retrieval gateway filtered project chunks field-level lexical match provenance exact-source indexed sections",
+              "selection maximizes distinct user-visible query coverage before expanding snippets",
+          }
+          calls = []
+          original_run = RetrievalDispatcher.run
+
+          def observed_run(self, query, *args, **kwargs):
+              result = original_run(self, query, *args, **kwargs)
+              if query in targets:
+                  rows = []
+                  for rank, chunk in enumerate(result.chunks[:10], start=1):
+                      meta = dict(chunk.metadata or {})
+                      rows.append({
+                          "rank": rank,
+                          "score": chunk.score,
+                          "source": chunk.source,
+                          "path": meta.get("project_doc_path") or meta.get("source_path") or meta.get("path"),
+                          "title": meta.get("title"),
+                          "heading_path": meta.get("heading_path"),
+                          "token_estimate": meta.get("token_estimate"),
+                          "catalog_role": meta.get("project_doc_reason") or meta.get("catalog_role"),
+                          "doc_scope": meta.get("doc_scope"),
+                          "text": chunk.text,
+                      })
+                  calls.append({
+                      "query": query,
+                      "limit": kwargs.get("limit"),
+                      "budget": kwargs.get("budget"),
+                      "expand": kwargs.get("expand"),
+                      "filters": kwargs.get("filters"),
+                      "rows": rows,
+                  })
+              return result
+
+          case = next(c for c in load_cases() if c['id'] == 'v2-natural-request-flow')
+          captured = []
+          original_project_context = context_tools.project_docs_context
+          def observe_context(**kwargs):
+              captured.append(deepcopy(kwargs.get('retrieval') or {}))
+              return original_project_context(**kwargs)
+
+          with patch.object(RetrievalDispatcher, 'run', observed_run), patch.object(context_tools, 'project_docs_context', observe_context):
+              result = run(cases=(LiveCase(
+                  case_id=case['id'], question=case['question'], relevant_paths=(),
+                  lookup_queries=tuple(case['lookup_queries']), scope=case['scope'],
+              ),), negative_cases=())
+
+          payload = result['results'][0]['payload']
+          verdict = evaluate_case(case, payload)
+          retrieval = captured[-1]
+          pack = []
+          for row in retrieval.get('context_pack') or []:
+              if row.get('path') == 'docs/modules/project-context-retrieval.md' or any(
+                  qid.startswith('query-lookup') for qid in (row.get('retrieval_query_matches') or {})
+              ):
+                  pack.append({
+                      "path": row.get('path'),
+                      "section": row.get('section'),
+                      "content": row.get('content'),
+                      "retrieval_query_ids": row.get('retrieval_query_ids') or [],
+                      "matches": {
+                          qid: {k: trace.get(k) for k in (
+                              'query_text','qualified','coverage_kind','derived_from_query_id',
+                              'matched_terms','match_ratio','relation','public_parent_query_id'
+                          )}
+                          for qid, trace in (row.get('retrieval_query_matches') or {}).items()
+                          if qid.startswith('query-lookup')
+                      },
+                  })
+          print('RAW_AUDITED_LANES=' + json.dumps(calls, ensure_ascii=False, sort_keys=True))
+          print('REQUEST_FLOW_PACK=' + json.dumps(pack, ensure_ascii=False, sort_keys=True))
+          print('REQUEST_FLOW_PUBLIC=' + json.dumps({
+              'sources': payload.get('sources') or [],
+              'covered': payload.get('covered_query_ids') or [],
+              'missing': payload.get('missing_query_ids') or [],
+              'obligations': [{
+                  'id': o['id'], 'met': o['met'], 'visible_witnesses': o.get('visible_witnesses') or []
+              } for o in verdict['obligations']],
+          }, ensure_ascii=False, sort_keys=True))
           PY
