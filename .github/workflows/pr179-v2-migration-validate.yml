@@ -1,0 +1,149 @@
+name: PR179 V2 acceptance migration validation
+on:
+  push:
+    branches: [fix/context-first-project-reads-finalization]
+    paths: [.github/workflows/pr179-v2-migration-validate.yml]
+permissions:
+  contents: read
+env:
+  DOCATLAS_OFFLINE: '1'
+  DOCATLAS_AUTO_VECTORS: '0'
+  HF_HUB_OFFLINE: '1'
+  TRANSFORMERS_OFFLINE: '1'
+  PYTHONHASHSEED: '0'
+  PYTHONPATH: '.'
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: 'true'
+jobs:
+  validate:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    outputs:
+      tree: ${{ steps.tree.outputs.sha }}
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1
+        with:
+          python-version: '3.13'
+      - name: Install frozen dependencies
+        run: |
+          set -euo pipefail
+          python -m pip install uv==0.9.25
+          uv sync --frozen --extra dev
+      - name: Apply checksum-bound reviewed tree
+        run: |
+          set -euo pipefail
+          cat > "$RUNNER_TEMP/expected-carrier.txt" <<'EOF'
+          .github/review/pr179-v2-migration.patch.gz
+          .github/workflows/pr179-v2-migration-validate.yml
+          EOF
+          git diff --name-only 0ce9a6f3232726e9d64065b75bd969835b418df2 HEAD | sort > "$RUNNER_TEMP/actual-carrier.txt"
+          diff -u "$RUNNER_TEMP/expected-carrier.txt" "$RUNNER_TEMP/actual-carrier.txt"
+          echo '1bd1b1249546ed6136636d62ee027505e92ce5b09c28ef75485d547460bdc627  .github/review/pr179-v2-migration.patch.gz' | sha256sum -c -
+          gzip -dc .github/review/pr179-v2-migration.patch.gz > "$RUNNER_TEMP/pr179-v2-migration.patch"
+          echo '3f2b81aa024935fbe5c9817c0d1f6debe1675e7f693a5c36041b681f35ed2a00  '$RUNNER_TEMP'/pr179-v2-migration.patch' | sha256sum -c -
+          git apply --check "$RUNNER_TEMP/pr179-v2-migration.patch"
+          git apply --index "$RUNNER_TEMP/pr179-v2-migration.patch"
+          git rm .github/review/pr179-v2-migration.patch.gz .github/workflows/pr179-v2-migration-validate.yml
+          git diff --cached --check
+      - name: Prove frozen corpora and protocol locks were not relaxed
+        run: |
+          set -euo pipefail
+          git diff --exit-code 0ce9a6f3232726e9d64065b75bd969835b418df2 -- \
+            eval/project_context_quality/cases.json \
+            eval/project_context_quality/cases.legacy.json \
+            eval/project_context_quality/natural.json \
+            eval/project_context_quality/paraphrases.json \
+            eval/project_context_quality/protocol.lock.json \
+            eval/project_context_quality/lanes.lock.json \
+            eval/project_context_quality_v2/cases.json \
+            eval/project_context_quality_v2/diagnostic.json \
+            eval/project_context_quality_v2/migration-crosswalk.json \
+            eval/project_context_quality_v2/protocol.lock.json
+      - name: Targeted and neighboring contracts
+        run: |
+          set -euo pipefail
+          uv run --no-sync pytest -q \
+            tests/docs/test_v2_acceptance_gaps.py \
+            tests/docs/test_documentation_query_plan.py \
+            tests/test_project_context_quality_acceptance.py \
+            tests/test_project_context_quality_v2_protocol.py \
+            tests/docs/test_review_span_lineage.py \
+            tests/docs/test_review_assignment_identity.py \
+            tests/docs/test_review_query_lineage.py
+      - name: Full offline suite and static checks
+        run: |
+          set -euo pipefail
+          uv run --no-sync pytest tests/ -q --junitxml="$RUNNER_TEMP/pr179-v2-full.xml" | tee "$RUNNER_TEMP/pr179-v2-full.log"
+          uv run --no-sync python -m compileall -q docmancer eval scripts tests
+          uv run --no-sync python scripts/check_python_module_size.py | tee "$RUNNER_TEMP/pr179-v2-size.log"
+          git diff --cached --check
+      - name: Legacy compatibility report and preserved safety-lineage floor
+        run: |
+          set -euo pipefail
+          uv run --no-sync python eval/project_context_quality_protocol.py > "$RUNNER_TEMP/pr179-v2-legacy-hermetic.json"
+          uv run --no-sync python eval/project_context_quality_protocol.py --live --report-only --output "$RUNNER_TEMP/pr179-v2-legacy-live.json" > "$RUNNER_TEMP/pr179-v2-legacy-live.stdout"
+          uv run --no-sync python scripts/check_legacy_project_context_lineage.py "$RUNNER_TEMP/pr179-v2-legacy-live.json" | tee "$RUNNER_TEMP/pr179-v2-legacy-floor.log"
+      - name: V2 blocking acceptance
+        run: |
+          set -euo pipefail
+          uv run --no-sync python scripts/run_project_context_quality_v2_gate.py --output "$RUNNER_TEMP/pr179-v2-live.json" | tee "$RUNNER_TEMP/pr179-v2-acceptance.log"
+      - name: Existing Agent Truth evidence boundaries
+        run: |
+          set -euo pipefail
+          for script in run_paraphrase_proofability_gate run_mixed_evidence_provenance_gate run_evidence_is_data_gate run_p1_agent_truth_closure_gate p1_agent_truth_closure_self_test; do
+            uv run --no-sync python "scripts/$script.py" | tee "$RUNNER_TEMP/pr179-v2-$script.log"
+          done
+          git diff --cached --check
+      - name: Bind publication to tested tree
+        id: tree
+        run: |
+          set -euo pipefail
+          git write-tree > "$RUNNER_TEMP/pr179-v2-tested-tree.txt"
+          echo "sha=$(cat "$RUNNER_TEMP/pr179-v2-tested-tree.txt")" >> "$GITHUB_OUTPUT"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: pr179-v2-migration-validation
+          path: ${{ runner.temp }}/pr179-v2-*
+          retention-days: 14
+          if-no-files-found: error
+  publish:
+    needs: validate
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+      - name: Publish exactly the tested tree
+        env:
+          TESTED_TREE: ${{ needs.validate.outputs.tree }}
+        run: |
+          set -euo pipefail
+          echo '1bd1b1249546ed6136636d62ee027505e92ce5b09c28ef75485d547460bdc627  .github/review/pr179-v2-migration.patch.gz' | sha256sum -c -
+          gzip -dc .github/review/pr179-v2-migration.patch.gz > "$RUNNER_TEMP/pr179-v2-migration.patch"
+          echo '3f2b81aa024935fbe5c9817c0d1f6debe1675e7f693a5c36041b681f35ed2a00  '$RUNNER_TEMP'/pr179-v2-migration.patch' | sha256sum -c -
+          git apply --check "$RUNNER_TEMP/pr179-v2-migration.patch"
+          git apply --index "$RUNNER_TEMP/pr179-v2-migration.patch"
+          git rm .github/review/pr179-v2-migration.patch.gz .github/workflows/pr179-v2-migration-validate.yml
+          git diff --cached --check
+          test "$(git write-tree)" = "$TESTED_TREE"
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git commit -m 'fix: promote semantic V2 project-context acceptance'
+          git push origin HEAD:fix/context-first-project-reads-finalization
+          git rev-parse HEAD > "$RUNNER_TEMP/pr179-v2-published-revision.txt"
+          git rev-parse HEAD^{tree} > "$RUNNER_TEMP/pr179-v2-published-tree.txt"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: pr179-v2-migration-published
+          path: ${{ runner.temp }}/pr179-v2-published-*
+          retention-days: 14
+          if-no-files-found: error
