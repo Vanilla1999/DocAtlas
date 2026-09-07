@@ -178,4 +178,97 @@ new = '''        missing_compound_priority_ids = (
             ),
 '''
 assert text.count(old) == 1
-projection.write_text(text.replace(old, new, 1), encoding="utf-8")
+text = text.replace(old, new, 1)
+
+# 4) Two nearby, disjoint variants from the same evidence item should consume
+# one source slot when a contiguous source-local span can safely preserve both.
+# Keep the existing separate-evidence fallback for distant/oversized spans.
+old = '''        if existing_index is not None:
+            existing = sources[existing_index]
+            start = raw_snippet.find(variant["snippet"])
+            previous_start = raw_snippet.find(existing["snippet"])
+            disjoint = start >= 0 and previous_start >= 0 and (
+                start + len(variant["snippet"]) <= previous_start
+                or previous_start + len(existing["snippet"]) <= start
+            )
+            if (
+                disjoint
+                and qualified_query_ids((existing,)) <= qualified_query_ids((original,))
+                and (qualified_query_ids((variant,)) & eligible_query_ids - qualified_query_ids(sources)
+                     or set(component_witnesses(variant, obligations)) - selected_components)
+            ):
+                # Distinct visible spans may prove different facts in one chunk.
+                identity = f"{variant['evidence_id']}:{start}:{start + len(variant['snippet'])}"
+                variant = {**variant, "evidence_id": "ev-" + hashlib.sha256(identity.encode()).hexdigest()[:16]}
+                existing_index = seen_ids.get(variant["evidence_id"])
+'''
+new = '''        if existing_index is not None:
+            existing = sources[existing_index]
+            start = raw_snippet.find(variant["snippet"])
+            previous_start = raw_snippet.find(existing["snippet"])
+            disjoint = start >= 0 and previous_start >= 0 and (
+                start + len(variant["snippet"]) <= previous_start
+                or previous_start + len(existing["snippet"]) <= start
+            )
+            adds_new_direction = bool(
+                qualified_query_ids((variant,)) & eligible_query_ids - qualified_query_ids(sources)
+                or set(component_witnesses(variant, obligations)) - selected_components
+            )
+            if (
+                disjoint
+                and qualified_query_ids((existing,)) <= qualified_query_ids((original,))
+                and adds_new_direction
+            ):
+                merged_start = min(start, previous_start)
+                merged_end = max(
+                    start + len(variant["snippet"]),
+                    previous_start + len(existing["snippet"]),
+                )
+                merged_snippet = raw_snippet[merged_start:merged_end].strip()
+                merged = _requalify_visible_source({
+                    **existing,
+                    "snippet": merged_snippet,
+                    "line_start": _focused_line_range(
+                        raw_snippet, merged_start, merged_end, original.get("line_start"),
+                    )[0],
+                    "line_end": _focused_line_range(
+                        raw_snippet, merged_start, merged_end, original.get("line_start"),
+                    )[1],
+                    "retrieval_query_matches": merge_query_matches(
+                        existing.get("retrieval_query_matches"),
+                        variant.get("retrieval_query_matches"),
+                    ),
+                }, query_text=query_text)
+                expected_query_ids = (
+                    qualified_query_ids((existing,)) | qualified_query_ids((variant,))
+                ) & eligible_query_ids
+                expected_components = (
+                    set(component_witnesses(existing, obligations))
+                    | set(component_witnesses(variant, obligations))
+                )
+                merged_sources = [
+                    *sources[:existing_index], merged, *sources[existing_index + 1:]
+                ]
+                merged_decision = context_selection_decision(
+                    merged_sources, public_query_ids,
+                )
+                if (
+                    len(merged_snippet) <= 640
+                    and expected_query_ids <= qualified_query_ids((merged,))
+                    and expected_components <= set(component_witnesses(merged, obligations))
+                    and estimate_projection_tokens(_payload(
+                        merged_sources, decision=merged_decision, query_plan=query_plan,
+                    )) <= max_tokens
+                ):
+                    variant = merged
+                    disjoint = False
+                if disjoint:
+                    # Distant spans remain independent evidence; never fabricate
+                    # a disconnected snippet or line range to save a source slot.
+                    identity = f"{variant['evidence_id']}:{start}:{start + len(variant['snippet'])}"
+                    variant = {**variant, "evidence_id": "ev-" + hashlib.sha256(identity.encode()).hexdigest()[:16]}
+                    existing_index = seen_ids.get(variant["evidence_id"])
+'''
+assert text.count(old) == 1
+text = text.replace(old, new, 1)
+projection.write_text(text, encoding="utf-8")
