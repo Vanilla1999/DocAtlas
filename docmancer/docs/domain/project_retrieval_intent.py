@@ -212,6 +212,14 @@ def build_project_retrieval_aliases(
         or _has(tokens, "назначен", "purpose", "overview")
         or (_has(tokens, "проблем") and _has(tokens, "решает", "решающ"))
     )
+    # A host may omit the product name while asking for the product-definition
+    # facet. Keep this recognition narrow and descriptive; original lineage is
+    # still separately gated by same-intent equivalence and parent exact terms.
+    product_purpose = product_purpose or _has_phrase(
+        normalized,
+        "local-first documentation context for coding agents",
+        "documentation context runtime for coding agents",
+    )
 
     # Broad newcomer/workflow questions deliberately return docs_context.
     if _has(tokens, "офлайн", "offline") or _has_phrase(
@@ -349,18 +357,35 @@ def build_project_retrieval_aliases(
             f"{product_prefix}per-project SQLite index storage",
         )
     if _has(tokens, "чанк", "секци", "разбив", "chunk", "section", "split"):
+        chunk_queries: list[str] = []
+        if _has(tokens, "заголов", "heading", "parent", "родител"):
+            chunk_queries.append(f"{product_prefix}documentation headings semantic parent sections")
+        if _has(tokens, "child", "дочер", "фрагмент", "size", "limit", "overlap", "размер", "огранич"):
+            chunk_queries.append(f"{product_prefix}child chunks size limit overlap")
         emit(
             "index_chunking",
             True,
-            f"{product_prefix}indexing split documentation sections parent child chunks",
+            *(chunk_queries or (f"{product_prefix}indexing split documentation sections parent child chunks",)),
         )
-    if _has(tokens, "доказател", "evidence") and _has(
-        tokens, "выбор", "выбира", "кандидат", "select", "candidate",
-    ):
+    evidence_selection_question = (
+        _has(tokens, "доказател", "evidence")
+        and _has(tokens, "выбор", "выбира", "кандидат", "select", "candidate")
+    )
+    retrieval_proof_question = (
+        _has(tokens, "retriev", "search", "result", "hit", "text", "passage")
+        and _has(tokens, "proof", "certif", "доказател")
+    )
+    if evidence_selection_question:
         emit(
             "evidence_selection",
             True,
             f"{product_prefix}evidence selection candidates proof assignment ranking",
+        )
+    if retrieval_proof_question:
+        emit(
+            "evidence_selection",
+            True,
+            f"{product_prefix}retrieval hit proof",
         )
     if _has(tokens, "тест", "протест", "test", "pytest") and not any(
         row.intent_id == "pytest_markers" for row in rows
@@ -368,9 +393,9 @@ def build_project_retrieval_aliases(
         emit(
             "testing_contribution",
             True,
-            "tests before pull request",
-            "CONTRIBUTING.md tests",
-            "docs/testing.md pytest",
+            "contributor full test suite before pull request",
+            "CONTRIBUTING.md full test suite",
+            "docs/testing.md pytest test suite",
         )
     if _has(tokens, "локальн", "local", "develop", "разработ") and _has(
         tokens, "запуст", "setup", "install", "окруж", "environment", "dependency",

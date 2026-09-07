@@ -1,0 +1,10 @@
+{
+  "schema_version": 1,
+  "module_labels": {
+    "tests/test_project_context_quality_acceptance.py": "behavioral"
+  },
+  "module_node_hashes": {
+    "tests/test_project_context_quality_acceptance.py": "dff098d861cc1204b6f72817df57c3ff2f4b607e5c590a9ce10cb99a99bfe9af"
+  },
+  "node_overrides": {}
+}

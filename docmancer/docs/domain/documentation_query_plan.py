@@ -125,24 +125,131 @@ _HOST_SELECTION_LOOKUP_RE = re.compile(
 )
 
 
+_HOST_NEGATION_RE = re.compile(
+    r"\b(?:not|never|no|cannot|can't|can’t|won't|won’t|doesn't|doesn’t|"
+    r"does\s+not|do\s+not|did\s+not|must\s+not|should\s+not)\b", re.I,
+)
+_HOST_REWRITE_QUALIFIER_RE = re.compile(
+    r"\b(?:except|only|without|avoid(?:ed|ing|s)?|outdated|archive|archived|"
+    r"previously|legacy|conditional|conditionally|another|different)\b|\baudit\s+log\b",
+    re.I,
+)
+
+
+_UNVERIFIED_PREMISE_RE = re.compile(
+    r"\b(?:unknown|imaginary|hypothetical|fictitious|nonexistent|made[- ]?up|"
+    r"неизвестн\w*|воображаем\w*|гипотетич\w*|несуществующ\w*)\b", re.I,
+)
+_NOVEL_TOPIC_QUALIFIER_RE = re.compile(
+    r"(?:\bfor\s+(?:the\s+)?[a-z][a-z-]+\s+[a-z][a-z-]+|"
+    r"\band\s+the\s+(?:[a-z][a-z-]+\s+){1,3}(?:subsystem|system|module)|"
+    r"\bдля\s+(?!кажд\w*\s|эт\w*\s|мо\w*\s|ваш\w*\s|сво\w*\s)[а-яё][а-яё-]+\s+[а-яё][а-яё-]+)", re.I,
+)
+_ORIGINAL_RETRIEVAL_INTENTS = frozenset({
+    "product_overview", "project_architecture", "retrieval_pipeline",
+    "project_docs_sync", "troubleshooting", "index_cleanup",
+    "project_storage", "index_chunking", "evidence_selection",
+    "offline_usage", "docs_mcp_public_tools",
+    "getting_started", "contributor_start", "docs_mcp_workflow",
+    "project_docs_configuration", "testing_contribution",
+})
+_HOST_AUDITED_RETRIEVAL_INTENTS = frozenset({
+    # These facets have stable, context-only canonical rewrites that preserve
+    # the explicit host lookup's meaning while improving source recall. Keep
+    # this list narrow: other intents (notably installation verification and
+    # compound request-flow retrieval) have distinct facets that broad aliases
+    # can accidentally collapse.
+    "testing_contribution", "index_chunking", "evidence_selection",
+})
+
+
+def _can_derive_original_from_intent(
+    question: str, aliases: tuple[object, ...],
+) -> bool:
+    """Allow a canonical alias to represent the original retrieval direction only.
+
+    This is intentionally weaker than answer completeness. It is available only
+    for one recognized context-only intent with no exact identifier, negation, or
+    explicit unknown/hypothetical premise. Multi-intent questions stay partial.
+    """
+    intent_ids = {getattr(alias, "intent_id", None) for alias in aliases}
+    if not aliases or len(intent_ids) != 1 or not intent_ids <= _ORIGINAL_RETRIEVAL_INTENTS:
+        return False
+    if (
+        technical_anchors(question)
+        or _HOST_NEGATION_RE.search(question)
+        or _UNVERIFIED_PREMISE_RE.search(question)
+        or _NOVEL_TOPIC_QUALIFIER_RE.search(question)
+    ):
+        return False
+    return all(bool(getattr(alias, "force_context_only", False)) for alias in aliases)
+
+
+
+
+def _host_lookup_can_derive_original(
+    original_question: str, lookup_text: str,
+) -> bool:
+    """Audit one explicit lookup as the same retrieval direction as the question.
+
+    Host text is not trusted by itself. Both sides must independently collapse to
+    the same single context-only domain intent and share a canonical retrieval
+    alias. This permits derived *retrieval* lineage while keeping arbitrary host
+    decompositions unable to certify the original question.
+    """
+    original_aliases = build_project_retrieval_aliases(original_question)
+    lookup_aliases = build_project_retrieval_aliases(lookup_text)
+    if not _can_derive_original_from_intent(original_question, original_aliases):
+        return False
+    if _HOST_REWRITE_QUALIFIER_RE.search(lookup_text):
+        return False
+    original_intents = {alias.intent_id for alias in original_aliases}
+    lookup_intents = {alias.intent_id for alias in lookup_aliases}
+    if len(lookup_intents) != 1 or lookup_intents != original_intents:
+        return False
+    if not lookup_aliases or not all(alias.force_context_only for alias in lookup_aliases):
+        return False
+    def canonical_texts(rows: tuple[object, ...]) -> set[str]:
+        return {
+            re.sub(r"^docatlas\s+", "", str(getattr(alias, "text", "")).casefold()).strip()
+            for alias in rows
+            if str(getattr(alias, "text", "")).strip()
+        }
+
+    return bool(canonical_texts(original_aliases) & canonical_texts(lookup_aliases))
+
+
 def _audited_host_lookup_rewrites(
     original_question: str, lookup_text: str,
 ) -> tuple[str, ...]:
-    """Audit whole positive relations; preserve all other host lookups verbatim."""
+    """Return bounded domain-owned retrieval rewrites for one positive host facet.
+
+    These rewrites may derive *retrieval* coverage for their explicit host parent;
+    they never create proof obligations, answer support, or edit authority. Exact
+    technical terms and negative relations remain verbatim and are never widened.
+    """
     text = " ".join(str(lookup_text or "").strip().split())
-    if not text or technical_anchors(text):
+    if (
+        not text
+        or technical_anchors(text)
+        or _HOST_NEGATION_RE.search(text)
+        or _HOST_REWRITE_QUALIFIER_RE.search(text)
+    ):
         return ()
     original_anchors = {value.casefold() for value in technical_anchors(original_question)}
-    if "get_docs_context" not in original_anchors:
+    if "get_docs_context" in original_anchors:
+        if _HOST_BOUNDARY_LOOKUP_RE.fullmatch(text):
+            return ("get_docs_context question project_path lookup_queries module_path scope",)
+        if _HOST_SELECTION_LOOKUP_RE.fullmatch(text):
+            return (
+                "retrieval gateway filtered project chunks",
+                "selection maximizes distinct visible query coverage",
+            )
+    aliases = build_project_retrieval_aliases(text)
+    intent_ids = {alias.intent_id for alias in aliases}
+    if len(intent_ids) != 1 or not intent_ids <= _HOST_AUDITED_RETRIEVAL_INTENTS:
         return ()
-    if _HOST_BOUNDARY_LOOKUP_RE.fullmatch(text):
-        return ("get_docs_context question project_path lookup_queries module_path scope",)
-    if _HOST_SELECTION_LOOKUP_RE.fullmatch(text):
-        return (
-            "retrieval gateway filtered project chunks",
-            "selection maximizes distinct visible query coverage",
-        )
-    return ()
+    return tuple(dict.fromkeys(alias.text for alias in aliases if alias.force_context_only))
 
 
 def build_documentation_query_plan(
@@ -220,9 +327,12 @@ def build_documentation_query_plan(
         if not cleaned:
             continue
         parent_query_id = f"query-lookup-{index}"
+        derives_original = _host_lookup_can_derive_original(question, cleaned)
         queries.append(DocumentationLookup(
             parent_query_id, cleaned, "host_lookup", False,
-            relation="host_lookup",
+            relation="audited_rewrite" if derives_original else "host_lookup",
+            public_parent_query_id="query-original" if derives_original else None,
+            parent_exact_terms=parent_exact_terms if derives_original else (),
             **host_policies(cleaned),
         ))
         host_rows.append((parent_query_id, cleaned))
@@ -235,7 +345,7 @@ def build_documentation_query_plan(
             *(value.casefold() for value in documentation_technical_anchors(cleaned)),
         )))
         for rewrite in _audited_host_lookup_rewrites(question, cleaned):
-            if host_rewrite_count >= 4 or rewrite.casefold() in seen:
+            if host_rewrite_count >= 6:
                 break
             host_rewrite_count += 1
             queries.append(DocumentationLookup(
@@ -249,13 +359,17 @@ def build_documentation_query_plan(
             seen.add(rewrite.casefold())
     for index, alias in enumerate(retrieval_aliases, start=1):
         # Topic overlap, even for one facet, is not a complete equivalence audit.
-        equivalent = alias.text.casefold() == question.strip().casefold() or (
-            alias.intent_id == "installation_verification"
-            and alias.text.endswith("local installation setup verification getting started")
-            and re.fullmatch(
-                r"как установить (?:docatlas|docmancer|проект) локально и проверить,? что он работает\??",
-                " ".join(question.casefold().split()),
-            ) is not None
+        equivalent = (
+            alias.text.casefold() == question.strip().casefold()
+            or _can_derive_original_from_intent(question, retrieval_aliases)
+            or (
+                alias.intent_id == "installation_verification"
+                and alias.text.endswith("local installation setup verification getting started")
+                and re.fullmatch(
+                    r"как установить (?:docatlas|docmancer|проект) локально и проверить,? что он работает\??",
+                    " ".join(question.casefold().split()),
+                ) is not None
+            )
         )
         queries.append(DocumentationLookup(
             f"query-intent-{index}", alias.text, "canonical_intent", False,

@@ -948,6 +948,11 @@ def _facet_aware_candidates(
             for key, trace in (source.get("retrieval_query_matches") or {}).items()
             if key in required_query_ids and trace.get("qualified") is True
         )
+        # A catalog-role preference may break ties between candidates serving an
+        # outstanding public direction. Once all public directions are covered,
+        # it must not outrank validated supplemental lineage and spend the final
+        # source slot on a merely topical document.
+        role_tiebreak = rank[4] if qualified_ids & required_query_ids else 0.0
         return (
             int(exact_count > 0),
             component_count,
@@ -955,12 +960,13 @@ def _facet_aware_candidates(
             rank[3] if exact_count else 0.0,
             exact_count,
             len(_fully_matched_query_ids((source,)) & required_query_ids),
+            role_tiebreak,
             len(qualified_ids & required_query_ids),
             len(qualified_ids & (supplemental_query_ids or set())),
             rank[0],
             match_ratio,
             len(qualified_ids & (canonical_query_ids or set())),
-            rank[1:3] + rank[4:],
+            rank[1:3] + rank[5:],
         )
 
     return sorted(candidates, key=candidate_key, reverse=True)

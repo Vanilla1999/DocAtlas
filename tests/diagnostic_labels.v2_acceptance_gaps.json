@@ -1,0 +1,10 @@
+{
+  "schema_version": 1,
+  "module_labels": {
+    "tests/docs/test_v2_acceptance_gaps.py": "behavioral"
+  },
+  "module_node_hashes": {
+    "tests/docs/test_v2_acceptance_gaps.py": "511b82faa3e60d5ba55ef1b34e764533699434cd8a507509d1e7197e3b9fbdf8"
+  },
+  "node_overrides": {}
+}

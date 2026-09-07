@@ -52,8 +52,8 @@ def test_documentation_query_plan_owns_retrieval_only_alias_lineage():
     assert by_origin["host_lookup"][0]["relation"] == "host_lookup"
     assert by_origin["host_lookup"][0]["public_parent_query_id"] is None
     assert all(
-        item["relation"] == "host_lookup"
-        and item["public_parent_query_id"] is None
+        item["relation"] == "audited_rewrite"
+        and item["public_parent_query_id"] == "query-original"
         and item["preferred_catalog_roles"]
         for item in by_origin["canonical_intent"]
     )
@@ -410,3 +410,36 @@ def test_audited_installation_needs_qualified_evidence_not_just_a_plan_alias(bod
     assert (parent is not None) is covered
     if not covered:
         assert qualification.reason == "insufficient_visible_match"
+
+
+def test_product_definition_host_lookup_without_product_name_can_derive_original():
+    plan = build_documentation_query_plan(
+        "Что такое DocAtlas и зачем он нужен разработчику?",
+        lookup_queries=("local-first documentation context for coding agents",),
+    )
+    host = next(q for q in plan.queries if q.query_id == "query-lookup-1")
+    assert host.relation == "audited_rewrite"
+    assert host.public_parent_query_id == "query-original"
+
+
+@pytest.mark.parametrize("lookup", [
+    "coding agents documentation",
+    "local-first documentation context for deployment agents",
+    "documentation context for coding agents without project overview",
+])
+def test_product_definition_neighbors_do_not_derive_original(lookup):
+    plan = build_documentation_query_plan(
+        "Что такое DocAtlas и зачем он нужен разработчику?",
+        lookup_queries=(lookup,),
+    )
+    host = next(q for q in plan.queries if q.query_id == "query-lookup-1")
+    assert host.relation == "host_lookup"
+    assert host.public_parent_query_id is None
+
+
+def test_conservative_ru_fallback_cannot_authorize_original_lineage():
+    plan = build_documentation_query_plan("Как хранение связано с очисткой?")
+    fallback = next(q for q in plan.queries if q.origin == "canonical_intent")
+    assert "storage" in fallback.text and "clear index" in fallback.text
+    assert fallback.relation == "host_lookup"
+    assert fallback.public_parent_query_id is None

@@ -1,8 +1,11 @@
 # Project context quality v2
 
-This independent, provider-free baseline evaluates final visible retrieval
-responses. It is report-only: no release thresholds have been selected or
-frozen, and neither lane can emit `PASS`.
+This independent, provider-free evaluator scores final visible retrieval
+responses. The evaluator itself remains report-only so captured reports stay
+claim-boundary neutral. Release/PR acceptance is now a separate wrapper,
+`scripts/run_project_context_quality_v2_gate.py`, bound to
+`acceptance.lock.json`; it cannot rewrite corpus results or turn evaluator
+failures into passes.
 
 V2 models each positive case as mandatory semantic obligations with stable
 obligation IDs that are distinct from lookup-query IDs, plus reviewed
@@ -55,9 +58,19 @@ adversarial evaluator shard and is not part of baseline denominators.
 Run `python eval/project_context_quality_v2_protocol.py` for a no-response
 contract report, add `--responses FILE` to score captured public payloads, or
 add `--live` to exercise current production through the existing in-process
-self-host infrastructure. Live output remains report-only and does not modify
-or reinterpret v1 thresholds. Run
-`pytest -q tests/test_project_context_quality_v2_protocol.py`.
+self-host infrastructure. The evaluator output remains report-only. Blocking
+acceptance is `python scripts/run_project_context_quality_v2_gate.py`, which
+requires all 15 natural and all 5 exposed positive cases to satisfy their
+semantic obligations, all safety/budget/negative/control checks to pass, zero
+false-full coverage, and frozen lookup-attribution non-regression floors.
+
+The previous v1/Legacy live corpus is retained as an explicit compatibility
+report. Its path-specific relevance verdict no longer decides release quality,
+but `scripts/check_legacy_project_context_lineage.py` still enforces the frozen
+`query-original >= 12/15` floor and the existing zero-tolerance safety/budget
+metrics. This separates obsolete path adjudication from safeguards rather than
+silently lowering or deleting them. Run
+`pytest -q tests/test_project_context_quality_v2_protocol.py tests/test_project_context_quality_acceptance.py`.
 
 ## 2.4 evaluator audit
 

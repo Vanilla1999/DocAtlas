@@ -1,0 +1,40 @@
+{
+  "schema_version": "project-context-quality-v2-acceptance-v1",
+  "v2_protocol_lock_sha256": "b5339fd68d5701bbd08a8ca790566acd5b14e57e8c58d82f0b55f86062a66320",
+  "legacy_protocol_lock_sha256": "58322c3af9cea3ebb74b76f7438d0abf677a4f98e94bd483550086bf4ac83516",
+  "lanes": {
+    "natural": {
+      "semantic_usefulness": {"minimum": 15, "denominator": 15},
+      "lookup_attribution": {"minimum": 33, "denominator": 36},
+      "safety": {"minimum": 19, "denominator": 19},
+      "budget_compliance": {"minimum": 19, "denominator": 19},
+      "negative_correctness": {"minimum": 2, "denominator": 2},
+      "unsupported_answer_control_correctness": {"minimum": 2, "denominator": 2},
+      "evaluator_verified_full_semantic_component_coverage": {"minimum": 15, "denominator": 15},
+      "false_full_coverage": {"maximum": 0, "denominator": 15}
+    },
+    "exposed_paraphrases": {
+      "semantic_usefulness": {"minimum": 5, "denominator": 5},
+      "lookup_attribution": {"minimum": 12, "denominator": 12},
+      "safety": {"minimum": 6, "denominator": 6},
+      "budget_compliance": {"minimum": 6, "denominator": 6},
+      "negative_correctness": {"minimum": 1, "denominator": 1},
+      "unsupported_answer_control_correctness": {"minimum": 0, "denominator": 0},
+      "evaluator_verified_full_semantic_component_coverage": {"minimum": 5, "denominator": 5},
+      "false_full_coverage": {"maximum": 0, "denominator": 5}
+    }
+  },
+  "legacy_lineage_floor": {
+    "original_query_coverage_min": 12,
+    "hard_zero_metrics": [
+      "false_supported_count",
+      "operational_contamination_count",
+      "metadata_only_evidence_count",
+      "packs_contamination_count",
+      "docs_analysis_contamination_count",
+      "false_docs_answer_count",
+      "source_budget_violation_count",
+      "token_budget_violation_count"
+    ]
+  }
+}

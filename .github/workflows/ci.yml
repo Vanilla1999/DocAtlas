@@ -216,8 +216,13 @@ jobs:
       - name: Run hermetic Context7-style project chat gate
         run: python eval/project_context_quality_protocol.py > "$RUNNER_TEMP/project-context-quality-hermetic.json"
 
-      - name: Run live Context7-style project chat gate
-        run: python eval/project_context_quality_protocol.py --live > "$RUNNER_TEMP/project-context-quality-live.json"
+      - name: Run Legacy live compatibility report and lineage floor
+        run: |
+          python eval/project_context_quality_protocol.py --live --report-only --output "$RUNNER_TEMP/project-context-quality-legacy-live.json"
+          python scripts/check_legacy_project_context_lineage.py "$RUNNER_TEMP/project-context-quality-legacy-live.json"
+
+      - name: Run V2 project-context acceptance gate
+        run: python scripts/run_project_context_quality_v2_gate.py --output "$RUNNER_TEMP/project-context-quality-v2-live.json"
 
       - name: Upload Project Docs quality reports
         if: always()
@@ -226,7 +231,8 @@ jobs:
           name: project-docs-quality-${{ github.run_id }}
           path: |
             ${{ runner.temp }}/project-context-quality-hermetic.json
-            ${{ runner.temp }}/project-context-quality-live.json
+            ${{ runner.temp }}/project-context-quality-legacy-live.json
+            ${{ runner.temp }}/project-context-quality-v2-live.json
           if-no-files-found: error
           retention-days: 14
 

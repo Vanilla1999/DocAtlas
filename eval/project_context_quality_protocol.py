@@ -231,16 +231,20 @@ def run_live(lane: str = "legacy", *, question_only: bool = False) -> dict[str, 
     return report
 
 
-def main() -> int:
+def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--live", action="store_true")
     parser.add_argument("--lane", choices=("legacy", "natural", "paraphrases"), default="legacy")
     parser.add_argument("--question-only", action="store_true", help="Live report-only ablation; omit host lookups without changing gate thresholds")
     parser.add_argument("--output", type=Path)
-    args = parser.parse_args()
+    parser.add_argument("--report-only", action="store_true", help="preserve the legacy live report without using its path-specific verdict as release acceptance")
+    args = parser.parse_args(argv)
     if args.question_only and not args.live:
         parser.error("--question-only requires --live")
     report = run_live(args.lane, question_only=args.question_only) if args.live else run_contract(args.lane)
+    if args.report_only:
+        report["report_only"] = True
+        report["acceptance_role"] = "legacy_compatibility_report_only"
     serialized = json.dumps(report, ensure_ascii=False, indent=2)
     if args.output:
         args.output.parent.mkdir(parents=True, exist_ok=True)
