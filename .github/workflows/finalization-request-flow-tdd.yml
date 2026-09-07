@@ -1,4 +1,4 @@
-name: Finalization request-flow variant trace
+name: Finalization request flow GREEN
 
 on:
   push:
@@ -6,7 +6,7 @@ on:
     paths: [.github/workflows/finalization-request-flow-tdd.yml]
 
 permissions:
-  contents: read
+  contents: write
 
 env:
   DOCATLAS_OFFLINE: "1"
@@ -16,48 +16,38 @@ env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
 
 jobs:
-  trace:
+  green:
     runs-on: ubuntu-24.04
-    timeout-minutes: 20
+    timeout-minutes: 35
     steps:
       - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
         with:
           ref: fix/context-first-project-reads-finalization
+          fetch-depth: 0
       - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1
         with:
           python-version: '3.12'
       - run: python -m pip install -e ".[dev]"
-      - run: python .github/scripts/finalization_request_flow_patch.py
-      - name: Trace Application orchestration variants
-        shell: bash
+      - name: Apply request-flow fix
+        run: python .github/scripts/finalization_request_flow_patch.py
+      - name: Static checks
         run: |
-          python - <<'PY'
-          import json
-          from unittest.mock import patch
-          import docmancer.docs.application.docs_context_projection as dcp
-          from docmancer.docs.interfaces.mcp import context_tools
-          from eval.project_context_quality_v2_protocol import load_cases, evaluate_case
-          from scripts.run_project_docs_self_host_gate import LiveCase, run
-
-          rows=[]
-          original=dcp._qualified_fragments
-          def observe(source, **kwargs):
-              variants=original(source, **kwargs)
-              if 'Application orchestration' in str(source.get('section') or ''):
-                  rows.append({
-                      'raw_len': len(kwargs.get('raw_snippet') or ''),
-                      'query_ids': sorted(kwargs.get('query_ids') or ()),
-                      'variants': [{
-                          'len': len(v.get('snippet') or ''),
-                          'ids': sorted(dcp.qualified_query_ids((v,))),
-                          'snippet': v.get('snippet'),
-                      } for v in variants[:20]],
-                  })
-              return variants
-          case=next(c for c in load_cases() if c['id']=='v2-natural-request-flow')
-          with patch.object(dcp,'_qualified_fragments',observe):
-              result=run(cases=(LiveCase(case_id=case['id'],question=case['question'],relevant_paths=(),lookup_queries=tuple(case['lookup_queries']),scope=case['scope']),),negative_cases=())
-          payload=result['results'][0]['payload']
-          print('VARIANTS='+json.dumps(rows,ensure_ascii=False,sort_keys=True))
-          print('PUBLIC='+json.dumps({'sources':payload.get('sources'),'obligations':evaluate_case(case,payload)['obligations'],'estimated_tokens':payload.get('estimated_tokens')},ensure_ascii=False,sort_keys=True))
-          PY
+          python -m compileall -q docmancer/docs/domain/documentation_query_plan.py docmancer/docs/domain/project_doc_ranking.py docmancer/docs/application/docs_context_projection.py
+          git diff --check
+      - name: Request-flow contract
+        run: pytest -q tests/docs/test_request_flow_lineage.py
+      - name: Neighboring ranking and projection contracts
+        run: |
+          pytest -q tests/docs/test_project_doc_ranking.py tests/docs/test_context_projection_boundaries.py tests/docs/test_context7_style_project_chat.py tests/docs/test_context_selection.py tests/docs/test_project_context_service.py tests/test_docs_service_part03.py
+      - name: V2 live report
+        run: python eval/project_context_quality_v2_protocol.py --live --output /tmp/v2.json
+      - name: Publish request-flow slice
+        run: |
+          rm .github/workflows/finalization-request-flow-tdd.yml
+          rm .github/scripts/finalization_request_flow_patch.py
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add docmancer/docs/domain/documentation_query_plan.py docmancer/docs/domain/project_doc_ranking.py docmancer/docs/application/docs_context_projection.py .github/workflows/finalization-request-flow-tdd.yml .github/scripts/finalization_request_flow_patch.py
+          git diff --cached --check
+          git commit -m "fix: preserve compound request-flow evidence"
+          git push origin HEAD:fix/context-first-project-reads-finalization
