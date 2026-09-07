@@ -1,4 +1,4 @@
-name: Finalization request flow rerank trace
+name: Finalization request flow identity trace
 
 on:
   push:
@@ -28,63 +28,44 @@ jobs:
           python-version: '3.12'
       - run: python -m pip install -e ".[dev]"
       - run: python .github/scripts/finalization_request_flow_patch.py
-      - name: Trace outer rerank boundary
+      - name: Trace raw and packed chunk identities
         shell: bash
         run: |
           python - <<'PY'
           import json
           from copy import deepcopy
           from unittest.mock import patch
-          import docmancer.docs.application._project_context_service_part01 as pcs
           from docmancer.docs.interfaces.mcp import context_tools
-          from eval.project_context_quality_v2_protocol import evaluate_case, load_cases
+          from eval.project_context_quality_v2_protocol import load_cases
           from scripts.run_project_docs_self_host_gate import LiveCase, run
 
           case = next(c for c in load_cases() if c['id'] == 'v2-natural-request-flow')
           captured = []
-          reranks = []
-          original_rerank = pcs.rerank_project_doc_chunks
-          original_projection = context_tools.project_docs_context
+          original = context_tools.project_docs_context
+          raw_rows = []
 
-          def summarize(chunk):
-              md = chunk.metadata or {}
-              return {
-                  'path': md.get('project_doc_path') or chunk.path,
-                  'section': md.get('heading_path') or md.get('title'),
-                  'tokens': md.get('token_estimate'),
-                  'ids': list(md.get('retrieval_query_ids') or ()),
-                  'qualified': {qid: {
-                      'qualified': tr.get('qualified'),
-                      'relation': tr.get('relation'),
-                      'parent': tr.get('public_parent_query_id'),
-                      'derived_from': tr.get('derived_from_query_id'),
-                  } for qid, tr in (md.get('retrieval_query_matches') or {}).items() if tr.get('qualified') is True},
-              }
-
-          def observe_rerank(chunks, **kwargs):
-              before = [summarize(c) for c in chunks]
-              result = original_rerank(chunks, **kwargs)
-              reranks.append({'kwargs': {k: str(v) for k,v in kwargs.items()}, 'before': before, 'after': [summarize(c) for c in result]})
-              return result
-
-          def observe_projection(**kwargs):
+          def observe(**kwargs):
               captured.append(deepcopy(kwargs.get('retrieval') or {}))
-              return original_projection(**kwargs)
+              return original(**kwargs)
 
-          with patch.object(pcs, 'rerank_project_doc_chunks', observe_rerank), patch.object(context_tools, 'project_docs_context', observe_projection):
-              result = run(cases=(LiveCase(case_id=case['id'], question=case['question'], relevant_paths=(), lookup_queries=tuple(case['lookup_queries']), scope=case['scope']),), negative_cases=())
-          payload = result['results'][0]['payload']
-          verdict = evaluate_case(case, payload)
-          print('RERANKS=' + json.dumps(reranks, ensure_ascii=False, sort_keys=True))
+          # Capture production gateway calls by wrapping the dispatcher class method
+          # indirectly through ProjectDocsService._tagged results is unnecessary:
+          # internal diagnostics already records all retrieved stable identities.
+          with patch.object(context_tools, 'project_docs_context', observe):
+              result = run(cases=(LiveCase(
+                  case_id=case['id'], question=case['question'], relevant_paths=(),
+                  lookup_queries=tuple(case['lookup_queries']), scope=case['scope'],
+              ),), negative_cases=())
+          retrieval = captured[-1]
+          diagnostics = ((retrieval.get('retrieval_diagnostics') or {}).get('project_docs') or {})
+          print('DIAGNOSTICS=' + json.dumps(diagnostics, ensure_ascii=False, sort_keys=True))
           print('PACK=' + json.dumps([{
               'path': c.get('path') or c.get('source'),
               'section': c.get('section') or c.get('parent_title'),
+              'chunk_index': c.get('chunk_index'),
+              'stable_chunk_id': c.get('stable_chunk_id'),
+              'parent_logical_id': c.get('parent_logical_id'),
+              'line_start': c.get('line_start'),
               'ids': c.get('retrieval_query_ids') or [],
-          } for c in captured[-1].get('context_pack') or []], ensure_ascii=False, sort_keys=True))
-          print('PUBLIC=' + json.dumps({
-              'covered': payload.get('covered_query_ids') or [],
-              'missing': payload.get('missing_query_ids') or [],
-              'obligations': verdict['obligations'],
-              'sources': [{'path': s.get('path_or_url'), 'section': s.get('section')} for s in payload.get('sources') or []],
-          }, ensure_ascii=False, sort_keys=True))
+          } for c in retrieval.get('context_pack') or []], ensure_ascii=False, sort_keys=True))
           PY
