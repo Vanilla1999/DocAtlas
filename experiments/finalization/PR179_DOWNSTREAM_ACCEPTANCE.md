@@ -32,6 +32,20 @@ Targeted evidence:
 - repeated isolated deadline runs completed successfully before command-budget cutoff;
 - no timeout constant or production executor semantics were weakened.
 
+## P1 evidence refresh
+
+Evidence refresh commit: `1ce88a67ee1a6add6f06aa34880bef6d0d730646`.
+
+P1.4, P1.5 and P1.6 were regenerated after the production ownership change. Review of the generated diff showed no case, verdict, mismatch, assignment, safety metric or claim-boundary change. The only changes in those three reports are the new `_project_answer_contract_part02.py` blob identity and the aggregate planner SHA. The P1 Agent Truth closure then changed only its references to the refreshed P1.4/P1.5/P1.6 blobs.
+
+Verified after regeneration:
+
+- P1.4 gate PASS; self-test `5/5`;
+- P1.5 gate PASS; self-test `6/6`;
+- P1.6 gate PASS; self-test `6/6`;
+- P1 Agent Truth closure PASS; self-test `4/4`;
+- closure outcome remains `AUTONOMOUS_AGENT_TRUTH_NOT_PROVEN`.
+
 ## Temporary publication infrastructure
 
-A one-shot workflow applied the reviewed patch to the current PR head and removed itself in the same production commit. `.github/workflows/pr179-downstream-fix.yml` is absent from `dc1befb5...`.
+The one-shot downstream-fix and evidence-refresh workflows removed themselves in their publication commits. Neither `.github/workflows/pr179-downstream-fix.yml` nor `.github/workflows/pr179-refresh-p1-evidence.yml` is present in the final production tree.
