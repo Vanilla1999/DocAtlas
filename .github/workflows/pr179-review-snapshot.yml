@@ -1,0 +1,32 @@
+name: PR179 review source snapshot
+
+on:
+  push:
+    branches: [fix/context-first-project-reads-finalization]
+    paths: [.github/workflows/pr179-review-snapshot.yml]
+
+permissions:
+  contents: read
+
+jobs:
+  snapshot:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Export review source without running project code
+        run: |
+          mkdir -p "$RUNNER_TEMP/pr179-source"
+          git bundle create "$RUNNER_TEMP/pr179-source/source.bundle" HEAD refs/remotes/origin/main
+          git rev-parse HEAD > "$RUNNER_TEMP/pr179-source/HEAD.txt"
+          cd "$RUNNER_TEMP/pr179-source"
+          sha256sum source.bundle > SHA256SUMS
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: pr179-review-source-snapshot
+          path: ${{ runner.temp }}/pr179-source/
+          retention-days: 3
+          if-no-files-found: error
