@@ -33,6 +33,15 @@ replacements = {
 ''': '''            hashes = visible_assignment_hashes(
                 source.get("_qualification_candidate", source), union_candidate, assignments)
 ''',
+'''            union_candidate["_assigned_requirement_ids"] = [
+                item["requirement_id"] for item in assignments
+                if item.get("projected_content_hash") in hashes
+                and item.get("requirement_id") in set(source.get("_assigned_requirement_ids") or ())
+            ]
+''': '''            union_candidate["_assigned_requirement_ids"] = [
+                item["requirement_id"] for item in assignments if item.get("projected_content_hash") in hashes
+                and item.get("requirement_id") in set(source.get("_assigned_requirement_ids") or ())]
+''',
 '''    # Variants of one evidence item compete before global source selection.
     # Prefer a bounded, structurally complete contiguous span when coverage is
     # otherwise equivalent, so a shorter mid-sentence prefix cannot consume the
@@ -43,4 +52,5 @@ replacements = {
 for old, new in replacements.items():
     assert old in text, old
     text = text.replace(old, new, 1)
+text = text.replace("                variants.append(candidate)\n\n    # Offer one bounded", "                variants.append(candidate)\n    # Offer one bounded", 1)
 path.write_text(text, encoding="utf-8")
