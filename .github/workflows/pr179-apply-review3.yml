@@ -1,0 +1,104 @@
+name: PR179 third-review validation and publication
+
+on:
+  push:
+    branches: [fix/context-first-project-reads-finalization]
+    paths: [.github/workflows/pr179-apply-review3.yml]
+
+permissions:
+  contents: read
+
+env:
+  DOCATLAS_OFFLINE: "1"
+  DOCATLAS_AUTO_VECTORS: "0"
+  HF_HUB_OFFLINE: "1"
+  TRANSFORMERS_OFFLINE: "1"
+  PYTHONHASHSEED: "0"
+  PYTHONPATH: "."
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
+
+jobs:
+  validate:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1
+        with:
+          python-version: '3.13'
+      - name: Install frozen test dependencies
+        run: |
+          python -m pip install uv==0.9.25
+          uv sync --frozen --extra dev
+      - name: Verify and apply the reviewed source patch
+        run: |
+          echo '9dc7b55529dc83e8c56df56d19208c603658f052cd6207f9536c7b7ca40cbe15  .github/review/pr179-review3.patch' | sha256sum -c -
+          git ls-files -z eval scripts | xargs -0 sha256sum > "$RUNNER_TEMP/frozen.sha256"
+          git apply --check .github/review/pr179-review3.patch
+          git apply --index .github/review/pr179-review3.patch
+          git rm .github/review/pr179-review3.patch .github/workflows/pr179-apply-review3.yml .github/workflows/pr179-review-snapshot.yml
+          git diff --cached --check
+      - name: Full offline suite and static checks
+        run: |
+          set -euo pipefail
+          uv run --no-sync pytest tests/ -q --junitxml="$RUNNER_TEMP/review3-full.xml" | tee "$RUNNER_TEMP/review3-full.log"
+          uv run --no-sync python -m compileall -q docmancer eval scripts tests
+          uv run --no-sync python scripts/check_python_module_size.py
+      - name: Preserve evidence boundaries
+        run: |
+          set -euo pipefail
+          uv run --no-sync python scripts/run_paraphrase_proofability_gate.py
+          uv run --no-sync python scripts/run_mixed_evidence_provenance_gate.py
+          uv run --no-sync python scripts/run_evidence_is_data_gate.py
+          uv run --no-sync python scripts/run_p1_agent_truth_closure_gate.py
+          uv run --no-sync python scripts/p1_agent_truth_closure_self_test.py
+          sha256sum -c "$RUNNER_TEMP/frozen.sha256" > "$RUNNER_TEMP/frozen-check.log"
+          git diff --exit-code
+      - name: Preserve validation logs
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: pr179-review3-validation
+          path: |
+            ${{ runner.temp }}/review3-full.xml
+            ${{ runner.temp }}/review3-full.log
+            ${{ runner.temp }}/frozen.sha256
+            ${{ runner.temp }}/frozen-check.log
+          retention-days: 14
+          if-no-files-found: warn
+
+  publish:
+    needs: validate
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+      - name: Publish only the validated patch to the existing branch
+        run: |
+          echo '9dc7b55529dc83e8c56df56d19208c603658f052cd6207f9536c7b7ca40cbe15  .github/review/pr179-review3.patch' | sha256sum -c -
+          git apply --check .github/review/pr179-review3.patch
+          git apply --index .github/review/pr179-review3.patch
+          git rm .github/review/pr179-review3.patch .github/workflows/pr179-apply-review3.yml .github/workflows/pr179-review-snapshot.yml
+          git diff --cached --check
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "fix: bind visible assignments to exact spans and rebuild query lineage"
+          git push origin HEAD:fix/context-first-project-reads-finalization
+          git rev-parse HEAD > "$RUNNER_TEMP/published-revision.txt"
+          git rev-parse HEAD^{tree} > "$RUNNER_TEMP/published-tree.txt"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: pr179-review3-published
+          path: |
+            ${{ runner.temp }}/published-revision.txt
+            ${{ runner.temp }}/published-tree.txt
+          retention-days: 14
+          if-no-files-found: error
