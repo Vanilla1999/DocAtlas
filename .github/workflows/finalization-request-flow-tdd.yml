@@ -1,4 +1,4 @@
-name: Finalization request flow GREEN
+name: Finalization request flow rerank trace
 
 on:
   push:
@@ -6,7 +6,7 @@ on:
     paths: [.github/workflows/finalization-request-flow-tdd.yml]
 
 permissions:
-  contents: write
+  contents: read
 
 env:
   DOCATLAS_OFFLINE: "1"
@@ -16,37 +16,75 @@ env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
 
 jobs:
-  green:
+  trace:
     runs-on: ubuntu-24.04
-    timeout-minutes: 25
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
         with:
           ref: fix/context-first-project-reads-finalization
-          fetch-depth: 0
       - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1
         with:
           python-version: '3.12'
       - run: python -m pip install -e ".[dev]"
-      - name: Apply bounded request-flow fixes
-        run: python .github/scripts/finalization_request_flow_patch.py
-      - name: Static checks
+      - run: python .github/scripts/finalization_request_flow_patch.py
+      - name: Trace outer rerank boundary
+        shell: bash
         run: |
-          python -m compileall -q docmancer/docs/domain/documentation_query_plan.py docmancer/docs/application/_project_docs_service_part03.py
-          git diff --check
-      - name: Request-flow lineage tests
-        run: pytest -q tests/docs/test_request_flow_lineage.py
-      - name: Neighboring retrieval contracts
-        run: |
-          pytest -q tests/docs/test_context_projection_boundaries.py tests/docs/test_context7_style_project_chat.py tests/test_docs_service_part03.py tests/docs/test_project_context_service.py
-          python scripts/run_agent_developer_adversarial_gate.py
-      - name: Publish request-flow slice
-        run: |
-          rm .github/workflows/finalization-request-flow-tdd.yml
-          rm .github/scripts/finalization_request_flow_patch.py
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add docmancer/docs/domain/documentation_query_plan.py docmancer/docs/application/_project_docs_service_part03.py .github/workflows/finalization-request-flow-tdd.yml .github/scripts/finalization_request_flow_patch.py
-          git diff --cached --check
-          git commit -m "fix: preserve public request flow coverage"
-          git push origin HEAD:fix/context-first-project-reads-finalization
+          python - <<'PY'
+          import json
+          from copy import deepcopy
+          from unittest.mock import patch
+          import docmancer.docs.application._project_context_service_part01 as pcs
+          from docmancer.docs.interfaces.mcp import context_tools
+          from eval.project_context_quality_v2_protocol import evaluate_case, load_cases
+          from scripts.run_project_docs_self_host_gate import LiveCase, run
+
+          case = next(c for c in load_cases() if c['id'] == 'v2-natural-request-flow')
+          captured = []
+          reranks = []
+          original_rerank = pcs.rerank_project_doc_chunks
+          original_projection = context_tools.project_docs_context
+
+          def summarize(chunk):
+              md = chunk.metadata or {}
+              return {
+                  'path': md.get('project_doc_path') or chunk.path,
+                  'section': md.get('heading_path') or md.get('title'),
+                  'tokens': md.get('token_estimate'),
+                  'ids': list(md.get('retrieval_query_ids') or ()),
+                  'qualified': {qid: {
+                      'qualified': tr.get('qualified'),
+                      'relation': tr.get('relation'),
+                      'parent': tr.get('public_parent_query_id'),
+                      'derived_from': tr.get('derived_from_query_id'),
+                  } for qid, tr in (md.get('retrieval_query_matches') or {}).items() if tr.get('qualified') is True},
+              }
+
+          def observe_rerank(chunks, **kwargs):
+              before = [summarize(c) for c in chunks]
+              result = original_rerank(chunks, **kwargs)
+              reranks.append({'kwargs': {k: str(v) for k,v in kwargs.items()}, 'before': before, 'after': [summarize(c) for c in result]})
+              return result
+
+          def observe_projection(**kwargs):
+              captured.append(deepcopy(kwargs.get('retrieval') or {}))
+              return original_projection(**kwargs)
+
+          with patch.object(pcs, 'rerank_project_doc_chunks', observe_rerank), patch.object(context_tools, 'project_docs_context', observe_projection):
+              result = run(cases=(LiveCase(case_id=case['id'], question=case['question'], relevant_paths=(), lookup_queries=tuple(case['lookup_queries']), scope=case['scope']),), negative_cases=())
+          payload = result['results'][0]['payload']
+          verdict = evaluate_case(case, payload)
+          print('RERANKS=' + json.dumps(reranks, ensure_ascii=False, sort_keys=True))
+          print('PACK=' + json.dumps([{
+              'path': c.get('path') or c.get('source'),
+              'section': c.get('section') or c.get('parent_title'),
+              'ids': c.get('retrieval_query_ids') or [],
+          } for c in captured[-1].get('context_pack') or []], ensure_ascii=False, sort_keys=True))
+          print('PUBLIC=' + json.dumps({
+              'covered': payload.get('covered_query_ids') or [],
+              'missing': payload.get('missing_query_ids') or [],
+              'obligations': verdict['obligations'],
+              'sources': [{'path': s.get('path_or_url'), 'section': s.get('section')} for s in payload.get('sources') or []],
+          }, ensure_ascii=False, sort_keys=True))
+          PY
