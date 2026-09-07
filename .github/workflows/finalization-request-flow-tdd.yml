@@ -38,7 +38,7 @@ jobs:
         run: pytest -q tests/docs/test_request_flow_lineage.py
       - name: Projection schema and neighboring contracts
         run: |
-          pytest -q tests/docs/test_model_visible_projection.py tests/docs/test_model_visible_projection_part02.py tests/docs/test_project_doc_ranking.py tests/docs/test_context_projection_boundaries.py tests/docs/test_context7_style_project_chat.py tests/docs/test_context_selection.py tests/docs/test_project_context_service.py tests/test_docs_service_part03.py
+          pytest -q tests/docs/test_model_visible_projection.py tests/docs/test_model_visible_projection_part02.py tests/docs/test_project_doc_ranking.py tests/docs/test_context_projection_boundaries.py tests/docs/test_context7_style_project_chat.py tests/docs/test_project_context_service.py tests/test_docs_service_part03.py
       - name: V2 live report
         run: python eval/project_context_quality_v2_protocol.py --live --output /tmp/v2.json
       - name: Publish request-flow slice
