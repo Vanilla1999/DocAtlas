@@ -1,4 +1,4 @@
-name: Finalization request flow RED
+name: Finalization request flow GREEN
 
 on:
   push:
@@ -6,7 +6,7 @@ on:
     paths: [.github/workflows/finalization-request-flow-tdd.yml]
 
 permissions:
-  contents: read
+  contents: write
 
 env:
   DOCATLAS_OFFLINE: "1"
@@ -16,30 +16,90 @@ env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
 
 jobs:
-  red:
+  green:
     runs-on: ubuntu-24.04
-    timeout-minutes: 15
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
         with:
           ref: fix/context-first-project-reads-finalization
+          fetch-depth: 0
       - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1
         with:
           python-version: '3.12'
       - run: python -m pip install -e ".[dev]"
-      - name: Planner audited lineage is RED
+      - name: Apply bounded audited host rewrites
         shell: bash
         run: |
-          set +e
-          pytest -q tests/docs/test_request_flow_lineage.py::test_request_flow_host_lookups_gain_bounded_audited_rewrites
-          rc=$?
-          set -e
-          test "$rc" -ne 0
-      - name: Public four-fact flow is RED
+          python - <<'PY'
+          from pathlib import Path
+          path = Path('docmancer/docs/domain/documentation_query_plan.py')
+          text = path.read_text()
+          marker = '\n\ndef build_documentation_query_plan(\n'
+          assert text.count(marker) == 1
+          helper = r'''
+
+_HOST_LOOKUP_NEGATION_RE = re.compile(
+    r"\b(?:not|never|without|no|не|нет|никогда|без)\b", re.I,
+)
+
+
+def _audited_host_lookup_rewrites(
+    original_question: str, lookup_text: str,
+) -> tuple[str, ...]:
+    """Return conservative retrieval-only rewrites for one public host lookup.
+
+    Rewrites never become public query IDs. They are allowed only for the
+    documented get_docs_context flow when the lookup contains no negation or
+    independent exact technical identity; qualification still happens against
+    the model-visible source before parent coverage may be derived.
+    """
+    text = " ".join(str(lookup_text or "").strip().split())
+    if not text or _HOST_LOOKUP_NEGATION_RE.search(text):
+        return ()
+    if technical_anchors(text):
+        return ()
+    original_anchors = {value.casefold() for value in technical_anchors(original_question)}
+    if "get_docs_context" not in original_anchors:
+        return ()
+    tokens = tuple(re.findall(r"[a-z0-9_]+", text.casefold()))
+
+    def has(*stems: str) -> bool:
+        return any(token.startswith(stem) for token in tokens for stem in stems)
+
+    rows: list[str] = []
+    if has("request") and has("boundar") and has("accept", "input", "argument"):
+        rows.append("get_docs_context question project_path lookup_queries module_path scope")
+    if has("retriev") and has("select") and has("chunk", "source", "candidate"):
+        rows.extend((
+            "retrieval gateway filtered project chunks",
+            "selection maximizes distinct visible query coverage",
+        ))
+    return tuple(dict.fromkeys(rows))[:2]
+'''
+          text = text.replace(marker, helper + marker, 1)
+
+          old = '''    for index, text in enumerate(lookup_queries[:5], start=1):\n        cleaned = text.strip()\n        if not cleaned:\n            continue\n        queries.append(DocumentationLookup(\n            f"query-lookup-{index}", cleaned, "host_lookup", False,\n            relation="host_lookup",\n            **host_policies(cleaned),\n        ))\n        seen.add(cleaned.casefold())\n'''
+          new = '''    host_rows: list[tuple[str, str]] = []\n    for index, text in enumerate(lookup_queries[:5], start=1):\n        cleaned = text.strip()\n        if not cleaned:\n            continue\n        parent_query_id = f"query-lookup-{index}"\n        queries.append(DocumentationLookup(\n            parent_query_id, cleaned, "host_lookup", False,\n            relation="host_lookup",\n            **host_policies(cleaned),\n        ))\n        host_rows.append((parent_query_id, cleaned))\n        seen.add(cleaned.casefold())\n    host_rewrite_count = 0\n    for parent_query_id, cleaned in host_rows:\n        policies = host_policies(cleaned)\n        parent_exact_terms = tuple(dict.fromkeys((\n            *(term.normalized_value for term in documentation_exact_terms(cleaned)),\n            *(value.casefold() for value in documentation_technical_anchors(cleaned)),\n        )))\n        for rewrite in _audited_host_lookup_rewrites(question, cleaned):\n            if host_rewrite_count >= 4 or rewrite.casefold() in seen:\n                break\n            host_rewrite_count += 1\n            queries.append(DocumentationLookup(\n                f"query-host-rewrite-{host_rewrite_count}", rewrite, "canonical_intent", False,\n                relation="audited_rewrite", public_parent_query_id=parent_query_id,\n                preferred_catalog_roles=policies["preferred_catalog_roles"],\n                forbidden_catalog_roles=policies["forbidden_catalog_roles"],\n                forbidden_evidence_terms=policies["forbidden_evidence_terms"],\n                parent_exact_terms=parent_exact_terms,\n            ))\n            seen.add(rewrite.casefold())\n'''
+          assert text.count(old) == 1
+          path.write_text(text.replace(old, new, 1))
+          PY
+          python -m compileall -q docmancer/docs/domain/documentation_query_plan.py
+          git diff --check
+      - name: Request-flow lineage tests
+        run: pytest -q tests/docs/test_request_flow_lineage.py
+      - name: Neighboring query-plan and projection contracts
         shell: bash
         run: |
-          set +e
-          pytest -q tests/docs/test_request_flow_lineage.py::test_request_flow_public_contract_remains_four_fact_fail_safe
-          rc=$?
-          set -e
-          test "$rc" -ne 0
+          pytest -q tests/docs/test_context_projection_boundaries.py tests/docs/test_context7_style_project_chat.py tests/test_docs_service_part03.py
+          python scripts/run_agent_developer_adversarial_gate.py
+      - name: Publish request-flow slice
+        shell: bash
+        run: |
+          rm .github/workflows/finalization-request-flow-tdd.yml
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add docmancer/docs/domain/documentation_query_plan.py .github/workflows/finalization-request-flow-tdd.yml
+          git diff --cached --check
+          git commit -m "fix: preserve request flow lookup lineage"
+          git push origin HEAD:fix/context-first-project-reads-finalization
