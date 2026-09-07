@@ -110,11 +110,6 @@ def _payload(
         "sources": public_sources,
         "edit_ready": False,
         "investigation_allowed": True,
-        "instruction": (
-            "Answer only claims directly grounded in the returned sources, cite their paths, "
-            "and do not claim that the context is complete. Never use this retrieval-only "
-            "result to authorize an edit."
-        ),
         "estimated_tokens": 0,
     }
     _refresh_estimate(payload)

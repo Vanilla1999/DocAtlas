@@ -106,6 +106,37 @@ class DocumentationQueryPlan:
         }
 
 
+_HOST_LOOKUP_NEGATION_RE = re.compile(
+    r"\b(?:not|never|without|no|не|нет|никогда|без)\b", re.I,
+)
+
+
+def _audited_host_lookup_rewrites(
+    original_question: str, lookup_text: str,
+) -> tuple[str, ...]:
+    """Return conservative retrieval-only rewrites for one public host lookup."""
+    text = " ".join(str(lookup_text or "").strip().split())
+    if not text or _HOST_LOOKUP_NEGATION_RE.search(text) or technical_anchors(text):
+        return ()
+    original_anchors = {value.casefold() for value in technical_anchors(original_question)}
+    if "get_docs_context" not in original_anchors:
+        return ()
+    tokens = tuple(re.findall(r"[a-z0-9_]+", text.casefold()))
+
+    def has(*stems: str) -> bool:
+        return any(token.startswith(stem) for token in tokens for stem in stems)
+
+    rows: list[str] = []
+    if has("request") and has("boundar") and has("accept", "input", "argument"):
+        rows.append("get_docs_context question project_path lookup_queries module_path scope")
+    if has("retriev") and has("select") and has("chunk", "source", "candidate"):
+        rows.extend((
+            "retrieval gateway filtered project chunks",
+            "selection maximizes distinct visible query coverage",
+        ))
+    return tuple(dict.fromkeys(rows))[:2]
+
+
 def build_documentation_query_plan(
     question: str, *, lookup_queries: tuple[str, ...] = (), explicit_path: str | None = None,
     requirements: object | None = None,
@@ -175,16 +206,39 @@ def build_documentation_query_plan(
             forbidden_evidence_terms=() if explicit_path else forbidden_evidence_terms,
         ))
         seen.add(anchor.casefold())
+    host_rows: list[tuple[str, str]] = []
     for index, text in enumerate(lookup_queries[:5], start=1):
         cleaned = text.strip()
         if not cleaned:
             continue
+        parent_query_id = f"query-lookup-{index}"
         queries.append(DocumentationLookup(
-            f"query-lookup-{index}", cleaned, "host_lookup", False,
+            parent_query_id, cleaned, "host_lookup", False,
             relation="host_lookup",
             **host_policies(cleaned),
         ))
+        host_rows.append((parent_query_id, cleaned))
         seen.add(cleaned.casefold())
+    host_rewrite_count = 0
+    for parent_query_id, cleaned in host_rows:
+        policies = host_policies(cleaned)
+        parent_exact_terms = tuple(dict.fromkeys((
+            *(term.normalized_value for term in documentation_exact_terms(cleaned)),
+            *(value.casefold() for value in documentation_technical_anchors(cleaned)),
+        )))
+        for rewrite in _audited_host_lookup_rewrites(question, cleaned):
+            if host_rewrite_count >= 4 or rewrite.casefold() in seen:
+                break
+            host_rewrite_count += 1
+            queries.append(DocumentationLookup(
+                f"query-host-rewrite-{host_rewrite_count}", rewrite, "canonical_intent", False,
+                relation="audited_rewrite", public_parent_query_id=parent_query_id,
+                preferred_catalog_roles=policies["preferred_catalog_roles"],
+                forbidden_catalog_roles=policies["forbidden_catalog_roles"],
+                forbidden_evidence_terms=policies["forbidden_evidence_terms"],
+                parent_exact_terms=parent_exact_terms,
+            ))
+            seen.add(rewrite.casefold())
     for index, alias in enumerate(retrieval_aliases, start=1):
         # Topic overlap, even for one facet, is not a complete equivalence audit.
         equivalent = alias.text.casefold() == question.strip().casefold() or (

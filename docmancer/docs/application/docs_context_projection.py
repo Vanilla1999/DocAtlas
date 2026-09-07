@@ -137,6 +137,18 @@ def project_docs_context(
     canonical_intent_query_ids = _query_ids_for_origins(
         query_plan, {"canonical_intent"},
     )
+    audited_rewrite_query_ids = {
+        str(item.get("query_id") or "")
+        for item in query_plan.get("queries") or ()
+        if isinstance(item, dict)
+        and item.get("relation") == "audited_rewrite"
+        and str(item.get("public_parent_query_id") or "") in host_query_ids
+        and item.get("query_id")
+    }
+    compound_priority_query_ids = (
+        host_query_ids | audited_rewrite_query_ids
+        if len(host_query_ids) > 1 else public_query_id_set
+    )
     eligible_query_ids = public_query_id_set | canonical_intent_query_ids
     original_question = str(query_plan.get("original_question") or retrieval.get("question") or query_text.get("query-original") or "")
     requirements = retrieval.get("requirements") or {}
@@ -161,7 +173,7 @@ def project_docs_context(
     candidates = list(retrieval.get("context_pack") or ())
     initially_ranked = _facet_aware_candidates(
         candidates, query_text=query_text,
-        required_query_ids=public_query_id_set,
+        required_query_ids=compound_priority_query_ids,
         canonical_query_ids=canonical_intent_query_ids,
         assigned_evidence_ids=set(assigned_evidence_by_requirement.values()),
         bound_assigned_evidence_ids=required_assigned_evidence_ids,
@@ -316,11 +328,18 @@ def project_docs_context(
             if query_id in public_query_id_set
         }
         selected_components = {key for source in sources for key in component_witnesses(source, obligations)}
+        missing_compound_priority_ids = (
+            compound_priority_query_ids - qualified_query_ids(sources)
+        )
         prepared = _facet_aware_candidates(
             prepared, query_text=query_text,
-            required_query_ids=public_query_id_set - (qualified_query_ids(sources) if len(host_query_ids) > 1 else selected_public_ids),
+            required_query_ids=missing_compound_priority_ids,
             canonical_query_ids=canonical_intent_query_ids - selected_canonical_ids,
-            exact_query_ids=exact_anchor_query_ids - selected_public_ids,
+            exact_query_ids=(
+                set()
+                if len(host_query_ids) > 1 and missing_compound_priority_ids
+                else exact_anchor_query_ids - selected_public_ids
+            ),
             obligations=obligations, missing_component_ids=mandatory_component_ids - selected_components,
             assigned_evidence_ids=set(assigned_evidence_by_requirement.values()),
             bound_assigned_evidence_ids=required_assigned_evidence_ids,
@@ -650,6 +669,56 @@ def _qualified_fragments(
             ]
             if snippet and (qualified_query_ids((candidate,)) & query_ids or component_witnesses(candidate, obligations)):
                 variants.append(candidate)
+
+    # When two qualified alternatives from one source prove different requested
+    # directions, offer a single contiguous union span before global selection.
+    # The gap remains verbatim source text, the span stays bounded, and visible
+    # qualification must preserve both directions.
+    seed_variants = tuple(variants)
+    for left_index, left in enumerate(seed_variants):
+        left_start = raw_snippet.find(str(left.get("snippet") or ""))
+        if left_start < 0:
+            continue
+        left_ids = qualified_query_ids((left,)) & query_ids
+        if not left_ids:
+            continue
+        for right in seed_variants[left_index + 1:]:
+            right_start = raw_snippet.find(str(right.get("snippet") or ""))
+            if right_start < 0:
+                continue
+            right_ids = qualified_query_ids((right,)) & query_ids
+            if not right_ids or left_ids == right_ids:
+                continue
+            union_ids = left_ids | right_ids
+            union_start = min(left_start, right_start)
+            union_end = max(
+                left_start + len(str(left.get("snippet") or "")),
+                right_start + len(str(right.get("snippet") or "")),
+            )
+            if union_end - union_start > 640 or (union_start, union_end) in seen_spans:
+                continue
+            union_snippet = raw_snippet[union_start:union_end].strip()
+            union_candidate = dict(source)
+            union_candidate["snippet"] = union_snippet
+            union_candidate["line_start"], union_candidate["line_end"] = _focused_line_range(
+                raw_snippet, union_start, union_end, source_line_start,
+            )
+            union_candidate = _requalify_visible_source(
+                union_candidate, query_text=query_text,
+            )
+            if not union_ids <= (qualified_query_ids((union_candidate,)) & query_ids):
+                continue
+            hashes = visible_assignment_hashes(
+                source.get("_qualification_candidate", source), union_candidate, assignments,
+            )
+            union_candidate["_visible_assignment_hashes"] = list(hashes)
+            union_candidate["_assigned_requirement_ids"] = [
+                item["requirement_id"] for item in assignments
+                if item.get("projected_content_hash") in hashes
+                and item.get("requirement_id") in set(source.get("_assigned_requirement_ids") or ())
+            ]
+            seen_spans.add((union_start, union_end))
+            variants.append(union_candidate)
     # Variants of one evidence item compete before global source selection.
     # Prefer a bounded, structurally complete contiguous span when coverage is
     # otherwise equivalent, so a shorter mid-sentence prefix cannot consume the

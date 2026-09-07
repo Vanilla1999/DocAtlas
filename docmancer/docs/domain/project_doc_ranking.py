@@ -637,9 +637,12 @@ def rerank_project_doc_chunks(
             continue
         public_queries_by_id[id(chunk)] = {
             query_id for query_id in qualified_query_ids
-            if query_matches[query_id].get("query_origin") in {
-                "original", "host_lookup", "exact_anchor", "exact_path",
-            }
+            if query_id == "query-original"
+            or query_id.startswith(("query-lookup-", "query-anchor-", "query-path-"))
+            or (
+                query_matches[query_id].get("relation") == "audited_rewrite"
+                and str(query_matches[query_id].get("public_parent_query_id") or "").startswith("query-lookup-")
+            )
         } if not exact_path_anchor else set()
         base = chunk_base_score(chunk, index)
         score = base * source_weight_for_intent(path, getattr(chunk, "heading_path", None), intent) * source_requirement_boost(path, question, intent)
