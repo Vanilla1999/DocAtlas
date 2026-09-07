@@ -67,11 +67,16 @@ FROZEN_OWNERSHIP_CASES = (
     ),
     FrozenOwnershipCase(
         "What does docs_status report and when should it be used?",
-        "question_plan",
-        (),
+        "legacy",
         (
-            "unresolved_question_clause:What does docs_status report",
-            "unresolved_question_clause:when should it be used",
+            (
+                "behavior", "docs_status", None, "behavior", None,
+                "text", None, None, None, "value", None,
+            ),
+            (
+                "usage", "docs_status", None, "usage", None,
+                "text", None, None, None, "value", None,
+            ),
         ),
     ),
     FrozenOwnershipCase(
@@ -240,12 +245,12 @@ FROZEN_UNSUPPORTED_QUESTIONS = tuple(
 def classify_question_ownership(question: str) -> QuestionOwnership:
     plan = compile_question_plan(question)
     contract = build_project_answer_contract(question)
-    if plan.handled:
-        owner = "question_plan"
-        trace = tuple(plan.parse_trace)
-    elif contract.unresolved_parts:
+    if contract.unresolved_parts:
         owner = "unsupported"
         trace = tuple(contract.parse_trace)
+    elif plan.facets:
+        owner = "question_plan"
+        trace = tuple(plan.parse_trace)
     else:
         owner = "legacy"
         trace = ()

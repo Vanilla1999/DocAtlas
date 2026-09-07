@@ -85,6 +85,11 @@ def test_cancel_between_staging_fetch_and_commit_never_publishes_index(tmp_path,
 def test_library_prefetch_job_deadline_is_terminal_and_retryable(tmp_path, monkeypatch):
     agent = SlowAgent()
     service = _service(tmp_path, monkeypatch, agent)
+    # This assertion is about execution-time terminalization, not process-wide
+    # queue contention from unrelated service instances.  Isolate the executor
+    # so a previously queued shared job cannot consume this 50 ms deadline
+    # before SlowAgent.add() starts.
+    service.library_docs.job_executor = LibraryJobExecutor(max_workers=1, max_queued=0)
     monkeypatch.setattr(service.library_docs, "_library_job_timeout_seconds", lambda: 0.05)
     result = service.prefetch_docs(
         "example-docs",

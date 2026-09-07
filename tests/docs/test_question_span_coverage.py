@@ -148,6 +148,18 @@ def test_unresolved_residue_reaches_the_requirements_gate(question: str) -> None
     assert any(row.kind == "unsupported_query" for row in requirements)
 
 
+
+
+def test_legacy_behavior_usage_fallback_rejects_extra_compound_tail() -> None:
+    contract = build_project_answer_contract(
+        "What does docs_status report and when should it be used, and tell me the Bitcoin price?"
+    )
+    assert contract.unresolved_parts
+    assert any(
+        row.startswith("unresolved_question_clause:")
+        for row in contract.unresolved_parts
+    )
+
 def test_plan_retains_exact_source_spans_after_wrapper_and_whitespace_normalization() -> None:
     question = "Please,   Which source   types are supported for indexing?"
     plan = compile_question_plan(question)

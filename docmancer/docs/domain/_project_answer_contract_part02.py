@@ -27,6 +27,26 @@ def _source_document_behavior_context(question: str, subject: str) -> str | None
     return _clean_phrase(match.group(1)) or None
 
 
+_LEGACY_BEHAVIOR_USAGE_COMPOUND_RE = re.compile(
+    r"^\s*what\s+does\s+`?(?P<subject>[A-Za-z_][A-Za-z0-9_.:-]*)`?\s+"
+    r"(?:do|report)\s+and\s+when\s+should\s+"
+    r"(?:i\s+use\s+it|it\s+be\s+used)\s*[?!.]*\s*$",
+    re.I,
+)
+
+
+def _legacy_behavior_usage_compound(question: str) -> bool:
+    """Permit the old exact-subject behavior+usage surface to keep legacy ownership.
+
+    QuestionPlan intentionally does not resolve cross-clause pronouns here.  The
+    legacy contract already binds both obligations to one explicit technical
+    identifier, so this bounded grammar is unambiguous without teaching the new
+    parser a broader pronoun-resolution rule.
+    """
+
+    return _LEGACY_BEHAVIOR_USAGE_COMPOUND_RE.fullmatch(question) is not None
+
+
 def _generic_behavior_qualifiers(
     question: str, subject: str,
 ) -> tuple[str | None, str | None]:
@@ -56,7 +76,11 @@ def build_project_answer_contract(question: str) -> ProjectAnswerContract:
     input_limits: list[str] = ["question"] if len(source_question) > 4_000 else []
     lifecycle = lifecycle_intent_for_question(raw_question)
     question_plan = compile_question_plan(raw_question)
-    if question_plan.handled:
+    if question_plan.handled and not (
+        not question_plan.facets
+        and question_plan.unresolved_parts
+        and _legacy_behavior_usage_compound(raw_question)
+    ):
         return _contract_from_question_plan(
             raw_question, question_plan, lifecycle=lifecycle,
             input_limits=tuple(input_limits),
