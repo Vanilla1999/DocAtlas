@@ -669,11 +669,7 @@ def _qualified_fragments(
             ]
             if snippet and (qualified_query_ids((candidate,)) & query_ids or component_witnesses(candidate, obligations)):
                 variants.append(candidate)
-
-    # When two qualified alternatives from one source prove different requested
-    # directions, offer a single contiguous union span before global selection.
-    # The gap remains verbatim source text, the span stays bounded, and visible
-    # qualification must preserve both directions.
+    # Offer one bounded verbatim union span when it preserves both directions.
     seed_variants = tuple(variants)
     for left_index, left in enumerate(seed_variants):
         left_start = raw_snippet.find(str(left.get("snippet") or ""))
@@ -691,38 +687,27 @@ def _qualified_fragments(
                 continue
             union_ids = left_ids | right_ids
             union_start = min(left_start, right_start)
-            union_end = max(
-                left_start + len(str(left.get("snippet") or "")),
-                right_start + len(str(right.get("snippet") or "")),
-            )
+            union_end = max(left_start + len(str(left.get("snippet") or "")),
+                            right_start + len(str(right.get("snippet") or "")))
             if union_end - union_start > 640 or (union_start, union_end) in seen_spans:
                 continue
             union_snippet = raw_snippet[union_start:union_end].strip()
             union_candidate = dict(source)
             union_candidate["snippet"] = union_snippet
             union_candidate["line_start"], union_candidate["line_end"] = _focused_line_range(
-                raw_snippet, union_start, union_end, source_line_start,
-            )
-            union_candidate = _requalify_visible_source(
-                union_candidate, query_text=query_text,
-            )
+                raw_snippet, union_start, union_end, source_line_start)
+            union_candidate = _requalify_visible_source(union_candidate, query_text=query_text)
             if not union_ids <= (qualified_query_ids((union_candidate,)) & query_ids):
                 continue
             hashes = visible_assignment_hashes(
-                source.get("_qualification_candidate", source), union_candidate, assignments,
-            )
+                source.get("_qualification_candidate", source), union_candidate, assignments)
             union_candidate["_visible_assignment_hashes"] = list(hashes)
             union_candidate["_assigned_requirement_ids"] = [
-                item["requirement_id"] for item in assignments
-                if item.get("projected_content_hash") in hashes
-                and item.get("requirement_id") in set(source.get("_assigned_requirement_ids") or ())
-            ]
+                item["requirement_id"] for item in assignments if item.get("projected_content_hash") in hashes
+                and item.get("requirement_id") in set(source.get("_assigned_requirement_ids") or ())]
             seen_spans.add((union_start, union_end))
             variants.append(union_candidate)
-    # Variants of one evidence item compete before global source selection.
-    # Prefer a bounded, structurally complete contiguous span when coverage is
-    # otherwise equivalent, so a shorter mid-sentence prefix cannot consume the
-    # slot and later block a safe expansion under the same 800-token budget.
+    # Prefer structurally complete variants when coverage is otherwise equal.
     variants.sort(
         key=lambda candidate: (
             len(qualified_query_ids((candidate,)) & query_ids),
