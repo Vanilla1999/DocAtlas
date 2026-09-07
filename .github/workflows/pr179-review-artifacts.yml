@@ -1,0 +1,46 @@
+name: PR179 review artifacts
+
+on:
+  push:
+    branches: [fix/context-first-project-reads-finalization]
+    paths: [.github/workflows/pr179-review-artifacts.yml]
+
+permissions:
+  contents: read
+
+env:
+  DOCATLAS_OFFLINE: "1"
+  DOCATLAS_AUTO_VECTORS: "0"
+  HF_HUB_OFFLINE: "1"
+  TRANSFORMERS_OFFLINE: "1"
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
+
+jobs:
+  artifacts:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1
+        with:
+          python-version: '3.11'
+      - name: Export locked dependencies and source history for offline review
+        run: |
+          python -m pip install uv==0.9.25
+          mkdir -p review-artifacts/wheels
+          uv export --frozen --extra dev --no-emit-project --no-hashes --format requirements-txt --output-file review-artifacts/requirements.txt
+          python -m pip download --only-binary=:all: -r review-artifacts/requirements.txt -d review-artifacts/wheels
+          git bundle create review-artifacts/review.bundle HEAD refs/remotes/origin/main
+          git rev-parse HEAD > review-artifacts/revision.txt
+          cd review-artifacts
+          sha256sum wheels/* review.bundle requirements.txt > SHA256SUMS
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: pr179-offline-review
+          path: review-artifacts/
+          retention-days: 3
+          compression-level: 0
+          if-no-files-found: error
