@@ -1,0 +1,111 @@
+name: PR179 source-span review validation
+
+on:
+  push:
+    branches: [fix/context-first-project-reads-finalization]
+    paths: [.github/workflows/pr179-publish-review3.yml]
+
+permissions:
+  contents: write
+
+env:
+  DOCATLAS_OFFLINE: "1"
+  DOCATLAS_AUTO_VECTORS: "0"
+  HF_HUB_OFFLINE: "1"
+  TRANSFORMERS_OFFLINE: "1"
+  PYTHONHASHSEED: "0"
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
+
+jobs:
+  reviewed-fixes:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1
+        with:
+          python-version: '3.13'
+      - name: Install frozen development dependencies
+        run: |
+          python -m pip install uv==0.9.25
+          uv sync --frozen --extra dev
+      - name: Snapshot frozen inputs and apply only the reviewed patch
+        run: |
+          python - <<'PY'
+          import hashlib, json, os, subprocess
+          from pathlib import Path
+          files = subprocess.check_output(['git', 'ls-files', 'eval', 'scripts'], text=True).splitlines()
+          frozen = {p: hashlib.sha256(Path(p).read_bytes()).hexdigest() for p in files
+                    if p.startswith('eval/') or (p.startswith('scripts/') and 'quality' in p)}
+          Path(os.environ['RUNNER_TEMP'], 'pr179-review3-frozen.json').write_text(json.dumps(frozen, indent=2))
+          PY
+          echo '81234e633e210a9f36ccaca429bf56084e275480d2c297fa2e516dd55ca5cea7  .github/review/pr179-source-span.patch' | sha256sum -c -
+          git apply --check .github/review/pr179-source-span.patch
+          git apply --index .github/review/pr179-source-span.patch
+          git rm .github/review/pr179-source-span.patch .github/workflows/pr179-publish-review3.yml .github/workflows/pr179-review-snapshot.yml
+          git diff --cached --check
+      - name: Complete offline suite and static contracts
+        run: |
+          set -euo pipefail
+          uv run --no-sync pytest tests/ -q --junitxml="$RUNNER_TEMP/pr179-review3-full.xml" | tee "$RUNNER_TEMP/pr179-review3-full.log"
+          uv run --no-sync python -m compileall -q docmancer eval scripts tests
+          uv run --no-sync python scripts/check_python_module_size.py
+          git diff --cached --check
+      - name: P1 evidence and recovery regression gates
+        run: |
+          uv run --no-sync python scripts/run_paraphrase_proofability_gate.py
+          uv run --no-sync python scripts/run_mixed_evidence_provenance_gate.py
+          uv run --no-sync python scripts/run_evidence_is_data_gate.py
+          uv run --no-sync python scripts/run_p1_agent_truth_closure_gate.py
+          uv run --no-sync python scripts/p1_agent_truth_closure_self_test.py
+          uv run --no-sync python scripts/run_recovery_contract_gate.py
+          uv run --no-sync python scripts/run_recovery_mutation_gate.py
+          git diff --exit-code
+      - name: Verify frozen bytes and record actual test results
+        run: |
+          python - <<'PY'
+          import hashlib, json, os, xml.etree.ElementTree as ET
+          from pathlib import Path
+          temp = Path(os.environ['RUNNER_TEMP'])
+          frozen = json.loads((temp / 'pr179-review3-frozen.json').read_text())
+          changed = [p for p, digest in frozen.items() if hashlib.sha256(Path(p).read_bytes()).hexdigest() != digest]
+          assert not changed, changed
+          root = ET.parse(temp / 'pr179-review3-full.xml').getroot()
+          suites = root.findall('testsuite') if root.tag == 'testsuites' else [root]
+          counts = {k: sum(int(s.attrib.get(k, 0)) for s in suites) for k in ('tests', 'failures', 'errors', 'skipped')}
+          assert counts['tests'] > 0 and counts['failures'] == counts['errors'] == 0, counts
+          passed = counts['tests'] - counts['skipped']
+          report = Path('experiments/finalization/PR179_REVIEW3.md')
+          report.write_text(report.read_text() + '\n## Publication validation\n\n'
+              + f"GitHub Actions run: {os.environ['GITHUB_RUN_ID']}.\n\n"
+              + f"Full frozen-dependency offline suite: **{passed} passed, {counts['skipped']} skipped**.\n"
+              + f"Static checks and all seven P1/recovery checks passed; {len(frozen)} frozen files unchanged.\n"
+              + 'This validates the corrective slice, not the outstanding quality/release gate.\n')
+          paths = ['docmancer/docs/application/context_selection.py', 'docmancer/docs/application/docs_context_projection.py', 'docmancer/docs/domain/context_windows.py', 'tests/docs/test_review_span_lineage.py']
+          (temp / 'pr179-review3-source-hashes.json').write_text(json.dumps({p: hashlib.sha256(Path(p).read_bytes()).hexdigest() for p in paths}, indent=2))
+          PY
+          git add experiments/finalization/PR179_REVIEW3.md
+          git diff --cached --check
+      - name: Publish verified corrections to the existing PR branch
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "fix: bind visible witnesses to source spans and rebuild query lineage"
+          git push origin HEAD:fix/context-first-project-reads-finalization
+          git rev-parse HEAD > "$RUNNER_TEMP/pr179-review3-revision.txt"
+      - name: Preserve review validation evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: pr179-review3-validation
+          retention-days: 14
+          if-no-files-found: warn
+          path: |
+            ${{ runner.temp }}/pr179-review3-full.xml
+            ${{ runner.temp }}/pr179-review3-full.log
+            ${{ runner.temp }}/pr179-review3-revision.txt
+            ${{ runner.temp }}/pr179-review3-source-hashes.json
+            ${{ runner.temp }}/pr179-review3-frozen.json
+            experiments/finalization/PR179_REVIEW3.md
