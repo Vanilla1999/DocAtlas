@@ -1,4 +1,4 @@
-name: Finalization request flow GREEN
+name: Finalization request flow trace
 
 on:
   push:
@@ -6,7 +6,7 @@ on:
     paths: [.github/workflows/finalization-request-flow-tdd.yml]
 
 permissions:
-  contents: write
+  contents: read
 
 env:
   DOCATLAS_OFFLINE: "1"
@@ -16,37 +16,63 @@ env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
 
 jobs:
-  green:
+  trace:
     runs-on: ubuntu-24.04
-    timeout-minutes: 20
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
         with:
           ref: fix/context-first-project-reads-finalization
-          fetch-depth: 0
       - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1
         with:
           python-version: '3.12'
       - run: python -m pip install -e ".[dev]"
-      - name: Apply bounded audited host rewrites
-        run: python .github/scripts/finalization_request_flow_patch.py
-      - name: Static checks
+      - run: python .github/scripts/finalization_request_flow_patch.py
+      - name: Trace final sources and lineage
+        shell: bash
         run: |
-          python -m compileall -q docmancer/docs/domain/documentation_query_plan.py
-          git diff --check
-      - name: Request-flow lineage tests
-        run: pytest -q tests/docs/test_request_flow_lineage.py
-      - name: Neighboring query-plan and projection contracts
-        run: |
-          pytest -q tests/docs/test_context_projection_boundaries.py tests/docs/test_context7_style_project_chat.py tests/test_docs_service_part03.py
-          python scripts/run_agent_developer_adversarial_gate.py
-      - name: Publish request-flow slice
-        run: |
-          rm .github/workflows/finalization-request-flow-tdd.yml
-          rm .github/scripts/finalization_request_flow_patch.py
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add docmancer/docs/domain/documentation_query_plan.py .github/workflows/finalization-request-flow-tdd.yml .github/scripts/finalization_request_flow_patch.py
-          git diff --cached --check
-          git commit -m "fix: preserve request flow lookup lineage"
-          git push origin HEAD:fix/context-first-project-reads-finalization
+          python - <<'PY'
+          import json
+          from copy import deepcopy
+          from unittest.mock import patch
+          from eval.project_context_quality_v2_protocol import evaluate_case, load_cases
+          from scripts.run_project_docs_self_host_gate import LiveCase, run
+          from docmancer.docs.interfaces.mcp import context_tools
+
+          case = next(c for c in load_cases() if c['id'] == 'v2-natural-request-flow')
+          captured = []
+          original = context_tools.project_docs_context
+          def observe(**kwargs):
+              captured.append(deepcopy(kwargs.get('retrieval') or {}))
+              return original(**kwargs)
+          with patch.object(context_tools, 'project_docs_context', observe):
+              result = run(cases=(LiveCase(case_id=case['id'], question=case['question'], relevant_paths=(), lookup_queries=tuple(case['lookup_queries']), scope=case['scope']),), negative_cases=())
+          payload = result['results'][0]['payload']
+          verdict = evaluate_case(case, payload)
+          retrieval = captured[-1]
+          rows = []
+          for index, candidate in enumerate(retrieval.get('context_pack') or []):
+              path = candidate.get('path') or candidate.get('source')
+              if path != 'docs/modules/project-context-retrieval.md':
+                  continue
+              rows.append({
+                  'index': index,
+                  'path': path,
+                  'section': candidate.get('section') or candidate.get('parent_title'),
+                  'content': candidate.get('content') or candidate.get('snippet'),
+                  'matches': {
+                      qid: {k: trace.get(k) for k in ('query_text','relation','public_parent_query_id','qualified','coverage_kind','derived_from_query_id','matched_terms','match_ratio') if k in trace}
+                      for qid, trace in (candidate.get('retrieval_query_matches') or {}).items()
+                  },
+              })
+          print('PLAN=' + json.dumps(retrieval.get('documentation_query_plan') or {}, ensure_ascii=False, sort_keys=True))
+          print('CONTEXT=' + json.dumps(rows, ensure_ascii=False, sort_keys=True))
+          print('PUBLIC=' + json.dumps({
+              'sources': payload.get('sources') or [],
+              'covered': payload.get('covered_query_ids') or [],
+              'missing': payload.get('missing_query_ids') or [],
+              'tokens': payload.get('estimated_tokens'),
+              'obligations': verdict['obligations'],
+              'false_full': verdict['false_full_coverage'],
+          }, ensure_ascii=False, sort_keys=True))
+          PY
