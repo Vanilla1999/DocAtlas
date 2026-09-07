@@ -1,0 +1,369 @@
+diff --git a/docmancer/docs/application/context_selection.py b/docmancer/docs/application/context_selection.py
+index b5e52e2..c835971 100644
+--- a/docmancer/docs/application/context_selection.py
++++ b/docmancer/docs/application/context_selection.py
+@@ -8,6 +8,7 @@ from typing import Any, Iterable, Mapping
+ 
+ from docmancer.docs.domain.answer_units import _subject_present, best_local_proof, extract_answer_units
+ from docmancer.docs.domain.lifecycle_policy import lifecycle_allows
++from docmancer.docs.domain.context_windows import source_local_span
+ from docmancer.docs.domain.project_answer_contract import ProofObligation
+ 
+ 
+@@ -193,6 +194,12 @@ def visible_assignment_hashes(
+         original.get("display_text"),
+     ) if isinstance(value, str) and value), "")
+     visible_text = str(projected.get("snippet") or "")
++    visible_span = source_local_span(
++        raw_text, visible_text, source_line_start=original.get("line_start"),
++        line_start=projected.get("line_start"), line_end=projected.get("line_end"),
++    )
++    if visible_span is None:
++        return ()
+     source_start = original.get("char_start")
+     visible: list[str] = []
+     for assignment in assignments:
+@@ -206,7 +213,8 @@ def visible_assignment_hashes(
+                 start, end = start - source_start, end - source_start
+         if digest and isinstance(start, int) and isinstance(end, int) and 0 <= start < end <= len(raw_text):
+             witness = raw_text[start:end]
+-            if hashlib.sha256(witness.encode("utf-8")).hexdigest() == digest and witness in visible_text:
++            if (visible_span[0] <= start < end <= visible_span[1]
++                    and hashlib.sha256(witness.encode("utf-8")).hexdigest() == digest):
+                 visible.append(digest)
+     return tuple(dict.fromkeys(visible))
+ 
+diff --git a/docmancer/docs/application/docs_context_projection.py b/docmancer/docs/application/docs_context_projection.py
+index 3e6471b..6e28c48 100644
+--- a/docmancer/docs/application/docs_context_projection.py
++++ b/docmancer/docs/application/docs_context_projection.py
+@@ -731,7 +731,8 @@ def _requalify_visible_source(
+     for query_id, trace in (source.get("retrieval_query_matches") or {}).items():
+         if not isinstance(trace, dict) or trace.get("derived_from_query_id"):
+             continue
+-        probe = dict(trace)
++        # Aggregated lineage belongs to the old window; rebuild it from visible probes.
++        probe = {k: v for k, v in trace.items() if k not in {"coverage_kinds", "derived_from_query_ids"}}
+         if query_id == "query-original":
+             probe["exact_terms"] = list(dict.fromkeys((
+                 *(probe.get("exact_terms") or ()),
+@@ -754,7 +755,7 @@ def _requalify_visible_source(
+             expected_project_identity=source.get("_expected_project_identity"),
+             lifecycle_intent=source.get("_lifecycle_intent", "current"),
+         )
+-        matches[str(query_id)] = dict(qualification.trace)
++        matches = merge_query_matches(matches, {str(query_id): dict(qualification.trace)})
+         parent_trace = derived_parent_trace(
+             qualification.trace,
+             source_query_id=str(query_id),
+diff --git a/docmancer/docs/domain/context_windows.py b/docmancer/docs/domain/context_windows.py
+index 8a3630f..575ac08 100644
+--- a/docmancer/docs/domain/context_windows.py
++++ b/docmancer/docs/domain/context_windows.py
+@@ -259,3 +259,35 @@ def _focused_line_range(
+     line_start = source_line_start + text[:start].count("\n")
+     line_end = line_start + text[start:end].count("\n")
+     return line_start, line_end
++
++
++def source_local_span(
++    text: str, snippet: str, *, source_line_start: int | None = None,
++    line_start: int | None = None, line_end: int | None = None,
++) -> tuple[int, int] | None:
++    """Resolve one exact occurrence, using line provenance when available.
++
++    Equal text at another offset is not the same witness. Without enough
++    provenance to distinguish repeated occurrences, do not guess a range.
++    """
++    if not snippet or any(
++        value is not None and (type(value) is not int or value < 1)
++        for value in (source_line_start, line_start, line_end)
++    ):
++        return None
++    if line_start is not None and line_end is not None and line_start > line_end:
++        return None
++    result = None
++    start = text.find(snippet)
++    while start >= 0:
++        actual_line = (source_line_start + text.count("\n", 0, start)
++                       if source_line_start is not None else None)
++        if actual_line is None or (
++            (line_start is None or line_start == actual_line)
++            and (line_end is None or line_end == actual_line + snippet.count("\n"))
++        ):
++            if result is not None:
++                return None
++            result = (start, start + len(snippet))
++        start = text.find(snippet, start + 1)
++    return result
+diff --git a/experiments/finalization/PR179_REVIEW3.md b/experiments/finalization/PR179_REVIEW3.md
+new file mode 100644
+index 0000000..a365c65
+--- /dev/null
++++ b/experiments/finalization/PR179_REVIEW3.md
+@@ -0,0 +1,103 @@
++# PR #179 third review — visible lineage and exact witness offsets
++
++## Scope and starting point
++
++Production baseline: `981de86ce9c42c13443b9ef819969032de35784f`.
++Snapshot checkpoint: `3ff09f6125bf97e1af77f6ba0458a2b3dd6c0391` (only a
++read-only source-export workflow). This is a corrective review of the existing
++projection/lineage implementation, not approval of the entire accumulated PR.
++All changes stay on `fix/context-first-project-reads-finalization`; no merge.
++
++## Reproduced and fixed findings
++
++### P2 — Direct/derived attribution depends on trace insertion order
++
++In `_requalify_visible_source`, a later failed direct host probe overwrote the
++successful parent attribution already derived from an audited child. A later
++successful direct probe could also discard the already established lineage.
++The same visible source and same query plan therefore returned different public
++lookup coverage depending on the order of the trace dictionary.
++
++The function now uses the existing `merge_query_matches` contract for direct
++results as well as derived parents. Qualified direct evidence retains priority;
++failed direct evidence cannot erase a qualified derived parent. No generated
++child ID becomes a public query ID and no original-question coverage is invented.
++
++### P2 — Requalification retains lineage from a previous, larger snippet
++
++An accepted direct trace could carry `coverage_kinds` and
++`derived_from_query_ids` aggregated for the previous window. After clipping away
++the child's evidence, these fields still claimed the old successful derivation.
++
++These aggregate fields are now discarded before requalification. The visible
++probes rebuild lineage; direct attribution can remain while a no-longer-visible
++child's derivation disappears. Qualification thresholds and audited rewrite
++families are unchanged.
++
++### P1 — Equal text at a different offset satisfies the wrong assigned witness
++
++`visible_assignment_hashes` checked source identity, the assigned offsets, the
++hash of the assigned text, and text membership in the visible snippet. It did
++not check that the *assigned occurrence* was inside the visible source span.
++When identical text appeared before and after a migration, the second occurrence
++could be credited as the selected witness from the first occurrence.
++
++The domain window module now resolves one exact source-local snippet occurrence,
++using line provenance when available. Application assignment accounting requires
++the original assigned character range to be contained in that delivered span.
++An ambiguous repeated snippet is not assigned an invented range. Unique snippets
++still work without optional line metadata. Unit-relative and absolute character
++coordinates, Unicode text, source identity and SHA-256 checks remain supported.
++No text is stitched, copied from another source, or rewritten to pass this check.
++
++## TDD and verification
++
++The new test module is `tests/docs/test_review_span_lineage.py`, with its own
++hash-bound behavioral diagnostic manifest. All 24 scenarios were frozen before
++changing runtime:
++
++- Unmodified production plus new tests: **14 failed, 10 passed**.
++- Corrected runtime, new and neighboring checks: **179 passed**.
++- Complete local offline suite: **4031 passed, 10 skipped**, no deselection.
++- `compileall`, Python module-size gate and `git diff --check`: PASS.
++- P1.4, P1.5, P1.6, existing P1 closure and its four self-tests: PASS, without
++  rewriting their evidence reports. The closure still states
++  `AUTONOMOUS_AGENT_TRUTH_NOT_PROVEN`.
++- Existing request-flow, scope, source/budget, table-boundary and prior review
++  regressions are included in the full suite.
++
++The tests cover trace permutations, valid direct/derived coexistence, clipping,
++public payload validation, duplicate occurrences, wrong/ambiguous line ranges,
++Unicode, absolute/relative offsets and invalid identity/hash/bounds.
++
++Verification uses Python 3.13 and an offline wheelhouse exported from the frozen
++lockfile. No model API, installed-agent harness or model download was used.
++Evaluation and script hashes were checked unchanged.
++
++### Reproduction caveat
++
++A restored bundle initially configured `origin` as a local bundle filename.
++A full run in that setup gave 1 failure, 4030 passes and 10 skips; the failing
++stale-health case also failed on the unchanged runtime. Restoring the real
++GitHub origin made that test pass without a code change; the complete suite was
++then repeated successfully. A preliminary baseline worktree also used a different
++local project identity and is excluded from the paired quality comparison.
++The retained logs distinguish these attempts instead of replacing failed evidence.
++
++Use independent clones with the same canonical origin when reproducing the
++before/after quality reports. Repository identity changes serialized budget cost;
++it is not an interchangeable fixture setting.
++
++## Remaining acceptance boundary
++
++The current legacy live protocol remains **FAIL**: 11/15 positive cases pass all
++checks, while the separately named `useful_result_count` metric is 12/15.
++The current V2 result remains **REPORT_ONLY**: 14/15 natural and 3/5 exposed
++paraphrases; false-full is zero and safety/budgets pass for all 25 cases.
++These are provider-free in-process retrieval evaluations, not measurements of an
++independent host model's final answers. No thresholds or expected witnesses were
++changed to turn these remaining failures green.
++
++The narrow review defects above are fixed. Broader quality acceptance, including
++the existing chunking-parent, contributor-testing and search-trust gaps, remains
++open. This commit is not merge approval; PR #179 stays draft and unmerged.
+diff --git a/tests/diagnostic_labels.review_span_lineage.json b/tests/diagnostic_labels.review_span_lineage.json
+new file mode 100644
+index 0000000..047f00e
+--- /dev/null
++++ b/tests/diagnostic_labels.review_span_lineage.json
+@@ -0,0 +1,10 @@
++{
++  "schema_version": 1,
++  "module_labels": {
++    "tests/docs/test_review_span_lineage.py": "behavioral"
++  },
++  "module_node_hashes": {
++    "tests/docs/test_review_span_lineage.py": "f1a0ca944e34a6e3de103fc021ab794b8a5b7c97a14d67262e7137fd10775988"
++  },
++  "node_overrides": {}
++}
+diff --git a/tests/docs/test_review_span_lineage.py b/tests/docs/test_review_span_lineage.py
+new file mode 100644
+index 0000000..35a2196
+--- /dev/null
++++ b/tests/docs/test_review_span_lineage.py
+@@ -0,0 +1,140 @@
++"""Source-local witnesses and query lineage must survive projection, not guessing."""
++from __future__ import annotations
++
++from copy import deepcopy
++from hashlib import sha256
++
++import pytest
++
++from docmancer.docs.application.context_selection import qualified_query_ids, visible_assignment_hashes
++from docmancer.docs.application.docs_context_projection import _requalify_visible_source, project_docs_context
++from docmancer.docs.application.model_visible_projection import validate_model_visible_projection
++from docmancer.docs.domain.documentation_query_plan import build_documentation_query_plan
++from tests.docs.test_docs_context_compound_projection import _host_lookup_context_retrieval
++
++
++def _boundary_source(reverse: bool, direct: bool = False):
++    plan = build_documentation_query_plan(
++        "Explain get_docs_context request flow.",
++        lookup_queries=("What does the documentation request boundary accept?",),
++    )
++    parent = next(query for query in plan.queries if query.origin == "host_lookup")
++    child = next(query for query in plan.queries if query.relation == "audited_rewrite"
++                 and query.public_parent_query_id == parent.query_id)
++    pairs = (child, parent) if reverse else (parent, child)
++    source = _host_lookup_context_retrieval()["context_pack"][0]
++    source.update(
++        path="docs/api.md", heading_path="Boundary",
++        content="get_docs_context(question, project_path, lookup_queries, module_path, scope) accepts scoped queries.",
++        retrieval_query_matches={query.query_id: {
++            "query_text": query.text, "relation": query.relation,
++            "public_parent_query_id": query.public_parent_query_id,
++            "parent_exact_terms": query.parent_exact_terms,
++        } for query in pairs},
++    )
++    if direct:
++        source["content"] += " The documentation request boundary accepts scoped input."
++    return plan, parent.query_id, child.query_id, source
++
++
++@pytest.mark.parametrize("reverse", [False, True])
++@pytest.mark.parametrize("direct", [False, True])
++def test_visible_requalification_merges_direct_and_derived_independent_of_order(reverse, direct):
++    plan, parent, child, source = _boundary_source(reverse, direct)
++    source.update(path_or_url=source["path"], snippet=source["content"])
++    before = deepcopy(source)
++    result = _requalify_visible_source(source, query_text={q.query_id: q.text for q in plan.queries})
++    assert {parent, child} <= qualified_query_ids((result,))
++    trace = result["retrieval_query_matches"][parent]
++    assert set(trace["coverage_kinds"]) == ({"direct", "derived"} if direct else {"derived"})
++    assert trace.get("coverage_kind", "direct") == ("direct" if direct else "derived")
++    assert trace["derived_from_query_ids"] == [child]
++    assert source == before
++
++
++@pytest.mark.parametrize("reverse", [False, True])
++def test_public_context_keeps_audited_host_coverage_after_trace_permutation(reverse):
++    plan, parent, child, source = _boundary_source(reverse)
++    payload, snapshot = project_docs_context(retrieval={
++        "context_pack": [source], "documentation_query_plan": plan.as_payload(),
++    })
++    assert parent in payload["covered_query_ids"]
++    assert child not in payload["covered_query_ids"]
++    assert "query-original" not in payload["covered_query_ids"]
++    assert payload["answer_supported"] is False and payload["edit_ready"] is False
++    assert len(payload["sources"]) <= 3 and payload["estimated_tokens"] <= 800
++    assert validate_model_visible_projection(payload, snapshot=snapshot, max_tokens=800) == []
++
++
++@pytest.mark.parametrize("reverse", [False, True])
++def test_clipping_recomputes_lineage_instead_of_preserving_stale_derived_claims(reverse):
++    parent, child = "query-lookup-1", "query-host-rewrite-1"
++    pairs = [(parent, {"query_text": "amber", "relation": "host_lookup"}),
++             (child, {"query_text": "violet", "relation": "audited_rewrite",
++                      "public_parent_query_id": parent})]
++    source = {"snippet": "Amber violet.", "path_or_url": "docs/colors.md",
++              "retrieval_query_matches": dict(reversed(pairs) if reverse else pairs)}
++    texts = {parent: "amber", child: "violet"}
++    full = _requalify_visible_source(source, query_text=texts)
++    clipped = _requalify_visible_source({**full, "snippet": "Amber."}, query_text=texts)
++    trace = clipped["retrieval_query_matches"][parent]
++    assert trace["qualified"] is True
++    assert trace.get("coverage_kind", "direct") == "direct"
++    assert trace.get("coverage_kinds", ["direct"]) == ["direct"]
++    assert not trace.get("derived_from_query_ids") and not trace.get("derived_from_query_id")
++    assert child not in qualified_query_ids((clipped,))
++
++
++def _repeated_witness(absolute: bool, unicode: bool):
++    witness = "КЛЮЧ сохраняет копии." if unicode else "ALPHA_KEY retains backups."
++    raw = f"Before migration: {witness}\nAfter migration: {witness}"
++    source = {"stable_id": "chunk-1", "content": raw, "char_start": 100, "line_start": 20}
++    def assignment(occurrence: int):
++        start = raw.index(witness) if occurrence == 0 else raw.rindex(witness)
++        offset = source["char_start"] if absolute else 0
++        prefix = "" if absolute else "unit_"
++        return {"evidence_id": "chunk-1", "requirement_id": "backup-policy",
++                f"{prefix}char_start": offset + start,
++                f"{prefix}char_end": offset + start + len(witness),
++                "projected_content_hash": sha256(witness.encode()).hexdigest()}
++    return source, witness, assignment
++
++
++@pytest.mark.parametrize("absolute", [False, True])
++@pytest.mark.parametrize("unicode", [False, True])
++def test_equal_text_at_another_offset_cannot_satisfy_the_selected_assignment(absolute, unicode):
++    source, witness, assignment = _repeated_witness(absolute, unicode)
++    projected = {"snippet": f"After migration: {witness}", "line_start": 21, "line_end": 21}
++    assert visible_assignment_hashes(source, projected, (assignment(0),)) == ()
++    assert visible_assignment_hashes(source, projected, (assignment(1),)) == (assignment(1)["projected_content_hash"],)
++
++
++@pytest.mark.parametrize("line", [20, 21])
++@pytest.mark.parametrize("occurrence", [0, 1])
++def test_repeated_snippet_uses_source_lines_to_bind_one_actual_occurrence(line, occurrence):
++    source, witness, assignment = _repeated_witness(False, False)
++    projected = {"snippet": witness, "line_start": line, "line_end": line}
++    expected = (assignment(occurrence)["projected_content_hash"],) if line == 20 + occurrence else ()
++    assert visible_assignment_hashes(source, projected, (assignment(occurrence),)) == expected
++
++
++@pytest.mark.parametrize("lines", [{}, {"line_start": 999, "line_end": 999},
++                                    {"line_start": 20, "line_end": 21}])
++def test_ambiguous_or_inconsistent_visible_span_cannot_claim_an_assignment(lines):
++    source, witness, assignment = _repeated_witness(False, False)
++    assert visible_assignment_hashes(source, {"snippet": witness, **lines}, (assignment(0),)) == ()
++
++
++def test_unique_visible_span_can_bind_without_optional_line_metadata():
++    source, witness, assignment = _repeated_witness(False, False)
++    projected = {"snippet": f"After migration: {witness}"}
++    assert visible_assignment_hashes(source, projected, (assignment(0),)) == ()
++    assert visible_assignment_hashes(source, projected, (assignment(1),)) == (assignment(1)["projected_content_hash"],)
++
++
++@pytest.mark.parametrize("change", [{"evidence_id": "foreign"}, {"projected_content_hash": "0" * 64},
++                                     {"unit_char_start": -1}, {"unit_char_end": 9999}])
++def test_invalid_assignment_identity_hash_or_offsets_still_fail_closed(change):
++    source, witness, assignment = _repeated_witness(False, False)
++    projected = {"snippet": source["content"], "line_start": 20, "line_end": 21}
++    assert visible_assignment_hashes(source, projected, ({**assignment(0), **change},)) == ()
