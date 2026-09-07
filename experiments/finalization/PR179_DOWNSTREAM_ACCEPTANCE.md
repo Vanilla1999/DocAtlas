@@ -32,6 +32,21 @@ Targeted evidence:
 - repeated isolated deadline runs completed successfully before command-budget cutoff;
 - no timeout constant or production executor semantics were weakened.
 
+## Diagnostic inventory repair
+
+Inventory repair commit: `b60d0992149e0ab54e61aa6456b8392bbdae3186`.
+
+The first publication incorrectly wrote the SHA-256 of `tests/test_docs_service_part07.py` into `module_node_hashes`. That field is defined as the SHA-256 of the sorted base pytest node IDs, not the file contents. The deadline test changed only its body, so its 15-node inventory is unchanged and the correct digest remains `8657db026c2d2a0ddfdb1bbe266fc807360f223ba8f0d639ffbe0fa203939813`.
+
+The `tests/docs/test_question_span_coverage.py` digest remains `6ae30e88c1c081c0bbed9ed2705233aed6b2acfe7073977a44dbb5731929674c` because that module really did add one new adversarial test node.
+
+GitHub-side verification before publication:
+
+- recomputed the service-module digest from exactly 15 discovered test nodes;
+- full offline-core `--collect-only` passed the diagnostic inventory hook;
+- `tests/test_docs_service_part07.py` plus `tests/test_diagnostic_labels.py` passed;
+- the publication diff was restricted to `tests/diagnostic_labels.json`.
+
 ## P1 evidence refresh
 
 Evidence refresh commit: `1ce88a67ee1a6add6f06aa34880bef6d0d730646`.
@@ -48,4 +63,4 @@ Verified after regeneration:
 
 ## Temporary publication infrastructure
 
-The one-shot downstream-fix and evidence-refresh workflows removed themselves in their publication commits. Neither `.github/workflows/pr179-downstream-fix.yml` nor `.github/workflows/pr179-refresh-p1-evidence.yml` is present in the final production tree.
+The one-shot downstream-fix, evidence-refresh and diagnostic-repair workflows removed themselves in their publication commits. None of `.github/workflows/pr179-downstream-fix.yml`, `.github/workflows/pr179-refresh-p1-evidence.yml`, or `.github/workflows/pr179-fix-diagnostic-node-hash.yml` is present in the final production tree.
