@@ -28,7 +28,7 @@ jobs:
         with:
           python-version: '3.12'
       - run: python -m pip install -e ".[dev]"
-      - name: Apply request-flow fix with same-source coalescing
+      - name: Apply request-flow fix with multi-query witness window
         run: python .github/scripts/finalization_request_flow_patch.py
       - name: Static checks
         run: |
