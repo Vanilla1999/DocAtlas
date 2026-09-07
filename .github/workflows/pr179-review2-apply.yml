@@ -1,0 +1,76 @@
+name: PR179 second review validation
+
+on:
+  push:
+    branches: [fix/context-first-project-reads-finalization]
+    paths: [.github/workflows/pr179-review2-apply.yml]
+
+permissions:
+  contents: write
+
+env:
+  DOCATLAS_OFFLINE: "1"
+  DOCATLAS_AUTO_VECTORS: "0"
+  HF_HUB_OFFLINE: "1"
+  TRANSFORMERS_OFFLINE: "1"
+  PYTHONHASHSEED: "0"
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
+
+jobs:
+  reviewed-fixes:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1
+        with:
+          python-version: '3.13'
+      - name: Install frozen test dependencies
+        run: |
+          python -m pip install uv==0.9.25
+          uv sync --frozen --extra dev
+      - name: Apply reviewed patch and remove temporary files
+        run: |
+          echo '5db9eba37376f18d2e6dfdc975b0fc69de7a0dc617a84b37c09186c13ebc33e0  .github/review/pr179-review2.patch' | sha256sum -c -
+          git apply --check .github/review/pr179-review2.patch
+          git apply --index .github/review/pr179-review2.patch
+          git rm .github/review/pr179-review2.patch .github/workflows/pr179-review2-apply.yml .github/workflows/pr179-review2-export.yml
+          git diff --cached --check
+      - name: Full offline suite and static contracts
+        run: |
+          set -euo pipefail
+          uv run --no-sync pytest tests/ -q --junitxml="$RUNNER_TEMP/pr179-review2-full.xml" | tee "$RUNNER_TEMP/pr179-review2-full.log"
+          uv run --no-sync python -m compileall -q docmancer eval scripts tests
+          uv run --no-sync python scripts/check_python_module_size.py | tee "$RUNNER_TEMP/pr179-review2-size.log"
+      - name: Verify existing P1 evidence without rewriting reports
+        run: |
+          uv run --no-sync python scripts/run_paraphrase_proofability_gate.py
+          uv run --no-sync python scripts/run_mixed_evidence_provenance_gate.py
+          uv run --no-sync python scripts/run_evidence_is_data_gate.py
+          uv run --no-sync python scripts/run_p1_agent_truth_closure_gate.py
+          uv run --no-sync python scripts/p1_agent_truth_closure_self_test.py
+          git diff --exit-code
+      - name: Publish only the validated source tree to the existing branch
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git diff --cached --check
+          git commit -m "fix: preserve source row semantics and public query priority"
+          git push origin HEAD:fix/context-first-project-reads-finalization
+          git rev-parse HEAD > "$RUNNER_TEMP/pr179-review2-revision.txt"
+          git bundle create "$RUNNER_TEMP/pr179-review2-validated.bundle" HEAD
+      - name: Preserve validation evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: pr179-review2-validation
+          path: |
+            ${{ runner.temp }}/pr179-review2-full.xml
+            ${{ runner.temp }}/pr179-review2-full.log
+            ${{ runner.temp }}/pr179-review2-size.log
+            ${{ runner.temp }}/pr179-review2-revision.txt
+            ${{ runner.temp }}/pr179-review2-validated.bundle
+          if-no-files-found: warn
+          retention-days: 14
