@@ -1,4 +1,4 @@
-name: PR178 audited rewrite packing trace
+name: PR178 explicit public query diversity TDD
 
 on:
   push:
@@ -6,7 +6,7 @@ on:
     paths: [.github/workflows/pr178-arch-flow-tdd.yml]
 
 permissions:
-  contents: read
+  contents: write
 
 env:
   DOCATLAS_OFFLINE: "1"
@@ -16,91 +16,204 @@ env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
 jobs:
-  trace:
+  green:
     runs-on: ubuntu-24.04
-    timeout-minutes: 12
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
         with:
           ref: fix/context-first-project-reads
+          fetch-depth: 0
       - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1
         with:
           python-version: '3.12'
       - run: python -m pip install -e ".[dev]"
-      - name: Apply disposable implementation and trace packing decisions
+
+      - name: Add public-behavior and reranker regressions
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import ast, hashlib, json
+          from pathlib import Path
+
+          path = Path('tests/docs/test_context_projection_boundaries.py')
+          text = path.read_text()
+          start = text.index('def test_frozen_architecture_infrastructure_boundary_enters_retrieval_candidates')
+          end = text.index('\ndef test_frozen_request_flow_prefers_project_context_module_witnesses', start)
+          replacement = '''def test_frozen_architecture_keeps_all_module_boundaries_visible():\n    from eval.project_context_quality_v2_protocol import evaluate_case, load_cases\n    from scripts.run_project_docs_self_host_gate import LiveCase, run\n\n    case = next(row for row in load_cases() if row["id"] == "v2-natural-architecture")\n    result = run(cases=(LiveCase(\n        case_id=case["id"], question=case["question"], relevant_paths=(),\n        lookup_queries=tuple(case["lookup_queries"]), scope=case["scope"],\n    ),), negative_cases=())\n    payload = result["results"][0]["payload"]\n    verdict = evaluate_case(case, payload)\n    assert all(row["met"] for row in verdict["obligations"]), verdict["obligations"]\n    assert verdict["semantic_useful"] is True\n    assert verdict["false_full_coverage"] is False\n    assert payload["answer_supported"] is False and payload["edit_ready"] is False\n    assert len(payload["sources"]) <= 3 and payload["estimated_tokens"] <= 800\n\n\n'''
+          text = text[:start] + replacement + text[end + 1:]
+          assert 'test_audited_host_flow_rewrites_are_parent_bound_and_non_public' not in text
+          text += '''\n\ndef test_audited_host_flow_rewrites_are_parent_bound_and_non_public():\n    from docmancer.docs.domain.documentation_query_plan import build_documentation_query_plan\n\n    plan = build_documentation_query_plan(\n        "How does get_docs_context move from its request boundary to visible sources?",\n        lookup_queries=(\n            "What does the documentation request boundary accept?",\n            "How do retrieved chunks become selected visible sources?",\n        ),\n    ).as_payload()\n    rewrites = [row for row in plan["queries"] if row["relation"] == "audited_rewrite"]\n    assert any(row["public_parent_query_id"] == "query-lookup-1" and "get_docs_context" in row["text"] for row in rewrites)\n    assert sum(row["public_parent_query_id"] == "query-lookup-2" for row in rewrites) == 2\n    assert not {row["query_id"] for row in rewrites} & set(plan["public_query_ids"])\n\n\ndef test_audited_host_flow_rewrites_fail_closed_on_negation_and_temporal_wording():\n    from docmancer.docs.domain.documentation_query_plan import build_documentation_query_plan\n\n    for lookup in (\n        "What does the documentation request boundary not accept?",\n        "How do retrieved chunks become selected visible sources before validation?",\n    ):\n        plan = build_documentation_query_plan(\n            "How does get_docs_context move from its request boundary to visible sources?",\n            lookup_queries=(lookup,),\n        ).as_payload()\n        assert not any(\n            row["relation"] == "audited_rewrite"\n            and row["public_parent_query_id"] == "query-lookup-1"\n            for row in plan["queries"]\n        )\n\n\ndef test_reranker_uses_explicit_public_ids_for_derived_parent_coverage():\n    from types import SimpleNamespace\n    from docmancer.docs.domain.project_doc_ranking import rerank_project_doc_chunks\n    from docmancer.docs.domain.project_query_intent import classify_project_query_intent\n\n    question = "How does get_docs_context move from its request boundary to visible sources?"\n    intent = classify_project_query_intent(question)\n\n    def chunk(label, query_id, *, origin, coverage_kind, score):\n        return SimpleNamespace(\n            path="docs/modules/project-context-retrieval.md",\n            heading_path=label,\n            title=label,\n            score=score,\n            content=label,\n            authority="source_of_truth",\n            lifecycle_status="active",\n            stale=False,\n            impact_policy="track",\n            metadata={"retrieval_query_matches": {query_id: {\n                "qualified": True,\n                "query_origin": origin,\n                "coverage_kind": coverage_kind,\n                "lexical_score": score,\n            }}},\n        )\n\n    ranked = rerank_project_doc_chunks(\n        [\n            chunk("Public boundary", "query-lookup-1", origin="concept_alias", coverage_kind="derived", score=0.40),\n            chunk("Application orchestration", "query-lookup-2", origin="host_lookup", coverage_kind="direct", score=0.99),\n            chunk("Infrastructure port", "query-lookup-3", origin="concept_alias", coverage_kind="derived", score=0.30),\n        ],\n        question=question, intent=intent, limit=3,\n        broad_max_per_source=1, narrow_max_per_source=1,\n        public_query_ids=("query-original", "query-lookup-1", "query-lookup-2", "query-lookup-3"),\n    )\n    assert {row.heading_path for row in ranked} == {\n        "Public boundary", "Application orchestration", "Infrastructure port",\n    }\n'''
+          path.write_text(text)
+
+          nodeids = sorted(
+              f'tests/docs/test_context_projection_boundaries.py::{node.name}'
+              for node in ast.parse(text).body
+              if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)) and node.name.startswith('test_')
+          )
+          manifest_path = Path('tests/diagnostic_labels.projection_boundaries.json')
+          manifest = json.loads(manifest_path.read_text())
+          manifest['module_node_hashes']['tests/docs/test_context_projection_boundaries.py'] = hashlib.sha256('\n'.join(nodeids).encode()).hexdigest()
+          manifest_path.write_text(json.dumps(manifest, indent=2, sort_keys=True) + '\n')
+          PY
+          git diff --check
+
+      - name: Confirm explicit-public reranker regression is RED
+        shell: bash
+        run: |
+          set +e
+          pytest -q tests/docs/test_context_projection_boundaries.py::test_reranker_uses_explicit_public_ids_for_derived_parent_coverage
+          rc=$?
+          set -e
+          if [ "$rc" -eq 0 ]; then
+            echo "Expected explicit-public reranker test to fail before implementation"
+            exit 1
+          fi
+
+      - name: Apply bounded production candidate
         shell: bash
         run: |
           set -euo pipefail
           python - <<'PY'
           from pathlib import Path
 
-          p=Path('docatlas.project-docs.yaml'); t=p.read_text()
-          old='''  - path: docs/modules/project-context-retrieval.md\n    role: development\n    scope: module\n    module_path: docmancer/docs/application\n    description: Project context retrieval bounded context, application allocation, infrastructure port, and MCP invariants.\n'''
-          new='''  - path: docs/modules/project-context-retrieval.md\n    role: module_architecture\n    scope: module\n    module_path: docmancer/docs/application\n    description: Project context retrieval bounded context, application allocation, SQLite persistence and candidate generation, evidence qualification, infrastructure port, and MCP invariants.\n'''
-          assert t.count(old)==1; p.write_text(t.replace(old,new,1))
+          catalog = Path('docatlas.project-docs.yaml')
+          text = catalog.read_text()
+          old = '''  - path: docs/modules/project-context-retrieval.md\n    role: development\n    scope: module\n    module_path: docmancer/docs/application\n    description: Project context retrieval bounded context, application allocation, infrastructure port, and MCP invariants.\n'''
+          new = '''  - path: docs/modules/project-context-retrieval.md\n    role: module_architecture\n    scope: module\n    module_path: docmancer/docs/application\n    description: Project context retrieval bounded context, application allocation, SQLite persistence and candidate generation, evidence qualification, infrastructure port, and MCP invariants.\n'''
+          assert text.count(old) == 1
+          catalog.write_text(text.replace(old, new, 1))
 
-          p=Path('docmancer/docs/domain/project_retrieval_intent.py'); t=p.read_text()
-          t=t.replace('    "project_architecture": (("project_architecture", "overview"), ("roadmap",)),\n','    "project_architecture": (("project_architecture", "module_architecture", "overview"), ("roadmap",)),\n',1)
-          t=t.replace('    "retrieval_pipeline": (("project_architecture", "api_contract"), ("roadmap",)),\n','    "retrieval_pipeline": (("module_architecture", "project_architecture", "api_contract"), ("roadmap",)),\n',1)
-          old='''        emit(\n            "project_architecture",\n            True,\n            f"{product_prefix}project architecture overview components indexing retrieval storage",\n        )\n'''
-          new='''        emit(\n            "project_architecture",\n            True,\n            f"{product_prefix}project architecture overview components indexing retrieval storage",\n            f"{product_prefix}SQLite persistence candidate generation metadata evidence qualification",\n        )\n'''
-          assert t.count(old)==1; p.write_text(t.replace(old,new,1))
+          intent = Path('docmancer/docs/domain/project_retrieval_intent.py')
+          text = intent.read_text()
+          old = '    "project_architecture": (("project_architecture", "overview"), ("roadmap",)),\n'
+          new = '    "project_architecture": (("project_architecture", "module_architecture", "overview"), ("roadmap",)),\n'
+          assert text.count(old) == 1
+          text = text.replace(old, new, 1)
+          old = '    "retrieval_pipeline": (("project_architecture", "api_contract"), ("roadmap",)),\n'
+          new = '    "retrieval_pipeline": (("module_architecture", "project_architecture", "api_contract"), ("roadmap",)),\n'
+          assert text.count(old) == 1
+          text = text.replace(old, new, 1)
+          old = '''        emit(\n            "project_architecture",\n            True,\n            f"{product_prefix}project architecture overview components indexing retrieval storage",\n        )\n'''
+          new = '''        emit(\n            "project_architecture",\n            True,\n            f"{product_prefix}project architecture overview components indexing retrieval storage",\n            f"{product_prefix}SQLite persistence candidate generation metadata evidence qualification",\n        )\n'''
+          assert text.count(old) == 1
+          intent.write_text(text.replace(old, new, 1))
 
-          p=Path('docmancer/docs/domain/documentation_query_plan.py'); t=p.read_text()
-          needle='''    requirement_hints = tuple(\n        str(value).strip()\n        for value in getattr(requirements, "retrieval_hints", ())\n        if str(value).strip()\n    )\n'''
-          helper='''    def host_audited_rewrites(lookup_text: str) -> tuple[tuple[str, tuple[str, ...]], ...]:\n        normalized = " ".join(lookup_text.casefold().split())\n        if re.search(r"\\b(?:not|never|no|without|except|before|after|until|unless)\\b", normalized):\n            return ()\n        tokens = tuple(re.findall(r"[a-z0-9_]+", normalized))\n        rows: list[tuple[str, tuple[str, ...]]] = []\n        if "documentation" in tokens and "request" in tokens and "boundary" in tokens and any(token.startswith("accept") for token in tokens):\n            anchors=technical_anchors(question)\n            if len(anchors)==1:\n                anchor=anchors[0]\n                rows.append((f"{anchor} request boundary question project_path lookup_queries module_path scope",(anchor.casefold(),)))\n        if (any(token.startswith("retriev") for token in tokens) and any(token.startswith("chunk") for token in tokens) and any(token.startswith("select") for token in tokens) and any(token.startswith("visib") for token in tokens) and any(token.startswith("source") for token in tokens)):\n            rows.extend((("retrieval gateway filtered project chunks field-level lexical match provenance exact-source indexed sections",()),("selection maximizes distinct user-visible query coverage before expanding snippets",())))\n        return tuple(rows)\n\n'''+needle
-          assert t.count(needle)==1; t=t.replace(needle,helper,1)
-          old='''    for index, text in enumerate(lookup_queries[:5], start=1):\n        cleaned = text.strip()\n        if not cleaned:\n            continue\n        queries.append(DocumentationLookup(\n            f"query-lookup-{index}", cleaned, "host_lookup", False,\n            relation="host_lookup",\n            **host_policies(cleaned),\n        ))\n        seen.add(cleaned.casefold())\n'''
-          new='''    for index, text in enumerate(lookup_queries[:5], start=1):\n        cleaned=text.strip()\n        if not cleaned:\n            continue\n        parent_query_id=f"query-lookup-{index}"; policies=host_policies(cleaned)\n        queries.append(DocumentationLookup(parent_query_id,cleaned,"host_lookup",False,relation="host_lookup",**policies)); seen.add(cleaned.casefold())\n        for rewrite_index,(rewrite_text,parent_terms) in enumerate(host_audited_rewrites(cleaned),start=1):\n            if rewrite_text.casefold() in seen:\n                continue\n            queries.append(DocumentationLookup(f"query-lookup-{index}-rewrite-{rewrite_index}",rewrite_text,"concept_alias",False,relation="audited_rewrite",public_parent_query_id=parent_query_id,parent_exact_terms=parent_terms,**policies)); seen.add(rewrite_text.casefold())\n'''
-          assert t.count(old)==1; p.write_text(t.replace(old,new,1))
+          plan = Path('docmancer/docs/domain/documentation_query_plan.py')
+          text = plan.read_text()
+          needle = '''    requirement_hints = tuple(\n        str(value).strip()\n        for value in getattr(requirements, "retrieval_hints", ())\n        if str(value).strip()\n    )\n'''
+          helper = '''    def host_audited_rewrites(lookup_text: str) -> tuple[tuple[str, tuple[str, ...]], ...]:\n        """Return narrow semantic-preserving rewrites bound to one public lookup."""\n        normalized = " ".join(lookup_text.casefold().split())\n        if re.search(r"\\b(?:not|never|no|without|except|before|after|until|unless)\\b", normalized):\n            return ()\n        tokens = tuple(re.findall(r"[a-z0-9_]+", normalized))\n        rows: list[tuple[str, tuple[str, ...]]] = []\n        if "documentation" in tokens and "request" in tokens and "boundary" in tokens and any(token.startswith("accept") for token in tokens):\n            anchors = technical_anchors(question)\n            if len(anchors) == 1:\n                anchor = anchors[0]\n                rows.append((f"{anchor} request boundary question project_path lookup_queries module_path scope", (anchor.casefold(),)))\n        if (any(token.startswith("retriev") for token in tokens)\n            and any(token.startswith("chunk") for token in tokens)\n            and any(token.startswith("select") for token in tokens)\n            and any(token.startswith("visib") for token in tokens)\n            and any(token.startswith("source") for token in tokens)):\n            rows.extend((\n                ("retrieval gateway filtered project chunks field-level lexical match provenance exact-source indexed sections", ()),\n                ("selection maximizes distinct user-visible query coverage before expanding snippets", ()),\n            ))\n        return tuple(rows)\n\n''' + needle
+          assert text.count(needle) == 1
+          text = text.replace(needle, helper, 1)
+          old_loop = '''    for index, text in enumerate(lookup_queries[:5], start=1):\n        cleaned = text.strip()\n        if not cleaned:\n            continue\n        queries.append(DocumentationLookup(\n            f"query-lookup-{index}", cleaned, "host_lookup", False,\n            relation="host_lookup",\n            **host_policies(cleaned),\n        ))\n        seen.add(cleaned.casefold())\n'''
+          new_loop = '''    for index, text in enumerate(lookup_queries[:5], start=1):\n        cleaned = text.strip()\n        if not cleaned:\n            continue\n        parent_query_id = f"query-lookup-{index}"\n        policies = host_policies(cleaned)\n        queries.append(DocumentationLookup(parent_query_id, cleaned, "host_lookup", False, relation="host_lookup", **policies))\n        seen.add(cleaned.casefold())\n        for rewrite_index, (rewrite_text, parent_terms) in enumerate(host_audited_rewrites(cleaned), start=1):\n            if rewrite_text.casefold() in seen:\n                continue\n            queries.append(DocumentationLookup(\n                f"query-lookup-{index}-rewrite-{rewrite_index}", rewrite_text, "concept_alias", False,\n                relation="audited_rewrite", public_parent_query_id=parent_query_id,\n                parent_exact_terms=parent_terms, **policies,\n            ))\n            seen.add(rewrite_text.casefold())\n'''
+          assert text.count(old_loop) == 1
+          plan.write_text(text.replace(old_loop, new_loop, 1))
 
-          p=Path('docmancer/docs/application/_project_docs_service_part03.py'); t=p.read_text()
-          old='''        queries_by_origin: dict[str, list[list[Any]]] = {}\n        for item in documentation_query_plan.queries:\n            lane = supplemental_chunks_by_query.get(item.text)\n            if lane:\n                queries_by_origin.setdefault(item.origin, []).append(lane)\n        candidates = select_context_candidates([\n            [\n                *queries_by_origin.get("exact_path", []),\n                *queries_by_origin.get("exact_anchor", []),\n            ],\n            [[*authoritative_chunks, *chunks]],\n            queries_by_origin.get("host_lookup", []),\n            [\n                *queries_by_origin.get("canonical_intent", []),\n                *queries_by_origin.get("concept_alias", []),\n                *queries_by_origin.get("retrieval_hint", []),\n            ],\n        ])\n'''
-          new='''        queries_by_origin: dict[str, list[list[Any]]] = {}\n        audited_rewrite_lanes: list[list[Any]] = []\n        for item in documentation_query_plan.queries:\n            lane = supplemental_chunks_by_query.get(item.text)\n            if not lane:\n                continue\n            if item.relation == "audited_rewrite":\n                audited_rewrite_lanes.append(lane)\n            else:\n                queries_by_origin.setdefault(item.origin, []).append(lane)\n        candidates = select_context_candidates([\n            [*queries_by_origin.get("exact_path", []), *queries_by_origin.get("exact_anchor", [])],\n            [[*authoritative_chunks, *chunks]],\n            queries_by_origin.get("host_lookup", []),\n            audited_rewrite_lanes,\n            [*queries_by_origin.get("canonical_intent", []), *queries_by_origin.get("concept_alias", []), *queries_by_origin.get("retrieval_hint", [])],\n        ])\n'''
-          assert t.count(old)==1; p.write_text(t.replace(old,new,1))
+          service = Path('docmancer/docs/application/_project_docs_service_part03.py')
+          text = service.read_text()
+          old = '''        queries_by_origin: dict[str, list[list[Any]]] = {}\n        for item in documentation_query_plan.queries:\n            lane = supplemental_chunks_by_query.get(item.text)\n            if lane:\n                queries_by_origin.setdefault(item.origin, []).append(lane)\n        candidates = select_context_candidates([\n            [\n                *queries_by_origin.get("exact_path", []),\n                *queries_by_origin.get("exact_anchor", []),\n            ],\n            [[*authoritative_chunks, *chunks]],\n            queries_by_origin.get("host_lookup", []),\n            [\n                *queries_by_origin.get("canonical_intent", []),\n                *queries_by_origin.get("concept_alias", []),\n                *queries_by_origin.get("retrieval_hint", []),\n            ],\n        ])\n'''
+          new = '''        queries_by_origin: dict[str, list[list[Any]]] = {}\n        audited_rewrite_lanes: list[list[Any]] = []\n        for item in documentation_query_plan.queries:\n            lane = supplemental_chunks_by_query.get(item.text)\n            if not lane:\n                continue\n            if item.relation == "audited_rewrite":\n                audited_rewrite_lanes.append(lane)\n            else:\n                queries_by_origin.setdefault(item.origin, []).append(lane)\n        candidates = select_context_candidates([\n            [*queries_by_origin.get("exact_path", []), *queries_by_origin.get("exact_anchor", [])],\n            [[*authoritative_chunks, *chunks]],\n            queries_by_origin.get("host_lookup", []),\n            audited_rewrite_lanes,\n            [*queries_by_origin.get("canonical_intent", []), *queries_by_origin.get("concept_alias", []), *queries_by_origin.get("retrieval_hint", [])],\n        ])\n'''
+          assert text.count(old) == 1
+          service.write_text(text.replace(old, new, 1))
+
+          ranking = Path('docmancer/docs/domain/project_doc_ranking.py')
+          text = ranking.read_text()
+          old = '''def rerank_project_doc_chunks(\n    chunks: list[Any], *, question: str, intent: Any, limit: int | None = None,\n    broad_max_per_source: int = 2, narrow_max_per_source: int = 4,\n    lifecycle_intent_value: str | None = None,\n) -> list[Any]:\n'''
+          new = '''def rerank_project_doc_chunks(\n    chunks: list[Any], *, question: str, intent: Any, limit: int | None = None,\n    broad_max_per_source: int = 2, narrow_max_per_source: int = 4,\n    lifecycle_intent_value: str | None = None,\n    public_query_ids: tuple[str, ...] = (),\n) -> list[Any]:\n'''
+          assert text.count(old) == 1
+          text = text.replace(old, new, 1)
+          old = '''    public_queries_by_id: dict[int, set[str]] = {}\n    exact_anchors = {\n'''
+          new = '''    public_queries_by_id: dict[int, set[str]] = {}\n    explicit_public_query_ids = {str(value) for value in public_query_ids if value}\n    exact_anchors = {\n'''
+          assert text.count(old) == 1
+          text = text.replace(old, new, 1)
+          old = '''        public_queries_by_id[id(chunk)] = {\n            query_id for query_id in qualified_query_ids\n            if query_matches[query_id].get("query_origin") in {\n                "original", "host_lookup", "exact_anchor", "exact_path",\n            }\n        } if not exact_path_anchor else set()\n'''
+          new = '''        if exact_path_anchor:\n            public_queries_by_id[id(chunk)] = set()\n        elif explicit_public_query_ids:\n            # A derived parent trace keeps the internal rewrite's origin. The\n            # immutable query plan, not that child origin, defines public IDs.\n            public_queries_by_id[id(chunk)] = qualified_query_ids & explicit_public_query_ids\n        else:\n            public_queries_by_id[id(chunk)] = {\n                query_id for query_id in qualified_query_ids\n                if query_matches[query_id].get("query_origin") in {\n                    "original", "host_lookup", "exact_anchor", "exact_path",\n                }\n            }\n'''
+          assert text.count(old) == 1
+          ranking.write_text(text.replace(old, new, 1))
+
+          context_service = Path('docmancer/docs/application/_project_context_service_part01.py')
+          text = context_service.read_text()
+          old = '''                        broad_max_per_source=4 if evidence_path else 2,\n                        lifecycle_intent_value=canonical_requirements.lifecycle_intent,\n                    ),\n'''
+          new = '''                        broad_max_per_source=4 if evidence_path else 2,\n                        lifecycle_intent_value=canonical_requirements.lifecycle_intent,\n                        public_query_ids=documentation_query_plan.public_query_ids,\n                    ),\n'''
+          assert text.count(old) == 1
+          context_service.write_text(text.replace(old, new, 1))
           PY
+          python -m compileall -q \
+            docmancer/docs/domain/documentation_query_plan.py \
+            docmancer/docs/domain/project_retrieval_intent.py \
+            docmancer/docs/domain/project_doc_ranking.py \
+            docmancer/docs/application/_project_docs_service_part03.py \
+            docmancer/docs/application/_project_context_service_part01.py
+          git diff --check
 
+      - name: Verify RED cases and safety are GREEN
+        shell: bash
+        run: |
+          set -euo pipefail
+          pytest -q \
+            tests/docs/test_context_projection_boundaries.py::test_reranker_uses_explicit_public_ids_for_derived_parent_coverage \
+            tests/docs/test_context_projection_boundaries.py::test_audited_host_flow_rewrites_are_parent_bound_and_non_public \
+            tests/docs/test_context_projection_boundaries.py::test_audited_host_flow_rewrites_fail_closed_on_negation_and_temporal_wording \
+            tests/docs/test_context_projection_boundaries.py::test_frozen_architecture_keeps_all_module_boundaries_visible \
+            tests/docs/test_context_projection_boundaries.py::test_frozen_request_flow_prefers_project_context_module_witnesses
+
+      - name: Verify neighboring contracts and adversarial
+        shell: bash
+        run: |
+          set -euo pipefail
+          pytest -q \
+            tests/docs/test_context_projection_boundaries.py \
+            tests/docs/test_project_doc_ranking.py \
+            tests/docs/test_context7_style_project_chat.py \
+            tests/docs/test_generic_context_workflows.py \
+            tests/docs/test_project_docs_catalog.py \
+            tests/docs/test_question_plan_v4.py \
+            tests/docs/test_project_context_quality.py \
+            tests/test_docs_service_part03.py
+          python scripts/run_agent_developer_adversarial_gate.py
+
+      - name: Verify frozen positive lanes
+        shell: bash
+        run: |
+          set -euo pipefail
           python - <<'PY'
           import json
-          from unittest.mock import patch
-          from docmancer.docs.application import _project_docs_service_part03 as service
-          from docmancer.docs.domain.lifecycle_policy import lifecycle_allows
-          from eval.project_context_quality_v2_protocol import load_cases,evaluate_case
-          from scripts.run_project_docs_self_host_gate import LiveCase,run
-
-          allocated=[]
-          original_select=service.select_context_candidates
-          def observe(groups):
-              rows=original_select(groups)
-              allocated.extend(rows)
-              return rows
-
-          case=next(c for c in load_cases() if c['id']=='v2-natural-request-flow')
-          with patch.object(service,'select_context_candidates',observe):
-              result=run(cases=(LiveCase(case_id=case['id'],question=case['question'],relevant_paths=(),lookup_queries=tuple(case['lookup_queries']),scope=case['scope']),),negative_cases=())
-          payload=result['results'][0]['payload']; verdict=evaluate_case(case,payload)
-
-          selected=[]; seen=set(); token_total=0; events=[]
-          for pos,chunk in enumerate(allocated, start=1):
-              meta=dict(chunk.metadata or {}); key=(chunk.source,chunk.chunk_index)
-              heading=meta.get('heading_path') or meta.get('title')
-              qids=list(meta.get('retrieval_query_ids') or ())
-              interesting=(meta.get('project_doc_path')=='docs/modules/project-context-retrieval.md' and any(name in str(heading) for name in ('Public boundary','Application orchestration','Infrastructure port','Domain vocabulary')))
-              reason='selected'
-              if not lifecycle_allows(meta,'current'):
-                  reason='lifecycle'
-              elif key in seen:
-                  reason='duplicate'
-              elif len(selected)>=20:
-                  reason='limit'
-              else:
-                  tok=int(meta.get('token_estimate') or 0)
-                  if token_total+tok>4000:
-                      reason='budget'
-                  else:
-                      selected.append(chunk); seen.add(key); token_total+=tok
-              if interesting or any(qid.startswith('query-lookup-1-rewrite') or qid.startswith('query-lookup-3-rewrite') for qid in qids):
-                  events.append({'position':pos,'reason':reason,'source':chunk.source,'chunk_index':chunk.chunk_index,'stable_chunk_id':meta.get('stable_chunk_id'),'heading':heading,'qids':qids,'token_estimate':meta.get('token_estimate'),'token_total_after':token_total,'score':chunk.score,'text':chunk.text})
-          print('PACKING_EVENTS='+json.dumps(events,ensure_ascii=False,sort_keys=True))
-          print('PACKING_SUMMARY='+json.dumps({'allocated_count':len(allocated),'sim_selected_count':len(selected),'sim_token_total':token_total,'public_sources':payload.get('sources') or [],'covered':payload.get('covered_query_ids') or [],'missing':payload.get('missing_query_ids') or [],'obligations':[{ 'id':o['id'],'met':o['met']} for o in verdict['obligations']]},ensure_ascii=False,sort_keys=True))
+          from eval.project_context_quality_v2_protocol import load_cases, evaluate_case
+          from scripts.run_project_docs_self_host_gate import LiveCase, run
+          output = {}
+          for lane in ('natural', 'exposed_paraphrases'):
+              cases = tuple(case for case in load_cases(lane) if case.get('case_type', 'positive' if case.get('expected_kind') == 'docs_context' else 'strict_negative') == 'positive')
+              result = run(cases=tuple(LiveCase(case_id=case['id'], question=case['question'], relevant_paths=(), lookup_queries=tuple(case['lookup_queries']), scope=case['scope']) for case in cases), negative_cases=())
+              rows = []
+              for case, observed in zip(cases, result['results'], strict=True):
+                  verdict = evaluate_case(case, observed['payload'])
+                  rows.append({'id': case['id'], 'semantic_useful': verdict['semantic_useful'], 'false_full': verdict['false_full_coverage'], 'missing': [item['id'] for item in verdict['obligations'] if not item['met']]})
+              output[lane] = {'useful': sum(row['semantic_useful'] for row in rows), 'total': len(rows), 'false_full': sum(row['false_full'] for row in rows), 'rows': rows}
+          print('FROZEN_V2=' + json.dumps(output, ensure_ascii=False, sort_keys=True))
+          natural = {row['id']: row for row in output['natural']['rows']}
+          assert natural['v2-natural-architecture']['semantic_useful'] is True
+          assert natural['v2-natural-request-flow']['semantic_useful'] is True
+          assert output['natural']['false_full'] == 0 and output['exposed_paraphrases']['false_full'] == 0
           PY
+
+      - name: Verify full repository suite
+        shell: bash
+        run: |
+          set -euo pipefail
+          pytest -q
+          python -m compileall -q docmancer tests scripts eval
+          git diff --check
+
+      - name: Publish only after full green
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm .github/workflows/pr178-arch-flow-tdd.yml
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git diff --cached --check
+          git commit -m "fix: preserve explicit public lookup diversity"
+          git push origin HEAD:fix/context-first-project-reads
