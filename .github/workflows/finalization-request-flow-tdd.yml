@@ -1,4 +1,4 @@
-name: Finalization request flow aggregate trace
+name: Finalization request flow projection trace
 
 on:
   push:
@@ -28,40 +28,42 @@ jobs:
           python-version: '3.12'
       - run: python -m pip install -e ".[dev]"
       - run: python .github/scripts/finalization_request_flow_patch.py
-      - name: Trace aggregate candidate order
+      - name: Trace projection diagnostics
         shell: bash
         run: |
           python - <<'PY'
           import json
+          from copy import deepcopy
           from unittest.mock import patch
-          import docmancer.docs.application._project_docs_service_part03 as p3
-          from eval.project_context_quality_v2_protocol import load_cases
+          from docmancer.docs.interfaces.mcp import context_tools
+          from eval.project_context_quality_v2_protocol import load_cases, evaluate_case
           from scripts.run_project_docs_self_host_gate import LiveCase, run
 
-          original_select = p3.select_context_candidates
-          traces = []
-          def row(c):
-              md = c.metadata or {}
-              return {
-                  'path': md.get('project_doc_path') or c.source,
-                  'chunk_index': c.chunk_index,
-                  'stable_chunk_id': md.get('stable_chunk_id'),
-                  'heading_path': md.get('heading_path'),
-                  'tokens': md.get('token_estimate'),
-                  'ids': list(md.get('retrieval_query_ids') or ()),
-              }
-          class TraceList(list):
-              def sort(self, *args, **kwargs):
-                  super().sort(*args, **kwargs)
-                  traces.append({'after_sort': [row(c) for c in self[:30]]})
-          def observe(groups):
-              value = TraceList(original_select(groups))
-              traces.append({'before_sort': [row(c) for c in value[:30]]})
-              return value
+          captured = []
+          original = context_tools.project_docs_context
+          def observe(**kwargs):
+              result = original(**kwargs)
+              captured.append({
+                  'retrieval': deepcopy(kwargs.get('retrieval') or {}),
+                  'projection': deepcopy(result[0]),
+              })
+              return result
           case = next(c for c in load_cases() if c['id'] == 'v2-natural-request-flow')
-          with patch.object(p3, 'select_context_candidates', observe):
-              result = run(cases=(LiveCase(case_id=case['id'], question=case['question'], relevant_paths=(), lookup_queries=tuple(case['lookup_queries']), scope=case['scope']),), negative_cases=())
-          print('AGGREGATE=' + json.dumps(traces, ensure_ascii=False, sort_keys=True))
+          with patch.object(context_tools, 'project_docs_context', observe):
+              result = run(cases=(LiveCase(
+                  case_id=case['id'], question=case['question'], relevant_paths=(),
+                  lookup_queries=tuple(case['lookup_queries']), scope=case['scope'],
+              ),), negative_cases=())
           payload = result['results'][0]['payload']
-          print('PUBLIC=' + json.dumps({'covered': payload.get('covered_query_ids'), 'sources': [{'path': s.get('path_or_url'), 'section': s.get('section')} for s in payload.get('sources') or []]}, ensure_ascii=False, sort_keys=True))
+          verdict = evaluate_case(case, payload)
+          retrieval = captured[-1]['retrieval']
+          diag = ((retrieval.get('retrieval_diagnostics') or {}).get('docs_context_projection') or {})
+          print('DIAG=' + json.dumps(diag, ensure_ascii=False, sort_keys=True))
+          print('PUBLIC=' + json.dumps({
+              'estimated_tokens': payload.get('estimated_tokens'),
+              'covered': payload.get('covered_query_ids') or [],
+              'missing': payload.get('missing_query_ids') or [],
+              'sources': [{'path': s.get('path_or_url'), 'section': s.get('section'), 'snippet': s.get('snippet')} for s in payload.get('sources') or []],
+              'obligations': verdict['obligations'],
+          }, ensure_ascii=False, sort_keys=True))
           PY
