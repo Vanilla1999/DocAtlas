@@ -115,3 +115,35 @@ new = '''        # Parent coverage derived from an audited internal rewrite is s
 '''
 assert ranking_text.count(old) == 1
 ranking.write_text(ranking_text.replace(old, new, 1), encoding="utf-8")
+
+service = Path("docmancer/docs/application/_project_context_service_part01.py")
+service_text = service.read_text(encoding="utf-8")
+old = '''                    project_docs,
+                    results=rerank_project_doc_chunks(
+                        project_docs.results,
+                        question=question,
+                        intent=intent,
+                        limit=limit,
+                        broad_max_per_source=4 if evidence_path else 2,
+                        lifecycle_intent_value=canonical_requirements.lifecycle_intent,
+                    ),
+                )
+'''
+new = '''                    project_docs,
+                    results=rerank_project_doc_chunks(
+                        project_docs.results,
+                        question=question,
+                        intent=intent,
+                        # Preserve one bounded pre-projection opportunity for
+                        # each public host lookup. Final model-visible output
+                        # remains constrained by the downstream 3-source/800-token
+                        # projection boundary.
+                        limit=max(limit or 4, min(candidate_limit, len(lookup_queries) + 2))
+                        if lookup_queries else limit,
+                        broad_max_per_source=4 if evidence_path else 2,
+                        lifecycle_intent_value=canonical_requirements.lifecycle_intent,
+                    ),
+                )
+'''
+assert service_text.count(old) == 1
+service.write_text(service_text.replace(old, new, 1), encoding="utf-8")
