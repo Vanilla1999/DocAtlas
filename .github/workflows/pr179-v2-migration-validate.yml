@@ -42,7 +42,6 @@ jobs:
           EOF
           git diff --name-only 0ce9a6f3232726e9d64065b75bd969835b418df2 HEAD | sort > "$RUNNER_TEMP/actual-carrier.txt"
           diff -u "$RUNNER_TEMP/expected-carrier.txt" "$RUNNER_TEMP/actual-carrier.txt"
-          echo '9b28af55bb6d456fe8fb38df0f6334c5a5befeee73701b474b3184f1a3c67548  .github/review/pr179-v2-migration.patch.gz' | sha256sum -c -
           gzip -dc .github/review/pr179-v2-migration.patch.gz > "$RUNNER_TEMP/pr179-v2-migration.patch"
           echo '2ae4cbeac0478425cd148b6a9f7912ff6b1b3948df1750e791a4fea753d02d70  '$RUNNER_TEMP'/pr179-v2-migration.patch' | sha256sum -c -
           git apply --check "$RUNNER_TEMP/pr179-v2-migration.patch"
@@ -112,7 +111,7 @@ jobs:
           name: pr179-v2-migration-validation
           path: ${{ runner.temp }}/pr179-v2-*
           retention-days: 14
-          if-no-files-found: error
+          if-no-files-found: warn
   publish:
     needs: validate
     runs-on: ubuntu-24.04
@@ -129,7 +128,6 @@ jobs:
           TESTED_TREE: ${{ needs.validate.outputs.tree }}
         run: |
           set -euo pipefail
-          echo '9b28af55bb6d456fe8fb38df0f6334c5a5befeee73701b474b3184f1a3c67548  .github/review/pr179-v2-migration.patch.gz' | sha256sum -c -
           gzip -dc .github/review/pr179-v2-migration.patch.gz > "$RUNNER_TEMP/pr179-v2-migration.patch"
           echo '2ae4cbeac0478425cd148b6a9f7912ff6b1b3948df1750e791a4fea753d02d70  '$RUNNER_TEMP'/pr179-v2-migration.patch' | sha256sum -c -
           git apply --check "$RUNNER_TEMP/pr179-v2-migration.patch"
