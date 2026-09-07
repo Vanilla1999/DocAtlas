@@ -1,5 +1,6 @@
 from pathlib import Path
 
+# 1) Add conservative audited rewrites for the documented request-flow shape.
 path = Path("docmancer/docs/domain/documentation_query_plan.py")
 text = path.read_text(encoding="utf-8")
 marker = "\n\ndef build_documentation_query_plan(\n"
@@ -45,7 +46,6 @@ def _audited_host_lookup_rewrites(
     return tuple(dict.fromkeys(rows))[:2]
 '''
 text = text.replace(marker, helper + marker, 1)
-
 old = '''    for index, text in enumerate(lookup_queries[:5], start=1):
         cleaned = text.strip()
         if not cleaned:
@@ -94,74 +94,83 @@ new = '''    host_rows: list[tuple[str, str]] = []
 assert text.count(old) == 1
 path.write_text(text.replace(old, new, 1), encoding="utf-8")
 
-service = Path("docmancer/docs/application/_project_docs_service_part03.py")
-service_text = service.read_text(encoding="utf-8")
-old = '''        queries_by_origin: dict[str, list[list[Any]]] = {}
-        for item in documentation_query_plan.queries:
-            lane = supplemental_chunks_by_query.get(item.text)
-            if lane:
-                queries_by_origin.setdefault(item.origin, []).append(lane)
-        candidates = select_context_candidates([
-            [
-                *queries_by_origin.get("exact_path", []),
-                *queries_by_origin.get("exact_anchor", []),
-            ],
-            [[*authoritative_chunks, *chunks]],
-            queries_by_origin.get("host_lookup", []),
-            [
-                *queries_by_origin.get("canonical_intent", []),
-                *queries_by_origin.get("concept_alias", []),
-                *queries_by_origin.get("retrieval_hint", []),
-            ],
-        ])
-        candidates.sort(
-            key=lambda chunk: not bool(
-                (chunk.metadata or {}).get("retrieval_query_ids")
-            )
-        )
+# 2) Derived parent coverage lives under a stable public query ID even though
+# its witness trace retains internal audited-rewrite origin metadata.
+ranking = Path("docmancer/docs/domain/project_doc_ranking.py")
+text = ranking.read_text(encoding="utf-8")
+old = '''        public_queries_by_id[id(chunk)] = {
+            query_id for query_id in qualified_query_ids
+            if query_matches[query_id].get("query_origin") in {
+                "original", "host_lookup", "exact_anchor", "exact_path",
+            }
+        } if not exact_path_anchor else set()
 '''
-new = '''        queries_by_origin: dict[str, list[list[Any]]] = {}
-        audited_parent_lanes: list[list[Any]] = []
-        generic_canonical_lanes: list[list[Any]] = []
-        for item in documentation_query_plan.queries:
-            lane = supplemental_chunks_by_query.get(item.text)
-            if not lane:
-                continue
-            queries_by_origin.setdefault(item.origin, []).append(lane)
-            if item.origin == "canonical_intent":
-                if item.relation == "audited_rewrite" and item.public_parent_query_id:
-                    audited_parent_lanes.append(lane)
-                else:
-                    generic_canonical_lanes.append(lane)
-        candidates = select_context_candidates([
-            [
-                *queries_by_origin.get("exact_path", []),
-                *queries_by_origin.get("exact_anchor", []),
-            ],
-            [[*authoritative_chunks, *chunks]],
-            audited_parent_lanes,
-            queries_by_origin.get("host_lookup", []),
-            [
-                *generic_canonical_lanes,
-                *queries_by_origin.get("concept_alias", []),
-                *queries_by_origin.get("retrieval_hint", []),
-            ],
-        ])
-        # Audited rewrites are the only generated queries allowed to derive
-        # coverage for a public parent. Their compact top witness must survive
-        # aggregate admission before noisy recall-only lanes spend the same
-        # bounded candidate budget. This changes admission order only; it does
-        # not increase the internal budget or the public 3-source/800-token cap.
-        audited_seed_ids = {
-            str((lane[0].metadata or {}).get("stable_chunk_id") or "")
-            for lane in audited_parent_lanes if lane
-        }
-        candidates.sort(
-            key=lambda chunk: (
-                str((chunk.metadata or {}).get("stable_chunk_id") or "") not in audited_seed_ids,
-                not bool((chunk.metadata or {}).get("retrieval_query_ids")),
-            )
-        )
+new = '''        public_queries_by_id[id(chunk)] = {
+            query_id for query_id in qualified_query_ids
+            if query_id == "query-original"
+            or query_id.startswith(("query-lookup-", "query-anchor-", "query-path-"))
+        } if not exact_path_anchor else set()
 '''
-assert service_text.count(old) == 1
-service.write_text(service_text.replace(old, new, 1), encoding="utf-8")
+assert text.count(old) == 1
+ranking.write_text(text.replace(old, new, 1), encoding="utf-8")
+
+# 3) For compound host reads, selection must spend scarce visible capacity on
+# distinct host directions (including audited sub-directions) before an exact
+# anchor that does not close another requested lookup.
+projection = Path("docmancer/docs/application/docs_context_projection.py")
+text = projection.read_text(encoding="utf-8")
+old = '''    canonical_intent_query_ids = _query_ids_for_origins(
+        query_plan, {"canonical_intent"},
+    )
+    eligible_query_ids = public_query_id_set | canonical_intent_query_ids
+'''
+new = '''    canonical_intent_query_ids = _query_ids_for_origins(
+        query_plan, {"canonical_intent"},
+    )
+    audited_rewrite_query_ids = {
+        str(item.get("query_id") or "")
+        for item in query_plan.get("queries") or ()
+        if isinstance(item, dict)
+        and item.get("relation") == "audited_rewrite"
+        and str(item.get("public_parent_query_id") or "") in host_query_ids
+        and item.get("query_id")
+    }
+    compound_priority_query_ids = (
+        host_query_ids | audited_rewrite_query_ids
+        if len(host_query_ids) > 1 else public_query_id_set
+    )
+    eligible_query_ids = public_query_id_set | canonical_intent_query_ids
+'''
+assert text.count(old) == 1
+text = text.replace(old, new, 1)
+old = '''        candidates, query_text=query_text,
+        required_query_ids=public_query_id_set,
+        canonical_query_ids=canonical_intent_query_ids,
+'''
+new = '''        candidates, query_text=query_text,
+        required_query_ids=compound_priority_query_ids,
+        canonical_query_ids=canonical_intent_query_ids,
+'''
+assert text.count(old) == 1
+text = text.replace(old, new, 1)
+old = '''        prepared = _facet_aware_candidates(
+            prepared, query_text=query_text,
+            required_query_ids=public_query_id_set - (qualified_query_ids(sources) if len(host_query_ids) > 1 else selected_public_ids),
+            canonical_query_ids=canonical_intent_query_ids - selected_canonical_ids,
+            exact_query_ids=exact_anchor_query_ids - selected_public_ids,
+'''
+new = '''        missing_compound_priority_ids = (
+            compound_priority_query_ids - qualified_query_ids(sources)
+        )
+        prepared = _facet_aware_candidates(
+            prepared, query_text=query_text,
+            required_query_ids=missing_compound_priority_ids,
+            canonical_query_ids=canonical_intent_query_ids - selected_canonical_ids,
+            exact_query_ids=(
+                set()
+                if len(host_query_ids) > 1 and missing_compound_priority_ids
+                else exact_anchor_query_ids - selected_public_ids
+            ),
+'''
+assert text.count(old) == 1
+projection.write_text(text.replace(old, new, 1), encoding="utf-8")
