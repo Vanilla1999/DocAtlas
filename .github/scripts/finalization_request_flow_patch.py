@@ -94,8 +94,9 @@ new = '''    host_rows: list[tuple[str, str]] = []
 assert text.count(old) == 1
 path.write_text(text.replace(old, new, 1), encoding="utf-8")
 
-# 2) Derived parent coverage lives under a stable public query ID even though
-# its witness trace retains internal audited-rewrite origin metadata.
+# 2) Outer reranking must preserve two different audited sub-directions that
+# may share the same public parent lookup. Internal directions affect selection
+# only; public covered_query_ids remain unchanged.
 ranking = Path("docmancer/docs/domain/project_doc_ranking.py")
 text = ranking.read_text(encoding="utf-8")
 old = '''        public_queries_by_id[id(chunk)] = {
@@ -109,12 +110,16 @@ new = '''        public_queries_by_id[id(chunk)] = {
             query_id for query_id in qualified_query_ids
             if query_id == "query-original"
             or query_id.startswith(("query-lookup-", "query-anchor-", "query-path-"))
+            or (
+                query_matches[query_id].get("relation") == "audited_rewrite"
+                and str(query_matches[query_id].get("public_parent_query_id") or "").startswith("query-lookup-")
+            )
         } if not exact_path_anchor else set()
 '''
 assert text.count(old) == 1
 ranking.write_text(text.replace(old, new, 1), encoding="utf-8")
 
-# 3) For compound host reads, selection must spend scarce visible capacity on
+# 3) For compound host reads, projection spends scarce visible capacity on
 # distinct host directions (including audited sub-directions) before an exact
 # anchor that does not close another requested lookup.
 projection = Path("docmancer/docs/application/docs_context_projection.py")
