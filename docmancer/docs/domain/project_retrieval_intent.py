@@ -53,7 +53,7 @@ _INTENT_ROLE_POLICY: dict[str, tuple[tuple[str, ...], tuple[str, ...]]] = {
     "docs_mcp_server_command": (("api_contract", "runbook"), ("adr", "roadmap")),
     "project_docs_sync": (("runbook", "development"), ("roadmap",)),
     "project_docs_configuration": (("runbook", "development", "api_contract"), ("roadmap",)),
-    "project_architecture": (("project_architecture", "overview"), ("roadmap",)),
+    "project_architecture": (("project_architecture", "module_architecture", "overview"), ("roadmap",)),
     "retrieval_pipeline": (("project_architecture", "api_contract"), ("roadmap",)),
     "project_storage": (("project_architecture", "module_architecture"), ("roadmap",)),
     "index_chunking": (("project_architecture", "module_architecture"), ("roadmap",)),
@@ -414,6 +414,7 @@ def build_project_retrieval_aliases(
             "project_architecture",
             True,
             f"{product_prefix}project architecture overview components indexing retrieval storage",
+            f"{product_prefix}SQLite persistence candidate generation metadata evidence qualification",
         )
 
     # Conservative RU fallback for unanticipated wording. At least two
