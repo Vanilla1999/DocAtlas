@@ -32,13 +32,13 @@ jobs:
         run: python .github/scripts/finalization_request_flow_patch.py
       - name: Static checks
         run: |
-          python -m compileall -q docmancer/docs/domain/documentation_query_plan.py docmancer/docs/domain/project_doc_ranking.py docmancer/docs/application/_project_context_service_part01.py
+          python -m compileall -q docmancer/docs/domain/documentation_query_plan.py docmancer/docs/application/_project_docs_service_part03.py
           git diff --check
       - name: Request-flow lineage tests
         run: pytest -q tests/docs/test_request_flow_lineage.py
-      - name: Ranking and neighboring contracts
+      - name: Neighboring retrieval contracts
         run: |
-          pytest -q tests/docs/test_project_doc_ranking.py tests/docs/test_context_projection_boundaries.py tests/docs/test_context7_style_project_chat.py tests/test_docs_service_part03.py tests/docs/test_project_context_service.py
+          pytest -q tests/docs/test_context_projection_boundaries.py tests/docs/test_context7_style_project_chat.py tests/test_docs_service_part03.py tests/docs/test_project_context_service.py
           python scripts/run_agent_developer_adversarial_gate.py
       - name: Publish request-flow slice
         run: |
@@ -46,7 +46,7 @@ jobs:
           rm .github/scripts/finalization_request_flow_patch.py
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add docmancer/docs/domain/documentation_query_plan.py docmancer/docs/domain/project_doc_ranking.py docmancer/docs/application/_project_context_service_part01.py .github/workflows/finalization-request-flow-tdd.yml .github/scripts/finalization_request_flow_patch.py
+          git add docmancer/docs/domain/documentation_query_plan.py docmancer/docs/application/_project_docs_service_part03.py .github/workflows/finalization-request-flow-tdd.yml .github/scripts/finalization_request_flow_patch.py
           git diff --cached --check
           git commit -m "fix: preserve public request flow coverage"
           git push origin HEAD:fix/context-first-project-reads-finalization
