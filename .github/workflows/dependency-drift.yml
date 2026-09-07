@@ -114,7 +114,7 @@ jobs:
           python -m pip install "uv==$UV_VERSION"
           uv sync --locked --extra dev --python "3.12"
           uv run --locked --extra dev pytest tests/ -m advanced -v
-          uv run --locked --extra dev python scripts/run_legacy_contract_gate.py
+          uv run --locked --extra dev python eval/project_context_quality_protocol.py
           uv run --locked --extra dev python scripts/run_project_docs_self_host_gate.py
           uv run --locked --extra dev python scripts/run_question_surface_gate.py
           uv run --locked --extra dev python scripts/run_agent_developer_gate.py

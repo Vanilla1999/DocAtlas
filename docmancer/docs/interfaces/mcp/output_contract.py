@@ -19,6 +19,16 @@ _SUMMARY_KEYS = (
     "score",
     "ranking",
 )
+_SUPPORT_DECISION_KEYS = {
+    "status", "tool", "schema_version", "kind", "answer_supported", "answer_available",
+    "support_status", "decision", "reason_code", "edit_ready", "operational",
+    "operational_status", "context_available", "disposition", "missing",
+    "missing_requirement_ids", "satisfied_requirement_ids", "mandatory_requirement_ids",
+    "mandatory_coverage", "evidence_coverage", "selected_evidence_ids", "requirements_hash",
+    "selector_config_hash", "eligibility_contract_hash", "candidate_trace_hash", "selection_hash",
+    "assignment_hash", "decision_hash", "hard_stop", "next_action", "next_actions",
+    "arguments_patch", "requires_confirmation", "confirmation_reason", "document_content_policy",
+}
 def json_bytes(payload: Any) -> int:
     return len(json.dumps(payload, ensure_ascii=False, default=str).encode("utf-8"))
 
@@ -126,7 +136,13 @@ def _fit_payload(payload: dict[str, Any], *, max_bytes: int) -> dict[str, Any]:
     if json_bytes(compact) <= max_bytes:
         return compact
     keep_keys = {
-        "status", "tool", "schema_version", "answer_available", "answer_type", "answer_completeness",
+        "status", "tool", "schema_version", "kind", "answer_supported", "answer_available",
+        "support_status", "decision", "reason_code", "answer_type", "answer_completeness",
+        "edit_ready", "operational", "operational_status", "context_available", "disposition",
+        "missing", "missing_requirement_ids", "satisfied_requirement_ids", "mandatory_requirement_ids",
+        "mandatory_coverage", "evidence_coverage", "selected_evidence_ids", "requirements_hash",
+        "selector_config_hash", "eligibility_contract_hash", "candidate_trace_hash", "selection_hash",
+        "assignment_hash", "decision_hash", "hard_stop",
         "mode", "reason", "message", "response_style", "primary_snippet", "context_pack", "supporting_snippets",
         "next_actions", "next_action", "arguments_patch", "warnings", "mcp_compaction",
         "requires_confirmation", "confirmation_reason", "document_content_policy",
@@ -134,7 +150,21 @@ def _fit_payload(payload: dict[str, Any], *, max_bytes: int) -> dict[str, Any]:
     omitted = [key for key in compact if key not in keep_keys]
     compact = {key: value for key, value in compact.items() if key in keep_keys}
     compact["mcp_compaction"] = {**dict(compact.get("mcp_compaction") or {}), "hard_cap_enforced": True, "omitted_sections": omitted_sections, "omitted_fields": omitted[:40]}
-    return compact
+    if json_bytes(compact) <= max_bytes:
+        return compact
+    if "answer_supported" in payload:
+        minimal = {key: deepcopy(value) for key, value in payload.items() if key in _SUPPORT_DECISION_KEYS}
+        minimal["mcp_compaction"] = {
+            "hard_cap_enforced": True,
+            "omitted_fields": [key for key in payload if key not in _SUPPORT_DECISION_KEYS][:40],
+        }
+        if json_bytes(minimal) <= max_bytes:
+            return minimal
+    return {
+        "status": "failed",
+        "reason_code": "transport_size_limit",
+        "message": "MCP payload exceeded the transport size limit.",
+    }
 
 
 def compact_mcp_payload(
@@ -185,8 +215,12 @@ def compact_mcp_payload(
     _append_warning(compact, _warning("mcp_compact_output_truncated", f"Compact MCP response was truncated to stay under {max_bytes} bytes."))
     compact = _fit_payload(compact, max_bytes=max_bytes)
     if isinstance(compact.get("mcp_compaction"), dict):
-        compact["mcp_compaction"]["returned_bytes"] = json_bytes(compact)
-    return compact
+        for _ in range(3):
+            returned_bytes = json_bytes(compact)
+            if compact["mcp_compaction"].get("returned_bytes") == returned_bytes:
+                break
+            compact["mcp_compaction"]["returned_bytes"] = returned_bytes
+    return _fit_payload(compact, max_bytes=max_bytes)
 
 
 def strip_debug_noise(payload: dict[str, Any]) -> dict[str, Any]:

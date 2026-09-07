@@ -20,8 +20,8 @@ from docmancer.docs.domain.technical_terms import (
     controlled_noun_forms,
     extract_technical_terms,
 )
-from docmancer.retrieval.contracts import canonical_hash
-from docmancer.retrieval.query_planning import extract_exact_terms
+from docmancer.docs.domain.canonical import canonical_hash
+from docmancer.docs.domain.query_terms import documentation_exact_terms as extract_exact_terms
 
 
 PROJECT_ANSWER_CONTRACT_SCHEMA = "project-answer-contract-v3"

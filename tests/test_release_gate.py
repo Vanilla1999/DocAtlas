@@ -13,6 +13,308 @@ from scripts import main_ruleset
 ROOT = Path(__file__).resolve().parents[1]
 
 
+@pytest.fixture
+def self_host_payload_runner(monkeypatch, tmp_path):
+    from types import SimpleNamespace
+    from unittest.mock import Mock
+
+    from scripts import run_project_docs_self_host_gate as gate
+    from docmancer.docs.interfaces.mcp import context_tools
+    from docmancer.docs.application.model_visible_projection import _snapshot_entry, _source_digest
+
+    text = "Docs provide grounded project documentation.\nPacks build code context bundles.\n"
+    (tmp_path / "wiki").mkdir()
+    (tmp_path / "wiki/Commands.md").write_text(text)
+    monkeypatch.setattr(gate, "REPO_ROOT", tmp_path)
+    monkeypatch.setattr(gate, "_historical_paths", lambda: set())
+    original = {"path": "wiki/Commands.md", "content": text}
+    source = {
+        "path_or_url": "wiki/Commands.md", "evidence_id": "e1",
+        "snippet": text.splitlines()[0], "content_sha256": _source_digest(original),
+        "retrieval_query_matches": {"query-original": {"qualified": True, "coverage_kind": "direct"}},
+    }
+    payload = {
+        "status": "ok", "kind": "docs_context", "context_status": "ready",
+        "answer_supported": False, "answer_available": False, "edit_ready": False,
+        "answer_policy": "cite_only", "facets": [], "sources": [{
+            key: value for key, value in source.items() if key != "retrieval_query_matches"
+        }],
+        "covered_query_ids": ["query-original"], "missing_query_ids": [],
+        "estimated_tokens": 1,
+    }
+    app = SimpleNamespace(
+        get_docs_context=Mock(return_value=SimpleNamespace(context_pack=[{
+            **original, "retrieval_query_matches": source["retrieval_query_matches"],
+        }])),
+    )
+    service = SimpleNamespace(
+        sync_project_docs=Mock(return_value=SimpleNamespace(status="success")),
+        unified_context=app,
+        get_docs_context=Mock(side_effect=AssertionError("Do not replay the facade query")),
+    )
+    monkeypatch.setattr(gate, "LibraryDocsService", lambda **kwargs: service)
+    monkeypatch.setattr(gate, "LibraryRegistry", lambda *args: None)
+    monkeypatch.setattr(gate, "DocmancerAgent", lambda **kwargs: None)
+    monkeypatch.setattr(context_tools, "validate_model_visible_projection", lambda *args, **kwargs: [])
+
+    def run(
+        mutator=lambda value: None, *, question="How do Docs work?",
+        snapshot_mutator=lambda value: None, missing=False, negative=None,
+        expected_public_query_ids=(), lookup_queries=(), real_projection=False,
+        payload_transform=lambda value: value, expected_kind="docs_context",
+        preflight_transform=lambda value: value,
+    ):
+        app.get_docs_context.reset_mock()
+        retrieve = app.get_docs_context
+        select = gate.docs_context_projection.context_selection_decision
+        validate = context_tools.validate_model_visible_projection
+        value = copy.deepcopy(payload)
+        snapshot = {"e1": {
+            **_snapshot_entry(original, copy.deepcopy(payload["sources"][0])),
+            "qualification": copy.deepcopy(source),
+        }}
+        mutator(value)
+        snapshot_mutator(snapshot)
+        calls = 0
+
+        def dispatch(tool, arguments, instance):
+            nonlocal calls
+            calls += 1
+            if calls == 1:
+                return preflight_transform({"recommended_next_action": {"arguments_patch": {"action": "sync_project_docs"}}})
+            instance.unified_context.get_docs_context(arguments["question"], project_path=arguments["project_path"])
+            if arguments["question"] == "negative":
+                return negative
+            if missing and calls == 2:
+                return None
+            decision = gate.docs_context_projection.context_selection_decision(
+                [snapshot["e1"]["qualification"]], ["query-original"],
+            )
+            projected = gate.docs_context_projection._payload(
+                [snapshot["e1"]["qualification"]], decision=decision, query_plan={},
+            ) if real_projection else value
+            if real_projection:
+                snapshot["e1"]["projected_source"] = copy.deepcopy(projected["sources"][0])
+            context_tools.validate_model_visible_projection(projected, snapshot=snapshot, max_tokens=800)
+            return payload_transform(copy.deepcopy(projected))
+
+        monkeypatch.setattr(gate, "call_docs_tool_payload", dispatch)
+        case = gate.LiveCase(
+            question, ("wiki/Commands.md",), required_fragments=("grounded project documentation",),
+            expected_kind=expected_kind,
+            required_facts_by_path=(("wiki/Commands.md", "grounded project documentation"),),
+            expected_public_query_ids=expected_public_query_ids, lookup_queries=lookup_queries,
+        )
+        report = gate.run(cases=(case,) * 15, negative_cases=("negative",))
+        assert app.get_docs_context is retrieve
+        assert gate.docs_context_projection.context_selection_decision is select
+        assert context_tools.validate_model_visible_projection is validate
+        service.get_docs_context.assert_not_called()
+        return report, app
+
+    return run
+
+
+def _assert_self_host_payload_baseline(self_host_payload_runner):
+    report, _ = self_host_payload_runner(negative={"status": "insufficient_evidence"})
+    assert report["verdict"] == "PASS", report["errors"]
+
+
+_SELF_HOST_BAD_PAYLOADS = [
+    (lambda p: p["sources"][0].update(snippet="Docs provide context.", title="grounded project documentation"), "required_facts"),
+    (lambda p: p.update(sources=p["sources"] * 4), "context_contract"),
+    (lambda p: p.update(answer="x" * 4000), "context_contract"),
+    (lambda p: p.update(edit_ready=True), "context_contract"),
+    (lambda p: p.update(answer_available=True), "context_contract"),
+    (lambda p: p["sources"][0].update(evidence_id="forged"), "citation_integrity"),
+    (lambda p: p["sources"][0].update(content_sha256="a" * 64), "citation_integrity"),
+    (lambda p: p.update(facets=[{"evidence_ids": ["forged"]}]), "citation_integrity"),
+    (lambda p: p.update(covered_query_ids=["query-original", "query-internal-1"]), "public_query_inventory"),
+    (lambda p: p.update(missing_query_ids=["query-internal-1"]), "public_query_inventory"),
+    (lambda p: p.update(covered_query_ids=["query-original", "query-original"]), "public_query_inventory"),
+    (lambda p: p.update(missing_query_ids=["query-original"]), "public_query_inventory"),
+    (lambda p: p.update(covered_query_ids=[]), "public_query_inventory"),
+    (lambda p: p.update(answer_policy="answer_freely"), "context_contract"),
+]
+
+
+def _assert_self_host_rejects_bad_payloads(self_host_payload_runner, mutation, check):
+    report, _ = self_host_payload_runner(mutation, negative={"status": "insufficient_evidence"})
+    assert report["verdict"] == "FAIL"
+    assert report["results"][0]["checks"][check] is False
+
+
+def _assert_self_host_metadata_is_not_top1_fact(self_host_payload_runner):
+    report, _ = self_host_payload_runner(lambda p: p["sources"][0].update(
+        snippet="Docs provide context.", title="grounded project documentation",
+    ))
+    assert report["metrics"]["top1_fact_bearing_count"] == 0
+    assert report["metrics"]["useful_result_count"] == 0
+    report, _ = self_host_payload_runner(lambda p: p["sources"].insert(
+        0, {"snippet": "Docs provide grounded project documentation."},
+    ))
+    assert report["metrics"]["top1_fact_bearing_count"] == 0
+
+
+def _assert_self_host_measures_full_budgets(self_host_payload_runner):
+    report, _ = self_host_payload_runner(lambda p: p.update(sources=p["sources"] * 4, answer="x" * 4000))
+    assert report["metrics"]["max_source_count"] == 4
+    assert report["metrics"]["source_budget_violation_count"] == 15
+    assert report["metrics"]["max_estimated_tokens"] > 800
+    assert report["metrics"]["token_budget_violation_count"] == 15
+
+
+def _assert_self_host_packs_content_is_intent_scoped(self_host_payload_runner, question, expected):
+    snippet = "Docs provide grounded project documentation.\nPacks build code context bundles."
+
+    def snapshot_mutator(snapshot):
+        snapshot["e1"]["projected_source"]["snippet"] = snippet
+        snapshot["e1"]["qualification"]["snippet"] = snippet
+
+    report, _ = self_host_payload_runner(
+        lambda p: p["sources"][0].update(snippet=snippet), question=question,
+        snapshot_mutator=snapshot_mutator, negative={"status": "insufficient_evidence"},
+    )
+    assert report["metrics"]["packs_contamination_count"] == expected
+    assert report["verdict"] == ("FAIL" if expected else "PASS"), report["errors"]
+
+
+def _assert_self_host_missing_payload_preserves_case_partitions(self_host_payload_runner):
+    report, _ = self_host_payload_runner(missing=True)
+    assert report["case_count"] == 16
+    assert report["positive_case_count"] == 15
+    assert report["negative_case_count"] == 1
+    assert report["results"][0]["passed"] is False
+    assert any("failed negative cases" in error for error in report["errors"])
+
+
+def _assert_self_host_negative_cannot_authorize(self_host_payload_runner, flag):
+    report, _ = self_host_payload_runner(negative={"status": "insufficient_evidence", flag: True})
+    assert report["verdict"] == "FAIL"
+    assert report["results"][-1]["passed"] is False
+
+
+def _assert_self_host_attribution_uses_same_call_qualified_snapshot(self_host_payload_runner, kinds):
+    def change(snapshot):
+        snapshot["e1"]["qualification"]["retrieval_query_matches"]["query-original"] = {
+            "qualified": bool(kinds), "coverage_kinds": list(kinds),
+            "coverage_kind": kinds[0] if kinds else "direct",
+        }
+
+    report, service = self_host_payload_runner(snapshot_mutator=change)
+    assert service.get_docs_context.call_count == 16
+    assert report["results"][0]["observed"]["coverage_attribution"] == sorted(kinds)
+    assert report["metrics"]["direct_only_coverage_count"] == (15 if kinds == ("direct",) else 0)
+    assert report["metrics"]["derived_only_coverage_count"] == (15 if kinds == ("derived",) else 0)
+    assert report["metrics"]["both_coverage_count"] == (15 if len(kinds) == 2 else 0)
+
+
+def _assert_self_host_attribution_rejects_same_path_different_identity(self_host_payload_runner):
+    report, _ = self_host_payload_runner(lambda p: p["sources"][0].update(evidence_id="other"))
+    assert report["results"][0]["observed"]["coverage_attribution"] == []
+
+
+def _assert_self_host_token_boundary(self_host_payload_runner):
+    from docmancer.docs.application.model_visible_projection import estimate_projection_tokens
+
+    def resize(payload, target):
+        payload.pop("estimated_tokens")
+        payload["padding"] = ""
+        payload["padding"] = "x" * (4 * (target - estimate_projection_tokens(payload)))
+        assert estimate_projection_tokens(payload) == target
+
+    for target in (800, 801):
+        report, _ = self_host_payload_runner(
+            lambda payload: resize(payload, target), negative={"status": "insufficient_evidence"},
+        )
+        assert report["metrics"]["max_estimated_tokens"] == target
+        assert report["metrics"]["token_budget_violation_count"] == (15 if target > 800 else 0)
+        assert report["verdict"] == ("FAIL" if target > 800 else "PASS")
+
+
+def _assert_self_host_expected_public_inventory(self_host_payload_runner):
+    for expected in (("query-original", "query-lookup-1"), ()):
+        report, _ = self_host_payload_runner(
+            lambda payload: payload.update(missing_query_ids=["query-lookup-1"]),
+            expected_public_query_ids=expected, lookup_queries=("Docs retrieval",),
+            negative={"status": "insufficient_evidence"},
+        )
+        assert report["verdict"] == "PASS", report["errors"]
+
+
+def _assert_self_host_attribution_rejects_changed_snapshot(self_host_payload_runner):
+    for field, value in (("snippet", "Other text"), ("evidence_id", "other"), ("content_sha256", "a" * 64)):
+        report, _ = self_host_payload_runner(snapshot_mutator=lambda snapshot: snapshot["e1"]["qualification"].update({field: value}))
+        assert report["results"][0]["observed"]["coverage_attribution"] == []
+
+
+def _assert_self_host_private_qualification_projection(self_host_payload_runner):
+    def qualify(snapshot):
+        source = snapshot["e1"]["qualification"]
+        source.update({
+            "_qualification_candidate": {"content": source["snippet"], "path": source["path_or_url"]},
+            "_expected_project_identity": "project-test",
+            "_lifecycle_intent": "active",
+            "catalog_role": "commands",
+            "retrieval_query_ids": ["query-original"],
+            "_assigned_requirement_ids": [],
+        })
+        source["retrieval_query_matches"]["query-original"].update(
+            coverage_kinds=["direct", "derived"],
+        )
+
+    report, app = self_host_payload_runner(
+        snapshot_mutator=qualify, real_projection=True,
+        negative={"status": "insufficient_evidence"},
+    )
+    assert app.get_docs_context.call_count == 16
+    assert report["verdict"] == "PASS", report["errors"]
+    assert report["metrics"]["both_coverage_count"] == 15
+    assert report["metrics"]["original_query_covered_count"] == 15
+    assert "_qualification_candidate" not in report["results"][0]["payload"]["sources"][0]
+
+
+def _assert_self_host_exact_public_source_keys(self_host_payload_runner):
+    for mutate in (
+        lambda bound: bound["qualification"].update(scope=None),
+        lambda bound: bound["projected_source"].update(scope=None),
+        lambda bound: bound["qualification"].pop("snippet"),
+        lambda bound: bound["projected_source"].pop("snippet"),
+    ):
+        report, _ = self_host_payload_runner(snapshot_mutator=lambda snapshot: mutate(snapshot["e1"]))
+        assert report["results"][0]["observed"]["coverage_attribution"] == []
+
+
+def _assert_self_host_abstention_safety(self_host_payload_runner):
+    for unsafe in ({"kind": "docs_answer"}, {"edit_ready": True}, {"mutation_ready": True}):
+        payload = {"status": "insufficient_evidence", **unsafe}
+        report, _ = self_host_payload_runner(negative=payload)
+        assert report["results"][-1]["passed"] is False, unsafe
+        report, _ = self_host_payload_runner(
+            lambda value: value.update(payload), expected_kind="insufficient_evidence",
+        )
+        assert report["results"][0]["passed"] is False, unsafe
+
+
+def _assert_self_host_nonmapping_payloads(self_host_payload_runner):
+    for invalid in (None, [], ["unexpected"], "unexpected", 7):
+        report, _ = self_host_payload_runner(payload_transform=lambda value: invalid, negative=invalid)
+        assert report["case_count"] == 16
+        assert report["positive_case_count"] == 15
+        assert report["negative_case_count"] == 1
+        assert report["passed_count"] == 0
+        assert report["verdict"] == "FAIL"
+        report, _ = self_host_payload_runner(preflight_transform=lambda value: invalid)
+        assert report["verdict"] == "FAIL"
+        assert any("pre-sync" in error for error in report["errors"])
+
+
+def _assert_self_host_positive_passed_count(self_host_payload_runner):
+    report, _ = self_host_payload_runner(missing=True, negative={"status": "insufficient_evidence"})
+    assert report["positive_passed_count"] == 14
+    assert report["passed_count"] == 15
+
+
 def test_publish_workflow_is_manual_build_once_and_oidc() -> None:
     text = (ROOT / ".github/workflows/publish.yml").read_text()
     trigger_block = text.split("\non:\n", 1)[1].split("\npermissions:\n", 1)[0]
@@ -114,7 +416,7 @@ def test_public_release_smoke_is_exact_public_and_no_cache() -> None:
 def test_stdio_smoke_requires_cited_content() -> None:
     text = (ROOT / "scripts/docs_mcp_stdio_smoke.py").read_text()
     assert "assert NEEDLE in rendered" in text
-    assert 'assert set(canonical_query) == {"question", "project_path", "mode"}' in text
+    assert 'assert set(canonical_query) == {"question", "project_path"}' in text
     canonical_block = text[text.index("canonical_query = {"):text.index("answer = payload", text.index("canonical_query = {"))]
     assert "output_mode" not in canonical_block
     assert "compatibility_query" not in text
@@ -130,7 +432,36 @@ def test_stdio_smoke_uses_primary_docatlas_home_without_legacy_writes() -> None:
     assert 'not (user_home / ".docmancer").exists()' in text
 
 
-def test_stdio_smoke_accepts_structured_content_and_legacy_json_text() -> None:
+@pytest.mark.parametrize("self_host_check,args", [
+    *[(check, ()) for check in (
+        _assert_self_host_payload_baseline,
+        _assert_self_host_metadata_is_not_top1_fact,
+        _assert_self_host_measures_full_budgets,
+        _assert_self_host_missing_payload_preserves_case_partitions,
+        _assert_self_host_attribution_rejects_same_path_different_identity,
+        _assert_self_host_token_boundary,
+        _assert_self_host_expected_public_inventory,
+        _assert_self_host_attribution_rejects_changed_snapshot,
+        _assert_self_host_private_qualification_projection,
+        _assert_self_host_exact_public_source_keys,
+        _assert_self_host_abstention_safety,
+        _assert_self_host_nonmapping_payloads,
+        _assert_self_host_positive_passed_count,
+    )],
+    *[(_assert_self_host_rejects_bad_payloads, values) for values in _SELF_HOST_BAD_PAYLOADS],
+    *[(_assert_self_host_packs_content_is_intent_scoped, values) for values in (
+        ("How do Docs work?", 15), ("Compare Docs and Packs", 0),
+        ("How do Docs work, not Packs?", 15), ("How do I get started?", 0),
+    )],
+    *[(_assert_self_host_negative_cannot_authorize, (flag,)) for flag in (
+        "answer_supported", "answer_available", "edit_ready",
+    )],
+    *[(_assert_self_host_attribution_uses_same_call_qualified_snapshot, (kinds,)) for kinds in (
+        ("direct",), ("derived",), ("direct", "derived"), (),
+    )],
+])
+def test_stdio_smoke_accepts_structured_content_and_legacy_json_text(self_host_payload_runner, self_host_check, args) -> None:
+    self_host_check(self_host_payload_runner, *args)
     from scripts.docs_mcp_stdio_smoke import payload, text_payload, validate_context_payload
     from scripts.run_project_docs_self_host_gate import (
         GOLD_CASES,
@@ -167,12 +498,11 @@ def test_stdio_smoke_accepts_structured_content_and_legacy_json_text() -> None:
             "content_sha256": "a" * 64,
         }],
     }, required_fragment="needle")
-    by_id = {case.surface_case_id: case for case in GOLD_CASES if case.surface_case_id is not None}
-    assert set(by_id) == set(range(1, 21))
-    assert all(case.expected_kind for case in by_id.values())
+    assert len(GOLD_CASES) == 15
+    assert all(case.expected_kind == "docs_context" for case in GOLD_CASES)
     assert all(
         case.relevant_paths or case.expected_kind == "insufficient_evidence"
-        for case in by_id.values()
+        for case in GOLD_CASES
     )
     invalid_citation = {
         "kind": "docs_context",
@@ -189,21 +519,31 @@ def test_stdio_smoke_accepts_structured_content_and_legacy_json_text() -> None:
     passing_metrics = {
         "false_supported_count": 0,
         "operational_contamination_count": 0,
-        "top1_relevance": 0.8,
-        "top3_relevance": 0.95,
-        "false_abstention_count": 2,
-        "cases_scoring_8_plus": 16,
-        "mean_score": 8.0,
+        "useful_result_count": 13,
+        "top1_fact_bearing_count": 12,
+        "top3_relevant_count": 15,
+        "original_query_covered_count": 12,
+        "metadata_only_evidence_count": 0,
+        "packs_contamination_count": 0,
+        "docs_analysis_contamination_count": 0,
+        "false_docs_answer_count": 0,
+        "source_budget_violation_count": 0,
+        "token_budget_violation_count": 0,
     }
     assert _threshold_failures(passing_metrics, 20) == []
     for key, value in (
         ("false_supported_count", 1),
         ("operational_contamination_count", 1),
-        ("top1_relevance", 0.79),
-        ("top3_relevance", 0.94),
-        ("false_abstention_count", 3),
-        ("cases_scoring_8_plus", 15),
-        ("mean_score", 7.99),
+        ("useful_result_count", 12),
+        ("top1_fact_bearing_count", 11),
+        ("top3_relevant_count", 14),
+        ("original_query_covered_count", 11),
+        ("metadata_only_evidence_count", 1),
+        ("packs_contamination_count", 1),
+        ("docs_analysis_contamination_count", 1),
+        ("false_docs_answer_count", 1),
+        ("source_budget_violation_count", 1),
+        ("token_budget_violation_count", 1),
     ):
         assert _threshold_failures({**passing_metrics, key: value}, 20)
 

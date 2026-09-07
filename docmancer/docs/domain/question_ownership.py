@@ -67,16 +67,11 @@ FROZEN_OWNERSHIP_CASES = (
     ),
     FrozenOwnershipCase(
         "What does docs_status report and when should it be used?",
-        "legacy",
+        "question_plan",
+        (),
         (
-            (
-                "behavior", "docs_status", None, "behavior", None,
-                "text", None, None, None, "value", None,
-            ),
-            (
-                "usage", "docs_status", None, "usage", None,
-                "text", None, None, None, "value", None,
-            ),
+            "unresolved_question_clause:What does docs_status report",
+            "unresolved_question_clause:when should it be used",
         ),
     ),
     FrozenOwnershipCase(

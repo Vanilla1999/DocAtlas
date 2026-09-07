@@ -68,7 +68,7 @@ def compute_coverage(*, context_pack: list[dict[str, Any]]) -> dict[str, bool]:
         "architecture": "architecture" in text,
         "project_structure": "contributing.md" in text or "project structure" in text or "layout" in text,
         "setup_or_commands": "install" in text or "setup" in text or "doc-atlas " in text or "docmancer " in text,
-        "mcp_docs": "docs-serve" in text or "get_project_context" in text or "get_library_docs" in text,
+        "mcp_docs": "docs-serve" in text or "get_docs_context" in text or "prepare_docs" in text,
         "mcp_packs": "mcp-packs" in text or "install-pack" in text or "action packs" in text,
         "release_history": "changelog" in text or "breaking" in text or "added" in text,
     }

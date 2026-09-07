@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from docmancer.core.models import Document
 from docmancer.core.sqlite_store import SQLiteStore
+from docmancer.docs.domain.evidence_qualification import qualify_evidence
 
 
 def _store(tmp_path, documents: list[Document], name: str = "ranking.db") -> SQLiteStore:
@@ -10,7 +11,7 @@ def _store(tmp_path, documents: list[Document], name: str = "ranking.db") -> SQL
     return store
 
 
-def _doc(source: str, title: str, body: str) -> Document:
+def _doc(source: str, title: str, body: str, *, project_identity: str | None = None) -> Document:
     return Document(
         source=source,
         content=f"# {title}\n\n{body}",
@@ -22,6 +23,7 @@ def _doc(source: str, title: str, body: str) -> Document:
             "chunking_schema": "parent-child-v1",
             "child_target_tokens": 2_000,
             "child_hard_max_tokens": 3_000,
+            **({"project_identity": project_identity} if project_identity else {}),
         },
     )
 
@@ -130,10 +132,71 @@ def test_lexical_match_trace_distinguishes_strict_and_weak_or_fallback(tmp_path)
     )
 
     assert strict.metadata["lexical_match"]["mode"] == "and"
-    assert strict.metadata["lexical_match"]["qualified"] is True
+    assert "qualified" not in strict.metadata["lexical_match"]
+    assert qualify_evidence(strict.metadata["lexical_match"], query_id="q", visible_text=strict.text).qualified
     assert any(item.metadata["lexical_match"]["mode"] == "or_fallback" for item in fallback)
-    assert all(item.metadata["lexical_match"]["qualified"] is False for item in fallback)
+    assert all(not qualify_evidence(item.metadata["lexical_match"], query_id="q", visible_text=item.text).qualified for item in fallback)
     assert "text" not in strict.metadata["lexical_match"]
+
+
+def test_and_candidates_do_not_suppress_a_more_useful_or_candidate(tmp_path):
+    store = _store(
+        tmp_path,
+        [
+            _doc(
+                "docs/reference.md",
+                "Reference",
+                "configure widget cache migration terminology reference", project_identity="repo",
+            ),
+            _doc(
+                "docs/configure.md",
+                "Configure widget cache",
+                "Configure the widget cache with a bounded cache mode.", project_identity="repo",
+            ),
+        ],
+    )
+
+    result = store.query(
+        "configure widget cache migration", limit=1, budget=1_000,
+        filters={"project_identity": "repo"},
+    )[0]
+
+    assert result.source == "docs/configure.md"
+    assert result.metadata["lexical_match"]["mode"] == "or_union"
+    assert result.metadata["lexical_match"]["match_ratio"] == 0.75
+    assert result.metadata["ranking"]["candidate_pool_size"] == 2
+
+
+def test_or_union_half_query_false_proof_is_rejected_downstream(tmp_path):
+    store = _store(
+        tmp_path,
+        [
+            _doc(
+                "docs/complete.md",
+                "Telegram alerts indexing configuration",
+                "Telegram alerts use this indexing configuration.", project_identity="repo",
+            ),
+            _doc(
+                "docs/generic.md",
+                "Indexing configuration",
+                "Generic indexing configuration reference.", project_identity="repo",
+            ),
+        ],
+    )
+
+    results = store.query(
+        "Telegram alerts indexing configuration", limit=2, budget=2_000,
+        filters={"project_identity": "repo"},
+    )
+    partial = next(result for result in results if result.source == "docs/generic.md")
+    trace = partial.metadata["lexical_match"]
+
+    assert trace["mode"] == "or_union"
+    assert trace["match_ratio"] == 0.5
+    assert trace["missing_exact_terms"] == ["telegram"]
+    assert not qualify_evidence(
+        trace, query_id="q", visible_text=partial.text,
+    ).qualified
 
 
 def test_or_fallback_requires_exact_terms_and_half_the_query(tmp_path):
@@ -150,4 +213,73 @@ def test_or_fallback_requires_exact_terms_and_half_the_query(tmp_path):
     assert trace["mode"] == "or_fallback"
     assert trace["match_ratio"] == 0.5
     assert trace["missing_exact_terms"] == ["telegram"]
-    assert trace["qualified"] is False
+    assert "qualified" not in trace
+    assert not qualify_evidence(trace, query_id="q", visible_text=result.text).qualified
+
+
+def test_sentence_initial_politeness_is_not_an_exact_technical_term(tmp_path):
+    store = _store(
+        tmp_path,
+        [_doc(
+            "docs/architecture.md",
+            "DocAtlas architecture",
+            "DocAtlas architecture describes the retrieval runtime.",
+        )],
+    )
+
+    result = store.query(
+        "Please explain the DocAtlas architecture", limit=1, budget=1_000,
+    )[0]
+    trace = result.metadata["lexical_match"]
+
+    assert "please" not in trace["exact_terms"]
+    assert "please" not in trace["missing_exact_terms"]
+    assert "docatlas" in trace["exact_terms"]
+    assert "qualified" not in trace
+    assert qualify_evidence(trace, query_id="q", visible_text=result.text).qualified
+
+
+def test_exact_filename_qualification_uses_the_same_corpus_as_fts(tmp_path):
+    requested = _doc(
+        "docatlas.project-docs.yaml",
+        "Project documentation catalog",
+        "Registered project documentation entries.",
+    )
+    similar = _doc(
+        "docatlas.docs.yaml",
+        "External documentation catalog",
+        "Registered external documentation entries.",
+    )
+    store = _store(tmp_path, [similar, requested])
+
+    results = store.query("docatlas.project-docs.yaml", limit=2, budget=2_000)
+
+    assert results
+    assert results[0].source == "docatlas.project-docs.yaml"
+    assert results[0].metadata["lexical_match"]["exact_terms"] == [
+        "docatlas.project-docs.yaml",
+    ]
+    assert "qualified" not in results[0].metadata["lexical_match"]
+    assert results[0].metadata["lexical_match"]["missing_exact_terms"] == []
+    assert all(
+        result.metadata["lexical_match"]["missing_exact_terms"]
+        for result in results
+        if result.source == "docatlas.docs.yaml"
+    )
+
+
+def test_lexical_trace_reports_field_level_provenance():
+    trace = SQLiteStore._lexical_match_trace(
+        "architecture storage retrieval",
+        title="Architecture",
+        body="Storage details",
+        retrieval_text="Architecture Storage Retrieval catalog metadata",
+        mode="and",
+        bm25_cost=-1.0,
+    )
+
+    assert trace["field_matches"]["title"] == ["architecture"]
+    assert trace["field_matches"]["body"] == ["storage"]
+    assert trace["field_matches"]["retrieval_text"] == [
+        "architecture", "storage", "retrieval",
+    ]

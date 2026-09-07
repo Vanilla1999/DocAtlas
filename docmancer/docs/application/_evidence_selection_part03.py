@@ -375,7 +375,23 @@ def select_evidence(
             if requirement.mandatory
             if (obligation := requirement.as_proof_obligation()) is not None
         )
-        if proof_obligations and not obligations_can_authorize_docs_answer(proof_obligations):
+        explicit_support_contract = any(
+            requirement.mandatory
+            and requirement.public_provenance in {
+                "public_task_contract", "required_evidence_paths",
+            }
+            for requirement in requirements
+        )
+        context_only_retrieval = bool(
+            "fallback:generic_project_terms" in requirements.parse_trace
+            and "unsupported_query:generic_free_form_relation"
+            in requirements.unresolved_parts
+            and not explicit_support_contract
+        )
+        if context_only_retrieval:
+            missing.add("unsupported_answer_authorization:unresolved_query")
+            status = "insufficient_evidence"
+        elif proof_obligations and not obligations_can_authorize_docs_answer(proof_obligations):
             missing.add("unsupported_answer_authorization:context_only_relation")
             missing.update(
                 f"context_only:{obligation.relation or obligation.kind}"

@@ -630,7 +630,7 @@ class ProjectContextResult:
     project_path: str
     question: str
     status: str = "success"
-    tool: str = "get_project_context"
+    tool: str = "get_docs_context"
     schema_version: str = "1.0-mvp"
     answer_available: bool = True
     answer_type: str = "exact"

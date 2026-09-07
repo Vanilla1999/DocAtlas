@@ -197,6 +197,8 @@ def build_recovery_diagnosis(
     selection: Any,
     *,
     operational_reason_code: str | None = None,
+    projection: dict[str, Any] | None = None,
+    retrieval: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     """Explain one failed docs proof and return a bounded recovery contract.
 
@@ -206,10 +208,10 @@ def build_recovery_diagnosis(
     """
 
     decision = _selection_decision(selection)
-    if decision is None:
+    if decision is None and projection is None:
         return {}
     support = getattr(decision, "support_decision", None)
-    if support is not None and bool(getattr(support, "answer_supported", False)):
+    if projection is None and support is not None and bool(getattr(support, "answer_supported", False)):
         return {}
 
     operational_reason = _clean_fragment(operational_reason_code, max_chars=120)
@@ -236,6 +238,32 @@ def build_recovery_diagnosis(
             "origin": "operational",
             "reason_code": operational_reason,
             "disposition": "use_operational_recovery",
+        })
+        return result
+
+    if projection is not None:
+        if projection.get("context_available"):
+            return {}
+        candidates = (retrieval or {}).get("context_pack") or ()
+        qualified = any(
+            isinstance(source, dict) and any(
+                isinstance(trace, dict) and trace.get("qualified") is True
+                for trace in (source.get("retrieval_query_matches") or {}).values()
+            ) for source in candidates
+        )
+        diagnostics = ((retrieval or {}).get("retrieval_diagnostics") or {}).get("docs_context_projection")
+        if isinstance(diagnostics, dict):
+            qualified = bool(diagnostics.get("qualified_variants"))
+        reason = (
+            "no_candidates" if not candidates else
+            "bounded_selection_failed" if qualified and diagnostics and diagnostics.get("budget_rejections") else
+            "visible_evidence_lost" if qualified else "evidence_rejected"
+        )
+        result.update({
+            "origin": "retrieval" if not candidates else "selection" if qualified else "eligibility",
+            "reason_code": reason,
+            "disposition": "search_local_source",
+            "problem_spans": _problem_spans(question, requirements),
         })
         return result
 
@@ -324,6 +352,26 @@ def build_recovery_diagnosis(
             "rephrase_exhausted": True,
         })
     return result
+
+
+def projection_recovery_action(
+    question: str, selection: Any, *, projection: dict[str, Any],
+    retrieval: dict[str, Any], request: dict[str, Any],
+    operational_reason_code: str | None = None,
+) -> dict[str, Any] | None:
+    """Bind non-operational recovery to the already computed projection."""
+    diagnosis = build_recovery_diagnosis(
+        question, selection, projection=projection, retrieval=retrieval,
+        operational_reason_code=operational_reason_code,
+    )
+    if not diagnosis:
+        return None
+    retrieval.update({
+        "recovery_origin": diagnosis["origin"],
+        "recovery_reason_code": diagnosis["reason_code"],
+        "recovery_disposition": diagnosis["disposition"],
+    })
+    return recovery_action(diagnosis, project_path=request.get("project_path"), scope=request.get("scope"))
 
 
 def recovery_action(

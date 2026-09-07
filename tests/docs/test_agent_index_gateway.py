@@ -55,6 +55,21 @@ class FailingWitnessStore:
         raise RuntimeError("index temporarily unavailable")
 
 
+class ComponentDispatcher:
+    def __init__(self, rows):
+        self.rows = rows
+        self.calls = []
+
+    def run(self, query, **kwargs):
+        self.calls.append((query, kwargs))
+        return type("Result", (), {
+            "chunks": self.rows,
+            "mode_used": "lexical",
+            "query_plan_hash": "plan-hash",
+            "fusion_config_hash": "fusion-hash",
+        })()
+
+
 def _record(library_id="/pub/riverpod/2.0/api", canonical_id=None):
     return LibraryRecord(
         library_id=library_id,
@@ -319,6 +334,81 @@ def test_library_witness_probe_is_fail_closed_when_every_store_query_fails(tmp_p
 
     assert probe.status == "unavailable"
     assert probe.failure_count == len(probe.queried_requirement_ids)
+
+
+def test_document_component_search_is_bounded_scoped_and_deduplicated(tmp_path, monkeypatch):
+    monkeypatch.setenv("DOCATLAS_HOME", str(tmp_path / "home"))
+    default = FakeAgent(config=DocmancerConfig())
+    default.store = WitnessStore()
+    gateway = AgentIndexGateway(DocmancerConfig(), default_agent=default, agent_factory=FakeAgent)
+    chunk = RetrievedChunk(
+        source="docs/modules/context.md",
+        chunk_index=3,
+        text="SQLite owns persistence and retrieval provenance.",
+        score=1.0,
+        metadata={
+            "stable_chunk_id": "context-3",
+            "project_doc_path": "docs/modules/context.md",
+            "retrieval_trace": {"final_rank": 1},
+        },
+    )
+    dispatcher = ComponentDispatcher([chunk, chunk])
+    monkeypatch.setattr(gateway, "dispatcher_for", lambda agent, mode=None: dispatcher)
+
+    result = gateway.search_document_components(
+        "project:docmancer",
+        str(tmp_path),
+        ["docs/modules/context.md", "README.md"],
+        [("storage", "Where is persistence owned?"), ("retrieval", "retrieval provenance")],
+        budget=80,
+    )
+
+    assert result.status == "ok"
+    assert len(result.candidates) == 1
+    assert result.candidates[0].stable_identity == "context-3"
+    assert result.candidates[0].component_id == "storage"
+    assert result.candidates[0].provenance == {
+        "producer": "retrieval_dispatcher",
+        "mode": "lexical",
+        "query_plan_hash": "plan-hash",
+        "fusion_config_hash": "fusion-hash",
+        "retrieval_trace": {"final_rank": 1},
+    }
+    expected_filters = {
+        "project_identity": "project:docmancer",
+        "project_path": str(tmp_path),
+        "project_doc_path": {"in": ["docs/modules/context.md", "README.md"]},
+        "source_class": "project_file",
+        "lifecycle_status": {"in": ["active", "current"]},
+    }
+    assert all(call[1] == {
+        "mode": "lexical", "limit": 4, "budget": 40,
+        "expand": "none", "filters": expected_filters,
+    } for call in dispatcher.calls)
+
+
+def test_document_component_search_rejects_overflow_and_fails_closed(tmp_path, monkeypatch):
+    default = FakeAgent(config=DocmancerConfig())
+    default.store = WitnessStore()
+    gateway = AgentIndexGateway(DocmancerConfig(), default_agent=default, agent_factory=FakeAgent)
+
+    overflow = gateway.search_document_components(
+        "project:docmancer", str(tmp_path), ["one.md", "two.md", "three.md"], [("one", "query")],
+    )
+    assert overflow.status == "invalid_request"
+    assert overflow.candidates == ()
+
+    class FailingDispatcher:
+        def run(self, query, **kwargs):
+            raise RuntimeError("index temporarily unavailable")
+
+    monkeypatch.setattr(gateway, "dispatcher_for", lambda agent, mode=None: FailingDispatcher())
+    failed = gateway.search_document_components(
+        "project:docmancer", str(tmp_path), ["one.md"], [("one", "query")],
+    )
+    assert failed.status == "unavailable"
+    assert failed.candidates == ()
+    assert failed.failure_count == 1
 
 
 def test_default_agent_created_by_project_does_not_hijack_library_query(tmp_path, monkeypatch):

@@ -1,14 +1,36 @@
 from __future__ import annotations
 
+import subprocess
+import sys
+
+import pytest
+
 from docmancer.docs.application.evidence_selection import build_requirements
 from docmancer.retrieval.query_planning import (
     MAX_EXACT_TERMS,
     build_query_plan,
     extract_document_locator,
     extract_exact_terms,
+    is_exact_technical_token,
     compile_backend_filters,
     metadata_matches_filters,
 )
+
+
+@pytest.mark.parametrize("modules", [
+    ("docmancer.retrieval.contracts", "docmancer.docs"),
+    ("docmancer.docs", "docmancer.retrieval.contracts"),
+])
+def test_public_packages_import_in_fresh_processes(modules):
+    result = subprocess.run(
+        [sys.executable, "-c", "; ".join([
+            *(f"import {module}" for module in modules),
+            "from docmancer.docs import LibraryDocsService",
+            "from docmancer.docs.service import LibraryDocsService as Service",
+            "assert LibraryDocsService is Service",
+        ])], capture_output=True, text=True, timeout=30,
+    )
+    assert result.returncode == 0, result.stderr
 
 
 def test_query_plan_is_deterministic_and_does_not_store_raw_query():
@@ -54,6 +76,16 @@ def test_exact_term_extraction_does_not_treat_prose_as_config_or_path():
     assert "MCP" not in values
     assert "fetch/index" not in values
     assert {"CONFIG_KEY", "docs/setup.md"} <= values
+
+
+def test_lexical_exact_token_policy_excludes_request_framing():
+    assert not any(
+        is_exact_technical_token(value) for value in ("Please", "Explain", "Which")
+    )
+    assert all(
+        is_exact_technical_token(value)
+        for value in ("Telegram", "DocAtlas", "README.md", "DOCATLAS_HOME")
+    )
 
 
 def test_path_term_suppresses_overlapping_symbol_and_config_terms():
@@ -155,3 +187,22 @@ def test_verified_authority_does_not_admit_legal_and_forbidden_aliases_are_check
         {"authority": "verified", "library_id": "sdk-v2"},
         {"minimum_authority": "verified", "forbidden_sources": ["sdk-v2"]},
     )
+
+
+def test_documentation_terms_filter_framing_and_preserve_shipped_identities():
+    from docmancer.docs.domain.query_terms import documentation_technical_anchors, is_exact_technical_token
+    from docmancer.docs.domain.documentation_query_plan import technical_anchors
+
+    assert not any(is_exact_technical_token(token) for token in (
+        "MCP", "Compare", "Summarize", "Расскажи", "architecture", "и", "или", "and", "or", "the",
+    ))
+    assert documentation_technical_anchors("Compare MCP architecture") == ()
+    assert technical_anchors("Compare MCP architecture") == ()
+    assert all(is_exact_technical_token(token) for token in (
+        "Telegram", "docs/setup.md", "--dry-run", "2.4.1", "get_docs_context", "Client.connect",
+    ))
+
+
+def test_probe_terms_filter_single_connectors():
+    from docmancer.docs.domain.query_terms import documentation_query_terms
+    assert documentation_query_terms("architecture и или and or the storage") == ("architecture", "storage")

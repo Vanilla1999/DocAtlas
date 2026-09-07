@@ -306,6 +306,30 @@ def test_mcp_docs_status_uses_project_local_storage_topology(tmp_path):
     assert active["retrieval_mode"] == "lexical"
 
 
+def test_docs_status_filters_modules_before_the_eight_row_limit():
+    from docmancer.docs.interfaces.mcp.prefetch_tools import _bounded_project_status
+
+    unrelated = [
+        {"module_id": f"module-{index}", "module_name": f"module-{index}",
+         "module_path": f"packages/module-{index}"}
+        for index in range(12)
+    ]
+    auth = [
+        {"module_id": f"auth-{index}", "module_name": "auth",
+         "module_path": f"packages/auth-{index}"}
+        for index in range(3)
+    ]
+    project = {"project_docs": {"modules": [*unrelated, *auth]}}
+
+    result = _bounded_project_status(project, details=True, module="auth")
+
+    assert [row["module_path"] for row in result["project_docs"]["modules"]] == [
+        "packages/auth-0", "packages/auth-1", "packages/auth-2",
+    ]
+    assert result["project_docs"]["module_count"] == 3
+    assert result["project_docs"]["modules_omitted"] == 0
+
+
 def test_project_service_cache_reuses_directory_config_and_invalidates_on_change(tmp_path):
     project = tmp_path / "project"
     project.mkdir()

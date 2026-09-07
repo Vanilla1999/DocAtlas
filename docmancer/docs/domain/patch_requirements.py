@@ -5,7 +5,7 @@ from dataclasses import dataclass
 from typing import Literal
 
 from docmancer.docs.domain.patch_request_plan import PatchRequestPlan
-from docmancer.retrieval.contracts import canonical_hash
+from docmancer.docs.domain.canonical import canonical_hash
 
 
 PatchRequirementKind = Literal[

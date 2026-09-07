@@ -39,7 +39,6 @@ def main(argv: list[str] | None = None) -> int:
     derived = derive_from_paths(
         repo_root=REPO_ROOT,
         protocol_path=ROOT / "mixed_provenance_protocol.json",
-        selector_path=REPO_ROOT / "docmancer" / "docs" / "application" / "evidence_selection.py",
         model_path=_production_evidence_model_path(),
     )
     verify_report(derived)

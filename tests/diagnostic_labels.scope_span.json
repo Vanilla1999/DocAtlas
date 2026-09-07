@@ -1,0 +1,17 @@
+{
+  "schema_version": 1,
+  "module_labels": {
+    "tests/docs/test_host_scope_contract.py": "behavioral",
+    "tests/docs/test_context_span_growth.py": "behavioral"
+  },
+  "module_node_hashes": {
+    "tests/docs/test_host_scope_contract.py": "8d9e6cacdf26399769ae3bf2e2afd1f8c1d3ca701c5bf7f618d22501cda72265",
+    "tests/docs/test_context_span_growth.py": "27dce25fc9cabca0029a0de84455222890ee0bfa4507a4890f7afba98233907e"
+  },
+  "node_overrides": {
+    "tests/docs/test_host_scope_contract.py::test_host_policy_distinguishes_onboarding_from_repo_policy": "schema",
+    "tests/docs/test_host_scope_contract.py::test_host_examples_validate_and_keep_distinct_scope_intents": "schema",
+    "tests/docs/test_host_scope_contract.py::test_advertised_scope_explains_all_without_adding_a_default": "schema",
+    "tests/docs/test_host_scope_contract.py::test_generated_host_guides_include_the_scope_decision": "schema"
+  }
+}

@@ -11,6 +11,8 @@ from __future__ import annotations
 from dataclasses import replace
 import re
 
+from docmancer.docs.domain.question_component_rewrite import rewrite_component
+
 from docmancer.docs.domain.question_frame_core import (
     QuestionClause,
     ambiguous_frame_reason,
@@ -45,6 +47,8 @@ from docmancer.docs.domain.question_plan_core import (
     _bind_whole_plan,
     _clean,
     _normalized_clause,
+    _safe_coverage_gap,
+    _finalize_full_span_coverage,
     _technical,
     _unsafe_free_text,
 )
@@ -61,6 +65,7 @@ from docmancer.docs.domain.question_plan_surface_rules import (
     public_tool_usage,
     public_tools_with_purposes,
     python_version_support,
+    semantic_components,
 )
 
 
@@ -551,6 +556,7 @@ def _semantic_premise(q: str) -> QuestionPlan | None:
 
 
 _SPECIFIC_RULES: tuple[Rule, ...] = (
+    semantic_components,
     governance_facets,
     _semantic_premise,
     _semantic_comparison,
@@ -705,9 +711,12 @@ def _guard_plan_subjects(plan: QuestionPlan) -> QuestionPlan:
         *("unresolved_query_subject" for _ in unsafe),
     )))
     return QuestionPlan(
+        facets=tuple(facet for facet in plan.facets if facet.subject not in unsafe),
         clauses=plan.clauses,
         unresolved_parts=unresolved,
         parse_trace=(*plan.parse_trace, "fail_closed:generic_subject"),
+        consumed_spans=plan.consumed_spans,
+        component_scope_complete=plan.component_scope_complete,
     )
 
 
@@ -734,6 +743,16 @@ def _compile_generic_question(q: str) -> QuestionPlan | None:
 
 
 def _compile_atomic_question(q: str) -> QuestionPlan | None:
+    rewritten = rewrite_component(q)
+    if rewritten is not None:
+        rule, facet, _ = rewritten
+        return QuestionPlan(facets=(facet,), clauses=(q,), parse_trace=(rule,),
+                            component_scope_complete=facet.kind != "inventory")
+    surface = normalize_question_surface(q)
+    if surface is not None and surface.rule in {"components:tools_en", "components:tools_ru"}:
+        plan = _compile_specific_question(surface.text)
+        if plan is not None:
+            return replace(plan, parse_trace=(f"surface:{surface.rule}", *plan.parse_trace))
     specific = _compile_specific_question(q)
     if specific is not None:
         return specific
@@ -785,6 +804,7 @@ def _combine_clause_plans(
             unresolved_parts=tuple(dict.fromkeys(unresolved)),
             parse_trace=("frame:compound", *trace),
             consumed_spans=tuple(sorted(set(consumed))),
+            component_scope_complete=all(plan.component_scope_complete for plan in handled),
         ))
 
     # Some frozen compound rules are intentionally recognized as a whole
@@ -834,7 +854,7 @@ def _combine_clause_plans(
             unresolved_parts=tuple(dict.fromkeys(unresolved)),
             parse_trace=("fail_closed:unresolved_compound",),
         )
-    return None
+    return _unresolved_compound(clause_texts, trace="fail_closed:unresolved_compound")
 
 
 def _prefix_plan_is_owned(plan: QuestionPlan) -> bool:
@@ -884,55 +904,6 @@ def _recognized_prefix_residue_plan(q: str) -> QuestionPlan | None:
             parse_trace=("fail_closed:recognized_prefix_residue",),
         )
     return None
-
-
-def _safe_coverage_gap(value: str) -> bool:
-    residue = re.sub(
-        r"\b(?:and\s+also|while\s+also|as\s+well\s+as|along\s+with|"
-        r"and|but|plus|then|also|и\s+также|а\s+также|и|но|плюс|затем)\b",
-        "",
-        value,
-        flags=re.I,
-    )
-    residue = re.sub(r"[\s,;:.!?/\u2013\u2014]+", "", residue)
-    return not residue
-
-
-def _finalize_full_span_coverage(question: str, plan: QuestionPlan) -> QuestionPlan:
-    """Fail closed unless every non-separator source span was consumed."""
-
-    if not plan.facets or plan.unresolved_parts:
-        return plan
-    spans = sorted(set(plan.consumed_spans))
-    if not spans:
-        return replace(
-            plan,
-            unresolved_parts=("unresolved_question_clause:missing_consumed_span",),
-            parse_trace=(*plan.parse_trace, "fail_closed:missing_consumed_span"),
-        )
-
-    cursor = 0
-    gaps: list[str] = []
-    for start, end in spans:
-        if start < cursor or start < 0 or end <= start or end > len(question):
-            gaps.append("invalid_consumed_span")
-            continue
-        gap = question[cursor:start]
-        if gap and not _safe_coverage_gap(gap):
-            gaps.append(_clean(gap))
-        cursor = end
-    tail = question[cursor:]
-    if tail and not _safe_coverage_gap(tail):
-        gaps.append(_clean(tail))
-    if not gaps:
-        return plan
-    return replace(
-        plan,
-        unresolved_parts=tuple(dict.fromkeys(
-            f"unresolved_question_clause:{gap}" for gap in gaps if gap
-        )),
-        parse_trace=(*plan.parse_trace, "fail_closed:unconsumed_span"),
-    )
 
 
 def _compile_question_plan_core(raw: str) -> QuestionPlan:

@@ -139,7 +139,7 @@ def test_exact_heading_outranks_unrelated_source_of_truth():
     )
     exact.authority = "supporting"
     evaluation = fake_chunk(
-        "eval/project_answer_quality_v4/README.md",
+        "eval/project_context_quality/README.md",
         "MCP boundary transport contract benchmark",
         0.99,
     )
@@ -324,6 +324,29 @@ def test_ranking_metadata_attached_when_metadata_is_none():
     metadata = getattr(ranked[0], "metadata", None)
     assert isinstance(metadata, dict)
     assert "project_ranking" in metadata
+
+
+def test_exact_filename_outranks_generic_configuration_boost_without_query_trace():
+    question = "How is configuration defined in docatlas.project-docs.yaml?"
+    intent = classify_project_query_intent(question)
+
+    ranked = rerank_project_doc_chunks(
+        [
+            fake_chunk(
+                "wiki/Configuration.md", "Configuration", 1.0,
+                "Generic configuration reference.",
+            ),
+            fake_chunk(
+                "docatlas.project-docs.yaml", "Project docs catalog", 0.01,
+                "Project documentation catalog configuration.",
+            ),
+        ],
+        question=question,
+        intent=intent,
+        limit=2,
+    )
+
+    assert ranked[0].path == "docatlas.project-docs.yaml"
 
 
 def test_is_specific_docs_mcp_source_matches_docs_server_py():

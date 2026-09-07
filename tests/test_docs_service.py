@@ -43,7 +43,8 @@ def test_inspect_project_docs_returns_candidates_dependency_sources_and_next_act
     assert "flutter" in result.project_type
     assert result.project_docs["found"][0]["path"] == "README.md"
     assert result.reason_code == "project_docs_found_not_indexed"
-    assert result.next_action == {"type": "sync_project_docs", "tool": "sync_project_docs"}
+    assert result.next_action["tool"] == "prepare_docs"
+    assert result.next_action["arguments_patch"]["action"] == "sync_project_docs"
     assert result.requires_confirmation is False
     assert result.confirmation_reason is None
     assert result.arguments_patch["project_path"] == str(project.resolve())
@@ -158,7 +159,7 @@ def test_inspect_project_docs_reports_indexed_and_stale_sources(tmp_path, monkey
     indexed = service.inspect_project_docs(str(project))
 
     assert indexed.reason_code == "project_docs_ready"
-    assert indexed.next_action == {"type": "get_project_context", "tool": "get_project_context"}
+    assert indexed.next_action is None
     assert indexed.requires_confirmation is False
     assert indexed.project_docs["indexed"][0]["path"] == "README.md"
     assert indexed.project_docs["stale"] == []

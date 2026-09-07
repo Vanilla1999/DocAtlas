@@ -34,15 +34,17 @@ def _generic_behavior_qualifiers(
 
     subject_pattern = re.escape(subject).replace(r"\ ", r"[\s_]+")
     match = re.match(
-        rf"^\s*how\s+does\s+(?:the\s+)?{subject_pattern}\s+"
+        rf"^\s*(?:how|what)\s+does\s+(?:the\s+)?{subject_pattern}\s+"
         r"([A-Za-z][A-Za-z0-9_-]*)\s*(.*?)[?!.]*\s*$",
         question,
         re.I,
     )
-    if match is None or match.group(1).casefold() == "work":
+    if match is None or match.group(1).casefold() in {"do", "work"}:
         return None, None
     action = _clean_phrase(match.group(1)) or None
     target = _clean_phrase(match.group(2)) or None
+    if target and re.match(r"^(?:and|or)\b", target, re.I):
+        return None, None
     return action, target
 
 
@@ -62,6 +64,24 @@ def build_project_answer_contract(question: str) -> ProjectAnswerContract:
     technical_terms = _technical_terms(raw_question)
     subjects = _subjects(raw_question)
     obligations: list[ProofObligation] = []
+
+    # Multi-word quantified attributes are specific enough for typed local proof.
+    # A bare noun (for example `attempts`) retains the existing fail-closed path.
+    quantified_attribute = re.match(
+        r"^\s*how\s+many\s+([A-Za-z][A-Za-z0-9_-]*(?:\s+[A-Za-z][A-Za-z0-9_-]+){1,4})\s+does\s+"
+        r"`?([A-Za-z_][A-Za-z0-9_.:-]*)`?\s+"
+        r"(?:allow|permit|support|have|use)\b",
+        raw_question, re.I,
+    )
+    if quantified_attribute:
+        attribute = _clean_phrase(quantified_attribute.group(1))
+        subject = quantified_attribute.group(2).strip("`")
+        obligations.append(_obligation(
+            question=raw_question, index=len(obligations), kind="attribute",
+            subject=subject, attribute=attribute, value_kind="number",
+            response_mode="count", lifecycle_intent=lifecycle,
+            span_value=quantified_attribute.group(0).strip(),
+        ))
 
     declarative = _DECLARATIVE_RELATION_RE.match(raw_question)
     if declarative and not re.match(r"^(?:what|which|how|when|where|why|who|что|как|когда|где|почему)\b", raw_question, re.I):

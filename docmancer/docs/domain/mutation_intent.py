@@ -8,7 +8,7 @@ from typing import Any, Iterable, Literal, Mapping
 
 from docmancer.docs.domain.patch_request_plan import PatchRequestPlan, build_patch_request_plan
 from docmancer.docs.domain.request_intent import is_change_request
-from docmancer.retrieval.contracts import canonical_hash
+from docmancer.docs.domain.canonical import canonical_hash
 
 
 MUTATION_INTENT_SCHEMA = "mutation-intent-v2"

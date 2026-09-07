@@ -26,7 +26,7 @@ from docmancer.docs.application.evidence_selection import (
     validate_assignment_binding,
 )
 from docmancer.docs.domain.answer_units import materialize_answer_units
-from docmancer.docs.domain.request_intent import model_projection_kind
+from docmancer.docs.domain.context_budget import PROJECT_CONTEXT_BUDGET
 from docmancer.docs.application.insufficient_projection import (
     apply_terminal_insufficient_projection,
     bounded_missing_value,
@@ -40,11 +40,11 @@ from docmancer.docs.application.model_visible_projection_helpers import (
 
 
 DOCS_ANSWER_MAX_TOKENS = 800
-DOCS_CONTEXT_MAX_TOKENS = 800
+DOCS_CONTEXT_MAX_TOKENS = PROJECT_CONTEXT_BUDGET.max_tokens
 PATCH_CONTEXT_TARGET_TOKENS = 1_500
 PATCH_CONTEXT_HARD_TOKENS = 2_000
 INSUFFICIENT_EVIDENCE_MAX_TOKENS = 300
-MAX_DOCS_SOURCES = 3
+MAX_DOCS_SOURCES = PROJECT_CONTEXT_BUDGET.max_sources
 DOCS_SOURCE_FIELDS = frozenset({
     "evidence_id", "path_or_url", "section", "snippet", "version_binding",
     "content_sha256",
@@ -141,12 +141,6 @@ def decode_support_envelope(value: Any) -> dict[str, Any]:
     if set(decoded) != set(SUPPORT_ENVELOPE_KEYS):
         raise ValueError("incomplete support envelope payload")
     return decoded
-
-
-def projection_kind(question: str) -> str:
-    """Classify explicit change requests without treating how-to questions as edits."""
-
-    return model_projection_kind(question)
 
 
 def _unit_materialized_item(

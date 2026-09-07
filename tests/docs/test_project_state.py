@@ -74,6 +74,42 @@ def test_project_docs_structured_next_action_values(tmp_path):
     assert user_message
 
 
+def test_ready_project_docs_have_no_next_action(tmp_path):
+    result = project_docs_structured_next_action(
+        reason_code="project_docs_ready",
+        root=Path(tmp_path),
+        query="How is the project organized?",
+    )
+
+    next_action, requires_confirmation, _, arguments_patch, message, _ = result
+    assert next_action is None
+    assert requires_confirmation is False
+    assert arguments_patch == {
+        "project_path": str(tmp_path),
+        "question": "How is the project organized?",
+    }
+    assert "ready" in message.casefold()
+
+
+def test_stale_project_docs_use_public_prepare_docs_action(tmp_path):
+    result = project_docs_structured_next_action(
+        reason_code="project_docs_stale",
+        root=Path(tmp_path),
+    )
+
+    next_action, requires_confirmation, _, _, _, _ = result
+    assert next_action == {
+        "type": "prepare_docs",
+        "tool": "prepare_docs",
+        "arguments_patch": {
+            "action": "sync_project_docs",
+            "project_path": str(tmp_path),
+            "with_vectors": False,
+        },
+    }
+    assert requires_confirmation is False
+
+
 def test_manifest_only_evidence_is_partial_and_not_complete(tmp_path):
     (tmp_path / "pyproject.toml").write_text("[project]\nname = \"demo\"\n")
 

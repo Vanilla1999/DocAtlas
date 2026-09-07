@@ -1,4 +1,6 @@
 """Split tests from test_model_visible_projection.py; shared helpers remain in the façade module."""
+import hashlib
+
 from tests.docs import _shared_test_model_visible_projection as _shared
 globals().update({k: v for k, v in vars(_shared).items() if not k.startswith("__")})
 from docmancer.docs.application.docs_context_projection import project_docs_context
@@ -105,6 +107,7 @@ def test_docs_context_ranks_equal_facet_candidates_deterministically():
 
 
 def test_docs_context_covered_facet_uses_only_assigned_witness():
+    witness = "The exact project storage location is ~/.docatlas/projects/<hash>."
     base = {
         "source_class": "project_doc", "project_identity": "git:example/project",
         "lifecycle_status": "active", "freshness": "current",
@@ -116,10 +119,12 @@ def test_docs_context_covered_facet_uses_only_assigned_witness():
     projection, snapshot = project_docs_context(retrieval={
         "context_pack": [
             {**base, "stable_id": "lexical-only", "path": "docs/lexical.md", "content": "The storage location is discussed here but not proved."},
-            {**base, "stable_id": "assigned", "path": "docs/proof.md", "content": "The exact project storage location is ~/.docatlas/projects/<hash>."},
+            {**base, "stable_id": "assigned", "path": "docs/proof.md", "content": witness},
         ],
         "selection_decision": {"assignments": [{
             "requirement_id": "requirement-storage", "evidence_id": "assigned",
+            "unit_char_start": 0, "unit_char_end": len(witness),
+            "projected_content_hash": hashlib.sha256(witness.encode()).hexdigest(),
         }]},
         "documentation_query_plan": {
             "original_question": "Where is storage located?",

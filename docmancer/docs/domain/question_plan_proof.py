@@ -646,6 +646,26 @@ def workflow_proof(
     source: Mapping[str, object] | None = None,
 ) -> PlannedProof | None:
     relation = str(obligation.relation or "")
+    if relation in {"reading", "testing"}:
+        for clause in _proposition_clauses(text):
+            if not _has(obligation.subject, clause) or re.search(
+                r"\b(?:not|never|cannot|skip|не|нельзя)\b", clause, re.I,
+            ):
+                continue
+            if obligation.target and not _has(obligation.target, clause):
+                continue
+            if relation == "reading":
+                action = re.search(r"\b(?:read|review|start\s+with)\b", clause, re.I)
+                detail = re.search(r"\b[\w./-]+\.(?:md|rst|txt)\b", clause, re.I)
+            else:
+                action = re.search(r"\b(?:run|execute|test|verify|check)\b", clause, re.I)
+                detail = re.search(
+                    r"\b(?:pytest\s+\S+|(?:npm|pnpm|yarn|cargo|go|flutter)\s+test\b"
+                    r"|(?:unit|integration|widget|offline)\s+tests?\b)", clause, re.I,
+                )
+            if action and detail and action.start() <= detail.start():
+                return PlannedProof(True, 4, 3, f"{relation}_workflow", 3)
+        return PlannedProof(False, reason=f"{relation}_workflow_missing")
     if relation not in {"procedure", "configuration", "protocol_run"}:
         return None
     normalized = _norm(text)
@@ -669,14 +689,12 @@ def workflow_proof(
 
     if relation == "protocol_run":
         command = bool(re.search(
-            r"python\s+(?:(?:-m\s+eval\.)|(?:eval/))?project_answer_quality_v4_protocol(?:\.py)?\b",
+            r"python\s+(?:(?:-m\s+eval\.)|(?:eval/))?project_context_quality_protocol(?:\.py)?\b",
             text,
             re.I,
         ))
-        produces_report = "--output" in text
-        validation_only = "--validate-protocol" in text and not produces_report
-        source_matches = all(token in source_text for token in ("project", "answer", "quality", "v4"))
-        valid = command and produces_report and not validation_only and source_matches
+        source_matches = all(token in source_text for token in ("project", "context", "quality"))
+        valid = command and source_matches
         return PlannedProof(
             valid,
             4 if valid else 0,

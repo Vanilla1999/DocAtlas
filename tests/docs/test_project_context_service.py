@@ -7,7 +7,7 @@ def test_project_context_service_returns_selected_project_and_dependency_section
     result = ProjectContextService(facade).get_project_context("/repo", "use go_router", tokens=1200, limit=3, allow_network=True)
 
     assert result.status == "success"
-    assert result.tool == "get_project_context"
+    assert result.tool == "get_docs_context"
     assert {item["source_class"] for item in result.context_pack} == {"project_doc", "dependency_doc"}
     dependency_item = next(item for item in result.context_pack if item["source_class"] == "dependency_doc")
     assert dependency_item["source"]["source_class"] == "dependency_doc"
@@ -22,7 +22,11 @@ def test_project_context_service_returns_selected_project_and_dependency_section
     project_call = next(call for call in facade.calls if call[0] == "project")
     assert project_call[:3] == ("project", "/repo", "use go_router")
     assert project_call[3]["requirements"] is result.requirements
-    assert {key: value for key, value in project_call[3].items() if key != "requirements"} == {
+    assert project_call[3]["documentation_query_plan"].original_question == "use go_router"
+    assert {
+        key: value for key, value in project_call[3].items()
+        if key not in {"requirements", "documentation_query_plan"}
+    } == {
         "tokens": 1200, "limit": 12, "expand": None, "module": None,
         "module_path": None, "scope": None,
     }
@@ -499,11 +503,11 @@ def test_russian_architecture_query_prefers_architecture_docs_over_feature_plans
 
     assert result.diagnostics["query_intent"] == "architecture"
     assert result.context_pack[0]["path"] == "ARCHITECTURE.md"
-    assert result.diagnostics["trust_decision"]["reason"] == "typed_evidence_contract_satisfied"
+    assert result.diagnostics["trust_decision"]["reason"] == "partial_navigational_context"
     assert result.diagnostics["trust_decision"]["query_terms_missing"] == []
 
 
-def test_architecture_query_injects_root_architecture_when_retrieval_misses_it(tmp_path):
+def test_architecture_query_does_not_inject_unindexed_root_document(tmp_path):
     (tmp_path / "ARCHITECTURE.md").write_text(
         "Project architecture overview: UI -> application -> domain -> infrastructure.\n",
         encoding="utf-8",
@@ -525,11 +529,11 @@ def test_architecture_query_injects_root_architecture_when_retrieval_misses_it(t
 
     result = ProjectContextService(facade).get_project_context(str(tmp_path), "архитектура", mode="project-only")
 
-    assert result.context_pack[0]["path"] == "ARCHITECTURE.md"
+    assert result.context_pack[0]["path"] == "docs/EXTERNAL_OIDC_BROWSER_SELECTION_FIX_PLAN.md"
     assert result.project_docs is not None
-    injected = next(chunk for chunk in result.project_docs.results if chunk.path == "ARCHITECTURE.md")
-    assert injected.source_class == "project_file"
-    assert injected.metadata["injection_policy"] == "root_reviewable_project_doc_after_preflight"
+    assert {chunk.path for chunk in result.project_docs.results} == {
+        "docs/EXTERNAL_OIDC_BROWSER_SELECTION_FIX_PLAN.md",
+    }
 
 
 def test_explicit_document_locator_prevents_broad_architecture_injection(tmp_path):
@@ -589,7 +593,7 @@ def test_project_shadow_selection_marks_navigation_context_as_non_factual():
     assert result.support_decision.answer_supported is False
 
 
-def test_architecture_query_only_injects_authoritative_catalog_candidates(tmp_path):
+def test_architecture_query_does_not_hydrate_catalog_candidates_outside_retrieval(tmp_path):
     (tmp_path / "README.md").write_text("# Unlisted readme\n", encoding="utf-8")
     (tmp_path / "handbook").mkdir()
     system_doc = tmp_path / "handbook" / "system.md"
@@ -633,16 +637,8 @@ def test_architecture_query_only_injects_authoritative_catalog_candidates(tmp_pa
     )
 
     assert result.project_docs is not None
-    assert {chunk.path for chunk in result.project_docs.results} == {
-        "feature.md",
-        "handbook/system.md",
-    }
+    assert {chunk.path for chunk in result.project_docs.results} == {"feature.md"}
     assert all(chunk.path != "README.md" for chunk in result.project_docs.results)
-    injected = next(
-        chunk for chunk in result.project_docs.results if chunk.path == "handbook/system.md"
-    )
-    assert injected.description == "Whole-project architecture."
-    assert injected.authority == "source_of_truth"
 
 
 def test_architecture_query_does_not_fall_back_when_catalog_is_invalid(tmp_path):
@@ -679,7 +675,7 @@ def test_architecture_query_does_not_fall_back_when_catalog_is_invalid(tmp_path)
     assert all(chunk.path != "ARCHITECTURE.md" for chunk in result.project_docs.results)
 
 
-def test_architecture_injection_excludes_historical_and_module_catalog_docs(tmp_path):
+def test_architecture_query_does_not_hydrate_unretrieved_catalog_rows(tmp_path):
     for rel in ("active.md", "completed.md", "module.md"):
         (tmp_path / rel).write_text(f"# {rel}\nArchitecture details.\n", encoding="utf-8")
     facade = FakeProjectContextFacade()
@@ -712,4 +708,4 @@ def test_architecture_injection_excludes_historical_and_module_catalog_docs(tmp_
     )
 
     assert result.project_docs is not None
-    assert {chunk.path for chunk in result.project_docs.results} == {"existing.md", "active.md"}
+    assert {chunk.path for chunk in result.project_docs.results} == {"existing.md"}

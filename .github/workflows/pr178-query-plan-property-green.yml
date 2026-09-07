@@ -1,0 +1,183 @@
+name: PR178 query plan public IDs GREEN
+
+on:
+  push:
+    branches: [fix/context-first-project-reads]
+    paths: [.github/workflows/pr178-query-plan-property-green.yml]
+
+permissions:
+  contents: write
+
+env:
+  DOCATLAS_OFFLINE: "1"
+  DOCATLAS_AUTO_VECTORS: "0"
+  HF_HUB_OFFLINE: "1"
+  TRANSFORMERS_OFFLINE: "1"
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+jobs:
+  green:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 22
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+        with:
+          ref: fix/context-first-project-reads
+          fetch-depth: 0
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1
+        with:
+          python-version: '3.12'
+      - run: python -m pip install -e ".[dev]"
+
+      - name: Reuse exact reviewed regression and production-candidate scripts
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import subprocess, yaml
+          from pathlib import Path
+          data = yaml.safe_load(Path('.github/workflows/pr178-arch-flow-tdd.yml').read_text())
+          steps = data['jobs']['green']['steps']
+          for name in (
+              'Add public-behavior and reranker regressions',
+              'Apply bounded production candidate',
+          ):
+              script = next(step['run'] for step in steps if step.get('name') == name)
+              subprocess.run(['bash', '-c', script], check=True)
+          PY
+
+      - name: Add immutable public-query contract on DocumentationQueryPlan
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import ast, hashlib, json
+          from pathlib import Path
+
+          plan = Path('docmancer/docs/domain/documentation_query_plan.py')
+          text = plan.read_text()
+          old = '''    schema_version: str = "documentation-query-plan-v2"\n\n    def as_payload(self) -> dict[str, object]:\n        public_origins = {"original", "host_lookup", "exact_anchor", "exact_path"}\n        return {\n'''
+          new = '''    schema_version: str = "documentation-query-plan-v2"\n\n    @property\n    def public_query_ids(self) -> tuple[str, ...]:\n        """Return the model-visible query IDs from the immutable plan contract."""\n        public_origins = {"original", "host_lookup", "exact_anchor", "exact_path"}\n        return tuple(\n            query.query_id for query in self.queries\n            if query.origin in public_origins\n        )\n\n    def as_payload(self) -> dict[str, object]:\n        return {\n'''
+          assert text.count(old) == 1, 'DocumentationQueryPlan payload prelude drifted'
+          text = text.replace(old, new, 1)
+          old = '''            "public_query_ids": [\n                query.query_id for query in self.queries\n                if query.origin in public_origins\n            ],\n'''
+          new = '''            "public_query_ids": list(self.public_query_ids),\n'''
+          assert text.count(old) == 1, 'public_query_ids payload block drifted'
+          plan.write_text(text.replace(old, new, 1))
+
+          tests = Path('tests/docs/test_context_projection_boundaries.py')
+          test_text = tests.read_text()
+          marker = 'def test_documentation_query_plan_public_ids_match_serialized_contract():'
+          assert marker not in test_text
+          test_text += '''\n\ndef test_documentation_query_plan_public_ids_match_serialized_contract():\n    from docmancer.docs.domain.documentation_query_plan import build_documentation_query_plan\n\n    plan = build_documentation_query_plan(\n        "How does get_docs_context move from request boundary to visible sources?",\n        lookup_queries=(\n            "What does the documentation request boundary accept?",\n            "How do retrieved chunks become selected visible sources?",\n        ),\n    )\n    assert plan.public_query_ids == tuple(plan.as_payload()["public_query_ids"])\n    assert plan.public_query_ids == (\n        "query-original", "query-anchor-1", "query-lookup-1", "query-lookup-2",\n    )\n    assert not any("rewrite" in query_id for query_id in plan.public_query_ids)\n'''
+          tests.write_text(test_text)
+
+          nodeids = sorted(
+              f'tests/docs/test_context_projection_boundaries.py::{node.name}'
+              for node in ast.parse(test_text).body
+              if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef))
+              and node.name.startswith('test_')
+          )
+          manifest_path = Path('tests/diagnostic_labels.projection_boundaries.json')
+          manifest = json.loads(manifest_path.read_text())
+          manifest['module_node_hashes']['tests/docs/test_context_projection_boundaries.py'] = hashlib.sha256('\n'.join(nodeids).encode()).hexdigest()
+          manifest_path.write_text(json.dumps(manifest, indent=2, sort_keys=True) + '\n')
+          PY
+          python -m compileall -q \
+            docmancer/docs/domain/documentation_query_plan.py \
+            docmancer/docs/domain/project_doc_ranking.py \
+            docmancer/docs/application/_project_context_service_part01.py
+          git diff --check
+
+      - name: Verify targeted RED cases and safety are GREEN
+        shell: bash
+        run: |
+          set -euo pipefail
+          pytest -q \
+            tests/docs/test_context_projection_boundaries.py::test_documentation_query_plan_public_ids_match_serialized_contract \
+            tests/docs/test_context_projection_boundaries.py::test_reranker_uses_explicit_public_ids_for_derived_parent_coverage \
+            tests/docs/test_context_projection_boundaries.py::test_audited_host_flow_rewrites_are_parent_bound_and_non_public \
+            tests/docs/test_context_projection_boundaries.py::test_audited_host_flow_rewrites_fail_closed_on_negation_and_temporal_wording \
+            tests/docs/test_context_projection_boundaries.py::test_frozen_architecture_keeps_all_module_boundaries_visible \
+            tests/docs/test_context_projection_boundaries.py::test_frozen_request_flow_prefers_project_context_module_witnesses
+
+      - name: Verify neighboring contracts and adversarial
+        shell: bash
+        run: |
+          set -euo pipefail
+          pytest -q \
+            tests/docs/test_context_projection_boundaries.py \
+            tests/docs/test_project_doc_ranking.py \
+            tests/docs/test_context7_style_project_chat.py \
+            tests/docs/test_generic_context_workflows.py \
+            tests/docs/test_project_docs_catalog.py \
+            tests/docs/test_question_plan_v4.py \
+            tests/docs/test_project_context_quality.py \
+            tests/test_docs_service_part03.py
+          python scripts/run_agent_developer_adversarial_gate.py
+
+      - name: Verify unchanged frozen positive lanes
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json
+          from eval.project_context_quality_v2_protocol import load_cases, evaluate_case, validate_corpus
+          from scripts.run_project_docs_self_host_gate import LiveCase, run
+
+          validate_corpus()
+          output = {}
+          for lane in ('natural', 'exposed_paraphrases'):
+              cases = tuple(
+                  case for case in load_cases(lane)
+                  if case.get('case_type', 'positive' if case.get('expected_kind') == 'docs_context' else 'strict_negative') == 'positive'
+              )
+              result = run(cases=tuple(LiveCase(
+                  case_id=case['id'], question=case['question'], relevant_paths=(),
+                  lookup_queries=tuple(case['lookup_queries']), scope=case['scope'],
+              ) for case in cases), negative_cases=())
+              rows = []
+              for case, observed in zip(cases, result['results'], strict=True):
+                  verdict = evaluate_case(case, observed['payload'])
+                  rows.append({
+                      'id': case['id'],
+                      'semantic_useful': verdict['semantic_useful'],
+                      'false_full': verdict['false_full_coverage'],
+                      'missing': [item['id'] for item in verdict['obligations'] if not item['met']],
+                  })
+              output[lane] = {
+                  'useful': sum(bool(row['semantic_useful']) for row in rows),
+                  'total': len(rows),
+                  'false_full': sum(bool(row['false_full']) for row in rows),
+                  'rows': rows,
+              }
+          print('FROZEN_V2=' + json.dumps(output, ensure_ascii=False, sort_keys=True))
+          natural = {row['id']: row for row in output['natural']['rows']}
+          assert natural['v2-natural-architecture']['semantic_useful'] is True
+          assert natural['v2-natural-request-flow']['semantic_useful'] is True
+          assert output['natural']['false_full'] == 0
+          assert output['exposed_paraphrases']['false_full'] == 0
+          PY
+
+      - name: Verify full repository suite
+        shell: bash
+        run: |
+          set -euo pipefail
+          pytest -q
+          python -m compileall -q docmancer tests scripts eval
+          git diff --check
+
+      - name: Publish runtime only after full GREEN
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -f \
+            .github/workflows/pr178-arch-flow-tdd.yml \
+            .github/workflows/pr178-rerank-stage-trace.yml \
+            .github/workflows/pr178-query-plan-property-green.yml
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git diff --cached --check
+          git commit -m "fix: preserve explicit public query diversity"
+          git push origin HEAD:fix/context-first-project-reads

@@ -97,7 +97,12 @@ def _compact_project_sync(result: Any) -> dict[str, Any]:
     }
 
 
-def _bounded_project_status(project: Any, *, details: bool) -> dict[str, Any]:
+def _bounded_project_status(
+    project: Any,
+    *,
+    details: bool,
+    module: str | None = None,
+) -> dict[str, Any]:
     """Project status for agents: preserve exact module identity without dumping inspect state."""
     if not isinstance(project, dict):
         return {}
@@ -106,11 +111,27 @@ def _bounded_project_status(project: Any, *, details: bool) -> dict[str, Any]:
         project_docs = {}
     raw_modules = project_docs.get("modules")
     modules = raw_modules if isinstance(raw_modules, list) else []
+    selector = str(module or "").strip()
+    matching_modules = [
+        row for row in modules
+        if isinstance(row, dict)
+        and (
+            not selector
+            or selector in {
+                str(row.get("module_id") or "").strip(),
+                str(row.get("module_name") or "").strip(),
+                str(row.get("module_path") or "").strip(),
+            }
+        )
+    ]
     visible_modules: list[dict[str, Any]] = []
     if details:
-        for row in modules[:_DOCS_STATUS_MODULE_LIMIT]:
-            if not isinstance(row, dict):
+        seen_paths: set[str] = set()
+        for row in matching_modules:
+            module_path = str(row.get("module_path") or "").strip()
+            if not module_path or module_path in seen_paths:
                 continue
+            seen_paths.add(module_path)
             visible_modules.append({
                 key: row.get(key)
                 for key in (
@@ -118,7 +139,9 @@ def _bounded_project_status(project: Any, *, details: bool) -> dict[str, Any]:
                 )
                 if row.get(key) not in (None, "")
             })
-    module_count = len(modules)
+            if len(visible_modules) >= _DOCS_STATUS_MODULE_LIMIT:
+                break
+    module_count = len(matching_modules)
     raw_diagnostics = project.get("diagnostics")
     diagnostics = raw_diagnostics if isinstance(raw_diagnostics, dict) else {}
     raw_active_index = diagnostics.get("active_index")
@@ -327,15 +350,16 @@ def handle_prefetch_tool(name: str, args: dict[str, Any], service: LibraryDocsSe
                     "reason_code": "project_path_required",
                     "message": "project_path is required for action='project'",
                 }
-            project = handle_project_tool(
-                "inspect_project_docs",
-                {"project_path": project_path},
-                service,
-            )
+            project = asdict(project_docs_app.inspect_project_docs(project_path))
+            details = args.get("details")
             return {
                 "tool": "docs_status",
                 "action": action,
-                "project": _bounded_project_status(project, details=True),
+                "project": _bounded_project_status(
+                    project,
+                    details=True if details is None else bool(details),
+                    module=str(args.get("module") or "").strip() or None,
+                ),
             }
         if action == "library":
             canonical_id = str(args.get("canonical_id") or "").strip()

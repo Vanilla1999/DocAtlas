@@ -3,6 +3,11 @@ from __future__ import annotations
 import json
 
 from docmancer.docs.interfaces.mcp.output_contract import compact_mcp_payload, paginate_context_items
+from docmancer.docs.application.model_visible_projection import estimate_projection_tokens
+from docmancer.docs.interfaces.mcp.recovery_projection import (
+    _bound_recoverable_insufficient_projection,
+    bind_module_recovery_selector,
+)
 
 
 def _bytes(payload: dict) -> int:
@@ -68,3 +73,61 @@ def test_normalize_output_mode_shared_details_fallback() -> None:
     payload = compact_mcp_payload({"status": "ok"})
 
     assert payload == {"status": "ok"}
+
+
+def test_compaction_enforces_actual_bytes_when_token_estimate_is_forged():
+    payload = {
+        "status": "ok",
+        "estimated_tokens": 1,
+        "blob": "x" * 100_000,
+    }
+
+    compact = compact_mcp_payload(payload, max_bytes=32_000)
+
+    assert _bytes(compact) <= 32_000
+    assert len(str(compact.get("blob") or "")) < 100_000
+
+
+def test_module_recovery_omits_an_impossible_exact_path_without_throwing():
+    impossible_path = "packages/" + "very-long-segment/" * 1_200 + "auth"
+    payload = {
+        "status": "insufficient_evidence",
+        "kind": "docs_answer",
+        "missing": ["Select an exact module_path and retry."],
+        "recommended_next_action": {
+            "tool": "docs_status",
+            "arguments_patch": {"action": "project", "project_path": "/repo"},
+            "requires_confirmation": False,
+            "auto_execute": False,
+        },
+        "operational_reason_code": "module_ambiguous",
+        "module_candidates": [{"module_path": impossible_path}],
+        "answer_supported": False,
+        "answer_available": False,
+        "support_status": "insufficient_evidence",
+        "estimated_tokens": 0,
+    }
+
+    _bound_recoverable_insufficient_projection(payload, max_tokens=256)
+
+    assert payload.get("module_candidates") in (None, [])
+    assert impossible_path not in str(payload)
+    assert payload["status"] == "insufficient_evidence"
+    assert payload["answer_supported"] is False
+    assert payload["answer_available"] is False
+    assert estimate_projection_tokens(payload) <= 256
+
+
+def test_module_recovery_status_action_preserves_the_ambiguous_selector():
+    action = {
+        "tool": "docs_status",
+        "arguments_patch": {"action": "project", "project_path": "/repo"},
+    }
+    payload = {"lanes": {"project": {
+        "reason_code": "module_ambiguous", "module_selector": "auth",
+    }}}
+
+    updated = bind_module_recovery_selector(action, payload)
+
+    assert updated["arguments_patch"]["module"] == "auth"
+    assert "module" not in action["arguments_patch"]

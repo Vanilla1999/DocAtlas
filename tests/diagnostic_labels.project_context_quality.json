@@ -1,0 +1,10 @@
+{
+  "module_labels": {
+    "tests/test_project_context_quality_protocol.py": "behavioral"
+  },
+  "module_node_hashes": {
+    "tests/test_project_context_quality_protocol.py": "326d78abf4f62354d3a4b277b6234f6f0afcbd5c42302e98074d2ad10c4da48c"
+  },
+  "node_overrides": {},
+  "schema_version": 1
+}

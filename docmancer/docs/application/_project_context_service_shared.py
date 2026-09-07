@@ -45,7 +45,7 @@ from docmancer.docs.domain.retrieval_routing import (
     should_run_repo_map,
     validate_routing_record,
 )
-from docmancer.docs.models import SOURCE_CLASS_PROJECT_FILE, DeliveryDecision, DocsChunk, DocsResult, ProjectContextResult, ProjectDocsChunk, ProjectDocsResult, ProjectMetadata
+from docmancer.docs.models import DeliveryDecision, DocsChunk, DocsResult, ProjectContextResult, ProjectDocsChunk, ProjectDocsResult, ProjectMetadata
 
 LOW_TRUST_PROJECT_RISK_FLAGS = frozenset({
     "research_artifact",
@@ -206,6 +206,7 @@ def project_context_pack(*, question: str = "", project_docs: ProjectDocsResult 
                 "module_path": item.module_path,
                 "module_type": item.module_type,
                 "description": item.description,
+                "catalog_role": item.metadata.get("project_doc_reason"),
                 "lifecycle_status": item.lifecycle_status or "active",
                 "temporal_relevance": temporal_relevance_for_status(item.lifecycle_status),
                 "index_freshness": "stale" if item.stale else "synchronized",
@@ -344,76 +345,6 @@ def _project_docs_preflight_confirmation_result(*, root: Path, question: str, mo
         answer_outline={"answer_completeness": answer_completeness},
         message=project_docs.message or "Project docs preflight requires confirmation before returning trusted project context.",
     )
-
-
-def _inject_broad_architecture_docs(
-    project_docs: ProjectDocsResult,
-    *,
-    root: Path,
-    intent: Any,
-    evidence_path: str | None = None,
-    lifecycle_intent_value: str = "current",
-    catalog_authoritative: bool = False,
-) -> ProjectDocsResult:
-    if evidence_path or not getattr(intent, "wants_architecture", False):
-        return project_docs
-    existing = {normalize_doc_path(chunk.path) for chunk in project_docs.results}
-    injected: list[ProjectDocsChunk] = []
-    if catalog_authoritative:
-        injection_rows = [
-            item
-            for item in project_docs.candidate_sources
-            if item.get("reason") in {"overview", "project_architecture"}
-            and item.get("doc_scope") == "project"
-            and lifecycle_allows(item, lifecycle_intent_value)
-        ][:3]
-    else:
-        injection_rows = (
-            [
-                {"path": rel, "doc_scope": "project", "lifecycle_status": "active"}
-                for rel in ("ARCHITECTURE.md", "docs/INDEX.md", "README.md")
-            ]
-            if lifecycle_intent_value != "historical"
-            else []
-        )
-    for row in injection_rows:
-        rel = str(row.get("path") or "")
-        if normalize_doc_path(rel) in existing:
-            continue
-        path = root / rel
-        if not path.is_file() or path.stat().st_size > 80_000:
-            continue
-        text = path.read_text(encoding="utf-8", errors="replace").strip()
-        if not text or _looks_like_placeholder_context_doc(rel, text):
-            continue
-        injected.append(ProjectDocsChunk(
-            title=path.stem if path.stem else rel,
-            content=text[:12_000],
-            source=str(path),
-            url=None,
-            metadata={
-                "score": 1.0,
-                "injected_for": "broad_architecture_query",
-                "injection_policy": "root_reviewable_project_doc_after_preflight",
-                "lifecycle_status": row.get("lifecycle_status") or "active",
-                "temporal_relevance": temporal_relevance_for_status(row.get("lifecycle_status")),
-                "index_freshness": "synchronized",
-            },
-            source_class=SOURCE_CLASS_PROJECT_FILE,
-            path=rel,
-            doc_scope=str(row.get("doc_scope") or "project"),
-            module_id=row.get("module_id"),
-            module_name=row.get("module_name"),
-            module_path=row.get("module_path"),
-            module_type=row.get("module_type"),
-            description=row.get("description"),
-            authority=row.get("authority"),
-            lifecycle_status=row.get("lifecycle_status"),
-            impact_policy=row.get("impact_policy"),
-        ))
-    if not injected:
-        return project_docs
-    return replace(project_docs, results=[*project_docs.results, *injected])
 
 
 def _drop_placeholder_context_doc(item: ProjectDocsChunk) -> bool:
