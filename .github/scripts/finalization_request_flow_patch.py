@@ -114,6 +114,11 @@ old = '''        queries_by_origin: dict[str, list[list[Any]]] = {}
                 *queries_by_origin.get("retrieval_hint", []),
             ],
         ])
+        candidates.sort(
+            key=lambda chunk: not bool(
+                (chunk.metadata or {}).get("retrieval_query_ids")
+            )
+        )
 '''
 new = '''        queries_by_origin: dict[str, list[list[Any]]] = {}
         audited_parent_lanes: list[list[Any]] = []
@@ -134,9 +139,6 @@ new = '''        queries_by_origin: dict[str, list[list[Any]]] = {}
                 *queries_by_origin.get("exact_anchor", []),
             ],
             [[*authoritative_chunks, *chunks]],
-            # Audited rewrites are domain-proven retrieval equivalents for a
-            # public parent, so reserve their bounded top candidate before
-            # generic generated aliases can consume candidate budget.
             audited_parent_lanes,
             queries_by_origin.get("host_lookup", []),
             [
@@ -145,6 +147,21 @@ new = '''        queries_by_origin: dict[str, list[list[Any]]] = {}
                 *queries_by_origin.get("retrieval_hint", []),
             ],
         ])
+        # Audited rewrites are the only generated queries allowed to derive
+        # coverage for a public parent. Their compact top witness must survive
+        # aggregate admission before noisy recall-only lanes spend the same
+        # bounded candidate budget. This changes admission order only; it does
+        # not increase the internal budget or the public 3-source/800-token cap.
+        audited_seed_ids = {
+            str((lane[0].metadata or {}).get("stable_chunk_id") or "")
+            for lane in audited_parent_lanes if lane
+        }
+        candidates.sort(
+            key=lambda chunk: (
+                str((chunk.metadata or {}).get("stable_chunk_id") or "") not in audited_seed_ids,
+                not bool((chunk.metadata or {}).get("retrieval_query_ids")),
+            )
+        )
 '''
 assert service_text.count(old) == 1
 service.write_text(service_text.replace(old, new, 1), encoding="utf-8")
