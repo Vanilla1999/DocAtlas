@@ -99,7 +99,7 @@
       "evidence_status": "provider_free_measured_accepted",
       "execution_status": "closed",
       "facts": {
-        "answer_supported": 5,
+        "answer_supported": 6,
         "candidate_discovered": 10,
         "case_count": 14,
         "false_supported_negative_controls": 0,
@@ -149,15 +149,15 @@
       "path": "eval/agent_developer_v1/results/contract-v2-ablation.json"
     },
     "p1_4": {
-      "git_blob_sha1": "2963d14e1c5a4aec95b194a70a781b8b52dfc40c",
+      "git_blob_sha1": "a3c61b61514fa52e7e52a9fbff965ff1050b46bb",
       "path": "eval/agent_developer_v1/results/paraphrase-proofability.json"
     },
     "p1_5": {
-      "git_blob_sha1": "91aa782749f590586dfe34d5bceea9ec76d5f72c",
+      "git_blob_sha1": "bcfc0923c33a649fda86242f407cec6c50d73aa7",
       "path": "eval/agent_developer_v1/results/mixed-evidence-provenance.json"
     },
     "p1_6": {
-      "git_blob_sha1": "ca9057dc578b2fd70f13fd7324b8b4a532e25c83",
+      "git_blob_sha1": "f541a6e2298063d80151b6060d8a68f308b685da",
       "path": "eval/agent_developer_v1/results/evidence-is-data.json"
     }
   }

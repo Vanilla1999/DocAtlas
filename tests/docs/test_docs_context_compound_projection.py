@@ -293,7 +293,9 @@ def test_expansion_preserves_each_previously_selected_witness():
 
 def test_recovery_uses_actual_projection_budget_rejection():
     retrieval = _host_lookup_context_retrieval()
-    projection, _ = project_docs_context(retrieval=retrieval, max_tokens=256)
+    # A compact payload no longer carries redundant prose instructions; use a
+    # budget below the minimum source envelope rather than the old 256 boundary.
+    projection, _ = project_docs_context(retrieval=retrieval, max_tokens=200)
     assert projection["context_available"] is False
     diagnosis = build_recovery_diagnosis("Uncertain project overview", None,
                                          projection=projection, retrieval=retrieval)
@@ -333,15 +335,18 @@ def test_smaller_qualified_variant_fits_when_best_coverage_variant_does_not():
         retrieval["documentation_query_plan"]["queries"][index]["text"] = text
     retrieval["context_pack"] = [source]
     full, _ = project_docs_context(retrieval=retrieval)
-    bounded, snapshot = project_docs_context(retrieval=retrieval, max_tokens=375)
+    # Exercise the actual serialization boundary, not a stale fixed cost that
+    # depended on the removed prose instruction in docs_context.
+    budget = full["estimated_tokens"] - 1
+    bounded, snapshot = project_docs_context(retrieval=retrieval, max_tokens=budget)
     assert full["covered_query_ids"] == ["query-lookup-1", "query-lookup-2"]
-    assert full["estimated_tokens"] > 375
+    assert full["estimated_tokens"] > budget
     assert bounded["covered_query_ids"] == ["query-lookup-1"]
     snippet = bounded["sources"][0]["snippet"]
     assert 160 < len(snippet) <= 320
     assert snippet in source["content"]
-    assert bounded["estimated_tokens"] <= 375
-    assert validate_model_visible_projection(bounded, snapshot=snapshot, max_tokens=375) == []
+    assert bounded["estimated_tokens"] <= budget
+    assert validate_model_visible_projection(bounded, snapshot=snapshot, max_tokens=budget) == []
 
 
 def test_duplicate_evidence_never_joins_noncontiguous_fragments():

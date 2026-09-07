@@ -613,6 +613,7 @@ def rerank_project_doc_chunks(
     scored = []
     score_by_id: dict[int, tuple[float, float, int]] = {}
     public_queries_by_id: dict[int, set[str]] = {}
+    audited_queries_by_id: dict[int, set[str]] = {}
     exact_anchors = {
         normalize_doc_path(value)
         for value in technical_anchors(question)
@@ -635,14 +636,20 @@ def rerank_project_doc_chunks(
         # Explicit qualification failures must not survive boosts or backfill.
         if "retrieval_query_matches" in metadata and not qualified_query_ids:
             continue
+        # Audited rewrites already attribute qualified public parents upstream.
+        # Count each public direction once, never its generated child aliases.
         public_queries_by_id[id(chunk)] = {
             query_id for query_id in qualified_query_ids
             if query_id == "query-original"
             or query_id.startswith(("query-lookup-", "query-anchor-", "query-path-"))
-            or (
-                query_matches[query_id].get("relation") == "audited_rewrite"
-                and str(query_matches[query_id].get("public_parent_query_id") or "").startswith("query-lookup-")
-            )
+        } if not exact_path_anchor else set()
+        # Distinct audited retrieval directions break public-coverage ties only.
+        # They cannot invent coverage when their public parent did not qualify.
+        audited_queries_by_id[id(chunk)] = {
+            query_id for query_id in qualified_query_ids
+            if query_matches[query_id].get("relation") == "audited_rewrite"
+            and str(query_matches[query_id].get("public_parent_query_id") or "").startswith("query-lookup-")
+            and query_matches[query_id]["public_parent_query_id"] in qualified_query_ids
         } if not exact_path_anchor else set()
         base = chunk_base_score(chunk, index)
         score = base * source_weight_for_intent(path, getattr(chunk, "heading_path", None), intent) * source_requirement_boost(path, question, intent)
@@ -703,6 +710,7 @@ def rerank_project_doc_chunks(
     selected: list[Any] = []
     per_source_count: dict[str, int] = {}
     covered_public_queries: set[str] = set()
+    covered_audited_queries: set[str] = set()
     diversity_relaxed_ids: set[int] = set()
     remaining = list(scored)
     while remaining:
@@ -710,17 +718,20 @@ def rerank_project_doc_chunks(
         next_index = max(range(len(remaining)), key=lambda i: (
             remaining[i][0],
             len(public_queries_by_id[id(remaining[i][3])] - covered_public_queries),
+            len(audited_queries_by_id[id(remaining[i][3])] - covered_audited_queries),
             -i,
         ))
         _, _, index, chunk = remaining.pop(next_index)
         path = _source_key(chunk, index)
         new_public_queries = public_queries_by_id[id(chunk)] - covered_public_queries
+        new_audited_queries = audited_queries_by_id[id(chunk)] - covered_audited_queries
         if per_source_count.get(path, 0) >= max_per_source:
-            if not new_public_queries:
+            if not new_public_queries and not new_audited_queries:
                 continue
             diversity_relaxed_ids.add(id(chunk))
         selected.append(chunk)
         covered_public_queries.update(new_public_queries)
+        covered_audited_queries.update(new_audited_queries)
         per_source_count[path] = per_source_count.get(path, 0) + 1
         if limit and len(selected) >= limit:
             break

@@ -107,7 +107,7 @@ class DocumentationQueryPlan:
 
 
 _HOST_LOOKUP_NEGATION_RE = re.compile(
-    r"\b(?:not|never|without|no|не|нет|никогда|без)\b", re.I,
+    r"\b(?:not|never|without|no|cannot|neither|nor|[a-z]+n['’]t|не|нет|никогда|без)\b", re.I,
 )
 
 
@@ -222,7 +222,7 @@ def build_documentation_query_plan(
     host_rewrite_count = 0
     for parent_query_id, cleaned in host_rows:
         policies = host_policies(cleaned)
-        parent_exact_terms = tuple(dict.fromkeys((
+        host_parent_exact_terms = tuple(dict.fromkeys((
             *(term.normalized_value for term in documentation_exact_terms(cleaned)),
             *(value.casefold() for value in documentation_technical_anchors(cleaned)),
         )))
@@ -236,7 +236,7 @@ def build_documentation_query_plan(
                 preferred_catalog_roles=policies["preferred_catalog_roles"],
                 forbidden_catalog_roles=policies["forbidden_catalog_roles"],
                 forbidden_evidence_terms=policies["forbidden_evidence_terms"],
-                parent_exact_terms=parent_exact_terms,
+                parent_exact_terms=host_parent_exact_terms,
             ))
             seen.add(rewrite.casefold())
     for index, alias in enumerate(retrieval_aliases, start=1):

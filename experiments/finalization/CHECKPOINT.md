@@ -23,7 +23,7 @@ Inherited diagnostic progress:
 Latest closure on PR #179:
 - request-flow lineage is GREEN: 7/7 targeted tests;
 - the frozen request-flow case visibly carries MCP boundary, application orchestration, retrieval gateway, and selection policy within the existing 3-source / 800-token limit;
-- project-context quality v2 live evaluation is GREEN on the published request-flow slice;
+- project-context quality v2 live evaluation completed on the published request-flow slice; it is REPORT_ONLY, not a passing release/quality gate;
 - neighboring model-visible projection, ranking, context, and service contracts are GREEN;
 - `docs_context_projection.py` is back within the repository 1000-line module budget after formatting-only cleanup;
 - temporary request-flow and size-validation Actions workflows/scripts were removed after their validated production commits;
