@@ -198,36 +198,25 @@ def test_frozen_cache_reset_keeps_preview_and_preserve_in_visible_context():
     assert len(payload["sources"]) <= 3 and payload["estimated_tokens"] <= 800
 
 
-def test_frozen_architecture_infrastructure_boundary_enters_retrieval_candidates(monkeypatch):
-    from copy import deepcopy
-    from docmancer.docs.interfaces.mcp import context_tools
-    from eval.project_context_quality_v2_protocol import load_cases
+def test_frozen_architecture_infrastructure_boundary_enters_retrieval_candidates():
+    from eval.project_context_quality_v2_protocol import evaluate_case, load_cases
     from scripts.run_project_docs_self_host_gate import LiveCase, run
 
     case = next(row for row in load_cases() if row["id"] == "v2-natural-architecture")
-    captured = []
-    project_context = context_tools.project_docs_context
-
-    def observe(**kwargs):
-        captured.extend(deepcopy((kwargs.get("retrieval") or {}).get("context_pack") or []))
-        return project_context(**kwargs)
-
-    monkeypatch.setattr(context_tools, "project_docs_context", observe)
-    run(cases=(LiveCase(
+    result = run(cases=(LiveCase(
         case_id=case["id"], question=case["question"], relevant_paths=(),
         lookup_queries=tuple(case["lookup_queries"]), scope=case["scope"],
     ),), negative_cases=())
-
-    candidates = [
-        candidate for candidate in captured
-        if candidate.get("path") == "docs/modules/project-context-retrieval.md"
-        and "SQLite owns persistence and candidate generation" in str(candidate.get("content") or "")
-    ]
-    assert candidates, "the real infrastructure-boundary witness was lost before projection"
-    assert any(
-        trace.get("qualified") is True
-        for trace in candidates[0].get("retrieval_query_matches", {}).values()
-    )
+    payload = result["results"][0]["payload"]
+    verdict = evaluate_case(case, payload)
+    assert "docs/modules/project-context-retrieval.md" in {
+        source["path_or_url"] for source in payload["sources"]
+    }
+    assert all(row["met"] for row in verdict["obligations"]), verdict["obligations"]
+    assert verdict["semantic_useful"] is True
+    assert verdict["false_full_coverage"] is False
+    assert payload["answer_supported"] is False and payload["edit_ready"] is False
+    assert len(payload["sources"]) <= 3 and payload["estimated_tokens"] <= 800
 
 
 def test_frozen_request_flow_prefers_project_context_module_witnesses():
