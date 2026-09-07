@@ -1,0 +1,72 @@
+name: PR179 reviewed fixes validation
+
+on:
+  push:
+    branches: [fix/context-first-project-reads-finalization]
+    paths: [.github/workflows/pr179-apply-review.yml]
+
+permissions:
+  contents: write
+
+env:
+  DOCATLAS_OFFLINE: "1"
+  DOCATLAS_AUTO_VECTORS: "0"
+  HF_HUB_OFFLINE: "1"
+  TRANSFORMERS_OFFLINE: "1"
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
+
+jobs:
+  reviewed-fixes:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1
+        with:
+          python-version: '3.13'
+      - name: Install frozen test dependencies
+        run: |
+          python -m pip install uv==0.9.25
+          uv sync --frozen --extra dev
+      - name: Apply the checksum-bound reviewed patch and remove temporary workflows
+        run: |
+          echo 'b3669daa3a66c2828e7cff1f0b23cacfda88c31254766823f674b1f6e2bdea4f  .github/review/pr179-reviewed.patch' | sha256sum -c -
+          git apply --check .github/review/pr179-reviewed.patch
+          git apply --index .github/review/pr179-reviewed.patch
+          git rm .github/review/pr179-reviewed.patch .github/workflows/pr179-apply-review.yml .github/workflows/pr179-review-artifacts.yml .github/workflows/pr178-arch-flow-tdd.yml
+          git diff --cached --check
+      - name: Full offline suite and static contracts
+        run: |
+          set -euo pipefail
+          uv run --no-sync pytest tests/ -q --junitxml="$RUNNER_TEMP/pr179-full.xml" | tee "$RUNNER_TEMP/pr179-full.log"
+          uv run --no-sync python -m compileall -q docmancer eval scripts tests
+          uv run --no-sync python scripts/check_python_module_size.py
+      - name: Verify P1 evidence and the refreshed closure without rewriting reports
+        run: |
+          uv run --no-sync python scripts/run_paraphrase_proofability_gate.py
+          uv run --no-sync python scripts/run_mixed_evidence_provenance_gate.py
+          uv run --no-sync python scripts/run_evidence_is_data_gate.py
+          uv run --no-sync python scripts/run_p1_agent_truth_closure_gate.py
+          uv run --no-sync python scripts/p1_agent_truth_closure_self_test.py
+          git diff --exit-code
+      - name: Publish validated fixes to the existing PR branch
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git diff --cached --check
+          git commit -m "fix: isolate query lineage and prioritize distinct public coverage"
+          git push origin HEAD:fix/context-first-project-reads-finalization
+          git rev-parse HEAD > "$RUNNER_TEMP/pr179-reviewed-revision.txt"
+      - name: Preserve validation evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: pr179-reviewed-validation
+          path: |
+            ${{ runner.temp }}/pr179-full.xml
+            ${{ runner.temp }}/pr179-full.log
+            ${{ runner.temp }}/pr179-reviewed-revision.txt
+          if-no-files-found: warn
+          retention-days: 14
