@@ -1,4 +1,4 @@
-name: Finalization request flow trace
+name: Finalization request flow allocation trace
 
 on:
   push:
@@ -13,7 +13,7 @@ env:
   DOCATLAS_AUTO_VECTORS: "0"
   HF_HUB_OFFLINE: "1"
   TRANSFORMERS_OFFLINE: "1"
-  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
 jobs:
   trace:
@@ -28,51 +28,74 @@ jobs:
           python-version: '3.12'
       - run: python -m pip install -e ".[dev]"
       - run: python .github/scripts/finalization_request_flow_patch.py
-      - name: Trace final sources and lineage
+      - name: Trace raw audited lanes and bounded context pack
         shell: bash
         run: |
           python - <<'PY'
           import json
           from copy import deepcopy
           from unittest.mock import patch
+          from docmancer.retrieval.dispatch import RetrievalDispatcher
+          from docmancer.docs.interfaces.mcp import context_tools
           from eval.project_context_quality_v2_protocol import evaluate_case, load_cases
           from scripts.run_project_docs_self_host_gate import LiveCase, run
-          from docmancer.docs.interfaces.mcp import context_tools
 
           case = next(c for c in load_cases() if c['id'] == 'v2-natural-request-flow')
+          raw = []
           captured = []
-          original = context_tools.project_docs_context
+          dispatcher_run = RetrievalDispatcher.run
+          project_context = context_tools.project_docs_context
+
+          def trace_dispatch(self, query, **kwargs):
+              result = dispatcher_run(self, query, **kwargs)
+              if query in {
+                  'get_docs_context question project_path lookup_queries module_path scope',
+                  'retrieval gateway filtered project chunks',
+                  'selection maximizes distinct visible query coverage',
+              }:
+                  raw.append({
+                      'query': query,
+                      'limit': kwargs.get('limit'),
+                      'budget': kwargs.get('budget'),
+                      'chunks': [{
+                          'rank': rank,
+                          'path': (chunk.metadata or {}).get('project_doc_path') or chunk.source,
+                          'chunk_index': chunk.chunk_index,
+                          'text': chunk.text,
+                          'tokens': (chunk.metadata or {}).get('token_estimate'),
+                      } for rank, chunk in enumerate(result.chunks, 1)],
+                  })
+              return result
+
           def observe(**kwargs):
               captured.append(deepcopy(kwargs.get('retrieval') or {}))
-              return original(**kwargs)
-          with patch.object(context_tools, 'project_docs_context', observe):
+              return project_context(**kwargs)
+
+          with patch.object(RetrievalDispatcher, 'run', trace_dispatch), patch.object(context_tools, 'project_docs_context', observe):
               result = run(cases=(LiveCase(case_id=case['id'], question=case['question'], relevant_paths=(), lookup_queries=tuple(case['lookup_queries']), scope=case['scope']),), negative_cases=())
           payload = result['results'][0]['payload']
           verdict = evaluate_case(case, payload)
           retrieval = captured[-1]
-          rows = []
-          for index, candidate in enumerate(retrieval.get('context_pack') or []):
-              path = candidate.get('path') or candidate.get('source')
-              if path != 'docs/modules/project-context-retrieval.md':
-                  continue
-              rows.append({
-                  'index': index,
-                  'path': path,
-                  'section': candidate.get('section') or candidate.get('parent_title'),
-                  'content': candidate.get('content') or candidate.get('snippet'),
-                  'matches': {
-                      qid: {k: trace.get(k) for k in ('query_text','relation','public_parent_query_id','qualified','coverage_kind','derived_from_query_id','matched_terms','match_ratio') if k in trace}
-                      for qid, trace in (candidate.get('retrieval_query_matches') or {}).items()
-                  },
-              })
-          print('PLAN=' + json.dumps(retrieval.get('documentation_query_plan') or {}, ensure_ascii=False, sort_keys=True))
-          print('CONTEXT=' + json.dumps(rows, ensure_ascii=False, sort_keys=True))
+          pack = [{
+              'index': i,
+              'path': c.get('path') or c.get('source'),
+              'section': c.get('section') or c.get('parent_title'),
+              'text': c.get('content') or c.get('snippet'),
+              'ids': c.get('retrieval_query_ids') or [],
+              'matches': {qid: {
+                  'qualified': tr.get('qualified'),
+                  'relation': tr.get('relation'),
+                  'parent': tr.get('public_parent_query_id'),
+                  'coverage_kind': tr.get('coverage_kind'),
+                  'derived_from': tr.get('derived_from_query_id'),
+              } for qid, tr in (c.get('retrieval_query_matches') or {}).items()},
+          } for i, c in enumerate(retrieval.get('context_pack') or [])]
+          print('RAW_AUDITED=' + json.dumps(raw, ensure_ascii=False, sort_keys=True))
+          print('PACK=' + json.dumps(pack, ensure_ascii=False, sort_keys=True))
           print('PUBLIC=' + json.dumps({
               'sources': payload.get('sources') or [],
               'covered': payload.get('covered_query_ids') or [],
               'missing': payload.get('missing_query_ids') or [],
-              'tokens': payload.get('estimated_tokens'),
               'obligations': verdict['obligations'],
-              'false_full': verdict['false_full_coverage'],
           }, ensure_ascii=False, sort_keys=True))
           PY
