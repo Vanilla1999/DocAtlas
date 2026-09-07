@@ -145,10 +145,9 @@ def project_docs_context(
         and str(item.get("public_parent_query_id") or "") in host_query_ids
         and item.get("query_id")
     }
-    compound_priority_query_ids = (
-        host_query_ids | audited_rewrite_query_ids
-        if len(host_query_ids) > 1 else public_query_id_set
-    )
+    compound_priority_query_ids = public_query_id_set
+    if len(host_query_ids) > 1:
+        compound_priority_query_ids = host_query_ids | audited_rewrite_query_ids
     eligible_query_ids = public_query_id_set | canonical_intent_query_ids
     original_question = str(query_plan.get("original_question") or retrieval.get("question") or query_text.get("query-original") or "")
     requirements = retrieval.get("requirements") or {}
@@ -173,7 +172,8 @@ def project_docs_context(
     candidates = list(retrieval.get("context_pack") or ())
     initially_ranked = _facet_aware_candidates(
         candidates, query_text=query_text,
-        required_query_ids=compound_priority_query_ids,
+        required_query_ids=compound_priority_query_ids - audited_rewrite_query_ids,
+        supplemental_query_ids=audited_rewrite_query_ids,
         canonical_query_ids=canonical_intent_query_ids,
         assigned_evidence_ids=set(assigned_evidence_by_requirement.values()),
         bound_assigned_evidence_ids=required_assigned_evidence_ids,
@@ -333,7 +333,8 @@ def project_docs_context(
         )
         prepared = _facet_aware_candidates(
             prepared, query_text=query_text,
-            required_query_ids=missing_compound_priority_ids,
+            required_query_ids=missing_compound_priority_ids - audited_rewrite_query_ids,
+            supplemental_query_ids=audited_rewrite_query_ids - qualified_query_ids(sources),
             canonical_query_ids=canonical_intent_query_ids - selected_canonical_ids,
             exact_query_ids=(
                 set()
@@ -411,11 +412,8 @@ def project_docs_context(
             - selected_qualified_public_ids
             - dependent_on_covered_parent
         )
-        # Query coverage is retrieval attribution, not a second semantic proof.
-        # Generated exact-anchor children inherit their public parent's direction:
-        # once that parent is already qualified, those children cannot by themselves
-        # admit a lower-authority duplicate source. Explicit host lookups with no
-        # covered parent still count as genuinely new independent directions.
+        # Retrieval attribution is not proof. Anchor children share their parent's
+        # direction; only independent lookups can admit a lower-authority duplicate.
         if (
             sources
             and obligations
@@ -835,8 +833,6 @@ def _public_query_ids(query_plan: dict[str, Any]) -> tuple[str, ...]:
     return tuple(dict.fromkeys(values or _required_query_ids(query_plan)))
 
 
-
-
 def _assigned_requirements_for_source(
     source: dict[str, Any], assignments: dict[str, str],
 ) -> tuple[str, ...]:
@@ -938,11 +934,13 @@ def _context_rank(
 def _facet_aware_candidates(
     candidates: list[Any], *, query_text: dict[str, str], required_query_ids: set[str],
     canonical_query_ids: set[str] | None = None,
+    supplemental_query_ids: set[str] | None = None,
     assigned_evidence_ids: set[str] | None = None,
     bound_assigned_evidence_ids: set[str] | None = None,
     exact_query_ids: set[str] | None = None,
     obligations: tuple[Any, ...] = (), missing_component_ids: set[str] | None = None,
 ) -> list[Any]:
+    # Audited directions break public-coverage ties; they are not public queries.
     # Exact-anchor lanes are identity-sensitive: when two candidates both
     # visibly qualify, preserve the upstream assigned witness before rewarding
     # extra lexical mentions. General host/original lanes keep action and
@@ -974,6 +972,7 @@ def _facet_aware_candidates(
             exact_count,
             len(_fully_matched_query_ids((source,)) & required_query_ids),
             len(qualified_ids & required_query_ids),
+            len(qualified_ids & (supplemental_query_ids or set())),
             rank[0],
             match_ratio,
             len(qualified_ids & (canonical_query_ids or set())),

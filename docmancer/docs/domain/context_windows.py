@@ -15,6 +15,11 @@ _QUERY_STOP_WORDS = frozenset({
 _BASE_WINDOW_LIMITS = (160, 320, 520)
 _SHORT_COMPLETE_SOURCE_MAX_CHARS = 640
 
+# A chunk may start below its table header. Protect every unescaped pipe-bearing
+# source line, including rows with either optional edge omitted and pipelines.
+# Escaped literal pipes remain ordinary prose; even backslashes do not escape it.
+_UNESCAPED_PIPE_RE = re.compile(r"(?<!\\)(?:\\\\)*\|")
+
 
 def _projection_limits(text: str) -> tuple[int, ...]:
     """Return bounded window sizes, preserving a short source whole when safe.
@@ -74,13 +79,7 @@ def _focused_snippet(
     terms = _query_terms(queries)
     # A numbered list marker is not a sentence. Keep each list item together
     # so its subject/step number cannot be separated from the returned body.
-    spans = [(match.start(), match.end())
-        for match in re.finditer(
-            r"\S(?:.*?\S)?(?=(?:\n{2,}|(?<!\d\.)(?<=[.!?])\s+|"
-            r"\n(?=[ \t]*(?:\d+[.)]|[-*+])\s)|(?<=\|)\n(?=\s*\|)|$))",
-            value, re.S,
-        )
-    ]
+    spans = _source_unit_spans(value)
     if not spans:
         return "", leading, leading
     best_index = max(range(len(spans)), key=lambda index: sum(
@@ -148,6 +147,25 @@ def _focused_snippet(
     return snippet, leading + adjusted_start, leading + adjusted_start + len(snippet)
 
 
+def _source_unit_spans(value: str) -> list[tuple[int, int]]:
+    """Keep pipe rows atomic before scoring, not only after clipping a winner."""
+    prose = re.compile(
+        r"\S(?:.*?\S)?(?=(?:\n{2,}|(?<!\d\.)(?<=[.!?])\s+|"
+        r"\n(?=[ \t]*(?:\d+[.)]|[-*+])\s)|$))", re.S,
+    )
+    spans: list[tuple[int, int]] = []
+    cursor = 0
+    for line in re.finditer(r"[^\n]+", value):
+        if not _UNESCAPED_PIPE_RE.search(line[0]):
+            continue
+        spans.extend((match.start(), match.end())
+                     for match in prose.finditer(value, cursor, line.start()))
+        spans.append((line.start(), line.end()))
+        cursor = line.end()
+    spans.extend((match.start(), match.end()) for match in prose.finditer(value, cursor))
+    return spans
+
+
 def _include_complete_table_row(
     text: str, start: int, end: int, *, terms: set[str], limit: int,
 ) -> tuple[int, int]:
@@ -162,7 +180,7 @@ def _include_complete_table_row(
         right = text.find("\n", position)
         right = len(text) if right < 0 else right
         row = text[left:right].strip()
-        return left, right, row.startswith("|") and row.endswith("|")
+        return left, right, bool(_UNESCAPED_PIPE_RE.search(row))
 
     # The last cells can contain restrictions; never expose their partial row.
     if start < end:

@@ -106,35 +106,43 @@ class DocumentationQueryPlan:
         }
 
 
-_HOST_LOOKUP_NEGATION_RE = re.compile(
-    r"\b(?:not|never|without|no|cannot|neither|nor|[a-z]+n['’]t|не|нет|никогда|без)\b", re.I,
+# Audited rewrites may derive public-parent coverage. Unlike optional search
+# aliases, they must consume a complete reviewed relation, not a bag of stems.
+_REQUEST_BOUNDARY = r"(?:the )?(?:documentation )?request boundary"
+_HOST_BOUNDARY_LOOKUP_RE = re.compile(
+    r"(?:"
+    r"(?:what|which)(?: (?:inputs?|arguments?))? (?:does|can) "
+    + _REQUEST_BOUNDARY + r" accept|"
+    r"(?:what|which) (?:inputs?|arguments?) (?:are|can be) accepted (?:by|at) "
+    + _REQUEST_BOUNDARY + r")[?!.]?", re.I,
+)
+_HOST_SELECTION_LOOKUP_RE = re.compile(
+    r"(?:"
+    r"how (?:do|can) (?:the )?retrieved (?:chunks|candidates) become selected (?:visible )?sources|"
+    r"how (?:are|can) (?:the )?retrieved (?:chunks|candidates) (?:be )?selected as (?:visible )?sources|"
+    r"how (?:does|can) (?:the )?retrieval(?: (?:process|pipeline))? select (?:visible )?(?:source )?(?:chunks|candidates|sources)"
+    r")[?!.]?", re.I,
 )
 
 
 def _audited_host_lookup_rewrites(
     original_question: str, lookup_text: str,
 ) -> tuple[str, ...]:
-    """Return conservative retrieval-only rewrites for one public host lookup."""
+    """Audit whole positive relations; preserve all other host lookups verbatim."""
     text = " ".join(str(lookup_text or "").strip().split())
-    if not text or _HOST_LOOKUP_NEGATION_RE.search(text) or technical_anchors(text):
+    if not text or technical_anchors(text):
         return ()
     original_anchors = {value.casefold() for value in technical_anchors(original_question)}
     if "get_docs_context" not in original_anchors:
         return ()
-    tokens = tuple(re.findall(r"[a-z0-9_]+", text.casefold()))
-
-    def has(*stems: str) -> bool:
-        return any(token.startswith(stem) for token in tokens for stem in stems)
-
-    rows: list[str] = []
-    if has("request") and has("boundar") and has("accept", "input", "argument"):
-        rows.append("get_docs_context question project_path lookup_queries module_path scope")
-    if has("retriev") and has("select") and has("chunk", "source", "candidate"):
-        rows.extend((
+    if _HOST_BOUNDARY_LOOKUP_RE.fullmatch(text):
+        return ("get_docs_context question project_path lookup_queries module_path scope",)
+    if _HOST_SELECTION_LOOKUP_RE.fullmatch(text):
+        return (
             "retrieval gateway filtered project chunks",
             "selection maximizes distinct visible query coverage",
-        ))
-    return tuple(dict.fromkeys(rows))[:2]
+        )
+    return ()
 
 
 def build_documentation_query_plan(
