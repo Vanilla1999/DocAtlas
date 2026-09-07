@@ -1,0 +1,25 @@
+name: PR179 second review snapshot
+on:
+  push:
+    branches: [fix/context-first-project-reads-finalization]
+    paths: [.github/workflows/pr179-review2-export.yml]
+permissions:
+  contents: read
+jobs:
+  snapshot:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - run: |
+          mkdir -p "$RUNNER_TEMP/review2"
+          git bundle create "$RUNNER_TEMP/review2/source.bundle" HEAD refs/remotes/origin/main
+          git rev-parse HEAD > "$RUNNER_TEMP/review2/revision.txt"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: pr179-review2-source
+          path: ${{ runner.temp }}/review2/
+          retention-days: 3
