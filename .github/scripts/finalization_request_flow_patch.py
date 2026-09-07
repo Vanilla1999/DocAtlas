@@ -94,56 +94,57 @@ new = '''    host_rows: list[tuple[str, str]] = []
 assert text.count(old) == 1
 path.write_text(text.replace(old, new, 1), encoding="utf-8")
 
-ranking = Path("docmancer/docs/domain/project_doc_ranking.py")
-ranking_text = ranking.read_text(encoding="utf-8")
-old = '''        public_queries_by_id[id(chunk)] = {
-            query_id for query_id in qualified_query_ids
-            if query_matches[query_id].get("query_origin") in {
-                "original", "host_lookup", "exact_anchor", "exact_path",
-            }
-        } if not exact_path_anchor else set()
-'''
-new = '''        # Parent coverage derived from an audited internal rewrite is stored
-        # under the public query ID while retaining the rewrite's internal
-        # origin in its trace. Public-lane diversity therefore follows the
-        # stable public ID, not the witness origin metadata.
-        public_queries_by_id[id(chunk)] = {
-            query_id for query_id in qualified_query_ids
-            if query_id == "query-original"
-            or query_id.startswith(("query-lookup-", "query-anchor-", "query-path-"))
-        } if not exact_path_anchor else set()
-'''
-assert ranking_text.count(old) == 1
-ranking.write_text(ranking_text.replace(old, new, 1), encoding="utf-8")
-
-service = Path("docmancer/docs/application/_project_context_service_part01.py")
+service = Path("docmancer/docs/application/_project_docs_service_part03.py")
 service_text = service.read_text(encoding="utf-8")
-old = '''                    project_docs,
-                    results=rerank_project_doc_chunks(
-                        project_docs.results,
-                        question=question,
-                        intent=intent,
-                        limit=limit,
-                        broad_max_per_source=4 if evidence_path else 2,
-                        lifecycle_intent_value=canonical_requirements.lifecycle_intent,
-                    ),
-                )
+old = '''        queries_by_origin: dict[str, list[list[Any]]] = {}
+        for item in documentation_query_plan.queries:
+            lane = supplemental_chunks_by_query.get(item.text)
+            if lane:
+                queries_by_origin.setdefault(item.origin, []).append(lane)
+        candidates = select_context_candidates([
+            [
+                *queries_by_origin.get("exact_path", []),
+                *queries_by_origin.get("exact_anchor", []),
+            ],
+            [[*authoritative_chunks, *chunks]],
+            queries_by_origin.get("host_lookup", []),
+            [
+                *queries_by_origin.get("canonical_intent", []),
+                *queries_by_origin.get("concept_alias", []),
+                *queries_by_origin.get("retrieval_hint", []),
+            ],
+        ])
 '''
-new = '''                    project_docs,
-                    results=rerank_project_doc_chunks(
-                        project_docs.results,
-                        question=question,
-                        intent=intent,
-                        # Preserve one bounded pre-projection opportunity for
-                        # each public host lookup. Final model-visible output
-                        # remains constrained by the downstream 3-source/800-token
-                        # projection boundary.
-                        limit=max(limit or 4, min(candidate_limit, len(lookup_queries) + 2))
-                        if lookup_queries else limit,
-                        broad_max_per_source=4 if evidence_path else 2,
-                        lifecycle_intent_value=canonical_requirements.lifecycle_intent,
-                    ),
-                )
+new = '''        queries_by_origin: dict[str, list[list[Any]]] = {}
+        audited_parent_lanes: list[list[Any]] = []
+        generic_canonical_lanes: list[list[Any]] = []
+        for item in documentation_query_plan.queries:
+            lane = supplemental_chunks_by_query.get(item.text)
+            if not lane:
+                continue
+            queries_by_origin.setdefault(item.origin, []).append(lane)
+            if item.origin == "canonical_intent":
+                if item.relation == "audited_rewrite" and item.public_parent_query_id:
+                    audited_parent_lanes.append(lane)
+                else:
+                    generic_canonical_lanes.append(lane)
+        candidates = select_context_candidates([
+            [
+                *queries_by_origin.get("exact_path", []),
+                *queries_by_origin.get("exact_anchor", []),
+            ],
+            [[*authoritative_chunks, *chunks]],
+            # Audited rewrites are domain-proven retrieval equivalents for a
+            # public parent, so reserve their bounded top candidate before
+            # generic generated aliases can consume candidate budget.
+            audited_parent_lanes,
+            queries_by_origin.get("host_lookup", []),
+            [
+                *generic_canonical_lanes,
+                *queries_by_origin.get("concept_alias", []),
+                *queries_by_origin.get("retrieval_hint", []),
+            ],
+        ])
 '''
 assert service_text.count(old) == 1
 service.write_text(service_text.replace(old, new, 1), encoding="utf-8")
