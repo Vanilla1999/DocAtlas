@@ -1,0 +1,490 @@
+diff --git a/docmancer/docs/application/docs_context_projection.py b/docmancer/docs/application/docs_context_projection.py
+index 00b6e1f4..3e6471b3 100644
+--- a/docmancer/docs/application/docs_context_projection.py
++++ b/docmancer/docs/application/docs_context_projection.py
+@@ -145,10 +145,9 @@ def project_docs_context(
+         and str(item.get("public_parent_query_id") or "") in host_query_ids
+         and item.get("query_id")
+     }
+-    compound_priority_query_ids = (
+-        host_query_ids | audited_rewrite_query_ids
+-        if len(host_query_ids) > 1 else public_query_id_set
+-    )
++    compound_priority_query_ids = public_query_id_set
++    if len(host_query_ids) > 1:
++        compound_priority_query_ids = host_query_ids | audited_rewrite_query_ids
+     eligible_query_ids = public_query_id_set | canonical_intent_query_ids
+     original_question = str(query_plan.get("original_question") or retrieval.get("question") or query_text.get("query-original") or "")
+     requirements = retrieval.get("requirements") or {}
+@@ -173,7 +172,8 @@ def project_docs_context(
+     candidates = list(retrieval.get("context_pack") or ())
+     initially_ranked = _facet_aware_candidates(
+         candidates, query_text=query_text,
+-        required_query_ids=compound_priority_query_ids,
++        required_query_ids=compound_priority_query_ids - audited_rewrite_query_ids,
++        supplemental_query_ids=audited_rewrite_query_ids,
+         canonical_query_ids=canonical_intent_query_ids,
+         assigned_evidence_ids=set(assigned_evidence_by_requirement.values()),
+         bound_assigned_evidence_ids=required_assigned_evidence_ids,
+@@ -333,7 +333,8 @@ def project_docs_context(
+         )
+         prepared = _facet_aware_candidates(
+             prepared, query_text=query_text,
+-            required_query_ids=missing_compound_priority_ids,
++            required_query_ids=missing_compound_priority_ids - audited_rewrite_query_ids,
++            supplemental_query_ids=audited_rewrite_query_ids - qualified_query_ids(sources),
+             canonical_query_ids=canonical_intent_query_ids - selected_canonical_ids,
+             exact_query_ids=(
+                 set()
+@@ -411,11 +412,8 @@ def project_docs_context(
+             - selected_qualified_public_ids
+             - dependent_on_covered_parent
+         )
+-        # Query coverage is retrieval attribution, not a second semantic proof.
+-        # Generated exact-anchor children inherit their public parent's direction:
+-        # once that parent is already qualified, those children cannot by themselves
+-        # admit a lower-authority duplicate source. Explicit host lookups with no
+-        # covered parent still count as genuinely new independent directions.
++        # Retrieval attribution is not proof. Anchor children share their parent's
++        # direction; only independent lookups can admit a lower-authority duplicate.
+         if (
+             sources
+             and obligations
+@@ -835,8 +833,6 @@ def _public_query_ids(query_plan: dict[str, Any]) -> tuple[str, ...]:
+     return tuple(dict.fromkeys(values or _required_query_ids(query_plan)))
+ 
+ 
+-
+-
+ def _assigned_requirements_for_source(
+     source: dict[str, Any], assignments: dict[str, str],
+ ) -> tuple[str, ...]:
+@@ -938,11 +934,13 @@ def _context_rank(
+ def _facet_aware_candidates(
+     candidates: list[Any], *, query_text: dict[str, str], required_query_ids: set[str],
+     canonical_query_ids: set[str] | None = None,
++    supplemental_query_ids: set[str] | None = None,
+     assigned_evidence_ids: set[str] | None = None,
+     bound_assigned_evidence_ids: set[str] | None = None,
+     exact_query_ids: set[str] | None = None,
+     obligations: tuple[Any, ...] = (), missing_component_ids: set[str] | None = None,
+ ) -> list[Any]:
++    # Audited directions break public-coverage ties; they are not public queries.
+     # Exact-anchor lanes are identity-sensitive: when two candidates both
+     # visibly qualify, preserve the upstream assigned witness before rewarding
+     # extra lexical mentions. General host/original lanes keep action and
+@@ -974,6 +972,7 @@ def _facet_aware_candidates(
+             exact_count,
+             len(_fully_matched_query_ids((source,)) & required_query_ids),
+             len(qualified_ids & required_query_ids),
++            len(qualified_ids & (supplemental_query_ids or set())),
+             rank[0],
+             match_ratio,
+             len(qualified_ids & (canonical_query_ids or set())),
+diff --git a/docmancer/docs/domain/context_windows.py b/docmancer/docs/domain/context_windows.py
+index 44e1888a..8a3630f9 100644
+--- a/docmancer/docs/domain/context_windows.py
++++ b/docmancer/docs/domain/context_windows.py
+@@ -15,6 +15,11 @@ _QUERY_STOP_WORDS = frozenset({
+ _BASE_WINDOW_LIMITS = (160, 320, 520)
+ _SHORT_COMPLETE_SOURCE_MAX_CHARS = 640
+ 
++# A chunk may start below its table header. Protect every unescaped pipe-bearing
++# source line, including rows with either optional edge omitted and pipelines.
++# Escaped literal pipes remain ordinary prose; even backslashes do not escape it.
++_UNESCAPED_PIPE_RE = re.compile(r"(?<!\\)(?:\\\\)*\|")
++
+ 
+ def _projection_limits(text: str) -> tuple[int, ...]:
+     """Return bounded window sizes, preserving a short source whole when safe.
+@@ -74,13 +79,7 @@ def _focused_snippet(
+     terms = _query_terms(queries)
+     # A numbered list marker is not a sentence. Keep each list item together
+     # so its subject/step number cannot be separated from the returned body.
+-    spans = [(match.start(), match.end())
+-        for match in re.finditer(
+-            r"\S(?:.*?\S)?(?=(?:\n{2,}|(?<!\d\.)(?<=[.!?])\s+|"
+-            r"\n(?=[ \t]*(?:\d+[.)]|[-*+])\s)|(?<=\|)\n(?=\s*\|)|$))",
+-            value, re.S,
+-        )
+-    ]
++    spans = _source_unit_spans(value)
+     if not spans:
+         return "", leading, leading
+     best_index = max(range(len(spans)), key=lambda index: sum(
+@@ -148,6 +147,25 @@ def _focused_snippet(
+     return snippet, leading + adjusted_start, leading + adjusted_start + len(snippet)
+ 
+ 
++def _source_unit_spans(value: str) -> list[tuple[int, int]]:
++    """Keep pipe rows atomic before scoring, not only after clipping a winner."""
++    prose = re.compile(
++        r"\S(?:.*?\S)?(?=(?:\n{2,}|(?<!\d\.)(?<=[.!?])\s+|"
++        r"\n(?=[ \t]*(?:\d+[.)]|[-*+])\s)|$))", re.S,
++    )
++    spans: list[tuple[int, int]] = []
++    cursor = 0
++    for line in re.finditer(r"[^\n]+", value):
++        if not _UNESCAPED_PIPE_RE.search(line[0]):
++            continue
++        spans.extend((match.start(), match.end())
++                     for match in prose.finditer(value, cursor, line.start()))
++        spans.append((line.start(), line.end()))
++        cursor = line.end()
++    spans.extend((match.start(), match.end()) for match in prose.finditer(value, cursor))
++    return spans
++
++
+ def _include_complete_table_row(
+     text: str, start: int, end: int, *, terms: set[str], limit: int,
+ ) -> tuple[int, int]:
+@@ -162,7 +180,7 @@ def _include_complete_table_row(
+         right = text.find("\n", position)
+         right = len(text) if right < 0 else right
+         row = text[left:right].strip()
+-        return left, right, row.startswith("|") and row.endswith("|")
++        return left, right, bool(_UNESCAPED_PIPE_RE.search(row))
+ 
+     # The last cells can contain restrictions; never expose their partial row.
+     if start < end:
+diff --git a/docmancer/docs/domain/documentation_query_plan.py b/docmancer/docs/domain/documentation_query_plan.py
+index f97d5e6a..fd00e505 100644
+--- a/docmancer/docs/domain/documentation_query_plan.py
++++ b/docmancer/docs/domain/documentation_query_plan.py
+@@ -106,35 +106,43 @@ class DocumentationQueryPlan:
+         }
+ 
+ 
+-_HOST_LOOKUP_NEGATION_RE = re.compile(
+-    r"\b(?:not|never|without|no|cannot|neither|nor|[a-z]+n['’]t|не|нет|никогда|без)\b", re.I,
++# Audited rewrites may derive public-parent coverage. Unlike optional search
++# aliases, they must consume a complete reviewed relation, not a bag of stems.
++_REQUEST_BOUNDARY = r"(?:the )?(?:documentation )?request boundary"
++_HOST_BOUNDARY_LOOKUP_RE = re.compile(
++    r"(?:"
++    r"(?:what|which)(?: (?:inputs?|arguments?))? (?:does|can) "
++    + _REQUEST_BOUNDARY + r" accept|"
++    r"(?:what|which) (?:inputs?|arguments?) (?:are|can be) accepted (?:by|at) "
++    + _REQUEST_BOUNDARY + r")[?!.]?", re.I,
++)
++_HOST_SELECTION_LOOKUP_RE = re.compile(
++    r"(?:"
++    r"how (?:do|can) (?:the )?retrieved (?:chunks|candidates) become selected (?:visible )?sources|"
++    r"how (?:are|can) (?:the )?retrieved (?:chunks|candidates) (?:be )?selected as (?:visible )?sources|"
++    r"how (?:does|can) (?:the )?retrieval(?: (?:process|pipeline))? select (?:visible )?(?:source )?(?:chunks|candidates|sources)"
++    r")[?!.]?", re.I,
+ )
+ 
+ 
+ def _audited_host_lookup_rewrites(
+     original_question: str, lookup_text: str,
+ ) -> tuple[str, ...]:
+-    """Return conservative retrieval-only rewrites for one public host lookup."""
++    """Audit whole positive relations; preserve all other host lookups verbatim."""
+     text = " ".join(str(lookup_text or "").strip().split())
+-    if not text or _HOST_LOOKUP_NEGATION_RE.search(text) or technical_anchors(text):
++    if not text or technical_anchors(text):
+         return ()
+     original_anchors = {value.casefold() for value in technical_anchors(original_question)}
+     if "get_docs_context" not in original_anchors:
+         return ()
+-    tokens = tuple(re.findall(r"[a-z0-9_]+", text.casefold()))
+-
+-    def has(*stems: str) -> bool:
+-        return any(token.startswith(stem) for token in tokens for stem in stems)
+-
+-    rows: list[str] = []
+-    if has("request") and has("boundar") and has("accept", "input", "argument"):
+-        rows.append("get_docs_context question project_path lookup_queries module_path scope")
+-    if has("retriev") and has("select") and has("chunk", "source", "candidate"):
+-        rows.extend((
++    if _HOST_BOUNDARY_LOOKUP_RE.fullmatch(text):
++        return ("get_docs_context question project_path lookup_queries module_path scope",)
++    if _HOST_SELECTION_LOOKUP_RE.fullmatch(text):
++        return (
+             "retrieval gateway filtered project chunks",
+             "selection maximizes distinct visible query coverage",
+-        ))
+-    return tuple(dict.fromkeys(rows))[:2]
++        )
++    return ()
+ 
+ 
+ def build_documentation_query_plan(
+diff --git a/experiments/finalization/PR179_REVIEW2.md b/experiments/finalization/PR179_REVIEW2.md
+new file mode 100644
+index 00000000..4c04d9fe
+--- /dev/null
++++ b/experiments/finalization/PR179_REVIEW2.md
+@@ -0,0 +1,103 @@
++# PR #179 second review — source boundaries and public-query priority
++
++## Scope
++
++Reviewed production baseline: `6113a19abb476dce63e1bb6457e675688bbea83b`.
++The local checkout `77e6a598e4421c5fe3beb7e873eb6d057bc3df97` adds only a
++read-only snapshot-export workflow. This review targets the preceding review's
++query-lineage changes, bounded source windows, and final public projection.
++It is not approval of the entire accumulated PR or a release/merge approval.
++
++## Fixed findings
++
++### P1 — Optional-edge Markdown table rows lose their subject or restriction
++
++`docmancer/docs/domain/context_windows.py` recognized a table row only when
++both outer pipes were present. A row such as `ProductionOnly | ... |
++ResetAgent clears the cache | forbidden without approval` could therefore
++become a suffix beginning at `ResetAgent`, or a prefix without its restriction.
++Long bare-pipe tables also hid a later, short matching row during unit scoring.
++
++Source-unit scanning and boundary repair now preserve whole unescaped
++pipe-bearing lines, including rows with either or both outer pipes omitted.
++A fitting row remains an exact contiguous substring; an oversized row is not
++returned piecemeal. Odd-backslash-escaped literal pipes remain ordinary prose.
++This is deliberately conservative for headerless chunks and shell pipelines,
++not a complete Markdown parser: a long unescaped pipe-bearing prose line can
++also be withheld rather than clipped. No synthetic cell/row reconstruction is
++performed. Public source containment, budget, and validator checks are retained.
++
++### P1 — Audited rewrites discard modifiers and extra clauses
++
++`docmancer/docs/domain/documentation_query_plan.py` used a negative-word guard
++plus stem matches to authorize audited host rewrites. Positive search aliases
++could then be attached to lookups asking about `except`, `unsupported`, past
++behavior, archive-only selection, or an additional audit-log question.
++
++Audited rewriting now requires a full match against two bounded, positive
++relation families: request-boundary inputs and selection of retrieved sources.
++Unsupported modifiers, negation, extra clauses, and unrelated exact identifiers
++do not gain an audit. The original host lookup is retained verbatim and remains
++searchable. This narrows only audited attribution, not ordinary retrieval, and
++adds no answer-proof authorization or general semantic translation.
++
++### P2 — Final projection still counts audited children as public directions
++
++The preceding review separated public and audited priorities in upstream
++ranking, but `docmancer/docs/application/docs_context_projection.py` reunited
++them in its candidate-priority count. One lookup with one/two generated aliases
++could outrank two independent public lookups, including at the 256-token
++boundary where only one source fit.
++
++Final candidate ordering now counts public directions first and uses audited
++supplemental directions only to break that coverage tie. Supplemental directions
++still participate in exact-anchor deferral, preserving the real request-flow
++gateway witness. Simply removing supplemental handling was tested and rejected
++because it displaced that witness. Audited child IDs remain outside public
++`covered_query_ids`; answer/edit authorization remains false.
++
++## Executed validation
++
++New cases are in `tests/docs/test_review_boundary_semantics.py`, registered by
++`tests/diagnostic_labels.review_boundary_semantics.json`.
++
++- Clean production baseline plus the final unchanged tests: **35 failed,
++  15 passed**, confirming all three findings independently of earlier edits.
++- Corrected runtime: all **50 new cases pass** as part of **116 passing targeted
++  and neighboring tests**, including the prior review regressions and all four
++  request-flow facts within the existing 3-source / 800-token public limit.
++- `compileall`, Python module-size gate (all files <= 1000 lines), and
++  `git diff --check`: PASS.
++- Full-suite results are recorded in the accompanying validation run's JUnit
++  and log; they must not be inferred from the targeted result alone.
++
++The publication workflow applies a checksum-bound patch, runs the full offline
++suite with frozen dependencies, and publishes only on success. It removes the
++patch and both temporary review workflows from the published source tree.
++The artifact records the resulting commit. This does not imply that every
++ordinary PR-triggered CI workflow or the outstanding quality gate is green.
++
++## Quality acceptance remains blocked
++
++Both complete in-process live protocols were repeated before and after these
++fixes with `PYTHONHASHSEED=0`, without changing frozen inputs or thresholds.
++
++| Measurement | Baseline | Corrected runtime |
++| --- | --- | --- |
++| Legacy positive cases passing every check | 11/15 | 11/15 |
++| Legacy `useful_result_count` metric | 12/15 | 12/15 |
++| Legacy verdict / process exit | FAIL / 1 | FAIL / 1 |
++| V2 natural semantic usefulness | 14/15 | 14/15 |
++| V2 exposed-paraphrase usefulness | 3/5 | 3/5 |
++| V2 safety and budget compliance | 25/25 | 25/25 |
++| V2 false-full coverage | 0 | 0 |
++| V2 verdict | REPORT_ONLY | REPORT_ONLY |
++
++Legacy failed cases remain `ru-overview`, `ru-selection`, `ru-offline`, and
++`ru-server-command`. Its all-check pass count and usefulness metric are distinct;
++neither is silently substituted for the other. V2 also retains its existing
++chunking-parent, review/testing, and search-trust witness gaps. These metrics
++show no regression from this corrective slice, not quality acceptance closure.
++
++No frozen corpus, evaluator, expected witness, scope rule, source limit, token
++limit, or threshold was relaxed. PR #179 remains draft and unmerged.
+diff --git a/tests/diagnostic_labels.review_boundary_semantics.json b/tests/diagnostic_labels.review_boundary_semantics.json
+new file mode 100644
+index 00000000..8ade9c12
+--- /dev/null
++++ b/tests/diagnostic_labels.review_boundary_semantics.json
+@@ -0,0 +1,10 @@
++{
++  "schema_version": 1,
++  "module_labels": {
++    "tests/docs/test_review_boundary_semantics.py": "behavioral"
++  },
++  "module_node_hashes": {
++    "tests/docs/test_review_boundary_semantics.py": "5e6034743f90c63770b604d5f8d0a9c9e53d4ebae467a4ccc8d38e07e96c3435"
++  },
++  "node_overrides": {}
++}
+diff --git a/tests/docs/test_review_boundary_semantics.py b/tests/docs/test_review_boundary_semantics.py
+new file mode 100644
+index 00000000..20d459a1
+--- /dev/null
++++ b/tests/docs/test_review_boundary_semantics.py
+@@ -0,0 +1,146 @@
++"""Second-review regressions for source rows and whole-lookup audit boundaries."""
++from __future__ import annotations
++
++import pytest
++
++from docmancer.docs.application.docs_context_projection import project_docs_context
++from docmancer.docs.application.model_visible_projection import validate_model_visible_projection
++from docmancer.docs.domain.context_windows import _focused_snippet
++from docmancer.docs.domain.documentation_query_plan import build_documentation_query_plan
++from tests.docs.test_docs_context_compound_projection import _host_lookup_context_retrieval
++
++
++def _row(edges: str, repetitions: int) -> str:
++    row = "ProductionOnly | " + "details " * repetitions + "| ResetAgent clears the cache | forbidden without approval"
++    return ("| " if edges in {"left", "both"} else "") + row + (" |" if edges in {"right", "both"} else "")
++
++
++@pytest.mark.parametrize("edges", ["none", "left", "right", "both"])
++@pytest.mark.parametrize("limit", [160, 320, 520])
++def test_optional_table_edges_never_expose_a_partial_row(edges, limit):
++    row = _row(edges, 100)
++    text = "Target | Description | Operation | Restriction\n--- | --- | --- | ---\n" + row + "\n"
++    snippet, start, end = _focused_snippet(text, ("ResetAgent clears cache",), limit=limit)
++    assert text[start:end] == snippet
++    assert len(snippet) <= limit
++    assert row in snippet or "ResetAgent" not in snippet
++
++
++@pytest.mark.parametrize("edges", ["none", "left", "right", "both"])
++def test_short_optional_edge_rows_remain_queryable(edges):
++    row = _row(edges, 2)
++    text = "\n".join(_row(edges, 1).replace("ResetAgent", f"OtherAgent{i}") for i in range(8)) + "\n" + row
++    snippet, start, end = _focused_snippet(text, ("ResetAgent clears cache",), limit=160)
++    assert row in snippet
++    assert text[start:end] == snippet
++    assert len(snippet) <= 160
++
++
++@pytest.mark.parametrize("edges", ["none", "left", "right", "both"])
++def test_public_projection_does_not_certify_a_clipped_optional_edge_row(edges):
++    retrieval = _host_lookup_context_retrieval()
++    source = retrieval["context_pack"][0]
++    row = _row(edges, 100)
++    source.update(content="Target | Description | Operation | Restriction\n--- | --- | --- | ---\n" + row,
++                  retrieval_query_matches={"query-lookup-1": {
++                      "query_text": "ResetAgent clears cache", "exact_terms": ["ResetAgent"], "qualified": True,
++                  }})
++    retrieval["context_pack"] = [source]
++    plan = retrieval["documentation_query_plan"]
++    plan["queries"][1]["text"] = "ResetAgent clears cache"
++    payload, snapshot = project_docs_context(retrieval=retrieval)
++    for visible in payload.get("sources", ()):
++        assert row in visible["snippet"] or "ResetAgent" not in visible["snippet"]
++        assert visible["snippet"] in source["content"]
++    assert payload["answer_supported"] is False
++    assert payload["edit_ready"] is False
++    assert validate_model_visible_projection(payload, snapshot=snapshot, max_tokens=800) == []
++
++
++@pytest.mark.parametrize("lookup", [
++    "Which arguments does the request boundary accept except legacy arguments?",
++    "Which arguments are unsupported by the request boundary?",
++    "What request boundary inputs were accepted previously?",
++    "How does retrieval avoid selecting outdated source chunks?",
++    "How does retrieval select source chunks only from an archive?",
++    "What does the documentation request boundary accept, and where is the audit log?",
++    "How do retrieved chunks become selected visible sources without authentication?",
++    "How do retrieved chunks become selected visible sources for another project?",
++    "What does the documentation request boundary accept conditionally?",
++    "How does retrieval select archived source chunks?",
++])
++def test_qualified_or_compound_host_lookups_cannot_gain_unqualified_audits(lookup):
++    plan = build_documentation_query_plan("Explain get_docs_context request flow.", lookup_queries=(lookup,))
++    assert any(query.origin == "host_lookup" and query.text == lookup for query in plan.queries)
++    assert not [query for query in plan.queries if query.relation == "audited_rewrite"
++                and query.public_parent_query_id == "query-lookup-1"]
++
++
++@pytest.mark.parametrize("lookup", [
++    "What does the documentation request boundary accept?",
++    "Which inputs does the request boundary accept?",
++    "What arguments are accepted by the documentation request boundary?",
++    "How do retrieved chunks become selected visible sources?",
++    "How does retrieval select source chunks?",
++    "How are retrieved candidates selected as visible sources?",
++])
++def test_complete_positive_host_lookup_families_still_gain_bounded_audits(lookup):
++    plan = build_documentation_query_plan("Explain get_docs_context request flow.", lookup_queries=(lookup,))
++    audits = [query for query in plan.queries if query.relation == "audited_rewrite"
++              and query.public_parent_query_id == "query-lookup-1"]
++    assert 1 <= len(audits) <= 2
++    public = plan.as_payload()["public_query_ids"]
++    assert "query-lookup-1" in public
++    assert not any(query.query_id in public for query in audits)
++
++
++@pytest.mark.parametrize("literal", [r"\|", r"\\\|"])
++def test_escaped_pipe_prose_does_not_become_an_oversized_table(literal):
++    text = "Background " * 60 + literal + " ordinary text. ResetAgent requires approval."
++    snippet, start, end = _focused_snippet(text, ("ResetAgent approval",), limit=160)
++    assert "ResetAgent requires approval." in snippet
++    assert text[start:end] == snippet
++    assert len(snippet) <= 160
++
++
++@pytest.mark.parametrize("edges", ["none", "left", "right", "both"])
++def test_table_restriction_cannot_be_lost_from_a_row_prefix(edges):
++    row = _row(edges, 90).replace("details ", "ResetAgent ")
++    text = row + "\nOtherTarget | Unrelated entry | No action | No change\n"
++    snippet, start, end = _focused_snippet(text, ("ProductionOnly ResetAgent",), limit=160)
++    assert row in snippet or "ProductionOnly" not in snippet
++    assert text[start:end] == snippet
++    assert len(snippet) <= 160
++
++
++@pytest.mark.parametrize("aliases", [1, 2])
++@pytest.mark.parametrize("budget", [256, 800])
++@pytest.mark.parametrize("reverse", [False, True])
++def test_public_projection_prioritizes_public_queries_not_audited_alias_count(aliases, budget, reverse):
++    retrieval = _host_lookup_context_retrieval()
++    single, diverse = retrieval["context_pack"][:2]
++    queries = [{"query_id": "query-original", "origin": "original", "text": "Explain the processing directions."}]
++    queries.extend({"query_id": f"query-lookup-{index}", "origin": "host_lookup", "text": text}
++                   for index, text in enumerate(("amber", "indigo", "cobalt"), 1))
++    queries.extend({
++        "query_id": f"query-host-rewrite-{index}", "origin": "canonical_intent", "text": text,
++        "relation": "audited_rewrite", "public_parent_query_id": "query-lookup-1",
++    } for index, text in enumerate(("copper", "silver")[:aliases], 1))
++    single.update(path="docs/single.md", content="Amber copper silver.", retrieval_query_matches={})
++    diverse.update(path="docs/diverse.md", content="Indigo cobalt.", retrieval_query_matches={})
++    for query in queries[1:]:
++        source = single if query.get("public_parent_query_id") or query["text"] == "amber" else diverse
++        source["retrieval_query_matches"][query["query_id"]] = {
++            "query_text": query["text"], "qualified": True,
++            "relation": query.get("relation", "host_lookup"),
++            "public_parent_query_id": query.get("public_parent_query_id"),
++        }
++    retrieval["context_pack"] = [diverse, single] if reverse else [single, diverse]
++    retrieval["documentation_query_plan"] = {"queries": queries, "required_query_ids": []}
++    payload, snapshot = project_docs_context(retrieval=retrieval, max_tokens=budget)
++    assert payload["sources"][0]["path_or_url"] == "docs/diverse.md"
++    assert {"query-lookup-2", "query-lookup-3"} <= set(payload["covered_query_ids"])
++    assert not any(value.startswith("query-host-rewrite-") for value in payload["covered_query_ids"])
++    assert payload["answer_supported"] is False and payload["edit_ready"] is False
++    assert payload["estimated_tokens"] <= budget
++    assert validate_model_visible_projection(payload, snapshot=snapshot, max_tokens=budget) == []
