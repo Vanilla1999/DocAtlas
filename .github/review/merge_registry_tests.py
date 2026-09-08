@@ -95,6 +95,22 @@ if roadmap_text.count(needle) != 1:
     raise SystemExit("expected P0.5 historical release sentence exactly once")
 roadmap.write_text(roadmap_text.replace(needle, replacement, 1), encoding="utf-8")
 
+scorecard = ROOT / "docs/public-truth-scorecard.md"
+scorecard_text = scorecard.read_text(encoding="utf-8")
+needle = (
+    "The exact records are:\n\n"
+    "- [`release-evidence/v1.3.1-publish-attempt-1.json`](./release-evidence/v1.3.1-publish-attempt-1.json)\n"
+)
+replacement = (
+    "Attempts 1 and 2 prove that two canonical PyPI exchanges were rejected before upload. "
+    "The external correction remains under PyPI `Your projects → doc-atlas → Manage → Publishing`.\n\n"
+    "The exact records are:\n\n"
+    "- [`release-evidence/v1.3.1-publish-attempt-1.json`](./release-evidence/v1.3.1-publish-attempt-1.json)\n"
+)
+if scorecard_text.count(needle) != 1:
+    raise SystemExit("expected historical PyPI evidence boundary exactly once")
+scorecard.write_text(scorecard_text.replace(needle, replacement, 1), encoding="utf-8")
+
 # The staged generator appends the registry job as a standalone block. Make it
 # an actual job under the existing top-level `jobs:` map, then add the official
 # publisher's local validation command before OIDC authentication.
