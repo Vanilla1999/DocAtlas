@@ -31,6 +31,7 @@ jobs:
         run: |
           python -m json.tool server.json >/dev/null
           python -m pip install -q -e . pytest
+          python -c "import yaml; yaml.safe_load(open('.github/workflows/publish.yml', encoding='utf-8'))"
           pytest -q \
             tests/test_release_state_repair.py \
             tests/test_patch_release_identity.py \
