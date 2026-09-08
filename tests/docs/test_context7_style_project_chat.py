@@ -3,7 +3,6 @@ from __future__ import annotations
 import pytest
 
 from docmancer.docs.application.docs_context_projection import project_docs_context
-from docmancer.docs.interfaces.mcp.docs_context_routing import docs_context_fallback_allowed
 from docmancer.docs.domain.documentation_query_plan import build_documentation_query_plan
 from docmancer.docs.domain.project_answer_contract import (
     build_project_answer_contract,
@@ -11,6 +10,8 @@ from docmancer.docs.domain.project_answer_contract import (
 )
 from docmancer.docs.domain.project_retrieval_intent import (
     build_project_retrieval_aliases,
+    project_retrieval_allows_certified_answer,
+    project_retrieval_disposition,
     project_retrieval_requires_context_only,
 )
 from docmancer.docs.application.recovery import _suggested_questions
@@ -78,6 +79,10 @@ def test_exact_symbol_question_is_not_misclassified_as_product_overview():
 
     assert "product_overview" not in {alias.intent_id for alias in aliases}
 
+    aliases = build_project_retrieval_aliases("What is the model-visible projection?")
+
+    assert "product_overview" not in {alias.intent_id for alias in aliases}
+
 
 def test_generic_project_alias_does_not_require_docatlas_product_wording():
     aliases = build_project_retrieval_aliases(
@@ -102,21 +107,13 @@ def test_broad_intent_suppresses_mandatory_proof_queries_for_retrieval():
     assert original.coverage_required is False
     assert any(item.facet_id == "intent-context:getting_started" for item in canonical)
 
-
-@pytest.mark.parametrize(
-    "raw",
-    [
-        {"mode_selected": "project", "status": "success", "hard_stop": True},
-        {"mode_selected": "project", "status": "success", "requires_confirmation": True},
-        {"mode_selected": "project", "status": "failed"},
-    ],
-)
-def test_context_only_intent_cannot_bypass_operational_or_hard_stop(raw: dict):
-    assert docs_context_fallback_allowed(
-        raw=raw,
-        args={"project_path": "/project"},
-        recovery=None,
-    ) is False
+    technical = build_documentation_query_plan(
+        "Compare docatlas.project-docs.yaml with docatlas.docs.yaml via get_docs_context"
+    )
+    anchors = [item.text for item in technical.queries if item.origin == "exact_anchor"]
+    assert anchors == [
+        "docatlas.project-docs.yaml", "docatlas.docs.yaml", "get_docs_context",
+    ]
 
 
 def test_canonical_intent_can_carry_bounded_context_without_answer_proof():
@@ -130,7 +127,10 @@ def test_canonical_intent_can_carry_bounded_context_without_answer_proof():
             "source_class": "project_doc",
             "path": "README.md",
             "heading_path": "Installation",
-            "content": "Install the package locally, run command-line help, and verify the server starts.",
+            "content": (
+                "Local installation setup verification: install the package, run command-line "
+                "help, and verify the server starts."
+            ),
             "project_identity": "git:example/project",
             "authority": "source_of_truth",
             "doc_scope": "project",
@@ -156,7 +156,11 @@ def test_canonical_intent_can_carry_bounded_context_without_answer_proof():
     assert projection["answer_supported"] is False
     assert projection["edit_ready"] is False
     assert projection["sources"][0]["path_or_url"] == "README.md"
-    assert canonical.query_id in projection["covered_query_ids"]
+    assert canonical.query_id not in projection["covered_query_ids"]
+    assert projection["missing_query_ids"] == ["query-original"]
+    assert any(
+        facet["status"] == "retrieval_only" for facet in projection["facets"]
+    )
 
 
 def test_generic_first_commands_are_not_docs_mcp_public_tool_inventory():
@@ -227,6 +231,67 @@ def test_broad_retrieval_intent_requires_context_only_delivery():
     assert project_retrieval_requires_context_only(
         "Какая команда запускает Docs MCP сервер?"
     ) is False
+
+
+def test_certified_answer_preservation_requires_a_complete_question_contract():
+    narrow = "Which command syncs project docs after file changes?"
+    mixed = (
+        "Which command syncs project docs after file changes and "
+        "how is the project architecture organized?"
+    )
+
+    assert project_retrieval_requires_context_only(narrow) is False
+    assert project_retrieval_allows_certified_answer(narrow) is True
+    assert project_retrieval_requires_context_only(mixed) is True
+    assert project_retrieval_allows_certified_answer(mixed) is False
+    assert project_retrieval_allows_certified_answer(
+        "How do I install and verify DocAtlas locally?"
+    ) is False
+    assert project_retrieval_allows_certified_answer(
+        "What is DocAtlas and what problem does it solve?"
+    ) is False
+    assert project_retrieval_allows_certified_answer(
+        "What test markers are available?"
+    ) is True
+
+
+@pytest.mark.parametrize(
+    ("question", "expected"),
+    [
+        ("What is OrdersDraftStore?", "typed_context"),
+        ("What is Storage?", "broad_context"),
+        ("What markers are available?", "broad_context"),
+        ("What test markers are available?", "typed_context"),
+        ("Which imaginary contract governs this repository?", "fail_closed"),
+        ("How many attempts does ProjectRetryPolicy allow?", "fail_closed"),
+        ("Does README prove the storage writer-lease contract?", "broad_context"),
+        ("What lunar quantum retention policy does DocAtlas use?", "fail_closed"),
+        ("What problem do projects solve?", "broad_context"),
+        ("What is the model-visible projection?", "broad_context"),
+    ],
+)
+def test_project_retrieval_disposition_is_structural(question: str, expected: str):
+    assert project_retrieval_disposition(question) == expected
+
+
+@pytest.mark.parametrize(
+    "question",
+    [
+        "What problem does a project solve?",
+        "What problem do projects solve?",
+        "What problem does a repository solve?",
+        "What problem do repositories solve?",
+        "What problem do systems solve?",
+        "What problem do products solve?",
+    ],
+)
+def test_project_scope_aliases_accept_bounded_plural_forms(question: str):
+    assert project_retrieval_disposition(question) == "broad_context"
+
+
+@pytest.mark.parametrize("term", ["projection", "projector", "projective"])
+def test_project_scope_aliases_reject_prefix_collisions(term: str):
+    assert build_project_retrieval_aliases(f"What is the model-visible {term}?") == ()
 
 
 def test_current_docatlas_index_persists_across_service_restart_without_resync(
@@ -316,7 +381,6 @@ project:
         {
             "question": "Как установить проект локально и проверить запуск?",
             "project_path": str(project),
-            "mode": "project",
         },
         second,
     )

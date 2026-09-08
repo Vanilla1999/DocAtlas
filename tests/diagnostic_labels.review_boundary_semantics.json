@@ -1,0 +1,10 @@
+{
+  "schema_version": 1,
+  "module_labels": {
+    "tests/docs/test_review_boundary_semantics.py": "behavioral"
+  },
+  "module_node_hashes": {
+    "tests/docs/test_review_boundary_semantics.py": "5e6034743f90c63770b604d5f8d0a9c9e53d4ebae467a4ccc8d38e07e96c3435"
+  },
+  "node_overrides": {}
+}

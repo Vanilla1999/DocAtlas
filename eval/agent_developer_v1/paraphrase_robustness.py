@@ -17,6 +17,10 @@ from docmancer.docs.application.evidence_selection import (
 from docmancer.docs.domain.project_answer_contract import (
     build_project_answer_contract,
 )
+from eval.agent_developer_v1.proof_runtime_provenance import (
+    build_proof_runtime_manifest,
+    verify_proof_runtime_manifest,
+)
 
 
 PROTOCOL = "paraphrase-proofability-v1"
@@ -323,7 +327,6 @@ def derive_from_paths(
     *,
     repo_root: Path,
     protocol_path: Path,
-    selector_path: Path,
     planner_path: Path,
 ) -> dict[str, Any]:
     protocol = load_json(protocol_path)
@@ -338,10 +341,7 @@ def derive_from_paths(
                 "path": _relative_path(protocol_path, repo_root),
                 "git_blob_sha1": git_blob_sha1(protocol_path),
             },
-            "selector": {
-                "path": _relative_path(selector_path, repo_root),
-                "git_blob_sha1": git_blob_sha1(selector_path),
-            },
+            "proof_runtime": build_proof_runtime_manifest(repo_root),
             "planner": {
                 "path": _relative_path(planner_path, repo_root),
                 "git_blob_sha1": git_blob_sha1(planner_path),
@@ -420,10 +420,12 @@ def verify_report(report: dict[str, Any]) -> None:
 
     identities = report.get("source_identities")
     if not isinstance(identities, dict) or set(identities) != {
-        "protocol", "selector", "planner"
+        "protocol", "proof_runtime", "planner"
     }:
         raise ValueError("P1.4 report source identities are incomplete")
-    for identity in identities.values():
+    verify_proof_runtime_manifest(identities["proof_runtime"])
+    for name in ("protocol", "planner"):
+        identity = identities[name]
         if not isinstance(identity, dict):
             raise ValueError("P1.4 source identity is malformed")
         if not str(identity.get("path") or "") or str(identity["path"]).startswith(("/", "\\")):

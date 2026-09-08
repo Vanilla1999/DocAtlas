@@ -22,7 +22,6 @@ _PREPARE_ACTION_BY_TOOL = {
 }
 _CONTEXT_ACTION_TOOLS = {
     "get_project_docs",
-    "get_project_context",
     "get_library_docs",
 }
 _STATUS_ACTION_BY_TOOL = {

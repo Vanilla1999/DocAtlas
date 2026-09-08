@@ -5,7 +5,7 @@
   "infrastructure_errors": [],
   "input_tokens": 23985,
   "model": "gpt-5.6-luna",
-  "oracle_contract_sha256": "e7bba83f624d9f382486275a8b9f8ab50bf63b301a18bc3fd78530626d21854c",
+  "oracle_contract_sha256": "666318e529a8ea8afcf30b471e2d2744723680c3c697538b9719ec9b70afe306",
   "output_tokens": 1163,
   "pass_rate": 0.0,
   "passed_tasks": 0,

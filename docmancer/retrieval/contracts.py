@@ -1,24 +1,14 @@
 """Versioned internal contracts for deterministic contextual retrieval."""
 from __future__ import annotations
 
-import hashlib
-import json
 from dataclasses import dataclass, field
 from typing import Any, Mapping
+
+from docmancer.docs.domain.canonical import canonical_hash
 
 
 CONTEXT_SCHEMA_VERSION = "deterministic-context-v2"
 SYMBOL_EXTRACTOR_VERSION = "retrieval-symbols-v1"
-
-
-def canonical_hash(value: Any) -> str:
-    payload = json.dumps(
-        value,
-        ensure_ascii=False,
-        sort_keys=True,
-        separators=(",", ":"),
-    )
-    return hashlib.sha256(payload.encode("utf-8")).hexdigest()
 
 
 @dataclass(frozen=True, slots=True)

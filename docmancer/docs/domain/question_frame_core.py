@@ -66,7 +66,7 @@ _ACTION_START = (
     r"sync|synchronize|update|refresh|reindex|run|verify|audit|check|compare|"
     r"configure|install|delete|remove|start|launch|fetch|explain|"
     r"пересобери|расскажи|покажи|перечисли|синхронизируй|обнови|"
-    r"переиндексируй|запусти|проверь|удали)\b"
+    r"переиндексируй|запусти|проверь|удали|объясни(?:те)?)\b"
 )
 _REQUEST_WRAPPER_RE = re.compile(
     r"^\s*(?:"

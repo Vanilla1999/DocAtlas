@@ -163,6 +163,10 @@ class _RetrievalDispatcherPart02:
     def _rerank_intent_matches(self, query: str, chunks: list[Any], *, expand: str | None = None) -> list[Any]:
         if not query or len(chunks) < 2:
             return chunks
+        # Project lanes already carry SQLite ranking; library snippet boosts
+        # must not displace repository prose requirements with code examples.
+        if all((getattr(chunk, "metadata", {}) or {}).get("source_class") == "project_file" for chunk in chunks):
+            return chunks
         query_lower = query.lower()
         query_terms = _query_api_terms(query)
         intent_terms = _query_intent_terms(query_lower)

@@ -381,7 +381,11 @@ def project_docs_structured_next_action(
             message = "Project documentation files were found but are not indexed. Call sync_project_docs before answering project-level questions."
         else:
             message = "Project documentation index is out of sync. Call sync_project_docs before answering project-level questions."
-        return ({"type": "sync_project_docs", "tool": "sync_project_docs"}, False, None, sync_args, message, None)
+        return ({
+            "type": "prepare_docs",
+            "tool": "prepare_docs",
+            "arguments_patch": {"action": "sync_project_docs", **sync_args},
+        }, False, None, sync_args, message, None)
     if reason_code in {"no_project_docs", "architecture_doc_creation_recommended"}:
         handoff = create_project_docs_next_action(root, query)
         agent_message = "No reviewable project docs were found. Ask the user whether to create ARCHITECTURE.md as a repository file, then inspect and sync it after creation."
@@ -409,4 +413,4 @@ def project_docs_structured_next_action(
     get_context_args = {"project_path": str(root)}
     if query:
         get_context_args["question"] = query
-    return ({"type": "get_project_context", "tool": "get_project_context"}, False, None, get_context_args, "Project documentation is indexed and ready. Use get_project_context or get_project_docs for repo-specific questions.", None)
+    return (None, False, None, get_context_args, "Project documentation is indexed and ready.", None)

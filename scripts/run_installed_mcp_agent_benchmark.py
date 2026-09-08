@@ -379,7 +379,6 @@ def _scripted_plans() -> dict[str, list[dict[str, Any]]]:
         "arguments": {
             "question": "What is OrdersDraftStore?",
             "project_path": PROJECT_TOKEN,
-            "mode": "project",
             "scope": "module",
             "module_path": "packages/orders",
         },

@@ -283,6 +283,7 @@ class _SQLiteStorePart03:
                 text,
                 title=str(row["title"]),
                 body=str(row["text"]),
+                retrieval_text=str(row.get("retrieval_text") or ""),
                 mode=str(row.get("_lexical_query_mode") or "and"),
                 bm25_cost=float(row["rank"]),
             )
@@ -301,32 +302,40 @@ class _SQLiteStorePart03:
 
     @classmethod
     def _lexical_match_trace(
-        cls, query: str, *, title: str, body: str, mode: str, bm25_cost: float,
+        cls, query: str, *, title: str, body: str, retrieval_text: str = "",
+        mode: str, bm25_cost: float,
     ) -> dict[str, Any]:
         raw_terms = tuple(
-            token for token in re.findall(r"[\w./:+-]+", cls._strip_stopwords(query))
+            token for token in re.findall(r"\w+", cls._strip_stopwords(query))
             if token
         )
         terms = tuple(dict.fromkeys(token.casefold() for token in raw_terms))
         exact_terms = tuple(dict.fromkeys(
             token.casefold()
-            for token in raw_terms
+            for token in re.findall(r"[\w~./:+-]+", query)
             if token.casefold() not in _GENERIC_QUERY_TERMS
-            and (
-                any(char in token for char in "._/:+-")
-                or any(char.isupper() for char in token[1:])
-                or (token[:1].isupper() and len(token) > 2)
-            )
+            and token.casefold() not in _QUERY_STOPWORDS
+            and is_exact_technical_token(token)
         ))
-        haystack = f"{title}\n{body}".casefold()
+        fields = {
+            "title": title.casefold(),
+            "body": body.casefold(),
+            "retrieval_text": retrieval_text.casefold(),
+        }
+        haystack = (retrieval_text or f"{title}\n{body}").casefold()
         matched = tuple(term for term in terms if re.search(rf"(?<!\w){re.escape(term)}(?!\w)", haystack))
-        missing_exact = tuple(term for term in exact_terms if term not in matched)
-        ratio = len(matched) / len(terms) if terms else 0.0
-        required_ratio = 1.0 if len(terms) == 1 else 0.5
-        qualified = bool(matched) and (
-            mode == "and"
-            or (ratio >= required_ratio and not missing_exact)
+        missing_exact = tuple(
+            term for term in exact_terms
+            if re.search(rf"(?<!\w){re.escape(term)}(?!\w)", haystack) is None
         )
+        ratio = len(matched) / len(terms) if terms else 0.0
+        field_matches = {
+            field: [
+                term for term in terms
+                if re.search(rf"(?<!\w){re.escape(term)}(?!\w)", value)
+            ]
+            for field, value in fields.items()
+        }
         return {
             "mode": mode,
             "query_terms": list(terms),
@@ -338,7 +347,7 @@ class _SQLiteStorePart03:
             "match_ratio": round(ratio, 4),
             "bm25_cost": bm25_cost,
             "lexical_score": -bm25_cost,
-            "qualified": qualified,
+            "field_matches": field_matches,
         }
 
     @classmethod
@@ -500,7 +509,14 @@ class _SQLiteStorePart03:
         *,
         filters: dict[str, Any] | None = None,
     ) -> list[dict[str, Any]]:
-        cleaned = self._strip_stopwords(query)
+        # Contrast connectors can dominate an OR candidate window without
+        # identifying either subject. Keep the original query for qualification.
+        search_text = query
+        if not re.search(r'[`"]', query):
+            contrasted = re.sub(r"\brather\s+than\b", " ", query, flags=re.I).strip()
+            if re.search(r"\w", contrasted):
+                search_text = contrasted
+        cleaned = self._strip_stopwords(search_text)
         terms = [token for token in re.findall(r"\w+", cleaned) if token]
         filter_sql, filter_params = self._metadata_filter_sql(filters, promoted=True)
         with self._connect() as conn:
@@ -508,6 +524,7 @@ class _SQLiteStorePart03:
             if not active_generation:
                 return []
             if active_generation:
+                rows: list[Any] = []
                 try:
                     rows = list(
                         conn.execute(
@@ -530,10 +547,12 @@ class _SQLiteStorePart03:
                             (cleaned, active_generation, *filter_params, limit),
                         )
                     )
-                    if rows or len(terms) <= 1:
+                    if len(terms) <= 1:
                         return self._mark_lexical_mode(rows, "and")
                 except sqlite3.OperationalError:
                     pass
+                if rows and not (filters or {}).get("project_identity"):
+                    return self._mark_lexical_mode(rows, "and")
                 fallback_query = " OR ".join(terms)
                 if not fallback_query:
                     return []
@@ -558,11 +577,32 @@ class _SQLiteStorePart03:
                         (fallback_query, active_generation, *filter_params, limit),
                     )
                 )
-                return self._mark_lexical_mode(child_fallback, "or_fallback")
+                if not rows:
+                    return self._mark_lexical_mode(child_fallback, "or_fallback")
+
+                combined = self._mark_lexical_mode(rows, "and")
+                seen = {self._lexical_row_identity(row) for row in combined}
+                for row in self._mark_lexical_mode(child_fallback, "or_union"):
+                    identity = self._lexical_row_identity(row)
+                    if identity not in seen:
+                        combined.append(row)
+                        seen.add(identity)
+                return combined
 
     @staticmethod
     def _mark_lexical_mode(rows: list[Any], mode: str) -> list[dict[str, Any]]:
         return [{**dict(row), "_lexical_query_mode": mode} for row in rows]
+
+    @staticmethod
+    def _lexical_row_identity(row: dict[str, Any]) -> str:
+        stable_id = str(row.get("stable_chunk_id") or "")
+        if stable_id:
+            return stable_id
+        return "lex-" + hashlib.sha256(
+            f"{row['source']}\0{row['chunk_index']}\0{row.get('content_hash') or _chunk_hash(str(row['text']))}".encode(
+                "utf-8"
+            )
+        ).hexdigest()[:20]
 
     @staticmethod
     def _metadata_filter_sql(

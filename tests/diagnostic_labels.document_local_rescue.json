@@ -1,0 +1,10 @@
+{
+  "schema_version": 1,
+  "module_labels": {
+    "tests/docs/test_document_local_rescue.py": "behavioral"
+  },
+  "node_overrides": {},
+  "module_node_hashes": {
+    "tests/docs/test_document_local_rescue.py": "84fa55ec74f5c99c3e894be786f18b8a8c46c324780a9efd777312b5bc093de7"
+  }
+}

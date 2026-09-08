@@ -27,6 +27,26 @@ def _source_document_behavior_context(question: str, subject: str) -> str | None
     return _clean_phrase(match.group(1)) or None
 
 
+_LEGACY_BEHAVIOR_USAGE_COMPOUND_RE = re.compile(
+    r"^\s*what\s+does\s+`?(?P<subject>[A-Za-z_][A-Za-z0-9_.:-]*)`?\s+"
+    r"(?:do|report)\s+and\s+when\s+should\s+"
+    r"(?:i\s+use\s+it|it\s+be\s+used)\s*[?!.]*\s*$",
+    re.I,
+)
+
+
+def _legacy_behavior_usage_compound(question: str) -> bool:
+    """Permit the old exact-subject behavior+usage surface to keep legacy ownership.
+
+    QuestionPlan intentionally does not resolve cross-clause pronouns here.  The
+    legacy contract already binds both obligations to one explicit technical
+    identifier, so this bounded grammar is unambiguous without teaching the new
+    parser a broader pronoun-resolution rule.
+    """
+
+    return _LEGACY_BEHAVIOR_USAGE_COMPOUND_RE.fullmatch(question) is not None
+
+
 def _generic_behavior_qualifiers(
     question: str, subject: str,
 ) -> tuple[str | None, str | None]:
@@ -34,15 +54,17 @@ def _generic_behavior_qualifiers(
 
     subject_pattern = re.escape(subject).replace(r"\ ", r"[\s_]+")
     match = re.match(
-        rf"^\s*how\s+does\s+(?:the\s+)?{subject_pattern}\s+"
+        rf"^\s*(?:how|what)\s+does\s+(?:the\s+)?{subject_pattern}\s+"
         r"([A-Za-z][A-Za-z0-9_-]*)\s*(.*?)[?!.]*\s*$",
         question,
         re.I,
     )
-    if match is None or match.group(1).casefold() == "work":
+    if match is None or match.group(1).casefold() in {"do", "work"}:
         return None, None
     action = _clean_phrase(match.group(1)) or None
     target = _clean_phrase(match.group(2)) or None
+    if target and re.match(r"^(?:and|or)\b", target, re.I):
+        return None, None
     return action, target
 
 
@@ -54,7 +76,11 @@ def build_project_answer_contract(question: str) -> ProjectAnswerContract:
     input_limits: list[str] = ["question"] if len(source_question) > 4_000 else []
     lifecycle = lifecycle_intent_for_question(raw_question)
     question_plan = compile_question_plan(raw_question)
-    if question_plan.handled:
+    if question_plan.handled and not (
+        not question_plan.facets
+        and question_plan.unresolved_parts
+        and _legacy_behavior_usage_compound(raw_question)
+    ):
         return _contract_from_question_plan(
             raw_question, question_plan, lifecycle=lifecycle,
             input_limits=tuple(input_limits),
@@ -62,6 +88,24 @@ def build_project_answer_contract(question: str) -> ProjectAnswerContract:
     technical_terms = _technical_terms(raw_question)
     subjects = _subjects(raw_question)
     obligations: list[ProofObligation] = []
+
+    # Multi-word quantified attributes are specific enough for typed local proof.
+    # A bare noun (for example `attempts`) retains the existing fail-closed path.
+    quantified_attribute = re.match(
+        r"^\s*how\s+many\s+([A-Za-z][A-Za-z0-9_-]*(?:\s+[A-Za-z][A-Za-z0-9_-]+){1,4})\s+does\s+"
+        r"`?([A-Za-z_][A-Za-z0-9_.:-]*)`?\s+"
+        r"(?:allow|permit|support|have|use)\b",
+        raw_question, re.I,
+    )
+    if quantified_attribute:
+        attribute = _clean_phrase(quantified_attribute.group(1))
+        subject = quantified_attribute.group(2).strip("`")
+        obligations.append(_obligation(
+            question=raw_question, index=len(obligations), kind="attribute",
+            subject=subject, attribute=attribute, value_kind="number",
+            response_mode="count", lifecycle_intent=lifecycle,
+            span_value=quantified_attribute.group(0).strip(),
+        ))
 
     declarative = _DECLARATIVE_RELATION_RE.match(raw_question)
     if declarative and not re.match(r"^(?:what|which|how|when|where|why|who|что|как|когда|где|почему)\b", raw_question, re.I):

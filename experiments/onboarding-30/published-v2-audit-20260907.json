@@ -1,0 +1,69 @@
+{
+  "schema": "docatlas-published-v2-audit-v1",
+  "runtime_anchor": "01f7b43afb00ead4a151099b9b11c0a27b94eafe",
+  "workflow_run_id": 34064647267,
+  "workflow_job_id": 101571164064,
+  "protocol": "eval/project_context_quality_v2/protocol.lock.json",
+  "corpus_mutated": false,
+  "evaluator_mutated": false,
+  "thresholds_mutated": false,
+  "summary": {
+    "natural": {"useful": 12, "total": 15, "false_full": 0},
+    "exposed_paraphrases": {"useful": 3, "total": 5, "false_full": 0},
+    "answer_supported_true": 0,
+    "edit_ready_true": 0
+  },
+  "nonpassing": [
+    {
+      "id": "v2-natural-architecture",
+      "lane": "natural",
+      "missing_obligations": ["infrastructure_boundary"],
+      "paths": ["docs/PROJECT_MAP.md", "docs/PROJECT_MAP.md"],
+      "covered_query_ids": ["query-lookup-1", "query-lookup-2"],
+      "missing_query_ids": ["query-original", "query-lookup-3"],
+      "estimated_tokens": 623
+    },
+    {
+      "id": "v2-natural-request-flow",
+      "lane": "natural",
+      "missing_obligations": ["flow_mcp", "flow_application", "flow_gateway", "flow_selection"],
+      "paths": ["docs/project-docs-mcp-workflow.md", "docs/adr/0001-mcp-boundary-contracts.md"],
+      "covered_query_ids": ["query-anchor-1", "query-lookup-2"],
+      "missing_query_ids": ["query-original", "query-lookup-1", "query-lookup-3"],
+      "estimated_tokens": 715
+    },
+    {
+      "id": "v2-natural-sync-renames",
+      "lane": "natural",
+      "missing_obligations": ["sync"],
+      "paths": ["docs/mcp-docs-server.md", "docs/project-docs-mcp-workflow.md", "README.md"],
+      "covered_query_ids": ["query-lookup-1", "query-lookup-2", "query-lookup-3"],
+      "missing_query_ids": ["query-original"],
+      "estimated_tokens": 795
+    },
+    {
+      "id": "v2-paraphrase-review-ready",
+      "lane": "exposed_paraphrases",
+      "missing_obligations": ["test"],
+      "paths": ["CONTRIBUTING.md", "README.md"],
+      "covered_query_ids": ["query-lookup-1"],
+      "missing_query_ids": ["query-original", "query-lookup-2"],
+      "estimated_tokens": 615
+    },
+    {
+      "id": "v2-paraphrase-search-trust",
+      "lane": "exposed_paraphrases",
+      "missing_obligations": ["not_proof"],
+      "paths": ["docs/modules/evidence-selection.md", "docs/mcp-docs-server.md", "docs/modules/question-planning.md"],
+      "covered_query_ids": ["query-lookup-1", "query-lookup-2", "query-lookup-3"],
+      "missing_query_ids": ["query-original"],
+      "estimated_tokens": 767
+    }
+  ],
+  "passing_exposed_note": {
+    "id": "v2-paraphrase-cache-reset",
+    "obligations": {"preview": true, "preserve": true},
+    "paths": ["README.md", "docs/index-cleanup.md"],
+    "estimated_tokens": 582
+  }
+}

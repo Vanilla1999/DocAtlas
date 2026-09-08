@@ -1,0 +1,1556 @@
+{
+  "schema_version": "project-context-quality-v2-corpus-3",
+  "evaluator_version": "2.4.0",
+  "limits": {
+    "maximum_sources": 3,
+    "maximum_estimated_tokens": 800
+  },
+  "obligations": {
+    "install": {
+      "id": "install",
+      "accepted_authorities": [
+        "source_of_truth"
+      ],
+      "accepted_scopes": [
+        "project"
+      ],
+      "accepted_witnesses": [
+        {
+          "path": "README.md",
+          "text": "curl -LsSf https://raw.githubusercontent.com/Vanilla1999/DocAtlas/main/scripts/install.sh | sh"
+        }
+      ]
+    },
+    "verify": {
+      "id": "verify",
+      "accepted_authorities": [
+        "source_of_truth"
+      ],
+      "accepted_scopes": [
+        "project"
+      ],
+      "accepted_witnesses": [
+        {
+          "path": "wiki/Commands.md",
+          "text": "doc-atlas doctor"
+        },
+        {
+          "path": "README.md",
+          "text": "doc-atlas --version"
+        }
+      ]
+    },
+    "purpose": {
+      "id": "purpose",
+      "accepted_authorities": [
+        "source_of_truth"
+      ],
+      "accepted_scopes": [
+        "project"
+      ],
+      "accepted_witnesses": [
+        {
+          "path": "README.md",
+          "text": "guessing from stale or generic documentation"
+        }
+      ]
+    },
+    "product": {
+      "id": "product",
+      "accepted_authorities": [
+        "source_of_truth"
+      ],
+      "accepted_scopes": [
+        "project"
+      ],
+      "accepted_witnesses": [
+        {
+          "path": "docs/PROJECT_MAP.md",
+          "text": "DocAtlas is a local-first documentation and context runtime for coding agents"
+        },
+        {
+          "path": "README.md",
+          "text": "It turns reviewable project docs, lockfiles, and approved dependency documentation into compact, source-attributed evidence for coding agents"
+        }
+      ]
+    },
+    "setup": {
+      "id": "setup",
+      "accepted_authorities": [
+        "source_of_truth"
+      ],
+      "accepted_scopes": [
+        "project"
+      ],
+      "accepted_witnesses": [
+        {
+          "path": "wiki/Commands.md",
+          "text": "Create config and SQLite database"
+        }
+      ]
+    },
+    "ingest": {
+      "id": "ingest",
+      "accepted_authorities": [
+        "source_of_truth"
+      ],
+      "accepted_scopes": [
+        "project"
+      ],
+      "accepted_witnesses": [
+        {
+          "path": "wiki/Commands.md",
+          "text": "Index local files or directories"
+        },
+        {
+          "path": "wiki/Architecture.md",
+          "text": "`doc-atlas ingest` (local files)"
+        }
+      ]
+    },
+    "query": {
+      "id": "query",
+      "accepted_authorities": [
+        "source_of_truth"
+      ],
+      "accepted_scopes": [
+        "project"
+      ],
+      "accepted_witnesses": [
+        {
+          "path": "wiki/Commands.md",
+          "text": "doc-atlas query \"<text>\""
+        }
+      ]
+    },
+    "reading": {
+      "id": "reading",
+      "accepted_authorities": [
+        "source_of_truth"
+      ],
+      "accepted_scopes": [
+        "project"
+      ],
+      "accepted_witnesses": [
+        {
+          "path": "CONTRIBUTING.md",
+          "text": "New contributors should start by reading `README.md`, this `CONTRIBUTING.md`"
+        }
+      ]
+    },
+    "test": {
+      "id": "test",
+      "accepted_authorities": [
+        "source_of_truth"
+      ],
+      "accepted_scopes": [
+        "project"
+      ],
+      "accepted_witnesses": [
+        {
+          "path": "CONTRIBUTING.md",
+          "text": "Run the full test suite"
+        }
+      ]
+    },
+    "application": {
+      "id": "application",
+      "accepted_authorities": [
+        "source_of_truth"
+      ],
+      "accepted_scopes": [
+        "project"
+      ],
+      "accepted_witnesses": [
+        {
+          "path": "docs/PROJECT_MAP.md",
+          "text": "`docmancer/docs/application/` | Project, library and unified context workflows"
+        }
+      ]
+    },
+    "domain": {
+      "id": "domain",
+      "accepted_authorities": [
+        "source_of_truth"
+      ],
+      "accepted_scopes": [
+        "project"
+      ],
+      "accepted_witnesses": [
+        {
+          "path": "docs/PROJECT_MAP.md",
+          "text": "`docmancer/docs/domain/` | Ranking, trust, source identity and policy rules"
+        }
+      ]
+    },
+    "mcp_boundary": {
+      "id": "mcp_boundary",
+      "accepted_authorities": [
+        "source_of_truth"
+      ],
+      "accepted_scopes": [
+        "project"
+      ],
+      "accepted_witnesses": [
+        {
+          "path": "docs/PROJECT_MAP.md",
+          "text": "`docmancer/mcp/docs_server.py` | Public documentation tools, resources and transport boundary"
+        }
+      ]
+    },
+    "infrastructure_boundary": {
+      "id": "infrastructure_boundary",
+      "accepted_authorities": [
+        "source_of_truth"
+      ],
+      "accepted_scopes": [
+        "module"
+      ],
+      "accepted_witnesses": [
+        {
+          "path": "docs/modules/project-context-retrieval.md",
+          "text": "SQLite owns persistence and candidate generation; metadata-only matching may discover a candidate but cannot qualify public evidence"
+        }
+      ]
+    },
+    "flow_mcp": {
+      "id": "flow_mcp",
+      "accepted_authorities": [
+        "source_of_truth"
+      ],
+      "accepted_scopes": [
+        "module"
+      ],
+      "accepted_witnesses": [
+        {
+          "path": "docs/modules/project-context-retrieval.md",
+          "text": "The MCP boundary is `get_docs_context(question, project_path, lookup_queries?, module_path?, scope?)`"
+        }
+      ]
+    },
+    "flow_application": {
+      "id": "flow_application",
+      "accepted_authorities": [
+        "source_of_truth"
+      ],
+      "accepted_scopes": [
+        "module"
+      ],
+      "accepted_witnesses": [
+        {
+          "path": "docs/modules/project-context-retrieval.md",
+          "text": "`ProjectContextService` builds one query plan and passes it to project retrieval"
+        }
+      ]
+    },
+    "flow_gateway": {
+      "id": "flow_gateway",
+      "accepted_authorities": [
+        "source_of_truth"
+      ],
+      "accepted_scopes": [
+        "module"
+      ],
+      "accepted_witnesses": [
+        {
+          "path": "docs/modules/project-context-retrieval.md",
+          "text": "The retrieval gateway provides filtered project chunks, field-level lexical match provenance, and exact-source indexed sections"
+        }
+      ]
+    },
+    "flow_selection": {
+      "id": "flow_selection",
+      "accepted_authorities": [
+        "source_of_truth"
+      ],
+      "accepted_scopes": [
+        "module",
+        "project"
+      ],
+      "accepted_witnesses": [
+        {
+          "path": "docs/modules/project-context-retrieval.md",
+          "text": "For compound reads, selection maximizes distinct user-visible query coverage before expanding snippets"
+        },
+        {
+          "path": "docs/mcp-docs-server.md",
+          "text": "Compound projection selects compact witnesses for distinct lookup IDs before expanding snippets with remaining capacity, then requalifies coverage against the visible path, section, and snippet"
+        }
+      ]
+    },
+    "sync": {
+      "id": "sync",
+      "accepted_authorities": [
+        "source_of_truth"
+      ],
+      "accepted_scopes": [
+        "project"
+      ],
+      "accepted_witnesses": [
+        {
+          "path": "docs/project-docs-mcp-workflow.md",
+          "text": "sync_project_docs"
+        },
+        {
+          "path": "README.md",
+          "text": "prepare_docs(action=\"sync_project_docs\")"
+        }
+      ]
+    },
+    "stale": {
+      "id": "stale",
+      "accepted_authorities": [
+        "source_of_truth"
+      ],
+      "accepted_scopes": [
+        "project"
+      ],
+      "accepted_witnesses": [
+        {
+          "path": "docs/project-docs-mcp-workflow.md",
+          "text": "removes stale indexed sections"
+        },
+        {
+          "path": "README.md",
+          "text": "removes stale indexed sections"
+        }
+      ]
+    },
+    "orphans": {
+      "id": "orphans",
+      "accepted_authorities": [
+        "source_of_truth"
+      ],
+      "accepted_scopes": [
+        "project"
+      ],
+      "accepted_witnesses": [
+        {
+          "path": "docs/project-docs-mcp-workflow.md",
+          "text": "prunes** orphaned indexed sources"
+        },
+        {
+          "path": "README.md",
+          "text": "prunes orphaned indexed sources"
+        }
+      ]
+    },
+    "catalog": {
+      "id": "catalog",
+      "accepted_authorities": [
+        "source_of_truth"
+      ],
+      "accepted_scopes": [
+        "project"
+      ],
+      "accepted_witnesses": [
+        {
+          "path": "docs/project-docs-mcp-workflow.md",
+          "text": "keep a reviewable `docatlas.project-docs.yaml` catalog"
+        }
+      ]
+    },
+    "catalog_invalid": {
+      "id": "catalog_invalid",
+      "accepted_authorities": [
+        "source_of_truth"
+      ],
+      "accepted_scopes": [
+        "project"
+      ],
+      "accepted_witnesses": [
+        {
+          "path": "docs/project-docs-mcp-workflow.md",
+          "text": "without pruning the existing index"
+        }
+      ]
+    },
+    "preview": {
+      "id": "preview",
+      "accepted_authorities": [
+        "source_of_truth"
+      ],
+      "accepted_scopes": [
+        "project"
+      ],
+      "accepted_witnesses": [
+        {
+          "path": "docs/index-cleanup.md",
+          "text": "preview-only"
+        }
+      ]
+    },
+    "preserve": {
+      "id": "preserve",
+      "accepted_authorities": [
+        "source_of_truth"
+      ],
+      "accepted_scopes": [
+        "project"
+      ],
+      "accepted_witnesses": [
+        {
+          "path": "docs/index-cleanup.md",
+          "text": "preserving project sources, `docatlas.yaml`, configuration, and unrelated files"
+        }
+      ]
+    },
+    "health": {
+      "id": "health",
+      "accepted_authorities": [
+        "source_of_truth"
+      ],
+      "accepted_scopes": [
+        "project"
+      ],
+      "accepted_witnesses": [
+        {
+          "path": "README.md",
+          "text": "Explicit health, freshness, index, or background-job status requests only"
+        },
+        {
+          "path": "docs/PROJECT_MAP.md",
+          "text": "reserved for explicit health, freshness, index, and job"
+        }
+      ]
+    },
+    "isolation": {
+      "id": "isolation",
+      "accepted_authorities": [
+        "source_of_truth"
+      ],
+      "accepted_scopes": [
+        "project"
+      ],
+      "accepted_witnesses": [
+        {
+          "path": "wiki/Architecture.md",
+          "text": "Each project identity receives isolated SQLite index"
+        }
+      ]
+    },
+    "authoritative": {
+      "id": "authoritative",
+      "accepted_authorities": [
+        "source_of_truth"
+      ],
+      "accepted_scopes": [
+        "project"
+      ],
+      "accepted_witnesses": [
+        {
+          "path": "wiki/Architecture.md",
+          "text": "The filesystem documents remain authoritative"
+        },
+        {
+          "path": "docs/PROJECT_MAP.md",
+          "text": "Reviewable repository files remain the source of"
+        }
+      ]
+    },
+    "parents": {
+      "id": "parents",
+      "accepted_authorities": [
+        "source_of_truth"
+      ],
+      "accepted_scopes": [
+        "project"
+      ],
+      "accepted_witnesses": [
+        {
+          "path": "wiki/Architecture.md",
+          "text": "semantic parent sections based on heading structure"
+        }
+      ]
+    },
+    "children": {
+      "id": "children",
+      "accepted_authorities": [
+        "source_of_truth"
+      ],
+      "accepted_scopes": [
+        "project"
+      ],
+      "accepted_witnesses": [
+        {
+          "path": "wiki/Architecture.md",
+          "text": "hard maximum 512, zero visible overlap"
+        }
+      ]
+    },
+    "selection_domain": {
+      "id": "selection_domain",
+      "accepted_authorities": [
+        "source_of_truth"
+      ],
+      "accepted_scopes": [
+        "module"
+      ],
+      "accepted_witnesses": [
+        {
+          "path": "docs/modules/project-context-retrieval.md",
+          "text": "Domain policies own lineage, source-role eligibility, and visible evidence qualification"
+        }
+      ]
+    },
+    "selection_application": {
+      "id": "selection_application",
+      "accepted_authorities": [
+        "source_of_truth"
+      ],
+      "accepted_scopes": [
+        "module"
+      ],
+      "accepted_witnesses": [
+        {
+          "path": "docs/modules/project-context-retrieval.md",
+          "text": "Candidate allocation gives one opportunity to exact-anchor, original-question, and host-query lanes before consuming second candidates"
+        }
+      ]
+    },
+    "selection_proof": {
+      "id": "selection_proof",
+      "accepted_authorities": [
+        "source_of_truth"
+      ],
+      "accepted_scopes": [
+        "module",
+        "project"
+      ],
+      "accepted_witnesses": [
+        {
+          "path": "docs/modules/evidence-selection.md",
+          "text": "It may only mark a mandatory facet covered when a model-visible answer unit locally proves that exact obligation"
+        },
+        {
+          "path": "docs/mcp-docs-server.md",
+          "text": "Evidence selection chooses candidates by requiring locally bound subject, relation, and value proof for every mandatory facet; complete exact proof outranks compact generic text"
+        }
+      ]
+    },
+    "selection": {
+      "id": "selection",
+      "accepted_authorities": [
+        "source_of_truth"
+      ],
+      "accepted_scopes": [
+        "module"
+      ],
+      "accepted_witnesses": [
+        {
+          "path": "docs/modules/evidence-selection.md",
+          "text": "bounded candidates into an auditable certification decision"
+        }
+      ]
+    },
+    "not_proof": {
+      "id": "not_proof",
+      "accepted_authorities": [
+        "source_of_truth"
+      ],
+      "accepted_scopes": [
+        "module"
+      ],
+      "accepted_witnesses": [
+        {
+          "path": "docs/modules/evidence-selection.md",
+          "text": "a retrieval hit is not proof"
+        }
+      ]
+    },
+    "project_context": {
+      "id": "project_context",
+      "accepted_authorities": [
+        "source_of_truth"
+      ],
+      "accepted_scopes": [
+        "module",
+        "project"
+      ],
+      "accepted_witnesses": [
+        {
+          "path": "docs/modules/evidence-selection.md",
+          "text": "Project-only reads bypass answer certification"
+        },
+        {
+          "path": "wiki/Architecture.md",
+          "text": "Project reads return bounded `docs_context`"
+        }
+      ]
+    },
+    "offline_ingest": {
+      "id": "offline_ingest",
+      "accepted_authorities": [
+        "source_of_truth"
+      ],
+      "accepted_scopes": [
+        "project"
+      ],
+      "accepted_witnesses": [
+        {
+          "path": "wiki/Commands.md",
+          "text": "`--no-vectors` | Skip the embedding + vector upsert path entirely. Useful for FTS5-only installs and CI runs that should not download FastEmbed models"
+        },
+        {
+          "path": "wiki/Supported-Sources.md",
+          "text": "`--no-vectors` skips the embedding + vector upsert path for FTS5-only ingest."
+        }
+      ]
+    },
+    "offline_test": {
+      "id": "offline_test",
+      "accepted_authorities": [
+        "source_of_truth"
+      ],
+      "accepted_scopes": [
+        "project"
+      ],
+      "accepted_witnesses": [
+        {
+          "path": "docs/testing.md",
+          "text": "DOCATLAS_OFFLINE=1 pytest tests/ -m \"not advanced and not live and not live_network\""
+        }
+      ]
+    },
+    "tool_inventory": {
+      "id": "tool_inventory",
+      "accepted_authorities": [
+        "source_of_truth"
+      ],
+      "accepted_scopes": [
+        "project"
+      ],
+      "accepted_witnesses": [
+        {
+          "path": "docs/mcp-docs-server.md",
+          "text": "The three Docs MCP public tools are `get_docs_context`, `prepare_docs`, and `docs_status`."
+        }
+      ]
+    },
+    "tool_context": {
+      "id": "tool_context",
+      "accepted_authorities": [
+        "source_of_truth"
+      ],
+      "accepted_scopes": [
+        "project"
+      ],
+      "accepted_witnesses": [
+        {
+          "path": "docs/mcp-docs-server.md",
+          "text": "`get_docs_context` | First documentation question about a repository, dependency, library, or a mix"
+        }
+      ]
+    },
+    "tool_prepare": {
+      "id": "tool_prepare",
+      "accepted_authorities": [
+        "source_of_truth"
+      ],
+      "accepted_scopes": [
+        "project"
+      ],
+      "accepted_witnesses": [
+        {
+          "path": "docs/mcp-docs-server.md",
+          "text": "`prepare_docs` | The exact lifecycle action returned by `get_docs_context`, or an explicit user-approved sync/refresh request"
+        },
+        {
+          "path": "README.md",
+          "text": "`prepare_docs` | Lifecycle work only: sync, refresh, index, or prefetch"
+        }
+      ]
+    },
+    "tool_status": {
+      "id": "tool_status",
+      "accepted_authorities": [
+        "source_of_truth"
+      ],
+      "accepted_scopes": [
+        "project"
+      ],
+      "accepted_witnesses": [
+        {
+          "path": "docs/mcp-docs-server.md",
+          "text": "`docs_status` | A returned job id, index health, freshness, or status request"
+        },
+        {
+          "path": "README.md",
+          "text": "`docs_status` | Explicit health, freshness, index, or background-job status requests only"
+        }
+      ]
+    }
+  },
+  "cases": [
+    {
+      "id": "v2-natural-install-verify",
+      "migrated_from": "natural-install-verify",
+      "lane": "natural",
+      "question": "Я впервые ставлю DocAtlas на свой компьютер. Как его установить и убедиться, что установка исправна?",
+      "original_question": "Я впервые ставлю DocAtlas на свой компьютер. Как его установить и убедиться, что установка исправна?",
+      "scope": "project",
+      "expected_kind": "docs_context",
+      "lookup_queries": [
+        "How can I install the local documentation tool?",
+        "How can I check whether the installation is healthy?"
+      ],
+      "lookup_query_ids": [
+        "query-lookup-1",
+        "query-lookup-2"
+      ],
+      "expected_public_query_ids": [
+        "query-original",
+        "query-lookup-1",
+        "query-lookup-2"
+      ],
+      "obligations": [
+        {
+          "obligation_id": "install",
+          "lookup_query_ids": [
+            "query-lookup-1"
+          ]
+        },
+        {
+          "obligation_id": "verify",
+          "lookup_query_ids": [
+            "query-lookup-2"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "v2-natural-purpose-start",
+      "migrated_from": "natural-purpose-start",
+      "lane": "natural",
+      "question": "Что это за проект и какую проблему он решает?",
+      "original_question": "Что это за проект и какую проблему он решает?",
+      "scope": "project",
+      "expected_kind": "docs_context",
+      "lookup_queries": [
+        "What is this project and who is it for?",
+        "What problem does this documentation tool solve for a coding agent?"
+      ],
+      "lookup_query_ids": [
+        "query-lookup-1",
+        "query-lookup-2"
+      ],
+      "expected_public_query_ids": [
+        "query-original",
+        "query-lookup-1",
+        "query-lookup-2"
+      ],
+      "obligations": [
+        {
+          "obligation_id": "product",
+          "lookup_query_ids": [
+            "query-lookup-1"
+          ]
+        },
+        {
+          "obligation_id": "purpose",
+          "lookup_query_ids": [
+            "query-lookup-2"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "v2-natural-first-session",
+      "migrated_from": "natural-first-session",
+      "lane": "natural",
+      "question": "Установка закончилась. Как подготовить локальную базу, добавить в неё мои файлы и выполнить первый поиск?",
+      "original_question": "Установка закончилась. Как подготовить локальную базу, добавить в неё мои файлы и выполнить первый поиск?",
+      "scope": "project",
+      "expected_kind": "docs_context",
+      "lookup_queries": [
+        "How do I initialize the local documentation database?",
+        "How do I add local files to the index?",
+        "How do I search the indexed text from a terminal?"
+      ],
+      "lookup_query_ids": [
+        "query-lookup-1",
+        "query-lookup-2",
+        "query-lookup-3"
+      ],
+      "expected_public_query_ids": [
+        "query-original",
+        "query-lookup-1",
+        "query-lookup-2",
+        "query-lookup-3"
+      ],
+      "obligations": [
+        {
+          "obligation_id": "setup",
+          "lookup_query_ids": [
+            "query-lookup-1"
+          ]
+        },
+        {
+          "obligation_id": "ingest",
+          "lookup_query_ids": [
+            "query-lookup-2"
+          ]
+        },
+        {
+          "obligation_id": "query",
+          "lookup_query_ids": [
+            "query-lookup-3"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "v2-natural-contributor",
+      "migrated_from": "natural-contributor",
+      "lane": "natural",
+      "question": "Я хочу прислать первое исправление: что сначала прочитать в репозитории и что проверить перед отправкой?",
+      "original_question": "Я хочу прислать первое исправление: что сначала прочитать в репозитории и что проверить перед отправкой?",
+      "scope": "project",
+      "expected_kind": "docs_context",
+      "lookup_queries": [
+        "Where should a newcomer begin reading the repository?",
+        "What testing is required before submitting a contribution?"
+      ],
+      "lookup_query_ids": [
+        "query-lookup-1",
+        "query-lookup-2"
+      ],
+      "expected_public_query_ids": [
+        "query-original",
+        "query-lookup-1",
+        "query-lookup-2"
+      ],
+      "obligations": [
+        {
+          "obligation_id": "reading",
+          "lookup_query_ids": [
+            "query-lookup-1"
+          ]
+        },
+        {
+          "obligation_id": "test",
+          "lookup_query_ids": [
+            "query-lookup-2"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "v2-natural-architecture",
+      "migrated_from": "natural-architecture",
+      "lane": "natural",
+      "question": "Как устроена архитектура проекта и где проходят основные границы модулей?",
+      "original_question": "Как устроена архитектура проекта и где проходят основные границы модулей?",
+      "scope": "all",
+      "expected_kind": "docs_context",
+      "lookup_queries": [
+        "How are application workflows separated from domain rules?",
+        "Where does the documentation transport boundary live?",
+        "Which responsibilities belong to storage rather than evidence qualification?"
+      ],
+      "lookup_query_ids": [
+        "query-lookup-1",
+        "query-lookup-2",
+        "query-lookup-3"
+      ],
+      "expected_public_query_ids": [
+        "query-original",
+        "query-lookup-1",
+        "query-lookup-2",
+        "query-lookup-3"
+      ],
+      "obligations": [
+        {
+          "obligation_id": "application",
+          "lookup_query_ids": [
+            "query-lookup-1"
+          ]
+        },
+        {
+          "obligation_id": "domain",
+          "lookup_query_ids": [
+            "query-lookup-1"
+          ]
+        },
+        {
+          "obligation_id": "mcp_boundary",
+          "lookup_query_ids": [
+            "query-lookup-2"
+          ]
+        },
+        {
+          "obligation_id": "infrastructure_boundary",
+          "lookup_query_ids": [
+            "query-lookup-3"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "v2-natural-request-flow",
+      "migrated_from": "natural-request-flow",
+      "lane": "natural",
+      "question": "Как проходит запрос get_docs_context от MCP-входа до выбора источников?",
+      "original_question": "Как проходит запрос get_docs_context от MCP-входа до выбора источников?",
+      "scope": "all",
+      "expected_kind": "docs_context",
+      "lookup_queries": [
+        "What does the documentation request boundary accept?",
+        "How does the application pass a project question to retrieval?",
+        "How do retrieved chunks become selected visible sources?"
+      ],
+      "lookup_query_ids": [
+        "query-lookup-1",
+        "query-lookup-2",
+        "query-lookup-3"
+      ],
+      "expected_public_query_ids": [
+        "query-original",
+        "query-anchor-1",
+        "query-lookup-1",
+        "query-lookup-2",
+        "query-lookup-3"
+      ],
+      "obligations": [
+        {
+          "obligation_id": "flow_mcp",
+          "lookup_query_ids": [
+            "query-lookup-1"
+          ]
+        },
+        {
+          "obligation_id": "flow_application",
+          "lookup_query_ids": [
+            "query-lookup-2"
+          ]
+        },
+        {
+          "obligation_id": "flow_gateway",
+          "lookup_query_ids": [
+            "query-lookup-3"
+          ]
+        },
+        {
+          "obligation_id": "flow_selection",
+          "lookup_query_ids": [
+            "query-lookup-3"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "v2-natural-sync-renames",
+      "migrated_from": "natural-sync-renames",
+      "lane": "natural",
+      "question": "Я переписал один документ и удалил другой. Как обновить поиск, чтобы старые разделы и удалённый файл больше не выдавались?",
+      "original_question": "Я переписал один документ и удалил другой. Как обновить поиск, чтобы старые разделы и удалённый файл больше не выдавались?",
+      "scope": "project",
+      "expected_kind": "docs_context",
+      "lookup_queries": [
+        "How do I reconcile documentation after editing repository files?",
+        "What happens to indexed sections when their source file changes?",
+        "How are deleted documentation files removed from search?"
+      ],
+      "lookup_query_ids": [
+        "query-lookup-1",
+        "query-lookup-2",
+        "query-lookup-3"
+      ],
+      "expected_public_query_ids": [
+        "query-original",
+        "query-lookup-1",
+        "query-lookup-2",
+        "query-lookup-3"
+      ],
+      "obligations": [
+        {
+          "obligation_id": "sync",
+          "lookup_query_ids": [
+            "query-lookup-1"
+          ]
+        },
+        {
+          "obligation_id": "stale",
+          "lookup_query_ids": [
+            "query-lookup-2"
+          ]
+        },
+        {
+          "obligation_id": "orphans",
+          "lookup_query_ids": [
+            "query-lookup-3"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "v2-natural-catalog",
+      "migrated_from": "natural-catalog",
+      "lane": "natural",
+      "question": "Документы лежат в нестандартных местах. Как явно задать состав документации и что произойдёт при ошибке в каталоге?",
+      "original_question": "Документы лежат в нестандартных местах. Как явно задать состав документации и что произойдёт при ошибке в каталоге?",
+      "scope": "project",
+      "expected_kind": "docs_context",
+      "lookup_queries": [
+        "How can a repository declare documentation in nonstandard locations?",
+        "Does an invalid documentation catalog remove existing indexed content?"
+      ],
+      "lookup_query_ids": [
+        "query-lookup-1",
+        "query-lookup-2"
+      ],
+      "expected_public_query_ids": [
+        "query-original",
+        "query-lookup-1",
+        "query-lookup-2"
+      ],
+      "obligations": [
+        {
+          "obligation_id": "catalog",
+          "lookup_query_ids": [
+            "query-lookup-1"
+          ]
+        },
+        {
+          "obligation_id": "catalog_invalid",
+          "lookup_query_ids": [
+            "query-lookup-2"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "v2-natural-cleanup",
+      "migrated_from": "natural-cleanup",
+      "lane": "natural",
+      "question": "Хочу удалить только производный индекс, а исходники и настройки оставить. Как сначала увидеть план очистки?",
+      "original_question": "Хочу удалить только производный индекс, а исходники и настройки оставить. Как сначала увидеть план очистки?",
+      "scope": "project",
+      "expected_kind": "docs_context",
+      "lookup_queries": [
+        "How do I preview index cleanup before deleting anything?",
+        "Which project files are preserved when clearing the index?"
+      ],
+      "lookup_query_ids": [
+        "query-lookup-1",
+        "query-lookup-2"
+      ],
+      "expected_public_query_ids": [
+        "query-original",
+        "query-lookup-1",
+        "query-lookup-2"
+      ],
+      "obligations": [
+        {
+          "obligation_id": "preview",
+          "lookup_query_ids": [
+            "query-lookup-1"
+          ]
+        },
+        {
+          "obligation_id": "preserve",
+          "lookup_query_ids": [
+            "query-lookup-2"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "v2-natural-stale-health",
+      "migrated_from": "natural-stale-health",
+      "lane": "natural",
+      "question": "Поиск показывает старую документацию. Как проверить её состояние и убрать устаревшие разделы после правки файлов?",
+      "original_question": "Поиск показывает старую документацию. Как проверить её состояние и убрать устаревшие разделы после правки файлов?",
+      "scope": "project",
+      "expected_kind": "docs_context",
+      "lookup_queries": [
+        "How do I inspect documentation freshness?",
+        "How can I reconcile stale indexed sections with edited files?"
+      ],
+      "lookup_query_ids": [
+        "query-lookup-1",
+        "query-lookup-2"
+      ],
+      "expected_public_query_ids": [
+        "query-original",
+        "query-lookup-1",
+        "query-lookup-2"
+      ],
+      "obligations": [
+        {
+          "obligation_id": "health",
+          "lookup_query_ids": [
+            "query-lookup-1"
+          ]
+        },
+        {
+          "obligation_id": "sync",
+          "lookup_query_ids": [
+            "query-lookup-2"
+          ]
+        },
+        {
+          "obligation_id": "stale",
+          "lookup_query_ids": [
+            "query-lookup-2"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "v2-natural-storage",
+      "migrated_from": "natural-storage",
+      "lane": "natural",
+      "question": "Если я работаю с двумя репозиториями, могут ли их индексы смешаться и что считать истиной при расхождении индекса с файлами?",
+      "original_question": "Если я работаю с двумя репозиториями, могут ли их индексы смешаться и что считать истиной при расхождении индекса с файлами?",
+      "scope": "project",
+      "expected_kind": "docs_context",
+      "lookup_queries": [
+        "How is documentation index state isolated between repositories?",
+        "Are repository documents or their cached index authoritative?"
+      ],
+      "lookup_query_ids": [
+        "query-lookup-1",
+        "query-lookup-2"
+      ],
+      "expected_public_query_ids": [
+        "query-original",
+        "query-lookup-1",
+        "query-lookup-2"
+      ],
+      "obligations": [
+        {
+          "obligation_id": "isolation",
+          "lookup_query_ids": [
+            "query-lookup-1"
+          ]
+        },
+        {
+          "obligation_id": "authoritative",
+          "lookup_query_ids": [
+            "query-lookup-2"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "v2-natural-chunking",
+      "migrated_from": "natural-chunking",
+      "lane": "natural",
+      "question": "Как большой документ превращается в родительские секции и небольшие поисковые фрагменты, есть ли у них ограничение размера?",
+      "original_question": "Как большой документ превращается в родительские секции и небольшие поисковые фрагменты, есть ли у них ограничение размера?",
+      "scope": "project",
+      "expected_kind": "docs_context",
+      "lookup_queries": [
+        "How are document headings converted into parent sections?",
+        "What size limits and overlap apply to child chunks?"
+      ],
+      "lookup_query_ids": [
+        "query-lookup-1",
+        "query-lookup-2"
+      ],
+      "expected_public_query_ids": [
+        "query-original",
+        "query-lookup-1",
+        "query-lookup-2"
+      ],
+      "obligations": [
+        {
+          "obligation_id": "parents",
+          "lookup_query_ids": [
+            "query-lookup-1"
+          ]
+        },
+        {
+          "obligation_id": "children",
+          "lookup_query_ids": [
+            "query-lookup-2"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "v2-natural-evidence-selection",
+      "migrated_from": "natural-evidence-selection",
+      "lane": "natural",
+      "question": "Как система выбирает доказательства?",
+      "original_question": "Как система выбирает доказательства?",
+      "scope": "all",
+      "expected_kind": "docs_context",
+      "lookup_queries": [
+        "Which domain rules determine whether visible evidence qualifies?",
+        "How does the application allocate candidates across retrieval directions?",
+        "How does project context selection differ from proving mandatory answer facts?"
+      ],
+      "lookup_query_ids": [
+        "query-lookup-1",
+        "query-lookup-2",
+        "query-lookup-3"
+      ],
+      "expected_public_query_ids": [
+        "query-original",
+        "query-lookup-1",
+        "query-lookup-2",
+        "query-lookup-3"
+      ],
+      "obligations": [
+        {
+          "obligation_id": "selection_proof",
+          "lookup_query_ids": [
+            "query-lookup-3"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "v2-natural-offline",
+      "migrated_from": "natural-offline",
+      "lane": "natural",
+      "question": "Мне нужно работать без сети: как индексировать локальные файлы без загрузки моделей и какой набор тестов запускать офлайн?",
+      "original_question": "Мне нужно работать без сети: как индексировать локальные файлы без загрузки моделей и какой набор тестов запускать офлайн?",
+      "scope": "project",
+      "expected_kind": "docs_context",
+      "lookup_queries": [
+        "How can I ingest files without downloading embedding models?",
+        "Which tests run in the fail-closed offline suite?"
+      ],
+      "lookup_query_ids": [
+        "query-lookup-1",
+        "query-lookup-2"
+      ],
+      "expected_public_query_ids": [
+        "query-original",
+        "query-lookup-1",
+        "query-lookup-2"
+      ],
+      "obligations": [
+        {
+          "obligation_id": "offline_ingest",
+          "lookup_query_ids": [
+            "query-lookup-1"
+          ]
+        },
+        {
+          "obligation_id": "offline_test",
+          "lookup_query_ids": [
+            "query-lookup-2"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "v2-natural-docs-server",
+      "migrated_from": "natural-docs-server",
+      "lane": "natural",
+      "question": "Какие публичные инструменты предоставляет Docs MCP?",
+      "original_question": "Какие публичные инструменты предоставляет Docs MCP?",
+      "scope": "project",
+      "expected_kind": "docs_context",
+      "lookup_queries": [
+        "Which public tool handles a documentation question?",
+        "Which public tool performs approved documentation lifecycle work?",
+        "Which public tool reports index health and background job status?"
+      ],
+      "lookup_query_ids": [
+        "query-lookup-1",
+        "query-lookup-2",
+        "query-lookup-3"
+      ],
+      "expected_public_query_ids": [
+        "query-original",
+        "query-lookup-1",
+        "query-lookup-2",
+        "query-lookup-3"
+      ],
+      "forbidden_fragments": [
+        "packs-serve",
+        "install-pack"
+      ],
+      "obligations": [
+        {
+          "obligation_id": "tool_inventory",
+          "lookup_query_ids": [
+            "query-lookup-1",
+            "query-lookup-2",
+            "query-lookup-3"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "v2-natural-negative-retention",
+      "migrated_from": "natural-negative-retention",
+      "lane": "natural",
+      "question": "Какой срок хранения документации предписывает лунный квантовый регламент DocAtlas?",
+      "original_question": "Какой срок хранения документации предписывает лунный квантовый регламент DocAtlas?",
+      "scope": "project",
+      "expected_kind": "insufficient_evidence",
+      "lookup_queries": [],
+      "lookup_query_ids": [],
+      "expected_public_query_ids": [
+        "query-original"
+      ],
+      "obligations": []
+    },
+    {
+      "id": "v2-natural-negative-telepathy",
+      "migrated_from": "natural-negative-telepathy",
+      "lane": "natural",
+      "question": "Как DocAtlas передаёт секреты телепатическому серверу на Юпитере?",
+      "original_question": "Как DocAtlas передаёт секреты телепатическому серверу на Юпитере?",
+      "scope": "project",
+      "expected_kind": "insufficient_evidence",
+      "lookup_queries": [],
+      "lookup_query_ids": [],
+      "expected_public_query_ids": [
+        "query-original"
+      ],
+      "obligations": []
+    },
+    {
+      "id": "v2-natural-negative-retention-policy",
+      "migrated_from": null,
+      "lane": "natural",
+      "case_type": "unsupported_answer_control",
+      "question": "Как долго DocAtlas хранит удалённые документы в индексе перед автоматической очисткой?",
+      "original_question": "Как долго DocAtlas хранит удалённые документы в индексе перед автоматической очисткой?",
+      "scope": "project",
+      "expected_kind": "insufficient_evidence",
+      "lookup_queries": [],
+      "lookup_query_ids": [],
+      "expected_public_query_ids": [
+        "query-original"
+      ],
+      "obligations": []
+    },
+    {
+      "id": "v2-natural-negative-encryption",
+      "migrated_from": null,
+      "lane": "natural",
+      "case_type": "unsupported_answer_control",
+      "question": "Какой алгоритм шифрования DocAtlas использует для локальной базы SQLite и где ротируются ключи?",
+      "original_question": "Какой алгоритм шифрования DocAtlas использует для локальной базы SQLite и где ротируются ключи?",
+      "scope": "project",
+      "expected_kind": "insufficient_evidence",
+      "lookup_queries": [],
+      "lookup_query_ids": [],
+      "expected_public_query_ids": [
+        "query-original"
+      ],
+      "obligations": []
+    },
+    {
+      "id": "v2-paraphrase-local-trial",
+      "migrated_from": "paraphrase-local-trial",
+      "lane": "exposed_paraphrases",
+      "question": "Can I try this on my own documents without fetching embedding models, and check the change without network tests?",
+      "original_question": "Can I try this on my own documents without fetching embedding models, and check the change without network tests?",
+      "scope": "project",
+      "expected_kind": "docs_context",
+      "lookup_queries": [
+        "Can local file ingestion skip embeddings?",
+        "How should a contributor run tests with networking disabled?"
+      ],
+      "lookup_query_ids": [
+        "query-lookup-1",
+        "query-lookup-2"
+      ],
+      "expected_public_query_ids": [
+        "query-original",
+        "query-lookup-1",
+        "query-lookup-2"
+      ],
+      "obligations": [
+        {
+          "obligation_id": "offline_ingest",
+          "lookup_query_ids": [
+            "query-lookup-1"
+          ]
+        },
+        {
+          "obligation_id": "offline_test",
+          "lookup_query_ids": [
+            "query-lookup-2"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "v2-paraphrase-review-ready",
+      "migrated_from": "paraphrase-review-ready",
+      "lane": "exposed_paraphrases",
+      "question": "Before I send my first fix for review, which reading will orient me and what testing does the contribution guide expect?",
+      "original_question": "Before I send my first fix for review, which reading will orient me and what testing does the contribution guide expect?",
+      "scope": "project",
+      "expected_kind": "docs_context",
+      "lookup_queries": [
+        "What reading is recommended to first-time contributors?",
+        "What tests should precede a contribution review?"
+      ],
+      "lookup_query_ids": [
+        "query-lookup-1",
+        "query-lookup-2"
+      ],
+      "expected_public_query_ids": [
+        "query-original",
+        "query-lookup-1",
+        "query-lookup-2"
+      ],
+      "obligations": [
+        {
+          "obligation_id": "reading",
+          "lookup_query_ids": [
+            "query-lookup-1"
+          ]
+        },
+        {
+          "obligation_id": "test",
+          "lookup_query_ids": [
+            "query-lookup-2"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "v2-paraphrase-cache-reset",
+      "migrated_from": "paraphrase-cache-reset",
+      "lane": "exposed_paraphrases",
+      "question": "I want a dry look at what an index reset would remove, with my source tree and configuration left alone. What is the documented process?",
+      "original_question": "I want a dry look at what an index reset would remove, with my source tree and configuration left alone. What is the documented process?",
+      "scope": "project",
+      "expected_kind": "docs_context",
+      "lookup_queries": [
+        "Can index removal be previewed without applying it?",
+        "Does clearing derived storage preserve source files and configuration?"
+      ],
+      "lookup_query_ids": [
+        "query-lookup-1",
+        "query-lookup-2"
+      ],
+      "expected_public_query_ids": [
+        "query-original",
+        "query-lookup-1",
+        "query-lookup-2"
+      ],
+      "obligations": [
+        {
+          "obligation_id": "preview",
+          "lookup_query_ids": [
+            "query-lookup-1"
+          ]
+        },
+        {
+          "obligation_id": "preserve",
+          "lookup_query_ids": [
+            "query-lookup-2"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "v2-paraphrase-search-trust",
+      "migrated_from": "paraphrase-search-trust",
+      "lane": "exposed_paraphrases",
+      "question": "A search returned a plausible passage. How does selection assess candidates, and does that certify an answer about this repository?",
+      "original_question": "A search returned a plausible passage. How does selection assess candidates, and does that certify an answer about this repository?",
+      "scope": "all",
+      "expected_kind": "docs_context",
+      "lookup_queries": [
+        "What decision does evidence selection make from search candidates?",
+        "Is retrieved text sufficient proof?",
+        "What support guarantee accompanies project read context?"
+      ],
+      "lookup_query_ids": [
+        "query-lookup-1",
+        "query-lookup-2",
+        "query-lookup-3"
+      ],
+      "expected_public_query_ids": [
+        "query-original",
+        "query-lookup-1",
+        "query-lookup-2",
+        "query-lookup-3"
+      ],
+      "obligations": [
+        {
+          "obligation_id": "selection",
+          "lookup_query_ids": [
+            "query-lookup-1"
+          ]
+        },
+        {
+          "obligation_id": "not_proof",
+          "lookup_query_ids": [
+            "query-lookup-2"
+          ]
+        },
+        {
+          "obligation_id": "project_context",
+          "lookup_query_ids": [
+            "query-lookup-3"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "v2-paraphrase-reconcile-files",
+      "migrated_from": "paraphrase-reconcile-files",
+      "lane": "exposed_paraphrases",
+      "question": "The search cache still knows about a removed guide and an earlier revision. How do I bring both back in line with the working files?",
+      "original_question": "The search cache still knows about a removed guide and an earlier revision. How do I bring both back in line with the working files?",
+      "scope": "project",
+      "expected_kind": "docs_context",
+      "lookup_queries": [
+        "How do repository files and the documentation index get reconciled?",
+        "How are changed documentation sections replaced?",
+        "What removes orphaned documentation sources from the index?"
+      ],
+      "lookup_query_ids": [
+        "query-lookup-1",
+        "query-lookup-2",
+        "query-lookup-3"
+      ],
+      "expected_public_query_ids": [
+        "query-original",
+        "query-lookup-1",
+        "query-lookup-2",
+        "query-lookup-3"
+      ],
+      "obligations": [
+        {
+          "obligation_id": "sync",
+          "lookup_query_ids": [
+            "query-lookup-1"
+          ]
+        },
+        {
+          "obligation_id": "stale",
+          "lookup_query_ids": [
+            "query-lookup-2"
+          ]
+        },
+        {
+          "obligation_id": "orphans",
+          "lookup_query_ids": [
+            "query-lookup-3"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "v2-paraphrase-negative-martian",
+      "migrated_from": "paraphrase-negative-martian",
+      "lane": "exposed_paraphrases",
+      "question": "Which Martian telepathic retention standard governs this documentation runtime?",
+      "original_question": "Which Martian telepathic retention standard governs this documentation runtime?",
+      "scope": "project",
+      "expected_kind": "insufficient_evidence",
+      "lookup_queries": [],
+      "lookup_query_ids": [],
+      "expected_public_query_ids": [
+        "query-original"
+      ],
+      "obligations": []
+    }
+  ]
+}

@@ -1,0 +1,41 @@
+{
+  "schema_version": "project-context-quality-lanes-v1",
+  "frozen_before_live_execution": true,
+  "threshold_policy": "Use protocol.lock.json numeric thresholds unchanged. No rescaling for report-only datasets; their observed verdict and errors remain visible.",
+  "protocol_lock_sha256": "58322c3af9cea3ebb74b76f7438d0abf677a4f98e94bd483550086bf4ac83516",
+  "original_five_provenance": "verbatim_user_follow_up_before_first_live_run",
+  "original_five_case_ids": ["natural-purpose-start", "natural-architecture", "natural-request-flow", "natural-docs-server", "natural-evidence-selection"],
+  "lanes": {
+    "natural": {
+      "case_file_sha256": "ea8e4d9e6b518cb41b39c12ef3bc57424bf4dae8a408a451da67a8871a09a5b4",
+      "case_count": 17,
+      "positive_case_count": 15,
+      "negative_case_count": 2,
+      "report_only": false,
+      "case_ids": [
+        "natural-install-verify", "natural-purpose-start", "natural-first-session",
+        "natural-contributor", "natural-architecture", "natural-request-flow",
+        "natural-sync-renames", "natural-catalog", "natural-cleanup",
+        "natural-stale-health", "natural-storage", "natural-chunking",
+        "natural-evidence-selection", "natural-offline", "natural-docs-server",
+        "natural-negative-retention", "natural-negative-telepathy"
+      ]
+    },
+    "paraphrases": {
+      "case_file_sha256": "9b575bff7c2906dc8c91e94f2ad3d5c80607893e0c15188c986b6e2f2588d658",
+      "case_count": 6,
+      "positive_case_count": 5,
+      "negative_case_count": 1,
+      "report_only": true,
+      "case_ids": [
+        "paraphrase-local-trial", "paraphrase-review-ready", "paraphrase-cache-reset",
+        "paraphrase-search-trust", "paraphrase-reconcile-files", "paraphrase-negative-martian"
+      ]
+    }
+  },
+  "question_only": {
+    "report_only": true,
+    "input_policy": "Keep question, scope, stable ID and fact groups; omit lookup_queries and only query-lookup-* expectations. Lookup minimum is not applicable without supplied lookups. Original plus legitimate anchors remain explicit.",
+    "threshold_policy": "Unchanged protocol.lock.json numeric thresholds; never used to satisfy the primary lane."
+  }
+}

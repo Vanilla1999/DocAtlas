@@ -1,0 +1,12 @@
+{
+  "schema_version": 1,
+  "module_labels": {
+    "tests/docs/test_component_coverage.py": "behavioral",
+    "tests/docs/test_component_completeness.py": "behavioral"
+  },
+  "node_overrides": {},
+  "module_node_hashes": {
+    "tests/docs/test_component_coverage.py": "7ae241ab13b5e65a010056a0ad8d7a21528a8a67d318a16028fd1e6d3abd7037",
+    "tests/docs/test_component_completeness.py": "b7d6d44879da6030363cbc0907b9176d05d773b6fa1df4c29a2e9d7aa7131810"
+  }
+}

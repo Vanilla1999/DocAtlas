@@ -1,0 +1,10 @@
+{
+  "schema_version": 1,
+  "module_labels": {
+    "tests/docs/test_host_scope_planning_contract.py": "behavioral"
+  },
+  "module_node_hashes": {
+    "tests/docs/test_host_scope_planning_contract.py": "a758058952bdf4e64734c301d4518d449ef75d9bde5d0f7ba618560168eee2dc"
+  },
+  "node_overrides": {}
+}

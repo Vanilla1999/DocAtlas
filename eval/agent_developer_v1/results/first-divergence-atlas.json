@@ -18,11 +18,11 @@
     "fresh_installed_provider_run_available": false,
     "fresh_run_blocker": "repository OPENAI_API_KEY is not configured",
     "model": "gpt-5.6-luna",
-    "oracle_sha256": "e7bba83f624d9f382486275a8b9f8ab50bf63b301a18bc3fd78530626d21854c",
+    "oracle_sha256": "666318e529a8ea8afcf30b471e2d2744723680c3c697538b9719ec9b70afe306",
     "provider_id": "opencode-chat",
     "public_tasks_sha256": "517853c15d0a234307199ccd4dfdbd8cb8f8dee56f7a1e12bee247a02634a9b8",
     "report_protocol": "agent-developer-model-v1",
-    "report_sha256": "ebc6da0de44ead15f4da7205a7b4bc20c01f0125877f178026fd6293a69308fa"
+    "report_sha256": "c31cdc7e83281e9553fefeac4704576f8fcd0a651ea4c928e34207826d1838a3"
   },
   "summary": {
     "failure_class_counts": {

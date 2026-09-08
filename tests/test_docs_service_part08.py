@@ -186,6 +186,12 @@ def test_inspect_library_docs_marks_truncated_manifest_unhealthy(tmp_path, monke
 def test_docs_job_status_changes_to_succeeded_and_tracks_counts(tmp_path, monkeypatch):
     agent = FakeAgent()
     service = _service(tmp_path, monkeypatch, agent)
+    # This test asserts this job's lifecycle, not process-global queue latency.
+    # Use an isolated executor so unrelated jobs from the full suite cannot
+    # consume its one-second observation window.
+    service.library_docs.job_executor = LibraryJobExecutor(
+        max_workers=1, max_queued=1, poll_seconds=0.005
+    )
 
     result = service.prefetch_docs_targets(
         [

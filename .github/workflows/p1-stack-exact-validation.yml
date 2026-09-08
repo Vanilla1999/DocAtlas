@@ -34,6 +34,7 @@ jobs:
     steps:
       - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
         with:
+          fetch-depth: 0
           persist-credentials: false
       - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
         with:
@@ -78,10 +79,12 @@ jobs:
       - name: Run production-path contracts
         run: |
           pytest tests/ -m advanced -q
-          python scripts/run_legacy_contract_gate.py
+          python eval/project_context_quality_protocol.py
           python scripts/run_recovery_contract_gate.py
           python scripts/run_recovery_mutation_gate.py
-          python scripts/run_project_docs_self_host_gate.py
+          python eval/project_context_quality_protocol.py --live --report-only --output "$RUNNER_TEMP/project-context-quality-legacy-live.json"
+          python scripts/check_legacy_project_context_lineage.py "$RUNNER_TEMP/project-context-quality-legacy-live.json"
+          python scripts/run_project_context_quality_v2_gate.py --output "$RUNNER_TEMP/project-context-quality-v2-live.json"
           python scripts/run_question_surface_gate.py
           python scripts/run_agent_developer_gate.py
           python scripts/run_agent_developer_adversarial_gate.py

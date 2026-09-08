@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 from ._docs_server_shared import *  # noqa: F401,F403
+from docmancer.docs.interfaces.mcp.output_contract import compact_mcp_payload
 
 def current_docs_surface(env: Mapping[str, str] | None = None) -> DocsMcpSurface:
     """Build the docs MCP surface from the current environment.
@@ -164,7 +165,7 @@ def call_docs_tool_payload(
             tool=name,
             phase="validation",
         )
-    return payload
+    return compact_mcp_payload(payload, tool=name)
 
 
 def read_docs_resource(uri: str) -> dict[str, str] | None:
@@ -234,6 +235,7 @@ def _mcp_tool_result(
     *,
     text_fallback: bool,
 ) -> Any:
+    payload = compact_mcp_payload(payload)
     kwargs: dict[str, Any] = {
         "content": _json_text(mcp_types, payload, text_fallback=text_fallback),
     }

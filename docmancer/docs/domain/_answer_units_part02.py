@@ -17,6 +17,18 @@ from ._answer_units_part01 import (
     _word_distance,
 )
 
+_CERTIFICATION_PATH_RE = re.compile(
+    r"(?<![A-Za-z0-9_])(?:~|\.{0,2})?/(?:[^\s`'\"<>]+)|"
+    r"(?<![A-Za-z0-9_])(?:[A-Za-z]:\\)(?:[^\s`'\"<>]+)",
+)
+
+
+def _certification_semantic_text(text: str) -> str:
+    """Exclude filesystem identity from semantic proof without hiding context."""
+
+    return _CERTIFICATION_PATH_RE.sub(" ", text)
+
+
 def _attribute_aliases(attribute: str | None) -> tuple[str, ...]:
     normalized = _normal(attribute)
     aliases = {
@@ -138,11 +150,20 @@ _OPEN_INVENTORY_RE = re.compile(
 )
 
 
+def _contract_fact_disclaimer(text: str) -> bool:
+    normalized = _normal(text)
+    return bool(
+        _NEGATION_RE.search(text)
+        or re.search(
+            r"\b(?:obsolete|deprecated|document(?:ed|s)?|describ(?:ed|es)?|mention(?:ed|s)?)\b",
+            normalized,
+        )
+    )
+
+
 def _contract_fact_relation_valid(text: str) -> bool:
     normalized = _normal(text)
-    if _NEGATION_RE.search(text) or re.search(
-        r"\b(?:obsolete|deprecated|documented|described|mentioned)\b", normalized,
-    ):
+    if _contract_fact_disclaimer(text):
         return False
     returns_result = bool(re.search(
         r"\b(?:return|returns|responds?\s+with|produces?|emits?|result(?:s)?\s+(?:is|are))\b",
@@ -172,7 +193,9 @@ def _value_score(value_kind: str, text: str, *, cardinality: int | None = None) 
     if value_kind == "status":
         return 3 if _STATUS_VALUE_RE.search(text) else 0
     if value_kind == "number":
-        return 2 if re.search(r"(?<!\w)\d+(?:\.\d+)?(?!\w)", text) else 0
+        numeric = re.search(r"(?<!\w)\d+(?:\.\d+)?(?!\w)", text) is not None
+        word_number = any(_contains_term(word, text) for word in _NUMBER_WORD_VALUES)
+        return 2 if numeric or word_number else 0
     if value_kind == "boolean":
         return 2 if re.search(r"\b(?:true|false|yes|no|enabled|disabled|да|нет|включен|выключен)\b", text, re.I) else 0
     if value_kind == "path":
@@ -422,7 +445,8 @@ def local_proof_for_obligation(
 ) -> LocalProof:
     """Validate one obligation against exactly one model-visible answer unit."""
 
-    text = unit.text
+    raw_text = unit.text
+    text = _certification_semantic_text(raw_text)
     source = source or {}
     source_text = "\n".join(str(source.get(key) or "") for key in (
         "path", "source", "title", "heading_path", "project_identity", "module_id",
@@ -533,7 +557,7 @@ def local_proof_for_obligation(
         closed_inventory = not _OPEN_INVENTORY_RE.search(text)
         names_valid = closed_inventory and len(names) >= 2 and (
             obligation.cardinality is None or len(names) == obligation.cardinality
-        )
+        ) and (explicit_count is None or len(names) == explicit_count)
         derived_count = explicit_count if explicit_count is not None else (len(names) if names_valid else None)
         count_valid = derived_count is not None and (
             obligation.cardinality is None or derived_count == obligation.cardinality
@@ -570,6 +594,7 @@ def local_proof_for_obligation(
         return LocalProof(valid, 3 if expected_present else 0, relation, 3 if call_shape else 0, relation + (3 if expected_present else 0) + (3 if call_shape else 0), "command" if valid else "command_operation_not_locally_bound")
 
     if obligation.kind == "location":
+        text = raw_text
         if unit.source_field not in {"path_or_url", "path", "source_path"}:
             return LocalProof(False, reason="location_requires_source_field")
         source_identity_text = source_text + "\n" + text
@@ -738,11 +763,11 @@ def local_proof_for_obligation(
 
     if obligation.kind == "exact_fact":
         relation = 2 if (not obligation.attribute or _attribute_present(obligation.attribute, text)) else 0
-        if (
-            obligation.relation == "contract_fact"
-            and _normal(obligation.attribute) == "response contract"
-        ):
-            relation = 3 if relation and _contract_fact_relation_valid(text) else 0
+        if obligation.relation == "contract_fact":
+            if _contract_fact_disclaimer(text):
+                relation = 0
+            elif _normal(obligation.attribute) == "response contract":
+                relation = 3 if relation and _contract_fact_relation_valid(text) else 0
         value = _value_score(obligation.value_kind, text)
         if obligation.expected_value:
             value = max(value, 3 if _contains_term(obligation.expected_value, text) else 0)

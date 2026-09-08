@@ -180,13 +180,8 @@ def is_change_request(question: str) -> bool:
     return find_change_clause(question) is not None
 
 
-def model_projection_kind(question: str) -> str:
-    return "patch_context" if is_change_request(question) else "docs_answer"
-
-
 __all__ = [
     "ChangeIntentClause",
     "find_change_clause",
     "is_change_request",
-    "model_projection_kind",
 ]

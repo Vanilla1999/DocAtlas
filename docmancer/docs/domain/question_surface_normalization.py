@@ -20,6 +20,7 @@ from docmancer.docs.domain.question_plan_core import (
     QuestionPlan,
     _bind_whole_plan,
     _normalized_clause,
+    _unsafe_free_text,
 )
 
 
@@ -100,9 +101,61 @@ def rebind_surface_plan(
 def normalize_question_surface(question: str) -> SurfaceNormalization | None:
     """Return a semantics-preserving canonical surface for a complete question."""
 
+    if len(" ".join(question.split())) > 180:
+        return None
     q = clean_phrase(strip_request_wrapper(question))
     if not q:
         return None
+
+    component_negation = re.search(r"\b(?:not|never|without|не|никогда|без)\b", q, re.I)
+    component_patterns = (
+        (r"what is (.+?), what (?:is it|are they) for, and what problem does (?:it|that product) solve", "product overview for", "components:product_en"),
+        (r"what problem does (.+?) solve, what is it, and what is its purpose", "product overview for", "components:product_reordered_en"),
+        (r"что (?:это за|представляет собой) (.+?) и какую проблему (?:он|она|оно) решает", "product overview for", "components:product_ru"),
+        (r"how is (.+?) architected and where are its (?:main )?module boundaries", "architecture and module boundaries for", "components:architecture_en"),
+        (r"как устроена архитектура (.+?) и где проходят (?:его|её|ее) (?:основные )?границы модулей", "architecture and module boundaries for", "components:architecture_ru"),
+        (r"which public tools does (.+?) (?:provide|expose)", "public tool inventory for", "components:tools_en"),
+        (r"какие публичные инструменты (?:предоставляет|экспортирует) (.+)", "public tool inventory for", "components:tools_ru"),
+        (r"how does (.+?) (?:select|choose) ((?:which )?(?:evidence )?(?:candidates?|witnesses?|sources?|documents?|chunks?|results?)(?: are selected)?)", "selection behavior for", "components:selection_en"),
+        (r"как (.+?) выбирает ((?:кандидат(?:а|ов|ы)?|доказательств(?:а)?|источники|документы|фрагменты|результаты)(?: доказательств)?)", "selection behavior for", "components:selection_ru"),
+        (r"how (?:do|can) i install (.+?) and (?:then )?verify (?:it|the installation)", "install verify for", "components:install_verify_en"),
+        (r"как установить (.+?) и (?:затем )?(?:проверить|убедиться),? (?:что )?(?:он|она|оно|установка) (?:работает|исправна)", "install verify for", "components:install_verify_ru"),
+        (r"what should i read (?:for|in) (.+?) and what should i test", "read test for", "components:read_test_en"),
+        (r"что (?:сначала )?прочитать (?:в|для) (.+?) и что (?:затем )?проверить", "read test for", "components:read_test_ru"),
+        (r"how do i initialize (.+?), ingest (?:files )?(?:into it|there), and query it", "initialize ingest query for", "components:init_ingest_query_en"),
+        (r"как (?:подготовить|инициализировать) (.+?), (?:добавить|загрузить) (?:в неё|в нее|туда) (?:мои )?файлы и (?:выполнить|сделать) (?:первый )?поиск", "initialize ingest query for", "components:init_ingest_query_ru"),
+        (r"how do i (.+?) and what (?:happens|are the consequences)", "action consequences for", "components:action_consequences_en"),
+        (r"как (.+?) и (?:что произойдёт|каковы последствия)", "action consequences for", "components:action_consequences_ru"),
+        (r"how do i configure (.+?) and what happens (?:when|if) (?:it|the configuration) is invalid", "configuration invalid behavior for", "components:config_invalid_en"),
+        (r"как (?:настроить|задать) (.+?) и что произойдёт при (?:ошибке|неверной конфигурации)", "configuration invalid behavior for", "components:config_invalid_ru"),
+    )
+    for pattern, canonical, rule in (() if component_negation else component_patterns):
+        match = re.fullmatch(pattern, q, re.I)
+        if match is not None:
+            subject = clean_phrase(match.group(1)).strip("`\"'")
+            if canonical == "public tool inventory for" and _unsafe_free_text(subject):
+                continue
+            if subject:
+                target = clean_phrase(match.group(2)).strip("`\"'") if match.lastindex and match.lastindex > 1 else None
+                if canonical == "selection behavior for":
+                    text = f"Component {canonical} {subject} selecting {target}"
+                else:
+                    text = f"Component {canonical} {subject}{f' {target}' if target else ''}"
+                return _result(text, rule)
+
+    for pattern in (() if component_negation else (
+        r"how does (.+?) flow from (.+?) to (.+)",
+        r"how does (.+?) travel from (.+?) through to (.+)",
+        r"как проходит (.+?) от (.+?) до (.+)",
+    )):
+        match = re.fullmatch(pattern, q, re.I)
+        if match is not None:
+            operation, source, target = (clean_phrase(match.group(i)).strip("`\"'") for i in range(1, 4))
+            if operation and source and target:
+                return _result(
+                    f"Component operation flow {operation} from {source} to {target}",
+                    "components:operation_flow",
+                )
 
     # Reviewed Russian variants of the reusable semantic frames. Captured
     # technical identities are preserved; only closed relation vocabulary is

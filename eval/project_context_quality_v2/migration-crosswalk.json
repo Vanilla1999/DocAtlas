@@ -1,0 +1,42 @@
+{
+  "schema_version": "project-context-quality-v2-migration-crosswalk-2",
+  "source_corpora": ["eval/project_context_quality/natural.json", "eval/project_context_quality/paraphrases.json"],
+  "global_changes": [
+    "Original question and lookup-query text is byte-for-byte preserved per case.",
+    "V1 fact groups become mandatory semantic obligations with stable obligation IDs distinct from lookup IDs and source-verified alternate witnesses; matching remains formatting-only.",
+    "Public source path_or_url and response estimated_tokens replace evaluator-only path and output_tokens fields.",
+    "Authority and scope are derived from the active catalog for real responses; explicit values are accepted only in marked synthetic fixtures.",
+    "Real source identity includes active explicit documents and supported files recursively discovered under active catalog roots; root-derived identity does not adjudicate relevance.",
+    "Realistic unsupported-answer controls require safety, identity, budget, and no-authorization gates for both insufficient-evidence and retrieval-only payloads; retrieval-only context must explicitly deny answer support, availability, and edit readiness.",
+    "Lookup and query-original retrieval attribution never establish completeness; evaluator semantic completeness is compared only with an explicit internal diagnostics.component_coverage claim, otherwise the runtime claim is unavailable.",
+    "Accepted semantic witnesses require a nonempty unique returned evidence_id, exact accepted source, and substantive non-heading snippet.",
+    "No v1 thresholds carry into v2; both lanes are report-only and reused v1 paraphrases are EXPOSED_PARAPHRASES_REPORT_ONLY, not an independent holdout."
+  ],
+  "crosswalk": [
+    {"v1_id":"natural-install-verify","v2_id":"v2-natural-install-verify","expectation_change":"the authoritative one-line curl installer workflow and verification are separately mandatory; either reviewed verification witness is accepted"},
+    {"v1_id":"natural-purpose-start","v2_id":"v2-natural-purpose-start","expectation_change":"product identity and stale-documentation problem are separately mandatory"},
+    {"v1_id":"natural-first-session","v2_id":"v2-natural-first-session","expectation_change":"database setup, ingestion, and first query are three mandatory components"},
+    {"v1_id":"natural-contributor","v2_id":"v2-natural-contributor","expectation_change":"recommended reading and pre-submission testing are separately mandatory"},
+    {"v1_id":"natural-architecture","v2_id":"v2-natural-architecture","expectation_change":"application, domain, MCP, and infrastructure boundaries are all mandatory; module witnesses retain catalog module scope"},
+    {"v1_id":"natural-request-flow","v2_id":"v2-natural-request-flow","expectation_change":"MCP input, application handoff, gateway output, and visible selection are all mandatory; query-anchor-1 remains in the public plan inventory"},
+    {"v1_id":"natural-sync-renames","v2_id":"v2-natural-sync-renames","expectation_change":"sync action, stale-section removal, and orphan removal are all mandatory"},
+    {"v1_id":"natural-catalog","v2_id":"v2-natural-catalog","expectation_change":"explicit catalog declaration and fail-safe invalid-catalog behavior are separately mandatory"},
+    {"v1_id":"natural-cleanup","v2_id":"v2-natural-cleanup","expectation_change":"preview-only behavior and preservation of project sources plus configuration are separately mandatory"},
+    {"v1_id":"natural-stale-health","v2_id":"v2-natural-stale-health","expectation_change":"status inspection, sync, and stale-section removal are mandatory; two latter components may map to one real lookup"},
+    {"v1_id":"natural-storage","v2_id":"v2-natural-storage","expectation_change":"per-project isolation and filesystem authority are separately mandatory"},
+    {"v1_id":"natural-chunking","v2_id":"v2-natural-chunking","expectation_change":"parent-section construction and child size/overlap behavior are separately mandatory"},
+    {"v1_id":"natural-evidence-selection","v2_id":"v2-natural-evidence-selection","expectation_change":"2.4 audit: broad original question requires a substantive selection rule (docs/mcp-docs-server.md:45), not architecture details introduced only by host lookups; selection_proof remains mandatory"},
+    {"v1_id":"natural-offline","v2_id":"v2-natural-offline","expectation_change":"2.4 audit: FTS5-only ingestion and the exact offline test command remain separately mandatory; wiki/Supported-Sources.md:44 explicitly proves the same no-embedding/vector operation as Commands.md"},
+    {"v1_id":"natural-docs-server","v2_id":"v2-natural-docs-server","expectation_change":"2.4 audit: original question asks inventory, not distinct roles; docs/mcp-docs-server.md:53 directly names all three tools. Count-only evidence is insufficient; legacy pack commands remain forbidden"},
+    {"v1_id":"natural-negative-retention","v2_id":"v2-natural-negative-retention","expectation_change":"unchanged abstention expectation, measured outside positive usefulness"},
+    {"v1_id":"natural-negative-telepathy","v2_id":"v2-natural-negative-telepathy","expectation_change":"unchanged abstention expectation, measured outside positive usefulness"},
+    {"v1_id":null,"v2_id":"v2-natural-negative-retention-policy","expectation_change":"new realistic unsupported retention-duration control; accepts fail-closed insufficient evidence or safe retrieval-only context without an answer or original-relation coverage claim"},
+    {"v1_id":null,"v2_id":"v2-natural-negative-encryption","expectation_change":"new realistic unsupported SQLite encryption/key-rotation control; accepts fail-closed insufficient evidence or safe retrieval-only context without an answer or original-relation coverage claim"},
+    {"v1_id":"paraphrase-local-trial","v2_id":"v2-paraphrase-local-trial","expectation_change":"same two mandatory facts in the exposed-paraphrases report-only lane; reused v1 text is not independent"},
+    {"v1_id":"paraphrase-review-ready","v2_id":"v2-paraphrase-review-ready","expectation_change":"same two mandatory facts in the exposed-paraphrases report-only lane; reused v1 text is not independent"},
+    {"v1_id":"paraphrase-cache-reset","v2_id":"v2-paraphrase-cache-reset","expectation_change":"same two mandatory facts in the exposed-paraphrases report-only lane; reused v1 text is not independent"},
+    {"v1_id":"paraphrase-search-trust","v2_id":"v2-paraphrase-search-trust","expectation_change":"selection, retrieval-not-proof, and project-context support are mandatory in the exposed-paraphrases report-only lane; reused v1 text is not independent"},
+    {"v1_id":"paraphrase-reconcile-files","v2_id":"v2-paraphrase-reconcile-files","expectation_change":"sync, stale replacement, and orphan removal are mandatory in the exposed-paraphrases report-only lane; reused v1 text is not independent"},
+    {"v1_id":"paraphrase-negative-martian","v2_id":"v2-paraphrase-negative-martian","expectation_change":"negative remains an abstention control in the exposed-paraphrases report-only lane; reused v1 text is not independent"}
+  ]
+}
