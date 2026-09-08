@@ -3,6 +3,26 @@ from __future__ import annotations
 from ._docs_server_schema import *  # noqa: F401,F403
 from ._docs_server_tool_data import *  # noqa: F401,F403
 
+_GET_DOCS_CONTEXT_QUESTION_PLANNING_GUIDANCE = """
+
+Question planning:
+- One get_docs_context call answers one concrete user question. If the user provides multiple independent questions (for example, a multi-question evaluation), make separate get_docs_context calls.
+- Put the concrete question itself in question. Do not put a generic test, evaluation, or meta request in question while moving the real questions into lookup_queries.
+- lookup_queries may translate, paraphrase, or decompose facets of the same question only. They are not a batch channel for independent questions or separate tasks.
+"""
+_GET_DOCS_CONTEXT_QUESTION_DESCRIPTION = (
+    "One concrete user question for this call. For multiple independent questions, "
+    "make separate get_docs_context calls. Never replace the concrete question with "
+    "a generic evaluation or meta request."
+)
+_GET_DOCS_CONTEXT_LOOKUP_DESCRIPTION = (
+    "Optional bounded single-concept lookups used only to improve retrieval recall for "
+    "the same question. A lookup may translate, paraphrase, or decompose one facet of "
+    "that question. Do not put independent questions or separate tasks here. Preserve "
+    "exact identifiers."
+)
+
+
 def _handler_for_tool(name: str) -> ToolHandler:
     if name in {tool["name"] for tool in context_tools(RAW_TOOLS)}:
         return handle_context_tool
@@ -29,12 +49,24 @@ def _strip_null_enum_values(value: Any) -> Any:
 def _tool_spec(raw: dict[str, Any], *, text_fallback: bool = False) -> ToolSpec:
     name = str(raw["name"])
     validation_schema = _strip_null_enum_values(copy.deepcopy(raw["inputSchema"]))
+    advertised_schema = _strip_null_enum_values(copy.deepcopy(
+        PUBLIC_ADVERTISED_INPUT_SCHEMAS.get(name, raw["inputSchema"])
+    ))
+    description = PUBLIC_ADVERTISED_DESCRIPTIONS.get(name, str(raw["description"]))
+    if name == "get_docs_context":
+        description = f"{description}{_GET_DOCS_CONTEXT_QUESTION_PLANNING_GUIDANCE}"
+        properties = advertised_schema.get("properties", {})
+        question_schema = properties.get("question")
+        if isinstance(question_schema, dict):
+            question_schema["description"] = _GET_DOCS_CONTEXT_QUESTION_DESCRIPTION
+        lookup_schema = properties.get("lookup_queries")
+        if isinstance(lookup_schema, dict):
+            lookup_schema["description"] = _GET_DOCS_CONTEXT_LOOKUP_DESCRIPTION
+        validation_schema = copy.deepcopy(advertised_schema)
     return ToolSpec(
         name=name,
-        description=PUBLIC_ADVERTISED_DESCRIPTIONS.get(name, str(raw["description"])),
-        input_schema=_strip_null_enum_values(copy.deepcopy(
-            PUBLIC_ADVERTISED_INPUT_SCHEMAS.get(name, raw["inputSchema"])
-        )),
+        description=description,
+        input_schema=advertised_schema,
         handler=_handler_for_tool(name),
         output_schema=(
             None
@@ -43,7 +75,7 @@ def _tool_spec(raw: dict[str, Any], *, text_fallback: bool = False) -> ToolSpec:
         ),
         validation_schema=_strip_null_enum_values(copy.deepcopy(
             PUBLIC_ADVERTISED_INPUT_SCHEMAS.get(name, validation_schema)
-        )),
+        )) if name != "get_docs_context" else validation_schema,
     )
 
 
