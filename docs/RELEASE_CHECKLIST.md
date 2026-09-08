@@ -26,7 +26,7 @@ Before the next public release candidate:
 - [ ] Any explicit state/config migration shipped in this release is ownership-checked, preview-first, fail-closed on ambiguous/foreign state, and covered by installed tests.
 - [ ] Installed agent guidance and examples validate against the real three-tool public MCP schema.
 - [ ] The active release identity note and changelog agree on the intended public version. Repository `1.2.0` is an unpublished milestone; failed `1.3.0`/`1.3.1` tags remain audit history; the next intended public release is `1.3.2`.
-- [ ] A new executable release decision for `.github/release-requests/v1.3.2.json` must bind the exact merged launch base/delta, tag, publisher identity, and public tool inventory before any `v1.3.2` tag is created. The old `v1.3.1` request remains audit history.
+- [ ] The historical executable release decision `.github/release-requests/v1.3.1.json` remains immutable audit evidence. For the next candidate, a new `.github/release-requests/v1.3.2.json` must bind the exact merged launch base/delta, tag, publisher identity, and public tool inventory before any `v1.3.2` tag is created.
 
 ## Built artifact
 
