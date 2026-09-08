@@ -7,7 +7,7 @@ _GET_DOCS_CONTEXT_QUESTION_PLANNING_GUIDANCE = """
 
 Question planning:
 - One get_docs_context call answers one concrete user question. If the user provides multiple independent questions (for example, a multi-question evaluation), make separate get_docs_context calls.
-- Put the concrete question itself in question. Do not put a generic test, evaluation, or meta request in question while moving the real questions into lookup_queries.
+- A benchmark or evaluation request is not itself the documentation question when it contains or asks you to generate multiple concrete questions. Put each concrete documentation question in question on its own call.
 - lookup_queries may translate, paraphrase, or decompose facets of the same question only. They are not a batch channel for independent questions or separate tasks.
 """
 _GET_DOCS_CONTEXT_QUESTION_DESCRIPTION = (
@@ -20,6 +20,15 @@ _GET_DOCS_CONTEXT_LOOKUP_DESCRIPTION = (
     "the same question. A lookup may translate, paraphrase, or decompose one facet of "
     "that question. Do not put independent questions or separate tasks here. Preserve "
     "exact identifiers."
+)
+_ORIGINAL_REQUEST_GUIDANCE = (
+    "Pass the user's original request unchanged as question; never substitute a "
+    "documentation-governance meta-question. "
+)
+_CONCRETE_QUESTION_GUIDANCE = (
+    "Pass one concrete documentation question unchanged as question; never substitute "
+    "the surrounding benchmark/evaluation request or a documentation-governance "
+    "meta-question. "
 )
 
 
@@ -54,6 +63,10 @@ def _tool_spec(raw: dict[str, Any], *, text_fallback: bool = False) -> ToolSpec:
     ))
     description = PUBLIC_ADVERTISED_DESCRIPTIONS.get(name, str(raw["description"]))
     if name == "get_docs_context":
+        description = description.replace(
+            _ORIGINAL_REQUEST_GUIDANCE,
+            _CONCRETE_QUESTION_GUIDANCE,
+        )
         description = f"{description}{_GET_DOCS_CONTEXT_QUESTION_PLANNING_GUIDANCE}"
         properties = advertised_schema.get("properties", {})
         question_schema = properties.get("question")
@@ -73,9 +86,13 @@ def _tool_spec(raw: dict[str, Any], *, text_fallback: bool = False) -> ToolSpec:
             if text_fallback
             else copy.deepcopy(PUBLIC_ADVERTISED_OUTPUT_SCHEMAS.get(name, raw.get("outputSchema")))
         ),
-        validation_schema=_strip_null_enum_values(copy.deepcopy(
-            PUBLIC_ADVERTISED_INPUT_SCHEMAS.get(name, validation_schema)
-        )) if name != "get_docs_context" else validation_schema,
+        validation_schema=(
+            validation_schema
+            if name == "get_docs_context"
+            else _strip_null_enum_values(copy.deepcopy(
+                PUBLIC_ADVERTISED_INPUT_SCHEMAS.get(name, validation_schema)
+            ))
+        ),
     )
 
 
