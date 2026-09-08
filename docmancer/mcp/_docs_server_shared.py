@@ -26,8 +26,8 @@ _ORIGINAL_REQUEST_GUIDANCE = (
     "documentation-governance meta-question. "
 )
 _CONCRETE_QUESTION_GUIDANCE = (
-    "Pass one concrete documentation question unchanged as question; never substitute "
-    "the surrounding benchmark/evaluation request or a documentation-governance "
+    "For one concrete documentation question, pass that question as the original request unchanged; "
+    "never substitute the surrounding benchmark/evaluation request or a documentation-governance "
     "meta-question. "
 )
 
