@@ -1,4 +1,4 @@
-<!-- mcp-name: io.github.vanilla1999/docatlas -->
+<!-- mcp-name: io.github.Vanilla1999/docatlas -->
 <div align="center">
 
 # DocAtlas

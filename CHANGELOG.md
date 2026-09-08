@@ -6,7 +6,16 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 
+## [1.3.2] - 2026-09-08
+
+### Added
+
+- Added Official MCP Registry metadata for the local Docs MCP server (`io.github.Vanilla1999/docatlas`) and a GitHub-OIDC publication step that runs only after the exact public PyPI package passes Linux, macOS, and Windows smoke.
+- Added the PyPI ownership marker required by the Official MCP Registry while keeping it hidden from the rendered README.
+
 ### Changed
+
+- Reworked the README first screen around the user problem: small, source-attributed project and version-aware dependency context for coding agents, with a one-line install and a compact architecture summary.
 
 - Project chat now retrieves bounded current project documentation before attempting strict answer certification. Natural Russian newcomer questions can use auditable retrieval-only aliases and fall back to non-authoritative `docs_context`; generic CLI commands are no longer confused with the Docs MCP tool inventory, and mixed-language recovery questions are not generated.
 

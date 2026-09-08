@@ -1,0 +1,34 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "io.github.Vanilla1999/docatlas",
+  "title": "DocAtlas",
+  "description": "Local-first MCP docs context for coding agents: bounded, source-attributed, version-aware evidence.",
+  "websiteUrl": "https://github.com/Vanilla1999/DocAtlas",
+  "repository": {
+    "url": "https://github.com/Vanilla1999/DocAtlas",
+    "source": "github"
+  },
+  "version": "1.3.2",
+  "packages": [
+    {
+      "registryType": "pypi",
+      "registryBaseUrl": "https://pypi.org",
+      "identifier": "doc-atlas",
+      "version": "1.3.2",
+      "runtimeHint": "uvx",
+      "transport": {
+        "type": "stdio"
+      },
+      "packageArguments": [
+        {
+          "type": "positional",
+          "value": "mcp"
+        },
+        {
+          "type": "positional",
+          "value": "docs-serve"
+        }
+      ]
+    }
+  ]
+}

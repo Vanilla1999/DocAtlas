@@ -25,8 +25,8 @@ Before the next public release candidate:
 - [ ] Fresh installs use `DOCATLAS_HOME`, `~/.docatlas`, `docatlas.yaml`, and the `docatlas` MCP registration identity.
 - [ ] Any explicit state/config migration shipped in this release is ownership-checked, preview-first, fail-closed on ambiguous/foreign state, and covered by installed tests.
 - [ ] Installed agent guidance and examples validate against the real three-tool public MCP schema.
-- [ ] The active release identity note and changelog agree on the intended public version. Repository `1.2.0` is an unpublished milestone; the next intended public release is `1.3.1` unless a later reviewed release-preparation change supersedes it.
-- [ ] The executable release decision is reviewable in `.github/release-requests/v1.3.1.json`; its exact base commit, allowed release delta, tag, publisher identity, and public tool inventory are validated before any tag is created.
+- [ ] The active release identity note and changelog agree on the intended public version. Repository `1.2.0` is an unpublished milestone; failed `1.3.0`/`1.3.1` tags remain audit history; the next intended public release is `1.3.2`.
+- [ ] A new executable release decision for `.github/release-requests/v1.3.2.json` must bind the exact merged launch base/delta, tag, publisher identity, and public tool inventory before any `v1.3.2` tag is created. The old `v1.3.1` request remains audit history.
 
 ## Built artifact
 
@@ -51,6 +51,9 @@ Before the next public release candidate:
 - [ ] Download the public wheel and sdist and verify their bytes/SHA-256 values match the gated artifacts before accepting the publication.
 - [ ] Reinstall the exact public version with pip cache disabled and rerun the installed Docs MCP stdio smoke.
 - [ ] Verify the exact public package on Linux, macOS, and Windows for the claimed primary MCP/install surface.
+- [ ] The PyPI package README contains `<!-- mcp-name: io.github.Vanilla1999/docatlas -->`, and `server.json` names the exact same server/package version.
+- [ ] After all three public-platform smokes pass, publish `io.github.Vanilla1999/docatlas` to the Official MCP Registry with GitHub OIDC; no Registry PAT/secret is stored.
+- [ ] Query the Registry API and retain exact `io.github.Vanilla1999/docatlas` + release-version evidence.
 - [ ] Retain the controller's `reviewed-public-release-<version>-<run_id>` evidence artifact and move scorecard rows to green only through a separate reviewed closure PR.
 
 ### `invalid-publisher` recovery

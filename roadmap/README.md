@@ -144,28 +144,24 @@ Acceptance:
 - normal-agent docs do not advertise server-owned compatibility arguments;
 - installed guidance carries a reproducible contract/schema identity.
 
-## P0.5 — Publish and verify public `1.3.1`
+## P0.5 — Publish and verify public `1.3.2`
 
-
-The immutable `v1.3.0` tag records a superseded pre-public attempt whose OIDC upload failed before publication. It must not be moved or rerun. `1.3.1` is the replacement public candidate because current `main` contains reviewed recovery fixes that are not part of that old tag.
-
-Do not reuse or move a historical `1.2.0` identity. Prepare a new public `1.3.1` release only after P0.3/P0.4 are complete.
+`v1.3.0` and `v1.3.1` are superseded pre-public attempt identities; both remain immutable, and their PyPI OIDC uploads failed before publication. `1.3.2` is the next public candidate because the launch README, PyPI MCP ownership marker, and Official MCP Registry metadata were added after `v1.3.1`.
 
 Acceptance:
 
-- source version, tag, changelog, wheel, and sdist agree on `1.3.1`;
-- PyPI metadata says Beta;
-- publication uses the existing OIDC/Trusted Publishing path;
-- downloaded public wheel/sdist bytes match gated SHA-256 values;
-- a no-cache install of the exact public version passes Docs MCP stdio smoke;
-- installed public behavior is verified on Linux, macOS, and Windows;
-- the installed public tool inventory is exactly the three-tool contract.
+- source version, reviewed tag, changelog, wheel, sdist, and `server.json` agree on `1.3.2`;
+- the PyPI README contains the exact `io.github.Vanilla1999/docatlas` ownership marker;
+- PyPI metadata says Beta and exact public artifact hashes match the gated build;
+- a no-cache install passes the exact three-tool Docs MCP stdio smoke;
+- Linux, macOS, and Windows public-package smokes are green;
+- only then, GitHub OIDC publishes `io.github.Vanilla1999/docatlas` `1.3.2` to the Official MCP Registry and the exact Registry entry is verified.
 
 ## P0.6 — Public-truth closure scorecard
 
 Maintain [`docs/public-truth-scorecard.md`](../docs/public-truth-scorecard.md) as the single closure record for P0.
 
-Scorecard states are `green`, `pending`, and `accepted_risk`. Branch protection is the one explicitly accepted residual risk for `1.3.1`; it must never be rendered as green. Artifact/public-install rows remain pending until the exact PyPI release exists and post-publish verification completes.
+Scorecard states are `green`, `pending`, and `accepted_risk`. Branch protection is the one explicitly accepted residual risk for `1.3.2`; it must never be rendered as green. Artifact/public-install rows remain pending until the exact PyPI release exists and post-publish verification completes.
 
 P0 exits when every row is `green` or an explicitly documented `accepted_risk`, no row is `pending`, and product maturity remains honestly **Beta**. An accepted risk does not become evidence that the missing control exists.
 
