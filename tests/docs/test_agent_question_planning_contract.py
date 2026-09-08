@@ -24,7 +24,8 @@ def test_runtime_tool_teaches_one_concrete_question_per_call() -> None:
     assert "independent questions" in description
     assert "separate" in description
     assert "benchmark or evaluation request is not itself" in description
-    assert "user's original request unchanged" not in description
+    assert "original request unchanged" in description
+    assert "surrounding benchmark/evaluation request" in description
 
     assert "one concrete user question" in question_description
     assert "separate" in question_description
