@@ -79,11 +79,11 @@ jobs:
               'tests/test_docs_service_part08.py',
               '.github/workflows/pr179-final-core-fix.yml',
           }
-          changed = set(subprocess.check_output(['git','diff','--name-only']).decode().splitlines())
+          changed = set(subprocess.check_output(['git','diff','HEAD','--name-only']).decode().splitlines())
           assert changed == allowed, (changed, allowed)
           PY
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add docmancer/docs/application/evidence_requirements.py tests/test_docs_service_part08.py
+          git add -A
           git commit -m 'fix: close final PR179 core regressions'
           git push origin HEAD:fix/context-first-project-reads-finalization
