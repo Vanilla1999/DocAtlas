@@ -53,6 +53,7 @@ def test_registry_publish_is_oidc_only_and_after_public_platform_smoke() -> None
     assert "publish-official-mcp-registry" in workflow
     assert "needs: [public-platform-smoke]" in workflow
     assert "id-token: write" in workflow
+    assert "./mcp-publisher validate server.json" in workflow
     assert "./mcp-publisher login github-oidc" in workflow
     assert "./mcp-publisher publish server.json" in workflow
     assert "releases/download/v1.7.9/mcp-publisher_linux_amd64.tar.gz" in workflow
@@ -93,6 +94,32 @@ replacement = (
 if roadmap_text.count(needle) != 1:
     raise SystemExit("expected P0.5 historical release sentence exactly once")
 roadmap.write_text(roadmap_text.replace(needle, replacement, 1), encoding="utf-8")
+
+# The staged generator appends the registry job as a standalone block. Make it
+# an actual job under the existing top-level `jobs:` map, then add the official
+# publisher's local validation command before OIDC authentication.
+publish = ROOT / ".github/workflows/publish.yml"
+publish_text = publish.read_text(encoding="utf-8")
+job_marker = "\nmcp-registry:\n"
+if publish_text.count(job_marker) != 1:
+    raise SystemExit("expected one generated top-level mcp-registry block")
+prefix, job_body = publish_text.split(job_marker, 1)
+job_lines = ("mcp-registry:\n" + job_body).splitlines()
+indented_job = "\n".join("  " + line if line else line for line in job_lines)
+publish_text = prefix.rstrip() + "\n\n" + indented_job + "\n"
+needle = (
+    "          ./mcp-publisher --help\n"
+    "      - name: Authenticate to Official MCP Registry\n"
+)
+replacement = (
+    "          ./mcp-publisher --help\n"
+    "      - name: Validate Official MCP Registry metadata\n"
+    "        run: ./mcp-publisher validate server.json\n"
+    "      - name: Authenticate to Official MCP Registry\n"
+)
+if publish_text.count(needle) != 1:
+    raise SystemExit("expected one Registry publisher install/auth boundary")
+publish.write_text(publish_text.replace(needle, replacement, 1), encoding="utf-8")
 
 # The canonical maturity test derives current release truth from the source
 # version. Move only its current-candidate assertions to 1.3.2; historical
