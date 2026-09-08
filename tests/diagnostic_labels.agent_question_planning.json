@@ -1,0 +1,12 @@
+{
+  "module_labels": {
+    "tests/docs/test_agent_question_planning_contract.py": "behavioral",
+    "tests/docs/test_agent_question_planning_live_eval.py": "behavioral"
+  },
+  "module_node_hashes": {
+    "tests/docs/test_agent_question_planning_contract.py": "bbaccb5c7edc9acf6a97d08f331f884771f605f9cc83253d8e8d7578891cc86d",
+    "tests/docs/test_agent_question_planning_live_eval.py": "203a8f86df0a0301ee56492fc4eeeb28c56a1dc510740ece94892131d1538110"
+  },
+  "node_overrides": {},
+  "schema_version": 1
+}

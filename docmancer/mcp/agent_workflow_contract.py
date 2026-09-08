@@ -47,6 +47,9 @@ WORKFLOW_POLICY: dict[str, Any] = {
         "original_question_unchanged": True,
         "preserve_exact_technical_anchors": True,
         "compound_or_cross_language_decomposition_required": True,
+        "independent_questions_use_separate_calls": True,
+        "lookup_queries_must_refine_same_question": True,
+        "meta_request_must_not_replace_concrete_question": True,
         "answer_only_from_returned_sources": True,
         "partial_coverage_is_not_completeness": True,
         "authorizes_answer_or_edit": False,
@@ -101,6 +104,20 @@ PUBLIC_EXAMPLES: tuple[dict[str, Any], ...] = (
             "project_path": "/repo",
             "scope": "module",
             "module_path": "packages/orders",
+        },
+    },
+    {
+        "id": "cross-language-single-question",
+        "tool": "get_docs_context",
+        "condition": "one user question needs same-question lookups in the documentation language",
+        "arguments": {
+            "question": "Как проверить актуальность индекса после изменения документации?",
+            "project_path": "/repo",
+            "scope": "project",
+            "lookup_queries": [
+                "check project documentation index freshness after editing files",
+                "sync project docs after file changes",
+            ],
         },
     },
     {
