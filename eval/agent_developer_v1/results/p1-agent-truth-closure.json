@@ -149,15 +149,15 @@
       "path": "eval/agent_developer_v1/results/contract-v2-ablation.json"
     },
     "p1_4": {
-      "git_blob_sha1": "cd8f398d72184d1679102aee259df63e30ff61e5",
+      "git_blob_sha1": "359b786601d35d05493996d0ce7145f01311a521",
       "path": "eval/agent_developer_v1/results/paraphrase-proofability.json"
     },
     "p1_5": {
-      "git_blob_sha1": "79fabf7b08b79b565819187a58eb819eb30c5953",
+      "git_blob_sha1": "53dd0be662b2ec13037f3516fd85ce108ee0605c",
       "path": "eval/agent_developer_v1/results/mixed-evidence-provenance.json"
     },
     "p1_6": {
-      "git_blob_sha1": "32e1a93fec9b268e6f2629f1d1b81068d1985d0e",
+      "git_blob_sha1": "378d02cd91e67b830d2cd97808c7249aa810024b",
       "path": "eval/agent_developer_v1/results/evidence-is-data.json"
     }
   }
