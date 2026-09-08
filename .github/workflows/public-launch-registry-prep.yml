@@ -49,9 +49,10 @@ jobs:
           tar -xzf /tmp/mcp-publisher.tar.gz -C /tmp mcp-publisher
           /tmp/mcp-publisher validate server.json
 
-      - name: Publish validated preparation commit
+      - name: Publish validated non-workflow preparation
         run: |
-          rm .github/workflows/public-launch-registry-prep.yml
+          cp .github/workflows/publish.yml .github/review/final-publish.yml
+          git checkout HEAD -- .github/workflows/publish.yml
           rm .github/review/public_launch_registry_prep.py
           rm .github/review/fix_registry_description.py
           rm .github/review/merge_registry_tests.py
@@ -59,5 +60,9 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add -A
           git diff --cached --check
+          if git diff --cached --name-only | grep -q '^\.github/workflows/publish\.yml$'; then
+            echo 'publish.yml must be handed off through the connector, not GITHUB_TOKEN' >&2
+            exit 1
+          fi
           git commit -m "feat: prepare Official MCP Registry launch"
           git push origin HEAD:docs/public-launch-readme-registry
