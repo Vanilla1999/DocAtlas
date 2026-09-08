@@ -13,13 +13,13 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 def test_patch_release_identity_is_single_source_and_preserves_failed_tag_audit():
-    assert __version__ == "1.3.1"
+    assert __version__ == "1.3.2"
     changelog = (ROOT / "CHANGELOG.md").read_text(encoding="utf-8")
-    assert changelog.index("## [1.3.1]") < changelog.index("## [1.3.0]")
+    assert changelog.index("## [1.3.2]") < changelog.index("## [1.3.1]") < changelog.index("## [1.3.0]")
 
     identity = (ROOT / "docs/release-identity.md").read_text(encoding="utf-8")
-    assert "current source release candidate is **DocAtlas 1.3.1**" in identity
-    assert "v1.3.0" in identity
+    assert "current source release candidate is **DocAtlas 1.3.2**" in identity
+    assert "v1.3.1" in identity
     assert "must never be moved, replaced, or reused" in identity
     assert "invalid-publisher" in identity
     assert "environment: release-current" in identity
@@ -33,7 +33,7 @@ def test_patch_release_identity_is_single_source_and_preserves_failed_tag_audit(
     assert "account-level **pending publisher**" in identity
 
     roadmap = (ROOT / "roadmap/README.md").read_text(encoding="utf-8")
-    assert "P0.5 — Publish and verify public `1.3.1`" in roadmap
+    assert "P0.5 — Publish and verify public `1.3.2`" in roadmap
     assert "superseded pre-public attempt" in roadmap
     assert "publication remains manual through the `release-current` environment" in roadmap
     assert "publication remains manual through the `release` environment" not in roadmap
@@ -42,7 +42,7 @@ def test_patch_release_identity_is_single_source_and_preserves_failed_tag_audit(
     assert "Status: **INCOMPLETE**" in scorecard
     assert "two canonical PyPI exchanges were rejected before upload" in scorecard
     assert "Trusted Publisher identity | `pending`" in scorecard
-    assert "doc-atlas==1.3.1" in scorecard
+    assert "doc-atlas==1.3.2" in scorecard
     assert "Attempts 1 and 2" in scorecard
     assert "Manage → Publishing" in scorecard
 
@@ -129,7 +129,7 @@ def test_patch_release_identity_is_single_source_and_preserves_failed_tag_audit(
 
 def test_publish_workflow_uses_replacement_identity_not_failed_environment():
     workflow = (ROOT / ".github/workflows/publish.yml").read_text(encoding="utf-8")
-    assert "for example v1.3.1" in workflow
+    assert "for example v1.3.2" in workflow
     assert "    environment: release-current" in workflow
     assert "    environment: release\n" not in workflow
     assert "Record expected Trusted Publisher identity" in workflow

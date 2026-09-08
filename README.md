@@ -1,16 +1,51 @@
-<img width="1448" height="1086" alt="68c5f033-e8f3-4331-a88e-cc64bf28fb62" src="https://github.com/user-attachments/assets/78458fed-22c5-4e78-bbb0-67a902948f9c" />
+<!-- mcp-name: io.github.Vanilla1999/docatlas -->
 <div align="center">
 
 # DocAtlas
 
-**Local-first, version-bound documentation authority and evidence delivery for coding agents.**
+**Give coding agents the right project and dependency docs — without stuffing the context window.**
+
+Local-first · version-aware · source-attributed · MCP
 
 [![License: MIT](https://img.shields.io/github/license/Vanilla1999/DocAtlas?style=for-the-badge)](https://github.com/Vanilla1999/DocAtlas/blob/main/LICENSE)
 [![Python 3.11 | 3.12 | 3.13](https://img.shields.io/badge/python-3.11%20|%203.12%20|%203.13-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://pypi.org/project/doc-atlas/)
 
-[Install](#one-line-install) | [Docs MCP](#project-docs-mcp-server) | [Advanced surfaces](#advanced-surfaces) | [CLI reference](./docs/capabilities.md#end-to-end-examples-of-current-behavior)
+[Install](#one-line-install) · [How it works](#what-docatlas-is-and-what-problem-it-solves) · [Docs MCP](#project-docs-mcp-server) · [CLI reference](./docs/capabilities.md#end-to-end-examples-of-current-behavior)
 
 </div>
+
+DocAtlas is a local documentation context runtime for **Claude Code, Codex, OpenCode, and other MCP clients**. It retrieves compact evidence from reviewable project docs and version-aware dependency documentation so the host model can answer from the sources your project actually uses — instead of stale model memory or oversized prompt dumps.
+
+```text
+question
+   ↓
+get_docs_context
+   ↓
+bounded, source-attributed project / dependency evidence
+   ↓
+your coding agent answers with sources
+```
+
+| Instead of | DocAtlas |
+|---|---|
+| Guessing from model memory or latest-only docs | Uses project-owned docs and version-bound dependency evidence |
+| Dumping whole pages into the prompt | Returns compact, server-bounded context |
+| Treating every retrieved chunk as trustworthy | Keeps source authority, provenance, scope, and version binding explicit |
+| Making up an answer when proof is missing | Fails closed when mandatory evidence is unavailable |
+
+### Try it
+
+```bash
+curl -LsSf https://raw.githubusercontent.com/Vanilla1999/DocAtlas/main/scripts/install.sh | sh
+```
+
+The installer can register the Docs MCP server for **Claude Code, Codex, and OpenCode**. No hosted DocAtlas service is required for the local project-docs workflow.
+
+<details>
+<summary>Architecture overview</summary>
+<br>
+<img width="900" alt="DocAtlas architecture overview" src="https://github.com/user-attachments/assets/78458fed-22c5-4e78-bbb0-67a902948f9c" />
+</details>
 
 ---
 

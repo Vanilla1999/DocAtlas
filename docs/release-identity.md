@@ -2,25 +2,27 @@
 
 ## Current public candidate
 
-The current source release candidate is **DocAtlas 1.3.1**.
+The current source release candidate is **DocAtlas 1.3.2**. It supersedes the unpublished `1.3.1` candidate because the public-launch README and Official MCP Registry ownership metadata were added after the immutable `v1.3.1` tag.
 
-Canonical identity:
+Canonical intended identity:
 
 ```text
 product: DocAtlas
 distribution: doc-atlas
-source version: 1.3.1
-immutable tag: v1.3.1
-tag object: 77bced8c530c88c57d2e6c5f58cb717bfe837a9f
-tag target: cfa9ab5c365a28d1a4af63afe9f1d53b19532d89
+source version: 1.3.2
+planned immutable tag: v1.3.2
 maturity: Beta
+MCP Registry name: io.github.Vanilla1999/docatlas
+MCP package: doc-atlas==1.3.2
+MCP command: uvx doc-atlas==1.3.2 mcp docs-serve
 ```
 
-The annotated `v1.3.1` tag exists and resolves to the exact reviewed merge of PR #133. It must never be moved, replaced, or reused.
+No `v1.3.2` tag or public `doc-atlas==1.3.2` artifact is claimed by this preparation change. The tag must be created only by the reviewed release-request controller after this launch tree is merged and after the external PyPI Trusted Publisher is corrected. `server.json`, the source version, changelog, and hidden PyPI README ownership marker are kept version-aligned so the exact public package can be verified by the Official MCP Registry.
 
-No public `doc-atlas==1.3.1` release is claimed until the PyPI artifact bytes and post-publish platform smokes exist.
+The Registry publication path uses GitHub OIDC and runs only after the canonical PyPI publish job and exact Linux/macOS/Windows public-package smokes succeed.
 
-## Current `v1.3.1` publication blocker
+## Historical `v1.3.1` publication blocker
+
 
 Canonical workflow run `32587903026` used the immutable `v1.3.1` source. Build, wheel tests on Python 3.11–3.13, sdist/installer validation, `required-release`, and build-provenance attestation passed. The publish job then failed before upload at `pypa/gh-action-pypi-publish` with:
 
@@ -93,16 +95,11 @@ environment: release-current
 
 Environment is optional in PyPI generally, but this workflow deliberately uses `release-current`; a publisher configured with a different environment does not match these claims.
 
-### Safe retry boundary
+### Superseded retry boundary
 
-After the existing-project publisher is visibly registered with the exact tuple above, retry only the failed jobs of canonical run `32587903026`. Before another retry, require that:
+The two `v1.3.1` failures remain immutable audit evidence. They are no longer the active publication path: the launch and Registry ownership metadata were added after that tag, so the next public candidate is `1.3.2`. `v1.3.1` must never be moved, replaced, or reused. Do not move or recreate `v1.3.1`, and do not present a newer tree as that tag.
 
-- public `doc-atlas==1.3.1` is still absent;
-- `v1.3.1` remains an annotated tag targeting `cfa9ab5c365a28d1a4af63afe9f1d53b19532d89`;
-- the original run's gated wheel and sdist artifacts remain available;
-- no token fallback is introduced.
-
-Do not move or recreate the tag. Do not start a replacement workflow from a newer `main` commit and present its provenance as the tagged source. If the public version appears before the retry, switch to verify-only handling and never overwrite it.
+After the existing-project PyPI publisher is visibly corrected, create and approve a reviewed `v1.3.2` release request from the exact merged launch tree. No long-lived token fallback is permitted.
 
 ## Historical repository milestone
 
@@ -131,4 +128,4 @@ sha256 e5bb4eb1f2b3221bcd3e8e9db719fe8f11596a88bd000e3d922bd6826c6683ab
 
 Until the exact public version is downloadable and passes the post-publish Linux/macOS/Windows MCP smoke, release truth remains incomplete and product maturity remains **Beta**.
 
-For clarity, no public `doc-atlas==1.3.1` release is claimed at this pre-public stage.
+For clarity, the failed `1.3.1` attempts remain historical pre-public evidence; no public `doc-atlas==1.3.2` release is claimed until the new exact release is published and verified.
