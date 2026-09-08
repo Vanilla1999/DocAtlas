@@ -1,0 +1,50 @@
+name: PR180 V2 lock hash probe
+
+on:
+  push:
+    branches:
+      - docs/public-launch-readme-registry
+
+permissions:
+  contents: read
+
+jobs:
+  probe:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+      - name: Prove identity-only lock refresh values
+        run: |
+          python - <<'PY'
+          from hashlib import sha256
+          from pathlib import Path
+
+          readme = Path('README.md').read_bytes()
+          protocol_path = Path('eval/project_context_quality_v2/protocol.lock.json')
+          acceptance_path = Path('eval/project_context_quality_v2/acceptance.lock.json')
+          protocol = protocol_path.read_bytes()
+          acceptance = acceptance_path.read_bytes()
+
+          old_readme = b'4509e45583f48e8516a8b23b1a18e6695ff24dd5683d14076208fb5ed62fe736'
+          old_protocol = sha256(protocol).hexdigest().encode()
+          new_readme = sha256(readme).hexdigest().encode()
+
+          assert protocol.count(old_readme) == 1, 'expected one old README lock identity'
+          assert acceptance.count(old_protocol) == 1, 'acceptance must bind exact current protocol lock'
+
+          refreshed_protocol = protocol.replace(old_readme, new_readme, 1)
+          new_protocol = sha256(refreshed_protocol).hexdigest().encode()
+          refreshed_acceptance = acceptance.replace(old_protocol, new_protocol, 1)
+
+          # Prove the refresh changes only fixed-length identity bytes.
+          assert len(refreshed_protocol) == len(protocol)
+          assert len(refreshed_acceptance) == len(acceptance)
+          assert refreshed_protocol.replace(new_readme, old_readme, 1) == protocol
+          assert refreshed_acceptance.replace(new_protocol, old_protocol, 1) == acceptance
+
+          print('README_SHA256=' + new_readme.decode())
+          print('OLD_PROTOCOL_SHA256=' + old_protocol.decode())
+          print('NEW_PROTOCOL_SHA256=' + new_protocol.decode())
+          print('IDENTITY_ONLY_PROOF=PASS')
+          PY
