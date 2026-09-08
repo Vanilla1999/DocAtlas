@@ -1,11 +1,12 @@
 from __future__ import annotations
 
 from importlib.resources import files
+from typing import Any
 
 from docmancer.mcp.agent_workflow_contract import public_agent_contract, runtime_public_tool_dicts
 
 
-def _get_docs_context_tool() -> dict[str, object]:
+def _get_docs_context_tool() -> dict[str, Any]:
     return next(
         tool for tool in runtime_public_tool_dicts()
         if tool["name"] == "get_docs_context"
@@ -22,7 +23,8 @@ def test_runtime_tool_teaches_one_concrete_question_per_call() -> None:
     assert "one concrete user question" in description
     assert "independent questions" in description
     assert "separate" in description
-    assert "meta" in description
+    assert "benchmark or evaluation request is not itself" in description
+    assert "user's original request unchanged" not in description
 
     assert "one concrete user question" in question_description
     assert "separate" in question_description
@@ -58,4 +60,4 @@ def test_installed_agent_contract_repeats_question_grouping_rule() -> None:
     assert "independent questions" in text
     assert "separate `get_docs_context` calls" in text
     assert "same question" in text
-    assert "meta" in text
+    assert "documentation-governance meta-question" in text
