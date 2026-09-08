@@ -10,6 +10,6 @@ Use the three-tool Docs MCP workflow with bounded structured results:
 3. Use `prepare_docs` only from `recommended_next_action` or an explicit docs-lifecycle request. Use `docs_status` only for explicit status/health/freshness/job requests or a returned action.
 4. Scope explicitly: onboarding/cross-module -> `scope="all"`; repo policy -> `scope="project"`; one known module -> `scope="module"` plus exact `module_path`. Preserve explicit scope; never widen `project` to `all`. For mixed module/repo proof, prefer two calls.
 5. After preparation retry the original question unchanged; follow at most one returned non-automatic `rephrase_question`.
-6. On `insufficient_evidence`, do not claim support. Continue local recovery when `hard_stop=false`; stop before editing only when `hard_stop=true`.
+6. On `insufficient_evidence`, do not claim support. Continue local recovery when `hard_stop=false`. Stop before editing only when `hard_stop=true`.
 
 Project docs prove repository conventions, dependency docs external APIs, and code current implementation. Partial coverage never authorizes edits. Do not use legacy direct documentation tools.
