@@ -25,6 +25,7 @@ jobs:
       - name: Apply fail-closed launch preparation
         run: |
           python .github/review/public_launch_registry_prep.py
+          python .github/review/fix_registry_description.py
           python .github/review/merge_registry_tests.py
 
       - name: Validate launch release preparation
@@ -52,6 +53,7 @@ jobs:
         run: |
           rm .github/workflows/public-launch-registry-prep.yml
           rm .github/review/public_launch_registry_prep.py
+          rm .github/review/fix_registry_description.py
           rm .github/review/merge_registry_tests.py
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
