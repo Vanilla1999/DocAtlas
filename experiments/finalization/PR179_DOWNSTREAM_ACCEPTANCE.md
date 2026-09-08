@@ -64,3 +64,20 @@ Verified after regeneration:
 ## Temporary publication infrastructure
 
 The one-shot downstream-fix, evidence-refresh and diagnostic-repair workflows removed themselves in their publication commits. None of `.github/workflows/pr179-downstream-fix.yml`, `.github/workflows/pr179-refresh-p1-evidence.yml`, or `.github/workflows/pr179-fix-diagnostic-node-hash.yml` is present in the final production tree.
+
+## Final evidence refresh after `e1ec6de`
+
+The last production fix changed `docmancer/docs/application/evidence_requirements.py`, so the committed P1.4/P1.5/P1.6 reports became stale by runtime identity even though their prior measurements were unchanged. Ordinary CI correctly rejected those reports instead of silently accepting stale evidence.
+
+A fail-closed one-shot verifier regenerated the three P1 slices and closure, then compared the complete JSON documents after normalizing only the permitted identity fields. Publication was allowed only when all of the following held:
+
+- in P1.4/P1.5/P1.6 the only changed proof-runtime file identity was `evidence_requirements.py` plus the aggregate runtime-manifest SHA;
+- cases, metrics, verdicts, assignments, summaries and claim boundaries were otherwise identical;
+- in closure only the `p1_4`, `p1_5` and `p1_6` result blob references changed;
+- the changed result set was exactly the three P1 slices plus closure.
+
+That semantic comparison passed. The regenerated gates also passed with P1.4 self-test `5/5`, P1.5 `6/6`, P1.6 `6/6`, and closure `4/4`. Closure remains `AUTONOMOUS_AGENT_TRUTH_NOT_PROVEN`.
+
+Validated evidence publication commit: `4fae76a34c650ad719b614d235ba29bf285ae91b`. The temporary final-evidence workflow deleted itself in that publication commit.
+
+Final tree hygiene review additionally confirmed no `pr179*` one-shot workflow remains under `.github/workflows` and `.github/review` is absent. The frozen Legacy corpus/lanes/protocol and frozen V2 cases/diagnostic/crosswalk/protocol have the same Git blob identities as checkpoint `0ce9a6f3232726e9d64065b75bd969835b418df2`; the migration did not rewrite those fixtures to manufacture acceptance.
