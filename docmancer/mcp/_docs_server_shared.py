@@ -3,32 +3,19 @@ from __future__ import annotations
 from ._docs_server_schema import *  # noqa: F401,F403
 from ._docs_server_tool_data import *  # noqa: F401,F403
 
-_GET_DOCS_CONTEXT_QUESTION_PLANNING_GUIDANCE = """
-
-Question planning:
-- One get_docs_context call answers one concrete user question. If the user provides multiple independent questions (for example, a multi-question evaluation), make separate get_docs_context calls.
-- A benchmark or evaluation request is not itself the documentation question when it contains or asks you to generate multiple concrete questions. Put each concrete documentation question in question on its own call.
-- lookup_queries may translate, paraphrase, or decompose facets of the same question only. They are not a batch channel for independent questions or separate tasks.
-"""
-_GET_DOCS_CONTEXT_QUESTION_DESCRIPTION = (
-    "One concrete user question for this call. For multiple independent questions, "
-    "make separate get_docs_context calls. Never replace the concrete question with "
-    "a generic evaluation or meta request."
-)
-_GET_DOCS_CONTEXT_LOOKUP_DESCRIPTION = (
-    "Optional bounded single-concept lookups used only to improve retrieval recall for "
-    "the same question. A lookup may translate, paraphrase, or decompose one facet of "
-    "that question. Do not put independent questions or separate tasks here. Preserve "
-    "exact identifiers."
-)
 _ORIGINAL_REQUEST_GUIDANCE = (
     "Pass the user's original request unchanged as question; never substitute a "
     "documentation-governance meta-question. "
 )
 _CONCRETE_QUESTION_GUIDANCE = (
-    "For one concrete documentation question, pass that question as the original request unchanged; "
-    "never substitute the surrounding benchmark/evaluation request or a documentation-governance "
-    "meta-question. "
+    "One call = one concrete question; pass it as the original request unchanged, never a "
+    "benchmark/evaluation or documentation-governance meta-question. "
+)
+_GET_DOCS_CONTEXT_QUESTION_DESCRIPTION = (
+    "One concrete question; independent questions use separate calls."
+)
+_GET_DOCS_CONTEXT_LOOKUP_DESCRIPTION = (
+    "Same question only; never batch independent questions."
 )
 
 
@@ -67,7 +54,6 @@ def _tool_spec(raw: dict[str, Any], *, text_fallback: bool = False) -> ToolSpec:
             _ORIGINAL_REQUEST_GUIDANCE,
             _CONCRETE_QUESTION_GUIDANCE,
         )
-        description = f"{description}{_GET_DOCS_CONTEXT_QUESTION_PLANNING_GUIDANCE}"
         properties = advertised_schema.get("properties", {})
         question_schema = properties.get("question")
         if isinstance(question_schema, dict):
