@@ -122,7 +122,7 @@ if publish_text.count(job_marker) != 1:
 prefix, job_body = publish_text.split(job_marker, 1)
 job_lines = ("mcp-registry:\n" + job_body).splitlines()
 indented_job = "\n".join("  " + line if line else line for line in job_lines)
-publish_text = prefix.rstrip() + "\n\n" + indented_job + "\n"
+publish_text = prefix.rstrip() + "\n\n" + indented_job
 needle = (
     "          ./mcp-publisher --help\n"
     "      - name: Authenticate to Official MCP Registry\n"
@@ -135,7 +135,8 @@ replacement = (
 )
 if publish_text.count(needle) != 1:
     raise SystemExit("expected one Registry publisher install/auth boundary")
-publish.write_text(publish_text.replace(needle, replacement, 1), encoding="utf-8")
+publish_text = publish_text.replace(needle, replacement, 1)
+publish.write_text(publish_text.rstrip() + "\n", encoding="utf-8")
 
 # The canonical maturity test derives current release truth from the source
 # version. Move only its current-candidate assertions to 1.3.2; historical
