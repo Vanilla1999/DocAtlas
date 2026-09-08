@@ -13,7 +13,11 @@ from typing import Any, Iterable, Literal, Mapping, Sequence
 
 from docmancer.docs.application.evidence_candidates import normalized_source as _normalized_source
 from docmancer.docs.application.evidence_models import EvidenceRequirement, EvidenceRequirementSet
-from docmancer.docs.domain.project_answer_contract import ProofObligation, ProjectAnswerContract, build_project_answer_contract
+from docmancer.docs.domain.project_answer_contract import (
+    ProofObligation, ProjectAnswerContract, build_project_answer_contract,
+    obligations_can_authorize_docs_answer,
+)
+from docmancer.docs.domain.question_ownership import FROZEN_LEGACY_QUESTIONS
 from docmancer.docs.domain.patch_requirements import PatchRequirement, build_patch_requirements
 from docmancer.docs.domain.patch_request_plan import PatchRequestPlan
 from docmancer.retrieval.contracts import canonical_hash
@@ -447,9 +451,28 @@ def build_requirements(
             )
     if profile == "project_docs_answer":
         answer_contract = build_project_answer_contract(question)
-        for obligation in answer_contract.proof_obligations:
-            typed = _requirement_from_obligation(obligation)
-            unique[typed.requirement_id] = typed
+        frozen_legacy_context_only = bool(
+            question in FROZEN_LEGACY_QUESTIONS
+            and answer_contract.proof_obligations
+            and not obligations_can_authorize_docs_answer(
+                answer_contract.proof_obligations
+            )
+        )
+        if not frozen_legacy_context_only:
+            for obligation in answer_contract.proof_obligations:
+                typed = _requirement_from_obligation(obligation)
+                unique[typed.requirement_id] = typed
+        # Frozen legacy compatibility questions keep their legacy parser
+        # signature for ownership auditing, but context-only relations must not
+        # become selector answer-proof during the context-first migration.
+        if frozen_legacy_context_only:
+            unique["unresolved:0:legacy_context_only_relation"] = EvidenceRequirement(
+                requirement_id="unresolved:0:legacy_context_only_relation",
+                kind="unsupported_query",
+                value="legacy_context_only_relation",
+                public_provenance="query_exact_term",
+                query_extraction_kind="legacy_context_only_relation",
+            )
         # A parse failure must fail closed when the natural-language question
         # is the only authority for what needs proving.  If the caller supplied
         # an explicit public evidence contract, however, that independent
