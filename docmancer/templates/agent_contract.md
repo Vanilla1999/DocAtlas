@@ -3,7 +3,7 @@
 Agent workflow contract schema: `docatlas-agent-contract-v1`  
 Agent workflow contract identity: `{{DOCATLAS_AGENT_CONTRACT_ID}}`
 
-Use the three-tool Docs MCP workflow:
+Use the three-tool Docs MCP workflow with bounded structured results:
 
 1. Start docs, coding, and patch tasks with `get_docs_context`; pass one concrete question as `question` and the repository root as `project_path`. Independent questions require separate `get_docs_context` calls. Never use a benchmark/evaluation or documentation-governance meta-question as `question`.
 2. `lookup_queries` may only translate, paraphrase, or decompose the same question (max five, one concept each); never batch independent questions.
