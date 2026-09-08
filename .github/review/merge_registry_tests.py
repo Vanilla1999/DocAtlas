@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import re
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -63,3 +64,22 @@ def test_registry_publish_is_oidc_only_and_after_public_platform_smoke() -> None
     assert "MCP_PRIVATE_KEY" not in workflow
 '''
 release_test.write_text(text, encoding="utf-8")
+
+# The diagnostic inventory is deliberately hash-bound to the exact collected
+# node IDs. These two new behavioral release tests therefore require an exact
+# reviewed hash refresh rather than bypassing collection hardening.
+manifest = ROOT / "tests/diagnostic_labels.json"
+manifest_text = manifest.read_text(encoding="utf-8")
+pattern = re.compile(
+    r'("tests/test_release_state_repair\.py"\s*:\s*")([0-9a-f]{64})(")'
+)
+replacement_digest = "9e6a44ac6abc3eeaf0e55d9ea6df3f0da90cd7982412e664b9589262277ff9dc"
+manifest_text, count = pattern.subn(
+    rf"\g<1>{replacement_digest}\g<3>", manifest_text, count=1
+)
+if count != 1:
+    raise SystemExit(
+        "expected exactly one hash-bound diagnostic manifest entry for "
+        "tests/test_release_state_repair.py"
+    )
+manifest.write_text(manifest_text, encoding="utf-8")
