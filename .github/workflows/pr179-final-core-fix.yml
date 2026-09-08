@@ -1,0 +1,86 @@
+name: PR179 final core fix
+
+on:
+  push:
+    branches: [fix/context-first-project-reads-finalization]
+    paths: [.github/workflows/pr179-final-core-fix.yml]
+
+permissions:
+  contents: write
+
+jobs:
+  fix-and-validate:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+        with:
+          ref: fix/context-first-project-reads-finalization
+          fetch-depth: 0
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1
+        with:
+          python-version: '3.11'
+      - name: Apply narrow fixes
+        shell: python
+        run: |
+          from pathlib import Path
+
+          req = Path('docmancer/docs/application/evidence_requirements.py')
+          text = req.read_text(encoding='utf-8')
+          old = 'from docmancer.docs.domain.project_answer_contract import ProofObligation, ProjectAnswerContract, build_project_answer_contract\n'
+          new = 'from docmancer.docs.domain.project_answer_contract import (\n    ProofObligation, ProjectAnswerContract, build_project_answer_contract,\n    obligations_can_authorize_docs_answer,\n)\nfrom docmancer.docs.domain.question_plan import compile_question_plan\n'
+          assert old in text
+          text = text.replace(old, new, 1)
+
+          old = '''    if profile == "project_docs_answer":\n        answer_contract = build_project_answer_contract(question)\n        for obligation in answer_contract.proof_obligations:\n            typed = _requirement_from_obligation(obligation)\n            unique[typed.requirement_id] = typed\n        # A parse failure must fail closed when the natural-language question\n'''
+          new = '''    if profile == "project_docs_answer":\n        answer_contract = build_project_answer_contract(question)\n        question_plan = compile_question_plan(question)\n        legacy_context_only = bool(\n            answer_contract.proof_obligations\n            and not question_plan.facets\n            and not obligations_can_authorize_docs_answer(\n                answer_contract.proof_obligations\n            )\n        )\n        if not legacy_context_only:\n            for obligation in answer_contract.proof_obligations:\n                typed = _requirement_from_obligation(obligation)\n                unique[typed.requirement_id] = typed\n        # Frozen legacy questions can still expose broad local propositions for\n        # retrieval, but those context-only relations are not selector answer\n        # proof. Keep the ownership/signature contract intact while making the\n        # authorization boundary explicitly fail closed.\n        if legacy_context_only:\n            unique["unresolved:0:legacy_context_only_relation"] = EvidenceRequirement(\n                requirement_id="unresolved:0:legacy_context_only_relation",\n                kind="unsupported_query",\n                value="legacy_context_only_relation",\n                public_provenance="query_exact_term",\n                query_extraction_kind="legacy_context_only_relation",\n            )\n        # A parse failure must fail closed when the natural-language question\n'''
+          assert old in text
+          text = text.replace(old, new, 1)
+          req.write_text(text, encoding='utf-8')
+
+          test = Path('tests/test_docs_service_part08.py')
+          text = test.read_text(encoding='utf-8')
+          old = '''def test_docs_job_status_changes_to_succeeded_and_tracks_counts(tmp_path, monkeypatch):\n    agent = FakeAgent()\n    service = _service(tmp_path, monkeypatch, agent)\n\n    result = service.prefetch_docs_targets(\n'''
+          new = '''def test_docs_job_status_changes_to_succeeded_and_tracks_counts(tmp_path, monkeypatch):\n    agent = FakeAgent()\n    service = _service(tmp_path, monkeypatch, agent)\n    # This test asserts this job's lifecycle, not process-global queue latency.\n    # Use an isolated executor so unrelated jobs from the full suite cannot\n    # consume its one-second observation window.\n    service.library_docs.job_executor = LibraryJobExecutor(\n        max_workers=1, max_queued=1, poll_seconds=0.005\n    )\n\n    result = service.prefetch_docs_targets(\n'''
+          assert old in text
+          text = text.replace(old, new, 1)
+          test.write_text(text, encoding='utf-8')
+      - name: Install dependencies
+        run: python -m pip install -e '.[dev]'
+      - name: Run focused contracts
+        run: |
+          pytest -q \
+            tests/docs/test_evidence_selection.py::test_broad_behavior_and_usage_facets_are_context_only_even_when_locally_proved \
+            tests/docs/test_evidence_selection.py::test_broad_relational_comparison_is_context_only_even_when_locally_proved \
+            tests/docs/test_evidence_selection.py::test_named_symbol_behavior_local_proof_can_authorize_project_docs_answer \
+            tests/docs/test_question_span_coverage.py::test_legacy_fallback_questions_remain_unclaimed_by_question_plan \
+            tests/test_docs_service_part08.py::test_docs_job_status_changes_to_succeeded_and_tracks_counts \
+            tests/test_docs_service_part07.py::test_library_prefetch_job_deadline_is_terminal_and_retryable \
+            tests/docs/test_library_job_executor.py::test_queued_work_does_not_receive_a_fresh_execution_deadline \
+            tests/test_diagnostic_labels.py
+      - name: Run neighboring selection and job tests
+        run: |
+          pytest -q \
+            tests/docs/test_evidence_selection.py \
+            tests/docs/test_question_plan_v4.py \
+            tests/docs/test_question_span_coverage.py \
+            tests/docs/test_library_job_executor.py \
+            tests/test_docs_service_part07.py \
+            tests/test_docs_service_part08.py
+      - name: Verify diff and commit
+        run: |
+          git rm .github/workflows/pr179-final-core-fix.yml
+          python - <<'PY'
+          import subprocess
+          allowed = {
+              'docmancer/docs/application/evidence_requirements.py',
+              'tests/test_docs_service_part08.py',
+              '.github/workflows/pr179-final-core-fix.yml',
+          }
+          changed = set(subprocess.check_output(['git','diff','--name-only']).decode().splitlines())
+          assert changed == allowed, (changed, allowed)
+          PY
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add docmancer/docs/application/evidence_requirements.py tests/test_docs_service_part08.py
+          git commit -m 'fix: close final PR179 core regressions'
+          git push origin HEAD:fix/context-first-project-reads-finalization
