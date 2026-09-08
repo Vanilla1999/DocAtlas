@@ -65,6 +65,50 @@ def test_registry_publish_is_oidc_only_and_after_public_platform_smoke() -> None
 '''
 release_test.write_text(text, encoding="utf-8")
 
+# Preserve the explicit immutable-history wording while changing only the
+# active candidate from unpublished 1.3.1 to launch-capable 1.3.2.
+identity = ROOT / "docs/release-identity.md"
+identity_text = identity.read_text(encoding="utf-8")
+needle = (
+    "Do not move or recreate `v1.3.1`, and do not present a newer tree as that tag."
+)
+replacement = (
+    "`v1.3.1` must never be moved, replaced, or reused. "
+    "Do not move or recreate `v1.3.1`, and do not present a newer tree as that tag."
+)
+if identity_text.count(needle) != 1:
+    raise SystemExit("expected historical v1.3.1 immutability sentence exactly once")
+identity.write_text(identity_text.replace(needle, replacement, 1), encoding="utf-8")
+
+roadmap = ROOT / "roadmap/README.md"
+roadmap_text = roadmap.read_text(encoding="utf-8")
+needle = (
+    "`v1.3.0` and `v1.3.1` remain immutable pre-public audit identities whose "
+    "PyPI OIDC uploads failed before publication."
+)
+replacement = (
+    "`v1.3.0` and `v1.3.1` are superseded pre-public attempt identities; both "
+    "remain immutable, and their PyPI OIDC uploads failed before publication."
+)
+if roadmap_text.count(needle) != 1:
+    raise SystemExit("expected P0.5 historical release sentence exactly once")
+roadmap.write_text(roadmap_text.replace(needle, replacement, 1), encoding="utf-8")
+
+# The canonical maturity test derives current release truth from the source
+# version. Move only its current-candidate assertions to 1.3.2; historical
+# 1.3.1 audit checks remain in the dedicated release tests.
+branding_test = ROOT / "tests/docs/test_user_facing_docs_branding.py"
+branding = branding_test.read_text(encoding="utf-8")
+for old, new in (
+    ('assert source_version.group(1) == "1.3.1"', 'assert source_version.group(1) == "1.3.2"'),
+    ('assert "no public `doc-atlas==1.3.1` release is claimed" in release_identity.lower()', 'assert "no public `doc-atlas==1.3.2`" in release_identity.lower()'),
+    ('assert f"## [{source_version.group(1)}] - 2026-08-22" in changelog', 'assert f"## [{source_version.group(1)}] - 2026-09-08" in changelog'),
+):
+    if branding.count(old) != 1:
+        raise SystemExit(f"branding release assertion drifted: {old}")
+    branding = branding.replace(old, new, 1)
+branding_test.write_text(branding, encoding="utf-8")
+
 # The diagnostic inventory is deliberately hash-bound to the exact collected
 # node IDs. These two new behavioral release tests therefore require an exact
 # reviewed hash refresh rather than bypassing collection hardening.
