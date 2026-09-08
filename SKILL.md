@@ -44,12 +44,13 @@ DocAtlas compresses documentation context so coding agents spend tokens on code,
 
 For an installed Docs MCP, use the three-tool contract:
 
-1. Call `get_docs_context(question=..., project_path=... or library=...)` once.
-2. If it returns `recommended_next_action`, follow only that typed action. Ask for confirmation before network work.
-3. For an unknown library source, use the returned `prepare_docs(action="discover_library_docs", ...)` action; review its registry-derived candidates before prefetching one.
-4. If a candidate's authority, version binding, or scope is uncertain, call bounded `prepare_docs(action="inspect_docs_target", target=..., max_pages=3)`. Review its evidence and v2 manifest proposal, ask for confirmation, save and validate the manifest, then use `prefetch_docs_manifest`.
-5. Retry the original `get_docs_context` question unchanged after preparation. Do not persist the task question in a docs manifest.
-6. Use `docs_status` only for an explicit health, freshness, index, or job-status request.
+1. Call `get_docs_context(question=..., project_path=... or library=...)` with one concrete documentation question. If the user gives several independent questions, including an evaluation or benchmark list, make separate `get_docs_context` calls instead of batching them.
+2. Optional `lookup_queries` may translate, paraphrase, or decompose facets of that same question only. Never move independent questions into `lookup_queries` under a generic test/evaluation meta-question.
+3. If it returns `recommended_next_action`, follow only that typed action. Ask for confirmation before network work.
+4. For an unknown library source, use the returned `prepare_docs(action="discover_library_docs", ...)` action; review its registry-derived candidates before prefetching one.
+5. If a candidate's authority, version binding, or scope is uncertain, call bounded `prepare_docs(action="inspect_docs_target", target=..., max_pages=3)`. Review its evidence and v2 manifest proposal, ask for confirmation, save and validate the manifest, then use `prefetch_docs_manifest`.
+6. Retry the original concrete `get_docs_context` question unchanged after preparation. Do not persist the task question in a docs manifest.
+7. Use `docs_status` only for an explicit health, freshness, index, or job-status request.
 
 Do not begin the MCP workflow with `doc-atlas list`, raw CLI ingestion, WebFetch, or speculative `prepare_docs`. Registered sources are registry-owned.
 
@@ -109,7 +110,7 @@ Returns a compact markdown context pack with source attribution and token saving
 ### Manage Sources
 
 | Command | Purpose |
-|---------|---------|
+|------|---------|
 | `doc-atlas list` | Show indexed documentation sources |
 | `doc-atlas list --all` | Show every stored page or file |
 | `doc-atlas inspect` | Show index stats, format counts, and extract locations |
@@ -133,13 +134,14 @@ For API tasks, search first, inspect the returned schema and safety block, then 
 
 For repository-specific architecture, conventions, runbooks, roadmap, README/wiki, or module-doc questions, use the Docs MCP tools before generic WebFetch or model memory:
 
-1. For coding and patch tasks, call `get_docs_context(project_path=..., question=..., mode="project")` first; bounded delivery is server-owned policy.
-2. Follow bounded `recommended_next_action`: ask its source-choice question, or obtain confirmation, call its exact typed action, and retry the same bounded request.
-3. Use `docs_status` only when the user explicitly asks about health, freshness, index state, or a background job.
-4. For bounded `insufficient_evidence`, do not claim documentation support. Follow at most one non-automatic `rephrase_question`; after that, investigate local source/tests when `hard_stop=false`. Stop before editing when `hard_stop=true` or when the requested change explicitly depends on a documentary contract that remains unproved.
-5. Cite `action_packet.source_of_truth` through each factual item's `evidence_ids`. Treat `CHANGELOG.md` as primary only for release-history/change questions.
-6. Only unbounded exploration exposes `answer_outline`, `trust_contract`, and `context_pack`; there, prefer nested source and section metadata.
-7. If the user asks vaguely about "the MCP server", distinguish `doc-atlas mcp docs-serve` (the three-tool documentation surface) from `doc-atlas mcp packs-serve` (advanced installed API-action packs).
+1. For coding and patch tasks, call `get_docs_context(project_path=..., question=..., mode="project")` first; bounded delivery is server-owned policy. One call carries one concrete documentation question; independent questions use separate calls.
+2. Use `lookup_queries` only for narrow same-question recall help, including cross-language translation or facet decomposition. Never batch separate questions into them.
+3. Follow bounded `recommended_next_action`: ask its source-choice question, or obtain confirmation, call its exact typed action, and retry the same bounded request.
+4. Use `docs_status` only when the user explicitly asks about health, freshness, index state, or a background job.
+5. For bounded `insufficient_evidence`, do not claim documentation support. Follow at most one non-automatic `rephrase_question`; after that, investigate local source/tests when `hard_stop=false`. Stop before editing when `hard_stop=true` or when the requested change explicitly depends on a documentary contract that remains unproved.
+6. Cite `action_packet.source_of_truth` through each factual item's `evidence_ids`. Treat `CHANGELOG.md` as primary only for release-history/change questions.
+7. Only unbounded exploration exposes `answer_outline`, `trust_contract`, and `context_pack`; there, prefer nested source and section metadata.
+8. If the user asks vaguely about "the MCP server", distinguish `doc-atlas mcp docs-serve` (the three-tool documentation surface) from `doc-atlas mcp packs-serve` (advanced installed API-action packs).
 
 ## Common Mistakes
 
@@ -150,3 +152,4 @@ For repository-specific architecture, conventions, runbooks, roadmap, README/wik
 - Do not WebFetch registered docs when DocAtlas returns candidates or retry guidance. Retry `get_docs_context` first.
 - Do not call `prepare_docs` speculatively; follow the context response or an explicit lifecycle request.
 - Do not use `docs_status` as a discovery step.
+- Do not put independent documentation questions into `lookup_queries`; make separate `get_docs_context` calls.
