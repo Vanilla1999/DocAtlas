@@ -1,0 +1,121 @@
+name: Public launch bootstrap
+
+on:
+  push:
+    branches:
+      - docs/public-launch-readme-registry
+
+permissions:
+  contents: write
+
+jobs:
+  bootstrap:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: docs/public-launch-readme-registry
+          fetch-depth: 0
+
+      - name: Rewrite README hero
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          path = Path("README.md")
+          text = path.read_text(encoding="utf-8")
+          marker = "## What DocAtlas is and what problem it solves"
+          if marker not in text:
+              raise SystemExit(f"README marker not found: {marker}")
+
+          _, rest = text.split(marker, 1)
+          hero = '''<!-- mcp-name: io.github.vanilla1999/docatlas -->
+          <div align="center">
+
+          # DocAtlas
+
+          **Give coding agents the right project and dependency docs — without stuffing the context window.**
+
+          Local-first · version-aware · source-attributed · MCP
+
+          [![License: MIT](https://img.shields.io/github/license/Vanilla1999/DocAtlas?style=for-the-badge)](https://github.com/Vanilla1999/DocAtlas/blob/main/LICENSE)
+          [![Python 3.11 | 3.12 | 3.13](https://img.shields.io/badge/python-3.11%20|%203.12%20|%203.13-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://pypi.org/project/doc-atlas/)
+
+          [Install](#one-line-install) · [How it works](#what-docatlas-is-and-what-problem-it-solves) · [Docs MCP](#project-docs-mcp-server) · [CLI reference](./docs/capabilities.md#end-to-end-examples-of-current-behavior)
+
+          </div>
+
+          DocAtlas is a local documentation context runtime for **Claude Code, Codex, OpenCode, and other MCP clients**. It retrieves compact evidence from reviewable project docs and version-aware dependency documentation so the host model can answer from the sources your project actually uses — instead of stale model memory or oversized prompt dumps.
+
+          ```text
+          question
+             ↓
+          get_docs_context
+             ↓
+          bounded, source-attributed project / dependency evidence
+             ↓
+          your coding agent answers with sources
+          ```
+
+          | Instead of | DocAtlas |
+          |---|---|
+          | Guessing from model memory or latest-only docs | Uses project-owned docs and version-bound dependency evidence |
+          | Dumping whole pages into the prompt | Returns compact, server-bounded context |
+          | Treating every retrieved chunk as trustworthy | Keeps source authority, provenance, scope, and version binding explicit |
+          | Making up an answer when proof is missing | Fails closed when mandatory evidence is unavailable |
+
+          ### Try it
+
+          ```bash
+          curl -LsSf https://raw.githubusercontent.com/Vanilla1999/DocAtlas/main/scripts/install.sh | sh
+          ```
+
+          The installer can register the Docs MCP server for **Claude Code, Codex, and OpenCode**. No hosted DocAtlas service is required for the local project-docs workflow.
+
+          <details>
+          <summary>Architecture overview</summary>
+          <br>
+          <img width="900" alt="DocAtlas architecture overview" src="https://github.com/user-attachments/assets/78458fed-22c5-4e78-bbb0-67a902948f9c" />
+          </details>
+
+          ---
+
+          '''
+          path.write_text(hero + marker + rest, encoding="utf-8")
+          PY
+
+      - name: Try to set GitHub description and topics
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set +e
+          DESCRIPTION='Local-first MCP documentation runtime for coding agents. Delivers bounded, source-attributed project and version-aware dependency context instead of stale model memory or oversized prompts.'
+          gh api --method PATCH "repos/${GITHUB_REPOSITORY}" -f description="$DESCRIPTION"
+          DESCRIPTION_STATUS=$?
+
+          cat > /tmp/topics.json <<'JSON'
+          {"names":["mcp","model-context-protocol","coding-agents","ai-agents","developer-tools","documentation","rag","context-engine","context-management","local-first","offline-first","llm","claude-code","codex","opencode","python","semantic-search","retrieval-augmented-generation"]}
+          JSON
+          gh api --method PUT "repos/${GITHUB_REPOSITORY}/topics" --input /tmp/topics.json
+          TOPICS_STATUS=$?
+
+          echo "description_status=${DESCRIPTION_STATUS}"
+          echo "topics_status=${TOPICS_STATUS}"
+          exit 0
+
+      - name: Commit README and remove bootstrap workflow
+        shell: bash
+        run: |
+          rm .github/workflows/public-launch-bootstrap.yml
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add README.md .github/workflows/public-launch-bootstrap.yml
+          if git diff --cached --quiet; then
+            echo "No changes to commit"
+            exit 0
+          fi
+          git commit -m "docs: sharpen public launch positioning"
+          git push origin HEAD:docs/public-launch-readme-registry
