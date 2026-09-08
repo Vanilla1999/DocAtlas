@@ -5,7 +5,7 @@ Agent workflow contract identity: `{{DOCATLAS_AGENT_CONTRACT_ID}}`
 
 Use the three-tool Docs MCP workflow:
 
-1. Start documentation, coding, and patch tasks with `get_docs_context`; pass the original concrete request as `question` and the repository root as `project_path`. It returns bounded structured evidence. Never replace the concrete question with a documentation-governance, test, evaluation, or other meta-question.
+1. Start documentation, coding, and patch tasks with `get_docs_context`; pass the original concrete request as `question` and the repository root as `project_path`. It returns bounded structured evidence. Never replace the concrete question with a documentation-governance meta-question, generic test/evaluation request, or other meta request.
 2. Treat one `get_docs_context` call as one concrete user question. If the user gives multiple independent questions, including a benchmark or evaluation list, make separate `get_docs_context` calls for them. `lookup_queries` are only translations, paraphrases, or decomposed facets of the same question; never use them to batch independent questions or separate tasks.
 3. Call `prepare_docs` only from `recommended_next_action` or for an explicit documentation-lifecycle request. Call `docs_status` only for explicit status/health/freshness/job requests or a returned next action.
 4. Choose scope explicitly. For onboarding or cross-module investigation use `scope="all"` without module filters. Use `scope="project"` for repo-level policy and `scope="module"` plus the exact `module_path` for one known module. Preserve explicit scope; never widen `project` to `all` after a miss. If one task needs module-local and repo-level proof, prefer two bounded calls.
