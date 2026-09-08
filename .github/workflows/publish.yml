@@ -5,7 +5,7 @@ on:
   workflow_dispatch:
     inputs:
       tag:
-        description: Existing release tag (for example v1.3.1)
+        description: Existing release tag (for example v1.3.2)
         required: true
         type: string
 
@@ -369,3 +369,90 @@ jobs:
           python-version: "3.12"
       - name: Verify exact public version and three-tool MCP surface
         run: python scripts/public_release_smoke.py --tag "${{ inputs.tag }}"
+
+  mcp-registry:
+    name: publish-official-mcp-registry
+    if: github.event_name == 'workflow_dispatch'
+    needs: [public-platform-smoke]
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with:
+          ref: refs/tags/${{ inputs.tag }}
+          persist-credentials: false
+      - name: Verify exact MCP Registry metadata
+        env:
+          RELEASE_TAG: ${{ inputs.tag }}
+        run: |
+          python - <<'PYREG'
+          import json
+          import os
+          from pathlib import Path
+
+          expected_version = os.environ["RELEASE_TAG"].removeprefix("v")
+          payload = json.loads(Path("server.json").read_text(encoding="utf-8"))
+          expected_name = "io.github.Vanilla1999/docatlas"
+          if payload.get("name") != expected_name:
+              raise SystemExit(f"server name mismatch: {payload.get('name')!r}")
+          if payload.get("version") != expected_version:
+              raise SystemExit(
+                  f"server version mismatch: expected={expected_version!r} actual={payload.get('version')!r}"
+              )
+          packages = payload.get("packages") or []
+          if len(packages) != 1:
+              raise SystemExit(f"expected exactly one Registry package, got {len(packages)}")
+          package = packages[0]
+          if package.get("identifier") != "doc-atlas" or package.get("version") != expected_version:
+              raise SystemExit("PyPI package identity/version does not match release")
+          marker = f"<!-- mcp-name: {expected_name} -->"
+          if marker not in Path("README.md").read_text(encoding="utf-8"):
+              raise SystemExit("PyPI README ownership marker is missing")
+          print("MCP Registry release metadata: PASS")
+          PYREG
+      - name: Install pinned MCP Registry publisher
+        run: |
+          curl -fL                     https://github.com/modelcontextprotocol/registry/releases/download/v1.7.9/mcp-publisher_linux_amd64.tar.gz                     -o /tmp/mcp-publisher.tar.gz
+          echo 'ab128162b0616090b47cf245afe0a23f3ef08936fdce19074f5ba0a4469281ac  /tmp/mcp-publisher.tar.gz' | sha256sum -c -
+          tar -xzf /tmp/mcp-publisher.tar.gz mcp-publisher
+          ./mcp-publisher --help
+      - name: Validate Official MCP Registry metadata
+        run: ./mcp-publisher validate server.json
+      - name: Authenticate to Official MCP Registry
+        run: ./mcp-publisher login github-oidc
+      - name: Publish to Official MCP Registry
+        run: ./mcp-publisher publish server.json
+      - name: Verify exact Registry entry
+        env:
+          RELEASE_TAG: ${{ inputs.tag }}
+        run: |
+          python - <<'PYREG'
+          import json
+          import os
+          import urllib.parse
+          import urllib.request
+
+          name = "io.github.Vanilla1999/docatlas"
+          version = os.environ["RELEASE_TAG"].removeprefix("v")
+          query = urllib.parse.urlencode({"search": name})
+          url = f"https://registry.modelcontextprotocol.io/v0.1/servers?{query}"
+          request = urllib.request.Request(url, headers={"User-Agent": "DocAtlas-release-verifier/1"})
+          with urllib.request.urlopen(request, timeout=30) as response:
+              payload = json.load(response)
+
+          def exact(value):
+              if isinstance(value, dict):
+                  if value.get("name") == name and value.get("version") == version:
+                      return True
+                  return any(exact(child) for child in value.values())
+              if isinstance(value, list):
+                  return any(exact(child) for child in value)
+              return False
+
+          if not exact(payload):
+              raise SystemExit(f"published Registry entry not found for {name} {version}")
+          print(f"Official MCP Registry verification: PASS ({name} {version})")
+          PYREG
