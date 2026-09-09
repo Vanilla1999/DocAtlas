@@ -18,7 +18,7 @@
       "git_blob_sha": "4d524e3adbf2db6a1c05eb91c3b579cfd3ae9af9"
     },
     "docs/DOCMANCER_PRODUCT_BRIEF.md": {
-      "git_blob_sha": "5911f4f630939f42e1cda226de2eeca781fefdc9"
+      "git_blob_sha": "3607b058429abe7a8fb1068d467475c67a5c9893"
     }
   },
   "cases": [
@@ -26,7 +26,7 @@
       "id": "Q01",
       "question": "What is DocAtlas, and what core problem is it designed to solve for coding agents?",
       "fact_groups": [
-        {"id": "product", "witnesses": [{"path": "docs/PROJECT_MAP.md", "text": "DocAtlas is a local-first documentation and context runtime for coding agents."}]},
+        {"id": "product", "witnesses": [{"path": "docs/PROJECT_MAP.md", "text": "DocAtlas is a local-first documentation and context runtime for coding agents."}, {"path": "README.md", "text": "DocAtlas is a local documentation context runtime for **Claude Code, Codex, OpenCode, and other MCP clients**."}]},
         {"id": "problem", "witnesses": [{"path": "README.md", "text": "DocAtlas solves the problem of coding agents guessing from stale or generic documentation."}]}
       ]
     },
@@ -52,14 +52,14 @@
       "id": "Q04",
       "question": "When should an agent use get_docs_context?",
       "fact_groups": [
-        {"id": "entry_point", "witnesses": [{"path": "docs/mcp-docs-server.md", "text": "`get_docs_context` | First documentation question about a repository, dependency, library, or a mix."}]}
+        {"id": "entry_point", "witnesses": [{"path": "docs/mcp-docs-server.md", "text": "`get_docs_context` | First documentation question about a repository, dependency, library, or a mix."}, {"path": "README.md", "text": "`get_docs_context` | Default first call for project, library, dependency, or mixed documentation questions."}]}
       ]
     },
     {
       "id": "Q05",
       "question": "When is an agent allowed to call prepare_docs?",
       "fact_groups": [
-        {"id": "allowed_trigger", "witnesses": [{"path": "docs/mcp-docs-server.md", "text": "`prepare_docs` | The exact lifecycle action returned by `get_docs_context`, or an explicit user-approved sync/refresh request."}]},
+        {"id": "allowed_trigger", "witnesses": [{"path": "docs/mcp-docs-server.md", "text": "`prepare_docs` | The exact lifecycle action returned by `get_docs_context`, or an explicit user-approved sync/refresh request."}, {"path": "README.md", "text": "`prepare_docs` | Lifecycle work only: sync, refresh, index, or prefetch. Call it from bounded `recommended_next_action`, unbounded `next_action`, or an explicit user request."}]},
         {"id": "conditional_confirmation", "witnesses": [{"path": "README.md", "text": "Network actions require approval."}]}
       ]
     },
@@ -67,16 +67,16 @@
       "id": "Q06",
       "question": "What kinds of requests should use docs_status, and when must it not be used?",
       "fact_groups": [
-        {"id": "status_uses", "witnesses": [{"path": "docs/mcp-docs-server.md", "text": "`docs_status` | A returned job id, index health, freshness, or status request."}]},
-        {"id": "not_discovery", "witnesses": [{"path": "docs/mcp-docs-server.md", "text": "The first discovery call."}]}
+        {"id": "status_uses", "witnesses": [{"path": "docs/mcp-docs-server.md", "text": "`docs_status` | A returned job id, index health, freshness, or status request."}, {"path": "README.md", "text": "`docs_status` | Explicit health, freshness, index, or background-job status requests only."}]},
+        {"id": "not_discovery", "witnesses": [{"path": "docs/mcp-docs-server.md", "text": "The first discovery call."}, {"path": "README.md", "text": "It is not a discovery step."}]}
       ]
     },
     {
       "id": "Q07",
       "question": "What does fail-closed behavior mean in the DocAtlas documentation workflow?",
       "fact_groups": [
-        {"id": "no_unsupported_claim_or_edit", "witnesses": [{"path": "docs/DOCMANCER_PRODUCT_BRIEF.md", "text": "Return typed `insufficient_evidence` rather than authorizing unsupported claims or edits."}]},
-        {"id": "safe_context_remains", "witnesses": [{"path": "docs/mcp-docs-server.md", "text": "`docs_context` for safe retrieval-only project context when completeness or the requested relation remains uncertain"}]}
+        {"id": "no_unsupported_claim_or_edit", "witnesses": [{"path": "docs/DOCMANCER_PRODUCT_BRIEF.md", "text": "Return typed `insufficient_evidence` rather than authorizing unsupported claims or edits."}, {"path": "README.md", "text": "Retrieval-only aliases never authorize an answer or edit."}]},
+        {"id": "safe_context_remains", "witnesses": [{"path": "docs/mcp-docs-server.md", "text": "`docs_context` for safe retrieval-only project context when completeness or the requested relation remains uncertain"}, {"path": "README.md", "text": "Parser uncertainty blocks answer certification, not safe project-scoped retrieval."}]}
       ]
     },
     {
@@ -113,9 +113,9 @@
       "id": "Q11",
       "question": "How does DocAtlas determine whether a dependency version is exact, declared-only, or unbound?",
       "fact_groups": [
-        {"id": "exact", "witnesses": [{"path": "docs/DOCMANCER_PRODUCT_BRIEF.md", "text": "Resolve exact dependency versions only from repository evidence strong enough to prove the selected version"}, {"path": "README.md", "text": "Python versions become resolved evidence only from `uv.lock`, `poetry.lock`, `pdm.lock`, or `Pipfile.lock`"}]},
-        {"id": "declared_only", "witnesses": [{"path": "README.md", "text": "a `requirements.txt`/`pyproject.toml` pin remains declared intent"}, {"path": "docs/DOCMANCER_PRODUCT_BRIEF.md", "text": "weaker declarations remain explicitly unbound or declared-only"}]},
-        {"id": "unbound", "witnesses": [{"path": "README.md", "text": "path, Git, and direct-URL dependencies remain unbound and require an explicit documentation source"}]}
+        {"id": "exact", "witnesses": [{"path": "docs/DOCMANCER_PRODUCT_BRIEF.md", "text": "`exact` means repository state proves the selected version"}, {"path": "README.md", "text": "Python versions become resolved evidence only from `uv.lock`, `poetry.lock`, `pdm.lock`, or `Pipfile.lock`"}]},
+        {"id": "declared_only", "witnesses": [{"path": "docs/DOCMANCER_PRODUCT_BRIEF.md", "text": "`declared-only` means a manifest declaration exists but repository state does not prove the selected runtime version"}, {"path": "README.md", "text": "a `requirements.txt`/`pyproject.toml` pin remains declared intent"}]},
+        {"id": "unbound", "witnesses": [{"path": "docs/DOCMANCER_PRODUCT_BRIEF.md", "text": "`unbound` means repository evidence cannot safely bind the dependency to an exact documentation version/source"}, {"path": "README.md", "text": "path, Git, and direct-URL dependencies remain unbound and require an explicit documentation source"}]}
       ]
     },
     {
