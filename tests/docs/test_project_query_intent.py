@@ -19,10 +19,22 @@ from tests.docs.test_project_doc_ranking import fake_chunk
         ("What changed recently in ingestion?", "release_history"),
         ("Why are my docs stale?", "troubleshooting"),
         ("How does the MCP server work?", "mcp_disambiguation"),
+        ("What is DocAtlas, and what core problem is it designed to solve for coding agents?", "product_overview"),
+        ("What is the recommended sequence of MCP tool calls for answering a normal project documentation question?", "docs_mcp"),
+        ("When should an agent use get_docs_context?", "docs_mcp"),
+        ("When is an agent allowed to call prepare_docs?", "docs_mcp"),
+        ("What kinds of requests should use docs_status, and when must it not be used?", "docs_mcp"),
+        ('What does prepare_docs(action="sync_project_docs") do to new, changed, stale, and deleted project documentation?', "docs_mcp"),
     ],
 )
 def test_classify_project_query_intent(question, expected):
-    assert classify_project_query_intent(question).name == expected
+    intent = classify_project_query_intent(question)
+    assert intent.name == expected
+    if question.startswith("What is DocAtlas"):
+        assert intent.wants_architecture is False
+        assert intent.wants_troubleshooting is False
+    if "sync_project_docs" in question:
+        assert intent.wants_release_history is False
 
 
 @pytest.mark.parametrize(
@@ -61,6 +73,18 @@ def test_package_with_docs_mcp_is_docs_mcp_not_disambiguation():
     assert intent.wants_docs_mcp is True
     assert intent.wants_packs_mcp is False
 
+    for concept_question in (
+        "What does fail-closed behavior mean in the DocAtlas documentation workflow?",
+        "What is the difference between docs_answer, docs_context, patch_context, and insufficient_evidence?",
+    ):
+        assert classify_project_query_intent(concept_question).wants_troubleshooting is False
+
+    incident = classify_project_query_intent(
+        "get_docs_context returned insufficient_evidence unexpectedly; how do I troubleshoot it?"
+    )
+    assert incident.name == "docs_mcp"
+    assert incident.wants_troubleshooting is True
+
 
 def test_documentation_files_do_not_imply_code_symbol_evidence():
     intent = classify_project_query_intent(
@@ -69,6 +93,36 @@ def test_documentation_files_do_not_imply_code_symbol_evidence():
     assert intent.name == "release_history"
     assert intent.wants_code_symbols is False
 
+    implementation_question = "Where is the public Docs MCP server implemented in this repository?"
+    generic_guide = fake_chunk(
+        "docs/mcp-docs-server.md",
+        "Public tools",
+        0.92,
+        "The public tools are `get_docs_context`, `prepare_docs`, and `docs_status`.",
+    )
+    relation_map = fake_chunk(
+        "docs/PROJECT_MAP.md",
+        "Runtime areas",
+        0.55,
+        "| MCP Docs server | `docmancer/mcp/docs_server.py` | Public documentation tools, resources and transport boundary |",
+    )
+    ranked = rerank_project_doc_chunks(
+        [generic_guide, relation_map],
+        question=implementation_question,
+        intent=classify_project_query_intent(implementation_question),
+        limit=2,
+    )
+    assert ranked[0].path == "docs/PROJECT_MAP.md"
+
+    inventory_question = "What are the three public tools exposed by the DocAtlas Docs MCP server?"
+    ranked_inventory = rerank_project_doc_chunks(
+        [generic_guide, relation_map],
+        question=inventory_question,
+        intent=classify_project_query_intent(inventory_question),
+        limit=2,
+    )
+    assert ranked_inventory[0].path == "docs/mcp-docs-server.md"
+
 
 @pytest.mark.parametrize(
     "question",
@@ -76,118 +130,8 @@ def test_documentation_files_do_not_imply_code_symbol_evidence():
         "Which source files implement the MCP server?",
         "Where is the MCP server implemented?",
         "Which implementation file defines ProjectContextService?",
+        "Where is the public Docs MCP server implemented in this repository?",
     ],
 )
 def test_explicit_source_identity_questions_require_code_symbol_evidence(question):
     assert classify_project_query_intent(question).wants_code_symbols is True
-
-
-def test_named_product_purpose_question_avoids_architecture_and_incident_routes():
-    intent = classify_project_query_intent(
-        "What is DocAtlas, and what core problem is it designed to solve for coding agents?"
-    )
-    assert intent.name == "product_overview"
-    assert intent.wants_architecture is False
-    assert intent.wants_troubleshooting is False
-
-
-def test_docs_mcp_sequence_question_uses_docs_mcp_route():
-    intent = classify_project_query_intent(
-        "What is the recommended sequence of MCP tool calls for answering a normal project documentation question?"
-    )
-    assert intent.name == "docs_mcp"
-    assert intent.wants_docs_mcp is True
-    assert intent.wants_packs_mcp is False
-
-
-@pytest.mark.parametrize(
-    "question",
-    [
-        "When should an agent use get_docs_context?",
-        "When is an agent allowed to call prepare_docs?",
-        "What kinds of requests should use docs_status, and when must it not be used?",
-    ],
-)
-def test_current_public_docs_mcp_tool_names_route_to_docs_mcp(question: str):
-    intent = classify_project_query_intent(question)
-    assert intent.name == "docs_mcp"
-    assert intent.wants_docs_mcp is True
-    assert intent.wants_packs_mcp is False
-
-
-def test_project_docs_sync_lifecycle_question_is_not_release_history():
-    intent = classify_project_query_intent(
-        'What does prepare_docs(action="sync_project_docs") do to new, changed, stale, and deleted project documentation?'
-    )
-    assert intent.name == "docs_mcp"
-    assert intent.wants_docs_mcp is True
-    assert intent.wants_release_history is False
-
-
-@pytest.mark.parametrize(
-    "question",
-    [
-        "What does fail-closed behavior mean in the DocAtlas documentation workflow?",
-        "What is the difference between docs_answer, docs_context, patch_context, and insufficient_evidence?",
-    ],
-)
-def test_concept_definition_or_contrast_does_not_become_troubleshooting(question: str):
-    assert classify_project_query_intent(question).wants_troubleshooting is False
-
-
-def test_real_incident_with_public_tool_keeps_troubleshooting_signal():
-    intent = classify_project_query_intent(
-        "get_docs_context returned insufficient_evidence unexpectedly; how do I troubleshoot it?"
-    )
-    assert intent.name == "docs_mcp"
-    assert intent.wants_troubleshooting is True
-
-
-def test_implementation_location_relation_outranks_generic_tool_symbol_mentions():
-    question = "Where is the public Docs MCP server implemented in this repository?"
-    generic_guide = fake_chunk(
-        "docs/mcp-docs-server.md",
-        "Public tools",
-        0.92,
-        "The public tools are `get_docs_context`, `prepare_docs`, and `docs_status`.",
-    )
-    relation_map = fake_chunk(
-        "docs/PROJECT_MAP.md",
-        "Runtime areas",
-        0.55,
-        "| MCP Docs server | `docmancer/mcp/docs_server.py` | Public documentation tools, resources and transport boundary |",
-    )
-
-    ranked = rerank_project_doc_chunks(
-        [generic_guide, relation_map],
-        question=question,
-        intent=classify_project_query_intent(question),
-        limit=2,
-    )
-
-    assert ranked[0].path == "docs/PROJECT_MAP.md"
-
-
-def test_public_tool_inventory_keeps_docs_mcp_guide_preference():
-    question = "What are the three public tools exposed by the DocAtlas Docs MCP server?"
-    generic_guide = fake_chunk(
-        "docs/mcp-docs-server.md",
-        "Public tools",
-        0.92,
-        "The public tools are `get_docs_context`, `prepare_docs`, and `docs_status`.",
-    )
-    relation_map = fake_chunk(
-        "docs/PROJECT_MAP.md",
-        "Runtime areas",
-        0.55,
-        "| MCP Docs server | `docmancer/mcp/docs_server.py` | Public documentation tools, resources and transport boundary |",
-    )
-
-    ranked = rerank_project_doc_chunks(
-        [generic_guide, relation_map],
-        question=question,
-        intent=classify_project_query_intent(question),
-        limit=2,
-    )
-
-    assert ranked[0].path == "docs/mcp-docs-server.md"
