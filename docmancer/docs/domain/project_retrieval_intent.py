@@ -16,6 +16,7 @@ from docmancer.docs.domain.project_query_intent import (
     is_product_purpose_question,
     mentions_docs_mcp_surface,
 )
+from docmancer.docs.domain.quality import query_requests_implementation_location
 
 
 _MAX_ALIASES = 4
@@ -61,6 +62,7 @@ _INTENT_ROLE_POLICY: dict[str, tuple[tuple[str, ...], tuple[str, ...]]] = {
     "dependency_version_binding": (("overview", "api_contract"), ("roadmap",)),
     "module_responsibilities": (("project_architecture", "module_architecture"), ("roadmap",)),
     "product_claims": (("overview",), ("roadmap",)),
+    "implementation_location": (("project_architecture", "module_architecture", "api_contract"), ("roadmap",)),
     "packs_mcp_workflow": (("api_contract", "runbook"), ("adr", "roadmap")),
     "product_overview": (("overview", "project_architecture"), ("adr", "roadmap")),
     "getting_started": (("overview", "development", "runbook"), ("adr", "roadmap")),
@@ -290,7 +292,7 @@ def build_project_retrieval_aliases(
         emit(
             "product_overview",
             True,
-            f"{product_prefix}project overview",
+            f"{product_prefix}product definition purpose problem coding agents",
             f"{product_prefix}project purpose",
             f"{product_prefix}problem statement",
         )
@@ -308,7 +310,7 @@ def build_project_retrieval_aliases(
             emit(
                 "docs_mcp_tool_policy",
                 True,
-                f"{tool_name} Docs MCP usage policy conditions lifecycle boundary",
+                f"{tool_name} Docs MCP public tool contract default use must not be used for",
             )
     if _has_phrase(normalized, "fail-closed", "fail closed") and (
         concept_definition or _has(tokens, "behavior", "behaviour", "workflow", "principle")
@@ -316,7 +318,7 @@ def build_project_retrieval_aliases(
         emit(
             "fail_closed_workflow",
             True,
-            f"{product_prefix}fail-closed documentation workflow evidence safety",
+            f"{product_prefix}fail closed evidence support response contract safe context",
         )
     response_names = tuple(
         name for name in ("docs_answer", "docs_context", "patch_context", "insufficient_evidence")
@@ -341,7 +343,7 @@ def build_project_retrieval_aliases(
         emit(
             "product_boundaries",
             True,
-            f"{product_prefix}product boundaries complementary systems not replace",
+            f"{product_prefix}product boundaries does not replace systems",
         )
     if (
         mentions_product
@@ -352,7 +354,7 @@ def build_project_retrieval_aliases(
         emit(
             "dependency_version_binding",
             True,
-            f"{product_prefix}dependency version binding exact declared-only unbound repository evidence",
+            f"{product_prefix}dependency version evidence exact declared-only unbound selected version",
             f"{product_prefix}dependency selected version lockfile declaration unbound source",
         )
     if (
@@ -373,8 +375,8 @@ def build_project_retrieval_aliases(
         emit(
             "product_claims",
             True,
-            f"{product_prefix}product brief claims evidence status not demonstrated",
-            f"{product_prefix}product claims validation evidence status",
+            f"{product_prefix}product claims evidence status demonstrated",
+            f"{product_prefix}product claims validation status",
         )
 
     docs_mcp_workflow_question = mentions_docs_mcp and not mentions_packs and (
@@ -385,9 +387,8 @@ def build_project_retrieval_aliases(
         emit(
             "docs_mcp_workflow",
             True,
-            f"{product_prefix}Docs MCP server workflow",
-            "get_docs_context prepare_docs docs_status",
-            "docs/mcp-docs-server.md",
+            f"{product_prefix}Docs MCP public tool contract normal flow sequence",
+            f"{product_prefix}Docs MCP context-first sequence normal flow",
         )
     if mentions_mcp and mentions_packs and _has(tokens, "workflow", "работ", "процесс", "поток"):
         emit("packs_mcp_workflow", True, "Packs MCP runtime workflow action packs")
@@ -404,10 +405,17 @@ def build_project_retrieval_aliases(
             and _has(tokens, "поиск", "search", "документ", "docs", "file")
         )
     ):
+        sync_subject = "sync_project_docs" if "sync_project_docs" in source.casefold() else "project docs sync"
+        requested_states = " ".join(
+            token for token in tokens
+            if any(token.startswith(stem) for stem in (
+                "new", "changed", "stale", "deleted", "нов", "измен", "устар", "удален",
+            ))
+        )
         emit(
             "project_docs_sync",
             True,
-            f"{product_prefix}sync refresh project documentation after file changes",
+            f"{product_prefix}{sync_subject} lifecycle {requested_states} project documentation",
         )
     if (
         _has(tokens, "настро", "конфиг", "configure", "configuration")
@@ -418,6 +426,16 @@ def build_project_retrieval_aliases(
             "project_docs_configuration",
             True,
             f"{product_prefix}configure project documentation catalog and index settings",
+        )
+    if (
+        query_requests_implementation_location(source)
+        and not any(row.intent_id == "project_docs_config_location" for row in rows)
+    ):
+        subject = "Docs MCP server" if mentions_docs_mcp else "requested component"
+        emit(
+            "implementation_location",
+            True,
+            f"{product_prefix}{subject} implementation location source path project architecture",
         )
     if _has(tokens, "очист", "clear", "cleanup") and _has(tokens, "индекс", "index"):
         emit(
