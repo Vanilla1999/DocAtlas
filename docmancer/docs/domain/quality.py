@@ -40,6 +40,25 @@ _CODE_SYMBOL_RE = re.compile(
     r")",
     re.IGNORECASE,
 )
+_CODE_PATH_RE = re.compile(
+    r"\b[\w./-]+\.(?:py|dart|ts|tsx|js|jsx|go|rs|java|kt|swift|rb|php|cs|c|cc|cpp|h|hpp)\b",
+    re.IGNORECASE,
+)
+_IMPLEMENTATION_LOCATION_RE = re.compile(
+    r"(?:"
+    r"\bwhere\b[^?\n]{0,160}\b(?:implemented|defined|located)\b|"
+    r"\b(?:implementation|source|code)\s+(?:file|path|location)\b|"
+    r"\b(?:which|what)\s+(?:implementation|source|code)\s+file\b|"
+    r"\b(?:implemented|defined)\s+in\b|"
+    r"\bгде\b[^?\n]{0,160}\b(?:реализован|реализована|реализовано|определен|определена|находится)\b"
+    r")",
+    re.IGNORECASE,
+)
+_RELATION_STOPWORDS = frozenset({
+    "a", "an", "and", "are", "code", "defined", "defines", "file", "implemented",
+    "implementation", "in", "is", "located", "location", "of", "path", "public",
+    "repository", "source", "the", "this", "what", "where", "which",
+})
 
 
 def looks_like_code_or_command(text: str) -> bool:
@@ -84,3 +103,54 @@ def internal_noise_score(content: str) -> float:
 def has_code_symbol_evidence(content: str, title: str | None = None, heading_path: str | None = None, path: str | None = None) -> bool:
     text = "\n".join(part for part in [path or "", title or "", heading_path or "", content or ""] if part)
     return bool(_CODE_SYMBOL_RE.search(text))
+
+
+def query_requests_implementation_location(question: str) -> bool:
+    """Return whether the question asks for a code/source location relation."""
+
+    return bool(_IMPLEMENTATION_LOCATION_RE.search(str(question or "")))
+
+
+def _implementation_subject_terms(question: str) -> tuple[str, ...]:
+    return tuple(dict.fromkeys(
+        token.casefold()
+        for token in re.findall(r"[A-Za-z_][A-Za-z0-9_]*", str(question or ""))
+        if len(token) >= 3 and token.casefold() not in _RELATION_STOPWORDS
+    ))
+
+
+def has_requested_code_evidence(
+    question: str,
+    content: str,
+    title: str | None = None,
+    heading_path: str | None = None,
+    path: str | None = None,
+) -> bool:
+    """Require relation-local source evidence only for implementation-location asks.
+
+    The legacy broad helper remains authoritative for ordinary code-symbol asks.
+    Location questions are stricter: a programming-language source path must be
+    visible in the evidence text and be locally tied to the requested subject.
+    The documentation chunk's own source path is deliberately not enough.
+    """
+
+    if not query_requests_implementation_location(question):
+        return has_code_symbol_evidence(content, title, heading_path, path)
+
+    visible = "\n".join(part for part in [title or "", heading_path or "", content or ""] if part)
+    if not _CODE_PATH_RE.search(visible):
+        return False
+
+    subject_terms = _implementation_subject_terms(question)
+    if not subject_terms:
+        return True
+    lines = [line for line in visible.splitlines() if line.strip()]
+    for index, line in enumerate(lines):
+        if not _CODE_PATH_RE.search(line):
+            continue
+        local = " ".join(lines[max(0, index - 1): min(len(lines), index + 2)]).casefold()
+        matched = sum(1 for term in subject_terms if re.search(rf"\b{re.escape(term)}\b", local))
+        exact_identifier = any("_" in term and term in local for term in subject_terms)
+        if exact_identifier or matched >= min(2, len(subject_terms)):
+            return True
+    return False
