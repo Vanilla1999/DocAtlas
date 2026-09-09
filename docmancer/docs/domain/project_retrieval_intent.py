@@ -54,7 +54,7 @@ _INTENT_ROLE_POLICY: dict[str, tuple[tuple[str, ...], tuple[str, ...]]] = {
     "troubleshooting": (("runbook", "development"), ("adr", "roadmap")),
     "context_budget": (("api_contract", "module_architecture"), ("adr", "roadmap")),
     "docs_mcp_public_tools": (("api_contract", "runbook"), ("adr", "roadmap")),
-    "docs_mcp_tool_policy": (("api_contract", "runbook", "development"), ("adr", "roadmap")),
+    "docs_mcp_tool_policy": (("overview", "api_contract", "runbook", "development"), ("adr", "roadmap")),
     "fail_closed_workflow": (("api_contract", "overview", "project_architecture"), ("roadmap",)),
     "response_contract": (("api_contract", "overview"), ("roadmap",)),
     "source_authority": (("overview", "project_architecture"), ("roadmap",)),
@@ -72,7 +72,7 @@ _INTENT_ROLE_POLICY: dict[str, tuple[tuple[str, ...], tuple[str, ...]]] = {
     "testing_contribution": (("development", "runbook"), ("adr", "roadmap")),
     "docs_mcp_workflow": (("api_contract", "runbook", "development"), ("adr", "roadmap")),
     "docs_mcp_server_command": (("api_contract", "runbook"), ("adr", "roadmap")),
-    "project_docs_sync": (("runbook", "development"), ("roadmap",)),
+    "project_docs_sync": (("overview", "runbook", "development"), ("roadmap",)),
     "project_docs_configuration": (("runbook", "development", "api_contract"), ("roadmap",)),
     "project_architecture": (("project_architecture", "module_architecture", "overview"), ("roadmap",)),
     "retrieval_pipeline": (("project_architecture", "api_contract"), ("roadmap",)),
@@ -308,12 +308,15 @@ def build_project_retrieval_aliases(
         tokens, "when", "use", "allowed", "call", "request", "should", "must",
     ):
         for tool_name in public_tool_names:
-            policy_queries = [
-                f"{tool_name} Docs MCP default use",
-                f"{tool_name} Docs MCP must not be used for",
-            ]
-            if tool_name == "prepare_docs" and _has(tokens, "allowed", "permission", "approve"):
-                policy_queries.append(f"{tool_name} Docs MCP lifecycle confirmation approval")
+            policy_queries = [f"{tool_name} Docs MCP default use"]
+            if tool_name == "prepare_docs":
+                if _has(tokens, "allowed", "permission", "approve"):
+                    policy_queries.extend((
+                        f"{tool_name} Docs MCP allowed lifecycle action",
+                        f"{tool_name} Docs MCP network approval confirmation",
+                    ))
+            else:
+                policy_queries.append(f"{tool_name} Docs MCP must not be used for")
             emit("docs_mcp_tool_policy", True, *policy_queries)
     if _has_phrase(normalized, "fail-closed", "fail closed") and (
         concept_definition or _has(tokens, "behavior", "behaviour", "workflow", "principle")
@@ -321,8 +324,8 @@ def build_project_retrieval_aliases(
         emit(
             "fail_closed_workflow",
             True,
-            f"{product_prefix}fail closed retrieval-only safe context",
-            f"{product_prefix}fail closed response contract answer certification edit",
+            f"{product_prefix}fail closed insufficient_evidence unsupported claims edits",
+            f"{product_prefix}fail closed safe retrieval-only context answer certification edit",
         )
     response_names = tuple(
         name for name in ("docs_answer", "docs_context", "patch_context", "insufficient_evidence")
@@ -347,8 +350,7 @@ def build_project_retrieval_aliases(
         emit(
             "product_boundaries",
             True,
-            f"{product_prefix}does not replace",
-            f"{product_prefix}product boundaries",
+            f"{product_prefix}product boundaries evidence responsibilities does not replace",
         )
     if (
         mentions_product
@@ -420,7 +422,7 @@ def build_project_retrieval_aliases(
         )
         sync_queries = [f"{product_prefix}{sync_subject} lifecycle project documentation"]
         if requested_states:
-            sync_queries.insert(0, f"{product_prefix}{sync_subject} {requested_states}")
+            sync_queries.insert(0, f"{product_prefix}project docs {requested_states}")
         emit("project_docs_sync", True, *sync_queries)
     if (
         _has(tokens, "настро", "конфиг", "configure", "configuration")
@@ -436,12 +438,11 @@ def build_project_retrieval_aliases(
         query_requests_implementation_location(source)
         and not any(row.intent_id == "project_docs_config_location" for row in rows)
     ):
-        subject = "Docs MCP server" if mentions_docs_mcp else "requested component"
+        subject = "MCP Docs server" if mentions_docs_mcp else "requested component"
         emit(
             "implementation_location",
             True,
-            f"{product_prefix}{subject} path",
-            f"{product_prefix}{subject} implementation location",
+            f"{product_prefix}{subject} area responsibility public documentation tools resources transport implementation",
         )
     if _has(tokens, "очист", "clear", "cleanup") and _has(tokens, "индекс", "index"):
         emit(
@@ -449,21 +450,25 @@ def build_project_retrieval_aliases(
             True,
             f"{product_prefix}inspect safely clear local index preview cleanup plan",
         )
-    if not concept_definition and (
-        (not product_purpose and _has(tokens, "проблем", "problem"))
-        or _has(
-            tokens,
-            "ошиб", "диагност", "troubleshoot", "fail", "stale",
-            "insufficient_evidence",
-        )
-        or _has_phrase(
-            normalized,
-            "не работает",
-            "не находится",
-            "ничего не находит",
-            "nothing found",
-            "что проверить",
-            "what should i check",
+    if (
+        not concept_definition
+        and not any(row.intent_id == "project_docs_sync" for row in rows)
+        and (
+            (not product_purpose and _has(tokens, "проблем", "problem"))
+            or _has(
+                tokens,
+                "ошиб", "диагност", "troubleshoot", "fail", "stale",
+                "insufficient_evidence",
+            )
+            or _has_phrase(
+                normalized,
+                "не работает",
+                "не находится",
+                "ничего не находит",
+                "nothing found",
+                "что проверить",
+                "what should i check",
+            )
         )
     ):
         emit(

@@ -19,6 +19,9 @@
     },
     "docs/DOCMANCER_PRODUCT_BRIEF.md": {
       "git_blob_sha": "3607b058429abe7a8fb1068d467475c67a5c9893"
+    },
+    "wiki/Commands.md": {
+      "git_blob_sha": "5600b98a55027df743c6ab212e195d30811e1d89"
     }
   },
   "cases": [
@@ -26,7 +29,7 @@
       "id": "Q01",
       "question": "What is DocAtlas, and what core problem is it designed to solve for coding agents?",
       "fact_groups": [
-        {"id": "product", "witnesses": [{"path": "docs/PROJECT_MAP.md", "text": "DocAtlas is a local-first documentation and context runtime for coding agents."}, {"path": "README.md", "text": "DocAtlas is a local documentation context runtime for **Claude Code, Codex, OpenCode, and other MCP clients**."}]},
+        {"id": "product", "witnesses": [{"path": "docs/PROJECT_MAP.md", "text": "DocAtlas is a local-first documentation and context runtime for coding agents."}, {"path": "README.md", "text": "DocAtlas is a local documentation context runtime for **Claude Code, Codex, OpenCode, and other MCP clients**."}, {"path": "README.md", "text": "Local-first documentation context remains the runtime foundation"}]},
         {"id": "problem", "witnesses": [{"path": "README.md", "text": "DocAtlas solves the problem of coding agents guessing from stale or generic documentation."}]}
       ]
     },
@@ -41,18 +44,18 @@
       "id": "Q03",
       "question": "What is the recommended sequence of MCP tool calls for answering a normal project documentation question?",
       "fact_groups": [
-        {"id": "context_first", "witnesses": [{"path": "docs/mcp-docs-server.md", "text": "`get_docs_context`, execute only an explicitly returned `prepare_docs`"}]},
-        {"id": "prepare_only_when_needed", "witnesses": [{"path": "README.md", "text": "follow a returned prepare_docs action when needed → answer with sources"}]},
+        {"id": "context_first", "witnesses": [{"path": "docs/mcp-docs-server.md", "text": "`get_docs_context`, execute only an explicitly returned `prepare_docs`"}, {"path": "docs/mcp-docs-server.md", "text": "get_docs_context(question, project_path)"}]},
+        {"id": "prepare_only_when_needed", "witnesses": [{"path": "README.md", "text": "follow a returned prepare_docs action when needed → answer with sources"}, {"path": "wiki/Commands.md", "text": "`prepare_docs` — a returned or explicitly approved sync/prefetch action"}]},
         {"id": "confirmation", "witnesses": [{"path": "docs/mcp-docs-server.md", "text": "obtain confirmation and call that exact action"}]},
         {"id": "job_status_only_if_job", "witnesses": [{"path": "docs/mcp-docs-server.md", "text": "if a job was returned, poll docs_status(job_id)"}]},
-        {"id": "retry_unchanged", "witnesses": [{"path": "docs/mcp-docs-server.md", "text": "then retry the unchanged question"}]}
+        {"id": "retry_unchanged", "witnesses": [{"path": "docs/mcp-docs-server.md", "text": "then retry the unchanged question"}, {"path": "docs/mcp-docs-server.md", "text": "retry the original bounded get_docs_context question"}]}
       ]
     },
     {
       "id": "Q04",
       "question": "When should an agent use get_docs_context?",
       "fact_groups": [
-        {"id": "entry_point", "witnesses": [{"path": "docs/mcp-docs-server.md", "text": "`get_docs_context` | First documentation question about a repository, dependency, library, or a mix."}, {"path": "README.md", "text": "`get_docs_context` | Default first call for project, library, dependency, or mixed documentation questions."}]}
+        {"id": "entry_point", "witnesses": [{"path": "docs/mcp-docs-server.md", "text": "`get_docs_context` | First documentation question about a repository, dependency, library, or a mix."}, {"path": "README.md", "text": "`get_docs_context` | Default first call for project, library, dependency, or mixed documentation questions."}, {"path": "README.md", "text": "otherwise they start with `get_docs_context`"}]}
       ]
     },
     {
