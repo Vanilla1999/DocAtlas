@@ -20,6 +20,8 @@ from tests.docs.test_project_doc_ranking import fake_chunk
         ("Why are my docs stale?", "troubleshooting"),
         ("How does the MCP server work?", "mcp_disambiguation"),
         ("What is DocAtlas, and what core problem is it designed to solve for coding agents?", "product_overview"),
+        ("What is DocAtlas architecture?", "architecture"),
+        ("What is DocAtlas architecture and what problem does it solve?", "architecture"),
         ("What is the recommended sequence of MCP tool calls for answering a normal project documentation question?", "docs_mcp"),
         ("When should an agent use get_docs_context?", "docs_mcp"),
         ("When is an agent allowed to call prepare_docs?", "docs_mcp"),
@@ -30,7 +32,7 @@ from tests.docs.test_project_doc_ranking import fake_chunk
 def test_classify_project_query_intent(question, expected):
     intent = classify_project_query_intent(question)
     assert intent.name == expected
-    if question.startswith("What is DocAtlas"):
+    if "core problem is it designed to solve" in question:
         assert intent.wants_architecture is False
         assert intent.wants_troubleshooting is False
     if "sync_project_docs" in question:
