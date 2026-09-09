@@ -78,3 +78,64 @@ def test_documentation_files_do_not_imply_code_symbol_evidence():
 )
 def test_explicit_source_identity_questions_require_code_symbol_evidence(question):
     assert classify_project_query_intent(question).wants_code_symbols is True
+
+
+def test_named_product_purpose_question_avoids_architecture_and_incident_routes():
+    intent = classify_project_query_intent(
+        "What is DocAtlas, and what core problem is it designed to solve for coding agents?"
+    )
+    assert intent.name == "product_overview"
+    assert intent.wants_architecture is False
+    assert intent.wants_troubleshooting is False
+
+
+def test_docs_mcp_sequence_question_uses_docs_mcp_route():
+    intent = classify_project_query_intent(
+        "What is the recommended sequence of MCP tool calls for answering a normal project documentation question?"
+    )
+    assert intent.name == "docs_mcp"
+    assert intent.wants_docs_mcp is True
+    assert intent.wants_packs_mcp is False
+
+
+@pytest.mark.parametrize(
+    "question",
+    [
+        "When should an agent use get_docs_context?",
+        "When is an agent allowed to call prepare_docs?",
+        "What kinds of requests should use docs_status, and when must it not be used?",
+    ],
+)
+def test_current_public_docs_mcp_tool_names_route_to_docs_mcp(question: str):
+    intent = classify_project_query_intent(question)
+    assert intent.name == "docs_mcp"
+    assert intent.wants_docs_mcp is True
+    assert intent.wants_packs_mcp is False
+
+
+def test_project_docs_sync_lifecycle_question_is_not_release_history():
+    intent = classify_project_query_intent(
+        'What does prepare_docs(action="sync_project_docs") do to new, changed, stale, and deleted project documentation?'
+    )
+    assert intent.name == "docs_mcp"
+    assert intent.wants_docs_mcp is True
+    assert intent.wants_release_history is False
+
+
+@pytest.mark.parametrize(
+    "question",
+    [
+        "What does fail-closed behavior mean in the DocAtlas documentation workflow?",
+        "What is the difference between docs_answer, docs_context, patch_context, and insufficient_evidence?",
+    ],
+)
+def test_concept_definition_or_contrast_does_not_become_troubleshooting(question: str):
+    assert classify_project_query_intent(question).wants_troubleshooting is False
+
+
+def test_real_incident_with_public_tool_keeps_troubleshooting_signal():
+    intent = classify_project_query_intent(
+        "get_docs_context returned insufficient_evidence unexpectedly; how do I troubleshoot it?"
+    )
+    assert intent.name == "docs_mcp"
+    assert intent.wants_troubleshooting is True
