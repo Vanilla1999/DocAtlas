@@ -292,7 +292,8 @@ def build_project_retrieval_aliases(
         emit(
             "product_overview",
             True,
-            f"{product_prefix}product definition purpose problem coding agents",
+            f"{product_prefix}documentation context runtime coding agents",
+            f"{product_prefix}product purpose problem coding agents",
             f"{product_prefix}project purpose",
             f"{product_prefix}problem statement",
         )
@@ -307,18 +308,21 @@ def build_project_retrieval_aliases(
         tokens, "when", "use", "allowed", "call", "request", "should", "must",
     ):
         for tool_name in public_tool_names:
-            emit(
-                "docs_mcp_tool_policy",
-                True,
-                f"{tool_name} Docs MCP public tool contract default use must not be used for",
-            )
+            policy_queries = [
+                f"{tool_name} Docs MCP default use",
+                f"{tool_name} Docs MCP must not be used for",
+            ]
+            if tool_name == "prepare_docs" and _has(tokens, "allowed", "permission", "approve"):
+                policy_queries.append(f"{tool_name} Docs MCP lifecycle confirmation approval")
+            emit("docs_mcp_tool_policy", True, *policy_queries)
     if _has_phrase(normalized, "fail-closed", "fail closed") and (
         concept_definition or _has(tokens, "behavior", "behaviour", "workflow", "principle")
     ):
         emit(
             "fail_closed_workflow",
             True,
-            f"{product_prefix}fail closed evidence support response contract safe context",
+            f"{product_prefix}fail closed retrieval-only safe context",
+            f"{product_prefix}fail closed response contract answer certification edit",
         )
     response_names = tuple(
         name for name in ("docs_answer", "docs_context", "patch_context", "insufficient_evidence")
@@ -343,7 +347,8 @@ def build_project_retrieval_aliases(
         emit(
             "product_boundaries",
             True,
-            f"{product_prefix}product boundaries does not replace systems",
+            f"{product_prefix}does not replace",
+            f"{product_prefix}product boundaries",
         )
     if (
         mentions_product
@@ -387,8 +392,9 @@ def build_project_retrieval_aliases(
         emit(
             "docs_mcp_workflow",
             True,
-            f"{product_prefix}Docs MCP public tool contract normal flow sequence",
-            f"{product_prefix}Docs MCP context-first sequence normal flow",
+            f"{product_prefix}Docs MCP server workflow get_docs_context prepare_docs docs_status documentation context",
+            f"{product_prefix}Docs MCP normal flow",
+            f"{product_prefix}Docs MCP public tool contract sequence",
         )
     if mentions_mcp and mentions_packs and _has(tokens, "workflow", "работ", "процесс", "поток"):
         emit("packs_mcp_workflow", True, "Packs MCP runtime workflow action packs")
@@ -412,11 +418,10 @@ def build_project_retrieval_aliases(
                 "new", "changed", "stale", "deleted", "нов", "измен", "устар", "удален",
             ))
         )
-        emit(
-            "project_docs_sync",
-            True,
-            f"{product_prefix}{sync_subject} lifecycle {requested_states} project documentation",
-        )
+        sync_queries = [f"{product_prefix}{sync_subject} lifecycle project documentation"]
+        if requested_states:
+            sync_queries.insert(0, f"{product_prefix}{sync_subject} {requested_states}")
+        emit("project_docs_sync", True, *sync_queries)
     if (
         _has(tokens, "настро", "конфиг", "configure", "configuration")
         and (mentions_docs or mentions_project or mentions_product)
@@ -435,7 +440,8 @@ def build_project_retrieval_aliases(
         emit(
             "implementation_location",
             True,
-            f"{product_prefix}{subject} implementation location source path project architecture",
+            f"{product_prefix}{subject} path",
+            f"{product_prefix}{subject} implementation location",
         )
     if _has(tokens, "очист", "clear", "cleanup") and _has(tokens, "индекс", "index"):
         emit(
