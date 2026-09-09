@@ -167,7 +167,12 @@ def _assert_direct_15_sidecar() -> None:
             os.environ["DOCATLAS_HOME"] = previous_home
 
     assert call_count == 15
-    assert not failures, failures
+    if failures:
+        details = "\n".join(
+            f"{case_id}: {json.dumps(failure, sort_keys=True)}"
+            for case_id, failure in sorted(failures.items())
+        )
+        pytest.fail(f"direct-15 failures:\n{details}", pytrace=False)
 
 
 def test_v2_natural_chunking_keeps_parent_and_child_witnesses():
