@@ -30,13 +30,105 @@ PACKS_MCP_PHRASES = [
     "api actions",
 ]
 
+PUBLIC_DOCS_MCP_TOOL_NAMES = (
+    "get_docs_context",
+    "prepare_docs",
+    "docs_status",
+)
 
-def _contains_phrase(text: str, phrases: list[str]) -> bool:
+_DOCS_MCP_PHRASES = (
+    "docs mcp",
+    "documentation mcp",
+    "mcp docs",
+    "docs serve",
+    "get project context",
+    "get project docs",
+    "get library docs",
+    "resolve library id",
+    "context7",
+)
+_PRODUCT_NAME_RE = re.compile(r"(?<![\w])(?:docatlas|docmancer)(?![\w])", re.I)
+
+
+def _contains_phrase(text: str, phrases: list[str] | tuple[str, ...]) -> bool:
     return any(phrase in text for phrase in phrases)
 
 
 def _contains_word(text: str, words: list[str]) -> bool:
     return any(re.search(rf"\b{re.escape(word)}\b", text) for word in words)
+
+
+def _normalized_question(question: str) -> tuple[str, str]:
+    raw = (question or "").casefold()
+    normalized = " ".join(raw.replace("_", " ").replace("-", " ").split())
+    return raw, normalized
+
+
+def is_product_purpose_question(question: str) -> bool:
+    """Recognize product-definition/purpose questions without incident wording."""
+
+    raw, normalized = _normalized_question(question)
+    mentions_product = bool(_PRODUCT_NAME_RE.search(raw))
+    explicit_named_definition = bool(
+        re.search(r"\bwhat\s+is\s+(?:the\s+)?(?:docatlas|docmancer)\b", normalized)
+        or re.search(r"\b(?:что\s+такое|что\s+это\s+за)\s+(?:docatlas|docmancer)\b", normalized)
+    )
+    generic_definition = bool(
+        re.search(
+            r"\bwhat\s+is\s+(?:this|the)\s+(?:project|product|system)"
+            r"(?=\s*(?:[?,;]|$|\band\b))",
+            normalized,
+        )
+        or re.search(r"\bчто\s+это\s+за\s+(?:проект|продукт|систем[ау])\b", normalized)
+    )
+    purpose_relation = bool(
+        re.search(r"\bproblems?\b[^?]{0,120}\b(?:solve|solves|solved)\b", normalized)
+        or re.search(r"\b(?:purpose|intended\s+for|designed\s+to\s+solve)\b", normalized)
+        or ("проблем" in normalized and re.search(r"\bреша(?:ет|ют|ть|ющ)\w*\b", normalized))
+        or "назначен" in normalized
+    )
+    generic_product_subject = bool(
+        re.search(r"\b(?:this|the)\s+(?:project|product|system)\b", normalized)
+        or re.search(r"\b(?:проект|продукт|систем[ау])\b", normalized)
+    )
+    return (
+        explicit_named_definition
+        or generic_definition
+        or (mentions_product and purpose_relation)
+        or (generic_product_subject and purpose_relation)
+    )
+
+
+def mentions_docs_mcp_surface(question: str) -> bool:
+    """Recognize the current public Docs MCP surface and narrow workflow wording."""
+
+    raw, normalized = _normalized_question(question)
+    if any(name in raw for name in PUBLIC_DOCS_MCP_TOOL_NAMES):
+        return True
+    if _contains_phrase(normalized, _DOCS_MCP_PHRASES):
+        return True
+    public_tool_phrases = tuple(name.replace("_", " ") for name in PUBLIC_DOCS_MCP_TOOL_NAMES)
+    if _contains_phrase(normalized, public_tool_phrases):
+        return True
+    return bool(
+        re.search(r"\bmcp\b", normalized)
+        and re.search(r"\b(?:project\s+)?documentation\b", normalized)
+        and re.search(r"\b(?:sequence|workflow|tool\s+calls?|call\s+sequence|answering)\b", normalized)
+    )
+
+
+def is_concept_definition_or_contrast(question: str) -> bool:
+    """Distinguish concept questions from reports of an operational incident."""
+
+    _, normalized = _normalized_question(question)
+    return bool(
+        re.search(r"\bwhat\s+does\b[^?]{0,180}\bmean\b", normalized)
+        or re.search(r"\b(?:what\s+is\s+the\s+)?difference\s+between\b", normalized)
+        or re.search(r"\bmeaning\s+of\b", normalized)
+        or re.search(r"\bdefine\b", normalized)
+        or re.search(r"\bчто\s+означа(?:ет|ют)\b", normalized)
+        or re.search(r"\bв\s+ч[её]м\s+разниц[аы]\s+между\b", normalized)
+    )
 
 
 def classify_project_query_intent(question: str) -> ProjectQueryIntent:
@@ -46,6 +138,8 @@ def classify_project_query_intent(question: str) -> ProjectQueryIntent:
     def has_any(terms: list[str]) -> bool:
         return any(term in q for term in terms)
 
+    product_purpose = is_product_purpose_question(question)
+    concept_definition = is_concept_definition_or_contrast(question)
     wants_architecture = has_any([
         "architecture", "architectural", "project structure", "structured", "structure", "layout", "components", "design", "overview", "workflow", "convention", "conventions", "runbook", "runbooks", "adr",
         "архитектура", "архитектур", "структура проекта", "структура", "компоненты", "обзор", "конвенции", "соглашения",
@@ -63,13 +157,11 @@ def classify_project_query_intent(question: str) -> ProjectQueryIntent:
     explicit_release = has_any(["changelog", "release", "version history", "what changed", "recently changed"])
     wants_troubleshooting = has_any(["error", "bug", "fail", "failed", "why doesn't", "why does not", "not working", "stale", "missing", "diagnose", "doctor", "fix", "troubleshoot", "ошиб", "проблем", "не работает", "не наход", "устар", "диагност"])
     wants_troubleshooting = wants_troubleshooting or _contains_word(q, ["problem", "problems"])
+    if concept_definition:
+        wants_troubleshooting = False
     # Code-symbol routing must be explicit.  Treating every occurrence of
     # ``file``/``files`` as source-navigation intent makes ordinary
-    # documentation questions (for example "Which docs files must stay under
-    # the release line limit?") require implementation evidence and therefore
-    # fail closed even when a canonical documentation answer is already
-    # selected.  Keep file-based routing only for phrases that actually ask
-    # about source/implementation identity.
+    # documentation questions require implementation evidence and fail closed.
     wants_code_symbols = has_any([
         "class", "classes", "function", "functions", "method", "methods",
         "module", "implementation", "implements", "implemented", "defined",
@@ -80,21 +172,31 @@ def classify_project_query_intent(question: str) -> ProjectQueryIntent:
         "where is implemented", "where is defined", "implemented in", "defined in",
         "file path", "source path",
     ])
-    wants_docs_mcp = has_any(["docs mcp", "documentation mcp", "mcp docs", "docs serve", "docs serve", "get project context", "get project docs", "get library docs", "resolve library id", "context7"])
+    wants_docs_mcp = mentions_docs_mcp_surface(question)
     wants_packs_mcp = _contains_phrase(q, PACKS_MCP_PHRASES) or _contains_phrase(q_raw, PACKS_MCP_PHRASES)
     wants_packs_mcp = wants_packs_mcp or ("mcp" in q and _contains_word(q, ["packs"]))
     mentions_mcp = "mcp" in q
 
-    if explicit_release or (wants_release and not wants_how_to and not wants_architecture):
+    if product_purpose:
+        return ProjectQueryIntent(name="product_overview", broad=True)
+    if explicit_release:
         return ProjectQueryIntent(name="release_history", wants_release_history=True, wants_code_symbols=wants_code_symbols)
     if wants_docs_mcp and not wants_packs_mcp:
-        return ProjectQueryIntent(name="docs_mcp", wants_docs_mcp=True, wants_how_to=wants_how_to, wants_code_symbols=wants_code_symbols)
+        return ProjectQueryIntent(
+            name="docs_mcp",
+            wants_docs_mcp=True,
+            wants_how_to=wants_how_to,
+            wants_troubleshooting=wants_troubleshooting,
+            wants_code_symbols=wants_code_symbols,
+        )
     if wants_packs_mcp and not wants_docs_mcp:
         return ProjectQueryIntent(name="packs_mcp", wants_packs_mcp=True, wants_how_to=wants_how_to, wants_code_symbols=wants_code_symbols)
     if mentions_mcp and not wants_docs_mcp and not wants_packs_mcp:
         return ProjectQueryIntent(name="mcp_disambiguation", broad=True, wants_docs_mcp=True, wants_packs_mcp=True, wants_how_to=wants_how_to, wants_code_symbols=wants_code_symbols)
     if wants_docs_mcp and wants_packs_mcp:
         return ProjectQueryIntent(name="mcp_disambiguation", broad=True, wants_docs_mcp=True, wants_packs_mcp=True, wants_how_to=wants_how_to, wants_code_symbols=wants_code_symbols)
+    if wants_release and not wants_how_to and not wants_architecture:
+        return ProjectQueryIntent(name="release_history", wants_release_history=True, wants_code_symbols=wants_code_symbols)
     if wants_ingestion and wants_how_to:
         return ProjectQueryIntent(name="ingestion_how_to", wants_how_to=True, wants_code_symbols=wants_code_symbols)
     if wants_ingestion:
