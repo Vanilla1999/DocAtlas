@@ -3,12 +3,15 @@ from __future__ import annotations
 
 import hashlib
 import json
+import os
 from pathlib import Path
+from tempfile import TemporaryDirectory
 
 import pytest
 
 from eval.project_context_quality_v2_protocol import evaluate_case, load_cases
 from scripts.run_project_docs_self_host_gate import LiveCase, run
+import scripts.run_project_docs_self_host_gate as self_host_gate
 from docmancer.docs.domain.documentation_query_plan import build_documentation_query_plan
 
 
@@ -64,7 +67,7 @@ def _assert_direct_15_sidecar() -> None:
         assert path.is_file(), source_path
         assert _git_blob_sha(path) == metadata["git_blob_sha"], source_path
 
-    live_cases = []
+    cases = []
     for case in sidecar["cases"]:
         assert case["fact_groups"], case["id"]
         required_fact_groups = []
@@ -76,58 +79,91 @@ def _assert_direct_15_sidecar() -> None:
                 assert witness["text"] in source_text, (case["id"], group["id"], witness)
                 alternatives.append((witness["path"], witness["text"]))
             required_fact_groups.append(tuple(alternatives))
-        relevant_paths = tuple(dict.fromkeys(
-            path for alternatives in required_fact_groups for path, _ in alternatives
-        ))
-        live_cases.append(LiveCase(
-            case_id=case["id"],
-            question=case["question"],
-            relevant_paths=relevant_paths,
-            required_fact_groups=tuple(required_fact_groups),
-            expected_kind="docs_context",
-            lookup_queries=(),
-            scope="all",
-        ))
+        cases.append((case, tuple(required_fact_groups)))
 
     catalog_text = (_REPO_ROOT / "docatlas.project-docs.yaml").read_text(encoding="utf-8")
     assert "eval/direct_docatlas_questions_15" not in catalog_text
 
-    report = run(cases=tuple(live_cases), negative_cases=())
-    results = {row["case_id"]: row for row in report["results"]}
-    assert set(results) == {f"Q{index:02d}" for index in range(1, 16)}
-
+    previous_home = os.environ.get("DOCATLAS_HOME")
     failures = {}
-    for case_id, row in results.items():
-        payload = row["payload"]
-        checks = row["checks"]
-        public_query_ids = {
-            str(value)
-            for value in (
-                *(payload.get("covered_query_ids") or ()),
-                *(payload.get("missing_query_ids") or ()),
+    call_count = 0
+    try:
+        with TemporaryDirectory(prefix="docatlas-direct-15-") as raw_tmp:
+            tmp = Path(raw_tmp)
+            os.environ["DOCATLAS_HOME"] = str(tmp / "home")
+            config = self_host_gate.DocmancerConfig()
+            config.index.db_path = str(tmp / "docmancer.db")
+            config.index.extracted_dir = str(tmp / "extracted")
+            service = self_host_gate.LibraryDocsService(
+                config=config,
+                config_source="explicit",
+                registry=self_host_gate.LibraryRegistry(config.index.db_path),
+                agent=self_host_gate.DocmancerAgent(config=config),
+                job_tracker=self_host_gate.DocsJobTracker(),
             )
-        }
-        case_checks = {
-            "status_ok": checks.get("status_ok"),
-            "kind_matches": checks.get("kind_matches"),
-            "source_backed": checks.get("source_backed"),
-            "context_contract": checks.get("context_contract"),
-            "required_facts": checks.get("required_facts"),
-            "citation_integrity": checks.get("citation_integrity"),
-            "no_lookup_queries": not any(value.startswith("query-lookup-") for value in public_query_ids),
-            "source_budget": len(payload.get("sources") or ()) <= 3,
-            "token_budget": int(payload.get("estimated_tokens") or 0) <= 800,
-            "retrieval_only": payload.get("answer_supported") is False and payload.get("edit_ready") is False,
-        }
-        if not all(case_checks.values()):
-            failures[case_id] = {
-                "checks": case_checks,
-                "fact_checks": row.get("fact_checks"),
-                "sources": payload.get("sources"),
-                "covered_query_ids": payload.get("covered_query_ids"),
-                "missing_query_ids": payload.get("missing_query_ids"),
-            }
+            sync = service.sync_project_docs(str(_REPO_ROOT), with_vectors=False)
+            assert getattr(sync, "status", None) == "success"
 
+            for case, required_fact_groups in cases:
+                payload, snapshot = self_host_gate._call_with_snapshot(
+                    {
+                        "question": case["question"],
+                        "project_path": str(_REPO_ROOT),
+                        "scope": "all",
+                    },
+                    service,
+                )
+                call_count += 1
+                payload = dict(payload or {})
+                sources = payload.get("sources") if isinstance(payload.get("sources"), list) else []
+                public_query_ids = {
+                    str(value)
+                    for value in (
+                        *(payload.get("covered_query_ids") or ()),
+                        *(payload.get("missing_query_ids") or ()),
+                    )
+                }
+                fact_checks = {
+                    f"fact-group-{index}": any(
+                        str(source.get("path_or_url") or "") == path
+                        and fragment.casefold() in str(source.get("snippet") or "").casefold()
+                        for path, fragment in alternatives
+                        for source in sources if isinstance(source, dict)
+                    )
+                    for index, alternatives in enumerate(required_fact_groups, 1)
+                }
+                observer_counts = ((payload.get("diagnostics") or {}).get("observer_counts") or {})
+                checks = {
+                    "status_ok": payload.get("status") == "ok",
+                    "kind_matches": payload.get("kind") == "docs_context",
+                    "source_backed": bool(sources),
+                    "context_contract": self_host_gate._validate_context_result(payload) is None,
+                    "required_facts": all(fact_checks.values()),
+                    "citation_integrity": self_host_gate._citation_integrity(payload, snapshot),
+                    "no_packs_contamination": not self_host_gate._packs_contamination(case["question"], payload),
+                    "no_lookup_queries": not any(value.startswith("query-lookup-") for value in public_query_ids),
+                    "source_budget": len(sources) <= 3,
+                    "token_budget": int(payload.get("estimated_tokens") or 0) <= 800,
+                    "retrieval_only": payload.get("answer_supported") is False and payload.get("edit_ready") is False,
+                    "one_retrieval_call": observer_counts.get("retrieval_calls") == 1,
+                    "one_validation_call": observer_counts.get("validation_calls") == 1,
+                }
+                if not all(checks.values()):
+                    failures[case["id"]] = {
+                        "checks": checks,
+                        "fact_checks": fact_checks,
+                        "sources": sources,
+                        "covered_query_ids": payload.get("covered_query_ids"),
+                        "missing_query_ids": payload.get("missing_query_ids"),
+                        "query_intent": (payload.get("diagnostics") or {}).get("query_intent"),
+                    }
+    finally:
+        if previous_home is None:
+            os.environ.pop("DOCATLAS_HOME", None)
+        else:
+            os.environ["DOCATLAS_HOME"] = previous_home
+
+    assert call_count == 15
     assert not failures, failures
 
 
