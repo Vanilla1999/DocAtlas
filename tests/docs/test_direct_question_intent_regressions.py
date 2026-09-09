@@ -18,7 +18,7 @@ def _alias_ids(question: str) -> set[str]:
 def test_product_purpose_question_is_not_architecture_or_incident_routing():
     intent = classify_project_query_intent(Q01)
 
-    assert intent.name == "general"
+    assert intent.name == "product_overview"
     assert intent.wants_architecture is False
     assert intent.wants_troubleshooting is False
     assert _alias_ids(Q01) == {"product_overview"}
