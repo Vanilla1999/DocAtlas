@@ -31,6 +31,16 @@ from docmancer.docs.application.recovery import _suggested_questions
         ("Что сделать после редактирования markdown-документа, чтобы поиск увидел изменения?", "project_docs_sync"),
         ("Почему get_docs_context вернул insufficient_evidence и что проверить первым?", "troubleshooting"),
         ("Архитектура?", "project_architecture"),
+        ("When should an agent use get_docs_context?", "docs_mcp_tool_policy"),
+        ("When is an agent allowed to call prepare_docs?", "docs_mcp_tool_policy"),
+        ("What kinds of requests should use docs_status, and when must it not be used?", "docs_mcp_tool_policy"),
+        ("What does fail-closed behavior mean in the DocAtlas documentation workflow?", "fail_closed_workflow"),
+        ("What is the difference between docs_answer, docs_context, patch_context, and insufficient_evidence?", "response_contract"),
+        ("Which repository files are the source of truth, and which DocAtlas storage artifacts are only derived indexes?", "source_authority"),
+        ("What systems does DocAtlas explicitly not replace?", "product_boundaries"),
+        ("How does DocAtlas determine whether a dependency version is exact, declared-only, or unbound?", "dependency_version_binding"),
+        ("What are the responsibilities of docmancer/docs/application and docmancer/docs/domain in this repository?", "module_responsibilities"),
+        ("What claims about DocAtlas are not currently demonstrated according to the product brief?", "product_claims"),
     ],
 )
 def test_russian_newcomer_queries_get_retrieval_only_aliases(question: str, intent_id: str):
@@ -51,6 +61,17 @@ def test_russian_newcomer_queries_get_retrieval_only_aliases(question: str, inte
 )
 def test_named_policy_or_contract_is_not_collapsed_to_broad_storage_alias(question: str):
     assert build_project_retrieval_aliases(question) == ()
+
+    negative_neighbors = (
+        ("get_docs_context returned an error; how should I troubleshoot it?", "fail_closed_workflow"),
+        ("What claims are accepted by the HTTP API contract?", "product_claims"),
+        ("Which database file stores the local cache?", "source_authority"),
+        ("Which version of Python should I install?", "dependency_version_binding"),
+        ("Which modules import pathlib?", "module_responsibilities"),
+    )
+    for neighbor, forbidden_facet in negative_neighbors:
+        facets = {alias.intent_id for alias in build_project_retrieval_aliases(neighbor)}
+        assert forbidden_facet not in facets
 
 
 def test_state_home_variable_uses_narrow_retrieval_without_forcing_context():
@@ -82,6 +103,31 @@ def test_exact_symbol_question_is_not_misclassified_as_product_overview():
     aliases = build_project_retrieval_aliases("What is the model-visible projection?")
 
     assert "product_overview" not in {alias.intent_id for alias in aliases}
+
+    product_aliases = build_project_retrieval_aliases(
+        "What is DocAtlas, and what core problem is it designed to solve for coding agents?"
+    )
+    assert {alias.intent_id for alias in product_aliases} == {"product_overview"}
+
+    workflow_aliases = build_project_retrieval_aliases(
+        "What is the recommended sequence of MCP tool calls for answering a normal project documentation question?"
+    )
+    workflow_facets = {alias.intent_id for alias in workflow_aliases}
+    assert "docs_mcp_workflow" in workflow_facets
+    assert "product_overview" not in workflow_facets
+
+    for concept_question in (
+        "What does fail-closed behavior mean in the DocAtlas documentation workflow?",
+        "What is the difference between docs_answer, docs_context, patch_context, and insufficient_evidence?",
+    ):
+        assert "troubleshooting" not in {
+            alias.intent_id for alias in build_project_retrieval_aliases(concept_question)
+        }
+
+    incident_aliases = build_project_retrieval_aliases(
+        "get_docs_context returned insufficient_evidence unexpectedly; how do I troubleshoot it?"
+    )
+    assert "troubleshooting" in {alias.intent_id for alias in incident_aliases}
 
 
 def test_generic_project_alias_does_not_require_docatlas_product_wording():
@@ -387,74 +433,3 @@ project:
     assert result["kind"] == "docs_context"
     assert result["edit_ready"] is False
     assert result["sources"][0]["path_or_url"] == "README.md"
-
-
-@pytest.mark.parametrize(
-    ("question", "expected_facet"),
-    [
-        ("When should an agent use get_docs_context?", "docs_mcp_tool_policy"),
-        ("When is an agent allowed to call prepare_docs?", "docs_mcp_tool_policy"),
-        ("What kinds of requests should use docs_status, and when must it not be used?", "docs_mcp_tool_policy"),
-        ("What does fail-closed behavior mean in the DocAtlas documentation workflow?", "fail_closed_workflow"),
-        ("What is the difference between docs_answer, docs_context, patch_context, and insufficient_evidence?", "response_contract"),
-        ("Which repository files are the source of truth, and which DocAtlas storage artifacts are only derived indexes?", "source_authority"),
-        ("What systems does DocAtlas explicitly not replace?", "product_boundaries"),
-        ("How does DocAtlas determine whether a dependency version is exact, declared-only, or unbound?", "dependency_version_binding"),
-        ("What are the responsibilities of docmancer/docs/application and docmancer/docs/domain in this repository?", "module_responsibilities"),
-        ("What claims about DocAtlas are not currently demonstrated according to the product brief?", "product_claims"),
-    ],
-)
-def test_direct_questions_get_relation_specific_retrieval_facets(question: str, expected_facet: str):
-    facets = {alias.intent_id for alias in build_project_retrieval_aliases(question)}
-    assert expected_facet in facets
-
-
-@pytest.mark.parametrize(
-    ("question", "forbidden_facet"),
-    [
-        ("get_docs_context returned an error; how should I troubleshoot it?", "fail_closed_workflow"),
-        ("What claims are accepted by the HTTP API contract?", "product_claims"),
-        ("Which database file stores the local cache?", "source_authority"),
-        ("Which version of Python should I install?", "dependency_version_binding"),
-        ("Which modules import pathlib?", "module_responsibilities"),
-    ],
-)
-def test_direct_relation_facets_do_not_capture_neighboring_questions(question: str, forbidden_facet: str):
-    facets = {alias.intent_id for alias in build_project_retrieval_aliases(question)}
-    assert forbidden_facet not in facets
-
-
-def test_direct_product_purpose_alias_stays_product_overview_only():
-    aliases = build_project_retrieval_aliases(
-        "What is DocAtlas, and what core problem is it designed to solve for coding agents?"
-    )
-    assert {alias.intent_id for alias in aliases} == {"product_overview"}
-
-
-def test_docs_mcp_sequence_alias_is_workflow_not_product_overview():
-    aliases = build_project_retrieval_aliases(
-        "What is the recommended sequence of MCP tool calls for answering a normal project documentation question?"
-    )
-    facets = {alias.intent_id for alias in aliases}
-    assert "docs_mcp_workflow" in facets
-    assert "product_overview" not in facets
-
-
-@pytest.mark.parametrize(
-    "question",
-    [
-        "What does fail-closed behavior mean in the DocAtlas documentation workflow?",
-        "What is the difference between docs_answer, docs_context, patch_context, and insufficient_evidence?",
-    ],
-)
-def test_concept_questions_do_not_receive_troubleshooting_alias(question: str):
-    assert "troubleshooting" not in {
-        alias.intent_id for alias in build_project_retrieval_aliases(question)
-    }
-
-
-def test_real_insufficient_evidence_incident_keeps_troubleshooting_alias():
-    aliases = build_project_retrieval_aliases(
-        "get_docs_context returned insufficient_evidence unexpectedly; how do I troubleshoot it?"
-    )
-    assert "troubleshooting" in {alias.intent_id for alias in aliases}
