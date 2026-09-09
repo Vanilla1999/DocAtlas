@@ -1,0 +1,158 @@
+{
+  "schema_version": "direct-docatlas-questions-1",
+  "baseline_commit": "e179471527e009c88f77acbdaeeeeb8ad1c8d316",
+  "request_contract": {
+    "scope": "all",
+    "lookup_queries": "absent",
+    "maximum_sources": 3,
+    "maximum_estimated_tokens": 800
+  },
+  "sources": {
+    "README.md": {
+      "git_blob_sha": "1a1975b2ffaf587f3b752c1966acdb20e7a88468"
+    },
+    "docs/PROJECT_MAP.md": {
+      "git_blob_sha": "78704768e38cde4e7088bfb7f7411a909a29eb06"
+    },
+    "docs/mcp-docs-server.md": {
+      "git_blob_sha": "4d524e3adbf2db6a1c05eb91c3b579cfd3ae9af9"
+    },
+    "docs/DOCMANCER_PRODUCT_BRIEF.md": {
+      "git_blob_sha": "5911f4f630939f42e1cda226de2eeca781fefdc9"
+    }
+  },
+  "cases": [
+    {
+      "id": "Q01",
+      "question": "What is DocAtlas, and what core problem is it designed to solve for coding agents?",
+      "fact_groups": [
+        {"id": "product", "witnesses": [{"path": "docs/PROJECT_MAP.md", "text": "DocAtlas is a local-first documentation and context runtime for coding agents."}]},
+        {"id": "problem", "witnesses": [{"path": "README.md", "text": "DocAtlas solves the problem of coding agents guessing from stale or generic documentation."}]}
+      ]
+    },
+    {
+      "id": "Q02",
+      "question": "What are the three public tools exposed by the DocAtlas Docs MCP server?",
+      "fact_groups": [
+        {"id": "tool_inventory", "witnesses": [{"path": "docs/mcp-docs-server.md", "text": "The three Docs MCP public tools are `get_docs_context`, `prepare_docs`, and `docs_status`."}]}
+      ]
+    },
+    {
+      "id": "Q03",
+      "question": "What is the recommended sequence of MCP tool calls for answering a normal project documentation question?",
+      "fact_groups": [
+        {"id": "context_first", "witnesses": [{"path": "docs/mcp-docs-server.md", "text": "`get_docs_context`, execute only an explicitly returned `prepare_docs`"}]},
+        {"id": "prepare_only_when_needed", "witnesses": [{"path": "README.md", "text": "follow a returned prepare_docs action when needed → answer with sources"}]},
+        {"id": "confirmation", "witnesses": [{"path": "docs/mcp-docs-server.md", "text": "obtain confirmation and call that exact action"}]},
+        {"id": "job_status_only_if_job", "witnesses": [{"path": "docs/mcp-docs-server.md", "text": "if a job was returned, poll docs_status(job_id)"}]},
+        {"id": "retry_unchanged", "witnesses": [{"path": "docs/mcp-docs-server.md", "text": "then retry the unchanged question"}]}
+      ]
+    },
+    {
+      "id": "Q04",
+      "question": "When should an agent use get_docs_context?",
+      "fact_groups": [
+        {"id": "entry_point", "witnesses": [{"path": "docs/mcp-docs-server.md", "text": "`get_docs_context` | First documentation question about a repository, dependency, library, or a mix."}]}
+      ]
+    },
+    {
+      "id": "Q05",
+      "question": "When is an agent allowed to call prepare_docs?",
+      "fact_groups": [
+        {"id": "allowed_trigger", "witnesses": [{"path": "docs/mcp-docs-server.md", "text": "`prepare_docs` | The exact lifecycle action returned by `get_docs_context`, or an explicit user-approved sync/refresh request."}]},
+        {"id": "conditional_confirmation", "witnesses": [{"path": "README.md", "text": "Network actions require approval."}]}
+      ]
+    },
+    {
+      "id": "Q06",
+      "question": "What kinds of requests should use docs_status, and when must it not be used?",
+      "fact_groups": [
+        {"id": "status_uses", "witnesses": [{"path": "docs/mcp-docs-server.md", "text": "`docs_status` | A returned job id, index health, freshness, or status request."}]},
+        {"id": "not_discovery", "witnesses": [{"path": "docs/mcp-docs-server.md", "text": "The first discovery call."}]}
+      ]
+    },
+    {
+      "id": "Q07",
+      "question": "What does fail-closed behavior mean in the DocAtlas documentation workflow?",
+      "fact_groups": [
+        {"id": "no_unsupported_claim_or_edit", "witnesses": [{"path": "docs/DOCMANCER_PRODUCT_BRIEF.md", "text": "Return typed `insufficient_evidence` rather than authorizing unsupported claims or edits."}]},
+        {"id": "safe_context_remains", "witnesses": [{"path": "docs/mcp-docs-server.md", "text": "`docs_context` for safe retrieval-only project context when completeness or the requested relation remains uncertain"}]}
+      ]
+    },
+    {
+      "id": "Q08",
+      "question": "What is the difference between docs_answer, docs_context, patch_context, and insufficient_evidence?",
+      "fact_groups": [
+        {"id": "docs_answer", "witnesses": [{"path": "docs/mcp-docs-server.md", "text": "`docs_answer` for a narrow typed question whose mandatory relation-specific proof obligations are complete"}]},
+        {"id": "docs_context", "witnesses": [{"path": "docs/mcp-docs-server.md", "text": "`docs_context` for safe retrieval-only project context when completeness or the requested relation remains uncertain"}]},
+        {"id": "patch_context", "witnesses": [{"path": "docs/mcp-docs-server.md", "text": "`patch_context` for explicit change tasks"}]},
+        {"id": "insufficient_evidence", "witnesses": [{"path": "docs/mcp-docs-server.md", "text": "`insufficient_evidence` when no safe context is available"}]}
+      ]
+    },
+    {
+      "id": "Q09",
+      "question": "Which repository files are the source of truth, and which DocAtlas storage artifacts are only derived indexes?",
+      "fact_groups": [
+        {"id": "authority", "witnesses": [{"path": "docs/DOCMANCER_PRODUCT_BRIEF.md", "text": "Repository Markdown and project files remain the source of truth."}]},
+        {"id": "derived_indexes", "witnesses": [{"path": "docs/DOCMANCER_PRODUCT_BRIEF.md", "text": "SQLite/vector data are derived indexes."}]}
+      ]
+    },
+    {
+      "id": "Q10",
+      "question": "What systems does DocAtlas explicitly not replace?",
+      "fact_groups": [
+        {"id": "code_search_lsp", "witnesses": [{"path": "docs/DOCMANCER_PRODUCT_BRIEF.md", "text": "project source-code search or an LSP"}]},
+        {"id": "graphs", "witnesses": [{"path": "docs/DOCMANCER_PRODUCT_BRIEF.md", "text": "call graphs or a complete repository semantic graph"}]},
+        {"id": "tests_analysis_review", "witnesses": [{"path": "docs/DOCMANCER_PRODUCT_BRIEF.md", "text": "tests, static analysis, or patch correctness review"}]},
+        {"id": "agent_reasoning", "witnesses": [{"path": "docs/DOCMANCER_PRODUCT_BRIEF.md", "text": "a coding agent or its general reasoning loop"}]},
+        {"id": "web_catalog", "witnesses": [{"path": "docs/DOCMANCER_PRODUCT_BRIEF.md", "text": "general web search or a complete hosted documentation catalog"}]},
+        {"id": "memory", "witnesses": [{"path": "docs/DOCMANCER_PRODUCT_BRIEF.md", "text": "agent memory/session-history products"}]}
+      ]
+    },
+    {
+      "id": "Q11",
+      "question": "How does DocAtlas determine whether a dependency version is exact, declared-only, or unbound?",
+      "fact_groups": [
+        {"id": "exact", "witnesses": [{"path": "docs/DOCMANCER_PRODUCT_BRIEF.md", "text": "Resolve exact dependency versions only from repository evidence strong enough to prove the selected version"}, {"path": "README.md", "text": "Python versions become resolved evidence only from `uv.lock`, `poetry.lock`, `pdm.lock`, or `Pipfile.lock`"}]},
+        {"id": "declared_only", "witnesses": [{"path": "README.md", "text": "a `requirements.txt`/`pyproject.toml` pin remains declared intent"}, {"path": "docs/DOCMANCER_PRODUCT_BRIEF.md", "text": "weaker declarations remain explicitly unbound or declared-only"}]},
+        {"id": "unbound", "witnesses": [{"path": "README.md", "text": "path, Git, and direct-URL dependencies remain unbound and require an explicit documentation source"}]}
+      ]
+    },
+    {
+      "id": "Q12",
+      "question": "What are the responsibilities of docmancer/docs/application and docmancer/docs/domain in this repository?",
+      "fact_groups": [
+        {"id": "application", "witnesses": [{"path": "docs/PROJECT_MAP.md", "text": "`docmancer/docs/application/` | Project, library and unified context workflows"}]},
+        {"id": "domain", "witnesses": [{"path": "docs/PROJECT_MAP.md", "text": "`docmancer/docs/domain/` | Ranking, trust, source identity and policy rules"}]}
+      ]
+    },
+    {
+      "id": "Q13",
+      "question": "Where is the public Docs MCP server implemented in this repository?",
+      "fact_groups": [
+        {"id": "server_location", "witnesses": [{"path": "docs/PROJECT_MAP.md", "text": "| MCP Docs server | `docmancer/mcp/docs_server.py` | Public documentation tools, resources and transport boundary |"}]}
+      ]
+    },
+    {
+      "id": "Q14",
+      "question": "What does prepare_docs(action=\"sync_project_docs\") do to new, changed, stale, and deleted project documentation?",
+      "fact_groups": [
+        {"id": "discover_new", "witnesses": [{"path": "README.md", "text": "discovers current candidates from the filesystem;"}]},
+        {"id": "delete_orphans", "witnesses": [{"path": "README.md", "text": "prunes orphaned indexed sources (deleted files);"}]},
+        {"id": "remove_stale", "witnesses": [{"path": "README.md", "text": "removes stale indexed sections (changed files);"}]},
+        {"id": "index_new_changed", "witnesses": [{"path": "README.md", "text": "indexes new and changed candidates;"}]}
+      ]
+    },
+    {
+      "id": "Q15",
+      "question": "What claims about DocAtlas are not currently demonstrated according to the product brief?",
+      "fact_groups": [
+        {"id": "autonomous_planning", "witnesses": [{"path": "docs/DOCMANCER_PRODUCT_BRIEF.md", "text": "autonomous live evidence planning is **not demonstrated** by the current evidence"}]},
+        {"id": "planning_qualifier", "witnesses": [{"path": "docs/DOCMANCER_PRODUCT_BRIEF.md", "text": "the recorded model-backed Agent Developer result is 0/11"}]},
+        {"id": "coding_task", "witnesses": [{"path": "docs/DOCMANCER_PRODUCT_BRIEF.md", "text": "real coding-task improvement is **not demonstrated**"}]},
+        {"id": "coding_task_qualifier", "witnesses": [{"path": "docs/DOCMANCER_PRODUCT_BRIEF.md", "text": "the historical Task 23 product decision is formally `INCONCLUSIVE`"}]},
+        {"id": "context7_parity", "witnesses": [{"path": "docs/DOCMANCER_PRODUCT_BRIEF.md", "text": "Context7 parity is **not demonstrated**"}]}
+      ]
+    }
+  ]
+}
