@@ -97,6 +97,7 @@ def is_product_purpose_question(question: str) -> bool:
     )
     generic_product_subject = bool(
         re.search(r"\b(?:this|the)\s+(?:project|product|system)\b", normalized)
+        or re.search(r"\b(?:project|product|system)\s+(?:purpose|mission|goal)\b", normalized)
         or re.search(r"\b(?:проект|продукт|систем[ау])\b", normalized)
     )
     return (
@@ -150,9 +151,9 @@ def classify_project_query_intent(question: str) -> ProjectQueryIntent:
     named_product_purpose = product_purpose and bool(_PRODUCT_NAME_RE.search(question or ""))
     concept_definition = is_concept_definition_or_contrast(question)
     explicit_architecture = has_any([
-        "architecture", "architectural", "project structure", "structured", "structure", "layout", "components", "design", "overview", "workflow", "convention", "conventions", "runbook", "runbooks", "adr",
+        "architecture", "architectural", "project structure", "structured", "structure", "layout", "components", "overview", "workflow", "convention", "conventions", "runbook", "runbooks", "adr",
         "архитектура", "архитектур", "структура проекта", "структура", "компоненты", "обзор", "конвенции", "соглашения",
-    ])
+    ]) or _contains_word(q, ["design"])
     wants_architecture = explicit_architecture
     wants_architecture = wants_architecture or (
         not named_product_purpose
