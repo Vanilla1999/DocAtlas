@@ -150,9 +150,12 @@ def _assert_direct_15_sidecar() -> None:
                 }
                 if not all(checks.values()):
                     failures[case["id"]] = {
-                        "checks": checks,
-                        "fact_checks": fact_checks,
-                        "sources": sources,
+                        "failed_checks": [name for name, passed in checks.items() if not passed],
+                        "missing_fact_groups": [name for name, passed in fact_checks.items() if not passed],
+                        "source_paths": [
+                            str(source.get("path_or_url") or "")
+                            for source in sources if isinstance(source, dict)
+                        ],
                         "covered_query_ids": payload.get("covered_query_ids"),
                         "missing_query_ids": payload.get("missing_query_ids"),
                         "query_intent": (payload.get("diagnostics") or {}).get("query_intent"),
