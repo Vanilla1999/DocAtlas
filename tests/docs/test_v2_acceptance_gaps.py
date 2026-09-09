@@ -132,7 +132,8 @@ def _assert_direct_15_sidecar() -> None:
                     )
                     for index, alternatives in enumerate(required_fact_groups, 1)
                 }
-                observer_counts = ((payload.get("diagnostics") or {}).get("observer_counts") or {})
+                diagnostics = payload.get("diagnostics") if isinstance(payload.get("diagnostics"), dict) else {}
+                observer_counts = diagnostics.get("observer_counts") or {}
                 checks = {
                     "status_ok": payload.get("status") == "ok",
                     "kind_matches": payload.get("kind") == "docs_context",
@@ -150,15 +151,22 @@ def _assert_direct_15_sidecar() -> None:
                 }
                 if not all(checks.values()):
                     failures[case["id"]] = {
+                        "status": payload.get("status"),
+                        "kind": payload.get("kind"),
+                        "reason_code": payload.get("reason_code"),
                         "failed_checks": [name for name, passed in checks.items() if not passed],
                         "missing_fact_groups": [name for name, passed in fact_checks.items() if not passed],
-                        "source_paths": [
-                            str(source.get("path_or_url") or "")
+                        "sources": [
+                            {
+                                "path": str(source.get("path_or_url") or ""),
+                                "snippet": str(source.get("snippet") or "")[:1400],
+                            }
                             for source in sources if isinstance(source, dict)
                         ],
                         "covered_query_ids": payload.get("covered_query_ids"),
                         "missing_query_ids": payload.get("missing_query_ids"),
-                        "query_intent": (payload.get("diagnostics") or {}).get("query_intent"),
+                        "diagnostic_keys": sorted(str(key) for key in diagnostics),
+                        "diagnostics_preview": json.dumps(diagnostics, sort_keys=True, default=str)[:4000],
                     }
     finally:
         if previous_home is None:
