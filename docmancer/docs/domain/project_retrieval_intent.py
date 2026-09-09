@@ -11,6 +11,12 @@ from dataclasses import dataclass
 import re
 from typing import Literal
 
+from docmancer.docs.domain.project_query_intent import (
+    is_concept_definition_or_contrast,
+    is_product_purpose_question,
+    mentions_docs_mcp_surface,
+)
+
 
 _MAX_ALIASES = 4
 _TOKEN_RE = re.compile(r"[A-Za-zА-Яа-яЁё0-9_.:/+-]+")
@@ -161,6 +167,8 @@ def build_project_retrieval_aliases(
     mentions_packs = _has(tokens, "packs", "pack", "пакет")
     mentions_command = _has(tokens, "команд", "command", "cli")
     mentions_start = _has(tokens, "запуст", "запуск", "старт", "start", "serve", "run")
+    mentions_docs_mcp = mentions_docs_mcp_surface(source)
+    concept_definition = is_concept_definition_or_contrast(source)
     specific_contract_request = _specific_contract_request(tokens)
     if specific_contract_request:
         return ()
@@ -206,12 +214,7 @@ def build_project_retrieval_aliases(
         _has(tokens, "контриб", "вклад", "contribut", "разработчик", "developer", "карт", "map", "модул", "module", "код", "codebase", "репозитор", "repository")
         and _has(tokens, "читать", "read", "нач", "start")
     )
-    product_purpose = (mentions_product or mentions_project) and (
-        _has_phrase(normalized, "что такое", "что это за", "для чего", "зачем")
-        or re.search(r"\bwhat\s+is\b|\bwhat\s+problems?\b.+\bsolves?\b", normalized)
-        or _has(tokens, "назначен", "purpose", "overview")
-        or (_has(tokens, "проблем") and _has(tokens, "решает", "решающ"))
-    )
+    product_purpose = is_product_purpose_question(source)
     # A host may omit the product name while asking for the product-definition
     # facet. Keep this recognition narrow and descriptive; original lineage is
     # still separately gated by same-intent equivalence and parent exact terms.
@@ -278,9 +281,11 @@ def build_project_retrieval_aliases(
             True,
             f"{product_prefix}new contributor repository reading order contributing project map",
         )
-    if mentions_mcp and (mentions_docs or not mentions_packs) and _has(
-        tokens, "работ", "устро", "процесс", "поток", "workflow", "fit",
-    ):
+    docs_mcp_workflow_question = mentions_docs_mcp and not mentions_packs and (
+        _has(tokens, "работ", "устро", "процесс", "поток", "workflow", "fit", "sequence", "answer")
+        or _has_phrase(normalized, "tool calls", "tool call", "call sequence")
+    )
+    if docs_mcp_workflow_question:
         emit(
             "docs_mcp_workflow",
             True,
@@ -324,18 +329,22 @@ def build_project_retrieval_aliases(
             True,
             f"{product_prefix}inspect safely clear local index preview cleanup plan",
         )
-    if (not product_purpose and _has(tokens, "проблем", "problem")) or _has(
-        tokens,
-        "ошиб", "диагност", "troubleshoot", "fail", "stale",
-        "insufficient_evidence",
-    ) or _has_phrase(
-        normalized,
-        "не работает",
-        "не находится",
-        "ничего не находит",
-        "nothing found",
-        "что проверить",
-        "what should i check",
+    if not concept_definition and (
+        (not product_purpose and _has(tokens, "проблем", "problem"))
+        or _has(
+            tokens,
+            "ошиб", "диагност", "troubleshoot", "fail", "stale",
+            "insufficient_evidence",
+        )
+        or _has_phrase(
+            normalized,
+            "не работает",
+            "не находится",
+            "ничего не находит",
+            "nothing found",
+            "что проверить",
+            "what should i check",
+        )
     ):
         emit(
             "troubleshooting",
