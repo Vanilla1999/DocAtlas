@@ -70,8 +70,16 @@ def is_product_purpose_question(question: str) -> bool:
     raw, normalized = _normalized_question(question)
     mentions_product = bool(_PRODUCT_NAME_RE.search(raw))
     explicit_named_definition = bool(
-        re.search(r"\bwhat\s+is\s+(?:the\s+)?(?:docatlas|docmancer)\b", normalized)
-        or re.search(r"\b(?:что\s+такое|что\s+это\s+за)\s+(?:docatlas|docmancer)\b", normalized)
+        re.search(
+            r"\bwhat\s+is\s+(?:the\s+)?(?:docatlas|docmancer)\b"
+            r"(?=\s*(?:[?,;]|$|\band\b))",
+            normalized,
+        )
+        or re.search(
+            r"\b(?:что\s+такое|что\s+это\s+за)\s+(?:docatlas|docmancer)\b"
+            r"(?=\s*(?:[?,;]|$|\bи\b))",
+            normalized,
+        )
     )
     generic_definition = bool(
         re.search(
@@ -141,12 +149,14 @@ def classify_project_query_intent(question: str) -> ProjectQueryIntent:
     product_purpose = is_product_purpose_question(question)
     named_product_purpose = product_purpose and bool(_PRODUCT_NAME_RE.search(question or ""))
     concept_definition = is_concept_definition_or_contrast(question)
-    wants_architecture = has_any([
+    explicit_architecture = has_any([
         "architecture", "architectural", "project structure", "structured", "structure", "layout", "components", "design", "overview", "workflow", "convention", "conventions", "runbook", "runbooks", "adr",
         "архитектура", "архитектур", "структура проекта", "структура", "компоненты", "обзор", "конвенции", "соглашения",
     ])
+    wants_architecture = explicit_architecture
     wants_architecture = wants_architecture or (
-        has_any(["project", "repository", "docatlas", "docmancer", "проект", "систем"])
+        not named_product_purpose
+        and has_any(["project", "repository", "docatlas", "docmancer", "проект", "систем"])
         and (
             re.search(r"\bwhat\s+problems?\b.+\bsolves?\b", q) is not None
             or (has_any(["проблем"]) and has_any(["решает"]))
@@ -178,7 +188,7 @@ def classify_project_query_intent(question: str) -> ProjectQueryIntent:
     wants_packs_mcp = wants_packs_mcp or ("mcp" in q and _contains_word(q, ["packs"]))
     mentions_mcp = "mcp" in q
 
-    if named_product_purpose:
+    if named_product_purpose and not explicit_architecture:
         return ProjectQueryIntent(name="product_overview", broad=True)
     if explicit_release:
         return ProjectQueryIntent(name="release_history", wants_release_history=True, wants_code_symbols=wants_code_symbols)
