@@ -46,12 +46,21 @@ def test_current_docs_mcp_tool_policy_targets_default_use_without_inventing_poli
         policy = [row for row in aliases if row.intent_id == "docs_mcp_tool_policy"]
         assert policy
         assert any(tool in row.text and "default use" in row.text.casefold() for row in policy)
+        assert "overview" in policy[0].preferred_catalog_roles
 
     prepare = [
         row for row in _aliases("When is an agent allowed to call prepare_docs?")
         if row.intent_id == "docs_mcp_tool_policy"
     ]
-    assert any("confirmation approval" in row.text.casefold() for row in prepare)
+    assert any("allowed lifecycle action" in row.text.casefold() for row in prepare)
+    assert any("network approval confirmation" in row.text.casefold() for row in prepare)
+    assert not any("must not" in row.text.casefold() for row in prepare)
+
+    status_policy = [
+        row for row in _aliases("What requests should use docs_status, and when must it not be used?")
+        if row.intent_id == "docs_mcp_tool_policy"
+    ]
+    assert any("must not" in row.text.casefold() for row in status_policy)
 
     assert not any(
         row.intent_id == "docs_mcp_tool_policy"
@@ -76,7 +85,8 @@ def test_implementation_location_is_a_relation_not_any_code_symbol_or_config_loc
     locations = [row for row in aliases if row.intent_id == "implementation_location"]
 
     assert locations
-    assert any("docs mcp server path" in row.text.casefold() for row in locations)
+    assert len(locations) == 1
+    assert "mcp docs server area responsibility" in locations[0].text.casefold()
     assert all("docmancer/mcp/docs_server.py" not in row.text for row in locations)
     assert "project_architecture" in locations[0].preferred_catalog_roles
     assert not any(
@@ -95,7 +105,11 @@ def test_product_boundaries_use_relation_not_the_known_inventory():
     ]
 
     assert boundaries
-    assert any("does not replace" in row.text.casefold() for row in boundaries)
+    assert any(
+        "product boundaries" in row.text.casefold()
+        and "does not replace" in row.text.casefold()
+        for row in boundaries
+    )
     forbidden_answers = ("memory", "lsp", "static analysis", "web search")
     assert all(
         answer not in row.text.casefold()
@@ -108,7 +122,8 @@ def test_fail_closed_definition_targets_context_contract_not_incident_diagnostic
     aliases = _aliases("What does fail-closed behavior mean in the DocAtlas documentation workflow?")
 
     assert any(row.intent_id == "fail_closed_workflow" for row in aliases)
-    assert any("retrieval-only safe context" in row.text.casefold() for row in aliases)
+    assert any("insufficient_evidence" in row.text.casefold() for row in aliases)
+    assert any("safe retrieval-only context" in row.text.casefold() for row in aliases)
     assert not any(row.intent_id == "troubleshooting" for row in aliases)
 
 
@@ -134,10 +149,14 @@ def test_sync_alias_preserves_only_states_explicitly_asked_by_the_user():
     sync = [row for row in aliases if row.intent_id == "project_docs_sync"]
 
     assert sync
-    assert any(
-        all(state in row.text.casefold() for state in ("new", "changed", "stale", "deleted"))
-        for row in sync
+    assert all("overview" in row.preferred_catalog_roles for row in sync)
+    assert not any(row.intent_id == "troubleshooting" for row in aliases)
+    state_probe = next(
+        row for row in sync
+        if all(state in row.text.casefold() for state in ("new", "changed", "stale", "deleted"))
     )
+    assert "sync_project_docs" not in state_probe.text
+    assert "project docs" in state_probe.text.casefold()
 
     generic = next(
         row for row in _aliases("How do I sync project documentation?")
