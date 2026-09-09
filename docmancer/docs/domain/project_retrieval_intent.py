@@ -34,6 +34,11 @@ _SPECIFIC_RELATION_TOKEN_RE = re.compile(
 _CODE_IDENTITY_RE = re.compile(
     r"^(?=.{2,160}$)(?=.*[a-z])(?=(?:.*[A-Z]){2})[A-Z][A-Za-z0-9]*$",
 )
+_PUBLIC_DOCS_MCP_TOOL_NAMES = (
+    "get_docs_context",
+    "prepare_docs",
+    "docs_status",
+)
 _RETRIEVAL_ONLY_UNRESOLVED_PREFIXES = (
     "unresolved_inventory_category:",
     "unresolved_query_subject",
@@ -48,6 +53,14 @@ _INTENT_ROLE_POLICY: dict[str, tuple[tuple[str, ...], tuple[str, ...]]] = {
     "troubleshooting": (("runbook", "development"), ("adr", "roadmap")),
     "context_budget": (("api_contract", "module_architecture"), ("adr", "roadmap")),
     "docs_mcp_public_tools": (("api_contract", "runbook"), ("adr", "roadmap")),
+    "docs_mcp_tool_policy": (("api_contract", "runbook", "development"), ("adr", "roadmap")),
+    "fail_closed_workflow": (("api_contract", "overview", "project_architecture"), ("roadmap",)),
+    "response_contract": (("api_contract", "overview"), ("roadmap",)),
+    "source_authority": (("overview", "project_architecture"), ("roadmap",)),
+    "product_boundaries": (("overview",), ("roadmap",)),
+    "dependency_version_binding": (("overview", "api_contract"), ("roadmap",)),
+    "module_responsibilities": (("project_architecture", "module_architecture"), ("roadmap",)),
+    "product_claims": (("overview",), ("roadmap",)),
     "packs_mcp_workflow": (("api_contract", "runbook"), ("adr", "roadmap")),
     "product_overview": (("overview", "project_architecture"), ("adr", "roadmap")),
     "getting_started": (("overview", "development", "runbook"), ("adr", "roadmap")),
@@ -156,7 +169,10 @@ def build_project_retrieval_aliases(
                 forbidden_evidence_terms=(
                     "docs/adr/", "mcp pack commands", "packs mcp runtime",
                     "install-pack", "packs-serve",
-                ) if intent_id in {"docs_mcp_workflow", "docs_mcp_server_command", "docs_mcp_public_tools"} else (),
+                ) if intent_id in {
+                    "docs_mcp_workflow", "docs_mcp_server_command", "docs_mcp_public_tools",
+                    "docs_mcp_tool_policy", "fail_closed_workflow", "response_contract",
+                } else (),
             ))
 
     mentions_docs = _has(tokens, "документ", "док", "docs", "documentation")
@@ -169,6 +185,9 @@ def build_project_retrieval_aliases(
     mentions_start = _has(tokens, "запуст", "запуск", "старт", "start", "serve", "run")
     mentions_docs_mcp = mentions_docs_mcp_surface(source)
     concept_definition = is_concept_definition_or_contrast(source)
+    public_tool_names = tuple(
+        name for name in _PUBLIC_DOCS_MCP_TOOL_NAMES if name in source.casefold()
+    )
     specific_contract_request = _specific_contract_request(tokens)
     if specific_contract_request:
         return ()
@@ -281,6 +300,83 @@ def build_project_retrieval_aliases(
             True,
             f"{product_prefix}new contributor repository reading order contributing project map",
         )
+
+    if public_tool_names and _has(
+        tokens, "when", "use", "allowed", "call", "request", "should", "must",
+    ):
+        for tool_name in public_tool_names:
+            emit(
+                "docs_mcp_tool_policy",
+                True,
+                f"{tool_name} Docs MCP usage policy conditions lifecycle boundary",
+            )
+    if _has_phrase(normalized, "fail-closed", "fail closed") and (
+        concept_definition or _has(tokens, "behavior", "behaviour", "workflow", "principle")
+    ):
+        emit(
+            "fail_closed_workflow",
+            True,
+            f"{product_prefix}fail-closed documentation workflow evidence safety",
+        )
+    response_names = tuple(
+        name for name in ("docs_answer", "docs_context", "patch_context", "insufficient_evidence")
+        if name in source.casefold()
+    )
+    if len(response_names) >= 2:
+        emit(
+            "response_contract",
+            True,
+            "Docs MCP response contract docs_answer docs_context patch_context insufficient_evidence",
+        )
+    if (
+        _has_phrase(normalized, "source of truth", "source-of-truth")
+        or (_has(tokens, "derived") and _has(tokens, "index"))
+    ) and (mentions_product or mentions_project or mentions_docs):
+        emit(
+            "source_authority",
+            True,
+            f"{product_prefix}source authority source of truth derived index storage contract",
+        )
+    if mentions_product and _has(tokens, "replace") and _has(tokens, "system"):
+        emit(
+            "product_boundaries",
+            True,
+            f"{product_prefix}product boundaries complementary systems not replace",
+        )
+    if (
+        mentions_product
+        and _has(tokens, "dependency", "package")
+        and _has(tokens, "version")
+        and sum(bool(_has(tokens, stem)) for stem in ("exact", "declared", "unbound")) >= 2
+    ):
+        emit(
+            "dependency_version_binding",
+            True,
+            f"{product_prefix}dependency version binding exact declared-only unbound repository evidence",
+            f"{product_prefix}dependency selected version lockfile declaration unbound source",
+        )
+    if (
+        _has(tokens, "responsibilit")
+        and "docmancer/docs/application" in source.casefold()
+        and "docmancer/docs/domain" in source.casefold()
+    ):
+        emit(
+            "module_responsibilities",
+            True,
+            f"{product_prefix}application domain module responsibilities architecture boundaries",
+        )
+    if (
+        mentions_product
+        and _has(tokens, "claim")
+        and (_has_phrase(normalized, "product brief") or _has(tokens, "demonstrat", "evidence"))
+    ):
+        emit(
+            "product_claims",
+            True,
+            f"{product_prefix}product brief claims evidence status not demonstrated",
+            f"{product_prefix}product claims validation evidence status",
+        )
+
     docs_mcp_workflow_question = mentions_docs_mcp and not mentions_packs and (
         _has(tokens, "работ", "устро", "процесс", "поток", "workflow", "fit", "sequence", "answer")
         or _has_phrase(normalized, "tool calls", "tool call", "call sequence")
