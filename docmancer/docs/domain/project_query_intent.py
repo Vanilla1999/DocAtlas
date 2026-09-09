@@ -139,6 +139,7 @@ def classify_project_query_intent(question: str) -> ProjectQueryIntent:
         return any(term in q for term in terms)
 
     product_purpose = is_product_purpose_question(question)
+    named_product_purpose = product_purpose and bool(_PRODUCT_NAME_RE.search(question or ""))
     concept_definition = is_concept_definition_or_contrast(question)
     wants_architecture = has_any([
         "architecture", "architectural", "project structure", "structured", "structure", "layout", "components", "design", "overview", "workflow", "convention", "conventions", "runbook", "runbooks", "adr",
@@ -177,7 +178,7 @@ def classify_project_query_intent(question: str) -> ProjectQueryIntent:
     wants_packs_mcp = wants_packs_mcp or ("mcp" in q and _contains_word(q, ["packs"]))
     mentions_mcp = "mcp" in q
 
-    if product_purpose:
+    if named_product_purpose:
         return ProjectQueryIntent(name="product_overview", broad=True)
     if explicit_release:
         return ProjectQueryIntent(name="release_history", wants_release_history=True, wants_code_symbols=wants_code_symbols)
