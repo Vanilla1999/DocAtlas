@@ -1,0 +1,81 @@
+"""Source-local list relations survive chunk packing and explicit index refresh."""
+from __future__ import annotations
+
+import pytest
+
+from docmancer.core import structured_chunking as chunking
+from docmancer.docs.domain.project_state import partition_project_doc_state
+
+
+@pytest.mark.parametrize('identity', [
+    'guide.md',
+    'project_file:git:example/Aurora:docs/product.md',
+    'project_file:git:example/deeply/nested/Aurora:docs/product.md',
+])
+def test_list_introduction_and_items_form_one_contiguous_atom(identity):
+    intro = 'Aurora does **not** replace:\n\n'
+    items = '- a scheduler;\n- an archive;\n- an audit service;\n- an operator;\n- a catalog;\n- a message broker.\n\n'
+    source = '# Boundaries\n\n' + 'Background ownership responsibility. ' * 10 + '\n\n' + intro + items + 'Independent ending.\n'
+    atoms = chunking._atom_spans(source, 0, len(source))
+    assert any(source[a.start:a.end] == intro + items for a in atoms)
+    _, children = chunking.chunk_markdown_parent_child(source, identity, chunking.ChunkingConfig(target_tokens=80, hard_max_tokens=200))
+    assert any(intro + items in c.display_text for c in children)
+    assert ''.join(c.display_text for c in children) == source
+    assert all(chunking.estimate_utf8_tokens(c.retrieval_text) <= 200 for c in children)
+    assert all(source.encode()[c.byte_start:c.byte_end].decode() == c.display_text for c in children)
+
+
+@pytest.mark.parametrize('prefix', ['Unrelated ending.\n\n', '# Heading:\n\n', '```text\nExample:\n```\n\n', '- Previous list:\n\n'])
+def test_only_adjacent_prose_introduction_can_bind_a_list(prefix):
+    source = prefix + '- first item\n- second item\n'
+    atoms = chunking._atom_spans(source, 0, len(source))
+    assert not any(a.start == 0 and a.end == len(source) for a in atoms)
+
+
+def test_oversized_introduced_list_still_respects_hard_limit_and_source_spans():
+    source = '# Rules\n\nAurora requires:\n\n' + ''.join(f'- правило {i}: сохранение исходного текста.\n' for i in range(80))
+    _, children = chunking.chunk_markdown_parent_child(source, 'rules.md', chunking.ChunkingConfig(target_tokens=32, hard_max_tokens=80))
+    assert ''.join(c.display_text for c in children) == source
+    assert all(chunking.estimate_utf8_tokens(c.retrieval_text) <= 80 for c in children)
+    assert all(left.char_end == right.char_start for left, right in zip(children, children[1:]))
+
+
+def test_atomization_revision_changes_configuration_fingerprint(monkeypatch):
+    current = chunking.ChunkingConfig().config_hash
+    monkeypatch.setattr(chunking, '_ATOMIZATION_REVISION', 'previous-parser', raising=False)
+    assert chunking.ChunkingConfig().config_hash != current
+
+
+def test_parser_configuration_drift_is_stale_not_a_source_edit():
+    candidate = {'path': 'README.md', 'content_hash': 'same', 'catalog_entry_hash': 'same', 'mtime_ns': 1}
+    current, stale, ignored = partition_project_doc_state([candidate], [{**candidate, 'chunking_current': False}])
+    assert not current and not ignored
+    assert stale[0]['stale_reasons'] == ['chunking_configuration_changed']
+    assert stale[0]['current_content_hash'] == 'same'
+
+
+def test_old_generation_requires_explicit_sync_without_touching_project_files(tmp_path, monkeypatch):
+    from tests.docs.test_question_frame_paraphrase_e2e import _service
+    from docmancer.mcp.docs_server import call_docs_tool_payload
+
+    project = tmp_path / 'project'
+    project.mkdir()
+    path = project / 'README.md'
+    path.write_text('# Aurora\n\nAurora does not replace:\n\n- a scheduler;\n- an archive.\n')
+    before = path.read_bytes()
+    service = _service(tmp_path, monkeypatch)
+    with monkeypatch.context() as previous:
+        previous.setattr(chunking, '_ATOMIZATION_REVISION', 'previous-parser', raising=False)
+        assert service.sync_project_docs(str(project), with_vectors=False).status == 'success'
+        old_generation = service._agent_instance().store.active_generation_id()
+    payload = call_docs_tool_payload('get_docs_context', {'question': 'What does Aurora not replace?', 'project_path': str(project), 'scope': 'all'}, service)
+    assert service._agent_instance().store.active_generation_id() == old_generation
+    assert path.read_bytes() == before
+    action = payload.get('recommended_next_action') or {}
+    assert payload['status'] == 'insufficient_evidence'
+    assert action.get('tool') == 'prepare_docs'
+    assert action.get('arguments_patch', {}).get('action') == 'sync_project_docs'
+    assert action.get('auto_execute') is False
+    assert service.sync_project_docs(str(project), with_vectors=False).status == 'success'
+    assert service._agent_instance().store.active_generation_id() != old_generation
+    assert path.read_bytes() == before
