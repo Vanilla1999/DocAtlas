@@ -21,26 +21,22 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.13'
-      - name: Validate exact reviewed payload and permitted paths
+      - name: Validate reviewed payload and permitted paths
         run: |
           git merge-base --is-ancestor af214219499673e4a6a878292f123ed7f06c2d0e HEAD
           python - <<'PY'
           import base64, hashlib, lzma, pathlib, subprocess
-          root=pathlib.Path('.github/review/evidence-v2')
-          files=sorted(root.glob('part*.b64'))
+          files=sorted(pathlib.Path('.github/review/evidence-v2').glob('part*.b64'))
           assert [f.name for f in files] == [f'part{i:02}.b64' for i in range(1,9)]
           compressed=base64.b64decode(''.join(f.read_text().strip() for f in files),validate=True)
           assert hashlib.sha256(compressed).hexdigest() == 'c34a8771b195ebb08d8bc89609f179e4d37cd4c9b063ebeb09b97ef3988a5bdb'
-          patch=lzma.decompress(compressed)
-          target=pathlib.Path('/tmp/evidence-reviewed.patch'); target.write_bytes(patch)
-          names=subprocess.check_output(['git','apply','--numstat',str(target)],text=True)
-          for line in names.splitlines():
+          target=pathlib.Path('/tmp/evidence-reviewed.patch'); target.write_bytes(lzma.decompress(compressed))
+          for line in subprocess.check_output(['git','apply','--numstat',str(target)],text=True).splitlines():
               name=line.split('\t')[-1]
               assert '..' not in pathlib.PurePosixPath(name).parts
               assert name.startswith(('eval/evidence_quality_v2/','tests/evidence_quality_v2/')) or name == 'tests/diagnostic_labels.evidence_quality_v2.json', name
           subprocess.run(['git','apply','--check',str(target)],check=True)
           subprocess.run(['git','apply',str(target)],check=True)
-          print('Reviewed evaluation-only payload: verified')
           PY
       - uses: actions/download-artifact@v4
         with:
@@ -58,7 +54,7 @@ jobs:
         run: python -m pip install '.[dev]' tiktoken==0.11.0 > "$RUNNER_TEMP/install.log" 2>&1
       - name: Reconstruct and verify frozen source/case hashes
         run: python -m eval.evidence_quality_v2.build_frozen_corpus --input-root "$RUNNER_TEMP/public-inputs"
-      - name: Test measurement plus frozen experiment contracts
+      - name: Test measurement and preserve upstream source bytes
         env:
           TIKTOKEN_CACHE_DIR: ${{ runner.temp }}/tokenizer
         run: |
