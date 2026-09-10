@@ -1,0 +1,89 @@
+name: Evidence v2 reviewed checkpoint
+on:
+  push:
+    branches: [fix/evidence-quality-v2-20260910]
+    paths: ['.github/workflows/evidence-v2-publish-checkpoint.yml']
+permissions:
+  contents: write
+  actions: read
+jobs:
+  validate-publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      DOCATLAS_OFFLINE: '1'
+      DOCATLAS_AUTO_VECTORS: '0'
+      TIKTOKEN_CACHE_DIR: ${{ runner.temp }}/tokenizer
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ github.sha }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - name: Validate exact reviewed payload and permitted paths
+        run: |
+          git merge-base --is-ancestor af214219499673e4a6a878292f123ed7f06c2d0e HEAD
+          python - <<'PY'
+          import base64, hashlib, lzma, pathlib, subprocess
+          root=pathlib.Path('.github/review/evidence-v2')
+          files=sorted(root.glob('part*.b64'))
+          assert [f.name for f in files] == [f'part{i:02}.b64' for i in range(1,9)]
+          compressed=base64.b64decode(''.join(f.read_text().strip() for f in files),validate=True)
+          assert hashlib.sha256(compressed).hexdigest() == 'c34a8771b195ebb08d8bc89609f179e4d37cd4c9b063ebeb09b97ef3988a5bdb'
+          patch=lzma.decompress(compressed)
+          target=pathlib.Path('/tmp/evidence-reviewed.patch'); target.write_bytes(patch)
+          names=subprocess.check_output(['git','apply','--numstat',str(target)],text=True)
+          for line in names.splitlines():
+              name=line.split('\t')[-1]
+              assert '..' not in pathlib.PurePosixPath(name).parts
+              assert name.startswith(('eval/evidence_quality_v2/','tests/evidence_quality_v2/')) or name == 'tests/diagnostic_labels.evidence_quality_v2.json', name
+          subprocess.run(['git','apply','--check',str(target)],check=True)
+          subprocess.run(['git','apply',str(target)],check=True)
+          print('Reviewed evaluation-only payload: verified')
+          PY
+      - uses: actions/download-artifact@v4
+        with:
+          name: evidence-v2-public-inputs-d0066b669b5fa95564ed242d0fab982217eaa866
+          run-id: 34536457992
+          github-token: ${{ github.token }}
+          path: ${{ runner.temp }}/public-inputs
+      - uses: actions/download-artifact@v4
+        with:
+          name: evidence-v2-o200k
+          run-id: 34537907326
+          github-token: ${{ github.token }}
+          path: ${{ runner.temp }}/tokenizer
+      - name: Reconstruct and verify frozen source/case hashes
+        run: python -m eval.evidence_quality_v2.build_frozen_corpus --input-root "$RUNNER_TEMP/public-inputs"
+      - name: Install and test measurement plus frozen experiment contracts
+        run: |
+          python -m pip install '.[dev]' tiktoken==0.11.0 > "$RUNNER_TEMP/install.log" 2>&1
+          mkdir -p "$RUNNER_TEMP/test-home"
+          HOME="$RUNNER_TEMP/test-home" DOCATLAS_HOME="$RUNNER_TEMP/test-home/docatlas" python -m pytest -q tests/evidence_quality_v2 > "$RUNNER_TEMP/evidence-tests.log" 2>&1
+          cat "$RUNNER_TEMP/evidence-tests.log"
+          git diff --check
+      - name: Publish completed checkpoint only to the work branch
+        run: |
+          test "$(git ls-remote origin refs/heads/fix/evidence-quality-v2-20260910 | cut -f1)" = "${GITHUB_SHA}"
+          git config user.name 'Vanilla1999'
+          git config user.email '41183994+Vanilla1999@users.noreply.github.com'
+          git add eval/evidence_quality_v2 tests/evidence_quality_v2 tests/diagnostic_labels.evidence_quality_v2.json
+          git rm -r .github/review/evidence-v2
+          git diff --cached --check
+          git commit -m 'test(eval): publish measured P1-P4 evidence quality checkpoint'
+          git push origin HEAD:refs/heads/fix/evidence-quality-v2-20260910
+          git rev-parse HEAD > "$RUNNER_TEMP/published-head.txt"
+          git bundle create "$RUNNER_TEMP/evidence-checkpoint.bundle" HEAD --branches
+      - name: Preserve execution proof and exact Git history
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: evidence-v2-checkpoint-proof
+          path: |
+            ${{ runner.temp }}/install.log
+            ${{ runner.temp }}/evidence-tests.log
+            ${{ runner.temp }}/published-head.txt
+            ${{ runner.temp }}/evidence-checkpoint.bundle
+          retention-days: 7
