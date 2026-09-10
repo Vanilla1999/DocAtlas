@@ -15,7 +15,7 @@
       "git_blob_sha": "78704768e38cde4e7088bfb7f7411a909a29eb06"
     },
     "docs/mcp-docs-server.md": {
-      "git_blob_sha": "99687432270f220c90b88ab3993b23d7ce6d671e"
+      "git_blob_sha": "4d524e3adbf2db6a1c05eb91c3b579cfd3ae9af9"
     },
     "docs/DOCMANCER_PRODUCT_BRIEF.md": {
       "git_blob_sha": "3607b058429abe7a8fb1068d467475c67a5c9893"
@@ -28,6 +28,9 @@
     },
     "wiki/Troubleshooting.md": {
       "git_blob_sha": "3bdb3c854f27049eb4ee495f9c6da1f98a6e7cf8"
+    },
+    "docs/mcp-response-contract.md": {
+      "git_blob_sha": "320256a5ef130ef3424bfc676d65b2e7f4461f4c"
     }
   },
   "cases": [
@@ -50,13 +53,13 @@
       "id": "Q03",
       "question": "What is the recommended sequence of MCP tool calls for answering a normal project documentation question?",
       "fact_groups": [
-        {"id": "context_first", "witnesses": [{"path": "docs/mcp-docs-server.md", "text": "`get_docs_context`, execute only an explicitly returned `prepare_docs`"}, {"path": "docs/mcp-docs-server.md", "text": "get_docs_context(question, project_path)"}]},
-        {"id": "sufficient_context_stops", "witnesses": [{"path": "docs/mcp-docs-server.md", "text": "sufficient context? answer with sources and stop"}]},
+        {"id": "context_first", "witnesses": [{"path": "docs/mcp-docs-server.md", "text": "`get_docs_context`, execute only an explicitly returned `prepare_docs`"}, {"path": "docs/mcp-docs-server.md", "text": "get_docs_context(question, project_path)"}, {"path": "docs/mcp-response-contract.md", "text": "get_docs_context(question, project_path)"}]},
+        {"id": "sufficient_context_stops", "witnesses": [{"path": "docs/mcp-response-contract.md", "text": "sufficient context? answer with sources and stop"}]},
         {"id": "prepare_only_when_needed", "witnesses": [{"path": "README.md", "text": "follow a returned prepare_docs action when needed → answer with sources"}, {"path": "wiki/Commands.md", "text": "`prepare_docs` — a returned or explicitly approved sync/prefetch action"}]},
-        {"id": "confirmation", "witnesses": [{"path": "docs/mcp-docs-server.md", "text": "obtain confirmation if required and call that exact action"}]},
-        {"id": "job_status_only_if_job", "witnesses": [{"path": "docs/mcp-docs-server.md", "text": "if a job was returned, poll docs_status(job_id)"}]},
-        {"id": "retry_after_success", "witnesses": [{"path": "docs/mcp-docs-server.md", "text": "preparation succeeded? retry the original bounded get_docs_context question"}]},
-        {"id": "retry_unchanged", "witnesses": [{"path": "docs/mcp-docs-server.md", "text": "then retry the unchanged question"}, {"path": "docs/mcp-docs-server.md", "text": "retry the original bounded get_docs_context question"}]}
+        {"id": "confirmation", "witnesses": [{"path": "docs/mcp-response-contract.md", "text": "obtain confirmation if required and call that exact action"}]},
+        {"id": "job_status_only_if_job", "witnesses": [{"path": "docs/mcp-docs-server.md", "text": "if a job was returned, poll docs_status(job_id)"}, {"path": "docs/mcp-response-contract.md", "text": "if a job was returned, poll docs_status(job_id)"}]},
+        {"id": "retry_after_success", "witnesses": [{"path": "docs/mcp-response-contract.md", "text": "preparation succeeded? retry the original bounded get_docs_context question"}]},
+        {"id": "retry_unchanged", "witnesses": [{"path": "docs/mcp-docs-server.md", "text": "then retry the unchanged question"}, {"path": "docs/mcp-docs-server.md", "text": "retry the original bounded get_docs_context question"}, {"path": "docs/mcp-response-contract.md", "text": "retry the original bounded get_docs_context question"}]}
       ]
     },
     {
@@ -89,19 +92,19 @@
       "question": "What does fail-closed behavior mean in the DocAtlas documentation workflow?",
       "fact_groups": [
         {"id": "no_unsupported_claim_or_edit", "witnesses": [{"path": "docs/DOCMANCER_PRODUCT_BRIEF.md", "text": "Return typed `insufficient_evidence` rather than authorizing unsupported claims or edits."}, {"path": "README.md", "text": "Retrieval-only aliases never authorize an answer or edit."}]},
-        {"id": "safe_context_remains", "witnesses": [{"path": "docs/mcp-docs-server.md", "text": "`docs_context` for safe retrieval-only project context when completeness or the requested relation remains uncertain"}, {"path": "README.md", "text": "Parser uncertainty blocks answer certification, not safe project-scoped retrieval."}]}
+        {"id": "safe_context_remains", "witnesses": [{"path": "docs/mcp-docs-server.md", "text": "`docs_context` for safe retrieval-only project context when completeness or the requested relation remains uncertain"}, {"path": "docs/mcp-response-contract.md", "text": "`docs_context` for safe retrieval-only project context when completeness or the requested relation remains uncertain"}, {"path": "README.md", "text": "Parser uncertainty blocks answer certification, not safe project-scoped retrieval."}]}
       ]
     },
     {
       "id": "Q08",
       "question": "What is the difference between docs_answer, docs_context, patch_context, and insufficient_evidence?",
       "fact_groups": [
-        {"id": "docs_answer", "witnesses": [{"path": "docs/mcp-docs-server.md", "text": "`docs_answer` for a narrow typed question whose mandatory relation-specific proof obligations are complete"}]},
-        {"id": "docs_context", "witnesses": [{"path": "docs/mcp-docs-server.md", "text": "`docs_context` for safe retrieval-only project context when completeness or the requested relation remains uncertain"}]},
-        {"id": "patch_context", "witnesses": [{"path": "docs/mcp-docs-server.md", "text": "`patch_context` for explicit change tasks"}]},
-        {"id": "insufficient_evidence", "witnesses": [{"path": "docs/mcp-docs-server.md", "text": "`insufficient_evidence` when no safe context is available"}]},
-        {"id": "status_is_not_kind", "witnesses": [{"path": "docs/mcp-docs-server.md", "text": "The separate `status` is `ok`, `truncated`, or `insufficient_evidence` when no safe context is available, not a fourth kind."}]},
-        {"id": "project_read_lane", "witnesses": [{"path": "docs/project-docs-mcp-workflow.md", "text": "Certified `docs_answer` remains limited to library, dependency, and mixed evidence lanes."}, {"path": "docs/mcp-docs-server.md", "text": "Project reads return `docs_context`, never `docs_answer`; certification belongs to library, dependency, or mixed evidence lanes."}]}
+        {"id": "docs_answer", "witnesses": [{"path": "docs/mcp-docs-server.md", "text": "`docs_answer` for a narrow typed question whose mandatory relation-specific proof obligations are complete"}, {"path": "docs/mcp-response-contract.md", "text": "`docs_answer` for a narrow typed question whose mandatory relation-specific proof obligations are complete"}]},
+        {"id": "docs_context", "witnesses": [{"path": "docs/mcp-docs-server.md", "text": "`docs_context` for safe retrieval-only project context when completeness or the requested relation remains uncertain"}, {"path": "docs/mcp-response-contract.md", "text": "`docs_context` for safe retrieval-only project context when completeness or the requested relation remains uncertain"}]},
+        {"id": "patch_context", "witnesses": [{"path": "docs/mcp-docs-server.md", "text": "`patch_context` for explicit change tasks"}, {"path": "docs/mcp-response-contract.md", "text": "`patch_context` for explicit change tasks"}]},
+        {"id": "insufficient_evidence", "witnesses": [{"path": "docs/mcp-docs-server.md", "text": "`insufficient_evidence` when no safe context is available"}, {"path": "docs/mcp-response-contract.md", "text": "`insufficient_evidence` when no safe context is available"}]},
+        {"id": "status_is_not_kind", "witnesses": [{"path": "docs/mcp-response-contract.md", "text": "The separate `status` is `ok`, `truncated`, or `insufficient_evidence` when no safe context is available, not a fourth kind."}]},
+        {"id": "project_read_lane", "witnesses": [{"path": "docs/project-docs-mcp-workflow.md", "text": "Certified `docs_answer` remains limited to library, dependency, and mixed evidence lanes."}, {"path": "docs/mcp-response-contract.md", "text": "Project reads return `docs_context`, never `docs_answer`; certification belongs to library, dependency, or mixed evidence lanes."}]}
       ]
     },
     {
