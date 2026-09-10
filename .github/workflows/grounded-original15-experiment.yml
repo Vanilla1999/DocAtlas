@@ -1,0 +1,45 @@
+name: DocAtlas baseline path control
+on:
+  push:
+    branches: [experiment/grounded-docs-original15-20260910]
+    paths:
+      - '.github/workflows/grounded-original15-experiment.yml'
+      - 'scripts/experiments/q10_path_probe.py'
+permissions:
+  contents: read
+jobs:
+  path-control:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      DOCATLAS_OFFLINE: '1'
+      DOCATLAS_AUTO_VECTORS: '0'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Set up isolated experiment paths
+        run: |
+          mkdir -p "$RUNNER_TEMP/q10-path-proof"
+          echo "EXPERIMENT_OUT=$RUNNER_TEMP/q10-path-proof" >> "$GITHUB_ENV"
+          echo "BASELINE_ROOT=$RUNNER_TEMP/docatlas-baseline" >> "$GITHUB_ENV"
+          git worktree add --detach "$RUNNER_TEMP/docatlas-baseline" e179471527e009c88f77acbdaeeeeb8ad1c8d316
+          git rev-parse HEAD > "$RUNNER_TEMP/q10-path-proof/experiment-head.txt"
+      - name: Install dependencies
+        run: |
+          python -m pip install '.[dev]' > "$EXPERIMENT_OUT/pip-install.log" 2>&1
+          python -m pip freeze > "$EXPERIMENT_OUT/pip-freeze.txt"
+      - name: Compare Q10 with only the baseline checkout path varied
+        run: python scripts/experiments/q10_path_probe.py
+      - name: Preserve raw outputs and indexed chunks
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: q10-path-control-${{ github.sha }}
+          path: ${{ runner.temp }}/q10-path-proof/
+          include-hidden-files: true
+          retention-days: 7
