@@ -35,7 +35,7 @@ tests/                  # pytest tests (mirror docmancer/ where useful)
 
 Keep the public Docs MCP inventory to `get_docs_context`, `prepare_docs`, and `docs_status`. Repository files are the source of truth; DocAtlas may index accepted docs but must not silently author or commit them. Read [the canonical Docs MCP reference](./docs/mcp-docs-server.md) before changing this boundary.
 
-The bounded `get_docs_context` result union is `docs_answer`, `docs_context`, `patch_context`, or `insufficient_evidence`. Preserve the conservative boundary: only narrow relation-specific proof may authorize `docs_answer`; broad onboarding, overview, and explanatory questions remain `docs_context`.
+`get_docs_context` separates three `kind` values (`docs_answer`, `docs_context`, `patch_context`) from `status` (`ok`, `truncated`, `insufficient_evidence`). Project reads remain retrieval-only `docs_context`; only supported library, dependency, or mixed evidence lanes may certify `docs_answer`, and explicit change tasks use `patch_context`.
 
 ## Adding a new doc source (fetcher)
 
