@@ -1,0 +1,68 @@
+name: Reviewed neutral retrieval fixes
+on:
+  push:
+    branches: [fix/evidence-quality-v2-20260910]
+    paths: ['.github/workflows/readme-neutral-publish.yml']
+permissions:
+  contents: write
+jobs:
+  validate-publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      DOCATLAS_OFFLINE: '1'
+      DOCATLAS_AUTO_VECTORS: '0'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ github.sha }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - name: Verify exact reviewed patch and preserve all concurrent files
+        run: |
+          python - <<'PY'
+          import hashlib, pathlib, subprocess
+          carrier=pathlib.Path('.github/review/readme-neutral.patch')
+          # Repair only the accidental leading space of a diff header in the
+          # transport carrier; the reviewed semantic patch digest stays fixed.
+          data=carrier.read_text().replace('\n diff --git ', '\ndiff --git ').encode()
+          assert hashlib.sha256(data).hexdigest() == '18645ca5c01a0b82a5e412895a0ee7111b46eb336e4417b38f72388c4f8f6b7f'
+          target=pathlib.Path('/tmp/readme-neutral-reviewed.patch');target.write_bytes(data)
+          actual={line.split('\t')[-1] for line in subprocess.check_output(['git','apply','--numstat',str(target)],text=True).splitlines()}
+          expected={'docmancer/docs/application/docs_context_projection.py','docmancer/docs/domain/context_hint_policy.py','docmancer/docs/domain/documentation_query_plan.py','tests/diagnostic_labels.readme_neutral.json','tests/evidence_quality_v2/test_readme_neutral_context.py'}
+          assert actual == expected
+          subprocess.run(['git','apply','--check',str(target)],check=True)
+          subprocess.run(['git','apply',str(target)],check=True)
+          PY
+      - name: Validate real handler, negative controls and neighbouring contracts
+        run: |
+          python -m pip install '.[dev]' tiktoken==0.11.0 > "$RUNNER_TEMP/readme-install.log" 2>&1
+          mkdir -p "$RUNNER_TEMP/readme-home"
+          HOME="$RUNNER_TEMP/readme-home" python -m pytest -q tests/evidence_quality_v2/test_readme_neutral_context.py tests/docs/test_documentation_query_plan.py tests/docs/test_context7_style_project_chat.py tests/docs/test_docs_context_compound_projection.py > "$RUNNER_TEMP/readme-targeted.log" 2>&1
+          cat "$RUNNER_TEMP/readme-targeted.log"
+          git diff --check
+      - name: Publish only if the work branch has not moved
+        run: |
+          test "$(git ls-remote origin refs/heads/fix/evidence-quality-v2-20260910 | cut -f1)" = "$GITHUB_SHA"
+          git config user.name 'Vanilla1999'
+          git config user.email '41183994+Vanilla1999@users.noreply.github.com'
+          git add docmancer/docs/application/docs_context_projection.py docmancer/docs/domain/context_hint_policy.py docmancer/docs/domain/documentation_query_plan.py tests/diagnostic_labels.readme_neutral.json tests/evidence_quality_v2/test_readme_neutral_context.py
+          git rm .github/review/readme-neutral.patch
+          git diff --cached --check
+          git commit -m 'fix(context): preserve safe hint evidence and deduplicate the exact original lookup'
+          git push origin HEAD:refs/heads/fix/evidence-quality-v2-20260910
+          git rev-parse HEAD > "$RUNNER_TEMP/readme-published-head.txt"
+          git bundle create "$RUNNER_TEMP/readme-neutral.bundle" HEAD --branches
+      - name: Preserve scoped validation and exact history
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: readme-neutral-proof
+          path: |
+            ${{ runner.temp }}/readme-install.log
+            ${{ runner.temp }}/readme-targeted.log
+            ${{ runner.temp }}/readme-published-head.txt
+            ${{ runner.temp }}/readme-neutral.bundle
+          retention-days: 7
