@@ -105,11 +105,8 @@ def test_product_boundaries_use_relation_not_the_known_inventory():
     ]
 
     assert boundaries
-    assert any(
-        "product boundaries" in row.text.casefold()
-        and "does not replace" in row.text.casefold()
-        for row in boundaries
-    )
+    assert boundaries[0].text.casefold() == "docatlas product boundaries"
+    assert any("does not replace" in row.text.casefold() for row in boundaries)
     forbidden_answers = ("memory", "lsp", "static analysis", "web search")
     assert all(
         answer not in row.text.casefold()
