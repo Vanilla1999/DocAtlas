@@ -24,6 +24,55 @@ def test_list_introduction_and_items_form_one_contiguous_atom(identity):
     assert all(chunking.estimate_utf8_tokens(c.retrieval_text) <= 200 for c in children)
     assert all(source.encode()[c.byte_start:c.byte_end].decode() == c.display_text for c in children)
 
+    # Exercise final model-visible projection, not only the chunk/window helper.
+    # Generic responsibilities precede the separate non-replacement relation.
+    from docmancer.docs.application.docs_context_projection import project_docs_context
+    from docmancer.docs.application.model_visible_projection import validate_model_visible_projection
+
+    path = identity.rsplit(":", 1)[-1]
+    project_identity = (
+        identity.removeprefix("project_file:").rsplit(":", 1)[0]
+        if identity.startswith("project_file:") else "path:/test/Aurora"
+    )
+    retrieval = {
+        "context_pack": [{
+            "source_class": "project_doc", "path": path,
+            "heading_path": "Boundaries", "content": child.display_text,
+            "stable_chunk_id": child.stable_id,
+            "char_start": child.char_start, "char_end": child.char_end,
+            "line_start": child.line_start, "line_end": child.line_end,
+            "project_identity": project_identity, "authority": "source_of_truth",
+            "doc_scope": "project", "lifecycle_status": "active",
+            "freshness": "current", "index_freshness": "synchronized",
+            "risk_flags": [], "retrieval_query_ids": ["query-original"],
+            "retrieval_query_matches": {
+                "query-original": {"qualified": True, "mode": "and"},
+            },
+        } for child in children],
+        "documentation_query_plan": {
+            "query_ids": ["query-original"],
+            "queries": [{
+                "query_id": "query-original", "origin": "original",
+                "text": "What does Aurora not replace?",
+            }],
+        },
+    }
+    payload, snapshot = project_docs_context(retrieval=retrieval)
+    assert payload["status"] == "ok"
+    assert payload["kind"] == "docs_context"
+    assert payload["answer_supported"] is False
+    assert payload["answer_available"] is False
+    assert payload["edit_ready"] is False
+    assert 0 < len(payload["sources"]) <= 3
+    assert payload["estimated_tokens"] <= 800
+    assert any((intro + items).strip() in row["snippet"] for row in payload["sources"])
+    assert validate_model_visible_projection(payload, snapshot=snapshot, max_tokens=800) == []
+    lines = source.splitlines(keepends=True)
+    for row in payload["sources"]:
+        assert row["project_identity"] == project_identity
+        assert row["path_or_url"] == path
+        assert row["snippet"] in "".join(lines[row["line_start"] - 1:row["line_end"]])
+
 
 @pytest.mark.parametrize('prefix', ['Unrelated ending.\n\n', '# Heading:\n\n', '```text\nExample:\n```\n\n', '- Previous list:\n\n'])
 def test_only_adjacent_prose_introduction_can_bind_a_list(prefix):
