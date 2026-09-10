@@ -10,6 +10,8 @@ This is the canonical map of maintained DocAtlas project-owned documentation. Ag
 
 ## MCP and project-docs workflows
 
+- [MCP response contract](./mcp-response-contract.md) — clarification of result kinds versus status, project-only reads, and conditional preparation.
+
 - [MCP docs server](./mcp-docs-server.md) — full Context7-style MCP docs-server surface, tool lanes, response shapes, safety defaults, and implementation notes.
 - [Project docs MCP workflow](./project-docs-mcp-workflow.md) — project-owned docs lifecycle, module docs, confirmation gates, and `sync_project_docs` guidance.
 - [Project docs demo](./project-docs-demo.md) — example project-docs flow.
@@ -21,7 +23,7 @@ This is the canonical map of maintained DocAtlas project-owned documentation. Ag
 - [Product brief](./DOCMANCER_PRODUCT_BRIEF.md) — product positioning and scope.
 - [Architecture](../wiki/Architecture.md) — architecture narrative for indexing, retrieval, Docs MCP, Packs runtime, registry, and version provenance.
 - [Question planning](./modules/question-planning.md) — fail-closed documentation-question and proof-obligation boundary.
-- [Patch request planning](./modules/patch-request-planning.md) — reviewed imperative grammar, mutation readiness, and edit authorization.
+- [Patch request planning](./modules/patch-request-planning.md) — reviewed imperative grammar, patch requirements, target resolution, mutation readiness, and edit authorization.
 
 ## User-facing reference
 
@@ -51,4 +53,4 @@ This is the canonical map of maintained DocAtlas project-owned documentation. Ag
 - Prefer links to repository-owned docs over generated hidden summaries.
 - Update this file when adding architecture docs, runbooks, ADRs, workflow docs, or new user-facing references.
 - After documentation changes, call `get_docs_context`; when it recommends synchronization, run the returned `prepare_docs(action="sync_project_docs")` action and retry the original question unchanged.
-- The result has three `kind` values (`docs_answer`, `docs_context`, `patch_context`); `insufficient_evidence` is a separate `status`, not a fourth kind. Project reads remain cited `docs_context`; only supported library, dependency, or mixed evidence lanes may certify `docs_answer`.
+- The bounded result union is `docs_answer`, `docs_context`, `patch_context`, or `insufficient_evidence`; broad questions use cited `docs_context`, while only narrow relation-specific proof authorizes `docs_answer`.
