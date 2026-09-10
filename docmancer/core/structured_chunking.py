@@ -59,15 +59,20 @@ class ChunkingConfig:
             raise ValueError("parent-child-v1 supports zero visible overlap only")
 
     @property
-    def config_hash(self) -> str:
+    def identity_config_hash(self) -> str:
+        """Stable content-identity parameters, independent of parser revision."""
         return _digest(
             self.schema_version,
             self.estimator_version,
-            _ATOMIZATION_REVISION,
             str(self.target_tokens),
             str(self.hard_max_tokens),
             str(self.overlap_tokens),
         )
+
+    @property
+    def config_hash(self) -> str:
+        """Generation freshness includes the parser; unchanged content keeps IDs."""
+        return _digest(self.identity_config_hash, _ATOMIZATION_REVISION)
 
 
 @dataclass(frozen=True, slots=True)
@@ -459,7 +464,7 @@ def chunk_markdown_parent_child(
             duplicate_counts[display_hash] = duplicate_counts.get(display_hash, 0) + 1
             duplicate_occurrence = duplicate_counts[display_hash]
             stable_id = "child-" + _digest(
-                parent.logical_id, config.config_hash, display_hash, str(duplicate_occurrence)
+                parent.logical_id, config.identity_config_hash, display_hash, str(duplicate_occurrence)
             )[:40]
             sqlite_id = stable_sqlite_id(stable_id)
             prior = seen_sql_ids.get(sqlite_id)

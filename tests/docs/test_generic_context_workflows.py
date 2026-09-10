@@ -54,7 +54,7 @@ def test_generic_workflow_facts_survive_real_index(tmp_path, monkeypatch, topic,
 
 
 def test_stale_health_live_status_sync_and_removal(monkeypatch):
-    from eval.project_context_quality_v2_protocol import load_cases, validate_corpus, evaluate_case
+    from eval.project_context_quality_v2_protocol import load_cases, validate_corpus, evaluate_case, _witness_visible
     from scripts.run_project_docs_self_host_gate import LiveCase, run
 
     validate_corpus()
@@ -75,10 +75,17 @@ def test_stale_health_live_status_sync_and_removal(monkeypatch):
     verdict = evaluate_case(case, payload)
     health = next(row for row in captured[-1]["context_pack"]
                   if row["path"] == "README.md" and "Explicit health, freshness" in row["content"])
+    # Keep both frozen obligations in one qualified candidate; do not require
+    # a particular pre-chunking paragraph or Markdown emphasis presentation.
+    sync_obligations = [item for item in case["obligations"] if item["id"] in {"sync", "stale"}]
+    assert len(sync_obligations) == 2
     sync = next(row for row in captured[-1]["context_pack"]
                 if row["path"] == "docs/project-docs-mcp-workflow.md"
-                and "removes stale indexed sections" in row["content"]
-                and 'prepare_docs(action="sync_project_docs")' in row["content"])
+                and all(any(
+                    witness["path"] == row["path"]
+                    and _witness_visible(witness["text"], row["content"])
+                    for witness in obligation["accepted_witnesses"]
+                ) for obligation in sync_obligations))
     assert health["retrieval_query_matches"]["query-lookup-1"]["qualified"] is True
     assert sync["retrieval_query_matches"]["query-lookup-2"]["qualified"] is True
     assert all(verdict["hard_gates"].values())
