@@ -34,9 +34,10 @@ The normal flow is:
 
 ```text
 get_docs_context(question, project_path)
-→ returned recommended_next_action? obtain confirmation and call that exact action
+→ sufficient context? answer with sources and stop
+→ returned recommended_next_action? obtain confirmation if required and call that exact action
 → if a job was returned, poll docs_status(job_id)
-→ retry the original bounded get_docs_context question
+→ preparation succeeded? retry the original bounded get_docs_context question
 ```
 
 The `get_docs_context` response has three `kind` values: `docs_answer` for a narrow typed question whose mandatory relation-specific proof obligations are complete, `docs_context` for safe retrieval-only project context when completeness or the requested relation remains uncertain, and `patch_context` for explicit change tasks. Project reads return `docs_context`, never `docs_answer`; certification belongs to library, dependency, or mixed evidence lanes. The separate `status` is `ok`, `truncated`, or `insufficient_evidence` when no safe context is available, not a fourth kind.
