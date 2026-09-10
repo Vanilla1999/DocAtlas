@@ -151,6 +151,19 @@ jobs:
                   print(f'text_fallback={fallback}; assisted={assisted}; passed={passed}/15')
           assert not failures, json.dumps(failures)
           PY
+      - name: Audit first-loss stages on the original baseline
+        if: always() && steps.install.outcome == 'success'
+        run: |
+          current_root="$GITHUB_WORKSPACE"
+          baseline_root="$RUNNER_TEMP/direct-question-baseline"
+          git worktree add --detach "$baseline_root" e179471527e009c88f77acbdaeeeeb8ad1c8d316
+          trap 'git worktree remove --force "$baseline_root" >/dev/null 2>&1 || true' EXIT
+          DOCATLAS_CODE_ROOT="$baseline_root" PYTHONPATH="$baseline_root" \
+            python "$current_root/eval/direct_docatlas_questions_15/audit_first_loss.py" \
+              --project-root "$baseline_root" \
+              --corpus "$current_root/eval/direct_docatlas_questions_15/cases.json" \
+              --output "$RUNNER_TEMP/direct-question-proof/baseline-first-loss.json"
+
       - name: Preserve SHA-bound core and stdio evidence
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
