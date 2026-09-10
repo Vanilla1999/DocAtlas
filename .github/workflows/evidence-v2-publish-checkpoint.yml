@@ -54,13 +54,14 @@ jobs:
           run-id: 34537907326
           github-token: ${{ github.token }}
           path: ${{ runner.temp }}/tokenizer
+      - name: Install explicit dependencies
+        run: python -m pip install '.[dev]' tiktoken==0.11.0 > "$RUNNER_TEMP/install.log" 2>&1
       - name: Reconstruct and verify frozen source/case hashes
         run: python -m eval.evidence_quality_v2.build_frozen_corpus --input-root "$RUNNER_TEMP/public-inputs"
-      - name: Install and test measurement plus frozen experiment contracts
+      - name: Test measurement plus frozen experiment contracts
         env:
           TIKTOKEN_CACHE_DIR: ${{ runner.temp }}/tokenizer
         run: |
-          python -m pip install '.[dev]' tiktoken==0.11.0 > "$RUNNER_TEMP/install.log" 2>&1
           mkdir -p "$RUNNER_TEMP/test-home"
           HOME="$RUNNER_TEMP/test-home" DOCATLAS_HOME="$RUNNER_TEMP/test-home/docatlas" python -m pytest -q tests/evidence_quality_v2 > "$RUNNER_TEMP/evidence-tests.log" 2>&1
           cat "$RUNNER_TEMP/evidence-tests.log"
