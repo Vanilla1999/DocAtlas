@@ -7,6 +7,7 @@ import json
 
 from docmancer.docs.domain.project_state import has_high_level_project_overview, partition_project_doc_state
 from docmancer.docs.models import ProjectMetadata
+from docmancer.core.structured_chunking import ChunkingConfig
 
 
 class ProjectDocsState:
@@ -22,6 +23,19 @@ class ProjectDocsState:
         root = Path(project_path).expanduser().resolve()
         agent = self._agent_instance()
         rows: list[dict[str, Any]] = []
+        generation_reader = getattr(agent.store, "generation_info", None)
+        generation = generation_reader() if callable(generation_reader) else None
+        chunking_current = True
+        if isinstance(generation, dict):
+            settings = json.loads(generation.get("config_json") or "{}")
+            expected = ChunkingConfig(
+                target_tokens=int(settings.get("target_tokens") or 160),
+                hard_max_tokens=int(settings.get("hard_max_tokens") or 512),
+                overlap_tokens=int(settings.get("overlap_tokens") or 0),
+                schema_version=str(generation["schema_version"]),
+                estimator_version=str(settings.get("estimator_version") or "utf8-bytes-div4-v1"),
+            )
+            chunking_current = generation.get("config_hash") == expected.config_hash
         with agent.store._connect() as conn:
             for row in conn.execute(
                 """
@@ -53,6 +67,7 @@ class ProjectDocsState:
                     "impact_policy": metadata.get("project_doc_impact_policy"),
                     "catalog_entry_hash": metadata.get("project_doc_catalog_entry_hash"),
                     "ingested_at": row["ingested_at"],
+                    "chunking_current": chunking_current,
                 })
         return rows
 

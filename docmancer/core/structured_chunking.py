@@ -16,6 +16,7 @@ from dataclasses import dataclass
 
 SCHEMA_VERSION = "parent-child-v1"
 TOKEN_ESTIMATOR_VERSION = "utf8-bytes-div4-v1"
+_ATOMIZATION_REVISION = "introduced-list-v2"
 _HEADING = re.compile(r"^(#{1,6})[ \t]+(.+?)[ \t]*\r?\n?$")
 _FENCE = re.compile(r"^ {0,3}(`{3,}|~{3,})")
 _LIST = re.compile(r"^[ \t]*(?:[-+*]|\d+[.)])[ \t]+")
@@ -62,6 +63,7 @@ class ChunkingConfig:
         return _digest(
             self.schema_version,
             self.estimator_version,
+            _ATOMIZATION_REVISION,
             str(self.target_tokens),
             str(self.hard_max_tokens),
             str(self.overlap_tokens),
@@ -262,7 +264,14 @@ def _atom_spans(content: str, start: int, end: int) -> list[_AtomSpan]:
         atom_start = start + offsets[block_start]
         atom_end = start + offsets[i]
         if atom_end > atom_start:
-            spans.append(_AtomSpan(atom_start, atom_end, atom_type))
+            # A colon-terminated introduction gives the immediately following
+            # list its subject/relation. Keep that exact contiguous unit intact
+            # before packing; oversized units still use the hard-limit splitter.
+            if (atom_type == "list" and spans and spans[-1].atom_type == "prose"
+                    and content[spans[-1].start:spans[-1].end].rstrip().endswith(":")):
+                spans[-1] = _AtomSpan(spans[-1].start, atom_end, "list")
+            else:
+                spans.append(_AtomSpan(atom_start, atom_end, atom_type))
     return spans
 
 

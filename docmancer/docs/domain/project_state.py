@@ -219,6 +219,8 @@ def partition_project_doc_state(
             continue
         stale_reasons: list[str] = []
         metadata_drift_reasons: list[str] = []
+        if indexed.get("chunking_current") is False:
+            stale_reasons.append("chunking_configuration_changed")
         if candidate.get("content_hash") != indexed.get("content_hash"):
             stale_reasons.append("content_hash_changed")
         if candidate.get("catalog_entry_hash") != indexed.get("catalog_entry_hash"):
