@@ -1,22 +1,19 @@
-name: Grounded Docs original-15 experiment
+name: DocAtlas baseline path control
 on:
   push:
     branches: [experiment/grounded-docs-original15-20260910]
     paths:
       - '.github/workflows/grounded-original15-experiment.yml'
-      - 'scripts/experiments/grounded_original15_probe.py'
+      - 'scripts/experiments/q10_path_probe.py'
 permissions:
   contents: read
 jobs:
-  compare:
+  path-control:
     runs-on: ubuntu-latest
-    timeout-minutes: 25
+    timeout-minutes: 10
     env:
       DOCATLAS_OFFLINE: '1'
       DOCATLAS_AUTO_VECTORS: '0'
-      DOCS_MCP_APP_TELEMETRY_ENABLED: 'false'
-      DO_NOT_TRACK: '1'
-      PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: '1'
     steps:
       - uses: actions/checkout@v4
         with:
@@ -25,34 +22,24 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '22'
       - name: Set up isolated experiment paths
         run: |
-          mkdir -p "$RUNNER_TEMP/grounded-proof" "$RUNNER_TEMP/grounded-install"
-          echo "EXPERIMENT_OUT=$RUNNER_TEMP/grounded-proof" >> "$GITHUB_ENV"
+          mkdir -p "$RUNNER_TEMP/q10-path-proof"
+          echo "EXPERIMENT_OUT=$RUNNER_TEMP/q10-path-proof" >> "$GITHUB_ENV"
           echo "BASELINE_ROOT=$RUNNER_TEMP/docatlas-baseline" >> "$GITHUB_ENV"
-          echo "GROUNDED_ENTRY=$RUNNER_TEMP/grounded-install/node_modules/@arabold/docs-mcp-server/dist/index.js" >> "$GITHUB_ENV"
           git worktree add --detach "$RUNNER_TEMP/docatlas-baseline" e179471527e009c88f77acbdaeeeeb8ad1c8d316
-          git rev-parse HEAD > "$RUNNER_TEMP/grounded-proof/experiment-head.txt"
-      - name: Install DocAtlas dependencies and pinned upstream Grounded Docs
+          git rev-parse HEAD > "$RUNNER_TEMP/q10-path-proof/experiment-head.txt"
+      - name: Install dependencies
         run: |
           python -m pip install '.[dev]' > "$EXPERIMENT_OUT/pip-install.log" 2>&1
           python -m pip freeze > "$EXPERIMENT_OUT/pip-freeze.txt"
-          cd "$RUNNER_TEMP/grounded-install"
-          npm init -y > /dev/null
-          npm install --save-exact @arabold/docs-mcp-server@3.1.0 > "$EXPERIMENT_OUT/npm-install.log" 2>&1
-          cp package-lock.json "$EXPERIMENT_OUT/grounded-package-lock.json"
-          node --version > "$EXPERIMENT_OUT/node-version.txt"
-          node "$GROUNDED_ENTRY" --version > "$EXPERIMENT_OUT/grounded-version.txt" 2>&1
-      - name: Trace DocAtlas and ask original questions through Grounded MCP
-        run: python scripts/experiments/grounded_original15_probe.py
-      - name: Preserve raw outputs, corpus manifests and failure logs
+      - name: Compare Q10 with only the baseline checkout path varied
+        run: python scripts/experiments/q10_path_probe.py
+      - name: Preserve raw outputs and indexed chunks
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: grounded-original15-${{ github.sha }}
-          path: ${{ runner.temp }}/grounded-proof/
+          name: q10-path-control-${{ github.sha }}
+          path: ${{ runner.temp }}/q10-path-proof/
           include-hidden-files: true
           retention-days: 7
