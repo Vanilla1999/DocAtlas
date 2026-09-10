@@ -22,6 +22,9 @@
     },
     "wiki/Commands.md": {
       "git_blob_sha": "5600b98a55027df743c6ab212e195d30811e1d89"
+    },
+    "wiki/Troubleshooting.md": {
+      "git_blob_sha": "3bdb3c854f27049eb4ee495f9c6da1f98a6e7cf8"
     }
   },
   "cases": [
@@ -55,7 +58,7 @@
       "id": "Q04",
       "question": "When should an agent use get_docs_context?",
       "fact_groups": [
-        {"id": "entry_point", "witnesses": [{"path": "docs/mcp-docs-server.md", "text": "`get_docs_context` | First documentation question about a repository, dependency, library, or a mix."}, {"path": "README.md", "text": "`get_docs_context` | Default first call for project, library, dependency, or mixed documentation questions."}, {"path": "README.md", "text": "otherwise they start with `get_docs_context`"}]}
+        {"id": "entry_point", "witnesses": [{"path": "docs/mcp-docs-server.md", "text": "`get_docs_context` | First documentation question about a repository, dependency, library, or a mix."}, {"path": "README.md", "text": "`get_docs_context` | Default first call for project, library, dependency, or mixed documentation questions."}, {"path": "README.md", "text": "otherwise they start with `get_docs_context`"}, {"path": "wiki/Troubleshooting.md", "text": "The first tool for documentation questions is `get_docs_context`"}]}
       ]
     },
     {
