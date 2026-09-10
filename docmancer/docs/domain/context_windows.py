@@ -135,6 +135,25 @@ def _focused_snippet(
     selected_start, selected_end = _include_complete_table_row(
         value, selected_start, selected_end, terms=terms, limit=limit,
     )
+    # A short lead-in ending with ':' is semantically incomplete without the
+    # contiguous list it introduces. Prefer that forward block over a richer
+    # backward window when it fits; this is source-local projection only and
+    # does not create query attribution or answer proof.
+    intro_start, intro_end = spans[best_index]
+    intro = value[intro_start:intro_end].strip()
+    if intro.endswith(":") and best_index + 1 < len(spans):
+        list_end = intro_end
+        saw_item = False
+        for item_start, item_end in spans[best_index + 1:]:
+            item = value[item_start:item_end].lstrip()
+            if not re.match(r"(?:[-*+]\s+|\d+[.)]\s+)", item):
+                break
+            if item_end - intro_start > limit:
+                break
+            list_end = item_end
+            saw_item = True
+        if saw_item:
+            selected_start, selected_end = intro_start, list_end
     selected_start, selected_end = _include_complete_code_fence(value, selected_start, selected_end, limit=limit)
     # Overlong prose still keeps whole tokens at both edges.
     if selected_start and not value[selected_start - 1].isspace():

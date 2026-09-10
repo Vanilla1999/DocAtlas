@@ -1,0 +1,10 @@
+{
+  "schema_version": 1,
+  "module_labels": {
+    "tests/test_sqlite_phrase_ranking.py": "behavioral"
+  },
+  "node_overrides": {},
+  "module_node_hashes": {
+    "tests/test_sqlite_phrase_ranking.py": "37f2bd752376e126d805f2b2f71e65fac96e65b282e105c32492bb9aaf5b2bcc"
+  }
+}

@@ -45,3 +45,15 @@ def test_complete_short_source_keeps_exact_text_and_offsets():
     text = "  Each tenant owns its cache. The cache is not shared.\n  "
     snippet, start, end = _focused_snippet(text, ("tenant cache",), limit=160)
     assert snippet == text.strip() == text[start:end]
+
+
+def test_list_introduction_keeps_following_items_instead_of_preceding_topic_noise():
+    from docmancer.docs.domain.context_windows import _focused_snippet
+
+    text = """Background boundaries.\n\n- old responsibility one;\n- old responsibility two.\n\nAurora does not replace:\n\n- source search;\n- graphs;\n- tests;\n- agent reasoning;\n- web search;\n- session memory.\n\nRepository files remain authoritative."""
+    snippet, _, _ = _focused_snippet(text, ("Aurora does not replace",), limit=180)
+
+    assert snippet.startswith("Aurora does not replace:")
+    assert "- source search;" in snippet
+    assert "- session memory." in snippet
+    assert "old responsibility" not in snippet

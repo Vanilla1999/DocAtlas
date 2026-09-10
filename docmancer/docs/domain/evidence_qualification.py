@@ -64,6 +64,7 @@ def qualify_evidence(
     lines = body.splitlines()
     substantive_lines = []
     heading_lines = []
+    table_rows: list[tuple[str, str]] = []
     fence = ""
     for index, line in enumerate(lines):
         fence_match = re.match(r"^ {0,3}(`{3,}|~{3,})(.*)$", line)
@@ -91,6 +92,10 @@ def qualify_evidence(
                 r"\|?\s*:?-{3,}:?\s*(?:\|\s*:?-{3,}:?\s*)*\|?", next_line,
             )
         ):
+            for row in lines[index + 2:]:
+                if not row.strip() or "|" not in row:
+                    break
+                table_rows.append((line, row))
             continue
         line = re.sub(r"!?\[[^\]]*\](?:\([^)]*\)|\[[^\]]*\])", "", line)
         line = re.sub(r"https?://\S+", "", line)
@@ -141,8 +146,17 @@ def qualify_evidence(
         )
     )
     heading_context_allowed = len(body_matched) >= 2
+    # Column labels describe a substantive row, not standalone evidence. Only
+    # bind them when that table's key cell contains every requested exact term.
+    # They may recover a relation term, but never supply a missing identifier.
+    table_context = _bound_table_context(table_rows, exact_terms)
+    table_matched = tuple(
+        term for term in terms if term not in exact_terms
+        and _visible_term_present(term, table_context, exact=False)
+    )
     matched = tuple(dict.fromkeys((
         *body_matched,
+        *table_matched,
         *(
             term for term in terms
             if heading_context_allowed
@@ -172,7 +186,10 @@ def qualify_evidence(
     result.update({
         "matched_terms": list(matched),
         "body_matched_terms": list(body_matched),
-        "heading_context_used": heading_context_allowed and len(matched) > len(body_matched),
+        "heading_context_used": heading_context_allowed and any(
+            term not in body_matched and term not in table_matched for term in matched
+        ),
+        "table_context_used": any(term not in body_matched for term in table_matched),
         "missing_exact_terms": list(missing_exact),
         "missing_parent_exact_terms": list(missing_parent_exact),
         "matched_term_count": len(matched),
@@ -222,6 +239,23 @@ def derived_parent_trace(
         "derived_from_query_ids": [source_query_id],
     })
     return result
+
+
+def _bound_table_context(rows: list[tuple[str, str]], exact_terms: tuple[str, ...]) -> str:
+    if not exact_terms:
+        return ""
+    headers = []
+    for header, row in rows:
+        cells = row.strip().strip("|").split("|")
+        if len(cells) < 2 or len(cells) != len(header.strip().strip("|").split("|")):
+            continue
+        cells = [re.sub(r"!?\[[^\]]*\](?:\([^)]*\)|\[[^\]]*\])", "", cell) for cell in cells]
+        cells = [re.sub(r"https?://\S+", "", cell).casefold() for cell in cells]
+        if not all(_visible_term_present(term, cells[0], exact=True) for term in exact_terms):
+            continue
+        if any(cell.strip(" \t-*+0123456789.)|:<>_=`") for cell in cells[1:]):
+            headers.append(header)
+    return "\n".join(headers).casefold()
 
 
 def _coverage_kind(probe: Mapping[str, Any]) -> CoverageKind:

@@ -16,6 +16,7 @@ from dataclasses import dataclass
 
 SCHEMA_VERSION = "parent-child-v1"
 TOKEN_ESTIMATOR_VERSION = "utf8-bytes-div4-v1"
+_ATOMIZATION_REVISION = "introduced-list-v2"
 _HEADING = re.compile(r"^(#{1,6})[ \t]+(.+?)[ \t]*\r?\n?$")
 _FENCE = re.compile(r"^ {0,3}(`{3,}|~{3,})")
 _LIST = re.compile(r"^[ \t]*(?:[-+*]|\d+[.)])[ \t]+")
@@ -58,7 +59,8 @@ class ChunkingConfig:
             raise ValueError("parent-child-v1 supports zero visible overlap only")
 
     @property
-    def config_hash(self) -> str:
+    def identity_config_hash(self) -> str:
+        """Stable content-identity parameters, independent of parser revision."""
         return _digest(
             self.schema_version,
             self.estimator_version,
@@ -66,6 +68,11 @@ class ChunkingConfig:
             str(self.hard_max_tokens),
             str(self.overlap_tokens),
         )
+
+    @property
+    def config_hash(self) -> str:
+        """Generation freshness includes the parser; unchanged content keeps IDs."""
+        return _digest(self.identity_config_hash, _ATOMIZATION_REVISION)
 
 
 @dataclass(frozen=True, slots=True)
@@ -262,7 +269,14 @@ def _atom_spans(content: str, start: int, end: int) -> list[_AtomSpan]:
         atom_start = start + offsets[block_start]
         atom_end = start + offsets[i]
         if atom_end > atom_start:
-            spans.append(_AtomSpan(atom_start, atom_end, atom_type))
+            # A colon-terminated introduction gives the immediately following
+            # list its subject/relation. Keep that exact contiguous unit intact
+            # before packing; oversized units still use the hard-limit splitter.
+            if (atom_type == "list" and spans and spans[-1].atom_type == "prose"
+                    and content[spans[-1].start:spans[-1].end].rstrip().endswith(":")):
+                spans[-1] = _AtomSpan(spans[-1].start, atom_end, "list")
+            else:
+                spans.append(_AtomSpan(atom_start, atom_end, atom_type))
     return spans
 
 
@@ -450,7 +464,7 @@ def chunk_markdown_parent_child(
             duplicate_counts[display_hash] = duplicate_counts.get(display_hash, 0) + 1
             duplicate_occurrence = duplicate_counts[display_hash]
             stable_id = "child-" + _digest(
-                parent.logical_id, config.config_hash, display_hash, str(duplicate_occurrence)
+                parent.logical_id, config.identity_config_hash, display_hash, str(duplicate_occurrence)
             )[:40]
             sqlite_id = stable_sqlite_id(stable_id)
             prior = seen_sql_ids.get(sqlite_id)

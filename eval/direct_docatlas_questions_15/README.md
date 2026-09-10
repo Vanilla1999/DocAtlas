@@ -1,0 +1,9 @@
+# Direct DocAtlas questions sidecar
+
+This report-only sidecar contains the 15 English questions from the direct-question quality investigation. It is intentionally separate from both frozen `eval/project_context_quality` and `eval/project_context_quality_v2`; their corpora, locks, thresholds, historical verdicts, and denominators are unchanged.
+
+Each case is executed question-only against the existing production public handler with `scope="all"` and no `lookup_queries`. The test prepares the project index first with the normal offline `sync_project_docs` lifecycle path and then makes exactly one observed `get_docs_context` call for each of Q01–Q15. It reuses the self-host runner's existing same-call observer, projection validation, citation-integrity, contamination, and budget helpers rather than introducing a second evaluator framework. Alternatives inside one fact group are OR, fact groups are AND, and a fact is credited only when the exact witness text is visible in a returned source with the expected path.
+
+`cases.json` records the baseline commit and Git blob SHA for every source used as an accepted witness. Tests recompute those Git blob identities from current bytes and verify every witness still exists before the live run. The sidecar also checks that every observed question has exactly one retrieval and one model-visible validation call, no `query-lookup-*` public IDs, at most three sources, at most 800 estimated tokens, valid source/citation identity, no Docs/Packs contamination, and the retrieval-only `docs_context` safety contract. This sidecar is evaluator/test data only and is not part of the project documentation catalog or production retrieval index.
+
+The direct lane does not claim to be an independent holdout: its questions and criteria are exposed development cases. It is also not an installed-agent result. Installed stdio MCP and host-agent checks remain separate claim boundaries.

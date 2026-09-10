@@ -31,6 +31,16 @@ from docmancer.docs.application.recovery import _suggested_questions
         ("Что сделать после редактирования markdown-документа, чтобы поиск увидел изменения?", "project_docs_sync"),
         ("Почему get_docs_context вернул insufficient_evidence и что проверить первым?", "troubleshooting"),
         ("Архитектура?", "project_architecture"),
+        ("When should an agent use get_docs_context?", "docs_mcp_tool_policy"),
+        ("When is an agent allowed to call prepare_docs?", "docs_mcp_tool_policy"),
+        ("What kinds of requests should use docs_status, and when must it not be used?", "docs_mcp_tool_policy"),
+        ("What does fail-closed behavior mean in the DocAtlas documentation workflow?", "fail_closed_workflow"),
+        ("What is the difference between docs_answer, docs_context, patch_context, and insufficient_evidence?", "response_contract"),
+        ("Which repository files are the source of truth, and which DocAtlas storage artifacts are only derived indexes?", "source_authority"),
+        ("What systems does DocAtlas explicitly not replace?", "product_boundaries"),
+        ("How does DocAtlas determine whether a dependency version is exact, declared-only, or unbound?", "dependency_version_binding"),
+        ("What are the responsibilities of docmancer/docs/application and docmancer/docs/domain in this repository?", "module_responsibilities"),
+        ("What claims about DocAtlas are not currently demonstrated according to the product brief?", "product_claims"),
     ],
 )
 def test_russian_newcomer_queries_get_retrieval_only_aliases(question: str, intent_id: str):
@@ -51,6 +61,17 @@ def test_russian_newcomer_queries_get_retrieval_only_aliases(question: str, inte
 )
 def test_named_policy_or_contract_is_not_collapsed_to_broad_storage_alias(question: str):
     assert build_project_retrieval_aliases(question) == ()
+
+    negative_neighbors = (
+        ("get_docs_context returned an error; how should I troubleshoot it?", "fail_closed_workflow"),
+        ("What claims are accepted by the HTTP API contract?", "product_claims"),
+        ("Which database file stores the local cache?", "source_authority"),
+        ("Which version of Python should I install?", "dependency_version_binding"),
+        ("Which modules import pathlib?", "module_responsibilities"),
+    )
+    for neighbor, forbidden_facet in negative_neighbors:
+        facets = {alias.intent_id for alias in build_project_retrieval_aliases(neighbor)}
+        assert forbidden_facet not in facets
 
 
 def test_state_home_variable_uses_narrow_retrieval_without_forcing_context():
@@ -82,6 +103,31 @@ def test_exact_symbol_question_is_not_misclassified_as_product_overview():
     aliases = build_project_retrieval_aliases("What is the model-visible projection?")
 
     assert "product_overview" not in {alias.intent_id for alias in aliases}
+
+    product_aliases = build_project_retrieval_aliases(
+        "What is DocAtlas, and what core problem is it designed to solve for coding agents?"
+    )
+    assert {alias.intent_id for alias in product_aliases} == {"product_overview"}
+
+    workflow_aliases = build_project_retrieval_aliases(
+        "What is the recommended sequence of MCP tool calls for answering a normal project documentation question?"
+    )
+    workflow_facets = {alias.intent_id for alias in workflow_aliases}
+    assert "docs_mcp_workflow" in workflow_facets
+    assert "product_overview" not in workflow_facets
+
+    for concept_question in (
+        "What does fail-closed behavior mean in the DocAtlas documentation workflow?",
+        "What is the difference between docs_answer, docs_context, patch_context, and insufficient_evidence?",
+    ):
+        assert "troubleshooting" not in {
+            alias.intent_id for alias in build_project_retrieval_aliases(concept_question)
+        }
+
+    incident_aliases = build_project_retrieval_aliases(
+        "get_docs_context returned insufficient_evidence unexpectedly; how do I troubleshoot it?"
+    )
+    assert "troubleshooting" in {alias.intent_id for alias in incident_aliases}
 
 
 def test_generic_project_alias_does_not_require_docatlas_product_wording():
@@ -206,7 +252,6 @@ def test_generic_architecture_is_not_rewritten_as_mcp_server_architecture():
     assert can_authorize_docs_answer(contract) is False
 
 
-
 class _EmptyRequirements:
     retrieval_hints = ()
     query_requirement_spans = ()
@@ -221,7 +266,6 @@ def test_russian_parser_failure_does_not_generate_mixed_language_rephrase():
         _EmptyRequirements(),
         evidence_path=None,
     ) == []
-
 
 
 def test_broad_retrieval_intent_requires_context_only_delivery():

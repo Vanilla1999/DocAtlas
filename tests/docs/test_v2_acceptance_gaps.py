@@ -45,8 +45,6 @@ def test_v2_search_trust_keeps_selection_proof_and_context_witnesses():
 
 
 def test_single_intent_context_aliases_derive_only_original_retrieval_lineage():
-    from docmancer.docs.domain.documentation_query_plan import build_documentation_query_plan
-
     for question in (
         "Что это за проект и какую проблему он решает?",
         "Как система выбирает доказательства?",
@@ -61,17 +59,19 @@ def test_single_intent_context_aliases_derive_only_original_retrieval_lineage():
 
 
 def test_original_lineage_rejects_multi_intent_unknown_negated_and_hypothetical_questions():
-    from docmancer.docs.domain.documentation_query_plan import build_documentation_query_plan
-
     for question in (
         "Explain project architecture and testing",
         "Explain UnknownLedger project architecture",
         "Explain project architecture and the imaginary orbital subsystem",
         "Explain project architecture that must not use indexing",
     ):
-        aliases = [row for row in build_documentation_query_plan(question).queries if row.origin == "canonical_intent"]
+        aliases = [
+            row for row in build_documentation_query_plan(question).queries
+            if row.origin == "canonical_intent"
+        ]
         assert all(row.public_parent_query_id is None for row in aliases)
         assert all(row.relation == "host_lookup" for row in aliases)
+
 
 @pytest.mark.parametrize("question, lookup", [
     ("Что проверить, если проектная документация устарела или ничего не находится?",
@@ -89,7 +89,8 @@ def test_equivalent_host_lookup_may_derive_original_retrieval_lineage(question, 
 
 def test_arbitrary_host_lookup_cannot_derive_original_retrieval_lineage():
     plan = build_documentation_query_plan(
-        "Explain project architecture", lookup_queries=("troubleshooting stale documentation no results",),
+        "Explain project architecture",
+        lookup_queries=("troubleshooting stale documentation no results",),
     )
     host = next(q for q in plan.queries if q.query_id == "query-lookup-1")
     assert host.relation == "host_lookup"

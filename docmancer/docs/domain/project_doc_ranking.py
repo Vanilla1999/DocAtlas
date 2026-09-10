@@ -7,7 +7,7 @@ from dataclasses import replace
 from typing import Any
 
 from docmancer.docs.domain.lifecycle_policy import lifecycle_allows, lifecycle_intent
-from docmancer.docs.domain.quality import has_code_symbol_evidence, internal_noise_score
+from docmancer.docs.domain.quality import has_requested_code_evidence, internal_noise_score
 from docmancer.docs.domain.documentation_query_plan import technical_anchors
 
 
@@ -688,7 +688,13 @@ def rerank_project_doc_chunks(
         ):
             score *= 0.1
         if getattr(intent, "wants_code_symbols", False):
-            if has_code_symbol_evidence(getattr(chunk, "content", ""), getattr(chunk, "title", None), getattr(chunk, "heading_path", None), path):
+            if has_requested_code_evidence(
+                question,
+                getattr(chunk, "content", ""),
+                getattr(chunk, "title", None),
+                getattr(chunk, "heading_path", None),
+                path,
+            ):
                 score *= 2.5
             else:
                 score *= 0.2

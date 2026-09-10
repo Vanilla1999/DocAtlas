@@ -61,6 +61,8 @@ Project code search answers implementation facts. DocAtlas supplies documentatio
 - Return compact source-attributed MCP evidence for coding agents.
 - Return typed `insufficient_evidence` rather than authorizing unsupported claims or edits.
 
+Dependency version evidence uses three distinct states. `exact` means repository state proves the selected version (for supported ecosystems, normally through an authoritative lockfile or equivalent resolved state). `declared-only` means a manifest declaration exists but repository state does not prove the selected runtime version. `unbound` means repository evidence cannot safely bind the dependency to an exact documentation version/source; local/path, Git, and direct-URL dependencies are common examples.
+
 For the detailed current contract, commands, response fields, and examples, use [the Docs MCP reference](./mcp-docs-server.md). It is the canonical detailed workflow document; this brief and `README.md` stay intentionally concise.
 
 ## Evidence status and product claims

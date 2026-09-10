@@ -377,7 +377,16 @@ class _SQLiteStorePart03:
             contributions.append(("title_term_boost", 1.5 * len(title_term_overlap)))
 
         stripped_query = cls._strip_stopwords(query).lower()
-        if stripped_query and stripped_query in body_lower[:500]:
+        # Preserve the complete relation (including negation) across inline
+        # Markdown emphasis. Matching is source-local and cannot cross sentence
+        # or paragraph boundaries; no text or qualification flags are rewritten.
+        phrase_tokens = query.casefold().split()
+        inline_phrase = r"(?<!\w)" + r"[ \t*_`~]+".join(
+            re.escape(token) for token in phrase_tokens
+        ) + r"(?!\w)"
+        if (stripped_query and stripped_query in body_lower[:500]) or (
+            len(phrase_tokens) > 1 and re.search(inline_phrase, body_lower[:500])
+        ):
             contributions.append(("leading_exact_phrase_boost", 2.0))
 
         task_signals = {

@@ -1,0 +1,12 @@
+{
+  "schema_version": 1,
+  "module_labels": {
+    "tests/docs/test_direct_docatlas_questions_15.py": "behavioral",
+    "tests/docs/test_direct_question_retrieval_intents.py": "behavioral"
+  },
+  "node_overrides": {},
+  "module_node_hashes": {
+    "tests/docs/test_direct_docatlas_questions_15.py": "f8c4d63661865a988446f22a43bc2fc5a5e5989b9779cfe3ba26d11ed4e46496",
+    "tests/docs/test_direct_question_retrieval_intents.py": "2f0b7ed974f849b4fc88ad11fa7267b7faba56b9b217703eb1b972867b9ef4b4"
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "schema_version": 1,
+  "module_labels": {
+    "tests/test_list_introduction_atomicity.py": "behavioral"
+  },
+  "node_overrides": {},
+  "module_node_hashes": {
+    "tests/test_list_introduction_atomicity.py": "7f2b7c7883786c98d6ca144dbad1fd24e1121188436219711c987cd50d5a4be3"
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "schema_version": 1,
+  "module_labels": {
+    "tests/docs/test_bound_table_qualification.py": "behavioral"
+  },
+  "node_overrides": {},
+  "module_node_hashes": {
+    "tests/docs/test_bound_table_qualification.py": "25c44558969d8754955af6957b6d4bbfe06be2f4e4a0e2164219c22a09350294"
+  }
+}

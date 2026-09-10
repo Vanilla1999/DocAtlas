@@ -11,6 +11,13 @@ from dataclasses import dataclass
 import re
 from typing import Literal
 
+from docmancer.docs.domain.project_query_intent import (
+    is_concept_definition_or_contrast,
+    is_product_purpose_question,
+    mentions_docs_mcp_surface,
+)
+from docmancer.docs.domain.quality import query_requests_implementation_location
+
 
 _MAX_ALIASES = 4
 _TOKEN_RE = re.compile(r"[A-Za-zА-Яа-яЁё0-9_.:/+-]+")
@@ -28,6 +35,11 @@ _SPECIFIC_RELATION_TOKEN_RE = re.compile(
 _CODE_IDENTITY_RE = re.compile(
     r"^(?=.{2,160}$)(?=.*[a-z])(?=(?:.*[A-Z]){2})[A-Z][A-Za-z0-9]*$",
 )
+_PUBLIC_DOCS_MCP_TOOL_NAMES = (
+    "get_docs_context",
+    "prepare_docs",
+    "docs_status",
+)
 _RETRIEVAL_ONLY_UNRESOLVED_PREFIXES = (
     "unresolved_inventory_category:",
     "unresolved_query_subject",
@@ -42,6 +54,15 @@ _INTENT_ROLE_POLICY: dict[str, tuple[tuple[str, ...], tuple[str, ...]]] = {
     "troubleshooting": (("runbook", "development"), ("adr", "roadmap")),
     "context_budget": (("api_contract", "module_architecture"), ("adr", "roadmap")),
     "docs_mcp_public_tools": (("api_contract", "runbook"), ("adr", "roadmap")),
+    "docs_mcp_tool_policy": (("overview", "api_contract", "runbook", "development"), ("adr", "roadmap")),
+    "fail_closed_workflow": (("api_contract", "overview", "project_architecture"), ("roadmap",)),
+    "response_contract": (("api_contract", "overview"), ("roadmap",)),
+    "source_authority": (("overview", "project_architecture"), ("roadmap",)),
+    "product_boundaries": (("overview",), ("roadmap",)),
+    "dependency_version_binding": (("overview", "api_contract"), ("roadmap",)),
+    "module_responsibilities": (("project_architecture", "module_architecture"), ("roadmap",)),
+    "product_claims": (("overview",), ("roadmap",)),
+    "implementation_location": (("project_architecture", "module_architecture", "api_contract"), ("roadmap",)),
     "packs_mcp_workflow": (("api_contract", "runbook"), ("adr", "roadmap")),
     "product_overview": (("overview", "project_architecture"), ("adr", "roadmap")),
     "getting_started": (("overview", "development", "runbook"), ("adr", "roadmap")),
@@ -51,7 +72,7 @@ _INTENT_ROLE_POLICY: dict[str, tuple[tuple[str, ...], tuple[str, ...]]] = {
     "testing_contribution": (("development", "runbook"), ("adr", "roadmap")),
     "docs_mcp_workflow": (("api_contract", "runbook", "development"), ("adr", "roadmap")),
     "docs_mcp_server_command": (("api_contract", "runbook"), ("adr", "roadmap")),
-    "project_docs_sync": (("runbook", "development"), ("roadmap",)),
+    "project_docs_sync": (("overview", "runbook", "development"), ("roadmap",)),
     "project_docs_configuration": (("runbook", "development", "api_contract"), ("roadmap",)),
     "project_architecture": (("project_architecture", "module_architecture", "overview"), ("roadmap",)),
     "retrieval_pipeline": (("project_architecture", "api_contract"), ("roadmap",)),
@@ -150,7 +171,10 @@ def build_project_retrieval_aliases(
                 forbidden_evidence_terms=(
                     "docs/adr/", "mcp pack commands", "packs mcp runtime",
                     "install-pack", "packs-serve",
-                ) if intent_id in {"docs_mcp_workflow", "docs_mcp_server_command", "docs_mcp_public_tools"} else (),
+                ) if intent_id in {
+                    "docs_mcp_workflow", "docs_mcp_server_command", "docs_mcp_public_tools",
+                    "docs_mcp_tool_policy", "fail_closed_workflow", "response_contract",
+                } else (),
             ))
 
     mentions_docs = _has(tokens, "документ", "док", "docs", "documentation")
@@ -161,6 +185,11 @@ def build_project_retrieval_aliases(
     mentions_packs = _has(tokens, "packs", "pack", "пакет")
     mentions_command = _has(tokens, "команд", "command", "cli")
     mentions_start = _has(tokens, "запуст", "запуск", "старт", "start", "serve", "run")
+    mentions_docs_mcp = mentions_docs_mcp_surface(source)
+    concept_definition = is_concept_definition_or_contrast(source)
+    public_tool_names = tuple(
+        name for name in _PUBLIC_DOCS_MCP_TOOL_NAMES if name in source.casefold()
+    )
     specific_contract_request = _specific_contract_request(tokens)
     if specific_contract_request:
         return ()
@@ -206,12 +235,7 @@ def build_project_retrieval_aliases(
         _has(tokens, "контриб", "вклад", "contribut", "разработчик", "developer", "карт", "map", "модул", "module", "код", "codebase", "репозитор", "repository")
         and _has(tokens, "читать", "read", "нач", "start")
     )
-    product_purpose = (mentions_product or mentions_project) and (
-        _has_phrase(normalized, "что такое", "что это за", "для чего", "зачем")
-        or re.search(r"\bwhat\s+is\b|\bwhat\s+problems?\b.+\bsolves?\b", normalized)
-        or _has(tokens, "назначен", "purpose", "overview")
-        or (_has(tokens, "проблем") and _has(tokens, "решает", "решающ"))
-    )
+    product_purpose = is_product_purpose_question(source)
     # A host may omit the product name while asking for the product-definition
     # facet. Keep this recognition narrow and descriptive; original lineage is
     # still separately gated by same-intent equivalence and parent exact terms.
@@ -268,7 +292,8 @@ def build_project_retrieval_aliases(
         emit(
             "product_overview",
             True,
-            f"{product_prefix}project overview",
+            f"{product_prefix}documentation context runtime coding agents",
+            f"{product_prefix}product purpose problem coding agents",
             f"{product_prefix}project purpose",
             f"{product_prefix}problem statement",
         )
@@ -278,15 +303,101 @@ def build_project_retrieval_aliases(
             True,
             f"{product_prefix}new contributor repository reading order contributing project map",
         )
-    if mentions_mcp and (mentions_docs or not mentions_packs) and _has(
-        tokens, "работ", "устро", "процесс", "поток", "workflow", "fit",
+
+    if public_tool_names and _has(
+        tokens, "when", "use", "allowed", "call", "request", "should", "must",
     ):
+        for tool_name in public_tool_names:
+            policy_queries = [f"{tool_name} Docs MCP default use"]
+            if tool_name == "prepare_docs":
+                if _has(tokens, "allowed", "permission", "approve"):
+                    policy_queries.extend((
+                        f"{tool_name} Docs MCP allowed lifecycle action",
+                        f"{tool_name} Docs MCP network approval confirmation",
+                    ))
+            else:
+                policy_queries.append(f"{tool_name} Docs MCP must not be used for")
+            emit("docs_mcp_tool_policy", True, *policy_queries)
+    if _has_phrase(normalized, "fail-closed", "fail closed") and (
+        concept_definition or _has(tokens, "behavior", "behaviour", "workflow", "principle")
+    ):
+        emit(
+            "fail_closed_workflow",
+            True,
+            f"{product_prefix}fail closed insufficient_evidence unsupported claims edits",
+            f"{product_prefix}fail closed safe retrieval-only context answer certification edit",
+        )
+    response_names = tuple(
+        name for name in ("docs_answer", "docs_context", "patch_context", "insufficient_evidence")
+        if re.search(rf"(?<![A-Za-z0-9_]){re.escape(name)}(?![A-Za-z0-9_])", source, re.IGNORECASE)
+    )
+    if len(response_names) >= 2:
+        emit(
+            "response_contract",
+            True,
+            "Docs MCP response contract docs_answer docs_context patch_context insufficient_evidence",
+        )
+    if (
+        _has_phrase(normalized, "source of truth", "source-of-truth")
+        or (_has(tokens, "derived") and _has(tokens, "index"))
+    ) and (mentions_product or mentions_project or mentions_docs):
+        emit(
+            "source_authority",
+            True,
+            f"{product_prefix}source authority source of truth derived index storage contract",
+        )
+    if mentions_product and _has(tokens, "replace") and _has(tokens, "system"):
+        emit(
+            "product_boundaries",
+            True,
+            f"{product_prefix}product boundaries",
+            f"{product_prefix}does not replace",
+        )
+    if (
+        mentions_product
+        and _has(tokens, "dependency", "package")
+        and _has(tokens, "version")
+        and sum(bool(_has(tokens, stem)) for stem in ("exact", "declared", "unbound")) >= 2
+    ):
+        emit(
+            "dependency_version_binding",
+            True,
+            f"{product_prefix}dependency version evidence exact declared-only unbound selected version",
+            f"{product_prefix}dependency selected version lockfile declaration unbound source",
+        )
+    if (
+        _has(tokens, "responsibilit")
+        and "docmancer/docs/application" in source.casefold()
+        and "docmancer/docs/domain" in source.casefold()
+    ):
+        emit(
+            "module_responsibilities",
+            True,
+            f"{product_prefix}application domain module responsibilities architecture boundaries",
+        )
+    if (
+        mentions_product
+        and _has(tokens, "claim")
+        and (_has_phrase(normalized, "product brief") or _has(tokens, "demonstrat", "evidence"))
+    ):
+        emit(
+            "product_claims",
+            True,
+            f"{product_prefix}product claims evidence status demonstrated",
+            f"{product_prefix}product claims validation status",
+        )
+
+    docs_mcp_workflow_question = mentions_docs_mcp and not mentions_packs and (
+        _has(tokens, "работ", "устро", "процесс", "поток", "workflow", "fit", "sequence", "answer")
+        or _has_phrase(normalized, "tool calls", "tool call", "call sequence")
+    )
+    if docs_mcp_workflow_question:
         emit(
             "docs_mcp_workflow",
             True,
-            f"{product_prefix}Docs MCP server workflow",
-            "get_docs_context prepare_docs docs_status",
-            "docs/mcp-docs-server.md",
+            f"{product_prefix}Docs MCP server workflow get_docs_context prepare_docs docs_status documentation context",
+            f"{product_prefix}Docs MCP normal flow",
+            f"{product_prefix}Docs MCP public tool contract sequence",
         )
     if mentions_mcp and mentions_packs and _has(tokens, "workflow", "работ", "процесс", "поток"):
         emit("packs_mcp_workflow", True, "Packs MCP runtime workflow action packs")
@@ -303,11 +414,17 @@ def build_project_retrieval_aliases(
             and _has(tokens, "поиск", "search", "документ", "docs", "file")
         )
     ):
-        emit(
-            "project_docs_sync",
-            True,
-            f"{product_prefix}sync refresh project documentation after file changes",
+        sync_subject = "sync_project_docs" if "sync_project_docs" in source.casefold() else "project docs sync"
+        requested_states = " ".join(
+            token for token in tokens
+            if any(token.startswith(stem) for stem in (
+                "new", "changed", "stale", "deleted", "нов", "измен", "устар", "удален",
+            ))
         )
+        sync_queries = [f"{product_prefix}{sync_subject} lifecycle project documentation"]
+        if requested_states:
+            sync_queries.insert(0, f"{product_prefix}project docs {requested_states}")
+        emit("project_docs_sync", True, *sync_queries)
     if (
         _has(tokens, "настро", "конфиг", "configure", "configuration")
         and (mentions_docs or mentions_project or mentions_product)
@@ -318,24 +435,42 @@ def build_project_retrieval_aliases(
             True,
             f"{product_prefix}configure project documentation catalog and index settings",
         )
+    if (
+        query_requests_implementation_location(source)
+        and not any(row.intent_id == "project_docs_config_location" for row in rows)
+    ):
+        subject = "MCP Docs server" if mentions_docs_mcp else "requested component"
+        emit(
+            "implementation_location",
+            True,
+            f"{product_prefix}{subject} area responsibility public documentation tools resources transport implementation",
+        )
     if _has(tokens, "очист", "clear", "cleanup") and _has(tokens, "индекс", "index"):
         emit(
             "index_cleanup",
             True,
             f"{product_prefix}inspect safely clear local index preview cleanup plan",
         )
-    if (not product_purpose and _has(tokens, "проблем", "problem")) or _has(
-        tokens,
-        "ошиб", "диагност", "troubleshoot", "fail", "stale",
-        "insufficient_evidence",
-    ) or _has_phrase(
-        normalized,
-        "не работает",
-        "не находится",
-        "ничего не находит",
-        "nothing found",
-        "что проверить",
-        "what should i check",
+    if (
+        not concept_definition
+        and not any(row.intent_id == "project_docs_sync" for row in rows)
+        and (
+            (not product_purpose and _has(tokens, "проблем", "problem"))
+            or _has(
+                tokens,
+                "ошиб", "диагност", "troubleshoot", "fail", "stale",
+                "insufficient_evidence",
+            )
+            or _has_phrase(
+                normalized,
+                "не работает",
+                "не находится",
+                "ничего не находит",
+                "nothing found",
+                "что проверить",
+                "what should i check",
+            )
+        )
     ):
         emit(
             "troubleshooting",

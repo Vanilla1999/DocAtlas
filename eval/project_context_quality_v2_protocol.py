@@ -38,6 +38,46 @@ def normalize_prose(value: str) -> str:
     return " ".join(value.casefold().split())
 
 
+def _call_keyword_signature(value: str) -> tuple[str, dict[str, str]] | None:
+    """Parse a simple keyword-only call used as a semantic witness."""
+    match = re.fullmatch(r"([a-z_]\w*(?:\.[a-z_]\w*)*)\(([^()]*)\)", value.strip(), re.I)
+    if not match:
+        return None
+    function, body = match.groups()
+    parts = [part.strip() for part in body.split(",") if part.strip()]
+    if not parts or any("=" not in part for part in parts):
+        return None
+    kwargs: dict[str, str] = {}
+    for part in parts:
+        key, raw_value = part.split("=", 1)
+        key = key.strip().casefold()
+        if not re.fullmatch(r"[a-z_]\w*", key, re.I):
+            return None
+        kwargs[key] = re.sub(r"\s+", "", raw_value.casefold())
+    return function.casefold(), kwargs
+
+
+def _witness_visible(witness: str, visible_text: str) -> bool:
+    """Match prose exactly, but allow extra kwargs on the same witnessed call."""
+    witness_normalized = normalize_prose(witness)
+    visible_normalized = normalize_prose(visible_text)
+    if witness_normalized in visible_normalized:
+        return True
+    signature = _call_keyword_signature(witness_normalized)
+    if signature is None:
+        return False
+    function, required_kwargs = signature
+    for match in re.finditer(
+        rf"(?<![\w.]){re.escape(function)}\(([^()]*)\)", visible_normalized, re.I,
+    ):
+        candidate = _call_keyword_signature(f"{function}({match.group(1)})")
+        if candidate is not None and all(
+            candidate[1].get(key) == value for key, value in required_kwargs.items()
+        ):
+            return True
+    return False
+
+
 def _catalog() -> dict[str, dict[str, Any]]:
     payload = yaml.safe_load((ROOT / "docatlas.project-docs.yaml").read_text(encoding="utf-8"))
     documents = {
@@ -236,7 +276,7 @@ def evaluate_case(case: dict[str, Any], response: dict[str, Any]) -> dict[str, A
                         and str(source.get("evidence_id") or "")
                         and evidence_id_counts[str(source.get("evidence_id") or "")] == 1
                         and not _heading_only(str(source.get("snippet", "")))
-                        and normalize_prose(witness["text"]) in normalize_prose(str(source.get("snippet", "")))):
+                        and _witness_visible(witness["text"], str(source.get("snippet", "")))):
                     matches.append({"path_or_url": path, "evidence_id": source.get("evidence_id")})
         obligation_results.append({"id": obligation["id"], "met": bool(matches), "lookup_query_ids": obligation["lookup_query_ids"], "visible_witnesses": matches})
     case_type = case.get("case_type", "positive" if case["expected_kind"] == "docs_context" else "strict_negative")
