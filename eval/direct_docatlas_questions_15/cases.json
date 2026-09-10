@@ -15,10 +15,13 @@
       "git_blob_sha": "78704768e38cde4e7088bfb7f7411a909a29eb06"
     },
     "docs/mcp-docs-server.md": {
-      "git_blob_sha": "4d524e3adbf2db6a1c05eb91c3b579cfd3ae9af9"
+      "git_blob_sha": "99687432270f220c90b88ab3993b23d7ce6d671e"
     },
     "docs/DOCMANCER_PRODUCT_BRIEF.md": {
       "git_blob_sha": "3607b058429abe7a8fb1068d467475c67a5c9893"
+    },
+    "docs/project-docs-mcp-workflow.md": {
+      "git_blob_sha": "316a520a4df91ebb577da84c99d783c3583b035f"
     },
     "wiki/Commands.md": {
       "git_blob_sha": "5600b98a55027df743c6ab212e195d30811e1d89"
@@ -48,9 +51,11 @@
       "question": "What is the recommended sequence of MCP tool calls for answering a normal project documentation question?",
       "fact_groups": [
         {"id": "context_first", "witnesses": [{"path": "docs/mcp-docs-server.md", "text": "`get_docs_context`, execute only an explicitly returned `prepare_docs`"}, {"path": "docs/mcp-docs-server.md", "text": "get_docs_context(question, project_path)"}]},
+        {"id": "sufficient_context_stops", "witnesses": [{"path": "docs/mcp-docs-server.md", "text": "sufficient context? answer with sources and stop"}]},
         {"id": "prepare_only_when_needed", "witnesses": [{"path": "README.md", "text": "follow a returned prepare_docs action when needed → answer with sources"}, {"path": "wiki/Commands.md", "text": "`prepare_docs` — a returned or explicitly approved sync/prefetch action"}]},
-        {"id": "confirmation", "witnesses": [{"path": "docs/mcp-docs-server.md", "text": "obtain confirmation and call that exact action"}]},
+        {"id": "confirmation", "witnesses": [{"path": "docs/mcp-docs-server.md", "text": "obtain confirmation if required and call that exact action"}]},
         {"id": "job_status_only_if_job", "witnesses": [{"path": "docs/mcp-docs-server.md", "text": "if a job was returned, poll docs_status(job_id)"}]},
+        {"id": "retry_after_success", "witnesses": [{"path": "docs/mcp-docs-server.md", "text": "preparation succeeded? retry the original bounded get_docs_context question"}]},
         {"id": "retry_unchanged", "witnesses": [{"path": "docs/mcp-docs-server.md", "text": "then retry the unchanged question"}, {"path": "docs/mcp-docs-server.md", "text": "retry the original bounded get_docs_context question"}]}
       ]
     },
@@ -58,7 +63,8 @@
       "id": "Q04",
       "question": "When should an agent use get_docs_context?",
       "fact_groups": [
-        {"id": "entry_point", "witnesses": [{"path": "docs/mcp-docs-server.md", "text": "`get_docs_context` | First documentation question about a repository, dependency, library, or a mix."}, {"path": "README.md", "text": "`get_docs_context` | Default first call for project, library, dependency, or mixed documentation questions."}, {"path": "README.md", "text": "otherwise they start with `get_docs_context`"}, {"path": "wiki/Troubleshooting.md", "text": "The first tool for documentation questions is `get_docs_context`"}]}
+        {"id": "entry_point", "witnesses": [{"path": "docs/mcp-docs-server.md", "text": "`get_docs_context` | First documentation question about a repository, dependency, library, or a mix."}, {"path": "README.md", "text": "`get_docs_context` | Default first call for project, library, dependency, or mixed documentation questions."}, {"path": "README.md", "text": "otherwise they start with `get_docs_context`"}, {"path": "wiki/Troubleshooting.md", "text": "The first tool for documentation questions is `get_docs_context`"}]},
+        {"id": "documentation_scopes", "witnesses": [{"path": "docs/mcp-docs-server.md", "text": "First documentation question about a repository, dependency, library, or a mix."}, {"path": "README.md", "text": "Default first call for project, library, dependency, or mixed documentation questions."}]}
       ]
     },
     {
@@ -66,6 +72,7 @@
       "question": "When is an agent allowed to call prepare_docs?",
       "fact_groups": [
         {"id": "allowed_trigger", "witnesses": [{"path": "docs/mcp-docs-server.md", "text": "`prepare_docs` | The exact lifecycle action returned by `get_docs_context`, or an explicit user-approved sync/refresh request."}, {"path": "README.md", "text": "`prepare_docs` | Lifecycle work only: sync, refresh, index, or prefetch. Call it from bounded `recommended_next_action`, unbounded `next_action`, or an explicit user request."}]},
+        {"id": "no_confirmation_when_allowed", "witnesses": [{"path": "docs/mcp-docs-server.md", "text": "the response returns a no-confirmation `prepare_docs(action=\"sync_project_docs\")` instruction bound to a preflight `plan_digest`"}]},
         {"id": "conditional_confirmation", "witnesses": [{"path": "README.md", "text": "Network actions require approval."}]}
       ]
     },
@@ -92,7 +99,9 @@
         {"id": "docs_answer", "witnesses": [{"path": "docs/mcp-docs-server.md", "text": "`docs_answer` for a narrow typed question whose mandatory relation-specific proof obligations are complete"}]},
         {"id": "docs_context", "witnesses": [{"path": "docs/mcp-docs-server.md", "text": "`docs_context` for safe retrieval-only project context when completeness or the requested relation remains uncertain"}]},
         {"id": "patch_context", "witnesses": [{"path": "docs/mcp-docs-server.md", "text": "`patch_context` for explicit change tasks"}]},
-        {"id": "insufficient_evidence", "witnesses": [{"path": "docs/mcp-docs-server.md", "text": "`insufficient_evidence` when no safe context is available"}]}
+        {"id": "insufficient_evidence", "witnesses": [{"path": "docs/mcp-docs-server.md", "text": "`insufficient_evidence` when no safe context is available"}]},
+        {"id": "status_is_not_kind", "witnesses": [{"path": "docs/mcp-docs-server.md", "text": "The separate `status` is `ok`, `truncated`, or `insufficient_evidence` when no safe context is available, not a fourth kind."}]},
+        {"id": "project_read_lane", "witnesses": [{"path": "docs/project-docs-mcp-workflow.md", "text": "Certified `docs_answer` remains limited to library, dependency, and mixed evidence lanes."}, {"path": "docs/mcp-docs-server.md", "text": "Project reads return `docs_context`, never `docs_answer`; certification belongs to library, dependency, or mixed evidence lanes."}]}
       ]
     },
     {
