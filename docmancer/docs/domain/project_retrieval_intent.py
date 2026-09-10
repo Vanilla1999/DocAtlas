@@ -350,7 +350,8 @@ def build_project_retrieval_aliases(
         emit(
             "product_boundaries",
             True,
-            f"{product_prefix}product boundaries evidence responsibilities does not replace",
+            f"{product_prefix}product boundaries",
+            f"{product_prefix}does not replace",
         )
     if (
         mentions_product
