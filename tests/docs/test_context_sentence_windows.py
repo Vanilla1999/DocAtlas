@@ -58,12 +58,12 @@ def test_list_introduction_keeps_following_items_instead_of_preceding_topic_nois
     assert "- session memory." in snippet
     assert "old responsibility" not in snippet
 
-    sync_text = """`prepare_docs(action=\"sync_project_docs\")` reconciles the index:
+    sync_text = """`prepare_docs(action=\"sync_project_docs\")` replaces the old two-step loop. It:
 1. discovers current candidates;
 2. prunes orphaned indexed sources;
 3. removes stale indexed sections;
 4. indexes new and changed candidates."""
-    sync_snippet, _, _ = _focused_snippet(sync_text, ("stale orphaned",), limit=180)
+    sync_snippet, _, _ = _focused_snippet(sync_text, ("stale orphaned",), limit=220)
 
     assert sync_snippet.startswith('`prepare_docs(action="sync_project_docs")`')
     assert "prunes orphaned indexed sources" in sync_snippet
