@@ -135,26 +135,6 @@ def _focused_snippet(
     selected_start, selected_end = _include_complete_table_row(
         value, selected_start, selected_end, terms=terms, limit=limit,
     )
-    # If matching starts inside a list, keep the short ':' lead-in that gives
-    # those items their subject. Walk only across preceding list items and only
-    # when the resulting source-local span still fits the same projection limit.
-    selected_index = next((
-        index for index, (left, right) in enumerate(spans)
-        if left <= selected_start < right or selected_start <= left < selected_end
-    ), None)
-    if selected_index is not None and re.match(
-        r"(?:[-*+]\s+|\d+[.)]\s+)", value[spans[selected_index][0]:spans[selected_index][1]].lstrip(),
-    ):
-        intro_index = selected_index - 1
-        while intro_index >= 0 and re.match(
-            r"(?:[-*+]\s+|\d+[.)]\s+)", value[spans[intro_index][0]:spans[intro_index][1]].lstrip(),
-        ):
-            intro_index -= 1
-        if intro_index >= 0:
-            intro_start, intro_end = spans[intro_index]
-            intro = value[intro_start:intro_end].strip()
-            if intro.endswith(":") and selected_end - intro_start <= limit:
-                selected_start = intro_start
     # A short lead-in ending with ':' is semantically incomplete without the
     # contiguous list it introduces. Prefer that forward block over a richer
     # backward window when it fits; this is source-local projection only and
