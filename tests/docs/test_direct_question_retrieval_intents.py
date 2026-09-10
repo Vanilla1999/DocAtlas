@@ -1,3 +1,5 @@
+import pytest
+
 from docmancer.docs.domain.project_retrieval_intent import build_project_retrieval_aliases
 
 
@@ -160,3 +162,47 @@ def test_sync_alias_preserves_only_states_explicitly_asked_by_the_user():
         if row.intent_id == "project_docs_sync"
     )
     assert all(state not in generic.text.casefold() for state in ("new", "changed", "stale", "deleted"))
+
+
+@pytest.mark.parametrize(
+    ("question", "intent_id"),
+    [
+        ("What is the purpose of DocAtlas for coding agents, and which documentation problem is it designed to solve?", "product_overview"),
+        ("Which three public tools does the Docs MCP server expose?", "docs_mcp_public_tools"),
+        ("In what order should a coding agent use the Docs MCP tool calls for a normal project-documentation answer?", "docs_mcp_workflow"),
+        ("When is get_docs_context the right tool to use for documentation context?", "docs_mcp_tool_policy"),
+        ("When should an agent call prepare_docs during the documentation lifecycle?", "docs_mcp_tool_policy"),
+        ("When should docs_status be used, and when is it not a discovery tool?", "docs_mcp_tool_policy"),
+        ("Define fail-closed behavior for the DocAtlas documentation workflow.", "fail_closed_workflow"),
+        ("What is the difference between docs_answer and docs_context, and how do patch_context and insufficient_evidence fit?", "response_contract"),
+        ("For DocAtlas, which repository documents are the source of truth and which indexes are derived?", "source_authority"),
+        ("Which systems is DocAtlas designed not to replace?", "product_boundaries"),
+        ("For a dependency version, how does DocAtlas distinguish exact, declared-only, and unbound evidence?", "dependency_version_binding"),
+        ("What responsibilities belong to docmancer/docs/application versus docmancer/docs/domain?", "module_responsibilities"),
+        ("Which implementation file defines the public Docs MCP server?", "implementation_location"),
+        ("During project documentation sync, how are new, changed, stale, and deleted files handled?", "project_docs_sync"),
+        ("According to the product brief, which DocAtlas claims remain not demonstrated?", "product_claims"),
+    ],
+)
+def test_original_direct_question_families_keep_a_fresh_paraphrase(question, intent_id):
+    assert intent_id in {row.intent_id for row in _aliases(question)}
+
+
+@pytest.mark.parametrize(
+    ("question", "forbidden_intent"),
+    [
+        ("How do MCP Packs tool calls work?", "docs_mcp_workflow"),
+        ("Where is prepare_docs implemented in this repository?", "docs_mcp_tool_policy"),
+        ("get_docs_context failed closed unexpectedly; how do I troubleshoot it?", "fail_closed_workflow"),
+        ("get_docs_context returned insufficient_evidence unexpectedly; how do I troubleshoot it?", "response_contract"),
+        ("Which database file stores the local cache?", "source_authority"),
+        ("Which systems integrate with DocAtlas?", "product_boundaries"),
+        ("Which version of Python should I install?", "dependency_version_binding"),
+        ("Which modules import pathlib?", "module_responsibilities"),
+        ("Where is the project docs configuration located?", "implementation_location"),
+        ("Show the release history for project documentation.", "project_docs_sync"),
+        ("Which claims are accepted by the HTTP API contract?", "product_claims"),
+    ],
+)
+def test_direct_question_family_neighbors_do_not_collapse_to_the_wrong_relation(question, forbidden_intent):
+    assert forbidden_intent not in {row.intent_id for row in _aliases(question)}

@@ -329,7 +329,7 @@ def build_project_retrieval_aliases(
         )
     response_names = tuple(
         name for name in ("docs_answer", "docs_context", "patch_context", "insufficient_evidence")
-        if name in source.casefold()
+        if re.search(rf"(?<![A-Za-z0-9_]){re.escape(name)}(?![A-Za-z0-9_])", source, re.IGNORECASE)
     )
     if len(response_names) >= 2:
         emit(
