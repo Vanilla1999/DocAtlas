@@ -1,0 +1,32 @@
+name: Evidence v2 tokenizer material
+on:
+  push:
+    branches: [fix/evidence-quality-v2-20260910]
+    paths: ['.github/workflows/evidence-v2-tokenizer.yml']
+permissions:
+  contents: read
+jobs:
+  tokenizer:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - name: Download pinned tokenizer data
+        env:
+          TIKTOKEN_CACHE_DIR: ${{ runner.temp }}/tokenizer
+        run: |
+          python -m pip install tiktoken==0.11.0
+          python - <<'PY'
+          import tiktoken, pathlib, os, hashlib, json
+          e=tiktoken.get_encoding('o200k_base')
+          p=pathlib.Path(os.environ['TIKTOKEN_CACHE_DIR'])
+          files={f.name:hashlib.sha256(f.read_bytes()).hexdigest() for f in p.iterdir() if f.is_file()}
+          (p/'manifest.json').write_text(json.dumps({'package':'tiktoken==0.11.0','encoding':e.name,'files':files},indent=2))
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: evidence-v2-o200k
+          path: ${{ runner.temp }}/tokenizer/
+          retention-days: 7
