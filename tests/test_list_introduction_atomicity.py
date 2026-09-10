@@ -79,3 +79,36 @@ def test_old_generation_requires_explicit_sync_without_touching_project_files(tm
     assert service.sync_project_docs(str(project), with_vectors=False).status == 'success'
     assert service._agent_instance().store.active_generation_id() != old_generation
     assert path.read_bytes() == before
+
+
+def test_parser_revision_does_not_churn_unchanged_evidence_identities(monkeypatch):
+    source = '# Aurora\n\nAn independently versioned unchanged source fact.\n'
+    with monkeypatch.context() as previous:
+        previous.setattr(chunking, '_ATOMIZATION_REVISION', 'previous-parser')
+        old_config = chunking.ChunkingConfig()
+        old_fingerprint = old_config.config_hash
+        _, old_children = chunking.chunk_markdown_parent_child(source, 'guide.md', old_config)
+    _, current = chunking.chunk_markdown_parent_child(source, 'guide.md')
+    assert chunking.ChunkingConfig().config_hash != old_fingerprint
+    assert [c.stable_id for c in current] == [c.stable_id for c in old_children]
+    assert [c.sqlite_id for c in current] == [c.sqlite_id for c in old_children]
+    assert [c.vector_id for c in current] == [c.vector_id for c in old_children]
+    assert [c.display_text for c in current] == [c.display_text for c in old_children]
+    assert current[0].config_hash != old_children[0].config_hash
+
+
+def test_unchanged_evidence_retains_pre_revision_identity_contract():
+    import hashlib
+    source = '# Aurora\n\nAn independently versioned unchanged source fact.\n'
+    config = chunking.ChunkingConfig()
+    parents, children = chunking.chunk_markdown_parent_child(source, 'guide.md', config)
+    legacy_identity_config = chunking._digest(
+        config.schema_version, config.estimator_version,
+        str(config.target_tokens), str(config.hard_max_tokens), str(config.overlap_tokens),
+    )
+    assert len(children) == 1
+    expected = 'child-' + chunking._digest(
+        parents[0].logical_id, legacy_identity_config,
+        hashlib.sha256(source.encode()).hexdigest(), '1',
+    )[:40]
+    assert children[0].stable_id == expected
