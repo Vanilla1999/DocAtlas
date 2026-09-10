@@ -27,16 +27,19 @@ jobs:
           echo "$PATCH_B64" | base64 -d | gzip -d > /tmp/pr183.patch
           git apply --check /tmp/pr183.patch
           git apply /tmp/pr183.patch
-          rm .github/workflows/pr183-finalize-once.yml
       - name: Run focused regression tests
         run: |
           python -m pip install -e '.[dev]'
           python -m pytest -q tests/docs/test_direct_question_retrieval_intents.py tests/docs/test_project_query_intent.py tests/docs/test_generic_context_workflows.py tests/docs/test_context7_style_project_chat.py --tb=short
-      - name: Commit reviewed changes
+      - name: Commit reviewed non-workflow changes
         shell: bash
         run: |
+          git checkout -- .github/workflows/direct-question-validation.yml
           git config user.name 'ChatGPT Codex Connector'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add -A
+          git add docmancer/docs/domain/project_retrieval_intent.py \
+                  tests/docs/test_direct_question_retrieval_intents.py \
+                  tests/diagnostic_labels.direct_questions.json \
+                  eval/direct_docatlas_questions_15/audit_first_loss.py
           git commit -m 'fix: harden direct-question audit coverage'
           git push origin HEAD:fix/direct-question-tdd-ddd-15
