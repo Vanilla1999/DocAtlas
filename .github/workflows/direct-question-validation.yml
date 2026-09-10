@@ -1,0 +1,160 @@
+name: Direct question validation
+
+on:
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: direct-question-validation-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  direct-question-proof:
+    if: github.event.pull_request.head.ref == 'fix/direct-question-tdd-ddd-15'
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    env:
+      DOCATLAS_OFFLINE: "1"
+      DOCATLAS_AUTO_VECTORS: "0"
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1
+        with:
+          python-version: "3.13"
+      - name: Install dependencies
+        id: install
+        run: python -m pip install -e ".[dev]"
+      - name: Run unchanged offline core inventory with a compact console report
+        run: |
+          mkdir -p "$RUNNER_TEMP/direct-question-proof"
+          git rev-parse HEAD > "$RUNNER_TEMP/direct-question-proof/head.txt"
+          set +e
+          python -m pytest tests/ -m "not advanced and not live and not live_network" -q --tb=short --junitxml="$RUNNER_TEMP/direct-question-proof/core.xml" > "$RUNNER_TEMP/direct-question-proof/core.log" 2>&1
+          result=$?
+          set -e
+          tail -n 80 "$RUNNER_TEMP/direct-question-proof/core.log"
+          exit "$result"
+      - name: Original 15 questions over real stdio, including text fallback and assisted diagnostics
+        if: always() && steps.install.outcome == 'success'
+        run: |
+          python - <<'PY'
+          import asyncio
+          import hashlib
+          import json
+          import os
+          from pathlib import Path
+          import subprocess
+          import tempfile
+          from datetime import timedelta
+
+          from mcp import ClientSession, StdioServerParameters
+          from mcp.client.stdio import stdio_client
+          from docmancer.docs.domain.project_retrieval_intent import build_project_retrieval_aliases
+
+          root = Path.cwd()
+          out = Path(os.environ['RUNNER_TEMP']) / 'direct-question-proof'
+          out.mkdir(parents=True, exist_ok=True)
+          corpus = json.loads((root / 'eval/direct_docatlas_questions_15/cases.json').read_text())
+          rows = []
+          failures = []
+          report = {'head': subprocess.check_output(['git', 'rev-parse', 'HEAD'], text=True).strip(),
+                    'transport': 'real stdio MCP', 'claim': 'exposed original corpus; not an unseen or live-agent test',
+                    'assisted_method': 'up to three existing canonical retrieval aliases, diagnostic only',
+                    'sessions': [], 'results': rows, 'failures': failures}
+
+          def validate_sources():
+              for name, metadata in corpus['sources'].items():
+                  data = (root / name).read_bytes()
+                  assert hashlib.sha1(f'blob {len(data)}\0'.encode() + data).hexdigest() == metadata['git_blob_sha'], name
+
+          def decode(result):
+              if isinstance(result.structuredContent, dict):
+                  return result.structuredContent
+              texts = [item.text for item in result.content if getattr(item, 'type', '') == 'text']
+              assert len(texts) == 1, 'expected one JSON text fallback'
+              return json.loads(texts[0])
+
+          async def run_session(text_fallback):
+              with tempfile.TemporaryDirectory(prefix='docatlas-direct-stdio-') as tmp:
+                  env = {key: os.environ[key] for key in ('PATH', 'SYSTEMROOT', 'LANG', 'LC_ALL', 'TMPDIR') if key in os.environ}
+                  env.update({'HOME': tmp, 'USERPROFILE': tmp, 'DOCATLAS_HOME': str(Path(tmp) / 'state'),
+                              'DOCATLAS_OFFLINE': '1', 'DOCATLAS_AUTO_VECTORS': '0', 'NO_PROXY': '*',
+                              'DOCATLAS_REGISTRY_API_URL': 'http://127.0.0.1:1'})
+                  if text_fallback:
+                      env['DOCATLAS_MCP_TEXT_FALLBACK'] = '1'
+                  params = StdioServerParameters(command='doc-atlas', args=['mcp', 'docs-serve'], env=env, cwd=tmp)
+                  async with stdio_client(params) as streams:
+                      async with ClientSession(*streams, read_timeout_seconds=timedelta(seconds=90)) as session:
+                          await session.initialize()
+                          tools = await session.list_tools()
+                          assert {tool.name for tool in tools.tools} == {'get_docs_context', 'prepare_docs', 'docs_status'}
+                          session_record = {'text_fallback': text_fallback, 'tools_list': tools.model_dump(mode='json')}
+                          report['sessions'].append(session_record)
+                          setup = await session.call_tool('prepare_docs', {'action': 'sync_project_docs', 'project_path': str(root), 'with_vectors': False})
+                          session_record['preparation'] = setup.model_dump(mode='json')
+                          assert not setup.isError, decode(setup)
+                          assert decode(setup).get('status') not in {'error', 'failed'}
+                          for assisted in (False, True):
+                              for case in corpus['cases']:
+                                  args = {'question': case['question'], 'project_path': str(root), 'scope': 'all'}
+                                  if assisted:
+                                      aliases = list(dict.fromkeys(a.text for a in build_project_retrieval_aliases(case['question'])))[:3]
+                                      if aliases:
+                                          args['lookup_queries'] = aliases
+                                  result = await session.call_tool('get_docs_context', args)
+                                  payload = decode(result)
+                                  sources = payload.get('sources') or []
+                                  facts = {group['id']: any(source.get('path_or_url') == witness['path'] and
+                                              witness['text'].casefold() in str(source.get('snippet', '')).casefold()
+                                              for witness in group['witnesses'] for source in sources)
+                                           for group in case['fact_groups']}
+                                  checks = {'tool_success': not result.isError, 'status': payload.get('status') == 'ok',
+                                            'kind': payload.get('kind') == 'docs_context', 'facts': all(facts.values()),
+                                            'budget': 0 < len(sources) <= 3 and int(payload.get('estimated_tokens') or 0) <= 800,
+                                            'retrieval_only': payload.get('answer_supported') is False and payload.get('edit_ready') is False,
+                                            'wire_mode': (result.structuredContent is None) if text_fallback else isinstance(result.structuredContent, dict)}
+                                  row = {'id': case['id'], 'assisted': assisted, 'text_fallback': text_fallback,
+                                         'arguments': args, 'facts': facts, 'checks': checks, 'wire_result': result.model_dump(mode='json')}
+                                  rows.append(row)
+                                  # Assisted diagnostics can never substitute for mandatory direct acceptance.
+                                  if not assisted and not all(checks.values()):
+                                      failures.append({'id': case['id'], 'text_fallback': text_fallback,
+                                                       'failed_checks': [key for key, ok in checks.items() if not ok],
+                                                       'missing_facts': [key for key, ok in facts.items() if not ok]})
+
+          async def main():
+              validate_sources()
+              await run_session(False)
+              await run_session(True)
+              validate_sources()
+
+          try:
+              asyncio.run(main())
+          except BaseException as exc:
+              report['execution_error'] = f'{type(exc).__name__}: {exc}'
+              raise
+          finally:
+              (out / 'original-15-stdio.json').write_text(json.dumps(report, ensure_ascii=False, indent=2) + '\n')
+          assert len(rows) == 60, len(rows)
+          for fallback in (False, True):
+              for assisted in (False, True):
+                  selected = [r for r in rows if r['text_fallback'] == fallback and r['assisted'] == assisted]
+                  passed = sum(all(r['checks'].values()) for r in selected)
+                  print(f'text_fallback={fallback}; assisted={assisted}; passed={passed}/15')
+          assert not failures, json.dumps(failures)
+          PY
+      - name: Preserve SHA-bound core and stdio evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: direct-question-proof-${{ github.event.pull_request.head.sha }}
+          path: ${{ runner.temp }}/direct-question-proof/
+          retention-days: 14
