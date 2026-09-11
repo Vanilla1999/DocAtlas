@@ -96,15 +96,21 @@ jobs:
           set -eu
           python -m eval.evidence_quality_v2.documentation_audit --output "$RUNNER_TEMP/evidence-validation/documentation-audit" > "$RUNNER_TEMP/evidence-validation/documentation-audit.log" 2>&1
           python -m compileall -q docmancer eval scripts
-          python scripts/installed_mcp_contract_self_test.py > "$RUNNER_TEMP/evidence-validation/installed-contract.log" 2>&1
+          python -m scripts.installed_mcp_contract_self_test > "$RUNNER_TEMP/evidence-validation/installed-contract.log" 2>&1
           python -m build --wheel --outdir "$RUNNER_TEMP/evidence-validation/wheel" > "$RUNNER_TEMP/evidence-validation/build.log" 2>&1
           sha256sum "$RUNNER_TEMP/evidence-validation/wheel/"*.whl > "$RUNNER_TEMP/evidence-validation/wheel.sha256"
+      - name: Replay the frozen matrix and source-bound host inputs
+        run: |
+          set -eu
+          python -m eval.evidence_quality_v2.run --output "$RUNNER_TEMP/evidence-validation/native" > "$RUNNER_TEMP/evidence-validation/native.log" 2>&1
+          python -m eval.evidence_quality_v2.host_control --native-output "$RUNNER_TEMP/evidence-validation/native" --output "$RUNNER_TEMP/evidence-validation/host-inputs" > "$RUNNER_TEMP/evidence-validation/host-inputs.log" 2>&1
+          python -m eval.evidence_quality_v2.robustness --output "$RUNNER_TEMP/evidence-validation/robustness" > "$RUNNER_TEMP/evidence-validation/robustness.log" 2>&1
       - name: Real installed-wheel scripted MCP trajectory
         run: |
           set -eu
           WHEEL=$(find "$RUNNER_TEMP/evidence-validation/wheel" -name '*.whl' -type f)
-          python scripts/run_installed_mcp_agent_benchmark.py --wheel "$WHEEL" --source-commit "$(git rev-parse HEAD)" --planner scripted --task module_definition_supported --max-schema-repairs 1 --min-pass-rate 1 --output "$RUNNER_TEMP/evidence-validation/installed/report.json" > "$RUNNER_TEMP/evidence-validation/installed.log" 2>&1
-          python scripts/verify_installed_mcp_agent_report.py "$RUNNER_TEMP/evidence-validation/installed/report.json" --expected-origin reviewed-wheel --min-task-count 1 --min-pass-rate 1 --require-schema-repair > "$RUNNER_TEMP/evidence-validation/installed-verifier.log" 2>&1
+          python -m scripts.run_installed_mcp_agent_benchmark --wheel "$WHEEL" --source-commit "$(git rev-parse HEAD)" --planner scripted --task module_definition_supported --max-schema-repairs 1 --min-pass-rate 1 --output "$RUNNER_TEMP/evidence-validation/installed/report.json" > "$RUNNER_TEMP/evidence-validation/installed.log" 2>&1
+          python -m scripts.verify_installed_mcp_agent_report "$RUNNER_TEMP/evidence-validation/installed/report.json" --expected-origin reviewed-wheel --min-task-count 1 --min-pass-rate 1 --require-schema-repair > "$RUNNER_TEMP/evidence-validation/installed-verifier.log" 2>&1
       - name: Publish only validated commits by fast-forward
         run: |
           set -eu
