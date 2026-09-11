@@ -8,6 +8,9 @@ import os
 import sys
 import tempfile
 import string
+import subprocess
+import sqlite3
+import time
 from pathlib import Path
 
 from docmancer.mcp.agent_config import AgentTarget, register_server
@@ -60,6 +63,99 @@ def validate_context_payload(answer: dict, *, required_fragment: str) -> None:
         assert len(digest) == 64 and all(char in string.hexdigits.lower()[:16] for char in digest), source
 
 
+def _accept_fixture(project: Path) -> None:
+    """Commit only the temporary public fixture, never the caller's repository."""
+    for args in (
+        ("init", "-q"),
+        ("config", "user.email", "fixture@example.test"),
+        ("config", "user.name", "Docs MCP smoke fixture"),
+        ("add", "."),
+        ("commit", "-qm", "accepted fixture documentation"),
+    ):
+        subprocess.run(["git", "-C", str(project), *args], check=True, timeout=15)
+
+
+async def lifecycle_smoke(session: object, root: Path) -> None:
+    """Scripted lifecycle checks on the same real installed MCP connection.
+
+    Status/preparation calls here are explicit fixture lifecycle requests, not
+    speculative model actions. No live model, network fetch or new polling
+    policy is involved. A locally invalid manifest fails before source fetching.
+    """
+    project = root / "lifecycle-project"
+    project.mkdir()
+    (project / "README.md").write_text(
+        f"# Docs MCP server\n\nThe command that starts the Docs MCP server is `{NEEDLE}`.\n",
+        encoding="utf-8",
+    )
+    _accept_fixture(project)
+    original = {"question": QUESTION, "project_path": str(project)}
+    initial = payload(await session.call_tool("get_docs_context", original))
+    assert not initial.get("answer_supported"), initial
+    status_args = {"action": "project", "project_path": str(project), "details": True}
+    inspected = payload(await session.call_tool("docs_status", status_args))["project"]
+    assert inspected["source_summary"]["indexed"] == 0, inspected
+    action = inspected["next_action"]
+    assert action["tool"] == "prepare_docs" and action["requires_confirmation"] is False, action
+    guarded = action["arguments_patch"]
+    assert guarded["action"] == "sync_project_docs" and guarded["plan_digest"], guarded
+
+    # A legitimate precondition race must fail closed before changing the index.
+    (project / "unreviewed.txt").write_text("unreviewed fixture change\n", encoding="utf-8")
+    rejected = payload(await session.call_tool("prepare_docs", guarded))
+    assert rejected["status"] == "precondition_failed", rejected
+    assert rejected["requires_confirmation"] is True, rejected
+    dirty = payload(await session.call_tool("docs_status", status_args))["project"]
+    assert dirty["requires_confirmation"] is True, dirty
+    assert dirty["source_summary"]["indexed"] == 0, dirty
+    # No unguarded prepare follows a confirmation-required response.
+    _accept_fixture(project)  # fixture author explicitly accepts the new snapshot
+    accepted = payload(await session.call_tool("docs_status", status_args))["project"]
+    next_action = accepted["next_action"]
+    assert next_action["requires_confirmation"] is False, next_action
+    synced = payload(await session.call_tool("prepare_docs", next_action["arguments_patch"]))
+    assert synced["status"] == "success", synced
+    answer = payload(await session.call_tool("get_docs_context", original))
+    validate_context_payload(answer, required_fragment=NEEDLE)
+    # Exactly the original question is retried once; sufficient evidence stops
+    # this task. No extra discovery/status call is made for this ready context.
+
+    # Explicit, local-only invalid-manifest request exercises a real async job.
+    manifest = root / "invalid.docs.yaml"
+    manifest.write_text("schema_version: 1\ntargets: not-a-list\n", encoding="utf-8")
+    started = payload(await session.call_tool("prepare_docs", {
+        "action": "prefetch_docs_manifest", "manifest_path": str(manifest),
+        "project_path": str(project),
+    }))
+    assert started["job_id"] and started["status"] == "running", started
+    # Infrastructure readiness barrier, not extra host/MCP polling or a new
+    # agent policy. Read only status in this fixture's own database so scheduler
+    # timing cannot turn the terminal-state check into a flaky sleep-based test.
+    database = Path(inspected["diagnostics"]["active_index"]["db_path"]).resolve()
+    assert database.is_relative_to(root.resolve()), "fixture database escaped isolation"
+    deadline = time.monotonic() + 10
+    readiness_reads = 0
+    while True:
+        with sqlite3.connect(database.as_uri() + "?mode=ro", uri=True, timeout=1) as db:
+            state = db.execute("SELECT status FROM docs_jobs WHERE job_id = ?", (started["job_id"],)).fetchone()
+        readiness_reads += 1
+        if state and state[0] == "failed":
+            break
+        if time.monotonic() >= deadline:
+            raise TimeoutError("local invalid-manifest fixture did not reach terminal state")
+        await asyncio.sleep(0.01)
+    print(f"Lifecycle fixture readiness: {readiness_reads} read-only storage checks; "
+          "one MCP job-status call follows (not a model or latency measurement)")
+    terminal = payload(await session.call_tool("docs_status", {
+        "action": "job", "job_id": started["job_id"],
+    }))
+    assert terminal["status"] == "failed" and terminal["retryable"] is False, terminal
+    assert terminal["counts"]["pages"]["total"] == 0, terminal
+    # Terminal failure stops: no retry, cancellation or further polling.
+    print("Installed lifecycle smoke: clean guard / confirmation / unchanged retry / "
+          "ready stop / async status / terminal stop PASS (scripted, no live model)")
+
+
 async def smoke() -> None:
     # The parsers below are provider-free release contracts. Import the MCP
     # client only when the installed-artifact smoke is actually executed.
@@ -110,6 +206,7 @@ async def smoke() -> None:
                     source.get("path_or_url") == "README.md" or source.get("path") == "README.md"
                     for source in sources
                 ), answer
+                await lifecycle_smoke(session, root)
         config_path = user_home / "opencode.json"
         register_server(AgentTarget("opencode", config_path, "json_opencode_mcp"))
         registrations = json.loads(config_path.read_text())["mcp"]
