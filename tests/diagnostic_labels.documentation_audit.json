@@ -1,0 +1,10 @@
+{
+  "schema_version": 1,
+  "module_labels": {
+    "tests/evidence_quality_v2/test_documentation_audit.py": "behavioral"
+  },
+  "node_overrides": {},
+  "module_node_hashes": {
+    "tests/evidence_quality_v2/test_documentation_audit.py": "e6c1d3187a2eae2ab91337331fb617002f00e0af8a5085a34eefdbb6dff9abe4"
+  }
+}
