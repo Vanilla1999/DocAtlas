@@ -29,7 +29,7 @@ from docmancer.docs.application.model_visible_projection import (
     project_insufficient,
 )
 from docmancer.docs.domain.project_doc_ranking import (
-    project_question_lane,
+    project_question_lane, condition_lead_priority,
     project_source_lane,
 )
 from docmancer.docs.domain.context_budget import PROJECT_CONTEXT_BUDGET
@@ -961,6 +961,7 @@ def _facet_aware_candidates(
             int(exact_count > 0),
             component_count,
             bound_assignment,
+            condition_lead_priority(query_text.get("query-original", ""), str(source.get("snippet") or "")),
             rank[3] if exact_count else 0.0,
             exact_count,
             len(_fully_matched_query_ids((source,)) & required_query_ids),
