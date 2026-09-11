@@ -1,0 +1,130 @@
+name: Evidence v2 validated continuation
+on:
+  push:
+    branches: [fix/evidence-quality-v2-20260910]
+    paths: [.github/workflows/evidence-v2-close-checkpoint.yml]
+permissions:
+  contents: write
+concurrency:
+  group: evidence-v2-reviewed-publication
+  cancel-in-progress: false
+jobs:
+  validate-publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    env:
+      DOCATLAS_OFFLINE: '1'
+      DOCATLAS_AUTO_VECTORS: '0'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ github.sha }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - name: Apply only the reviewed hash-bound patch
+        run: |
+          set -eu
+          mkdir -p "$RUNNER_TEMP/evidence-validation"
+          git merge-base --is-ancestor a018a709112d62ab610f5ee5ffd15b4651c7103b HEAD
+          python - <<'PY'
+          import base64, hashlib, lzma, pathlib, subprocess
+          allowed = {
+              'docmancer/docs/application/docs_context_projection.py',
+              'docmancer/docs/domain/project_doc_ranking.py',
+              'eval/evidence_quality_v2/P4_CONDITION_REVIEW.md',
+              'tests/evidence_quality_v2/test_condition_lead.py',
+              'tests/diagnostic_labels.condition_lead.json',
+              'eval/evidence_quality_v2/documentation_audit.py',
+              'tests/evidence_quality_v2/test_documentation_audit.py',
+              'tests/diagnostic_labels.documentation_audit.json',
+              'eval/evidence_quality_v2/host_control.py',
+              'tests/evidence_quality_v2/test_host_control.py',
+              'tests/diagnostic_labels.host_evidence_control.json',
+          }
+          patch = lzma.decompress(base64.b64decode(pathlib.Path('.github/review/resume-p4-p6.b64').read_text()))
+          assert hashlib.sha256(patch).hexdigest() == '94b5571fd0679fea2be1f56d0addbe2df554a3ca026fcc90f5802c5bd7a733f3'
+          names = subprocess.check_output(['git', 'apply', '--numstat'], input=patch).decode()
+          assert {line.split('\t', 2)[2] for line in names.splitlines()} == allowed, names
+          drift = subprocess.check_output(['git', 'diff', '--name-only', 'a018a709112d62ab610f5ee5ffd15b4651c7103b', 'HEAD'], text=True).splitlines()
+          assert set(drift) == {'.github/review/resume-p4-p6.b64', '.github/workflows/evidence-v2-close-checkpoint.yml'}, drift
+          subprocess.run(['git', 'apply', '--check'], input=patch, check=True)
+          subprocess.run(['git', 'apply'], input=patch, check=True)
+          PY
+          git diff --check
+      - name: Create separate reviewed commits without publishing yet
+        run: |
+          set -eu
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add docmancer/docs/application/docs_context_projection.py docmancer/docs/domain/project_doc_ranking.py eval/evidence_quality_v2/P4_CONDITION_REVIEW.md tests/evidence_quality_v2/test_condition_lead.py tests/diagnostic_labels.condition_lead.json
+          git commit -m 'fix: retain explicit permission conditions in bounded project context'
+          git add eval/evidence_quality_v2/documentation_audit.py tests/evidence_quality_v2/test_documentation_audit.py tests/diagnostic_labels.documentation_audit.json
+          git commit -m 'test(eval): distinguish selected-source gaps from runtime fact loss'
+          git add eval/evidence_quality_v2/host_control.py tests/evidence_quality_v2/test_host_control.py tests/diagnostic_labels.host_evidence_control.json
+          git commit -m 'test(eval): add source-bound oracle and evidence-order controls'
+          python - <<'PY'
+          import subprocess
+          files = [
+              '.github/workflows/evidence-quality-v2-bootstrap.yml',
+              '.github/workflows/evidence-v2-public-inputs.yml',
+              '.github/workflows/evidence-v2-tokenizer.yml',
+              '.github/workflows/evidence-v2-publish-checkpoint.yml',
+              '.github/workflows/evidence-v2-resume-snapshot.yml',
+              '.github/workflows/evidence-v2-close-checkpoint.yml',
+              '.github/review/resume-p4-p6.b64',
+          ]
+          for path in files:
+              found = subprocess.run(['git', 'cat-file', '-e', 'e1daf4fa68f16f626068f2c58646e2ebfd4293f7:' + path], capture_output=True)
+              assert found.returncode != 0, 'refusing to delete a base-main file: ' + path
+          subprocess.run(['git', 'rm', '--', *files], check=True)
+          PY
+          git commit -m 'chore: remove consumed evidence continuation delivery workflows'
+          git rev-parse HEAD > "$RUNNER_TEMP/evidence-validation/validated-head.txt"
+          git log -5 --format=fuller > "$RUNNER_TEMP/evidence-validation/commits.txt"
+      - name: Install validation dependencies
+        run: python -m pip install '.[dev]' 'tiktoken==0.11.0' build > "$RUNNER_TEMP/evidence-validation/dependencies.log" 2>&1
+      - name: Full offline core on the exact clean publication tree
+        run: |
+          set -eu
+          mkdir -p "$RUNNER_TEMP/validation-home"
+          env -u DOCATLAS_HOME -u DOCMANCER_HOME -u XDG_CONFIG_HOME -u XDG_DATA_HOME -u XDG_CACHE_HOME HOME="$RUNNER_TEMP/validation-home" python -m pytest tests/ -q -m 'not advanced and not live and not live_network' --junitxml="$RUNNER_TEMP/evidence-validation/core.xml" > "$RUNNER_TEMP/evidence-validation/core.log" 2>&1
+          tail -5 "$RUNNER_TEMP/evidence-validation/core.log"
+      - name: Verify the documentary-gap audit and packaging contract
+        run: |
+          set -eu
+          python -m eval.evidence_quality_v2.documentation_audit --output "$RUNNER_TEMP/evidence-validation/documentation-audit" > "$RUNNER_TEMP/evidence-validation/documentation-audit.log" 2>&1
+          python -m compileall -q docmancer eval scripts
+          python scripts/installed_mcp_contract_self_test.py > "$RUNNER_TEMP/evidence-validation/installed-contract.log" 2>&1
+          python -m build --wheel --outdir "$RUNNER_TEMP/evidence-validation/wheel" > "$RUNNER_TEMP/evidence-validation/build.log" 2>&1
+          sha256sum "$RUNNER_TEMP/evidence-validation/wheel/"*.whl > "$RUNNER_TEMP/evidence-validation/wheel.sha256"
+      - name: Real installed-wheel scripted MCP trajectory
+        run: |
+          set -eu
+          WHEEL=$(find "$RUNNER_TEMP/evidence-validation/wheel" -name '*.whl' -type f)
+          python scripts/run_installed_mcp_agent_benchmark.py --wheel "$WHEEL" --source-commit "$(git rev-parse HEAD)" --planner scripted --task module_definition_supported --max-schema-repairs 1 --min-pass-rate 1 --output "$RUNNER_TEMP/evidence-validation/installed/report.json" > "$RUNNER_TEMP/evidence-validation/installed.log" 2>&1
+          python scripts/verify_installed_mcp_agent_report.py "$RUNNER_TEMP/evidence-validation/installed/report.json" --expected-origin reviewed-wheel --min-task-count 1 --min-pass-rate 1 --require-schema-repair > "$RUNNER_TEMP/evidence-validation/installed-verifier.log" 2>&1
+      - name: Publish only validated commits by fast-forward
+        run: |
+          set -eu
+          git diff --check
+          test -z "$(git status --porcelain)"
+          ACTUAL=$(git ls-remote origin refs/heads/fix/evidence-quality-v2-20260910 | cut -f1)
+          test "$ACTUAL" = '${{ github.sha }}'
+          git push origin HEAD:refs/heads/fix/evidence-quality-v2-20260910
+          git rev-parse HEAD > "$RUNNER_TEMP/evidence-validation/published-head.txt"
+      - name: Preserve source and logs even if validation fails
+        if: always()
+        run: |
+          mkdir -p "$RUNNER_TEMP/evidence-validation"
+          git bundle create "$RUNNER_TEMP/evidence-validation/source.bundle" HEAD
+          git diff --binary > "$RUNNER_TEMP/evidence-validation/uncommitted.patch"
+          git status --short > "$RUNNER_TEMP/evidence-validation/worktree.txt"
+          python -m pip freeze > "$RUNNER_TEMP/evidence-validation/packages.txt"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: evidence-v2-validated-${{ github.sha }}
+          path: ${{ runner.temp }}/evidence-validation/
+          retention-days: 14
