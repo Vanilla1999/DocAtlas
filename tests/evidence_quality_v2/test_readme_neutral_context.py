@@ -97,3 +97,18 @@ def test_distinct_lookup_retains_its_own_direction(lookup):
     from docmancer.docs.domain.documentation_query_plan import build_documentation_query_plan
     plan=build_documentation_query_plan('Pebble must refresh',lookup_queries=(lookup,))
     assert any(q.origin=='host_lookup' and q.text==lookup for q in plan.queries)
+
+
+@pytest.mark.parametrize("question", [
+    "Как Pebble отправляет сообщения через квантовый канал?",
+    "Как Pebble Pebble отправляет сообщения через квантовый канал?",
+])
+def test_name_only_hint_does_not_establish_an_unknown_topic(tmp_path, monkeypatch, question):
+    service, root = _named_document_service(tmp_path, monkeypatch, ["README.md"], {"README.md": TEXT})
+    answer, trace = capture(service, {"question": question, "project_path": root, "scope": "all"})
+    # Retrieval really found the owned document. Only the subject matches;
+    # source eligibility does not establish relevance to this new allegation.
+    assert trace["stages"]["retrieved_candidates"]
+    assert not answer.get("context_available"), answer
+    assert not answer["answer_supported"]
+    assert not integrity(answer, trace["snapshot"], Path(root))

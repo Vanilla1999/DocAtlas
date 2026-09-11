@@ -239,7 +239,10 @@ def _run_process_bounded(
 ) -> tuple[bytes, bytes, int, bool, bool]:
     """Drain a subprocess concurrently while enforcing byte and wall-clock limits."""
     try:
-        process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        # Bounded read-only commands must not inherit the MCP host input pipe.
+        process = subprocess.Popen(
+            command, stdin=subprocess.DEVNULL, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+        )
     except OSError as exc:
         return b"", str(exc).encode("utf-8", errors="replace"), 1, False, False
     assert process.stdout is not None and process.stderr is not None

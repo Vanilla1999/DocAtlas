@@ -29,3 +29,15 @@ def fallback_context_query_ids(plan: dict[str, Any], retrieval: dict[str, Any], 
             if q.get('origin') == 'retrieval_hint' and q.get('query_id')
             and len(str(q.get('text') or '').strip()) >= 4
             and re.search(r'(?<!\w)' + re.escape(str(q['text']).strip()) + r'(?!\w)', question, re.I)}
+
+
+def has_context_hint_support(source: dict[str, Any]) -> bool:
+    """A lone subject/name hit cannot rescue an otherwise unqualified question.
+
+    Use the existing body-only lexical facts, recomputed by the projector, not
+    filename/heading matches or repeated spelling variants of the same token.
+    This is a conservative preference floor; it never certifies the question.
+    """
+    trace = (source.get("retrieval_query_matches") or {}).get("query-original") or {}
+    terms = {str(term).strip().casefold() for term in trace.get("body_matched_terms") or ()}
+    return len(terms - {""}) >= 2

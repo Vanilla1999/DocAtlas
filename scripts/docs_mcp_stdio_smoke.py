@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import asyncio
+from contextlib import closing
 import json
 import os
 import sys
@@ -67,12 +68,19 @@ def _accept_fixture(project: Path) -> None:
     """Commit only the temporary public fixture, never the caller's repository."""
     for args in (
         ("init", "-q"),
+        ("config", "core.autocrlf", "false"),
         ("config", "user.email", "fixture@example.test"),
         ("config", "user.name", "Docs MCP smoke fixture"),
         ("add", "."),
         ("commit", "-qm", "accepted fixture documentation"),
     ):
         subprocess.run(["git", "-C", str(project), *args], check=True, timeout=15)
+
+
+def _read_fixture_job_state(database: Path, job_id: str) -> tuple[str] | None:
+    """Read one state and release its handle before temporary-fixture cleanup."""
+    with closing(sqlite3.connect(database.as_uri() + "?mode=ro", uri=True, timeout=1)) as db:
+        return db.execute("SELECT status FROM docs_jobs WHERE job_id = ?", (job_id,)).fetchone()
 
 
 async def lifecycle_smoke(session: object, root: Path) -> None:
@@ -86,7 +94,7 @@ async def lifecycle_smoke(session: object, root: Path) -> None:
     project.mkdir()
     (project / "README.md").write_text(
         f"# Docs MCP server\n\nThe command that starts the Docs MCP server is `{NEEDLE}`.\n",
-        encoding="utf-8",
+        encoding="utf-8", newline="\n",
     )
     _accept_fixture(project)
     original = {"question": QUESTION, "project_path": str(project)}
@@ -96,12 +104,12 @@ async def lifecycle_smoke(session: object, root: Path) -> None:
     inspected = payload(await session.call_tool("docs_status", status_args))["project"]
     assert inspected["source_summary"]["indexed"] == 0, inspected
     action = inspected["next_action"]
-    assert action["tool"] == "prepare_docs" and action["requires_confirmation"] is False, action
+    assert action.get("tool") == "prepare_docs" and action.get("requires_confirmation") is False, inspected
     guarded = action["arguments_patch"]
     assert guarded["action"] == "sync_project_docs" and guarded["plan_digest"], guarded
 
     # A legitimate precondition race must fail closed before changing the index.
-    (project / "unreviewed.txt").write_text("unreviewed fixture change\n", encoding="utf-8")
+    (project / "unreviewed.txt").write_text("unreviewed fixture change\n", encoding="utf-8", newline="\n")
     rejected = payload(await session.call_tool("prepare_docs", guarded))
     assert rejected["status"] == "precondition_failed", rejected
     assert rejected["requires_confirmation"] is True, rejected
@@ -136,8 +144,7 @@ async def lifecycle_smoke(session: object, root: Path) -> None:
     deadline = time.monotonic() + 10
     readiness_reads = 0
     while True:
-        with sqlite3.connect(database.as_uri() + "?mode=ro", uri=True, timeout=1) as db:
-            state = db.execute("SELECT status FROM docs_jobs WHERE job_id = ?", (started["job_id"],)).fetchone()
+        state = _read_fixture_job_state(database, started["job_id"])
         readiness_reads += 1
         if state and state[0] == "failed":
             break

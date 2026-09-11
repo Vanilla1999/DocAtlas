@@ -6,7 +6,7 @@ import hashlib
 import re
 from typing import Any
 from ._docs_context_payload import _payload
-from docmancer.docs.domain.context_hint_policy import fallback_context_query_ids
+from docmancer.docs.domain.context_hint_policy import fallback_context_query_ids, has_context_hint_support
 
 from docmancer.docs.application.context_selection import (
     component_coverage_decision,
@@ -242,7 +242,7 @@ def project_docs_context(
             )
         ):
             continue
-        if not component_ids and not required_ids and not exact_anchor_ids and not original_hit and not host_ids and not canonical_intent_ids and not (qualified_ids & context_hint_query_ids):
+        if not component_ids and not required_ids and not exact_anchor_ids and not original_hit and not host_ids and not canonical_intent_ids and not (qualified_ids & context_hint_query_ids and has_context_hint_support(qualified_original)):
             continue
         if (
             "contract_fact" in context_only_relations

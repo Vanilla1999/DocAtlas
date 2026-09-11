@@ -1,0 +1,10 @@
+{
+  "schema_version": 1,
+  "module_labels": {
+    "tests/evidence_quality_v2/test_git_stdio_isolation.py": "behavioral"
+  },
+  "node_overrides": {},
+  "module_node_hashes": {
+    "tests/evidence_quality_v2/test_git_stdio_isolation.py": "31a9c961cc3bb13d8ac75bc8a169dbf4deae4029a7dc052da67156a37d28d2ae"
+  }
+}
