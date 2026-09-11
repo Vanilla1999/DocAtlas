@@ -7,13 +7,24 @@ This report-only update does not change production, source documents, questions,
 annotations, thresholds, tool schemas or token budgets. Ordinary CI for a later
 report commit must be checked separately; results below are not silently rebound.
 
+## Audit correction, 2026-09-11
+
+Recounting immutable artifact 10192554093 exposed transcription errors in this
+report: its primitive rows and its saved summary both show **28/48**, not 29/48,
+and **18/48**, not 19/48, without structural expansion. All 560 row identities,
+14 source files, 551 final cited spans and token recounts verified. No request,
+scorer, witness, source text, acceptance threshold or runtime was changed to
+make this correction. See `ARTIFACT_AUDIT.json` and `CONTINUATION_AUDIT.md`.
+The new c8fcd428 replay reproduces every historical sufficiency label; its
+identity-bearing metadata and size/latency measurements remain a separate run.
+
 ## Published and executed, not just staged
 
 | Step | Hypothesis or contract | Executed evidence | Change and result | Boundary |
 | --- | --- | --- | --- | --- |
 | P1 | Separate source support, sufficiency, citation integrity and first loss | Measurement tests, same-call capture, fixed candidate replay, final validation | Eval-only assessment/trace/cost/answer modules | Approved-witness recognition is not universal semantic judgment; unknown alternatives remain review items |
 | P2 | Test outside original-15 on fixed real documentation | 80 tasks, eight pinned upstream projects, exact 14-document manifest | 40 development / 40 exposed validation, grouped by project | Exposed development benchmark, NOT hidden validation |
-| P3 | Test canonical aliases, ranking, expansion and host lookups one factor at a time | 560 rows: 400 real handler calls and 160 same-candidate projector replays | A/B/C/explicit/duplicate/nearby each 29/48 recognized sufficient; no-expansion 19/48 | No blanket superiority claim; C/D are replays, not fresh retrieval |
+| P3 | Test canonical aliases, ranking, expansion and host lookups one factor at a time | 560 rows: 400 real handler calls and 160 same-candidate projector replays | A/B/C/explicit/duplicate/nearby each 28/48 recognized sufficient; no-expansion 18/48 | No blanket superiority claim; C/D are replays, not fresh retrieval |
 | P4a/c | Safe literal hints were lost for unresolved broad questions; exact-original duplicate added no requirement | Neutral Pebble handler/projection tests and safety negatives in full core | Published `9fe3e017`: bounded hint fallback and exact-original dedup; no original/full/support fabrication | Exact API/path, normative-premise and unsafe evidence retain existing protections |
 | P4b | Q05 permission condition was retrieved but lost during selection | Unchanged original-15 RED, same-call trace, ordering-column rollback and final regression | Published `f921c4b2`: single-operation condition-lead preference; original-15 now passes | Narrow preference, not a semantic classifier; neutral 400-token probe is explicitly characterization |
 | P4d | Root/seed/ingest/format changes might break invariant fixture meaning | Eight subprocess/root variants, 40 handler calls, both projects populated | All three required facts preserved; eight distinct-identity isolation controls; zero observed violations | DISPROVED_ON_THIS_FIXTURE; no extra production patch justified |
@@ -37,8 +48,8 @@ branch. It did not merge the PR or publish a release.
   The selected command excludes advanced/live/live_network; it is not all tests.
   The existing direct original-15 test is included and passes without changes.
 - Frozen 80-task matrix: 560/560 rows, zero operational errors and zero observed
-  source-integrity/contract violations. Native A: 29 sufficient, 31 needs_review,
-  20 insufficient of all 80. Primary denominator is 48 within-budget tasks.
+  source-integrity/contract violations. Native A: 28 sufficient, 31 needs_review,
+  21 insufficient of all 80. Primary denominator is 48 within-budget tasks.
 - Documentary gap audit: PASS; no source-doc change proposed.
 - Metamorphic fixture: 8 runs, 40 handler calls, 3/3 baseline facts complete,
   no semantic changes or observed integrity/isolation violations.
@@ -78,28 +89,30 @@ and latency summaries.
 
 | Series | Recognized sufficient / 48 | Actual tokens p50 / p95 over 80 |
 | --- | --- | --- |
-| DocAtlas A, published-head CI handler payload | 29 | 360 / 633 |
-| Grounded 3.1.0 native lexical, limit 1, separate local replay | 21 | 433 / 1669 |
-| Grounded 3.1.0 native lexical, limit 3, separate local replay | 32 | 1219 / 3072 |
-| Grounded 3.1.0 native lexical, limit 5, separate local replay | 32 | 1848 / 4684 |
+| DocAtlas A, published-head CI handler payload | 28 | 360 / 633 |
+| Grounded 3.1.0 native lexical, limit 1, 2026-09-11 replay | 22 | 433 / 1669 |
+| Grounded 3.1.0 native lexical, limit 3, 2026-09-11 replay | 32 | 1219 / 3072 |
+| Grounded 3.1.0 native lexical, limit 5, 2026-09-11 replay | 32 | 1848 / 4684 |
 
 The separate Grounded replay verified the same 14 source documents in its actual
 SQLite ingest, no missing/extra sources and no non-null embeddings. It completed
 240/240 native stdio requests without operational errors. Source-paragraph
 mapping is conservative; unknown alternatives require review, not automatic FAIL.
-These latest local counts supersede the earlier historical 22/32/32 checkpoint;
-they are not silently pooled with it. The local runtime/package and raw results
-must accompany any reproduction; no independent hybrid-search comparison exists.
+The displayed Grounded values are the separately executed 2026-09-11 replay,
+not a re-labeling of the historical DocAtlas artifact. The earlier unbound local
+21/32/32 and adapter 7/48 prose is superseded by this saved run, not pooled with
+it. Its raw results and package identity accompany the audit. No independent
+hybrid-search comparison exists.
 
 The deliberately simple common first-whole-paragraph adapter gives Grounded
-7/48 and DocAtlas 29/48. It spends the three-block cap poorly. This is a negative
+8/48 and DocAtlas 28/48 in the 2026-09-11 replay. It spends the three-block cap poorly. This is a negative
 result for that adapter, NOT evidence that native Grounded is bad or a fair proof
 of DocAtlas superiority. Native top-3 is not an 800-token DocAtlas envelope.
 No token-savings factor at equal correctness is established by this table.
 
 A separate same-path, same-config/source/evaluator old-code/new-code replay of
-all 80 questions retained 29/48 primary sufficiency on both main baseline and
-this product tree. Ten results moved insufficient -> needs_review (eight
+all 80 questions retained 28/48 primary sufficiency on both main baseline and
+checked c8fcd428 tree in the 2026-09-11 replay. Ten results moved insufficient -> needs_review (eight
 ambiguous, one partial, one within-budget); these are not credited as successes.
 All runtime module origins were verified against the selected baseline checkout.
 The paired primary difference is zero: comparative outcome INCONCLUSIVE. Do not
@@ -119,8 +132,8 @@ bootstrap, exact tools/list, bounded schema repair and source-backed retrieval.
 It is not falsely reported as six installed lifecycle scenarios or autonomous
 reasoning. Existing offline tests separately exercise guarded clean-Git prepare,
 dirty-tree confirmation, precondition recheck, recovery and terminal job states;
-those are backend/contract tests, not a live host trajectory. A dedicated full
-installed lifecycle/job trajectory matrix is still outstanding.
+those are backend/contract tests, not a live host trajectory. The later six-scenario installed lifecycle/job smoke is described in
+FINAL_REVIEW.md; its Linux result does not stand in for Windows/PR acceptance.
 
 The answer/citation scorer and its tests distinguish supported partial answers,
 wrong-version/irrelevant citations, polarity violations, unknown extra assertions
@@ -128,7 +141,7 @@ and unjustified refusal. No actual model answers were collected here:
 context_sufficiency x answer_outcome is empty and support ratio is N/A, not 100%.
 
 Independent hidden validation, blind semantic adjudication of the review queue,
-live host repetitions, full provider cost, installed lifecycle matrix and final
+live host repetitions, full provider cost and final
 ordinary PR/platform/frozen acceptance results are separate remaining acceptance
 items. This checkpoint does not relabel them green or assert market superiority.
 

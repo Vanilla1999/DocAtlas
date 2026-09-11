@@ -72,9 +72,11 @@ installed scripted task. The runtime tree matches the locally checked tree on
 which all 593 advanced tests also passed. These scopes stay separate until the
 latest-head CI independently reruns them.
 
-Same-path old/new code comparison keeps primary recognized sufficiency at 29/48.
+The audited 2026-09-11 same-path old/new comparison keeps primary recognized
+sufficiency at 28/48. The earlier 29/48 transcription is corrected, not credited
+as a runtime change. See ARTIFACT_AUDIT.json and CONTINUATION_AUDIT.md.
 Ten non-success results move insufficient to needs_review; this is not credited
-as a gain. The local Grounded native replay is 21/32/32 at limits 1/3/5 with
+as a gain. The 2026-09-11 Grounded native replay is 22/32/32 at limits 1/3/5 with
 substantially larger payloads. A poor common adapter is not evidence against
 native Grounded. No equal-correctness end-to-end token saving is established.
 
