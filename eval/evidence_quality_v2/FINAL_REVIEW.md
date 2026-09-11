@@ -63,6 +63,21 @@ chooses these actions. The clean preparation action comes from an **explicit
 status/lifecycle request**; this test does not falsely assert that every initial
 unindexed free-form question already returns that action.
 
+## Latest published acceptance candidate
+
+Product/fixture fixes were published at
+`0d703f2d0e95a2fae351d50de081e7d3d37c4693` (`fix: isolate Git stdin and close
+fixture handles while preserving context guards`). The previous guarded Linux
+review had already passed offline core, frozen V2 and installed lifecycle; the
+remaining blocker was Windows reporting the lifecycle fixture as dirty. The
+0d703 fix is the current candidate for that blocker and keeps the context guards.
+
+The pull-request workflows created automatically for 0d703 finished immediately
+with GitHub's `action_required` conclusion and no jobs, so they are not counted as
+passing or failing product evidence. This report-only commit exists to request a
+fresh ordinary PR validation from a user-authored branch update without changing
+questions, thresholds, runtime policy, source documents or token budgets.
+
 ## What the evidence does not establish
 
 The exact published product validation at `5f7e70fa` includes 3660 passing offline
