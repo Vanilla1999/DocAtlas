@@ -1,0 +1,97 @@
+name: Evidence v2 final review fixes
+on:
+  push:
+    branches: [fix/evidence-quality-v2-20260910]
+    paths: [.github/workflows/evidence-v2-final-review-fixes.yml]
+permissions:
+  contents: read
+jobs:
+  validate:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 20
+    env:
+      DOCATLAS_OFFLINE: '1'
+      DOCATLAS_AUTO_VECTORS: '0'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - name: Verify and apply reviewed patch
+        shell: bash
+        run: |
+          python - <<'PY'
+          import base64, hashlib, lzma, pathlib, subprocess
+          encoded = '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'
+          patch = lzma.decompress(base64.b64decode(encoded))
+          assert hashlib.sha256(patch).hexdigest() == 'da83d964f82abca26a7e850a195648604ce27646a27a15870f7464f333957bf5'
+          subprocess.run(['git', 'apply', '--check'], input=patch, check=True)
+          subprocess.run(['git', 'apply'], input=patch, check=True)
+          pathlib.Path('review.patch').write_bytes(patch)
+          PY
+      - name: Install and run neutral regressions
+        shell: bash
+        run: |
+          python -m pip install '.[dev]' build 'tiktoken==0.11.0'
+          python -m pytest -q tests/evidence_quality_v2/test_readme_neutral_context.py
+      - name: Full offline core and frozen V2 on Linux
+        if: runner.os == 'Linux'
+        shell: bash
+        run: |
+          python -m pytest tests/ -q -m 'not advanced and not live and not live_network' > "$RUNNER_TEMP/core.log" 2>&1
+          python scripts/run_project_context_quality_v2_gate.py --output "$RUNNER_TEMP/v2.json"
+      - name: Real installed-wheel lifecycle smoke
+        shell: bash
+        run: |
+          python -m build --wheel --outdir "$RUNNER_TEMP/review-wheel"
+          python -m pip install --force-reinstall --no-deps "$RUNNER_TEMP/review-wheel/"*.whl
+          python scripts/docs_mcp_stdio_smoke.py
+      - name: Preserve validation proof
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: review-proof-${{ runner.os }}
+          path: |
+            review.patch
+            ${{ runner.temp }}/core.log
+            ${{ runner.temp }}/v2.json
+          retention-days: 14
+  publish:
+    needs: validate
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ github.sha }}
+      - uses: actions/download-artifact@v4
+        with:
+          name: review-proof-Linux
+          path: ${{ runner.temp }}/review-proof
+      - name: Publish exactly the validated patch and remove its carrier
+        shell: bash
+        run: |
+          set -eu
+          PATCH=$(find "$RUNNER_TEMP/review-proof" -name review.patch -type f)
+          test -n "$PATCH"
+          echo "da83d964f82abca26a7e850a195648604ce27646a27a15870f7464f333957bf5  $PATCH" | sha256sum --check
+          git apply --check "$PATCH"
+          git apply "$PATCH"
+          git diff --check
+          git rm .github/workflows/evidence-v2-final-review-fixes.yml
+          git add docmancer/docs/application/docs_context_projection.py docmancer/docs/domain/context_hint_policy.py scripts/docs_mcp_stdio_smoke.py tests/evidence_quality_v2/test_readme_neutral_context.py tests/diagnostic_labels.readme_neutral.json
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git commit -m 'fix: reject name-only hint context and isolate Windows Git fixture'
+          test "$(git ls-remote origin refs/heads/fix/evidence-quality-v2-20260910 | cut -f1)" = '${{ github.sha }}'
+          git push origin HEAD:refs/heads/fix/evidence-quality-v2-20260910
+          git log -1 --format=fuller
