@@ -6,6 +6,7 @@ import hashlib
 import re
 from typing import Any
 from ._docs_context_payload import _payload
+from docmancer.docs.domain.context_hint_policy import fallback_context_query_ids, has_context_hint_support
 
 from docmancer.docs.application.context_selection import (
     component_coverage_decision,
@@ -28,7 +29,7 @@ from docmancer.docs.application.model_visible_projection import (
     project_insufficient,
 )
 from docmancer.docs.domain.project_doc_ranking import (
-    project_question_lane,
+    project_question_lane, condition_lead_priority,
     project_source_lane,
 )
 from docmancer.docs.domain.context_budget import PROJECT_CONTEXT_BUDGET
@@ -150,6 +151,8 @@ def project_docs_context(
     if len(host_query_ids) > 1:
         compound_priority_query_ids = host_query_ids | audited_rewrite_query_ids
     eligible_query_ids = public_query_id_set | canonical_intent_query_ids
+    context_hint_query_ids = fallback_context_query_ids(query_plan, retrieval, eligible_query_ids)
+    eligible_query_ids |= context_hint_query_ids
     original_question = str(query_plan.get("original_question") or retrieval.get("question") or query_text.get("query-original") or "")
     requirements = retrieval.get("requirements") or {}
     requirement_items = requirements.get("requirements", ()) if isinstance(requirements, dict) else ()
@@ -239,7 +242,7 @@ def project_docs_context(
             )
         ):
             continue
-        if not component_ids and not required_ids and not exact_anchor_ids and not original_hit and not host_ids and not canonical_intent_ids:
+        if not component_ids and not required_ids and not exact_anchor_ids and not original_hit and not host_ids and not canonical_intent_ids and not (qualified_ids & context_hint_query_ids and has_context_hint_support(qualified_original)):
             continue
         if (
             "contract_fact" in context_only_relations
@@ -428,7 +431,8 @@ def project_docs_context(
             continue
         if sources and not (new_components or
             qualified_ids & public_query_id_set - selected_public_ids or
-            qualified_ids & canonical_intent_query_ids - selected_canonical_ids
+            qualified_ids & canonical_intent_query_ids - selected_canonical_ids or
+            qualified_ids & context_hint_query_ids - qualified_query_ids(sources)
         ):
             continue
         required_ids = qualified_ids & required_query_id_set
@@ -957,6 +961,7 @@ def _facet_aware_candidates(
             int(exact_count > 0),
             component_count,
             bound_assignment,
+            condition_lead_priority(query_text.get("query-original", ""), str(source.get("snippet") or "")),
             rank[3] if exact_count else 0.0,
             exact_count,
             len(_fully_matched_query_ids((source,)) & required_query_ids),

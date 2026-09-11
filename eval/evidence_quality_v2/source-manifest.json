@@ -1,0 +1,143 @@
+{
+  "sources": [
+    {
+      "project": "fastapi",
+      "repository": "fastapi/fastapi",
+      "ref": "0.115.0",
+      "commit": "40e33e492dbf4af6172997f4e3238a32e56cbe26",
+      "path": "docs/en/docs/tutorial/background-tasks.md",
+      "sha256": "d59a2e7da8f947e53a509efda0acf74dee093799710878dfc7abf09e3e4de89a",
+      "bytes": 5704
+    },
+    {
+      "project": "fastapi",
+      "repository": "fastapi/fastapi",
+      "ref": "0.115.0",
+      "commit": "40e33e492dbf4af6172997f4e3238a32e56cbe26",
+      "path": "docs/en/docs/tutorial/cors.md",
+      "sha256": "8ef62d49193d8cce86697211badd2a71e720b3d56cdde6266c516f432c152b76",
+      "bytes": 5223
+    },
+    {
+      "project": "starlette",
+      "repository": "encode/starlette",
+      "ref": "0.39.2",
+      "commit": "0b50b9c4abd992a39d6e32148cc6f577ac3b1c44",
+      "path": "docs/background.md",
+      "sha256": "e2c622d46ad52bf7d90abe62fd75f355c1ff6f46a0b8a1d55d18e3875bbece63",
+      "bytes": 1961
+    },
+    {
+      "project": "starlette",
+      "repository": "encode/starlette",
+      "ref": "0.39.2",
+      "commit": "0b50b9c4abd992a39d6e32148cc6f577ac3b1c44",
+      "path": "docs/lifespan.md",
+      "sha256": "a9de5de995935cfbd676335fbbbee6f87c96086174aff3d17ecdf89b6220e788",
+      "bytes": 2366
+    },
+    {
+      "project": "typer",
+      "repository": "fastapi/typer",
+      "ref": "0.12.5",
+      "commit": "88aefd4492696bd1afa7bdb49477dec2c29d7e77",
+      "path": "docs/tutorial/parameter-types/bool.md",
+      "sha256": "c025b6f1d713e6e07925d2d724f8b97cf3f80cad86b363e5e89c4fc42d80821d",
+      "bytes": 4277
+    },
+    {
+      "project": "typer",
+      "repository": "fastapi/typer",
+      "ref": "0.12.5",
+      "commit": "88aefd4492696bd1afa7bdb49477dec2c29d7e77",
+      "path": "docs/tutorial/terminating.md",
+      "sha256": "efa52652496e4c6a872b340a8bb0fc884d4e48b05540569b687a1063677c6a09",
+      "bytes": 3024
+    },
+    {
+      "project": "pydantic",
+      "repository": "pydantic/pydantic",
+      "ref": "v2.9.2",
+      "commit": "7cedbfb03df82ac55c844c97e6f975359cb51bb9",
+      "path": "docs/concepts/strict_mode.md",
+      "sha256": "06e00a3e114c85ff31286640cb9842a99209d4112d5cb4812b47d4bf556f2b71",
+      "bytes": 14364
+    },
+    {
+      "project": "pydantic",
+      "repository": "pydantic/pydantic",
+      "ref": "v2.9.2",
+      "commit": "7cedbfb03df82ac55c844c97e6f975359cb51bb9",
+      "path": "docs/concepts/alias.md",
+      "sha256": "0c65c7fddc78232eb17b34def5383402e8c2df715da9935ba3d97a98277233e0",
+      "bytes": 6864
+    },
+    {
+      "project": "httpx",
+      "repository": "encode/httpx",
+      "ref": "0.28.1",
+      "commit": "26d48e0634e6ee9cdc0533996db289ce4b430177",
+      "path": "docs/advanced/timeouts.md",
+      "sha256": "48959a587ecc6430f9051ab1b1c76fcebc3f3e95ec01199281aab813a2dcfaa1",
+      "bytes": 2763
+    },
+    {
+      "project": "httpx",
+      "repository": "encode/httpx",
+      "ref": "0.28.1",
+      "commit": "26d48e0634e6ee9cdc0533996db289ce4b430177",
+      "path": "docs/environment_variables.md",
+      "sha256": "d0cdf4d740dc3ed8b21c4ee45735551e05d4e57d0fda05a2f18c4684197a27eb",
+      "bytes": 1967
+    },
+    {
+      "project": "mkdocs",
+      "repository": "mkdocs/mkdocs",
+      "ref": "1.6.1",
+      "commit": "bb7e8b62185b11d9f59bb7f50b13c15134f62f8a",
+      "path": "docs/user-guide/writing-your-docs.md",
+      "sha256": "a6b69d1318ae84455bae021b6655b71274f29c19ba43d021d872d100b7b38cba",
+      "bytes": 19342
+    },
+    {
+      "project": "ruff",
+      "repository": "astral-sh/ruff",
+      "ref": "0.6.8",
+      "commit": "ae39ce56c0cc1f8ac15f980c0b457b16b67c1f2a",
+      "path": "docs/preview.md",
+      "sha256": "cb4f7f28ec9856fa77493af0182794aa39265753d5ef7947aa36e7f9918a141d",
+      "bytes": 3967
+    },
+    {
+      "project": "ruff",
+      "repository": "astral-sh/ruff",
+      "ref": "0.6.8",
+      "commit": "ae39ce56c0cc1f8ac15f980c0b457b16b67c1f2a",
+      "path": "docs/configuration.md",
+      "sha256": "bf1f9a85b89c749f9a17d2fee5af4630cb894fdbbee134ec7a635e4a1bc3b9ad",
+      "bytes": 27472
+    },
+    {
+      "project": "uv",
+      "repository": "astral-sh/uv",
+      "ref": "0.4.20",
+      "commit": "0e1b25a536b727276cd4012ce2e2751f9dac141d",
+      "path": "docs/pip/compatibility.md",
+      "sha256": "193d4e4f575ae0975b66b76d4ea93b15aaede550b85de37989caef9f6f494923",
+      "bytes": 24743
+    }
+  ],
+  "licenses": [
+    "licenses/fastapi/LICENSE",
+    "licenses/starlette/LICENSE.md",
+    "licenses/typer/LICENSE",
+    "licenses/pydantic/LICENSE",
+    "licenses/httpx/LICENSE.md",
+    "licenses/mkdocs/LICENSE",
+    "licenses/ruff/LICENSE",
+    "licenses/uv/LICENSE-APACHE",
+    "licenses/uv/LICENSE-MIT"
+  ],
+  "source_transform": "NONE: exact full upstream Markdown files; external include directives not expanded",
+  "scope": "selected document snapshot, not every upstream document or rendered website"
+}

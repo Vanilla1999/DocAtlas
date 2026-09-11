@@ -33,6 +33,30 @@ _HISTORY_INTENT_RE = re.compile(
 )
 
 
+def condition_lead_priority(question: str, snippet: str) -> int:
+    """Prefer a complete local condition over a generic permission mention.
+
+    This is only a relevance preference for a single named operation. It neither
+    qualifies evidence nor infers that the operation is actually permitted. In
+    particular a negative consequence remains negative, not an authorization.
+    """
+    if not re.match(r"^\s*(?:when\b.*\b(?:allowed|permitted)\b|"
+                    r"under (?:what|which) conditions\b|"
+                    r"когда\b.*(?:разреш|можно|допуст)|при каких условиях\b)", question, re.I):
+        return 0
+    if re.search(r"\b(?:not|never|нельзя|не)\b", question, re.I):
+        return 0
+    anchors = technical_anchors(question)
+    if len(anchors) != 1 or "/" in anchors[0]:
+        return 0
+    # Fenced examples are not a natural-language rule lead. Inline identifiers
+    # remain intact and must match the requested subject, not a substring.
+    visible = re.sub(r"```.*?```|~~~.*?~~~", "", snippet[:2200], flags=re.S)
+    lead = re.compile(r"(?:^|\n|[.!?]\s+)(?:when|if|unless|когда|если)\b"
+                      r"[^.!?\n]{0,350}(?<!\w)" + re.escape(anchors[0]) + r"(?!\w)", re.I)
+    return int(bool(lead.search(visible)))
+
+
 def normalize_doc_path(path: str | None) -> str:
     return (path or "").replace("\\", "/").lower().strip()
 

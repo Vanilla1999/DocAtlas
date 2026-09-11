@@ -324,7 +324,8 @@ def build_documentation_query_plan(
     host_rows: list[tuple[str, str]] = []
     for index, text in enumerate(lookup_queries[:5], start=1):
         cleaned = text.strip()
-        if not cleaned:
+        # An exact repeat of the original adds no new direction or authority.
+        if not cleaned or cleaned == question.strip():
             continue
         parent_query_id = f"query-lookup-{index}"
         derives_original = _host_lookup_can_derive_original(question, cleaned)

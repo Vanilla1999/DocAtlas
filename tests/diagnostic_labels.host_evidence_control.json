@@ -1,0 +1,10 @@
+{
+  "schema_version": 1,
+  "module_labels": {
+    "tests/evidence_quality_v2/test_host_control.py": "behavioral"
+  },
+  "node_overrides": {},
+  "module_node_hashes": {
+    "tests/evidence_quality_v2/test_host_control.py": "240b62fc54819122c462d15c554ebfd0a6d4929c5dcdcfb77807005a4af80431"
+  }
+}

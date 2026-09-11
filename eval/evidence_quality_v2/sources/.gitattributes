@@ -1,0 +1,5 @@
+# Pinned upstream fixture bytes must not change with checkout EOL settings.
+*.md -text
+# This immutable upstream file uses a two-space Markdown hard break on line 384.
+# Preserve its reviewed SHA; code and every other path retain normal checks.
+mkdocs/docs/user-guide/writing-your-docs.md whitespace=-blank-at-eol

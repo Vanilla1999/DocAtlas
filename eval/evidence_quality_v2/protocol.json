@@ -1,0 +1,81 @@
+{
+  "schema_version": "evidence-quality-protocol-v2",
+  "baseline_code_sha": "e1daf4fa68f16f626068f2c58646e2ebfd4293f7",
+  "split_state": "frozen_development_benchmark; validation visible to implementing agent",
+  "unseen_validation": "NOT_MEASURED",
+  "case_count": 80,
+  "split_counts": {
+    "development": 40,
+    "frozen_validation_exposed": 40
+  },
+  "primary_outcome": "full approved evidence on within_budget cases; needs_review never PASS",
+  "secondary": "required fact coverage, separate literal score and non-full categories",
+  "variants": [
+    "A-current",
+    "B-no-canonical",
+    "C-lexical-replay",
+    "D-no-expansion-replay",
+    "L-explicit",
+    "L-duplicate",
+    "L-nearby"
+  ],
+  "grounded": {
+    "package": "@arabold/docs-mcp-server",
+    "version": "3.1.0",
+    "mode": "FTS-only",
+    "native_limits": [
+      1,
+      3,
+      5
+    ],
+    "controlled": "source-preserving adapter with 800 actual o200k_base tokens and <=3 blocks; reject unmappable reassembly, never invent contiguous ranges"
+  },
+  "tokenizer": {
+    "package": "tiktoken",
+    "version": "0.11.0",
+    "encoding": "o200k_base"
+  },
+  "promotion_thresholds": {
+    "observed_safety_violations": 0,
+    "p95_actual_tokens_ratio_max": 1.1,
+    "p95_query_latency_ratio_max": 1.25,
+    "primary_loss_max": 0
+  },
+  "bootstrap": {
+    "unit": "project_group",
+    "resamples": 2000,
+    "seed": 20260910,
+    "claim": "few groups; interval including zero is INCONCLUSIVE"
+  },
+  "host_control": {
+    "cases": [
+      "fastapi-04",
+      "starlette-03",
+      "typer-01",
+      "pydantic-02"
+    ],
+    "orders": [
+      "original",
+      "reverse",
+      "rotate_one"
+    ],
+    "repeats": 2,
+    "no_live_connection": "deterministic input assembly only; model outcomes and positional sensitivity NOT_MEASURED"
+  },
+  "safety": "unchanged production limits, authority, scope, version, support flags and frozen gates",
+  "source_sha256": "f0395dcc526161b51d9378ef3ac6d4c8a1a1bd2e323be0c4c6cff58f783b0985",
+  "cases_sha256": "4b01b66609f1a04a067062556c97de1e2fcccc41359ecabcb75ee1154fc0d67d",
+  "implementation_clarifications": [
+    {
+      "topic": "valid original duplicate",
+      "reason": "tools/list lookup_queries has uniqueItems=true; two identical array items are a validation-negative control, not a retrieval ablation",
+      "valid_L_duplicate": "one lookup equal to original question",
+      "algorithm_or_corpus_change": false
+    },
+    {
+      "topic": "Grounded incremental per-file ingest",
+      "reason": "CLI scrape defaults clean=true; use official --no-clean to retain the same selected document manifest",
+      "algorithm_or_corpus_change": false
+    }
+  ]
+}

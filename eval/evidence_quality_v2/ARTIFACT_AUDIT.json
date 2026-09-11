@@ -1,0 +1,24 @@
+{
+  "artifact_id": 10192554093,
+  "artifact_sha256": "23daa238070d22ac5312bbb68af0c641eaac37108e382fd6cc409cc0326437a0",
+  "source_commit": "5f7e70fa9d205c19d8d1e6f116b2526f7a7b0e59",
+  "rows_sha256": "0351557bf4d0454b813eb606c4394c064f12b837c2bcc1c358e47685b7902541",
+  "summary_sha256": "be62ecf3f7ef156411d35d32b74eb337a6f0564786c92bf5fbc4efb3087325c6",
+  "protocol_sha256": "96a6c66e9061b3e40b5c2f01e1b69fb5eca5d88a4a542d5512246315fdb67de2",
+  "inventory_rows": 560,
+  "variant_count": 7,
+  "case_count": 80,
+  "source_documents_verified": 14,
+  "final_source_spans_revalidated": 551,
+  "summary_matches_rows": true,
+  "size_recounts_match": true,
+  "variants": {
+    "A-current": {"cases":80,"operational_errors":0,"within_budget":48,"within_budget_sufficient":28,"sufficiency":{"needs_review":31,"sufficient":28,"insufficient":21},"source_integrity_or_contract_violations":0,"tokens":{"n":80,"p50":360,"p95":633}},
+    "B-no-canonical": {"cases":80,"operational_errors":0,"within_budget":48,"within_budget_sufficient":28,"sufficiency":{"needs_review":31,"sufficient":28,"insufficient":21},"source_integrity_or_contract_violations":0,"tokens":{"n":80,"p50":360,"p95":633}},
+    "C-lexical-replay": {"cases":80,"operational_errors":0,"within_budget":48,"within_budget_sufficient":28,"sufficiency":{"needs_review":31,"sufficient":28,"insufficient":21},"source_integrity_or_contract_violations":0,"tokens":{"n":80,"p50":360,"p95":640}},
+    "D-no-expansion-replay": {"cases":80,"operational_errors":0,"within_budget":48,"within_budget_sufficient":18,"sufficiency":{"needs_review":41,"sufficient":18,"insufficient":21},"source_integrity_or_contract_violations":0,"tokens":{"n":80,"p50":331,"p95":619}},
+    "L-explicit": {"cases":80,"operational_errors":0,"within_budget":48,"within_budget_sufficient":28,"sufficiency":{"needs_review":31,"sufficient":28,"insufficient":21},"source_integrity_or_contract_violations":0,"tokens":{"n":80,"p50":360,"p95":639}},
+    "L-duplicate": {"cases":80,"operational_errors":0,"within_budget":48,"within_budget_sufficient":28,"sufficiency":{"needs_review":31,"sufficient":28,"insufficient":21},"source_integrity_or_contract_violations":0,"tokens":{"n":80,"p50":360,"p95":633}},
+    "L-nearby": {"cases":80,"operational_errors":0,"within_budget":48,"within_budget_sufficient":28,"sufficiency":{"needs_review":21,"sufficient":28,"insufficient":31},"source_integrity_or_contract_violations":0,"tokens":{"n":80,"p50":343,"p95":639}}
+  }
+}

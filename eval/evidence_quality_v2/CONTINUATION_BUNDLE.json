@@ -1,0 +1,11 @@
+{
+  "file_name": "DOCATLAS_PR185_CONTINUATION_EVIDENCE.zip",
+  "sha256": "d9b874a6daa3480112367a06df16db69df738fe7c1732c99561388fc3c9cb8b4",
+  "bytes": 17816225,
+  "evidence_files": 2412,
+  "measured_head": "c8fcd428c2d90a46caf890de4c547e88e359416e",
+  "availability": "Created conversation artifact, not assumed to be a permanent GitHub asset",
+  "claim": "Fresh c8fcd428 checks plus earlier immutable-artifact audit, not later runtime or platform acceptance",
+  "contents": ["Full logs and exit codes", "Native 560-row matrix with payloads and same-call traces", "Grounded 240 native stdio responses and actual ingest", "Same-path old/new 160-case results and module origins", "Installed original-15 direct/assisted results in both wire modes", "P5 source audit", "Host oracle/order input controls", "Robustness controls", "Drivers and per-evidence SHA256 manifest"],
+  "excluded": ["Reproducible SQLite state", "Environments and dependency packages", "Personal indexes or credentials"]
+}
