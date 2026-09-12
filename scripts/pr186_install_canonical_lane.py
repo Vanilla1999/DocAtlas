@@ -31,48 +31,20 @@ replacement = r'''def _run_lane(*, name: str, work: Path, protocol: dict[str, An
         "cap_on_requal_off", "cap_off_requal_off", "contextualization_off",
     }
     capture_fixed_pool = name == "cap_on_requal_on"
-    fixed_pools: dict[tuple[Any, ...], list[tuple[str, int, str]]] = globals().setdefault(
+    # Evaluation-only control: freeze the exact pre-cap baseline chunks.  Each
+    # counterfactual receives those chunks, with only fresh-index project
+    # identity/path rebound to its own isolated corpus.  Raw fresh-index pools
+    # are still fingerprinted separately so retrieval drift remains visible.
+    fixed_pools: dict[tuple[Any, ...], list[Any]] = globals().setdefault(
         "_SYSTEMIC_FIXED_PRE_CAP_POOLS", {}
     )
     if capture_fixed_pool:
         fixed_pools.clear()
     call_occurrences: Counter[tuple[Any, ...]] = Counter()
-    active_call_keys: list[tuple[Any, ...]] = []
+    active_calls: list[tuple[tuple[Any, ...], dict[str, Any]]] = []
     seen_call_keys: list[tuple[Any, ...]] = []
     original_run = RetrievalDispatcher.run
     original_cap = RetrievalDispatcher._limit_sections_per_source
-
-    def semantic_candidate_key(chunk: Any) -> tuple[str, int, str]:
-        if isinstance(chunk, dict):
-            metadata = chunk.get("metadata") or {}
-            source_path = str(
-                chunk.get("project_doc_path")
-                or chunk.get("source_path")
-                or chunk.get("path")
-                or chunk.get("source")
-                or metadata.get("project_doc_path")
-                or metadata.get("source_path")
-                or metadata.get("canonical_url")
-                or ""
-            )
-            chunk_index = int(chunk.get("chunk_index", -1))
-            body = str(chunk.get("text") or chunk.get("snippet") or "")
-        else:
-            metadata = getattr(chunk, "metadata", {}) or {}
-            source_path = str(
-                metadata.get("project_doc_path")
-                or metadata.get("source_path")
-                or metadata.get("canonical_url")
-                or getattr(chunk, "source", "")
-                or ""
-            )
-            chunk_index = int(getattr(chunk, "chunk_index", -1))
-            body = str(getattr(chunk, "text", "") or "")
-        return (
-            _semantic_source_identity(source_path),
-            chunk_index,
-            hashlib.sha256(body.encode("utf-8")).hexdigest(),
-        )
 
     def retrieval_scope(query: str, kwargs: dict[str, Any]) -> tuple[Any, ...]:
         filters = kwargs.get("filters") or {}
@@ -96,49 +68,67 @@ replacement = r'''def _run_lane(*, name: str, work: Path, protocol: dict[str, An
         encoded = json.dumps(key, ensure_ascii=False, separators=(",", ":")).encode("utf-8")
         return f"{hashlib.sha256(encoded).hexdigest()[:24]}:{fingerprint}"
 
+    def rebind_chunk(chunk: Any, filters: dict[str, Any]) -> Any:
+        value = deepcopy(chunk)
+        if isinstance(value, dict):
+            metadata = dict(value.get("metadata") or {})
+            project_identity = str(filters.get("project_identity") or "")
+            project_path = str(filters.get("project_path") or "")
+            if project_identity:
+                metadata["project_identity"] = project_identity
+                if "repository_identity" in metadata:
+                    metadata["repository_identity"] = project_identity
+            if project_path:
+                metadata["project_path"] = project_path
+            value["metadata"] = metadata
+            if project_identity and "project_identity" in value:
+                value["project_identity"] = project_identity
+            return value
+        metadata = dict(getattr(value, "metadata", {}) or {})
+        project_identity = str(filters.get("project_identity") or "")
+        project_path = str(filters.get("project_path") or "")
+        if project_identity:
+            metadata["project_identity"] = project_identity
+            if "repository_identity" in metadata:
+                metadata["repository_identity"] = project_identity
+        if project_path:
+            metadata["project_path"] = project_path
+        copier = getattr(value, "model_copy", None)
+        if callable(copier):
+            return copier(update={"metadata": metadata})
+        setattr(value, "metadata", metadata)
+        return value
+
     def observed_run(self: Any, query: str, *args: Any, **kwargs: Any) -> Any:
         scope = retrieval_scope(query, kwargs)
         occurrence = call_occurrences[scope]
         call_occurrences[scope] += 1
         key = (*scope, occurrence)
-        active_call_keys.append(key)
+        filters = kwargs.get("filters") or {}
+        filters = dict(filters) if isinstance(filters, dict) else {}
+        active_calls.append((key, filters))
         seen_call_keys.append(key)
         try:
             return original_run(self, query, *args, **kwargs)
         finally:
-            popped = active_call_keys.pop()
-            if popped != key:
+            popped_key, _ = active_calls.pop()
+            if popped_key != key:
                 raise RuntimeError("retrieval call stack lost deterministic ordering")
 
     def observed_cap(self: Any, chunks: list[Any], *, limit: int | None = None, expand: str | None = None) -> list[Any]:
-        if not active_call_keys:
+        if not active_calls:
             raise RuntimeError("pre-cap pool observed outside RetrievalDispatcher.run")
-        key = active_call_keys[-1]
+        key, filters = active_calls[-1]
         raw_fingerprint = _candidate_pool_fingerprint(chunks)
         raw_cap_inputs.append(call_identity(key, raw_fingerprint))
         controlled_chunks = chunks
         if causal_lane:
             if capture_fixed_pool:
-                fixed_pools[key] = [semantic_candidate_key(chunk) for chunk in chunks]
+                fixed_pools[key] = deepcopy(chunks)
             frozen = fixed_pools.get(key)
             if frozen is None:
                 raise RuntimeError(f"counterfactual retrieval call absent from frozen current pool: {key!r}")
-            buckets: dict[tuple[str, int, str], list[Any]] = defaultdict(list)
-            for chunk in chunks:
-                buckets[semantic_candidate_key(chunk)].append(chunk)
-            remapped: list[Any] = []
-            missing_candidates: list[tuple[str, int, str]] = []
-            for candidate_key in frozen:
-                bucket = buckets.get(candidate_key)
-                if not bucket:
-                    missing_candidates.append(candidate_key)
-                    continue
-                remapped.append(bucket.pop(0))
-            if missing_candidates:
-                raise RuntimeError(
-                    f"fresh lane cannot replay frozen semantic pool for {key!r}: missing={missing_candidates!r}"
-                )
-            controlled_chunks = remapped
+            controlled_chunks = [rebind_chunk(chunk, filters) for chunk in frozen]
         controlled_fingerprint = _candidate_pool_fingerprint(controlled_chunks)
         cap_inputs.append(call_identity(key, controlled_fingerprint))
         if cap == "off":
