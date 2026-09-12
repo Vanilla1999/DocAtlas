@@ -1,0 +1,54 @@
+name: Systemic retrieval v3 harness fix
+
+on:
+  push:
+    branches: [feat/systemic-retrieval-mechanics]
+    paths:
+      - .github/workflows/systemic-retrieval-v3-harness-fix.yml
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+        with:
+          ref: feat/systemic-retrieval-mechanics
+          fetch-depth: 0
+          persist-credentials: true
+      - name: Compare semantic candidate pools as multisets
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          path = Path('.github/workflows/systemic-retrieval-finalize-v3.yml')
+          text = path.read_text(encoding='utf-8')
+          old = '            "same_as_current": lane["cap_inputs"] == current["cap_inputs"],\\n'
+          new = (
+              '            "same_as_current": Counter(lane["cap_inputs"]) == Counter(current["cap_inputs"]),\\n'
+              '            "ordered_same_as_current": lane["cap_inputs"] == current["cap_inputs"],\\n'
+          )
+          if text.count(old) != 1:
+              raise SystemExit('fixed-pool equality anchor changed')
+          text = text.replace(old, ''.join(new), 1)
+          old_message = '        failures.append("2x2/contextualization lanes did not share the same semantic pre-cap candidate pools")\\n'
+          new_message = '        failures.append("2x2/contextualization lanes did not share the same semantic pre-cap candidate-pool multiset")\\n'
+          if text.count(old_message) != 1:
+              raise SystemExit('fixed-pool failure-message anchor changed')
+          path.write_text(text.replace(old_message, new_message, 1), encoding='utf-8')
+          PY
+          git diff --check
+          grep -F 'Counter(lane["cap_inputs"]) == Counter(current["cap_inputs"])' .github/workflows/systemic-retrieval-finalize-v3.yml
+      - name: Publish and consume harness fixer
+        shell: bash
+        run: |
+          rm .github/workflows/systemic-retrieval-v3-harness-fix.yml
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add .github/workflows/systemic-retrieval-finalize-v3.yml .github/workflows/systemic-retrieval-v3-harness-fix.yml
+          git commit -m 'test: compare fixed candidate pools as multisets'
+          git push origin HEAD:feat/systemic-retrieval-mechanics
