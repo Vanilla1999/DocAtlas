@@ -127,36 +127,58 @@ class _RetrievalDispatcherPart02:
             return limit
         return max(limit * 3, limit + int(max_per_source) * 3)
 
-    def _limit_sections_per_source(self, chunks: list[Any], *, limit: int | None = None, expand: str | None = None) -> list[Any]:
+    def _limit_sections_per_source(
+        self,
+        chunks: list[Any],
+        *,
+        limit: int | None = None,
+        expand: str | None = None,
+    ) -> list[Any]:
         if (expand or "").lower() in {"adjacent", "page"}:
             return chunks
         max_per_source = getattr(self.config.retrieval, "max_sections_per_source", None)
         if not max_per_source:
             return chunks[:limit] if limit is not None else chunks
 
-        # Treat the per-source setting as a diversity preference, not a terminal
-        # loss of recall. Every source first gets its bounded quota in ranked
-        # order. Only if that preferred lane leaves global capacity unused may
-        # same-source overflow backfill the remaining slots. Thus A3 can fill an
-        # otherwise empty third slot, but it cannot displace the first B hit.
+        # The per-source quota remains the diversity floor. One additional
+        # candidate may backfill unused global capacity only when its indexed
+        # parent is already represented by a preferred chunk from that source.
+        # Parent identity proves source-local structure, not semantic support;
+        # the normal evidence qualification/projection gates still decide
+        # whether the added candidate may become visible evidence.
         counts: dict[str, int] = {}
         preferred: list[Any] = []
-        overflow: list[Any] = []
+        preferred_parents: dict[str, set[str]] = {}
+        structural_overflow: list[Any] = []
+        overflow_sources: set[str] = set()
         for chunk in chunks:
             metadata = getattr(chunk, "metadata", {}) or {}
-            source = str(metadata.get("canonical_url") or getattr(chunk, "source", "") or "")
+            source = str(
+                metadata.get("canonical_url")
+                or getattr(chunk, "source", "")
+                or ""
+            )
+            parent = str(metadata.get("parent_logical_id") or "")
             count = counts.get(source, 0)
             if count < int(max_per_source):
                 counts[source] = count + 1
                 preferred.append(chunk)
-            else:
-                overflow.append(chunk)
+                if parent:
+                    preferred_parents.setdefault(source, set()).add(parent)
+                continue
+            if (
+                source not in overflow_sources
+                and parent
+                and parent in preferred_parents.get(source, set())
+            ):
+                structural_overflow.append(chunk)
+                overflow_sources.add(source)
 
         if limit is None:
-            return [*preferred, *overflow]
+            return [*preferred, *structural_overflow]
         selected = preferred[:limit]
         if len(selected) < limit:
-            selected.extend(overflow[:limit - len(selected)])
+            selected.extend(structural_overflow[:limit - len(selected)])
         return selected
 
     @staticmethod
