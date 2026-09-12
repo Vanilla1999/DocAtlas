@@ -1,0 +1,30 @@
+{
+  "schema_version": "systemic-retrieval-independent-project-sample-v1",
+  "selection_state": "posthoc_independent_project_sample",
+  "sources": [
+    {
+      "project": "httpcore",
+      "repository": "encode/httpcore",
+      "ref": "git-blob:4567ba44b402b1f03f5744f88d9f2d49d608a485",
+      "path": "README.md",
+      "sha256": "182648691fcc325b8eeab9c5b3119c239dcea75c7fa6d1c3bd15524239fbc218",
+      "bytes": 3375
+    },
+    {
+      "project": "sqlmodel",
+      "repository": "fastapi/sqlmodel",
+      "ref": "git-blob:281f99081cb3c747d6df1387f49151663045d712",
+      "path": "docs/tutorial/index.md",
+      "sha256": "de8a99b385609149e1940877a759eae84a4411a35d690a935c9f67a073a224e1",
+      "bytes": 1533
+    },
+    {
+      "project": "itsdangerous",
+      "repository": "pallets/itsdangerous",
+      "ref": "git-blob:528236d7c0bd0c703943965eec5a46fa17d88595",
+      "path": "README.md",
+      "sha256": "a3e791c4af02a2575518d650c01775f63fe152526b3798064ab64d244c1c6208",
+      "bytes": 1529
+    }
+  ]
+}
