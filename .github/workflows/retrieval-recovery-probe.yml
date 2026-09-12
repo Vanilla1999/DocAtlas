@@ -24,7 +24,18 @@ jobs:
           python-version: "3.12"
       - name: Install probe dependencies
         run: python -m pip install -e '.[dev]' 'tiktoken==0.11.0'
-      - name: Run soft diversity regressions
-        run: python -m pytest -q tests/test_retrieval_diversity_policy.py
-      - name: Run frozen pydantic probe
+      - name: Run systemic retrieval regressions
+        run: |
+          python -m pytest -q \
+            tests/test_retrieval_diversity_policy.py \
+            tests/test_active_fts_projection.py \
+            tests/test_parent_child_index.py \
+            tests/test_retrieval_features.py \
+            tests/docs/test_subject_binding_strength.py \
+            tests/docs/test_project_answer_contract_v2.py \
+            tests/docs/test_project_answer_contract_v3.py \
+            tests/docs/test_question_plan_v4.py
+          python -m compileall -q docmancer tests
+          git diff --check
+      - name: Run all frozen evidence-quality rows
         run: python scripts/retrieval_recovery_probe.py
