@@ -133,19 +133,31 @@ class _RetrievalDispatcherPart02:
         max_per_source = getattr(self.config.retrieval, "max_sections_per_source", None)
         if not max_per_source:
             return chunks[:limit] if limit is not None else chunks
+
+        # Treat the per-source setting as a diversity preference, not a terminal
+        # loss of recall. Every source first gets its bounded quota in ranked
+        # order. Only if that preferred lane leaves global capacity unused may
+        # same-source overflow backfill the remaining slots. Thus A3 can fill an
+        # otherwise empty third slot, but it cannot displace the first B hit.
         counts: dict[str, int] = {}
-        out: list[Any] = []
+        preferred: list[Any] = []
+        overflow: list[Any] = []
         for chunk in chunks:
             metadata = getattr(chunk, "metadata", {}) or {}
             source = str(metadata.get("canonical_url") or getattr(chunk, "source", "") or "")
             count = counts.get(source, 0)
-            if count >= int(max_per_source):
-                continue
-            counts[source] = count + 1
-            out.append(chunk)
-            if limit is not None and len(out) >= limit:
-                break
-        return out
+            if count < int(max_per_source):
+                counts[source] = count + 1
+                preferred.append(chunk)
+            else:
+                overflow.append(chunk)
+
+        if limit is None:
+            return [*preferred, *overflow]
+        selected = preferred[:limit]
+        if len(selected) < limit:
+            selected.extend(overflow[:limit - len(selected)])
+        return selected
 
     @staticmethod
     def _filter_chunks(chunks: list[Any], filters: dict | None) -> list[Any]:
