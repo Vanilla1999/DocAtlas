@@ -1,5 +1,5 @@
 name: Systemic retrieval final acceptance v3
-# trigger: standalone-canonical-lane-20260912
+# trigger: exact-baseline-precap-replay-20260912
 
 on:
   push:
