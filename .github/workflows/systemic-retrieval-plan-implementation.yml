@@ -174,6 +174,30 @@ jobs:
             tests/docs/test_question_plan_v4.py
           python -m compileall -q docmancer tests scripts eval/systemic_retrieval_plan
           git diff --check
+      - name: Correct acceptance DTO budget scope
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          path = Path("scripts/run_systemic_retrieval_plan_gate.py")
+          text = path.read_text(encoding="utf-8")
+          old = '''    full80_valid_rows = [row for row in full80["rows"] if "error" not in row]\n    full80_max_tokens = max((int(row.get("size", {}).get("actual_tokens") or 0) for row in full80_valid_rows), default=0)\n'''
+          new = '''    full80_valid_rows = [row for row in full80["rows"] if "error" not in row]\n    full80_budget_rows = [\n        row for row in full80_valid_rows\n        if row.get("answerability") == "within_budget"\n    ]\n    full80_budget_max_tokens = max(\n        (int(row.get("size", {}).get("actual_tokens") or 0) for row in full80_budget_rows),\n        default=0,\n    )\n    full80_all_valid_max_tokens = max(\n        (int(row.get("size", {}).get("actual_tokens") or 0) for row in full80_valid_rows),\n        default=0,\n    )\n'''
+          if text.count(old) != 1:
+              raise SystemExit("full80 budget measurement patch anchor changed")
+          text = text.replace(old, new)
+          old = '''            "max_actual_model_visible_tokens": full80_max_tokens,\n            "actual_full_dto_budget": full80_max_tokens <= MAX_TOKENS,\n'''
+          new = '''            "within_budget_max_actual_model_visible_tokens": full80_budget_max_tokens,\n            "all_valid_max_actual_model_visible_tokens_diagnostic": full80_all_valid_max_tokens,\n            "actual_full_dto_budget": full80_budget_max_tokens <= MAX_TOKENS,\n'''
+          if text.count(old) != 1:
+              raise SystemExit("full80 budget report patch anchor changed")
+          text = text.replace(old, new)
+          old = '''    if full80_max_tokens > MAX_TOKENS:\n        failures.append("full model-visible DTO exceeded the 800-token ceiling")\n'''
+          new = '''    if len(full80_budget_rows) != 48:\n        failures.append("within-budget valid DTO inventory changed")\n    if full80_budget_max_tokens > MAX_TOKENS:\n        failures.append("within-budget full model-visible DTO exceeded the 800-token ceiling")\n'''
+          if text.count(old) != 1:
+              raise SystemExit("full80 budget gate patch anchor changed")
+          path.write_text(text.replace(old, new), encoding="utf-8")
+          PY
+          git diff --check
       - name: Run complete systemic retrieval acceptance
         run: |
           python scripts/run_systemic_retrieval_plan_gate.py \
@@ -188,6 +212,7 @@ jobs:
             docmancer/core/sqlite_store.py \
             docmancer/retrieval/_dispatch_part01.py \
             docmancer/retrieval/_dispatch_part02.py \
+            scripts/run_systemic_retrieval_plan_gate.py \
             experiments/finalization/PR186_SYSTEMIC_RETRIEVAL_ACCEPTANCE.json
           git diff --cached --check
           git config user.name "github-actions[bot]"
