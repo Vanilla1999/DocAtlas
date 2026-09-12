@@ -36,6 +36,7 @@ def test_service_restart_automatically_resumes_authorized_library_prefetch(tmp_p
         config=first.config,
         registry=first.registry,
         agent=FakeAgent(),
+        library_index_root=tmp_path / "home" / "docs-indexes",
         job_tracker=restarted_tracker,
     )
 

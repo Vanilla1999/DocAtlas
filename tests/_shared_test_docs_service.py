@@ -17,6 +17,7 @@ import pytest
 from click.testing import CliRunner
 
 from docmancer.cli.__main__ import cli
+from docmancer.core.product_identity import ensure_owned_home
 from docmancer.core.config import DocmancerConfig
 from docmancer.core.storage_topology import StorageTopologyResolver
 from docmancer.core.models import Document, RetrievedChunk
@@ -326,6 +327,7 @@ def _service(
     durable_jobs: bool = False,
 ) -> LibraryDocsService:
     monkeypatch.setenv("DOCATLAS_HOME", str(tmp_path / "home"))
+    ensure_owned_home(tmp_path / "home")
     agent = agent or FakeAgent()
     config = DocmancerConfig()
     config.index.db_path = str(tmp_path / "docmancer.db")
@@ -339,12 +341,14 @@ def _service(
         registry=LibraryRegistry(config.index.db_path),
         agent=agent,
         agent_factory=agent_factory,
+        library_index_root=tmp_path / "home" / "docs-indexes",
         job_tracker=DocsJobTracker(db_path=config.index.db_path) if durable_jobs else DocsJobTracker(),
     )
 
 
 def _service_with_real_agent(tmp_path, monkeypatch) -> LibraryDocsService:
     monkeypatch.setenv("DOCATLAS_HOME", str(tmp_path / "home"))
+    ensure_owned_home(tmp_path / "home")
     config = DocmancerConfig()
     config.index.db_path = str(tmp_path / "docmancer.db")
     config.index.extracted_dir = str(tmp_path / "extracted")
@@ -352,6 +356,7 @@ def _service_with_real_agent(tmp_path, monkeypatch) -> LibraryDocsService:
         config=config,
         registry=LibraryRegistry(config.index.db_path),
         agent=DocmancerAgent(config=config),
+        library_index_root=tmp_path / "home" / "docs-indexes",
         job_tracker=DocsJobTracker(),
     )
 
