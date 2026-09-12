@@ -1,0 +1,107 @@
+name: Systemic retrieval mechanics TDD carrier
+
+on:
+  push:
+    branches: [feat/systemic-retrieval-mechanics]
+
+permissions:
+  contents: write
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
+  DOCATLAS_OFFLINE: "1"
+
+jobs:
+  red-green:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with:
+          ref: feat/systemic-retrieval-mechanics
+          fetch-depth: 0
+          persist-credentials: true
+
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: "3.12"
+
+      - name: Install focused test dependencies
+        run: python -m pip install -e '.[dev]'
+
+      - name: Write regression tests first
+        run: python scripts/systemic_retrieval_tdd_carrier.py write-tests
+
+      - name: Classify new regression modules
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          path = Path("tests/diagnostic_labels.json")
+          payload = json.loads(path.read_text(encoding="utf-8"))
+          payload["tests/test_active_fts_projection.py"] = "behavioral"
+          payload["tests/docs/test_subject_binding_strength.py"] = "behavioral"
+          path.write_text(
+              json.dumps(payload, ensure_ascii=False, indent=2, sort_keys=True) + "\n",
+              encoding="utf-8",
+          )
+          PY
+
+      - name: Prove FTS history regression is red on old runtime
+        shell: bash
+        run: |
+          set +e
+          output=$(python -m pytest -q tests/test_active_fts_projection.py::test_ready_candidate_cannot_change_active_fts_scoring_or_postings 2>&1)
+          status=$?
+          set -e
+          printf '%s\n' "$output"
+          if [ "$status" -ne 1 ]; then
+            echo "::error::expected one real pytest failure for FTS history regression; exit=$status"
+            exit 1
+          fi
+          if ! grep -Eq '1 failed' <<<"$output"; then
+            echo "::error::FTS red phase did not report a failed test"
+            exit 1
+          fi
+
+      - name: Prove weak subject binding regression is red on old runtime
+        shell: bash
+        run: |
+          set +e
+          output=$(python -m pytest -q 'tests/docs/test_subject_binding_strength.py::test_version_capability_binds_subject_from_grammar_not_sentence_lead[Since]' 2>&1)
+          status=$?
+          set -e
+          printf '%s\n' "$output"
+          if [ "$status" -ne 1 ]; then
+            echo "::error::expected one real pytest failure for weak subject binding; exit=$status"
+            exit 1
+          fi
+          if ! grep -Eq '1 failed' <<<"$output"; then
+            echo "::error::subject-binding red phase did not report a failed test"
+            exit 1
+          fi
+
+      - name: Apply minimal systemic fixes
+        run: python scripts/systemic_retrieval_tdd_carrier.py apply-fix
+
+      - name: Prove focused regressions green
+        run: |
+          python -m pytest -q tests/test_active_fts_projection.py tests/docs/test_subject_binding_strength.py
+
+      - name: Run adjacent regression suites
+        run: |
+          python -m pytest -q tests/test_parent_child_index.py tests/docs/test_project_answer_contract_v2.py tests/docs/test_project_answer_contract_v3.py tests/docs/test_question_plan_v4.py
+          python -m compileall -q docmancer tests
+          git diff --check
+
+      - name: Publish first delivery and remove carriers
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm .github/workflows/systemic-retrieval-tdd-carrier.yml scripts/systemic_retrieval_tdd_carrier.py
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "fix: isolate active FTS scoring and strengthen version subject binding"
+          git push origin HEAD:feat/systemic-retrieval-mechanics
