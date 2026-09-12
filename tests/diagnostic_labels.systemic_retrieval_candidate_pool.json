@@ -1,0 +1,10 @@
+{
+  "schema_version": 1,
+  "module_labels": {
+    "tests/test_systemic_retrieval_candidate_pool.py": "behavioral"
+  },
+  "module_node_hashes": {
+    "tests/test_systemic_retrieval_candidate_pool.py": "bbd1e5112002850af4302d4c0edb558dcad2cacb88cc274f80df2786bb45b1ad"
+  },
+  "node_overrides": {}
+}
