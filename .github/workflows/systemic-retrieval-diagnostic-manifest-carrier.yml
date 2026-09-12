@@ -1,0 +1,53 @@
+name: Systemic retrieval diagnostic manifest carrier
+
+on:
+  push:
+    branches: [feat/systemic-retrieval-mechanics]
+
+permissions:
+  contents: write
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with:
+          ref: feat/systemic-retrieval-mechanics
+          fetch-depth: 0
+          persist-credentials: true
+
+      - name: Merge systemic regression labels into canonical manifest
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          canonical_path = Path("tests/diagnostic_labels.json")
+          overlay_path = Path("tests/diagnostic_labels.systemic_retrieval.json")
+          canonical = json.loads(canonical_path.read_text(encoding="utf-8"))
+          overlay = json.loads(overlay_path.read_text(encoding="utf-8"))
+          assert canonical.get("schema_version") == overlay.get("schema_version") == 1
+          for section in ("module_labels", "module_node_hashes", "node_overrides"):
+              canonical.setdefault(section, {}).update(overlay.get(section, {}))
+          canonical_path.write_text(
+              json.dumps(canonical, ensure_ascii=False, indent=2, sort_keys=True) + "\n",
+              encoding="utf-8",
+          )
+          overlay_path.unlink()
+          Path(".github/workflows/systemic-retrieval-diagnostic-manifest-carrier.yml").unlink()
+          PY
+
+      - name: Publish canonical manifest only
+        run: |
+          set -euo pipefail
+          git diff --check
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add tests/diagnostic_labels.json tests/diagnostic_labels.systemic_retrieval.json .github/workflows/systemic-retrieval-diagnostic-manifest-carrier.yml
+          git commit -m "test: register systemic retrieval regressions canonically"
+          git push origin HEAD:feat/systemic-retrieval-mechanics
