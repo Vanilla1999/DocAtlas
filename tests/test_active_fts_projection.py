@@ -45,6 +45,27 @@ def _projection_ids(store: SQLiteStore) -> tuple[set[int], set[int]]:
     return expected, actual
 
 
+def _generation_ids(store: SQLiteStore, generation_id: str) -> set[int]:
+    with store._connect() as conn:
+        return {
+            int(row["id"])
+            for row in conn.execute(
+                "SELECT id FROM retrieval_children WHERE generation_id = ?",
+                (generation_id,),
+            )
+        }
+
+
+def _fts_ids(conn) -> set[int]:
+    return {
+        int(row["rowid"])
+        for row in conn.execute(
+            "SELECT rowid FROM retrieval_children_fts "
+            "WHERE retrieval_children_fts MATCH 'projectiontoken'"
+        )
+    }
+
+
 def test_ready_candidate_cannot_change_active_fts_scoring_or_postings(tmp_path):
     store = SQLiteStore(tmp_path / "index.db")
     docs = [
@@ -126,3 +147,45 @@ def test_open_repairs_pre_projection_state_database(tmp_path):
     assert reopened.active_generation_id() == active
     expected, actual = _projection_ids(reopened)
     assert actual == expected
+
+
+def test_active_projection_switch_is_atomic_for_another_connection(tmp_path):
+    store = SQLiteStore(tmp_path / "index.db")
+    first = store.add_documents([
+        _doc("docs/old-a.md", "# Old A\n\nprojectiontoken alpha\n"),
+        _doc("docs/old-b.md", "# Old B\n\nprojectiontoken beta\n"),
+    ], recreate=True)
+    candidate = store.add_documents([
+        _doc("docs/new.md", "# New\n\nprojectiontoken gamma\n"),
+    ], activate_generation=False)
+
+    assert first.generation_id is not None
+    assert candidate.generation_id is not None
+    old_ids = _generation_ids(store, first.generation_id)
+    new_ids = _generation_ids(store, candidate.generation_id)
+    assert old_ids and new_ids and old_ids.isdisjoint(new_ids)
+
+    writer = store._connect()
+    try:
+        writer.execute("BEGIN IMMEDIATE")
+        store._activate_generation(writer, candidate.generation_id)
+
+        # The writer sees the complete next snapshot before commit.
+        assert store._active_generation_id(writer) == candidate.generation_id
+        assert _fts_ids(writer) == new_ids
+
+        # A separate reader cannot observe a mixed pointer/projection state.
+        with store._connect() as reader:
+            assert store._active_generation_id(reader) == first.generation_id
+            assert _fts_ids(reader) == old_ids
+
+        writer.commit()
+    except Exception:
+        writer.rollback()
+        raise
+    finally:
+        writer.close()
+
+    with store._connect() as reader:
+        assert store._active_generation_id(reader) == candidate.generation_id
+        assert _fts_ids(reader) == new_ids
