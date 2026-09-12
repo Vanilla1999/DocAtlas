@@ -8,7 +8,7 @@
           "p95": 2268
         },
         "cases": 48,
-        "cpu_seconds_per_case": 0.335451,
+        "cpu_seconds_per_case": 0.364279,
         "failure_families": {
           "api": 1,
           "conditional": 4,
@@ -24,12 +24,12 @@
         },
         "latency_seconds": {
           "n": 48,
-          "p50": 0.2916455799999653,
-          "p95": 0.4884375760000239
+          "p50": 0.31296472399998265,
+          "p95": 0.5075791600000059
         },
         "literal_full": 28,
         "operational_errors": 0,
-        "process_cpu_seconds": 16.101624,
+        "process_cpu_seconds": 17.48538,
         "required_supported": 28,
         "required_total": 48,
         "slices": {
@@ -151,9 +151,9 @@
         "tokens": {
           "n": 48,
           "p50": 381,
-          "p95": 664
+          "p95": 668
         },
-        "wall_seconds": 16.711228,
+        "wall_seconds": 18.118686,
         "within_budget": 48,
         "within_budget_sufficient": 28
       },
@@ -164,7 +164,7 @@
           "p95": 2268
         },
         "cases": 48,
-        "cpu_seconds_per_case": 0.324997,
+        "cpu_seconds_per_case": 0.353566,
         "failure_families": {
           "api": 1,
           "conditional": 3,
@@ -180,12 +180,12 @@
         },
         "latency_seconds": {
           "n": 48,
-          "p50": 0.28090486499996814,
-          "p95": 0.4694413160000295
+          "p50": 0.29169825600001786,
+          "p95": 0.49089380899999924
         },
         "literal_full": 29,
         "operational_errors": 0,
-        "process_cpu_seconds": 15.599865,
+        "process_cpu_seconds": 16.971151,
         "required_supported": 29,
         "required_total": 48,
         "slices": {
@@ -306,10 +306,10 @@
         },
         "tokens": {
           "n": 48,
-          "p50": 384,
-          "p95": 669
+          "p50": 386,
+          "p95": 668
         },
-        "wall_seconds": 17.482652,
+        "wall_seconds": 19.96703,
         "within_budget": 48,
         "within_budget_sufficient": 29
       },
@@ -320,7 +320,7 @@
           "p95": 2268
         },
         "cases": 48,
-        "cpu_seconds_per_case": 0.290245,
+        "cpu_seconds_per_case": 0.320676,
         "failure_families": {
           "api": 1,
           "conditional": 4,
@@ -336,12 +336,12 @@
         },
         "latency_seconds": {
           "n": 48,
-          "p50": 0.25316930500002854,
-          "p95": 0.41701432100001057
+          "p50": 0.26620206500001586,
+          "p95": 0.5487713059999919
         },
         "literal_full": 29,
         "operational_errors": 0,
-        "process_cpu_seconds": 13.931779,
+        "process_cpu_seconds": 15.392435,
         "required_supported": 29,
         "required_total": 48,
         "slices": {
@@ -462,10 +462,10 @@
         },
         "tokens": {
           "n": 48,
-          "p50": 380,
-          "p95": 657
+          "p50": 382,
+          "p95": 651
         },
-        "wall_seconds": 14.798064,
+        "wall_seconds": 17.390325,
         "within_budget": 48,
         "within_budget_sufficient": 29
       },
@@ -476,7 +476,7 @@
           "p95": 2268
         },
         "cases": 48,
-        "cpu_seconds_per_case": 0.331123,
+        "cpu_seconds_per_case": 0.36597,
         "failure_families": {
           "api": 1,
           "conditional": 3,
@@ -492,12 +492,12 @@
         },
         "latency_seconds": {
           "n": 48,
-          "p50": 0.2691904370000202,
-          "p95": 0.481863111999985
+          "p50": 0.2888681869999914,
+          "p95": 0.5081099509999945
         },
         "literal_full": 30,
         "operational_errors": 0,
-        "process_cpu_seconds": 15.893917,
+        "process_cpu_seconds": 17.566574,
         "required_supported": 30,
         "required_total": 48,
         "slices": {
@@ -618,10 +618,10 @@
         },
         "tokens": {
           "n": 48,
-          "p50": 379,
-          "p95": 661
+          "p50": 378,
+          "p95": 665
         },
-        "wall_seconds": 16.615947,
+        "wall_seconds": 20.651996,
         "within_budget": 48,
         "within_budget_sufficient": 30
       },
@@ -632,7 +632,7 @@
           "p95": 2177
         },
         "cases": 48,
-        "cpu_seconds_per_case": 0.28038,
+        "cpu_seconds_per_case": 0.301245,
         "failure_families": {
           "api": 2,
           "conditional": 4,
@@ -648,12 +648,12 @@
         },
         "latency_seconds": {
           "n": 48,
-          "p50": 0.24832603599998038,
-          "p95": 0.3743362430000161
+          "p50": 0.26001103300001205,
+          "p95": 0.42627274800000237
         },
         "literal_full": 20,
         "operational_errors": 0,
-        "process_cpu_seconds": 13.458235,
+        "process_cpu_seconds": 14.45978,
         "required_supported": 20,
         "required_total": 48,
         "slices": {
@@ -775,9 +775,9 @@
         "tokens": {
           "n": 48,
           "p50": 365,
-          "p95": 627
+          "p95": 629
         },
-        "wall_seconds": 14.035068,
+        "wall_seconds": 16.321795,
         "within_budget": 48,
         "within_budget_sufficient": 20
       }
@@ -1136,7 +1136,7 @@
   "claim_boundaries": {
     "live_agent_end_to_end": "NOT_MEASURED",
     "market_or_unseen_distribution_generalization": "NOT_CLAIMED",
-    "production_selector": "INVESTIGATE_OBSERVED_GAP_BEFORE_PRODUCT_CHANGE",
+    "production_selector": "NO_PRODUCTION_SELECTOR_VALIDATED",
     "total_task_token_savings": "NOT_MEASURED"
   },
   "contextualization": {
@@ -1299,14 +1299,14 @@
   },
   "full_frozen_80": {
     "actual_full_dto_budget": true,
-    "all_valid_max_actual_model_visible_tokens_diagnostic": 716,
+    "all_valid_max_actual_model_visible_tokens_diagnostic": 720,
     "bytes": {
       "n": 80,
       "p50": 1324,
       "p95": 2216
     },
     "cases": 80,
-    "cpu_seconds_per_case": 0.256148,
+    "cpu_seconds_per_case": 0.27462,
     "failure_families": {
       "ambiguous": 8,
       "api": 1,
@@ -1327,12 +1327,12 @@
     "historical_floor_preserved": true,
     "latency_seconds": {
       "n": 80,
-      "p50": 0.2014237960000287,
-      "p95": 0.3314084579999985
+      "p50": 0.2161333749999983,
+      "p95": 0.36712804999999094
     },
     "literal_full": 30,
     "operational_errors": 0,
-    "process_cpu_seconds": 20.491834,
+    "process_cpu_seconds": 21.969608,
     "required_supported": 33,
     "required_total": 88,
     "slices": {
@@ -1485,15 +1485,15 @@
     },
     "tokens": {
       "n": 80,
-      "p50": 347,
-      "p95": 635
+      "p50": 352,
+      "p95": 629
     },
-    "wall_seconds": 21.178476,
+    "wall_seconds": 22.976144,
     "within_budget": 48,
-    "within_budget_max_actual_model_visible_tokens": 716,
+    "within_budget_max_actual_model_visible_tokens": 720,
     "within_budget_sufficient": 30
   },
-  "generated_from_head": "54ab09f21a4dd5ded264ba5609a051cb69c33417",
+  "generated_from_head": "440f162a750198b5986f9855f0670e42ad6b9bd1",
   "independent_project_sample": {
     "cases": 6,
     "claim_boundary": "Independent projects are measured, but this is a post-hoc sample and not external hidden validation.",
@@ -1504,15 +1504,15 @@
         "p95": 1909
       },
       "cases": 6,
-      "cpu_seconds_per_case": 0.15678,
+      "cpu_seconds_per_case": 0.200108,
       "latency_seconds": {
         "n": 6,
-        "p50": 0.11340594500001089,
-        "p95": 0.2101803140000129
+        "p50": 0.1238008969999953,
+        "p95": 0.4009079400000246
       },
       "literal_full": 2,
       "operational_errors": 0,
-      "process_cpu_seconds": 0.940679,
+      "process_cpu_seconds": 1.20065,
       "required_supported": 5,
       "required_total": 6,
       "slices": {
@@ -1568,10 +1568,10 @@
       },
       "tokens": {
         "n": 6,
-        "p50": 339,
-        "p95": 551
+        "p50": 342,
+        "p95": 555
       },
-      "wall_seconds": 1.542718,
+      "wall_seconds": 1.441887,
       "within_budget": 6,
       "within_budget_sufficient": 5
     },
@@ -1583,15 +1583,15 @@
         "p95": 1909
       },
       "cases": 6,
-      "cpu_seconds_per_case": 0.147521,
+      "cpu_seconds_per_case": 0.159861,
       "latency_seconds": {
         "n": 6,
-        "p50": 0.10177978699999812,
-        "p95": 0.1955137749999949
+        "p50": 0.10781370799998058,
+        "p95": 0.20491243999998687
       },
       "literal_full": 2,
       "operational_errors": 0,
-      "process_cpu_seconds": 0.885124,
+      "process_cpu_seconds": 0.959164,
       "required_supported": 5,
       "required_total": 6,
       "slices": {
@@ -1647,10 +1647,10 @@
       },
       "tokens": {
         "n": 6,
-        "p50": 337,
-        "p95": 557
+        "p50": 342,
+        "p95": 565
       },
-      "wall_seconds": 1.044912,
+      "wall_seconds": 1.162258,
       "within_budget": 6,
       "within_budget_sufficient": 5
     },
@@ -1694,14 +1694,49 @@
   },
   "schema_version": "systemic-retrieval-plan-acceptance-v1",
   "selection": {
-    "beam_recoveries": [
+    "blind_proxy_exact_gap": [
       "uv-03"
     ],
-    "beam_width": 4,
+    "blind_singleton_candidate_limit": 8,
+    "blind_singleton_changes": [
+      "fastapi-02",
+      "fastapi-06",
+      "mkdocs-01",
+      "typer-02"
+    ],
+    "blind_singleton_losses": [
+      "mkdocs-01",
+      "typer-02"
+    ],
+    "blind_singleton_recoveries": [],
     "candidate_pool_limit": 8,
     "cases": [
       {
-        "beam_recovery": null,
+        "blind_singleton_choice": {
+          "indices": [
+            0
+          ],
+          "proxy": [
+            4,
+            1,
+            1,
+            -355
+          ],
+          "required_count": 1,
+          "required_supported": 0,
+          "safety_errors": [],
+          "sources": 1,
+          "sufficient": false,
+          "tokens": 355
+        },
+        "blind_singleton_sufficient": false,
+        "blind_singleton_used": false,
+        "current_proxy": [
+          4,
+          1,
+          1,
+          -355
+        ],
         "current_sufficient": false,
         "enumerated_packages": 41,
         "exact_recovery": null,
@@ -1716,7 +1751,31 @@
         "simple_recovery": null
       },
       {
-        "beam_recovery": null,
+        "blind_singleton_choice": {
+          "indices": [
+            1
+          ],
+          "proxy": [
+            3,
+            1,
+            1,
+            -359
+          ],
+          "required_count": 1,
+          "required_supported": 0,
+          "safety_errors": [],
+          "sources": 1,
+          "sufficient": false,
+          "tokens": 359
+        },
+        "blind_singleton_sufficient": false,
+        "blind_singleton_used": true,
+        "current_proxy": [
+          3,
+          1,
+          1,
+          -362
+        ],
         "current_sufficient": false,
         "enumerated_packages": 14,
         "exact_recovery": null,
@@ -1731,7 +1790,148 @@
         "simple_recovery": null
       },
       {
-        "beam_recovery": null,
+        "blind_singleton_choice": {
+          "indices": [
+            0
+          ],
+          "proxy": [
+            4,
+            1,
+            1,
+            -335
+          ],
+          "required_count": 1,
+          "required_supported": 1,
+          "safety_errors": [],
+          "sources": 1,
+          "sufficient": true,
+          "tokens": 335
+        },
+        "blind_singleton_sufficient": true,
+        "blind_singleton_used": false,
+        "current_proxy": [
+          4,
+          1,
+          1,
+          -335
+        ],
+        "current_sufficient": true,
+        "enumerated_packages": 5,
+        "exact_recovery": null,
+        "id": "fastapi-03",
+        "pool": {
+          "candidate_count": 5,
+          "candidates_with_parent": 5,
+          "same_parent_pairs": 1,
+          "unique_parents": 4,
+          "unique_sources": 2
+        },
+        "simple_recovery": null
+      },
+      {
+        "blind_singleton_choice": {
+          "indices": [
+            0
+          ],
+          "proxy": [
+            2,
+            1,
+            1,
+            -404
+          ],
+          "required_count": 1,
+          "required_supported": 1,
+          "safety_errors": [],
+          "sources": 1,
+          "sufficient": true,
+          "tokens": 404
+        },
+        "blind_singleton_sufficient": true,
+        "blind_singleton_used": false,
+        "current_proxy": [
+          2,
+          1,
+          2,
+          -611
+        ],
+        "current_sufficient": true,
+        "enumerated_packages": 6,
+        "exact_recovery": null,
+        "id": "fastapi-04",
+        "pool": {
+          "candidate_count": 6,
+          "candidates_with_parent": 6,
+          "same_parent_pairs": 3,
+          "unique_parents": 4,
+          "unique_sources": 2
+        },
+        "simple_recovery": null
+      },
+      {
+        "blind_singleton_choice": {
+          "indices": [
+            0
+          ],
+          "proxy": [
+            5,
+            1,
+            1,
+            -349
+          ],
+          "required_count": 1,
+          "required_supported": 1,
+          "safety_errors": [],
+          "sources": 1,
+          "sufficient": true,
+          "tokens": 349
+        },
+        "blind_singleton_sufficient": true,
+        "blind_singleton_used": false,
+        "current_proxy": [
+          5,
+          1,
+          2,
+          -542
+        ],
+        "current_sufficient": true,
+        "enumerated_packages": 3,
+        "exact_recovery": null,
+        "id": "fastapi-05",
+        "pool": {
+          "candidate_count": 3,
+          "candidates_with_parent": 3,
+          "same_parent_pairs": 0,
+          "unique_parents": 3,
+          "unique_sources": 1
+        },
+        "simple_recovery": null
+      },
+      {
+        "blind_singleton_choice": {
+          "indices": [
+            1
+          ],
+          "proxy": [
+            1,
+            1,
+            1,
+            -349
+          ],
+          "required_count": 1,
+          "required_supported": 0,
+          "safety_errors": [],
+          "sources": 1,
+          "sufficient": false,
+          "tokens": 349
+        },
+        "blind_singleton_sufficient": false,
+        "blind_singleton_used": true,
+        "current_proxy": [
+          1,
+          1,
+          1,
+          -356
+        ],
         "current_sufficient": false,
         "enumerated_packages": 3,
         "exact_recovery": null,
@@ -1746,7 +1946,31 @@
         "simple_recovery": null
       },
       {
-        "beam_recovery": null,
+        "blind_singleton_choice": {
+          "indices": [
+            1
+          ],
+          "proxy": [
+            4,
+            1,
+            1,
+            -381
+          ],
+          "required_count": 1,
+          "required_supported": 0,
+          "safety_errors": [],
+          "sources": 1,
+          "sufficient": false,
+          "tokens": 381
+        },
+        "blind_singleton_sufficient": false,
+        "blind_singleton_used": false,
+        "current_proxy": [
+          4,
+          2,
+          2,
+          -622
+        ],
         "current_sufficient": false,
         "enumerated_packages": 41,
         "exact_recovery": null,
@@ -1761,7 +1985,70 @@
         "simple_recovery": null
       },
       {
-        "beam_recovery": null,
+        "blind_singleton_choice": {
+          "indices": [
+            4
+          ],
+          "proxy": [
+            4,
+            1,
+            1,
+            -381
+          ],
+          "required_count": 1,
+          "required_supported": 1,
+          "safety_errors": [],
+          "sources": 1,
+          "sufficient": true,
+          "tokens": 381
+        },
+        "blind_singleton_sufficient": true,
+        "blind_singleton_used": false,
+        "current_proxy": [
+          4,
+          2,
+          2,
+          -622
+        ],
+        "current_sufficient": true,
+        "enumerated_packages": 6,
+        "exact_recovery": null,
+        "id": "httpx-02",
+        "pool": {
+          "candidate_count": 6,
+          "candidates_with_parent": 6,
+          "same_parent_pairs": 1,
+          "unique_parents": 5,
+          "unique_sources": 2
+        },
+        "simple_recovery": null
+      },
+      {
+        "blind_singleton_choice": {
+          "indices": [
+            2
+          ],
+          "proxy": [
+            2,
+            1,
+            1,
+            -334
+          ],
+          "required_count": 1,
+          "required_supported": 0,
+          "safety_errors": [],
+          "sources": 1,
+          "sufficient": false,
+          "tokens": 334
+        },
+        "blind_singleton_sufficient": false,
+        "blind_singleton_used": false,
+        "current_proxy": [
+          2,
+          1,
+          1,
+          -334
+        ],
         "current_sufficient": false,
         "enumerated_packages": 14,
         "exact_recovery": null,
@@ -1776,7 +2063,93 @@
         "simple_recovery": null
       },
       {
-        "beam_recovery": null,
+        "blind_singleton_choice": {
+          "indices": [
+            0
+          ],
+          "proxy": [
+            7,
+            1,
+            1,
+            -352
+          ],
+          "required_count": 1,
+          "required_supported": 1,
+          "safety_errors": [],
+          "sources": 1,
+          "sufficient": true,
+          "tokens": 352
+        },
+        "blind_singleton_sufficient": true,
+        "blind_singleton_used": false,
+        "current_proxy": [
+          7,
+          1,
+          2,
+          -615
+        ],
+        "current_sufficient": true,
+        "enumerated_packages": 4,
+        "exact_recovery": null,
+        "id": "httpx-04",
+        "pool": {
+          "candidate_count": 4,
+          "candidates_with_parent": 4,
+          "same_parent_pairs": 3,
+          "unique_parents": 2,
+          "unique_sources": 1
+        },
+        "simple_recovery": null
+      },
+      {
+        "blind_singleton_choice": {
+          "indices": [
+            0
+          ],
+          "proxy": [
+            6,
+            1,
+            1,
+            -365
+          ],
+          "required_count": 1,
+          "required_supported": 1,
+          "safety_errors": [],
+          "sources": 1,
+          "sufficient": true,
+          "tokens": 365
+        },
+        "blind_singleton_sufficient": true,
+        "blind_singleton_used": false,
+        "current_proxy": [
+          6,
+          2,
+          2,
+          -622
+        ],
+        "current_sufficient": true,
+        "enumerated_packages": 6,
+        "exact_recovery": null,
+        "id": "httpx-05",
+        "pool": {
+          "candidate_count": 6,
+          "candidates_with_parent": 6,
+          "same_parent_pairs": 1,
+          "unique_parents": 5,
+          "unique_sources": 2
+        },
+        "simple_recovery": null
+      },
+      {
+        "blind_singleton_choice": null,
+        "blind_singleton_sufficient": false,
+        "blind_singleton_used": false,
+        "current_proxy": [
+          0,
+          0,
+          0,
+          -184
+        ],
         "current_sufficient": false,
         "enumerated_packages": 0,
         "exact_recovery": null,
@@ -1791,7 +2164,187 @@
         "simple_recovery": null
       },
       {
-        "beam_recovery": null,
+        "blind_singleton_choice": {
+          "indices": [
+            2
+          ],
+          "proxy": [
+            2,
+            1,
+            1,
+            -369
+          ],
+          "required_count": 1,
+          "required_supported": 0,
+          "safety_errors": [],
+          "sources": 1,
+          "sufficient": false,
+          "tokens": 369
+        },
+        "blind_singleton_sufficient": false,
+        "blind_singleton_used": true,
+        "current_proxy": [
+          2,
+          1,
+          1,
+          -373
+        ],
+        "current_sufficient": true,
+        "enumerated_packages": 5,
+        "exact_recovery": null,
+        "id": "mkdocs-01",
+        "pool": {
+          "candidate_count": 5,
+          "candidates_with_parent": 4,
+          "same_parent_pairs": 3,
+          "unique_parents": 2,
+          "unique_sources": 2
+        },
+        "simple_recovery": null
+      },
+      {
+        "blind_singleton_choice": {
+          "indices": [
+            2
+          ],
+          "proxy": [
+            3,
+            1,
+            1,
+            -329
+          ],
+          "required_count": 1,
+          "required_supported": 1,
+          "safety_errors": [],
+          "sources": 1,
+          "sufficient": true,
+          "tokens": 329
+        },
+        "blind_singleton_sufficient": true,
+        "blind_singleton_used": false,
+        "current_proxy": [
+          4,
+          1,
+          2,
+          -605
+        ],
+        "current_sufficient": true,
+        "enumerated_packages": 3,
+        "exact_recovery": null,
+        "id": "mkdocs-02",
+        "pool": {
+          "candidate_count": 3,
+          "candidates_with_parent": 3,
+          "same_parent_pairs": 3,
+          "unique_parents": 1,
+          "unique_sources": 1
+        },
+        "simple_recovery": null
+      },
+      {
+        "blind_singleton_choice": {
+          "indices": [
+            0
+          ],
+          "proxy": [
+            6,
+            1,
+            1,
+            -339
+          ],
+          "required_count": 1,
+          "required_supported": 1,
+          "safety_errors": [],
+          "sources": 1,
+          "sufficient": true,
+          "tokens": 339
+        },
+        "blind_singleton_sufficient": true,
+        "blind_singleton_used": false,
+        "current_proxy": [
+          6,
+          1,
+          1,
+          -339
+        ],
+        "current_sufficient": true,
+        "enumerated_packages": 2,
+        "exact_recovery": null,
+        "id": "mkdocs-03",
+        "pool": {
+          "candidate_count": 2,
+          "candidates_with_parent": 2,
+          "same_parent_pairs": 1,
+          "unique_parents": 1,
+          "unique_sources": 1
+        },
+        "simple_recovery": null
+      },
+      {
+        "blind_singleton_choice": {
+          "indices": [
+            3
+          ],
+          "proxy": [
+            3,
+            1,
+            1,
+            -376
+          ],
+          "required_count": 1,
+          "required_supported": 1,
+          "safety_errors": [],
+          "sources": 1,
+          "sufficient": true,
+          "tokens": 376
+        },
+        "blind_singleton_sufficient": true,
+        "blind_singleton_used": false,
+        "current_proxy": [
+          3,
+          1,
+          2,
+          -604
+        ],
+        "current_sufficient": true,
+        "enumerated_packages": 5,
+        "exact_recovery": null,
+        "id": "mkdocs-04",
+        "pool": {
+          "candidate_count": 5,
+          "candidates_with_parent": 4,
+          "same_parent_pairs": 3,
+          "unique_parents": 2,
+          "unique_sources": 2
+        },
+        "simple_recovery": null
+      },
+      {
+        "blind_singleton_choice": {
+          "indices": [
+            3
+          ],
+          "proxy": [
+            3,
+            1,
+            1,
+            -339
+          ],
+          "required_count": 1,
+          "required_supported": 0,
+          "safety_errors": [],
+          "sources": 1,
+          "sufficient": false,
+          "tokens": 339
+        },
+        "blind_singleton_sufficient": false,
+        "blind_singleton_used": false,
+        "current_proxy": [
+          3,
+          1,
+          1,
+          -339
+        ],
         "current_sufficient": false,
         "enumerated_packages": 14,
         "exact_recovery": null,
@@ -1806,7 +2359,31 @@
         "simple_recovery": null
       },
       {
-        "beam_recovery": null,
+        "blind_singleton_choice": {
+          "indices": [
+            0
+          ],
+          "proxy": [
+            7,
+            1,
+            1,
+            -352
+          ],
+          "required_count": 1,
+          "required_supported": 0,
+          "safety_errors": [],
+          "sources": 1,
+          "sufficient": false,
+          "tokens": 352
+        },
+        "blind_singleton_sufficient": false,
+        "blind_singleton_used": false,
+        "current_proxy": [
+          7,
+          1,
+          1,
+          -352
+        ],
         "current_sufficient": false,
         "enumerated_packages": 14,
         "exact_recovery": null,
@@ -1821,7 +2398,93 @@
         "simple_recovery": null
       },
       {
-        "beam_recovery": null,
+        "blind_singleton_choice": {
+          "indices": [
+            0
+          ],
+          "proxy": [
+            5,
+            1,
+            1,
+            -356
+          ],
+          "required_count": 1,
+          "required_supported": 1,
+          "safety_errors": [],
+          "sources": 1,
+          "sufficient": true,
+          "tokens": 356
+        },
+        "blind_singleton_sufficient": true,
+        "blind_singleton_used": false,
+        "current_proxy": [
+          5,
+          1,
+          1,
+          -356
+        ],
+        "current_sufficient": true,
+        "enumerated_packages": 4,
+        "exact_recovery": null,
+        "id": "pydantic-01",
+        "pool": {
+          "candidate_count": 4,
+          "candidates_with_parent": 4,
+          "same_parent_pairs": 1,
+          "unique_parents": 3,
+          "unique_sources": 1
+        },
+        "simple_recovery": null
+      },
+      {
+        "blind_singleton_choice": {
+          "indices": [
+            2
+          ],
+          "proxy": [
+            5,
+            1,
+            1,
+            -317
+          ],
+          "required_count": 1,
+          "required_supported": 1,
+          "safety_errors": [],
+          "sources": 1,
+          "sufficient": true,
+          "tokens": 317
+        },
+        "blind_singleton_sufficient": true,
+        "blind_singleton_used": false,
+        "current_proxy": [
+          5,
+          1,
+          1,
+          -317
+        ],
+        "current_sufficient": true,
+        "enumerated_packages": 5,
+        "exact_recovery": null,
+        "id": "pydantic-02",
+        "pool": {
+          "candidate_count": 5,
+          "candidates_with_parent": 5,
+          "same_parent_pairs": 1,
+          "unique_parents": 4,
+          "unique_sources": 2
+        },
+        "simple_recovery": null
+      },
+      {
+        "blind_singleton_choice": null,
+        "blind_singleton_sufficient": false,
+        "blind_singleton_used": false,
+        "current_proxy": [
+          0,
+          0,
+          0,
+          -187
+        ],
         "current_sufficient": false,
         "enumerated_packages": 0,
         "exact_recovery": null,
@@ -1836,7 +2499,70 @@
         "simple_recovery": null
       },
       {
-        "beam_recovery": null,
+        "blind_singleton_choice": {
+          "indices": [
+            0
+          ],
+          "proxy": [
+            4,
+            1,
+            1,
+            -394
+          ],
+          "required_count": 1,
+          "required_supported": 1,
+          "safety_errors": [],
+          "sources": 1,
+          "sufficient": true,
+          "tokens": 394
+        },
+        "blind_singleton_sufficient": true,
+        "blind_singleton_used": false,
+        "current_proxy": [
+          4,
+          1,
+          2,
+          -675
+        ],
+        "current_sufficient": true,
+        "enumerated_packages": 6,
+        "exact_recovery": null,
+        "id": "pydantic-04",
+        "pool": {
+          "candidate_count": 6,
+          "candidates_with_parent": 6,
+          "same_parent_pairs": 3,
+          "unique_parents": 4,
+          "unique_sources": 2
+        },
+        "simple_recovery": null
+      },
+      {
+        "blind_singleton_choice": {
+          "indices": [
+            0
+          ],
+          "proxy": [
+            2,
+            1,
+            1,
+            -353
+          ],
+          "required_count": 1,
+          "required_supported": 0,
+          "safety_errors": [],
+          "sources": 1,
+          "sufficient": false,
+          "tokens": 353
+        },
+        "blind_singleton_sufficient": false,
+        "blind_singleton_used": false,
+        "current_proxy": [
+          2,
+          1,
+          1,
+          -353
+        ],
         "current_sufficient": false,
         "enumerated_packages": 3,
         "exact_recovery": null,
@@ -1851,7 +2577,70 @@
         "simple_recovery": null
       },
       {
-        "beam_recovery": null,
+        "blind_singleton_choice": {
+          "indices": [
+            0
+          ],
+          "proxy": [
+            2,
+            1,
+            1,
+            -377
+          ],
+          "required_count": 1,
+          "required_supported": 1,
+          "safety_errors": [],
+          "sources": 1,
+          "sufficient": true,
+          "tokens": 377
+        },
+        "blind_singleton_sufficient": true,
+        "blind_singleton_used": false,
+        "current_proxy": [
+          2,
+          1,
+          1,
+          -377
+        ],
+        "current_sufficient": true,
+        "enumerated_packages": 1,
+        "exact_recovery": null,
+        "id": "pydantic-06",
+        "pool": {
+          "candidate_count": 1,
+          "candidates_with_parent": 1,
+          "same_parent_pairs": 0,
+          "unique_parents": 1,
+          "unique_sources": 1
+        },
+        "simple_recovery": null
+      },
+      {
+        "blind_singleton_choice": {
+          "indices": [
+            0
+          ],
+          "proxy": [
+            3,
+            1,
+            1,
+            -376
+          ],
+          "required_count": 1,
+          "required_supported": 0,
+          "safety_errors": [],
+          "sources": 1,
+          "sufficient": false,
+          "tokens": 376
+        },
+        "blind_singleton_sufficient": false,
+        "blind_singleton_used": false,
+        "current_proxy": [
+          3,
+          1,
+          2,
+          -665
+        ],
         "current_sufficient": false,
         "enumerated_packages": 63,
         "exact_recovery": null,
@@ -1866,7 +2655,226 @@
         "simple_recovery": null
       },
       {
-        "beam_recovery": null,
+        "blind_singleton_choice": {
+          "indices": [
+            0
+          ],
+          "proxy": [
+            3,
+            1,
+            1,
+            -408
+          ],
+          "required_count": 1,
+          "required_supported": 1,
+          "safety_errors": [],
+          "sources": 1,
+          "sufficient": true,
+          "tokens": 408
+        },
+        "blind_singleton_sufficient": true,
+        "blind_singleton_used": false,
+        "current_proxy": [
+          3,
+          2,
+          2,
+          -633
+        ],
+        "current_sufficient": true,
+        "enumerated_packages": 7,
+        "exact_recovery": null,
+        "id": "ruff-02",
+        "pool": {
+          "candidate_count": 7,
+          "candidates_with_parent": 7,
+          "same_parent_pairs": 3,
+          "unique_parents": 4,
+          "unique_sources": 2
+        },
+        "simple_recovery": null
+      },
+      {
+        "blind_singleton_choice": {
+          "indices": [
+            0
+          ],
+          "proxy": [
+            4,
+            1,
+            1,
+            -403
+          ],
+          "required_count": 1,
+          "required_supported": 1,
+          "safety_errors": [],
+          "sources": 1,
+          "sufficient": true,
+          "tokens": 403
+        },
+        "blind_singleton_sufficient": true,
+        "blind_singleton_used": false,
+        "current_proxy": [
+          4,
+          1,
+          1,
+          -403
+        ],
+        "current_sufficient": true,
+        "enumerated_packages": 6,
+        "exact_recovery": null,
+        "id": "ruff-03",
+        "pool": {
+          "candidate_count": 6,
+          "candidates_with_parent": 6,
+          "same_parent_pairs": 2,
+          "unique_parents": 4,
+          "unique_sources": 2
+        },
+        "simple_recovery": null
+      },
+      {
+        "blind_singleton_choice": {
+          "indices": [
+            2
+          ],
+          "proxy": [
+            5,
+            1,
+            1,
+            -306
+          ],
+          "required_count": 1,
+          "required_supported": 1,
+          "safety_errors": [],
+          "sources": 1,
+          "sufficient": true,
+          "tokens": 306
+        },
+        "blind_singleton_sufficient": true,
+        "blind_singleton_used": false,
+        "current_proxy": [
+          5,
+          1,
+          2,
+          -611
+        ],
+        "current_sufficient": true,
+        "enumerated_packages": 3,
+        "exact_recovery": null,
+        "id": "ruff-04",
+        "pool": {
+          "candidate_count": 3,
+          "candidates_with_parent": 3,
+          "same_parent_pairs": 1,
+          "unique_parents": 2,
+          "unique_sources": 1
+        },
+        "simple_recovery": null
+      },
+      {
+        "blind_singleton_choice": {
+          "indices": [
+            0
+          ],
+          "proxy": [
+            4,
+            1,
+            1,
+            -375
+          ],
+          "required_count": 1,
+          "required_supported": 0,
+          "safety_errors": [],
+          "sources": 1,
+          "sufficient": false,
+          "tokens": 375
+        },
+        "blind_singleton_sufficient": true,
+        "blind_singleton_used": false,
+        "current_proxy": [
+          4,
+          1,
+          2,
+          -632
+        ],
+        "current_sufficient": true,
+        "enumerated_packages": 5,
+        "exact_recovery": null,
+        "id": "ruff-05",
+        "pool": {
+          "candidate_count": 5,
+          "candidates_with_parent": 5,
+          "same_parent_pairs": 2,
+          "unique_parents": 3,
+          "unique_sources": 2
+        },
+        "simple_recovery": null
+      },
+      {
+        "blind_singleton_choice": {
+          "indices": [
+            0
+          ],
+          "proxy": [
+            6,
+            1,
+            1,
+            -369
+          ],
+          "required_count": 1,
+          "required_supported": 1,
+          "safety_errors": [],
+          "sources": 1,
+          "sufficient": true,
+          "tokens": 369
+        },
+        "blind_singleton_sufficient": true,
+        "blind_singleton_used": false,
+        "current_proxy": [
+          6,
+          1,
+          1,
+          -369
+        ],
+        "current_sufficient": true,
+        "enumerated_packages": 4,
+        "exact_recovery": null,
+        "id": "ruff-06",
+        "pool": {
+          "candidate_count": 4,
+          "candidates_with_parent": 4,
+          "same_parent_pairs": 1,
+          "unique_parents": 3,
+          "unique_sources": 1
+        },
+        "simple_recovery": null
+      },
+      {
+        "blind_singleton_choice": {
+          "indices": [
+            0
+          ],
+          "proxy": [
+            2,
+            1,
+            1,
+            -293
+          ],
+          "required_count": 1,
+          "required_supported": 0,
+          "safety_errors": [],
+          "sources": 1,
+          "sufficient": false,
+          "tokens": 293
+        },
+        "blind_singleton_sufficient": false,
+        "blind_singleton_used": false,
+        "current_proxy": [
+          2,
+          1,
+          1,
+          -293
+        ],
         "current_sufficient": false,
         "enumerated_packages": 3,
         "exact_recovery": null,
@@ -1881,7 +2889,304 @@
         "simple_recovery": null
       },
       {
-        "beam_recovery": null,
+        "blind_singleton_choice": {
+          "indices": [
+            2
+          ],
+          "proxy": [
+            5,
+            1,
+            1,
+            -333
+          ],
+          "required_count": 1,
+          "required_supported": 1,
+          "safety_errors": [],
+          "sources": 1,
+          "sufficient": true,
+          "tokens": 333
+        },
+        "blind_singleton_sufficient": true,
+        "blind_singleton_used": false,
+        "current_proxy": [
+          7,
+          1,
+          2,
+          -603
+        ],
+        "current_sufficient": true,
+        "enumerated_packages": 7,
+        "exact_recovery": null,
+        "id": "starlette-02",
+        "pool": {
+          "candidate_count": 7,
+          "candidates_with_parent": 7,
+          "same_parent_pairs": 2,
+          "unique_parents": 5,
+          "unique_sources": 2
+        },
+        "simple_recovery": null
+      },
+      {
+        "blind_singleton_choice": {
+          "indices": [
+            0
+          ],
+          "proxy": [
+            4,
+            1,
+            1,
+            -333
+          ],
+          "required_count": 1,
+          "required_supported": 1,
+          "safety_errors": [],
+          "sources": 1,
+          "sufficient": true,
+          "tokens": 333
+        },
+        "blind_singleton_sufficient": true,
+        "blind_singleton_used": false,
+        "current_proxy": [
+          4,
+          1,
+          1,
+          -333
+        ],
+        "current_sufficient": true,
+        "enumerated_packages": 4,
+        "exact_recovery": null,
+        "id": "starlette-03",
+        "pool": {
+          "candidate_count": 4,
+          "candidates_with_parent": 4,
+          "same_parent_pairs": 1,
+          "unique_parents": 3,
+          "unique_sources": 1
+        },
+        "simple_recovery": null
+      },
+      {
+        "blind_singleton_choice": {
+          "indices": [
+            0
+          ],
+          "proxy": [
+            5,
+            1,
+            1,
+            -290
+          ],
+          "required_count": 1,
+          "required_supported": 1,
+          "safety_errors": [],
+          "sources": 1,
+          "sufficient": true,
+          "tokens": 290
+        },
+        "blind_singleton_sufficient": true,
+        "blind_singleton_used": false,
+        "current_proxy": [
+          5,
+          1,
+          2,
+          -470
+        ],
+        "current_sufficient": true,
+        "enumerated_packages": 5,
+        "exact_recovery": null,
+        "id": "starlette-04",
+        "pool": {
+          "candidate_count": 5,
+          "candidates_with_parent": 5,
+          "same_parent_pairs": 3,
+          "unique_parents": 3,
+          "unique_sources": 2
+        },
+        "simple_recovery": null
+      },
+      {
+        "blind_singleton_choice": {
+          "indices": [
+            0
+          ],
+          "proxy": [
+            4,
+            1,
+            1,
+            -458
+          ],
+          "required_count": 1,
+          "required_supported": 1,
+          "safety_errors": [],
+          "sources": 1,
+          "sufficient": true,
+          "tokens": 458
+        },
+        "blind_singleton_sufficient": true,
+        "blind_singleton_used": false,
+        "current_proxy": [
+          4,
+          1,
+          1,
+          -458
+        ],
+        "current_sufficient": true,
+        "enumerated_packages": 1,
+        "exact_recovery": null,
+        "id": "starlette-05",
+        "pool": {
+          "candidate_count": 1,
+          "candidates_with_parent": 1,
+          "same_parent_pairs": 0,
+          "unique_parents": 1,
+          "unique_sources": 1
+        },
+        "simple_recovery": null
+      },
+      {
+        "blind_singleton_choice": {
+          "indices": [
+            0
+          ],
+          "proxy": [
+            1,
+            1,
+            1,
+            -291
+          ],
+          "required_count": 1,
+          "required_supported": 1,
+          "safety_errors": [],
+          "sources": 1,
+          "sufficient": true,
+          "tokens": 291
+        },
+        "blind_singleton_sufficient": true,
+        "blind_singleton_used": false,
+        "current_proxy": [
+          1,
+          1,
+          1,
+          -291
+        ],
+        "current_sufficient": true,
+        "enumerated_packages": 2,
+        "exact_recovery": null,
+        "id": "starlette-06",
+        "pool": {
+          "candidate_count": 2,
+          "candidates_with_parent": 2,
+          "same_parent_pairs": 1,
+          "unique_parents": 1,
+          "unique_sources": 1
+        },
+        "simple_recovery": null
+      },
+      {
+        "blind_singleton_choice": {
+          "indices": [
+            2
+          ],
+          "proxy": [
+            4,
+            1,
+            1,
+            -381
+          ],
+          "required_count": 1,
+          "required_supported": 0,
+          "safety_errors": [],
+          "sources": 1,
+          "sufficient": false,
+          "tokens": 381
+        },
+        "blind_singleton_sufficient": true,
+        "blind_singleton_used": false,
+        "current_proxy": [
+          5,
+          1,
+          2,
+          -639
+        ],
+        "current_sufficient": true,
+        "enumerated_packages": 5,
+        "exact_recovery": null,
+        "id": "typer-01",
+        "pool": {
+          "candidate_count": 5,
+          "candidates_with_parent": 5,
+          "same_parent_pairs": 3,
+          "unique_parents": 3,
+          "unique_sources": 2
+        },
+        "simple_recovery": null
+      },
+      {
+        "blind_singleton_choice": {
+          "indices": [
+            1
+          ],
+          "proxy": [
+            1,
+            1,
+            1,
+            -445
+          ],
+          "required_count": 1,
+          "required_supported": 0,
+          "safety_errors": [],
+          "sources": 1,
+          "sufficient": false,
+          "tokens": 445
+        },
+        "blind_singleton_sufficient": false,
+        "blind_singleton_used": true,
+        "current_proxy": [
+          1,
+          1,
+          1,
+          -449
+        ],
+        "current_sufficient": true,
+        "enumerated_packages": 5,
+        "exact_recovery": null,
+        "id": "typer-02",
+        "pool": {
+          "candidate_count": 5,
+          "candidates_with_parent": 5,
+          "same_parent_pairs": 1,
+          "unique_parents": 4,
+          "unique_sources": 2
+        },
+        "simple_recovery": null
+      },
+      {
+        "blind_singleton_choice": {
+          "indices": [
+            4
+          ],
+          "proxy": [
+            2,
+            1,
+            1,
+            -381
+          ],
+          "required_count": 1,
+          "required_supported": 0,
+          "safety_errors": [],
+          "sources": 1,
+          "sufficient": false,
+          "tokens": 381
+        },
+        "blind_singleton_sufficient": false,
+        "blind_singleton_used": false,
+        "current_proxy": [
+          2,
+          1,
+          1,
+          -381
+        ],
         "current_sufficient": false,
         "enumerated_packages": 41,
         "exact_recovery": null,
@@ -1896,7 +3201,54 @@
         "simple_recovery": null
       },
       {
-        "beam_recovery": null,
+        "blind_singleton_choice": {
+          "indices": [
+            0
+          ],
+          "proxy": [
+            4,
+            1,
+            1,
+            -413
+          ],
+          "required_count": 1,
+          "required_supported": 1,
+          "safety_errors": [],
+          "sources": 1,
+          "sufficient": true,
+          "tokens": 413
+        },
+        "blind_singleton_sufficient": true,
+        "blind_singleton_used": false,
+        "current_proxy": [
+          4,
+          1,
+          1,
+          -413
+        ],
+        "current_sufficient": true,
+        "enumerated_packages": 2,
+        "exact_recovery": null,
+        "id": "typer-04",
+        "pool": {
+          "candidate_count": 2,
+          "candidates_with_parent": 2,
+          "same_parent_pairs": 1,
+          "unique_parents": 1,
+          "unique_sources": 1
+        },
+        "simple_recovery": null
+      },
+      {
+        "blind_singleton_choice": null,
+        "blind_singleton_sufficient": false,
+        "blind_singleton_used": false,
+        "current_proxy": [
+          0,
+          0,
+          0,
+          -185
+        ],
         "current_sufficient": false,
         "enumerated_packages": 0,
         "exact_recovery": null,
@@ -1911,7 +3263,124 @@
         "simple_recovery": null
       },
       {
-        "beam_recovery": {
+        "blind_singleton_choice": {
+          "indices": [
+            1
+          ],
+          "proxy": [
+            3,
+            1,
+            1,
+            -406
+          ],
+          "required_count": 1,
+          "required_supported": 0,
+          "safety_errors": [],
+          "sources": 1,
+          "sufficient": false,
+          "tokens": 406
+        },
+        "blind_singleton_sufficient": true,
+        "blind_singleton_used": false,
+        "current_proxy": [
+          3,
+          1,
+          2,
+          -712
+        ],
+        "current_sufficient": true,
+        "enumerated_packages": 3,
+        "exact_recovery": null,
+        "id": "typer-06",
+        "pool": {
+          "candidate_count": 3,
+          "candidates_with_parent": 3,
+          "same_parent_pairs": 3,
+          "unique_parents": 1,
+          "unique_sources": 1
+        },
+        "simple_recovery": null
+      },
+      {
+        "blind_singleton_choice": {
+          "indices": [
+            0
+          ],
+          "proxy": [
+            4,
+            1,
+            1,
+            -321
+          ],
+          "required_count": 1,
+          "required_supported": 1,
+          "safety_errors": [],
+          "sources": 1,
+          "sufficient": true,
+          "tokens": 321
+        },
+        "blind_singleton_sufficient": true,
+        "blind_singleton_used": false,
+        "current_proxy": [
+          4,
+          1,
+          1,
+          -321
+        ],
+        "current_sufficient": true,
+        "enumerated_packages": 3,
+        "exact_recovery": null,
+        "id": "uv-01",
+        "pool": {
+          "candidate_count": 3,
+          "candidates_with_parent": 3,
+          "same_parent_pairs": 1,
+          "unique_parents": 2,
+          "unique_sources": 1
+        },
+        "simple_recovery": null
+      },
+      {
+        "blind_singleton_choice": {
+          "indices": [
+            0
+          ],
+          "proxy": [
+            1,
+            1,
+            1,
+            -351
+          ],
+          "required_count": 1,
+          "required_supported": 1,
+          "safety_errors": [],
+          "sources": 1,
+          "sufficient": true,
+          "tokens": 351
+        },
+        "blind_singleton_sufficient": true,
+        "blind_singleton_used": false,
+        "current_proxy": [
+          1,
+          1,
+          1,
+          -351
+        ],
+        "current_sufficient": true,
+        "enumerated_packages": 3,
+        "exact_recovery": null,
+        "id": "uv-02",
+        "pool": {
+          "candidate_count": 3,
+          "candidates_with_parent": 3,
+          "same_parent_pairs": 3,
+          "unique_parents": 1,
+          "unique_sources": 1
+        },
+        "simple_recovery": null
+      },
+      {
+        "blind_singleton_choice": {
           "indices": [
             1
           ],
@@ -1919,15 +3388,23 @@
             4,
             1,
             1,
-            -434
+            -433
           ],
           "required_count": 1,
           "required_supported": 1,
           "safety_errors": [],
           "sources": 1,
           "sufficient": true,
-          "tokens": 434
+          "tokens": 433
         },
+        "blind_singleton_sufficient": false,
+        "blind_singleton_used": false,
+        "current_proxy": [
+          4,
+          1,
+          2,
+          -614
+        ],
         "current_sufficient": false,
         "enumerated_packages": 14,
         "exact_recovery": {
@@ -1938,14 +3415,14 @@
             4,
             1,
             1,
-            -434
+            -433
           ],
           "required_count": 1,
           "required_supported": 1,
           "safety_errors": [],
           "sources": 1,
           "sufficient": true,
-          "tokens": 434
+          "tokens": 433
         },
         "id": "uv-03",
         "pool": {
@@ -1958,7 +3435,31 @@
         "simple_recovery": null
       },
       {
-        "beam_recovery": null,
+        "blind_singleton_choice": {
+          "indices": [
+            1
+          ],
+          "proxy": [
+            5,
+            1,
+            1,
+            -342
+          ],
+          "required_count": 1,
+          "required_supported": 0,
+          "safety_errors": [],
+          "sources": 1,
+          "sufficient": false,
+          "tokens": 342
+        },
+        "blind_singleton_sufficient": false,
+        "blind_singleton_used": false,
+        "current_proxy": [
+          5,
+          1,
+          2,
+          -620
+        ],
         "current_sufficient": false,
         "enumerated_packages": 14,
         "exact_recovery": null,
@@ -1973,7 +3474,31 @@
         "simple_recovery": null
       },
       {
-        "beam_recovery": null,
+        "blind_singleton_choice": {
+          "indices": [
+            0
+          ],
+          "proxy": [
+            3,
+            1,
+            1,
+            -355
+          ],
+          "required_count": 1,
+          "required_supported": 0,
+          "safety_errors": [],
+          "sources": 1,
+          "sufficient": false,
+          "tokens": 355
+        },
+        "blind_singleton_sufficient": false,
+        "blind_singleton_used": false,
+        "current_proxy": [
+          3,
+          1,
+          1,
+          -355
+        ],
         "current_sufficient": false,
         "enumerated_packages": 3,
         "exact_recovery": null,
@@ -1988,7 +3513,31 @@
         "simple_recovery": null
       },
       {
-        "beam_recovery": null,
+        "blind_singleton_choice": {
+          "indices": [
+            0
+          ],
+          "proxy": [
+            5,
+            1,
+            1,
+            -378
+          ],
+          "required_count": 1,
+          "required_supported": 0,
+          "safety_errors": [],
+          "sources": 1,
+          "sufficient": false,
+          "tokens": 378
+        },
+        "blind_singleton_sufficient": false,
+        "blind_singleton_used": false,
+        "current_proxy": [
+          5,
+          1,
+          1,
+          -378
+        ],
         "current_sufficient": false,
         "enumerated_packages": 14,
         "exact_recovery": null,
@@ -2010,10 +3559,9 @@
       "uv-03"
     ],
     "package_source_limit": 3,
-    "production_selector_decision": "INVESTIGATE_OBSERVED_GAP_BEFORE_PRODUCT_CHANGE",
+    "production_selector_decision": "NO_PRODUCTION_SELECTOR_VALIDATED",
     "projector_failures": 0,
-    "proxy_exact_gap": [],
-    "reference": "exhaustive subset replay through unchanged projector; gold is used only to score the oracle, never the beam proxy",
+    "reference": "exact oracle enumerates bounded subsets with evaluator sufficiency; blind singleton choice is fixed only by model-visible proxy before gold scoring",
     "selection_bottleneck": "OBSERVED",
     "simple_recoveries": []
   },
