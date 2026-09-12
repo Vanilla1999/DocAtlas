@@ -726,17 +726,8 @@ class _SQLiteStorePart02:
                 ).fetchone()
                 if row is None or str(row["status"]) != "superseded":
                     continue
-                child_ids = [
-                    int(item["id"])
-                    for item in conn.execute(
-                        "SELECT id FROM retrieval_children WHERE generation_id = ?",
-                        (generation_id,),
-                    )
-                ]
-                for child_id in child_ids:
-                    conn.execute(
-                        "DELETE FROM retrieval_children_fts WHERE rowid = ?", (child_id,)
-                    )
+                # FTS5 is an active-generation projection. Inactive/candidate
+                # backing rows have no postings to delete here.
                 conn.execute(
                     "DELETE FROM generation_vector_upserts WHERE generation_id = ?",
                     (generation_id,),
@@ -768,11 +759,8 @@ class _SQLiteStorePart02:
             ).fetchone()
             if row is None or row["status"] not in {"building", "ready"}:
                 return False
-            child_ids = [int(row["id"]) for row in conn.execute(
-                "SELECT id FROM retrieval_children WHERE generation_id = ?", (generation_id,)
-            )]
-            for child_id in child_ids:
-                conn.execute("DELETE FROM retrieval_children_fts WHERE rowid = ?", (child_id,))
+            # FTS5 is an active-generation projection. Inactive/candidate
+            # backing rows have no postings to delete here.
             for table in (
                 "generation_vector_upserts", "retrieval_children",
                 "retrieval_parents", "generation_sources",

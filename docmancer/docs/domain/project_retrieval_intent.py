@@ -50,7 +50,7 @@ _INTENT_ROLE_POLICY: dict[str, tuple[tuple[str, ...], tuple[str, ...]]] = {
     "project_docs_config_location": (("runbook", "development", "api_contract"), ("roadmap",)),
     "state_home_variable": (("runbook", "api_contract", "development"), ("adr", "roadmap")),
     "offline_usage": (("runbook", "development", "api_contract"), ("adr", "roadmap")),
-    "index_cleanup": (("runbook", "api_contract"), ("adr", "roadmap")),
+    "index_cleanup": (("operations", "runbook", "api_contract"), ("adr", "roadmap")),
     "troubleshooting": (("runbook", "development"), ("adr", "roadmap")),
     "context_budget": (("api_contract", "module_architecture"), ("adr", "roadmap")),
     "docs_mcp_public_tools": (("api_contract", "runbook"), ("adr", "roadmap")),

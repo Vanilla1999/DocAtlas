@@ -225,7 +225,7 @@ def summarize(rows: list[dict], protocol: dict) -> dict:
     return result
 
 
-def run(output: Path, projects: list[str] | None = None) -> dict:
+def run(output: Path, projects: list[str] | None = None, *, fixture_output: Path | None = None) -> dict:
     from docmancer.docs.application import docs_context_projection as projection
     from docmancer.docs.application.model_visible_projection import validate_model_visible_projection
     from docmancer.docs.domain import documentation_query_plan
@@ -240,11 +240,14 @@ def run(output: Path, projects: list[str] | None = None) -> dict:
     rows=[]
     for project in sorted({c['project_group'] for c in cases}):
         if projects and project not in projects: continue
-        root=output/'corpus'/project
+        fixture = fixture_output.resolve() if fixture_output is not None else output
+        root=fixture/'corpus'/project
         documents=documents_for(project,manifest); registry=registry_for(project,manifest)
-        write_project(root,documents)
-        with isolated_service(output/'state'/project) as (service,config):
-            index=index_project(service,config,root)
+        if fixture_output is None:
+            write_project(root,documents)
+        with isolated_service(fixture/'state'/project) as (service,config):
+            index=(json.loads((fixture/'ingest'/f'{project}.json').read_text())
+                   if fixture_output is not None else index_project(service,config,root))
             save_json(output/'ingest'/f'{project}.json',index)
             for case in [c for c in cases if c['project_group']==project]:
                 base_trace=None

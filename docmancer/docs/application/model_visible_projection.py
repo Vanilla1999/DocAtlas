@@ -5,7 +5,6 @@ from __future__ import annotations
 import base64
 import hashlib
 import json
-import math
 import re
 import zlib
 from copy import deepcopy
@@ -36,6 +35,9 @@ from docmancer.docs.application.model_visible_projection_helpers import (
     bounded_action as _bounded_action,
     cited_patch_items as _cited_patch_items,
     sanitized_projection_manifest,
+    canonical_projection_bytes,
+    estimate_projection_tokens,
+    docs_context_budget_tokens,
 )
 
 
@@ -97,15 +99,6 @@ _INSUFFICIENT_SUPPORT_KEYS = (
 _OPTIONAL_INSUFFICIENT_KEYS = (
     "operational_status", "context_available", "disposition",
 )
-
-def canonical_projection_bytes(value: Any) -> bytes:
-    return json.dumps(value, ensure_ascii=False, sort_keys=True, separators=(",", ":")).encode("utf-8")
-
-
-def estimate_projection_tokens(value: Any) -> int:
-    size = len(canonical_projection_bytes(value))
-    return max(1, math.ceil(size / 4))
-
 
 def encode_support_envelope(value: dict[str, Any]) -> dict[str, str]:
     """Encode a complete canonical support envelope for tiny public budgets."""
@@ -674,6 +667,12 @@ def validate_model_visible_projection(
     actual = estimate_projection_tokens(payload)
     if payload.get("estimated_tokens") != actual or actual > limit:
         errors.append("projection estimate mismatch or budget exceeded")
+    if (
+        kind == "docs_context"
+        and status in {"ok", "truncated"}
+        and docs_context_budget_tokens(payload) > max_tokens
+    ):
+        errors.append("docs_context conservative budget exceeded")
     if status == "insufficient_evidence":
         transport = payload.get("support_envelope")
         transport_support: dict[str, Any] | None = None

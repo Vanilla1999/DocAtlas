@@ -1,0 +1,10 @@
+{
+  "schema_version": 1,
+  "module_labels": {
+    "tests/test_pre_hydration_source_policy.py": "behavioral"
+  },
+  "module_node_hashes": {
+    "tests/test_pre_hydration_source_policy.py": "53ccb7f604fb0060748001f6214db2fd5f8da52ceadd47947bad60668240b347"
+  },
+  "node_overrides": {}
+}

@@ -86,6 +86,7 @@ def _payload(
                 "retrieval_query_ids", "retrieval_query_matches",
                 "_assigned_requirement_ids", "_visible_assignment_hashes", "catalog_role",
                 "_qualification_candidate", "_expected_project_identity", "_lifecycle_intent",
+                "_independent_query_plan",
             }
         }
         for source in sources

@@ -119,6 +119,40 @@ class _RetrievalDispatcherPart02:
             return []
         return self.store.fetch_sections_by_id(section_ids, budget=budget)
 
+    def _filter_section_ids_before_hydration(
+        self, section_ids: list[int], filters: dict | None,
+    ) -> list[int]:
+        if not section_ids or not filters:
+            return section_ids
+        metadata_for = getattr(self.store, "section_filter_metadata_for", None)
+        if not callable(metadata_for):
+            # Compatibility stores still retain the post-hydration policy check.
+            return section_ids
+        try:
+            metadata_by_id = metadata_for(section_ids)
+        except Exception as exc:
+            logger.warning(
+                "pre-hydration source-policy metadata failed (%s)",
+                type(exc).__name__,
+            )
+            return []
+        return [
+            section_id
+            for section_id in section_ids
+            if (metadata := metadata_by_id.get(int(section_id))) is not None
+            and metadata_matches_filters(
+                metadata, filters, source=str(metadata.get("source") or ""),
+            )
+        ]
+
+    def _hydrate_policy_filtered(
+        self, section_ids: list[int], *, budget: int, filters: dict | None,
+    ) -> list:
+        return self._hydrate(
+            self._filter_section_ids_before_hydration(section_ids, filters),
+            budget=budget,
+        )
+
     def _candidate_limit_for_diversity(self, limit: int, expand: str | None) -> int:
         if (expand or "").lower() in {"adjacent", "page"}:
             return limit
@@ -127,25 +161,59 @@ class _RetrievalDispatcherPart02:
             return limit
         return max(limit * 3, limit + int(max_per_source) * 3)
 
-    def _limit_sections_per_source(self, chunks: list[Any], *, limit: int | None = None, expand: str | None = None) -> list[Any]:
+    def _limit_sections_per_source(
+        self,
+        chunks: list[Any],
+        *,
+        limit: int | None = None,
+        expand: str | None = None,
+    ) -> list[Any]:
         if (expand or "").lower() in {"adjacent", "page"}:
             return chunks
         max_per_source = getattr(self.config.retrieval, "max_sections_per_source", None)
         if not max_per_source:
             return chunks[:limit] if limit is not None else chunks
+
+        # The per-source quota remains the diversity floor. One additional
+        # candidate may backfill unused global capacity only when its indexed
+        # parent is already represented by a preferred chunk from that source.
+        # Parent identity proves source-local structure, not semantic support;
+        # the normal evidence qualification/projection gates still decide
+        # whether the added candidate may become visible evidence.
         counts: dict[str, int] = {}
-        out: list[Any] = []
+        preferred: list[Any] = []
+        preferred_parents: dict[str, set[str]] = {}
+        structural_overflow: list[Any] = []
+        overflow_sources: set[str] = set()
         for chunk in chunks:
             metadata = getattr(chunk, "metadata", {}) or {}
-            source = str(metadata.get("canonical_url") or getattr(chunk, "source", "") or "")
+            source = str(
+                metadata.get("canonical_url")
+                or getattr(chunk, "source", "")
+                or ""
+            )
+            parent = str(metadata.get("parent_logical_id") or "")
             count = counts.get(source, 0)
-            if count >= int(max_per_source):
+            if count < int(max_per_source):
+                counts[source] = count + 1
+                preferred.append(chunk)
+                if parent:
+                    preferred_parents.setdefault(source, set()).add(parent)
                 continue
-            counts[source] = count + 1
-            out.append(chunk)
-            if limit is not None and len(out) >= limit:
-                break
-        return out
+            if (
+                source not in overflow_sources
+                and parent
+                and parent in preferred_parents.get(source, set())
+            ):
+                structural_overflow.append(chunk)
+                overflow_sources.add(source)
+
+        if limit is None:
+            return [*preferred, *structural_overflow]
+        selected = preferred[:limit]
+        if len(selected) < limit:
+            selected.extend(structural_overflow[:limit - len(selected)])
+        return selected
 
     @staticmethod
     def _filter_chunks(chunks: list[Any], filters: dict | None) -> list[Any]:

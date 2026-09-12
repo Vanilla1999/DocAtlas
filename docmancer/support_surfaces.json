@@ -30,7 +30,8 @@
       "pdfplumber",
       "pypdf",
       "python-docx",
-      "striprtf"
+      "striprtf",
+      "tiktoken"
     ],
     "task24_extra_candidates": [
       "qdrant-client",

@@ -1,0 +1,79 @@
+{
+  "schema_version": "systemic-retrieval-independent-project-sample-v1",
+  "state": "posthoc_independent_project_sample",
+  "note": "Projects and source bytes are outside the frozen evidence-quality 80-case development corpus. This is not a hidden or preregistered benchmark.",
+  "cases": [
+    {
+      "id": "httpcore-01",
+      "question": "Does HTTP Core handle redirects and session cookie handling for the caller?",
+      "family": "polarity",
+      "project_group": "httpcore",
+      "split": "independent_project_sample",
+      "source_kind": "real_upstream",
+      "policy": {"version": "git-blob:4567ba44b402b1f03f5744f88d9f2d49d608a485", "scope": "project", "authority": "source_of_truth", "lifecycle": "active"},
+      "answerability": "within_budget",
+      "required_claims": [{"id": "required", "witness_sets": [{"parts": [{"path": "README.md", "text": "It does not provide any high level model abstractions over the API, does not handle redirects, multipart uploads, building authentication headers, transparent HTTP caching, URL parsing, session cookie handling, content or charset decoding, handling JSON, environment based configuration defaults, or any of that Jazz.", "line_start": 11, "line_end": 15}]}]}],
+      "forbidden_inferences": ["Do not infer behavior beyond the pinned README."]
+    },
+    {
+      "id": "httpcore-02",
+      "question": "Which async backends does HTTP Core support?",
+      "family": "enumeration",
+      "project_group": "httpcore",
+      "split": "independent_project_sample",
+      "source_kind": "real_upstream",
+      "policy": {"version": "git-blob:4567ba44b402b1f03f5744f88d9f2d49d608a485", "scope": "project", "authority": "source_of_truth", "lifecycle": "active"},
+      "answerability": "within_budget",
+      "required_claims": [{"id": "required", "witness_sets": [{"parts": [{"path": "README.md", "text": "Async backend support for `asyncio` and `trio`.", "line_start": 24, "line_end": 24}]}]}],
+      "forbidden_inferences": ["Do not infer support for an async backend not named in the witness."]
+    },
+    {
+      "id": "sqlmodel-01",
+      "question": "What does SQLModel use for everything in this tutorial, and what editor support does that enable?",
+      "family": "behavior",
+      "project_group": "sqlmodel",
+      "split": "independent_project_sample",
+      "source_kind": "real_upstream",
+      "policy": {"version": "git-blob:281f99081cb3c747d6df1387f49151663045d712", "scope": "project", "authority": "source_of_truth", "lifecycle": "active"},
+      "answerability": "within_budget",
+      "required_claims": [{"id": "required", "witness_sets": [{"parts": [{"path": "docs/tutorial/index.md", "text": "SQLModel uses type annotations for everything, this way you can use a familiar Python syntax and get all the editor support possible, with autocompletion and in-editor error checking.", "line_start": 11, "line_end": 11}]}]}],
+      "forbidden_inferences": ["Do not infer guarantees beyond the pinned tutorial."]
+    },
+    {
+      "id": "sqlmodel-02",
+      "question": "Are the tutorial code blocks intended to be copied and used directly?",
+      "family": "polarity",
+      "project_group": "sqlmodel",
+      "split": "independent_project_sample",
+      "source_kind": "real_upstream",
+      "policy": {"version": "git-blob:281f99081cb3c747d6df1387f49151663045d712", "scope": "project", "authority": "source_of_truth", "lifecycle": "active"},
+      "answerability": "within_budget",
+      "required_claims": [{"id": "required", "witness_sets": [{"parts": [{"path": "docs/tutorial/index.md", "text": "All the code blocks can be copied and used directly (they are tested Python files).", "line_start": 25, "line_end": 25}]}]}],
+      "forbidden_inferences": ["Do not infer that every external example is tested."]
+    },
+    {
+      "id": "itsdangerous-01",
+      "question": "How does ItsDangerous ensure that a token has not been tampered with?",
+      "family": "mechanism",
+      "project_group": "itsdangerous",
+      "split": "independent_project_sample",
+      "source_kind": "real_upstream",
+      "policy": {"version": "git-blob:528236d7c0bd0c703943965eec5a46fa17d88595", "scope": "project", "authority": "source_of_truth", "lifecycle": "active"},
+      "answerability": "within_budget",
+      "required_claims": [{"id": "required", "witness_sets": [{"parts": [{"path": "README.md", "text": "Data is cryptographically signed to ensure that a token has not been tampered with.", "line_start": 7, "line_end": 9}]}]}],
+      "forbidden_inferences": ["Do not infer encryption when the source only establishes signing."]
+    },
+    {
+      "id": "itsdangerous-02",
+      "question": "Can ItsDangerous add a timestamp and verify it automatically when loading a token?",
+      "family": "polarity",
+      "project_group": "itsdangerous",
+      "split": "independent_project_sample",
+      "source_kind": "real_upstream",
+      "policy": {"version": "git-blob:528236d7c0bd0c703943965eec5a46fa17d88595", "scope": "project", "authority": "source_of_truth", "lifecycle": "active"},
+      "answerability": "within_budget",
+      "required_claims": [{"id": "required", "witness_sets": [{"parts": [{"path": "README.md", "text": "A timestamp can be added and verified automatically while loading a token.", "line_start": 11, "line_end": 13}]}]}],
+      "forbidden_inferences": ["Do not infer timestamp semantics beyond the pinned README."]
+    }
+  ]
+}

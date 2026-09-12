@@ -1,0 +1,10 @@
+{
+  "schema_version": 1,
+  "module_labels": {
+    "tests/docs/test_docs_context_budget_reserve.py": "behavioral"
+  },
+  "module_node_hashes": {
+    "tests/docs/test_docs_context_budget_reserve.py": "07c99c540b8c1c5eb9d859f306f22535366d840db00e75d03ec3b04597b5c982"
+  },
+  "node_overrides": {}
+}

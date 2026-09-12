@@ -256,7 +256,9 @@ class _RetrievalDispatcherPart01:
                 budget_cap=limit * 3,
             )
 
-        chunks = self._hydrate(section_ids, budget=budget)
+        chunks = self._hydrate_policy_filtered(
+            section_ids, budget=budget, filters=merged_filters,
+        )
         chunks = self._filter_chunks(chunks, merged_filters)
         chunks = self._append_api_term_matches(query, chunks, budget=budget, expand=retrieval_expand, backend_filters=backend_filters, verification_filters=merged_filters)
         chunks = self._rerank_intent_matches(query, chunks, expand=retrieval_expand)
@@ -532,7 +534,9 @@ class _RetrievalDispatcherPart01:
             section_ids = self._expand_section_ids(
                 section_ids, mode=expand, budget_cap=limit * 3
             )
-        chunks = self._hydrate(section_ids, budget=budget)
+        chunks = self._hydrate_policy_filtered(
+            section_ids, budget=budget, filters=filters,
+        )
         chunks = self._filter_chunks(chunks, filters)
         chunks = self._append_api_term_matches(
             query, chunks, budget=budget, expand=expand,

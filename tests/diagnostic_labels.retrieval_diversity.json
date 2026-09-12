@@ -1,0 +1,10 @@
+{
+  "schema_version": 1,
+  "module_labels": {
+    "tests/test_retrieval_diversity_policy.py": "behavioral"
+  },
+  "module_node_hashes": {
+    "tests/test_retrieval_diversity_policy.py": "2ac7ce6c782744243fdc41cb4896eadda1315387557fae3fbcafa47ea82f205b"
+  },
+  "node_overrides": {}
+}

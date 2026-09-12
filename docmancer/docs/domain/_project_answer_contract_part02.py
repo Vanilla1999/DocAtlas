@@ -68,6 +68,36 @@ def _generic_behavior_qualifiers(
     return action, target
 
 
+
+_VERSION_CAPABILITY_SUBJECT_RE = re.compile(
+    r"^\s*(?:since|from)\s+which\s+version\s+can\s+(?:the\s+)?"
+    r"(?P<subject>`[^`\n]{2,120}`|[A-Za-z_][A-Za-z0-9_.:-]*)\s+be\b",
+    re.I,
+)
+
+
+def _version_capability_subject(
+    question: str,
+    technical_terms: tuple[TechnicalTerm, ...],
+) -> tuple[str, dict[str, Any]] | None:
+    """Bind a version subject from syntax instead of sentence-initial title case.
+
+    A query span proves where text came from, not that a title-cased discourse
+    word is the entity being constrained. This narrow grammar covers the
+    auditable ``Since/From which version can X be ...`` form. Explicit
+    technical identifiers retain their stronger typed identity.
+    """
+
+    match = _VERSION_CAPABILITY_SUBJECT_RE.match(question)
+    if match is None:
+        return None
+    raw_subject = _clean_phrase(match.group("subject").strip("`"))
+    if not raw_subject:
+        return None
+    term = _technical_term_for_value(raw_subject, technical_terms)
+    subject = term.raw if term is not None else raw_subject
+    return subject, _subject_fields(subject, term)
+
 def build_project_answer_contract(question: str) -> ProjectAnswerContract:
     """Build a bounded deterministic answer contract from the public question."""
 
@@ -151,17 +181,24 @@ def build_project_answer_contract(question: str) -> ProjectAnswerContract:
             lifecycle_intent=lifecycle, span_value=task_match.group(0),
         ))
 
-    if _VERSION_QUESTION_RE.search(raw_question):
-        subject = _best_subject(
-            raw_question,
-            [value for value in subjects if value.casefold() not in {"python", "version"}],
-            fallback="project",
-        )
+    version_question = _VERSION_QUESTION_RE.search(raw_question)
+    if version_question:
+        bound_version_subject = _version_capability_subject(raw_question, technical_terms)
+        subject_fields: dict[str, Any] = {}
+        if bound_version_subject is not None:
+            subject, subject_fields = bound_version_subject
+        else:
+            subject = _best_subject(
+                raw_question,
+                [value for value in subjects if value.casefold() not in {"python", "version"}],
+                fallback="project",
+            )
         attribute = "python_version" if re.search(r"\bpython\b", raw_question, re.I) else "version"
         obligations.append(_obligation(
             question=raw_question, index=len(obligations), kind="attribute",
             subject=subject, attribute=attribute, value_kind="version_range",
-            lifecycle_intent=lifecycle, span_value=_VERSION_QUESTION_RE.search(raw_question).group(0),
+            lifecycle_intent=lifecycle, span_value=version_question.group(0),
+            **subject_fields,
         ))
 
     if _TIMEOUT_RE.search(raw_question):
