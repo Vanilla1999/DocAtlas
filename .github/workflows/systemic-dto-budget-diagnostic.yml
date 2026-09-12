@@ -1,0 +1,73 @@
+name: Systemic DTO budget diagnostic
+
+on:
+  push:
+    branches: [feat/systemic-retrieval-mechanics]
+
+permissions:
+  contents: read
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
+  DOCATLAS_OFFLINE: "1"
+
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with:
+          ref: feat/systemic-retrieval-mechanics
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: "3.12"
+      - name: Install dependencies
+        run: python -m pip install -e '.[dev]' 'tiktoken==0.11.0'
+      - name: Measure actual full structured DTO tokens
+        run: |
+          python - <<'PY'
+          from copy import deepcopy
+          import json
+          from pathlib import Path
+          import shutil
+          from unittest.mock import patch
+
+          from eval.evidence_quality_v2 import run as evidence
+
+          output = Path('/tmp/docatlas-dto-budget')
+          shutil.rmtree(output, ignore_errors=True)
+          protocol, cases, manifest = evidence.load_protocol()
+          protocol = deepcopy(protocol)
+          protocol['variants'] = ['A-current']
+          with patch.object(evidence, 'load_protocol', return_value=(protocol, cases, manifest)):
+              evidence.run(output)
+          rows = json.loads((output / 'rows.json').read_text(encoding='utf-8'))
+          primary = [
+              row for row in rows
+              if 'error' not in row and row.get('answerability') == 'within_budget'
+          ]
+          ranked = sorted(primary, key=lambda row: int(row['size']['actual_tokens']), reverse=True)
+          report = []
+          for row in ranked[:12]:
+              payload = row.get('payload') or {}
+              report.append({
+                  'id': row['id'],
+                  'actual_tokens': row['size']['actual_tokens'],
+                  'estimated_tokens': row.get('engineering_estimate'),
+                  'utf8_bytes': row['size']['utf8_bytes'],
+                  'kind': payload.get('kind'),
+                  'status': payload.get('status'),
+                  'source_count': len(payload.get('sources') or []),
+                  'source_snippet_chars': [len(str(source.get('snippet') or '')) for source in payload.get('sources') or []],
+                  'support_envelope_chars': len(str((payload.get('support_envelope') or {}).get('data') or '')),
+                  'payload_keys': sorted(payload),
+              })
+          print('ACTUAL_DTO_BUDGET_DIAGNOSTIC_BEGIN')
+          print(json.dumps(report, indent=2, ensure_ascii=False, sort_keys=True))
+          print('ACTUAL_DTO_BUDGET_DIAGNOSTIC_END')
+          overflow = [row for row in ranked if int(row['size']['actual_tokens']) > 800]
+          print('overflow_ids=', [(row['id'], row['size']['actual_tokens'], row.get('engineering_estimate')) for row in overflow])
+          if not overflow:
+              raise SystemExit('expected at least one overflow from the acceptance RED')
+          PY
