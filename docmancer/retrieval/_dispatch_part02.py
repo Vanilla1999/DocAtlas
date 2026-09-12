@@ -119,6 +119,34 @@ class _RetrievalDispatcherPart02:
             return []
         return self.store.fetch_sections_by_id(section_ids, budget=budget)
 
+    def _filter_section_ids_before_hydration(
+        self, section_ids: list[int], filters: dict | None,
+    ) -> list[int]:
+        if not section_ids or not filters:
+            return section_ids
+        read_metadata = getattr(self.store, "fetch_section_filter_metadata", None)
+        if not callable(read_metadata):
+            # Compatibility for third-party/test stores; hydrated chunks still
+            # pass through the existing defense-in-depth policy check.
+            return section_ids
+        allowed = {
+            int(row["section_id"])
+            for row in read_metadata(section_ids)
+            if row.get("section_id") is not None
+            and metadata_matches_filters(
+                row, filters, source=str(row.get("source") or ""),
+            )
+        }
+        return [value for value in section_ids if int(value) in allowed]
+
+    def _hydrate_policy_filtered(
+        self, section_ids: list[int], *, budget: int, filters: dict | None,
+    ) -> list:
+        return self._hydrate(
+            self._filter_section_ids_before_hydration(section_ids, filters),
+            budget=budget,
+        )
+
     def _candidate_limit_for_diversity(self, limit: int, expand: str | None) -> int:
         if (expand or "").lower() in {"adjacent", "page"}:
             return limit

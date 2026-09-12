@@ -7,6 +7,7 @@ transaction so readers observe either the previous snapshot or the next one.
 """
 from __future__ import annotations
 
+import json
 import sqlite3
 from typing import Any
 
@@ -66,6 +67,54 @@ class _SQLiteStoreActiveFTS:
             """,
             (generation_id, _ACTIVE_FTS_PROJECTION_VERSION),
         )
+
+    def fetch_section_filter_metadata(self, section_ids: list[int]) -> list[dict[str, Any]]:
+        """Read only policy metadata for candidate ids before text hydration."""
+        ordered = list(dict.fromkeys(int(value) for value in section_ids))
+        if not ordered:
+            return []
+        placeholders = ",".join("?" for _ in ordered)
+        with self._connect() as conn:
+            generation_id = self._active_generation_id(conn)
+            if not generation_id:
+                return []
+            rows = conn.execute(
+                f"""
+                SELECT hydration_id AS section_id, source, source_path,
+                       source_identity, library_id, project_identity, project_path,
+                       module_id, doc_scope, source_class, authority, lifecycle_status,
+                       temporal_relevance, index_freshness, docs_snapshot_exact, metadata_json
+                FROM retrieval_children
+                WHERE generation_id = ? AND hydration_id IN ({placeholders})
+                """,
+                (generation_id, *ordered),
+            )
+            result: dict[int, dict[str, Any]] = {}
+            for row in rows:
+                try:
+                    metadata = json.loads(str(row["metadata_json"] or "{}"))
+                except (TypeError, json.JSONDecodeError):
+                    metadata = {}
+                metadata.update({
+                    "section_id": int(row["section_id"]),
+                    "source": str(row["source"] or ""),
+                    "source_path": str(row["source_path"] or ""),
+                    "source_identity": str(row["source_identity"] or ""),
+                    "library_id": str(row["library_id"] or ""),
+                    "project_identity": str(row["project_identity"] or ""),
+                    "project_path": str(row["project_path"] or ""),
+                    "module_id": str(row["module_id"] or ""),
+                    "doc_scope": str(row["doc_scope"] or ""),
+                    "source_class": str(row["source_class"] or ""),
+                    "authority": str(row["authority"] or "unknown"),
+                    "lifecycle_status": str(row["lifecycle_status"] or "active"),
+                    "temporal_relevance": str(row["temporal_relevance"] or "current"),
+                    "index_freshness": str(row["index_freshness"] or "synchronized"),
+                })
+                if row["docs_snapshot_exact"] is not None:
+                    metadata["docs_snapshot_exact"] = bool(row["docs_snapshot_exact"])
+                result[int(row["section_id"])] = metadata
+        return [result[value] for value in ordered if value in result]
 
     def _ensure_schema(self) -> None:
         super()._ensure_schema()
