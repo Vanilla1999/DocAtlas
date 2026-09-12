@@ -228,6 +228,51 @@ def _final_citation_policy(rows: list[dict[str, Any]], manifest: dict[str, Any])
     return {"checked_final_citations": checked, "violations": violations, "status": "PASS" if not violations else "FAIL"}
 
 
+
+def _candidate_pool_fingerprint(pool: list[Any]) -> str:
+    """Hash semantic ranked candidates while ignoring fresh-index identities."""
+    canonical: list[dict[str, Any]] = []
+    for row in pool:
+        if isinstance(row, dict):
+            metadata = row.get("metadata") or {}
+            path = str(
+                row.get("project_doc_path")
+                or row.get("source_path")
+                or row.get("path")
+                or row.get("source")
+                or metadata.get("project_doc_path")
+                or metadata.get("source_path")
+                or metadata.get("canonical_url")
+                or ""
+            )
+            chunk_index = row.get("chunk_index")
+            body = str(row.get("text") or row.get("snippet") or "")
+        else:
+            metadata = getattr(row, "metadata", {}) or {}
+            path = str(
+                metadata.get("project_doc_path")
+                or metadata.get("source_path")
+                or metadata.get("canonical_url")
+                or getattr(row, "source", "")
+                or ""
+            )
+            chunk_index = getattr(row, "chunk_index", None)
+            body = str(getattr(row, "text", "") or "")
+        canonical.append(
+            {
+                "path": path,
+                "chunk_index": chunk_index,
+                "text_sha256": hashlib.sha256(body.encode("utf-8")).hexdigest(),
+            }
+        )
+    encoded = json.dumps(
+        canonical,
+        ensure_ascii=False,
+        sort_keys=True,
+        separators=(",", ":"),
+    ).encode("utf-8")
+    return hashlib.sha256(encoded).hexdigest()
+
 def _candidate_structure(pool: list[dict[str, Any]]) -> dict[str, Any]:
     sources: list[str] = []
     parents: list[str] = []
