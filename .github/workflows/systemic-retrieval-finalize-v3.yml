@@ -1,5 +1,5 @@
 name: Systemic retrieval final acceptance v3
-# trigger: stable-project-path-scope-20260912
+# trigger: repair-project-scope-escaping-20260912
 
 on:
   push:
@@ -30,6 +30,22 @@ jobs:
           python-version: '3.12'
       - name: Install dependencies
         run: python -m pip install -e '.[dev]' 'tiktoken==0.11.0'
+      - name: Repair temporary project-scope generator escaping
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import re
+          path = Path('scripts/pr186_prepare_final_acceptance.py')
+          text = path.read_text(encoding='utf-8')
+          pattern = r'        project_path = str\(filters\.get\("project_path"\) or ""\)\.rstrip\([^\n]+\)'
+          replacement = '        project_path = str(filters.get("project_path") or "")'
+          text, count = re.subn(pattern, replacement, text, count=1)
+          if count != 1:
+              raise SystemExit('project scope escaping repair anchor changed')
+          path.write_text(text, encoding='utf-8')
+          compile(text, str(path), 'exec')
+          PY
       - name: Prepare fixed-pool acceptance patches
         run: python scripts/pr186_prepare_final_acceptance.py
       - name: Prove candidate-pool TDD GREEN
