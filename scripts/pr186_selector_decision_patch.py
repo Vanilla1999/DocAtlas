@@ -14,10 +14,10 @@ if start < 0 or end < 0:
 replacement = r'''def _selection_diagnostic(*, cases: list[dict[str, Any]], manifest: dict[str, Any], current_lane: dict[str, Any]) -> dict[str, Any]:
     """Measure an oracle gap separately from a production-blind selector.
 
-    The oracle may use evaluator sufficiency only after enumeration.  The blind
+    The oracle may use evaluator sufficiency only after enumeration. The blind
     singleton control chooses solely from model-visible query overlap, source
     diversity/count and token cost, then gold is consulted only to score that
-    already-fixed choice.  This keeps the product decision independent of the
+    already-fixed choice. This keeps the product decision independent of the
     benchmark answer key.
     """
     by_case = {case["id"]: case for case in cases}
@@ -98,7 +98,10 @@ replacement = r'''def _selection_diagnostic(*, cases: list[dict[str, Any]], mani
         singleton_candidates = [project((index,)) for index in range(len(pool))]
         blind_choice = max(
             singleton_candidates,
-            key=lambda item: (tuple(item["proxy"]), -item["tokens"], tuple(-index for index in item["indices"])),
+            key=lambda item: (
+                tuple(item["proxy"]), -item["tokens"],
+                tuple(-index for index in item["indices"]),
+            ),
             default=None,
         )
         use_blind_choice = bool(
@@ -184,5 +187,11 @@ replacement = r'''def _selection_diagnostic(*, cases: list[dict[str, Any]], mani
     }
 '''
 
-path.write_text(text[:start] + replacement + text[end:], encoding="utf-8")
+updated = text[:start] + replacement + text[end:]
+old_print = '"selection": {"status": selection["selection_bottleneck"], "exact_recoveries": selection["exact_recoveries"], "beam_recoveries": selection["beam_recoveries"]},'
+new_print = '"selection": {"status": selection["selection_bottleneck"], "exact_recoveries": selection["exact_recoveries"], "blind_singleton_recoveries": selection["blind_singleton_recoveries"], "decision": selection["production_selector_decision"]},'
+if updated.count(old_print) != 1:
+    raise SystemExit("selection summary print anchor changed")
+updated = updated.replace(old_print, new_print, 1)
+path.write_text(updated, encoding="utf-8")
 Path(__file__).unlink()
