@@ -1,4 +1,5 @@
 name: Systemic retrieval final acceptance v3
+# trigger: frozen-pool-final-20260912
 
 on:
   push:
