@@ -1,5 +1,4 @@
 name: Systemic retrieval final acceptance v3
-# trigger: lane-local-semantic-pool-replay-20260912
 
 on:
   push:
@@ -30,147 +29,19 @@ jobs:
           python-version: '3.12'
       - name: Install dependencies
         run: python -m pip install -e '.[dev]' 'tiktoken==0.11.0'
-      - name: Repair one-shot helper quoting
-        shell: bash
-        run: |
-          python - <<'PY'
-          from pathlib import Path
-          path = Path('scripts/pr186_patch_candidate_pool.py')
-          text = path.read_text(encoding='utf-8')
-          opening = "freeze_block = r'''\n"
-          closing = "\nPY\ngit diff --check\n'''\nscript = script.replace"
-          if text.count(opening) != 1 or text.count(closing) != 1:
-              raise SystemExit('one-shot helper quoting anchors changed')
-          text = text.replace(opening, 'freeze_block = r"""\n', 1)
-          text = text.replace(closing, '\nPY\ngit diff --check\n"""\nscript = script.replace', 1)
-          path.write_text(text, encoding='utf-8')
-          compile(text, str(path), 'exec')
-          PY
-      - name: Normalize isolated candidate-pool identities
-        run: python scripts/pr186_patch_candidate_pool.py
-      - name: Replay frozen semantic pools with lane-local chunks
-        shell: bash
-        run: |
-          python - <<'PY'
-          from pathlib import Path
-          path = Path('scripts/pr186_finalize.sh')
-          text = path.read_text(encoding='utf-8')
-          old = '''    fixed_pools: dict[tuple[str, int], list[Any]] = globals().setdefault(
-              "_SYSTEMIC_FIXED_PRE_CAP_POOLS", {}
-          )
-          if capture_fixed_pool:
-              fixed_pools.clear()
-          call_occurrences: Counter[str] = Counter()
-          active_call_keys: list[tuple[str, int]] = []
-          seen_call_keys: list[tuple[str, int]] = []
-          original_run = RetrievalDispatcher.run
-          original_cap = RetrievalDispatcher._limit_sections_per_source
-
-          def call_identity(key: tuple[str, int], fingerprint: str) -> str:
-              query_hash = hashlib.sha256(key[0].encode("utf-8")).hexdigest()[:16]
-              return f"{query_hash}:{key[1]}:{fingerprint}"
-'''
-          new = '''    fixed_pools: dict[tuple[str, int], list[tuple[str, int, str]]] = globals().setdefault(
-              "_SYSTEMIC_FIXED_PRE_CAP_POOLS", {}
-          )
-          if capture_fixed_pool:
-              fixed_pools.clear()
-          call_occurrences: Counter[str] = Counter()
-          active_call_keys: list[tuple[str, int]] = []
-          seen_call_keys: list[tuple[str, int]] = []
-          original_run = RetrievalDispatcher.run
-          original_cap = RetrievalDispatcher._limit_sections_per_source
-
-          def semantic_candidate_key(chunk: Any) -> tuple[str, int, str]:
-              if isinstance(chunk, dict):
-                  metadata = chunk.get("metadata") or {}
-                  source_path = str(
-                      chunk.get("project_doc_path")
-                      or chunk.get("source_path")
-                      or chunk.get("path")
-                      or chunk.get("source")
-                      or metadata.get("project_doc_path")
-                      or metadata.get("source_path")
-                      or metadata.get("canonical_url")
-                      or ""
-                  )
-                  chunk_index = int(chunk.get("chunk_index", -1))
-                  body = str(chunk.get("text") or chunk.get("snippet") or "")
-              else:
-                  metadata = getattr(chunk, "metadata", {}) or {}
-                  source_path = str(
-                      metadata.get("project_doc_path")
-                      or metadata.get("source_path")
-                      or metadata.get("canonical_url")
-                      or getattr(chunk, "source", "")
-                      or ""
-                  )
-                  chunk_index = int(getattr(chunk, "chunk_index", -1))
-                  body = str(getattr(chunk, "text", "") or "")
-              return (
-                  _semantic_source_identity(source_path),
-                  chunk_index,
-                  hashlib.sha256(body.encode("utf-8")).hexdigest(),
-              )
-
-          def call_identity(key: tuple[str, int], fingerprint: str) -> str:
-              query_hash = hashlib.sha256(key[0].encode("utf-8")).hexdigest()[:16]
-              return f"{query_hash}:{key[1]}:{fingerprint}"
-'''
-          if text.count(old) != 1:
-              raise SystemExit('fixed-pool state anchor changed')
-          text = text.replace(old, new, 1)
-
-          old = '''        controlled_chunks = chunks
-              if causal_lane:
-                  if capture_fixed_pool:
-                      fixed_pools[key] = deepcopy(chunks)
-                  frozen = fixed_pools.get(key)
-                  if frozen is None:
-                      raise RuntimeError(f"counterfactual retrieval call absent from frozen current pool: {key!r}")
-                  controlled_chunks = deepcopy(frozen)
-              controlled_fingerprint = _candidate_pool_fingerprint(controlled_chunks)
-'''
-          new = '''        controlled_chunks = chunks
-              if causal_lane:
-                  if capture_fixed_pool:
-                      fixed_pools[key] = [semantic_candidate_key(chunk) for chunk in chunks]
-                  frozen = fixed_pools.get(key)
-                  if frozen is None:
-                      raise RuntimeError(f"counterfactual retrieval call absent from frozen current pool: {key!r}")
-                  buckets: dict[tuple[str, int, str], list[Any]] = defaultdict(list)
-                  for chunk in chunks:
-                      buckets[semantic_candidate_key(chunk)].append(chunk)
-                  remapped: list[Any] = []
-                  missing_candidates: list[tuple[str, int, str]] = []
-                  for candidate_key in frozen:
-                      bucket = buckets.get(candidate_key)
-                      if not bucket:
-                          missing_candidates.append(candidate_key)
-                          continue
-                      remapped.append(bucket.pop(0))
-                  if missing_candidates:
-                      raise RuntimeError(
-                          f"fresh lane cannot replay frozen semantic pool for {key!r}: "
-                          f"missing={missing_candidates!r}"
-                      )
-                  controlled_chunks = remapped
-              controlled_fingerprint = _candidate_pool_fingerprint(controlled_chunks)
-'''
-          if text.count(old) != 1:
-              raise SystemExit('fixed-pool replay anchor changed')
-          text = text.replace(old, new, 1)
-          path.write_text(text, encoding='utf-8')
-          PY
-          bash -n scripts/pr186_finalize.sh
-      - name: Prove fingerprint TDD GREEN
+      - name: Prepare fixed-pool acceptance patches
+        run: python scripts/pr186_prepare_final_acceptance.py
+      - name: Prove candidate-pool TDD GREEN
         run: python -m pytest -q tests/test_systemic_retrieval_candidate_pool.py tests/test_diagnostic_labels.py
       - name: Run TDD and complete systemic acceptance
         run: bash scripts/pr186_finalize.sh
-      - name: Publish accepted non-workflow state
+      - name: Publish accepted state and remove carriers
         shell: bash
         run: |
-          rm scripts/pr186_finalize.sh
+          rm -f \
+            scripts/pr186_finalize.sh \
+            .github/workflows/systemic-retrieval-finalize-v3.yml \
+            .github/workflows/systemic-retrieval-v3-harness-fix.yml
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add -A
