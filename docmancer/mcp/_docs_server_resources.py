@@ -36,7 +36,7 @@ The default public surface has exactly three tools:
 ## Default project workflow
 
 1. For coding and patch tasks, call once before the first edit:
-   `get_docs_context(project_path=..., question=..., mode="auto")`
+   `get_docs_context(project_path=..., question=...)`
 
    The server returns one bounded projection. Cite evidence from `trust_contract.sources`. Do not repeat retrieval before the first edit unless an explicit `prepare_docs` recovery action was completed.
 
@@ -59,7 +59,7 @@ whether documentation is indexed, stale, or healthy. Use `action="jobs"` or
 
 For public/dependency docs, use the canonical public tool:
 
-`get_docs_context(question=..., library=..., version=..., mode="library" | "mixed")`
+`get_docs_context(question=..., library=..., version=...)`
 
 If docs are missing/stale and the user approves network access, use:
 
@@ -102,7 +102,7 @@ Always separate:
         "mimeType": "text/markdown",
         "text": """# Project docs workflow
 
-1. For coding and patch tasks, call `get_docs_context(project_path=..., question=..., mode="auto")` once before the first edit. The server returns one bounded structured projection.
+1. For coding and patch tasks, call `get_docs_context(project_path=..., question=...)` once before the first edit. The server returns one bounded structured projection.
 2. If the response explicitly returns `prepare_docs` as `recommended_next_action`, follow it and retry the same bounded request.
 3. Inspect canonical `status`, `kind`, `sources`, `missing`, and `omitted_counts`.
 4. On `insufficient_evidence`, do not claim documentation support. Follow the bounded typed recovery; retry at most one server-suggested rephrase. If it still fails and `hard_stop=false`, use local source/tests for investigation. Stop before editing on `hard_stop=true` or when the task requires the unproved documentary contract.
@@ -152,10 +152,12 @@ The public Docs MCP surface contains exactly these three tools.
         "mimeType": "text/markdown",
         "text": """# Library docs workflow
 
+Legacy `mode="library"` is internal compatibility syntax; omit `mode` from public calls.
+
 Use the public unified tool first:
 
 1. Call:
-   `get_docs_context(question=..., library=..., version=..., mode="library")`
+   `get_docs_context(question=..., library=..., version=...)`
 
 2. If `status="insufficient_evidence"` and `recommended_next_action.requires_confirmation=true`, ask the user before network access.
 
@@ -171,10 +173,10 @@ Use the public unified tool first:
    `prepare_docs(action="prefetch_docs_manifest", manifest_path=...)`.
 
 5. Retry:
-   `get_docs_context(question=..., library=..., version=..., mode="library")`
+   `get_docs_context(question=..., library=..., version=...)`
 
 6. If working inside a repository, call:
-   `get_docs_context(project_path=..., question=..., mode="mixed")`
+   `get_docs_context(project_path=..., question=...)`
 
 Do not use WebFetch as a substitute for registered docs before Docmancer has returned no trusted route.
 
@@ -184,6 +186,12 @@ Only the canonical `get_docs_context`, `prepare_docs`, and `docs_status` tools a
 ]
 
 MCP_RESOURCE_TEMPLATES: list[dict[str, str]] = [
+    {
+        "uriTemplate": "docatlas://source/{reference}",
+        "name": "Bounded source continuation",
+        "description": "Read only a returned source_uri for a concrete missing fact. At most 600 tokens per read and two reads per chain; never construct a reference or open a source merely because answer flags are false. Requires host resources/read support.",
+        "mimeType": "application/json",
+    },
     {
         "uriTemplate": "docmancer://workflow/project-docs/{project_path}",
         "name": "Project-specific docs workflow",

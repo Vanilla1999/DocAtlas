@@ -6,6 +6,7 @@ import hashlib
 import re
 from typing import Any
 from ._docs_context_payload import _payload
+from .source_continuation import attach_source_continuation_locators
 from .context_query_probes import independent_query_probes
 from docmancer.docs.domain.context_hint_policy import fallback_context_query_ids, has_context_hint_support
 
@@ -553,6 +554,8 @@ def project_docs_context(
         )
         for source in payload["sources"]
     }
+    if root := retrieval.get("_source_continuation_project_root"):
+        attach_source_continuation_locators(payload, snapshot, root=root, max_tokens=max_tokens)
     return payload, snapshot
 
 

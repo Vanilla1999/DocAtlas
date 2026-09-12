@@ -187,6 +187,8 @@ def project_context_pack(*, question: str = "", project_docs: ProjectDocsResult 
                 "stable_chunk_id": item.stable_chunk_id,
                 "parent_logical_id": item.parent_logical_id,
                 "display_content_hash": item.display_content_hash,
+                "_source_snapshot_sha256": item.content_hash,
+                "_source_catalog_hash": item.metadata.get("project_doc_catalog_entry_hash"),
                 **({
                     "char_start": item.char_start,
                     "char_end": item.char_end,

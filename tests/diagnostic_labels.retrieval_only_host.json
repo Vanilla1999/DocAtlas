@@ -1,0 +1,10 @@
+{
+  "schema_version": 1,
+  "module_labels": {
+    "tests/task_level/test_retrieval_only_host.py": "behavioral"
+  },
+  "node_overrides": {},
+  "module_node_hashes": {
+    "tests/task_level/test_retrieval_only_host.py": "a40eff0062f9144611f31dc0c9ee1f5b3d2491acbfc4ac95af54b95629a19916"
+  }
+}

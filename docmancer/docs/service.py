@@ -49,6 +49,11 @@ class LibraryDocsService:
             agent_factory=agent_factory,
             library_index_root=library_index_root,
         )
+        from docmancer.docs.application.source_continuation import SourceContinuationReader
+        from docmancer.docs.infrastructure.project_source_read_gateway import ProjectSourceReadGateway
+        self.source_reader = SourceContinuationReader(
+            ProjectSourceReadGateway(lambda: self._agent_instance().store),
+        )
         self.lock_gateway = FilesystemLockGateway()
         self.project_reader = project_reader or ProjectMetadataReader()
         self.stale_after_days = stale_after_days

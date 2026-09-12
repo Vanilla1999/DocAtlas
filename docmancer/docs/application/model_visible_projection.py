@@ -735,16 +735,20 @@ def validate_model_visible_projection(
         if not isinstance(expected, dict):
             errors.append("internal snapshot is missing its canonical projected source")
             continue
+        optional = {"source_uri"} if kind == "docs_context" else set()
         missing = sorted(allowed_fields - set(source))
-        unknown = sorted(set(source) - allowed_fields)
+        unknown = sorted(set(source) - allowed_fields - optional)
         for key in missing:
             errors.append(f"projection source field is missing: {key}")
         if unknown:
             errors.append(
                 "projection source contains unknown fields: " + ", ".join(unknown)
             )
-        if set(expected) != allowed_fields:
+        if set(expected) - optional != allowed_fields:
             errors.append("internal snapshot projected source schema is invalid")
+        if (set(source) & optional != set(expected) & optional
+            or source.get("source_uri") != expected.get("source_uri")):
+            errors.append("projection source locator does not match the internal snapshot")
         if source.get("content_sha256") != expected.get("content_sha256"):
             errors.append("projection source hash does not match the internal snapshot")
         bound_source = bound.get("source")

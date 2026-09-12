@@ -1009,6 +1009,18 @@
       "support_policy": "current release only"
     },
     {
+      "id": "mcp-template:docatlas://source/{reference}",
+      "kind": "mcp_template",
+      "tier": "core",
+      "owner": "DocAtlas maintainers",
+      "docs": "docs/mcp-docs-server.md",
+      "test_tier": "core-offline",
+      "network_dependencies": [],
+      "removal_rule": "may change or be removed in a future release without a compatibility window",
+      "failure_budget": "source policy or snapshot substitution blocks release; unavailable continuations preserve existing citations",
+      "support_policy": "current release only"
+    },
+    {
       "id": "mcp-template:docmancer://workflow/project-docs/{project_path}",
       "kind": "mcp_template",
       "tier": "core",
