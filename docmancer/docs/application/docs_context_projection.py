@@ -6,6 +6,7 @@ import hashlib
 import re
 from typing import Any
 from ._docs_context_payload import _payload
+from .context_query_probes import independent_query_probes
 from docmancer.docs.domain.context_hint_policy import fallback_context_query_ids, has_context_hint_support
 
 from docmancer.docs.application.context_selection import (
@@ -289,6 +290,7 @@ def project_docs_context(
             "retrieval_query_matches": dict(original.get("retrieval_query_matches") or {}),
             "_assigned_requirement_ids": list(assigned_requirement_ids),
             "_qualification_candidate": original["_qualification_candidate"],
+            "_independent_query_plan": query_plan,
             "_expected_project_identity": original["_expected_project_identity"],
             "_lifecycle_intent": original["_lifecycle_intent"],
         })
@@ -715,7 +717,7 @@ def _requalify_visible_source(
         "path_or_url", "section", "snippet",
     ))
     matches: dict[str, dict[str, Any]] = {}
-    for query_id, trace in (source.get("retrieval_query_matches") or {}).items():
+    for query_id, trace in independent_query_probes(source, source.get("_independent_query_plan") or {}).items():
         if not isinstance(trace, dict) or trace.get("derived_from_query_id"):
             continue
         # Aggregated lineage belongs to the old window; rebuild it from visible probes.
@@ -959,9 +961,9 @@ def _facet_aware_candidates(
         role_tiebreak = rank[4] if qualified_ids & required_query_ids else 0.0
         return (
             int(exact_count > 0),
+            condition_lead_priority(query_text.get("query-original", ""), str(source.get("snippet") or "")),
             component_count,
             bound_assignment,
-            condition_lead_priority(query_text.get("query-original", ""), str(source.get("snippet") or "")),
             rank[3] if exact_count else 0.0,
             exact_count,
             len(_fully_matched_query_ids((source,)) & required_query_ids),

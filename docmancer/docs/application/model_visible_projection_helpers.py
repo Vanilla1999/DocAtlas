@@ -1,6 +1,9 @@
 """Small serialization helpers for model-visible projections."""
 from __future__ import annotations
 
+import json
+import math
+
 from copy import deepcopy
 from typing import Any
 
@@ -65,3 +68,19 @@ def sanitized_projection_manifest(
 
 
 __all__ = ["bounded_action", "cited_patch_items", "sanitized_projection_manifest"]
+
+
+def canonical_projection_bytes(value: Any) -> bytes:
+    return json.dumps(value, ensure_ascii=False, sort_keys=True, separators=(",", ":")).encode("utf-8")
+
+
+def estimate_projection_tokens(value: Any) -> int:
+    size = len(canonical_projection_bytes(value))
+    return max(1, math.ceil(size / 4))
+
+
+def docs_context_budget_tokens(value: Any) -> int:
+    """Admit only DTOs fitting both the public estimate and pinned offline codec."""
+    from .projection_tokenizer import projection_token_count
+
+    return max(estimate_projection_tokens(value), projection_token_count(canonical_projection_bytes(value)))

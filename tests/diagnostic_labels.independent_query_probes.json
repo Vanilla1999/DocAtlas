@@ -1,0 +1,10 @@
+{
+  "schema_version": 1,
+  "module_labels": {
+    "tests/docs/test_independent_query_probes.py": "behavioral"
+  },
+  "module_node_hashes": {
+    "tests/docs/test_independent_query_probes.py": "d0fbb456d7d76872a6bfdb6d47ebd5438b6956d059437de32d06834833622b20"
+  },
+  "node_overrides": {}
+}

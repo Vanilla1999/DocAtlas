@@ -332,10 +332,33 @@ jobs:
           python scripts/release_request_self_test.py
           git diff --check
 
+  retrieval-evidence:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: "3.12"
+      - name: Install evaluator dependencies
+        run: python -m pip install -e ".[dev]" "tiktoken==0.11.0"
+      - name: Verify frozen retrieval evidence and independent sample
+        run: python scripts/run_systemic_retrieval_plan_gate.py --work "$RUNNER_TEMP/retrieval-evidence" --report "$RUNNER_TEMP/retrieval-evidence-report.json"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        if: always()
+        with:
+          name: retrieval-evidence
+          path: |
+            ${{ runner.temp }}/retrieval-evidence-report.json
+            ${{ runner.temp }}/retrieval-evidence
+          retention-days: 14
+
   required-ci:
     name: required-ci
     if: always()
-    needs: [docs-contract, installer-smoke, platform-smoke, test, advanced-contract, installed-mcp-harness, static-contract]
+    needs: [docs-contract, installer-smoke, platform-smoke, test, advanced-contract, installed-mcp-harness, static-contract, retrieval-evidence]
     runs-on: ubuntu-latest
     timeout-minutes: 5
 
@@ -349,7 +372,8 @@ jobs:
           ADVANCED_CONTRACT: ${{ needs.advanced-contract.result }}
           INSTALLED_MCP_HARNESS: ${{ needs.installed-mcp-harness.result }}
           STATIC_CONTRACT: ${{ needs.static-contract.result }}
+          RETRIEVAL_EVIDENCE: ${{ needs.retrieval-evidence.result }}
         run: |
-          for result in "$DOCS_CONTRACT" "$INSTALLER_SMOKE" "$PLATFORM_SMOKE" "$CORE_TESTS" "$ADVANCED_CONTRACT" "$INSTALLED_MCP_HARNESS" "$STATIC_CONTRACT"; do
+          for result in "$DOCS_CONTRACT" "$INSTALLER_SMOKE" "$PLATFORM_SMOKE" "$CORE_TESTS" "$ADVANCED_CONTRACT" "$INSTALLED_MCP_HARNESS" "$STATIC_CONTRACT" "$RETRIEVAL_EVIDENCE"; do
             test "$result" = "success"
           done

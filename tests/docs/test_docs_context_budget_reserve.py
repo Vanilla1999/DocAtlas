@@ -42,9 +42,9 @@ def test_docs_context_budget_reserves_for_structured_token_density() -> None:
 
     # Keep the public engineering estimate backward-compatible.
     assert estimate_projection_tokens(payload) == math.ceil(serialized_bytes / 4)
-    # Admission for docs_context is deliberately more conservative.
-    assert docs_context_budget_tokens(payload) >= math.ceil(serialized_bytes / 3)
-    assert docs_context_budget_tokens(payload) > estimate_projection_tokens(payload)
+    # Admission also enforces the named offline codec, independently of the public estimate.
+    from docmancer.docs.application.projection_tokenizer import projection_token_count
+    assert docs_context_budget_tokens(payload) == max(estimate_projection_tokens(payload), projection_token_count(canonical_projection_bytes(payload)))
 
 
 def test_non_context_projection_keeps_existing_byte_estimator_contract() -> None:
@@ -52,3 +52,23 @@ def test_non_context_projection_keeps_existing_byte_estimator_contract() -> None
     serialized_bytes = len(canonical_projection_bytes(payload))
 
     assert estimate_projection_tokens(payload) == math.ceil(serialized_bytes / 4)
+
+
+def test_pinned_codec_is_offline_and_matches_reference_counts(monkeypatch) -> None:
+    from docmancer.docs.application.projection_tokenizer import projection_encoder, projection_token_count
+    import tiktoken.load
+    def forbidden(*args, **kwargs):
+        raise AssertionError('token accounting must never download its vocabulary')
+    projection_encoder.cache_clear()
+    monkeypatch.setattr(tiktoken.load, 'read_file', forbidden)
+    assert projection_token_count(b'{"ids":[123,456],"hash":"abc123def456","ok":true}') == 18
+    assert projection_token_count('Привет, мир! 日本語の文。 🚀'.encode()) == 12
+    assert projection_token_count(b'x_y = {"key": "<|endoftext|>"}\n') == 14
+
+
+def test_dense_identifiers_cannot_enter_on_byte_estimate_alone() -> None:
+    from docmancer.docs.application.projection_tokenizer import projection_token_count
+    payload = {'sources': [{'snippet': ' '.join(f'x_{i:04x}' for i in range(150))}]}
+    actual = projection_token_count(canonical_projection_bytes(payload))
+    assert actual > estimate_projection_tokens(payload)
+    assert docs_context_budget_tokens(payload) == actual

@@ -101,129 +101,92 @@ def _no_contextualization(sources: list[dict[str, Any]], **_: Any) -> list[dict[
     return deepcopy(sources)
 
 
-def _run_lane(*, name: str, work: Path, protocol: dict[str, Any], cases: list[dict[str, Any]], manifest: dict[str, Any], cap: str = "bounded", requalification: bool = True, contextualization: bool = True, documents_for: Any | None = None, registry_for: Any | None = None) -> dict[str, Any]:
+class _FrozenCasePools:
+    """Evaluation-only baseline discovery support, isolated by whole question.
+
+    A counterfactual may consume fewer/repeated routes. Unseen routes have no
+    candidates in this fixed-support estimand; natural end-to-end runs remain
+    separate. Pools and runtime IDs belong to the same unchanged fixture DB.
+    """
+
+    def __init__(self) -> None:
+        self.cases: dict[tuple[str, str], dict[tuple[Any, ...], list[Any]]] = {}
+
+    def capture(self, case: tuple[str, str], route: tuple[Any, ...], chunks: list[Any]) -> None:
+        routes = self.cases.setdefault(case, {})
+        if route in routes and _candidate_pool_fingerprint(routes[route]) != _candidate_pool_fingerprint(chunks):
+            raise RuntimeError("baseline route changed within one case")
+        routes[route] = deepcopy(chunks)
+
+    def replay(self, case: tuple[str, str], route: tuple[Any, ...]) -> list[Any]:
+        return deepcopy(self.cases[case].get(route, []))
+
+    def fingerprint(self, case: tuple[str, str]) -> str:
+        entries = [(repr(route), _candidate_pool_fingerprint(chunks))
+                   for route, chunks in self.cases[case].items()]
+        return hashlib.sha256(json.dumps(sorted(entries)).encode()).hexdigest()
+
+
+def _run_lane(*, name: str, work: Path, protocol: dict[str, Any], cases: list[dict[str, Any]], manifest: dict[str, Any], cap: str = "bounded", requalification: bool = True, contextualization: bool = True, documents_for: Any | None = None, registry_for: Any | None = None, pools: _FrozenCasePools | None = None, fixture_output: Path | None = None) -> dict[str, Any]:
     output = work / name
     shutil.rmtree(output, ignore_errors=True)
     lane_protocol = _single_variant_protocol(protocol)
-    cap_inputs: list[str] = []
-    raw_cap_inputs: list[str] = []
-    causal_lane = name in {
-        "cap_on_requal_on", "cap_off_requal_on",
-        "cap_on_requal_off", "cap_off_requal_off", "contextualization_off",
-    }
-    capture_fixed_pool = name == "cap_on_requal_on"
-    # Evaluation-only control: freeze the exact pre-cap baseline chunks.  Each
-    # counterfactual receives those chunks, with only fresh-index project
-    # identity/path rebound to its own isolated corpus.  Raw fresh-index pools
-    # are still fingerprinted separately so retrieval drift remains visible.
-    fixed_pools: dict[tuple[Any, ...], list[Any]] = globals().setdefault(
-        "_SYSTEMIC_FIXED_PRE_CAP_POOLS", {}
-    )
-    if capture_fixed_pool:
-        fixed_pools.clear()
-    call_occurrences: Counter[tuple[Any, ...]] = Counter()
-    active_calls: list[tuple[tuple[Any, ...], dict[str, Any]]] = []
-    seen_call_keys: list[tuple[Any, ...]] = []
+    capturing = pools is not None and fixture_output is None
+    active_case: tuple[str, str] | None = None
+    active_routes: list[tuple[Any, ...]] = []
+    seen_cases: set[tuple[str, str]] = set()
+    consumed: list[str] = []
+    unsupported: list[dict[str, Any]] = []
     original_run = RetrievalDispatcher.run
     original_cap = RetrievalDispatcher._limit_sections_per_source
+    original_observe = evidence.observe_call
 
-    def retrieval_scope(query: str, kwargs: dict[str, Any]) -> tuple[Any, ...]:
-        filters = kwargs.get("filters") or {}
-        if not isinstance(filters, dict):
-            filters = {}
-        project_path = str(filters.get("project_path") or "")
-        project = Path(project_path).name if project_path else "unknown-project"
-        return (
-            project,
-            query,
-            str(filters.get("authority") or ""),
-            str(filters.get("source_class") or ""),
-            str(filters.get("doc_scope") or ""),
-            str(kwargs.get("mode") or ""),
-            str(kwargs.get("expand") or ""),
-            int(kwargs.get("limit") or -1),
-            int(kwargs.get("budget") or -1),
-        )
-
-    def call_identity(key: tuple[Any, ...], fingerprint: str) -> str:
-        encoded = json.dumps(key, ensure_ascii=False, separators=(",", ":")).encode("utf-8")
-        return f"{hashlib.sha256(encoded).hexdigest()[:24]}:{fingerprint}"
-
-    def rebind_chunk(chunk: Any, filters: dict[str, Any]) -> Any:
-        value = deepcopy(chunk)
-        if isinstance(value, dict):
-            metadata = dict(value.get("metadata") or {})
-            project_identity = str(filters.get("project_identity") or "")
-            project_path = str(filters.get("project_path") or "")
-            if project_identity:
-                metadata["project_identity"] = project_identity
-                if "repository_identity" in metadata:
-                    metadata["repository_identity"] = project_identity
-            if project_path:
-                metadata["project_path"] = project_path
-            value["metadata"] = metadata
-            if project_identity and "project_identity" in value:
-                value["project_identity"] = project_identity
-            return value
-        metadata = dict(getattr(value, "metadata", {}) or {})
-        project_identity = str(filters.get("project_identity") or "")
-        project_path = str(filters.get("project_path") or "")
-        if project_identity:
-            metadata["project_identity"] = project_identity
-            if "repository_identity" in metadata:
-                metadata["repository_identity"] = project_identity
-        if project_path:
-            metadata["project_path"] = project_path
-        copier = getattr(value, "model_copy", None)
-        if callable(copier):
-            return copier(update={"metadata": metadata})
-        setattr(value, "metadata", metadata)
-        return value
+    def observed_call(service: Any, arguments: dict[str, Any]) -> Any:
+        nonlocal active_case
+        active_case = (Path(arguments["project_path"]).name, arguments["question"])
+        seen_cases.add(active_case)
+        if capturing:
+            pools.cases.setdefault(active_case, {})
+        try:
+            return original_observe(service, arguments)
+        finally:
+            active_case = None
 
     def observed_run(self: Any, query: str, *args: Any, **kwargs: Any) -> Any:
-        scope = retrieval_scope(query, kwargs)
-        occurrence = call_occurrences[scope]
-        call_occurrences[scope] += 1
-        key = (*scope, occurrence)
-        filters = kwargs.get("filters") or {}
-        filters = dict(filters) if isinstance(filters, dict) else {}
-        active_calls.append((key, filters))
-        seen_call_keys.append(key)
+        # Case identity carries the project. Keep all policy/requirements input
+        # in the route key; no global occurrence counter couples different cases.
+        route = (query, json.dumps(kwargs, sort_keys=True, default=str))
+        active_routes.append(route)
         try:
             return original_run(self, query, *args, **kwargs)
         finally:
-            popped_key, _ = active_calls.pop()
-            if popped_key != key:
-                raise RuntimeError("retrieval call stack lost deterministic ordering")
+            active_routes.pop()
 
     def observed_cap(self: Any, chunks: list[Any], *, limit: int | None = None, expand: str | None = None) -> list[Any]:
-        if not active_calls:
-            raise RuntimeError("pre-cap pool observed outside RetrievalDispatcher.run")
-        key, filters = active_calls[-1]
-        raw_fingerprint = _candidate_pool_fingerprint(chunks)
-        raw_cap_inputs.append(call_identity(key, raw_fingerprint))
-        controlled_chunks = chunks
-        if causal_lane:
-            if capture_fixed_pool:
-                fixed_pools[key] = deepcopy(chunks)
-            frozen = fixed_pools.get(key)
-            if frozen is None:
-                raise RuntimeError(f"counterfactual retrieval call absent from frozen current pool: {key!r}")
-            controlled_chunks = [rebind_chunk(chunk, filters) for chunk in frozen]
-        controlled_fingerprint = _candidate_pool_fingerprint(controlled_chunks)
-        cap_inputs.append(call_identity(key, controlled_fingerprint))
+        controlled = chunks
+        if pools is not None:
+            if active_case is None or not active_routes:
+                raise RuntimeError("pre-cap pool outside a case retrieval")
+            route = (*active_routes[-1], limit, expand)
+            if capturing:
+                pools.capture(active_case, route, chunks)
+            elif route not in pools.cases[active_case]:
+                unsupported.append({"case": active_case, "query": active_routes[-1][0]})
+            controlled = pools.replay(active_case, route)
+            consumed.append(_candidate_pool_fingerprint(controlled))
         if cap == "off":
-            return _no_source_cap(self, controlled_chunks, limit=limit, expand=expand)
+            return _no_source_cap(self, controlled, limit=limit, expand=expand)
         if cap == "strict":
-            return _strict_source_cap(self, controlled_chunks, limit=limit, expand=expand)
+            return _strict_source_cap(self, controlled, limit=limit, expand=expand)
         if cap == "bounded":
-            return original_cap(self, controlled_chunks, limit=limit, expand=expand)
+            return original_cap(self, controlled, limit=limit, expand=expand)
         raise ValueError(f"unknown cap mode: {cap}")
 
     started_cpu = time.process_time()
     started_wall = time.perf_counter()
     with ExitStack() as stack:
         stack.enter_context(patch.object(evidence, "load_protocol", return_value=(lane_protocol, deepcopy(cases), deepcopy(manifest))))
+        stack.enter_context(patch.object(evidence, "observe_call", observed_call))
         stack.enter_context(patch.object(RetrievalDispatcher, "run", observed_run))
         stack.enter_context(patch.object(RetrievalDispatcher, "_limit_sections_per_source", observed_cap))
         if not requalification:
@@ -234,7 +197,7 @@ def _run_lane(*, name: str, work: Path, protocol: dict[str, Any], cases: list[di
             stack.enter_context(patch.object(evidence, "documents_for", documents_for))
         if registry_for is not None:
             stack.enter_context(patch.object(evidence, "registry_for", registry_for))
-        summary = evidence.run(output)
+        summary = evidence.run(output, fixture_output=fixture_output)
     cpu = time.process_time() - started_cpu
     wall = time.perf_counter() - started_wall
     rows = json.loads((output / "rows.json").read_text(encoding="utf-8"))
@@ -242,25 +205,19 @@ def _run_lane(*, name: str, work: Path, protocol: dict[str, Any], cases: list[di
     metrics["process_cpu_seconds"] = round(cpu, 6)
     metrics["wall_seconds"] = round(wall, 6)
     metrics["cpu_seconds_per_case"] = round(cpu / max(1, len(rows)), 6)
-    if causal_lane and set(seen_call_keys) != set(fixed_pools):
-        missing = sorted(set(fixed_pools) - set(seen_call_keys))
-        extra = sorted(set(seen_call_keys) - set(fixed_pools))
-        raise RuntimeError(f"fixed-pool retrieval topology changed: missing={missing!r} extra={extra!r}")
+    available = {repr(case): pools.fingerprint(case) for case in sorted(seen_cases)} if pools is not None else {}
     return {
-        "name": name,
-        "output": output,
-        "summary": summary,
-        "metrics": metrics,
-        "rows": rows,
-        "cap_inputs": cap_inputs,
-        "raw_cap_inputs": raw_cap_inputs,
-        "fixed_pool_calls": len(fixed_pools) if causal_lane else 0,
+        "name": name, "output": output, "summary": summary, "metrics": metrics,
+        "rows": rows, "available_case_pools": available, "consumed_pools": consumed,
+        "unsupported_routes": unsupported,
     }
 
 
 def _paired(baseline_rows: list[dict[str, Any]], variant_rows: list[dict[str, Any]], *, seed: int, resamples: int) -> dict[str, Any]:
     baseline = {row["id"]: row for row in baseline_rows}
     variant = {row["id"]: row for row in variant_rows}
+    if len(baseline) != len(baseline_rows) or len(variant) != len(variant_rows) or baseline.keys() != variant.keys():
+        raise ValueError("paired case inventory changed or contains duplicates")
     ids = sorted(set(baseline).intersection(variant))
     wins = [case_id for case_id in ids if _ok(variant[case_id]) and not _ok(baseline[case_id])]
     losses = [case_id for case_id in ids if _ok(baseline[case_id]) and not _ok(variant[case_id])]
@@ -436,7 +393,122 @@ def _visible_proxy(payload: dict[str, Any], question: str, tokens: int) -> tuple
     return (len(overlap), len(paths), len(payload.get("sources") or []), -tokens)
 
 
+def _proxy_choice(candidates: list[dict[str, Any]]) -> dict[str, Any] | None:
+    """Select without reading gold sufficiency/support labels."""
+    feasible = [c for c in candidates if not c.get("error") and not c.get("safety_errors")
+                and c["tokens"] <= MAX_TOKENS and 0 < c["sources"] <= SELECTION_PACKAGE_LIMIT]
+    return max(feasible, key=lambda c: (tuple(c["proxy"]), tuple(-i for i in c["indices"])), default=None)
+
+
 def _selection_diagnostic(*, cases: list[dict[str, Any]], manifest: dict[str, Any], current_lane: dict[str, Any]) -> dict[str, Any]:
+    by_case = {case["id"]: case for case in cases}
+    registry_by_project = {project: evidence.registry_for(project, manifest) for project in sorted({case["project_group"] for case in cases})}
+    current_rows = {row["id"]: row for row in current_lane["rows"] if row.get("answerability") == "within_budget"}
+    results: list[dict[str, Any]] = []
+    exact_recoveries: list[str] = []
+    simple_recoveries: list[str] = []
+    beam_recoveries: list[str] = []
+    projector_failures = 0
+    proxy_recoveries: list[str] = []
+    started_cpu = time.process_time()
+    for case_id, row in sorted(current_rows.items()):
+        if _ok(row):
+            continue
+        case = by_case[case_id]
+        trace_path = current_lane["output"] / "traces" / "A-current" / f"{case_id}.json"
+        trace = json.loads(trace_path.read_text(encoding="utf-8"))
+        projector_inputs = trace.get("stages", {}).get("projector_inputs") or []
+        if len(projector_inputs) != 1:
+            results.append({"id": case_id, "status": "UNOBSERVED", "reason": "projector_input_count"})
+            continue
+        retrieval = projector_inputs[0]
+        pool = list(retrieval.get("context_pack") or ())[:SELECTION_POOL_LIMIT]
+        root = current_lane["output"] / "corpus" / case["project_group"]
+        registry = registry_by_project[case["project_group"]]
+        cache: dict[tuple[int, ...], dict[str, Any]] = {}
+
+        def project(indices: tuple[int, ...]) -> dict[str, Any]:
+            nonlocal projector_failures
+            if indices in cache:
+                return cache[indices]
+            candidate = deepcopy(retrieval)
+            candidate["context_pack"] = [deepcopy(pool[index]) for index in indices]
+            try:
+                payload, snapshot = projection.project_docs_context(retrieval=candidate, max_tokens=MAX_TOKENS)
+                assessment = assess_context(case, payload, registry)
+                safety = evidence.audit_payload(payload, snapshot, root)
+                size = count_input(model_visible_text({"structuredContent": payload}, "structured"))
+                value = {
+                    "indices": list(indices),
+                    "sufficient": assessment["context_sufficiency"] == "sufficient" and not safety and size["actual_tokens"] <= MAX_TOKENS,
+                    "required_supported": assessment["required_supported"],
+                    "required_count": assessment["required_count"],
+                    "tokens": size["actual_tokens"],
+                    "sources": len(payload.get("sources") or []),
+                    "proxy": list(_visible_proxy(payload, case["question"], size["actual_tokens"])),
+                    "safety_errors": safety,
+                }
+            except Exception as exc:
+                projector_failures += 1
+                value = {"indices": list(indices), "sufficient": False, "required_supported": 0, "required_count": len(case["required_claims"]), "tokens": MAX_TOKENS + 1, "sources": 0, "proxy": [0, 0, 0, -(MAX_TOKENS + 1)], "error": f"{type(exc).__name__}: {exc}"}
+            cache[indices] = value
+            return value
+
+        exact_candidates: list[dict[str, Any]] = []
+        for size in range(1, min(SELECTION_PACKAGE_LIMIT, len(pool)) + 1):
+            for indices in itertools.combinations(range(len(pool)), size):
+                candidate = project(indices)
+                if candidate["sufficient"]:
+                    exact_candidates.append(candidate)
+        exact = min(exact_candidates, key=lambda item: (item["tokens"], item["sources"], item["indices"]), default=None)
+
+        exact_proxy = _proxy_choice(list(cache.values()))
+        simple_success = _proxy_choice([
+            project(tuple(range(size)))
+            for size in range(1, min(SELECTION_PACKAGE_LIMIT, len(pool)) + 1)
+        ])
+        beam_states: list[tuple[int, ...]] = [()]
+        beam_visited: list[dict[str, Any]] = []
+        for _depth in range(1, min(SELECTION_PACKAGE_LIMIT, len(pool)) + 1):
+            expanded = {(*state, index) for state in beam_states
+                        for index in range(state[-1] + 1 if state else 0, len(pool))}
+            scored = [project(state) for state in sorted(expanded)]
+            beam_visited.extend(scored)
+            # Invalid partial packages can still have feasible continuations.
+            scored.sort(key=lambda item: (tuple(item["proxy"]), tuple(-i for i in item["indices"])), reverse=True)
+            beam_states = [tuple(item["indices"]) for item in scored[:BEAM_WIDTH]]
+        beam_success = _proxy_choice(beam_visited)
+        if exact_proxy is not None and exact_proxy["sufficient"]:
+            proxy_recoveries.append(case_id)
+        if exact is not None:
+            exact_recoveries.append(case_id)
+        if simple_success is not None and simple_success["sufficient"]:
+            simple_recoveries.append(case_id)
+        if beam_success is not None and beam_success["sufficient"]:
+            beam_recoveries.append(case_id)
+        results.append({"id": case_id, "current_sufficient": False, "pool": _candidate_structure(pool), "exact_oracle_recovery": exact, "exact_proxy_choice": exact_proxy, "simple_choice": simple_success, "beam_choice": beam_success, "enumerated_packages": len(cache)})
+    status = "OBSERVED" if exact_recoveries else "NOT_OBSERVED_IN_BOUNDED_POOL"
+    return {
+        "candidate_pool_limit": SELECTION_POOL_LIMIT,
+        "package_source_limit": SELECTION_PACKAGE_LIMIT,
+        "beam_width": BEAM_WIDTH,
+        "reference": "exhaustive subsets through unchanged projector; oracle feasibility is separate from gold-blind exact-proxy/simple/beam selection",
+        "exact_proxy_recoveries": proxy_recoveries,
+        "process_cpu_seconds": time.process_time() - started_cpu,
+        "selection_bottleneck": status,
+        "exact_recoveries": exact_recoveries,
+        "simple_recoveries": simple_recoveries,
+        "beam_recoveries": beam_recoveries,
+        "exact_simple_gap": sorted(set(exact_recoveries) - set(simple_recoveries)),
+        "oracle_beam_sufficiency_gap": sorted(set(exact_recoveries) - set(beam_recoveries)),
+        "proxy_objective_gap_cases": [r["id"] for r in results if r.get("exact_proxy_choice") and (not r.get("beam_choice") or r["beam_choice"]["proxy"] < r["exact_proxy_choice"]["proxy"])],
+        "projector_failures": projector_failures,
+        "production_selector_decision": "DEFER_NO_GOLD_BLIND_RECOVERY" if exact_recoveries and not proxy_recoveries else "REQUIRES_INDEPENDENT_VALIDATION" if exact_recoveries else "NOT_JUSTIFIED_BY_THIS_SAMPLE",
+        "cases": results,
+    }
+
+
+def _singleton_diagnostic(*, cases: list[dict[str, Any]], manifest: dict[str, Any], current_lane: dict[str, Any]) -> dict[str, Any]:
     """Measure an oracle gap separately from a production-blind selector.
 
     The oracle may use evaluator sufficiency only after enumeration. The blind
@@ -493,7 +565,7 @@ def _selection_diagnostic(*, cases: list[dict[str, Any]], manifest: dict[str, An
                 )
                 value = {
                     "indices": list(indices),
-                    "sufficient": assessment["context_sufficiency"] == "sufficient" and not safety,
+                    "sufficient": assessment["context_sufficiency"] == "sufficient" and not safety and size["actual_tokens"] <= MAX_TOKENS,
                     "required_supported": assessment["required_supported"],
                     "required_count": assessment["required_count"],
                     "tokens": size["actual_tokens"],
@@ -521,14 +593,7 @@ def _selection_diagnostic(*, cases: list[dict[str, Any]], manifest: dict[str, An
         current_sufficient = _ok(row)
 
         singleton_candidates = [project((index,)) for index in range(len(pool))]
-        blind_choice = max(
-            singleton_candidates,
-            key=lambda item: (
-                tuple(item["proxy"]), -item["tokens"],
-                tuple(-index for index in item["indices"]),
-            ),
-            default=None,
-        )
+        blind_choice = _proxy_choice(singleton_candidates)
         use_blind_choice = bool(
             blind_choice is not None and tuple(blind_choice["proxy"]) > tuple(current_proxy)
         )
@@ -612,6 +677,7 @@ def _selection_diagnostic(*, cases: list[dict[str, Any]], manifest: dict[str, An
     }
 
 
+
 def _load_holdout() -> tuple[list[dict[str, Any]], dict[str, Any], dict[str, str]]:
     cases_doc = json.loads((HOLDOUT / "cases.json").read_text(encoding="utf-8"))
     manifest = json.loads((HOLDOUT / "source-manifest.json").read_text(encoding="utf-8"))
@@ -668,19 +734,21 @@ def main() -> int:
         ("cap_off_requal_off", "off", False, True),
         ("contextualization_off", "bounded", True, False),
     )
+    pools = _FrozenCasePools()
+    fixture_output = None
     for name, cap, requalification, contextualization in lane_specs:
-        lanes[name] = _run_lane(name=name, work=work / "causal", protocol=frozen_protocol, cases=causal_cases, manifest=frozen_manifest, cap=cap, requalification=requalification, contextualization=contextualization)
+        lanes[name] = _run_lane(name=name, work=work / "causal", protocol=frozen_protocol, cases=causal_cases, manifest=frozen_manifest, cap=cap, requalification=requalification, contextualization=contextualization, pools=pools, fixture_output=fixture_output)
+        fixture_output = lanes["cap_on_requal_on"]["output"]
 
     full80 = _run_lane(name="full80_current", work=work / "acceptance", protocol=frozen_protocol, cases=frozen_cases, manifest=frozen_manifest)
     current = lanes["cap_on_requal_on"]
     fixed_pool = {
         name: {
-            "calls": len(lane["cap_inputs"]),
-            "same_as_current": Counter(lane["cap_inputs"]) == Counter(current["cap_inputs"]),
-            "ordered_same_as_current": lane["cap_inputs"] == current["cap_inputs"],
-            "raw_same_as_current": Counter(lane["raw_cap_inputs"]) == Counter(current["raw_cap_inputs"]),
-            "raw_ordered_same_as_current": lane["raw_cap_inputs"] == current["raw_cap_inputs"],
-            "frozen_calls": lane["fixed_pool_calls"],
+            "cases": len(lane["available_case_pools"]),
+            "same_as_current": lane["available_case_pools"] == current["available_case_pools"],
+            "available_case_fingerprints": lane["available_case_pools"],
+            "consumed_calls": len(lane["consumed_pools"]),
+            "unsupported_routes": lane["unsupported_routes"],
         }
         for name, lane in lanes.items()
     }
@@ -696,6 +764,7 @@ def main() -> int:
     final_policy = _final_citation_policy(current["rows"], frozen_manifest)
     selection = _selection_diagnostic(cases=causal_cases, manifest=frozen_manifest, current_lane=current)
 
+    singleton = _singleton_diagnostic(cases=causal_cases, manifest=frozen_manifest, current_lane=current)
     holdout_cases, holdout_manifest, holdout_documents = _load_holdout()
     documents_for, registry_for = _holdout_adapters(holdout_manifest, holdout_documents)
     holdout_current = _run_lane(name="holdout_current", work=work / "holdout", protocol=frozen_protocol, cases=holdout_cases, manifest=holdout_manifest, documents_for=documents_for, registry_for=registry_for)
@@ -710,7 +779,7 @@ def main() -> int:
     full80_budget_max_tokens = max((int(row.get("size", {}).get("actual_tokens") or 0) for row in full80_budget_rows), default=0)
     full80_all_valid_max_tokens = max((int(row.get("size", {}).get("actual_tokens") or 0) for row in full80_valid_rows), default=0)
     report = {
-        "schema_version": "systemic-retrieval-plan-acceptance-v1",
+        "schema_version": "systemic-retrieval-plan-acceptance-v2",
         "generated_from_head": head,
         "frozen_configuration": {
             "primary_outcome": PRIMARY_OUTCOME,
@@ -738,6 +807,7 @@ def main() -> int:
         "contextualization": {"paired_against_current": paired["contextualization_off"], "compact_and_expanded": compact_expanded},
         "source_policy": {"pre_hydration": {"status": "PRODUCTION_BOUNDARY_TESTED", "test": "tests/test_pre_hydration_source_policy.py", "defense_in_depth_post_hydration_filter_retained": True}, "final_citations": final_policy},
         "selection": selection,
+        "singleton_control": singleton,
         "independent_project_sample": {
             "state": "POSTHOC_NOT_HIDDEN_OR_PREREGISTERED",
             "projects": sorted({case["project_group"] for case in holdout_cases}),
@@ -758,11 +828,18 @@ def main() -> int:
         "head": head,
         "frozen_80": {"within_budget": frozen_current["within_budget"], "within_budget_sufficient": frozen_current["within_budget_sufficient"], "operational_errors": frozen_current["operational_errors"], "integrity_violations": frozen_current["source_integrity_or_contract_violations"]},
         "causal_cells": {name: value["within_budget_sufficient"] for name, value in cells.items()},
-        "selection": {"status": selection["selection_bottleneck"], "exact_recoveries": selection["exact_recoveries"], "blind_singleton_recoveries": selection["blind_singleton_recoveries"], "decision": selection["production_selector_decision"]},
+        "selection": {"status": selection["selection_bottleneck"], "exact_recoveries": selection["exact_recoveries"], "beam_recoveries": selection["beam_recoveries"]},
         "holdout": {"current": holdout_current["metrics"]["within_budget_sufficient"], "strict": holdout_strict["metrics"]["within_budget_sufficient"], "comparison": holdout_generalization},
     }, indent=2, ensure_ascii=False))
 
     failures: list[str] = []
+    for name, lane in lanes.items():
+        if lane["metrics"]["cases"] != 48 or lane["metrics"]["operational_errors"]:
+            failures.append(f"{name}: incomplete causal case inventory or operational errors")
+        if lane["metrics"]["source_integrity_or_contract_violations"]:
+            failures.append(f"{name}: source integrity or contract violations")
+    if selection["projector_failures"]:
+        failures.append("selection diagnostic has projector exceptions")
     if frozen_current["cases"] != 80:
         failures.append("frozen case inventory changed")
     if frozen_current["within_budget"] != 48:
@@ -782,7 +859,7 @@ def main() -> int:
     if full80_budget_max_tokens > MAX_TOKENS:
         failures.append("within-budget full model-visible DTO exceeded the 800-token ceiling")
     if not all(value["same_as_current"] for value in fixed_pool.values()):
-        failures.append("2x2/contextualization lanes did not share the same semantic pre-cap candidate-pool multiset")
+        failures.append("2x2/contextualization lanes did not share the same case-level pre-cap support")
     if compact_expanded["lost_evidence_identities"]:
         failures.append("contextualization lost compact evidence identities")
     if final_policy["violations"]:
