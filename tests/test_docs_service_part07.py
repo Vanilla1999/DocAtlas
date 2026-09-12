@@ -196,51 +196,58 @@ def test_cancel_terminalizes_without_waiting_for_library_worker(tmp_path, monkey
 
 
 def test_cancellation_during_registry_commit_rolls_back_late_publication(tmp_path, monkeypatch):
-    agent = SlowIndexingAgent()
+    agent = FakeAgent()
     service = _service(tmp_path, monkeypatch, agent)
-    monkeypatch.setattr(service.library_docs, "_library_job_timeout_seconds", lambda: 5.0)
-    original_upsert = service.registry.upsert
+    executor = LibraryJobExecutor(max_workers=1, max_queued=0)
+    service.library_docs.job_executor = executor
+    monkeypatch.setattr(service.library_docs, "_library_job_timeout_seconds", lambda: 30.0)
+    original_submit = executor.submit_reserved
+    start_work = Event()
+    work_done = Event()
     commit_entered = Event()
-    commit_release = Event()
 
+    def observe_completion(work, **kwargs):
+        def observed_work():
+            try:
+                if not start_work.wait(timeout=10):
+                    raise AssertionError("test did not release the worker")
+                work()
+            finally:
+                work_done.set()
+        return original_submit(observed_work, **kwargs)
+
+    monkeypatch.setattr(executor, "submit_reserved", observe_completion)
+    original_upsert = service.registry.upsert
     result = service.prefetch_docs(
         "commit-docs",
         ecosystem="web",
         docs_url="https://example.com/commit/",
         async_=True,
     )
-    assert agent.entered.wait(timeout=1)
 
-    def blocking_upsert(**values):
+    def cancel_at_commit(**values):
         if values.get("status") in {"available", "empty_index"}:
             commit_entered.set()
-            commit_release.wait(timeout=1)
+            # Inject cancellation at the commit boundary itself; SQLite setup
+            # speed is not part of this rollback contract.
+            service.cancel_docs_job(result.job_id)
         return original_upsert(**values)
 
-    monkeypatch.setattr(service.registry, "upsert", blocking_upsert)
-    agent.release.set()
-    assert commit_entered.wait(timeout=1)
-    service.cancel_docs_job(result.job_id)
-    for _ in range(80):
+    try:
+        monkeypatch.setattr(service.registry, "upsert", cancel_at_commit)
+        start_work.set()
+        assert work_done.wait(timeout=10)
+        assert commit_entered.is_set()
         status = service.get_docs_job_status(result.job_id)
-        if status and status.status == "cancelled":
-            break
-        time.sleep(0.01)
-    assert status is not None
-    assert status.reason_code == "cancelled"
-    commit_release.set()
-    for _ in range(80):
+        assert status is not None
+        assert status.reason_code == "cancelled"
         record = service.registry.get("commit-docs", "web", "latest")
-        if (
-            record
-            and record.last_refreshed_at is None
-            and service.library_docs.registry_ops.count_index_entries(record) == (0, 0)
-        ):
-            break
-        time.sleep(0.01)
-    assert record is not None
-    assert record.last_refreshed_at is None
-    assert service.library_docs.registry_ops.count_index_entries(record) == (0, 0)
+        assert record is not None
+        assert record.last_refreshed_at is None
+        assert service.library_docs.registry_ops.count_index_entries(record) == (0, 0)
+    finally:
+        start_work.set()
+        work_done.wait(timeout=10)
 
 
 def test_registry_commit_failure_rolls_back_published_staging_index(tmp_path, monkeypatch):
