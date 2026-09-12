@@ -363,7 +363,14 @@ def _call_with_snapshot(arguments: dict, service: LibraryDocsService) -> tuple[d
             key: value for key, value in source.items()
             if key in DOCS_CONTEXT_SOURCE_FIELDS
         }
-        if bound and public_source == bound.get("projected_source"):
+        # Optional locators are attached after selection, without altering its
+        # evidence. Bind qualification to the exact evidence-bearing fields;
+        # _coverage_attribution still checks the whole final source (URI included).
+        projected_evidence = {
+            key: value for key, value in (bound or {}).get("projected_source", {}).items()
+            if key != "source_uri"
+        }
+        if bound and public_source == projected_evidence:
             bound["qualification"] = source
     return payload, snapshot
 

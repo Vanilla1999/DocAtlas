@@ -158,3 +158,20 @@ DOCATLAS_OFFLINE=1 python experiments/grounded-partial/run_audit40.py \
 Runner требует новый каталог вывода вне checkout, сохраняет corpus/index,
 полные stage traces и не меняет исходный протокол вопросов. Runtime и тесты
 в этой сессии выполнялись с наследуемым kernel-запретом исходящей сети.
+
+
+## Исправление по результатам серверного CI
+
+Первый GitHub CI выявил дополнительный Legacy lineage gate, которого не было
+в списке 27 локальных проверок: observer показывал 5/15 вместо порога 12/15.
+Он сопоставлял pre-locator selected source с post-locator финальным объектом
+и терял qualification при добавлении optional `source_uri`. Исправление относится
+только к evaluator: evidence-bearing поля сравниваются точно, а последующая
+проверка attribution по-прежнему требует полного совпадения final source вместе
+с URI. Подменённые snippet и URI остаются отрицательными контролями.
+
+Реальный SQLite-контрпример сначала падал, затем прошёл; 80 смежных тестов зелёные.
+Повторный Legacy live self-host дал **12/15**, порог и hard-safety не изменены.
+Первый серверный полный pytest и остальные CI jobs прошли; упал именно этот
+legacy observer gate и зависящий от него aggregate. Финальный статус проверяется
+на новом commit в PR, отдельно от локальных измерений runtime выше.

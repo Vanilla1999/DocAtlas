@@ -195,6 +195,19 @@ def test_public_handler_binds_reader_to_real_active_sqlite_snapshot(tmp_path):
     args = dict(question='Explain job polling.', lookup_queries=['job polling progress'],
                 project_path=str(tmp_path), scope='all')
     payload = call_docs_tool_payload('get_docs_context', args, service)
+    from scripts.run_project_docs_self_host_gate import _call_with_snapshot, _coverage_attribution
+    observed, snapshot = _call_with_snapshot({**args, 'question': 'Job polling uses docs_status to inspect progress.'}, service)
+    assert 'query-original' in observed['covered_query_ids']
+    assert _coverage_attribution(snapshot, observed)
+    from copy import deepcopy
+    tampered = deepcopy(observed)
+    for row in tampered['sources']:
+        row['snippet'] += ' unsupported claim'
+    assert not _coverage_attribution(snapshot, tampered)
+    tampered = deepcopy(observed)
+    for row in tampered['sources']:
+        row['source_uri'] = 'docatlas://source/' + '0' * 24
+    assert not _coverage_attribution(snapshot, tampered)
     source = next(row for row in payload['sources'] if row.get('source_uri'))
     read = json.loads(read_docs_resource(source['source_uri'], service)['text'])
     assert read['line_start'] == source['line_end'] + 1
