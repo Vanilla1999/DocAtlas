@@ -1,5 +1,5 @@
 name: Systemic retrieval final acceptance v3
-# trigger: frozen-pool-final-20260912
+# trigger: fixed-helper-quoting-20260912
 
 on:
   push:
@@ -30,6 +30,22 @@ jobs:
           python-version: '3.12'
       - name: Install dependencies
         run: python -m pip install -e '.[dev]' 'tiktoken==0.11.0'
+      - name: Repair one-shot helper quoting
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          path = Path('scripts/pr186_patch_candidate_pool.py')
+          text = path.read_text(encoding='utf-8')
+          opening = "freeze_block = r'''\n"
+          closing = "\nPY\ngit diff --check\n'''\nscript = script.replace"
+          if text.count(opening) != 1 or text.count(closing) != 1:
+              raise SystemExit('one-shot helper quoting anchors changed')
+          text = text.replace(opening, 'freeze_block = r"""\n', 1)
+          text = text.replace(closing, '\nPY\ngit diff --check\n"""\nscript = script.replace', 1)
+          path.write_text(text, encoding='utf-8')
+          compile(text, str(path), 'exec')
+          PY
       - name: Normalize isolated candidate-pool identities
         run: python scripts/pr186_patch_candidate_pool.py
       - name: Prove fingerprint TDD GREEN
