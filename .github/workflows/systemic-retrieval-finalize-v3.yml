@@ -1,5 +1,5 @@
 name: Systemic retrieval final acceptance v3
-# trigger: project-scoped-fixed-pool-20260912
+# trigger: stable-project-path-scope-20260912
 
 on:
   push:
