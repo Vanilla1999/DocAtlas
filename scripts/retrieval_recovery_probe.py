@@ -38,15 +38,20 @@ def _payload_sources(row: dict) -> list[dict[str, object]]:
     return result
 
 
+def _without_per_source_cap(self, chunks, *, limit=None, expand=None):
+    """Counterfactual: remove only source quota, keep the public lane limit."""
+    del self, expand
+    values = list(chunks)
+    return values[:limit] if limit is not None else values
+
+
 def main() -> int:
     shutil.rmtree(ROOT, ignore_errors=True)
     run(BASELINE, projects=["pydantic"])
 
     original = RetrievalDispatcher._limit_sections_per_source
     try:
-        RetrievalDispatcher._limit_sections_per_source = staticmethod(
-            lambda sections, *, per_source_limit: sections
-        )
+        RetrievalDispatcher._limit_sections_per_source = _without_per_source_cap
         run(NO_CAP, projects=["pydantic"])
     finally:
         RetrievalDispatcher._limit_sections_per_source = original
