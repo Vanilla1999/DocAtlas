@@ -29,6 +29,10 @@ jobs:
           python-version: '3.12'
       - name: Install dependencies
         run: python -m pip install -e '.[dev]' 'tiktoken==0.11.0'
+      - name: Normalize isolated candidate-pool identities
+        run: python scripts/pr186_patch_candidate_pool.py
+      - name: Prove fingerprint TDD GREEN
+        run: python -m pytest -q tests/test_systemic_retrieval_candidate_pool.py tests/test_diagnostic_labels.py
       - name: Run TDD and complete systemic acceptance
         run: bash scripts/pr186_finalize.sh
       - name: Publish accepted non-workflow state
