@@ -3,72 +3,71 @@ from __future__ import annotations
 import json
 import shutil
 from pathlib import Path
-from typing import Any
 
 from eval.evidence_quality_v2.run import run
 
 
-OUTPUT = Path("/tmp/docatlas-semantic-recovery-probe")
-TARGET_PATH = "docs/environment_variables.md"
+OUTPUT = Path("/tmp/docatlas-retrieval-recovery-probe")
 
 
-def _walk(value: Any):
-    if isinstance(value, dict):
-        yield value
-        for nested in value.values():
-            yield from _walk(nested)
-    elif isinstance(value, list):
-        for nested in value:
-            yield from _walk(nested)
-
-
-def _path(item: dict[str, Any]) -> str:
-    metadata = item.get("metadata") if isinstance(item.get("metadata"), dict) else {}
-    for value in (
-        item.get("path"), item.get("source_path"), item.get("project_doc_path"),
-        item.get("source"), metadata.get("project_doc_path"), metadata.get("source_path"),
-    ):
-        if isinstance(value, str) and value:
-            return value
-    return ""
-
-
-def _safe(value: Any) -> Any:
-    if isinstance(value, dict):
-        return {str(key): _safe(item) for key, item in value.items() if key not in {"content", "text", "retrieval_text", "display_text"}}
-    if isinstance(value, list):
-        return [_safe(item) for item in value[:24]]
-    if isinstance(value, tuple):
-        return [_safe(item) for item in value[:24]]
-    if isinstance(value, (str, int, float, bool)) or value is None:
-        return value
-    return repr(value)
+def _short_source(source: dict) -> dict:
+    return {
+        "path": source.get("path_or_url") or source.get("source_path"),
+        "line_start": source.get("line_start"),
+        "line_end": source.get("line_end"),
+        "snippet": str(source.get("snippet") or source.get("display_text") or "")[:500],
+        "evidence_id": source.get("evidence_id") or source.get("stable_chunk_id"),
+    }
 
 
 def main() -> int:
     shutil.rmtree(OUTPUT, ignore_errors=True)
-    run(OUTPUT, projects=["httpx"])
-    trace = json.loads((OUTPUT / "traces" / "A-current" / "httpx-06.json").read_text(encoding="utf-8"))
-    report: dict[str, Any] = {}
-    for stage in ("retrieved_candidates", "query_window", "qualified_fragments", "projector_inputs"):
-        matches = []
-        seen = set()
-        for item in _walk((trace.get("stages") or {}).get(stage, [])):
-            if _path(item).replace("\\", "/").casefold() != TARGET_PATH.casefold():
-                continue
-            signature = json.dumps(_safe(item), sort_keys=True, ensure_ascii=False)
-            if signature in seen:
-                continue
-            seen.add(signature)
-            metadata = item.get("metadata") if isinstance(item.get("metadata"), dict) else {}
-            content = item.get("content") or item.get("text") or item.get("retrieval_text") or item.get("display_text") or ""
-            matches.append({
-                "top_level": _safe(item),
-                "metadata": _safe(metadata),
-                "content": " ".join(str(content).split())[:500],
-            })
-        report[stage] = matches[:8]
-    print("SEMANTIC_RECOVERY_PROVENANCE=" + json.dumps(report, ensure_ascii=False, sort_keys=True))
+    run(OUTPUT, projects=["pydantic"])
+    rows = json.loads((OUTPUT / "rows.json").read_text(encoding="utf-8"))
+    rows = [row for row in rows if row.get("id") == "pydantic-02"]
+    report: dict[str, object] = {"rows": []}
+    for row in rows:
+        variant = str(row["variant"])
+        trace = json.loads(
+            (OUTPUT / "traces" / variant / "pydantic-02.json").read_text(encoding="utf-8")
+        )
+        stage_report: dict[str, object] = {}
+        for stage in (
+            "retrieved_candidates",
+            "query_window",
+            "rankings",
+            "qualified_fragments",
+            "expansions",
+        ):
+            calls = trace.get("stages", {}).get(stage, [])
+            compact_calls = []
+            for call in calls:
+                compact: dict[str, object] = {
+                    key: value
+                    for key, value in call.items()
+                    if key not in {"sources", "before", "after"}
+                }
+                for key in ("sources", "before", "after"):
+                    value = call.get(key)
+                    if isinstance(value, list):
+                        compact[key] = [_short_source(item) for item in value]
+                    elif isinstance(value, dict):
+                        compact[key] = _short_source(value)
+                compact_calls.append(compact)
+            stage_report[stage] = compact_calls
+        report["rows"].append(
+            {
+                "variant": variant,
+                "sufficiency": row.get("assessment", {}).get("context_sufficiency"),
+                "literal_required": row.get("literal_required"),
+                "first_loss": row.get("stage_assessment", {}).get("first_observed_loss"),
+                "payload_sources": [_short_source(item) for item in row.get("payload", {}).get("sources", [])],
+                "stages": stage_report,
+            }
+        )
+    print("RECOVERY_PROBE_BEGIN")
+    print(json.dumps(report, indent=2, ensure_ascii=False, sort_keys=True))
+    print("RECOVERY_PROBE_END")
     return 0
 
 
