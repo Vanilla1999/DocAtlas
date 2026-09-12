@@ -25,7 +25,7 @@ from docmancer.docs.application.model_visible_projection import (
     _docs_source,
     _refresh_estimate,
     _snapshot_entry,
-    estimate_projection_tokens,
+    docs_context_budget_tokens,
     project_insufficient,
 )
 from docmancer.docs.domain.project_doc_ranking import (
@@ -387,7 +387,7 @@ def project_docs_context(
                 continue
             candidate_sources = [*sources[:existing_index], variant, *sources[existing_index + 1:]]
         decision = context_selection_decision(candidate_sources, public_query_ids)
-        if estimate_projection_tokens(_payload(
+        if docs_context_budget_tokens(_payload(
             candidate_sources, decision=decision, query_plan=query_plan,
         )) > max_tokens:
             projection_diagnostics["budget_rejections"] += 1
@@ -466,7 +466,7 @@ def project_docs_context(
             candidate_sources = [dict(source) for source in sources]
             candidate_sources[existing_index] = normalized
             candidate_decision = context_selection_decision(candidate_sources, public_query_ids)
-            if estimate_projection_tokens(
+            if docs_context_budget_tokens(
                     _payload(candidate_sources, decision=candidate_decision, query_plan=query_plan)
             ) <= max_tokens:
                 sources = candidate_sources
@@ -481,7 +481,7 @@ def project_docs_context(
         candidate_payload = _payload(
             candidate_sources, decision=candidate_decision, query_plan=query_plan,
         )
-        if estimate_projection_tokens(candidate_payload) > max_tokens:
+        if docs_context_budget_tokens(candidate_payload) > max_tokens:
             continue
         sources = candidate_sources
         snapshot_source = {
@@ -620,7 +620,7 @@ def _expand_selected_snippets(
             candidate = bind_visible_assignments(original, candidate, retained)
             candidate_sources = [*expanded[:index], candidate, *expanded[index + 1:]]
             decision = context_selection_decision(candidate_sources, public_query_ids)
-            if estimate_projection_tokens(_payload(
+            if docs_context_budget_tokens(_payload(
                 candidate_sources, decision=decision, query_plan=query_plan,
             )) <= max_tokens:
                 expanded = candidate_sources

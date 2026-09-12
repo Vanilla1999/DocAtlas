@@ -124,20 +124,26 @@ class _RetrievalDispatcherPart02:
     ) -> list[int]:
         if not section_ids or not filters:
             return section_ids
-        read_metadata = getattr(self.store, "fetch_section_filter_metadata", None)
-        if not callable(read_metadata):
-            # Compatibility for third-party/test stores; hydrated chunks still
-            # pass through the existing defense-in-depth policy check.
+        metadata_for = getattr(self.store, "section_filter_metadata_for", None)
+        if not callable(metadata_for):
+            # Compatibility stores still retain the post-hydration policy check.
             return section_ids
-        allowed = {
-            int(row["section_id"])
-            for row in read_metadata(section_ids)
-            if row.get("section_id") is not None
-            and metadata_matches_filters(
-                row, filters, source=str(row.get("source") or ""),
+        try:
+            metadata_by_id = metadata_for(section_ids)
+        except Exception as exc:
+            logger.warning(
+                "pre-hydration source-policy metadata failed (%s)",
+                type(exc).__name__,
             )
-        }
-        return [value for value in section_ids if int(value) in allowed]
+            return []
+        return [
+            section_id
+            for section_id in section_ids
+            if (metadata := metadata_by_id.get(int(section_id))) is not None
+            and metadata_matches_filters(
+                metadata, filters, source=str(metadata.get("source") or ""),
+            )
+        ]
 
     def _hydrate_policy_filtered(
         self, section_ids: list[int], *, budget: int, filters: dict | None,

@@ -4,6 +4,7 @@ import math
 
 from docmancer.docs.application.model_visible_projection import (
     canonical_projection_bytes,
+    docs_context_budget_tokens,
     estimate_projection_tokens,
 )
 
@@ -37,13 +38,13 @@ def test_docs_context_budget_reserves_for_structured_token_density() -> None:
         ],
         "estimated_tokens": 0,
     }
-
     serialized_bytes = len(canonical_projection_bytes(payload))
 
-    # docs_context is a hard <=800 model-input envelope. Its provider-free
-    # engineering estimate must reserve for punctuation/JSON-heavy structured
-    # payloads instead of assuming the optimistic four UTF-8 bytes per token.
-    assert estimate_projection_tokens(payload) >= math.ceil(serialized_bytes / 3)
+    # Keep the public engineering estimate backward-compatible.
+    assert estimate_projection_tokens(payload) == math.ceil(serialized_bytes / 4)
+    # Admission for docs_context is deliberately more conservative.
+    assert docs_context_budget_tokens(payload) >= math.ceil(serialized_bytes / 3)
+    assert docs_context_budget_tokens(payload) > estimate_projection_tokens(payload)
 
 
 def test_non_context_projection_keeps_existing_byte_estimator_contract() -> None:

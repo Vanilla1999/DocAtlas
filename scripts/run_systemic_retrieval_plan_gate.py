@@ -105,16 +105,127 @@ def _run_lane(*, name: str, work: Path, protocol: dict[str, Any], cases: list[di
     output = work / name
     shutil.rmtree(output, ignore_errors=True)
     lane_protocol = _single_variant_protocol(protocol)
+    cap_inputs: list[str] = []
+    raw_cap_inputs: list[str] = []
+    causal_lane = name in {
+        "cap_on_requal_on", "cap_off_requal_on",
+        "cap_on_requal_off", "cap_off_requal_off", "contextualization_off",
+    }
+    capture_fixed_pool = name == "cap_on_requal_on"
+    # Evaluation-only control: freeze the exact pre-cap baseline chunks.  Each
+    # counterfactual receives those chunks, with only fresh-index project
+    # identity/path rebound to its own isolated corpus.  Raw fresh-index pools
+    # are still fingerprinted separately so retrieval drift remains visible.
+    fixed_pools: dict[tuple[Any, ...], list[Any]] = globals().setdefault(
+        "_SYSTEMIC_FIXED_PRE_CAP_POOLS", {}
+    )
+    if capture_fixed_pool:
+        fixed_pools.clear()
+    call_occurrences: Counter[tuple[Any, ...]] = Counter()
+    active_calls: list[tuple[tuple[Any, ...], dict[str, Any]]] = []
+    seen_call_keys: list[tuple[Any, ...]] = []
+    original_run = RetrievalDispatcher.run
+    original_cap = RetrievalDispatcher._limit_sections_per_source
+
+    def retrieval_scope(query: str, kwargs: dict[str, Any]) -> tuple[Any, ...]:
+        filters = kwargs.get("filters") or {}
+        if not isinstance(filters, dict):
+            filters = {}
+        project_path = str(filters.get("project_path") or "")
+        project = Path(project_path).name if project_path else "unknown-project"
+        return (
+            project,
+            query,
+            str(filters.get("authority") or ""),
+            str(filters.get("source_class") or ""),
+            str(filters.get("doc_scope") or ""),
+            str(kwargs.get("mode") or ""),
+            str(kwargs.get("expand") or ""),
+            int(kwargs.get("limit") or -1),
+            int(kwargs.get("budget") or -1),
+        )
+
+    def call_identity(key: tuple[Any, ...], fingerprint: str) -> str:
+        encoded = json.dumps(key, ensure_ascii=False, separators=(",", ":")).encode("utf-8")
+        return f"{hashlib.sha256(encoded).hexdigest()[:24]}:{fingerprint}"
+
+    def rebind_chunk(chunk: Any, filters: dict[str, Any]) -> Any:
+        value = deepcopy(chunk)
+        if isinstance(value, dict):
+            metadata = dict(value.get("metadata") or {})
+            project_identity = str(filters.get("project_identity") or "")
+            project_path = str(filters.get("project_path") or "")
+            if project_identity:
+                metadata["project_identity"] = project_identity
+                if "repository_identity" in metadata:
+                    metadata["repository_identity"] = project_identity
+            if project_path:
+                metadata["project_path"] = project_path
+            value["metadata"] = metadata
+            if project_identity and "project_identity" in value:
+                value["project_identity"] = project_identity
+            return value
+        metadata = dict(getattr(value, "metadata", {}) or {})
+        project_identity = str(filters.get("project_identity") or "")
+        project_path = str(filters.get("project_path") or "")
+        if project_identity:
+            metadata["project_identity"] = project_identity
+            if "repository_identity" in metadata:
+                metadata["repository_identity"] = project_identity
+        if project_path:
+            metadata["project_path"] = project_path
+        copier = getattr(value, "model_copy", None)
+        if callable(copier):
+            return copier(update={"metadata": metadata})
+        setattr(value, "metadata", metadata)
+        return value
+
+    def observed_run(self: Any, query: str, *args: Any, **kwargs: Any) -> Any:
+        scope = retrieval_scope(query, kwargs)
+        occurrence = call_occurrences[scope]
+        call_occurrences[scope] += 1
+        key = (*scope, occurrence)
+        filters = kwargs.get("filters") or {}
+        filters = dict(filters) if isinstance(filters, dict) else {}
+        active_calls.append((key, filters))
+        seen_call_keys.append(key)
+        try:
+            return original_run(self, query, *args, **kwargs)
+        finally:
+            popped_key, _ = active_calls.pop()
+            if popped_key != key:
+                raise RuntimeError("retrieval call stack lost deterministic ordering")
+
+    def observed_cap(self: Any, chunks: list[Any], *, limit: int | None = None, expand: str | None = None) -> list[Any]:
+        if not active_calls:
+            raise RuntimeError("pre-cap pool observed outside RetrievalDispatcher.run")
+        key, filters = active_calls[-1]
+        raw_fingerprint = _candidate_pool_fingerprint(chunks)
+        raw_cap_inputs.append(call_identity(key, raw_fingerprint))
+        controlled_chunks = chunks
+        if causal_lane:
+            if capture_fixed_pool:
+                fixed_pools[key] = deepcopy(chunks)
+            frozen = fixed_pools.get(key)
+            if frozen is None:
+                raise RuntimeError(f"counterfactual retrieval call absent from frozen current pool: {key!r}")
+            controlled_chunks = [rebind_chunk(chunk, filters) for chunk in frozen]
+        controlled_fingerprint = _candidate_pool_fingerprint(controlled_chunks)
+        cap_inputs.append(call_identity(key, controlled_fingerprint))
+        if cap == "off":
+            return _no_source_cap(self, controlled_chunks, limit=limit, expand=expand)
+        if cap == "strict":
+            return _strict_source_cap(self, controlled_chunks, limit=limit, expand=expand)
+        if cap == "bounded":
+            return original_cap(self, controlled_chunks, limit=limit, expand=expand)
+        raise ValueError(f"unknown cap mode: {cap}")
+
     started_cpu = time.process_time()
     started_wall = time.perf_counter()
     with ExitStack() as stack:
         stack.enter_context(patch.object(evidence, "load_protocol", return_value=(lane_protocol, deepcopy(cases), deepcopy(manifest))))
-        if cap == "off":
-            stack.enter_context(patch.object(RetrievalDispatcher, "_limit_sections_per_source", _no_source_cap))
-        elif cap == "strict":
-            stack.enter_context(patch.object(RetrievalDispatcher, "_limit_sections_per_source", _strict_source_cap))
-        elif cap != "bounded":
-            raise ValueError(f"unknown cap mode: {cap}")
+        stack.enter_context(patch.object(RetrievalDispatcher, "run", observed_run))
+        stack.enter_context(patch.object(RetrievalDispatcher, "_limit_sections_per_source", observed_cap))
         if not requalification:
             stack.enter_context(patch.object(projection, "_requalify_visible_source", _trust_inherited_requalification))
         if not contextualization:
@@ -131,7 +242,20 @@ def _run_lane(*, name: str, work: Path, protocol: dict[str, Any], cases: list[di
     metrics["process_cpu_seconds"] = round(cpu, 6)
     metrics["wall_seconds"] = round(wall, 6)
     metrics["cpu_seconds_per_case"] = round(cpu / max(1, len(rows)), 6)
-    return {"name": name, "output": output, "summary": summary, "metrics": metrics, "rows": rows}
+    if causal_lane and set(seen_call_keys) != set(fixed_pools):
+        missing = sorted(set(fixed_pools) - set(seen_call_keys))
+        extra = sorted(set(seen_call_keys) - set(fixed_pools))
+        raise RuntimeError(f"fixed-pool retrieval topology changed: missing={missing!r} extra={extra!r}")
+    return {
+        "name": name,
+        "output": output,
+        "summary": summary,
+        "metrics": metrics,
+        "rows": rows,
+        "cap_inputs": cap_inputs,
+        "raw_cap_inputs": raw_cap_inputs,
+        "fixed_pool_calls": len(fixed_pools) if causal_lane else 0,
+    }
 
 
 def _paired(baseline_rows: list[dict[str, Any]], variant_rows: list[dict[str, Any]], *, seed: int, resamples: int) -> dict[str, Any]:
@@ -229,6 +353,18 @@ def _final_citation_policy(rows: list[dict[str, Any]], manifest: dict[str, Any])
 
 
 
+
+def _semantic_source_identity(value: Any) -> str:
+    """Remove only the eval lane root from isolated corpus source paths."""
+    normalized = str(value or "").replace("\\", "/")
+    parts = [part for part in normalized.split("/") if part and part != "."]
+    corpus_positions = [index for index, part in enumerate(parts) if part == "corpus"]
+    if corpus_positions:
+        suffix = parts[corpus_positions[-1] + 1 :]
+        if len(suffix) >= 2:
+            return "/".join(suffix)
+    return normalized
+
 def _candidate_pool_fingerprint(pool: list[Any]) -> str:
     """Hash semantic ranked candidates while ignoring fresh-index identities."""
     canonical: list[dict[str, Any]] = []
@@ -260,7 +396,7 @@ def _candidate_pool_fingerprint(pool: list[Any]) -> str:
             body = str(getattr(row, "text", "") or "")
         canonical.append(
             {
-                "path": path,
+                "path": _semantic_source_identity(path),
                 "chunk_index": chunk_index,
                 "text_sha256": hashlib.sha256(body.encode("utf-8")).hexdigest(),
             }
@@ -306,6 +442,7 @@ def _selection_diagnostic(*, cases: list[dict[str, Any]], manifest: dict[str, An
     current_rows = {row["id"]: row for row in current_lane["rows"] if row.get("answerability") == "within_budget"}
     results: list[dict[str, Any]] = []
     exact_recoveries: list[str] = []
+    simple_recoveries: list[str] = []
     beam_recoveries: list[str] = []
     projector_failures = 0
     for case_id, row in sorted(current_rows.items()):
@@ -359,6 +496,13 @@ def _selection_diagnostic(*, cases: list[dict[str, Any]], manifest: dict[str, An
                     exact_candidates.append(candidate)
         exact = min(exact_candidates, key=lambda item: (item["tokens"], item["sources"], item["indices"]), default=None)
 
+        simple_success: dict[str, Any] | None = None
+        for size in range(1, min(SELECTION_PACKAGE_LIMIT, len(pool)) + 1):
+            candidate = project(tuple(range(size)))
+            if candidate["sufficient"]:
+                simple_success = candidate
+                break
+
         beam_states: list[tuple[int, ...]] = [()]
         beam_success: dict[str, Any] | None = None
         for _depth in range(1, min(SELECTION_PACKAGE_LIMIT, len(pool)) + 1):
@@ -379,9 +523,11 @@ def _selection_diagnostic(*, cases: list[dict[str, Any]], manifest: dict[str, An
 
         if exact is not None:
             exact_recoveries.append(case_id)
+        if simple_success is not None:
+            simple_recoveries.append(case_id)
         if beam_success is not None:
             beam_recoveries.append(case_id)
-        results.append({"id": case_id, "current_sufficient": False, "pool": _candidate_structure(pool), "exact_recovery": exact, "beam_recovery": beam_success, "enumerated_packages": len(cache)})
+        results.append({"id": case_id, "current_sufficient": False, "pool": _candidate_structure(pool), "exact_recovery": exact, "simple_recovery": simple_success, "beam_recovery": beam_success, "enumerated_packages": len(cache)})
     status = "OBSERVED" if exact_recoveries else "NOT_OBSERVED_IN_BOUNDED_POOL"
     return {
         "candidate_pool_limit": SELECTION_POOL_LIMIT,
@@ -390,7 +536,9 @@ def _selection_diagnostic(*, cases: list[dict[str, Any]], manifest: dict[str, An
         "reference": "exhaustive subset replay through unchanged projector; gold is used only to score the oracle, never the beam proxy",
         "selection_bottleneck": status,
         "exact_recoveries": exact_recoveries,
+        "simple_recoveries": simple_recoveries,
         "beam_recoveries": beam_recoveries,
+        "exact_simple_gap": sorted(set(exact_recoveries) - set(simple_recoveries)),
         "proxy_exact_gap": sorted(set(exact_recoveries) - set(beam_recoveries)),
         "projector_failures": projector_failures,
         "production_selector_decision": "INVESTIGATE_OBSERVED_GAP_BEFORE_PRODUCT_CHANGE" if exact_recoveries else "NOT_JUSTIFIED_BY_THIS_SAMPLE",
@@ -459,6 +607,17 @@ def main() -> int:
 
     full80 = _run_lane(name="full80_current", work=work / "acceptance", protocol=frozen_protocol, cases=frozen_cases, manifest=frozen_manifest)
     current = lanes["cap_on_requal_on"]
+    fixed_pool = {
+        name: {
+            "calls": len(lane["cap_inputs"]),
+            "same_as_current": Counter(lane["cap_inputs"]) == Counter(current["cap_inputs"]),
+            "ordered_same_as_current": lane["cap_inputs"] == current["cap_inputs"],
+            "raw_same_as_current": Counter(lane["raw_cap_inputs"]) == Counter(current["raw_cap_inputs"]),
+            "raw_ordered_same_as_current": lane["raw_cap_inputs"] == current["raw_cap_inputs"],
+            "frozen_calls": lane["fixed_pool_calls"],
+        }
+        for name, lane in lanes.items()
+    }
     paired = {name: _paired(current["rows"], lane["rows"], seed=seed, resamples=resamples) for name, lane in lanes.items() if name != "cap_on_requal_on"}
     cells = {name: {**lane["metrics"], "failure_families": _failure_families(lane["rows"])} for name, lane in lanes.items()}
     current_rate = cells["cap_on_requal_on"]["within_budget_sufficient"] / 48
@@ -481,7 +640,9 @@ def main() -> int:
     head = subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=REPO, text=True).strip()
     frozen_current = full80["metrics"]
     full80_valid_rows = [row for row in full80["rows"] if "error" not in row]
-    full80_max_tokens = max((int(row.get("size", {}).get("actual_tokens") or 0) for row in full80_valid_rows), default=0)
+    full80_budget_rows = [row for row in full80_valid_rows if row.get("answerability") == "within_budget"]
+    full80_budget_max_tokens = max((int(row.get("size", {}).get("actual_tokens") or 0) for row in full80_budget_rows), default=0)
+    full80_all_valid_max_tokens = max((int(row.get("size", {}).get("actual_tokens") or 0) for row in full80_valid_rows), default=0)
     report = {
         "schema_version": "systemic-retrieval-plan-acceptance-v1",
         "generated_from_head": head,
@@ -497,15 +658,17 @@ def main() -> int:
             "counterfactual_cap": "bounded structural overflow vs no per-source cap",
             "counterfactual_requalification": "visible-text requalification vs inherited retrieval qualification",
             "contextualization_control": "same end-to-end call with final snippet expansion disabled",
+            "performance_metrics_frozen": ["process_cpu_seconds", "cpu_seconds_per_case", "latency_seconds.p95"],
         },
         "full_frozen_80": {
             **frozen_current,
             "failure_families": _failure_families(full80["rows"]),
             "historical_floor_preserved": frozen_current["within_budget"] == 48 and frozen_current["within_budget_sufficient"] >= HISTORICAL_CURRENT_FLOOR,
-            "max_actual_model_visible_tokens": full80_max_tokens,
-            "actual_full_dto_budget": full80_max_tokens <= MAX_TOKENS,
+            "within_budget_max_actual_model_visible_tokens": full80_budget_max_tokens,
+            "all_valid_max_actual_model_visible_tokens_diagnostic": full80_all_valid_max_tokens,
+            "actual_full_dto_budget": full80_budget_max_tokens <= MAX_TOKENS,
         },
-        "causal_2x2": {"cells": cells, "paired_against_current": paired, "difference_in_differences_success_rate": interaction, "interpretation": "Counterfactual diagnostic only; no causal claim extends beyond this fixed exposed corpus."},
+        "causal_2x2": {"cells": cells, "paired_against_current": paired, "fixed_pre_cap_candidate_pool": fixed_pool, "difference_in_differences_success_rate": interaction, "interpretation": "Counterfactual lanes replay the frozen current pre-cap pools; raw fresh-index drift is reported separately. No causal claim extends beyond this fixed exposed corpus."},
         "contextualization": {"paired_against_current": paired["contextualization_off"], "compact_and_expanded": compact_expanded},
         "source_policy": {"pre_hydration": {"status": "PRODUCTION_BOUNDARY_TESTED", "test": "tests/test_pre_hydration_source_policy.py", "defense_in_depth_post_hydration_filter_retained": True}, "final_citations": final_policy},
         "selection": selection,
@@ -548,8 +711,12 @@ def main() -> int:
         failures.append("causal current lane regressed below 28/48")
     if lanes["contextualization_off"]["metrics"]["within_budget_sufficient"] < HISTORICAL_NO_CONTEXT_FLOOR:
         failures.append("no-contextualization floor regressed below 18/48")
-    if full80_max_tokens > MAX_TOKENS:
-        failures.append("full model-visible DTO exceeded the 800-token ceiling")
+    if len(full80_budget_rows) != 48:
+        failures.append("within-budget valid DTO inventory changed")
+    if full80_budget_max_tokens > MAX_TOKENS:
+        failures.append("within-budget full model-visible DTO exceeded the 800-token ceiling")
+    if not all(value["same_as_current"] for value in fixed_pool.values()):
+        failures.append("2x2/contextualization lanes did not share the same semantic pre-cap candidate-pool multiset")
     if compact_expanded["lost_evidence_identities"]:
         failures.append("contextualization lost compact evidence identities")
     if final_policy["violations"]:

@@ -107,6 +107,18 @@ def estimate_projection_tokens(value: Any) -> int:
     return max(1, math.ceil(size / 4))
 
 
+def docs_context_budget_tokens(value: Any) -> int:
+    """Conservative provider-free admission reserve for docs_context payloads.
+
+    ``estimated_tokens`` remains the stable public engineering estimate. This
+    reserve is intentionally separate so structured JSON-heavy context is
+    trimmed before it can exceed the hard model-input envelope.
+    """
+
+    size = len(canonical_projection_bytes(value))
+    return max(1, math.ceil(size / 3))
+
+
 def encode_support_envelope(value: dict[str, Any]) -> dict[str, str]:
     """Encode a complete canonical support envelope for tiny public budgets."""
 
@@ -674,6 +686,12 @@ def validate_model_visible_projection(
     actual = estimate_projection_tokens(payload)
     if payload.get("estimated_tokens") != actual or actual > limit:
         errors.append("projection estimate mismatch or budget exceeded")
+    if (
+        kind == "docs_context"
+        and status in {"ok", "truncated"}
+        and docs_context_budget_tokens(payload) > max_tokens
+    ):
+        errors.append("docs_context conservative budget exceeded")
     if status == "insufficient_evidence":
         transport = payload.get("support_envelope")
         transport_support: dict[str, Any] | None = None
