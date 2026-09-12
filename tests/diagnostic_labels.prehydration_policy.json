@@ -1,0 +1,10 @@
+{
+  "schema_version": 1,
+  "module_labels": {
+    "tests/test_prehydration_policy.py": "behavioral"
+  },
+  "module_node_hashes": {
+    "tests/test_prehydration_policy.py": "f8de0857dcada42f6590c56f0965cb946fe6afcd05cd9dd52b6fcb7ad96722cb"
+  },
+  "node_overrides": {}
+}
