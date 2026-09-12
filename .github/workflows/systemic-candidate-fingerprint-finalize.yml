@@ -1,0 +1,104 @@
+name: Systemic candidate fingerprint finalize
+
+on:
+  push:
+    branches:
+      - feat/systemic-retrieval-mechanics
+    paths:
+      - .github/workflows/systemic-candidate-fingerprint-finalize.yml
+
+permissions:
+  contents: write
+
+jobs:
+  finalize:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+        with:
+          ref: feat/systemic-retrieval-mechanics
+          fetch-depth: 0
+
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1
+        with:
+          python-version: '3.12'
+
+      - name: Add semantic candidate-pool fingerprint
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          path = Path('scripts/run_systemic_retrieval_plan_gate.py')
+          text = path.read_text(encoding='utf-8')
+          if 'def _candidate_pool_fingerprint(' in text:
+              raise SystemExit('candidate pool fingerprint already present')
+          needle = '\ndef _candidate_structure(pool: list[dict[str, Any]]) -> dict[str, Any]:\n'
+          if needle not in text:
+              raise SystemExit('candidate structure insertion point not found')
+          helper = '''
+          def _candidate_pool_fingerprint(pool: list[Any]) -> str:
+              """Hash semantic ranked candidates while ignoring fresh-index identities."""
+              canonical: list[dict[str, Any]] = []
+              for row in pool:
+                  if isinstance(row, dict):
+                      metadata = row.get("metadata") or {}
+                      path = str(
+                          row.get("project_doc_path")
+                          or row.get("source_path")
+                          or row.get("path")
+                          or row.get("source")
+                          or metadata.get("project_doc_path")
+                          or metadata.get("source_path")
+                          or metadata.get("canonical_url")
+                          or ""
+                      )
+                      chunk_index = row.get("chunk_index")
+                      body = str(row.get("text") or row.get("snippet") or "")
+                  else:
+                      metadata = getattr(row, "metadata", {}) or {}
+                      path = str(
+                          metadata.get("project_doc_path")
+                          or metadata.get("source_path")
+                          or metadata.get("canonical_url")
+                          or getattr(row, "source", "")
+                          or ""
+                      )
+                      chunk_index = getattr(row, "chunk_index", None)
+                      body = str(getattr(row, "text", "") or "")
+                  canonical.append(
+                      {
+                          "path": path,
+                          "chunk_index": chunk_index,
+                          "text_sha256": hashlib.sha256(body.encode("utf-8")).hexdigest(),
+                      }
+                  )
+              encoded = json.dumps(
+                  canonical,
+                  ensure_ascii=False,
+                  sort_keys=True,
+                  separators=(",", ":"),
+              ).encode("utf-8")
+              return hashlib.sha256(encoded).hexdigest()
+
+          '''
+          text = text.replace(needle, '\n' + helper + needle.lstrip('\n'), 1)
+          path.write_text(text, encoding='utf-8')
+          PY
+
+      - name: Install test dependencies
+        run: python -m pip install -e '.[dev]'
+
+      - name: Prove fingerprint contract GREEN
+        run: pytest tests/test_systemic_retrieval_candidate_pool.py -q
+
+      - name: Publish fix and remove carrier
+        shell: bash
+        run: |
+          rm .github/workflows/systemic-candidate-fingerprint-finalize.yml
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add scripts/run_systemic_retrieval_plan_gate.py .github/workflows/systemic-candidate-fingerprint-finalize.yml
+          git commit -m 'test: close semantic candidate-pool fingerprint contract'
+          git push origin HEAD:feat/systemic-retrieval-mechanics
