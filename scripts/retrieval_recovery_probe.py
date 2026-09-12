@@ -26,7 +26,7 @@ def _path(item: dict[str, Any]) -> str:
     metadata = item.get("metadata") if isinstance(item.get("metadata"), dict) else {}
     for value in (
         item.get("path"), item.get("source_path"), item.get("project_doc_path"),
-        metadata.get("project_doc_path"), metadata.get("source_path"),
+        item.get("source"), metadata.get("project_doc_path"), metadata.get("source_path"),
     ):
         if isinstance(value, str) and value:
             return value
