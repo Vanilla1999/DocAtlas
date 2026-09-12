@@ -1,0 +1,224 @@
+name: Systemic retrieval final acceptance v2
+
+on:
+  push:
+    branches: [feat/systemic-retrieval-mechanics]
+
+permissions:
+  contents: write
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
+  DOCATLAS_OFFLINE: "1"
+
+jobs:
+  finalize:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with:
+          ref: feat/systemic-retrieval-mechanics
+          fetch-depth: 0
+          persist-credentials: true
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: "3.12"
+      - name: Install dependencies
+        run: python -m pip install -e '.[dev]' 'tiktoken==0.11.0'
+
+      - name: Prove both new contracts are RED first
+        run: |
+          set -euo pipefail
+          if python -m pytest -q tests/docs/test_docs_context_budget_reserve.py; then
+            echo 'budget reserve unexpectedly GREEN before fix' >&2
+            exit 1
+          fi
+          if python -m pytest -q tests/test_systemic_retrieval_candidate_pool.py; then
+            echo 'candidate-pool identity unexpectedly GREEN before fix' >&2
+            exit 1
+          fi
+          echo 'Both systemic acceptance defects reproduced RED.'
+
+      - name: Apply conservative docs-context budget and one pre-hydration boundary
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          projection = Path('docmancer/docs/application/model_visible_projection.py')
+          text = projection.read_text(encoding='utf-8')
+          old = '''def estimate_projection_tokens(value: Any) -> int:\n    size = len(canonical_projection_bytes(value))\n    return max(1, math.ceil(size / 4))\n'''
+          new = '''def estimate_projection_tokens(value: Any) -> int:\n    size = len(canonical_projection_bytes(value))\n    # Project documentation context has a hard model-input envelope and is\n    # JSON/punctuation heavy. Keep the estimator provider-free, but reserve\n    # conservatively instead of assuming four UTF-8 bytes per token. Other\n    # projection kinds retain their long-standing engineering estimate.\n    bytes_per_token = (\n        3\n        if isinstance(value, dict) and value.get("kind") == "docs_context"\n        else 4\n    )\n    return max(1, math.ceil(size / bytes_per_token))\n'''
+          if text.count(old) != 1:
+              raise SystemExit('projection estimator anchor changed')
+          projection.write_text(text.replace(old, new, 1), encoding='utf-8')
+
+          active = Path('docmancer/core/_sqlite_store_active_fts.py')
+          text = active.read_text(encoding='utf-8')
+          text = text.replace('import json\n', '', 1)
+          start = text.find('    def fetch_section_filter_metadata(')
+          end = text.find('    def _ensure_schema(self) -> None:', start)
+          if start < 0 or end < 0:
+              raise SystemExit('active-FTS duplicate metadata boundary not found')
+          active.write_text(text[:start] + text[end:], encoding='utf-8')
+
+          store = Path('docmancer/core/sqlite_store.py')
+          text = store.read_text(encoding='utf-8')
+          if 'from ._sqlite_store_filter_metadata import _SQLiteStoreFilterMetadata' not in text:
+              text = text.replace(
+                  'from ._sqlite_store_active_fts import _SQLiteStoreActiveFTS\n',
+                  'from ._sqlite_store_active_fts import _SQLiteStoreActiveFTS\nfrom ._sqlite_store_filter_metadata import _SQLiteStoreFilterMetadata\n',
+                  1,
+              )
+          text = text.replace(
+              'class SQLiteStore(_SQLiteStoreActiveFTS, _SQLiteStorePart01,',
+              'class SQLiteStore(_SQLiteStoreActiveFTS, _SQLiteStoreFilterMetadata, _SQLiteStorePart01,',
+              1,
+          )
+          text = text.replace(
+              "'docmancer.core._sqlite_store_shared', 'docmancer.core._sqlite_store_active_fts', 'docmancer.core._sqlite_store_part01'",
+              "'docmancer.core._sqlite_store_shared', 'docmancer.core._sqlite_store_active_fts', 'docmancer.core._sqlite_store_filter_metadata', 'docmancer.core._sqlite_store_part01'",
+              1,
+          )
+          store.write_text(text, encoding='utf-8')
+
+          dispatch = Path('docmancer/retrieval/_dispatch_part02.py')
+          text = dispatch.read_text(encoding='utf-8')
+          start = text.find('    def _filter_section_ids_before_hydration(')
+          end = text.find('    def _hydrate_policy_filtered(', start)
+          if start < 0 or end < 0:
+              raise SystemExit('dispatcher pre-hydration boundary not found')
+          replacement = '''    def _filter_section_ids_before_hydration(\n        self, section_ids: list[int], filters: dict | None,\n    ) -> list[int]:\n        if not section_ids or not filters:\n            return section_ids\n        metadata_for = getattr(self.store, "section_filter_metadata_for", None)\n        if not callable(metadata_for):\n            # Lightweight compatibility stores still pass hydrated chunks through\n            # the defense-in-depth post-hydration source-policy filter.\n            return section_ids\n        try:\n            metadata_by_id = metadata_for(section_ids)\n        except Exception as exc:\n            logger.warning(\n                "pre-hydration source-policy metadata failed (%s)",\n                type(exc).__name__,\n            )\n            return []\n        return [\n            section_id\n            for section_id in section_ids\n            if (metadata := metadata_by_id.get(int(section_id))) is not None\n            and metadata_matches_filters(\n                metadata, filters, source=str(metadata.get("source") or ""),\n            )\n        ]\n\n'''
+          dispatch.write_text(text[:start] + replacement + text[end:], encoding='utf-8')
+          PY
+          rm tests/test_prehydration_policy.py
+          rm tests/diagnostic_labels.prehydration_policy.json
+          git diff --check
+
+      - name: Make causal pool identity semantic and finish selector controls
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          path = Path('scripts/run_systemic_retrieval_plan_gate.py')
+          text = path.read_text(encoding='utf-8')
+
+          marker = '''def _no_contextualization(sources: list[dict[str, Any]], **_: Any) -> list[dict[str, Any]]:\n    return deepcopy(sources)\n\n\n'''
+          addition = '''def _candidate_pool_fingerprint(chunks: list[Any]) -> dict[str, Any]:\n    """Compare candidate semantics across fresh indexes, never volatile row IDs."""\n    material = []\n    for chunk in chunks:\n        metadata = getattr(chunk, "metadata", {}) or {}\n        source_path = str(\n            metadata.get("project_doc_path")\n            or metadata.get("source_path")\n            or getattr(chunk, "source", "")\n            or ""\n        )\n        candidate_text = str(getattr(chunk, "text", "") or "")\n        material.append({\n            "source_path": source_path,\n            "chunk_index": int(getattr(chunk, "chunk_index", -1)),\n            "source_class": str(metadata.get("source_class") or ""),\n            "text_sha256": hashlib.sha256(candidate_text.encode("utf-8")).hexdigest(),\n        })\n    encoded = json.dumps(\n        material, ensure_ascii=False, sort_keys=True, separators=(",", ":")\n    ).encode("utf-8")\n    return {"count": len(material), "sha256": hashlib.sha256(encoded).hexdigest()}\n\n\n'''
+          if '_candidate_pool_fingerprint' not in text:
+              if text.count(marker) != 1:
+                  raise SystemExit('candidate-pool fingerprint insertion anchor changed')
+              text = text.replace(marker, marker + addition, 1)
+
+          old = '''    output = work / name\n    shutil.rmtree(output, ignore_errors=True)\n    lane_protocol = _single_variant_protocol(protocol)\n    started_cpu = time.process_time()\n    started_wall = time.perf_counter()\n    with ExitStack() as stack:\n        stack.enter_context(patch.object(evidence, "load_protocol", return_value=(lane_protocol, deepcopy(cases), deepcopy(manifest))))\n        if cap == "off":\n            stack.enter_context(patch.object(RetrievalDispatcher, "_limit_sections_per_source", _no_source_cap))\n        elif cap == "strict":\n            stack.enter_context(patch.object(RetrievalDispatcher, "_limit_sections_per_source", _strict_source_cap))\n        elif cap != "bounded":\n            raise ValueError(f"unknown cap mode: {cap}")\n'''
+          new = '''    output = work / name\n    shutil.rmtree(output, ignore_errors=True)\n    lane_protocol = _single_variant_protocol(protocol)\n    cap_inputs: list[dict[str, Any]] = []\n    original_cap = RetrievalDispatcher._limit_sections_per_source\n\n    def observed_cap(self: Any, chunks: list[Any], *, limit: int | None = None, expand: str | None = None) -> list[Any]:\n        cap_inputs.append(_candidate_pool_fingerprint(chunks))\n        if cap == "off":\n            return _no_source_cap(self, chunks, limit=limit, expand=expand)\n        if cap == "strict":\n            return _strict_source_cap(self, chunks, limit=limit, expand=expand)\n        if cap == "bounded":\n            return original_cap(self, chunks, limit=limit, expand=expand)\n        raise ValueError(f"unknown cap mode: {cap}")\n\n    started_cpu = time.process_time()\n    started_wall = time.perf_counter()\n    with ExitStack() as stack:\n        stack.enter_context(patch.object(evidence, "load_protocol", return_value=(lane_protocol, deepcopy(cases), deepcopy(manifest))))\n        stack.enter_context(patch.object(RetrievalDispatcher, "_limit_sections_per_source", observed_cap))\n'''
+          if text.count(old) != 1:
+              raise SystemExit('run-lane cap patch anchor changed')
+          text = text.replace(old, new, 1)
+
+          old = '''    return {"name": name, "output": output, "summary": summary, "metrics": metrics, "rows": rows}\n'''
+          new = '''    return {"name": name, "output": output, "summary": summary, "metrics": metrics, "rows": rows, "cap_inputs": cap_inputs}\n'''
+          if text.count(old) != 1:
+              raise SystemExit('run-lane return anchor changed')
+          text = text.replace(old, new, 1)
+
+          old = '''    exact_recoveries: list[str] = []\n    beam_recoveries: list[str] = []\n'''
+          new = '''    exact_recoveries: list[str] = []\n    simple_recoveries: list[str] = []\n    beam_recoveries: list[str] = []\n'''
+          if text.count(old) != 1:
+              raise SystemExit('selection recovery list anchor changed')
+          text = text.replace(old, new, 1)
+
+          old = '''        exact = min(exact_candidates, key=lambda item: (item["tokens"], item["sources"], item["indices"]), default=None)\n\n        beam_states: list[tuple[int, ...]] = [()]\n'''
+          new = '''        exact = min(exact_candidates, key=lambda item: (item["tokens"], item["sources"], item["indices"]), default=None)\n\n        simple_success: dict[str, Any] | None = None\n        for size in range(1, min(SELECTION_PACKAGE_LIMIT, len(pool)) + 1):\n            candidate = project(tuple(range(size)))\n            if candidate["sufficient"]:\n                simple_success = candidate\n                break\n\n        beam_states: list[tuple[int, ...]] = [()]\n'''
+          if text.count(old) != 1:
+              raise SystemExit('simple selector insertion anchor changed')
+          text = text.replace(old, new, 1)
+
+          old = '''        if exact is not None:\n            exact_recoveries.append(case_id)\n        if beam_success is not None:\n            beam_recoveries.append(case_id)\n        results.append({"id": case_id, "current_sufficient": False, "pool": _candidate_structure(pool), "exact_recovery": exact, "beam_recovery": beam_success, "enumerated_packages": len(cache)})\n'''
+          new = '''        if exact is not None:\n            exact_recoveries.append(case_id)\n        if simple_success is not None:\n            simple_recoveries.append(case_id)\n        if beam_success is not None:\n            beam_recoveries.append(case_id)\n        results.append({"id": case_id, "current_sufficient": False, "pool": _candidate_structure(pool), "exact_recovery": exact, "simple_recovery": simple_success, "beam_recovery": beam_success, "enumerated_packages": len(cache)})\n'''
+          if text.count(old) != 1:
+              raise SystemExit('selection result anchor changed')
+          text = text.replace(old, new, 1)
+
+          old = '''        "exact_recoveries": exact_recoveries,\n        "beam_recoveries": beam_recoveries,\n        "proxy_exact_gap": sorted(set(exact_recoveries) - set(beam_recoveries)),\n'''
+          new = '''        "exact_recoveries": exact_recoveries,\n        "simple_recoveries": simple_recoveries,\n        "beam_recoveries": beam_recoveries,\n        "exact_simple_gap": sorted(set(exact_recoveries) - set(simple_recoveries)),\n        "proxy_exact_gap": sorted(set(exact_recoveries) - set(beam_recoveries)),\n'''
+          if text.count(old) != 1:
+              raise SystemExit('selection summary anchor changed')
+          text = text.replace(old, new, 1)
+
+          old = '''    current = lanes["cap_on_requal_on"]\n    paired = {name: _paired(current["rows"], lane["rows"], seed=seed, resamples=resamples) for name, lane in lanes.items() if name != "cap_on_requal_on"}\n'''
+          new = '''    current = lanes["cap_on_requal_on"]\n    fixed_pool = {\n        name: {\n            "calls": len(lane["cap_inputs"]),\n            "same_as_current": lane["cap_inputs"] == current["cap_inputs"],\n        }\n        for name, lane in lanes.items()\n    }\n    paired = {name: _paired(current["rows"], lane["rows"], seed=seed, resamples=resamples) for name, lane in lanes.items() if name != "cap_on_requal_on"}\n'''
+          if text.count(old) != 1:
+              raise SystemExit('fixed-pool comparison anchor changed')
+          text = text.replace(old, new, 1)
+
+          old = '''    full80_valid_rows = [row for row in full80["rows"] if "error" not in row]\n    full80_max_tokens = max((int(row.get("size", {}).get("actual_tokens") or 0) for row in full80_valid_rows), default=0)\n'''
+          new = '''    full80_valid_rows = [row for row in full80["rows"] if "error" not in row]\n    full80_budget_rows = [row for row in full80_valid_rows if row.get("answerability") == "within_budget"]\n    full80_budget_max_tokens = max((int(row.get("size", {}).get("actual_tokens") or 0) for row in full80_budget_rows), default=0)\n    full80_all_valid_max_tokens = max((int(row.get("size", {}).get("actual_tokens") or 0) for row in full80_valid_rows), default=0)\n'''
+          if text.count(old) != 1:
+              raise SystemExit('DTO budget scope anchor changed')
+          text = text.replace(old, new, 1)
+
+          text = text.replace(
+              '            "contextualization_control": "same end-to-end call with final snippet expansion disabled",\n',
+              '            "contextualization_control": "same end-to-end call with final snippet expansion disabled",\n            "performance_metrics_frozen": ["process_cpu_seconds", "cpu_seconds_per_case", "latency_seconds.p95"],\n',
+              1,
+          )
+          text = text.replace(
+              '            "max_actual_model_visible_tokens": full80_max_tokens,\n            "actual_full_dto_budget": full80_max_tokens <= MAX_TOKENS,\n',
+              '            "within_budget_max_actual_model_visible_tokens": full80_budget_max_tokens,\n            "all_valid_max_actual_model_visible_tokens_diagnostic": full80_all_valid_max_tokens,\n            "actual_full_dto_budget": full80_budget_max_tokens <= MAX_TOKENS,\n',
+              1,
+          )
+          text = text.replace(
+              '        "causal_2x2": {"cells": cells, "paired_against_current": paired, "difference_in_differences_success_rate": interaction, "interpretation": "Counterfactual diagnostic only; no causal claim extends beyond this fixed exposed corpus."},\n',
+              '        "causal_2x2": {"cells": cells, "paired_against_current": paired, "fixed_pre_cap_candidate_pool": fixed_pool, "difference_in_differences_success_rate": interaction, "interpretation": "Counterfactual diagnostic only; no causal claim extends beyond this fixed exposed corpus."},\n',
+              1,
+          )
+          text = text.replace(
+              '    if full80_max_tokens > MAX_TOKENS:\n        failures.append("full model-visible DTO exceeded the 800-token ceiling")\n',
+              '    if len(full80_budget_rows) != 48:\n        failures.append("within-budget valid DTO inventory changed")\n    if full80_budget_max_tokens > MAX_TOKENS:\n        failures.append("within-budget full model-visible DTO exceeded the 800-token ceiling")\n    if not all(value["same_as_current"] for value in fixed_pool.values()):\n        failures.append("2x2/contextualization lanes did not share the same semantic pre-cap candidate pools")\n',
+              1,
+          )
+          path.write_text(text, encoding='utf-8')
+          PY
+          git diff --check
+
+      - name: GREEN targeted TDD and retrieval regressions
+        run: |
+          python -m pytest -q \
+            tests/docs/test_docs_context_budget_reserve.py \
+            tests/test_systemic_retrieval_candidate_pool.py \
+            tests/test_pre_hydration_source_policy.py \
+            tests/test_retrieval_diversity_policy.py \
+            tests/test_active_fts_projection.py \
+            tests/test_retrieval_features.py \
+            tests/test_query_planning.py \
+            tests/test_public_vector_retrieval.py \
+            tests/docs/test_subject_binding_strength.py \
+            tests/docs/test_project_answer_contract_v2.py \
+            tests/docs/test_project_answer_contract_v3.py \
+            tests/docs/test_question_plan_v4.py
+          python -m compileall -q docmancer tests scripts eval/systemic_retrieval_plan
+          git diff --check
+
+      - name: Run complete systemic acceptance
+        run: |
+          python scripts/run_systemic_retrieval_plan_gate.py \
+            --work /tmp/docatlas-systemic-plan \
+            --report experiments/finalization/PR186_SYSTEMIC_RETRIEVAL_ACCEPTANCE.json
+
+      - name: Publish accepted state and consume every temporary carrier
+        run: |
+          git rm \
+            .github/workflows/systemic-retrieval-finalize-v2.yml \
+            .github/workflows/systemic-retrieval-finalize.yml \
+            .github/workflows/systemic-retrieval-plan-implementation.yml \
+            .github/workflows/systemic-dto-budget-diagnostic.yml \
+            .github/workflows/retrieval-recovery-probe.yml \
+            scripts/retrieval_recovery_probe.py
+          git add -A
+          git diff --cached --check
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git commit -m 'test: record final systemic retrieval acceptance'
+          git push origin HEAD:feat/systemic-retrieval-mechanics
