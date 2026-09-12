@@ -30,11 +30,13 @@ jobs:
         run: |
           set -euo pipefail
           python scripts/run_paraphrase_proofability_gate.py --write
+          python scripts/run_mixed_evidence_provenance_gate.py --write
           python scripts/run_evidence_is_data_gate.py --write
           python scripts/run_p1_agent_truth_closure_gate.py --write
           echo '--- derived report diff ---'
           git diff -- \
             eval/agent_developer_v1/results/paraphrase-proofability.json \
+            eval/agent_developer_v1/results/mixed-evidence-provenance.json \
             eval/agent_developer_v1/results/evidence-is-data.json \
             eval/agent_developer_v1/results/p1-agent-truth-closure.json
       - name: Reject unexpected generated changes
@@ -44,6 +46,7 @@ jobs:
           import subprocess
           expected = {
               'eval/agent_developer_v1/results/paraphrase-proofability.json',
+              'eval/agent_developer_v1/results/mixed-evidence-provenance.json',
               'eval/agent_developer_v1/results/evidence-is-data.json',
               'eval/agent_developer_v1/results/p1-agent-truth-closure.json',
           }
