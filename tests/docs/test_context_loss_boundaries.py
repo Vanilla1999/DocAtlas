@@ -55,6 +55,9 @@ def test_unadmittable_full_candidate_does_not_disable_useful_partial_evidence():
 @pytest.mark.parametrize('query,body', [
     ('retried', 'retry'), ('retry', 'retried'),
     ('copied', 'copy'), ('copy', 'copied'), ('supplied', 'supply'),
+    ('identities', 'identity'), ('identity', 'identities'),
+    ('policies', 'policy'), ('policy', 'policies'),
+    ('dependencies', 'dependency'),
 ])
 def test_regular_inflection_preserves_visible_procedure(query, body):
     result = qualify_evidence(
@@ -66,7 +69,10 @@ def test_regular_inflection_preserves_visible_procedure(query, body):
     assert query in result.trace['body_matched_terms']
 
 
-@pytest.mark.parametrize('query,body', [('retried', 'retry'), ('copied', 'copy')])
+@pytest.mark.parametrize('query,body', [
+    ('retried', 'retry'), ('copied', 'copy'), ('identities', 'identity'),
+    ('policy', 'policies'),
+])
 def test_inflection_never_changes_an_explicit_identifier(query, body):
     result = qualify_evidence(
         {'query_terms': [query], 'exact_terms': [query]},
@@ -243,3 +249,131 @@ def test_one_host_lookup_can_retain_complementary_qualified_body_facts():
     assert {row['snippet'] for row in payload['sources']} == {first, second}
     assert not payload['answer_supported']
     assert 'query-original' not in payload['covered_query_ids']
+
+
+@pytest.mark.parametrize('facts,qualified', [
+    ({}, True), ({'project_identity': 'foreign'}, False),
+    ({'stale': True}, False), ({'risk_flags': ['unsafe']}, False),
+    ({'project_doc_reason': 'roadmap'}, False),
+])
+def test_host_qualification_precedes_window_regardless_of_discovery(facts, qualified):
+    from docmancer.docs.application._project_docs_service_part03 import _qualify_candidate_lookups
+    from docmancer.docs.domain.documentation_query_plan import DocumentationQueryPlan
+    lookup = DocumentationLookup('query-lookup-1', 'Storage compression reduces usage',
+        'host_lookup', relation='host_lookup', forbidden_catalog_roles=('roadmap',))
+    chunk = RetrievedChunk(source='docs/storage.md', chunk_index=0,
+        text='Storage compression reduces disk usage.', score=99,
+        metadata={'project_identity': 'repo', **facts,
+            'retrieval_query_matches': {'query-original': {'qualified': False}},
+            'retrieval_query_ids': ()})
+    result = _qualify_candidate_lookups([chunk], DocumentationQueryPlan('Частный вопрос', (lookup,)),
+        expected_project_identity='repo', lifecycle_intent='current')[0]
+    trace = result.metadata['retrieval_query_matches']['query-lookup-1']
+    assert trace['qualified'] is qualified
+    assert trace['lexical_score'] == 0  # Cross-checking is not a BM25 search hit.
+    assert result.metadata['retrieval_query_matches']['query-original']['qualified'] is False
+    assert 'query-lookup-1' not in chunk.metadata['retrieval_query_matches']
+
+
+def test_cross_lane_qualification_retains_exact_identity_and_discovery_scores():
+    from docmancer.docs.application._project_docs_service_part03 import _qualify_candidate_lookups
+    from docmancer.docs.domain.documentation_query_plan import DocumentationQueryPlan
+    lookup = DocumentationLookup('query-lookup-1', 'Use `storage_mode` for compression', 'host_lookup')
+    chunk = RetrievedChunk(source='docs/storage.md', chunk_index=0,
+        text='Use storage mode for compression.', score=8, metadata={'project_identity': 'repo'})
+    plan = DocumentationQueryPlan('original', (lookup,))
+    result = _qualify_candidate_lookups([chunk], plan,
+        expected_project_identity='repo', lifecycle_intent='current')[0]
+    assert not result.metadata['retrieval_query_matches']['query-lookup-1']['qualified']
+    tagged = _tag_retrieval_query([chunk], lookup.query_id, lookup.text, lookup,
+        expected_project_identity='repo')[0]
+    result = _qualify_candidate_lookups([tagged], plan,
+        expected_project_identity='repo', lifecycle_intent='current')[0]
+    assert result.metadata == tagged.metadata
+
+
+@pytest.mark.parametrize('trigger,witness', [
+    ('the cache expires', 'An expired cache aborts the download.'),
+    ('the connection fails', 'A failed connection aborts the download.'),
+    ('the worker waits', 'A worker that waited aborts the download.'),
+])
+def test_requested_trigger_precedes_topical_role_preference(trigger, witness):
+    from docmancer.docs.application.context_candidate_ranking import _facet_aware_candidates
+    lookup = f'What happens when {trigger} before a download starts?'
+    def source(body, role):
+        return {'path': f'docs/{role}.md', 'snippet': body, 'catalog_role': role,
+            'retrieval_query_matches': {'query-lookup-1': {
+                'qualified': True, 'match_ratio': 0.5,
+                'preferred_catalog_roles': ['runbook']}}}
+    topical = source('Before a download starts, the system checks its configuration.', 'runbook')
+    expected = source(witness, 'api_contract')
+    ranked = _facet_aware_candidates([topical, expected],
+        query_text={'query-original': 'Опиши поведение.', 'query-lookup-1': lookup},
+        required_query_ids={'query-original', 'query-lookup-1'}, host_query_ids={'query-lookup-1'})
+    assert ranked[0] is expected
+    assert expected['retrieval_query_matches']['query-lookup-1']['match_ratio'] == 0.5
+
+
+@pytest.mark.parametrize('body', [
+    '# Cache expires\n\nThe download starts normally.',
+    '[Cache expires](cache.md)\n\nThe download starts normally.',
+])
+def test_condition_preference_never_uses_navigation(body):
+    from docmancer.docs.application.context_candidate_ranking import _condition_body_priority
+    assert _condition_body_priority('What happens when the cache expires?', body) == 0
+
+
+@pytest.mark.parametrize('existing_qualified', [False, True])
+def test_cross_lane_witness_survives_actual_query_window(tmp_path, existing_qualified):
+    from types import SimpleNamespace
+    from docmancer.docs.application.project_docs_service import ProjectDocsService
+    original = 'Describe private deployment'
+    class Agent:
+        config = SimpleNamespace(query=SimpleNamespace(default_limit=1))
+        def query(self, query, *, limit, budget, expand, filters):
+            if query != original:
+                return []
+            return [RetrievedChunk(source=path, chunk_index=0, text=body, score=score,
+                metadata={'project_identity': filters['project_identity'], 'token_estimate': 20})
+                for path, body, score in [
+                    ('docs/overview.md', 'Describe private deployment procedures.'
+                     if existing_qualified else 'Unrelated navigation.', 10),
+                    ('docs/storage.md', 'Storage compression reduces disk usage.', 1)]]
+    class Facade:
+        def _agent_instance(self):
+            return Agent()
+    chunks = ProjectDocsService(Facade()).query_project_docs(str(tmp_path), original,
+        lookup_queries=('Storage compression reduces usage',), limit=1)
+    assert [chunk.source for chunk in chunks] == [
+        'docs/overview.md' if existing_qualified else 'docs/storage.md']
+    assert chunks[0].metadata['retrieval_query_ids'] == (
+        'query-original' if existing_qualified else 'query-lookup-1',)
+
+
+@pytest.mark.parametrize('question,body', [
+    ('How does request validation differ from routing requests?',
+     'The dispatcher routes requests to the selected worker.'),
+    ('What is the difference between selecting records and validating records?',
+     'The validator validates records before storage.'),
+])
+def test_comparison_preserves_named_operation_over_topical_nouns(question, body):
+    from docmancer.docs.application.context_candidate_ranking import _facet_aware_candidates
+    def source(snippet, role):
+        return {'snippet': snippet, 'catalog_role': role,
+            'retrieval_query_matches': {'query-lookup-1': {
+                'qualified': True, 'match_ratio': 0.5, 'preferred_catalog_roles': ['overview']}}}
+    overview = source('Request validation and records are documented here.', 'overview')
+    witness = source(body, 'api_contract')
+    ranked = _facet_aware_candidates([overview, witness], query_text={'query-lookup-1': question},
+        required_query_ids={'query-lookup-1'}, host_query_ids={'query-lookup-1'})
+    assert ranked[0] is witness
+
+
+@pytest.mark.parametrize('body', [
+    '# Routing requests\n\nGeneric request notes.',
+    '[Routing requests](routing.md)\n\nGeneric request notes.',
+])
+def test_comparison_operation_requires_visible_body(body):
+    from docmancer.docs.application.context_candidate_ranking import _comparison_action_priority
+    assert _comparison_action_priority(
+        'How does request validation differ from routing requests?', body) == 0

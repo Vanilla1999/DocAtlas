@@ -60,7 +60,7 @@ def _retrieval_stage_diagnostics(
                     "rejected" if trace.get("qualified") is False else
                     "unclassified"
                 ),
-                "reason": str(trace.get("reason_code") or trace.get("reason") or "unclassified")[:120],
+                "reason": str(trace.get("qualification_reason") or trace.get("reason_code") or trace.get("reason") or "unclassified")[:120],
             })
             if len(outcomes) >= _INTERNAL_DIAGNOSTIC_LIMIT:
                 break
@@ -151,6 +151,36 @@ def _tag_retrieval_query(
         })
         tagged.append(chunk.model_copy(update={"metadata": metadata}))
     return tagged
+
+
+def _qualify_candidate_lookups(
+    chunks: list[Any], plan: DocumentationQueryPlan, *,
+    expected_project_identity: str, lifecycle_intent: str,
+) -> list[Any]:
+    """Check independent public lookups before admission, across discovery lanes.
+
+    No extra retrieval is performed and no original/parent coverage is derived.
+    Existing discovery traces keep their scores; a cross-check has no BM25 score.
+    """
+    lookups = [item for item in plan.queries
+               if item.origin == "host_lookup" and not item.public_parent_query_id]
+    result = []
+    for chunk in chunks:
+        for lookup in lookups:
+            if lookup.query_id in (chunk.metadata or {}).get("retrieval_query_matches", {}):
+                continue
+            chunk = _tag_retrieval_query(
+                [chunk], lookup.query_id, lookup.text, lookup,
+                expected_project_identity=expected_project_identity,
+                lifecycle_intent=lifecycle_intent,
+            )[0]
+            trace = chunk.metadata["retrieval_query_matches"][lookup.query_id]
+            for field in ("bm25_cost", "field_matches", "mode"):
+                trace.pop(field, None)
+            trace.update(lexical_score=0.0, qualification_route="cross_lane_body",
+                         query_term_count=len(trace.get("query_terms") or ()))
+        result.append(chunk)
+    return result
 
 
 class _ProjectDocsServicePart03:
@@ -392,6 +422,15 @@ class _ProjectDocsServicePart03:
                 *queries_by_origin.get("retrieval_hint", []),
             ],
         ])
+        # Recover a wholly unqualified pool without letting additional weak
+        # cross-lane matches displace existing qualified evidence. Visible
+        # projector requalification remains authoritative after admission.
+        if not any((chunk.metadata or {}).get("retrieval_query_ids") for chunk in candidates):
+            candidates = _qualify_candidate_lookups(
+                candidates, documentation_query_plan,
+                expected_project_identity=filters["project_identity"],
+                lifecycle_intent=answer_lifecycle_intent,
+            )
         candidates.sort(
             key=lambda chunk: not bool(
                 (chunk.metadata or {}).get("retrieval_query_ids")

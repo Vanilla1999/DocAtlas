@@ -10,6 +10,7 @@ from docmancer.docs.domain.project_doc_ranking import project_question_lane, pro
 from docmancer.docs.domain.answer_units import extract_answer_units, _NEGATION_RE
 from docmancer.docs.domain.normative_language import _FORBIDDEN_RE
 from docmancer.docs.domain.evidence_qualification import _visible_term_present, qualify_evidence
+from docmancer.docs.domain.question_semantic_frames import match_comparison_frame
 
 
 def _context_rank(
@@ -158,6 +159,10 @@ def _facet_aware_candidates(
             rank[3] if exact_count else 0.0,
             exact_count,
             len(_fully_matched_query_ids((source,)) & required_query_ids),
+            max((_condition_body_priority(query_text.get(key, ''), str(source.get('snippet') or ''))
+                 for key in qualified_ids & required_query_ids), default=0),
+            max((_comparison_action_priority(query_text.get(key, ''), str(source.get('snippet') or ''))
+                 for key in qualified_ids & required_query_ids), default=0),
             role_tiebreak,
             len(qualified_ids & required_query_ids),
             original_body_overlap,
@@ -206,3 +211,43 @@ def _fully_matched_query_ids(sources: Any) -> set[str]:
         if isinstance(trace, dict) and trace.get("qualified") is True
         and (trace.get("match_ratio") == 1.0 or trace.get("mode") == "exact_path")
     }
+
+
+def _condition_body_priority(question: str, snippet: str) -> int:
+    """Keep the stated triggering event ahead of a merely topical procedure.
+
+    This bounded preference does not qualify a source or infer an outcome.
+    Temporal ordering stays in the original question and visible evidence.
+    """
+    condition = re.fullmatch(r"\s*what\s+happens\s+(?:when|if)\s+(.+?)[?]?\s*", question, re.I)
+    if not condition:
+        return 0
+    event = re.split(r"\b(?:before|after|while)\b", condition[1], maxsplit=1, flags=re.I)[0]
+    terms = _query_terms((event,))
+    trace = qualify_evidence(
+        {"query_terms": sorted(terms)}, query_id="condition-preference",
+        visible_text=snippet, evidence_text=snippet,
+    ).trace
+    return int(len(terms) >= 2 and terms <= set(trace.get("body_matched_terms") or ()))
+
+
+def _comparison_action_priority(question: str, snippet: str) -> int:
+    """Prefer the named operation in a comparison over its surrounding nouns.
+
+    Reuse the domain comparison frame. This only orders already qualified
+    evidence; mentioning an operation cannot prove the requested distinction.
+    """
+    frame = match_comparison_frame(question)
+    if frame is None:
+        return 0
+    actions = {
+        match[0].casefold() for side in (frame.left, frame.right)
+        if (match := re.match(r"[a-z]{4,}ing\b", side, re.I))
+    }
+    if not actions:
+        return 0
+    trace = qualify_evidence(
+        {"query_terms": sorted(actions)}, query_id="comparison-preference",
+        visible_text=snippet, evidence_text=snippet,
+    ).trace
+    return len(actions & set(trace.get("body_matched_terms") or ()))
