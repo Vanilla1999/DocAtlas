@@ -35,7 +35,7 @@ jobs:
       - name: Boundary tests and prior research tests
         run: |
           set -o pipefail
-          python -m pytest experiments/grounded-partial/bounded-relaxation/test_relaxation.py experiments/grounded-partial/section-scope/test_section_scope.py experiments/grounded-partial/contextual-late/test_factorial.py experiments/grounded-partial/semantic-selection/test_evaluate.py -q 2>&1 | tee "$RUNNER_TEMP/bounded-relaxation/tests.log"
+          python -m pytest experiments/grounded-partial/bounded-relaxation experiments/grounded-partial/section-scope/test_section_scope.py experiments/grounded-partial/contextual-late/test_factorial.py experiments/grounded-partial/semantic-selection/test_evaluate.py -q 2>&1 | tee "$RUNNER_TEMP/bounded-relaxation/tests.log"
       - name: Restore frozen data and verify native80
         run: |
           set -o pipefail

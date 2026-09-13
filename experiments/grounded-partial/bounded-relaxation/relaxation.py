@@ -7,7 +7,6 @@ import re
 from unittest.mock import patch
 import section_scope
 from section_scope import ScopeBinder, present, explicit_owners
-from docmancer.docs.domain.evidence_qualification import _visible_term_present
 
 BASE_LABEL = section_scope.label
 MODES = {"catalog": (True, False, False), "spelling": (False, True, False),
@@ -116,12 +115,19 @@ class RelaxedBinder(ScopeBinder):
         extra = {t for t in terms if contextual(t)}
         single_definition = (self.one_anchor and len(body) == 1 and bool(extra - body)
                              and definition_anchor(next(iter(body)), source['snippet'], proof))
+        old_matched = set(before.trace.get('matched_terms', ()))
+        catalog_gain = any(from_catalog(t) and t not in old_matched for t in terms)
+        spelling_gain = any(name.casefold() in terms and name.casefold() not in old_matched
+                            for name, _ in proof.get('spellings', ()))
+        # An unrelated heading-only ratio rescue is NOT one of our interventions.
+        # Require an actual enabled feature, not just a nonempty heading chain.
+        if not (catalog_gain or spelling_gain or single_definition):
+            return before, None
         if len(body) < 2 and not single_definition:
             return before, None
-        matched = set(before.trace.get('matched_terms', ())) | extra
+        matched = old_matched | extra
         if len(matched) < 2:
             return before, None
-        # Preserve existing exact-match semantics outside the explicit bindings.
         missing = [t for t in before.trace.get('missing_exact_terms', ()) if not contextual(t)]
         parent_missing = [t for t in before.trace.get('missing_parent_exact_terms', ()) if not contextual(t)]
         ratio = len(matched) / len(terms)
@@ -133,8 +139,8 @@ class RelaxedBinder(ScopeBinder):
                      matched_terms=[t for t in terms if t in matched], matched_term_count=len(matched),
                      match_ratio=round(ratio, 4), missing_exact_terms=missing,
                      missing_parent_exact_terms=parent_missing, heading_context_used=True,
-                     catalog_context_used=any(from_catalog(t) for t in terms),
-                     spelling_context_used=bool(proof['spellings']), one_anchor_used=single_definition)
+                     catalog_context_used=catalog_gain, spelling_context_used=spelling_gain,
+                     one_anchor_used=single_definition)
         return replace(before, qualified=True, covered_query_ids=(kwargs['query_id'],),
                        coverage_kind='derived' if probe.get('coverage_kind') == 'derived' else 'direct',
                        reason='bounded_contextual_relevance', trace=trace), proof
@@ -142,6 +148,5 @@ class RelaxedBinder(ScopeBinder):
 
 @contextmanager
 def installed(binder, events):
-    # Reuse the already-tested every-window instrumentation and restore on exit.
     with patch.object(section_scope, 'label', label), section_scope.installed(binder, 'scope_requalify', events):
         yield
