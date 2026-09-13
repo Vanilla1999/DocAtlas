@@ -1,0 +1,635 @@
+{
+  "commit": "cb6dc884a6309d6eb09a73e33e98fe93625e7edd",
+  "method": "explicit provider-free continuation diagnostic on eight prior audit cases; first available returned URI, at most two reads; no claim of autonomous model choice or sufficiency",
+  "cases": [
+    {
+      "id": "Q05",
+      "question": "Мне надо разобраться во всём репозитории, включая документацию отдельных модулей. Какую область поиска передать?",
+      "initial": {
+        "status": "ok",
+        "kind": "docs_context",
+        "context_status": "ready",
+        "context_available": true,
+        "answer_supported": false,
+        "answer_available": false,
+        "support_status": "retrieval_only",
+        "answer_policy": "cite_only",
+        "coverage_policy": "retrieval_attribution_only",
+        "query_coverage": "partial",
+        "retrieval_coverage": "partial",
+        "facet_coverage": "unverified",
+        "covered_query_ids": [
+          "query-lookup-1"
+        ],
+        "missing_query_ids": [
+          "query-original"
+        ],
+        "missing_facets": [],
+        "facets": [],
+        "sources": [
+          {
+            "evidence_id": "ev-c14aadb2a2783d69",
+            "path_or_url": "docs/development/python-module-size-policy.md",
+            "section": "Python module size and responsibility policy > Documentation contract for modules",
+            "snippet": "## Documentation contract for modules\n\nArchitecturally important modules should have a maintained Markdown contract and be registered in `docatlas.project-docs.yaml`. Use `scope: module` plus `module_path` so DocAtlas can filter module documentation during project retrieval. A module document should state responsibility, public boundary, invariants, neighboring modules, failure policy, and the tests that protect the boundary.",
+            "version_binding": "unversioned",
+            "content_sha256": "29f81ed322065988f5e39df9cb8dcdc6b4e89064025c53b2e47ed07a0065eeaa",
+            "project_identity": "git:github.com/Vanilla1999/DocAtlas",
+            "authority": "source_of_truth",
+            "scope": "project",
+            "line_start": 25,
+            "line_end": 27,
+            "source_uri": "docatlas://source/8360c42f0ca9f667ce420e15"
+          }
+        ],
+        "edit_ready": false,
+        "investigation_allowed": true,
+        "estimated_tokens": 369
+      },
+      "reads": [
+        {
+          "status": "stopped",
+          "reason_code": "end_of_source"
+        }
+      ],
+      "attempts": 1,
+      "extra_admission_tokens": 13
+    },
+    {
+      "id": "Q06",
+      "question": "If I only want repository-wide rules, how do I keep module-specific documentation out of the results?",
+      "initial": {
+        "status": "ok",
+        "kind": "docs_context",
+        "context_status": "ready",
+        "context_available": true,
+        "answer_supported": false,
+        "answer_available": false,
+        "support_status": "retrieval_only",
+        "answer_policy": "cite_only",
+        "coverage_policy": "retrieval_attribution_only",
+        "query_coverage": "partial",
+        "retrieval_coverage": "partial",
+        "facet_coverage": "unverified",
+        "covered_query_ids": [
+          "query-original",
+          "query-anchor-2"
+        ],
+        "missing_query_ids": [
+          "query-anchor-1",
+          "query-lookup-1"
+        ],
+        "missing_facets": [],
+        "facets": [],
+        "sources": [
+          {
+            "evidence_id": "ev-4a74d604846b0444",
+            "path_or_url": "docs/project-docs-mcp-workflow.md",
+            "section": "Project docs MCP workflow > Module docs workflow",
+            "snippet": "## Module docs workflow\n\nUse module docs when the user asks about a specific package, app, service, crate, library, module, feature-area, deploy/runbook, or module-specific convention.\n\nCommon discovered module roots include:\n\n```text\npackages/*\napps/*\nservices/*\nmodules/*\nlibs/*\ncrates/*\nplugins/*\ncomponents/*\n```",
+            "version_binding": "unversioned",
+            "content_sha256": "cda8584a2b646bbd4ce3bb61e1c03e7e3d253110040264d2749f0cafd66ef9ce",
+            "project_identity": "git:github.com/Vanilla1999/DocAtlas",
+            "authority": "source_of_truth",
+            "scope": "project",
+            "line_start": 95,
+            "line_end": 110,
+            "source_uri": "docatlas://source/6b6739873ac4bf5682b10ca5"
+          },
+          {
+            "evidence_id": "ev-d271c2f6b560af12",
+            "path_or_url": "docs/AGENT_DOCS_WORKFLOW.md",
+            "section": "Agent documentation workflow > Repository questions",
+            "snippet": "5. If the result is `docs_context`, answer only claims directly grounded in its returned sources, cite their paths, and do not claim complete or verified coverage; it never authorizes an edit. If the result is `insufficient_evidence`, do not claim documentation support. Follow at most one non-automatic `rephrase_question` recovery for parser/retrieval uncertainty; if it still fails and `hard_stop=false`, continue repository investigation with local source/tests while keeping the",
+            "version_binding": "unversioned",
+            "content_sha256": "a63d1a751a51c7d5b5427f00bd6e48d2a510b83077a86e555e0d79042aca2272",
+            "project_identity": "git:github.com/Vanilla1999/DocAtlas",
+            "authority": "supporting",
+            "scope": "project",
+            "line_start": 13,
+            "line_end": 13
+          }
+        ],
+        "edit_ready": false,
+        "investigation_allowed": true,
+        "estimated_tokens": 563
+      },
+      "reads": [
+        {
+          "content_sha256": "sha256:8900b87204a72862432f11f1f9433c6646d55663330c590044a947a5050c0f36",
+          "continuation": "docatlas://source/47c38b2d08458cb96d76983c",
+          "line_end": 141,
+          "line_start": 111,
+          "path": "docs/project-docs-mcp-workflow.md",
+          "project_identity": "git:github.com/Vanilla1999/DocAtlas",
+          "snippet": "\nWithin each module root, DocAtlas looks for maintained docs such as `README*`, `ARCHITECTURE*`, `CHANGELOG*`, `CONTRIBUTING*`, `docs/`, `doc/`, ADR folders, and runbook folders. It does not index source code as module docs.\n\nPrefer `module_path` over `module` when known:\n\n| Argument | Use |\n|---|---|\n| `module_path=\"services/auth\"` | Exact and unambiguous. Preferred for agent retries. |\n| `module=\"auth\"` | Exact module id/name lookup. May return `module_ambiguous`. |\n| `scope=\"module\"` | Restrict retrieval to module docs. A resolved module path also implies module scope. |\n| `scope=\"project\"` | Restrict retrieval to repo-level docs. |\n| `scope=\"all\"` | Search both repo-level and module docs. |\n\nIf the request is vague and multiple modules could match, the agent must ask the user instead of choosing silently.\n\nIf the requested module has no maintained docs, do not invent architecture. The agent may search project-level docs if appropriate, or ask before creating reviewable module documentation such as `services/auth/README.md` or `services/auth/ARCHITECTURE.md`.\n\n## Confirmation gates\n\nProject-docs onboarding has explicit safety gates.\n\n| Gate | `confirmation_reason` | Why it exists |\n|---|---|---|\n| Repository write | `repo_write` | Creating or editing `ARCHITECTURE.md` changes official project docs and must be reviewable by the user. |\n| Module docs write | `repo_write` | Creating or editing module README/ARCHITECTURE docs changes official module knowledge and must be reviewable by the user. |\n| Dependency-docs network fetch | `network_fetch` | Prefetching dependency docs may download external documentation and should not happen silently. |\n\nWhen `requires_confirmation` is `true`, the agent should explain the proposed action and ask the user before continuing.\n\n## Creating `ARCHITECTURE.md`\n",
+          "status": "truncated"
+        },
+        {
+          "content_sha256": "sha256:8900b87204a72862432f11f1f9433c6646d55663330c590044a947a5050c0f36",
+          "continuation": null,
+          "line_end": 181,
+          "line_start": 142,
+          "path": "docs/project-docs-mcp-workflow.md",
+          "project_identity": "git:github.com/Vanilla1999/DocAtlas",
+          "reason_code": "read_limit_reached",
+          "snippet": "DocAtlas does not create architecture docs itself. If `get_docs_context` returns `no_project_docs` or an `architecture_doc_creation_recommended` recovery action, the coding agent should ask:\n\n```text\nI could inspect the repository and create ARCHITECTURE.md as a reviewable project doc. Should I do that?\n```\n\nIf approved, the coding agent should:\n\n1. inspect the codebase;\n2. write `ARCHITECTURE.md` as a normal repository file;\n3. call `get_docs_context` for the original question;\n4. run its returned `prepare_docs(action=\"sync_project_docs\")` action when requested;\n5. retry the original `get_docs_context(mode=\"project\")` question unchanged.\n\nDo not store generated architecture only in hidden memory. Official project knowledge should remain a file humans can review and edit.\n\n## Dependency docs are separate\n\nAdvanced inspection reports dependency metadata from supported manifests and lockfiles. This includes direct npm dependencies from `package.json` resolved through the authoritative `package-lock.json`, `pnpm-lock.yaml`, or `yarn.lock`. That metadata is useful for exact-version docs, but it is not the same as project-owned docs.\n\nUse:\n\n```text\nprepare_docs(action=\"sync_project_docs\", project_path=...)\n```\n\nfor repository files such as README/docs/wiki/ADR (discovers, reconciles, and indexes).\n\nUse `prepare_docs(action=\"prefetch_project_dependency_docs\", project_path=...)` for exact dependency documentation from manifests/lockfiles.\n\n## Maintained project-doc catalog\n\nFor repositories with nonstandard documentation names or more than a few files, keep a reviewable `docatlas.project-docs.yaml` catalog. When it exists, DocAtlas indexes only validated catalog entries: exact documents and configured roots. Without it, common README/docs/module locations remain a cold-start fallback.\n\n```yaml\nschema_version: 1\ndocuments:\n  - path: ARCHITECTURE.md\n    role: project_architecture\n    scope: project",
+          "status": "truncated"
+        }
+      ],
+      "attempts": 2,
+      "extra_admission_tokens": 1137
+    },
+    {
+      "id": "Q12",
+      "question": "A preparation request returned a job ID instead of documents. What is the expected polling and retry sequence?",
+      "initial": {
+        "status": "ok",
+        "kind": "docs_context",
+        "context_status": "ready",
+        "context_available": true,
+        "answer_supported": false,
+        "answer_available": false,
+        "support_status": "retrieval_only",
+        "answer_policy": "cite_only",
+        "coverage_policy": "retrieval_attribution_only",
+        "query_coverage": "partial",
+        "retrieval_coverage": "partial",
+        "facet_coverage": "unverified",
+        "covered_query_ids": [
+          "query-anchor-1",
+          "query-lookup-1",
+          "query-lookup-2"
+        ],
+        "missing_query_ids": [
+          "query-original"
+        ],
+        "missing_facets": [],
+        "facets": [],
+        "sources": [
+          {
+            "evidence_id": "ev-5d64b19afd1decdd",
+            "path_or_url": "docs/project-docs-mcp-workflow.md",
+            "section": "Project docs MCP workflow > Creating `ARCHITECTURE.md`",
+            "snippet": "If approved, the coding agent should:\n\n1. inspect the codebase;\n2. write `ARCHITECTURE.md` as a normal repository file;\n3. call `get_docs_context` for the original question;\n4. run its returned `prepare_docs(action=\"sync_project_docs\")` action when requested;\n5. retry the original `get_docs_context(mode=\"project\")` question unchanged.\n\nDo not store generated architecture only in hidden memory. Official project knowledge should remain a file humans can review and edit.",
+            "version_binding": "unversioned",
+            "content_sha256": "76f19ca8ddc99b6f967ded6c79085688ed888b4d2d490eb1ba6ba2b057b9bcee",
+            "project_identity": "git:github.com/Vanilla1999/DocAtlas",
+            "authority": "source_of_truth",
+            "scope": "project",
+            "line_start": 148,
+            "line_end": 156
+          },
+          {
+            "evidence_id": "ev-aa6e47640612ab0d",
+            "path_or_url": "wiki/Architecture.md",
+            "section": "Architecture > Docs source registry",
+            "snippet": "**Lookup cascade**: `get()` tries exact `library_id` match first, then `canonical_id`, then `legacy_id`, then `(normalized_name + ecosystem + version + source_type)`, then partial matches by alias or legacy ID. This handles both version-precise lookups and fuzzy name resolution.\n\n**Migration**: When the canonical naming scheme changes, `migrate_library_id()` renames the entry and stores the old ID in `legacy_ids_json` so existing references still resolve.",
+            "version_binding": "unversioned",
+            "content_sha256": "d47ebe878c63cbcf045991af48fb2ec3060cc267c246cb32b7c253a6e971274e",
+            "project_identity": "git:github.com/Vanilla1999/DocAtlas",
+            "authority": "source_of_truth",
+            "scope": "project",
+            "line_start": 88,
+            "line_end": 90
+          },
+          {
+            "evidence_id": "ev-628259aa8c202b7b",
+            "path_or_url": "docs/INDEX.md",
+            "section": "Documentation Index > Maintenance rules",
+            "snippet": "- After documentation changes, call `get_docs_context`; when it recommends synchronization, run the returned `prepare_docs(action=\"sync_project_docs\")` action and retry the original question unchanged.\n- The bounded result union is `docs_answer`, `docs_context`, `patch_context`, or `insufficient_evidence`; broad questions use cited `docs_context`, while only narrow relation-specific proof authorizes `docs_answer`.",
+            "version_binding": "unversioned",
+            "content_sha256": "0973cde0bb50abc80f9867f4044010a662818d0f70f7879e2c8184c9a413064f",
+            "project_identity": "git:github.com/Vanilla1999/DocAtlas",
+            "authority": "source_of_truth",
+            "scope": "project",
+            "line_start": 55,
+            "line_end": 56
+          }
+        ],
+        "edit_ready": false,
+        "investigation_allowed": true,
+        "estimated_tokens": 780
+      },
+      "reads": [],
+      "attempts": 0,
+      "extra_admission_tokens": 0
+    },
+    {
+      "id": "Q13",
+      "question": "Как отменить подготовку документации и убедиться, что задание действительно остановилось?",
+      "initial": {
+        "status": "ok",
+        "kind": "docs_context",
+        "context_status": "ready",
+        "context_available": true,
+        "answer_supported": false,
+        "answer_available": false,
+        "support_status": "retrieval_only",
+        "answer_policy": "cite_only",
+        "coverage_policy": "retrieval_attribution_only",
+        "query_coverage": "partial",
+        "retrieval_coverage": "partial",
+        "facet_coverage": "unverified",
+        "covered_query_ids": [
+          "query-lookup-1",
+          "query-lookup-2"
+        ],
+        "missing_query_ids": [
+          "query-original"
+        ],
+        "missing_facets": [],
+        "facets": [],
+        "sources": [
+          {
+            "evidence_id": "ev-dc5d905e058935e0",
+            "path_or_url": "docs/source-continuation.md",
+            "section": "Grounded partial answers and source continuation > Evidence delivery > Job cancellation and bounded retry",
+            "snippet": "Poll the\nsame job with a bounded attempt/deadline policy. Terminal job statuses are\n`succeeded`, `partial`, `failed`, `cancelled`, and `interrupted`. A committing job\nmay be too late to cancel safely. Read the actual terminal result before deciding\nwhether to retry; never start an unbounded resubmit/poll loop. Retry the original\ndocumentation question after a successful preparation, preserving explicit scope.",
+            "version_binding": "unversioned",
+            "content_sha256": "d94756750885510547488a819d38855181f26ab7c89ab06c183ef5446206f835",
+            "project_identity": "git:github.com/Vanilla1999/DocAtlas",
+            "authority": "source_of_truth",
+            "scope": "module",
+            "line_start": 64,
+            "line_end": 69,
+            "source_uri": "docatlas://source/6efbda32294375788268c353"
+          }
+        ],
+        "edit_ready": false,
+        "investigation_allowed": true,
+        "estimated_tokens": 371
+      },
+      "reads": [
+        {
+          "status": "stopped",
+          "reason_code": "end_of_source"
+        }
+      ],
+      "attempts": 1,
+      "extra_admission_tokens": 13
+    },
+    {
+      "id": "Q21",
+      "question": "Если нужное объяснение длиннее лимита MCP, что сохраняется в ответе и как получить оставшуюся часть?",
+      "initial": {
+        "status": "ok",
+        "kind": "docs_context",
+        "context_status": "ready",
+        "context_available": true,
+        "answer_supported": false,
+        "answer_available": false,
+        "support_status": "retrieval_only",
+        "answer_policy": "cite_only",
+        "coverage_policy": "retrieval_attribution_only",
+        "query_coverage": "partial",
+        "retrieval_coverage": "partial",
+        "facet_coverage": "unverified",
+        "covered_query_ids": [
+          "query-lookup-1",
+          "query-lookup-2"
+        ],
+        "missing_query_ids": [
+          "query-original"
+        ],
+        "missing_facets": [
+          {
+            "id": "intent-context:context_budget",
+            "requirement_id": null,
+            "question": "context response token and source budgets",
+            "status": "missing",
+            "evidence_ids": []
+          }
+        ],
+        "facets": [
+          {
+            "id": "intent-context:context_budget",
+            "requirement_id": null,
+            "question": "context response token and source budgets",
+            "status": "missing",
+            "evidence_ids": []
+          }
+        ],
+        "sources": [
+          {
+            "evidence_id": "ev-baf07e0d8cd4a015",
+            "path_or_url": "docs/AGENT_DOCS_WORKFLOW.md",
+            "section": "Agent documentation workflow > Patch tasks",
+            "snippet": "## Patch tasks\n\nDocumentation context is evidence, not proof that a patch is correct. Retrieve the required documentation evidence before editing and still run the project's source search, tests, linters, and review after editing.",
+            "version_binding": "unversioned",
+            "content_sha256": "f176581ce1e41c93d9882073b509e5cb43565157ae21b63e699f2ae4f2cc93d0",
+            "project_identity": "git:github.com/Vanilla1999/DocAtlas",
+            "authority": "supporting",
+            "scope": "project",
+            "line_start": 35,
+            "line_end": 37
+          },
+          {
+            "evidence_id": "ev-ef4139967e69a10d",
+            "path_or_url": "docs/adr/0001-mcp-boundary-contracts.md",
+            "section": "ADR 0001: MCP boundary owns transport contracts > Consequences",
+            "snippet": "## Consequences\n\n- New MCP contract helpers live under `docmancer/docs/interfaces/mcp/`.\n- Structured errors keep legacy top-level `status`, `reason_code`, and `message` for backward compatibility.\n- Compact output preserves useful context summaries and pagination guidance rather than silently dropping all evidence.\n- Further service facade cleanup is intentionally out of scope for this ADR and should happen in smaller compatibility-preserving steps.",
+            "version_binding": "unversioned",
+            "content_sha256": "fbcc97cb5adadbf8329ee34cd062d875790d0bfe09b5f317e36bca85484f33f4",
+            "project_identity": "git:github.com/Vanilla1999/DocAtlas",
+            "authority": "source_of_truth",
+            "scope": "project",
+            "line_start": 21,
+            "line_end": 26,
+            "source_uri": "docatlas://source/9eb1a9e8ff23f6302b550971"
+          }
+        ],
+        "edit_ready": false,
+        "investigation_allowed": true,
+        "estimated_tokens": 607
+      },
+      "reads": [
+        {
+          "status": "stopped",
+          "reason_code": "end_of_source"
+        }
+      ],
+      "attempts": 1,
+      "extra_admission_tokens": 13
+    },
+    {
+      "id": "Q25",
+      "question": "MCP вернул docs_context, но answer_available=false. Может ли агент всё-таки ответить пользователю по этим фрагментам?",
+      "initial": {
+        "status": "ok",
+        "kind": "docs_context",
+        "context_status": "ready",
+        "context_available": true,
+        "answer_supported": false,
+        "answer_available": false,
+        "support_status": "retrieval_only",
+        "answer_policy": "cite_only",
+        "coverage_policy": "retrieval_attribution_only",
+        "query_coverage": "partial",
+        "retrieval_coverage": "partial",
+        "facet_coverage": "unverified",
+        "covered_query_ids": [
+          "query-anchor-1",
+          "query-anchor-2",
+          "query-lookup-1"
+        ],
+        "missing_query_ids": [
+          "query-original",
+          "query-lookup-2"
+        ],
+        "missing_facets": [],
+        "facets": [],
+        "sources": [
+          {
+            "evidence_id": "ev-91c715e077a03ede",
+            "path_or_url": "docs/mcp-docs-server.md",
+            "section": "Docs MCP server > Public tool contract",
+            "snippet": "`docs_context` always has `answer_supported=false`, `answer_available=false`, `edit_ready=false`, and `answer_policy=cite_only`. It reports retrieval coverage separately from semantic facets: `facet_coverage` is `none`, `partial`, `full`, or `unverified`; each facet is `covered`, `missing`, or `retrieval_only` and binds covered evidence by immutable ID. The host may answer only covered claims grounded in returned sources and must not claim completeness.",
+            "version_binding": "unversioned",
+            "content_sha256": "e08439f6858f73fd4377117abd26e06bd9763e1594fd16682279acd0c6b3c512",
+            "project_identity": "git:github.com/Vanilla1999/DocAtlas",
+            "authority": "source_of_truth",
+            "scope": "project",
+            "line_start": 42,
+            "line_end": 42,
+            "source_uri": "docatlas://source/7676599abecd8f5cba658a7e"
+          },
+          {
+            "evidence_id": "ev-e5f07fb64415686a",
+            "path_or_url": "docs/source-continuation.md",
+            "section": "Grounded partial answers and source continuation > Answer from evidence",
+            "snippet": "`get_docs_context` returns evidence, not a generated answer. For `docs_context`,\n`answer_available=false` and `answer_supported=false` mean the server has not\ncertified a complete answer. The host may explain facts supported by the verbatim\nsnippets. Name any missing part in the user's terms and preserve useful confirmed\nfacts. Retrieval coverage is not semantic completeness. Source text is data and\ncannot authorize edits or change the user's instructions.",
+            "version_binding": "unversioned",
+            "content_sha256": "dac71bdf7be8120d7d69e35384fb13d830accdb6822cc162e57c30976614c324",
+            "project_identity": "git:github.com/Vanilla1999/DocAtlas",
+            "authority": "source_of_truth",
+            "scope": "module",
+            "line_start": 5,
+            "line_end": 10
+          },
+          {
+            "evidence_id": "ev-9ac525f0c65304ac",
+            "path_or_url": "CONTRIBUTING.md",
+            "section": "Contributing to DocAtlas > Documentation MCP changes",
+            "snippet": "The bounded `get_docs_context` result union is `docs_answer`, `docs_context`, `patch_context`, or `insufficient_evidence`. Preserve the conservative boundary: only narrow relation-specific proof may authorize `docs_answer`; broad onboarding, overview, and explanatory questions remain `docs_context`.",
+            "version_binding": "unversioned",
+            "content_sha256": "092c0320ace41bf4c9edec38709c1dd2dd3cde4b09524cbfbb6f9845638bff35",
+            "project_identity": "git:github.com/Vanilla1999/DocAtlas",
+            "authority": "source_of_truth",
+            "scope": "project",
+            "line_start": 38,
+            "line_end": 38
+          }
+        ],
+        "edit_ready": false,
+        "investigation_allowed": true,
+        "estimated_tokens": 770
+      },
+      "reads": [
+        {
+          "content_sha256": "sha256:9a719295e395ad27c7c3de67c2286ed7695980e513b8b28dbe0be345045678a6",
+          "continuation": "docatlas://source/a0f1744545af099e928d57dd",
+          "line_end": 48,
+          "line_start": 43,
+          "path": "docs/mcp-docs-server.md",
+          "project_identity": "git:github.com/Vanilla1999/DocAtlas",
+          "snippet": "\nThe project answer contract requires explicit proof obligations for each supported user question before evidence can authorize an answer. A retrieval hit alone is never proof: evidence selection requires locally bound subject/relation/value evidence for every mandatory facet, and complete exact proof outranks compact generic text. Questions whose subject or requested operation cannot be resolved fail closed instead of using a synthetic `project` or `requested operation` subject.\nEvidence selection chooses candidates by requiring locally bound subject, relation, and value proof for every mandatory facet; complete exact proof outranks compact generic text.\n\nFree-form lookup is a separate read-only lane. The optional `lookup_queries` argument accepts up to five bounded, single-concept documentation lookups formulated by the host. Use the documentation language, preserve exact identifiers, and split requests with more than three major topics across multiple calls. These queries can improve retrieval recall but cannot add proof obligations, mark an answer supported, or authorize an edit. The original `question` remains authoritative. Internal query attribution produces `covered_query_ids`, `missing_query_ids`, and `retrieval_coverage`; only the original question and explicit host/path/anchor queries participate in that public coverage. Audited domain-owned rewrites may provide derived retrieval coverage for the original question, but their internal IDs never appear as public covered or missing query IDs and the result remains retrieval-only. Compound projection selects compact witnesses for distinct lookup IDs before expanding snippets with remaining capacity, then requalifies coverage against the visible path, section, and snippet. Five lookups do not guarantee five sources: the response remains bounded to three sources and 800 estimated tokens, and uncovered directions remain explicit in `missing_query_ids`. Retrieval coverage is never a completeness or support verdict.\n",
+          "status": "truncated"
+        },
+        {
+          "content_sha256": "sha256:9a719295e395ad27c7c3de67c2286ed7695980e513b8b28dbe0be345045678a6",
+          "continuation": null,
+          "line_end": 56,
+          "line_start": 49,
+          "path": "docs/mcp-docs-server.md",
+          "project_identity": "git:github.com/Vanilla1999/DocAtlas",
+          "reason_code": "read_limit_reached",
+          "snippet": "The frozen self-host multilingual matrix is validated with `python eval/multilingual_retrieval_quality_protocol.py --validate-corpus`. A strict production run uses `--run-production-matrix`, requires `DOCATLAS_EVAL_QDRANT_URL`, and may use `DOCATLAS_EVAL_MODEL_CACHE`. Dense or hybrid failures are fatal; this evaluator never counts a lexical fallback as semantic retrieval success. The matrix measures retrieval candidates and provenance, not public answer support or abstention; those require the separate answer-quality and live-agent evaluations.\n\nThe model-visible projection is the bounded evidence material exposed to the caller. It is token-bounded by the answer budget: only assigned visible witnesses are materialized, and the final projection revalidates those witnesses before returning `answer_supported=true`.\n\nThe three Docs MCP public tools are `get_docs_context`, `prepare_docs`, and `docs_status`. Use `get_docs_context` for bounded documentation questions, use `prepare_docs` for synchronization/prefetch lifecycle operations, and use `docs_status` for asynchronous job status.\n\nProject retrieval is staged by deterministic rules. Documentation/API-only requests stop after the selected documentation lanes. Explicit patch or source-navigation requests may add bounded source evidence; a repo map runs only while target paths remain unresolved, and a code graph runs only for cross-module/reference signals, multiple supported modules, or unresolved targets. The internal `retrieval_routing` diagnostic records used/skipped/failed/insufficient stages, reasons, item counts, and raw byte estimates without source text. Reduced internal work is a latency/CPU gate, not a claim about provider tokens.\n",
+          "status": "truncated"
+        }
+      ],
+      "attempts": 2,
+      "extra_admission_tokens": 1086
+    },
+    {
+      "id": "Q28",
+      "question": "Are source paths and line numbers enough to reopen the exact text that produced a snippet after the file changes?",
+      "initial": {
+        "status": "ok",
+        "kind": "docs_context",
+        "context_status": "ready",
+        "context_available": true,
+        "answer_supported": false,
+        "answer_available": false,
+        "support_status": "retrieval_only",
+        "answer_policy": "cite_only",
+        "coverage_policy": "retrieval_attribution_only",
+        "query_coverage": "partial",
+        "retrieval_coverage": "partial",
+        "facet_coverage": "unverified",
+        "covered_query_ids": [
+          "query-lookup-1",
+          "query-lookup-2"
+        ],
+        "missing_query_ids": [
+          "query-original"
+        ],
+        "missing_facets": [
+          {
+            "id": "intent-context:security",
+            "requirement_id": null,
+            "question": "project path validation safe file reads repository boundary",
+            "status": "missing",
+            "evidence_ids": []
+          }
+        ],
+        "facets": [
+          {
+            "id": "intent-context:project_docs_sync",
+            "requirement_id": null,
+            "question": "project docs sync lifecycle project documentation",
+            "status": "retrieval_only",
+            "evidence_ids": [
+              "ev-74c59717cf5c280c"
+            ]
+          },
+          {
+            "id": "intent-context:security",
+            "requirement_id": null,
+            "question": "project path validation safe file reads repository boundary",
+            "status": "missing",
+            "evidence_ids": []
+          }
+        ],
+        "sources": [
+          {
+            "evidence_id": "ev-42cb9cf1711e90f3",
+            "path_or_url": "docs/DOCMANCER_PRODUCT_BRIEF.md",
+            "section": "DocAtlas product brief > Current capabilities",
+            "snippet": "- Sync and retrieve local project documentation with citations.\n- Detect supported Python, Node/TypeScript, Dart/Flutter, Rust, Go, Java, and other project dependency metadata where available.\n- Resolve exact dependency versions only from repository evidence strong enough to prove the selected version; weaker declarations remain explicitly unbound or declared-only.\n- Produce `docs-impact` reports that tell reviewers which maintained docs may need attention after code changes.\n- Return compact source-attributed MCP evidence for coding agents.\n- Return typed `insufficient_evidence` rather than authorizing unsupported claims or edits.",
+            "version_binding": "unversioned",
+            "content_sha256": "65010d7372beff93959a953b4a8a5d13c736b14928b953bbad249fe9dda8aa13",
+            "project_identity": "git:github.com/Vanilla1999/DocAtlas",
+            "authority": "source_of_truth",
+            "scope": "project",
+            "line_start": 57,
+            "line_end": 62,
+            "source_uri": "docatlas://source/4b873a46bfa83270d6e12c59"
+          },
+          {
+            "evidence_id": "ev-74c59717cf5c280c",
+            "path_or_url": "docs/project-docs-mcp-workflow.md",
+            "section": "Project docs MCP workflow > Canonical lifecycle: sync",
+            "snippet": "## Canonical lifecycle: sync\n\nAfter editing project documentation files, refresh the repository index with the\nreturned `prepare_docs(action=\"sync_project_docs\")` action. This is the canonical\nworkflow for reconciling changed files before retrying `get_docs_context`.",
+            "version_binding": "unversioned",
+            "content_sha256": "c2db5d6306c2cc3a2d9590dc648cac1d7018b49e53e07b178dc811c9939c8684",
+            "project_identity": "git:github.com/Vanilla1999/DocAtlas",
+            "authority": "source_of_truth",
+            "scope": "project",
+            "line_start": 17,
+            "line_end": 21,
+            "source_uri": "docatlas://source/608f30bfe64bf3ee706d5f5b"
+          }
+        ],
+        "edit_ready": false,
+        "investigation_allowed": true,
+        "estimated_tokens": 731
+      },
+      "reads": [
+        {
+          "content_sha256": "sha256:d30ce04cafffc05f8efa6d30414d7901877e8db6ec3496eaa142e72c45b845ef",
+          "continuation": "docatlas://source/1242ff15dca06a976147df75",
+          "line_end": 84,
+          "line_start": 63,
+          "path": "docs/DOCMANCER_PRODUCT_BRIEF.md",
+          "project_identity": "git:github.com/Vanilla1999/DocAtlas",
+          "snippet": "\nDependency version evidence uses three distinct states. `exact` means repository state proves the selected version (for supported ecosystems, normally through an authoritative lockfile or equivalent resolved state). `declared-only` means a manifest declaration exists but repository state does not prove the selected runtime version. `unbound` means repository evidence cannot safely bind the dependency to an exact documentation version/source; local/path, Git, and direct-URL dependencies are common examples.\n\nFor the detailed current contract, commands, response fields, and examples, use [the Docs MCP reference](./mcp-docs-server.md). It is the canonical detailed workflow document; this brief and `README.md` stay intentionally concise.\n\n## Evidence status and product claims\n\nDifferent evaluation layers prove different things and must not be collapsed into one success claim:\n\n- deterministic/oracle Agent Developer trajectories are strongly validated;\n- live three-tool selection has a positive frozen result;\n- autonomous live evidence planning is **not demonstrated** by the current evidence; the recorded model-backed Agent Developer result is 0/11;\n- real coding-task improvement is **not demonstrated**; the historical Task 23 product decision is formally `INCONCLUSIVE`;\n- Context7 parity is **not demonstrated**;\n- infrastructure safety and reproducibility do not, by themselves, prove agent usability or patch correctness.\n\nThe next product-validation sequence is therefore public truth → agent truth → product truth. See [`../roadmap/README.md`](../roadmap/README.md) and [ADR 0002](./adr/0002-evidence-authority-direction.md).\n\n## Installation truth\n\nThe package distributed on PyPI is `doc-atlas`. The `main` branch can contain workflow changes that are not yet published. Check `doc-atlas --version`, use release documentation that matches that installed version, and do not assume a one-line installer for `main` has published every documented feature.\n",
+          "status": "truncated"
+        },
+        {
+          "content_sha256": "sha256:d30ce04cafffc05f8efa6d30414d7901877e8db6ec3496eaa142e72c45b845ef",
+          "continuation": null,
+          "line_end": 109,
+          "line_start": 85,
+          "path": "docs/DOCMANCER_PRODUCT_BRIEF.md",
+          "project_identity": "git:github.com/Vanilla1999/DocAtlas",
+          "reason_code": "read_limit_reached",
+          "snippet": "At the 2026-08 roadmap reset, repository version `1.2.0` is treated as an **unpublished repository milestone**, not as the next public artifact to publish from current `main`. The next intended public release is `1.3.0` after the P0 public-truth work is complete. See [release identity](./release-identity.md).\n\n## Advanced surfaces\n\nMCP Packs, patch constraints, patch planning, Qdrant administration, and USPTO ingestion are advanced or maintenance surfaces. They are not part of the beginner Docs MCP workflow.\n\nPatch constraints are advisory/non-blocking evidence helpers. They do not prove that a patch is safe to merge and never replace tests or human review.\n\n## Maturity\n\nDocAtlas is currently **Beta** for the primary Docs MCP workflow.\n\nThe existing technical release gates remain necessary. Task 15 proves the wheel/sdist/installer and installed stdio MCP artifact path; Task 14 owns the bounded live external-ingest acceptance evidence; and the exact public release still requires post-publish verification of the published package. Those gates protect artifact/release truth, but they are no longer sufficient by themselves for a Stable product claim.\n\nStable promotion now also requires the newer validation layers. P0 must make source protection, release identity, installed behavior, product namespace/state, and agent guidance internally consistent. P1 must then demonstrate that a real coding model can acquire the intended evidence through the installed public MCP contract. P2 must demonstrate real coding-task value or a material reduction in unsupported/wrong-version claims at acceptable total trajectory cost.\n\nUntil those gates are satisfied, `Stable`, `Context7 replacement/parity`, and `proven patch improvement` are out-of-scope public claims.\n\n## Documentation maintenance rule\n\nKeep active user/model documentation small and non-duplicated:\n\n- `README.md`: first-screen product journey and install truth;\n- `docs/mcp-docs-server.md`: canonical detailed Docs MCP workflow;\n- this brief: product scope and claims;",
+          "status": "truncated"
+        }
+      ],
+      "attempts": 2,
+      "extra_admission_tokens": 1173
+    },
+    {
+      "id": "Q30",
+      "question": "If two repositories have a guide with the same filename, what prevents one project from citing the other project’s content?",
+      "initial": {
+        "status": "ok",
+        "kind": "docs_context",
+        "context_status": "ready",
+        "context_available": true,
+        "answer_supported": false,
+        "answer_available": false,
+        "support_status": "retrieval_only",
+        "answer_policy": "cite_only",
+        "coverage_policy": "retrieval_attribution_only",
+        "query_coverage": "partial",
+        "retrieval_coverage": "partial",
+        "facet_coverage": "unverified",
+        "covered_query_ids": [
+          "query-lookup-1"
+        ],
+        "missing_query_ids": [
+          "query-original"
+        ],
+        "missing_facets": [],
+        "facets": [],
+        "sources": [
+          {
+            "evidence_id": "ev-91c715e077a03ede",
+            "path_or_url": "docs/mcp-docs-server.md",
+            "section": "Docs MCP server > Public tool contract",
+            "snippet": "The host may answer only covered claims grounded in returned sources and must not claim completeness. Sources expose path, section, a contiguous verbatim snippet, line range, authority, scope, project identity, and content hash. BM25 values, query-term arrays, match traces, raw `context_pack`, full content, and retrieval diagnostics remain internal. The projection remains bounded to 800 estimated tokens and at most three sources.",
+            "version_binding": "unversioned",
+            "content_sha256": "e08439f6858f73fd4377117abd26e06bd9763e1594fd16682279acd0c6b3c512",
+            "project_identity": "git:github.com/Vanilla1999/DocAtlas",
+            "authority": "source_of_truth",
+            "scope": "project",
+            "line_start": 42,
+            "line_end": 42,
+            "source_uri": "docatlas://source/7676599abecd8f5cba658a7e"
+          }
+        ],
+        "edit_ready": false,
+        "investigation_allowed": true,
+        "estimated_tokens": 353
+      },
+      "reads": [
+        {
+          "content_sha256": "sha256:9a719295e395ad27c7c3de67c2286ed7695980e513b8b28dbe0be345045678a6",
+          "continuation": "docatlas://source/6c9a604a56a2c0234e85da1c",
+          "line_end": 48,
+          "line_start": 43,
+          "path": "docs/mcp-docs-server.md",
+          "project_identity": "git:github.com/Vanilla1999/DocAtlas",
+          "snippet": "\nThe project answer contract requires explicit proof obligations for each supported user question before evidence can authorize an answer. A retrieval hit alone is never proof: evidence selection requires locally bound subject/relation/value evidence for every mandatory facet, and complete exact proof outranks compact generic text. Questions whose subject or requested operation cannot be resolved fail closed instead of using a synthetic `project` or `requested operation` subject.\nEvidence selection chooses candidates by requiring locally bound subject, relation, and value proof for every mandatory facet; complete exact proof outranks compact generic text.\n\nFree-form lookup is a separate read-only lane. The optional `lookup_queries` argument accepts up to five bounded, single-concept documentation lookups formulated by the host. Use the documentation language, preserve exact identifiers, and split requests with more than three major topics across multiple calls. These queries can improve retrieval recall but cannot add proof obligations, mark an answer supported, or authorize an edit. The original `question` remains authoritative. Internal query attribution produces `covered_query_ids`, `missing_query_ids`, and `retrieval_coverage`; only the original question and explicit host/path/anchor queries participate in that public coverage. Audited domain-owned rewrites may provide derived retrieval coverage for the original question, but their internal IDs never appear as public covered or missing query IDs and the result remains retrieval-only. Compound projection selects compact witnesses for distinct lookup IDs before expanding snippets with remaining capacity, then requalifies coverage against the visible path, section, and snippet. Five lookups do not guarantee five sources: the response remains bounded to three sources and 800 estimated tokens, and uncovered directions remain explicit in `missing_query_ids`. Retrieval coverage is never a completeness or support verdict.\n",
+          "status": "truncated"
+        },
+        {
+          "content_sha256": "sha256:9a719295e395ad27c7c3de67c2286ed7695980e513b8b28dbe0be345045678a6",
+          "continuation": null,
+          "line_end": 56,
+          "line_start": 49,
+          "path": "docs/mcp-docs-server.md",
+          "project_identity": "git:github.com/Vanilla1999/DocAtlas",
+          "reason_code": "read_limit_reached",
+          "snippet": "The frozen self-host multilingual matrix is validated with `python eval/multilingual_retrieval_quality_protocol.py --validate-corpus`. A strict production run uses `--run-production-matrix`, requires `DOCATLAS_EVAL_QDRANT_URL`, and may use `DOCATLAS_EVAL_MODEL_CACHE`. Dense or hybrid failures are fatal; this evaluator never counts a lexical fallback as semantic retrieval success. The matrix measures retrieval candidates and provenance, not public answer support or abstention; those require the separate answer-quality and live-agent evaluations.\n\nThe model-visible projection is the bounded evidence material exposed to the caller. It is token-bounded by the answer budget: only assigned visible witnesses are materialized, and the final projection revalidates those witnesses before returning `answer_supported=true`.\n\nThe three Docs MCP public tools are `get_docs_context`, `prepare_docs`, and `docs_status`. Use `get_docs_context` for bounded documentation questions, use `prepare_docs` for synchronization/prefetch lifecycle operations, and use `docs_status` for asynchronous job status.\n\nProject retrieval is staged by deterministic rules. Documentation/API-only requests stop after the selected documentation lanes. Explicit patch or source-navigation requests may add bounded source evidence; a repo map runs only while target paths remain unresolved, and a code graph runs only for cross-module/reference signals, multiple supported modules, or unresolved targets. The internal `retrieval_routing` diagnostic records used/skipped/failed/insufficient stages, reasons, item counts, and raw byte estimates without source text. Reduced internal work is a latency/CPU gate, not a claim about provider tokens.\n",
+          "status": "truncated"
+        }
+      ],
+      "attempts": 2,
+      "extra_admission_tokens": 1086
+    }
+  ]
+}

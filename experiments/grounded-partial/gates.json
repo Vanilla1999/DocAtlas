@@ -1,0 +1,168 @@
+{
+  "commit": "cb6dc884a6309d6eb09a73e33e98fe93625e7edd",
+  "network": "kernel-denied outbound syscalls",
+  "gates": [
+    {
+      "script": "build_agent_developer_first_divergence.py --check",
+      "exit_code": 0,
+      "seconds": 0.030723863001185236,
+      "tail": "Agent Developer P1.2 first-divergence atlas: CHECK PASS (11 tasks; sha256=c31cdc7e83281e9553fefeac4704576f8fcd0a651ea4c928e34207826d1838a3)\n"
+    },
+    {
+      "script": "build_agent_contract_v2_ablation.py --check",
+      "exit_code": 0,
+      "seconds": 0.031719646001874935,
+      "tail": "Agent Contract v2 ablation: CHECK PASS\n"
+    },
+    {
+      "script": "run_paraphrase_proofability_gate.py",
+      "exit_code": 0,
+      "seconds": 0.25808772500022314,
+      "tail": "P1.4 paraphrase/proofability: PASS; cases=14; negative_false_support=0; sha256=1e7ebed144b9e09a2c4e3a7f58e5469743e89e61b56d388bba8a62f5e2718dd1\n"
+    },
+    {
+      "script": "paraphrase_proofability_self_test.py",
+      "exit_code": 0,
+      "seconds": 0.4660042590003286,
+      "tail": "PASS: test_exact_report_and_family_separation\nPASS: test_negative_false_support_fails_closed\nPASS: test_required_discovery_and_support_fail_closed\nPASS: test_claim_and_path_leak_fail_closed\nPASS: test_proof_runtime_shard_identity_fails_closed\nP1.4 self-test: PASS (5/5)\n"
+    },
+    {
+      "script": "run_mixed_evidence_provenance_gate.py",
+      "exit_code": 0,
+      "seconds": 0.16777540700059035,
+      "tail": "P1.5 mixed-evidence provenance: PASS; cases=7; matched=7; sha256=58d12aa61244a6122c13cd2a1cde60983781d1bb93961732472ce24e0915bf8c\n"
+    },
+    {
+      "script": "mixed_evidence_provenance_self_test.py",
+      "exit_code": 0,
+      "seconds": 0.2287919249974948,
+      "tail": "PASS: test_exact_claim_local_assignments\nPASS: test_provenance_gap_is_retained_but_not_hidden\nPASS: test_support_gap_is_retained_but_not_hidden\nPASS: test_assignment_source_ledgers_fail_closed\nPASS: test_claim_and_path_leak_fail_closed\nPASS: test_proof_runtime_shard_identity_fails_closed\nP1.5 self-test: PASS (6/6)\n"
+    },
+    {
+      "script": "run_evidence_is_data_gate.py",
+      "exit_code": 0,
+      "seconds": 0.17258748099993682,
+      "tail": "P1.6 evidence-is-data: PASS; cases=6; matched=6; sha256=a7f34a6c15b03f43b7e2c6086721f46ee3f525c9d0e2b47e0746e2346c9034b0\n"
+    },
+    {
+      "script": "evidence_is_data_self_test.py",
+      "exit_code": 0,
+      "seconds": 0.24926500899891835,
+      "tail": "PASS: test_exact_hostile_document_boundary\nPASS: test_support_and_assignment_override_fail_closed\nPASS: test_assignment_source_ledgers_fail_closed\nPASS: test_content_control_and_raw_marker_fail_closed\nPASS: test_claim_and_path_leak_fail_closed\nPASS: test_proof_runtime_shard_identity_fails_closed\nP1.6 self-test: PASS (6/6)\n"
+    },
+    {
+      "script": "run_p1_agent_truth_closure_gate.py",
+      "exit_code": 0,
+      "seconds": 0.053001246000349056,
+      "tail": "P1 Agent Truth closure: PASS; execution=CLOSED; outcome=AUTONOMOUS_AGENT_TRUTH_NOT_PROVEN; sha256=1d5850f7b08fe6923a01b1005d278b2f11195f58b255092776d6157ddb09fcc7\n"
+    },
+    {
+      "script": "p1_agent_truth_closure_self_test.py",
+      "exit_code": 0,
+      "seconds": 0.166957622001064,
+      "tail": "PASS: test_exact_non_positive_closure\nPASS: test_autonomous_and_stable_overclaim_fail_closed\nPASS: test_missing_work_item_and_runtime_change_fail_closed\nPASS: test_maturity_and_path_leak_fail_closed\nP1 closure self-test: PASS (4/4)\n"
+    },
+    {
+      "script": "verify_product_truth_protocol.py",
+      "exit_code": 0,
+      "seconds": 0.09652191800341825,
+      "tail": "P2 Product Truth protocol: PASS; sha256=78521ab7dfae4f51cc55d4225054a1b38375a80be1d76d894ba74d9c851cc367; schemas=4; samples=4; canary=16; full=576-720\n"
+    },
+    {
+      "script": "run_product_truth_positive_controls.py",
+      "exit_code": 0,
+      "seconds": 5.411638465000578,
+      "tail": "P2.1B positive controls: PASS; tasks=3; gold=3; real_model_oracle=0; valid=0\n"
+    },
+    {
+      "script": "run_product_truth_task_pack.py",
+      "exit_code": 0,
+      "seconds": 0.06325125800140086,
+      "tail": "P2.1C task pack: PASS; fixtures=15; structural=12; valid=0; ready=False\n"
+    },
+    {
+      "script": "run_product_truth_comparative_harness.py",
+      "exit_code": 0,
+      "seconds": 0.061539384001662256,
+      "tail": "P2.2A comparative harness: PASS; authorized=False; canary_runs=0; pilot_runs=0\n"
+    },
+    {
+      "script": "run_product_truth_execution_gate.py",
+      "exit_code": 0,
+      "seconds": 0.06362599699787097,
+      "tail": "P2.2B/C execution gate: PASS; authorized=False; scored_runs=0\n"
+    },
+    {
+      "script": "run_product_truth_product_decision.py",
+      "exit_code": 0,
+      "seconds": 0.11795300300218514,
+      "tail": "P2.3 Product Truth decision: PASS; execution=CLOSED; outcome=PRODUCT_TRUTH_NOT_PROVEN; valid_tasks=0; scored_runs=0\n"
+    },
+    {
+      "script": "product_truth_product_decision_self_test.py",
+      "exit_code": 0,
+      "seconds": 0.09750897200137842,
+      "tail": "P2.3 product-decision self-test: PASS (12 fail-closed mutations)\n"
+    },
+    {
+      "script": "run_project_context_quality_v2_gate.py --output /tmp/docatlas-v2-final.json",
+      "exit_code": 0,
+      "seconds": 38.82080409199989,
+      "tail": "V2 project-context acceptance: PASS; natural=15/15; paraphrases=5/5; false_full=0; safety/budgets=25/25\n"
+    },
+    {
+      "script": "run_question_surface_gate.py",
+      "exit_code": 0,
+      "seconds": 0.17858121599783772,
+      "tail": "comparison_location: 10/10\ncompound: 10/10\ncondition: 10/10\ngeneral: 10/10\ninventory: 10/10\nownership: 10/10\npremise: 10/10\npublic_tools: 10/10\nrussian: 10/10\nworkflow: 10/10\nowners: legacy=11, question_plan=77, unsupported=12\nquestion surface gate: PASS (100/100 expected outcomes)\n"
+    },
+    {
+      "script": "run_recovery_contract_gate.py",
+      "exit_code": 0,
+      "seconds": 1.4996567439993669,
+      "tail": "PASS: parser/retrieval failures expose bounded non-automatic recovery; 100 unknown contract modifiers do not create hard stops; rephrase is limited to one retry; eligibility/documentation/conflict classes remain distinct; exact indexed documents recover bounded retrieval-only context; public context projection stays <=800 tokens\n"
+    },
+    {
+      "script": "run_recovery_mutation_gate.py",
+      "exit_code": 0,
+      "seconds": 6.85892763299853,
+      "tail": "KILLED: rephrase-auto-executes\nKILLED: authoritative-conflict-does-not-stop\nKILLED: unbounded-rephrase-loop\nKILLED: rephrase-invents-domain-fact\nKILLED: eligibility-treated-as-retrieval\nKILLED: exact-document-fallback-disabled\nPASS: recoverable documentation failure mutation gate killed 6/6 mutants\n"
+    },
+    {
+      "script": "run_agent_developer_gate.py",
+      "exit_code": 0,
+      "seconds": 1.6663084589999926,
+      "tail": "module_definition_supported: TARGET-CLOSED\nmodule_behavior_named_gap: TARGET-CLOSED\nmodule_requirements_named_gap: TARGET-CLOSED\nproject_policy_supported: TARGET-CLOSED\nmodule_plus_project_two_call_trajectory: TARGET-CLOSED\ncross_module_comparison_supported: TARGET-CLOSED\nwrong_module_isolation: TARGET-CLOSED\nautodiscovery_module_supported: TARGET-CLOSED\nambiguous_module_recovery_named_gap: TARGET-CLOSED\nstale_module_docs_recovery: TARGET-CLOSED\ndependency_prefetch_recovery: TARGET-CLOSED\ntarget closure: 11/11 tasks; named target gaps=0; false-supported=0; forbidden-source-contamination=0\ntarget metrics: {\"cross_module_scope_accuracy\": 1.0, \"false_supported\": 0, \"forbidden_source_contamination\": 0, \"module_dependency_scope_accuracy\": 1.0, \"module_only_expected_evidence_rate\": 1.0, \"module_project_max_context_calls\": 2, \"recovery_contract_accuracy\": 1.0, \"unsupported_edit_ready_false_rate\": 1.0}\nAgent Developer Protocol v1: TARGET PASS\n"
+    },
+    {
+      "script": "run_agent_developer_adversarial_gate.py",
+      "exit_code": 0,
+      "seconds": 3.6324202739997418,
+      "tail": "Agent Developer adversarial v2: 28/28 cases; v1=11 target-green; v1-max-tokens=724; v2-max-tokens=765; violations=0\nAgent Developer adversarial v2: PASS\n"
+    },
+    {
+      "script": "run_critical_mutation_gate.py",
+      "exit_code": 0,
+      "seconds": 5.518956092997541,
+      "tail": "KILLED: normative_code_declaration_guard\nKILLED: active_task33_actionability_contract\nKILLED: github_models_host_turn_limit\nPASS: baseline green; 3 critical mutants killed\n"
+    },
+    {
+      "script": "run_agent_developer_adversarial_mutation_gate.py",
+      "exit_code": 0,
+      "seconds": 14.805227977001778,
+      "tail": "KILLED: agent_projection_budget_guard\nKILLED: agent_trajectory_budget_guard\nKILLED: agent_forbidden_source_guard\nKILLED: agent_exact_scope_guard\nKILLED: agent_retry_candidate_guard\nKILLED: agent_edit_readiness_guard\nKILLED: project_module_ambiguity_guard\nKILLED: project_status_module_projection_guard\nKILLED: module_recovery_reason_projection_guard\nPASS: Agent Developer adversarial baseline green; 9 critical mutants killed\n"
+    },
+    {
+      "script": "check_python_module_size.py",
+      "exit_code": 0,
+      "seconds": 0.08981839300031425,
+      "tail": "Python module size gate: PASS (all .py <= 1000 lines)\n"
+    },
+    {
+      "script": "docs_mcp_stdio_smoke.py",
+      "exit_code": 0,
+      "seconds": 3.1724422330007656,
+      "tail": "Lifecycle fixture readiness: 2 read-only storage checks; one MCP job-status call follows (not a model or latency measurement)\nInstalled lifecycle smoke: clean guard / confirmation / unchanged retry / ready stop / async status / terminal stop PASS (scripted, no live model)\nDocs MCP installed-artifact stdio smoke: PASS\n"
+    }
+  ]
+}

@@ -1,0 +1,6 @@
+{
+  "validated_local_runtime_commit": "cb6dc884a6309d6eb09a73e33e98fe93625e7edd",
+  "published_runtime_commit": "6c1010ae088648a73f07cda5fdb53351e41daeca",
+  "identical_runtime_tree": "021bf3717c84831dab8d2e0207ff2ccaae0ce0e4",
+  "note": "GitHub API publication recreates the commit identity; exact Git tree equality verified. Subsequent report commit changes only experiments/grounded-partial."
+}

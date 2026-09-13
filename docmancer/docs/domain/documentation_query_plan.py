@@ -321,6 +321,21 @@ def build_documentation_query_plan(
             forbidden_evidence_terms=() if explicit_path else forbidden_evidence_terms,
         ))
         seen.add(anchor.casefold())
+    # Preserve lexical recall for prose compounds without promoting them into
+    # public exact-identity directions or deriving original-question coverage.
+    lexical_slots = 12 - sum(query.origin == "exact_anchor" for query in queries)
+    for index, term in enumerate(extract_technical_terms(question), start=1):
+        if lexical_slots <= 0:
+            break
+        if (term.kind != "plain_term" or not is_exact_technical_token(term.raw)
+                or term.raw.casefold() in seen):
+            continue
+        queries.append(DocumentationLookup(
+            f"query-hint-lexical-{index}", term.raw, "lexical_topic", False,
+            relation="host_lookup",
+        ))
+        seen.add(term.raw.casefold())
+        lexical_slots -= 1
     host_rows: list[tuple[str, str]] = []
     for index, text in enumerate(lookup_queries[:5], start=1):
         cleaned = text.strip()
@@ -523,7 +538,8 @@ def technical_anchors(question: str) -> tuple[str, ...]:
     )
     values.extend(
         term.raw for term in extract_technical_terms(question)
-        if term.raw.casefold() not in {"docatlas", "docmancer"}
+        if term.kind != "plain_term"
+        and term.raw.casefold() not in {"docatlas", "docmancer"}
         and is_exact_technical_token(term.raw)
         and not any(term.raw in existing for existing in values)
     )

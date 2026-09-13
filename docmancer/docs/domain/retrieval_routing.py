@@ -43,6 +43,11 @@ _CROSS_MODULE_RE = re.compile(
     re.IGNORECASE,
 )
 _PATH_HINT_RE = re.compile(r"\b(?:src|lib|app|packages?)/[A-Za-z0-9_./-]+")
+_CALL_PATH_RE = re.compile(
+    r"\b(?:call(?:s|ed|ers)?|invok\w*|used|вызыва\w*|использу\w*)\b|"
+    r"\b(?:path|flow)\b.{0,160}\bfrom\b.{1,160}\bto\b|"
+    r"\bпуть\b.{0,160}\bот\b.{1,160}\bдо\b", re.IGNORECASE,
+)
 
 
 @dataclass(frozen=True)
@@ -133,8 +138,10 @@ def should_run_code_graph(
     repo = list(repo_map_items)
     if not route.project_mode or route.intent in {"docs", "api"}:
         return False, "documentation/API intent does not require connectivity evidence"
-    if _CROSS_MODULE_RE.search(str(question or "")):
+    if _CROSS_MODULE_RE.search(str(question or "")) or _CALL_PATH_RE.search(str(question or "")):
         return True, "the question explicitly requires cross-module/reference connectivity"
+    if route.intent == "source_navigation" and not is_change_request(question):
+        return False, "path discovery alone does not require connectivity evidence"
     modules = {_top_module(path) for path in _proven_source_paths([*source, *repo]) if _top_module(path)}
     if len(modules) > 1:
         return True, "earlier evidence supports multiple target modules"
