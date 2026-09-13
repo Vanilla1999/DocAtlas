@@ -1,0 +1,11 @@
+{
+  "execution": "native_reordered_existing_candidates_with_cached_scores",
+  "A": 33,
+  "B": 33,
+  "wins": [],
+  "losses": [],
+  "audit_errors": 0,
+  "unscored_candidates": 0,
+  "max_admission_tokens": 791,
+  "controls_sufficient": []
+}
