@@ -1,0 +1,65 @@
+{
+  "runtime_tree": "c2515c14380644c12b4c60a280469b9844d5fc0d",
+  "model_files": {
+    "/tmp/docatlas-xprovence/model.safetensors": {
+      "sha256": "be4ca7a7ac5a426b5dfec1c949dfbf7f3324ce38a95a95e2ac517f6234860e09",
+      "bytes": 2271080220
+    },
+    "/tmp/docatlas-xprovence/special_tokens_map.json": {
+      "sha256": "8c785abebea9ae3257b61681b4e6fd8365ceafde980c21970d001e834cf10835",
+      "bytes": 964
+    },
+    "/tmp/docatlas-xprovence/tokenizer.json": {
+      "sha256": "5d704acb9b49c8315d60393b34ec989aa0d6c2e3e0682f6b5cf6ab79649ca685",
+      "bytes": 17083151
+    },
+    "/tmp/docatlas-xprovence/tokenizer_config.json": {
+      "sha256": "52f012ba0703c1da824a5b2bec660940babaf9bd9943a1249837850bec878023",
+      "bytes": 1392
+    },
+    "/tmp/docatlas-xprovence/modeling_xprovence_hf.py": {
+      "sha256": "e4a51681e106dffe7d06243ed2b9c5f1fb44ce21f02de7cee5b4b5b36996c986",
+      "bytes": 21091
+    },
+    "/tmp/docatlas-xprovence/config.json": {
+      "sha256": "dff29375d7d58e3b83aceab9254860846013fee4f851c884f743d4258f3194e9",
+      "bytes": 807
+    },
+    "/tmp/docatlas-jina-v3/config_sentence_transformers.json": {
+      "sha256": "151f37c3e01b7ec0a97f5301ff559496c6a178b7ffb2a2bbb13348a3344072c6",
+      "bytes": 464
+    },
+    "/tmp/docatlas-jina-v3/model.safetensors": {
+      "sha256": "17ca06efd886a065d0081912b04c9e27ef5086a9dd09659cce32aa9c84587f23",
+      "bytes": 1144685320
+    },
+    "/tmp/docatlas-jina-v3/custom_st.py": {
+      "sha256": "a2e02dd7d02efcfd19f8249a440999f6441dfccfe1200fac7c508fe148d9f50a",
+      "bytes": 8877
+    },
+    "/tmp/docatlas-jina-v3/special_tokens_map.json": {
+      "sha256": "8c785abebea9ae3257b61681b4e6fd8365ceafde980c21970d001e834cf10835",
+      "bytes": 964
+    },
+    "/tmp/docatlas-jina-v3/tokenizer.json": {
+      "sha256": "f59925fcb90c92b894cb93e51bb9b4a6105c5c249fe54ce1c704420ac39b81af",
+      "bytes": 17082756
+    },
+    "/tmp/docatlas-jina-v3/tokenizer_config.json": {
+      "sha256": "e1bc77da5b90ba65b47aa8bd776c6317f47d50dc6717e92b10177686b3b8f161",
+      "bytes": 1148
+    },
+    "/tmp/docatlas-jina-v3/config.json": {
+      "sha256": "556941599709401b3dc94acf775526f1c4670abe5e123cb53cca8eb5250b0cb5",
+      "bytes": 1799
+    },
+    "/tmp/docatlas-jina-v3/modules.json": {
+      "sha256": "5195606c12cbe65635173069d503c1eeb503b6358d6453936f66ca0e38390c29",
+      "bytes": 378
+    },
+    "/tmp/docatlas-context-gguf/qwen2.5-0.5b-instruct-q8_0.gguf": {
+      "sha256": "ca59ca7f13d0e15a8cfa77bd17e65d24f6844b554a7b6c12e07a5f89ff76844e",
+      "bytes": 675710816
+    }
+  }
+}

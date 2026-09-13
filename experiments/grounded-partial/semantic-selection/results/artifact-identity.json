@@ -1,0 +1,120 @@
+{
+  "baseline": {
+    "frozen": {
+      "schema_version": "evidence-quality-protocol-v2",
+      "baseline_code_sha": "e1daf4fa68f16f626068f2c58646e2ebfd4293f7",
+      "split_state": "frozen_development_benchmark; validation visible to implementing agent",
+      "unseen_validation": "NOT_MEASURED",
+      "case_count": 80,
+      "split_counts": {
+        "development": 40,
+        "frozen_validation_exposed": 40
+      },
+      "primary_outcome": "full approved evidence on within_budget cases; needs_review never PASS",
+      "secondary": "required fact coverage, separate literal score and non-full categories",
+      "variants": [
+        "A-current",
+        "B-no-canonical",
+        "C-lexical-replay",
+        "D-no-expansion-replay",
+        "L-explicit",
+        "L-duplicate",
+        "L-nearby"
+      ],
+      "grounded": {
+        "package": "@arabold/docs-mcp-server",
+        "version": "3.1.0",
+        "mode": "FTS-only",
+        "native_limits": [
+          1,
+          3,
+          5
+        ],
+        "controlled": "source-preserving adapter with 800 actual o200k_base tokens and <=3 blocks; reject unmappable reassembly, never invent contiguous ranges"
+      },
+      "tokenizer": {
+        "package": "tiktoken",
+        "version": "0.11.0",
+        "encoding": "o200k_base"
+      },
+      "promotion_thresholds": {
+        "observed_safety_violations": 0,
+        "p95_actual_tokens_ratio_max": 1.1,
+        "p95_query_latency_ratio_max": 1.25,
+        "primary_loss_max": 0
+      },
+      "bootstrap": {
+        "unit": "project_group",
+        "resamples": 2000,
+        "seed": 20260910,
+        "claim": "few groups; interval including zero is INCONCLUSIVE"
+      },
+      "host_control": {
+        "cases": [
+          "fastapi-04",
+          "starlette-03",
+          "typer-01",
+          "pydantic-02"
+        ],
+        "orders": [
+          "original",
+          "reverse",
+          "rotate_one"
+        ],
+        "repeats": 2,
+        "no_live_connection": "deterministic input assembly only; model outcomes and positional sensitivity NOT_MEASURED"
+      },
+      "safety": "unchanged production limits, authority, scope, version, support flags and frozen gates",
+      "source_sha256": "f0395dcc526161b51d9378ef3ac6d4c8a1a1bd2e323be0c4c6cff58f783b0985",
+      "cases_sha256": "4b01b66609f1a04a067062556c97de1e2fcccc41359ecabcb75ee1154fc0d67d",
+      "implementation_clarifications": [
+        {
+          "topic": "valid original duplicate",
+          "reason": "tools/list lookup_queries has uniqueItems=true; two identical array items are a validation-negative control, not a retrieval ablation",
+          "valid_L_duplicate": "one lookup equal to original question",
+          "algorithm_or_corpus_change": false
+        },
+        {
+          "topic": "Grounded incremental per-file ingest",
+          "reason": "CLI scrape defaults clean=true; use official --no-clean to retain the same selected document manifest",
+          "algorithm_or_corpus_change": false
+        }
+      ]
+    },
+    "candidates_sha256": "3e1389add5843531e98bda887fea1ab1a52c63280e73a53a07d166b97a94cfd4",
+    "baseline_count": 80,
+    "baseline_sufficient": 33,
+    "baseline_all80_paths_snippets_identical": true
+  },
+  "runtime": "266a3c40cee896522a11c89f4cacda8f12275d59",
+  "experiment_source_commit_before_evaluation": "97d9196",
+  "holdout_status": "frozen_not_scored_H1_gate_failed",
+  "artifacts": {
+    "AMENDMENT_02.md": "09754323d6db52929e2550ca03c07c8f7bb6caf3df10dc093e1dca2097598cfa",
+    "README.md": "bbee9efa598448051ffd131bbd8c80e1276020f0b394e9a92f3a4efd46766829",
+    "PLAN_RU.md": "d3165bd3b2d73a92a71bedf0e7abcd483f9e56daac5d9f886f4a5ec49b7699cb",
+    "AMENDMENT_01.md": "7aaa9f79dbfdc002301889ca12ed173f53540e94979f83fbbef68361f8ba9703",
+    "test_evaluate.py": "d6117798282b6737cba7f16ec969c11d920e130c7396aabf6f6fb537cd82072a",
+    "downstream.py": "fcf23e7593622cd4a262d5933e0e91987b2d12b6ba027a1e013050a908458f8d",
+    "export.py": "4ffe4f4276a0d301a4781d1b05e0a4105c5592e19410b68d4f5eba522c96e6aa",
+    "RESULT_RU.md": "37d2aa11027832d43829619172e503f5ced03c426216f9a4d4169f893da9e049",
+    "evaluate.py": "10d6ff64e502df2c7e35890b11d54fe92cd4b4ad987ee415b8ace15c978aa559",
+    "score.py": "aedd8deeacd8f5ed882d0f399c89c3a4d07e3bc8b14988797966159653d32592",
+    "run_protocol.json": "217adb6b31977307e448c26e554eade6e00df406bb75284c4de6932ee377f1ae",
+    "holdout/source-manifest.json": "e88a160b812851947dbabc30575c46d560452ab66ca301540b01223401ab00b3",
+    "holdout/cases.json": "716fd3110d247e5a5d1f8702e67d67c4f0073ce89f47cee43b2a2683a2fd03bb",
+    "holdout/identity.json": "349d3d6d15a556a87daf6ec3be5a5d19b5e43f2c054015ccc3245f1e64fd72ab",
+    "results/raw-results.json.xz": "12a8aae97c3507c0f00566729c242cbdc5a3b99b5e7ef73066f6cbc4454d1077",
+    "results/ranking-summary.json": "ea941cfc8c091654623fd045508ea5c668c915c7a10dcf92befce20e83351725",
+    "results/ranking-rows.json": "5e2497527f82d2e3b02a7800ceb855e8e82d665a560b1366b125a922d57f6ba3",
+    "results/transitions-summary.json": "d1fd6f2586b82e0f543e252caf0b7dc6a2a2767ac07f26c4de0171d4d621ca8e",
+    "results/environment.json": "12800319b3492484bbe4290743cf1536f09aeab77c0fa2a16a7f5e1601acfb94",
+    "results/candidates.jsonl": "3e1389add5843531e98bda887fea1ab1a52c63280e73a53a07d166b97a94cfd4",
+    "results/five-case-review.json": "21ba5e042329b4bee7015adb3ced013ce8119b59af93c42964514c6379fc0d61",
+    "results/native-summary.json": "dd3840b3f1eda9b6d1e846e7b2418d1777f8f0c2fd14ec6baf0b35155085974d",
+    "holdout/licenses/click.txt": "9a8ad106a394e853bfe21f42f4e72d592819a22805d991b5f3275029292b658d",
+    "holdout/licenses/requests.txt": "09e8a9bcec8067104652c168685ab0931e7868f9c8284b66f5ae6edae5f1130b",
+    "holdout/sources/click/docs/options.rst": "6ef07a7fd827f7918533855a78d4d83ea0c46e25f9487e25bc55c2071ef91747",
+    "holdout/sources/requests/docs/user/quickstart.rst": "e2be6bd4a434b69e0c23c4ca5bcc12a2c7785ffd3b9eadd747ca98caea666bfd"
+  }
+}

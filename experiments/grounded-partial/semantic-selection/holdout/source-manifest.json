@@ -1,0 +1,22 @@
+{
+  "sources": [
+    {
+      "project": "requests",
+      "repository": "psf/requests",
+      "ref": "v2.32.3",
+      "path": "docs/user/quickstart.rst",
+      "url": "https://raw.githubusercontent.com/psf/requests/v2.32.3/docs/user/quickstart.rst",
+      "sha256": "e2be6bd4a434b69e0c23c4ca5bcc12a2c7785ffd3b9eadd747ca98caea666bfd",
+      "bytes": 19018
+    },
+    {
+      "project": "click",
+      "repository": "pallets/click",
+      "ref": "8.1.7",
+      "path": "docs/options.rst",
+      "url": "https://raw.githubusercontent.com/pallets/click/8.1.7/docs/options.rst",
+      "sha256": "6ef07a7fd827f7918533855a78d4d83ea0c46e25f9487e25bc55c2071ef91747",
+      "bytes": 26719
+    }
+  ]
+}

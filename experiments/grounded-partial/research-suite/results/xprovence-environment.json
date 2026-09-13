@@ -1,0 +1,9 @@
+{
+  "model": "naver/xprovence-reranker-bgem3-v2",
+  "revision": "f2798d357213c40164bdd79557d6d2e43ca7d8d2",
+  "threshold": 0.3,
+  "title": null,
+  "always_select_title": false,
+  "total_seconds": 616.711757457997,
+  "peak_rss_kib": 2371608
+}

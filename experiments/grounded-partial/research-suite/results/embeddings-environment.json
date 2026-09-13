@@ -1,0 +1,97 @@
+{
+  "model": "jinaai/jina-embeddings-v3",
+  "revision": "ab036b023d30b4d1138c4c3bfa9f0c445ab455d6",
+  "code_revision": "bd55a5ec8e6c0fb1d6c26efb4b6a4a74ce8a88d3",
+  "dtype": "float32",
+  "threads": 2,
+  "passage_pooling": "mean source/context tokens; exclude instruction and special tokens",
+  "query_pooling": "mean all tokens",
+  "task_instructions": {
+    "retrieval.query": "Represent the query for retrieving evidence documents: ",
+    "retrieval.passage": "Represent the document for retrieval: ",
+    "separation": "",
+    "classification": "",
+    "text-matching": ""
+  },
+  "lora_cache_equivalence_max_error": 0.0,
+  "sdpa_equivalence_max_error": 7.152557373046875e-07,
+  "windows": [
+    {
+      "document": "7286c7398d725f5ee8319af6b378ecbfdee2c0cc071703b8425a86956dad432f",
+      "tokens": 1674,
+      "windows": 1
+    },
+    {
+      "document": "9324b7eb88999f76aac72421d9ae219ebe256ad33ed30c829d4bf9f0c2e5cc90",
+      "tokens": 1597,
+      "windows": 1
+    },
+    {
+      "document": "891705aeac6105663a3da3d53d15eac306396b8db743c59bfffb9fcd35d0f5e5",
+      "tokens": 780,
+      "windows": 1
+    },
+    {
+      "document": "34ece67ed4460b1b37d6d27d0107cea5082a9ac26b4679889a9119e15697dbb5",
+      "tokens": 690,
+      "windows": 1
+    },
+    {
+      "document": "b7bb8bbe3f0e91f6fb7d789bab3b7f8296b4376cb245566d129dd9f411fc4104",
+      "tokens": 5027,
+      "windows": 1
+    },
+    {
+      "document": "eaa35d3c62cb43ed43e794113649e31b208e6cffc211134cc9e6d31483ecc6ff",
+      "tokens": 4667,
+      "windows": 1
+    },
+    {
+      "document": "9eadb453f1d552a553cd250fb75f775a6e715fc30e4d7e2c98f737539f770623",
+      "tokens": 2403,
+      "windows": 1
+    },
+    {
+      "document": "c4ed83dbb67a4ba91b6cf344cab7a512ac42f7dbaf78d78dba3f0b258e0431da",
+      "tokens": 1164,
+      "windows": 1
+    },
+    {
+      "document": "55470d97166246fc95e214e0eccd31234a654af86d7edd52acf036499dbc5e6e",
+      "tokens": 7914,
+      "windows": 1
+    },
+    {
+      "document": "89867050493fbf5714b169bb7cc46340104e9f42ce405176020b8574de1e1c8a",
+      "tokens": 593,
+      "windows": 1
+    },
+    {
+      "document": "3b3133e00655442941370def11214b02400e75d735b51df0ae98f13c7e90722a",
+      "tokens": 666,
+      "windows": 1
+    },
+    {
+      "document": "8a557e38660bb9b04da723194cc6bc8a0c75f5ff674bedd8c19547afac83fb9e",
+      "tokens": 1435,
+      "windows": 1
+    },
+    {
+      "document": "cc3648eb440c815ca6bfdebaa0f20e10970b7a5b24711d1c2bb37d8eaba41e44",
+      "tokens": 858,
+      "windows": 1
+    },
+    {
+      "document": "41fc70971ae591a0597a2d67fc116627ad9f74c909f101d738700bb997ed7ec9",
+      "tokens": 6962,
+      "windows": 1
+    }
+  ],
+  "timings": {
+    "queries_seconds": 32.38193678900279,
+    "plain_index_seconds": 247.5128535949989,
+    "late_index_seconds": 279.4994586840039
+  },
+  "total_seconds": 559.5180282559959,
+  "peak_rss_kib": 7547104
+}

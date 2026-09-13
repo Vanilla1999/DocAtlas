@@ -1,0 +1,560 @@
+{
+  "cases": [
+    {
+      "id": "requests-h01",
+      "project_group": "requests",
+      "question": "When a Requests query parameter has value None, is it included in the URL?",
+      "answerability": "within_budget",
+      "policy": {
+        "version": "v2.32.3",
+        "scope": "project",
+        "authority": "source_of_truth",
+        "lifecycle": "active"
+      },
+      "required_claims": [
+        {
+          "id": "required",
+          "witness_sets": [
+            {
+              "parts": [
+                {
+                  "path": "docs/user/quickstart.rst",
+                  "line_start": 73,
+                  "line_end": 74,
+                  "text": "Note that any dictionary key whose value is ``None`` will not be added to the\nURL's query string."
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "requests-h02",
+      "project_group": "requests",
+      "question": "Почему успешный r.json() не доказывает успешность HTTP-запроса и как её проверить?",
+      "answerability": "within_budget",
+      "policy": {
+        "version": "v2.32.3",
+        "scope": "project",
+        "authority": "source_of_truth",
+        "lifecycle": "active"
+      },
+      "required_claims": [
+        {
+          "id": "required",
+          "witness_sets": [
+            {
+              "parts": [
+                {
+                  "path": "docs/user/quickstart.rst",
+                  "line_start": 160,
+                  "line_end": 164,
+                  "text": "It should be noted that the success of the call to ``r.json()`` does **not**\nindicate the success of the response. Some servers may return a JSON object in a\nfailed response (e.g. error details with HTTP 500). Such JSON will be decoded\nand returned. To check that a request is successful, use\n``r.raise_for_status()`` or check ``r.status_code`` is what you expect."
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "requests-h03",
+      "project_group": "requests",
+      "question": "Does Requests timeout cap the complete download duration, and what happens without an explicit timeout?",
+      "answerability": "within_budget",
+      "policy": {
+        "version": "v2.32.3",
+        "scope": "project",
+        "authority": "source_of_truth",
+        "lifecycle": "active"
+      },
+      "required_claims": [
+        {
+          "id": "required",
+          "witness_sets": [
+            {
+              "parts": [
+                {
+                  "path": "docs/user/quickstart.rst",
+                  "line_start": 542,
+                  "line_end": 546,
+                  "text": "    ``timeout`` is not a time limit on the entire response download;\n    rather, an exception is raised if the server has not issued a\n    response for ``timeout`` seconds (more precisely, if no bytes have been\n    received on the underlying socket for ``timeout`` seconds). If no timeout is specified explicitly, requests do\n    not time out."
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "requests-h04",
+      "project_group": "requests",
+      "question": "Какие запросы Requests по умолчанию следуют перенаправлениям и как включить это для HEAD?",
+      "answerability": "within_budget",
+      "policy": {
+        "version": "v2.32.3",
+        "scope": "project",
+        "authority": "source_of_truth",
+        "lifecycle": "active"
+      },
+      "required_claims": [
+        {
+          "id": "required",
+          "witness_sets": [
+            {
+              "parts": [
+                {
+                  "path": "docs/user/quickstart.rst",
+                  "line_start": 480,
+                  "line_end": 481,
+                  "text": "By default Requests will perform location redirection for all verbs except\nHEAD."
+                },
+                {
+                  "path": "docs/user/quickstart.rst",
+                  "line_start": 515,
+                  "line_end": 517,
+                  "text": "If you're using HEAD, you can enable redirection as well::\n\n    >>> r = requests.head('http://github.com/', allow_redirects=True)"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "requests-h05",
+      "project_group": "requests",
+      "question": "In what order are the responses in Response.history?",
+      "answerability": "within_budget",
+      "policy": {
+        "version": "v2.32.3",
+        "scope": "project",
+        "authority": "source_of_truth",
+        "lifecycle": "active"
+      },
+      "required_claims": [
+        {
+          "id": "required",
+          "witness_sets": [
+            {
+              "parts": [
+                {
+                  "path": "docs/user/quickstart.rst",
+                  "line_start": 485,
+                  "line_end": 488,
+                  "text": "The :attr:`Response.history <requests.Response.history>` list contains the\n:class:`Response <requests.Response>` objects that were created in order to\ncomplete the request. The list is sorted from the oldest to the most recent\nresponse."
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "requests-h06",
+      "project_group": "requests",
+      "question": "Что произойдёт с параметром json в Requests при одновременной передаче data или files?",
+      "answerability": "within_budget",
+      "policy": {
+        "version": "v2.32.3",
+        "scope": "project",
+        "authority": "source_of_truth",
+        "lifecycle": "active"
+      },
+      "required_claims": [
+        {
+          "id": "required",
+          "witness_sets": [
+            {
+              "parts": [
+                {
+                  "path": "docs/user/quickstart.rst",
+                  "line_start": 300,
+                  "line_end": 300,
+                  "text": "Note, the ``json`` parameter is ignored if either ``data`` or ``files`` is passed."
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "requests-h07",
+      "project_group": "requests",
+      "question": "What exact p99 latency in milliseconds does this library achieve on my production server?",
+      "answerability": "unanswerable",
+      "policy": {
+        "version": "v2.32.3",
+        "scope": "project",
+        "authority": "source_of_truth",
+        "lifecycle": "active"
+      },
+      "required_claims": [
+        {
+          "id": "local_latency",
+          "witness_sets": []
+        }
+      ]
+    },
+    {
+      "id": "requests-h08",
+      "project_group": "requests",
+      "question": "When a Requests query parameter has value None, is it included in the URL? Also give the exact p99 latency on my production server.",
+      "answerability": "partial",
+      "policy": {
+        "version": "v2.32.3",
+        "scope": "project",
+        "authority": "source_of_truth",
+        "lifecycle": "active"
+      },
+      "required_claims": [
+        {
+          "id": "documented",
+          "witness_sets": [
+            {
+              "parts": [
+                {
+                  "path": "docs/user/quickstart.rst",
+                  "line_start": 73,
+                  "line_end": 74,
+                  "text": "Note that any dictionary key whose value is ``None`` will not be added to the\nURL's query string."
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "local_latency",
+          "witness_sets": []
+        }
+      ]
+    },
+    {
+      "id": "requests-h09",
+      "project_group": "requests",
+      "question": "What is the default setting?",
+      "answerability": "ambiguous",
+      "policy": {
+        "version": "v2.32.3",
+        "scope": "project",
+        "authority": "source_of_truth",
+        "lifecycle": "active"
+      },
+      "required_claims": [
+        {
+          "id": "unspecified_setting",
+          "witness_sets": []
+        }
+      ]
+    },
+    {
+      "id": "requests-h10",
+      "project_group": "requests",
+      "question": "Reproduce verbatim the complete docs/user/quickstart.rst document, including every example and explanation.",
+      "answerability": "over_budget",
+      "policy": {
+        "version": "v2.32.3",
+        "scope": "project",
+        "authority": "source_of_truth",
+        "lifecycle": "active"
+      },
+      "required_claims": [
+        {
+          "id": "complete_document",
+          "witness_sets": [
+            {
+              "parts": [
+                {
+                  "path": "docs/user/quickstart.rst",
+                  "line_start": 1,
+                  "line_end": 570,
+                  "text": ".. _quickstart:\n\nQuickstart\n==========\n\n.. module:: requests.models\n\nEager to get started? This page gives a good introduction in how to get started\nwith Requests.\n\nFirst, make sure that:\n\n* Requests is :ref:`installed <install>`\n* Requests is :ref:`up-to-date <updates>`\n\n\nLet's get started with some simple examples.\n\n\nMake a Request\n--------------\n\nMaking a request with Requests is very simple.\n\nBegin by importing the Requests module::\n\n    >>> import requests\n\nNow, let's try to get a webpage. For this example, let's get GitHub's public\ntimeline::\n\n    >>> r = requests.get('https://api.github.com/events')\n\nNow, we have a :class:`Response <requests.Response>` object called ``r``. We can\nget all the information we need from this object.\n\nRequests' simple API means that all forms of HTTP request are as obvious. For\nexample, this is how you make an HTTP POST request::\n\n    >>> r = requests.post('https://httpbin.org/post', data={'key': 'value'})\n\nNice, right? What about the other HTTP request types: PUT, DELETE, HEAD and\nOPTIONS? These are all just as simple::\n\n    >>> r = requests.put('https://httpbin.org/put', data={'key': 'value'})\n    >>> r = requests.delete('https://httpbin.org/delete')\n    >>> r = requests.head('https://httpbin.org/get')\n    >>> r = requests.options('https://httpbin.org/get')\n\nThat's all well and good, but it's also only the start of what Requests can\ndo.\n\n\nPassing Parameters In URLs\n--------------------------\n\nYou often want to send some sort of data in the URL's query string. If\nyou were constructing the URL by hand, this data would be given as key/value\npairs in the URL after a question mark, e.g. ``httpbin.org/get?key=val``.\nRequests allows you to provide these arguments as a dictionary of strings,\nusing the ``params`` keyword argument. As an example, if you wanted to pass\n``key1=value1`` and ``key2=value2`` to ``httpbin.org/get``, you would use the\nfollowing code::\n\n    >>> payload = {'key1': 'value1', 'key2': 'value2'}\n    >>> r = requests.get('https://httpbin.org/get', params=payload)\n\nYou can see that the URL has been correctly encoded by printing the URL::\n\n    >>> print(r.url)\n    https://httpbin.org/get?key2=value2&key1=value1\n\nNote that any dictionary key whose value is ``None`` will not be added to the\nURL's query string.\n\nYou can also pass a list of items as a value::\n\n    >>> payload = {'key1': 'value1', 'key2': ['value2', 'value3']}\n\n    >>> r = requests.get('https://httpbin.org/get', params=payload)\n    >>> print(r.url)\n    https://httpbin.org/get?key1=value1&key2=value2&key2=value3\n\nResponse Content\n----------------\n\nWe can read the content of the server's response. Consider the GitHub timeline\nagain::\n\n    >>> import requests\n\n    >>> r = requests.get('https://api.github.com/events')\n    >>> r.text\n    '[{\"repository\":{\"open_issues\":0,\"url\":\"https://github.com/...\n\nRequests will automatically decode content from the server. Most unicode\ncharsets are seamlessly decoded.\n\nWhen you make a request, Requests makes educated guesses about the encoding of\nthe response based on the HTTP headers. The text encoding guessed by Requests\nis used when you access ``r.text``. You can find out what encoding Requests is\nusing, and change it, using the ``r.encoding`` property::\n\n    >>> r.encoding\n    'utf-8'\n    >>> r.encoding = 'ISO-8859-1'\n\nIf you change the encoding, Requests will use the new value of ``r.encoding``\nwhenever you call ``r.text``. You might want to do this in any situation where\nyou can apply special logic to work out what the encoding of the content will\nbe. For example, HTML and XML have the ability to specify their encoding in\ntheir body. In situations like this, you should use ``r.content`` to find the\nencoding, and then set ``r.encoding``. This will let you use ``r.text`` with\nthe correct encoding.\n\nRequests will also use custom encodings in the event that you need them. If\nyou have created your own encoding and registered it with the ``codecs``\nmodule, you can simply use the codec name as the value of ``r.encoding`` and\nRequests will handle the decoding for you.\n\nBinary Response Content\n-----------------------\n\nYou can also access the response body as bytes, for non-text requests::\n\n    >>> r.content\n    b'[{\"repository\":{\"open_issues\":0,\"url\":\"https://github.com/...\n\nThe ``gzip`` and ``deflate`` transfer-encodings are automatically decoded for you.\n\nThe ``br``  transfer-encoding is automatically decoded for you if a Brotli library\nlike `brotli <https://pypi.org/project/brotli>`_ or `brotlicffi <https://pypi.org/project/brotlicffi>`_ is installed.\n\nFor example, to create an image from binary data returned by a request, you can\nuse the following code::\n\n    >>> from PIL import Image\n    >>> from io import BytesIO\n\n    >>> i = Image.open(BytesIO(r.content))\n\n\nJSON Response Content\n---------------------\n\nThere's also a builtin JSON decoder, in case you're dealing with JSON data::\n\n    >>> import requests\n\n    >>> r = requests.get('https://api.github.com/events')\n    >>> r.json()\n    [{'repository': {'open_issues': 0, 'url': 'https://github.com/...\n\nIn case the JSON decoding fails, ``r.json()`` raises an exception. For example, if\nthe response gets a 204 (No Content), or if the response contains invalid JSON,\nattempting ``r.json()`` raises ``requests.exceptions.JSONDecodeError``. This wrapper exception\nprovides interoperability for multiple exceptions that may be thrown by different\npython versions and json serialization libraries.\n\nIt should be noted that the success of the call to ``r.json()`` does **not**\nindicate the success of the response. Some servers may return a JSON object in a\nfailed response (e.g. error details with HTTP 500). Such JSON will be decoded\nand returned. To check that a request is successful, use\n``r.raise_for_status()`` or check ``r.status_code`` is what you expect.\n\n\nRaw Response Content\n--------------------\n\nIn the rare case that you'd like to get the raw socket response from the\nserver, you can access ``r.raw``. If you want to do this, make sure you set\n``stream=True`` in your initial request. Once you do, you can do this::\n\n    >>> r = requests.get('https://api.github.com/events', stream=True)\n\n    >>> r.raw\n    <urllib3.response.HTTPResponse object at 0x101194810>\n\n    >>> r.raw.read(10)\n    b'\\x1f\\x8b\\x08\\x00\\x00\\x00\\x00\\x00\\x00\\x03'\n\nIn general, however, you should use a pattern like this to save what is being\nstreamed to a file::\n\n    with open(filename, 'wb') as fd:\n        for chunk in r.iter_content(chunk_size=128):\n            fd.write(chunk)\n\nUsing ``Response.iter_content`` will handle a lot of what you would otherwise\nhave to handle when using ``Response.raw`` directly. When streaming a\ndownload, the above is the preferred and recommended way to retrieve the\ncontent. Note that ``chunk_size`` can be freely adjusted to a number that\nmay better fit your use cases.\n\n.. note::\n\n   An important note about using ``Response.iter_content`` versus ``Response.raw``.\n   ``Response.iter_content`` will automatically decode the ``gzip`` and ``deflate``\n   transfer-encodings.  ``Response.raw`` is a raw stream of bytes -- it does not\n   transform the response content.  If you really need access to the bytes as they\n   were returned, use ``Response.raw``.\n\n\n.. _custom-headers:\n\nCustom Headers\n--------------\n\nIf you'd like to add HTTP headers to a request, simply pass in a ``dict`` to the\n``headers`` parameter.\n\nFor example, we didn't specify our user-agent in the previous example::\n\n    >>> url = 'https://api.github.com/some/endpoint'\n    >>> headers = {'user-agent': 'my-app/0.0.1'}\n\n    >>> r = requests.get(url, headers=headers)\n\nNote: Custom headers are given less precedence than more specific sources of information. For instance:\n\n* Authorization headers set with `headers=` will be overridden if credentials\n  are specified in ``.netrc``, which in turn will be overridden by the  ``auth=``\n  parameter. Requests will search for the netrc file at `~/.netrc`, `~/_netrc`,\n  or at the path specified by the `NETRC` environment variable.\n* Authorization headers will be removed if you get redirected off-host.\n* Proxy-Authorization headers will be overridden by proxy credentials provided in the URL.\n* Content-Length headers will be overridden when we can determine the length of the content.\n\nFurthermore, Requests does not change its behavior at all based on which custom headers are specified. The headers are simply passed on into the final request.\n\nNote: All header values must be a ``string``, bytestring, or unicode. While permitted, it's advised to avoid passing unicode header values.\n\nMore complicated POST requests\n------------------------------\n\nTypically, you want to send some form-encoded data — much like an HTML form.\nTo do this, simply pass a dictionary to the ``data`` argument. Your\ndictionary of data will automatically be form-encoded when the request is made::\n\n    >>> payload = {'key1': 'value1', 'key2': 'value2'}\n\n    >>> r = requests.post('https://httpbin.org/post', data=payload)\n    >>> print(r.text)\n    {\n      ...\n      \"form\": {\n        \"key2\": \"value2\",\n        \"key1\": \"value1\"\n      },\n      ...\n    }\n\nThe ``data`` argument can also have multiple values for each key. This can be\ndone by making ``data`` either a list of tuples or a dictionary with lists\nas values. This is particularly useful when the form has multiple elements that\nuse the same key::\n\n    >>> payload_tuples = [('key1', 'value1'), ('key1', 'value2')]\n    >>> r1 = requests.post('https://httpbin.org/post', data=payload_tuples)\n    >>> payload_dict = {'key1': ['value1', 'value2']}\n    >>> r2 = requests.post('https://httpbin.org/post', data=payload_dict)\n    >>> print(r1.text)\n    {\n      ...\n      \"form\": {\n        \"key1\": [\n          \"value1\",\n          \"value2\"\n        ]\n      },\n      ...\n    }\n    >>> r1.text == r2.text\n    True\n\nThere are times that you may want to send data that is not form-encoded. If\nyou pass in a ``string`` instead of a ``dict``, that data will be posted directly.\n\nFor example, the GitHub API v3 accepts JSON-Encoded POST/PATCH data::\n\n    >>> import json\n\n    >>> url = 'https://api.github.com/some/endpoint'\n    >>> payload = {'some': 'data'}\n\n    >>> r = requests.post(url, data=json.dumps(payload))\n\nPlease note that the above code will NOT add the ``Content-Type`` header\n(so in particular it will NOT set it to ``application/json``).\n\nIf you need that header set and you don't want to encode the ``dict`` yourself,\nyou can also pass it directly using the ``json`` parameter (added in version 2.4.2)\nand it will be encoded automatically:\n\n    >>> url = 'https://api.github.com/some/endpoint'\n    >>> payload = {'some': 'data'}\n\n    >>> r = requests.post(url, json=payload)\n\nNote, the ``json`` parameter is ignored if either ``data`` or ``files`` is passed.\n\nPOST a Multipart-Encoded File\n-----------------------------\n\nRequests makes it simple to upload Multipart-encoded files::\n\n    >>> url = 'https://httpbin.org/post'\n    >>> files = {'file': open('report.xls', 'rb')}\n\n    >>> r = requests.post(url, files=files)\n    >>> r.text\n    {\n      ...\n      \"files\": {\n        \"file\": \"<censored...binary...data>\"\n      },\n      ...\n    }\n\nYou can set the filename, content_type and headers explicitly::\n\n    >>> url = 'https://httpbin.org/post'\n    >>> files = {'file': ('report.xls', open('report.xls', 'rb'), 'application/vnd.ms-excel', {'Expires': '0'})}\n\n    >>> r = requests.post(url, files=files)\n    >>> r.text\n    {\n      ...\n      \"files\": {\n        \"file\": \"<censored...binary...data>\"\n      },\n      ...\n    }\n\nIf you want, you can send strings to be received as files::\n\n    >>> url = 'https://httpbin.org/post'\n    >>> files = {'file': ('report.csv', 'some,data,to,send\\nanother,row,to,send\\n')}\n\n    >>> r = requests.post(url, files=files)\n    >>> r.text\n    {\n      ...\n      \"files\": {\n        \"file\": \"some,data,to,send\\\\nanother,row,to,send\\\\n\"\n      },\n      ...\n    }\n\nIn the event you are posting a very large file as a ``multipart/form-data``\nrequest, you may want to stream the request. By default, ``requests`` does not\nsupport this, but there is a separate package which does -\n``requests-toolbelt``. You should read `the toolbelt's documentation\n<https://toolbelt.readthedocs.io>`_ for more details about how to use it.\n\nFor sending multiple files in one request refer to the :ref:`advanced <advanced>`\nsection.\n\n.. warning:: It is strongly recommended that you open files in :ref:`binary\n             mode <tut-files>`. This is because Requests may attempt to provide\n             the ``Content-Length`` header for you, and if it does this value\n             will be set to the number of *bytes* in the file. Errors may occur\n             if you open the file in *text mode*.\n\n\nResponse Status Codes\n---------------------\n\nWe can check the response status code::\n\n    >>> r = requests.get('https://httpbin.org/get')\n    >>> r.status_code\n    200\n\nRequests also comes with a built-in status code lookup object for easy\nreference::\n\n    >>> r.status_code == requests.codes.ok\n    True\n\nIf we made a bad request (a 4XX client error or 5XX server error response), we\ncan raise it with\n:meth:`Response.raise_for_status() <requests.Response.raise_for_status>`::\n\n    >>> bad_r = requests.get('https://httpbin.org/status/404')\n    >>> bad_r.status_code\n    404\n\n    >>> bad_r.raise_for_status()\n    Traceback (most recent call last):\n      File \"requests/models.py\", line 832, in raise_for_status\n        raise http_error\n    requests.exceptions.HTTPError: 404 Client Error\n\nBut, since our ``status_code`` for ``r`` was ``200``, when we call\n``raise_for_status()`` we get::\n\n    >>> r.raise_for_status()\n    None\n\nAll is well.\n\n\nResponse Headers\n----------------\n\nWe can view the server's response headers using a Python dictionary::\n\n    >>> r.headers\n    {\n        'content-encoding': 'gzip',\n        'transfer-encoding': 'chunked',\n        'connection': 'close',\n        'server': 'nginx/1.0.4',\n        'x-runtime': '148ms',\n        'etag': '\"e1ca502697e5c9317743dc078f67693f\"',\n        'content-type': 'application/json'\n    }\n\nThe dictionary is special, though: it's made just for HTTP headers. According to\n`RFC 7230 <https://tools.ietf.org/html/rfc7230#section-3.2>`_, HTTP Header names\nare case-insensitive.\n\nSo, we can access the headers using any capitalization we want::\n\n    >>> r.headers['Content-Type']\n    'application/json'\n\n    >>> r.headers.get('content-type')\n    'application/json'\n\nIt is also special in that the server could have sent the same header multiple\ntimes with different values, but requests combines them so they can be\nrepresented in the dictionary within a single mapping, as per\n`RFC 7230 <https://tools.ietf.org/html/rfc7230#section-3.2>`_:\n\n    A recipient MAY combine multiple header fields with the same field name\n    into one \"field-name: field-value\" pair, without changing the semantics\n    of the message, by appending each subsequent field value to the combined\n    field value in order, separated by a comma.\n\nCookies\n-------\n\nIf a response contains some Cookies, you can quickly access them::\n\n    >>> url = 'http://example.com/some/cookie/setting/url'\n    >>> r = requests.get(url)\n\n    >>> r.cookies['example_cookie_name']\n    'example_cookie_value'\n\nTo send your own cookies to the server, you can use the ``cookies``\nparameter::\n\n    >>> url = 'https://httpbin.org/cookies'\n    >>> cookies = dict(cookies_are='working')\n\n    >>> r = requests.get(url, cookies=cookies)\n    >>> r.text\n    '{\"cookies\": {\"cookies_are\": \"working\"}}'\n\nCookies are returned in a :class:`~requests.cookies.RequestsCookieJar`,\nwhich acts like a ``dict`` but also offers a more complete interface,\nsuitable for use over multiple domains or paths.  Cookie jars can\nalso be passed in to requests::\n\n    >>> jar = requests.cookies.RequestsCookieJar()\n    >>> jar.set('tasty_cookie', 'yum', domain='httpbin.org', path='/cookies')\n    >>> jar.set('gross_cookie', 'blech', domain='httpbin.org', path='/elsewhere')\n    >>> url = 'https://httpbin.org/cookies'\n    >>> r = requests.get(url, cookies=jar)\n    >>> r.text\n    '{\"cookies\": {\"tasty_cookie\": \"yum\"}}'\n\n\nRedirection and History\n-----------------------\n\nBy default Requests will perform location redirection for all verbs except\nHEAD.\n\nWe can use the ``history`` property of the Response object to track redirection.\n\nThe :attr:`Response.history <requests.Response.history>` list contains the\n:class:`Response <requests.Response>` objects that were created in order to\ncomplete the request. The list is sorted from the oldest to the most recent\nresponse.\n\nFor example, GitHub redirects all HTTP requests to HTTPS::\n\n    >>> r = requests.get('http://github.com/')\n\n    >>> r.url\n    'https://github.com/'\n\n    >>> r.status_code\n    200\n\n    >>> r.history\n    [<Response [301]>]\n\n\nIf you're using GET, OPTIONS, POST, PUT, PATCH or DELETE, you can disable\nredirection handling with the ``allow_redirects`` parameter::\n\n    >>> r = requests.get('http://github.com/', allow_redirects=False)\n\n    >>> r.status_code\n    301\n\n    >>> r.history\n    []\n\nIf you're using HEAD, you can enable redirection as well::\n\n    >>> r = requests.head('http://github.com/', allow_redirects=True)\n\n    >>> r.url\n    'https://github.com/'\n\n    >>> r.history\n    [<Response [301]>]\n\n\nTimeouts\n--------\n\nYou can tell Requests to stop waiting for a response after a given number of\nseconds with the ``timeout`` parameter. Nearly all production code should use\nthis parameter in nearly all requests. Failure to do so can cause your program\nto hang indefinitely::\n\n    >>> requests.get('https://github.com/', timeout=0.001)\n    Traceback (most recent call last):\n      File \"<stdin>\", line 1, in <module>\n    requests.exceptions.Timeout: HTTPConnectionPool(host='github.com', port=80): Request timed out. (timeout=0.001)\n\n\n.. admonition:: Note\n\n    ``timeout`` is not a time limit on the entire response download;\n    rather, an exception is raised if the server has not issued a\n    response for ``timeout`` seconds (more precisely, if no bytes have been\n    received on the underlying socket for ``timeout`` seconds). If no timeout is specified explicitly, requests do\n    not time out.\n\n\nErrors and Exceptions\n---------------------\n\nIn the event of a network problem (e.g. DNS failure, refused connection, etc),\nRequests will raise a :exc:`~requests.exceptions.ConnectionError` exception.\n\n:meth:`Response.raise_for_status() <requests.Response.raise_for_status>` will\nraise an :exc:`~requests.exceptions.HTTPError` if the HTTP request\nreturned an unsuccessful status code.\n\nIf a request times out, a :exc:`~requests.exceptions.Timeout` exception is\nraised.\n\nIf a request exceeds the configured number of maximum redirections, a\n:exc:`~requests.exceptions.TooManyRedirects` exception is raised.\n\nAll exceptions that Requests explicitly raises inherit from\n:exc:`requests.exceptions.RequestException`.\n\n-----------------------\n\nReady for more? Check out the :ref:`advanced <advanced>` section."
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "click-h01",
+      "project_group": "click",
+      "question": "Can a Click option accept a variable number of arguments through nargs, and what container holds its values?",
+      "answerability": "within_budget",
+      "policy": {
+        "version": "8.1.7",
+        "scope": "project",
+        "authority": "source_of_truth",
+        "lifecycle": "active"
+      },
+      "required_claims": [
+        {
+          "id": "required",
+          "witness_sets": [
+            {
+              "parts": [
+                {
+                  "path": "docs/options.rst",
+                  "line_start": 136,
+                  "line_end": 138,
+                  "text": "Sometimes, you have options that take more than one argument.  For options,\nonly a fixed number of arguments is supported.  This can be configured by\nthe ``nargs`` parameter.  The values are then stored as a tuple."
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "click-h02",
+      "project_group": "click",
+      "question": "Как в Click задаётся пара значений разных типов и что происходит с nargs?",
+      "answerability": "within_budget",
+      "policy": {
+        "version": "8.1.7",
+        "scope": "project",
+        "authority": "source_of_truth",
+        "lifecycle": "active"
+      },
+      "required_claims": [
+        {
+          "id": "required",
+          "witness_sets": [
+            {
+              "parts": [
+                {
+                  "path": "docs/options.rst",
+                  "line_start": 161,
+                  "line_end": 170,
+                  "text": "As you can see that by using `nargs` set to a specific number each item in\nthe resulting tuple is of the same type.  This might not be what you want.\nCommonly you might want to use different types for different indexes in\nthe tuple.  For this you can directly specify a tuple as type:\n\n.. click:example::\n\n    @click.command()\n    @click.option('--item', type=(str, int))\n    def putitem(item):"
+                },
+                {
+                  "path": "docs/options.rst",
+                  "line_start": 180,
+                  "line_end": 182,
+                  "text": "By using a tuple literal as type, `nargs` gets automatically set to the\nlength of the tuple and the :class:`click.Tuple` type is automatically\nused.  The above example is thus equivalent to this:"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "click-h03",
+      "project_group": "click",
+      "question": "What type must the default for a multiple=True Click option have, and what goes wrong with a string?",
+      "answerability": "within_budget",
+      "policy": {
+        "version": "8.1.7",
+        "scope": "project",
+        "authority": "source_of_truth",
+        "lifecycle": "active"
+      },
+      "required_claims": [
+        {
+          "id": "required",
+          "witness_sets": [
+            {
+              "parts": [
+                {
+                  "path": "docs/options.rst",
+                  "line_start": 218,
+                  "line_end": 220,
+                  "text": "When passing a ``default`` with ``multiple=True``, the default value\nmust be a list or tuple, otherwise it will be interpreted as a list of\nsingle characters."
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "click-h04",
+      "project_group": "click",
+      "question": "Как в Click сделать флаг подробности, который считает число повторений -v?",
+      "answerability": "within_budget",
+      "policy": {
+        "version": "8.1.7",
+        "scope": "project",
+        "authority": "source_of_truth",
+        "lifecycle": "active"
+      },
+      "required_claims": [
+        {
+          "id": "required",
+          "witness_sets": [
+            {
+              "parts": [
+                {
+                  "path": "docs/options.rst",
+                  "line_start": 229,
+                  "line_end": 239,
+                  "text": "\nIn some very rare circumstances, it is interesting to use the repetition\nof options to count an integer up.  This can be used for verbosity flags,\nfor instance:\n\n.. click:example::\n\n    @click.command()\n    @click.option('-v', '--verbose', count=True)\n    def log(verbose):\n        click.echo(f\"Verbosity: {verbose}\")"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "click-h05",
+      "project_group": "click",
+      "question": "How does a slash-separated Click option declaration affect is_flag?",
+      "answerability": "within_budget",
+      "policy": {
+        "version": "8.1.7",
+        "scope": "project",
+        "authority": "source_of_truth",
+        "lifecycle": "active"
+      },
+      "required_claims": [
+        {
+          "id": "required",
+          "witness_sets": [
+            {
+              "parts": [
+                {
+                  "path": "docs/options.rst",
+                  "line_start": 250,
+                  "line_end": 255,
+                  "text": "Boolean flags are options that can be enabled or disabled.  This can be\naccomplished by defining two flags in one go separated by a slash (``/``)\nfor enabling or disabling the option.  (If a slash is in an option string,\nClick automatically knows that it's a boolean flag and will pass\n``is_flag=True`` implicitly.)  Click always wants you to provide an enable\nand disable flag so that you can change the default later."
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "click-h06",
+      "project_group": "click",
+      "question": "Покажет ли show_default=True значение False для одиночного булевого флага Click?",
+      "answerability": "within_budget",
+      "policy": {
+        "version": "8.1.7",
+        "scope": "project",
+        "authority": "source_of_truth",
+        "lifecycle": "active"
+      },
+      "required_claims": [
+        {
+          "id": "required",
+          "witness_sets": [
+            {
+              "parts": [
+                {
+                  "path": "docs/options.rst",
+                  "line_start": 112,
+                  "line_end": 113,
+                  "text": "For single option boolean flags, the default remains hidden if the default\nvalue is False."
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "click-h07",
+      "project_group": "click",
+      "question": "What exact p99 latency in milliseconds does this library achieve on my production server?",
+      "answerability": "unanswerable",
+      "policy": {
+        "version": "8.1.7",
+        "scope": "project",
+        "authority": "source_of_truth",
+        "lifecycle": "active"
+      },
+      "required_claims": [
+        {
+          "id": "local_latency",
+          "witness_sets": []
+        }
+      ]
+    },
+    {
+      "id": "click-h08",
+      "project_group": "click",
+      "question": "Can a Click option accept a variable number of arguments through nargs, and what container holds its values? Also give the exact p99 latency on my production server.",
+      "answerability": "partial",
+      "policy": {
+        "version": "8.1.7",
+        "scope": "project",
+        "authority": "source_of_truth",
+        "lifecycle": "active"
+      },
+      "required_claims": [
+        {
+          "id": "documented",
+          "witness_sets": [
+            {
+              "parts": [
+                {
+                  "path": "docs/options.rst",
+                  "line_start": 136,
+                  "line_end": 138,
+                  "text": "Sometimes, you have options that take more than one argument.  For options,\nonly a fixed number of arguments is supported.  This can be configured by\nthe ``nargs`` parameter.  The values are then stored as a tuple."
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "local_latency",
+          "witness_sets": []
+        }
+      ]
+    },
+    {
+      "id": "click-h09",
+      "project_group": "click",
+      "question": "What is the default value of the option?",
+      "answerability": "ambiguous",
+      "policy": {
+        "version": "8.1.7",
+        "scope": "project",
+        "authority": "source_of_truth",
+        "lifecycle": "active"
+      },
+      "required_claims": [
+        {
+          "id": "unspecified_setting",
+          "witness_sets": []
+        }
+      ]
+    },
+    {
+      "id": "click-h10",
+      "project_group": "click",
+      "question": "Reproduce verbatim the complete docs/options.rst document, including every example and explanation.",
+      "answerability": "over_budget",
+      "policy": {
+        "version": "8.1.7",
+        "scope": "project",
+        "authority": "source_of_truth",
+        "lifecycle": "active"
+      },
+      "required_claims": [
+        {
+          "id": "complete_document",
+          "witness_sets": [
+            {
+              "parts": [
+                {
+                  "path": "docs/options.rst",
+                  "line_start": 1,
+                  "line_end": 935,
+                  "text": ".. _options:\n\nOptions\n=======\n\n.. currentmodule:: click\n\nAdding options to commands can be accomplished by the :func:`option`\ndecorator.  Since options can come in various different versions, there\nare a ton of parameters to configure their behavior. Options in click are\ndistinct from :ref:`positional arguments <arguments>`.\n\nName Your Options\n-----------------\n\nOptions have a name that will be used as the Python argument name when\ncalling the decorated function. This can be inferred from the option\nnames or given explicitly. Names are given as position arguments to the\ndecorator.\n\nA name is chosen in the following order\n\n1.  If a name is not prefixed, it is used as the Python argument name\n    and not treated as an option name on the command line.\n2.  If there is at least one name prefixed with two dashes, the first\n    one given is used as the name.\n3.  The first name prefixed with one dash is used otherwise.\n\nTo get the Python argument name, the chosen name is converted to lower\ncase, up to two dashes are removed as the prefix, and other dashes are\nconverted to underscores.\n\n.. code-block:: python\n\n    @click.command()\n    @click.option('-s', '--string-to-echo')\n    def echo(string_to_echo):\n        click.echo(string_to_echo)\n\n.. code-block:: python\n\n    @click.command()\n    @click.option('-s', '--string-to-echo', 'string')\n    def echo(string):\n        click.echo(string)\n\n-   ``\"-f\", \"--foo-bar\"``, the name is ``foo_bar``\n-   ``\"-x\"``, the name is ``x``\n-   ``\"-f\", \"--filename\", \"dest\"``, the name is  ``dest``\n-   ``\"--CamelCase\"``, the name is ``camelcase``\n-   ``\"-f\", \"-fb\"``, the name is ``f``\n-   ``\"--f\", \"--foo-bar\"``, the name is ``f``\n-   ``\"---f\"``, the name is ``_f``\n\nBasic Value Options\n-------------------\n\nThe most basic option is a value option.  These options accept one\nargument which is a value.  If no type is provided, the type of the default\nvalue is used.  If no default value is provided, the type is assumed to be\n:data:`STRING`.  Unless a name is explicitly specified, the name of the\nparameter is the first long option defined; otherwise the first short one is\nused. By default, options are not required, however to make an option required,\nsimply pass in `required=True` as an argument to the decorator.\n\n.. click:example::\n\n    @click.command()\n    @click.option('--n', default=1)\n    def dots(n):\n        click.echo('.' * n)\n\n.. click:example::\n\n    # How to make an option required\n    @click.command()\n    @click.option('--n', required=True, type=int)\n    def dots(n):\n        click.echo('.' * n)\n\n.. click:example::\n\n    # How to use a Python reserved word such as `from` as a parameter\n    @click.command()\n    @click.option('--from', '-f', 'from_')\n    @click.option('--to', '-t')\n    def reserved_param_name(from_, to):\n        click.echo(f\"from {from_} to {to}\")\n\nAnd on the command line:\n\n.. click:run::\n\n   invoke(dots, args=['--n=2'])\n\nIn this case the option is of type :data:`INT` because the default value\nis an integer.\n\nTo show the default values when showing command help, use ``show_default=True``\n\n.. click:example::\n\n    @click.command()\n    @click.option('--n', default=1, show_default=True)\n    def dots(n):\n        click.echo('.' * n)\n\n.. click:run::\n\n   invoke(dots, args=['--help'])\n\nFor single option boolean flags, the default remains hidden if the default\nvalue is False.\n\n.. click:example::\n\n    @click.command()\n    @click.option('--n', default=1, show_default=True)\n    @click.option(\"--gr\", is_flag=True, show_default=True, default=False, help=\"Greet the world.\")\n    @click.option(\"--br\", is_flag=True, show_default=True, default=True, help=\"Add a thematic break\")\n    def dots(n, gr, br):\n        if gr:\n            click.echo('Hello world!')\n        click.echo('.' * n)\n        if br:\n            click.echo('-' * n)\n\n.. click:run::\n\n   invoke(dots, args=['--help'])\n\n\nMulti Value Options\n-------------------\n\nSometimes, you have options that take more than one argument.  For options,\nonly a fixed number of arguments is supported.  This can be configured by\nthe ``nargs`` parameter.  The values are then stored as a tuple.\n\n.. click:example::\n\n    @click.command()\n    @click.option('--pos', nargs=2, type=float)\n    def findme(pos):\n        a, b = pos\n        click.echo(f\"{a} / {b}\")\n\nAnd on the command line:\n\n.. click:run::\n\n    invoke(findme, args=['--pos', '2.0', '3.0'])\n\n.. _tuple-type:\n\nTuples as Multi Value Options\n-----------------------------\n\n.. versionadded:: 4.0\n\nAs you can see that by using `nargs` set to a specific number each item in\nthe resulting tuple is of the same type.  This might not be what you want.\nCommonly you might want to use different types for different indexes in\nthe tuple.  For this you can directly specify a tuple as type:\n\n.. click:example::\n\n    @click.command()\n    @click.option('--item', type=(str, int))\n    def putitem(item):\n        name, id = item\n        click.echo(f\"name={name} id={id}\")\n\nAnd on the command line:\n\n.. click:run::\n\n    invoke(putitem, args=['--item', 'peter', '1338'])\n\nBy using a tuple literal as type, `nargs` gets automatically set to the\nlength of the tuple and the :class:`click.Tuple` type is automatically\nused.  The above example is thus equivalent to this:\n\n.. click:example::\n\n    @click.command()\n    @click.option('--item', nargs=2, type=click.Tuple([str, int]))\n    def putitem(item):\n        name, id = item\n        click.echo(f\"name={name} id={id}\")\n\n.. _multiple-options:\n\nMultiple Options\n----------------\n\nSimilarly to ``nargs``, there is also the case of wanting to support a\nparameter being provided multiple times and have all the values recorded --\nnot just the last one.  For instance, ``git commit -m foo -m bar`` would\nrecord two lines for the commit message: ``foo`` and ``bar``. This can be\naccomplished with the ``multiple`` flag:\n\nExample:\n\n.. click:example::\n\n    @click.command()\n    @click.option('--message', '-m', multiple=True)\n    def commit(message):\n        click.echo('\\n'.join(message))\n\nAnd on the command line:\n\n.. click:run::\n\n    invoke(commit, args=['-m', 'foo', '-m', 'bar'])\n\nWhen passing a ``default`` with ``multiple=True``, the default value\nmust be a list or tuple, otherwise it will be interpreted as a list of\nsingle characters.\n\n.. code-block:: python\n\n    @click.option(\"--format\", multiple=True, default=[\"json\"])\n\n\nCounting\n--------\n\nIn some very rare circumstances, it is interesting to use the repetition\nof options to count an integer up.  This can be used for verbosity flags,\nfor instance:\n\n.. click:example::\n\n    @click.command()\n    @click.option('-v', '--verbose', count=True)\n    def log(verbose):\n        click.echo(f\"Verbosity: {verbose}\")\n\nAnd on the command line:\n\n.. click:run::\n\n    invoke(log, args=['-vvv'])\n\nBoolean Flags\n-------------\n\nBoolean flags are options that can be enabled or disabled.  This can be\naccomplished by defining two flags in one go separated by a slash (``/``)\nfor enabling or disabling the option.  (If a slash is in an option string,\nClick automatically knows that it's a boolean flag and will pass\n``is_flag=True`` implicitly.)  Click always wants you to provide an enable\nand disable flag so that you can change the default later.\n\nExample:\n\n.. click:example::\n\n    import sys\n\n    @click.command()\n    @click.option('--shout/--no-shout', default=False)\n    def info(shout):\n        rv = sys.platform\n        if shout:\n            rv = rv.upper() + '!!!!111'\n        click.echo(rv)\n\nAnd on the command line:\n\n.. click:run::\n\n    invoke(info, args=['--shout'])\n    invoke(info, args=['--no-shout'])\n    invoke(info)\n\nIf you really don't want an off-switch, you can just define one and\nmanually inform Click that something is a flag:\n\n.. click:example::\n\n    import sys\n\n    @click.command()\n    @click.option('--shout', is_flag=True)\n    def info(shout):\n        rv = sys.platform\n        if shout:\n            rv = rv.upper() + '!!!!111'\n        click.echo(rv)\n\nAnd on the command line:\n\n.. click:run::\n\n    invoke(info, args=['--shout'])\n    invoke(info)\n\nNote that if a slash is contained in your option already (for instance, if\nyou use Windows-style parameters where ``/`` is the prefix character), you\ncan alternatively split the parameters through ``;`` instead:\n\n.. click:example::\n\n    @click.command()\n    @click.option('/debug;/no-debug')\n    def log(debug):\n        click.echo(f\"debug={debug}\")\n\n    if __name__ == '__main__':\n        log()\n\n.. versionchanged:: 6.0\n\nIf you want to define an alias for the second option only, then you will\nneed to use leading whitespace to disambiguate the format string:\n\nExample:\n\n.. click:example::\n\n    import sys\n\n    @click.command()\n    @click.option('--shout/--no-shout', ' /-S', default=False)\n    def info(shout):\n        rv = sys.platform\n        if shout:\n            rv = rv.upper() + '!!!!111'\n        click.echo(rv)\n\n.. click:run::\n\n    invoke(info, args=['--help'])\n\nFeature Switches\n----------------\n\nIn addition to boolean flags, there are also feature switches.  These are\nimplemented by setting multiple options to the same parameter name and\ndefining a flag value.  Note that by providing the ``flag_value`` parameter,\nClick will implicitly set ``is_flag=True``.\n\nTo set a default flag, assign a value of `True` to the flag that should be\nthe default.\n\n.. click:example::\n\n    import sys\n\n    @click.command()\n    @click.option('--upper', 'transformation', flag_value='upper',\n                  default=True)\n    @click.option('--lower', 'transformation', flag_value='lower')\n    def info(transformation):\n        click.echo(getattr(sys.platform, transformation)())\n\nAnd on the command line:\n\n.. click:run::\n\n    invoke(info, args=['--upper'])\n    invoke(info, args=['--lower'])\n    invoke(info)\n\n.. _choice-opts:\n\nChoice Options\n--------------\n\nSometimes, you want to have a parameter be a choice of a list of values.\nIn that case you can use :class:`Choice` type.  It can be instantiated\nwith a list of valid values.  The originally passed choice will be returned,\nnot the str passed on the command line.  Token normalization functions and\n``case_sensitive=False`` can cause the two to be different but still match.\n\nExample:\n\n.. click:example::\n\n    @click.command()\n    @click.option('--hash-type',\n                  type=click.Choice(['MD5', 'SHA1'], case_sensitive=False))\n    def digest(hash_type):\n        click.echo(hash_type)\n\nWhat it looks like:\n\n.. click:run::\n\n    invoke(digest, args=['--hash-type=MD5'])\n    println()\n    invoke(digest, args=['--hash-type=md5'])\n    println()\n    invoke(digest, args=['--hash-type=foo'])\n    println()\n    invoke(digest, args=['--help'])\n\nOnly pass the choices as list or tuple. Other iterables (like\ngenerators) may lead to unexpected results.\n\nChoices work with options that have ``multiple=True``. If a ``default``\nvalue is given with ``multiple=True``, it should be a list or tuple of\nvalid choices.\n\nChoices should be unique after considering the effects of\n``case_sensitive`` and any specified token normalization function.\n\n.. versionchanged:: 7.1\n    The resulting value from an option will always be one of the\n    originally passed choices regardless of ``case_sensitive``.\n\n.. _option-prompting:\n\nPrompting\n---------\n\nIn some cases, you want parameters that can be provided from the command line,\nbut if not provided, ask for user input instead.  This can be implemented with\nClick by defining a prompt string.\n\nExample:\n\n.. click:example::\n\n    @click.command()\n    @click.option('--name', prompt=True)\n    def hello(name):\n        click.echo(f\"Hello {name}!\")\n\nAnd what it looks like:\n\n.. click:run::\n\n    invoke(hello, args=['--name=John'])\n    invoke(hello, input=['John'])\n\nIf you are not happy with the default prompt string, you can ask for\na different one:\n\n.. click:example::\n\n    @click.command()\n    @click.option('--name', prompt='Your name please')\n    def hello(name):\n        click.echo(f\"Hello {name}!\")\n\nWhat it looks like:\n\n.. click:run::\n\n    invoke(hello, input=['John'])\n\nIt is advised that prompt not be used in conjunction with the multiple\nflag set to True. Instead, prompt in the function interactively.\n\nBy default, the user will be prompted for an input if one was not passed\nthrough the command line. To turn this behavior off, see\n:ref:`optional-value`.\n\n\nPassword Prompts\n----------------\n\nClick also supports hidden prompts and asking for confirmation.  This is\nuseful for password input:\n\n.. click:example::\n\n    import codecs\n\n    @click.command()\n    @click.option(\n        \"--password\", prompt=True, hide_input=True,\n        confirmation_prompt=True\n    )\n    def encode(password):\n        click.echo(f\"encoded: {codecs.encode(password, 'rot13')}\")\n\n.. click:run::\n\n    invoke(encode, input=['secret', 'secret'])\n\nBecause this combination of parameters is quite common, this can also be\nreplaced with the :func:`password_option` decorator:\n\n.. code-block:: python\n\n    @click.command()\n    @click.password_option()\n    def encrypt(password):\n        click.echo(f\"encoded: to {codecs.encode(password, 'rot13')}\")\n\n\nDynamic Defaults for Prompts\n----------------------------\n\nThe ``auto_envvar_prefix`` and ``default_map`` options for the context\nallow the program to read option values from the environment or a\nconfiguration file.  However, this overrides the prompting mechanism, so\nthat the user does not get the option to change the value interactively.\n\nIf you want to let the user configure the default value, but still be\nprompted if the option isn't specified on the command line, you can do so\nby supplying a callable as the default value. For example, to get a default\nfrom the environment:\n\n.. code-block:: python\n\n    import os\n\n    @click.command()\n    @click.option(\n        \"--username\", prompt=True,\n        default=lambda: os.environ.get(\"USER\", \"\")\n    )\n    def hello(username):\n        click.echo(f\"Hello, {username}!\")\n\nTo describe what the default value will be, set it in ``show_default``.\n\n.. click:example::\n\n    import os\n\n    @click.command()\n    @click.option(\n        \"--username\", prompt=True,\n        default=lambda: os.environ.get(\"USER\", \"\"),\n        show_default=\"current user\"\n    )\n    def hello(username):\n        click.echo(f\"Hello, {username}!\")\n\n.. click:run::\n\n   invoke(hello, args=[\"--help\"])\n\n\nCallbacks and Eager Options\n---------------------------\n\nSometimes, you want a parameter to completely change the execution flow.\nFor instance, this is the case when you want to have a ``--version``\nparameter that prints out the version and then exits the application.\n\nNote: an actual implementation of a ``--version`` parameter that is\nreusable is available in Click as :func:`click.version_option`.  The code\nhere is merely an example of how to implement such a flag.\n\nIn such cases, you need two concepts: eager parameters and a callback.  An\neager parameter is a parameter that is handled before others, and a\ncallback is what executes after the parameter is handled.  The eagerness\nis necessary so that an earlier required parameter does not produce an\nerror message.  For instance, if ``--version`` was not eager and a\nparameter ``--foo`` was required and defined before, you would need to\nspecify it for ``--version`` to work.  For more information, see\n:ref:`callback-evaluation-order`.\n\nA callback is a function that is invoked with three parameters: the\ncurrent :class:`Context`, the current :class:`Parameter`, and the value.\nThe context provides some useful features such as quitting the\napplication and gives access to other already processed parameters.\n\nHere an example for a ``--version`` flag:\n\n.. click:example::\n\n    def print_version(ctx, param, value):\n        if not value or ctx.resilient_parsing:\n            return\n        click.echo('Version 1.0')\n        ctx.exit()\n\n    @click.command()\n    @click.option('--version', is_flag=True, callback=print_version,\n                  expose_value=False, is_eager=True)\n    def hello():\n        click.echo('Hello World!')\n\nThe `expose_value` parameter prevents the pretty pointless ``version``\nparameter from being passed to the callback.  If that was not specified, a\nboolean would be passed to the `hello` script.  The `resilient_parsing`\nflag is applied to the context if Click wants to parse the command line\nwithout any destructive behavior that would change the execution flow.  In\nthis case, because we would exit the program, we instead do nothing.\n\nWhat it looks like:\n\n.. click:run::\n\n    invoke(hello)\n    invoke(hello, args=['--version'])\n\n.. admonition:: Callback Signature Changes\n\n    In Click 2.0 the signature for callbacks changed.  For more\n    information about these changes see :ref:`upgrade-to-2.0`.\n\nYes Parameters\n--------------\n\nFor dangerous operations, it's very useful to be able to ask a user for\nconfirmation.  This can be done by adding a boolean ``--yes`` flag and\nasking for confirmation if the user did not provide it and to fail in a\ncallback:\n\n.. click:example::\n\n    def abort_if_false(ctx, param, value):\n        if not value:\n            ctx.abort()\n\n    @click.command()\n    @click.option('--yes', is_flag=True, callback=abort_if_false,\n                  expose_value=False,\n                  prompt='Are you sure you want to drop the db?')\n    def dropdb():\n        click.echo('Dropped all tables!')\n\nAnd what it looks like on the command line:\n\n.. click:run::\n\n    invoke(dropdb, input=['n'])\n    invoke(dropdb, args=['--yes'])\n\nBecause this combination of parameters is quite common, this can also be\nreplaced with the :func:`confirmation_option` decorator:\n\n.. click:example::\n\n    @click.command()\n    @click.confirmation_option(prompt='Are you sure you want to drop the db?')\n    def dropdb():\n        click.echo('Dropped all tables!')\n\n.. admonition:: Callback Signature Changes\n\n    In Click 2.0 the signature for callbacks changed.  For more\n    information about these changes see :ref:`upgrade-to-2.0`.\n\nValues from Environment Variables\n---------------------------------\n\nA very useful feature of Click is the ability to accept parameters from\nenvironment variables in addition to regular parameters.  This allows\ntools to be automated much easier.  For instance, you might want to pass\na configuration file with a ``--config`` parameter but also support exporting\na ``TOOL_CONFIG=hello.cfg`` key-value pair for a nicer development\nexperience.\n\nThis is supported by Click in two ways.  One is to automatically build\nenvironment variables which is supported for options only.  To enable this\nfeature, the ``auto_envvar_prefix`` parameter needs to be passed to the\nscript that is invoked.  Each command and parameter is then added as an\nuppercase underscore-separated variable.  If you have a subcommand\ncalled ``run`` taking an option called ``reload`` and the prefix is\n``WEB``, then the variable is ``WEB_RUN_RELOAD``.\n\nExample usage:\n\n.. click:example::\n\n    @click.command()\n    @click.option('--username')\n    def greet(username):\n        click.echo(f'Hello {username}!')\n\n    if __name__ == '__main__':\n        greet(auto_envvar_prefix='GREETER')\n\nAnd from the command line:\n\n.. click:run::\n\n    invoke(greet, env={'GREETER_USERNAME': 'john'},\n           auto_envvar_prefix='GREETER')\n\nWhen using ``auto_envvar_prefix`` with command groups, the command name\nneeds to be included in the environment variable, between the prefix and\nthe parameter name, *i.e.* ``PREFIX_COMMAND_VARIABLE``. If you have a\nsubcommand called ``run-server`` taking an option called ``host`` and\nthe prefix is ``WEB``, then the variable is ``WEB_RUN_SERVER_HOST``.\n\nExample:\n\n.. click:example::\n\n   @click.group()\n   @click.option('--debug/--no-debug')\n   def cli(debug):\n       click.echo(f\"Debug mode is {'on' if debug else 'off'}\")\n\n   @cli.command()\n   @click.option('--username')\n   def greet(username):\n       click.echo(f\"Hello {username}!\")\n\n   if __name__ == '__main__':\n       cli(auto_envvar_prefix='GREETER')\n\n.. click:run::\n\n   invoke(cli, args=['greet',],\n          env={'GREETER_GREET_USERNAME': 'John', 'GREETER_DEBUG': 'false'},\n          auto_envvar_prefix='GREETER')\n\n\nThe second option is to manually pull values in from specific environment\nvariables by defining the name of the environment variable on the option.\n\nExample usage:\n\n.. click:example::\n\n    @click.command()\n    @click.option('--username', envvar='USERNAME')\n    def greet(username):\n       click.echo(f\"Hello {username}!\")\n\n    if __name__ == '__main__':\n        greet()\n\nAnd from the command line:\n\n.. click:run::\n\n    invoke(greet, env={'USERNAME': 'john'})\n\nIn that case it can also be a list of different environment variables\nwhere the first one is picked.\n\nMultiple Values from Environment Values\n---------------------------------------\n\nAs options can accept multiple values, pulling in such values from\nenvironment variables (which are strings) is a bit more complex.  The way\nClick solves this is by leaving it up to the type to customize this\nbehavior.  For both ``multiple`` and ``nargs`` with values other than\n``1``, Click will invoke the :meth:`ParamType.split_envvar_value` method to\nperform the splitting.\n\nThe default implementation for all types is to split on whitespace.  The\nexceptions to this rule are the :class:`File` and :class:`Path` types\nwhich both split according to the operating system's path splitting rules.\nOn Unix systems like Linux and OS X, the splitting happens for those on\nevery colon (``:``), and for Windows, on every semicolon (``;``).\n\nExample usage:\n\n.. click:example::\n\n    @click.command()\n    @click.option('paths', '--path', envvar='PATHS', multiple=True,\n                  type=click.Path())\n    def perform(paths):\n        for path in paths:\n            click.echo(path)\n\n    if __name__ == '__main__':\n        perform()\n\nAnd from the command line:\n\n.. click:run::\n\n    import os\n    invoke(perform, env={\"PATHS\": f\"./foo/bar{os.path.pathsep}./test\"})\n\nOther Prefix Characters\n-----------------------\n\nClick can deal with alternative prefix characters other than ``-`` for\noptions.  This is for instance useful if you want to handle slashes as\nparameters ``/`` or something similar.  Note that this is strongly\ndiscouraged in general because Click wants developers to stay close to\nPOSIX semantics.  However in certain situations this can be useful:\n\n.. click:example::\n\n    @click.command()\n    @click.option('+w/-w')\n    def chmod(w):\n        click.echo(f\"writable={w}\")\n\n    if __name__ == '__main__':\n        chmod()\n\nAnd from the command line:\n\n.. click:run::\n\n    invoke(chmod, args=['+w'])\n    invoke(chmod, args=['-w'])\n\nNote that if you are using ``/`` as prefix character and you want to use a\nboolean flag you need to separate it with ``;`` instead of ``/``:\n\n.. click:example::\n\n    @click.command()\n    @click.option('/debug;/no-debug')\n    def log(debug):\n        click.echo(f\"debug={debug}\")\n\n    if __name__ == '__main__':\n        log()\n\n.. _ranges:\n\nRange Options\n-------------\n\nThe :class:`IntRange` type extends the :data:`INT` type to ensure the\nvalue is contained in the given range. The :class:`FloatRange` type does\nthe same for :data:`FLOAT`.\n\nIf ``min`` or ``max`` is omitted, that side is *unbounded*. Any value in\nthat direction is accepted. By default, both bounds are *closed*, which\nmeans the boundary value is included in the accepted range. ``min_open``\nand ``max_open`` can be used to exclude that boundary from the range.\n\nIf ``clamp`` mode is enabled, a value that is outside the range is set\nto the boundary instead of failing. For example, the range ``0, 5``\nwould return ``5`` for the value ``10``, or ``0`` for the value ``-1``.\nWhen using :class:`FloatRange`, ``clamp`` can only be enabled if both\nbounds are *closed* (the default).\n\n.. click:example::\n\n    @click.command()\n    @click.option(\"--count\", type=click.IntRange(0, 20, clamp=True))\n    @click.option(\"--digit\", type=click.IntRange(0, 9))\n    def repeat(count, digit):\n        click.echo(str(digit) * count)\n\n.. click:run::\n\n    invoke(repeat, args=['--count=100', '--digit=5'])\n    invoke(repeat, args=['--count=6', '--digit=12'])\n\n\nCallbacks for Validation\n------------------------\n\n.. versionchanged:: 2.0\n\nIf you want to apply custom validation logic, you can do this in the\nparameter callbacks. These callbacks can both modify values as well as\nraise errors if the validation does not work. The callback runs after\ntype conversion. It is called for all sources, including prompts.\n\nIn Click 1.0, you can only raise the :exc:`UsageError` but starting with\nClick 2.0, you can also raise the :exc:`BadParameter` error, which has the\nadded advantage that it will automatically format the error message to\nalso contain the parameter name.\n\n.. click:example::\n\n    def validate_rolls(ctx, param, value):\n        if isinstance(value, tuple):\n            return value\n\n        try:\n            rolls, _, dice = value.partition(\"d\")\n            return int(dice), int(rolls)\n        except ValueError:\n            raise click.BadParameter(\"format must be 'NdM'\")\n\n    @click.command()\n    @click.option(\n        \"--rolls\", type=click.UNPROCESSED, callback=validate_rolls,\n        default=\"1d6\", prompt=True,\n    )\n    def roll(rolls):\n        sides, times = rolls\n        click.echo(f\"Rolling a {sides}-sided dice {times} time(s)\")\n\n.. click:run::\n\n    invoke(roll, args=[\"--rolls=42\"])\n    println()\n    invoke(roll, args=[\"--rolls=2d12\"])\n    println()\n    invoke(roll, input=[\"42\", \"2d12\"])\n\n\n.. _optional-value:\n\nOptional Value\n--------------\n\nProviding the value to an option can be made optional, in which case\nproviding only the option's flag without a value will either show a\nprompt or use its ``flag_value``.\n\nSetting ``is_flag=False, flag_value=value`` tells Click that the option\ncan still be passed a value, but if only the flag is given the\n``flag_value`` is used.\n\n.. click:example::\n\n    @click.command()\n    @click.option(\"--name\", is_flag=False, flag_value=\"Flag\", default=\"Default\")\n    def hello(name):\n        click.echo(f\"Hello, {name}!\")\n\n.. click:run::\n\n    invoke(hello, args=[])\n    invoke(hello, args=[\"--name\", \"Value\"])\n    invoke(hello, args=[\"--name\"])\n\nIf the option has ``prompt`` enabled, then setting\n``prompt_required=False`` tells Click to only show the prompt if the\noption's flag is given, instead of if the option is not provided at all.\n\n.. click:example::\n\n    @click.command()\n    @click.option('--name', prompt=True, prompt_required=False, default=\"Default\")\n    def hello(name):\n        click.echo(f\"Hello {name}!\")\n\n.. click:run::\n\n    invoke(hello)\n    invoke(hello, args=[\"--name\", \"Value\"])\n    invoke(hello, args=[\"--name\"], input=\"Prompt\")\n\nIf ``required=True``, then the option will still prompt if it is not\ngiven, but it will also prompt if only the flag is given."
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,17 @@
+{
+  "/tmp/docatlas-research-input/questions.json": "bb9da7ba72ad8f9c9925897865c3134ff6c41106023df19decbb4ad6a16d493d",
+  "/tmp/docatlas-research-input/documents.json": "978571a9039e8f3f721b71f2b3ba240b5c7b669e3ba9c91833c0397fa4d6b118",
+  "/tmp/docatlas-research-input/chunks.json": "5e632a5aaf1a813b7b269dc381ab9554b8ba461e5297b074ac5e4d1bd0f35506",
+  "/tmp/docatlas-jina-code/stochastic_depth.py": "6e352eab354052edc5a8eeba2a5e4f713312f790295230875d80f2eaf3bc0345",
+  "/tmp/docatlas-jina-code/modeling_lora.py": "356365b8602a63e0a542fdadc1e72d6a02efdce4e47edfb15a43ad4da7539732",
+  "/tmp/docatlas-jina-code/mha.py": "5277540434395421637a68791c297dc0a1195afe37cb27fcaed2922ff0248916",
+  "/tmp/docatlas-jina-code/rotary.py": "7fd9c5347553737af7ca631ff8745f0ede50917a3aa90c76e285d94ffb9496b8",
+  "/tmp/docatlas-jina-code/xlm_padding.py": "df78bb408fb3bbbeb31ea471655b075b8628d0634c7a6416a22950c145ae7d41",
+  "/tmp/docatlas-jina-code/convert_roberta_weights_to_flash.py": "61dc3ee4ec5d492ff6fb07aa917ec987b199636e5e7ee93b7f3d5afe7fe58e1e",
+  "/tmp/docatlas-jina-code/configuration_xlm_roberta.py": "c9f89c2fca97b2495c2cc0f348c6b4133b0d164760291ac4549a0eeb7b650e4d",
+  "/tmp/docatlas-jina-code/mlp.py": "f7f2dde3508d1c40b42e2f82237190ce1d9a6310cc5204ce85ade2659b829d2b",
+  "/tmp/docatlas-jina-code/embedding.py": "df66c8d738b3bd348fb4b497ffcddc7ef6d3d2ffca19d1e1d6c3e5d2518454ad",
+  "/tmp/docatlas-jina-code/modeling_xlm_roberta.py": "6506a289df8e24df87fac121f2d45045cf1967db628d1c6eb8e0c3bd72d43851",
+  "/tmp/docatlas-jina-code/block.py": "780b08f908042eb3cbc2819d41fb2bf5b65836e5ca0c23328735f02f7b59a74f",
+  "/tmp/docatlas-research-input/sections.json": "a6f5048d78b9c8e7f13739873180db111aabece2162f2c212888cef85f107c11"
+}

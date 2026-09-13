@@ -1,0 +1,10 @@
+{
+  "status": "frozen_before_H1_scores",
+  "sha256": {
+    "source-manifest.json": "e88a160b812851947dbabc30575c46d560452ab66ca301540b01223401ab00b3",
+    "cases.json": "716fd3110d247e5a5d1f8702e67d67c4f0073ce89f47cee43b2a2683a2fd03bb",
+    "sources/click/docs/options.rst": "6ef07a7fd827f7918533855a78d4d83ea0c46e25f9487e25bc55c2071ef91747",
+    "sources/requests/docs/user/quickstart.rst": "e2be6bd4a434b69e0c23c4ca5bcc12a2c7785ffd3b9eadd747ca98caea666bfd"
+  },
+  "note": "20 new questions; full-document reproduction controls are synthetic budget stress tests, not representative coding questions."
+}

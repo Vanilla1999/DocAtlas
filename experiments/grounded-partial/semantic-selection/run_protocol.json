@@ -1,0 +1,20 @@
+{
+  "status": "preregistered_before_scores",
+  "model": "BAAI/bge-reranker-v2-m3",
+  "revision": "953dc6f6f85a1b2dbfca4c34a2796e7dde08d41e",
+  "device": "cpu",
+  "dtype": "float32",
+  "threads": 4,
+  "batch_size": 4,
+  "seed": 0,
+  "max_length": 1024,
+  "truncation": "only_second",
+  "candidate_limit": 64,
+  "primary_k": 5,
+  "files": {
+    "experiments/grounded-partial/semantic-selection/PLAN_RU.md": "d3165bd3b2d73a92a71bedf0e7abcd483f9e56daac5d9f886f4a5ec49b7699cb",
+    "experiments/grounded-partial/semantic-selection/export.py": "4bcf94138cd927f8c6c639d9257491977676eb6be94b6588f6873440965c1b25",
+    "experiments/grounded-partial/semantic-selection/score.py": "32f70c8654d78510c5061b624a5a313df1b5ce35613acd689485be10fb88c3b6",
+    "experiments/grounded-partial/semantic-selection/holdout/identity.json": "349d3d6d15a556a87daf6ec3be5a5d19b5e43f2c054015ccc3245f1e64fd72ab"
+  }
+}

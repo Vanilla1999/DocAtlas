@@ -1,0 +1,1015 @@
+[
+  {
+    "id": "fastapi-01",
+    "question": "When do FastAPI background tasks run relative to returning the response?",
+    "overlapping_candidates": [
+      {
+        "span": {
+          "evidence_id": "child-93baed0b87c2ce64d1222a4e8f1dcdbc05cb6129",
+          "path_or_url": "docs/en/docs/tutorial/background-tasks.md",
+          "project_identity": "local:c271ffeda6ad1b6b26a15f7d889e4142479cb6220143f263ac6a5fc77e94b4f3",
+          "snippet": "# Background Tasks\n\nYou can define background tasks to be run *after* returning a response.\n\nThis is useful for operations that need to happen after a request, but that the client doesn't really have to be waiting for the operation to complete before receiving the response.\n\n",
+          "version_binding": null,
+          "line_start": 1,
+          "line_end": 6,
+          "char_start": 0,
+          "char_end": 276,
+          "authority": "source_of_truth",
+          "scope": "project",
+          "lifecycle": "active",
+          "retrieval_query_matches": {
+            "query-hint-2": {
+              "mode": "and",
+              "query_terms": [
+                "background"
+              ],
+              "matched_terms": [
+                "background"
+              ],
+              "exact_terms": [],
+              "missing_exact_terms": [],
+              "query_term_count": 1,
+              "matched_term_count": 1,
+              "match_ratio": 1.0,
+              "bm25_cost": -2.0631241330685114e-06,
+              "lexical_score": 2.0631241330685114e-06,
+              "field_matches": {
+                "title": [
+                  "background"
+                ],
+                "body": [
+                  "background"
+                ],
+                "retrieval_text": [
+                  "background"
+                ]
+              },
+              "query_text": "background",
+              "query_origin": "retrieval_hint",
+              "relation": "host_lookup",
+              "public_parent_query_id": null,
+              "preferred_catalog_roles": [],
+              "forbidden_catalog_roles": [],
+              "forbidden_evidence_terms": [],
+              "parent_exact_terms": [],
+              "body_matched_terms": [
+                "background"
+              ],
+              "heading_context_used": false,
+              "table_context_used": false,
+              "missing_parent_exact_terms": [],
+              "qualified": true,
+              "qualification_reason": "visible_fields"
+            }
+          },
+          "span_identity": "c7ebb176bb55bf1902d07899188ed1f7d35ce4199e2b30c90a6a7235773afa16"
+        },
+        "score": 4.645683288574219,
+        "A_rank": 5,
+        "B_rank": 1,
+        "original_check": {
+          "mode": "and",
+          "query_terms": [
+            "when",
+            "fastapi",
+            "background",
+            "tasks",
+            "relative",
+            "returning",
+            "response"
+          ],
+          "matched_terms": [
+            "background",
+            "tasks",
+            "returning",
+            "response"
+          ],
+          "exact_terms": [
+            "fastapi"
+          ],
+          "missing_exact_terms": [
+            "fastapi"
+          ],
+          "query_term_count": 1,
+          "matched_term_count": 4,
+          "match_ratio": 0.5714,
+          "bm25_cost": -2.0631241330685114e-06,
+          "lexical_score": 2.0631241330685114e-06,
+          "field_matches": {
+            "title": [
+              "background"
+            ],
+            "body": [
+              "background"
+            ],
+            "retrieval_text": [
+              "background"
+            ]
+          },
+          "query_text": "When do FastAPI background tasks run relative to returning the response?",
+          "query_origin": "original",
+          "relation": "direct",
+          "public_parent_query_id": null,
+          "preferred_catalog_roles": [],
+          "forbidden_catalog_roles": [],
+          "forbidden_evidence_terms": [],
+          "parent_exact_terms": [],
+          "body_matched_terms": [
+            "background",
+            "tasks",
+            "returning",
+            "response"
+          ],
+          "heading_context_used": false,
+          "table_context_used": false,
+          "missing_parent_exact_terms": [],
+          "qualified": false,
+          "qualification_reason": "insufficient_visible_match"
+        }
+      }
+    ],
+    "final": {
+      "status": "ok",
+      "kind": "docs_context",
+      "context_status": "ready",
+      "context_available": true,
+      "answer_supported": false,
+      "answer_available": false,
+      "support_status": "retrieval_only",
+      "answer_policy": "cite_only",
+      "coverage_policy": "retrieval_attribution_only",
+      "query_coverage": "full",
+      "retrieval_coverage": "full",
+      "facet_coverage": "unverified",
+      "covered_query_ids": [
+        "query-original",
+        "query-anchor-1"
+      ],
+      "missing_query_ids": [],
+      "missing_facets": [],
+      "facets": [],
+      "sources": [
+        {
+          "evidence_id": "ev-080d179288afc9f8",
+          "path_or_url": "docs/en/docs/tutorial/background-tasks.md",
+          "section": "Background Tasks > Technical Details",
+          "snippet": "By only using `BackgroundTasks` (and not `BackgroundTask`), it's then possible to use it as a *path operation function* parameter and have **FastAPI** handle the rest for you, just like when using the `Request` object directly.\n\nIt's still possible to use `BackgroundTask` alone in FastAPI, but you have to create the object in your code and return a Starlette `Response` including it.",
+          "version_binding": "unversioned",
+          "content_sha256": "9f42a04ee09c956d130b3ac01c33a5b4449a6831a6433a47c9297422196c51dc",
+          "project_identity": "local:c271ffeda6ad1b6b26a15f7d889e4142479cb6220143f263ac6a5fc77e94b4f3",
+          "authority": "source_of_truth",
+          "scope": "project",
+          "line_start": 124,
+          "line_end": 126,
+          "source_uri": "docatlas://source/25948311360277ed06939d9a"
+        }
+      ],
+      "edit_ready": false,
+      "investigation_allowed": true,
+      "estimated_tokens": 354
+    }
+  },
+  {
+    "id": "pydantic-03",
+    "question": "Перечисли способы включить strict mode, включая field, annotation, config и validation call.",
+    "overlapping_candidates": [
+      {
+        "span": {
+          "evidence_id": "child-fbd0a1a740b5bf86727ef62f2847659c12e8fea4",
+          "path_or_url": "docs/concepts/strict_mode.md",
+          "project_identity": "local:018ea9466ce56db843176950c4a6e34ca69e6d8082d7a725110a56898cb941c7",
+          "snippet": "There are various ways to get strict-mode validation while using Pydantic, which will be discussed in more detail below:\n\n* [Passing `strict=True` to the validation methods](#strict-mode-in-method-calls), such as `BaseModel.model_validate`,\n  `TypeAdapter.validate_python`, and similar for JSON\n* [Using `Field(strict=True)`](#strict-mode-with-field) with fields of a `BaseModel`, `dataclass`, or `TypedDict`\n* [Using `pydantic.types.Strict` as a type annotation](#strict-mode-with-annotated-strict) on a field\n  * Pydantic provides some type aliases that are already annotated with `Strict`, such as `pydantic.types.StrictInt`\n* [Using `ConfigDict(strict=True)`](#strict-mode-with-configdict)\n\n",
+          "version_binding": null,
+          "line_start": 39,
+          "line_end": 47,
+          "char_start": 1387,
+          "char_end": 2082,
+          "authority": "source_of_truth",
+          "scope": "project",
+          "lifecycle": "active",
+          "retrieval_query_matches": {
+            "query-original": {
+              "mode": "or_fallback",
+              "query_terms": [
+                "перечисли",
+                "способы",
+                "включить",
+                "strict",
+                "mode",
+                "включая",
+                "field",
+                "annotation",
+                "config",
+                "validation",
+                "call."
+              ],
+              "matched_terms": [
+                "strict",
+                "mode",
+                "field",
+                "validation"
+              ],
+              "exact_terms": [],
+              "missing_exact_terms": [],
+              "query_term_count": 11,
+              "matched_term_count": 4,
+              "match_ratio": 0.3636,
+              "bm25_cost": -2.7616908435768956,
+              "lexical_score": 2.7616908435768956,
+              "field_matches": {
+                "title": [],
+                "body": [
+                  "strict",
+                  "mode",
+                  "field",
+                  "annotation",
+                  "validation"
+                ],
+                "retrieval_text": [
+                  "strict",
+                  "mode",
+                  "field",
+                  "annotation",
+                  "validation"
+                ]
+              },
+              "query_text": "Перечисли способы включить strict mode, включая field, annotation, config и validation call.",
+              "query_origin": "original",
+              "relation": "direct",
+              "public_parent_query_id": null,
+              "preferred_catalog_roles": [],
+              "forbidden_catalog_roles": [],
+              "forbidden_evidence_terms": [],
+              "parent_exact_terms": [],
+              "body_matched_terms": [
+                "strict",
+                "mode",
+                "field",
+                "validation"
+              ],
+              "heading_context_used": false,
+              "table_context_used": false,
+              "missing_parent_exact_terms": [],
+              "qualified": false,
+              "qualification_reason": "insufficient_visible_match"
+            }
+          },
+          "span_identity": "e8830fb238212c6d98255850d5d27694e10822c95a1472bb6c2043b77dee67c5"
+        },
+        "score": 1.7571959495544434,
+        "A_rank": 2,
+        "B_rank": 1,
+        "original_check": {
+          "mode": "or_fallback",
+          "query_terms": [
+            "перечисли",
+            "способы",
+            "включить",
+            "strict",
+            "mode",
+            "включая",
+            "field",
+            "annotation",
+            "config",
+            "validation",
+            "call."
+          ],
+          "matched_terms": [
+            "strict",
+            "mode",
+            "field",
+            "validation"
+          ],
+          "exact_terms": [],
+          "missing_exact_terms": [],
+          "query_term_count": 11,
+          "matched_term_count": 4,
+          "match_ratio": 0.3636,
+          "bm25_cost": -2.7616908435768956,
+          "lexical_score": 2.7616908435768956,
+          "field_matches": {
+            "title": [],
+            "body": [
+              "strict",
+              "mode",
+              "field",
+              "annotation",
+              "validation"
+            ],
+            "retrieval_text": [
+              "strict",
+              "mode",
+              "field",
+              "annotation",
+              "validation"
+            ]
+          },
+          "query_text": "Перечисли способы включить strict mode, включая field, annotation, config и validation call.",
+          "query_origin": "original",
+          "relation": "direct",
+          "public_parent_query_id": null,
+          "preferred_catalog_roles": [],
+          "forbidden_catalog_roles": [],
+          "forbidden_evidence_terms": [],
+          "parent_exact_terms": [],
+          "body_matched_terms": [
+            "strict",
+            "mode",
+            "field",
+            "validation"
+          ],
+          "heading_context_used": false,
+          "table_context_used": false,
+          "missing_parent_exact_terms": [],
+          "qualified": false,
+          "qualification_reason": "insufficient_visible_match"
+        }
+      }
+    ],
+    "final": {
+      "status": "insufficient_evidence",
+      "kind": "docs_context",
+      "missing": [
+        "No safe, current, project-scoped documentation context was retrieved."
+      ],
+      "estimated_tokens": 236,
+      "recommended_next_action": {
+        "tool": "code_search",
+        "type": "search_local_source",
+        "handled_by": "coding_agent",
+        "requires_confirmation": false,
+        "reason": "no_candidates",
+        "query_terms": [
+          "Перечисли способы включить strict mode, включая field, annotation, config и validation call"
+        ],
+        "repeat_docs_context": false,
+        "auto_execute": false
+      },
+      "context_available": false,
+      "documentation_supported": false,
+      "investigation_allowed": true,
+      "hard_stop": false,
+      "recovery_origin": "retrieval",
+      "recovery_reason_code": "no_candidates",
+      "recovery_disposition": "search_local_source",
+      "disposition": "search_local_source",
+      "edit_ready": false,
+      "source_search_status": "required",
+      "requires_confirmation": false,
+      "answer_supported": false,
+      "answer_available": false,
+      "support_status": "insufficient_evidence"
+    }
+  },
+  {
+    "id": "httpx-06",
+    "question": "Какие переменные задают прокси для http, https и всех запросов?",
+    "overlapping_candidates": [
+      {
+        "span": {
+          "evidence_id": "child-a6aac8e525c7ff9853ccdcdc9c081aeb650c9e32",
+          "path_or_url": "docs/environment_variables.md",
+          "project_identity": "local:e2eb53934b00f51d04bf4199a34b40df1a006ea70347a936be3f9e28cacf38e0",
+          "snippet": "### `HTTP_PROXY`, `HTTPS_PROXY`, `ALL_PROXY`\n\nValid values: A URL to a proxy\n\n`HTTP_PROXY`, `HTTPS_PROXY`, `ALL_PROXY` set the proxy to be used for `http`, `https`, or all requests respectively.\n\n",
+          "version_binding": null,
+          "line_start": 20,
+          "line_end": 25,
+          "char_start": 893,
+          "char_end": 1089,
+          "authority": "source_of_truth",
+          "scope": "project",
+          "lifecycle": "active",
+          "retrieval_query_matches": {
+            "query-original": {
+              "mode": "or_fallback",
+              "query_terms": [
+                "какие",
+                "переменные",
+                "задают",
+                "прокси",
+                "http",
+                "https",
+                "всех",
+                "запросов"
+              ],
+              "matched_terms": [
+                "http",
+                "https"
+              ],
+              "exact_terms": [],
+              "missing_exact_terms": [],
+              "query_term_count": 8,
+              "matched_term_count": 2,
+              "match_ratio": 0.25,
+              "bm25_cost": -2.187460454092142,
+              "lexical_score": 2.187460454092142,
+              "field_matches": {
+                "title": [],
+                "body": [
+                  "http",
+                  "https"
+                ],
+                "retrieval_text": [
+                  "http",
+                  "https"
+                ]
+              },
+              "query_text": "Какие переменные задают прокси для http, https и всех запросов?",
+              "query_origin": "original",
+              "relation": "direct",
+              "public_parent_query_id": null,
+              "preferred_catalog_roles": [],
+              "forbidden_catalog_roles": [],
+              "forbidden_evidence_terms": [],
+              "parent_exact_terms": [],
+              "body_matched_terms": [
+                "http",
+                "https"
+              ],
+              "heading_context_used": false,
+              "table_context_used": false,
+              "missing_parent_exact_terms": [],
+              "qualified": false,
+              "qualification_reason": "insufficient_visible_match"
+            }
+          },
+          "span_identity": "3226062131e704f8702c26baee07e7b156ae4777d9f7d1c1bb11cce349c97c81"
+        },
+        "score": 3.916029930114746,
+        "A_rank": 1,
+        "B_rank": 1,
+        "original_check": {
+          "mode": "or_fallback",
+          "query_terms": [
+            "какие",
+            "переменные",
+            "задают",
+            "прокси",
+            "http",
+            "https",
+            "всех",
+            "запросов"
+          ],
+          "matched_terms": [
+            "http",
+            "https"
+          ],
+          "exact_terms": [],
+          "missing_exact_terms": [],
+          "query_term_count": 8,
+          "matched_term_count": 2,
+          "match_ratio": 0.25,
+          "bm25_cost": -2.187460454092142,
+          "lexical_score": 2.187460454092142,
+          "field_matches": {
+            "title": [],
+            "body": [
+              "http",
+              "https"
+            ],
+            "retrieval_text": [
+              "http",
+              "https"
+            ]
+          },
+          "query_text": "Какие переменные задают прокси для http, https и всех запросов?",
+          "query_origin": "original",
+          "relation": "direct",
+          "public_parent_query_id": null,
+          "preferred_catalog_roles": [],
+          "forbidden_catalog_roles": [],
+          "forbidden_evidence_terms": [],
+          "parent_exact_terms": [],
+          "body_matched_terms": [
+            "http",
+            "https"
+          ],
+          "heading_context_used": false,
+          "table_context_used": false,
+          "missing_parent_exact_terms": [],
+          "qualified": false,
+          "qualification_reason": "insufficient_visible_match"
+        }
+      }
+    ],
+    "final": {
+      "status": "insufficient_evidence",
+      "kind": "docs_context",
+      "missing": [
+        "No safe, current, project-scoped documentation context was retrieved."
+      ],
+      "estimated_tokens": 232,
+      "recommended_next_action": {
+        "tool": "code_search",
+        "type": "search_local_source",
+        "handled_by": "coding_agent",
+        "requires_confirmation": false,
+        "reason": "no_candidates",
+        "query_terms": [
+          "Какие переменные задают прокси для http, https и всех запросов"
+        ],
+        "repeat_docs_context": false,
+        "auto_execute": false
+      },
+      "context_available": false,
+      "documentation_supported": false,
+      "investigation_allowed": true,
+      "hard_stop": false,
+      "recovery_origin": "retrieval",
+      "recovery_reason_code": "no_candidates",
+      "recovery_disposition": "search_local_source",
+      "disposition": "search_local_source",
+      "edit_ready": false,
+      "source_search_status": "required",
+      "requires_confirmation": false,
+      "answer_supported": false,
+      "answer_available": false,
+      "support_status": "insufficient_evidence"
+    }
+  },
+  {
+    "id": "mkdocs-05",
+    "question": "Which page title wins when the navigation configuration and Markdown content define different titles?",
+    "overlapping_candidates": [
+      {
+        "span": {
+          "evidence_id": "child-9612e4a6decf578067e196c76e957bc2298e46c5",
+          "path_or_url": "docs/user-guide/writing-your-docs.md",
+          "project_identity": "local:f19826046a7fb3bd47cdcfdf6fff0d604a1935413213bd49f880b9ae85dc359a",
+          "snippet": "Note that if a title is defined for a page in the navigation, that title will be\nused throughout the site for that page and will override any title defined\nwithin the page itself.\n\nNavigation sub-sections can be created by listing related pages together under a\nsection title. For example:\n\n",
+          "version_binding": null,
+          "line_start": 133,
+          "line_end": 139,
+          "char_start": 4604,
+          "char_end": 4895,
+          "authority": "source_of_truth",
+          "scope": "project",
+          "lifecycle": "active",
+          "retrieval_query_matches": {
+            "query-hint-2": {
+              "mode": "and",
+              "query_terms": [
+                "page"
+              ],
+              "matched_terms": [
+                "page"
+              ],
+              "exact_terms": [],
+              "missing_exact_terms": [],
+              "query_term_count": 1,
+              "matched_term_count": 1,
+              "match_ratio": 1.0,
+              "bm25_cost": -2.5642536387555435,
+              "lexical_score": 2.5642536387555435,
+              "field_matches": {
+                "title": [],
+                "body": [
+                  "page"
+                ],
+                "retrieval_text": [
+                  "page"
+                ]
+              },
+              "query_text": "page",
+              "query_origin": "retrieval_hint",
+              "relation": "host_lookup",
+              "public_parent_query_id": null,
+              "preferred_catalog_roles": [],
+              "forbidden_catalog_roles": [],
+              "forbidden_evidence_terms": [],
+              "parent_exact_terms": [],
+              "body_matched_terms": [
+                "page"
+              ],
+              "heading_context_used": false,
+              "table_context_used": false,
+              "missing_parent_exact_terms": [],
+              "qualified": true,
+              "qualification_reason": "visible_fields"
+            }
+          },
+          "span_identity": "222b9e1552708d6aa0e6bc252a9827b62ec77102f01bfd2952c0e89d0315d802"
+        },
+        "score": -4.188114643096924,
+        "A_rank": 2,
+        "B_rank": 4,
+        "original_check": {
+          "mode": "and",
+          "query_terms": [
+            "page",
+            "title",
+            "wins",
+            "when",
+            "navigation",
+            "configuration",
+            "markdown",
+            "content",
+            "define",
+            "different",
+            "titles"
+          ],
+          "matched_terms": [
+            "page",
+            "title",
+            "navigation"
+          ],
+          "exact_terms": [],
+          "missing_exact_terms": [],
+          "query_term_count": 1,
+          "matched_term_count": 3,
+          "match_ratio": 0.2727,
+          "bm25_cost": -2.5642536387555435,
+          "lexical_score": 2.5642536387555435,
+          "field_matches": {
+            "title": [],
+            "body": [
+              "page"
+            ],
+            "retrieval_text": [
+              "page"
+            ]
+          },
+          "query_text": "Which page title wins when the navigation configuration and Markdown content define different titles?",
+          "query_origin": "original",
+          "relation": "direct",
+          "public_parent_query_id": null,
+          "preferred_catalog_roles": [],
+          "forbidden_catalog_roles": [],
+          "forbidden_evidence_terms": [],
+          "parent_exact_terms": [],
+          "body_matched_terms": [
+            "page",
+            "title",
+            "navigation"
+          ],
+          "heading_context_used": false,
+          "table_context_used": false,
+          "missing_parent_exact_terms": [],
+          "qualified": false,
+          "qualification_reason": "insufficient_visible_match"
+        }
+      }
+    ],
+    "final": {
+      "status": "ok",
+      "kind": "docs_context",
+      "context_status": "ready",
+      "context_available": true,
+      "answer_supported": false,
+      "answer_available": false,
+      "support_status": "retrieval_only",
+      "answer_policy": "cite_only",
+      "coverage_policy": "retrieval_attribution_only",
+      "query_coverage": "partial",
+      "retrieval_coverage": "partial",
+      "facet_coverage": "unverified",
+      "covered_query_ids": [],
+      "missing_query_ids": [
+        "query-original"
+      ],
+      "missing_facets": [],
+      "facets": [],
+      "sources": [
+        {
+          "evidence_id": "ev-d03b8650191486b2",
+          "path_or_url": "docs/user-guide/writing-your-docs.md",
+          "section": "Writing your docs > Writing with Markdown",
+          "snippet": "In addition to the base Markdown [syntax] which is common across all Markdown\nimplementations, MkDocs includes support for extending the Markdown syntax with\nPython-Markdown [extensions]. See the MkDocs' [markdown_extensions]\nconfiguration setting for details on how to enable extensions.\n\nMkDocs includes some extensions by default, which are highlighted below.",
+          "version_binding": "unversioned",
+          "content_sha256": "be34396bfcbbb29252edc7f9b844c00d716a97ad2c95d1f64dc8047e65ad17be",
+          "project_identity": "local:f19826046a7fb3bd47cdcfdf6fff0d604a1935413213bd49f880b9ae85dc359a",
+          "authority": "source_of_truth",
+          "scope": "project",
+          "line_start": 178,
+          "line_end": 183,
+          "source_uri": "docatlas://source/97a0c1b19d620cb90e54a946"
+        }
+      ],
+      "edit_ready": false,
+      "investigation_allowed": true,
+      "estimated_tokens": 346
+    }
+  },
+  {
+    "id": "uv-05",
+    "question": "Compare first-match, unsafe-first-match and unsafe-best-match index strategies.",
+    "overlapping_candidates": [
+      {
+        "span": {
+          "evidence_id": "child-e8e623240aa0db04fbd5ec77abe899cdf322fc72",
+          "path_or_url": "docs/pip/compatibility.md",
+          "project_identity": "local:87206403485bc09460daaee6e9ae06293336f51a16ff00d91d3314de52fdcba6",
+          "snippet": "As of v0.1.39, users can opt in to `pip`-style behavior for multiple indexes via the\n`--index-strategy` command-line option, or the `UV_INDEX_STRATEGY` environment variable, which\nsupports the following values:\n\n- `first-match` (default): Search for each package across all indexes, limiting the candidate\n  versions to those present in the first index that contains the package, prioritizing the\n  `--extra-index-url` indexes over the default index URL.\n- `unsafe-first-match`: Search for each package across all indexes, but prefer the first index with\n  a compatible version, even if newer versions are available on other indexes.\n- `unsafe-best-match`: Search for each package across all indexes, and select the best version from\n  the combined set of candidate versions.\n\n",
+          "version_binding": null,
+          "line_start": 136,
+          "line_end": 147,
+          "char_start": 8130,
+          "char_end": 8907,
+          "authority": "source_of_truth",
+          "scope": "project",
+          "lifecycle": "active",
+          "retrieval_query_matches": {
+            "query-hint-lexical-1": {
+              "mode": "and",
+              "query_terms": [
+                "first-match"
+              ],
+              "matched_terms": [
+                "first-match"
+              ],
+              "exact_terms": [],
+              "missing_exact_terms": [],
+              "query_term_count": 2,
+              "matched_term_count": 1,
+              "match_ratio": 1.0,
+              "bm25_cost": -9.18987743391854,
+              "lexical_score": 9.18987743391854,
+              "field_matches": {
+                "title": [],
+                "body": [
+                  "first",
+                  "match"
+                ],
+                "retrieval_text": [
+                  "first",
+                  "match"
+                ]
+              },
+              "query_text": "first-match",
+              "query_origin": "lexical_topic",
+              "relation": "host_lookup",
+              "public_parent_query_id": null,
+              "preferred_catalog_roles": [],
+              "forbidden_catalog_roles": [],
+              "forbidden_evidence_terms": [],
+              "parent_exact_terms": [],
+              "body_matched_terms": [
+                "first-match"
+              ],
+              "heading_context_used": false,
+              "table_context_used": false,
+              "missing_parent_exact_terms": [],
+              "qualified": true,
+              "qualification_reason": "visible_fields"
+            },
+            "query-hint-2": {
+              "mode": "and",
+              "query_terms": [
+                "first-match"
+              ],
+              "matched_terms": [
+                "first-match"
+              ],
+              "exact_terms": [],
+              "missing_exact_terms": [],
+              "query_term_count": 2,
+              "matched_term_count": 1,
+              "match_ratio": 1.0,
+              "bm25_cost": -9.18987743391854,
+              "lexical_score": 9.18987743391854,
+              "field_matches": {
+                "title": [],
+                "body": [
+                  "first",
+                  "match"
+                ],
+                "retrieval_text": [
+                  "first",
+                  "match"
+                ]
+              },
+              "query_text": "first-match",
+              "query_origin": "retrieval_hint",
+              "relation": "host_lookup",
+              "public_parent_query_id": null,
+              "preferred_catalog_roles": [],
+              "forbidden_catalog_roles": [],
+              "forbidden_evidence_terms": [],
+              "parent_exact_terms": [],
+              "body_matched_terms": [
+                "first-match"
+              ],
+              "heading_context_used": false,
+              "table_context_used": false,
+              "missing_parent_exact_terms": [],
+              "qualified": true,
+              "qualification_reason": "visible_fields"
+            }
+          },
+          "span_identity": "839c46149863fd23132481598d3e609e30be6682337907e7635b73129e8ae616"
+        },
+        "score": 2.7770256996154785,
+        "A_rank": 1,
+        "B_rank": 1,
+        "original_check": {
+          "mode": "and",
+          "query_terms": [
+            "first-match",
+            "unsafe-first-match",
+            "unsafe-best-match",
+            "index",
+            "strategies."
+          ],
+          "matched_terms": [
+            "first-match",
+            "unsafe-first-match",
+            "unsafe-best-match",
+            "index"
+          ],
+          "exact_terms": [],
+          "missing_exact_terms": [],
+          "query_term_count": 2,
+          "matched_term_count": 4,
+          "match_ratio": 0.8,
+          "bm25_cost": -9.18987743391854,
+          "lexical_score": 9.18987743391854,
+          "field_matches": {
+            "title": [],
+            "body": [
+              "first",
+              "match"
+            ],
+            "retrieval_text": [
+              "first",
+              "match"
+            ]
+          },
+          "query_text": "Compare first-match, unsafe-first-match and unsafe-best-match index strategies.",
+          "query_origin": "original",
+          "relation": "direct",
+          "public_parent_query_id": null,
+          "preferred_catalog_roles": [],
+          "forbidden_catalog_roles": [],
+          "forbidden_evidence_terms": [],
+          "parent_exact_terms": [],
+          "body_matched_terms": [
+            "first-match",
+            "unsafe-first-match",
+            "unsafe-best-match",
+            "index"
+          ],
+          "heading_context_used": false,
+          "table_context_used": false,
+          "missing_parent_exact_terms": [],
+          "qualified": true,
+          "qualification_reason": "visible_fields"
+        }
+      },
+      {
+        "span": {
+          "evidence_id": "child-daf07f3c117f96c7b16dede1afebeccb60073e98",
+          "path_or_url": "docs/pip/compatibility.md",
+          "project_identity": "local:87206403485bc09460daaee6e9ae06293336f51a16ff00d91d3314de52fdcba6",
+          "snippet": "While `unsafe-best-match` is the closest to `pip`'s behavior, it exposes users to the risk of\n\"dependency confusion\" attacks.\n\n",
+          "version_binding": null,
+          "line_start": 148,
+          "line_end": 150,
+          "char_start": 8907,
+          "char_end": 9034,
+          "authority": "source_of_truth",
+          "scope": "project",
+          "lifecycle": "active",
+          "retrieval_query_matches": {
+            "query-hint-lexical-3": {
+              "mode": "and",
+              "query_terms": [
+                "unsafe-best-match"
+              ],
+              "matched_terms": [
+                "unsafe-best-match"
+              ],
+              "exact_terms": [],
+              "missing_exact_terms": [],
+              "query_term_count": 3,
+              "matched_term_count": 1,
+              "match_ratio": 1.0,
+              "bm25_cost": -12.608724403230521,
+              "lexical_score": 12.608724403230521,
+              "field_matches": {
+                "title": [],
+                "body": [
+                  "unsafe",
+                  "best",
+                  "match"
+                ],
+                "retrieval_text": [
+                  "unsafe",
+                  "best",
+                  "match"
+                ]
+              },
+              "query_text": "unsafe-best-match",
+              "query_origin": "lexical_topic",
+              "relation": "host_lookup",
+              "public_parent_query_id": null,
+              "preferred_catalog_roles": [],
+              "forbidden_catalog_roles": [],
+              "forbidden_evidence_terms": [],
+              "parent_exact_terms": [],
+              "body_matched_terms": [
+                "unsafe-best-match"
+              ],
+              "heading_context_used": false,
+              "table_context_used": false,
+              "missing_parent_exact_terms": [],
+              "qualified": true,
+              "qualification_reason": "visible_fields"
+            }
+          },
+          "span_identity": "f2e218c674ab7a6a05133a1015bc3c33c374b3bdc34c54d42e14c12ca2a0e010"
+        },
+        "score": 0.13977766036987305,
+        "A_rank": 2,
+        "B_rank": 2,
+        "original_check": {
+          "mode": "and",
+          "query_terms": [
+            "first-match",
+            "unsafe-first-match",
+            "unsafe-best-match",
+            "index",
+            "strategies."
+          ],
+          "matched_terms": [
+            "unsafe-best-match"
+          ],
+          "exact_terms": [],
+          "missing_exact_terms": [],
+          "query_term_count": 3,
+          "matched_term_count": 1,
+          "match_ratio": 0.2,
+          "bm25_cost": -12.608724403230521,
+          "lexical_score": 12.608724403230521,
+          "field_matches": {
+            "title": [],
+            "body": [
+              "unsafe",
+              "best",
+              "match"
+            ],
+            "retrieval_text": [
+              "unsafe",
+              "best",
+              "match"
+            ]
+          },
+          "query_text": "Compare first-match, unsafe-first-match and unsafe-best-match index strategies.",
+          "query_origin": "original",
+          "relation": "direct",
+          "public_parent_query_id": null,
+          "preferred_catalog_roles": [],
+          "forbidden_catalog_roles": [],
+          "forbidden_evidence_terms": [],
+          "parent_exact_terms": [],
+          "body_matched_terms": [
+            "unsafe-best-match"
+          ],
+          "heading_context_used": false,
+          "table_context_used": false,
+          "missing_parent_exact_terms": [],
+          "qualified": false,
+          "qualification_reason": "insufficient_visible_match"
+        }
+      }
+    ],
+    "final": {
+      "status": "ok",
+      "kind": "docs_context",
+      "context_status": "ready",
+      "context_available": true,
+      "answer_supported": false,
+      "answer_available": false,
+      "support_status": "retrieval_only",
+      "answer_policy": "cite_only",
+      "coverage_policy": "retrieval_attribution_only",
+      "query_coverage": "full",
+      "retrieval_coverage": "full",
+      "facet_coverage": "unverified",
+      "covered_query_ids": [
+        "query-original"
+      ],
+      "missing_query_ids": [],
+      "missing_facets": [],
+      "facets": [],
+      "sources": [
+        {
+          "evidence_id": "ev-cd10c71db758b505",
+          "path_or_url": "docs/pip/compatibility.md",
+          "section": "Compatibility with `pip` and `pip-tools` > Packages that exist on multiple indexes",
+          "snippet": "- `unsafe-first-match`: Search for each package across all indexes, but prefer the first index with\n  a compatible version, even if newer versions are available on other indexes.\n- `unsafe-best-match`: Search for each package across all indexes, and select the best version from\n  the combined set of candidate versions.",
+          "version_binding": "unversioned",
+          "content_sha256": "db978b5a2a7e7361721d214487fe9ea76f29b9e32d3a4dabce5ecda4cf7940e7",
+          "project_identity": "local:87206403485bc09460daaee6e9ae06293336f51a16ff00d91d3314de52fdcba6",
+          "authority": "source_of_truth",
+          "scope": "project",
+          "line_start": 143,
+          "line_end": 146,
+          "source_uri": "docatlas://source/c6bcd0c317107645da1fb572"
+        }
+      ],
+      "edit_ready": false,
+      "investigation_allowed": true,
+      "estimated_tokens": 341
+    }
+  }
+]

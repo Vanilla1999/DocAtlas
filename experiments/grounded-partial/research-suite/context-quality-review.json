@@ -1,0 +1,176 @@
+{
+  "selection": "two lowest SHA keys per library, chosen before contexts finish; descriptive manual quality audit only",
+  "scope": "Single-assistant descriptive review of16 source-only preselected chunks. Not a calibrated quality score or independent adjudication. Repetition alone does not prove uselessness. No retrieval tuning followed the review.",
+  "metrics": {
+    "contexts": 353,
+    "generated_tokens": 23867,
+    "capped_at128": 54,
+    "within_requested50to80_words": 94,
+    "normalized_context_substring_of_own_chunk": 146,
+    "unique_normalized_contexts": 304,
+    "rows_sharing_an_identical_context": 73,
+    "maximum_prompt_tokens": 7377
+  },
+  "rows": [
+    {
+      "key": "00529c5ee479e441aea9b36344e078ad9cf02736412d645acca20454d4cfa0db",
+      "library": "fastapi",
+      "path": "docs/en/docs/tutorial/background-tasks.md",
+      "line_start": 140,
+      "source": "## Recap\n\nImport and use `BackgroundTasks` with parameters in *path operation functions* and dependencies to add background tasks.",
+      "context": "You can define background tasks to be run *after* returning a response. This is useful for operations that need to happen after a request, but that the client doesn't really have to be waiting for the operation to complete before receiving the response.",
+      "category": "generic_document_summary",
+      "note": "Repeats general response-timing paragraph instead of contextualizing the recap about dependency/path-operation parameters."
+    },
+    {
+      "key": "0c2588fe61834c8452ee1b53dbc17f4016afffc4ae50176cd20a5f89df0e209d",
+      "library": "fastapi",
+      "path": "docs/en/docs/tutorial/background-tasks.md",
+      "line_start": 138,
+      "source": "But if you need to access variables and objects from the same **FastAPI** app, or you need to perform small background tasks (like sending an email notification), you can simply just use `BackgroundTasks`.",
+      "context": "You can define background tasks to be run *after* returning a response. This is useful for operations that need to happen after a request, but that the client doesn't really have to be waiting for the operation to complete before receiving the response.",
+      "category": "generic_document_summary",
+      "note": "General background-task timing does not identify the excerpt condition of sharing app variables and small tasks."
+    },
+    {
+      "key": "084b5572e709886199d892c5c227e6297a8adb97fde4acbbed1529c9140299dd",
+      "library": "httpx",
+      "path": "docs/environment_variables.md",
+      "line_start": 1,
+      "source": "# Environment Variables\n\nThe HTTPX library can be configured via environment variables.\nEnvironment variables are used by default. To ignore environment variables, `trust_env` has to be set `False`. There are two ways to set `trust_env` to disable environment variables:\n\n* On the client via `httpx.Client(trust_env=False)`.\n* Using the top-level API, such as `httpx.get(\"<url>\", trust_env=False)`.",
+      "context": "The HTTPX library can be configured via environment variables. To ignore environment variables, `trust_env` has to be set `False`.",
+      "category": "source_repetition",
+      "note": "Rephrases existing trust_env configuration; little added context."
+    },
+    {
+      "key": "0e81d606c5599603625c8a286328193ca9ff7eb82643766178efdd812c4253b8",
+      "library": "httpx",
+      "path": "docs/environment_variables.md",
+      "line_start": 37,
+      "source": "### `NO_PROXY`\n\nValid values: a comma-separated list of hostnames/urls\n\n`NO_PROXY` disables the proxy for specific urls",
+      "context": "### `NO_PROXY`\n\nValid values: a comma-separated list of hostnames/urls",
+      "category": "source_repetition",
+      "note": "Copies heading and valid values; omits even the existing NO_PROXY effect."
+    },
+    {
+      "key": "00e3476e8354e2afe92811e063c171b91abb5d140dbaea83d747876d28d4fb6f",
+      "library": "mkdocs",
+      "path": "docs/user-guide/writing-your-docs.md",
+      "line_start": 43,
+      "source": "The file layout you use determines the URLs that are used for the generated\npages. Given the above layout, pages would be generated for the following URLs:\n\n```text\n/\n/about/\n/license/\n```\n\nYou can also include your Markdown files in nested directories if that better\nsuits your documentation layout.\n\n```text\ndocs/\n    index.md\n    user-guide/getting-started.md\n    user-guide/configuration-options.md\n    license.md\n```",
+      "context": "The file layout you use determines the URLs that are used for the generated pages. Given the above layout, pages would be generated for the following URLs:\n\n```text\n/\n/about/\n/license/\n```",
+      "category": "source_repetition",
+      "note": "Repeats existing file-layout paragraph and URL example."
+    },
+    {
+      "key": "0195f04fec5584932c62edeb5c2cf7ea87d322f3470d66ab89470ed88e85e01a",
+      "library": "mkdocs",
+      "path": "docs/user-guide/writing-your-docs.md",
+      "line_start": 1,
+      "source": "# Writing your docs\n\nHow to layout and write your Markdown source files.\n\n---",
+      "context": "# Writing your docs",
+      "category": "heading_only",
+      "note": "Returns Writing your docs heading only."
+    },
+    {
+      "key": "01b65f79442b5014a15d134c6c45c33b97f2ba01d9188b86eef584bfd0a8ed33",
+      "library": "pydantic",
+      "path": "docs/concepts/strict_mode.md",
+      "line_start": 323,
+      "source": "### `BaseModel`\n\nIf you want to enable strict mode for all fields on a complex input type, you can use\n[`ConfigDict(strict=True)`](../api/config.md#pydantic.config.ConfigDict) in the `model_config`:",
+      "context": "### `BaseModel`\n\nIf you want to enable strict mode for all fields on a complex input type, you can use\n[`ConfigDict(strict=True)`](../api/config.md#pydantic.config.ConfigDict) in the `model_config`:\n\n```python\nfrom pydantic import BaseModel, ConfigDict, ValidationError\n\n\nclass User(BaseModel):\n    model_config = ConfigDict(strict=True)\n\n    name: str\n    age: int\n    is_active: bool\n\n\ntry:\n    User(name='David', age='33', is_active='yes')\nexcept ValidationError as exc:\n    print(exc)\n    \"\"\"\n    2",
+      "category": "copied_context_truncated_code",
+      "note": "Adds neighboring ConfigDict example from full document, but emits capped code rather than concise contextual description."
+    },
+    {
+      "key": "08f37f4d407ce0bc0912ed671ba0302782afd0b14563007a5ed9c28f851d8e83",
+      "library": "pydantic",
+      "path": "docs/concepts/strict_mode.md",
+      "line_start": 197,
+      "source": "## Strict mode with `Field`\n\nFor individual fields on a model, you can [set `strict=True` on the field](../api/fields.md#pydantic.fields.Field).\nThis will cause strict-mode validation to be used for that field, even when the validation methods are called without\n`strict=True`.\n\nOnly the fields for which `strict=True` is set will be affected:",
+      "context": "Only the fields for which `strict=True` is set will be affected.",
+      "category": "source_repetition",
+      "note": "Only repeats the last sentence about fields with strict=True."
+    },
+    {
+      "key": "03709d4d71a4863305d047a68c87db94d820b7c519acde2c59a5e2534f3ae566",
+      "library": "ruff",
+      "path": "docs/configuration.md",
+      "line_start": 404,
+      "source": "You can completely disable Jupyter Notebook support by updating the\n[`extend-exclude`](settings.md#extend-exclude) setting:\n\n=== \"pyproject.toml\"\n\n    ```toml\n    [tool.ruff]\n    extend-exclude = [\"*.ipynb\"]\n    ```\n\n=== \"ruff.toml\"\n\n    ```toml\n    extend-exclude = [\"*.ipynb\"]\n    ```\n\nIf you'd like to ignore certain rules specifically for Jupyter Notebook files, you can do so by\nusing the [`per-file-ignores`](settings.md#per-file-ignores) setting:",
+      "context": "The context for the excerpt is:\n\n=== \"pyproject.toml\"\n\n    ```toml\n    [tool.ruff]\n    # Extend the `pyproject.toml` file in the parent directory...\n    extend = \"../pyproject.toml\"\n\n    # ...but use a different line length.\n    line-length = 100\n    ```\n\n=== \"ruff.toml\"\n\n    ```toml\n    # Extend the `ruff.toml` file in the parent directory...\n    extend = \"../ruff.toml\"\n\n    # ...but use a different line length.\n    line-length = 100\n",
+      "category": "wrong_excerpt_topic",
+      "note": "Excerpt is notebook exclusion; description switches to configuration inheritance and line length."
+    },
+    {
+      "key": "07ae2b1764ba86f496c3e3b0943ef322f4edcacfaac2bc04f979eabf584f8022",
+      "library": "ruff",
+      "path": "docs/configuration.md",
+      "line_start": 681,
+      "source": "option always take precedence over all configuration files, including\n          configuration files that were also specified using `--config`\n      --isolated\n          Ignore all configuration files\n```\n\n<!-- End auto-generated check help. -->\n\nOr `ruff help format` for more on the formatting command:\n\n<!-- Begin auto-generated format help. -->",
+      "context": "Return one paragraph of 50 to 80 words.",
+      "category": "prompt_echo",
+      "note": "Returns the instruction to write50–80 words, not a document description."
+    },
+    {
+      "key": "17ce440971686f209422f70547c59c9b4fd4d24e7f1f2fe6eb94dc7dd693f73a",
+      "library": "starlette",
+      "path": "docs/background.md",
+      "line_start": 1,
+      "source": "Starlette includes a `BackgroundTask` class for in-process background tasks.\n\nA background task should be attached to a response, and will run only once\nthe response has been sent.",
+      "context": "Starlette includes a `BackgroundTask` class for in-process background tasks. A background task should be attached to a response, and will run only once the response has been sent.",
+      "category": "source_repetition",
+      "note": "Nearly verbatim existing background-task introduction."
+    },
+    {
+      "key": "3c6a1e3fc498b8a1feba58094f89530cc46a64b800eb5484932d7c14c2e80110",
+      "library": "starlette",
+      "path": "docs/lifespan.md",
+      "line_start": 40,
+      "source": "```python\nimport contextlib\nfrom typing import AsyncIterator, TypedDict\n\nimport httpx\nfrom starlette.applications import Starlette\nfrom starlette.requests import Request\nfrom starlette.responses import PlainTextResponse\nfrom starlette.routing import Route\n\n\nclass State(TypedDict):\n    http_client: httpx.AsyncClient\n\n\n@contextlib.asynccontextmanager\nasync def lifespan(app: Starlette) -> AsyncIterator[State]:\n    async with httpx.AsyncClient() as client:\n        yield {\"http_client\": client}\n\n\nasync def homepage(request: Request) -> PlainTextResponse:\n    client = request.state.http_client\n    response = await client.get(\"https://www.example.com\")\n    return PlainTextResponse(response.text)\n\n\napp = Starlette(\n    lifespan=lifespan,\n    routes=[Route(\"/\", homepage)]\n)\n```",
+      "context": "The lifespan has the concept of `state`, which is a dictionary that can be used to share the objects between the lifespan, and the requests.",
+      "category": "useful_document_context",
+      "note": "Explains shared lifespan/request state for the code excerpt using surrounding documentation."
+    },
+    {
+      "key": "00cfa26bf86ea52c2877ce241f4f43311bffa0a9449897d654290e6a42147e64",
+      "library": "typer",
+      "path": "docs/tutorial/parameter-types/bool.md",
+      "line_start": 192,
+      "source": "## Only names for `False`\n\nIf you want to (although it might not be a good idea), you can declare only *CLI option* names to set the `False` value.\n\nTo do that, use a space and a single `/` and pass the negative name after:\n\n//// tab | Python 3.7+\n\n```Python hl_lines=\"5\"\n{!> ../docs_src/parameter_types/bool/tutorial004_an.py!}\n```\n\n////\n\n//// tab | Python 3.7+ non-Annotated\n\n/// tip\n\nPrefer to use the `Annotated` version if possible.\n\n///",
+      "context": "## Only names for `False`\n\nIf you want to (although it might not be a good idea), you can declare only *CLI option* names to set the `False` value.\n\nTo do that, use a space and a single `/` and pass the negative name after:",
+      "category": "source_repetition",
+      "note": "Repeats the existing negative-name declaration instructions."
+    },
+    {
+      "key": "016fd96059b6529015c4ab12d6a3c75d08af4e1f2fb09a8319390270ec24ab1e",
+      "library": "typer",
+      "path": "docs/tutorial/parameter-types/bool.md",
+      "line_start": 214,
+      "source": "```Python hl_lines=\"4\"\n{!> ../docs_src/parameter_types/bool/tutorial004.py!}\n```\n\n////\n\n/// tip\n\nHave in mind that it's a string with a preceding space and then a `/`.\n\nSo, it's `\" /-S\"` not `\"/-S\"`.\n\n///\n\nCheck it:\n\n<div class=\"termy\">",
+      "context": "```Python hl_lines=\"4\"\n{!> ../docs_src/parameter_types/bool/tutorial004.py!}\n```",
+      "category": "include_directive_only",
+      "note": "Copies source include directive, without contextualizing its leading-space/slash requirement."
+    },
+    {
+      "key": "02cabb6b523956f7f9e67d06ad5bb692789199398f4aa8404097a8188d29e035",
+      "library": "uv",
+      "path": "docs/pip/compatibility.md",
+      "line_start": 422,
+      "source": "## `egg` support\n\nuv does not support features that are considered legacy or deprecated in `pip`. For example, uv does\nnot support `.egg`-style distributions.\n\nHowever, uv does have partial support for (1) `.egg-info`-style distributions (which are\noccasionally found in Docker images and Conda environments) and (2) legacy editable\n`.egg-link`-style distributions.",
+      "context": "## `pip` command-line options and subcommands\n\nuv does not support the complete set of `pip`'s command-line options and subcommands, although it\ndoes support a large subset. Missing options and subcommands are prioritized based on user demand and\nthe complexity of the implementation, and tend to be tracked in individual issues. For example:\n\n- [`--trusted-host`](https://github.com/astral-sh/uv/issues/1339)\n- [`--user`](https://github.com/astral-sh/uv/issues/2077)\n\nIf you encounter a missing option or subcommand, please search the",
+      "category": "wrong_excerpt_topic",
+      "note": "Excerpt concerns egg distribution support; context switches to unrelated pip command-line option coverage."
+    },
+    {
+      "key": "02fcd6e31a3b4be7e87134e197f0abd0f2f058927829bd8397acc4ed7ba489c4",
+      "library": "uv",
+      "path": "docs/pip/compatibility.md",
+      "line_start": 431,
+      "source": "Specifically, uv does not support installing new `.egg-info`- or `.egg-link`-style distributions,\nbut will respect any such existing distributions during resolution, list them with `uv pip list` and\n`uv pip freeze`, and uninstall them with `uv pip uninstall`.",
+      "context": "Specifically, uv does not support installing new `.egg-info`- or `.egg-link`-style distributions, but will respect any such existing distributions during resolution, list them with `uv pip list` and `uv pip freeze`, and uninstall them with `uv pip uninstall`.",
+      "category": "source_repetition",
+      "note": "Repeats the existing egg-info/egg-link install/resolution distinction."
+    }
+  ]
+}

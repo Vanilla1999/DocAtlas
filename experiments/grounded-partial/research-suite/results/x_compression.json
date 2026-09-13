@@ -1,0 +1,402 @@
+{
+  "f4e0971ebb4bbaae8046bfa93105c98267dc146e93396c32423e38ff8d2bb216": {
+    "input_chars": 5210,
+    "retained_chars": 1879,
+    "retained_spans": 7
+  },
+  "3450f1eb092a0661bcf54f93cb9929ff371870f88f0737b69f65d01032c0321c": {
+    "input_chars": 2078,
+    "retained_chars": 869,
+    "retained_spans": 3
+  },
+  "85560124e44583624d3a5586af9676f3db81e909c5896fc4d635ab3a6e0205f7": {
+    "input_chars": 4525,
+    "retained_chars": 3735,
+    "retained_spans": 9
+  },
+  "79b092e5315fbfd833dec478f2da59652d969614bae5d09938e9c01f0ed38ed5": {
+    "input_chars": 4494,
+    "retained_chars": 518,
+    "retained_spans": 2
+  },
+  "eb07379cee6ac12a003506bbb27872505404b023510b4514cd1e889a8d6372bb": {
+    "input_chars": 2761,
+    "retained_chars": 939,
+    "retained_spans": 4
+  },
+  "3e807149a9b6f031edbfec9d79a93b1d7e21588fb4133bcdeff834d2a0a31eb4": {
+    "input_chars": 660,
+    "retained_chars": 118,
+    "retained_spans": 1
+  },
+  "99541a07edae4bac152e4d4e7b361d0a883591f3cdaad590307816df2374431e": {
+    "input_chars": 5183,
+    "retained_chars": 1371,
+    "retained_spans": 4
+  },
+  "d8da31c7a1ac78a8090a8a93efa6b629fe8e54cb57ce92fa1ba2cfbb09a98f06": {
+    "input_chars": 1445,
+    "retained_chars": 0,
+    "retained_spans": 0
+  },
+  "21020bd42fa5c5b74e24108634609591029cfd471a68f20aadecde2b5e3017c7": {
+    "input_chars": 2982,
+    "retained_chars": 1182,
+    "retained_spans": 4
+  },
+  "cb44c74c5f54484374d85976bd72a32ce90506b85d779df1adc1e6e3687fc121": {
+    "input_chars": 4069,
+    "retained_chars": 1807,
+    "retained_spans": 6
+  },
+  "36942ed50a1f7577540257e8cac21571cc313ad6e53ddbe07dc033c720dce8b3": {
+    "input_chars": 2870,
+    "retained_chars": 1035,
+    "retained_spans": 5
+  },
+  "13752d42403a7f05e55c94f8961a9f5795f47356b4e3c93fd1ace91fef830349": {
+    "input_chars": 3469,
+    "retained_chars": 1203,
+    "retained_spans": 4
+  },
+  "e8bffd64f49b0ea148e6225f87a3d729cdbe5046df793fb4d7500536cfa1d09e": {
+    "input_chars": 2241,
+    "retained_chars": 1591,
+    "retained_spans": 6
+  },
+  "d3ef3c4257ecc6f6c51d8407906ec005c980f5923185aef4dfec21d5b50dbbfc": {
+    "input_chars": 2430,
+    "retained_chars": 984,
+    "retained_spans": 4
+  },
+  "ee1297a59c892cbdd777f729105c282be5dc0d3897957ef8df7e0c6163037162": {
+    "input_chars": 3667,
+    "retained_chars": 1168,
+    "retained_spans": 4
+  },
+  "82c01d58d7ac49e435d3c359a968eb6e350e36094c974e8d626211d805a20d85": {
+    "input_chars": 1097,
+    "retained_chars": 1024,
+    "retained_spans": 4
+  },
+  "2dbbc1a1ef263128a5bdcc7edb9a3a8f0f1fc80f067d4f3f2841f4916fc0bfff": {
+    "input_chars": 3740,
+    "retained_chars": 959,
+    "retained_spans": 5
+  },
+  "2d9f13b0f4c5b5ca7251dfb0ad82385e5861f7844b01a99aee284cc4bff1ed3c": {
+    "input_chars": 1742,
+    "retained_chars": 0,
+    "retained_spans": 0
+  },
+  "298d301e52867fb5d9e31ec1132de498c26da7c4823fadfbfc57afa4f5401b3d": {
+    "input_chars": 2289,
+    "retained_chars": 886,
+    "retained_spans": 3
+  },
+  "b5694a4729d971c77ef74c51231457ef62191e200e97dade71507ca448be05c0": {
+    "input_chars": 2899,
+    "retained_chars": 2340,
+    "retained_spans": 8
+  },
+  "ec49ac4a5c33bae55c21cec130e09601b572e321770c7e82418270e575c1e2f8": {
+    "input_chars": 2732,
+    "retained_chars": 710,
+    "retained_spans": 3
+  },
+  "351bd6e6c0e49500bc2b39d52e48d33640d1171f6d555bc77c82366823a5629e": {
+    "input_chars": 2039,
+    "retained_chars": 564,
+    "retained_spans": 3
+  },
+  "53a8b6c531ce91469cb7fb9ab2f0aab0401b61299a95fc2794feba5f4339e5b4": {
+    "input_chars": 3281,
+    "retained_chars": 231,
+    "retained_spans": 1
+  },
+  "c935a7ffa302379783e7ecdf2ecae300de17d3390329d39b02fb4cbe492a6875": {
+    "input_chars": 3789,
+    "retained_chars": 2216,
+    "retained_spans": 10
+  },
+  "a85bb2abec5c37bea14e4973171a32a83c43797e2d565157b250db180fce9041": {
+    "input_chars": 3516,
+    "retained_chars": 451,
+    "retained_spans": 3
+  },
+  "690db283b5a5b17b173e0a10cc48c98fa3b691cfa9730f21360659a87ea8cb78": {
+    "input_chars": 2846,
+    "retained_chars": 573,
+    "retained_spans": 3
+  },
+  "8259757a800d955332e48d0aca808960cb317345e5d813e85b21d9f60a46f3bb": {
+    "input_chars": 2244,
+    "retained_chars": 861,
+    "retained_spans": 4
+  },
+  "3a0571630863c8028611fc1905b36ad019bcc36bef3cba23ea9f1d4a7f30c569": {
+    "input_chars": 1122,
+    "retained_chars": 0,
+    "retained_spans": 0
+  },
+  "882fbc89d6954d066b256b6364e32b9324370e614b438db1a85220a35814eb2b": {
+    "input_chars": 2858,
+    "retained_chars": 700,
+    "retained_spans": 4
+  },
+  "1313ba0b94cbf6545eff492e3a9e35c1ef212d7c8c631d2a07a31677123affcc": {
+    "input_chars": 2763,
+    "retained_chars": 290,
+    "retained_spans": 2
+  },
+  "89499b7d722f84671af7bce3782552956455f1a2a0f5d3759f3c40e44e2e767d": {
+    "input_chars": 5764,
+    "retained_chars": 3755,
+    "retained_spans": 13
+  },
+  "7e3e3525dee109abfcc43e71e7c3c099ad0f9bd3afc787ac74b7bad0d44504fb": {
+    "input_chars": 4423,
+    "retained_chars": 2462,
+    "retained_spans": 3
+  },
+  "9b29609929de20242fda64bf5f08072cc45beaf92c8438fe98adf1243b85b073": {
+    "input_chars": 2505,
+    "retained_chars": 2066,
+    "retained_spans": 5
+  },
+  "79b9187a6d1ad6105dc11425cc88c8e162cc341d070426100894d072c1580b7d": {
+    "input_chars": 4881,
+    "retained_chars": 3043,
+    "retained_spans": 9
+  },
+  "213c85f4fe147db024034667086c1f7128103f834eed3786b043b7f14f5404c6": {
+    "input_chars": 3441,
+    "retained_chars": 2590,
+    "retained_spans": 10
+  },
+  "a88436b96d5481c8228ed69ec2a62592701f8b87cb766a1bda78b221db138e49": {
+    "input_chars": 2707,
+    "retained_chars": 426,
+    "retained_spans": 1
+  },
+  "298a415c5030b86b28d4ca49293b2abde657b4a7ca1f0c0c5d7dd2739b54fe5d": {
+    "input_chars": 5313,
+    "retained_chars": 4398,
+    "retained_spans": 15
+  },
+  "01d3e85f1d0212af214b99d9096582bbcc4d5c929364d3099a5630adeb697b72": {
+    "input_chars": 2750,
+    "retained_chars": 0,
+    "retained_spans": 0
+  },
+  "1588c4ded4e74ae273baf5e654fe633c6c9c71a18f3e798bebde8ca56230069d": {
+    "input_chars": 4250,
+    "retained_chars": 1887,
+    "retained_spans": 5
+  },
+  "7576e8d2db84ceda345fc93b8c7de93386773b778917ae64a015bea88637c7d4": {
+    "input_chars": 3100,
+    "retained_chars": 856,
+    "retained_spans": 4
+  },
+  "07d601bf6a385fa212bcd935436d051cb9df3c34f13c75ebd2bcae7253bc8d9f": {
+    "input_chars": 4156,
+    "retained_chars": 713,
+    "retained_spans": 2
+  },
+  "44a4b2f4b6a88a432b597b7f3e6ba05bbb815f9d9c258df1b92f6ac193097865": {
+    "input_chars": 3917,
+    "retained_chars": 2388,
+    "retained_spans": 9
+  },
+  "3216ec55d58ea80ee940d9dcb6c475a9ea2935a390719541c72255d350752954": {
+    "input_chars": 4658,
+    "retained_chars": 2051,
+    "retained_spans": 8
+  },
+  "ee205854805a2344ed902eed9ba38da05aa5f2132d5f730594a328ca7966a368": {
+    "input_chars": 4623,
+    "retained_chars": 1391,
+    "retained_spans": 6
+  },
+  "8fe505a14077092c4201713a0958ac5ea5b5f9a8f1609e72c45d984091f1de68": {
+    "input_chars": 3866,
+    "retained_chars": 1176,
+    "retained_spans": 6
+  },
+  "1890222c086776fa691b6d23c67e1c45c6a51f883a24e84f0f72259b3741aa24": {
+    "input_chars": 4644,
+    "retained_chars": 1141,
+    "retained_spans": 3
+  },
+  "f0111850ef8908db7b332ea4af049cf4164ed2773fa0f12ad1d719d06eac5248": {
+    "input_chars": 7198,
+    "retained_chars": 565,
+    "retained_spans": 3
+  },
+  "393b135ac550d1ea1b1f50981834c57aea25e5885258ccd9b8b4bb51ff835163": {
+    "input_chars": 2699,
+    "retained_chars": 0,
+    "retained_spans": 0
+  },
+  "783f3658c3b23fa3d75c4a85d2d00177706e657fede32b7f4fd8bc499cb936de": {
+    "input_chars": 5963,
+    "retained_chars": 2541,
+    "retained_spans": 6
+  },
+  "2cf7bfbe779d30eec943c0ec64c4317c252dc33eb6ce02176a3289c014cc0311": {
+    "input_chars": 6848,
+    "retained_chars": 2568,
+    "retained_spans": 7
+  },
+  "70b87367b13cff21f67c5464819fa16594c580ecfd2ae7e99710a4468506105f": {
+    "input_chars": 1515,
+    "retained_chars": 365,
+    "retained_spans": 2
+  },
+  "99cc4701412c5b8801a74c618f40334f206e1d84f5b5cc4c1e0668725dcf9d48": {
+    "input_chars": 3473,
+    "retained_chars": 2233,
+    "retained_spans": 4
+  },
+  "b5467ddca5fc72bebbb77fcf1540d14796f864cc15b90e82b764ae247dbb381a": {
+    "input_chars": 3132,
+    "retained_chars": 718,
+    "retained_spans": 2
+  },
+  "efe251b1a20361c9e7da83235a5078bfb6e39ef708b92a3586eed81da7fcb47d": {
+    "input_chars": 2924,
+    "retained_chars": 105,
+    "retained_spans": 1
+  },
+  "fd8d09a6d30182b8f5826357f1675cd35c21dc33a0ea3df42c32e24b60cb5639": {
+    "input_chars": 3546,
+    "retained_chars": 3082,
+    "retained_spans": 9
+  },
+  "67cdd8998f6ba3d70ba962aaf1912c2f3ef0198ce13d548103673e69236c4805": {
+    "input_chars": 2201,
+    "retained_chars": 1540,
+    "retained_spans": 3
+  },
+  "3556129a0252f16d022dd5a4aae3e9997d8886efbdb99cdd875c77751b307720": {
+    "input_chars": 1515,
+    "retained_chars": 365,
+    "retained_spans": 2
+  },
+  "ab773cc79f885b58e02e36f5a66c1ee0d11584157b6a8afb94fbf66a36d8cb7c": {
+    "input_chars": 3113,
+    "retained_chars": 0,
+    "retained_spans": 0
+  },
+  "676ad15b2965672e0100722bded00dde3de52647ebc0620e71f0cb157a0cc9a3": {
+    "input_chars": 3778,
+    "retained_chars": 123,
+    "retained_spans": 1
+  },
+  "e14b2a153cdfc85a8872dd7a5ea8a598b9561450c739a69b49100ac446534bff": {
+    "input_chars": 3590,
+    "retained_chars": 2884,
+    "retained_spans": 6
+  },
+  "a8559c8929b7a3e4431ecaa883781eb518e32b39ea7c3cdb1f9f7444fec0b594": {
+    "input_chars": 5223,
+    "retained_chars": 1709,
+    "retained_spans": 7
+  },
+  "ea1fbd37a8040aba080767778d6c0aa7c5818f86191a27d8dc11feb20e57a1df": {
+    "input_chars": 3589,
+    "retained_chars": 2968,
+    "retained_spans": 9
+  },
+  "65d9d961e77525dcd72955e8561c335c24bb768c1374ccaeedacc7f9cb24408a": {
+    "input_chars": 3565,
+    "retained_chars": 1885,
+    "retained_spans": 9
+  },
+  "1ef182fd56ac921369788b01a602c30c91467ee54cc3c76e2b04d737d6b690cc": {
+    "input_chars": 1971,
+    "retained_chars": 1238,
+    "retained_spans": 4
+  },
+  "96a5fbc6a5c17c501cd57b45f074d1d820d94864aab4b27429f7b37de4db2852": {
+    "input_chars": 1108,
+    "retained_chars": 217,
+    "retained_spans": 1
+  },
+  "eac4ecd5b29846b103c133d992368f4f63cd3d14745746300535e1aa5d1bab9a": {
+    "input_chars": 3520,
+    "retained_chars": 758,
+    "retained_spans": 2
+  },
+  "564d449e620fd8fa3ba52b13975709eeb1a30eea0cdcc5ca0591839a4c5dbb86": {
+    "input_chars": 4154,
+    "retained_chars": 140,
+    "retained_spans": 2
+  },
+  "31a13320670c75c222a2febb0e61c44768524e885d0fd059ff07c5de806c0a93": {
+    "input_chars": 1714,
+    "retained_chars": 0,
+    "retained_spans": 0
+  },
+  "86c17f8961e75883741779f194a63defb71888578de6adf660c320597e8bebb9": {
+    "input_chars": 2567,
+    "retained_chars": 378,
+    "retained_spans": 2
+  },
+  "1563fb222bcc5c7f8aba4efa9fb498caa2bd84e6da1f18c148b677ea5098951b": {
+    "input_chars": 3290,
+    "retained_chars": 2007,
+    "retained_spans": 8
+  },
+  "4ea8195ddccd93f0740a9aac883efab45fe70429a561b87bb70d5c2dc64e4972": {
+    "input_chars": 2067,
+    "retained_chars": 679,
+    "retained_spans": 3
+  },
+  "fb63d0b480a703e8e88c1497156e8be7dd633db0fe041dd4a1000139615e8f40": {
+    "input_chars": 1617,
+    "retained_chars": 1220,
+    "retained_spans": 4
+  },
+  "f37e1ae5fb9a6ac83eaa4f19efc7242c15aa0fcc0753b41a7b7993d4d875ea4e": {
+    "input_chars": 4799,
+    "retained_chars": 2870,
+    "retained_spans": 12
+  },
+  "d3cd9d0e0544f57c22fac7388c8deacc8e8136150e045073c44e13afcdbb82c2": {
+    "input_chars": 3598,
+    "retained_chars": 2612,
+    "retained_spans": 7
+  },
+  "10e5735b6978ee1fc33661c44c357637699285389a3fdc77585b92d9d4de5ffc": {
+    "input_chars": 2327,
+    "retained_chars": 1822,
+    "retained_spans": 5
+  },
+  "7653c93cb4a78bcbf4d1a2803f2f6a2e66c6e20fca578a02034be474489664dc": {
+    "input_chars": 2711,
+    "retained_chars": 631,
+    "retained_spans": 3
+  },
+  "e8a04655fdb72e5370585071e9a9d7895bdddd490f2838d6b6071e54f8822b78": {
+    "input_chars": 1867,
+    "retained_chars": 290,
+    "retained_spans": 2
+  },
+  "682f815bf43c3c1845d1b0ded024d8ab2bb4e89a028de5986665ee08b3b7372d": {
+    "input_chars": 1906,
+    "retained_chars": 0,
+    "retained_spans": 0
+  },
+  "dee118a6a2aad84b1c9cf330637c64c86740d4b74b3172e0dd5737b6304467fc": {
+    "input_chars": 2939,
+    "retained_chars": 942,
+    "retained_spans": 4
+  },
+  "6e01f103f1667e1d15e8594ed9fd0bd1c03a26218b0fe7d1b04447bf8c88c11b": {
+    "input_chars": 2588,
+    "retained_chars": 988,
+    "retained_spans": 4
+  }
+}

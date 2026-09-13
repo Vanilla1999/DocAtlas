@@ -1,0 +1,28 @@
+{
+  "archive_sha256": "c279fe2bcbc8ce0566ee09c299f7fd463d235d2b0ec134916db0e76359ff86da",
+  "uncompressed_bytes": 46231516,
+  "compressed_bytes": 399072,
+  "files": {
+    "docatlas-research-input/chunks.json": "d28e64918b4cd191fc53c2adcd9ab56ed6b96f82621c70f215e67c3f1f4cb256",
+    "docatlas-research-input/documents.json": "b7ac0acebfe9fcd778e312b85696fa881330bedde6301878c474ea535ff12a89",
+    "docatlas-research-input/questions.json": "3117ed004d0a8ca54be3493a7f1ba75371503e1049ef4a717af9721b128b04ac",
+    "docatlas-research-input/sections.json": "3777a7493b1bcde642eaeb334de9b794745943084f4aca8dd64da3fc5437cb82",
+    "docatlas-xprovence-output-v2/environment.json": "60cd0bf739400e52c52a79e6cb691c194d58d2171645e58097f8459a626b4d54",
+    "docatlas-xprovence-output-v2/rows.json": "a8920af7d91cc4609baf36f65b0c82d922f09a0e1ded368538aedff7475b30fd",
+    "docatlas-embedding-output-v2/environment.json": "eb40d89e4c24b43d5cc34ef26096d18b99dcbc1c8b8bfdab5bdcfdb47edf0f83",
+    "docatlas-embedding-output-v2/rankings.json": "c673016db7d66b70483990453b2f9e05ec498c14f6e969d3c8b0bd7fb572ceb2",
+    "docatlas-contextual-final/contexts.json": "1fdd95f8bea7084f3110193bb772e4b1f2a657f0bff6835402cf8ce8c5e7dc3f",
+    "docatlas-contextual-final/environment.json": "49350d9445e4d516499b1de9d4308c14d6f56e10645d9c47eaded8bcec44c8e2",
+    "docatlas-context-embedding-final/environment.json": "8b61d2bb487f8bd610fffbf7700b174f5d933f8f26452b869ec6f654d9279d22",
+    "docatlas-context-embedding-final/rankings.json": "b3348943041213fd7b6c67b0481a1a64f972fc32ebfe9d68ffcc1d6a024ff931",
+    "docatlas-research-final-eval/paired.json": "0f1776d734efba7a55e21eab0b5bacdcd55bcd97dfa440713faccac05be8c2f1",
+    "docatlas-research-final-eval/rows.json": "4be7be70d4502ddf1f05e088b180901846b4ea650734a00c58e5110e6f4a733c",
+    "docatlas-research-final-eval/summary.json": "4c7f60e1ce43cda761a1ec979c0167e4026c7a34a3541cf21117cfdaa7878508",
+    "docatlas-research-final-eval/x_compression.json": "8a17d2479f70e9d70ad33b036e6012d3d4fd8f574872bbc25152d02729c59f40",
+    "docatlas-research-index-coverage.json": "e67c1b516be144a5d0a11e42ca95f34113d3d4a0b5f71ca907974bc6188845b0"
+  },
+  "vector_arrays_included": false,
+  "scores_and_full_rankings_included": true,
+  "frozen80": 80,
+  "weak_answer_model_tested": false
+}

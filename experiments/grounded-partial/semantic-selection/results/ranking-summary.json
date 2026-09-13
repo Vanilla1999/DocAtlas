@@ -1,0 +1,76 @@
+{
+  "cases": 80,
+  "primary_k": 5,
+  "native_baseline": 33,
+  "ks": {
+    "1": {
+      "A": 25,
+      "B": 37,
+      "wins": [
+        "fastapi-01",
+        "fastapi-02",
+        "fastapi-03",
+        "starlette-01",
+        "pydantic-03",
+        "httpx-01",
+        "httpx-02",
+        "httpx-05",
+        "mkdocs-01",
+        "mkdocs-02",
+        "mkdocs-04",
+        "uv-03"
+      ],
+      "losses": [],
+      "mcnemar_exact_p": 0.00048828125
+    },
+    "3": {
+      "A": 40,
+      "B": 43,
+      "wins": [
+        "fastapi-01",
+        "fastapi-02",
+        "pydantic-02",
+        "uv-06"
+      ],
+      "losses": [
+        "mkdocs-05"
+      ],
+      "mcnemar_exact_p": 0.375
+    },
+    "5": {
+      "A": 44,
+      "B": 44,
+      "wins": [],
+      "losses": [],
+      "mcnemar_exact_p": 1
+    },
+    "10": {
+      "A": 44,
+      "B": 44,
+      "wins": [],
+      "losses": [],
+      "mcnemar_exact_p": 1
+    }
+  },
+  "pool_complete": 44,
+  "scorer_visible_pool_complete": 44,
+  "H1": "not_supported",
+  "timings": {
+    "p50_warm_query_seconds": 4.5109483740016,
+    "p95_warm_query_seconds": 10.624041634997411,
+    "cold_model_load_seconds": 4.535985438000353,
+    "first_query_seconds": 11.055367106004269,
+    "peak_rss_kib": 4333916,
+    "pairs": 701,
+    "pair_input_tokens": 115724
+  },
+  "raw_truncation_flags": 692,
+  "truncated_candidates": 0,
+  "pool_missing": [
+    "fastapi-06",
+    "typer-05",
+    "httpx-03",
+    "uv-04"
+  ],
+  "unmapped_spans": 0
+}
