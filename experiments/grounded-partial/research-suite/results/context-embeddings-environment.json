@@ -1,0 +1,25 @@
+{
+  "model": "jinaai/jina-embeddings-v3",
+  "revision": "ab036b023d30b4d1138c4c3bfa9f0c445ab455d6",
+  "code_revision": "bd55a5ec8e6c0fb1d6c26efb4b6a4a74ce8a88d3",
+  "dtype": "float32",
+  "threads": 2,
+  "passage_pooling": "mean source/context tokens; exclude instruction and special tokens",
+  "query_pooling": "mean all tokens",
+  "task_instructions": {
+    "retrieval.query": "Represent the query for retrieving evidence documents: ",
+    "retrieval.passage": "Represent the document for retrieval: ",
+    "separation": "",
+    "classification": "",
+    "text-matching": ""
+  },
+  "lora_cache_equivalence_max_error": 0.0,
+  "sdpa_equivalence_max_error": 7.152557373046875e-07,
+  "windows": [],
+  "timings": {
+    "context_index_seconds": 368.83417446594103,
+    "context_wait_seconds": 724.9955002620627
+  },
+  "total_seconds": 1093.9014605389966,
+  "peak_rss_kib": 5580668
+}

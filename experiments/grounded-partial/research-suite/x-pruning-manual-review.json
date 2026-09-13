@@ -1,0 +1,376 @@
+{
+  "scope": "Post-hoc manual critique of thirteen lost literal witness sets, BEFORE final packing; not new gold, not an answer-model experiment, not a replacement acceptance score. No parameters were retuned.",
+  "reviewer": "single assistant review, not independent blinded adjudication",
+  "rows": [
+    {
+      "id": "fastapi-04",
+      "question": "Can allow_credentials work with allow_origins=[\"*\"] in CORSMiddleware, and what is the default?",
+      "gold": [
+        {
+          "id": "required",
+          "witness_sets": [
+            {
+              "parts": [
+                {
+                  "path": "docs/en/docs/tutorial/cors.md",
+                  "text": "* `allow_credentials` - Indicate that cookies should be supported for cross-origin requests. Defaults to `False`. Also, `allow_origins` cannot be set to `['*']` for credentials to be allowed, origins must be specified.",
+                  "line_start": 61,
+                  "line_end": 61
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "retained": [
+        "The default parameters used by the `CORSMiddleware` implementation are restrictive by default, so you'll need to explicitly enable particular origins, methods, or headers, in order for browsers to be permitted to use them in a Cross-Domain context.",
+        "But that will only allow certain types of communication, excluding everything that involves credentials: Cookies, Authorization headers like those used with Bearer Tokens, etc.\n\nSo, for everything to work correctly, it's better to specify explicitly the allowed origins."
+      ],
+      "manual_category": "clear_required_fact_missing",
+      "manual_reason": "The explicit default False is missing; generic restrictive defaults cannot establish it."
+    },
+    {
+      "id": "fastapi-05",
+      "question": "What identifies a CORS preflight request and which response status codes can the middleware return?",
+      "gold": [
+        {
+          "id": "required",
+          "witness_sets": [
+            {
+              "parts": [
+                {
+                  "path": "docs/en/docs/tutorial/cors.md",
+                  "text": "These are any `OPTIONS` request with `Origin` and `Access-Control-Request-Method` headers.\n\nIn this case the middleware will intercept the incoming request and respond with appropriate CORS headers, and either a `200` or `400` response for informational purposes.",
+                  "line_start": 69,
+                  "line_end": 71
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "retained": [
+        "In this case the middleware will intercept the incoming request and respond with appropriate CORS headers, and either a `200` or `400` response for informational purposes.",
+        "In this case the middleware will pass the request through as normal, but will include appropriate CORS headers on the response.",
+        "As connecting to an email server and sending an email tends to be \"slow\" (several seconds), you can return the response right away and send the email notification in the background.\n* Processing data:\n    * For example, let's say you receive a file that must go through a slow process, you can return a response of \"Accepted\" (HTTP 202) and process the file in the background."
+      ],
+      "manual_category": "clear_required_fact_missing",
+      "manual_reason": "OPTIONS and both identifying header names are removed; response codes remain."
+    },
+    {
+      "id": "starlette-01",
+      "question": "If one BackgroundTasks function raises an exception, what happens to later tasks and their ordering?",
+      "gold": [
+        {
+          "id": "required",
+          "witness_sets": [
+            {
+              "parts": [
+                {
+                  "path": "docs/background.md",
+                  "text": "The tasks are executed in order. In case one of the tasks raises\n    an exception, the following tasks will not get the opportunity to be executed.",
+                  "line_start": 77,
+                  "line_end": 78
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "retained": [
+        "In case one of the tasks raises\n    an exception, the following tasks will not get the opportunity to be executed.",
+        "The lifespan teardown will run once all connections have been closed, and\nany in-process background tasks have completed.\n\nConsider using [`anyio.create_task_group()`](https://anyio.readthedocs.io/en/stable/tasks.html)\nfor managing asynchronous tasks."
+      ],
+      "manual_category": "explicit_order_statement_missing",
+      "manual_reason": "Exception behavior remains; the explicit statement that tasks execute in order is removed. Following tasks suggests sequence but is weaker evidence for the ordering subquestion."
+    },
+    {
+      "id": "typer-01",
+      "question": "Does raising typer.Exit() itself imply an error, and what is its default exit code?",
+      "gold": [
+        {
+          "id": "required",
+          "witness_sets": [
+            {
+              "parts": [
+                {
+                  "path": "docs/tutorial/terminating.md",
+                  "text": "`typer.Exit()` takes an optional `code` parameter. By default, `code` is `0`, meaning there was no error.",
+                  "line_start": 57,
+                  "line_end": 57
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "retained": [
+        "By default, `code` is `0`, meaning there was no error.",
+        "In that case, you can raise a `typer.Exit()` exception:\n\n```Python hl_lines=\"9\"\n{!../docs_src/terminating/tutorial001.py!}\n```",
+        "This is done with an exception because it works as an \"error\" and stops all execution.",
+        "This is the one that takes a *CLI argument*.\n* The function `maybe_create_user()` can terminate the program by raising `typer.Exit()`.\n* If the program is terminated by `maybe_create_user()` then `send_new_user_notification()` will never execute inside of `main()`.\n\nCheck it:\n\n<div class=\"termy\">",
+        "It works more or less the same as `typer.Exit()` but will print `\"Aborted!\"` to the screen and can be useful in certain cases later to make it explicit that the execution was aborted:\n\n```Python hl_lines=\"7\"\n{!../docs_src/terminating/tutorial003.py!}\n```\n\nCheck it:\n\n<div class=\"termy\">"
+      ],
+      "manual_category": "answer_via_multiple_fragments",
+      "manual_reason": "Default code0 and no error remain, and typer.Exit appears elsewhere. The original optional-code binding sentence is removed; a reader must connect separate fragments."
+    },
+    {
+      "id": "typer-06",
+      "question": "What happens to --no-force when I declare only the --force option?",
+      "gold": [
+        {
+          "id": "required",
+          "witness_sets": [
+            {
+              "parts": [
+                {
+                  "path": "docs/tutorial/parameter-types/bool.md",
+                  "text": "// And --no-force no longer exists ⛔️\n$ python main.py --no-force\n\nUsage: main.py [OPTIONS]\nTry \"main.py --help\" for help.\n\nError: No such option: --no-force",
+                  "line_start": 60,
+                  "line_end": 66
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "retained": [
+        "```console\n// Check the help\n$ python main.py --help\n\n// Notice there's only --force, we no longer have --no-force\nUsage: main.py [OPTIONS]\n\nOptions:\n  --force               [default: False]\n  --help                Show this message and exit.\n\n// Try it:\n$ python main.py\n\nNot forcing\n\n// Now add --force\n$ python main.py --force\n\nForcing operation\n\n// And --no-force no longer exists ⛔️\n$ python main.py --no-force\n\nUsage: main.py [OPTIONS]\nTry \"main.py --help\" for help."
+      ],
+      "manual_category": "direct_answer_retained",
+      "manual_reason": "Retained console comments explicitly say --no-force no longer exists. The exact error line required by the frozen witness is removed."
+    },
+    {
+      "id": "pydantic-04",
+      "question": "What is AliasPath used to specify for validation aliases?",
+      "gold": [
+        {
+          "id": "required",
+          "witness_sets": [
+            {
+              "parts": [
+                {
+                  "path": "docs/concepts/alias.md",
+                  "text": "The `AliasPath` is used to specify a path to a field using aliases. For example:",
+                  "line_start": 25,
+                  "line_end": 25
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "retained": [
+        "```py lint=\"skip\"\nfrom pydantic import BaseModel, Field, AliasPath\n\n\nclass User(BaseModel):\n    first_name: str = Field(validation_alias=AliasPath('names', 0))\n    last_name: str = Field(validation_alias=AliasPath('names', 1))\n\nuser = User.model_validate({'names': ['John', 'Doe']})  # (1)!\nprint(user)\n#> first_name='John' last_name='Doe'\n```\n\n1.",
+        "We are using `model_validate` to validate a dictionary using the field aliases.",
+        "In the `'last_name'` field, we are using the alias `'names'` and the index `1` to specify the path to the last name.\n\n`AliasChoices` is used to specify a choice of aliases.",
+        "```py lint=\"skip\"\nfrom pydantic import BaseModel, Field, AliasPath, AliasChoices\n\n\nclass User(BaseModel):\n    first_name: str = Field(validation_alias=AliasChoices('first_name', AliasPath('names', 0)))\n    last_name: str = Field(validation_alias=AliasChoices('last_name', AliasPath('names', 1)))\n\n\nuser = User.model_validate({'first_name': 'John', 'last_name': 'Doe'})\nprint(user)\n#> first_name='John' last_name='Doe'\nuser = User.model_validate({'names': ['John', 'Doe']})\nprint(user)\n#> first_name='John' last_name='Doe'\nuser = User.model_validate({'names': ['John'], 'last_name': 'Doe'})\nprint(user)\n#> first_name='John' last_name='Doe'\n```",
+        "There are various ways to get strict-mode validation while using Pydantic, which will be discussed in more detail below:\n\n* [Passing `strict=True` to the validation methods](#strict-mode-in-method-calls), such as `BaseModel.model_validate`,\n  `TypeAdapter.validate_python`, and similar for JSON\n* [Using `Field(strict=True)`](#strict-mode-with-field) with fields of a `BaseModel`, `dataclass`, or `TypedDict`\n* [Using `pydantic.types.Strict` as a type annotation](#strict-mode-with-annotated-strict) on a field\n  *",
+        "Pydantic provides some type aliases that are already annotated with `Strict`, such as `pydantic.types.StrictInt`\n* [Using `ConfigDict(strict=True)`](#strict-mode-with-configdict)"
+      ],
+      "manual_category": "answer_via_example",
+      "manual_reason": "AliasPath code and the explanation using names/index1 specify a path to a field. The exact general-definition sentence is removed."
+    },
+    {
+      "id": "httpx-04",
+      "question": "What does pool timeout wait for, which exception is raised, and which argument limits connections?",
+      "gold": [
+        {
+          "id": "required",
+          "witness_sets": [
+            {
+              "parts": [
+                {
+                  "path": "docs/advanced/timeouts.md",
+                  "text": "* The **pool** timeout specifies the maximum duration to wait for acquiring\na connection from the connection pool. If HTTPX is unable to acquire a connection\nwithin this time frame, a `PoolTimeout` exception is raised. A related\nconfiguration here is the maximum number of allowable connections in the\nconnection pool, which is configured by the `limits` argument.",
+                  "line_start": 57,
+                  "line_end": 61
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "retained": [
+        "If HTTPX is unable to acquire a connection\nwithin this time frame, a `PoolTimeout` exception is raised.",
+        "These are **connect**,\n**read**, **write**, and **pool** timeouts.\n\n* The **connect** timeout specifies the maximum amount of time to wait until\na socket connection to the requested host is established.",
+        "If HTTPX is unable to connect\nwithin this time frame, a `ConnectTimeout` exception is raised.",
+        "* The **read** timeout specifies the maximum duration to wait for a chunk of\ndata to be received (for example, a chunk of the response body).",
+        "If HTTPX is\nunable to receive data within this time frame, a `ReadTimeout` exception is raised.\n* The **write** timeout specifies the maximum duration to wait for a chunk of\ndata to be sent (for example, a chunk of the request body).",
+        "If HTTPX is unable\nto send data within this time frame, a `WriteTimeout` exception is raised."
+      ],
+      "manual_category": "clear_required_fact_missing",
+      "manual_reason": "PoolTimeout remains but the required limits argument is absent."
+    },
+    {
+      "id": "httpx-05",
+      "question": "How can HTTPX ignore environment variables for both a Client and top-level requests?",
+      "gold": [
+        {
+          "id": "required",
+          "witness_sets": [
+            {
+              "parts": [
+                {
+                  "path": "docs/environment_variables.md",
+                  "text": "Environment variables are used by default. To ignore environment variables, `trust_env` has to be set `False`. There are two ways to set `trust_env` to disable environment variables:\n\n* On the client via `httpx.Client(trust_env=False)`.\n* Using the top-level API, such as `httpx.get(\"<url>\", trust_env=False)`.",
+                  "line_start": 4,
+                  "line_end": 7
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "retained": [
+        "To ignore environment variables, `trust_env` has to be set `False`.",
+        "There are two ways to set `trust_env` to disable environment variables:\n\n* On the client via `httpx.Client(trust_env=False)`.\n* Using the top-level API, such as `httpx.get(\"<url>\", trust_env=False)`.",
+        "#",
+        "Setting and disabling timeouts\n\nYou can set timeouts for an individual request:\n\n```python\n# Using the top-level API:\nhttpx.get('http://example.com/api/v1/example', timeout=10.0)\n\n# Using a client instance:\nwith httpx.Client() as client:\n    client.get(\"http://example.com/api/v1/example\", timeout=10.0)\n```\n\nOr disable timeouts for an individual request:"
+      ],
+      "manual_category": "direct_answer_retained",
+      "manual_reason": "Both Client and top-level trust_env=False forms remain. Removed default-environment behavior is extra to this question."
+    },
+    {
+      "id": "mkdocs-03",
+      "question": "Are pages absent from nav still built, and what navigation links do they lose?",
+      "gold": [
+        {
+          "id": "required",
+          "witness_sets": [
+            {
+              "parts": [
+                {
+                  "path": "docs/user-guide/writing-your-docs.md",
+                  "text": "Any pages not listed in your navigation configuration will still be rendered and\nincluded with the built site, however, they will not be linked from the global\nnavigation and will not be included in the `previous` and `next` links. Such\npages will be \"hidden\" unless linked to directly.",
+                  "line_start": 163,
+                  "line_end": 166
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "retained": [
+        "Any pages not listed in your navigation configuration will still be rendered and\nincluded with the built site, however, they will not be linked from the global\nnavigation and will not be included in the `previous` and `next` links."
+      ],
+      "manual_category": "direct_answer_retained",
+      "manual_reason": "Still-built behavior and loss of global/previous/next links all remain. The additional hidden-unless-linked sentence is removed."
+    },
+    {
+      "id": "mkdocs-06",
+      "question": "Can table cells contain block elements or multiple lines, and are blank lines around a table required?",
+      "gold": [
+        {
+          "id": "required",
+          "witness_sets": [
+            {
+              "parts": [
+                {
+                  "path": "docs/user-guide/writing-your-docs.md",
+                  "text": "Note that table cells cannot contain any block level elements and cannot contain\nmultiple lines of text. They can, however, include inline Markdown as defined in\nMarkdown's [syntax] rules.\n\nAdditionally, a table must be surrounded by blank lines. There must be a blank\nline before and after the table.",
+                  "line_start": 500,
+                  "line_end": 505
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "retained": [
+        "Additionally, a table must be surrounded by blank lines.",
+        "If you wish, you can add a leading and tailing pipe to each line of the table:\n\n```markdown\n| First Header | Second Header | Third Header |\n| ------------",
+        "| -------------",
+        "| ------------",
+        "|\n| Content Cell | Content Cell  | Content Cell |\n| Content Cell | Content Cell  | Content Cell |\n```\n\nSpecify alignment for each column by adding colons to separator lines:"
+      ],
+      "manual_category": "clear_required_fact_missing",
+      "manual_reason": "Blank-line requirement remains, but prohibition on block elements/multiline cells is removed."
+    },
+    {
+      "id": "ruff-01",
+      "question": "Does enabling preview automatically enable all preview rules?",
+      "gold": [
+        {
+          "id": "required",
+          "witness_sets": [
+            {
+              "parts": [
+                {
+                  "path": "docs/preview.md",
+                  "text": "Enabling preview mode does not on its own enable all preview rules. See the [rules section](#using-rules-that-are-in-preview) for details on selecting preview rules.",
+                  "line_start": 8,
+                  "line_end": 8
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "retained": [],
+      "manual_category": "clear_required_fact_missing",
+      "manual_reason": "Nothing remains in the retained top5 contexts."
+    },
+    {
+      "id": "ruff-04",
+      "question": "What happens if a deprecated rule is explicitly selected while preview is enabled?",
+      "gold": [
+        {
+          "id": "required",
+          "witness_sets": [
+            {
+              "parts": [
+                {
+                  "path": "docs/preview.md",
+                  "text": "When preview mode is enabled, deprecated rules will be disabled. If a deprecated rule is selected explicitly, an\nerror will be raised. Deprecated rules will not be included if selected via a rule category or prefix.",
+                  "line_start": 186,
+                  "line_end": 187
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "retained": [
+        "#",
+        "# Deprecated rules\n\nWhen preview mode is enabled, deprecated rules will be disabled.",
+        "If a deprecated rule is selected explicitly, an\nerror will be raised.",
+        "Using rules that are in preview\n\nIf a rule is marked as preview, it can only be selected if preview mode is enabled.",
+        "= \"CLI\"\n\n    ```console\n    ruff check --select ALL\n    ```\n\nHowever, it _would_ be enabled in any of the above cases if you enabled preview mode:\n\n==",
+        "= \"pyproject.toml\"\n\n    ```toml\n    [tool.ruff.lint]\n    extend-select = [\"HYP\"]\n    preview = true\n    ```\n\n=== \"ruff.toml\"",
+        "Only applicable\n          when fix itself is enabled (e.g., via `--fix`)\n      --extend-fixable <RULE_CODE>\n          Like --fixable, but adds additional rule codes on top of those\n          already specified\n\nFile selection:\n      --exclude <FILE_PATTERN>"
+      ],
+      "manual_category": "direct_answer_retained",
+      "manual_reason": "The explicit-selection error remains. Removed category/prefix behavior is extra to the asked condition."
+    },
+    {
+      "id": "uv-06",
+      "question": "Which build isolation mode does uv use by default and what is the escape hatch for a missing build dependency?",
+      "gold": [
+        {
+          "id": "required",
+          "witness_sets": [
+            {
+              "parts": [
+                {
+                  "path": "docs/pip/compatibility.md",
+                  "text": "uv uses [PEP 517](https://peps.python.org/pep-0517/) build isolation by default (akin to\n`pip install --use-pep517`), following `pypa/build` and in anticipation of `pip` defaulting to PEP\n517 builds in the future ([pypa/pip#9175](https://github.com/pypa/pip/issues/9175)).\n\nIf a package fails to install due to a missing build-time dependency, try using a newer version of\nthe package; if the problem persists, consider filing an issue with the package maintainer,\nrequesting that they update the packaging setup to declare the correct PEP 517 build-time\ndependencies.\n\nAs an escape hatch, you can preinstall a package's build dependencies, then run `uv pip install`\nwith `--no-build-isolation`, as in:\n\n```shell\nuv pip install wheel && uv pip install --no-build-isolation biopython==1.77",
+                  "line_start": 158,
+                  "line_end": 171
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "retained": [
+        "As an escape hatch, you can preinstall a package's build dependencies, then run `uv pip install`\nwith `--no-build-isolation`, as in:",
+        "#",
+        "# PEP 517 build isolation\n\nuv uses [PEP 517](https://peps.python.org/pep-0517/) build isolation by default (akin to\n`pip install --use-pep517`), following `pypa/build` and in anticipation of `pip` defaulting to PEP\n517 builds in the future ([pypa/pip#9175](https://github.com/pypa/pip/issues/9175)).",
+        "Build constraints\n\nWhen constraints are provided via `--constraint` (or `UV_CONSTRAINT`), uv will _not_ apply the\nconstraints when resolving build dependencies (i.e., to build a source distribution)."
+      ],
+      "manual_category": "direct_answer_retained",
+      "manual_reason": "Default PEP517 and preinstall dependencies plus --no-build-isolation remain. Package-maintainer advice and example command are unnecessary to answer the question as phrased."
+    }
+  ]
+}

@@ -1,0 +1,251 @@
+{
+  "bm25": {
+    "top_k": {
+      "1": 33,
+      "3": 41,
+      "5": 44,
+      "10": 46,
+      "20": 47
+    },
+    "all": 48,
+    "replay_sufficient": 34,
+    "replay_wins": [
+      "httpx-01"
+    ],
+    "replay_losses": [],
+    "source_only_packet_sufficient": 38,
+    "audit_errors": 0,
+    "controls_replay_sufficient": []
+  },
+  "bm25_context": {
+    "top_k": {
+      "1": 29,
+      "3": 37,
+      "5": 44,
+      "10": 46,
+      "20": 47
+    },
+    "all": 48,
+    "replay_sufficient": 32,
+    "replay_wins": [
+      "httpx-01"
+    ],
+    "replay_losses": [
+      "starlette-06",
+      "typer-02"
+    ],
+    "source_only_packet_sufficient": 35,
+    "audit_errors": 0,
+    "controls_replay_sufficient": []
+  },
+  "context": {
+    "top_k": {
+      "1": 32,
+      "3": 40,
+      "5": 43,
+      "10": 47,
+      "20": 48
+    },
+    "all": 48,
+    "replay_sufficient": 34,
+    "replay_wins": [
+      "httpx-01"
+    ],
+    "replay_losses": [],
+    "source_only_packet_sufficient": 35,
+    "audit_errors": 0,
+    "controls_replay_sufficient": []
+  },
+  "hybrid_context": {
+    "top_k": {
+      "1": 29,
+      "3": 43,
+      "5": 46,
+      "10": 47,
+      "20": 47
+    },
+    "all": 48,
+    "replay_sufficient": 34,
+    "replay_wins": [
+      "httpx-01"
+    ],
+    "replay_losses": [],
+    "source_only_packet_sufficient": 37,
+    "audit_errors": 0,
+    "controls_replay_sufficient": []
+  },
+  "hybrid_plain": {
+    "top_k": {
+      "1": 33,
+      "3": 43,
+      "5": 45,
+      "10": 47,
+      "20": 47
+    },
+    "all": 48,
+    "replay_sufficient": 34,
+    "replay_wins": [
+      "httpx-01"
+    ],
+    "replay_losses": [],
+    "source_only_packet_sufficient": 37,
+    "audit_errors": 0,
+    "controls_replay_sufficient": []
+  },
+  "late": {
+    "top_k": {
+      "1": 30,
+      "3": 38,
+      "5": 44,
+      "10": 45,
+      "20": 46
+    },
+    "all": 48,
+    "replay_sufficient": 33,
+    "replay_wins": [
+      "httpx-01"
+    ],
+    "replay_losses": [
+      "starlette-06"
+    ],
+    "source_only_packet_sufficient": 35,
+    "audit_errors": 0,
+    "controls_replay_sufficient": []
+  },
+  "plain": {
+    "top_k": {
+      "1": 31,
+      "3": 40,
+      "5": 43,
+      "10": 47,
+      "20": 47
+    },
+    "all": 48,
+    "replay_sufficient": 33,
+    "replay_wins": [
+      "httpx-01"
+    ],
+    "replay_losses": [
+      "uv-02"
+    ],
+    "source_only_packet_sufficient": 35,
+    "audit_errors": 0,
+    "controls_replay_sufficient": []
+  },
+  "x_original": {
+    "top_k": {
+      "1": 25,
+      "3": 40,
+      "5": 44,
+      "10": 44,
+      "20": 44
+    },
+    "all": 44,
+    "replay_sufficient": 34,
+    "replay_wins": [
+      "httpx-01"
+    ],
+    "replay_losses": [],
+    "source_only_packet_sufficient": 34,
+    "audit_errors": 0,
+    "controls_replay_sufficient": []
+  },
+  "x_pruned": {
+    "top_k": {
+      "1": 18,
+      "3": 31,
+      "5": 31,
+      "10": 31,
+      "20": 31
+    },
+    "all": 31,
+    "replay_sufficient": 19,
+    "replay_wins": [],
+    "replay_losses": [
+      "fastapi-04",
+      "fastapi-05",
+      "typer-01",
+      "typer-02",
+      "typer-03",
+      "typer-06",
+      "pydantic-04",
+      "httpx-04",
+      "httpx-05",
+      "mkdocs-03",
+      "ruff-01",
+      "ruff-04",
+      "ruff-05",
+      "uv-03"
+    ],
+    "source_only_packet_sufficient": 29,
+    "audit_errors": 0,
+    "controls_replay_sufficient": []
+  },
+  "x_rank": {
+    "top_k": {
+      "1": 38,
+      "3": 42,
+      "5": 44,
+      "10": 44,
+      "20": 44
+    },
+    "all": 44,
+    "replay_sufficient": 34,
+    "replay_wins": [
+      "httpx-01"
+    ],
+    "replay_losses": [],
+    "source_only_packet_sufficient": 39,
+    "audit_errors": 0,
+    "controls_replay_sufficient": []
+  },
+  "x_rank_pruned_top5": {
+    "top_k": {
+      "1": 27,
+      "3": 31,
+      "5": 31,
+      "10": 31,
+      "20": 31
+    },
+    "all": 31,
+    "replay_sufficient": 19,
+    "replay_wins": [],
+    "replay_losses": [
+      "fastapi-04",
+      "fastapi-05",
+      "typer-01",
+      "typer-02",
+      "typer-03",
+      "typer-06",
+      "pydantic-04",
+      "httpx-04",
+      "httpx-05",
+      "mkdocs-03",
+      "ruff-01",
+      "ruff-04",
+      "ruff-05",
+      "uv-03"
+    ],
+    "source_only_packet_sufficient": 29,
+    "audit_errors": 0,
+    "controls_replay_sufficient": []
+  },
+  "x_rank_top5": {
+    "top_k": {
+      "1": 38,
+      "3": 42,
+      "5": 44,
+      "10": 44,
+      "20": 44
+    },
+    "all": 44,
+    "replay_sufficient": 34,
+    "replay_wins": [
+      "httpx-01"
+    ],
+    "replay_losses": [],
+    "source_only_packet_sufficient": 39,
+    "audit_errors": 0,
+    "controls_replay_sufficient": []
+  }
+}

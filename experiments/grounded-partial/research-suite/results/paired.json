@@ -1,0 +1,1293 @@
+{
+  "comparisons": {
+    "x_original -> x_rank": {
+      "top1": {
+        "left": 25,
+        "right": 38,
+        "wins": [
+          "fastapi-01",
+          "fastapi-02",
+          "fastapi-03",
+          "starlette-01",
+          "pydantic-02",
+          "pydantic-03",
+          "httpx-01",
+          "httpx-02",
+          "httpx-05",
+          "mkdocs-01",
+          "mkdocs-02",
+          "mkdocs-04",
+          "uv-03"
+        ],
+        "losses": [],
+        "n": 48
+      },
+      "top5": {
+        "left": 44,
+        "right": 44,
+        "wins": [],
+        "losses": [],
+        "n": 48
+      },
+      "all": {
+        "left": 44,
+        "right": 44,
+        "wins": [],
+        "losses": [],
+        "n": 48
+      },
+      "replay": {
+        "left": 34,
+        "right": 34,
+        "wins": [],
+        "losses": [],
+        "n": 48
+      },
+      "source_only_packet": {
+        "left": 34,
+        "right": 39,
+        "wins": [
+          "fastapi-01",
+          "fastapi-02",
+          "httpx-01",
+          "httpx-05",
+          "mkdocs-02",
+          "ruff-05"
+        ],
+        "losses": [
+          "mkdocs-05"
+        ],
+        "n": 48
+      },
+      "ru_top5": {
+        "left": 10,
+        "right": 10,
+        "wins": [],
+        "losses": [],
+        "n": 13
+      },
+      "en_top5": {
+        "left": 34,
+        "right": 34,
+        "wins": [],
+        "losses": [],
+        "n": 35
+      }
+    },
+    "x_rank_top5 -> x_rank_pruned_top5": {
+      "top1": {
+        "left": 38,
+        "right": 27,
+        "wins": [],
+        "losses": [
+          "fastapi-04",
+          "fastapi-05",
+          "starlette-01",
+          "typer-01",
+          "typer-06",
+          "pydantic-04",
+          "httpx-04",
+          "httpx-05",
+          "mkdocs-03",
+          "ruff-01",
+          "ruff-04"
+        ],
+        "n": 48
+      },
+      "top5": {
+        "left": 44,
+        "right": 31,
+        "wins": [],
+        "losses": [
+          "fastapi-04",
+          "fastapi-05",
+          "starlette-01",
+          "typer-01",
+          "typer-06",
+          "pydantic-04",
+          "httpx-04",
+          "httpx-05",
+          "mkdocs-03",
+          "mkdocs-06",
+          "ruff-01",
+          "ruff-04",
+          "uv-06"
+        ],
+        "n": 48
+      },
+      "all": {
+        "left": 44,
+        "right": 31,
+        "wins": [],
+        "losses": [
+          "fastapi-04",
+          "fastapi-05",
+          "starlette-01",
+          "typer-01",
+          "typer-06",
+          "pydantic-04",
+          "httpx-04",
+          "httpx-05",
+          "mkdocs-03",
+          "mkdocs-06",
+          "ruff-01",
+          "ruff-04",
+          "uv-06"
+        ],
+        "n": 48
+      },
+      "replay": {
+        "left": 34,
+        "right": 19,
+        "wins": [],
+        "losses": [
+          "fastapi-04",
+          "fastapi-05",
+          "typer-01",
+          "typer-02",
+          "typer-03",
+          "typer-06",
+          "pydantic-04",
+          "httpx-01",
+          "httpx-04",
+          "httpx-05",
+          "mkdocs-03",
+          "ruff-01",
+          "ruff-04",
+          "ruff-05",
+          "uv-03"
+        ],
+        "n": 48
+      },
+      "source_only_packet": {
+        "left": 39,
+        "right": 29,
+        "wins": [
+          "mkdocs-05"
+        ],
+        "losses": [
+          "fastapi-04",
+          "fastapi-05",
+          "starlette-01",
+          "typer-01",
+          "typer-06",
+          "pydantic-04",
+          "httpx-04",
+          "httpx-05",
+          "mkdocs-03",
+          "ruff-01",
+          "ruff-04"
+        ],
+        "n": 48
+      },
+      "ru_top5": {
+        "left": 10,
+        "right": 10,
+        "wins": [],
+        "losses": [],
+        "n": 13
+      },
+      "en_top5": {
+        "left": 34,
+        "right": 21,
+        "wins": [],
+        "losses": [
+          "fastapi-04",
+          "fastapi-05",
+          "starlette-01",
+          "typer-01",
+          "typer-06",
+          "pydantic-04",
+          "httpx-04",
+          "httpx-05",
+          "mkdocs-03",
+          "mkdocs-06",
+          "ruff-01",
+          "ruff-04",
+          "uv-06"
+        ],
+        "n": 35
+      }
+    },
+    "plain -> late": {
+      "top1": {
+        "left": 31,
+        "right": 30,
+        "wins": [
+          "fastapi-01",
+          "fastapi-02",
+          "typer-05",
+          "httpx-02",
+          "mkdocs-05",
+          "uv-02"
+        ],
+        "losses": [
+          "fastapi-03",
+          "fastapi-04",
+          "fastapi-05",
+          "starlette-06",
+          "typer-06",
+          "ruff-03",
+          "uv-03"
+        ],
+        "n": 48
+      },
+      "top5": {
+        "left": 43,
+        "right": 44,
+        "wins": [
+          "typer-05",
+          "mkdocs-05"
+        ],
+        "losses": [
+          "mkdocs-01"
+        ],
+        "n": 48
+      },
+      "all": {
+        "left": 48,
+        "right": 48,
+        "wins": [],
+        "losses": [],
+        "n": 48
+      },
+      "replay": {
+        "left": 33,
+        "right": 33,
+        "wins": [
+          "uv-02"
+        ],
+        "losses": [
+          "starlette-06"
+        ],
+        "n": 48
+      },
+      "source_only_packet": {
+        "left": 35,
+        "right": 35,
+        "wins": [
+          "fastapi-01",
+          "typer-05",
+          "mkdocs-05"
+        ],
+        "losses": [
+          "fastapi-04",
+          "fastapi-05",
+          "fastapi-06"
+        ],
+        "n": 48
+      },
+      "ru_top5": {
+        "left": 11,
+        "right": 12,
+        "wins": [
+          "typer-05"
+        ],
+        "losses": [],
+        "n": 13
+      },
+      "en_top5": {
+        "left": 32,
+        "right": 32,
+        "wins": [
+          "mkdocs-05"
+        ],
+        "losses": [
+          "mkdocs-01"
+        ],
+        "n": 35
+      }
+    },
+    "plain -> context": {
+      "top1": {
+        "left": 31,
+        "right": 32,
+        "wins": [
+          "fastapi-02",
+          "httpx-02",
+          "uv-02"
+        ],
+        "losses": [
+          "httpx-06",
+          "mkdocs-02"
+        ],
+        "n": 48
+      },
+      "top5": {
+        "left": 43,
+        "right": 43,
+        "wins": [
+          "typer-05"
+        ],
+        "losses": [
+          "mkdocs-01"
+        ],
+        "n": 48
+      },
+      "all": {
+        "left": 48,
+        "right": 48,
+        "wins": [],
+        "losses": [],
+        "n": 48
+      },
+      "replay": {
+        "left": 33,
+        "right": 34,
+        "wins": [
+          "uv-02"
+        ],
+        "losses": [],
+        "n": 48
+      },
+      "source_only_packet": {
+        "left": 35,
+        "right": 35,
+        "wins": [
+          "ruff-05"
+        ],
+        "losses": [
+          "mkdocs-02"
+        ],
+        "n": 48
+      },
+      "ru_top5": {
+        "left": 11,
+        "right": 12,
+        "wins": [
+          "typer-05"
+        ],
+        "losses": [],
+        "n": 13
+      },
+      "en_top5": {
+        "left": 32,
+        "right": 31,
+        "wins": [],
+        "losses": [
+          "mkdocs-01"
+        ],
+        "n": 35
+      }
+    },
+    "bm25 -> bm25_context": {
+      "top1": {
+        "left": 33,
+        "right": 29,
+        "wins": [
+          "mkdocs-05"
+        ],
+        "losses": [
+          "fastapi-01",
+          "starlette-06",
+          "typer-02",
+          "pydantic-03",
+          "mkdocs-01"
+        ],
+        "n": 48
+      },
+      "top5": {
+        "left": 44,
+        "right": 44,
+        "wins": [],
+        "losses": [],
+        "n": 48
+      },
+      "all": {
+        "left": 48,
+        "right": 48,
+        "wins": [],
+        "losses": [],
+        "n": 48
+      },
+      "replay": {
+        "left": 34,
+        "right": 32,
+        "wins": [],
+        "losses": [
+          "starlette-06",
+          "typer-02"
+        ],
+        "n": 48
+      },
+      "source_only_packet": {
+        "left": 38,
+        "right": 35,
+        "wins": [],
+        "losses": [
+          "fastapi-01",
+          "typer-06",
+          "mkdocs-01"
+        ],
+        "n": 48
+      },
+      "ru_top5": {
+        "left": 10,
+        "right": 10,
+        "wins": [],
+        "losses": [],
+        "n": 13
+      },
+      "en_top5": {
+        "left": 34,
+        "right": 34,
+        "wins": [],
+        "losses": [],
+        "n": 35
+      }
+    },
+    "hybrid_plain -> hybrid_context": {
+      "top1": {
+        "left": 33,
+        "right": 29,
+        "wins": [
+          "httpx-01"
+        ],
+        "losses": [
+          "fastapi-01",
+          "typer-06",
+          "pydantic-03",
+          "mkdocs-01",
+          "mkdocs-02"
+        ],
+        "n": 48
+      },
+      "top5": {
+        "left": 45,
+        "right": 46,
+        "wins": [
+          "httpx-03"
+        ],
+        "losses": [],
+        "n": 48
+      },
+      "all": {
+        "left": 48,
+        "right": 48,
+        "wins": [],
+        "losses": [],
+        "n": 48
+      },
+      "replay": {
+        "left": 34,
+        "right": 34,
+        "wins": [],
+        "losses": [],
+        "n": 48
+      },
+      "source_only_packet": {
+        "left": 37,
+        "right": 37,
+        "wins": [
+          "mkdocs-05",
+          "ruff-05"
+        ],
+        "losses": [
+          "fastapi-01",
+          "mkdocs-01"
+        ],
+        "n": 48
+      },
+      "ru_top5": {
+        "left": 11,
+        "right": 12,
+        "wins": [
+          "httpx-03"
+        ],
+        "losses": [],
+        "n": 13
+      },
+      "en_top5": {
+        "left": 34,
+        "right": 34,
+        "wins": [],
+        "losses": [],
+        "n": 35
+      }
+    }
+  },
+  "budgets": {
+    "bm25": {
+      "max_replay_tokens": 795,
+      "max_packet_tokens": 800
+    },
+    "bm25_context": {
+      "max_replay_tokens": 795,
+      "max_packet_tokens": 800
+    },
+    "context": {
+      "max_replay_tokens": 795,
+      "max_packet_tokens": 800
+    },
+    "hybrid_context": {
+      "max_replay_tokens": 795,
+      "max_packet_tokens": 800
+    },
+    "hybrid_plain": {
+      "max_replay_tokens": 795,
+      "max_packet_tokens": 800
+    },
+    "late": {
+      "max_replay_tokens": 795,
+      "max_packet_tokens": 799
+    },
+    "plain": {
+      "max_replay_tokens": 795,
+      "max_packet_tokens": 800
+    },
+    "x_original": {
+      "max_replay_tokens": 795,
+      "max_packet_tokens": 799
+    },
+    "x_pruned": {
+      "max_replay_tokens": 788,
+      "max_packet_tokens": 798
+    },
+    "x_rank": {
+      "max_replay_tokens": 795,
+      "max_packet_tokens": 800
+    },
+    "x_rank_pruned_top5": {
+      "max_replay_tokens": 788,
+      "max_packet_tokens": 793
+    },
+    "x_rank_top5": {
+      "max_replay_tokens": 795,
+      "max_packet_tokens": 794
+    }
+  },
+  "five_cases": {
+    "fastapi-01": {
+      "bm25": {
+        "top5": true,
+        "all": true,
+        "replay": "needs_review",
+        "packet": "sufficient"
+      },
+      "bm25_context": {
+        "top5": true,
+        "all": true,
+        "replay": "needs_review",
+        "packet": "needs_review"
+      },
+      "context": {
+        "top5": true,
+        "all": true,
+        "replay": "needs_review",
+        "packet": "needs_review"
+      },
+      "hybrid_context": {
+        "top5": true,
+        "all": true,
+        "replay": "needs_review",
+        "packet": "needs_review"
+      },
+      "hybrid_plain": {
+        "top5": true,
+        "all": true,
+        "replay": "needs_review",
+        "packet": "sufficient"
+      },
+      "late": {
+        "top5": true,
+        "all": true,
+        "replay": "needs_review",
+        "packet": "sufficient"
+      },
+      "plain": {
+        "top5": true,
+        "all": true,
+        "replay": "needs_review",
+        "packet": "needs_review"
+      },
+      "x_original": {
+        "top5": true,
+        "all": true,
+        "replay": "needs_review",
+        "packet": "needs_review"
+      },
+      "x_pruned": {
+        "top5": true,
+        "all": true,
+        "replay": "needs_review",
+        "packet": "sufficient"
+      },
+      "x_rank": {
+        "top5": true,
+        "all": true,
+        "replay": "needs_review",
+        "packet": "sufficient"
+      },
+      "x_rank_pruned_top5": {
+        "top5": true,
+        "all": true,
+        "replay": "needs_review",
+        "packet": "sufficient"
+      },
+      "x_rank_top5": {
+        "top5": true,
+        "all": true,
+        "replay": "needs_review",
+        "packet": "sufficient"
+      }
+    },
+    "pydantic-03": {
+      "bm25": {
+        "top5": true,
+        "all": true,
+        "replay": "insufficient",
+        "packet": "sufficient"
+      },
+      "bm25_context": {
+        "top5": true,
+        "all": true,
+        "replay": "insufficient",
+        "packet": "sufficient"
+      },
+      "context": {
+        "top5": false,
+        "all": true,
+        "replay": "insufficient",
+        "packet": "needs_review"
+      },
+      "hybrid_context": {
+        "top5": true,
+        "all": true,
+        "replay": "insufficient",
+        "packet": "sufficient"
+      },
+      "hybrid_plain": {
+        "top5": true,
+        "all": true,
+        "replay": "insufficient",
+        "packet": "sufficient"
+      },
+      "late": {
+        "top5": false,
+        "all": true,
+        "replay": "insufficient",
+        "packet": "needs_review"
+      },
+      "plain": {
+        "top5": false,
+        "all": true,
+        "replay": "insufficient",
+        "packet": "needs_review"
+      },
+      "x_original": {
+        "top5": true,
+        "all": true,
+        "replay": "insufficient",
+        "packet": "sufficient"
+      },
+      "x_pruned": {
+        "top5": true,
+        "all": true,
+        "replay": "insufficient",
+        "packet": "sufficient"
+      },
+      "x_rank": {
+        "top5": true,
+        "all": true,
+        "replay": "insufficient",
+        "packet": "sufficient"
+      },
+      "x_rank_pruned_top5": {
+        "top5": true,
+        "all": true,
+        "replay": "insufficient",
+        "packet": "sufficient"
+      },
+      "x_rank_top5": {
+        "top5": true,
+        "all": true,
+        "replay": "insufficient",
+        "packet": "sufficient"
+      }
+    },
+    "httpx-06": {
+      "bm25": {
+        "top5": true,
+        "all": true,
+        "replay": "insufficient",
+        "packet": "sufficient"
+      },
+      "bm25_context": {
+        "top5": true,
+        "all": true,
+        "replay": "insufficient",
+        "packet": "sufficient"
+      },
+      "context": {
+        "top5": true,
+        "all": true,
+        "replay": "insufficient",
+        "packet": "sufficient"
+      },
+      "hybrid_context": {
+        "top5": true,
+        "all": true,
+        "replay": "insufficient",
+        "packet": "sufficient"
+      },
+      "hybrid_plain": {
+        "top5": true,
+        "all": true,
+        "replay": "insufficient",
+        "packet": "sufficient"
+      },
+      "late": {
+        "top5": true,
+        "all": true,
+        "replay": "insufficient",
+        "packet": "sufficient"
+      },
+      "plain": {
+        "top5": true,
+        "all": true,
+        "replay": "insufficient",
+        "packet": "sufficient"
+      },
+      "x_original": {
+        "top5": true,
+        "all": true,
+        "replay": "insufficient",
+        "packet": "sufficient"
+      },
+      "x_pruned": {
+        "top5": true,
+        "all": true,
+        "replay": "insufficient",
+        "packet": "sufficient"
+      },
+      "x_rank": {
+        "top5": true,
+        "all": true,
+        "replay": "insufficient",
+        "packet": "sufficient"
+      },
+      "x_rank_pruned_top5": {
+        "top5": true,
+        "all": true,
+        "replay": "insufficient",
+        "packet": "sufficient"
+      },
+      "x_rank_top5": {
+        "top5": true,
+        "all": true,
+        "replay": "insufficient",
+        "packet": "sufficient"
+      }
+    },
+    "mkdocs-05": {
+      "bm25": {
+        "top5": true,
+        "all": true,
+        "replay": "needs_review",
+        "packet": "sufficient"
+      },
+      "bm25_context": {
+        "top5": true,
+        "all": true,
+        "replay": "needs_review",
+        "packet": "sufficient"
+      },
+      "context": {
+        "top5": false,
+        "all": true,
+        "replay": "needs_review",
+        "packet": "needs_review"
+      },
+      "hybrid_context": {
+        "top5": true,
+        "all": true,
+        "replay": "needs_review",
+        "packet": "sufficient"
+      },
+      "hybrid_plain": {
+        "top5": true,
+        "all": true,
+        "replay": "needs_review",
+        "packet": "needs_review"
+      },
+      "late": {
+        "top5": true,
+        "all": true,
+        "replay": "needs_review",
+        "packet": "sufficient"
+      },
+      "plain": {
+        "top5": false,
+        "all": true,
+        "replay": "needs_review",
+        "packet": "needs_review"
+      },
+      "x_original": {
+        "top5": true,
+        "all": true,
+        "replay": "needs_review",
+        "packet": "sufficient"
+      },
+      "x_pruned": {
+        "top5": true,
+        "all": true,
+        "replay": "insufficient",
+        "packet": "sufficient"
+      },
+      "x_rank": {
+        "top5": true,
+        "all": true,
+        "replay": "needs_review",
+        "packet": "needs_review"
+      },
+      "x_rank_pruned_top5": {
+        "top5": true,
+        "all": true,
+        "replay": "insufficient",
+        "packet": "sufficient"
+      },
+      "x_rank_top5": {
+        "top5": true,
+        "all": true,
+        "replay": "needs_review",
+        "packet": "needs_review"
+      }
+    },
+    "uv-05": {
+      "bm25": {
+        "top5": true,
+        "all": true,
+        "replay": "needs_review",
+        "packet": "needs_review"
+      },
+      "bm25_context": {
+        "top5": true,
+        "all": true,
+        "replay": "needs_review",
+        "packet": "needs_review"
+      },
+      "context": {
+        "top5": true,
+        "all": true,
+        "replay": "needs_review",
+        "packet": "needs_review"
+      },
+      "hybrid_context": {
+        "top5": true,
+        "all": true,
+        "replay": "needs_review",
+        "packet": "needs_review"
+      },
+      "hybrid_plain": {
+        "top5": true,
+        "all": true,
+        "replay": "needs_review",
+        "packet": "needs_review"
+      },
+      "late": {
+        "top5": true,
+        "all": true,
+        "replay": "needs_review",
+        "packet": "needs_review"
+      },
+      "plain": {
+        "top5": true,
+        "all": true,
+        "replay": "needs_review",
+        "packet": "needs_review"
+      },
+      "x_original": {
+        "top5": true,
+        "all": true,
+        "replay": "needs_review",
+        "packet": "needs_review"
+      },
+      "x_pruned": {
+        "top5": true,
+        "all": true,
+        "replay": "needs_review",
+        "packet": "needs_review"
+      },
+      "x_rank": {
+        "top5": true,
+        "all": true,
+        "replay": "needs_review",
+        "packet": "needs_review"
+      },
+      "x_rank_pruned_top5": {
+        "top5": true,
+        "all": true,
+        "replay": "needs_review",
+        "packet": "needs_review"
+      },
+      "x_rank_top5": {
+        "top5": true,
+        "all": true,
+        "replay": "needs_review",
+        "packet": "needs_review"
+      }
+    }
+  },
+  "controls": {
+    "bm25": {
+      "partial": {
+        "cases": 8,
+        "replay_sufficient": 0,
+        "recognized_required_claims": 4,
+        "with_sources": 7,
+        "claims_answer_supported": 0
+      },
+      "ambiguous": {
+        "cases": 8,
+        "replay_sufficient": 0,
+        "recognized_required_claims": 0,
+        "with_sources": 4,
+        "claims_answer_supported": 0
+      },
+      "unanswerable": {
+        "cases": 8,
+        "replay_sufficient": 0,
+        "recognized_required_claims": 0,
+        "with_sources": 0,
+        "claims_answer_supported": 0
+      },
+      "over_budget": {
+        "cases": 8,
+        "replay_sufficient": 0,
+        "recognized_required_claims": 0,
+        "with_sources": 1,
+        "claims_answer_supported": 0
+      }
+    },
+    "bm25_context": {
+      "partial": {
+        "cases": 8,
+        "replay_sufficient": 0,
+        "recognized_required_claims": 4,
+        "with_sources": 7,
+        "claims_answer_supported": 0
+      },
+      "ambiguous": {
+        "cases": 8,
+        "replay_sufficient": 0,
+        "recognized_required_claims": 0,
+        "with_sources": 4,
+        "claims_answer_supported": 0
+      },
+      "unanswerable": {
+        "cases": 8,
+        "replay_sufficient": 0,
+        "recognized_required_claims": 0,
+        "with_sources": 0,
+        "claims_answer_supported": 0
+      },
+      "over_budget": {
+        "cases": 8,
+        "replay_sufficient": 0,
+        "recognized_required_claims": 0,
+        "with_sources": 1,
+        "claims_answer_supported": 0
+      }
+    },
+    "context": {
+      "partial": {
+        "cases": 8,
+        "replay_sufficient": 0,
+        "recognized_required_claims": 4,
+        "with_sources": 7,
+        "claims_answer_supported": 0
+      },
+      "ambiguous": {
+        "cases": 8,
+        "replay_sufficient": 0,
+        "recognized_required_claims": 0,
+        "with_sources": 4,
+        "claims_answer_supported": 0
+      },
+      "unanswerable": {
+        "cases": 8,
+        "replay_sufficient": 0,
+        "recognized_required_claims": 0,
+        "with_sources": 0,
+        "claims_answer_supported": 0
+      },
+      "over_budget": {
+        "cases": 8,
+        "replay_sufficient": 0,
+        "recognized_required_claims": 0,
+        "with_sources": 0,
+        "claims_answer_supported": 0
+      }
+    },
+    "hybrid_context": {
+      "partial": {
+        "cases": 8,
+        "replay_sufficient": 0,
+        "recognized_required_claims": 4,
+        "with_sources": 7,
+        "claims_answer_supported": 0
+      },
+      "ambiguous": {
+        "cases": 8,
+        "replay_sufficient": 0,
+        "recognized_required_claims": 0,
+        "with_sources": 4,
+        "claims_answer_supported": 0
+      },
+      "unanswerable": {
+        "cases": 8,
+        "replay_sufficient": 0,
+        "recognized_required_claims": 0,
+        "with_sources": 0,
+        "claims_answer_supported": 0
+      },
+      "over_budget": {
+        "cases": 8,
+        "replay_sufficient": 0,
+        "recognized_required_claims": 0,
+        "with_sources": 0,
+        "claims_answer_supported": 0
+      }
+    },
+    "hybrid_plain": {
+      "partial": {
+        "cases": 8,
+        "replay_sufficient": 0,
+        "recognized_required_claims": 4,
+        "with_sources": 7,
+        "claims_answer_supported": 0
+      },
+      "ambiguous": {
+        "cases": 8,
+        "replay_sufficient": 0,
+        "recognized_required_claims": 0,
+        "with_sources": 4,
+        "claims_answer_supported": 0
+      },
+      "unanswerable": {
+        "cases": 8,
+        "replay_sufficient": 0,
+        "recognized_required_claims": 0,
+        "with_sources": 0,
+        "claims_answer_supported": 0
+      },
+      "over_budget": {
+        "cases": 8,
+        "replay_sufficient": 0,
+        "recognized_required_claims": 0,
+        "with_sources": 0,
+        "claims_answer_supported": 0
+      }
+    },
+    "late": {
+      "partial": {
+        "cases": 8,
+        "replay_sufficient": 0,
+        "recognized_required_claims": 4,
+        "with_sources": 7,
+        "claims_answer_supported": 0
+      },
+      "ambiguous": {
+        "cases": 8,
+        "replay_sufficient": 0,
+        "recognized_required_claims": 0,
+        "with_sources": 4,
+        "claims_answer_supported": 0
+      },
+      "unanswerable": {
+        "cases": 8,
+        "replay_sufficient": 0,
+        "recognized_required_claims": 0,
+        "with_sources": 0,
+        "claims_answer_supported": 0
+      },
+      "over_budget": {
+        "cases": 8,
+        "replay_sufficient": 0,
+        "recognized_required_claims": 0,
+        "with_sources": 0,
+        "claims_answer_supported": 0
+      }
+    },
+    "plain": {
+      "partial": {
+        "cases": 8,
+        "replay_sufficient": 0,
+        "recognized_required_claims": 4,
+        "with_sources": 7,
+        "claims_answer_supported": 0
+      },
+      "ambiguous": {
+        "cases": 8,
+        "replay_sufficient": 0,
+        "recognized_required_claims": 0,
+        "with_sources": 4,
+        "claims_answer_supported": 0
+      },
+      "unanswerable": {
+        "cases": 8,
+        "replay_sufficient": 0,
+        "recognized_required_claims": 0,
+        "with_sources": 0,
+        "claims_answer_supported": 0
+      },
+      "over_budget": {
+        "cases": 8,
+        "replay_sufficient": 0,
+        "recognized_required_claims": 0,
+        "with_sources": 0,
+        "claims_answer_supported": 0
+      }
+    },
+    "x_original": {
+      "partial": {
+        "cases": 8,
+        "replay_sufficient": 0,
+        "recognized_required_claims": 4,
+        "with_sources": 7,
+        "claims_answer_supported": 0
+      },
+      "ambiguous": {
+        "cases": 8,
+        "replay_sufficient": 0,
+        "recognized_required_claims": 0,
+        "with_sources": 4,
+        "claims_answer_supported": 0
+      },
+      "unanswerable": {
+        "cases": 8,
+        "replay_sufficient": 0,
+        "recognized_required_claims": 0,
+        "with_sources": 0,
+        "claims_answer_supported": 0
+      },
+      "over_budget": {
+        "cases": 8,
+        "replay_sufficient": 0,
+        "recognized_required_claims": 0,
+        "with_sources": 1,
+        "claims_answer_supported": 0
+      }
+    },
+    "x_pruned": {
+      "partial": {
+        "cases": 8,
+        "replay_sufficient": 0,
+        "recognized_required_claims": 3,
+        "with_sources": 5,
+        "claims_answer_supported": 0
+      },
+      "ambiguous": {
+        "cases": 8,
+        "replay_sufficient": 0,
+        "recognized_required_claims": 0,
+        "with_sources": 3,
+        "claims_answer_supported": 0
+      },
+      "unanswerable": {
+        "cases": 8,
+        "replay_sufficient": 0,
+        "recognized_required_claims": 0,
+        "with_sources": 0,
+        "claims_answer_supported": 0
+      },
+      "over_budget": {
+        "cases": 8,
+        "replay_sufficient": 0,
+        "recognized_required_claims": 0,
+        "with_sources": 0,
+        "claims_answer_supported": 0
+      }
+    },
+    "x_rank": {
+      "partial": {
+        "cases": 8,
+        "replay_sufficient": 0,
+        "recognized_required_claims": 4,
+        "with_sources": 7,
+        "claims_answer_supported": 0
+      },
+      "ambiguous": {
+        "cases": 8,
+        "replay_sufficient": 0,
+        "recognized_required_claims": 0,
+        "with_sources": 4,
+        "claims_answer_supported": 0
+      },
+      "unanswerable": {
+        "cases": 8,
+        "replay_sufficient": 0,
+        "recognized_required_claims": 0,
+        "with_sources": 0,
+        "claims_answer_supported": 0
+      },
+      "over_budget": {
+        "cases": 8,
+        "replay_sufficient": 0,
+        "recognized_required_claims": 0,
+        "with_sources": 1,
+        "claims_answer_supported": 0
+      }
+    },
+    "x_rank_pruned_top5": {
+      "partial": {
+        "cases": 8,
+        "replay_sufficient": 0,
+        "recognized_required_claims": 3,
+        "with_sources": 5,
+        "claims_answer_supported": 0
+      },
+      "ambiguous": {
+        "cases": 8,
+        "replay_sufficient": 0,
+        "recognized_required_claims": 0,
+        "with_sources": 3,
+        "claims_answer_supported": 0
+      },
+      "unanswerable": {
+        "cases": 8,
+        "replay_sufficient": 0,
+        "recognized_required_claims": 0,
+        "with_sources": 0,
+        "claims_answer_supported": 0
+      },
+      "over_budget": {
+        "cases": 8,
+        "replay_sufficient": 0,
+        "recognized_required_claims": 0,
+        "with_sources": 0,
+        "claims_answer_supported": 0
+      }
+    },
+    "x_rank_top5": {
+      "partial": {
+        "cases": 8,
+        "replay_sufficient": 0,
+        "recognized_required_claims": 4,
+        "with_sources": 7,
+        "claims_answer_supported": 0
+      },
+      "ambiguous": {
+        "cases": 8,
+        "replay_sufficient": 0,
+        "recognized_required_claims": 0,
+        "with_sources": 4,
+        "claims_answer_supported": 0
+      },
+      "unanswerable": {
+        "cases": 8,
+        "replay_sufficient": 0,
+        "recognized_required_claims": 0,
+        "with_sources": 0,
+        "claims_answer_supported": 0
+      },
+      "over_budget": {
+        "cases": 8,
+        "replay_sufficient": 0,
+        "recognized_required_claims": 0,
+        "with_sources": 0,
+        "claims_answer_supported": 0
+      }
+    }
+  }
+}

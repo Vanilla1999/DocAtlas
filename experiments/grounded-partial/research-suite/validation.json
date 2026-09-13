@@ -1,0 +1,14 @@
+{
+  "baseline_cases_reproduced": 80,
+  "baseline_sufficient": 33,
+  "source_coverage_counterexample_tests_passed": 6,
+  "comparisons": 960,
+  "citation_policy_budget_errors": 0,
+  "max_replay_admission_tokens": 795,
+  "max_packet_admission_tokens": 800,
+  "holdout_opened": false,
+  "promotion_threshold": ">34 replay sufficient, paired model-specific gain, retain original33, no audits",
+  "production_runtime_tree": "c2515c14380644c12b4c60a280469b9844d5fc0d",
+  "full_ci_run": false,
+  "weak_answer_model_run": false
+}

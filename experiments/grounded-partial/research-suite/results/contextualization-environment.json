@@ -1,0 +1,16 @@
+{
+  "model": "Qwen/Qwen2.5-0.5B-Instruct-GGUF",
+  "revision": "9217f5db79a29953eb74d5343926648285ec7e67",
+  "file_sha256": "ca59ca7f13d0e15a8cfa77bd17e65d24f6844b554a7b6c12e07a5f89ff76844e",
+  "runtime": "llama-cpp-python",
+  "runtime_version": "0.3.35",
+  "quantization": "Q8_0",
+  "system": "Write a concise retrieval context for an excerpt from a technical document. Use only the document supplied. Identify the library, the subject of the excerpt and its relationship to the surrounding document. Return one paragraph of 50 to 80 words. Do not answer a user question. Do not invent missing information.",
+  "max_new_tokens": 128,
+  "temperature": 0.0,
+  "repeat_penalty": 1.0,
+  "threads": 3,
+  "question_access": false,
+  "total_seconds": 1340.425951063,
+  "peak_rss_kib": 2048304
+}
