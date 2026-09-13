@@ -1,0 +1,14 @@
+{
+  "eval/evidence_quality_v2/cases.json": "4b01b66609f1a04a067062556c97de1e2fcccc41359ecabcb75ee1154fc0d67d",
+  "eval/evidence_quality_v2/source-manifest.json": "f0395dcc526161b51d9378ef3ac6d4c8a1a1bd2e323be0c4c6cff58f783b0985",
+  "eval/evidence_quality_v2/protocol.json": "96a6c66e9061b3e40b5c2f01e1b69fb5eca5d88a4a542d5512246315fdb67de2",
+  "runtime_commit": "266a3c40cee896522a11c89f4cacda8f12275d59",
+  "artifact_hashes": {
+    "summary.json": "659344257f854de4a86cf5129539adc4ad393efc78be582e3610952b7e7932f9",
+    "followup_protocol.json": "375d6f75c3f1f72f207c0b453381deda19d26177fb81c032e0ab8ba1ce908cf4",
+    "ANALYSIS_RU.md": "66e3efa0da894a733513cb38b4b32e577e275e24b37a0cc4f0838804d8867377",
+    "results.json": "b5cc91005433985478282fe28b8748a1590952ccc8e635e1348b4fdefbbe9342",
+    "run.py": "d73e243fe0c1b924d4b23421846dd95920936f9359dc3b155b1f280572d587c1",
+    "protocol.json": "f70eaf23c8622af06c7ad19f6450f9fef7a3b01b90eda8e2c028c787e20ce0df"
+  }
+}
