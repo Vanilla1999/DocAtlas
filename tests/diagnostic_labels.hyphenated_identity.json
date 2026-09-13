@@ -5,6 +5,6 @@
   },
   "node_overrides": {},
   "module_node_hashes": {
-    "tests/docs/test_hyphenated_query_identity.py": "b874f33c33d46e28180c0ab8c54ff3e954d67784ab03d974ae33858f67e3cffb"
+    "tests/docs/test_hyphenated_query_identity.py": "503fd72ba010cecd9b90463ae70a5e43b834f258827d28f0dda92d0e20bd0467"
   }
 }

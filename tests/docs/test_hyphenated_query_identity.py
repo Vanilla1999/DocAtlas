@@ -6,7 +6,7 @@ from docmancer.docs.domain.technical_terms import extract_technical_terms
 
 
 @pytest.mark.parametrize("modifier", ["repository-wide", "high-availability", "latency-sensitive", "source-backed"])
-def test_unquoted_prose_modifier_is_not_a_mandatory_command_identity(modifier):
+def test_unquoted_prose_modifier_remains_a_lexical_topic(modifier):
     question = f"How does {modifier} documentation retrieval preserve useful evidence?"
     assert modifier in technical_anchors(question)  # keep lexical search recall
     terms = [term for term in extract_technical_terms(question) if term.raw == modifier]
@@ -29,6 +29,9 @@ def test_unquoted_prose_modifier_is_not_a_mandatory_command_identity(modifier):
 ])
 def test_explicit_command_syntax_retains_exact_hyphenated_identity(question):
     assert "archive-store" in technical_anchors(question)
+    terms = [term for term in extract_technical_terms(question) if term.raw == "archive-store"]
+    assert len(terms) == 1
+    assert terms[0].kind == "cli_command"
 
 
 def test_command_context_does_not_promote_an_unrelated_prose_modifier():
@@ -40,7 +43,9 @@ def test_command_context_does_not_promote_an_unrelated_prose_modifier():
 
 
 def test_former_prose_prefix_can_be_a_real_explicit_command():
-    assert "provider-free" in technical_anchors("Run provider-free --help")
+    question = "Run provider-free --help"
+    assert "provider-free" in technical_anchors(question)
+    assert next(term for term in extract_technical_terms(question) if term.raw == "provider-free").kind == "cli_command"
 
 
 @pytest.mark.parametrize("question", [
