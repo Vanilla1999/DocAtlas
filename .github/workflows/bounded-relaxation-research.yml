@@ -1,0 +1,56 @@
+name: Bounded lexical relaxation research
+on:
+  pull_request:
+    types: [opened, reopened, synchronize]
+    paths:
+      - '.github/workflows/bounded-relaxation-research.yml'
+      - 'experiments/grounded-partial/bounded-relaxation/**'
+permissions:
+  contents: read
+jobs:
+  bounded-relaxation:
+    if: github.head_ref == 'experiment/contextual-late-sufficiency'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      DOCATLAS_OFFLINE: '1'
+      DOCATLAS_AUTO_VECTORS: '0'
+      PYTHONHASHSEED: '0'
+      PYTHONPATH: ${{ github.workspace }}:${{ github.workspace }}/experiments/grounded-partial/bounded-relaxation:${{ github.workspace }}/experiments/grounded-partial/section-scope
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Preserve code and install existing dependencies
+        run: |
+          mkdir -p "$RUNNER_TEMP/bounded-relaxation/code"
+          git rev-parse HEAD > "$RUNNER_TEMP/bounded-relaxation/head.txt"
+          cp experiments/grounded-partial/bounded-relaxation/* "$RUNNER_TEMP/bounded-relaxation/code/"
+          python -m pip install '.[dev]' > "$RUNNER_TEMP/bounded-relaxation/install.log" 2>&1
+          python -m pip freeze > "$RUNNER_TEMP/bounded-relaxation/pip-freeze.txt"
+      - name: Boundary tests and prior research tests
+        run: |
+          set -o pipefail
+          python -m pytest experiments/grounded-partial/bounded-relaxation/test_relaxation.py experiments/grounded-partial/section-scope/test_section_scope.py experiments/grounded-partial/contextual-late/test_factorial.py experiments/grounded-partial/semantic-selection/test_evaluate.py -q 2>&1 | tee "$RUNNER_TEMP/bounded-relaxation/tests.log"
+      - name: Restore frozen data and verify native80
+        run: |
+          set -o pipefail
+          python experiments/grounded-partial/research-suite/restore.py
+          python experiments/grounded-partial/hypothesis5/no_network.py experiments/grounded-partial/research-suite/verify_baseline.py 2>&1 | tee "$RUNNER_TEMP/bounded-relaxation/native.log"
+      - name: Fixed isolated and combined policies
+        run: |
+          set -o pipefail
+          python experiments/grounded-partial/hypothesis5/no_network.py experiments/grounded-partial/bounded-relaxation/run.py --output "$RUNNER_TEMP/bounded-relaxation/results" 2>&1 | tee "$RUNNER_TEMP/bounded-relaxation/replay.log"
+      - name: Verify tracked files unchanged
+        if: always()
+        run: git diff --exit-code
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: bounded-relaxation-${{ github.event.pull_request.head.sha }}
+          path: ${{ runner.temp }}/bounded-relaxation/
+          retention-days: 14
