@@ -154,3 +154,46 @@ def test_host_loop_retains_initial_facts_and_requested_continuation(context):
     assert blocks['docatlas_result'] == context
     assert blocks['source_reads'] == [read]
     assert blocks['requested_facts'] == {'retry': 'When may I retry?'}
+
+
+@pytest.mark.parametrize('initial_overlap', [False, True])
+def test_distinct_locators_cannot_repeat_source_lines(context, initial_overlap):
+    source = context['sources'][0]
+    first_uri, second_uri = ('docatlas://source/' + char * 24 for char in 'ab')
+    source.update(source_uri=first_uri, line_start=1, line_end=1)
+    other = {**source, 'source_uri': second_uri, 'line_start': 3 if initial_overlap else 5,
+             'line_end': 3 if initial_overlap else 5, 'snippet': 'Another cited fact.'}
+    context['sources'].append(other)
+    def read(uri):
+        start, end = (2, 4) if uri == first_uri else (6, 7)
+        return dict(status='complete', path=source['path_or_url'],
+                    project_identity=source['project_identity'], content_sha256='sha256:' + 'f' * 64,
+                    line_start=start, line_end=end,
+                    snippet='\n'.join(f'Fact at line {line}.' for line in range(start, end + 1)),
+                    continuation=None)
+    controller = SourceReadController(context, requested_facts={'remaining': 'What remains?'}, read_resource=read)
+    result = controller.read(first_uri, missing_fact_id='remaining')
+    if initial_overlap:
+        assert result['reason_code'] == 'repeated_source_span'
+        assert controller.results == []
+    else:
+        assert result['status'] == 'complete'
+        assert controller.read(second_uri, missing_fact_id='remaining')['status'] == 'complete'
+
+
+def test_distinct_continuation_chains_cannot_overlap(context):
+    source = context['sources'][0]
+    first_uri, second_uri = ('docatlas://source/' + char * 24 for char in 'ab')
+    source.update(source_uri=first_uri, line_start=1, line_end=1)
+    # The second seed has no complete range, as permitted for legacy citations.
+    context['sources'].append({**source, 'source_uri': second_uri, 'line_start': None, 'line_end': 3})
+    def read(uri):
+        start = 2 if uri == first_uri else 4
+        return dict(status='complete', path=source['path_or_url'],
+                    project_identity=source['project_identity'], content_sha256='sha256:' + 'f' * 64,
+                    line_start=start, line_end=start + 2, snippet=f'Lines {start} through {start + 2}.',
+                    continuation=None)
+    controller = SourceReadController(context, requested_facts={'remaining': 'What remains?'}, read_resource=read)
+    assert controller.read(first_uri, missing_fact_id='remaining')['status'] == 'complete'
+    assert controller.read(second_uri, missing_fact_id='remaining')['reason_code'] == 'repeated_source_span'
+    assert len(controller.results) == 1

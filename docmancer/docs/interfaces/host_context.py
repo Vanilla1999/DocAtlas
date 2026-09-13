@@ -68,6 +68,17 @@ class SourceReadController:
             and type(source.get('line_end')) is int and source['line_end'] > 0
         }
         self._seen_uris: set[str] = set()
+        # Different locators can refer to overlapping sections of one file.
+        # Citation hashes describe snippets, not file snapshots, so initial
+        # intervals use an unknown snapshot and conservatively match any read.
+        self._seen_spans: list[tuple[str, str, str | None, int, int]] = [
+            (source.get('project_identity'), source.get('path_or_url'), None,
+             source['line_start'], source['line_end'])
+            for source in context.get('sources') or ()
+            if isinstance(source, dict) and type(source.get('line_start')) is int
+            and type(source.get('line_end')) is int
+            and 0 < source['line_start'] <= source['line_end']
+        ]
         self._seen_text = {' '.join(str(source.get('snippet') or '').split())
                            for source in context.get('sources') or () if isinstance(source, dict)}
         self.read_attempts = 0
@@ -105,10 +116,17 @@ class SourceReadController:
             or not re.fullmatch(r'sha256:[0-9a-f]{64}', result['content_sha256'])
             or (expected['content_sha256'] and result['content_sha256'] != expected['content_sha256'])):
             return self._stop('source_binding_mismatch')
+        if any(project == result['project_identity'] and path == result['path']
+               and (digest is None or digest == result['content_sha256'])
+               and start <= seen_end and seen_start <= end
+               for project, path, digest, seen_start, seen_end in self._seen_spans):
+            return self._stop('repeated_source_span')
         text = ' '.join(str(result['snippet']).split())
         if not text or text in self._seen_text:
             return self._stop('no_new_source_text')
         self._seen_text.add(text)
+        self._seen_spans.append((result['project_identity'], result['path'],
+                                 result['content_sha256'], start, end))
         self.results.append(deepcopy(result))
         continuation = result.get('continuation')
         if isinstance(continuation, str) and re.fullmatch(r'docatlas://source/[0-9a-f]{24}', continuation):

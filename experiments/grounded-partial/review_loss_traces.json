@@ -1,0 +1,837 @@
+[
+  {
+    "id": "Q06",
+    "lane": "guided",
+    "before": {
+      "cap": [
+        {
+          "query": "Which documentation scope restricts retrieval to repository-level documentation?",
+          "path": "docs/project-docs-mcp-workflow.md",
+          "lines": [
+            116,
+            123
+          ],
+          "kept": false
+        }
+      ],
+      "projector_inputs": [],
+      "final_sources": []
+    },
+    "after": {
+      "cap": [
+        {
+          "query": "Which documentation scope restricts retrieval to repository-level documentation?",
+          "path": "docs/project-docs-mcp-workflow.md",
+          "lines": [
+            116,
+            123
+          ],
+          "kept": true
+        }
+      ],
+      "projector_inputs": [
+        {
+          "path": "docs/project-docs-mcp-workflow.md",
+          "text": "| Argument | Use |\n|---|---|\n| `module_path=\"services/auth\"` | Exact and unambiguous. Preferred for agent retries. |\n| `module=\"auth\"` | Exact module id/name lookup. May return `module_ambiguous`. |\n| `scope=\"module\"` | Restrict retrieval to module docs. A resolved module path also implies module scope. |\n| `scope=\"project\"` | Restrict retrieval to repo-level docs. |\n| `scope=\"all\"` | Search both repo-level and module docs. |\n\n",
+          "matches": {
+            "query-lookup-1": {
+              "mode": "or_fallback",
+              "query_terms": [
+                "documentation",
+                "scope",
+                "restricts",
+                "retrieval",
+                "repository-level"
+              ],
+              "matched_terms": [
+                "scope",
+                "restricts",
+                "retrieval"
+              ],
+              "exact_terms": [],
+              "missing_exact_terms": [],
+              "query_term_count": 6,
+              "matched_term_count": 3,
+              "match_ratio": 0.6,
+              "bm25_cost": -11.280546656898114,
+              "lexical_score": 11.280546656898114,
+              "field_matches": {
+                "title": [],
+                "body": [
+                  "scope",
+                  "retrieval",
+                  "level"
+                ],
+                "retrieval_text": [
+                  "documentation",
+                  "scope",
+                  "retrieval",
+                  "level"
+                ]
+              },
+              "query_text": "Which documentation scope restricts retrieval to repository-level documentation?",
+              "query_origin": "host_lookup",
+              "relation": "host_lookup",
+              "public_parent_query_id": null,
+              "preferred_catalog_roles": [],
+              "forbidden_catalog_roles": [],
+              "forbidden_evidence_terms": [],
+              "parent_exact_terms": [],
+              "body_matched_terms": [
+                "scope",
+                "restricts",
+                "retrieval"
+              ],
+              "heading_context_used": false,
+              "table_context_used": false,
+              "missing_parent_exact_terms": [],
+              "qualified": true,
+              "qualification_reason": "visible_fields"
+            }
+          }
+        }
+      ],
+      "final_sources": [
+        {
+          "evidence_id": "ev-df5094988a2baf1a",
+          "path_or_url": "docs/project-docs-mcp-workflow.md",
+          "section": "Project docs MCP workflow > Module docs workflow",
+          "snippet": "| Argument | Use |\n|---|---|\n| `module_path=\"services/auth\"` | Exact and unambiguous. Preferred for agent retries. |\n| `module=\"auth\"` | Exact module id/name lookup. May return `module_ambiguous`. |\n| `scope=\"module\"` | Restrict retrieval to module docs. A resolved module path also implies module scope. |\n| `scope=\"project\"` | Restrict retrieval to repo-level docs. |\n| `scope=\"all\"` | Search both repo-level and module docs. |",
+          "version_binding": "unversioned",
+          "content_sha256": "9c46252264448fae299b16b8f0143aea13e7b798e87a61ce8ccc51c6a4d70647",
+          "project_identity": "git:github.com/Vanilla1999/DocAtlas",
+          "authority": "source_of_truth",
+          "scope": "project",
+          "line_start": 116,
+          "line_end": 122
+        }
+      ]
+    }
+  },
+  {
+    "id": "Q12",
+    "lane": "guided",
+    "before": {
+      "cap": [
+        {
+          "query": "A preparation request returned a job ID instead of documents. What is the expected polling and retry sequence?",
+          "path": "docs/mcp-response-contract.md",
+          "lines": [
+            9,
+            20
+          ],
+          "kept": true
+        },
+        {
+          "query": "A preparation request returned a job ID instead of documents. What is the expected polling and retry sequence?",
+          "path": "docs/mcp-docs-server.md",
+          "lines": [
+            33,
+            41
+          ],
+          "kept": true
+        },
+        {
+          "query": "A preparation request returned a job ID instead of documents. What is the expected polling and retry sequence?",
+          "path": "docs/mcp-docs-server.md",
+          "lines": [
+            33,
+            41
+          ],
+          "kept": true
+        },
+        {
+          "query": "What should an agent do when prepare_docs returns a job ID?",
+          "path": "docs/mcp-response-contract.md",
+          "lines": [
+            9,
+            20
+          ],
+          "kept": true
+        },
+        {
+          "query": "What should an agent do when prepare_docs returns a job ID?",
+          "path": "docs/mcp-docs-server.md",
+          "lines": [
+            33,
+            41
+          ],
+          "kept": true
+        },
+        {
+          "query": "When should the original documentation question be retried?",
+          "path": "docs/mcp-response-contract.md",
+          "lines": [
+            9,
+            20
+          ],
+          "kept": true
+        },
+        {
+          "query": "When should the original documentation question be retried?",
+          "path": "docs/mcp-docs-server.md",
+          "lines": [
+            33,
+            41
+          ],
+          "kept": true
+        },
+        {
+          "query": "preparation",
+          "path": "docs/mcp-response-contract.md",
+          "lines": [
+            9,
+            20
+          ],
+          "kept": false
+        },
+        {
+          "query": "returned",
+          "path": "docs/mcp-response-contract.md",
+          "lines": [
+            9,
+            20
+          ],
+          "kept": true
+        },
+        {
+          "query": "returned",
+          "path": "docs/mcp-docs-server.md",
+          "lines": [
+            33,
+            41
+          ],
+          "kept": false
+        },
+        {
+          "query": "job",
+          "path": "docs/mcp-response-contract.md",
+          "lines": [
+            9,
+            20
+          ],
+          "kept": false
+        },
+        {
+          "query": "job",
+          "path": "docs/mcp-docs-server.md",
+          "lines": [
+            33,
+            41
+          ],
+          "kept": false
+        }
+      ],
+      "projector_inputs": [
+        {
+          "path": "docs/mcp-response-contract.md",
+          "text": "## Normal Docs MCP workflow\n\nThe normal Docs MCP flow is:\n\n```text\nget_docs_context(question, project_path)\n→ sufficient context? answer with sources and stop\n→ returned recommended_next_action? obtain confirmation if required and call that exact action\n→ if a job was returned, poll docs_status(job_id)\n→ preparation succeeded? retry the original bounded get_docs_context question\n```\n\n",
+          "matches": {
+            "query-hint-3": {
+              "mode": "and",
+              "query_terms": [
+                "returned"
+              ],
+              "matched_terms": [
+                "returned"
+              ],
+              "exact_terms": [],
+              "missing_exact_terms": [],
+              "query_term_count": 1,
+              "matched_term_count": 1,
+              "match_ratio": 1.0,
+              "bm25_cost": -5.81005884522668,
+              "lexical_score": 5.81005884522668,
+              "field_matches": {
+                "title": [],
+                "body": [
+                  "returned"
+                ],
+                "retrieval_text": [
+                  "returned"
+                ]
+              },
+              "query_text": "returned",
+              "query_origin": "retrieval_hint",
+              "relation": "host_lookup",
+              "public_parent_query_id": null,
+              "preferred_catalog_roles": [],
+              "forbidden_catalog_roles": [],
+              "forbidden_evidence_terms": [],
+              "parent_exact_terms": [],
+              "body_matched_terms": [
+                "returned"
+              ],
+              "heading_context_used": false,
+              "table_context_used": false,
+              "missing_parent_exact_terms": [],
+              "qualified": true,
+              "qualification_reason": "visible_fields",
+              "coverage_kinds": [
+                "direct"
+              ]
+            },
+            "query-lookup-2": {
+              "mode": "or_fallback",
+              "query_terms": [
+                "when",
+                "should",
+                "original",
+                "documentation",
+                "question",
+                "retried"
+              ],
+              "matched_terms": [
+                "original",
+                "question"
+              ],
+              "exact_terms": [],
+              "missing_exact_terms": [],
+              "query_term_count": 4,
+              "matched_term_count": 2,
+              "match_ratio": 0.3333,
+              "bm25_cost": -9.848983190758066,
+              "lexical_score": 9.848983190758066,
+              "field_matches": {
+                "title": [],
+                "body": [
+                  "original",
+                  "question"
+                ],
+                "retrieval_text": [
+                  "original",
+                  "question"
+                ]
+              },
+              "query_text": "When should the original documentation question be retried?",
+              "query_origin": "host_lookup",
+              "relation": "host_lookup",
+              "public_parent_query_id": null,
+              "preferred_catalog_roles": [],
+              "forbidden_catalog_roles": [],
+              "forbidden_evidence_terms": [],
+              "parent_exact_terms": [],
+              "body_matched_terms": [
+                "original",
+                "question"
+              ],
+              "heading_context_used": false,
+              "table_context_used": false,
+              "missing_parent_exact_terms": [],
+              "qualified": false,
+              "qualification_reason": "insufficient_visible_match",
+              "coverage_kinds": []
+            },
+            "query-lookup-1": {
+              "mode": "or_fallback",
+              "query_terms": [
+                "should",
+                "agent",
+                "when",
+                "prepare_docs",
+                "returns",
+                "id"
+              ],
+              "matched_terms": [
+                "returns"
+              ],
+              "exact_terms": [
+                "id",
+                "prepare_docs"
+              ],
+              "missing_exact_terms": [
+                "id",
+                "prepare_docs"
+              ],
+              "query_term_count": 5,
+              "matched_term_count": 1,
+              "match_ratio": 0.1667,
+              "bm25_cost": -10.257467519265413,
+              "lexical_score": 10.257467519265413,
+              "field_matches": {
+                "title": [],
+                "body": [
+                  "job"
+                ],
+                "retrieval_text": [
+                  "job"
+                ]
+              },
+              "query_text": "What should an agent do when prepare_docs returns a job ID?",
+              "query_origin": "host_lookup",
+              "relation": "host_lookup",
+              "public_parent_query_id": null,
+              "preferred_catalog_roles": [
+                "overview",
+                "api_contract",
+                "runbook",
+                "development"
+              ],
+              "forbidden_catalog_roles": [
+                "adr",
+                "roadmap"
+              ],
+              "forbidden_evidence_terms": [
+                "docs/adr/",
+                "mcp pack commands",
+                "packs mcp runtime",
+                "install-pack",
+                "packs-serve"
+              ],
+              "parent_exact_terms": [],
+              "body_matched_terms": [
+                "returns"
+              ],
+              "heading_context_used": false,
+              "table_context_used": false,
+              "missing_parent_exact_terms": [],
+              "qualified": false,
+              "qualification_reason": "insufficient_visible_match",
+              "coverage_kinds": []
+            },
+            "query-original": {
+              "mode": "or_fallback",
+              "query_terms": [
+                "preparation",
+                "request",
+                "returned",
+                "id",
+                "instead",
+                "documents.",
+                "expected",
+                "polling",
+                "retry",
+                "sequence"
+              ],
+              "matched_terms": [
+                "preparation",
+                "returned",
+                "polling",
+                "retry"
+              ],
+              "exact_terms": [
+                "id"
+              ],
+              "missing_exact_terms": [
+                "id"
+              ],
+              "query_term_count": 12,
+              "matched_term_count": 4,
+              "match_ratio": 0.4,
+              "bm25_cost": -27.199488644638375,
+              "lexical_score": 27.199488644638375,
+              "field_matches": {
+                "title": [],
+                "body": [
+                  "preparation",
+                  "returned",
+                  "job",
+                  "and",
+                  "retry"
+                ],
+                "retrieval_text": [
+                  "preparation",
+                  "returned",
+                  "job",
+                  "and",
+                  "retry"
+                ]
+              },
+              "query_text": "A preparation request returned a job ID instead of documents. What is the expected polling and retry sequence?",
+              "query_origin": "original",
+              "relation": "direct",
+              "public_parent_query_id": null,
+              "preferred_catalog_roles": [],
+              "forbidden_catalog_roles": [],
+              "forbidden_evidence_terms": [],
+              "parent_exact_terms": [],
+              "body_matched_terms": [
+                "preparation",
+                "returned",
+                "polling",
+                "retry"
+              ],
+              "heading_context_used": false,
+              "table_context_used": false,
+              "missing_parent_exact_terms": [],
+              "qualified": false,
+              "qualification_reason": "insufficient_visible_match",
+              "coverage_kinds": []
+            }
+          }
+        }
+      ],
+      "final_sources": []
+    },
+    "after": {
+      "cap": [
+        {
+          "query": "A preparation request returned a job ID instead of documents. What is the expected polling and retry sequence?",
+          "path": "docs/mcp-response-contract.md",
+          "lines": [
+            9,
+            20
+          ],
+          "kept": true
+        },
+        {
+          "query": "A preparation request returned a job ID instead of documents. What is the expected polling and retry sequence?",
+          "path": "docs/mcp-docs-server.md",
+          "lines": [
+            33,
+            41
+          ],
+          "kept": true
+        },
+        {
+          "query": "A preparation request returned a job ID instead of documents. What is the expected polling and retry sequence?",
+          "path": "docs/mcp-docs-server.md",
+          "lines": [
+            33,
+            41
+          ],
+          "kept": true
+        },
+        {
+          "query": "What should an agent do when prepare_docs returns a job ID?",
+          "path": "docs/mcp-response-contract.md",
+          "lines": [
+            9,
+            20
+          ],
+          "kept": true
+        },
+        {
+          "query": "What should an agent do when prepare_docs returns a job ID?",
+          "path": "docs/mcp-docs-server.md",
+          "lines": [
+            33,
+            41
+          ],
+          "kept": false
+        },
+        {
+          "query": "When should the original documentation question be retried?",
+          "path": "docs/mcp-response-contract.md",
+          "lines": [
+            9,
+            20
+          ],
+          "kept": true
+        },
+        {
+          "query": "When should the original documentation question be retried?",
+          "path": "docs/mcp-docs-server.md",
+          "lines": [
+            33,
+            41
+          ],
+          "kept": true
+        },
+        {
+          "query": "preparation",
+          "path": "docs/mcp-response-contract.md",
+          "lines": [
+            9,
+            20
+          ],
+          "kept": false
+        },
+        {
+          "query": "returned",
+          "path": "docs/mcp-response-contract.md",
+          "lines": [
+            9,
+            20
+          ],
+          "kept": true
+        },
+        {
+          "query": "returned",
+          "path": "docs/mcp-docs-server.md",
+          "lines": [
+            33,
+            41
+          ],
+          "kept": false
+        },
+        {
+          "query": "job",
+          "path": "docs/mcp-response-contract.md",
+          "lines": [
+            9,
+            20
+          ],
+          "kept": false
+        },
+        {
+          "query": "job",
+          "path": "docs/mcp-docs-server.md",
+          "lines": [
+            33,
+            41
+          ],
+          "kept": false
+        }
+      ],
+      "projector_inputs": [
+        {
+          "path": "docs/mcp-response-contract.md",
+          "text": "## Normal Docs MCP workflow\n\nThe normal Docs MCP flow is:\n\n```text\nget_docs_context(question, project_path)\n→ sufficient context? answer with sources and stop\n→ returned recommended_next_action? obtain confirmation if required and call that exact action\n→ if a job was returned, poll docs_status(job_id)\n→ preparation succeeded? retry the original bounded get_docs_context question\n```\n\n",
+          "matches": {
+            "query-hint-3": {
+              "mode": "and",
+              "query_terms": [
+                "returned"
+              ],
+              "matched_terms": [
+                "returned"
+              ],
+              "exact_terms": [],
+              "missing_exact_terms": [],
+              "query_term_count": 1,
+              "matched_term_count": 1,
+              "match_ratio": 1.0,
+              "bm25_cost": -5.81005884522668,
+              "lexical_score": 5.81005884522668,
+              "field_matches": {
+                "title": [],
+                "body": [
+                  "returned"
+                ],
+                "retrieval_text": [
+                  "returned"
+                ]
+              },
+              "query_text": "returned",
+              "query_origin": "retrieval_hint",
+              "relation": "host_lookup",
+              "public_parent_query_id": null,
+              "preferred_catalog_roles": [],
+              "forbidden_catalog_roles": [],
+              "forbidden_evidence_terms": [],
+              "parent_exact_terms": [],
+              "body_matched_terms": [
+                "returned"
+              ],
+              "heading_context_used": false,
+              "table_context_used": false,
+              "missing_parent_exact_terms": [],
+              "qualified": true,
+              "qualification_reason": "visible_fields",
+              "coverage_kinds": [
+                "direct"
+              ]
+            },
+            "query-lookup-2": {
+              "mode": "or_fallback",
+              "query_terms": [
+                "when",
+                "should",
+                "original",
+                "documentation",
+                "question",
+                "retried"
+              ],
+              "matched_terms": [
+                "original",
+                "question",
+                "retried"
+              ],
+              "exact_terms": [],
+              "missing_exact_terms": [],
+              "query_term_count": 4,
+              "matched_term_count": 3,
+              "match_ratio": 0.5,
+              "bm25_cost": -9.848983190758066,
+              "lexical_score": 9.848983190758066,
+              "field_matches": {
+                "title": [],
+                "body": [
+                  "original",
+                  "question"
+                ],
+                "retrieval_text": [
+                  "original",
+                  "question"
+                ]
+              },
+              "query_text": "When should the original documentation question be retried?",
+              "query_origin": "host_lookup",
+              "relation": "host_lookup",
+              "public_parent_query_id": null,
+              "preferred_catalog_roles": [],
+              "forbidden_catalog_roles": [],
+              "forbidden_evidence_terms": [],
+              "parent_exact_terms": [],
+              "body_matched_terms": [
+                "original",
+                "question",
+                "retried"
+              ],
+              "heading_context_used": false,
+              "table_context_used": false,
+              "missing_parent_exact_terms": [],
+              "qualified": true,
+              "qualification_reason": "visible_fields",
+              "coverage_kinds": [
+                "direct"
+              ]
+            },
+            "query-lookup-1": {
+              "mode": "or_fallback",
+              "query_terms": [
+                "should",
+                "agent",
+                "when",
+                "prepare_docs",
+                "returns",
+                "id"
+              ],
+              "matched_terms": [
+                "returns"
+              ],
+              "exact_terms": [
+                "id",
+                "prepare_docs"
+              ],
+              "missing_exact_terms": [
+                "id",
+                "prepare_docs"
+              ],
+              "query_term_count": 5,
+              "matched_term_count": 1,
+              "match_ratio": 0.1667,
+              "bm25_cost": -10.257467519265413,
+              "lexical_score": 10.257467519265413,
+              "field_matches": {
+                "title": [],
+                "body": [
+                  "job"
+                ],
+                "retrieval_text": [
+                  "job"
+                ]
+              },
+              "query_text": "What should an agent do when prepare_docs returns a job ID?",
+              "query_origin": "host_lookup",
+              "relation": "host_lookup",
+              "public_parent_query_id": null,
+              "preferred_catalog_roles": [
+                "overview",
+                "api_contract",
+                "runbook",
+                "development"
+              ],
+              "forbidden_catalog_roles": [
+                "adr",
+                "roadmap"
+              ],
+              "forbidden_evidence_terms": [
+                "docs/adr/",
+                "mcp pack commands",
+                "packs mcp runtime",
+                "install-pack",
+                "packs-serve"
+              ],
+              "parent_exact_terms": [],
+              "body_matched_terms": [
+                "returns"
+              ],
+              "heading_context_used": false,
+              "table_context_used": false,
+              "missing_parent_exact_terms": [],
+              "qualified": false,
+              "qualification_reason": "insufficient_visible_match",
+              "coverage_kinds": []
+            },
+            "query-original": {
+              "mode": "or_fallback",
+              "query_terms": [
+                "preparation",
+                "request",
+                "returned",
+                "id",
+                "instead",
+                "documents.",
+                "expected",
+                "polling",
+                "retry",
+                "sequence"
+              ],
+              "matched_terms": [
+                "preparation",
+                "returned",
+                "polling",
+                "retry"
+              ],
+              "exact_terms": [
+                "id"
+              ],
+              "missing_exact_terms": [
+                "id"
+              ],
+              "query_term_count": 12,
+              "matched_term_count": 4,
+              "match_ratio": 0.4,
+              "bm25_cost": -27.199488644638375,
+              "lexical_score": 27.199488644638375,
+              "field_matches": {
+                "title": [],
+                "body": [
+                  "preparation",
+                  "returned",
+                  "job",
+                  "and",
+                  "retry"
+                ],
+                "retrieval_text": [
+                  "preparation",
+                  "returned",
+                  "job",
+                  "and",
+                  "retry"
+                ]
+              },
+              "query_text": "A preparation request returned a job ID instead of documents. What is the expected polling and retry sequence?",
+              "query_origin": "original",
+              "relation": "direct",
+              "public_parent_query_id": null,
+              "preferred_catalog_roles": [],
+              "forbidden_catalog_roles": [],
+              "forbidden_evidence_terms": [],
+              "parent_exact_terms": [],
+              "body_matched_terms": [
+                "preparation",
+                "returned",
+                "polling",
+                "retry"
+              ],
+              "heading_context_used": false,
+              "table_context_used": false,
+              "missing_parent_exact_terms": [],
+              "qualified": false,
+              "qualification_reason": "insufficient_visible_match",
+              "coverage_kinds": []
+            }
+          }
+        }
+      ],
+      "final_sources": [
+        {
+          "evidence_id": "ev-e49c62177ee37a73",
+          "path_or_url": "docs/mcp-response-contract.md",
+          "section": "Docs MCP response and workflow contract > Normal Docs MCP workflow",
+          "snippet": "## Normal Docs MCP workflow\n\nThe normal Docs MCP flow is:\n\n```text\nget_docs_context(question, project_path)\n→ sufficient context? answer with sources and stop\n→ returned recommended_next_action? obtain confirmation if required and call that exact action\n→ if a job was returned, poll docs_status(job_id)\n→ preparation succeeded? retry the original bounded get_docs_context question\n```",
+          "version_binding": "unversioned",
+          "content_sha256": "ad44658bfac9430af3cbfd15d725effa8a74c30ea5982466e0dd7e04fe198726",
+          "project_identity": "git:github.com/Vanilla1999/DocAtlas",
+          "authority": "supporting",
+          "scope": "project",
+          "line_start": 9,
+          "line_end": 19
+        }
+      ]
+    }
+  }
+]
