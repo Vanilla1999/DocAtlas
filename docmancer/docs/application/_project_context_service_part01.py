@@ -7,6 +7,7 @@ from ._project_context_service_shared import *  # noqa: F401,F403
 from docmancer.docs.application.evidence_selection import requirement_probe_query
 from docmancer.docs.application._project_docs_service_part03 import _tag_retrieval_query
 from docmancer.docs.application.project_docs_service import ProjectDocsService
+from docmancer.docs.domain.source_map import ProjectSourceFacts
 
 
 class _ProjectContextServicePart01:
@@ -250,9 +251,11 @@ class _ProjectContextServicePart01:
                 reason=retrieval_route.source_reason,
             )
         run_repo_map, repo_reason = should_run_repo_map(retrieval_route, source_evidence_items)
+        source_facts = ProjectSourceFacts()
         if run_repo_map:
             observed_repo_map = build_project_repo_map(
                 root,
+                source_facts=source_facts,
                 question=question,
                 max_files=max(1, min(8, limit or 4)),
                 token_budget=_repo_map_token_budget(tokens),
@@ -279,6 +282,7 @@ class _ProjectContextServicePart01:
             try:
                 code_graph = build_project_code_graph(
                     root,
+                    source_facts=source_facts,
                     question=question,
                     requirements=requirements,
                     max_files=max(8, min(24, (limit or 4) * 3)),

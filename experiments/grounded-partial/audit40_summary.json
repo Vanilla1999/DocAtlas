@@ -1,0 +1,98 @@
+{
+  "runtime_commit": "cb6dc884a6309d6eb09a73e33e98fe93625e7edd",
+  "runtime_tree": "021bf3717c84831dab8d2e0207ff2ccaae0ce0e4",
+  "baseline_commit": "3b88763bd9acb6cbe403feb99288c86f1fe0d21d",
+  "questions_sha256": "34735190a1e140b47f6ec2ea7cf4fe2892090a967fd8c8b74ff9eeb5217818ba",
+  "method": "40 unchanged questions; minimal/all/guided; offline public MCP handler; maintained docs changed, so not a fixed-corpus causal improvement claim; manual non-blinded evidence grading, not model answers",
+  "metrics": {
+    "minimal": {
+      "questions": 40,
+      "ordinary": 36,
+      "negative_controls": 4,
+      "before_grades": {
+        "partial": 5,
+        "none": 26,
+        "full": 5
+      },
+      "after_grades": {
+        "partial": 4,
+        "none": 24,
+        "full": 8
+      },
+      "status": {
+        "ok": 25,
+        "insufficient_evidence": 15
+      },
+      "tokens_median_before": 356.0,
+      "tokens_median_after": 395.0,
+      "tokens_max": 800,
+      "source_uris": 35,
+      "errors": 0,
+      "observer_mismatches": 0,
+      "instrumented_latency_median_before": 0.7853641399997286,
+      "instrumented_latency_median_after": 0.8077997679993132
+    },
+    "all": {
+      "questions": 40,
+      "ordinary": 36,
+      "negative_controls": 4,
+      "before_grades": {
+        "partial": 5,
+        "none": 26,
+        "full": 5
+      },
+      "after_grades": {
+        "partial": 4,
+        "none": 24,
+        "full": 8
+      },
+      "status": {
+        "ok": 25,
+        "insufficient_evidence": 15
+      },
+      "tokens_median_before": 356.0,
+      "tokens_median_after": 395.0,
+      "tokens_max": 800,
+      "source_uris": 35,
+      "errors": 0,
+      "observer_mismatches": 0,
+      "instrumented_latency_median_before": 0.7806742714992652,
+      "instrumented_latency_median_after": 0.8182081620016106
+    },
+    "guided": {
+      "questions": 40,
+      "ordinary": 36,
+      "negative_controls": 4,
+      "before_grades": {
+        "partial": 11,
+        "full": 14,
+        "none": 11
+      },
+      "after_grades": {
+        "partial": 11,
+        "full": 17,
+        "none": 8
+      },
+      "status": {
+        "ok": 39,
+        "insufficient_evidence": 1
+      },
+      "tokens_median_before": 620.0,
+      "tokens_median_after": 751.5,
+      "tokens_max": 800,
+      "source_uris": 36,
+      "errors": 0,
+      "observer_mismatches": 0,
+      "instrumented_latency_median_before": 1.0941223369991349,
+      "instrumented_latency_median_after": 1.124534966500505
+    }
+  },
+  "full_suite": {
+    "passed": 4320,
+    "skipped": 10,
+    "failed": 0
+  },
+  "live_model": "NOT_RUN",
+  "task_token_savings": "NOT_MEASURED",
+  "frozen_docs_modified": false
+}

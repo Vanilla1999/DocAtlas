@@ -3,7 +3,7 @@ from __future__ import annotations
 
 import re
 
-from docmancer.docs.domain.query_terms import documentation_exact_terms
+from docmancer.docs.domain.query_terms import documentation_exact_terms, documentation_technical_anchors
 from docmancer.docs.domain.evidence_qualification import qualify_evidence
 
 
@@ -21,7 +21,10 @@ def independent_query_probes(source, query_plan):
         probe = {
             'query_text': text, 'query_origin': query['origin'],
             'relation': query.get('relation'),
-            'exact_terms': [term.normalized_value for term in documentation_exact_terms(text)],
+            'exact_terms': list(dict.fromkeys((
+                *(term.normalized_value for term in documentation_exact_terms(text)),
+                *(term.casefold() for term in documentation_technical_anchors(text)),
+            ))),
             'forbidden_catalog_roles': list(query.get('forbidden_catalog_roles') or ()),
             'forbidden_evidence_terms': list(query.get('forbidden_evidence_terms') or ()),
             'parent_exact_terms': list(query.get('parent_exact_terms') or ()),

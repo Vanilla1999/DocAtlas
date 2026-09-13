@@ -228,13 +228,37 @@ class _RetrievalDispatcherPart02:
             )
         ]
 
+    @staticmethod
+    def _rank_project_bodies_within_source(query: str, chunks: list[Any]) -> list[Any]:
+        """Spend each source's quota on body matches before heading mentions.
+
+        Keep the inter-source ordering and global capacity unchanged. This is
+        a candidate preference only; source policy and visible qualification
+        still govern admission. Stable ties retain the original retrieval rank.
+        """
+        from docmancer.docs.domain.evidence_qualification import _visible_term_present
+        from docmancer.docs.domain.query_terms import documentation_query_terms, documentation_exact_terms
+
+        terms = documentation_query_terms(query)
+        exact = {term.normalized_value for term in documentation_exact_terms(query)}
+        def key(chunk: Any) -> tuple[int, int]:
+            body = str(chunk.text).casefold()
+            return (sum(_visible_term_present(term, body, exact=True) for term in exact),
+                    sum(_visible_term_present(term, body, exact=term in exact) for term in terms))
+        groups: dict[str, list[Any]] = {}
+        for chunk in chunks:
+            source = str((chunk.metadata or {}).get('canonical_url') or chunk.source)
+            groups.setdefault(source, []).append(chunk)
+        queues = {source: iter(sorted(group, key=key, reverse=True)) for source, group in groups.items()}
+        return [next(queues[str((chunk.metadata or {}).get('canonical_url') or chunk.source)]) for chunk in chunks]
+
     def _rerank_intent_matches(self, query: str, chunks: list[Any], *, expand: str | None = None) -> list[Any]:
         if not query or len(chunks) < 2:
             return chunks
         # Project lanes already carry SQLite ranking; library snippet boosts
         # must not displace repository prose requirements with code examples.
         if all((getattr(chunk, "metadata", {}) or {}).get("source_class") == "project_file" for chunk in chunks):
-            return chunks
+            return self._rank_project_bodies_within_source(query, chunks)
         query_lower = query.lower()
         query_terms = _query_api_terms(query)
         intent_terms = _query_intent_terms(query_lower)

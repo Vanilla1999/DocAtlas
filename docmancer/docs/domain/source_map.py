@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import ast
+import json
 import re
 from pathlib import Path
 from typing import Any
@@ -93,6 +94,18 @@ _KEYWORDS = {
 }
 
 
+class ProjectSourceFacts:
+    """Request-local immutable captures; each consumer gets independent values."""
+
+    def __init__(self):
+        self._captures: dict[tuple, tuple[str, ...]] = {}
+
+    def materialize(self, key: tuple, load) -> list[dict[str, Any]]:
+        if key not in self._captures:
+            self._captures[key] = tuple(json.dumps(item, ensure_ascii=False) for item in load())
+        return [json.loads(item) for item in self._captures[key]]
+
+
 def build_project_repo_map(
     project_root: str | Path,
     *,
@@ -101,6 +114,7 @@ def build_project_repo_map(
     token_budget: int = _DEFAULT_TOKEN_BUDGET,
     source_boundary: SourceBoundary | None = None,
     include_generated: bool | None = None,
+    source_facts: ProjectSourceFacts | None = None,
 ) -> list[dict[str, Any]]:
     """Build a deterministic, compact source-file map for project context.
 
@@ -116,6 +130,7 @@ def build_project_repo_map(
         token_budget=token_budget,
         source_boundary=source_boundary,
         include_generated=include_generated,
+        source_facts=source_facts,
     )
 
 
@@ -128,6 +143,7 @@ def collect_project_source_facts(
     include_unmatched: bool = False,
     source_boundary: SourceBoundary | None = None,
     include_generated: bool | None = None,
+    source_facts: ProjectSourceFacts | None = None,
 ) -> list[dict[str, Any]]:
     """Collect deterministic source facts for repo_map and future graph layers.
 
@@ -147,6 +163,7 @@ def collect_project_source_facts(
         token_budget=token_budget,
         include_unmatched=include_unmatched,
         source_boundary=source_boundary,
+        source_facts=source_facts,
         include_generated=(
             _question_requests_generated_artifacts(question)
             if include_generated is None else include_generated
@@ -163,13 +180,18 @@ def _select_project_source_facts(
     include_unmatched: bool = False,
     source_boundary: SourceBoundary | None = None,
     include_generated: bool = False,
+    source_facts: ProjectSourceFacts | None = None,
 ) -> list[dict[str, Any]]:
     query_terms = _query_terms(question)
     candidates: list[dict[str, Any]] = []
-    for path in _iter_source_files(root, source_boundary=source_boundary, include_generated=include_generated):
-        item = _map_source_file(root, path)
-        if item is None:
-            continue
+    boundary = source_boundary or SourceBoundary.from_project(root)
+    def capture():
+        for path in _iter_source_files(root, source_boundary=boundary, include_generated=include_generated):
+            item = _map_source_file(root, path)
+            if item is not None:
+                yield item
+    observed = source_facts.materialize((str(root), boundary, include_generated), capture) if source_facts else capture()
+    for item in observed:
         item["matched_terms"] = _matched_terms(item, query_terms)
         item["selection_score"] = _selection_score(item, query_terms)
         if item["selection_score"] <= 0 and not include_unmatched:

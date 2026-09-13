@@ -1,0 +1,15 @@
+{
+  "design": "Post-hoc diagnosis of the exact frozen 48 within-budget cases; original 80-case annotations unchanged. No live model or production edits.",
+  "baseline": "33/48 at runtime 266a3c40cee896522a11c89f4cacda8f12275d59",
+  "variants": {
+    "baseline": "Unmodified real handler on all 80 cases; verify against published spans.",
+    "soft": "Real handler on all 80; override only insufficient_visible_match with >=1 body match and no missing exact/parent exact terms. Preserve all policy checks. No gold or case-specific rules in predicate.",
+    "lexical_replay": "All 48, same baseline projector inputs; existing generic lexical ordering only, unchanged qualification and budget.",
+    "oracle_qualification": "15 misses; target witness range relevance supplied by gold only for original query, never unrelated intent rewrites. Preserve source-policy and exact checks.",
+    "oracle_priority": "15 misses, fixed baseline projector inputs; witness-overlapping candidates first, qualification unchanged.",
+    "oracle_window": "15 misses; replace baseline pack with real contiguous witness windows, same question and fresh original qualification; no foreign query coverage.",
+    "oracle_window_qualification": "Same windows, plus gold original-query relevance; retain exact and policy rejection.",
+    "gold_dto": "All 48; full actual witness spans and metadata serialized in ordinary retrieval-only DTO. Feasibility bound, not retrieval."
+  },
+  "acceptance": "Report frozen sufficiency, old sufficient losses, audit errors and full DTO budget separately. Manually assess the 15 without modifying frozen gold. A prototype succeeds only on final evidence, not intermediate recall. No tuning after seeing results."
+}

@@ -1,0 +1,10 @@
+{
+  "schema_version": 1,
+  "module_labels": {
+    "tests/test_docs_service_fixture_isolation.py": "behavioral"
+  },
+  "node_overrides": {},
+  "module_node_hashes": {
+    "tests/test_docs_service_fixture_isolation.py": "5e6fb217b9707d98cb9d94c9849b4fc98bdedf6c3598b6c3280b1c6022774fa8"
+  }
+}

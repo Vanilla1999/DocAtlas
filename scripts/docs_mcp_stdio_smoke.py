@@ -208,6 +208,17 @@ async def smoke() -> None:
                 rendered = json.dumps(answer, sort_keys=True)
                 assert "README.md" in rendered, answer
                 assert NEEDLE in rendered, answer
+                from docmancer.docs.interfaces.grounded_mcp_session import GroundedMCPSession
+                grounded = await GroundedMCPSession.start(session, arguments=canonical_query,
+                    requested_facts={'command': 'How do I start the server?',
+                                     'details': 'What additional operational details are documented?'})
+                source = next(s for s in grounded.context['sources'] if NEEDLE in s['snippet'])
+                grounded.support('command', evidence_id=source['evidence_id'], quote=NEEDLE)
+                if source.get('source_uri'):
+                    await grounded.read(source['source_uri'], missing_fact_id='details')
+                handoff = grounded.finish()
+                assert handoff['status'] == 'partial' and handoff['known'][0]['quote'] == NEEDLE
+                assert handoff['answer_supported'] is False
                 sources = answer.get("sources") or answer.get("selected_sources") or answer.get("context_pack") or []
                 assert any(
                     source.get("path_or_url") == "README.md" or source.get("path") == "README.md"
@@ -236,12 +247,16 @@ async def smoke() -> None:
                     "question": QUESTION,
                     "project_path": str(project),
                 }
-                text_answer = text_payload(
-                    await session.call_tool("get_docs_context", canonical_query)
-                )
+                grounded_text = await GroundedMCPSession.start(session,
+                    arguments=canonical_query, structured_supported=False,
+                    requested_facts={'command': 'How do I start the server?'})
+                text_answer = grounded_text.context
                 rendered = json.dumps(text_answer, sort_keys=True)
                 assert "README.md" in rendered, text_answer
                 assert NEEDLE in rendered, text_answer
+                text_source = next(s for s in text_answer['sources'] if NEEDLE in s['snippet'])
+                grounded_text.support('command', evidence_id=text_source['evidence_id'], quote=NEEDLE)
+                assert grounded_text.finish()['status'] == 'host_assessed_complete'
         assert not (user_home / ".docmancer").exists(), (
             "installed release smoke wrote implicit foreign ~/.docmancer state"
         )

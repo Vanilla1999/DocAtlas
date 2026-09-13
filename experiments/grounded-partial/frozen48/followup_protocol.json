@@ -1,0 +1,10 @@
+{
+  "timing": "Exploratory follow-up after initial native and replay results; not a hidden holdout.",
+  "full_block_replay": "Same baseline projector inputs on all 48. Offer each existing qualified full raw block up to the existing 3000-character source schema ceiling; ordinary full DTO admission remains.",
+  "whole_only_replay": "Same inputs on all 48. Select the longest qualified variant per candidate, then ordinary ranking and admission. No gold in this predicate.",
+  "oracle_window_subject": "Gold additionally resolves missing exact subject identity for the known source span on query-original. This deliberately bypasses the requirement to repeat the library/API spelling in that body; it is NOT an implemented source-binding proof. Source-policy rejections are still enforced.",
+  "oracle_window_subject_full": "Known full contiguous witness windows, gold relevance/subject, longest qualified variant; ordinary projection schema and whole-DTO budget.",
+  "oracle_complete_replay": "Apply the same known-window, subject and full-variant oracle to ALL 48, including the previous 33 successes. Never splice baseline successes into an alleged common-prototype result.",
+  "oracle_scope": "All gold-guided lanes are feasibility/causal diagnostics only. No claims about automatic discovery, semantic classifier quality or live-agent outcomes.",
+  "harness_review": "Discarded initial gold DTO results that accidentally retained an old snippet field; rebuilt intrinsic section metadata from the index and explicitly supplied the new source span. Final retained artifacts pass source-span checks. No frozen annotations or runtime code changed."
+}

@@ -168,7 +168,21 @@ def call_docs_tool_payload(
     return compact_mcp_payload(payload, tool=name)
 
 
-def read_docs_resource(uri: str) -> dict[str, str] | None:
+def read_docs_resource(uri: str, service: LibraryDocsService | None = None) -> dict[str, str] | None:
+    if uri.startswith("docatlas://source/"):
+        result = {"status": "source_unavailable", "reason_code": "unknown_or_expired_reference"}
+        if service is not None:
+            with service._project_service_cache_lock:
+                services = [service, *service._project_service_cache.values()]
+            for owner in services:
+                reader = owner.source_reader
+                if reader.has_reference(uri):
+                    result = reader.read(uri)
+                    break
+        return {
+            "uri": uri, "name": "Bounded source continuation", "mimeType": "application/json",
+            "text": json.dumps(result, ensure_ascii=False, sort_keys=True, separators=(",", ":")),
+        }
     for resource in MCP_RESOURCES:
         if resource["uri"] == uri:
             return resource
@@ -283,7 +297,7 @@ async def _run_async(service: LibraryDocsService) -> None:
 
     @server.read_resource()
     async def _read_resource(uri: Any) -> str:
-        resource = read_docs_resource(str(uri))
+        resource = await asyncio.to_thread(read_docs_resource, str(uri), service)
         if resource is None:
             raise ValueError(f"unknown resource: {uri}")
         return resource["text"]

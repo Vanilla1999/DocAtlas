@@ -12,8 +12,10 @@ from typing import Any, Iterable, Protocol
 from docmancer.docs.application.model_visible_projection import (
     FORBIDDEN_MODEL_KEYS,
     estimate_projection_tokens,
+    docs_context_budget_tokens,
 )
 from eval.task_level.execution import shell_call_metrics
+from docmancer.docs.interfaces.host_context import SourceReadController
 
 
 LOOP_AUDIT_SCHEMA_VERSION = 1
@@ -30,6 +32,7 @@ _ACTION_ALIASES = {
     "bash": "shell",
     "command": "shell",
     "command_execution": "shell",
+    "source_read": "source_read",
 }
 
 
@@ -54,6 +57,7 @@ class LoopCapabilities:
     bounded_repairs_and_tests: bool = False
     deterministic_history_compaction: bool = False
     provider_usage_available: bool = False
+    source_continuations: bool = False
 
     @property
     def verified(self) -> bool:
@@ -106,6 +110,7 @@ class AgentLoopAdapter(Protocol):
         self, action: dict[str, Any], *, max_output_bytes: int
     ) -> ToolExecution: ...
     def provider_usage(self) -> dict[str, int] | None: ...
+    def read_docatlas_resource(self, uri: str, *, max_tokens: int) -> dict[str, Any]: ...
 
 
 @dataclass
@@ -134,6 +139,9 @@ class _LoopState:
     shell_events: list[dict[str, Any]] = field(default_factory=list)
     dynamic_tool_exposure_verified: bool = False
     bounded_output_hashes_verified: bool = True
+    source_controller: SourceReadController | None = None
+    source_reads: list[dict[str, Any]] = field(default_factory=list)
+    source_reads_stopped: bool = False
 
 
 def canonical_loop_bytes(value: Any) -> bytes:
@@ -326,6 +334,17 @@ class OneCallAgentLoop:
                     break
                 state.docatlas_state = "accepted"
                 state.docatlas_result = payload
+                if payload.get("kind") == "docs_context" and self.adapter.capabilities.source_continuations:
+                    requested_facts = action.get("requested_facts") or {"question": objective}
+                    resource_reader = getattr(self.adapter, "read_docatlas_resource", None)
+                    if callable(resource_reader):
+                        try:
+                            state.source_controller = SourceReadController(
+                                payload, requested_facts=requested_facts,
+                                read_resource=lambda uri: resource_reader(uri, max_tokens=600),
+                            )
+                        except (ValueError, TypeError, AttributeError):
+                            state.source_reads_stopped = True
                 if self.adapter.capabilities.dynamic_tool_exposure:
                     self.adapter.set_docatlas_enabled(False)
                 state.completed.append({
@@ -345,6 +364,27 @@ class OneCallAgentLoop:
 
             if state.docatlas_state != "accepted":
                 terminal_status, terminal_reason = "incomplete", "edit_before_docatlas_acceptance"
+                break
+
+            if action_type == "source_read":
+                if state.source_controller is None or state.source_reads_stopped:
+                    terminal_status, terminal_reason = "incomplete", "source_read_unavailable_or_no_progress"
+                    break
+                try:
+                    result = state.source_controller.read(
+                        str(action.get("uri") or ""),
+                        missing_fact_id=str(action.get("missing_fact_id") or "question"),
+                    )
+                except (ValueError, OSError, RuntimeError):
+                    result = {"status": "stopped", "reason_code": "source_reader_failed"}
+                state.source_reads.append(result)
+                state.source_reads_stopped = result.get("status") == "stopped"
+                continue
+
+            # This coding adapter exposes an unrestricted shell, not a read-only
+            # source reader. Retrieval-only acceptance must not unlock it either.
+            if state.docatlas_result and state.docatlas_result.get("kind") == "docs_context":
+                terminal_status, terminal_reason = "incomplete", "retrieval_only_does_not_authorize_edit"
                 break
 
             if action_type in {"edit", "repair"}:
@@ -458,6 +498,10 @@ class OneCallAgentLoop:
         ]
         if state.docatlas_result is not None:
             blocks.append(HistoryBlock("docatlas", "docatlas_result", state.docatlas_result, True, 0))
+        if state.source_reads:
+            blocks.append(HistoryBlock("source-reads", "source_reads", state.source_reads, True, 0))
+        if state.source_controller is not None:
+            blocks.append(HistoryBlock("requested-facts", "requested_facts", state.source_controller.requested_facts, True, 0))
         if state.current_diff is not None:
             blocks.append(HistoryBlock("current-diff", "current_diff", state.current_diff, True, 0))
         if state.latest_failure is not None:
@@ -503,6 +547,8 @@ class OneCallAgentLoop:
             "repair_passes": state.repair_passes,
             "test_invocations": state.test_invocations,
             "action_attempts": state.action_attempts,
+            "source_read_attempts": state.source_controller.read_attempts if state.source_controller else 0,
+            "source_read_tokens": state.source_controller.extra_tokens if state.source_controller else 0,
             "failed_shell_calls": shell["failed_shell_calls"],
             "retried_command_count": shell["retried_command_count"],
         }
@@ -550,7 +596,7 @@ def validate_docatlas_result(payload: dict[str, Any]) -> list[str]:
     kind = payload.get("kind")
     if status not in {"ok", "truncated"}:
         errors.append("successful DocAtlas result has an invalid status")
-    if kind not in {"docs_answer", "patch_context"}:
+    if kind not in {"docs_answer", "docs_context", "patch_context"}:
         errors.append("DocAtlas result has an invalid kind")
     forbidden = sorted(_find_forbidden_model_keys(payload))
     if forbidden:
@@ -593,7 +639,32 @@ def validate_docatlas_result(payload: dict[str, Any]) -> list[str]:
             ):
                 errors.append("DocAtlas source has an invalid content_sha256")
 
-    if kind == "docs_answer":
+    if kind == "docs_context":
+        allowed = {
+            "status", "kind", "context_status", "context_available", "answer_supported",
+            "answer_available", "support_status", "answer_policy", "coverage_policy",
+            "query_coverage", "retrieval_coverage", "facet_coverage", "covered_query_ids",
+            "missing_query_ids", "missing_facets", "facets", "sources", "edit_ready",
+            "investigation_allowed", "estimated_tokens",
+        }
+        if payload.get("answer_policy") != "cite_only":
+            errors.append("docs_context requires cite_only policy")
+        if any(payload.get(key) is not False for key in (
+            "answer_supported", "answer_available", "edit_ready",
+        )):
+            errors.append("docs_context cannot certify an answer or authorize edits")
+        if docs_context_budget_tokens(payload) > 800:
+            errors.append("docs_context exceeds whole-payload admission budget")
+        if isinstance(sources, list):
+            if len(sources) > 3:
+                errors.append("docs_context exceeds source limit")
+            for source in sources:
+                if not isinstance(source, dict) or any(
+                    not isinstance(source.get(key), str) or not source[key].strip()
+                    for key in ("snippet", "path_or_url", "project_identity")
+                ):
+                    errors.append("docs_context requires attributed source text")
+    elif kind == "docs_answer":
         allowed = {
             "status", "kind", "answer", "answer_evidence_ids", "sources",
             "omitted_counts", "estimated_tokens",
@@ -684,6 +755,7 @@ class FakeLoopAdapter:
         self, actions: Iterable[dict[str, Any]], *, docatlas_result: dict[str, Any],
         executions: Iterable[ToolExecution] = (), capabilities: LoopCapabilities | None = None,
         usage: dict[str, int] | None = None,
+        source_reads: Iterable[dict[str, Any]] = (),
     ):
         self.actions = list(actions)
         self.docatlas_result = docatlas_result
@@ -699,6 +771,7 @@ class FakeLoopAdapter:
             provider_usage_available=usage is not None,
         )
         self.usage = usage
+        self.source_reads = list(source_reads)
         self.model_inputs: list[dict[str, Any]] = []
         self.docatlas_enabled_events: list[bool] = [True]
         self.action_output_limits: list[int] = []
@@ -711,6 +784,8 @@ class FakeLoopAdapter:
         names = ["edit", "shell", "finish"]
         if docatlas_enabled:
             names.insert(0, "get_docs_context")
+        elif self.capabilities.source_continuations:
+            names.append("source_read")
         return [{"name": name} for name in names]
 
     def call_docatlas(self, arguments: dict[str, Any], *, max_bytes: int) -> dict[str, Any]:
@@ -730,6 +805,11 @@ class FakeLoopAdapter:
 
     def provider_usage(self) -> dict[str, int] | None:
         return self.usage
+
+    def read_docatlas_resource(self, uri: str, *, max_tokens: int) -> dict[str, Any]:
+        return self.source_reads.pop(0) if self.source_reads else {
+            "status": "source_unavailable", "reason_code": "reader_unavailable",
+        }
 
 
 def _hash_value(value: Any) -> str:

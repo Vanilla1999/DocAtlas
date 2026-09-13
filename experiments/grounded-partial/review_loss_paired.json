@@ -1,0 +1,869 @@
+{
+  "schema": "docatlas-paired-frozen-review-v1",
+  "baseline_runtime_commit": "0707aa520d9cae803a9bd0c977270c140d6bbf6d",
+  "baseline_remote_commit": "c7ab9da06bd963599c46207aa7e06b303fde040e",
+  "runtime_commit": "4c6cc0540041ba10e2c0f4b9d0b8f80419723f23",
+  "cases": 80,
+  "previous_sufficient_retained": 31,
+  "gained_sufficient_cases": [
+    "ruff-01",
+    "typer-03"
+  ],
+  "lost_sufficient_cases": [],
+  "lost_supported_claims": [],
+  "lost_nonempty_context_cases": [],
+  "pydantic_partial_original_excerpt_retained": true,
+  "limitations": "Frozen adjudication is not a live-model evaluation; retention of confirmed claims and nonempty context is not proof that every possible fact was preserved.",
+  "rows": [
+    {
+      "id": "fastapi-01",
+      "family": "conditional",
+      "answerability": "within_budget",
+      "before": "needs_review",
+      "after": "needs_review",
+      "supported_claims_before": 0,
+      "supported_claims_after": 0
+    },
+    {
+      "id": "fastapi-02",
+      "family": "polarity",
+      "answerability": "within_budget",
+      "before": "needs_review",
+      "after": "needs_review",
+      "supported_claims_before": 0,
+      "supported_claims_after": 0
+    },
+    {
+      "id": "fastapi-03",
+      "family": "list",
+      "answerability": "within_budget",
+      "before": "sufficient",
+      "after": "sufficient",
+      "supported_claims_before": 1,
+      "supported_claims_after": 1
+    },
+    {
+      "id": "fastapi-04",
+      "family": "conditional",
+      "answerability": "within_budget",
+      "before": "sufficient",
+      "after": "sufficient",
+      "supported_claims_before": 1,
+      "supported_claims_after": 1
+    },
+    {
+      "id": "fastapi-05",
+      "family": "workflow",
+      "answerability": "within_budget",
+      "before": "sufficient",
+      "after": "sufficient",
+      "supported_claims_before": 1,
+      "supported_claims_after": 1
+    },
+    {
+      "id": "fastapi-06",
+      "family": "definition",
+      "answerability": "within_budget",
+      "before": "needs_review",
+      "after": "needs_review",
+      "supported_claims_before": 0,
+      "supported_claims_after": 0
+    },
+    {
+      "id": "fastapi-07",
+      "family": "partial",
+      "answerability": "partial",
+      "before": "needs_review",
+      "after": "needs_review",
+      "supported_claims_before": 0,
+      "supported_claims_after": 0
+    },
+    {
+      "id": "fastapi-08",
+      "family": "unanswerable",
+      "answerability": "unanswerable",
+      "before": "insufficient",
+      "after": "insufficient",
+      "supported_claims_before": 0,
+      "supported_claims_after": 0
+    },
+    {
+      "id": "fastapi-09",
+      "family": "ambiguous",
+      "answerability": "ambiguous",
+      "before": "insufficient",
+      "after": "insufficient",
+      "supported_claims_before": 0,
+      "supported_claims_after": 0
+    },
+    {
+      "id": "fastapi-10",
+      "family": "over_budget",
+      "answerability": "over_budget",
+      "before": "insufficient",
+      "after": "insufficient",
+      "supported_claims_before": 0,
+      "supported_claims_after": 0
+    },
+    {
+      "id": "httpx-01",
+      "family": "default",
+      "answerability": "within_budget",
+      "before": "needs_review",
+      "after": "needs_review",
+      "supported_claims_before": 0,
+      "supported_claims_after": 0
+    },
+    {
+      "id": "httpx-02",
+      "family": "api",
+      "answerability": "within_budget",
+      "before": "sufficient",
+      "after": "sufficient",
+      "supported_claims_before": 1,
+      "supported_claims_after": 1
+    },
+    {
+      "id": "httpx-03",
+      "family": "list",
+      "answerability": "within_budget",
+      "before": "needs_review",
+      "after": "needs_review",
+      "supported_claims_before": 0,
+      "supported_claims_after": 0
+    },
+    {
+      "id": "httpx-04",
+      "family": "conditional",
+      "answerability": "within_budget",
+      "before": "sufficient",
+      "after": "sufficient",
+      "supported_claims_before": 1,
+      "supported_claims_after": 1
+    },
+    {
+      "id": "httpx-05",
+      "family": "workflow",
+      "answerability": "within_budget",
+      "before": "sufficient",
+      "after": "sufficient",
+      "supported_claims_before": 1,
+      "supported_claims_after": 1
+    },
+    {
+      "id": "httpx-06",
+      "family": "api",
+      "answerability": "within_budget",
+      "before": "insufficient",
+      "after": "insufficient",
+      "supported_claims_before": 0,
+      "supported_claims_after": 0
+    },
+    {
+      "id": "httpx-07",
+      "family": "partial",
+      "answerability": "partial",
+      "before": "needs_review",
+      "after": "needs_review",
+      "supported_claims_before": 0,
+      "supported_claims_after": 0
+    },
+    {
+      "id": "httpx-08",
+      "family": "unanswerable",
+      "answerability": "unanswerable",
+      "before": "insufficient",
+      "after": "insufficient",
+      "supported_claims_before": 0,
+      "supported_claims_after": 0
+    },
+    {
+      "id": "httpx-09",
+      "family": "ambiguous",
+      "answerability": "ambiguous",
+      "before": "needs_review",
+      "after": "needs_review",
+      "supported_claims_before": 0,
+      "supported_claims_after": 0
+    },
+    {
+      "id": "httpx-10",
+      "family": "over_budget",
+      "answerability": "over_budget",
+      "before": "insufficient",
+      "after": "insufficient",
+      "supported_claims_before": 0,
+      "supported_claims_after": 0
+    },
+    {
+      "id": "mkdocs-01",
+      "family": "path",
+      "answerability": "within_budget",
+      "before": "sufficient",
+      "after": "sufficient",
+      "supported_claims_before": 1,
+      "supported_claims_after": 1
+    },
+    {
+      "id": "mkdocs-02",
+      "family": "conditional",
+      "answerability": "within_budget",
+      "before": "sufficient",
+      "after": "sufficient",
+      "supported_claims_before": 1,
+      "supported_claims_after": 1
+    },
+    {
+      "id": "mkdocs-03",
+      "family": "polarity",
+      "answerability": "within_budget",
+      "before": "sufficient",
+      "after": "sufficient",
+      "supported_claims_before": 1,
+      "supported_claims_after": 1
+    },
+    {
+      "id": "mkdocs-04",
+      "family": "path",
+      "answerability": "within_budget",
+      "before": "sufficient",
+      "after": "sufficient",
+      "supported_claims_before": 1,
+      "supported_claims_after": 1
+    },
+    {
+      "id": "mkdocs-05",
+      "family": "contrast",
+      "answerability": "within_budget",
+      "before": "needs_review",
+      "after": "needs_review",
+      "supported_claims_before": 0,
+      "supported_claims_after": 0
+    },
+    {
+      "id": "mkdocs-06",
+      "family": "table",
+      "answerability": "within_budget",
+      "before": "needs_review",
+      "after": "needs_review",
+      "supported_claims_before": 0,
+      "supported_claims_after": 0
+    },
+    {
+      "id": "mkdocs-07",
+      "family": "partial",
+      "answerability": "partial",
+      "before": "needs_review",
+      "after": "needs_review",
+      "supported_claims_before": 1,
+      "supported_claims_after": 1
+    },
+    {
+      "id": "mkdocs-08",
+      "family": "unanswerable",
+      "answerability": "unanswerable",
+      "before": "insufficient",
+      "after": "insufficient",
+      "supported_claims_before": 0,
+      "supported_claims_after": 0
+    },
+    {
+      "id": "mkdocs-09",
+      "family": "ambiguous",
+      "answerability": "ambiguous",
+      "before": "needs_review",
+      "after": "needs_review",
+      "supported_claims_before": 0,
+      "supported_claims_after": 0
+    },
+    {
+      "id": "mkdocs-10",
+      "family": "over_budget",
+      "answerability": "over_budget",
+      "before": "insufficient",
+      "after": "insufficient",
+      "supported_claims_before": 0,
+      "supported_claims_after": 0
+    },
+    {
+      "id": "pydantic-01",
+      "family": "workflow",
+      "answerability": "within_budget",
+      "before": "sufficient",
+      "after": "sufficient",
+      "supported_claims_before": 1,
+      "supported_claims_after": 1,
+      "question": "What can strict mode be enabled on, and what happens instead of coercing an incorrect type?",
+      "before_sources": [
+        {
+          "path_or_url": "docs/concepts/strict_mode.md",
+          "snippet": "However, there are also situations where this is not desirable, and you want Pydantic to error instead of coercing data.\n\nTo better support this use case, Pydantic provides a \"strict mode\" that can be enabled on a per-model, per-field, or\neven per-validation-call basis. When strict mode is enabled, Pydantic will be much less lenient when coercing data,\nand will instead error if the data is not of the correct type.",
+          "line_start": 9,
+          "line_end": 13
+        }
+      ],
+      "after_sources": [
+        {
+          "path_or_url": "docs/concepts/strict_mode.md",
+          "snippet": "However, there are also situations where this is not desirable, and you want Pydantic to error instead of coercing data.\n\nTo better support this use case, Pydantic provides a \"strict mode\" that can be enabled on a per-model, per-field, or\neven per-validation-call basis. When strict mode is enabled, Pydantic will be much less lenient when coercing data,\nand will instead error if the data is not of the correct type.",
+          "line_start": 9,
+          "line_end": 13
+        }
+      ]
+    },
+    {
+      "id": "pydantic-02",
+      "family": "contrast",
+      "answerability": "within_budget",
+      "before": "sufficient",
+      "after": "sufficient",
+      "supported_claims_before": 1,
+      "supported_claims_after": 1
+    },
+    {
+      "id": "pydantic-03",
+      "family": "list",
+      "answerability": "within_budget",
+      "before": "insufficient",
+      "after": "insufficient",
+      "supported_claims_before": 0,
+      "supported_claims_after": 0
+    },
+    {
+      "id": "pydantic-04",
+      "family": "api",
+      "answerability": "within_budget",
+      "before": "sufficient",
+      "after": "sufficient",
+      "supported_claims_before": 1,
+      "supported_claims_after": 1
+    },
+    {
+      "id": "pydantic-05",
+      "family": "usage",
+      "answerability": "within_budget",
+      "before": "needs_review",
+      "after": "needs_review",
+      "supported_claims_before": 0,
+      "supported_claims_after": 0
+    },
+    {
+      "id": "pydantic-06",
+      "family": "polarity",
+      "answerability": "within_budget",
+      "before": "sufficient",
+      "after": "sufficient",
+      "supported_claims_before": 1,
+      "supported_claims_after": 1
+    },
+    {
+      "id": "pydantic-07",
+      "family": "partial",
+      "answerability": "partial",
+      "before": "needs_review",
+      "after": "needs_review",
+      "supported_claims_before": 0,
+      "supported_claims_after": 0,
+      "question": "What can strict mode be enabled on, and what happens instead of coercing an incorrect type? Also identify the exact value chosen in our private production deployment.",
+      "before_sources": [
+        {
+          "path_or_url": "docs/concepts/strict_mode.md",
+          "snippet": "## Type coercions in strict mode\n\nFor most types, when validating data from python in strict mode, only the instances of the exact types are accepted.\nFor example, when validating an `int` field, only instances of `int` are accepted; passing instances of `float` or `str`\nwill result in raising a `ValidationError`.",
+          "line_start": 48,
+          "line_end": 52
+        }
+      ],
+      "after_sources": [
+        {
+          "path_or_url": "docs/concepts/strict_mode.md",
+          "snippet": "## Strict mode with `Annotated[..., Strict()]`\n\n??? api \"API Documentation\"\n    [`pydantic.types.Strict`][pydantic.types.Strict]<br>\n\nPydantic also provides the [`Strict`](../api/types.md#pydantic.types.Strict) class, which is intended for use as\nmetadata with [`typing.Annotated`][] class; this annotation indicates that the annotated field should be validated in\nstrict mode:",
+          "line_start": 285,
+          "line_end": 292
+        },
+        {
+          "path_or_url": "docs/concepts/strict_mode.md",
+          "snippet": "## Type coercions in strict mode\n\nFor most types, when validating data from python in strict mode, only the instances of the exact types are accepted.\nFor example, when validating an `int` field, only instances of `int` are accepted; passing instances of `float` or `str`\nwill result in raising a `ValidationError`.",
+          "line_start": 48,
+          "line_end": 52
+        }
+      ]
+    },
+    {
+      "id": "pydantic-08",
+      "family": "unanswerable",
+      "answerability": "unanswerable",
+      "before": "insufficient",
+      "after": "insufficient",
+      "supported_claims_before": 0,
+      "supported_claims_after": 0
+    },
+    {
+      "id": "pydantic-09",
+      "family": "ambiguous",
+      "answerability": "ambiguous",
+      "before": "insufficient",
+      "after": "needs_review",
+      "supported_claims_before": 0,
+      "supported_claims_after": 0,
+      "question": "Which pydantic configuration is best for our service? Our workload and deployment constraints are not specified.",
+      "before_sources": [],
+      "after_sources": [
+        {
+          "path_or_url": "docs/concepts/strict_mode.md",
+          "snippet": "## Strict mode with `Annotated[..., Strict()]`\n\n??? api \"API Documentation\"\n    [`pydantic.types.Strict`][pydantic.types.Strict]<br>\n\nPydantic also provides the [`Strict`](../api/types.md#pydantic.types.Strict) class, which is intended for use as\nmetadata with [`typing.Annotated`][] class; this annotation indicates that the annotated field should be validated in\nstrict mode:",
+          "line_start": 285,
+          "line_end": 292
+        }
+      ]
+    },
+    {
+      "id": "pydantic-10",
+      "family": "over_budget",
+      "answerability": "over_budget",
+      "before": "insufficient",
+      "after": "insufficient",
+      "supported_claims_before": 0,
+      "supported_claims_after": 0
+    },
+    {
+      "id": "ruff-01",
+      "family": "polarity",
+      "answerability": "within_budget",
+      "before": "needs_review",
+      "after": "sufficient",
+      "supported_claims_before": 0,
+      "supported_claims_after": 1,
+      "question": "Does enabling preview automatically enable all preview rules?",
+      "before_sources": [
+        {
+          "path_or_url": "docs/preview.md",
+          "snippet": "```console\n    ruff check --preview\n    ```\n\n\nTo enable preview style formatting without enabling any preview lint rules:\n\n=== \"pyproject.toml\"\n\n    ```toml\n    [tool.ruff.format]\n    preview = true\n    ```\n\n=== \"ruff.toml\"\n\n    ```toml\n    [format]\n    preview = true\n    ```\n\n=== \"CLI\"\n\n    ```console\n    ruff format --preview\n    ```",
+          "line_start": 33,
+          "line_end": 58
+        },
+        {
+          "path_or_url": "docs/preview.md",
+          "snippet": "Preview mode can be configured separately for linting and formatting (requires Ruff v0.1.1+). To enable preview lint rules without preview style formatting:",
+          "line_start": 15,
+          "line_end": 15
+        },
+        {
+          "path_or_url": "docs/configuration.md",
+          "snippet": "The minimum Python version that should be supported [possible values:\n          py37, py38, py39, py310, py311, py312, py313]\n      --preview\n          Enable preview mode; checks will include unstable rules and fixes.",
+          "line_start": 599,
+          "line_end": 602
+        }
+      ],
+      "after_sources": [
+        {
+          "path_or_url": "docs/preview.md",
+          "snippet": "Enabling preview mode does not on its own enable all preview rules. See the [rules section](#using-rules-that-are-in-preview) for details on selecting preview rules.",
+          "line_start": 8,
+          "line_end": 8
+        },
+        {
+          "path_or_url": "docs/preview.md",
+          "snippet": "```console\n    ruff check --preview\n    ```\n\n\nTo enable preview style formatting without enabling any preview lint rules:\n\n=== \"pyproject.toml\"\n\n    ```toml\n    [tool.ruff.format]\n    preview = true\n    ```\n\n=== \"ruff.toml\"\n\n    ```toml\n    [format]\n    preview = true\n    ```\n\n=== \"CLI\"\n\n    ```console\n    ruff format --preview\n    ```",
+          "line_start": 33,
+          "line_end": 58
+        },
+        {
+          "path_or_url": "docs/preview.md",
+          "snippet": "## Enabling preview mode\n\nPreview mode can be enabled with the `--preview` flag on the CLI or by setting `preview = true` in your Ruff\nconfiguration file.\n\nPreview mode can be configured separately for linting and formatting (requires Ruff v0.1.1+). To enable preview lint rules without preview style formatting:",
+          "line_start": 10,
+          "line_end": 15
+        }
+      ]
+    },
+    {
+      "id": "ruff-02",
+      "family": "usage",
+      "answerability": "within_budget",
+      "before": "sufficient",
+      "after": "sufficient",
+      "supported_claims_before": 1,
+      "supported_claims_after": 1
+    },
+    {
+      "id": "ruff-03",
+      "family": "version",
+      "answerability": "within_budget",
+      "before": "sufficient",
+      "after": "sufficient",
+      "supported_claims_before": 1,
+      "supported_claims_after": 1
+    },
+    {
+      "id": "ruff-04",
+      "family": "lifecycle",
+      "answerability": "within_budget",
+      "before": "sufficient",
+      "after": "sufficient",
+      "supported_claims_before": 1,
+      "supported_claims_after": 1
+    },
+    {
+      "id": "ruff-05",
+      "family": "conditional",
+      "answerability": "within_budget",
+      "before": "sufficient",
+      "after": "sufficient",
+      "supported_claims_before": 1,
+      "supported_claims_after": 1
+    },
+    {
+      "id": "ruff-06",
+      "family": "contrast",
+      "answerability": "within_budget",
+      "before": "sufficient",
+      "after": "sufficient",
+      "supported_claims_before": 1,
+      "supported_claims_after": 1
+    },
+    {
+      "id": "ruff-07",
+      "family": "partial",
+      "answerability": "partial",
+      "before": "insufficient",
+      "after": "insufficient",
+      "supported_claims_before": 0,
+      "supported_claims_after": 0
+    },
+    {
+      "id": "ruff-08",
+      "family": "unanswerable",
+      "answerability": "unanswerable",
+      "before": "insufficient",
+      "after": "insufficient",
+      "supported_claims_before": 0,
+      "supported_claims_after": 0
+    },
+    {
+      "id": "ruff-09",
+      "family": "ambiguous",
+      "answerability": "ambiguous",
+      "before": "insufficient",
+      "after": "needs_review",
+      "supported_claims_before": 0,
+      "supported_claims_after": 0,
+      "question": "Which ruff configuration is best for our service? Our workload and deployment constraints are not specified.",
+      "before_sources": [],
+      "after_sources": [
+        {
+          "path_or_url": "docs/configuration.md",
+          "snippet": "Unlike [ESLint](https://eslint.org/docs/latest/use/configure/configuration-files#cascading-configuration-objects),\nRuff does not merge settings across configuration files; instead, the \"closest\" configuration file\nis used, and any parent configuration files are ignored. In lieu of this implicit cascade, Ruff\nsupports an [`extend`](settings.md#extend) field, which allows you to inherit the settings from another\nconfig file, like so:\n\n=== \"pyproject.toml\"",
+          "line_start": 278,
+          "line_end": 284
+        },
+        {
+          "path_or_url": "docs/configuration.md",
+          "snippet": "Ruff respects `pyproject.toml`, `ruff.toml`, and `.ruff.toml` files. All three implement an\nequivalent schema (though in the `ruff.toml` and `.ruff.toml` versions, the `[tool.ruff]` header and\n`tool.ruff` section prefix is omitted).\n\nFor a complete enumeration of the available configuration options, see [_Settings_](settings.md).",
+          "line_start": 249,
+          "line_end": 253
+        }
+      ]
+    },
+    {
+      "id": "ruff-10",
+      "family": "over_budget",
+      "answerability": "over_budget",
+      "before": "needs_review",
+      "after": "needs_review",
+      "supported_claims_before": 0,
+      "supported_claims_after": 0
+    },
+    {
+      "id": "starlette-01",
+      "family": "conditional",
+      "answerability": "within_budget",
+      "before": "needs_review",
+      "after": "needs_review",
+      "supported_claims_before": 0,
+      "supported_claims_after": 0
+    },
+    {
+      "id": "starlette-02",
+      "family": "polarity",
+      "answerability": "within_budget",
+      "before": "sufficient",
+      "after": "sufficient",
+      "supported_claims_before": 1,
+      "supported_claims_after": 1
+    },
+    {
+      "id": "starlette-03",
+      "family": "lifecycle",
+      "answerability": "within_budget",
+      "before": "sufficient",
+      "after": "sufficient",
+      "supported_claims_before": 1,
+      "supported_claims_after": 1
+    },
+    {
+      "id": "starlette-04",
+      "family": "contrast",
+      "answerability": "within_budget",
+      "before": "sufficient",
+      "after": "sufficient",
+      "supported_claims_before": 1,
+      "supported_claims_after": 1
+    },
+    {
+      "id": "starlette-05",
+      "family": "usage",
+      "answerability": "within_budget",
+      "before": "sufficient",
+      "after": "sufficient",
+      "supported_claims_before": 1,
+      "supported_claims_after": 1
+    },
+    {
+      "id": "starlette-06",
+      "family": "api",
+      "answerability": "within_budget",
+      "before": "sufficient",
+      "after": "sufficient",
+      "supported_claims_before": 1,
+      "supported_claims_after": 1
+    },
+    {
+      "id": "starlette-07",
+      "family": "partial",
+      "answerability": "partial",
+      "before": "needs_review",
+      "after": "needs_review",
+      "supported_claims_before": 0,
+      "supported_claims_after": 0
+    },
+    {
+      "id": "starlette-08",
+      "family": "unanswerable",
+      "answerability": "unanswerable",
+      "before": "insufficient",
+      "after": "insufficient",
+      "supported_claims_before": 0,
+      "supported_claims_after": 0
+    },
+    {
+      "id": "starlette-09",
+      "family": "ambiguous",
+      "answerability": "ambiguous",
+      "before": "insufficient",
+      "after": "insufficient",
+      "supported_claims_before": 0,
+      "supported_claims_after": 0
+    },
+    {
+      "id": "starlette-10",
+      "family": "over_budget",
+      "answerability": "over_budget",
+      "before": "insufficient",
+      "after": "insufficient",
+      "supported_claims_before": 0,
+      "supported_claims_after": 0
+    },
+    {
+      "id": "typer-01",
+      "family": "polarity",
+      "answerability": "within_budget",
+      "before": "sufficient",
+      "after": "sufficient",
+      "supported_claims_before": 1,
+      "supported_claims_after": 1
+    },
+    {
+      "id": "typer-02",
+      "family": "usage",
+      "answerability": "within_budget",
+      "before": "sufficient",
+      "after": "sufficient",
+      "supported_claims_before": 1,
+      "supported_claims_after": 1
+    },
+    {
+      "id": "typer-03",
+      "family": "contrast",
+      "answerability": "within_budget",
+      "before": "needs_review",
+      "after": "sufficient",
+      "supported_claims_before": 0,
+      "supported_claims_after": 1,
+      "question": "What visible message distinguishes aborting a Typer program from a normal Exit?",
+      "before_sources": [
+        {
+          "path_or_url": "docs/tutorial/parameter-types/bool.md",
+          "snippet": "```console\n// Check the help\n$ python main.py --help\n\n// Notice the --accept / --reject\nUsage: main.py [OPTIONS]\n\nOptions:\n  --accept / --reject\n  --help                Show this message and exit.\n\n// Try it\n$ python main.py\n\nI don't know what you want yet\n\n// Now pass --accept\n$ python main.py --accept\n\nAccepting!\n\n// And --reject\n$ python main.py --reject\n\nRejecting!\n```\n\n</div>",
+          "line_start": 107,
+          "line_end": 134
+        }
+      ],
+      "after_sources": [
+        {
+          "path_or_url": "docs/tutorial/terminating.md",
+          "snippet": "## Abort\n\nThere's a special exception that you can use to \"abort\" a program.\n\nIt works more or less the same as `typer.Exit()` but will print `\"Aborted!\"` to the screen and can be useful in certain cases later to make it explicit that the execution was aborted:\n\n```Python hl_lines=\"7\"\n{!../docs_src/terminating/tutorial003.py!}\n```\n\nCheck it:\n\n<div class=\"termy\">",
+          "line_start": 100,
+          "line_end": 112
+        },
+        {
+          "path_or_url": "docs/tutorial/terminating.md",
+          "snippet": "## `Exit` a CLI program\n\nYou can normally just let the code of your CLI program finish its execution, but in some scenarios, you might want to terminate at some point in the middle of it. And prevent any subsequent code to run.\n\nThis doesn't have to mean that there's an error, just that nothing else needs to be executed.\n\nIn that case, you can raise a `typer.Exit()` exception:\n\n```Python hl_lines=\"9\"\n{!../docs_src/terminating/tutorial001.py!}\n```",
+          "line_start": 7,
+          "line_end": 17
+        }
+      ]
+    },
+    {
+      "id": "typer-04",
+      "family": "api",
+      "answerability": "within_budget",
+      "before": "sufficient",
+      "after": "sufficient",
+      "supported_claims_before": 1,
+      "supported_claims_after": 1
+    },
+    {
+      "id": "typer-05",
+      "family": "exact_identifier",
+      "answerability": "within_budget",
+      "before": "insufficient",
+      "after": "insufficient",
+      "supported_claims_before": 0,
+      "supported_claims_after": 0
+    },
+    {
+      "id": "typer-06",
+      "family": "conditional",
+      "answerability": "within_budget",
+      "before": "sufficient",
+      "after": "sufficient",
+      "supported_claims_before": 1,
+      "supported_claims_after": 1
+    },
+    {
+      "id": "typer-07",
+      "family": "partial",
+      "answerability": "partial",
+      "before": "needs_review",
+      "after": "needs_review",
+      "supported_claims_before": 1,
+      "supported_claims_after": 1
+    },
+    {
+      "id": "typer-08",
+      "family": "unanswerable",
+      "answerability": "unanswerable",
+      "before": "insufficient",
+      "after": "insufficient",
+      "supported_claims_before": 0,
+      "supported_claims_after": 0
+    },
+    {
+      "id": "typer-09",
+      "family": "ambiguous",
+      "answerability": "ambiguous",
+      "before": "insufficient",
+      "after": "insufficient",
+      "supported_claims_before": 0,
+      "supported_claims_after": 0
+    },
+    {
+      "id": "typer-10",
+      "family": "over_budget",
+      "answerability": "over_budget",
+      "before": "insufficient",
+      "after": "insufficient",
+      "supported_claims_before": 0,
+      "supported_claims_after": 0
+    },
+    {
+      "id": "uv-01",
+      "family": "polarity",
+      "answerability": "within_budget",
+      "before": "sufficient",
+      "after": "sufficient",
+      "supported_claims_before": 1,
+      "supported_claims_after": 1
+    },
+    {
+      "id": "uv-02",
+      "family": "list",
+      "answerability": "within_budget",
+      "before": "sufficient",
+      "after": "sufficient",
+      "supported_claims_before": 1,
+      "supported_claims_after": 1
+    },
+    {
+      "id": "uv-03",
+      "family": "workflow",
+      "answerability": "within_budget",
+      "before": "sufficient",
+      "after": "sufficient",
+      "supported_claims_before": 1,
+      "supported_claims_after": 1
+    },
+    {
+      "id": "uv-04",
+      "family": "conditional",
+      "answerability": "within_budget",
+      "before": "needs_review",
+      "after": "needs_review",
+      "supported_claims_before": 0,
+      "supported_claims_after": 0
+    },
+    {
+      "id": "uv-05",
+      "family": "list",
+      "answerability": "within_budget",
+      "before": "needs_review",
+      "after": "needs_review",
+      "supported_claims_before": 0,
+      "supported_claims_after": 0
+    },
+    {
+      "id": "uv-06",
+      "family": "workflow",
+      "answerability": "within_budget",
+      "before": "needs_review",
+      "after": "needs_review",
+      "supported_claims_before": 0,
+      "supported_claims_after": 0
+    },
+    {
+      "id": "uv-07",
+      "family": "partial",
+      "answerability": "partial",
+      "before": "needs_review",
+      "after": "needs_review",
+      "supported_claims_before": 1,
+      "supported_claims_after": 1
+    },
+    {
+      "id": "uv-08",
+      "family": "unanswerable",
+      "answerability": "unanswerable",
+      "before": "insufficient",
+      "after": "insufficient",
+      "supported_claims_before": 0,
+      "supported_claims_after": 0
+    },
+    {
+      "id": "uv-09",
+      "family": "ambiguous",
+      "answerability": "ambiguous",
+      "before": "needs_review",
+      "after": "needs_review",
+      "supported_claims_before": 0,
+      "supported_claims_after": 0
+    },
+    {
+      "id": "uv-10",
+      "family": "over_budget",
+      "answerability": "over_budget",
+      "before": "insufficient",
+      "after": "insufficient",
+      "supported_claims_before": 0,
+      "supported_claims_after": 0
+    }
+  ]
+}

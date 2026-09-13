@@ -1,0 +1,10 @@
+{
+  "schema_version": 1,
+  "module_labels": {
+    "tests/docs/test_request_source_facts.py": "behavioral"
+  },
+  "node_overrides": {},
+  "module_node_hashes": {
+    "tests/docs/test_request_source_facts.py": "90f0287d01c1c007a2a13fd1bc1dc955b7395b084040bd1bd9582ad872fad94c"
+  }
+}

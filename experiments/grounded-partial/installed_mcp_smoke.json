@@ -1,0 +1,34 @@
+{
+  "commit": "cb6dc884a6309d6eb09a73e33e98fe93625e7edd",
+  "transport": "installed editable entrypoint over MCP stdio",
+  "results": [
+    {
+      "channel": "structured",
+      "tools": [
+        "get_docs_context",
+        "prepare_docs",
+        "docs_status"
+      ],
+      "kind": "docs_context",
+      "source_count": 1,
+      "read_status": "complete",
+      "read_line_start": 4,
+      "snippet_received": true,
+      "model_executed": false
+    },
+    {
+      "channel": "text_fallback",
+      "tools": [
+        "get_docs_context",
+        "prepare_docs",
+        "docs_status"
+      ],
+      "kind": "docs_context",
+      "source_count": 1,
+      "read_status": "complete",
+      "read_line_start": 4,
+      "snippet_received": true,
+      "model_executed": false
+    }
+  ]
+}

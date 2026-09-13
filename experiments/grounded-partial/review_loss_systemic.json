@@ -1,0 +1,4671 @@
+{
+  "causal_2x2": {
+    "cells": {
+      "cap_off_requal_off": {
+        "bytes": {
+          "n": 48,
+          "p50": 1460,
+          "p95": 2704
+        },
+        "cases": 48,
+        "cpu_seconds_per_case": 0.373281,
+        "failure_families": {
+          "api": 1,
+          "conditional": 4,
+          "contrast": 2,
+          "definition": 1,
+          "exact_identifier": 1,
+          "list": 3,
+          "polarity": 1,
+          "table": 1,
+          "usage": 1,
+          "workflow": 1
+        },
+        "latency_seconds": {
+          "n": 48,
+          "p50": 0.296411970999543,
+          "p95": 0.5560269930001596
+        },
+        "literal_full": 32,
+        "operational_errors": 0,
+        "process_cpu_seconds": 17.917487,
+        "required_supported": 32,
+        "required_total": 48,
+        "slices": {
+          "answerability": {
+            "within_budget": {
+              "n": 48,
+              "sufficient": 32
+            }
+          },
+          "family": {
+            "api": {
+              "n": 5,
+              "sufficient": 4
+            },
+            "conditional": {
+              "n": 8,
+              "sufficient": 4
+            },
+            "contrast": {
+              "n": 5,
+              "sufficient": 3
+            },
+            "default": {
+              "n": 1,
+              "sufficient": 1
+            },
+            "definition": {
+              "n": 1,
+              "sufficient": 0
+            },
+            "exact_identifier": {
+              "n": 1,
+              "sufficient": 0
+            },
+            "lifecycle": {
+              "n": 2,
+              "sufficient": 2
+            },
+            "list": {
+              "n": 5,
+              "sufficient": 2
+            },
+            "path": {
+              "n": 2,
+              "sufficient": 2
+            },
+            "polarity": {
+              "n": 7,
+              "sufficient": 6
+            },
+            "table": {
+              "n": 1,
+              "sufficient": 0
+            },
+            "usage": {
+              "n": 4,
+              "sufficient": 3
+            },
+            "version": {
+              "n": 1,
+              "sufficient": 1
+            },
+            "workflow": {
+              "n": 5,
+              "sufficient": 4
+            }
+          },
+          "project": {
+            "fastapi": {
+              "n": 6,
+              "sufficient": 2
+            },
+            "httpx": {
+              "n": 6,
+              "sufficient": 4
+            },
+            "mkdocs": {
+              "n": 6,
+              "sufficient": 4
+            },
+            "pydantic": {
+              "n": 6,
+              "sufficient": 4
+            },
+            "ruff": {
+              "n": 6,
+              "sufficient": 6
+            },
+            "starlette": {
+              "n": 6,
+              "sufficient": 5
+            },
+            "typer": {
+              "n": 6,
+              "sufficient": 4
+            },
+            "uv": {
+              "n": 6,
+              "sufficient": 3
+            }
+          },
+          "split": {
+            "development": {
+              "n": 24,
+              "sufficient": 15
+            },
+            "frozen_validation_exposed": {
+              "n": 24,
+              "sufficient": 17
+            }
+          }
+        },
+        "source_integrity_or_contract_violations": 0,
+        "sufficiency": {
+          "insufficient": 3,
+          "needs_review": 13,
+          "sufficient": 32
+        },
+        "tokens": {
+          "n": 48,
+          "p50": 410,
+          "p95": 793
+        },
+        "wall_seconds": 18.034135,
+        "within_budget": 48,
+        "within_budget_sufficient": 32
+      },
+      "cap_off_requal_on": {
+        "bytes": {
+          "n": 48,
+          "p50": 1460,
+          "p95": 2704
+        },
+        "cases": 48,
+        "cpu_seconds_per_case": 0.331789,
+        "failure_families": {
+          "api": 1,
+          "conditional": 3,
+          "contrast": 2,
+          "definition": 1,
+          "exact_identifier": 1,
+          "list": 3,
+          "polarity": 1,
+          "table": 1,
+          "usage": 1,
+          "workflow": 1
+        },
+        "latency_seconds": {
+          "n": 48,
+          "p50": 0.2631837139997515,
+          "p95": 0.5041946230003305
+        },
+        "literal_full": 33,
+        "operational_errors": 0,
+        "process_cpu_seconds": 15.92585,
+        "required_supported": 33,
+        "required_total": 48,
+        "slices": {
+          "answerability": {
+            "within_budget": {
+              "n": 48,
+              "sufficient": 33
+            }
+          },
+          "family": {
+            "api": {
+              "n": 5,
+              "sufficient": 4
+            },
+            "conditional": {
+              "n": 8,
+              "sufficient": 5
+            },
+            "contrast": {
+              "n": 5,
+              "sufficient": 3
+            },
+            "default": {
+              "n": 1,
+              "sufficient": 1
+            },
+            "definition": {
+              "n": 1,
+              "sufficient": 0
+            },
+            "exact_identifier": {
+              "n": 1,
+              "sufficient": 0
+            },
+            "lifecycle": {
+              "n": 2,
+              "sufficient": 2
+            },
+            "list": {
+              "n": 5,
+              "sufficient": 2
+            },
+            "path": {
+              "n": 2,
+              "sufficient": 2
+            },
+            "polarity": {
+              "n": 7,
+              "sufficient": 6
+            },
+            "table": {
+              "n": 1,
+              "sufficient": 0
+            },
+            "usage": {
+              "n": 4,
+              "sufficient": 3
+            },
+            "version": {
+              "n": 1,
+              "sufficient": 1
+            },
+            "workflow": {
+              "n": 5,
+              "sufficient": 4
+            }
+          },
+          "project": {
+            "fastapi": {
+              "n": 6,
+              "sufficient": 3
+            },
+            "httpx": {
+              "n": 6,
+              "sufficient": 4
+            },
+            "mkdocs": {
+              "n": 6,
+              "sufficient": 4
+            },
+            "pydantic": {
+              "n": 6,
+              "sufficient": 4
+            },
+            "ruff": {
+              "n": 6,
+              "sufficient": 6
+            },
+            "starlette": {
+              "n": 6,
+              "sufficient": 5
+            },
+            "typer": {
+              "n": 6,
+              "sufficient": 4
+            },
+            "uv": {
+              "n": 6,
+              "sufficient": 3
+            }
+          },
+          "split": {
+            "development": {
+              "n": 24,
+              "sufficient": 16
+            },
+            "frozen_validation_exposed": {
+              "n": 24,
+              "sufficient": 17
+            }
+          }
+        },
+        "source_integrity_or_contract_violations": 0,
+        "sufficiency": {
+          "insufficient": 3,
+          "needs_review": 12,
+          "sufficient": 33
+        },
+        "tokens": {
+          "n": 48,
+          "p50": 410,
+          "p95": 793
+        },
+        "wall_seconds": 16.008014,
+        "within_budget": 48,
+        "within_budget_sufficient": 33
+      },
+      "cap_on_requal_off": {
+        "bytes": {
+          "n": 48,
+          "p50": 1477,
+          "p95": 2588
+        },
+        "cases": 48,
+        "cpu_seconds_per_case": 0.312572,
+        "failure_families": {
+          "api": 1,
+          "conditional": 4,
+          "contrast": 1,
+          "default": 1,
+          "definition": 1,
+          "exact_identifier": 1,
+          "list": 3,
+          "polarity": 1,
+          "table": 1,
+          "usage": 1,
+          "workflow": 1
+        },
+        "latency_seconds": {
+          "n": 48,
+          "p50": 0.26400811500025156,
+          "p95": 0.5290530470001613
+        },
+        "literal_full": 32,
+        "operational_errors": 0,
+        "process_cpu_seconds": 15.003434,
+        "required_supported": 32,
+        "required_total": 48,
+        "slices": {
+          "answerability": {
+            "within_budget": {
+              "n": 48,
+              "sufficient": 32
+            }
+          },
+          "family": {
+            "api": {
+              "n": 5,
+              "sufficient": 4
+            },
+            "conditional": {
+              "n": 8,
+              "sufficient": 4
+            },
+            "contrast": {
+              "n": 5,
+              "sufficient": 4
+            },
+            "default": {
+              "n": 1,
+              "sufficient": 0
+            },
+            "definition": {
+              "n": 1,
+              "sufficient": 0
+            },
+            "exact_identifier": {
+              "n": 1,
+              "sufficient": 0
+            },
+            "lifecycle": {
+              "n": 2,
+              "sufficient": 2
+            },
+            "list": {
+              "n": 5,
+              "sufficient": 2
+            },
+            "path": {
+              "n": 2,
+              "sufficient": 2
+            },
+            "polarity": {
+              "n": 7,
+              "sufficient": 6
+            },
+            "table": {
+              "n": 1,
+              "sufficient": 0
+            },
+            "usage": {
+              "n": 4,
+              "sufficient": 3
+            },
+            "version": {
+              "n": 1,
+              "sufficient": 1
+            },
+            "workflow": {
+              "n": 5,
+              "sufficient": 4
+            }
+          },
+          "project": {
+            "fastapi": {
+              "n": 6,
+              "sufficient": 2
+            },
+            "httpx": {
+              "n": 6,
+              "sufficient": 3
+            },
+            "mkdocs": {
+              "n": 6,
+              "sufficient": 4
+            },
+            "pydantic": {
+              "n": 6,
+              "sufficient": 4
+            },
+            "ruff": {
+              "n": 6,
+              "sufficient": 6
+            },
+            "starlette": {
+              "n": 6,
+              "sufficient": 5
+            },
+            "typer": {
+              "n": 6,
+              "sufficient": 5
+            },
+            "uv": {
+              "n": 6,
+              "sufficient": 3
+            }
+          },
+          "split": {
+            "development": {
+              "n": 24,
+              "sufficient": 16
+            },
+            "frozen_validation_exposed": {
+              "n": 24,
+              "sufficient": 16
+            }
+          }
+        },
+        "source_integrity_or_contract_violations": 0,
+        "sufficiency": {
+          "insufficient": 3,
+          "needs_review": 13,
+          "sufficient": 32
+        },
+        "tokens": {
+          "n": 48,
+          "p50": 422,
+          "p95": 774
+        },
+        "wall_seconds": 15.107628,
+        "within_budget": 48,
+        "within_budget_sufficient": 32
+      },
+      "cap_on_requal_on": {
+        "bytes": {
+          "n": 48,
+          "p50": 1477,
+          "p95": 2588
+        },
+        "cases": 48,
+        "cpu_seconds_per_case": 0.332893,
+        "failure_families": {
+          "api": 1,
+          "conditional": 3,
+          "contrast": 1,
+          "default": 1,
+          "definition": 1,
+          "exact_identifier": 1,
+          "list": 3,
+          "polarity": 1,
+          "table": 1,
+          "usage": 1,
+          "workflow": 1
+        },
+        "latency_seconds": {
+          "n": 48,
+          "p50": 0.27083266699992237,
+          "p95": 0.546760658000494
+        },
+        "literal_full": 33,
+        "operational_errors": 0,
+        "process_cpu_seconds": 15.978848,
+        "required_supported": 33,
+        "required_total": 48,
+        "slices": {
+          "answerability": {
+            "within_budget": {
+              "n": 48,
+              "sufficient": 33
+            }
+          },
+          "family": {
+            "api": {
+              "n": 5,
+              "sufficient": 4
+            },
+            "conditional": {
+              "n": 8,
+              "sufficient": 5
+            },
+            "contrast": {
+              "n": 5,
+              "sufficient": 4
+            },
+            "default": {
+              "n": 1,
+              "sufficient": 0
+            },
+            "definition": {
+              "n": 1,
+              "sufficient": 0
+            },
+            "exact_identifier": {
+              "n": 1,
+              "sufficient": 0
+            },
+            "lifecycle": {
+              "n": 2,
+              "sufficient": 2
+            },
+            "list": {
+              "n": 5,
+              "sufficient": 2
+            },
+            "path": {
+              "n": 2,
+              "sufficient": 2
+            },
+            "polarity": {
+              "n": 7,
+              "sufficient": 6
+            },
+            "table": {
+              "n": 1,
+              "sufficient": 0
+            },
+            "usage": {
+              "n": 4,
+              "sufficient": 3
+            },
+            "version": {
+              "n": 1,
+              "sufficient": 1
+            },
+            "workflow": {
+              "n": 5,
+              "sufficient": 4
+            }
+          },
+          "project": {
+            "fastapi": {
+              "n": 6,
+              "sufficient": 3
+            },
+            "httpx": {
+              "n": 6,
+              "sufficient": 3
+            },
+            "mkdocs": {
+              "n": 6,
+              "sufficient": 4
+            },
+            "pydantic": {
+              "n": 6,
+              "sufficient": 4
+            },
+            "ruff": {
+              "n": 6,
+              "sufficient": 6
+            },
+            "starlette": {
+              "n": 6,
+              "sufficient": 5
+            },
+            "typer": {
+              "n": 6,
+              "sufficient": 5
+            },
+            "uv": {
+              "n": 6,
+              "sufficient": 3
+            }
+          },
+          "split": {
+            "development": {
+              "n": 24,
+              "sufficient": 17
+            },
+            "frozen_validation_exposed": {
+              "n": 24,
+              "sufficient": 16
+            }
+          }
+        },
+        "source_integrity_or_contract_violations": 0,
+        "sufficiency": {
+          "insufficient": 3,
+          "needs_review": 12,
+          "sufficient": 33
+        },
+        "tokens": {
+          "n": 48,
+          "p50": 422,
+          "p95": 774
+        },
+        "wall_seconds": 16.067536,
+        "within_budget": 48,
+        "within_budget_sufficient": 33
+      },
+      "contextualization_off": {
+        "bytes": {
+          "n": 48,
+          "p50": 1451,
+          "p95": 2479
+        },
+        "cases": 48,
+        "cpu_seconds_per_case": 0.275236,
+        "failure_families": {
+          "api": 2,
+          "conditional": 4,
+          "contrast": 3,
+          "default": 1,
+          "definition": 1,
+          "exact_identifier": 1,
+          "list": 4,
+          "polarity": 3,
+          "table": 1,
+          "usage": 2,
+          "workflow": 5
+        },
+        "latency_seconds": {
+          "n": 48,
+          "p50": 0.23128294400066807,
+          "p95": 0.483995443000822
+        },
+        "literal_full": 21,
+        "operational_errors": 0,
+        "process_cpu_seconds": 13.211313,
+        "required_supported": 21,
+        "required_total": 48,
+        "slices": {
+          "answerability": {
+            "within_budget": {
+              "n": 48,
+              "sufficient": 21
+            }
+          },
+          "family": {
+            "api": {
+              "n": 5,
+              "sufficient": 3
+            },
+            "conditional": {
+              "n": 8,
+              "sufficient": 4
+            },
+            "contrast": {
+              "n": 5,
+              "sufficient": 2
+            },
+            "default": {
+              "n": 1,
+              "sufficient": 0
+            },
+            "definition": {
+              "n": 1,
+              "sufficient": 0
+            },
+            "exact_identifier": {
+              "n": 1,
+              "sufficient": 0
+            },
+            "lifecycle": {
+              "n": 2,
+              "sufficient": 2
+            },
+            "list": {
+              "n": 5,
+              "sufficient": 1
+            },
+            "path": {
+              "n": 2,
+              "sufficient": 2
+            },
+            "polarity": {
+              "n": 7,
+              "sufficient": 4
+            },
+            "table": {
+              "n": 1,
+              "sufficient": 0
+            },
+            "usage": {
+              "n": 4,
+              "sufficient": 2
+            },
+            "version": {
+              "n": 1,
+              "sufficient": 1
+            },
+            "workflow": {
+              "n": 5,
+              "sufficient": 0
+            }
+          },
+          "project": {
+            "fastapi": {
+              "n": 6,
+              "sufficient": 2
+            },
+            "httpx": {
+              "n": 6,
+              "sufficient": 1
+            },
+            "mkdocs": {
+              "n": 6,
+              "sufficient": 3
+            },
+            "pydantic": {
+              "n": 6,
+              "sufficient": 1
+            },
+            "ruff": {
+              "n": 6,
+              "sufficient": 4
+            },
+            "starlette": {
+              "n": 6,
+              "sufficient": 5
+            },
+            "typer": {
+              "n": 6,
+              "sufficient": 4
+            },
+            "uv": {
+              "n": 6,
+              "sufficient": 1
+            }
+          },
+          "split": {
+            "development": {
+              "n": 24,
+              "sufficient": 12
+            },
+            "frozen_validation_exposed": {
+              "n": 24,
+              "sufficient": 9
+            }
+          }
+        },
+        "source_integrity_or_contract_violations": 0,
+        "sufficiency": {
+          "insufficient": 3,
+          "needs_review": 24,
+          "sufficient": 21
+        },
+        "tokens": {
+          "n": 48,
+          "p50": 391,
+          "p95": 774
+        },
+        "wall_seconds": 13.281851,
+        "within_budget": 48,
+        "within_budget_sufficient": 21
+      }
+    },
+    "difference_in_differences_success_rate": 0.0,
+    "fixed_pre_cap_candidate_pool": {
+      "cap_off_requal_off": {
+        "available_case_fingerprints": {
+          "('fastapi', 'Can allow_credentials work with allow_origins=[\"*\"] in CORSMiddleware, and what is the default?')": "d39d72a2dc92243e620766401a62d36a5ef4f06d265441b86bf3c43cd23ffd59",
+          "('fastapi', 'What identifies a CORS preflight request and which response status codes can the middleware return?')": "7380006119c31295d828b461c63a2136389cdbe255fc1bbd183cabebd0ad2901",
+          "('fastapi', 'When do FastAPI background tasks run relative to returning the response?')": "5abcf657a0d37b3c7f3a79dabc74d32872a9cc7529915e7d75d236dbca64eea7",
+          "('fastapi', 'Which arguments does .add_task() receive and in what roles?')": "30934eaaaf2bc3161614ce2f5ab5d664d1f17a901c6ae604713e75fba1db75de",
+          "('fastapi', 'Из каких компонентов состоит origin в CORS?')": "6487fda3dcece81632e746757a4949148d4c39c462d76affb52e612ba8341a8a",
+          "('fastapi', 'Может ли task function для BackgroundTasks быть обычной def, а не async def?')": "137f41607dc396543e6758932ceb0edbe62a8f452be1dddca63b3f4eed8bd4d3",
+          "('httpx', 'How can HTTPX ignore environment variables for both a Client and top-level requests?')": "83090f1a850d68f7cb73525b504c925c4c4ffd879ac45f405359ea9c8af2e317",
+          "('httpx', 'How can I disable all timeouts by default on an HTTPX Client?')": "e18f7a205ef771f7ddeca3cdf2f9b92628988e7d13f6aaec8ae6108e4ce64015",
+          "('httpx', 'What does pool timeout wait for, which exception is raised, and which argument limits connections?')": "8e439c3a1decc07943aae02b72ae5f43f940e372c1fc4f828b0d273c01101996",
+          "('httpx', 'What is HTTPX default timeout behavior: how long and which exception?')": "b51e99093f0f7a3b1558b93e572c559dcd96b51ab5867a37527bdc6989d27889",
+          "('httpx', 'Какие переменные задают прокси для http, https и всех запросов?')": "fce023b213d4fff145891b5941ffecc4670eeac3e0780b8840e729b43f919875",
+          "('httpx', 'Назови четыре типа timeout в HTTPX и объясни, что ограничивает каждый.')": "953fb78473bcc434222037971051b99718514b963a5b78425d9b399f3f28b204",
+          "('mkdocs', 'Are pages absent from nav still built, and what navigation links do they lose?')": "4ea40dc139aa10049846e1c739ca2e1fb3319de897c194236187d8e1ecd2961e",
+          "('mkdocs', 'Can table cells contain block elements or multiple lines, and are blank lines around a table required?')": "d38089c088b2869dd4328e0792d4bb53a5f8395b6073f68a5ea2a5b2aa475bd2",
+          "('mkdocs', 'What happens when index.md and README.md are in the same directory?')": "0f5f4e8c2f5d1cb16a889ef4d9797accb6477e79c280fd8536393302f57d0a0c",
+          "('mkdocs', 'Where do documentation sources and mkdocs.yml live by default?')": "b68651d22063f661177ab3fa1423abe9e5ad41634af0eb5a5eda8e028b5acb1b",
+          "('mkdocs', 'Which page title wins when the navigation configuration and Markdown content define different titles?')": "89a65caf2b24283ba35e964e7635c70f863a1bea9d71e2d8a573baa8b0641228",
+          "('mkdocs', 'Относительно чего задаются пути в nav и где лежат index.md и about.md при docs_dir=docs?')": "6c0f62bd0bf6bc853956e5a94f0f9d9dce9ce3586fee4b3bce495bc025163ddf",
+          "('pydantic', 'Does a UUID string pass strict validation from JSON and from Python in the same way?')": "02f7b9bfcb451f47c9ddedb7d51a549732cf8818474100a4a5d96edc26d75153",
+          "('pydantic', 'How does AliasGenerator help use different naming conventions when loading and saving?')": "b2a955aeedbb33308b4d3786a126928a89e1f9d002399edac6925ef3adbc1c30",
+          "('pydantic', 'What can strict mode be enabled on, and what happens instead of coercing an incorrect type?')": "590fc2562eb718cba95f28e5327cb3d6b2ef5977269f78a88a1c2d1d744b73b5",
+          "('pydantic', 'What is AliasPath used to specify for validation aliases?')": "9ca65b53146d0b5fd48064d61497d45c6664a51adcdd87a98f9c7c0f0abcc131",
+          "('pydantic', 'В чём различие alias_priority=1 и alias_priority=2?')": "a20dc95e5c937ad6ded3a2c0a48b6931eb0c94bb16bded2003dc517c3bf1be27",
+          "('pydantic', 'Перечисли способы включить strict mode, включая field, annotation, config и validation call.')": "bca248d4eef1682d2feed782af68bbddf18638a21b9b68b4a219f206a9e65435",
+          "('ruff', 'Does Ruff merge parent configuration files, and what explicit mechanism supports inheritance?')": "a981b6c47f95d2cb9102e3af15bf635686c4b4d2d3ddb59e67c53be9b80f4cf4",
+          "('ruff', 'Does enabling preview automatically enable all preview rules?')": "51a678049b09a933d606d719a3d4083943550c35a3c2cf8a316b83c4d05e365e",
+          "('ruff', 'Since which version can preview be configured separately for linting and formatting?')": "01e070383e9b7ecca10e7517de33dfd16704594bca14c73d374fa090a0ada7d5",
+          "('ruff', 'What happens if a deprecated rule is explicitly selected while preview is enabled?')": "7d8a935166b32e4d939137170e264d2090d9ff29118921b25307afda3163f576",
+          "('ruff', 'What happens to explicit-preview-rules when preview mode is disabled?')": "b932fad17dd296dfb97b9d8fb213604bc46c7adc631a65abf7723fa95c6f95aa",
+          "('ruff', 'Как включить Ruff preview через CLI или configuration file?')": "8c769929917d25d6a77328afca4e1e323a238cc6704bd0e3e07c6092e51d3cb5",
+          "('starlette', 'How should I use TestClient to ensure lifespan runs in tests?')": "ac4ef9b30490662a20b0c9f98267b4350ade437f4e9c4cc5839579bf813b99b4",
+          "('starlette', 'If one BackgroundTasks function raises an exception, what happens to later tasks and their ordering?')": "19419115525380feac9e1ec400228e59d9e49af154aa943613ec34285156f43e",
+          "('starlette', 'Is request state a deep or shallow copy of lifespan state?')": "b7fbcda3ceb70791d3d8592ff913ec25ca348b25daa6150b58bb3cb90fa93915",
+          "('starlette', 'Will Starlette serve incoming requests before its lifespan handler has run?')": "ae45c41d56a56b6b66df463e295a630f42b3e4998fc0700420baced2455588f0",
+          "('starlette', 'Какая сигнатура BackgroundTask добавляет одну фоновую задачу к response?')": "d02f6b68967bf617a967165badd818122a6b0c2eb04a0618329a47b84659cff5",
+          "('starlette', 'Когда начинается lifespan teardown относительно connections и background tasks?')": "2e1e246b9f0b8b170240f0a6f4c559f9fa944b4431a6f761ccd16fab166a532f",
+          "('typer', 'Does raising typer.Exit() itself imply an error, and what is its default exit code?')": "9b56413daad67f9b79d751b5710ad3a4cd5b8048d3631bbfe81b4aff5a6c5cb2",
+          "('typer', 'How do I give a boolean option alternative positive and negative names such as --accept and --reject?')": "0f98aa70ac0ee9c1c1deed90b8bb1bdb094db01c52f0034d69bae3365fd985f4",
+          "('typer', 'What happens to --no-force when I declare only the --force option?')": "5cd0253fdc6bffb0eff606bd566c872cbb22167e9d3a9a3239becf1c3d6f4742",
+          "('typer', 'What visible message distinguishes aborting a Typer program from a normal Exit?')": "57fcfba7401a0f53610d37e6e82da7740740bbc4995478faf528bbfc33bf1aa4",
+          "('typer', 'Как записать только отрицательное имя boolean option: важен ли пробел перед /?')": "24f2d8d0282396195676e595f19d5d379f60867664b195f4e911d8154a1ef201",
+          "('typer', 'Как через typer.Exit сообщить терминалу об ошибке?')": "d1998185ced831476ea98e7869913b62f65f1522ca575e4f44e48407792daf0a",
+          "('uv', 'Compare first-match, unsafe-first-match and unsafe-best-match index strategies.')": "55f8b44a50fb8fca779e40a74a3023c36d52e758bb6f31354e330c5ad3b0bde6",
+          "('uv', 'Does uv read pip.conf or PIP_INDEX_URL?')": "40b0eee0a949d7288e29672c824786e8244bc9aae343eea10b92899f1347b537",
+          "('uv', 'How does uv restrict candidate versions across multiple indexes and why?')": "4d9574ceb677664de596afc3b9d95539add8d92f24815dc062c543888d80b885",
+          "('uv', 'What can I do when dependency resolution fails due to a transitive pre-release?')": "fb4b451a6566fd8d7edd9257d64f267bef0e6f79f79b2718bc26986f76a80f83",
+          "('uv', 'Which build isolation mode does uv use by default and what is the escape hatch for a missing build dependency?')": "fee7280fe8cb106b7b1b70bd47ba510406fda87159681c99987550f05a635a5f",
+          "('uv', 'В каких двух случаях uv принимает pre-release версии по умолчанию?')": "5ef300f71b57b9e2edffc4bd9290cd7f767de0933cc51f21f433c08373b401bb"
+        },
+        "cases": 48,
+        "consumed_calls": 351,
+        "same_as_current": true,
+        "unsupported_routes": []
+      },
+      "cap_off_requal_on": {
+        "available_case_fingerprints": {
+          "('fastapi', 'Can allow_credentials work with allow_origins=[\"*\"] in CORSMiddleware, and what is the default?')": "d39d72a2dc92243e620766401a62d36a5ef4f06d265441b86bf3c43cd23ffd59",
+          "('fastapi', 'What identifies a CORS preflight request and which response status codes can the middleware return?')": "7380006119c31295d828b461c63a2136389cdbe255fc1bbd183cabebd0ad2901",
+          "('fastapi', 'When do FastAPI background tasks run relative to returning the response?')": "5abcf657a0d37b3c7f3a79dabc74d32872a9cc7529915e7d75d236dbca64eea7",
+          "('fastapi', 'Which arguments does .add_task() receive and in what roles?')": "30934eaaaf2bc3161614ce2f5ab5d664d1f17a901c6ae604713e75fba1db75de",
+          "('fastapi', 'Из каких компонентов состоит origin в CORS?')": "6487fda3dcece81632e746757a4949148d4c39c462d76affb52e612ba8341a8a",
+          "('fastapi', 'Может ли task function для BackgroundTasks быть обычной def, а не async def?')": "137f41607dc396543e6758932ceb0edbe62a8f452be1dddca63b3f4eed8bd4d3",
+          "('httpx', 'How can HTTPX ignore environment variables for both a Client and top-level requests?')": "83090f1a850d68f7cb73525b504c925c4c4ffd879ac45f405359ea9c8af2e317",
+          "('httpx', 'How can I disable all timeouts by default on an HTTPX Client?')": "e18f7a205ef771f7ddeca3cdf2f9b92628988e7d13f6aaec8ae6108e4ce64015",
+          "('httpx', 'What does pool timeout wait for, which exception is raised, and which argument limits connections?')": "8e439c3a1decc07943aae02b72ae5f43f940e372c1fc4f828b0d273c01101996",
+          "('httpx', 'What is HTTPX default timeout behavior: how long and which exception?')": "b51e99093f0f7a3b1558b93e572c559dcd96b51ab5867a37527bdc6989d27889",
+          "('httpx', 'Какие переменные задают прокси для http, https и всех запросов?')": "fce023b213d4fff145891b5941ffecc4670eeac3e0780b8840e729b43f919875",
+          "('httpx', 'Назови четыре типа timeout в HTTPX и объясни, что ограничивает каждый.')": "953fb78473bcc434222037971051b99718514b963a5b78425d9b399f3f28b204",
+          "('mkdocs', 'Are pages absent from nav still built, and what navigation links do they lose?')": "4ea40dc139aa10049846e1c739ca2e1fb3319de897c194236187d8e1ecd2961e",
+          "('mkdocs', 'Can table cells contain block elements or multiple lines, and are blank lines around a table required?')": "d38089c088b2869dd4328e0792d4bb53a5f8395b6073f68a5ea2a5b2aa475bd2",
+          "('mkdocs', 'What happens when index.md and README.md are in the same directory?')": "0f5f4e8c2f5d1cb16a889ef4d9797accb6477e79c280fd8536393302f57d0a0c",
+          "('mkdocs', 'Where do documentation sources and mkdocs.yml live by default?')": "b68651d22063f661177ab3fa1423abe9e5ad41634af0eb5a5eda8e028b5acb1b",
+          "('mkdocs', 'Which page title wins when the navigation configuration and Markdown content define different titles?')": "89a65caf2b24283ba35e964e7635c70f863a1bea9d71e2d8a573baa8b0641228",
+          "('mkdocs', 'Относительно чего задаются пути в nav и где лежат index.md и about.md при docs_dir=docs?')": "6c0f62bd0bf6bc853956e5a94f0f9d9dce9ce3586fee4b3bce495bc025163ddf",
+          "('pydantic', 'Does a UUID string pass strict validation from JSON and from Python in the same way?')": "02f7b9bfcb451f47c9ddedb7d51a549732cf8818474100a4a5d96edc26d75153",
+          "('pydantic', 'How does AliasGenerator help use different naming conventions when loading and saving?')": "b2a955aeedbb33308b4d3786a126928a89e1f9d002399edac6925ef3adbc1c30",
+          "('pydantic', 'What can strict mode be enabled on, and what happens instead of coercing an incorrect type?')": "590fc2562eb718cba95f28e5327cb3d6b2ef5977269f78a88a1c2d1d744b73b5",
+          "('pydantic', 'What is AliasPath used to specify for validation aliases?')": "9ca65b53146d0b5fd48064d61497d45c6664a51adcdd87a98f9c7c0f0abcc131",
+          "('pydantic', 'В чём различие alias_priority=1 и alias_priority=2?')": "a20dc95e5c937ad6ded3a2c0a48b6931eb0c94bb16bded2003dc517c3bf1be27",
+          "('pydantic', 'Перечисли способы включить strict mode, включая field, annotation, config и validation call.')": "bca248d4eef1682d2feed782af68bbddf18638a21b9b68b4a219f206a9e65435",
+          "('ruff', 'Does Ruff merge parent configuration files, and what explicit mechanism supports inheritance?')": "a981b6c47f95d2cb9102e3af15bf635686c4b4d2d3ddb59e67c53be9b80f4cf4",
+          "('ruff', 'Does enabling preview automatically enable all preview rules?')": "51a678049b09a933d606d719a3d4083943550c35a3c2cf8a316b83c4d05e365e",
+          "('ruff', 'Since which version can preview be configured separately for linting and formatting?')": "01e070383e9b7ecca10e7517de33dfd16704594bca14c73d374fa090a0ada7d5",
+          "('ruff', 'What happens if a deprecated rule is explicitly selected while preview is enabled?')": "7d8a935166b32e4d939137170e264d2090d9ff29118921b25307afda3163f576",
+          "('ruff', 'What happens to explicit-preview-rules when preview mode is disabled?')": "b932fad17dd296dfb97b9d8fb213604bc46c7adc631a65abf7723fa95c6f95aa",
+          "('ruff', 'Как включить Ruff preview через CLI или configuration file?')": "8c769929917d25d6a77328afca4e1e323a238cc6704bd0e3e07c6092e51d3cb5",
+          "('starlette', 'How should I use TestClient to ensure lifespan runs in tests?')": "ac4ef9b30490662a20b0c9f98267b4350ade437f4e9c4cc5839579bf813b99b4",
+          "('starlette', 'If one BackgroundTasks function raises an exception, what happens to later tasks and their ordering?')": "19419115525380feac9e1ec400228e59d9e49af154aa943613ec34285156f43e",
+          "('starlette', 'Is request state a deep or shallow copy of lifespan state?')": "b7fbcda3ceb70791d3d8592ff913ec25ca348b25daa6150b58bb3cb90fa93915",
+          "('starlette', 'Will Starlette serve incoming requests before its lifespan handler has run?')": "ae45c41d56a56b6b66df463e295a630f42b3e4998fc0700420baced2455588f0",
+          "('starlette', 'Какая сигнатура BackgroundTask добавляет одну фоновую задачу к response?')": "d02f6b68967bf617a967165badd818122a6b0c2eb04a0618329a47b84659cff5",
+          "('starlette', 'Когда начинается lifespan teardown относительно connections и background tasks?')": "2e1e246b9f0b8b170240f0a6f4c559f9fa944b4431a6f761ccd16fab166a532f",
+          "('typer', 'Does raising typer.Exit() itself imply an error, and what is its default exit code?')": "9b56413daad67f9b79d751b5710ad3a4cd5b8048d3631bbfe81b4aff5a6c5cb2",
+          "('typer', 'How do I give a boolean option alternative positive and negative names such as --accept and --reject?')": "0f98aa70ac0ee9c1c1deed90b8bb1bdb094db01c52f0034d69bae3365fd985f4",
+          "('typer', 'What happens to --no-force when I declare only the --force option?')": "5cd0253fdc6bffb0eff606bd566c872cbb22167e9d3a9a3239becf1c3d6f4742",
+          "('typer', 'What visible message distinguishes aborting a Typer program from a normal Exit?')": "57fcfba7401a0f53610d37e6e82da7740740bbc4995478faf528bbfc33bf1aa4",
+          "('typer', 'Как записать только отрицательное имя boolean option: важен ли пробел перед /?')": "24f2d8d0282396195676e595f19d5d379f60867664b195f4e911d8154a1ef201",
+          "('typer', 'Как через typer.Exit сообщить терминалу об ошибке?')": "d1998185ced831476ea98e7869913b62f65f1522ca575e4f44e48407792daf0a",
+          "('uv', 'Compare first-match, unsafe-first-match and unsafe-best-match index strategies.')": "55f8b44a50fb8fca779e40a74a3023c36d52e758bb6f31354e330c5ad3b0bde6",
+          "('uv', 'Does uv read pip.conf or PIP_INDEX_URL?')": "40b0eee0a949d7288e29672c824786e8244bc9aae343eea10b92899f1347b537",
+          "('uv', 'How does uv restrict candidate versions across multiple indexes and why?')": "4d9574ceb677664de596afc3b9d95539add8d92f24815dc062c543888d80b885",
+          "('uv', 'What can I do when dependency resolution fails due to a transitive pre-release?')": "fb4b451a6566fd8d7edd9257d64f267bef0e6f79f79b2718bc26986f76a80f83",
+          "('uv', 'Which build isolation mode does uv use by default and what is the escape hatch for a missing build dependency?')": "fee7280fe8cb106b7b1b70bd47ba510406fda87159681c99987550f05a635a5f",
+          "('uv', 'В каких двух случаях uv принимает pre-release версии по умолчанию?')": "5ef300f71b57b9e2edffc4bd9290cd7f767de0933cc51f21f433c08373b401bb"
+        },
+        "cases": 48,
+        "consumed_calls": 351,
+        "same_as_current": true,
+        "unsupported_routes": []
+      },
+      "cap_on_requal_off": {
+        "available_case_fingerprints": {
+          "('fastapi', 'Can allow_credentials work with allow_origins=[\"*\"] in CORSMiddleware, and what is the default?')": "d39d72a2dc92243e620766401a62d36a5ef4f06d265441b86bf3c43cd23ffd59",
+          "('fastapi', 'What identifies a CORS preflight request and which response status codes can the middleware return?')": "7380006119c31295d828b461c63a2136389cdbe255fc1bbd183cabebd0ad2901",
+          "('fastapi', 'When do FastAPI background tasks run relative to returning the response?')": "5abcf657a0d37b3c7f3a79dabc74d32872a9cc7529915e7d75d236dbca64eea7",
+          "('fastapi', 'Which arguments does .add_task() receive and in what roles?')": "30934eaaaf2bc3161614ce2f5ab5d664d1f17a901c6ae604713e75fba1db75de",
+          "('fastapi', 'Из каких компонентов состоит origin в CORS?')": "6487fda3dcece81632e746757a4949148d4c39c462d76affb52e612ba8341a8a",
+          "('fastapi', 'Может ли task function для BackgroundTasks быть обычной def, а не async def?')": "137f41607dc396543e6758932ceb0edbe62a8f452be1dddca63b3f4eed8bd4d3",
+          "('httpx', 'How can HTTPX ignore environment variables for both a Client and top-level requests?')": "83090f1a850d68f7cb73525b504c925c4c4ffd879ac45f405359ea9c8af2e317",
+          "('httpx', 'How can I disable all timeouts by default on an HTTPX Client?')": "e18f7a205ef771f7ddeca3cdf2f9b92628988e7d13f6aaec8ae6108e4ce64015",
+          "('httpx', 'What does pool timeout wait for, which exception is raised, and which argument limits connections?')": "8e439c3a1decc07943aae02b72ae5f43f940e372c1fc4f828b0d273c01101996",
+          "('httpx', 'What is HTTPX default timeout behavior: how long and which exception?')": "b51e99093f0f7a3b1558b93e572c559dcd96b51ab5867a37527bdc6989d27889",
+          "('httpx', 'Какие переменные задают прокси для http, https и всех запросов?')": "fce023b213d4fff145891b5941ffecc4670eeac3e0780b8840e729b43f919875",
+          "('httpx', 'Назови четыре типа timeout в HTTPX и объясни, что ограничивает каждый.')": "953fb78473bcc434222037971051b99718514b963a5b78425d9b399f3f28b204",
+          "('mkdocs', 'Are pages absent from nav still built, and what navigation links do they lose?')": "4ea40dc139aa10049846e1c739ca2e1fb3319de897c194236187d8e1ecd2961e",
+          "('mkdocs', 'Can table cells contain block elements or multiple lines, and are blank lines around a table required?')": "d38089c088b2869dd4328e0792d4bb53a5f8395b6073f68a5ea2a5b2aa475bd2",
+          "('mkdocs', 'What happens when index.md and README.md are in the same directory?')": "0f5f4e8c2f5d1cb16a889ef4d9797accb6477e79c280fd8536393302f57d0a0c",
+          "('mkdocs', 'Where do documentation sources and mkdocs.yml live by default?')": "b68651d22063f661177ab3fa1423abe9e5ad41634af0eb5a5eda8e028b5acb1b",
+          "('mkdocs', 'Which page title wins when the navigation configuration and Markdown content define different titles?')": "89a65caf2b24283ba35e964e7635c70f863a1bea9d71e2d8a573baa8b0641228",
+          "('mkdocs', 'Относительно чего задаются пути в nav и где лежат index.md и about.md при docs_dir=docs?')": "6c0f62bd0bf6bc853956e5a94f0f9d9dce9ce3586fee4b3bce495bc025163ddf",
+          "('pydantic', 'Does a UUID string pass strict validation from JSON and from Python in the same way?')": "02f7b9bfcb451f47c9ddedb7d51a549732cf8818474100a4a5d96edc26d75153",
+          "('pydantic', 'How does AliasGenerator help use different naming conventions when loading and saving?')": "b2a955aeedbb33308b4d3786a126928a89e1f9d002399edac6925ef3adbc1c30",
+          "('pydantic', 'What can strict mode be enabled on, and what happens instead of coercing an incorrect type?')": "590fc2562eb718cba95f28e5327cb3d6b2ef5977269f78a88a1c2d1d744b73b5",
+          "('pydantic', 'What is AliasPath used to specify for validation aliases?')": "9ca65b53146d0b5fd48064d61497d45c6664a51adcdd87a98f9c7c0f0abcc131",
+          "('pydantic', 'В чём различие alias_priority=1 и alias_priority=2?')": "a20dc95e5c937ad6ded3a2c0a48b6931eb0c94bb16bded2003dc517c3bf1be27",
+          "('pydantic', 'Перечисли способы включить strict mode, включая field, annotation, config и validation call.')": "bca248d4eef1682d2feed782af68bbddf18638a21b9b68b4a219f206a9e65435",
+          "('ruff', 'Does Ruff merge parent configuration files, and what explicit mechanism supports inheritance?')": "a981b6c47f95d2cb9102e3af15bf635686c4b4d2d3ddb59e67c53be9b80f4cf4",
+          "('ruff', 'Does enabling preview automatically enable all preview rules?')": "51a678049b09a933d606d719a3d4083943550c35a3c2cf8a316b83c4d05e365e",
+          "('ruff', 'Since which version can preview be configured separately for linting and formatting?')": "01e070383e9b7ecca10e7517de33dfd16704594bca14c73d374fa090a0ada7d5",
+          "('ruff', 'What happens if a deprecated rule is explicitly selected while preview is enabled?')": "7d8a935166b32e4d939137170e264d2090d9ff29118921b25307afda3163f576",
+          "('ruff', 'What happens to explicit-preview-rules when preview mode is disabled?')": "b932fad17dd296dfb97b9d8fb213604bc46c7adc631a65abf7723fa95c6f95aa",
+          "('ruff', 'Как включить Ruff preview через CLI или configuration file?')": "8c769929917d25d6a77328afca4e1e323a238cc6704bd0e3e07c6092e51d3cb5",
+          "('starlette', 'How should I use TestClient to ensure lifespan runs in tests?')": "ac4ef9b30490662a20b0c9f98267b4350ade437f4e9c4cc5839579bf813b99b4",
+          "('starlette', 'If one BackgroundTasks function raises an exception, what happens to later tasks and their ordering?')": "19419115525380feac9e1ec400228e59d9e49af154aa943613ec34285156f43e",
+          "('starlette', 'Is request state a deep or shallow copy of lifespan state?')": "b7fbcda3ceb70791d3d8592ff913ec25ca348b25daa6150b58bb3cb90fa93915",
+          "('starlette', 'Will Starlette serve incoming requests before its lifespan handler has run?')": "ae45c41d56a56b6b66df463e295a630f42b3e4998fc0700420baced2455588f0",
+          "('starlette', 'Какая сигнатура BackgroundTask добавляет одну фоновую задачу к response?')": "d02f6b68967bf617a967165badd818122a6b0c2eb04a0618329a47b84659cff5",
+          "('starlette', 'Когда начинается lifespan teardown относительно connections и background tasks?')": "2e1e246b9f0b8b170240f0a6f4c559f9fa944b4431a6f761ccd16fab166a532f",
+          "('typer', 'Does raising typer.Exit() itself imply an error, and what is its default exit code?')": "9b56413daad67f9b79d751b5710ad3a4cd5b8048d3631bbfe81b4aff5a6c5cb2",
+          "('typer', 'How do I give a boolean option alternative positive and negative names such as --accept and --reject?')": "0f98aa70ac0ee9c1c1deed90b8bb1bdb094db01c52f0034d69bae3365fd985f4",
+          "('typer', 'What happens to --no-force when I declare only the --force option?')": "5cd0253fdc6bffb0eff606bd566c872cbb22167e9d3a9a3239becf1c3d6f4742",
+          "('typer', 'What visible message distinguishes aborting a Typer program from a normal Exit?')": "57fcfba7401a0f53610d37e6e82da7740740bbc4995478faf528bbfc33bf1aa4",
+          "('typer', 'Как записать только отрицательное имя boolean option: важен ли пробел перед /?')": "24f2d8d0282396195676e595f19d5d379f60867664b195f4e911d8154a1ef201",
+          "('typer', 'Как через typer.Exit сообщить терминалу об ошибке?')": "d1998185ced831476ea98e7869913b62f65f1522ca575e4f44e48407792daf0a",
+          "('uv', 'Compare first-match, unsafe-first-match and unsafe-best-match index strategies.')": "55f8b44a50fb8fca779e40a74a3023c36d52e758bb6f31354e330c5ad3b0bde6",
+          "('uv', 'Does uv read pip.conf or PIP_INDEX_URL?')": "40b0eee0a949d7288e29672c824786e8244bc9aae343eea10b92899f1347b537",
+          "('uv', 'How does uv restrict candidate versions across multiple indexes and why?')": "4d9574ceb677664de596afc3b9d95539add8d92f24815dc062c543888d80b885",
+          "('uv', 'What can I do when dependency resolution fails due to a transitive pre-release?')": "fb4b451a6566fd8d7edd9257d64f267bef0e6f79f79b2718bc26986f76a80f83",
+          "('uv', 'Which build isolation mode does uv use by default and what is the escape hatch for a missing build dependency?')": "fee7280fe8cb106b7b1b70bd47ba510406fda87159681c99987550f05a635a5f",
+          "('uv', 'В каких двух случаях uv принимает pre-release версии по умолчанию?')": "5ef300f71b57b9e2edffc4bd9290cd7f767de0933cc51f21f433c08373b401bb"
+        },
+        "cases": 48,
+        "consumed_calls": 351,
+        "same_as_current": true,
+        "unsupported_routes": []
+      },
+      "cap_on_requal_on": {
+        "available_case_fingerprints": {
+          "('fastapi', 'Can allow_credentials work with allow_origins=[\"*\"] in CORSMiddleware, and what is the default?')": "d39d72a2dc92243e620766401a62d36a5ef4f06d265441b86bf3c43cd23ffd59",
+          "('fastapi', 'What identifies a CORS preflight request and which response status codes can the middleware return?')": "7380006119c31295d828b461c63a2136389cdbe255fc1bbd183cabebd0ad2901",
+          "('fastapi', 'When do FastAPI background tasks run relative to returning the response?')": "5abcf657a0d37b3c7f3a79dabc74d32872a9cc7529915e7d75d236dbca64eea7",
+          "('fastapi', 'Which arguments does .add_task() receive and in what roles?')": "30934eaaaf2bc3161614ce2f5ab5d664d1f17a901c6ae604713e75fba1db75de",
+          "('fastapi', 'Из каких компонентов состоит origin в CORS?')": "6487fda3dcece81632e746757a4949148d4c39c462d76affb52e612ba8341a8a",
+          "('fastapi', 'Может ли task function для BackgroundTasks быть обычной def, а не async def?')": "137f41607dc396543e6758932ceb0edbe62a8f452be1dddca63b3f4eed8bd4d3",
+          "('httpx', 'How can HTTPX ignore environment variables for both a Client and top-level requests?')": "83090f1a850d68f7cb73525b504c925c4c4ffd879ac45f405359ea9c8af2e317",
+          "('httpx', 'How can I disable all timeouts by default on an HTTPX Client?')": "e18f7a205ef771f7ddeca3cdf2f9b92628988e7d13f6aaec8ae6108e4ce64015",
+          "('httpx', 'What does pool timeout wait for, which exception is raised, and which argument limits connections?')": "8e439c3a1decc07943aae02b72ae5f43f940e372c1fc4f828b0d273c01101996",
+          "('httpx', 'What is HTTPX default timeout behavior: how long and which exception?')": "b51e99093f0f7a3b1558b93e572c559dcd96b51ab5867a37527bdc6989d27889",
+          "('httpx', 'Какие переменные задают прокси для http, https и всех запросов?')": "fce023b213d4fff145891b5941ffecc4670eeac3e0780b8840e729b43f919875",
+          "('httpx', 'Назови четыре типа timeout в HTTPX и объясни, что ограничивает каждый.')": "953fb78473bcc434222037971051b99718514b963a5b78425d9b399f3f28b204",
+          "('mkdocs', 'Are pages absent from nav still built, and what navigation links do they lose?')": "4ea40dc139aa10049846e1c739ca2e1fb3319de897c194236187d8e1ecd2961e",
+          "('mkdocs', 'Can table cells contain block elements or multiple lines, and are blank lines around a table required?')": "d38089c088b2869dd4328e0792d4bb53a5f8395b6073f68a5ea2a5b2aa475bd2",
+          "('mkdocs', 'What happens when index.md and README.md are in the same directory?')": "0f5f4e8c2f5d1cb16a889ef4d9797accb6477e79c280fd8536393302f57d0a0c",
+          "('mkdocs', 'Where do documentation sources and mkdocs.yml live by default?')": "b68651d22063f661177ab3fa1423abe9e5ad41634af0eb5a5eda8e028b5acb1b",
+          "('mkdocs', 'Which page title wins when the navigation configuration and Markdown content define different titles?')": "89a65caf2b24283ba35e964e7635c70f863a1bea9d71e2d8a573baa8b0641228",
+          "('mkdocs', 'Относительно чего задаются пути в nav и где лежат index.md и about.md при docs_dir=docs?')": "6c0f62bd0bf6bc853956e5a94f0f9d9dce9ce3586fee4b3bce495bc025163ddf",
+          "('pydantic', 'Does a UUID string pass strict validation from JSON and from Python in the same way?')": "02f7b9bfcb451f47c9ddedb7d51a549732cf8818474100a4a5d96edc26d75153",
+          "('pydantic', 'How does AliasGenerator help use different naming conventions when loading and saving?')": "b2a955aeedbb33308b4d3786a126928a89e1f9d002399edac6925ef3adbc1c30",
+          "('pydantic', 'What can strict mode be enabled on, and what happens instead of coercing an incorrect type?')": "590fc2562eb718cba95f28e5327cb3d6b2ef5977269f78a88a1c2d1d744b73b5",
+          "('pydantic', 'What is AliasPath used to specify for validation aliases?')": "9ca65b53146d0b5fd48064d61497d45c6664a51adcdd87a98f9c7c0f0abcc131",
+          "('pydantic', 'В чём различие alias_priority=1 и alias_priority=2?')": "a20dc95e5c937ad6ded3a2c0a48b6931eb0c94bb16bded2003dc517c3bf1be27",
+          "('pydantic', 'Перечисли способы включить strict mode, включая field, annotation, config и validation call.')": "bca248d4eef1682d2feed782af68bbddf18638a21b9b68b4a219f206a9e65435",
+          "('ruff', 'Does Ruff merge parent configuration files, and what explicit mechanism supports inheritance?')": "a981b6c47f95d2cb9102e3af15bf635686c4b4d2d3ddb59e67c53be9b80f4cf4",
+          "('ruff', 'Does enabling preview automatically enable all preview rules?')": "51a678049b09a933d606d719a3d4083943550c35a3c2cf8a316b83c4d05e365e",
+          "('ruff', 'Since which version can preview be configured separately for linting and formatting?')": "01e070383e9b7ecca10e7517de33dfd16704594bca14c73d374fa090a0ada7d5",
+          "('ruff', 'What happens if a deprecated rule is explicitly selected while preview is enabled?')": "7d8a935166b32e4d939137170e264d2090d9ff29118921b25307afda3163f576",
+          "('ruff', 'What happens to explicit-preview-rules when preview mode is disabled?')": "b932fad17dd296dfb97b9d8fb213604bc46c7adc631a65abf7723fa95c6f95aa",
+          "('ruff', 'Как включить Ruff preview через CLI или configuration file?')": "8c769929917d25d6a77328afca4e1e323a238cc6704bd0e3e07c6092e51d3cb5",
+          "('starlette', 'How should I use TestClient to ensure lifespan runs in tests?')": "ac4ef9b30490662a20b0c9f98267b4350ade437f4e9c4cc5839579bf813b99b4",
+          "('starlette', 'If one BackgroundTasks function raises an exception, what happens to later tasks and their ordering?')": "19419115525380feac9e1ec400228e59d9e49af154aa943613ec34285156f43e",
+          "('starlette', 'Is request state a deep or shallow copy of lifespan state?')": "b7fbcda3ceb70791d3d8592ff913ec25ca348b25daa6150b58bb3cb90fa93915",
+          "('starlette', 'Will Starlette serve incoming requests before its lifespan handler has run?')": "ae45c41d56a56b6b66df463e295a630f42b3e4998fc0700420baced2455588f0",
+          "('starlette', 'Какая сигнатура BackgroundTask добавляет одну фоновую задачу к response?')": "d02f6b68967bf617a967165badd818122a6b0c2eb04a0618329a47b84659cff5",
+          "('starlette', 'Когда начинается lifespan teardown относительно connections и background tasks?')": "2e1e246b9f0b8b170240f0a6f4c559f9fa944b4431a6f761ccd16fab166a532f",
+          "('typer', 'Does raising typer.Exit() itself imply an error, and what is its default exit code?')": "9b56413daad67f9b79d751b5710ad3a4cd5b8048d3631bbfe81b4aff5a6c5cb2",
+          "('typer', 'How do I give a boolean option alternative positive and negative names such as --accept and --reject?')": "0f98aa70ac0ee9c1c1deed90b8bb1bdb094db01c52f0034d69bae3365fd985f4",
+          "('typer', 'What happens to --no-force when I declare only the --force option?')": "5cd0253fdc6bffb0eff606bd566c872cbb22167e9d3a9a3239becf1c3d6f4742",
+          "('typer', 'What visible message distinguishes aborting a Typer program from a normal Exit?')": "57fcfba7401a0f53610d37e6e82da7740740bbc4995478faf528bbfc33bf1aa4",
+          "('typer', 'Как записать только отрицательное имя boolean option: важен ли пробел перед /?')": "24f2d8d0282396195676e595f19d5d379f60867664b195f4e911d8154a1ef201",
+          "('typer', 'Как через typer.Exit сообщить терминалу об ошибке?')": "d1998185ced831476ea98e7869913b62f65f1522ca575e4f44e48407792daf0a",
+          "('uv', 'Compare first-match, unsafe-first-match and unsafe-best-match index strategies.')": "55f8b44a50fb8fca779e40a74a3023c36d52e758bb6f31354e330c5ad3b0bde6",
+          "('uv', 'Does uv read pip.conf or PIP_INDEX_URL?')": "40b0eee0a949d7288e29672c824786e8244bc9aae343eea10b92899f1347b537",
+          "('uv', 'How does uv restrict candidate versions across multiple indexes and why?')": "4d9574ceb677664de596afc3b9d95539add8d92f24815dc062c543888d80b885",
+          "('uv', 'What can I do when dependency resolution fails due to a transitive pre-release?')": "fb4b451a6566fd8d7edd9257d64f267bef0e6f79f79b2718bc26986f76a80f83",
+          "('uv', 'Which build isolation mode does uv use by default and what is the escape hatch for a missing build dependency?')": "fee7280fe8cb106b7b1b70bd47ba510406fda87159681c99987550f05a635a5f",
+          "('uv', 'В каких двух случаях uv принимает pre-release версии по умолчанию?')": "5ef300f71b57b9e2edffc4bd9290cd7f767de0933cc51f21f433c08373b401bb"
+        },
+        "cases": 48,
+        "consumed_calls": 351,
+        "same_as_current": true,
+        "unsupported_routes": []
+      },
+      "contextualization_off": {
+        "available_case_fingerprints": {
+          "('fastapi', 'Can allow_credentials work with allow_origins=[\"*\"] in CORSMiddleware, and what is the default?')": "d39d72a2dc92243e620766401a62d36a5ef4f06d265441b86bf3c43cd23ffd59",
+          "('fastapi', 'What identifies a CORS preflight request and which response status codes can the middleware return?')": "7380006119c31295d828b461c63a2136389cdbe255fc1bbd183cabebd0ad2901",
+          "('fastapi', 'When do FastAPI background tasks run relative to returning the response?')": "5abcf657a0d37b3c7f3a79dabc74d32872a9cc7529915e7d75d236dbca64eea7",
+          "('fastapi', 'Which arguments does .add_task() receive and in what roles?')": "30934eaaaf2bc3161614ce2f5ab5d664d1f17a901c6ae604713e75fba1db75de",
+          "('fastapi', 'Из каких компонентов состоит origin в CORS?')": "6487fda3dcece81632e746757a4949148d4c39c462d76affb52e612ba8341a8a",
+          "('fastapi', 'Может ли task function для BackgroundTasks быть обычной def, а не async def?')": "137f41607dc396543e6758932ceb0edbe62a8f452be1dddca63b3f4eed8bd4d3",
+          "('httpx', 'How can HTTPX ignore environment variables for both a Client and top-level requests?')": "83090f1a850d68f7cb73525b504c925c4c4ffd879ac45f405359ea9c8af2e317",
+          "('httpx', 'How can I disable all timeouts by default on an HTTPX Client?')": "e18f7a205ef771f7ddeca3cdf2f9b92628988e7d13f6aaec8ae6108e4ce64015",
+          "('httpx', 'What does pool timeout wait for, which exception is raised, and which argument limits connections?')": "8e439c3a1decc07943aae02b72ae5f43f940e372c1fc4f828b0d273c01101996",
+          "('httpx', 'What is HTTPX default timeout behavior: how long and which exception?')": "b51e99093f0f7a3b1558b93e572c559dcd96b51ab5867a37527bdc6989d27889",
+          "('httpx', 'Какие переменные задают прокси для http, https и всех запросов?')": "fce023b213d4fff145891b5941ffecc4670eeac3e0780b8840e729b43f919875",
+          "('httpx', 'Назови четыре типа timeout в HTTPX и объясни, что ограничивает каждый.')": "953fb78473bcc434222037971051b99718514b963a5b78425d9b399f3f28b204",
+          "('mkdocs', 'Are pages absent from nav still built, and what navigation links do they lose?')": "4ea40dc139aa10049846e1c739ca2e1fb3319de897c194236187d8e1ecd2961e",
+          "('mkdocs', 'Can table cells contain block elements or multiple lines, and are blank lines around a table required?')": "d38089c088b2869dd4328e0792d4bb53a5f8395b6073f68a5ea2a5b2aa475bd2",
+          "('mkdocs', 'What happens when index.md and README.md are in the same directory?')": "0f5f4e8c2f5d1cb16a889ef4d9797accb6477e79c280fd8536393302f57d0a0c",
+          "('mkdocs', 'Where do documentation sources and mkdocs.yml live by default?')": "b68651d22063f661177ab3fa1423abe9e5ad41634af0eb5a5eda8e028b5acb1b",
+          "('mkdocs', 'Which page title wins when the navigation configuration and Markdown content define different titles?')": "89a65caf2b24283ba35e964e7635c70f863a1bea9d71e2d8a573baa8b0641228",
+          "('mkdocs', 'Относительно чего задаются пути в nav и где лежат index.md и about.md при docs_dir=docs?')": "6c0f62bd0bf6bc853956e5a94f0f9d9dce9ce3586fee4b3bce495bc025163ddf",
+          "('pydantic', 'Does a UUID string pass strict validation from JSON and from Python in the same way?')": "02f7b9bfcb451f47c9ddedb7d51a549732cf8818474100a4a5d96edc26d75153",
+          "('pydantic', 'How does AliasGenerator help use different naming conventions when loading and saving?')": "b2a955aeedbb33308b4d3786a126928a89e1f9d002399edac6925ef3adbc1c30",
+          "('pydantic', 'What can strict mode be enabled on, and what happens instead of coercing an incorrect type?')": "590fc2562eb718cba95f28e5327cb3d6b2ef5977269f78a88a1c2d1d744b73b5",
+          "('pydantic', 'What is AliasPath used to specify for validation aliases?')": "9ca65b53146d0b5fd48064d61497d45c6664a51adcdd87a98f9c7c0f0abcc131",
+          "('pydantic', 'В чём различие alias_priority=1 и alias_priority=2?')": "a20dc95e5c937ad6ded3a2c0a48b6931eb0c94bb16bded2003dc517c3bf1be27",
+          "('pydantic', 'Перечисли способы включить strict mode, включая field, annotation, config и validation call.')": "bca248d4eef1682d2feed782af68bbddf18638a21b9b68b4a219f206a9e65435",
+          "('ruff', 'Does Ruff merge parent configuration files, and what explicit mechanism supports inheritance?')": "a981b6c47f95d2cb9102e3af15bf635686c4b4d2d3ddb59e67c53be9b80f4cf4",
+          "('ruff', 'Does enabling preview automatically enable all preview rules?')": "51a678049b09a933d606d719a3d4083943550c35a3c2cf8a316b83c4d05e365e",
+          "('ruff', 'Since which version can preview be configured separately for linting and formatting?')": "01e070383e9b7ecca10e7517de33dfd16704594bca14c73d374fa090a0ada7d5",
+          "('ruff', 'What happens if a deprecated rule is explicitly selected while preview is enabled?')": "7d8a935166b32e4d939137170e264d2090d9ff29118921b25307afda3163f576",
+          "('ruff', 'What happens to explicit-preview-rules when preview mode is disabled?')": "b932fad17dd296dfb97b9d8fb213604bc46c7adc631a65abf7723fa95c6f95aa",
+          "('ruff', 'Как включить Ruff preview через CLI или configuration file?')": "8c769929917d25d6a77328afca4e1e323a238cc6704bd0e3e07c6092e51d3cb5",
+          "('starlette', 'How should I use TestClient to ensure lifespan runs in tests?')": "ac4ef9b30490662a20b0c9f98267b4350ade437f4e9c4cc5839579bf813b99b4",
+          "('starlette', 'If one BackgroundTasks function raises an exception, what happens to later tasks and their ordering?')": "19419115525380feac9e1ec400228e59d9e49af154aa943613ec34285156f43e",
+          "('starlette', 'Is request state a deep or shallow copy of lifespan state?')": "b7fbcda3ceb70791d3d8592ff913ec25ca348b25daa6150b58bb3cb90fa93915",
+          "('starlette', 'Will Starlette serve incoming requests before its lifespan handler has run?')": "ae45c41d56a56b6b66df463e295a630f42b3e4998fc0700420baced2455588f0",
+          "('starlette', 'Какая сигнатура BackgroundTask добавляет одну фоновую задачу к response?')": "d02f6b68967bf617a967165badd818122a6b0c2eb04a0618329a47b84659cff5",
+          "('starlette', 'Когда начинается lifespan teardown относительно connections и background tasks?')": "2e1e246b9f0b8b170240f0a6f4c559f9fa944b4431a6f761ccd16fab166a532f",
+          "('typer', 'Does raising typer.Exit() itself imply an error, and what is its default exit code?')": "9b56413daad67f9b79d751b5710ad3a4cd5b8048d3631bbfe81b4aff5a6c5cb2",
+          "('typer', 'How do I give a boolean option alternative positive and negative names such as --accept and --reject?')": "0f98aa70ac0ee9c1c1deed90b8bb1bdb094db01c52f0034d69bae3365fd985f4",
+          "('typer', 'What happens to --no-force when I declare only the --force option?')": "5cd0253fdc6bffb0eff606bd566c872cbb22167e9d3a9a3239becf1c3d6f4742",
+          "('typer', 'What visible message distinguishes aborting a Typer program from a normal Exit?')": "57fcfba7401a0f53610d37e6e82da7740740bbc4995478faf528bbfc33bf1aa4",
+          "('typer', 'Как записать только отрицательное имя boolean option: важен ли пробел перед /?')": "24f2d8d0282396195676e595f19d5d379f60867664b195f4e911d8154a1ef201",
+          "('typer', 'Как через typer.Exit сообщить терминалу об ошибке?')": "d1998185ced831476ea98e7869913b62f65f1522ca575e4f44e48407792daf0a",
+          "('uv', 'Compare first-match, unsafe-first-match and unsafe-best-match index strategies.')": "55f8b44a50fb8fca779e40a74a3023c36d52e758bb6f31354e330c5ad3b0bde6",
+          "('uv', 'Does uv read pip.conf or PIP_INDEX_URL?')": "40b0eee0a949d7288e29672c824786e8244bc9aae343eea10b92899f1347b537",
+          "('uv', 'How does uv restrict candidate versions across multiple indexes and why?')": "4d9574ceb677664de596afc3b9d95539add8d92f24815dc062c543888d80b885",
+          "('uv', 'What can I do when dependency resolution fails due to a transitive pre-release?')": "fb4b451a6566fd8d7edd9257d64f267bef0e6f79f79b2718bc26986f76a80f83",
+          "('uv', 'Which build isolation mode does uv use by default and what is the escape hatch for a missing build dependency?')": "fee7280fe8cb106b7b1b70bd47ba510406fda87159681c99987550f05a635a5f",
+          "('uv', 'В каких двух случаях uv принимает pre-release версии по умолчанию?')": "5ef300f71b57b9e2edffc4bd9290cd7f767de0933cc51f21f433c08373b401bb"
+        },
+        "cases": 48,
+        "consumed_calls": 351,
+        "same_as_current": true,
+        "unsupported_routes": []
+      }
+    },
+    "interpretation": "Counterfactual lanes replay the frozen current pre-cap pools; raw fresh-index drift is reported separately. No causal claim extends beyond this fixed exposed corpus.",
+    "paired_against_current": {
+      "cap_off_requal_off": {
+        "cluster_bootstrap_95": [
+          -0.08333333333333333,
+          0.041666666666666664
+        ],
+        "family_delta": {
+          "api": {
+            "n": 5,
+            "net": 0
+          },
+          "conditional": {
+            "n": 8,
+            "net": -1
+          },
+          "contrast": {
+            "n": 5,
+            "net": -1
+          },
+          "default": {
+            "n": 1,
+            "net": 1
+          },
+          "definition": {
+            "n": 1,
+            "net": 0
+          },
+          "exact_identifier": {
+            "n": 1,
+            "net": 0
+          },
+          "lifecycle": {
+            "n": 2,
+            "net": 0
+          },
+          "list": {
+            "n": 5,
+            "net": 0
+          },
+          "path": {
+            "n": 2,
+            "net": 0
+          },
+          "polarity": {
+            "n": 7,
+            "net": 0
+          },
+          "table": {
+            "n": 1,
+            "net": 0
+          },
+          "usage": {
+            "n": 4,
+            "net": 0
+          },
+          "version": {
+            "n": 1,
+            "net": 0
+          },
+          "workflow": {
+            "n": 5,
+            "net": 0
+          }
+        },
+        "losses": [
+          "fastapi-04",
+          "typer-03"
+        ],
+        "mean_project_delta": -0.020833333333333332,
+        "pairs": 48,
+        "project_groups": 8,
+        "ties": 45,
+        "wins": [
+          "httpx-01"
+        ]
+      },
+      "cap_off_requal_on": {
+        "cluster_bootstrap_95": [
+          -0.0625,
+          0.0625
+        ],
+        "family_delta": {
+          "api": {
+            "n": 5,
+            "net": 0
+          },
+          "conditional": {
+            "n": 8,
+            "net": 0
+          },
+          "contrast": {
+            "n": 5,
+            "net": -1
+          },
+          "default": {
+            "n": 1,
+            "net": 1
+          },
+          "definition": {
+            "n": 1,
+            "net": 0
+          },
+          "exact_identifier": {
+            "n": 1,
+            "net": 0
+          },
+          "lifecycle": {
+            "n": 2,
+            "net": 0
+          },
+          "list": {
+            "n": 5,
+            "net": 0
+          },
+          "path": {
+            "n": 2,
+            "net": 0
+          },
+          "polarity": {
+            "n": 7,
+            "net": 0
+          },
+          "table": {
+            "n": 1,
+            "net": 0
+          },
+          "usage": {
+            "n": 4,
+            "net": 0
+          },
+          "version": {
+            "n": 1,
+            "net": 0
+          },
+          "workflow": {
+            "n": 5,
+            "net": 0
+          }
+        },
+        "losses": [
+          "typer-03"
+        ],
+        "mean_project_delta": 0.0,
+        "pairs": 48,
+        "project_groups": 8,
+        "ties": 46,
+        "wins": [
+          "httpx-01"
+        ]
+      },
+      "cap_on_requal_off": {
+        "cluster_bootstrap_95": [
+          -0.0625,
+          0.0
+        ],
+        "family_delta": {
+          "api": {
+            "n": 5,
+            "net": 0
+          },
+          "conditional": {
+            "n": 8,
+            "net": -1
+          },
+          "contrast": {
+            "n": 5,
+            "net": 0
+          },
+          "default": {
+            "n": 1,
+            "net": 0
+          },
+          "definition": {
+            "n": 1,
+            "net": 0
+          },
+          "exact_identifier": {
+            "n": 1,
+            "net": 0
+          },
+          "lifecycle": {
+            "n": 2,
+            "net": 0
+          },
+          "list": {
+            "n": 5,
+            "net": 0
+          },
+          "path": {
+            "n": 2,
+            "net": 0
+          },
+          "polarity": {
+            "n": 7,
+            "net": 0
+          },
+          "table": {
+            "n": 1,
+            "net": 0
+          },
+          "usage": {
+            "n": 4,
+            "net": 0
+          },
+          "version": {
+            "n": 1,
+            "net": 0
+          },
+          "workflow": {
+            "n": 5,
+            "net": 0
+          }
+        },
+        "losses": [
+          "fastapi-04"
+        ],
+        "mean_project_delta": -0.020833333333333332,
+        "pairs": 48,
+        "project_groups": 8,
+        "ties": 47,
+        "wins": []
+      },
+      "contextualization_off": {
+        "cluster_bootstrap_95": [
+          -0.35416666666666663,
+          -0.16666666666666666
+        ],
+        "family_delta": {
+          "api": {
+            "n": 5,
+            "net": -1
+          },
+          "conditional": {
+            "n": 8,
+            "net": -1
+          },
+          "contrast": {
+            "n": 5,
+            "net": -2
+          },
+          "default": {
+            "n": 1,
+            "net": 0
+          },
+          "definition": {
+            "n": 1,
+            "net": 0
+          },
+          "exact_identifier": {
+            "n": 1,
+            "net": 0
+          },
+          "lifecycle": {
+            "n": 2,
+            "net": 0
+          },
+          "list": {
+            "n": 5,
+            "net": -1
+          },
+          "path": {
+            "n": 2,
+            "net": 0
+          },
+          "polarity": {
+            "n": 7,
+            "net": -2
+          },
+          "table": {
+            "n": 1,
+            "net": 0
+          },
+          "usage": {
+            "n": 4,
+            "net": -1
+          },
+          "version": {
+            "n": 1,
+            "net": 0
+          },
+          "workflow": {
+            "n": 5,
+            "net": -4
+          }
+        },
+        "losses": [
+          "fastapi-05",
+          "httpx-04",
+          "httpx-05",
+          "mkdocs-03",
+          "pydantic-01",
+          "pydantic-02",
+          "pydantic-04",
+          "ruff-01",
+          "ruff-06",
+          "typer-02",
+          "uv-02",
+          "uv-03"
+        ],
+        "mean_project_delta": -0.25,
+        "pairs": 48,
+        "project_groups": 8,
+        "ties": 36,
+        "wins": []
+      }
+    }
+  },
+  "claim_boundaries": {
+    "live_agent_end_to_end": "NOT_MEASURED",
+    "market_or_unseen_distribution_generalization": "NOT_CLAIMED",
+    "production_selector": "NOT_JUSTIFIED_BY_THIS_SAMPLE",
+    "total_task_token_savings": "NOT_MEASURED"
+  },
+  "contextualization": {
+    "compact_and_expanded": {
+      "calls": 45,
+      "changed_spans": 28,
+      "compact_sources_observed": 68,
+      "examples": [
+        {
+          "case": "fastapi-01",
+          "compact_chars": 156,
+          "evidence_id": "ev-080d179288afc9f8",
+          "expanded_chars": 385
+        },
+        {
+          "case": "fastapi-04",
+          "compact_chars": 218,
+          "evidence_id": "ev-9f0a1822f7bc33d2",
+          "expanded_chars": 480
+        },
+        {
+          "case": "fastapi-05",
+          "compact_chars": 147,
+          "evidence_id": "ev-6de6bc0ae3f24d21",
+          "expanded_chars": 292
+        },
+        {
+          "case": "fastapi-05",
+          "compact_chars": 127,
+          "evidence_id": "ev-dab20c170aacb814",
+          "expanded_chars": 185
+        },
+        {
+          "case": "httpx-01",
+          "compact_chars": 299,
+          "evidence_id": "ev-8b598c29adc11290",
+          "expanded_chars": 398
+        },
+        {
+          "case": "httpx-02",
+          "compact_chars": 299,
+          "evidence_id": "ev-8b598c29adc11290",
+          "expanded_chars": 398
+        },
+        {
+          "case": "httpx-02",
+          "compact_chars": 238,
+          "evidence_id": "ev-51d6621852b37b16",
+          "expanded_chars": 424
+        },
+        {
+          "case": "httpx-04",
+          "compact_chars": 316,
+          "evidence_id": "ev-2770bad8115e0c20",
+          "expanded_chars": 431
+        }
+      ],
+      "expanded_sources_observed": 68,
+      "lost_evidence_identities": 0
+    },
+    "paired_against_current": {
+      "cluster_bootstrap_95": [
+        -0.35416666666666663,
+        -0.16666666666666666
+      ],
+      "family_delta": {
+        "api": {
+          "n": 5,
+          "net": -1
+        },
+        "conditional": {
+          "n": 8,
+          "net": -1
+        },
+        "contrast": {
+          "n": 5,
+          "net": -2
+        },
+        "default": {
+          "n": 1,
+          "net": 0
+        },
+        "definition": {
+          "n": 1,
+          "net": 0
+        },
+        "exact_identifier": {
+          "n": 1,
+          "net": 0
+        },
+        "lifecycle": {
+          "n": 2,
+          "net": 0
+        },
+        "list": {
+          "n": 5,
+          "net": -1
+        },
+        "path": {
+          "n": 2,
+          "net": 0
+        },
+        "polarity": {
+          "n": 7,
+          "net": -2
+        },
+        "table": {
+          "n": 1,
+          "net": 0
+        },
+        "usage": {
+          "n": 4,
+          "net": -1
+        },
+        "version": {
+          "n": 1,
+          "net": 0
+        },
+        "workflow": {
+          "n": 5,
+          "net": -4
+        }
+      },
+      "losses": [
+        "fastapi-05",
+        "httpx-04",
+        "httpx-05",
+        "mkdocs-03",
+        "pydantic-01",
+        "pydantic-02",
+        "pydantic-04",
+        "ruff-01",
+        "ruff-06",
+        "typer-02",
+        "uv-02",
+        "uv-03"
+      ],
+      "mean_project_delta": -0.25,
+      "pairs": 48,
+      "project_groups": 8,
+      "ties": 36,
+      "wins": []
+    }
+  },
+  "frozen_configuration": {
+    "beam_width": 4,
+    "contextualization_control": "same end-to-end call with final snippet expansion disabled",
+    "counterfactual_cap": "bounded structural overflow vs no per-source cap",
+    "counterfactual_requalification": "visible-text requalification vs inherited retrieval qualification",
+    "historical_current_floor": 28,
+    "historical_no_context_floor": 18,
+    "max_model_visible_tokens": 800,
+    "performance_metrics_frozen": [
+      "process_cpu_seconds",
+      "cpu_seconds_per_case",
+      "latency_seconds.p95"
+    ],
+    "primary_outcome": "within_budget_sufficient",
+    "selection_candidate_pool": 8,
+    "selection_package_sources": 3,
+    "utility_function": "1 iff context_sufficiency is sufficient and safety_errors is empty; otherwise 0"
+  },
+  "full_frozen_80": {
+    "actual_full_dto_budget": true,
+    "all_valid_max_actual_model_visible_tokens_diagnostic": 800,
+    "bytes": {
+      "n": 80,
+      "p50": 1394,
+      "p95": 2382
+    },
+    "cases": 80,
+    "cpu_seconds_per_case": 0.26335,
+    "failure_families": {
+      "ambiguous": 8,
+      "api": 1,
+      "conditional": 3,
+      "contrast": 1,
+      "default": 1,
+      "definition": 1,
+      "exact_identifier": 1,
+      "list": 3,
+      "over_budget": 8,
+      "partial": 8,
+      "polarity": 1,
+      "table": 1,
+      "unanswerable": 8,
+      "usage": 1,
+      "workflow": 1
+    },
+    "historical_floor_preserved": true,
+    "latency_seconds": {
+      "n": 80,
+      "p50": 0.20763481299945852,
+      "p95": 0.37641797099968244
+    },
+    "literal_full": 33,
+    "operational_errors": 0,
+    "process_cpu_seconds": 21.067965,
+    "required_supported": 36,
+    "required_total": 88,
+    "slices": {
+      "answerability": {
+        "ambiguous": {
+          "n": 8,
+          "sufficient": 0
+        },
+        "over_budget": {
+          "n": 8,
+          "sufficient": 0
+        },
+        "partial": {
+          "n": 8,
+          "sufficient": 0
+        },
+        "unanswerable": {
+          "n": 8,
+          "sufficient": 0
+        },
+        "within_budget": {
+          "n": 48,
+          "sufficient": 33
+        }
+      },
+      "family": {
+        "ambiguous": {
+          "n": 8,
+          "sufficient": 0
+        },
+        "api": {
+          "n": 5,
+          "sufficient": 4
+        },
+        "conditional": {
+          "n": 8,
+          "sufficient": 5
+        },
+        "contrast": {
+          "n": 5,
+          "sufficient": 4
+        },
+        "default": {
+          "n": 1,
+          "sufficient": 0
+        },
+        "definition": {
+          "n": 1,
+          "sufficient": 0
+        },
+        "exact_identifier": {
+          "n": 1,
+          "sufficient": 0
+        },
+        "lifecycle": {
+          "n": 2,
+          "sufficient": 2
+        },
+        "list": {
+          "n": 5,
+          "sufficient": 2
+        },
+        "over_budget": {
+          "n": 8,
+          "sufficient": 0
+        },
+        "partial": {
+          "n": 8,
+          "sufficient": 0
+        },
+        "path": {
+          "n": 2,
+          "sufficient": 2
+        },
+        "polarity": {
+          "n": 7,
+          "sufficient": 6
+        },
+        "table": {
+          "n": 1,
+          "sufficient": 0
+        },
+        "unanswerable": {
+          "n": 8,
+          "sufficient": 0
+        },
+        "usage": {
+          "n": 4,
+          "sufficient": 3
+        },
+        "version": {
+          "n": 1,
+          "sufficient": 1
+        },
+        "workflow": {
+          "n": 5,
+          "sufficient": 4
+        }
+      },
+      "project": {
+        "fastapi": {
+          "n": 10,
+          "sufficient": 3
+        },
+        "httpx": {
+          "n": 10,
+          "sufficient": 3
+        },
+        "mkdocs": {
+          "n": 10,
+          "sufficient": 4
+        },
+        "pydantic": {
+          "n": 10,
+          "sufficient": 4
+        },
+        "ruff": {
+          "n": 10,
+          "sufficient": 6
+        },
+        "starlette": {
+          "n": 10,
+          "sufficient": 5
+        },
+        "typer": {
+          "n": 10,
+          "sufficient": 5
+        },
+        "uv": {
+          "n": 10,
+          "sufficient": 3
+        }
+      },
+      "split": {
+        "development": {
+          "n": 40,
+          "sufficient": 17
+        },
+        "frozen_validation_exposed": {
+          "n": 40,
+          "sufficient": 16
+        }
+      }
+    },
+    "source_integrity_or_contract_violations": 0,
+    "sufficiency": {
+      "insufficient": 22,
+      "needs_review": 25,
+      "sufficient": 33
+    },
+    "tokens": {
+      "n": 80,
+      "p50": 381,
+      "p95": 715
+    },
+    "wall_seconds": 21.229037,
+    "within_budget": 48,
+    "within_budget_max_actual_model_visible_tokens": 800,
+    "within_budget_sufficient": 33
+  },
+  "generated_from_head": "f330c141fcc26b98cd7fd8cffc3643bd3b55f604",
+  "independent_project_sample": {
+    "cases": 6,
+    "claim_boundary": "Independent projects are measured, but this is a post-hoc sample and not external hidden validation.",
+    "current": {
+      "bytes": {
+        "n": 6,
+        "p50": 1353,
+        "p95": 2755
+      },
+      "cases": 6,
+      "cpu_seconds_per_case": 0.155984,
+      "latency_seconds": {
+        "n": 6,
+        "p50": 0.1098516109996126,
+        "p95": 0.21624262200020894
+      },
+      "literal_full": 2,
+      "operational_errors": 0,
+      "process_cpu_seconds": 0.935907,
+      "required_supported": 5,
+      "required_total": 6,
+      "slices": {
+        "answerability": {
+          "within_budget": {
+            "n": 6,
+            "sufficient": 5
+          }
+        },
+        "family": {
+          "behavior": {
+            "n": 1,
+            "sufficient": 0
+          },
+          "enumeration": {
+            "n": 1,
+            "sufficient": 1
+          },
+          "mechanism": {
+            "n": 1,
+            "sufficient": 1
+          },
+          "polarity": {
+            "n": 3,
+            "sufficient": 3
+          }
+        },
+        "project": {
+          "httpcore": {
+            "n": 2,
+            "sufficient": 2
+          },
+          "itsdangerous": {
+            "n": 2,
+            "sufficient": 2
+          },
+          "sqlmodel": {
+            "n": 2,
+            "sufficient": 1
+          }
+        },
+        "split": {
+          "independent_project_sample": {
+            "n": 6,
+            "sufficient": 5
+          }
+        }
+      },
+      "source_integrity_or_contract_violations": 0,
+      "sufficiency": {
+        "needs_review": 1,
+        "sufficient": 5
+      },
+      "tokens": {
+        "n": 6,
+        "p50": 361,
+        "p95": 793
+      },
+      "wall_seconds": 0.945767,
+      "within_budget": 6,
+      "within_budget_sufficient": 5
+    },
+    "generalization_result": "NO_REGRESSION_BUT_IMPROVEMENT_NOT_OBSERVED",
+    "historical_strict_cap_counterfactual": {
+      "bytes": {
+        "n": 6,
+        "p50": 1353,
+        "p95": 2755
+      },
+      "cases": 6,
+      "cpu_seconds_per_case": 0.144299,
+      "latency_seconds": {
+        "n": 6,
+        "p50": 0.09829721099958988,
+        "p95": 0.17832118700061983
+      },
+      "literal_full": 2,
+      "operational_errors": 0,
+      "process_cpu_seconds": 0.865792,
+      "required_supported": 5,
+      "required_total": 6,
+      "slices": {
+        "answerability": {
+          "within_budget": {
+            "n": 6,
+            "sufficient": 5
+          }
+        },
+        "family": {
+          "behavior": {
+            "n": 1,
+            "sufficient": 0
+          },
+          "enumeration": {
+            "n": 1,
+            "sufficient": 1
+          },
+          "mechanism": {
+            "n": 1,
+            "sufficient": 1
+          },
+          "polarity": {
+            "n": 3,
+            "sufficient": 3
+          }
+        },
+        "project": {
+          "httpcore": {
+            "n": 2,
+            "sufficient": 2
+          },
+          "itsdangerous": {
+            "n": 2,
+            "sufficient": 2
+          },
+          "sqlmodel": {
+            "n": 2,
+            "sufficient": 1
+          }
+        },
+        "split": {
+          "independent_project_sample": {
+            "n": 6,
+            "sufficient": 5
+          }
+        }
+      },
+      "source_integrity_or_contract_violations": 0,
+      "sufficiency": {
+        "needs_review": 1,
+        "sufficient": 5
+      },
+      "tokens": {
+        "n": 6,
+        "p50": 360,
+        "p95": 790
+      },
+      "wall_seconds": 0.877556,
+      "within_budget": 6,
+      "within_budget_sufficient": 5
+    },
+    "paired_current_vs_strict_cap": {
+      "cluster_bootstrap_95": [
+        0.0,
+        0.0
+      ],
+      "family_delta": {
+        "behavior": {
+          "n": 1,
+          "net": 0
+        },
+        "enumeration": {
+          "n": 1,
+          "net": 0
+        },
+        "mechanism": {
+          "n": 1,
+          "net": 0
+        },
+        "polarity": {
+          "n": 3,
+          "net": 0
+        }
+      },
+      "losses": [],
+      "mean_project_delta": 0.0,
+      "pairs": 6,
+      "project_groups": 3,
+      "ties": 6,
+      "wins": []
+    },
+    "projects": [
+      "httpcore",
+      "itsdangerous",
+      "sqlmodel"
+    ],
+    "source_manifest_sha256": "861c6728357dc3f9315b23f29a17c01870707558260109a51f5162c17c1e3062",
+    "state": "POSTHOC_NOT_HIDDEN_OR_PREREGISTERED"
+  },
+  "schema_version": "systemic-retrieval-plan-acceptance-v2",
+  "selection": {
+    "beam_recoveries": [],
+    "beam_width": 4,
+    "candidate_pool_limit": 8,
+    "cases": [
+      {
+        "beam_choice": {
+          "indices": [
+            0,
+            1,
+            2
+          ],
+          "proxy": [
+            4,
+            1,
+            1,
+            -383
+          ],
+          "required_count": 1,
+          "required_supported": 0,
+          "safety_errors": [],
+          "sources": 1,
+          "sufficient": false,
+          "tokens": 383
+        },
+        "current_sufficient": false,
+        "enumerated_packages": 41,
+        "exact_oracle_recovery": null,
+        "exact_proxy_choice": {
+          "indices": [
+            0,
+            1,
+            2
+          ],
+          "proxy": [
+            4,
+            1,
+            1,
+            -383
+          ],
+          "required_count": 1,
+          "required_supported": 0,
+          "safety_errors": [],
+          "sources": 1,
+          "sufficient": false,
+          "tokens": 383
+        },
+        "id": "fastapi-01",
+        "pool": {
+          "candidate_count": 6,
+          "candidates_with_parent": 6,
+          "same_parent_pairs": 2,
+          "unique_parents": 4,
+          "unique_sources": 2
+        },
+        "simple_choice": {
+          "indices": [
+            0,
+            1,
+            2
+          ],
+          "proxy": [
+            4,
+            1,
+            1,
+            -383
+          ],
+          "required_count": 1,
+          "required_supported": 0,
+          "safety_errors": [],
+          "sources": 1,
+          "sufficient": false,
+          "tokens": 383
+        }
+      },
+      {
+        "beam_choice": {
+          "indices": [
+            0,
+            1,
+            2
+          ],
+          "proxy": [
+            3,
+            1,
+            1,
+            -384
+          ],
+          "required_count": 1,
+          "required_supported": 0,
+          "safety_errors": [],
+          "sources": 1,
+          "sufficient": false,
+          "tokens": 384
+        },
+        "current_sufficient": false,
+        "enumerated_packages": 14,
+        "exact_oracle_recovery": null,
+        "exact_proxy_choice": {
+          "indices": [
+            0,
+            1,
+            2
+          ],
+          "proxy": [
+            3,
+            1,
+            1,
+            -384
+          ],
+          "required_count": 1,
+          "required_supported": 0,
+          "safety_errors": [],
+          "sources": 1,
+          "sufficient": false,
+          "tokens": 384
+        },
+        "id": "fastapi-02",
+        "pool": {
+          "candidate_count": 4,
+          "candidates_with_parent": 4,
+          "same_parent_pairs": 1,
+          "unique_parents": 3,
+          "unique_sources": 1
+        },
+        "simple_choice": {
+          "indices": [
+            0,
+            1,
+            2
+          ],
+          "proxy": [
+            3,
+            1,
+            1,
+            -384
+          ],
+          "required_count": 1,
+          "required_supported": 0,
+          "safety_errors": [],
+          "sources": 1,
+          "sufficient": false,
+          "tokens": 384
+        }
+      },
+      {
+        "beam_choice": {
+          "indices": [
+            0,
+            1
+          ],
+          "proxy": [
+            1,
+            1,
+            2,
+            -636
+          ],
+          "required_count": 1,
+          "required_supported": 0,
+          "safety_errors": [],
+          "sources": 2,
+          "sufficient": false,
+          "tokens": 636
+        },
+        "current_sufficient": false,
+        "enumerated_packages": 3,
+        "exact_oracle_recovery": null,
+        "exact_proxy_choice": {
+          "indices": [
+            0,
+            1
+          ],
+          "proxy": [
+            1,
+            1,
+            2,
+            -636
+          ],
+          "required_count": 1,
+          "required_supported": 0,
+          "safety_errors": [],
+          "sources": 2,
+          "sufficient": false,
+          "tokens": 636
+        },
+        "id": "fastapi-06",
+        "pool": {
+          "candidate_count": 2,
+          "candidates_with_parent": 2,
+          "same_parent_pairs": 0,
+          "unique_parents": 2,
+          "unique_sources": 1
+        },
+        "simple_choice": {
+          "indices": [
+            0,
+            1
+          ],
+          "proxy": [
+            1,
+            1,
+            2,
+            -636
+          ],
+          "required_count": 1,
+          "required_supported": 0,
+          "safety_errors": [],
+          "sources": 2,
+          "sufficient": false,
+          "tokens": 636
+        }
+      },
+      {
+        "beam_choice": {
+          "indices": [
+            0,
+            1,
+            3
+          ],
+          "proxy": [
+            4,
+            2,
+            2,
+            -660
+          ],
+          "required_count": 1,
+          "required_supported": 0,
+          "safety_errors": [],
+          "sources": 2,
+          "sufficient": false,
+          "tokens": 660
+        },
+        "current_sufficient": false,
+        "enumerated_packages": 41,
+        "exact_oracle_recovery": null,
+        "exact_proxy_choice": {
+          "indices": [
+            0,
+            1,
+            3
+          ],
+          "proxy": [
+            4,
+            2,
+            2,
+            -660
+          ],
+          "required_count": 1,
+          "required_supported": 0,
+          "safety_errors": [],
+          "sources": 2,
+          "sufficient": false,
+          "tokens": 660
+        },
+        "id": "httpx-01",
+        "pool": {
+          "candidate_count": 6,
+          "candidates_with_parent": 6,
+          "same_parent_pairs": 0,
+          "unique_parents": 6,
+          "unique_sources": 2
+        },
+        "simple_choice": {
+          "indices": [
+            0,
+            1,
+            2
+          ],
+          "proxy": [
+            4,
+            1,
+            2,
+            -638
+          ],
+          "required_count": 1,
+          "required_supported": 0,
+          "safety_errors": [],
+          "sources": 2,
+          "sufficient": false,
+          "tokens": 638
+        }
+      },
+      {
+        "beam_choice": {
+          "indices": [
+            0,
+            3
+          ],
+          "proxy": [
+            2,
+            1,
+            1,
+            -355
+          ],
+          "required_count": 1,
+          "required_supported": 0,
+          "safety_errors": [],
+          "sources": 1,
+          "sufficient": false,
+          "tokens": 355
+        },
+        "current_sufficient": false,
+        "enumerated_packages": 14,
+        "exact_oracle_recovery": null,
+        "exact_proxy_choice": {
+          "indices": [
+            0,
+            1,
+            3
+          ],
+          "proxy": [
+            2,
+            1,
+            1,
+            -355
+          ],
+          "required_count": 1,
+          "required_supported": 0,
+          "safety_errors": [],
+          "sources": 1,
+          "sufficient": false,
+          "tokens": 355
+        },
+        "id": "httpx-03",
+        "pool": {
+          "candidate_count": 4,
+          "candidates_with_parent": 4,
+          "same_parent_pairs": 0,
+          "unique_parents": 4,
+          "unique_sources": 2
+        },
+        "simple_choice": {
+          "indices": [
+            0,
+            1,
+            2
+          ],
+          "proxy": [
+            2,
+            1,
+            1,
+            -356
+          ],
+          "required_count": 1,
+          "required_supported": 0,
+          "safety_errors": [],
+          "sources": 1,
+          "sufficient": false,
+          "tokens": 356
+        }
+      },
+      {
+        "beam_choice": null,
+        "current_sufficient": false,
+        "enumerated_packages": 0,
+        "exact_oracle_recovery": null,
+        "exact_proxy_choice": null,
+        "id": "httpx-06",
+        "pool": {
+          "candidate_count": 0,
+          "candidates_with_parent": 0,
+          "same_parent_pairs": 0,
+          "unique_parents": 0,
+          "unique_sources": 0
+        },
+        "simple_choice": null
+      },
+      {
+        "beam_choice": {
+          "indices": [
+            0,
+            1,
+            3
+          ],
+          "proxy": [
+            3,
+            1,
+            1,
+            -355
+          ],
+          "required_count": 1,
+          "required_supported": 0,
+          "safety_errors": [],
+          "sources": 1,
+          "sufficient": false,
+          "tokens": 355
+        },
+        "current_sufficient": false,
+        "enumerated_packages": 14,
+        "exact_oracle_recovery": null,
+        "exact_proxy_choice": {
+          "indices": [
+            0,
+            1,
+            3
+          ],
+          "proxy": [
+            3,
+            1,
+            1,
+            -355
+          ],
+          "required_count": 1,
+          "required_supported": 0,
+          "safety_errors": [],
+          "sources": 1,
+          "sufficient": false,
+          "tokens": 355
+        },
+        "id": "mkdocs-05",
+        "pool": {
+          "candidate_count": 4,
+          "candidates_with_parent": 4,
+          "same_parent_pairs": 2,
+          "unique_parents": 2,
+          "unique_sources": 1
+        },
+        "simple_choice": null
+      },
+      {
+        "beam_choice": {
+          "indices": [
+            0,
+            1,
+            2
+          ],
+          "proxy": [
+            7,
+            1,
+            1,
+            -369
+          ],
+          "required_count": 1,
+          "required_supported": 0,
+          "safety_errors": [],
+          "sources": 1,
+          "sufficient": false,
+          "tokens": 369
+        },
+        "current_sufficient": false,
+        "enumerated_packages": 14,
+        "exact_oracle_recovery": null,
+        "exact_proxy_choice": {
+          "indices": [
+            0,
+            1,
+            2
+          ],
+          "proxy": [
+            7,
+            1,
+            1,
+            -369
+          ],
+          "required_count": 1,
+          "required_supported": 0,
+          "safety_errors": [],
+          "sources": 1,
+          "sufficient": false,
+          "tokens": 369
+        },
+        "id": "mkdocs-06",
+        "pool": {
+          "candidate_count": 4,
+          "candidates_with_parent": 4,
+          "same_parent_pairs": 3,
+          "unique_parents": 2,
+          "unique_sources": 1
+        },
+        "simple_choice": {
+          "indices": [
+            0,
+            1,
+            2
+          ],
+          "proxy": [
+            7,
+            1,
+            1,
+            -369
+          ],
+          "required_count": 1,
+          "required_supported": 0,
+          "safety_errors": [],
+          "sources": 1,
+          "sufficient": false,
+          "tokens": 369
+        }
+      },
+      {
+        "beam_choice": null,
+        "current_sufficient": false,
+        "enumerated_packages": 0,
+        "exact_oracle_recovery": null,
+        "exact_proxy_choice": null,
+        "id": "pydantic-03",
+        "pool": {
+          "candidate_count": 0,
+          "candidates_with_parent": 0,
+          "same_parent_pairs": 0,
+          "unique_parents": 0,
+          "unique_sources": 0
+        },
+        "simple_choice": null
+      },
+      {
+        "beam_choice": {
+          "indices": [
+            0,
+            1
+          ],
+          "proxy": [
+            2,
+            1,
+            1,
+            -378
+          ],
+          "required_count": 1,
+          "required_supported": 0,
+          "safety_errors": [],
+          "sources": 1,
+          "sufficient": false,
+          "tokens": 378
+        },
+        "current_sufficient": false,
+        "enumerated_packages": 3,
+        "exact_oracle_recovery": null,
+        "exact_proxy_choice": {
+          "indices": [
+            0,
+            1
+          ],
+          "proxy": [
+            2,
+            1,
+            1,
+            -378
+          ],
+          "required_count": 1,
+          "required_supported": 0,
+          "safety_errors": [],
+          "sources": 1,
+          "sufficient": false,
+          "tokens": 378
+        },
+        "id": "pydantic-05",
+        "pool": {
+          "candidate_count": 2,
+          "candidates_with_parent": 2,
+          "same_parent_pairs": 1,
+          "unique_parents": 1,
+          "unique_sources": 1
+        },
+        "simple_choice": {
+          "indices": [
+            0,
+            1
+          ],
+          "proxy": [
+            2,
+            1,
+            1,
+            -378
+          ],
+          "required_count": 1,
+          "required_supported": 0,
+          "safety_errors": [],
+          "sources": 1,
+          "sufficient": false,
+          "tokens": 378
+        }
+      },
+      {
+        "beam_choice": {
+          "indices": [
+            0,
+            1
+          ],
+          "proxy": [
+            2,
+            1,
+            1,
+            -320
+          ],
+          "required_count": 1,
+          "required_supported": 0,
+          "safety_errors": [],
+          "sources": 1,
+          "sufficient": false,
+          "tokens": 320
+        },
+        "current_sufficient": false,
+        "enumerated_packages": 3,
+        "exact_oracle_recovery": null,
+        "exact_proxy_choice": {
+          "indices": [
+            0,
+            1
+          ],
+          "proxy": [
+            2,
+            1,
+            1,
+            -320
+          ],
+          "required_count": 1,
+          "required_supported": 0,
+          "safety_errors": [],
+          "sources": 1,
+          "sufficient": false,
+          "tokens": 320
+        },
+        "id": "starlette-01",
+        "pool": {
+          "candidate_count": 2,
+          "candidates_with_parent": 2,
+          "same_parent_pairs": 1,
+          "unique_parents": 1,
+          "unique_sources": 1
+        },
+        "simple_choice": {
+          "indices": [
+            0,
+            1
+          ],
+          "proxy": [
+            2,
+            1,
+            1,
+            -320
+          ],
+          "required_count": 1,
+          "required_supported": 0,
+          "safety_errors": [],
+          "sources": 1,
+          "sufficient": false,
+          "tokens": 320
+        }
+      },
+      {
+        "beam_choice": null,
+        "current_sufficient": false,
+        "enumerated_packages": 0,
+        "exact_oracle_recovery": null,
+        "exact_proxy_choice": null,
+        "id": "typer-05",
+        "pool": {
+          "candidate_count": 0,
+          "candidates_with_parent": 0,
+          "same_parent_pairs": 0,
+          "unique_parents": 0,
+          "unique_sources": 0
+        },
+        "simple_choice": null
+      },
+      {
+        "beam_choice": {
+          "indices": [
+            0,
+            1,
+            2
+          ],
+          "proxy": [
+            5,
+            1,
+            3,
+            -784
+          ],
+          "required_count": 1,
+          "required_supported": 0,
+          "safety_errors": [],
+          "sources": 3,
+          "sufficient": false,
+          "tokens": 784
+        },
+        "current_sufficient": false,
+        "enumerated_packages": 14,
+        "exact_oracle_recovery": null,
+        "exact_proxy_choice": {
+          "indices": [
+            0,
+            1,
+            2
+          ],
+          "proxy": [
+            5,
+            1,
+            3,
+            -784
+          ],
+          "required_count": 1,
+          "required_supported": 0,
+          "safety_errors": [],
+          "sources": 3,
+          "sufficient": false,
+          "tokens": 784
+        },
+        "id": "uv-04",
+        "pool": {
+          "candidate_count": 4,
+          "candidates_with_parent": 4,
+          "same_parent_pairs": 6,
+          "unique_parents": 1,
+          "unique_sources": 1
+        },
+        "simple_choice": {
+          "indices": [
+            0,
+            1,
+            2
+          ],
+          "proxy": [
+            5,
+            1,
+            3,
+            -784
+          ],
+          "required_count": 1,
+          "required_supported": 0,
+          "safety_errors": [],
+          "sources": 3,
+          "sufficient": false,
+          "tokens": 784
+        }
+      },
+      {
+        "beam_choice": {
+          "indices": [
+            0,
+            1
+          ],
+          "proxy": [
+            3,
+            1,
+            1,
+            -382
+          ],
+          "required_count": 1,
+          "required_supported": 0,
+          "safety_errors": [],
+          "sources": 1,
+          "sufficient": false,
+          "tokens": 382
+        },
+        "current_sufficient": false,
+        "enumerated_packages": 3,
+        "exact_oracle_recovery": null,
+        "exact_proxy_choice": {
+          "indices": [
+            0,
+            1
+          ],
+          "proxy": [
+            3,
+            1,
+            1,
+            -382
+          ],
+          "required_count": 1,
+          "required_supported": 0,
+          "safety_errors": [],
+          "sources": 1,
+          "sufficient": false,
+          "tokens": 382
+        },
+        "id": "uv-05",
+        "pool": {
+          "candidate_count": 2,
+          "candidates_with_parent": 2,
+          "same_parent_pairs": 1,
+          "unique_parents": 1,
+          "unique_sources": 1
+        },
+        "simple_choice": {
+          "indices": [
+            0,
+            1
+          ],
+          "proxy": [
+            3,
+            1,
+            1,
+            -382
+          ],
+          "required_count": 1,
+          "required_supported": 0,
+          "safety_errors": [],
+          "sources": 1,
+          "sufficient": false,
+          "tokens": 382
+        }
+      },
+      {
+        "beam_choice": {
+          "indices": [
+            0,
+            1,
+            2
+          ],
+          "proxy": [
+            5,
+            1,
+            1,
+            -406
+          ],
+          "required_count": 1,
+          "required_supported": 0,
+          "safety_errors": [],
+          "sources": 1,
+          "sufficient": false,
+          "tokens": 406
+        },
+        "current_sufficient": false,
+        "enumerated_packages": 14,
+        "exact_oracle_recovery": null,
+        "exact_proxy_choice": {
+          "indices": [
+            0,
+            1,
+            2
+          ],
+          "proxy": [
+            5,
+            1,
+            1,
+            -406
+          ],
+          "required_count": 1,
+          "required_supported": 0,
+          "safety_errors": [],
+          "sources": 1,
+          "sufficient": false,
+          "tokens": 406
+        },
+        "id": "uv-06",
+        "pool": {
+          "candidate_count": 4,
+          "candidates_with_parent": 4,
+          "same_parent_pairs": 3,
+          "unique_parents": 2,
+          "unique_sources": 1
+        },
+        "simple_choice": {
+          "indices": [
+            0,
+            1,
+            2
+          ],
+          "proxy": [
+            5,
+            1,
+            1,
+            -406
+          ],
+          "required_count": 1,
+          "required_supported": 0,
+          "safety_errors": [],
+          "sources": 1,
+          "sufficient": false,
+          "tokens": 406
+        }
+      }
+    ],
+    "exact_proxy_recoveries": [],
+    "exact_recoveries": [],
+    "exact_simple_gap": [],
+    "oracle_beam_sufficiency_gap": [],
+    "package_source_limit": 3,
+    "process_cpu_seconds": 2.4578805259999967,
+    "production_selector_decision": "NOT_JUSTIFIED_BY_THIS_SAMPLE",
+    "projector_failures": 0,
+    "proxy_objective_gap_cases": [],
+    "reference": "exhaustive subsets through unchanged projector; oracle feasibility is separate from gold-blind exact-proxy/simple/beam selection",
+    "selection_bottleneck": "NOT_OBSERVED_IN_BOUNDED_POOL",
+    "simple_recoveries": []
+  },
+  "singleton_control": {
+    "blind_proxy_exact_gap": [],
+    "blind_singleton_candidate_limit": 8,
+    "blind_singleton_changes": [
+      "httpx-03",
+      "typer-02"
+    ],
+    "blind_singleton_losses": [
+      "typer-02"
+    ],
+    "blind_singleton_recoveries": [],
+    "candidate_pool_limit": 8,
+    "cases": [
+      {
+        "blind_singleton_choice": {
+          "indices": [
+            0
+          ],
+          "proxy": [
+            4,
+            1,
+            1,
+            -383
+          ],
+          "required_count": 1,
+          "required_supported": 0,
+          "safety_errors": [],
+          "sources": 1,
+          "sufficient": false,
+          "tokens": 383
+        },
+        "blind_singleton_sufficient": false,
+        "blind_singleton_used": false,
+        "current_proxy": [
+          4,
+          1,
+          1,
+          -383
+        ],
+        "current_sufficient": false,
+        "enumerated_packages": 41,
+        "exact_recovery": null,
+        "id": "fastapi-01",
+        "pool": {
+          "candidate_count": 6,
+          "candidates_with_parent": 6,
+          "same_parent_pairs": 2,
+          "unique_parents": 4,
+          "unique_sources": 2
+        },
+        "simple_recovery": null
+      },
+      {
+        "blind_singleton_choice": {
+          "indices": [
+            0
+          ],
+          "proxy": [
+            3,
+            1,
+            1,
+            -384
+          ],
+          "required_count": 1,
+          "required_supported": 0,
+          "safety_errors": [],
+          "sources": 1,
+          "sufficient": false,
+          "tokens": 384
+        },
+        "blind_singleton_sufficient": false,
+        "blind_singleton_used": false,
+        "current_proxy": [
+          3,
+          1,
+          1,
+          -384
+        ],
+        "current_sufficient": false,
+        "enumerated_packages": 14,
+        "exact_recovery": null,
+        "id": "fastapi-02",
+        "pool": {
+          "candidate_count": 4,
+          "candidates_with_parent": 4,
+          "same_parent_pairs": 1,
+          "unique_parents": 3,
+          "unique_sources": 1
+        },
+        "simple_recovery": null
+      },
+      {
+        "blind_singleton_choice": {
+          "indices": [
+            0
+          ],
+          "proxy": [
+            4,
+            1,
+            1,
+            -361
+          ],
+          "required_count": 1,
+          "required_supported": 1,
+          "safety_errors": [],
+          "sources": 1,
+          "sufficient": true,
+          "tokens": 361
+        },
+        "blind_singleton_sufficient": true,
+        "blind_singleton_used": false,
+        "current_proxy": [
+          4,
+          1,
+          1,
+          -361
+        ],
+        "current_sufficient": true,
+        "enumerated_packages": 5,
+        "exact_recovery": null,
+        "id": "fastapi-03",
+        "pool": {
+          "candidate_count": 5,
+          "candidates_with_parent": 5,
+          "same_parent_pairs": 1,
+          "unique_parents": 4,
+          "unique_sources": 2
+        },
+        "simple_recovery": null
+      },
+      {
+        "blind_singleton_choice": {
+          "indices": [
+            0
+          ],
+          "proxy": [
+            2,
+            1,
+            1,
+            -430
+          ],
+          "required_count": 1,
+          "required_supported": 1,
+          "safety_errors": [],
+          "sources": 1,
+          "sufficient": true,
+          "tokens": 430
+        },
+        "blind_singleton_sufficient": true,
+        "blind_singleton_used": false,
+        "current_proxy": [
+          2,
+          1,
+          2,
+          -667
+        ],
+        "current_sufficient": true,
+        "enumerated_packages": 6,
+        "exact_recovery": null,
+        "id": "fastapi-04",
+        "pool": {
+          "candidate_count": 6,
+          "candidates_with_parent": 6,
+          "same_parent_pairs": 3,
+          "unique_parents": 4,
+          "unique_sources": 2
+        },
+        "simple_recovery": null
+      },
+      {
+        "blind_singleton_choice": {
+          "indices": [
+            0
+          ],
+          "proxy": [
+            5,
+            1,
+            1,
+            -374
+          ],
+          "required_count": 1,
+          "required_supported": 1,
+          "safety_errors": [],
+          "sources": 1,
+          "sufficient": true,
+          "tokens": 374
+        },
+        "blind_singleton_sufficient": true,
+        "blind_singleton_used": false,
+        "current_proxy": [
+          5,
+          1,
+          2,
+          -596
+        ],
+        "current_sufficient": true,
+        "enumerated_packages": 3,
+        "exact_recovery": null,
+        "id": "fastapi-05",
+        "pool": {
+          "candidate_count": 3,
+          "candidates_with_parent": 3,
+          "same_parent_pairs": 0,
+          "unique_parents": 3,
+          "unique_sources": 1
+        },
+        "simple_recovery": null
+      },
+      {
+        "blind_singleton_choice": {
+          "indices": [
+            0
+          ],
+          "proxy": [
+            1,
+            1,
+            1,
+            -374
+          ],
+          "required_count": 1,
+          "required_supported": 0,
+          "safety_errors": [],
+          "sources": 1,
+          "sufficient": false,
+          "tokens": 374
+        },
+        "blind_singleton_sufficient": false,
+        "blind_singleton_used": false,
+        "current_proxy": [
+          1,
+          1,
+          2,
+          -636
+        ],
+        "current_sufficient": false,
+        "enumerated_packages": 3,
+        "exact_recovery": null,
+        "id": "fastapi-06",
+        "pool": {
+          "candidate_count": 2,
+          "candidates_with_parent": 2,
+          "same_parent_pairs": 0,
+          "unique_parents": 2,
+          "unique_sources": 1
+        },
+        "simple_recovery": null
+      },
+      {
+        "blind_singleton_choice": {
+          "indices": [
+            1
+          ],
+          "proxy": [
+            4,
+            1,
+            1,
+            -402
+          ],
+          "required_count": 1,
+          "required_supported": 0,
+          "safety_errors": [],
+          "sources": 1,
+          "sufficient": false,
+          "tokens": 402
+        },
+        "blind_singleton_sufficient": false,
+        "blind_singleton_used": false,
+        "current_proxy": [
+          4,
+          2,
+          2,
+          -660
+        ],
+        "current_sufficient": false,
+        "enumerated_packages": 41,
+        "exact_recovery": null,
+        "id": "httpx-01",
+        "pool": {
+          "candidate_count": 6,
+          "candidates_with_parent": 6,
+          "same_parent_pairs": 0,
+          "unique_parents": 6,
+          "unique_sources": 2
+        },
+        "simple_recovery": null
+      },
+      {
+        "blind_singleton_choice": {
+          "indices": [
+            4
+          ],
+          "proxy": [
+            4,
+            1,
+            1,
+            -402
+          ],
+          "required_count": 1,
+          "required_supported": 1,
+          "safety_errors": [],
+          "sources": 1,
+          "sufficient": true,
+          "tokens": 402
+        },
+        "blind_singleton_sufficient": true,
+        "blind_singleton_used": false,
+        "current_proxy": [
+          4,
+          2,
+          2,
+          -660
+        ],
+        "current_sufficient": true,
+        "enumerated_packages": 6,
+        "exact_recovery": null,
+        "id": "httpx-02",
+        "pool": {
+          "candidate_count": 6,
+          "candidates_with_parent": 6,
+          "same_parent_pairs": 1,
+          "unique_parents": 5,
+          "unique_sources": 2
+        },
+        "simple_recovery": null
+      },
+      {
+        "blind_singleton_choice": {
+          "indices": [
+            3
+          ],
+          "proxy": [
+            2,
+            1,
+            1,
+            -355
+          ],
+          "required_count": 1,
+          "required_supported": 0,
+          "safety_errors": [],
+          "sources": 1,
+          "sufficient": false,
+          "tokens": 355
+        },
+        "blind_singleton_sufficient": false,
+        "blind_singleton_used": true,
+        "current_proxy": [
+          2,
+          1,
+          1,
+          -356
+        ],
+        "current_sufficient": false,
+        "enumerated_packages": 14,
+        "exact_recovery": null,
+        "id": "httpx-03",
+        "pool": {
+          "candidate_count": 4,
+          "candidates_with_parent": 4,
+          "same_parent_pairs": 0,
+          "unique_parents": 4,
+          "unique_sources": 2
+        },
+        "simple_recovery": null
+      },
+      {
+        "blind_singleton_choice": {
+          "indices": [
+            0
+          ],
+          "proxy": [
+            7,
+            1,
+            1,
+            -375
+          ],
+          "required_count": 1,
+          "required_supported": 1,
+          "safety_errors": [],
+          "sources": 1,
+          "sufficient": true,
+          "tokens": 375
+        },
+        "blind_singleton_sufficient": true,
+        "blind_singleton_used": false,
+        "current_proxy": [
+          7,
+          1,
+          2,
+          -658
+        ],
+        "current_sufficient": true,
+        "enumerated_packages": 4,
+        "exact_recovery": null,
+        "id": "httpx-04",
+        "pool": {
+          "candidate_count": 4,
+          "candidates_with_parent": 4,
+          "same_parent_pairs": 3,
+          "unique_parents": 2,
+          "unique_sources": 1
+        },
+        "simple_recovery": null
+      },
+      {
+        "blind_singleton_choice": {
+          "indices": [
+            0
+          ],
+          "proxy": [
+            6,
+            1,
+            1,
+            -382
+          ],
+          "required_count": 1,
+          "required_supported": 1,
+          "safety_errors": [],
+          "sources": 1,
+          "sufficient": true,
+          "tokens": 382
+        },
+        "blind_singleton_sufficient": true,
+        "blind_singleton_used": false,
+        "current_proxy": [
+          6,
+          2,
+          2,
+          -658
+        ],
+        "current_sufficient": true,
+        "enumerated_packages": 6,
+        "exact_recovery": null,
+        "id": "httpx-05",
+        "pool": {
+          "candidate_count": 6,
+          "candidates_with_parent": 6,
+          "same_parent_pairs": 1,
+          "unique_parents": 5,
+          "unique_sources": 2
+        },
+        "simple_recovery": null
+      },
+      {
+        "blind_singleton_choice": null,
+        "blind_singleton_sufficient": false,
+        "blind_singleton_used": false,
+        "current_proxy": [
+          0,
+          0,
+          0,
+          -184
+        ],
+        "current_sufficient": false,
+        "enumerated_packages": 0,
+        "exact_recovery": null,
+        "id": "httpx-06",
+        "pool": {
+          "candidate_count": 0,
+          "candidates_with_parent": 0,
+          "same_parent_pairs": 0,
+          "unique_parents": 0,
+          "unique_sources": 0
+        },
+        "simple_recovery": null
+      },
+      {
+        "blind_singleton_choice": {
+          "indices": [
+            0
+          ],
+          "proxy": [
+            2,
+            1,
+            1,
+            -390
+          ],
+          "required_count": 1,
+          "required_supported": 1,
+          "safety_errors": [],
+          "sources": 1,
+          "sufficient": true,
+          "tokens": 390
+        },
+        "blind_singleton_sufficient": true,
+        "blind_singleton_used": false,
+        "current_proxy": [
+          2,
+          1,
+          1,
+          -390
+        ],
+        "current_sufficient": true,
+        "enumerated_packages": 5,
+        "exact_recovery": null,
+        "id": "mkdocs-01",
+        "pool": {
+          "candidate_count": 5,
+          "candidates_with_parent": 4,
+          "same_parent_pairs": 3,
+          "unique_parents": 2,
+          "unique_sources": 2
+        },
+        "simple_recovery": null
+      },
+      {
+        "blind_singleton_choice": {
+          "indices": [
+            2
+          ],
+          "proxy": [
+            3,
+            1,
+            1,
+            -347
+          ],
+          "required_count": 1,
+          "required_supported": 1,
+          "safety_errors": [],
+          "sources": 1,
+          "sufficient": true,
+          "tokens": 347
+        },
+        "blind_singleton_sufficient": true,
+        "blind_singleton_used": false,
+        "current_proxy": [
+          4,
+          1,
+          2,
+          -642
+        ],
+        "current_sufficient": true,
+        "enumerated_packages": 3,
+        "exact_recovery": null,
+        "id": "mkdocs-02",
+        "pool": {
+          "candidate_count": 3,
+          "candidates_with_parent": 3,
+          "same_parent_pairs": 3,
+          "unique_parents": 1,
+          "unique_sources": 1
+        },
+        "simple_recovery": null
+      },
+      {
+        "blind_singleton_choice": {
+          "indices": [
+            0
+          ],
+          "proxy": [
+            6,
+            1,
+            1,
+            -359
+          ],
+          "required_count": 1,
+          "required_supported": 1,
+          "safety_errors": [],
+          "sources": 1,
+          "sufficient": true,
+          "tokens": 359
+        },
+        "blind_singleton_sufficient": true,
+        "blind_singleton_used": false,
+        "current_proxy": [
+          6,
+          1,
+          1,
+          -359
+        ],
+        "current_sufficient": true,
+        "enumerated_packages": 2,
+        "exact_recovery": null,
+        "id": "mkdocs-03",
+        "pool": {
+          "candidate_count": 2,
+          "candidates_with_parent": 2,
+          "same_parent_pairs": 1,
+          "unique_parents": 1,
+          "unique_sources": 1
+        },
+        "simple_recovery": null
+      },
+      {
+        "blind_singleton_choice": {
+          "indices": [
+            3
+          ],
+          "proxy": [
+            3,
+            1,
+            1,
+            -395
+          ],
+          "required_count": 1,
+          "required_supported": 1,
+          "safety_errors": [],
+          "sources": 1,
+          "sufficient": true,
+          "tokens": 395
+        },
+        "blind_singleton_sufficient": true,
+        "blind_singleton_used": false,
+        "current_proxy": [
+          3,
+          1,
+          2,
+          -642
+        ],
+        "current_sufficient": true,
+        "enumerated_packages": 5,
+        "exact_recovery": null,
+        "id": "mkdocs-04",
+        "pool": {
+          "candidate_count": 5,
+          "candidates_with_parent": 4,
+          "same_parent_pairs": 3,
+          "unique_parents": 2,
+          "unique_sources": 2
+        },
+        "simple_recovery": null
+      },
+      {
+        "blind_singleton_choice": {
+          "indices": [
+            3
+          ],
+          "proxy": [
+            3,
+            1,
+            1,
+            -355
+          ],
+          "required_count": 1,
+          "required_supported": 0,
+          "safety_errors": [],
+          "sources": 1,
+          "sufficient": false,
+          "tokens": 355
+        },
+        "blind_singleton_sufficient": false,
+        "blind_singleton_used": false,
+        "current_proxy": [
+          3,
+          1,
+          1,
+          -355
+        ],
+        "current_sufficient": false,
+        "enumerated_packages": 14,
+        "exact_recovery": null,
+        "id": "mkdocs-05",
+        "pool": {
+          "candidate_count": 4,
+          "candidates_with_parent": 4,
+          "same_parent_pairs": 2,
+          "unique_parents": 2,
+          "unique_sources": 1
+        },
+        "simple_recovery": null
+      },
+      {
+        "blind_singleton_choice": {
+          "indices": [
+            0
+          ],
+          "proxy": [
+            7,
+            1,
+            1,
+            -369
+          ],
+          "required_count": 1,
+          "required_supported": 0,
+          "safety_errors": [],
+          "sources": 1,
+          "sufficient": false,
+          "tokens": 369
+        },
+        "blind_singleton_sufficient": false,
+        "blind_singleton_used": false,
+        "current_proxy": [
+          7,
+          1,
+          1,
+          -369
+        ],
+        "current_sufficient": false,
+        "enumerated_packages": 14,
+        "exact_recovery": null,
+        "id": "mkdocs-06",
+        "pool": {
+          "candidate_count": 4,
+          "candidates_with_parent": 4,
+          "same_parent_pairs": 3,
+          "unique_parents": 2,
+          "unique_sources": 1
+        },
+        "simple_recovery": null
+      },
+      {
+        "blind_singleton_choice": {
+          "indices": [
+            0
+          ],
+          "proxy": [
+            5,
+            1,
+            1,
+            -381
+          ],
+          "required_count": 1,
+          "required_supported": 1,
+          "safety_errors": [],
+          "sources": 1,
+          "sufficient": true,
+          "tokens": 381
+        },
+        "blind_singleton_sufficient": true,
+        "blind_singleton_used": false,
+        "current_proxy": [
+          5,
+          1,
+          1,
+          -381
+        ],
+        "current_sufficient": true,
+        "enumerated_packages": 4,
+        "exact_recovery": null,
+        "id": "pydantic-01",
+        "pool": {
+          "candidate_count": 4,
+          "candidates_with_parent": 4,
+          "same_parent_pairs": 1,
+          "unique_parents": 3,
+          "unique_sources": 1
+        },
+        "simple_recovery": null
+      },
+      {
+        "blind_singleton_choice": {
+          "indices": [
+            2
+          ],
+          "proxy": [
+            5,
+            1,
+            1,
+            -342
+          ],
+          "required_count": 1,
+          "required_supported": 1,
+          "safety_errors": [],
+          "sources": 1,
+          "sufficient": true,
+          "tokens": 342
+        },
+        "blind_singleton_sufficient": true,
+        "blind_singleton_used": false,
+        "current_proxy": [
+          5,
+          1,
+          1,
+          -342
+        ],
+        "current_sufficient": true,
+        "enumerated_packages": 5,
+        "exact_recovery": null,
+        "id": "pydantic-02",
+        "pool": {
+          "candidate_count": 5,
+          "candidates_with_parent": 5,
+          "same_parent_pairs": 1,
+          "unique_parents": 4,
+          "unique_sources": 2
+        },
+        "simple_recovery": null
+      },
+      {
+        "blind_singleton_choice": null,
+        "blind_singleton_sufficient": false,
+        "blind_singleton_used": false,
+        "current_proxy": [
+          0,
+          0,
+          0,
+          -187
+        ],
+        "current_sufficient": false,
+        "enumerated_packages": 0,
+        "exact_recovery": null,
+        "id": "pydantic-03",
+        "pool": {
+          "candidate_count": 0,
+          "candidates_with_parent": 0,
+          "same_parent_pairs": 0,
+          "unique_parents": 0,
+          "unique_sources": 0
+        },
+        "simple_recovery": null
+      },
+      {
+        "blind_singleton_choice": {
+          "indices": [
+            0
+          ],
+          "proxy": [
+            4,
+            1,
+            1,
+            -423
+          ],
+          "required_count": 1,
+          "required_supported": 1,
+          "safety_errors": [],
+          "sources": 1,
+          "sufficient": true,
+          "tokens": 423
+        },
+        "blind_singleton_sufficient": true,
+        "blind_singleton_used": false,
+        "current_proxy": [
+          4,
+          1,
+          2,
+          -731
+        ],
+        "current_sufficient": true,
+        "enumerated_packages": 6,
+        "exact_recovery": null,
+        "id": "pydantic-04",
+        "pool": {
+          "candidate_count": 6,
+          "candidates_with_parent": 6,
+          "same_parent_pairs": 3,
+          "unique_parents": 4,
+          "unique_sources": 2
+        },
+        "simple_recovery": null
+      },
+      {
+        "blind_singleton_choice": {
+          "indices": [
+            0
+          ],
+          "proxy": [
+            2,
+            1,
+            1,
+            -378
+          ],
+          "required_count": 1,
+          "required_supported": 0,
+          "safety_errors": [],
+          "sources": 1,
+          "sufficient": false,
+          "tokens": 378
+        },
+        "blind_singleton_sufficient": false,
+        "blind_singleton_used": false,
+        "current_proxy": [
+          2,
+          1,
+          1,
+          -378
+        ],
+        "current_sufficient": false,
+        "enumerated_packages": 3,
+        "exact_recovery": null,
+        "id": "pydantic-05",
+        "pool": {
+          "candidate_count": 2,
+          "candidates_with_parent": 2,
+          "same_parent_pairs": 1,
+          "unique_parents": 1,
+          "unique_sources": 1
+        },
+        "simple_recovery": null
+      },
+      {
+        "blind_singleton_choice": {
+          "indices": [
+            0
+          ],
+          "proxy": [
+            2,
+            1,
+            1,
+            -403
+          ],
+          "required_count": 1,
+          "required_supported": 1,
+          "safety_errors": [],
+          "sources": 1,
+          "sufficient": true,
+          "tokens": 403
+        },
+        "blind_singleton_sufficient": true,
+        "blind_singleton_used": false,
+        "current_proxy": [
+          2,
+          1,
+          1,
+          -403
+        ],
+        "current_sufficient": true,
+        "enumerated_packages": 1,
+        "exact_recovery": null,
+        "id": "pydantic-06",
+        "pool": {
+          "candidate_count": 1,
+          "candidates_with_parent": 1,
+          "same_parent_pairs": 0,
+          "unique_parents": 1,
+          "unique_sources": 1
+        },
+        "simple_recovery": null
+      },
+      {
+        "blind_singleton_choice": {
+          "indices": [
+            0
+          ],
+          "proxy": [
+            4,
+            1,
+            1,
+            -313
+          ],
+          "required_count": 1,
+          "required_supported": 1,
+          "safety_errors": [],
+          "sources": 1,
+          "sufficient": true,
+          "tokens": 313
+        },
+        "blind_singleton_sufficient": true,
+        "blind_singleton_used": false,
+        "current_proxy": [
+          4,
+          1,
+          3,
+          -789
+        ],
+        "current_sufficient": true,
+        "enumerated_packages": 7,
+        "exact_recovery": null,
+        "id": "ruff-01",
+        "pool": {
+          "candidate_count": 7,
+          "candidates_with_parent": 7,
+          "same_parent_pairs": 2,
+          "unique_parents": 5,
+          "unique_sources": 2
+        },
+        "simple_recovery": null
+      },
+      {
+        "blind_singleton_choice": {
+          "indices": [
+            0
+          ],
+          "proxy": [
+            3,
+            1,
+            1,
+            -427
+          ],
+          "required_count": 1,
+          "required_supported": 1,
+          "safety_errors": [],
+          "sources": 1,
+          "sufficient": true,
+          "tokens": 427
+        },
+        "blind_singleton_sufficient": true,
+        "blind_singleton_used": false,
+        "current_proxy": [
+          3,
+          2,
+          2,
+          -670
+        ],
+        "current_sufficient": true,
+        "enumerated_packages": 7,
+        "exact_recovery": null,
+        "id": "ruff-02",
+        "pool": {
+          "candidate_count": 7,
+          "candidates_with_parent": 7,
+          "same_parent_pairs": 3,
+          "unique_parents": 4,
+          "unique_sources": 2
+        },
+        "simple_recovery": null
+      },
+      {
+        "blind_singleton_choice": {
+          "indices": [
+            0
+          ],
+          "proxy": [
+            4,
+            1,
+            1,
+            -422
+          ],
+          "required_count": 1,
+          "required_supported": 1,
+          "safety_errors": [],
+          "sources": 1,
+          "sufficient": true,
+          "tokens": 422
+        },
+        "blind_singleton_sufficient": true,
+        "blind_singleton_used": false,
+        "current_proxy": [
+          4,
+          1,
+          1,
+          -422
+        ],
+        "current_sufficient": true,
+        "enumerated_packages": 6,
+        "exact_recovery": null,
+        "id": "ruff-03",
+        "pool": {
+          "candidate_count": 6,
+          "candidates_with_parent": 6,
+          "same_parent_pairs": 2,
+          "unique_parents": 4,
+          "unique_sources": 2
+        },
+        "simple_recovery": null
+      },
+      {
+        "blind_singleton_choice": {
+          "indices": [
+            0
+          ],
+          "proxy": [
+            5,
+            1,
+            1,
+            -324
+          ],
+          "required_count": 1,
+          "required_supported": 1,
+          "safety_errors": [],
+          "sources": 1,
+          "sufficient": true,
+          "tokens": 324
+        },
+        "blind_singleton_sufficient": true,
+        "blind_singleton_used": false,
+        "current_proxy": [
+          5,
+          1,
+          2,
+          -648
+        ],
+        "current_sufficient": true,
+        "enumerated_packages": 3,
+        "exact_recovery": null,
+        "id": "ruff-04",
+        "pool": {
+          "candidate_count": 3,
+          "candidates_with_parent": 3,
+          "same_parent_pairs": 1,
+          "unique_parents": 2,
+          "unique_sources": 1
+        },
+        "simple_recovery": null
+      },
+      {
+        "blind_singleton_choice": {
+          "indices": [
+            0
+          ],
+          "proxy": [
+            4,
+            1,
+            1,
+            -394
+          ],
+          "required_count": 1,
+          "required_supported": 0,
+          "safety_errors": [],
+          "sources": 1,
+          "sufficient": false,
+          "tokens": 394
+        },
+        "blind_singleton_sufficient": true,
+        "blind_singleton_used": false,
+        "current_proxy": [
+          4,
+          1,
+          2,
+          -671
+        ],
+        "current_sufficient": true,
+        "enumerated_packages": 5,
+        "exact_recovery": null,
+        "id": "ruff-05",
+        "pool": {
+          "candidate_count": 5,
+          "candidates_with_parent": 5,
+          "same_parent_pairs": 2,
+          "unique_parents": 3,
+          "unique_sources": 2
+        },
+        "simple_recovery": null
+      },
+      {
+        "blind_singleton_choice": {
+          "indices": [
+            0
+          ],
+          "proxy": [
+            6,
+            1,
+            1,
+            -388
+          ],
+          "required_count": 1,
+          "required_supported": 1,
+          "safety_errors": [],
+          "sources": 1,
+          "sufficient": true,
+          "tokens": 388
+        },
+        "blind_singleton_sufficient": true,
+        "blind_singleton_used": false,
+        "current_proxy": [
+          6,
+          1,
+          1,
+          -388
+        ],
+        "current_sufficient": true,
+        "enumerated_packages": 4,
+        "exact_recovery": null,
+        "id": "ruff-06",
+        "pool": {
+          "candidate_count": 4,
+          "candidates_with_parent": 4,
+          "same_parent_pairs": 1,
+          "unique_parents": 3,
+          "unique_sources": 1
+        },
+        "simple_recovery": null
+      },
+      {
+        "blind_singleton_choice": {
+          "indices": [
+            0
+          ],
+          "proxy": [
+            2,
+            1,
+            1,
+            -320
+          ],
+          "required_count": 1,
+          "required_supported": 0,
+          "safety_errors": [],
+          "sources": 1,
+          "sufficient": false,
+          "tokens": 320
+        },
+        "blind_singleton_sufficient": false,
+        "blind_singleton_used": false,
+        "current_proxy": [
+          2,
+          1,
+          1,
+          -320
+        ],
+        "current_sufficient": false,
+        "enumerated_packages": 3,
+        "exact_recovery": null,
+        "id": "starlette-01",
+        "pool": {
+          "candidate_count": 2,
+          "candidates_with_parent": 2,
+          "same_parent_pairs": 1,
+          "unique_parents": 1,
+          "unique_sources": 1
+        },
+        "simple_recovery": null
+      },
+      {
+        "blind_singleton_choice": {
+          "indices": [
+            0
+          ],
+          "proxy": [
+            5,
+            1,
+            1,
+            -359
+          ],
+          "required_count": 1,
+          "required_supported": 1,
+          "safety_errors": [],
+          "sources": 1,
+          "sufficient": true,
+          "tokens": 359
+        },
+        "blind_singleton_sufficient": true,
+        "blind_singleton_used": false,
+        "current_proxy": [
+          7,
+          1,
+          2,
+          -653
+        ],
+        "current_sufficient": true,
+        "enumerated_packages": 7,
+        "exact_recovery": null,
+        "id": "starlette-02",
+        "pool": {
+          "candidate_count": 7,
+          "candidates_with_parent": 7,
+          "same_parent_pairs": 2,
+          "unique_parents": 5,
+          "unique_sources": 2
+        },
+        "simple_recovery": null
+      },
+      {
+        "blind_singleton_choice": {
+          "indices": [
+            0
+          ],
+          "proxy": [
+            4,
+            1,
+            1,
+            -359
+          ],
+          "required_count": 1,
+          "required_supported": 1,
+          "safety_errors": [],
+          "sources": 1,
+          "sufficient": true,
+          "tokens": 359
+        },
+        "blind_singleton_sufficient": true,
+        "blind_singleton_used": false,
+        "current_proxy": [
+          4,
+          1,
+          1,
+          -359
+        ],
+        "current_sufficient": true,
+        "enumerated_packages": 4,
+        "exact_recovery": null,
+        "id": "starlette-03",
+        "pool": {
+          "candidate_count": 4,
+          "candidates_with_parent": 4,
+          "same_parent_pairs": 1,
+          "unique_parents": 3,
+          "unique_sources": 1
+        },
+        "simple_recovery": null
+      },
+      {
+        "blind_singleton_choice": {
+          "indices": [
+            0
+          ],
+          "proxy": [
+            5,
+            1,
+            1,
+            -317
+          ],
+          "required_count": 1,
+          "required_supported": 1,
+          "safety_errors": [],
+          "sources": 1,
+          "sufficient": true,
+          "tokens": 317
+        },
+        "blind_singleton_sufficient": true,
+        "blind_singleton_used": false,
+        "current_proxy": [
+          5,
+          1,
+          2,
+          -528
+        ],
+        "current_sufficient": true,
+        "enumerated_packages": 5,
+        "exact_recovery": null,
+        "id": "starlette-04",
+        "pool": {
+          "candidate_count": 5,
+          "candidates_with_parent": 5,
+          "same_parent_pairs": 3,
+          "unique_parents": 3,
+          "unique_sources": 2
+        },
+        "simple_recovery": null
+      },
+      {
+        "blind_singleton_choice": {
+          "indices": [
+            0
+          ],
+          "proxy": [
+            4,
+            1,
+            1,
+            -486
+          ],
+          "required_count": 1,
+          "required_supported": 1,
+          "safety_errors": [],
+          "sources": 1,
+          "sufficient": true,
+          "tokens": 486
+        },
+        "blind_singleton_sufficient": true,
+        "blind_singleton_used": false,
+        "current_proxy": [
+          4,
+          1,
+          1,
+          -486
+        ],
+        "current_sufficient": true,
+        "enumerated_packages": 1,
+        "exact_recovery": null,
+        "id": "starlette-05",
+        "pool": {
+          "candidate_count": 1,
+          "candidates_with_parent": 1,
+          "same_parent_pairs": 0,
+          "unique_parents": 1,
+          "unique_sources": 1
+        },
+        "simple_recovery": null
+      },
+      {
+        "blind_singleton_choice": {
+          "indices": [
+            0
+          ],
+          "proxy": [
+            1,
+            1,
+            1,
+            -320
+          ],
+          "required_count": 1,
+          "required_supported": 1,
+          "safety_errors": [],
+          "sources": 1,
+          "sufficient": true,
+          "tokens": 320
+        },
+        "blind_singleton_sufficient": true,
+        "blind_singleton_used": false,
+        "current_proxy": [
+          1,
+          1,
+          1,
+          -320
+        ],
+        "current_sufficient": true,
+        "enumerated_packages": 2,
+        "exact_recovery": null,
+        "id": "starlette-06",
+        "pool": {
+          "candidate_count": 2,
+          "candidates_with_parent": 2,
+          "same_parent_pairs": 1,
+          "unique_parents": 1,
+          "unique_sources": 1
+        },
+        "simple_recovery": null
+      },
+      {
+        "blind_singleton_choice": {
+          "indices": [
+            2
+          ],
+          "proxy": [
+            4,
+            1,
+            1,
+            -415
+          ],
+          "required_count": 1,
+          "required_supported": 0,
+          "safety_errors": [],
+          "sources": 1,
+          "sufficient": false,
+          "tokens": 415
+        },
+        "blind_singleton_sufficient": true,
+        "blind_singleton_used": false,
+        "current_proxy": [
+          5,
+          1,
+          2,
+          -704
+        ],
+        "current_sufficient": true,
+        "enumerated_packages": 5,
+        "exact_recovery": null,
+        "id": "typer-01",
+        "pool": {
+          "candidate_count": 5,
+          "candidates_with_parent": 5,
+          "same_parent_pairs": 3,
+          "unique_parents": 3,
+          "unique_sources": 2
+        },
+        "simple_recovery": null
+      },
+      {
+        "blind_singleton_choice": {
+          "indices": [
+            1
+          ],
+          "proxy": [
+            1,
+            1,
+            1,
+            -477
+          ],
+          "required_count": 1,
+          "required_supported": 0,
+          "safety_errors": [],
+          "sources": 1,
+          "sufficient": false,
+          "tokens": 477
+        },
+        "blind_singleton_sufficient": false,
+        "blind_singleton_used": true,
+        "current_proxy": [
+          1,
+          1,
+          1,
+          -480
+        ],
+        "current_sufficient": true,
+        "enumerated_packages": 5,
+        "exact_recovery": null,
+        "id": "typer-02",
+        "pool": {
+          "candidate_count": 5,
+          "candidates_with_parent": 5,
+          "same_parent_pairs": 1,
+          "unique_parents": 4,
+          "unique_sources": 2
+        },
+        "simple_recovery": null
+      },
+      {
+        "blind_singleton_choice": {
+          "indices": [
+            0
+          ],
+          "proxy": [
+            3,
+            1,
+            1,
+            -410
+          ],
+          "required_count": 1,
+          "required_supported": 0,
+          "safety_errors": [],
+          "sources": 1,
+          "sufficient": false,
+          "tokens": 410
+        },
+        "blind_singleton_sufficient": true,
+        "blind_singleton_used": false,
+        "current_proxy": [
+          3,
+          1,
+          2,
+          -694
+        ],
+        "current_sufficient": true,
+        "enumerated_packages": 6,
+        "exact_recovery": null,
+        "id": "typer-03",
+        "pool": {
+          "candidate_count": 6,
+          "candidates_with_parent": 6,
+          "same_parent_pairs": 0,
+          "unique_parents": 6,
+          "unique_sources": 2
+        },
+        "simple_recovery": null
+      },
+      {
+        "blind_singleton_choice": {
+          "indices": [
+            0
+          ],
+          "proxy": [
+            4,
+            1,
+            1,
+            -444
+          ],
+          "required_count": 1,
+          "required_supported": 1,
+          "safety_errors": [],
+          "sources": 1,
+          "sufficient": true,
+          "tokens": 444
+        },
+        "blind_singleton_sufficient": true,
+        "blind_singleton_used": false,
+        "current_proxy": [
+          4,
+          1,
+          1,
+          -444
+        ],
+        "current_sufficient": true,
+        "enumerated_packages": 2,
+        "exact_recovery": null,
+        "id": "typer-04",
+        "pool": {
+          "candidate_count": 2,
+          "candidates_with_parent": 2,
+          "same_parent_pairs": 1,
+          "unique_parents": 1,
+          "unique_sources": 1
+        },
+        "simple_recovery": null
+      },
+      {
+        "blind_singleton_choice": null,
+        "blind_singleton_sufficient": false,
+        "blind_singleton_used": false,
+        "current_proxy": [
+          0,
+          0,
+          0,
+          -185
+        ],
+        "current_sufficient": false,
+        "enumerated_packages": 0,
+        "exact_recovery": null,
+        "id": "typer-05",
+        "pool": {
+          "candidate_count": 0,
+          "candidates_with_parent": 0,
+          "same_parent_pairs": 0,
+          "unique_parents": 0,
+          "unique_sources": 0
+        },
+        "simple_recovery": null
+      },
+      {
+        "blind_singleton_choice": {
+          "indices": [
+            1
+          ],
+          "proxy": [
+            3,
+            1,
+            1,
+            -438
+          ],
+          "required_count": 1,
+          "required_supported": 0,
+          "safety_errors": [],
+          "sources": 1,
+          "sufficient": false,
+          "tokens": 438
+        },
+        "blind_singleton_sufficient": true,
+        "blind_singleton_used": false,
+        "current_proxy": [
+          3,
+          1,
+          2,
+          -774
+        ],
+        "current_sufficient": true,
+        "enumerated_packages": 3,
+        "exact_recovery": null,
+        "id": "typer-06",
+        "pool": {
+          "candidate_count": 3,
+          "candidates_with_parent": 3,
+          "same_parent_pairs": 3,
+          "unique_parents": 1,
+          "unique_sources": 1
+        },
+        "simple_recovery": null
+      },
+      {
+        "blind_singleton_choice": {
+          "indices": [
+            0
+          ],
+          "proxy": [
+            4,
+            1,
+            1,
+            -351
+          ],
+          "required_count": 1,
+          "required_supported": 1,
+          "safety_errors": [],
+          "sources": 1,
+          "sufficient": true,
+          "tokens": 351
+        },
+        "blind_singleton_sufficient": true,
+        "blind_singleton_used": false,
+        "current_proxy": [
+          4,
+          1,
+          1,
+          -351
+        ],
+        "current_sufficient": true,
+        "enumerated_packages": 3,
+        "exact_recovery": null,
+        "id": "uv-01",
+        "pool": {
+          "candidate_count": 3,
+          "candidates_with_parent": 3,
+          "same_parent_pairs": 1,
+          "unique_parents": 2,
+          "unique_sources": 1
+        },
+        "simple_recovery": null
+      },
+      {
+        "blind_singleton_choice": {
+          "indices": [
+            0
+          ],
+          "proxy": [
+            1,
+            1,
+            1,
+            -376
+          ],
+          "required_count": 1,
+          "required_supported": 1,
+          "safety_errors": [],
+          "sources": 1,
+          "sufficient": true,
+          "tokens": 376
+        },
+        "blind_singleton_sufficient": true,
+        "blind_singleton_used": false,
+        "current_proxy": [
+          1,
+          1,
+          1,
+          -376
+        ],
+        "current_sufficient": true,
+        "enumerated_packages": 3,
+        "exact_recovery": null,
+        "id": "uv-02",
+        "pool": {
+          "candidate_count": 3,
+          "candidates_with_parent": 3,
+          "same_parent_pairs": 3,
+          "unique_parents": 1,
+          "unique_sources": 1
+        },
+        "simple_recovery": null
+      },
+      {
+        "blind_singleton_choice": {
+          "indices": [
+            0
+          ],
+          "proxy": [
+            4,
+            1,
+            1,
+            -461
+          ],
+          "required_count": 1,
+          "required_supported": 1,
+          "safety_errors": [],
+          "sources": 1,
+          "sufficient": true,
+          "tokens": 461
+        },
+        "blind_singleton_sufficient": true,
+        "blind_singleton_used": false,
+        "current_proxy": [
+          4,
+          1,
+          2,
+          -718
+        ],
+        "current_sufficient": true,
+        "enumerated_packages": 4,
+        "exact_recovery": null,
+        "id": "uv-03",
+        "pool": {
+          "candidate_count": 4,
+          "candidates_with_parent": 4,
+          "same_parent_pairs": 3,
+          "unique_parents": 2,
+          "unique_sources": 1
+        },
+        "simple_recovery": null
+      },
+      {
+        "blind_singleton_choice": {
+          "indices": [
+            1
+          ],
+          "proxy": [
+            5,
+            1,
+            1,
+            -369
+          ],
+          "required_count": 1,
+          "required_supported": 0,
+          "safety_errors": [],
+          "sources": 1,
+          "sufficient": false,
+          "tokens": 369
+        },
+        "blind_singleton_sufficient": false,
+        "blind_singleton_used": false,
+        "current_proxy": [
+          5,
+          1,
+          3,
+          -784
+        ],
+        "current_sufficient": false,
+        "enumerated_packages": 14,
+        "exact_recovery": null,
+        "id": "uv-04",
+        "pool": {
+          "candidate_count": 4,
+          "candidates_with_parent": 4,
+          "same_parent_pairs": 6,
+          "unique_parents": 1,
+          "unique_sources": 1
+        },
+        "simple_recovery": null
+      },
+      {
+        "blind_singleton_choice": {
+          "indices": [
+            0
+          ],
+          "proxy": [
+            3,
+            1,
+            1,
+            -382
+          ],
+          "required_count": 1,
+          "required_supported": 0,
+          "safety_errors": [],
+          "sources": 1,
+          "sufficient": false,
+          "tokens": 382
+        },
+        "blind_singleton_sufficient": false,
+        "blind_singleton_used": false,
+        "current_proxy": [
+          3,
+          1,
+          1,
+          -382
+        ],
+        "current_sufficient": false,
+        "enumerated_packages": 3,
+        "exact_recovery": null,
+        "id": "uv-05",
+        "pool": {
+          "candidate_count": 2,
+          "candidates_with_parent": 2,
+          "same_parent_pairs": 1,
+          "unique_parents": 1,
+          "unique_sources": 1
+        },
+        "simple_recovery": null
+      },
+      {
+        "blind_singleton_choice": {
+          "indices": [
+            0
+          ],
+          "proxy": [
+            5,
+            1,
+            1,
+            -406
+          ],
+          "required_count": 1,
+          "required_supported": 0,
+          "safety_errors": [],
+          "sources": 1,
+          "sufficient": false,
+          "tokens": 406
+        },
+        "blind_singleton_sufficient": false,
+        "blind_singleton_used": false,
+        "current_proxy": [
+          5,
+          1,
+          1,
+          -406
+        ],
+        "current_sufficient": false,
+        "enumerated_packages": 14,
+        "exact_recovery": null,
+        "id": "uv-06",
+        "pool": {
+          "candidate_count": 4,
+          "candidates_with_parent": 4,
+          "same_parent_pairs": 3,
+          "unique_parents": 2,
+          "unique_sources": 1
+        },
+        "simple_recovery": null
+      }
+    ],
+    "exact_recoveries": [],
+    "exact_simple_gap": [],
+    "package_source_limit": 3,
+    "production_selector_decision": "NOT_JUSTIFIED_BY_THIS_SAMPLE",
+    "projector_failures": 0,
+    "reference": "exact oracle enumerates bounded subsets with evaluator sufficiency; blind singleton choice is fixed only by model-visible proxy before gold scoring",
+    "selection_bottleneck": "NOT_OBSERVED_IN_BOUNDED_POOL",
+    "simple_recoveries": []
+  },
+  "source_policy": {
+    "final_citations": {
+      "checked_final_citations": 68,
+      "status": "PASS",
+      "violations": []
+    },
+    "pre_hydration": {
+      "defense_in_depth_post_hydration_filter_retained": true,
+      "status": "PRODUCTION_BOUNDARY_TESTED",
+      "test": "tests/test_pre_hydration_source_policy.py"
+    }
+  }
+}

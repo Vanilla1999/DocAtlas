@@ -1,0 +1,186 @@
+{
+  "frozen_variants": {
+    "baseline": {
+      "cases": 48,
+      "sufficient": 33,
+      "wins": [],
+      "losses": [],
+      "max_admission_tokens": 791
+    },
+    "full_block_replay": {
+      "cases": 48,
+      "sufficient": 32,
+      "wins": [],
+      "losses": [
+        "pydantic-02"
+      ],
+      "max_admission_tokens": 791
+    },
+    "gold_dto": {
+      "cases": 48,
+      "sufficient": 48,
+      "wins": [
+        "fastapi-01",
+        "fastapi-02",
+        "fastapi-06",
+        "starlette-01",
+        "typer-05",
+        "pydantic-03",
+        "pydantic-05",
+        "httpx-01",
+        "httpx-03",
+        "httpx-06",
+        "mkdocs-05",
+        "mkdocs-06",
+        "uv-04",
+        "uv-05",
+        "uv-06"
+      ],
+      "losses": [],
+      "max_admission_tokens": 531
+    },
+    "lexical_replay": {
+      "cases": 48,
+      "sufficient": 32,
+      "wins": [],
+      "losses": [
+        "typer-03"
+      ],
+      "max_admission_tokens": 794
+    },
+    "oracle_complete_replay": {
+      "cases": 48,
+      "sufficient": 48,
+      "wins": [
+        "fastapi-01",
+        "fastapi-02",
+        "fastapi-06",
+        "starlette-01",
+        "typer-05",
+        "pydantic-03",
+        "pydantic-05",
+        "httpx-01",
+        "httpx-03",
+        "httpx-06",
+        "mkdocs-05",
+        "mkdocs-06",
+        "uv-04",
+        "uv-05",
+        "uv-06"
+      ],
+      "losses": [],
+      "max_admission_tokens": 560
+    },
+    "oracle_priority": {
+      "cases": 15,
+      "sufficient": 0,
+      "wins": [],
+      "losses": [],
+      "max_admission_tokens": 791
+    },
+    "oracle_qualification": {
+      "cases": 15,
+      "sufficient": 2,
+      "wins": [
+        "httpx-06",
+        "mkdocs-05"
+      ],
+      "losses": [],
+      "max_admission_tokens": 795
+    },
+    "oracle_window": {
+      "cases": 15,
+      "sufficient": 2,
+      "wins": [
+        "pydantic-05",
+        "mkdocs-06"
+      ],
+      "losses": [],
+      "max_admission_tokens": 374
+    },
+    "oracle_window_qualification": {
+      "cases": 15,
+      "sufficient": 6,
+      "wins": [
+        "typer-05",
+        "pydantic-03",
+        "pydantic-05",
+        "httpx-06",
+        "mkdocs-05",
+        "mkdocs-06"
+      ],
+      "losses": [],
+      "max_admission_tokens": 430
+    },
+    "oracle_window_subject": {
+      "cases": 15,
+      "sufficient": 11,
+      "wins": [
+        "fastapi-01",
+        "fastapi-02",
+        "fastapi-06",
+        "starlette-01",
+        "typer-05",
+        "pydantic-03",
+        "pydantic-05",
+        "httpx-01",
+        "httpx-06",
+        "mkdocs-05",
+        "mkdocs-06"
+      ],
+      "losses": [],
+      "max_admission_tokens": 430
+    },
+    "oracle_window_subject_full": {
+      "cases": 15,
+      "sufficient": 15,
+      "wins": [
+        "fastapi-01",
+        "fastapi-02",
+        "fastapi-06",
+        "starlette-01",
+        "typer-05",
+        "pydantic-03",
+        "pydantic-05",
+        "httpx-01",
+        "httpx-03",
+        "httpx-06",
+        "mkdocs-05",
+        "mkdocs-06",
+        "uv-04",
+        "uv-05",
+        "uv-06"
+      ],
+      "losses": [],
+      "max_admission_tokens": 560
+    },
+    "soft": {
+      "cases": 48,
+      "sufficient": 32,
+      "wins": [
+        "httpx-06"
+      ],
+      "losses": [
+        "httpx-05",
+        "ruff-05"
+      ],
+      "max_admission_tokens": 800
+    },
+    "whole_only_replay": {
+      "cases": 48,
+      "sufficient": 32,
+      "wins": [],
+      "losses": [
+        "pydantic-02"
+      ],
+      "max_admission_tokens": 783
+    }
+  },
+  "retained_results": 490,
+  "native_handler_calls": 175,
+  "projector_replays": 267,
+  "gold_dto_feasibility_cases": 48,
+  "audit_errors": 0,
+  "baseline_span_matches": 80,
+  "live_model": "NOT_RUN"
+}

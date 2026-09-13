@@ -571,19 +571,18 @@ RAW_TOOLS = [tool for tool in RAW_TOOLS if tool["name"] in CLASSIFIED_TOOL_NAMES
 
 PUBLIC_ADVERTISED_DESCRIPTIONS: dict[str, str] = {
     "get_docs_context": (
-        "Source-grounded documentation tool. Call before edits or for docs/API questions. "
-        "Pass the user's original request unchanged as question; never substitute a documentation-governance meta-question. "
-        "For compound or cross-language requests, add up to five single-concept lookup_queries in the documentation language. "
-        "Preserve exact identifiers, filenames, commands and versions verbatim. "
-        "lookup_queries improve retrieval only; they never authorize an answer or edit. "
-        "Split over three topics across bounded calls. "
-        "For onboarding, architecture or cross-module reads use scope=all without module filters "
-        "(scope=\"all\", same repository). For repo-level policy use scope=\"project\"; for one module use scope=\"module\" with exact module_path. "
-        "module_path always implies module scope. Preserve explicit scope, including on a miss. "
-        "For module plus repo-policy evidence, make two bounded calls (module then project). "
-        "On module ambiguity follow returned docs_status with an exact module_path. "
-        "On insufficient_evidence keep claims unproved; follow returned local source-search when hard_stop=false. "
-        "Stop before editing on hard_stop=true or a change requiring an unproved documentary contract."
+        "Source-grounded documentation tool. Call before edits. One call = one concrete question. "
+        "Pass the original request unchanged; never substitute a benchmark/evaluation or documentation-governance meta-question. "
+        "Use up to five single-concept lookup_queries in the docs language; preserve identifiers, filenames, commands, versions. "
+        "Split over three topics. Lookups never authorize an answer or edit. "
+        "For onboarding/cross-module use scope=all without module filters (scope=\"all\", same repository); policy scope=\"project\"; "
+        "scope=\"module\" with exact module_path. module_path always implies module scope. Preserve explicit scope on misses. "
+        "For module plus repo policy make two bounded calls (module then project). "
+        "docs_context: cite supported snippets; false answer flags mean uncertified, not forbidden. "
+        "Give supported parts and missing facts; retrieval-full is not completeness. "
+        "Links/false flags alone never require reads. Use available bounded continuation only for missing facts; "
+        "stop when sufficient, never reread spans. On insufficient_evidence keep claims unproved; "
+        "local source-search if hard_stop=false. Stop edits if hard_stop=true or required contracts remain unproved."
     ),
     "prepare_docs": (
         "Confirmation-first documentation preparation. Call only from get_docs_context "

@@ -1,0 +1,10 @@
+{
+  "schema_version": 1,
+  "module_labels": {
+    "tests/docs/test_context_loss_boundaries.py": "behavioral"
+  },
+  "node_overrides": {},
+  "module_node_hashes": {
+    "tests/docs/test_context_loss_boundaries.py": "c179e209e073680ef29c46289aedac9e98be2f3f919ae3b78f1a53e52cfc3a45"
+  }
+}

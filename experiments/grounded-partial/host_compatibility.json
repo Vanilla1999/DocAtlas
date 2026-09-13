@@ -1,0 +1,438 @@
+{
+  "baseline_commit": "3b88763bd9acb6cbe403feb99288c86f1fe0d21d",
+  "measurement": "host validator replay of frozen public payloads; no new retrieval or live-model run",
+  "successful_payloads": 86,
+  "rejected": 0,
+  "cases": [
+    {
+      "case": "Q01",
+      "lane": "minimal",
+      "errors": []
+    },
+    {
+      "case": "Q02",
+      "lane": "minimal",
+      "errors": []
+    },
+    {
+      "case": "Q04",
+      "lane": "minimal",
+      "errors": []
+    },
+    {
+      "case": "Q06",
+      "lane": "minimal",
+      "errors": []
+    },
+    {
+      "case": "Q08",
+      "lane": "minimal",
+      "errors": []
+    },
+    {
+      "case": "Q10",
+      "lane": "minimal",
+      "errors": []
+    },
+    {
+      "case": "Q11",
+      "lane": "minimal",
+      "errors": []
+    },
+    {
+      "case": "Q12",
+      "lane": "minimal",
+      "errors": []
+    },
+    {
+      "case": "Q14",
+      "lane": "minimal",
+      "errors": []
+    },
+    {
+      "case": "Q17",
+      "lane": "minimal",
+      "errors": []
+    },
+    {
+      "case": "Q18",
+      "lane": "minimal",
+      "errors": []
+    },
+    {
+      "case": "Q20",
+      "lane": "minimal",
+      "errors": []
+    },
+    {
+      "case": "Q23",
+      "lane": "minimal",
+      "errors": []
+    },
+    {
+      "case": "Q25",
+      "lane": "minimal",
+      "errors": []
+    },
+    {
+      "case": "Q26",
+      "lane": "minimal",
+      "errors": []
+    },
+    {
+      "case": "Q28",
+      "lane": "minimal",
+      "errors": []
+    },
+    {
+      "case": "Q31",
+      "lane": "minimal",
+      "errors": []
+    },
+    {
+      "case": "Q32",
+      "lane": "minimal",
+      "errors": []
+    },
+    {
+      "case": "Q33",
+      "lane": "minimal",
+      "errors": []
+    },
+    {
+      "case": "Q34",
+      "lane": "minimal",
+      "errors": []
+    },
+    {
+      "case": "Q35",
+      "lane": "minimal",
+      "errors": []
+    },
+    {
+      "case": "Q37",
+      "lane": "minimal",
+      "errors": []
+    },
+    {
+      "case": "Q38",
+      "lane": "minimal",
+      "errors": []
+    },
+    {
+      "case": "Q39",
+      "lane": "minimal",
+      "errors": []
+    },
+    {
+      "case": "Q01",
+      "lane": "all",
+      "errors": []
+    },
+    {
+      "case": "Q02",
+      "lane": "all",
+      "errors": []
+    },
+    {
+      "case": "Q04",
+      "lane": "all",
+      "errors": []
+    },
+    {
+      "case": "Q06",
+      "lane": "all",
+      "errors": []
+    },
+    {
+      "case": "Q08",
+      "lane": "all",
+      "errors": []
+    },
+    {
+      "case": "Q10",
+      "lane": "all",
+      "errors": []
+    },
+    {
+      "case": "Q11",
+      "lane": "all",
+      "errors": []
+    },
+    {
+      "case": "Q12",
+      "lane": "all",
+      "errors": []
+    },
+    {
+      "case": "Q14",
+      "lane": "all",
+      "errors": []
+    },
+    {
+      "case": "Q17",
+      "lane": "all",
+      "errors": []
+    },
+    {
+      "case": "Q18",
+      "lane": "all",
+      "errors": []
+    },
+    {
+      "case": "Q20",
+      "lane": "all",
+      "errors": []
+    },
+    {
+      "case": "Q23",
+      "lane": "all",
+      "errors": []
+    },
+    {
+      "case": "Q25",
+      "lane": "all",
+      "errors": []
+    },
+    {
+      "case": "Q26",
+      "lane": "all",
+      "errors": []
+    },
+    {
+      "case": "Q28",
+      "lane": "all",
+      "errors": []
+    },
+    {
+      "case": "Q31",
+      "lane": "all",
+      "errors": []
+    },
+    {
+      "case": "Q32",
+      "lane": "all",
+      "errors": []
+    },
+    {
+      "case": "Q33",
+      "lane": "all",
+      "errors": []
+    },
+    {
+      "case": "Q34",
+      "lane": "all",
+      "errors": []
+    },
+    {
+      "case": "Q35",
+      "lane": "all",
+      "errors": []
+    },
+    {
+      "case": "Q37",
+      "lane": "all",
+      "errors": []
+    },
+    {
+      "case": "Q38",
+      "lane": "all",
+      "errors": []
+    },
+    {
+      "case": "Q39",
+      "lane": "all",
+      "errors": []
+    },
+    {
+      "case": "Q01",
+      "lane": "guided",
+      "errors": []
+    },
+    {
+      "case": "Q02",
+      "lane": "guided",
+      "errors": []
+    },
+    {
+      "case": "Q03",
+      "lane": "guided",
+      "errors": []
+    },
+    {
+      "case": "Q04",
+      "lane": "guided",
+      "errors": []
+    },
+    {
+      "case": "Q05",
+      "lane": "guided",
+      "errors": []
+    },
+    {
+      "case": "Q06",
+      "lane": "guided",
+      "errors": []
+    },
+    {
+      "case": "Q07",
+      "lane": "guided",
+      "errors": []
+    },
+    {
+      "case": "Q08",
+      "lane": "guided",
+      "errors": []
+    },
+    {
+      "case": "Q09",
+      "lane": "guided",
+      "errors": []
+    },
+    {
+      "case": "Q10",
+      "lane": "guided",
+      "errors": []
+    },
+    {
+      "case": "Q11",
+      "lane": "guided",
+      "errors": []
+    },
+    {
+      "case": "Q12",
+      "lane": "guided",
+      "errors": []
+    },
+    {
+      "case": "Q13",
+      "lane": "guided",
+      "errors": []
+    },
+    {
+      "case": "Q14",
+      "lane": "guided",
+      "errors": []
+    },
+    {
+      "case": "Q15",
+      "lane": "guided",
+      "errors": []
+    },
+    {
+      "case": "Q16",
+      "lane": "guided",
+      "errors": []
+    },
+    {
+      "case": "Q17",
+      "lane": "guided",
+      "errors": []
+    },
+    {
+      "case": "Q18",
+      "lane": "guided",
+      "errors": []
+    },
+    {
+      "case": "Q20",
+      "lane": "guided",
+      "errors": []
+    },
+    {
+      "case": "Q21",
+      "lane": "guided",
+      "errors": []
+    },
+    {
+      "case": "Q22",
+      "lane": "guided",
+      "errors": []
+    },
+    {
+      "case": "Q23",
+      "lane": "guided",
+      "errors": []
+    },
+    {
+      "case": "Q24",
+      "lane": "guided",
+      "errors": []
+    },
+    {
+      "case": "Q25",
+      "lane": "guided",
+      "errors": []
+    },
+    {
+      "case": "Q26",
+      "lane": "guided",
+      "errors": []
+    },
+    {
+      "case": "Q27",
+      "lane": "guided",
+      "errors": []
+    },
+    {
+      "case": "Q28",
+      "lane": "guided",
+      "errors": []
+    },
+    {
+      "case": "Q30",
+      "lane": "guided",
+      "errors": []
+    },
+    {
+      "case": "Q31",
+      "lane": "guided",
+      "errors": []
+    },
+    {
+      "case": "Q32",
+      "lane": "guided",
+      "errors": []
+    },
+    {
+      "case": "Q33",
+      "lane": "guided",
+      "errors": []
+    },
+    {
+      "case": "Q34",
+      "lane": "guided",
+      "errors": []
+    },
+    {
+      "case": "Q35",
+      "lane": "guided",
+      "errors": []
+    },
+    {
+      "case": "Q36",
+      "lane": "guided",
+      "errors": []
+    },
+    {
+      "case": "Q37",
+      "lane": "guided",
+      "errors": []
+    },
+    {
+      "case": "Q38",
+      "lane": "guided",
+      "errors": []
+    },
+    {
+      "case": "Q39",
+      "lane": "guided",
+      "errors": []
+    },
+    {
+      "case": "Q40",
+      "lane": "guided",
+      "errors": []
+    }
+  ]
+}

@@ -1,0 +1,264 @@
+{
+  "before_runtime": "b3d964643bbfac8f9be51e02b06ba08e3b44b114",
+  "after_runtime": "43cc61b0fa0e6068a451c949f2403b99a79da58e",
+  "same_corpus": true,
+  "same_input_projector_replay_matched_native": true,
+  "changed": [
+    {
+      "id": "Q01",
+      "lane": "guided",
+      "before": [
+        {
+          "path_or_url": "docs/mcp-docs-server.md",
+          "snippet": "The normal flow is:\n\n```text\nget_docs_context(question, project_path)\n→ returned recommended_next_action? obtain confirmation and call that exact action\n→ if a job was returned, poll docs_status(job_id)\n→ retry the original bounded get_docs_context question\n```",
+          "line_start": 33,
+          "line_end": 40
+        },
+        {
+          "path_or_url": "docs/mcp-response-contract.md",
+          "snippet": "## Normal Docs MCP workflow\n\nThe normal Docs MCP flow is:\n\n```text\nget_docs_context(question, project_path)\n→ sufficient context? answer with sources and stop\n→ returned recommended_next_action? obtain confirmation if required and call that exact action\n→ if a job was returned, poll docs_status(job_id)\n→ preparation succeeded? retry the original bounded get_docs_context question\n```",
+          "line_start": 9,
+          "line_end": 19
+        }
+      ],
+      "after": [
+        {
+          "path_or_url": "docs/mcp-docs-server.md",
+          "snippet": "The normal flow is:\n\n```text\nget_docs_context(question, project_path)\n→ returned recommended_next_action? obtain confirmation and call that exact action\n→ if a job was returned, poll docs_status(job_id)\n→ retry the original bounded get_docs_context question\n```",
+          "line_start": 33,
+          "line_end": 40
+        },
+        {
+          "path_or_url": "README.md",
+          "snippet": "The contract is read-only. For an explicit health, freshness, index, or job-status request, agents use `docs_status`; otherwise they start with `get_docs_context`. Agents call `prepare_docs` only when that tool returns it as `next_action`, or when a user explicitly requests a refresh or sync.",
+          "line_start": 223,
+          "line_end": 223
+        },
+        {
+          "path_or_url": "docs/mcp-response-contract.md",
+          "snippet": "## Normal Docs MCP workflow\n\nThe normal Docs MCP flow is:\n\n```text\nget_docs_context(question, project_path)\n→ sufficient context? answer with sources and stop\n→ returned recommended_next_action? obtain confirmation if required and call that exact action\n→ if a job was returned, poll docs_status(job_id)\n→ preparation succeeded? retry the original bounded get_docs_context question\n```",
+          "line_start": 9,
+          "line_end": 19
+        }
+      ]
+    },
+    {
+      "id": "Q04",
+      "lane": "guided",
+      "before": [
+        {
+          "path_or_url": "wiki/Architecture.md",
+          "snippet": "Internally, project context retrieval is staged: documentation first, then bounded source evidence, repository map, and code graph only when deterministic unresolved-target or cross-module signals require them. A versioned routing record stores stage status/reason/count/bytes outside the canonical model projection. Repository maps remain navigation evidence and never become authoritative project policy.",
+          "line_start": 110,
+          "line_end": 110
+        }
+      ],
+      "after": [
+        {
+          "path_or_url": "wiki/Architecture.md",
+          "snippet": "Internally, project context retrieval is staged: documentation first, then bounded source evidence, repository map, and code graph only when deterministic unresolved-target or cross-module signals require them. A versioned routing record stores stage status/reason/count/bytes outside the canonical model projection. Repository maps remain navigation evidence and never become authoritative project policy.",
+          "line_start": 110,
+          "line_end": 110
+        },
+        {
+          "path_or_url": "docs/project-docs-mcp-workflow.md",
+          "snippet": "| Argument | Use |\n|---|---|\n| `module_path=\"services/auth\"` | Exact and unambiguous. Preferred for agent retries. |\n| `module=\"auth\"` | Exact module id/name lookup. May return `module_ambiguous`. |\n| `scope=\"module\"` | Restrict retrieval to module docs. A resolved module path also implies module scope. |\n| `scope=\"project\"` | Restrict retrieval to repo-level docs. |\n| `scope=\"all\"` | Search both repo-level and module docs. |",
+          "line_start": 116,
+          "line_end": 122
+        }
+      ]
+    },
+    {
+      "id": "Q09",
+      "lane": "guided",
+      "before": [
+        {
+          "path_or_url": "docs/project-docs-mcp-workflow.md",
+          "snippet": "For a clean committed Git snapshot it may return `prepare_docs(action=\"sync_project_docs\", plan_digest=...)`; preparation revalidates the whole worktree and `HEAD` before reconciling. Dirty or indeterminate state and semantic preflight risks require confirmation.",
+          "line_start": 44,
+          "line_end": 44
+        }
+      ],
+      "after": [
+        {
+          "path_or_url": "docs/project-docs-mcp-workflow.md",
+          "snippet": "For a clean committed Git snapshot it may return `prepare_docs(action=\"sync_project_docs\", plan_digest=...)`; preparation revalidates the whole worktree and `HEAD` before reconciling. Dirty or indeterminate state and semantic preflight risks require confirmation.",
+          "line_start": 44,
+          "line_end": 44
+        },
+        {
+          "path_or_url": "docs/mcp-docs-server.md",
+          "snippet": "For a repository question, call `get_docs_context` first. The call never reconciles the index itself. When committed project docs are stale or not yet indexed and the whole Git worktree is clean, the response returns a no-confirmation `prepare_docs(action=\"sync_project_docs\")` instruction bound to a preflight `plan_digest`. `prepare_docs` rechecks the clean worktree and accepted `HEAD` before mutation. Dirty or indeterminate Git state, placeholders, unsupported docs, config shadowing, and orphan pruning remain confirmation-gated.",
+          "line_start": 61,
+          "line_end": 61
+        }
+      ]
+    },
+    {
+      "id": "Q11",
+      "lane": "guided",
+      "before": [
+        {
+          "path_or_url": "docs/mcp-response-contract.md",
+          "snippet": "## Normal Docs MCP workflow\n\nThe normal Docs MCP flow is:\n\n```text\nget_docs_context(question, project_path)\n→ sufficient context? answer with sources and stop\n→ returned recommended_next_action? obtain confirmation if required and call that exact action\n→ if a job was returned, poll docs_status(job_id)\n→ preparation succeeded? retry the original bounded get_docs_context question\n```",
+          "line_start": 9,
+          "line_end": 19
+        }
+      ],
+      "after": [
+        {
+          "path_or_url": "docs/mcp-response-contract.md",
+          "snippet": "## Normal Docs MCP workflow\n\nThe normal Docs MCP flow is:\n\n```text\nget_docs_context(question, project_path)\n→ sufficient context? answer with sources and stop\n→ returned recommended_next_action? obtain confirmation if required and call that exact action\n→ if a job was returned, poll docs_status(job_id)\n→ preparation succeeded? retry the original bounded get_docs_context question\n```",
+          "line_start": 9,
+          "line_end": 19
+        },
+        {
+          "path_or_url": "docs/project-docs-mcp-workflow.md",
+          "snippet": "If approved, the coding agent should:\n\n1. inspect the codebase;\n2. write `ARCHITECTURE.md` as a normal repository file;\n3. call `get_docs_context` for the original question;\n4. run its returned `prepare_docs(action=\"sync_project_docs\")` action when requested;\n5. retry the original `get_docs_context(mode=\"project\")` question unchanged.\n\nDo not store generated architecture only in hidden memory. Official project knowledge should remain a file humans can review and edit.",
+          "line_start": 148,
+          "line_end": 156
+        }
+      ]
+    },
+    {
+      "id": "Q13",
+      "lane": "guided",
+      "before": [
+        {
+          "path_or_url": "docs/retrieval-boundaries.md",
+          "snippet": "The public `estimated_tokens` retains its compatible estimate: the ceiling of\ncanonical UTF-8 JSON bytes divided by four. Admission of `docs_context` separately\ntakes the maximum of that estimate and the pinned offline `o200k_base` token count\nover the entire canonical JSON, including metadata and optional locators, within\n800 tokens and three sources. Neither number promises the exact count of every\nclient model.\nDo not change the public estimate globally to simulate this internal admission\npolicy. A shorter snippet still must retain a qualified contiguous source span.",
+          "line_start": 23,
+          "line_end": 30
+        },
+        {
+          "path_or_url": "CONTRIBUTING.md",
+          "snippet": "The bounded `get_docs_context` result union is `docs_answer`, `docs_context`, `patch_context`, or `insufficient_evidence`. Preserve the conservative boundary: only narrow relation-specific proof may authorize `docs_answer`; broad onboarding, overview, and explanatory questions remain `docs_context`.",
+          "line_start": 38,
+          "line_end": 38
+        }
+      ],
+      "after": [
+        {
+          "path_or_url": "docs/retrieval-boundaries.md",
+          "snippet": "The public `estimated_tokens` retains its compatible estimate: the ceiling of\ncanonical UTF-8 JSON bytes divided by four. Admission of `docs_context` separately\ntakes the maximum of that estimate and the pinned offline `o200k_base` token count\nover the entire canonical JSON, including metadata and optional locators, within\n800 tokens and three sources. Neither number promises the exact count of every\nclient model.\nDo not change the public estimate globally to simulate this internal admission\npolicy. A shorter snippet still must retain a qualified contiguous source span.",
+          "line_start": 23,
+          "line_end": 30
+        },
+        {
+          "path_or_url": "CONTRIBUTING.md",
+          "snippet": "The bounded `get_docs_context` result union is `docs_answer`, `docs_context`, `patch_context`, or `insufficient_evidence`. Preserve the conservative boundary: only narrow relation-specific proof may authorize `docs_answer`; broad onboarding, overview, and explanatory questions remain `docs_context`.",
+          "line_start": 38,
+          "line_end": 38
+        },
+        {
+          "path_or_url": "wiki/Architecture.md",
+          "snippet": "## Context packs\n\nThe output of `doc-atlas query` is a compact context pack: the top matching sections, their heading paths, source URLs, version/timestamp metadata, and a token estimate. Each query also reports:\n\n- **Tokens saved** versus the raw full-page docs context\n- **Agentic runway multiplier** showing how much more context budget is available for actual work\n\nThis feedback loop makes the compression value visible on every query.",
+          "line_start": 57,
+          "line_end": 64
+        }
+      ]
+    },
+    {
+      "id": "Q15",
+      "lane": "guided",
+      "before": [
+        {
+          "path_or_url": "docs/source-continuation.md",
+          "snippet": "## Read only a missing part\n\nWhen spare space remains in the initial 800-token admission budget, a selected\nproject source may carry `source_uri`. This optional locator never displaces a\nselected snippet. Pass the exact returned URI to MCP `resources/read`; ordinary\nMarkdown links are citations, not continuation capabilities. The initial response\nstill contains at most three sources and retains its public token-estimate meaning.",
+          "line_start": 16,
+          "line_end": 22
+        },
+        {
+          "path_or_url": "docs/grounded-host-session.md",
+          "snippet": "The host reads the returned snippets and assesses whether a requested fact is\nsupported. `support(fact_id, evidence_id=..., quote=...)` accepts only a verbatim\nquote from retained evidence. A matching quote binds the judgment to a source;\nit does not prove that the quote logically answers the question. Semantic\nassessment remains the host's responsibility.",
+          "line_start": 16,
+          "line_end": 20
+        }
+      ],
+      "after": [
+        {
+          "path_or_url": "docs/source-continuation.md",
+          "snippet": "## Read only a missing part\n\nWhen spare space remains in the initial 800-token admission budget, a selected\nproject source may carry `source_uri`. This optional locator never displaces a\nselected snippet. Pass the exact returned URI to MCP `resources/read`; ordinary\nMarkdown links are citations, not continuation capabilities. The initial response\nstill contains at most three sources and retains its public token-estimate meaning.",
+          "line_start": 16,
+          "line_end": 22
+        },
+        {
+          "path_or_url": "docs/grounded-host-session.md",
+          "snippet": "The host reads the returned snippets and assesses whether a requested fact is\nsupported. `support(fact_id, evidence_id=..., quote=...)` accepts only a verbatim\nquote from retained evidence. A matching quote binds the judgment to a source;\nit does not prove that the quote logically answers the question. Semantic\nassessment remains the host's responsibility.",
+          "line_start": 16,
+          "line_end": 20
+        },
+        {
+          "path_or_url": "docs/grounded-host-session.md",
+          "snippet": "`answer_supported` remains false in all three states. A read failure cannot turn\nan existing partial answer into an empty refusal. The host should state the\nsupported part, explicitly name what is unknown and provide a feasible next\nstep or a necessary clarifying question. Unknown private configuration is never\ninferred from a general documentation quote.",
+          "line_start": 66,
+          "line_end": 70
+        }
+      ]
+    },
+    {
+      "id": "Q19",
+      "lane": "guided",
+      "before": [
+        {
+          "path_or_url": "docs/grounded-host-session.md",
+          "snippet": "`answer_supported` remains false in all three states. A read failure cannot turn\nan existing partial answer into an empty refusal. The host should state the\nsupported part, explicitly name what is unknown and provide a feasible next\nstep or a necessary clarifying question. Unknown private configuration is never\ninferred from a general documentation quote.",
+          "line_start": 66,
+          "line_end": 70
+        }
+      ],
+      "after": [
+        {
+          "path_or_url": "docs/grounded-host-session.md",
+          "snippet": "`answer_supported` remains false in all three states. A read failure cannot turn\nan existing partial answer into an empty refusal. The host should state the\nsupported part, explicitly name what is unknown and provide a feasible next\nstep or a necessary clarifying question. Unknown private configuration is never\ninferred from a general documentation quote.",
+          "line_start": 66,
+          "line_end": 70
+        },
+        {
+          "path_or_url": "docs/grounded-host-session.md",
+          "snippet": "## Partial answers and source reads\n\nDeclare one to three concrete facts to investigate before the first call. Call\n`GroundedMCPSession.start(client, arguments=..., requested_facts=...)` once.\nThe arguments are the normal `get_docs_context` arguments, including the original\nquestion, project path, scope and optional documentation-language lookups.\nThe adapter preserves the original question and never silently retries it.",
+          "line_start": 8,
+          "line_end": 14
+        }
+      ]
+    },
+    {
+      "id": "Q31",
+      "lane": "guided",
+      "before": [
+        {
+          "path_or_url": "README.md",
+          "snippet": "| Instead of | DocAtlas |\n|---|---|\n| Guessing from model memory or latest-only docs | Uses project-owned docs and version-bound dependency evidence |\n| Dumping whole pages into the prompt | Returns compact, server-bounded context |\n| Treating every retrieved chunk as trustworthy | Keeps source authority, provenance, scope, and version binding explicit |\n| Making up an answer when proof is missing | Fails closed when mandatory evidence is unavailable |",
+          "line_start": 29,
+          "line_end": 34
+        },
+        {
+          "path_or_url": "README.md",
+          "snippet": "## One-line install\n\nInstall `uv`, the `doc-atlas` CLI, and register the docs MCP server into your agent — in a single command:\n\n```bash\ncurl -LsSf https://raw.githubusercontent.com/Vanilla1999/DocAtlas/main/scripts/install.sh | sh\n```",
+          "line_start": 70,
+          "line_end": 76
+        }
+      ],
+      "after": [
+        {
+          "path_or_url": "README.md",
+          "snippet": "| Instead of | DocAtlas |\n|---|---|\n| Guessing from model memory or latest-only docs | Uses project-owned docs and version-bound dependency evidence |\n| Dumping whole pages into the prompt | Returns compact, server-bounded context |\n| Treating every retrieved chunk as trustworthy | Keeps source authority, provenance, scope, and version binding explicit |\n| Making up an answer when proof is missing | Fails closed when mandatory evidence is unavailable |",
+          "line_start": 29,
+          "line_end": 34
+        },
+        {
+          "path_or_url": "README.md",
+          "snippet": "## One-line install\n\nInstall `uv`, the `doc-atlas` CLI, and register the docs MCP server into your agent — in a single command:\n\n```bash\ncurl -LsSf https://raw.githubusercontent.com/Vanilla1999/DocAtlas/main/scripts/install.sh | sh\n```",
+          "line_start": 70,
+          "line_end": 76
+        },
+        {
+          "path_or_url": "docs/DOCMANCER_PRODUCT_BRIEF.md",
+          "snippet": "- Sync and retrieve local project documentation with citations.\n- Detect supported Python, Node/TypeScript, Dart/Flutter, Rust, Go, Java, and other project dependency metadata where available.\n- Resolve exact dependency versions only from repository evidence strong enough to prove the selected version; weaker declarations remain explicitly unbound or declared-only.",
+          "line_start": 57,
+          "line_end": 59
+        }
+      ]
+    }
+  ]
+}

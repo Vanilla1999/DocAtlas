@@ -1,0 +1,214 @@
+[
+  {
+    "id": "Q15",
+    "initial": {
+      "status": "ok",
+      "kind": "docs_context",
+      "context_status": "ready",
+      "context_available": true,
+      "answer_supported": false,
+      "answer_available": false,
+      "support_status": "retrieval_only",
+      "answer_policy": "cite_only",
+      "coverage_policy": "retrieval_attribution_only",
+      "query_coverage": "partial",
+      "retrieval_coverage": "partial",
+      "facet_coverage": "unverified",
+      "covered_query_ids": [
+        "query-anchor-1",
+        "query-lookup-1"
+      ],
+      "missing_query_ids": [
+        "query-original"
+      ],
+      "missing_facets": [],
+      "facets": [],
+      "sources": [
+        {
+          "evidence_id": "ev-0fed3501258bac9e",
+          "path_or_url": "docs/source-continuation.md",
+          "section": "Grounded partial answers and source continuation > Read only a missing part",
+          "snippet": "## Read only a missing part\n\nWhen spare space remains in the initial 800-token admission budget, a selected\nproject source may carry `source_uri`. This optional locator never displaces a\nselected snippet. Pass the exact returned URI to MCP `resources/read`; ordinary\nMarkdown links are citations, not continuation capabilities. The initial response\nstill contains at most three sources and retains its public token-estimate meaning.",
+          "version_binding": "unversioned",
+          "content_sha256": "89d99acbd7fef7cf51bcfd99e1b99903fd88df9f78087324b13764ce2713c348",
+          "project_identity": "git:github.com/Vanilla1999/DocAtlas",
+          "authority": "source_of_truth",
+          "scope": "module",
+          "line_start": 16,
+          "line_end": 22,
+          "source_uri": "docatlas://source/dc211b86557cf39284c61340"
+        },
+        {
+          "evidence_id": "ev-9c4e4bc207583e17",
+          "path_or_url": "docs/grounded-host-session.md",
+          "section": "Grounded host sessions over MCP > Partial answers and source reads",
+          "snippet": "The host reads the returned snippets and assesses whether a requested fact is\nsupported. `support(fact_id, evidence_id=..., quote=...)` accepts only a verbatim\nquote from retained evidence. A matching quote binds the judgment to a source;\nit does not prove that the quote logically answers the question. Semantic\nassessment remains the host's responsibility.",
+          "version_binding": "unversioned",
+          "content_sha256": "51d4ac03bfd81bcaca873455dd1c81acf7ec6f79e96985c220eba0d19bb974ad",
+          "project_identity": "git:github.com/Vanilla1999/DocAtlas",
+          "authority": "source_of_truth",
+          "scope": "module",
+          "line_start": 16,
+          "line_end": 20,
+          "source_uri": "docatlas://source/fadece6e5ebad41f25925cf7"
+        },
+        {
+          "evidence_id": "ev-d6821cc55bf2b657",
+          "path_or_url": "docs/grounded-host-session.md",
+          "section": "Grounded host sessions over MCP > Final handoff",
+          "snippet": "`answer_supported` remains false in all three states. A read failure cannot turn\nan existing partial answer into an empty refusal. The host should state the\nsupported part, explicitly name what is unknown and provide a feasible next\nstep or a necessary clarifying question. Unknown private configuration is never\ninferred from a general documentation quote.",
+          "version_binding": "unversioned",
+          "content_sha256": "0bc5fe3a2c1cfd53fa893d9108ef24da0c8d5b0234c3ba47ecb21d6b7e012c58",
+          "project_identity": "git:github.com/Vanilla1999/DocAtlas",
+          "authority": "source_of_truth",
+          "scope": "module",
+          "line_start": 66,
+          "line_end": 70,
+          "source_uri": "docatlas://source/e0ea86ebd0f8dbbcf7036581"
+        }
+      ],
+      "edit_ready": false,
+      "investigation_allowed": true,
+      "estimated_tokens": 787
+    },
+    "reads": [
+      {
+        "status": "truncated",
+        "path": "docs/source-continuation.md",
+        "project_identity": "git:github.com/Vanilla1999/DocAtlas",
+        "content_sha256": "sha256:00715dd09b8bcf6894ae65edaa0a5629c13e887887323724538968c2ea5b4a3a",
+        "line_start": 23,
+        "line_end": 53,
+        "snippet": "\nThe application reader starts immediately after the cited line range and returns\nat most 40 contiguous lines within 600 conservative tokens for the entire JSON.\nA `truncated` result may contain an opaque next `continuation`. The host controller\nallows at most two read attempts per question, across all sources (at most 1,200\nadditional admission tokens). The server separately limits each continuation chain\nto two reads. These are admission estimates, not measured provider token bills.\nStop on sufficient evidence, a repeated range, no new text, source failure, or the\nread limit. Keep the original snippets together with any accepted continuation.\nNew text alone does not prove that the missing fact was answered.\n\nReferences expire after ten minutes, are session-local, and may be evicted after\n128 references. Restart invalidates them. Each read checks repository identity,\nexplicit active catalog entry, authority, scope, active-index metadata, and the\noriginal full-file snapshot digest. Text is opened without following symlinks and\nis never fetched from the network. A changed snapshot returns `source_changed`;\nan unavailable, expired, or disallowed source returns `source_unavailable`.\nNeither result silently opens the latest file. Explain the missing fact and a\nconcrete next step instead of inventing an answer.\n\nThis initial reader supports explicit maintained project catalog entries on\nplatforms supporting safe POSIX directory-relative opening. Discovery-only and\nexternal-library citations remain usable evidence but do not promise this reader.\nA generic client must implement resource reading and the per-question host limit;\nit is not verified merely because it can list the resource template. The included\nhost adapter is a reference integration, not proof of any particular model's behavior.\n\n## Evidence delivery\n\nStructured-aware clients consume `structuredContent` once. Text-only clients can\nuse `DOCATLAS_MCP_TEXT_FALLBACK=1`; unsupported delivery must be diagnosed rather",
+        "continuation": "docatlas://source/6775f39a49c7a8c96a199ab1"
+      },
+      {
+        "status": "complete",
+        "path": "docs/source-continuation.md",
+        "project_identity": "git:github.com/Vanilla1999/DocAtlas",
+        "content_sha256": "sha256:00715dd09b8bcf6894ae65edaa0a5629c13e887887323724538968c2ea5b4a3a",
+        "line_start": 54,
+        "line_end": 69,
+        "snippet": "than treating a marker as evidence. Do not duplicate the complete payload across\nboth model-input channels. Engineering gates establish their tested boundaries. They do not establish\nunmeasured product guarantees or task-token savings. Keep any unsupported claim\nunproved unless a current authoritative source actually establishes it.\n\n\n### Job cancellation and bounded retry\n\nInspect a returned job with `docs_status(action=\"job\", job_id=...)`. A requested\ncancellation uses `prepare_docs(action=\"cancel_docs_job\", job_id=...)` and may\nreturn `cancelling`; this is an acknowledgement, not a terminal state. Poll the\nsame job with a bounded attempt/deadline policy. Terminal job statuses are\n`succeeded`, `partial`, `failed`, `cancelled`, and `interrupted`. A committing job\nmay be too late to cancel safely. Read the actual terminal result before deciding\nwhether to retry; never start an unbounded resubmit/poll loop. Retry the original\ndocumentation question after a successful preparation, preserving explicit scope.",
+        "continuation": null
+      }
+    ],
+    "method": "Post-hoc human-selected continuation via public handler and production reader in process; transport covered separately by stdio smoke. No model or code-search callback.",
+    "handoff": {
+      "status": "partial",
+      "known": [
+        {
+          "fact": "Как использовать возвращённый локатор?",
+          "quote": "Pass the exact returned URI",
+          "evidence_id": "ev-0fed3501258bac9e",
+          "path_or_url": "docs/source-continuation.md",
+          "line_start": 16,
+          "line_end": 22
+        }
+      ],
+      "missing": [
+        "Ссылка source_uri появилась в цитате. Нужно ли немедленно её открывать?"
+      ],
+      "answer_supported": false,
+      "assessment_owner": "host",
+      "next_step": null,
+      "stop_reason": "read_budget_exhausted"
+    }
+  },
+  {
+    "id": "Q16",
+    "initial": {
+      "status": "ok",
+      "kind": "docs_context",
+      "context_status": "ready",
+      "context_available": true,
+      "answer_supported": false,
+      "answer_available": false,
+      "support_status": "retrieval_only",
+      "answer_policy": "cite_only",
+      "coverage_policy": "retrieval_attribution_only",
+      "query_coverage": "full",
+      "retrieval_coverage": "full",
+      "facet_coverage": "unverified",
+      "covered_query_ids": [
+        "query-original",
+        "query-lookup-1"
+      ],
+      "missing_query_ids": [],
+      "missing_facets": [],
+      "facets": [],
+      "sources": [
+        {
+          "evidence_id": "ev-d1cb81e8a20f2de7",
+          "path_or_url": "docs/index-cleanup.md",
+          "section": "Cleaning DocAtlas index state safely",
+          "snippet": "`clear-index` supports exactly two scopes: `project-local` and `global`.\nQuarantine is the same-filesystem staging area used before final deletion so\nmoved targets can be restored if the move phase fails. In `clear-index`,\n`--allow-incomplete` acknowledges that reported unverified vector or cache\nstate will remain; it never bypasses live-process blockers or authorizes remote\ndeletion. `clear-index` deletes only derived SQLite, extracted-document, cache,\nand verified local vector state. `clear-index` preserves project sources,\n`docatlas.yaml`, configuration, and unrelated files.",
+          "version_binding": "unversioned",
+          "content_sha256": "41519994d695415ac912b4e34fe7b27722f0de50e65206f7bc4399b5b33321e6",
+          "project_identity": "git:github.com/Vanilla1999/DocAtlas",
+          "authority": "source_of_truth",
+          "scope": "project",
+          "line_start": 8,
+          "line_end": 15,
+          "source_uri": "docatlas://source/0bd38bfcee42f2a6b62fdc1a"
+        },
+        {
+          "evidence_id": "ev-0fed3501258bac9e",
+          "path_or_url": "docs/source-continuation.md",
+          "section": "Grounded partial answers and source continuation > Read only a missing part",
+          "snippet": "## Read only a missing part\n\nWhen spare space remains in the initial 800-token admission budget, a selected\nproject source may carry `source_uri`. This optional locator never displaces a\nselected snippet. Pass the exact returned URI to MCP `resources/read`; ordinary\nMarkdown links are citations, not continuation capabilities. The initial response\nstill contains at most three sources and retains its public token-estimate meaning.",
+          "version_binding": "unversioned",
+          "content_sha256": "89d99acbd7fef7cf51bcfd99e1b99903fd88df9f78087324b13764ce2713c348",
+          "project_identity": "git:github.com/Vanilla1999/DocAtlas",
+          "authority": "source_of_truth",
+          "scope": "module",
+          "line_start": 16,
+          "line_end": 22,
+          "source_uri": "docatlas://source/dc211b86557cf39284c61340"
+        }
+      ],
+      "edit_ready": false,
+      "investigation_allowed": true,
+      "estimated_tokens": 622
+    },
+    "reads": [
+      {
+        "status": "truncated",
+        "path": "docs/source-continuation.md",
+        "project_identity": "git:github.com/Vanilla1999/DocAtlas",
+        "content_sha256": "sha256:00715dd09b8bcf6894ae65edaa0a5629c13e887887323724538968c2ea5b4a3a",
+        "line_start": 23,
+        "line_end": 53,
+        "snippet": "\nThe application reader starts immediately after the cited line range and returns\nat most 40 contiguous lines within 600 conservative tokens for the entire JSON.\nA `truncated` result may contain an opaque next `continuation`. The host controller\nallows at most two read attempts per question, across all sources (at most 1,200\nadditional admission tokens). The server separately limits each continuation chain\nto two reads. These are admission estimates, not measured provider token bills.\nStop on sufficient evidence, a repeated range, no new text, source failure, or the\nread limit. Keep the original snippets together with any accepted continuation.\nNew text alone does not prove that the missing fact was answered.\n\nReferences expire after ten minutes, are session-local, and may be evicted after\n128 references. Restart invalidates them. Each read checks repository identity,\nexplicit active catalog entry, authority, scope, active-index metadata, and the\noriginal full-file snapshot digest. Text is opened without following symlinks and\nis never fetched from the network. A changed snapshot returns `source_changed`;\nan unavailable, expired, or disallowed source returns `source_unavailable`.\nNeither result silently opens the latest file. Explain the missing fact and a\nconcrete next step instead of inventing an answer.\n\nThis initial reader supports explicit maintained project catalog entries on\nplatforms supporting safe POSIX directory-relative opening. Discovery-only and\nexternal-library citations remain usable evidence but do not promise this reader.\nA generic client must implement resource reading and the per-question host limit;\nit is not verified merely because it can list the resource template. The included\nhost adapter is a reference integration, not proof of any particular model's behavior.\n\n## Evidence delivery\n\nStructured-aware clients consume `structuredContent` once. Text-only clients can\nuse `DOCATLAS_MCP_TEXT_FALLBACK=1`; unsupported delivery must be diagnosed rather",
+        "continuation": "docatlas://source/a3b22e9ce030cb94c13fc575"
+      }
+    ],
+    "method": "Post-hoc human-selected continuation via public handler and production reader in process; transport covered separately by stdio smoke. No model or code-search callback.",
+    "handoff": {
+      "status": "host_assessed_complete",
+      "known": [
+        {
+          "fact": "Как использовать возвращённый локатор?",
+          "quote": "Pass the exact returned URI",
+          "evidence_id": "ev-0fed3501258bac9e",
+          "path_or_url": "docs/source-continuation.md",
+          "line_start": 16,
+          "line_end": 22
+        },
+        {
+          "fact": "Can a continuation locator be used to read an unrelated file?",
+          "quote": "Each read checks repository identity,\nexplicit active catalog entry, authority, scope, active-index metadata, and the\noriginal full-file snapshot digest.",
+          "evidence_id": "read-1",
+          "path_or_url": "docs/source-continuation.md",
+          "line_start": 23,
+          "line_end": 53
+        }
+      ],
+      "missing": [],
+      "answer_supported": false,
+      "assessment_owner": "host",
+      "next_step": null,
+      "stop_reason": null
+    }
+  }
+]

@@ -17,6 +17,7 @@ from docmancer.docs.domain.project_query_intent import (
     mentions_docs_mcp_surface,
 )
 from docmancer.docs.domain.quality import query_requests_implementation_location
+from docmancer.docs.domain.technical_terms import extract_technical_terms
 
 
 _MAX_ALIASES = 4
@@ -193,6 +194,10 @@ def build_project_retrieval_aliases(
     specific_contract_request = _specific_contract_request(tokens)
     if specific_contract_request:
         return ()
+    if _has_phrase(normalized, "по умолчанию", "by default"):
+        topics = [term.raw for term in extract_technical_terms(source) if term.kind == "plain_term"]
+        if topics:
+            emit("default_behavior", True, f"{' '.join(topics[:2])} default")
     specific_technical_request = (
         any(_CODE_IDENTITY_RE.fullmatch(token) for token in raw_tokens)
         and _has(tokens, "require", "govern", "contract", "rule", "инвариант")

@@ -267,6 +267,12 @@ def _visible_term_present(term: str, text: str, *, exact: bool) -> bool:
     if re.search(rf"(?<!\w){re.escape(term)}{suffix}(?!\w)", text) is not None:
         return True
     if not exact and re.fullmatch(r"[a-z]+", term):
+        # Regular consonant-y inflection is lexical equivalence, not an
+        # identifier alias: retry/retried/retries, identity/identities.
+        stem = re.sub(r"(?:ied|ies|y)$", "", term)
+        if (stem != term and len(stem) >= 3 and stem[-1] not in 'aeiou'
+                and re.search(rf"(?<!\w){re.escape(stem)}(?:y|ied|ies)(?!\w)", text)):
+            return True
         base = re.sub(r"(?:ing|ed|es|s)$", "", term)
         if len(base) >= 4:
             return re.search(rf"(?<!\w){re.escape(base)}{suffix}(?!\w)", text) is not None

@@ -1,0 +1,31 @@
+{
+  "commit": "068e4fbe96d39e64707cd5ed7375e89b9a9a9ad6",
+  "scope": "map plus graph builders, same working tree and settings; native ABBA; concurrent validation may affect wall time; not whole task latency",
+  "rows": [
+    {
+      "shared": false,
+      "wall_seconds": 8.14107357100147,
+      "cpu_seconds": 8.140835503,
+      "output_sha256": "532c3f88225e0fc2abd0ea3e0f4fc4048f90a3471ef370336a605a376a161fd6"
+    },
+    {
+      "shared": true,
+      "wall_seconds": 4.51629562800008,
+      "cpu_seconds": 4.516013137,
+      "output_sha256": "532c3f88225e0fc2abd0ea3e0f4fc4048f90a3471ef370336a605a376a161fd6"
+    },
+    {
+      "shared": true,
+      "wall_seconds": 4.725992272997246,
+      "cpu_seconds": 4.7254025649999996,
+      "output_sha256": "532c3f88225e0fc2abd0ea3e0f4fc4048f90a3471ef370336a605a376a161fd6"
+    },
+    {
+      "shared": false,
+      "wall_seconds": 8.311817229001463,
+      "cpu_seconds": 8.310831841999999,
+      "output_sha256": "532c3f88225e0fc2abd0ea3e0f4fc4048f90a3471ef370336a605a376a161fd6"
+    }
+  ],
+  "identical_outputs": true
+}

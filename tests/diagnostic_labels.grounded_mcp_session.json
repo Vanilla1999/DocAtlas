@@ -1,0 +1,10 @@
+{
+  "schema_version": 1,
+  "module_labels": {
+    "tests/task_level/test_grounded_mcp_session.py": "behavioral"
+  },
+  "node_overrides": {},
+  "module_node_hashes": {
+    "tests/task_level/test_grounded_mcp_session.py": "bdbb526f984c0928445e45eb5b75386b2d35cd638409d19c245154e3891cf80b"
+  }
+}

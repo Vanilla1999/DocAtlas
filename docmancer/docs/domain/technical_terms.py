@@ -29,10 +29,37 @@ _SNAKE_RE = re.compile(r"(?<!\w)[A-Za-z][A-Za-z0-9]*_[A-Za-z0-9_]+(?!\w)")
 _CLI_COMMAND_RE = re.compile(r"(?<![\w-])[a-z][a-z0-9]*(?:-[a-z0-9]+)+(?![\w-])")
 _QUOTED_RE = re.compile(r"[`\"']([^`\"'\n]{2,160})[`\"']")
 
-_PROSE_HYPHEN_PREFIXES = (
-    "same-", "three-", "two-", "one-", "project-local", "production-",
-    "source-backed", "provider-free", "model-visible", "end-to-end",
+# A hyphen is ambiguous in ordinary prose. Bind unquoted command identities
+# to local command syntax instead of maintaining exceptions for known words.
+_COMMAND_PREFIX_RE = re.compile(
+    r"\b(?:run|execute|invoke|command|subcommand|executable|binary|"
+    r"запусти|запустить|выполни|выполнить|команда|команду|утилита|утилиту)"
+    r"\s+(?:(?:named|called)\s+)?$", re.I,
 )
+_COMMAND_SUFFIX_RE = re.compile(r"^\s+(?:command|subcommand|executable|binary)\b", re.I)
+
+
+def _explicit_command_context(source: str, start: int, end: int) -> bool:
+    before, after = source[:start], source[end:]
+    return bool(
+        not before.strip() and not after.strip(" ?.!\n\t")
+        or _COMMAND_PREFIX_RE.search(before) is not None
+        or _COMMAND_SUFFIX_RE.match(after) is not None
+        or re.match(r"^\s+--[A-Za-z]", after) is not None
+        # Preserve a named subject in an explicit action/inventory question.
+        # Unlike an attributive modifier, it occupies the entire subject slot.
+        or (
+            re.fullmatch(r"\s*(?:what|which(?:\s+\w+){1,3})\s+does\s+", before, re.I)
+            and re.match(r"^\s+(?:support|accept|delete|preserve|do|provide|expose)\b", after, re.I)
+        )
+        # A shaped option/API name scoped to a final named command is also
+        # explicit identity, even when the user omitted Markdown quoting.
+        or (
+            re.search(r"\b[A-Za-z][A-Za-z0-9]*_[A-Za-z0-9_]+\s+in\s+$", before)
+            and not after.strip(" ?.!\n\t")
+        )
+    )
+
 
 _IRREGULAR_SINGULARS = {
     "indices": "index",
@@ -293,9 +320,12 @@ def extract_technical_terms(question: str) -> tuple[TechnicalTerm, ...]:
         (_CLI_COMMAND_RE, "cli_command"),
     ):
         for match in pattern.finditer(source):
-            if kind == "cli_command" and match.group(0).casefold().startswith(_PROSE_HYPHEN_PREFIXES):
-                continue
-            add(match, kind)  # type: ignore[arg-type]
+            candidate_kind = kind
+            if kind == "cli_command" and not _explicit_command_context(source, *match.span()):
+                # Keep lexical recall without inferring a CLI identity from
+                # punctuation. This applies equally to prose and borrowed terms.
+                candidate_kind = "plain_term"
+            add(match, candidate_kind)  # type: ignore[arg-type]
 
     results: list[TechnicalTerm] = []
     seen: set[tuple[str, str]] = set()

@@ -6,16 +6,29 @@ The advertised runtime `ToolSpec` objects for the default Docs MCP surface are t
 
 ## Repository questions
 
-1. For documentation questions and coding or patch tasks, call `get_docs_context(project_path=..., question=..., mode="project")` before the first edit. The `question` is one concrete documentation question, not a surrounding benchmark, evaluation, or documentation-governance meta-question.
+1. For documentation questions and coding or patch tasks, call `get_docs_context(project_path=..., question=...)` before the first edit. The `question` is one concrete documentation question, not a surrounding benchmark, evaluation, or documentation-governance meta-question.
 2. If the user provides multiple independent questions, including a benchmark/evaluation list, make separate `get_docs_context` calls. `lookup_queries` may translate, paraphrase, or decompose facets of the same question only; they are not a batch channel for independent questions.
 3. Call `prepare_docs` only from `recommended_next_action`, or when the user explicitly requests documentation lifecycle work such as sync, refresh, index, or prefetch. After preparation succeeds, retry the original `get_docs_context` question unchanged.
 4. Use `docs_status` only for an explicit health, freshness, index, or background-job status request, or when `get_docs_context` returns it as `recommended_next_action`; it is not discovery.
 5. If the result is `docs_context`, answer only claims directly grounded in its returned sources, cite their paths, and do not claim complete or verified coverage; it never authorizes an edit. If the result is `insufficient_evidence`, do not claim documentation support. Follow at most one non-automatic `rephrase_question` recovery for parser/retrieval uncertainty; if it still fails and `hard_stop=false`, continue repository investigation with local source/tests while keeping the documentary claim unproved. Stop before an edit when `hard_stop=true` or when the task explicitly requires a documentary contract that remains unproved.
 6. For a free-form or compound documentation request, the host may provide up to five narrow `lookup_queries`, one concept per lookup, for that same question. `covered_query_ids` and `missing_query_ids` report retrieval coverage; `query_coverage="partial"` must not be presented as complete documentation coverage.
 
+## Answering from retrieved context
+
+For `docs_context`, false answer flags mean that the server has not certified an
+answer. The host may still synthesize claims directly supported by the snippets.
+Preserve useful partial answers, cite their sources, and name the concrete facts
+that remain unknown. Retrieval coverage is not semantic completeness.
+
+A source link is optional navigation. Neither a link nor false/unverified flags
+alone require opening a file. If a concrete requested fact is missing from an
+otherwise relevant excerpt, use an actually available bounded reader, with at
+most two extra reads. Stop when sufficient and never reload the same span. Do not
+invent a reader when the installed host does not expose one.
+
 ## Library and dependency questions
 
-Call `get_docs_context(question=..., library=..., version=..., mode="library")`.
+Call `get_docs_context(question=..., library=..., version=...)`.
 
 Network access is opt-in. If documentation must be fetched or refreshed, ask the user and then use the exact `prepare_docs` action returned by `get_docs_context`.
 

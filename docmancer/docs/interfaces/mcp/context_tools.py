@@ -1,6 +1,9 @@
 from __future__ import annotations
 
 from docmancer.docs.application.docs_context_projection import project_docs_context
+from docmancer.docs.application.source_continuation import (
+    bind_project_source_continuations,
+)
 from docmancer.docs.application.recovery import projection_recovery_action
 from copy import deepcopy
 from dataclasses import asdict, is_dataclass
@@ -391,7 +394,15 @@ def handle_context_tool(name: str, args: dict[str, Any], service: LibraryDocsSer
         if kind in {"docs_answer", "docs_context"}:
             selection_trace: dict[str, Any] = {}
             if kind == "docs_context":
-                projection, snapshot = project_docs_context(retrieval=raw, max_tokens=min(800, output_budget), selection_diagnostics=selection_trace)
+                source_root = str(args.get("project_path") or "")
+                reader = getattr(service, "source_reader", None)
+                if reader is not None and source_root:
+                    raw["_source_continuation_project_root"] = source_root
+                projection, snapshot = project_docs_context(
+                    retrieval=raw, max_tokens=min(800, output_budget), selection_diagnostics=selection_trace,
+                )
+                if reader is not None and source_root:
+                    bind_project_source_continuations(reader, source_root, projection, snapshot)
                 if not is_operational_recovery_action(recovery):
                     recovery = projection_recovery_action(
                         question, canonical_selection, projection=projection, retrieval=raw, request=args,

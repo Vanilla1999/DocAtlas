@@ -12,6 +12,19 @@ CONTRACT_SCHEMA = "docatlas-agent-contract-v1"
 PUBLIC_TOOL_ORDER = ("get_docs_context", "prepare_docs", "docs_status")
 
 WORKFLOW_POLICY: dict[str, Any] = {
+    "retrieval_only_answer": {
+        "synthesize_from_returned_snippets": True,
+        "false_answer_flags_mean": "no_server_certification",
+        "retrieval_full_proves_semantic_completeness": False,
+        "preserve_supported_partial_answer": True,
+        "name_concrete_missing_facts": True,
+        "source_link_requires_read": False,
+        "false_or_unverified_flags_require_read": False,
+        "continuation_requires": "concrete_missing_fact_and_available_bounded_reader",
+        "stop_when_sufficient": True,
+        "repeat_same_source_span": False,
+        "authorizes_edit": False,
+    },
     "first_call": {
         "tool": "get_docs_context",
         "for": ["documentation_question", "coding_task", "patch_task"],

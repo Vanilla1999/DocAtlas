@@ -277,6 +277,33 @@ documents:
     status: active
     impact: track
 
+  - path: docs/source-continuation.md
+    role: api_contract
+    scope: module
+    module_path: docmancer
+    description: Grounded partial answers, bounded resource continuation, snapshot binding, and host limits.
+    authority: source_of_truth
+    status: active
+    impact: track
+
+  - path: docs/grounded-host-session.md
+    role: api_contract
+    scope: module
+    module_path: docmancer
+    description: Python MCP host session, quoted partial answers, explicit source reads, and bounded local recovery.
+    authority: source_of_truth
+    status: active
+    impact: track
+
+  - path: docs/retrieval-boundaries.md
+    role: api_contract
+    scope: module
+    module_path: docmancer
+    description: Active lexical statistics, structural overflow, conservative admission, and request source facts.
+    authority: source_of_truth
+    status: active
+    impact: track
+
 roots:
   - path: docs
     scope: project

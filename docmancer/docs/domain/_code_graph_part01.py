@@ -81,6 +81,7 @@ def build_project_code_graph(
     max_files: int = 24,
     token_budget: int = 4000,
     include_unmatched: bool = False,
+    source_facts: Any = None,
 ) -> CodeGraph:
     root = Path(project_root).expanduser().resolve()
     if max_files <= 0 or token_budget <= 0 or not root.exists() or not root.is_dir():
@@ -92,6 +93,7 @@ def build_project_code_graph(
         max_files=max_files,
         token_budget=token_budget,
         include_unmatched=include_unmatched,
+        source_facts=source_facts,
     )
     all_paths = {str(item.get("path") or "") for item in facts if item.get("path")}
     nodes: list[CodeGraphNode] = []

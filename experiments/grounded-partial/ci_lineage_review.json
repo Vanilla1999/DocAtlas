@@ -1,0 +1,17 @@
+{
+  "failing_github_head": "fd97c31c20fc01ab0634c50d65a8813d1410fc80",
+  "cause": "Legacy observer compared pre-locator selected fields with post-locator projected source, dropping qualification despite unchanged evidence.",
+  "before_original_query_covered": 5,
+  "after_original_query_covered": 12,
+  "required_floor": 12,
+  "threshold_changed": false,
+  "tests": {
+    "red": "real SQLite source URI case lost original-query attribution",
+    "green_passed": 80,
+    "negative_controls": [
+      "changed snippet loses attribution",
+      "changed final URI loses attribution"
+    ]
+  },
+  "scope": "evaluation observer only; production evidence selection and audit40 payloads unchanged"
+}
