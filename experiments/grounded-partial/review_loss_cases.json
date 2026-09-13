@@ -1,8 +1,9 @@
 {
   "schema": "docatlas-review-losses-v1",
-  "execution_started_on_head": "0707aa520d9cae803a9bd0c977270c140d6bbf6d",
-  "runtime_commit": "7fd68da813e4a43ffbbe73433e9c3069a85b8a9a",
-  "runtime_tree": "c11b1abc82b1044a9426c633c07edcb0b088e372",
+  "review_started_on_head": "0707aa520d9cae803a9bd0c977270c140d6bbf6d",
+  "execution_started_on_head": "f330c141fcc26b98cd7fd8cffc3643bd3b55f604",
+  "runtime_commit": "4c6cc0540041ba10e2c0f4b9d0b8f80419723f23",
+  "runtime_tree": "d1a2d52a77f954f96fac6f3d411f32695ab18c42",
   "baseline_remote_commit": "c7ab9da06bd963599c46207aa7e06b303fde040e",
   "method": "Unchanged 40 questions and identical 131-document corpus; manual non-blinded evidence sufficiency, not model answers. Runtime edits committed unchanged after execution started. No model calls.",
   "questions_sha256": "34735190a1e140b47f6ec2ea7cf4fe2892090a967fd8c8b74ff9eeb5217818ba",
@@ -70,26 +71,27 @@
       "requirement": "Назвать get_docs_context, prepare_docs, docs_status; подготовка — prepare_docs.",
       "before": "none",
       "after": "partial",
-      "assessment": "Теперь видны get_docs_context и docs_status; prepare_docs и весь перечень пока отсутствуют.",
+      "assessment": "Теперь видны get_docs_context и prepare_docs; docs_status и весь перечень пока отсутствуют.",
       "evidence_changed": true,
       "before_sha256": "35f445935b7f9d94f6c49d7c7e853f661c5ee99238b5ae712f056482d8fbf16b",
-      "after_sha256": "0386233941e2ec9f294f7330f697fbed12b32ff36e810ad421c44156a27ad0fc",
-      "actual_tokens": 779,
+      "after_sha256": "5ea9f7eafd9fd671153ccaf473e4bfbf92275d7a8976f706ce416a91d92e0f50",
+      "actual_tokens": 790,
       "audit_errors": [],
       "native_observer_equal": null,
       "sources": [
         {
-          "evidence_id": "ev-8555f13ce0818b33",
-          "path_or_url": "docs/context7-docmancer-comparison.md",
-          "section": "DocAtlas MCP vs Context7 — comparison report > Product interpretation > DocAtlas MCP's best lane",
-          "snippet": "It is particularly valuable when:\n\n- the repository has README/docs/ADR/wiki that should guide the answer;\n- dependency versions matter;\n- private/local docs are involved;\n- the agent will ask many related docs questions during a coding task;\n- offline/reproducible docs context matters;\n- token budget needs to be managed explicitly.",
+          "evidence_id": "ev-5d64b19afd1decdd",
+          "path_or_url": "docs/project-docs-mcp-workflow.md",
+          "section": "Project docs MCP workflow > Creating `ARCHITECTURE.md`",
+          "snippet": "If approved, the coding agent should:\n\n1. inspect the codebase;\n2. write `ARCHITECTURE.md` as a normal repository file;\n3. call `get_docs_context` for the original question;\n4. run its returned `prepare_docs(action=\"sync_project_docs\")` action when requested;\n5. retry the original `get_docs_context(mode=\"project\")` question unchanged.\n\nDo not store generated architecture only in hidden memory. Official project knowledge should remain a file humans can review and edit.",
           "version_binding": "unversioned",
-          "content_sha256": "1d74f0146fbd906c3c5fef801f925123035baae50aac47342437f578b4ef4fb5",
+          "content_sha256": "76f19ca8ddc99b6f967ded6c79085688ed888b4d2d490eb1ba6ba2b057b9bcee",
           "project_identity": "git:github.com/Vanilla1999/DocAtlas",
-          "authority": "supporting",
+          "authority": "source_of_truth",
           "scope": "project",
-          "line_start": 224,
-          "line_end": 231
+          "line_start": 148,
+          "line_end": 156,
+          "source_uri": "docatlas://source/744bfe37840c666f475a1cd1"
         },
         {
           "evidence_id": "ev-fcb08545690a408c",
@@ -102,20 +104,22 @@
           "authority": "source_of_truth",
           "scope": "project",
           "line_start": 214,
-          "line_end": 221
+          "line_end": 221,
+          "source_uri": "docatlas://source/efd6830eda2d396adfcdb64f"
         },
         {
           "evidence_id": "ev-32f41c85e7d6a0ef",
           "path_or_url": "wiki/Architecture.md",
           "section": "Architecture > Docs MCP runtime",
-          "snippet": "For repository coding and patch tasks, agents call `get_docs_context(project_path=..., question=...)` first. Project reads return bounded `docs_context`; explicit changes return `patch_context`; absent safe evidence returns `insufficient_evidence`. Certified `docs_answer` is reserved for library, dependency, and mixed lanes. Operational retrieval excludes evaluation, planning, and history lanes unless explicitly requested. Follow a bounded `recommended_next_action` when reconciliation is needed, then retry the same request. `docs_status` is reserved for explicit health, freshness, index, and job-status requests.",
+          "snippet": "For repository coding and patch tasks, agents call `get_docs_context(project_path=..., question=...)` first.",
           "version_binding": "unversioned",
           "content_sha256": "d45f79d56e94fc635cc84e05381842de498a60b830e75de49f192f8f234812b4",
           "project_identity": "git:github.com/Vanilla1999/DocAtlas",
           "authority": "source_of_truth",
           "scope": "project",
           "line_start": 108,
-          "line_end": 108
+          "line_end": 108,
+          "source_uri": "docatlas://source/12ebd4c6f8cda95206fe5fe0"
         }
       ]
     },
@@ -195,56 +199,13 @@
       "requirement": "docatlas.project-docs.yaml определяет состав/авторитет документов; docatlas.yaml — runtime/index/retrieval.",
       "before": "full",
       "after": "full",
-      "assessment": "Содержание сверено вручную; прежняя достаточность сохраняется.",
-      "evidence_changed": true,
+      "assessment": "Прежняя оценка сохранена по совпадающим тексту и атрибуции.",
+      "evidence_changed": false,
       "before_sha256": "3fcc3e1c8a19e0a82109faa33fd446342bb6d464c436c90c0dbaf79815532f0a",
-      "after_sha256": "ce7157f579f6af4633a2c0aa0392c48ba9a64eafc0376ac2aa2c1c180bf07ef6",
-      "actual_tokens": 713,
+      "after_sha256": "3fcc3e1c8a19e0a82109faa33fd446342bb6d464c436c90c0dbaf79815532f0a",
+      "actual_tokens": 731,
       "audit_errors": [],
-      "native_observer_equal": null,
-      "sources": [
-        {
-          "evidence_id": "ev-cddc8b114bfee724",
-          "path_or_url": "wiki/Commands.md",
-          "section": "Commands > Advanced retrieval",
-          "snippet": "- `retrieval.hierarchical.enabled: true` switches the dispatcher to a two-stage retrieval: cast a wide net, aggregate scores by `document_title_hash`, pick the top `documents_limit` documents, then re-retrieve sections filtered to those documents.",
-          "version_binding": "unversioned",
-          "content_sha256": "47b66c8ee9a5f3af8bb16117ef5e86ea23ced701c7cda086dfe8e49b84d01e91",
-          "project_identity": "git:github.com/Vanilla1999/DocAtlas",
-          "authority": "source_of_truth",
-          "scope": "project",
-          "line_start": 129,
-          "line_end": 129,
-          "source_uri": "docatlas://source/baf4470c716b55b0988e1dda"
-        },
-        {
-          "evidence_id": "ev-42aab85940e49cc9",
-          "path_or_url": "wiki/Configuration.md",
-          "section": "Configuration",
-          "snippet": "Project documentation configuration for a repository is defined by the\nrepository's `docatlas.project-docs.yaml` catalog. Runtime index and retrieval\ndefaults remain in `docatlas.yaml`; the project-doc catalog defines which\nreviewable files are authoritative for project questions.",
-          "version_binding": "unversioned",
-          "content_sha256": "1e21073972f0a75fa878832ac38ede5a34433514b7f7db5108fc0ab1e38079e7",
-          "project_identity": "git:github.com/Vanilla1999/DocAtlas",
-          "authority": "source_of_truth",
-          "scope": "project",
-          "line_start": 7,
-          "line_end": 10,
-          "source_uri": "docatlas://source/590f6c01abc4ebacdfb9c96b"
-        },
-        {
-          "evidence_id": "ev-98acd471bea6d279",
-          "path_or_url": "wiki/Troubleshooting.md",
-          "section": "Troubleshooting > MCP packs > Path with `/` or `?` returns the wrong resource",
-          "snippet": "### Path with `/` or `?` returns the wrong resource\n\nThe HTTP executor percent-encodes path parameters as one segment, so values like branch names (`feat/x`) or S3 keys with slashes are sent as `feat%2Fx`. If your API expects multiple path segments from one parameter, the contract should declare separate parameters; otherwise the encoded value is correct.",
-          "version_binding": "unversioned",
-          "content_sha256": "14142d78dcea0831558b4efa20bdddde57bb7f4f8d01dcbdcd9ea47c30044b6a",
-          "project_identity": "git:github.com/Vanilla1999/DocAtlas",
-          "authority": "supporting",
-          "scope": "project",
-          "line_start": 137,
-          "line_end": 139
-        }
-      ]
+      "native_observer_equal": null
     },
     {
       "id": "Q09",
@@ -380,13 +341,29 @@
       "requirement": "Локальные lexical index/query работают без сети; загрузки внешних docs, моделей и облачные embeddings требуют доступных ресурсов/разрешений.",
       "before": "none",
       "after": "none",
-      "assessment": "Прежняя оценка сохранена по совпадающим тексту и атрибуции.",
-      "evidence_changed": false,
+      "assessment": "Содержание сверено вручную; прежняя достаточность сохраняется.",
+      "evidence_changed": true,
       "before_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
-      "after_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
-      "actual_tokens": 189,
+      "after_sha256": "0b1faf60f54cc9f6de6f94b20af51a4586b89dcc09d3d0db4af3dd63c7f2c25c",
+      "actual_tokens": 314,
       "audit_errors": [],
-      "native_observer_equal": null
+      "native_observer_equal": null,
+      "sources": [
+        {
+          "evidence_id": "ev-4ea4070129065ca3",
+          "path_or_url": "docs/index-cleanup.md",
+          "section": "Cleaning DocAtlas index state safely > Safety rules > Coordination with index writers",
+          "snippet": "### Coordination with index writers\n\nStorage mutation coordination is fail-closed: a project sync or library refresh registers a writer lease, while `clear-index` takes the cleanup barrier and refuses cleanup while any live writer lease exists.",
+          "version_binding": "unversioned",
+          "content_sha256": "eff4f5203f2ccc9f3eb01c5c56d8b57c9347f14a80937d975df903f1019be7ff",
+          "project_identity": "git:github.com/Vanilla1999/DocAtlas",
+          "authority": "source_of_truth",
+          "scope": "project",
+          "line_start": 102,
+          "line_end": 104,
+          "source_uri": "docatlas://source/2d0f3b311b7337aada92ae84"
+        }
+      ]
     },
     {
       "id": "Q17",
@@ -576,13 +553,29 @@
       "requirement": "Project identity и source-policy boundary исключают чужой проект до выдачи; одинаковый filename не даёт права пересекать scope.",
       "before": "none",
       "after": "none",
-      "assessment": "Прежняя оценка сохранена по совпадающим тексту и атрибуции.",
-      "evidence_changed": false,
+      "assessment": "Содержание сверено вручную; прежняя достаточность сохраняется.",
+      "evidence_changed": true,
       "before_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
-      "after_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
-      "actual_tokens": 194,
+      "after_sha256": "eda8c03bb10682c236d55f13480e53daaeddfc9b9ed994300ebb322ac8b17c4b",
+      "actual_tokens": 308,
       "audit_errors": [],
-      "native_observer_equal": null
+      "native_observer_equal": null,
+      "sources": [
+        {
+          "evidence_id": "ev-848245170f3a3e63",
+          "path_or_url": "CONTRIBUTING.md",
+          "section": "Contributing to DocAtlas",
+          "snippet": "# Contributing to DocAtlas\n\nThe product and CLI are named DocAtlas and `doc-atlas`; the Python import namespace remains `docmancer`.\n\nThank you for contributing! This guide covers project layout and common extension points.",
+          "version_binding": "unversioned",
+          "content_sha256": "51ae40c351fde63c630f269960dbc4adf1622499e93d9208bff13aa5f3b33b5c",
+          "project_identity": "git:github.com/Vanilla1999/DocAtlas",
+          "authority": "source_of_truth",
+          "scope": "project",
+          "line_start": 1,
+          "line_end": 5,
+          "source_uri": "docatlas://source/72c5a1d66b80d56ea173753c"
+        }
+      ]
     },
     {
       "id": "Q31",
@@ -828,26 +821,27 @@
       "requirement": "Назвать get_docs_context, prepare_docs, docs_status; подготовка — prepare_docs.",
       "before": "none",
       "after": "partial",
-      "assessment": "Теперь видны get_docs_context и docs_status; prepare_docs и весь перечень пока отсутствуют.",
+      "assessment": "Теперь видны get_docs_context и prepare_docs; docs_status и весь перечень пока отсутствуют.",
       "evidence_changed": true,
       "before_sha256": "35f445935b7f9d94f6c49d7c7e853f661c5ee99238b5ae712f056482d8fbf16b",
-      "after_sha256": "0386233941e2ec9f294f7330f697fbed12b32ff36e810ad421c44156a27ad0fc",
-      "actual_tokens": 779,
+      "after_sha256": "5ea9f7eafd9fd671153ccaf473e4bfbf92275d7a8976f706ce416a91d92e0f50",
+      "actual_tokens": 790,
       "audit_errors": [],
       "native_observer_equal": null,
       "sources": [
         {
-          "evidence_id": "ev-8555f13ce0818b33",
-          "path_or_url": "docs/context7-docmancer-comparison.md",
-          "section": "DocAtlas MCP vs Context7 — comparison report > Product interpretation > DocAtlas MCP's best lane",
-          "snippet": "It is particularly valuable when:\n\n- the repository has README/docs/ADR/wiki that should guide the answer;\n- dependency versions matter;\n- private/local docs are involved;\n- the agent will ask many related docs questions during a coding task;\n- offline/reproducible docs context matters;\n- token budget needs to be managed explicitly.",
+          "evidence_id": "ev-5d64b19afd1decdd",
+          "path_or_url": "docs/project-docs-mcp-workflow.md",
+          "section": "Project docs MCP workflow > Creating `ARCHITECTURE.md`",
+          "snippet": "If approved, the coding agent should:\n\n1. inspect the codebase;\n2. write `ARCHITECTURE.md` as a normal repository file;\n3. call `get_docs_context` for the original question;\n4. run its returned `prepare_docs(action=\"sync_project_docs\")` action when requested;\n5. retry the original `get_docs_context(mode=\"project\")` question unchanged.\n\nDo not store generated architecture only in hidden memory. Official project knowledge should remain a file humans can review and edit.",
           "version_binding": "unversioned",
-          "content_sha256": "1d74f0146fbd906c3c5fef801f925123035baae50aac47342437f578b4ef4fb5",
+          "content_sha256": "76f19ca8ddc99b6f967ded6c79085688ed888b4d2d490eb1ba6ba2b057b9bcee",
           "project_identity": "git:github.com/Vanilla1999/DocAtlas",
-          "authority": "supporting",
+          "authority": "source_of_truth",
           "scope": "project",
-          "line_start": 224,
-          "line_end": 231
+          "line_start": 148,
+          "line_end": 156,
+          "source_uri": "docatlas://source/744bfe37840c666f475a1cd1"
         },
         {
           "evidence_id": "ev-fcb08545690a408c",
@@ -860,20 +854,22 @@
           "authority": "source_of_truth",
           "scope": "project",
           "line_start": 214,
-          "line_end": 221
+          "line_end": 221,
+          "source_uri": "docatlas://source/efd6830eda2d396adfcdb64f"
         },
         {
           "evidence_id": "ev-32f41c85e7d6a0ef",
           "path_or_url": "wiki/Architecture.md",
           "section": "Architecture > Docs MCP runtime",
-          "snippet": "For repository coding and patch tasks, agents call `get_docs_context(project_path=..., question=...)` first. Project reads return bounded `docs_context`; explicit changes return `patch_context`; absent safe evidence returns `insufficient_evidence`. Certified `docs_answer` is reserved for library, dependency, and mixed lanes. Operational retrieval excludes evaluation, planning, and history lanes unless explicitly requested. Follow a bounded `recommended_next_action` when reconciliation is needed, then retry the same request. `docs_status` is reserved for explicit health, freshness, index, and job-status requests.",
+          "snippet": "For repository coding and patch tasks, agents call `get_docs_context(project_path=..., question=...)` first.",
           "version_binding": "unversioned",
           "content_sha256": "d45f79d56e94fc635cc84e05381842de498a60b830e75de49f192f8f234812b4",
           "project_identity": "git:github.com/Vanilla1999/DocAtlas",
           "authority": "source_of_truth",
           "scope": "project",
           "line_start": 108,
-          "line_end": 108
+          "line_end": 108,
+          "source_uri": "docatlas://source/12ebd4c6f8cda95206fe5fe0"
         }
       ]
     },
@@ -953,56 +949,13 @@
       "requirement": "docatlas.project-docs.yaml определяет состав/авторитет документов; docatlas.yaml — runtime/index/retrieval.",
       "before": "full",
       "after": "full",
-      "assessment": "Содержание сверено вручную; прежняя достаточность сохраняется.",
-      "evidence_changed": true,
+      "assessment": "Прежняя оценка сохранена по совпадающим тексту и атрибуции.",
+      "evidence_changed": false,
       "before_sha256": "3fcc3e1c8a19e0a82109faa33fd446342bb6d464c436c90c0dbaf79815532f0a",
-      "after_sha256": "ce7157f579f6af4633a2c0aa0392c48ba9a64eafc0376ac2aa2c1c180bf07ef6",
-      "actual_tokens": 713,
+      "after_sha256": "3fcc3e1c8a19e0a82109faa33fd446342bb6d464c436c90c0dbaf79815532f0a",
+      "actual_tokens": 731,
       "audit_errors": [],
-      "native_observer_equal": null,
-      "sources": [
-        {
-          "evidence_id": "ev-cddc8b114bfee724",
-          "path_or_url": "wiki/Commands.md",
-          "section": "Commands > Advanced retrieval",
-          "snippet": "- `retrieval.hierarchical.enabled: true` switches the dispatcher to a two-stage retrieval: cast a wide net, aggregate scores by `document_title_hash`, pick the top `documents_limit` documents, then re-retrieve sections filtered to those documents.",
-          "version_binding": "unversioned",
-          "content_sha256": "47b66c8ee9a5f3af8bb16117ef5e86ea23ced701c7cda086dfe8e49b84d01e91",
-          "project_identity": "git:github.com/Vanilla1999/DocAtlas",
-          "authority": "source_of_truth",
-          "scope": "project",
-          "line_start": 129,
-          "line_end": 129,
-          "source_uri": "docatlas://source/baf4470c716b55b0988e1dda"
-        },
-        {
-          "evidence_id": "ev-42aab85940e49cc9",
-          "path_or_url": "wiki/Configuration.md",
-          "section": "Configuration",
-          "snippet": "Project documentation configuration for a repository is defined by the\nrepository's `docatlas.project-docs.yaml` catalog. Runtime index and retrieval\ndefaults remain in `docatlas.yaml`; the project-doc catalog defines which\nreviewable files are authoritative for project questions.",
-          "version_binding": "unversioned",
-          "content_sha256": "1e21073972f0a75fa878832ac38ede5a34433514b7f7db5108fc0ab1e38079e7",
-          "project_identity": "git:github.com/Vanilla1999/DocAtlas",
-          "authority": "source_of_truth",
-          "scope": "project",
-          "line_start": 7,
-          "line_end": 10,
-          "source_uri": "docatlas://source/590f6c01abc4ebacdfb9c96b"
-        },
-        {
-          "evidence_id": "ev-98acd471bea6d279",
-          "path_or_url": "wiki/Troubleshooting.md",
-          "section": "Troubleshooting > MCP packs > Path with `/` or `?` returns the wrong resource",
-          "snippet": "### Path with `/` or `?` returns the wrong resource\n\nThe HTTP executor percent-encodes path parameters as one segment, so values like branch names (`feat/x`) or S3 keys with slashes are sent as `feat%2Fx`. If your API expects multiple path segments from one parameter, the contract should declare separate parameters; otherwise the encoded value is correct.",
-          "version_binding": "unversioned",
-          "content_sha256": "14142d78dcea0831558b4efa20bdddde57bb7f4f8d01dcbdcd9ea47c30044b6a",
-          "project_identity": "git:github.com/Vanilla1999/DocAtlas",
-          "authority": "supporting",
-          "scope": "project",
-          "line_start": 137,
-          "line_end": 139
-        }
-      ]
+      "native_observer_equal": null
     },
     {
       "id": "Q09",
@@ -1138,13 +1091,29 @@
       "requirement": "Локальные lexical index/query работают без сети; загрузки внешних docs, моделей и облачные embeddings требуют доступных ресурсов/разрешений.",
       "before": "none",
       "after": "none",
-      "assessment": "Прежняя оценка сохранена по совпадающим тексту и атрибуции.",
-      "evidence_changed": false,
+      "assessment": "Содержание сверено вручную; прежняя достаточность сохраняется.",
+      "evidence_changed": true,
       "before_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
-      "after_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
-      "actual_tokens": 189,
+      "after_sha256": "0b1faf60f54cc9f6de6f94b20af51a4586b89dcc09d3d0db4af3dd63c7f2c25c",
+      "actual_tokens": 314,
       "audit_errors": [],
-      "native_observer_equal": null
+      "native_observer_equal": null,
+      "sources": [
+        {
+          "evidence_id": "ev-4ea4070129065ca3",
+          "path_or_url": "docs/index-cleanup.md",
+          "section": "Cleaning DocAtlas index state safely > Safety rules > Coordination with index writers",
+          "snippet": "### Coordination with index writers\n\nStorage mutation coordination is fail-closed: a project sync or library refresh registers a writer lease, while `clear-index` takes the cleanup barrier and refuses cleanup while any live writer lease exists.",
+          "version_binding": "unversioned",
+          "content_sha256": "eff4f5203f2ccc9f3eb01c5c56d8b57c9347f14a80937d975df903f1019be7ff",
+          "project_identity": "git:github.com/Vanilla1999/DocAtlas",
+          "authority": "source_of_truth",
+          "scope": "project",
+          "line_start": 102,
+          "line_end": 104,
+          "source_uri": "docatlas://source/2d0f3b311b7337aada92ae84"
+        }
+      ]
     },
     {
       "id": "Q17",
@@ -1334,13 +1303,29 @@
       "requirement": "Project identity и source-policy boundary исключают чужой проект до выдачи; одинаковый filename не даёт права пересекать scope.",
       "before": "none",
       "after": "none",
-      "assessment": "Прежняя оценка сохранена по совпадающим тексту и атрибуции.",
-      "evidence_changed": false,
+      "assessment": "Содержание сверено вручную; прежняя достаточность сохраняется.",
+      "evidence_changed": true,
       "before_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
-      "after_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
-      "actual_tokens": 194,
+      "after_sha256": "eda8c03bb10682c236d55f13480e53daaeddfc9b9ed994300ebb322ac8b17c4b",
+      "actual_tokens": 308,
       "audit_errors": [],
-      "native_observer_equal": null
+      "native_observer_equal": null,
+      "sources": [
+        {
+          "evidence_id": "ev-848245170f3a3e63",
+          "path_or_url": "CONTRIBUTING.md",
+          "section": "Contributing to DocAtlas",
+          "snippet": "# Contributing to DocAtlas\n\nThe product and CLI are named DocAtlas and `doc-atlas`; the Python import namespace remains `docmancer`.\n\nThank you for contributing! This guide covers project layout and common extension points.",
+          "version_binding": "unversioned",
+          "content_sha256": "51ae40c351fde63c630f269960dbc4adf1622499e93d9208bff13aa5f3b33b5c",
+          "project_identity": "git:github.com/Vanilla1999/DocAtlas",
+          "authority": "source_of_truth",
+          "scope": "project",
+          "line_start": 1,
+          "line_end": 5,
+          "source_uri": "docatlas://source/72c5a1d66b80d56ea173753c"
+        }
+      ]
     },
     {
       "id": "Q31",

@@ -91,3 +91,75 @@ def test_independent_lookup_cannot_drop_a_required_acronym():
         'query_id': lookup.query_id, 'text': question, 'origin': 'host_lookup', 'relation': 'host_lookup',
     }]})
     assert not independent.get(lookup.query_id, {}).get('qualified')
+
+
+@pytest.mark.parametrize('boundary', ['dominated', 'other_source', 'different_public_direction', 'incomparable'])
+def test_heading_boost_cannot_replace_strictly_richer_same_source_body(boundary):
+    from dataclasses import dataclass, field
+    from docmancer.docs.domain.project_doc_ranking import rerank_project_doc_chunks
+    from docmancer.docs.domain.project_query_intent import classify_project_query_intent
+
+    @dataclass
+    class Chunk:
+        content: str
+        heading_path: str
+        score: float
+        metadata: dict = field(default_factory=dict)
+        path: str = 'docs/storage.md'
+
+    question = 'How does storage retention remove expired records?'
+    def candidate(body, heading, score):
+        trace = qualify_evidence({'query_terms': ['storage', 'retention', 'remove', 'expired', 'records'],
+            'exact_terms': []}, query_id='query-original', visible_text=body, evidence_text=body).trace
+        return Chunk(body, heading, score, {'retrieval_query_matches': {'query-original': trace}})
+    overview = candidate('Storage retention keeps records.', 'Storage retention records', 10)
+    witness = candidate('Storage retention will remove expired records.', 'Operation', 1)
+    if boundary == 'other_source':
+        witness.path = 'docs/other.md'
+    elif boundary == 'different_public_direction':
+        overview.metadata['retrieval_query_matches']['query-lookup-1'] = {'qualified': True}
+    elif boundary == 'incomparable':
+        witness = candidate('Retention will remove expired records.', 'Operation', 1)
+    result = rerank_project_doc_chunks([overview, witness], question=question,
+        intent=classify_project_query_intent(question), limit=1)
+    assert result[0].content == (witness if boundary == 'dominated' else overview).content
+
+
+def test_partial_body_support_does_not_depend_on_original_discovery_route():
+    question = 'Explain storage compression and identify our private deployment configuration.'
+    body = 'Storage compression reduces disk usage.'
+    retrieval = {'question': question, 'context_pack': [{
+        'source_class': 'project_doc', 'path': 'docs/storage.md', 'content': body,
+        'project_identity': 'repo', 'authority': 'source_of_truth', 'doc_scope': 'project',
+        'lifecycle_status': 'active', 'index_freshness': 'synchronized',
+        'retrieval_query_matches': {'query-hint-1': {
+            'qualified': True, 'query_text': 'storage', 'query_terms': ['storage']}},
+    }], 'documentation_query_plan': {'original_question': question,
+        'unresolved_parts': ['private deployment configuration'],
+        'queries': [{'query_id': 'query-original', 'text': question, 'origin': 'original'},
+                    {'query_id': 'query-hint-1', 'text': 'storage', 'origin': 'retrieval_hint'}]}}
+    payload, _ = project_docs_context(retrieval=retrieval)
+    assert any(row['snippet'] == body for row in payload.get('sources', []))
+    assert payload['answer_supported'] is False
+    assert 'query-original' not in payload['covered_query_ids']
+
+
+def test_partial_projection_preserves_distinguishing_body_within_budget():
+    question = 'Which signal distinguishes cancelling a job from a normal finish? Also describe our private deployment.'
+    witness = 'Cancelling a job emits the STOPPED signal; a normal finish is silent.'
+    def source(body, heading):
+        return {'source_class': 'project_doc', 'path': 'docs/jobs.md', 'content': body,
+            'heading_path': heading, 'project_identity': 'repo', 'authority': 'source_of_truth',
+            'doc_scope': 'project', 'lifecycle_status': 'active', 'index_freshness': 'synchronized',
+            'retrieval_query_matches': {'query-hint-1': {
+                'qualified': True, 'query_text': 'finish', 'query_terms': ['finish']}}}
+    payload, _ = project_docs_context(max_tokens=400, retrieval={
+        'question': question, 'context_pack': [
+            source('A normal finish closes the job.', question),
+            source(witness, 'Cancellation'),
+        ], 'documentation_query_plan': {'original_question': question,
+            'unresolved_parts': ['private deployment'], 'queries': [
+                {'query_id': 'query-original', 'text': question, 'origin': 'original'},
+                {'query_id': 'query-hint-1', 'text': 'finish', 'origin': 'retrieval_hint'}]}})
+    assert any('STOPPED' in row['snippet'] for row in payload.get('sources', []))
+    assert not payload['answer_supported']

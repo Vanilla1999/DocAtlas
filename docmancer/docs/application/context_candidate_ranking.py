@@ -9,7 +9,7 @@ from docmancer.docs.domain.context_windows import _query_terms
 from docmancer.docs.domain.project_doc_ranking import project_question_lane, project_source_lane, condition_lead_priority
 from docmancer.docs.domain.answer_units import extract_answer_units, _NEGATION_RE
 from docmancer.docs.domain.normative_language import _FORBIDDEN_RE
-from docmancer.docs.domain.evidence_qualification import _visible_term_present
+from docmancer.docs.domain.evidence_qualification import _visible_term_present, qualify_evidence
 
 
 def _context_rank(
@@ -94,6 +94,7 @@ def _facet_aware_candidates(
     bound_assigned_evidence_ids: set[str] | None = None,
     exact_query_ids: set[str] | None = None,
     host_query_ids: set[str] | None = None,
+    fallback_query_ids: set[str] | None = None,
     obligations: tuple[Any, ...] = (), missing_component_ids: set[str] | None = None,
 ) -> list[Any]:
     # Audited directions break public-coverage ties; they are not public queries.
@@ -167,7 +168,33 @@ def _facet_aware_candidates(
             rank[1:3] + rank[5:],
         )
 
-    return sorted(candidates, key=candidate_key, reverse=True)
+    ranked = sorted(candidates, key=candidate_key, reverse=True)
+    if not fallback_query_ids:
+        return ranked
+    # Partial context has no qualified public direction to break a tie. Within
+    # one source, prefer a strict superset of original-question body matches;
+    # a heading or extra discovery hint must not consume its bounded slot.
+    # This changes order only, never qualification or certified coverage.
+    facts = {}
+    for source in ranked:
+        ids = qualified_query_ids((source,))
+        if ids & required_query_ids or not ids & fallback_query_ids:
+            continue
+        body = str(source.get('snippet') or source.get('content') or '')
+        trace = qualify_evidence({'query_text': query_text.get('query-original', '')},
+            query_id='query-original', visible_text=body, evidence_text=body).trace
+        facts[id(source)] = (
+            str(source.get('path_or_url') or source.get('path') or source.get('source') or ''),
+            candidate_key(source)[:9], set(trace.get('body_matched_terms') or ()),
+        )
+    for index in range(len(ranked)):
+        best = index
+        for other in range(index + 1, len(ranked)):
+            left, right = facts.get(id(ranked[other])), facts.get(id(ranked[best]))
+            if left and right and left[:2] == right[:2] and right[2] < left[2]:
+                best = other
+        ranked.insert(index, ranked.pop(best))
+    return ranked
 
 
 def _fully_matched_query_ids(sources: Any) -> set[str]:

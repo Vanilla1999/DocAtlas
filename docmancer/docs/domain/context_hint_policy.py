@@ -3,6 +3,7 @@ from __future__ import annotations
 import re
 from typing import Any
 from docmancer.docs.domain.project_retrieval_intent import _specific_contract_request, _tokens
+from docmancer.docs.domain.evidence_qualification import qualify_evidence
 
 
 def fallback_context_query_ids(plan: dict[str, Any], retrieval: dict[str, Any], eligible_ids: set[str]) -> set[str]:
@@ -31,7 +32,7 @@ def fallback_context_query_ids(plan: dict[str, Any], retrieval: dict[str, Any], 
             and re.search(r'(?<!\w)' + re.escape(str(q['text']).strip()) + r'(?!\w)', question, re.I)}
 
 
-def has_context_hint_support(source: dict[str, Any]) -> bool:
+def has_context_hint_support(source: dict[str, Any], *, question: str = '') -> bool:
     """A lone subject/name hit cannot rescue an otherwise unqualified question.
 
     Use the existing body-only lexical facts, recomputed by the projector, not
@@ -39,5 +40,12 @@ def has_context_hint_support(source: dict[str, Any]) -> bool:
     This is a conservative preference floor; it never certifies the question.
     """
     trace = (source.get("retrieval_query_matches") or {}).get("query-original") or {}
+    if not trace and question:
+        # A candidate discovered only by a hint has no original-query trace.
+        # Recompute body facts for this preference without adding query coverage
+        # or weakening the independent policy/qualification admission checks.
+        body = str(source.get('snippet') or '')
+        trace = qualify_evidence({'query_text': question}, query_id='query-original',
+            visible_text=body, evidence_text=body).trace
     terms = {str(term).strip().casefold() for term in trace.get("body_matched_terms") or ()}
     return len(terms - {""}) >= 2

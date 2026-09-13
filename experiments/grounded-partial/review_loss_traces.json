@@ -833,5 +833,1098 @@
         }
       ]
     }
+  },
+  {
+    "id": "pydantic-01",
+    "before_runtime": "19255e156f1c05aa27d35664321f7de1d3522534",
+    "after_runtime": "4c6cc0540041ba10e2c0f4b9d0b8f80419723f23",
+    "purpose": "Followup review: preserve complete and partial evidence, not merely aggregate sufficiency.",
+    "before": {
+      "query_window": [
+        {
+          "path": "docs/concepts/strict_mode.md",
+          "snippet_sha256": "85dc6d94807b544337771479d954f836077ac6c7725c37d0cd1b3fd140308069",
+          "snippet_start": "However, there are also situations where this is not desirable, and you want Pydantic to error instead of coercing data.\n\nTo better support this use case, Pydantic provides a \"stri",
+          "query_matches": {
+            "query-original": {
+              "qualified": true,
+              "match_ratio": 0.75,
+              "body_matched_terms": [
+                "strict",
+                "mode",
+                "enabled",
+                "instead",
+                "coercing",
+                "type"
+              ]
+            }
+          }
+        },
+        {
+          "path": "docs/concepts/strict_mode.md",
+          "snippet_sha256": "63232c29858ee13de04f361dd3fa052b77168392a2422e6e939c1c10feb3857d",
+          "snippet_start": "## Strict mode with `Annotated[..., Strict()]`\n\n??? api \"API Documentation\"\n    [`pydantic.types.Strict`][pydantic.types.Strict]<br>\n\nPydantic also provides the [`Strict`](../api/t",
+          "query_matches": {
+            "query-hint-2": {
+              "qualified": true,
+              "match_ratio": 1.0,
+              "body_matched_terms": [
+                "strict"
+              ]
+            }
+          }
+        },
+        {
+          "path": "docs/concepts/strict_mode.md",
+          "snippet_sha256": "e5d98e44383ef09a59ec15d4887cebe14cb973cf12ed24318b4f10fb0c16caa2",
+          "snippet_start": "(This is also the case for dataclasses and `TypedDict`.)\n\nIf this is undesirable, you should make sure that strict mode is enabled for all the types involved.\nFor example, this can",
+          "query_matches": {
+            "query-original": {
+              "qualified": true,
+              "match_ratio": 0.5,
+              "body_matched_terms": [
+                "strict",
+                "mode",
+                "enabled",
+                "type"
+              ]
+            }
+          }
+        },
+        {
+          "path": "docs/concepts/strict_mode.md",
+          "snippet_sha256": "a4887ab4cce06580894f44a68d6423db766a0fde9fa89cdec6269657e3c49d08",
+          "snippet_start": "This is, in fact, the method used to implement some of the strict-out-of-the-box types provided by Pydantic,\nsuch as [`StrictInt`](../api/types.md#pydantic.types.StrictInt).\n\n",
+          "query_matches": {
+            "query-hint-2": {
+              "qualified": true,
+              "match_ratio": 1.0,
+              "body_matched_terms": [
+                "strict"
+              ]
+            }
+          }
+        },
+        {
+          "path": "docs/concepts/strict_mode.md",
+          "snippet_sha256": "b24a7cbecb7249f710a883eedc309356528f69859a6ed547e002b7a32962e36e",
+          "snippet_start": "For more details about what types are allowed as inputs in strict mode, you can review the\n[Conversion Table](conversion_table.md).\n\n",
+          "query_matches": {
+            "query-hint-3": {
+              "qualified": true,
+              "match_ratio": 1.0,
+              "body_matched_terms": [
+                "mode"
+              ]
+            },
+            "query-hint-1": {
+              "qualified": false,
+              "match_ratio": 1.0,
+              "body_matched_terms": null
+            }
+          }
+        },
+        {
+          "path": "docs/concepts/strict_mode.md",
+          "snippet_sha256": "784dc8f0b616fc8b5f7db9e180b209348266a829416bb4e135338a8b55244850",
+          "snippet_start": "```python\nfrom typing_extensions import Annotated\n\nfrom pydantic import BaseModel, Strict, ValidationError\n\n\nclass User(BaseModel):\n    name: str\n    age: int\n    is_active: Annota",
+          "query_matches": {
+            "query-hint-2": {
+              "qualified": true,
+              "match_ratio": 1.0,
+              "body_matched_terms": [
+                "strict"
+              ]
+            }
+          }
+        },
+        {
+          "path": "docs/concepts/strict_mode.md",
+          "snippet_sha256": "ab8106809f56bbe36200695de3fa853ea930b5e8947b1ea6ac76e03fd8dfa51a",
+          "snippet_start": "## Type coercions in strict mode\n\nFor most types, when validating data from python in strict mode, only the instances of the exact types are accepted.\nFor example, when validating ",
+          "query_matches": {
+            "query-hint-3": {
+              "qualified": true,
+              "match_ratio": 1.0,
+              "body_matched_terms": [
+                "mode"
+              ]
+            }
+          }
+        },
+        {
+          "path": "docs/concepts/strict_mode.md",
+          "snippet_sha256": "369ed62426e6e0d9d04912ab0e4f50b9d4da4e6a61725c01f4af59d65e37fae9",
+          "snippet_start": "## Strict mode with `ConfigDict`\n\n",
+          "query_matches": {
+            "query-hint-3": {
+              "qualified": false,
+              "match_ratio": 1.0,
+              "body_matched_terms": null
+            }
+          }
+        },
+        {
+          "path": "docs/concepts/strict_mode.md",
+          "snippet_sha256": "6ec3b9bf37aad55db7c9406afaf5c9aa2937ff8b328e40eddb0f2f70f7b68f3e",
+          "snippet_start": "When possible, you can achieve nested strict mode for vanilla dataclasses or `TypedDict` subclasses by annotating fields\nwith the [`pydantic.types.Strict` annotation](#strict-mode-",
+          "query_matches": {
+            "query-hint-1": {
+              "qualified": false,
+              "match_ratio": 1.0,
+              "body_matched_terms": null
+            }
+          }
+        },
+        {
+          "path": "docs/concepts/strict_mode.md",
+          "snippet_sha256": "578452fe5d7d9fc925fb08a09e288f0e355c45471b6b95fb08aeb30d4cc9fe73",
+          "snippet_start": "### Using `Field` as an annotation\n\nNote that `Field(strict=True)` (or with any other keyword arguments) can be used as an annotation if necessary, e.g.,\nwhen working with `TypedDi",
+          "query_matches": {
+            "query-concept-1": {
+              "qualified": false,
+              "match_ratio": 0.6667,
+              "body_matched_terms": null
+            }
+          }
+        },
+        {
+          "path": "docs/concepts/strict_mode.md",
+          "snippet_sha256": "87a3ab5bd68ca86613c86ba2db8dff3d088b2bc5d7fb9f4a2a62196d8126ddd3",
+          "snippet_start": "```python\nfrom typing_extensions import Annotated, TypedDict\n\nfrom pydantic import Field, TypeAdapter, ValidationError\n\n\nclass MyDict(TypedDict):\n    x: Annotated[int, Field(strict",
+          "query_matches": {
+            "query-concept-1": {
+              "qualified": false,
+              "match_ratio": 0.6667,
+              "body_matched_terms": null
+            }
+          }
+        },
+        {
+          "path": "docs/concepts/strict_mode.md",
+          "snippet_sha256": "8275436a7b9c109fc4acc49306f179ebe7fef9e8a0b434b2a83570fff30cd5a9",
+          "snippet_start": "There are various ways to get strict-mode validation while using Pydantic, which will be discussed in more detail below:\n\n* [Passing `strict=True` to the validation methods](#stric",
+          "query_matches": {
+            "query-original": {
+              "qualified": false,
+              "match_ratio": 0.375,
+              "body_matched_terms": [
+                "strict",
+                "mode",
+                "type"
+              ]
+            }
+          }
+        }
+      ],
+      "projector_inputs": [
+        {
+          "path": "docs/concepts/strict_mode.md",
+          "content": "(This is also the case for dataclasses and `TypedDict`.)\n\nIf this is undesirable, you should make sure that strict mode is enabled for all the types involved.\nFor example, this can be done for model classes by using a shared base class with\n`model_config = ConfigDict(strict=True)`:\n\n"
+        },
+        {
+          "path": "docs/concepts/strict_mode.md",
+          "content": "For more details about what types are allowed as inputs in strict mode, you can review the\n[Conversion Table](conversion_table.md).\n\n"
+        },
+        {
+          "path": "docs/concepts/strict_mode.md",
+          "content": "## Type coercions in strict mode\n\nFor most types, when validating data from python in strict mode, only the instances of the exact types are accepted.\nFor example, when validating an `int` field, only instances of `int` are accepted; passing instances of `float` or `str`\nwill result in raising a `ValidationError`.\n\n"
+        },
+        {
+          "path": "docs/concepts/strict_mode.md",
+          "content": "## Strict mode with `Annotated[..., Strict()]`\n\n??? api \"API Documentation\"\n    [`pydantic.types.Strict`][pydantic.types.Strict]<br>\n\nPydantic also provides the [`Strict`](../api/types.md#pydantic.types.Strict) class, which is intended for use as\nmetadata with [`typing.Annotated`][] class; this annotation indicates that the annotated field should be validated in\nstrict mode:\n\n"
+        }
+      ],
+      "final_sources": [
+        {
+          "path_or_url": "docs/concepts/strict_mode.md",
+          "snippet": "(This is also the case for dataclasses and `TypedDict`.)\n\nIf this is undesirable, you should make sure that strict mode is enabled for all the types involved.\nFor example, this can be done for model classes by using a shared base class with\n`model_config = ConfigDict(strict=True)`:",
+          "line_start": 399,
+          "line_end": 403
+        }
+      ]
+    },
+    "after": {
+      "query_window": [
+        {
+          "path": "docs/concepts/strict_mode.md",
+          "snippet_sha256": "85dc6d94807b544337771479d954f836077ac6c7725c37d0cd1b3fd140308069",
+          "snippet_start": "However, there are also situations where this is not desirable, and you want Pydantic to error instead of coercing data.\n\nTo better support this use case, Pydantic provides a \"stri",
+          "query_matches": {
+            "query-original": {
+              "qualified": true,
+              "match_ratio": 0.75,
+              "body_matched_terms": [
+                "strict",
+                "mode",
+                "enabled",
+                "instead",
+                "coercing",
+                "type"
+              ]
+            }
+          }
+        },
+        {
+          "path": "docs/concepts/strict_mode.md",
+          "snippet_sha256": "63232c29858ee13de04f361dd3fa052b77168392a2422e6e939c1c10feb3857d",
+          "snippet_start": "## Strict mode with `Annotated[..., Strict()]`\n\n??? api \"API Documentation\"\n    [`pydantic.types.Strict`][pydantic.types.Strict]<br>\n\nPydantic also provides the [`Strict`](../api/t",
+          "query_matches": {
+            "query-hint-2": {
+              "qualified": true,
+              "match_ratio": 1.0,
+              "body_matched_terms": [
+                "strict"
+              ]
+            }
+          }
+        },
+        {
+          "path": "docs/concepts/strict_mode.md",
+          "snippet_sha256": "e5d98e44383ef09a59ec15d4887cebe14cb973cf12ed24318b4f10fb0c16caa2",
+          "snippet_start": "(This is also the case for dataclasses and `TypedDict`.)\n\nIf this is undesirable, you should make sure that strict mode is enabled for all the types involved.\nFor example, this can",
+          "query_matches": {
+            "query-original": {
+              "qualified": true,
+              "match_ratio": 0.5,
+              "body_matched_terms": [
+                "strict",
+                "mode",
+                "enabled",
+                "type"
+              ]
+            }
+          }
+        },
+        {
+          "path": "docs/concepts/strict_mode.md",
+          "snippet_sha256": "a4887ab4cce06580894f44a68d6423db766a0fde9fa89cdec6269657e3c49d08",
+          "snippet_start": "This is, in fact, the method used to implement some of the strict-out-of-the-box types provided by Pydantic,\nsuch as [`StrictInt`](../api/types.md#pydantic.types.StrictInt).\n\n",
+          "query_matches": {
+            "query-hint-2": {
+              "qualified": true,
+              "match_ratio": 1.0,
+              "body_matched_terms": [
+                "strict"
+              ]
+            }
+          }
+        },
+        {
+          "path": "docs/concepts/strict_mode.md",
+          "snippet_sha256": "b24a7cbecb7249f710a883eedc309356528f69859a6ed547e002b7a32962e36e",
+          "snippet_start": "For more details about what types are allowed as inputs in strict mode, you can review the\n[Conversion Table](conversion_table.md).\n\n",
+          "query_matches": {
+            "query-hint-3": {
+              "qualified": true,
+              "match_ratio": 1.0,
+              "body_matched_terms": [
+                "mode"
+              ]
+            },
+            "query-hint-1": {
+              "qualified": false,
+              "match_ratio": 1.0,
+              "body_matched_terms": null
+            }
+          }
+        },
+        {
+          "path": "docs/concepts/strict_mode.md",
+          "snippet_sha256": "784dc8f0b616fc8b5f7db9e180b209348266a829416bb4e135338a8b55244850",
+          "snippet_start": "```python\nfrom typing_extensions import Annotated\n\nfrom pydantic import BaseModel, Strict, ValidationError\n\n\nclass User(BaseModel):\n    name: str\n    age: int\n    is_active: Annota",
+          "query_matches": {
+            "query-hint-2": {
+              "qualified": true,
+              "match_ratio": 1.0,
+              "body_matched_terms": [
+                "strict"
+              ]
+            }
+          }
+        },
+        {
+          "path": "docs/concepts/strict_mode.md",
+          "snippet_sha256": "ab8106809f56bbe36200695de3fa853ea930b5e8947b1ea6ac76e03fd8dfa51a",
+          "snippet_start": "## Type coercions in strict mode\n\nFor most types, when validating data from python in strict mode, only the instances of the exact types are accepted.\nFor example, when validating ",
+          "query_matches": {
+            "query-hint-3": {
+              "qualified": true,
+              "match_ratio": 1.0,
+              "body_matched_terms": [
+                "mode"
+              ]
+            }
+          }
+        },
+        {
+          "path": "docs/concepts/strict_mode.md",
+          "snippet_sha256": "369ed62426e6e0d9d04912ab0e4f50b9d4da4e6a61725c01f4af59d65e37fae9",
+          "snippet_start": "## Strict mode with `ConfigDict`\n\n",
+          "query_matches": {
+            "query-hint-3": {
+              "qualified": false,
+              "match_ratio": 1.0,
+              "body_matched_terms": null
+            }
+          }
+        },
+        {
+          "path": "docs/concepts/strict_mode.md",
+          "snippet_sha256": "6ec3b9bf37aad55db7c9406afaf5c9aa2937ff8b328e40eddb0f2f70f7b68f3e",
+          "snippet_start": "When possible, you can achieve nested strict mode for vanilla dataclasses or `TypedDict` subclasses by annotating fields\nwith the [`pydantic.types.Strict` annotation](#strict-mode-",
+          "query_matches": {
+            "query-hint-1": {
+              "qualified": false,
+              "match_ratio": 1.0,
+              "body_matched_terms": null
+            }
+          }
+        },
+        {
+          "path": "docs/concepts/strict_mode.md",
+          "snippet_sha256": "578452fe5d7d9fc925fb08a09e288f0e355c45471b6b95fb08aeb30d4cc9fe73",
+          "snippet_start": "### Using `Field` as an annotation\n\nNote that `Field(strict=True)` (or with any other keyword arguments) can be used as an annotation if necessary, e.g.,\nwhen working with `TypedDi",
+          "query_matches": {
+            "query-concept-1": {
+              "qualified": false,
+              "match_ratio": 0.6667,
+              "body_matched_terms": null
+            }
+          }
+        },
+        {
+          "path": "docs/concepts/strict_mode.md",
+          "snippet_sha256": "87a3ab5bd68ca86613c86ba2db8dff3d088b2bc5d7fb9f4a2a62196d8126ddd3",
+          "snippet_start": "```python\nfrom typing_extensions import Annotated, TypedDict\n\nfrom pydantic import Field, TypeAdapter, ValidationError\n\n\nclass MyDict(TypedDict):\n    x: Annotated[int, Field(strict",
+          "query_matches": {
+            "query-concept-1": {
+              "qualified": false,
+              "match_ratio": 0.6667,
+              "body_matched_terms": null
+            }
+          }
+        },
+        {
+          "path": "docs/concepts/strict_mode.md",
+          "snippet_sha256": "8275436a7b9c109fc4acc49306f179ebe7fef9e8a0b434b2a83570fff30cd5a9",
+          "snippet_start": "There are various ways to get strict-mode validation while using Pydantic, which will be discussed in more detail below:\n\n* [Passing `strict=True` to the validation methods](#stric",
+          "query_matches": {
+            "query-original": {
+              "qualified": false,
+              "match_ratio": 0.375,
+              "body_matched_terms": [
+                "strict",
+                "mode",
+                "type"
+              ]
+            }
+          }
+        }
+      ],
+      "projector_inputs": [
+        {
+          "path": "docs/concepts/strict_mode.md",
+          "content": "However, there are also situations where this is not desirable, and you want Pydantic to error instead of coercing data.\n\nTo better support this use case, Pydantic provides a \"strict mode\" that can be enabled on a per-model, per-field, or\neven per-validation-call basis. When strict mode is enabled, Pydantic will be much less lenient when coercing data,\nand will instead error if the data is not of the correct type.\n\n"
+        },
+        {
+          "path": "docs/concepts/strict_mode.md",
+          "content": "For more details about what types are allowed as inputs in strict mode, you can review the\n[Conversion Table](conversion_table.md).\n\n"
+        },
+        {
+          "path": "docs/concepts/strict_mode.md",
+          "content": "## Type coercions in strict mode\n\nFor most types, when validating data from python in strict mode, only the instances of the exact types are accepted.\nFor example, when validating an `int` field, only instances of `int` are accepted; passing instances of `float` or `str`\nwill result in raising a `ValidationError`.\n\n"
+        },
+        {
+          "path": "docs/concepts/strict_mode.md",
+          "content": "## Strict mode with `Annotated[..., Strict()]`\n\n??? api \"API Documentation\"\n    [`pydantic.types.Strict`][pydantic.types.Strict]<br>\n\nPydantic also provides the [`Strict`](../api/types.md#pydantic.types.Strict) class, which is intended for use as\nmetadata with [`typing.Annotated`][] class; this annotation indicates that the annotated field should be validated in\nstrict mode:\n\n"
+        }
+      ],
+      "final_sources": [
+        {
+          "path_or_url": "docs/concepts/strict_mode.md",
+          "snippet": "However, there are also situations where this is not desirable, and you want Pydantic to error instead of coercing data.\n\nTo better support this use case, Pydantic provides a \"strict mode\" that can be enabled on a per-model, per-field, or\neven per-validation-call basis. When strict mode is enabled, Pydantic will be much less lenient when coercing data,\nand will instead error if the data is not of the correct type.",
+          "line_start": 9,
+          "line_end": 13
+        }
+      ]
+    }
+  },
+  {
+    "id": "pydantic-07",
+    "before_runtime": "19255e156f1c05aa27d35664321f7de1d3522534",
+    "after_runtime": "4c6cc0540041ba10e2c0f4b9d0b8f80419723f23",
+    "purpose": "Followup review: preserve complete and partial evidence, not merely aggregate sufficiency.",
+    "before": {
+      "query_window": [
+        {
+          "path": "docs/concepts/strict_mode.md",
+          "snippet_sha256": "63232c29858ee13de04f361dd3fa052b77168392a2422e6e939c1c10feb3857d",
+          "snippet_start": "## Strict mode with `Annotated[..., Strict()]`\n\n??? api \"API Documentation\"\n    [`pydantic.types.Strict`][pydantic.types.Strict]<br>\n\nPydantic also provides the [`Strict`](../api/t",
+          "query_matches": {
+            "query-hint-2": {
+              "qualified": true,
+              "match_ratio": 1.0,
+              "body_matched_terms": [
+                "strict"
+              ]
+            }
+          }
+        },
+        {
+          "path": "docs/concepts/strict_mode.md",
+          "snippet_sha256": "a4887ab4cce06580894f44a68d6423db766a0fde9fa89cdec6269657e3c49d08",
+          "snippet_start": "This is, in fact, the method used to implement some of the strict-out-of-the-box types provided by Pydantic,\nsuch as [`StrictInt`](../api/types.md#pydantic.types.StrictInt).\n\n",
+          "query_matches": {
+            "query-hint-2": {
+              "qualified": true,
+              "match_ratio": 1.0,
+              "body_matched_terms": [
+                "strict"
+              ]
+            }
+          }
+        },
+        {
+          "path": "docs/concepts/strict_mode.md",
+          "snippet_sha256": "b24a7cbecb7249f710a883eedc309356528f69859a6ed547e002b7a32962e36e",
+          "snippet_start": "For more details about what types are allowed as inputs in strict mode, you can review the\n[Conversion Table](conversion_table.md).\n\n",
+          "query_matches": {
+            "query-hint-3": {
+              "qualified": true,
+              "match_ratio": 1.0,
+              "body_matched_terms": [
+                "mode"
+              ]
+            },
+            "query-hint-1": {
+              "qualified": false,
+              "match_ratio": 1.0,
+              "body_matched_terms": null
+            }
+          }
+        },
+        {
+          "path": "docs/concepts/strict_mode.md",
+          "snippet_sha256": "784dc8f0b616fc8b5f7db9e180b209348266a829416bb4e135338a8b55244850",
+          "snippet_start": "```python\nfrom typing_extensions import Annotated\n\nfrom pydantic import BaseModel, Strict, ValidationError\n\n\nclass User(BaseModel):\n    name: str\n    age: int\n    is_active: Annota",
+          "query_matches": {
+            "query-hint-2": {
+              "qualified": true,
+              "match_ratio": 1.0,
+              "body_matched_terms": [
+                "strict"
+              ]
+            }
+          }
+        },
+        {
+          "path": "docs/concepts/strict_mode.md",
+          "snippet_sha256": "ab8106809f56bbe36200695de3fa853ea930b5e8947b1ea6ac76e03fd8dfa51a",
+          "snippet_start": "## Type coercions in strict mode\n\nFor most types, when validating data from python in strict mode, only the instances of the exact types are accepted.\nFor example, when validating ",
+          "query_matches": {
+            "query-hint-3": {
+              "qualified": true,
+              "match_ratio": 1.0,
+              "body_matched_terms": [
+                "mode"
+              ]
+            },
+            "query-concept-1": {
+              "qualified": false,
+              "match_ratio": 0.5,
+              "body_matched_terms": null
+            }
+          }
+        },
+        {
+          "path": "docs/concepts/strict_mode.md",
+          "snippet_sha256": "85dc6d94807b544337771479d954f836077ac6c7725c37d0cd1b3fd140308069",
+          "snippet_start": "However, there are also situations where this is not desirable, and you want Pydantic to error instead of coercing data.\n\nTo better support this use case, Pydantic provides a \"stri",
+          "query_matches": {
+            "query-original": {
+              "qualified": false,
+              "match_ratio": 0.4375,
+              "body_matched_terms": [
+                "strict",
+                "mode",
+                "enabled",
+                "instead",
+                "coercing",
+                "type",
+                "also"
+              ]
+            }
+          }
+        },
+        {
+          "path": "docs/concepts/strict_mode.md",
+          "snippet_sha256": "369ed62426e6e0d9d04912ab0e4f50b9d4da4e6a61725c01f4af59d65e37fae9",
+          "snippet_start": "## Strict mode with `ConfigDict`\n\n",
+          "query_matches": {
+            "query-hint-3": {
+              "qualified": false,
+              "match_ratio": 1.0,
+              "body_matched_terms": null
+            }
+          }
+        },
+        {
+          "path": "docs/concepts/strict_mode.md",
+          "snippet_sha256": "e5d98e44383ef09a59ec15d4887cebe14cb973cf12ed24318b4f10fb0c16caa2",
+          "snippet_start": "(This is also the case for dataclasses and `TypedDict`.)\n\nIf this is undesirable, you should make sure that strict mode is enabled for all the types involved.\nFor example, this can",
+          "query_matches": {
+            "query-original": {
+              "qualified": false,
+              "match_ratio": 0.3125,
+              "body_matched_terms": [
+                "strict",
+                "mode",
+                "enabled",
+                "type",
+                "also"
+              ]
+            }
+          }
+        },
+        {
+          "path": "docs/concepts/strict_mode.md",
+          "snippet_sha256": "621a353c24e9d5b6b749a80b6883bd94176c9984137c98c0ba97505df3e0092c",
+          "snippet_start": "```python\nfrom dataclasses import dataclass\n\nfrom pydantic import TypeAdapter, ValidationError\n\n\n@dataclass\nclass MyDataclass:\n    x: int\n\n\ntry:\n    TypeAdapter(MyDataclass).valida",
+          "query_matches": {
+            "query-concept-1": {
+              "qualified": false,
+              "match_ratio": 0.75,
+              "body_matched_terms": null
+            }
+          }
+        },
+        {
+          "path": "docs/concepts/strict_mode.md",
+          "snippet_sha256": "6ec3b9bf37aad55db7c9406afaf5c9aa2937ff8b328e40eddb0f2f70f7b68f3e",
+          "snippet_start": "When possible, you can achieve nested strict mode for vanilla dataclasses or `TypedDict` subclasses by annotating fields\nwith the [`pydantic.types.Strict` annotation](#strict-mode-",
+          "query_matches": {
+            "query-hint-1": {
+              "qualified": false,
+              "match_ratio": 1.0,
+              "body_matched_terms": null
+            }
+          }
+        },
+        {
+          "path": "docs/concepts/strict_mode.md",
+          "snippet_sha256": "e7b9b59908ddbffa431d0646e89fed33bdd76b4c5bfe23d52aacf2f43fb413b6",
+          "snippet_start": "```py\nfrom pydantic import BaseModel, ValidationError\n\n\nclass MyModel(BaseModel):\n    x: int\n\n\nprint(MyModel.model_validate({'x': '123'}))  # lax mode\n#> x=123\n\ntry:\n    MyModel.mo",
+          "query_matches": {
+            "query-original": {
+              "qualified": false,
+              "match_ratio": 0.1875,
+              "body_matched_terms": [
+                "strict",
+                "mode",
+                "type"
+              ]
+            }
+          }
+        }
+      ],
+      "projector_inputs": [
+        {
+          "path": "docs/concepts/strict_mode.md",
+          "content": "For more details about what types are allowed as inputs in strict mode, you can review the\n[Conversion Table](conversion_table.md).\n\n"
+        },
+        {
+          "path": "docs/concepts/strict_mode.md",
+          "content": "## Type coercions in strict mode\n\nFor most types, when validating data from python in strict mode, only the instances of the exact types are accepted.\nFor example, when validating an `int` field, only instances of `int` are accepted; passing instances of `float` or `str`\nwill result in raising a `ValidationError`.\n\n"
+        },
+        {
+          "path": "docs/concepts/strict_mode.md",
+          "content": "## Strict mode with `Annotated[..., Strict()]`\n\n??? api \"API Documentation\"\n    [`pydantic.types.Strict`][pydantic.types.Strict]<br>\n\nPydantic also provides the [`Strict`](../api/types.md#pydantic.types.Strict) class, which is intended for use as\nmetadata with [`typing.Annotated`][] class; this annotation indicates that the annotated field should be validated in\nstrict mode:\n\n"
+        },
+        {
+          "path": "docs/concepts/strict_mode.md",
+          "content": "This is, in fact, the method used to implement some of the strict-out-of-the-box types provided by Pydantic,\nsuch as [`StrictInt`](../api/types.md#pydantic.types.StrictInt).\n\n"
+        }
+      ],
+      "final_sources": []
+    },
+    "after": {
+      "query_window": [
+        {
+          "path": "docs/concepts/strict_mode.md",
+          "snippet_sha256": "63232c29858ee13de04f361dd3fa052b77168392a2422e6e939c1c10feb3857d",
+          "snippet_start": "## Strict mode with `Annotated[..., Strict()]`\n\n??? api \"API Documentation\"\n    [`pydantic.types.Strict`][pydantic.types.Strict]<br>\n\nPydantic also provides the [`Strict`](../api/t",
+          "query_matches": {
+            "query-hint-2": {
+              "qualified": true,
+              "match_ratio": 1.0,
+              "body_matched_terms": [
+                "strict"
+              ]
+            }
+          }
+        },
+        {
+          "path": "docs/concepts/strict_mode.md",
+          "snippet_sha256": "a4887ab4cce06580894f44a68d6423db766a0fde9fa89cdec6269657e3c49d08",
+          "snippet_start": "This is, in fact, the method used to implement some of the strict-out-of-the-box types provided by Pydantic,\nsuch as [`StrictInt`](../api/types.md#pydantic.types.StrictInt).\n\n",
+          "query_matches": {
+            "query-hint-2": {
+              "qualified": true,
+              "match_ratio": 1.0,
+              "body_matched_terms": [
+                "strict"
+              ]
+            }
+          }
+        },
+        {
+          "path": "docs/concepts/strict_mode.md",
+          "snippet_sha256": "b24a7cbecb7249f710a883eedc309356528f69859a6ed547e002b7a32962e36e",
+          "snippet_start": "For more details about what types are allowed as inputs in strict mode, you can review the\n[Conversion Table](conversion_table.md).\n\n",
+          "query_matches": {
+            "query-hint-3": {
+              "qualified": true,
+              "match_ratio": 1.0,
+              "body_matched_terms": [
+                "mode"
+              ]
+            },
+            "query-hint-1": {
+              "qualified": false,
+              "match_ratio": 1.0,
+              "body_matched_terms": null
+            }
+          }
+        },
+        {
+          "path": "docs/concepts/strict_mode.md",
+          "snippet_sha256": "784dc8f0b616fc8b5f7db9e180b209348266a829416bb4e135338a8b55244850",
+          "snippet_start": "```python\nfrom typing_extensions import Annotated\n\nfrom pydantic import BaseModel, Strict, ValidationError\n\n\nclass User(BaseModel):\n    name: str\n    age: int\n    is_active: Annota",
+          "query_matches": {
+            "query-hint-2": {
+              "qualified": true,
+              "match_ratio": 1.0,
+              "body_matched_terms": [
+                "strict"
+              ]
+            }
+          }
+        },
+        {
+          "path": "docs/concepts/strict_mode.md",
+          "snippet_sha256": "ab8106809f56bbe36200695de3fa853ea930b5e8947b1ea6ac76e03fd8dfa51a",
+          "snippet_start": "## Type coercions in strict mode\n\nFor most types, when validating data from python in strict mode, only the instances of the exact types are accepted.\nFor example, when validating ",
+          "query_matches": {
+            "query-hint-3": {
+              "qualified": true,
+              "match_ratio": 1.0,
+              "body_matched_terms": [
+                "mode"
+              ]
+            },
+            "query-concept-1": {
+              "qualified": false,
+              "match_ratio": 0.5,
+              "body_matched_terms": null
+            }
+          }
+        },
+        {
+          "path": "docs/concepts/strict_mode.md",
+          "snippet_sha256": "85dc6d94807b544337771479d954f836077ac6c7725c37d0cd1b3fd140308069",
+          "snippet_start": "However, there are also situations where this is not desirable, and you want Pydantic to error instead of coercing data.\n\nTo better support this use case, Pydantic provides a \"stri",
+          "query_matches": {
+            "query-original": {
+              "qualified": false,
+              "match_ratio": 0.4375,
+              "body_matched_terms": [
+                "strict",
+                "mode",
+                "enabled",
+                "instead",
+                "coercing",
+                "type",
+                "also"
+              ]
+            }
+          }
+        },
+        {
+          "path": "docs/concepts/strict_mode.md",
+          "snippet_sha256": "369ed62426e6e0d9d04912ab0e4f50b9d4da4e6a61725c01f4af59d65e37fae9",
+          "snippet_start": "## Strict mode with `ConfigDict`\n\n",
+          "query_matches": {
+            "query-hint-3": {
+              "qualified": false,
+              "match_ratio": 1.0,
+              "body_matched_terms": null
+            }
+          }
+        },
+        {
+          "path": "docs/concepts/strict_mode.md",
+          "snippet_sha256": "e5d98e44383ef09a59ec15d4887cebe14cb973cf12ed24318b4f10fb0c16caa2",
+          "snippet_start": "(This is also the case for dataclasses and `TypedDict`.)\n\nIf this is undesirable, you should make sure that strict mode is enabled for all the types involved.\nFor example, this can",
+          "query_matches": {
+            "query-original": {
+              "qualified": false,
+              "match_ratio": 0.3125,
+              "body_matched_terms": [
+                "strict",
+                "mode",
+                "enabled",
+                "type",
+                "also"
+              ]
+            }
+          }
+        },
+        {
+          "path": "docs/concepts/strict_mode.md",
+          "snippet_sha256": "621a353c24e9d5b6b749a80b6883bd94176c9984137c98c0ba97505df3e0092c",
+          "snippet_start": "```python\nfrom dataclasses import dataclass\n\nfrom pydantic import TypeAdapter, ValidationError\n\n\n@dataclass\nclass MyDataclass:\n    x: int\n\n\ntry:\n    TypeAdapter(MyDataclass).valida",
+          "query_matches": {
+            "query-concept-1": {
+              "qualified": false,
+              "match_ratio": 0.75,
+              "body_matched_terms": null
+            }
+          }
+        },
+        {
+          "path": "docs/concepts/strict_mode.md",
+          "snippet_sha256": "6ec3b9bf37aad55db7c9406afaf5c9aa2937ff8b328e40eddb0f2f70f7b68f3e",
+          "snippet_start": "When possible, you can achieve nested strict mode for vanilla dataclasses or `TypedDict` subclasses by annotating fields\nwith the [`pydantic.types.Strict` annotation](#strict-mode-",
+          "query_matches": {
+            "query-hint-1": {
+              "qualified": false,
+              "match_ratio": 1.0,
+              "body_matched_terms": null
+            }
+          }
+        },
+        {
+          "path": "docs/concepts/strict_mode.md",
+          "snippet_sha256": "e7b9b59908ddbffa431d0646e89fed33bdd76b4c5bfe23d52aacf2f43fb413b6",
+          "snippet_start": "```py\nfrom pydantic import BaseModel, ValidationError\n\n\nclass MyModel(BaseModel):\n    x: int\n\n\nprint(MyModel.model_validate({'x': '123'}))  # lax mode\n#> x=123\n\ntry:\n    MyModel.mo",
+          "query_matches": {
+            "query-original": {
+              "qualified": false,
+              "match_ratio": 0.1875,
+              "body_matched_terms": [
+                "strict",
+                "mode",
+                "type"
+              ]
+            }
+          }
+        }
+      ],
+      "projector_inputs": [
+        {
+          "path": "docs/concepts/strict_mode.md",
+          "content": "For more details about what types are allowed as inputs in strict mode, you can review the\n[Conversion Table](conversion_table.md).\n\n"
+        },
+        {
+          "path": "docs/concepts/strict_mode.md",
+          "content": "## Type coercions in strict mode\n\nFor most types, when validating data from python in strict mode, only the instances of the exact types are accepted.\nFor example, when validating an `int` field, only instances of `int` are accepted; passing instances of `float` or `str`\nwill result in raising a `ValidationError`.\n\n"
+        },
+        {
+          "path": "docs/concepts/strict_mode.md",
+          "content": "## Strict mode with `Annotated[..., Strict()]`\n\n??? api \"API Documentation\"\n    [`pydantic.types.Strict`][pydantic.types.Strict]<br>\n\nPydantic also provides the [`Strict`](../api/types.md#pydantic.types.Strict) class, which is intended for use as\nmetadata with [`typing.Annotated`][] class; this annotation indicates that the annotated field should be validated in\nstrict mode:\n\n"
+        },
+        {
+          "path": "docs/concepts/strict_mode.md",
+          "content": "This is, in fact, the method used to implement some of the strict-out-of-the-box types provided by Pydantic,\nsuch as [`StrictInt`](../api/types.md#pydantic.types.StrictInt).\n\n"
+        }
+      ],
+      "final_sources": [
+        {
+          "path_or_url": "docs/concepts/strict_mode.md",
+          "snippet": "## Strict mode with `Annotated[..., Strict()]`\n\n??? api \"API Documentation\"\n    [`pydantic.types.Strict`][pydantic.types.Strict]<br>\n\nPydantic also provides the [`Strict`](../api/types.md#pydantic.types.Strict) class, which is intended for use as\nmetadata with [`typing.Annotated`][] class; this annotation indicates that the annotated field should be validated in\nstrict mode:",
+          "line_start": 285,
+          "line_end": 292
+        },
+        {
+          "path_or_url": "docs/concepts/strict_mode.md",
+          "snippet": "## Type coercions in strict mode\n\nFor most types, when validating data from python in strict mode, only the instances of the exact types are accepted.\nFor example, when validating an `int` field, only instances of `int` are accepted; passing instances of `float` or `str`\nwill result in raising a `ValidationError`.",
+          "line_start": 48,
+          "line_end": 52
+        }
+      ]
+    }
+  },
+  {
+    "id": "typer-03",
+    "before_runtime": "19255e156f1c05aa27d35664321f7de1d3522534",
+    "after_runtime": "4c6cc0540041ba10e2c0f4b9d0b8f80419723f23",
+    "purpose": "Followup review: preserve complete and partial evidence, not merely aggregate sufficiency.",
+    "before": {
+      "query_window": [
+        {
+          "path": "docs/tutorial/terminating.md",
+          "snippet_sha256": "9a477984ad8ea64b7e82f31b29692750e3c7209e336bc01c9bec72112b49d88d",
+          "snippet_start": "## Abort\n\nThere's a special exception that you can use to \"abort\" a program.\n\nIt works more or less the same as `typer.Exit()` but will print `\"Aborted!\"` to the screen and can be ",
+          "query_matches": {
+            "query-hint-1": {
+              "qualified": true,
+              "match_ratio": 1.0,
+              "body_matched_terms": [
+                "typer"
+              ]
+            },
+            "query-original": {
+              "qualified": false,
+              "match_ratio": 0.4444,
+              "body_matched_terms": [
+                "aborting",
+                "typer",
+                "program",
+                "exit"
+              ]
+            }
+          }
+        },
+        {
+          "path": "docs/tutorial/terminating.md",
+          "snippet_sha256": "4d00f28fecc64f1f85153f3b9f00521445f11a6881eb19ecf823069afe9828fd",
+          "snippet_start": "## Exit with an error\n\n`typer.Exit()` takes an optional `code` parameter. By default, `code` is `0`, meaning there was no error.\n\nYou can pass a `code` with a number other than `0`",
+          "query_matches": {
+            "query-hint-2": {
+              "qualified": true,
+              "match_ratio": 1.0,
+              "body_matched_terms": [
+                "exit"
+              ]
+            },
+            "query-hint-1": {
+              "qualified": true,
+              "match_ratio": 1.0,
+              "body_matched_terms": [
+                "typer"
+              ]
+            }
+          }
+        },
+        {
+          "path": "docs/tutorial/terminating.md",
+          "snippet_sha256": "86ebcb37d4d8f3bfc22152ef6016f99c24056d7246b37cc50e958a88a38d0be1",
+          "snippet_start": "## `Exit` a CLI program\n\nYou can normally just let the code of your CLI program finish its execution, but in some scenarios, you might want to terminate at some point in the middle",
+          "query_matches": {
+            "query-hint-2": {
+              "qualified": true,
+              "match_ratio": 1.0,
+              "body_matched_terms": [
+                "exit"
+              ]
+            },
+            "query-concept-1": {
+              "qualified": false,
+              "match_ratio": 1.0,
+              "body_matched_terms": null
+            },
+            "query-original": {
+              "qualified": false,
+              "match_ratio": 0.3333,
+              "body_matched_terms": [
+                "typer",
+                "program",
+                "exit"
+              ]
+            }
+          }
+        },
+        {
+          "path": "docs/tutorial/terminating.md",
+          "snippet_sha256": "e235d887cc788906240eaf6db9868d27499959bfbfeba95f14e60279cf562ac6",
+          "snippet_start": "But then **Typer** (actually Click) catches it and just terminates the program normally.\n\n///\n\n",
+          "query_matches": {
+            "query-concept-1": {
+              "qualified": false,
+              "match_ratio": 1.0,
+              "body_matched_terms": null
+            }
+          }
+        },
+        {
+          "path": "docs/tutorial/terminating.md",
+          "snippet_sha256": "7d324a74a150545123993f0b95074f24ec31e81beccf04561d8b62886b58230f",
+          "snippet_start": "There are several things to see in this example.\n\n* The CLI program is the function `main()`, not the others. This is the one that takes a *CLI argument*.\n* The function `maybe_cre",
+          "query_matches": {
+            "query-original": {
+              "qualified": false,
+              "match_ratio": 0.3333,
+              "body_matched_terms": [
+                "typer",
+                "program",
+                "exit"
+              ]
+            }
+          }
+        }
+      ],
+      "projector_inputs": [
+        {
+          "path": "docs/tutorial/terminating.md",
+          "content": "## `Exit` a CLI program\n\nYou can normally just let the code of your CLI program finish its execution, but in some scenarios, you might want to terminate at some point in the middle of it. And prevent any subsequent code to run.\n\nThis doesn't have to mean that there's an error, just that nothing else needs to be executed.\n\nIn that case, you can raise a `typer.Exit()` exception:\n\n```Python hl_lines=\"9\"\n{!../docs_src/terminating/tutorial001.py!}\n```\n\n"
+        },
+        {
+          "path": "docs/tutorial/terminating.md",
+          "content": "## Exit with an error\n\n`typer.Exit()` takes an optional `code` parameter. By default, `code` is `0`, meaning there was no error.\n\nYou can pass a `code` with a number other than `0` to tell the terminal that there was an error in the execution of the program:\n\n```Python hl_lines=\"7\"\n{!../docs_src/terminating/tutorial002.py!}\n```\n\nCheck it:\n\n<div class=\"termy\">\n\n"
+        },
+        {
+          "path": "docs/tutorial/terminating.md",
+          "content": "## Abort\n\nThere's a special exception that you can use to \"abort\" a program.\n\nIt works more or less the same as `typer.Exit()` but will print `\"Aborted!\"` to the screen and can be useful in certain cases later to make it explicit that the execution was aborted:\n\n```Python hl_lines=\"7\"\n{!../docs_src/terminating/tutorial003.py!}\n```\n\nCheck it:\n\n<div class=\"termy\">\n\n"
+        }
+      ],
+      "final_sources": [
+        {
+          "path_or_url": "docs/tutorial/terminating.md",
+          "snippet": "## `Exit` a CLI program\n\nYou can normally just let the code of your CLI program finish its execution, but in some scenarios, you might want to terminate at some point in the middle of it. And prevent any subsequent code to run.\n\nThis doesn't have to mean that there's an error, just that nothing else needs to be executed.\n\nIn that case, you can raise a `typer.Exit()` exception:\n\n```Python hl_lines=\"9\"\n{!../docs_src/terminating/tutorial001.py!}\n```",
+          "line_start": 7,
+          "line_end": 17
+        },
+        {
+          "path_or_url": "docs/tutorial/terminating.md",
+          "snippet": "## Abort\n\nThere's a special exception that you can use to \"abort\" a program.\n\nIt works more or less the same as `typer.Exit()` but will print `\"Aborted!\"` to the screen and can be useful in certain cases later to make it explicit that the execution was aborted:\n\n```Python hl_lines=\"7\"\n{!../docs_src/terminating/tutorial003.py!}\n```\n\nCheck it:\n\n<div class=\"termy\">",
+          "line_start": 100,
+          "line_end": 112
+        }
+      ]
+    },
+    "after": {
+      "query_window": [
+        {
+          "path": "docs/tutorial/terminating.md",
+          "snippet_sha256": "9a477984ad8ea64b7e82f31b29692750e3c7209e336bc01c9bec72112b49d88d",
+          "snippet_start": "## Abort\n\nThere's a special exception that you can use to \"abort\" a program.\n\nIt works more or less the same as `typer.Exit()` but will print `\"Aborted!\"` to the screen and can be ",
+          "query_matches": {
+            "query-hint-1": {
+              "qualified": true,
+              "match_ratio": 1.0,
+              "body_matched_terms": [
+                "typer"
+              ]
+            },
+            "query-original": {
+              "qualified": false,
+              "match_ratio": 0.4444,
+              "body_matched_terms": [
+                "aborting",
+                "typer",
+                "program",
+                "exit"
+              ]
+            }
+          }
+        },
+        {
+          "path": "docs/tutorial/terminating.md",
+          "snippet_sha256": "4d00f28fecc64f1f85153f3b9f00521445f11a6881eb19ecf823069afe9828fd",
+          "snippet_start": "## Exit with an error\n\n`typer.Exit()` takes an optional `code` parameter. By default, `code` is `0`, meaning there was no error.\n\nYou can pass a `code` with a number other than `0`",
+          "query_matches": {
+            "query-hint-2": {
+              "qualified": true,
+              "match_ratio": 1.0,
+              "body_matched_terms": [
+                "exit"
+              ]
+            },
+            "query-hint-1": {
+              "qualified": true,
+              "match_ratio": 1.0,
+              "body_matched_terms": [
+                "typer"
+              ]
+            }
+          }
+        },
+        {
+          "path": "docs/tutorial/terminating.md",
+          "snippet_sha256": "86ebcb37d4d8f3bfc22152ef6016f99c24056d7246b37cc50e958a88a38d0be1",
+          "snippet_start": "## `Exit` a CLI program\n\nYou can normally just let the code of your CLI program finish its execution, but in some scenarios, you might want to terminate at some point in the middle",
+          "query_matches": {
+            "query-hint-2": {
+              "qualified": true,
+              "match_ratio": 1.0,
+              "body_matched_terms": [
+                "exit"
+              ]
+            },
+            "query-concept-1": {
+              "qualified": false,
+              "match_ratio": 1.0,
+              "body_matched_terms": null
+            },
+            "query-original": {
+              "qualified": false,
+              "match_ratio": 0.3333,
+              "body_matched_terms": [
+                "typer",
+                "program",
+                "exit"
+              ]
+            }
+          }
+        },
+        {
+          "path": "docs/tutorial/terminating.md",
+          "snippet_sha256": "e235d887cc788906240eaf6db9868d27499959bfbfeba95f14e60279cf562ac6",
+          "snippet_start": "But then **Typer** (actually Click) catches it and just terminates the program normally.\n\n///\n\n",
+          "query_matches": {
+            "query-concept-1": {
+              "qualified": false,
+              "match_ratio": 1.0,
+              "body_matched_terms": null
+            }
+          }
+        },
+        {
+          "path": "docs/tutorial/terminating.md",
+          "snippet_sha256": "7d324a74a150545123993f0b95074f24ec31e81beccf04561d8b62886b58230f",
+          "snippet_start": "There are several things to see in this example.\n\n* The CLI program is the function `main()`, not the others. This is the one that takes a *CLI argument*.\n* The function `maybe_cre",
+          "query_matches": {
+            "query-original": {
+              "qualified": false,
+              "match_ratio": 0.3333,
+              "body_matched_terms": [
+                "typer",
+                "program",
+                "exit"
+              ]
+            }
+          }
+        }
+      ],
+      "projector_inputs": [
+        {
+          "path": "docs/tutorial/terminating.md",
+          "content": "## `Exit` a CLI program\n\nYou can normally just let the code of your CLI program finish its execution, but in some scenarios, you might want to terminate at some point in the middle of it. And prevent any subsequent code to run.\n\nThis doesn't have to mean that there's an error, just that nothing else needs to be executed.\n\nIn that case, you can raise a `typer.Exit()` exception:\n\n```Python hl_lines=\"9\"\n{!../docs_src/terminating/tutorial001.py!}\n```\n\n"
+        },
+        {
+          "path": "docs/tutorial/terminating.md",
+          "content": "## Exit with an error\n\n`typer.Exit()` takes an optional `code` parameter. By default, `code` is `0`, meaning there was no error.\n\nYou can pass a `code` with a number other than `0` to tell the terminal that there was an error in the execution of the program:\n\n```Python hl_lines=\"7\"\n{!../docs_src/terminating/tutorial002.py!}\n```\n\nCheck it:\n\n<div class=\"termy\">\n\n"
+        },
+        {
+          "path": "docs/tutorial/terminating.md",
+          "content": "## Abort\n\nThere's a special exception that you can use to \"abort\" a program.\n\nIt works more or less the same as `typer.Exit()` but will print `\"Aborted!\"` to the screen and can be useful in certain cases later to make it explicit that the execution was aborted:\n\n```Python hl_lines=\"7\"\n{!../docs_src/terminating/tutorial003.py!}\n```\n\nCheck it:\n\n<div class=\"termy\">\n\n"
+        }
+      ],
+      "final_sources": [
+        {
+          "path_or_url": "docs/tutorial/terminating.md",
+          "snippet": "## Abort\n\nThere's a special exception that you can use to \"abort\" a program.\n\nIt works more or less the same as `typer.Exit()` but will print `\"Aborted!\"` to the screen and can be useful in certain cases later to make it explicit that the execution was aborted:\n\n```Python hl_lines=\"7\"\n{!../docs_src/terminating/tutorial003.py!}\n```\n\nCheck it:\n\n<div class=\"termy\">",
+          "line_start": 100,
+          "line_end": 112
+        },
+        {
+          "path_or_url": "docs/tutorial/terminating.md",
+          "snippet": "## `Exit` a CLI program\n\nYou can normally just let the code of your CLI program finish its execution, but in some scenarios, you might want to terminate at some point in the middle of it. And prevent any subsequent code to run.\n\nThis doesn't have to mean that there's an error, just that nothing else needs to be executed.\n\nIn that case, you can raise a `typer.Exit()` exception:\n\n```Python hl_lines=\"9\"\n{!../docs_src/terminating/tutorial001.py!}\n```",
+          "line_start": 7,
+          "line_end": 17
+        }
+      ]
+    }
   }
 ]

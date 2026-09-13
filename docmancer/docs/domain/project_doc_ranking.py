@@ -743,6 +743,30 @@ def rerank_project_doc_chunks(
     covered_audited_queries: set[str] = set()
     diversity_relaxed_ids: set[int] = set()
     remaining = list(scored)
+
+    # Heading/catalog boosts must not spend the last slot on a strict
+    # subset of the visible evidence available in the same source. Keep
+    # incomparable passages and distinct public directions in normal order.
+    # Qualification and source quotas remain independent of this preference.
+    def dominates(left: Any, right: Any) -> bool:
+        if _source_key(left) != _source_key(right):
+            return False
+        public = public_queries_by_id[id(right)]
+        if not public or public != public_queries_by_id[id(left)]:
+            return False
+        if not audited_queries_by_id[id(right)] <= audited_queries_by_id[id(left)]:
+            return False
+        left_traces = (getattr(left, 'metadata', None) or {}).get('retrieval_query_matches', {})
+        right_traces = (getattr(right, 'metadata', None) or {}).get('retrieval_query_matches', {})
+        strict = False
+        for query_id in public:
+            a = set(left_traces[query_id].get('body_matched_terms') or [])
+            b = set(right_traces[query_id].get('body_matched_terms') or [])
+            if not b or not b <= a:
+                return False
+            strict |= b < a
+        return strict
+
     while remaining:
         # Spend bounded slots on new public lookups, not repeated or alias hits.
         next_index = max(range(len(remaining)), key=lambda i: (
@@ -751,6 +775,10 @@ def rerank_project_doc_chunks(
             len(audited_queries_by_id[id(remaining[i][3])] - covered_audited_queries),
             -i,
         ))
+        for candidate_index, row in enumerate(remaining):
+            current = remaining[next_index]
+            if row[0] == current[0] and dominates(row[3], current[3]):
+                next_index = candidate_index
         _, _, index, chunk = remaining.pop(next_index)
         path = _source_key(chunk, index)
         new_public_queries = public_queries_by_id[id(chunk)] - covered_public_queries

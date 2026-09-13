@@ -174,6 +174,7 @@ def project_docs_context(
     candidates = list(retrieval.get("context_pack") or ())
     initially_ranked = _facet_aware_candidates(
         candidates, query_text=query_text,
+        fallback_query_ids=context_hint_query_ids,
         host_query_ids=host_query_ids,
         required_query_ids=compound_priority_query_ids - audited_rewrite_query_ids,
         supplemental_query_ids=audited_rewrite_query_ids,
@@ -241,7 +242,7 @@ def project_docs_context(
             )
         ):
             continue
-        if not component_ids and not required_ids and not exact_anchor_ids and not original_hit and not host_ids and not canonical_intent_ids and not (qualified_ids & context_hint_query_ids and has_context_hint_support(qualified_original)):
+        if not component_ids and not required_ids and not exact_anchor_ids and not original_hit and not host_ids and not canonical_intent_ids and not (qualified_ids & context_hint_query_ids and has_context_hint_support(qualified_original, question=original_question)):
             continue
         if (
             "contract_fact" in context_only_relations
@@ -337,6 +338,7 @@ def project_docs_context(
         )
         prepared = _facet_aware_candidates(
             prepared, query_text=query_text,
+            fallback_query_ids=context_hint_query_ids,
             host_query_ids=host_query_ids,
             required_query_ids=missing_compound_priority_ids - audited_rewrite_query_ids,
             supplemental_query_ids=audited_rewrite_query_ids - qualified_query_ids(sources),
