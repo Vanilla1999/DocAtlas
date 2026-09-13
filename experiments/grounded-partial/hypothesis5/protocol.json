@@ -1,0 +1,30 @@
+{
+  "schema": "docatlas-hypothesis5-v1",
+  "runtime_commit": "266a3c40cee896522a11c89f4cacda8f12275d59",
+  "design": "Post-hoc diagnostic, not held-out acceptance. Freeze one manually shortened lookup before running. Keep original question, source policy, source corpus and 800-token complete DTO. No model call and no production edits.",
+  "success": "All requested facts supported by the returned verbatim spans; marker detection is diagnostic only. Controls must be manually reviewed for lost facts and unsupported premises.",
+  "hypotheses": [
+    {"id":"Q05", "compact_lookup":"scope repository docs", "target_path":"docs/project-docs-mcp-workflow.md", "marker":"scope=\"project\"", "hypothesis":"The indexed scope table is retrieved but rejected by lexical body qualification; a shorter lookup may admit it without changing production."},
+    {"id":"Q14", "compact_lookup":"token budget metadata", "target_path":"docs/retrieval-boundaries.md", "marker":"including metadata", "hypothesis":"The relevant budget paragraph is lost before projection because natural-language terms do not match its body sufficiently. Budget size is not the first blocker."},
+    {"id":"Q15", "compact_lookup":"source_uri automatic read", "target_path":"docs/grounded-host-session.md", "marker":"does not cause I/O", "hypothesis":"The answer reaches qualified variants but loses competition to usage prose. Forward continuation depends on which citation was selected and may read past or away from the missing fact."},
+    {"id":"Q25", "compact_lookup":"per-source cap related chunks", "target_path":"docs/retrieval-boundaries.md", "marker":"additional candidate per source", "hypothesis":"The overflow paragraph reaches projection but cannot qualify for the question's wording; ranking alone cannot restore a rejected span."},
+    {"id":"Q36", "compact_lookup":"tests task tokens", "target_path":"docs/source-continuation.md", "marker":"task-token savings", "hypothesis":"Broad acceptance/testing lookups retrieve test instructions rather than the limit on product claims; the needed span is absent from the request's pre-cap pool."}
+  ],
+  "controls": [
+    {"sample":"new40", "id":"Q01", "compact_lookup":"docs_status get_docs_context start"},
+    {"sample":"new40", "id":"Q17", "compact_lookup":"source snapshot changes continuation"},
+    {"sample":"new40", "id":"Q23", "compact_lookup":"project identities scopes isolation"},
+    {"sample":"new40", "id":"Q37", "compact_lookup":"fixed fifty-percent task-token saving guaranteed"},
+    {"sample":"new40", "id":"Q38", "compact_lookup":"guarantee every query complete correct answer"},
+    {"sample":"new40", "id":"Q39", "compact_lookup":"unknown private deployment password"},
+    {"sample":"new40", "id":"Q40", "compact_lookup":"mandatory ninety-day conversation retention"},
+    {"sample":"old40", "id":"Q22", "compact_lookup":"same document citations per-source cap overflow"}
+  ],
+  "oracle_diagnostics": [
+    "Known target first at projector ranking, keeping qualification unchanged: only for targets already present in the projector input.",
+    "Known target admitted past lexical qualification, preserving identity/freshness/risk/lifecycle/exact-anchor rejection; compare qualification alone with qualification plus target-first. Oracle labels use gold and are not deployable classifiers.",
+    "One manually selected contiguous authoritative answer span in an ordinary bounded DTO: feasibility upper bound, not a retrieval result.",
+    "For Q15 compare two actual forward reader attempts from each relevant returned locator; no whole-file read is sent to a model."
+  ],
+  "stopping_rule": "No tuning compact lookups after seeing results. Report failures and oracle/practical differences; do not add a selector, synonyms or a second reader to production from five cases."
+}

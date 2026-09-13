@@ -1,0 +1,8 @@
+{
+  "schema": "docatlas-hypothesis5-soft-lexical-v1",
+  "timing": "Exploratory follow-up, registered after observing the initial compact-lookup and known-support probes, before executing this treatment.",
+  "hypothesis": "A minimal deployable-shaped substitute for the gold support oracle might recover the useful spans without a semantic model: admit a policy-eligible span with at least one body term, even below the current lexical ratio.",
+  "treatment": "Override only insufficient_visible_match, only with nonempty body_matched_terms and no missing exact/parent exact terms. No question ID, target path, gold marker or source quote used by the predicate. Keep current question and guided lookups. Apply identically to the five failures and eight controls.",
+  "limits": "Test-only monkeypatch. Public answer flags, policy checks and full DTO limits remain. This is not semantic certification. No production edit or recommendation to lower a threshold without preserved prior facts and useful evidence.",
+  "stopping_rule": "One predicate, one pass, no threshold tuning after results. Reject if it loses a previously complete control or fails to restore the targeted facts."
+}
