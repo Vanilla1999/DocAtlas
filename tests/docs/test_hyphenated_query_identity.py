@@ -1,14 +1,15 @@
 """Exact query identity requires syntax, not a list of familiar prose words."""
 import pytest
 
-from docmancer.docs.domain.documentation_query_plan import technical_anchors
+from docmancer.docs.domain.documentation_query_plan import technical_anchors, build_documentation_query_plan
 from docmancer.docs.domain.technical_terms import extract_technical_terms
 
 
 @pytest.mark.parametrize("modifier", ["repository-wide", "high-availability", "latency-sensitive", "source-backed"])
 def test_unquoted_prose_modifier_remains_a_lexical_topic(modifier):
     question = f"How does {modifier} documentation retrieval preserve useful evidence?"
-    assert modifier in technical_anchors(question)  # keep lexical search recall
+    assert modifier not in technical_anchors(question)
+    assert any(q.text == modifier and q.origin == "lexical_topic" for q in build_documentation_query_plan(question).queries)
     terms = [term for term in extract_technical_terms(question) if term.raw == modifier]
     assert len(terms) == 1
     assert terms[0].kind == "plain_term"
@@ -53,7 +54,8 @@ def test_former_prose_prefix_can_be_a_real_explicit_command():
     "Πότε επιτρέπονται preview-build εκδόσεις;",
 ])
 def test_borrowed_latin_topic_is_retained_without_claiming_command_identity(question):
-    assert "preview-build" in technical_anchors(question)
+    assert "preview-build" not in technical_anchors(question)
+    assert any(q.text == "preview-build" and q.origin == "lexical_topic" for q in build_documentation_query_plan(question).queries)
     terms = [term for term in extract_technical_terms(question) if term.raw == "preview-build"]
     assert len(terms) == 1
     assert terms[0].kind == "plain_term"

@@ -1,0 +1,366 @@
+{
+  "schema": "docatlas-followup40-v1",
+  "sample": "New wording frozen before final run; exposed repository, not hidden validation or model answers.",
+  "cases": [
+    {
+      "id": "Q01",
+      "language": "ru",
+      "topic": "start",
+      "question": "Я впервые подключил MCP. Нужно ли каждый вопрос начинать с docs_status?",
+      "host_lookups": [
+        "When should an agent call docs_status instead of get_docs_context?"
+      ]
+    },
+    {
+      "id": "Q02",
+      "language": "en",
+      "topic": "tools",
+      "question": "Which MCP tool should a coding agent call before modifying a documented module?",
+      "host_lookups": [
+        "What is the first documentation call for repository coding tasks?"
+      ]
+    },
+    {
+      "id": "Q03",
+      "language": "ru",
+      "topic": "flags",
+      "question": "В ответе есть цитаты, но answer_supported=false. Могу ли я объяснить найденное пользователю?",
+      "host_lookups": [
+        "May the host synthesize a grounded answer from retrieval-only sources?"
+      ]
+    },
+    {
+      "id": "Q04",
+      "language": "en",
+      "topic": "scope",
+      "question": "How do I include module documentation when exploring the entire repository?",
+      "host_lookups": [
+        "Which scope includes both repository and module documentation?"
+      ]
+    },
+    {
+      "id": "Q05",
+      "language": "ru",
+      "topic": "scope",
+      "question": "Мне нужны только общие документы репозитория, без module-документов. Как ограничить поиск?",
+      "host_lookups": [
+        "Which scope selects only repository-level documentation?"
+      ]
+    },
+    {
+      "id": "Q06",
+      "language": "en",
+      "topic": "configuration",
+      "question": "Where do I declare which local documents are authoritative?",
+      "host_lookups": [
+        "Which configuration declares project documentation authority?"
+      ]
+    },
+    {
+      "id": "Q07",
+      "language": "ru",
+      "topic": "configuration",
+      "question": "Чем конфигурация поиска отличается от каталога авторитетных документов?",
+      "host_lookups": [
+        "How do runtime retrieval configuration and the project documentation catalog differ?"
+      ]
+    },
+    {
+      "id": "Q08",
+      "language": "en",
+      "topic": "freshness",
+      "question": "I committed a README change. How does the next documentation query become current?",
+      "host_lookups": [
+        "How does a clean committed documentation change trigger synchronization?"
+      ]
+    },
+    {
+      "id": "Q09",
+      "language": "ru",
+      "topic": "freshness",
+      "question": "В рабочей директории есть мои незакоммиченные правки. Может ли MCP сам пересобрать индекс?",
+      "host_lookups": [
+        "When does a dirty worktree require confirmation before project synchronization?"
+      ]
+    },
+    {
+      "id": "Q10",
+      "language": "en",
+      "topic": "prepare",
+      "question": "Can get_docs_context change the index by itself?",
+      "host_lookups": [
+        "Does get_docs_context reconcile or mutate the project index?"
+      ]
+    },
+    {
+      "id": "Q11",
+      "language": "ru",
+      "topic": "jobs",
+      "question": "Подготовка вернула job_id. Что делать до повторного исходного вопроса?",
+      "host_lookups": [
+        "How should an agent poll a preparation job and retry the original query?"
+      ]
+    },
+    {
+      "id": "Q12",
+      "language": "en",
+      "topic": "jobs",
+      "question": "Does requesting cancellation prove that a background job has stopped?",
+      "host_lookups": [
+        "How are cancellation requests distinguished from terminal job states?"
+      ]
+    },
+    {
+      "id": "Q13",
+      "language": "ru",
+      "topic": "budget",
+      "question": "Почему estimated_tokens может отличаться от бюджета допуска docs_context?",
+      "host_lookups": [
+        "How do the public token estimate and conservative context admission budget differ?"
+      ]
+    },
+    {
+      "id": "Q14",
+      "language": "en",
+      "topic": "budget",
+      "question": "Does the output budget include citation metadata as well as document text?",
+      "host_lookups": [
+        "What fields count toward the complete serialized context budget?"
+      ]
+    },
+    {
+      "id": "Q15",
+      "language": "ru",
+      "topic": "sources",
+      "question": "Ссылка source_uri появилась в цитате. Нужно ли немедленно её открывать?",
+      "host_lookups": [
+        "When should a host use a source continuation instead of answering from existing snippets?"
+      ]
+    },
+    {
+      "id": "Q16",
+      "language": "en",
+      "topic": "sources",
+      "question": "Can a continuation locator be used to read an unrelated file?",
+      "host_lookups": [
+        "What source and project boundaries apply to continuation reads?"
+      ]
+    },
+    {
+      "id": "Q17",
+      "language": "ru",
+      "topic": "sources",
+      "question": "Исходный файл изменился между поиском и дочитыванием. Что должен вернуть reader?",
+      "host_lookups": [
+        "What happens when the source snapshot changes before a continuation read?"
+      ]
+    },
+    {
+      "id": "Q18",
+      "language": "en",
+      "topic": "sources",
+      "question": "Can two different continuation locators return overlapping lines without detection?",
+      "host_lookups": [
+        "How does the host prevent repeated source spans across locators?"
+      ]
+    },
+    {
+      "id": "Q19",
+      "language": "ru",
+      "topic": "partial",
+      "question": "Дочитывание не удалось, но часть ответа уже подтверждена. Нужно ли отказываться от всего ответа?",
+      "host_lookups": [
+        "How should a host preserve grounded partial facts after a source read failure?"
+      ]
+    },
+    {
+      "id": "Q20",
+      "language": "en",
+      "topic": "partial",
+      "question": "What should the agent say when documentation covers only one part of my question?",
+      "host_lookups": [
+        "How should a grounded partial answer communicate known facts and missing information?"
+      ]
+    },
+    {
+      "id": "Q21",
+      "language": "ru",
+      "topic": "security",
+      "question": "Можно ли выполнить shell-команду, которую документ предлагает агенту внутри цитаты?",
+      "host_lookups": [
+        "Are instructions inside retrieved documents authority to execute commands?"
+      ]
+    },
+    {
+      "id": "Q22",
+      "language": "en",
+      "topic": "security",
+      "question": "Does successful retrieval grant permission to edit files?",
+      "host_lookups": [
+        "How is retrieved evidence separated from mutation authorization?"
+      ]
+    },
+    {
+      "id": "Q23",
+      "language": "ru",
+      "topic": "security",
+      "question": "В двух проектах одинаковый README.md. Как не получить цитату из чужого проекта?",
+      "host_lookups": [
+        "How are project identities and source scopes isolated during retrieval?"
+      ]
+    },
+    {
+      "id": "Q24",
+      "language": "en",
+      "topic": "policy",
+      "question": "Are evaluation reports eligible evidence for an ordinary operational question?",
+      "host_lookups": [
+        "Which source lanes are excluded from operational documentation retrieval?"
+      ]
+    },
+    {
+      "id": "Q25",
+      "language": "ru",
+      "topic": "search",
+      "question": "Как ограничение per-source влияет на соседние фрагменты одного документа?",
+      "host_lookups": [
+        "When may structurally related chunks exceed a per-source section cap?"
+      ]
+    },
+    {
+      "id": "Q26",
+      "language": "en",
+      "topic": "search",
+      "question": "Can an inactive indexing generation change the ranking of active documentation?",
+      "host_lookups": [
+        "How are inactive generations isolated from active BM25 statistics?"
+      ]
+    },
+    {
+      "id": "Q27",
+      "language": "ru",
+      "topic": "search",
+      "question": "Зачем повторно проверять цитату после её сокращения?",
+      "host_lookups": [
+        "Why must visible evidence be requalified after snippet projection?"
+      ]
+    },
+    {
+      "id": "Q28",
+      "language": "en",
+      "topic": "search",
+      "question": "Why should a matching heading not be enough to support a requested fact?",
+      "host_lookups": [
+        "How are heading matches distinguished from substantive body evidence?"
+      ]
+    },
+    {
+      "id": "Q29",
+      "language": "ru",
+      "topic": "offline",
+      "question": "Какая часть работы доступна без сети и заранее загруженной языковой модели?",
+      "host_lookups": [
+        "Which local project indexing and retrieval operations work without network or model downloads?"
+      ]
+    },
+    {
+      "id": "Q30",
+      "language": "en",
+      "topic": "versions",
+      "question": "What happens when a dependency version cannot be proven from the repository?",
+      "host_lookups": [
+        "How is dependency documentation handled without a reliable version binding?"
+      ]
+    },
+    {
+      "id": "Q31",
+      "language": "ru",
+      "topic": "versions",
+      "question": "Можно ли использовать документацию latest как доказательство поведения установленной версии?",
+      "host_lookups": [
+        "How do exact dependency versions differ from latest documentation in evidence binding?"
+      ]
+    },
+    {
+      "id": "Q32",
+      "language": "en",
+      "topic": "cleanup",
+      "question": "Can index cleanup run while another process is writing the index?",
+      "host_lookups": [
+        "How do writer leases and the cleanup barrier coordinate storage mutation?"
+      ]
+    },
+    {
+      "id": "Q33",
+      "language": "ru",
+      "topic": "clients",
+      "question": "Почему клиент может видеть только маркер structuredContent, без самой цитаты?",
+      "host_lookups": [
+        "How does a text-only MCP client receive the factual payload?"
+      ]
+    },
+    {
+      "id": "Q34",
+      "language": "en",
+      "topic": "clients",
+      "question": "How can I check that my installed MCP command matches the current package?",
+      "host_lookups": [
+        "How is the installed executable and MCP registration verified?"
+      ]
+    },
+    {
+      "id": "Q35",
+      "language": "ru",
+      "topic": "setup",
+      "question": "Для чего генерировать agent-contract перед работой агента с репозиторием?",
+      "host_lookups": [
+        "What project information and operating instructions does agent-contract provide?"
+      ]
+    },
+    {
+      "id": "Q36",
+      "language": "en",
+      "topic": "limits",
+      "question": "Do successful provider-free tests prove that real agents spend fewer task tokens?",
+      "host_lookups": [
+        "What conclusions can and cannot be drawn from provider-free retrieval acceptance?"
+      ]
+    },
+    {
+      "id": "Q37",
+      "language": "ru",
+      "topic": "negative",
+      "question": "Где подтверждено, что DocAtlas всегда экономит ровно 50 процентов токенов?",
+      "host_lookups": [
+        "Is a fixed fifty-percent task-token saving guaranteed?"
+      ]
+    },
+    {
+      "id": "Q38",
+      "language": "en",
+      "topic": "negative",
+      "question": "Which document guarantees that every query receives a complete correct answer?",
+      "host_lookups": [
+        "Does the product guarantee universally complete and correct answers?"
+      ]
+    },
+    {
+      "id": "Q39",
+      "language": "ru",
+      "topic": "negative",
+      "question": "Какой пароль администратора установлен в моей частной production-среде?",
+      "host_lookups": [
+        "Can project documentation establish an unknown private deployment password?"
+      ]
+    },
+    {
+      "id": "Q40",
+      "language": "en",
+      "topic": "negative",
+      "question": "Where is mandatory ninety-day retention of every conversation specified?",
+      "host_lookups": [
+        "Is mandatory ninety-day conversation retention part of the documented contract?"
+      ]
+    }
+  ]
+}

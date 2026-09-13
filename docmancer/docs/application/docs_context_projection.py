@@ -49,6 +49,7 @@ from docmancer.docs.domain.normative_language import _FORBIDDEN_RE, _REQUIRED_RE
 def project_docs_context(
     *, retrieval: dict[str, Any], max_tokens: int = DOCS_CONTEXT_MAX_TOKENS,
     selection_diagnostics: dict[str, Any] | None = None,
+    _allow_context_hints: bool = False,
 ) -> tuple[dict[str, Any], dict[str, dict[str, Any]]]:
     """Project trusted retrieval as context without claiming answer support."""
 
@@ -149,7 +150,8 @@ def project_docs_context(
     if len(host_query_ids) > 1:
         compound_priority_query_ids = host_query_ids | audited_rewrite_query_ids
     eligible_query_ids = public_query_id_set | canonical_intent_query_ids
-    context_hint_query_ids = fallback_context_query_ids(query_plan, retrieval, eligible_query_ids)
+    fallback_ids = fallback_context_query_ids(query_plan, retrieval, eligible_query_ids)
+    context_hint_query_ids = fallback_ids if _allow_context_hints else set()
     eligible_query_ids |= context_hint_query_ids
     original_question = str(query_plan.get("original_question") or retrieval.get("question") or query_text.get("query-original") or "")
     requirements = retrieval.get("requirements") or {}
@@ -455,13 +457,15 @@ def project_docs_context(
             )
         ):
             continue
-        # Compound reads may supplement a partial lead; single-direction reads retain it.
+        # A lexical hit does not complete a host question. Permit a complementary
+        # qualified body for one lookup only when it adds two requested terms;
+        # a lone topical mention must not spend the remaining source budget.
         if (host_ids and not new_components and not (host_ids - selected_host_query_ids)
             and not required_ids and not exact_anchor_ids and not original_hit and not canonical_intent_ids
-            and not (len(host_query_ids) > 1 and any(set(normalized["retrieval_query_matches"][key].get("matched_terms") or ()) - {
+            and not (any(len(set(normalized["retrieval_query_matches"][key].get("body_matched_terms") or ()) - {
                 term for source in sources
-                for term in (source.get("retrieval_query_matches", {}).get(key, {}).get("matched_terms") or ())
-            } for key in host_ids - selected_public_ids))):
+                for term in (source.get("retrieval_query_matches", {}).get(key, {}).get("body_matched_terms") or ())
+            }) >= (1 if len(host_query_ids) > 1 else 2) for key in host_ids - selected_public_ids))):
             continue
         evidence_id = normalized["evidence_id"]
         if evidence_id in seen_ids:
@@ -501,6 +505,17 @@ def project_docs_context(
             break
 
     if not sources:
+        if fallback_ids and not _allow_context_hints:
+            # Decide fallback after visible qualification and complete DTO
+            # admission. Raw candidates can qualify yet fail that boundary.
+            # Conversely, hints must not steal space from a surviving answer.
+            primary_diagnostics = projection_diagnostics
+            result = project_docs_context(
+                retrieval=retrieval, max_tokens=max_tokens,
+                selection_diagnostics=selection_diagnostics, _allow_context_hints=True,
+            )
+            retrieval['retrieval_diagnostics']['docs_context_projection']['primary_attempt'] = primary_diagnostics
+            return result
         if selection_diagnostics is not None:
             selection_diagnostics["component_coverage"] = component_coverage_decision(
                 query_plan.get("_component_contract") or (), assignments, (),

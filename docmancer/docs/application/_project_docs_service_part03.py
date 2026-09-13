@@ -206,7 +206,7 @@ class _ProjectDocsServicePart03:
         lookup_query_ids = {
             item.text: item.query_id
             for item in documentation_query_plan.queries
-            if item.origin in {"exact_anchor", "exact_path", "host_lookup", "canonical_intent", "concept_alias", "retrieval_hint"}
+            if item.origin in {"exact_anchor", "exact_path", "host_lookup", "canonical_intent", "concept_alias", "retrieval_hint", "lexical_topic"}
         }
         exact_path_query_id = next((
             item.query_id for item in documentation_query_plan.queries
@@ -237,7 +237,7 @@ class _ProjectDocsServicePart03:
         ))[:4]
         planned_lookup_queries = tuple(
             item.text for item in documentation_query_plan.queries
-            if item.origin in {"exact_anchor", "exact_path", "host_lookup", "canonical_intent", "concept_alias", "retrieval_hint"}
+            if item.origin in {"exact_anchor", "exact_path", "host_lookup", "canonical_intent", "concept_alias", "retrieval_hint", "lexical_topic"}
         )
         supplemental_queries = tuple(dict.fromkeys((
             *planned_lookup_queries,
@@ -382,6 +382,7 @@ class _ProjectDocsServicePart03:
             [
                 *queries_by_origin.get("exact_path", []),
                 *queries_by_origin.get("exact_anchor", []),
+                *queries_by_origin.get("lexical_topic", []),
             ],
             [[*authoritative_chunks, *chunks]],
             queries_by_origin.get("host_lookup", []),

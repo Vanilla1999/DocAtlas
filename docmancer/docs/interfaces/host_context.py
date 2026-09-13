@@ -7,6 +7,7 @@ from __future__ import annotations
 
 from copy import deepcopy
 import json
+import inspect
 import re
 from typing import Callable, Any
 
@@ -91,17 +92,42 @@ class SourceReadController:
             raise ValueError('unknown requested fact')
         self.supported_facts.add(fact_id)
 
-    def read(self, uri: str, *, missing_fact_id: str) -> dict:
+    def _begin_read(self, uri: str, missing_fact_id: str):
         if missing_fact_id not in self.requested_facts or missing_fact_id in self.supported_facts:
-            return self._stop('no_concrete_missing_fact')
+            return None, self._stop('no_concrete_missing_fact')
         if self.read_attempts >= 2:
-            return self._stop('read_budget_exhausted')
+            return None, self._stop('read_budget_exhausted')
         if uri in self._seen_uris or uri not in self._allowed:
-            return self._stop('unknown_or_repeated_source')
+            return None, self._stop('unknown_or_repeated_source')
         expected = self._allowed.pop(uri)
         self._seen_uris.add(uri)
         self.read_attempts += 1
-        result = self._read_resource(uri)
+        return expected, None
+
+    def read(self, uri: str, *, missing_fact_id: str) -> dict:
+        expected, stopped = self._begin_read(uri, missing_fact_id)
+        if stopped:
+            return stopped
+        try:
+            result = self._read_resource(uri)
+        except Exception:
+            return self._stop('source_read_failed')
+        return self._accept_read(result, expected)
+
+    async def aread(self, uri: str, *, missing_fact_id: str) -> dict:
+        """Authorize before I/O; apply the same boundary to async MCP clients."""
+        expected, stopped = self._begin_read(uri, missing_fact_id)
+        if stopped:
+            return stopped
+        try:
+            result = self._read_resource(uri)
+            if inspect.isawaitable(result):
+                result = await result
+        except Exception:
+            return self._stop('source_read_failed')
+        return self._accept_read(result, expected)
+
+    def _accept_read(self, result: dict, expected: dict) -> dict:
         if not isinstance(result, dict) or docs_context_budget_tokens(result) > 600:
             return self._stop('invalid_or_oversized_read')
         self.extra_tokens += docs_context_budget_tokens(result)

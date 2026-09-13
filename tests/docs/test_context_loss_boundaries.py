@@ -11,6 +11,47 @@ from docmancer.docs.application._project_docs_service_part03 import _tag_retriev
 from docmancer.docs.domain.documentation_query_plan import DocumentationLookup
 
 
+@pytest.mark.parametrize('word', ['repository-wide', 'per-source', 'pre-release', 'blue-green'])
+def test_plain_compounds_keep_recall_without_exact_identity(word):
+    from docmancer.docs.domain.documentation_query_plan import build_documentation_query_plan, technical_anchors
+    question = f'Explain the {word} behavior.'
+    plan = build_documentation_query_plan(question).as_payload()
+    assert word not in technical_anchors(question)
+    lookups = [q for q in plan['queries'] if q['text'] == word]
+    assert lookups and all(q['origin'] == 'lexical_topic' for q in lookups)
+    assert all(q['query_id'] not in plan['public_query_ids'] for q in lookups)
+
+
+def test_default_lookup_preserves_a_prose_topic_without_claiming_identity():
+    from docmancer.docs.domain.project_retrieval_intent import build_project_retrieval_aliases
+    rows = build_project_retrieval_aliases('Как blue-green работает по умолчанию?')
+    assert any(row.text == 'blue-green default' and row.force_context_only for row in rows)
+    assert not any(row.intent_id == 'default_behavior' for row in
+        build_project_retrieval_aliases('Как blue-green работает?'))
+
+
+def test_unadmittable_full_candidate_does_not_disable_useful_partial_evidence():
+    terms = ['storage', 'compression', 'encoding', 'latency', 'formats', 'deployment', 'quotas', 'transport']
+    question = 'Explain ' + ' '.join(terms)
+    def source(path, body, qid, query):
+        return {'source_class': 'project_doc', 'path': path, 'content': body,
+            'project_identity': 'repo', 'authority': 'source_of_truth', 'doc_scope': 'project',
+            'lifecycle_status': 'active', 'index_freshness': 'synchronized',
+            'retrieval_query_matches': {qid: {'qualified': True, 'query_text': query}}}
+    partial = 'Storage compression reduces disk usage.'
+    retrieval = {'question': question, 'context_pack': [
+        source('docs/large.md', '\n\n'.join(term + ' ' + 'Additional explanatory material. '*120 for term in terms),
+               'query-original', question),
+        source('docs/short.md', partial, 'query-hint-1', 'storage'),
+    ], 'documentation_query_plan': {'original_question': question,
+        'unresolved_parts': ['independent requested topics'], 'required_query_ids': ['query-original'],
+        'queries': [{'query_id': 'query-original', 'text': question, 'origin': 'original'},
+                    {'query_id': 'query-hint-1', 'text': 'storage', 'origin': 'retrieval_hint'}]}}
+    payload, _ = project_docs_context(retrieval=retrieval, max_tokens=400)
+    assert any(row['snippet'] == partial for row in payload.get('sources', []))
+    assert not payload['answer_supported']
+
+
 @pytest.mark.parametrize('query,body', [
     ('retried', 'retry'), ('retry', 'retried'),
     ('copied', 'copy'), ('copy', 'copied'), ('supplied', 'supply'),
@@ -163,3 +204,42 @@ def test_partial_projection_preserves_distinguishing_body_within_budget():
                 {'query_id': 'query-hint-1', 'text': 'finish', 'origin': 'retrieval_hint'}]}})
     assert any('STOPPED' in row['snippet'] for row in payload.get('sources', []))
     assert not payload['answer_supported']
+
+
+def test_partial_fallback_cannot_spend_a_surviving_primary_answers_budget():
+    question = 'Explain storage compression encoding latency formats deployment quotas transport'
+    witness = 'Storage compression encoding latency formats deployment quotas transport are documented here.'
+    def source(path, body, qid, query):
+        return {'source_class': 'project_doc', 'path': path, 'content': body,
+            'project_identity': 'repo', 'authority': 'source_of_truth', 'doc_scope': 'project',
+            'lifecycle_status': 'active', 'index_freshness': 'synchronized',
+            'retrieval_query_matches': {qid: {'qualified': True, 'query_text': query}}}
+    payload, _ = project_docs_context(retrieval={'question': question, 'context_pack': [
+        source('docs/complete.md', witness, 'query-original', question),
+        source('docs/partial.md', 'Storage compression reduces disk usage.', 'query-hint-1', 'storage'),
+    ], 'documentation_query_plan': {'original_question': question,
+        'unresolved_parts': ['independent requested topics'], 'required_query_ids': ['query-original'],
+        'queries': [{'query_id': 'query-original', 'text': question, 'origin': 'original'},
+                    {'query_id': 'query-hint-1', 'text': 'storage', 'origin': 'retrieval_hint'}]}})
+    assert any(row['snippet'] == witness for row in payload['sources'])
+    assert all(row['path_or_url'] != 'docs/partial.md' for row in payload['sources'])
+
+
+def test_one_host_lookup_can_retain_complementary_qualified_body_facts():
+    question = 'Explain our private deployment policy.'
+    lookup = 'storage compression encoding latency formats quotas'
+    first = 'Storage compression encoding latency use adaptive settings.'
+    second = 'Encoding latency formats quotas have explicit bounds.'
+    def source(path, body):
+        return {'source_class': 'project_doc', 'path': path, 'content': body,
+            'project_identity': 'repo', 'authority': 'source_of_truth', 'doc_scope': 'project',
+            'lifecycle_status': 'active', 'index_freshness': 'synchronized',
+            'retrieval_query_matches': {'query-lookup-1': {'qualified': True, 'query_text': lookup}}}
+    payload, _ = project_docs_context(retrieval={'question': question,
+        'context_pack': [source('docs/first.md', first), source('docs/second.md', second)],
+        'documentation_query_plan': {'original_question': question,
+            'queries': [{'query_id': 'query-original', 'text': question, 'origin': 'original'},
+                        {'query_id': 'query-lookup-1', 'text': lookup, 'origin': 'host_lookup'}]}})
+    assert {row['snippet'] for row in payload['sources']} == {first, second}
+    assert not payload['answer_supported']
+    assert 'query-original' not in payload['covered_query_ids']
