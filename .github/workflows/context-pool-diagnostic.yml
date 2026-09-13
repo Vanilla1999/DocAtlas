@@ -1,0 +1,49 @@
+name: Context pool diagnostic
+on:
+  pull_request:
+    types: [opened, reopened, synchronize]
+    paths:
+      - '.github/workflows/context-pool-diagnostic.yml'
+      - 'experiments/grounded-partial/contextual-late/diagnose_selection_pool.py'
+permissions:
+  contents: read
+jobs:
+  qualified-pool:
+    if: github.head_ref == 'experiment/contextual-late-sufficiency'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      DOCATLAS_OFFLINE: '1'
+      DOCATLAS_AUTO_VECTORS: '0'
+      PYTHONHASHSEED: '0'
+      PYTHONPATH: ${{ github.workspace }}:${{ github.workspace }}/experiments/grounded-partial/contextual-late
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Record experiment revision and install dependencies
+        run: |
+          mkdir -p "$RUNNER_TEMP/pool-diagnostic"
+          git rev-parse HEAD > "$RUNNER_TEMP/pool-diagnostic/head.txt"
+          python -m pip install '.[dev]' > "$RUNNER_TEMP/pool-diagnostic/pip-install.log" 2>&1
+          python -m pip freeze > "$RUNNER_TEMP/pool-diagnostic/pip-freeze.txt"
+      - name: Restore frozen development inputs
+        run: python experiments/grounded-partial/research-suite/restore.py
+      - name: Localize witness losses without changing selection
+        run: |
+          set -o pipefail
+          python experiments/grounded-partial/hypothesis5/no_network.py experiments/grounded-partial/contextual-late/diagnose_selection_pool.py --output "$RUNNER_TEMP/pool-diagnostic/results" 2>&1 | tee "$RUNNER_TEMP/pool-diagnostic/diagnostic.log"
+      - name: Verify tracked files remain unchanged
+        if: always()
+        run: git diff --exit-code
+      - name: Preserve unbounded diagnostics separately from actual DTO results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: context-pool-${{ github.event.pull_request.head.sha }}
+          path: ${{ runner.temp }}/pool-diagnostic/
+          retention-days: 14
