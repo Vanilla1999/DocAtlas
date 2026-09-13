@@ -9,7 +9,6 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 import re
-import unicodedata
 from typing import Iterable, Literal
 
 
@@ -301,12 +300,6 @@ def extract_technical_terms(question: str) -> tuple[TechnicalTerm, ...]:
     """Extract bounded technical identities without promoting ordinary prose."""
 
     source = str(question or "")
-    # A Latin topic embedded in another script is a useful lexical bridge,
-    # even without command syntax. Do not upgrade it to a command identity.
-    has_non_latin_prose = any(
-        char.isalpha() and "LATIN" not in unicodedata.name(char, "")
-        for char in source
-    )
     candidates: list[tuple[int, int, str, TechnicalTermKind | None]] = []
     occupied: list[tuple[int, int]] = []
 
@@ -329,8 +322,8 @@ def extract_technical_terms(question: str) -> tuple[TechnicalTerm, ...]:
         for match in pattern.finditer(source):
             candidate_kind = kind
             if kind == "cli_command" and not _explicit_command_context(source, *match.span()):
-                if not has_non_latin_prose:
-                    continue
+                # Keep lexical recall without inferring a CLI identity from
+                # punctuation. This applies equally to prose and borrowed terms.
                 candidate_kind = "plain_term"
             add(match, candidate_kind)  # type: ignore[arg-type]
 

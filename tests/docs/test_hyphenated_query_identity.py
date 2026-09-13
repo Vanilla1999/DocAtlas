@@ -8,8 +8,10 @@ from docmancer.docs.domain.technical_terms import extract_technical_terms
 @pytest.mark.parametrize("modifier", ["repository-wide", "high-availability", "latency-sensitive", "source-backed"])
 def test_unquoted_prose_modifier_is_not_a_mandatory_command_identity(modifier):
     question = f"How does {modifier} documentation retrieval preserve useful evidence?"
-    assert modifier not in technical_anchors(question)
-    assert modifier not in {term.raw for term in extract_technical_terms(question)}
+    assert modifier in technical_anchors(question)  # keep lexical search recall
+    terms = [term for term in extract_technical_terms(question) if term.raw == modifier]
+    assert len(terms) == 1
+    assert terms[0].kind == "plain_term"
 
 
 @pytest.mark.parametrize("question", [
@@ -32,7 +34,9 @@ def test_explicit_command_syntax_retains_exact_hyphenated_identity(question):
 def test_command_context_does_not_promote_an_unrelated_prose_modifier():
     question = "Run archive-store for repository-wide documentation retrieval."
     assert "archive-store" in technical_anchors(question)
-    assert "repository-wide" not in technical_anchors(question)
+    kinds = {term.raw: term.kind for term in extract_technical_terms(question)}
+    assert kinds["archive-store"] == "cli_command"
+    assert kinds["repository-wide"] == "plain_term"
 
 
 def test_former_prose_prefix_can_be_a_real_explicit_command():
