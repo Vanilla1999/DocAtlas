@@ -59,7 +59,6 @@ def test_final_public_handler_preserves_quality_and_usable_reference(tmp_path):
     assert read["line_end"] <= target["line_end"]
     assert read["content_sha256"] == target["snapshot_sha256"]
 
-    # The ordinary host still requires a concrete missing fact before consuming it.
     service = _real_service(tmp_path / "second")
     payload = call_docs_tool_payload("get_docs_context", {
         **args, "project_path": str(tmp_path / "second"),
@@ -187,3 +186,52 @@ def test_binding_failure_removes_dead_read_next_and_reports_cause():
     assert payload["read_next"] == []
     assert "source_unavailable" in payload["context_quality"]["reasons"]
     assert docs_context_budget_tokens(payload) <= 800
+
+
+def test_final_projection_quality_uses_surviving_component_witness():
+    from docmancer.docs.application.docs_context_projection import project_docs_context
+
+    witness = "Verify the installation with the health check."
+    content = "Install locally. " + witness
+    witness_start = content.index(witness)
+    witness_hash = hashlib.sha256(witness.encode()).hexdigest()
+    payload, _ = project_docs_context(retrieval={
+        "context_pack": [{
+            "stable_id": "project:quality-doc", "source_class": "project_doc",
+            "path": "docs/install.md", "content": content,
+            "project_identity": "project:recovery", "lifecycle_status": "active",
+            "freshness": "current", "index_freshness": "synchronized", "risk_flags": [],
+            "retrieval_query_matches": {"query-original": {
+                "qualified": True, "mode": "and", "query_text": "install verify health check",
+            }},
+        }],
+        "selection_decision": {"assignments": [{
+            "requirement_id": "project_answer:verify", "evidence_id": "project:quality-doc",
+            "projected_content_hash": witness_hash,
+            "unit_char_start": witness_start, "unit_char_end": witness_start + len(witness),
+        }]},
+        "documentation_query_plan": {
+            "original_question": "install verify health check",
+            "query_ids": ["query-original"], "public_query_ids": ["query-original"],
+            "queries": [{"query_id": "query-original", "text": "install verify health check", "origin": "original"}],
+            "_component_contract": [{"component_id": "project_answer:verify"}],
+        },
+    })
+    assert payload["context_quality"] == {"status": "checked", "reasons": []}
+    assert payload["read_next"] == []
+
+
+def test_public_schema_exposes_quality_and_registered_range_contract():
+    from docmancer.mcp._docs_server_schema import PUBLIC_GET_DOCS_CONTEXT_OUTPUT_SCHEMA
+
+    properties = PUBLIC_GET_DOCS_CONTEXT_OUTPUT_SCHEMA["properties"]
+    assert set(properties["context_quality"]["properties"]["status"]["enum"]) == {
+        "checked", "partial", "unverified", "unavailable",
+    }
+    assert properties["context_quality"]["properties"]["reasons"]["maxItems"] == 2
+    assert properties["read_next"]["maxItems"] == 1
+    required = set(properties["read_next"]["items"]["required"])
+    assert required == {
+        "source_uri", "path", "project_identity", "snapshot_sha256",
+        "line_start", "line_end", "reason",
+    }
