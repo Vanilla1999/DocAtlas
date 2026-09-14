@@ -1,0 +1,60 @@
+name: Whole-block packing research
+on:
+  pull_request:
+    types: [opened, reopened, synchronize]
+    paths:
+      - '.github/workflows/block-packing-research.yml'
+      - 'experiments/grounded-partial/block-packing/structural_blocks.py'
+      - 'experiments/grounded-partial/block-packing/run_blocks.py'
+      - 'experiments/grounded-partial/block-packing/test_structural_blocks.py'
+permissions:
+  contents: read
+  actions: read
+jobs:
+  whole-blocks:
+    if: github.head_ref == 'experiment/contextual-late-sufficiency'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      DOCATLAS_OFFLINE: '1'
+      DOCATLAS_AUTO_VECTORS: '0'
+      PYTHONHASHSEED: '0'
+      PYTHONPATH: ${{ github.workspace }}:${{ github.workspace }}/experiments/grounded-partial/block-packing:${{ github.workspace }}/experiments/grounded-partial/bounded-relaxation:${{ github.workspace }}/experiments/grounded-partial/section-scope
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Record code and prepare experiment dependencies
+        run: |
+          mkdir -p "$RUNNER_TEMP/block-packing/code"
+          git rev-parse HEAD > "$RUNNER_TEMP/block-packing/head.txt"
+          cp experiments/grounded-partial/block-packing/* "$RUNNER_TEMP/block-packing/code/"
+          python -m pip install '.[dev]' markdown-it-py==4.2.0 > "$RUNNER_TEMP/block-packing/install.log" 2>&1
+          python -m pip freeze > "$RUNNER_TEMP/block-packing/pip-freeze.txt"
+      - name: Retrieve and authenticate the fixed previous input archive
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh api /repos/Vanilla1999/DocAtlas/actions/artifacts/10325979852/zip > "$RUNNER_TEMP/block-input.zip"
+          echo "f3e78c127d0c0fae4686da0613efd34c5f0c28ae3bb04bf8e4f25db834319c96  $RUNNER_TEMP/block-input.zip" | sha256sum --check
+      - name: Boundary and existing qualification tests
+        run: |
+          set -o pipefail
+          python -m pytest experiments/grounded-partial/block-packing/test_structural_blocks.py experiments/grounded-partial/bounded-relaxation experiments/grounded-partial/section-scope/test_section_scope.py experiments/grounded-partial/contextual-late/test_factorial.py experiments/grounded-partial/semantic-selection/test_evaluate.py -q 2>&1 | tee "$RUNNER_TEMP/block-packing/tests.log"
+      - name: Replay identical English inputs with production tokenizer and no network
+        run: |
+          set -o pipefail
+          python experiments/grounded-partial/hypothesis5/no_network.py experiments/grounded-partial/block-packing/run_blocks.py --archive "$RUNNER_TEMP/block-input.zip" --output "$RUNNER_TEMP/block-packing/results" 2>&1 | tee "$RUNNER_TEMP/block-packing/replay.log"
+      - name: Ensure no tracked source files changed
+        if: always()
+        run: git diff --exit-code
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: whole-blocks-${{ github.event.pull_request.head.sha }}
+          path: ${{ runner.temp }}/block-packing/
+          retention-days: 14
