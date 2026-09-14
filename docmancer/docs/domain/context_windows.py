@@ -4,6 +4,8 @@ from __future__ import annotations
 import re
 from typing import Any
 
+from .technical_tokens import technical_term_pattern
+
 
 _QUERY_STOP_WORDS = frozenset({
     "about", "after", "does", "from", "have", "into", "project", "that",
@@ -83,7 +85,7 @@ def _focused_snippet(
     if not spans:
         return "", leading, leading
     best_index = max(range(len(spans)), key=lambda index: sum(
-        term in value[spans[index][0]:spans[index][1]].casefold() for term in terms))
+        bool(re.search(technical_term_pattern(term, exact=False), value[spans[index][0]:spans[index][1]], re.I)) for term in terms))
     start = end = best_index
     selected_start, selected_end = spans[best_index]
     if selected_end - selected_start > limit:
@@ -98,7 +100,7 @@ def _focused_snippet(
             if index < 0 or index >= len(spans):
                 continue
             adjacent = value[spans[index][0]:spans[index][1]].casefold()
-            if terms and not any(term in adjacent for term in terms):
+            if terms and not any(re.search(technical_term_pattern(term, exact=False), adjacent, re.I) for term in terms):
                 continue
             candidate_start = min(start, index)
             candidate_end = max(end, index)
@@ -116,7 +118,7 @@ def _focused_snippet(
     # Score structurally valid windows, not a prefix that will lose its last row.
     # A tied first sentence must not hide additional witnesses across a short gap.
     hits = [(match.start(), match.end(), term) for term in terms
-            for match in re.finditer(rf"(?<!\w){re.escape(term)}(?!\w)", value, re.I)]
+            for match in re.finditer(technical_term_pattern(term, exact=False), value, re.I)]
     for _, boundary in spans:
         row_end = value.find("\n", boundary)
         boundary = (len(value) if row_end < 0 else row_end) if "|" in value[value.rfind("\n", 0, boundary) + 1:boundary] else boundary
@@ -222,7 +224,8 @@ def _bounded_text_window(
 ) -> tuple[int, int]:
     segment = text[start:end]
     matched_positions = [
-        segment.casefold().find(term) for term in terms if term in segment.casefold()
+        match.start() for term in terms
+        if (match := re.search(technical_term_pattern(term, exact=False), segment, re.I)) is not None
     ]
     anchor = min((position for position in matched_positions if position >= 0), default=0)
     window_start = start + max(0, anchor - limit // 3)

@@ -51,7 +51,8 @@ def _context_rank(
         "content", "display_text", "snippet",
     )).casefold()[:2_000]
     identity_score = float(sum(
-        term in identity_text for term in _query_terms((original_question,))
+        _visible_term_present(term, identity_text, exact=False)
+        for term in _query_terms((original_question,))
     ))
     source_ids = {
         str(source.get(key) or "")

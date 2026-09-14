@@ -1,7 +1,6 @@
 """Regression cases for intact, source-bound runtime context delivery."""
 from __future__ import annotations
 
-import hashlib
 import re
 
 import pytest
@@ -12,11 +11,12 @@ from docmancer.docs.application.docs_context_projection import (
 )
 from docmancer.docs.application.model_visible_projection import (
     _docs_source,
+    _source_digest,
     docs_context_budget_tokens,
     validate_model_visible_projection,
 )
 from docmancer.docs.domain.context_windows import _focused_snippet
-from docmancer.docs.domain.evidence_qualification import _visible_term_present
+from docmancer.docs.domain.evidence_qualification import _visible_term_present, qualify_evidence
 
 
 # Original list from the reviewed uv source, not an expected/generated answer.
@@ -81,7 +81,8 @@ def test_three_named_options_survive_as_one_complete_list(rename, intro):
             block = block.replace(old, new)
             question = question.replace(old, new)
     text = intro + block
-    payload, snapshot = project_docs_context(retrieval=_retrieval(text, question))
+    retrieval = _retrieval(text, question)
+    payload, snapshot = project_docs_context(retrieval=retrieval)
     snippets = [source["snippet"] for source in payload["sources"]]
     assert any(block in snippet for snippet in snippets), snippets
     assert docs_context_budget_tokens(payload) <= 800
@@ -90,7 +91,7 @@ def test_three_named_options_survive_as_one_complete_list(rename, intro):
         offset = text.index(source["snippet"])
         assert source["line_start"] == 136 + text[:offset].count("\n")
         assert source["line_end"] == source["line_start"] + source["snippet"].count("\n")
-        assert source["content_sha256"] == hashlib.sha256(source["snippet"].encode()).hexdigest()
+        assert source["content_sha256"] == _source_digest(retrieval["context_pack"][0])
 
 
 @pytest.mark.parametrize("name, larger", [
@@ -104,6 +105,12 @@ def test_identifier_suffix_is_not_a_distinct_option(name, larger):
     assert not _visible_term_present(name.lower(), larger.lower(), exact=False)
     assert _visible_term_present(name.lower(), f"Use `{name}`.".lower(), exact=True)
     assert _visible_term_present(name.lower(), f"{name.lower()}.", exact=True)
+    result = qualify_evidence(
+        {"query_terms": [name.lower(), "export", "identifiers"], "exact_terms": [name.lower()]},
+        query_id="query-original", visible_text=f"{larger} can export identifiers.",
+    )
+    assert not result.qualified
+    assert name.lower() in result.trace["missing_exact_terms"]
 
 
 def test_window_ranking_does_not_reward_identifier_suffix():

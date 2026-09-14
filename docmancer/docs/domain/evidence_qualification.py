@@ -6,6 +6,7 @@ from dataclasses import dataclass
 import re
 from typing import Any, Literal, Mapping
 
+from docmancer.docs.domain.technical_tokens import technical_term_pattern
 from docmancer.docs.domain.lifecycle_policy import lifecycle_allows
 from docmancer.docs.domain.project_answer_contract import LifecycleIntent
 
@@ -169,15 +170,12 @@ def qualify_evidence(
     )
     missing_exact = tuple(
         term for term in exact_terms
-        if re.search(rf"(?<!\w){re.escape(term)}(?!\w)", exact_evidence) is None
+        if not _visible_term_present(term, exact_evidence, exact=True)
     )
     missing_parent_exact = tuple(
         str(value).casefold()
         for value in probe.get("parent_exact_terms") or ()
-        if re.search(
-            rf"(?<!\w){re.escape(str(value).casefold())}(?!\w)",
-            exact_evidence,
-        ) is None
+        if not _visible_term_present(str(value).casefold(), exact_evidence, exact=True)
     )
     ratio = len(matched) / len(terms)
     required_ratio = 1.0 if len(terms) == 1 else 0.4 if exact_terms else 0.5
@@ -264,7 +262,7 @@ def _coverage_kind(probe: Mapping[str, Any]) -> CoverageKind:
 
 def _visible_term_present(term: str, text: str, *, exact: bool) -> bool:
     suffix = "" if exact else r"(?:s|es|ed|ing)?"
-    if re.search(rf"(?<!\w){re.escape(term)}{suffix}(?!\w)", text) is not None:
+    if re.search(technical_term_pattern(term, exact=exact), text) is not None:
         return True
     if not exact and re.fullmatch(r"[a-z]+", term):
         # Regular consonant-y inflection is lexical equivalence, not an
