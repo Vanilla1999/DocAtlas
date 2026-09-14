@@ -14,6 +14,7 @@ from docmancer.mcp.docs_server import call_docs_tool_payload, read_docs_resource
 
 
 def _real_service(tmp_path):
+    tmp_path.mkdir(parents=True, exist_ok=True)
     (tmp_path / "docs").mkdir()
     (tmp_path / "pyproject.toml").write_text('[project]\nname="recovery-smoke"\nversion="0.1"\n')
     path = tmp_path / "docs/polling.md"
@@ -58,6 +59,7 @@ def test_final_public_handler_preserves_quality_and_usable_reference(tmp_path):
     assert read["line_end"] <= target["line_end"]
     assert read["content_sha256"] == target["snapshot_sha256"]
 
+    # The ordinary host still requires a concrete missing fact before consuming it.
     service = _real_service(tmp_path / "second")
     payload = call_docs_tool_payload("get_docs_context", {
         **args, "project_path": str(tmp_path / "second"),
