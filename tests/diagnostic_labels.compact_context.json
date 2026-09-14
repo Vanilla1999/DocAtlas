@@ -1,0 +1,10 @@
+{
+  "schema_version": 1,
+  "module_labels": {
+    "tests/docs/test_compact_context_blocks.py": "behavioral"
+  },
+  "node_overrides": {},
+  "module_node_hashes": {
+    "tests/docs/test_compact_context_blocks.py": "cdd31ba15e856ba94c57da3db8a7d6bed0b822a5c9b24db740004cc656888f78"
+  }
+}
