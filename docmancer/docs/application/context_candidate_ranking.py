@@ -11,6 +11,9 @@ from docmancer.docs.domain.answer_units import extract_answer_units, _NEGATION_R
 from docmancer.docs.domain.normative_language import _FORBIDDEN_RE
 from docmancer.docs.domain.evidence_qualification import _visible_term_present, qualify_evidence
 from docmancer.docs.domain.question_semantic_frames import match_comparison_frame
+from docmancer.docs.domain.context_request_preferences import (
+    direct_evidence_preference, recognized_request_satisfied,
+)
 
 
 def _context_rank(
@@ -148,10 +151,15 @@ def _facet_aware_candidates(
         # A host paraphrase can match an incidental procedure very well.
         # Among candidates serving the same outstanding direction, preserve
         # the original question's body terms before topical/authority ties.
+        body_text = str(source.get('snippet') or source.get('content') or '')
         original_body_overlap = sum(
             weight for term, weight in term_weights.items()
-            if _visible_term_present(term, str(source.get('snippet') or source.get('content') or '').casefold(), exact=False)
+            if _visible_term_present(term, body_text.casefold(), exact=False)
         ) if qualified_ids & required_query_ids and not exact_count else 0
+        request_preference = (
+            direct_evidence_preference(query_text.get("query-original", ""), body_text)
+            if qualified_ids & required_query_ids else (0, 0, 0, 0)
+        )
         return (
             int(exact_count > 0),
             condition_lead_priority(query_text.get("query-original", ""), str(source.get("snippet") or "")),
@@ -166,6 +174,7 @@ def _facet_aware_candidates(
                  for key in qualified_ids & required_query_ids), default=0),
             role_tiebreak,
             len(qualified_ids & required_query_ids),
+            request_preference,
             original_body_overlap,
             len(qualified_ids & (supplemental_query_ids or set())),
             rank[0],
@@ -205,16 +214,25 @@ def _facet_aware_candidates(
 
 def _fully_matched_query_ids(sources: Any) -> set[str]:
     # Partial lexical attribution must not crowd out a complete visible match.
-    # This is a selection preference, not a semantic completeness claim.
-    return {
-        query_id for source in sources
-        for query_id, trace in (source.get("retrieval_query_matches") or {}).items()
-        if isinstance(trace, dict) and trace.get("qualified") is True
-        and (trace.get("match_ratio") == 1.0 or trace.get("mode") == "exact_path")
-    }
+    # Recognized request shapes may stop *selection* once all of their literal
+    # requested parts survive in one visible candidate. This remains a ranking
+    # heuristic; it is never a public answer-completeness/``checked`` proof.
+    result: set[str] = set()
+    for source in sources:
+        body = str(source.get("snippet") or source.get("content") or "")
+        for query_id, trace in (source.get("retrieval_query_matches") or {}).items():
+            if not isinstance(trace, dict) or trace.get("qualified") is not True:
+                continue
+            if trace.get("match_ratio") == 1.0 or trace.get("mode") == "exact_path":
+                result.add(query_id)
+                continue
+            question = str(trace.get("query_text") or "")
+            if recognized_request_satisfied(question, body):
+                result.add(query_id)
+    return result
 
 
-def _condition_body_priority(question: str, snippet: str) -> int:
+def _condition_body_priority(question: str, snippet: st) -> int:
     """Keep the stated triggering event ahead of a merely topical procedure.
 
     This bounded preference does not qualify a source or infer an outcome.
@@ -232,7 +250,7 @@ def _condition_body_priority(question: str, snippet: str) -> int:
     return int(len(terms) >= 2 and terms <= set(trace.get("body_matched_terms") or ()))
 
 
-def _comparison_action_priority(question: str, snippet: str) -> int:
+def _comparison_action_priority(question: str, snippet: st) -> int:
     """Prefer the named operation in a comparison over its surrounding nouns.
 
     Reuse the domain comparison frame. This only orders already qualified
@@ -243,7 +261,7 @@ def _comparison_action_priority(question: str, snippet: str) -> int:
         return 0
     actions = {
         match[0].casefold() for side in (frame.left, frame.right)
-        if (match := re.match(r"[a-z]{4,}ing\b", side, re.I))
+        if (match := re.match(r"[a-z={4,}ing\b", side, re.I))
     }
     if not actions:
         return 0
@@ -251,4 +269,4 @@ def _comparison_action_priority(question: str, snippet: str) -> int:
         {"query_terms": sorted(actions)}, query_id="comparison-preference",
         visible_text=snippet, evidence_text=snippet,
     ).trace
-    return len(actions & set(trace.get("body_matched_terms") or ()))
+    return len(actions & set(trace.get("body_matched_terms") or ())
