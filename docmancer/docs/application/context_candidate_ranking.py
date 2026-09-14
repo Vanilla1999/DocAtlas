@@ -232,7 +232,7 @@ def _fully_matched_query_ids(sources: Any) -> set[str]:
     return result
 
 
-def _condition_body_priority(question: str, snippet: st) -> int:
+def _condition_body_priority(question: str, snippet: str) -> int:
     """Keep the stated triggering event ahead of a merely topical procedure.
 
     This bounded preference does not qualify a source or infer an outcome.
@@ -250,7 +250,7 @@ def _condition_body_priority(question: str, snippet: st) -> int:
     return int(len(terms) >= 2 and terms <= set(trace.get("body_matched_terms") or ()))
 
 
-def _comparison_action_priority(question: str, snippet: st) -> int:
+def _comparison_action_priority(question: str, snippet: str) -> int:
     """Prefer the named operation in a comparison over its surrounding nouns.
 
     Reuse the domain comparison frame. This only orders already qualified
@@ -261,7 +261,7 @@ def _comparison_action_priority(question: str, snippet: st) -> int:
         return 0
     actions = {
         match[0].casefold() for side in (frame.left, frame.right)
-        if (match := re.match(r"[a-z={4,}ing\b", side, re.I))
+        if (match := re.match(r"[a-z]{4,}ing\b", side, re.I))
     }
     if not actions:
         return 0
@@ -269,4 +269,4 @@ def _comparison_action_priority(question: str, snippet: st) -> int:
         {"query_terms": sorted(actions)}, query_id="comparison-preference",
         visible_text=snippet, evidence_text=snippet,
     ).trace
-    return len(actions & set(trace.get("body_matched_terms") or ())
+    return len(actions & set(trace.get("body_matched_terms") or ()))
