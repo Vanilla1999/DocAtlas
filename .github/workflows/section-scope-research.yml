@@ -1,0 +1,56 @@
+name: Source-bound section research
+on:
+  pull_request:
+    types: [opened, reopened, synchronize]
+    paths:
+      - '.github/workflows/section-scope-research.yml'
+      - 'experiments/grounded-partial/section-scope/**'
+permissions:
+  contents: read
+jobs:
+  section-scope:
+    if: github.head_ref == 'experiment/contextual-late-sufficiency'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      DOCATLAS_OFFLINE: '1'
+      DOCATLAS_AUTO_VECTORS: '0'
+      PYTHONHASHSEED: '0'
+      PYTHONPATH: ${{ github.workspace }}:${{ github.workspace }}/experiments/grounded-partial/section-scope
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Record code and install existing dependencies
+        run: |
+          mkdir -p "$RUNNER_TEMP/section-scope"
+          git rev-parse HEAD > "$RUNNER_TEMP/section-scope/head.txt"
+          cp -r experiments/grounded-partial/section-scope "$RUNNER_TEMP/section-scope/code"
+          python -m pip install '.[dev]' > "$RUNNER_TEMP/section-scope/install.log" 2>&1
+          python -m pip freeze > "$RUNNER_TEMP/section-scope/pip-freeze.txt"
+      - name: Counterexamples and prior research checks
+        run: |
+          set -o pipefail
+          python -m pytest experiments/grounded-partial/section-scope/test_section_scope.py experiments/grounded-partial/contextual-late/test_factorial.py experiments/grounded-partial/semantic-selection/test_evaluate.py -q 2>&1 | tee "$RUNNER_TEMP/section-scope/tests.log"
+      - name: Restore frozen inputs and verify native baseline
+        run: |
+          set -o pipefail
+          python experiments/grounded-partial/research-suite/restore.py
+          python experiments/grounded-partial/hypothesis5/no_network.py experiments/grounded-partial/research-suite/verify_baseline.py 2>&1 | tee "$RUNNER_TEMP/section-scope/native.log"
+      - name: Compare initial-only and every-window qualification
+        run: |
+          set -o pipefail
+          python experiments/grounded-partial/hypothesis5/no_network.py experiments/grounded-partial/section-scope/run.py --output "$RUNNER_TEMP/section-scope/results" 2>&1 | tee "$RUNNER_TEMP/section-scope/replay.log"
+      - name: Ensure no tracked source was modified
+        if: always()
+        run: git diff --exit-code
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: section-scope-${{ github.event.pull_request.head.sha }}
+          path: ${{ runner.temp }}/section-scope/
+          retention-days: 14

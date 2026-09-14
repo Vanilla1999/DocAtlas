@@ -1,0 +1,87 @@
+{
+  "hybrid_plain -> hybrid_context_bm25_plain": {
+    "wins": [],
+    "losses": [],
+    "changed_output_cases": [
+      "typer-06",
+      "mkdocs-09",
+      "ruff-01",
+      "uv-04"
+    ],
+    "top5_wins": [],
+    "top5_losses": []
+  },
+  "hybrid_plain -> hybrid_late": {
+    "wins": [],
+    "losses": [],
+    "changed_output_cases": [
+      "fastapi-01",
+      "fastapi-06",
+      "httpx-03",
+      "mkdocs-09",
+      "ruff-01"
+    ],
+    "top5_wins": [
+      "httpx-03"
+    ],
+    "top5_losses": [
+      "pydantic-03"
+    ]
+  },
+  "hybrid_context_bm25_plain -> hybrid_context_bm25_late": {
+    "wins": [],
+    "losses": [
+      "starlette-06"
+    ],
+    "changed_output_cases": [
+      "fastapi-01",
+      "fastapi-06",
+      "starlette-06",
+      "typer-06",
+      "httpx-01",
+      "httpx-03"
+    ],
+    "top5_wins": [
+      "httpx-03"
+    ],
+    "top5_losses": [
+      "pydantic-03"
+    ]
+  },
+  "hybrid_late -> hybrid_context_bm25_late": {
+    "wins": [],
+    "losses": [
+      "starlette-06"
+    ],
+    "changed_output_cases": [
+      "starlette-06",
+      "httpx-01",
+      "ruff-01",
+      "uv-04"
+    ],
+    "top5_wins": [],
+    "top5_losses": []
+  },
+  "hybrid_plain -> hybrid_context_bm25_late": {
+    "wins": [],
+    "losses": [
+      "starlette-06"
+    ],
+    "changed_output_cases": [
+      "fastapi-01",
+      "fastapi-06",
+      "starlette-06",
+      "httpx-01",
+      "httpx-03",
+      "mkdocs-09",
+      "ruff-01",
+      "uv-04"
+    ],
+    "top5_wins": [
+      "httpx-03"
+    ],
+    "top5_losses": [
+      "pydantic-03"
+    ]
+  }
+}

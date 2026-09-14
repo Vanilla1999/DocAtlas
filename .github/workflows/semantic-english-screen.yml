@@ -1,0 +1,63 @@
+name: English semantic scorer screening
+on:
+  pull_request:
+    types: [opened, reopened, synchronize]
+    paths:
+      - '.github/workflows/semantic-english-screen.yml'
+      - 'experiments/grounded-partial/semantic-english/**'
+permissions:
+  contents: read
+jobs:
+  real-scorers:
+    if: github.head_ref == 'experiment/contextual-late-sufficiency'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      PYTHONHASHSEED: '0'
+      PYTHONUNBUFFERED: '1'
+      HF_HUB_DISABLE_TELEMETRY: '1'
+      TOKENIZERS_PARALLELISM: 'false'
+      PYTHONPATH: ${{ github.workspace }}/experiments/grounded-partial/semantic-english
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Preserve code and install experiment-only inference dependencies
+        run: |
+          mkdir -p "$RUNNER_TEMP/english-screen/code"
+          git rev-parse HEAD > "$RUNNER_TEMP/english-screen/head.txt"
+          cp experiments/grounded-partial/semantic-english/* "$RUNNER_TEMP/english-screen/code/"
+          python -m pip install torch==2.8.0 --index-url https://download.pytorch.org/whl/cpu > "$RUNNER_TEMP/english-screen/install.log" 2>&1
+          python -m pip install transformers==4.56.2 huggingface-hub==0.34.4 pytest==8.4.2 >> "$RUNNER_TEMP/english-screen/install.log" 2>&1
+          python -m pip freeze > "$RUNNER_TEMP/english-screen/pip-freeze.txt"
+          lscpu > "$RUNNER_TEMP/english-screen/cpu.txt"
+      - name: English data and leakage boundary tests
+        run: |
+          set -o pipefail
+          python -m pytest experiments/grounded-partial/semantic-english/test_screen.py -q | tee "$RUNNER_TEMP/english-screen/tests.log"
+      - name: Prepare pinned official scorer weights
+        run: |
+          set -o pipefail
+          python experiments/grounded-partial/semantic-english/screen.py --models "$RUNNER_TEMP/scorer-models" --download 2>&1 | tee "$RUNNER_TEMP/english-screen/download.log"
+          cp "$RUNNER_TEMP/scorer-models/manifest.json" "$RUNNER_TEMP/english-screen/model-manifest.json"
+      - name: Real local inference without network, calibration then evaluation
+        env:
+          HF_HUB_OFFLINE: '1'
+          TRANSFORMERS_OFFLINE: '1'
+        run: |
+          set -o pipefail
+          python experiments/grounded-partial/hypothesis5/no_network.py experiments/grounded-partial/semantic-english/screen.py --models "$RUNNER_TEMP/scorer-models" --output "$RUNNER_TEMP/english-screen/results" 2>&1 | tee "$RUNNER_TEMP/english-screen/inference.log"
+      - name: Verify no tracked files changed
+        if: always()
+        run: git diff --exit-code
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: semantic-english-${{ github.event.pull_request.head.sha }}
+          path: ${{ runner.temp }}/english-screen/
+          include-hidden-files: true
+          retention-days: 14
