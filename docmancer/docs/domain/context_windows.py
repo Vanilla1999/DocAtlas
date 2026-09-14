@@ -5,6 +5,7 @@ import re
 from typing import Any
 
 from .technical_tokens import technical_term_pattern
+from .context_blocks import source_block_alternatives
 
 
 _QUERY_STOP_WORDS = frozenset({
@@ -24,16 +25,20 @@ _UNESCAPED_PIPE_RE = re.compile(r"(?<!\\)(?:\\\\)*\|")
 
 
 def _projection_limits(text: str) -> tuple[int, ...]:
-    """Return bounded window sizes, preserving a short source whole when safe.
+    """Return bounded window sizes plus exact complete block lengths.
 
-    The public 800-token payload budget remains authoritative. This extra
-    source-local window avoids chopping a compact table merely because it is a
-    little larger than the ordinary 520-character expansion ceiling.
+    Structural lengths are candidate-window hints only; the existing complete
+    DTO admission budget remains authoritative. No block is clipped to a
+    local character ceiling merely to become eligible for that later check.
     """
+    limits = set(_BASE_WINDOW_LIMITS)
     compact_length = len(text.strip())
     if _BASE_WINDOW_LIMITS[-1] < compact_length <= _SHORT_COMPLETE_SOURCE_MAX_CHARS:
-        return (*_BASE_WINDOW_LIMITS, compact_length)
-    return _BASE_WINDOW_LIMITS
+        limits.add(compact_length)
+    for start, end in source_block_alternatives(text).spans:
+        if end > start:
+            limits.add(end - start)
+    return tuple(sorted(limits))
 
 
 def _query_terms(queries: tuple[str, ...]) -> set[str]:
