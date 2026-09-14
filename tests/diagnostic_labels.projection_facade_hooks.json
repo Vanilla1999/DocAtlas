@@ -1,0 +1,10 @@
+{
+  "schema_version": 1,
+  "module_labels": {
+    "tests/docs/test_projection_facade_hooks.py": "compatibility"
+  },
+  "node_overrides": {},
+  "module_node_hashes": {
+    "tests/docs/test_projection_facade_hooks.py": "3e329212e467474578d8b0911751f5fc9e5afc282a87c5b57017607911b76c90"
+  }
+}
