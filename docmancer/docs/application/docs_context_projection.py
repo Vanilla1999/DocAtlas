@@ -34,6 +34,29 @@ _qualified_fragments = _core._qualified_fragments
 _requalify_visible_source = _core._requalify_visible_source
 
 
+def _core_context_selection_decision(*args: Any, **kwargs: Any) -> Any:
+    """Route core selection through the public facade hook.
+
+    The facade/core split is an implementation detail. Existing same-call observers
+    patch the public helper to capture the exact selection used by production, so
+    the core must resolve that helper dynamically instead of retaining its
+    pre-split imported function object.
+    """
+    return context_selection_decision(*args, **kwargs)
+
+
+def _core_component_coverage_decision(*args: Any, **kwargs: Any) -> Any:
+    """Route core coverage through the public facade hook for the same reason."""
+    return component_coverage_decision(*args, **kwargs)
+
+
+# Keep established observation/monkeypatch seams working without mutating these
+# globals per request. The tiny proxies resolve facade globals at call time, so
+# patched observers remain effective while ordinary calls keep identical behavior.
+_core.context_selection_decision = _core_context_selection_decision
+_core.component_coverage_decision = _core_component_coverage_decision
+
+
 def _final_sources(snapshot: dict[str, Any], payload: dict[str, Any]) -> tuple[dict[str, Any], ...]:
     rows: list[dict[str, Any]] = []
     for public in payload.get("sources") or ():
