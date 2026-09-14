@@ -42,6 +42,7 @@ class _Cursor:
     start: int
     remaining_reads: int
     expires: float
+    end: int | None = None
 
 
 class SourceContinuationReader:
@@ -85,6 +86,42 @@ class SourceContinuationReader:
                 self.clock() + self.retention_seconds,
             ))
 
+    def issue_range(
+        self, reference: SourceReference, *, line_start: int, line_end: int,
+        uri: str | None = None,
+    ) -> str | None:
+        """Register one authorized bounded interval without exposing range params."""
+        if (
+            type(line_start) is not int or type(line_end) is not int
+            or line_start < 1 or line_end < line_start
+            or type(reference.line_end) is not int or reference.line_end < 1
+            or self.gateway.authorize(reference)
+        ):
+            return None
+        cursor = _Cursor(
+            reference, line_start, self.max_reads,
+            self.clock() + self.retention_seconds, line_end,
+        )
+        with self._lock:
+            if uri is None:
+                return self._issue_cursor(cursor)
+            if not uri.startswith(self.uri_prefix) or len(uri) != len(self.uri_prefix) + 24:
+                return None
+            existing = self._cursors.get(uri)
+            if existing is not None:
+                if (
+                    existing.reference != reference
+                    or existing.start != line_start
+                    or existing.end != line_end
+                ):
+                    return None
+                # Idempotent binding must not refresh expiry or read budget.
+                return uri
+            self._cursors[uri] = cursor
+            while len(self._cursors) > self.max_references:
+                self._cursors.popitem(last=False)
+            return uri
+
     def _issue_cursor(self, cursor: _Cursor) -> str:
         uri = self.uri_prefix + secrets.token_hex(12)
         self._cursors[uri] = cursor
@@ -120,12 +157,13 @@ class SourceContinuationReader:
             lines = raw.decode("utf-8").splitlines()
         except UnicodeDecodeError:
             return self._failure("source_unavailable", "unsupported_encoding")
-        if cursor.start > len(lines):
+        target_end = min(len(lines), cursor.end) if cursor.end is not None else len(lines)
+        if cursor.start > target_end:
             return {"status": "complete", "reason_code": "end_of_source"}
-        stop = min(len(lines), cursor.start + self.max_lines - 1)
+        stop = min(target_end, cursor.start + self.max_lines - 1)
         next_uri = self.uri_prefix + secrets.token_hex(12)
         while stop >= cursor.start:
-            more = stop < len(lines)
+            more = stop < target_end
             continuation = next_uri if more and cursor.remaining_reads > 1 else None
             result = {
                 "status": "truncated" if more else "complete",
@@ -144,6 +182,7 @@ class SourceContinuationReader:
                     with self._lock:
                         self._cursors[continuation] = _Cursor(
                             reference, stop + 1, cursor.remaining_reads - 1, cursor.expires,
+                            cursor.end,
                         )
                         while len(self._cursors) > self.max_references:
                             self._cursors.popitem(last=False)
