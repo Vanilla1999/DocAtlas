@@ -21,10 +21,13 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          cat .github/query-planning-completion/part-*.patch > /tmp/query-planning-completion.patch
+          cat .github/query-planning-completion/part-0[1-7].patch > /tmp/query-planning-completion.patch
           echo '2f5b7087017b5e2b97dead2f561dfbb6795fa134c3de4eae04134b738d712702  /tmp/query-planning-completion.patch' | sha256sum -c -
           git apply --check /tmp/query-planning-completion.patch
           git apply /tmp/query-planning-completion.patch
+          echo '5e7b8fb31640c143a8e1b6294ca2390b9c1251a125ee052c23ccd7746e5b9ab9  .github/query-planning-completion/part-08.patch' | sha256sum -c -
+          git apply --check .github/query-planning-completion/part-08.patch
+          git apply .github/query-planning-completion/part-08.patch
           python -m compileall -q \
             docmancer/docs/application/_docs_context_projection_core.py \
             docmancer/docs/application/_project_docs_service_part03.py \
