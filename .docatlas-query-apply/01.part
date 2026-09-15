@@ -1,0 +1,166 @@
+--- a/docmancer/docs/application/_project_docs_service_part03.py
++++ b/docmancer/docs/application/_project_docs_service_part03.py
+@@ -16,14 +16,29 @@
+     derived_parent_trace,
+     qualify_evidence,
+ )
++from docmancer.docs.domain.project_doc_ranking import condition_lead_priority
+ from docmancer.docs.domain.query_terms import (
+     documentation_exact_terms,
+     documentation_query_terms,
+     documentation_technical_anchors,
++    supplemental_query_is_useful,
+ )
+ 
+ 
+ _INTERNAL_DIAGNOSTIC_LIMIT = 32
++
++
++def _candidate_admission_priority(query: str, chunk: Any) -> tuple[bool, int]:
++    """Keep qualified condition-bearing evidence inside the bounded pool.
++
++    This is only an admission ordering preference. It cannot qualify a chunk,
++    alter source policy, or increase the candidate/query budget.
++    """
++    qualified = bool((chunk.metadata or {}).get("retrieval_query_ids"))
++    return (
++        not qualified,
++        -condition_lead_priority(query, str(getattr(chunk, "text", "") or "")),
++    )
+ 
+ 
+ def _diagnostic_candidate_id(chunk: Any) -> dict[str, str]:
+@@ -255,26 +270,19 @@
+             for requirement in mandatory_requirements
+             if (probe := requirement_probe_query(requirement))
+         ))[:8]
+-        retrieval_hints = tuple(dict.fromkeys(
+-            str(value).strip()
+-            for value in getattr(requirements, "retrieval_hints", ())
+-            if str(value).strip()
+-        ))[:4]
+-        contract_concepts = tuple(dict.fromkeys(
+-            str(value).strip()
+-            for value in getattr(requirements, "concept_queries", ())
+-            if str(value).strip()
+-        ))[:4]
++        # The query plan owns the optional lookup budget. Do not append the
++        # raw requirements again: that resurrects rejected/duplicate hints and
++        # turns a grouped replacement into additional internal requests.
+         planned_lookup_queries = tuple(
+             item.text for item in documentation_query_plan.queries
+             if item.origin in {"exact_anchor", "exact_path", "host_lookup", "canonical_intent", "concept_alias", "retrieval_hint", "lexical_topic"}
+         )
+-        supplemental_queries = tuple(dict.fromkeys((
+-            *planned_lookup_queries,
+-            *probe_queries,
+-            *contract_concepts,
+-            *retrieval_hints,
+-        )))[:12]
++        supplemental_queries = tuple(dict.fromkeys(
++            text for text in (
++                *planned_lookup_queries,
++                *probe_queries,
++            ) if supplemental_query_is_useful(text)
++        ))[:12]
+         next_supplemental_id = 1
+         for supplemental_query in supplemental_queries:
+             if supplemental_query in lookup_query_ids:
+@@ -431,11 +439,7 @@
+                 expected_project_identity=filters["project_identity"],
+                 lifecycle_intent=answer_lifecycle_intent,
+             )
+-        candidates.sort(
+-            key=lambda chunk: not bool(
+-                (chunk.metadata or {}).get("retrieval_query_ids")
+-            )
+-        )
++        candidates.sort(key=lambda chunk: _candidate_admission_priority(query, chunk))
+         if internal_diagnostics is not None:
+             internal_diagnostics.update(
+                 _retrieval_stage_diagnostics(documentation_query_plan, candidates)
+--- a/docmancer/docs/application/context_candidate_ranking.py
++++ b/docmancer/docs/application/context_candidate_ranking.py
+@@ -152,6 +152,9 @@
+         # Among candidates serving the same outstanding direction, preserve
+         # the original question's body terms before topical/authority ties.
+         body_text = str(source.get('snippet') or source.get('content') or '')
++        relation_preference = _relation_request_priority(
++            query_text.get("query-original", ""), body_text,
++        )
+         original_body_overlap = sum(
+             weight for term, weight in term_weights.items()
+             if _visible_term_present(term, body_text.casefold(), exact=False)
+@@ -161,8 +164,9 @@
+             if qualified_ids & required_query_ids else (0, 0, 0, 0)
+         )
+         return (
++            condition_lead_priority(query_text.get("query-original", ""), str(source.get("snippet") or "")),
++            relation_preference,
+             int(exact_count > 0),
+-            condition_lead_priority(query_text.get("query-original", ""), str(source.get("snippet") or "")),
+             component_count,
+             bound_assignment,
+             rank[3] if exact_count else 0.0,
+@@ -210,6 +214,105 @@
+                 best = other
+         ranked.insert(index, ranked.pop(best))
+     return ranked
++
++
++_COMPOUND_INTERROGATIVE_RE = re.compile(
++    r"\b(?:which|what|how|when)\b.+?\b(?:and|or)\s+(?:which|what|how|when)\b",
++    re.I,
++)
++_LIST_RE = re.compile(
++    r"\b([A-Za-z][A-Za-z0-9_-]*(?:\s*,\s*[A-Za-z][A-Za-z0-9_-]*)+"
++    r"\s*,?\s*(?:and|or)\s+[A-Za-z][A-Za-z0-9_-]*)\b",
++    re.I,
++)
++
++
++def _relation_request_priority(question: str, snippet: str) -> tuple[float, ...]:
++    """Prefer visible relation-bearing text without turning it into proof.
++
++    Exact identifiers and aliases are retrieval aids.  For an explicitly
++    conditional or multi-part question they must not crowd out an already
++    qualified span that visibly preserves the user's condition/alternatives.
++    This is a deterministic ordering hint only; it neither qualifies evidence
++    nor changes component coverage or ``checked`` semantics.
++    """
++    if not question or not snippet:
++        return (0.0, 0.0, 0.0, 0.0)
++    # Narrow request shapes (code/signature/default-timeout/origin comparison)
++    # already have a stronger dedicated selector. Do not let this generic
++    # relation hint compete with those explicit parts.
++    if recognized_request_parts(question):
++        return (0.0, 0.0, 0.0, 0.0)
++    body = snippet.casefold()
++
++    # Preserve the state named in a conditional question in either common
++    # surface order: "what happens if X is stale" and "if X is stale, what
++    # happens ...".  The state is user text, never an inferred outcome.
++    condition = None
++    for pattern in (
++        r"\bwhat\s+happens\s+(?:when|if)\s+(.+?)(?:[?.]|$)",
++        r"^\s*(?:when|if)\s+(.+?)[,;]\s*what\s+happens\b",
++    ):
++        match = re.search(pattern, question, re.I)
++        if match is not None:
++            condition = match.group(1)
++            break
++    state_score = 0.0
++    if condition:
++        state_match = re.search(
++            r"\b(?:is|are|was|were|becomes?|gets?)\s+([A-Za-z][A-Za-z0-9_-]{2,})\b",
++            condition,
++            re.I,
++        )
++        if state_match and _visible_term_present(
++            state_match.group(1), body, exact=False,
++        ):
++            state_score = 1.0
++
++    # Questions that explicitly enumerate alternatives (exact / declared-only /
++    # unbound; new / changed / stale / deleted) should prefer a single visible
++    # span retaining more of those user-named altern

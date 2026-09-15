@@ -1,0 +1,40 @@
+name: Apply query-planning patch
+
+on:
+  push:
+    branches:
+      - fix/query-planning-scope
+    paths:
+      - '.docatlas-query-apply/**'
+      - '.github/workflows/apply-query-planning-patch.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  apply:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Apply verified patch
+        shell: bash
+        run: |
+          set -euo pipefail
+          cat .docatlas-query-apply/*.part > /tmp/query-planning.patch
+          git apply --check /tmp/query-planning.patch
+          git apply /tmp/query-planning.patch
+          rm -rf .docatlas-query-apply
+          rm -f .github/workflows/apply-query-planning-patch.yml
+          git diff --check
+      - name: Commit final tree
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -A
+          git commit -m 'fix: preserve query planning intent and evidence'
+          git push origin HEAD:fix/query-planning-scope

@@ -1,0 +1,116 @@
+        score *= 0.2
+-        scored.append((exact_compatible, score, index, chunk))
++        condition_priority = condition_lead_priority(
++            question, str(getattr(chunk, "content", "") or ""),
++        )
++        scored.append((exact_compatible, condition_priority, score, index, chunk))
+         score_by_id[id(chunk)] = (base, score, index)
+     # Authority breaks relevance ties; it cannot outweigh a better match.
+     scored.sort(key=lambda row: (
+-        -row[0], -row[1],
++        -row[0], -row[1], -row[2],
+         -{"source_of_truth": 3, "supporting": 2, "historical": 1, "generated": 0}.get(
+-            getattr(row[3], "authority", None), 2,
++            getattr(row[4], "authority", None), 2,
+         ),
+-        row[2],
++        row[3],
+     ))
+ 
+     max_per_source = broad_max_per_source if getattr(intent, "broad", False) else narrow_max_per_source
+@@ -771,15 +774,16 @@
+         # Spend bounded slots on new public lookups, not repeated or alias hits.
+         next_index = max(range(len(remaining)), key=lambda i: (
+             remaining[i][0],
+-            len(public_queries_by_id[id(remaining[i][3])] - covered_public_queries),
+-            len(audited_queries_by_id[id(remaining[i][3])] - covered_audited_queries),
++            remaining[i][1],
++            len(public_queries_by_id[id(remaining[i][4])] - covered_public_queries),
++            len(audited_queries_by_id[id(remaining[i][4])] - covered_audited_queries),
+             -i,
+         ))
+         for candidate_index, row in enumerate(remaining):
+             current = remaining[next_index]
+-            if row[0] == current[0] and dominates(row[3], current[3]):
++            if row[:2] == current[:2] and dominates(row[4], current[4]):
+                 next_index = candidate_index
+-        _, _, index, chunk = remaining.pop(next_index)
++        _, _, _, index, chunk = remaining.pop(next_index)
+         path = _source_key(chunk, index)
+         new_public_queries = public_queries_by_id[id(chunk)] - covered_public_queries
+         new_audited_queries = audited_queries_by_id[id(chunk)] - covered_audited_queries
+@@ -794,11 +798,11 @@
+         if limit and len(selected) >= limit:
+             break
+     pre_injection_ids = {id(c) for c in selected}
+-    selected = ensure_broad_query_sources(selected, [chunk for _, _, _, chunk in scored], question=question, intent=intent, limit=limit)
++    selected = ensure_broad_query_sources(selected, [chunk for _, _, _, _, chunk in scored], question=question, intent=intent, limit=limit)
+     if limit and len(selected) < limit:
+         selected_ids = {id(c) for c in selected}
+         selected_counts = Counter(_source_key(c) for c in selected)
+-        for _, _, index, chunk in scored:
++        for _, _, _, index, chunk in scored:
+             if len(selected) >= limit:
+                 break
+             if id(chunk) not in selected_ids:
+@@ -808,10 +812,10 @@
+                 selected.append(chunk)
+                 selected_ids.add(id(chunk))
+                 selected_counts[source_key] += 1
+-        unique_candidate_sources = {_source_key(chunk, index) for _, _, index, chunk in scored}
++        unique_candidate_sources = {_source_key(chunk, index) for _, _, _, index, chunk in scored}
+         may_relax_diversity = not getattr(intent, "broad", False) or len(unique_candidate_sources) <= 1
+         if len(selected) < limit and may_relax_diversity:
+-            for _, _, _, chunk in scored:
++            for _, _, _, _, chunk in scored:
+                 if len(selected) >= limit:
+                     break
+                 if id(chunk) not in selected_ids:
+--- a/docmancer/docs/domain/project_query_intent.py
++++ b/docmancer/docs/domain/project_query_intent.py
+@@ -165,8 +165,11 @@
+     )
+     wants_how_to = has_any(["how do i", "how to", "how does", "usage", "use", "setup", "configure", "config", "install", "quickstart", "getting started", "как ", "настро", "установ", "запуст", "пользова", "с чего начать", "первые команд"])
+     wants_ingestion = has_any(["ingest", "ingestion", "index", "indexing", "indexed", "retrieval", "retrieve", "chunk", "chunking", "embedding", "vector", "fts", "qdrant", "индекс", "поиск", "чанк", "секци", "эмбед", "вектор", "хран"])
+-    wants_release = has_any(["changelog", "release", "released", "changed", "added", "removed", "breaking", "migration", "version history", "what changed", "recently changed"])
++    wants_release = has_any(["changelog", "release", "released", "breaking", "migration", "version history", "what changed", "recently changed"])
+     explicit_release = has_any(["changelog", "release", "version history", "what changed", "recently changed"])
++    explicit_release = explicit_release or bool(re.search(
++        r"\b(?:релиз\w*|история\s+версий|что\s+изменилось)\b", q,
++    ))
+     wants_troubleshooting = has_any(["error", "bug", "fail", "failed", "why doesn't", "why does not", "not working", "stale", "missing", "diagnose", "doctor", "fix", "troubleshoot", "ошиб", "проблем", "не работает", "не наход", "устар", "диагност"])
+     wants_troubleshooting = wants_troubleshooting or _contains_word(q, ["problem", "problems"])
+     if concept_definition:
+--- a/docmancer/docs/domain/project_retrieval_intent.py
++++ b/docmancer/docs/domain/project_retrieval_intent.py
+@@ -258,8 +258,8 @@
+             "offline_usage",
+             True,
+             f"{product_prefix}offline mode",
+-            "DOCATLAS_OFFLINE",
+-            f"{product_prefix}offline test suite",
++            *((f"{product_prefix}offline test suite",) if _has(tokens, "test", "pytest", "тест") else ()),
++            *(("DOCATLAS_OFFLINE",) if _has(tokens, "test", "pytest", "тест", "docatlas_offline") else ()),
+         )
+     if _has(tokens, "установ", "инстал", "install", "setup") or _has_phrase(
+         normalized, "как поставить", "how to install",
+@@ -410,14 +410,24 @@
+         emit("docs_mcp_public_tools", True, "Docs MCP public tools get_docs_context prepare_docs docs_status")
+     if _has(tokens, "бюджет", "budget", "лимит", "limit") and _has(tokens, "контекст", "context", "токен", "token", "output", "response", "ответ", "источник"):
+         emit("context_budget", True, f"{product_prefix}context response token and source budgets")
+-    if (
+-        (_has(tokens, "синхрон", "обнов", "refresh", "sync") and (
+-            mentions_docs or mentions_project
+-        ))
+-        or (
+-            _has(tokens, "редакт", "измен", "edit", "change", "markdown")
+-            and _has(tokens, "поиск", "search", "документ", "docs", "file")
+-        )
++    # Bind file-sync to the changed object, not to any change plus a later
++    # mention of documentation (e.g. a dependency version in a lockfile).
++    explicit_sync = "sync_project_docs" in source.casefold() or bool(re.search(
++        r"\b(?:sync\w*|refresh|синхрон\w*|обновить)\s+"
++        r"(?:(?:the|my|project|repository|проектную|файлы)\s+){0,3}"
++        r"(?:docs|documentation|документаци\w*)\b", source, re.I,
++    ))
++  

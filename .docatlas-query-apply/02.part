@@ -1,0 +1,157 @@
+atives.
++    alternative_score = 0.0
++    list_match = _LIST_RE.search(question)
++    if list_match is not None:
++        alternatives = tuple(dict.fromkeys(
++            token.casefold()
++            for token in re.findall(r"[A-Za-z][A-Za-z0-9_-]*", list_match.group(1))
++            if token.casefold() not in {"and", "or"}
++        ))
++        if len(alternatives) >= 3:
++            alternative_score = float(sum(
++                _visible_term_present(term, body, exact=False)
++                for term in alternatives
++            )) / len(alternatives)
++
++    # Repeated interrogatives form explicit sibling clauses.  Reward balanced
++    # coverage (the weakest clause) rather than a topical span that saturates one
++    # side and omits the other.  This remains lexical and source-local.
++    clause_score = 0.0
++    clause_average = 0.0
++    if _COMPOUND_INTERROGATIVE_RE.search(question):
++        clauses = tuple(
++            part.strip(" ,;?")
++            for part in re.split(
++                r"\s*,?\s+(?:and|or)\s+(?=(?:which|what|how|when)\b)",
++                question,
++                flags=re.I,
++            )
++            if part.strip(" ,;?")
++        )
++        ratios: list[float] = []
++        for clause in clauses:
++            terms = _query_terms((clause,))
++            if not terms:
++                continue
++            ratios.append(sum(
++                _visible_term_present(term, body, exact=False) for term in terms
++            ) / len(terms))
++        if len(ratios) >= 2:
++            clause_score = min(ratios)
++            clause_average = sum(ratios) / len(ratios)
++    return (state_score, alternative_score, clause_score, clause_average)
+ 
+ 
+ def _fully_matched_query_ids(sources: Any) -> set[str]:
+--- a/docmancer/docs/application/docs_context_projection.py
++++ b/docmancer/docs/application/docs_context_projection.py
+@@ -156,6 +156,28 @@
+             if isinstance(projected, dict):
+                 projected.pop("source_uri", None)
+     _refresh_estimate(payload)
++
++
++def _retains_visible_sources(
++    previous: dict[str, Any], trial: dict[str, Any],
++) -> bool:
++    """Do not buy recovery metadata by deleting already-visible evidence text."""
++    trial_by_id = {
++        str(row.get("evidence_id") or ""): row
++        for row in trial.get("sources") or () if isinstance(row, dict)
++    }
++    for row in previous.get("sources") or ():
++        if not isinstance(row, dict):
++            continue
++        evidence_id = str(row.get("evidence_id") or "")
++        replacement = trial_by_id.get(evidence_id)
++        if replacement is None:
++            return False
++        old_snippet = str(row.get("snippet") or "")
++        new_snippet = str(replacement.get("snippet") or "")
++        if old_snippet and old_snippet not in new_snippet:
++            return False
++    return True
+ 
+ 
+ def _finalize_quality(
+@@ -248,6 +270,7 @@
+                 trial_coverage = ((trial_retrieval.get("documentation_query_plan") or {}).get("_component_coverage") or {})
+                 retained = (
+                     retained_ids <= trial_ids
++                    and _retains_visible_sources(payload, trial_payload)
+                     and set(payload.get("covered_query_ids") or ()) <= set(trial_payload.get("covered_query_ids") or ())
+                     and set(old_coverage.get("covered_component_ids") or ()) <= set(trial_coverage.get("covered_component_ids") or ())
+                 )
+--- a/docmancer/docs/domain/_project_answer_contract_part01.py
++++ b/docmancer/docs/domain/_project_answer_contract_part01.py
+@@ -163,6 +163,9 @@
+         object.__setattr__(self, "input_limits", tuple(sorted(set(self.input_limits))))
+         object.__setattr__(self, "parse_trace", tuple(dict.fromkeys(str(value)[:160] for value in self.parse_trace if str(value))))
+         object.__setattr__(self, "unresolved_parts", tuple(dict.fromkeys(str(value)[:160] for value in self.unresolved_parts if str(value))))
++        # A partial parse cannot certify the scope, even with a recognized subject.
++        if self.unresolved_parts:
++            object.__setattr__(self, "component_scope_complete", False)
+ 
+     @property
+     def hash_payload(self) -> dict[str, Any]:
+--- a/docmancer/docs/domain/_project_answer_contract_shared.py
++++ b/docmancer/docs/domain/_project_answer_contract_shared.py
+@@ -156,7 +156,7 @@
+     re.I,
+ )
+ _IMPLEMENT_RE = re.compile(
+-    r"\b(?:implement|implementation|wire|add\s+support|реализова(?:ть|н|но)|сделать|добавить)\b",
++    r"\b(?:implement|implementation|wire|add\s+support|реализова(?:ть|н|но)|(?:сделать|добавить)\s+(?:функци\w*|метод\w*|класс\w*|обработчик\w*|поддержку))\b",
+     re.I,
+ )
+ _DECLARATIVE_RELATION_RE = re.compile(
+@@ -171,13 +171,21 @@
+     r"|\b(`?[A-Za-z_][A-Za-z0-9_]*`?)\s+instead\s+of\s+(`?[A-Za-z_][A-Za-z0-9_]*`?)",
+     re.I,
+ )
++# Document lifecycle is not the age of a dependency or a cached result.
++# Bare old/previous/past words cannot authorize historical-only retrieval.
+ _HISTORY_RE = re.compile(
+-    r"\b(?:histor(?:y|ical)|previous|formerly|old|past|superseded|completed\s+(?:roadmap|task|incident|rollout|plan|policy|phase|project|document)|"
+-    r"истори(?:я|ческий|ческие)|раньше|предыдущ|закрыт(?:ая|ый|ое)|завершенн(?:ая|ый|ое))\b",
++    r"\b(?:historical|superseded|"
++    r"completed\s+(?:roadmap|task|incident|rollout|plan|policy|phase|project|document)|"
++    r"историческ\w*|"
++    r"(?:закрыт\w*|заверш[её]нн\w*|отмен[её]нн\w*)\s+(?:план\w*|документ\w*|политик\w*|дорожн\w*\s+карт\w*))\b"
++    r"|\b(?:текущ\w*|действующ\w*)\s+(?:политик\w*|план\w*|документ\w*)\s+с\s+отмен[её]нн\w*\b"
++    r"|\b(?:which|show|find)\b[^?!.]{0,80}\b(?:old|previous|past)\s+"
++    r"(?:rollout\s+)?(?:plan|policy|document|roadmap)\b",
+     re.I,
+ )
+ _CURRENT_RE = re.compile(
+-    r"\b(?:current|currently|active|now|today|latest|present|актуальн|текущ|сейчас|действующ)\b",
++    r"\b(?:current|currently|active|now|today|latest|present|"
++    r"актуальн\w*|текущ\w*|сейчас|действующ\w*)\b",
+     re.I,
+ )
+ _NUMBER_WORDS = {
+--- a/docmancer/docs/domain/documentation_query_plan.py
++++ b/docmancer/docs/domain/documentation_query_plan.py
+@@ -16,6 +16,7 @@
+     documentation_exact_terms,
+     documentation_technical_anchors,
+     is_exact_technical_token,
++    supplemental_query_is_useful,
+ )
+ from docmancer.docs.domain.technical_terms import extract_technical_terms
+ 
+@@ -154,24 +155,13 @@
+     "project_docs_configuration", "testing_contribution",
+ })
+ _HOST_AUDITED_RETRIEVAL_INTENTS = frozenset({
+-    # These facets have stable, context-only canonical rewrites that preserve
+-    # the explicit host lookup's meaning while improving source recall. Keep
+-    # this list narrow: other intents (notably installation verification and
+-    # compound request-flow retrieval) have distinct facets that broad aliases
+-    # can accidentally collapse.
+     "testing_contribution", "index_chunking", "evidence_selection",
+ })
+-
+-
+-def _can_derive_original_from_intent(
+-    question: s
