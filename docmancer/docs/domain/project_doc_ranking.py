@@ -52,8 +52,24 @@ def condition_lead_priority(question: str, snippet: str) -> int:
     # Fenced examples are not a natural-language rule lead. Inline identifiers
     # remain intact and must match the requested subject, not a substring.
     visible = re.sub(r"```.*?```|~~~.*?~~~", "", snippet[:2200], flags=re.S)
+    anchor = re.escape(anchors[0])
+    # A compact summary rule is more useful for a broad permission question than
+    # one isolated conditional example. This remains a local ordering signal: it
+    # does not certify that every permission case was covered.
+    summary = re.compile(
+        r"(?<!\w)" + anchor + r"(?!\w)[^.!?\n]{0,260}"
+        r"(?:\bonly\s+(?:when|if)\b|\bcall\s+it\s+from\b)",
+        re.I,
+    )
+    breadth = re.compile(
+        r"\b(?:or\s+(?:when|if)|explicit(?:ly)?\s+(?:user|approved)|"
+        r"approval|confirmation)\b",
+        re.I,
+    )
+    if summary.search(visible) and breadth.search(visible):
+        return 2
     lead = re.compile(r"(?:^|\n|[.!?]\s+)(?:when|if|unless|когда|если)\b"
-                      r"[^.!?\n]{0,350}(?<!\w)" + re.escape(anchors[0]) + r"(?!\w)", re.I)
+                      r"[^.!?\n]{0,350}(?<!\w)" + anchor + r"(?!\w)", re.I)
     return int(bool(lead.search(visible)))
 
 

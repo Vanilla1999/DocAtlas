@@ -6,7 +6,9 @@ import math
 from typing import Any
 from .context_selection import component_witnesses, qualified_query_ids
 from docmancer.docs.domain.context_windows import _query_terms
-from docmancer.docs.domain.project_doc_ranking import project_question_lane, project_source_lane, condition_lead_priority
+from docmancer.docs.domain.project_doc_ranking import (
+    condition_lead_priority, project_question_lane, project_source_lane, technical_anchors,
+)
 from docmancer.docs.domain.answer_units import extract_answer_units, _NEGATION_RE
 from docmancer.docs.domain.normative_language import _FORBIDDEN_RE
 from docmancer.docs.domain.evidence_qualification import _visible_term_present, qualify_evidence
@@ -237,13 +239,54 @@ def _relation_request_priority(question: str, snippet: str) -> tuple[float, ...]
     nor changes component coverage or ``checked`` semantics.
     """
     if not question or not snippet:
-        return (0.0, 0.0, 0.0, 0.0)
+        return (0.0, 0.0, 0.0, 0.0, 0.0)
     # Narrow request shapes (code/signature/default-timeout/origin comparison)
     # already have a stronger dedicated selector. Do not let this generic
     # relation hint compete with those explicit parts.
     if recognized_request_parts(question):
         return (0.0, 0.0, 0.0, 0.0)
     body = snippet.casefold()
+
+    # An action question about an explicit insufficient-evidence state needs a
+    # procedural span, not merely a definition saying that the state exists.
+    # The signal is intentionally generic: it rewards action language but does
+    # not encode which recovery action is correct.
+    recovery_action_score = 0.0
+    action_question = bool(
+        re.search(r"\bwhat\s+should\b[^?]{0,100}\bdo\b", question, re.I)
+        or re.search(r"\bчто\s+долж\w*\s+(?:сдел|предприн)\w*", question, re.I)
+    )
+    insufficient_state = bool(
+        re.search(r"\binsufficient[_ ]evidence\b", question, re.I)
+        or re.search(r"\bнедостаточно\s+(?:доказательств|данных)\b", question, re.I)
+    )
+    if action_question and insufficient_state and "insufficient_evidence" in body:
+        if re.search(
+            r"\b(?:follow|continue|stop|retry|do\s+not|must\s+not|"
+            r"should\s+not|ask|call|use)\b",
+            body, re.I,
+        ):
+            recovery_action_score = 1.0
+
+    # Once a broad permission rule has been selected, a complementary caveat
+    # (approval/confirmation) is more useful than another example of the same
+    # returned-action path.  Requiring the requested technical subject keeps
+    # unrelated safety prose from receiving this preference.
+    permission_caveat_score = 0.0
+    if re.match(
+        r"^\s*(?:when\b.*\b(?:allowed|permitted)\b|"
+        r"under (?:what|which) conditions\b|"
+        r"когда\b.*(?:разреш|можно|допуст)|при каких условиях\b)",
+        question, re.I,
+    ):
+        anchors = technical_anchors(question)
+        if len(anchors) == 1 and _visible_term_present(anchors[0], body, exact=True):
+            if re.search(
+                r"\b(?:approval|confirmation|opt[ -]?in|ask(?:s|ed)?\s+(?:the\s+)?user|"
+                r"user\s+(?:approval|confirmation))\b",
+                body, re.I,
+            ):
+                permission_caveat_score = 1.0
 
     # Preserve the state named in a conditional question in either common
     # surface order: "what happens if X is stale" and "if X is stale, what
@@ -312,7 +355,10 @@ def _relation_request_priority(question: str, snippet: str) -> tuple[float, ...]
         if len(ratios) >= 2:
             clause_score = min(ratios)
             clause_average = sum(ratios) / len(ratios)
-    return (state_score, alternative_score, clause_score, clause_average)
+    return (
+        recovery_action_score, permission_caveat_score, state_score,
+        alternative_score, clause_score, clause_average,
+    )
 
 
 def _fully_matched_query_ids(sources: Any) -> set[str]:

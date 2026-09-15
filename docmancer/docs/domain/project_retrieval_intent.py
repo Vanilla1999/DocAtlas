@@ -323,6 +323,28 @@ def build_project_retrieval_aliases(
             else:
                 policy_queries.append(f"{tool_name} Docs MCP must not be used for")
             emit("docs_mcp_tool_policy", True, *policy_queries)
+    insufficient_agent_workflow = (
+        mentions_docs_mcp
+        and bool(public_tool_names)
+        and _has(tokens, "агент", "agent")
+        and _has(tokens, "долж", "сдел", "предприн", "should", "next", "do")
+        and (
+            _has_phrase(
+                normalized,
+                "недостаточно доказательств",
+                "недостаточно данных",
+                "insufficient evidence",
+                "not enough evidence",
+            )
+            or "insufficient_evidence" in source.casefold()
+        )
+    )
+    if insufficient_agent_workflow:
+        emit(
+            "fail_closed_workflow",
+            True,
+            f"{product_prefix}insufficient_evidence documentation support workflow",
+        )
     if _has_phrase(normalized, "fail-closed", "fail closed") and (
         concept_definition or _has(tokens, "behavior", "behaviour", "workflow", "principle")
     ):

@@ -206,3 +206,27 @@ def test_original_direct_question_families_keep_a_fresh_paraphrase(question, int
 )
 def test_direct_question_family_neighbors_do_not_collapse_to_the_wrong_relation(question, forbidden_intent):
     assert forbidden_intent not in {row.intent_id for row in _aliases(question)}
+
+
+def test_insufficient_evidence_agent_workflow_gets_neutral_cross_language_lookup():
+    questions = (
+        "Что должен сделать агент, если get_docs_context вернул недостаточно доказательств?",
+        "What should the agent do if get_docs_context returns insufficient evidence?",
+    )
+    for question in questions:
+        aliases = _aliases(question)
+        workflow = [row for row in aliases if row.intent_id == "fail_closed_workflow"]
+        assert workflow
+        assert any("insufficient_evidence" in row.text.casefold() for row in workflow)
+        assert all(
+            forbidden not in row.text.casefold()
+            for row in workflow
+            for forbidden in ("rephrase_question", "hard_stop", "local source", "tests")
+        )
+
+
+def test_unknown_tool_insufficient_evidence_does_not_inherit_docs_mcp_workflow():
+    aliases = _aliases(
+        "What should the agent do if lookup_context returns insufficient evidence?"
+    )
+    assert not any(row.intent_id == "fail_closed_workflow" for row in aliases)

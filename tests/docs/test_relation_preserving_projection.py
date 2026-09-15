@@ -91,3 +91,46 @@ def test_read_next_compaction_cannot_shrink_existing_visible_evidence():
 
     assert _retains_visible_sources(previous, shorter) is False
     assert _retains_visible_sources(previous, superset) is True
+
+
+def test_permission_summary_beats_single_conditional_example():
+    question = "When is an agent allowed to call sync_catalog?"
+    single_case = _candidate(
+        "If the local catalog is stale, call sync_catalog with the returned plan."
+    )
+    summary_rule = _candidate(
+        "Agents call sync_catalog only when it is returned as next_action, or when "
+        "a user explicitly requests a refresh."
+    )
+
+    ranked = sorted(
+        [single_case, summary_rule],
+        key=lambda item: _candidate_admission_priority(question, item),
+    )
+
+    assert ranked[0] is summary_rule
+
+
+def test_permission_caveat_beats_redundant_returned_action_example():
+    question = "When is an agent allowed to call sync_catalog?"
+    redundant = "If the server returns sync_catalog as next_action, call the returned action."
+    caveat = "Network access is opt-in. Ask the user before using sync_catalog to fetch data."
+
+    assert _relation_request_priority(question, caveat) > _relation_request_priority(
+        question, redundant,
+    )
+
+
+def test_insufficient_evidence_action_prefers_procedural_span_over_state_definition():
+    question = "What should the agent do if lookup_context returns insufficient evidence?"
+    state_only = (
+        "lookup_context returns `insufficient_evidence` when no safe context is available."
+    )
+    procedural = (
+        "If the result is `insufficient_evidence`, do not claim support. "
+        "Follow the bounded recovery path before continuing."
+    )
+
+    assert _relation_request_priority(question, procedural) > _relation_request_priority(
+        question, state_only,
+    )
