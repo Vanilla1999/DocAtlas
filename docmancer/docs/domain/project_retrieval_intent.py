@@ -417,7 +417,7 @@ def build_project_retrieval_aliases(
         r"(?:(?:the|my|project|repository|проектную|файлы)\s+){0,3}"
         r"(?:docs|documentation|документаци\w*)\b", source, re.I,
     ))
-     docs_file_subject = bool(re.search(
+    docs_file_subject = bool(re.search(
         r"\bmarkdown\b|\b[\w./-]+\.md\b|"
         r"\b(?:project\s+)?(?:documentation|docs)\s+files?\b|"
         r"\bфайл\w*\s+(?:проектной\s+)?документаци\w*\b|"

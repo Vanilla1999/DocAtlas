@@ -49,7 +49,7 @@ def test_weak_alias_cannot_restrict_original_or_exact_or_audit_it(monkeypatch, c
     before = planner.build_documentation_query_plan(question, explicit_path='docs/source.md')
     alias = ProjectRetrievalAlias('offline_usage', 'offline mode', True, 'en',
         ('runbook',), ('api_contract',), ('credentials',))
-     monkeypatch.setattr(planner, 'build_project_retrieval_aliases',
+    monkeypatch.setattr(planner, 'build_project_retrieval_aliases',
         lambda text: tuple(replace(alias, text=f'offline mode {i}') for i in range(count)))
     after = planner.build_documentation_query_plan(question, explicit_path='docs/source.md')
     assert before.original_question == after.original_question == question
