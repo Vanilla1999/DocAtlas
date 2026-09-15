@@ -27,7 +27,7 @@ jobs:
           python-version: "3.13"
       - name: Install package
         run: python -m pip install -e ".[dev]"
-      - name: Ask fresh questions through real MCP stdio
+      - name: Ask weak-case paraphrases through real MCP stdio
         run: |
           python - <<'PY'
           import asyncio
@@ -45,23 +45,16 @@ jobs:
           out = Path(os.environ['RUNNER_TEMP']) / 'adhoc-quality-probe'
           out.mkdir(parents=True, exist_ok=True)
           questions = [
-              ('N01', 'A Flutter project uses go_router. How does DocAtlas decide which documentation version should be used for that dependency?'),
-              ('N02', 'I changed a dependency version in the lockfile. What should happen so DocAtlas does not keep serving documentation for the old version?'),
-              ('N03', 'Can an agent treat a successful documentation search hit as proof that the requested fact is actually supported? Why or why not?'),
-              ('N04', 'A dependency is declared with a version range, but there is no exact lockfile resolution. How should DocAtlas represent the version binding?'),
-              ('N05', 'If a project documentation file is deleted from the repository, what happens to its indexed content on the next sync_project_docs run?'),
-              ('N06', 'get_docs_context returned insufficient_evidence. Should the agent always call prepare_docs next, or only under specific conditions?'),
-              ('N07', 'Which DocAtlas files or databases are derived artifacts that may be rebuilt, and what remains the source of truth?'),
-              ('N08', 'I need to change query intent classification and model-visible context projection. Which application/domain modules own those responsibilities?'),
-              ('N09', 'What information in a docs_context response lets an agent trace the visible evidence back to its source?'),
-              ('N10', 'Does DocAtlas execute shell commands or instructions found inside documentation while retrieving context?'),
-              ('N11', 'What happens in offline mode when the documentation needed for a question has not been prefetched or indexed yet?'),
-              ('N12', 'prepare_docs returned a job_id. What should the agent do next, and when should it retry the original question?'),
-              ('N13', 'Can DocAtlas replace repository code search, the package manager, or the coding agent itself?'),
-              ('N14', 'How do project documentation and dependency/library documentation differ in retrieval scope and provenance?'),
-              ('N15', 'Based on the project evidence, which product-quality claims should we avoid making because they have not been demonstrated yet?'),
-              ('N16', 'Что должен сделать агент, если get_docs_context вернул недостаточно доказательств для ответа по документации проекта?'),
-              ('N17', 'Если версия зависимости изменилась в lockfile, как DocAtlas должен защитить агента от документации старой версии?'),
+              ('P01', 'How does DocAtlas resolve a Flutter package documentation version from pubspec.lock?'),
+              ('P02', 'After pubspec.lock changes from go_router 14.8.1 to 15.0.0, how is the documentation version resolved on the next get_docs_context call?'),
+              ('P03', 'Does sync_project_docs prune orphaned indexed sources when a project documentation file was deleted?'),
+              ('P04', 'Where is project query intent classification implemented, and where is the model-visible docs context projection implemented?'),
+              ('P05', 'Is text retrieved from documentation treated only as data, or can it authorize the agent to run tools and shell commands?'),
+              ('P06', 'In offline mode, will get_docs_context fetch missing documentation from the network, or must missing evidence fail closed / require an explicit lifecycle action?'),
+              ('P07', 'What is the difference between repository-owned project docs and external dependency docs in DocAtlas?'),
+              ('P08', 'Which current claims are explicitly not demonstrated: autonomous live evidence planning, real coding-task improvement, and Context7 parity?'),
+              ('P09', 'Если get_docs_context вернул insufficient_evidence, можно ли утверждать, что документация подтверждает ответ, и что делать дальше?'),
+              ('P10', 'Если в pubspec.lock версия go_router сменилась с 14.8.1 на 15.0.0, откуда DocAtlas должен взять актуальную версию документации?'),
           ]
 
           def decode(result):
@@ -96,12 +89,7 @@ jobs:
                                   'question': question, 'project_path': str(root), 'scope': 'all'
                               })
                               payload = decode(result)
-                              rows.append({
-                                  'id': qid,
-                                  'question': question,
-                                  'is_error': bool(result.isError),
-                                  'payload': payload,
-                              })
+                              rows.append({'id': qid, 'question': question, 'is_error': bool(result.isError), 'payload': payload})
                               print(qid, payload.get('status'), payload.get('kind'), payload.get('estimated_tokens'),
                                     [s.get('path_or_url') for s in (payload.get('sources') or [])])
                           report = {
