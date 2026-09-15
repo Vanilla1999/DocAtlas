@@ -1,0 +1,41 @@
+name: Query planning finalize
+
+on:
+  push:
+    branches:
+      - fix/query-planning-scope
+
+permissions:
+  contents: write
+
+jobs:
+  apply-final-delta:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: fix/query-planning-scope
+          fetch-depth: 0
+      - name: Apply verified final delta
+        shell: bash
+        run: |
+          set -euo pipefail
+          git apply --check .github/query-planning-final.delta.patch
+          git apply .github/query-planning-final.delta.patch
+          python -m compileall -q \
+            docmancer/docs/application/context_candidate_ranking.py \
+            docmancer/docs/domain/project_doc_ranking.py \
+            docmancer/docs/domain/project_retrieval_intent.py
+          git diff --check
+          git rm .github/query-planning-final.delta.patch .github/workflows/query-planning-finalize.yml
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add \
+            docmancer/docs/application/context_candidate_ranking.py \
+            docmancer/docs/domain/project_doc_ranking.py \
+            docmancer/docs/domain/project_retrieval_intent.py \
+            tests/docs/test_direct_question_retrieval_intents.py \
+            tests/docs/test_relation_preserving_projection.py
+          git commit -m "fix: complete query-planning relation preservation"
+          git push origin HEAD:fix/query-planning-scope
