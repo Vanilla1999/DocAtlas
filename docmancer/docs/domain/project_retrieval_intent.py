@@ -258,8 +258,8 @@ def build_project_retrieval_aliases(
             "offline_usage",
             True,
             f"{product_prefix}offline mode",
-            "DOCATLAS_OFFLINE",
-            f"{product_prefix}offline test suite",
+            *((f"{product_prefix}offline test suite",) if _has(tokens, "test", "pytest", "тест") else ()),
+            *(("DOCATLAS_OFFLINE",) if _has(tokens, "test", "pytest", "тест", "docatlas_offline") else ()),
         )
     if _has(tokens, "установ", "инстал", "install", "setup") or _has_phrase(
         normalized, "как поставить", "how to install",
@@ -323,6 +323,28 @@ def build_project_retrieval_aliases(
             else:
                 policy_queries.append(f"{tool_name} Docs MCP must not be used for")
             emit("docs_mcp_tool_policy", True, *policy_queries)
+    insufficient_agent_workflow = (
+        mentions_docs_mcp
+        and bool(public_tool_names)
+        and _has(tokens, "агент", "agent")
+        and _has(tokens, "долж", "сдел", "предприн", "should", "next", "do")
+        and (
+            _has_phrase(
+                normalized,
+                "недостаточно доказательств",
+                "недостаточно данных",
+                "insufficient evidence",
+                "not enough evidence",
+            )
+            or "insufficient_evidence" in source.casefold()
+        )
+    )
+    if insufficient_agent_workflow:
+        emit(
+            "fail_closed_workflow",
+            True,
+            f"{product_prefix}insufficient_evidence documentation support workflow",
+        )
     if _has_phrase(normalized, "fail-closed", "fail closed") and (
         concept_definition or _has(tokens, "behavior", "behaviour", "workflow", "principle")
     ):
@@ -410,14 +432,24 @@ def build_project_retrieval_aliases(
         emit("docs_mcp_public_tools", True, "Docs MCP public tools get_docs_context prepare_docs docs_status")
     if _has(tokens, "бюджет", "budget", "лимит", "limit") and _has(tokens, "контекст", "context", "токен", "token", "output", "response", "ответ", "источник"):
         emit("context_budget", True, f"{product_prefix}context response token and source budgets")
-    if (
-        (_has(tokens, "синхрон", "обнов", "refresh", "sync") and (
-            mentions_docs or mentions_project
-        ))
-        or (
-            _has(tokens, "редакт", "измен", "edit", "change", "markdown")
-            and _has(tokens, "поиск", "search", "документ", "docs", "file")
-        )
+    # Bind file-sync to the changed object, not to any change plus a later
+    # mention of documentation (e.g. a dependency version in a lockfile).
+    explicit_sync = "sync_project_docs" in source.casefold() or bool(re.search(
+        r"\b(?:sync\w*|refresh|синхрон\w*|обновить)\s+"
+        r"(?:(?:the|my|project|repository|проектную|файлы)\s+){0,3}"
+        r"(?:docs|documentation|документаци\w*)\b", source, re.I,
+    ))
+    docs_file_subject = bool(re.search(
+        r"\bmarkdown\b|\b[\w./-]+\.md\b|"
+        r"\b(?:project\s+)?(?:documentation|docs)\s+files?\b|"
+        r"\bфайл\w*\s+(?:проектной\s+)?документаци\w*\b|"
+        r"\b(?:edit\w*|chang\w*|delet\w*|remov\w*)\s+"
+        r"(?:(?:a|the|my|project|repository)\s+){0,3}(?:documentation|docs)\b",
+        source, re.I,
+    ))
+    explicit_sync = explicit_sync or _has_phrase(normalized, "documentation sync", "docs sync", "синхронизация документации")
+    if explicit_sync or (
+        docs_file_subject and _has(tokens, "редакт", "измен", "удал", "edit", "chang", "delet", "remov")
     ):
         sync_subject = "sync_project_docs" if "sync_project_docs" in source.casefold() else "project docs sync"
         requested_states = " ".join(
@@ -649,7 +681,11 @@ def project_retrieval_disposition(question: str) -> ProjectRetrievalDisposition:
     if force_context_only:
         return "broad_context"
     if contract.proof_obligations:
-        return "fail_closed" if contract.unresolved_parts else "broad_context"
+        # A newly unreviewed legacy frame loses certification, not safe reads.
+        # Existing explicit semantic gaps still keep their previous disposition.
+        blocking_gaps = tuple(part for part in contract.unresolved_parts
+                              if not part.startswith("legacy_unresolved:unreviewed_frame:"))
+        return "fail_closed" if blocking_gaps else "broad_context"
 
     tokens = _tokens(question)
     if any(

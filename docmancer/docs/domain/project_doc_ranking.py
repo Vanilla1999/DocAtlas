@@ -52,8 +52,24 @@ def condition_lead_priority(question: str, snippet: str) -> int:
     # Fenced examples are not a natural-language rule lead. Inline identifiers
     # remain intact and must match the requested subject, not a substring.
     visible = re.sub(r"```.*?```|~~~.*?~~~", "", snippet[:2200], flags=re.S)
+    anchor = re.escape(anchors[0])
+    # A compact summary rule is more useful for a broad permission question than
+    # one isolated conditional example. This remains a local ordering signal: it
+    # does not certify that every permission case was covered.
+    summary = re.compile(
+        r"(?<!\w)" + anchor + r"(?!\w)[^.!?\n]{0,260}"
+        r"(?:\bonly\s+(?:when|if)\b|\bcall\s+it\s+from\b)",
+        re.I,
+    )
+    breadth = re.compile(
+        r"\b(?:or\s+(?:when|if)|explicit(?:ly)?\s+(?:user|approved)|"
+        r"approval|confirmation)\b",
+        re.I,
+    )
+    if summary.search(visible) and breadth.search(visible):
+        return 2
     lead = re.compile(r"(?:^|\n|[.!?]\s+)(?:when|if|unless|когда|если)\b"
-                      r"[^.!?\n]{0,350}(?<!\w)" + re.escape(anchors[0]) + r"(?!\w)", re.I)
+                      r"[^.!?\n]{0,350}(?<!\w)" + anchor + r"(?!\w)", re.I)
     return int(bool(lead.search(visible)))
 
 
@@ -725,15 +741,18 @@ def rerank_project_doc_chunks(
         noise = internal_noise_score(getattr(chunk, "content", ""))
         if noise >= 0.5 and getattr(intent, "wants_how_to", False) and not _query_allows_internal_noise(question, intent):
             score *= 0.2
-        scored.append((exact_compatible, score, index, chunk))
+        condition_priority = condition_lead_priority(
+            question, str(getattr(chunk, "content", "") or ""),
+        )
+        scored.append((exact_compatible, condition_priority, score, index, chunk))
         score_by_id[id(chunk)] = (base, score, index)
     # Authority breaks relevance ties; it cannot outweigh a better match.
     scored.sort(key=lambda row: (
-        -row[0], -row[1],
+        -row[0], -row[1], -row[2],
         -{"source_of_truth": 3, "supporting": 2, "historical": 1, "generated": 0}.get(
-            getattr(row[3], "authority", None), 2,
+            getattr(row[4], "authority", None), 2,
         ),
-        row[2],
+        row[3],
     ))
 
     max_per_source = broad_max_per_source if getattr(intent, "broad", False) else narrow_max_per_source
@@ -771,15 +790,16 @@ def rerank_project_doc_chunks(
         # Spend bounded slots on new public lookups, not repeated or alias hits.
         next_index = max(range(len(remaining)), key=lambda i: (
             remaining[i][0],
-            len(public_queries_by_id[id(remaining[i][3])] - covered_public_queries),
-            len(audited_queries_by_id[id(remaining[i][3])] - covered_audited_queries),
+            remaining[i][1],
+            len(public_queries_by_id[id(remaining[i][4])] - covered_public_queries),
+            len(audited_queries_by_id[id(remaining[i][4])] - covered_audited_queries),
             -i,
         ))
         for candidate_index, row in enumerate(remaining):
             current = remaining[next_index]
-            if row[0] == current[0] and dominates(row[3], current[3]):
+            if row[:2] == current[:2] and dominates(row[4], current[4]):
                 next_index = candidate_index
-        _, _, index, chunk = remaining.pop(next_index)
+        _, _, _, index, chunk = remaining.pop(next_index)
         path = _source_key(chunk, index)
         new_public_queries = public_queries_by_id[id(chunk)] - covered_public_queries
         new_audited_queries = audited_queries_by_id[id(chunk)] - covered_audited_queries
@@ -794,11 +814,11 @@ def rerank_project_doc_chunks(
         if limit and len(selected) >= limit:
             break
     pre_injection_ids = {id(c) for c in selected}
-    selected = ensure_broad_query_sources(selected, [chunk for _, _, _, chunk in scored], question=question, intent=intent, limit=limit)
+    selected = ensure_broad_query_sources(selected, [chunk for _, _, _, _, chunk in scored], question=question, intent=intent, limit=limit)
     if limit and len(selected) < limit:
         selected_ids = {id(c) for c in selected}
         selected_counts = Counter(_source_key(c) for c in selected)
-        for _, _, index, chunk in scored:
+        for _, _, _, index, chunk in scored:
             if len(selected) >= limit:
                 break
             if id(chunk) not in selected_ids:
@@ -808,10 +828,10 @@ def rerank_project_doc_chunks(
                 selected.append(chunk)
                 selected_ids.add(id(chunk))
                 selected_counts[source_key] += 1
-        unique_candidate_sources = {_source_key(chunk, index) for _, _, index, chunk in scored}
+        unique_candidate_sources = {_source_key(chunk, index) for _, _, _, index, chunk in scored}
         may_relax_diversity = not getattr(intent, "broad", False) or len(unique_candidate_sources) <= 1
         if len(selected) < limit and may_relax_diversity:
-            for _, _, _, chunk in scored:
+            for _, _, _, _, chunk in scored:
                 if len(selected) >= limit:
                     break
                 if id(chunk) not in selected_ids:

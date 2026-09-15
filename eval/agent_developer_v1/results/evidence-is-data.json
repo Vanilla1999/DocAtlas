@@ -291,7 +291,7 @@
           "path": "docmancer/docs/domain/_answer_units_shared.py"
         },
         {
-          "git_blob_sha1": "41427a66ebceb66ff22726895f8f8d2f42a3c599",
+          "git_blob_sha1": "d695b0dfc6d65ea1459a1d2b9a0f2e7bcb69e756",
           "path": "docmancer/docs/domain/_project_answer_contract_part01.py"
         },
         {
@@ -299,7 +299,7 @@
           "path": "docmancer/docs/domain/_project_answer_contract_part02.py"
         },
         {
-          "git_blob_sha1": "211182c6f223d9d3697e8619a26d1fad3af3d24a",
+          "git_blob_sha1": "02ba5ed28dfbfe6275630232fd1ed529e1b35ac0",
           "path": "docmancer/docs/domain/_project_answer_contract_shared.py"
         },
         {
@@ -311,7 +311,7 @@
           "path": "docmancer/docs/domain/project_answer_contract.py"
         }
       ],
-      "sha256": "40c2fb6cbc99205aaaeecffd60838cf8701a89ed1868e076c4bf6467d6238fde"
+      "sha256": "9a931ad6c215294e5505e3b52b98e669f3f9c02a6fc5c53c1f45d5c895a09557"
     },
     "protocol_git_blob_sha1": "9f05de62916edff051e5d6814ff17a81f2e5e978",
     "recovery_projection_git_blob_sha1": "4e527a68bae53bbfcddc29651cfe50cfab77f095"

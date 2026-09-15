@@ -158,6 +158,28 @@ def _strip_legacy_locators(payload: dict[str, Any], snapshot: dict[str, Any]) ->
     _refresh_estimate(payload)
 
 
+def _retains_visible_sources(
+    previous: dict[str, Any], trial: dict[str, Any],
+) -> bool:
+    """Do not buy recovery metadata by deleting already-visible evidence text."""
+    trial_by_id = {
+        str(row.get("evidence_id") or ""): row
+        for row in trial.get("sources") or () if isinstance(row, dict)
+    }
+    for row in previous.get("sources") or ():
+        if not isinstance(row, dict):
+            continue
+        evidence_id = str(row.get("evidence_id") or "")
+        replacement = trial_by_id.get(evidence_id)
+        if replacement is None:
+            return False
+        old_snippet = str(row.get("snippet") or "")
+        new_snippet = str(replacement.get("snippet") or "")
+        if old_snippet and old_snippet not in new_snippet:
+            return False
+    return True
+
+
 def _finalize_quality(
     retrieval: dict[str, Any], payload: dict[str, Any], snapshot: dict[str, Any],
 ) -> None:
@@ -248,6 +270,7 @@ def project_docs_context(
                 trial_coverage = ((trial_retrieval.get("documentation_query_plan") or {}).get("_component_coverage") or {})
                 retained = (
                     retained_ids <= trial_ids
+                    and _retains_visible_sources(payload, trial_payload)
                     and set(payload.get("covered_query_ids") or ()) <= set(trial_payload.get("covered_query_ids") or ())
                     and set(old_coverage.get("covered_component_ids") or ()) <= set(trial_coverage.get("covered_component_ids") or ())
                 )

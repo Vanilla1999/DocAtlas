@@ -1,0 +1,92 @@
+diff --git a/docmancer/docs/application/_docs_context_projection_core.py b/docmancer/docs/application/_docs_context_projection_core.py
+index 92c8eb9..efde7eb 100644
+--- a/docmancer/docs/application/_docs_context_projection_core.py
++++ b/docmancer/docs/application/_docs_context_projection_core.py
+@@ -337,7 +337,7 @@ def project_docs_context(
+         }
+         selected_components = {key for source in sources for key in component_witnesses(source, obligations)}
+         missing_compound_priority_ids = (
+-            compound_priority_query_ids - selected_public_ids
++            compound_priority_query_ids - qualified_query_ids(sources)
+         )
+         prepared = _facet_aware_candidates(
+             prepared, query_text=query_text,
+diff --git a/docmancer/docs/application/_project_docs_service_part03.py b/docmancer/docs/application/_project_docs_service_part03.py
+index 0f15bf1..84dfcb9 100644
+--- a/docmancer/docs/application/_project_docs_service_part03.py
++++ b/docmancer/docs/application/_project_docs_service_part03.py
+@@ -414,7 +414,7 @@ class _ProjectDocsServicePart03:
+                 f"query-supplemental-{next_supplemental_id}"
+             )
+             next_supplemental_id += 1
+-        supplemental_budget = min(budget, max(128, budget // 4))
++        supplemental_budget = min(budget, max(128, min(400, budget // 4)))
+ 
+         gateway = getattr(self.facade, "agent_gateway", None)
+         if gateway is not None:
+@@ -529,7 +529,11 @@ class _ProjectDocsServicePart03:
+             lane = _run(
+                 supplemental_query,
+                 query_limit=effective_limit if public_lookup else 4,
+-                query_budget=budget if public_lookup else supplemental_budget,
++                query_budget=(
++                    budget if public_lookup else
++                    min(budget, max(800, supplemental_budget))
++                    if preserve_canonical_neighbors else supplemental_budget
++                ),
+                 query_expand="adjacent" if preserve_canonical_neighbors else "none",
+                 query_filters=filters,
+             )
+diff --git a/docmancer/docs/application/context_candidate_ranking.py b/docmancer/docs/application/context_candidate_ranking.py
+index 2a64551..313d8c2 100644
+--- a/docmancer/docs/application/context_candidate_ranking.py
++++ b/docmancer/docs/application/context_candidate_ranking.py
+@@ -204,9 +204,19 @@ def _facet_aware_candidates(
+             _relation_request_priority(query_text.get(key, ""), body_text)
+             for key in qualified_ids & required_query_ids
+         ), default=(0.0,) * 8)
++        host_condition_priority = max((
++            _condition_body_priority(query_text.get(key, ""), body_text)
++            for key in qualified_ids & required_query_ids
++        ), default=0)
++        comparison_action_priority = max((
++            _comparison_action_priority(query_text.get(key, ""), body_text)
++            for key in qualified_ids & required_query_ids
++        ), default=0)
+         return (
+             condition_lead_priority(query_text.get("query-original", ""), str(source.get("snippet") or "")),
+             required_relation_preference,
++            host_condition_priority,
++            comparison_action_priority,
+             role_tiebreak,
+             direct_required_count,
+             direct_required_lexical,
+@@ -218,10 +228,6 @@ def _facet_aware_candidates(
+             rank[3] if exact_count else 0.0,
+             exact_count,
+             len(_fully_matched_query_ids((source,)) & required_query_ids),
+-            max((_condition_body_priority(query_text.get(key, ''), str(source.get('snippet') or ''))
+-                 for key in qualified_ids & required_query_ids), default=0),
+-            max((_comparison_action_priority(query_text.get(key, ''), str(source.get('snippet') or ''))
+-                 for key in qualified_ids & required_query_ids), default=0),
+             len(qualified_ids & required_query_ids),
+             request_preference,
+             original_body_overlap,
+@@ -312,9 +318,14 @@ def _relation_request_priority(question: str, snippet: str) -> tuple[float, ...]
+     # the mechanism span, not merely a taxonomy of possible states.  The
+     # preference is relation-shaped and does not encode a particular answer.
+     decision_mechanism_score = 0.0
+-    if re.search(r"\bhow\b[^?]{0,120}\b(?:decid|choos|select|resolv)\w*\b", question, re.I):
+-        if re.search(r"\b(?:decid\w*|choos\w*|version\s+(?:is\s+)?resolv\w*)\b", body, re.I):
+-            decision_mechanism_score = 1.0
++    decision_question = bool(
++        re.search(r"\bhow\b[^?]{0,120}\b(?:decid|choos|select|resolv)\w*\b", question, re.I)
++        or re.search(r"\bwhat\s+decision\b[^?]{0,120}\b(?:make|mak|take|use)\w*\b", question, re.I)
++    )
++    if decision_question and re.search(
++        r"\b(?:decision|decid\w*|choos\w*|select\w*|resolv\w*)\b", body, re.I,
++    ):
++        decision_mechanism_score = 1.0
+ 
+     # An action question about an explicit insufficient-evidence state needs a
+     # procedural span, not merely a definition saying that the state exists.

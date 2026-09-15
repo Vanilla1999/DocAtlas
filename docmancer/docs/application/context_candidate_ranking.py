@@ -6,7 +6,9 @@ import math
 from typing import Any
 from .context_selection import component_witnesses, qualified_query_ids
 from docmancer.docs.domain.context_windows import _query_terms
-from docmancer.docs.domain.project_doc_ranking import project_question_lane, project_source_lane, condition_lead_priority
+from docmancer.docs.domain.project_doc_ranking import (
+    condition_lead_priority, project_question_lane, project_source_lane, technical_anchors,
+)
 from docmancer.docs.domain.answer_units import extract_answer_units, _NEGATION_RE
 from docmancer.docs.domain.normative_language import _FORBIDDEN_RE
 from docmancer.docs.domain.evidence_qualification import _visible_term_present, qualify_evidence
@@ -152,6 +154,9 @@ def _facet_aware_candidates(
         # Among candidates serving the same outstanding direction, preserve
         # the original question's body terms before topical/authority ties.
         body_text = str(source.get('snippet') or source.get('content') or '')
+        relation_preference = _relation_request_priority(
+            query_text.get("query-original", ""), body_text,
+        )
         original_body_overlap = sum(
             weight for term, weight in term_weights.items()
             if _visible_term_present(term, body_text.casefold(), exact=False)
@@ -161,8 +166,9 @@ def _facet_aware_candidates(
             if qualified_ids & required_query_ids else (0, 0, 0, 0)
         )
         return (
-            int(exact_count > 0),
             condition_lead_priority(query_text.get("query-original", ""), str(source.get("snippet") or "")),
+            relation_preference,
+            int(exact_count > 0),
             component_count,
             bound_assignment,
             rank[3] if exact_count else 0.0,
@@ -210,6 +216,149 @@ def _facet_aware_candidates(
                 best = other
         ranked.insert(index, ranked.pop(best))
     return ranked
+
+
+_COMPOUND_INTERROGATIVE_RE = re.compile(
+    r"\b(?:which|what|how|when)\b.+?\b(?:and|or)\s+(?:which|what|how|when)\b",
+    re.I,
+)
+_LIST_RE = re.compile(
+    r"\b([A-Za-z][A-Za-z0-9_-]*(?:\s*,\s*[A-Za-z][A-Za-z0-9_-]*)+"
+    r"\s*,?\s*(?:and|or)\s+[A-Za-z][A-Za-z0-9_-]*)\b",
+    re.I,
+)
+
+
+def _relation_request_priority(question: str, snippet: str) -> tuple[float, ...]:
+    """Prefer visible relation-bearing text without turning it into proof.
+
+    Exact identifiers and aliases are retrieval aids.  For an explicitly
+    conditional or multi-part question they must not crowd out an already
+    qualified span that visibly preserves the user's condition/alternatives.
+    This is a deterministic ordering hint only; it neither qualifies evidence
+    nor changes component coverage or ``checked`` semantics.
+    """
+    if not question or not snippet:
+        return (0.0, 0.0, 0.0, 0.0, 0.0)
+    # Narrow request shapes (code/signature/default-timeout/origin comparison)
+    # already have a stronger dedicated selector. Do not let this generic
+    # relation hint compete with those explicit parts.
+    if recognized_request_parts(question):
+        return (0.0, 0.0, 0.0, 0.0)
+    body = snippet.casefold()
+
+    # An action question about an explicit insufficient-evidence state needs a
+    # procedural span, not merely a definition saying that the state exists.
+    # The signal is intentionally generic: it rewards action language but does
+    # not encode which recovery action is correct.
+    recovery_action_score = 0.0
+    action_question = bool(
+        re.search(r"\bwhat\s+should\b[^?]{0,100}\bdo\b", question, re.I)
+        or re.search(r"\bчто\s+долж\w*\s+(?:сдел|предприн)\w*", question, re.I)
+    )
+    insufficient_state = bool(
+        re.search(r"\binsufficient[_ ]evidence\b", question, re.I)
+        or re.search(r"\bнедостаточно\s+(?:доказательств|данных)\b", question, re.I)
+    )
+    if action_question and insufficient_state and "insufficient_evidence" in body:
+        if re.search(
+            r"\b(?:follow|continue|stop|retry|do\s+not|must\s+not|"
+            r"should\s+not|ask|call|use)\b",
+            body, re.I,
+        ):
+            recovery_action_score = 1.0
+
+    # Once a broad permission rule has been selected, a complementary caveat
+    # (approval/confirmation) is more useful than another example of the same
+    # returned-action path.  Requiring the requested technical subject keeps
+    # unrelated safety prose from receiving this preference.
+    permission_caveat_score = 0.0
+    if re.match(
+        r"^\s*(?:when\b.*\b(?:allowed|permitted)\b|"
+        r"under (?:what|which) conditions\b|"
+        r"когда\b.*(?:разреш|можно|допуст)|при каких условиях\b)",
+        question, re.I,
+    ):
+        anchors = technical_anchors(question)
+        if len(anchors) == 1 and _visible_term_present(anchors[0], body, exact=True):
+            if re.search(
+                r"\b(?:approval|confirmation|opt[ -]?in|ask(?:s|ed)?\s+(?:the\s+)?user|"
+                r"user\s+(?:approval|confirmation))\b",
+                body, re.I,
+            ):
+                permission_caveat_score = 1.0
+
+    # Preserve the state named in a conditional question in either common
+    # surface order: "what happens if X is stale" and "if X is stale, what
+    # happens ...".  The state is user text, never an inferred outcome.
+    condition = None
+    for pattern in (
+        r"\bwhat\s+happens\s+(?:when|if)\s+(.+?)(?:[?.]|$)",
+        r"^\s*(?:when|if)\s+(.+?)[,;]\s*what\s+happens\b",
+    ):
+        match = re.search(pattern, question, re.I)
+        if match is not None:
+            condition = match.group(1)
+            break
+    state_score = 0.0
+    if condition:
+        state_match = re.search(
+            r"\b(?:is|are|was|were|becomes?|gets?)\s+([A-Za-z][A-Za-z0-9_-]{2,})\b",
+            condition,
+            re.I,
+        )
+        if state_match and _visible_term_present(
+            state_match.group(1), body, exact=False,
+        ):
+            state_score = 1.0
+
+    # Questions that explicitly enumerate alternatives (exact / declared-only /
+    # unbound; new / changed / stale / deleted) should prefer a single visible
+    # span retaining more of those user-named alternatives.
+    alternative_score = 0.0
+    list_match = _LIST_RE.search(question)
+    if list_match is not None:
+        alternatives = tuple(dict.fromkeys(
+            token.casefold()
+            for token in re.findall(r"[A-Za-z][A-Za-z0-9_-]*", list_match.group(1))
+            if token.casefold() not in {"and", "or"}
+        ))
+        if len(alternatives) >= 3:
+            alternative_score = float(sum(
+                _visible_term_present(term, body, exact=False)
+                for term in alternatives
+            )) / len(alternatives)
+
+    # Repeated interrogatives form explicit sibling clauses.  Reward balanced
+    # coverage (the weakest clause) rather than a topical span that saturates one
+    # side and omits the other.  This remains lexical and source-local.
+    clause_score = 0.0
+    clause_average = 0.0
+    if _COMPOUND_INTERROGATIVE_RE.search(question):
+        clauses = tuple(
+            part.strip(" ,;?")
+            for part in re.split(
+                r"\s*,?\s+(?:and|or)\s+(?=(?:which|what|how|when)\b)",
+                question,
+                flags=re.I,
+            )
+            if part.strip(" ,;?")
+        )
+        ratios: list[float] = []
+        for clause in clauses:
+            terms = _query_terms((clause,))
+            if not terms:
+                continue
+            ratios.append(sum(
+                _visible_term_present(term, body, exact=False) for term in terms
+            ) / len(terms))
+        if len(ratios) >= 2:
+            clause_score = min(ratios)
+            clause_average = sum(ratios) / len(ratios)
+    return (
+        recovery_action_score, permission_caveat_score, state_score,
+        alternative_score, clause_score, clause_average,
+    )
 
 
 def _fully_matched_query_ids(sources: Any) -> set[str]:
