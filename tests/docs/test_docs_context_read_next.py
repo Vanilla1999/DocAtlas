@@ -235,3 +235,34 @@ def test_public_schema_exposes_quality_and_registered_range_contract():
         "source_uri", "path", "project_identity", "snapshot_sha256",
         "line_start", "line_end", "reason",
     }
+
+
+def test_optional_recovery_cannot_evict_accepted_evidence(monkeypatch):
+    from docmancer.docs.application import docs_context_projection as projection
+    from docmancer.docs.application.model_visible_projection import docs_context_budget_tokens
+    from tests.docs.test_docs_context_compound_projection import _host_lookup_context_retrieval
+
+    retrieval = _host_lookup_context_retrieval()
+    retrieval["_source_continuation_project_root"] = "/repo"
+    retrieval["context_pack"] = retrieval["context_pack"][:2]
+    target = {"source_uri": "docatlas://source/range", "path": "docs/extra.md",
+              "project_identity": "project:test", "snapshot_sha256": "sha256:" + "a" * 64,
+              "line_start": 1, "line_end": 20, "reason": "inspect_source_context"}
+    core = projection._run_core
+    calls = []
+    def observed(**kwargs):
+        result = core(**kwargs)
+        calls.append(deepcopy(result[0]))
+        return result
+    monkeypatch.setattr(projection, "_run_core", observed)
+    monkeypatch.setattr(projection, "prepare_docs_context_read_next", lambda *args, **kwargs: (target, {}))
+    monkeypatch.setattr(projection, "docs_context_read_next_cost", lambda *args: 650)
+    # Force the reservation path; the reduced evidence budget cannot retain both.
+    monkeypatch.setattr(projection, "attach_docs_context_read_next", lambda *args, **kwargs: False)
+    payload, _ = projection.project_docs_context(retrieval=retrieval)
+    assert len(calls) == 2
+    assert {s["evidence_id"] for s in payload["sources"]} == {s["evidence_id"] for s in calls[0]["sources"]}
+    assert payload["covered_query_ids"] == calls[0]["covered_query_ids"]
+    assert payload["read_next"] == []
+    assert "budget_limited" in payload["context_quality"]["reasons"]
+    assert docs_context_budget_tokens(payload) <= 800

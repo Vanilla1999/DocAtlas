@@ -32,6 +32,7 @@ from docmancer.docs.application.model_visible_projection import (
 )
 from .context_candidate_ranking import _context_rank, _facet_aware_candidates, _fully_matched_query_ids
 from docmancer.docs.domain.context_budget import PROJECT_CONTEXT_BUDGET
+from docmancer.docs.domain.context_blocks import inline_command_literals, source_block_alternatives
 from docmancer.docs.domain.context_windows import (
     _focused_line_range, _focused_snippet, _is_complete_source_span,
     _projection_limits, _query_terms,
@@ -369,10 +370,10 @@ def project_docs_context(
             if (
                 disjoint
                 and qualified_query_ids((existing,)) <= qualified_query_ids((original,))
-                and (qualified_query_ids((variant,)) & eligible_query_ids - qualified_query_ids(sources)
-                     or set(component_witnesses(variant, obligations)) - selected_components)
+                and qualified_query_ids((variant,)) & eligible_query_ids - qualified_query_ids(sources)
             ):
-                # Distinct visible spans may prove different facts in one chunk.
+                # A second span needs an independently qualified new direction.
+                # Internal component novelty alone cannot multiply one source ID.
                 identity = f"{variant['evidence_id']}:{start}:{start + len(variant['snippet'])}"
                 variant = {**variant, "evidence_id": "ev-" + hashlib.sha256(identity.encode()).hexdigest()[:16]}
                 existing_index = seen_ids.get(variant["evidence_id"])
@@ -389,6 +390,8 @@ def project_docs_context(
             if not (qualified_query_ids((existing,)) & eligible_query_ids) <= qualified_query_ids((variant,)):
                 continue
             if not set(component_witnesses(existing, obligations)) <= set(component_witnesses(variant, obligations)):
+                continue
+            if not inline_command_literals(existing["snippet"]) <= inline_command_literals(variant["snippet"]):
                 continue
             candidate_sources = [*sources[:existing_index], variant, *sources[existing_index + 1:]]
         decision = context_selection_decision(candidate_sources, public_query_ids)
@@ -602,7 +605,7 @@ def _expand_selected_snippets(
             preserve_span = any(
                 trace.get("qualified") is True and trace.get("exact_terms")
                 for trace in (source.get("retrieval_query_matches") or {}).values()
-            ) or _REQUIRED_RE.search(source["snippet"]) or _FORBIDDEN_RE.search(source["snippet"])
+            ) or _REQUIRED_RE.search(source["snippet"]) or _FORBIDDEN_RE.search(source["snippet"]) or inline_command_literals(source["snippet"])
             retained_start = raw_snippet.find(source["snippet"])
             if preserve_span and (retained_start < 0
                     or raw_snippet.find(source["snippet"], retained_start + 1) >= 0):
@@ -677,6 +680,43 @@ def _qualified_fragments(
             )
             if snippet and (qualified_query_ids((candidate,)) & query_ids or component_witnesses(candidate, obligations)):
                 variants.append(candidate)
+    # Exact small atoms can remove a heading or irrelevant adjacent paragraph
+    # without widening any rolling window. Larger prose is offered only for an
+    # unstructured mandatory direction, not optional aliases or hidden metadata.
+    required_ids = set((source.get("_independent_query_plan") or {}).get("required_query_ids") or ())
+    preserve_required_blocks = bool(required_ids & query_ids and not obligations and not assignments)
+    required_blocks: list[tuple[int, int]] = []
+    for snippet_start, snippet_end in source_block_alternatives(raw_snippet).spans:
+        if ((snippet_start, snippet_end) in seen_spans
+                or (snippet_end - snippet_start > 640 and not preserve_required_blocks)):
+            continue
+        snippet = raw_snippet[snippet_start:snippet_end]
+        candidate = dict(source)
+        candidate["snippet"] = snippet
+        candidate["line_start"], candidate["line_end"] = _focused_line_range(
+            raw_snippet, snippet_start, snippet_end, source_line_start,
+        )
+        candidate = _requalify_visible_source(candidate, query_text=query_text)
+        candidate = bind_visible_assignments(
+            source.get("_qualification_candidate", source), candidate, assignments,
+        )
+        candidate_ids = qualified_query_ids((candidate,)) & query_ids
+        if candidate_ids or component_witnesses(candidate, obligations):
+            seen_spans.add((snippet_start, snippet_end))
+            variants.append(candidate)
+            if preserve_required_blocks and candidate_ids & required_ids:
+                required_blocks.append((snippet_start, snippet_end))
+    if required_blocks:
+        # For an unstructured mandatory request, a clipped interior is not a
+        # substitute for its qualified whole block. Typed component/assignment
+        # requests above retain their finer-grained witness policy. Admission
+        # can reject the whole atom, but cannot silently pass its prefix instead.
+        variants = [candidate for candidate in variants if not any(
+            start <= (offset := raw_snippet.find(str(candidate.get("snippet") or "")))
+            and offset + len(str(candidate.get("snippet") or "")) <= end
+            and (offset, offset + len(str(candidate.get("snippet") or ""))) != (start, end)
+            for start, end in required_blocks
+        )]
     # Offer one bounded verbatim union span when it preserves both directions.
     seed_variants = tuple(variants)
     for left_index, left in enumerate(seed_variants):

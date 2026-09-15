@@ -109,20 +109,33 @@ def source_block_alternatives(text: str) -> BlockAlternatives:
         if len(spans) > MAX_ALTERNATIVES:
             return BlockAlternatives((), ("block_work_limited",))
 
-    # Bounded contiguous alternatives within one heading section. This keeps
-    # source order and exact text; it never stitches disconnected quotations.
-    for index, (start, _, kind, section) in enumerate(roots):
-        if kind in {"heading", "unsupported"}:
-            continue
-        for _, end, following_kind, following_section in roots[index:]:
-            if following_section != section or following_kind == "unsupported":
-                break
-            if following_kind != "heading":
-                spans.add((start, end))
-            if len(spans) > MAX_ALTERNATIVES:
-                return BlockAlternatives((), ("block_work_limited",))
+    # A short lead-in can be a dependency of the immediately following
+    # structured block. Arbitrary unions of all paragraphs in a section are not
+    # semantic blocks: they inflate candidates and join unrelated evidence.
+    for left, right in zip(roots, roots[1:]):
+        start, intro_end, kind, section = left
+        _, end, following_kind, following_section = right
+        if (kind == "prose" and section == following_section
+                and following_kind in {"code", "list", "table"}
+                and text[start:intro_end].rstrip().endswith(":")):
+            spans.add((start, end))
+        if len(spans) > MAX_ALTERNATIVES:
+            return BlockAlternatives((), ("block_work_limited",))
 
     return BlockAlternatives(
         tuple(sorted(spans, key=lambda span: (span[1] - span[0], span[0]))),
         tuple(sorted(limitations)),
+    )
+
+
+def inline_command_literals(text: str) -> frozenset[str]:
+    """Return visible inline invocations/options that re-slicing must retain.
+
+    Ordinary prose and single identifier aliases are not commands. Keeping a
+    command does not certify an answer; this only prevents a selected operation
+    from silently becoming a different operation with similar topical words.
+    """
+    return frozenset(
+        match.group(0) for match in re.finditer(r"(?<!`)`([^`\n]+)`(?!`)", text)
+        if re.match(r"^(?:--[\w-]+(?:[=\s].*)?|[\w./-]+\s+\S.*)$", match.group(1))
     )

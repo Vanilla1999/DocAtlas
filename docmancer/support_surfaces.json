@@ -31,7 +31,7 @@
       "pypdf",
       "python-docx",
       "striprtf",
-      "tiktoken"
+      "regex"
     ],
     "task24_extra_candidates": [
       "qdrant-client",

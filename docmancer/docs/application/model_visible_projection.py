@@ -40,7 +40,6 @@ from docmancer.docs.application.model_visible_projection_helpers import (
     docs_context_budget_tokens,
 )
 
-
 DOCS_ANSWER_MAX_TOKENS = 800
 DOCS_CONTEXT_MAX_TOKENS = PROJECT_CONTEXT_BUDGET.max_tokens
 PATCH_CONTEXT_TARGET_TOKENS = 1_500
@@ -632,6 +631,10 @@ def project_insufficient(
         "missing": messages or [_MINIMAL_MISSING],
         "estimated_tokens": 0,
     }
+    if kind == "docs_context":
+        from .context_quality import context_quality
+        payload["context_quality"] = context_quality(sources=())
+        payload["read_next"] = []
     action = _bounded_action(recommended_next_action)
     if action:
         payload["recommended_next_action"] = action

@@ -82,6 +82,10 @@ def visible_request_parts(question: str, text: str) -> FrozenSet[str]:
 def direct_evidence_preference(question: str, text: str) -> tuple[int, int, int, int]:
     """Tie-break already-qualified evidence without creating completeness proof."""
     requested = recognized_request_parts(question)
+    if not requested:
+        # Generic retrieval keeps its established relevance/stable-order policy.
+        # Mere shortness is not evidence that a candidate answers the question.
+        return (0, 0, 0, 0)
     visible = visible_request_parts(question, text)
     non_echo = int(not _is_question_echo(question, text))
     if "code_example" in requested:

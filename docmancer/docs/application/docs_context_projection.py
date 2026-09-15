@@ -2,12 +2,14 @@
 from __future__ import annotations
 
 from copy import deepcopy
+from functools import wraps
 from typing import Any
 
 from . import _docs_context_projection_core as _core
 from ._docs_context_payload import _payload
 from .context_quality import context_quality
 from .context_selection import (
+    bind_visible_assignments,
     component_coverage_decision,
     component_obligations,
     component_witnesses,
@@ -16,6 +18,7 @@ from .context_selection import (
 from .model_visible_projection import (
     DOCS_CONTEXT_MAX_TOKENS,
     INSUFFICIENT_EVIDENCE_MAX_TOKENS,
+    docs_context_budget_tokens,
     _refresh_estimate,
 )
 from .source_continuation import (
@@ -57,13 +60,41 @@ _core.context_selection_decision = _core_context_selection_decision
 _core.component_coverage_decision = _core_component_coverage_decision
 
 
-def _final_sources(snapshot: dict[str, Any], payload: dict[str, Any]) -> tuple[dict[str, Any], ...]:
+def _facade_hook(name: str):
+    """Resolve a supported facade seam at call time, without per-request writes."""
+    @wraps(globals()[name])
+    def dispatch(*args: Any, **kwargs: Any) -> Any:
+        return globals()[name](*args, **kwargs)
+    return dispatch
+
+
+for _hook_name in (
+    "_expand_selected_snippets", "_facet_aware_candidates", "_focused_line_range",
+    "_focused_snippet", "_qualified_fragments", "_requalify_visible_source",
+):
+    setattr(_core, _hook_name, _facade_hook(_hook_name))
+
+
+def _final_sources(
+    snapshot: dict[str, Any], payload: dict[str, Any], assignments: tuple[Any, ...],
+    *, expected_project_identity: Any = None,
+) -> tuple[dict[str, Any], ...]:
     rows: list[dict[str, Any]] = []
     for public in payload.get("sources") or ():
         bound = snapshot.get(public.get("evidence_id")) if isinstance(public, dict) else None
-        projected = bound.get("projected_source") if isinstance(bound, dict) else None
-        if isinstance(projected, dict):
-            rows.append(projected)
+        original = bound.get("source") if isinstance(bound, dict) else None
+        if not isinstance(original, dict):
+            continue
+        # Rebind against the actual surviving snippet, never a hidden retrieval
+        # window. Public serialization intentionally strips these private fields;
+        # their absence must not erase real proof during quality finalization.
+        visible = {
+            **public,
+            "_qualification_candidate": original,
+            "_expected_project_identity": expected_project_identity,
+            "_lifecycle_intent": original.get("_lifecycle_intent", "current"),
+        }
+        rows.append(bind_visible_assignments(original, visible, assignments))
     return tuple(rows)
 
 
@@ -137,7 +168,10 @@ def _finalize_quality(
     assignments = tuple(
         item for item in ((selection or {}).get("assignments") or ()) if isinstance(item, dict)
     ) if isinstance(selection, dict) else ()
-    final_sources = _final_sources(snapshot, payload)
+    final_sources = _final_sources(
+        snapshot, payload, assignments,
+        expected_project_identity=retrieval.get("project_identity"),
+    )
     coverage = component_coverage_decision(
         plan.get("_component_contract") or (), assignments, final_sources,
         unresolved_residue=plan.get("unresolved_parts") or (),
@@ -197,29 +231,45 @@ def project_docs_context(
             reserve = docs_context_read_next_cost(payload, target)
             evidence_budget = max(1, packet_max - reserve)
             if evidence_budget < packet_max:
-                payload, snapshot = _run_core(
-                    retrieval=retrieval, max_tokens=evidence_budget,
-                    selection_diagnostics=selection_diagnostics,
+                # Recovery metadata must not evict accepted evidence. Evaluate
+                # compaction on a separate trace so a rejected trial cannot poison
+                # the quality/omission report for the retained original packet.
+                trial_retrieval = deepcopy(retrieval)
+                trial_payload, trial_snapshot = _run_core(
+                    retrieval=trial_retrieval, max_tokens=evidence_budget,
+                    selection_diagnostics=None,
                     allow_context_hints=_allow_context_hints,
                 )
-                _strip_legacy_locators(payload, snapshot)
-                _finalize_quality(retrieval, payload, snapshot)
-                target, target_source = prepare_docs_context_read_next(
-                    payload, snapshot, retrieval, root=root,
+                _strip_legacy_locators(trial_payload, trial_snapshot)
+                _finalize_quality(trial_retrieval, trial_payload, trial_snapshot)
+                retained_ids = {row["evidence_id"] for row in payload.get("sources") or ()}
+                trial_ids = {row["evidence_id"] for row in trial_payload.get("sources") or ()}
+                old_coverage = ((retrieval.get("documentation_query_plan") or {}).get("_component_coverage") or {})
+                trial_coverage = ((trial_retrieval.get("documentation_query_plan") or {}).get("_component_coverage") or {})
+                retained = (
+                    retained_ids <= trial_ids
+                    and set(payload.get("covered_query_ids") or ()) <= set(trial_payload.get("covered_query_ids") or ())
+                    and set(old_coverage.get("covered_component_ids") or ()) <= set(trial_coverage.get("covered_component_ids") or ())
                 )
-                if (
-                    target is not None and target_source is not None
-                    and attach_docs_context_read_next(payload, target, max_tokens=packet_max)
-                ):
+                if retained and attach_docs_context_read_next(trial_payload, target, max_tokens=packet_max):
+                    payload, snapshot = trial_payload, trial_snapshot
+                    retrieval.clear()
+                    retrieval.update(trial_retrieval)
+                    if selection_diagnostics is not None:
+                        selection_diagnostics["component_coverage"] = trial_coverage
                     snapshot["__read_next__"] = {"source": deepcopy(target_source)}
         if target is not None and not payload.get("read_next"):
             quality = payload.get("context_quality") or {}
             reasons = list(quality.get("reasons") or ())
             if "budget_limited" not in reasons and len(reasons) < 2:
                 reasons.append("budget_limited")
+                previous_quality = deepcopy(quality)
                 quality["reasons"] = reasons
                 payload["context_quality"] = quality
                 _refresh_estimate(payload)
+                if docs_context_budget_tokens(payload) > target_budget:
+                    payload["context_quality"] = previous_quality
+                    _refresh_estimate(payload)
 
     if root:
         attach_source_continuation_locators(payload, snapshot, root=root, max_tokens=packet_max)

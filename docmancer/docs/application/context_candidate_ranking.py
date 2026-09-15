@@ -12,7 +12,7 @@ from docmancer.docs.domain.normative_language import _FORBIDDEN_RE
 from docmancer.docs.domain.evidence_qualification import _visible_term_present, qualify_evidence
 from docmancer.docs.domain.question_semantic_frames import match_comparison_frame
 from docmancer.docs.domain.context_request_preferences import (
-    direct_evidence_preference, recognized_request_satisfied,
+    direct_evidence_preference, recognized_request_parts, recognized_request_satisfied,
 )
 
 
@@ -172,10 +172,10 @@ def _facet_aware_candidates(
                  for key in qualified_ids & required_query_ids), default=0),
             max((_comparison_action_priority(query_text.get(key, ''), str(source.get('snippet') or ''))
                  for key in qualified_ids & required_query_ids), default=0),
-            role_tiebreak,
             len(qualified_ids & required_query_ids),
             request_preference,
             original_body_overlap,
+            role_tiebreak,
             len(qualified_ids & (supplemental_query_ids or set())),
             rank[0],
             match_ratio,
@@ -223,11 +223,13 @@ def _fully_matched_query_ids(sources: Any) -> set[str]:
         for query_id, trace in (source.get("retrieval_query_matches") or {}).items():
             if not isinstance(trace, dict) or trace.get("qualified") is not True:
                 continue
-            if trace.get("match_ratio") == 1.0 or trace.get("mode") == "exact_path":
-                result.add(query_id)
-                continue
             question = str(trace.get("query_text") or "")
-            if recognized_request_satisfied(question, body):
+            if recognized_request_parts(question):
+                # Matching every lexical term cannot close a multi-part request
+                # while one of its explicit requested parts is still absent.
+                if recognized_request_satisfied(question, body):
+                    result.add(query_id)
+            elif trace.get("match_ratio") == 1.0 or trace.get("mode") == "exact_path":
                 result.add(query_id)
     return result
 

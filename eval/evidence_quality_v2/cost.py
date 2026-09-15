@@ -1,6 +1,5 @@
 """Eval-only token and usage accounting. Never changes the product estimator."""
 from __future__ import annotations
-import importlib.metadata
 import json
 from collections.abc import Iterable, Mapping
 from math import ceil
@@ -24,18 +23,18 @@ def model_visible_text(wire: Mapping, mode: str) -> str:
 
 
 def tokenizer():
-    import tiktoken
-    version = importlib.metadata.version('tiktoken')
-    if version != '0.11.0':
-        raise RuntimeError('experiment requires pinned tiktoken 0.11.0')
-    return tiktoken.get_encoding('o200k_base')
+    # Same bundled vocabulary and literal-text policy as production. Offline
+    # implementation identity is reported separately from the frozen codec.
+    from docmancer.docs.application.projection_tokenizer import projection_encoder
+    return projection_encoder()
 
 
 def count_input(text: str, encoder=None) -> dict:
-    encoder = encoder or tokenizer()
+    implementation = 'docatlas-offline:o200k_base' if encoder is None else 'provided_encoder'
+    encoder = encoder if encoder is not None else tokenizer()
     return {'utf8_bytes': len(text.encode('utf-8')),
             'actual_tokens': len(encoder.encode(text, disallowed_special=())),
-            'tokenizer': 'tiktoken/0.11.0:o200k_base'}
+            'tokenizer': implementation}
 
 
 def summarize_usage(attempts: Iterable[Mapping]) -> dict:

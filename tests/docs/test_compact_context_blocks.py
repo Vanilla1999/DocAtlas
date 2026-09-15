@@ -151,3 +151,46 @@ def test_structural_dependencies_are_not_silently_removed(text, required):
     if text.startswith("```"):
         assert all(item["snippet"].startswith("```python\n") and item["snippet"].endswith("\n```")
                    for item in alternatives)
+
+
+def test_atomic_alternatives_do_not_widen_ordinary_windows_or_join_sections():
+    from docmancer.docs.domain.context_blocks import source_block_alternatives
+    from docmancer.docs.domain.context_windows import _projection_limits
+    text = "First standalone fact.\n\n" + "Unrelated background. " * 70 + "\n\nLast standalone fact."
+    alternatives = source_block_alternatives(text).spans
+    assert _projection_limits(text) == (160, 320, 520)
+    assert all(not ("First standalone" in text[start:end] and "Last standalone" in text[start:end])
+               for start, end in alternatives)
+    dependent = "Use this example:\n\n```python\nexport()\n```"
+    assert (0, len(dependent)) in source_block_alternatives(dependent).spans
+
+
+def test_selected_command_cannot_be_replaced_by_topical_operation(monkeypatch):
+    from copy import deepcopy
+    from docmancer.docs.application import docs_context_projection as projection
+    retained = "| `lumen load` | Load local files. |"
+    replacement = "| `lumen export` | Export local files after load. |"
+    text = retained + "\n\n" + "Unrelated background. " * 40 + "\n\n" + replacement
+    question = "Load local files safely"
+    variants = _variants(text, question)
+    first = next(row for row in variants if row["snippet"] == retained)
+    first.update(project_identity="project:compact-context", authority="source_of_truth", scope="project")
+    second = deepcopy(first)
+    second["snippet"] = replacement
+    second["line_start"] = second["line_end"] = 136 + text[:text.index(replacement)].count("\n")
+    selected = [first, second]
+    # Force the already accepted witness to be followed by an equally qualified
+    # alternative, without relying on incidental candidate-order heuristics.
+    monkeypatch.setattr(projection, "_qualified_fragments", lambda *args, **kwargs: deepcopy(selected))
+    monkeypatch.setattr(projection, "_facet_aware_candidates", lambda candidates, **kwargs: candidates)
+    monkeypatch.setattr(projection, "_expand_selected_snippets", lambda sources, **kwargs: sources)
+    payload, snapshot = projection.project_docs_context(retrieval=_retrieval(text, question))
+    assert [row["snippet"] for row in payload["sources"]] == [retained]
+    assert validate_model_visible_projection(payload, snapshot=snapshot, max_tokens=800) == []
+
+
+def test_inline_command_retention_does_not_pin_single_identifier_aliases():
+    from docmancer.docs.domain.context_blocks import inline_command_literals
+    text = "Use `lumen load` with `--offline`; see `WidgetClient.open` and `optional-alias`."
+    assert inline_command_literals(text) == frozenset({"`lumen load`", "`--offline`"})
+    assert not inline_command_literals("```python\nWidgetClient.open()\n```")

@@ -32,6 +32,10 @@ def _payload(
             query_id in qualified_query_ids((source,)) for source in sources
         )
         requirement_id = str(item.get("requirement_id") or "")
+        if not requirement_id and not retrieved and item.get("origin") == "canonical_intent":
+            # An unused generated retrieval hint is not a missing user obligation.
+            # Keep it in private query diagnostics, not twice in the bounded DTO.
+            continue
         assigned_evidence_ids = [
             str(source.get("evidence_id") or "")
             for source in sources
