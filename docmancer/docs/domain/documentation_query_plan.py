@@ -16,6 +16,7 @@ from docmancer.docs.domain.query_terms import (
     documentation_exact_terms,
     documentation_technical_anchors,
     is_exact_technical_token,
+    supplemental_query_is_useful,
 )
 from docmancer.docs.domain.technical_terms import extract_technical_terms
 
@@ -154,24 +155,13 @@ _ORIGINAL_RETRIEVAL_INTENTS = frozenset({
     "project_docs_configuration", "testing_contribution",
 })
 _HOST_AUDITED_RETRIEVAL_INTENTS = frozenset({
-    # These facets have stable, context-only canonical rewrites that preserve
-    # the explicit host lookup's meaning while improving source recall. Keep
-    # this list narrow: other intents (notably installation verification and
-    # compound request-flow retrieval) have distinct facets that broad aliases
-    # can accidentally collapse.
     "testing_contribution", "index_chunking", "evidence_selection",
 })
+_CONDITIONAL_SURFACE_RE = re.compile(r"\b(?:if|when|unless|если|когда)\b", re.I)
 
 
-def _can_derive_original_from_intent(
-    question: str, aliases: tuple[object, ...],
-) -> bool:
-    """Allow a canonical alias to represent the original retrieval direction only.
-
-    This is intentionally weaker than answer completeness. It is available only
-    for one recognized context-only intent with no exact identifier, negation, or
-    explicit unknown/hypothetical premise. Multi-intent questions stay partial.
-    """
+def _can_derive_original_from_intent(question: str, aliases: tuple[object, ...]) -> bool:
+    """Audit a single reviewed retrieval intent without changing the public question."""
     intent_ids = {getattr(alias, "intent_id", None) for alias in aliases}
     if not aliases or len(intent_ids) != 1 or not intent_ids <= _ORIGINAL_RETRIEVAL_INTENTS:
         return False
@@ -180,28 +170,23 @@ def _can_derive_original_from_intent(
         or _HOST_NEGATION_RE.search(question)
         or _UNVERIFIED_PREMISE_RE.search(question)
         or _NOVEL_TOPIC_QUALIFIER_RE.search(question)
+        or _CONDITIONAL_SURFACE_RE.search(question)
     ):
         return False
     return all(bool(getattr(alias, "force_context_only", False)) for alias in aliases)
 
 
-
-
 def _host_lookup_can_derive_original(
     original_question: str, lookup_text: str,
 ) -> bool:
-    """Audit one explicit lookup as the same retrieval direction as the question.
-
-    Host text is not trusted by itself. Both sides must independently collapse to
-    the same single context-only domain intent and share a canonical retrieval
-    alias. This permits derived *retrieval* lineage while keeping arbitrary host
-    decompositions unable to certify the original question.
-    """
+    """Audit only reviewed single-intent rewrites that preserve conditions."""
     original_aliases = build_project_retrieval_aliases(original_question)
     lookup_aliases = build_project_retrieval_aliases(lookup_text)
     if not _can_derive_original_from_intent(original_question, original_aliases):
         return False
     if _HOST_REWRITE_QUALIFIER_RE.search(lookup_text):
+        return False
+    if _CONDITIONAL_SURFACE_RE.search(lookup_text):
         return False
     original_intents = {alias.intent_id for alias in original_aliases}
     lookup_intents = {alias.intent_id for alias in lookup_aliases}
@@ -212,12 +197,9 @@ def _host_lookup_can_derive_original(
     def canonical_texts(rows: tuple[object, ...]) -> set[str]:
         return {
             re.sub(r"^docatlas\s+", "", str(getattr(alias, "text", "")).casefold()).strip()
-            for alias in rows
-            if str(getattr(alias, "text", "")).strip()
+            for alias in rows if str(getattr(alias, "text", "")).strip()
         }
-
     return bool(canonical_texts(original_aliases) & canonical_texts(lookup_aliases))
-
 
 def _audited_host_lookup_rewrites(
     original_question: str, lookup_text: str,
@@ -251,26 +233,26 @@ def _audited_host_lookup_rewrites(
         return ()
     return tuple(dict.fromkeys(alias.text for alias in aliases if alias.force_context_only))
 
-
 def build_documentation_query_plan(
     question: str, *, lookup_queries: tuple[str, ...] = (), explicit_path: str | None = None,
     requirements: object | None = None,
 ) -> DocumentationQueryPlan:
     retrieval_aliases = build_project_retrieval_aliases(question)
     single_facet = len({alias.intent_id for alias in retrieval_aliases}) == 1
+    trusted_original_policy = _can_derive_original_from_intent(question, retrieval_aliases)
+    preferred_roles = tuple(dict.fromkeys(
+        role for alias in retrieval_aliases for role in alias.preferred_catalog_roles
+    )) if trusted_original_policy else ()
+    forbidden_roles = tuple(dict.fromkeys(
+        role for alias in retrieval_aliases for role in alias.forbidden_catalog_roles
+    )) if trusted_original_policy else ()
+    forbidden_evidence_terms = tuple(dict.fromkeys(
+        term for alias in retrieval_aliases for term in alias.forbidden_evidence_terms
+    )) if trusted_original_policy else ()
     parent_exact_terms = tuple(dict.fromkeys((
         *(term.normalized_value for term in documentation_exact_terms(question)),
         *(value.casefold() for value in documentation_technical_anchors(question)),
     )))
-    preferred_roles = tuple(dict.fromkeys(
-        role for alias in retrieval_aliases for role in alias.preferred_catalog_roles
-    ))
-    forbidden_roles = tuple(dict.fromkeys(
-        role for alias in retrieval_aliases if single_facet for role in alias.forbidden_catalog_roles
-    ))
-    forbidden_evidence_terms = tuple(dict.fromkeys(
-        term for alias in retrieval_aliases if single_facet for term in alias.forbidden_evidence_terms
-    ))
     force_context_only = (
         project_retrieval_disposition(question) == "broad_context"
         and any(alias.force_context_only for alias in retrieval_aliases)
@@ -316,9 +298,6 @@ def build_documentation_query_plan(
         queries.append(DocumentationLookup(
             f"query-anchor-{index}", anchor, "exact_anchor", False,
             relation="exact_anchor", public_parent_query_id="query-original",
-            preferred_catalog_roles=() if explicit_path else preferred_roles,
-            forbidden_catalog_roles=() if explicit_path else forbidden_roles,
-            forbidden_evidence_terms=() if explicit_path else forbidden_evidence_terms,
         ))
         seen.add(anchor.casefold())
     # Preserve lexical recall for prose compounds without promoting them into
@@ -425,7 +404,20 @@ def build_documentation_query_plan(
         for value in getattr(requirements, "concept_queries", ())
         if str(value).strip()
     )
+    # Keep a subject-bearing raw clause together instead of spending all four
+    # slots on the first individual hints. This adds no guessed action/fact.
+    clause_groups = []
+    for clause in split_question_clauses(question):
+        text = clause.strip()
+        if not text or len(text) > 500 or text.casefold() in seen:
+            continue
+        present_hints = [hint for hint in requirement_hints
+            if supplemental_query_is_useful(hint)
+            and re.search(r"(?<![\w.])" + re.escape(hint) + r"(?![\w.])", text, re.I)]
+        if len(present_hints) >= 2:
+            clause_groups.append(text)
     optional_queries = [
+        *((text, "retrieval_hint") for text in clause_groups),
         *((text, "concept_alias") for applies, text in concept_queries if applies),
         *((text, "concept_alias") for text in requirement_concepts),
         *((text, "retrieval_hint") for text in requirement_hints),
@@ -462,7 +454,8 @@ def build_documentation_query_plan(
     origin_counts = {"concept_alias": 0, "retrieval_hint": 0}
     for text, origin in optional_queries:
         if (
-            (text.casefold() in seen and origin != "retrieval_hint")
+            text.casefold() in seen
+            or not supplemental_query_is_useful(text)
             or optional_count >= 4
         ):
             continue

@@ -16,14 +16,29 @@ from docmancer.docs.domain.evidence_qualification import (
     derived_parent_trace,
     qualify_evidence,
 )
+from docmancer.docs.domain.project_doc_ranking import condition_lead_priority
 from docmancer.docs.domain.query_terms import (
     documentation_exact_terms,
     documentation_query_terms,
     documentation_technical_anchors,
+    supplemental_query_is_useful,
 )
 
 
 _INTERNAL_DIAGNOSTIC_LIMIT = 32
+
+
+def _candidate_admission_priority(query: str, chunk: Any) -> tuple[bool, int]:
+    """Keep qualified condition-bearing evidence inside the bounded pool.
+
+    This is only an admission ordering preference. It cannot qualify a chunk,
+    alter source policy, or increase the candidate/query budget.
+    """
+    qualified = bool((chunk.metadata or {}).get("retrieval_query_ids"))
+    return (
+        not qualified,
+        -condition_lead_priority(query, str(getattr(chunk, "text", "") or "")),
+    )
 
 
 def _diagnostic_candidate_id(chunk: Any) -> dict[str, str]:
@@ -255,26 +270,19 @@ class _ProjectDocsServicePart03:
             for requirement in mandatory_requirements
             if (probe := requirement_probe_query(requirement))
         ))[:8]
-        retrieval_hints = tuple(dict.fromkeys(
-            str(value).strip()
-            for value in getattr(requirements, "retrieval_hints", ())
-            if str(value).strip()
-        ))[:4]
-        contract_concepts = tuple(dict.fromkeys(
-            str(value).strip()
-            for value in getattr(requirements, "concept_queries", ())
-            if str(value).strip()
-        ))[:4]
+        # The query plan owns the optional lookup budget. Do not append the
+        # raw requirements again: that resurrects rejected/duplicate hints and
+        # turns a grouped replacement into additional internal requests.
         planned_lookup_queries = tuple(
             item.text for item in documentation_query_plan.queries
             if item.origin in {"exact_anchor", "exact_path", "host_lookup", "canonical_intent", "concept_alias", "retrieval_hint", "lexical_topic"}
         )
-        supplemental_queries = tuple(dict.fromkeys((
-            *planned_lookup_queries,
-            *probe_queries,
-            *contract_concepts,
-            *retrieval_hints,
-        )))[:12]
+        supplemental_queries = tuple(dict.fromkeys(
+            text for text in (
+                *planned_lookup_queries,
+                *probe_queries,
+            ) if supplemental_query_is_useful(text)
+        ))[:12]
         next_supplemental_id = 1
         for supplemental_query in supplemental_queries:
             if supplemental_query in lookup_query_ids:
@@ -431,11 +439,7 @@ class _ProjectDocsServicePart03:
                 expected_project_identity=filters["project_identity"],
                 lifecycle_intent=answer_lifecycle_intent,
             )
-        candidates.sort(
-            key=lambda chunk: not bool(
-                (chunk.metadata or {}).get("retrieval_query_ids")
-            )
-        )
+        candidates.sort(key=lambda chunk: _candidate_admission_priority(query, chunk))
         if internal_diagnostics is not None:
             internal_diagnostics.update(
                 _retrieval_stage_diagnostics(documentation_query_plan, candidates)
