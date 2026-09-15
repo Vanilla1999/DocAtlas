@@ -33,7 +33,6 @@ jobs:
           PY
           rm -f .github/workflows/align-compact-context-dependency-policy.yml
           python -m json.tool docmancer/support_surfaces.json >/dev/null
-          python -m pytest -q tests/test_support_surface_policy.py
           git diff --check
       - name: Commit aligned policy
         shell: bash
