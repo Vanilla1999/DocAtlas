@@ -4,6 +4,7 @@ from __future__ import annotations
 from typing import Any
 
 from .context_selection import qualified_query_ids
+from .context_quality import context_quality
 from .model_visible_projection import _refresh_estimate
 
 
@@ -11,9 +12,10 @@ def _payload(
     sources: list[dict[str, Any]], *, decision: Any = None,
     query_plan: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
+    query_plan = query_plan or {}
     plan_queries = {
         str(item.get("query_id") or ""): item
-        for item in (query_plan or {}).get("queries") or ()
+        for item in query_plan.get("queries") or ()
         if isinstance(item, dict)
     }
     context_only = bool(query_plan.get("broad_context_only"))
@@ -30,6 +32,10 @@ def _payload(
             query_id in qualified_query_ids((source,)) for source in sources
         )
         requirement_id = str(item.get("requirement_id") or "")
+        if not requirement_id and not retrieved and item.get("origin") == "canonical_intent":
+            # An unused generated retrieval hint is not a missing user obligation.
+            # Keep it in private query diagnostics, not twice in the bounded DTO.
+            continue
         assigned_evidence_ids = [
             str(source.get("evidence_id") or "")
             for source in sources
@@ -109,6 +115,12 @@ def _payload(
         "missing_facets": missing_facets,
         "facets": facets,
         "sources": public_sources,
+        "context_quality": context_quality(
+            sources=public_sources,
+            component_coverage=query_plan.get("_component_coverage"),
+            omissions=query_plan.get("_projection_omissions") or (),
+        ),
+        "read_next": [],
         "edit_ready": False,
         "investigation_allowed": True,
         "estimated_tokens": 0,

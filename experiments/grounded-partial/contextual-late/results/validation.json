@@ -1,0 +1,17 @@
+{
+  "rows": 320,
+  "unchanged_hybrid_plain_cases": 80,
+  "audit_errors": 0,
+  "max_replay_tokens": 795,
+  "max_packet_tokens": 800,
+  "native_sufficient_cases_lost": [
+    "starlette-06"
+  ],
+  "combined_passes_screening": false,
+  "holdout_opened": false,
+  "answer_model_run": false,
+  "inference_reused": true,
+  "input_archive_sha256": "c279fe2bcbc8ce0566ee09c299f7fd463d235d2b0ec134916db0e76359ff86da",
+  "native_archive_sha256": "12a8aae97c3507c0f00566729c242cbdc5a3b99b5e7ef73066f6cbc4454d1077",
+  "raw_results_sha256": "fce60a5d8441654f7b5e5023f60495ff9b2460420739de57197c7757f3998ecc"
+}

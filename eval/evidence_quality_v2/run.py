@@ -235,7 +235,7 @@ def run(output: Path, projects: list[str] | None = None, *, fixture_output: Path
     output.mkdir(parents=True,exist_ok=True)
     save_json(output/'environment.json',{'python':sys.version,'platform':platform.platform(),
         'executable':sys.executable,'code_head':subprocess.check_output(['git','rev-parse','HEAD'],cwd=REPO,text=True).strip(),
-        'protocol_sha256':digest((HERE/'protocol.json').read_bytes()),'packages':{n:importlib.metadata.version(n) for n in ['pydantic','mcp','tiktoken']},
+        'protocol_sha256':digest((HERE/'protocol.json').read_bytes()),'packages':{n:next((d.version for d in importlib.metadata.distributions() if d.metadata['Name'].lower()==n),None) for n in ['pydantic','mcp','regex']},'tokenizer_implementation':'docatlas-offline:o200k_base',
         'mode':'lexical, no embeddings, no live provider','transport':'handler; installed stdio is a separate run'})
     rows=[]
     for project in sorted({c['project_group'] for c in cases}):

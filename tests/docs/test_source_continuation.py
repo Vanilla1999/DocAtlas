@@ -221,3 +221,58 @@ def test_public_handler_binds_reader_to_real_active_sqlite_snapshot(tmp_path):
     read = json.loads(read_docs_resource(source['source_uri'], service)['text'])
     assert read['status'] == 'source_changed'
     assert 'snippet' not in read
+
+
+def _range_raw():
+    lines = [f'line {i}' for i in range(1, 201)]
+    lines[157] = 'rule begins here'
+    lines[158] = 'rule continues here'
+    lines[159] = 'rule ends here'
+    return ('\n'.join(lines) + '\n').encode()
+
+
+def _range_reference(raw):
+    return SourceReference('/repo', 'project:test', 'docs/range.md',
+                           'sha256:' + hashlib.sha256(raw).hexdigest(), 'catalog:range',
+                           'source_of_truth', 'project', None, 168)
+
+
+def test_targeted_range_can_precede_selected_quote():
+    raw = _range_raw()
+    reader = SourceContinuationReader(Gateway(raw))
+    uri = reader.issue_range(_range_reference(raw), line_start=156, line_end=172)
+    result = reader.read(uri)
+    assert result['line_start'] == 156
+    assert result['line_end'] == 172
+    assert 'rule begins here\nrule continues here\nrule ends here' in result['snippet']
+    assert result['status'] == 'complete'
+
+
+def test_range_read_stops_at_target_end():
+    raw = _range_raw()
+    reader = SourceContinuationReader(Gateway(raw))
+    result = reader.read(reader.issue_range(_range_reference(raw), line_start=156, line_end=172))
+    assert result['line_end'] == 172
+    assert 'line 173' not in result['snippet']
+    assert result['continuation'] is None
+
+
+def test_legacy_continuation_still_reads_forward():
+    raw = _range_raw()
+    reader = SourceContinuationReader(Gateway(raw))
+    result = reader.read(reader.issue(_range_reference(raw)))
+    assert result['line_start'] == 169
+
+
+def test_range_registration_rejects_invalid_or_conflicting_bounds_before_io():
+    raw = _range_raw()
+    gateway = Gateway(raw)
+    reader = SourceContinuationReader(gateway)
+    ref = _range_reference(raw)
+    assert reader.issue_range(ref, line_start=True, line_end=172) is None
+    assert reader.issue_range(ref, line_start=173, line_end=172) is None
+    uri = reader.uri_prefix + 'a' * 24
+    assert reader.issue_range(ref, line_start=156, line_end=172, uri=uri) == uri
+    assert reader.issue_range(ref, line_start=156, line_end=172, uri=uri) == uri
+    assert reader.issue_range(ref, line_start=155, line_end=172, uri=uri) is None
+    assert gateway.reads == 0

@@ -197,3 +197,175 @@ def test_distinct_continuation_chains_cannot_overlap(context):
     assert controller.read(first_uri, missing_fact_id='remaining')['status'] == 'complete'
     assert controller.read(second_uri, missing_fact_id='remaining')['reason_code'] == 'repeated_source_span'
     assert len(controller.results) == 1
+
+
+def _registered_range_context(context):
+    value = deepcopy(context)
+    source = value['sources'][0]
+    source.update(line_start=162, line_end=168)
+    uri = 'docatlas://source/' + 'b' * 24
+    value['read_next'] = [{
+        'source_uri': uri,
+        'path': source['path_or_url'],
+        'project_identity': source['project_identity'],
+        'snapshot_sha256': 'sha256:' + 'f' * 64,
+        'line_start': 156,
+        'line_end': 172,
+        'reason': 'inspect_source_context',
+    }]
+    _refresh_estimate(value)
+    return value, uri
+
+
+def _registered_range_result(context, *, start=156, end=172, continuation=None):
+    source = context['sources'][0]
+    return dict(
+        status='truncated' if continuation else 'complete',
+        path=source['path_or_url'], project_identity=source['project_identity'],
+        content_sha256='sha256:' + 'f' * 64,
+        line_start=start, line_end=end,
+        snippet='\n'.join(f'Range line {line}.' for line in range(start, end + 1)),
+        continuation=continuation,
+    )
+
+
+def test_registered_backward_target_accepted_sync_and_async(context):
+    import asyncio
+    ranged, uri = _registered_range_context(context)
+    result = _registered_range_result(ranged)
+    sync_calls = []
+    sync_controller = SourceReadController(
+        ranged, requested_facts={'rule': 'What rule appears above the quote?'},
+        read_resource=lambda value: sync_calls.append(value) or result,
+    )
+    accepted = sync_controller.read(uri, missing_fact_id='rule')
+    assert accepted['line_start'] == 156
+    assert accepted['line_end'] == 172
+    assert sync_calls == [uri]
+
+    async_calls = []
+    async def aread(value):
+        async_calls.append(value)
+        return result
+    async_controller = SourceReadController(
+        ranged, requested_facts={'rule': 'What rule appears above the quote?'},
+        read_resource=aread,
+    )
+    accepted = asyncio.run(async_controller.aread(uri, missing_fact_id='rule'))
+    assert accepted['status'] == 'complete'
+    assert async_calls == [uri]
+
+
+def test_arbitrary_backward_uri_is_rejected_before_callback(context):
+    ranged, _ = _registered_range_context(context)
+    calls = []
+    controller = SourceReadController(
+        ranged, requested_facts={'rule': 'What rule appears above the quote?'},
+        read_resource=lambda value: calls.append(value),
+    )
+    result = controller.read('docatlas://source/' + 'c' * 24, missing_fact_id='rule')
+    assert result['reason_code'] == 'unknown_or_repeated_source'
+    assert calls == []
+
+
+def test_fully_seen_registered_range_is_not_progress(context):
+    ranged, uri = _registered_range_context(context)
+    source = ranged['sources'][0]
+    ranged['read_next'][0].update(line_start=162, line_end=168)
+    _refresh_estimate(ranged)
+    result = _registered_range_result(ranged, start=162, end=168)
+    controller = SourceReadController(
+        ranged, requested_facts={'rule': 'What rule appears above the quote?'},
+        read_resource=lambda value: result,
+    )
+    stopped = controller.read(uri, missing_fact_id='rule')
+    assert stopped['reason_code'] == 'repeated_source_span'
+    assert controller.results == []
+    assert source['line_start'] == 162 and source['line_end'] == 168
+
+
+def test_quality_or_registered_link_alone_never_triggers_read(context):
+    ranged, _ = _registered_range_context(context)
+    ranged['context_quality'] = {'status': 'partial', 'reasons': ['requested_part_missing']}
+    calls = []
+    SourceReadController(
+        ranged, requested_facts={'rule': 'What rule appears above the quote?'},
+        read_resource=lambda value: calls.append(value),
+    )
+    assert calls == []
+
+
+def test_completed_fact_and_third_attempt_stop_before_io_for_registered_ranges(context):
+    ranged, uri = _registered_range_context(context)
+    calls = []
+    completed = SourceReadController(
+        ranged, requested_facts={'rule': 'What rule appears above the quote?'},
+        read_resource=lambda value: calls.append(value),
+    )
+    completed.mark_supported('rule')
+    assert completed.read(uri, missing_fact_id='rule')['reason_code'] == 'no_concrete_missing_fact'
+    assert calls == []
+
+    # One registered range can legitimately page twice. A continuation returned
+    # by the second page is known, but the global two-read budget blocks its I/O.
+    ranged['read_next'][0]['line_end'] = 199
+    _refresh_estimate(ranged)
+    continuation_1 = 'docatlas://source/' + 'd' * 24
+    continuation_2 = 'docatlas://source/' + 'e' * 24
+
+    def read(value):
+        calls.append(value)
+        if value == uri:
+            return _registered_range_result(
+                ranged, start=156, end=170, continuation=continuation_1,
+            )
+        if value == continuation_1:
+            return _registered_range_result(
+                ranged, start=171, end=185, continuation=continuation_2,
+            )
+        pytest.fail('third range read reached I/O')
+
+    controller = SourceReadController(
+        ranged, requested_facts={'other': 'What follows?'}, read_resource=read,
+    )
+    first = controller.read(uri, missing_fact_id='other')
+    assert first['continuation'] == continuation_1
+    second = controller.read(continuation_1, missing_fact_id='other')
+    assert second['continuation'] == continuation_2
+    assert controller.read(continuation_2, missing_fact_id='other')['reason_code'] == 'read_budget_exhausted'
+    assert calls == [uri, continuation_1]
+
+
+def test_unavailable_context_can_offer_only_an_authorized_recovery_target(context):
+    ranged, uri = _registered_range_context(context)
+    target = deepcopy(ranged['read_next'][0])
+    unavailable = {
+        'status': 'insufficient_evidence', 'kind': 'docs_context',
+        'sources': [], 'context_quality': {'status': 'unavailable', 'reasons': ['source_unavailable']},
+        'read_next': [target], 'answer_supported': False, 'answer_available': False,
+        'answer_policy': 'cite_only', 'edit_ready': False, 'estimated_tokens': 0,
+    }
+    _refresh_estimate(unavailable)
+    calls = []
+    controller = SourceReadController(
+        unavailable, requested_facts={'rule': 'What rule is missing?'},
+        read_resource=lambda value: calls.append(value) or {
+            'status': 'complete', 'path': target['path'],
+            'project_identity': target['project_identity'],
+            'content_sha256': target['snapshot_sha256'],
+            'line_start': target['line_start'], 'line_end': target['line_end'],
+            'snippet': 'Recovered bounded source range.', 'continuation': None,
+        },
+    )
+    assert controller.read(uri, missing_fact_id='rule')['status'] == 'complete'
+    assert calls == [uri]
+
+    calls.clear()
+    unavailable['read_next'] = []
+    _refresh_estimate(unavailable)
+    controller = SourceReadController(
+        unavailable, requested_facts={'rule': 'What rule is missing?'},
+        read_resource=lambda value: calls.append(value),
+    )
+    assert controller.read(uri, missing_fact_id='rule')['reason_code'] == 'unknown_or_repeated_source'
+    assert calls == []

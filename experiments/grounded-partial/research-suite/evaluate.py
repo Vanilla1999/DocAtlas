@@ -32,8 +32,30 @@ def rrf(first,second):
   for i,k in enumerate(order):scores[k]+=1/(60+i+1)
  return sorted(scores,key=lambda k:-scores[k])
 
+def hybrid_factorial(question, pool, vector_orders, contexts):
+ """Change only sparse contextualization and dense chunk encoding; cite originals."""
+ bykey = {c['key']: c for c in pool}
+ if len(bykey) != len(pool) or not pool:
+  raise ValueError('Expected a nonempty unique source pool')
+ for name in ('plain', 'late'):
+  order = vector_orders[name]
+  if len(order) != len(pool) or set(order) != set(bykey):
+   raise ValueError('Both dense orders must cover the same complete source pool')
+ if not set(bykey) <= set(contexts):
+  raise ValueError('Missing context description')
+ lanes = {}
+ for contextual in (False, True):
+  texts = [(contexts[c['key']] + '\n' if contextual else '') + c['text'] for c in pool]
+  sparse = [pool[j]['key'] for j in bm25(question, texts)]
+  for dense in ('plain', 'late'):
+   name = 'hybrid_' + ('context_bm25_' if contextual else '') + dense
+   lanes[name] = [bykey[k] for k in rrf(sparse, vector_orders[dense])]
+ return lanes
+
 def main():
- p=argparse.ArgumentParser();p.add_argument('--input',type=Path,required=True);p.add_argument('--output',type=Path,required=True);p.add_argument('--xprovence',type=Path);p.add_argument('--embeddings',type=Path);p.add_argument('--context-embeddings',type=Path);p.add_argument('--contexts',type=Path);a=p.parse_args();a.output.mkdir(exist_ok=False)
+ p=argparse.ArgumentParser();p.add_argument('--input',type=Path,required=True);p.add_argument('--output',type=Path,required=True);p.add_argument('--xprovence',type=Path);p.add_argument('--embeddings',type=Path);p.add_argument('--context-embeddings',type=Path);p.add_argument('--contexts',type=Path);p.add_argument('--hybrid-factorial-only',action='store_true');a=p.parse_args()
+ if a.hybrid_factorial_only and (not a.embeddings or not a.contexts or a.xprovence or a.context_embeddings):p.error('factorial requires plain/late embeddings and contexts only')
+ a.output.mkdir(exist_ok=False)
  _,cases,manifest=load_protocol();chunks=json.loads((a.input/'chunks.json').read_text());chunkmap={c['key']:c for c in chunks};questions=json.loads((a.input/'questions.json').read_text());docs=json.loads((a.input/'documents.json').read_text());docmap={d['key']:d for d in docs}
  for c in chunks:
   text=docmap[c['document']]['text'];c['line_start']=text[:c['char_start']].count('\n')+1;c['line_end']=text[:c['char_end']-1].count('\n')+1
@@ -82,7 +104,13 @@ def main():
  if a.context_embeddings:
   for r in json.loads(a.context_embeddings.read_text()):
    for name,values in r['lanes'].items():lanes[r['key']][name]=[chunkmap[v['key']] for v in values]
- if a.embeddings:
+ if a.hybrid_factorial_only:
+  contexts={r['key']:r['context'] for r in json.loads(a.contexts.read_text())}
+  for q in questions:
+   pool=[c for c in chunks if c['library']==q['library']]
+   orders={name:[c['key'] for c in lanes[q['key']][name]] for name in ('plain','late')}
+   lanes[q['key']]=hybrid_factorial(q['question'],pool,orders,contexts)
+ elif a.embeddings:
   contexts={r['key']:r['context'] for r in json.loads(a.contexts.read_text())} if a.contexts else None
   for q in questions:
    pool=[c for c in chunks if c['library']==q['library']];bykey={c['key']:c for c in pool};plain=bm25(q['question'],[c['text'] for c in pool]);lanes[q['key']]['bm25']=[pool[j] for j in plain]

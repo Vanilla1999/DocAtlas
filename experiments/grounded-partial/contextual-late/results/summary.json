@@ -1,0 +1,167 @@
+{
+  "hybrid_plain": {
+    "top5": 45,
+    "top20": 47,
+    "sufficient": 34,
+    "assessment_counts": {
+      "needs_review": 11,
+      "sufficient": 34,
+      "insufficient": 3
+    },
+    "found_top20_not_confirmed_final": [
+      "fastapi-01",
+      "fastapi-02",
+      "fastapi-06",
+      "starlette-01",
+      "typer-05",
+      "pydantic-03",
+      "pydantic-05",
+      "httpx-03",
+      "httpx-06",
+      "mkdocs-05",
+      "mkdocs-06",
+      "uv-05",
+      "uv-06"
+    ],
+    "controls": {
+      "ambiguous": {
+        "insufficient": 4,
+        "needs_review": 4
+      },
+      "over_budget": {
+        "insufficient": 8
+      },
+      "partial": {
+        "needs_review": 7,
+        "insufficient": 1
+      },
+      "unanswerable": {
+        "insufficient": 8
+      }
+    }
+  },
+  "hybrid_context_bm25_plain": {
+    "top5": 45,
+    "top20": 47,
+    "sufficient": 34,
+    "assessment_counts": {
+      "needs_review": 11,
+      "sufficient": 34,
+      "insufficient": 3
+    },
+    "found_top20_not_confirmed_final": [
+      "fastapi-01",
+      "fastapi-02",
+      "fastapi-06",
+      "starlette-01",
+      "typer-05",
+      "pydantic-03",
+      "pydantic-05",
+      "httpx-03",
+      "httpx-06",
+      "mkdocs-05",
+      "mkdocs-06",
+      "uv-05",
+      "uv-06"
+    ],
+    "controls": {
+      "ambiguous": {
+        "insufficient": 4,
+        "needs_review": 4
+      },
+      "over_budget": {
+        "insufficient": 8
+      },
+      "partial": {
+        "needs_review": 7,
+        "insufficient": 1
+      },
+      "unanswerable": {
+        "insufficient": 8
+      }
+    }
+  },
+  "hybrid_late": {
+    "top5": 45,
+    "top20": 47,
+    "sufficient": 34,
+    "assessment_counts": {
+      "needs_review": 11,
+      "sufficient": 34,
+      "insufficient": 3
+    },
+    "found_top20_not_confirmed_final": [
+      "fastapi-01",
+      "fastapi-02",
+      "fastapi-06",
+      "starlette-01",
+      "typer-05",
+      "pydantic-03",
+      "pydantic-05",
+      "httpx-03",
+      "httpx-06",
+      "mkdocs-05",
+      "mkdocs-06",
+      "uv-05",
+      "uv-06"
+    ],
+    "controls": {
+      "ambiguous": {
+        "insufficient": 4,
+        "needs_review": 4
+      },
+      "over_budget": {
+        "insufficient": 8
+      },
+      "partial": {
+        "needs_review": 7,
+        "insufficient": 1
+      },
+      "unanswerable": {
+        "insufficient": 8
+      }
+    }
+  },
+  "hybrid_context_bm25_late": {
+    "top5": 45,
+    "top20": 47,
+    "sufficient": 33,
+    "assessment_counts": {
+      "needs_review": 12,
+      "sufficient": 33,
+      "insufficient": 3
+    },
+    "found_top20_not_confirmed_final": [
+      "fastapi-01",
+      "fastapi-02",
+      "fastapi-06",
+      "starlette-01",
+      "starlette-06",
+      "typer-05",
+      "pydantic-03",
+      "pydantic-05",
+      "httpx-03",
+      "httpx-06",
+      "mkdocs-05",
+      "mkdocs-06",
+      "uv-05",
+      "uv-06"
+    ],
+    "controls": {
+      "ambiguous": {
+        "insufficient": 4,
+        "needs_review": 4
+      },
+      "over_budget": {
+        "insufficient": 8
+      },
+      "partial": {
+        "needs_review": 7,
+        "insufficient": 1
+      },
+      "unanswerable": {
+        "insufficient": 8
+      }
+    }
+  }
+}

@@ -94,6 +94,41 @@ PUBLIC_GET_DOCS_CONTEXT_OUTPUT_SCHEMA: dict[str, Any] = {
         "status": {"enum": ["ok", "truncated", "insufficient_evidence", "failed"]},
         "kind": {"enum": ["docs_answer", "docs_context", "patch_context"]},
         "estimated_tokens": {"type": "integer"},
+        "context_quality": {
+            "type": "object",
+            "required": ["status", "reasons"],
+            "properties": {
+                "status": {"enum": ["checked", "partial", "unverified", "unavailable"]},
+                "reasons": {
+                    "type": "array", "maxItems": 2, "uniqueItems": True,
+                    "items": {"enum": [
+                        "coverage_unverified", "requested_part_missing", "budget_limited",
+                        "source_unavailable", "source_changed", "structure_unverified",
+                    ]},
+                },
+            },
+            "additionalProperties": False,
+        },
+        "read_next": {
+            "type": "array", "maxItems": 1,
+            "items": {
+                "type": "object",
+                "required": [
+                    "source_uri", "path", "project_identity", "snapshot_sha256",
+                    "line_start", "line_end", "reason",
+                ],
+                "properties": {
+                    "source_uri": {"type": "string", "pattern": "^docatlas://source/[0-9a-f]{24}$"},
+                    "path": {"type": "string", "minLength": 1},
+                    "project_identity": {"type": "string", "minLength": 1},
+                    "snapshot_sha256": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+                    "line_start": {"type": "integer", "minimum": 1},
+                    "line_end": {"type": "integer", "minimum": 1},
+                    "reason": {"type": "string", "pattern": "^[a-z0-9_]{1,64}$"},
+                },
+                "additionalProperties": False,
+            },
+        },
         "reason_code": {"type": "string"},
         "operational_reason_code": {"type": "string"},
         "documentation_supported": {"type": "boolean"},

@@ -1,0 +1,10 @@
+{
+  "schema_version": 1,
+  "module_labels": {
+    "tests/docs/test_compact_context_selection.py": "behavioral"
+  },
+  "node_overrides": {},
+  "module_node_hashes": {
+    "tests/docs/test_compact_context_selection.py": "47bbc5fede3016a6f84bddf35525f2bdca0defaded72a981746a6f43eb326ed5"
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "schema_version": 1,
+  "module_labels": {
+    "tests/docs/test_docs_context_read_next.py": "behavioral"
+  },
+  "node_overrides": {},
+  "module_node_hashes": {
+    "tests/docs/test_docs_context_read_next.py": "af044f6119be8b85de474f225bd0c3218505f7919086b592b1021256d989b1a2"
+  }
+}

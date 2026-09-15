@@ -10,6 +10,7 @@ _RECOVERY_SUMMARY_KEYS = (
     "documentation_supported", "investigation_allowed", "hard_stop",
     "recovery_origin", "recovery_reason_code", "recovery_disposition",
     "edit_ready", "source_search_status", "requires_confirmation",
+    "context_quality", "read_next",
 )
 
 
@@ -99,7 +100,7 @@ def apply_terminal_insufficient_projection(
     payload.clear()
     payload.update({
         "status": "insufficient_evidence",
-        "kind": "docs_answer" if kind == "docs_answer" else "patch_context",
+        "kind": kind if kind in {"docs_answer", "docs_context", "patch_context"} else "patch_context",
         "missing": [missing],
         "answer_supported": False,
         "answer_available": False,
