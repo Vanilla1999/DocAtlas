@@ -16,7 +16,10 @@ CoverageKind = Literal["direct", "derived"]
 _COMPARISON_RELATION_MARKERS = frozenset({"different", "separate"})
 _VISIBLE_COMPARISON_RELATION_RE = re.compile(
     r"(?:"
-    r"\b(?:different|differs?|differed|differing|separate|separately|distinct|distinctly|whereas)\b|"
+    r"\b(?:differs?|differed|differing|whereas)\b|"
+    r"\b(?:different|distinct|separate)\s+from\b|"
+    r"\b(?:are|is|was|were|remain(?:s|ed)?|become(?:s)?|became)\s+"
+    r"(?:different|distinct|separate)\b|"
     r"\brather\s+than\b|\binstead\s+of\b|\bnot\s+the\s+same\b|"
     r"\bno\s+distinction\b|"
     r"\b(?:not|never)\b[^.!?\n]{0,80}\b(?:proof|enough|sufficient|same|equivalent)\b|"

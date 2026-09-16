@@ -252,6 +252,25 @@ def test_comparison_relation_qualification_prefers_supporting_relation_over_keyw
     assert distractor.reason == "missing_visible_comparison_relation"
 
 
+def test_comparison_relation_rejects_unrelated_different_adjective() -> None:
+    probe = {
+        "query_text": (
+            "matching search result evidence sufficient answer condition different separate"
+        )
+    }
+    distractor = qualify_evidence(
+        probe,
+        query_id="query-relation-1",
+        visible_text=(
+            "The guide contains different examples of matching search result evidence "
+            "and sufficient answer condition terminology."
+        ),
+    )
+
+    assert distractor.qualified is False
+    assert distractor.reason == "missing_visible_comparison_relation"
+
+
 def test_comparison_relation_qualification_accepts_russian_relation_not_keyword_salad() -> None:
     probe = {
         "query_text": "локальный поиск удаленный каталог different separate",
