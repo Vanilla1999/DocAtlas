@@ -160,7 +160,7 @@ def _facet_aware_candidates(
         continuation_score = int(any(
             isinstance(trace, dict)
             and trace.get("qualified") is True
-            and trace.get("qualification_route") == "same_atom_continuation"
+            and trace.get("qualification_route") in {"same_atom_continuation", "same_list_item_continuation"}
             for trace in (source.get("retrieval_query_matches") or {}).values()
         ))
         # Optional canonical aliases are search hypotheses, not votes. When two

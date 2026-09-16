@@ -786,7 +786,7 @@ def _requalify_visible_source(
         if (
             query_id != "query-original"
             and trace.get("qualified") is True
-            and trace.get("qualification_route") == "same_atom_continuation"
+            and trace.get("qualification_route") in {"same_atom_continuation", "same_list_item_continuation"}
             and trace.get("coverage_kind") == "derived"
         ):
             continuation_trace = dict(trace)
