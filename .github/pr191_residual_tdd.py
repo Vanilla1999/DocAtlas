@@ -53,19 +53,26 @@ def test_plain_offline_question_keeps_generic_probe_and_no_test_bias():
     assert not _rows("How does DocAtlas work in offline mode?", "offline_dependency_acquisition")
 
 
-def test_ru_project_vs_external_dependency_docs_gets_neutral_boundary_probe():
+def test_ru_project_vs_external_dependency_docs_gets_diverse_neutral_boundary_probes():
     q = "Чем поиск по собственной документации этого репозитория отличается от поиска по документации внешнего пакета?"
     rows = _rows(q, "documentation_scope_boundary")
-    assert len(rows) == 1
-    assert rows[0].text == "project-owned documentation external dependency documentation different separate retrieval scope provenance"
-    assert all(forbidden not in rows[0].text for forbidden in ("manifest", "lockfile", "sync_project_docs", "prefetch"))
+    assert [r.text for r in rows] == [
+        "project-owned documentation external dependency documentation different separate",
+        "project documentation external dependency documentation retrieval scope provenance",
+    ]
+    assert all(
+        forbidden not in " ".join(r.text for r in rows)
+        for forbidden in ("manifest", "lockfile", "sync_project_docs", "prefetch")
+    )
 
 
-def test_en_project_vs_external_dependency_docs_uses_same_boundary_probe():
+def test_en_project_vs_external_dependency_docs_uses_same_boundary_probes():
     q = "How is searching this repository's own documentation different from searching an external package's documentation?"
     rows = _rows(q, "documentation_scope_boundary")
-    assert len(rows) == 1
-    assert rows[0].text == "project-owned documentation external dependency documentation different separate retrieval scope provenance"
+    assert [r.text for r in rows] == [
+        "project-owned documentation external dependency documentation different separate",
+        "project documentation external dependency documentation retrieval scope provenance",
+    ]
 ''',encoding='utf-8')
     Path(MANIFEST).write_text(json.dumps({
         'schema_version':1,'module_labels':{TEST:'behavioral'},'node_overrides':{},
@@ -92,7 +99,7 @@ def apply_fix():
         '''                "ошиб", "диагност", "troubleshoot", "fail", "error", "stale",\n                "insufficient_evidence",''',
     )
     marker='''    if mentions_product and _has(tokens, "replace") and _has(tokens, "system"):\n        emit(\n            "product_boundaries",\n            True,\n            f"{product_prefix}product boundaries",\n            f"{product_prefix}does not replace",\n        )\n'''
-    insertion=marker+'''    documentation_scope_boundary = (\n        mentions_docs\n        and _has(tokens, "репозитор", "repository", "project")\n        and _has(tokens, "пакет", "package", "dependency", "library", "зависим")\n        and _has(tokens, "отлич", "differ", "different", "compare", "разниц")\n    )\n    if documentation_scope_boundary:\n        emit(\n            "documentation_scope_boundary",\n            True,\n            "project-owned documentation external dependency documentation different separate retrieval scope provenance",\n        )\n'''
+    insertion=marker+'''    documentation_scope_boundary = (\n        mentions_docs\n        and _has(tokens, "репозитор", "repository", "project")\n        and _has(tokens, "пакет", "package", "dependency", "library", "зависим")\n        and _has(tokens, "отлич", "differ", "different", "compare", "разниц")\n    )\n    if documentation_scope_boundary:\n        emit(\n            "documentation_scope_boundary",\n            True,\n            "project-owned documentation external dependency documentation different separate",\n            "project documentation external dependency documentation retrieval scope provenance",\n        )\n'''
     replace_once(path,marker,insertion)
 
 
