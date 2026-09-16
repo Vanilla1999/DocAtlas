@@ -63,7 +63,7 @@ jobs:
             tests/docs/test_relation_preserving_projection.py \
             tests/docs/test_comparison_relation_query_planning.py \
             tests/docs/test_documentation_query_plan.py \
-            tests/docs/test_query_planning_budget.py \
+            tests/docs/test_query_planning_budget_regressions.py \
             tests/docs/test_host_scope_contract.py \
             tests/docs/test_host_scope_planning_contract.py \
             tests/docs/test_mcp_docs_tools_registration.py \
