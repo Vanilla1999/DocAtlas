@@ -156,7 +156,7 @@ _SEMANTIC_SUBJECT_RE = re.compile(
     re.I,
 )
 _IMPLEMENT_RE = re.compile(
-    r"\b(?:implement|implementation|wire|add\s+support|реализова(?:ть|н|но)|сделать|добавить)\b",
+    r"\b(?:implement|implementation|wire|add\s+support|реализова(?:ть|н|но)|(?:сделать|добавить)\s+(?:функци\w*|метод\w*|класс\w*|обработчик\w*|поддержку))\b",
     re.I,
 )
 _DECLARATIVE_RELATION_RE = re.compile(
@@ -171,13 +171,21 @@ _COMPARE_RE = re.compile(
     r"|\b(`?[A-Za-z_][A-Za-z0-9_]*`?)\s+instead\s+of\s+(`?[A-Za-z_][A-Za-z0-9_]*`?)",
     re.I,
 )
+# Document lifecycle is not the age of a dependency or a cached result.
+# Bare old/previous/past words cannot authorize historical-only retrieval.
 _HISTORY_RE = re.compile(
-    r"\b(?:histor(?:y|ical)|previous|formerly|old|past|superseded|completed\s+(?:roadmap|task|incident|rollout|plan|policy|phase|project|document)|"
-    r"истори(?:я|ческий|ческие)|раньше|предыдущ|закрыт(?:ая|ый|ое)|завершенн(?:ая|ый|ое))\b",
+    r"\b(?:historical|superseded|"
+    r"completed\s+(?:roadmap|task|incident|rollout|plan|policy|phase|project|document)|"
+    r"историческ\w*|"
+    r"(?:закрыт\w*|заверш[её]нн\w*|отмен[её]нн\w*)\s+(?:план\w*|документ\w*|политик\w*|дорожн\w*\s+карт\w*))\b"
+    r"|\b(?:текущ\w*|действующ\w*)\s+(?:политик\w*|план\w*|документ\w*)\s+с\s+отмен[её]нн\w*\b"
+    r"|\b(?:which|show|find)\b[^?!.]{0,80}\b(?:old|previous|past)\s+"
+    r"(?:rollout\s+)?(?:plan|policy|document|roadmap)\b",
     re.I,
 )
 _CURRENT_RE = re.compile(
-    r"\b(?:current|currently|active|now|today|latest|present|актуальн|текущ|сейчас|действующ)\b",
+    r"\b(?:current|currently|active|now|today|latest|present|"
+    r"актуальн\w*|текущ\w*|сейчас|действующ\w*)\b",
     re.I,
 )
 _NUMBER_WORDS = {

@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "module_labels": {
+    "tests/docs/test_query_planning_budget_regressions.py": "behavioral",
+    "tests/docs/test_query_planning_scope_regressions.py": "behavioral",
+    "tests/docs/test_query_planning_alias_regressions.py": "behavioral",
+    "tests/docs/test_query_planning_temporal_regressions.py": "behavioral"
+  },
+  "node_overrides": {},
+  "module_node_hashes": {
+    "tests/docs/test_query_planning_budget_regressions.py": "16a26d08912b819b76d5ecd6276be87de1a139b37dc922e2e2915dbbc40750e8",
+    "tests/docs/test_query_planning_scope_regressions.py": "441c78548126d18b44993945eb8f3f1c9b865d756dbea4c47cf360d66d97e5d6",
+    "tests/docs/test_query_planning_alias_regressions.py": "686d7cb406626a0a8d39a1b0ba58d695ec684ba219002833ce3c16f05ea31075",
+    "tests/docs/test_query_planning_temporal_regressions.py": "e5db8178237b12cb19992f67aa4cbf630594d393cf607b586da280d030e006d2"
+  }
+}

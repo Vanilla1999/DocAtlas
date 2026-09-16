@@ -256,7 +256,7 @@
       "candidate_content_sha256": "26b6ded80e7603476322177b36d2476b7db494fc1d01bb702a053c6345aee245",
       "candidate_discovered": true,
       "candidate_source": "packages/orders/README.md",
-      "decision_hash": "476c8c698eacfda2a73642c7891828f854b6eafe31af35ac1e19d563200ad5a4",
+      "decision_hash": "be773e5e4516f7034c9043fa567121672f553bd8e231773a79d7e0e53ce22acc",
       "family": "requirements",
       "id": "requirements_validation_conditions",
       "matched_discovery_terms": [
@@ -293,7 +293,7 @@
       "proofability": {
         "assignment_count": 0,
         "candidate_count": 1,
-        "decision_hash": "476c8c698eacfda2a73642c7891828f854b6eafe31af35ac1e19d563200ad5a4",
+        "decision_hash": "be773e5e4516f7034c9043fa567121672f553bd8e231773a79d7e0e53ce22acc",
         "documentation_issue": true,
         "eligible_count": 1,
         "missing_requirement_ids": [
@@ -313,7 +313,7 @@
       "question": "Which conditions are required by OrderValidationContract?",
       "require_discovery": true,
       "require_support": false,
-      "requirements_hash": "372a62d54253691c2f01aafa0a4b80f1d08289361db6181d15c4fc9fe28ec6da",
+      "requirements_hash": "6ed0012d6069c8c227132b5fe2cd7288a6aa84080a63c2123e1272d738671610",
       "selected_evidence_ids": [],
       "selected_sources": [
         "packages/orders/README.md"
@@ -381,7 +381,7 @@
       "candidate_content_sha256": "f7c0c2a91e2909fcf59ed31284c24d07191d67c6a958f6cd103615e1c88c412a",
       "candidate_discovered": true,
       "candidate_source": "ARCHITECTURE.md",
-      "decision_hash": "da46ce1814a78fb2a616bd144bfe7c57253c9e0f4cbe0df8f1aebcbbad0cfe56",
+      "decision_hash": "2e480a493052d48017f3e401d09bf5a6a56718a3b97c80d4fd8f4a5a62dc2d91",
       "family": "policy",
       "id": "policy_retry_backoff",
       "matched_discovery_terms": [
@@ -390,6 +390,7 @@
       ],
       "missing_requirement_ids": [
         "context_only:contract_fact",
+        "unresolved:0:legacy_unresolved:unreviewed_frame:What retry backoff does ProjectRetryPolicy require?",
         "unsupported_answer_authorization:context_only_relation"
       ],
       "negative_control": false,
@@ -397,7 +398,9 @@
         "concept_queries": [
           "ProjectRetryPolicy requirement rule contract"
         ],
-        "parse_trace": [],
+        "parse_trace": [
+          "fail_closed:legacy_coverage"
+        ],
         "proof_obligation_count": 1,
         "requirement_probe_count": 2,
         "retrieval_hints": [
@@ -409,24 +412,27 @@
         "subjects": [
           "ProjectRetryPolicy"
         ],
-        "unresolved_parts": []
+        "unresolved_parts": [
+          "legacy_unresolved:unreviewed_frame:What retry backoff does ProjectRetryPolicy require?"
+        ]
       },
       "proofability": {
         "assignment_count": 1,
         "candidate_count": 1,
-        "decision_hash": "da46ce1814a78fb2a616bd144bfe7c57253c9e0f4cbe0df8f1aebcbbad0cfe56",
+        "decision_hash": "2e480a493052d48017f3e401d09bf5a6a56718a3b97c80d4fd8f4a5a62dc2d91",
         "documentation_issue": true,
         "eligible_count": 1,
         "missing_requirement_ids": [
           "context_only:contract_fact",
+          "unresolved:0:legacy_unresolved:unreviewed_frame:What retry backoff does ProjectRetryPolicy require?",
           "unsupported_answer_authorization:context_only_relation"
         ],
         "omission_counts": {},
         "origin": "source_documentation",
         "reason_codes": [
-          "mandatory_requirement_uncovered"
+          "mandatory_support_not_localized"
         ],
-        "recommended_doc_action": "document_missing_requirement",
+        "recommended_doc_action": "add_explicit_proposition",
         "schema_version": 1,
         "selected_count": 1,
         "status": "blocked"
@@ -434,7 +440,7 @@
       "question": "What retry backoff does ProjectRetryPolicy require?",
       "require_discovery": true,
       "require_support": false,
-      "requirements_hash": "c42c64c11ebf006d23d9d216eb2013e4a7a3fb406f0250acfcfd05e8f7ce7b76",
+      "requirements_hash": "93492ce1fe51d6276725724ae59c26c2d1bf14071bb8be32d9425c7accd09ee9",
       "selected_evidence_ids": [
         "p1.4:policy_retry_backoff"
       ],
@@ -569,7 +575,7 @@
       "candidate_content_sha256": "6f13aec3ccc8d596f1552421aa7f4e0f2f2738b6e9654eeab1621e4a07f704a1",
       "candidate_discovered": true,
       "candidate_source": "packages/orders/README.md",
-      "decision_hash": "8bac63123acd7673a325e2a07365acc90a2bd8c529f02c951c6a25a97ca7bada",
+      "decision_hash": "81b86c47a8e6322a98529c27c752b3f88c739978b43ed42cb5a3bee5f3586d2b",
       "family": "alias",
       "id": "alias_order_drafts",
       "matched_discovery_terms": [
@@ -608,7 +614,7 @@
       "proofability": {
         "assignment_count": 0,
         "candidate_count": 1,
-        "decision_hash": "8bac63123acd7673a325e2a07365acc90a2bd8c529f02c951c6a25a97ca7bada",
+        "decision_hash": "81b86c47a8e6322a98529c27c752b3f88c739978b43ed42cb5a3bee5f3586d2b",
         "documentation_issue": true,
         "eligible_count": 1,
         "missing_requirement_ids": [
@@ -628,7 +634,7 @@
       "question": "How are order drafts stored before upload?",
       "require_discovery": true,
       "require_support": false,
-      "requirements_hash": "2f08580cc78b613d203217d5767a64f08e44b906b3410c99e171280581d37fd8",
+      "requirements_hash": "eb77aac454e227671814baf960e73e98e35b9fe84172254f28156ed70c9afb3e",
       "selected_evidence_ids": [],
       "selected_sources": [
         "packages/orders/README.md"
@@ -973,7 +979,7 @@
           "path": "docmancer/docs/domain/_answer_units_shared.py"
         },
         {
-          "git_blob_sha1": "41427a66ebceb66ff22726895f8f8d2f42a3c599",
+          "git_blob_sha1": "d695b0dfc6d65ea1459a1d2b9a0f2e7bcb69e756",
           "path": "docmancer/docs/domain/_project_answer_contract_part01.py"
         },
         {
@@ -981,7 +987,7 @@
           "path": "docmancer/docs/domain/_project_answer_contract_part02.py"
         },
         {
-          "git_blob_sha1": "211182c6f223d9d3697e8619a26d1fad3af3d24a",
+          "git_blob_sha1": "02ba5ed28dfbfe6275630232fd1ed529e1b35ac0",
           "path": "docmancer/docs/domain/_project_answer_contract_shared.py"
         },
         {
@@ -993,7 +999,7 @@
           "path": "docmancer/docs/domain/project_answer_contract.py"
         }
       ],
-      "sha256": "40c2fb6cbc99205aaaeecffd60838cf8701a89ed1868e076c4bf6467d6238fde"
+      "sha256": "9a931ad6c215294e5505e3b52b98e669f3f9c02a6fc5c53c1f45d5c895a09557"
     },
     "protocol": {
       "git_blob_sha1": "43cd3b77175205d72092ab768907b6f82259a0a6",

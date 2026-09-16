@@ -95,3 +95,13 @@ def test_arbitrary_host_lookup_cannot_derive_original_retrieval_lineage():
     host = next(q for q in plan.queries if q.query_id == "query-lookup-1")
     assert host.relation == "host_lookup"
     assert host.public_parent_query_id is None
+
+
+def test_conditional_host_lookup_lineage_stays_narrow_to_audited_troubleshooting():
+    plan = build_documentation_query_plan(
+        "What should the agent do if get_docs_context returns insufficient evidence?",
+        lookup_queries=("insufficient evidence documentation support workflow",),
+    )
+    host = next(q for q in plan.queries if q.query_id == "query-lookup-1")
+    assert host.relation == "host_lookup"
+    assert host.public_parent_query_id is None

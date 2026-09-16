@@ -142,3 +142,29 @@ __all__ = [
     "documentation_technical_anchors",
     "is_exact_technical_token",
 ]
+
+
+# Used only to admit an OPTIONAL lookup, never to rewrite the public question
+# or to decide whether its conditions/negation have been semantically covered.
+_SUPPLEMENTAL_FUNCTION_WORDS = frozenset({
+    "i", "a", "an", "the", "in", "on", "at", "so", "to", "of", "for", "from",
+    "by", "as", "and", "or", "do", "does", "did", "we", "it", "its", "is", "are",
+    "was", "were", "be", "been", "this", "that", "these", "those", "with", "about",
+    "what", "which", "how", "when", "where", "why", "who", "should", "would",
+    "happen", "happens", "happened",
+    "can", "could", "will", "shall", "must", "not", "only", "if", "unless", "without",
+    "я", "мы", "он", "она", "оно", "они", "в", "во", "на", "от", "по", "за",
+    "к", "ко", "с", "со", "из", "до", "для", "о", "об", "и", "или", "а", "но",
+    "что", "как", "где", "когда", "кто", "это", "этот", "эти", "так", "же", "бы",
+    "не", "нет", "если", "без", "только", "должен", "нужно", "надо",
+})
+
+
+def supplemental_query_is_useful(text: str) -> bool:
+    """Reject empty/function-word residue without destroying technical identity."""
+    if documentation_technical_anchors(text):
+        return True
+    return any(
+        token.casefold() not in _SUPPLEMENTAL_FUNCTION_WORDS
+        for token in re.findall(r"[\w]+(?:[.:/+-][\w-]+)*", str(text or ""))
+    )

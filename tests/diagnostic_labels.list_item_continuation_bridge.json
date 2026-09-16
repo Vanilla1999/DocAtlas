@@ -1,0 +1,10 @@
+{
+  "schema_version": 1,
+  "module_labels": {
+    "tests/docs/test_list_item_continuation_bridge.py": "behavioral"
+  },
+  "node_overrides": {},
+  "module_node_hashes": {
+    "tests/docs/test_list_item_continuation_bridge.py": "0b0d9dbd5633ed7c9e643503a7aed2bbcc5f9faf1365dfce99ffdda16867b59b"
+  }
+}

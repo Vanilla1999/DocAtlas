@@ -1,0 +1,10 @@
+{
+  "schema_version": 1,
+  "module_labels": {
+    "tests/docs/test_relation_preserving_projection.py": "behavioral"
+  },
+  "node_overrides": {},
+  "module_node_hashes": {
+    "tests/docs/test_relation_preserving_projection.py": "1b54a5fbf2dfc57abd65e54015b3339ca79ae8a1a394bbc1d9f39aa1b41377cb"
+  }
+}

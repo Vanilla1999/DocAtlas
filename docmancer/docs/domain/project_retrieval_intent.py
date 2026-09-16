@@ -51,6 +51,8 @@ _INTENT_ROLE_POLICY: dict[str, tuple[tuple[str, ...], tuple[str, ...]]] = {
     "project_docs_config_location": (("runbook", "development", "api_contract"), ("roadmap",)),
     "state_home_variable": (("runbook", "api_contract", "development"), ("adr", "roadmap")),
     "offline_usage": (("runbook", "development", "api_contract"), ("adr", "roadmap")),
+    "offline_dependency_acquisition": (("overview", "api_contract", "runbook"), ("adr", "roadmap")),
+    "documentation_scope_boundary": (("runbook", "api_contract", "overview"), ("adr", "roadmap")),
     "index_cleanup": (("operations", "runbook", "api_contract"), ("adr", "roadmap")),
     "troubleshooting": (("runbook", "development"), ("adr", "roadmap")),
     "context_budget": (("api_contract", "module_architecture"), ("adr", "roadmap")),
@@ -60,7 +62,8 @@ _INTENT_ROLE_POLICY: dict[str, tuple[tuple[str, ...], tuple[str, ...]]] = {
     "response_contract": (("api_contract", "overview"), ("roadmap",)),
     "source_authority": (("overview", "project_architecture"), ("roadmap",)),
     "product_boundaries": (("overview",), ("roadmap",)),
-    "dependency_version_binding": (("overview", "api_contract"), ("roadmap",)),
+    "dependency_version_binding": (("overview", "api_contract", "project_architecture"), ("roadmap",)),
+    "instruction_trust": (("api_contract", "project_architecture", "runbook"), ("roadmap",)),
     "module_responsibilities": (("project_architecture", "module_architecture"), ("roadmap",)),
     "product_claims": (("overview",), ("roadmap",)),
     "implementation_location": (("project_architecture", "module_architecture", "api_contract"), ("roadmap",)),
@@ -162,6 +165,17 @@ def build_project_retrieval_aliases(
             if not text or key in seen:
                 continue
             seen.add(key)
+            forbidden_terms = (
+                "docs/adr/", "mcp pack commands", "packs mcp runtime",
+                "install-pack", "packs-serve",
+            ) if intent_id in {
+                "docs_mcp_workflow", "docs_mcp_server_command", "docs_mcp_public_tools",
+                "docs_mcp_tool_policy", "fail_closed_workflow", "response_contract",
+            } else ()
+            if intent_id == "offline_usage" and not _has(tokens, "test", "pytest", "тест"):
+                forbidden_terms = tuple(dict.fromkeys(
+                    (*forbidden_terms, "pytest", "smoke", "fixture", "test suite")
+                ))
             rows.append(ProjectRetrievalAlias(
                 intent_id=intent_id,
                 text=text,
@@ -169,16 +183,10 @@ def build_project_retrieval_aliases(
                 source_language=language,
                 preferred_catalog_roles=preferred_roles,
                 forbidden_catalog_roles=forbidden_roles,
-                forbidden_evidence_terms=(
-                    "docs/adr/", "mcp pack commands", "packs mcp runtime",
-                    "install-pack", "packs-serve",
-                ) if intent_id in {
-                    "docs_mcp_workflow", "docs_mcp_server_command", "docs_mcp_public_tools",
-                    "docs_mcp_tool_policy", "fail_closed_workflow", "response_contract",
-                } else (),
+                forbidden_evidence_terms=forbidden_terms,
             ))
 
-    mentions_docs = _has(tokens, "документ", "док", "docs", "documentation")
+    mentions_docs = _has(tokens, "документ", "док", "docs", "documentation", "document")
     mentions_project = _has(
         tokens, "проект", "репозитор", "систем", "продукт",
     ) or any(_PROJECT_SCOPE_TOKEN_RE.fullmatch(token) for token in tokens)
@@ -251,16 +259,33 @@ def build_project_retrieval_aliases(
     )
 
     # Broad newcomer/workflow questions deliberately return docs_context.
-    if _has(tokens, "офлайн", "offline") or _has_phrase(
-        normalized, "без интернета", "без сети", "without internet", "no network",
-    ):
+    offline_question = _has(tokens, "офлайн", "offline") or _has_phrase(
+        normalized,
+        "без интернета", "без сети", "without internet", "no network",
+        "не подключен к сети", "не подключён к сети",
+        "not connected to the network", "no network access",
+    )
+    if offline_question:
         emit(
             "offline_usage",
             True,
             f"{product_prefix}offline mode",
-            "DOCATLAS_OFFLINE",
-            f"{product_prefix}offline test suite",
+            *((f"{product_prefix}offline test suite",) if _has(tokens, "test", "pytest", "тест") else ()),
+            *(("DOCATLAS_OFFLINE",) if _has(tokens, "test", "pytest", "тест", "docatlas_offline") else ()),
         )
+        offline_subject = (
+            mentions_docs
+            and (
+                _has(tokens, "dependency", "package", "зависим", "пакет")
+                or _has(tokens, "cache", "cached", "prefetch", "кэш", "кеш")
+            )
+        )
+        if offline_subject:
+            emit(
+                "offline_dependency_acquisition",
+                True,
+                "external dependency documentation normal retrieval network acquisition cache",
+            )
     if _has(tokens, "установ", "инстал", "install", "setup") or _has_phrase(
         normalized, "как поставить", "how to install",
     ):
@@ -323,6 +348,28 @@ def build_project_retrieval_aliases(
             else:
                 policy_queries.append(f"{tool_name} Docs MCP must not be used for")
             emit("docs_mcp_tool_policy", True, *policy_queries)
+    insufficient_agent_workflow = (
+        mentions_docs_mcp
+        and bool(public_tool_names)
+        and _has(tokens, "агент", "agent")
+        and _has(tokens, "долж", "сдел", "предприн", "should", "next", "do")
+        and (
+            _has_phrase(
+                normalized,
+                "недостаточно доказательств",
+                "недостаточно данных",
+                "insufficient evidence",
+                "not enough evidence",
+            )
+            or "insufficient_evidence" in source.casefold()
+        )
+    )
+    if insufficient_agent_workflow:
+        emit(
+            "fail_closed_workflow",
+            True,
+            f"{product_prefix}insufficient_evidence documentation support workflow",
+        )
     if _has_phrase(normalized, "fail-closed", "fail closed") and (
         concept_definition or _has(tokens, "behavior", "behaviour", "workflow", "principle")
     ):
@@ -358,18 +405,44 @@ def build_project_retrieval_aliases(
             f"{product_prefix}product boundaries",
             f"{product_prefix}does not replace",
         )
-    if (
-        mentions_product
-        and _has(tokens, "dependency", "package")
-        and _has(tokens, "version")
-        and sum(bool(_has(tokens, stem)) for stem in ("exact", "declared", "unbound")) >= 2
-    ):
+    documentation_scope_boundary = (
+        mentions_docs
+        and _has(tokens, "репозитор", "repository", "project")
+        and _has(tokens, "пакет", "package", "dependency", "library", "зависим")
+        and _has(tokens, "отлич", "differ", "different", "compare", "разниц")
+    )
+    if documentation_scope_boundary:
         emit(
-            "dependency_version_binding",
+            "documentation_scope_boundary",
             True,
-            f"{product_prefix}dependency version evidence exact declared-only unbound selected version",
-            f"{product_prefix}dependency selected version lockfile declaration unbound source",
+            "project-owned documentation external dependency documentation different separate",
+            "project-owned documentation repository retrieval scope provenance",
+            "external dependency documentation retrieval scope provenance",
         )
+    dependency_subject = _has(tokens, "dependency", "package", "зависим", "пакет")
+    version_subject = _has(tokens, "version", "верс")
+    taxonomy_terms = sum(
+        bool(_has(tokens, stem))
+        for stem in ("exact", "declared", "unbound", "точн", "объяв")
+    )
+    version_evidence_terms = taxonomy_terms + int(bool(_has(tokens, "lockfile", "pubspec.lock")))
+    if dependency_subject and version_subject and (
+        mentions_product or mentions_docs or version_evidence_terms >= 1
+    ):
+        # Resolution and evidence-state taxonomy are two different retrieval
+        # hypotheses.  Do not spend two optional slots for every version
+        # question: mechanism/change questions need the resolver path, while an
+        # explicit exact-vs-declared comparison needs the taxonomy.  This keeps
+        # weak aliases from winning by majority inside the bounded pack.
+        if taxonomy_terms >= 2 or concept_definition:
+            version_queries = (
+                "dependency version evidence exact declared-only unbound selected version",
+            )
+        else:
+            version_queries = (
+                "dependency version binding lockfile exact latest documentation",
+            )
+        emit("dependency_version_binding", True, *version_queries)
     if (
         _has(tokens, "responsibilit")
         and "docmancer/docs/application" in source.casefold()
@@ -381,7 +454,7 @@ def build_project_retrieval_aliases(
             f"{product_prefix}application domain module responsibilities architecture boundaries",
         )
     if (
-        mentions_product
+        (mentions_product or mentions_project)
         and _has(tokens, "claim")
         and (_has_phrase(normalized, "product brief") or _has(tokens, "demonstrat", "evidence"))
     ):
@@ -390,6 +463,18 @@ def build_project_retrieval_aliases(
             True,
             f"{product_prefix}product claims evidence status demonstrated",
             f"{product_prefix}product claims validation status",
+        )
+
+    if (
+        mentions_docs
+        and _has(tokens, "command", "shell", "инструк", "команд")
+        and _has(tokens, "execute", "run", "authoriz", "trust", "исполн", "выполн", "запуск", "разреш")
+    ):
+        emit(
+            "instruction_trust",
+            True,
+            "documentation instruction trust document data shell actions",
+            "documentation content execution authority policy",
         )
 
     docs_mcp_workflow_question = mentions_docs_mcp and not mentions_packs and (
@@ -410,14 +495,24 @@ def build_project_retrieval_aliases(
         emit("docs_mcp_public_tools", True, "Docs MCP public tools get_docs_context prepare_docs docs_status")
     if _has(tokens, "бюджет", "budget", "лимит", "limit") and _has(tokens, "контекст", "context", "токен", "token", "output", "response", "ответ", "источник"):
         emit("context_budget", True, f"{product_prefix}context response token and source budgets")
-    if (
-        (_has(tokens, "синхрон", "обнов", "refresh", "sync") and (
-            mentions_docs or mentions_project
-        ))
-        or (
-            _has(tokens, "редакт", "измен", "edit", "change", "markdown")
-            and _has(tokens, "поиск", "search", "документ", "docs", "file")
-        )
+    # Bind file-sync to the changed object, not to any change plus a later
+    # mention of documentation (e.g. a dependency version in a lockfile).
+    explicit_sync = "sync_project_docs" in source.casefold() or bool(re.search(
+        r"\b(?:sync\w*|refresh|синхрон\w*|обновить)\s+"
+        r"(?:(?:the|my|project|repository|проектную|файлы)\s+){0,3}"
+        r"(?:docs|documentation|документаци\w*)\b", source, re.I,
+    ))
+    docs_file_subject = bool(re.search(
+        r"\bmarkdown\b|\b[\w./-]+\.md\b|"
+        r"\b(?:project\s+)?(?:documentation|docs)\s+files?\b|"
+        r"\bфайл\w*\s+(?:проектной\s+)?документаци\w*\b|"
+        r"\b(?:edit\w*|chang\w*|delet\w*|remov\w*)\s+"
+        r"(?:(?:a|the|my|project|repository)\s+){0,3}(?:documentation|docs)\b",
+        source, re.I,
+    ))
+    explicit_sync = explicit_sync or _has_phrase(normalized, "documentation sync", "docs sync", "синхронизация документации")
+    if explicit_sync or (
+        docs_file_subject and _has(tokens, "редакт", "измен", "удал", "edit", "chang", "delet", "remov")
     ):
         sync_subject = "sync_project_docs" if "sync_project_docs" in source.casefold() else "project docs sync"
         requested_states = " ".join(
@@ -456,6 +551,12 @@ def build_project_retrieval_aliases(
             True,
             f"{product_prefix}inspect safely clear local index preview cleanup plan",
         )
+    preparation_job_problem = (
+        _has(tokens, "job", "task", "задач")
+        and _has(tokens, "prepar", "подготов")
+        and (mentions_docs or _has(tokens, "documentation", "документац"))
+        and _has(tokens, "fail", "error", "ошиб", "status", "заверш")
+    )
     if (
         not concept_definition
         and not any(row.intent_id == "project_docs_sync" for row in rows)
@@ -463,7 +564,7 @@ def build_project_retrieval_aliases(
             (not product_purpose and _has(tokens, "проблем", "problem"))
             or _has(
                 tokens,
-                "ошиб", "диагност", "troubleshoot", "fail", "stale",
+                "ошиб", "диагност", "troubleshoot", "fail", "error", "stale",
                 "insufficient_evidence",
             )
             or _has_phrase(
@@ -480,7 +581,11 @@ def build_project_retrieval_aliases(
         emit(
             "troubleshooting",
             True,
-            f"{product_prefix}troubleshooting stale documentation no results diagnostics",
+            (
+                "documentation preparation job status terminal failed docs_status"
+                if preparation_job_problem
+                else f"{product_prefix}troubleshooting stale documentation no results diagnostics"
+            ),
         )
     if (
         _has(tokens, "хран", "storage", "изоляц", "isolat", "баз", "database", "пиш")
@@ -525,7 +630,7 @@ def build_project_retrieval_aliases(
         emit(
             "evidence_selection",
             True,
-            f"{product_prefix}retrieval hit proof",
+            f"{product_prefix}evidence selection proof retrieval hit",
         )
     if _has(tokens, "тест", "протест", "test", "pytest") and not any(
         row.intent_id == "pytest_markers" for row in rows
@@ -649,7 +754,11 @@ def project_retrieval_disposition(question: str) -> ProjectRetrievalDisposition:
     if force_context_only:
         return "broad_context"
     if contract.proof_obligations:
-        return "fail_closed" if contract.unresolved_parts else "broad_context"
+        # A newly unreviewed legacy frame loses certification, not safe reads.
+        # Existing explicit semantic gaps still keep their previous disposition.
+        blocking_gaps = tuple(part for part in contract.unresolved_parts
+                              if not part.startswith("legacy_unresolved:unreviewed_frame:"))
+        return "fail_closed" if blocking_gaps else "broad_context"
 
     tokens = _tokens(question)
     if any(

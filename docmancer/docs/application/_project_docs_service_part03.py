@@ -16,14 +16,30 @@ from docmancer.docs.domain.evidence_qualification import (
     derived_parent_trace,
     qualify_evidence,
 )
+from docmancer.docs.domain.project_doc_ranking import condition_lead_priority
+from docmancer.docs.domain.project_retrieval_intent import build_project_retrieval_aliases
 from docmancer.docs.domain.query_terms import (
     documentation_exact_terms,
     documentation_query_terms,
     documentation_technical_anchors,
+    supplemental_query_is_useful,
 )
 
 
 _INTERNAL_DIAGNOSTIC_LIMIT = 32
+
+
+def _candidate_admission_priority(query: str, chunk: Any) -> tuple[bool, int]:
+    """Keep qualified condition-bearing evidence inside the bounded pool.
+
+    This is only an admission ordering preference. It cannot qualify a chunk,
+    alter source policy, or increase the candidate/query budget.
+    """
+    qualified = bool((chunk.metadata or {}).get("retrieval_query_ids"))
+    return (
+        not qualified,
+        -condition_lead_priority(query, str(getattr(chunk, "text", "") or "")),
+    )
 
 
 def _diagnostic_candidate_id(chunk: Any) -> dict[str, str]:
@@ -153,6 +169,145 @@ def _tag_retrieval_query(
     return tagged
 
 
+def _starts_markdown_list_item(text: str) -> bool:
+    value = str(text or "").lstrip()
+    if value.startswith(("- ", "+ ", "* ")):
+        return True
+    first = value.split(None, 1)[0] if value else ""
+    return len(first) > 1 and first[:-1].isdigit() and first[-1] in ".)"
+
+
+def _structured_continuation_route(anchor: Any, candidate: Any) -> str | None:
+    """Return a provenance-only continuation route for adjacent retrieval chunks."""
+    left = anchor.metadata or {}
+    right = candidate.metadata or {}
+    left_span = left.get("char_span") or ()
+    right_span = right.get("char_span") or ()
+    left_parent = str(left.get("parent_logical_id") or "")
+    right_parent = str(right.get("parent_logical_id") or "")
+    if (
+        len(left_span) != 2 or len(right_span) != 2
+        or right_span[0] != left_span[1]
+        or not left_parent or left_parent != right_parent
+        or candidate.source != anchor.source
+    ):
+        return None
+    left_atom = str(left.get("atom_id") or "")
+    right_atom = str(right.get("atom_id") or "")
+    if left_atom and left_atom == right_atom:
+        return "same_atom_continuation"
+    if (
+        str(left.get("atom_type") or "") == "list"
+        and str(right.get("atom_type") or "") == "list"
+        and not _starts_markdown_list_item(str(getattr(candidate, "text", "") or ""))
+    ):
+        return "same_list_item_continuation"
+    return None
+
+
+def _qualify_same_atom_continuations(chunks: list[Any], query_id: str) -> list[Any]:
+    """Carry one qualified canonical probe into its immediate structural continuation.
+
+    Same-atom children retain the historical route. A packed list fragment may
+    also bridge an atom-id change only when source/parent spans are contiguous
+    and the next list chunk does not start a new list item. This is provenance,
+    not semantic proof, and never derives public/original query coverage.
+    """
+    result = list(chunks)
+    anchors = []
+    for chunk in result:
+        metadata = chunk.metadata or {}
+        trace = (metadata.get("retrieval_query_matches") or {}).get(query_id) or {}
+        span = metadata.get("char_span") or ()
+        if trace.get("qualified") is True and len(span) == 2:
+            anchors.append(chunk)
+    for anchor in anchors:
+        anchor_meta = anchor.metadata or {}
+        for index, candidate in enumerate(result):
+            route = _structured_continuation_route(anchor, candidate)
+            if route is None:
+                continue
+            metadata = candidate.metadata or {}
+            matches = dict(metadata.get("retrieval_query_matches") or {})
+            current = dict(matches.get(query_id) or {})
+            if current.get("qualified") is True:
+                continue
+            anchor_trace = dict(
+                (anchor_meta.get("retrieval_query_matches") or {}).get(query_id) or {}
+            )
+            if anchor_trace.get("qualified") is not True:
+                continue
+            derived = dict(anchor_trace)
+            derived.update({
+                "qualified": True,
+                "qualification_reason": route,
+                "qualification_route": route,
+                "coverage_kind": "derived",
+                "coverage_kinds": ["derived"],
+                "derived_from_stable_chunk_id": str(anchor_meta.get("stable_chunk_id") or ""),
+                "matched_terms": [],
+                "body_matched_terms": [],
+                "match_ratio": 0.0,
+            })
+            matches[query_id] = derived
+            updated = dict(metadata)
+            updated["retrieval_query_matches"] = matches
+            updated["retrieval_query_ids"] = tuple(
+                key for key, value in matches.items() if value.get("qualified") is True
+            )
+            result[index] = candidate.model_copy(update={"metadata": updated})
+            break
+    return result
+
+def _merge_same_atom_continuations(
+    chunks: list[Any], query_id: str, *, max_chars: int = 1024,
+) -> list[Any]:
+    """Reassemble one immediate structured continuation within the existing cap."""
+    result = list(chunks)
+    remove: set[int] = set()
+    for index, anchor in enumerate(tuple(result)):
+        if index in remove:
+            continue
+        metadata = dict(anchor.metadata or {})
+        trace = (metadata.get("retrieval_query_matches") or {}).get(query_id) or {}
+        span = metadata.get("char_span") or ()
+        if trace.get("qualified") is not True or len(span) != 2:
+            continue
+        for other_index, candidate in enumerate(result):
+            if other_index == index or other_index in remove:
+                continue
+            route = _structured_continuation_route(anchor, candidate)
+            if route is None:
+                continue
+            other = candidate.metadata or {}
+            other_trace = (other.get("retrieval_query_matches") or {}).get(query_id) or {}
+            other_span = other.get("char_span") or ()
+            if (
+                other_trace.get("qualification_route") != route
+                or other_trace.get("qualified") is not True
+                or len(other_span) != 2
+            ):
+                continue
+            text = f"{anchor.text}{candidate.text}"
+            if len(text) > max_chars:
+                continue
+            metadata["char_span"] = [span[0], other_span[1]]
+            for field in ("byte_span", "line_span"):
+                left = metadata.get(field) or ()
+                right = other.get(field) or ()
+                if len(left) == 2 and len(right) == 2:
+                    metadata[field] = [left[0], right[1]]
+            metadata["reassembled_from_stable_chunk_ids"] = [
+                str(metadata.get("stable_chunk_id") or ""),
+                str(other.get("stable_chunk_id") or ""),
+            ]
+            metadata["display_token_estimate"] = int(metadata.get("display_token_estimate") or 0) + int(other.get("display_token_estimate") or 0)
+            metadata["token_estimate"] = int(metadata.get("token_estimate") or 0) + int(other.get("token_estimate") or 0)
+            result[index] = anchor.model_copy(update={"text": text, "metadata": metadata})
+            remove.add(other_index)
+            break
+    return [chunk for index, chunk in enumerate(result) if index not in remove]
+
 def _qualify_candidate_lookups(
     chunks: list[Any], plan: DocumentationQueryPlan, *,
     expected_project_identity: str, lifecycle_intent: str,
@@ -255,26 +410,19 @@ class _ProjectDocsServicePart03:
             for requirement in mandatory_requirements
             if (probe := requirement_probe_query(requirement))
         ))[:8]
-        retrieval_hints = tuple(dict.fromkeys(
-            str(value).strip()
-            for value in getattr(requirements, "retrieval_hints", ())
-            if str(value).strip()
-        ))[:4]
-        contract_concepts = tuple(dict.fromkeys(
-            str(value).strip()
-            for value in getattr(requirements, "concept_queries", ())
-            if str(value).strip()
-        ))[:4]
+        # The query plan owns the optional lookup budget. Do not append the
+        # raw requirements again: that resurrects rejected/duplicate hints and
+        # turns a grouped replacement into additional internal requests.
         planned_lookup_queries = tuple(
             item.text for item in documentation_query_plan.queries
             if item.origin in {"exact_anchor", "exact_path", "host_lookup", "canonical_intent", "concept_alias", "retrieval_hint", "lexical_topic"}
         )
-        supplemental_queries = tuple(dict.fromkeys((
-            *planned_lookup_queries,
-            *probe_queries,
-            *contract_concepts,
-            *retrieval_hints,
-        )))[:12]
+        supplemental_queries = tuple(dict.fromkeys(
+            text for text in (
+                *planned_lookup_queries,
+                *probe_queries,
+            ) if supplemental_query_is_useful(text)
+        ))[:12]
         next_supplemental_id = 1
         for supplemental_query in supplemental_queries:
             if supplemental_query in lookup_query_ids:
@@ -283,7 +431,7 @@ class _ProjectDocsServicePart03:
                 f"query-supplemental-{next_supplemental_id}"
             )
             next_supplemental_id += 1
-        supplemental_budget = min(budget, max(128, budget // 4))
+        supplemental_budget = min(budget, max(128, min(400, budget // 4)))
 
         gateway = getattr(self.facade, "agent_gateway", None)
         if gateway is not None:
@@ -379,17 +527,31 @@ class _ProjectDocsServicePart03:
                         anchor_lookup,
                         expected_project_identity=filters["project_identity"], lifecycle_intent=answer_lifecycle_intent,
                     )
+        same_atom_canonical_texts = {
+            alias.text
+            for alias in build_project_retrieval_aliases(query)
+            if alias.intent_id == "fail_closed_workflow"
+        }
         supplemental_chunks_by_query = {}
         for supplemental_query in supplemental_queries:
             lookups = [item for item in documentation_query_plan.queries if item.text == supplemental_query]
             public_lookup = requirements is not None and any(item.origin == "host_lookup" for item in lookups)
             # Public lookups need the same pre-qualification candidate window
             # as the original question; projection owns the public budget.
+            preserve_canonical_neighbors = any(
+                item.origin == "canonical_intent"
+                and item.text in same_atom_canonical_texts
+                for item in lookups
+            )
             lane = _run(
                 supplemental_query,
                 query_limit=effective_limit if public_lookup else 4,
-                query_budget=budget if public_lookup else supplemental_budget,
-                query_expand="none",
+                query_budget=(
+                    budget if public_lookup else
+                    min(budget, max(800, supplemental_budget))
+                    if preserve_canonical_neighbors else supplemental_budget
+                ),
+                query_expand="adjacent" if preserve_canonical_neighbors else "none",
                 query_filters=filters,
             )
             if not lookups:
@@ -402,6 +564,9 @@ class _ProjectDocsServicePart03:
                     lane, lookup.query_id, lookup.text, lookup,
                     expected_project_identity=filters["project_identity"], lifecycle_intent=answer_lifecycle_intent,
                 )
+                if lookup.origin == "canonical_intent":
+                    lane = _qualify_same_atom_continuations(lane, lookup.query_id)
+                    lane = _merge_same_atom_continuations(lane, lookup.query_id)
             supplemental_chunks_by_query[supplemental_query] = lane
         queries_by_origin: dict[str, list[list[Any]]] = {}
         for item in documentation_query_plan.queries:
@@ -431,11 +596,7 @@ class _ProjectDocsServicePart03:
                 expected_project_identity=filters["project_identity"],
                 lifecycle_intent=answer_lifecycle_intent,
             )
-        candidates.sort(
-            key=lambda chunk: not bool(
-                (chunk.metadata or {}).get("retrieval_query_ids")
-            )
-        )
+        candidates.sort(key=lambda chunk: _candidate_admission_priority(query, chunk))
         if internal_diagnostics is not None:
             internal_diagnostics.update(
                 _retrieval_stage_diagnostics(documentation_query_plan, candidates)

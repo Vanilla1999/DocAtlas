@@ -163,6 +163,9 @@ class ProjectAnswerContract:
         object.__setattr__(self, "input_limits", tuple(sorted(set(self.input_limits))))
         object.__setattr__(self, "parse_trace", tuple(dict.fromkeys(str(value)[:160] for value in self.parse_trace if str(value))))
         object.__setattr__(self, "unresolved_parts", tuple(dict.fromkeys(str(value)[:160] for value in self.unresolved_parts if str(value))))
+        # A partial parse cannot certify the scope, even with a recognized subject.
+        if self.unresolved_parts:
+            object.__setattr__(self, "component_scope_complete", False)
 
     @property
     def hash_payload(self) -> dict[str, Any]:

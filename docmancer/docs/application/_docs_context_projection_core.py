@@ -39,6 +39,7 @@ from docmancer.docs.domain.context_windows import (
 )
 from docmancer.docs.domain.evidence_qualification import (
     derived_parent_trace,
+    evidence_policy_rejection_reason,
     qualify_evidence,
 )
 from docmancer.docs.domain.query_terms import documentation_exact_terms
@@ -777,6 +778,33 @@ def _requalify_visible_source(
     matches: dict[str, dict[str, Any]] = {}
     for query_id, trace in independent_query_probes(source, source.get("_independent_query_plan") or {}).items():
         if not isinstance(trace, dict) or trace.get("derived_from_query_id"):
+            continue
+        # A physically contiguous continuation of the same structured atom was
+        # qualified by source structure upstream, not by lexical coincidence in
+        # this child.  Preserve that derived canonical context while still
+        # refusing to manufacture original/public coverage.
+        if (
+            query_id != "query-original"
+            and trace.get("qualified") is True
+            and trace.get("qualification_route") in {"same_atom_continuation", "same_list_item_continuation"}
+            and trace.get("coverage_kind") == "derived"
+        ):
+            continuation_trace = dict(trace)
+            policy_reason = evidence_policy_rejection_reason(
+                trace,
+                visible_text=visible_text,
+                catalog_role=str(source.get("catalog_role") or ""),
+                candidate=source.get("_qualification_candidate", source),
+                expected_project_identity=source.get("_expected_project_identity"),
+                lifecycle_intent=source.get("_lifecycle_intent", "current"),
+            )
+            if policy_reason is not None:
+                continuation_trace.update(
+                    qualified=False, qualification_reason=policy_reason,
+                )
+            matches = merge_query_matches(
+                matches, {str(query_id): continuation_trace},
+            )
             continue
         # Aggregated lineage belongs to the old window; rebuild it from visible probes.
         probe = {k: v for k, v in trace.items() if k not in {"coverage_kinds", "derived_from_query_ids"}}

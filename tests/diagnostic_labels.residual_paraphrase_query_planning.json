@@ -1,0 +1,10 @@
+{
+  "schema_version": 1,
+  "module_labels": {
+    "tests/docs/test_residual_paraphrase_query_planning.py": "behavioral"
+  },
+  "node_overrides": {},
+  "module_node_hashes": {
+    "tests/docs/test_residual_paraphrase_query_planning.py": "b35d444e6503e7a22c98ae04fc50e1a7d0e7c2fa1e839fab67583099a5f0d726"
+  }
+}

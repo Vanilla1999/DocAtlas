@@ -165,8 +165,11 @@ def classify_project_query_intent(question: str) -> ProjectQueryIntent:
     )
     wants_how_to = has_any(["how do i", "how to", "how does", "usage", "use", "setup", "configure", "config", "install", "quickstart", "getting started", "как ", "настро", "установ", "запуст", "пользова", "с чего начать", "первые команд"])
     wants_ingestion = has_any(["ingest", "ingestion", "index", "indexing", "indexed", "retrieval", "retrieve", "chunk", "chunking", "embedding", "vector", "fts", "qdrant", "индекс", "поиск", "чанк", "секци", "эмбед", "вектор", "хран"])
-    wants_release = has_any(["changelog", "release", "released", "changed", "added", "removed", "breaking", "migration", "version history", "what changed", "recently changed"])
+    wants_release = has_any(["changelog", "release", "released", "breaking", "migration", "version history", "what changed", "recently changed"])
     explicit_release = has_any(["changelog", "release", "version history", "what changed", "recently changed"])
+    explicit_release = explicit_release or bool(re.search(
+        r"\b(?:релиз\w*|история\s+версий|что\s+изменилось)\b", q,
+    ))
     wants_troubleshooting = has_any(["error", "bug", "fail", "failed", "why doesn't", "why does not", "not working", "stale", "missing", "diagnose", "doctor", "fix", "troubleshoot", "ошиб", "проблем", "не работает", "не наход", "устар", "диагност"])
     wants_troubleshooting = wants_troubleshooting or _contains_word(q, ["problem", "problems"])
     if concept_definition:
