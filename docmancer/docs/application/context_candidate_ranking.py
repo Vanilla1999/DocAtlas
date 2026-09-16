@@ -173,6 +173,36 @@ def _facet_aware_candidates(
             if key in (canonical_query_ids or set())
             and isinstance(trace, dict) and trace.get("qualified") is True
         ), default=0.0)
+        relation_group_traces = [
+            trace
+            for key, trace in (source.get("retrieval_query_matches") or {}).items()
+            if str(key).startswith("query-relation-")
+            and key in (canonical_query_ids or set())
+            and isinstance(trace, dict) and trace.get("qualified") is True
+        ]
+        # Relation groups are compact probes made only from the user's own
+        # comparison sides/axes or condition states. They are stronger visible
+        # relevance evidence than a generic topical hit against the full
+        # question, but remain retrieval-only and never derive public coverage.
+        relation_group_count = len(relation_group_traces)
+        relation_group_match_ratio = max((
+            float(trace.get("match_ratio") or 0.0) for trace in relation_group_traces
+        ), default=0.0)
+        relation_group_lexical = max((
+            float(trace.get("lexical_score") or 0.0) for trace in relation_group_traces
+        ), default=0.0)
+        comparison_relation_marker = 0
+        if relation_group_traces and re.search(
+            r"\b(?:differ|difference|compare|versus|vs\.?)\b",
+            query_text.get("query-original", ""), re.I,
+        ):
+            relation_surface = " ".join(str(identity.get(key) or "") for key in (
+                "heading_path", "title", "snippet", "content",
+            ))
+            comparison_relation_marker = int(bool(re.search(
+                r"\b(?:separate|different|differ|distinct|versus|vs\.?|rather than|not the same)\b",
+                relation_surface, re.I,
+            )))
         direct_required_traces = [
             trace
             for key, trace in (source.get("retrieval_query_matches") or {}).items()
@@ -215,6 +245,10 @@ def _facet_aware_candidates(
         return (
             condition_lead_priority(query_text.get("query-original", ""), str(source.get("snippet") or "")),
             required_relation_preference,
+            comparison_relation_marker,
+            relation_group_count,
+            relation_group_match_ratio,
+            relation_group_lexical,
             host_condition_priority,
             comparison_action_priority,
             role_tiebreak,

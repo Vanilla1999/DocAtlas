@@ -109,6 +109,20 @@ def qualify_evidence(
     normalized_evidence = "\n".join(substantive_lines).casefold()
     normalized_headings = "\n".join(heading_lines).casefold()
 
+    relation_text = str(probe.get("query_text") or "").casefold()
+    if query_id.startswith("query-relation-"):
+        negated_state = re.search(
+            r"(?<!\w)(?:not|without|never|no)(?!\w)\s+([a-z][a-z0-9_-]{2,})\s*$",
+            relation_text, re.I,
+        )
+        if negated_state is not None:
+            state = re.escape(negated_state.group(1))
+            if re.search(
+                rf"(?<!\w)(?:not|without|never|no)(?!\w)(?:\s+\w+){{0,2}}\s+{state}(?!\w)",
+                normalized_evidence, re.I,
+            ) is None:
+                return _rejected(result, "missing_visible_relation_negation")
+
     if str(probe.get("mode") or "") == "exact_path":
         query_text = str(probe.get("query_text") or "").replace("\\", "/").casefold()
         qualified = bool(query_text and query_text in normalized_visible)

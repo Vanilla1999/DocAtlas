@@ -14,6 +14,7 @@ from docmancer.docs.domain.project_retrieval_intent import (
 )
 from docmancer.docs.domain.query_terms import (
     documentation_exact_terms,
+    documentation_query_terms,
     documentation_technical_anchors,
     is_exact_technical_token,
     supplemental_query_is_useful,
@@ -246,6 +247,84 @@ def _audited_host_lookup_rewrites(
         return ()
     return tuple(dict.fromkeys(alias.text for alias in aliases if alias.force_context_only))
 
+
+def _subject_relation_groups(question: str) -> tuple[str, ...]:
+    """Build bounded subject-bearing probes from relations already in the question.
+
+    These are retrieval hypotheses only. They preserve user-provided subjects,
+    conditions, and comparison axes without adding an expected outcome. The
+    caller spends the existing optional-query slots on them before falling back
+    to isolated lexical hints.
+    """
+    groups: list[str] = []
+
+    def side_alternatives(value: str) -> tuple[str, ...]:
+        """Expand one slash alternative while preserving the surrounding phrase."""
+        match = re.search(r"\b([A-Za-z][A-Za-z0-9_-]*)\s*/\s*([A-Za-z][A-Za-z0-9_-]*)\b", value)
+        if match is None:
+            return (" ".join(value.split()),)
+        prefix, suffix = value[:match.start()], value[match.end():]
+        return tuple(dict.fromkeys(
+            " ".join(f"{prefix}{choice}{suffix}".split())
+            for choice in match.group(1, 2)
+        ))
+
+    # For a comparison, first keep both user-named sides in the same lexical
+    # probe. This is the only shape that can directly retrieve a source that
+    # contrasts the two domains. Remaining slots keep each side together with
+    # all user-named comparison axes; no answer-side vocabulary is invented.
+    comparison = re.match(
+        r"^\s*how\s+do\s+(.+?)\s+and\s+(.+?)\s+differ(?:\s+in\s+(.+?))?[?.!]*\s*$",
+        question,
+        re.I,
+    )
+    if comparison is not None:
+        left, right, axis = (value.strip(" ,;?.!") if value else "" for value in comparison.groups())
+        left_variants = side_alternatives(left)
+        right_variants = side_alternatives(right)
+        axis_parts = [
+            part.strip(" ,;?.!")
+            for part in re.split(r"\s+(?:and|or)\s+", axis, flags=re.I)
+            if part.strip(" ,;?.!")
+        ] if axis else []
+        axis_text = " ".join(axis_parts)
+        for left_value in left_variants:
+            for right_value in right_variants:
+                value = f"{left_value} {right_value}".strip()
+                if value and supplemental_query_is_useful(value):
+                    groups.append(value[:500])
+        for side in (left_variants[0], " ".join(re.sub(r"\s*/\s*", " ", right).split())):
+            value = " ".join(part for part in (side, axis_text) if part).strip()
+            if value and supplemental_query_is_useful(value):
+                groups.append(value[:500])
+
+    # Passive state alternatives are common in conditional questions. Preserve
+    # the bounded subject phrase (not just its first noun) plus every user-named
+    # state. This keeps "documentation needed ... not indexed" distinct from a
+    # generic mention of already-indexed content.
+    condition = re.search(r"\b(?:when|if)\s+(.+?)(?:[?.!]|$)", question, re.I)
+    if condition is not None:
+        value = condition.group(1).strip(" ,;?.!")
+        state = re.match(
+            r"(.+?)\s+(?:is|are|was|were|has\s+(?:not\s+)?been|have\s+(?:not\s+)?been)\s+"
+            r"([A-Za-z][A-Za-z0-9_-]+)\s+(?:or|and)\s+([A-Za-z][A-Za-z0-9_-]+)(?:\s+yet)?$",
+            value,
+            re.I,
+        )
+        if state is not None:
+            subject_terms = documentation_query_terms(state.group(1))
+            subject = " ".join(subject_terms[:4])
+            negated = bool(re.search(r"\bnot\b", value, re.I))
+            for named_state in state.group(2, 3):
+                probe = " ".join(part for part in (subject, "not" if negated else "", named_state) if part)
+                if probe and supplemental_query_is_useful(probe):
+                    groups.append(probe[:500])
+        elif value and len(value.split()) >= 2 and supplemental_query_is_useful(value):
+            groups.append(value[:500])
+
+    return tuple(dict.fromkeys(groups))
+
+
 def build_documentation_query_plan(
     question: str, *, lookup_queries: tuple[str, ...] = (), explicit_path: str | None = None,
     requirements: object | None = None,
@@ -429,7 +508,11 @@ def build_documentation_query_plan(
             and re.search(r"(?<![\w.])" + re.escape(hint) + r"(?![\w.])", text, re.I)]
         if len(present_hints) >= 2:
             clause_groups.append(text)
+    relation_groups = _subject_relation_groups(question)
     optional_queries = [
+        # Relation groups are optional canonical search hypotheses so they can
+        # contribute useful broad context without deriving public coverage.
+        *((text, "canonical_intent") for text in relation_groups),
         *((text, "retrieval_hint") for text in clause_groups),
         *((text, "concept_alias") for applies, text in concept_queries if applies),
         *((text, "concept_alias") for text in requirement_concepts),
@@ -464,7 +547,7 @@ def build_documentation_query_plan(
             component_rewrite_audit=(rule, start, end, raw),
         ))
         seen.add(text.casefold())
-    origin_counts = {"concept_alias": 0, "retrieval_hint": 0}
+    origin_counts = {"canonical_intent": 0, "concept_alias": 0, "retrieval_hint": 0}
     for text, origin in optional_queries:
         if (
             text.casefold() in seen
@@ -473,8 +556,12 @@ def build_documentation_query_plan(
         ):
             continue
         origin_counts[origin] += 1
+        prefix = (
+            "relation" if origin == "canonical_intent"
+            else "concept" if origin == "concept_alias" else "hint"
+        )
         queries.append(DocumentationLookup(
-            f"query-{'concept' if origin == 'concept_alias' else 'hint'}-{origin_counts[origin]}",
+            f"query-{prefix}-{origin_counts[origin]}",
             text,
             origin,
             False,

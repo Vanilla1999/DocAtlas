@@ -310,3 +310,54 @@ def test_optional_canonical_candidate_prefers_stronger_visible_match_over_source
         }, required_query_ids={"query-original"}, canonical_query_ids={"query-intent-1"},
     )
     assert ranked[0] is stronger
+
+
+def test_negated_relation_probe_rejects_positive_only_evidence():
+    from docmancer.docs.domain.evidence_qualification import qualify_evidence
+
+    probe = {
+        "query_text": "documentation needed question not indexed",
+        "query_terms": ["documentation", "needed", "question", "indexed"],
+    }
+    positive = qualify_evidence(
+        probe, query_id="query-relation-1",
+        visible_text="Documentation is indexed; failures must not be presented as answers.",
+        evidence_text="Documentation is indexed; failures must not be presented as answers.",
+    )
+    negative = qualify_evidence(
+        probe, query_id="query-relation-1",
+        visible_text="Project documentation is not yet indexed for the question.",
+        evidence_text="Project documentation is not yet indexed for the question.",
+    )
+
+    assert positive.qualified is False
+    assert positive.reason == "missing_visible_relation_negation"
+    assert negative.qualified is True
+
+
+def test_user_relation_probe_beats_generic_topical_original_hit():
+    from docmancer.docs.application.context_candidate_ranking import _facet_aware_candidates
+
+    generic = {
+        "path": "docs/index.md", "snippet": "Documentation index and provenance overview.",
+        "retrieval_query_matches": {"query-original": {
+            "qualified": True, "match_ratio": 0.6, "lexical_score": 20.0,
+        }},
+    }
+    relation = {
+        "path": "docs/workflow.md",
+        "snippet": "Dependency documentation uses a separately bound retrieval scope.",
+        "_qualification_candidate": {"heading_path": "Dependency docs are separate"},
+        "retrieval_query_matches": {"query-relation-2": {
+            "qualified": True, "match_ratio": 0.75, "lexical_score": 8.0,
+        }},
+    }
+    ranked = _facet_aware_candidates(
+        [generic, relation],
+        query_text={
+            "query-original": "How do project documentation and dependency documentation differ in scope?",
+            "query-relation-2": "dependency documentation scope",
+        },
+        required_query_ids=set(), canonical_query_ids={"query-relation-2"},
+    )
+    assert ranked[0] is relation

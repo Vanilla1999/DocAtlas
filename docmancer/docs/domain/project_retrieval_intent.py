@@ -163,6 +163,17 @@ def build_project_retrieval_aliases(
             if not text or key in seen:
                 continue
             seen.add(key)
+            forbidden_terms = (
+                "docs/adr/", "mcp pack commands", "packs mcp runtime",
+                "install-pack", "packs-serve",
+            ) if intent_id in {
+                "docs_mcp_workflow", "docs_mcp_server_command", "docs_mcp_public_tools",
+                "docs_mcp_tool_policy", "fail_closed_workflow", "response_contract",
+            } else ()
+            if intent_id == "offline_usage" and not _has(tokens, "test", "pytest", "тест"):
+                forbidden_terms = tuple(dict.fromkeys(
+                    (*forbidden_terms, "pytest", "smoke", "fixture", "test suite")
+                ))
             rows.append(ProjectRetrievalAlias(
                 intent_id=intent_id,
                 text=text,
@@ -170,13 +181,7 @@ def build_project_retrieval_aliases(
                 source_language=language,
                 preferred_catalog_roles=preferred_roles,
                 forbidden_catalog_roles=forbidden_roles,
-                forbidden_evidence_terms=(
-                    "docs/adr/", "mcp pack commands", "packs mcp runtime",
-                    "install-pack", "packs-serve",
-                ) if intent_id in {
-                    "docs_mcp_workflow", "docs_mcp_server_command", "docs_mcp_public_tools",
-                    "docs_mcp_tool_policy", "fail_closed_workflow", "response_contract",
-                } else (),
+                forbidden_evidence_terms=forbidden_terms,
             ))
 
     mentions_docs = _has(tokens, "документ", "док", "docs", "documentation", "document")

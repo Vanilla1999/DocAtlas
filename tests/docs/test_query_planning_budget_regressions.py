@@ -59,3 +59,45 @@ def test_application_does_not_reintroduce_rejected_residue(tmp_path, junk):
     assert 'cache freshness' in texts
     assert len(calls) <= 14
     assert texts[:2] == ['Explain cached documentation'] * 2
+
+
+def test_comparison_uses_subject_bearing_side_probes_before_single_word_hints():
+    question = (
+        "How do project documentation and dependency/library documentation differ "
+        "in retrieval scope and provenance?"
+    )
+    requirements = build_requirements(question, profile="project_docs_answer")
+    plan = build_documentation_query_plan(question, requirements=requirements)
+    optional = [
+        q for q in plan.queries
+        if q.origin in {"canonical_intent", "concept_alias", "retrieval_hint", "component_rewrite"}
+        and q.query_id.startswith(("query-relation-", "query-concept-", "query-hint-", "query-component-"))
+    ]
+    relation = [q.text.casefold() for q in optional if q.query_id.startswith("query-relation-")]
+
+    assert len(optional) <= 4
+    assert "project documentation dependency documentation" in relation
+    assert "project documentation library documentation" in relation
+    assert "project documentation retrieval scope provenance" in relation
+    assert "dependency library documentation retrieval scope provenance" in relation
+    assert not any(q.text.casefold() == "differ" for q in optional)
+
+
+def test_conditional_relation_keeps_subject_and_negative_states_in_existing_slots():
+    question = (
+        "What happens in offline mode when the documentation needed for a question "
+        "has not been prefetched or indexed yet?"
+    )
+    requirements = build_requirements(question, profile="project_docs_answer")
+    plan = build_documentation_query_plan(question, requirements=requirements)
+    relation = [
+        q.text.casefold() for q in plan.queries if q.query_id.startswith("query-relation-")
+    ]
+
+    assert "documentation needed question not prefetched" in relation
+    assert "documentation needed question not indexed" in relation
+    assert not any(q.text.casefold() == "happens" for q in plan.queries)
+    assert len([
+        q for q in plan.queries
+        if q.query_id.startswith(("query-relation-", "query-concept-", "query-hint-", "query-component-"))
+    ]) <= 4

@@ -151,6 +151,7 @@ _SUPPLEMENTAL_FUNCTION_WORDS = frozenset({
     "by", "as", "and", "or", "do", "does", "did", "we", "it", "its", "is", "are",
     "was", "were", "be", "been", "this", "that", "these", "those", "with", "about",
     "what", "which", "how", "when", "where", "why", "who", "should", "would",
+    "happen", "happens", "happened",
     "can", "could", "will", "shall", "must", "not", "only", "if", "unless", "without",
     "я", "мы", "он", "она", "оно", "они", "в", "во", "на", "от", "по", "за",
     "к", "ко", "с", "со", "из", "до", "для", "о", "об", "и", "или", "а", "но",
