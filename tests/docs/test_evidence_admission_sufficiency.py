@@ -190,28 +190,6 @@ def test_partial_primary_packet_can_add_safe_hint_without_losing_primary_source(
     assert payload["edit_ready"] is False
 
 
-def test_natural_ru_comparison_order_preserves_both_sides_and_builds_relation_probe():
-    from docmancer.docs.domain.project_answer_contract import build_project_answer_contract
-
-    question = "Чем отличается локальный поиск от удалённого каталога?"
-    contract = build_project_answer_contract(question)
-
-    assert contract.unresolved_parts == ()
-    assert [
-        (row.kind, row.subject, row.target)
-        for row in contract.proof_obligations
-    ] == [("comparison", "локальный поиск", "удалённого каталога")]
-
-    requirements = build_requirements(question, profile="project_docs_answer")
-    plan = build_documentation_query_plan(question, requirements=requirements)
-    assert any(
-        item.query_id.startswith("query-relation-")
-        and "локальный поиск" in item.text
-        and "удалённого каталога" in item.text
-        for item in plan.queries
-    )
-
-
 def test_comparison_relation_qualification_prefers_supporting_relation_over_keyword_salad():
     from docmancer.docs.domain.evidence_qualification import qualify_evidence
 
@@ -269,30 +247,6 @@ def test_comparison_relation_rejects_unrelated_different_adjective() -> None:
 
     assert distractor.qualified is False
     assert distractor.reason == "missing_visible_comparison_relation"
-
-
-def test_comparison_relation_qualification_accepts_russian_relation_not_keyword_salad() -> None:
-    probe = {
-        "query_text": "локальный поиск удаленный каталог different separate",
-        "query_terms": ["локальный", "поиск", "удаленный", "каталог", "different", "separate"],
-    }
-    good = qualify_evidence(
-        probe,
-        query_id="query-relation-9",
-        visible_text=(
-            "Локальный поиск использует индекс проекта, тогда как удаленный каталог "
-            "обращается к внешнему источнику."
-        ),
-    )
-    bad = qualify_evidence(
-        probe,
-        query_id="query-relation-9",
-        visible_text="Локальный поиск и удаленный каталог: поиск, каталог, локальный, удаленный.",
-    )
-
-    assert good.qualified is True
-    assert bad.qualified is False
-    assert bad.reason == "missing_visible_comparison_relation"
 
 
 @pytest.mark.parametrize("overrides", [

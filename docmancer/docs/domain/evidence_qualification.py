@@ -23,10 +23,7 @@ _VISIBLE_COMPARISON_RELATION_RE = re.compile(
     r"\brather\s+than\b|\binstead\s+of\b|\bnot\s+the\s+same\b|"
     r"\bno\s+distinction\b|"
     r"\b(?:not|never)\b[^.!?\n]{0,80}\b(?:proof|enough|sufficient|same|equivalent)\b|"
-    r"\bbut\b[^.!?\n]{0,80}\b(?:not|never)\b[^.!?\n]{0,60}\b(?:prove|proof|enough|sufficient|same|equivalent)\b|"
-    r"\b(?:тогда\s+как|в\s+отличие\s+от|отлича[а-яё]*|различа[а-яё]*|различн[а-яё]*)\b|"
-    r"\bне\b[^.!?\n]{0,80}\b(?:достаточн[а-яё]*|доказ[а-яё]*|одинаков[а-яё]*|эквивалентн[а-яё]*)\b|"
-    r"\bно\b[^.!?\n]{0,80}\bне\b[^.!?\n]{0,60}\b(?:доказ[а-яё]*|достаточн[а-яё]*|одинаков[а-яё]*|эквивалентн[а-яё]*)\b"
+    r"\bbut\b[^.!?\n]{0,80}\b(?:not|never)\b[^.!?\n]{0,60}\b(?:prove|proof|enough|sufficient|same|equivalent)\b"
     r")",
     re.I,
 )
