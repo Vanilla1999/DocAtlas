@@ -40,7 +40,7 @@ def test_ru_no_network_dependency_cache_question_gets_neutral_offline_subject_pr
     q = "Ноутбук не подключён к сети, а документация этой зависимости никогда не кэшировалась. Может ли обычный запрос документации загрузить её?"
     rows = _rows(q, "offline_usage")
     assert rows
-    assert rows[0].text == "offline dependency documentation cache prefetch network"
+    assert rows[0].text == "offline dependency documentation normal retrieval network acquisition cache"
     assert all(forbidden not in rows[0].text for forbidden in ("cannot", "must", "fetch denied", "ask user"))
 
 
@@ -55,7 +55,7 @@ def test_ru_project_vs_external_dependency_docs_gets_neutral_boundary_probe():
     q = "Чем поиск по собственной документации этого репозитория отличается от поиска по документации внешнего пакета?"
     rows = _rows(q, "documentation_scope_boundary")
     assert len(rows) == 1
-    assert rows[0].text == "project documentation dependency documentation retrieval scope provenance"
+    assert rows[0].text == "project documentation dependency documentation different separate retrieval scope provenance"
     assert all(forbidden not in rows[0].text for forbidden in ("manifest", "lockfile", "sync_project_docs", "prefetch"))
 
 
@@ -63,7 +63,7 @@ def test_en_project_vs_external_dependency_docs_uses_same_boundary_probe():
     q = "How is searching this repository's own documentation different from searching an external package's documentation?"
     rows = _rows(q, "documentation_scope_boundary")
     assert len(rows) == 1
-    assert rows[0].text == "project documentation dependency documentation retrieval scope provenance"
+    assert rows[0].text == "project documentation dependency documentation different separate retrieval scope provenance"
 ''',encoding='utf-8')
     Path(MANIFEST).write_text(json.dumps({
         'schema_version':1,'module_labels':{TEST:'behavioral'},'node_overrides':{},
@@ -75,7 +75,7 @@ def apply_fix():
     replace_once(
         path,
         '''    # Broad newcomer/workflow questions deliberately return docs_context.\n    if _has(tokens, "офлайн", "offline") or _has_phrase(\n        normalized, "без интернета", "без сети", "without internet", "no network",\n    ):\n        emit(\n            "offline_usage",\n            True,\n            f"{product_prefix}offline mode",\n            *((f"{product_prefix}offline test suite",) if _has(tokens, "test", "pytest", "тест") else ()),\n            *(("DOCATLAS_OFFLINE",) if _has(tokens, "test", "pytest", "тест", "docatlas_offline") else ()),\n        )''',
-        '''    # Broad newcomer/workflow questions deliberately return docs_context.\n    offline_question = _has(tokens, "офлайн", "offline") or _has_phrase(\n        normalized,\n        "без интернета", "без сети", "without internet", "no network",\n        "не подключен к сети", "не подключён к сети",\n        "not connected to the network", "no network access",\n    )\n    if offline_question:\n        offline_subject = (\n            mentions_docs\n            and (\n                _has(tokens, "dependency", "package", "зависим", "пакет")\n                or _has(tokens, "cache", "cached", "prefetch", "кэш", "кеш")\n            )\n        )\n        offline_probe = (\n            "offline dependency documentation cache prefetch network"\n            if offline_subject else f"{product_prefix}offline mode"\n        )\n        emit(\n            "offline_usage",\n            True,\n            offline_probe,\n            *((f"{product_prefix}offline test suite",) if _has(tokens, "test", "pytest", "тест") else ()),\n            *(("DOCATLAS_OFFLINE",) if _has(tokens, "test", "pytest", "тест", "docatlas_offline") else ()),\n        )''',
+        '''    # Broad newcomer/workflow questions deliberately return docs_context.\n    offline_question = _has(tokens, "офлайн", "offline") or _has_phrase(\n        normalized,\n        "без интернета", "без сети", "without internet", "no network",\n        "не подключен к сети", "не подключён к сети",\n        "not connected to the network", "no network access",\n    )\n    if offline_question:\n        offline_subject = (\n            mentions_docs\n            and (\n                _has(tokens, "dependency", "package", "зависим", "пакет")\n                or _has(tokens, "cache", "cached", "prefetch", "кэш", "кеш")\n            )\n        )\n        offline_probe = (\n            "offline dependency documentation normal retrieval network acquisition cache"\n            if offline_subject else f"{product_prefix}offline mode"\n        )\n        emit(\n            "offline_usage",\n            True,\n            offline_probe,\n            *((f"{product_prefix}offline test suite",) if _has(tokens, "test", "pytest", "тест") else ()),\n            *(("DOCATLAS_OFFLINE",) if _has(tokens, "test", "pytest", "тест", "docatlas_offline") else ()),\n        )''',
     )
     replace_once(
         path,
@@ -83,7 +83,7 @@ def apply_fix():
         '''                "ошиб", "диагност", "troubleshoot", "fail", "error", "stale",\n                "insufficient_evidence",''',
     )
     marker='''    if mentions_product and _has(tokens, "replace") and _has(tokens, "system"):\n        emit(\n            "product_boundaries",\n            True,\n            f"{product_prefix}product boundaries",\n            f"{product_prefix}does not replace",\n        )\n'''
-    insertion=marker+'''    documentation_scope_boundary = (\n        mentions_docs\n        and _has(tokens, "репозитор", "repository", "project")\n        and _has(tokens, "пакет", "package", "dependency", "library", "зависим")\n        and _has(tokens, "отлич", "differ", "different", "compare", "разниц")\n    )\n    if documentation_scope_boundary:\n        emit(\n            "documentation_scope_boundary",\n            True,\n            "project documentation dependency documentation retrieval scope provenance",\n        )\n'''
+    insertion=marker+'''    documentation_scope_boundary = (\n        mentions_docs\n        and _has(tokens, "репозитор", "repository", "project")\n        and _has(tokens, "пакет", "package", "dependency", "library", "зависим")\n        and _has(tokens, "отлич", "differ", "different", "compare", "разниц")\n    )\n    if documentation_scope_boundary:\n        emit(\n            "documentation_scope_boundary",\n            True,\n            "project documentation dependency documentation different separate retrieval scope provenance",\n        )\n'''
     replace_once(path,marker,insertion)
 
 
