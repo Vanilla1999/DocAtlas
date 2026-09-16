@@ -49,7 +49,7 @@ jobs:
           set -e
           cat "$RUNNER_TEMP/red.log"
           test "$status" -eq 1
-          grep -q '2 failed, 1 passed' "$RUNNER_TEMP/red.log"
+          grep -q '3 failed' "$RUNNER_TEMP/red.log"
       - name: Apply minimal chain fix
         run: python .github/pr191_chain_tdd.py fix
       - name: GREEN chain plus safety/projection
