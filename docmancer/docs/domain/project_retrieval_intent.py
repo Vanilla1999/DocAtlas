@@ -51,6 +51,8 @@ _INTENT_ROLE_POLICY: dict[str, tuple[tuple[str, ...], tuple[str, ...]]] = {
     "project_docs_config_location": (("runbook", "development", "api_contract"), ("roadmap",)),
     "state_home_variable": (("runbook", "api_contract", "development"), ("adr", "roadmap")),
     "offline_usage": (("runbook", "development", "api_contract"), ("adr", "roadmap")),
+    "offline_dependency_acquisition": (("overview", "api_contract", "runbook"), ("adr", "roadmap")),
+    "documentation_scope_boundary": (("runbook", "api_contract", "overview"), ("adr", "roadmap")),
     "index_cleanup": (("operations", "runbook", "api_contract"), ("adr", "roadmap")),
     "troubleshooting": (("runbook", "development"), ("adr", "roadmap")),
     "context_budget": (("api_contract", "module_architecture"), ("adr", "roadmap")),
@@ -257,9 +259,13 @@ def build_project_retrieval_aliases(
     )
 
     # Broad newcomer/workflow questions deliberately return docs_context.
-    if _has(tokens, "офлайн", "offline") or _has_phrase(
-        normalized, "без интернета", "без сети", "without internet", "no network",
-    ):
+    offline_question = _has(tokens, "офлайн", "offline") or _has_phrase(
+        normalized,
+        "без интернета", "без сети", "without internet", "no network",
+        "не подключен к сети", "не подключён к сети",
+        "not connected to the network", "no network access",
+    )
+    if offline_question:
         emit(
             "offline_usage",
             True,
@@ -267,6 +273,19 @@ def build_project_retrieval_aliases(
             *((f"{product_prefix}offline test suite",) if _has(tokens, "test", "pytest", "тест") else ()),
             *(("DOCATLAS_OFFLINE",) if _has(tokens, "test", "pytest", "тест", "docatlas_offline") else ()),
         )
+        offline_subject = (
+            mentions_docs
+            and (
+                _has(tokens, "dependency", "package", "зависим", "пакет")
+                or _has(tokens, "cache", "cached", "prefetch", "кэш", "кеш")
+            )
+        )
+        if offline_subject:
+            emit(
+                "offline_dependency_acquisition",
+                True,
+                "external dependency documentation normal retrieval network acquisition cache",
+            )
     if _has(tokens, "установ", "инстал", "install", "setup") or _has_phrase(
         normalized, "как поставить", "how to install",
     ):
@@ -385,6 +404,20 @@ def build_project_retrieval_aliases(
             True,
             f"{product_prefix}product boundaries",
             f"{product_prefix}does not replace",
+        )
+    documentation_scope_boundary = (
+        mentions_docs
+        and _has(tokens, "репозитор", "repository", "project")
+        and _has(tokens, "пакет", "package", "dependency", "library", "зависим")
+        and _has(tokens, "отлич", "differ", "different", "compare", "разниц")
+    )
+    if documentation_scope_boundary:
+        emit(
+            "documentation_scope_boundary",
+            True,
+            "project-owned documentation external dependency documentation different separate",
+            "project-owned documentation repository retrieval scope provenance",
+            "external dependency documentation retrieval scope provenance",
         )
     dependency_subject = _has(tokens, "dependency", "package", "зависим", "пакет")
     version_subject = _has(tokens, "version", "верс")
@@ -531,7 +564,7 @@ def build_project_retrieval_aliases(
             (not product_purpose and _has(tokens, "проблем", "problem"))
             or _has(
                 tokens,
-                "ошиб", "диагност", "troubleshoot", "fail", "stale",
+                "ошиб", "диагност", "troubleshoot", "fail", "error", "stale",
                 "insufficient_evidence",
             )
             or _has_phrase(
