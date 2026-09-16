@@ -249,10 +249,6 @@ def project_docs_answer(
     sources: list[dict[str, Any]] = []
     snapshot: dict[str, dict[str, Any]] = {}
     omitted = len(decision.omissions)
-    use_unit_projection = (
-        retrieval.get("selection_profile") == "project_docs_answer"
-        or any(assignment.unit_id for assignment in decision.assignments)
-    )
     assigned_ids = {
         assignment.evidence_id for assignment in decision.assignments
     } if has_canonical_selection else {
@@ -273,6 +269,14 @@ def project_docs_answer(
         candidate_assignments = tuple(
             assignment for assignment in decision.assignments
             if assignment.evidence_id == candidate.stable_id
+        )
+        # Mixed selections may contain unit-bound project evidence and
+        # whole-chunk library evidence. A neighboring candidate's unit must
+        # not change this candidate's canonical materialization contract.
+        use_unit_projection = (
+            retrieval.get("selection_profile") == "project_docs_answer"
+            or bool(candidate.project_identity)
+            or any(assignment.unit_id for assignment in candidate_assignments)
         )
         item = (
             _unit_materialized_item(candidate, candidate_assignments)

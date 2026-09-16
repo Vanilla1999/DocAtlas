@@ -189,7 +189,11 @@ class _UnifiedDocsContextServicePart01:
                 )
             project_result = self.service.get_project_context(project_path, question, tokens=tokens, limit=limit, expand=expand, library=library, libraries=libraries, ecosystem=ecosystem, version=version, module=module, module_path=module_path, scope=scope, mode="deps-only", response_style=response_style, allow_network=effective_allow_network, mutation_intent=mutation_intent, lookup_queries=lookup_queries)
         elif mode_selected == "mixed":
-            project_result = self.service.get_project_context(project_path, question, tokens=tokens, limit=limit, expand=expand, library=library, libraries=libraries, ecosystem=ecosystem, version=version, module=module, module_path=module_path, scope=scope, mode="auto", response_style=response_style, allow_network=effective_allow_network, mutation_intent=mutation_intent, lookup_queries=lookup_queries)
+            # Explicit libraries are handled by the version-bound library lane
+            # below. Do not also auto-route the project lane into dependency
+            # preparation: that can block an already cached exact snapshot.
+            project_mode = "project-only" if libs else "auto"
+            project_result = self.service.get_project_context(project_path, question, tokens=tokens, limit=limit, expand=expand, library=library, libraries=libraries, ecosystem=ecosystem, version=version, module=module, module_path=module_path, scope=scope, mode=project_mode, response_style=response_style, allow_network=effective_allow_network, mutation_intent=mutation_intent, lookup_queries=lookup_queries)
             routing["dependency_detected"] = bool(getattr(project_result, "dependency_docs", None))
             explicit_library_results = []
             for lib in libs:

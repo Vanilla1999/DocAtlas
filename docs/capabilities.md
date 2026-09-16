@@ -32,7 +32,13 @@ These commands are direct and diagnostic surfaces. Coding agents should use the 
 
 ## Dependency/version evidence
 
-DocAtlas reads supported project manifests and lockfiles to help bind documentation to a dependency version. It must not silently replace an unresolved or ambiguous project version with latest documentation.
+DocAtlas binds dependency documentation to the current resolved version in supported project manifests and lockfiles. After a lockfile changes from version A to B, the next current-project query reads the metadata again: cached documentation A is no longer eligible evidence. DocAtlas must return matching documentation B or fail closed with an actionable preparation/source request. An unresolved or ambiguous version must not silently become `latest`.
+
+Old snapshots need not be deleted: another project or an explicit historical/exact-version query may still use them (`cached != eligible`). The host must re-query after changing dependency state; already delivered conversation context is not automatically revoked.
+
+### Version-transition validation boundary
+
+The stateful regression in `tests/docs/test_dependency_version_transition.py` covers supported Pub lockfile changes between calls, missing/new snapshots, shared-cache isolation and rollback. It does not claim an atomic snapshot when files change during a running request, or universal exact-version support across ecosystems.
 
 Current exact external-source coverage is limited and under evaluation. If a safe source or version is unavailable, the result should request an explicit source or report unsupported coverage.
 

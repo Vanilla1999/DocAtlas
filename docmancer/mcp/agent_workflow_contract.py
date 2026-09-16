@@ -30,6 +30,7 @@ WORKFLOW_POLICY: dict[str, Any] = {
         "for": ["documentation_question", "coding_task", "patch_task"],
         "before_first_edit": True,
         "max_calls_before_first_edit": 1,
+        "call_limit_scope": "per_concrete_question_and_evidence_scope",
     },
     "prepare_docs": {
         "tool": "prepare_docs",
@@ -38,7 +39,7 @@ WORKFLOW_POLICY: dict[str, Any] = {
     },
     "docs_status": {
         "tool": "docs_status",
-        "allowed_when": ["explicit_status_request", "recommended_next_action"],
+        "allowed_when": ["explicit_status_request", "recommended_next_action", "returned_job_id"],
         "discovery": False,
     },
     "scope_planning": {
@@ -59,6 +60,7 @@ WORKFLOW_POLICY: dict[str, Any] = {
         "maximum_lookup_queries": 5,
         "original_question_unchanged": True,
         "preserve_exact_technical_anchors": True,
+        "preserve_conditions_negation_and_comparison_sides": True,
         "compound_or_cross_language_decomposition_required": True,
         "independent_questions_use_separate_calls": True,
         "lookup_queries_must_refine_same_question": True,
@@ -67,8 +69,17 @@ WORKFLOW_POLICY: dict[str, Any] = {
         "partial_coverage_is_not_completeness": True,
         "authorizes_answer_or_edit": False,
     },
+    "version_binding": {
+        "project_query_default": "resolve_current_project_version",
+        "explicit_version": "explicit_exact_or_historical_request",
+        "after_lockfile_change": "requery_current_project_do_not_reuse_previous_context",
+        "cached_previous_version_is_current_evidence": False,
+    },
     "recovery": {
         "after_prepare": "retry_original_get_docs_context_unchanged",
+        "retry_after_prepare_requires": "terminal_success",
+        "after_prepare_job_id": "poll_docs_status",
+        "after_prepare_failure": "inspect_failure_no_automatic_retry",
         "rephrase_retry_limit": 1,
         "rephrase_auto_execute": False,
         "investigation_allowed_when_hard_stop_false": True,

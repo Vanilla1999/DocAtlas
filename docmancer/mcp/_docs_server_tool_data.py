@@ -586,12 +586,13 @@ PUBLIC_ADVERTISED_DESCRIPTIONS: dict[str, str] = {
     ),
     "prepare_docs": (
         "Confirmation-first documentation preparation. Call only from get_docs_context "
-        "recommended_next_action or an explicit user sync, refresh, index, or prefetch request."
+        "recommended_next_action or an explicit user sync, refresh, index, or prefetch request. "
+        "Honor approval requirements. Poll a returned job_id through docs_status; retry the unchanged question only after success. Failure is not readiness."
     ),
     "docs_status": (
         "Read-only project documentation or background-job status. Use when the user explicitly asks about "
         "health, freshness, indexing, or job progress, or when get_docs_context returns docs_status as its "
-        "recommended_next_action."
+        "recommended_next_action, or to poll a returned job_id from prepare_docs. Running is not ready; failed/cancelled jobs do not justify retrying retrieval."
     ),
 }
 
@@ -603,7 +604,7 @@ PUBLIC_ADVERTISED_INPUT_SCHEMAS: dict[str, dict[str, Any]] = {
             "lookup_queries": {"type": ["array", "null"], "maxItems": 5, "uniqueItems": True, "items": {"type": "string", "minLength": 1, "maxLength": 500}, "description": "Retrieval-only, single-concept lookups in the documentation language. Preserve identifiers and split requests with more than three major topics across calls."},
             "project_path": {"type": ["string", "null"]},
             "library": {"type": ["string", "null"]},
-            "version": {"type": ["string", "null"]},
+            "version": {"type": ["string", "null"], "description": "Omit for current project dependency queries so the current lockfile is resolved again. Set only for an explicitly requested exact/historical version; never carry a previous binding forward after a lockfile change."},
             "module_path": {
                 "type": ["string", "null"],
                 "description": "Exact path; always implies module scope.",

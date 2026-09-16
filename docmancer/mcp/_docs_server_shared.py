@@ -15,7 +15,7 @@ _GET_DOCS_CONTEXT_QUESTION_DESCRIPTION = (
     "One concrete question; independent questions use separate calls."
 )
 _GET_DOCS_CONTEXT_LOOKUP_DESCRIPTION = (
-    "Same question only; never batch independent questions."
+    "Same question only; never batch independent questions. Preserve identifiers, versions, conditions, negation and comparison sides; do not invent expected answers."
 )
 
 

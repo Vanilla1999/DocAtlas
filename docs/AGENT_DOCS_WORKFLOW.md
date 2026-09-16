@@ -8,10 +8,16 @@ The advertised runtime `ToolSpec` objects for the default Docs MCP surface are t
 
 1. For documentation questions and coding or patch tasks, call `get_docs_context(project_path=..., question=...)` before the first edit. The `question` is one concrete documentation question, not a surrounding benchmark, evaluation, or documentation-governance meta-question.
 2. If the user provides multiple independent questions, including a benchmark/evaluation list, make separate `get_docs_context` calls. `lookup_queries` may translate, paraphrase, or decompose facets of the same question only; they are not a batch channel for independent questions.
-3. Call `prepare_docs` only from `recommended_next_action`, or when the user explicitly requests documentation lifecycle work such as sync, refresh, index, or prefetch. After preparation succeeds, retry the original `get_docs_context` question unchanged.
-4. Use `docs_status` only for an explicit health, freshness, index, or background-job status request, or when `get_docs_context` returns it as `recommended_next_action`; it is not discovery.
+3. Call `prepare_docs` only from `recommended_next_action`, or when the user explicitly requests documentation lifecycle work such as sync, refresh, index, or prefetch. After preparation succeeds, retry the original `get_docs_context` question unchanged. If a `job_id` is returned, poll `docs_status(action="job", job_id=...)` within a bounded attempt/deadline policy and inspect the terminal result. A running, failed or cancelled job is not readiness; inspect its typed failure/action instead of blindly retrying retrieval.
+4. Use `docs_status` only for an explicit health, freshness, index, or background-job status request, or to poll a returned `job_id`, or when `get_docs_context` returns it as `recommended_next_action`; it is not discovery.
 5. If the result is `docs_context`, answer only claims directly grounded in its returned sources, cite their paths, and do not claim complete or verified coverage; it never authorizes an edit. If the result is `insufficient_evidence`, do not claim documentation support. Follow at most one non-automatic `rephrase_question` recovery for parser/retrieval uncertainty; if it still fails and `hard_stop=false`, continue repository investigation with local source/tests while keeping the documentary claim unproved. Stop before an edit when `hard_stop=true` or when the task explicitly requires a documentary contract that remains unproved.
 6. For a free-form or compound documentation request, the host may provide up to five narrow `lookup_queries`, one concept per lookup, for that same question. `covered_query_ids` and `missing_query_ids` report retrieval coverage; `query_coverage="partial"` must not be presented as complete documentation coverage.
+
+## Formulating a bounded question
+
+Preserve the user's subject, conditions, negation, version and both sides of a comparison. A question about what happens **if** preparation fails is not a request to implement the preparation tool. Keep one coherent comparison/conditional question together; separate genuinely independent questions rather than splitting off its condition. `lookup_queries` may translate or decompose that same question, but must not add an expected answer, a guessed file owner, or an unrelated topic. Never replace the original question with those lookups.
+
+For example, keep `May I use the cached API docs after the lockfile changes?` unchanged; a same-question lookup can be `cached dependency documentation after lockfile version change`, not an invented answer such as `the cache automatically deletes old snapshots`.
 
 ## Answering from retrieved context
 
@@ -28,7 +34,9 @@ invent a reader when the installed host does not expose one.
 
 ## Library and dependency questions
 
-Call `get_docs_context(question=..., library=..., version=...)`.
+Project documentation is repository-owned evidence scoped by `project_path` and optional `module_path`/`scope`. Library documentation is external-source evidence bound to a library identity and version. Call `get_docs_context(question=..., library=..., project_path=...)` for a current project dependency, or `get_docs_context(question=..., library=..., version=...)` for an explicitly requested exact version.
+
+For current project binding, omit `version`: do not copy it from an earlier response. After a lockfile change, re-query before using dependency evidence. An old cached snapshot or conversation answer is not evidence for the new binding. An explicit historical version must not be presented as current without matching repository evidence.
 
 Network access is opt-in. If documentation must be fetched or refreshed, ask the user and then use the exact `prepare_docs` action returned by `get_docs_context`.
 

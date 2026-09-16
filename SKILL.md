@@ -49,8 +49,10 @@ For an installed Docs MCP, use the three-tool contract:
 3. If it returns `recommended_next_action`, follow only that typed action. Ask for confirmation before network work.
 4. For an unknown library source, use the returned `prepare_docs(action="discover_library_docs", ...)` action; review its registry-derived candidates before prefetching one.
 5. If a candidate's authority, version binding, or scope is uncertain, call bounded `prepare_docs(action="inspect_docs_target", target=..., max_pages=3)`. Review its evidence and v2 manifest proposal, ask for confirmation, save and validate the manifest, then use `prefetch_docs_manifest`.
-6. Retry the original concrete `get_docs_context` question unchanged after preparation. Do not persist the task question in a docs manifest.
-7. Use `docs_status` only for an explicit health, freshness, index, or job-status request.
+6. If preparation returns a `job_id`, poll `docs_status(action="job", job_id=...)` until terminal success. A running, failed or cancelled job is not ready. Retry the original concrete `get_docs_context` question unchanged only after success. Do not persist the task question in a docs manifest.
+7. Use `docs_status` for an explicit health, freshness, index, or job-status request, or to poll a returned preparation job.
+
+Preserve conditions, negation, versions and both comparison sides in questions and lookups. For a current project dependency, pass `project_path` and omit `version` unless the user explicitly requests an exact/historical version. Re-query after a lockfile change rather than reusing old evidence.
 
 Do not begin the MCP workflow with `doc-atlas list`, raw CLI ingestion, WebFetch, or speculative `prepare_docs`. Registered sources are registry-owned.
 
