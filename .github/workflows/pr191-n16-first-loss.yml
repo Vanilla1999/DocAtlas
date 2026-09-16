@@ -31,9 +31,7 @@ jobs:
           deps=[x for x in d['project']['dependencies'] if not x.lower().startswith('tiktoken')]+d['project']['optional-dependencies']['dev']
           subprocess.check_call([sys.executable,'-m','pip','install','-q',*deps])
           PY
-      - name: Apply chain candidate fix in diagnostic workspace
-        run: python .github/pr191_chain_tdd.py fix
-      - name: Trace project-docs result, context pack, and public output
+      - name: Trace canonical retrieval lane
         run: |
           python - <<'PY'
           import os,tempfile
@@ -41,34 +39,34 @@ jobs:
           from docmancer.agent import DocmancerAgent
           from docmancer.core.config import DocmancerConfig
           from docmancer.docs.application.docs_job_service import DocsJobTracker
-          from docmancer.docs.application.evidence_requirements import build_requirements
-          from docmancer.docs.application._project_context_service_shared import project_context_pack
+          from docmancer.docs.domain.lifecycle_policy import lifecycle_filters_for_intent
           from docmancer.docs.registry import LibraryRegistry
           from docmancer.docs.service import LibraryDocsService
-          from docmancer.mcp.docs_server import call_docs_tool_payload
 
-          q='Что должен сделать агент, если get_docs_context вернул недостаточно доказательств для ответа по документации проекта?'
+          q='insufficient_evidence documentation support workflow'
           root=Path('.').resolve()
           with tempfile.TemporaryDirectory() as td:
               os.environ['DOCATLAS_HOME']=td
               c=DocmancerConfig(); c.index.db_path=str(Path(td)/'db.sqlite'); c.index.extracted_dir=str(Path(td)/'extracted')
-              svc=LibraryDocsService(config=c,config_source='explicit',registry=LibraryRegistry(c.index.db_path),agent=DocmancerAgent(config=c),job_tracker=DocsJobTracker())
+              agent=DocmancerAgent(config=c)
+              svc=LibraryDocsService(config=c,config_source='explicit',registry=LibraryRegistry(c.index.db_path),agent=agent,job_tracker=DocsJobTracker())
               assert svc.sync_project_docs(str(root),with_vectors=False).status=='success'
-              req=build_requirements(q,profile='project_docs_answer')
-              result=svc.get_project_docs(str(root),q,tokens=800,limit=3,scope='project',requirements=req)
-              print('PROJECT_DOCS_STATUS',result.status,'COUNT',len(result.results))
-              for i,item in enumerate(result.results):
-                  m=item.metadata or {}
-                  print('RESULT',i,'path=',item.path,'len=',len(item.content),'tail=',repr(item.content[-180:]))
-                  print(' META span=',m.get('char_span'),'atom=',m.get('atom_id'),'stable=',m.get('stable_chunk_id'),'reassembled=',m.get('reassembled_from_stable_chunk_ids'),'qids=',m.get('retrieval_query_ids'))
-              pack=project_context_pack(question=q,project_docs=result,dependency_docs=None)
-              print('PACK_COUNT',len(pack))
-              for i,item in enumerate(pack):
-                  print('PACK',i,'path=',item.get('path'),'content_len=',len(str(item.get('content') or '')),'snippet_len=',len(str(item.get('snippet') or '')),'surround_len=',len(str(item.get('surrounding_context') or '')))
-                  print(' CONTENT_TAIL',repr(str(item.get('content') or '')[-180:]))
-                  print(' SNIPPET',repr(item.get('snippet')))
-              p=call_docs_tool_payload('get_docs_context',{'question':q,'project_path':str(root),'scope':'all'},svc)
-              print('PUBLIC tokens=',p.get('estimated_tokens'),'quality=',p.get('context_quality'))
-              for i,s in enumerate(p.get('sources') or []):
-                  print('PUBLIC',i,s.get('path_or_url'),'len=',len(str(s.get('snippet') or '')),'tail=',repr(str(s.get('snippet') or '')[-180:]))
+              identity=svc.project_docs._repository_identity(root)
+              filters={'project_path':str(root),'project_identity':identity,'source_class':'project_file',**lifecycle_filters_for_intent('current')}
+              print('IDENTITY',identity)
+              for expand in ('none','adjacent','page'):
+                  rows=agent.query(q,limit=4,budget=800,expand=expand,filters=filters)
+                  print('\nEXPAND',expand,'COUNT',len(rows))
+                  for i,row in enumerate(rows):
+                      m=row.metadata or {}
+                      print('ROW',i,'src=',row.source,'idx=',row.chunk_index,'score=',row.score,'len=',len(row.text),'span=',m.get('char_span'),'atom=',m.get('atom_id'),'stable=',m.get('stable_chunk_id'))
+                      if 'AGENT_DOCS_WORKFLOW' in str(m.get('project_doc_path') or row.source):
+                          print(' AGENT_TEXT',repr(row.text))
+              # Show all indexed sections for this source directly, without a new semantic query.
+              stored=agent.store.search_sections(filters={'project_identity':identity,'project_doc_path':'docs/AGENT_DOCS_WORKFLOW.md'},limit=100)
+              print('\nSTORED',len(stored))
+              for i,row in enumerate(stored):
+                  m=row.metadata or {}
+                  if m.get('atom_id')=='atom-20d714bdb28eff58e1957d8e919b3956' or (m.get('char_span') and 900 <= m['char_span'][0] <= 2600):
+                      print('STORED_ROW',i,'idx=',row.chunk_index,'len=',len(row.text),'span=',m.get('char_span'),'atom=',m.get('atom_id'),'stable=',m.get('stable_chunk_id'),'text=',repr(row.text))
           PY
