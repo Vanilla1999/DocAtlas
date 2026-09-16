@@ -1,0 +1,38 @@
+name: Local validation source export
+on:
+  push:
+    branches: [fix/version-evidence-skill-validation]
+    paths: [.github/workflows/local-validation-export.yml]
+permissions:
+  contents: read
+jobs:
+  export:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - name: Export source and offline dependency wheels
+        shell: bash
+        run: |
+          mkdir -p /tmp/docatlas-export/wheels
+          git rev-parse HEAD > /tmp/docatlas-export/HEAD.txt
+          git archive --format=tar.gz HEAD > /tmp/docatlas-export/source.tar.gz
+          python - <<'PY'
+          import pathlib, tomllib
+          data = tomllib.loads(pathlib.Path('pyproject.toml').read_text())
+          deps = [d for d in data['project']['dependencies'] if not d.startswith(('tiktoken', 'fastembed'))]
+          deps += data['project']['optional-dependencies']['dev']
+          pathlib.Path('/tmp/docatlas-export/requirements.txt').write_text('\n'.join(deps) + '\n')
+          PY
+          python -m pip download --only-binary=:all: -r /tmp/docatlas-export/requirements.txt -d /tmp/docatlas-export/wheels
+      - uses: actions/upload-artifact@v4
+        with:
+          name: docatlas-local-validation-source
+          path: /tmp/docatlas-export
+          retention-days: 3
