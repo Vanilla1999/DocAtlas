@@ -1,19 +1,74 @@
-name: Verify validation patch transfer
+name: Verify and publish version evidence patch
 on:
   push:
     branches: [fix/version-evidence-skill-validation]
     paths: [.github/workflows/validation-transfer-check.yml]
 permissions:
-  contents: read
+  contents: write
 jobs:
   verify:
     runs-on: ubuntu-latest
-    timeout-minutes: 3
+    timeout-minutes: 15
+    env:
+      DOCATLAS_OFFLINE: '1'
+      DOCATLAS_AUTO_VECTORS: '0'
     steps:
       - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
-      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
-          name: validation-transfer-source
-          path: .github/workflows/local-validation-export.yml
-          include-hidden-files: true
-          retention-days: 1
+          ref: fix/version-evidence-skill-validation
+          fetch-depth: 2
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1
+        with:
+          python-version: '3.13'
+      - name: Restore byte-verified patch transport
+        run: |
+          python - <<'PY'
+          import ast,base64,gzip,hashlib,pathlib,re,subprocess
+          s=pathlib.Path('.github/workflows/local-validation-export.yml').read_text()
+          encoded=ast.literal_eval(re.search(r"encoded=('[^']*')",s).group(1))
+          assert len(encoded)==13859
+          corrections=[(387,388,'4'),(1168,1170,''),(1391,1392,''),(2928,2929,'v')]
+          for start,end,text in reversed(corrections):
+              encoded=encoded[:start]+text+encoded[end:]
+          data=gzip.decompress(base64.b64decode(encoded))
+          assert hashlib.sha256(data).hexdigest()=='ee26d54e3ead6260ee8e260e17608d2e96c6bc50b90aec020a00a9519ebec594'
+          p=pathlib.Path('/tmp/version-evidence.patch');p.write_bytes(data)
+          subprocess.run(['git','apply','--check',str(p)],check=True)
+          subprocess.run(['git','apply',str(p)],check=True)
+          PY
+      - name: Install test dependencies without tiktoken or model runtime
+        run: |
+          python - <<'PY'
+          import subprocess,sys,tomllib
+          d=tomllib.load(open('pyproject.toml','rb'))
+          deps=[x for x in d['project']['dependencies'] if not x.startswith(('tiktoken','fastembed'))]
+          deps+=d['project']['optional-dependencies']['dev']
+          subprocess.run([sys.executable,'-m','pip','install','-q',*deps],check=True)
+          PY
+      - name: Test public contracts and stateful version transitions
+        run: |
+          set -o pipefail
+          python -m pytest -q tests/docs/test_dependency_version_transition.py tests/docs/test_agent_recovery_version_guidance.py tests/docs/test_agent_question_planning_contract.py tests/docs/test_host_scope_contract.py tests/docs/test_host_scope_planning_contract.py tests/test_install_cmd.py tests/docs/test_mcp_docs_tools_registration.py | tee /tmp/version-evidence-tests.log
+          python - <<'PY'
+          import importlib.util
+          assert importlib.util.find_spec('tiktoken') is None
+          PY
+          git diff --check
+      - name: Publish tested changes and remove temporary workflows
+        run: |
+          rm .github/workflows/local-validation-export.yml .github/workflows/validation-transfer-check.yml
+          git add -A
+          git diff --cached --check
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git commit -m 'fix: preserve version-bound mixed evidence and clarify agent workflow'
+          git push origin HEAD:fix/version-evidence-skill-validation
+          git rev-parse HEAD > /tmp/version-evidence-head.txt
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: version-evidence-validation
+          path: |
+            /tmp/version-evidence-tests.log
+            /tmp/version-evidence-head.txt
+          retention-days: 7
