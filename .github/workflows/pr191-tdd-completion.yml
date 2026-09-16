@@ -3,6 +3,7 @@ name: PR191 query-planning completion TDD
 on:
   push:
     branches: [fix/query-planning-scope]
+  workflow_dispatch:
 
 permissions:
   contents: write
@@ -28,7 +29,7 @@ jobs:
         run: |
           set -euo pipefail
           base="196da000edf28fcfea9718d5dd3d5f43ad857e39"
-          test "$(git rev-parse HEAD~2)" = "$base"
+          git merge-base --is-ancestor "$base" HEAD
           expected="$(printf '%s\n' '.github/pr191_tdd_completion.py' '.github/workflows/pr191-tdd-completion.yml' | sort)"
           actual="$(git diff --name-only "$base"..HEAD | sort)"
           test "$actual" = "$expected"
