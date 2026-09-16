@@ -99,6 +99,7 @@ jobs:
                   or 'repository files such as readme/docs/wiki/adr' in a03
                   or 'sync_project_docs' in a03
                   or 'project reads return' in a03
+                  or 'retrieves current repository-owned documentation' in a03
               )
               external_side = (
                   'external dependency question' in a03
@@ -137,13 +138,13 @@ jobs:
           assert (by['N16'].get('context_quality') or {}).get('status')!='checked'
           assert (by['C01'].get('context_quality') or {}).get('status')=='checked'
           assert (by['C02'].get('context_quality') or {}).get('status')=='checked'
-          Path(os.environ['RUNNER_TEMP'],'pr191-final-31-v3.json').write_text(json.dumps({'results':rows},ensure_ascii=False,indent=2),encoding='utf-8')
+          Path(os.environ['RUNNER_TEMP'],'pr191-final-31-v4.json').write_text(json.dumps({'results':rows},ensure_ascii=False,indent=2),encoding='utf-8')
           PY
       - name: Upload final 31
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
-          name: pr191-final-31-after-residuals-v3
-          path: ${{ runner.temp }}/pr191-final-31-v3.json
+          name: pr191-final-31-after-residuals-v4
+          path: ${{ runner.temp }}/pr191-final-31-v4.json
           if-no-files-found: error
           retention-days: 14
       - name: Publish tested residual fix and clean staging
