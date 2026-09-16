@@ -57,12 +57,12 @@ jobs:
               print('PLAN')
               for x in plan.queries: print(x.query_id,x.origin,x.text,x.coverage_required)
               result=svc.project_docs.query_project_docs(str(root),q,requirements=req,documentation_query_plan=plan)
-              print('RESULTS',len(result.results))
-              for i,item in enumerate(result.results[:12]):
+              print('RESULTS',len(result))
+              for i,item in enumerate(result[:20]):
                   m=item.metadata or {}
-                  print('\nR',i,'path=',item.path,'len=',len(item.content),'section=',item.heading_path,'span=',m.get('char_span'),'atom=',m.get('atom_id'),'atype=',m.get('atom_type'))
+                  print('\nR',i,'src=',item.source,'len=',len(item.text),'span=',m.get('char_span'),'section=',m.get('heading_path'),'atom=',m.get('atom_id'),'atype=',m.get('atom_type'))
                   print('ids=',m.get('retrieval_query_ids'))
-                  print(repr(item.content[:1400]))
+                  print(repr(item.text[:1600]))
               p=call_docs_tool_payload('get_docs_context',{'question':q,'project_path':str(root),'scope':'all'},svc)
               print('\nPUBLIC',p.get('estimated_tokens'),p.get('context_quality'))
               for s in p.get('sources') or []:
