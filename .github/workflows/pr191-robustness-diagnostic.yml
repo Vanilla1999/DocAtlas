@@ -1,0 +1,76 @@
+name: PR191 residual paraphrase diagnostic
+
+on:
+  push:
+    branches: [fix/query-planning-scope]
+
+permissions:
+  contents: read
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
+  DOCATLAS_OFFLINE: "1"
+  DOCATLAS_AUTO_VECTORS: "0"
+
+jobs:
+  trace:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+        with:
+          ref: fix/query-planning-scope
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1
+        with:
+          python-version: "3.12"
+      - name: Install dependencies except tiktoken
+        run: |
+          python - <<'PY'
+          import subprocess,sys,tomllib
+          d=tomllib.loads(open('pyproject.toml','rb').read().decode())
+          deps=[x for x in d['project']['dependencies'] if not x.lower().startswith('tiktoken')]+d['project']['optional-dependencies']['dev']
+          subprocess.check_call([sys.executable,'-m','pip','install','-q',*deps])
+          PY
+      - name: Trace residual questions
+        run: |
+          python - <<'PY'
+          import os,tempfile
+          from pathlib import Path
+          from docmancer.agent import DocmancerAgent
+          from docmancer.core.config import DocmancerConfig
+          from docmancer.docs.application.docs_job_service import DocsJobTracker
+          from docmancer.docs.application.evidence_selection import build_requirements
+          from docmancer.docs.domain.documentation_query_plan import build_documentation_query_plan
+          from docmancer.docs.domain.project_retrieval_intent import build_project_retrieval_aliases
+          from docmancer.docs.registry import LibraryRegistry
+          from docmancer.docs.service import LibraryDocsService
+          from docmancer.mcp.docs_server import call_docs_tool_payload
+
+          cases={
+            'A01-EN':'The documentation preparation task finished with an error. Should I repeat my original question now, or take another step first?',
+            'A02-RU':'Ноутбук не подключён к сети, а документация этой зависимости никогда не кэшировалась. Может ли обычный запрос документации загрузить её?',
+            'A03-RU':'Чем поиск по собственной документации этого репозитория отличается от поиска по документации внешнего пакета?',
+          }
+          root=Path('.').resolve()
+          with tempfile.TemporaryDirectory() as td:
+              os.environ['DOCATLAS_HOME']=td
+              c=DocmancerConfig(); c.index.db_path=str(Path(td)/'db.sqlite'); c.index.extracted_dir=str(Path(td)/'extracted')
+              svc=LibraryDocsService(config=c,config_source='explicit',registry=LibraryRegistry(c.index.db_path),agent=DocmancerAgent(config=c),job_tracker=DocsJobTracker())
+              assert svc.sync_project_docs(str(root),with_vectors=False).status=='success'
+              for cid,q in cases.items():
+                  print('\n===',cid,'===')
+                  print('ALIASES')
+                  for a in build_project_retrieval_aliases(q): print(a.intent_id,repr(a.text),a.force_context_only)
+                  req=build_requirements(q,profile='project_docs_answer')
+                  plan=build_documentation_query_plan(q,requirements=req)
+                  print('PLAN')
+                  for x in plan.queries: print(x.query_id,x.origin,repr(x.text),x.coverage_required)
+                  rows=svc.project_docs.query_project_docs(str(root),q,requirements=req,documentation_query_plan=plan)
+                  print('TOP',len(rows))
+                  for i,item in enumerate(rows[:12]):
+                      m=item.metadata or {}
+                      print('R',i,item.source,m.get('heading_path'),m.get('retrieval_query_ids'),repr(item.text[:600]))
+                  p=call_docs_tool_payload('get_docs_context',{'question':q,'project_path':str(root),'scope':'all'},svc)
+                  print('PUBLIC',p.get('estimated_tokens'),p.get('context_quality'))
+                  for s in p.get('sources') or []: print('S',s.get('path_or_url'),s.get('section'),repr(s.get('snippet')))
+          PY
