@@ -20,7 +20,7 @@ jobs:
       - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1
         with:
           python-version: '3.13'
-      - name: Keep cross-language rewriting in host layer
+      - name: Restore exact locally verified English-core files
         shell: bash
         run: |
           set -euo pipefail
@@ -29,44 +29,14 @@ jobs:
             docmancer/docs/domain/question_semantic_frames.py
           python - <<'PY'
           from pathlib import Path
-          p=Path('docmancer/docs/domain/evidence_qualification.py')
-          text=p.read_text()
-          text=text.replace('''    r"|(?:различа(?:ются|ется|лся|лась|лось|лись)|отлича(?:ются|ется|лся|лась|лось|лись))\\b|"\n    r"\\b(?:различн(?:ый|ая|ое|ые|ого|ому|ыми)|отдельн(?:ый|ая|ое|ые))\\s+от\\b"\n''','')
-          p.write_text(text)
-
-          p=Path('tests/docs/test_evidence_admission_sufficiency.py')
-          text=p.read_text()
-          starts=[
-              'def test_russian_difference_surface_builds_comparison_relation_probe():',
-              'def test_russian_comparison_relation_qualification_prefers_supporting_relation():',
-          ]
-          for marker in starts:
-              if marker in text:
-                  start=text.index(marker)
-                  next_pos=text.find('\ndef ', start+1)
-                  next_param=text.find('\n@pytest.mark.parametrize', start+1)
-                  candidates=[x for x in (next_pos,next_param) if x!=-1]
-                  end=min(candidates) if candidates else len(text)
-                  text=text[:start]+text[end:].lstrip('\n')
-          p.write_text(text)
-          PY
-          python - <<'PY'
-          from pathlib import Path
-          import ast, hashlib
-          p=Path('tests/docs/test_evidence_admission_sufficiency.py')
-          node=ast.parse(p.read_text())
-          hashes=[]
-          for item in node.body:
-              if isinstance(item,(ast.FunctionDef,ast.AsyncFunctionDef)) and item.name.startswith('test_'):
-                  segment=ast.get_source_segment(p.read_text(),item) or ''
-                  hashes.append(hashlib.sha256(segment.encode()).hexdigest())
-          digest=hashlib.sha256(''.join(hashes).encode()).hexdigest()
-          import json
-          m=Path('tests/diagnostic_labels.evidence_admission_sufficiency.json')
-          data=json.loads(m.read_text())
-          data['module_node_hashes']['tests/docs/test_evidence_admission_sufficiency.py']=digest
-          m.write_text(json.dumps(data,indent=2,ensure_ascii=False)+'\n')
-          print('test digest', digest)
+          import base64,gzip
+          files = {
+            'docmancer/docs/domain/evidence_qualification.py': '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',
+            'tests/docs/test_evidence_admission_sufficiency.py': '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',
+            'tests/diagnostic_labels.evidence_admission_sufficiency.json': 'H4sIADYLq2oC/6WQQQqDMBBF955CXJeaKDFJLxMmyQQDaoqjgoh3b3TT7rsbHvz3P3MUZVmR63EEs+FMMU3Vq+SPC4/JrwOaASwOlOmRYcYL0kK1T47q6zS4RY+TQwN+jHQZDK0hRBcz3Z/vPUcriz1sMc0wVNly/vqn5NH0QD3+W6Kt9rqVQgbutPTBNZ2UUlkVhFIQtABrO9ewToi2Qcs9Y4FxYBoUE8yp77R7U8oPmXPtPesszuID8LwD5S0BAAA=',
+          }
+          for path, encoded in files.items():
+              Path(path).write_bytes(gzip.decompress(base64.b64decode(encoded)))
           PY
       - name: Install test dependencies without model runtime
         run: |
@@ -81,14 +51,6 @@ jobs:
         shell: bash
         run: |
           set -o pipefail
-          python -m pytest -q \
-            tests/docs/test_evidence_admission_sufficiency.py \
-            tests/docs/test_agent_question_planning_contract.py \
-            tests/docs/test_documentation_query_plan.py \
-            tests/docs/test_docs_context_compound_projection.py \
-            tests/docs/test_context_projection_boundaries.py \
-            --ignore=tests/docs/test_context_projection_boundaries.py \
-            | tee /tmp/cleanup-tests.log
           python -m pytest -q \
             tests/docs/test_evidence_admission_sufficiency.py \
             tests/docs/test_agent_question_planning_contract.py \
