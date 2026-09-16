@@ -26,7 +26,7 @@ Agent workflow:
             "type": "object",
             "properties": {
                 "question": {"type": "string"},
-                "lookup_queries": {"type": ["array", "null"], "maxItems": 5, "uniqueItems": True, "items": {"type": "string", "minLength": 1, "maxLength": 500}, "description": "Optional bounded single-concept project-documentation lookups used only to improve retrieval recall. Use the documentation language, preserve exact identifiers, and put only one topic in each lookup."},
+                "lookup_queries": {"type": ["array", "null"], "maxItems": 5, "uniqueItems": True, "items": {"type": "string", "minLength": 1, "maxLength": 500}, "description": "Optional same-question retrieval hypotheses. For cross-language, comparison, conditional, or multiple dependent facets, use 1–3 short lookups in the documentation language; simple single-facet questions need none. Keep the original question unchanged; preserve exact identifiers, versions, conditions, negation and comparison sides; never invent the expected answer or use guessed source names."},
                 "project_path": {"type": ["string", "null"]},
                 "library": {"type": ["string", "null"]},
                 "version": {"type": ["string", "null"]},
@@ -601,7 +601,7 @@ PUBLIC_ADVERTISED_INPUT_SCHEMAS: dict[str, dict[str, Any]] = {
         "type": "object",
         "properties": {
             "question": {"type": "string", "minLength": 1},
-            "lookup_queries": {"type": ["array", "null"], "maxItems": 5, "uniqueItems": True, "items": {"type": "string", "minLength": 1, "maxLength": 500}, "description": "Retrieval-only, single-concept lookups in the documentation language. Preserve identifiers and split requests with more than three major topics across calls."},
+            "lookup_queries": {"type": ["array", "null"], "maxItems": 5, "uniqueItems": True, "items": {"type": "string", "minLength": 1, "maxLength": 500}, "description": "Retrieval-only hypotheses for the same question. For cross-language, comparison, conditional, or multiple dependent facets, use 1–3 short lookups in the documentation language; simple single-facet questions need none. Keep the original question unchanged; preserve exact identifiers, versions, conditions, negation and comparison sides; never invent the expected answer or use guessed source names. Independent questions use separate calls."},
             "project_path": {"type": ["string", "null"]},
             "library": {"type": ["string", "null"]},
             "version": {"type": ["string", "null"], "description": "Omit for current project dependency queries so the current lockfile is resolved again. Set only for an explicitly requested exact/historical version; never carry a previous binding forward after a lockfile change."},

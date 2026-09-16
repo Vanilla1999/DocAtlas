@@ -83,6 +83,7 @@ def match_comparison_frame(question: str) -> ComparisonFrame | None:
         r"(.+?)\s+vs\.?\s+(.+?)[,:]?\s+what\s+differs",
         r"compare\s+(.+?)\s+(?:with|to|and)\s+(.+)",
         r"чем\s+(.+?)\s+отличается\s+от\s+(.+)",
+        r"чем\s+отличается\s+(.+?)\s+от\s+(.+)",
         r"сравни\s+(.+?)\s+(?:с|и)\s+(.+)",
     )
     for pattern in patterns:

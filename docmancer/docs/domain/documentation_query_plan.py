@@ -7,6 +7,7 @@ import re
 from typing import Literal
 
 from docmancer.docs.domain.question_frame_core import split_question_clauses
+from docmancer.docs.domain.question_semantic_frames import match_comparison_frame
 from docmancer.docs.domain.question_component_rewrite import rewrite_component
 from docmancer.docs.domain.project_retrieval_intent import (
     build_project_retrieval_aliases,
@@ -322,6 +323,15 @@ def _subject_relation_groups(question: str) -> tuple[str, ...]:
             value = " ".join(part for part in (side, axis_text) if part).strip()
             if value and supplemental_query_is_useful(value):
                 groups.append(value[:500])
+
+    if comparison is None:
+        frame = match_comparison_frame(question)
+        if frame is not None:
+            for left_value in side_alternatives(frame.left):
+                for right_value in side_alternatives(frame.right):
+                    value = f"{left_value} {right_value} different separate".strip()
+                    if value and supplemental_query_is_useful(value):
+                        groups.append(value[:500])
 
     # Passive state alternatives are common in conditional questions. Preserve
     # the bounded subject phrase (not just its first noun) plus every user-named

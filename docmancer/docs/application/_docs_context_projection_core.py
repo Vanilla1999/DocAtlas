@@ -573,6 +573,38 @@ def project_docs_context(
         )
         for source in payload["sources"]
     }
+    if (
+        fallback_ids
+        and not _allow_context_hints
+        and len(payload["sources"]) < MAX_DOCS_SOURCES
+    ):
+        # A safe retrieval hint is a read-only supplement, not a replacement
+        # for already admitted public evidence. Re-run the bounded projector
+        # with hints enabled, but accept that packet only when it preserves
+        # every primary visible evidence identity and adds a new source.
+        primary_diagnostics = projection_diagnostics
+        primary_ids = {
+            str(source.get("evidence_id") or "")
+            for source in payload["sources"]
+            if source.get("evidence_id")
+        }
+        hinted_payload, hinted_snapshot = project_docs_context(
+            retrieval=retrieval,
+            max_tokens=max_tokens,
+            selection_diagnostics=selection_diagnostics,
+            _allow_context_hints=True,
+        )
+        hinted_ids = {
+            str(source.get("evidence_id") or "")
+            for source in hinted_payload.get("sources") or ()
+            if source.get("evidence_id")
+        }
+        hinted_diagnostics = retrieval["retrieval_diagnostics"]["docs_context_projection"]
+        hinted_diagnostics["primary_attempt"] = primary_diagnostics
+        if primary_ids < hinted_ids:
+            return hinted_payload, hinted_snapshot
+        primary_diagnostics["hint_attempt"] = hinted_diagnostics
+        retrieval["retrieval_diagnostics"]["docs_context_projection"] = primary_diagnostics
     if root := retrieval.get("_source_continuation_project_root"):
         attach_source_continuation_locators(payload, snapshot, root=root, max_tokens=max_tokens)
     return payload, snapshot

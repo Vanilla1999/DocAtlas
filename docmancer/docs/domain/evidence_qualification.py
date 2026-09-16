@@ -13,6 +13,33 @@ from docmancer.docs.domain.project_answer_contract import LifecycleIntent
 CoverageKind = Literal["direct", "derived"]
 
 
+_COMPARISON_RELATION_MARKERS = frozenset({"different", "separate"})
+_VISIBLE_COMPARISON_RELATION_RE = re.compile(
+    r"(?:"
+    r"\b(?:different|differs?|differed|differing|separate|separately|distinct|distinctly|whereas)\b|"
+    r"\brather\s+than\b|\binstead\s+of\b|\bnot\s+the\s+same\b|"
+    r"\bno\s+distinction\b|"
+    r"\b(?:not|never)\b[^.!?\n]{0,80}\b(?:proof|enough|sufficient|same|equivalent)\b|"
+    r"\bbut\b[^.!?\n]{0,80}\b(?:not|never)\b[^.!?\n]{0,60}\b(?:prove|proof|enough|sufficient|same|equivalent)\b|"
+    r"\b(?:тогда\s+как|в\s+отличие\s+от|отлича[а-яё]*|различа[а-яё]*|различн[а-яё]*)\b|"
+    r"\bне\b[^.!?\n]{0,80}\b(?:достаточн[а-яё]*|доказ[а-яё]*|одинаков[а-яё]*|эквивалентн[а-яё]*)\b|"
+    r"\bно\b[^.!?\n]{0,80}\bне\b[^.!?\n]{0,60}\b(?:доказ[а-яё]*|достаточн[а-яё]*|одинаков[а-яё]*|эквивалентн[а-яё]*)\b"
+    r")",
+    re.I,
+)
+
+
+def _comparison_relation_probe(query_id: str, query_text: str) -> bool:
+    if not query_id.startswith("query-relation-"):
+        return False
+    tokens = tuple(re.findall(r"[A-Za-z]+", query_text.casefold()))
+    return len(tokens) >= 2 and tuple(tokens[-2:]) == ("different", "separate")
+
+
+def _visible_comparison_relation(text: str) -> bool:
+    return _VISIBLE_COMPARISON_RELATION_RE.search(text) is not None
+
+
 @dataclass(frozen=True, slots=True)
 class EvidenceQualification:
     qualified: bool
@@ -130,6 +157,9 @@ def qualify_evidence(
     normalized_headings = "\n".join(heading_lines).casefold()
 
     relation_text = str(probe.get("query_text") or "").casefold()
+    comparison_relation = _comparison_relation_probe(query_id, relation_text)
+    if comparison_relation and not _visible_comparison_relation(normalized_evidence):
+        return _rejected(result, "missing_visible_comparison_relation")
     if query_id.startswith("query-relation-"):
         negated_state = re.search(
             r"(?<!\w)(?:not|without|never|no)(?!\w)\s+([a-z][a-z0-9_-]{2,})\s*$",
@@ -168,6 +198,8 @@ def qualify_evidence(
                 r"[A-Za-zА-Яа-яЁё0-9_.-]{4,}", str(probe.get("query_text") or ""),
             )
         ))
+    if comparison_relation:
+        terms = tuple(term for term in terms if term not in _COMPARISON_RELATION_MARKERS)
     if not terms:
         return _rejected(result, "missing_visible_query_terms")
 
@@ -212,7 +244,11 @@ def qualify_evidence(
         if not _visible_term_present(str(value).casefold(), exact_evidence, exact=True)
     )
     ratio = len(matched) / len(terms)
-    required_ratio = 1.0 if len(terms) == 1 else 0.4 if exact_terms else 0.5
+    required_ratio = (
+        1.0 if len(terms) == 1
+        else 0.4 if exact_terms or comparison_relation
+        else 0.5
+    )
     qualified = bool(matched) and ratio >= required_ratio and not missing_exact
     reason = "visible_fields" if qualified else "insufficient_visible_match"
     result.update({

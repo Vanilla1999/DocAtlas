@@ -60,3 +60,64 @@ def test_installed_agent_contract_repeats_question_grouping_rule() -> None:
     assert "separate `get_docs_context` calls" in text
     assert "same question" in text
     assert "documentation-governance meta-question" in text
+
+
+def test_agent_contract_has_explicit_lookup_decomposition_triggers_and_bounds() -> None:
+    contract = public_agent_contract()
+    lookup = contract["workflow"]["free_form_lookup"]
+
+    assert lookup["recommended_lookup_query_min"] == 1
+    assert lookup["recommended_lookup_query_max"] == 3
+    assert lookup["simple_single_facet_lookup_required"] is False
+    assert set(lookup["decomposition_triggers"]) == {
+        "cross_language", "comparison", "conditional", "multiple_dependent_facets",
+    }
+    assert lookup["original_question_unchanged"] is True
+    assert lookup["preserve_exact_technical_anchors"] is True
+    assert lookup["preserve_conditions_negation_and_comparison_sides"] is True
+    assert lookup["expected_answer_in_lookup_allowed"] is False
+    assert lookup["guessed_source_names_in_lookup_allowed"] is False
+
+
+def test_rendered_agent_contract_teaches_bounded_semantic_decomposition_without_rewrite() -> None:
+    from docmancer.cli.commands import _get_template_content
+
+    canonical = files("docmancer.templates").joinpath("agent_contract.md").read_text(
+        encoding="utf-8"
+    )
+    rendered = _get_template_content("agent_contract.md")
+    for text in (canonical, rendered):
+        lowered = text.casefold()
+        assert "1–3" in text or "1-3" in text
+        assert "cross-language" in lowered
+        assert "comparison" in lowered
+        assert "conditional" in lowered
+        assert "documentation language" in lowered
+        assert "simple single-facet" in lowered
+        assert "original question unchanged" in lowered
+        assert "exact identifiers" in lowered
+        assert "versions" in lowered
+        assert "negation" in lowered
+        assert "comparison sides" in lowered
+        assert "expected answer" in lowered
+        assert "guessed source" in lowered
+
+
+def test_runtime_lookup_schema_teaches_when_to_add_lookups_without_changing_original() -> None:
+    tool = _get_docs_context_tool()
+    description = str(tool["inputSchema"]["properties"]["lookup_queries"]["description"])
+    lowered = description.casefold()
+
+    assert "1–3" in description or "1-3" in description
+    assert "cross-language" in lowered
+    assert "comparison" in lowered
+    assert "conditional" in lowered
+    assert "documentation language" in lowered
+    assert "simple single-facet" in lowered
+    assert "original question" in lowered and "unchanged" in lowered
+    assert "exact identifiers" in lowered
+    assert "versions" in lowered
+    assert "negation" in lowered
+    assert "comparison sides" in lowered
+    assert "expected answer" in lowered
+    assert "guessed source" in lowered

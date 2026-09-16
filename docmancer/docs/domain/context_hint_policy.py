@@ -20,7 +20,7 @@ def fallback_context_query_ids(plan: dict[str, Any], retrieval: dict[str, Any], 
         return set()
     if (retrieval.get('hard_stop') or not plan.get('broad_context_only')
             or plan.get('_component_contract') or plan.get('explicit_paths')
-            or any(q.get('origin') in {'exact_anchor', 'exact_path', 'host_lookup'} for q in queries)):
+            or any(q.get('origin') == 'exact_path' for q in queries)):
         return set()
     # A qualified full window may not survive projection into the DTO budget.
     # Keep partial alternatives available until admission; the projector retries
