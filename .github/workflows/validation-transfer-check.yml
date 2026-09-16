@@ -1,0 +1,19 @@
+name: Verify validation patch transfer
+on:
+  push:
+    branches: [fix/version-evidence-skill-validation]
+    paths: [.github/workflows/validation-transfer-check.yml]
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: validation-transfer-source
+          path: .github/workflows/local-validation-export.yml
+          include-hidden-files: true
+          retention-days: 1
