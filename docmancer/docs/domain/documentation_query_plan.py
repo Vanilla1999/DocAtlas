@@ -177,6 +177,25 @@ def _can_derive_original_from_intent(question: str, aliases: tuple[object, ...])
     return all(bool(getattr(alias, "force_context_only", False)) for alias in aliases)
 
 
+
+_REVIEWED_CONDITIONAL_TROUBLESHOOTING_RE = re.compile(
+    r"(?:"
+    r"(?:what\s+should\s+i\s+check|what\s+do\s+i\s+check|how\s+(?:do|should)\s+i\s+troubleshoot)"
+    r"\s*,?\s*(?:if|when)\s+(?:(?:the|my|project|repository)\s+){0,3}"
+    r"documentation\s+(?:is\s+)?(?:stale|outdated)\s+(?:or|and)\s+"
+    r"(?:nothing(?:\s+is)?\s+found|no\s+results(?:\s+are)?\s+found|search\s+returns\s+no\s+results)"
+    r"|(?:что\s+проверить|как\s+диагностировать)\s*,?\s*(?:если|когда)\s+"
+    r"(?:(?:проектн\w*|репозиторн\w*)\s+)?документац\w*\s+устар\w*\s+"
+    r"(?:или|и)\s+(?:ничего\s+не\s+находится|ничего\s+не\s+найдено|нет\s+результатов)"
+    r")\s*[?!.]*\s*$",
+    re.I,
+)
+
+
+def _reviewed_conditional_troubleshooting_frame(question: str) -> bool:
+    return _REVIEWED_CONDITIONAL_TROUBLESHOOTING_RE.fullmatch(question) is not None
+
+
 def _host_lookup_can_derive_original(
     original_question: str, lookup_text: str,
 ) -> bool:
@@ -185,7 +204,7 @@ def _host_lookup_can_derive_original(
     lookup_aliases = build_project_retrieval_aliases(lookup_text)
     original_intents = {alias.intent_id for alias in original_aliases}
     conditional_troubleshooting = (
-        bool(_CONDITIONAL_SURFACE_RE.search(original_question))
+        _reviewed_conditional_troubleshooting_frame(original_question)
         and original_intents == {"troubleshooting"}
         and bool(original_aliases)
         and all(alias.force_context_only for alias in original_aliases)

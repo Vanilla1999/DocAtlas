@@ -1,0 +1,10 @@
+{
+  "schema_version": 1,
+  "module_labels": {
+    "tests/docs/test_query_planning_completion_safety.py": "behavioral"
+  },
+  "node_overrides": {},
+  "module_node_hashes": {
+    "tests/docs/test_query_planning_completion_safety.py": "ed3fb667e5790e77a6e70002eaae37384f7730c7a844b49711886d0389393dc2"
+  }
+}

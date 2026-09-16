@@ -22,6 +22,46 @@ class EvidenceQualification:
     trace: Mapping[str, Any]
 
 
+def evidence_policy_rejection_reason(
+    probe: Mapping[str, Any], *, visible_text: str, catalog_role: str = "",
+    forbidden_catalog_roles: tuple[str, ...] = (),
+    forbidden_evidence_terms: tuple[str, ...] = (),
+    candidate: Mapping[str, Any] | None = None,
+    expected_project_identity: str | None = None,
+    lifecycle_intent: LifecycleIntent = "current",
+) -> str | None:
+    """Return the source/policy rejection independently of lexical matching."""
+    if candidate is not None or expected_project_identity:
+        candidate = candidate or {}
+        identity = str(candidate.get("project_identity") or "").strip()
+        if (expected_project_identity or candidate.get("source_class") == "project_doc") and not identity:
+            return "missing_project_identity"
+        if expected_project_identity and identity != expected_project_identity:
+            return "wrong_project_identity"
+        if candidate.get("stale") or str(candidate.get("freshness") or "current") != "current":
+            return "stale_evidence"
+        if str(candidate.get("index_freshness") or "synchronized") != "synchronized":
+            return "unsynchronized_index"
+        if candidate.get("risk_flags"):
+            return "unsafe_evidence"
+        if not lifecycle_allows(candidate, lifecycle_intent):
+            return "lifecycle_not_allowed"
+    normalized_visible = visible_text.casefold()
+    forbidden_terms = tuple(dict.fromkeys((
+        *(str(value) for value in probe.get("forbidden_evidence_terms") or ()),
+        *forbidden_evidence_terms,
+    )))
+    forbidden_roles = set(str(value) for value in (
+        *(probe.get("forbidden_catalog_roles") or ()),
+        *forbidden_catalog_roles,
+    ))
+    if any(str(term).casefold() in normalized_visible for term in forbidden_terms):
+        return "forbidden_evidence_term"
+    if catalog_role and catalog_role in forbidden_roles:
+        return "forbidden_catalog_role"
+    return None
+
+
 def qualify_evidence(
     probe: Mapping[str, Any], *, query_id: str, visible_text: str,
     evidence_text: str | None = None,
@@ -33,34 +73,14 @@ def qualify_evidence(
 ) -> EvidenceQualification:
     """Qualify one retrieval probe against evidence visible to the model."""
     result = dict(probe)
-    if candidate is not None or expected_project_identity:
-        candidate = candidate or {}
-        identity = str(candidate.get("project_identity") or "").strip()
-        if (expected_project_identity or candidate.get("source_class") == "project_doc") and not identity:
-            return _rejected(result, "missing_project_identity")
-        if expected_project_identity and identity != expected_project_identity:
-            return _rejected(result, "wrong_project_identity")
-        if candidate.get("stale") or str(candidate.get("freshness") or "current") != "current":
-            return _rejected(result, "stale_evidence")
-        if str(candidate.get("index_freshness") or "synchronized") != "synchronized":
-            return _rejected(result, "unsynchronized_index")
-        if candidate.get("risk_flags"):
-            return _rejected(result, "unsafe_evidence")
-        if not lifecycle_allows(candidate, lifecycle_intent):
-            return _rejected(result, "lifecycle_not_allowed")
-    normalized_visible = visible_text.casefold()
-    forbidden_terms = tuple(dict.fromkeys((
-        *(str(value) for value in probe.get("forbidden_evidence_terms") or ()),
-        *forbidden_evidence_terms,
-    )))
-    forbidden_roles = set(str(value) for value in (
-        *(probe.get("forbidden_catalog_roles") or ()),
-        *forbidden_catalog_roles,
-    ))
-    if any(str(term).casefold() in normalized_visible for term in forbidden_terms):
-        return _rejected(result, "forbidden_evidence_term")
-    if catalog_role and catalog_role in forbidden_roles:
-        return _rejected(result, "forbidden_catalog_role")
+    policy_reason = evidence_policy_rejection_reason(
+        probe, visible_text=visible_text, catalog_role=catalog_role,
+        forbidden_catalog_roles=forbidden_catalog_roles,
+        forbidden_evidence_terms=forbidden_evidence_terms, candidate=candidate,
+        expected_project_identity=expected_project_identity, lifecycle_intent=lifecycle_intent,
+    )
+    if policy_reason is not None:
+        return _rejected(result, policy_reason)
     body = evidence_text if evidence_text is not None else visible_text
     lines = body.splitlines()
     substantive_lines = []
@@ -300,6 +320,7 @@ __all__ = [
     "CoverageKind",
     "EvidenceQualification",
     "derived_parent_trace",
+    "evidence_policy_rejection_reason",
     "qualify_evidence",
     "qualify_visible_trace",
 ]

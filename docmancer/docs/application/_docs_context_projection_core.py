@@ -39,6 +39,7 @@ from docmancer.docs.domain.context_windows import (
 )
 from docmancer.docs.domain.evidence_qualification import (
     derived_parent_trace,
+    evidence_policy_rejection_reason,
     qualify_evidence,
 )
 from docmancer.docs.domain.query_terms import documentation_exact_terms
@@ -788,7 +789,22 @@ def _requalify_visible_source(
             and trace.get("qualification_route") == "same_atom_continuation"
             and trace.get("coverage_kind") == "derived"
         ):
-            matches = merge_query_matches(matches, {str(query_id): dict(trace)})
+            continuation_trace = dict(trace)
+            policy_reason = evidence_policy_rejection_reason(
+                trace,
+                visible_text=visible_text,
+                catalog_role=str(source.get("catalog_role") or ""),
+                candidate=source.get("_qualification_candidate", source),
+                expected_project_identity=source.get("_expected_project_identity"),
+                lifecycle_intent=source.get("_lifecycle_intent", "current"),
+            )
+            if policy_reason is not None:
+                continuation_trace.update(
+                    qualified=False, qualification_reason=policy_reason,
+                )
+            matches = merge_query_matches(
+                matches, {str(query_id): continuation_trace},
+            )
             continue
         # Aggregated lineage belongs to the old window; rebuild it from visible probes.
         probe = {k: v for k, v in trace.items() if k not in {"coverage_kinds", "derived_from_query_ids"}}
