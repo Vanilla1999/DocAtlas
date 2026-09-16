@@ -1,0 +1,10 @@
+{
+  "schema_version": 1,
+  "module_labels": {
+    "tests/docs/test_comparison_relation_query_planning.py": "behavioral"
+  },
+  "node_overrides": {},
+  "module_node_hashes": {
+    "tests/docs/test_comparison_relation_query_planning.py": "04bfe95ea9604236347769c4aabb26952c5103ad705a27cd220b59f846822bb5"
+  }
+}

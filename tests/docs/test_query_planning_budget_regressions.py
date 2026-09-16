@@ -76,7 +76,7 @@ def test_comparison_uses_subject_bearing_side_probes_before_single_word_hints():
     relation = [q.text.casefold() for q in optional if q.query_id.startswith("query-relation-")]
 
     assert len(optional) <= 4
-    assert "project documentation dependency documentation" in relation
+    assert "project documentation dependency documentation different separate" in relation
     assert "project documentation library documentation" in relation
     assert "project documentation retrieval scope provenance" in relation
     assert "dependency library documentation retrieval scope provenance" in relation

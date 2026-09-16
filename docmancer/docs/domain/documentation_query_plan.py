@@ -307,9 +307,15 @@ def _subject_relation_groups(question: str) -> tuple[str, ...]:
             if part.strip(" ,;?.!")
         ] if axis else []
         axis_text = " ".join(axis_parts)
+        pair_index = 0
         for left_value in left_variants:
             for right_value in right_variants:
-                value = f"{left_value} {right_value}".strip()
+                # Keep two independent retrieval hypotheses inside the same
+                # bounded slot budget: one relation-aware paraphrase and, when
+                # slash alternatives exist, one plain lexical cross-side view.
+                relation_suffix = " different separate" if pair_index == 0 else ""
+                value = f"{left_value} {right_value}{relation_suffix}".strip()
+                pair_index += 1
                 if value and supplemental_query_is_useful(value):
                     groups.append(value[:500])
         for side in (left_variants[0], " ".join(re.sub(r"\s*/\s*", " ", right).split())):
