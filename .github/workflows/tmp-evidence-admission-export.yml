@@ -1,0 +1,39 @@
+name: Temporary evidence admission export
+on:
+  push:
+    branches: [fix/evidence-admission-sufficiency]
+    paths: [.github/workflows/tmp-evidence-admission-export.yml]
+permissions:
+  contents: read
+jobs:
+  export:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+        with:
+          fetch-depth: 2
+          persist-credentials: false
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1
+        with:
+          python-version: '3.13'
+      - name: Export source and binary dependency wheels
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/docatlas-export/wheels
+          git rev-parse HEAD > /tmp/docatlas-export/HEAD.txt
+          git archive --format=tar.gz HEAD > /tmp/docatlas-export/source.tar.gz
+          python - <<'PY'
+          import pathlib, tomllib
+          data = tomllib.loads(pathlib.Path('pyproject.toml').read_text())
+          deps = [d for d in data['project']['dependencies'] if not d.startswith(('tiktoken', 'fastembed'))]
+          deps += data['project']['optional-dependencies']['dev']
+          pathlib.Path('/tmp/docatlas-export/requirements.txt').write_text('\n'.join(deps) + '\n')
+          PY
+          python -m pip download --only-binary=:all: -r /tmp/docatlas-export/requirements.txt -d /tmp/docatlas-export/wheels
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: docatlas-evidence-admission-export
+          path: /tmp/docatlas-export
+          retention-days: 2
