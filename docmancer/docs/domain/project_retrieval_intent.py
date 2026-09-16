@@ -60,7 +60,8 @@ _INTENT_ROLE_POLICY: dict[str, tuple[tuple[str, ...], tuple[str, ...]]] = {
     "response_contract": (("api_contract", "overview"), ("roadmap",)),
     "source_authority": (("overview", "project_architecture"), ("roadmap",)),
     "product_boundaries": (("overview",), ("roadmap",)),
-    "dependency_version_binding": (("overview", "api_contract"), ("roadmap",)),
+    "dependency_version_binding": (("overview", "api_contract", "project_architecture"), ("roadmap",)),
+    "instruction_trust": (("api_contract", "project_architecture", "runbook"), ("roadmap",)),
     "module_responsibilities": (("project_architecture", "module_architecture"), ("roadmap",)),
     "product_claims": (("overview",), ("roadmap",)),
     "implementation_location": (("project_architecture", "module_architecture", "api_contract"), ("roadmap",)),
@@ -178,7 +179,7 @@ def build_project_retrieval_aliases(
                 } else (),
             ))
 
-    mentions_docs = _has(tokens, "документ", "док", "docs", "documentation")
+    mentions_docs = _has(tokens, "документ", "док", "docs", "documentation", "document")
     mentions_project = _has(
         tokens, "проект", "репозитор", "систем", "продукт",
     ) or any(_PROJECT_SCOPE_TOKEN_RE.fullmatch(token) for token in tokens)
@@ -380,18 +381,30 @@ def build_project_retrieval_aliases(
             f"{product_prefix}product boundaries",
             f"{product_prefix}does not replace",
         )
-    if (
-        mentions_product
-        and _has(tokens, "dependency", "package")
-        and _has(tokens, "version")
-        and sum(bool(_has(tokens, stem)) for stem in ("exact", "declared", "unbound")) >= 2
+    dependency_subject = _has(tokens, "dependency", "package", "зависим", "пакет")
+    version_subject = _has(tokens, "version", "верс")
+    taxonomy_terms = sum(
+        bool(_has(tokens, stem))
+        for stem in ("exact", "declared", "unbound", "точн", "объяв")
+    )
+    version_evidence_terms = taxonomy_terms + int(bool(_has(tokens, "lockfile", "pubspec.lock")))
+    if dependency_subject and version_subject and (
+        mentions_product or mentions_docs or version_evidence_terms >= 1
     ):
-        emit(
-            "dependency_version_binding",
-            True,
-            f"{product_prefix}dependency version evidence exact declared-only unbound selected version",
-            f"{product_prefix}dependency selected version lockfile declaration unbound source",
-        )
+        # Resolution and evidence-state taxonomy are two different retrieval
+        # hypotheses.  Do not spend two optional slots for every version
+        # question: mechanism/change questions need the resolver path, while an
+        # explicit exact-vs-declared comparison needs the taxonomy.  This keeps
+        # weak aliases from winning by majority inside the bounded pack.
+        if taxonomy_terms >= 2 or concept_definition:
+            version_queries = (
+                "dependency version evidence exact declared-only unbound selected version",
+            )
+        else:
+            version_queries = (
+                "dependency version binding lockfile exact latest documentation",
+            )
+        emit("dependency_version_binding", True, *version_queries)
     if (
         _has(tokens, "responsibilit")
         and "docmancer/docs/application" in source.casefold()
@@ -403,7 +416,7 @@ def build_project_retrieval_aliases(
             f"{product_prefix}application domain module responsibilities architecture boundaries",
         )
     if (
-        mentions_product
+        (mentions_product or mentions_project)
         and _has(tokens, "claim")
         and (_has_phrase(normalized, "product brief") or _has(tokens, "demonstrat", "evidence"))
     ):
@@ -412,6 +425,18 @@ def build_project_retrieval_aliases(
             True,
             f"{product_prefix}product claims evidence status demonstrated",
             f"{product_prefix}product claims validation status",
+        )
+
+    if (
+        mentions_docs
+        and _has(tokens, "command", "shell", "инструк", "команд")
+        and _has(tokens, "execute", "run", "authoriz", "trust", "исполн", "выполн", "запуск", "разреш")
+    ):
+        emit(
+            "instruction_trust",
+            True,
+            "documentation instruction trust document data shell actions",
+            "documentation content execution authority policy",
         )
 
     docs_mcp_workflow_question = mentions_docs_mcp and not mentions_packs and (
@@ -488,6 +513,12 @@ def build_project_retrieval_aliases(
             True,
             f"{product_prefix}inspect safely clear local index preview cleanup plan",
         )
+    preparation_job_problem = (
+        _has(tokens, "job", "task", "задач")
+        and _has(tokens, "prepar", "подготов")
+        and (mentions_docs or _has(tokens, "documentation", "документац"))
+        and _has(tokens, "fail", "error", "ошиб", "status", "заверш")
+    )
     if (
         not concept_definition
         and not any(row.intent_id == "project_docs_sync" for row in rows)
@@ -512,7 +543,11 @@ def build_project_retrieval_aliases(
         emit(
             "troubleshooting",
             True,
-            f"{product_prefix}troubleshooting stale documentation no results diagnostics",
+            (
+                "documentation preparation job status terminal failed docs_status"
+                if preparation_job_problem
+                else f"{product_prefix}troubleshooting stale documentation no results diagnostics"
+            ),
         )
     if (
         _has(tokens, "хран", "storage", "изоляц", "isolat", "баз", "database", "пиш")
@@ -557,7 +592,7 @@ def build_project_retrieval_aliases(
         emit(
             "evidence_selection",
             True,
-            f"{product_prefix}retrieval hit proof",
+            f"{product_prefix}evidence selection proof retrieval hit",
         )
     if _has(tokens, "тест", "протест", "test", "pytest") and not any(
         row.intent_id == "pytest_markers" for row in rows

@@ -182,13 +182,26 @@ def _host_lookup_can_derive_original(
     """Audit only reviewed single-intent rewrites that preserve conditions."""
     original_aliases = build_project_retrieval_aliases(original_question)
     lookup_aliases = build_project_retrieval_aliases(lookup_text)
-    if not _can_derive_original_from_intent(original_question, original_aliases):
+    original_intents = {alias.intent_id for alias in original_aliases}
+    conditional_troubleshooting = (
+        bool(_CONDITIONAL_SURFACE_RE.search(original_question))
+        and original_intents == {"troubleshooting"}
+        and bool(original_aliases)
+        and all(alias.force_context_only for alias in original_aliases)
+        and not technical_anchors(original_question)
+        and not _HOST_NEGATION_RE.search(original_question)
+        and not _UNVERIFIED_PREMISE_RE.search(original_question)
+        and not _NOVEL_TOPIC_QUALIFIER_RE.search(original_question)
+    )
+    if not (
+        _can_derive_original_from_intent(original_question, original_aliases)
+        or conditional_troubleshooting
+    ):
         return False
     if _HOST_REWRITE_QUALIFIER_RE.search(lookup_text):
         return False
     if _CONDITIONAL_SURFACE_RE.search(lookup_text):
         return False
-    original_intents = {alias.intent_id for alias in original_aliases}
     lookup_intents = {alias.intent_id for alias in lookup_aliases}
     if len(lookup_intents) != 1 or lookup_intents != original_intents:
         return False

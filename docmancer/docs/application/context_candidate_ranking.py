@@ -157,6 +157,41 @@ def _facet_aware_candidates(
         relation_preference = _relation_request_priority(
             query_text.get("query-original", ""), body_text,
         )
+        continuation_score = int(any(
+            isinstance(trace, dict)
+            and trace.get("qualified") is True
+            and trace.get("qualification_route") == "same_atom_continuation"
+            for trace in (source.get("retrieval_query_matches") or {}).values()
+        ))
+        # Optional canonical aliases are search hypotheses, not votes. When two
+        # candidates serve the same optional direction, prefer the one with the
+        # stronger visible qualification before generic source-lane priors.
+        # This does not create public coverage or reward the number of aliases.
+        canonical_match_ratio = max((
+            float(trace.get("match_ratio") or 0.0)
+            for key, trace in (source.get("retrieval_query_matches") or {}).items()
+            if key in (canonical_query_ids or set())
+            and isinstance(trace, dict) and trace.get("qualified") is True
+        ), default=0.0)
+        direct_required_traces = [
+            trace
+            for key, trace in (source.get("retrieval_query_matches") or {}).items()
+            if key in required_query_ids
+            and isinstance(trace, dict)
+            and trace.get("qualified") is True
+            and trace.get("query_origin") == "host_lookup"
+            and not trace.get("derived_from_query_id")
+        ]
+        # A domain-owned rewrite may legitimately derive retrieval coverage for
+        # a host facet, but it is still a search hypothesis. When the direct
+        # host lookup itself produced a qualified candidate, keep that evidence
+        # ahead of a rewrite-derived candidate for the same missing facet.
+        # This changes selection order only; it does not create coverage/proof.
+        direct_required_count = len(direct_required_traces)
+        direct_required_lexical = max((
+            float(trace.get("lexical_score") or 0.0)
+            for trace in direct_required_traces
+        ), default=0.0)
         original_body_overlap = sum(
             weight for term, weight in term_weights.items()
             if _visible_term_present(term, body_text.casefold(), exact=False)
@@ -165,27 +200,42 @@ def _facet_aware_candidates(
             direct_evidence_preference(query_text.get("query-original", ""), body_text)
             if qualified_ids & required_query_ids else (0, 0, 0, 0)
         )
+        required_relation_preference = max((
+            _relation_request_priority(query_text.get(key, ""), body_text)
+            for key in qualified_ids & required_query_ids
+        ), default=(0.0,) * 8)
+        host_condition_priority = max((
+            _condition_body_priority(query_text.get(key, ""), body_text)
+            for key in qualified_ids & required_query_ids
+        ), default=0)
+        comparison_action_priority = max((
+            _comparison_action_priority(query_text.get(key, ""), body_text)
+            for key in qualified_ids & required_query_ids
+        ), default=0)
         return (
             condition_lead_priority(query_text.get("query-original", ""), str(source.get("snippet") or "")),
+            required_relation_preference,
+            host_condition_priority,
+            comparison_action_priority,
+            role_tiebreak,
+            direct_required_count,
+            direct_required_lexical,
             relation_preference,
+            continuation_score,
             int(exact_count > 0),
             component_count,
             bound_assignment,
             rank[3] if exact_count else 0.0,
             exact_count,
             len(_fully_matched_query_ids((source,)) & required_query_ids),
-            max((_condition_body_priority(query_text.get(key, ''), str(source.get('snippet') or ''))
-                 for key in qualified_ids & required_query_ids), default=0),
-            max((_comparison_action_priority(query_text.get(key, ''), str(source.get('snippet') or ''))
-                 for key in qualified_ids & required_query_ids), default=0),
             len(qualified_ids & required_query_ids),
             request_preference,
             original_body_overlap,
-            role_tiebreak,
             len(qualified_ids & (supplemental_query_ids or set())),
             rank[0],
             match_ratio,
-            len(qualified_ids & (canonical_query_ids or set())),
+            canonical_match_ratio,
+            int(bool(qualified_ids & (canonical_query_ids or set()))),
             rank[1:3] + rank[5:],
         )
 
@@ -239,13 +289,43 @@ def _relation_request_priority(question: str, snippet: str) -> tuple[float, ...]
     nor changes component coverage or ``checked`` semantics.
     """
     if not question or not snippet:
-        return (0.0, 0.0, 0.0, 0.0, 0.0)
+        return (0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0)
     # Narrow request shapes (code/signature/default-timeout/origin comparison)
     # already have a stronger dedicated selector. Do not let this generic
     # relation hint compete with those explicit parts.
     if recognized_request_parts(question):
-        return (0.0, 0.0, 0.0, 0.0)
+        return (0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0)
     body = snippet.casefold()
+
+    # Preserve an explicitly requested retrieval->proof relation.  A span that
+    # visibly says whether a retrieval/search hit is proof is stronger than one
+    # that merely contains both topical words in unrelated clauses.  Either
+    # polarity is accepted; this is relation visibility, not answer injection.
+    proof_relation_score = 0.0
+    if (
+        re.search(r"\b(?:retriev\w*|search|passage|text|hit)\b", question, re.I)
+        and re.search(r"\b(?:proof|certif\w*|sufficien\w*)\b", question, re.I)
+    ):
+        if re.search(
+            r"\b(?:retriev\w*(?:\s+\w+){0,3}|search(?:\s+\w+){0,3}|hit|passage)\b"
+            r"[^.!?\n]{0,80}\b(?:is|are|does|alone|not|never|sufficien\w*)\b"
+            r"[^.!?\n]{0,40}\b(?:proof|certif\w*)\b",
+            body, re.I,
+        ):
+            proof_relation_score = 1.0
+
+    # A question asking how a system decides/selects/resolves something needs
+    # the mechanism span, not merely a taxonomy of possible states.  The
+    # preference is relation-shaped and does not encode a particular answer.
+    decision_mechanism_score = 0.0
+    decision_question = bool(
+        re.search(r"\bhow\b[^?]{0,120}\b(?:decid|choos|select|resolv)\w*\b", question, re.I)
+        or re.search(r"\bwhat\s+decision\b[^?]{0,120}\b(?:make|mak|take|use)\w*\b", question, re.I)
+    )
+    if decision_question and re.search(
+        r"\b(?:decision|decid\w*|choos\w*|select\w*|resolv\w*)\b", body, re.I,
+    ):
+        decision_mechanism_score = 1.0
 
     # An action question about an explicit insufficient-evidence state needs a
     # procedural span, not merely a definition saying that the state exists.
@@ -356,8 +436,8 @@ def _relation_request_priority(question: str, snippet: str) -> tuple[float, ...]
             clause_score = min(ratios)
             clause_average = sum(ratios) / len(ratios)
     return (
-        recovery_action_score, permission_caveat_score, state_score,
-        alternative_score, clause_score, clause_average,
+        proof_relation_score, decision_mechanism_score, recovery_action_score, permission_caveat_score,
+        state_score, alternative_score, clause_score, clause_average,
     )
 
 
@@ -378,7 +458,19 @@ def _fully_matched_query_ids(sources: Any) -> set[str]:
                 # while one of its explicit requested parts is still absent.
                 if recognized_request_satisfied(question, body):
                     result.add(query_id)
-            elif trace.get("match_ratio") == 1.0 or trace.get("mode") == "exact_path":
+            elif trace.get("mode") == "exact_path":
+                result.add(query_id)
+            elif (
+                trace.get("match_ratio") == 1.0
+                and (
+                    trace.get("coverage_kind") != "derived"
+                    or "direct" in set(trace.get("coverage_kinds") or ())
+                )
+            ):
+                # A rewrite may derive retrieval coverage for its parent, but
+                # lexical completeness against the rewrite is not evidence that
+                # the original host wording is visibly complete. Keep the facet
+                # open for a direct/complementary witness.
                 result.add(query_id)
     return result
 

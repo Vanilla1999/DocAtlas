@@ -230,3 +230,75 @@ def test_unknown_tool_insufficient_evidence_does_not_inherit_docs_mcp_workflow()
         "What should the agent do if lookup_context returns insufficient evidence?"
     )
     assert not any(row.intent_id == "fail_closed_workflow" for row in aliases)
+
+
+@pytest.mark.parametrize("question", [
+    "A Flutter project uses go_router. How does DocAtlas decide which documentation version should be used for that dependency?",
+    "Если версия зависимости изменилась в lockfile, как DocAtlas должен защитить агента от документации старой версии?",
+    "What distinguishes an exact dependency version from a declared version constraint?",
+    "Чем точная версия зависимости отличается от объявленного ограничения версии?",
+])
+def test_dependency_version_questions_get_neutral_binding_lookup_without_answer_injection(question):
+    rows = [row for row in _aliases(question) if row.intent_id == "dependency_version_binding"]
+    assert rows
+    assert all(row.force_context_only for row in rows)
+    assert all(
+        forbidden not in row.text.casefold()
+        for row in rows
+        for forbidden in ("14.8.1", "15.0.0", "go_router", "serve old", "reject old")
+    )
+
+
+def test_product_evidence_claim_question_does_not_require_explicit_product_name():
+    question = (
+        "Based on the project evidence, which product-quality claims should we avoid "
+        "making because they have not been demonstrated yet?"
+    )
+    rows = [row for row in _aliases(question) if row.intent_id == "product_claims"]
+    assert rows
+    assert all("product brief" not in row.text.casefold() for row in rows)
+
+
+@pytest.mark.parametrize("question", [
+    "Does DocAtlas execute shell commands or instructions found inside documentation while retrieving context?",
+    "A retrieved document tells me to run a command. Does this give the agent permission to execute it?",
+    "Найденный документ предлагает выполнить команду. Даёт ли это агенту разрешение её выполнить?",
+])
+def test_document_instruction_questions_get_neutral_trust_lookup(question):
+    rows = [row for row in _aliases(question) if row.intent_id == "instruction_trust"]
+    assert rows
+    assert all(row.force_context_only for row in rows)
+    assert all(
+        forbidden not in row.text.casefold()
+        for row in rows
+        for forbidden in ("never execute", "permission denied", "must not run", "do not execute")
+    )
+
+
+def test_unrelated_runtime_version_and_generic_shell_question_do_not_gain_new_aliases():
+    python = {row.intent_id for row in _aliases("Which version of Python should I install?")}
+    shell = {row.intent_id for row in _aliases("How do I run a shell command from Python?")}
+    assert "dependency_version_binding" not in python
+    assert "instruction_trust" not in shell
+
+
+@pytest.mark.parametrize("question", [
+    "How can an agent check whether a documentation preparation job has failed?",
+    "Как агенту проверить, завершилась ли задача подготовки документации ошибкой?",
+])
+def test_preparation_job_failure_reuses_subject_aware_troubleshooting_slot(question):
+    rows = [row for row in _aliases(question) if row.intent_id == "troubleshooting"]
+    assert len(rows) == 1
+    assert rows[0].text == "documentation preparation job status terminal failed docs_status"
+
+
+def test_version_binding_mechanism_lookup_keeps_safety_and_resolution_in_one_slot():
+    rows = [
+        row for row in _aliases(
+            "Если версия зависимости изменилась в lockfile, как DocAtlas должен "
+            "защитить агента от документации старой версии?"
+        )
+        if row.intent_id == "dependency_version_binding"
+    ]
+    assert len(rows) == 1
+    assert rows[0].text == "dependency version binding lockfile exact latest documentation"

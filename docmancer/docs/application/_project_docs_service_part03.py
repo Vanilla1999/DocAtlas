@@ -17,6 +17,7 @@ from docmancer.docs.domain.evidence_qualification import (
     qualify_evidence,
 )
 from docmancer.docs.domain.project_doc_ranking import condition_lead_priority
+from docmancer.docs.domain.project_retrieval_intent import build_project_retrieval_aliases
 from docmancer.docs.domain.query_terms import (
     documentation_exact_terms,
     documentation_query_terms,
@@ -168,6 +169,128 @@ def _tag_retrieval_query(
     return tagged
 
 
+def _qualify_same_atom_continuations(chunks: list[Any], query_id: str) -> list[Any]:
+    """Carry one qualified canonical probe across a physically split atom.
+
+    Parent/atom identity plus contiguous source spans are structural provenance,
+    not semantic inference.  This keeps a sentence/list item split by the child
+    chunk hard limit available to projection without deriving public/original
+    query coverage or adding another retrieval call.
+    """
+    result = list(chunks)
+    anchors = []
+    for chunk in result:
+        metadata = chunk.metadata or {}
+        trace = (metadata.get("retrieval_query_matches") or {}).get(query_id) or {}
+        span = metadata.get("char_span") or ()
+        if trace.get("qualified") is True and len(span) == 2:
+            anchors.append(chunk)
+    for anchor in anchors:
+        anchor_meta = anchor.metadata or {}
+        anchor_span = anchor_meta.get("char_span") or ()
+        atom_id = str(anchor_meta.get("atom_id") or "")
+        parent_id = str(anchor_meta.get("parent_logical_id") or "")
+        if not atom_id or not parent_id or len(anchor_span) != 2:
+            continue
+        for index, candidate in enumerate(result):
+            metadata = candidate.metadata or {}
+            span = metadata.get("char_span") or ()
+            if (
+                len(span) != 2 or span[0] != anchor_span[1]
+                or str(metadata.get("atom_id") or "") != atom_id
+                or str(metadata.get("parent_logical_id") or "") != parent_id
+                or candidate.source != anchor.source
+            ):
+                continue
+            matches = dict(metadata.get("retrieval_query_matches") or {})
+            current = dict(matches.get(query_id) or {})
+            if current.get("qualified") is True:
+                continue
+            anchor_trace = dict(
+                (anchor_meta.get("retrieval_query_matches") or {}).get(query_id) or {}
+            )
+            if anchor_trace.get("qualified") is not True:
+                continue
+            derived = dict(anchor_trace)
+            derived.update({
+                "qualified": True,
+                "qualification_reason": "same_atom_continuation",
+                "qualification_route": "same_atom_continuation",
+                "coverage_kind": "derived",
+                "coverage_kinds": ["derived"],
+                "derived_from_stable_chunk_id": str(anchor_meta.get("stable_chunk_id") or ""),
+                "matched_terms": [],
+                "body_matched_terms": [],
+                "match_ratio": 0.0,
+            })
+            matches[query_id] = derived
+            metadata = dict(metadata)
+            metadata["retrieval_query_matches"] = matches
+            metadata["retrieval_query_ids"] = tuple(
+                key for key, value in matches.items() if value.get("qualified") is True
+            )
+            result[index] = candidate.model_copy(update={"metadata": metadata})
+            break
+    return result
+
+
+def _merge_same_atom_continuations(
+    chunks: list[Any], query_id: str, *, max_chars: int = 1024,
+) -> list[Any]:
+    """Reassemble one forward split of a qualified structured atom.
+
+    The merge is source-contiguous and identity-bound.  It does not join
+    paragraphs/atoms or create public-query coverage; it only restores text that
+    child chunking split inside one atom.
+    """
+    result = list(chunks)
+    remove: set[int] = set()
+    for index, anchor in enumerate(tuple(result)):
+        if index in remove:
+            continue
+        metadata = dict(anchor.metadata or {})
+        trace = (metadata.get("retrieval_query_matches") or {}).get(query_id) or {}
+        span = metadata.get("char_span") or ()
+        atom_id = str(metadata.get("atom_id") or "")
+        parent_id = str(metadata.get("parent_logical_id") or "")
+        if trace.get("qualified") is not True or not atom_id or not parent_id or len(span) != 2:
+            continue
+        for other_index, candidate in enumerate(result):
+            if other_index == index or other_index in remove:
+                continue
+            other = candidate.metadata or {}
+            other_trace = (other.get("retrieval_query_matches") or {}).get(query_id) or {}
+            other_span = other.get("char_span") or ()
+            if (
+                other_trace.get("qualification_route") != "same_atom_continuation"
+                or other_trace.get("qualified") is not True
+                or len(other_span) != 2 or other_span[0] != span[1]
+                or str(other.get("atom_id") or "") != atom_id
+                or str(other.get("parent_logical_id") or "") != parent_id
+                or candidate.source != anchor.source
+            ):
+                continue
+            text = f"{anchor.text}{candidate.text}"
+            if len(text) > max_chars:
+                continue
+            metadata["char_span"] = [span[0], other_span[1]]
+            for field in ("byte_span", "line_span"):
+                left = metadata.get(field) or ()
+                right = other.get(field) or ()
+                if len(left) == 2 and len(right) == 2:
+                    metadata[field] = [left[0], right[1]]
+            metadata["reassembled_from_stable_chunk_ids"] = [
+                str(metadata.get("stable_chunk_id") or ""),
+                str(other.get("stable_chunk_id") or ""),
+            ]
+            metadata["display_token_estimate"] = int(metadata.get("display_token_estimate") or 0) + int(other.get("display_token_estimate") or 0)
+            metadata["token_estimate"] = int(metadata.get("token_estimate") or 0) + int(other.get("token_estimate") or 0)
+            result[index] = anchor.model_copy(update={"text": text, "metadata": metadata})
+            remove.add(other_index)
+            break
+    return [chunk for index, chunk in enumerate(result) if index not in remove]
+
+
 def _qualify_candidate_lookups(
     chunks: list[Any], plan: DocumentationQueryPlan, *,
     expected_project_identity: str, lifecycle_intent: str,
@@ -291,7 +414,7 @@ class _ProjectDocsServicePart03:
                 f"query-supplemental-{next_supplemental_id}"
             )
             next_supplemental_id += 1
-        supplemental_budget = min(budget, max(128, budget // 4))
+        supplemental_budget = min(budget, max(128, min(400, budget // 4)))
 
         gateway = getattr(self.facade, "agent_gateway", None)
         if gateway is not None:
@@ -387,17 +510,31 @@ class _ProjectDocsServicePart03:
                         anchor_lookup,
                         expected_project_identity=filters["project_identity"], lifecycle_intent=answer_lifecycle_intent,
                     )
+        same_atom_canonical_texts = {
+            alias.text
+            for alias in build_project_retrieval_aliases(query)
+            if alias.intent_id == "fail_closed_workflow"
+        }
         supplemental_chunks_by_query = {}
         for supplemental_query in supplemental_queries:
             lookups = [item for item in documentation_query_plan.queries if item.text == supplemental_query]
             public_lookup = requirements is not None and any(item.origin == "host_lookup" for item in lookups)
             # Public lookups need the same pre-qualification candidate window
             # as the original question; projection owns the public budget.
+            preserve_canonical_neighbors = any(
+                item.origin == "canonical_intent"
+                and item.text in same_atom_canonical_texts
+                for item in lookups
+            )
             lane = _run(
                 supplemental_query,
                 query_limit=effective_limit if public_lookup else 4,
-                query_budget=budget if public_lookup else supplemental_budget,
-                query_expand="none",
+                query_budget=(
+                    budget if public_lookup else
+                    min(budget, max(800, supplemental_budget))
+                    if preserve_canonical_neighbors else supplemental_budget
+                ),
+                query_expand="adjacent" if preserve_canonical_neighbors else "none",
                 query_filters=filters,
             )
             if not lookups:
@@ -410,6 +547,9 @@ class _ProjectDocsServicePart03:
                     lane, lookup.query_id, lookup.text, lookup,
                     expected_project_identity=filters["project_identity"], lifecycle_intent=answer_lifecycle_intent,
                 )
+                if lookup.origin == "canonical_intent":
+                    lane = _qualify_same_atom_continuations(lane, lookup.query_id)
+                    lane = _merge_same_atom_continuations(lane, lookup.query_id)
             supplemental_chunks_by_query[supplemental_query] = lane
         queries_by_origin: dict[str, list[list[Any]]] = {}
         for item in documentation_query_plan.queries:

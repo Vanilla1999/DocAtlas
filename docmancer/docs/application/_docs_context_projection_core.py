@@ -778,6 +778,18 @@ def _requalify_visible_source(
     for query_id, trace in independent_query_probes(source, source.get("_independent_query_plan") or {}).items():
         if not isinstance(trace, dict) or trace.get("derived_from_query_id"):
             continue
+        # A physically contiguous continuation of the same structured atom was
+        # qualified by source structure upstream, not by lexical coincidence in
+        # this child.  Preserve that derived canonical context while still
+        # refusing to manufacture original/public coverage.
+        if (
+            query_id != "query-original"
+            and trace.get("qualified") is True
+            and trace.get("qualification_route") == "same_atom_continuation"
+            and trace.get("coverage_kind") == "derived"
+        ):
+            matches = merge_query_matches(matches, {str(query_id): dict(trace)})
+            continue
         # Aggregated lineage belongs to the old window; rebuild it from visible probes.
         probe = {k: v for k, v in trace.items() if k not in {"coverage_kinds", "derived_from_query_ids"}}
         if query_id == "query-original":

@@ -15,7 +15,7 @@ _QUERY_STOP_WORDS = frozenset({
 
 
 _BASE_WINDOW_LIMITS = (160, 320, 520)
-_SHORT_COMPLETE_SOURCE_MAX_CHARS = 640
+_SHORT_COMPLETE_SOURCE_MAX_CHARS = 704
 
 # A chunk may start below its table header. Protect every unescaped pipe-bearing
 # source line, including rows with either optional edge omitted and pipelines.
@@ -144,16 +144,33 @@ def _focused_snippet(
     intro_start, intro_end = spans[best_index]
     intro = value[intro_start:intro_end].strip()
     if intro.endswith(":") and best_index + 1 < len(spans):
+        # ``_source_unit_spans`` intentionally splits prose sentences, so one
+        # markdown list item may occupy several adjacent spans. Treat the list
+        # marker plus its following non-marker spans as one structural item;
+        # otherwise a lead-in can keep only the first sentence of the first
+        # bullet and crowd out later query-bearing bullets even when they fit.
         list_end = intro_end
         saw_item = False
-        for item_start, item_end in spans[best_index + 1:]:
+        cursor = best_index + 1
+        while cursor < len(spans):
+            item_start, item_end = spans[cursor]
             item = value[item_start:item_end].lstrip()
             if not re.match(r"(?:[-*+]\s+|\d+[.)]\s+)", item):
                 break
-            if item_end - intro_start > limit:
+            group_end = item_end
+            next_index = cursor + 1
+            while next_index < len(spans):
+                continuation_start, continuation_end = spans[next_index]
+                continuation = value[continuation_start:continuation_end].lstrip()
+                if re.match(r"(?:[-*+]\s+|\d+[.)]\s+)", continuation):
+                    break
+                group_end = continuation_end
+                next_index += 1
+            if group_end - intro_start > limit:
                 break
-            list_end = item_end
+            list_end = group_end
             saw_item = True
+            cursor = next_index
         if saw_item:
             selected_start, selected_end = intro_start, list_end
     selected_start, selected_end = _include_complete_code_fence(value, selected_start, selected_end, limit=limit)

@@ -134,3 +134,179 @@ def test_insufficient_evidence_action_prefers_procedural_span_over_state_definit
     assert _relation_request_priority(question, procedural) > _relation_request_priority(
         question, state_only,
     )
+
+
+def test_medium_complete_source_is_available_without_widening_long_windows():
+    from docmancer.docs.domain.context_windows import _projection_limits
+
+    # Keep enough room for one complete procedural atom (for example a job
+    # polling/retry paragraph) without making long architecture sections a
+    # universal projection window.
+    medium = "x" * 644
+    long = "x" * 955
+
+    assert _projection_limits(medium) == (160, 320, 520, 644)
+    assert _projection_limits(long) == (160, 320, 520)
+
+
+def test_decision_question_prefers_mechanism_over_state_taxonomy():
+    question = "How does the service decide which documentation version should be used?"
+    mechanism = "Project metadata is inspected to choose the exact documentation version."
+    taxonomy = "A version binding can be exact, declared-only, or unbound."
+
+    assert _relation_request_priority(question, mechanism) > _relation_request_priority(
+        question, taxonomy,
+    )
+
+
+def test_same_atom_forward_continuation_inherits_only_canonical_probe_qualification():
+    from docmancer.core.models import RetrievedChunk
+    from docmancer.docs.application._project_docs_service_part03 import (
+        _qualify_same_atom_continuations,
+    )
+
+    common = {
+        "parent_logical_id": "parent-1", "atom_id": "atom-1",
+        "project_identity": "project:test", "source_class": "project_file",
+    }
+    first = RetrievedChunk(
+        source="docs/workflow.md", chunk_index=1, text="If evidence is insufficient, continue ", score=2,
+        metadata={**common, "stable_chunk_id": "child-1", "char_span": [10, 48],
+                  "retrieval_query_matches": {"query-intent-1": {"qualified": True, "relation": "host_lookup"}},
+                  "retrieval_query_ids": ("query-intent-1",)},
+    )
+    second = RetrievedChunk(
+        source="docs/workflow.md", chunk_index=2, text="locally and stop before unsafe edits.", score=1,
+        metadata={**common, "stable_chunk_id": "child-2", "char_span": [48, 84],
+                  "retrieval_query_matches": {"query-intent-1": {"qualified": False}},
+                  "retrieval_query_ids": ()},
+    )
+    unrelated = RetrievedChunk(
+        source="docs/workflow.md", chunk_index=3, text="Unrelated next atom.", score=.5,
+        metadata={**common, "atom_id": "atom-2", "stable_chunk_id": "child-3", "char_span": [84, 105],
+                  "retrieval_query_matches": {"query-intent-1": {"qualified": False}},
+                  "retrieval_query_ids": ()},
+    )
+
+    rows = _qualify_same_atom_continuations([first, second, unrelated], "query-intent-1")
+    trace = rows[1].metadata["retrieval_query_matches"]["query-intent-1"]
+    assert trace["qualified"] is True
+    assert trace["qualification_route"] == "same_atom_continuation"
+    assert trace["coverage_kind"] == "derived"
+    assert rows[2].metadata["retrieval_query_ids"] == ()
+
+
+def test_same_atom_continuation_beats_unrelated_supplemental_candidate():
+    from docmancer.docs.application.context_candidate_ranking import _facet_aware_candidates
+
+    continuation = {
+        "path": "docs/workflow.md", "snippet": "continue locally; stop before unsafe edits",
+        "retrieval_query_matches": {"query-intent-1": {
+            "qualified": True, "qualification_route": "same_atom_continuation",
+        }},
+    }
+    unrelated = {
+        "path": "docs/examples.md", "snippet": "general project documentation examples",
+        "retrieval_query_matches": {"query-intent-1": {"qualified": True}},
+    }
+    ranked = _facet_aware_candidates(
+        [unrelated, continuation],
+        query_text={"query-original": "What should the agent do if evidence is insufficient?",
+                    "query-intent-1": "insufficient evidence documentation workflow"},
+        required_query_ids={"query-original"}, canonical_query_ids={"query-intent-1"},
+    )
+    assert ranked[0] is continuation
+
+
+def test_projection_keeps_structurally_derived_same_atom_continuation_without_public_coverage():
+    from docmancer.docs.application._docs_context_projection_core import _requalify_visible_source
+
+    source = {
+        "path_or_url": "docs/workflow.md", "section": "Workflow",
+        "snippet": "source/tests while keeping the claim unproved; stop before unsafe edits.",
+        "retrieval_query_matches": {"query-intent-1": {
+            "qualified": True, "relation": "host_lookup",
+            "qualification_route": "same_atom_continuation", "coverage_kind": "derived",
+            "coverage_kinds": ["derived"], "query_text": "insufficient evidence workflow",
+        }},
+        "retrieval_query_ids": ["query-intent-1"],
+        "_independent_query_plan": {"queries": [{
+            "query_id": "query-intent-1", "text": "insufficient evidence workflow",
+            "origin": "canonical_intent",
+        }]},
+    }
+    visible = _requalify_visible_source(source, query_text={
+        "query-original": "What should the agent do if evidence is insufficient?",
+        "query-intent-1": "insufficient evidence workflow",
+    })
+    assert visible["retrieval_query_matches"]["query-intent-1"]["qualified"] is True
+    assert "query-original" not in visible["retrieval_query_ids"]
+
+
+def test_same_atom_continuation_reassembles_verbatim_without_joining_next_atom():
+    from docmancer.core.models import RetrievedChunk
+    from docmancer.docs.application._project_docs_service_part03 import (
+        _merge_same_atom_continuations,
+    )
+    common = {"parent_logical_id": "p", "atom_id": "a", "char_span": [0, 6],
+              "retrieval_query_matches": {"q": {"qualified": True}},
+              "retrieval_query_ids": ("q",), "stable_chunk_id": "c1"}
+    lead = RetrievedChunk(source="docs/a.md", chunk_index=1, text="hello ", score=2, metadata=common)
+    cont = RetrievedChunk(source="docs/a.md", chunk_index=2, text="world", score=1, metadata={
+        **common, "char_span": [6, 11], "stable_chunk_id": "c2",
+        "retrieval_query_matches": {"q": {"qualified": True, "qualification_route": "same_atom_continuation"}},
+    })
+    other = RetrievedChunk(source="docs/a.md", chunk_index=3, text="!other", score=.5, metadata={
+        **common, "atom_id": "b", "char_span": [11, 17], "stable_chunk_id": "c3",
+    })
+    rows = _merge_same_atom_continuations([lead, cont, other], "q")
+    assert [row.text for row in rows] == ["hello world", "!other"]
+    assert rows[0].metadata["char_span"] == [0, 11]
+    assert rows[0].metadata["reassembled_from_stable_chunk_ids"] == ["c1", "c2"]
+
+
+def test_colon_leadin_keeps_complete_list_items_with_continuation_sentences():
+    from docmancer.docs.domain.context_windows import _focused_snippet
+
+    text = (
+        "The resolver chooses an exact artifact version from project metadata:\n\n"
+        "- **channel file** — selects an SDK channel. Determines SDK docs.\n"
+        "- **lock file** — extracts pinned dependency versions. Used as exact package docs versions.\n"
+        "- **manifest** — records declared dependency constraints.\n"
+    )
+    snippet, _, _ = _focused_snippet(
+        text,
+        ("How does the resolver choose the dependency version from a lock file?",),
+        limit=520,
+    )
+    assert "channel file" in snippet
+    assert "Determines SDK docs" in snippet
+    assert "lock file" in snippet
+    assert "Used as exact package docs versions" in snippet
+    assert "manifest" in snippet
+
+
+def test_optional_canonical_candidate_prefers_stronger_visible_match_over_source_prior():
+    from docmancer.docs.application.context_candidate_ranking import _facet_aware_candidates
+
+    stronger = {
+        "path": "docs/architecture.md", "snippet": "dependency version resolution from project lockfile",
+        "catalog_role": "project_architecture", "project_ranking": {"final_score": 1.0},
+        "retrieval_query_matches": {"query-intent-1": {
+            "qualified": True, "match_ratio": 0.8, "lexical_score": 8.0,
+        }},
+    }
+    weaker = {
+        "path": "docs/overview.md", "snippet": "dependency version evidence from a lockfile",
+        "catalog_role": "overview", "project_ranking": {"final_score": 9.0},
+        "retrieval_query_matches": {"query-intent-1": {
+            "qualified": True, "match_ratio": 0.6, "lexical_score": 20.0,
+        }},
+    }
+    ranked = _facet_aware_candidates(
+        [weaker, stronger], query_text={
+            "query-original": "Как система выбирает версию зависимости?",
+            "query-intent-1": "dependency version resolution project lockfile",
+        }, required_query_ids={"query-original"}, canonical_query_ids={"query-intent-1"},
+    )
+    assert ranked[0] is stronger
