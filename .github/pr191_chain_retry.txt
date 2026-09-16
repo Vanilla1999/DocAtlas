@@ -1,0 +1,1 @@
+Retry same-atom continuation-chain TDD after correcting the RED expectation to three failing invariants.
