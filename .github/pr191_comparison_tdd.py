@@ -53,6 +53,17 @@ def test_comparison_lookup_keeps_relation_semantics_in_cross_side_probe():
     )
     # Search vocabulary is relation-only; it must not inject a domain answer.
     assert not any(word in " ".join(relation) for word in ("manifest", "lockfile", "repository-owned"))
+
+
+def test_slash_comparison_keeps_relation_and_plain_cross_side_hypotheses():
+    question = "How do alpha documentation and beta/gamma documentation differ in retrieval scope and provenance?"
+    plan = build_documentation_query_plan(
+        question, requirements=build_requirements(question, profile="project_docs_answer")
+    )
+    relation = [q.text.casefold() for q in plan.queries if q.query_id.startswith("query-relation-")]
+    assert len(relation) <= 4
+    assert "alpha documentation beta documentation different separate" in relation
+    assert "alpha documentation gamma documentation" in relation
 ''',encoding='utf-8')
     Path(NEW_MANIFEST).write_text(json.dumps({
         'schema_version':1,'module_labels':{NEW_TEST:'behavioral'},'node_overrides':{},
@@ -62,16 +73,13 @@ def test_comparison_lookup_keeps_relation_semantics_in_cross_side_probe():
 def apply_fix():
     replace_once(
         'docmancer/docs/domain/documentation_query_plan.py',
-        'value = f"{left_value} {right_value}".strip()\n                if value and supplemental_query_is_useful(value):',
-        'value = f"{left_value} {right_value} different separate".strip()\n                if value and supplemental_query_is_useful(value):',
+        '''        for left_value in left_variants:\n            for right_value in right_variants:\n                value = f"{left_value} {right_value}".strip()\n                if value and supplemental_query_is_useful(value):\n                    groups.append(value[:500])''',
+        '''        pair_index = 0\n        for left_value in left_variants:\n            for right_value in right_variants:\n                # Keep two independent retrieval hypotheses inside the same\n                # bounded slot budget: one relation-aware paraphrase and, when\n                # slash alternatives exist, one plain lexical cross-side view.\n                relation_suffix = " different separate" if pair_index == 0 else ""\n                value = f"{left_value} {right_value}{relation_suffix}".strip()\n                pair_index += 1\n                if value and supplemental_query_is_useful(value):\n                    groups.append(value[:500])''',
     )
-    # The prior regression intentionally froze the old cross-side text. Update
-    # only those assertions to keep the same <=4-slot contract while requiring
-    # the newly preserved relation; the two axis probes remain unchanged.
     replace_once(
         OLD_TEST,
         '    assert "project documentation dependency documentation" in relation\n    assert "project documentation library documentation" in relation\n',
-        '    assert "project documentation dependency documentation different separate" in relation\n    assert "project documentation library documentation different separate" in relation\n',
+        '    assert "project documentation dependency documentation different separate" in relation\n    assert "project documentation library documentation" in relation\n',
     )
     refresh_manifest(OLD_MANIFEST,OLD_TEST)
 
