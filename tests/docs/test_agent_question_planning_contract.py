@@ -133,6 +133,9 @@ def test_host_gap_policy_preserves_question_and_targets_missing_fact() -> None:
     assert policy["bridge_values_require_source_reference"] is True
     assert policy["subquestions_preserve_conditions_and_comparison"] is True
     assert policy["stop_when_sufficient_or_no_progress"] is True
+    assert policy["first_call_before_split"] == "original_root_question"
+    assert policy["split_requires"] == "concrete_missing_requested_part_after_first_packet"
+    assert policy["comparison_alone_triggers_split"] is False
     assert workflow["retrieval_only_answer"]["false_or_unverified_flags_require_read"] is False
     assert workflow["retrieval_only_answer"]["authorizes_edit"] is False
 
@@ -157,3 +160,5 @@ def test_agent_surfaces_repeat_gap_directed_follow_up_rule() -> None:
         assert "conditions" in lowered and "comparison" in lowered
         assert "no progress" in lowered
         assert "unverified" in lowered and "does not require" in lowered
+        assert "do not pre-split" in lowered
+        assert "first packet" in lowered

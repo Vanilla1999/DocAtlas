@@ -47,6 +47,7 @@ def fixture(witness_line, *, selected):
         "projected_content_hash": sha256(witness.encode()).hexdigest(),
         "unit_char_start": start, "unit_char_end": start + len(witness),
     }
+    # The canonical assignment is source-bound and really verified by production.
     assert visible_assignments(source, {
         "snippet": text.rstrip("\n"), "line_start": 1, "line_end": 100,
     }, [assignment]) == (assignment,)
@@ -115,9 +116,12 @@ def test_checked_packet_does_not_schedule_recovery():
 
 def test_verified_missing_ranges_uses_assignment_offsets():
     from docmancer.docs.application.source_recovery_ranges import verified_missing_ranges
+
     source, _, _, _, retrieval = fixture(76, selected=False)
     assignments = tuple(retrieval["selection_decision"]["assignments"])
-    assert verified_missing_ranges(source, assignments, frozenset({"missing-rule"})) == (("missing-rule", 76, 76),)
+    assert verified_missing_ranges(
+        source, assignments, frozenset({"missing-rule"}),
+    ) == (("missing-rule", 76, 76),)
 
 
 @pytest.mark.parametrize("field,value", [
@@ -128,22 +132,36 @@ def test_verified_missing_ranges_uses_assignment_offsets():
 ])
 def test_invalid_assignment_is_not_a_targeted_witness(field, value):
     from docmancer.docs.application.source_recovery_ranges import verified_missing_ranges
+
     source, _, _, _, retrieval = fixture(76, selected=False)
     original = retrieval["selection_decision"]["assignments"][0]
     corrupted = {**original, field: value}
-    assert verified_missing_ranges(source, (corrupted,), frozenset({"missing-rule"})) == ()
+    assert verified_missing_ranges(
+        source, (corrupted,), frozenset({"missing-rule"}),
+    ) == ()
 
 
 def test_repeated_text_uses_assignment_occurrence():
     from docmancer.docs.application.source_recovery_ranges import verified_missing_ranges
+
     source, witness, _, _, retrieval = fixture(76, selected=False)
     lines = source["content"].splitlines()
     lines[9] = witness
     text = "\n".join(lines) + "\n"
-    source = {**source, "content": text, "_source_snapshot_sha256": "sha256:" + sha256(text.encode()).hexdigest()}
+    source = {
+        **source,
+        "content": text,
+        "_source_snapshot_sha256": "sha256:" + sha256(text.encode()).hexdigest(),
+    }
     start = text.rindex(witness)
-    assignment = {**retrieval["selection_decision"]["assignments"][0], "unit_char_start": start, "unit_char_end": start + len(witness)}
-    assert verified_missing_ranges(source, (assignment,), frozenset({"missing-rule"})) == (("missing-rule", 76, 76),)
+    assignment = {
+        **retrieval["selection_decision"]["assignments"][0],
+        "unit_char_start": start,
+        "unit_char_end": start + len(witness),
+    }
+    assert verified_missing_ranges(
+        source, (assignment,), frozenset({"missing-rule"}),
+    ) == (("missing-rule", 76, 76),)
 
 
 def test_public_handler_registers_targeted_missing_witness_and_controller_reads_it():
@@ -161,12 +179,13 @@ def test_public_handler_registers_targeted_missing_witness_and_controller_reads_
 
     def candidate(path, content, query_id, stable_id):
         return {
-            "stable_id": stable_id, "source_class": "project_doc", "path": path,
-            "heading_path": "Recovery", "content": content,
+            "stable_id": stable_id, "source_class": "project_doc",
+            "path": path, "heading_path": "Recovery", "content": content,
             "project_identity": "project:recovery", "line_start": 1,
             "line_end": 1 + content.count("\n"), "authority": "source_of_truth",
             "doc_scope": "project", "lifecycle_status": "active",
-            "freshness": "current", "index_freshness": "synchronized", "risk_flags": [],
+            "freshness": "current", "index_freshness": "synchronized",
+            "risk_flags": [],
             "_source_snapshot_sha256": "sha256:" + sha256(content.encode()).hexdigest(),
             "_source_catalog_hash": "sha256:" + sha256(("catalog:" + path).encode()).hexdigest(),
             "retrieval_query_ids": [query_id],
@@ -185,7 +204,8 @@ def test_public_handler_registers_targeted_missing_witness_and_controller_reads_
         "unit_char_start": start, "unit_char_end": start + len(witness),
     }
     raw = {
-        "status": "success", "mode_selected": "project", "project_identity": "project:recovery",
+        "status": "success", "mode_selected": "project",
+        "project_identity": "project:recovery",
         "context_pack": [direct_candidate, missing_candidate],
         "selection_decision": {"assignments": [assignment]},
         "documentation_query_plan": {
@@ -206,9 +226,14 @@ def test_public_handler_registers_targeted_missing_witness_and_controller_reads_
     class MappingGateway:
         def __init__(self):
             self.reads = 0
-            self.payloads = {"docs/direct.md": direct.encode(), "docs/example.md": long_source.encode()}
+            self.payloads = {
+                "docs/direct.md": direct.encode(),
+                "docs/example.md": long_source.encode(),
+            }
+
         def authorize(self, reference):
             return None
+
         def read_snapshot(self, reference):
             self.reads += 1
             return self.payloads[reference.path]
@@ -218,6 +243,7 @@ def test_public_handler_registers_targeted_missing_witness_and_controller_reads_
             self.raw = retrieval
             self.source_reader = source_reader
             self.unified_context = self
+
         def get_docs_context(self, *args, **kwargs):
             return deepcopy(self.raw)
 
@@ -246,3 +272,71 @@ def test_public_handler_registers_targeted_missing_witness_and_controller_reads_
     assert accepted["status"] in {"complete", "truncated"}
     assert witness in accepted["snippet"]
     assert gateway.reads == 1
+
+
+def _fallback_fixture(extra_before: str, extra_after: str):
+    visible = "Visible rule line one.\nVisible rule line two."
+    text = "\n".join([extra_before, *visible.splitlines(), extra_after]) + "\n"
+    source = {
+        "stable_id": "fallback-source", "source_class": "project_doc",
+        "path": "docs/fallback.md", "project_identity": "project:fixture",
+        "content": text, "line_start": 1, "line_end": 4,
+        "authority": "source_of_truth", "doc_scope": "project",
+        "_source_snapshot_sha256": "sha256:" + sha256(text.encode()).hexdigest(),
+        "_source_catalog_hash": "sha256:" + sha256(b"fallback-catalog").hexdigest(),
+    }
+    projected = {
+        "evidence_id": "visible-fallback", "path_or_url": source["path"],
+        "snippet": visible, "line_start": 2, "line_end": 3,
+    }
+    payload = {
+        "kind": "docs_context", "context_quality": {
+            "status": "unverified", "reasons": ["coverage_unverified"],
+        }, "sources": [projected], "edit_ready": False,
+    }
+    snapshot = {"visible-fallback": {"source": source}}
+    retrieval = {
+        "context_pack": [source], "selection_decision": {"assignments": []},
+        "documentation_query_plan": {"_component_coverage": {
+            "missing_component_ids": [],
+        }},
+        "retrieval_diagnostics": {"docs_context_projection": {
+            "projection_rejections": [],
+        }},
+    }
+    return source, payload, snapshot, retrieval
+
+
+def test_generic_read_next_targets_only_unseen_nonblank_lines():
+    source, payload, snapshot, retrieval = _fallback_fixture(
+        "Earlier unseen context.", "Later unseen context.",
+    )
+    target, bound = prepare_docs_context_read_next(
+        payload, snapshot, retrieval, root="/repo",
+    )
+    assert bound is source
+    assert target is not None
+    assert (target["line_start"], target["line_end"]) in {(1, 1), (4, 4)}
+
+    gateway = BytesGateway(source["content"].encode())
+    reader = SourceContinuationReader(gateway)
+    reference = SourceReference(
+        "/repo", source["project_identity"], source["path"],
+        source["_source_snapshot_sha256"], source["_source_catalog_hash"],
+        "source_of_truth", "project", None, 4,
+    )
+    reader.issue_range(
+        reference, line_start=target["line_start"], line_end=target["line_end"],
+        uri=target["source_uri"],
+    )
+    result = reader.read(target["source_uri"])
+    assert result["status"] == "complete"
+    assert "Visible rule" not in result["snippet"]
+    assert "unseen context" in result["snippet"]
+
+
+def test_generic_read_next_is_omitted_when_only_unseen_lines_are_blank():
+    _, payload, snapshot, retrieval = _fallback_fixture("", "")
+    assert prepare_docs_context_read_next(
+        payload, snapshot, retrieval, root="/repo",
+    ) == (None, None)

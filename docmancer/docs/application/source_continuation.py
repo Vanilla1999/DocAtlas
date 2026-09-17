@@ -8,7 +8,7 @@ from typing import Any
 
 from . import _source_continuation_core as _core
 from .model_visible_projection_helpers import docs_context_budget_tokens
-from .source_recovery_ranges import verified_missing_ranges
+from .source_recovery_ranges import unseen_adjacent_range, verified_missing_ranges
 
 SourceReference = _core.SourceReference
 SourceReadGateway = _core.SourceReadGateway
@@ -146,10 +146,13 @@ def prepare_docs_context_read_next(
             continue
         if not (0 < raw_start <= quote_start <= quote_end <= raw_end):
             continue
-        start = max(raw_start, quote_start - 20)
-        end = min(raw_end, start + SourceContinuationReader.max_lines - 1)
-        if start >= quote_start and end <= quote_end:
+        adjacent = unseen_adjacent_range(
+            original, visible_start=quote_start, visible_end=quote_end,
+            max_lines=SourceContinuationReader.max_lines,
+        )
+        if adjacent is None:
             continue
+        start, end = adjacent
         target = _read_next_row(
             root, original, line_start=start, line_end=end, reason="inspect_source_context",
         )

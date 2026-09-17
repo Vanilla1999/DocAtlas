@@ -97,13 +97,34 @@ def _context_rank(
     # A visible imperative is a better procedural lead than a topical mention.
     action_score = 0.0
     for query_id in required:
-        action = re.match(r"how\s+(?:do|can|should)\s+i\s+(\w+)\b", query_text.get(query_id, ""), re.I)
-        if not action and re.match(r"(?:what|which)\b", query_text.get(query_id, ""), re.I):
-            action = re.search(r"\b(run|use|call|invoke)\b", query_text[query_id], re.I)
-        if action and not (_NEGATION_RE.search(query_text[query_id]) or _FORBIDDEN_RE.search(query_text[query_id])) and any(unit.proposition and not (_NEGATION_RE.search(unit.text) or _FORBIDDEN_RE.search(unit.text)) and re.search(
+        question = query_text.get(query_id, "")
+        action = re.match(r"how\s+(?:do|can|should)\s+i\s+(\w+)\b", question, re.I)
+        if not action and re.match(r"(?:what|which)\b", question, re.I):
+            action = re.search(r"\b(run|use|call|invoke)\b", question, re.I)
+        safe_action_question = not (
+            _NEGATION_RE.search(question)
+            or re.search(r"\bnot\b", question, re.I)
+            or _FORBIDDEN_RE.search(question)
+        )
+        units = extract_answer_units(str(source.get("snippet") or source.get("content") or ""))
+        if action and safe_action_question and any(unit.proposition and not (_NEGATION_RE.search(unit.text) or _FORBIDDEN_RE.search(unit.text)) and re.search(
             rf"(?:^|[.!?]\s+|^\s*\|[^|\n]*\|\s*){re.escape(action[1])}\b|\b(?:use|run|call|invoke)\s+[^.!?\n`]{{0,80}}`[^`\n]+`",
             unit.text, re.I | re.M,
-        ) for unit in extract_answer_units(str(source.get("snippet") or source.get("content") or ""))):
+        ) for unit in units):
+            action_score += 1.0
+            continue
+        generic_action_question = bool(re.match(
+            r"\s*what\s+should\s+.+?\s+do\b", question, re.I,
+        ))
+        if generic_action_question and safe_action_question and any(
+            unit.proposition
+            and not (_NEGATION_RE.search(unit.text) or _FORBIDDEN_RE.search(unit.text))
+            and re.search(
+                r"\b(?:call|use|run|invoke|review|ask|validate|save|prefetch|check|read|retry|stop|continue)\b",
+                unit.text, re.I,
+            )
+            for unit in units
+        ):
             action_score += 1.0
     return (
         action_score,
@@ -271,8 +292,16 @@ def _facet_aware_candidates(
             _comparison_action_priority(query_text.get(key, ""), body_text)
             for key in qualified_ids & required_query_ids
         ), default=0)
+        root_question = query_text.get("query-original", "")
+        generic_action_priority = (
+            rank[0]
+            if re.match(r"\s*what\s+should\s+.+?\s+do\b", root_question, re.I)
+            and not (_NEGATION_RE.search(root_question) or re.search(r"\bnot\b", root_question, re.I) or _FORBIDDEN_RE.search(root_question))
+            else 0.0
+        )
         return (
-            condition_lead_priority(query_text.get("query-original", ""), str(source.get("snippet") or "")),
+            condition_lead_priority(root_question, str(source.get("snippet") or "")),
+            generic_action_priority,
             required_relation_preference,
             comparison_relation_marker,
             relation_group_count,

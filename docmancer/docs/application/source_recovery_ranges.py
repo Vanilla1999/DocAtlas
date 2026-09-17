@@ -35,6 +35,39 @@ def _assignment_span(
     return start, end
 
 
+def unseen_adjacent_range(
+    source: Mapping[str, Any], *, visible_start: int, visible_end: int, max_lines: int,
+) -> tuple[int, int] | None:
+    """Return a nonblank source-local range that excludes already-visible lines."""
+    raw_start, raw_end = source.get("line_start"), source.get("line_end")
+    if (
+        any(type(value) is not int for value in (raw_start, raw_end, visible_start, visible_end, max_lines))
+        or raw_start < 1 or raw_end < raw_start or max_lines < 1
+        or not raw_start <= visible_start <= visible_end <= raw_end
+    ):
+        return None
+    raw_text = _raw_text(source)
+    lines = raw_text.splitlines()
+    expected = raw_end - raw_start + 1
+    if len(lines) < expected:
+        return None
+    lines = lines[:expected]
+
+    def trimmed(start: int, end: int) -> tuple[int, int] | None:
+        if start > end:
+            return None
+        values = lines[start - raw_start:end - raw_start + 1]
+        nonblank = [index for index, value in enumerate(values) if value.strip()]
+        if not nonblank:
+            return None
+        return start + nonblank[0], start + nonblank[-1]
+
+    before = trimmed(max(raw_start, visible_start - max_lines), visible_start - 1)
+    if before is not None:
+        return before
+    return trimmed(visible_end + 1, min(raw_end, visible_end + max_lines))
+
+
 def verified_missing_ranges(
     source: dict[str, Any], assignments: tuple[dict[str, Any], ...],
     missing_ids: frozenset[str],
@@ -74,4 +107,4 @@ def verified_missing_ranges(
     return tuple(ranges)
 
 
-__all__ = ["verified_missing_ranges"]
+__all__ = ["unseen_adjacent_range", "verified_missing_ranges"]

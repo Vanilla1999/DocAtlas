@@ -85,6 +85,9 @@ WORKFLOW_POLICY: dict[str, Any] = {
         "bridge_values_require_source_reference": True,
         "subquestions_preserve_conditions_and_comparison": True,
         "stop_when_sufficient_or_no_progress": True,
+        "first_call_before_split": "original_root_question",
+        "split_requires": "concrete_missing_requested_part_after_first_packet",
+        "comparison_alone_triggers_split": False,
     },
     "version_binding": {
         "project_query_default": "resolve_current_project_version",
