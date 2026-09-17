@@ -22,17 +22,26 @@ def _prefer_missing_baseline_candidate(
     candidates: list[Any], selected: list[dict[str, Any]], public_query_ids: set[str],
     host_query_ids: set[str], canonical_query_ids: set[str],
 ) -> None:
-    """Keep original/exact evidence ahead of expansion-only candidates."""
+    """Protect baseline evidence without starving independent host lookups."""
     if not host_query_ids:
         return
     selected_ids = qualified_query_ids(selected)
+    missing_host = host_query_ids - selected_ids
+    preserve_lookup_diversity = len(host_query_ids) > 1 and bool(missing_host)
+
+    def protects(candidate: Any, wanted_ids: set[str]) -> bool:
+        candidate_ids = qualified_query_ids((candidate,))
+        return bool(candidate_ids & wanted_ids) and (
+            not preserve_lookup_diversity or bool(candidate_ids & missing_host)
+        )
+
     missing_public = (public_query_ids - host_query_ids) - selected_ids
     protected = next((i for i, candidate in enumerate(candidates)
-                      if qualified_query_ids((candidate,)) & missing_public), None)
+                      if protects(candidate, missing_public)), None)
     if protected is None:
         missing_canonical = canonical_query_ids - selected_ids
         protected = next((i for i, candidate in enumerate(candidates)
-                          if qualified_query_ids((candidate,)) & missing_canonical
+                          if protects(candidate, missing_canonical)
                           and not (qualified_query_ids((candidate,)) & host_query_ids)), None)
     if protected not in (None, 0):
         candidates.insert(0, candidates.pop(protected))

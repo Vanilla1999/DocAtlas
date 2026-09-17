@@ -8,6 +8,7 @@ import re
 from typing import Any
 from ._docs_context_payload import _payload
 from .source_continuation import attach_source_continuation_locators
+from .visible_evidence_retention import retains_visible_sources
 from .context_query_probes import independent_query_probes
 from docmancer.docs.domain.context_hint_policy import fallback_context_query_ids, has_context_hint_support
 
@@ -619,11 +620,13 @@ def project_docs_context(
             retrieval["retrieval_diagnostics"]["docs_context_projection"]
         )
         hinted_diagnostics['primary_attempt'] = primary_attempt
-        if primary_ids < hinted_ids:
+        if primary_ids < hinted_ids and retains_visible_sources(payload, hinted_payload):
             retrieval["retrieval_diagnostics"]["docs_context_projection"] = hinted_diagnostics
             return hinted_payload, hinted_snapshot
         primary_diagnostics['hint_attempt'] = hinted_diagnostics
         retrieval["retrieval_diagnostics"]["docs_context_projection"] = primary_diagnostics
+        if selection_diagnostics is not None:
+            selection_diagnostics["component_coverage"] = component_decision.as_payload()
     if root := retrieval.get("_source_continuation_project_root"):
         attach_source_continuation_locators(payload, snapshot, root=root, max_tokens=max_tokens)
     return payload, snapshot

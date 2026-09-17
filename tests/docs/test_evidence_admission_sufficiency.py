@@ -192,6 +192,70 @@ def test_partial_primary_packet_can_add_safe_hint_without_losing_primary_source(
     assert payload["edit_ready"] is False
 
 
+def test_additive_hint_retry_preserves_primary_snippet_under_tight_budget():
+    question = "When answering about a module, should the agent automatically use scope=all for maximum recall?"
+    lookups = ("maximum recall repository breadth",)
+    requirements = build_requirements(question, profile="project_docs_answer")
+    plan = build_documentation_query_plan(question, lookup_queries=lookups, requirements=requirements)
+    host = next(item for item in plan.queries if item.query_id == "query-lookup-1")
+    hint = next(item for item in plan.queries if item.query_id == "query-hint-1")
+    primary = _project_source(
+        path="docs/repository-overview.md",
+        query_id=host.query_id,
+        query_text=host.text,
+        content=(
+            "Maximum recall across repository breadth is an overview concern.\n\n"
+            "The overview must not grant edit authority."
+        ),
+    )
+    supporting = _project_source(
+        path="docs/module-scope.md",
+        query_id=hint.query_id,
+        query_text=hint.text,
+        content=(
+            "When answering about a module, keep the request scoped to that module and "
+            "its exact module path. Repository-wide scope is a separate overview case."
+        ),
+    )
+    base_retrieval = {
+        "question": question,
+        "project_identity": PROJECT_ID,
+        "requirements": requirements.hash_payload,
+        "context_pack": [primary],
+        "documentation_query_plan": plan.as_payload(),
+    }
+    hinted_retrieval = {**base_retrieval, "context_pack": [primary, supporting]}
+
+    before, _ = project_docs_context(retrieval=base_retrieval, max_tokens=410)
+    after, _ = project_docs_context(retrieval=hinted_retrieval, max_tokens=410)
+
+    assert before["sources"]
+    previous = before["sources"][0]
+    assert "The overview must not grant edit authority." in previous["snippet"]
+    trial_by_id = {row["evidence_id"]: row for row in after["sources"]}
+    assert previous["evidence_id"] in trial_by_id
+    assert previous["snippet"] in trial_by_id[previous["evidence_id"]]["snippet"]
+    assert after["estimated_tokens"] <= 410
+    assert len(after["sources"]) <= 3
+    assert after["answer_supported"] is False
+    assert after["edit_ready"] is False
+
+
+def test_visible_source_retention_requires_ids_and_existing_snippets():
+    from docmancer.docs.application.docs_context_projection import _retains_visible_sources
+
+    previous = {"sources": [{"evidence_id": "a", "snippet": "alpha beta"}]}
+    assert _retains_visible_sources(
+        previous, {"sources": [{"evidence_id": "a", "snippet": "alpha beta gamma"}]}
+    ) is True
+    assert _retains_visible_sources(
+        previous, {"sources": [{"evidence_id": "a", "snippet": "alpha"}]}
+    ) is False
+    assert _retains_visible_sources(
+        previous, {"sources": [{"evidence_id": "b", "snippet": "alpha beta"}]}
+    ) is False
+
+
 def test_comparison_relation_qualification_prefers_supporting_relation_over_keyword_salad():
     from docmancer.docs.domain.evidence_qualification import qualify_evidence
 
@@ -230,6 +294,116 @@ def test_comparison_relation_qualification_prefers_supporting_relation_over_keyw
     assert supporting.qualified is True
     assert distractor.qualified is False
     assert distractor.reason == "missing_visible_comparison_relation"
+
+
+@pytest.mark.parametrize("subject", ["cache", "queue", "database"])
+def test_comparison_relation_rejects_unrelated_same_sentence_clause(subject: str) -> None:
+    probe = {
+        "query_text": (
+            "matching search result evidence sufficient answer condition different separate"
+        )
+    }
+    for text in (
+        (
+            "Matching search result evidence describes sufficient answer condition terminology, "
+            f"whereas this {subject} has new settings."
+        ),
+        (
+            "Matching search result evidence describes sufficient answer condition terminology; "
+            f"this {subject} is not enough to prove storage capacity."
+        ),
+        (
+            "Matching search result evidence describes sufficient answer condition terminology; "
+            f"this {subject} is different from last year."
+        ),
+    ):
+        result = qualify_evidence(
+            probe, query_id="query-relation-1", visible_text=text
+        )
+        assert result.qualified is False, text
+        assert result.reason == "missing_visible_comparison_relation"
+
+
+@pytest.mark.parametrize("text", [
+    (
+        "Matching search result evidence\n"
+        "is not the same as\n"
+        "sufficient answer condition."
+    ),
+    (
+        "Matching search result evidence is not the\n"
+        "same as sufficient answer condition."
+    ),
+    (
+        "Matching search result evidence is different\n"
+        "from sufficient answer condition."
+    ),
+])
+def test_comparison_relation_preserves_soft_wrapped_prose(text: str) -> None:
+    probe = {
+        "query_text": (
+            "matching search result evidence sufficient answer condition different separate"
+        )
+    }
+    compact = " ".join(text.split())
+    assert qualify_evidence(
+        probe, query_id="query-relation-1", visible_text=compact
+    ).qualified is True
+    assert qualify_evidence(
+        probe, query_id="query-relation-1", visible_text=text
+    ).qualified is True
+
+
+@pytest.mark.parametrize("text", [
+    (
+        "Matching search result evidence describes sufficient answer condition terminology.\n\n"
+        "These cache settings are different."
+    ),
+    (
+        "- Matching search result evidence describes sufficient answer condition terminology\n"
+        "- These cache settings are different"
+    ),
+    (
+        "| Matching search result evidence sufficient answer condition | "
+        "These settings are different |"
+    ),
+    (
+        "Matching search result evidence describes sufficient answer condition terminology.\n\n"
+        "```text\nThese cache settings are different\n```"
+    ),
+    (
+        "# Matching search result evidence sufficient answer condition\n\n"
+        "These cache settings are different."
+    ),
+])
+def test_comparison_relation_does_not_cross_structural_boundaries(text: str) -> None:
+    probe = {
+        "query_text": (
+            "matching search result evidence sufficient answer condition different separate"
+        )
+    }
+    result = qualify_evidence(
+        probe, query_id="query-relation-1", visible_text=text
+    )
+    assert result.qualified is False
+    assert result.reason == "missing_visible_comparison_relation"
+
+
+def test_comparison_relation_keeps_valid_relation_with_unrelated_suffix() -> None:
+    probe = {
+        "query_text": (
+            "matching search result evidence sufficient answer condition different separate"
+        )
+    }
+    result = qualify_evidence(
+        probe,
+        query_id="query-relation-1",
+        visible_text=(
+            "Matching search result evidence is different from sufficient answer condition; "
+            "this cache has new settings."
+        ),
+    )
+    assert result.qualified is True
 
 
 def test_comparison_relation_rejects_unrelated_different_adjective() -> None:
@@ -298,6 +472,60 @@ def test_comparison_relation_rejects_unrelated_different_from_clause() -> None:
         "These examples are different from last year."))
     assert distractor.qualified is False
     assert distractor.reason == "missing_visible_comparison_relation"
+
+
+
+def test_multiple_host_lookups_do_not_let_baseline_only_candidate_preempt_lookup_diversity():
+    from docmancer.docs.application.context_candidate_ranking import _prefer_missing_baseline_candidate
+
+    def candidate(*query_ids: str) -> dict:
+        return {
+            "retrieval_query_matches": {
+                query_id: {"qualified": True}
+                for query_id in query_ids
+            }
+        }
+
+    lookup_candidate = candidate("query-lookup-1", "query-lookup-2")
+    anchor_only = candidate("query-anchor-1")
+    canonical_only = candidate("query-intent-1")
+    candidates = [lookup_candidate, anchor_only, canonical_only]
+
+    _prefer_missing_baseline_candidate(
+        candidates,
+        [],
+        {"query-original", "query-anchor-1", "query-lookup-1", "query-lookup-2"},
+        {"query-lookup-1", "query-lookup-2"},
+        {"query-intent-1"},
+    )
+
+    assert candidates[0] is lookup_candidate
+
+def test_multiple_host_lookups_allow_baseline_protection_after_lookup_coverage_is_complete():
+    from docmancer.docs.application.context_candidate_ranking import _prefer_missing_baseline_candidate
+
+    def candidate(*query_ids: str) -> dict:
+        return {
+            "retrieval_query_matches": {
+                query_id: {"qualified": True}
+                for query_id in query_ids
+            }
+        }
+
+    neutral = candidate("query-hint-1")
+    anchor_only = candidate("query-anchor-1")
+    candidates = [neutral, anchor_only]
+    selected = [candidate("query-lookup-1", "query-lookup-2")]
+
+    _prefer_missing_baseline_candidate(
+        candidates,
+        selected,
+        {"query-original", "query-anchor-1", "query-lookup-1", "query-lookup-2"},
+        {"query-lookup-1", "query-lookup-2"},
+        {"query-intent-1"},
+    )
+
+    assert candidates[0] is anchor_only
 
 
 def test_original_witness_is_protected_even_when_it_also_matches_host_lookup():

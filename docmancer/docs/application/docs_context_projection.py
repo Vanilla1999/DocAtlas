@@ -27,6 +27,7 @@ from .source_continuation import (
     docs_context_read_next_cost,
     prepare_docs_context_read_next,
 )
+from .visible_evidence_retention import retains_visible_sources as _retains_visible_sources
 
 # Preserve the established helper surface used by focused production tests.
 _expand_selected_snippets = _core._expand_selected_snippets
@@ -156,28 +157,6 @@ def _strip_legacy_locators(payload: dict[str, Any], snapshot: dict[str, Any]) ->
             if isinstance(projected, dict):
                 projected.pop("source_uri", None)
     _refresh_estimate(payload)
-
-
-def _retains_visible_sources(
-    previous: dict[str, Any], trial: dict[str, Any],
-) -> bool:
-    """Do not buy recovery metadata by deleting already-visible evidence text."""
-    trial_by_id = {
-        str(row.get("evidence_id") or ""): row
-        for row in trial.get("sources") or () if isinstance(row, dict)
-    }
-    for row in previous.get("sources") or ():
-        if not isinstance(row, dict):
-            continue
-        evidence_id = str(row.get("evidence_id") or "")
-        replacement = trial_by_id.get(evidence_id)
-        if replacement is None:
-            return False
-        old_snippet = str(row.get("snippet") or "")
-        new_snippet = str(replacement.get("snippet") or "")
-        if old_snippet and old_snippet not in new_snippet:
-            return False
-    return True
 
 
 def _finalize_quality(

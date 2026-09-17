@@ -36,11 +36,139 @@ _PROOF_INSUFFICIENCY_RELATION_RE = re.compile(
 )
 
 
+def _clean_relation_line(value: str) -> str:
+    value = re.sub(r"!?\[[^\]]*\](?:\([^)]*\)|\[[^\]]*\])", "", value)
+    value = re.sub(r"https?://\S+", "", value)
+    return " ".join(value.split()).strip()
+
+
+def _relation_units(body: str) -> tuple[str, ...]:
+    """Build relation-local units while preserving Markdown structural boundaries."""
+    lines = body.splitlines()
+    units: list[str] = []
+    buffer: list[str] = []
+    buffer_kind = ""
+    fence = ""
+
+    def flush() -> None:
+        nonlocal buffer, buffer_kind
+        value = _clean_relation_line(" ".join(buffer))
+        if value:
+            units.append(value)
+        buffer = []
+        buffer_kind = ""
+
+    index = 0
+    while index < len(lines):
+        line = lines[index]
+        stripped = line.strip()
+        fence_match = re.match(r"^ {0,3}(`{3,}|~{3,})(.*)$", line)
+        if fence:
+            if (
+                fence_match
+                and fence_match[1][0] == fence[0]
+                and len(fence_match[1]) >= len(fence)
+                and not fence_match[2].strip()
+            ):
+                flush()
+                fence = ""
+            elif stripped:
+                buffer.append(line)
+            index += 1
+            continue
+        if fence_match:
+            flush()
+            fence = fence_match[1]
+            buffer_kind = "code"
+            index += 1
+            continue
+        if not stripped:
+            flush()
+            index += 1
+            continue
+        if line.lstrip().startswith("#"):
+            flush()
+            index += 1
+            continue
+        next_line = lines[index + 1].strip() if index + 1 < len(lines) else ""
+        if next_line and re.fullmatch(r"[=-]{3,}", next_line):
+            flush()
+            index += 2
+            continue
+        if re.fullmatch(r"\|?\s*:?-{3,}:?\s*(?:\|\s*:?-{3,}:?\s*)*\|?", stripped):
+            flush()
+            index += 1
+            continue
+        if line.count("|") >= 2:
+            flush()
+            for cell in re.split(r"(?<!\\)\|", line.strip().strip("|")):
+                value = _clean_relation_line(cell)
+                if value and not re.fullmatch(r":?-{3,}:?", value):
+                    units.append(value)
+            index += 1
+            continue
+        list_match = re.match(r"^\s*(?:[-*+] |\d+[.)]\s+)(.*)$", line)
+        if list_match:
+            flush()
+            buffer = [list_match.group(1)]
+            buffer_kind = "list"
+            index += 1
+            continue
+        if buffer_kind == "list" and not line[:1].isspace():
+            flush()
+        buffer.append(line)
+        if not buffer_kind:
+            buffer_kind = "prose"
+        index += 1
+    flush()
+    return tuple(units)
+
+
 def _comparison_relation_probe(query_id: str, query_text: str) -> bool:
     if not query_id.startswith("query-relation-"):
         return False
     tokens = tuple(re.findall(r"[A-Za-z]+", query_text.casefold()))
     return len(tokens) >= 2 and tuple(tokens[-2:]) == ("different", "separate")
+
+
+def _relation_term_count(text: str, terms: tuple[str, ...]) -> int:
+    return sum(_visible_term_present(term, text, exact=False) for term in terms)
+
+
+def _proof_relation_is_locally_bound(
+    clause: str, match: re.Match[str], terms: tuple[str, ...],
+) -> bool:
+    """Do not borrow proof subjects from a neighboring comma-delimited clause."""
+    left = max(clause.rfind(",", 0, match.start()), clause.rfind(";", 0, match.start()))
+    right_candidates = [
+        pos for token in (",", ";")
+        if (pos := clause.find(token, match.end())) >= 0
+    ]
+    right = min(right_candidates) if right_candidates else len(clause)
+    local = clause[left + 1:right]
+    return any(_visible_term_present(term, local, exact=False) for term in terms)
+
+
+def _general_relation_is_locally_bound(
+    clause: str, match: re.Match[str], terms: tuple[str, ...],
+) -> bool:
+    marker = match.group(0).casefold()
+    before, after = clause[:match.start()], clause[match.end():]
+    splits_sides = (
+        "whereas" in marker
+        or re.search(r"\bdiffers?\b", marker) is not None
+        or "rather than" in marker
+        or "instead of" in marker
+        or " from" in marker
+        or ("not the same" in marker and re.match(r"\s+as\b", after) is not None)
+    )
+    if splits_sides:
+        return (
+            _relation_term_count(before, terms) >= 1
+            and _relation_term_count(after, terms) >= 1
+        )
+    needed = min(2, len(terms))
+    return bool(needed and _relation_term_count(clause, terms) >= needed)
 
 
 def _visible_comparison_relation(text: str, terms: tuple[str, ...]) -> bool:
@@ -49,19 +177,15 @@ def _visible_comparison_relation(text: str, terms: tuple[str, ...]) -> bool:
         sentence = sentence.strip()
         if not sentence:
             continue
-        if _PROOF_INSUFFICIENCY_RELATION_RE.search(sentence):
-            if any(
-                _visible_term_present(term, sentence, exact=False)
-                for term in terms
-            ):
-                return True
-        if _GENERAL_COMPARISON_RELATION_RE.search(sentence):
-            needed = min(2, len(terms))
-            if needed and sum(
-                _visible_term_present(term, sentence, exact=False)
-                for term in terms
-            ) >= needed:
-                return True
+        for clause in (value.strip() for value in sentence.split(";")):
+            if not clause:
+                continue
+            for match in _PROOF_INSUFFICIENCY_RELATION_RE.finditer(clause):
+                if _proof_relation_is_locally_bound(clause, match, terms):
+                    return True
+            for match in _GENERAL_COMPARISON_RELATION_RE.finditer(clause):
+                if _general_relation_is_locally_bound(clause, match, terms):
+                    return True
     return False
 
 
@@ -224,7 +348,8 @@ def qualify_evidence(
         ))
     if comparison_relation:
         terms = tuple(term for term in terms if term not in _COMPARISON_RELATION_MARKERS)
-        if not _visible_comparison_relation(normalized_evidence, terms):
+        relation_units = _relation_units(body)
+        if not any(_visible_comparison_relation(unit, terms) for unit in relation_units):
             return _rejected(result, "missing_visible_comparison_relation")
     if not terms:
         return _rejected(result, "missing_visible_query_terms")
