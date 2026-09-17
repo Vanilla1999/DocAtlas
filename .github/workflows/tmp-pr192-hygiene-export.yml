@@ -12,9 +12,9 @@ jobs:
         with:
           ref: fix/pr192-ci-hygiene
       - name: Archive source
-        run: tar --exclude=.git --exclude=.github/workflows/tmp-pr192-hygiene-export.yml -czf hygiene-source.tar.gz .
+        run: tar --exclude=.git --exclude=.github/workflows/tmp-pr192-hygiene-export.yml -czf /tmp/hygiene-source.tar.gz .
       - uses: actions/upload-artifact@v4
         with:
           name: pr192-hygiene-source
-          path: hygiene-source.tar.gz
+          path: /tmp/hygiene-source.tar.gz
           if-no-files-found: error
