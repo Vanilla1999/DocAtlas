@@ -47,7 +47,6 @@ def fixture(witness_line, *, selected):
         "projected_content_hash": sha256(witness.encode()).hexdigest(),
         "unit_char_start": start, "unit_char_end": start + len(witness),
     }
-    # The canonical assignment is source-bound and really verified by production.
     assert visible_assignments(source, {
         "snippet": text.rstrip("\n"), "line_start": 1, "line_end": 100,
     }, [assignment]) == (assignment,)
@@ -116,12 +115,9 @@ def test_checked_packet_does_not_schedule_recovery():
 
 def test_verified_missing_ranges_uses_assignment_offsets():
     from docmancer.docs.application.source_recovery_ranges import verified_missing_ranges
-
     source, _, _, _, retrieval = fixture(76, selected=False)
     assignments = tuple(retrieval["selection_decision"]["assignments"])
-    assert verified_missing_ranges(
-        source, assignments, frozenset({"missing-rule"}),
-    ) == (("missing-rule", 76, 76),)
+    assert verified_missing_ranges(source, assignments, frozenset({"missing-rule"})) == (("missing-rule", 76, 76),)
 
 
 @pytest.mark.parametrize("field,value", [
@@ -132,33 +128,121 @@ def test_verified_missing_ranges_uses_assignment_offsets():
 ])
 def test_invalid_assignment_is_not_a_targeted_witness(field, value):
     from docmancer.docs.application.source_recovery_ranges import verified_missing_ranges
-
     source, _, _, _, retrieval = fixture(76, selected=False)
     original = retrieval["selection_decision"]["assignments"][0]
     corrupted = {**original, field: value}
-    assert verified_missing_ranges(
-        source, (corrupted,), frozenset({"missing-rule"}),
-    ) == ()
+    assert verified_missing_ranges(source, (corrupted,), frozenset({"missing-rule"})) == ()
 
 
 def test_repeated_text_uses_assignment_occurrence():
     from docmancer.docs.application.source_recovery_ranges import verified_missing_ranges
-
     source, witness, _, _, retrieval = fixture(76, selected=False)
     lines = source["content"].splitlines()
     lines[9] = witness
     text = "\n".join(lines) + "\n"
-    source = {
-        **source,
-        "content": text,
-        "_source_snapshot_sha256": "sha256:" + sha256(text.encode()).hexdigest(),
-    }
+    source = {**source, "content": text, "_source_snapshot_sha256": "sha256:" + sha256(text.encode()).hexdigest()}
     start = text.rindex(witness)
+    assignment = {**retrieval["selection_decision"]["assignments"][0], "unit_char_start": start, "unit_char_end": start + len(witness)}
+    assert verified_missing_ranges(source, (assignment,), frozenset({"missing-rule"})) == (("missing-rule", 76, 76),)
+
+
+def test_public_handler_registers_targeted_missing_witness_and_controller_reads_it():
+    from docmancer.docs.interfaces.host_context import SourceReadController
+    from docmancer.docs.interfaces.mcp.context_tools import handle_context_tool
+
+    witness = "Only after the review completes may the operation proceed."
+    direct = "The export operation preserves original identifiers."
+    lines = ["```python"]
+    lines.extend(f"# background {index}" for index in range(1, 94))
+    lines.append(witness)
+    lines.extend(f"# background {index}" for index in range(95, 180))
+    lines.append("```")
+    long_source = "\n".join(lines)
+
+    def candidate(path, content, query_id, stable_id):
+        return {
+            "stable_id": stable_id, "source_class": "project_doc", "path": path,
+            "heading_path": "Recovery", "content": content,
+            "project_identity": "project:recovery", "line_start": 1,
+            "line_end": 1 + content.count("\n"), "authority": "source_of_truth",
+            "doc_scope": "project", "lifecycle_status": "active",
+            "freshness": "current", "index_freshness": "synchronized", "risk_flags": [],
+            "_source_snapshot_sha256": "sha256:" + sha256(content.encode()).hexdigest(),
+            "_source_catalog_hash": "sha256:" + sha256(("catalog:" + path).encode()).hexdigest(),
+            "retrieval_query_ids": [query_id],
+            "retrieval_query_matches": {query_id: {
+                "qualified": True, "mode": "and",
+                "query_text": "export identifiers" if query_id == "query-original" else "complete runnable example",
+            }},
+        }
+
+    direct_candidate = candidate("docs/direct.md", direct, "query-original", "direct")
+    missing_candidate = candidate("docs/example.md", long_source, "query-example", "source-example")
+    start = long_source.index(witness)
     assignment = {
-        **retrieval["selection_decision"]["assignments"][0],
-        "unit_char_start": start,
-        "unit_char_end": start + len(witness),
+        "requirement_id": "missing-rule", "evidence_id": "source-example",
+        "projected_content_hash": sha256(witness.encode()).hexdigest(),
+        "unit_char_start": start, "unit_char_end": start + len(witness),
     }
-    assert verified_missing_ranges(
-        source, (assignment,), frozenset({"missing-rule"}),
-    ) == (("missing-rule", 76, 76),)
+    raw = {
+        "status": "success", "mode_selected": "project", "project_identity": "project:recovery",
+        "context_pack": [direct_candidate, missing_candidate],
+        "selection_decision": {"assignments": [assignment]},
+        "documentation_query_plan": {
+            "original_question": "How does export preserve identifiers and what review rule applies?",
+            "query_ids": ["query-original", "query-example"],
+            "required_query_ids": ["query-original", "query-example"],
+            "public_query_ids": ["query-original", "query-example"],
+            "queries": [
+                {"query_id": "query-original", "text": "export identifiers", "origin": "original"},
+                {"query_id": "query-example", "text": "complete runnable example", "origin": "host_lookup"},
+            ],
+            "_component_contract": [{"component_id": "missing-rule"}],
+            "component_scope_complete": True,
+        },
+        "retrieval_diagnostics": {},
+    }
+
+    class MappingGateway:
+        def __init__(self):
+            self.reads = 0
+            self.payloads = {"docs/direct.md": direct.encode(), "docs/example.md": long_source.encode()}
+        def authorize(self, reference):
+            return None
+        def read_snapshot(self, reference):
+            self.reads += 1
+            return self.payloads[reference.path]
+
+    class ContextApp:
+        def __init__(self, retrieval, source_reader):
+            self.raw = retrieval
+            self.source_reader = source_reader
+            self.unified_context = self
+        def get_docs_context(self, *args, **kwargs):
+            return deepcopy(self.raw)
+
+    gateway = MappingGateway()
+    reader = SourceContinuationReader(gateway)
+    payload = handle_context_tool("get_docs_context", {
+        "question": raw["documentation_query_plan"]["original_question"],
+        "project_path": "/repo", "scope": "all",
+    }, ContextApp(raw, reader))
+
+    assert gateway.reads == 0
+    assert payload["context_quality"]["status"] == "partial"
+    assert len(payload["read_next"]) == 1
+    target = payload["read_next"][0]
+    assert target["path"] == "docs/example.md"
+    assert target["line_start"] == target["line_end"] == 95
+    assert target["reason"] == "requested_part_missing"
+    assert docs_context_budget_tokens(payload) <= 800
+
+    controller = SourceReadController(
+        payload,
+        requested_facts={"missing-rule": "What review rule applies to the operation?"},
+        read_resource=reader.read,
+    )
+    accepted = controller.read(target["source_uri"], missing_fact_id="missing-rule")
+    assert accepted["status"] in {"complete", "truncated"}
+    assert witness in accepted["snippet"]
+    assert gateway.reads == 1
