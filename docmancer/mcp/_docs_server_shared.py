@@ -18,7 +18,7 @@ _GET_DOCS_CONTEXT_LOOKUP_DESCRIPTION = (
     "Same question only. For cross-language, comparison, conditional, or multiple dependent facets use 1–3 short lookups in the documentation language; simple single-facet questions need none. Keep the original question unchanged; preserve exact identifiers, versions, conditions, negation and comparison sides. Never batch independent questions, invent the expected answer, or use guessed source names."
 )
 _GET_DOCS_CONTEXT_SCOPE_GUIDANCE = (
-    'For onboarding/cross-module use scope="all"; use scope="project" for repo policy and '
+    'For onboarding/cross-module use scope=all without module filters (scope="all"); use scope="project" for repo policy and '
     'scope="module" with exact module_path. module_path always implies module scope. Preserve explicit scope; never widen it.'
 )
 _GET_DOCS_CONTEXT_SCOPE_DESCRIPTION = (
