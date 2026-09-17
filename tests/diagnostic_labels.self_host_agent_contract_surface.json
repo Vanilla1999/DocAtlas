@@ -1,0 +1,10 @@
+{
+  "schema_version": 1,
+  "module_labels": {
+    "tests/docs/test_self_host_agent_contract_surface.py": "behavioral"
+  },
+  "node_overrides": {},
+  "module_node_hashes": {
+    "tests/docs/test_self_host_agent_contract_surface.py": "abb741bbd2e703cc41fe65f1f2a72143abce9a24be6568a4fe1b44698f16eb36"
+  }
+}
