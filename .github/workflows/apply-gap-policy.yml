@@ -96,7 +96,7 @@ jobs:
                   assert "unverified" in lowered and "does not require" in lowered
           '''
           if 'def test_host_gap_policy_preserves_question_and_targets_missing_fact' not in text:
-              tests.write_text(text.rstrip() + extra + '\n', encoding='utf-8')
+              tests.write_text(text.rstrip() + extra.rstrip() + '\n', encoding='utf-8')
 
           manifest = Path('tests/diagnostic_labels.agent_question_planning.json')
           data = json.loads(manifest.read_text(encoding='utf-8'))
