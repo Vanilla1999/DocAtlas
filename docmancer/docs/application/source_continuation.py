@@ -8,6 +8,7 @@ from typing import Any
 
 from . import _source_continuation_core as _core
 from .model_visible_projection_helpers import docs_context_budget_tokens
+from .source_recovery_ranges import verified_missing_ranges
 
 SourceReference = _core.SourceReference
 SourceReadGateway = _core.SourceReadGateway
@@ -81,6 +82,37 @@ def prepare_docs_context_read_next(
         item for item in retrieval.get("context_pack") or ()
         if isinstance(item, dict) and str(item.get("source_class") or "") == "project_doc"
     )
+
+    selection = retrieval.get("selection_decision") or {}
+    assignments = tuple(
+        row for row in selection.get("assignments", ()) if isinstance(row, dict)
+    ) if isinstance(selection, dict) else ()
+    current_call_candidates = list(candidates)
+    current_call_candidates.extend(
+        bound["source"] for bound in snapshot.values()
+        if isinstance(bound, dict) and isinstance(bound.get("source"), dict)
+        and bound["source"].get("source_class") == "project_doc"
+    )
+    seen_sources = set()
+    for original in current_call_candidates:
+        key = (
+            _candidate_identity(original), original.get("_source_snapshot_sha256"),
+            original.get("project_identity"),
+        )
+        if key in seen_sources:
+            continue
+        seen_sources.add(key)
+        for _, start, end in verified_missing_ranges(
+            original, assignments, frozenset(missing),
+        ):
+            if end - start + 1 > SourceContinuationReader.max_lines:
+                continue
+            target = _read_next_row(
+                root, original, line_start=start, line_end=end,
+                reason="requested_part_missing",
+            )
+            if target is not None:
+                return target, original
 
     for rejection in rejections:
         if not isinstance(rejection, dict) or rejection.get("reason") != "token_budget":

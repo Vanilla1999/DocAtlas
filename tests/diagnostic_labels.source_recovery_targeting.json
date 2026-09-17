@@ -1,0 +1,10 @@
+{
+  "schema_version": 1,
+  "module_labels": {
+    "tests/docs/test_source_recovery_targeting.py": "behavioral"
+  },
+  "node_overrides": {},
+  "module_node_hashes": {
+    "tests/docs/test_source_recovery_targeting.py": "c5942e9e21165735377bddcd181d0611a9cec7ee6c27883479f54d95b750b57c"
+  }
+}
