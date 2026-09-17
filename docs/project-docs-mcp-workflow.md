@@ -157,7 +157,9 @@ Do not store generated architecture only in hidden memory. Official project know
 
 ## Dependency docs are separate
 
-Advanced inspection reports dependency metadata from supported manifests and lockfiles. This includes direct npm dependencies from `package.json` resolved through the authoritative `package-lock.json`, `pnpm-lock.yaml`, or `yarn.lock`. That metadata is useful for exact-version docs, but it is not the same as project-owned docs.
+Project documentation comes from repository-owned files and is scoped by project identity and optional module scope. Dependency/library documentation comes from external sources bound to a library identity and version; manifests and lockfiles supply project-version evidence. This external documentation is not the same as project-owned docs, even when `project_path` is used to resolve its dependency version.
+
+Advanced inspection reports supported dependency metadata. For example, direct npm dependencies from `package.json` resolve through the authoritative `package-lock.json`, `pnpm-lock.yaml`, or `yarn.lock`.
 
 Use:
 

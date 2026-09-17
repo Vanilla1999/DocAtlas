@@ -1,0 +1,12 @@
+{
+  "schema_version": 1,
+  "module_labels": {
+    "tests/docs/test_dependency_version_transition.py": "behavioral",
+    "tests/docs/test_agent_recovery_version_guidance.py": "schema"
+  },
+  "module_node_hashes": {
+    "tests/docs/test_dependency_version_transition.py": "7b1bdeaffd029b5004926b04e94dfa162f50bc43a244a826f204b3cd0bc84d94",
+    "tests/docs/test_agent_recovery_version_guidance.py": "74615c98b2d3954417eeeda0689fec106caf6fe1ada684e14002d671467e61b4"
+  },
+  "node_overrides": {}
+}

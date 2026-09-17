@@ -46,19 +46,15 @@ PATCH_CONTEXT_TARGET_TOKENS = 1_500
 PATCH_CONTEXT_HARD_TOKENS = 2_000
 INSUFFICIENT_EVIDENCE_MAX_TOKENS = 300
 MAX_DOCS_SOURCES = PROJECT_CONTEXT_BUDGET.max_sources
-DOCS_SOURCE_FIELDS = frozenset({
-    "evidence_id", "path_or_url", "section", "snippet", "version_binding",
-    "content_sha256",
-})
+DOCS_SOURCE_FIELDS = frozenset({"evidence_id", "path_or_url", "section", "snippet",
+                                "version_binding", "content_sha256"})
 DOCS_CONTEXT_SOURCE_FIELDS = frozenset({
     "evidence_id", "path_or_url", "section", "snippet", "version_binding",
     "content_sha256", "project_identity", "line_start", "line_end",
     "authority", "scope",
 })
-PATCH_SOURCE_FIELDS = frozenset({
-    "evidence_id", "path", "symbol_or_section", "authority",
-    "instruction_trust", "scope", "version_binding", "content_sha256",
-})
+PATCH_SOURCE_FIELDS = frozenset({"evidence_id", "path", "symbol_or_section", "authority",
+                                 "instruction_trust", "scope", "version_binding", "content_sha256"})
 _ACTIONABLE_QUESTION_RE = re.compile(
     r"\b(?:how\s+(?:do|can|should)\s+(?:i|we)\s+(?:configure|set|call|run|use)"
     r"|(?:configure|set|call|run)\s+(?:up\s+)?(?:the\s+)?"
@@ -95,9 +91,7 @@ _INSUFFICIENT_SUPPORT_KEYS = (
     "answer_supported", "answer_available", "support_status", "reason_code",
     "decision_hash",
 )
-_OPTIONAL_INSUFFICIENT_KEYS = (
-    "operational_status", "context_available", "disposition",
-)
+_OPTIONAL_INSUFFICIENT_KEYS = ("operational_status", "context_available", "disposition")
 
 def encode_support_envelope(value: dict[str, Any]) -> dict[str, str]:
     """Encode a complete canonical support envelope for tiny public budgets."""
@@ -249,10 +243,6 @@ def project_docs_answer(
     sources: list[dict[str, Any]] = []
     snapshot: dict[str, dict[str, Any]] = {}
     omitted = len(decision.omissions)
-    use_unit_projection = (
-        retrieval.get("selection_profile") == "project_docs_answer"
-        or any(assignment.unit_id for assignment in decision.assignments)
-    )
     assigned_ids = {
         assignment.evidence_id for assignment in decision.assignments
     } if has_canonical_selection else {
@@ -273,6 +263,14 @@ def project_docs_answer(
         candidate_assignments = tuple(
             assignment for assignment in decision.assignments
             if assignment.evidence_id == candidate.stable_id
+        )
+        # Mixed selections may contain unit-bound project evidence and
+        # whole-chunk library evidence. A neighboring candidate's unit must
+        # not change this candidate's canonical materialization contract.
+        use_unit_projection = (
+            retrieval.get("selection_profile") == "project_docs_answer"
+            or bool(candidate.project_identity)
+            or any(assignment.unit_id for assignment in candidate_assignments)
         )
         item = (
             _unit_materialized_item(candidate, candidate_assignments)

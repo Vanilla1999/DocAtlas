@@ -12,6 +12,14 @@ The module must fail closed when it cannot resolve a subject or requested operat
 
 This fail-closed rule governs `docs_answer`, not read-only discovery. An unresolved or unproved question may still produce a bounded `docs_context` projection from current project-scoped retrieval results. That projection is not a replacement `QuestionPlan`, carries no support verdict, and cannot authorize an edit.
 
+## Implementation ownership
+
+Query intent classification is owned by `docmancer/docs/domain/project_query_intent.py` (`ProjectQueryIntent` and `classify_project_query_intent()`). Model-visible context projection is owned by `docmancer/docs/application/model_visible_projection.py`, the canonical provider-free boundary from rich retrieval to model-visible context. Classification determines intent, not source support; projection delivers selected evidence, not new proof obligations.
+
+Retrieval-only query planning lives in `docmancer/docs/domain/documentation_query_plan.py`: it builds bounded lookup directions without replacing the original question. Project-specific span packing lives in `docmancer/docs/application/_docs_context_projection_core.py` and preserves provenance within the public budget.
+
+Domain owns question rules; application owns orchestration and delivery. This map is maintained documentation, not permission for Docs MCP to search Python source. Use repository code search to inspect current implementation details, and update this map when ownership changes.
+
 ## Public boundary
 
 The durable output is the project-answer requirement contract: resolved subjects, intents, mandatory facets, conditions, technical identities, parse trace, and unresolved parts. Retrieval ranking is not owned here.

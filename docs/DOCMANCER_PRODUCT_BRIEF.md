@@ -40,6 +40,7 @@ DocAtlas owns these evidence responsibilities:
 DocAtlas does **not** replace:
 
 - project source-code search or an LSP;
+- a package manager or dependency resolver: it reads manifests and lockfiles as version evidence; it does not install, update, solve, or mutate project dependencies;
 - call graphs or a complete repository semantic graph;
 - tests, static analysis, or patch correctness review;
 - a coding agent or its general reasoning loop;
