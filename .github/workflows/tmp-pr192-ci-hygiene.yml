@@ -1,0 +1,31 @@
+name: Temporary PR192 CI hygiene baseline
+on:
+  push:
+    branches: [tmp/pr192-ci-hygiene]
+permissions:
+  contents: write
+jobs:
+  full-docs-suite:
+    runs-on: ubuntu-24.04
+    env:
+      DOCATLAS_OFFLINE: '1'
+      DOCATLAS_AUTO_VECTORS: '0'
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+        with:
+          ref: tmp/pr192-ci-hygiene
+          fetch-depth: 20
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1
+        with:
+          python-version: '3.13'
+      - name: Install offline-friendly dependencies
+        run: |
+          python - <<'PY'
+          import subprocess, sys, tomllib
+          data = tomllib.load(open('pyproject.toml','rb'))
+          deps=[x for x in data['project']['dependencies'] if not x.startswith(('tiktoken','fastembed'))]
+          deps += data['project']['optional-dependencies']['dev']
+          subprocess.run([sys.executable,'-m','pip','install','-q',*deps], check=True)
+          PY
+      - name: Full docs suite baseline
+        run: python -m pytest -q tests/docs
