@@ -1,4 +1,4 @@
-name: Apply verified adaptive docs patch
+name: Apply exact adaptive docs state
 on:
   push:
     branches: [feat/adaptive-docs-query-planner]
@@ -17,11 +17,11 @@ jobs:
       - uses: astral-sh/setup-uv@v6
       - name: Install locked dependencies
         run: uv sync --frozen
-      - name: Apply verified patch
+      - name: Restore exact verified files
         run: |
-          base64 -d .github/task56ext.patch.gz.b64 | gzip -d > /tmp/task56ext.patch
-          git apply --check /tmp/task56ext.patch
-          git apply /tmp/task56ext.patch
+          base64 -d .github/task56ext.patch.gz.b64 > /tmp/task56ext.tar.gz
+          echo '4a76223f1d976265dea970c28fc7f591259d3cdeb29cf9b1d9a0032507fd2360  /tmp/task56ext.tar.gz' | sha256sum -c -
+          tar -xzf /tmp/task56ext.tar.gz -C .
           git diff --check
       - name: Targeted TDD gate
         run: |
