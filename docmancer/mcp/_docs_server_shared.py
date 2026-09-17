@@ -15,7 +15,7 @@ _GET_DOCS_CONTEXT_QUESTION_DESCRIPTION = (
     "One concrete question; independent questions use separate calls."
 )
 _GET_DOCS_CONTEXT_LOOKUP_DESCRIPTION = (
-    "Same question only; keep the original question unchanged. For cross-language, comparison, conditional, or multiple dependent facets, add 1–3 short lookups in the documentation language; a simple single-facet question needs none. Preserve exact identifiers, versions, conditions, negation and comparison sides; never batch independent questions, invent the expected answer, or use guessed source names."
+    "Same question only. For cross-language, comparison, conditional, or multiple dependent facets use 1–3 short lookups in the documentation language; simple single-facet questions need none. Keep the original question unchanged; preserve exact identifiers, versions, conditions, negation and comparison sides. Never batch independent questions, invent the expected answer, or use guessed source names."
 )
 
 
