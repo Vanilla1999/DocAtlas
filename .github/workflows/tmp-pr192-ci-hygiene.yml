@@ -18,6 +18,18 @@ jobs:
       - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1
         with:
           python-version: '3.13'
+      - name: Apply exact-path qualification fix
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          path = Path('docmancer/docs/domain/evidence_qualification.py')
+          text = path.read_text()
+          old = '''    if str(probe.get("mode") or "") == "exact_path":\n        query_text = str(probe.get("query_text") or "").replace("\\\\", "/").casefold()\n        qualified = bool(query_text and query_text in normalized_visible)\n'''
+          new = '''    if str(probe.get("mode") or "") == "exact_path":\n        query_text = str(probe.get("query_text") or "").replace("\\\\", "/").casefold()\n        normalized_visible = visible_text.replace("\\\\", "/").casefold()\n        qualified = bool(query_text and query_text in normalized_visible)\n'''
+          if old not in text:
+              raise SystemExit('exact-path qualification block not found')
+          path.write_text(text.replace(old, new, 1))
+          PY
       - name: Install offline-friendly dependencies
         run: |
           python - <<'PY'
@@ -27,5 +39,11 @@ jobs:
           deps += data['project']['optional-dependencies']['dev']
           subprocess.run([sys.executable,'-m','pip','install','-q',*deps], check=True)
           PY
-      - name: Full docs suite baseline
+      - name: Exact-path regression cluster
+        run: |
+          python -m pytest -q \
+            tests/docs/test_evidence_qualification.py \
+            tests/docs/test_context_projection_boundaries.py::test_path_only_projection_uses_the_current_exact_topic_guard \
+            tests/docs/test_exact_document_fallback_context.py
+      - name: Full docs suite
         run: python -m pytest -q tests/docs
