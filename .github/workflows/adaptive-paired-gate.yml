@@ -1,0 +1,79 @@
+name: Adaptive docs paired regression gate
+on:
+  push:
+    branches: [tmp/adaptive-paired-gate]
+permissions:
+  contents: read
+jobs:
+  paired-regression:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: astral-sh/setup-uv@v6
+      - name: Prepare exact base and candidate worktrees
+        run: |
+          git worktree add --detach /tmp/docatlas-base 3cf3dd927b4c155e0c76862aed05b7ea7aa25e47
+          git worktree add --detach /tmp/docatlas-candidate f6ee6e8ba7761ebffe2e02e139337f92b2d252b1
+      - name: Run identical locked suites
+        shell: bash
+        run: |
+          set -euo pipefail
+          run_suite() {
+            local name="$1" dir="$2"
+            cd "$dir"
+            uv sync --frozen --extra dev
+            set +e
+            uv run --frozen --extra dev python -m pytest -q tests/docs 2>&1 | tee "/tmp/${name}-docs.log"
+            echo "${PIPESTATUS[0]}" > "/tmp/${name}-docs.exit"
+            uv run --frozen --extra dev python -m pytest tests/ -m 'not advanced and not live and not live_network' -q 2>&1 | tee "/tmp/${name}-nonlive.log"
+            echo "${PIPESTATUS[0]}" > "/tmp/${name}-nonlive.exit"
+            uv run --frozen --extra dev python -m compileall -q docmancer 2>&1 | tee "/tmp/${name}-compile.log"
+            echo "${PIPESTATUS[0]}" > "/tmp/${name}-compile.exit"
+            git diff --check 2>&1 | tee "/tmp/${name}-diffcheck.log"
+            echo "${PIPESTATUS[0]}" > "/tmp/${name}-diffcheck.exit"
+            set -e
+          }
+          run_suite base /tmp/docatlas-base
+          run_suite candidate /tmp/docatlas-candidate
+      - name: Summarize paired failures
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import re, json
+          out = {}
+          for name in ('base','candidate'):
+              row = {}
+              for suite in ('docs','nonlive','compile','diffcheck'):
+                  row[suite + '_exit'] = int(Path(f'/tmp/{name}-{suite}.exit').read_text().strip())
+                  text = Path(f'/tmp/{name}-{suite}.log').read_text(errors='replace')
+                  row[suite + '_failed_nodes'] = sorted(set(re.findall(r'^FAILED\s+([^\s]+)', text, re.M)))
+                  row[suite + '_summary_lines'] = [line for line in text.splitlines() if re.search(r'\b(?:failed|passed|skipped|error|errors)\b', line, re.I)][-30:]
+              out[name] = row
+          base = set(out['base']['docs_failed_nodes']) | set(out['base']['nonlive_failed_nodes'])
+          cand = set(out['candidate']['docs_failed_nodes']) | set(out['candidate']['nonlive_failed_nodes'])
+          out['comparison'] = {
+              'base_failure_count': len(base),
+              'candidate_failure_count': len(cand),
+              'new_candidate_failures': sorted(cand - base),
+              'resolved_base_failures': sorted(base - cand),
+              'shared_failures': sorted(base & cand),
+          }
+          Path('/tmp/paired-summary.json').write_text(json.dumps(out, indent=2, ensure_ascii=False) + '\n')
+          print(Path('/tmp/paired-summary.json').read_text())
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: adaptive-docs-paired-regression
+          path: |
+            /tmp/base-docs.log
+            /tmp/candidate-docs.log
+            /tmp/base-nonlive.log
+            /tmp/candidate-nonlive.log
+            /tmp/base-compile.log
+            /tmp/candidate-compile.log
+            /tmp/base-diffcheck.log
+            /tmp/candidate-diffcheck.log
+            /tmp/paired-summary.json
