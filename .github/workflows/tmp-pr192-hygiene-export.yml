@@ -1,0 +1,20 @@
+name: Temporary PR192 hygiene export
+on:
+  push:
+    branches: [fix/pr192-ci-hygiene]
+permissions:
+  contents: read
+jobs:
+  export:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+        with:
+          ref: fix/pr192-ci-hygiene
+      - name: Archive source
+        run: tar --exclude=.git --exclude=.github/workflows/tmp-pr192-hygiene-export.yml -czf hygiene-source.tar.gz .
+      - uses: actions/upload-artifact@v4
+        with:
+          name: pr192-hygiene-source
+          path: hygiene-source.tar.gz
+          if-no-files-found: error
