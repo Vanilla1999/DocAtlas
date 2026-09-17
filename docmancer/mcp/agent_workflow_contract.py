@@ -77,6 +77,15 @@ WORKFLOW_POLICY: dict[str, Any] = {
         "partial_coverage_is_not_completeness": True,
         "authorizes_answer_or_edit": False,
     },
+    "gap_resolution": {
+        "trigger": "concrete_missing_requested_fact",
+        "known_source_first": "issued_bounded_source_read",
+        "unknown_source_next": "one_targeted_same_need_query",
+        "root_question_immutable": True,
+        "bridge_values_require_source_reference": True,
+        "subquestions_preserve_conditions_and_comparison": True,
+        "stop_when_sufficient_or_no_progress": True,
+    },
     "version_binding": {
         "project_query_default": "resolve_current_project_version",
         "explicit_version": "explicit_exact_or_historical_request",
