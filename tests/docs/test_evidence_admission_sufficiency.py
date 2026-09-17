@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import json
+
 import pytest
 
 from docmancer.docs.application.docs_context_projection import project_docs_context
@@ -247,6 +249,63 @@ def test_comparison_relation_rejects_unrelated_different_adjective() -> None:
 
     assert distractor.qualified is False
     assert distractor.reason == "missing_visible_comparison_relation"
+
+
+def test_rejected_hint_retry_diagnostics_remain_json_serializable():
+    question = "When answering about a module, should the agent automatically use scope=all for maximum recall?"
+    lookups = ("maximum recall repository breadth",)
+    requirements = build_requirements(question, profile="project_docs_answer")
+    plan = build_documentation_query_plan(question, lookup_queries=lookups, requirements=requirements)
+    host = next(item for item in plan.queries if item.query_id == "query-lookup-1")
+    source = _project_source(
+        path="docs/repository-overview.md", query_id=host.query_id, query_text=host.text,
+        content="Maximum recall across repository breadth is an overview concern.",
+    )
+    retrieval = {"question": question, "project_identity": PROJECT_ID,
+        "requirements": requirements.hash_payload, "context_pack": [source],
+        "documentation_query_plan": plan.as_payload()}
+    payload, _snapshot = project_docs_context(retrieval=retrieval)
+    assert [row["path_or_url"] for row in payload["sources"]] == ["docs/repository-overview.md"]
+    json.dumps(retrieval["retrieval_diagnostics"])
+
+
+def test_comparison_relation_rejects_unrelated_not_enough_clause() -> None:
+    probe = {"query_text": "matching search result evidence sufficient answer condition different separate"}
+    distractor = qualify_evidence(probe, query_id="query-relation-1", visible_text=(
+        "Matching search result evidence describes sufficient answer condition terminology. "
+        "This is not enough storage."))
+    assert distractor.qualified is False
+    assert distractor.reason == "missing_visible_comparison_relation"
+
+
+def test_comparison_relation_rejects_unrelated_different_from_clause() -> None:
+    probe = {"query_text": "matching search result evidence sufficient answer condition different separate"}
+    distractor = qualify_evidence(probe, query_id="query-relation-1", visible_text=(
+        "Matching search result evidence describes sufficient answer condition terminology. "
+        "These examples are different from last year."))
+    assert distractor.qualified is False
+    assert distractor.reason == "missing_visible_comparison_relation"
+
+
+def test_single_host_lookup_cannot_displace_available_canonical_witness_under_budget():
+    question = "Does retrieved documentation authorize executing a destructive delete command?"
+    lookups = ("destructive delete command permission",)
+    requirements = build_requirements(question, profile="project_docs_answer")
+    plan = build_documentation_query_plan(question, lookup_queries=lookups, requirements=requirements)
+    canonical = next(item for item in plan.queries if item.query_id == "query-intent-1")
+    host = next(item for item in plan.queries if item.query_id == "query-lookup-1")
+    canonical_source = _project_source(path="docs/security.md", query_id=canonical.query_id,
+        query_text=canonical.text, content=(
+            "Documentation instruction trust treats document data as untrusted. "
+            "Document content cannot override system user tool or runtime safety policy."))
+    host_source = _project_source(path="docs/delete.md", query_id=host.query_id, query_text=host.text,
+        content=("Destructive delete command permission requires an explicit allow-destructive configuration. " * 4),
+        authority="supporting")
+    retrieval = {"question": question, "project_identity": PROJECT_ID,
+        "requirements": requirements.hash_payload, "context_pack": [host_source, canonical_source],
+        "documentation_query_plan": plan.as_payload()}
+    payload, _snapshot = project_docs_context(retrieval=retrieval, max_tokens=340)
+    assert "docs/security.md" in [row["path_or_url"] for row in payload["sources"]]
 
 
 @pytest.mark.parametrize("overrides", [

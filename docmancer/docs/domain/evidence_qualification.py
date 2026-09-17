@@ -14,16 +14,23 @@ CoverageKind = Literal["direct", "derived"]
 
 
 _COMPARISON_RELATION_MARKERS = frozenset({"different", "separate"})
-_VISIBLE_COMPARISON_RELATION_RE = re.compile(
+_GENERAL_COMPARISON_RELATION_RE = re.compile(
     r"(?:"
     r"\b(?:differs?|differed|differing|whereas)\b|"
     r"\b(?:different|distinct|separate)\s+from\b|"
     r"\b(?:are|is|was|were|remain(?:s|ed)?|become(?:s)?|became)\s+"
     r"(?:different|distinct|separate)\b|"
     r"\brather\s+than\b|\binstead\s+of\b|\bnot\s+the\s+same\b|"
-    r"\bno\s+distinction\b|"
-    r"\b(?:not|never)\b[^.!?\n]{0,80}\b(?:proof|enough|sufficient|same|equivalent)\b|"
-    r"\bbut\b[^.!?\n]{0,80}\b(?:not|never)\b[^.!?\n]{0,60}\b(?:prove|proof|enough|sufficient|same|equivalent)\b"
+    r"\bno\s+distinction\b"
+    r")",
+    re.I,
+)
+_PROOF_INSUFFICIENCY_RELATION_RE = re.compile(
+    r"(?:"
+    r"\b(?:not|never)\b[^.!?\n]{0,40}\b(?:enough|sufficient)\b"
+    r"[^.!?\n]{0,48}\b(?:prove|support|establish|answer|cover)\w*\b|"
+    r"\b(?:does|do|did|is|are|was|were)\s+not\b[^.!?\n]{0,56}"
+    r"\b(?:prove|support|establish|certif|sufficien)\w*\b"
     r")",
     re.I,
 )
@@ -36,8 +43,22 @@ def _comparison_relation_probe(query_id: str, query_text: str) -> bool:
     return len(tokens) >= 2 and tuple(tokens[-2:]) == ("different", "separate")
 
 
-def _visible_comparison_relation(text: str) -> bool:
-    return _VISIBLE_COMPARISON_RELATION_RE.search(text) is not None
+def _visible_comparison_relation(text: str, terms: tuple[str, ...]) -> bool:
+    """Require the visible relation to be local to the requested concepts."""
+    for sentence in re.split(r"[.!?\n]+", text):
+        sentence = sentence.strip()
+        if not sentence:
+            continue
+        if _PROOF_INSUFFICIENCY_RELATION_RE.search(sentence):
+            return True
+        if _GENERAL_COMPARISON_RELATION_RE.search(sentence):
+            needed = min(2, len(terms))
+            if needed and sum(
+                _visible_term_present(term, sentence, exact=False)
+                for term in terms
+            ) >= needed:
+                return True
+    return False
 
 
 @dataclass(frozen=True, slots=True)
@@ -158,8 +179,6 @@ def qualify_evidence(
 
     relation_text = str(probe.get("query_text") or "").casefold()
     comparison_relation = _comparison_relation_probe(query_id, relation_text)
-    if comparison_relation and not _visible_comparison_relation(normalized_evidence):
-        return _rejected(result, "missing_visible_comparison_relation")
     if query_id.startswith("query-relation-"):
         negated_state = re.search(
             r"(?<!\w)(?:not|without|never|no)(?!\w)\s+([a-z][a-z0-9_-]{2,})\s*$",
@@ -200,6 +219,8 @@ def qualify_evidence(
         ))
     if comparison_relation:
         terms = tuple(term for term in terms if term not in _COMPARISON_RELATION_MARKERS)
+        if not _visible_comparison_relation(normalized_evidence, terms):
+            return _rejected(result, "missing_visible_comparison_relation")
     if not terms:
         return _rejected(result, "missing_visible_query_terms")
 

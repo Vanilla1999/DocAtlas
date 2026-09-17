@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import copy
 import hashlib
 import re
 from typing import Any
@@ -46,6 +47,11 @@ from docmancer.docs.domain.query_terms import documentation_exact_terms
 from docmancer.docs.domain.documentation_query_plan import technical_anchors
 from docmancer.docs.domain.lifecycle_policy import lifecycle_intent
 from docmancer.docs.domain.normative_language import _FORBIDDEN_RE, _REQUIRED_RE
+
+
+def _diagnostics_snapshot(value: dict[str, Any]) -> dict[str, Any]:
+    """Copy one diagnostic attempt before linking it into another attempt."""
+    return copy.deepcopy(value)
 
 
 def project_docs_context(
@@ -356,6 +362,20 @@ def project_docs_context(
             assigned_evidence_ids=set(assigned_evidence_by_requirement.values()),
             bound_assigned_evidence_ids=required_assigned_evidence_ids,
         )
+        # Host rewrites are expansion lanes. Before spending budget on a
+        # host-only candidate, preserve any still-available baseline-only
+        # original/exact or canonical-intent direction. Candidates that also
+        # qualify a host lookup remain in normal ranking.
+        if host_query_ids:
+            protected_query_ids = (public_query_id_set - host_query_ids) | canonical_intent_query_ids
+            missing_protected_ids = protected_query_ids - qualified_query_ids(sources)
+            protected_index = next((
+                index for index, candidate in enumerate(prepared)
+                if (qualified_query_ids((candidate,)) & missing_protected_ids)
+                and not (qualified_query_ids((candidate,)) & host_query_ids)
+            ), None)
+            if protected_index not in (None, 0):
+                prepared.insert(0, prepared.pop(protected_index))
         variant = prepared.pop(0)
         original, raw_snippet, focus_queries, assigned_requirement_ids = variant_inputs[id(variant)]
         candidate_id = _internal_candidate_id(original)
@@ -513,12 +533,16 @@ def project_docs_context(
             # Decide fallback after visible qualification and complete DTO
             # admission. Raw candidates can qualify yet fail that boundary.
             # Conversely, hints must not steal space from a surviving answer.
-            primary_diagnostics = projection_diagnostics
+            primary_attempt = _diagnostics_snapshot(projection_diagnostics)
             result = project_docs_context(
                 retrieval=retrieval, max_tokens=max_tokens,
                 selection_diagnostics=selection_diagnostics, _allow_context_hints=True,
             )
-            retrieval['retrieval_diagnostics']['docs_context_projection']['primary_attempt'] = primary_diagnostics
+            hinted_diagnostics = _diagnostics_snapshot(
+                retrieval['retrieval_diagnostics']['docs_context_projection']
+            )
+            hinted_diagnostics['primary_attempt'] = primary_attempt
+            retrieval['retrieval_diagnostics']['docs_context_projection'] = hinted_diagnostics
             return result
         if selection_diagnostics is not None:
             selection_diagnostics["component_coverage"] = component_coverage_decision(
@@ -583,6 +607,7 @@ def project_docs_context(
         # with hints enabled, but accept that packet only when it preserves
         # every primary visible evidence identity and adds a new source.
         primary_diagnostics = projection_diagnostics
+        primary_attempt = _diagnostics_snapshot(primary_diagnostics)
         primary_ids = {
             str(source.get("evidence_id") or "")
             for source in payload["sources"]
@@ -599,11 +624,14 @@ def project_docs_context(
             for source in hinted_payload.get("sources") or ()
             if source.get("evidence_id")
         }
-        hinted_diagnostics = retrieval["retrieval_diagnostics"]["docs_context_projection"]
-        hinted_diagnostics["primary_attempt"] = primary_diagnostics
+        hinted_diagnostics = _diagnostics_snapshot(
+            retrieval["retrieval_diagnostics"]["docs_context_projection"]
+        )
+        hinted_diagnostics['primary_attempt'] = primary_attempt
         if primary_ids < hinted_ids:
+            retrieval["retrieval_diagnostics"]["docs_context_projection"] = hinted_diagnostics
             return hinted_payload, hinted_snapshot
-        primary_diagnostics["hint_attempt"] = hinted_diagnostics
+        primary_diagnostics['hint_attempt'] = hinted_diagnostics
         retrieval["retrieval_diagnostics"]["docs_context_projection"] = primary_diagnostics
     if root := retrieval.get("_source_continuation_project_root"):
         attach_source_continuation_locators(payload, snapshot, root=root, max_tokens=max_tokens)
