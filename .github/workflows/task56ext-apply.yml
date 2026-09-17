@@ -9,8 +9,6 @@ permissions:
 jobs:
   apply-and-verify:
     runs-on: ubuntu-latest
-    env:
-      GH_TOKEN: ${{ github.token }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -22,32 +20,10 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+          git fetch origin tmp/adaptive-upload:refs/remotes/origin/tmp/adaptive-upload
           : > /tmp/task56ext.b64
-          for sha in \
-            6645802febf68e286ced41c6c6a87a751752ba40 \
-            6edb0e0be88ecb025f2ea8e651a6494235e659b0 \
-            7d37f366ed2260cb65a761ad603bdac911e336c2 \
-            e0c44f8302ae97703d188d4db64b9cb2c78a297d \
-            191f52771ed88395b28855c90d8fd8bbb0ee537a \
-            222a8d1a023172f6e2cac209c1e696aa43ec4d03 \
-            90bd65371623c1a6d66b3c5e1fa2b37e1b75539b \
-            a507b0d4166c687028181cbc8ed047ce30bc6c69 \
-            c9d4c17396923509b124228fca279f4085ab2085 \
-            042ffc786202088f6290389b5ed7ed8e0c96760e \
-            e683992e2a0649651f5579e3912774f78ac1f748 \
-            5484004b22d41b4f36d465f4b7facad5a4c50fc7 \
-            e09c40a18b02649360ebfa2d0d987dfc98d3befc \
-            efd76beba528e947e17e1304a905bb3606818e6a \
-            6b5a505babc7d8a4e0b9af6cc46a02c450d9958c \
-            56899b5f1e35ecd1390a65be7f58ed210556f41c \
-            51ce86504747001e23f31775dc81db7cf8330194 \
-            3a59665d200ba2b41dcaa361ff53d2a657e0530b \
-            7ab079a099ff3b274d8eac596ce99c2bf40d70ba \
-            d0499bcab565fd416eaf65d1d2dc9a748f2cd2e2 \
-            f0bbf35bf64abd5de1c6c45afa03e05eb28ab998 \
-            8faeecaa123e48c3126980e53fc07d5edfdffb6a
-          do
-            gh api "repos/${GITHUB_REPOSITORY}/git/blobs/${sha}" --jq .content | tr -d '\n' | base64 -d >> /tmp/task56ext.b64
+          for n in $(seq -w 0 21); do
+            git show "origin/tmp/adaptive-upload:.github/upload-chunks/${n}" >> /tmp/task56ext.b64
           done
           base64 -d /tmp/task56ext.b64 > /tmp/task56ext.tar.gz
           echo '4a76223f1d976265dea970c28fc7f591259d3cdeb29cf9b1d9a0032507fd2360  /tmp/task56ext.tar.gz' | sha256sum -c -
