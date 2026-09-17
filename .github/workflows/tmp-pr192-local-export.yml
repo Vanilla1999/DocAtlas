@@ -1,0 +1,21 @@
+name: Temporary PR192 local export
+on:
+  push:
+    branches: [tmp/pr192-ci-local-export]
+permissions:
+  contents: read
+jobs:
+  export:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+        with:
+          ref: tmp/pr192-ci-local-export
+      - name: Build source archive
+        run: |
+          tar --exclude=.git --exclude=.github/workflows/tmp-pr192-local-export.yml -czf /tmp/pr192-ci-tree.tar.gz .
+      - uses: actions/upload-artifact@v4
+        with:
+          name: pr192-ci-tree
+          path: /tmp/pr192-ci-tree.tar.gz
+          if-no-files-found: error
