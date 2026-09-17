@@ -19,7 +19,7 @@ _GET_DOCS_CONTEXT_LOOKUP_DESCRIPTION = (
 )
 _GET_DOCS_CONTEXT_SCOPE_GUIDANCE = (
     'For onboarding/cross-module use scope="all"; use scope="project" for repo policy and '
-    'scope="module" with exact module_path. Preserve explicit scope; never widen it.'
+    'scope="module" with exact module_path. module_path always implies module scope. Preserve explicit scope; never widen it.'
 )
 _GET_DOCS_CONTEXT_SCOPE_DESCRIPTION = (
     "project=repo-level docs only; module=one module; all=repo-level plus modules in the same repository; "
