@@ -103,7 +103,7 @@ jobs:
           data['module_node_hashes']['tests/docs/test_agent_question_planning_contract.py'] = '82044bd7d9b1a3c5c8592ab1e469b468ad86531b7298ada5bc5e6beac8a65a24'
           manifest.write_text(json.dumps(data, indent=2, sort_keys=True) + '\n', encoding='utf-8')
       - name: Install locked environment
-        run: uv sync --frozen
+        run: uv sync --frozen --extra dev
       - name: Verify focused gap policy gates
         run: |
           uv run pytest -q \
