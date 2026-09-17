@@ -1,0 +1,10 @@
+{
+  "schema_version": 1,
+  "module_labels": {
+    "tests/docs/test_context_capture_integrity.py": "behavioral"
+  },
+  "node_overrides": {},
+  "module_node_hashes": {
+    "tests/docs/test_context_capture_integrity.py": "cefa23d52a4a72d2a6169d34c85380547ca42be6d2274189017d36d253e63a12"
+  }
+}
