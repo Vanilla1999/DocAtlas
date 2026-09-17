@@ -1,0 +1,30 @@
+name: Temporary PR192 full docs baseline
+on:
+  push:
+    branches: [fix/pr192-ci-hygiene]
+permissions:
+  contents: read
+jobs:
+  baseline:
+    runs-on: ubuntu-24.04
+    env:
+      DOCATLAS_OFFLINE: '1'
+      DOCATLAS_AUTO_VECTORS: '0'
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+        with:
+          ref: fix/pr192-ci-hygiene
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1
+        with:
+          python-version: '3.13'
+      - name: Install test dependencies
+        run: |
+          python - <<'PY'
+          import subprocess, sys, tomllib
+          data = tomllib.load(open('pyproject.toml','rb'))
+          deps = [x for x in data['project']['dependencies'] if not x.startswith(('tiktoken','fastembed'))]
+          deps += data['project']['optional-dependencies']['dev']
+          subprocess.run([sys.executable, '-m', 'pip', 'install', '-q', *deps], check=True)
+          PY
+      - name: Full docs suite unchanged
+        run: python -m pytest -q tests/docs
