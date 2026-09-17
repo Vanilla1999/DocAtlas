@@ -3,7 +3,7 @@
 Agent workflow contract schema: `docatlas-agent-contract-v1`  
 Agent workflow contract identity: `{{DOCATLAS_AGENT_CONTRACT_ID}}`
 
-1. Call `get_docs_context` with the original concrete `question` and `project_path` (or `library`). Independent questions need separate `get_docs_context` calls; never substitute a benchmark/evaluation or documentation-governance meta-question.
+1. Call `get_docs_context` for bounded structured context with the original concrete `question` and `project_path` (or `library`). Independent questions need separate `get_docs_context` calls; never substitute a benchmark/evaluation or documentation-governance meta-question.
 2. Keep the original question unchanged. For cross-language/comparison/conditional/multi-facet questions add 1–3 lookups (same question) in the documentation language; a simple single-facet question needs none. Preserve exact identifiers, versions, conditions, negation, comparison sides; no expected answer or guessed source names.
 3. Use `scope="all"` for onboarding/cross-module, `scope="project"` for repository policy, `scope="module"` with exact `module_path` for one module. Never widen explicit scope; use separate bounded calls for module and repository proof.
 4. Use `prepare_docs` only for returned actions or explicit lifecycle requests. Honor approvals. Poll returned `job_id` with `docs_status`; retry unchanged only after success, not failure. Status is not discovery.

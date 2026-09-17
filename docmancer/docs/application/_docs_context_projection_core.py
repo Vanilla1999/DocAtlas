@@ -31,7 +31,7 @@ from docmancer.docs.application.model_visible_projection import (
     docs_context_budget_tokens,
     project_insufficient,
 )
-from .context_candidate_ranking import _context_rank, _facet_aware_candidates, _fully_matched_query_ids
+from .context_candidate_ranking import _context_rank, _facet_aware_candidates, _fully_matched_query_ids, _prefer_missing_baseline_candidate
 from docmancer.docs.domain.context_budget import PROJECT_CONTEXT_BUDGET
 from docmancer.docs.domain.context_blocks import inline_command_literals, source_block_alternatives
 from docmancer.docs.domain.context_windows import (
@@ -362,26 +362,9 @@ def project_docs_context(
             assigned_evidence_ids=set(assigned_evidence_by_requirement.values()),
             bound_assigned_evidence_ids=required_assigned_evidence_ids,
         )
-        # Host rewrites are expansion lanes. Preserve missing original/exact
-        # evidence first, even when the same candidate also matches a host lookup.
-        # Canonical-intent fallback is weaker: protect it only when it is baseline-only,
-        # so a weak alias cannot outrank a stronger explicit lookup.
-        if host_query_ids:
-            selected_query_ids = qualified_query_ids(sources)
-            missing_public_ids = (public_query_id_set - host_query_ids) - selected_query_ids
-            protected_index = next((
-                index for index, candidate in enumerate(prepared)
-                if qualified_query_ids((candidate,)) & missing_public_ids
-            ), None)
-            if protected_index is None:
-                missing_canonical_ids = canonical_intent_query_ids - selected_query_ids
-                protected_index = next((
-                    index for index, candidate in enumerate(prepared)
-                    if (qualified_query_ids((candidate,)) & missing_canonical_ids)
-                    and not (qualified_query_ids((candidate,)) & host_query_ids)
-                ), None)
-            if protected_index not in (None, 0):
-                prepared.insert(0, prepared.pop(protected_index))
+        _prefer_missing_baseline_candidate(
+            prepared, sources, public_query_id_set, host_query_ids, canonical_intent_query_ids,
+        )
         variant = prepared.pop(0)
         original, raw_snippet, focus_queries, assigned_requirement_ids = variant_inputs[id(variant)]
         candidate_id = _internal_candidate_id(original)
@@ -586,17 +569,18 @@ def project_docs_context(
         if isinstance(original, dict):
             original["_assigned_requirement_ids"] = list(source["_assigned_requirement_ids"])
     decision = context_selection_decision(sources, public_query_ids)
+    component_decision = component_coverage_decision(
+        query_plan.get("_component_contract") or (), assignments, sources,
+        unresolved_residue=query_plan.get("unresolved_parts") or (),
+        component_scope_complete=query_plan.get("component_scope_complete", True),
+    )
     payload = _payload(sources, decision=decision, query_plan=query_plan)
     projection_diagnostics["final_visible_evidence_ids"] = [
         str(source.get("evidence_id") or "") for source in payload["sources"][:3]
         if source.get("evidence_id")
     ]
     if selection_diagnostics is not None:
-        selection_diagnostics["component_coverage"] = component_coverage_decision(
-            query_plan.get("_component_contract") or (), assignments, sources,
-            unresolved_residue=query_plan.get("unresolved_parts") or (),
-            component_scope_complete=query_plan.get("component_scope_complete", True),
-        ).as_payload()
+        selection_diagnostics["component_coverage"] = component_decision.as_payload()
     snapshot = {
         source["evidence_id"]: _snapshot_entry(
             snapshot[source["evidence_id"]]["source"], source,
@@ -607,6 +591,7 @@ def project_docs_context(
         fallback_ids
         and not _allow_context_hints
         and len(payload["sources"]) < MAX_DOCS_SOURCES
+        and (decision.missing_query_ids or component_decision.missing_component_ids)
     ):
         # A safe retrieval hint is a read-only supplement, not a replacement
         # for already admitted public evidence. Re-run the bounded projector

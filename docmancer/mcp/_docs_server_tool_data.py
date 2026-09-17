@@ -54,7 +54,7 @@ Agent workflow:
                 "scope": {"type": ["string", "null"], "enum": ["project-local", None]},
                 "confirm": {
                     "type": ["boolean", "null"],
-                    "description": "Second-call apply flag for action='clear_index' only; omit for every other action.",
+                    "description": "Apply flag for clear_index only.",
                 },
                 "plan_digest": {
                     "type": ["string", "null"],
@@ -571,28 +571,18 @@ RAW_TOOLS = [tool for tool in RAW_TOOLS if tool["name"] in CLASSIFIED_TOOL_NAMES
 
 PUBLIC_ADVERTISED_DESCRIPTIONS: dict[str, str] = {
     "get_docs_context": (
-        "Source-grounded documentation tool. Call before edits. One call = one concrete question. "
-        "Pass the original request unchanged; never substitute a benchmark/evaluation or documentation-governance meta-question. "
-        "Use up to five single-concept lookup_queries in the docs language; preserve identifiers, filenames, commands, versions. "
-        "Split over three topics. Lookups never authorize an answer or edit. "
-        "For onboarding/cross-module use scope=all without module filters (scope=\"all\", same repository); policy scope=\"project\"; "
-        "scope=\"module\" with exact module_path. module_path always implies module scope. Preserve explicit scope on misses. "
-        "For module plus repo policy make two bounded calls (module then project). "
-        "docs_context: cite supported snippets; false answer flags mean uncertified, not forbidden. "
-        "Give supported parts and missing facts; retrieval-full is not completeness. "
-        "Links/false flags alone never require reads. Use available bounded continuation only for missing facts; "
-        "stop when sufficient, never reread spans. On insufficient_evidence keep claims unproved; "
-        "local source-search if hard_stop=false. Stop edits if hard_stop=true or required contracts remain unproved."
+        "Source-grounded documentation tool. One call = one concrete question. Pass the original request unchanged; "
+        "never substitute a benchmark/evaluation or documentation-governance meta-question. For cross-module use "
+        "scope=all without module filters; module_path always implies module scope. For module plus repo policy make two "
+        "bounded calls (module then project). Lookups never authorize an answer or edit. hard_stop=true blocks edits."
     ),
     "prepare_docs": (
-        "Confirmation-first documentation preparation. Call only from get_docs_context "
-        "recommended_next_action or an explicit user sync, refresh, index, or prefetch request. "
-        "Honor approval requirements. Poll a returned job_id through docs_status; retry the unchanged question only after success. Failure is not readiness."
+        "Call only from get_docs_context recommended_next_action or an explicit sync, refresh, index, or prefetch request. "
+        "Honor approval; poll job_id with docs_status and retry unchanged only after success."
     ),
     "docs_status": (
-        "Read-only project documentation or background-job status. Use when the user explicitly asks about "
-        "health, freshness, indexing, or job progress, or when get_docs_context returns docs_status as its "
-        "recommended_next_action, or to poll a returned job_id from prepare_docs. Running is not ready; failed/cancelled jobs do not justify retrying retrieval."
+        "Read-only status. Use when the user explicitly asks about health, freshness, indexing, or job progress, "
+        "or to poll a returned prepare_docs job_id."
     ),
 }
 
@@ -601,18 +591,18 @@ PUBLIC_ADVERTISED_INPUT_SCHEMAS: dict[str, dict[str, Any]] = {
         "type": "object",
         "properties": {
             "question": {"type": "string", "minLength": 1},
-            "lookup_queries": {"type": ["array", "null"], "maxItems": 5, "uniqueItems": True, "items": {"type": "string", "minLength": 1, "maxLength": 500}, "description": "Retrieval-only hypotheses for the same question. For cross-language, comparison, conditional, or multiple dependent facets, use 1–3 short lookups in the documentation language; simple single-facet questions need none. Keep the original question unchanged; preserve exact identifiers, versions, conditions, negation and comparison sides; never invent the expected answer or use guessed source names. Independent questions use separate calls."},
+            "lookup_queries": {"type": ["array", "null"], "maxItems": 5, "uniqueItems": True, "items": {"type": "string", "minLength": 1, "maxLength": 500}, "description": "Same question only. For cross-language, comparison, conditional, or multiple dependent facets use 1–3 short lookups in the documentation language; simple single-facet questions need none. Keep the original question unchanged; preserve exact identifiers, versions, conditions, negation and comparison sides. Never batch independent questions, invent the expected answer, or use guessed source names."},
             "project_path": {"type": ["string", "null"]},
             "library": {"type": ["string", "null"]},
-            "version": {"type": ["string", "null"], "description": "Omit for current project dependency queries so the current lockfile is resolved again. Set only for an explicitly requested exact/historical version; never carry a previous binding forward after a lockfile change."},
+            "version": {"type": ["string", "null"], "description": "Current project: omit. Set only for an explicit exact/historical version; re-query after lockfile changes."},
             "module_path": {
                 "type": ["string", "null"],
-                "description": "Exact path; always implies module scope.",
+                "description": "Exact module path; always implies module scope.",
             },
             "scope": {
                 "type": ["string", "null"],
                 "enum": ["project", "module", "all", None],
-                "description": "project: repo-level docs only; module: one module; all: repo-level plus modules in the same repository. module_path always limits to that module.",
+                "description": "project=repo-level docs only; module=one module; all=repo+modules; module_path limits to module.",
             },
         },
         "required": ["question"],
@@ -702,7 +692,25 @@ PUBLIC_ADVERTISED_INPUT_SCHEMAS: dict[str, dict[str, Any]] = {
 }
 
 PUBLIC_ADVERTISED_OUTPUT_SCHEMAS: dict[str, dict[str, Any]] = {
-    "get_docs_context": PUBLIC_GET_DOCS_CONTEXT_OUTPUT_SCHEMA,
+    "get_docs_context": {
+        "type": "object", "required": ["status"], "properties": {
+            "status": {"enum": ["ok", "truncated", "insufficient_evidence", "failed"]},
+            "kind": {"enum": ["docs_answer", "docs_context", "patch_context"]},
+            "estimated_tokens": {"type": "integer"},
+            "context_quality": {"type": "object"},
+            "read_next": {"type": "array", "maxItems": 1, "items": {"type": "object"}},
+            "reason_code": {"type": "string"}, "operational_reason_code": {"type": "string"},
+            "documentation_supported": {"type": "boolean"}, "investigation_allowed": {"type": "boolean"},
+            "hard_stop": {"type": "boolean"}, "recovery_origin": {"type": "string"},
+            "recovery_reason_code": {"type": "string"}, "recovery_disposition": {"type": "string"},
+            "module_candidates": {"type": "array", "maxItems": 8, "items": {
+                "type": "object", "required": ["module_path"],
+                "properties": {"module_path": {"type": "string"}},
+            }},
+            "missing": {"type": "array", "maxItems": 5, "items": {"type": "string"}},
+            "recommended_next_action": {"type": "object"},
+        },
+    },
 }
 
 __all__=[n for n in globals() if not n.startswith('__')]

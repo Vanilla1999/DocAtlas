@@ -18,6 +18,26 @@ from docmancer.docs.domain.context_request_preferences import (
 )
 
 
+def _prefer_missing_baseline_candidate(
+    candidates: list[Any], selected: list[dict[str, Any]], public_query_ids: set[str],
+    host_query_ids: set[str], canonical_query_ids: set[str],
+) -> None:
+    """Keep original/exact evidence ahead of expansion-only candidates."""
+    if not host_query_ids:
+        return
+    selected_ids = qualified_query_ids(selected)
+    missing_public = (public_query_ids - host_query_ids) - selected_ids
+    protected = next((i for i, candidate in enumerate(candidates)
+                      if qualified_query_ids((candidate,)) & missing_public), None)
+    if protected is None:
+        missing_canonical = canonical_query_ids - selected_ids
+        protected = next((i for i, candidate in enumerate(candidates)
+                          if qualified_query_ids((candidate,)) & missing_canonical
+                          and not (qualified_query_ids((candidate,)) & host_query_ids)), None)
+    if protected not in (None, 0):
+        candidates.insert(0, candidates.pop(protected))
+
+
 def _context_rank(
     source: Any, query_text: dict[str, str], required_query_ids: set[str],
     assigned_evidence_ids: set[str] | None = None,
