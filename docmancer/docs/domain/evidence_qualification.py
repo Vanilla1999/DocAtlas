@@ -50,7 +50,11 @@ def _visible_comparison_relation(text: str, terms: tuple[str, ...]) -> bool:
         if not sentence:
             continue
         if _PROOF_INSUFFICIENCY_RELATION_RE.search(sentence):
-            return True
+            if any(
+                _visible_term_present(term, sentence, exact=False)
+                for term in terms
+            ):
+                return True
         if _GENERAL_COMPARISON_RELATION_RE.search(sentence):
             needed = min(2, len(terms))
             if needed and sum(

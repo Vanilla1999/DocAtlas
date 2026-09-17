@@ -278,6 +278,19 @@ def test_comparison_relation_rejects_unrelated_not_enough_clause() -> None:
     assert distractor.reason == "missing_visible_comparison_relation"
 
 
+def test_comparison_relation_rejects_unrelated_proof_insufficiency_clause() -> None:
+    probe = {"query_text": "matching search result evidence sufficient answer condition different separate"}
+    distractor = qualify_evidence(
+        probe, query_id="query-relation-1",
+        visible_text=(
+            "Matching search result evidence describes sufficient answer condition terminology. "
+            "This cache is not enough to prove storage capacity."
+        ),
+    )
+    assert distractor.qualified is False
+    assert distractor.reason == "missing_visible_comparison_relation"
+
+
 def test_comparison_relation_rejects_unrelated_different_from_clause() -> None:
     probe = {"query_text": "matching search result evidence sufficient answer condition different separate"}
     distractor = qualify_evidence(probe, query_id="query-relation-1", visible_text=(
