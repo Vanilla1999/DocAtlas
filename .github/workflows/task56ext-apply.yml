@@ -14,8 +14,8 @@ jobs:
         with:
           fetch-depth: 0
       - uses: astral-sh/setup-uv@v6
-      - name: Install locked dependencies
-        run: uv sync --frozen
+      - name: Install locked test dependencies
+        run: uv sync --frozen --extra dev
       - name: Reconstruct exact verified archive
         shell: bash
         run: |
@@ -31,7 +31,7 @@ jobs:
           git diff --check
       - name: Targeted TDD gate
         run: |
-          uv run --frozen python -m pytest -q \
+          uv run --frozen --extra dev python -m pytest -q \
             tests/docs/test_source_recovery_targeting.py \
             tests/docs/test_docs_context_read_next.py \
             tests/docs/test_context_quality.py \
@@ -45,7 +45,7 @@ jobs:
             tests/docs/test_self_host_agent_contract_surface.py \
             tests/docs/test_mcp_docs_tools_registration.py \
             tests/docs/test_host_scope_planning_contract.py
-          uv run --frozen python -m compileall -q docmancer
+          uv run --frozen --extra dev python -m compileall -q docmancer
       - name: Publish clean commit
         shell: bash
         run: |
