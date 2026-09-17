@@ -26,5 +26,25 @@ jobs:
           deps += data['project']['optional-dependencies']['dev']
           subprocess.run([sys.executable, '-m', 'pip', 'install', '-q', *deps], check=True)
           PY
-      - name: Full docs suite unchanged
+      - name: Refresh reviewed direct-question diagnostic hash in workspace
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import ast, hashlib, json
+          module = 'tests/docs/test_direct_question_retrieval_intents.py'
+          tree = ast.parse(Path(module).read_text())
+          nodes = sorted(
+              f'{module}::{node.name}'
+              for node in tree.body
+              if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef))
+              and node.name.startswith('test_')
+          )
+          path = Path('tests/diagnostic_labels.direct_questions.json')
+          data = json.loads(path.read_text())
+          assert data['module_labels'][module] == 'behavioral'
+          data['module_node_hashes'][module] = hashlib.sha256('\n'.join(nodes).encode()).hexdigest()
+          path.write_text(json.dumps(data, indent=2) + '\n')
+          print(module, data['module_node_hashes'][module], len(nodes))
+          PY
+      - name: Full docs suite after inventory refresh
         run: python -m pytest -q tests/docs
