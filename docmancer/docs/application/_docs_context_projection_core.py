@@ -586,17 +586,18 @@ def project_docs_context(
         if isinstance(original, dict):
             original["_assigned_requirement_ids"] = list(source["_assigned_requirement_ids"])
     decision = context_selection_decision(sources, public_query_ids)
+    component_decision = component_coverage_decision(
+        query_plan.get("_component_contract") or (), assignments, sources,
+        unresolved_residue=query_plan.get("unresolved_parts") or (),
+        component_scope_complete=query_plan.get("component_scope_complete", True),
+    )
     payload = _payload(sources, decision=decision, query_plan=query_plan)
     projection_diagnostics["final_visible_evidence_ids"] = [
         str(source.get("evidence_id") or "") for source in payload["sources"][:3]
         if source.get("evidence_id")
     ]
     if selection_diagnostics is not None:
-        selection_diagnostics["component_coverage"] = component_coverage_decision(
-            query_plan.get("_component_contract") or (), assignments, sources,
-            unresolved_residue=query_plan.get("unresolved_parts") or (),
-            component_scope_complete=query_plan.get("component_scope_complete", True),
-        ).as_payload()
+        selection_diagnostics["component_coverage"] = component_decision.as_payload()
     snapshot = {
         source["evidence_id"]: _snapshot_entry(
             snapshot[source["evidence_id"]]["source"], source,
@@ -607,6 +608,7 @@ def project_docs_context(
         fallback_ids
         and not _allow_context_hints
         and len(payload["sources"]) < MAX_DOCS_SOURCES
+        and (decision.missing_query_ids or component_decision.missing_component_ids)
     ):
         # A safe retrieval hint is a read-only supplement, not a replacement
         # for already admitted public evidence. Re-run the bounded projector
