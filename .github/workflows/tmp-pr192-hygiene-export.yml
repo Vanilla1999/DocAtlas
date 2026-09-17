@@ -41,7 +41,7 @@ jobs:
           python - <<'PY'
           from pathlib import Path
           from scripts.check_python_module_size import DEFAULT_MAX_LINES, oversized_modules
-          offenders = {path.name: lines for path, lines in oversized_modules(Path.cwd(), DEFAULT_MAX_LINES)}
+          offenders = {path.split('/')[-1]: lines for lines, path in oversized_modules(Path.cwd(), DEFAULT_MAX_LINES)}
           assert '_docs_context_projection_core.py' not in offenders, offenders
           assert 'model_visible_projection.py' not in offenders, offenders
           print('remaining base line-budget offenders:', offenders)
