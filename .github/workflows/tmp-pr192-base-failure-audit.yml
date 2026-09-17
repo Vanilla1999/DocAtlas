@@ -1,0 +1,56 @@
+name: Temporary PR192 base failure audit
+on:
+  push:
+    branches: [tmp/pr192-base-failure-audit]
+permissions:
+  contents: read
+jobs:
+  audit:
+    runs-on: ubuntu-24.04
+    env:
+      DOCATLAS_OFFLINE: '1'
+      DOCATLAS_AUTO_VECTORS: '0'
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+        with:
+          ref: tmp/pr192-base-failure-audit
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1
+        with:
+          python-version: '3.13'
+      - name: Install test dependencies
+        run: |
+          python - <<'PY'
+          import subprocess, sys, tomllib
+          data = tomllib.load(open('pyproject.toml','rb'))
+          deps = [x for x in data['project']['dependencies'] if not x.startswith(('tiktoken','fastembed'))]
+          deps += data['project']['optional-dependencies']['dev']
+          subprocess.run([sys.executable, '-m', 'pip', 'install', '-q', *deps], check=True)
+          PY
+      - name: Refresh only stale diagnostic hashes in workspace
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import ast, hashlib, json
+          reviewed = {
+            'tests/diagnostic_labels.direct_questions.json': ['tests/docs/test_direct_question_retrieval_intents.py'],
+            'tests/diagnostic_labels.v2_acceptance_gaps.json': ['tests/docs/test_v2_acceptance_gaps.py'],
+          }
+          for manifest_name, modules in reviewed.items():
+              manifest = Path(manifest_name)
+              if not manifest.exists():
+                  continue
+              data = json.loads(manifest.read_text())
+              for module in modules:
+                  if module not in data.get('module_labels', {}):
+                      continue
+                  tree = ast.parse(Path(module).read_text())
+                  nodes = sorted(
+                      f'{module}::{node.name}' for node in tree.body
+                      if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef))
+                      and node.name.startswith('test_')
+                  )
+                  data['module_node_hashes'][module] = hashlib.sha256('\n'.join(nodes).encode()).hexdigest()
+              manifest.write_text(json.dumps(data, indent=2) + '\n')
+          PY
+      - name: Run full docs suite on base
+        run: python -m pytest -q tests/docs
