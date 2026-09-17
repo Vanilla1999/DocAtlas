@@ -30,6 +30,21 @@ jobs:
               raise SystemExit('exact-path qualification block not found')
           path.write_text(text.replace(old, new, 1))
           PY
+      - name: Refresh verified witness revision locks
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import json
+          sidecar_path = Path('eval/direct_docatlas_questions_15/cases.json')
+          sidecar = json.loads(sidecar_path.read_text())
+          sidecar['sources']['docs/DOCMANCER_PRODUCT_BRIEF.md']['git_blob_sha'] = '22c728f92e1647db0b7793a8e7a470203ede6a25'
+          sidecar_path.write_text(json.dumps(sidecar, indent=2, ensure_ascii=False) + '\n')
+
+          lock_path = Path('eval/project_context_quality_v2/protocol.lock.json')
+          lock = json.loads(lock_path.read_text())
+          lock['active_document_sha256']['docs/project-docs-mcp-workflow.md'] = '0b7264fd4572fa6827cf7965c218cf6a09c220c3a7f9fb81d53c113ff332b8c3'
+          lock_path.write_text(json.dumps(lock, indent=2, ensure_ascii=False) + '\n')
+          PY
       - name: Install offline-friendly dependencies
         run: |
           python - <<'PY'
@@ -45,5 +60,10 @@ jobs:
             tests/docs/test_evidence_qualification.py \
             tests/docs/test_context_projection_boundaries.py::test_path_only_projection_uses_the_current_exact_topic_guard \
             tests/docs/test_exact_document_fallback_context.py
+      - name: Witness lock regression cluster
+        run: |
+          python -m pytest -q \
+            tests/docs/test_direct_docatlas_questions_15.py::test_direct_docatlas_questions_15_visible_context_covers_all_required_facts \
+            tests/docs/test_generic_context_workflows.py::test_stale_health_live_status_sync_and_removal
       - name: Full docs suite
         run: python -m pytest -q tests/docs
