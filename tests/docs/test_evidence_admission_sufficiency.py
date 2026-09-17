@@ -300,6 +300,43 @@ def test_comparison_relation_rejects_unrelated_different_from_clause() -> None:
     assert distractor.reason == "missing_visible_comparison_relation"
 
 
+def test_original_witness_is_protected_even_when_it_also_matches_host_lookup():
+    question = "Does preparing dependency documentation also install the dependency into my application?"
+    lookups = ("preparing documentation and installing project dependencies",)
+    requirements = build_requirements(question, profile="project_docs_answer")
+    plan = build_documentation_query_plan(question, lookup_queries=lookups, requirements=requirements)
+    original = next(item for item in plan.queries if item.query_id == "query-original")
+    host = next(item for item in plan.queries if item.query_id == "query-lookup-1")
+    canonical = next(
+        item for item in plan.queries
+        if item.origin == "canonical_intent" and item.text == "install command line help"
+    )
+    boundary = _project_source(
+        path="docs/boundary.md", query_id=original.query_id, query_text=original.text,
+        content=(
+            "Preparing dependency documentation reads manifests and lockfiles as version evidence; "
+            "it does not install the dependency into your application or mutate project dependencies."
+        ),
+    )
+    boundary["retrieval_query_ids"].append(host.query_id)
+    boundary["retrieval_query_matches"][host.query_id] = {
+        "qualified": True, "query_text": host.text, "query_origin": "host_lookup",
+        "relation": "host_lookup",
+    }
+    weak_canonical = _project_source(
+        path="docs/install.md", query_id=canonical.query_id, query_text=canonical.text,
+        content="Install DocAtlas command line help with the one-line installer for the CLI.",
+    )
+    retrieval = {
+        "question": question, "project_identity": PROJECT_ID,
+        "requirements": requirements.hash_payload,
+        "context_pack": [weak_canonical, boundary],
+        "documentation_query_plan": plan.as_payload(),
+    }
+    payload, _snapshot = project_docs_context(retrieval=retrieval, max_tokens=340)
+    assert [row["path_or_url"] for row in payload["sources"]] == ["docs/boundary.md"]
+
+
 def test_single_host_lookup_cannot_displace_available_canonical_witness_under_budget():
     question = "Does retrieved documentation authorize executing a destructive delete command?"
     lookups = ("destructive delete command permission",)

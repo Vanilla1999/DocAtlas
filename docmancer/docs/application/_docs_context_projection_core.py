@@ -362,18 +362,24 @@ def project_docs_context(
             assigned_evidence_ids=set(assigned_evidence_by_requirement.values()),
             bound_assigned_evidence_ids=required_assigned_evidence_ids,
         )
-        # Host rewrites are expansion lanes. Before spending budget on a
-        # host-only candidate, preserve any still-available baseline-only
-        # original/exact or canonical-intent direction. Candidates that also
-        # qualify a host lookup remain in normal ranking.
+        # Host rewrites are expansion lanes. Preserve missing original/exact
+        # evidence first, even when the same candidate also matches a host lookup.
+        # Canonical-intent fallback is weaker: protect it only when it is baseline-only,
+        # so a weak alias cannot outrank a stronger explicit lookup.
         if host_query_ids:
-            protected_query_ids = (public_query_id_set - host_query_ids) | canonical_intent_query_ids
-            missing_protected_ids = protected_query_ids - qualified_query_ids(sources)
+            selected_query_ids = qualified_query_ids(sources)
+            missing_public_ids = (public_query_id_set - host_query_ids) - selected_query_ids
             protected_index = next((
                 index for index, candidate in enumerate(prepared)
-                if (qualified_query_ids((candidate,)) & missing_protected_ids)
-                and not (qualified_query_ids((candidate,)) & host_query_ids)
+                if qualified_query_ids((candidate,)) & missing_public_ids
             ), None)
+            if protected_index is None:
+                missing_canonical_ids = canonical_intent_query_ids - selected_query_ids
+                protected_index = next((
+                    index for index, candidate in enumerate(prepared)
+                    if (qualified_query_ids((candidate,)) & missing_canonical_ids)
+                    and not (qualified_query_ids((candidate,)) & host_query_ids)
+                ), None)
             if protected_index not in (None, 0):
                 prepared.insert(0, prepared.pop(protected_index))
         variant = prepared.pop(0)
