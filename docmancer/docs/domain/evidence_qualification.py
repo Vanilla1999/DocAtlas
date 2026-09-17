@@ -198,6 +198,7 @@ def qualify_evidence(
 
     if str(probe.get("mode") or "") == "exact_path":
         query_text = str(probe.get("query_text") or "").replace("\\", "/").casefold()
+        normalized_visible = visible_text.replace("\\", "/").casefold()
         qualified = bool(query_text and query_text in normalized_visible)
         result.update(
             qualified=qualified,
