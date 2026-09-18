@@ -64,6 +64,7 @@ jobs:
                       k: trace.get(k) for k in (
                           "qualified", "qualification_reason", "query_origin", "relation",
                           "lexical_score", "match_ratio", "body_matched_terms", "matched_terms",
+                          "query_terms", "exact_terms", "missing_exact_terms", "missing_parent_exact_terms",
                           "public_parent_query_id",
                       )
                   }
