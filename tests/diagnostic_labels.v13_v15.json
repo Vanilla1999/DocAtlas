@@ -3,12 +3,14 @@
   "module_labels": {
     "tests/docs/test_comparison_treat_frame.py": "behavioral",
     "tests/docs/test_bounded_response_docs_parity.py": "behavioral",
-    "tests/docs/test_reporting_relation_selection.py": "behavioral"
+    "tests/docs/test_reporting_relation_selection.py": "behavioral",
+    "tests/docs/test_current_source_authority_docs_parity.py": "behavioral"
   },
   "node_overrides": {},
   "module_node_hashes": {
     "tests/docs/test_comparison_treat_frame.py": "5ec9ddd96b8c6caf25cd17f890c34069e5bee621dc5c716251155905455ca20b",
     "tests/docs/test_bounded_response_docs_parity.py": "a39016c00a8da9456413b2b18fb8fd48a399ab6c9c6a21ad84cefe6890fe83fb",
-    "tests/docs/test_reporting_relation_selection.py": "63d320f0b7dbf00d4e5a63ecbf7010355fa38f034a80c053bcd62798fae8e43d"
+    "tests/docs/test_reporting_relation_selection.py": "63d320f0b7dbf00d4e5a63ecbf7010355fa38f034a80c053bcd62798fae8e43d",
+    "tests/docs/test_current_source_authority_docs_parity.py": "83c2fd93bb1a4bcc7437bd6303d7eda143f14571b5be2b11277c9e51853c197e"
   }
 }
