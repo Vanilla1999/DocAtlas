@@ -295,7 +295,7 @@ def _subject_relation_groups(question: str) -> tuple[str, ...]:
     # side/context probes can retrieve complementary evidence when the contract
     # is documented separately for each side.
     semantic_comparison = match_comparison_frame(question)
-    if semantic_comparison is not None:
+    if semantic_comparison is not None and semantic_comparison.context:
         left = " ".join(semantic_comparison.left.split())
         right = " ".join(semantic_comparison.right.split())
         context = " ".join(str(semantic_comparison.context or "").split())
