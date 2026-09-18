@@ -1,5 +1,6 @@
 import pytest
 
+from docmancer.docs.domain.question_plan import _semantic_comparison
 from docmancer.docs.domain.question_semantic_frames import match_comparison_frame
 
 
@@ -63,3 +64,18 @@ def test_existing_forms_are_unchanged(question):
 )
 def test_noncomparison_or_invalid_operands_are_not_invented(question):
     assert match_comparison_frame(question) is None
+
+def test_comparison_plan_keeps_current_answer_context():
+    question = (
+        "How should current documentation answers treat CHANGELOG.md "
+        "compared with current source-of-truth documentation?"
+    )
+    plan = _semantic_comparison(question)
+    assert plan is not None
+    assert len(plan.facets) == 1
+    facet = plan.facets[0]
+    assert facet.subject == "CHANGELOG.md"
+    assert facet.target == "current source-of-truth documentation"
+    assert facet.relation == "contrast"
+    assert facet.context == "current documentation answers"
+
