@@ -145,6 +145,16 @@ For repository-specific architecture, conventions, runbooks, roadmap, README/wik
 7. Only unbounded exploration exposes `answer_outline`, `trust_contract`, and `context_pack`; there, prefer nested source and section metadata.
 8. If the user asks vaguely about "the MCP server", distinguish `doc-atlas mcp docs-serve` (the three-tool documentation surface) from `doc-atlas mcp packs-serve` (advanced installed API-action packs).
 
+## Gap-directed follow-up
+
+Before retrieval, identify what the user actually requests without guessing the answer. Keep the root question unchanged. Preserve shared conditions, versions, negation, and both sides of a comparison. Start with one bounded `get_docs_context` call for that root question; do not pre-split a single compound or comparison question.
+
+- Same need, different vocabulary: keep one concrete call and use narrow `lookup_queries`.
+- Split only after the first packet leaves a concrete, independently answerable requested part missing; then use a separate concrete `get_docs_context` call for that missing part. A comparison alone does not trigger a split.
+- Known source, concrete missing requested fact: use an issued bounded source read. If its source is unknown, make one targeted same-need query within existing limits.
+
+A later query may use a discovered bridge value only with its returned source reference. For a sufficient visible packet, stop even when `context_quality` is unverified; an unverified flag alone does not require another read. Stop on sufficient evidence or no progress. Do not reread the same span or replenish task budgets by renaming a subquestion.
+
 ## Common Mistakes
 
 - Do not use `doc-atlas add` for new local files. Use `doc-atlas ingest <path>`.

@@ -40,6 +40,14 @@ documents:
     status: active
     impact: track
 
+  - path: SKILL.md
+    role: runbook
+    scope: project
+    description: Canonical Docs MCP agent workflow, preparation and evidence-use rules.
+    authority: source_of_truth
+    status: active
+    impact: search_only
+
   - path: docs/DOCMANCER_PRODUCT_BRIEF.md
     role: overview
     scope: project

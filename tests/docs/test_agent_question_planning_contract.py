@@ -121,3 +121,44 @@ def test_runtime_lookup_schema_teaches_when_to_add_lookups_without_changing_orig
     assert "comparison sides" in lowered
     assert "expected answer" in lowered
     assert "guessed source" in lowered
+
+def test_host_gap_policy_preserves_question_and_targets_missing_fact() -> None:
+    workflow = public_agent_contract()["workflow"]
+    policy = workflow["gap_resolution"]
+
+    assert policy["trigger"] == "concrete_missing_requested_fact"
+    assert policy["known_source_first"] == "issued_bounded_source_read"
+    assert policy["unknown_source_next"] == "one_targeted_same_need_query"
+    assert policy["root_question_immutable"] is True
+    assert policy["bridge_values_require_source_reference"] is True
+    assert policy["subquestions_preserve_conditions_and_comparison"] is True
+    assert policy["stop_when_sufficient_or_no_progress"] is True
+    assert policy["first_call_before_split"] == "original_root_question"
+    assert policy["split_requires"] == "concrete_missing_requested_part_after_first_packet"
+    assert policy["comparison_alone_triggers_split"] is False
+    assert workflow["retrieval_only_answer"]["false_or_unverified_flags_require_read"] is False
+    assert workflow["retrieval_only_answer"]["authorizes_edit"] is False
+
+def test_agent_surfaces_repeat_gap_directed_follow_up_rule() -> None:
+    from pathlib import Path
+    from docmancer.mcp._docs_server_resources import MCP_RESOURCES
+
+    skill = Path("SKILL.md").read_text(encoding="utf-8")
+    template = files("docmancer.templates").joinpath("agent_contract.md").read_text(encoding="utf-8")
+    quickstart = next(
+        item["text"] for item in MCP_RESOURCES
+        if item["uri"] == "docmancer://agent/quickstart"
+    )
+    for text in (skill, template, quickstart):
+        lowered = text.casefold()
+        assert "gap-directed follow-up" in lowered
+        assert "root" in lowered and "unchanged" in lowered
+        assert "concrete missing requested fact" in lowered
+        assert "bounded source read" in lowered
+        assert "one targeted" in lowered
+        assert "source reference" in lowered
+        assert "conditions" in lowered and "comparison" in lowered
+        assert "no progress" in lowered
+        assert "unverified" in lowered and "does not require" in lowered
+        assert "do not pre-split" in lowered
+        assert "first packet" in lowered

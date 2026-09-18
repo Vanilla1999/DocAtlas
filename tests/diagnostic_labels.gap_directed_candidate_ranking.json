@@ -1,0 +1,10 @@
+{
+  "schema_version": 1,
+  "module_labels": {
+    "tests/docs/test_gap_directed_candidate_ranking.py": "behavioral"
+  },
+  "node_overrides": {},
+  "module_node_hashes": {
+    "tests/docs/test_gap_directed_candidate_ranking.py": "239591935d041dd6aa1252ca1cce18ba7e5c08b0625b575104c74ebd1917a0ab"
+  }
+}
