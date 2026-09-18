@@ -80,7 +80,7 @@ def match_comparison_frame(question: str) -> ComparisonFrame | None:
     q = clean_phrase(question)
 
     treat_match = re.fullmatch(
-        r"how\\s+should\\s+(.+?)\\s+treat\\s+(.+?)\\s+compared\\s+(?:with|to)\\s+(.+)",
+        r"how\s+should\s+(.+?)\s+treat\s+(.+?)\s+compared\s+(?:with|to)\s+(.+)",
         q,
         re.I,
     )
