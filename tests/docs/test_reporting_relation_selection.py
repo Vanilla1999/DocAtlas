@@ -81,3 +81,11 @@ def test_reporting_relation_does_not_reward_report_verb_without_requested_target
     question = "How does Lumen report dropped records?"
     unrelated = "Lumen reports startup warnings to the operator."
     assert _relation_request_priority(question, unrelated) == (0.0,) * 9
+
+def test_relation_priority_keeps_fixed_shape_for_narrow_requests():
+    priority = _relation_request_priority(
+        "What is the signature of BackgroundTask?",
+        "Signature: `BackgroundTask(func, *args, **kwargs)`.",
+    )
+    assert priority == (0.0,) * 9
+
