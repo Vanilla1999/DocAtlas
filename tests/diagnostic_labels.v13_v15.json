@@ -1,10 +1,12 @@
 {
   "schema_version": 1,
   "module_labels": {
-    "tests/docs/test_comparison_treat_frame.py": "behavioral"
+    "tests/docs/test_comparison_treat_frame.py": "behavioral",
+    "tests/docs/test_bounded_response_docs_parity.py": "behavioral"
   },
   "node_overrides": {},
   "module_node_hashes": {
-    "tests/docs/test_comparison_treat_frame.py": "978a5eb3654a9f944852fee9eaae5fd1c8c9f9ae5f6a58e8c9548abe261e9885"
+    "tests/docs/test_comparison_treat_frame.py": "978a5eb3654a9f944852fee9eaae5fd1c8c9f9ae5f6a58e8c9548abe261e9885",
+    "tests/docs/test_bounded_response_docs_parity.py": "a39016c00a8da9456413b2b18fb8fd48a399ab6c9c6a21ad84cefe6890fe83fb"
   }
 }
