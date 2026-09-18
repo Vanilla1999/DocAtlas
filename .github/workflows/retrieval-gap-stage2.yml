@@ -1,0 +1,147 @@
+name: Retrieval gap stage 2
+on:
+  push:
+    branches: [experiment/retrieval-candidate-gaps-v13-v15-v17]
+permissions:
+  contents: read
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+      - run: uv sync --frozen --extra dev
+      - name: Diagnose filter versus cap versus budget
+        run: |
+          uv run --frozen --extra dev python - <<'PY'
+          from __future__ import annotations
+          import json, os
+          from pathlib import Path
+          from tempfile import TemporaryDirectory
+
+          from docmancer.agent import DocmancerAgent
+          from docmancer.core.config import DocmancerConfig
+          from docmancer.docs.registry import LibraryRegistry
+          from docmancer.docs.service import DocsJobTracker, LibraryDocsService
+          from docmancer.docs.application.evidence_selection import build_requirements
+          from docmancer.docs.domain.documentation_query_plan import build_documentation_query_plan
+          from docmancer.docs.application._project_context_service_shared import project_context_pack
+
+          ROOT = Path.cwd()
+          CASES = {
+              "V13": {
+                  "question": "How does DocAtlas report omitted material when a bounded documentation response cannot include everything?",
+                  "lookups": ("bounded documentation response omitted_counts truncation reporting",),
+                  "path": "docs/project-docs-mcp-workflow.md",
+                  "witness": "documentation_gap.bounds.omitted_counts",
+              },
+              "V15": {
+                  "question": "How should current documentation answers treat CHANGELOG.md compared with current source-of-truth documentation?",
+                  "lookups": (),
+                  "path": "SKILL.md",
+                  "witness": "Treat `CHANGELOG.md` as primary only for release-history/change questions.",
+              },
+              "V17": {
+                  "question": "How does DocAtlas decide whether a documentation source is stale versus synchronized?",
+                  "lookups": ("documentation freshness stale synchronized decision",),
+                  "path": "docs/project-docs-mcp-workflow.md",
+                  "witness": "Indexed docs changed on disk, were deleted, or are no longer part of current discovery.",
+              },
+          }
+
+          def row(chunk):
+              md = chunk.metadata or {}
+              span = md.get("line_span") or (None, None)
+              return {
+                  "path": str(md.get("project_doc_path") or md.get("source_path") or chunk.source or ""),
+                  "line_start": span[0], "line_end": span[1],
+                  "score": float(chunk.score),
+                  "token_estimate": int(md.get("token_estimate") or 0),
+                  "retrieval_query_ids": list(md.get("retrieval_query_ids") or ()),
+                  "text": chunk.text,
+              }
+
+          def hit(rows, case):
+              w = case["witness"].casefold()
+              return [
+                  {"index": i, **r}
+                  for i, r in enumerate(rows)
+                  if r["path"] == case["path"] and w in r["text"].casefold()
+              ]
+
+          with TemporaryDirectory(prefix="docatlas-gap2-") as raw:
+              tmp = Path(raw)
+              os.environ["DOCATLAS_HOME"] = str(tmp / "home")
+              config = DocmancerConfig()
+              config.index.db_path = str(tmp / "docmancer.db")
+              config.index.extracted_dir = str(tmp / "extracted")
+              service = LibraryDocsService(
+                  config=config, config_source="explicit",
+                  registry=LibraryRegistry(config.index.db_path),
+                  agent=DocmancerAgent(config=config), job_tracker=DocsJobTracker(),
+              )
+              sync = service.sync_project_docs(str(ROOT), with_vectors=False)
+              assert getattr(sync, "status", None) == "success"
+              out = {"code_sha": os.environ.get("GITHUB_SHA"), "cases": {}}
+
+              for cid, case in CASES.items():
+                  req = build_requirements(case["question"], profile="project_docs_answer")
+                  plan = build_documentation_query_plan(
+                      case["question"], lookup_queries=case["lookups"], requirements=req,
+                  )
+
+                  variants = {}
+                  for limit, tokens in ((20,800),(80,800),(20,4000),(80,4000)):
+                      chunks = service.project_docs.query_project_docs(
+                          str(ROOT), case["question"], limit=limit, tokens=tokens,
+                          scope="project", requirements=req,
+                          lookup_queries=case["lookups"], documentation_query_plan=plan,
+                      )
+                      rows = [row(c) for c in chunks]
+                      variants[f"limit{limit}_tokens{tokens}"] = {
+                          "count": len(rows), "total_tokens": sum(r["token_estimate"] for r in rows),
+                          "witness_hits": hit(rows, case),
+                          "top_paths": [r["path"] for r in rows[:25]],
+                      }
+
+                  project_docs = service.project_docs.get_project_docs(
+                      str(ROOT), case["question"], tokens=800, limit=20, scope="project",
+                      requirements=req, lookup_queries=case["lookups"],
+                      documentation_query_plan=plan,
+                  )
+                  result_rows = [{
+                      "path": c.path, "line_start": c.line_start, "line_end": c.line_end,
+                      "text": c.content, "token_estimate": int((c.metadata or {}).get("token_estimate") or 0),
+                  } for c in project_docs.results]
+                  packed = project_context_pack(
+                      question=case["question"], project_docs=project_docs, dependency_docs=None,
+                  )
+                  pack_rows = [{
+                      "path": str(x.get("path") or ""), "line_start": x.get("line_start"),
+                      "line_end": x.get("line_end"), "text": str(x.get("content") or ""),
+                      "token_estimate": int(x.get("token_estimate") or 0),
+                  } for x in packed]
+                  out["cases"][cid] = {
+                      "question": case["question"], "path": case["path"], "witness": case["witness"],
+                      "query_plan": plan.as_payload(),
+                      "variants": variants,
+                      "get_project_docs": {
+                          "count": len(result_rows),
+                          "witness_hits": hit(result_rows, case),
+                      },
+                      "project_context_pack": {
+                          "count": len(pack_rows),
+                          "witness_hits": hit(pack_rows, case),
+                      },
+                  }
+
+              Path("retrieval-gap-stage2.json").write_text(
+                  json.dumps(out, ensure_ascii=False, indent=2, default=str) + "\n",
+                  encoding="utf-8",
+              )
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: retrieval-gap-stage2
+          path: retrieval-gap-stage2.json
