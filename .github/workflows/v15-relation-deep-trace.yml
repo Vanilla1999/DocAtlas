@@ -1,0 +1,155 @@
+name: V15 relation deep trace
+on:
+  push:
+    branches: [fix/v13-v15-evidence-pipeline]
+    paths:
+      - .github/workflows/v15-relation-deep-trace.yml
+
+permissions:
+  contents: read
+
+jobs:
+  trace:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: runtime
+      - uses: actions/checkout@v4
+        with:
+          ref: fbf36763f89f89f3745b4ea58b773eb33489d2f4
+          path: corpus
+      - uses: astral-sh/setup-uv@v6
+      - working-directory: runtime
+        run: uv sync --frozen --extra dev
+      - name: Trace V15 query lanes and pool
+        working-directory: runtime
+        run: |
+          PYTHONPATH="$PWD" uv run --frozen --extra dev python - <<'PY'
+          import json, os
+          from pathlib import Path
+          from tempfile import TemporaryDirectory
+          from unittest.mock import patch
+
+          from docmancer.agent import DocmancerAgent
+          from docmancer.core.config import DocmancerConfig
+          from docmancer.docs.registry import LibraryRegistry
+          from docmancer.docs.service import DocsJobTracker, LibraryDocsService
+          from docmancer.docs.application import _project_docs_service_part03 as pds
+          from docmancer.docs.application.evidence_selection import build_requirements
+          from docmancer.docs.domain.documentation_query_plan import build_documentation_query_plan
+
+          ROOT = Path("../corpus").resolve()
+          Q = "How should current documentation answers treat CHANGELOG.md compared with current source-of-truth documentation?"
+          EXPECTED_PATH = "SKILL.md"
+          NEEDLE = "Treat `CHANGELOG.md` as primary only for release-history/change questions."
+
+          def info(chunk):
+              md = dict(getattr(chunk, "metadata", None) or {})
+              text = str(getattr(chunk, "text", None) or getattr(chunk, "content", None) or "")
+              path = str(
+                  getattr(chunk, "path", None) or md.get("project_doc_path")
+                  or md.get("source_path") or getattr(chunk, "source", "") or ""
+              )
+              matches = {}
+              for qid, trace in (md.get("retrieval_query_matches") or {}).items():
+                  if isinstance(trace, dict):
+                      matches[str(qid)] = {
+                          k: trace.get(k) for k in (
+                              "qualified", "qualification_reason", "query_origin", "relation",
+                              "match_ratio", "lexical_score", "body_matched_terms",
+                              "query_terms", "exact_terms", "missing_exact_terms",
+                              "missing_parent_exact_terms", "public_parent_query_id",
+                          )
+                      }
+              return {
+                  "path": path,
+                  "score": getattr(chunk, "score", None) or md.get("score"),
+                  "retrieval_query_ids": list(md.get("retrieval_query_ids") or ()),
+                  "retrieval_query_matches": matches,
+                  "text": text,
+              }
+
+          def hits(rows):
+              return [
+                  {"index": i, **row} for i, row in enumerate(rows)
+                  if row["path"] == EXPECTED_PATH and NEEDLE.casefold() in row["text"].casefold()
+              ]
+
+          with TemporaryDirectory(prefix="v15-rel-deep-") as raw:
+              tmp = Path(raw)
+              os.environ["DOCATLAS_HOME"] = str(tmp / "home")
+              cfg = DocmancerConfig()
+              cfg.index.db_path = str(tmp / "db.sqlite")
+              cfg.index.extracted_dir = str(tmp / "extracted")
+              svc = LibraryDocsService(
+                  config=cfg, config_source="explicit",
+                  registry=LibraryRegistry(cfg.index.db_path),
+                  agent=DocmancerAgent(config=cfg), job_tracker=DocsJobTracker(),
+              )
+              assert svc.sync_project_docs(str(ROOT), with_vectors=False).status == "success"
+              req = build_requirements(Q, profile="project_docs_answer")
+              plan = build_documentation_query_plan(Q, lookup_queries=(), requirements=req)
+
+              stages = {"dispatcher": [], "candidate_pool": []}
+              real_dispatcher_for = svc.agent_gateway.dispatcher_for
+              real_diag = pds._retrieval_stage_diagnostics
+
+              class Proxy:
+                  def __init__(self, inner):
+                      self.inner = inner
+                  def run(self, text, **kwargs):
+                      result = self.inner.run(text, **kwargs)
+                      rows = [info(x) for x in list(getattr(result, "chunks", ()) or ())]
+                      stages["dispatcher"].append({
+                          "query": text,
+                          "limit": kwargs.get("limit"),
+                          "budget": kwargs.get("budget"),
+                          "expand": kwargs.get("expand"),
+                          "count": len(rows),
+                          "hits": hits(rows),
+                          "top_paths": [row["path"] for row in rows[:20]],
+                      })
+                      return result
+
+              def dispatcher_for(agent, *, mode=None):
+                  return Proxy(real_dispatcher_for(agent, mode=mode))
+
+              def diagnostics(query_plan, candidates):
+                  rows = [info(x) for x in candidates]
+                  stages["candidate_pool"].append({
+                      "count": len(rows),
+                      "hits": hits(rows),
+                      "top_paths": [row["path"] for row in rows[:50]],
+                  })
+                  return real_diag(query_plan, candidates)
+
+              with (
+                  patch.object(svc.agent_gateway, "dispatcher_for", dispatcher_for),
+                  patch.object(pds, "_retrieval_stage_diagnostics", diagnostics),
+              ):
+                  rows = svc.project_docs.query_project_docs(
+                      str(ROOT), Q, limit=20, tokens=800, scope="project",
+                      requirements=req, lookup_queries=(), documentation_query_plan=plan,
+                  )
+              final = [info(x) for x in rows]
+              out = {
+                  "code_sha": os.environ.get("GITHUB_SHA"),
+                  "plan": plan.as_payload(),
+                  "stages": stages,
+                  "final": {
+                      "count": len(final),
+                      "hits": hits(final),
+                      "top_paths": [row["path"] for row in final],
+                  },
+              }
+              Path("../v15-relation-deep-trace.json").write_text(
+                  json.dumps(out, ensure_ascii=False, indent=2, default=str) + "\n",
+                  encoding="utf-8",
+              )
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: v15-relation-deep-trace
+          path: v15-relation-deep-trace.json
