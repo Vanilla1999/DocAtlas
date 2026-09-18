@@ -4,6 +4,7 @@ on:
     branches: [fix/v13-v15-evidence-pipeline]
     paths:
       - .github/workflows/v13-v15-public-proof.yml
+      - tests/docs/test_v13_v15_public_regressions.py
 
 permissions:
   contents: read
