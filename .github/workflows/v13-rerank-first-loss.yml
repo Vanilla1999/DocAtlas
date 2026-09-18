@@ -1,0 +1,76 @@
+name: V13 rerank first-loss trace
+on:
+  push:
+    branches: [experiment/retrieval-candidate-gaps-v13-v15-v17]
+permissions:
+  contents: read
+jobs:
+  trace:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+      - run: uv sync --frozen --extra dev
+      - name: Trace V13 rerank and stage-fit
+        run: |
+          uv run --frozen --extra dev python - <<'PY'
+          import json, os
+          from pathlib import Path
+          from tempfile import TemporaryDirectory
+
+          from docmancer.agent import DocmancerAgent
+          from docmancer.core.config import DocmancerConfig
+          from docmancer.docs.registry import LibraryRegistry
+          from docmancer.docs.service import DocsJobTracker, LibraryDocsService
+          from docmancer.docs.application.evidence_selection import build_requirements
+          from docmancer.docs.domain.documentation_query_plan import build_documentation_query_plan
+          from docmancer.docs.domain.project_query_intent import classify_project_query_intent
+          from docmancer.docs.domain.project_doc_ranking import rerank_project_doc_chunks
+          from docmancer.docs.application._project_context_service_shared import fit_stage_items
+
+          ROOT=Path.cwd()
+          Q="How does DocAtlas report omitted material when a bounded documentation response cannot include everything?"
+          LOOKUPS=("bounded documentation response omitted_counts truncation reporting",)
+          NEEDLE="documentation_gap.bounds.omitted_counts"
+
+          def rows(chunks):
+              out=[]
+              for c in chunks:
+                  md=c.metadata or {}
+                  span=md.get("line_span") or (None,None)
+                  out.append({
+                      "path": c.path if hasattr(c,"path") else str(md.get("project_doc_path") or c.source),
+                      "line_start": getattr(c,"line_start",None) or span[0],
+                      "line_end": getattr(c,"line_end",None) or span[1],
+                      "text": getattr(c,"content",None) or getattr(c,"text",""),
+                  })
+              return out
+          def hits(xs):
+              return [{"index":i,**x} for i,x in enumerate(xs) if x["path"]=="docs/project-docs-mcp-workflow.md" and NEEDLE.casefold() in x["text"].casefold()]
+
+          with TemporaryDirectory(prefix="v13-rerank-") as raw:
+              tmp=Path(raw); os.environ["DOCATLAS_HOME"]=str(tmp/"home")
+              cfg=DocmancerConfig(); cfg.index.db_path=str(tmp/"db.sqlite"); cfg.index.extracted_dir=str(tmp/"extracted")
+              svc=LibraryDocsService(config=cfg,config_source="explicit",registry=LibraryRegistry(cfg.index.db_path),agent=DocmancerAgent(config=cfg),job_tracker=DocsJobTracker())
+              assert svc.sync_project_docs(str(ROOT),with_vectors=False).status=="success"
+              req=build_requirements(Q,profile="project_docs_answer")
+              plan=build_documentation_query_plan(Q,lookup_queries=LOOKUPS,requirements=req)
+              pd=svc.project_docs.get_project_docs(str(ROOT),Q,scope="project",requirements=req,lookup_queries=LOOKUPS,documentation_query_plan=plan)
+              before=rows(pd.results)
+              ranked_chunks=rerank_project_doc_chunks(pd.results,question=Q,intent=classify_project_query_intent(Q),limit=None,broad_max_per_source=2,lifecycle_intent_value=req.lifecycle_intent)
+              ranked=rows(ranked_chunks)
+              fitted_chunks,issue=fit_stage_items("project_docs",ranked_chunks)
+              fitted=rows(fitted_chunks)
+              payload={
+                  "code_sha":os.environ.get("GITHUB_SHA"),
+                  "before":{"count":len(before),"hits":hits(before)},
+                  "reranked":{"count":len(ranked),"hits":hits(ranked)},
+                  "stage_fit":{"count":len(fitted),"hits":hits(fitted),"issue":issue},
+              }
+              Path("v13-rerank-first-loss.json").write_text(json.dumps(payload,ensure_ascii=False,indent=2)+"\n")
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: v13-rerank-first-loss
+          path: v13-rerank-first-loss.json
