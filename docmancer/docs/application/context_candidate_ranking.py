@@ -386,7 +386,7 @@ def _relation_request_priority(question: str, snippet: str) -> tuple[float, ...]
     # already have a stronger dedicated selector. Do not let this generic
     # relation hint compete with those explicit parts.
     if recognized_request_parts(question):
-        return (0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0)
+        return (0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0)
     body = snippet.casefold()
 
     # For a question asking how a system reports/surfaces/represents a requested
