@@ -4,6 +4,9 @@ on:
     branches: [fix/v13-v15-evidence-pipeline]
     paths:
       - .github/workflows/v15-post-parser-trace.yml
+      - docmancer/docs/domain/documentation_query_plan.py
+      - docmancer/docs/domain/question_semantic_frames.py
+      - docmancer/docs/domain/question_plan.py
 
 permissions:
   contents: read
