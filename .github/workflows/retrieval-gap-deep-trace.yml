@@ -1,0 +1,167 @@
+name: Retrieval candidate deep trace
+on:
+  push:
+    branches: [experiment/retrieval-candidate-gaps-v13-v15-v17]
+permissions:
+  contents: read
+jobs:
+  trace:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+      - run: uv sync --frozen --extra dev
+      - name: Deep trace retrieval boundaries
+        run: |
+          uv run --frozen --extra dev python - <<'PY'
+          from __future__ import annotations
+          import json, os
+          from copy import deepcopy
+          from pathlib import Path
+          from tempfile import TemporaryDirectory
+          from unittest.mock import patch
+
+          from docmancer.agent import DocmancerAgent
+          from docmancer.core.config import DocmancerConfig
+          from docmancer.docs.registry import LibraryRegistry
+          from docmancer.docs.service import DocsJobTracker, LibraryDocsService
+          from eval.project_context_quality.capture_public_context import capture_public_call
+          from docmancer.docs.application import _project_docs_service_part03 as pds
+          from docmancer.docs.application import _project_context_service_part01 as pcs1
+
+          ROOT = Path.cwd()
+          CASES = {
+              "V13": {
+                  "question": "How does DocAtlas report omitted material when a bounded documentation response cannot include everything?",
+                  "lookups": ["bounded documentation response omitted_counts truncation reporting"],
+                  "path": "docs/project-docs-mcp-workflow.md",
+                  "needle": "omitted_counts",
+              },
+              "V15": {
+                  "question": "How should current documentation answers treat CHANGELOG.md compared with current source-of-truth documentation?",
+                  "lookups": [],
+                  "path": "SKILL.md",
+                  "needle": "CHANGELOG.md",
+              },
+              "V17": {
+                  "question": "How does DocAtlas decide whether a documentation source is stale versus synchronized?",
+                  "lookups": ["documentation freshness stale synchronized decision"],
+                  "path": "docs/project-docs-mcp-workflow.md",
+                  "needle": "stale",
+              },
+          }
+
+          def info(chunk):
+              md = dict(getattr(chunk, "metadata", None) or {})
+              text = str(getattr(chunk, "text", None) or getattr(chunk, "content", None) or "")
+              path = str(getattr(chunk, "path", None) or md.get("project_doc_path") or md.get("source_path") or getattr(chunk, "source", "") or "")
+              matches = {}
+              for qid, trace in (md.get("retrieval_query_matches") or {}).items():
+                  if not isinstance(trace, dict):
+                      continue
+                  matches[qid] = {
+                      k: trace.get(k) for k in (
+                          "qualified", "qualification_reason", "query_origin", "relation",
+                          "lexical_score", "match_ratio", "body_matched_terms", "matched_terms",
+                          "public_parent_query_id",
+                      )
+                  }
+              return {
+                  "path": path,
+                  "line_start": getattr(chunk, "line_start", None) or ((md.get("line_span") or [None,None])[0]),
+                  "line_end": getattr(chunk, "line_end", None) or ((md.get("line_span") or [None,None])[1]),
+                  "score": getattr(chunk, "score", None) or md.get("score"),
+                  "token_estimate": md.get("token_estimate"),
+                  "retrieval_query_ids": list(md.get("retrieval_query_ids") or ()),
+                  "retrieval_query_matches": matches,
+                  "project_ranking": deepcopy(md.get("project_ranking")),
+                  "text": text,
+              }
+
+          with TemporaryDirectory(prefix="docatlas-gap-deep-") as raw:
+              tmp = Path(raw)
+              os.environ["DOCATLAS_HOME"] = str(tmp / "home")
+              config = DocmancerConfig()
+              config.index.db_path = str(tmp / "docmancer.db")
+              config.index.extracted_dir = str(tmp / "extracted")
+              service = LibraryDocsService(
+                  config=config, config_source="explicit",
+                  registry=LibraryRegistry(config.index.db_path),
+                  agent=DocmancerAgent(config=config),
+                  job_tracker=DocsJobTracker(),
+              )
+              assert service.sync_project_docs(str(ROOT), with_vectors=False).status == "success"
+              output = {"code_sha": os.environ.get("GITHUB_SHA"), "cases": {}}
+
+              for cid, case in CASES.items():
+                  stages = {"dispatcher": [], "candidate_pool": [], "query_window": [], "rerank": [], "stage_fit": []}
+                  real_dispatcher_for = service.agent_gateway.dispatcher_for
+                  real_diag = pds._retrieval_stage_diagnostics
+                  real_query = service.project_docs.query_project_docs
+                  real_rerank = pcs1.rerank_project_doc_chunks
+                  real_fit = pcs1.fit_stage_items
+
+                  class Proxy:
+                      def __init__(self, inner): self.inner = inner
+                      def run(self, text, **kwargs):
+                          result = self.inner.run(text, **kwargs)
+                          chunks = list(getattr(result, "chunks", ()) or ())
+                          stages["dispatcher"].append({
+                              "query": text, "limit": kwargs.get("limit"), "budget": kwargs.get("budget"),
+                              "expand": kwargs.get("expand"), "chunks": [info(x) for x in chunks],
+                          })
+                          return result
+
+                  def dispatcher_for(agent, *, mode=None):
+                      return Proxy(real_dispatcher_for(agent, mode=mode))
+
+                  def diagnostics(plan, candidates):
+                      stages["candidate_pool"].append([info(x) for x in candidates])
+                      return real_diag(plan, candidates)
+
+                  def query(*args, **kwargs):
+                      rows = real_query(*args, **kwargs)
+                      stages["query_window"].append([info(x) for x in rows])
+                      return rows
+
+                  def rerank(chunks, **kwargs):
+                      before = [info(x) for x in chunks]
+                      rows = real_rerank(chunks, **kwargs)
+                      stages["rerank"].append({"before": before, "after": [info(x) for x in rows], "kwargs": deepcopy(kwargs)})
+                      return rows
+
+                  def fit(stage, items):
+                      rows = list(items)
+                      result, issue = real_fit(stage, rows)
+                      if stage == "project_docs":
+                          stages["stage_fit"].append({"before": [info(x) for x in rows], "after": [info(x) for x in result], "issue": issue})
+                      return result, issue
+
+                  args = {"question": case["question"], "project_path": str(ROOT), "scope": "project"}
+                  if case["lookups"]: args["lookup_queries"] = list(case["lookups"])
+
+                  with (
+                      patch.object(service.agent_gateway, "dispatcher_for", dispatcher_for),
+                      patch.object(pds, "_retrieval_stage_diagnostics", diagnostics),
+                      patch.object(service.project_docs, "query_project_docs", query),
+                      patch.object(pcs1, "rerank_project_doc_chunks", rerank),
+                      patch.object(pcs1, "fit_stage_items", fit),
+                  ):
+                      capture = capture_public_call(service, args)
+
+                  cp = ((capture.get("projection_attempts") or [{}])[0].get("before_projection") or {}).get("context_pack") or []
+                  output["cases"][cid] = {
+                      "question": case["question"], "expected_path": case["path"], "needle": case["needle"],
+                      "stages": stages, "context_pack": cp, "public": capture.get("public_payload"),
+                  }
+
+              Path("retrieval-gap-deep-trace.json").write_text(
+                  json.dumps(output, ensure_ascii=False, indent=2, default=str) + "\n",
+                  encoding="utf-8",
+              )
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: retrieval-candidate-deep-trace
+          path: retrieval-gap-deep-trace.json
