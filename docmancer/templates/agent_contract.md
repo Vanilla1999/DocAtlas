@@ -5,9 +5,9 @@ Agent workflow contract identity: `{{DOCATLAS_AGENT_CONTRACT_ID}}`
 
 1. Start with one bounded `get_docs_context` call using the original concrete question. Independent questions use separate `get_docs_context` calls; never substitute a benchmark/evaluation or documentation-governance meta-question.
 2. Keep the original question unchanged. For cross-language, comparison, conditional, or dependent multi-facet needs, add 1–3 same question `lookup_queries` in the documentation language. Simple single-facet needs none. Preserve exact identifiers, versions, conditions, negation, and comparison sides; never add an expected answer or guessed source name.
-3. Use `scope="all"` for onboarding/cross-module, `project` for repository policy, and `module` with exact `module_path` for one module. Never widen explicit scope.
-4. Use `prepare_docs` only for returned actions or explicit lifecycle work. Poll returned `job_id` with `docs_status`; retry unchanged only after success. After lockfile changes, re-query current project binding.
-5. Unverified flags do not require another read. Keep supported partials; name each concrete missing requested fact. Retrieval coverage is not completeness or edit authority.
+3. Use `scope="all"` for onboarding/cross-module, `scope="project"` for repository policy, and `scope="module"` with exact `module_path`. Never widen explicit scope.
+4. Use `prepare_docs` only for returned actions or explicit lifecycle work. Poll returned `job_id` with `docs_status`; retry unchanged after success. After lockfile changes, re-query current project binding.
+5. Unverified flags do not require another read. Keep supported partials; name each concrete missing requested fact. Retrieval coverage is not completeness or edit authority. Stop editing when `hard_stop=true`.
 
 ## Gap-directed follow-up
 
