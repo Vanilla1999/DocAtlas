@@ -1,0 +1,239 @@
+{
+  "schema_version": 1,
+  "method": "Manual source-sufficiency review by the implementing assistant; no LLM judge or frozen evaluator score was used.",
+  "baseline": {
+    "runtime_sha": "fbf36763f89f89f3745b4ea58b773eb33489d2f4",
+    "artifact_id": 10558013844,
+    "sufficient": 11
+  },
+  "candidate": {
+    "runtime_sha": "c88d2a6beda80e16c00e1c2b60ad0cb85cc0372d",
+    "corpus_sha": "4419a49676ccc442ff1172313126581030e9553e",
+    "artifact_id": 10560287924,
+    "artifact_sha256": "5a6e88d1d57ce3bfafcc2f09d7fadbcbff30599747b6bc3f1576bbadf70942c0",
+    "sufficient": 27
+  },
+  "paired": {
+    "wins": 16,
+    "losses": 0,
+    "preserved_sufficient": 11,
+    "remaining_insufficient": [
+      "DR30-12",
+      "DR30-26",
+      "DR30-30"
+    ]
+  },
+  "scope_warning": "This is a targeted exposed development set constructed around V13/V15 failure classes. It is not an independent general-quality benchmark or a live weak-model answer benchmark.",
+  "cases": [
+    {
+      "id": "DR30-01",
+      "baseline": "insufficient",
+      "final": "sufficient",
+      "change": "win",
+      "rationale": "Final packet explicitly says clients should honor omitted_counts and that truncated omission is non-critical."
+    },
+    {
+      "id": "DR30-02",
+      "baseline": "insufficient",
+      "final": "sufficient",
+      "change": "win",
+      "rationale": "Final packet states truncated omission is non-critical."
+    },
+    {
+      "id": "DR30-03",
+      "baseline": "insufficient",
+      "final": "sufficient",
+      "change": "win",
+      "rationale": "Final packet names top-level omitted_counts and distinguishes the nested authoring field."
+    },
+    {
+      "id": "DR30-04",
+      "baseline": "insufficient",
+      "final": "sufficient",
+      "change": "win",
+      "rationale": "Final packet explicitly lists status, kind, sources, missing, and omitted_counts."
+    },
+    {
+      "id": "DR30-05",
+      "baseline": "sufficient",
+      "final": "sufficient",
+      "change": "preserved",
+      "rationale": "Authoring handoff snippet directly names documentation_gap.bounds.omitted_counts."
+    },
+    {
+      "id": "DR30-06",
+      "baseline": "sufficient",
+      "final": "sufficient",
+      "change": "preserved",
+      "rationale": "Authoring handoff snippet preserves missing categories and sync/retry actions."
+    },
+    {
+      "id": "DR30-07",
+      "baseline": "sufficient",
+      "final": "sufficient",
+      "change": "preserved",
+      "rationale": "Authoring handoff snippet states the 12 KiB complete serialized bound."
+    },
+    {
+      "id": "DR30-08",
+      "baseline": "insufficient",
+      "final": "sufficient",
+      "change": "win",
+      "rationale": "Final packet contains both top-level and nested omission contracts and explicitly distinguishes them."
+    },
+    {
+      "id": "DR30-09",
+      "baseline": "sufficient",
+      "final": "sufficient",
+      "change": "preserved",
+      "rationale": "Visible source contains the full dotted path, whose terminal member is omitted_counts."
+    },
+    {
+      "id": "DR30-10",
+      "baseline": "sufficient",
+      "final": "sufficient",
+      "change": "preserved",
+      "rationale": "Visible source directly states where the nested omitted_counts is recorded."
+    },
+    {
+      "id": "DR30-11",
+      "baseline": "insufficient",
+      "final": "sufficient",
+      "change": "win",
+      "rationale": "Final packet directly explains non-critical omission through top-level omitted_counts."
+    },
+    {
+      "id": "DR30-12",
+      "baseline": "insufficient",
+      "final": "insufficient",
+      "change": "preserved",
+      "rationale": "Final public result is insufficient_evidence; no comparison context survives projection."
+    },
+    {
+      "id": "DR30-13",
+      "baseline": "insufficient",
+      "final": "sufficient",
+      "change": "win",
+      "rationale": "V13 now returns docs/mcp-response-contract.md with the top-level omission rule as the first source."
+    },
+    {
+      "id": "DR30-14",
+      "baseline": "insufficient",
+      "final": "sufficient",
+      "change": "win",
+      "rationale": "Final packet directly explains how non-critical omission is surfaced."
+    },
+    {
+      "id": "DR30-15",
+      "baseline": "insufficient",
+      "final": "sufficient",
+      "change": "win",
+      "rationale": "V15 now returns the maintained current-versus-historical authority rule and present-state caveat."
+    },
+    {
+      "id": "DR30-16",
+      "baseline": "sufficient",
+      "final": "sufficient",
+      "change": "preserved",
+      "rationale": "Visible maintained rule says CHANGELOG.md is not primary for current-behavior questions."
+    },
+    {
+      "id": "DR30-17",
+      "baseline": "sufficient",
+      "final": "sufficient",
+      "change": "preserved",
+      "rationale": "Visible maintained rule explicitly lists the release/change/history cases where CHANGELOG.md is primary."
+    },
+    {
+      "id": "DR30-18",
+      "baseline": "insufficient",
+      "final": "sufficient",
+      "change": "win",
+      "rationale": "Visible maintained rule covers both sides of the present-behavior comparison."
+    },
+    {
+      "id": "DR30-19",
+      "baseline": "insufficient",
+      "final": "sufficient",
+      "change": "win",
+      "rationale": "Visible maintained rule explicitly gives current source-of-truth precedence."
+    },
+    {
+      "id": "DR30-20",
+      "baseline": "sufficient",
+      "final": "sufficient",
+      "change": "preserved",
+      "rationale": "Visible maintained rule explicitly makes CHANGELOG.md primary for release/history questions."
+    },
+    {
+      "id": "DR30-21",
+      "baseline": "insufficient",
+      "final": "sufficient",
+      "change": "win",
+      "rationale": "Visible maintained rule explains the authority distinction between current docs and CHANGELOG.md."
+    },
+    {
+      "id": "DR30-22",
+      "baseline": "insufficient",
+      "final": "sufficient",
+      "change": "win",
+      "rationale": "Visible maintained rule answers the current-state distinction despite one extra topical source."
+    },
+    {
+      "id": "DR30-23",
+      "baseline": "insufficient",
+      "final": "sufficient",
+      "change": "win",
+      "rationale": "Visible maintained rule covers both comparison sides for current documentation answers."
+    },
+    {
+      "id": "DR30-24",
+      "baseline": "insufficient",
+      "final": "sufficient",
+      "change": "win",
+      "rationale": "Visible maintained rule directly refutes the premise that current answers should prefer CHANGELOG.md."
+    },
+    {
+      "id": "DR30-25",
+      "baseline": "insufficient",
+      "final": "sufficient",
+      "change": "win",
+      "rationale": "Visible maintained rule says current answers use maintained source-of-truth documentation instead."
+    },
+    {
+      "id": "DR30-26",
+      "baseline": "insufficient",
+      "final": "insufficient",
+      "change": "preserved",
+      "rationale": "Returned source is about parent-child indexing and does not answer the split-before-first-packet policy."
+    },
+    {
+      "id": "DR30-27",
+      "baseline": "sufficient",
+      "final": "sufficient",
+      "change": "preserved",
+      "rationale": "Visible workflow text states narrow lookup_queries are one concept per lookup for the same question."
+    },
+    {
+      "id": "DR30-28",
+      "baseline": "sufficient",
+      "final": "sufficient",
+      "change": "preserved",
+      "rationale": "Visible SKILL text directly states when a split follow-up is appropriate."
+    },
+    {
+      "id": "DR30-29",
+      "baseline": "sufficient",
+      "final": "sufficient",
+      "change": "preserved",
+      "rationale": "Visible SKILL/workflow text directs a bounded source read for a known missing fact."
+    },
+    {
+      "id": "DR30-30",
+      "baseline": "insufficient",
+      "final": "insufficient",
+      "change": "preserved",
+      "rationale": "Returned source is retrieval configuration/RRF settings, not the stopping rule."
+    }
+  ]
+}
