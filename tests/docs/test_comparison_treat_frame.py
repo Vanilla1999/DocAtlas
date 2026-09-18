@@ -1,5 +1,7 @@
 import pytest
 
+from docmancer.docs.application.evidence_selection import build_requirements
+from docmancer.docs.domain.documentation_query_plan import build_documentation_query_plan
 from docmancer.docs.domain.question_plan import _semantic_comparison, compile_question_plan
 from docmancer.docs.domain.question_semantic_frames import match_comparison_frame
 
@@ -87,4 +89,33 @@ def test_compound_comparison_does_not_hide_unresolved_request():
     )
     assert plan.unresolved_parts
     assert any("deletion permissions" in part.casefold() for part in plan.unresolved_parts)
+
+def test_treat_comparison_emits_relation_probes_without_answer_terms():
+    questions = (
+        "How should current documentation answers treat CHANGELOG.md "
+        "compared with current source-of-truth documentation?",
+        "How should current API answers treat NOTES.rst "
+        "compared with maintained interface documentation?",
+    )
+    for question in questions:
+        plan = build_documentation_query_plan(
+            question,
+            requirements=build_requirements(question, profile="project_docs_answer"),
+        )
+        relation = [
+            row.text.casefold()
+            for row in plan.queries
+            if row.query_id.startswith("query-relation-")
+        ]
+        frame = match_comparison_frame(question)
+        assert frame is not None
+        assert relation
+        assert any(
+            frame.left.casefold() in text and frame.right.casefold() in text
+            for text in relation
+        )
+        assert not any(
+            term in " ".join(relation)
+            for term in ("release-history", "primary only", "historical authority")
+        )
 
