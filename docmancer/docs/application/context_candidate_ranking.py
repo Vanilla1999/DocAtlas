@@ -283,7 +283,7 @@ def _facet_aware_candidates(
         required_relation_preference = max((
             _relation_request_priority(query_text.get(key, ""), body_text)
             for key in qualified_ids & required_query_ids
-        ), default=(0.0,) * 8)
+        ), default=(0.0,) * 9)
         host_condition_priority = max((
             _condition_body_priority(query_text.get(key, ""), body_text)
             for key in qualified_ids & required_query_ids
@@ -381,13 +381,57 @@ def _relation_request_priority(question: str, snippet: str) -> tuple[float, ...]
     nor changes component coverage or ``checked`` semantics.
     """
     if not question or not snippet:
-        return (0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0)
+        return (0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0)
     # Narrow request shapes (code/signature/default-timeout/origin comparison)
     # already have a stronger dedicated selector. Do not let this generic
     # relation hint compete with those explicit parts.
     if recognized_request_parts(question):
         return (0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0)
     body = snippet.casefold()
+
+    # For a question asking how a system reports/surfaces/represents a requested
+    # object, prefer a sentence that visibly binds that reporting verb to the
+    # requested object. A topical source saying something else was "reported as
+    # warnings" must not win merely because it repeats the system name.
+    reporting_relation_score = 0.0
+    reporting = re.search(
+        r"\bhow\s+(?:does|do)\s+.+?\s+"
+        r"(?:report|surface|represent|record|expose|indicate|return)\w*\s+"
+        r"(.+?)(?:[?]|$)",
+        question,
+        re.I,
+    )
+    if reporting is not None:
+        target = re.split(
+            r"\b(?:when|if|while|where|because|after|before)\b",
+            reporting.group(1),
+            maxsplit=1,
+            flags=re.I,
+        )[0]
+        target_terms = _query_terms((target,))
+        if target_terms:
+            reporting_segments = [
+                segment
+                for segment in re.split(r"(?<=[.!?])\s+|\n+", snippet)
+                if re.search(
+                    r"\b(?:report\w*|surfac\w*|represent\w*|record\w*|"
+                    r"expos\w*|indicat\w*|return\w*)\b",
+                    segment,
+                    re.I,
+                )
+            ]
+            reporting_relation_score = max((
+                sum(_visible_term_present(term, segment.casefold(), exact=False)
+                    for term in target_terms) / len(target_terms)
+                for segment in reporting_segments
+            ), default=0.0)
+            minimum_matches = min(2, len(target_terms))
+            if max((
+                sum(_visible_term_present(term, segment.casefold(), exact=False)
+                    for term in target_terms)
+                for segment in reporting_segments
+            ), default=0) < minimum_matches:
+                reporting_relation_score = 0.0
 
     # Preserve an explicitly requested retrieval->proof relation.  A span that
     # visibly says whether a retrieval/search hit is proof is stronger than one
@@ -528,6 +572,7 @@ def _relation_request_priority(question: str, snippet: str) -> tuple[float, ...]
             clause_score = min(ratios)
             clause_average = sum(ratios) / len(ratios)
     return (
+        reporting_relation_score,
         proof_relation_score, decision_mechanism_score, recovery_action_score, permission_caveat_score,
         state_score, alternative_score, clause_score, clause_average,
     )
