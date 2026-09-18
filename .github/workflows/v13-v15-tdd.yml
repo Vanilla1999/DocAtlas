@@ -26,3 +26,12 @@ jobs:
           tests/docs/test_question_plan_v4.py
           -k "not test_question_plan_splits_compound_questions_into_mandatory_facets"
           -q
+      - name: Neighboring regression tests
+        run: >-
+          uv run --frozen --extra dev pytest
+          tests/docs/test_relation_preserving_projection.py
+          tests/docs/test_comparison_relation_query_planning.py
+          tests/docs/test_query_planning_budget_regressions.py
+          tests/docs/test_evidence_admission_sufficiency.py
+          tests/docs/test_project_doc_ranking.py
+          -q
