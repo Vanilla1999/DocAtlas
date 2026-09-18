@@ -1,6 +1,6 @@
 import pytest
 
-from docmancer.docs.domain.question_plan import _semantic_comparison
+from docmancer.docs.domain.question_plan import _semantic_comparison, compile_question_plan
 from docmancer.docs.domain.question_semantic_frames import match_comparison_frame
 
 
@@ -78,4 +78,13 @@ def test_comparison_plan_keeps_current_answer_context():
     assert facet.target == "current source-of-truth documentation"
     assert facet.relation == "contrast"
     assert facet.context == "current documentation answers"
+
+def test_compound_comparison_does_not_hide_unresolved_request():
+    plan = compile_question_plan(
+        "How should current documentation answers treat CHANGELOG.md "
+        "compared with current source-of-truth documentation? "
+        "Also explain deletion permissions."
+    )
+    assert plan.unresolved_parts
+    assert any("deletion permissions" in part.casefold() for part in plan.unresolved_parts)
 
