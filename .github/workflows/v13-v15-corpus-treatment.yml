@@ -24,7 +24,7 @@ jobs:
       - name: Checkout treated corpus
         uses: actions/checkout@v4
         with:
-          ref: 63062b0375071ff0546bc4cb8936c502f9cc171b
+          ref: fde6af35c3ef8da7e557727d141953823b825a78
           path: corpus-treated
       - uses: astral-sh/setup-uv@v6
       - name: Install treated runtime
