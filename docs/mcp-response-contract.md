@@ -10,9 +10,15 @@ The `get_docs_context` response has three `kind` values: `docs_answer` for a nar
 ## Omitted material
 
 When a bounded Docs MCP response returns `status="truncated"`, its
-`omitted_counts` reports omitted material; this status describes omission of
+`omitted_counts` reports omitted material; clients should honor that field
+when interpreting the bounded packet. This status describes omission of
 non-critical material. It does not certify that a project-context answer is
 complete or replace `status="insufficient_evidence"`.
+
+For bounded client handling, inspect `status`, `kind`, `sources`,
+`missing`, and `omitted_counts`. A response with
+`status="insufficient_evidence"` means no safe context is available for the
+requested documentary claim; do not present it as documentation support.
 
 The project-documentation authoring handoff has its own nested omission report,
 `documentation_gap.bounds.omitted_counts`. That nested field is not a second
