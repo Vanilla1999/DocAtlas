@@ -15,6 +15,7 @@ from docmancer.docs.domain.question_frame_core import clean_phrase, semantic_tai
 class ComparisonFrame:
     left: str
     right: str
+    context: str | None = None
 
 
 @dataclass(frozen=True, slots=True)
@@ -77,6 +78,17 @@ def _entity(value: str) -> str:
 
 def match_comparison_frame(question: str) -> ComparisonFrame | None:
     q = clean_phrase(question)
+
+    treat_match = re.fullmatch(
+        r"how\\s+should\\s+(.+?)\\s+treat\\s+(.+?)\\s+compared\\s+(?:with|to)\\s+(.+)",
+        q,
+        re.I,
+    )
+    if treat_match is not None:
+        context, left, right = (_entity(treat_match.group(i)) for i in range(1, 4))
+        if context and left and right and left.casefold() != right.casefold():
+            return ComparisonFrame(left, right, context)
+
     patterns = (
         r"how\s+does\s+(.+?)\s+differ\s+from\s+(.+)",
         r"what\s+is\s+the\s+difference\s+between\s+(.+?)\s+and\s+(.+)",
