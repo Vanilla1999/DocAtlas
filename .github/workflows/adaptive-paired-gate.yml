@@ -16,7 +16,7 @@ jobs:
       - name: Prepare exact base and candidate worktrees
         run: |
           git worktree add --detach /tmp/docatlas-base 3cf3dd927b4c155e0c76862aed05b7ea7aa25e47
-          git worktree add --detach /tmp/docatlas-candidate fbb0ea5ad445834c65e28519f0873f5a2556f4fd
+          git worktree add --detach /tmp/docatlas-candidate edab13102e03217b8a7ec440738ccdd20b0618b7
       - name: Run identical locked suites
         shell: bash
         run: |
