@@ -1,0 +1,145 @@
+name: Retrieval candidate gap trace
+on:
+  push:
+    branches: [experiment/retrieval-candidate-gaps-v13-v15-v17]
+permissions:
+  contents: read
+jobs:
+  trace:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+      - run: uv sync --frozen --extra dev
+      - name: Trace V13 V15 V17
+        run: |
+          uv run --frozen --extra dev python - <<'PY'
+          from __future__ import annotations
+          import json, os
+          from copy import deepcopy
+          from pathlib import Path
+          from tempfile import TemporaryDirectory
+          from unittest.mock import patch
+
+          from docmancer.agent import DocmancerAgent
+          from docmancer.core.config import DocmancerConfig
+          from docmancer.docs.registry import LibraryRegistry
+          from docmancer.docs.service import DocsJobTracker, LibraryDocsService
+          from eval.evidence_quality_v2.observer import observe_call
+          from eval.evidence_quality_v2.trace import source_span
+
+          ROOT = Path.cwd()
+          CASES = {
+              "V13": {
+                  "question": "How does DocAtlas report omitted material when a bounded documentation response cannot include everything?",
+                  "lookups": ["bounded documentation response omitted_counts truncation reporting"],
+                  "expected_paths": ["docs/project-docs-mcp-workflow.md"],
+                  "index_probes": ["omitted_counts", "documentation_gap bounds truncation"],
+              },
+              "V15": {
+                  "question": "How should current documentation answers treat CHANGELOG.md compared with current source-of-truth documentation?",
+                  "lookups": [],
+                  "expected_paths": ["SKILL.md"],
+                  "index_probes": ["CHANGELOG.md release history change questions", "CHANGELOG.md primary"],
+              },
+              "V17": {
+                  "question": "How does DocAtlas decide whether a documentation source is stale versus synchronized?",
+                  "lookups": ["documentation freshness stale synchronized decision"],
+                  "expected_paths": ["docs/project-docs-mcp-workflow.md"],
+                  "index_probes": ["project_docs_stale", "changed on disk deleted current discovery"],
+              },
+          }
+
+          def chunk_path(chunk):
+              md = getattr(chunk, "metadata", None) or {}
+              return str(md.get("project_doc_path") or md.get("source_path") or getattr(chunk, "source", "") or "")
+
+          with TemporaryDirectory(prefix="docatlas-gap-trace-") as raw:
+              tmp = Path(raw)
+              os.environ["DOCATLAS_HOME"] = str(tmp / "home")
+              config = DocmancerConfig()
+              config.index.db_path = str(tmp / "docmancer.db")
+              config.index.extracted_dir = str(tmp / "extracted")
+              service = LibraryDocsService(
+                  config=config,
+                  config_source="explicit",
+                  registry=LibraryRegistry(config.index.db_path),
+                  agent=DocmancerAgent(config=config),
+                  job_tracker=DocsJobTracker(),
+              )
+              sync = service.sync_project_docs(str(ROOT), with_vectors=False)
+              assert getattr(sync, "status", None) == "success", sync
+              store = service.project_docs._agent_instance().store
+              real_dispatcher_for = service.agent_gateway.dispatcher_for
+              output = {"code_sha": os.environ.get("GITHUB_SHA"), "cases": {}}
+
+              for case_id, case in CASES.items():
+                  lane_calls = []
+
+                  class Proxy:
+                      def __init__(self, inner):
+                          self.inner = inner
+                      def run(self, text, **kwargs):
+                          result = self.inner.run(text, **kwargs)
+                          chunks = list(getattr(result, "chunks", ()) or ())
+                          lane_calls.append({
+                              "query": text,
+                              "limit": kwargs.get("limit"),
+                              "budget": kwargs.get("budget"),
+                              "expand": kwargs.get("expand"),
+                              "filters": deepcopy(kwargs.get("filters")),
+                              "chunks": [source_span(chunk) for chunk in chunks],
+                          })
+                          return result
+
+                  def traced_dispatcher_for(agent, *, mode=None):
+                      return Proxy(real_dispatcher_for(agent, mode=mode))
+
+                  args = {
+                      "question": case["question"],
+                      "project_path": str(ROOT),
+                      "scope": "project",
+                  }
+                  if case["lookups"]:
+                      args["lookup_queries"] = list(case["lookups"])
+
+                  with patch.object(service.agent_gateway, "dispatcher_for", traced_dispatcher_for):
+                      payload, record = observe_call(service, args)
+
+                  index_probes = []
+                  for probe in case["index_probes"]:
+                      rows = store.query(probe, limit=20, budget=800)
+                      index_probes.append({
+                          "query": probe,
+                          "chunks": [source_span(chunk) for chunk in rows],
+                      })
+
+                  projector_inputs = record["stages"].get("projector_inputs") or []
+                  plan = (projector_inputs[0].get("documentation_query_plan") if projector_inputs else None)
+                  output["cases"][case_id] = {
+                      "question": case["question"],
+                      "lookups": case["lookups"],
+                      "expected_paths": case["expected_paths"],
+                      "query_plan": plan,
+                      "index_probes": index_probes,
+                      "dispatcher_lanes": lane_calls,
+                      "observer_stages": record["stages"],
+                      "bounded_diagnostics": record.get("bounded_diagnostics"),
+                      "final": {
+                          "context_quality": payload.get("context_quality"),
+                          "sources": payload.get("sources"),
+                          "missing_query_ids": payload.get("missing_query_ids"),
+                          "covered_query_ids": payload.get("covered_query_ids"),
+                      },
+                  }
+
+              Path("retrieval-gap-trace.json").write_text(
+                  json.dumps(output, ensure_ascii=False, indent=2, default=str) + "\n",
+                  encoding="utf-8",
+              )
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: retrieval-candidate-gap-trace
+          path: retrieval-gap-trace.json
