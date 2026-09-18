@@ -1,0 +1,10 @@
+{
+  "schema_version": 1,
+  "module_labels": {
+    "tests/docs/test_comparison_treat_frame.py": "behavioral"
+  },
+  "node_overrides": {},
+  "module_node_hashes": {
+    "tests/docs/test_comparison_treat_frame.py": "37938b55390701fb801a26a3702f8ceb20ddaaee48e67d9080e3c6f02111e809"
+  }
+}
