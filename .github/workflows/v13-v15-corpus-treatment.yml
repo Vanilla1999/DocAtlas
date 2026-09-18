@@ -17,10 +17,9 @@ jobs:
         uses: actions/checkout@v4
         with:
           path: assets
-      - name: Checkout treated runtime
+      - name: Checkout candidate runtime
         uses: actions/checkout@v4
         with:
-          ref: 63062b0375071ff0546bc4cb8936c502f9cc171b
           path: runtime-treated
       - name: Checkout treated corpus
         uses: actions/checkout@v4
