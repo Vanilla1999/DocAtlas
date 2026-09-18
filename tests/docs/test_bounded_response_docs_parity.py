@@ -16,3 +16,7 @@ def test_response_note_preserves_public_omission_contract():
     assert 'status="truncated"' in quickstart
     assert '`omitted_counts`' in note
     assert "non-critical" in note
+    assert "honor" in note.casefold()
+    for field in ("status", "kind", "sources", "missing", "omitted_counts"):
+        assert f"`{field}`" in note
+    assert "no safe context" in note.casefold()
