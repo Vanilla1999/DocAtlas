@@ -8,6 +8,7 @@ from typing import Literal
 
 from docmancer.docs.domain.question_frame_core import split_question_clauses
 from docmancer.docs.domain.question_component_rewrite import rewrite_component
+from docmancer.docs.domain.question_semantic_frames import match_comparison_frame
 from docmancer.docs.domain.project_retrieval_intent import (
     build_project_retrieval_aliases,
     project_retrieval_disposition,
@@ -288,10 +289,27 @@ def _subject_relation_groups(question: str) -> tuple[str, ...]:
             for choice in match.group(1, 2)
         ))
 
-    # For a comparison, first keep both user-named sides in the same lexical
-    # probe. This is the only shape that can directly retrieve a source that
-    # contrasts the two domains. Remaining slots keep each side together with
-    # all user-named comparison axes; no answer-side vocabulary is invented.
+    # Reuse the semantic comparison parser first. This covers surfaces such as
+    # "How should X treat A compared with B?" without inventing answer-side
+    # vocabulary. The cross-side probe can find an explicit contrast; the two
+    # side/context probes can retrieve complementary evidence when the contract
+    # is documented separately for each side.
+    semantic_comparison = match_comparison_frame(question)
+    if semantic_comparison is not None:
+        left = " ".join(semantic_comparison.left.split())
+        right = " ".join(semantic_comparison.right.split())
+        context = " ".join(str(semantic_comparison.context or "").split())
+        pair = f"{left} {right} different separate".strip()
+        if supplemental_query_is_useful(pair):
+            groups.append(pair[:500])
+        for side in (left, right):
+            value = " ".join(part for part in (side, context) if part).strip()
+            if value and supplemental_query_is_useful(value):
+                groups.append(value[:500])
+
+    # Preserve the established axis-aware surface for "How do A and B differ".
+    # It may add more specific probes; tuple de-duplication below keeps the
+    # optional-query budget bounded.
     comparison = re.match(
         r"^\s*how\s+do\s+(.+?)\s+and\s+(.+?)\s+differ(?:\s+in\s+(.+?))?[?.!]*\s*$",
         question,
