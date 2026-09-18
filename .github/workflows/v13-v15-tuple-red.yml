@@ -1,9 +1,11 @@
-name: V13 V15 tuple-shape RED
+name: V13 V15 tuple-shape check
 on:
   push:
     branches: [fix/v13-v15-evidence-pipeline]
     paths:
       - .github/workflows/v13-v15-tuple-red.yml
+      - docmancer/docs/application/context_candidate_ranking.py
+      - tests/docs/test_reporting_relation_selection.py
 
 permissions:
   contents: read
