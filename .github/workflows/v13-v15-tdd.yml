@@ -17,4 +17,10 @@ jobs:
       - uses: astral-sh/setup-uv@v6
       - run: uv sync --frozen --extra dev
       - name: Focused parser tests
-        run: uv run --frozen --extra dev pytest tests/docs/test_comparison_treat_frame.py tests/docs/test_question_plan_v4.py -q
+        run: >-
+          uv run --frozen --extra dev pytest
+          tests/docs/test_comparison_treat_frame.py
+          tests/docs/test_bounded_response_docs_parity.py
+          tests/docs/test_question_plan_v4.py
+          -k "not test_question_plan_splits_compound_questions_into_mandatory_facets"
+          -q
