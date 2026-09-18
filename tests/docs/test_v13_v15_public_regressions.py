@@ -103,6 +103,6 @@ def test_v15_public_projection_keeps_current_vs_history_authority(tmp_path):
     payload = _capture(service, project, V15)
     _assert_retrieval_only(payload)
     text = _visible_text(payload)
+    assert "current documentation answers should use maintained source-of-truth" in text
     assert "`CHANGELOG.md` is release-history/change" in text
-    assert "maintained source-of-truth" in text
-    assert "must not outrank the current source-of-truth" in text
+    assert "treat it as primary when the question asks about releases" in text
