@@ -238,35 +238,6 @@ def evidence_policy_rejection_reason(
     return None
 
 
-
-def _substantive_markdown_line(line: str) -> str:
-    """Keep visible inline-link labels only when the line carries a real statement."""
-    if re.match(r"^\s*\[[^\]]+\]:\s*\S+", line):
-        return ""
-
-    code_parts: list[str] = []
-
-    def protect_code(match: re.Match[str]) -> str:
-        code_parts.append(match.group(2))
-        return f"\x00CODE{len(code_parts) - 1}\x00"
-
-    protected = re.sub(r"(`+)(.+?)\1", protect_code, line)
-    protected = re.sub(r"!\[[^\]]*\](?:\([^)]*\)|\[[^\]]*\])", "", protected)
-    link_re = re.compile(r"(?<!!)\[([^\]]+)\](?:\([^)]*\)|\[[^\]]*\])")
-    without_links = link_re.sub("", protected)
-    without_links = re.sub(r"https?://\S+", "", without_links)
-
-    probe = without_links
-    for index, code in enumerate(code_parts):
-        probe = probe.replace(f"\x00CODE{index}\x00", code)
-    has_statement = bool(probe.strip(" \t-*+0123456789.)|:<>_=`"))
-
-    rendered = link_re.sub(lambda m: m.group(1) if has_statement else "", protected)
-    rendered = re.sub(r"https?://\S+", "", rendered)
-    for index, code in enumerate(code_parts):
-        rendered = rendered.replace(f"\x00CODE{index}\x00", code)
-    return rendered
-
 def qualify_evidence(
     probe: Mapping[str, Any], *, query_id: str, visible_text: str,
     evidence_text: str | None = None,
@@ -323,7 +294,8 @@ def qualify_evidence(
                     break
                 table_rows.append((line, row))
             continue
-        line = _substantive_markdown_line(line)
+        line = re.sub(r"!?\[[^\]]*\](?:\([^)]*\)|\[[^\]]*\])", "", line)
+        line = re.sub(r"https?://\S+", "", line)
         if line.strip(" \t-*+0123456789.)|:<>_="):
             substantive_lines.append(line)
     if not substantive_lines:
@@ -392,28 +364,6 @@ def qualify_evidence(
         )
     )
     heading_context_allowed = len(body_matched) >= 2
-    bound_subjects = tuple(
-        str(value).casefold() for value in probe.get("bound_subjects") or () if value
-    )
-    bound_subject_context = str(probe.get("bound_subject_context") or "").casefold()
-    missing_bound_subjects = tuple(
-        subject for subject in bound_subjects
-        if not _visible_term_present(subject, normalized_evidence, exact=True)
-        and not (
-            heading_context_allowed
-            and _visible_term_present(subject, bound_subject_context, exact=True)
-        )
-    )
-    if missing_bound_subjects:
-        result.update(
-            bound_subjects=list(bound_subjects),
-            missing_bound_subjects=list(missing_bound_subjects),
-            qualified=False,
-            qualification_reason="missing_bound_subject",
-        )
-        return EvidenceQualification(
-            False, (), None, "missing_bound_subject", result,
-        )
     # Column labels describe a substantive row, not standalone evidence. Only
     # bind them when that table's key cell contains every requested exact term.
     # They may recover a relation term, but never supply a missing identifier.

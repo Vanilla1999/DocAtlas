@@ -13,7 +13,7 @@ from .context_query_probes import independent_query_probes, _has_visible_non_pat
 from docmancer.docs.domain.context_hint_policy import fallback_context_query_ids, has_context_hint_support
 
 from docmancer.docs.application.context_selection import (
-    attributable_query_ids, component_coverage_decision,
+    component_coverage_decision,
     component_obligations,
     component_witnesses,
     context_selection_decision,
@@ -33,7 +33,6 @@ from docmancer.docs.application.model_visible_projection import (
     project_insufficient,
 )
 from .context_candidate_ranking import _context_rank, _facet_aware_candidates, _fully_matched_query_ids, _prefer_missing_baseline_candidate
-from .retrieval_need_support import apply_retrieval_need_witness
 from docmancer.docs.domain.context_budget import PROJECT_CONTEXT_BUDGET
 from docmancer.docs.domain.context_blocks import inline_command_literals, source_block_alternatives
 from docmancer.docs.domain.context_windows import (
@@ -140,7 +139,7 @@ def project_docs_context(
     }
     public_query_ids = _public_query_ids(query_plan)
     public_query_id_set = set(public_query_ids)
-    host_query_ids = _query_ids_for_origins(query_plan, {"host_lookup"}); need_query_ids = _query_ids_for_origins(query_plan, {"retrieval_need"})
+    host_query_ids = _query_ids_for_origins(query_plan, {"host_lookup"})
     exact_anchor_query_ids = _query_ids_for_origins(
         query_plan, {"exact_anchor", "exact_path"},
     )
@@ -158,7 +157,7 @@ def project_docs_context(
     compound_priority_query_ids = public_query_id_set
     if len(host_query_ids) > 1:
         compound_priority_query_ids = host_query_ids | audited_rewrite_query_ids
-    eligible_query_ids = public_query_id_set | canonical_intent_query_ids | need_query_ids
+    eligible_query_ids = public_query_id_set | canonical_intent_query_ids
     fallback_ids = fallback_context_query_ids(query_plan, retrieval, eligible_query_ids)
     context_hint_query_ids = fallback_ids if _allow_context_hints else set()
     eligible_query_ids |= context_hint_query_ids
@@ -185,10 +184,10 @@ def project_docs_context(
     candidates = list(retrieval.get("context_pack") or ())
     initially_ranked = _facet_aware_candidates(
         candidates, query_text=query_text,
-        fallback_query_ids=context_hint_query_ids, need_query_ids=need_query_ids,
+        fallback_query_ids=context_hint_query_ids,
         host_query_ids=host_query_ids,
         required_query_ids=compound_priority_query_ids - audited_rewrite_query_ids,
-        supplemental_query_ids=audited_rewrite_query_ids | need_query_ids,
+        supplemental_query_ids=audited_rewrite_query_ids,
         canonical_query_ids=canonical_intent_query_ids,
         assigned_evidence_ids=set(assigned_evidence_by_requirement.values()),
         bound_assigned_evidence_ids=required_assigned_evidence_ids,
@@ -239,7 +238,6 @@ def project_docs_context(
         required_ids = qualified_ids & required_query_id_set
         original_hit = "query-original" in qualified_ids
         host_ids = qualified_ids & host_query_ids
-        need_ids = qualified_ids & need_query_ids
         exact_anchor_ids = qualified_ids & exact_anchor_query_ids
         canonical_intent_ids = qualified_ids & canonical_intent_query_ids
         path_only_ids = {
@@ -254,7 +252,7 @@ def project_docs_context(
             )
         ):
             continue
-        if not component_ids and not required_ids and not exact_anchor_ids and not original_hit and not host_ids and not need_ids and not canonical_intent_ids and not (qualified_ids & context_hint_query_ids and has_context_hint_support(qualified_original, question=original_question)):
+        if not component_ids and not required_ids and not exact_anchor_ids and not original_hit and not host_ids and not canonical_intent_ids and not (qualified_ids & context_hint_query_ids and has_context_hint_support(qualified_original, question=original_question)):
             continue
         if (
             "contract_fact" in context_only_relations
@@ -278,13 +276,14 @@ def project_docs_context(
         )
         supplemental_matches = tuple(
             str(((original.get("retrieval_query_matches") or {}).get(query_id) or {}).get("query_text") or "")
-            for query_id in qualified_ids if query_id.startswith("query-supplemental-") or query_id in need_query_ids
+            for query_id in qualified_ids if query_id.startswith("query-supplemental-")
         )
         focus_queries = (
             tuple(value for value in (*required_matches, *supplemental_matches) if value)
             or tuple(query_text.get(query_id, "") for query_id in qualified_ids)
         )
-        # Establish source identity before qualified variants cross projection.
+        # Establish source identity first; only qualified complete variants cross
+        # the projection boundary below.
         normalized = _docs_source(original, display_snippet=raw_snippet[:520])
         if normalized is None:
             continue
@@ -330,9 +329,10 @@ def project_docs_context(
         for variant in variants:
             prepared.append(variant)
             variant_inputs[id(variant)] = (original, raw_snippet, focus_queries, assigned_requirement_ids)
+
     selected_host_query_ids: set[str] = set()
     while prepared:
-        selected_qualified_public_ids = attributable_query_ids(sources) & public_query_id_set
+        selected_qualified_public_ids = qualified_query_ids(sources) & public_query_id_set
         selected_public_ids = _fully_matched_query_ids(sources) & public_query_id_set
         selected_canonical_ids = qualified_query_ids(sources) & canonical_intent_query_ids
         selected_authoritative_public_ids = {
@@ -348,10 +348,10 @@ def project_docs_context(
         )
         prepared = _facet_aware_candidates(
             prepared, query_text=query_text,
-            fallback_query_ids=context_hint_query_ids, need_query_ids=need_query_ids,
+            fallback_query_ids=context_hint_query_ids,
             host_query_ids=host_query_ids,
             required_query_ids=missing_compound_priority_ids - audited_rewrite_query_ids,
-            supplemental_query_ids=(audited_rewrite_query_ids | need_query_ids) - qualified_query_ids(sources),
+            supplemental_query_ids=audited_rewrite_query_ids - qualified_query_ids(sources),
             canonical_query_ids=canonical_intent_query_ids - selected_canonical_ids,
             exact_query_ids=(
                 set()
@@ -418,7 +418,6 @@ def project_docs_context(
             continue
         normalized = variant
         qualified_ids = qualified_query_ids((normalized,))
-        attributable_ids = attributable_query_ids((normalized,))
         component_ids = set(component_witnesses(normalized, obligations))
         new_components = component_ids - selected_components
         if not (qualified_ids & eligible_query_ids) and not component_ids:
@@ -431,7 +430,7 @@ def project_docs_context(
             and str(item.get("public_parent_query_id") or "") in selected_qualified_public_ids
         }
         novel_independent_public_ids = (
-            (attributable_ids & public_query_id_set)
+            (qualified_ids & public_query_id_set)
             - selected_qualified_public_ids
             - dependent_on_covered_parent
         )
@@ -449,9 +448,8 @@ def project_docs_context(
         ):
             continue
         if sources and not (new_components or
-            attributable_ids & public_query_id_set - selected_public_ids or
+            qualified_ids & public_query_id_set - selected_public_ids or
             qualified_ids & canonical_intent_query_ids - selected_canonical_ids or
-            qualified_ids & need_query_ids - qualified_query_ids(sources) or
             qualified_ids & context_hint_query_ids - qualified_query_ids(sources)
         ):
             continue
@@ -518,6 +516,7 @@ def project_docs_context(
         selected_host_query_ids.update(host_ids)
         if len(sources) >= MAX_DOCS_SOURCES:
             break
+
     if not sources:
         if fallback_ids and not _allow_context_hints:
             # Decide fallback after visible qualification and complete DTO
@@ -631,6 +630,7 @@ def project_docs_context(
         attach_source_continuation_locators(payload, snapshot, root=root, max_tokens=max_tokens)
     return payload, snapshot
 
+
 def _expand_selected_snippets(
     sources: list[dict[str, Any]], *,
     projection_inputs: dict[str, tuple[str, tuple[str, ...], Any]],
@@ -702,6 +702,7 @@ def _expand_selected_snippets(
             )) <= max_tokens:
                 expanded = candidate_sources
     return expanded
+
 
 def _qualified_fragments(
     source: dict[str, Any], *, raw_snippet: str, query_ids: set[str],
@@ -890,9 +891,6 @@ def _requalify_visible_source(
             continue
         # Aggregated lineage belongs to the old window; rebuild it from visible probes.
         probe = {k: v for k, v in trace.items() if k not in {"coverage_kinds", "derived_from_query_ids"}}
-        section = str(source.get("section") or "")
-        if section:
-            probe["bound_subject_context"] = section.rsplit(">", 1)[-1].strip()
         if query_id == "query-original":
             probe["exact_terms"] = list(dict.fromkeys((
                 *(probe.get("exact_terms") or ()),
@@ -906,19 +904,18 @@ def _requalify_visible_source(
                 probe["query_text"] = planned_text
                 probe["query_terms"] = sorted(_query_terms((planned_text,)))
         qualification = qualify_evidence(
-            probe, query_id=str(query_id), visible_text=visible_text,
+            probe,
+            query_id=str(query_id),
+            visible_text=visible_text,
             evidence_text=str(source.get("snippet") or ""),
             catalog_role=str(source.get("catalog_role") or ""),
             candidate=source.get("_qualification_candidate", source),
             expected_project_identity=source.get("_expected_project_identity"),
             lifecycle_intent=source.get("_lifecycle_intent", "current"),
         )
-        qualified_trace = apply_retrieval_need_witness(
-            {**probe, "query_id": query_id, "text": query_text.get(str(query_id), "")}, qualification.trace,
-            str(source.get("snippet") or ""), source={"heading_path": source.get("section"), "authority": source.get("authority"), "lifecycle_status": "active"})
-        matches = merge_query_matches(matches, {str(query_id): qualified_trace})
+        matches = merge_query_matches(matches, {str(query_id): dict(qualification.trace)})
         parent_trace = derived_parent_trace(
-            qualified_trace,
+            qualification.trace,
             source_query_id=str(query_id),
             parent_query_id=str(trace.get("public_parent_query_id") or ""),
         )

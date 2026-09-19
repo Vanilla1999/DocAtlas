@@ -37,9 +37,6 @@ from docmancer.docs.domain.question_surface_normalization import (
     rebind_surface_plan,
 )
 from docmancer.docs.domain.technical_terms import TechnicalTermKind
-from docmancer.docs.domain.query_terms import documentation_technical_anchors, query_constraint_roles
-
-from docmancer.docs.domain.question_retrieval_needs import RetrievalNeed, retrieval_needs
 
 from docmancer.docs.domain.question_plan_core import (
     PlanKind,
@@ -70,7 +67,6 @@ from docmancer.docs.domain.question_plan_surface_rules import (
     python_version_support,
     semantic_components,
 )
-
 
 
 def _release_docs_line_limit(q: str) -> QuestionPlan | None:
@@ -972,4 +968,4 @@ def compile_question_plan(question: str) -> QuestionPlan:
     return _compile_question_plan_core(raw)
 
 
-__all__ = ["PlannedFacet", "QuestionPlan", "RetrievalNeed", "retrieval_needs", "compile_question_plan"]
+__all__ = ["PlannedFacet", "QuestionPlan", "compile_question_plan"]
