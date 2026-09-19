@@ -23,7 +23,18 @@ def main():
         try:
             for project,spec in plan.items():
                 checkout=a.sources_root/project
-                docs={rel:(checkout/rel).read_text(encoding="utf-8") for rel in spec["files"]}
+                # DocAtlas project fixtures index Markdown. Preserve the exact pinned
+                # upstream text bytes, but give non-Markdown documentation a stable
+                # Markdown fixture alias. This is transport-only: questions, gold,
+                # source commits, and source contents are unchanged.
+                docs={}
+                for rel in spec["files"]:
+                    text=(checkout/rel).read_text(encoding="utf-8")
+                    suffix=Path(rel).suffix.casefold()
+                    fixture_rel=rel if suffix in {".md",".markdown"} else (
+                        "_frozen_text/" + rel.replace("/", "__") + ".md"
+                    )
+                    docs[fixture_rel]=text
                 project_root=base/"corpus"/project
                 write_project(project_root,docs)
                 ctx=isolated_service(base/"state"/project)
