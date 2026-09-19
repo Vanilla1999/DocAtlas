@@ -4,6 +4,7 @@ from __future__ import annotations
 import re
 from typing import Any
 
+from .context_blocks import source_block_alternatives
 from .technical_tokens import technical_term_pattern
 
 
@@ -54,10 +55,36 @@ def _is_complete_source_span(text: str, snippet: str) -> bool:
     """
     if not snippet:
         return False
-    start = text.find(snippet)
-    if start < 0:
+    resolved = source_local_span(text, snippet)
+    if resolved is None:
         return False
-    end = start + len(snippet)
+    start, end = resolved
+
+    # Sentence punctuation is not an item boundary.  A list item's trailing
+    # sentence can carry a default, restriction, or precondition that changes
+    # the meaning of an otherwise plausible prefix.  Reuse the structural
+    # alternatives already derived from the authorized source span and accept
+    # an item (or a contiguous run of items) only on complete item boundaries.
+    structural_spans = source_block_alternatives(text).spans
+    list_spans = [
+        span for span in structural_spans
+        if re.match(r"(?:[-+*]\s+|\d+[.)]\s+)", text[span[0]:span[1]].lstrip())
+    ]
+    atomic_items = [
+        span for span in list_spans
+        if not any(
+            other != span
+            and span[0] <= other[0] < other[1] <= span[1]
+            and (span[0], span[1]) != (other[0], other[1])
+            for other in list_spans
+        )
+    ]
+    touched_items = [
+        span for span in atomic_items if span[0] < end and start < span[1]
+    ]
+    if touched_items:
+        return start == touched_items[0][0] and end == touched_items[-1][1]
+
     left = text[:start]
     right = text[end:]
     left_complete = not left.strip() or left.endswith("\n\n")
