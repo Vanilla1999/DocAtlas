@@ -1,0 +1,99 @@
+{
+  "schema_version": 1,
+  "state": "frozen_validation_opened_no_posthoc_tuning",
+  "protocol_ref": "eval/scientific_validation40/protocol.json",
+  "source_artifact": {
+    "run_id": 35442584246,
+    "artifact_id": 10584315850,
+    "digest": "sha256:ff26a5a15b58916634c33f3ace14eb1a0d644c7f48e20a9d51f51dc5e8adc492"
+  },
+  "reader_run": {
+    "run_id": 35445870945,
+    "artifact_id": 10585389177,
+    "digest": "sha256:c75ea424fd7d82c61b84a09652b17b0624ef675d16fdbef73acbc13eba620aa2"
+  },
+  "candidate_runtime_ref": "e5e1bec980caa1b66758f655940d519f0ba2fa04",
+  "model": {
+    "name": "qwen2.5:1.5b",
+    "digest": "65ec06548149b04c096a120e4a6da9d4017ea809c91734ea5631e89f96ddc57b",
+    "quantization": "Q4_K_M",
+    "runtime": "ollama 0.34.2",
+    "draws_per_arm_case": 3
+  },
+  "arms": {
+    "raw_json": {
+      "grounded_correct": 76,
+      "total_draws": 120,
+      "rate": 0.6333333333333333,
+      "unsupported_or_wrong": 30
+    },
+    "view_text": {
+      "grounded_correct": 74,
+      "total_draws": 120,
+      "rate": 0.6166666666666667,
+      "unsupported_or_wrong": 28
+    }
+  },
+  "project_breakdown": {
+    "black": {
+      "raw_correct": 15,
+      "view_correct": 15,
+      "total_draws": 24,
+      "delta": 0
+    },
+    "poetry": {
+      "raw_correct": 13,
+      "view_correct": 11,
+      "total_draws": 24,
+      "delta": -0.08333333333333333
+    },
+    "textual": {
+      "raw_correct": 12,
+      "view_correct": 12,
+      "total_draws": 24,
+      "delta": 0
+    },
+    "vite": {
+      "raw_correct": 18,
+      "view_correct": 18,
+      "total_draws": 24,
+      "delta": 0
+    },
+    "eslint": {
+      "raw_correct": 18,
+      "view_correct": 18,
+      "total_draws": 24,
+      "delta": 0
+    }
+  },
+  "paired_cluster_bootstrap": {
+    "cluster": "project_group",
+    "seed": 20260919,
+    "resamples": 10000,
+    "mean_delta": -0.016666666666666666,
+    "interval_95": [
+      -0.05,
+      0
+    ]
+  },
+  "scoring": {
+    "judge": "manual claim-to-visible-source comparison",
+    "llm_judge": false,
+    "grounded_answer": "answer must be supported by the frozen visible source span",
+    "partial_with_explicit_gap": "must state the documented part and explicitly leave the unsupported part unresolved",
+    "abstention_or_clarification": "must not invent an unsupported requested fact",
+    "repeated_outputs": "all three provider calls per arm/case count only because none has reused_from"
+  },
+  "notable_cases": {
+    "V40-P03": "Visible packet supports the environment-variable naming rule. raw_json answered correctly in 1/3 draws; view_text abstained in all 3 draws.",
+    "V40-P08": "Unanswerable. raw_json safely abstained 3/3; view_text abstained 2/3 and hallucinated a hard maximum once.",
+    "V40-E04": "Packet lacks the requested defaults. raw_json hallucinated defaults in 3/3; view_text safely abstained 3/3. Safety improves here without correctness gain."
+  },
+  "decision_rule": {
+    "required_correctness_gain_pp": 5,
+    "required_cluster_bootstrap_lower_bound_gt": 0,
+    "unsupported_answer_count_must_not_increase": true
+  },
+  "decision": "presentation_not_supported_for_product_rollout",
+  "interpretation": "The preselected view_text candidate improved the opened H20 stress set but did not transfer to five new project families. Independent correctness is 1.67 percentage points lower than raw JSON and the project-cluster bootstrap interval does not exclude zero. Unsupported/wrong answers fall by two draws, which is useful diagnostic evidence but is insufficient to pass the frozen rollout gate. Keep reader_views eval-only and do not change the public or host contract in this cycle."
+}
