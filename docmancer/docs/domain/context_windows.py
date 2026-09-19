@@ -96,10 +96,13 @@ def _is_complete_source_span(
             for other in list_spans
         )
     ]
-    touched_items = [
-        span for span in atomic_items
-        if span[0] < item_end and item_start < span[1]
-    ]
+    touched_items = sorted(
+        (
+            span for span in atomic_items
+            if span[0] < item_end and item_start < span[1]
+        ),
+        key=lambda span: span[0],
+    )
     if touched_items:
         return (
             item_start == touched_items[0][0]
