@@ -102,3 +102,5 @@ jobs:
             ${{ runner.temp }}/core-base.log
             ${{ runner.temp }}/core-cand.log
             ${{ runner.temp }}/core-compare.json
+
+# trigger exact parity after lineage fix ecf3025a
