@@ -1,0 +1,208 @@
+{
+  "schema_version": 1,
+  "status": "sealed_holdout_assessed_no_tuning",
+  "protocol": {
+    "baseline_runtime": "7b92cc5e8a99ee7394fde93b46797c5bd0b162a8",
+    "candidate_runtime": "8cecc0e1355376699bd18d8eb7a720cff6868be0",
+    "corpus": "95e61265656283d609bc1328c46c52b2bf1a069e",
+    "root_only": true,
+    "lookups": 0,
+    "reader": "qwen2.5:1.5b",
+    "temperature": 0,
+    "seed": 0,
+    "num_predict": 160
+  },
+  "packet_pair": {
+    "exact_equal": 20,
+    "different": 0
+  },
+  "context_summary": {
+    "sufficient": 17,
+    "partial": 2,
+    "miss": 1
+  },
+  "reader_summary": {
+    "correct": 12,
+    "partial": 1,
+    "incorrect": 7
+  },
+  "pairwise": {
+    "context_wins": 0,
+    "context_losses": 0,
+    "reader_wins": 0,
+    "reader_losses": 0
+  },
+  "interpretation": "The alias fix is neutral on the independent external holdout. Retrieval context is sufficient in 17/20 cases, while the weak reader is fully correct in 12/20, partial in 1/20, and incorrect in 7/20. Five cases have sufficient visible context but a wrong/unsupported reader outcome (H01, H05, H14, H15, H16), demonstrating a reader/use-of-context bottleneck distinct from the fixed retrieval bug.",
+  "notable_context_gaps": {
+    "H04": "max_age default 600 is clipped from the visible packet",
+    "H07": "complete validation_alias/serialization_alias type contract is not visible",
+    "H08": "StrictInt or another requested strict alias is not visible"
+  },
+  "artifact": {
+    "run_id": 35436382180,
+    "artifact_id": 10582685749,
+    "digest": "sha256:d5404f39dc9acc57fcf42e1990cbe1b841675d6615c1c94c87816954b132fc08"
+  },
+  "cases": [
+    {
+      "id": "H01",
+      "context_baseline": "sufficient",
+      "context_candidate": "sufficient",
+      "reader_baseline": "incorrect",
+      "reader_candidate": "incorrect",
+      "rationale": "Packet directly states BackgroundTasks may be declared in a path operation, dependency, and sub-dependency; reader incorrectly abstains."
+    },
+    {
+      "id": "H02",
+      "context_baseline": "sufficient",
+      "context_candidate": "sufficient",
+      "reader_baseline": "correct",
+      "reader_candidate": "correct",
+      "rationale": "Packet directly names starlette.background; reader correct."
+    },
+    {
+      "id": "H03",
+      "context_baseline": "sufficient",
+      "context_candidate": "sufficient",
+      "reader_baseline": "correct",
+      "reader_candidate": "correct",
+      "rationale": "Packet directly recommends Celery; reader correct."
+    },
+    {
+      "id": "H04",
+      "context_baseline": "partial",
+      "context_candidate": "partial",
+      "reader_baseline": "incorrect",
+      "reader_candidate": "incorrect",
+      "rationale": "Packet exposes allow_methods, allow_headers, and expose_headers defaults but clips the max_age default 600; reader invents 0."
+    },
+    {
+      "id": "H05",
+      "context_baseline": "sufficient",
+      "context_candidate": "sufficient",
+      "reader_baseline": "incorrect",
+      "reader_candidate": "incorrect",
+      "rationale": "Packet contains the exact httpx.Timeout(10.0, connect=60.0) example; reader rewrites it to unsupported httpx.Timeout(connect=60.0, default=10.0)."
+    },
+    {
+      "id": "H06",
+      "context_baseline": "sufficient",
+      "context_candidate": "sufficient",
+      "reader_baseline": "correct",
+      "reader_candidate": "correct",
+      "rationale": "Packet directly states NO_PROXY is a comma-separated list of hostnames/URLs; reader correct."
+    },
+    {
+      "id": "H07",
+      "context_baseline": "partial",
+      "context_candidate": "partial",
+      "reader_baseline": "partial",
+      "reader_candidate": "partial",
+      "rationale": "Packet shows an AliasPath example but omits the complete validation_alias type set and serialization_alias type. Reader recognizes insufficiency but does not obey the exact abstention format."
+    },
+    {
+      "id": "H08",
+      "context_baseline": "miss",
+      "context_candidate": "miss",
+      "reader_baseline": "incorrect",
+      "reader_candidate": "incorrect",
+      "rationale": "Packet explains Strict metadata but omits a strict type alias such as StrictInt; reader answers Strict, which is not the requested alias."
+    },
+    {
+      "id": "H09",
+      "context_baseline": "sufficient",
+      "context_candidate": "sufficient",
+      "reader_baseline": "correct",
+      "reader_candidate": "correct",
+      "rationale": "Packet directly shows @validate_call(config=ConfigDict(strict=True)); reader correct."
+    },
+    {
+      "id": "H10",
+      "context_baseline": "sufficient",
+      "context_candidate": "sufficient",
+      "reader_baseline": "correct",
+      "reader_candidate": "correct",
+      "rationale": "Packet lists pyproject.toml, ruff.toml, and .ruff.toml; reader correct."
+    },
+    {
+      "id": "H11",
+      "context_baseline": "sufficient",
+      "context_candidate": "sufficient",
+      "reader_baseline": "correct",
+      "reader_candidate": "correct",
+      "rationale": "Packet directly states current working directory; reader correct."
+    },
+    {
+      "id": "H12",
+      "context_baseline": "sufficient",
+      "context_candidate": "sufficient",
+      "reader_baseline": "correct",
+      "reader_candidate": "correct",
+      "rationale": "Packet directly states Ruff 0.6.0 and higher; reader correct."
+    },
+    {
+      "id": "H13",
+      "context_baseline": "sufficient",
+      "context_candidate": "sufficient",
+      "reader_baseline": "correct",
+      "reader_candidate": "correct",
+      "rationale": "Packet directly states uv pip install/sync use virtual environments by default; reader correct."
+    },
+    {
+      "id": "H14",
+      "context_baseline": "sufficient",
+      "context_candidate": "sufficient",
+      "reader_baseline": "incorrect",
+      "reader_candidate": "incorrect",
+      "rationale": "Packet directly states bytecode compilation is disabled by default and --compile-bytecode enables it; reader incorrectly abstains."
+    },
+    {
+      "id": "H15",
+      "context_baseline": "sufficient",
+      "context_candidate": "sufficient",
+      "reader_baseline": "incorrect",
+      "reader_candidate": "incorrect",
+      "rationale": "Packet directly states only subprocess is supported and auto/import are not; reader incorrectly abstains."
+    },
+    {
+      "id": "H16",
+      "context_baseline": "sufficient",
+      "context_candidate": "sufficient",
+      "reader_baseline": "incorrect",
+      "reader_candidate": "incorrect",
+      "rationale": "Packet directly states .egg-style distributions are unsupported; reader incorrectly abstains."
+    },
+    {
+      "id": "H17",
+      "context_baseline": "sufficient",
+      "context_candidate": "sufficient",
+      "reader_baseline": "correct",
+      "reader_candidate": "correct",
+      "rationale": "Packet directly explains lifespan state dictionary sharing between lifespan and requests; reader correct."
+    },
+    {
+      "id": "H18",
+      "context_baseline": "sufficient",
+      "context_candidate": "sufficient",
+      "reader_baseline": "correct",
+      "reader_candidate": "correct",
+      "rationale": "Packet directly states BackgroundTask runs after the response has been sent; reader correct."
+    },
+    {
+      "id": "H19",
+      "context_baseline": "sufficient",
+      "context_candidate": "sufficient",
+      "reader_baseline": "correct",
+      "reader_candidate": "correct",
+      "rationale": "Packet supports relative path links between documentation pages; reader correct."
+    },
+    {
+      "id": "H20",
+      "context_baseline": "sufficient",
+      "context_candidate": "sufficient",
+      "reader_baseline": "correct",
+      "reader_candidate": "correct",
+      "rationale": "Packet directly states short option names are supported and gives -f/-F examples; reader correct."
+    }
+  ]
+}
