@@ -5,6 +5,8 @@ on:
     paths:
       - .github/workflows/scientific-structural-tdd.yml
       - tests/docs/test_structural_item_integrity.py
+      - tests/docs/test_structural_behavior_matrix.py
+      - tests/diagnostic_labels.structural_behavior.json
       - tests/diagnostic_labels.source_item_integrity.json
       - docmancer/docs/domain/context_windows.py
       - docmancer/docs/application/_docs_context_projection_core.py
@@ -188,6 +190,7 @@ jobs:
         run: |
           uv run --frozen --extra dev pytest \
             tests/docs/test_structural_item_integrity.py \
+            tests/docs/test_structural_behavior_matrix.py \
             tests/docs/test_compact_context_blocks.py \
             tests/docs/test_list_item_continuation_bridge.py \
             tests/docs/test_context_span_growth.py \
