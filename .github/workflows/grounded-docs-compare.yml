@@ -19,7 +19,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: 95e61265656283d609bc1328c46c52b2bf1a069e
+          ref: 0.0.0-95e61265656283d609bc1328c46c52b2bf1a069e
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
@@ -42,14 +42,14 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          ./node_modules/.bin/docs-mcp-server scrape docatlas file://$GITHUB_WORKSPACE/gd-corpus --version 95e6126 --quiet
+          ./node_modules/.bin/docs-mcp-server scrape docatlas file://$GITHUB_WORKSPACE/gd-corpus --version 0.0.0-95e6126 --quiet
           ./node_modules/.bin/docs-mcp-server list --output json --quiet > "$RUNNER_TEMP/list.json"
       - name: Smoke two queries
         shell: bash
         run: |
           set -euo pipefail
-          ./node_modules/.bin/docs-mcp-server search docatlas "If my question compares two things, should I split it into separate documentation searches before seeing the first result?" --version 95e6126 --exact-match --limit 5 --output json --quiet > "$RUNNER_TEMP/g21.json"
-          ./node_modules/.bin/docs-mcp-server search docatlas "If the system says it does not have enough documentation evidence, should I keep rephrasing the question over and over until something appears?" --version 95e6126 --exact-match --limit 5 --output json --quiet > "$RUNNER_TEMP/g27.json"
+          ./node_modules/.bin/docs-mcp-server search docatlas "If my question compares two things, should I split it into separate documentation searches before seeing the first result?" --version 0.0.0-95e6126 --exact-match --limit 5 --output json --quiet > "$RUNNER_TEMP/g21.json"
+          ./node_modules/.bin/docs-mcp-server search docatlas "If the system says it does not have enough documentation evidence, should I keep rephrasing the question over and over until something appears?" --version 0.0.0-95e6126 --exact-match --limit 5 --output json --quiet > "$RUNNER_TEMP/g27.json"
           python - <<'PY'
           import json, os
           from pathlib import Path
