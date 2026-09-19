@@ -1,0 +1,67 @@
+name: PR194 global evidence transfer24
+on:
+  push:
+    branches: [fix/v13-v15-evidence-pipeline]
+    paths: [.github/workflows/pr194-global-evidence-transfer24.yml]
+permissions: {contents: read}
+jobs:
+  transfer:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+        with: {path: candidate}
+      - uses: actions/checkout@v4
+        with: {ref: ef39e12ab60fd69f8052079847d9e0ca24a843b4, path: baseline}
+      - uses: actions/checkout@v4
+        with: {repository: pallets/click, ref: 6aabf099bfdd4c1e75fe8d0e0d4241372b988ab1, path: upstream/click}
+      - uses: actions/checkout@v4
+        with: {repository: encode/httpcore, ref: 10a658221deb38a4c5b16db55ab554b0bf731707, path: upstream/httpcore}
+      - uses: actions/checkout@v4
+        with: {repository: pallets/itsdangerous, ref: 672971d66a2ef9f85151e53283113f33d642dabd, path: upstream/itsdangerous}
+      - uses: actions/checkout@v4
+        with: {repository: fastapi/sqlmodel, ref: 7fec3bcbdbca5b29b21ac4777e3fb341d8a7e4e1, path: upstream/sqlmodel}
+      - uses: astral-sh/setup-uv@v6
+      - name: Sync exact runtimes
+        run: |
+          (cd baseline && uv sync --frozen --extra dev)
+          (cd candidate && uv sync --frozen --extra dev)
+      - name: Baseline once
+        run: |
+          cd baseline
+          PYTHONPATH="$PWD" uv run --frozen --extra dev python ../candidate/scripts/run_global_evidence_transfer24.py             --questions ../candidate/eval/global_evidence_transfer24/questions.json             --source-plan ../candidate/eval/global_evidence_transfer24/source_plan.json             --sources-root ../upstream --output "$RUNNER_TEMP/base.json"
+      - name: Candidate once
+        run: |
+          cd candidate
+          PYTHONPATH="$PWD" uv run --frozen --extra dev python scripts/run_global_evidence_transfer24.py             --questions eval/global_evidence_transfer24/questions.json             --source-plan eval/global_evidence_transfer24/source_plan.json             --sources-root ../upstream --output "$RUNNER_TEMP/candidate.json"
+      - name: Decide frozen transfer
+        shell: bash
+        run: |
+          python - <<'PY'
+          import json,os
+          from pathlib import Path
+          t=Path(os.environ["RUNNER_TEMP"])
+          A=json.loads((t/"base.json").read_text())["rows"]
+          B=json.loads((t/"candidate.json").read_text())["rows"]
+          a={r["id"]:r for r in A}; b={r["id"]:r for r in B}; assert set(a)==set(b)
+          fully=[i for i,r in a.items() if r["answerability"]=="within_budget"]
+          wins=[i for i in fully if b[i]["supported"] and not a[i]["supported"]]
+          losses=[i for i in fully if a[i]["supported"] and not b[i]["supported"]]
+          safety_a=sum(bool(r["safety_errors"]) for r in A); safety_b=sum(bool(r["safety_errors"]) for r in B)
+          win_families=sorted({b[i]["project"] for i in wins})
+          if losses or safety_b>safety_a: status="rejected"
+          elif len(win_families)>=2: status="transfer_validated"
+          else: status="transfer_not_established"
+          out={"status":status,"baseline_supported":sum(a[i]["supported"] for i in fully),"candidate_supported":sum(b[i]["supported"] for i in fully),"wins":wins,"losses":losses,"win_families":win_families,"baseline_safety":safety_a,"candidate_safety":safety_b}
+          (t/"transfer-summary.json").write_text(json.dumps(out,indent=2))
+          print(json.dumps(out,indent=2))
+          if status=="rejected": raise SystemExit("transfer regression")
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: pr194-global-evidence-transfer24
+          path: |
+            ${{ runner.temp }}/base.json
+            ${{ runner.temp }}/candidate.json
+            ${{ runner.temp }}/transfer-summary.json
