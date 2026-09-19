@@ -1,0 +1,108 @@
+{
+  "schema_version": 1,
+  "state": "frozen_unseen_validation",
+  "claim_boundary": "New external-documentation holdout. Not used to tune the retrieval-subject-binding fix.",
+  "retrieval_mode": "root_only_no_lookup_queries",
+  "cases": [
+    {
+      "id": "H01",
+      "project_group": "fastapi",
+      "question": "Can FastAPI `BackgroundTasks` be declared inside dependencies and sub-dependencies, or only in the path operation function?"
+    },
+    {
+      "id": "H02",
+      "project_group": "fastapi",
+      "question": "Which package does FastAPI's `BackgroundTasks` class come from?"
+    },
+    {
+      "id": "H03",
+      "project_group": "fastapi",
+      "question": "For heavy background computation that does not need to share process memory, what larger tool does the documentation suggest considering?"
+    },
+    {
+      "id": "H04",
+      "project_group": "fastapi",
+      "question": "What are the documented defaults for `allow_methods`, `allow_headers`, `expose_headers`, and `max_age` in FastAPI CORS middleware?"
+    },
+    {
+      "id": "H05",
+      "project_group": "httpx",
+      "question": "How do you configure an HTTPX client to use a 60-second connect timeout and 10 seconds for other timeout operations?"
+    },
+    {
+      "id": "H06",
+      "project_group": "httpx",
+      "question": "What kind of values does HTTPX expect in `NO_PROXY`?"
+    },
+    {
+      "id": "H07",
+      "project_group": "pydantic",
+      "question": "Which value types are accepted by Pydantic `validation_alias`, and what type is required for `serialization_alias`?"
+    },
+    {
+      "id": "H08",
+      "project_group": "pydantic",
+      "question": "Name one Pydantic strict type alias that is already annotated with `Strict`."
+    },
+    {
+      "id": "H09",
+      "project_group": "pydantic",
+      "question": "How is strict mode supplied to Pydantic's `@validate_call` decorator?"
+    },
+    {
+      "id": "H10",
+      "project_group": "ruff",
+      "question": "Which three configuration filenames can Ruff use?"
+    },
+    {
+      "id": "H11",
+      "project_group": "ruff",
+      "question": "When a Ruff configuration file is supplied directly with `--config`, relative paths inside it are resolved relative to what?"
+    },
+    {
+      "id": "H12",
+      "project_group": "ruff",
+      "question": "Starting with which Ruff version are Jupyter notebooks linted and formatted by default?"
+    },
+    {
+      "id": "H13",
+      "project_group": "uv",
+      "question": "Do `uv pip install` and `uv pip sync` target virtual environments by default?"
+    },
+    {
+      "id": "H14",
+      "project_group": "uv",
+      "question": "Does uv compile installed `.py` files into `.pyc` bytecode by default, and which option enables it?"
+    },
+    {
+      "id": "H15",
+      "project_group": "uv",
+      "question": "Which `--keyring-provider` mode does uv support for registry authentication?"
+    },
+    {
+      "id": "H16",
+      "project_group": "uv",
+      "question": "Does uv support `.egg`-style distributions?"
+    },
+    {
+      "id": "H17",
+      "project_group": "starlette",
+      "question": "What is Starlette lifespan `state` used for?"
+    },
+    {
+      "id": "H18",
+      "project_group": "starlette",
+      "question": "When does a Starlette `BackgroundTask` attached to a response run?"
+    },
+    {
+      "id": "H19",
+      "project_group": "mkdocs",
+      "question": "When linking from one MkDocs documentation page to another, what path style should a Markdown link use?"
+    },
+    {
+      "id": "H20",
+      "project_group": "typer",
+      "question": "Can a Typer boolean CLI option have short option names as well as long names?"
+    }
+  ]
+}
