@@ -1,10 +1,12 @@
 {
   "schema_version": 1,
   "module_labels": {
-    "tests/evidence_quality_v2/test_reader_views.py": "behavioral"
+    "tests/evidence_quality_v2/test_reader_views.py": "behavioral",
+    "tests/evidence_quality_v2/test_reader_run_integrity.py": "behavioral"
   },
   "node_overrides": {},
   "module_node_hashes": {
-    "tests/evidence_quality_v2/test_reader_views.py": "82f155c977d7ccd5a9f71aadb9b12ea2366a182831d0a48c2faff9606f13983d"
+    "tests/evidence_quality_v2/test_reader_views.py": "82f155c977d7ccd5a9f71aadb9b12ea2366a182831d0a48c2faff9606f13983d",
+    "tests/evidence_quality_v2/test_reader_run_integrity.py": "1ea7d631d8d8a7ba3122a453ef86378d2989e4feaa262acffb1f4a699ae01be3"
   }
 }
