@@ -1,0 +1,27 @@
+name: Retrieval generic30 candidate
+on:
+  push:
+    branches: [fix/v13-v15-evidence-pipeline]
+    paths: [.github/workflows/retrieval-generic30-candidate.yml]
+permissions: {contents: read}
+jobs:
+  capture:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with: {ref: 8cecc0e1355376699bd18d8eb7a720cff6868be0}
+      - uses: actions/checkout@v4
+        with: {ref: 95e61265656283d609bc1328c46c52b2bf1a069e, path: frozen-corpus}
+      - uses: astral-sh/setup-uv@v6
+      - run: uv sync --frozen --extra dev
+      - name: Capture candidate
+        run: |
+          PYTHONPATH="$PWD" uv run --frozen --extra dev python "$GITHUB_WORKSPACE/frozen-corpus/scripts/run_generic_blind_lookup_pair30.py" \
+            --project-root "$GITHUB_WORKSPACE/frozen-corpus" \
+            --questions "$GITHUB_WORKSPACE/frozen-corpus/eval/project_context_quality/generic_blind_lookup_pair30_questions.json" \
+            --output "$RUNNER_TEMP/generic30-candidate.json"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: retrieval-generic30-candidate
+          path: ${{ runner.temp }}/generic30-candidate.json
