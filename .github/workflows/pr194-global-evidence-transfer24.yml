@@ -1,4 +1,5 @@
 name: PR194 global evidence transfer24
+# Retry 2: fixture transport maps pinned non-Markdown docs to stable Markdown aliases.
 on:
   push:
     branches: [fix/v13-v15-evidence-pipeline]
