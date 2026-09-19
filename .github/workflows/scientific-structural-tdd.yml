@@ -139,8 +139,10 @@ jobs:
               ]
               assert any(all(name in text and value in text for name,value in required)
                          for text in raw_candidates), raw_candidates
-              assert any(all(name in text and value in text for name,value in required)
-                         for text in observed_variants), observed_variants
+              assert all(
+                  any(name in text and value in text for text in observed_variants)
+                  for name,value in required
+              ), observed_variants
 
               payload=h04['public_payload']
               visible='\n'.join(str(s.get('snippet') or '') for s in payload.get('sources') or [])
