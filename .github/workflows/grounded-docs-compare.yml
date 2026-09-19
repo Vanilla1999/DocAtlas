@@ -13,9 +13,9 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 25
     env:
-      DOCS_MCP_APP_STORE_PATH: ${{ runner.temp }}/grounded-store
+      DOCS_MCP_APP_STORE_PATH: ${{ github.workspace }}/.grounded-store
       DOCS_MCP_APP_TELEMETRY_ENABLED: 'false'
-      DOCS_MCP_SCRAPER_SECURITY_FILE_ACCESS_ALLOWED_ROOTS: '["${{ github.workspace }}/gd-corpus"]'
+      DOCS_MCP_SCRAPER_SECURITY_FILE_ACCESS_MODE: unrestricted
     steps:
       - uses: actions/checkout@v4
         with:
