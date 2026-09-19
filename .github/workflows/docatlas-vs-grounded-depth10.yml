@@ -1,0 +1,129 @@
+name: DocAtlas vs Grounded depth10 holdout
+on:
+  push:
+    branches: [fix/v13-v15-evidence-pipeline]
+    paths: [.github/workflows/docatlas-vs-grounded-depth10.yml]
+permissions: {contents: read}
+jobs:
+  compare:
+    runs-on: ubuntu-latest
+    timeout-minutes: 50
+    env:
+      DOCS_MCP_APP_TELEMETRY_ENABLED: 'false'
+      DOCS_MCP_SCRAPER_SECURITY_FILE_ACCESS_MODE: unrestricted
+      OPENAI_API_KEY: ollama
+      OPENAI_API_BASE: http://127.0.0.1:11434/v1
+      DOCS_MCP_EMBEDDING_MODEL: openai:all-minilm
+      DOCS_MCP_EMBEDDINGS_VECTOR_DIMENSION: '384'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with: {ref: 95e61265656283d609bc1328c46c52b2bf1a069e, path: frozen-corpus}
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - uses: astral-sh/setup-uv@v6
+      - run: uv sync --frozen --extra dev
+      - name: Install Grounded Docs and local models
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm install --no-save @arabold/docs-mcp-server@3.1.0
+          curl -fsSL https://ollama.com/install.sh | sh
+          ollama serve > "$RUNNER_TEMP/ollama.log" 2>&1 &
+          for i in $(seq 1 45); do curl -fsS http://127.0.0.1:11434/api/tags >/dev/null && break; sleep 1; done
+          ollama pull all-minilm
+          ollama pull qwen2.5:1.5b
+      - name: Index exact corpus with sufficient local depth
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY' > "$RUNNER_TEMP/versions.tsv"
+          import json
+          from pathlib import Path
+          m=json.loads(Path('frozen-corpus/eval/evidence_quality_v2/source-manifest.json').read_text()); d={}
+          for r in m['sources']: d.setdefault(r['project'],set()).add(r['ref'])
+          for p,refs in sorted(d.items()): assert len(refs)==1; print(p,next(iter(refs)),sep='\t')
+          PY
+          while IFS=$'\t' read -r project version; do
+            src="$GITHUB_WORKSPACE/frozen-corpus/eval/evidence_quality_v2/sources/$project"
+            DOCS_MCP_APP_STORE_PATH="$RUNNER_TEMP/fts" ./node_modules/.bin/docs-mcp-server scrape "$project" "file://$src" --version "$version" --max-depth 10 --quiet
+            DOCS_MCP_APP_STORE_PATH="$RUNNER_TEMP/hybrid" ./node_modules/.bin/docs-mcp-server scrape "$project" "file://$src" --version "$version" --max-depth 10 --embedding-model openai:all-minilm --quiet
+          done < "$RUNNER_TEMP/versions.tsv"
+      - name: Verify index coverage before scoring
+        shell: bash
+        run: |
+          python - <<'PY'
+          import json, os, subprocess
+          from pathlib import Path
+          root=Path.cwd(); cli=root/'node_modules/.bin/docs-mcp-server'; tmp=Path(os.environ['RUNNER_TEMP'])
+          versions=dict(line.strip().split('\t') for line in (tmp/'versions.tsv').read_text().splitlines())
+          probes={'fastapi':'BackgroundTasks','httpx':'NO_PROXY','pydantic':'validation_alias','ruff':'pyproject.toml','uv':'compile-bytecode','starlette':'BackgroundTask','mkdocs':'Markdown','typer':'bool'}
+          out={}
+          for project,q in probes.items():
+              env=os.environ.copy(); env['DOCS_MCP_APP_STORE_PATH']=str(tmp/'fts')
+              cp=subprocess.run([str(cli),'search',project,q,'--version',versions[project],'--exact-match','--limit','3','--output','json','--quiet'],env=env,text=True,stdout=subprocess.PIPE,stderr=subprocess.PIPE)
+              assert cp.returncode==0,cp.stderr
+              rows=json.loads(cp.stdout); out[project]={'query':q,'results':len(rows)}
+              assert rows, (project,q,'not indexed/searchable')
+          (tmp/'index-probes.json').write_text(json.dumps(out,indent=2)); print(json.dumps(out,indent=2))
+          PY
+      - name: Search, equal-pack, native-pack, and read sequentially
+        shell: bash
+        run: |
+          cat > "$RUNNER_TEMP/run.py" <<'PY'
+          import json, os, subprocess, urllib.request
+          from pathlib import Path
+          from urllib.parse import urlparse, unquote
+          from docmancer.docs.application.model_visible_projection_helpers import docs_context_budget_tokens
+          root=Path.cwd(); tmp=Path(os.environ['RUNNER_TEMP']); cli=root/'node_modules/.bin/docs-mcp-server'
+          cases=json.loads((root/'eval/retrieval_recheck/holdout20_questions.json').read_text())['cases']
+          m=json.loads((root/'frozen-corpus/eval/evidence_quality_v2/source-manifest.json').read_text()); versions={}
+          for r in m['sources']: versions.setdefault(r['project'],r['ref']); assert versions[r['project']]==r['ref']
+          system=json.loads((root/'eval/retrieval_recheck/holdout20_protocol.json').read_text())['reader']['prompt']
+          def base(): return {'kind':'docs_context','status':'ok','answer_supported':False,'answer_available':False,'edit_ready':False,'sources':[]}
+          def src(project,version,row):
+              p=Path(unquote(urlparse(row['url']).path)); b=root/'frozen-corpus/eval/evidence_quality_v2/sources'/project
+              try:path=p.relative_to(b).as_posix()
+              except Exception:path=p.name
+              return {'path_or_url':path,'snippet':row.get('content',''),'version_binding':version}
+          def equal_pack(project,version,rows):
+              p=base()
+              for row in rows:
+                  if len(p['sources'])>=3: break
+                  q=json.loads(json.dumps(p)); q['sources'].append(src(project,version,row))
+                  if docs_context_budget_tokens(q)<=800:p=q
+              p['estimated_tokens']=docs_context_budget_tokens(p); return p
+          def native_pack(project,version,rows):
+              p=base();p['sources']=[src(project,version,x) for x in rows[:3]];p['estimated_tokens']=docs_context_budget_tokens(p);return p
+          def search(store,project,version,q):
+              env=os.environ.copy();env['DOCS_MCP_APP_STORE_PATH']=str(store)
+              cp=subprocess.run([str(cli),'search',project,q,'--version',version,'--exact-match','--limit','5','--output','json','--quiet'],env=env,text=True,stdout=subprocess.PIPE,stderr=subprocess.PIPE)
+              assert cp.returncode==0,cp.stderr;return json.loads(cp.stdout)
+          def ask(q,p):
+              user='QUESTION:\n'+q+'\n\nCONTEXT (public packet JSON):\n'+json.dumps(p,ensure_ascii=False,separators=(',',':'))
+              body={'model':'qwen2.5:1.5b','stream':False,'messages':[{'role':'system','content':system},{'role':'user','content':user}],'options':{'temperature':0,'seed':0,'num_predict':160}}
+              req=urllib.request.Request('http://127.0.0.1:11434/api/chat',data=json.dumps(body).encode(),headers={'Content-Type':'application/json'})
+              with urllib.request.urlopen(req,timeout=300) as r:return json.loads(r.read())['message']['content']
+          rows=[]; calls=0
+          for c in cases:
+              project=c['project_group'];version=versions[project]
+              fr=search(tmp/'fts',project,version,c['question']); hr=search(tmp/'hybrid',project,version,c['question'])
+              fp=equal_pack(project,version,fr); hp=equal_pack(project,version,hr); np=native_pack(project,version,hr)
+              fa=ask(c['question'],fp);calls+=1
+              if hp==fp: ha=fa
+              else: ha=ask(c['question'],hp);calls+=1
+              if np==hp: na=ha
+              elif np==fp: na=fa
+              else: na=ask(c['question'],np);calls+=1
+              rows.append({'id':c['id'],'project_group':project,'question':c['question'],'fts_results':fr,'hybrid_results':hr,'fts_equal':fp,'hybrid_equal':hp,'hybrid_native_top3':np,'fts_equal_reader':fa,'hybrid_equal_reader':ha,'hybrid_native_top3_reader':na})
+              print(c['id'],'counts',len(fr),len(hr),'tokens',fp['estimated_tokens'],hp['estimated_tokens'],np['estimated_tokens'],'calls',calls,flush=True)
+          (tmp/'depth10.json').write_text(json.dumps({'competitor':'Grounded Docs 3.1.0','max_depth':10,'reader_calls':calls,'cases':rows},indent=2,ensure_ascii=False))
+          PY
+          PYTHONPATH="$PWD" uv run --frozen --extra dev python "$RUNNER_TEMP/run.py"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: docatlas-vs-grounded-depth10
+          path: |
+            ${{ runner.temp }}/depth10.json
+            ${{ runner.temp }}/index-probes.json
+            ${{ runner.temp }}/versions.tsv
