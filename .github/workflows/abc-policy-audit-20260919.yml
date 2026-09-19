@@ -1,0 +1,67 @@
+name: ABC policy-corrected replay
+on:
+  push:
+    branches: [experiment/abc-retrieval-review-20260919]
+    paths:
+      - .github/workflows/abc-policy-audit-20260919.yml
+      - scripts/abc_policy_audit_20260919.py
+permissions:
+  contents: read
+  actions: read
+jobs:
+  compare:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: harness
+      - uses: actions/checkout@v4
+        with:
+          ref: 95e61265656283d609bc1328c46c52b2bf1a069e
+          path: runtime
+      - uses: actions/checkout@v4
+        with:
+          ref: 95e61265656283d609bc1328c46c52b2bf1a069e
+          path: corpus
+      - uses: actions/download-artifact@v4
+        with:
+          name: generic-blind-lookup-pair30
+          run-id: 35385533863
+          github-token: ${{ github.token }}
+          path: input
+      - uses: actions/download-artifact@v4
+        with:
+          name: abc-retrieval-review-20260919
+          run-id: 35426507850
+          github-token: ${{ github.token }}
+          path: previous
+      - uses: astral-sh/setup-uv@v6
+      - name: Install frozen runtime
+        working-directory: runtime
+        run: uv sync --frozen --extra dev --python 3.12
+      - name: Install same experimental scorer
+        working-directory: runtime
+        run: uv pip install --python .venv/bin/python 'onnxruntime==1.22.1' 'transformers==4.53.3'
+      - name: Replay policy-corrected alternatives
+        working-directory: runtime
+        env:
+          CORPUS: ${{ github.workspace }}/corpus
+          ABC_OUT: ${{ runner.temp }}/abc-policy-results
+          ABC_PREVIOUS: ${{ github.workspace }}/previous
+          ABC_INPUT: ${{ github.workspace }}/input/generic-blind-lookup-pair30.json
+          TOKENIZERS_PARALLELISM: 'false'
+          HF_HUB_DISABLE_XET: '1'
+        run: |
+          mkdir -p "$ABC_OUT"
+          uv pip freeze --python .venv/bin/python > "$ABC_OUT/environment.txt"
+          cp ../harness/scripts/abc_policy_audit_20260919.py "$ABC_OUT/correction.py"
+          PYTHONPATH="$PWD" .venv/bin/python ../harness/scripts/abc_policy_audit_20260919.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: abc-policy-corrected-20260919
+          path: |
+            ${{ runner.temp }}/abc-policy-results/*.json
+            ${{ runner.temp }}/abc-policy-results/*.txt
+            ${{ runner.temp }}/abc-policy-results/*.py
