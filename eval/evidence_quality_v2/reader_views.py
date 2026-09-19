@@ -46,7 +46,7 @@ _KNOWN_SOURCE_FIELDS = frozenset({
 })
 
 _SOURCE_VIEW_FIELDS = (
-    "evidence_id", "path_or_url", "section", "symbol_or_section",
+    "evidence_id", "path_or_url", "path", "section", "symbol_or_section",
     "line_start", "line_end", "version_binding",
     "authority", "instruction_trust", "scope", "snippet",
 )
@@ -67,6 +67,10 @@ def reader_view(payload: dict[str, Any]) -> dict[str, Any]:
 
     if not isinstance(payload, dict) or payload.get("kind") != "docs_context":
         raise UnsupportedReaderView("only docs_context is supported")
+    # The reviewed docs_context contract is unversioned. Do not interpret an
+    # explicit future schema using this allowlist, even if its keys look familiar.
+    if "schema_version" in payload:
+        raise UnsupportedReaderView("explicit schema version is not supported")
     unknown = set(payload) - _KNOWN_TOP_LEVEL
     if unknown:
         raise UnsupportedReaderView(f"unknown top-level fields: {sorted(unknown)}")
@@ -78,6 +82,8 @@ def reader_view(payload: dict[str, Any]) -> dict[str, Any]:
     for source in sources:
         if not isinstance(source, dict):
             raise UnsupportedReaderView("source must be an object")
+        if not isinstance(source.get("snippet"), str):
+            raise UnsupportedReaderView("source snippet must be a string")
         unknown_source = set(source) - _KNOWN_SOURCE_FIELDS
         if unknown_source:
             raise UnsupportedReaderView(
@@ -115,7 +121,7 @@ def _render_text(view: dict[str, Any]) -> str:
         metadata_bytes = json.dumps(
             metadata, ensure_ascii=False, separators=(",", ":"),
         ).encode("utf-8")
-        snippet_bytes = str(source.get("snippet") or "").encode("utf-8")
+        snippet_bytes = source["snippet"].encode("utf-8")
         output.extend(f"META_BYTES {len(metadata_bytes)}\n".encode("ascii"))
         output.extend(metadata_bytes)
         output.extend(b"\n")
