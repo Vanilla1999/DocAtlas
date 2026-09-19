@@ -1,0 +1,52 @@
+name: Retrieval external80 pair
+on:
+  push:
+    branches: [fix/v13-v15-evidence-pipeline]
+    paths: [.github/workflows/retrieval-external80-pair.yml]
+permissions: {contents: read}
+jobs:
+  pair:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with: {ref: 7b92cc5e8a99ee7394fde93b46797c5bd0b162a8, path: baseline-runtime}
+      - uses: actions/checkout@v4
+        with: {ref: 8cecc0e1355376699bd18d8eb7a720cff6868be0, path: candidate-runtime}
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - uses: astral-sh/setup-uv@v6
+      - run: |
+          (cd baseline-runtime && uv sync --frozen --extra dev)
+          (cd candidate-runtime && uv sync --frozen --extra dev)
+      - name: Baseline 80
+        run: cd baseline-runtime && PYTHONPATH="$PWD" uv run --frozen --extra dev python -m eval.evidence_quality_v2.run --output "$RUNNER_TEMP/base"
+      - name: Candidate 80
+        run: cd candidate-runtime && PYTHONPATH="$PWD" uv run --frozen --extra dev python -m eval.evidence_quality_v2.run --output "$RUNNER_TEMP/cand"
+      - name: Compare
+        shell: bash
+        run: |
+          python - <<'PY'
+          import json,os
+          from pathlib import Path
+          t=Path(os.environ['RUNNER_TEMP']);a=t/'base';b=t/'cand';changes=[]
+          for da in sorted((a/'payloads').glob('*')):
+            if not da.is_dir():continue
+            db=b/'payloads'/da.name
+            for pa in sorted(da.glob('*.json')):
+              pb=db/pa.name
+              if json.loads(pa.read_text())!=json.loads(pb.read_text()):changes.append({'variant':da.name,'id':pa.stem})
+          sa=json.loads((a/'summary.json').read_text());sb=json.loads((b/'summary.json').read_text())
+          out={'raw_payload_changes':changes,'changed_ids':sorted({x['id'] for x in changes}),'baseline_summary':sa,'candidate_summary':sb}
+          (t/'compare.json').write_text(json.dumps(out,indent=2,ensure_ascii=False));print(json.dumps({'changes':len(changes),'ids':out['changed_ids']},indent=2))
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: retrieval-external80-pair
+          path: |
+            ${{ runner.temp }}/base/summary.json
+            ${{ runner.temp }}/base/rows.json
+            ${{ runner.temp }}/cand/summary.json
+            ${{ runner.temp }}/cand/rows.json
+            ${{ runner.temp }}/compare.json
