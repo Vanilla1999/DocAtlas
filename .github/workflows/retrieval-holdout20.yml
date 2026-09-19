@@ -1,0 +1,102 @@
+name: Retrieval sealed holdout 20
+on:
+  push:
+    branches: [fix/v13-v15-evidence-pipeline]
+    paths:
+      - .github/workflows/retrieval-holdout20.yml
+
+permissions:
+  contents: read
+
+jobs:
+  holdout:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with: {ref: 7b92cc5e8a99ee7394fde93b46797c5bd0b162a8, path: baseline-runtime}
+      - uses: actions/checkout@v4
+        with: {ref: 8cecc0e1355376699bd18d8eb7a720cff6868be0, path: candidate-runtime}
+      - uses: actions/checkout@v4
+        with: {ref: 95e61265656283d609bc1328c46c52b2bf1a069e, path: frozen-corpus}
+      - uses: astral-sh/setup-uv@v6
+      - name: Sync runtimes
+        run: |
+          (cd baseline-runtime && uv sync --frozen --extra dev)
+          (cd candidate-runtime && uv sync --frozen --extra dev)
+      - name: Write retrieval runner
+        shell: bash
+        run: |
+          cat > "$RUNNER_TEMP/run_holdout.py" <<'PY'
+          import argparse, hashlib, json, time
+          from pathlib import Path
+          ap=argparse.ArgumentParser(); ap.add_argument('--questions',type=Path,required=True); ap.add_argument('--frozen',type=Path,required=True); ap.add_argument('--output',type=Path,required=True); args=ap.parse_args()
+          from eval.evidence_quality_v2.runtime import write_project, isolated_service, index_project
+          from eval.project_context_quality.capture_public_context import capture_public_call
+          cases=json.loads(args.questions.read_text())['cases']; eq=args.frozen/'eval/evidence_quality_v2'; manifest=json.loads((eq/'source-manifest.json').read_text())
+          def docs(project):
+              out={}
+              for row in manifest['sources']:
+                  if row['project']!=project: continue
+                  p=eq/'sources'/project/row['path']; data=p.read_bytes(); assert hashlib.sha256(data).hexdigest()==row['sha256']; out[row['path']]=data.decode()
+              return out
+          args.output.mkdir(parents=True,exist_ok=True); rows=[]
+          for project in sorted({c['project_group'] for c in cases}):
+              pr=args.output/'corpus'/project; write_project(pr,docs(project))
+              with isolated_service(args.output/'state'/project) as (service,config):
+                  index_project(service,config,pr)
+                  for c in [x for x in cases if x['project_group']==project]:
+                      st=time.perf_counter(); cap=capture_public_call(service,{'project_path':str(pr),'scope':'all','question':c['question']}); elapsed=time.perf_counter()-st; p=cap['public_payload']
+                      assert (p.get('estimated_tokens') or 0)<=800 and len(p.get('sources') or [])<=3
+                      rows.append({'id':c['id'],'project_group':project,'question':c['question'],'elapsed_seconds':elapsed,'public_payload':p})
+                      print(c['id'],p.get('status'),p.get('estimated_tokens'),[s.get('path_or_url') for s in p.get('sources') or []],flush=True)
+          (args.output/'retrieval.json').write_text(json.dumps({'cases':rows},indent=2,ensure_ascii=False))
+          PY
+      - name: Baseline retrieval
+        run: cd baseline-runtime && PYTHONPATH="$PWD" uv run --frozen --extra dev python "$RUNNER_TEMP/run_holdout.py" --questions "$GITHUB_WORKSPACE/eval/retrieval_recheck/holdout20_questions.json" --frozen "$GITHUB_WORKSPACE/frozen-corpus" --output "$RUNNER_TEMP/baseline"
+      - name: Candidate retrieval
+        run: cd candidate-runtime && PYTHONPATH="$PWD" uv run --frozen --extra dev python "$RUNNER_TEMP/run_holdout.py" --questions "$GITHUB_WORKSPACE/eval/retrieval_recheck/holdout20_questions.json" --frozen "$GITHUB_WORKSPACE/frozen-corpus" --output "$RUNNER_TEMP/candidate"
+      - name: Install Qwen reader
+        shell: bash
+        run: |
+          curl -fsSL https://ollama.com/install.sh | sh
+          ollama serve > "$RUNNER_TEMP/ollama.log" 2>&1 &
+          for i in $(seq 1 45); do curl -fsS http://127.0.0.1:11434/api/tags >/dev/null && break; sleep 1; done
+          ollama pull qwen2.5:1.5b
+      - name: Read both lanes
+        shell: bash
+        run: |
+          python - <<'PY'
+          import json, os, urllib.request
+          from pathlib import Path
+          root=Path.cwd(); t=Path(os.environ['RUNNER_TEMP']); proto=json.loads((root/'eval/retrieval_recheck/holdout20_protocol.json').read_text()); system=proto['reader']['prompt']
+          def ask(q,p):
+              body={'model':'qwen2.5:1.5b','stream':False,'messages':[{'role':'system','content':system},{'role':'user','content':'QUESTION:\n'+q+'\n\nCONTEXT (public packet JSON):\n'+json.dumps(p,ensure_ascii=False,separators=(',',':'))}],'options':{'temperature':0,'seed':0,'num_predict':160}}
+              req=urllib.request.Request('http://127.0.0.1:11434/api/chat',data=json.dumps(body).encode(),headers={'Content-Type':'application/json'})
+              with urllib.request.urlopen(req,timeout=180) as r:return json.loads(r.read())['message']['content']
+          lanes={}
+          for lane in ('baseline','candidate'):
+              src=json.loads((t/lane/'retrieval.json').read_text()); rows=[]
+              for row in src['cases']:
+                  ans=ask(row['question'],row['public_payload']); rows.append({**row,'reader_answer':ans}); print(lane,row['id'],repr(ans[:100]),flush=True)
+              lanes[lane]=rows; (t/f'{lane}-reader.json').write_text(json.dumps({'cases':rows},indent=2,ensure_ascii=False))
+          def semsig(r):
+              p=r['public_payload']; return (p.get('status'),p.get('kind'),p.get('estimated_tokens'),[(s.get('path_or_url'),s.get('line_start'),s.get('line_end'),s.get('snippet')) for s in p.get('sources') or []])
+          out=[]
+          for a,b in zip(lanes['baseline'],lanes['candidate']):
+              out.append({'id':a['id'],'packet_equal_normalized':semsig(a)==semsig(b),'answer_equal':a['reader_answer']==b['reader_answer']})
+          (t/'pair.json').write_text(json.dumps({'cases':out},indent=2))
+          print(json.dumps(out,indent=2))
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: retrieval-sealed-holdout20
+          path: |
+            ${{ runner.temp }}/baseline/retrieval.json
+            ${{ runner.temp }}/candidate/retrieval.json
+            ${{ runner.temp }}/baseline-reader.json
+            ${{ runner.temp }}/candidate-reader.json
+            ${{ runner.temp }}/pair.json
+            ${{ runner.temp }}/ollama.log
