@@ -6,6 +6,8 @@ on:
       - .github/workflows/scientific-reader-view-tdd.yml
       - eval/evidence_quality_v2/reader_views.py
       - tests/evidence_quality_v2/test_reader_views.py
+      - tests/evidence_quality_v2/test_reader_run_integrity.py
+      - eval/evidence_quality_v2/reader_experiment.py
       - tests/diagnostic_labels.reader_views.json
 
 permissions:
@@ -20,4 +22,7 @@ jobs:
       - uses: astral-sh/setup-uv@v6
       - run: uv sync --frozen --extra dev
       - name: Reader view RED GREEN
-        run: uv run --frozen --extra dev pytest tests/evidence_quality_v2/test_reader_views.py -q
+        run: |
+          uv run --frozen --extra dev pytest \
+            tests/evidence_quality_v2/test_reader_views.py \
+            tests/evidence_quality_v2/test_reader_run_integrity.py -q
