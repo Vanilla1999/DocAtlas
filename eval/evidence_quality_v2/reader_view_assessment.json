@@ -1,0 +1,43 @@
+{
+  "schema_version": 1,
+  "status": "p3_preselected_view_candidate",
+  "source_artifact": {
+    "run_id": 35442352688,
+    "artifact_id": 10584620931,
+    "digest": "sha256:9e22e67d7e45eb5942b67460d17013cb50a71d20974969d1e589792049a3b9f4"
+  },
+  "model": {
+    "name": "qwen2.5:1.5b",
+    "digest": "65ec06548149b04c096a120e4a6da9d4017ea809c91734ea5631e89f96ddc57b",
+    "quantization": "Q4_K_M",
+    "runtime": "ollama 0.34.2",
+    "draws_per_arm_case": 3
+  },
+  "arms": {
+    "raw_json": {
+      "grounded_correct": 33,
+      "total_draws": 60,
+      "false_abstain": 15,
+      "unsupported_or_wrong": 12,
+      "majority_correct_cases": 11
+    },
+    "view_json": {
+      "grounded_correct": 43,
+      "total_draws": 60,
+      "false_abstain": 6,
+      "unsupported_or_wrong": 11,
+      "majority_correct_cases": 14
+    },
+    "view_text": {
+      "grounded_correct": 48,
+      "total_draws": 60,
+      "false_abstain": 0,
+      "unsupported_or_wrong": 12,
+      "majority_correct_cases": 16
+    }
+  },
+  "selected_candidate": "view_text",
+  "selection_reason": "Highest grounded-correct count and zero false abstentions without increasing unsupported_or_wrong relative to raw_json. H04/H07/H08 remain unsupported-context failures and were not tuned; H05 remains unstable and is not treated as solved.",
+  "no_production_integration_yet": true,
+  "validation_required": "scientific_validation40"
+}
