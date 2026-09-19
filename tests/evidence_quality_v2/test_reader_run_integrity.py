@@ -70,3 +70,30 @@ def test_reader_record_requires_frozen_model_identity():
             system_prompt="s", question="q", rendered_context="c",
             model_identity={"model": "qwen2.5:1.5b"}, provider_response={},
         )
+
+
+def test_case_pairing_accepts_actual_reader_record_ids():
+    def record(arm):
+        return make_reader_record(
+            case_id="x", arm=arm, draw=0,
+            system_prompt="s", question="q", rendered_context="c",
+            model_identity=MODEL, provider_response={"message": {"content": "answer"}},
+        )
+    paired = pair_by_case_id({"A": [record("A")], "C": [record("C")]})
+    assert paired["x"]["A"]["case_id"] == paired["x"]["C"]["case_id"] == "x"
+
+
+def test_case_pairing_rejects_conflicting_legacy_and_record_ids():
+    with pytest.raises(ValueError, match="conflicting case id"):
+        pair_by_case_id({"A": [{"id": "x", "case_id": "other"}]})
+
+
+def test_reader_record_keeps_replayable_inputs_not_only_their_digest():
+    record = make_reader_record(
+        case_id="x", arm="A", draw=0,
+        system_prompt="system", question="question", rendered_context="source\n☃",
+        model_identity=MODEL, provider_response={"message": {"content": "answer"}},
+    )
+    assert record["model_input"] == {
+        "system_prompt": "system", "question": "question", "rendered_context": "source\n☃",
+    }

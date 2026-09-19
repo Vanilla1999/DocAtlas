@@ -9,7 +9,7 @@ from typing import Any
 from ._docs_context_payload import _payload
 from .source_continuation import attach_source_continuation_locators
 from .visible_evidence_retention import retains_visible_sources
-from .context_query_probes import independent_query_probes
+from .context_query_probes import independent_query_probes, _has_visible_non_path_exact_term, _normalized_path
 from docmancer.docs.domain.context_hint_policy import fallback_context_query_ids, has_context_hint_support
 
 from docmancer.docs.application.context_selection import (
@@ -45,7 +45,6 @@ from docmancer.docs.domain.evidence_qualification import (
     qualify_evidence,
 )
 from docmancer.docs.domain.query_terms import documentation_exact_terms
-from docmancer.docs.domain.documentation_query_plan import technical_anchors
 from docmancer.docs.domain.lifecycle_policy import lifecycle_intent
 from docmancer.docs.domain.normative_language import _FORBIDDEN_RE, _REQUIRED_RE
 
@@ -941,27 +940,6 @@ def _required_query_ids(query_plan: dict[str, Any]) -> tuple[str, ...]:
     return tuple(str(value) for value in values if value)
 
 
-def _has_visible_non_path_exact_term(
-    *, raw_text: str, original_question: str, explicit_paths: set[str],
-) -> bool:
-    # Use whole anchors, not CamelCase substrings extracted from a file path.
-    # A heading such as "Reference" is not evidence for a topic merely because
-    # the requested file is named REFERENCE.md. Apply the ordinary body qualifier
-    # here too; headings, links and identifier prefixes cannot satisfy a topic.
-    terms = (
-        term for term in technical_anchors(original_question)
-        if "/" not in term and "\\" not in term
-        and _normalized_path(term) not in explicit_paths
-    )
-    return any(
-        qualify_evidence(
-            {"query_text": term, "query_terms": [term], "exact_terms": [term]},
-            query_id="exact-topic", visible_text=raw_text, evidence_text=raw_text,
-        ).qualified
-        for term in terms
-    )
-
-
 def _query_ids_for_origins(
     query_plan: dict[str, Any], origins: set[str],
 ) -> set[str]:
@@ -972,10 +950,6 @@ def _query_ids_for_origins(
         and str(item.get("origin") or "") in origins
         and item.get("query_id")
     }
-
-
-def _normalized_path(value: Any) -> str:
-    return str(value or "").replace("\\", "/").removeprefix("./").casefold()
 
 
 def _public_query_ids(query_plan: dict[str, Any]) -> tuple[str, ...]:

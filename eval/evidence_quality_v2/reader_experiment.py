@@ -28,7 +28,11 @@ def pair_by_case_id(
     for lane, rows in lanes.items():
         lane_map: dict[str, dict[str, Any]] = {}
         for row in rows:
-            case_id = str(row.get("id") or "")
+            legacy_id = str(row.get("id") or "")
+            record_id = str(row.get("case_id") or "")
+            if legacy_id and record_id and legacy_id != record_id:
+                raise ValueError(f"conflicting case id in lane {lane}")
+            case_id = record_id or legacy_id
             if not case_id:
                 raise ValueError(f"missing case id in lane {lane}")
             if case_id in lane_map:
@@ -87,6 +91,11 @@ def make_reader_record(
         "model_input_sha256": hashlib.sha256(
             model_input.encode("utf-8")
         ).hexdigest(),
+        "model_input": {
+            "system_prompt": system_prompt,
+            "question": question,
+            "rendered_context": rendered_context,
+        },
         "model_identity": deepcopy(model_identity),
         "provider_response": deepcopy(provider_response),
     }
