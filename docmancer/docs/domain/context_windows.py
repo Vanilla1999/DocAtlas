@@ -65,6 +65,12 @@ def _is_complete_source_span(text: str, snippet: str) -> bool:
     # the meaning of an otherwise plausible prefix.  Reuse the structural
     # alternatives already derived from the authorized source span and accept
     # an item (or a contiguous run of items) only on complete item boundaries.
+    item_start, item_end = start, end
+    while item_start < item_end and text[item_start].isspace():
+        item_start += 1
+    while item_end > item_start and text[item_end - 1].isspace():
+        item_end -= 1
+
     structural_spans = source_block_alternatives(text).spans
     list_spans = [
         span for span in structural_spans
@@ -80,10 +86,14 @@ def _is_complete_source_span(text: str, snippet: str) -> bool:
         )
     ]
     touched_items = [
-        span for span in atomic_items if span[0] < end and start < span[1]
+        span for span in atomic_items
+        if span[0] < item_end and item_start < span[1]
     ]
     if touched_items:
-        return start == touched_items[0][0] and end == touched_items[-1][1]
+        return (
+            item_start == touched_items[0][0]
+            and item_end == touched_items[-1][1]
+        )
 
     left = text[:start]
     right = text[end:]
