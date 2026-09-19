@@ -1,0 +1,89 @@
+name: Grounded Docs hybrid comparison
+on:
+  push:
+    branches: [fix/v13-v15-evidence-pipeline]
+    paths:
+      - .github/workflows/grounded-docs-hybrid-compare.yml
+
+permissions:
+  contents: read
+
+jobs:
+  compare:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    env:
+      DOCS_MCP_APP_STORE_PATH: ${{ github.workspace }}/.grounded-hybrid-store
+      DOCS_MCP_APP_TELEMETRY_ENABLED: 'false'
+      DOCS_MCP_SCRAPER_SECURITY_FILE_ACCESS_MODE: unrestricted
+      OPENAI_API_KEY: ollama
+      OPENAI_API_BASE: http://127.0.0.1:11434/v1
+      DOCS_MCP_EMBEDDING_MODEL: openai:all-minilm
+      DOCS_MCP_EMBEDDINGS_VECTOR_DIMENSION: '384'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: 95e61265656283d609bc1328c46c52b2bf1a069e
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Prepare comparable project-doc corpus
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p gd-corpus
+          for p in docs wiki roadmap adr adrs runbook runbooks; do
+            if [ -e "$p" ]; then cp -a "$p" gd-corpus/; fi
+          done
+          for f in README.md SKILL.md CHANGELOG.md CONTRIBUTING.md ARCHITECTURE.md; do
+            if [ -f "$f" ]; then cp "$f" gd-corpus/; fi
+          done
+      - name: Install Grounded Docs and Ollama
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm install --no-save @arabold/docs-mcp-server@3.1.0
+          curl -fsSL https://ollama.com/install.sh | sh
+          ollama serve > "$RUNNER_TEMP/ollama.log" 2>&1 &
+          for i in $(seq 1 30); do curl -fsS http://127.0.0.1:11434/api/tags >/dev/null && break; sleep 1; done
+          ollama pull all-minilm
+          curl -fsS http://127.0.0.1:11434/api/embed -H 'Content-Type: application/json' -d '{"model":"all-minilm","input":"dimension probe"}' > "$RUNNER_TEMP/embed-probe.json"
+      - name: Index hybrid corpus
+        shell: bash
+        run: |
+          set -euo pipefail
+          ./node_modules/.bin/docs-mcp-server scrape docatlas file://$GITHUB_WORKSPACE/gd-corpus --version 0.0.0-95e6126 --embedding-model openai:all-minilm --quiet
+          ./node_modules/.bin/docs-mcp-server list --output json --quiet > "$RUNNER_TEMP/list.json"
+      - name: Run frozen 30 questions
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json, os, subprocess, time
+          from pathlib import Path
+          root=Path.cwd(); out=Path(os.environ['RUNNER_TEMP']); cli=root/'node_modules/.bin/docs-mcp-server'
+          cases=json.loads((root/'eval/project_context_quality/generic_blind_lookup_pair30_questions.json').read_text())['cases']
+          def search(q):
+              t=time.perf_counter()
+              p=subprocess.run([str(cli),'search','docatlas',q,'--version','0.0.0-95e6126','--exact-match','--limit','5','--output','json','--quiet'],cwd=root,text=True,stdout=subprocess.PIPE,stderr=subprocess.PIPE)
+              elapsed=time.perf_counter()-t
+              if p.returncode: return {'status':'error','stderr':p.stderr[-4000:],'elapsed_seconds':elapsed,'results':[]}
+              try: results=json.loads(p.stdout)
+              except Exception as exc: return {'status':'parse_error','stderr':str(exc),'stdout':p.stdout[:4000],'elapsed_seconds':elapsed,'results':[]}
+              return {'status':'ok','elapsed_seconds':elapsed,'results':results}
+          rows=[]
+          for c in cases:
+              root_s=search(c['question']); look=[search(q) for q in c.get('lookup_queries',[])]
+              rows.append({'id':c['id'],'question':c['question'],'lookup_queries':c.get('lookup_queries',[]),'root_search':root_s,'lookup_searches':look})
+              print(c['id'],root_s['status'],[x['status'] for x in look],flush=True)
+          payload={'schema_version':1,'competitor':'@arabold/docs-mcp-server','competitor_version':'3.1.0','retrieval_mode':'hybrid_openai_compatible_ollama_all_minilm','corpus_sha':'95e61265656283d609bc1328c46c52b2bf1a069e','library_version':'0.0.0-95e6126','search_limit':5,'cases':rows}
+          (out/'grounded-hybrid30.json').write_text(json.dumps(payload,indent=2,ensure_ascii=False))
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: grounded-docs-hybrid30
+          path: |
+            ${{ runner.temp }}/grounded-hybrid30.json
+            ${{ runner.temp }}/list.json
+            ${{ runner.temp }}/embed-probe.json
+            ${{ runner.temp }}/ollama.log
