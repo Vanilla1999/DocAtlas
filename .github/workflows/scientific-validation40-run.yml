@@ -1,0 +1,195 @@
+name: Scientific validation40 structural
+on:
+  push:
+    branches: [fix/v13-v15-evidence-pipeline]
+    paths:
+      - .github/workflows/scientific-validation40-run.yml
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  validation:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - name: Checkout frozen validation definitions
+        uses: actions/checkout@v4
+      - name: Checkout structural baseline
+        uses: actions/checkout@v4
+        with:
+          ref: b07dc52bd7ba02a449477bc534cc84dc1d276ffd
+          path: baseline-runtime
+      - name: Checkout structural candidate
+        uses: actions/checkout@v4
+        with:
+          ref: e5e1bec980caa1b66758f655940d519f0ba2fa04
+          path: candidate-runtime
+      - name: Download frozen validation source artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: scientific-validation40-frozen-sources
+          path: ${{ runner.temp }}/validation-sources
+          run-id: 35442584246
+          github-token: ${{ github.token }}
+      - uses: astral-sh/setup-uv@v6
+      - name: Verify frozen protocol identities
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git hash-object eval/scientific_validation40/questions.json)" = "6802f6d56bafad51475787320d574ada218560c8"
+          test "$(git hash-object eval/scientific_validation40/gold_spans.json)" = "a34c451430f2390201b9dfd3845074c0c6b45619"
+          test "$(sha256sum "$RUNNER_TEMP/validation-sources/manifest.json" | awk '{print $1}')" = "f92d5fcea6cfcb4a8e95f8711b8ccfb40d7cd521b85e14e61d8747e5829d5f3f"
+      - name: Sync baseline and candidate
+        run: |
+          (cd baseline-runtime && uv sync --frozen --extra dev)
+          (cd candidate-runtime && uv sync --frozen --extra dev)
+      - name: Write fixed validation runner
+        shell: bash
+        run: |
+          cat > "$RUNNER_TEMP/run_validation40.py" <<'PY'
+          from __future__ import annotations
+          import argparse, hashlib, json
+          from pathlib import Path
+
+          ap=argparse.ArgumentParser()
+          ap.add_argument('--questions',type=Path,required=True)
+          ap.add_argument('--gold',type=Path,required=True)
+          ap.add_argument('--source-artifact',type=Path,required=True)
+          ap.add_argument('--workspace',type=Path,required=True)
+          ap.add_argument('--output',type=Path,required=True)
+          a=ap.parse_args()
+
+          from eval.evidence_quality_v2.runtime import write_project, isolated_service, index_project
+          from eval.evidence_quality_v2.semantic import assess_context
+          from eval.project_context_quality.capture_public_context import capture_public_call
+          from docmancer.docs.application.model_visible_projection_helpers import docs_context_budget_tokens
+
+          questions=json.loads(a.questions.read_text())['cases']
+          gold={x['id']:x for x in json.loads(a.gold.read_text())['cases']}
+          manifest=json.loads((a.source_artifact/'manifest.json').read_text())
+          rows_by_family={}
+          for row in manifest['sources']:
+              rows_by_family.setdefault(row['family'],[]).append(row)
+
+          def documents(family):
+              result={}
+              for row in rows_by_family[family]:
+                  p=a.source_artifact/'sources'/family/row['path']
+                  data=p.read_bytes()
+                  assert hashlib.sha256(data).hexdigest()==row['sha256'], row['path']
+                  result[row['path']]=data.decode('utf-8')
+              return result
+
+          def enriched_case(case, docs):
+              g=gold[case['id']]
+              claims=[]
+              for claim in g['required_claims']:
+                  c=dict(claim); sets=[]
+                  for witness in claim.get('witness_sets',[]):
+                      w=dict(witness); parts=[]
+                      for part in witness['parts']:
+                          p=dict(part)
+                          lines=docs[p['path']].splitlines()
+                          p['text']='\n'.join(lines[p['line_start']-1:p['line_end']])
+                          parts.append(p)
+                      w['parts']=parts; sets.append(w)
+                  c['witness_sets']=sets; claims.append(c)
+              return {**case,'required_claims':claims,'policy':{'scope':'project','authority':'source_of_truth','lifecycle':'active'}}
+
+          def audit(payload, project_root):
+              errors=[]
+              if docs_context_budget_tokens(payload)>800: errors.append('token_budget')
+              if len(payload.get('sources') or [])>3: errors.append('source_cap')
+              if payload.get('kind')=='docs_context' and any(payload.get(k) is not False for k in ('answer_supported','answer_available','edit_ready')):
+                  errors.append('retrieval_only_flags')
+              for s in payload.get('sources') or []:
+                  rel=str(s.get('path_or_url') or '')
+                  p=(project_root/rel).resolve()
+                  if not p.is_relative_to(project_root.resolve()) or not p.is_file(): errors.append('source_escape'); continue
+                  text=p.read_text()
+                  snippet=str(s.get('snippet') or '')
+                  if not snippet or snippet not in text: errors.append('snippet_not_source')
+                  ls,le=s.get('line_start'),s.get('line_end')
+                  if type(ls) is not int or type(le) is not int or ls<1 or le<ls: errors.append('line_range'); continue
+                  region='\n'.join(text.splitlines()[ls-1:le])
+                  if snippet not in region: errors.append('line_binding')
+              return sorted(set(errors))
+
+          out=[]
+          for family in sorted({c['project_group'] for c in questions}):
+              docs=documents(family)
+              project=a.workspace/'corpus'/family
+              write_project(project,docs)
+              registry={row['path']:{'project_group':family,'version':row['commit'],'scope':'project','authority':'source_of_truth','lifecycle':'active'} for row in rows_by_family[family]}
+              with isolated_service(a.workspace/'state'/family) as (service,config):
+                  ingest=index_project(service,config,project)
+                  assert not ingest['excluded_or_failed_paths'], ingest
+                  for case in [x for x in questions if x['project_group']==family]:
+                      cap=capture_public_call(service,{'project_path':str(project),'scope':'all','question':case['question']})
+                      payload=cap['public_payload']
+                      ec=enriched_case(case,docs)
+                      assessment=assess_context(ec,payload,registry)
+                      documented_ids=[c['id'] for c in ec['required_claims'] if c.get('witness_sets')]
+                      documented_supported=sum(assessment['claims'][cid]['status']=='supported' for cid in documented_ids)
+                      row={'id':case['id'],'project_group':family,'answerability':case['answerability'],'question':case['question'],
+                           'payload':payload,'assessment':assessment,'documented_ids':documented_ids,'documented_supported':documented_supported,
+                           'documented_total':len(documented_ids),'audit_errors':audit(payload,project)}
+                      out.append(row)
+                      print(case['id'],case['answerability'],documented_supported,'/',len(documented_ids),assessment['context_sufficiency'],row['audit_errors'],flush=True)
+          a.output.write_text(json.dumps({'cases':out},indent=2,ensure_ascii=False))
+          PY
+      - name: Run frozen baseline
+        shell: bash
+        run: |
+          cd baseline-runtime
+          PYTHONPATH="$PWD" uv run --frozen --extra dev python "$RUNNER_TEMP/run_validation40.py" \
+            --questions "$GITHUB_WORKSPACE/eval/scientific_validation40/questions.json" \
+            --gold "$GITHUB_WORKSPACE/eval/scientific_validation40/gold_spans.json" \
+            --source-artifact "$RUNNER_TEMP/validation-sources" \
+            --workspace "$RUNNER_TEMP/shared-baseline" \
+            --output "$RUNNER_TEMP/baseline.json"
+      - name: Run frozen structural candidate
+        shell: bash
+        run: |
+          cd candidate-runtime
+          PYTHONPATH="$PWD" uv run --frozen --extra dev python "$RUNNER_TEMP/run_validation40.py" \
+            --questions "$GITHUB_WORKSPACE/eval/scientific_validation40/questions.json" \
+            --gold "$GITHUB_WORKSPACE/eval/scientific_validation40/gold_spans.json" \
+            --source-artifact "$RUNNER_TEMP/validation-sources" \
+            --workspace "$RUNNER_TEMP/shared-candidate" \
+            --output "$RUNNER_TEMP/candidate.json"
+      - name: Compare frozen structural results
+        shell: bash
+        run: |
+          python - <<'PY'
+          import json, os
+          from pathlib import Path
+          t=Path(os.environ['RUNNER_TEMP'])
+          a=json.loads((t/'baseline.json').read_text())['cases']; b=json.loads((t/'candidate.json').read_text())['cases']
+          A={x['id']:x for x in a}; B={x['id']:x for x in b}; assert set(A)==set(B)
+          def ok(x): return x['documented_total']>0 and x['documented_supported']==x['documented_total'] and not x['audit_errors']
+          answerable=[cid for cid in A if A[cid]['answerability']=='within_budget']
+          partial=[cid for cid in A if A[cid]['answerability']=='partial']
+          controls=[cid for cid in A if A[cid]['answerability']=='unanswerable']
+          wins=[cid for cid in answerable if ok(B[cid]) and not ok(A[cid])]
+          losses=[cid for cid in answerable if ok(A[cid]) and not ok(B[cid])]
+          partial_losses=[cid for cid in partial if B[cid]['documented_supported'] < A[cid]['documented_supported']]
+          new_audit=[cid for cid in A if B[cid]['audit_errors'] and not A[cid]['audit_errors']]
+          out={'answerable':{'baseline':sum(ok(A[c]) for c in answerable),'candidate':sum(ok(B[c]) for c in answerable),'total':len(answerable),'wins':wins,'losses':losses},
+               'partial_documented':{'baseline':sum(A[c]['documented_supported'] for c in partial),'candidate':sum(B[c]['documented_supported'] for c in partial),'claims':sum(A[c]['documented_total'] for c in partial),'losses':partial_losses},
+               'unanswerable_controls':len(controls),'new_audit_errors':new_audit,
+               'pairwise':[{'id':cid,'answerability':A[cid]['answerability'],'baseline_supported':A[cid]['documented_supported'],'candidate_supported':B[cid]['documented_supported'],'baseline_audit':A[cid]['audit_errors'],'candidate_audit':B[cid]['audit_errors']} for cid in sorted(A)]}
+          (t/'comparison.json').write_text(json.dumps(out,indent=2,ensure_ascii=False))
+          print(json.dumps({k:v for k,v in out.items() if k!='pairwise'},indent=2))
+          if losses or partial_losses or new_audit: raise SystemExit('validation regression')
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: scientific-validation40-structural
+          path: |
+            ${{ runner.temp }}/baseline.json
+            ${{ runner.temp }}/candidate.json
+            ${{ runner.temp }}/comparison.json
