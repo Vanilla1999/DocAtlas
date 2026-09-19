@@ -1,0 +1,63 @@
+{
+  "schema_version": 1,
+  "status": "verified_green",
+  "candidate_runtime": "8cecc0e1355376699bd18d8eb7a720cff6868be0",
+  "evidence": "Task 4.1 hermetic safety matrix completed successfully in GitHub Actions run 35435837777.",
+  "controls": [
+    {
+      "requirement": "original defect, renamed/generic cases, positive chunking and nearby chunking distractor",
+      "tests": [
+        "tests/docs/test_retrieval_alias_subject_binding.py"
+      ]
+    },
+    {
+      "requirement": "foreign project, stale, risk and lifecycle eligibility",
+      "tests": [
+        "tests/docs/test_query_planning_completion_safety.py::test_same_atom_continuation_rechecks_source_eligibility",
+        "tests/docs/test_list_item_continuation_bridge.py::test_cross_atom_list_continuation_still_rechecks_source_policy",
+        "tests/docs/test_evidence_selection.py::test_forbidden_source_and_instruction_risk_never_reenter_scoring",
+        "tests/docs/test_evidence_selection.py::test_stale_canonical_policy_and_navigation_only_docs_fail_closed"
+      ]
+    },
+    {
+      "requirement": "snapshot binding and changed-source rejection",
+      "tests": [
+        "tests/docs/test_source_continuation.py::test_changed_snapshot_never_returns_latest_text",
+        "tests/docs/test_source_continuation.py::test_policy_revocation_and_forged_cursor_reject_before_hydration",
+        "tests/docs/test_source_continuation.py::test_public_handler_binds_reader_to_real_active_sqlite_snapshot"
+      ]
+    },
+    {
+      "requirement": "version isolation",
+      "tests": [
+        "tests/docs/test_evidence_selection.py::test_wrong_exact_version_cannot_win_with_a_higher_score",
+        "tests/docs/test_evidence_selection.py::test_registered_exact_version_url_satisfies_the_exact_version_requirement",
+        "tests/docs/test_evidence_selection_part02.py::test_similar_chunks_with_distinct_symbols_and_versions_are_preserved"
+      ]
+    },
+    {
+      "requirement": "current versus release-history authority",
+      "tests": [
+        "tests/docs/test_current_source_authority_docs_parity.py::test_current_source_authority_is_documented_in_searchable_project_docs",
+        "tests/docs/test_context_ranking_regressions.py::test_history_stays_eligible_only_when_explicitly_requested"
+      ]
+    },
+    {
+      "requirement": "long structural unit / no silent clipping / insufficient instead of garbage",
+      "tests": [
+        "tests/docs/test_compact_context_blocks.py::test_long_complete_block_is_offered_before_budget_decision",
+        "tests/docs/test_compact_context_blocks.py::test_overbudget_block_is_not_silently_clipped",
+        "tests/docs/test_compact_context_blocks.py::test_structural_dependencies_are_not_silently_removed",
+        "tests/docs/test_model_visible_projection.py::test_insufficient_projection_is_fail_closed_and_at_most_300_tokens"
+      ]
+    },
+    {
+      "requirement": "duplicate text and source range integrity",
+      "tests": [
+        "tests/docs/test_context_span_growth.py::test_later_expansion_preserves_the_latest_accepted_exact_span",
+        "tests/docs/test_context_span_growth.py::test_public_table_span_and_hash_stay_bound_to_the_original_source",
+        "tests/docs/test_evidence_selection_part02.py::test_exact_overlap_and_near_duplicates_are_collapsed_without_text_merging"
+      ]
+    }
+  ]
+}
