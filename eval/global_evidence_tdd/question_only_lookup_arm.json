@@ -1,0 +1,163 @@
+{
+  "schema_version": 1,
+  "state": "frozen_exposed_development_arm",
+  "host_integration_verified": false,
+  "host_contract": "repository contract says host formulates same-question lookup_queries; no automatic host generator exists in this repository",
+  "constraints": [
+    "question-only wording; no source filenames, gold values, or expected answers",
+    "root question remains byte-for-byte unchanged",
+    "1-3 lookup queries in one bounded call; public server budget remains <=800 tokens and <=3 sources",
+    "this exposed arm is development evidence, not independent validation"
+  ],
+  "cases": [
+    {
+      "suite": "external80",
+      "id": "fastapi-06",
+      "question": "Из каких компонентов состоит origin в CORS?",
+      "lookup_queries": [
+        "components of an origin in CORS"
+      ],
+      "forbidden_answer_terms": [
+        "protocol",
+        "domain",
+        "port"
+      ]
+    },
+    {
+      "suite": "external80",
+      "id": "httpx-03",
+      "question": "Назови четыре типа timeout в HTTPX и объясни, что ограничивает каждый.",
+      "lookup_queries": [
+        "HTTPX timeout types and what each limits"
+      ],
+      "forbidden_answer_terms": [
+        "connect timeout",
+        "read timeout",
+        "write timeout",
+        "pool timeout"
+      ]
+    },
+    {
+      "suite": "external80",
+      "id": "typer-05",
+      "question": "Как записать только отрицательное имя boolean option: важен ли пробел перед /?",
+      "lookup_queries": [
+        "Typer boolean option negative name spacing before slash"
+      ],
+      "forbidden_answer_terms": [
+        "/-S",
+        " /-S"
+      ]
+    },
+    {
+      "suite": "external80",
+      "id": "uv-04",
+      "question": "How does uv restrict candidate versions across multiple indexes and why?",
+      "lookup_queries": [
+        "uv candidate versions across multiple indexes",
+        "why uv restricts candidate versions across multiple indexes"
+      ],
+      "forbidden_answer_terms": [
+        "dependency confusion",
+        "first index"
+      ]
+    },
+    {
+      "suite": "generic30",
+      "id": "G01",
+      "question": "If a documentation search result is shortened because it cannot include everything, how can I tell what was left out?",
+      "lookup_queries": [
+        "shortened documentation response omitted material",
+        "truncated documentation result missing content"
+      ],
+      "forbidden_answer_terms": [
+        "omitted_counts"
+      ]
+    },
+    {
+      "suite": "generic30",
+      "id": "G03",
+      "question": "If a documentation answer is cut short, does that mean important evidence may have been silently removed?",
+      "lookup_queries": [
+        "truncated documentation answer importance of omitted material",
+        "cut short result omitted evidence"
+      ],
+      "forbidden_answer_terms": [
+        "non-critical"
+      ]
+    },
+    {
+      "suite": "generic30",
+      "id": "G17",
+      "question": "If I want to know when a feature changed and in which release, what kind of documentation should I search first?",
+      "lookup_queries": [
+        "feature change release history source",
+        "when feature changed release notes"
+      ],
+      "forbidden_answer_terms": [
+        "CHANGELOG.md"
+      ]
+    },
+    {
+      "suite": "generic30",
+      "id": "G21",
+      "question": "If my question compares two things, should I split it into separate documentation searches before seeing the first result?",
+      "lookup_queries": [
+        "comparison question retrieval planning",
+        "split comparison before first documentation result"
+      ],
+      "forbidden_answer_terms": [
+        "SKILL.md"
+      ]
+    },
+    {
+      "suite": "generic30",
+      "id": "G22",
+      "question": "If my question means the same thing as the docs but uses different terminology, should I add alternate phrasings to the same search or start unrelated searches?",
+      "lookup_queries": [
+        "same question different terminology retrieval",
+        "alternate phrasing same documentation search"
+      ],
+      "forbidden_answer_terms": [
+        "lookup_queries"
+      ]
+    },
+    {
+      "suite": "generic30",
+      "id": "G27",
+      "question": "If the system says it does not have enough documentation evidence, should I keep rephrasing the question over and over until something appears?",
+      "lookup_queries": [
+        "not enough documentation evidence rephrase retry",
+        "repeated rephrasing after insufficient evidence"
+      ],
+      "forbidden_answer_terms": [
+        "rephrase_question"
+      ]
+    },
+    {
+      "suite": "target30",
+      "id": "DR30-26",
+      "question": "Should a comparison question normally be split into multiple retrieval calls before the first bounded documentation packet is inspected?",
+      "lookup_queries": [
+        "comparison question retrieval planning",
+        "split comparison before first documentation result"
+      ],
+      "forbidden_answer_terms": [
+        "SKILL.md",
+        "no-pre-split"
+      ]
+    },
+    {
+      "suite": "target30",
+      "id": "DR30-30",
+      "question": "When should bounded retrieval stop rather than continuing solely because context quality is not perfect?",
+      "lookup_queries": [
+        "when to stop bounded documentation retrieval",
+        "imperfect context quality stop retrieval"
+      ],
+      "forbidden_answer_terms": [
+        "unverified"
+      ]
+    }
+  ]
+}

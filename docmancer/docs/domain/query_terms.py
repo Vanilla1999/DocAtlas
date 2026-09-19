@@ -124,6 +124,37 @@ def documentation_exact_terms(
     return tuple(found)
 
 
+
+@dataclass(frozen=True, slots=True)
+class QueryConstraintRoles:
+    hard_exact: tuple[str, ...]
+    bound_subjects: tuple[str, ...]
+    retrieval_anchors: tuple[str, ...]
+
+
+def query_constraint_roles(question: str) -> QueryConstraintRoles:
+    """Separate code identity from source-bound subjects and retrieval anchors."""
+    hard = tuple(dict.fromkeys(term.normalized_value for term in documentation_exact_terms(question)))
+    hard_set = set(hard)
+    subjects: list[str] = []
+    anchors: list[str] = []
+    for raw in documentation_technical_anchors(question):
+        normalized = raw.casefold()
+        if normalized in hard_set:
+            continue
+        anchors.append(normalized)
+        if (
+            any(char.islower() for char in raw)
+            and any(char.isupper() for char in raw[1:])
+            and not raw.isupper()
+        ):
+            subjects.append(normalized)
+    return QueryConstraintRoles(
+        hard_exact=hard,
+        bound_subjects=tuple(dict.fromkeys(subjects)),
+        retrieval_anchors=tuple(dict.fromkeys(anchors)),
+    )
+
 def _looks_like_source_path(value: str) -> bool:
     normalized = value.replace("\\", "/")
     first = normalized.partition("/")[0]
@@ -137,9 +168,11 @@ def _looks_like_source_path(value: str) -> bool:
 
 __all__ = [
     "DocumentationExactTerm",
+    "QueryConstraintRoles",
     "documentation_exact_terms",
     "documentation_query_terms",
     "documentation_technical_anchors",
+    "query_constraint_roles",
     "is_exact_technical_token",
 ]
 

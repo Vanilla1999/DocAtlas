@@ -18,10 +18,11 @@ from docmancer.docs.domain.evidence_qualification import (
 )
 from docmancer.docs.domain.project_doc_ranking import condition_lead_priority
 from docmancer.docs.domain.project_retrieval_intent import build_project_retrieval_aliases
+from docmancer.docs.application.retrieval_need_support import apply_retrieval_need_witness
 from docmancer.docs.domain.query_terms import (
-    documentation_exact_terms,
     documentation_query_terms,
     documentation_technical_anchors,
+    query_constraint_roles,
     supplemental_query_is_useful,
 )
 
@@ -121,10 +122,9 @@ def _tag_retrieval_query(
         if query_text:
             if trace.get("query_text") != query_text:
                 trace["query_terms"] = list(documentation_query_terms(query_text))
-                trace["exact_terms"] = list(dict.fromkeys((
-                    *(term.normalized_value for term in documentation_exact_terms(query_text)),
-                    *(term.casefold() for term in documentation_technical_anchors(query_text)),
-                )))
+                roles = query_constraint_roles(query_text)
+                trace.update(exact_terms=list(roles.hard_exact), bound_subjects=list(roles.bound_subjects),
+                             retrieval_anchors=list(roles.retrieval_anchors))
             trace["query_text"] = query_text
         if lookup is not None:
             trace.update({
@@ -135,10 +135,14 @@ def _tag_retrieval_query(
                 "forbidden_catalog_roles": list(lookup.forbidden_catalog_roles),
                 "forbidden_evidence_terms": list(lookup.forbidden_evidence_terms),
                 "parent_exact_terms": list(lookup.parent_exact_terms),
+                "need_subject": lookup.need_subject, "need_relation": lookup.need_relation, "need_context": lookup.need_context,
             })
+        heading_value = metadata.get("heading_path") or ""
+        heading_path = " > ".join(map(str, heading_value)) if isinstance(heading_value, (list, tuple)) else str(heading_value)
+        if heading_path: trace["bound_subject_context"] = heading_path.rsplit(">", 1)[-1].strip()
         visible_text = "\n".join(str(value or "") for value in (
             metadata.get("project_doc_path") or chunk.source,
-            metadata.get("title"), metadata.get("heading_path"), chunk.text,
+            metadata.get("title"), heading_path, chunk.text,
         ))
         trace = dict(qualify_evidence(
             trace, query_id=query_id, visible_text=visible_text,
@@ -148,6 +152,8 @@ def _tag_retrieval_query(
             expected_project_identity=expected_project_identity,
             lifecycle_intent=lifecycle_intent,
         ).trace)
+        trace = apply_retrieval_need_witness({**trace, "query_id": query_id, "text": query_text or ""}, trace, chunk.text,
+            source={"heading_path": heading_path, "authority": metadata.get("authority"), "lifecycle_status": metadata.get("lifecycle_status")})
         matches = dict(metadata.get("retrieval_query_matches") or {})
         matches[query_id] = trace
         parent_trace = (
@@ -167,7 +173,6 @@ def _tag_retrieval_query(
         })
         tagged.append(chunk.model_copy(update={"metadata": metadata}))
     return tagged
-
 
 def _starts_markdown_list_item(text: str) -> bool:
     value = str(text or "").lstrip()
@@ -258,7 +263,6 @@ def _qualify_same_atom_continuations(chunks: list[Any], query_id: str) -> list[A
             result[index] = candidate.model_copy(update={"metadata": updated})
             break
     return result
-
 def _merge_same_atom_continuations(
     chunks: list[Any], query_id: str, *, max_chars: int = 1024,
 ) -> list[Any]:
@@ -318,7 +322,7 @@ def _qualify_candidate_lookups(
     Existing discovery traces keep their scores; a cross-check has no BM25 score.
     """
     lookups = [item for item in plan.queries
-               if item.origin == "host_lookup" and not item.public_parent_query_id]
+               if item.origin in {"original", "host_lookup", "retrieval_need"} and not item.public_parent_query_id]
     result = []
     for chunk in chunks:
         for lookup in lookups:
@@ -334,10 +338,9 @@ def _qualify_candidate_lookups(
                 trace.pop(field, None)
             trace.update(lexical_score=0.0, qualification_route="cross_lane_body",
                          query_term_count=len(trace.get("query_terms") or ()))
+            if lookup.origin == "original": trace["admission_only"] = True
         result.append(chunk)
     return result
-
-
 class _ProjectDocsServicePart03:
     def query_project_docs(
         self,
@@ -587,15 +590,12 @@ class _ProjectDocsServicePart03:
                 *queries_by_origin.get("retrieval_hint", []),
             ],
         ])
-        # Recover a wholly unqualified pool without letting additional weak
-        # cross-lane matches displace existing qualified evidence. Visible
-        # projector requalification remains authoritative after admission.
-        if not any((chunk.metadata or {}).get("retrieval_query_ids") for chunk in candidates):
-            candidates = _qualify_candidate_lookups(
-                candidates, documentation_query_plan,
-                expected_project_identity=filters["project_identity"],
-                lifecycle_intent=answer_lifecycle_intent,
-            )
+        # Cross-check selected candidates without extra retrieval.
+        candidates = _qualify_candidate_lookups(
+            candidates, documentation_query_plan,
+            expected_project_identity=filters["project_identity"],
+            lifecycle_intent=answer_lifecycle_intent,
+        )
         candidates.sort(key=lambda chunk: _candidate_admission_priority(query, chunk))
         if internal_diagnostics is not None:
             internal_diagnostics.update(

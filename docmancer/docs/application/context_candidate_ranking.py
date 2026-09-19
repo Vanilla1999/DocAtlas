@@ -4,7 +4,7 @@ from __future__ import annotations
 import re
 import math
 from typing import Any
-from .context_selection import component_witnesses, qualified_query_ids
+from .context_selection import attributable_query_ids, component_witnesses, qualified_query_ids
 from docmancer.docs.domain.context_windows import _query_terms
 from docmancer.docs.domain.project_doc_ranking import (
     condition_lead_priority, project_question_lane, project_source_lane, technical_anchors,
@@ -25,12 +25,12 @@ def _prefer_missing_baseline_candidate(
     """Protect baseline evidence without starving independent host lookups."""
     if not host_query_ids:
         return
-    selected_ids = qualified_query_ids(selected)
+    selected_ids = attributable_query_ids(selected)
     missing_host = host_query_ids - selected_ids
     preserve_lookup_diversity = len(host_query_ids) > 1 and bool(missing_host)
 
     def protects(candidate: Any, wanted_ids: set[str]) -> bool:
-        candidate_ids = qualified_query_ids((candidate,))
+        candidate_ids = attributable_query_ids((candidate,))
         return bool(candidate_ids & wanted_ids) and (
             not preserve_lookup_diversity or bool(candidate_ids & missing_host)
         )
@@ -57,7 +57,7 @@ def _context_rank(
     matches = source.get("retrieval_query_matches") or {}
     qualified = [
         query_id for query_id, trace in matches.items()
-        if isinstance(trace, dict) and trace.get("qualified") is True
+        if isinstance(trace, dict) and trace.get("qualified") is True and trace.get("admission_only") is not True
     ]
     lexical = sum(
         float((matches.get(query_id) or {}).get("lexical_score") or 0.0)
@@ -152,6 +152,7 @@ def _facet_aware_candidates(
     exact_query_ids: set[str] | None = None,
     host_query_ids: set[str] | None = None,
     fallback_query_ids: set[str] | None = None,
+    need_query_ids: set[str] | None = None,
     obligations: tuple[Any, ...] = (), missing_component_ids: set[str] | None = None,
 ) -> list[Any]:
     # Audited directions break public-coverage ties; they are not public queries.
@@ -179,6 +180,7 @@ def _facet_aware_candidates(
     def candidate_key(source: Any) -> tuple[Any, ...]:
         qualified_ids = qualified_query_ids((source,))
         exact_count = len(qualified_ids & (exact_query_ids or set()))
+        need_count = len(qualified_ids & (need_query_ids or set()))
         component_count = len(
             set(component_witnesses(source, obligations)) & (missing_component_ids or set())
         )
@@ -300,6 +302,7 @@ def _facet_aware_candidates(
             else 0.0
         )
         return (
+            need_count,
             condition_lead_priority(root_question, str(source.get("snippet") or "")),
             generic_action_priority,
             required_relation_preference,
@@ -587,7 +590,8 @@ def _fully_matched_query_ids(sources: Any) -> set[str]:
     for source in sources:
         body = str(source.get("snippet") or source.get("content") or "")
         for query_id, trace in (source.get("retrieval_query_matches") or {}).items():
-            if not isinstance(trace, dict) or trace.get("qualified") is not True:
+            if (not isinstance(trace, dict) or trace.get("qualified") is not True
+                    or trace.get("admission_only") is True):
                 continue
             question = str(trace.get("query_text") or "")
             if recognized_request_parts(question):

@@ -157,7 +157,7 @@ def context_selection_decision(
     sources: Iterable[Mapping[str, Any]], requested_query_ids: Iterable[str],
 ) -> ContextSelectionDecision:
     selected = tuple(str(source.get("evidence_id") or "") for source in sources)
-    covered_set = qualified_query_ids(sources)
+    covered_set = attributable_query_ids(sources)
     requested = tuple(dict.fromkeys(str(value) for value in requested_query_ids if value))
     return ContextSelectionDecision(
         selected_evidence_ids=selected,
@@ -260,6 +260,19 @@ def qualified_query_ids(sources: Iterable[Mapping[str, Any]]) -> set[str]:
             str(query_id)
             for query_id, trace in matches.items()
             if isinstance(trace, Mapping) and trace.get("qualified") is True
+        )
+    return qualified
+
+
+def attributable_query_ids(sources: Iterable[Mapping[str, Any]]) -> set[str]:
+    """Qualified retrieval directions allowed to affect public coverage/ranking."""
+    qualified: set[str] = set()
+    for source in sources:
+        matches = source.get("retrieval_query_matches") or {}
+        qualified.update(
+            str(query_id) for query_id, trace in matches.items()
+            if isinstance(trace, Mapping) and trace.get("qualified") is True
+            and trace.get("admission_only") is not True
         )
     return qualified
 
