@@ -1,0 +1,104 @@
+name: Retrieval sealed holdout 20 fast
+on:
+  push:
+    branches: [fix/v13-v15-evidence-pipeline]
+    paths: [.github/workflows/retrieval-holdout20-fast.yml]
+permissions: {contents: read}
+jobs:
+  holdout:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with: {ref: 7b92cc5e8a99ee7394fde93b46797c5bd0b162a8, path: baseline-runtime}
+      - uses: actions/checkout@v4
+        with: {ref: 8cecc0e1355376699bd18d8eb7a720cff6868be0, path: candidate-runtime}
+      - uses: actions/checkout@v4
+        with: {ref: 95e61265656283d609bc1328c46c52b2bf1a069e, path: frozen-corpus}
+      - uses: astral-sh/setup-uv@v6
+      - name: Sync runtimes
+        run: |
+          (cd baseline-runtime && uv sync --frozen --extra dev)
+          (cd candidate-runtime && uv sync --frozen --extra dev)
+      - name: Materialize one shared external corpus
+        shell: bash
+        run: |
+          python - <<'PY'
+          import hashlib,json,os
+          from pathlib import Path
+          root=Path.cwd(); eq=root/'frozen-corpus/eval/evidence_quality_v2'; out=Path(os.environ['RUNNER_TEMP'])/'shared-corpus'; out.mkdir()
+          manifest=json.loads((eq/'source-manifest.json').read_text())
+          for row in manifest['sources']:
+              src=eq/'sources'/row['project']/row['path']; data=src.read_bytes(); assert hashlib.sha256(data).hexdigest()==row['sha256']
+              dst=out/row['project']/row['path']; dst.parent.mkdir(parents=True,exist_ok=True); dst.write_bytes(data)
+          PY
+      - name: Write common retrieval runner
+        shell: bash
+        run: |
+          cat > "$RUNNER_TEMP/run.py" <<'PY'
+          import argparse,json,time
+          from pathlib import Path
+          ap=argparse.ArgumentParser(); ap.add_argument('--questions',type=Path,required=True); ap.add_argument('--corpus',type=Path,required=True); ap.add_argument('--state',type=Path,required=True); ap.add_argument('--out',type=Path,required=True); a=ap.parse_args()
+          from eval.evidence_quality_v2.runtime import isolated_service,index_project
+          from eval.project_context_quality.capture_public_context import capture_public_call
+          cases=json.loads(a.questions.read_text())['cases']; rows=[]
+          for project in sorted({c['project_group'] for c in cases}):
+              pr=a.corpus/project
+              with isolated_service(a.state/project) as (service,config):
+                  index_project(service,config,pr)
+                  for c in [x for x in cases if x['project_group']==project]:
+                      st=time.perf_counter(); cap=capture_public_call(service,{'project_path':str(pr),'scope':'all','question':c['question']}); sec=time.perf_counter()-st; p=cap['public_payload']
+                      assert (p.get('estimated_tokens') or 0)<=800 and len(p.get('sources') or [])<=3
+                      rows.append({'id':c['id'],'project_group':project,'question':c['question'],'elapsed_seconds':sec,'public_payload':p})
+          a.out.write_text(json.dumps({'cases':rows},indent=2,ensure_ascii=False))
+          PY
+      - name: Retrieve both lanes on identical paths
+        shell: bash
+        run: |
+          (cd baseline-runtime && PYTHONPATH="$PWD" uv run --frozen --extra dev python "$RUNNER_TEMP/run.py" --questions "$GITHUB_WORKSPACE/eval/retrieval_recheck/holdout20_questions.json" --corpus "$RUNNER_TEMP/shared-corpus" --state "$RUNNER_TEMP/state-base" --out "$RUNNER_TEMP/base.json")
+          (cd candidate-runtime && PYTHONPATH="$PWD" uv run --frozen --extra dev python "$RUNNER_TEMP/run.py" --questions "$GITHUB_WORKSPACE/eval/retrieval_recheck/holdout20_questions.json" --corpus "$RUNNER_TEMP/shared-corpus" --state "$RUNNER_TEMP/state-cand" --out "$RUNNER_TEMP/cand.json")
+          python - <<'PY'
+          import json,os
+          from pathlib import Path
+          t=Path(os.environ['RUNNER_TEMP']); a=json.loads((t/'base.json').read_text()); b=json.loads((t/'cand.json').read_text()); out=[]
+          for x,y in zip(a['cases'],b['cases']):
+              assert x['id']==y['id']; out.append({'id':x['id'],'packet_equal':x['public_payload']==y['public_payload']})
+          (t/'packet-pair.json').write_text(json.dumps(out,indent=2)); print(out)
+          PY
+      - name: Install Qwen reader
+        shell: bash
+        run: |
+          curl -fsSL https://ollama.com/install.sh | sh
+          ollama serve > "$RUNNER_TEMP/ollama.log" 2>&1 &
+          for i in $(seq 1 45); do curl -fsS http://127.0.0.1:11434/api/tags >/dev/null && break; sleep 1; done
+          ollama pull qwen2.5:1.5b
+      - name: Read packets, reuse only exact-identical input
+        shell: bash
+        run: |
+          python - <<'PY'
+          import json,os,urllib.request
+          from pathlib import Path
+          root=Path.cwd(); t=Path(os.environ['RUNNER_TEMP']); proto=json.loads((root/'eval/retrieval_recheck/holdout20_protocol.json').read_text()); system=proto['reader']['prompt']
+          a=json.loads((t/'base.json').read_text())['cases']; b=json.loads((t/'cand.json').read_text())['cases']
+          def ask(q,p):
+              body={'model':'qwen2.5:1.5b','stream':False,'messages':[{'role':'system','content':system},{'role':'user','content':'QUESTION:\n'+q+'\n\nCONTEXT (public packet JSON):\n'+json.dumps(p,ensure_ascii=False,separators=(',',':'))}],'options':{'temperature':0,'seed':0,'num_predict':160}}
+              req=urllib.request.Request('http://127.0.0.1:11434/api/chat',data=json.dumps(body).encode(),headers={'Content-Type':'application/json'})
+              with urllib.request.urlopen(req,timeout=180) as r:return json.loads(r.read())['message']['content']
+          ao=[];bo=[]; reused=0
+          for x,y in zip(a,b):
+              assert x['id']==y['id']; ans=ask(x['question'],x['public_payload']); ao.append({**x,'reader_answer':ans})
+              if x['public_payload']==y['public_payload']: ans2=ans; reused+=1
+              else: ans2=ask(y['question'],y['public_payload'])
+              bo.append({**y,'reader_answer':ans2}); print(x['id'],'equal=',x['public_payload']==y['public_payload'],repr(ans[:100]),flush=True)
+          (t/'baseline-reader.json').write_text(json.dumps({'cases':ao},indent=2,ensure_ascii=False)); (t/'candidate-reader.json').write_text(json.dumps({'cases':bo},indent=2,ensure_ascii=False)); print('reused',reused)
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: retrieval-sealed-holdout20-fast
+          path: |
+            ${{ runner.temp }}/base.json
+            ${{ runner.temp }}/cand.json
+            ${{ runner.temp }}/packet-pair.json
+            ${{ runner.temp }}/baseline-reader.json
+            ${{ runner.temp }}/candidate-reader.json
