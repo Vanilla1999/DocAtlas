@@ -59,3 +59,18 @@ def test_quoted_api_still_requires_literal_identity():
     trace = tagged.metadata["retrieval_query_matches"]["query-original"]
     assert trace["qualified"] is False
     assert "api" in trace.get("missing_exact_terms", ())
+
+@pytest.mark.parametrize("term", ["HTTPX", "CORS"])
+def test_long_bare_acronym_can_bind_source_scope_without_becoming_local_hard_exact(term):
+    roles = query_constraint_roles(f"What is {term} default behavior?")
+    assert term.casefold() not in roles.hard_exact
+    assert term.casefold() in roles.bound_subjects
+
+
+@pytest.mark.parametrize("question,expected", [
+    ("Which task ID does enqueue_task return?", {"id", "enqueue_task"}),
+    ("What does missing_symbol mean?", {"missing_symbol"}),
+])
+def test_short_acronym_and_symbol_shaped_tokens_remain_hard_identity(question, expected):
+    roles = query_constraint_roles(question)
+    assert expected <= set(roles.hard_exact)

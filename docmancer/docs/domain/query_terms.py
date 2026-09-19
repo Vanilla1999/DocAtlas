@@ -132,9 +132,28 @@ class QueryConstraintRoles:
     retrieval_anchors: tuple[str, ...]
 
 
+_SOFT_BARE_ACRONYM_ANCHORS = frozenset({"api", "sdk", "rpc"})
+
+
+def _technical_anchor_role(raw: str) -> str:
+    """Classify an unquoted technical anchor without weakening code identity."""
+    normalized = raw.casefold()
+    if normalized in _SOFT_BARE_ACRONYM_ANCHORS:
+        return "anchor"
+    if raw.isupper() and len(raw) > 3:
+        return "subject"
+    if (
+        any(char.islower() for char in raw)
+        and any(char.isupper() for char in raw[1:])
+        and not raw.isupper()
+    ):
+        return "subject"
+    return "hard"
+
+
 def query_constraint_roles(question: str) -> QueryConstraintRoles:
-    """Separate code identity from source-bound subjects and retrieval anchors."""
-    hard = tuple(dict.fromkeys(term.normalized_value for term in documentation_exact_terms(question)))
+    """Separate local code identity, source-bound subjects, and search anchors."""
+    hard = list(dict.fromkeys(term.normalized_value for term in documentation_exact_terms(question)))
     hard_set = set(hard)
     subjects: list[str] = []
     anchors: list[str] = []
@@ -142,15 +161,16 @@ def query_constraint_roles(question: str) -> QueryConstraintRoles:
         normalized = raw.casefold()
         if normalized in hard_set:
             continue
+        role = _technical_anchor_role(raw)
+        if role == "hard":
+            hard.append(normalized)
+            hard_set.add(normalized)
+            continue
         anchors.append(normalized)
-        if (
-            any(char.islower() for char in raw)
-            and any(char.isupper() for char in raw[1:])
-            and not raw.isupper()
-        ):
+        if role == "subject":
             subjects.append(normalized)
     return QueryConstraintRoles(
-        hard_exact=hard,
+        hard_exact=tuple(hard),
         bound_subjects=tuple(dict.fromkeys(subjects)),
         retrieval_anchors=tuple(dict.fromkeys(anchors)),
     )

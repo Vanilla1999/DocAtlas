@@ -392,7 +392,8 @@ def build_documentation_query_plan(
     forbidden_evidence_terms = tuple(dict.fromkeys(
         term for alias in retrieval_aliases for term in alias.forbidden_evidence_terms
     )) if trusted_original_policy else ()
-    parent_exact_terms = query_constraint_roles(question).hard_exact
+    question_roles = query_constraint_roles(question)
+    parent_exact_terms = tuple(dict.fromkeys((*question_roles.hard_exact, *question_roles.bound_subjects)))
     force_context_only = (
         project_retrieval_disposition(question) == "broad_context"
         and any(alias.force_context_only for alias in retrieval_aliases)
@@ -494,7 +495,8 @@ def build_documentation_query_plan(
     host_rewrite_count = 0
     for parent_query_id, cleaned in host_rows:
         policies = host_policies(cleaned)
-        host_parent_exact_terms = query_constraint_roles(cleaned).hard_exact
+        host_roles = query_constraint_roles(cleaned)
+        host_parent_exact_terms = tuple(dict.fromkeys((*host_roles.hard_exact, *host_roles.bound_subjects)))
         for rewrite in _audited_host_lookup_rewrites(question, cleaned):
             if host_rewrite_count >= 6:
                 break
