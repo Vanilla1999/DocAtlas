@@ -1,0 +1,10 @@
+{
+  "schema_version": 1,
+  "module_labels": {
+    "tests/evidence_quality_v2/test_reader_view_contract_boundaries.py": "behavioral"
+  },
+  "node_overrides": {},
+  "module_node_hashes": {
+    "tests/evidence_quality_v2/test_reader_view_contract_boundaries.py": "218c2d9de1be15995504220fd4593f8c59879273dac09bd8e6cc347f000edae3"
+  }
+}

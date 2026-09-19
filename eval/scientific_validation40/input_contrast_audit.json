@@ -1,0 +1,181 @@
+{
+  "schema_version": 1,
+  "state": "reader_view_inconclusive_no_rollout",
+  "reader_run": {
+    "run_id": 35445870945,
+    "artifact_id": 10585389177,
+    "sha256": "c75ea424fd7d82c61b84a09652b17b0624ef675d16fdbef73acbc13eba620aa2"
+  },
+  "candidate_runtime_ref": "e5e1bec980caa1b66758f655940d519f0ba2fa04",
+  "rendered_case_count": 40,
+  "different_raw_and_view_inputs": 8,
+  "identical_raw_and_view_inputs": 32,
+  "different_input_case_ids": [
+    "V40-B04",
+    "V40-E01",
+    "V40-E02",
+    "V40-E04",
+    "V40-E05",
+    "V40-V02",
+    "V40-V03",
+    "V40-V04"
+  ],
+  "fallback_cases": [
+    {
+      "id": "V40-B01",
+      "reason": "unknown source fields: ['source_uri']"
+    },
+    {
+      "id": "V40-B02",
+      "reason": "unknown source fields: ['source_uri']"
+    },
+    {
+      "id": "V40-B03",
+      "reason": "unknown source fields: ['source_uri']"
+    },
+    {
+      "id": "V40-B05",
+      "reason": "unknown source fields: ['source_uri']"
+    },
+    {
+      "id": "V40-B06",
+      "reason": "unknown source fields: ['source_uri']"
+    },
+    {
+      "id": "V40-B07",
+      "reason": "unknown source fields: ['source_uri']"
+    },
+    {
+      "id": "V40-B08",
+      "reason": "unknown top-level fields: ['documentation_supported', 'hard_stop', 'recovery_disposition', 'recovery_origin', 'recovery_reason_code', 'source_search_status']"
+    },
+    {
+      "id": "V40-E03",
+      "reason": "unknown source fields: ['source_uri']"
+    },
+    {
+      "id": "V40-E06",
+      "reason": "unknown source fields: ['source_uri']"
+    },
+    {
+      "id": "V40-E07",
+      "reason": "unknown source fields: ['source_uri']"
+    },
+    {
+      "id": "V40-E08",
+      "reason": "unknown source fields: ['source_uri']"
+    },
+    {
+      "id": "V40-P01",
+      "reason": "unknown source fields: ['source_uri']"
+    },
+    {
+      "id": "V40-P02",
+      "reason": "unknown source fields: ['source_uri']"
+    },
+    {
+      "id": "V40-P03",
+      "reason": "unknown source fields: ['source_uri']"
+    },
+    {
+      "id": "V40-P04",
+      "reason": "unknown source fields: ['source_uri']"
+    },
+    {
+      "id": "V40-P05",
+      "reason": "unknown source fields: ['source_uri']"
+    },
+    {
+      "id": "V40-P06",
+      "reason": "unknown source fields: ['source_uri']"
+    },
+    {
+      "id": "V40-P07",
+      "reason": "unknown source fields: ['source_uri']"
+    },
+    {
+      "id": "V40-P08",
+      "reason": "unknown source fields: ['source_uri']"
+    },
+    {
+      "id": "V40-T01",
+      "reason": "unknown source fields: ['source_uri']"
+    },
+    {
+      "id": "V40-T02",
+      "reason": "unknown source fields: ['source_uri']"
+    },
+    {
+      "id": "V40-T03",
+      "reason": "unknown source fields: ['source_uri']"
+    },
+    {
+      "id": "V40-T04",
+      "reason": "unknown source fields: ['source_uri']"
+    },
+    {
+      "id": "V40-T05",
+      "reason": "unknown source fields: ['source_uri']"
+    },
+    {
+      "id": "V40-T06",
+      "reason": "unknown source fields: ['source_uri']"
+    },
+    {
+      "id": "V40-T07",
+      "reason": "unknown source fields: ['source_uri']"
+    },
+    {
+      "id": "V40-T08",
+      "reason": "unknown source fields: ['source_uri']"
+    },
+    {
+      "id": "V40-V01",
+      "reason": "unknown source fields: ['source_uri']"
+    },
+    {
+      "id": "V40-V05",
+      "reason": "unknown source fields: ['source_uri']"
+    },
+    {
+      "id": "V40-V06",
+      "reason": "unknown source fields: ['source_uri']"
+    },
+    {
+      "id": "V40-V07",
+      "reason": "unknown source fields: ['source_uri']"
+    },
+    {
+      "id": "V40-V08",
+      "reason": "unknown source fields: ['source_uri']"
+    }
+  ],
+  "record_integrity": {
+    "records": 240,
+    "unique_draw_keys": 240,
+    "reused_records": 0,
+    "input_hash_mismatches": [],
+    "finish_reasons": {
+      "stop": 240
+    },
+    "arm_token_counts": {
+      "raw_json": {
+        "prompt_eval_count": 95856,
+        "eval_count": 4253
+      },
+      "view_text": {
+        "prompt_eval_count": 88248,
+        "eval_count": 4176
+      }
+    }
+  },
+  "post_review_render_equivalence": {
+    "h20_packets": 20,
+    "validation40_packets": 40,
+    "arms_per_packet": 3,
+    "different_renderings": 0
+  },
+  "interpretation": "32/40 candidate cases fell back to raw JSON under the conservative unknown-field policy. Outcome differences for those identical model inputs are not evidence of a presentation effect. Do not repair the frozen candidate and rerun the exposed validation to claim transfer. Keep the view eval-only; no host-model rollout is authorized by this experiment.",
+  "existing_outcome_counts": "reader_assessment.json records the earlier manual labels; this audit verifies model inputs and provider records, not a second independent adjudication of its outcome counts.",
+  "policy": "Unknown source_uri/recovery fields are not newly allowlisted after validation exposure. Guards added by this review leave all 180 frozen packet/arm renderings byte-identical."
+}

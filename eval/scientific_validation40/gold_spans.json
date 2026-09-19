@@ -1,0 +1,878 @@
+{
+  "schema_version": 1,
+  "state": "sealed_gold_spans_not_for_retrieval_or_reader",
+  "cases": [
+    {
+      "id": "V40-B01",
+      "required_claims": [
+        {
+          "id": "required",
+          "witness_sets": [
+            {
+              "parts": [
+                {
+                  "path": "docs/usage_and_configuration/the_basics.md",
+                  "line_start": 63,
+                  "line_end": 65
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "expected_response": "grounded_answer",
+      "forbidden_inferences": [
+        "Do not infer facts absent from the selected pinned source snapshot."
+      ]
+    },
+    {
+      "id": "V40-B02",
+      "required_claims": [
+        {
+          "id": "required",
+          "witness_sets": [
+            {
+              "parts": [
+                {
+                  "path": "docs/usage_and_configuration/the_basics.md",
+                  "line_start": 86,
+                  "line_end": 88
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "expected_response": "grounded_answer",
+      "forbidden_inferences": [
+        "Do not infer facts absent from the selected pinned source snapshot."
+      ]
+    },
+    {
+      "id": "V40-B03",
+      "required_claims": [
+        {
+          "id": "required",
+          "witness_sets": [
+            {
+              "parts": [
+                {
+                  "path": "docs/usage_and_configuration/the_basics.md",
+                  "line_start": 180,
+                  "line_end": 186
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "expected_response": "grounded_answer",
+      "forbidden_inferences": [
+        "Do not infer facts absent from the selected pinned source snapshot."
+      ]
+    },
+    {
+      "id": "V40-B04",
+      "required_claims": [
+        {
+          "id": "required",
+          "witness_sets": [
+            {
+              "parts": [
+                {
+                  "path": "docs/usage_and_configuration/the_basics.md",
+                  "line_start": 232,
+                  "line_end": 237
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "expected_response": "grounded_answer",
+      "forbidden_inferences": [
+        "Do not infer facts absent from the selected pinned source snapshot."
+      ]
+    },
+    {
+      "id": "V40-B05",
+      "required_claims": [
+        {
+          "id": "required",
+          "witness_sets": [
+            {
+              "parts": [
+                {
+                  "path": "docs/usage_and_configuration/the_basics.md",
+                  "line_start": 329,
+                  "line_end": 333
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "expected_response": "grounded_answer",
+      "forbidden_inferences": [
+        "Do not infer facts absent from the selected pinned source snapshot."
+      ]
+    },
+    {
+      "id": "V40-B06",
+      "required_claims": [
+        {
+          "id": "documented_part",
+          "witness_sets": [
+            {
+              "parts": [
+                {
+                  "path": "docs/usage_and_configuration/the_basics.md",
+                  "line_start": 490,
+                  "line_end": 496
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "blackd_default_port",
+          "witness_sets": []
+        }
+      ],
+      "expected_response": "partial_with_explicit_gap",
+      "forbidden_inferences": [
+        "Do not fill the missing requested part from prior knowledge."
+      ]
+    },
+    {
+      "id": "V40-B07",
+      "required_claims": [
+        {
+          "id": "documented_part",
+          "witness_sets": [
+            {
+              "parts": [
+                {
+                  "path": "docs/usage_and_configuration/file_collection_and_discovery.md",
+                  "line_start": 25,
+                  "line_end": 30
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "cache_retention_days",
+          "witness_sets": []
+        }
+      ],
+      "expected_response": "partial_with_explicit_gap",
+      "forbidden_inferences": [
+        "Do not fill the missing requested part from prior knowledge."
+      ]
+    },
+    {
+      "id": "V40-B08",
+      "required_claims": [
+        {
+          "id": "unsupported_request",
+          "witness_sets": []
+        }
+      ],
+      "expected_response": "abstention_or_clarification",
+      "forbidden_inferences": [
+        "Do not guess an answer from prior knowledge or unrelated text."
+      ]
+    },
+    {
+      "id": "V40-P01",
+      "required_claims": [
+        {
+          "id": "required",
+          "witness_sets": [
+            {
+              "parts": [
+                {
+                  "path": "docs/configuration.md",
+                  "line_start": 33,
+                  "line_end": 35
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "expected_response": "grounded_answer",
+      "forbidden_inferences": [
+        "Do not infer facts absent from the selected pinned source snapshot."
+      ]
+    },
+    {
+      "id": "V40-P02",
+      "required_claims": [
+        {
+          "id": "required",
+          "witness_sets": [
+            {
+              "parts": [
+                {
+                  "path": "docs/configuration.md",
+                  "line_start": 122,
+                  "line_end": 134
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "expected_response": "grounded_answer",
+      "forbidden_inferences": [
+        "Do not infer facts absent from the selected pinned source snapshot."
+      ]
+    },
+    {
+      "id": "V40-P03",
+      "required_claims": [
+        {
+          "id": "required",
+          "witness_sets": [
+            {
+              "parts": [
+                {
+                  "path": "docs/configuration.md",
+                  "line_start": 102,
+                  "line_end": 114
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "expected_response": "grounded_answer",
+      "forbidden_inferences": [
+        "Do not infer facts absent from the selected pinned source snapshot."
+      ]
+    },
+    {
+      "id": "V40-P04",
+      "required_claims": [
+        {
+          "id": "required",
+          "witness_sets": [
+            {
+              "parts": [
+                {
+                  "path": "docs/managing-environments.md",
+                  "line_start": 72,
+                  "line_end": 76
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "expected_response": "grounded_answer",
+      "forbidden_inferences": [
+        "Do not infer facts absent from the selected pinned source snapshot."
+      ]
+    },
+    {
+      "id": "V40-P05",
+      "required_claims": [
+        {
+          "id": "required",
+          "witness_sets": [
+            {
+              "parts": [
+                {
+                  "path": "docs/dependency-specification.md",
+                  "line_start": 87,
+                  "line_end": 98
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "expected_response": "grounded_answer",
+      "forbidden_inferences": [
+        "Do not infer facts absent from the selected pinned source snapshot."
+      ]
+    },
+    {
+      "id": "V40-P06",
+      "required_claims": [
+        {
+          "id": "documented_part",
+          "witness_sets": [
+            {
+              "parts": [
+                {
+                  "path": "docs/managing-environments.md",
+                  "line_start": 79,
+                  "line_end": 87
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "activated_shell_pid",
+          "witness_sets": []
+        }
+      ],
+      "expected_response": "partial_with_explicit_gap",
+      "forbidden_inferences": [
+        "Do not fill the missing requested part from prior knowledge."
+      ]
+    },
+    {
+      "id": "V40-P07",
+      "required_claims": [
+        {
+          "id": "unsupported_request",
+          "witness_sets": []
+        }
+      ],
+      "expected_response": "abstention_or_clarification",
+      "forbidden_inferences": [
+        "Do not guess an answer from prior knowledge or unrelated text."
+      ]
+    },
+    {
+      "id": "V40-P08",
+      "required_claims": [
+        {
+          "id": "unsupported_request",
+          "witness_sets": []
+        }
+      ],
+      "expected_response": "abstention_or_clarification",
+      "forbidden_inferences": [
+        "Do not guess an answer from prior knowledge or unrelated text."
+      ]
+    },
+    {
+      "id": "V40-T01",
+      "required_claims": [
+        {
+          "id": "required",
+          "witness_sets": [
+            {
+              "parts": [
+                {
+                  "path": "docs/guide/reactivity.md",
+                  "line_start": 28,
+                  "line_end": 36
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "expected_response": "grounded_answer",
+      "forbidden_inferences": [
+        "Do not infer facts absent from the selected pinned source snapshot."
+      ]
+    },
+    {
+      "id": "V40-T02",
+      "required_claims": [
+        {
+          "id": "required",
+          "witness_sets": [
+            {
+              "parts": [
+                {
+                  "path": "docs/guide/reactivity.md",
+                  "line_start": 66,
+                  "line_end": 72
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "expected_response": "grounded_answer",
+      "forbidden_inferences": [
+        "Do not infer facts absent from the selected pinned source snapshot."
+      ]
+    },
+    {
+      "id": "V40-T03",
+      "required_claims": [
+        {
+          "id": "required",
+          "witness_sets": [
+            {
+              "parts": [
+                {
+                  "path": "docs/guide/reactivity.md",
+                  "line_start": 99,
+                  "line_end": 110
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "expected_response": "grounded_answer",
+      "forbidden_inferences": [
+        "Do not infer facts absent from the selected pinned source snapshot."
+      ]
+    },
+    {
+      "id": "V40-T04",
+      "required_claims": [
+        {
+          "id": "required",
+          "witness_sets": [
+            {
+              "parts": [
+                {
+                  "path": "docs/guide/reactivity.md",
+                  "line_start": 166,
+                  "line_end": 173
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "expected_response": "grounded_answer",
+      "forbidden_inferences": [
+        "Do not infer facts absent from the selected pinned source snapshot."
+      ]
+    },
+    {
+      "id": "V40-T05",
+      "required_claims": [
+        {
+          "id": "required",
+          "witness_sets": [
+            {
+              "parts": [
+                {
+                  "path": "docs/guide/workers.md",
+                  "line_start": 55,
+                  "line_end": 64
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "expected_response": "grounded_answer",
+      "forbidden_inferences": [
+        "Do not infer facts absent from the selected pinned source snapshot."
+      ]
+    },
+    {
+      "id": "V40-T06",
+      "required_claims": [
+        {
+          "id": "documented_part",
+          "witness_sets": [
+            {
+              "parts": [
+                {
+                  "path": "docs/guide/workers.md",
+                  "line_start": 91,
+                  "line_end": 94
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "guaranteed_cancel_latency",
+          "witness_sets": []
+        }
+      ],
+      "expected_response": "partial_with_explicit_gap",
+      "forbidden_inferences": [
+        "Do not fill the missing requested part from prior knowledge."
+      ]
+    },
+    {
+      "id": "V40-T07",
+      "required_claims": [
+        {
+          "id": "documented_part",
+          "witness_sets": [
+            {
+              "parts": [
+                {
+                  "path": "docs/guide/workers.md",
+                  "line_start": 153,
+                  "line_end": 159
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "thread_scheduling_policy",
+          "witness_sets": []
+        }
+      ],
+      "expected_response": "partial_with_explicit_gap",
+      "forbidden_inferences": [
+        "Do not fill the missing requested part from prior knowledge."
+      ]
+    },
+    {
+      "id": "V40-T08",
+      "required_claims": [
+        {
+          "id": "unsupported_request",
+          "witness_sets": []
+        }
+      ],
+      "expected_response": "abstention_or_clarification",
+      "forbidden_inferences": [
+        "Do not guess an answer from prior knowledge or unrelated text."
+      ]
+    },
+    {
+      "id": "V40-V01",
+      "required_claims": [
+        {
+          "id": "required",
+          "witness_sets": [
+            {
+              "parts": [
+                {
+                  "path": "docs/guide/env-and-mode.md",
+                  "line_start": 32,
+                  "line_end": 54
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "expected_response": "grounded_answer",
+      "forbidden_inferences": [
+        "Do not infer facts absent from the selected pinned source snapshot."
+      ]
+    },
+    {
+      "id": "V40-V02",
+      "required_claims": [
+        {
+          "id": "required",
+          "witness_sets": [
+            {
+              "parts": [
+                {
+                  "path": "docs/guide/env-and-mode.md",
+                  "line_start": 73,
+                  "line_end": 81
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "expected_response": "grounded_answer",
+      "forbidden_inferences": [
+        "Do not infer facts absent from the selected pinned source snapshot."
+      ]
+    },
+    {
+      "id": "V40-V03",
+      "required_claims": [
+        {
+          "id": "required",
+          "witness_sets": [
+            {
+              "parts": [
+                {
+                  "path": "docs/config/server-options.md",
+                  "line_start": 63,
+                  "line_end": 68
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "expected_response": "grounded_answer",
+      "forbidden_inferences": [
+        "Do not infer facts absent from the selected pinned source snapshot."
+      ]
+    },
+    {
+      "id": "V40-V04",
+      "required_claims": [
+        {
+          "id": "required",
+          "witness_sets": [
+            {
+              "parts": [
+                {
+                  "path": "docs/config/server-options.md",
+                  "line_start": 70,
+                  "line_end": 74
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "expected_response": "grounded_answer",
+      "forbidden_inferences": [
+        "Do not infer facts absent from the selected pinned source snapshot."
+      ]
+    },
+    {
+      "id": "V40-V05",
+      "required_claims": [
+        {
+          "id": "required",
+          "witness_sets": [
+            {
+              "parts": [
+                {
+                  "path": "docs/guide/assets.md",
+                  "line_start": 108,
+                  "line_end": 124
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "expected_response": "grounded_answer",
+      "forbidden_inferences": [
+        "Do not infer facts absent from the selected pinned source snapshot."
+      ]
+    },
+    {
+      "id": "V40-V06",
+      "required_claims": [
+        {
+          "id": "documented_part",
+          "witness_sets": [
+            {
+              "parts": [
+                {
+                  "path": "docs/config/server-options.md",
+                  "line_start": 379,
+                  "line_end": 384
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "fs_deny_status",
+          "witness_sets": []
+        }
+      ],
+      "expected_response": "partial_with_explicit_gap",
+      "forbidden_inferences": [
+        "Do not fill the missing requested part from prior knowledge."
+      ]
+    },
+    {
+      "id": "V40-V07",
+      "required_claims": [
+        {
+          "id": "unsupported_request",
+          "witness_sets": []
+        }
+      ],
+      "expected_response": "abstention_or_clarification",
+      "forbidden_inferences": [
+        "Do not guess an answer from prior knowledge or unrelated text."
+      ]
+    },
+    {
+      "id": "V40-V08",
+      "required_claims": [
+        {
+          "id": "unsupported_request",
+          "witness_sets": []
+        }
+      ],
+      "expected_response": "abstention_or_clarification",
+      "forbidden_inferences": [
+        "Do not guess an answer from prior knowledge or unrelated text."
+      ]
+    },
+    {
+      "id": "V40-E01",
+      "required_claims": [
+        {
+          "id": "required",
+          "witness_sets": [
+            {
+              "parts": [
+                {
+                  "path": "docs/src/use/configure/configuration-files.md",
+                  "line_start": 19,
+                  "line_end": 30
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "expected_response": "grounded_answer",
+      "forbidden_inferences": [
+        "Do not infer facts absent from the selected pinned source snapshot."
+      ]
+    },
+    {
+      "id": "V40-E02",
+      "required_claims": [
+        {
+          "id": "required",
+          "witness_sets": [
+            {
+              "parts": [
+                {
+                  "path": "docs/src/use/configure/configuration-files.md",
+                  "line_start": 782,
+                  "line_end": 793
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "expected_response": "grounded_answer",
+      "forbidden_inferences": [
+        "Do not infer facts absent from the selected pinned source snapshot."
+      ]
+    },
+    {
+      "id": "V40-E03",
+      "required_claims": [
+        {
+          "id": "required",
+          "witness_sets": [
+            {
+              "parts": [
+                {
+                  "path": "docs/src/use/command-line-interface.md",
+                  "line_start": 373,
+                  "line_end": 381
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "expected_response": "grounded_answer",
+      "forbidden_inferences": [
+        "Do not infer facts absent from the selected pinned source snapshot."
+      ]
+    },
+    {
+      "id": "V40-E04",
+      "required_claims": [
+        {
+          "id": "required",
+          "witness_sets": [
+            {
+              "parts": [
+                {
+                  "path": "docs/src/use/configure/ignore.md",
+                  "line_start": 24,
+                  "line_end": 48
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "expected_response": "grounded_answer",
+      "forbidden_inferences": [
+        "Do not infer facts absent from the selected pinned source snapshot."
+      ]
+    },
+    {
+      "id": "V40-E05",
+      "required_claims": [
+        {
+          "id": "documented_part",
+          "witness_sets": [
+            {
+              "parts": [
+                {
+                  "path": "docs/src/use/configure/configuration-files.md",
+                  "line_start": 795,
+                  "line_end": 809
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "jiti_startup_overhead",
+          "witness_sets": []
+        }
+      ],
+      "expected_response": "partial_with_explicit_gap",
+      "forbidden_inferences": [
+        "Do not fill the missing requested part from prior knowledge."
+      ]
+    },
+    {
+      "id": "V40-E06",
+      "required_claims": [
+        {
+          "id": "documented_part",
+          "witness_sets": [
+            {
+              "parts": [
+                {
+                  "path": "docs/src/use/command-line-interface.md",
+                  "line_start": 1020,
+                  "line_end": 1028
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "auto_worker_count_8_core",
+          "witness_sets": []
+        }
+      ],
+      "expected_response": "partial_with_explicit_gap",
+      "forbidden_inferences": [
+        "Do not fill the missing requested part from prior knowledge."
+      ]
+    },
+    {
+      "id": "V40-E07",
+      "required_claims": [
+        {
+          "id": "unsupported_request",
+          "witness_sets": []
+        }
+      ],
+      "expected_response": "abstention_or_clarification",
+      "forbidden_inferences": [
+        "Do not guess an answer from prior knowledge or unrelated text."
+      ]
+    },
+    {
+      "id": "V40-E08",
+      "required_claims": [
+        {
+          "id": "unsupported_request",
+          "witness_sets": []
+        }
+      ],
+      "expected_response": "abstention_or_clarification",
+      "forbidden_inferences": [
+        "Do not guess an answer from prior knowledge or unrelated text."
+      ]
+    }
+  ]
+}

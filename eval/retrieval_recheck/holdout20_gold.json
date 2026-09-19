@@ -1,0 +1,201 @@
+{
+  "schema_version": 1,
+  "state": "sealed_gold_not_for_retrieval_or_reader",
+  "corpus_ref": "95e61265656283d609bc1328c46c52b2bf1a069e",
+  "cases": [
+    {
+      "id": "H01",
+      "source": "fastapi/docs/en/docs/tutorial/background-tasks.md",
+      "line_start": 56,
+      "line_end": 56,
+      "required": [
+        "BackgroundTasks may be declared at multiple levels",
+        "dependency",
+        "sub-dependency"
+      ]
+    },
+    {
+      "id": "H02",
+      "source": "fastapi/docs/en/docs/tutorial/background-tasks.md",
+      "line_start": 120,
+      "line_end": 120,
+      "required": [
+        "starlette.background"
+      ]
+    },
+    {
+      "id": "H03",
+      "source": "fastapi/docs/en/docs/tutorial/background-tasks.md",
+      "line_start": 132,
+      "line_end": 132,
+      "required": [
+        "Celery"
+      ]
+    },
+    {
+      "id": "H04",
+      "source": "fastapi/docs/en/docs/tutorial/cors.md",
+      "line_start": 59,
+      "line_end": 63,
+      "required": [
+        "allow_methods defaults to ['GET']",
+        "allow_headers defaults to []",
+        "expose_headers defaults to []",
+        "max_age defaults to 600"
+      ]
+    },
+    {
+      "id": "H05",
+      "source": "httpx/docs/advanced/timeouts.md",
+      "line_start": 65,
+      "line_end": 68,
+      "required": [
+        "httpx.Timeout(10.0, connect=60.0)"
+      ]
+    },
+    {
+      "id": "H06",
+      "source": "httpx/docs/environment_variables.md",
+      "line_start": 37,
+      "line_end": 41,
+      "required": [
+        "comma-separated list of hostnames/urls"
+      ]
+    },
+    {
+      "id": "H07",
+      "source": "pydantic/docs/concepts/alias.md",
+      "line_start": 5,
+      "line_end": 10,
+      "required": [
+        "validation_alias accepts str, AliasPath, or AliasChoices",
+        "serialization_alias must be str"
+      ]
+    },
+    {
+      "id": "H08",
+      "source": "pydantic/docs/concepts/strict_mode.md",
+      "line_start": 41,
+      "line_end": 46,
+      "required": [
+        "StrictInt"
+      ]
+    },
+    {
+      "id": "H09",
+      "source": "pydantic/docs/concepts/strict_mode.md",
+      "line_start": 498,
+      "line_end": 508,
+      "required": [
+        "pass config keyword argument",
+        "ConfigDict(strict=True)"
+      ]
+    },
+    {
+      "id": "H10",
+      "source": "ruff/docs/configuration.md",
+      "line_start": 1,
+      "line_end": 3,
+      "required": [
+        "pyproject.toml",
+        "ruff.toml",
+        ".ruff.toml"
+      ]
+    },
+    {
+      "id": "H11",
+      "source": "ruff/docs/configuration.md",
+      "line_start": 263,
+      "line_end": 269,
+      "required": [
+        "current working directory"
+      ]
+    },
+    {
+      "id": "H12",
+      "source": "ruff/docs/configuration.md",
+      "line_start": 365,
+      "line_end": 368,
+      "required": [
+        "0.6.0 or higher"
+      ]
+    },
+    {
+      "id": "H13",
+      "source": "uv/docs/pip/compatibility.md",
+      "line_start": 194,
+      "line_end": 200,
+      "required": [
+        "uv pip install and uv pip sync use virtual environments by default"
+      ]
+    },
+    {
+      "id": "H14",
+      "source": "uv/docs/pip/compatibility.md",
+      "line_start": 378,
+      "line_end": 382,
+      "required": [
+        "does not compile .py to .pyc by default",
+        "--compile-bytecode"
+      ]
+    },
+    {
+      "id": "H15",
+      "source": "uv/docs/pip/compatibility.md",
+      "line_start": 412,
+      "line_end": 417,
+      "required": [
+        "only subprocess is supported",
+        "auto and import are not supported"
+      ]
+    },
+    {
+      "id": "H16",
+      "source": "uv/docs/pip/compatibility.md",
+      "line_start": 422,
+      "line_end": 429,
+      "required": [
+        ".egg-style distributions are not supported"
+      ]
+    },
+    {
+      "id": "H17",
+      "source": "starlette/docs/lifespan.md",
+      "line_start": 35,
+      "line_end": 38,
+      "required": [
+        "state is a dictionary",
+        "share objects between lifespan and requests"
+      ]
+    },
+    {
+      "id": "H18",
+      "source": "starlette/docs/background.md",
+      "line_start": 2,
+      "line_end": 5,
+      "required": [
+        "attached to a response",
+        "runs after the response has been sent"
+      ]
+    },
+    {
+      "id": "H19",
+      "source": "mkdocs/docs/user-guide/writing-your-docs.md",
+      "line_start": 200,
+      "line_end": 204,
+      "required": [
+        "Markdown link syntax",
+        "relative path to the Markdown document"
+      ]
+    },
+    {
+      "id": "H20",
+      "source": "typer/docs/tutorial/parameter-types/bool.md",
+      "line_start": 136,
+      "line_end": 140,
+      "required": [
+        "short versions of boolean option names are supported"
+      ]
+    }
+  ]
+}

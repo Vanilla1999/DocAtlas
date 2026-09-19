@@ -1,0 +1,59 @@
+{
+  "schema_version": 1,
+  "baseline_runtime": "95e61265656283d609bc1328c46c52b2bf1a069e",
+  "candidate_runtime": "8cecc0e1355376699bd18d8eb7a720cff6868be0",
+  "baseline_equivalence_note": "Production code between baseline artifact 95e6126 and pre-fix 7b92cc5 is identical; intervening changes are eval/workflow-only.",
+  "normalized_public_packet_changes": [
+    {
+      "id": "G21",
+      "lane": "root_only",
+      "semantic_result": "miss_preserved",
+      "detail": "irrelevant architecture context becomes fail-closed insufficient_evidence"
+    },
+    {
+      "id": "G21",
+      "lane": "with_lookups",
+      "semantic_result": "miss_to_sufficient",
+      "detail": "public packet exposes SKILL.md no-pre-split rule and split-after-missing-part rule"
+    }
+  ],
+  "all_other_cases_unchanged": true,
+  "manual_summary": {
+    "root_only": {
+      "baseline": {
+        "sufficient": 9,
+        "partial": 2,
+        "miss": 19
+      },
+      "candidate": {
+        "sufficient": 9,
+        "partial": 2,
+        "miss": 19
+      }
+    },
+    "with_lookups": {
+      "baseline": {
+        "sufficient": 20,
+        "partial": 3,
+        "miss": 7
+      },
+      "candidate": {
+        "sufficient": 21,
+        "partial": 3,
+        "miss": 6
+      }
+    }
+  },
+  "pairwise": {
+    "wins": 1,
+    "losses": 0,
+    "unchanged": 29,
+    "win_ids": [
+      "G21"
+    ]
+  },
+  "artifact_refs": {
+    "baseline_artifact_id": 10563443224,
+    "candidate_artifact_id": 10582189884
+  }
+}

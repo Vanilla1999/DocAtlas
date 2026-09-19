@@ -6,6 +6,24 @@ This note clarifies the runtime response fields and the conditional context-firs
 
 The `get_docs_context` response has three `kind` values: `docs_answer` for a narrow typed question whose mandatory relation-specific proof obligations are complete, `docs_context` for safe retrieval-only project context when completeness or the requested relation remains uncertain, and `patch_context` for explicit change tasks. Project reads return `docs_context`, never `docs_answer`; certification belongs to library, dependency, or mixed evidence lanes. The separate `status` is `ok`, `truncated`, or `insufficient_evidence` when no safe context is available, not a fourth kind.
 
+
+## Omitted material
+
+When a bounded Docs MCP response returns `status="truncated"`, its
+`omitted_counts` reports omitted material; clients should honor that field
+when interpreting the bounded packet. This status describes omission of
+non-critical material. It does not certify that a project-context answer is
+complete or replace `status="insufficient_evidence"`.
+
+For bounded client handling, inspect `status`, `kind`, `sources`,
+`missing`, and `omitted_counts`. A response with
+`status="insufficient_evidence"` means no safe context is available for the
+requested documentary claim; do not present it as documentation support.
+
+The project-documentation authoring handoff has its own nested omission report,
+`documentation_gap.bounds.omitted_counts`. That nested field is not a second
+name for a top-level public response field.
+
 ## Normal Docs MCP workflow
 
 The normal Docs MCP flow is:

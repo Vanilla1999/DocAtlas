@@ -1,0 +1,32 @@
+{
+  "schema_version": 1,
+  "frozen_before_execution": true,
+  "baseline_runtime_ref": "7b92cc5e8a99ee7394fde93b46797c5bd0b162a8",
+  "candidate_runtime_ref": "8cecc0e1355376699bd18d8eb7a720cff6868be0",
+  "corpus_ref": "95e61265656283d609bc1328c46c52b2bf1a069e",
+  "holdout_questions": "eval/retrieval_recheck/holdout20_questions.json",
+  "sealed_gold": "eval/retrieval_recheck/holdout20_gold.json",
+  "retrieval": {
+    "mode": "root_only_no_lookup_queries",
+    "scope": "all",
+    "max_sources": 3,
+    "max_estimated_tokens": 800
+  },
+  "reader": {
+    "provider": "ollama",
+    "model": "qwen2.5:1.5b",
+    "temperature": 0,
+    "seed": 0,
+    "num_predict": 160,
+    "prompt": "Answer the QUESTION using only the CONTEXT. If the CONTEXT does not support the answer, reply exactly INSUFFICIENT_CONTEXT. Be concise and do not use prior knowledge."
+  },
+  "assessment": {
+    "judge": "manual_human_like_review_by_assistant",
+    "llm_judge": false,
+    "dimensions": [
+      "context_sufficient",
+      "reader_correct"
+    ],
+    "no_tuning_after_open": true
+  }
+}

@@ -1,0 +1,157 @@
+{
+  "schema_version": 1,
+  "status": "fresh_adversarial_set",
+  "purpose": "Fresh root-only public-boundary questions for manual assistant assessment after V13/V15 fixes.",
+  "cases": [
+    {
+      "id": "F01",
+      "question": "A bounded Docs MCP packet returns `status=\"truncated\"`. What should the client do with that result?",
+      "lookup_queries": []
+    },
+    {
+      "id": "F02",
+      "question": "How can a caller tell what was left out of a bounded documentation response?",
+      "lookup_queries": []
+    },
+    {
+      "id": "F03",
+      "question": "Is `status=\"truncated\"` equivalent to `status=\"insufficient_evidence\"` in DocAtlas?",
+      "lookup_queries": []
+    },
+    {
+      "id": "F04",
+      "question": "When a response is truncated, does that mean required evidence may have been silently dropped?",
+      "lookup_queries": []
+    },
+    {
+      "id": "F05",
+      "question": "What is the role of `omitted_counts` in a bounded Docs MCP response?",
+      "lookup_queries": []
+    },
+    {
+      "id": "F06",
+      "question": "How does the public omission report differ from the project-documentation authoring handoff omission report?",
+      "lookup_queries": []
+    },
+    {
+      "id": "F07",
+      "question": "What should a client inspect alongside `status` when interpreting a bounded documentation packet?",
+      "lookup_queries": []
+    },
+    {
+      "id": "F08",
+      "question": "Can a truncated documentation packet still be usable, and what limitation should the caller keep in mind?",
+      "lookup_queries": []
+    },
+    {
+      "id": "F09",
+      "question": "If DocAtlas cannot safely provide evidence for a requested documentation claim, how should that differ from ordinary truncation?",
+      "lookup_queries": []
+    },
+    {
+      "id": "F10",
+      "question": "Where is omission metadata recorded in the bounded project-documentation authoring handoff?",
+      "lookup_queries": []
+    },
+    {
+      "id": "F11",
+      "question": "For a question about how the product works today, which source should be primary: maintained documentation or `CHANGELOG.md`?",
+      "lookup_queries": []
+    },
+    {
+      "id": "F12",
+      "question": "When is `CHANGELOG.md` the right primary source for a documentation answer?",
+      "lookup_queries": []
+    },
+    {
+      "id": "F13",
+      "question": "If `CHANGELOG.md` and maintained current documentation appear to disagree about present behavior, which should current answers follow?",
+      "lookup_queries": []
+    },
+    {
+      "id": "F14",
+      "question": "For a migration-history question, how should `CHANGELOG.md` be treated relative to current documentation?",
+      "lookup_queries": []
+    },
+    {
+      "id": "F15",
+      "question": "For a present-day configuration question, is a matching `CHANGELOG.md` entry enough to outrank maintained source-of-truth documentation?",
+      "lookup_queries": []
+    },
+    {
+      "id": "F16",
+      "question": "How should current API documentation answers use historical release notes?",
+      "lookup_queries": []
+    },
+    {
+      "id": "F17",
+      "question": "What source should answer a question about when a feature changed between releases?",
+      "lookup_queries": []
+    },
+    {
+      "id": "F18",
+      "question": "What source should answer a question about the feature's current contract after those changes?",
+      "lookup_queries": []
+    },
+    {
+      "id": "F19",
+      "question": "Should current-state answers cite only `CHANGELOG.md` when it contains the same feature name as maintained docs?",
+      "lookup_queries": []
+    },
+    {
+      "id": "F20",
+      "question": "How should release-history evidence supplement, rather than replace, maintained current documentation?",
+      "lookup_queries": []
+    },
+    {
+      "id": "F21",
+      "question": "Should DocAtlas split a comparison into multiple retrieval calls before inspecting the first bounded documentation packet?",
+      "lookup_queries": []
+    },
+    {
+      "id": "F22",
+      "question": "When should narrow `lookup_queries` be added to a documentation request?",
+      "lookup_queries": []
+    },
+    {
+      "id": "F23",
+      "question": "If the first packet is missing one independently answerable requested part, what is the next retrieval step?",
+      "lookup_queries": []
+    },
+    {
+      "id": "F24",
+      "question": "If a known documentation source contains the exact missing fact, how should DocAtlas continue?",
+      "lookup_queries": []
+    },
+    {
+      "id": "F25",
+      "question": "When should bounded retrieval stop even if the returned context is not perfect?",
+      "lookup_queries": []
+    },
+    {
+      "id": "F26",
+      "question": "Does `context_quality` being less than perfect automatically justify another retrieval call?",
+      "lookup_queries": []
+    },
+    {
+      "id": "F27",
+      "question": "After `insufficient_evidence`, should an agent keep rephrasing until something is returned?",
+      "lookup_queries": []
+    },
+    {
+      "id": "F28",
+      "question": "When a server returns a typed `recommended_next_action`, how should the client handle it?",
+      "lookup_queries": []
+    },
+    {
+      "id": "F29",
+      "question": "Is globally increasing top-k or the token budget the normal recovery strategy for a missing documentation fact?",
+      "lookup_queries": []
+    },
+    {
+      "id": "F30",
+      "question": "If wording differs from the documentation vocabulary but the question is otherwise the same, what kind of query expansion is appropriate?",
+      "lookup_queries": []
+    }
+  ]
+}

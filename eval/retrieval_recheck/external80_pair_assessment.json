@@ -1,0 +1,37 @@
+{
+  "schema_version": 1,
+  "baseline_runtime": "7b92cc5e8a99ee7394fde93b46797c5bd0b162a8",
+  "candidate_runtime": "8cecc0e1355376699bd18d8eb7a720cff6868be0",
+  "corpus": "frozen evidence_quality_v2 80-case corpus",
+  "trigger_reachability": {
+    "cases": 80,
+    "questions_with_token_prefix_split_or_razbiv": 0
+  },
+  "a_current": {
+    "baseline": {
+      "within_budget": 48,
+      "within_budget_sufficient": 31,
+      "required_supported": 35,
+      "required_total": 88,
+      "source_integrity_or_contract_violations": 0
+    },
+    "candidate": {
+      "within_budget": 48,
+      "within_budget_sufficient": 31,
+      "required_supported": 35,
+      "required_total": 88,
+      "source_integrity_or_contract_violations": 0
+    },
+    "all_project_family_split_answerability_sufficiency_slices_equal": true
+  },
+  "pairwise_decision": "no_regression_observed_no_gain_claimed",
+  "raw_payload_compare": {
+    "valid_for_causal_claim": false,
+    "reason": "The historical paired runner materialized baseline and candidate projects under different absolute output paths. project_identity/source_uri and serialized token accounting therefore differ. Because the only production change is the split/разбив alias trigger and no external80 question reaches that trigger, raw packet differences are harness-path confounding rather than evidence of the production fix."
+  },
+  "artifact": {
+    "run_id": 35435915709,
+    "artifact_id": 10581404583,
+    "digest": "sha256:16c1d7b021fdb55c551951a96629660bef63a813efc2c89cb46e8b31cf0d472c"
+  }
+}

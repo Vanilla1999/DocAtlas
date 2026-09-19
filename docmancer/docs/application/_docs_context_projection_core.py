@@ -9,7 +9,7 @@ from typing import Any
 from ._docs_context_payload import _payload
 from .source_continuation import attach_source_continuation_locators
 from .visible_evidence_retention import retains_visible_sources
-from .context_query_probes import independent_query_probes
+from .context_query_probes import independent_query_probes, _has_visible_non_path_exact_term, _normalized_path
 from docmancer.docs.domain.context_hint_policy import fallback_context_query_ids, has_context_hint_support
 
 from docmancer.docs.application.context_selection import (
@@ -45,7 +45,6 @@ from docmancer.docs.domain.evidence_qualification import (
     qualify_evidence,
 )
 from docmancer.docs.domain.query_terms import documentation_exact_terms
-from docmancer.docs.domain.documentation_query_plan import technical_anchors
 from docmancer.docs.domain.lifecycle_policy import lifecycle_intent
 from docmancer.docs.domain.normative_language import _FORBIDDEN_RE, _REQUIRED_RE
 
@@ -713,6 +712,7 @@ def _qualified_fragments(
 ) -> list[dict[str, Any]]:
     """Retain small qualified alternatives until the actual payload is measured."""
     variants = []
+    variant_spans: dict[int, tuple[int, int]] = {}
     seen_spans = set()
     focuses = (*tuple(query_text.get(query_id, "") for query_id in sorted(query_ids)),
                *component_witnesses({**source, "snippet": raw_snippet}, obligations).values())
@@ -735,6 +735,7 @@ def _qualified_fragments(
             )
             if snippet and (qualified_query_ids((candidate,)) & query_ids or component_witnesses(candidate, obligations)):
                 variants.append(candidate)
+                variant_spans[id(candidate)] = (snippet_start, snippet_end)
     # Exact small atoms can remove a heading or irrelevant adjacent paragraph
     # without widening any rolling window. Larger prose is offered only for an
     # unstructured mandatory direction, not optional aliases or hidden metadata.
@@ -759,6 +760,7 @@ def _qualified_fragments(
         if candidate_ids or component_witnesses(candidate, obligations):
             seen_spans.add((snippet_start, snippet_end))
             variants.append(candidate)
+            variant_spans[id(candidate)] = (snippet_start, snippet_end)
             if preserve_required_blocks and candidate_ids & required_ids:
                 required_blocks.append((snippet_start, snippet_end))
     if required_blocks:
@@ -766,39 +768,56 @@ def _qualified_fragments(
         # substitute for its qualified whole block. Typed component/assignment
         # requests above retain their finer-grained witness policy. Admission
         # can reject the whole atom, but cannot silently pass its prefix instead.
-        variants = [candidate for candidate in variants if not any(
-            start <= (offset := raw_snippet.find(str(candidate.get("snippet") or "")))
-            and offset + len(str(candidate.get("snippet") or "")) <= end
-            and (offset, offset + len(str(candidate.get("snippet") or ""))) != (start, end)
-            for start, end in required_blocks
-        )]
+        def inside_required_block(candidate: dict[str, Any]) -> bool:
+            span = variant_spans.get(id(candidate))
+            if span is None:
+                return False
+            offset, candidate_end = span
+            return any(
+                block_start <= offset
+                and candidate_end <= block_end
+                and span != (block_start, block_end)
+                for block_start, block_end in required_blocks
+            )
+
+        variants = [
+            candidate for candidate in variants
+            if not inside_required_block(candidate)
+        ]
     # Offer one bounded verbatim union span when it preserves both directions.
     seed_variants = tuple(variants)
     for left_index, left in enumerate(seed_variants):
-        left_start = raw_snippet.find(str(left.get("snippet") or ""))
-        if left_start < 0:
+        left_span = variant_spans.get(id(left))
+        if left_span is None:
             continue
+        left_start, left_end = left_span
         left_ids = qualified_query_ids((left,)) & query_ids
         if not left_ids:
             continue
         for right in seed_variants[left_index + 1:]:
-            right_start = raw_snippet.find(str(right.get("snippet") or ""))
-            if right_start < 0:
+            right_span = variant_spans.get(id(right))
+            if right_span is None:
                 continue
+            right_start, right_end = right_span
             right_ids = qualified_query_ids((right,)) & query_ids
             if not right_ids or left_ids == right_ids:
                 continue
             union_ids = left_ids | right_ids
             union_start = min(left_start, right_start)
-            union_end = max(left_start + len(str(left.get("snippet") or "")),
-                            right_start + len(str(right.get("snippet") or "")))
+            union_end = max(left_end, right_end)
             if union_end - union_start > 640 or (union_start, union_end) in seen_spans:
                 continue
             union_snippet = raw_snippet[union_start:union_end].strip()
+            union_visible_start = raw_snippet.find(
+                union_snippet, union_start, union_end + 1,
+            )
+            if union_visible_start < 0:
+                continue
+            union_visible_end = union_visible_start + len(union_snippet)
             union_candidate = dict(source)
             union_candidate["snippet"] = union_snippet
             union_candidate["line_start"], union_candidate["line_end"] = _focused_line_range(
-                raw_snippet, union_start, union_end, source_line_start)
+                raw_snippet, union_visible_start, union_visible_end, source_line_start)
             union_candidate = _requalify_visible_source(union_candidate, query_text=query_text)
             if not union_ids <= (qualified_query_ids((union_candidate,)) & query_ids):
                 continue
@@ -807,15 +826,25 @@ def _qualified_fragments(
             )
             seen_spans.add((union_start, union_end))
             variants.append(union_candidate)
+            variant_spans[id(union_candidate)] = (
+                union_visible_start, union_visible_end,
+            )
+
+    def structurally_complete(candidate: dict[str, Any]) -> bool:
+        span = variant_spans.get(id(candidate))
+        return _is_complete_source_span(
+            raw_snippet,
+            str(candidate.get("snippet") or ""),
+            span_start=span[0] if span is not None else None,
+        )
+
     # Prefer structurally complete variants when coverage is otherwise equal.
     variants.sort(
         key=lambda candidate: (
             len(qualified_query_ids((candidate,)) & query_ids),
             len(component_witnesses(candidate, obligations)),
             len(candidate.get("_visible_assignment_hashes") or ()),
-            int(_is_complete_source_span(
-                raw_snippet, str(candidate.get("snippet") or ""),
-            )),
+            int(structurally_complete(candidate)),
             -len(str(candidate.get("snippet") or "")),
         ),
         reverse=True,
@@ -911,27 +940,6 @@ def _required_query_ids(query_plan: dict[str, Any]) -> tuple[str, ...]:
     return tuple(str(value) for value in values if value)
 
 
-def _has_visible_non_path_exact_term(
-    *, raw_text: str, original_question: str, explicit_paths: set[str],
-) -> bool:
-    # Use whole anchors, not CamelCase substrings extracted from a file path.
-    # A heading such as "Reference" is not evidence for a topic merely because
-    # the requested file is named REFERENCE.md. Apply the ordinary body qualifier
-    # here too; headings, links and identifier prefixes cannot satisfy a topic.
-    terms = (
-        term for term in technical_anchors(original_question)
-        if "/" not in term and "\\" not in term
-        and _normalized_path(term) not in explicit_paths
-    )
-    return any(
-        qualify_evidence(
-            {"query_text": term, "query_terms": [term], "exact_terms": [term]},
-            query_id="exact-topic", visible_text=raw_text, evidence_text=raw_text,
-        ).qualified
-        for term in terms
-    )
-
-
 def _query_ids_for_origins(
     query_plan: dict[str, Any], origins: set[str],
 ) -> set[str]:
@@ -942,10 +950,6 @@ def _query_ids_for_origins(
         and str(item.get("origin") or "") in origins
         and item.get("query_id")
     }
-
-
-def _normalized_path(value: Any) -> str:
-    return str(value or "").replace("\\", "/").removeprefix("./").casefold()
 
 
 def _public_query_ids(query_plan: dict[str, Any]) -> tuple[str, ...]:

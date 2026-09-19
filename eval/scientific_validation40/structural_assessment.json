@@ -1,0 +1,34 @@
+{
+  "schema_version": 1,
+  "state": "frozen_validation_opened_no_posthoc_tuning",
+  "protocol_ref": "eval/scientific_validation40/protocol.json",
+  "source_artifact": {
+    "run_id": 35442584246,
+    "artifact_id": 10584315850,
+    "digest": "sha256:ff26a5a15b58916634c33f3ace14eb1a0d644c7f48e20a9d51f51dc5e8adc492"
+  },
+  "validation_run": {
+    "run_id": 35445797151,
+    "artifact_id": 10585058639,
+    "digest": "sha256:9b03da69ac80da8b869958090706b39f5fa8e68f2dd6bc07195f2015ca12ff5a"
+  },
+  "baseline_ref": "b07dc52bd7ba02a449477bc534cc84dc1d276ffd",
+  "candidate_ref": "e5e1bec980caa1b66758f655940d519f0ba2fa04",
+  "answerable": {
+    "baseline_full_witness": 6,
+    "candidate_full_witness": 6,
+    "total": 24,
+    "wins": [],
+    "losses": []
+  },
+  "partial": {
+    "baseline_documented_claims": 2,
+    "candidate_documented_claims": 2,
+    "total_documented_claims": 8,
+    "losses": []
+  },
+  "unanswerable_controls": 8,
+  "new_source_or_budget_audit_errors": [],
+  "decision": "structural_defect_fix_validated_no_general_retrieval_gain",
+  "interpretation": "The structural list-item fix generalizes as a bounded integrity correction: it fixes native H04 and passes synthetic behavior invariants without causing any loss on 40 new tasks. It does not improve root-only retrieval coverage on the new families. The 6/24 answerable witness rate is a separate post-validation observation and cannot be tuned against in this cycle."
+}

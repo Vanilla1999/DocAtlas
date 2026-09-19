@@ -92,6 +92,19 @@ get_docs_context(
 
 The advanced `inspect_project_docs` surface exposes discovered and indexed module summaries. Normal agents recover module ambiguity through the `docs_status` action returned by `get_docs_context`, then retry with the exact `module_path`.
 
+
+## Current versus historical authority
+
+For questions about current behavior, contracts, configuration, or workflows,
+current documentation answers should use maintained source-of-truth
+documentation as primary evidence. `CHANGELOG.md` is release-history/change
+history evidence: treat it as primary when the question asks about releases,
+changes, migration, deprecation, or compatibility history.
+
+For present-state questions, `CHANGELOG.md` may supplement maintained current
+documentation, but it must not outrank the current source-of-truth merely
+because it mentions the same feature.
+
 ## Module docs workflow
 
 Use module docs when the user asks about a specific package, app, service, crate, library, module, feature-area, deploy/runbook, or module-specific convention.

@@ -4,6 +4,7 @@ from __future__ import annotations
 import re
 from typing import Any
 
+from .context_blocks import source_block_alternatives
 from .technical_tokens import technical_term_pattern
 
 
@@ -45,7 +46,9 @@ def _query_terms(queries: tuple[str, ...]) -> set[str]:
     }
 
 
-def _is_complete_source_span(text: str, snippet: str) -> bool:
+def _is_complete_source_span(
+    text: str, snippet: str, *, span_start: int | None = None,
+) -> bool:
     """Return whether *snippet* ends at a source-local semantic boundary.
 
     This is a projection preference only. It never creates query attribution or
@@ -54,10 +57,58 @@ def _is_complete_source_span(text: str, snippet: str) -> bool:
     """
     if not snippet:
         return False
-    start = text.find(snippet)
-    if start < 0:
+    if span_start is None:
+        resolved = source_local_span(text, snippet)
+    elif (
+        type(span_start) is int
+        and 0 <= span_start <= len(text) - len(snippet)
+        and text[span_start:span_start + len(snippet)] == snippet
+    ):
+        resolved = (span_start, span_start + len(snippet))
+    else:
+        resolved = None
+    if resolved is None:
         return False
-    end = start + len(snippet)
+    start, end = resolved
+
+    # Sentence punctuation is not an item boundary.  A list item's trailing
+    # sentence can carry a default, restriction, or precondition that changes
+    # the meaning of an otherwise plausible prefix.  Reuse the structural
+    # alternatives already derived from the authorized source span and accept
+    # an item (or a contiguous run of items) only on complete item boundaries.
+    item_start, item_end = start, end
+    while item_start < item_end and text[item_start].isspace():
+        item_start += 1
+    while item_end > item_start and text[item_end - 1].isspace():
+        item_end -= 1
+
+    structural_spans = source_block_alternatives(text).spans
+    list_spans = [
+        span for span in structural_spans
+        if re.match(r"(?:[-+*]\s+|\d+[.)]\s+)", text[span[0]:span[1]].lstrip())
+    ]
+    atomic_items = [
+        span for span in list_spans
+        if not any(
+            other != span
+            and span[0] <= other[0] < other[1] <= span[1]
+            and (span[0], span[1]) != (other[0], other[1])
+            for other in list_spans
+        )
+    ]
+    touched_items = sorted(
+        (
+            span for span in atomic_items
+            if span[0] < item_end and item_start < span[1]
+        ),
+        key=lambda span: span[0],
+    )
+    if touched_items:
+        return (
+            item_start == touched_items[0][0]
+            and item_end == touched_items[-1][1]
+        )
+
     left = text[:start]
     right = text[end:]
     left_complete = not left.strip() or left.endswith("\n\n")

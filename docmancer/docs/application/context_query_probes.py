@@ -2,6 +2,9 @@
 from __future__ import annotations
 
 import re
+from typing import Any
+
+from docmancer.docs.domain.documentation_query_plan import technical_anchors
 
 from docmancer.docs.domain.query_terms import documentation_exact_terms, documentation_technical_anchors
 from docmancer.docs.domain.evidence_qualification import qualify_evidence
@@ -39,3 +42,28 @@ def independent_query_probes(source, query_plan):
         if qualified.qualified and len(body_matches) >= min(2, len(terms[query_id])) and distinctive & body_matches:
             matches[query_id] = dict(qualified.trace)
     return matches
+
+
+def _has_visible_non_path_exact_term(
+    *, raw_text: str, original_question: str, explicit_paths: set[str],
+) -> bool:
+    # Use whole anchors, not CamelCase substrings extracted from a file path.
+    # A heading such as "Reference" is not evidence for a topic merely because
+    # the requested file is named REFERENCE.md. Apply the ordinary body qualifier
+    # here too; headings, links and identifier prefixes cannot satisfy a topic.
+    terms = (
+        term for term in technical_anchors(original_question)
+        if "/" not in term and "\\" not in term
+        and _normalized_path(term) not in explicit_paths
+    )
+    return any(
+        qualify_evidence(
+            {"query_text": term, "query_terms": [term], "exact_terms": [term]},
+            query_id="exact-topic", visible_text=raw_text, evidence_text=raw_text,
+        ).qualified
+        for term in terms
+    )
+
+
+def _normalized_path(value: Any) -> str:
+    return str(value or "").replace("\\", "/").removeprefix("./").casefold()

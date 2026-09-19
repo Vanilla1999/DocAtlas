@@ -601,7 +601,7 @@ def build_project_retrieval_aliases(
             f"{product_prefix}project documentation storage and isolation",
             f"{product_prefix}per-project SQLite index storage",
         )
-    if _has(tokens, "чанк", "секци", "разбив", "chunk", "section", "split"):
+    if _has(tokens, "чанк", "секци", "chunk", "section"):
         chunk_queries: list[str] = []
         if _has(tokens, "заголов", "heading", "parent", "родител"):
             chunk_queries.append(f"{product_prefix}documentation headings semantic parent sections")
