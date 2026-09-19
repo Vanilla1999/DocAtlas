@@ -1,0 +1,66 @@
+name: Grounded Docs comparison smoke
+on:
+  push:
+    branches: [fix/v13-v15-evidence-pipeline]
+    paths:
+      - .github/workflows/grounded-docs-compare.yml
+
+permissions:
+  contents: read
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    env:
+      DOCS_MCP_APP_STORE_PATH: ${{ runner.temp }}/grounded-store
+      DOCS_MCP_APP_TELEMETRY_ENABLED: 'false'
+      DOCS_MCP_SCRAPER_SECURITY_FILE_ACCESS_ALLOWED_ROOTS: '["${{ github.workspace }}/gd-corpus"]'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: 95e61265656283d609bc1328c46c52b2bf1a069e
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Prepare comparable project-doc corpus
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p gd-corpus
+          for p in docs wiki roadmap adr adrs runbook runbooks; do
+            if [ -e "$p" ]; then cp -a "$p" gd-corpus/; fi
+          done
+          for f in README.md SKILL.md CHANGELOG.md CONTRIBUTING.md ARCHITECTURE.md; do
+            if [ -f "$f" ]; then cp "$f" gd-corpus/; fi
+          done
+          find gd-corpus -type f | sort > "$RUNNER_TEMP/corpus-files.txt"
+          wc -l "$RUNNER_TEMP/corpus-files.txt"
+      - name: Install Grounded Docs 3.1.0
+        run: npm install --no-save @arabold/docs-mcp-server@3.1.0
+      - name: Index local corpus
+        shell: bash
+        run: |
+          set -euo pipefail
+          ./node_modules/.bin/docs-mcp-server scrape docatlas file://$GITHUB_WORKSPACE/gd-corpus --version 95e6126 --quiet
+          ./node_modules/.bin/docs-mcp-server list --output json --quiet > "$RUNNER_TEMP/list.json"
+      - name: Smoke two queries
+        shell: bash
+        run: |
+          set -euo pipefail
+          ./node_modules/.bin/docs-mcp-server search docatlas "If my question compares two things, should I split it into separate documentation searches before seeing the first result?" --version 95e6126 --exact-match --limit 5 --output json --quiet > "$RUNNER_TEMP/g21.json"
+          ./node_modules/.bin/docs-mcp-server search docatlas "If the system says it does not have enough documentation evidence, should I keep rephrasing the question over and over until something appears?" --version 95e6126 --exact-match --limit 5 --output json --quiet > "$RUNNER_TEMP/g27.json"
+          python - <<'PY'
+          import json, os
+          from pathlib import Path
+          root=Path(os.environ['RUNNER_TEMP'])
+          out={'list':json.loads((root/'list.json').read_text()),'G21':json.loads((root/'g21.json').read_text()),'G27':json.loads((root/'g27.json').read_text())}
+          (root/'grounded-smoke.json').write_text(json.dumps(out,indent=2,ensure_ascii=False))
+          print(json.dumps(out,indent=2,ensure_ascii=False)[:12000])
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: grounded-docs-compare-smoke
+          path: |
+            ${{ runner.temp }}/grounded-smoke.json
+            ${{ runner.temp }}/corpus-files.txt
