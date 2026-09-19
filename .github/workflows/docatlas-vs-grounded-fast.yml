@@ -1,0 +1,120 @@
+name: DocAtlas vs Grounded equal-budget fast
+on:
+  push:
+    branches: [fix/v13-v15-evidence-pipeline]
+    paths: [.github/workflows/docatlas-vs-grounded-fast.yml]
+permissions: {contents: read}
+jobs:
+  compare:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    env:
+      DOCS_MCP_APP_TELEMETRY_ENABLED: 'false'
+      DOCS_MCP_SCRAPER_SECURITY_FILE_ACCESS_MODE: unrestricted
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with: {ref: 95e61265656283d609bc1328c46c52b2bf1a069e, path: frozen-corpus}
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - uses: astral-sh/setup-uv@v6
+      - run: uv sync --frozen --extra dev
+      - name: Install competitor and local models
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm install --no-save @arabold/docs-mcp-server@3.1.0
+          curl -fsSL https://ollama.com/install.sh | sh
+          ollama serve > "$RUNNER_TEMP/ollama.log" 2>&1 &
+          for i in $(seq 1 45); do curl -fsS http://127.0.0.1:11434/api/tags >/dev/null && break; sleep 1; done
+          ollama pull all-minilm
+          ollama pull qwen2.5:1.5b
+      - name: Index FTS and hybrid
+        shell: bash
+        env:
+          OPENAI_API_KEY: ollama
+          OPENAI_API_BASE: http://127.0.0.1:11434/v1
+          DOCS_MCP_EMBEDDING_MODEL: openai:all-minilm
+          DOCS_MCP_EMBEDDINGS_VECTOR_DIMENSION: '384'
+        run: |
+          python - <<'PY' > "$RUNNER_TEMP/versions.tsv"
+          import json
+          from pathlib import Path
+          m=json.loads(Path('frozen-corpus/eval/evidence_quality_v2/source-manifest.json').read_text()); d={}
+          for r in m['sources']: d.setdefault(r['project'],set()).add(r['ref'])
+          for p,refs in sorted(d.items()): assert len(refs)==1; print(p,next(iter(refs)),sep='\t')
+          PY
+          while IFS=$'\t' read -r project version; do
+            src="$GITHUB_WORKSPACE/frozen-corpus/eval/evidence_quality_v2/sources/$project"
+            DOCS_MCP_APP_STORE_PATH="$RUNNER_TEMP/fts" ./node_modules/.bin/docs-mcp-server scrape "$project" "file://$src" --version "$version" --quiet
+            DOCS_MCP_APP_STORE_PATH="$RUNNER_TEMP/hyb" ./node_modules/.bin/docs-mcp-server scrape "$project" "file://$src" --version "$version" --embedding-model openai:all-minilm --quiet
+          done < "$RUNNER_TEMP/versions.tsv"
+      - name: Search and pack
+        shell: bash
+        env:
+          OPENAI_API_KEY: ollama
+          OPENAI_API_BASE: http://127.0.0.1:11434/v1
+          DOCS_MCP_EMBEDDING_MODEL: openai:all-minilm
+          DOCS_MCP_EMBEDDINGS_VECTOR_DIMENSION: '384'
+        run: |
+          cat > "$RUNNER_TEMP/run.py" <<'PY'
+          import json,os,subprocess
+          from pathlib import Path
+          from urllib.parse import urlparse,unquote
+          from docmancer.docs.application.model_visible_projection_helpers import docs_context_budget_tokens
+          root=Path.cwd();tmp=Path(os.environ['RUNNER_TEMP']);cli=root/'node_modules/.bin/docs-mcp-server'
+          qs=json.loads((root/'eval/retrieval_recheck/holdout20_questions.json').read_text())['cases']
+          m=json.loads((root/'frozen-corpus/eval/evidence_quality_v2/source-manifest.json').read_text());vers={}
+          for r in m['sources']:vers.setdefault(r['project'],r['ref'])
+          def source(project,version,r):
+              p=Path(unquote(urlparse(r.get('url','')).path)); base=root/'frozen-corpus/eval/evidence_quality_v2/sources'/project
+              try:path=p.relative_to(base).as_posix()
+              except:path=p.name
+              return {'path_or_url':path,'snippet':r.get('content',''),'version_binding':version}
+          def pack(project,version,rs):
+              p={'kind':'docs_context','status':'ok','answer_supported':False,'answer_available':False,'edit_ready':False,'sources':[]}
+              for r in rs:
+                  if len(p['sources'])>=3:break
+                  q=json.loads(json.dumps(p));q['sources'].append(source(project,version,r))
+                  if docs_context_budget_tokens(q)<=800:p=q
+              p['estimated_tokens']=docs_context_budget_tokens(p);return p
+          def search(store,project,version,q):
+              env=os.environ.copy();env['DOCS_MCP_APP_STORE_PATH']=str(store)
+              cmd=[str(cli),'search',project,q,'--version',version,'--exact-match','--limit','5','--output','json','--quiet']
+              x=subprocess.run(cmd,text=True,stdout=subprocess.PIPE,stderr=subprocess.PIPE,env=env)
+              if x.returncode:raise RuntimeError(x.stderr[-3000:])
+              return json.loads(x.stdout)
+          rows=[]
+          for c in qs:
+              p=c['project_group'];v=vers[p];f=search(tmp/'fts',p,v,c['question']);h=search(tmp/'hyb',p,v,c['question'])
+              rows.append({'id':c['id'],'question':c['question'],'fts_equal':pack(p,v,f),'hybrid_equal':pack(p,v,h)})
+          (tmp/'packets.json').write_text(json.dumps({'cases':rows},indent=2,ensure_ascii=False))
+          PY
+          PYTHONPATH="$PWD" uv run --frozen --extra dev python "$RUNNER_TEMP/run.py"
+      - name: Read FTS and hybrid in parallel
+        shell: bash
+        run: |
+          python - <<'PY'
+          import concurrent.futures,json,os,urllib.request
+          from pathlib import Path
+          root=Path.cwd();tmp=Path(os.environ['RUNNER_TEMP']);data=json.loads((tmp/'packets.json').read_text())
+          proto=json.loads((root/'eval/retrieval_recheck/holdout20_protocol.json').read_text());system=proto['reader']['prompt']
+          def one(item):
+              row,lane=item;p=row[lane];user='QUESTION:\n'+row['question']+'\n\nCONTEXT (public packet JSON):\n'+json.dumps(p,ensure_ascii=False,separators=(',',':'))
+              body={'model':'qwen2.5:1.5b','stream':False,'messages':[{'role':'system','content':system},{'role':'user','content':user}],'options':{'temperature':0,'seed':0,'num_predict':160}}
+              req=urllib.request.Request('http://127.0.0.1:11434/api/chat',data=json.dumps(body).encode(),headers={'Content-Type':'application/json'})
+              with urllib.request.urlopen(req,timeout=240) as r:ans=json.loads(r.read())['message']['content']
+              return row['id'],lane,ans
+          jobs=[(r,l) for r in data['cases'] for l in ('fts_equal','hybrid_equal')]
+          with concurrent.futures.ThreadPoolExecutor(max_workers=4) as ex:
+              for cid,lane,ans in ex.map(one,jobs):
+                  row=next(r for r in data['cases'] if r['id']==cid);row[lane+'_reader']=ans;print(cid,lane,repr(ans[:80]),flush=True)
+          (tmp/'result.json').write_text(json.dumps(data,indent=2,ensure_ascii=False))
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: docatlas-vs-grounded-equal-budget-fast
+          path: |
+            ${{ runner.temp }}/packets.json
+            ${{ runner.temp }}/result.json
+            ${{ runner.temp }}/ollama.log
