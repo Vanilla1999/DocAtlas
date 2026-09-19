@@ -4,7 +4,8 @@ on:
     branches: [fix/v13-v15-evidence-pipeline]
     paths:
       - .github/workflows/global-evidence-tdd-apply.yml
-      - .github/global-evidence-candidate.patch.gz.b64
+      - .github/global-evidence-prod-*.b64
+      - .github/global-evidence-tests-*.b64
 
 permissions:
   contents: write
@@ -12,23 +13,33 @@ permissions:
 jobs:
   apply-and-verify:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 35
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
       - uses: astral-sh/setup-uv@v6
 
-      - name: Reconstruct exact reviewed patch
+      - name: Reconstruct exact reviewed patches
         shell: bash
         run: |
           set -euo pipefail
-          base64 -d .github/global-evidence-candidate.patch.gz.b64 > "$RUNNER_TEMP/candidate.patch.gz"
-          echo "81ffc50214485eb05d3860370f1f90d6c0219902f683ebb263de48547759e313  $RUNNER_TEMP/candidate.patch.gz" | sha256sum -c -
-          gzip -dc "$RUNNER_TEMP/candidate.patch.gz" > "$RUNNER_TEMP/candidate.patch"
-          echo "39f671267fc18bdda98be08be7288f50d11256501ade16b630d7165942ebecd9  $RUNNER_TEMP/candidate.patch" | sha256sum -c -
-          git apply --check "$RUNNER_TEMP/candidate.patch"
-          git apply --index "$RUNNER_TEMP/candidate.patch"
+          cat             .github/global-evidence-prod-00.b64             .github/global-evidence-prod-01.b64             .github/global-evidence-prod-02.b64             .github/global-evidence-prod-03a.b64             .github/global-evidence-prod-03b.b64             .github/global-evidence-prod-04.b64             .github/global-evidence-prod-05.b64 > "$RUNNER_TEMP/prod.b64"
+          base64 -d "$RUNNER_TEMP/prod.b64" > "$RUNNER_TEMP/prod.patch.gz"
+          echo "c5a6d42080325237322aebb47d2dc8724d06c595c3bd6d4075f60eb924ae134b  $RUNNER_TEMP/prod.patch.gz" | sha256sum -c -
+          gzip -dc "$RUNNER_TEMP/prod.patch.gz" > "$RUNNER_TEMP/prod.patch"
+          echo "588f9deae18d88acd0b09d3cd1c7d52a6d1ad5e0a5dd5aa2f3d471fdbc0057b2  $RUNNER_TEMP/prod.patch" | sha256sum -c -
+
+          cat             .github/global-evidence-tests-00.b64             .github/global-evidence-tests-01.b64             .github/global-evidence-tests-02.b64             .github/global-evidence-tests-03.b64 > "$RUNNER_TEMP/tests.b64"
+          base64 -d "$RUNNER_TEMP/tests.b64" > "$RUNNER_TEMP/tests.patch.gz"
+          echo "4529b8bdad309b7c9ee2caa8f156f3644b7ad888315e051dfae6402c6bb5a222  $RUNNER_TEMP/tests.patch.gz" | sha256sum -c -
+          gzip -dc "$RUNNER_TEMP/tests.patch.gz" > "$RUNNER_TEMP/tests.patch"
+          echo "ed0d3cb63e90135b5a2e244c8d26a75769164d93b6d2d1c9a80b6b80ea0288c8  $RUNNER_TEMP/tests.patch" | sha256sum -c -
+
+          git apply --check "$RUNNER_TEMP/prod.patch"
+          git apply --index "$RUNNER_TEMP/prod.patch"
+          git apply --check "$RUNNER_TEMP/tests.patch"
+          git apply --index "$RUNNER_TEMP/tests.patch"
           git diff --cached --check
 
       - name: Sync frozen environment
@@ -52,7 +63,7 @@ jobs:
           test "$code" -eq 1
           python - <<'PY'
           from pathlib import Path
-          import re, os
+          import os, re
           text=Path(os.environ["RUNNER_TEMP"]).joinpath("size.log").read_text()
           offenders=re.findall(r"^\s+(\d+)\s+(.+\.py)$", text, re.M)
           assert offenders == [("1147", "docmancer/docs/application/_project_docs_service_part03.py")], offenders
@@ -65,7 +76,8 @@ jobs:
           path: |
             ${{ runner.temp }}/focused.log
             ${{ runner.temp }}/size.log
-            ${{ runner.temp }}/candidate.patch
+            ${{ runner.temp }}/prod.patch
+            ${{ runner.temp }}/tests.patch
 
       - name: Commit verified candidate without staging files
         shell: bash
@@ -73,8 +85,18 @@ jobs:
           set -euo pipefail
           git config user.name "Vanilla1999"
           git config user.email "41183994+Vanilla1999@users.noreply.github.com"
-          git rm .github/global-evidence-candidate.patch.gz.b64
           git rm .github/workflows/global-evidence-tdd-apply.yml
+          git rm .github/global-evidence-prod-00.b64
+          git rm .github/global-evidence-prod-01.b64
+          git rm .github/global-evidence-prod-02.b64
+          git rm .github/global-evidence-prod-03a.b64
+          git rm .github/global-evidence-prod-03b.b64
+          git rm .github/global-evidence-prod-04.b64
+          git rm .github/global-evidence-prod-05.b64
+          git rm .github/global-evidence-tests-00.b64
+          git rm .github/global-evidence-tests-01.b64
+          git rm .github/global-evidence-tests-02.b64
+          git rm .github/global-evidence-tests-03.b64
           git add -A
           git diff --cached --check
           git commit -m "fix: preserve requested evidence across bounded delivery"
