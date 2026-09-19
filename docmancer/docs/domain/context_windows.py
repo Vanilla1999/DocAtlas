@@ -46,7 +46,9 @@ def _query_terms(queries: tuple[str, ...]) -> set[str]:
     }
 
 
-def _is_complete_source_span(text: str, snippet: str) -> bool:
+def _is_complete_source_span(
+    text: str, snippet: str, *, span_start: int | None = None,
+) -> bool:
     """Return whether *snippet* ends at a source-local semantic boundary.
 
     This is a projection preference only. It never creates query attribution or
@@ -55,7 +57,16 @@ def _is_complete_source_span(text: str, snippet: str) -> bool:
     """
     if not snippet:
         return False
-    resolved = source_local_span(text, snippet)
+    if span_start is None:
+        resolved = source_local_span(text, snippet)
+    elif (
+        type(span_start) is int
+        and 0 <= span_start <= len(text) - len(snippet)
+        and text[span_start:span_start + len(snippet)] == snippet
+    ):
+        resolved = (span_start, span_start + len(snippet))
+    else:
+        resolved = None
     if resolved is None:
         return False
     start, end = resolved
