@@ -1,0 +1,12 @@
+{
+  "schema_version": 1,
+  "module_labels": {
+    "tests/docs/test_query_reference_roles.py": "behavioral",
+    "tests/docs/test_source_locator_resolution.py": "behavioral"
+  },
+  "module_node_hashes": {
+    "tests/docs/test_query_reference_roles.py": "4fdd87dc2c5ca45b40cc7e1d17d210c41afe7551c51765eccd9876274b73a54f",
+    "tests/docs/test_source_locator_resolution.py": "d18918b1f6525206dc365e4046e157017d73a6a37de4a77935b67357b1a67027"
+  },
+  "node_overrides": {}
+}
