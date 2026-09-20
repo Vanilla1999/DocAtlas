@@ -1,0 +1,66 @@
+{
+  "schema_version": 1,
+  "status": "candidate_rejected",
+  "baseline_production_sha": "ef39e12ab60fd69f8052079847d9e0ca24a843b4",
+  "development": {
+    "core_parity": {
+      "run_id": 35469202972,
+      "artifact_id": 10592112447,
+      "artifact_sha256": "0c24fec20ed5d26454e8620de435b5d51e4f7e70e167c2c3343b999ddb95b2e5",
+      "baseline": "22 failed / 4103 passed / 10 skipped / 622 deselected",
+      "candidate": "22 failed / 4161 passed / 10 skipped / 622 deselected",
+      "same_failed_node_ids": true
+    },
+    "question_gate": {
+      "run_id": 35469593733,
+      "artifact_id": 10592502225,
+      "artifact_sha256": "259e2a2fa110bfdd4d9425263a41f1a286029eaf991c51374011332a64143aa1",
+      "target30_changed_ids": [],
+      "external80": {
+        "baseline_sufficient": 31,
+        "candidate_sufficient": 34,
+        "wins": [
+          "httpx-01",
+          "ruff-05",
+          "starlette-01"
+        ],
+        "losses": [],
+        "baseline_safety": 0,
+        "candidate_safety": 0
+      }
+    }
+  },
+  "transfer24": {
+    "frozen_before_candidate": true,
+    "first_run": {
+      "run_id": 35473691226,
+      "candidate_executed": false,
+      "failure": "baseline fixture ingest rejected non-Markdown .rst transport"
+    },
+    "retry": {
+      "run_id": 35473791525,
+      "artifact_id": 10593137200,
+      "artifact_sha256": "c3f8ee2162439fc9a9c64312b6b71fb04e40c7a27dd0c526fb642862295a1b51",
+      "baseline_supported": 7,
+      "candidate_supported": 7,
+      "wins": [
+        "T24-httpcore-03"
+      ],
+      "losses": [
+        "T24-click-02"
+      ],
+      "baseline_safety": 0,
+      "candidate_safety": 0,
+      "decision": "rejected"
+    },
+    "manual_loss_review": {
+      "case_id": "T24-click-02",
+      "baseline": "all three requested Click capability facts visible in one README source",
+      "candidate": "insufficient_evidence with zero sources",
+      "real_requested_evidence_loss": true
+    }
+  },
+  "post_transfer_production_tuning": false,
+  "final_production_action": "restore global-evidence production changes to ef39 baseline",
+  "final_status": "candidate_rejected_transfer_loss_confirmed_production_rolled_back"
+}

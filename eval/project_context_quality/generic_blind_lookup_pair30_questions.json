@@ -1,0 +1,251 @@
+{
+  "schema_version": 1,
+  "status": "generic_project_blind_pair_set",
+  "rules": [
+    "Root questions are written without DocAtlas-specific names, internal field names, file names, or status constants.",
+    "Lookup queries are paraphrases/facet restatements derivable from the root question only.",
+    "Lookup queries must not contain expected-answer-only vocabulary, guessed source names, or project identifiers."
+  ],
+  "cases": [
+    {
+      "id": "G01",
+      "question": "If a documentation search result is shortened because it cannot include everything, how can I tell what was left out?",
+      "lookup_queries": [
+        "shortened documentation response omitted material",
+        "truncated documentation result missing content"
+      ]
+    },
+    {
+      "id": "G02",
+      "question": "What is the difference between an answer being cut short and the system not finding enough reliable documentation to answer at all?",
+      "lookup_queries": [
+        "cut short response versus not enough documentation evidence",
+        "truncated result versus insufficient documentation evidence"
+      ]
+    },
+    {
+      "id": "G03",
+      "question": "If a documentation answer is cut short, does that mean important evidence may have been silently removed?",
+      "lookup_queries": [
+        "truncated documentation answer importance of omitted material",
+        "cut short result omitted evidence"
+      ]
+    },
+    {
+      "id": "G04",
+      "question": "When a documentation result is incomplete because of response limits, what information should I inspect to understand that limitation?",
+      "lookup_queries": [
+        "documentation response limits omission metadata",
+        "incomplete documentation result what was omitted"
+      ]
+    },
+    {
+      "id": "G05",
+      "question": "Can I still use a documentation result that was shortened, and what should I be careful not to assume?",
+      "lookup_queries": [
+        "using truncated documentation result safely",
+        "shortened documentation response completeness limitation"
+      ]
+    },
+    {
+      "id": "G06",
+      "question": "If a tool cannot safely support the claim I asked about, how should that differ from simply returning a shortened result?",
+      "lookup_queries": [
+        "no safe documentation evidence versus shortened result",
+        "unable to support claim versus truncated response"
+      ]
+    },
+    {
+      "id": "G07",
+      "question": "If a result includes useful sources but says some material was omitted, should I automatically treat the whole result as unusable?",
+      "lookup_queries": [
+        "useful sources with omitted material",
+        "truncated result still usable evidence"
+      ]
+    },
+    {
+      "id": "G08",
+      "question": "How can I distinguish content omitted because of output limits from content that the documentation search never found?",
+      "lookup_queries": [
+        "output limit omission versus search miss",
+        "truncation versus missing retrieval evidence"
+      ]
+    },
+    {
+      "id": "G09",
+      "question": "If a documentation response is shortened, should my first reaction be to increase the response size or search budget?",
+      "lookup_queries": [
+        "truncated documentation response recovery",
+        "shortened result increase budget or targeted follow up"
+      ]
+    },
+    {
+      "id": "G10",
+      "question": "What should a client look at besides the main result status before deciding whether a bounded documentation response is usable?",
+      "lookup_queries": [
+        "documentation response status sources missing omissions",
+        "bounded response usability metadata"
+      ]
+    },
+    {
+      "id": "G11",
+      "question": "When I ask how software works today, should old release notes or the maintained current documentation be treated as the main source?",
+      "lookup_queries": [
+        "current software behavior maintained docs versus release notes",
+        "present behavior source authority release notes current docs"
+      ]
+    },
+    {
+      "id": "G12",
+      "question": "For what kinds of questions are release notes the most appropriate primary source?",
+      "lookup_queries": [
+        "when release notes are primary evidence",
+        "release history migration deprecation questions"
+      ]
+    },
+    {
+      "id": "G13",
+      "question": "If current maintained documentation and older release notes seem to disagree about present behavior, which one should guide the answer?",
+      "lookup_queries": [
+        "current documentation versus historical release notes conflict",
+        "present behavior source authority"
+      ]
+    },
+    {
+      "id": "G14",
+      "question": "For a question about how users migrated between versions, should I prefer current docs or historical release notes?",
+      "lookup_queries": [
+        "migration between versions current docs or release notes",
+        "migration history documentation source"
+      ]
+    },
+    {
+      "id": "G15",
+      "question": "For a question about the software's current configuration, how much weight should an old release note carry?",
+      "lookup_queries": [
+        "current configuration old release notes",
+        "present configuration maintained docs historical notes"
+      ]
+    },
+    {
+      "id": "G16",
+      "question": "How should an answer about current API behavior make use of historical release notes?",
+      "lookup_queries": [
+        "current API behavior historical release notes",
+        "present API docs versus release history"
+      ]
+    },
+    {
+      "id": "G17",
+      "question": "If I want to know when a feature changed and in which release, what kind of documentation should I search first?",
+      "lookup_queries": [
+        "feature change release history source",
+        "when feature changed release notes"
+      ]
+    },
+    {
+      "id": "G18",
+      "question": "If I want to know the feature's current contract after several releases, what kind of source should be primary?",
+      "lookup_queries": [
+        "current feature contract primary documentation source",
+        "present behavior after historical changes"
+      ]
+    },
+    {
+      "id": "G19",
+      "question": "If release notes mention the same feature as the current docs, is that alone a reason to prefer the release notes for a present-day question?",
+      "lookup_queries": [
+        "same feature release notes versus current docs",
+        "present day question release note authority"
+      ]
+    },
+    {
+      "id": "G20",
+      "question": "How should historical deprecation notes be combined with documentation for the replacement that exists today?",
+      "lookup_queries": [
+        "deprecation history with current replacement documentation",
+        "historical notes supplement current docs"
+      ]
+    },
+    {
+      "id": "G21",
+      "question": "If my question compares two things, should I split it into separate documentation searches before seeing the first result?",
+      "lookup_queries": [
+        "comparison question retrieval planning",
+        "split comparison before first documentation result"
+      ]
+    },
+    {
+      "id": "G22",
+      "question": "If my question means the same thing as the docs but uses different terminology, should I add alternate phrasings to the same search or start unrelated searches?",
+      "lookup_queries": [
+        "same question different terminology retrieval",
+        "alternate phrasing same documentation search"
+      ]
+    },
+    {
+      "id": "G23",
+      "question": "If the first documentation result answers most of my question but clearly misses one independent part, what should I do next?",
+      "lookup_queries": [
+        "first result missing one independent requested part",
+        "targeted follow up for missing part"
+      ]
+    },
+    {
+      "id": "G24",
+      "question": "If I already know which documentation source contains the missing fact, should I search broadly again or read that source directly?",
+      "lookup_queries": [
+        "known documentation source missing fact targeted read",
+        "known source versus broad search"
+      ]
+    },
+    {
+      "id": "G25",
+      "question": "When should I stop retrieving documentation even if the returned context is not perfect?",
+      "lookup_queries": [
+        "when to stop documentation retrieval",
+        "sufficient evidence imperfect context"
+      ]
+    },
+    {
+      "id": "G26",
+      "question": "Does a low or uncertain context-quality indicator by itself mean I must run another documentation search?",
+      "lookup_queries": [
+        "uncertain context quality another search",
+        "quality indicator versus sufficient visible evidence"
+      ]
+    },
+    {
+      "id": "G27",
+      "question": "If the system says it does not have enough documentation evidence, should I keep rephrasing the question over and over until something appears?",
+      "lookup_queries": [
+        "not enough documentation evidence rephrase retry",
+        "repeated rephrasing after insufficient evidence"
+      ]
+    },
+    {
+      "id": "G28",
+      "question": "If the documentation tool explicitly suggests a next action, should I invent a different recovery step or follow the suggested one?",
+      "lookup_queries": [
+        "documentation tool suggested next action recovery",
+        "follow typed next action versus invent recovery"
+      ]
+    },
+    {
+      "id": "G29",
+      "question": "If one fact is missing, is globally increasing result count or token budget the normal recovery strategy?",
+      "lookup_queries": [
+        "missing documentation fact increase result count token budget",
+        "targeted recovery versus global budget increase"
+      ]
+    },
+    {
+      "id": "G30",
+      "question": "If a comparison result covers one side well but leaves the other side unsupported, what should the next search focus on?",
+      "lookup_queries": [
+        "comparison one side missing targeted follow up",
+        "missing comparison side separate documentation query"
+      ]
+    }
+  ]
+}

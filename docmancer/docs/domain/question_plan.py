@@ -505,7 +505,7 @@ def _semantic_comparison(q: str) -> QuestionPlan | None:
     return QuestionPlan(
         facets=(PlannedFacet(
             "comparison", frame.left, relation="contrast", target=frame.right,
-            span_text=q,
+            context=frame.context, span_text=q,
         ),),
         clauses=(q,),
         parse_trace=("frame:comparison",),

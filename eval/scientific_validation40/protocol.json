@@ -1,0 +1,29 @@
+{
+  "schema_version": 1,
+  "state": "frozen_before_first_validation_result",
+  "structural_baseline_ref": "b07dc52bd7ba02a449477bc534cc84dc1d276ffd",
+  "structural_candidate_ref": "e5e1bec980caa1b66758f655940d519f0ba2fa04",
+  "source_freeze": {
+    "run_id": 35442584246,
+    "artifact_id": 10584315850,
+    "artifact_digest": "sha256:ff26a5a15b58916634c33f3ace14eb1a0d644c7f48e20a9d51f51dc5e8adc492",
+    "manifest_sha256": "f92d5fcea6cfcb4a8e95f8711b8ccfb40d7cd521b85e14e61d8747e5829d5f3f"
+  },
+  "questions_blob_sha": "6802f6d56bafad51475787320d574ada218560c8",
+  "gold_spans_blob_sha": "a34c451430f2390201b9dfd3845074c0c6b45619",
+  "design": {
+    "families": 5,
+    "cases": 40,
+    "within_budget": 24,
+    "partial": 8,
+    "unanswerable": 8,
+    "lookups": 0,
+    "max_sources": 3,
+    "max_admission_tokens": 800
+  },
+  "anti_tuning_rule": "After first validation output is opened, do not change production candidate, questions, source artifact, gold spans, or reader arm definitions in this cycle.",
+  "decision_rule": {
+    "structural": "No new source/version/snapshot/negation regressions; compare gains/losses on 24 answerable plus fail-closed behavior on 16 controls.",
+    "presentation": "Only a preselected P3 arm may be tested; rollout requires >=5 percentage-point grounded-correct gain, project-cluster bootstrap lower bound > 0, no increase in unsupported answers, and transparent cost/latency."
+  }
+}

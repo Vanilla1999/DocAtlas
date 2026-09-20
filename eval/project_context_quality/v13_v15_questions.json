@@ -1,0 +1,187 @@
+{
+  "schema_version": 1,
+  "status": "frozen_development_set",
+  "purpose": "Targeted V13/V15 diagnostics; public capture only, no semantic score.",
+  "cases": [
+    {
+      "id": "DR30-01",
+      "legacy_id": null,
+      "question": "When `get_docs_context` returns `status=\"truncated\"`, how should an agent handle `omitted_counts`?",
+      "lookup_queries": []
+    },
+    {
+      "id": "DR30-02",
+      "legacy_id": null,
+      "question": "Does `status=\"truncated\"` mean that critical evidence may have been omitted?",
+      "lookup_queries": []
+    },
+    {
+      "id": "DR30-03",
+      "legacy_id": null,
+      "question": "Which field reports omitted material in a bounded DocAtlas response?",
+      "lookup_queries": []
+    },
+    {
+      "id": "DR30-04",
+      "legacy_id": null,
+      "question": "Which response fields should a client inspect when a documentation packet is bounded or truncated?",
+      "lookup_queries": []
+    },
+    {
+      "id": "DR30-05",
+      "legacy_id": null,
+      "question": "How is omitted evidence represented in the bounded project-documentation authoring handoff?",
+      "lookup_queries": []
+    },
+    {
+      "id": "DR30-06",
+      "legacy_id": null,
+      "question": "If evidence is omitted from the project-doc authoring handoff, what information about missing categories and retry actions remains available?",
+      "lookup_queries": []
+    },
+    {
+      "id": "DR30-07",
+      "legacy_id": null,
+      "question": "What size bound applies to the complete serialized project-documentation authoring handoff?",
+      "lookup_queries": []
+    },
+    {
+      "id": "DR30-08",
+      "legacy_id": null,
+      "question": "Contrast top-level `omitted_counts` with `documentation_gap.bounds.omitted_counts`.",
+      "lookup_queries": []
+    },
+    {
+      "id": "DR30-09",
+      "legacy_id": null,
+      "question": "In `documentation_gap.bounds.omitted_counts`, what is the terminal member?",
+      "lookup_queries": []
+    },
+    {
+      "id": "DR30-10",
+      "legacy_id": null,
+      "question": "Where is `omitted_counts` recorded when a project-doc authoring handoff is truncated?",
+      "lookup_queries": []
+    },
+    {
+      "id": "DR30-11",
+      "legacy_id": null,
+      "question": "How are omissions surfaced to a caller when a bounded context response cannot contain all non-critical material?",
+      "lookup_queries": []
+    },
+    {
+      "id": "DR30-12",
+      "legacy_id": null,
+      "question": "What is the difference between a truncated response and a response with insufficient evidence?",
+      "lookup_queries": []
+    },
+    {
+      "id": "DR30-13",
+      "legacy_id": "V13",
+      "question": "How does DocAtlas report omitted material when a bounded documentation response cannot include everything?",
+      "lookup_queries": []
+    },
+    {
+      "id": "DR30-14",
+      "legacy_id": null,
+      "question": "If a DocAtlas response is too large to include every non-critical detail, how is that omission surfaced to the caller?",
+      "lookup_queries": []
+    },
+    {
+      "id": "DR30-15",
+      "legacy_id": "V15",
+      "question": "How should current documentation answers treat CHANGELOG.md compared with current source-of-truth documentation?",
+      "lookup_queries": []
+    },
+    {
+      "id": "DR30-16",
+      "legacy_id": null,
+      "question": "For a current-behavior question, should `CHANGELOG.md` be treated as the primary source when maintained current documentation exists?",
+      "lookup_queries": []
+    },
+    {
+      "id": "DR30-17",
+      "legacy_id": null,
+      "question": "For what kind of question is `CHANGELOG.md` appropriately treated as a primary source?",
+      "lookup_queries": []
+    },
+    {
+      "id": "DR30-18",
+      "legacy_id": null,
+      "question": "Compare `CHANGELOG.md` with current source-of-truth documentation for answering questions about present behavior.",
+      "lookup_queries": []
+    },
+    {
+      "id": "DR30-19",
+      "legacy_id": null,
+      "question": "Which should take precedence for current behavior: `CHANGELOG.md` or current maintained source-of-truth documentation?",
+      "lookup_queries": []
+    },
+    {
+      "id": "DR30-20",
+      "legacy_id": null,
+      "question": "For a release-history question, how should `CHANGELOG.md` be ranked relative to current-behavior documentation?",
+      "lookup_queries": []
+    },
+    {
+      "id": "DR30-21",
+      "legacy_id": null,
+      "question": "How does `CHANGELOG.md` differ from current source-of-truth documentation in answer authority?",
+      "lookup_queries": []
+    },
+    {
+      "id": "DR30-22",
+      "legacy_id": null,
+      "question": "What is the difference between `CHANGELOG.md` and current source-of-truth documentation when answering current-state questions?",
+      "lookup_queries": []
+    },
+    {
+      "id": "DR30-23",
+      "legacy_id": null,
+      "question": "Compare `CHANGELOG.md` with current source-of-truth documentation for current documentation answers.",
+      "lookup_queries": []
+    },
+    {
+      "id": "DR30-24",
+      "legacy_id": null,
+      "question": "Current documentation answers should use `CHANGELOG.md` instead of maintained source-of-truth docs — is that correct?",
+      "lookup_queries": []
+    },
+    {
+      "id": "DR30-25",
+      "legacy_id": null,
+      "question": "What should current documentation answers use rather than `CHANGELOG.md` when both historical and maintained current sources are available?",
+      "lookup_queries": []
+    },
+    {
+      "id": "DR30-26",
+      "legacy_id": null,
+      "question": "Should a comparison question normally be split into multiple retrieval calls before the first bounded documentation packet is inspected?",
+      "lookup_queries": []
+    },
+    {
+      "id": "DR30-27",
+      "legacy_id": null,
+      "question": "When a question's wording differs from documentation vocabulary, how should narrow `lookup_queries` be used?",
+      "lookup_queries": []
+    },
+    {
+      "id": "DR30-28",
+      "legacy_id": null,
+      "question": "After the first documentation packet leaves an independently answerable requested part missing, when is a split follow-up query appropriate?",
+      "lookup_queries": []
+    },
+    {
+      "id": "DR30-29",
+      "legacy_id": null,
+      "question": "If a known source contains a concrete missing requested fact, what kind of bounded continuation should be used?",
+      "lookup_queries": []
+    },
+    {
+      "id": "DR30-30",
+      "legacy_id": null,
+      "question": "When should bounded retrieval stop rather than continuing solely because context quality is not perfect?",
+      "lookup_queries": []
+    }
+  ]
+}

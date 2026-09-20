@@ -1,0 +1,281 @@
+{
+  "schema_version": 1,
+  "method": "Manual source-sufficiency review of paired public packets. No LLM judge and no frozen evaluator score.",
+  "constraints": {
+    "project_blind_questions": true,
+    "project_blind_lookups": true,
+    "forbidden_leakage": [
+      "DocAtlas",
+      "SKILL.md",
+      "CHANGELOG.md",
+      "omitted_counts",
+      "documentation_gap",
+      "recommended_next_action",
+      "lookup_queries",
+      "context_quality",
+      "docs_context",
+      "insufficient_evidence",
+      "status=\"truncated\""
+    ],
+    "lookup_rule": "Each lookup is only a paraphrase or facet restatement derivable from the root question; no expected-answer-only vocabulary, guessed source names, or project identifiers."
+  },
+  "run": {
+    "runtime_sha": "95e61265656283d609bc1328c46c52b2bf1a069e",
+    "corpus_sha": "95e61265656283d609bc1328c46c52b2bf1a069e",
+    "questions_sha256": "5cb972b858723ca76680ff12bfa01ec727b2486666e543bdec9d10b976067577",
+    "artifact_id": 10563443224,
+    "artifact_digest": "sha256:13c4ade9bc01f871144ef1ecc1f6024e3c071a128c3d57a4bac625d5a8894035",
+    "execution_errors": 0,
+    "public_calls": 60
+  },
+  "rubric": {
+    "sufficient": "Visible public sources directly support a complete answer without guesswork or unsafe layer conflation.",
+    "partial": "Visible sources support an important part but omit a requested distinction/condition or risk conflating different contract layers.",
+    "miss": "Visible public sources do not support the requested answer."
+  },
+  "summary": {
+    "root_only": {
+      "sufficient": 9,
+      "partial": 2,
+      "miss": 19
+    },
+    "with_project_blind_lookups": {
+      "sufficient": 20,
+      "partial": 3,
+      "miss": 7
+    },
+    "pairwise": {
+      "improved": 12,
+      "worsened": 0,
+      "unchanged": 18
+    },
+    "strict_sufficient_delta": 11
+  },
+  "category_breakdown": {
+    "omission_and_bounded_response": {
+      "root_only": {
+        "sufficient": 0,
+        "partial": 2,
+        "miss": 8
+      },
+      "with_lookups": {
+        "sufficient": 4,
+        "partial": 3,
+        "miss": 3
+      }
+    },
+    "current_vs_history_authority": {
+      "root_only": {
+        "sufficient": 6,
+        "partial": 0,
+        "miss": 4
+      },
+      "with_lookups": {
+        "sufficient": 9,
+        "partial": 0,
+        "miss": 1
+      }
+    },
+    "workflow_and_recovery": {
+      "root_only": {
+        "sufficient": 3,
+        "partial": 0,
+        "miss": 7
+      },
+      "with_lookups": {
+        "sufficient": 7,
+        "partial": 0,
+        "miss": 3
+      }
+    }
+  },
+  "cases": [
+    {
+      "id": "G01",
+      "root_rating": "miss",
+      "lookup_rating": "sufficient",
+      "rationale": "Lookup surfaces the public omitted-material contract; root returns unrelated MCP Packs."
+    },
+    {
+      "id": "G02",
+      "root_rating": "miss",
+      "lookup_rating": "miss",
+      "rationale": "Even with lookups the visible sources do not explain cut-short versus no-safe-evidence; comparison retrieval drifts to unrelated authority/library material."
+    },
+    {
+      "id": "G03",
+      "root_rating": "miss",
+      "lookup_rating": "sufficient",
+      "rationale": "Lookup surfaces the omitted-material contract stating truncation omits non-critical material."
+    },
+    {
+      "id": "G04",
+      "root_rating": "miss",
+      "lookup_rating": "sufficient",
+      "rationale": "Lookup directly surfaces the client-handling field list: status, kind, sources, missing, omitted_counts."
+    },
+    {
+      "id": "G05",
+      "root_rating": "partial",
+      "lookup_rating": "partial",
+      "rationale": "Both variants support using grounded visible sources without claiming completeness, but neither directly binds that guidance to truncation."
+    },
+    {
+      "id": "G06",
+      "root_rating": "miss",
+      "lookup_rating": "partial",
+      "rationale": "Lookup surfaces the no-safe-context meaning of insufficient evidence but not the full contrasting truncation semantics in the same visible packet."
+    },
+    {
+      "id": "G07",
+      "root_rating": "miss",
+      "lookup_rating": "miss",
+      "rationale": "Both variants return no usable source for the question whether omitted material makes an otherwise useful packet unusable."
+    },
+    {
+      "id": "G08",
+      "root_rating": "partial",
+      "lookup_rating": "partial",
+      "rationale": "Both expose omission/missing concepts, but the omission witness is the nested authoring-handoff contract rather than the normal public-response omission field, so layer distinction remains unsafe."
+    },
+    {
+      "id": "G09",
+      "root_rating": "miss",
+      "lookup_rating": "miss",
+      "rationale": "Lookup finds truncation semantics but not the recovery policy needed to answer whether increasing budget should be the first reaction."
+    },
+    {
+      "id": "G10",
+      "root_rating": "miss",
+      "lookup_rating": "sufficient",
+      "rationale": "Lookup directly surfaces the public client-handling fields."
+    },
+    {
+      "id": "G11",
+      "root_rating": "sufficient",
+      "lookup_rating": "sufficient",
+      "rationale": "Both surface the maintained-current-docs versus release-history authority rule."
+    },
+    {
+      "id": "G12",
+      "root_rating": "miss",
+      "lookup_rating": "sufficient",
+      "rationale": "Lookup changes the result from unrelated workflow guidance to the direct release-history authority rule."
+    },
+    {
+      "id": "G13",
+      "root_rating": "sufficient",
+      "lookup_rating": "sufficient",
+      "rationale": "Both directly support current maintained documentation as primary for present behavior."
+    },
+    {
+      "id": "G14",
+      "root_rating": "sufficient",
+      "lookup_rating": "sufficient",
+      "rationale": "Both directly support release history as primary for migration/history questions."
+    },
+    {
+      "id": "G15",
+      "root_rating": "sufficient",
+      "lookup_rating": "sufficient",
+      "rationale": "Both directly support maintained current documentation for current configuration."
+    },
+    {
+      "id": "G16",
+      "root_rating": "miss",
+      "lookup_rating": "miss",
+      "rationale": "API wording hijacks both variants toward API keys/registry material; the current-versus-history rule is not surfaced."
+    },
+    {
+      "id": "G17",
+      "root_rating": "miss",
+      "lookup_rating": "sufficient",
+      "rationale": "Lookup surfaces the direct rule that release/change history is a release-notes/CHANGELOG question."
+    },
+    {
+      "id": "G18",
+      "root_rating": "sufficient",
+      "lookup_rating": "sufficient",
+      "rationale": "Both surface the current source-of-truth rule; lookup also surfaces the present-state caveat."
+    },
+    {
+      "id": "G19",
+      "root_rating": "sufficient",
+      "lookup_rating": "sufficient",
+      "rationale": "Both directly state that historical notes may supplement but must not outrank current source-of-truth merely due feature-name overlap."
+    },
+    {
+      "id": "G20",
+      "root_rating": "miss",
+      "lookup_rating": "sufficient",
+      "rationale": "Root returns only a historical changelog example; lookup surfaces the authority rule needed to combine history with current documentation."
+    },
+    {
+      "id": "G21",
+      "root_rating": "miss",
+      "lookup_rating": "miss",
+      "rationale": "Both interpret split mainly as chunk splitting/indexing instead of retrieval-planning split semantics."
+    },
+    {
+      "id": "G22",
+      "root_rating": "miss",
+      "lookup_rating": "miss",
+      "rationale": "Lookup avoids total failure but still does not surface the same-need/different-vocabulary workflow rule."
+    },
+    {
+      "id": "G23",
+      "root_rating": "miss",
+      "lookup_rating": "sufficient",
+      "rationale": "Lookup surfaces the exact gap-directed rule: split only after the first packet leaves an independently answerable requested part missing."
+    },
+    {
+      "id": "G24",
+      "root_rating": "miss",
+      "lookup_rating": "sufficient",
+      "rationale": "Lookup surfaces the exact known-source rule: use the issued bounded source read instead of broad search."
+    },
+    {
+      "id": "G25",
+      "root_rating": "sufficient",
+      "lookup_rating": "sufficient",
+      "rationale": "Both surface the explicit stop rule: sufficient visible packet or no progress; unverified quality alone is not a reason to continue."
+    },
+    {
+      "id": "G26",
+      "root_rating": "miss",
+      "lookup_rating": "sufficient",
+      "rationale": "Lookup turns no evidence into the exact unverified-quality stopping rule."
+    },
+    {
+      "id": "G27",
+      "root_rating": "miss",
+      "lookup_rating": "miss",
+      "rationale": "Neither surfaces the documented at-most-one non-automatic rephrase rule."
+    },
+    {
+      "id": "G28",
+      "root_rating": "sufficient",
+      "lookup_rating": "sufficient",
+      "rationale": "Both surface typed next-action workflow guidance sufficiently to answer follow-the-returned-action rather than invent recovery."
+    },
+    {
+      "id": "G29",
+      "root_rating": "sufficient",
+      "lookup_rating": "sufficient",
+      "rationale": "Both surface targeted gap recovery within existing limits, sufficient to reject global budget/result-count inflation as the normal strategy."
+    },
+    {
+      "id": "G30",
+      "root_rating": "miss",
+      "lookup_rating": "sufficient",
+      "rationale": "Lookup surfaces the exact rule to target the concrete missing side/part after the first packet."
+    }
+  ],
+  "observations": [
+    "Project-blind lookups materially improve final visible evidence, not merely metadata: strict sufficient cases rise from 9/30 to 20/30.",
+    "13/30 pairs improve by at least one rubric level; no pair worsens under the manual source-sufficiency rubric.",
+    "The remaining lookup-resistant failures are G02, G07, G09, G16, G21, G22, and G27.",
+    "Persistent failures cluster around semantic sense ambiguity, high-frequency distractor vocabulary, negation/stopping policy, and cross-section policy joins.",
+    "query_coverage/context_quality remain unsuitable as semantic answer scores; manual judgment is based on the visible sources."
+  ]
+}

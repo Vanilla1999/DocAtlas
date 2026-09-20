@@ -1,0 +1,202 @@
+{
+  "schema_version": 1,
+  "method": "Manual source-sufficiency review by the implementing assistant. No LLM judge and no frozen evaluator score.",
+  "run": {
+    "runtime_sha": "e5c192dc4176e0c4c52642eab0d3e44e309c6c51",
+    "questions_sha256": "a4d9e67b9617556e8bd00045fdfd039c74c13cec737ef5d6cf130f3b6c86516e",
+    "artifact_id": 10561361363,
+    "strategy": "original_root_only",
+    "execution_errors": 0
+  },
+  "rubric": {
+    "sufficient": "Visible public sources directly support a complete answer without guesswork.",
+    "partial": "Visible sources support an important part of the answer but omit a requested condition, distinction, or stopping rule.",
+    "miss": "Visible sources do not support the requested answer, despite the contract being documented elsewhere in the repository."
+  },
+  "summary": {
+    "sufficient": 19,
+    "partial": 2,
+    "miss": 9,
+    "total": 30,
+    "strict_sufficiency_rate": 0.6333333333333333,
+    "category_breakdown": {
+      "omission_and_truncation": {
+        "sufficient": 7,
+        "partial": 1,
+        "miss": 2,
+        "total": 10
+      },
+      "current_vs_history_authority": {
+        "sufficient": 9,
+        "partial": 0,
+        "miss": 1,
+        "total": 10
+      },
+      "workflow_and_recovery_policy": {
+        "sufficient": 3,
+        "partial": 1,
+        "miss": 6,
+        "total": 10
+      }
+    }
+  },
+  "cases": [
+    {
+      "id": "F01",
+      "rating": "sufficient",
+      "rationale": "Direct omission-contract source says honor omitted_counts, omission is non-critical, and truncation does not certify completeness."
+    },
+    {
+      "id": "F02",
+      "rating": "sufficient",
+      "rationale": "Visible response-contract source identifies omitted_counts as the bounded field to inspect for omissions; extra sources are noisy but non-blocking."
+    },
+    {
+      "id": "F03",
+      "rating": "sufficient",
+      "rationale": "Visible omission contract explicitly separates truncated from insufficient_evidence."
+    },
+    {
+      "id": "F04",
+      "rating": "miss",
+      "rationale": "Returned source only lists status/kind semantics and does not say truncation omits only non-critical material; the needed sentence exists in docs/mcp-response-contract.md but was not surfaced."
+    },
+    {
+      "id": "F05",
+      "rating": "sufficient",
+      "rationale": "Direct source explains the role of omitted_counts and its relation to truncated responses."
+    },
+    {
+      "id": "F06",
+      "rating": "sufficient",
+      "rationale": "Direct source distinguishes top-level omitted_counts from documentation_gap.bounds.omitted_counts."
+    },
+    {
+      "id": "F07",
+      "rating": "partial",
+      "rationale": "Visible source tells the client to honor omitted_counts, but the requested complete companion field list kind/sources/missing is not surfaced."
+    },
+    {
+      "id": "F08",
+      "rating": "sufficient",
+      "rationale": "Direct source explains that truncated omission is non-critical but does not certify complete project-context coverage."
+    },
+    {
+      "id": "F09",
+      "rating": "miss",
+      "rationale": "Returned product-evaluation text is unrelated; the documented safe distinction between insufficient_evidence and ordinary truncation is missed."
+    },
+    {
+      "id": "F10",
+      "rating": "sufficient",
+      "rationale": "Direct authoring-handoff source names documentation_gap.bounds.omitted_counts."
+    },
+    {
+      "id": "F11",
+      "rating": "sufficient",
+      "rationale": "Direct maintained-doc authority rule says present behavior uses maintained source-of-truth documentation as primary."
+    },
+    {
+      "id": "F12",
+      "rating": "sufficient",
+      "rationale": "Direct source names releases, changes, migration, deprecation, and compatibility history as CHANGELOG-primary cases."
+    },
+    {
+      "id": "F13",
+      "rating": "sufficient",
+      "rationale": "Direct source says CHANGELOG must not outrank current source-of-truth for present-state questions."
+    },
+    {
+      "id": "F14",
+      "rating": "sufficient",
+      "rationale": "Migration is explicitly listed as a history case where CHANGELOG is primary."
+    },
+    {
+      "id": "F15",
+      "rating": "sufficient",
+      "rationale": "Direct present-state caveat answers that a matching CHANGELOG entry is not enough to outrank maintained current docs."
+    },
+    {
+      "id": "F16",
+      "rating": "miss",
+      "rationale": "Returned API-key and registry material is unrelated; the current-vs-history authority rule exists in searchable project docs but is not retrieved."
+    },
+    {
+      "id": "F17",
+      "rating": "sufficient",
+      "rationale": "Direct source says change/release-history questions use CHANGELOG as primary."
+    },
+    {
+      "id": "F18",
+      "rating": "sufficient",
+      "rationale": "Direct source says current contracts use maintained source-of-truth documentation."
+    },
+    {
+      "id": "F19",
+      "rating": "sufficient",
+      "rationale": "Direct source says CHANGELOG may supplement but must not outrank current source-of-truth."
+    },
+    {
+      "id": "F20",
+      "rating": "sufficient",
+      "rationale": "Visible authority rule supports the supplement-vs-replace distinction."
+    },
+    {
+      "id": "F21",
+      "rating": "miss",
+      "rationale": "Retrieval confuses splitting a comparison request with indexing/chunk splitting; the no-pre-split policy exists in SKILL.md and the installed agent workflow resource."
+    },
+    {
+      "id": "F22",
+      "rating": "sufficient",
+      "rationale": "Direct workflow sources say lookup_queries are narrow same-question recall help for translation/facet decomposition, not a batch channel."
+    },
+    {
+      "id": "F23",
+      "rating": "sufficient",
+      "rationale": "Direct Gap-directed follow-up source says split only after the first packet leaves a concrete independently answerable requested part missing."
+    },
+    {
+      "id": "F24",
+      "rating": "miss",
+      "rationale": "Returned exact-version sources are unrelated; the known-source policy says to use an issued bounded source read."
+    },
+    {
+      "id": "F25",
+      "rating": "partial",
+      "rationale": "Visible docs_context contract says the host may answer covered claims without claiming completeness, but it does not surface the explicit stop rule: stop on sufficient visible evidence even when context_quality is unverified, or on no progress."
+    },
+    {
+      "id": "F26",
+      "rating": "miss",
+      "rationale": "Public result is insufficient_evidence with no source, although the stop rule is explicitly documented in SKILL.md and the installed workflow resource."
+    },
+    {
+      "id": "F27",
+      "rating": "miss",
+      "rationale": "Visible sources do not contain the documented at-most-one non-automatic rephrase_question rule."
+    },
+    {
+      "id": "F28",
+      "rating": "sufficient",
+      "rationale": "Direct workflow sources say follow the exact typed recommended_next_action, obtain confirmation when needed, then retry the original question unchanged after success."
+    },
+    {
+      "id": "F29",
+      "rating": "miss",
+      "rationale": "Returned benchmark comparison is unrelated; the maintained workflow instead prescribes targeted same-need recovery within existing limits rather than global budget/top-k expansion."
+    },
+    {
+      "id": "F30",
+      "rating": "miss",
+      "rationale": "Returned query configuration and test-policy material is unrelated; SKILL.md explicitly says same need/different vocabulary should use narrow lookup_queries."
+    }
+  ],
+  "observations": [
+    "query_coverage is not semantic answer sufficiency: F21 and F24 report full query coverage while their visible evidence is off-topic.",
+    "context_quality partial/unverified does not imply the answer is unusable: several sufficient cases expose the correct direct source despite conservative quality metadata.",
+    "The V13 omission family generalizes reasonably well, but negated/safety paraphrases F04 and F09 still miss an existing response-contract paragraph.",
+    "Current-vs-history authority generalizes strongly: 9/10 fresh prompts are sufficient; F16 is the main paraphrase miss.",
+    "Workflow/recovery policy is the weak area: only 3/10 fresh prompts are fully sufficient, with failures dominated by semantic ambiguity and vocabulary mismatch rather than missing documentation."
+  ]
+}

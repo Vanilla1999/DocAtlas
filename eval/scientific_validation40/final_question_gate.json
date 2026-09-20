@@ -1,0 +1,93 @@
+{
+  "schema_version": 1,
+  "date": "2026-09-19",
+  "gate": {
+    "run_id": 35448191809,
+    "head_sha": "3280baca319c79c078aeb9500afeef929206c126",
+    "artifact_id": 10585477554,
+    "artifact_sha256": "105c6a30dec7bae396019c0b9469be302c7ec83e7a991fd67fb805393f13206e",
+    "conclusion": "success"
+  },
+  "deterministic": {
+    "passed": 215,
+    "compileall": "success"
+  },
+  "target30": {
+    "cases": 30,
+    "sufficient": 27,
+    "insufficient": 3,
+    "insufficient_ids": [
+      "DR30-12",
+      "DR30-26",
+      "DR30-30"
+    ],
+    "visible_packet_changes_vs_f1113045": [],
+    "note": "Manual source-sufficiency review. DR30-26 has an ok/covered packet but still lacks the direct no-pre-split comparison rule; public coverage metadata is not treated as a semantic answer score."
+  },
+  "generic30": {
+    "root_only": {
+      "sufficient": 9,
+      "partial": 2,
+      "miss": 19
+    },
+    "with_project_blind_lookups": {
+      "sufficient": 21,
+      "partial": 3,
+      "miss": 6
+    },
+    "changed_visible_packets_vs_8cecc0e": [
+      {
+        "id": "G03",
+        "lane": "root_only",
+        "semantic": "miss_to_miss"
+      },
+      {
+        "id": "G17",
+        "lane": "with_lookups",
+        "semantic": "sufficient_to_sufficient"
+      },
+      {
+        "id": "G22",
+        "lane": "with_lookups",
+        "semantic": "miss_to_miss"
+      },
+      {
+        "id": "G28",
+        "lane": "with_lookups",
+        "semantic": "sufficient_to_sufficient"
+      },
+      {
+        "id": "G29",
+        "lane": "with_lookups",
+        "semantic": "sufficient_to_sufficient"
+      }
+    ],
+    "semantic_wins_vs_accepted_reference": 0,
+    "semantic_losses_vs_accepted_reference": 0
+  },
+  "external80": {
+    "total_cases": 80,
+    "within_budget_answerable": 48,
+    "sufficient": 31,
+    "reference_sufficient": 31,
+    "wins": [],
+    "losses": [],
+    "payload_changed_ids": [],
+    "source_integrity_or_contract_violations": 0,
+    "reference_safety_errors": 0,
+    "current_safety_errors": 0,
+    "p50_tokens": 404,
+    "p95_tokens": 797
+  },
+  "reader_view": {
+    "rerun": false,
+    "decision": "presentation_not_supported_for_product_rollout",
+    "reason": "Frozen reader validation was already opened and failed the rollout gate. Re-running or tuning after exposure would violate the predefined stop rule. The final contract fixes leave all 180 frozen renderings byte-identical."
+  },
+  "current_ci_context": {
+    "core_python_3_12": "22 failed, 4103 passed, 10 skipped, 622 deselected",
+    "static_contract": "pre-existing 1147-line docmancer/docs/application/_project_docs_service_part03.py remains over the 1000-line budget",
+    "note": "Question-gate acceptance is based on the dedicated final gate. Repository-wide CI remains red on known historical debt and is not represented as globally green."
+  },
+  "final_status": "structural_fix_validated_reader_view_rejected_question_regressions_passed"
+}
