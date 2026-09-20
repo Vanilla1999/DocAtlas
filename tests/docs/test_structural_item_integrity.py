@@ -79,3 +79,17 @@ def test_projection_owner_remains_within_repository_module_budget():
     root = Path(__file__).resolve().parents[2]
     owner = "docmancer/docs/application/_docs_context_projection_core.py"
     assert owner not in {path for _, path in oversized_modules(root, DEFAULT_MAX_LINES)}
+
+
+def test_list_intro_is_complete_only_when_contiguous_list_is_complete():
+    raw = (
+        "Supported backends:\n\n"
+        "- `alpha`\n"
+        "- `beta`\n"
+        "- `gamma`\n\n"
+        "A later unrelated paragraph.\n"
+    )
+    partial = "Supported backends:\n\n- `alpha`\n- `beta`"
+    complete = "Supported backends:\n\n- `alpha`\n- `beta`\n- `gamma`"
+    assert not _is_complete_source_span(raw, partial, span_start=0)
+    assert _is_complete_source_span(raw, complete, span_start=0)

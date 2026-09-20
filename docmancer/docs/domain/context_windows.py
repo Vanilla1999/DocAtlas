@@ -104,10 +104,24 @@ def _is_complete_source_span(
         key=lambda span: span[0],
     )
     if touched_items:
-        return (
-            item_start == touched_items[0][0]
-            and item_end == touched_items[-1][1]
-        )
+        starts_at_item = item_start == touched_items[0][0]
+        intro = text[item_start:touched_items[0][0]].rstrip()
+        starts_with_intro = item_start < touched_items[0][0] and intro.endswith(":")
+        if not (starts_at_item or starts_with_intro) or item_end != touched_items[-1][1]:
+            return False
+        if starts_with_intro:
+            # A prose lead-in such as "supports three backends:" is complete
+            # only with the whole contiguous list it introduces. Otherwise a
+            # short rolling window can win merely by ending at item 2 of 3.
+            later_items = [
+                span for span in atomic_items
+                if span[0] >= touched_items[-1][1]
+            ]
+            if later_items:
+                gap = text[touched_items[-1][1]:later_items[0][0]]
+                if not gap.strip():
+                    return False
+        return True
 
     left = text[:start]
     right = text[end:]

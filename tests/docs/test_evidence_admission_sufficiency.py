@@ -616,3 +616,25 @@ def test_supporting_hint_cannot_bypass_current_safe_source_policy(overrides):
 
     assert result["context_available"] is False
     assert not result.get("sources")
+
+
+def test_additive_retry_restores_primary_bytes_before_accepting_new_evidence():
+    from docmancer.docs.application import visible_evidence_retention as retention
+
+    restore = getattr(retention, "restore_visible_sources", None)
+    assert restore is not None, "additive retry restoration helper is missing"
+    previous = {"sources": [{"evidence_id": "primary", "snippet": "alpha beta gamma"}]}
+    previous_snapshot = {"primary": {"visible": "alpha beta gamma"}}
+    trial = {"sources": [
+        {"evidence_id": "primary", "snippet": "alpha beta"},
+        {"evidence_id": "new", "snippet": "delta"},
+    ]}
+    trial_snapshot = {
+        "primary": {"visible": "alpha beta"},
+        "new": {"visible": "delta"},
+    }
+    payload, snapshot = restore(previous, previous_snapshot, trial, trial_snapshot)
+    by_id = {row["evidence_id"]: row for row in payload["sources"]}
+    assert by_id["primary"]["snippet"] == "alpha beta gamma"
+    assert by_id["new"]["snippet"] == "delta"
+    assert snapshot["primary"] == previous_snapshot["primary"]

@@ -7,6 +7,7 @@ import re
 from typing import Literal
 
 from docmancer.docs.domain.question_frame_core import split_question_clauses
+from docmancer.docs.domain.question_plan import retrieval_needs
 from docmancer.docs.domain.question_component_rewrite import rewrite_component
 from docmancer.docs.domain.question_semantic_frames import match_comparison_frame
 from docmancer.docs.domain.project_retrieval_intent import (
@@ -18,6 +19,7 @@ from docmancer.docs.domain.query_terms import (
     documentation_query_terms,
     documentation_technical_anchors,
     is_exact_technical_token,
+    query_constraint_roles,
     supplemental_query_is_useful,
 )
 from docmancer.docs.domain.technical_terms import extract_technical_terms
@@ -41,6 +43,9 @@ class DocumentationLookup:
     forbidden_evidence_terms: tuple[str, ...] = ()
     parent_exact_terms: tuple[str, ...] = ()
     component_rewrite_audit: tuple[str, int, int, str] | None = None
+    need_subject: str | None = None
+    need_relation: str | None = None
+    need_context: str | None = None
 
     def __post_init__(self) -> None:
         if self.relation not in {"direct", "audited_rewrite", "host_lookup", "exact_anchor"}:
@@ -93,6 +98,9 @@ class DocumentationQueryPlan:
                     "forbidden_catalog_roles": list(query.forbidden_catalog_roles),
                     "forbidden_evidence_terms": list(query.forbidden_evidence_terms),
                     "parent_exact_terms": list(query.parent_exact_terms),
+                    "need_subject": query.need_subject,
+                    "need_relation": query.need_relation,
+                    "need_context": query.need_context,
                     **({"component_rewrite_audit": {
                         "rule": query.component_rewrite_audit[0],
                         "query_span_start": query.component_rewrite_audit[1],
@@ -384,10 +392,8 @@ def build_documentation_query_plan(
     forbidden_evidence_terms = tuple(dict.fromkeys(
         term for alias in retrieval_aliases for term in alias.forbidden_evidence_terms
     )) if trusted_original_policy else ()
-    parent_exact_terms = tuple(dict.fromkeys((
-        *(term.normalized_value for term in documentation_exact_terms(question)),
-        *(value.casefold() for value in documentation_technical_anchors(question)),
-    )))
+    question_roles = query_constraint_roles(question)
+    parent_exact_terms = tuple(dict.fromkeys((*question_roles.hard_exact, *question_roles.bound_subjects)))
     force_context_only = (
         project_retrieval_disposition(question) == "broad_context"
         and any(alias.force_context_only for alias in retrieval_aliases)
@@ -400,6 +406,25 @@ def build_documentation_query_plan(
         forbidden_catalog_roles=() if explicit_path else forbidden_roles,
         forbidden_evidence_terms=() if explicit_path else forbidden_evidence_terms,
     )]
+    supported_needs = (need for need in retrieval_needs(question) if (
+        need.relation in {"default", "exception", "requirement"}
+        or (need.relation == "behavior" and re.search(
+            r"\b(?:if|when)\b.+?\bis\s+(?:not\s+enabled|disabled|enabled)\b",
+            " ".join(value for value in (need.context, need.query_span_text) if value),
+            re.I,
+        ))
+    ))
+    for index, need in enumerate(supported_needs, start=1):
+        text = " ".join(value for value in (need.context, need.query_span_text) if value).strip()
+        if need.subject and need.subject.casefold() not in text.casefold():
+            text = f"{need.subject} {text}"
+        if text:
+            queries.append(DocumentationLookup(
+                f"query-need-{index}", text, "retrieval_need", False,
+                facet_id=f"retrieval-need:{need.need_id}", relation="host_lookup",
+                need_subject=need.subject or None, need_relation=need.relation,
+                need_context=need.context or None,
+            ))
     seen = {query.text.casefold() for query in queries}
 
     def host_policies(text: str) -> dict[str, tuple[str, ...]]:
@@ -470,10 +495,8 @@ def build_documentation_query_plan(
     host_rewrite_count = 0
     for parent_query_id, cleaned in host_rows:
         policies = host_policies(cleaned)
-        host_parent_exact_terms = tuple(dict.fromkeys((
-            *(term.normalized_value for term in documentation_exact_terms(cleaned)),
-            *(value.casefold() for value in documentation_technical_anchors(cleaned)),
-        )))
+        host_roles = query_constraint_roles(cleaned)
+        host_parent_exact_terms = tuple(dict.fromkeys((*host_roles.hard_exact, *host_roles.bound_subjects)))
         for rewrite in _audited_host_lookup_rewrites(question, cleaned):
             if host_rewrite_count >= 6:
                 break

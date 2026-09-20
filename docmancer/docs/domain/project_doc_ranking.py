@@ -654,6 +654,7 @@ def rerank_project_doc_chunks(
     score_by_id: dict[int, tuple[float, float, int]] = {}
     public_queries_by_id: dict[int, set[str]] = {}
     audited_queries_by_id: dict[int, set[str]] = {}
+    needs_by_id: dict[int, set[str]] = {}
     exact_anchors = {
         normalize_doc_path(value)
         for value in technical_anchors(question)
@@ -691,6 +692,11 @@ def rerank_project_doc_chunks(
             and str(query_matches[query_id].get("public_parent_query_id") or "").startswith("query-lookup-")
             and query_matches[query_id]["public_parent_query_id"] in qualified_query_ids
         } if not exact_path_anchor else set()
+        # Internal need witnesses preserve requested partial facts through this
+        # bounded prefit gate. They never become public query/answer coverage.
+        needs_by_id[id(chunk)] = {query_id for query_id in qualified_query_ids
+            if query_matches[query_id].get("query_origin") == "retrieval_need"
+            and query_matches[query_id].get("need_local_witness") is True}
         base = chunk_base_score(chunk, index)
         score = base * source_weight_for_intent(path, getattr(chunk, "heading_path", None), intent) * source_requirement_boost(path, question, intent)
         if any(query_id.startswith("query-path-") for query_id in qualified_query_ids):
@@ -760,6 +766,7 @@ def rerank_project_doc_chunks(
     per_source_count: dict[str, int] = {}
     covered_public_queries: set[str] = set()
     covered_audited_queries: set[str] = set()
+    covered_needs: set[str] = set()
     diversity_relaxed_ids: set[int] = set()
     remaining = list(scored)
 
@@ -793,6 +800,7 @@ def rerank_project_doc_chunks(
             remaining[i][1],
             len(public_queries_by_id[id(remaining[i][4])] - covered_public_queries),
             len(audited_queries_by_id[id(remaining[i][4])] - covered_audited_queries),
+            len(needs_by_id[id(remaining[i][4])] - covered_needs),
             -i,
         ))
         for candidate_index, row in enumerate(remaining):
@@ -810,6 +818,7 @@ def rerank_project_doc_chunks(
         selected.append(chunk)
         covered_public_queries.update(new_public_queries)
         covered_audited_queries.update(new_audited_queries)
+        covered_needs.update(needs_by_id[id(chunk)])
         per_source_count[path] = per_source_count.get(path, 0) + 1
         if limit and len(selected) >= limit:
             break

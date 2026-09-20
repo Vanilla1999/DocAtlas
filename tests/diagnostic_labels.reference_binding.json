@@ -2,11 +2,19 @@
   "schema_version": 1,
   "module_labels": {
     "tests/docs/test_query_reference_roles.py": "behavioral",
-    "tests/docs/test_source_locator_resolution.py": "behavioral"
+    "tests/docs/test_source_locator_resolution.py": "behavioral",
+    "tests/docs/test_typed_reference_evidence.py": "behavioral",
+    "tests/docs/test_reference_projection_retention.py": "behavioral",
+    "tests/docs/test_reference_behavior_matrix.py": "behavioral",
+    "tests/docs/test_reference_transfer_regressions.py": "behavioral"
   },
   "module_node_hashes": {
-    "tests/docs/test_query_reference_roles.py": "4fdd87dc2c5ca45b40cc7e1d17d210c41afe7551c51765eccd9876274b73a54f",
-    "tests/docs/test_source_locator_resolution.py": "d18918b1f6525206dc365e4046e157017d73a6a37de4a77935b67357b1a67027"
+    "tests/docs/test_query_reference_roles.py": "84a2969b0b6c5c44f0ce40416f4e5fcce80f5a920d0057f00e5b43fc5e8b96f2",
+    "tests/docs/test_source_locator_resolution.py": "5304c9c1ab89da22d4729cfcbfaccd0123fc592eabbc3f6d3c668758c835fc7c",
+    "tests/docs/test_typed_reference_evidence.py": "7ae1280572d57f92f8b97dc265ce7cd42967b3e7951776853b42c00976f9a38a",
+    "tests/docs/test_reference_projection_retention.py": "4f3cbdc6c170b229501cf3ec47ddad6698ce270991c2f1108e82dfdb6fb492dd",
+    "tests/docs/test_reference_behavior_matrix.py": "03d81d2311a745a82bfecbc12467f538b2e5209c373be173f71557843fa7e8a7",
+    "tests/docs/test_reference_transfer_regressions.py": "49295d4b8835bb343a9dc83be4333f6af743551091e3245cdd2dfee957917ed2"
   },
   "node_overrides": {}
 }

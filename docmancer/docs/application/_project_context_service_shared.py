@@ -188,6 +188,7 @@ def project_context_pack(*, question: str = "", project_docs: ProjectDocsResult 
                 "parent_logical_id": item.parent_logical_id,
                 "display_content_hash": item.display_content_hash,
                 "_source_snapshot_sha256": item.content_hash,
+                **{key: item.metadata[key] for key in ("_reference_evidence", "_reference_root_plan", "_reference_plans", "generation_id", "resolved_version") if key in item.metadata},
                 "_source_catalog_hash": item.metadata.get("project_doc_catalog_entry_hash"),
                 **({
                     "char_start": item.char_start,

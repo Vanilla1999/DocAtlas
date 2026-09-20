@@ -93,3 +93,14 @@ def test_unversioned_project_still_needs_a_real_snapshot():
     missing = replace(scope, snapshot_id="")
     p = resolve_references("Read the file Guide", catalog=[source("Guide.md", "d", missing)], scope=missing)
     assert locator(p).state == "unresolved"
+
+
+def test_according_to_named_markdown_document_resolves_against_catalog():
+    plan = resolve_references(
+        "According to Guide.md sync status, which commits match?",
+        catalog=[source("Guide.md", "doc:guide")], scope=SCOPE,
+    )
+    ref = next(r for r in plan.references if r.mention.text == "Guide.md")
+    assert ref.role == "source_locator"
+    assert ref.state == "resolved"
+    assert ref.source_ids == ("doc:guide",)

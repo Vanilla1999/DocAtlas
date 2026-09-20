@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import re
 from dataclasses import dataclass
+from functools import lru_cache
 from pathlib import Path
 
 
@@ -79,6 +80,7 @@ def documentation_technical_anchors(question: str, *, limit: int = 12) -> tuple[
     return tuple(values)
 
 
+@lru_cache(maxsize=512)
 def documentation_query_terms(question: str) -> tuple[str, ...]:
     """Bounded lexical probe terms, excluding standalone request connectors."""
     return tuple(dict.fromkeys(
@@ -124,6 +126,33 @@ def documentation_exact_terms(
     return tuple(found)
 
 
+
+@dataclass(frozen=True, slots=True)
+class QueryConstraintRoles:
+    hard_exact: tuple[str, ...]
+    bound_subjects: tuple[str, ...]
+    retrieval_anchors: tuple[str, ...]
+
+
+@lru_cache(maxsize=512)
+def query_constraint_roles(question: str) -> QueryConstraintRoles:
+    """Use declared occurrence roles, with the existing strict anchor fallback."""
+    from .query_reference_binding import query_mentions
+    mentions = query_mentions(question)
+    subjects = tuple(dict.fromkeys(m.text.casefold() for m in mentions if m.syntax_role == "semantic_subject"))
+    hard = list(dict.fromkeys(term.normalized_value for term in documentation_exact_terms(question)))
+    existing_anchors = {value.casefold() for value in documentation_technical_anchors(question)}
+    for mention in mentions:
+        # Unresolved bare anchors retain BASE's strict fallback, not a new
+        # invented semantic subject. Locators stay hard until source-bound.
+        required = (mention.syntax_role == "symbol_identity"
+            or (mention.syntax_role == "source_locator" and mention.explicit)
+            or (mention.syntax_role != "semantic_subject" and mention.text.casefold() in existing_anchors))
+        if required and mention.text.casefold() not in hard:
+            hard.append(mention.text.casefold())
+    return QueryConstraintRoles(tuple(hard), subjects, tuple(dict.fromkeys(m.text.casefold() for m in mentions)))
+
+
 def _looks_like_source_path(value: str) -> bool:
     normalized = value.replace("\\", "/")
     first = normalized.partition("/")[0]
@@ -137,9 +166,11 @@ def _looks_like_source_path(value: str) -> bool:
 
 __all__ = [
     "DocumentationExactTerm",
+    "QueryConstraintRoles",
     "documentation_exact_terms",
     "documentation_query_terms",
     "documentation_technical_anchors",
+    "query_constraint_roles",
     "is_exact_technical_token",
 ]
 

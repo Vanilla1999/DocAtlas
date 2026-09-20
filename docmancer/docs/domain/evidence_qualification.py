@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from functools import lru_cache
 import re
 from typing import Any, Literal, Mapping
 
@@ -238,6 +239,35 @@ def evidence_policy_rejection_reason(
     return None
 
 
+
+def _substantive_markdown_line(line: str) -> str:
+    """Keep visible inline-link labels only when the line carries a real statement."""
+    if re.match(r"^\s*\[[^\]]+\]:\s*\S+", line):
+        return ""
+
+    code_parts: list[str] = []
+
+    def protect_code(match: re.Match[str]) -> str:
+        code_parts.append(match.group(2))
+        return f"\x00CODE{len(code_parts) - 1}\x00"
+
+    protected = re.sub(r"(`+)(.+?)\1", protect_code, line)
+    protected = re.sub(r"!\[[^\]]*\](?:\([^)]*\)|\[[^\]]*\])", "", protected)
+    link_re = re.compile(r"(?<!!)\[([^\]]+)\](?:\([^)]*\)|\[[^\]]*\])")
+    without_links = link_re.sub("", protected)
+    without_links = re.sub(r"https?://\S+", "", without_links)
+
+    probe = without_links
+    for index, code in enumerate(code_parts):
+        probe = probe.replace(f"\x00CODE{index}\x00", code)
+    has_statement = bool(probe.strip(" \t-*+0123456789.)|:<>_=`"))
+
+    rendered = link_re.sub(lambda m: m.group(1) if has_statement else "", protected)
+    rendered = re.sub(r"https?://\S+", "", rendered)
+    for index, code in enumerate(code_parts):
+        rendered = rendered.replace(f"\x00CODE{index}\x00", code)
+    return rendered
+
 def qualify_evidence(
     probe: Mapping[str, Any], *, query_id: str, visible_text: str,
     evidence_text: str | None = None,
@@ -258,6 +288,11 @@ def qualify_evidence(
     if policy_reason is not None:
         return _rejected(result, policy_reason)
     body = evidence_text if evidence_text is not None else visible_text
+    from .query_reference_binding import prepare_reference_probe
+    probe, reference_reason = prepare_reference_probe(probe, candidate=candidate, evidence_text=body)
+    result = dict(probe)
+    if reference_reason is not None:
+        return _rejected(result, reference_reason)
     lines = body.splitlines()
     substantive_lines = []
     heading_lines = []
@@ -294,8 +329,7 @@ def qualify_evidence(
                     break
                 table_rows.append((line, row))
             continue
-        line = re.sub(r"!?\[[^\]]*\](?:\([^)]*\)|\[[^\]]*\])", "", line)
-        line = re.sub(r"https?://\S+", "", line)
+        line = _substantive_markdown_line(line)
         if line.strip(" \t-*+0123456789.)|:<>_="):
             substantive_lines.append(line)
     if not substantive_lines:
@@ -364,6 +398,28 @@ def qualify_evidence(
         )
     )
     heading_context_allowed = len(body_matched) >= 2
+    bound_subjects = tuple(
+        str(value).casefold() for value in probe.get("bound_subjects") or () if value
+    )
+    bound_subject_context = str(probe.get("bound_subject_context") or "").casefold()
+    missing_bound_subjects = tuple(
+        subject for subject in bound_subjects
+        if not _visible_term_present(subject, normalized_evidence, exact=True)
+        and not (
+            heading_context_allowed
+            and _visible_term_present(subject, bound_subject_context, exact=True)
+        )
+    )
+    if missing_bound_subjects:
+        result.update(
+            bound_subjects=list(bound_subjects),
+            missing_bound_subjects=list(missing_bound_subjects),
+            qualified=False,
+            qualification_reason="missing_bound_subject",
+        )
+        return EvidenceQualification(
+            False, (), None, "missing_bound_subject", result,
+        )
     # Column labels describe a substantive row, not standalone evidence. Only
     # bind them when that table's key cell contains every requested exact term.
     # They may recover a relation term, but never supply a missing identifier.
@@ -378,7 +434,8 @@ def qualify_evidence(
         *(
             term for term in terms
             if heading_context_allowed
-            and _visible_term_present(term, normalized_headings, exact=term in exact_terms)
+            and (_visible_term_present(term, normalized_headings, exact=term in exact_terms)
+                 or (term in bound_subjects and _visible_term_present(term, bound_subject_context, exact=True)))
         ),
     )))
     exact_evidence = (
@@ -481,6 +538,7 @@ def _coverage_kind(probe: Mapping[str, Any]) -> CoverageKind:
     return "derived" if probe.get("coverage_kind") == "derived" else "direct"
 
 
+@lru_cache(maxsize=4096)
 def _visible_term_present(term: str, text: str, *, exact: bool) -> bool:
     suffix = "" if exact else r"(?:s|es|ed|ing)?"
     if re.search(technical_term_pattern(term, exact=exact), text) is not None:

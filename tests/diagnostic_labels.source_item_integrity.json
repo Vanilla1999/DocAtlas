@@ -7,6 +7,6 @@
     "tests/docs/test_structural_item_integrity.py::test_projection_owner_remains_within_repository_module_budget": "artifact"
   },
   "module_node_hashes": {
-    "tests/docs/test_structural_item_integrity.py": "ca721cc9cdcbf1c413f8c4e7495fd8042593aadf178cd1f30bf871f9d0efa2f2"
+    "tests/docs/test_structural_item_integrity.py": "02a53aaa11f3adb872418f47353639ea32cf9a95ed302f62b93f26ad1a03d2f3"
   }
 }
