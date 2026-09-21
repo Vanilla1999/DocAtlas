@@ -278,6 +278,11 @@ def qualify_evidence(
     lifecycle_intent: LifecycleIntent = "current",
 ) -> EvidenceQualification:
     """Qualify one retrieval probe against evidence visible to the model."""
+    # Body-bound decisions belong to the current bytes, never the incoming trace.
+    probe = {key: value for key, value in probe.items() if key not in {
+        "need_local_witness", "admission_route", "matched_need_ids",
+        "need_witness_spans", "need_witness_source_key", "_admission_demands",
+    }}
     result = dict(probe)
     policy_reason = evidence_policy_rejection_reason(
         probe, visible_text=visible_text, catalog_role=catalog_role,
@@ -473,6 +478,22 @@ def qualify_evidence(
         "qualified": qualified,
         "qualification_reason": reason,
     })
+    from .admission_contract import choose_need_admission
+    decision, witness = choose_need_admission(
+        probe, query_id=query_id, text=body,
+        legacy_qualified=qualified, missing_exact=missing_exact,
+    )
+    qualified = decision.admitted
+    # Preserve old reason text on unsupported legacy forms.
+    if decision.route != "legacy_strict":
+        reason = decision.reason
+    if witness.status != "unknown" or probe.get("query_origin") == "retrieval_need":
+        result.update(qualified=qualified, qualification_reason=reason,
+            admission_route=decision.route, matched_need_ids=list(decision.matched_need_ids))
+    if decision.route == "typed_local":
+        result.update(need_local_witness=True,
+            need_witness_spans=[list(span) for span in witness.spans],
+            need_witness_source_key=witness.source_key)
     return EvidenceQualification(
         qualified,
         (query_id,) if qualified else (),
