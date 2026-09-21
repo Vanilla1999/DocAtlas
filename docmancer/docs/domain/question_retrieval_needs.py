@@ -112,6 +112,14 @@ def retrieval_needs(question: str) -> tuple[RetrievalNeed, ...]:
     if not raw.strip():
         return ()
 
+    # A complete bounded relation owns its clause, including RU condition
+    # punctuation that the generic question splitter would otherwise separate.
+    from .admission_grammar import NEW_RELATIONS, parse_admission_frame
+    frame = parse_admission_frame(raw)
+    if frame is not None and (frame.operator in NEW_RELATIONS or frame.operator == "behavior"):
+        return (RetrievalNeed("need-1", 0, len(raw), raw, frame.subject,
+            frame.operator, "", query_constraint_roles(raw).hard_exact),)
+
     sentences = _sentence_ranges(raw)
     if len(sentences) > 1:
         result = []

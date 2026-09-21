@@ -135,7 +135,7 @@ class SourceReferenceContext:
                                 line_span=[line_start, line_end])
                             metadata["_reference_evidence"] = {
                                 "schema_version": 1, "source": asdict(identity), "char_start": start, "char_end": end,
-                                "text": content[start:end],
+                                "text": content[start:end], "raw_document": content,
                                 "owner": {"text": header, "char_start": owner.char_start,
                                     "char_end": owner.char_start+len(header), "scope_start": owner.char_start,
                                     "scope_end": owner.char_end, "logical_id": owner.logical_id} if owner else None,

@@ -1,0 +1,26 @@
+{
+  "schema_version": 1,
+  "module_labels": {
+    "tests/docs/test_admission_guard_composition.py": "behavioral",
+    "tests/docs/test_admission_local_binding.py": "behavioral",
+    "tests/docs/test_admission_mapping_assignments.py": "behavioral",
+    "tests/docs/test_admission_meaning.py": "behavioral",
+    "tests/docs/test_admission_pipeline_invariants.py": "behavioral",
+    "tests/docs/test_admission_relation_safety.py": "behavioral",
+    "tests/docs/test_admission_relation_witnesses.py": "behavioral",
+    "tests/docs/test_admission_role_boundaries.py": "behavioral",
+    "tests/docs/test_admission_subject_binding.py": "behavioral"
+  },
+  "module_node_hashes": {
+    "tests/docs/test_admission_guard_composition.py": "aa115ae6d23e72493e6cf861ec5875367566ec337a8a63ccf70582f2cbc1e1bb",
+    "tests/docs/test_admission_local_binding.py": "3ba94d12fe9ebfcae5c86d5041dcb96979116aa6eeef2d57afd5b25d07e08382",
+    "tests/docs/test_admission_mapping_assignments.py": "fffd94be622e2d7c08ac6ef378ab558d524b6f1329c60e9c49d8e0772a78c6c7",
+    "tests/docs/test_admission_meaning.py": "9a6c79966a0235648037cce467c4aacb47825e19db9837d24221cc342afd588a",
+    "tests/docs/test_admission_pipeline_invariants.py": "b34f92f22756ea1892c505426b06e92c42288744be008b65cf2a2948e3f87753",
+    "tests/docs/test_admission_relation_safety.py": "077faa21a04fe876c8b34417761810456369f918e45fd4723322b3b178ff9b4f",
+    "tests/docs/test_admission_relation_witnesses.py": "a005ffa9039aa28ec770ad4fac6aa32c1f6e1ed0e7502b42b4dd20557794fe7f",
+    "tests/docs/test_admission_role_boundaries.py": "c9e8b53c258a82f5e785b1b300c5aa01889795c52ef0e1480b21fd24a39318c7",
+    "tests/docs/test_admission_subject_binding.py": "8b510e447e2ccec88edbf20c3b2aaf6b25bf7b6f4c4965c1638efb5734a25137"
+  },
+  "node_overrides": {}
+}
