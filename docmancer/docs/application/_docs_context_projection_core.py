@@ -9,6 +9,12 @@ from typing import Any
 from ._docs_context_payload import _payload
 from .source_continuation import attach_source_continuation_locators
 from .visible_evidence_retention import retains_visible_sources, restore_visible_sources
+from .qualified_support_units import DeliveryUnit, VariantFootprint
+from .context_variant_retention import (
+    is_same_origin_gain, prepare_delivery_inventory, qualified_fragments as _qualified_fragments,
+    prefer_same_origin_gain_candidate, replacement_preserves_or_advances_mandatory,
+    store_variant_footprint,
+)
 from .context_query_probes import independent_query_probes, _has_visible_non_path_exact_term, _normalized_path
 from docmancer.docs.domain.context_hint_policy import fallback_context_query_ids, has_context_hint_support
 
@@ -199,6 +205,8 @@ def project_docs_context(
     ]
     prepared: list[dict[str, Any]] = []
     variant_inputs: dict[int, tuple[Any, ...]] = {}
+    variant_footprints: dict[int, VariantFootprint] = {}
+    selected_footprints: dict[str, VariantFootprint] = {}
     for original in initially_ranked:
         if not isinstance(original, dict):
             continue
@@ -304,13 +312,21 @@ def project_docs_context(
             "_expected_project_identity": original["_expected_project_identity"],
             "_lifecycle_intent": original["_lifecycle_intent"],
         })
+        delivery_units, delivery_raw_start = prepare_delivery_inventory(
+            source=original, raw_text=raw_snippet, query_plan=query_plan,
+            query_text=query_text,
+            eligible_query_ids=frozenset(qualified_ids & eligible_query_ids),
+            requalify=_requalify_visible_source,
+        )
         variants = _qualified_fragments(
             normalized,
             raw_snippet=raw_snippet,
             query_ids=qualified_ids & eligible_query_ids,
             query_text=query_text,
-            source_line_start=original.get("line_start"),
+            source_line_start=original.get("line_start"), requalify=_requalify_visible_source,
             obligations=obligations, assignments=assignments,
+            delivery_units=delivery_units, delivery_raw_start=delivery_raw_start,
+            footprint_sink=variant_footprints,
         )
         projection_diagnostics["qualified_variants"] += len(variants)
         candidate_id = _internal_candidate_id(original)
@@ -365,8 +381,18 @@ def project_docs_context(
         _prefer_missing_baseline_candidate(
             prepared, sources, public_query_id_set, host_query_ids, canonical_intent_query_ids,
         )
+        missing_required_ids = (
+            (compound_priority_query_ids | required_query_id_set | canonical_intent_query_ids | need_query_ids)
+            - qualified_query_ids(sources)
+        )
+        prefer_same_origin_gain_candidate(
+            prepared, selected=selected_footprints, footprints=variant_footprints,
+            missing_mandatory_ids=missing_required_ids,
+            missing_component_ids=mandatory_component_ids - selected_components,
+        )
         variant = prepared.pop(0)
         original, raw_snippet, focus_queries, assigned_requirement_ids = variant_inputs[id(variant)]
+        candidate_footprint = variant_footprints.get(id(variant))
         candidate_id = _internal_candidate_id(original)
         existing_index = seen_ids.get(variant["evidence_id"])
         if existing_index is not None:
@@ -403,7 +429,25 @@ def project_docs_context(
                 continue
             if not inline_command_literals(existing["snippet"]) <= inline_command_literals(variant["snippet"]):
                 continue
+            old_footprint = selected_footprints.get(str(variant.get("evidence_id") or ""))
+            if not replacement_preserves_or_advances_mandatory(
+                old_footprint, candidate_footprint,
+                candidate_query_ids=qualified_query_ids((variant,)),
+                missing_mandatory_ids=(
+                    (compound_priority_query_ids | required_query_id_set | canonical_intent_query_ids | need_query_ids)
+                    - qualified_query_ids(sources)
+                ),
+                candidate_component_ids=set(component_witnesses(variant, obligations)),
+                selected_component_ids=selected_components,
+            ):
+                continue
             candidate_sources = [*sources[:existing_index], variant, *sources[existing_index + 1:]]
+        same_origin_gain = bool(
+            existing_index is not None
+            and candidate_footprint is not None
+            and (old_footprint := selected_footprints.get(str(variant.get("evidence_id") or ""))) is not None
+            and is_same_origin_gain(old_footprint, candidate_footprint)
+        )
         decision = context_selection_decision(candidate_sources, public_query_ids)
         if docs_context_budget_tokens(_payload(
             candidate_sources, decision=decision, query_plan=query_plan,
@@ -445,6 +489,7 @@ def project_docs_context(
             and str(normalized.get("authority") or "supporting").casefold() != "source_of_truth"
             and not new_components
             and not novel_independent_public_ids
+            and not same_origin_gain
             and not (qualified_ids & canonical_intent_query_ids - selected_canonical_ids)
         ):
             continue
@@ -452,7 +497,8 @@ def project_docs_context(
             attributable_ids & public_query_id_set - selected_public_ids or
             qualified_ids & canonical_intent_query_ids - selected_canonical_ids or
             qualified_ids & need_query_ids - qualified_query_ids(sources) or
-            qualified_ids & context_hint_query_ids - qualified_query_ids(sources)
+            qualified_ids & context_hint_query_ids - qualified_query_ids(sources) or
+            same_origin_gain
         ):
             continue
         required_ids = qualified_ids & required_query_id_set
@@ -476,6 +522,7 @@ def project_docs_context(
         # qualified body for one lookup only when it adds two requested terms;
         # a lone topical mention must not spend the remaining source budget.
         if (host_ids and not new_components and not (host_ids - selected_host_query_ids)
+            and not same_origin_gain
             and not required_ids and not exact_anchor_ids and not original_hit and not canonical_intent_ids
             and not (any(len(set(normalized["retrieval_query_matches"][key].get("body_matched_terms") or ()) - {
                 term for source in sources
@@ -496,7 +543,13 @@ def project_docs_context(
                     original, sources[existing_index],
                 )
                 projection_inputs[evidence_id] = (raw_snippet, focus_queries, original.get("line_start"))
+                if candidate_footprint is not None:
+                    selected_footprints[evidence_id] = candidate_footprint
                 selected_host_query_ids.update(host_ids)
+            continue
+        if len(sources) >= MAX_DOCS_SOURCES:
+            # Source cap blocks new rows, not content-preserving replacement of
+            # an already selected row. Keep scanning prepared same-origin upgrades.
             continue
         candidate_sources = [*sources, normalized]
         candidate_decision = context_selection_decision(candidate_sources, public_query_ids)
@@ -515,9 +568,9 @@ def project_docs_context(
             raw_snippet, focus_queries, original.get("line_start"),
         )
         seen_ids[evidence_id] = len(sources) - 1
+        if candidate_footprint is not None:
+            selected_footprints[evidence_id] = candidate_footprint
         selected_host_query_ids.update(host_ids)
-        if len(sources) >= MAX_DOCS_SOURCES:
-            break
     if not sources:
         if fallback_ids and not _allow_context_hints:
             # Decide fallback after visible qualification and complete DTO
@@ -711,154 +764,6 @@ def _expand_selected_snippets(
             )) <= max_tokens:
                 expanded = candidate_sources
     return expanded
-
-def _qualified_fragments(
-    source: dict[str, Any], *, raw_snippet: str, query_ids: set[str],
-    query_text: dict[str, str], source_line_start: Any,
-    obligations: tuple[Any, ...] = (),
-    assignments: Any = (),
-) -> list[dict[str, Any]]:
-    """Retain small qualified alternatives until the actual payload is measured."""
-    variants = []
-    variant_spans: dict[int, tuple[int, int]] = {}
-    seen_spans = set()
-    focuses = (*tuple(query_text.get(query_id, "") for query_id in sorted(query_ids)),
-               *component_witnesses({**source, "snippet": raw_snippet}, obligations).values())
-    for limit in _projection_limits(raw_snippet):
-        for focus in (focuses, *((value,) for value in focuses if value)):
-            snippet, snippet_start, snippet_end = _focused_snippet(
-                raw_snippet, focus, limit=limit,
-            )
-            if (snippet_start, snippet_end) in seen_spans:
-                continue
-            seen_spans.add((snippet_start, snippet_end))
-            candidate = dict(source)
-            candidate["snippet"] = snippet
-            candidate["line_start"], candidate["line_end"] = _focused_line_range(
-                raw_snippet, snippet_start, snippet_end, source_line_start,
-            )
-            candidate = _requalify_visible_source(candidate, query_text=query_text)
-            candidate = bind_visible_assignments(
-                source.get("_qualification_candidate", source), candidate, assignments,
-            )
-            if snippet and (qualified_query_ids((candidate,)) & query_ids or component_witnesses(candidate, obligations)):
-                variants.append(candidate)
-                variant_spans[id(candidate)] = (snippet_start, snippet_end)
-    # Exact small atoms can remove a heading or irrelevant adjacent paragraph
-    # without widening any rolling window. Larger prose is offered only for an
-    # unstructured mandatory direction, not optional aliases or hidden metadata.
-    required_ids = set((source.get("_independent_query_plan") or {}).get("required_query_ids") or ())
-    preserve_required_blocks = bool(required_ids & query_ids and not obligations and not assignments)
-    required_blocks: list[tuple[int, int]] = []
-    for snippet_start, snippet_end in source_block_alternatives(raw_snippet).spans:
-        if ((snippet_start, snippet_end) in seen_spans
-                or (snippet_end - snippet_start > 640 and not preserve_required_blocks)):
-            continue
-        snippet = raw_snippet[snippet_start:snippet_end]
-        candidate = dict(source)
-        candidate["snippet"] = snippet
-        candidate["line_start"], candidate["line_end"] = _focused_line_range(
-            raw_snippet, snippet_start, snippet_end, source_line_start,
-        )
-        candidate = _requalify_visible_source(candidate, query_text=query_text)
-        candidate = bind_visible_assignments(
-            source.get("_qualification_candidate", source), candidate, assignments,
-        )
-        candidate_ids = qualified_query_ids((candidate,)) & query_ids
-        if candidate_ids or component_witnesses(candidate, obligations):
-            seen_spans.add((snippet_start, snippet_end))
-            variants.append(candidate)
-            variant_spans[id(candidate)] = (snippet_start, snippet_end)
-            if preserve_required_blocks and candidate_ids & required_ids:
-                required_blocks.append((snippet_start, snippet_end))
-    if required_blocks:
-        # For an unstructured mandatory request, a clipped interior is not a
-        # substitute for its qualified whole block. Typed component/assignment
-        # requests above retain their finer-grained witness policy. Admission
-        # can reject the whole atom, but cannot silently pass its prefix instead.
-        def inside_required_block(candidate: dict[str, Any]) -> bool:
-            span = variant_spans.get(id(candidate))
-            if span is None:
-                return False
-            offset, candidate_end = span
-            return any(
-                block_start <= offset
-                and candidate_end <= block_end
-                and span != (block_start, block_end)
-                for block_start, block_end in required_blocks
-            )
-
-        variants = [
-            candidate for candidate in variants
-            if not inside_required_block(candidate)
-        ]
-    # Offer one bounded verbatim union span when it preserves both directions.
-    seed_variants = tuple(variants)
-    for left_index, left in enumerate(seed_variants):
-        left_span = variant_spans.get(id(left))
-        if left_span is None:
-            continue
-        left_start, left_end = left_span
-        left_ids = qualified_query_ids((left,)) & query_ids
-        if not left_ids:
-            continue
-        for right in seed_variants[left_index + 1:]:
-            right_span = variant_spans.get(id(right))
-            if right_span is None:
-                continue
-            right_start, right_end = right_span
-            right_ids = qualified_query_ids((right,)) & query_ids
-            if not right_ids or left_ids == right_ids:
-                continue
-            union_ids = left_ids | right_ids
-            union_start = min(left_start, right_start)
-            union_end = max(left_end, right_end)
-            if union_end - union_start > 640 or (union_start, union_end) in seen_spans:
-                continue
-            union_snippet = raw_snippet[union_start:union_end].strip()
-            union_visible_start = raw_snippet.find(
-                union_snippet, union_start, union_end + 1,
-            )
-            if union_visible_start < 0:
-                continue
-            union_visible_end = union_visible_start + len(union_snippet)
-            union_candidate = dict(source)
-            union_candidate["snippet"] = union_snippet
-            union_candidate["line_start"], union_candidate["line_end"] = _focused_line_range(
-                raw_snippet, union_visible_start, union_visible_end, source_line_start)
-            union_candidate = _requalify_visible_source(union_candidate, query_text=query_text)
-            if not union_ids <= (qualified_query_ids((union_candidate,)) & query_ids):
-                continue
-            union_candidate = bind_visible_assignments(
-                source.get("_qualification_candidate", source), union_candidate, assignments,
-            )
-            seen_spans.add((union_start, union_end))
-            variants.append(union_candidate)
-            variant_spans[id(union_candidate)] = (
-                union_visible_start, union_visible_end,
-            )
-
-    def structurally_complete(candidate: dict[str, Any]) -> bool:
-        span = variant_spans.get(id(candidate))
-        return _is_complete_source_span(
-            raw_snippet,
-            str(candidate.get("snippet") or ""),
-            span_start=span[0] if span is not None else None,
-        )
-
-    # Prefer structurally complete variants when coverage is otherwise equal.
-    variants.sort(
-        key=lambda candidate: (
-            len(qualified_query_ids((candidate,)) & query_ids),
-            len(component_witnesses(candidate, obligations)),
-            len(candidate.get("_visible_assignment_hashes") or ()),
-            int(structurally_complete(candidate)),
-            -len(str(candidate.get("snippet") or "")),
-        ),
-        reverse=True,
-    )
-    return variants
-
 
 def _requalify_visible_source(
     source: dict[str, Any], *, query_text: dict[str, str],
