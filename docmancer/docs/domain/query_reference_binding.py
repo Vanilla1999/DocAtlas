@@ -67,6 +67,9 @@ _QUOTED = re.compile(r'`([^`\n]{1,160})`|"([^"\n]{1,160})"')
 _NON_ENTITY_ACTORS = frozenset({"a", "an", "the", "it", "its", "they", "their", "our", "your", "this", "that", "these", "those", "we", "you", "i"})
 _PREDICATES = frozenset({"is", "are", "was", "were", "does", "do", "returns", "return", "raises", "raise", "has", "have"})
 _ROLE_WORDS = frozenset({"file", "document", "constant", "class", "library", "package", "function", "method"})
+# A bare preposition followed by its complement describes a role, not a name.
+# Quoted names and technical spellings (for.run, with_retries) do not match.
+_ROLE_COMPLEMENT = re.compile(r"(?:for|with|without|in|from|для|с|без|в|из)\s+\S", re.I)
 
 
 def _name_span(match: re.Match[str]) -> tuple[int, int]:
@@ -94,6 +97,8 @@ def query_mentions(question: str) -> tuple[QueryMention, ...]:
     for match in _CONTEXT.finditer(question):
         start, end = _name_span(match)
         if match.group("bare") and question[start:end].casefold() in _PREDICATES:
+            continue
+        if match.group("bare") and _ROLE_COMPLEMENT.match(question, start):
             continue
         if _SOURCE_CONTEXT.fullmatch(match["context"]):
             literal = match.group("quoted") is not None or match.group("double") is not None
@@ -319,6 +324,10 @@ def prepare_reference_probe(probe, *, candidate, evidence_text: str):
             exact_terms=list(roles.hard_exact), bound_subjects=list(roles.bound_subjects),
             parent_exact_terms=parent_terms, retrieval_anchors=list(roles.retrieval_anchors),
             reference_body_query=body_question)
+    from .source_subject_binding import prepared_owner_rejection
+    owner_reason = prepared_owner_rejection(evidence)
+    if owner_reason is not None:
+        return result, owner_reason
     owner = evidence.get("owner") or {}
     owner_text = str(owner.get("text") or "")
     if (owner_text and type(owner.get("scope_start")) is int and type(owner.get("scope_end")) is int
