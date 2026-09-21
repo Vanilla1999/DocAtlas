@@ -208,7 +208,10 @@ def _reviewed_conditional_troubleshooting_frame(question: str) -> bool:
 def _host_lookup_can_derive_original(
     original_question: str, lookup_text: str,
 ) -> bool:
-    """Audit only reviewed single-intent rewrites that preserve conditions."""
+    """Audit only checked meanings or reviewed single-intent rewrites."""
+    from .admission_meaning import questions_have_same_supported_meaning
+    if questions_have_same_supported_meaning(original_question, lookup_text):
+        return True
     original_aliases = build_project_retrieval_aliases(original_question)
     lookup_aliases = build_project_retrieval_aliases(lookup_text)
     original_intents = {alias.intent_id for alias in original_aliases}
@@ -406,13 +409,14 @@ def build_documentation_query_plan(
         forbidden_catalog_roles=() if explicit_path else forbidden_roles,
         forbidden_evidence_terms=() if explicit_path else forbidden_evidence_terms,
     )]
+    from .admission_grammar import NEW_RELATIONS, parse_admission_frame
     supported_needs = (need for need in retrieval_needs(question) if (
-        need.relation in {"default", "exception", "requirement"}
-        or (need.relation == "behavior" and re.search(
+        need.relation in {"default", "exception", "requirement", *NEW_RELATIONS}
+        or (need.relation == "behavior" and (parse_admission_frame(need.query_span_text) is not None or re.search(
             r"\b(?:if|when)\b.+?\bis\s+(?:not\s+enabled|disabled|enabled)\b",
             " ".join(value for value in (need.context, need.query_span_text) if value),
             re.I,
-        ))
+        )))
     ))
     for index, need in enumerate(supported_needs, start=1):
         text = " ".join(value for value in (need.context, need.query_span_text) if value).strip()
