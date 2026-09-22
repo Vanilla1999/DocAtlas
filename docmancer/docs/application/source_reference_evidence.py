@@ -52,6 +52,15 @@ class SourceReferenceContext:
             self.complete = True
         for text in dict.fromkeys((question, *(getattr(query, "text", "") for query in queries))):
             self.plan(text)
+        from docmancer.docs.domain.need_contracts import compile_need_contracts
+        references = resolve_references(question, catalog=tuple(self.sources.values()),
+            scope=self.scope, catalog_complete=self.complete,
+            document_suffixes=frozenset(SUPPORTED_EXTENSIONS))
+        self.need_contracts = compile_need_contracts(question, references)
+        self.dependency_sets = {}
+        self.dependency_sources = {}
+        self.dependency_windows = {}
+        self.dependency_rejections = {}
 
     def plan(self, text: str) -> dict[str, Any]:
         if text not in self.plans:
@@ -141,4 +150,14 @@ class SourceReferenceContext:
                                     "scope_end": owner.char_end, "logical_id": owner.logical_id} if owner else None,
                             }
             result.append(chunk.model_copy(update={"metadata": metadata}))
-        return result
+        from .source_dependency_preparation import prepare_dependency_sets, compact_dependency_record
+        prepare_dependency_sets(self, result, self.need_contracts)
+        prepared = []
+        for chunk in result:
+            metadata = dict(chunk.metadata or {})
+            evidence = metadata.get("_reference_evidence") or {}
+            window = (str(chunk.source), evidence.get("char_start"), evidence.get("char_end"))
+            ids = self.dependency_windows.get(window, ())
+            metadata["_evidence_sets"] = [compact_dependency_record(self.dependency_sets[key]) for key in ids]
+            prepared.append(chunk.model_copy(update={"metadata": metadata}))
+        return prepared

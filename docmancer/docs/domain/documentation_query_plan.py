@@ -429,6 +429,34 @@ def build_documentation_query_plan(
                 need_subject=need.subject or None, need_relation=need.relation,
                 need_context=need.context or None,
             ))
+    # Independently scoped source questions qualify the existing pool. These
+    # are internal needs, not public/parent rewrites and not extra retrievals.
+    # No facet_id: exposing these probes as another public question plan
+    # duplicates metadata and can force a needless full projection retry.
+    from .need_composition import independent_sentence_spans, compositional_parts
+    from .need_contracts import compile_need_contracts
+    from .query_reference_binding import ScopeKey, resolve_references
+    sentence_contracts = ()
+    if independent_sentence_spans(question):
+        references = resolve_references(question, catalog=(), scope=ScopeKey('', '', ''))
+        sentence_contracts = compile_need_contracts(question, references)
+        for index, contract in enumerate(sentence_contracts[:12], 1):
+            need = contract.need
+            queries.append(DocumentationLookup(
+                f"query-part-{index}", need.query_span_text, "retrieval_need", False,
+                relation="host_lookup",
+                need_subject=need.subject or None, need_relation=need.relation,
+            ))
+    if compositional_parts(question):
+        references = resolve_references(question, catalog=(), scope=ScopeKey('', '', ''))
+        for index, contract in enumerate(compile_need_contracts(question, references)[:12], 1):
+            need = contract.need
+            text = ' '.join(x for x in (need.context, need.query_span_text) if x)
+            queries.append(DocumentationLookup(
+                f'query-composed-{index}', text, 'retrieval_need', False,
+                relation='host_lookup',
+                need_subject=need.subject or None, need_relation=need.relation,
+                need_context=need.context or None))
     seen = {query.text.casefold() for query in queries}
 
     def host_policies(text: str) -> dict[str, tuple[str, ...]]:
@@ -645,9 +673,10 @@ def build_documentation_query_plan(
         component_scope_complete=getattr(requirements, "component_scope_complete", False),
         queries=tuple(queries),
         explicit_paths=(explicit_path,) if explicit_path else (),
-        unresolved_parts=tuple(
-            str(value) for value in getattr(requirements, "unresolved_parts", ()) if str(value)
-        ),
+        unresolved_parts=tuple(dict.fromkeys((
+            *(str(value) for value in getattr(requirements, "unresolved_parts", ()) if str(value)),
+            *(c.need.query_span_text for c in sentence_contracts if c.interpretation == "unresolved"),
+        ))),
         component_contract=tuple(
             {
                 key: value

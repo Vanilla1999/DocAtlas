@@ -655,6 +655,12 @@ def rerank_project_doc_chunks(
     public_queries_by_id: dict[int, set[str]] = {}
     audited_queries_by_id: dict[int, set[str]] = {}
     needs_by_id: dict[int, set[str]] = {}
+    # Independent sentence context is not typed proof, but must survive the
+    # same bounded prefit as a standalone question. Never derive root coverage.
+    from .need_composition import independent_sentence_spans
+    part_texts = {question[a:b] for a, b in independent_sentence_spans(question)}
+    parts_by_id: dict[int, set[str]] = {}
+    part_strength_by_id: dict[int, dict[str, float]] = {}
     exact_anchors = {
         normalize_doc_path(value)
         for value in technical_anchors(question)
@@ -697,6 +703,16 @@ def rerank_project_doc_chunks(
         needs_by_id[id(chunk)] = {query_id for query_id in qualified_query_ids
             if query_matches[query_id].get("query_origin") == "retrieval_need"
             and query_matches[query_id].get("need_local_witness") is True}
+        parts_by_id[id(chunk)] = {
+            q for q in qualified_query_ids
+            if query_matches[q].get("query_origin") == "retrieval_need"
+            and query_matches[q].get("query_text") in part_texts
+            and not query_matches[q].get("public_parent_query_id")
+        }
+        part_strength_by_id[id(chunk)] = {
+            q: float(query_matches[q].get("match_ratio") or 0.0)
+            for q in parts_by_id[id(chunk)]
+        }
         base = chunk_base_score(chunk, index)
         score = base * source_weight_for_intent(path, getattr(chunk, "heading_path", None), intent) * source_requirement_boost(path, question, intent)
         if any(query_id.startswith("query-path-") for query_id in qualified_query_ids):
@@ -767,6 +783,7 @@ def rerank_project_doc_chunks(
     covered_public_queries: set[str] = set()
     covered_audited_queries: set[str] = set()
     covered_needs: set[str] = set()
+    covered_parts: set[str] = set()
     diversity_relaxed_ids: set[int] = set()
     remaining = list(scored)
 
@@ -801,6 +818,9 @@ def rerank_project_doc_chunks(
             len(public_queries_by_id[id(remaining[i][4])] - covered_public_queries),
             len(audited_queries_by_id[id(remaining[i][4])] - covered_audited_queries),
             len(needs_by_id[id(remaining[i][4])] - covered_needs),
+            len(parts_by_id[id(remaining[i][4])] - covered_parts),
+            max((strength for key, strength in part_strength_by_id[id(remaining[i][4])].items()
+                 if key not in covered_parts), default=0.0),
             -i,
         ))
         for candidate_index, row in enumerate(remaining):
@@ -819,6 +839,7 @@ def rerank_project_doc_chunks(
         covered_public_queries.update(new_public_queries)
         covered_audited_queries.update(new_audited_queries)
         covered_needs.update(needs_by_id[id(chunk)])
+        covered_parts.update(parts_by_id[id(chunk)])
         per_source_count[path] = per_source_count.get(path, 0) + 1
         if limit and len(selected) >= limit:
             break

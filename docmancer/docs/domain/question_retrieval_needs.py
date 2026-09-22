@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, replace
+from functools import lru_cache
 import re
 
 from docmancer.docs.domain.question_frame_core import split_question_clause_spans
@@ -108,7 +109,13 @@ def _sentence_ranges(text: str) -> tuple[tuple[int, int], ...]:
 
 def retrieval_needs(question: str) -> tuple[RetrievalNeed, ...]:
     """Return bounded question-derived retrieval needs without answer values."""
-    raw = str(question or "")
+    return _cached_retrieval_needs(str(question or ""))
+
+
+@lru_cache(maxsize=256)
+def _cached_retrieval_needs(raw: str) -> tuple[RetrievalNeed, ...]:
+    # Cache only immutable syntax. Source bindings, witnesses and approvals are
+    # still rebuilt from each current source/window by the qualifier.
     if not raw.strip():
         return ()
 

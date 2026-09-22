@@ -571,6 +571,15 @@ def project_docs_context(
         if candidate_footprint is not None:
             selected_footprints[evidence_id] = candidate_footprint
         selected_host_query_ids.update(host_ids)
+    if not sources and (_allow_context_hints or not fallback_ids):
+        from .need_context_projection import project_need_context_fallback
+        contextual = project_need_context_fallback(
+            initially_ranked, query_plan=query_plan,
+            expected_project_identity=expected_project_identity,
+            max_tokens=max_tokens, diagnostics=projection_diagnostics,
+        )
+        if contextual is not None:
+            return contextual
     if not sources:
         if fallback_ids and not _allow_context_hints:
             # Decide fallback after visible qualification and complete DTO

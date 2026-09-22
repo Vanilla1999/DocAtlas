@@ -179,6 +179,9 @@ class _ProjectDocsServicePart03:
             query, lookup_queries=lookup_queries, explicit_path=evidence_path,
             requirements=requirements,
         )
+        from .need_query_schedule import scheduled_plan, requirement_search_probes
+        documentation_query_plan, scheduled_lookups = scheduled_plan(documentation_query_plan,
+            supplemental_queries=requirement_search_probes(requirements))
         reference_context = SourceReferenceContext(getattr(agent, "store", None), question=query,
             queries=documentation_query_plan.queries, filters=filters, lifecycle_intent=answer_lifecycle_intent)
         lookup_by_id = {
@@ -189,6 +192,7 @@ class _ProjectDocsServicePart03:
             for item in documentation_query_plan.queries
             if item.origin in {"exact_anchor", "exact_path", "host_lookup", "canonical_intent", "concept_alias", "retrieval_hint", "lexical_topic"}
         }
+        lookup_query_ids.update({item.text: item.query_id for item in scheduled_lookups})
         exact_path_query_id = next((
             item.query_id for item in documentation_query_plan.queries
             if item.origin == "exact_path"
@@ -196,37 +200,9 @@ class _ProjectDocsServicePart03:
         retrieval = getattr(agent.config, "retrieval", None)
         mode = str(getattr(retrieval, "default_mode", "lexical") or "lexical").lower()
 
-        mandatory_requirements = tuple(
-            requirement
-            for requirement in requirements or ()
-            if getattr(requirement, "mandatory", False)
-        )
-        probe_queries = tuple(dict.fromkeys(
-            probe
-            for requirement in mandatory_requirements
-            if (probe := requirement_probe_query(requirement))
-        ))[:8]
-        # The query plan owns the optional lookup budget. Do not append the
-        # raw requirements again: that resurrects rejected/duplicate hints and
-        # turns a grouped replacement into additional internal requests.
-        planned_lookup_queries = tuple(
-            item.text for item in documentation_query_plan.queries
-            if item.origin in {"exact_anchor", "exact_path", "host_lookup", "canonical_intent", "concept_alias", "retrieval_hint", "lexical_topic"}
-        )
-        supplemental_queries = tuple(dict.fromkeys(
-            text for text in (
-                *planned_lookup_queries,
-                *probe_queries,
-            ) if supplemental_query_is_useful(text)
-        ))[:12]
-        next_supplemental_id = 1
-        for supplemental_query in supplemental_queries:
-            if supplemental_query in lookup_query_ids:
-                continue
-            lookup_query_ids[supplemental_query] = (
-                f"query-supplemental-{next_supplemental_id}"
-            )
-            next_supplemental_id += 1
+        # One shared optional schedule. Two differently filtered root reads
+        # below remain distinct; no extra loop can resurrect unscheduled probes.
+        supplemental_queries = tuple(item.text for item in scheduled_lookups)
         supplemental_budget = min(budget, max(128, min(400, budget // 4)))
 
         gateway = getattr(self.facade, "agent_gateway", None)

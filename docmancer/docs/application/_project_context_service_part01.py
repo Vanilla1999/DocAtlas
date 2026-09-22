@@ -69,6 +69,9 @@ class _ProjectContextServicePart01:
             explicit_path=evidence_path,
             requirements=canonical_requirements,
         )
+        from .need_query_schedule import scheduled_plan, requirement_search_probes
+        documentation_query_plan, _ = scheduled_plan(documentation_query_plan,
+            supplemental_queries=requirement_search_probes(canonical_requirements))
         metadata = self.facade.read_project_metadata(str(root))
         project_docs = None
         if mode in {"auto", "project-only"}:

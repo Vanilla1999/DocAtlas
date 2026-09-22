@@ -911,6 +911,10 @@ def _recognized_prefix_residue_plan(q: str) -> QuestionPlan | None:
 
 
 def _compile_question_plan_core(raw: str) -> QuestionPlan:
+    from .compositional_question_plan import conflict_question_plan
+    conflict = conflict_question_plan(raw)
+    if conflict is not None:
+        return conflict
     normalized = " ".join(raw.split())
     whole_clause = QuestionClause(raw, 0, len(raw)) if raw else None
     if whole_clause is not None:

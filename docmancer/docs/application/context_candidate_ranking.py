@@ -177,6 +177,10 @@ def _facet_aware_candidates(
     term_weights = {term: math.log1p(len(source_paths) / (1 + len(paths)))
                     for term, paths in term_sources.items()}
 
+    from docmancer.docs.domain.need_composition import independent_sentence_spans
+    full_question = query_text.get("query-original", "")
+    independent_texts = {full_question[a:b] for a, b in independent_sentence_spans(full_question)}
+
     def candidate_key(source: Any) -> tuple[Any, ...]:
         qualified_ids = qualified_query_ids((source,))
         exact_count = len(qualified_ids & (exact_query_ids or set()))
@@ -301,8 +305,16 @@ def _facet_aware_candidates(
             and not (_NEGATION_RE.search(root_question) or re.search(r"\bnot\b", root_question, re.I) or _FORBIDDEN_RE.search(root_question))
             else 0.0
         )
+        # Relevance for an independent question is not diluted by unknown
+        # sibling wording. This affects ordering, never qualification or proof.
+        independent_ratio = max((float(t.get("match_ratio") or 0.0)
+            for key, t in (source.get("retrieval_query_matches") or {}).items()
+            if key in (need_query_ids or set()) and t.get("qualified") is True
+            and t.get("query_text") in independent_texts
+            and not t.get("public_parent_query_id")), default=0.0)
         return (
             need_count,
+            independent_ratio,
             condition_lead_priority(root_question, str(source.get("snippet") or "")),
             generic_action_priority,
             required_relation_preference,

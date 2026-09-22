@@ -282,6 +282,7 @@ def qualify_evidence(
     probe = {key: value for key, value in probe.items() if key not in {
         "need_local_witness", "admission_route", "matched_need_ids",
         "need_witness_spans", "need_witness_source_key", "_admission_demands",
+        "context_eligible", "context_need_ids", "_need_context",
     }}
     result = dict(probe)
     policy_reason = evidence_policy_rejection_reason(
