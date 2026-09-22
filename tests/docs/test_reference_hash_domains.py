@@ -7,7 +7,7 @@ from docmancer.docs.application.model_visible_projection_helpers import docs_con
 
 QUESTION = "Which command starts the Docs MCP server"
 NEEDLE = "doc-atlas mcp docs-serve"
-BODY = f"# Docs MCP server\n\nThe command that starts the Docs MCP server is \`{NEEDLE}\`.\n"
+BODY = f"# Docs MCP server\n\nThe command that starts the Docs MCP server is `{NEEDLE}`.\n"
 
 
 def test_crlf_project_file_keeps_native_reference_evidence(tmp_path):
