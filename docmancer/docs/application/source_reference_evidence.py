@@ -103,20 +103,16 @@ class SourceReferenceContext:
                     digest = str(metadata.get("project_doc_content_hash") or metadata.get("source_content_hash") or "").removeprefix("sha256:")
                     if 0 <= start <= end <= len(content):
                         window = content[start:end]
-                        span_attestable = True
                         if window != chunk.text:
-                            # Enrichment is optional: failure to bind one exact current-byte span
-                            # must remove the typed reference proof, not an already retrieved
-                            # candidate that the existing strict qualifier can still evaluate.
-                            # This also keeps platform newline/path representation differences from
-                            # turning a source-preparation miss into an empty retrieval result.
+                            # Some exact-document fallback rows retain a wider boundary span around
+                            # an already-trimmed chunk. Rebind only to exact current bytes; never
+                            # normalize both sides and then attest different text.
                             offset = window.find(chunk.text)
                             if offset < 0 or window.find(chunk.text, offset + 1) >= 0:
-                                span_attestable = False
-                            else:
-                                start += offset
-                                end = start + len(chunk.text)
-                        valid = (span_attestable and content[start:end] == chunk.text
+                                continue
+                            start += offset
+                            end = start + len(chunk.text)
+                        valid = (content[start:end] == chunk.text
                             and digest == identity.content_sha256 and path.casefold() == identity.canonical_path.casefold()
                             and (metadata.get("generation_id", self.scope.snapshot_id) == self.scope.snapshot_id
                                  or (metadata.get("stable_chunk_id") in embedded_generations
