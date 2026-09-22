@@ -34,8 +34,14 @@ _expand_selected_snippets = _core._expand_selected_snippets
 _facet_aware_candidates = _core._facet_aware_candidates
 _focused_line_range = _core._focused_line_range
 _focused_snippet = _core._focused_snippet
-_qualified_fragments = _core._qualified_fragments
+_qualified_fragments_impl = _core._qualified_fragments
 _requalify_visible_source = _core._requalify_visible_source
+
+
+def _qualified_fragments(*args: Any, **kwargs: Any) -> Any:
+    """Preserve the established helper seam while the core injects requalification."""
+    kwargs.setdefault("requalify", _requalify_visible_source)
+    return _qualified_fragments_impl(*args, **kwargs)
 
 
 def _core_context_selection_decision(*args: Any, **kwargs: Any) -> Any:
