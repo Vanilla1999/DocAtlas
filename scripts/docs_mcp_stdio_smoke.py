@@ -204,6 +204,16 @@ async def smoke() -> None:
                 }))
                 assert sync.get("status") not in {"error", "failed"}, sync
                 answer = payload(await session.call_tool("get_docs_context", canonical_query))
+                if NEEDLE not in json.dumps(answer, sort_keys=True):
+                    exact = payload(await session.call_tool("get_docs_context", {
+                        **canonical_query, "lookup_queries": [NEEDLE],
+                    }))
+                    raise AssertionError({
+                        "diagnostic": "installed_docs_context_missing_after_sync",
+                        "sync": sync,
+                        "canonical": answer,
+                        "exact_lookup": exact,
+                    })
                 validate_context_payload(answer, required_fragment=NEEDLE)
                 rendered = json.dumps(answer, sort_keys=True)
                 assert "README.md" in rendered, answer
