@@ -22,6 +22,7 @@ class SourceReferenceContext:
         self.question = question
         self.plans: dict[str, dict[str, Any]] = {}
         self.sources: dict[str, CatalogSource] = {}
+        self.source_file_hashes: dict[str, str] = {}
         self.documents: dict[str, Any] = {}
         self.complete = False
         generation = store.active_generation_id() if hasattr(store, "active_generation_id") else None
@@ -48,7 +49,13 @@ class SourceReferenceContext:
                     continue
                 if metadata.get("risk_flags") or metadata.get("index_freshness") not in (None, "", "synchronized"):
                     continue
-                self.sources[str(row["source"])] = CatalogSource(str(row["source_identity"]), self.scope, path, str(row["content_hash"]))
+                source_key = str(row["source"])
+                self.sources[source_key] = CatalogSource(
+                    str(row["source_identity"]), self.scope, path, str(row["content_hash"])
+                )
+                self.source_file_hashes[source_key] = str(
+                    metadata.get("project_doc_content_hash") or ""
+                )
             self.complete = True
         for text in dict.fromkeys((question, *(getattr(query, "text", "") for query in queries))):
             self.plan(text)
@@ -100,7 +107,9 @@ class SourceReferenceContext:
                 if len(span) == 2 and all(type(pos) is int for pos in span):
                     start, end = span
                     path = str(metadata.get("project_doc_path") or metadata.get("source_path") or "")
-                    digest = str(metadata.get("project_doc_content_hash") or metadata.get("source_content_hash") or "").removeprefix("sha256:")
+                    digest = str(metadata.get("project_doc_content_hash") or "").removeprefix("sha256:")
+                    trusted_file_hash = self.source_file_hashes.get(str(chunk.source), "")
+                    trusted_file_digest = trusted_file_hash.removeprefix("sha256:")
                     if 0 <= start <= end <= len(content):
                         window = content[start:end]
                         if window != chunk.text:
@@ -113,7 +122,8 @@ class SourceReferenceContext:
                             start += offset
                             end = start + len(chunk.text)
                         valid = (content[start:end] == chunk.text
-                            and digest == identity.content_sha256 and path.casefold() == identity.canonical_path.casefold()
+                            and bool(trusted_file_digest) and digest == trusted_file_digest
+                            and path.casefold() == identity.canonical_path.casefold()
                             and (metadata.get("generation_id", self.scope.snapshot_id) == self.scope.snapshot_id
                                  or (metadata.get("stable_chunk_id") in embedded_generations
                                      and metadata.get("generation_id") == embedded_generations[metadata["stable_chunk_id"]])))
@@ -134,7 +144,9 @@ class SourceReferenceContext:
                                 generation_id=self.scope.snapshot_id, char_span=[start, end],
                                 line_span=[line_start, line_end])
                             metadata["_reference_evidence"] = {
-                                "schema_version": 1, "source": asdict(identity), "char_start": start, "char_end": end,
+                                "schema_version": 1, "source": asdict(identity),
+                                "project_doc_content_hash": trusted_file_hash,
+                                "char_start": start, "char_end": end,
                                 "text": content[start:end], "raw_document": content,
                                 "owner": {"text": header, "char_start": owner.char_start,
                                     "char_end": owner.char_start+len(header), "scope_start": owner.char_start,
