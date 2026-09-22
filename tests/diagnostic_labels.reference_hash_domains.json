@@ -1,0 +1,10 @@
+{
+  "schema_version": 1,
+  "module_labels": {
+    "tests/docs/test_reference_hash_domains.py": "behavioral"
+  },
+  "module_node_hashes": {
+    "tests/docs/test_reference_hash_domains.py": "e77a715bd15ec7192f9c38030d19bcf1a5ab9e501db99cd5c0ffea158d5259ac"
+  },
+  "node_overrides": {}
+}
