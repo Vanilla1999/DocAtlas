@@ -107,9 +107,15 @@ class SourceReferenceContext:
                 if len(span) == 2 and all(type(pos) is int for pos in span):
                     start, end = span
                     path = str(metadata.get("project_doc_path") or metadata.get("source_path") or "")
-                    digest = str(metadata.get("project_doc_content_hash") or "").removeprefix("sha256:")
+                    project_digest = str(metadata.get("project_doc_content_hash") or "").removeprefix("sha256:")
+                    source_digest = str(metadata.get("source_content_hash") or "").removeprefix("sha256:")
                     trusted_file_hash = self.source_file_hashes.get(str(chunk.source), "")
                     trusted_file_digest = trusted_file_hash.removeprefix("sha256:")
+                    hash_valid = bool(trusted_file_digest or source_digest)
+                    if trusted_file_digest:
+                        hash_valid = hash_valid and project_digest == trusted_file_digest
+                    if source_digest:
+                        hash_valid = hash_valid and source_digest == identity.content_sha256
                     if 0 <= start <= end <= len(content):
                         window = content[start:end]
                         if window != chunk.text:
@@ -122,7 +128,7 @@ class SourceReferenceContext:
                             start += offset
                             end = start + len(chunk.text)
                         valid = (content[start:end] == chunk.text
-                            and bool(trusted_file_digest) and digest == trusted_file_digest
+                            and hash_valid
                             and path.casefold() == identity.canonical_path.casefold()
                             and (metadata.get("generation_id", self.scope.snapshot_id) == self.scope.snapshot_id
                                  or (metadata.get("stable_chunk_id") in embedded_generations
