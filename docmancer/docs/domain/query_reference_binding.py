@@ -274,9 +274,17 @@ def prepare_reference_probe(probe, *, candidate, evidence_text: str):
     for key in ("path", "path_or_url", "project_doc_path", "source_path"):
         if source.get(key) and normalize_reference_path(str(source[key])) != normalize_reference_path(str(identity.get("canonical_path") or "")):
             return result, "reference_path_mismatch"
-    for key in ("_source_snapshot_sha256", "project_doc_content_hash", "source_content_hash"):
-        if source.get(key) and str(source[key]).removeprefix("sha256:") != identity.get("content_sha256"):
+    file_snapshot_hash = str(evidence.get("project_doc_content_hash") or "").removeprefix("sha256:")
+    for key in ("_source_snapshot_sha256", "project_doc_content_hash"):
+        if source.get(key) and (
+            not file_snapshot_hash
+            or str(source[key]).removeprefix("sha256:") != file_snapshot_hash
+        ):
             return result, "reference_content_mismatch"
+    if (source.get("source_content_hash")
+            and str(source["source_content_hash"]).removeprefix("sha256:")
+                != identity.get("content_sha256")):
+        return result, "reference_content_mismatch"
     start, end = evidence.get("char_start"), evidence.get("char_end")
     text = str(evidence.get("text") or "")
     if type(start) is not int or type(end) is not int or end-start != len(text):
