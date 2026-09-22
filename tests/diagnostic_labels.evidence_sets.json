@@ -13,7 +13,8 @@
     "tests/docs/test_evidence_set_query_schedule.py": "behavioral",
     "tests/docs/test_evidence_set_retrieval_keys.py": "behavioral",
     "tests/docs/test_evidence_set_source_preparation.py": "behavioral",
-    "tests/docs/test_evidence_set_context_delivery.py": "behavioral"
+    "tests/docs/test_evidence_set_context_delivery.py": "behavioral",
+    "tests/docs/test_evidence_set_delivery_acceptance.py": "behavioral"
   },
   "module_node_hashes": {
     "tests/docs/test_evidence_set_compositional_frames.py": "fc91341eddb385ee51644a992201283f6b8a9040b4d468476830653299f53a1e",
@@ -28,7 +29,8 @@
     "tests/docs/test_evidence_set_query_schedule.py": "d5ad8f8ef04c33ee605526769e1535eff6a6ff9be1a7df803795f8b140ab4742",
     "tests/docs/test_evidence_set_retrieval_keys.py": "59bb0e4c565bf046a400bd626c324410c9cc588fb88f1d1d4d4373c5111534d1",
     "tests/docs/test_evidence_set_source_preparation.py": "fea5056d2ea86019036567fd7df61f45fdc9c91a7aa12a3148b18cf77047bed5",
-    "tests/docs/test_evidence_set_context_delivery.py": "e5078da33dd8e33c3c22c4d2e4b3d9d585f4c17b738ab493a5e72f04beb5875a"
+    "tests/docs/test_evidence_set_context_delivery.py": "e5078da33dd8e33c3c22c4d2e4b3d9d585f4c17b738ab493a5e72f04beb5875a",
+    "tests/docs/test_evidence_set_delivery_acceptance.py": "7235acb2c6255e33e3468148e3d065e32ebd7d9a09cf227b8b1b7d0316db0915"
   },
   "node_overrides": {}
 }

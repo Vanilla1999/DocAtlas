@@ -1,0 +1,86 @@
+{
+  "schema_version": 1,
+  "status": "validation_blocked",
+  "increment": "R0 native RED checkpoint; R1-R6 not implemented",
+  "remote_parent": "674a4796c8a49dad305a1a22f11711fa07b5574a",
+  "remote_parent_pr": 196,
+  "remote_base_branch": "feat/demand-evidence-sets",
+  "local_tested_checkpoint": "d13bf4a831d2e16348b3622b680f0d62ee0908f4",
+  "verified_runtime_tree": "196d3e7b20a386ea0cf353616fdbca2190082cfc",
+  "last_verified_main": "bf9c5951eb75347d5075ee6e040328fe50d6e804",
+  "main_merged": false,
+  "new_branch": "fix/evidence-delivery-v2-20260922",
+  "input_plan": {
+    "filename": "DocAtlas_delivery_TDD_v2_RU(1).md",
+    "sha256": "0500fae8048dcc230a068a2cc28c871631c7330b2ea8e6f94a96b2326b04b653"
+  },
+  "input_analysis": {
+    "filename": "DocAtlas_T06_root_cause_analysis_RU(1).md",
+    "sha256": "db9833db9e7394358c5220c3a80d4940519294fefa4cb9f14667e6528ff0c530"
+  },
+  "environment": {
+    "python": "3.13.5",
+    "platform": "Linux",
+    "frozen_sync": "blocked by DNS/network; no dependency mocks"
+  },
+  "tests": [
+    {
+      "command": "python -m pytest tests/docs/test_evidence_set_delivery_acceptance.py -q --tb=short",
+      "exit_code": 1,
+      "passed": 3,
+      "failed": 5,
+      "seconds": 5.33
+    },
+    {
+      "command": "python -m pytest tests/docs/test_evidence_set_*.py -q --tb=short",
+      "exit_code": 1,
+      "passed": 180,
+      "failed": 5,
+      "seconds": 10.25
+    },
+    {
+      "command": "python -m pytest -q --tb=short",
+      "exit_code": 2,
+      "skipped": 3,
+      "collection_errors": 6,
+      "blocker": "ModuleNotFoundError: w3lib",
+      "seconds": 10.67
+    }
+  ],
+  "red_cases": [
+    "mkdocs-05",
+    "pydantic-03",
+    "fastapi-06",
+    "httpx-03",
+    "uv-04"
+  ],
+  "green_controls": [
+    "pydantic-07 known part",
+    "ruff-07 known part",
+    "missing explicit class"
+  ],
+  "full_external80_rerun": false,
+  "latency_benchmark_run": false,
+  "ci_blocker": {
+    "pr": 195,
+    "head": "d8c1f197bef565abbe22bb5ae4fcf783fb2d3fb9",
+    "run_id": 35783613230,
+    "conclusion": "failure",
+    "root_cause": "unverified: some job logs and referenced paths could not be resolved consistently"
+  },
+  "production_changed_in_increment": false,
+  "test_file_hashes": {
+    "tests/docs/_delivery_acceptance_helpers.py": {
+      "sha256": "e64eaf1927c2a80c10fcfe6f59624943c03e113498817d888abfdc776d0ca82b",
+      "git_blob_sha1": "fe855457b165651c84869fe6b62c3ae7b77fbbc1"
+    },
+    "tests/docs/test_evidence_set_delivery_acceptance.py": {
+      "sha256": "7cc3a5e0649f5d3b4040d41f52edcf0778bd54993a579390e9dc12a284f74de1",
+      "git_blob_sha1": "28b85377b9e73a439d4560d1919763b32fe04c6f"
+    },
+    "tests/diagnostic_labels.evidence_sets.json": {
+      "sha256": "940e8915e26f8945aabc190cc390b57348eba188a9c48bd2592c20aa6e9dbee8",
+      "git_blob_sha1": "d4a198240ed3f84a883f200e1ccb213b3fd7203f"
+    }
+  }
+}
