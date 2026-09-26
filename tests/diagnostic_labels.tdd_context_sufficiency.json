@@ -1,0 +1,10 @@
+{
+  "schema_version": 1,
+  "module_labels": {
+    "tests/docs/test_tdd_context_sufficiency.py": "behavioral"
+  },
+  "module_node_hashes": {
+    "tests/docs/test_tdd_context_sufficiency.py": "5680c3bbc431ba4a02b56c847fb2021ff985df4c803d0e711d2f0f3ae1397c07"
+  },
+  "node_overrides": {}
+}
