@@ -39,7 +39,7 @@ your coding agent answers with sources
 curl -LsSf https://raw.githubusercontent.com/Vanilla1999/DocAtlas/main/scripts/install.sh | sh
 ```
 
-The installer can register the Docs MCP server for **Claude Code, Codex, and OpenCode**. No hosted DocAtlas service is required for the local project-docs workflow.
+The installer can register the Docs MCP server for **Claude Code**, **Codex**, and **OpenCode**. No hosted DocAtlas service is required for the local project-docs workflow.
 
 <details>
 <summary>Architecture overview</summary>
@@ -185,7 +185,9 @@ Project-docs lifecycle responses are bounded by the server:
 | Check what docs are relevant | `get_docs_context` |
 | Check health, freshness, or a job | `docs_status` |
 | Reconcile after file changes | `prepare_docs(action="sync_project_docs")` |
-| Answer "how does this repo work?" | `get_docs_context(mode="project")` |
+| Answer "how does this repo work?" | `get_docs_context(question="How does this repository work?", scope="all")` with the repository's `project_path` |
+
+Use `scope="project"` for repository-level policy only. For onboarding and cross-module overviews, `scope="all"` includes repository and module docs; an explicit `module_path` still limits retrieval to that module.
 
 ### Change-aware documentation review
 

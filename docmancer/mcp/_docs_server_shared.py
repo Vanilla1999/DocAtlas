@@ -77,6 +77,24 @@ def _tool_spec(raw: dict[str, Any], *, text_fallback: bool = False) -> ToolSpec:
         if isinstance(scope_schema, dict):
             scope_schema["description"] = _GET_DOCS_CONTEXT_SCOPE_DESCRIPTION
         validation_schema = copy.deepcopy(advertised_schema)
+    elif name == "prepare_docs":
+        # Keep the existing RAW_TOOLS definitions as the single source of truth.
+        # Publish only these supported sync fields, not the entire admin schema.
+        delta_fields = ("changed_paths", "deleted_paths", "renamed_paths")
+        for field in delta_fields:
+            advertised_schema["properties"][field] = copy.deepcopy(
+                validation_schema["properties"][field]
+            )
+        advertised_schema.setdefault("allOf", []).append({
+            "if": {
+                "required": ["action"],
+                "properties": {"action": {"const": "sync_project_docs"}},
+            },
+            "else": {"not": {"anyOf": [
+                {"required": [field]} for field in delta_fields
+            ]}},
+        })
+        validation_schema = copy.deepcopy(advertised_schema)
     elif name == "docs_status":
         description = description.replace(
             "a returned prepare_docs job_id",
@@ -94,7 +112,7 @@ def _tool_spec(raw: dict[str, Any], *, text_fallback: bool = False) -> ToolSpec:
         ),
         validation_schema=(
             validation_schema
-            if name == "get_docs_context"
+            if name in {"get_docs_context", "prepare_docs"}
             else _strip_null_enum_values(copy.deepcopy(
                 PUBLIC_ADVERTISED_INPUT_SCHEMAS.get(name, validation_schema)
             ))
