@@ -1,5 +1,6 @@
 """Import-time shared state for the docs MCP server."""
 from __future__ import annotations
+from ._docs_schema_compaction import compact_public_contract
 from ._docs_server_schema import *  # noqa: F401,F403
 from ._docs_server_tool_data import *  # noqa: F401,F403
 
@@ -106,6 +107,9 @@ def _tool_spec(raw: dict[str, Any], *, text_fallback: bool = False) -> ToolSpec:
             "a returned prepare_docs job_id",
             "a returned job_id from prepare_docs",
         )
+    advertised_schema, description = compact_public_contract(name, advertised_schema, description)
+    if name in PUBLIC_TOOL_NAMES:
+        validation_schema = copy.deepcopy(advertised_schema)
     return ToolSpec(
         name=name,
         description=description,
@@ -118,7 +122,7 @@ def _tool_spec(raw: dict[str, Any], *, text_fallback: bool = False) -> ToolSpec:
         ),
         validation_schema=(
             validation_schema
-            if name in {"get_docs_context", "prepare_docs"}
+            if name in PUBLIC_TOOL_NAMES
             else _strip_null_enum_values(copy.deepcopy(
                 PUBLIC_ADVERTISED_INPUT_SCHEMAS.get(name, validation_schema)
             ))
