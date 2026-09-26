@@ -1,0 +1,48 @@
+name: TDD projection trace
+on:
+  push:
+    branches: [fix/tdd-public-contract-20260926]
+    paths:
+      - scripts/trace_tdd_projection.py
+      - .github/workflows/tdd-projection-trace.yml
+      - docmancer/docs/application/_docs_context_projection_core.py
+      - docmancer/docs/domain/context_windows.py
+permissions:
+  contents: read
+concurrency:
+  group: tdd-projection-trace-${{ github.ref }}
+  cancel-in-progress: false
+env:
+  DOCATLAS_OFFLINE: "1"
+  DOCATLAS_AUTO_VECTORS: "0"
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
+jobs:
+  first-loss:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1
+        with:
+          python-version: "3.12"
+      - name: Install exact source and locked dependencies
+        run: |
+          python -m pip install 'uv==0.9.25'
+          uv sync --locked --extra dev --python 3.12
+          mkdir -p "$RUNNER_TEMP/projection-trace"
+          git rev-parse HEAD > "$RUNNER_TEMP/projection-trace/head.txt"
+          uv pip freeze --python .venv/bin/python > "$RUNNER_TEMP/projection-trace/freeze.txt"
+          cp scripts/trace_tdd_projection.py "$RUNNER_TEMP/trace_tdd_projection.py"
+      - name: Observe unchanged N26 projection decisions
+        run: |
+          set -o pipefail
+          .venv/bin/python "$RUNNER_TEMP/trace_tdd_projection.py" --repo "$GITHUB_WORKSPACE" --output "$RUNNER_TEMP/projection-trace/N26.json" 2>&1 | tee "$RUNNER_TEMP/projection-trace/trace.log"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: tdd-projection-trace-${{ github.sha }}
+          path: ${{ runner.temp }}/projection-trace
+          if-no-files-found: error
+          retention-days: 14
