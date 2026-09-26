@@ -1,0 +1,10 @@
+{
+  "schema_version": 1,
+  "module_labels": {
+    "tests/docs/test_cli_literal_query_binding.py": "behavioral"
+  },
+  "module_node_hashes": {
+    "tests/docs/test_cli_literal_query_binding.py": "8113c546c99ba7e4af43c9e0c70cd06516e5b14a0801049e13e1bbd5cb1eb3e2"
+  },
+  "node_overrides": {}
+}
