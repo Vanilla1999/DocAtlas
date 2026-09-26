@@ -4,6 +4,7 @@ on:
     branches: [fix/tdd-public-contract-20260926]
     paths:
       - scripts/trace_tdd_projection.py
+      - scripts/trace_tdd_upstream.py
       - .github/workflows/tdd-projection-trace.yml
       - docmancer/docs/application/_docs_context_projection_core.py
       - docmancer/docs/domain/context_windows.py
@@ -34,11 +35,11 @@ jobs:
           mkdir -p "$RUNNER_TEMP/projection-trace"
           git rev-parse HEAD > "$RUNNER_TEMP/projection-trace/head.txt"
           uv pip freeze --python .venv/bin/python > "$RUNNER_TEMP/projection-trace/freeze.txt"
-          cp scripts/trace_tdd_projection.py "$RUNNER_TEMP/trace_tdd_projection.py"
+          cp scripts/trace_tdd_projection.py scripts/trace_tdd_upstream.py "$RUNNER_TEMP/"
       - name: Observe unchanged N26 projection decisions
         run: |
           set -o pipefail
-          .venv/bin/python "$RUNNER_TEMP/trace_tdd_projection.py" --repo "$GITHUB_WORKSPACE" --output "$RUNNER_TEMP/projection-trace/N26.json" 2>&1 | tee "$RUNNER_TEMP/projection-trace/trace.log"
+          .venv/bin/python "$RUNNER_TEMP/trace_tdd_upstream.py" --repo "$GITHUB_WORKSPACE" --output "$RUNNER_TEMP/projection-trace/N26.json" 2>&1 | tee "$RUNNER_TEMP/projection-trace/trace.log"
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()
         with:
