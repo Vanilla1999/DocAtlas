@@ -2,11 +2,13 @@
   "schema_version": 1,
   "module_labels": {
     "tests/docs/test_active_mcp_examples.py": "behavioral",
-    "tests/docs/test_projection_decision_trace.py": "behavioral"
+    "tests/docs/test_projection_decision_trace.py": "behavioral",
+    "tests/docs/test_lower_camel_query_anchors.py": "behavioral"
   },
   "module_node_hashes": {
     "tests/docs/test_active_mcp_examples.py": "c1b33b1847e9bbbc5d48255e4506eff73dd58f7e69b21301d974e9411de0a123",
-    "tests/docs/test_projection_decision_trace.py": "887dd4df7b709289683ff608ac1c5b3837011cfcae5c1abcdfa9bd0edb21d7df"
+    "tests/docs/test_projection_decision_trace.py": "887dd4df7b709289683ff608ac1c5b3837011cfcae5c1abcdfa9bd0edb21d7df",
+    "tests/docs/test_lower_camel_query_anchors.py": "6a0c3e949c3fee69f0ce1ebf548df94cf03a5680ff392436f5048b20a7c5f8e2"
   },
   "node_overrides": {}
 }
