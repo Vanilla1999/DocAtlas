@@ -1,0 +1,14 @@
+{
+  "schema_version": 1,
+  "module_labels": {
+    "tests/docs/test_tdd_documented_request.py": "schema",
+    "tests/docs/test_tdd_project_isolation.py": "behavioral",
+    "tests/docs/test_tdd_quality_jobs.py": "artifact"
+  },
+  "module_node_hashes": {
+    "tests/docs/test_tdd_documented_request.py": "fe49101d870eb60175cc3883b851e333aeb78c539053c97c8ee41cd89210da49",
+    "tests/docs/test_tdd_project_isolation.py": "88b8ea3e1281be566502792cb44c233cd9aae2d38d97f261be385ffb2031ea98",
+    "tests/docs/test_tdd_quality_jobs.py": "735da1885650642adc7646f3bc6e9f94727b254ea5a6900be17f5a5cd364e834"
+  },
+  "node_overrides": {}
+}
