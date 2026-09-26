@@ -1,0 +1,27 @@
+{
+  "schema_version": 1,
+  "runtime_cases_sha256": "12835d40de697b0c719181bba59f88b86c66d4337bcfce7fc92bb673d969836f",
+  "baseline_rubric_sha256": "87c58f618a5d51bc6f0ab8d2dbc9383ec913d59fcf46ee72ec03f8547448d17c",
+  "independent_holdout": false,
+  "assisted_is_diagnostic": true,
+  "runtime_receives_gold": false,
+  "historical": {
+    "ids": [
+      "fastapi-01",
+      "fastapi-02",
+      "fastapi-06",
+      "httpx-03",
+      "mkdocs-05",
+      "pydantic-03",
+      "typer-05",
+      "uv-04"
+    ],
+    "files": {
+      "eval/evidence_quality_v2/cases.json": "4b01b66609f1a04a067062556c97de1e2fcccc41359ecabcb75ee1154fc0d67d",
+      "eval/evidence_quality_v2/protocol.json": "96a6c66e9061b3e40b5c2f01e1b69fb5eca5d88a4a542d5512246315fdb67de2",
+      "eval/evidence_quality_v2/source-manifest.json": "f0395dcc526161b51d9378ef3ac6d4c8a1a1bd2e323be0c4c6cff58f783b0985"
+    },
+    "source_integrity": "Existing load_protocol verifies every source hash and frozen case inventory. Case witness annotations are never copied to write_project.",
+    "assessment_boundary": "Recorded stage transitions are observations. needs_review is not an automatic wrong-answer verdict. Lists spanning multiple source windows require manual adjudication."
+  }
+}

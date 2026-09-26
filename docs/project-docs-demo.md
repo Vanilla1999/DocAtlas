@@ -18,7 +18,7 @@ Inside the DocAtlas repository, ask the agent a repo-specific question such as:
 
 Preferred public MCP happy path:
 
-1. Call `get_docs_context(project_path=".", question="Context7 project-owned docs roadmap", mode="project")`.
+1. Call `get_docs_context(project_path=".", question="Context7 project-owned docs roadmap", scope="all")`.
 2. If it returns `prepare_docs` as `next_action`, call the exact returned action and retry `get_docs_context`.
 3. Use `docs_status` only when the user explicitly asks about health, freshness, index state, or a background job.
 4. Answer only from a returned `docs_answer` or from cited `docs_context` sources under its `answer_policy="cite_only"`; follow typed recovery actions for incomplete results.
@@ -35,15 +35,15 @@ The supported public surface has exactly three tools: `get_docs_context`, `prepa
 
 ## Bootstrapping a repo with no docs
 
-If `get_docs_context(project_path=".", mode="project")` reports `no_project_docs`, DocAtlas should return a typed `ask_user_to_create_project_doc` action with `suggested_file: "ARCHITECTURE.md"`, `requires_confirmation: true`, and `confirmation_reason: "repo_write"`.
+If `get_docs_context(project_path=".", scope="all", question=...)` reports `no_project_docs`, DocAtlas should return a typed `ask_user_to_create_project_doc` action with `suggested_file: "ARCHITECTURE.md"`, `requires_confirmation: true`, and `confirmation_reason: "repo_write"`.
 
 Expected agent flow:
 
 1. Ask the user before creating documentation: "No project docs were found. May I inspect the codebase and create `ARCHITECTURE.md` as a reviewable project doc?"
 2. If approved, inspect the codebase and create `ARCHITECTURE.md` in the repository root.
-3. Retry `get_docs_context(project_path=".", mode="project")` for the original question.
+3. Retry `get_docs_context(project_path=".", scope="all", question=...)` for the original question.
 4. Run the returned `prepare_docs(action="sync_project_docs", project_path=".")` action, then retry the original question unchanged.
-5. Answer future repo-specific architecture questions through `get_docs_context(mode="project")`, citing `ARCHITECTURE.md` instead of relying on hidden memory.
+5. Answer future repo-specific architecture questions through `get_docs_context(scope="all", question=...)`, citing `ARCHITECTURE.md` instead of relying on hidden memory.
 
 ## Dependency docs are separate
 

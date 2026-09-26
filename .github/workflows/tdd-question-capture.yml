@@ -4,6 +4,16 @@ on:
   push:
     branches: [fix/tdd-public-contract-20260926]
     paths:
+      - SKILL.md
+      - docs/project-docs-demo.md
+      - docs/project-docs-mcp-workflow.md
+      - docmancer/docs/application/_docs_context_projection_core.py
+      - docmancer/docs/application/projection_decision_trace.py
+      - eval/tdd_acceptance/**
+      - tests/docs/test_active_mcp_examples.py
+      - tests/docs/test_projection_decision_trace.py
+      - tests/docs/test_tdd_acceptance_inventory.py
+      - tests/diagnostic_labels.tdd_finish.json
       - docmancer/docs/domain/request_intent.py
       - docmancer/docs/domain/query_terms.py
       - tests/docs/test_cli_literal_query_binding.py
@@ -52,6 +62,14 @@ jobs:
           set -o pipefail
           .venv/bin/python -m pytest -q --tb=short tests/docs/test_tdd_question_inventory.py tests/docs/test_cli_literal_query_binding.py \
             --junitxml="$RUNNER_TEMP/inventory/tests.xml" 2>&1 | tee "$RUNNER_TEMP/inventory/tests.log"
+      - name: Verify maintained examples, decision trace and pinned acceptance inventory
+        if: ${{ !cancelled() && steps.install.outcome == 'success' }}
+        run: |
+          set -o pipefail
+          .venv/bin/python -m pytest -q --tb=short \
+            tests/docs/test_active_mcp_examples.py tests/docs/test_projection_decision_trace.py \
+            tests/docs/test_tdd_acceptance_inventory.py \
+            --junitxml="$RUNNER_TEMP/inventory/finish.xml" 2>&1 | tee "$RUNNER_TEMP/inventory/finish.log"
       - name: Preserve sufficiency report controls
         if: ${{ !cancelled() && steps.install.outcome == 'success' }}
         run: |

@@ -7,6 +7,7 @@ import hashlib
 import re
 from typing import Any
 from ._docs_context_payload import _payload
+from .projection_decision_trace import ProjectionDecisionTrace
 from .source_continuation import attach_source_continuation_locators
 from .visible_evidence_retention import retains_visible_sources, restore_visible_sources
 from .qualified_support_units import DeliveryUnit, VariantFootprint
@@ -77,6 +78,7 @@ def project_docs_context(
     if not isinstance(retrieval.get("retrieval_diagnostics"), dict):
         retrieval["retrieval_diagnostics"] = {}
     retrieval.setdefault("retrieval_diagnostics", {})["docs_context_projection"] = projection_diagnostics
+    decision_trace = ProjectionDecisionTrace(projection_diagnostics)
     sources: list[dict[str, Any]] = []
     snapshot: dict[str, dict[str, Any]] = {}
     projection_inputs: dict[str, tuple[str, tuple[str, ...], Any]] = {}
@@ -209,11 +211,14 @@ def project_docs_context(
     selected_footprints: dict[str, VariantFootprint] = {}
     for original in initially_ranked:
         if not isinstance(original, dict):
+            decision_trace.record('candidate', 'rejected', 'invalid_candidate', original)
             continue
         original = dict(original)
         if str(original.get("source_class") or "") != "project_doc":
+            decision_trace.record('candidate', 'rejected', 'wrong_source_class', original)
             continue
         if explicit_paths and _normalized_path(original.get("path") or "") not in explicit_paths:
+            decision_trace.record('candidate', 'rejected', 'explicit_path_filter', original)
             continue
         project_identity = str(original.get("project_identity") or "").strip()
         if explicit_paths and _normalized_path(
@@ -241,8 +246,10 @@ def project_docs_context(
         component_ids = set(component_witnesses(qualified_original, obligations))
         visible_query_ids = qualified_ids & eligible_query_ids
         if strict_single_attribute and not component_ids:
+            decision_trace.record('candidate', 'rejected', 'missing_attribute', original)
             continue
         if not visible_query_ids and not component_ids:
+            decision_trace.record('candidate', 'rejected', 'no_visible_qualification', original)
             continue
         required_ids = qualified_ids & required_query_id_set
         original_hit = "query-original" in qualified_ids
@@ -261,8 +268,10 @@ def project_docs_context(
                 original_question=original_question, explicit_paths=explicit_paths,
             )
         ):
+            decision_trace.record('candidate', 'rejected', 'path_only', original)
             continue
         if not component_ids and not required_ids and not exact_anchor_ids and not original_hit and not host_ids and not need_ids and not canonical_intent_ids and not (qualified_ids & context_hint_query_ids and has_context_hint_support(qualified_original, question=original_question)):
+            decision_trace.record('candidate', 'rejected', 'no_admissible_direction', original)
             continue
         if (
             "contract_fact" in context_only_relations
@@ -271,6 +280,7 @@ def project_docs_context(
             and not host_ids
             and not exact_anchor_ids
         ):
+            decision_trace.record('candidate', 'rejected', 'contract_fact_filter', original)
             continue
         raw_snippet = next((
             value
@@ -295,6 +305,7 @@ def project_docs_context(
         # Establish source identity before qualified variants cross projection.
         normalized = _docs_source(original, display_snippet=raw_snippet[:520])
         if normalized is None:
+            decision_trace.record('candidate', 'rejected', 'invalid_source', original)
             continue
         assigned_requirement_ids = _assigned_requirements_for_source(
             original, assigned_evidence_by_requirement,
@@ -328,6 +339,8 @@ def project_docs_context(
             delivery_units=delivery_units, delivery_raw_start=delivery_raw_start,
             footprint_sink=variant_footprints,
         )
+        decision_trace.record('candidate', 'prepared' if variants else 'rejected',
+                              'prepared' if variants else 'visible_qualification', original)
         projection_diagnostics["qualified_variants"] += len(variants)
         candidate_id = _internal_candidate_id(original)
         if not variants and len(projection_diagnostics["projection_rejections"]) < 32:
@@ -348,6 +361,7 @@ def project_docs_context(
             variant_inputs[id(variant)] = (original, raw_snippet, focus_queries, assigned_requirement_ids)
     selected_host_query_ids: set[str] = set()
     while prepared:
+        decision_trace.state["variant_attempts"] += 1
         selected_qualified_public_ids = attributable_query_ids(sources) & public_query_id_set
         selected_public_ids = _fully_matched_query_ids(sources) & public_query_id_set
         selected_canonical_ids = qualified_query_ids(sources) & canonical_intent_query_ids
@@ -424,10 +438,13 @@ def project_docs_context(
                 ),
             }, query_text=query_text)
             if not (qualified_query_ids((existing,)) & eligible_query_ids) <= qualified_query_ids((variant,)):
+                decision_trace.record('selection', 'rejected', 'replacement_loses_query', original, variant)
                 continue
             if not set(component_witnesses(existing, obligations)) <= set(component_witnesses(variant, obligations)):
+                decision_trace.record('selection', 'rejected', 'replacement_loses_component', original, variant)
                 continue
             if not inline_command_literals(existing["snippet"]) <= inline_command_literals(variant["snippet"]):
+                decision_trace.record('selection', 'rejected', 'replacement_loses_command', original, variant)
                 continue
             old_footprint = selected_footprints.get(str(variant.get("evidence_id") or ""))
             if not replacement_preserves_or_advances_mandatory(
@@ -440,6 +457,7 @@ def project_docs_context(
                 candidate_component_ids=set(component_witnesses(variant, obligations)),
                 selected_component_ids=selected_components,
             ):
+                decision_trace.record('selection', 'rejected', 'replacement_loses_mandatory', original, variant)
                 continue
             candidate_sources = [*sources[:existing_index], variant, *sources[existing_index + 1:]]
         same_origin_gain = bool(
@@ -449,9 +467,10 @@ def project_docs_context(
             and is_same_origin_gain(old_footprint, candidate_footprint)
         )
         decision = context_selection_decision(candidate_sources, public_query_ids)
-        if docs_context_budget_tokens(_payload(
+        packet_cost = docs_context_budget_tokens(_payload(
             candidate_sources, decision=decision, query_plan=query_plan,
-        )) > max_tokens:
+        ))
+        if packet_cost > max_tokens:
             projection_diagnostics["budget_rejections"] += 1
             if len(projection_diagnostics["projection_rejections"]) < 32:
                 projection_diagnostics["projection_rejections"].append({
@@ -459,6 +478,7 @@ def project_docs_context(
                     "evidence_id": str(variant.get("evidence_id") or ""),
                     "reason": "token_budget",
                 })
+            decision_trace.record('selection', 'rejected', 'token_budget', original, variant, budget_tokens=packet_cost)
             continue
         normalized = variant
         qualified_ids = qualified_query_ids((normalized,))
@@ -466,6 +486,7 @@ def project_docs_context(
         component_ids = set(component_witnesses(normalized, obligations))
         new_components = component_ids - selected_components
         if not (qualified_ids & eligible_query_ids) and not component_ids:
+            decision_trace.record('selection', 'rejected', 'no_visible_qualification', original, variant)
             continue
         dependent_on_covered_parent = {
             str(item.get("query_id") or "")
@@ -492,6 +513,7 @@ def project_docs_context(
             and not same_origin_gain
             and not (qualified_ids & canonical_intent_query_ids - selected_canonical_ids)
         ):
+            decision_trace.record('selection', 'rejected', 'authority_duplicate', original, variant)
             continue
         if sources and not (new_components or
             attributable_ids & public_query_id_set - selected_public_ids or
@@ -500,6 +522,7 @@ def project_docs_context(
             qualified_ids & context_hint_query_ids - qualified_query_ids(sources) or
             same_origin_gain
         ):
+            decision_trace.record('selection', 'rejected', 'no_new_direction', original, variant)
             continue
         required_ids = qualified_ids & required_query_id_set
         original_hit = "query-original" in qualified_ids
@@ -517,6 +540,7 @@ def project_docs_context(
                 original_question=original_question, explicit_paths=explicit_paths,
             )
         ):
+            decision_trace.record('selection', 'rejected', 'path_only', original, variant)
             continue
         # A lexical hit does not complete a host question. Permit a complementary
         # qualified body for one lookup only when it adds two requested terms;
@@ -528,6 +552,7 @@ def project_docs_context(
                 term for source in sources
                 for term in (source.get("retrieval_query_matches", {}).get(key, {}).get("body_matched_terms") or ())
             }) >= (1 if len(host_query_ids) > 1 else 2) for key in host_ids - selected_public_ids))):
+            decision_trace.record('selection', 'rejected', 'insufficient_new_host_terms', original, variant)
             continue
         evidence_id = normalized["evidence_id"]
         if evidence_id in seen_ids:
@@ -535,9 +560,12 @@ def project_docs_context(
             candidate_sources = [dict(source) for source in sources]
             candidate_sources[existing_index] = normalized
             candidate_decision = context_selection_decision(candidate_sources, public_query_ids)
-            if docs_context_budget_tokens(
-                    _payload(candidate_sources, decision=candidate_decision, query_plan=query_plan)
-            ) <= max_tokens:
+            packet_cost = docs_context_budget_tokens(
+                _payload(candidate_sources, decision=candidate_decision, query_plan=query_plan)
+            )
+            if packet_cost <= max_tokens:
+                decision_trace.record('selection', 'replaced', 'replaced', original, normalized,
+                                      budget_tokens=packet_cost, previous=sources[existing_index])
                 sources = candidate_sources
                 snapshot[evidence_id] = _snapshot_entry(
                     original, sources[existing_index],
@@ -546,18 +574,26 @@ def project_docs_context(
                 if candidate_footprint is not None:
                     selected_footprints[evidence_id] = candidate_footprint
                 selected_host_query_ids.update(host_ids)
+            else:
+                decision_trace.record('selection', 'rejected', 'token_budget', original, normalized,
+                                      budget_tokens=packet_cost)
             continue
         if len(sources) >= MAX_DOCS_SOURCES:
             # Source cap blocks new rows, not content-preserving replacement of
             # an already selected row. Keep scanning prepared same-origin upgrades.
+            decision_trace.record('selection', 'rejected', 'source_cap', original, variant)
             continue
         candidate_sources = [*sources, normalized]
         candidate_decision = context_selection_decision(candidate_sources, public_query_ids)
         candidate_payload = _payload(
             candidate_sources, decision=candidate_decision, query_plan=query_plan,
         )
-        if docs_context_budget_tokens(candidate_payload) > max_tokens:
+        packet_cost = docs_context_budget_tokens(candidate_payload)
+        if packet_cost > max_tokens:
+            decision_trace.record('selection', 'rejected', 'token_budget', original, variant, budget_tokens=packet_cost)
             continue
+        decision_trace.record('selection', 'accepted', 'accepted', original, normalized,
+                              budget_tokens=packet_cost)
         sources = candidate_sources
         snapshot_source = {
             **original,

@@ -44,7 +44,7 @@ DocAtlas compresses documentation context so coding agents spend tokens on code,
 
 For an installed Docs MCP, use the three-tool contract:
 
-1. Call `get_docs_context(question=..., project_path=... or library=...)` with one concrete documentation question. If the user gives several independent questions, including an evaluation or benchmark list, make separate `get_docs_context` calls instead of batching them.
+1. Call `get_docs_context(question=..., project_path=..., scope="all")` or `get_docs_context(question=..., library=...)` with one concrete documentation question. If the user gives several independent questions, including an evaluation or benchmark list, make separate `get_docs_context` calls instead of batching them.
 2. Keep the original question unchanged. For a cross-language question, comparison, conditional scenario, or multiple dependent facets, add 1–3 short `lookup_queries` in the documentation language. A simple single-facet question needs no lookup. Preserve exact identifiers, versions, conditions, negation and both comparison sides; never insert the expected answer, use guessed source names, or move independent questions into `lookup_queries`.
 3. If it returns `recommended_next_action`, follow only that typed action. Ask for confirmation before network work.
 4. For an unknown library source, use the returned `prepare_docs(action="discover_library_docs", ...)` action; review its registry-derived candidates before prefetching one.
@@ -136,7 +136,7 @@ For API tasks, search first, inspect the returned schema and safety block, then 
 
 For repository-specific architecture, conventions, runbooks, roadmap, README/wiki, or module-doc questions, use the Docs MCP tools before generic WebFetch or model memory:
 
-1. For coding and patch tasks, call `get_docs_context(project_path=..., question=..., mode="project")` first; bounded delivery is server-owned policy. One call carries one concrete documentation question; independent questions use separate calls.
+1. For coding and patch tasks, call `get_docs_context(project_path=..., question=..., scope="all")` first; bounded delivery is server-owned policy. One call carries one concrete documentation question; independent questions use separate calls.
 2. Use `lookup_queries` only for narrow same-question recall help, including cross-language translation or facet decomposition. Never batch separate questions into them.
 3. Follow bounded `recommended_next_action`: ask its source-choice question, or obtain confirmation, call its exact typed action, and retry the same bounded request.
 4. Use `docs_status` only when the user explicitly asks about health, freshness, index state, or a background job.

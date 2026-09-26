@@ -31,3 +31,14 @@ def test_module_examples_keep_explicit_module_scope():
     assert calls
     for call in calls:
         assert 'scope="module"' in call
+
+
+def test_multiline_module_example_also_uses_the_public_schema():
+    spec = next(s for s in build_docs_surface(DocsServerConfig()).tools if s.name == 'get_docs_context')
+    text = (ROOT / 'docs/project-docs-mcp-workflow.md').read_text()
+    examples = re.findall(r'get_docs_context\(\n[^)]*\)', text)
+    assert examples, 'Multiline documentation calls were not checked'
+    for example in examples:
+        call = ast.parse(example, mode='eval').body
+        supplied = {arg.arg for arg in call.keywords if arg.arg is not None}
+        assert supplied <= set(spec.input_schema['properties']), example

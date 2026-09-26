@@ -1,0 +1,18 @@
+{
+  "N03": {
+    "kind": "stale_question_premise",
+    "basis": "code_verified",
+    "reason": "README no longer recommends mode. The question remains verbatim; mode is still rejected by the public API. Use the original required facts without treating the corrected README premise as current."
+  },
+  "N04": {
+    "kind": "intentional_contract_change",
+    "basis": "code_verified",
+    "introduced_commit": "7ae5ca61a1fdc56836e70c7698061a55e8718dec",
+    "reason": "The earlier TDD public delta fix intentionally changes the negative baseline expectation. Original rubric is retained unchanged for the original commit. This is not a score-driven oracle edit.",
+    "required_facts": [
+      "changed_paths, deleted_paths and renamed_paths are accepted by the current public prepare_docs schema for sync_project_docs.",
+      "Valid paths reach the sync service; malformed paths and use with unrelated actions are rejected.",
+      "This question is answered from the tested public contract, not by executing a destructive lifecycle request from the question corpus."
+    ]
+  }
+}
