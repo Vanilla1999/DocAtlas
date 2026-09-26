@@ -1,0 +1,31 @@
+name: Comparison tokenizer
+on:
+  push:
+    branches: [experiment/grounded-comparison-20260927]
+    paths: [.github/workflows/comparison-tokenizer.yml]
+permissions:
+  contents: read
+jobs:
+  export:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1
+        with:
+          python-version: '3.13'
+      - name: Prepare isolated scoring dependency without changing product environments
+        env:
+          TIKTOKEN_CACHE_DIR: ${{ runner.temp }}/tokenizer/cache
+        run: |
+          mkdir -p "$RUNNER_TEMP/tokenizer/wheels"
+          python -m pip download 'tiktoken==0.11.0' --only-binary=:all: --dest "$RUNNER_TEMP/tokenizer/wheels"
+          python -m pip install --no-index --find-links "$RUNNER_TEMP/tokenizer/wheels" 'tiktoken==0.11.0'
+          python -c 'import tiktoken; e=tiktoken.get_encoding("o200k_base"); print(e.name, e.n_vocab)' > "$RUNNER_TEMP/tokenizer/encoding.txt"
+          cd "$RUNNER_TEMP/tokenizer"
+          sha256sum wheels/* cache/* > SHA256SUMS
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: comparison-tokenizer
+          path: ${{ runner.temp }}/tokenizer
+          retention-days: 14
+          if-no-files-found: error
