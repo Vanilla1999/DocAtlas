@@ -1,0 +1,58 @@
+name: TDD host match priority
+
+on:
+  push:
+    branches: [fix/tdd-completion-integration-20260926]
+
+permissions:
+  contents: read
+
+env:
+  DOCATLAS_OFFLINE: "1"
+  DOCATLAS_AUTO_VECTORS: "0"
+
+jobs:
+  regression:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1
+        with:
+          python-version: "3.13"
+      - name: Install locked runtime
+        id: install
+        run: |
+          mkdir -p "$RUNNER_TEMP/host-priority"
+          git rev-parse HEAD > "$RUNNER_TEMP/host-priority/head.txt"
+          python -m pip install 'uv==0.9.25'
+          uv sync --locked --extra dev --python 3.13
+          uv pip freeze --python .venv/bin/python > "$RUNNER_TEMP/host-priority/freeze.txt"
+          sha256sum uv.lock > "$RUNNER_TEMP/host-priority/lock.sha256"
+      - name: Execute new regression cases
+        run: |
+          set -o pipefail
+          .venv/bin/python -m pytest -q --tb=short tests/docs/test_host_match_priority.py \
+            tests/docs/test_pydantic_direct_context.py tests/docs/test_enumeration_request_terms.py \
+            --junitxml="$RUNNER_TEMP/host-priority/regressions.xml" \
+            2>&1 | tee "$RUNNER_TEMP/host-priority/regressions.log"
+      - name: Preserve neighboring selection and source guards
+        if: ${{ !cancelled() && steps.install.outcome == 'success' }}
+        run: |
+          set -o pipefail
+          .venv/bin/python -m pytest -q --tb=short \
+            tests/docs/test_requested_evidence_retention.py \
+            tests/docs/test_support_retention_integration.py \
+            tests/docs/test_admission_relation_safety.py \
+            --junitxml="$RUNNER_TEMP/host-priority/neighbors.xml" \
+            2>&1 | tee "$RUNNER_TEMP/host-priority/neighbors.log"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: ${{ always() }}
+        with:
+          name: tdd-host-priority-${{ github.sha }}
+          path: ${{ runner.temp }}/host-priority
+          if-no-files-found: error
+          retention-days: 14

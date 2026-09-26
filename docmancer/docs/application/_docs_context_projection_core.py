@@ -376,6 +376,16 @@ def project_docs_context(
         missing_compound_priority_ids = (
             compound_priority_query_ids - qualified_query_ids(sources)
         )
+        if len(host_query_ids) > 1 and not (
+            query_plan.get("component_scope_complete", True) and obligations
+        ):
+            # Keep a partially matched lookup outstanding only when a complete
+            # visible match is still available. Partial-only independent lanes
+            # retain their existing diversity priority; none of this is proof.
+            available_full_host_ids = set().union(*(
+                _fully_matched_query_ids((item,)) for item in prepared
+            )) & host_query_ids
+            missing_compound_priority_ids |= available_full_host_ids - selected_public_ids
         prepared = _facet_aware_candidates(
             prepared, query_text=query_text,
             fallback_query_ids=context_hint_query_ids, need_query_ids=need_query_ids,
@@ -389,6 +399,7 @@ def project_docs_context(
                 else exact_anchor_query_ids - selected_public_ids
             ),
             obligations=obligations, missing_component_ids=mandatory_component_ids - selected_components,
+            component_scope_complete=query_plan.get("component_scope_complete", True),
             assigned_evidence_ids=set(assigned_evidence_by_requirement.values()),
             bound_assigned_evidence_ids=required_assigned_evidence_ids,
         )

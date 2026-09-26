@@ -1,0 +1,35 @@
+name: TDD integration source
+
+on:
+  push:
+    branches: [fix/tdd-completion-integration-20260926]
+    paths: [.github/workflows/tdd-integration-source.yml]
+
+permissions:
+  contents: read
+
+jobs:
+  export:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Export reachable public source history without local credentials
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/integration-source"
+          git rev-parse HEAD > "$RUNNER_TEMP/integration-source/head.txt"
+          git rev-parse HEAD^{tree} > "$RUNNER_TEMP/integration-source/tree.txt"
+          git bundle create "$RUNNER_TEMP/integration-source/source.bundle" HEAD refs/remotes/origin/main
+          git bundle verify "$RUNNER_TEMP/integration-source/source.bundle"
+          cd "$RUNNER_TEMP/integration-source"
+          sha256sum source.bundle > SHA256SUMS
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: tdd-integration-source-${{ github.sha }}
+          path: ${{ runner.temp }}/integration-source
+          if-no-files-found: error
+          retention-days: 7
