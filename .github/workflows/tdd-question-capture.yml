@@ -61,3 +61,61 @@ jobs:
           path: ${{ runner.temp }}/inventory
           if-no-files-found: error
           retention-days: 14
+
+  capture:
+    needs: inventory-contract
+    if: contains(github.event.head_commit.message, '[capture30]')
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: original
+            ref: 54bd540f6cc130b8a056b2253aca47762cbae63a
+          - name: candidate
+            ref: ''
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+        with:
+          path: harness
+          persist-credentials: false
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+        with:
+          path: project
+          ref: ${{ matrix.ref || github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1
+        with:
+          python-version: "3.12"
+      - name: Install exact target and isolate harness from indexed project
+        working-directory: project
+        run: |
+          mkdir -p "$RUNNER_TEMP/capture" "$RUNNER_TEMP/audit/scripts" "$RUNNER_TEMP/audit/eval/tdd_questions30"
+          cp "$GITHUB_WORKSPACE/harness/scripts/run_tdd_questions30.py" "$RUNNER_TEMP/audit/scripts/"
+          cp "$GITHUB_WORKSPACE/harness/eval/tdd_question_inventory.py" "$RUNNER_TEMP/audit/eval/"
+          touch "$RUNNER_TEMP/audit/eval/__init__.py"
+          cp "$GITHUB_WORKSPACE/harness/eval/tdd_questions30/"*.json "$RUNNER_TEMP/audit/eval/tdd_questions30/"
+          git rev-parse HEAD > "$RUNNER_TEMP/capture/head.txt"
+          sha256sum uv.lock > "$RUNNER_TEMP/capture/lock.sha256"
+          python -m pip install 'uv==0.9.25'
+          uv sync --locked --extra dev --python 3.12
+          uv pip freeze --python .venv/bin/python > "$RUNNER_TEMP/capture/freeze.txt"
+      - name: Capture thirty direct and thirty fixed assisted questions
+        env:
+          CAPTURE_TARGET: ${{ matrix.ref || github.sha }}
+        run: |
+          set -o pipefail
+          "$GITHUB_WORKSPACE/project/.venv/bin/python" "$RUNNER_TEMP/audit/scripts/run_tdd_questions30.py" \
+            --repo "$GITHUB_WORKSPACE/project" --target "$CAPTURE_TARGET" \
+            --cases "$RUNNER_TEMP/audit/eval/tdd_questions30/cases.json" \
+            --output "$RUNNER_TEMP/capture/responses.json" \
+            2>&1 | tee "$RUNNER_TEMP/capture/capture.log"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: ${{ always() }}
+        with:
+          name: tdd-capture-${{ matrix.name }}-${{ github.sha }}
+          path: ${{ runner.temp }}/capture
+          if-no-files-found: error
+          retention-days: 14
