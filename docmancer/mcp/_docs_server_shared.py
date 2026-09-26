@@ -82,9 +82,15 @@ def _tool_spec(raw: dict[str, Any], *, text_fallback: bool = False) -> ToolSpec:
         # Publish only these supported sync fields, not the entire admin schema.
         delta_fields = ("changed_paths", "deleted_paths", "renamed_paths")
         for field in delta_fields:
-            advertised_schema["properties"][field] = copy.deepcopy(
-                validation_schema["properties"][field]
-            )
+            definition = copy.deepcopy(validation_schema["properties"][field])
+            item = definition["items"]
+            paths = item["properties"].values() if field == "renamed_paths" else (item,)
+            for path_schema in paths:
+                # Reject lexical escapes before invoking a service. Filesystem
+                # resolution and symlink containment remain service obligations.
+                path_schema["minLength"] = 1
+                path_schema["pattern"] = r"^(?![\\/]|[A-Za-z]:)(?!.*(?:^|[\\/])\.\.(?:[\\/]|$))[^\x00\r\n]+$"
+            advertised_schema["properties"][field] = definition
         advertised_schema.setdefault("allOf", []).append({
             "if": {
                 "required": ["action"],
