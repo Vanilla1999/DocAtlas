@@ -1,0 +1,12 @@
+{
+  "schema_version": 1,
+  "module_labels": {
+    "tests/docs/test_active_mcp_examples.py": "behavioral",
+    "tests/docs/test_projection_decision_trace.py": "behavioral"
+  },
+  "module_node_hashes": {
+    "tests/docs/test_active_mcp_examples.py": "c1b33b1847e9bbbc5d48255e4506eff73dd58f7e69b21301d974e9411de0a123",
+    "tests/docs/test_projection_decision_trace.py": "887dd4df7b709289683ff608ac1c5b3837011cfcae5c1abcdfa9bd0edb21d7df"
+  },
+  "node_overrides": {}
+}
