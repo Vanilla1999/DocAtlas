@@ -1,0 +1,53 @@
+name: TDD anchor qualification
+on:
+  push:
+    branches: [fix/tdd-public-contract-20260926]
+    paths:
+      - tests/docs/test_anchor_discovery_qualification.py
+      - tests/diagnostic_labels.anchor_discovery.json
+      - docmancer/docs/application/_project_docs_service_part03.py
+      - .github/workflows/tdd-anchor-qualification.yml
+permissions:
+  contents: read
+concurrency:
+  group: tdd-anchor-qualification-${{ github.ref }}
+  cancel-in-progress: false
+env:
+  DOCATLAS_OFFLINE: "1"
+  DOCATLAS_AUTO_VECTORS: "0"
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
+jobs:
+  anchor-controls:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1
+        with:
+          python-version: "3.12"
+      - name: Install locked source
+        id: install
+        run: |
+          python -m pip install 'uv==0.9.25'
+          uv sync --locked --extra dev --python 3.12
+          mkdir -p "$RUNNER_TEMP/anchor-tests"
+          git rev-parse HEAD > "$RUNNER_TEMP/anchor-tests/head.txt"
+          uv pip freeze --python .venv/bin/python > "$RUNNER_TEMP/anchor-tests/freeze.txt"
+      - name: Exact-anchor route independence
+        run: |
+          set -o pipefail
+          .venv/bin/python -m pytest -q --tb=short tests/docs/test_anchor_discovery_qualification.py --junitxml="$RUNNER_TEMP/anchor-tests/regressions.xml" 2>&1 | tee "$RUNNER_TEMP/anchor-tests/regressions.log"
+      - name: Existing discovery and context controls
+        if: ${{ !cancelled() && steps.install.outcome == 'success' }}
+        run: |
+          set -o pipefail
+          .venv/bin/python -m pytest -q --tb=short tests/docs/test_discovery_independent_qualification.py tests/docs/test_context_loss_boundaries.py --junitxml="$RUNNER_TEMP/anchor-tests/neighbors.xml" 2>&1 | tee "$RUNNER_TEMP/anchor-tests/neighbors.log"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: tdd-anchor-tests-${{ github.sha }}
+          path: ${{ runner.temp }}/anchor-tests
+          if-no-files-found: error
+          retention-days: 14
