@@ -36,6 +36,7 @@ jobs:
         run: |
           set -o pipefail
           .venv/bin/python -m pytest -q --tb=short tests/docs/test_host_match_priority.py \
+            tests/docs/test_pydantic_direct_context.py tests/docs/test_enumeration_request_terms.py \
             --junitxml="$RUNNER_TEMP/host-priority/regressions.xml" \
             2>&1 | tee "$RUNNER_TEMP/host-priority/regressions.log"
       - name: Preserve neighboring selection and source guards
