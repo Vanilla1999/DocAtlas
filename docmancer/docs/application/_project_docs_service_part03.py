@@ -112,12 +112,8 @@ def _qualify_candidate_lookups(
     No extra retrieval is performed and no original/parent coverage is derived.
     Existing discovery traces keep their scores; a cross-check has no BM25 score.
     """
-    # A planned exact anchor can qualify its own body match even when another
-    # lane discovered the chunk. It never certifies the parent question.
-    lookups = [item for item in plan.queries if (
-        item.origin in {"original", "host_lookup", "retrieval_need"}
-        and not item.public_parent_query_id
-    ) or (item.origin == "exact_anchor" and item.relation == "exact_anchor")]
+    lookups = [item for item in plan.queries
+               if item.origin in {"original", "host_lookup", "retrieval_need"} and not item.public_parent_query_id]
     result = []
     for chunk in chunks:
         for lookup in lookups:
