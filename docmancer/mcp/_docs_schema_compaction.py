@@ -37,7 +37,7 @@ def compact_public_contract(name: str, schema: dict[str, Any], description: str)
         props["scope"]["description"] = "project=repo-level docs only; module=one module; all=repo-level plus modules; same repository."
         props["version"]["description"] = "Omit for current project; exact/historical only; re-query after lockfile changes."
     elif name == "prepare_docs":
-        props["confirm"]["description"] = "Second-call clear_index apply; omit otherwise."
+        props["confirm"]["description"] = "Second-call clear_index apply only."
         paths = [props[key]["items"] for key in ("changed_paths", "deleted_paths")]
         paths.extend(props["renamed_paths"]["items"]["properties"].values())
         # Keep type inside the reference AND inline: older JSON Schema dialects
@@ -63,7 +63,13 @@ def compact_public_contract(name: str, schema: dict[str, Any], description: str)
         for kind, key in (("string", "s"), ("boolean", "b")):
             if key in definitions:
                 continue
-            targets = [item for item in props.values() if item.get("type") == [kind, "null"] and "$ref" not in item]
+            # Draft7 ignores constraints next to $ref. Factor only pure types
+            # with annotations; constrained scalars must remain inline.
+            targets = [
+                item for item in props.values()
+                if item.get("type") == [kind, "null"]
+                and set(item) <= {"type", "description", "default", "title", "examples"}
+            ]
             if len(targets) < 8:
                 continue
             definitions[key] = {"type": [kind, "null"]}

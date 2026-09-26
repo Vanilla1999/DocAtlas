@@ -18,3 +18,14 @@ def test_delta_references_preserve_validation_in_both_dialects(dialect, field):
         }
         args = {"action": "sync_project_docs", "project_path": "/project", **delta}
         assert validator.is_valid(args) is accepted, (dialect.__name__, field, value)
+
+
+@pytest.mark.parametrize("dialect", [jsonschema.Draft7Validator, jsonschema.Draft202012Validator])
+def test_scalar_constraints_survive_factoring(dialect):
+    spec = next(s for s in build_docs_surface(DocsServerConfig()).tools if s.name == "prepare_docs")
+    validator = dialect(spec.input_schema)
+    for value, accepted in [("0" * 64, True), ("f" * 64, True), ("g" * 64, False),
+                            ("a" * 63, False), ("", False), (17, False), (None, True)]:
+        args = {"action": "clear_index", "scope": "project-local",
+                "project_path": "/project", "plan_digest": value}
+        assert validator.is_valid(args) is accepted, (dialect.__name__, value)
