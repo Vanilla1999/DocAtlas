@@ -5,6 +5,7 @@ on:
     branches: [fix/tdd-public-contract-20260926]
     paths:
       - docmancer/docs/domain/request_intent.py
+      - docmancer/docs/application/_project_docs_service_part03.py
       - eval/tdd_question_inventory.py
       - eval/tdd_questions30/**
       - scripts/run_tdd_questions30.py

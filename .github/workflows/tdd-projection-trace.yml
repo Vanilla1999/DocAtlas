@@ -7,6 +7,7 @@ on:
       - scripts/trace_tdd_upstream.py
       - .github/workflows/tdd-projection-trace.yml
       - docmancer/docs/application/_docs_context_projection_core.py
+      - docmancer/docs/application/_project_docs_service_part03.py
       - docmancer/docs/domain/context_windows.py
 permissions:
   contents: read
