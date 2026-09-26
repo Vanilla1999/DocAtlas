@@ -1,0 +1,87 @@
+name: TDD public contract
+
+on:
+  push:
+    branches: [fix/tdd-public-contract-20260926]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: tdd-public-contract-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  DOCATLAS_OFFLINE: "1"
+  DOCATLAS_AUTO_VECTORS: "0"
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
+
+jobs:
+  contract-regressions:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1
+        with:
+          python-version: "3.12"
+      - name: Install source and record environment
+        run: |
+          mkdir -p "$RUNNER_TEMP/tdd-evidence"
+          git rev-parse HEAD > "$RUNNER_TEMP/tdd-evidence/head.txt"
+          python -m pip install -e '.[dev]'
+          python -m pip freeze > "$RUNNER_TEMP/tdd-evidence/freeze.txt"
+          python -c 'import docmancer; print(docmancer.__file__)'
+          doc-atlas --version
+          git archive --format=tar HEAD docmancer tests scripts README.md pyproject.toml uv.lock .github/workflows/ci.yml | gzip > "$RUNNER_TEMP/tdd-evidence/source.tar.gz"
+      - name: Run public-boundary and real-store regressions
+        run: |
+          set -o pipefail
+          python -m pytest -q --tb=short \
+            tests/docs/test_readme_mcp_keyword_contract.py \
+            tests/docs/test_public_sync_delta_contract.py \
+            tests/docs/test_public_sync_delta_edges.py \
+            tests/docs/test_public_incremental_sync_e2e.py \
+            --junitxml="$RUNNER_TEMP/tdd-evidence/regressions.xml" \
+            2>&1 | tee "$RUNNER_TEMP/tdd-evidence/regressions.log"
+      - name: Run neighboring public contracts
+        if: ${{ !cancelled() }}
+        run: |
+          set -o pipefail
+          python -m pytest -q --tb=short tests/docs/test_mcp_docs_tools_registration.py \
+            --junitxml="$RUNNER_TEMP/tdd-evidence/neighbors.xml" \
+            2>&1 | tee "$RUNNER_TEMP/tdd-evidence/neighbors.log"
+      - name: Exercise installed stdio MCP
+        if: ${{ !cancelled() }}
+        run: |
+          set -o pipefail
+          python scripts/docs_mcp_stdio_smoke.py 2>&1 | tee "$RUNNER_TEMP/tdd-evidence/stdio.log"
+      - name: Summarize actual assertion failures
+        if: ${{ always() }}
+        run: |
+          python - <<'PY'
+          import os
+          from pathlib import Path
+          import xml.etree.ElementTree as ET
+          root = Path(os.environ['RUNNER_TEMP']) / 'tdd-evidence'
+          with open(os.environ['GITHUB_STEP_SUMMARY'], 'a', encoding='utf-8') as out:
+              for path in sorted(root.glob('*.xml')):
+                  tree = ET.parse(path)
+                  out.write(f'## {path.name}\n')
+                  for case in tree.iter('testcase'):
+                      for child in case:
+                          if child.tag in ('failure', 'error'):
+                              message = (child.get('message') or '')[:900]
+                              out.write(f"- {case.get('name')}: {message}\n")
+                              escaped = message.replace('%', '%25').replace('\r', '%0D').replace('\n', '%0A')
+                              print(f'::error::{case.get("name")}: {escaped}')
+          PY
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: ${{ always() }}
+        with:
+          name: tdd-public-contract-${{ github.sha }}
+          path: ${{ runner.temp }}/tdd-evidence
+          if-no-files-found: error
+          retention-days: 14

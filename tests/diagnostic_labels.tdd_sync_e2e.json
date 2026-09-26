@@ -1,0 +1,12 @@
+{
+  "schema_version": 1,
+  "module_labels": {
+    "tests/docs/test_public_incremental_sync_e2e.py": "behavioral",
+    "tests/docs/test_public_sync_delta_edges.py": "schema"
+  },
+  "module_node_hashes": {
+    "tests/docs/test_public_incremental_sync_e2e.py": "caac0a8e7615abbf022564ff79af1229f71f4cf3bf122b927f026519f711e9d2",
+    "tests/docs/test_public_sync_delta_edges.py": "ebe9e9c3a4563c193640edc2f15355eb6d5767280de856f50efe962013c88077"
+  },
+  "node_overrides": {}
+}

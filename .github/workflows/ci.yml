@@ -216,14 +216,6 @@ jobs:
       - name: Run hermetic Context7-style project chat gate
         run: python eval/project_context_quality_protocol.py > "$RUNNER_TEMP/project-context-quality-hermetic.json"
 
-      - name: Run Legacy live compatibility report and lineage floor
-        run: |
-          python eval/project_context_quality_protocol.py --live --report-only --output "$RUNNER_TEMP/project-context-quality-legacy-live.json"
-          python scripts/check_legacy_project_context_lineage.py "$RUNNER_TEMP/project-context-quality-legacy-live.json"
-
-      - name: Run V2 project-context acceptance gate
-        run: python scripts/run_project_context_quality_v2_gate.py --output "$RUNNER_TEMP/project-context-quality-v2-live.json"
-
       - name: Upload Project Docs quality reports
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
@@ -231,8 +223,6 @@ jobs:
           name: project-docs-quality-${{ github.run_id }}
           path: |
             ${{ runner.temp }}/project-context-quality-hermetic.json
-            ${{ runner.temp }}/project-context-quality-legacy-live.json
-            ${{ runner.temp }}/project-context-quality-v2-live.json
           if-no-files-found: error
           retention-days: 14
 
@@ -355,10 +345,58 @@ jobs:
             ${{ runner.temp }}/retrieval-evidence
           retention-days: 14
 
+  legacy-quality:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: "3.12"
+      - name: Install dependencies
+        run: python -m pip install -e ".[dev]"
+      - name: Run Legacy live compatibility report and lineage floor
+        run: |
+          python eval/project_context_quality_protocol.py --live --report-only --output "$RUNNER_TEMP/project-context-quality-legacy-live.json"
+          python scripts/check_legacy_project_context_lineage.py "$RUNNER_TEMP/project-context-quality-legacy-live.json"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        if: always()
+        with:
+          name: project-docs-quality-legacy-${{ github.run_id }}
+          path: ${{ runner.temp }}/project-context-quality-legacy-live.json
+          if-no-files-found: error
+          retention-days: 14
+
+  v2-quality:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: "3.12"
+      - name: Install dependencies
+        run: python -m pip install -e ".[dev]"
+      - name: Run V2 project-context acceptance gate
+        run: python scripts/run_project_context_quality_v2_gate.py --output "$RUNNER_TEMP/project-context-quality-v2-live.json"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        if: always()
+        with:
+          name: project-docs-quality-v2-${{ github.run_id }}
+          path: ${{ runner.temp }}/project-context-quality-v2-live.json
+          if-no-files-found: error
+          retention-days: 14
+
   required-ci:
     name: required-ci
     if: always()
-    needs: [docs-contract, installer-smoke, platform-smoke, test, advanced-contract, installed-mcp-harness, static-contract, retrieval-evidence]
+    needs: [docs-contract, installer-smoke, platform-smoke, test, advanced-contract, installed-mcp-harness, static-contract, retrieval-evidence, legacy-quality, v2-quality]
     runs-on: ubuntu-latest
     timeout-minutes: 5
 
@@ -373,7 +411,9 @@ jobs:
           INSTALLED_MCP_HARNESS: ${{ needs.installed-mcp-harness.result }}
           STATIC_CONTRACT: ${{ needs.static-contract.result }}
           RETRIEVAL_EVIDENCE: ${{ needs.retrieval-evidence.result }}
+          LEGACY_QUALITY: ${{ needs.legacy-quality.result }}
+          V2_QUALITY: ${{ needs.v2-quality.result }}
         run: |
-          for result in "$DOCS_CONTRACT" "$INSTALLER_SMOKE" "$PLATFORM_SMOKE" "$CORE_TESTS" "$ADVANCED_CONTRACT" "$INSTALLED_MCP_HARNESS" "$STATIC_CONTRACT" "$RETRIEVAL_EVIDENCE"; do
+          for result in "$DOCS_CONTRACT" "$INSTALLER_SMOKE" "$PLATFORM_SMOKE" "$CORE_TESTS" "$ADVANCED_CONTRACT" "$INSTALLED_MCP_HARNESS" "$STATIC_CONTRACT" "$RETRIEVAL_EVIDENCE" "$LEGACY_QUALITY" "$V2_QUALITY"; do
             test "$result" = "success"
           done

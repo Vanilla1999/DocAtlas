@@ -1,0 +1,6 @@
+{
+  "schema_version": 1,
+  "module_labels": {"tests/docs/test_russian_inquiry_intent.py": "behavioral"},
+  "module_node_hashes": {"tests/docs/test_russian_inquiry_intent.py": "3f0c0133b98278097c14b3623f3cceab62007f1eaf9db970e7db417029582260"},
+  "node_overrides": {}
+}

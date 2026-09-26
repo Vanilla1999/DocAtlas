@@ -1,5 +1,6 @@
 """Import-time shared state for the docs MCP server."""
 from __future__ import annotations
+from ._docs_schema_compaction import compact_public_contract
 from ._docs_server_schema import *  # noqa: F401,F403
 from ._docs_server_tool_data import *  # noqa: F401,F403
 
@@ -77,11 +78,38 @@ def _tool_spec(raw: dict[str, Any], *, text_fallback: bool = False) -> ToolSpec:
         if isinstance(scope_schema, dict):
             scope_schema["description"] = _GET_DOCS_CONTEXT_SCOPE_DESCRIPTION
         validation_schema = copy.deepcopy(advertised_schema)
+    elif name == "prepare_docs":
+        # Keep the existing RAW_TOOLS definitions as the single source of truth.
+        # Publish only these supported sync fields, not the entire admin schema.
+        delta_fields = ("changed_paths", "deleted_paths", "renamed_paths")
+        for field in delta_fields:
+            definition = copy.deepcopy(validation_schema["properties"][field])
+            item = definition["items"]
+            paths = item["properties"].values() if field == "renamed_paths" else (item,)
+            for path_schema in paths:
+                # Reject lexical escapes before invoking a service. Filesystem
+                # resolution and symlink containment remain service obligations.
+                path_schema["minLength"] = 1
+                path_schema["pattern"] = r"^(?![\\/]|[A-Za-z]:)(?!.*(?:^|[\\/])\.\.(?:[\\/]|$))[^\x00\r\n]+$"
+            advertised_schema["properties"][field] = definition
+        advertised_schema.setdefault("allOf", []).append({
+            "if": {
+                "required": ["action"],
+                "properties": {"action": {"const": "sync_project_docs"}},
+            },
+            "else": {"not": {"anyOf": [
+                {"required": [field]} for field in delta_fields
+            ]}},
+        })
+        validation_schema = copy.deepcopy(advertised_schema)
     elif name == "docs_status":
         description = description.replace(
             "a returned prepare_docs job_id",
             "a returned job_id from prepare_docs",
         )
+    advertised_schema, description = compact_public_contract(name, advertised_schema, description)
+    if name in PUBLIC_TOOL_NAMES:
+        validation_schema = copy.deepcopy(advertised_schema)
     return ToolSpec(
         name=name,
         description=description,
@@ -94,7 +122,7 @@ def _tool_spec(raw: dict[str, Any], *, text_fallback: bool = False) -> ToolSpec:
         ),
         validation_schema=(
             validation_schema
-            if name == "get_docs_context"
+            if name in PUBLIC_TOOL_NAMES
             else _strip_null_enum_values(copy.deepcopy(
                 PUBLIC_ADVERTISED_INPUT_SCHEMAS.get(name, validation_schema)
             ))

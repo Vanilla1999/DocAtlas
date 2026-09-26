@@ -1,0 +1,10 @@
+{
+  "schema_version": 1,
+  "module_labels": {
+    "tests/docs/test_cli_literal_query_limits.py": "behavioral"
+  },
+  "module_node_hashes": {
+    "tests/docs/test_cli_literal_query_limits.py": "d621cb13eb4667d8de950004956954b1b122e1d9373a41aa08ac387aae914ae7"
+  },
+  "node_overrides": {}
+}

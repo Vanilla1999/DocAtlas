@@ -1,0 +1,6 @@
+{
+  "schema_version": 1,
+  "module_labels": {"tests/docs/test_tdd_question_inventory.py": "behavioral"},
+  "module_node_hashes": {"tests/docs/test_tdd_question_inventory.py": "bbe418a19fc6bbfe66ccefdfaceb96c74eabee23efa035e2928ea8f818381c40"},
+  "node_overrides": {}
+}

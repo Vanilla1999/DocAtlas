@@ -1,0 +1,89 @@
+name: TDD continuation
+on:
+  push:
+    branches: [fix/tdd-public-contract-20260926]
+permissions:
+  contents: read
+concurrency:
+  group: tdd-continuation-${{ github.ref }}
+  cancel-in-progress: false
+env:
+  DOCATLAS_OFFLINE: '1'
+  DOCATLAS_AUTO_VECTORS: '0'
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: 'true'
+jobs:
+  regressions:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1
+        with:
+          python-version: '3.12'
+      - name: Install reviewed source
+        run: |
+          mkdir -p "$RUNNER_TEMP/tdd-continuation"
+          git rev-parse HEAD > "$RUNNER_TEMP/tdd-continuation/head.txt"
+          python -m pip install -e '.[dev]'
+          python -m pip freeze > "$RUNNER_TEMP/tdd-continuation/freeze.txt"
+      - name: Run continuation regressions
+        run: |
+          set -o pipefail
+          python -m pytest -q --tb=short tests/docs/test_tdd_documented_request.py tests/docs/test_tdd_project_isolation.py tests/docs/test_tdd_quality_jobs.py --junitxml="$RUNNER_TEMP/tdd-continuation/regressions.xml" 2>&1 | tee "$RUNNER_TEMP/tdd-continuation/regressions.log"
+      - name: Preserve neighboring controls
+        if: ${{ !cancelled() }}
+        run: |
+          set -o pipefail
+          python -m pytest -q --tb=short tests/docs/test_readme_mcp_keyword_contract.py tests/docs/test_public_sync_delta_contract.py tests/docs/test_public_sync_delta_edges.py tests/docs/test_public_incremental_sync_e2e.py tests/docs/test_mcp_docs_tools_registration.py --junitxml="$RUNNER_TEMP/tdd-continuation/neighbors.xml" 2>&1 | tee "$RUNNER_TEMP/tdd-continuation/neighbors.log"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: tdd-continuation-${{ github.sha }}
+          path: ${{ runner.temp }}/tdd-continuation
+          if-no-files-found: error
+          retention-days: 14
+  locked-core:
+    if: contains(github.event.head_commit.message, '[baseline]')
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - label: original
+            ref: 54bd540f6cc130b8a056b2253aca47762cbae63a
+          - label: current
+            ref: ''
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+        with:
+          ref: ${{ matrix.ref || github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1
+        with:
+          python-version: '3.12'
+      - name: Install identical locked dependency set
+        run: |
+          mkdir -p "$RUNNER_TEMP/locked-core"
+          git rev-parse HEAD > "$RUNNER_TEMP/locked-core/head.txt"
+          sha256sum uv.lock > "$RUNNER_TEMP/locked-core/lock.sha256"
+          git show 54bd540f6cc130b8a056b2253aca47762cbae63a:uv.lock | cmp - uv.lock
+          python -m pip install 'uv==0.9.25'
+          uv sync --locked --extra dev --python 3.12
+          uv pip freeze --python .venv/bin/python > "$RUNNER_TEMP/locked-core/freeze.txt"
+          .venv/bin/python -c 'import sys,docmancer; print(sys.version); print(docmancer.__file__)' > "$RUNNER_TEMP/locked-core/environment.txt"
+          git diff --exit-code -- uv.lock
+      - name: Run complete offline core inventory
+        run: |
+          set -o pipefail
+          .venv/bin/python -m pytest tests/ -m 'not advanced and not live and not live_network' -q --tb=short --junitxml="$RUNNER_TEMP/locked-core/core.xml" 2>&1 | tee "$RUNNER_TEMP/locked-core/core.log"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: tdd-locked-core-${{ matrix.label }}-${{ github.sha }}
+          path: ${{ runner.temp }}/locked-core
+          if-no-files-found: error
+          retention-days: 14

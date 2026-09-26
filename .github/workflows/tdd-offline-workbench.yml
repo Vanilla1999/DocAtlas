@@ -1,0 +1,47 @@
+name: TDD offline workbench
+
+on:
+  push:
+    branches: [fix/tdd-public-contract-20260926]
+    paths: [.github/workflows/tdd-offline-workbench.yml]
+
+permissions:
+  contents: read
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
+
+jobs:
+  export:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1
+        with:
+          python-version: "3.13"
+      - name: Export reviewed source and hash-checked dependencies
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/workbench/wheels"
+          git rev-parse HEAD > "$RUNNER_TEMP/workbench/head.txt"
+          git rev-parse HEAD^{tree} > "$RUNNER_TEMP/workbench/tree.txt"
+          git archive --format=tar.gz HEAD > "$RUNNER_TEMP/workbench/source.tar.gz"
+          python -m pip install 'uv==0.9.25'
+          uv export --frozen --extra dev --no-emit-project --format requirements-txt > "$RUNNER_TEMP/workbench/requirements.txt"
+          python -m pip download --require-hashes --only-binary=:all: \
+            -r "$RUNNER_TEMP/workbench/requirements.txt" -d "$RUNNER_TEMP/workbench/wheels"
+          python -m pip download --only-binary=:all: 'hatchling==1.26.3' 'editables==0.5' \
+            -d "$RUNNER_TEMP/workbench/wheels"
+          sha256sum uv.lock > "$RUNNER_TEMP/workbench/lock.sha256"
+          cd "$RUNNER_TEMP/workbench"
+          sha256sum source.tar.gz requirements.txt wheels/* > SHA256SUMS
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: tdd-offline-workbench-${{ github.sha }}
+          path: ${{ runner.temp }}/workbench
+          if-no-files-found: error
+          retention-days: 7
+          compression-level: 0
