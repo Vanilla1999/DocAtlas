@@ -1,0 +1,15 @@
+{
+  "schema_version": 1,
+  "module_labels": {
+    "tests/docs/test_readme_mcp_keyword_contract.py": "artifact",
+    "tests/docs/test_public_sync_delta_contract.py": "behavioral"
+  },
+  "module_node_hashes": {
+    "tests/docs/test_readme_mcp_keyword_contract.py": "fc60d2536e6747a4f34009d54ac207f377d9671be5958df7e038f924be6d540c",
+    "tests/docs/test_public_sync_delta_contract.py": "366911d1a67aa5031a719bc542b39db759ce269b96a3093ab757919801e5abb1"
+  },
+  "node_overrides": {
+    "tests/docs/test_public_sync_delta_contract.py::test_delta_property_is_advertised_and_validated": "schema",
+    "tests/docs/test_public_sync_delta_contract.py::test_other_action_rejects_delta_in_public_schema": "schema"
+  }
+}
