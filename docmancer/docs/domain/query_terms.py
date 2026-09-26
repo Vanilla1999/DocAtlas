@@ -72,10 +72,14 @@ def documentation_technical_anchors(question: str, *, limit: int = 12) -> tuple[
         # Use the existing quoted-exact constraint so a wrong option value,
         # split mentions, or another command cannot qualify this extra probe.
         literal = "`" + " ".join(match.group(0).split()) + "`"
+        if len(literal) - 2 > 160:
+            continue
         if literal not in values:
             values.append(literal)
         if len(values) >= min(4, limit):
             break
+    if len(values) >= limit:
+        return tuple(values)
     # A filename/qualified symbol is one identity, not independent identifiers
     # for each uppercase or dotted substring inside the same source span.
     # Keep a separately mentioned token: containment is positional, not textual.

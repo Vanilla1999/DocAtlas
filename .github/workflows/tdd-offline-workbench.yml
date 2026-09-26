@@ -33,7 +33,7 @@ jobs:
           uv export --frozen --extra dev --no-emit-project --format requirements-txt > "$RUNNER_TEMP/workbench/requirements.txt"
           python -m pip download --require-hashes --only-binary=:all: \
             -r "$RUNNER_TEMP/workbench/requirements.txt" -d "$RUNNER_TEMP/workbench/wheels"
-          python -m pip download --only-binary=:all: 'hatchling==1.27.0' 'editables==0.5' \
+          python -m pip download --only-binary=:all: 'hatchling==1.26.3' 'editables==0.5' \
             -d "$RUNNER_TEMP/workbench/wheels"
           sha256sum uv.lock > "$RUNNER_TEMP/workbench/lock.sha256"
           cd "$RUNNER_TEMP/workbench"
