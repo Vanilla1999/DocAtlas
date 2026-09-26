@@ -12,6 +12,14 @@ _REQUEST_FRAMING_TERMS = frozenset({
     "describe", "explain", "how", "please", "show", "tell", "what", "which",
     "compare", "summarize", "расскажи", "mcp", "and", "or", "the", "и", "или",
 })
+# A shaped command followed by one explicit long-option value is a literal
+# retrieval hypothesis, not a claim about option arity or answer sufficiency.
+# Do not consume natural-language connectors or cross a physical line.
+_COMMAND_OPTION_VALUE_RE = re.compile(
+    r"(?<![\w./-])[a-z][a-z0-9]*(?:-[a-z0-9]+)+[ \t]+"
+    r"--[A-Za-z][A-Za-z0-9-]{1,118}(?:[ \t]+|=)"
+    r"(?P<value>[A-Za-z0-9][A-Za-z0-9_.:/-]{0,79})(?![\w.-])"
+)
 _TECHNICAL_TERM_PATTERNS = (
     re.compile(r"[`\"]([^`\"\n]{2,160})[`\"]"),
     re.compile(r"(?<![\w.-])--[A-Za-z][A-Za-z0-9-]{1,118}"),
@@ -58,6 +66,16 @@ def is_exact_technical_token(token: str) -> bool:
 def documentation_technical_anchors(question: str, *, limit: int = 12) -> tuple[str, ...]:
     """Extract bounded exact anchors without depending on retrieval infrastructure."""
     values: list[str] = []
+    for match in _COMMAND_OPTION_VALUE_RE.finditer(question):
+        if match.group("value").casefold() in _SUPPLEMENTAL_FUNCTION_WORDS:
+            continue
+        # Use the existing quoted-exact constraint so a wrong option value,
+        # split mentions, or another command cannot qualify this extra probe.
+        literal = "`" + " ".join(match.group(0).split()) + "`"
+        if literal not in values:
+            values.append(literal)
+        if len(values) >= min(4, limit):
+            break
     # A filename/qualified symbol is one identity, not independent identifiers
     # for each uppercase or dotted substring inside the same source span.
     # Keep a separately mentioned token: containment is positional, not textual.
@@ -73,6 +91,7 @@ def documentation_technical_anchors(question: str, *, limit: int = 12) -> tuple[
                 and value.casefold() not in {"docatlas", "docmancer"}
                 and (pattern is _TECHNICAL_TERM_PATTERNS[0] or value.casefold() not in _REQUEST_FRAMING_TERMS)
                 and value not in values
+                and f"`{value}`" not in values
             ):
                 values.append(value)
             if len(values) >= limit:

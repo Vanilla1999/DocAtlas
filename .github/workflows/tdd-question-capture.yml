@@ -5,6 +5,9 @@ on:
     branches: [fix/tdd-public-contract-20260926]
     paths:
       - docmancer/docs/domain/request_intent.py
+      - docmancer/docs/domain/query_terms.py
+      - tests/docs/test_cli_literal_query_binding.py
+      - tests/diagnostic_labels.cli_literal_query.json
       - eval/tdd_question_inventory.py
       - eval/tdd_questions30/**
       - scripts/run_tdd_questions30.py
@@ -47,7 +50,7 @@ jobs:
       - name: Run capture contract tests
         run: |
           set -o pipefail
-          .venv/bin/python -m pytest -q --tb=short tests/docs/test_tdd_question_inventory.py \
+          .venv/bin/python -m pytest -q --tb=short tests/docs/test_tdd_question_inventory.py tests/docs/test_cli_literal_query_binding.py \
             --junitxml="$RUNNER_TEMP/inventory/tests.xml" 2>&1 | tee "$RUNNER_TEMP/inventory/tests.log"
       - name: Preserve sufficiency report controls
         if: ${{ !cancelled() && steps.install.outcome == 'success' }}
