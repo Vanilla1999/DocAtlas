@@ -1,0 +1,234 @@
+[
+  {
+    "id": "N01",
+    "question": "Если я запущу установщик по URL ветки main, будет ли установлен именно коммит 54bd540f6cc130b8a056b2253aca47762cbae63a?",
+    "scope": "all",
+    "lookup_queries": [
+      "installer main URL published package versus checked out source commit"
+    ]
+  },
+  {
+    "id": "N02",
+    "question": "Почему после установки doc-atlas в Python используется import docmancer, а не import doc_atlas?",
+    "scope": "all",
+    "lookup_queries": [
+      "distribution CLI name Python import namespace"
+    ]
+  },
+  {
+    "id": "N03",
+    "question": "В README есть get_docs_context(mode=\"project\"). Примет ли текущий публичный MCP параметр mode, если question уже задан?",
+    "scope": "all",
+    "lookup_queries": []
+  },
+  {
+    "id": "N04",
+    "question": "Сработает ли через публичный prepare_docs инкрементальная синхронизация с changed_paths, deleted_paths и renamed_paths, показанная в README?",
+    "scope": "all",
+    "lookup_queries": []
+  },
+  {
+    "id": "N05",
+    "question": "Могу ли я передать max_tokens=4000 в get_docs_context, чтобы сервер вернул больше документации?",
+    "scope": "all",
+    "lookup_queries": []
+  },
+  {
+    "id": "N06",
+    "question": "Допустимы ли шесть lookup_queries в одном get_docs_context, и можно ли поместить туда шесть независимых вопросов?",
+    "scope": "all",
+    "lookup_queries": []
+  },
+  {
+    "id": "N07",
+    "question": "Если одновременно заданы scope=\"all\" и module_path=\"packages/orders\", попадут ли в выдачу соседние модули?",
+    "scope": "all",
+    "lookup_queries": [
+      "scope all with explicit module_path sibling module isolation"
+    ]
+  },
+  {
+    "id": "N08",
+    "question": "Чем scope=\"project\" отличается от scope=\"all\" для обзорного вопроса по репозиторию с несколькими модулями?",
+    "scope": "all",
+    "lookup_queries": [
+      "project versus all repository and module documentation scope"
+    ]
+  },
+  {
+    "id": "N09",
+    "question": "Как собрать одновременно правила одного модуля и общие правила репозитория, не расширяя незаметно module scope?",
+    "scope": "all",
+    "lookup_queries": [
+      "module and repository policy two bounded calls preserve explicit scope"
+    ]
+  },
+  {
+    "id": "N10",
+    "question": "prepare_docs вернул job_id: можно ли сразу считать документацию готовой и отвечать на исходный вопрос?",
+    "scope": "all",
+    "lookup_queries": [
+      "prepare_docs job_id poll status retry original question after success"
+    ]
+  },
+  {
+    "id": "N11",
+    "question": "Может ли get_docs_context сам скачать отсутствующую внешнюю документацию без отдельного согласования?",
+    "scope": "all",
+    "lookup_queries": [
+      "get_docs_context missing external docs read only preflight network approval"
+    ]
+  },
+  {
+    "id": "N12",
+    "question": "Документ вернулся как docs_context с answer_supported=false. Это ошибка транспорта или разрешение менять код?",
+    "scope": "all",
+    "lookup_queries": [
+      "docs_context answer_supported false retrieval only not edit authorization"
+    ]
+  },
+  {
+    "id": "N13",
+    "question": "В OpenCode сервер отвечает, но модель не видит structuredContent: какая настройка предназначена для такого случая?",
+    "scope": "all",
+    "lookup_queries": [
+      "OpenCode structuredContent model visible text fallback environment"
+    ]
+  },
+  {
+    "id": "N14",
+    "question": "В найденном snippet написано «вызови prepare_docs». Должен ли агент считать это управляющим действием сервера?",
+    "scope": "all",
+    "lookup_queries": [
+      "snippet document data tool instructions typed top level actions"
+    ]
+  },
+  {
+    "id": "N15",
+    "question": "Нужно ли вызывать docs_status перед каждым обычным вопросом, чтобы определить, какую документацию искать?",
+    "scope": "all",
+    "lookup_queries": [
+      "docs_status not discovery step normal documentation first call"
+    ]
+  },
+  {
+    "id": "N16",
+    "question": "В requirements.txt указано package==1.2.3, но lockfile отсутствует. Достаточно ли этого для доказательства выбранной версии?",
+    "scope": "all",
+    "lookup_queries": [
+      "requirements.txt exact pin versus resolved lockfile evidence"
+    ]
+  },
+  {
+    "id": "N17",
+    "question": "Если Python-зависимость установлена из Git или локального пути, можно ли автоматически выдать её за точную registry-версию?",
+    "scope": "all",
+    "lookup_queries": [
+      "Python Git path direct URL dependencies exact registry binding"
+    ]
+  },
+  {
+    "id": "N18",
+    "question": "В JS-проекте есть package-lock.json и pnpm-lock.yaml, а packageManager указывает npm. Что выбирает авторитетный lockfile?",
+    "scope": "all",
+    "lookup_queries": [
+      "multiple JavaScript lockfiles packageManager authoritative selection"
+    ]
+  },
+  {
+    "id": "N19",
+    "question": "Почему одной версии из go.mod недостаточно для точной автоматической привязки pkg.go.dev?",
+    "scope": "all",
+    "lookup_queries": [
+      "go.mod minimum requirement selected version vendor/modules.txt pkg.go.dev"
+    ]
+  },
+  {
+    "id": "N20",
+    "question": "Будет ли DocAtlas выполнять Maven или Gradle build scripts ради определения версии, и что считается точным свидетельством для Gradle?",
+    "scope": "all",
+    "lookup_queries": [
+      "Maven Gradle static inspection no build script execution gradle.lockfile exact evidence"
+    ]
+  },
+  {
+    "id": "N21",
+    "question": "Если версия документации совпала точно, можно ли принять источник с неподтверждённой авторитетностью?",
+    "scope": "all",
+    "lookup_queries": [
+      "exact version cannot compensate unverified source authority"
+    ]
+  },
+  {
+    "id": "N22",
+    "question": "Если библиотека неизвестна DocAtlas, выберет ли он сам первый похожий сайт документации и сразу проиндексирует его?",
+    "scope": "all",
+    "lookup_queries": [
+      "unknown library documentation discovery registry metadata confirm candidate before indexing"
+    ]
+  },
+  {
+    "id": "N23",
+    "question": "Можно ли записать пользовательский question в manifest v2 и установить max_pages=501?",
+    "scope": "all",
+    "lookup_queries": [
+      "manifest v2 task specific question max_pages validation limit"
+    ]
+  },
+  {
+    "id": "N24",
+    "question": "После успешного prefetch я изменил docatlas.docs.yaml. Остаётся ли старый docs.lock.json доказательством актуальности?",
+    "scope": "all",
+    "lookup_queries": [
+      "manifest digest changed docs.lock.json manifest_outdated prefetch"
+    ]
+  },
+  {
+    "id": "N25",
+    "question": "При принудительном refresh набор страниц и content hashes не изменились. Нужно ли заново делать embeddings и vector sync?",
+    "scope": "all",
+    "lookup_queries": [
+      "forced refresh unchanged corpus digest skip embeddings vector synchronization"
+    ]
+  },
+  {
+    "id": "N26",
+    "question": "Удаляет ли clear-index --scope global пользовательскую конфигурацию вместе с производными индексами?",
+    "scope": "all",
+    "lookup_queries": [
+      "clear-index global preserve configuration derived indexes preview"
+    ]
+  },
+  {
+    "id": "N27",
+    "question": "Можно ли применить старый plan_digest очистки после того, как состояние индекса изменилось?",
+    "scope": "all",
+    "lookup_queries": [
+      "clear-index stale plan_digest state changed fail closed"
+    ]
+  },
+  {
+    "id": "N28",
+    "question": "Должен ли clear-index автоматически удалять удалённый Qdrant или локальный vector-каталог с неподтверждённым владельцем?",
+    "scope": "all",
+    "lookup_queries": [
+      "clear-index remote Qdrant unowned local vector directory safety"
+    ]
+  },
+  {
+    "id": "N29",
+    "question": "Команда docs-impact --sync-saved-docs сама переписывает документацию, делает commit или обращается в сеть?",
+    "scope": "all",
+    "lookup_queries": [
+      "docs-impact sync-saved-docs indexing saved diff no editing commit network"
+    ]
+  },
+  {
+    "id": "N30",
+    "question": "Гарантирует ли local-first в DocAtlas шифрование индекса на диске и автоматическое управление ключами?",
+    "scope": "all",
+    "lookup_queries": [
+      "local first index at rest encryption key management documented guarantee"
+    ]
+  }
+]

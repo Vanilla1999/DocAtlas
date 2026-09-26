@@ -1,0 +1,17 @@
+{
+  "schema_version": "tdd-question-inventory-v1",
+  "runtime_cases_sha256": "12835d40de697b0c719181bba59f88b86c66d4337bcfce7fc92bb673d969836f",
+  "original_bundle_sha256": "292fdf442248ece4ce43222d686a9e09036453078887d25f66d791c78f7a6d42",
+  "original_target_commit": "54bd540f6cc130b8a056b2253aca47762cbae63a",
+  "input_projection": ["id", "question", "scope", "lookup_queries"],
+  "gold_present": false,
+  "independent_holdout": false,
+  "design": "Source-informed regression cases preserved verbatim from the prior audit. No adaptive lookups.",
+  "assisted_limitation": "Some original prewritten lookups contain answer-direction cues. Assisted is diagnostic only, not an unbiased host-policy benchmark. Direct is the primary observation.",
+  "claim_boundary": "This captures tool output, not a host-model final answer. Expected facts and source-path hints from the gold file are not sent to MCP.",
+  "expectation_revisions": {
+    "N03": {"kind": "code-dependent", "reason": "README corrected; mode remains unsupported. Preserve the question but recognize its stale README premise."},
+    "N04": {"kind": "code-dependent", "introduced_commit": "7ae5ca61a1fdc56836e70c7698061a55e8718dec", "reason": "Public delta schema intentionally changed. Original negative gold is not valid for the corrected target."}
+  },
+  "rubric": "Review all required facts from the external original audit. Missing, contradicted and unknown are separate. Missing code-only evidence is not a hallucination. No runtime code imports this inventory."
+}
