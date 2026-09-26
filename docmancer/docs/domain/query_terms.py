@@ -106,9 +106,15 @@ def documentation_technical_anchors(question: str, *, limit: int = 12) -> tuple[
 @lru_cache(maxsize=512)
 def documentation_query_terms(question: str) -> tuple[str, ...]:
     """Bounded lexical probe terms, excluding standalone request connectors."""
+    # A leading enumeration imperative describes answer presentation, not a
+    # fact that documentation must repeat. Keep the public question, interior
+    # occurrences, exact identities and all condition words unchanged.
+    lexical_question = re.sub(
+        r"^\s*(?:перечисли(?:те)?|enumerate)\s+(?=\S)", "", question, count=1, flags=re.I,
+    )
     return tuple(dict.fromkeys(
         token.casefold()
-        for token in re.findall(r"[A-Za-zА-Яа-яЁё0-9_.:/+-]+", question)
+        for token in re.findall(r"[A-Za-zА-Яа-яЁё0-9_.:/+-]+", lexical_question)
         if token.casefold() not in _REQUEST_FRAMING_TERMS
         and (len(token) >= 4 or is_exact_technical_token(token))
     ))[:32]
