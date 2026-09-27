@@ -1,0 +1,10 @@
+{
+  "schema_version": 1,
+  "module_labels": {
+    "tests/docs/test_review_source_capabilities.py": "behavioral"
+  },
+  "module_node_hashes": {
+    "tests/docs/test_review_source_capabilities.py": "40181e364200003ea5381e1d2f4a294e265d8f233c74955e6c8929adfdaf8ffa"
+  },
+  "node_overrides": {}
+}
