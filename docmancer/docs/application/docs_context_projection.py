@@ -281,7 +281,8 @@ def project_docs_context(
 
     if root:
         attach_source_continuation_locators(payload, snapshot, root=root, max_tokens=packet_max)
-    return payload, snapshot
+    from .joint_context_selection import select_joint_context
+    return select_joint_context(payload, snapshot, retrieval, max_tokens=packet_max)
 
 
 __all__ = [
