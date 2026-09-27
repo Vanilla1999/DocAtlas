@@ -1,0 +1,10 @@
+{
+  "schema_version": 1,
+  "module_labels": {
+    "tests/docs/test_structural_context_delivery.py": "behavioral"
+  },
+  "module_node_hashes": {
+    "tests/docs/test_structural_context_delivery.py": "4d7c3b79aedf0a192785c942bb59dbeea807940f9d0c2784dca6c049fbc28876"
+  },
+  "node_overrides": {}
+}
