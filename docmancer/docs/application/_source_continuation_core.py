@@ -74,8 +74,14 @@ class SourceContinuationReader:
                 if not uri.startswith(self.uri_prefix) or len(uri) != len(self.uri_prefix) + 24:
                     return None
                 existing = self._cursors.get(uri)
-                if existing and existing.reference != reference:
-                    return None
+                if existing is not None:
+                    if (existing.reference != reference
+                            or existing.start != reference.line_end + 1
+                            or existing.end is not None):
+                        return None
+                    # Re-publication must not mutate a capability already given
+                    # to the client, including its original expiry/read budget.
+                    return uri
                 self._cursors[uri] = _Cursor(reference, reference.line_end + 1, self.max_reads,
                                              self.clock() + self.retention_seconds)
                 while len(self._cursors) > self.max_references:
