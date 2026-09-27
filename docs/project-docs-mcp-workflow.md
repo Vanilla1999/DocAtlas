@@ -36,7 +36,7 @@ No need to call `inspect` first: sync does a full reconcile. Call `inspect` only
 For public MCP clients, start with context and follow its decision:
 
 ```text
-get_docs_context(project_path=..., question=..., mode="project")
+get_docs_context(project_path=..., question=..., scope="all")
 -> returned prepare_docs action when required
 -> retry get_docs_context
 ```
@@ -63,7 +63,7 @@ Then follow the returned `reason_code`:
 
 | `reason_code` | What it means | Agent action |
 |---|---|---|
-| `project_docs_ready` | Project docs are discovered and current. | Call `get_docs_context(mode="project")`. |
+| `project_docs_ready` | Project docs are discovered and current. | Call `get_docs_context(scope="all", question=...)`. |
 | `project_docs_found_not_indexed` | Reviewable docs exist but are not indexed. | Call `prepare_docs(action="sync_project_docs")`. |
 | `project_docs_stale` | Indexed docs changed on disk, were deleted, or are no longer part of current discovery. | Call `prepare_docs(action="sync_project_docs")`. |
 | `no_project_docs` | No reviewable docs were discovered. | Ask before creating a reviewable `ARCHITECTURE.md`. |
@@ -73,10 +73,10 @@ Then follow the returned `reason_code`:
 After sync, proceed to:
 
 ```text
-get_docs_context(project_path=..., question=..., mode="project")
+get_docs_context(project_path=..., question=..., scope="all")
 ```
 
-`get_docs_context(project_path=...)` returns retrieval-only `docs_context` for project reads, source-bound `patch_context` for an explicit change task, or fail-closed `insufficient_evidence` when no safe project source exists. Certified `docs_answer` remains limited to library, dependency, and mixed evidence lanes.
+`get_docs_context(project_path=..., scope="all", question=...)` returns retrieval-only `docs_context` for project reads, source-bound `patch_context` for an explicit change task, or fail-closed `insufficient_evidence` when no safe project source exists. Certified `docs_answer` remains limited to library, dependency, and mixed evidence lanes.
 
 For module-specific queries, use exact module filters:
 
@@ -84,7 +84,6 @@ For module-specific queries, use exact module filters:
 get_docs_context(
   project_path=...,
   question=...,
-  mode="project",
   module_path="packages/backend",
   scope="module"
 )
@@ -164,7 +163,7 @@ If approved, the coding agent should:
 2. write `ARCHITECTURE.md` as a normal repository file;
 3. call `get_docs_context` for the original question;
 4. run its returned `prepare_docs(action="sync_project_docs")` action when requested;
-5. retry the original `get_docs_context(mode="project")` question unchanged.
+5. retry the original `get_docs_context(scope="all", question=...)` question unchanged.
 
 Do not store generated architecture only in hidden memory. Official project knowledge should remain a file humans can review and edit.
 
@@ -250,7 +249,7 @@ Checklist:
 3. Run `inspect_project_docs(project_path)` again.
    - Confirm `reason_code` is `project_docs_ready` or follow the returned `next_action`.
 
-4. Ask two or three project-specific smoke-test questions with `get_docs_context(mode="project")`.
+4. Ask two or three project-specific smoke-test questions with `get_docs_context(scope="all", question=...)`.
    - Use terms that should only appear in the expected docs.
    - Confirm the expected files are cited in `selected_sources`, `indexed_sources`, or result chunks.
 5. If expected files are not cited, fix the source map instead of guessing:
@@ -262,11 +261,11 @@ Checklist:
 Suggested smoke-test questions:
 
 ```text
-get_docs_context(project_path=..., question="What is the architecture decision for <unique ADR term>?", mode="project")
-get_docs_context(project_path=..., question="How do we deploy <unique service/module name>?", mode="project")
-get_docs_context(project_path=..., question="<description or unique phrase from a cataloged document>", mode="project")
-get_docs_context(project_path=..., question="<unique module phrase>", mode="project", module_path="<module>", scope="module")
-get_docs_context(project_path=..., question="<module-specific question>", mode="project", module_path="<module>", scope="module")
+get_docs_context(project_path=..., question="What is the architecture decision for <unique ADR term>?", scope="all")
+get_docs_context(project_path=..., question="How do we deploy <unique service/module name>?", scope="all")
+get_docs_context(project_path=..., question="<description or unique phrase from a cataloged document>", scope="all")
+get_docs_context(project_path=..., question="<unique module phrase>", module_path="<module>", scope="module")
+get_docs_context(project_path=..., question="<module-specific question>", module_path="<module>", scope="module")
 ```
 
 Agents should recommend this verification loop whenever docs were just added, refreshed, reorganized, or when a user expected a source that was not cited.
