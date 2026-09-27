@@ -1,10 +1,12 @@
 {
   "schema_version": 1,
   "module_labels": {
-    "tests/docs/test_joint_context_acceptance.py": "behavioral"
+    "tests/docs/test_joint_context_acceptance.py": "behavioral",
+    "tests/docs/test_joint_context_invariants.py": "behavioral"
   },
   "module_node_hashes": {
-    "tests/docs/test_joint_context_acceptance.py": "6ece7d9abada071ce8a8c584ea3e5d30901ec138522845aa6e31fe85cc9d0666"
+    "tests/docs/test_joint_context_acceptance.py": "6ece7d9abada071ce8a8c584ea3e5d30901ec138522845aa6e31fe85cc9d0666",
+    "tests/docs/test_joint_context_invariants.py": "41af77c0742d75c96d22484ae74df5549e98f42de3665e9009b12e6054516020"
   },
   "node_overrides": {}
 }
