@@ -1,0 +1,24 @@
+{
+  "schema_version": 1,
+  "module_labels": {
+    "tests/docs/test_cli_literal_query_limits.py": "behavioral",
+    "tests/docs/test_cli_literal_query_binding.py": "behavioral",
+    "tests/docs/test_russian_inquiry_intent.py": "behavioral",
+    "tests/docs/test_tdd_context_sufficiency.py": "behavioral",
+    "tests/docs/test_tdd_documented_request.py": "schema",
+    "tests/docs/test_active_mcp_examples.py": "behavioral",
+    "tests/docs/test_readme_mcp_keyword_contract.py": "artifact",
+    "tests/docs/test_projection_decision_trace.py": "behavioral"
+  },
+  "module_node_hashes": {
+    "tests/docs/test_cli_literal_query_limits.py": "d621cb13eb4667d8de950004956954b1b122e1d9373a41aa08ac387aae914ae7",
+    "tests/docs/test_cli_literal_query_binding.py": "8113c546c99ba7e4af43c9e0c70cd06516e5b14a0801049e13e1bbd5cb1eb3e2",
+    "tests/docs/test_russian_inquiry_intent.py": "3f0c0133b98278097c14b3623f3cceab62007f1eaf9db970e7db417029582260",
+    "tests/docs/test_tdd_context_sufficiency.py": "5680c3bbc431ba4a02b56c847fb2021ff985df4c803d0e711d2f0f3ae1397c07",
+    "tests/docs/test_tdd_documented_request.py": "fe49101d870eb60175cc3883b851e333aeb78c539053c97c8ee41cd89210da49",
+    "tests/docs/test_active_mcp_examples.py": "c2ae07906f2bcad0383f7b435cb139a7f840ca1b005b5e2a6d1c333ed568ff7f",
+    "tests/docs/test_readme_mcp_keyword_contract.py": "fc60d2536e6747a4f34009d54ac207f377d9671be5958df7e038f924be6d540c",
+    "tests/docs/test_projection_decision_trace.py": "887dd4df7b709289683ff608ac1c5b3837011cfcae5c1abcdfa9bd0edb21d7df"
+  },
+  "node_overrides": {}
+}

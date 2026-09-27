@@ -18,6 +18,7 @@ _ACTION_HEAD = re.compile(
     re.IGNORECASE,
 )
 _FENCE_LINE = re.compile(r"(?m)^[ \t]*(?P<fence>```|~~~)[^\n]*(?:\n|$)")
+_RUSSIAN_ACTION_QUESTION = re.compile(r"[А-Яа-яЁё]+[^\S\r\n]+ли\b", re.IGNORECASE)
 _RUSSIAN_INFINITIVE_ACTION = re.compile(r"[А-Яа-яЁё]+(?:ть|ться)$", re.IGNORECASE)
 _RUSSIAN_NARRATIVE_PREDICATE = re.compile(
     r"^[^,;:]{1,120}\b(?:"
@@ -157,6 +158,11 @@ def find_change_clause(question: str) -> ChangeIntentClause | None:
         if match is None:
             continue
         verb_start, verb_end = match.span("verb")
+        # "Удаляет ли ...?" describes behavior, not an instruction to edit.
+        # Test original text so masked code cannot bring a later "ли" next
+        # to the verb. Continue scanning for a subsequent real imperative.
+        if _RUSSIAN_ACTION_QUESTION.match(source, verb_start, end):
+            continue
         if _looks_like_narrative_action_label(
             source,
             verb_start=verb_start,

@@ -154,6 +154,7 @@ def _facet_aware_candidates(
     fallback_query_ids: set[str] | None = None,
     need_query_ids: set[str] | None = None,
     obligations: tuple[Any, ...] = (), missing_component_ids: set[str] | None = None,
+    component_scope_complete: bool = True,
 ) -> list[Any]:
     # Audited directions break public-coverage ties; they are not public queries.
     # Exact-anchor lanes are identity-sensitive: when two candidates both
@@ -312,6 +313,12 @@ def _facet_aware_candidates(
             relation_group_lexical,
             host_condition_priority,
             comparison_action_priority,
+            # A partial lexical hit is not a completed host direction. Prefer
+            # a complete visible match for a still-needed lookup over several
+            # topical cross-matches. This orders admitted evidence only.
+            (len(_fully_matched_query_ids((source,)) & required_query_ids & (host_query_ids or set()))
+             if len(host_query_ids or ()) > 1
+             and not (component_scope_complete and obligations) else 0),
             role_tiebreak,
             direct_required_count,
             direct_required_lexical,

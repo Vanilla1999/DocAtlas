@@ -1,0 +1,10 @@
+{
+  "schema_version": 1,
+  "module_labels": {
+    "tests/docs/test_host_match_priority.py": "behavioral"
+  },
+  "module_node_hashes": {
+    "tests/docs/test_host_match_priority.py": "f542c58740702fd50cf02f34285028f8d5c53bd35cd3c874bab23015924c3036"
+  },
+  "node_overrides": {}
+}
