@@ -1,0 +1,10 @@
+{
+  "schema_version": 1,
+  "module_labels": {
+    "tests/docs/test_mixed_script_recovery.py": "behavioral"
+  },
+  "module_node_hashes": {
+    "tests/docs/test_mixed_script_recovery.py": "022c375021245c27220605aca043930816cd92d8b0b2a2c1d2477cf91ac9ac20"
+  },
+  "node_overrides": {}
+}
