@@ -1,0 +1,10 @@
+{
+  "schema_version": 1,
+  "module_labels": {
+    "tests/docs/test_context_completion_guards.py": "behavioral"
+  },
+  "module_node_hashes": {
+    "tests/docs/test_context_completion_guards.py": "347f73d5285345731c99c3c320504905109596285ea76887b6891eb6e078fa4b"
+  },
+  "node_overrides": {}
+}

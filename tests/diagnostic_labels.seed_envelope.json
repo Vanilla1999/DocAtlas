@@ -1,0 +1,10 @@
+{
+  "schema_version": 1,
+  "module_labels": {
+    "tests/docs/test_contiguous_seed_envelope.py": "behavioral"
+  },
+  "module_node_hashes": {
+    "tests/docs/test_contiguous_seed_envelope.py": "eb38cfe11d8519c83ebe44043fa78f3a09de16d027c3558edb5779cfd51203a4"
+  },
+  "node_overrides": {}
+}

@@ -284,7 +284,9 @@ def project_docs_context(
     from .joint_context_selection import select_joint_context
     payload, snapshot = select_joint_context(payload, snapshot, retrieval, max_tokens=packet_max)
     from .query_block_context import select_query_block_context
-    return select_query_block_context(payload, snapshot, retrieval, max_tokens=packet_max)
+    payload, snapshot = select_query_block_context(payload, snapshot, retrieval, max_tokens=packet_max)
+    from .query_block_recovery import select_query_block_recovery
+    return select_query_block_recovery(payload, snapshot, retrieval, max_tokens=packet_max)
 
 
 __all__ = [

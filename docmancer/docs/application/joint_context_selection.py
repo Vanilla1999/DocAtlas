@@ -48,6 +48,9 @@ def _finish(payload: dict, snapshot: dict, retrieval: dict, root: str, budget: i
     b.pop("__read_next__", None)
     _strip_legacy_locators(p, b)
     _finalize_quality(r, p, b)
+    if docs_context_budget_tokens(p) > budget:
+        from .context_packet_labels import compact_section_labels
+        p, b = compact_section_labels(p, b)
     if root:
         previous = payload.get("read_next") or []
         if previous:
@@ -152,13 +155,16 @@ def packet_alternatives(payload: dict, snapshot: dict, retrieval: dict, *, max_t
         groups.append(options)
         if intro is not None:
             intros[intro[0]["evidence_id"]] = intro
+    from .joint_seed_envelopes import seed_envelopes
+    for index, option in seed_envelopes(payload, snapshot):
+        groups[index].append(option)
     root = str(retrieval.get("_source_continuation_project_root") or "")
     from .docs_context_projection import _finalize_quality
     baseline_retrieval, baseline_payload = deepcopy(retrieval), deepcopy(payload)
     _finalize_quality(baseline_retrieval, baseline_payload, snapshot)
     old_components = set(((baseline_retrieval.get("documentation_query_plan") or {})
         .get("_component_coverage") or {}).get("covered_component_ids") or ())
-    # <= 108 structural combinations, each <= 7 subsets of three citations.
+    # <= 180 structural combinations, each <= 7 subsets of three citations.
     for choices in product(*groups):
         for intro in (None, *intros.values()):
             rows = [deepcopy(c[0]) for c in choices]
@@ -223,11 +229,12 @@ def select_joint_context(payload: dict, snapshot: dict, retrieval: dict, *, max_
         by_id = {s["evidence_id"]: s["snippet"] for s in p["sources"]}
         mapping = retained_seed_mapping(payload, snapshot, p, b)
         closed = sum(text in by_id.get(mapping.get(eid, ""), "") for eid, text in closures.items())
-        gain = (closed, int(intro))
-        fallback = any(k == "containing_section" for k in kinds)
-        if gain != (0, 0) or fallback:
+        coalesced = len(mapping) - len(set(mapping.values()))
+        gain = (closed, coalesced, int(intro))
+        fallback = any(k in {"containing_section", "seed_envelope"} for k in kinds)
+        if gain != (0, 0, 0) or fallback:
             candidates.append((gain, docs_context_budget_tokens(p), p, b, r, kinds, fallback))
-    useful = [c for c in candidates if c[0] != (0, 0)]
+    useful = [c for c in candidates if c[0] != (0, 0, 0)]
     if useful:
         best_gain = max(c[0] for c in useful)
         viable = [c for c in useful if c[0] == best_gain]
@@ -243,6 +250,6 @@ def select_joint_context(payload: dict, snapshot: dict, retrieval: dict, *, max_
     retrieval.setdefault("retrieval_diagnostics", {}).setdefault("docs_context_projection", {})["joint_structural"] = {
         "candidates": len(candidates), "closed_seed_atoms": chosen[0][0],
         "coalesced_seed_ids": {a: b for a, b in mapping.items() if a != b},
-        "ancestor_introduction": bool(chosen[0][1]), "kinds": list(kinds), "budget_tokens": cost,
+        "ancestor_introduction": bool(chosen[0][2]), "kinds": list(kinds), "budget_tokens": cost,
     }
     return result, bindings

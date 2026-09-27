@@ -23,6 +23,7 @@ from docmancer.docs.domain.query_terms import (
     supplemental_query_is_useful,
 )
 from docmancer.docs.domain.technical_terms import extract_technical_terms
+from docmancer.docs.domain.query_script_runs import mixed_script_phrases
 
 
 QueryRelation = Literal["direct", "audited_rewrite", "host_lookup", "exact_anchor"]
@@ -583,6 +584,7 @@ def build_documentation_query_plan(
         # Relation groups are optional canonical search hypotheses so they can
         # contribute useful broad context without deriving public coverage.
         *((text, "canonical_intent") for text in relation_groups),
+        *((text, "retrieval_hint") for text in mixed_script_phrases(question)),
         *((text, "retrieval_hint") for text in clause_groups),
         *((text, "concept_alias") for applies, text in concept_queries if applies),
         *((text, "concept_alias") for text in requirement_concepts),
