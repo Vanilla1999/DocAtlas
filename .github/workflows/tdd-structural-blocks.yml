@@ -26,15 +26,15 @@ jobs:
           python -m pip install 'uv==0.9.25'
           uv sync --locked --extra dev --python 3.13
           uv pip freeze --python .venv/bin/python > "$RUNNER_TEMP/structural-evidence/freeze.txt"
-      - name: Run original-question assertions
+      - name: Run original-question assertions and source guards
         run: |
           set -o pipefail
-          .venv/bin/python -m pytest -q --tb=short tests/docs/test_structural_context_delivery.py --junitxml="$RUNNER_TEMP/structural-evidence/original.xml" 2>&1 | tee "$RUNNER_TEMP/structural-evidence/original.log"
-      - name: Preserve neighboring guards
+          .venv/bin/python -m pytest -q --tb=short tests/docs/test_structural_context_delivery.py tests/docs/test_structural_context_guards.py --junitxml="$RUNNER_TEMP/structural-evidence/original.xml" 2>&1 | tee "$RUNNER_TEMP/structural-evidence/original.log"
+      - name: Preserve neighboring guards and usable continuations
         if: ${{ !cancelled() }}
         run: |
           set -o pipefail
-          .venv/bin/python -m pytest -q --tb=short tests/docs/test_requested_evidence_retention.py tests/docs/test_support_retention_integration.py tests/docs/test_admission_relation_safety.py --junitxml="$RUNNER_TEMP/structural-evidence/neighbors.xml" 2>&1 | tee "$RUNNER_TEMP/structural-evidence/neighbors.log"
+          .venv/bin/python -m pytest -q --tb=short tests/docs/test_requested_evidence_retention.py tests/docs/test_support_retention_integration.py tests/docs/test_admission_relation_safety.py tests/docs/test_source_continuation.py tests/docs/test_docs_context_read_next.py --junitxml="$RUNNER_TEMP/structural-evidence/neighbors.xml" 2>&1 | tee "$RUNNER_TEMP/structural-evidence/neighbors.log"
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: ${{ always() }}
         with:

@@ -281,6 +281,14 @@ def project_docs_context(
 
     if root:
         attach_source_continuation_locators(payload, snapshot, root=root, max_tokens=packet_max)
+    from .structural_context_expansion import expand_structural_context
+    expansion_events: list[dict[str, Any]] = []
+    payload, snapshot = expand_structural_context(
+        payload, snapshot, max_tokens=packet_max, project_root=root, diagnostics=expansion_events,
+    )
+    retrieval.setdefault("retrieval_diagnostics", {}).setdefault(
+        "docs_context_projection", {},
+    )["structural_expansion"] = expansion_events
     return payload, snapshot
 
 

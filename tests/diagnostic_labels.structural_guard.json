@@ -1,0 +1,10 @@
+{
+  "schema_version": 1,
+  "module_labels": {
+    "tests/docs/test_structural_context_guards.py": "behavioral"
+  },
+  "module_node_hashes": {
+    "tests/docs/test_structural_context_guards.py": "aa2858a3682cea30aa525696e74fec898ceb93864298dfc5e8c7ee496791201b"
+  },
+  "node_overrides": {}
+}
