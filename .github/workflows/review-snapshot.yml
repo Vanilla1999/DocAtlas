@@ -1,0 +1,32 @@
+name: Isolated PR203 review snapshot
+on:
+  push:
+    branches: [review/pr203-snapshot-20260927]
+permissions:
+  contents: read
+jobs:
+  snapshot:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+        with:
+          ref: 428891c23020e9d327174ffd1b0eef2aaa3e5af7
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Export exact reviewed history
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = 428891c23020e9d327174ffd1b0eef2aaa3e5af7
+          mkdir -p "$RUNNER_TEMP/pr203-review"
+          git rev-parse HEAD > "$RUNNER_TEMP/pr203-review/head.txt"
+          git rev-parse HEAD^{tree} > "$RUNNER_TEMP/pr203-review/tree.txt"
+          git bundle create "$RUNNER_TEMP/pr203-review/source.bundle" --all HEAD
+          cd "$RUNNER_TEMP/pr203-review"
+          sha256sum source.bundle > SHA256SUMS
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: pr203-exact-review-source
+          path: ${{ runner.temp }}/pr203-review
+          retention-days: 3
+          if-no-files-found: error
