@@ -426,7 +426,7 @@ def handle_context_tool(name: str, args: dict[str, Any], service: LibraryDocsSer
                         "answer_supported", "answer_available", "support_status",
                         "reason_code", "decision_hash", "operational_status",
                         "operational_reason_code", "module_candidates",
-                        "context_available",
+                        "context_available", "context_quality", "read_next",
                     )
                     if key in projection
                 }

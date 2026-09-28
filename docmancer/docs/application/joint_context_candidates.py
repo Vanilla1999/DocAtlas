@@ -56,7 +56,7 @@ def _context_row(original: dict, public: dict, raw: str, parent: Any,
         'char_end': parent.char_start + len(header),
         'scope_start': parent.char_start, 'scope_end': parent.char_end,
         'logical_id': parent.logical_id,
-    })
+    } if parent.char_start <= start < end <= parent.char_end else None)
     _, reason = prepare_reference_probe({}, candidate=new, evidence_text=text)
     if reason is not None:
         return None

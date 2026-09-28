@@ -146,7 +146,16 @@ def test_already_issued_uri_keeps_range_after_new_packet(tmp_path):
         index_project(service, config, project)
         args = {'question': 'What is the difference between connect, read, write, and pool timeout limits?',
             'project_path': str(project), 'scope': 'all'}
-        with patch.object(joint, 'select_joint_context', side_effect=lambda p,s,r,**kw:(p,s)):
+        # Arrange a legacy-only publication. The later exploratory-recovery
+        # stage may legitimately replace an optional legacy locator with a
+        # bounded read_next when metadata is tight; it is not this test's seed.
+        with (
+            patch.object(joint, 'select_joint_context', side_effect=lambda p,s,r,**kw:(p,s)),
+            patch('docmancer.docs.application.query_block_context.select_query_block_context',
+                  side_effect=lambda p,s,r,**kw:(p,s)),
+            patch('docmancer.docs.application.query_block_recovery.select_query_block_recovery',
+                  side_effect=lambda p,s,r,**kw:(p,s)),
+        ):
             baseline = call_docs_tool_payload('get_docs_context', args, service)
         old = next(s for s in baseline['sources'] if s.get('source_uri'))
         candidate = call_docs_tool_payload('get_docs_context', args, service)

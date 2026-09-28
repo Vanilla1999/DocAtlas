@@ -1,0 +1,10 @@
+{
+  "schema_version": 1,
+  "module_labels": {
+    "tests/docs/test_context_completion_followup.py": "behavioral"
+  },
+  "module_node_hashes": {
+    "tests/docs/test_context_completion_followup.py": "4795b59dba44bf5013f5a950a27250ded213c04c65895853bf5112983f044311"
+  },
+  "node_overrides": {}
+}
