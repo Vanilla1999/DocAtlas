@@ -1,0 +1,35 @@
+Working directory: /tmp/m5-real-sjw9gmde
+Model: {'model_name': 'sentence-transformers/paraphrase-multilingual-mpnet-base-v2', 'model_revision': 'Xenova/paraphrase-multilingual-mpnet-base-v2', 'cache_dir': '/tmp/fastembed_cache', 'calibration_digest': 'm2b-calibration-v1'}
+Threshold: 0.7453
+Building vector service...
+All projects indexed with vectors.
+
+============================================================
+MPNet score check (gold blocks vs threshold)
+============================================================
+  typer-mixed-ru (mixed): score=0.5227 above_threshold=False ✗
+  typer-pure-ru (RU): score=0.5187 above_threshold=False ✗
+  typer-en (EN): score=0.4372 above_threshold=False ✗
+  m15-dev-01 (mixed): score=0.8409 above_threshold=True ✓
+  m15-dev-02 (EN): score=0.7241 above_threshold=False ✗
+  m15-dev-03 (RU): score=0.6281 above_threshold=False ✗
+  m15-dev-04 (mixed): score=0.6080 above_threshold=False ✗
+
+============================================================
+M5 with real MPNet scorer (frozen threshold 0.7453)
+============================================================
+  [FAIL] typer-mixed-ru (mixed): gold_found=False sources=0 budget=279 context_available=False
+  [FAIL] typer-pure-ru (RU): gold_found=False sources=0 budget=273 context_available=False
+  [PASS] typer-en (EN): gold_found=True sources=2 budget=786 context_available=True
+  [FAIL] m15-dev-01 (mixed): gold_found=False sources=2 budget=797 context_available=True
+  [FAIL] m15-dev-02 (EN): gold_found=False sources=2 budget=785 context_available=True
+  [PASS] m15-dev-03 (RU): gold_found=True sources=2 budget=780 context_available=True
+  [PASS] m15-dev-04 (mixed): gold_found=True sources=1 budget=705 context_available=True
+
+============================================================
+SUMMARY
+============================================================
+Typer (M0 target): 1/3
+M1.5 dev: 2/4
+
+Results saved to experiments/crosslingual_relevance/m5_real_scorer_results.json

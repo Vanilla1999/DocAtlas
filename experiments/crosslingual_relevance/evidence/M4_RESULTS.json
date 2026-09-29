@@ -1,0 +1,155 @@
+{
+  "en": {
+    "query": "How to declare only the negative name for a boolean option: is the space before / significant?",
+    "mode_requested": "hybrid",
+    "mode_used": "hybrid/dense_lexical_degraded",
+    "candidate_counts": {
+      "lexical": 13,
+      "dense": 21,
+      "sparse": 0
+    },
+    "failures": {
+      "sparse": "NotImplementedError: <redacted diagnostic text>"
+    },
+    "total_chunks": 20,
+    "gold_hits": [
+      {
+        "rank": 1,
+        "section_id": 1391247275200531524,
+        "line_start": null,
+        "line_end": null,
+        "path": "docs/tutorial/parameter-types/bool.md",
+        "contributions": {
+          "lexical": 1,
+          "dense": 1
+        }
+      }
+    ],
+    "gold_found": true,
+    "gold_rank": 1,
+    "dense_contributed": true
+  },
+  "mixed_ru_en": {
+    "query": "Как записать только отрицательное имя boolean option: важен ли пробел перед /?",
+    "mode_requested": "hybrid",
+    "mode_used": "hybrid/dense_lexical_degraded",
+    "candidate_counts": {
+      "lexical": 13,
+      "dense": 21,
+      "sparse": 0
+    },
+    "failures": {
+      "sparse": "NotImplementedError: <redacted diagnostic text>"
+    },
+    "total_chunks": 20,
+    "gold_hits": [
+      {
+        "rank": 3,
+        "section_id": 1391247275200531524,
+        "line_start": null,
+        "line_end": null,
+        "path": "docs/tutorial/parameter-types/bool.md",
+        "contributions": {
+          "lexical": 4,
+          "dense": 1
+        }
+      }
+    ],
+    "gold_found": true,
+    "gold_rank": 3,
+    "dense_contributed": true
+  },
+  "pure_ru": {
+    "query": "Как объявить только отрицательное имя для логической опции: важен ли пробел перед косой чертой?",
+    "mode_requested": "hybrid",
+    "mode_used": "hybrid/dense_degraded",
+    "candidate_counts": {
+      "lexical": 0,
+      "dense": 21,
+      "sparse": 0
+    },
+    "failures": {
+      "sparse": "NotImplementedError: <redacted diagnostic text>"
+    },
+    "total_chunks": 20,
+    "gold_hits": [
+      {
+        "rank": 1,
+        "section_id": 1391247275200531524,
+        "line_start": null,
+        "line_end": null,
+        "path": "docs/tutorial/parameter-types/bool.md",
+        "contributions": {
+          "dense": 1
+        }
+      }
+    ],
+    "gold_found": true,
+    "gold_rank": 1,
+    "dense_contributed": true
+  },
+  "en_lexical": {
+    "query": "How to declare only the negative name for a boolean option: is the space before / significant?",
+    "mode_requested": "lexical",
+    "mode_used": "lexical",
+    "candidate_counts": {
+      "lexical": 13
+    },
+    "failures": {},
+    "total_chunks": 13,
+    "gold_hits": [
+      {
+        "rank": 1,
+        "section_id": 1391247275200531524,
+        "line_start": null,
+        "line_end": null,
+        "path": "docs/tutorial/parameter-types/bool.md",
+        "contributions": {
+          "lexical": 1
+        }
+      }
+    ],
+    "gold_found": true,
+    "gold_rank": 1,
+    "dense_contributed": false
+  },
+  "mixed_ru_en_lexical": {
+    "query": "Как записать только отрицательное имя boolean option: важен ли пробел перед /?",
+    "mode_requested": "lexical",
+    "mode_used": "lexical",
+    "candidate_counts": {
+      "lexical": 13
+    },
+    "failures": {},
+    "total_chunks": 13,
+    "gold_hits": [
+      {
+        "rank": 4,
+        "section_id": 1391247275200531524,
+        "line_start": null,
+        "line_end": null,
+        "path": "docs/tutorial/parameter-types/bool.md",
+        "contributions": {
+          "lexical": 4
+        }
+      }
+    ],
+    "gold_found": true,
+    "gold_rank": 4,
+    "dense_contributed": false
+  },
+  "pure_ru_lexical": {
+    "query": "Как объявить только отрицательное имя для логической опции: важен ли пробел перед косой чертой?",
+    "mode_requested": "lexical",
+    "mode_used": "lexical",
+    "candidate_counts": {
+      "lexical": 0
+    },
+    "failures": {},
+    "total_chunks": 0,
+    "gold_hits": [],
+    "gold_found": false,
+    "gold_rank": null,
+    "dense_contributed": false
+  }
+}

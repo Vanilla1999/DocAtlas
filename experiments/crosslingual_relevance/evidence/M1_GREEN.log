@@ -1,0 +1,48 @@
+stage: M1
+status: GREEN
+git revision: 58c7f37c2a5ef686bcd6562abbade91ba94e347a
+branch: task-44-cross-lingual-retrieval
+date: 2026-09-28T11:32:44Z
+command: .venv/bin/python -m pytest tests/docs/test_multilingual_query_integrity.py -v
+exit code: 0
+
+===== test output =====
+============================= test session starts ==============================
+platform linux -- Python 3.13.12, pytest-9.0.3, pluggy-1.6.0 -- /home/viadmin/StudioProjects/hermes/docmancer/.venv/bin/python
+cachedir: .pytest_cache
+rootdir: /home/viadmin/StudioProjects/hermes/docmancer
+configfile: pytest.ini
+plugins: anyio-4.13.0, asyncio-1.4.0
+asyncio: mode=Mode.AUTO, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collecting ... collected 11 items
+
+tests/docs/test_multilingual_query_integrity.py::test_query_mentions_preserves_raw_literal_spans PASSED [  9%]
+tests/docs/test_multilingual_query_integrity.py::test_plan_preserves_original_question_verbatim PASSED [ 18%]
+tests/docs/test_multilingual_query_integrity.py::test_plan_preserves_original_question_with_literals PASSED [ 27%]
+tests/docs/test_multilingual_query_integrity.py::test_mixed_script_hints_are_literal_substrings PASSED [ 36%]
+tests/docs/test_multilingual_query_integrity.py::test_mixed_script_hints_bounded_to_two PASSED [ 45%]
+tests/docs/test_multilingual_query_integrity.py::test_mixed_script_hints_empty_for_pure_russian PASSED [ 54%]
+tests/docs/test_multilingual_query_integrity.py::test_hint_queries_never_claim_original_coverage PASSED [ 63%]
+tests/docs/test_multilingual_query_integrity.py::test_hint_query_text_is_literal_substring_not_translation PASSED [ 72%]
+tests/docs/test_multilingual_query_integrity.py::test_negation_pair_produces_distinct_anchor_queries PASSED [ 81%]
+tests/docs/test_multilingual_query_integrity.py::test_condition_question_preserves_full_question PASSED [ 90%]
+tests/docs/test_multilingual_query_integrity.py::test_exact_terms_normalise_but_mentions_preserve_raw PASSED [100%]
+
+============================== 11 passed in 0.11s ==============================
+===== end output =====
+
+summary:
+  11 tests, 11 passed, 0 failed, 0 execution errors
+  production code: unchanged
+
+verified invariants:
+  1. query_mentions preserves raw literal spans including whitespace (' /-S' vs '/-S')
+  2. build_documentation_query_plan preserves original_question verbatim
+  3. mixed_script_phrases are literal substrings, bounded to 2, empty for pure RU
+  4. retrieval_hint queries have coverage_required=False and no public_parent_query_id
+  5. negation pairs (--no-force vs --force) produce distinct anchor queries
+  6. exact_terms may normalise; raw distinction preserved by query_mentions
+
+acceptance: M1 GREEN. All invariants hold on current code. No production changes needed.
+  Not proven: completeness of meaning under any translation (out of scope).
+  Next: M1.5 — freeze evaluation set before model/threshold selection.

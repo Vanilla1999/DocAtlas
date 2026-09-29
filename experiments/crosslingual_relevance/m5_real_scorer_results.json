@@ -1,0 +1,87 @@
+{
+  "scorer": {
+    "model_name": "sentence-transformers/paraphrase-multilingual-mpnet-base-v2",
+    "model_revision": "Xenova/paraphrase-multilingual-mpnet-base-v2",
+    "cache_dir": "/tmp/fastembed_cache",
+    "calibration_digest": "m2b-calibration-v1"
+  },
+  "threshold": 0.7453,
+  "results": [
+    {
+      "task_id": "typer-mixed-ru",
+      "formulation": "mixed",
+      "project": "typer",
+      "gold_found": false,
+      "total_sources": 0,
+      "budget_tokens": 279,
+      "answer_supported": false,
+      "context_available": false
+    },
+    {
+      "task_id": "typer-pure-ru",
+      "formulation": "RU",
+      "project": "typer",
+      "gold_found": false,
+      "total_sources": 0,
+      "budget_tokens": 273,
+      "answer_supported": false,
+      "context_available": false
+    },
+    {
+      "task_id": "typer-en",
+      "formulation": "EN",
+      "project": "typer",
+      "gold_found": true,
+      "total_sources": 2,
+      "budget_tokens": 786,
+      "answer_supported": false,
+      "context_available": true
+    },
+    {
+      "task_id": "m15-dev-01",
+      "formulation": "mixed",
+      "project": "httpx",
+      "gold_found": false,
+      "total_sources": 2,
+      "budget_tokens": 797,
+      "answer_supported": false,
+      "context_available": true
+    },
+    {
+      "task_id": "m15-dev-02",
+      "formulation": "EN",
+      "project": "ruff",
+      "gold_found": false,
+      "total_sources": 2,
+      "budget_tokens": 785,
+      "answer_supported": false,
+      "context_available": true
+    },
+    {
+      "task_id": "m15-dev-03",
+      "formulation": "RU",
+      "project": "starlette",
+      "gold_found": true,
+      "total_sources": 2,
+      "budget_tokens": 780,
+      "answer_supported": false,
+      "context_available": true
+    },
+    {
+      "task_id": "m15-dev-04",
+      "formulation": "mixed",
+      "project": "pydantic",
+      "gold_found": true,
+      "total_sources": 1,
+      "budget_tokens": 705,
+      "answer_supported": false,
+      "context_available": true
+    }
+  ],
+  "summary": {
+    "typer_pass": 1,
+    "typer_total": 3,
+    "m15_pass": 2,
+    "m15_total": 4
+  }
+}

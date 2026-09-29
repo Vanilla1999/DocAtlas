@@ -1,0 +1,41 @@
+Working directory: /tmp/m4-full-epgvqbob
+  httpx: 2 documents, identity=local:httpx-92ac13ea...
+  ruff: 2 documents, identity=local:ruff-66a6f7aa...
+  starlette: 2 documents, identity=local:starlette-a7a4...
+  pydantic: 2 documents, identity=local:pydantic-2fbfc...
+  typer: 2 documents, identity=local:typer-a9faa3e0...
+
+Building agent with 10 documents...
+Dispatcher ready (mode=dense)
+
+============================================================
+STEP 1: Dispatcher with allow_degraded=False, mode='dense'
+============================================================
+  [PASS] m15-dev-01 (mixed): gold_found=True rank=1 chunks=14 mode=dense/hierarchical
+  [PASS] m15-dev-02 (EN): gold_found=True rank=1 chunks=19 mode=dense/hierarchical
+  [PASS] m15-dev-03 (RU): gold_found=True rank=1 chunks=12 mode=dense/hierarchical
+  [PASS] m15-dev-04 (mixed): gold_found=True rank=1 chunks=20 mode=dense/hierarchical
+  [PASS] typer-05-en (EN): gold_found=True rank=1 chunks=20 mode=dense/hierarchical
+  [PASS] typer-05-mixed (mixed): gold_found=True rank=1 chunks=20 mode=dense/hierarchical
+  [PASS] typer-05-ru (RU): gold_found=True rank=1 chunks=20 mode=dense/hierarchical
+
+--- Negative controls ---
+  wrong_project: gold_found=False chunks=16
+  wrong_project (RU): gold_found=False chunks=14
+
+--- Strict hybrid test (expected to fail: no sparse) ---
+  Expected failure: HybridRetrievalError
+
+============================================================
+SUMMARY
+============================================================
+Recall@5: 7/7 = 1.00
+Recall@20: 7/7 = 1.00
+  EN: Recall@5 = 2/2
+  RU: Recall@5 = 2/2
+  mixed: Recall@5 = 3/3
+  negative wrong_project: PASS (gold_found=False)
+  negative wrong_project: PASS (gold_found=False)
+  degraded runs: 0 (should be 0 for neural PASS)
+
+Results saved to experiments/crosslingual_relevance/m4_dense_results.json

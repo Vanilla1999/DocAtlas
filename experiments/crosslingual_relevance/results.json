@@ -1,0 +1,1150 @@
+{
+  "schema_version": 1,
+  "environment": {
+    "python": "3.13.12 (main, Mar 24 2026, 22:49:35) [Clang 22.1.1 ]",
+    "platform": "Linux-7.0.0-34-generic-x86_64-with-glibc2.39",
+    "git_head": "58c7f37c2a5ef686bcd6562abbade91ba94e347a",
+    "timestamp": "2026-09-28T12:50:34Z"
+  },
+  "model_b": {
+    "name": "sentence-transformers/paraphrase-multilingual-mpnet-base-v2",
+    "status": "OK",
+    "model_hash": "6938aed03f658b36",
+    "inference_seconds": 4.138991015999636
+  },
+  "lexical_a": {
+    "inference_seconds": 0.0010904129994742107
+  },
+  "pool_blocks": 29,
+  "pool_tasks": 12,
+  "task_results": [
+    {
+      "task_id": "m15-dev-01",
+      "split": "development",
+      "question": "Какое поведение timeout по умолчанию в HTTPX: сколько секунд и какое исключение?",
+      "formulation": "mixed",
+      "variant": "A_lexical",
+      "status": "OK",
+      "block_scores": [
+        {
+          "block_id": "b001",
+          "score": 0.25,
+          "relevant": true,
+          "source_allowed": true,
+          "covered_fact_ids": [
+            "httpx-default-timeout"
+          ],
+          "rank": 1
+        },
+        {
+          "block_id": "b002",
+          "score": 0.25,
+          "relevant": false,
+          "source_allowed": true,
+          "covered_fact_ids": [],
+          "rank": 2
+        },
+        {
+          "block_id": "b003",
+          "score": 0.0,
+          "relevant": false,
+          "source_allowed": false,
+          "covered_fact_ids": [],
+          "rank": 3
+        },
+        {
+          "block_id": "b004",
+          "score": 0.0,
+          "relevant": false,
+          "source_allowed": false,
+          "covered_fact_ids": [],
+          "rank": 4
+        }
+      ],
+      "mrr_at_5": 1.0,
+      "recall_at_5": 1.0
+    },
+    {
+      "task_id": "m15-dev-01",
+      "split": "development",
+      "question": "Какое поведение timeout по умолчанию в HTTPX: сколько секунд и какое исключение?",
+      "formulation": "mixed",
+      "variant": "B_encoder",
+      "status": "OK",
+      "block_scores": [
+        {
+          "block_id": "b001",
+          "score": 0.8617662191390991,
+          "relevant": true,
+          "source_allowed": true,
+          "covered_fact_ids": [
+            "httpx-default-timeout"
+          ],
+          "rank": 1
+        },
+        {
+          "block_id": "b002",
+          "score": 0.6282598972320557,
+          "relevant": false,
+          "source_allowed": true,
+          "covered_fact_ids": [],
+          "rank": 2
+        },
+        {
+          "block_id": "b004",
+          "score": 0.443909227848053,
+          "relevant": false,
+          "source_allowed": false,
+          "covered_fact_ids": [],
+          "rank": 3
+        },
+        {
+          "block_id": "b003",
+          "score": 0.18085592985153198,
+          "relevant": false,
+          "source_allowed": false,
+          "covered_fact_ids": [],
+          "rank": 4
+        }
+      ],
+      "mrr_at_5": 1.0,
+      "recall_at_5": 1.0
+    },
+    {
+      "task_id": "m15-dev-02",
+      "split": "development",
+      "question": "Does enabling preview automatically enable all preview rules?",
+      "formulation": "EN",
+      "variant": "A_lexical",
+      "status": "OK",
+      "block_scores": [
+        {
+          "block_id": "b003",
+          "score": 0.8333333333333334,
+          "relevant": true,
+          "source_allowed": true,
+          "covered_fact_ids": [
+            "ruff-preview-not-automatic"
+          ],
+          "rank": 1
+        },
+        {
+          "block_id": "b006",
+          "score": 0.5,
+          "relevant": false,
+          "source_allowed": true,
+          "covered_fact_ids": [],
+          "rank": 2
+        },
+        {
+          "block_id": "b005",
+          "score": 0.3333333333333333,
+          "relevant": true,
+          "source_allowed": true,
+          "covered_fact_ids": [
+            "ruff-preview-not-automatic"
+          ],
+          "rank": 3
+        },
+        {
+          "block_id": "b001",
+          "score": 0.0,
+          "relevant": false,
+          "source_allowed": false,
+          "covered_fact_ids": [],
+          "rank": 4
+        }
+      ],
+      "mrr_at_5": 1.0,
+      "recall_at_5": 1.0
+    },
+    {
+      "task_id": "m15-dev-02",
+      "split": "development",
+      "question": "Does enabling preview automatically enable all preview rules?",
+      "formulation": "EN",
+      "variant": "B_encoder",
+      "status": "OK",
+      "block_scores": [
+        {
+          "block_id": "b005",
+          "score": 0.7571396827697754,
+          "relevant": true,
+          "source_allowed": true,
+          "covered_fact_ids": [
+            "ruff-preview-not-automatic"
+          ],
+          "rank": 1
+        },
+        {
+          "block_id": "b006",
+          "score": 0.621966540813446,
+          "relevant": false,
+          "source_allowed": true,
+          "covered_fact_ids": [],
+          "rank": 2
+        },
+        {
+          "block_id": "b003",
+          "score": 0.6085551381111145,
+          "relevant": true,
+          "source_allowed": true,
+          "covered_fact_ids": [
+            "ruff-preview-not-automatic"
+          ],
+          "rank": 3
+        },
+        {
+          "block_id": "b001",
+          "score": 0.239950031042099,
+          "relevant": false,
+          "source_allowed": false,
+          "covered_fact_ids": [],
+          "rank": 4
+        }
+      ],
+      "mrr_at_5": 1.0,
+      "recall_at_5": 1.0
+    },
+    {
+      "task_id": "m15-dev-03",
+      "split": "development",
+      "question": "Когда выполняется teardown lifespan относительно соединений и фоновых задач?",
+      "formulation": "RU",
+      "variant": "A_lexical",
+      "status": "OK",
+      "block_scores": [
+        {
+          "block_id": "b007",
+          "score": 0.25,
+          "relevant": true,
+          "source_allowed": true,
+          "covered_fact_ids": [
+            "starlette-teardown-ordering"
+          ],
+          "rank": 1
+        },
+        {
+          "block_id": "b009",
+          "score": 0.25,
+          "relevant": false,
+          "source_allowed": true,
+          "covered_fact_ids": [],
+          "rank": 2
+        },
+        {
+          "block_id": "b008",
+          "score": 0.125,
+          "relevant": false,
+          "source_allowed": true,
+          "covered_fact_ids": [],
+          "rank": 3
+        },
+        {
+          "block_id": "b010",
+          "score": 0.0,
+          "relevant": false,
+          "source_allowed": false,
+          "covered_fact_ids": [],
+          "rank": 4
+        }
+      ],
+      "mrr_at_5": 1.0,
+      "recall_at_5": 1.0
+    },
+    {
+      "task_id": "m15-dev-03",
+      "split": "development",
+      "question": "Когда выполняется teardown lifespan относительно соединений и фоновых задач?",
+      "formulation": "RU",
+      "variant": "B_encoder",
+      "status": "OK",
+      "block_scores": [
+        {
+          "block_id": "b007",
+          "score": 0.7829900979995728,
+          "relevant": true,
+          "source_allowed": true,
+          "covered_fact_ids": [
+            "starlette-teardown-ordering"
+          ],
+          "rank": 1
+        },
+        {
+          "block_id": "b009",
+          "score": 0.5140796303749084,
+          "relevant": false,
+          "source_allowed": true,
+          "covered_fact_ids": [],
+          "rank": 2
+        },
+        {
+          "block_id": "b008",
+          "score": 0.3944028913974762,
+          "relevant": false,
+          "source_allowed": true,
+          "covered_fact_ids": [],
+          "rank": 3
+        },
+        {
+          "block_id": "b010",
+          "score": 0.05208929255604744,
+          "relevant": false,
+          "source_allowed": false,
+          "covered_fact_ids": [],
+          "rank": 4
+        }
+      ],
+      "mrr_at_5": 1.0,
+      "recall_at_5": 1.0
+    },
+    {
+      "task_id": "m15-dev-04",
+      "split": "development",
+      "question": "Что specifies AliasPath: какой path to a field using aliases?",
+      "formulation": "mixed",
+      "variant": "A_lexical",
+      "status": "OK",
+      "block_scores": [
+        {
+          "block_id": "b011",
+          "score": 0.7142857142857143,
+          "relevant": true,
+          "source_allowed": true,
+          "covered_fact_ids": [
+            "pydantic-aliaspath-purpose"
+          ],
+          "rank": 1
+        },
+        {
+          "block_id": "b012",
+          "score": 0.42857142857142855,
+          "relevant": true,
+          "source_allowed": true,
+          "covered_fact_ids": [
+            "pydantic-aliaspath-purpose"
+          ],
+          "rank": 2
+        },
+        {
+          "block_id": "b013",
+          "score": 0.2857142857142857,
+          "relevant": false,
+          "source_allowed": true,
+          "covered_fact_ids": [],
+          "rank": 3
+        },
+        {
+          "block_id": "b014",
+          "score": 0.0,
+          "relevant": false,
+          "source_allowed": false,
+          "covered_fact_ids": [],
+          "rank": 4
+        }
+      ],
+      "mrr_at_5": 1.0,
+      "recall_at_5": 1.0
+    },
+    {
+      "task_id": "m15-dev-04",
+      "split": "development",
+      "question": "Что specifies AliasPath: какой path to a field using aliases?",
+      "formulation": "mixed",
+      "variant": "B_encoder",
+      "status": "OK",
+      "block_scores": [
+        {
+          "block_id": "b011",
+          "score": 0.937690019607544,
+          "relevant": true,
+          "source_allowed": true,
+          "covered_fact_ids": [
+            "pydantic-aliaspath-purpose"
+          ],
+          "rank": 1
+        },
+        {
+          "block_id": "b012",
+          "score": 0.6505783796310425,
+          "relevant": true,
+          "source_allowed": true,
+          "covered_fact_ids": [
+            "pydantic-aliaspath-purpose"
+          ],
+          "rank": 2
+        },
+        {
+          "block_id": "b013",
+          "score": 0.6346871852874756,
+          "relevant": false,
+          "source_allowed": true,
+          "covered_fact_ids": [],
+          "rank": 3
+        },
+        {
+          "block_id": "b014",
+          "score": 0.13070166110992432,
+          "relevant": false,
+          "source_allowed": false,
+          "covered_fact_ids": [],
+          "rank": 4
+        }
+      ],
+      "mrr_at_5": 1.0,
+      "recall_at_5": 1.0
+    },
+    {
+      "task_id": "m15-cal-01",
+      "split": "calibration",
+      "question": "Назови четыре типа timeout в HTTPX и объясни, что ограничивает каждый.",
+      "formulation": "RU",
+      "variant": "A_lexical",
+      "status": "OK",
+      "block_scores": [
+        {
+          "block_id": "b015",
+          "score": 0.25,
+          "relevant": true,
+          "source_allowed": true,
+          "covered_fact_ids": [
+            "httpx-four-timeout-types"
+          ],
+          "rank": 1
+        },
+        {
+          "block_id": "b016",
+          "score": 0.25,
+          "relevant": false,
+          "source_allowed": true,
+          "covered_fact_ids": [],
+          "rank": 2
+        },
+        {
+          "block_id": "b001",
+          "score": 0.25,
+          "relevant": false,
+          "source_allowed": true,
+          "covered_fact_ids": [],
+          "rank": 3
+        },
+        {
+          "block_id": "b017",
+          "score": 0.0,
+          "relevant": false,
+          "source_allowed": false,
+          "covered_fact_ids": [],
+          "rank": 4
+        }
+      ],
+      "mrr_at_5": 1.0,
+      "recall_at_5": 1.0
+    },
+    {
+      "task_id": "m15-cal-01",
+      "split": "calibration",
+      "question": "Назови четыре типа timeout в HTTPX и объясни, что ограничивает каждый.",
+      "formulation": "RU",
+      "variant": "B_encoder",
+      "status": "OK",
+      "block_scores": [
+        {
+          "block_id": "b001",
+          "score": 0.6738238334655762,
+          "relevant": false,
+          "source_allowed": true,
+          "covered_fact_ids": [],
+          "rank": 1
+        },
+        {
+          "block_id": "b015",
+          "score": 0.5598639249801636,
+          "relevant": true,
+          "source_allowed": true,
+          "covered_fact_ids": [
+            "httpx-four-timeout-types"
+          ],
+          "rank": 2
+        },
+        {
+          "block_id": "b016",
+          "score": 0.5393065214157104,
+          "relevant": false,
+          "source_allowed": true,
+          "covered_fact_ids": [],
+          "rank": 3
+        },
+        {
+          "block_id": "b017",
+          "score": 0.2603219151496887,
+          "relevant": false,
+          "source_allowed": false,
+          "covered_fact_ids": [],
+          "rank": 4
+        }
+      ],
+      "mrr_at_5": 0.5,
+      "recall_at_5": 1.0
+    },
+    {
+      "task_id": "m15-cal-02",
+      "split": "calibration",
+      "question": "Что happens to deprecated rules когда preview mode enabled: will an error be raised?",
+      "formulation": "mixed",
+      "variant": "A_lexical",
+      "status": "OK",
+      "block_scores": [
+        {
+          "block_id": "b017",
+          "score": 0.8,
+          "relevant": true,
+          "source_allowed": true,
+          "covered_fact_ids": [
+            "ruff-deprecated-in-preview"
+          ],
+          "rank": 1
+        },
+        {
+          "block_id": "b006",
+          "score": 0.5,
+          "relevant": false,
+          "source_allowed": true,
+          "covered_fact_ids": [],
+          "rank": 2
+        },
+        {
+          "block_id": "b005",
+          "score": 0.3,
+          "relevant": false,
+          "source_allowed": true,
+          "covered_fact_ids": [],
+          "rank": 3
+        },
+        {
+          "block_id": "b018",
+          "score": 0.1,
+          "relevant": false,
+          "source_allowed": false,
+          "covered_fact_ids": [],
+          "rank": 4
+        }
+      ],
+      "mrr_at_5": 1.0,
+      "recall_at_5": 1.0
+    },
+    {
+      "task_id": "m15-cal-02",
+      "split": "calibration",
+      "question": "Что happens to deprecated rules когда preview mode enabled: will an error be raised?",
+      "formulation": "mixed",
+      "variant": "B_encoder",
+      "status": "OK",
+      "block_scores": [
+        {
+          "block_id": "b017",
+          "score": 0.9058583974838257,
+          "relevant": true,
+          "source_allowed": true,
+          "covered_fact_ids": [
+            "ruff-deprecated-in-preview"
+          ],
+          "rank": 1
+        },
+        {
+          "block_id": "b005",
+          "score": 0.7235790491104126,
+          "relevant": false,
+          "source_allowed": true,
+          "covered_fact_ids": [],
+          "rank": 2
+        },
+        {
+          "block_id": "b006",
+          "score": 0.5223289132118225,
+          "relevant": false,
+          "source_allowed": true,
+          "covered_fact_ids": [],
+          "rank": 3
+        },
+        {
+          "block_id": "b018",
+          "score": 0.3204084634780884,
+          "relevant": false,
+          "source_allowed": false,
+          "covered_fact_ids": [],
+          "rank": 4
+        }
+      ],
+      "mrr_at_5": 1.0,
+      "recall_at_5": 1.0
+    },
+    {
+      "task_id": "m15-cal-03",
+      "split": "calibration",
+      "question": "Is the request state a deep or shallow copy of the lifespan state?",
+      "formulation": "EN",
+      "variant": "A_lexical",
+      "status": "OK",
+      "block_scores": [
+        {
+          "block_id": "b019",
+          "score": 0.8333333333333334,
+          "relevant": true,
+          "source_allowed": true,
+          "covered_fact_ids": [
+            "starlette-state-shallow-copy"
+          ],
+          "rank": 1
+        },
+        {
+          "block_id": "b014",
+          "score": 0.5,
+          "relevant": true,
+          "source_allowed": true,
+          "covered_fact_ids": [],
+          "rank": 2
+        },
+        {
+          "block_id": "b004",
+          "score": 0.3333333333333333,
+          "relevant": false,
+          "source_allowed": true,
+          "covered_fact_ids": [],
+          "rank": 3
+        },
+        {
+          "block_id": "b020",
+          "score": 0.0,
+          "relevant": false,
+          "source_allowed": false,
+          "covered_fact_ids": [],
+          "rank": 4
+        }
+      ],
+      "mrr_at_5": 1.0,
+      "recall_at_5": 1.0
+    },
+    {
+      "task_id": "m15-cal-03",
+      "split": "calibration",
+      "question": "Is the request state a deep or shallow copy of the lifespan state?",
+      "formulation": "EN",
+      "variant": "B_encoder",
+      "status": "OK",
+      "block_scores": [
+        {
+          "block_id": "b019",
+          "score": 0.7453125715255737,
+          "relevant": true,
+          "source_allowed": true,
+          "covered_fact_ids": [
+            "starlette-state-shallow-copy"
+          ],
+          "rank": 1
+        },
+        {
+          "block_id": "b014",
+          "score": 0.716445803642273,
+          "relevant": true,
+          "source_allowed": true,
+          "covered_fact_ids": [],
+          "rank": 2
+        },
+        {
+          "block_id": "b004",
+          "score": 0.46236956119537354,
+          "relevant": false,
+          "source_allowed": true,
+          "covered_fact_ids": [],
+          "rank": 3
+        },
+        {
+          "block_id": "b020",
+          "score": 0.07492142915725708,
+          "relevant": false,
+          "source_allowed": false,
+          "covered_fact_ids": [],
+          "rank": 4
+        }
+      ],
+      "mrr_at_5": 1.0,
+      "recall_at_5": 1.0
+    },
+    {
+      "task_id": "m15-cal-04",
+      "split": "calibration",
+      "question": "В чём различие alias_priority=1 и alias_priority=2?",
+      "formulation": "RU",
+      "variant": "A_lexical",
+      "status": "OK",
+      "block_scores": [
+        {
+          "block_id": "b020",
+          "score": 0.5,
+          "relevant": true,
+          "source_allowed": true,
+          "covered_fact_ids": [
+            "pydantic-alias-priority"
+          ],
+          "rank": 1
+        },
+        {
+          "block_id": "b021",
+          "score": 0.0,
+          "relevant": true,
+          "source_allowed": true,
+          "covered_fact_ids": [],
+          "rank": 2
+        },
+        {
+          "block_id": "b013",
+          "score": 0.0,
+          "relevant": false,
+          "source_allowed": true,
+          "covered_fact_ids": [],
+          "rank": 3
+        },
+        {
+          "block_id": "b002",
+          "score": 0.0,
+          "relevant": false,
+          "source_allowed": false,
+          "covered_fact_ids": [],
+          "rank": 4
+        }
+      ],
+      "mrr_at_5": 1.0,
+      "recall_at_5": 1.0
+    },
+    {
+      "task_id": "m15-cal-04",
+      "split": "calibration",
+      "question": "В чём различие alias_priority=1 и alias_priority=2?",
+      "formulation": "RU",
+      "variant": "B_encoder",
+      "status": "OK",
+      "block_scores": [
+        {
+          "block_id": "b020",
+          "score": 0.7558257579803467,
+          "relevant": true,
+          "source_allowed": true,
+          "covered_fact_ids": [
+            "pydantic-alias-priority"
+          ],
+          "rank": 1
+        },
+        {
+          "block_id": "b021",
+          "score": 0.6199774146080017,
+          "relevant": true,
+          "source_allowed": true,
+          "covered_fact_ids": [],
+          "rank": 2
+        },
+        {
+          "block_id": "b013",
+          "score": 0.5150278806686401,
+          "relevant": false,
+          "source_allowed": true,
+          "covered_fact_ids": [],
+          "rank": 3
+        },
+        {
+          "block_id": "b002",
+          "score": 0.19330871105194092,
+          "relevant": false,
+          "source_allowed": false,
+          "covered_fact_ids": [],
+          "rank": 4
+        }
+      ],
+      "mrr_at_5": 1.0,
+      "recall_at_5": 1.0
+    },
+    {
+      "task_id": "m15-hold-01",
+      "split": "holdout",
+      "question": "Как отключить all timeouts для HTTPX Client: какой аргумент передать?",
+      "formulation": "mixed",
+      "variant": "A_lexical",
+      "status": "OK",
+      "block_scores": [
+        {
+          "block_id": "b002",
+          "score": 0.42857142857142855,
+          "relevant": true,
+          "source_allowed": true,
+          "covered_fact_ids": [
+            "httpx-disable-timeouts"
+          ],
+          "rank": 1
+        },
+        {
+          "block_id": "b022",
+          "score": 0.42857142857142855,
+          "relevant": true,
+          "source_allowed": true,
+          "covered_fact_ids": [],
+          "rank": 2
+        },
+        {
+          "block_id": "b001",
+          "score": 0.2857142857142857,
+          "relevant": false,
+          "source_allowed": true,
+          "covered_fact_ids": [],
+          "rank": 3
+        },
+        {
+          "block_id": "b023",
+          "score": 0.0,
+          "relevant": false,
+          "source_allowed": false,
+          "covered_fact_ids": [],
+          "rank": 4
+        }
+      ],
+      "mrr_at_5": 1.0,
+      "recall_at_5": 1.0
+    },
+    {
+      "task_id": "m15-hold-01",
+      "split": "holdout",
+      "question": "Как отключить all timeouts для HTTPX Client: какой аргумент передать?",
+      "formulation": "mixed",
+      "variant": "B_encoder",
+      "status": "OK",
+      "block_scores": [
+        {
+          "block_id": "b001",
+          "score": 0.8166946172714233,
+          "relevant": false,
+          "source_allowed": true,
+          "covered_fact_ids": [],
+          "rank": 1
+        },
+        {
+          "block_id": "b022",
+          "score": 0.7233761548995972,
+          "relevant": true,
+          "source_allowed": true,
+          "covered_fact_ids": [],
+          "rank": 2
+        },
+        {
+          "block_id": "b002",
+          "score": 0.6985926628112793,
+          "relevant": true,
+          "source_allowed": true,
+          "covered_fact_ids": [
+            "httpx-disable-timeouts"
+          ],
+          "rank": 3
+        },
+        {
+          "block_id": "b023",
+          "score": 0.05403327941894531,
+          "relevant": false,
+          "source_allowed": false,
+          "covered_fact_ids": [],
+          "rank": 4
+        }
+      ],
+      "mrr_at_5": 0.5,
+      "recall_at_5": 1.0
+    },
+    {
+      "task_id": "m15-hold-02",
+      "split": "holdout",
+      "question": "What happens to explicit-preview-rules setting when preview mode is not enabled?",
+      "formulation": "EN",
+      "variant": "A_lexical",
+      "status": "OK",
+      "block_scores": [
+        {
+          "block_id": "b025",
+          "score": 0.75,
+          "relevant": true,
+          "source_allowed": true,
+          "covered_fact_ids": [],
+          "rank": 1
+        },
+        {
+          "block_id": "b024",
+          "score": 0.5,
+          "relevant": true,
+          "source_allowed": true,
+          "covered_fact_ids": [
+            "ruff-explicit-preview-no-effect"
+          ],
+          "rank": 2
+        },
+        {
+          "block_id": "b017",
+          "score": 0.5,
+          "relevant": false,
+          "source_allowed": true,
+          "covered_fact_ids": [],
+          "rank": 3
+        },
+        {
+          "block_id": "b026",
+          "score": 0.0,
+          "relevant": false,
+          "source_allowed": false,
+          "covered_fact_ids": [],
+          "rank": 4
+        }
+      ],
+      "mrr_at_5": 1.0,
+      "recall_at_5": 1.0
+    },
+    {
+      "task_id": "m15-hold-02",
+      "split": "holdout",
+      "question": "What happens to explicit-preview-rules setting when preview mode is not enabled?",
+      "formulation": "EN",
+      "variant": "B_encoder",
+      "status": "OK",
+      "block_scores": [
+        {
+          "block_id": "b024",
+          "score": 0.8543798327445984,
+          "relevant": true,
+          "source_allowed": true,
+          "covered_fact_ids": [
+            "ruff-explicit-preview-no-effect"
+          ],
+          "rank": 1
+        },
+        {
+          "block_id": "b017",
+          "score": 0.7906296253204346,
+          "relevant": false,
+          "source_allowed": true,
+          "covered_fact_ids": [],
+          "rank": 2
+        },
+        {
+          "block_id": "b025",
+          "score": 0.7872353792190552,
+          "relevant": true,
+          "source_allowed": true,
+          "covered_fact_ids": [],
+          "rank": 3
+        },
+        {
+          "block_id": "b026",
+          "score": 0.17005644738674164,
+          "relevant": false,
+          "source_allowed": false,
+          "covered_fact_ids": [],
+          "rank": 4
+        }
+      ],
+      "mrr_at_5": 1.0,
+      "recall_at_5": 1.0
+    },
+    {
+      "task_id": "m15-hold-03",
+      "split": "holdout",
+      "question": "Как использовать TestClient, чтобы lifespan выполнился в тестах?",
+      "formulation": "RU",
+      "variant": "A_lexical",
+      "status": "OK",
+      "block_scores": [
+        {
+          "block_id": "b027",
+          "score": 0.3333333333333333,
+          "relevant": true,
+          "source_allowed": true,
+          "covered_fact_ids": [
+            "starlette-testclient-context-manager"
+          ],
+          "rank": 1
+        },
+        {
+          "block_id": "b004",
+          "score": 0.16666666666666666,
+          "relevant": false,
+          "source_allowed": true,
+          "covered_fact_ids": [],
+          "rank": 2
+        },
+        {
+          "block_id": "b028",
+          "score": 0.0,
+          "relevant": false,
+          "source_allowed": false,
+          "covered_fact_ids": [],
+          "rank": 3
+        }
+      ],
+      "mrr_at_5": 1.0,
+      "recall_at_5": 1.0
+    },
+    {
+      "task_id": "m15-hold-03",
+      "split": "holdout",
+      "question": "Как использовать TestClient, чтобы lifespan выполнился в тестах?",
+      "formulation": "RU",
+      "variant": "B_encoder",
+      "status": "OK",
+      "block_scores": [
+        {
+          "block_id": "b027",
+          "score": 0.661882221698761,
+          "relevant": true,
+          "source_allowed": true,
+          "covered_fact_ids": [
+            "starlette-testclient-context-manager"
+          ],
+          "rank": 1
+        },
+        {
+          "block_id": "b004",
+          "score": 0.4114567041397095,
+          "relevant": false,
+          "source_allowed": true,
+          "covered_fact_ids": [],
+          "rank": 2
+        },
+        {
+          "block_id": "b028",
+          "score": 0.09314437210559845,
+          "relevant": false,
+          "source_allowed": false,
+          "covered_fact_ids": [],
+          "rank": 3
+        }
+      ],
+      "mrr_at_5": 1.0,
+      "recall_at_5": 1.0
+    },
+    {
+      "task_id": "m15-hold-04",
+      "split": "holdout",
+      "question": "Как AliasGenerator помогает use different naming conventions при loading and saving?",
+      "formulation": "mixed",
+      "variant": "A_lexical",
+      "status": "OK",
+      "block_scores": [
+        {
+          "block_id": "b013",
+          "score": 0.8571428571428571,
+          "relevant": true,
+          "source_allowed": true,
+          "covered_fact_ids": [
+            "pydantic-aliasgenerator-purpose"
+          ],
+          "rank": 1
+        },
+        {
+          "block_id": "b029",
+          "score": 0.14285714285714285,
+          "relevant": false,
+          "source_allowed": false,
+          "covered_fact_ids": [],
+          "rank": 2
+        },
+        {
+          "block_id": "b021",
+          "score": 0.0,
+          "relevant": false,
+          "source_allowed": true,
+          "covered_fact_ids": [],
+          "rank": 3
+        },
+        {
+          "block_id": "b011",
+          "score": 0.0,
+          "relevant": false,
+          "source_allowed": true,
+          "covered_fact_ids": [],
+          "rank": 4
+        }
+      ],
+      "mrr_at_5": 1.0,
+      "recall_at_5": 1.0
+    },
+    {
+      "task_id": "m15-hold-04",
+      "split": "holdout",
+      "question": "Как AliasGenerator помогает use different naming conventions при loading and saving?",
+      "formulation": "mixed",
+      "variant": "B_encoder",
+      "status": "OK",
+      "block_scores": [
+        {
+          "block_id": "b013",
+          "score": 0.6689448356628418,
+          "relevant": true,
+          "source_allowed": true,
+          "covered_fact_ids": [
+            "pydantic-aliasgenerator-purpose"
+          ],
+          "rank": 1
+        },
+        {
+          "block_id": "b021",
+          "score": 0.48070472478866577,
+          "relevant": false,
+          "source_allowed": true,
+          "covered_fact_ids": [],
+          "rank": 2
+        },
+        {
+          "block_id": "b011",
+          "score": 0.46368175745010376,
+          "relevant": false,
+          "source_allowed": true,
+          "covered_fact_ids": [],
+          "rank": 3
+        },
+        {
+          "block_id": "b029",
+          "score": 0.12464191764593124,
+          "relevant": false,
+          "source_allowed": false,
+          "covered_fact_ids": [],
+          "rank": 4
+        }
+      ],
+      "mrr_at_5": 1.0,
+      "recall_at_5": 1.0
+    }
+  ],
+  "summary": {
+    "A_lexical/development": {
+      "n": 4,
+      "mrr_at_5": 1.0,
+      "recall_at_5": 1.0
+    },
+    "A_lexical/calibration": {
+      "n": 4,
+      "mrr_at_5": 1.0,
+      "recall_at_5": 1.0
+    },
+    "A_lexical/holdout": {
+      "n": 4,
+      "mrr_at_5": 1.0,
+      "recall_at_5": 1.0
+    },
+    "B_encoder/development": {
+      "n": 4,
+      "mrr_at_5": 1.0,
+      "recall_at_5": 1.0
+    },
+    "B_encoder/calibration": {
+      "n": 4,
+      "mrr_at_5": 0.875,
+      "recall_at_5": 1.0
+    },
+    "B_encoder/holdout": {
+      "n": 4,
+      "mrr_at_5": 0.875,
+      "recall_at_5": 1.0
+    }
+  }
+}

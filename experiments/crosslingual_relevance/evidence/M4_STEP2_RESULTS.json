@@ -1,0 +1,113 @@
+{
+  "step2": [
+    {
+      "task_id": "m15-dev-01",
+      "formulation": "mixed",
+      "project": "httpx",
+      "total_sources": 2,
+      "gold_found": false,
+      "gold_rank": null,
+      "gold_sources": [],
+      "answer_supported": false,
+      "context_available": true
+    },
+    {
+      "task_id": "m15-dev-02",
+      "formulation": "EN",
+      "project": "ruff",
+      "total_sources": 2,
+      "gold_found": true,
+      "gold_rank": 1,
+      "gold_sources": [
+        {
+          "rank": 1,
+          "path": "docs/preview.md",
+          "line_start": 1,
+          "line_end": 8
+        }
+      ],
+      "answer_supported": false,
+      "context_available": true
+    },
+    {
+      "task_id": "m15-dev-03",
+      "formulation": "RU",
+      "project": "starlette",
+      "total_sources": 2,
+      "gold_found": true,
+      "gold_rank": 2,
+      "gold_sources": [
+        {
+          "rank": 2,
+          "path": "docs/lifespan.md",
+          "line_start": 29,
+          "line_end": 30
+        }
+      ],
+      "answer_supported": false,
+      "context_available": true
+    },
+    {
+      "task_id": "m15-dev-04",
+      "formulation": "mixed",
+      "project": "pydantic",
+      "total_sources": 1,
+      "gold_found": true,
+      "gold_rank": 1,
+      "gold_sources": [
+        {
+          "rank": 1,
+          "path": "docs/concepts/alias.md",
+          "line_start": 16,
+          "line_end": 40
+        }
+      ],
+      "answer_supported": false,
+      "context_available": true
+    },
+    {
+      "task_id": "typer-05-en",
+      "formulation": "EN",
+      "project": "typer",
+      "total_sources": 2,
+      "gold_found": true,
+      "gold_rank": 1,
+      "gold_sources": [
+        {
+          "rank": 1,
+          "path": "docs/tutorial/parameter-types/bool.md",
+          "line_start": 192,
+          "line_end": 212
+        }
+      ],
+      "answer_supported": false,
+      "context_available": true
+    },
+    {
+      "task_id": "typer-05-mixed",
+      "formulation": "mixed",
+      "project": "typer",
+      "total_sources": 0,
+      "gold_found": false,
+      "gold_rank": null,
+      "gold_sources": [],
+      "answer_supported": false,
+      "context_available": false
+    },
+    {
+      "task_id": "typer-05-ru",
+      "formulation": "RU",
+      "project": "typer",
+      "total_sources": 0,
+      "gold_found": false,
+      "gold_rank": null,
+      "gold_sources": [],
+      "answer_supported": false,
+      "context_available": false
+    }
+  ],
+  "summary": {
+    "total": 7,
+    "found": 4
+  }
+}

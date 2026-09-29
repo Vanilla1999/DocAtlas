@@ -1,0 +1,96 @@
+stage: M0
+status: RED
+git revision: 58c7f37c2a5ef686bcd6562abbade91ba94e347a
+branch: task-44-cross-lingual-retrieval
+date: 2026-09-28T11:12:43Z
+command: .venv/bin/python -m pytest tests/docs/test_multilingual_first_packet.py -v
+exit code: 1
+
+===== test output =====
+============================= test session starts ==============================
+platform linux -- Python 3.13.12, pytest-9.0.3, pluggy-1.6.0 -- /home/viadmin/StudioProjects/hermes/docmancer/.venv/bin/python
+cachedir: .pytest_cache
+rootdir: /home/viadmin/StudioProjects/hermes/docmancer
+configfile: pytest.ini
+plugins: anyio-4.13.0, asyncio-1.4.0
+asyncio: mode=Mode.AUTO, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collecting ... collected 4 items
+
+tests/docs/test_multilingual_first_packet.py::test_mixed_russian_first_packet_carries_negative_name_rule FAILED [ 25%]
+tests/docs/test_multilingual_first_packet.py::test_pure_russian_first_packet_carries_negative_name_rule FAILED [ 50%]
+tests/docs/test_multilingual_first_packet.py::test_english_first_packet_control PASSED [ 75%]
+tests/docs/test_multilingual_first_packet.py::test_packaging_control_english_projector_output PASSED [100%]
+
+=================================== FAILURES ===================================
+__________ test_mixed_russian_first_packet_carries_negative_name_rule __________
+
+tmp_path = PosixPath('/tmp/pytest-of-viadmin/pytest-2/test_mixed_russian_first_packe0')
+
+    def test_mixed_russian_first_packet_carries_negative_name_rule(tmp_path):
+        root = _typer_project(tmp_path)
+        with isolated_service(tmp_path / "state") as (service, config):
+            index_project(service, config, root)
+            payload, _trace = _call(service, root, MIXED_RU_QUESTION)
+>       _assert_gold_in_first_packet(payload)
+
+tests/docs/test_multilingual_first_packet.py:72: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+payload = {'answer_available': False, 'answer_supported': False, 'context_available': False, 'context_quality': {'reasons': ['source_unavailable'], 'status': 'unavailable'}, ...}
+
+    def _assert_gold_in_first_packet(payload):
+        visible = "\n\n".join(s["snippet"] for s in payload.get("sources", []))
+        for phrase in GOLD_PHRASES:
+>           assert phrase in visible, f"gold phrase missing from first packet: {phrase!r}"
+E           AssertionError: gold phrase missing from first packet: 'only *CLI option* names to set the `False` value'
+E           assert 'only *CLI option* names to set the `False` value' in ''
+
+tests/docs/test_multilingual_first_packet.py:58: AssertionError
+__________ test_pure_russian_first_packet_carries_negative_name_rule ___________
+
+tmp_path = PosixPath('/tmp/pytest-of-viadmin/pytest-2/test_pure_russian_first_packet0')
+
+    def test_pure_russian_first_packet_carries_negative_name_rule(tmp_path):
+        root = _typer_project(tmp_path)
+        with isolated_service(tmp_path / "state") as (service, config):
+            index_project(service, config, root)
+            payload, _trace = _call(service, root, PURE_RU_QUESTION)
+>       _assert_gold_in_first_packet(payload)
+
+tests/docs/test_multilingual_first_packet.py:83: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+payload = {'answer_available': False, 'answer_supported': False, 'context_available': False, 'context_quality': {'reasons': ['source_unavailable'], 'status': 'unavailable'}, ...}
+
+    def _assert_gold_in_first_packet(payload):
+        visible = "\n\n".join(s["snippet"] for s in payload.get("sources", []))
+        for phrase in GOLD_PHRASES:
+>           assert phrase in visible, f"gold phrase missing from first packet: {phrase!r}"
+E           AssertionError: gold phrase missing from first packet: 'only *CLI option* names to set the `False` value'
+E           assert 'only *CLI option* names to set the `False` value' in ''
+
+tests/docs/test_multilingual_first_packet.py:58: AssertionError
+=========================== short test summary info ============================
+FAILED tests/docs/test_multilingual_first_packet.py::test_mixed_russian_first_packet_carries_negative_name_rule
+FAILED tests/docs/test_multilingual_first_packet.py::test_pure_russian_first_packet_carries_negative_name_rule
+========================= 2 failed, 2 passed in 1.60s ==========================
+===== end output =====
+
+summary:
+  test_mixed_russian_first_packet_carries_negative_name_rule: ASSERTION_FAIL
+  test_pure_russian_first_packet_carries_negative_name_rule: ASSERTION_FAIL
+  test_english_first_packet_control: PASS
+  test_packaging_control_english_projector_output: PASS
+  execution_errors: 0
+
+diagnosis:
+  Both Russian questions produce empty sources (context_available: false,
+  context_quality.status: unavailable, reason: source_unavailable).
+  The gold passage from bool.md lines 192-226 does not reach the first
+  packet for either mixed RU+EN or pure RU formulation.
+  English control finds the gold passage in the first packet.
+  Packaging control confirms the finalizer can fit the gold passage
+  into a valid <=800-token DTO when retrieval delivers it.
+
+acceptance: M0 RED reproduced. 2 assertion failures, English control PASS,
+  0 execution errors. Proceed to M1.

@@ -1,0 +1,10 @@
+{
+  "schema_version": 1,
+  "module_labels": {
+    "tests/docs/test_multilingual_query_integrity.py": "behavioral"
+  },
+  "node_overrides": {},
+  "module_node_hashes": {
+    "tests/docs/test_multilingual_query_integrity.py": "96e6d9d933dc7ea68e7637c6499e92b4763784290b9ec5b249926b258341b3a9"
+  }
+}

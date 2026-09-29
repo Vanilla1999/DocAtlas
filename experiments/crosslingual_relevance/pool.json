@@ -1,0 +1,776 @@
+{
+  "schema_version": 1,
+  "blocks": [
+    {
+      "block_id": "b001",
+      "path": "eval/evidence_quality_v2/sources/httpx/docs/advanced/timeouts.md",
+      "line_start": 1,
+      "line_end": 4,
+      "content_sha256": "7b90e978ea6793ad6218014fea02641811d12aae868d3f500d85ea25b73d50eb",
+      "text": "HTTPX is careful to enforce timeouts everywhere by default.\n\nThe default behavior is to raise a `TimeoutException` after 5 seconds of\nnetwork inactivity."
+    },
+    {
+      "block_id": "b002",
+      "path": "eval/evidence_quality_v2/sources/httpx/docs/advanced/timeouts.md",
+      "line_start": 32,
+      "line_end": 39,
+      "content_sha256": "521ac9de8023d7be5bd311016117a769c10188ee353b9f484b811ceca5f50102",
+      "text": "You can set a timeout on a client instance, which results in the given\n`timeout` being used as the default for requests made with this client:\n\n```python\nclient = httpx.Client()              # Use a default 5s timeout everywhere.\nclient = httpx.Client(timeout=10.0)  # Use a default 10s timeout everywhere.\nclient = httpx.Client(timeout=None)  # Disable all timeouts by default.\n```"
+    },
+    {
+      "block_id": "b003",
+      "path": "eval/evidence_quality_v2/sources/ruff/docs/preview.md",
+      "line_start": 1,
+      "line_end": 8,
+      "content_sha256": "f675c9a3b615600208c50879ea6ee393dbf1a1d19f6230faf6c0c883934d1bb9",
+      "text": "# Preview\n\nRuff includes an opt-in preview mode to provide an opportunity for community feedback and increase confidence that\nchanges are a net-benefit before enabling them for everyone.\n\nPreview mode enables a collection of unstable features such as new lint rules and fixes, formatter style changes, interface updates, and more. Warnings about deprecated features may turn into errors when using preview mode.\n\nEnabling preview mode does not on its own enable all preview rules. See the [rules section](#using-rules-that-are-in-preview) for details on selecting preview rules."
+    },
+    {
+      "block_id": "b004",
+      "path": "eval/evidence_quality_v2/sources/starlette/docs/lifespan.md",
+      "line_start": 27,
+      "line_end": 30,
+      "content_sha256": "f56fc0056d6ed804f722fed7ca6a14b4b7cac41b2d325674824eedd9cf78a356",
+      "text": "Starlette will not start serving any incoming requests until the lifespan has been run.\n\nThe lifespan teardown will run once all connections have been closed, and\nany in-process background tasks have completed."
+    },
+    {
+      "block_id": "b005",
+      "path": "eval/evidence_quality_v2/sources/ruff/docs/preview.md",
+      "line_start": 62,
+      "line_end": 63,
+      "content_sha256": "5383d82b29b71be0932654084b80ef05d028873472d15fe296ceb8bfa857be60",
+      "text": "If a rule is marked as preview, it can only be selected if preview mode is enabled. For example, consider a\nhypothetical rule, `HYP001`. If `HYP001` were in preview, it would _not_ be enabled by adding it to the selected rule set."
+    },
+    {
+      "block_id": "b006",
+      "path": "eval/evidence_quality_v2/sources/ruff/docs/preview.md",
+      "line_start": 159,
+      "line_end": 182,
+      "content_sha256": "3de571afaabe9d938c180bb4e6d4c70f2905129204388ea737da1c56b0b30326",
+      "text": "When preview mode is enabled, selecting rule categories or prefixes will include all preview rules that match.\nIf you'd prefer to opt in to each preview rule individually, you can toggle the `explicit-preview-rules`\nsetting in your configuration file:\n\n=== \"pyproject.toml\"\n\n    ```toml\n    [tool.ruff.lint]\n    preview = true\n    explicit-preview-rules = true\n    ```\n\n=== \"ruff.toml\"\n\n    ```toml\n    [lint]\n    preview = true\n    explicit-preview-rules = true\n    ```\n\nIn our previous example, `--select` with `ALL` `HYP`, `HYP0`, or `HYP00` would not enable `HYP001`. Each preview\nrule will need to be selected with its exact code, e.g. `--select ALL,HYP001`.\n\nIf preview mode is not enabled, this setting has no effect."
+    },
+    {
+      "block_id": "b007",
+      "path": "eval/evidence_quality_v2/sources/starlette/docs/lifespan.md",
+      "line_start": 29,
+      "line_end": 30,
+      "content_sha256": "1475436a9eb91256bf8ada457c0a93b245d96b4ecaa2cb72359fa59ef35d9e31",
+      "text": "The lifespan teardown will run once all connections have been closed, and\nany in-process background tasks have completed."
+    },
+    {
+      "block_id": "b008",
+      "path": "eval/evidence_quality_v2/sources/starlette/docs/lifespan.md",
+      "line_start": 27,
+      "line_end": 27,
+      "content_sha256": "b650499e23060fd763f65f6c3f41bd2d5c8a20c9547ffb3f2cc4d29015bf8680",
+      "text": "Starlette will not start serving any incoming requests until the lifespan has been run."
+    },
+    {
+      "block_id": "b009",
+      "path": "eval/evidence_quality_v2/sources/starlette/docs/lifespan.md",
+      "line_start": 76,
+      "line_end": 92,
+      "content_sha256": "53ddb12206ade5ae0c39dd669b6dde5329fa1c59860030bfe7070b6f983b8f26",
+      "text": "## Running lifespan in tests\n\nYou should use `TestClient` as a context manager, to ensure that the lifespan is called.\n\n```python\nfrom example import app\nfrom starlette.testclient import TestClient\n\n\ndef test_homepage():\n    with TestClient(app) as client:\n        # Application's lifespan is called on entering the block.\n        response = client.get(\"/\")\n        assert response.status_code == 200\n\n    # And the lifespan's teardown is run when exiting the block.\n```"
+    },
+    {
+      "block_id": "b010",
+      "path": "eval/evidence_quality_v2/sources/pydantic/docs/concepts/alias.md",
+      "line_start": 1,
+      "line_end": 13,
+      "content_sha256": "3661eaa5a0a586a384b248e6e8447e4e1532fe44f82479996b3ded2e38a5fcb3",
+      "text": "An alias is an alternative name for a field, used when serializing and deserializing data.\n\nYou can specify an alias in the following ways:\n\n* `alias` on the [`Field`][pydantic.fields.Field]\n    * must be a `str`\n* `validation_alias` on the [`Field`][pydantic.fields.Field]\n    * can be an instance of `str`, [`AliasPath`][pydantic.aliases.AliasPath], or [`AliasChoices`][pydantic.aliases.AliasChoices]\n* `serialization_alias` on the [`Field`][pydantic.fields.Field]\n    * must be a `str`\n* `alias_generator` on the [`Config`][pydantic.config.ConfigDict.alias_generator]\n    * can be a callable or an instance of [`AliasGenerator`][pydantic.aliases.AliasGenerator]\n"
+    },
+    {
+      "block_id": "b011",
+      "path": "eval/evidence_quality_v2/sources/pydantic/docs/concepts/alias.md",
+      "line_start": 25,
+      "line_end": 26,
+      "content_sha256": "62eff16d8c884108f7831a0456ec7fb5c76db84b9b124b28da1ffc8fe7d984e8",
+      "text": "The `AliasPath` is used to specify a path to a field using aliases. For example:\n"
+    },
+    {
+      "block_id": "b012",
+      "path": "eval/evidence_quality_v2/sources/pydantic/docs/concepts/alias.md",
+      "line_start": 44,
+      "line_end": 45,
+      "content_sha256": "2cf610f24401dcc22f95a4676b158ce7bf5fe28e999ad7eb06f49d3ab96925e3",
+      "text": "In the `'first_name'` field, we are using the alias `'names'` and the index `0` to specify the path to the first name.\nIn the `'last_name'` field, we are using the alias `'names'` and the index `1` to specify the path to the last name."
+    },
+    {
+      "block_id": "b013",
+      "path": "eval/evidence_quality_v2/sources/pydantic/docs/concepts/alias.md",
+      "line_start": 136,
+      "line_end": 140,
+      "content_sha256": "2a6a8d0f4cc0d656a95989f6428327982a77917b75b5a325a986b65070f87edf",
+      "text": "`AliasGenerator` is a class that allows you to specify multiple alias generators for a model.\nYou can use an `AliasGenerator` to specify different alias generators for validation and serialization.\n\nThis is particularly useful if you need to use different naming conventions for loading and saving data,\nbut you don't want to specify the validation and serialization aliases for each field individually."
+    },
+    {
+      "block_id": "b014",
+      "path": "eval/evidence_quality_v2/sources/starlette/docs/lifespan.md",
+      "line_start": 37,
+      "line_end": 38,
+      "content_sha256": "26206a82e2787b39fb409dd104b49a27251399c6847d2e616913ac1909dbca21",
+      "text": "The lifespan has the concept of `state`, which is a dictionary that\ncan be used to share the objects between the lifespan, and the requests."
+    },
+    {
+      "block_id": "b015",
+      "path": "eval/evidence_quality_v2/sources/httpx/docs/advanced/timeouts.md",
+      "line_start": 45,
+      "line_end": 61,
+      "content_sha256": "a7fdaacaf61e52335e6a366fb8149bf0ad8c71e7d9ed28fc628ad09c60ff55cf",
+      "text": "There are four different types of timeouts that may occur. These are **connect**,\n**read**, **write**, and **pool** timeouts.\n\n* The **connect** timeout specifies the maximum amount of time to wait until\na socket connection to the requested host is established. If HTTPX is unable to connect\nwithin this time frame, a `ConnectTimeout` exception is raised.\n* The **read** timeout specifies the maximum duration to wait for a chunk of\ndata to be received (for example, a chunk of the response body). If HTTPX is\nunable to receive data within this time frame, a `ReadTimeout` exception is raised.\n* The **write** timeout specifies the maximum duration to wait for a chunk of\ndata to be sent (for example, a chunk of the request body). If HTTPX is unable\nto send data within this time frame, a `WriteTimeout` exception is raised.\n* The **pool** timeout specifies the maximum duration to wait for acquiring\na connection from the connection pool. If HTTPX is unable to acquire a connection\nwithin this time frame, a `PoolTimeout` exception is raised. A related\nconfiguration here is the maximum number of allowable connections in the\nconnection pool, which is configured by the `limits` argument."
+    },
+    {
+      "block_id": "b016",
+      "path": "eval/evidence_quality_v2/sources/httpx/docs/advanced/timeouts.md",
+      "line_start": 63,
+      "line_end": 71,
+      "content_sha256": "16ce7cf292a3cc5ab5e40ccce6a47a8ff51947f046ef94184d73a99539a69d15",
+      "text": "You can configure the timeout behavior for any of these values...\n\n```python\n# A client with a 60s timeout for connecting, and a 10s timeout elsewhere.\ntimeout = httpx.Timeout(10.0, connect=60.0)\nclient = httpx.Client(timeout=timeout)\n\nresponse = client.get('http://example.com/')\n```"
+    },
+    {
+      "block_id": "b017",
+      "path": "eval/evidence_quality_v2/sources/ruff/docs/preview.md",
+      "line_start": 186,
+      "line_end": 187,
+      "content_sha256": "75fb40480f73407b1696921a5a5e1c36eb087ee21ceb3f70e7aa134fb708e5ca",
+      "text": "When preview mode is enabled, deprecated rules will be disabled. If a deprecated rule is selected explicitly, an\nerror will be raised. Deprecated rules will not be included if selected via a rule category or prefix."
+    },
+    {
+      "block_id": "b018",
+      "path": "eval/evidence_quality_v2/sources/httpx/docs/advanced/timeouts.md",
+      "line_start": 57,
+      "line_end": 61,
+      "content_sha256": "e75199b0bef1547a49ddab266e4c2291bbffb05b0d14d4f6a57f1bf7b382ccbf",
+      "text": "* The **pool** timeout specifies the maximum duration to wait for acquiring\na connection from the connection pool. If HTTPX is unable to acquire a connection\nwithin this time frame, a `PoolTimeout` exception is raised. A related\nconfiguration here is the maximum number of allowable connections in the\nconnection pool, which is configured by the `limits` argument."
+    },
+    {
+      "block_id": "b019",
+      "path": "eval/evidence_quality_v2/sources/starlette/docs/lifespan.md",
+      "line_start": 73,
+      "line_end": 74,
+      "content_sha256": "e34b92b1a78cdcbd82b82e9331fc383f7cd5ff2d299f5d5593117ec016c215a7",
+      "text": "The `state` received on the requests is a **shallow** copy of the state received on the\nlifespan handler."
+    },
+    {
+      "block_id": "b020",
+      "path": "eval/evidence_quality_v2/sources/pydantic/docs/concepts/alias.md",
+      "line_start": 194,
+      "line_end": 200,
+      "content_sha256": "84ea5d010d79653edf29076e25042b8c356bc9155d815e29f8740cdff05ec7de",
+      "text": "You may set `alias_priority` on a field to change this behavior:\n\n* `alias_priority=2` the alias will *not* be overridden by the alias generator.\n* `alias_priority=1` the alias *will* be overridden by the alias generator.\n* `alias_priority` not set:\n    * alias is set: the alias will *not* be overridden by the alias generator.\n    * alias is not set: the alias *will* be overridden by the alias generator."
+    },
+    {
+      "block_id": "b021",
+      "path": "eval/evidence_quality_v2/sources/pydantic/docs/concepts/alias.md",
+      "line_start": 168,
+      "line_end": 168,
+      "content_sha256": "00774faf83866f223370a2a34eae1365446138eeff556bfddd125404df9038cf",
+      "text": "If you specify an `alias` on the [`Field`][pydantic.fields.Field], it will take precedence over the generated alias by default:"
+    },
+    {
+      "block_id": "b022",
+      "path": "eval/evidence_quality_v2/sources/httpx/docs/advanced/timeouts.md",
+      "line_start": 19,
+      "line_end": 28,
+      "content_sha256": "25ac830786f7a8b807f82d259d3ffb535aae6d5427a8b5311fa3f402bcfc5eab",
+      "text": "Or disable timeouts for an individual request:\n\n```python\n# Using the top-level API:\nhttpx.get('http://example.com/api/v1/example', timeout=None)\n\n# Using a client instance:\nwith httpx.Client() as client:\n    client.get(\"http://example.com/api/v1/example\", timeout=None)\n```"
+    },
+    {
+      "block_id": "b023",
+      "path": "eval/evidence_quality_v2/sources/ruff/docs/preview.md",
+      "line_start": 12,
+      "line_end": 13,
+      "content_sha256": "1f0689a1bbfdc06af556bbaaac3f94305c0782cc5414d8b4e70237aab96e45c4",
+      "text": "Preview mode can be enabled with the `--preview` flag on the CLI or by setting `preview = true` in your Ruff\nconfiguration file."
+    },
+    {
+      "block_id": "b024",
+      "path": "eval/evidence_quality_v2/sources/ruff/docs/preview.md",
+      "line_start": 182,
+      "line_end": 182,
+      "content_sha256": "cc78157a0ebeb3dcc43631f0470e4dc528f2cffd8dd212683d890afcef5969df",
+      "text": "If preview mode is not enabled, this setting has no effect."
+    },
+    {
+      "block_id": "b025",
+      "path": "eval/evidence_quality_v2/sources/ruff/docs/preview.md",
+      "line_start": 159,
+      "line_end": 161,
+      "content_sha256": "180cdd6b64c3d63122c372f01a5f6fc7a6975c197b749edc83438cabbdfbc941",
+      "text": "When preview mode is enabled, selecting rule categories or prefixes will include all preview rules that match.\nIf you'd prefer to opt in to each preview rule individually, you can toggle the `explicit-preview-rules`\nsetting in your configuration file:"
+    },
+    {
+      "block_id": "b026",
+      "path": "eval/evidence_quality_v2/sources/starlette/docs/lifespan.md",
+      "line_start": 78,
+      "line_end": 78,
+      "content_sha256": "98a8b2b81ee0b4408438f7299100edcc85775e511644f245346fbb152721214d",
+      "text": "You should use `TestClient` as a context manager, to ensure that the lifespan is called."
+    },
+    {
+      "block_id": "b027",
+      "path": "eval/evidence_quality_v2/sources/starlette/docs/lifespan.md",
+      "line_start": 78,
+      "line_end": 92,
+      "content_sha256": "6028e5f7889c63e02cdb151ddb5a5bd5892f76bd2a9b58764688328664c7fd03",
+      "text": "You should use `TestClient` as a context manager, to ensure that the lifespan is called.\n\n```python\nfrom example import app\nfrom starlette.testclient import TestClient\n\n\ndef test_homepage():\n    with TestClient(app) as client:\n        # Application's lifespan is called on entering the block.\n        response = client.get(\"/\")\n        assert response.status_code == 200\n\n    # And the lifespan's teardown is run when exiting the block.\n```"
+    },
+    {
+      "block_id": "b028",
+      "path": "eval/evidence_quality_v2/sources/pydantic/docs/concepts/alias.md",
+      "line_start": 40,
+      "line_end": 45,
+      "content_sha256": "e5eb9a1629b2816c37cf68bb3fcba19b404bb256ba81f95ed895c436f14d416e",
+      "text": "1. We are using `model_validate` to validate a dictionary using the field aliases.\n\n    You can see more details about [`model_validate`][pydantic.main.BaseModel.model_validate] in the API reference.\n\nIn the `'first_name'` field, we are using the alias `'names'` and the index `0` to specify the path to the first name.\nIn the `'last_name'` field, we are using the alias `'names'` and the index `1` to specify the path to the last name."
+    },
+    {
+      "block_id": "b029",
+      "path": "eval/evidence_quality_v2/sources/httpx/docs/advanced/timeouts.md",
+      "line_start": 45,
+      "line_end": 46,
+      "content_sha256": "28f21530f96632883b6574394d7ca5ff7ad5fa2c8cb41426bd979b13cc9bc5df",
+      "text": "There are four different types of timeouts that may occur. These are **connect**,\n**read**, **write**, and **pool** timeouts."
+    }
+  ],
+  "tasks": [
+    {
+      "task_id": "m15-dev-01",
+      "split": "development",
+      "question": "Какое поведение timeout по умолчанию в HTTPX: сколько секунд и какое исключение?",
+      "formulation": "mixed",
+      "project": "httpx",
+      "facts": [
+        {
+          "fact_id": "httpx-default-timeout",
+          "description": "HTTPX enforces timeouts by default, raising TimeoutException after 5 seconds of network inactivity"
+        }
+      ],
+      "blocks": [
+        {
+          "block_id": "b001",
+          "source_allowed": true,
+          "relevant_to_question": true,
+          "covered_fact_ids": [
+            "httpx-default-timeout"
+          ],
+          "label_reason": "States default 5s timeout and TimeoutException"
+        },
+        {
+          "block_id": "b002",
+          "source_allowed": true,
+          "relevant_to_question": false,
+          "covered_fact_ids": [],
+          "label_reason": "Discusses setting custom client timeout, not default behavior"
+        },
+        {
+          "block_id": "b003",
+          "source_allowed": false,
+          "relevant_to_question": false,
+          "covered_fact_ids": [],
+          "label_reason": "Wrong project; semantically unrelated"
+        },
+        {
+          "block_id": "b004",
+          "source_allowed": false,
+          "relevant_to_question": false,
+          "covered_fact_ids": [],
+          "label_reason": "Wrong project; mentions 'default' but about lifespan, not timeout"
+        }
+      ]
+    },
+    {
+      "task_id": "m15-dev-02",
+      "split": "development",
+      "question": "Does enabling preview automatically enable all preview rules?",
+      "formulation": "EN",
+      "project": "ruff",
+      "facts": [
+        {
+          "fact_id": "ruff-preview-not-automatic",
+          "description": "Enabling preview mode does not on its own enable all preview rules; a preview-marked rule can only be selected if preview mode is enabled"
+        }
+      ],
+      "blocks": [
+        {
+          "block_id": "b005",
+          "source_allowed": true,
+          "relevant_to_question": true,
+          "covered_fact_ids": [
+            "ruff-preview-not-automatic"
+          ],
+          "label_reason": "Directly states preview rules require preview mode, not automatic"
+        },
+        {
+          "block_id": "b003",
+          "source_allowed": true,
+          "relevant_to_question": true,
+          "covered_fact_ids": [
+            "ruff-preview-not-automatic"
+          ],
+          "label_reason": "States enabling preview does not on its own enable all preview rules"
+        },
+        {
+          "block_id": "b006",
+          "source_allowed": true,
+          "relevant_to_question": false,
+          "covered_fact_ids": [],
+          "label_reason": "Discusses explicit-preview-rules setting, not whether preview enables all rules"
+        },
+        {
+          "block_id": "b001",
+          "source_allowed": false,
+          "relevant_to_question": false,
+          "covered_fact_ids": [],
+          "label_reason": "Wrong project; unrelated"
+        }
+      ]
+    },
+    {
+      "task_id": "m15-dev-03",
+      "split": "development",
+      "question": "Когда выполняется teardown lifespan относительно соединений и фоновых задач?",
+      "formulation": "RU",
+      "project": "starlette",
+      "facts": [
+        {
+          "fact_id": "starlette-teardown-ordering",
+          "description": "Lifespan teardown runs once all connections are closed and all in-process background tasks have completed"
+        }
+      ],
+      "blocks": [
+        {
+          "block_id": "b007",
+          "source_allowed": true,
+          "relevant_to_question": true,
+          "covered_fact_ids": [
+            "starlette-teardown-ordering"
+          ],
+          "label_reason": "Directly states teardown runs after connections closed and background tasks completed"
+        },
+        {
+          "block_id": "b008",
+          "source_allowed": true,
+          "relevant_to_question": false,
+          "covered_fact_ids": [],
+          "label_reason": "About startup blocking, not teardown ordering"
+        },
+        {
+          "block_id": "b009",
+          "source_allowed": true,
+          "relevant_to_question": false,
+          "covered_fact_ids": [],
+          "label_reason": "About TestClient context manager, not teardown ordering"
+        },
+        {
+          "block_id": "b010",
+          "source_allowed": false,
+          "relevant_to_question": false,
+          "covered_fact_ids": [],
+          "label_reason": "Wrong project; unrelated"
+        }
+      ]
+    },
+    {
+      "task_id": "m15-dev-04",
+      "split": "development",
+      "question": "Что specifies AliasPath: какой path to a field using aliases?",
+      "formulation": "mixed",
+      "project": "pydantic",
+      "facts": [
+        {
+          "fact_id": "pydantic-aliaspath-purpose",
+          "description": "AliasPath specifies a path to a field value using an alias key and a positional index"
+        }
+      ],
+      "blocks": [
+        {
+          "block_id": "b011",
+          "source_allowed": true,
+          "relevant_to_question": true,
+          "covered_fact_ids": [
+            "pydantic-aliaspath-purpose"
+          ],
+          "label_reason": "Directly states AliasPath specifies a path to a field using aliases"
+        },
+        {
+          "block_id": "b012",
+          "source_allowed": true,
+          "relevant_to_question": true,
+          "covered_fact_ids": [
+            "pydantic-aliaspath-purpose"
+          ],
+          "label_reason": "Explains alias + index path mechanism"
+        },
+        {
+          "block_id": "b013",
+          "source_allowed": true,
+          "relevant_to_question": false,
+          "covered_fact_ids": [],
+          "label_reason": "About AliasGenerator, not AliasPath"
+        },
+        {
+          "block_id": "b014",
+          "source_allowed": false,
+          "relevant_to_question": false,
+          "covered_fact_ids": [],
+          "label_reason": "Wrong project; uses word 'state' but unrelated"
+        }
+      ]
+    },
+    {
+      "task_id": "m15-cal-01",
+      "split": "calibration",
+      "question": "Назови четыре типа timeout в HTTPX и объясни, что ограничивает каждый.",
+      "formulation": "RU",
+      "project": "httpx",
+      "facts": [
+        {
+          "fact_id": "httpx-four-timeout-types",
+          "description": "HTTPX defines four timeout types (connect, read, write, pool), each with a distinct exception"
+        }
+      ],
+      "blocks": [
+        {
+          "block_id": "b015",
+          "source_allowed": true,
+          "relevant_to_question": true,
+          "covered_fact_ids": [
+            "httpx-four-timeout-types"
+          ],
+          "label_reason": "Lists all four timeout types with descriptions and exceptions"
+        },
+        {
+          "block_id": "b016",
+          "source_allowed": true,
+          "relevant_to_question": false,
+          "covered_fact_ids": [],
+          "label_reason": "About Timeout config API, not the four types"
+        },
+        {
+          "block_id": "b001",
+          "source_allowed": true,
+          "relevant_to_question": false,
+          "covered_fact_ids": [],
+          "label_reason": "About default behavior, not the four types"
+        },
+        {
+          "block_id": "b017",
+          "source_allowed": false,
+          "relevant_to_question": false,
+          "covered_fact_ids": [],
+          "label_reason": "Wrong project; mentions 'deprecated' and 'disabled' but unrelated"
+        }
+      ]
+    },
+    {
+      "task_id": "m15-cal-02",
+      "split": "calibration",
+      "question": "Что happens to deprecated rules когда preview mode enabled: will an error be raised?",
+      "formulation": "mixed",
+      "project": "ruff",
+      "facts": [
+        {
+          "fact_id": "ruff-deprecated-in-preview",
+          "description": "When preview mode is enabled, deprecated rules are disabled; explicitly selecting a deprecated rule raises an error"
+        }
+      ],
+      "blocks": [
+        {
+          "block_id": "b017",
+          "source_allowed": true,
+          "relevant_to_question": true,
+          "covered_fact_ids": [
+            "ruff-deprecated-in-preview"
+          ],
+          "label_reason": "Directly states deprecated rules disabled in preview, error on explicit selection"
+        },
+        {
+          "block_id": "b006",
+          "source_allowed": true,
+          "relevant_to_question": false,
+          "covered_fact_ids": [],
+          "label_reason": "About explicit-preview-rules setting, not deprecated rules"
+        },
+        {
+          "block_id": "b005",
+          "source_allowed": true,
+          "relevant_to_question": false,
+          "covered_fact_ids": [],
+          "label_reason": "About preview rule selection, not deprecated rules"
+        },
+        {
+          "block_id": "b018",
+          "source_allowed": false,
+          "relevant_to_question": false,
+          "covered_fact_ids": [],
+          "label_reason": "Wrong project; mentions 'pool' and 'connections' but unrelated"
+        }
+      ]
+    },
+    {
+      "task_id": "m15-cal-03",
+      "split": "calibration",
+      "question": "Is the request state a deep or shallow copy of the lifespan state?",
+      "formulation": "EN",
+      "project": "starlette",
+      "facts": [
+        {
+          "fact_id": "starlette-state-shallow-copy",
+          "description": "The state received on requests is a shallow copy of the state received on the lifespan handler"
+        }
+      ],
+      "blocks": [
+        {
+          "block_id": "b019",
+          "source_allowed": true,
+          "relevant_to_question": true,
+          "covered_fact_ids": [
+            "starlette-state-shallow-copy"
+          ],
+          "label_reason": "Directly states request state is a shallow copy of lifespan state"
+        },
+        {
+          "block_id": "b014",
+          "source_allowed": true,
+          "relevant_to_question": true,
+          "covered_fact_ids": [],
+          "label_reason": "Partially relevant: mentions state is shared, but does not say shallow copy"
+        },
+        {
+          "block_id": "b004",
+          "source_allowed": true,
+          "relevant_to_question": false,
+          "covered_fact_ids": [],
+          "label_reason": "About startup/teardown ordering, not state copy semantics"
+        },
+        {
+          "block_id": "b020",
+          "source_allowed": false,
+          "relevant_to_question": false,
+          "covered_fact_ids": [],
+          "label_reason": "Wrong project; mentions 'override' but about alias_priority, not state"
+        }
+      ]
+    },
+    {
+      "task_id": "m15-cal-04",
+      "split": "calibration",
+      "question": "В чём различие alias_priority=1 и alias_priority=2?",
+      "formulation": "RU",
+      "project": "pydantic",
+      "facts": [
+        {
+          "fact_id": "pydantic-alias-priority",
+          "description": "alias_priority=2 prevents the alias from being overridden by the generator; alias_priority=1 allows the generator to override it"
+        }
+      ],
+      "blocks": [
+        {
+          "block_id": "b020",
+          "source_allowed": true,
+          "relevant_to_question": true,
+          "covered_fact_ids": [
+            "pydantic-alias-priority"
+          ],
+          "label_reason": "Directly lists alias_priority=2 (not overridden) and =1 (overridden)"
+        },
+        {
+          "block_id": "b021",
+          "source_allowed": true,
+          "relevant_to_question": true,
+          "covered_fact_ids": [],
+          "label_reason": "Partially relevant: states field alias takes precedence by default, but does not explain priority values"
+        },
+        {
+          "block_id": "b013",
+          "source_allowed": true,
+          "relevant_to_question": false,
+          "covered_fact_ids": [],
+          "label_reason": "About AliasGenerator purpose, not priority"
+        },
+        {
+          "block_id": "b002",
+          "source_allowed": false,
+          "relevant_to_question": false,
+          "covered_fact_ids": [],
+          "label_reason": "Wrong project; unrelated"
+        }
+      ]
+    },
+    {
+      "task_id": "m15-hold-01",
+      "split": "holdout",
+      "question": "Как отключить all timeouts для HTTPX Client: какой аргумент передать?",
+      "formulation": "mixed",
+      "project": "httpx",
+      "facts": [
+        {
+          "fact_id": "httpx-disable-timeouts",
+          "description": "Pass timeout=None to httpx.Client() to disable all timeouts by default"
+        }
+      ],
+      "blocks": [
+        {
+          "block_id": "b002",
+          "source_allowed": true,
+          "relevant_to_question": true,
+          "covered_fact_ids": [
+            "httpx-disable-timeouts"
+          ],
+          "label_reason": "Shows httpx.Client(timeout=None) to disable all timeouts"
+        },
+        {
+          "block_id": "b022",
+          "source_allowed": true,
+          "relevant_to_question": true,
+          "covered_fact_ids": [],
+          "label_reason": "Partially relevant: shows per-request timeout=None, not client-level"
+        },
+        {
+          "block_id": "b001",
+          "source_allowed": true,
+          "relevant_to_question": false,
+          "covered_fact_ids": [],
+          "label_reason": "About default behavior, not disabling"
+        },
+        {
+          "block_id": "b023",
+          "source_allowed": false,
+          "relevant_to_question": false,
+          "covered_fact_ids": [],
+          "label_reason": "Wrong project; mentions 'enable' but about preview mode"
+        }
+      ]
+    },
+    {
+      "task_id": "m15-hold-02",
+      "split": "holdout",
+      "question": "What happens to explicit-preview-rules setting when preview mode is not enabled?",
+      "formulation": "EN",
+      "project": "ruff",
+      "facts": [
+        {
+          "fact_id": "ruff-explicit-preview-no-effect",
+          "description": "The explicit-preview-rules setting has no effect when preview mode is not enabled"
+        }
+      ],
+      "blocks": [
+        {
+          "block_id": "b024",
+          "source_allowed": true,
+          "relevant_to_question": true,
+          "covered_fact_ids": [
+            "ruff-explicit-preview-no-effect"
+          ],
+          "label_reason": "Directly states the setting has no effect without preview mode"
+        },
+        {
+          "block_id": "b025",
+          "source_allowed": true,
+          "relevant_to_question": true,
+          "covered_fact_ids": [],
+          "label_reason": "Partially relevant: introduces the setting but does not state the no-effect rule"
+        },
+        {
+          "block_id": "b017",
+          "source_allowed": true,
+          "relevant_to_question": false,
+          "covered_fact_ids": [],
+          "label_reason": "About deprecated rules, not explicit-preview-rules"
+        },
+        {
+          "block_id": "b026",
+          "source_allowed": false,
+          "relevant_to_question": false,
+          "covered_fact_ids": [],
+          "label_reason": "Wrong project; mentions 'ensure' but about TestClient"
+        }
+      ]
+    },
+    {
+      "task_id": "m15-hold-03",
+      "split": "holdout",
+      "question": "Как использовать TestClient, чтобы lifespan выполнился в тестах?",
+      "formulation": "RU",
+      "project": "starlette",
+      "facts": [
+        {
+          "fact_id": "starlette-testclient-context-manager",
+          "description": "TestClient must be used as a context manager for the lifespan to be called"
+        }
+      ],
+      "blocks": [
+        {
+          "block_id": "b027",
+          "source_allowed": true,
+          "relevant_to_question": true,
+          "covered_fact_ids": [
+            "starlette-testclient-context-manager"
+          ],
+          "label_reason": "Shows TestClient as context manager with lifespan explanation"
+        },
+        {
+          "block_id": "b004",
+          "source_allowed": true,
+          "relevant_to_question": false,
+          "covered_fact_ids": [],
+          "label_reason": "About startup/teardown ordering, not TestClient"
+        },
+        {
+          "block_id": "b028",
+          "source_allowed": false,
+          "relevant_to_question": false,
+          "covered_fact_ids": [],
+          "label_reason": "Wrong project; unrelated"
+        }
+      ]
+    },
+    {
+      "task_id": "m15-hold-04",
+      "split": "holdout",
+      "question": "Как AliasGenerator помогает use different naming conventions при loading and saving?",
+      "formulation": "mixed",
+      "project": "pydantic",
+      "facts": [
+        {
+          "fact_id": "pydantic-aliasgenerator-purpose",
+          "description": "AliasGenerator allows specifying different alias generators for validation and serialization, enabling different naming conventions for loading and saving"
+        }
+      ],
+      "blocks": [
+        {
+          "block_id": "b013",
+          "source_allowed": true,
+          "relevant_to_question": true,
+          "covered_fact_ids": [
+            "pydantic-aliasgenerator-purpose"
+          ],
+          "label_reason": "Directly states different generators for validation/serialization, different conventions"
+        },
+        {
+          "block_id": "b021",
+          "source_allowed": true,
+          "relevant_to_question": false,
+          "covered_fact_ids": [],
+          "label_reason": "About field alias precedence, not AliasGenerator"
+        },
+        {
+          "block_id": "b011",
+          "source_allowed": true,
+          "relevant_to_question": false,
+          "covered_fact_ids": [],
+          "label_reason": "About AliasPath, not AliasGenerator"
+        },
+        {
+          "block_id": "b029",
+          "source_allowed": false,
+          "relevant_to_question": false,
+          "covered_fact_ids": [],
+          "label_reason": "Wrong project; mentions 'types' but about timeouts"
+        }
+      ]
+    }
+  ]
+}

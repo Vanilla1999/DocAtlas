@@ -1,0 +1,10 @@
+{
+  "schema_version": 1,
+  "module_labels": {
+    "tests/docs/test_m5_first_packet_green.py": "behavioral"
+  },
+  "node_overrides": {},
+  "module_node_hashes": {
+    "tests/docs/test_m5_first_packet_green.py": "9919cbb2e3a7e1ec0cf49c9c04c0bc307cff88e27bef34d54e9aa8e855d2eb3b"
+  }
+}

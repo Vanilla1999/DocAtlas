@@ -1,0 +1,10 @@
+{
+  "schema_version": 1,
+  "module_labels": {
+    "tests/docs/test_bounded_contextual_relevance.py": "behavioral"
+  },
+  "node_overrides": {},
+  "module_node_hashes": {
+    "tests/docs/test_bounded_contextual_relevance.py": "750dfd89723a897e0fdf33321373a897cd004cb085936f72958390376927428c"
+  }
+}

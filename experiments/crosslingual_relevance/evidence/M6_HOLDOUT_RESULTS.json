@@ -1,0 +1,541 @@
+{
+  "condition_A_lexical_baseline": [
+    {
+      "task_id": "m15-hold-01",
+      "formulation": "mixed",
+      "project": "httpx",
+      "condition": "lexical_baseline",
+      "document_found": true,
+      "fact_range_found": true,
+      "gold_in_candidates": true,
+      "gold_in_packet": true,
+      "gold_sources": [
+        {
+          "rank": 2,
+          "path": "docs/advanced/timeouts.md",
+          "line_start": 30,
+          "line_end": 39
+        }
+      ],
+      "total_sources": 2,
+      "budget_tokens": 792,
+      "answer_supported": false,
+      "context_available": true,
+      "covered_query_ids": [
+        "query-anchor-1"
+      ],
+      "source_policy_violations": false,
+      "admission_errors": {
+        "false_admit": 1,
+        "false_reject": 0
+      }
+    },
+    {
+      "task_id": "m15-hold-02",
+      "formulation": "EN",
+      "project": "ruff",
+      "condition": "lexical_baseline",
+      "document_found": true,
+      "fact_range_found": true,
+      "gold_in_candidates": true,
+      "gold_in_packet": true,
+      "gold_sources": [
+        {
+          "rank": 1,
+          "path": "docs/preview.md",
+          "line_start": 173,
+          "line_end": 182
+        },
+        {
+          "rank": 2,
+          "path": "docs/preview.md",
+          "line_start": 157,
+          "line_end": 171
+        }
+      ],
+      "total_sources": 2,
+      "budget_tokens": 767,
+      "answer_supported": false,
+      "context_available": true,
+      "covered_query_ids": [
+        "query-original"
+      ],
+      "source_policy_violations": false,
+      "admission_errors": {
+        "false_admit": 0,
+        "false_reject": 0
+      }
+    },
+    {
+      "task_id": "m15-hold-03",
+      "formulation": "RU",
+      "project": "starlette",
+      "condition": "lexical_baseline",
+      "document_found": true,
+      "fact_range_found": true,
+      "gold_in_candidates": true,
+      "gold_in_packet": true,
+      "gold_sources": [
+        {
+          "rank": 1,
+          "path": "docs/lifespan.md",
+          "line_start": 76,
+          "line_end": 92
+        }
+      ],
+      "total_sources": 2,
+      "budget_tokens": 774,
+      "answer_supported": false,
+      "context_available": true,
+      "covered_query_ids": [
+        "query-anchor-1"
+      ],
+      "source_policy_violations": false,
+      "admission_errors": {
+        "false_admit": 1,
+        "false_reject": 0
+      }
+    },
+    {
+      "task_id": "m15-hold-04",
+      "formulation": "mixed",
+      "project": "pydantic",
+      "condition": "lexical_baseline",
+      "document_found": true,
+      "fact_range_found": true,
+      "gold_in_candidates": true,
+      "gold_in_packet": true,
+      "gold_sources": [
+        {
+          "rank": 1,
+          "path": "docs/concepts/alias.md",
+          "line_start": 129,
+          "line_end": 164
+        }
+      ],
+      "total_sources": 1,
+      "budget_tokens": 729,
+      "answer_supported": false,
+      "context_available": true,
+      "covered_query_ids": [
+        "query-anchor-1"
+      ],
+      "source_policy_violations": false,
+      "admission_errors": {
+        "false_admit": 0,
+        "false_reject": 0
+      }
+    }
+  ],
+  "condition_B_lexical_rescue": [
+    {
+      "task_id": "m15-hold-01",
+      "formulation": "mixed",
+      "project": "httpx",
+      "condition": "lexical_rescue",
+      "document_found": true,
+      "fact_range_found": true,
+      "gold_in_candidates": true,
+      "gold_in_packet": true,
+      "gold_sources": [
+        {
+          "rank": 2,
+          "path": "docs/advanced/timeouts.md",
+          "line_start": 30,
+          "line_end": 39
+        }
+      ],
+      "total_sources": 2,
+      "budget_tokens": 792,
+      "answer_supported": false,
+      "context_available": true,
+      "covered_query_ids": [
+        "query-anchor-1"
+      ],
+      "source_policy_violations": false,
+      "admission_errors": {
+        "false_admit": 1,
+        "false_reject": 0
+      }
+    },
+    {
+      "task_id": "m15-hold-02",
+      "formulation": "EN",
+      "project": "ruff",
+      "condition": "lexical_rescue",
+      "document_found": true,
+      "fact_range_found": true,
+      "gold_in_candidates": true,
+      "gold_in_packet": true,
+      "gold_sources": [
+        {
+          "rank": 1,
+          "path": "docs/preview.md",
+          "line_start": 173,
+          "line_end": 182
+        },
+        {
+          "rank": 2,
+          "path": "docs/preview.md",
+          "line_start": 157,
+          "line_end": 171
+        }
+      ],
+      "total_sources": 2,
+      "budget_tokens": 767,
+      "answer_supported": false,
+      "context_available": true,
+      "covered_query_ids": [
+        "query-original"
+      ],
+      "source_policy_violations": false,
+      "admission_errors": {
+        "false_admit": 0,
+        "false_reject": 0
+      }
+    },
+    {
+      "task_id": "m15-hold-03",
+      "formulation": "RU",
+      "project": "starlette",
+      "condition": "lexical_rescue",
+      "document_found": true,
+      "fact_range_found": true,
+      "gold_in_candidates": true,
+      "gold_in_packet": true,
+      "gold_sources": [
+        {
+          "rank": 1,
+          "path": "docs/lifespan.md",
+          "line_start": 76,
+          "line_end": 92
+        }
+      ],
+      "total_sources": 2,
+      "budget_tokens": 782,
+      "answer_supported": false,
+      "context_available": true,
+      "covered_query_ids": [
+        "query-anchor-1"
+      ],
+      "source_policy_violations": false,
+      "admission_errors": {
+        "false_admit": 1,
+        "false_reject": 0
+      }
+    },
+    {
+      "task_id": "m15-hold-04",
+      "formulation": "mixed",
+      "project": "pydantic",
+      "condition": "lexical_rescue",
+      "document_found": true,
+      "fact_range_found": true,
+      "gold_in_candidates": true,
+      "gold_in_packet": true,
+      "gold_sources": [
+        {
+          "rank": 1,
+          "path": "docs/concepts/alias.md",
+          "line_start": 129,
+          "line_end": 164
+        }
+      ],
+      "total_sources": 1,
+      "budget_tokens": 729,
+      "answer_supported": false,
+      "context_available": true,
+      "covered_query_ids": [
+        "query-anchor-1"
+      ],
+      "source_policy_violations": false,
+      "admission_errors": {
+        "false_admit": 0,
+        "false_reject": 0
+      }
+    }
+  ],
+  "condition_C_dense_baseline": [
+    {
+      "task_id": "m15-hold-01",
+      "formulation": "mixed",
+      "project": "httpx",
+      "condition": "dense_baseline",
+      "document_found": true,
+      "fact_range_found": false,
+      "gold_in_candidates": true,
+      "gold_in_packet": false,
+      "gold_sources": [],
+      "total_sources": 2,
+      "budget_tokens": 791,
+      "answer_supported": false,
+      "context_available": true,
+      "covered_query_ids": [
+        "query-anchor-1"
+      ],
+      "source_policy_violations": false,
+      "admission_errors": {
+        "false_admit": 2,
+        "false_reject": 1
+      }
+    },
+    {
+      "task_id": "m15-hold-02",
+      "formulation": "EN",
+      "project": "ruff",
+      "condition": "dense_baseline",
+      "document_found": true,
+      "fact_range_found": true,
+      "gold_in_candidates": true,
+      "gold_in_packet": true,
+      "gold_sources": [
+        {
+          "rank": 1,
+          "path": "docs/preview.md",
+          "line_start": 157,
+          "line_end": 171
+        },
+        {
+          "rank": 2,
+          "path": "docs/preview.md",
+          "line_start": 173,
+          "line_end": 182
+        }
+      ],
+      "total_sources": 2,
+      "budget_tokens": 765,
+      "answer_supported": false,
+      "context_available": true,
+      "covered_query_ids": [
+        "query-original"
+      ],
+      "source_policy_violations": false,
+      "admission_errors": {
+        "false_admit": 0,
+        "false_reject": 0
+      }
+    },
+    {
+      "task_id": "m15-hold-03",
+      "formulation": "RU",
+      "project": "starlette",
+      "condition": "dense_baseline",
+      "document_found": true,
+      "fact_range_found": true,
+      "gold_in_candidates": true,
+      "gold_in_packet": true,
+      "gold_sources": [
+        {
+          "rank": 1,
+          "path": "docs/lifespan.md",
+          "line_start": 76,
+          "line_end": 92
+        }
+      ],
+      "total_sources": 2,
+      "budget_tokens": 768,
+      "answer_supported": false,
+      "context_available": true,
+      "covered_query_ids": [
+        "query-anchor-1"
+      ],
+      "source_policy_violations": false,
+      "admission_errors": {
+        "false_admit": 1,
+        "false_reject": 0
+      }
+    },
+    {
+      "task_id": "m15-hold-04",
+      "formulation": "mixed",
+      "project": "pydantic",
+      "condition": "dense_baseline",
+      "document_found": true,
+      "fact_range_found": true,
+      "gold_in_candidates": true,
+      "gold_in_packet": true,
+      "gold_sources": [
+        {
+          "rank": 1,
+          "path": "docs/concepts/alias.md",
+          "line_start": 129,
+          "line_end": 164
+        }
+      ],
+      "total_sources": 1,
+      "budget_tokens": 729,
+      "answer_supported": false,
+      "context_available": true,
+      "covered_query_ids": [
+        "query-anchor-1"
+      ],
+      "source_policy_violations": false,
+      "admission_errors": {
+        "false_admit": 0,
+        "false_reject": 0
+      }
+    }
+  ],
+  "condition_D_dense_rescue": [
+    {
+      "task_id": "m15-hold-01",
+      "formulation": "mixed",
+      "project": "httpx",
+      "condition": "dense_rescue",
+      "document_found": true,
+      "fact_range_found": true,
+      "gold_in_candidates": true,
+      "gold_in_packet": true,
+      "gold_sources": [
+        {
+          "rank": 2,
+          "path": "docs/advanced/timeouts.md",
+          "line_start": 30,
+          "line_end": 39
+        }
+      ],
+      "total_sources": 2,
+      "budget_tokens": 797,
+      "answer_supported": false,
+      "context_available": true,
+      "covered_query_ids": [
+        "query-anchor-1"
+      ],
+      "source_policy_violations": false,
+      "admission_errors": {
+        "false_admit": 1,
+        "false_reject": 0
+      }
+    },
+    {
+      "task_id": "m15-hold-02",
+      "formulation": "EN",
+      "project": "ruff",
+      "condition": "dense_rescue",
+      "document_found": true,
+      "fact_range_found": true,
+      "gold_in_candidates": true,
+      "gold_in_packet": true,
+      "gold_sources": [
+        {
+          "rank": 1,
+          "path": "docs/preview.md",
+          "line_start": 157,
+          "line_end": 171
+        },
+        {
+          "rank": 2,
+          "path": "docs/preview.md",
+          "line_start": 173,
+          "line_end": 182
+        }
+      ],
+      "total_sources": 2,
+      "budget_tokens": 765,
+      "answer_supported": false,
+      "context_available": true,
+      "covered_query_ids": [
+        "query-original"
+      ],
+      "source_policy_violations": false,
+      "admission_errors": {
+        "false_admit": 0,
+        "false_reject": 0
+      }
+    },
+    {
+      "task_id": "m15-hold-03",
+      "formulation": "RU",
+      "project": "starlette",
+      "condition": "dense_rescue",
+      "document_found": true,
+      "fact_range_found": true,
+      "gold_in_candidates": true,
+      "gold_in_packet": true,
+      "gold_sources": [
+        {
+          "rank": 1,
+          "path": "docs/lifespan.md",
+          "line_start": 76,
+          "line_end": 92
+        }
+      ],
+      "total_sources": 2,
+      "budget_tokens": 775,
+      "answer_supported": false,
+      "context_available": true,
+      "covered_query_ids": [
+        "query-anchor-1"
+      ],
+      "source_policy_violations": false,
+      "admission_errors": {
+        "false_admit": 1,
+        "false_reject": 0
+      }
+    },
+    {
+      "task_id": "m15-hold-04",
+      "formulation": "mixed",
+      "project": "pydantic",
+      "condition": "dense_rescue",
+      "document_found": true,
+      "fact_range_found": true,
+      "gold_in_candidates": true,
+      "gold_in_packet": true,
+      "gold_sources": [
+        {
+          "rank": 1,
+          "path": "docs/concepts/alias.md",
+          "line_start": 129,
+          "line_end": 164
+        }
+      ],
+      "total_sources": 1,
+      "budget_tokens": 729,
+      "answer_supported": false,
+      "context_available": true,
+      "covered_query_ids": [
+        "query-anchor-1"
+      ],
+      "source_policy_violations": false,
+      "admission_errors": {
+        "false_admit": 0,
+        "false_reject": 0
+      }
+    }
+  ],
+  "summary": {
+    "A_lexical_baseline": {
+      "document_found": 4,
+      "fact_range_found": 4,
+      "source_policy_violations": 0,
+      "false_admits": 2,
+      "budget_ok": 4,
+      "total": 4
+    },
+    "B_lexical_rescue": {
+      "document_found": 4,
+      "fact_range_found": 4,
+      "source_policy_violations": 0,
+      "false_admits": 2,
+      "budget_ok": 4,
+      "total": 4
+    },
+    "C_dense_baseline": {
+      "document_found": 4,
+      "fact_range_found": 3,
+      "source_policy_violations": 0,
+      "false_admits": 3,
+      "budget_ok": 4,
+      "total": 4
+    },
+    "D_dense_rescue": {
+      "document_found": 4,
+      "fact_range_found": 4,
+      "source_policy_violations": 0,
+      "false_admits": 2,
+      "budget_ok": 4,
+      "total": 4
+    }
+  }
+}

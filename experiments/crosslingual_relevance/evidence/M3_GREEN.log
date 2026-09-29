@@ -1,0 +1,31 @@
+============================= test session starts ==============================
+platform linux -- Python 3.13.12, pytest-9.0.3, pluggy-1.6.0 -- /home/viadmin/StudioProjects/hermes/docmancer/.venv/bin/python
+cachedir: .pytest_cache
+rootdir: /home/viadmin/StudioProjects/hermes/docmancer
+configfile: pytest.ini
+plugins: anyio-4.13.0, asyncio-1.4.0
+asyncio: mode=Mode.AUTO, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collecting ... collected 20 items
+
+tests/docs/test_bounded_contextual_relevance.py::test_without_rescue_no_qualified_traces PASSED [  5%]
+tests/docs/test_bounded_contextual_relevance.py::test_base_case_rescued PASSED [ 10%]
+tests/docs/test_bounded_contextual_relevance.py::test_wrong_project_not_rescued PASSED [ 15%]
+tests/docs/test_bounded_contextual_relevance.py::test_stale_snapshot_not_rescued PASSED [ 20%]
+tests/docs/test_bounded_contextual_relevance.py::test_unsynchronized_index_not_rescued PASSED [ 25%]
+tests/docs/test_bounded_contextual_relevance.py::test_unsafe_evidence_not_rescued PASSED [ 30%]
+tests/docs/test_bounded_contextual_relevance.py::test_forbidden_evidence_term_not_rescued PASSED [ 35%]
+tests/docs/test_bounded_contextual_relevance.py::test_missing_exact_terms_not_rescued PASSED [ 40%]
+tests/docs/test_bounded_contextual_relevance.py::test_missing_bound_subject_not_rescued PASSED [ 45%]
+tests/docs/test_bounded_contextual_relevance.py::test_missing_local_demand_not_rescued PASSED [ 50%]
+tests/docs/test_bounded_contextual_relevance.py::test_metadata_only_evidence_not_rescued PASSED [ 55%]
+tests/docs/test_bounded_contextual_relevance.py::test_below_threshold_not_rescued PASSED [ 60%]
+tests/docs/test_bounded_contextual_relevance.py::test_rescue_no_attributable_coverage PASSED [ 65%]
+tests/docs/test_bounded_contextual_relevance.py::test_rescue_no_answer_supported_edit_ready PASSED [ 70%]
+tests/docs/test_bounded_contextual_relevance.py::test_score_binding_records_text_hash PASSED [ 75%]
+tests/docs/test_bounded_contextual_relevance.py::test_score_binding_changes_with_text PASSED [ 80%]
+tests/docs/test_bounded_contextual_relevance.py::test_forged_score_in_probe_ignored PASSED [ 85%]
+tests/docs/test_bounded_contextual_relevance.py::test_scorer_error_degraded_fallback PASSED [ 90%]
+tests/docs/test_bounded_contextual_relevance.py::test_scorer_evaluation_limit PASSED [ 95%]
+tests/docs/test_bounded_contextual_relevance.py::test_cached_score_no_reevaluation PASSED [100%]
+
+============================== 20 passed in 0.19s ==============================

@@ -1,0 +1,567 @@
+{
+  "schema_version": 1,
+  "created": "2026-09-28",
+  "git_revision": "58c7f37c2a5ef686bcd6562abbade91ba94e347a",
+  "description": "M1.5 frozen evaluation set: 12 semantic tasks from 4 documents, split 4/4/4. Each task has a question (EN/RU/mixed), gold passages, and a block pool with three independent labels: source_allowed, relevant_to_question, covered_fact_ids. Facts are verifiable rules/relationships, not individual words. Typer-05 is additional development control, not counted in the 12.",
+  "documents": [
+    "eval/evidence_quality_v2/sources/httpx/docs/advanced/timeouts.md",
+    "eval/evidence_quality_v2/sources/ruff/docs/preview.md",
+    "eval/evidence_quality_v2/sources/starlette/docs/lifespan.md",
+    "eval/evidence_quality_v2/sources/pydantic/docs/concepts/alias.md"
+  ],
+  "label_schema": {
+    "source_allowed": "true if the block is from the correct project and version; false for wrong-version or wrong-project blocks",
+    "relevant_to_question": "true if the block contains information that helps answer the question, regardless of source admissibility",
+    "covered_fact_ids": "list of fact IDs whose verifiable rule is present in the block text; empty if no fact is covered"
+  },
+  "splits": {
+    "development": [
+      {
+        "id": "m15-dev-01",
+        "document": "eval/evidence_quality_v2/sources/httpx/docs/advanced/timeouts.md",
+        "project": "httpx",
+        "formulation": "mixed",
+        "question": "Какое поведение timeout по умолчанию в HTTPX: сколько секунд и какое исключение?",
+        "facts": [
+          {
+            "fact_id": "httpx-default-timeout",
+            "description": "HTTPX enforces timeouts by default, raising TimeoutException after 5 seconds of network inactivity"
+          }
+        ],
+        "blocks": [
+          {
+            "path": "eval/evidence_quality_v2/sources/httpx/docs/advanced/timeouts.md",
+            "line_start": 1, "line_end": 4,
+            "source_allowed": true, "relevant_to_question": true,
+            "covered_fact_ids": ["httpx-default-timeout"],
+            "label_reason": "States default 5s timeout and TimeoutException"
+          },
+          {
+            "path": "eval/evidence_quality_v2/sources/httpx/docs/advanced/timeouts.md",
+            "line_start": 32, "line_end": 39,
+            "source_allowed": true, "relevant_to_question": false,
+            "covered_fact_ids": [],
+            "label_reason": "Discusses setting custom client timeout, not default behavior"
+          },
+          {
+            "path": "eval/evidence_quality_v2/sources/ruff/docs/preview.md",
+            "line_start": 1, "line_end": 8,
+            "source_allowed": false, "relevant_to_question": false,
+            "covered_fact_ids": [],
+            "label_reason": "Wrong project; semantically unrelated"
+          },
+          {
+            "path": "eval/evidence_quality_v2/sources/starlette/docs/lifespan.md",
+            "line_start": 27, "line_end": 30,
+            "source_allowed": false, "relevant_to_question": false,
+            "covered_fact_ids": [],
+            "label_reason": "Wrong project; mentions 'default' but about lifespan, not timeout"
+          }
+        ]
+      },
+      {
+        "id": "m15-dev-02",
+        "document": "eval/evidence_quality_v2/sources/ruff/docs/preview.md",
+        "project": "ruff",
+        "formulation": "EN",
+        "question": "Does enabling preview automatically enable all preview rules?",
+        "facts": [
+          {
+            "fact_id": "ruff-preview-not-automatic",
+            "description": "Enabling preview mode does not on its own enable all preview rules; a preview-marked rule can only be selected if preview mode is enabled"
+          }
+        ],
+        "blocks": [
+          {
+            "path": "eval/evidence_quality_v2/sources/ruff/docs/preview.md",
+            "line_start": 62, "line_end": 63,
+            "source_allowed": true, "relevant_to_question": true,
+            "covered_fact_ids": ["ruff-preview-not-automatic"],
+            "label_reason": "Directly states preview rules require preview mode, not automatic"
+          },
+          {
+            "path": "eval/evidence_quality_v2/sources/ruff/docs/preview.md",
+            "line_start": 1, "line_end": 8,
+            "source_allowed": true, "relevant_to_question": true,
+            "covered_fact_ids": ["ruff-preview-not-automatic"],
+            "label_reason": "States enabling preview does not on its own enable all preview rules"
+          },
+          {
+            "path": "eval/evidence_quality_v2/sources/ruff/docs/preview.md",
+            "line_start": 159, "line_end": 182,
+            "source_allowed": true, "relevant_to_question": false,
+            "covered_fact_ids": [],
+            "label_reason": "Discusses explicit-preview-rules setting, not whether preview enables all rules"
+          },
+          {
+            "path": "eval/evidence_quality_v2/sources/httpx/docs/advanced/timeouts.md",
+            "line_start": 1, "line_end": 4,
+            "source_allowed": false, "relevant_to_question": false,
+            "covered_fact_ids": [],
+            "label_reason": "Wrong project; unrelated"
+          }
+        ]
+      },
+      {
+        "id": "m15-dev-03",
+        "document": "eval/evidence_quality_v2/sources/starlette/docs/lifespan.md",
+        "project": "starlette",
+        "formulation": "RU",
+        "question": "Когда выполняется teardown lifespan относительно соединений и фоновых задач?",
+        "facts": [
+          {
+            "fact_id": "starlette-teardown-ordering",
+            "description": "Lifespan teardown runs once all connections are closed and all in-process background tasks have completed"
+          }
+        ],
+        "blocks": [
+          {
+            "path": "eval/evidence_quality_v2/sources/starlette/docs/lifespan.md",
+            "line_start": 29, "line_end": 30,
+            "source_allowed": true, "relevant_to_question": true,
+            "covered_fact_ids": ["starlette-teardown-ordering"],
+            "label_reason": "Directly states teardown runs after connections closed and background tasks completed"
+          },
+          {
+            "path": "eval/evidence_quality_v2/sources/starlette/docs/lifespan.md",
+            "line_start": 27, "line_end": 27,
+            "source_allowed": true, "relevant_to_question": false,
+            "covered_fact_ids": [],
+            "label_reason": "About startup blocking, not teardown ordering"
+          },
+          {
+            "path": "eval/evidence_quality_v2/sources/starlette/docs/lifespan.md",
+            "line_start": 76, "line_end": 92,
+            "source_allowed": true, "relevant_to_question": false,
+            "covered_fact_ids": [],
+            "label_reason": "About TestClient context manager, not teardown ordering"
+          },
+          {
+            "path": "eval/evidence_quality_v2/sources/pydantic/docs/concepts/alias.md",
+            "line_start": 1, "line_end": 13,
+            "source_allowed": false, "relevant_to_question": false,
+            "covered_fact_ids": [],
+            "label_reason": "Wrong project; unrelated"
+          }
+        ]
+      },
+      {
+        "id": "m15-dev-04",
+        "document": "eval/evidence_quality_v2/sources/pydantic/docs/concepts/alias.md",
+        "project": "pydantic",
+        "formulation": "mixed",
+        "question": "Что specifies AliasPath: какой path to a field using aliases?",
+        "facts": [
+          {
+            "fact_id": "pydantic-aliaspath-purpose",
+            "description": "AliasPath specifies a path to a field value using an alias key and a positional index"
+          }
+        ],
+        "blocks": [
+          {
+            "path": "eval/evidence_quality_v2/sources/pydantic/docs/concepts/alias.md",
+            "line_start": 25, "line_end": 26,
+            "source_allowed": true, "relevant_to_question": true,
+            "covered_fact_ids": ["pydantic-aliaspath-purpose"],
+            "label_reason": "Directly states AliasPath specifies a path to a field using aliases"
+          },
+          {
+            "path": "eval/evidence_quality_v2/sources/pydantic/docs/concepts/alias.md",
+            "line_start": 44, "line_end": 45,
+            "source_allowed": true, "relevant_to_question": true,
+            "covered_fact_ids": ["pydantic-aliaspath-purpose"],
+            "label_reason": "Explains alias + index path mechanism"
+          },
+          {
+            "path": "eval/evidence_quality_v2/sources/pydantic/docs/concepts/alias.md",
+            "line_start": 136, "line_end": 140,
+            "source_allowed": true, "relevant_to_question": false,
+            "covered_fact_ids": [],
+            "label_reason": "About AliasGenerator, not AliasPath"
+          },
+          {
+            "path": "eval/evidence_quality_v2/sources/starlette/docs/lifespan.md",
+            "line_start": 37, "line_end": 38,
+            "source_allowed": false, "relevant_to_question": false,
+            "covered_fact_ids": [],
+            "label_reason": "Wrong project; uses word 'state' but unrelated"
+          }
+        ]
+      }
+    ],
+    "calibration": [
+      {
+        "id": "m15-cal-01",
+        "document": "eval/evidence_quality_v2/sources/httpx/docs/advanced/timeouts.md",
+        "project": "httpx",
+        "formulation": "RU",
+        "question": "Назови четыре типа timeout в HTTPX и объясни, что ограничивает каждый.",
+        "facts": [
+          {
+            "fact_id": "httpx-four-timeout-types",
+            "description": "HTTPX defines four timeout types (connect, read, write, pool), each with a distinct exception"
+          }
+        ],
+        "blocks": [
+          {
+            "path": "eval/evidence_quality_v2/sources/httpx/docs/advanced/timeouts.md",
+            "line_start": 45, "line_end": 61,
+            "source_allowed": true, "relevant_to_question": true,
+            "covered_fact_ids": ["httpx-four-timeout-types"],
+            "label_reason": "Lists all four timeout types with descriptions and exceptions"
+          },
+          {
+            "path": "eval/evidence_quality_v2/sources/httpx/docs/advanced/timeouts.md",
+            "line_start": 63, "line_end": 71,
+            "source_allowed": true, "relevant_to_question": false,
+            "covered_fact_ids": [],
+            "label_reason": "About Timeout config API, not the four types"
+          },
+          {
+            "path": "eval/evidence_quality_v2/sources/httpx/docs/advanced/timeouts.md",
+            "line_start": 1, "line_end": 4,
+            "source_allowed": true, "relevant_to_question": false,
+            "covered_fact_ids": [],
+            "label_reason": "About default behavior, not the four types"
+          },
+          {
+            "path": "eval/evidence_quality_v2/sources/ruff/docs/preview.md",
+            "line_start": 186, "line_end": 187,
+            "source_allowed": false, "relevant_to_question": false,
+            "covered_fact_ids": [],
+            "label_reason": "Wrong project; mentions 'deprecated' and 'disabled' but unrelated"
+          }
+        ]
+      },
+      {
+        "id": "m15-cal-02",
+        "document": "eval/evidence_quality_v2/sources/ruff/docs/preview.md",
+        "project": "ruff",
+        "formulation": "mixed",
+        "question": "Что happens to deprecated rules когда preview mode enabled: will an error be raised?",
+        "facts": [
+          {
+            "fact_id": "ruff-deprecated-in-preview",
+            "description": "When preview mode is enabled, deprecated rules are disabled; explicitly selecting a deprecated rule raises an error"
+          }
+        ],
+        "blocks": [
+          {
+            "path": "eval/evidence_quality_v2/sources/ruff/docs/preview.md",
+            "line_start": 186, "line_end": 187,
+            "source_allowed": true, "relevant_to_question": true,
+            "covered_fact_ids": ["ruff-deprecated-in-preview"],
+            "label_reason": "Directly states deprecated rules disabled in preview, error on explicit selection"
+          },
+          {
+            "path": "eval/evidence_quality_v2/sources/ruff/docs/preview.md",
+            "line_start": 159, "line_end": 182,
+            "source_allowed": true, "relevant_to_question": false,
+            "covered_fact_ids": [],
+            "label_reason": "About explicit-preview-rules setting, not deprecated rules"
+          },
+          {
+            "path": "eval/evidence_quality_v2/sources/ruff/docs/preview.md",
+            "line_start": 62, "line_end": 63,
+            "source_allowed": true, "relevant_to_question": false,
+            "covered_fact_ids": [],
+            "label_reason": "About preview rule selection, not deprecated rules"
+          },
+          {
+            "path": "eval/evidence_quality_v2/sources/httpx/docs/advanced/timeouts.md",
+            "line_start": 57, "line_end": 61,
+            "source_allowed": false, "relevant_to_question": false,
+            "covered_fact_ids": [],
+            "label_reason": "Wrong project; mentions 'pool' and 'connections' but unrelated"
+          }
+        ]
+      },
+      {
+        "id": "m15-cal-03",
+        "document": "eval/evidence_quality_v2/sources/starlette/docs/lifespan.md",
+        "project": "starlette",
+        "formulation": "EN",
+        "question": "Is the request state a deep or shallow copy of the lifespan state?",
+        "facts": [
+          {
+            "fact_id": "starlette-state-shallow-copy",
+            "description": "The state received on requests is a shallow copy of the state received on the lifespan handler"
+          }
+        ],
+        "blocks": [
+          {
+            "path": "eval/evidence_quality_v2/sources/starlette/docs/lifespan.md",
+            "line_start": 73, "line_end": 74,
+            "source_allowed": true, "relevant_to_question": true,
+            "covered_fact_ids": ["starlette-state-shallow-copy"],
+            "label_reason": "Directly states request state is a shallow copy of lifespan state"
+          },
+          {
+            "path": "eval/evidence_quality_v2/sources/starlette/docs/lifespan.md",
+            "line_start": 37, "line_end": 38,
+            "source_allowed": true, "relevant_to_question": true,
+            "covered_fact_ids": [],
+            "label_reason": "Partially relevant: mentions state is shared, but does not say shallow copy"
+          },
+          {
+            "path": "eval/evidence_quality_v2/sources/starlette/docs/lifespan.md",
+            "line_start": 27, "line_end": 30,
+            "source_allowed": true, "relevant_to_question": false,
+            "covered_fact_ids": [],
+            "label_reason": "About startup/teardown ordering, not state copy semantics"
+          },
+          {
+            "path": "eval/evidence_quality_v2/sources/pydantic/docs/concepts/alias.md",
+            "line_start": 194, "line_end": 200,
+            "source_allowed": false, "relevant_to_question": false,
+            "covered_fact_ids": [],
+            "label_reason": "Wrong project; mentions 'override' but about alias_priority, not state"
+          }
+        ]
+      },
+      {
+        "id": "m15-cal-04",
+        "document": "eval/evidence_quality_v2/sources/pydantic/docs/concepts/alias.md",
+        "project": "pydantic",
+        "formulation": "RU",
+        "question": "В чём различие alias_priority=1 и alias_priority=2?",
+        "facts": [
+          {
+            "fact_id": "pydantic-alias-priority",
+            "description": "alias_priority=2 prevents the alias from being overridden by the generator; alias_priority=1 allows the generator to override it"
+          }
+        ],
+        "blocks": [
+          {
+            "path": "eval/evidence_quality_v2/sources/pydantic/docs/concepts/alias.md",
+            "line_start": 194, "line_end": 200,
+            "source_allowed": true, "relevant_to_question": true,
+            "covered_fact_ids": ["pydantic-alias-priority"],
+            "label_reason": "Directly lists alias_priority=2 (not overridden) and =1 (overridden)"
+          },
+          {
+            "path": "eval/evidence_quality_v2/sources/pydantic/docs/concepts/alias.md",
+            "line_start": 168, "line_end": 168,
+            "source_allowed": true, "relevant_to_question": true,
+            "covered_fact_ids": [],
+            "label_reason": "Partially relevant: states field alias takes precedence by default, but does not explain priority values"
+          },
+          {
+            "path": "eval/evidence_quality_v2/sources/pydantic/docs/concepts/alias.md",
+            "line_start": 136, "line_end": 140,
+            "source_allowed": true, "relevant_to_question": false,
+            "covered_fact_ids": [],
+            "label_reason": "About AliasGenerator purpose, not priority"
+          },
+          {
+            "path": "eval/evidence_quality_v2/sources/httpx/docs/advanced/timeouts.md",
+            "line_start": 32, "line_end": 39,
+            "source_allowed": false, "relevant_to_question": false,
+            "covered_fact_ids": [],
+            "label_reason": "Wrong project; unrelated"
+          }
+        ]
+      }
+    ],
+    "holdout": [
+      {
+        "id": "m15-hold-01",
+        "document": "eval/evidence_quality_v2/sources/httpx/docs/advanced/timeouts.md",
+        "project": "httpx",
+        "formulation": "mixed",
+        "question": "Как отключить all timeouts для HTTPX Client: какой аргумент передать?",
+        "facts": [
+          {
+            "fact_id": "httpx-disable-timeouts",
+            "description": "Pass timeout=None to httpx.Client() to disable all timeouts by default"
+          }
+        ],
+        "blocks": [
+          {
+            "path": "eval/evidence_quality_v2/sources/httpx/docs/advanced/timeouts.md",
+            "line_start": 32, "line_end": 39,
+            "source_allowed": true, "relevant_to_question": true,
+            "covered_fact_ids": ["httpx-disable-timeouts"],
+            "label_reason": "Shows httpx.Client(timeout=None) to disable all timeouts"
+          },
+          {
+            "path": "eval/evidence_quality_v2/sources/httpx/docs/advanced/timeouts.md",
+            "line_start": 19, "line_end": 28,
+            "source_allowed": true, "relevant_to_question": true,
+            "covered_fact_ids": [],
+            "label_reason": "Partially relevant: shows per-request timeout=None, not client-level"
+          },
+          {
+            "path": "eval/evidence_quality_v2/sources/httpx/docs/advanced/timeouts.md",
+            "line_start": 1, "line_end": 4,
+            "source_allowed": true, "relevant_to_question": false,
+            "covered_fact_ids": [],
+            "label_reason": "About default behavior, not disabling"
+          },
+          {
+            "path": "eval/evidence_quality_v2/sources/ruff/docs/preview.md",
+            "line_start": 12, "line_end": 13,
+            "source_allowed": false, "relevant_to_question": false,
+            "covered_fact_ids": [],
+            "label_reason": "Wrong project; mentions 'enable' but about preview mode"
+          }
+        ]
+      },
+      {
+        "id": "m15-hold-02",
+        "document": "eval/evidence_quality_v2/sources/ruff/docs/preview.md",
+        "project": "ruff",
+        "formulation": "EN",
+        "question": "What happens to explicit-preview-rules setting when preview mode is not enabled?",
+        "facts": [
+          {
+            "fact_id": "ruff-explicit-preview-no-effect",
+            "description": "The explicit-preview-rules setting has no effect when preview mode is not enabled"
+          }
+        ],
+        "blocks": [
+          {
+            "path": "eval/evidence_quality_v2/sources/ruff/docs/preview.md",
+            "line_start": 182, "line_end": 182,
+            "source_allowed": true, "relevant_to_question": true,
+            "covered_fact_ids": ["ruff-explicit-preview-no-effect"],
+            "label_reason": "Directly states the setting has no effect without preview mode"
+          },
+          {
+            "path": "eval/evidence_quality_v2/sources/ruff/docs/preview.md",
+            "line_start": 159, "line_end": 161,
+            "source_allowed": true, "relevant_to_question": true,
+            "covered_fact_ids": [],
+            "label_reason": "Partially relevant: introduces the setting but does not state the no-effect rule"
+          },
+          {
+            "path": "eval/evidence_quality_v2/sources/ruff/docs/preview.md",
+            "line_start": 186, "line_end": 187,
+            "source_allowed": true, "relevant_to_question": false,
+            "covered_fact_ids": [],
+            "label_reason": "About deprecated rules, not explicit-preview-rules"
+          },
+          {
+            "path": "eval/evidence_quality_v2/sources/starlette/docs/lifespan.md",
+            "line_start": 78, "line_end": 78,
+            "source_allowed": false, "relevant_to_question": false,
+            "covered_fact_ids": [],
+            "label_reason": "Wrong project; mentions 'ensure' but about TestClient"
+          }
+        ]
+      },
+      {
+        "id": "m15-hold-03",
+        "document": "eval/evidence_quality_v2/sources/starlette/docs/lifespan.md",
+        "project": "starlette",
+        "formulation": "RU",
+        "question": "Как использовать TestClient, чтобы lifespan выполнился в тестах?",
+        "facts": [
+          {
+            "fact_id": "starlette-testclient-context-manager",
+            "description": "TestClient must be used as a context manager for the lifespan to be called"
+          }
+        ],
+        "blocks": [
+          {
+            "path": "eval/evidence_quality_v2/sources/starlette/docs/lifespan.md",
+            "line_start": 78, "line_end": 92,
+            "source_allowed": true, "relevant_to_question": true,
+            "covered_fact_ids": ["starlette-testclient-context-manager"],
+            "label_reason": "Shows TestClient as context manager with lifespan explanation"
+          },
+          {
+            "path": "eval/evidence_quality_v2/sources/starlette/docs/lifespan.md",
+            "line_start": 27, "line_end": 30,
+            "source_allowed": true, "relevant_to_question": false,
+            "covered_fact_ids": [],
+            "label_reason": "About startup/teardown ordering, not TestClient"
+          },
+          {
+            "path": "eval/evidence_quality_v2/sources/pydantic/docs/concepts/alias.md",
+            "line_start": 40, "line_end": 45,
+            "source_allowed": false, "relevant_to_question": false,
+            "covered_fact_ids": [],
+            "label_reason": "Wrong project; unrelated"
+          }
+        ]
+      },
+      {
+        "id": "m15-hold-04",
+        "document": "eval/evidence_quality_v2/sources/pydantic/docs/concepts/alias.md",
+        "project": "pydantic",
+        "formulation": "mixed",
+        "question": "Как AliasGenerator помогает use different naming conventions при loading and saving?",
+        "facts": [
+          {
+            "fact_id": "pydantic-aliasgenerator-purpose",
+            "description": "AliasGenerator allows specifying different alias generators for validation and serialization, enabling different naming conventions for loading and saving"
+          }
+        ],
+        "blocks": [
+          {
+            "path": "eval/evidence_quality_v2/sources/pydantic/docs/concepts/alias.md",
+            "line_start": 136, "line_end": 140,
+            "source_allowed": true, "relevant_to_question": true,
+            "covered_fact_ids": ["pydantic-aliasgenerator-purpose"],
+            "label_reason": "Directly states different generators for validation/serialization, different conventions"
+          },
+          {
+            "path": "eval/evidence_quality_v2/sources/pydantic/docs/concepts/alias.md",
+            "line_start": 168, "line_end": 168,
+            "source_allowed": true, "relevant_to_question": false,
+            "covered_fact_ids": [],
+            "label_reason": "About field alias precedence, not AliasGenerator"
+          },
+          {
+            "path": "eval/evidence_quality_v2/sources/pydantic/docs/concepts/alias.md",
+            "line_start": 25, "line_end": 26,
+            "source_allowed": true, "relevant_to_question": false,
+            "covered_fact_ids": [],
+            "label_reason": "About AliasPath, not AliasGenerator"
+          },
+          {
+            "path": "eval/evidence_quality_v2/sources/httpx/docs/advanced/timeouts.md",
+            "line_start": 45, "line_end": 46,
+            "source_allowed": false, "relevant_to_question": false,
+            "covered_fact_ids": [],
+            "label_reason": "Wrong project; mentions 'types' but about timeouts"
+          }
+        ]
+      }
+    ]
+  },
+  "split_invariants": {
+    "development": {
+      "tasks": 4,
+      "documents": 4,
+      "formulations": ["mixed", "EN", "RU", "mixed"],
+      "has_hard_irrelevant": true,
+      "has_partially_useful": false,
+      "has_no_relevant_pool": false
+    },
+    "calibration": {
+      "tasks": 4,
+      "documents": 4,
+      "formulations": ["RU", "mixed", "EN", "RU"],
+      "has_hard_irrelevant": true,
+      "has_partially_useful": true,
+      "has_no_relevant_pool": false
+    },
+    "holdout": {
+      "tasks": 4,
+      "documents": 4,
+      "formulations": ["mixed", "EN", "RU", "mixed"],
+      "has_hard_irrelevant": true,
+      "has_partially_useful": true,
+      "has_no_relevant_pool": false,
+      "min_topics_from_different_documents": 2,
+      "actual_topics_from_different_documents": 4
+    }
+  },
+  "cross_split_notes": {
+    "document_overlap": "All 4 documents appear in all 3 splits, but with different facts. This is a small pilot, not proof of generalization to unknown libraries.",
+    "variant_rule": "All paraphrases, translations, and closely related variants of one fact belong to one split. No fact appears in more than one split.",
+    "typer_role": "Typer-05 from the existing evidence_quality_v2 cases is additional development control, not counted in the 12 tasks."
+  }
+}

@@ -1,0 +1,29 @@
+Working directory: /tmp/m4-step2-n7bxy3mw
+  Indexing httpx...
+  Indexing ruff...
+  Indexing starlette...
+  Indexing pydantic...
+  Indexing typer...
+
+All 5 projects indexed with vectors.
+
+============================================================
+STEP 2: Real get_docs_context (dense mode, with vectors)
+============================================================
+  [FAIL] m15-dev-01 (mixed): gold_found=False rank=None sources=2 context_available=True
+  [PASS] m15-dev-02 (EN): gold_found=True rank=1 sources=2 context_available=True
+  [PASS] m15-dev-03 (RU): gold_found=True rank=2 sources=2 context_available=True
+  [PASS] m15-dev-04 (mixed): gold_found=True rank=1 sources=1 context_available=True
+  [PASS] typer-05-en (EN): gold_found=True rank=1 sources=2 context_available=True
+  [FAIL] typer-05-mixed (mixed): gold_found=False rank=None sources=0 context_available=False
+  [FAIL] typer-05-ru (RU): gold_found=False rank=None sources=0 context_available=False
+
+============================================================
+SUMMARY
+============================================================
+Gold found: 4/7
+  EN: 2/2
+  RU: 1/2
+  mixed: 1/3
+
+Results saved to experiments/crosslingual_relevance/m4_step2_results.json

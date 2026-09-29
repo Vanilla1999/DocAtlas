@@ -1,0 +1,10 @@
+{
+  "schema_version": 1,
+  "module_labels": {
+    "tests/docs/test_multilingual_first_packet.py": "behavioral"
+  },
+  "node_overrides": {},
+  "module_node_hashes": {
+    "tests/docs/test_multilingual_first_packet.py": "5e6e76f8b0cb88829eae2e9881d4a18ba0e32b8addd9c85db7354aece533ff95"
+  }
+}

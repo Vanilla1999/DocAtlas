@@ -1,0 +1,238 @@
+{
+  "step1": [
+    {
+      "task_id": "m15-dev-01",
+      "formulation": "mixed",
+      "project": "httpx",
+      "mode_requested": "dense",
+      "mode_used": "dense/hierarchical",
+      "candidate_counts": {
+        "dense": 14,
+        "dense.stage2": 14
+      },
+      "failures": {},
+      "total_chunks": 14,
+      "gold_found": true,
+      "gold_rank": 1,
+      "gold_ranks": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "dense_contributed_to_gold": true
+    },
+    {
+      "task_id": "m15-dev-02",
+      "formulation": "EN",
+      "project": "ruff",
+      "mode_requested": "dense",
+      "mode_used": "dense/hierarchical",
+      "candidate_counts": {
+        "dense": 40,
+        "dense.stage2": 40
+      },
+      "failures": {},
+      "total_chunks": 19,
+      "gold_found": true,
+      "gold_rank": 1,
+      "gold_ranks": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10
+      ],
+      "dense_contributed_to_gold": true
+    },
+    {
+      "task_id": "m15-dev-03",
+      "formulation": "RU",
+      "project": "starlette",
+      "mode_requested": "dense",
+      "mode_used": "dense/hierarchical",
+      "candidate_counts": {
+        "dense": 12,
+        "dense.stage2": 12
+      },
+      "failures": {},
+      "total_chunks": 12,
+      "gold_found": true,
+      "gold_rank": 1,
+      "gold_ranks": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ],
+      "dense_contributed_to_gold": true
+    },
+    {
+      "task_id": "m15-dev-04",
+      "formulation": "mixed",
+      "project": "pydantic",
+      "mode_requested": "dense",
+      "mode_used": "dense/hierarchical",
+      "candidate_counts": {
+        "dense": 40,
+        "dense.stage2": 40
+      },
+      "failures": {},
+      "total_chunks": 20,
+      "gold_found": true,
+      "gold_rank": 1,
+      "gold_ranks": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19
+      ],
+      "dense_contributed_to_gold": true
+    },
+    {
+      "task_id": "typer-05-en",
+      "formulation": "EN",
+      "project": "typer",
+      "mode_requested": "dense",
+      "mode_used": "dense/hierarchical",
+      "candidate_counts": {
+        "dense": 21,
+        "dense.stage2": 21
+      },
+      "failures": {},
+      "total_chunks": 20,
+      "gold_found": true,
+      "gold_rank": 1,
+      "gold_ranks": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        16,
+        18
+      ],
+      "dense_contributed_to_gold": true
+    },
+    {
+      "task_id": "typer-05-mixed",
+      "formulation": "mixed",
+      "project": "typer",
+      "mode_requested": "dense",
+      "mode_used": "dense/hierarchical",
+      "candidate_counts": {
+        "dense": 21,
+        "dense.stage2": 21
+      },
+      "failures": {},
+      "total_chunks": 20,
+      "gold_found": true,
+      "gold_rank": 1,
+      "gold_ranks": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        16,
+        18
+      ],
+      "dense_contributed_to_gold": true
+    },
+    {
+      "task_id": "typer-05-ru",
+      "formulation": "RU",
+      "project": "typer",
+      "mode_requested": "dense",
+      "mode_used": "dense/hierarchical",
+      "candidate_counts": {
+        "dense": 21,
+        "dense.stage2": 21
+      },
+      "failures": {},
+      "total_chunks": 20,
+      "gold_found": true,
+      "gold_rank": 1,
+      "gold_ranks": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        9,
+        12,
+        13,
+        16,
+        18,
+        20
+      ],
+      "dense_contributed_to_gold": true
+    }
+  ],
+  "negative_controls": [
+    {
+      "task_id": "m15-dev-01",
+      "control": "wrong_project",
+      "total_chunks": 16,
+      "gold_found": false,
+      "mode_used": "dense/hierarchical"
+    },
+    {
+      "task_id": "m15-dev-03",
+      "control": "wrong_project",
+      "total_chunks": 14,
+      "gold_found": false,
+      "mode_used": "dense/hierarchical"
+    }
+  ],
+  "hybrid_strict": {
+    "hybrid_strict": "expected_error",
+    "error_type": "HybridRetrievalError"
+  },
+  "summary": {
+    "total_tasks": 7,
+    "recall_at_5": 1.0,
+    "recall_at_20": 1.0,
+    "degraded_runs": 0
+  }
+}

@@ -1,0 +1,28 @@
+============================= test session starts ==============================
+platform linux -- Python 3.13.12, pytest-9.0.3, pluggy-1.6.0 -- /home/viadmin/StudioProjects/hermes/docmancer/.venv/bin/python
+cachedir: .pytest_cache
+rootdir: /home/viadmin/StudioProjects/hermes/docmancer
+configfile: pytest.ini
+plugins: anyio-4.13.0, asyncio-1.4.0
+asyncio: mode=Mode.AUTO, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collecting ... collected 7 items
+
+tests/docs/test_m5_first_packet_green.py::test_lexical_baseline_mixed_ru_fails PASSED [ 14%]
+tests/docs/test_m5_first_packet_green.py::test_lexical_rescue_mixed_ru_fails PASSED [ 28%]
+tests/docs/test_m5_first_packet_green.py::test_dense_baseline_mixed_ru_fails PASSED [ 42%]
+tests/docs/test_m5_first_packet_green.py::test_dense_rescue_mixed_ru_passes PASSED [ 57%]
+tests/docs/test_m5_first_packet_green.py::test_dense_rescue_pure_ru_passes PASSED [ 71%]
+tests/docs/test_m5_first_packet_green.py::test_dense_rescue_english_control_passes PASSED [ 85%]
+tests/docs/test_m5_first_packet_green.py::test_dense_rescue_no_coverage PASSED [100%]
+
+=============================== warnings summary ===============================
+tests/docs/test_m5_first_packet_green.py::test_dense_baseline_mixed_ru_fails
+tests/docs/test_m5_first_packet_green.py::test_dense_rescue_mixed_ru_passes
+tests/docs/test_m5_first_packet_green.py::test_dense_rescue_pure_ru_passes
+tests/docs/test_m5_first_packet_green.py::test_dense_rescue_english_control_passes
+tests/docs/test_m5_first_packet_green.py::test_dense_rescue_no_coverage
+  /home/viadmin/StudioProjects/hermes/docmancer/docmancer/embeddings/fastembed_provider.py:69: UserWarning: The model sentence-transformers/paraphrase-multilingual-mpnet-base-v2 now uses mean pooling instead of CLS embedding. In order to preserve the previous behaviour, consider either pinning fastembed version to 0.5.1 or using `add_custom_model` functionality.
+    self._dense = TextEmbedding(model_name=self.model_name, cache_dir=cache_dir)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+======================== 7 passed, 5 warnings in 25.32s ========================

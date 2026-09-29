@@ -1,0 +1,73 @@
+Working directory: /tmp/m6-holdout-dhbdck_0
+Loaded 4 projects
+Building vector service...
+All projects indexed with vectors
+Building lexical service...
+All projects indexed (lexical)
+
+============================================================
+CONDITION A: lexical + baseline
+============================================================
+  [PASS] m15-hold-01 (mixed): gold_in_candidates=True gold_in_packet=True sources=2 budget=792
+  [PASS] m15-hold-02 (EN): gold_in_candidates=True gold_in_packet=True sources=2 budget=767
+  [PASS] m15-hold-03 (RU): gold_in_candidates=True gold_in_packet=True sources=2 budget=774
+  [PASS] m15-hold-04 (mixed): gold_in_candidates=True gold_in_packet=True sources=1 budget=729
+
+============================================================
+CONDITION B: lexical + rescue
+============================================================
+  [PASS] m15-hold-01 (mixed): gold_in_candidates=True gold_in_packet=True sources=2
+  [PASS] m15-hold-02 (EN): gold_in_candidates=True gold_in_packet=True sources=2
+  [PASS] m15-hold-03 (RU): gold_in_candidates=True gold_in_packet=True sources=2
+  [PASS] m15-hold-04 (mixed): gold_in_candidates=True gold_in_packet=True sources=1
+
+============================================================
+CONDITION C: dense + baseline
+============================================================
+  [FAIL] m15-hold-01 (mixed): gold_in_candidates=True gold_in_packet=False sources=2
+  [PASS] m15-hold-02 (EN): gold_in_candidates=True gold_in_packet=True sources=2
+  [PASS] m15-hold-03 (RU): gold_in_candidates=True gold_in_packet=True sources=2
+  [PASS] m15-hold-04 (mixed): gold_in_candidates=True gold_in_packet=True sources=1
+
+============================================================
+CONDITION D: dense + rescue (target)
+============================================================
+  [PASS] m15-hold-01 (mixed): gold_in_candidates=True gold_in_packet=True sources=2 budget=797 answer_supported=False
+  [PASS] m15-hold-02 (EN): gold_in_candidates=True gold_in_packet=True sources=2 budget=765 answer_supported=False
+  [PASS] m15-hold-03 (RU): gold_in_candidates=True gold_in_packet=True sources=2 budget=775 answer_supported=False
+  [PASS] m15-hold-04 (mixed): gold_in_candidates=True gold_in_packet=True sources=1 budget=729 answer_supported=False
+
+============================================================
+HOLDOUT SUMMARY
+============================================================
+  A_lexical_baseline:
+    document_found: 4/4
+    fact_range_found: 4/4
+    source_policy_violations: 0
+    false_admits: 2
+    budget_ok: 4/4
+  B_lexical_rescue:
+    document_found: 4/4
+    fact_range_found: 4/4
+    source_policy_violations: 0
+    false_admits: 2
+    budget_ok: 4/4
+  C_dense_baseline:
+    document_found: 4/4
+    fact_range_found: 3/4
+    source_policy_violations: 0
+    false_admits: 3
+    budget_ok: 4/4
+  D_dense_rescue:
+    document_found: 4/4
+    fact_range_found: 4/4
+    source_policy_violations: 0
+    false_admits: 2
+    budget_ok: 4/4
+
+  Condition D per language group:
+    EN: 1/1
+    RU: 1/1
+    mixed: 2/2
+
+Results saved to experiments/crosslingual_relevance/m6_holdout_results.json

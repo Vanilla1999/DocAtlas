@@ -1,0 +1,35 @@
+stage: M1.5
+status: FROZEN
+git revision: 58c7f37c2a5ef686bcd6562abbade91ba94e347a
+branch: task-44-cross-lingual-retrieval
+date: 2026-09-28T12:07:59Z
+
+manifest: experiments/crosslingual-relevance/m15_evaluation_manifest.json
+manifest_sha256: 4a3a33cf3c830bb6a88095469553991b82447d715642fd5c5653e414e9eb458b
+
+summary:
+  12 tasks, 4 documents, 3 splits (4/4/4)
+  12 unique facts (no overlap between splits)
+  formulations: dev=[mixed,EN,RU,mixed] cal=[RU,mixed,EN,RU] hold=[mixed,EN,RU,mixed]
+  each split: gold blocks, distractors, hard negatives (wrong project)
+  calibration+holdout: partially useful blocks
+  holdout: 4 topics from 4 different documents (>=2 required)
+
+documents:
+  1. httpx/docs/advanced/timeouts.md
+  2. ruff/docs/preview.md
+  3. starlette/docs/lifespan.md
+  4. pydantic/docs/concepts/alias.md
+
+label_schema:
+  source_allowed: correct project+version
+  relevant_to_question: block helps answer the question
+  covered_fact_ids: verifiable rules present in block text
+
+cross_split_notes:
+  All 4 documents appear in all 3 splits with different facts.
+  This is a small pilot, not proof of generalization.
+  Typer-05 is additional development control, not counted in the 12.
+
+acceptance: M1.5 manifest frozen. Development/calibration/holdout separated
+  before model/threshold selection. Next: M2 — first model experiment.

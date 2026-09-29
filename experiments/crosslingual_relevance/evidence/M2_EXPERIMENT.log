@@ -1,0 +1,53 @@
+stage: M2
+status: EXPERIMENT_COMPLETE
+git revision: 58c7f37c2a5ef686bcd6562abbade91ba94e347a
+branch: task-44-cross-lingual-retrieval
+date: 2026-09-28T12:44:21Z
+
+model_b: sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2 (fastembed 0.8.0)
+model_b_dim: 384
+pool_blocks: 29
+pool_tasks: 12
+
+=== A_lexical: gold block ratios vs production thresholds ===
+  dev-01 (mixed) ratio=0.250 threshold=0.5 REJECTED
+  dev-02 (EN)    ratio=0.833 threshold=0.4 PASS
+  dev-03 (RU)    ratio=0.250 threshold=0.5 REJECTED
+  dev-04 (mixed) ratio=0.714 threshold=0.4 PASS
+  cal-01 (RU)    ratio=0.250 threshold=0.5 REJECTED
+  cal-02 (mixed) ratio=0.800 threshold=0.4 PASS
+  cal-03 (EN)    ratio=0.833 threshold=0.4 PASS
+  cal-04 (RU)    ratio=0.500 threshold=0.4 PASS
+  hold-01 (mixed) ratio=0.429 threshold=0.4 PASS
+  hold-02 (EN)    ratio=0.500 threshold=0.4 PASS
+  hold-03 (RU)    ratio=0.333 threshold=0.5 REJECTED
+  hold-04 (mixed) ratio=0.857 threshold=0.4 PASS
+
+  RED confirmed: 4 of 12 gold blocks rejected by production lexical threshold.
+  All 4 are RU or mixed questions where ratio < 0.5.
+  EN questions always pass (ratio >= 0.5).
+
+=== B_encoder: gold vs best non-gold gap ===
+  9 of 12 tasks: gold > non-gold (positive gap)
+  3 of 12 tasks: non-gold > gold (negative gap):
+    dev-02 (EN):    gap=-0.020 (near tie, both relevant-ish)
+    cal-01 (RU):    gap=-0.036 (default-timeout distractor beats four-types gold)
+    hold-01 (mixed): gap=-0.141 (default-timeout distractor beats disable-timeout gold)
+
+  Recall@5: 1.0 for all splits (gold always in top-5)
+  MRR@5: 0.875 for non-EN, 1.0 for EN
+
+=== Summary ===
+  A_lexical: gold ranks #1 by raw ratio in all tasks, but 4/12 gold blocks
+    fall below production threshold (0.5 for RU questions).
+  B_encoder: gold ranks #1 in 9/12 tasks. In 2 cases a same-project
+    distractor (default-timeout block) beats the gold block for timeout questions.
+    Separation between gold and hard negatives (wrong project) is clear:
+    gold scores 0.53-0.93, hard negatives 0.05-0.20.
+
+  RED for production: lexical threshold rejects 4/12 gold blocks (RU/mixed).
+  B_encoder does NOT perfectly separate: 2 distractors beat gold.
+  M2b calibration needed to find threshold that admits gold without admitting
+    same-project distractors.
+
+acceptance: M2 experiment complete. Next: M2b calibration on development set.

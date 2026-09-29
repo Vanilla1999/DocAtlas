@@ -1,0 +1,241 @@
+{
+  "description": "M6 weak model evaluation protocol. Requires external LLM to execute.",
+  "holdout_tasks": 4,
+  "conditions": [
+    "no_context",
+    "baseline_context",
+    "new_context",
+    "oracle_context"
+  ],
+  "evaluations": [
+    {
+      "task_id": "m15-hold-01",
+      "formulation": "mixed",
+      "project": "httpx",
+      "question": "Как отключить all timeouts для HTTPX Client: какой аргумент передать?",
+      "fact_description": "Pass timeout=None to httpx.Client() to disable all timeouts by default",
+      "gold_phrases": [
+        "timeout=None",
+        "Disable all timeouts by default"
+      ],
+      "conditions": {
+        "no_context": {
+          "prompt": "Answer the following question. If you don't know, say so.\n\nQuestion: Как отключить all timeouts для HTTPX Client: какой аргумент передать?\n\nAnswer:",
+          "context": null
+        },
+        "baseline_context": {
+          "prompt": "Answer the question using only the provided documentation context.\nIf the context does not contain the answer, say you don't know.\nCite the source path for any claim you make.\n\nContext:\n# Source: docs/advanced/timeouts.md\n\n```python\n# A client with a 60s timeout for connecting, and a 10s timeout elsewhere.\ntimeout = httpx.Timeout(10.0, connect=60.0)\nclient = httpx.Client(timeout=timeout)\n\nresponse = client.get('http://example.com/')\n```\n\n# Source: docs/advanced/timeouts.md\n\n## Setting a default timeout on a client\n\nYou can set a timeout on a client instance, which results in the given\n`timeout` being used as the default for requests made with this client:\n\n```python\nclient = httpx.Client()              # Use a default 5s timeout everywhere.\nclient = httpx.Client(timeout=10.0)  # Use a default 10s timeout everywhere.\nclient = httpx.Client(timeout=None)  # Disable all timeouts by default.\n```\n\nQuestion: Как отключить all timeouts для HTTPX Client: какой аргумент передать?\n\nAnswer:",
+          "context_sources": 2,
+          "gold_in_packet": true,
+          "context": "# Source: docs/advanced/timeouts.md\n\n```python\n# A client with a 60s timeout for connecting, and a 10s timeout elsewhere.\ntimeout = httpx.Timeout(10.0, connect=60.0)\nclient = httpx.Client(timeout=timeout)\n\nresponse = client.get('http://example.com/')\n```\n\n# Source: docs/advanced/timeouts.md\n\n## Setting a default timeout on a client\n\nYou can set a timeout on a client instance, which results in the given\n`timeout` being used as the default for requests made with this client:\n\n```python\nclient = httpx.Client()              # Use a default 5s timeout everywhere.\nclient = httpx.Client(timeout=10.0)  # Use a default 10s timeout everywhere.\nclient = httpx.Client(timeout=None)  # Disable all timeouts by default.\n```",
+          "estimated_tokens": 179
+        },
+        "new_context": {
+          "prompt": "Answer the question using only the provided documentation context.\nIf the context does not contain the answer, say you don't know.\nCite the source path for any claim you make.\n\nContext:\n# Source: docs/advanced/timeouts.md\n\n## Fine tuning the configuration\n\nHTTPX also allows you to specify the timeout behavior in more fine grained detail.\n\nThere are four different types of timeouts that may occur. These are **connect**,\n**read**, **write**, and **pool** timeouts.\n\n* The **connect** timeout specifies the maximum amount of time to wait until\na socket connection to the requested host is established. If HTTPX is unable to connect\nwithin this time frame, a `ConnectTimeout` exception is raised.\n* The **read** timeout specifies the maximum duration to wait for a chunk of\ndata to be received (for example, a chunk of the response body). If HTTPX is\nunable to receive data within this time frame, a `ReadTimeout` exception is raised.\n* The **write** timeout specifies the maximum duration to wait for a chunk of\ndata to be sent (for example, a chunk of the request body). If HTTPX is unable\nto send data within this time frame, a `WriteTimeout` exception is raised.\n* The **pool** timeout specifies the maximum duration to wait for acquiring\na connection from the connection pool. If HTTPX is unable to acquire a connection\nwithin this time frame, a `PoolTimeout` exception is raised. A related\nconfiguration here is the maximum number of allowable connections in the\nconnection pool, which is configured by the `limits` argument.\n\n# Source: docs/advanced/timeouts.md\n\nHTTPX is careful to enforce timeouts everywhere by default.\n\nQuestion: Как отключить all timeouts для HTTPX Client: какой аргумент передать?\n\nAnswer:",
+          "context_sources": 2,
+          "gold_in_packet": true,
+          "budget_tokens": 786,
+          "context": "# Source: docs/advanced/timeouts.md\n\n## Fine tuning the configuration\n\nHTTPX also allows you to specify the timeout behavior in more fine grained detail.\n\nThere are four different types of timeouts that may occur. These are **connect**,\n**read**, **write**, and **pool** timeouts.\n\n* The **connect** timeout specifies the maximum amount of time to wait until\na socket connection to the requested host is established. If HTTPX is unable to connect\nwithin this time frame, a `ConnectTimeout` exception is raised.\n* The **read** timeout specifies the maximum duration to wait for a chunk of\ndata to be received (for example, a chunk of the response body). If HTTPX is\nunable to receive data within this time frame, a `ReadTimeout` exception is raised.\n* The **write** timeout specifies the maximum duration to wait for a chunk of\ndata to be sent (for example, a chunk of the request body). If HTTPX is unable\nto send data within this time frame, a `WriteTimeout` exception is raised.\n* The **pool** timeout specifies the maximum duration to wait for acquiring\na connection from the connection pool. If HTTPX is unable to acquire a connection\nwithin this time frame, a `PoolTimeout` exception is raised. A related\nconfiguration here is the maximum number of allowable connections in the\nconnection pool, which is configured by the `limits` argument.\n\n# Source: docs/advanced/timeouts.md\n\nHTTPX is careful to enforce timeouts everywhere by default.",
+          "estimated_tokens": 360
+        },
+        "oracle_context": {
+          "prompt": "Answer the question using only the provided documentation context.\nIf the context does not contain the answer, say you don't know.\nCite the source path for any claim you make.\n\nContext:\n# Source: docs/advanced/timeouts.md\n\nYou can set a timeout on a client instance, which results in the given\n`timeout` being used as the default for requests made with this client:\n\n```python\nclient = httpx.Client()              # Use a default 5s timeout everywhere.\nclient = httpx.Client(timeout=10.0)  # Use a default 10s timeout everywhere.\nclient = httpx.Client(timeout=None)  # Disable all timeouts by default.\n```\n\nQuestion: Как отключить all timeouts для HTTPX Client: какой аргумент передать?\n\nAnswer:",
+          "context": "# Source: docs/advanced/timeouts.md\n\nYou can set a timeout on a client instance, which results in the given\n`timeout` being used as the default for requests made with this client:\n\n```python\nclient = httpx.Client()              # Use a default 5s timeout everywhere.\nclient = httpx.Client(timeout=10.0)  # Use a default 10s timeout everywhere.\nclient = httpx.Client(timeout=None)  # Disable all timeouts by default.\n```",
+          "gold_phrases_present": true,
+          "estimated_tokens": 104
+        }
+      },
+      "model_settings": {
+        "model": "[to be filled: e.g., phi-3-mini-4k-instruct]",
+        "temperature": 0,
+        "max_tokens": 512,
+        "seed": 42,
+        "n_runs": 1
+      },
+      "judging_protocol": {
+        "judge": "[to be filled: separate model, NOT the tested weak model]",
+        "blind": true,
+        "criteria": [
+          "unsupported_claims: count of claims not supported by context",
+          "correct_refusals: did model refuse when context lacks answer?",
+          "citation_accuracy: are cited paths correct?",
+          "fact_coverage: does answer contain the verifiable rule?"
+        ]
+      }
+    },
+    {
+      "task_id": "m15-hold-02",
+      "formulation": "EN",
+      "project": "ruff",
+      "question": "What happens to explicit-preview-rules setting when preview mode is not enabled?",
+      "fact_description": "The explicit-preview-rules setting has no effect when preview mode is not enabled",
+      "gold_phrases": [
+        "this setting has no effect",
+        "preview mode is not enabled"
+      ],
+      "conditions": {
+        "no_context": {
+          "prompt": "Answer the following question. If you don't know, say so.\n\nQuestion: What happens to explicit-preview-rules setting when preview mode is not enabled?\n\nAnswer:",
+          "context": null
+        },
+        "baseline_context": {
+          "prompt": "Answer the question using only the provided documentation context.\nIf the context does not contain the answer, say you don't know.\nCite the source path for any claim you make.\n\nContext:\n# Source: docs/preview.md\n\n```toml\n    [lint]\n    preview = true\n    explicit-preview-rules = true\n    ```\n\nIn our previous example, `--select` with `ALL` `HYP`, `HYP0`, or `HYP00` would not enable `HYP001`. Each preview\nrule will need to be selected with its exact code, e.g. `--select ALL,HYP001`.\n\nIf preview mode is not enabled, this setting has no effect.\n\n# Source: docs/preview.md\n\n## Selecting single preview rules\n\nWhen preview mode is enabled, selecting rule categories or prefixes will include all preview rules that match.\nIf you'd prefer to opt in to each preview rule individually, you can toggle the `explicit-preview-rules`\nsetting in your configuration file:\n\n=== \"pyproject.toml\"\n\n    ```toml\n    [tool.ruff.lint]\n    preview = true\n    explicit-preview-rules = true\n    ```\n\n=== \"ruff.toml\"\n\nQuestion: What happens to explicit-preview-rules setting when preview mode is not enabled?\n\nAnswer:",
+          "context_sources": 2,
+          "gold_in_packet": true,
+          "context": "# Source: docs/preview.md\n\n```toml\n    [lint]\n    preview = true\n    explicit-preview-rules = true\n    ```\n\nIn our previous example, `--select` with `ALL` `HYP`, `HYP0`, or `HYP00` would not enable `HYP001`. Each preview\nrule will need to be selected with its exact code, e.g. `--select ALL,HYP001`.\n\nIf preview mode is not enabled, this setting has no effect.\n\n# Source: docs/preview.md\n\n## Selecting single preview rules\n\nWhen preview mode is enabled, selecting rule categories or prefixes will include all preview rules that match.\nIf you'd prefer to opt in to each preview rule individually, you can toggle the `explicit-preview-rules`\nsetting in your configuration file:\n\n=== \"pyproject.toml\"\n\n    ```toml\n    [tool.ruff.lint]\n    preview = true\n    explicit-preview-rules = true\n    ```\n\n=== \"ruff.toml\"",
+          "estimated_tokens": 202
+        },
+        "new_context": {
+          "prompt": "Answer the question using only the provided documentation context.\nIf the context does not contain the answer, say you don't know.\nCite the source path for any claim you make.\n\nContext:\n# Source: docs/preview.md\n\n## Selecting single preview rules\n\nWhen preview mode is enabled, selecting rule categories or prefixes will include all preview rules that match.\nIf you'd prefer to opt in to each preview rule individually, you can toggle the `explicit-preview-rules`\nsetting in your configuration file:\n\n=== \"pyproject.toml\"\n\n    ```toml\n    [tool.ruff.lint]\n    preview = true\n    explicit-preview-rules = true\n    ```\n\n=== \"ruff.toml\"\n\n# Source: docs/preview.md\n\n```toml\n    [lint]\n    preview = true\n    explicit-preview-rules = true\n    ```\n\nIn our previous example, `--select` with `ALL` `HYP`, `HYP0`, or `HYP00` would not enable `HYP001`. Each preview\nrule will need to be selected with its exact code, e.g. `--select ALL,HYP001`.\n\nIf preview mode is not enabled, this setting has no effect.\n\nQuestion: What happens to explicit-preview-rules setting when preview mode is not enabled?\n\nAnswer:",
+          "context_sources": 2,
+          "gold_in_packet": true,
+          "budget_tokens": 771,
+          "context": "# Source: docs/preview.md\n\n## Selecting single preview rules\n\nWhen preview mode is enabled, selecting rule categories or prefixes will include all preview rules that match.\nIf you'd prefer to opt in to each preview rule individually, you can toggle the `explicit-preview-rules`\nsetting in your configuration file:\n\n=== \"pyproject.toml\"\n\n    ```toml\n    [tool.ruff.lint]\n    preview = true\n    explicit-preview-rules = true\n    ```\n\n=== \"ruff.toml\"\n\n# Source: docs/preview.md\n\n```toml\n    [lint]\n    preview = true\n    explicit-preview-rules = true\n    ```\n\nIn our previous example, `--select` with `ALL` `HYP`, `HYP0`, or `HYP00` would not enable `HYP001`. Each preview\nrule will need to be selected with its exact code, e.g. `--select ALL,HYP001`.\n\nIf preview mode is not enabled, this setting has no effect.",
+          "estimated_tokens": 202
+        },
+        "oracle_context": {
+          "prompt": "Answer the question using only the provided documentation context.\nIf the context does not contain the answer, say you don't know.\nCite the source path for any claim you make.\n\nContext:\n# Source: docs/preview.md\n\nIf preview mode is not enabled, this setting has no effect.\n\nQuestion: What happens to explicit-preview-rules setting when preview mode is not enabled?\n\nAnswer:",
+          "context": "# Source: docs/preview.md\n\nIf preview mode is not enabled, this setting has no effect.",
+          "gold_phrases_present": true,
+          "estimated_tokens": 21
+        }
+      },
+      "model_settings": {
+        "model": "[to be filled: e.g., phi-3-mini-4k-instruct]",
+        "temperature": 0,
+        "max_tokens": 512,
+        "seed": 42,
+        "n_runs": 1
+      },
+      "judging_protocol": {
+        "judge": "[to be filled: separate model, NOT the tested weak model]",
+        "blind": true,
+        "criteria": [
+          "unsupported_claims: count of claims not supported by context",
+          "correct_refusals: did model refuse when context lacks answer?",
+          "citation_accuracy: are cited paths correct?",
+          "fact_coverage: does answer contain the verifiable rule?"
+        ]
+      }
+    },
+    {
+      "task_id": "m15-hold-03",
+      "formulation": "RU",
+      "project": "starlette",
+      "question": "Как использовать TestClient, чтобы lifespan выполнился в тестах?",
+      "fact_description": "TestClient must be used as a context manager for the lifespan to be called",
+      "gold_phrases": [
+        "TestClient",
+        "context manager",
+        "lifespan is called"
+      ],
+      "conditions": {
+        "no_context": {
+          "prompt": "Answer the following question. If you don't know, say so.\n\nQuestion: Как использовать TestClient, чтобы lifespan выполнился в тестах?\n\nAnswer:",
+          "context": null
+        },
+        "baseline_context": {
+          "prompt": "Answer the question using only the provided documentation context.\nIf the context does not contain the answer, say you don't know.\nCite the source path for any claim you make.\n\nContext:\n# Source: docs/lifespan.md\n\n## Running lifespan in tests\n\nYou should use `TestClient` as a context manager, to ensure that the lifespan is called.\n\n```python\nfrom example import app\nfrom starlette.testclient import TestClient\n\n\ndef test_homepage():\n    with TestClient(app) as client:\n        # Application's lifespan is called on entering the block.\n        response = client.get(\"/\")\n        assert response.status_code == 200\n\n    # And the lifespan's teardown is run when exiting the block.\n```\n\n# Source: docs/lifespan.md\n\nThe lifespan has the concept of `state`, which is a dictionary that\ncan be used to share the objects between the lifespan, and the requests.\n\nQuestion: Как использовать TestClient, чтобы lifespan выполнился в тестах?\n\nAnswer:",
+          "context_sources": 2,
+          "gold_in_packet": true,
+          "context": "# Source: docs/lifespan.md\n\n## Running lifespan in tests\n\nYou should use `TestClient` as a context manager, to ensure that the lifespan is called.\n\n```python\nfrom example import app\nfrom starlette.testclient import TestClient\n\n\ndef test_homepage():\n    with TestClient(app) as client:\n        # Application's lifespan is called on entering the block.\n        response = client.get(\"/\")\n        assert response.status_code == 200\n\n    # And the lifespan's teardown is run when exiting the block.\n```\n\n# Source: docs/lifespan.md\n\nThe lifespan has the concept of `state`, which is a dictionary that\ncan be used to share the objects between the lifespan, and the requests.",
+          "estimated_tokens": 167
+        },
+        "new_context": {
+          "prompt": "Answer the question using only the provided documentation context.\nIf the context does not contain the answer, say you don't know.\nCite the source path for any claim you make.\n\nContext:\n# Source: docs/lifespan.md\n\n## Running lifespan in tests\n\nYou should use `TestClient` as a context manager, to ensure that the lifespan is called.\n\n```python\nfrom example import app\nfrom starlette.testclient import TestClient\n\n\ndef test_homepage():\n    with TestClient(app) as client:\n        # Application's lifespan is called on entering the block.\n        response = client.get(\"/\")\n        assert response.status_code == 200\n\n    # And the lifespan's teardown is run when exiting the block.\n```\n\n# Source: docs/lifespan.md\n\nThe lifespan has the concept of `state`, which is a dictionary that\ncan be used to share the objects between the lifespan, and the requests.\n\nQuestion: Как использовать TestClient, чтобы lifespan выполнился в тестах?\n\nAnswer:",
+          "context_sources": 2,
+          "gold_in_packet": true,
+          "budget_tokens": 773,
+          "context": "# Source: docs/lifespan.md\n\n## Running lifespan in tests\n\nYou should use `TestClient` as a context manager, to ensure that the lifespan is called.\n\n```python\nfrom example import app\nfrom starlette.testclient import TestClient\n\n\ndef test_homepage():\n    with TestClient(app) as client:\n        # Application's lifespan is called on entering the block.\n        response = client.get(\"/\")\n        assert response.status_code == 200\n\n    # And the lifespan's teardown is run when exiting the block.\n```\n\n# Source: docs/lifespan.md\n\nThe lifespan has the concept of `state`, which is a dictionary that\ncan be used to share the objects between the lifespan, and the requests.",
+          "estimated_tokens": 167
+        },
+        "oracle_context": {
+          "prompt": "Answer the question using only the provided documentation context.\nIf the context does not contain the answer, say you don't know.\nCite the source path for any claim you make.\n\nContext:\n# Source: docs/lifespan.md\n\nYou should use `TestClient` as a context manager, to ensure that the lifespan is called.\n\n```python\nfrom example import app\nfrom starlette.testclient import TestClient\n\n\ndef test_homepage():\n    with TestClient(app) as client:\n        # Application's lifespan is called on entering the block.\n        response = client.get(\"/\")\n        assert response.status_code == 200\n\n    # And the lifespan's teardown is run when exiting the block.\n```\n\nQuestion: Как использовать TestClient, чтобы lifespan выполнился в тестах?\n\nAnswer:",
+          "context": "# Source: docs/lifespan.md\n\nYou should use `TestClient` as a context manager, to ensure that the lifespan is called.\n\n```python\nfrom example import app\nfrom starlette.testclient import TestClient\n\n\ndef test_homepage():\n    with TestClient(app) as client:\n        # Application's lifespan is called on entering the block.\n        response = client.get(\"/\")\n        assert response.status_code == 200\n\n    # And the lifespan's teardown is run when exiting the block.\n```",
+          "gold_phrases_present": true,
+          "estimated_tokens": 117
+        }
+      },
+      "model_settings": {
+        "model": "[to be filled: e.g., phi-3-mini-4k-instruct]",
+        "temperature": 0,
+        "max_tokens": 512,
+        "seed": 42,
+        "n_runs": 1
+      },
+      "judging_protocol": {
+        "judge": "[to be filled: separate model, NOT the tested weak model]",
+        "blind": true,
+        "criteria": [
+          "unsupported_claims: count of claims not supported by context",
+          "correct_refusals: did model refuse when context lacks answer?",
+          "citation_accuracy: are cited paths correct?",
+          "fact_coverage: does answer contain the verifiable rule?"
+        ]
+      }
+    },
+    {
+      "task_id": "m15-hold-04",
+      "formulation": "mixed",
+      "project": "pydantic",
+      "question": "Как AliasGenerator помогает use different naming conventions при loading and saving?",
+      "fact_description": "AliasGenerator allows specifying different alias generators for validation and serialization, enabling different naming conventions for loading and saving",
+      "gold_phrases": [
+        "AliasGenerator",
+        "different alias generators",
+        "loading and saving"
+      ],
+      "conditions": {
+        "no_context": {
+          "prompt": "Answer the following question. If you don't know, say so.\n\nQuestion: Как AliasGenerator помогает use different naming conventions при loading and saving?\n\nAnswer:",
+          "context": null
+        },
+        "baseline_context": {
+          "prompt": "Answer the question using only the provided documentation context.\nIf the context does not contain the answer, say you don't know.\nCite the source path for any claim you make.\n\nContext:\n# Source: docs/concepts/alias.md\n\n### Using an `AliasGenerator`\n\n??? api \"API Documentation\"\n\n    [`pydantic.aliases.AliasGenerator`][pydantic.aliases.AliasGenerator]<br>\n\n\n`AliasGenerator` is a class that allows you to specify multiple alias generators for a model.\nYou can use an `AliasGenerator` to specify different alias generators for validation and serialization.\n\nThis is particularly useful if you need to use different naming conventions for loading and saving data,\nbut you don't want to specify the validation and serialization aliases for each field individually.\n\nFor example:\n\n```py\nfrom pydantic import AliasGenerator, BaseModel, ConfigDict\n\n\nclass Tree(BaseModel):\n    model_config = ConfigDict(\n        alias_generator=AliasGenerator(\n            validation_alias=lambda field_name: field_name.upper(),\n            serialization_alias=lambda field_name: field_name.title(),\n        )\n    )\n\n    age: int\n    height: float\n    kind: str\n\n\nt = Tree.model_validate({'AGE': 12, 'HEIGHT': 1.2, 'KIND': 'oak'})\nprint(t.model_dump(by_alias=True))\n#> {'Age': 12, 'Height': 1.2, 'Kind': 'oak'}\n```\n\nQuestion: Как AliasGenerator помогает use different naming conventions при loading and saving?\n\nAnswer:",
+          "context_sources": 1,
+          "gold_in_packet": true,
+          "context": "# Source: docs/concepts/alias.md\n\n### Using an `AliasGenerator`\n\n??? api \"API Documentation\"\n\n    [`pydantic.aliases.AliasGenerator`][pydantic.aliases.AliasGenerator]<br>\n\n\n`AliasGenerator` is a class that allows you to specify multiple alias generators for a model.\nYou can use an `AliasGenerator` to specify different alias generators for validation and serialization.\n\nThis is particularly useful if you need to use different naming conventions for loading and saving data,\nbut you don't want to specify the validation and serialization aliases for each field individually.\n\nFor example:\n\n```py\nfrom pydantic import AliasGenerator, BaseModel, ConfigDict\n\n\nclass Tree(BaseModel):\n    model_config = ConfigDict(\n        alias_generator=AliasGenerator(\n            validation_alias=lambda field_name: field_name.upper(),\n            serialization_alias=lambda field_name: field_name.title(),\n        )\n    )\n\n    age: int\n    height: float\n    kind: str\n\n\nt = Tree.model_validate({'AGE': 12, 'HEIGHT': 1.2, 'KIND': 'oak'})\nprint(t.model_dump(by_alias=True))\n#> {'Age': 12, 'Height': 1.2, 'Kind': 'oak'}\n```",
+          "estimated_tokens": 276
+        },
+        "new_context": {
+          "prompt": "Answer the question using only the provided documentation context.\nIf the context does not contain the answer, say you don't know.\nCite the source path for any claim you make.\n\nContext:\n# Source: docs/concepts/alias.md\n\n### Using an `AliasGenerator`\n\n??? api \"API Documentation\"\n\n    [`pydantic.aliases.AliasGenerator`][pydantic.aliases.AliasGenerator]<br>\n\n\n`AliasGenerator` is a class that allows you to specify multiple alias generators for a model.\nYou can use an `AliasGenerator` to specify different alias generators for validation and serialization.\n\nThis is particularly useful if you need to use different naming conventions for loading and saving data,\nbut you don't want to specify the validation and serialization aliases for each field individually.\n\nFor example:\n\n```py\nfrom pydantic import AliasGenerator, BaseModel, ConfigDict\n\n\nclass Tree(BaseModel):\n    model_config = ConfigDict(\n        alias_generator=AliasGenerator(\n            validation_alias=lambda field_name: field_name.upper(),\n            serialization_alias=lambda field_name: field_name.title(),\n        )\n    )\n\n    age: int\n    height: float\n    kind: str\n\n\nt = Tree.model_validate({'AGE': 12, 'HEIGHT': 1.2, 'KIND': 'oak'})\nprint(t.model_dump(by_alias=True))\n#> {'Age': 12, 'Height': 1.2, 'Kind': 'oak'}\n```\n\nQuestion: Как AliasGenerator помогает use different naming conventions при loading and saving?\n\nAnswer:",
+          "context_sources": 1,
+          "gold_in_packet": true,
+          "budget_tokens": 730,
+          "context": "# Source: docs/concepts/alias.md\n\n### Using an `AliasGenerator`\n\n??? api \"API Documentation\"\n\n    [`pydantic.aliases.AliasGenerator`][pydantic.aliases.AliasGenerator]<br>\n\n\n`AliasGenerator` is a class that allows you to specify multiple alias generators for a model.\nYou can use an `AliasGenerator` to specify different alias generators for validation and serialization.\n\nThis is particularly useful if you need to use different naming conventions for loading and saving data,\nbut you don't want to specify the validation and serialization aliases for each field individually.\n\nFor example:\n\n```py\nfrom pydantic import AliasGenerator, BaseModel, ConfigDict\n\n\nclass Tree(BaseModel):\n    model_config = ConfigDict(\n        alias_generator=AliasGenerator(\n            validation_alias=lambda field_name: field_name.upper(),\n            serialization_alias=lambda field_name: field_name.title(),\n        )\n    )\n\n    age: int\n    height: float\n    kind: str\n\n\nt = Tree.model_validate({'AGE': 12, 'HEIGHT': 1.2, 'KIND': 'oak'})\nprint(t.model_dump(by_alias=True))\n#> {'Age': 12, 'Height': 1.2, 'Kind': 'oak'}\n```",
+          "estimated_tokens": 276
+        },
+        "oracle_context": {
+          "prompt": "Answer the question using only the provided documentation context.\nIf the context does not contain the answer, say you don't know.\nCite the source path for any claim you make.\n\nContext:\n# Source: docs/concepts/alias.md\n\n`AliasGenerator` is a class that allows you to specify multiple alias generators for a model.\nYou can use an `AliasGenerator` to specify different alias generators for validation and serialization.\n\nThis is particularly useful if you need to use different naming conventions for loading and saving data,\nbut you don't want to specify the validation and serialization aliases for each field individually.\n\nQuestion: Как AliasGenerator помогает use different naming conventions при loading and saving?\n\nAnswer:",
+          "context": "# Source: docs/concepts/alias.md\n\n`AliasGenerator` is a class that allows you to specify multiple alias generators for a model.\nYou can use an `AliasGenerator` to specify different alias generators for validation and serialization.\n\nThis is particularly useful if you need to use different naming conventions for loading and saving data,\nbut you don't want to specify the validation and serialization aliases for each field individually.",
+          "gold_phrases_present": true,
+          "estimated_tokens": 109
+        }
+      },
+      "model_settings": {
+        "model": "[to be filled: e.g., phi-3-mini-4k-instruct]",
+        "temperature": 0,
+        "max_tokens": 512,
+        "seed": 42,
+        "n_runs": 1
+      },
+      "judging_protocol": {
+        "judge": "[to be filled: separate model, NOT the tested weak model]",
+        "blind": true,
+        "criteria": [
+          "unsupported_claims: count of claims not supported by context",
+          "correct_refusals: did model refuse when context lacks answer?",
+          "citation_accuracy: are cited paths correct?",
+          "fact_coverage: does answer contain the verifiable rule?"
+        ]
+      }
+    }
+  ],
+  "notes": [
+    "Baseline is already 4/4 on holdout (no cross-lingual gap in holdout tasks).",
+    "One improvement: C→D (dense baseline 3/4 → dense+rescue 4/4, httpx-mixed).",
+    "Per plan: 'baseline already full → no proof of improvement by this criterion'.",
+    "Original RU/mixed fix proven in M5 (Typer), not in holdout.",
+    "Weak model evaluation requires external LLM access."
+  ]
+}

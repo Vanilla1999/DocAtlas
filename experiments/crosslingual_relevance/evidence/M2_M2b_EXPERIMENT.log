@@ -1,0 +1,44 @@
+stage: M2/M2b
+status: EXPERIMENT_COMPLETE_PARTIAL
+git revision: 58c7f37c2a5ef686bcd6562abbade91ba94e347a
+branch: task-44-cross-lingual-retrieval
+date: 2026-09-28T12:54:29Z
+
+model_b: sentence-transformers/paraphrase-multilingual-mpnet-base-v2
+model_b_dim: 768
+model_b_runtime: fastembed 0.8.0, onnxruntime
+pool_blocks: 29 (M1.5) + 5 (Typer-05)
+
+=== A_lexical: production threshold rejection ===
+  4/12 gold blocks rejected by production lexical threshold (ratio < 0.5)
+  All 4 are RU/mixed questions. EN always passes.
+  Rejected: dev-01(0.25), dev-03(0.25), cal-01(0.25), hold-03(0.33)
+
+=== B_encoder (MPNet): ranking ===
+  MRR@5: dev=1.0, cal=0.875, hold=0.875
+  Recall@5: 1.0 for all splits
+  Gold rank #1: 10/12 tasks
+  Gold rank #2: 2/12 tasks (cal-01 RU, hold-01 mixed)
+  Both losses: httpx default-timeout block beats gold for timeout questions
+
+=== Typer-05 (MPNet): gold rank #1 for all formulations ===
+  mixed: gold=0.490, distractor=0.398
+  pure_ru: gold=0.480, distractor=0.368
+  en: gold=0.419, distractor=0.350
+  Perfect separation: YES (gap=0.021)
+
+=== M2b calibration (M1.5 pool) ===
+  Best threshold (zero false positives): 0.7453
+  Recall at threshold: 0.50 (3/6 relevant admitted)
+  Perfect separation: NO (max irrelevant 0.7236 >= min relevant 0.5599)
+  Strategy 'reject all': not needed (3 positives admitted)
+
+=== Conclusion ===
+  MPNet improves ranking: gold ranks #1 in 10/12 tasks and all Typer-05 formulations.
+  MPNet does NOT perfectly separate same-project distractors on M1.5 pool.
+  M2b result: PARTIAL — encoder is useful for ranking but not as sole admission threshold.
+  M3 warranted: encoder signal as rescue in insufficient_visible_match branch,
+  with caveat that encoder alone cannot replace lexical filter.
+
+  The encoder signal should be used ONLY as an additional rescue signal,
+  not as a replacement for the existing lexical qualification.
