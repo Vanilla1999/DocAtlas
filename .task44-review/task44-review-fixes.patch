@@ -1,0 +1,1000 @@
+diff --git a/experiments/crosslingual_relevance/LOCAL_REVIEW_FIXES.md b/experiments/crosslingual_relevance/LOCAL_REVIEW_FIXES.md
+new file mode 100644
+index 00000000..7cbc3ebd
+--- /dev/null
++++ b/experiments/crosslingual_relevance/LOCAL_REVIEW_FIXES.md
+@@ -0,0 +1,96 @@
++# Task 44: local review corrections
++
++Base: `84938ab25c096257a7ad6af5f39b9d364e67b8e9`.
++These changes repair the experiment; they do **not** fix Typer's real-model score,
++activate rescue in production, or validate the archived threshold on new tasks.
++`M2B_THRESHOLD = 0.7453` is unchanged. No `docmancer/` production source, dependency
++lock, original M1.5 manifest/pool, archived result, or `protocol_v3.lock.json` changed.
++The original HANDOFF and logs remain historical, not results of this corrected runner.
++
++## Corrections
++
++* `scorer_runtime.py`: finite and typed execution limits; finite cosine in [-1,1];
++  an explicit unbounded **finite** contract can be chosen for logits. One cooperative
++  stage deadline includes cumulative time. Cached proven scores survive the work
++  cap with a visible degraded/cache event. This does not interrupt native inference.
++* `context_rescue.py`: only the original lexical rejection is rescued; prior
++  source/identity/reference/subject vetoes remain. No evidence is discarded merely
++  for having fewer than 80 characters. This changes scorer eligibility and requires
++  fresh evaluation. Context-only admission still creates no answer/edit authority.
++  Nested installations fail; unrelated threads/tasks do not inherit the question.
++  The global patch remains an isolated experimental harness, NOT a serving API.
++* Bindings now contain full text/question hashes, actual scorer fingerprint when
++  available, a hash of the archived calibration specification, and source coordinates.
++  A specification digest does not retrospectively prove historical model bytes.
++* `evaluation_v2.py`: canonical relative path, coordinates, text and available hash
++  binding are checked separately from policy and relevance. Complete packets require
++  ALL required claims; each claim may have alternative canonical witnesses. A word,
++  file name, or one-line overlap is not a fact. Unjudged blocks are not false positives.
++* `evaluation_claims_v2.json`: a NEW external review rubric. It does not rewrite the
++  frozen M1.5 gold. Exact witness clauses are intentionally conservative; alternative
++  semantic presentations require explicit adjudication, not silent normalization of
++  CLI literals. Evaluation claims are never supplied to real retrieval/scoring.
++* M2 ranks the entire pool before attaching judgments. Ties use content/path hashes,
++  not gold-first input order. The report says **known-positive recall**, separates
++  hit-rate from recall, and preserves unjudged pairs. Zero observed errors on a
++  small calibration set is not a transferable zero-FPR guarantee.
++* Both M4 entry points and M5/M6 use the external canonical claim evaluator. M4
++  reports first individually complete witness hit-rate, not file overlap. M5 no
++  longer probes a hand-picked gold window and mistakes it for pipeline input.
++* M6 defaults to a REAL scorer. `--oracle-plumbing` is explicit and its rows are never
++  model-quality evidence. These already inspected tasks are not a new blind holdout.
++  Policy errors use the native audit; absence from gold is not a policy violation.
++* New outputs are exclusive UUID-named files under `review_runs/`; archived reports
++  are never overwritten. Raw requests, packets, pipeline traces and opt-in scorer
++  inputs are retained for diagnosis. Treat these local records as private if future
++  experiments use private documents; do not publish them automatically.
++* MPNet requires a LOCAL file manifest: actual weight/config/tokenizer hashes,
++  dependency versions and runtime tokenizer settings. Retrieval and scoring use
++  the same loaded object. Used/full token counts and offsets make truncation visible.
++  No model downloads are triggered by the corrected runners. A missing lock fails
++  before loading. CPU provider/one thread/mean pooling/dimension 768 are explicit.
++
++## TDD execution in this local revision
++
++Recorded before their implementations: scorer 20 assertion failures/4 passes;
++metrics 10/1; real-oracle/loader controls 4/0; adapter 2/2; step2 3/1. The adapter's
++first attempt included a test-double keyword-signature error; its separate log is
++retained and NOT counted as a product RED. Thirty additional controls had no claim
++of independent RED history. Final focused run: **77 new cases + 56 native neighbors
++= 133 passes**. Five disabled-mechanism mutations reproduce assertion failures.
++No existing product test assertions were removed, skipped or weakened.
++
++A fresh ordinary SQLite/handler lexical control still returns 0/2 facts for mixed
++and Russian Typer and 2/2 for English, without citation errors. This is not a neural
++run. MPNet weights are unavailable in this environment; no new real MPNet/M2/M4/M5/M6
++quality or cross-encoder result is claimed. Full repository CI was not rerun.
++
++## How to run after exporting model files
++
++Prepare a standalone local directory containing the actual FastEmbed MPNet files
++(including `onnx/model.onnx`, tokenizer/config files). Do not use the model directory
++for the manifest. Internal or external symlink escapes must be exported as files.
++
++```bash
++python -m experiments.crosslingual_relevance.model_manifest \
++  --model-dir /absolute/model-export \
++  --output /absolute/locks/mpnet.json
++export DOCATLAS_RELEVANCE_MODEL_DIR=/absolute/model-export
++export DOCATLAS_RELEVANCE_MODEL_MANIFEST=/absolute/locks/mpnet.json
++# Only supply --revision when the immutable publisher commit is actually known.
++
++python -m pytest -q experiments/crosslingual_relevance/tests
++python -m experiments.crosslingual_relevance.run
++python -m experiments.crosslingual_relevance.m4_dense_candidates --max-sections-per-source 2
++python -m experiments.crosslingual_relevance.m4_step2_handler --max-sections-per-source 2
++python -m experiments.crosslingual_relevance.m5_real_scorer --max-sections-per-source 2
++python -m experiments.crosslingual_relevance.m6_holdout --max-sections-per-source 2
++# Repeat separately with 20 to measure the previous pilot's changed candidate cap.
++# --oracle-plumbing is ONLY a labelled mechanism control, never a model benchmark.
++```
++
++Both small and pilot caps are recorded. Inputs, used tokenizer offsets, scores,
++qualification decisions and final quotes can now be joined by hashes. Fixing the
++measurement does not license tuning the threshold to Typer. Choose a scorer and a
++new separately versioned calibration only after inspecting actual inputs and hard
++negatives; keep the old protocol and negative results intact.
+diff --git a/experiments/crosslingual_relevance/context_rescue.py b/experiments/crosslingual_relevance/context_rescue.py
+index 39179695..8c0e7190 100644
+--- a/experiments/crosslingual_relevance/context_rescue.py
++++ b/experiments/crosslingual_relevance/context_rescue.py
+@@ -16,16 +16,21 @@ Admitted traces are patched with:
+ This does NOT create factual/parent coverage and does NOT raise
+ ``answer_supported`` or ``edit_ready``.
+ 
+-Scorer limits (pilot): K=20 evaluations, timeout=10s per stage.
+-On error/timeout: degraded fallback (keep old path, no rescue).
++Scorer limits (pilot): K=60 evaluations, cooperative deadline=10s per stage.
++This rejects late results; it does not cancel an in-flight native call.
++On error/deadline: degraded fallback (keep old path, no rescue).
+ 
+ Production activation is a separate maintainer decision (P0 freeze).
+ """
+ from __future__ import annotations
+ 
+ import hashlib
++import json
++import math
+ import time
+-from contextlib import contextmanager
++import threading
++import asyncio
++from contextlib import contextmanager, ExitStack
+ from dataclasses import replace
+ from typing import Any, Callable
+ from unittest.mock import patch
+@@ -39,26 +44,42 @@ Scorer = Callable[[str, str], float]
+ 
+ M2B_THRESHOLD = 0.7453
+ MODEL_REVISION = "Xenova/paraphrase-multilingual-mpnet-base-v2"
+-CALIBRATION_DIGEST = "m2b-calibration-v1"
++# Bind the unchanged threshold to its archived result and scoring contract.
++# This is a specification hash, NOT a fabricated hash of model weights.
++CALIBRATION_SPEC = {
++    "threshold": M2B_THRESHOLD, "score_kind": "cosine",
++    "results_git_blob": "0c2c0261888d2c039881cecd938b844c514ca55f",
++    "manifest_git_blob": "7491989ffeb3737af9046f8287962e72351c0ee7",
++    "source_branch_commit": "84938ab25c096257a7ad6af5f39b9d364e67b8e9",
++}
++CALIBRATION_DIGEST = hashlib.sha256(json.dumps(
++    CALIBRATION_SPEC, sort_keys=True, separators=(",", ":")
++).encode()).hexdigest()
+ MAX_EVALUATIONS = 60
+ SCORER_TIMEOUT_SECONDS = 10.0
++# Kept as a historical diagnostic constant for existing experiment imports.
++# It is no longer an admission gate: nonempty short rules may be scored.
+ MIN_EVIDENCE_CHARS = 80
+ 
++from .scorer_runtime import BoundedScorer, text_digest
++
++_INSTALL_LOCK = threading.Lock()
++
+ 
+ # ---------------------------------------------------------------------------
+ # Score binding
+ # ---------------------------------------------------------------------------
+ def _text_hash(text: str) -> str:
+-    return hashlib.sha256(text.encode("utf-8")).hexdigest()[:16]
++    return text_digest(text)
+ 
+ 
+ def _question_hash(question: str) -> str:
+-    return hashlib.sha256(question.encode("utf-8")).hexdigest()[:16]
++    return text_digest(question)
+ 
+ 
+ def _build_binding(
+     question: str, evidence_text: str, source_identity: str,
+-) -> dict[str, str]:
++) -> dict[str, Any]:
+     return {
+         "question_hash": _question_hash(question),
+         "source_identity": source_identity,
+@@ -68,58 +89,6 @@ def _build_binding(
+     }
+ 
+ 
+-# ---------------------------------------------------------------------------
+-# Bounded scorer — enforces K, timeout, error fallback
+-# ---------------------------------------------------------------------------
+-class BoundedScorer:
+-    """Wraps a scorer with evaluation limits, timeout, and cache."""
+-
+-    def __init__(self, scorer: Scorer, *, max_evaluations: int = MAX_EVALUATIONS,
+-                 timeout: float = SCORER_TIMEOUT_SECONDS):
+-        self._scorer = scorer
+-        self._max = max_evaluations
+-        self._timeout = timeout
+-        self._count = 0
+-        self._cache: dict[tuple[str, str], float] = {}
+-        self._degraded = False
+-        self._degraded_reason: str | None = None
+-
+-    @property
+-    def degraded(self) -> bool:
+-        return self._degraded
+-
+-    @property
+-    def degraded_reason(self) -> str | None:
+-        return self._degraded_reason
+-
+-    def score(self, question: str, evidence_text: str) -> float | None:
+-        """Return score, or None if degraded/timeout/error/over-limit."""
+-        cache_key = (_question_hash(question), _text_hash(evidence_text))
+-        if cache_key in self._cache:
+-            return self._cache[cache_key]
+-        if self._degraded:
+-            return None
+-        if self._count >= self._max:
+-            self._degraded = True
+-            self._degraded_reason = "evaluation_limit_reached"
+-            return None
+-        self._count += 1
+-        try:
+-            start = time.monotonic()
+-            value = float(self._scorer(question, evidence_text))
+-            elapsed = time.monotonic() - start
+-            if elapsed > self._timeout:
+-                self._degraded = True
+-                self._degraded_reason = "scorer_timeout"
+-                return None
+-        except Exception:
+-            self._degraded = True
+-            self._degraded_reason = "scorer_error"
+-            return None
+-        self._cache[cache_key] = value
+-        return value
+-
+-
+ # ---------------------------------------------------------------------------
+ # Veto check — safety net beyond the reason check
+ # ---------------------------------------------------------------------------
+@@ -145,6 +114,7 @@ def apply_rescue(
+     evidence_text: str,
+     source_identity: str,
+     scorer: BoundedScorer,
++    source_binding: dict[str, Any] | None = None,
+     threshold: float = M2B_THRESHOLD,
+ ) -> EvidenceQualification:
+     """Patch a qualification result with context-only admission if eligible.
+@@ -153,15 +123,18 @@ def apply_rescue(
+     - The block already qualified.
+     - The rejection reason is not ``insufficient_visible_match``.
+     - Another veto (exact, subject) is present in the trace.
+-    - The evidence text is too short for meaningful neural scoring.
++    - The evidence text is empty (short complete rules are allowed).
+     - The scorer is degraded.
+     - The neural score is below the threshold.
+     """
++    if not math.isfinite(threshold):
++        raise ValueError("threshold must be finite")
+     if original.qualified:
+         return original
+     if original.reason != "insufficient_visible_match":
+         return original
+-    if len(evidence_text.strip()) < MIN_EVIDENCE_CHARS:
++    if not evidence_text.strip():
++        scorer.record_decision(question, evidence_text, decision="empty_evidence", query_id=query_id)
+         return original
+     result = dict(original.trace)
+     if _has_other_veto(result):
+@@ -174,9 +147,23 @@ def apply_rescue(
+         if scorer.degraded_reason:
+             patched_trace["context_relevance_degraded_reason"] = scorer.degraded_reason
+         return replace(original, trace=patched_trace)
++    scorer.record_decision(question, evidence_text, query_id=query_id,
++        decision="below_threshold" if score < threshold else "context_only_relevance",
++        score=score, threshold=threshold, source_identity=source_identity,
++        source_binding=dict(source_binding or {}))
+     if score < threshold:
+         return original
+     binding = _build_binding(question, evidence_text, source_identity)
++    try:
++        binding["scorer_identity"] = scorer.identity()
++    except Exception:
++        return replace(original, trace={**result, "context_relevance_degraded": True,
++            "context_relevance_degraded_reason": "scorer_identity_error"})
++    binding["model_revision"] = (binding["scorer_identity"].get("hub_revision")
++        or binding["scorer_identity"].get("fingerprint") or "unverified_callable")
++    binding["threshold_used"] = threshold
++    binding["threshold_matches_archived_calibration"] = threshold == M2B_THRESHOLD
++    binding["source_binding"] = dict(source_binding or {})
+     patched_trace = dict(result)
+     patched_trace.update(
+         qualified=True,
+@@ -210,42 +197,50 @@ def installed(scorer: Scorer | BoundedScorer, *, threshold: float = M2B_THRESHOL
+     Patches the function in every module that imported it by name.
+     The scorer receives (question, evidence_text) and returns a float.
+     """
+-    if isinstance(scorer, BoundedScorer):
+-        bounded = scorer
+-    else:
+-        bounded = BoundedScorer(scorer)
+-
+-    def _patched_qualify(probe, *, query_id, visible_text, evidence_text=None, **kwargs):
+-        result = _original_qualify(probe, query_id=query_id, visible_text=visible_text,
+-                                   evidence_text=evidence_text, **kwargs)
+-        text = evidence_text if evidence_text is not None else visible_text
+-        candidate = kwargs.get("candidate") or {}
+-        identity = str(candidate.get("project_identity") or source_identity)
+-        # Revalidate the current evidence; serialized prior admission is not authority.
+-        return apply_rescue(
+-            result, query_id=query_id, question=question,
+-            evidence_text=text, source_identity=identity,
+-            scorer=bounded, threshold=threshold,
+-        )
+-
+-    targets = [
+-        "docmancer.docs.domain.evidence_qualification",
+-        "docmancer.docs.application.context_query_probes",
+-        "docmancer.docs.application.reference_query_tagging",
+-        "docmancer.docs.application._docs_context_projection_core",
+-        "docmancer.docs.domain.context_hint_policy",
+-    ]
+-    patches = []
+-    for module_path in targets:
+-        patches.append(patch.object(
+-            __import__(module_path, fromlist=["qualify_evidence"]),
+-            "qualify_evidence",
+-            _patched_qualify,
+-        ))
+-    for p in patches:
+-        p.start()
++    if not math.isfinite(threshold):
++        raise ValueError("threshold must be finite")
++    if not _INSTALL_LOCK.acquire(blocking=False):
++        raise RuntimeError("rescue installation is isolated: nested/concurrent use is forbidden")
++    owner_thread = threading.get_ident()
++    def current_task():
++        try:
++            return asyncio.current_task()
++        except RuntimeError:
++            return None
++    owner_task = current_task()
+     try:
+-        yield bounded
++        bounded = scorer if isinstance(scorer, BoundedScorer) else BoundedScorer(scorer)
++        def _patched_qualify(probe, *, query_id, visible_text, evidence_text=None, **kwargs):
++            result = _original_qualify(probe, query_id=query_id, visible_text=visible_text,
++                                       evidence_text=evidence_text, **kwargs)
++            # Other threads/tasks must never use the installing request's question.
++            if threading.get_ident() != owner_thread or current_task() is not owner_task:
++                return result
++            text = evidence_text if evidence_text is not None else visible_text
++            candidate = kwargs.get("candidate") or {}
++            identity = str(candidate.get("project_identity") or source_identity)
++            reference = candidate.get("_reference_evidence") or {}
++            provenance = {key: candidate.get(key) for key in (
++                "path", "path_or_url", "resolved_version", "generation_id",
++                "_source_snapshot_sha256", "_source_catalog_hash", "char_start", "char_end",
++                "line_start", "line_end",
++            ) if candidate.get(key) is not None}
++            provenance["reference_source"] = reference.get("source")
++            return apply_rescue(result, query_id=query_id, question=question,
++                evidence_text=text, source_identity=identity, source_binding=provenance,
++                scorer=bounded, threshold=threshold)
++
++        targets = [
++            "docmancer.docs.domain.evidence_qualification",
++            "docmancer.docs.application.context_query_probes",
++            "docmancer.docs.application.reference_query_tagging",
++            "docmancer.docs.application._docs_context_projection_core",
++            "docmancer.docs.domain.context_hint_policy",
++        ]
++        with ExitStack() as stack:
++            for module_path in targets:
++                module = __import__(module_path, fromlist=["qualify_evidence"])
++                stack.enter_context(patch.object(module, "qualify_evidence", _patched_qualify))
++            yield bounded
+     finally:
+-        for p in patches:
+-            p.stop()
++        _INSTALL_LOCK.release()
+diff --git a/experiments/crosslingual_relevance/evaluation_claims_v2.json b/experiments/crosslingual_relevance/evaluation_claims_v2.json
+new file mode 100644
+index 00000000..c3fd7ec8
+--- /dev/null
++++ b/experiments/crosslingual_relevance/evaluation_claims_v2.json
+@@ -0,0 +1,177 @@
++{
++  "schema_version": 2,
++  "description": "External review rubric; does not replace M1.5 or protocol v3. Clauses within a witness must share one canonical quote. Not runtime input.",
++  "tasks": {
++    "typer-negative": [
++      {
++        "id": "typer-negative-claim-1",
++        "alternatives": [
++          {
++            "path": "docs/tutorial/parameter-types/bool.md",
++            "document_sha256": "c025b6f1d713e6e07925d2d724f8b97cf3f80cad86b363e5e89c4fc42d80821d",
++            "clauses": [
++              "you can declare only *CLI option* names to set the `False` value."
++            ]
++          }
++        ]
++      },
++      {
++        "id": "typer-negative-claim-2",
++        "alternatives": [
++          {
++            "path": "docs/tutorial/parameter-types/bool.md",
++            "document_sha256": "c025b6f1d713e6e07925d2d724f8b97cf3f80cad86b363e5e89c4fc42d80821d",
++            "clauses": [
++              "use a space and a single `/` and pass the negative name after:"
++            ]
++          }
++        ]
++      }
++    ],
++    "m15-dev-01": [
++      {
++        "id": "m15-dev-01-claim-1",
++        "alternatives": [
++          {
++            "path": "docs/advanced/timeouts.md",
++            "document_sha256": "48959a587ecc6430f9051ab1b1c76fcebc3f3e95ec01199281aab813a2dcfaa1",
++            "clauses": [
++              "HTTPX is careful to enforce timeouts everywhere by default."
++            ]
++          }
++        ]
++      },
++      {
++        "id": "m15-dev-01-claim-2",
++        "alternatives": [
++          {
++            "path": "docs/advanced/timeouts.md",
++            "document_sha256": "48959a587ecc6430f9051ab1b1c76fcebc3f3e95ec01199281aab813a2dcfaa1",
++            "clauses": [
++              "The default behavior is to raise a `TimeoutException` after 5 seconds of\nnetwork inactivity."
++            ]
++          }
++        ]
++      }
++    ],
++    "m15-dev-02": [
++      {
++        "id": "m15-dev-02-claim-1",
++        "alternatives": [
++          {
++            "path": "docs/preview.md",
++            "document_sha256": "cb4f7f28ec9856fa77493af0182794aa39265753d5ef7947aa36e7f9918a141d",
++            "clauses": [
++              "Enabling preview mode does not on its own enable all preview rules."
++            ]
++          }
++        ]
++      }
++    ],
++    "m15-dev-03": [
++      {
++        "id": "m15-dev-03-claim-1",
++        "alternatives": [
++          {
++            "path": "docs/lifespan.md",
++            "document_sha256": "a9de5de995935cfbd676335fbbbee6f87c96086174aff3d17ecdf89b6220e788",
++            "clauses": [
++              "The lifespan teardown will run once all connections have been closed, and\nany in-process background tasks have completed."
++            ]
++          }
++        ]
++      }
++    ],
++    "m15-dev-04": [
++      {
++        "id": "m15-dev-04-claim-1",
++        "alternatives": [
++          {
++            "path": "docs/concepts/alias.md",
++            "document_sha256": "0c65c7fddc78232eb17b34def5383402e8c2df715da9935ba3d97a98277233e0",
++            "clauses": [
++              "The `AliasPath` is used to specify a path to a field using aliases."
++            ]
++          }
++        ]
++      }
++    ],
++    "m15-hold-01": [
++      {
++        "id": "m15-hold-01-claim-1",
++        "alternatives": [
++          {
++            "path": "docs/advanced/timeouts.md",
++            "document_sha256": "48959a587ecc6430f9051ab1b1c76fcebc3f3e95ec01199281aab813a2dcfaa1",
++            "clauses": [
++              "Disable all timeouts by default.",
++              "httpx.Client(timeout=None)"
++            ]
++          }
++        ]
++      }
++    ],
++    "m15-hold-02": [
++      {
++        "id": "m15-hold-02-claim-1",
++        "alternatives": [
++          {
++            "path": "docs/preview.md",
++            "document_sha256": "cb4f7f28ec9856fa77493af0182794aa39265753d5ef7947aa36e7f9918a141d",
++            "clauses": [
++              "If preview mode is not enabled, this setting has no effect."
++            ]
++          }
++        ]
++      }
++    ],
++    "m15-hold-03": [
++      {
++        "id": "m15-hold-03-claim-1",
++        "alternatives": [
++          {
++            "path": "docs/lifespan.md",
++            "document_sha256": "a9de5de995935cfbd676335fbbbee6f87c96086174aff3d17ecdf89b6220e788",
++            "clauses": [
++              "You should use `TestClient` as a context manager, to ensure that the lifespan is called."
++            ]
++          }
++        ]
++      }
++    ],
++    "m15-hold-04": [
++      {
++        "id": "m15-hold-04-claim-1",
++        "alternatives": [
++          {
++            "path": "docs/concepts/alias.md",
++            "document_sha256": "0c65c7fddc78232eb17b34def5383402e8c2df715da9935ba3d97a98277233e0",
++            "clauses": [
++              "You can use an `AliasGenerator` to specify different alias generators for validation and serialization."
++            ]
++          }
++        ]
++      },
++      {
++        "id": "m15-hold-04-claim-2",
++        "alternatives": [
++          {
++            "path": "docs/concepts/alias.md",
++            "document_sha256": "0c65c7fddc78232eb17b34def5383402e8c2df715da9935ba3d97a98277233e0",
++            "clauses": [
++              "use different naming conventions for loading and saving data,"
++            ]
++          }
++        ]
++      }
++    ]
++  },
++  "task_aliases": {
++    "typer-mixed-ru": "typer-negative",
++    "typer-pure-ru": "typer-negative",
++    "typer-en": "typer-negative",
++    "typer-05-en": "typer-negative",
++    "typer-05-mixed": "typer-negative",
++    "typer-05-ru": "typer-negative"
++  }
++}
+diff --git a/experiments/crosslingual_relevance/evaluation_v2.py b/experiments/crosslingual_relevance/evaluation_v2.py
+new file mode 100644
+index 00000000..812a3d16
+--- /dev/null
++++ b/experiments/crosslingual_relevance/evaluation_v2.py
+@@ -0,0 +1,140 @@
++"""Versioned external evaluation; no labels enter retrieval or rescue.
++
++Canonical occurrence, source policy, relevance, and required-fact coverage are
++separate fields. Unjudged sources are not called irrelevant. An expected file
++name or a one-line overlap is never itself a witness.
++"""
++from __future__ import annotations
++from functools import lru_cache
++import hashlib
++import json
++import math
++from pathlib import Path, PurePosixPath
++from typing import Any, Mapping
++
++HERE = Path(__file__).resolve().parent
++
++@lru_cache(maxsize=16)
++def corpus_documents(project: str) -> dict[str, str]:
++    from eval.evidence_quality_v2.run import documents_for, load_protocol
++    return documents_for(project, load_protocol()[2])
++
++
++def canonical_row(row: Mapping[str, Any], documents: Mapping[str, str], *,
++                  expected_identity: str | None = None) -> dict[str, Any]:
++    path = row.get('path_or_url') or row.get('project_doc_path') or row.get('source_path')
++    if not isinstance(path, str) or not path or path not in documents:
++        return {'status':'unverified', 'reason':'missing_or_wrong_canonical_path'}
++    if PurePosixPath(path).is_absolute() or '..' in PurePosixPath(path).parts:
++        return {'status':'unverified', 'reason':'invalid_canonical_path'}
++    start, end = row.get('line_start'), row.get('line_end')
++    raw = documents[path]
++    lines = raw.splitlines(keepends=True)
++    if type(start) is not int or type(end) is not int or not 1 <= start <= end <= len(lines):
++        return {'status':'unverified', 'reason':'missing_or_invalid_range'}
++    text = row.get('snippet') or row.get('display_text') or row.get('text')
++    if not isinstance(text, str) or not text.strip() or text not in ''.join(lines[start-1:end]):
++        return {'status':'unverified', 'reason':'noncanonical_visible_bytes'}
++    identity = row.get('project_identity')
++    if expected_identity is not None and identity != expected_identity:
++        return {'status':'rejected', 'reason':'wrong_project_identity'}
++    digest = hashlib.sha256(raw.encode()).hexdigest()
++    supplied = row.get('source_content_hash') or row.get('_source_snapshot_sha256')
++    if supplied is not None and str(supplied).removeprefix('sha256:') != digest:
++        return {'status':'rejected', 'reason':'snapshot_mismatch'}
++    return {'status':'verified', 'path':path, 'text':text, 'line_start':start, 'line_end':end,
++            'document_sha256':digest, 'text_sha256':hashlib.sha256(text.encode()).hexdigest(),
++            'identity_verified':expected_identity is not None}
++
++
++def required_claims(task: Mapping[str, Any]) -> list[dict[str, Any]]:
++    if 'required_claims' in task:
++        return list(task['required_claims'])
++    spec = json.loads((HERE/'evaluation_claims_v2.json').read_text())
++    key = str(task.get('id') or task.get('task_id') or '')
++    aliases = spec.get('task_aliases', {})
++    return list(spec['tasks'].get(aliases.get(key, key), []))
++
++
++def assess_packet(payload: Mapping[str, Any], task: Mapping[str, Any], *,
++                  audit_errors: list[str] | None = None) -> dict[str, Any]:
++    documents = corpus_documents(str(task['project']))
++    rows = [canonical_row(row, documents, expected_identity=task.get('expected_project_identity'))
++            for row in payload.get('sources', []) if isinstance(row, Mapping)]
++    valid = [row for row in rows if row['status']=='verified']
++    claims = required_claims(task)
++    supported = []
++    for claim in claims:
++        # All clauses of one witness must occur in a single canonical quotation.
++        # Different claims can be supported by different quotations.
++        witnesses = claim['alternatives']
++        for witness in witnesses:
++            raw = documents.get(witness['path'])
++            if raw is None or hashlib.sha256(raw.encode()).hexdigest() != witness['document_sha256']:
++                raise ValueError('evaluation source identity changed')
++            for text in witness['clauses']:
++                if not text or text not in raw:
++                    raise ValueError('evaluation witness is not in canonical source')
++        if any(row['path']==w['path'] and all(c in row['text'] for c in w['clauses'])
++               for row in valid for w in witnesses):
++            supported.append(claim['id'])
++    full = bool(claims) and len(supported)==len(claims)
++    policy = 'NOT_EVALUATED' if audit_errors is None else ('FAIL' if audit_errors else 'PASS')
++    return {'metric_revision':'canonical-required-claims-v2',
++            'required_count':len(claims), 'supported_count':len(supported),
++            'supported_claim_ids':supported, 'all_required_facts':full,
++            'canonical_errors':[r for r in rows if r['status']!='verified'],
++            'source_policy_status':policy, 'source_policy_errors':audit_errors,
++            'relevance_false_admissions':None,  # No exhaustive relevance labels here.
++            'final_model_answer_quality':'NOT_MEASURED',
++            'verdict': 'NOT_EVALUATED' if not claims or policy=='NOT_EVALUATED'
++                       else 'PASS' if full and not audit_errors and all(r['status']=='verified' for r in rows)
++                       else 'FAIL'}
++
++
++def hit_at_k(relevance: list[bool], k: int = 5) -> float:
++    return float(any(relevance[:k]))
++
++
++def recall_at_k(relevance: list[bool], k: int = 5) -> float:
++    positives = sum(relevance)
++    return sum(relevance[:k]) / positives if positives else 0.0
++
++
++def rank_full_pool(blocks: list[dict], scores: list[float], task: dict, k: int = 5) -> dict:
++    """Rank the full fixed corpus before attaching task-local judgments.
++
++    Missing labels remain UNJUDGED. Known-positive recall is not corpus recall
++    unless all pairs are judged. Stable text/path hashes break ties without gold.
++    """
++    if len(blocks) != len(scores) or not all(math.isfinite(s) for s in scores):
++        raise ValueError('invalid score matrix row')
++    judged = {b['block_id']:b for b in task['blocks']}
++    def key(pair):
++        b,s = pair
++        identity = json.dumps([b.get('path'),b.get('text')],ensure_ascii=False,separators=(',',':'))
++        return -s, hashlib.sha256(identity.encode()).hexdigest(), str(b['block_id'])
++    ranked = sorted(zip(blocks,scores),key=key)
++    rows=[]
++    for rank,(b,s) in enumerate(ranked,1):
++        label=judged.get(b['block_id'])
++        rows.append({'block_id':b['block_id'],'score':float(s),'rank':rank,
++                     'judgment':'UNJUDGED' if label is None else 'JUDGED',
++                     'relevant':None if label is None else label['relevant_to_question'],
++                     'source_allowed':None if label is None else label['source_allowed'],
++                     'covered_fact_ids':None if label is None else label['covered_fact_ids']})
++    known = {bid for bid,label in judged.items() if label['relevant_to_question'] and label['source_allowed']}
++    top={r['block_id'] for r in rows[:k]}
++    return {'block_scores':rows, 'pool_size':len(blocks),'judged_pairs':len(judged),
++            'unjudged_in_top_k':sum(r['judgment']=='UNJUDGED' for r in rows[:k]),
++            'known_allowed_positive_recall_at_k':len(top & known)/len(known) if known else None,
++            'fully_judged':len(judged)==len(blocks),
++            'semantic_false_positive_rate':None}
++
++
++def save_new_report(path: Path, payload: Any) -> None:
++    """Never overwrite an archived result or silently accept nonfinite metrics."""
++    encoded=json.dumps(payload,ensure_ascii=False,indent=2,allow_nan=False)+'\n'
++    path.parent.mkdir(parents=True,exist_ok=True)
++    with path.open('x',encoding='utf-8') as stream:
++        stream.write(encoded)
+diff --git a/experiments/crosslingual_relevance/m4_dense_candidates.py b/experiments/crosslingual_relevance/m4_dense_candidates.py
+index c7fd1768..d5ecdcf4 100644
+--- a/experiments/crosslingual_relevance/m4_dense_candidates.py
++++ b/experiments/crosslingual_relevance/m4_dense_candidates.py
+@@ -120,7 +120,7 @@ def _load_all_documents(root: Path) -> dict[str, tuple[list[Document], str]]:
+     return result
+ 
+ 
+-def _build_agent(root: Path, all_docs: list[Document]) -> DocmancerAgent:
++def _build_agent(root: Path, all_docs: list[Document], *, max_sections_per_source: int = 20) -> DocmancerAgent:
+     """Build an isolated DocmancerAgent with sqlite-vec vector store, dense-only."""
+     config = DocmancerConfig()
+     config.index.db_path = str(root / "index.sqlite")
+@@ -128,7 +128,7 @@ def _build_agent(root: Path, all_docs: list[Document]) -> DocmancerAgent:
+     config.retrieval.default_mode = "dense"
+     config.retrieval.fusion.method = "rrf"
+     config.retrieval.fusion.rrf_k = 60
+-    config.retrieval.max_sections_per_source = 20
++    config.retrieval.max_sections_per_source = max_sections_per_source
+     config.embeddings.provider = "fastembed"
+     config.embeddings.model = DENSE_MODEL
+     config.embeddings.dimensions = DENSE_DIM
+@@ -146,23 +146,17 @@ def _build_agent(root: Path, all_docs: list[Document]) -> DocmancerAgent:
+     return agent
+ 
+ 
++def _chunk_row(chunk: Any) -> dict:
++    meta = dict(chunk.metadata or {})
++    return {**meta, "path_or_url":meta.get("project_doc_path") or meta.get("source_path"),
++            "snippet":meta.get("display_text") or getattr(chunk, "text", "")}
++
++
+ def _is_gold_chunk(chunk: Any, task: dict) -> bool:
+-    """Check if a chunk matches any gold range for the task."""
+-    path = chunk.metadata.get("project_doc_path") or chunk.metadata.get("source_path") or ""
+-    line_start = chunk.metadata.get("line_start")
+-    line_end = chunk.metadata.get("line_end")
+-    # Match by path and line overlap
+-    for gold_path in task["gold_paths"]:
+-        if gold_path in path or path in gold_path:
+-            if line_start is not None and line_end is not None:
+-                for gl_start, gl_end in task["gold_lines"]:
+-                    # Check line overlap
+-                    if line_start <= gl_end and line_end >= gl_start:
+-                        return True
+-            else:
+-                # If no line metadata, match by path only
+-                return True
+-    return False
++    """Require canonical bytes and all explicit v2 claims, never path-only success."""
++    from .evaluation_v2 import assess_packet
++    outcome = assess_packet({"sources":[_chunk_row(chunk)]}, task)
++    return outcome["all_required_facts"] and not outcome["canonical_errors"]
+ 
+ 
+ def _run_step1(dispatcher, task: dict, project_identity: str) -> dict[str, Any]:
+@@ -176,6 +170,7 @@ def _run_step1(dispatcher, task: dict, project_identity: str) -> dict[str, Any]:
+         allow_degraded=False,
+     )
+     chunks = list(result.chunks)
++    task = {**task, "expected_project_identity":project_identity}
+     contributions = {
+         str(sid): dict(cr) for sid, cr in result.contributions.items()
+     }
+@@ -184,6 +179,8 @@ def _run_step1(dispatcher, task: dict, project_identity: str) -> dict[str, Any]:
+         if _is_gold_chunk(chunk, task):
+             gold_ranks.append(i + 1)
+     return {
++        "metric_revision": "canonical-required-claims-v2",
++        "candidate_rows": [_chunk_row(chunk) for chunk in chunks],
+         "task_id": task["id"],
+         "formulation": task["formulation"],
+         "project": task["project"],
+@@ -195,6 +192,8 @@ def _run_step1(dispatcher, task: dict, project_identity: str) -> dict[str, Any]:
+         "gold_found": len(gold_ranks) > 0,
+         "gold_rank": gold_ranks[0] if gold_ranks else None,
+         "gold_ranks": gold_ranks,
++        "rank_semantics": "first individually complete canonical witness, not filename overlap",
++        "model_configuration": {"max_sections_per_source": dispatcher.config.retrieval.max_sections_per_source, "top_k": TOP_K},
+         "dense_contributed_to_gold": any(
+             "dense" in contributions.get(str(chunk.metadata.get("section_id")), {})
+             for chunk in chunks if _is_gold_chunk(chunk, task)
+@@ -231,7 +230,7 @@ def _run_step1_wrong_project(dispatcher, task: dict, wrong_identity: str) -> dic
+         }
+ 
+ 
+-def main():
++def _run(max_sections_per_source: int = 20):
+     tmp = Path(tempfile.mkdtemp(prefix="m4-full-"))
+     print(f"Working directory: {tmp}")
+ 
+@@ -246,7 +245,7 @@ def main():
+ 
+     # Build agent with vectors
+     print(f"\nBuilding agent with {len(all_docs)} documents...")
+-    agent = _build_agent(tmp, all_docs)
++    agent = _build_agent(tmp, all_docs, max_sections_per_source=max_sections_per_source)
+     dispatcher = dispatcher_for_agent(agent, mode="dense")
+     print(f"Dispatcher ready (mode=dense)")
+ 
+@@ -304,8 +303,8 @@ def main():
+     total = len(step1_results)
+     found_in_top5 = sum(1 for r in step1_results if r["gold_found"] and r["gold_rank"] <= 5)
+     found_in_top20 = sum(1 for r in step1_results if r["gold_found"])
+-    print(f"Recall@5: {found_in_top5}/{total} = {found_in_top5/total:.2f}")
+-    print(f"Recall@20: {found_in_top20}/{total} = {found_in_top20/total:.2f}")
++    print(f"CompleteWitnessHit@5: {found_in_top5}/{total} = {found_in_top5/total:.2f}")
++    print(f"CompleteWitnessHit@20: {found_in_top20}/{total} = {found_in_top20/total:.2f}")
+ 
+     # Per language group
+     by_formulation = {}
+@@ -332,16 +331,26 @@ def main():
+         "hybrid_strict": hybrid_result,
+         "summary": {
+             "total_tasks": total,
+-            "recall_at_5": found_in_top5 / total,
+-            "recall_at_20": found_in_top20 / total,
++            "complete_witness_hit_at_5": found_in_top5 / total,
++            "complete_witness_hit_at_20": found_in_top20 / total,
+             "degraded_runs": degraded_count,
+         },
+     }
+-    out_path = Path("experiments/crosslingual_relevance/m4_dense_results.json")
+-    out_path.write_text(json.dumps(output, ensure_ascii=False, indent=2, default=str) + "\n",
+-                        encoding="utf-8")
++    from .evaluation_v2 import save_new_report
++    out_path = Path("experiments/crosslingual_relevance/review_runs") / f"m4-{uuid.uuid4().hex}.json"
++    save_new_report(out_path, output)
+     print(f"\nResults saved to {out_path}")
+ 
+ 
++def main():
++    import argparse
++    from .pinned_embedding_session import pinned_embeddings
++    parser=argparse.ArgumentParser(description=__doc__)
++    parser.add_argument('--max-sections-per-source',type=int,choices=(2,20),default=20)
++    args=parser.parse_args()
++    with pinned_embeddings():
++        _run(args.max_sections_per_source)
++
++
+ if __name__ == "__main__":
+     main()
+diff --git a/experiments/crosslingual_relevance/m4_step2_handler.py b/experiments/crosslingual_relevance/m4_step2_handler.py
+index 46e94d69..0da418c0 100644
+--- a/experiments/crosslingual_relevance/m4_step2_handler.py
++++ b/experiments/crosslingual_relevance/m4_step2_handler.py
+@@ -1,186 +1,68 @@
+-"""M4 Step 2 — real get_docs_context with dense retrieval.
++"""M4 Step 2: real dense handler, canonical fact audit, no rescue scorer.
+ 
+-Prove that the query reaches the dense backend through the real handler
+-and results reach service candidates. No monkeypatching of search results.
+-
+-Uses the same corpus as Step 1 (M1.5 dev + Typer), indexed through the real
+-service with vectors enabled, then queried through get_docs_context via
+-observe_call (same pattern as M0 tests, but with vectors).
+-
+-Usage:
+-    python -m experiments.crosslingual_relevance.m4_step2_handler
++Shares the pinned vector service and evaluator with M5/M6. Existing historical
++results are not overwritten. No oracle-selected result or source is injected.
+ """
+ from __future__ import annotations
+ 
++import argparse
+ import json
+-import os
+ import tempfile
+ import uuid
+ from pathlib import Path
+-from typing import Any
+-from unittest.mock import patch
+-
+-from docmancer.core.config import DocmancerConfig, VectorStoreConfig
+ 
+ from eval.evidence_quality_v2.run import documents_for, load_protocol
+ from eval.evidence_quality_v2.runtime import write_project
+-from eval.evidence_quality_v2.observer import observe_call
+-
+-DENSE_MODEL = "sentence-transformers/paraphrase-multilingual-mpnet-base-v2"
+-DENSE_DIM = 768
+-
+-from experiments.crosslingual_relevance.m4_dense_candidates import (
+-    M15_DEV_TASKS, TYPER_TASKS, ALL_TASKS, PROJECTS,
+-)
+-
+-GOLD_PHRASES_TYPER = (
+-    "only *CLI option* names to set the `False` value",
+-)
++from .evaluation_v2 import assess_packet, save_new_report
++from .m4_dense_candidates import ALL_TASKS, PROJECTS
++from .m5_real_scorer import _build_vector_service, _index_all
++from .m6_holdout import _run_condition
++from .pinned_embedding_session import pinned_embeddings
+ 
+ 
+ def _is_gold_source(source: dict, task: dict) -> bool:
+-    """Check if a source from get_docs_context matches the task's gold."""
+-    path = source.get("path_or_url") or source.get("source_path") or ""
+-    line_start = source.get("line_start")
+-    line_end = source.get("line_end")
+-    snippet = source.get("snippet") or ""
+-    for gold_path in task["gold_paths"]:
+-        if gold_path.split("/")[-1] in path.split("/")[-1] or gold_path in path or path in gold_path:
+-            if line_start is not None and line_end is not None:
+-                for gl_start, gl_end in task["gold_lines"]:
+-                    if line_start <= gl_end and line_end >= gl_start:
+-                        return True
+-            if task["id"].startswith("typer"):
+-                if any(p in snippet for p in GOLD_PHRASES_TYPER):
+-                    return True
+-            elif not line_start:
+-                return True
+-    return False
++    assessment = assess_packet({'sources': [source]}, task)
++    return assessment['all_required_facts'] and not assessment['canonical_errors']
+ 
+ 
+ def main():
+-    tmp = Path(tempfile.mkdtemp(prefix="m4-step2-"))
+-    print(f"Working directory: {tmp}")
+-
+-    # Build service with vectors enabled
+-    import scripts.run_project_docs_self_host_gate as gate
+-
+-    state = tmp / "state"
+-    state.mkdir(parents=True, exist_ok=True)
+-    home_dir = tmp / "docatlas_home"
+-    home_dir.mkdir(parents=True, exist_ok=True)
+-    env = {key: str(state / key.lower()) for key in
+-           ('HOME', 'XDG_CONFIG_HOME', 'XDG_CACHE_HOME', 'XDG_DATA_HOME')}
+-    env['DOCATLAS_HOME'] = str(home_dir)
+-    env.update(DOCATLAS_OFFLINE='1', DOCATLAS_AUTO_VECTORS='1')
+-    for p in env.values():
+-        if p not in ('0', '1'):
+-            Path(p).mkdir(parents=True, exist_ok=True)
+-
+-    with patch.dict(os.environ, env):
+-        config = gate.DocmancerConfig()
+-        config.index.db_path = str(state / 'index.db')
+-        config.index.extracted_dir = str(state / 'extracted')
+-        config.retrieval.default_mode = "dense"
+-        config.retrieval.max_sections_per_source = 20
+-        config.embeddings.provider = "fastembed"
+-        config.embeddings.model = DENSE_MODEL
+-        config.embeddings.dimensions = DENSE_DIM
+-        config.embeddings.sparse_model = None
+-        config.embeddings.cache = "/tmp/fastembed_cache"
+-        config.vector_store = VectorStoreConfig(
+-            provider="sqlite-vec",
+-            collection=f"m4step2_{uuid.uuid4().hex[:8]}",
++    parser = argparse.ArgumentParser(description=__doc__)
++    parser.add_argument('--max-sections-per-source', type=int, choices=(2, 20), default=20)
++    args = parser.parse_args()
++    tmp = Path(tempfile.mkdtemp(prefix='m4-step2-reviewed-'))
++    manifest = load_protocol()[2]
++    roots = {}
++    for project in PROJECTS:
++        root = tmp / 'projects' / project
++        write_project(root, documents_for(project, manifest))
++        roots[project] = str(root)
++
++    with pinned_embeddings() as identity:
++        service, config, patcher = _build_vector_service(
++            tmp, max_sections_per_source=args.max_sections_per_source,
+         )
+-
+-        # Ensure DocAtlas owns the home directory
+-        from docmancer.core.product_identity import ensure_owned_home
+-        ensure_owned_home(str(home_dir))
+-
+-        service = gate.LibraryDocsService(
+-            config=config, config_source='explicit',
+-            registry=gate.LibraryRegistry(config.index.db_path),
+-            agent=gate.DocmancerAgent(config=config),
+-            job_tracker=gate.DocsJobTracker(),
+-        )
+-
+-        # Index all projects with vectors
+-        _, _, manifest = load_protocol()
+-        project_roots = {}
+-        for project in PROJECTS:
+-            docs = documents_for(project, manifest)
+-            root = tmp / "projects" / project
+-            write_project(root, docs)
+-            print(f"  Indexing {project}...")
+-            result = service.sync_project_docs(str(root), with_vectors=True)
+-            if result.status != 'success':
+-                raise RuntimeError(f"index failed for {project}: {result.status}")
+-            project_roots[project] = str(root)
+-
+-        print(f"\nAll {len(PROJECTS)} projects indexed with vectors.")
