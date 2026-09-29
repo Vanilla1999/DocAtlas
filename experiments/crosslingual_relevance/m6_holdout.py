@@ -90,7 +90,9 @@ def _run_condition(service, root: str, task: dict, condition: str, *, oracle_plu
     context=installed(bounded,question=task["question"]) if use_rescue else nullcontext()
     with context:
         payload,trace=observe_call(service,request)
-    errors=audit_payload(payload,trace.get("snapshot",{}),Path(root))
+    # Handler failures are not malformed model-visible projections.
+    errors=(audit_payload(payload,trace.get("snapshot",{}),Path(root))
+            if payload.get('status') != 'failed' else ['handler failed: '+str(payload.get('error',{}).get('exception_type'))])
     assessment=assess_packet(payload,task,audit_errors=errors)
     candidates=[s for e in trace.get("stages",{}).get("retrieved_candidates",[])
                 for s in e.get("sources",[]) if isinstance(s,dict)]
@@ -144,15 +146,21 @@ def main(argv=None):
         vconfig.retrieval.max_sections_per_source=args.max_sections_per_source
         try:
             _index_all(vservice,{k:str(v) for k,v in roots.items()})
+            # isolated_service changes process-global environment; keep the
+            # vector service on its own environment before entering that context.
+            for rescue in (False,True):
+                for task in HOLDOUT_TASKS:
+                    results.append(_run_condition(vservice,str(roots[task['project']]),task,
+                        'dense'+('_rescue' if rescue else '_baseline'),
+                        oracle_plumbing=args.oracle_plumbing))
             with isolated_service(root/'lexical') as (lservice,lconfig):
                 lconfig.retrieval.max_sections_per_source=args.max_sections_per_source
                 for path in roots.values(): index_project(lservice,lconfig,path)
-                for mode,service in [('lexical',lservice),('dense',vservice)]:
-                    for rescue in (False,True):
-                        for task in HOLDOUT_TASKS:
-                            results.append(_run_condition(service,str(roots[task['project']]),task,
-                                mode+('_rescue' if rescue else '_baseline'),
-                                oracle_plumbing=args.oracle_plumbing))
+                for rescue in (False,True):
+                    for task in HOLDOUT_TASKS:
+                        results.append(_run_condition(lservice,str(roots[task['project']]),task,
+                            'lexical'+('_rescue' if rescue else '_baseline'),
+                            oracle_plumbing=args.oracle_plumbing))
         finally:
             patcher.stop()
     output={'schema_version':2,'evaluation_kind':'oracle_plumbing' if args.oracle_plumbing else 'real_model_replay',

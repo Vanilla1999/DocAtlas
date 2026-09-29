@@ -671,8 +671,16 @@ gold блок Typer оценивается в 0.50–0.54, далеко ниже
 - M3: GREEN (22 PASS — rescue механизм + негативные контроли)
 - M4: PARTIAL (dispatcher находит gold, handler доходит до кандидатов)
 - M5 stub-scorer: GREEN (29/29 PASS — **диагностический**, не acceptance)
-- M5 real-scorer: **NO-GO** для Typer (порог не переносится), PARTIAL для M1.5
+- M5 real-scorer (MPNet): **NO-GO** для Typer (порог не переносится), PARTIAL для M1.5
+- M5 reranker (BGE-v2-m3): диагностический Typer 3/3 при пороге,
+  выбранном после просмотра Typer; **не acceptance GREEN**.
 - M6: NOT VALIDATED (holdout уже использовался в M2, weak-model не исполнен)
+
+Диагностический повтор M6 после изоляции environment dense/lexical:
+16/16 запросов вернули `status=ok`, без source-policy errors; dense baseline
+и dense rescue — по 3/4 полных первых пакета, lexical baseline и lexical
+rescue — по 4/4. У 6/8 rescue rows scorer деградировал при исходном лимите
+10 секунд. Это **просмотренные задачи**, не независимый holdout и не M6 GREEN.
 
 ### Что доказано
 
@@ -681,23 +689,40 @@ gold блок Typer оценивается в 0.50–0.54, далеко ниже
 3. BoundedScorer исправлен: cache до limit, минимальная длина, K=60
 4. Stub-scorer M5 доказывает **механизм** доставки (rescue → packet), но не **качество модели**
 5. Реальный MPNet при замороженном пороге не ловит Typer gold — это закономерный результат
+6. **BGE-reranker-v2-m3** улучшает ранжирование на изученном пуле, но порог
+   допуска на независимых данных не подтверждён.
+7. **Reranker fail-closed исправлен**: ошибки propagate to BoundedScorer → degraded=True
+8. Проверка fingerprint manifest и hash байтов модели подключена к identity;
+   локальный model-dependent пилот: 12 PASS (не acceptance).
+9. Пилотные тесты Typer не проверяют полный набор Step 6 и не доказывают
+   перенос на другой проект/версию.
+10. Полный regression gate не GREEN; прежний запуск имел 21 FAIL, для всех
+    причинность изменений не была установлена.
 
 ### Что не доказано
 
-1. M0 RED для Typer не исправлен при реальном scorer
-2. Порог 0.7453 не переносится с M1.5 calibration на Typer
-3. M6 не выполнен (holdout просмотрен, weak-model не запущен)
-4. Продакшн-активация не обоснована
+1. M0 RED для Typer остаётся RED в продукте (reranker включён только monkeypatch).
+2. Порог 0.7453 (MPNet) не переносится с M1.5 calibration на Typer
+3. M1.5 calibration threshold для reranker (0.9917) не переносится на Typer
+4. M6 не выполнен (holdout просмотрен, weak-model не запущен)
+5. Продакшн-активация не обоснована (P0 freeze)
+
+### Порог reranker 0.01 — отозван как acceptance
+
+Порог выбран по просмотренным Typer gold/non-gold scores. Название «noise floor»
+не делает выбор независимым. На M1.5 calibration отрицательные блоки имеют
+scores до 0.6242; без разметки именно потока `insufficient_visible_match`
+нельзя утверждать, что они все проходят lexical qualification. Порог 0.9917
+на cal+dev даёт лишь 4/12 положительных. Требуется новый независимый набор
+для настройки и отдельный нетронутый holdout для оценки.
 
 ### Следующий шаг
 
-План запрещает подстраивать порог под Typer. Возможные направления:
-1. Отметить NO-GO: замороженный порог не переносится, M0 RED не исправлен
-2. Провести отдельную калибровку на более широком корпусе (новый M2c)
-3. Использовать ранжирующий reranker вместо порогового допуска
-
-Решение — за мейнтейнером. Текущее состояние — экспериментальный PASS механизма,
-NO-GO продакшн-активации.
+1. Закончить RED→GREEN Step 6 (HTTPX, stale/version/risk, отрицание,
+   настоящий literal-control `" /-S"` vs `"/-S"`).
+2. Независимая калибровка и M6 weak-model gate; не выдавать изученный holdout
+   за новый. Повтор M6 dense работает, но не показывает улучшения.
+3. Продакшн-активация — отдельное решение мейнтейнера (P0 freeze).
 
 ## Implementation evidence
 

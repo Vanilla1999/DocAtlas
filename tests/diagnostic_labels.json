@@ -258,7 +258,8 @@
     "tests/test_unified_docs_context_part02.py": "behavioral",
     "tests/test_uspto_tm.py": "behavioral",
     "tests/test_vector_fallback.py": "behavioral",
-    "tests/test_web_fetcher.py": "behavioral"
+    "tests/test_web_fetcher.py": "behavioral",
+    "tests/docs/test_reranker_rescue.py": "behavioral"
   },
   "module_node_hashes": {
     "tests/docs/test_action_packet.py": "24c5657a625d74a7e39e4d966448aee249c0d3a1e79b2ff039d0ca5a472a7ee5",
@@ -519,7 +520,8 @@
     "tests/test_unified_docs_context_part02.py": "6927c5e57b51c17b11e55d715b1c4868ba123239f96cb9544dbc4a6659f9ab74",
     "tests/test_uspto_tm.py": "92f3214036e4547c97bfe9c55398e9f137756c3813fd5d0e9f4497a18f3dc2e1",
     "tests/test_vector_fallback.py": "44f6de6da958441969f465a6e9537a6ebce4cb24a12de6a34e04eb8831258513",
-    "tests/test_web_fetcher.py": "83a06465f2bab1e48fc02d9a2b330e9f5795b0ad9c953744c597c1e20cab58c7"
+    "tests/test_web_fetcher.py": "83a06465f2bab1e48fc02d9a2b330e9f5795b0ad9c953744c597c1e20cab58c7",
+    "tests/docs/test_reranker_rescue.py": "297881ad9b741dd59103a0207dca5941a34cd6d9a9ebcbe8fad86d69c34cb920"
   },
   "node_overrides": {
     "tests/docs/test_code_graph.py::test_code_graph_to_context_dict_is_json_serializable": "serialization",

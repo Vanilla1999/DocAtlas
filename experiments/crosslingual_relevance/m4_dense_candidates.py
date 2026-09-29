@@ -148,8 +148,12 @@ def _build_agent(root: Path, all_docs: list[Document], *, max_sections_per_sourc
 
 def _chunk_row(chunk: Any) -> dict:
     meta = dict(chunk.metadata or {})
-    return {**meta, "path_or_url":meta.get("project_doc_path") or meta.get("source_path"),
+    row = {**meta, "path_or_url":meta.get("project_doc_path") or meta.get("source_path"),
             "snippet":meta.get("display_text") or getattr(chunk, "text", "")}
+    ls = row.get("line_span")
+    if isinstance(ls, (list, tuple)) and len(ls) == 2 and "line_start" not in row:
+        row["line_start"], row["line_end"] = int(ls[0]), int(ls[1])
+    return row
 
 
 def _is_gold_chunk(chunk: Any, task: dict) -> bool:
