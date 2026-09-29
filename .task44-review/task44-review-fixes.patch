@@ -998,3 +998,2050 @@ index 46e94d69..0da418c0 100644
 -            project_roots[project] = str(root)
 -
 -        print(f"\nAll {len(PROJECTS)} projects indexed with vectors.")
+-
+-        # Run get_docs_context for all tasks via observe_call
+-        print(f"\n{'='*60}")
+-        print("STEP 2: Real get_docs_context (dense mode, with vectors)")
+-        print(f"{'='*60}")
+-        results = []
+-        for task in ALL_TASKS:
+-            project_root = project_roots[task["project"]]
+-            request = {
+-                "question": task["question"],
+-                "project_path": project_root,
+-                "scope": "all",
+-            }
+-            payload, _trace = observe_call(service, request)
+-            sources = payload.get("sources", [])
+-            gold_sources = []
+-            for i, source in enumerate(sources):
+-                if _is_gold_source(source, task):
+-                    gold_sources.append({
+-                        "rank": i + 1,
+-                        "path": source.get("path_or_url"),
+-                        "line_start": source.get("line_start"),
+-                        "line_end": source.get("line_end"),
+-                    })
+-            r = {
+-                "task_id": task["id"],
+-                "formulation": task["formulation"],
+-                "project": task["project"],
+-                "total_sources": len(sources),
+-                "gold_found": len(gold_sources) > 0,
+-                "gold_rank": gold_sources[0]["rank"] if gold_sources else None,
+-                "gold_sources": gold_sources,
+-                "answer_supported": payload.get("answer_supported"),
+-                "context_available": payload.get("context_available"),
+-            }
+-            results.append(r)
+-            status = "PASS" if r["gold_found"] else "FAIL"
+-            print(f"  [{status}] {r['task_id']} ({r['formulation']}): "
+-                  f"gold_found={r['gold_found']} rank={r['gold_rank']} "
+-                  f"sources={r['total_sources']} "
+-                  f"context_available={r['context_available']}")
+-
+-        # Summary
+-        print(f"\n{'='*60}")
+-        print("SUMMARY")
+-        print(f"{'='*60}")
+-        total = len(results)
+-        found = sum(1 for r in results if r["gold_found"])
+-        print(f"Gold found: {found}/{total}")
+-        by_formulation = {}
+-        for r in results:
+-            by_formulation.setdefault(r["formulation"], []).append(r)
+-        for formulation, fr in sorted(by_formulation.items()):
+-            f = sum(1 for r in fr if r["gold_found"])
+-            print(f"  {formulation}: {f}/{len(fr)}")
+-
+-        # Save
+-        output = {"step2": results, "summary": {"total": total, "found": found}}
+-        out_path = Path("experiments/crosslingual_relevance/m4_step2_results.json")
+-        out_path.write_text(json.dumps(output, ensure_ascii=False, indent=2, default=str) + "\n",
+-                            encoding="utf-8")
+-        print(f"\nResults saved to {out_path}")
+-
+-
+-if __name__ == "__main__":
++        try:
++            _index_all(service, roots)
++            rows = [_run_condition(service, roots[task['project']], task, 'dense_baseline')
++                    for task in ALL_TASKS]
++        finally:
++            patcher.stop()
++    output = {
++        'schema_version': 2,
++        'evaluation_kind': 'dense_handler_without_rescue',
++        'model_identity': identity,
++        'max_sections_per_source': args.max_sections_per_source,
++        'gold_oracle_used': False,
++        'rows': rows,
++        'summary': {
++            'total': len(rows),
++            'complete_audited_packets': sum(row['assessment']['verdict'] == 'PASS' for row in rows),
++        },
++    }
++    target = Path(__file__).parent / 'review_runs' / f'm4-step2-{uuid.uuid4().hex}.json'
++    save_new_report(target, json.loads(json.dumps(output, default=str)))
++    print(target)
++
++
++if __name__ == '__main__':
+     main()
+diff --git a/experiments/crosslingual_relevance/m5_real_scorer.py b/experiments/crosslingual_relevance/m5_real_scorer.py
+index 9f9890a7..d9193829 100644
+--- a/experiments/crosslingual_relevance/m5_real_scorer.py
++++ b/experiments/crosslingual_relevance/m5_real_scorer.py
+@@ -3,10 +3,9 @@
+ Replaces the stub scorer with the real frozen MPNet model (threshold 0.7453).
+ Tests both Typer (M0 RED target) and M1.5 development tasks.
+ 
+-Expected:
+-  - M1.5 dev tasks: gold scores above 0.7453 → rescue fires → PASS
+-  - Typer tasks: gold scores 0.50-0.54 → below threshold → rescue does NOT fire → FAIL
+-  - This is a legitimate finding: frozen threshold doesn't transfer to Typer
++Scores are recorded on the actual runtime evidence. Neither a manually selected
++gold window nor one matching keyword is proof of first-packet completeness.
++Historical scores are not predictions for the instrumented replay.
+ 
+ Usage:
+     python -m experiments.crosslingual_relevance.m5_real_scorer
+@@ -53,7 +52,7 @@ TYPER_TASKS = [
+     },
+ ]
+ 
+-# M1.5 development tasks (gold scores above threshold)
++# Existing M1.5 development tasks; no assumption about real scorer scores
+ M15_DEV_TASKS = [
+     {
+         "id": "m15-dev-01", "project": "httpx", "formulation": "mixed",
+@@ -80,7 +79,7 @@ M15_DEV_TASKS = [
+ ALL_PROJECTS = ["httpx", "ruff", "starlette", "pydantic", "typer"]
+ 
+ 
+-def _build_vector_service(tmp: Path):
++def _build_vector_service(tmp: Path, *, max_sections_per_source: int = 20):
+     import scripts.run_project_docs_self_host_gate as gate
+     from docmancer.core.config import VectorStoreConfig
+     from docmancer.core.product_identity import ensure_owned_home
+@@ -104,7 +103,7 @@ def _build_vector_service(tmp: Path):
+         config.index.db_path = str(state / 'index.db')
+         config.index.extracted_dir = str(state / 'extracted')
+         config.retrieval.default_mode = "dense"
+-        config.retrieval.max_sections_per_source = 20
++        config.retrieval.max_sections_per_source = max_sections_per_source
+         config.embeddings.provider = "fastembed"
+         config.embeddings.model = DENSE_MODEL
+         config.embeddings.dimensions = DENSE_DIM
+@@ -133,27 +132,24 @@ def _index_all(service, roots: dict[str, str]):
+             raise RuntimeError(f"index failed for {project}: {result.status}")
+ 
+ 
+-def _check_gold(payload, task) -> dict[str, Any]:
+-    sources = payload.get("sources", [])
+-    visible = "\n\n".join(s.get("snippet", "") for s in sources)
+-    gold_found = any(p in visible for p in task["gold_phrases"])
+-    budget = docs_context_budget_tokens(payload)
+-    return {
+-        "task_id": task["id"],
+-        "formulation": task["formulation"],
+-        "project": task["project"],
+-        "gold_found": gold_found,
+-        "total_sources": len(sources),
+-        "budget_tokens": budget,
+-        "answer_supported": payload.get("answer_supported", False),
+-        "context_available": payload.get("context_available", False),
+-    }
++def _check_gold(payload, task, *, audit_errors=None) -> dict[str, Any]:
++    from .evaluation_v2 import assess_packet
++    assessment = assess_packet(payload, task, audit_errors=audit_errors)
++    return {"task_id":task["id"], "formulation":task["formulation"], "project":task["project"],
++        "gold_found":assessment["all_required_facts"] and not assessment["canonical_errors"],
++        "total_sources":len(payload.get("sources",[])),
++        "budget_tokens":docs_context_budget_tokens(payload),
++        "answer_supported":payload.get("answer_supported",False),
++        "context_available":payload.get("context_available",False),
++        "assessment":assessment}
+ 
+ 
+-def main():
++def _run(max_sections_per_source: int = 20):
+     import tempfile
+     tmp = Path(tempfile.mkdtemp(prefix="m5-real-"))
+     print(f"Working directory: {tmp}")
++    from .mpnet_scorer import _get_model
++    _get_model()  # Verify the pinned local model before any indexing/experiment.
+     print(f"Model: {model_identity()}")
+     print(f"Threshold: {M2B_THRESHOLD}")
+ 
+@@ -167,86 +163,87 @@ def main():
+         roots[project] = str(root)
+ 
+     print("Building vector service...")
+-    service, config, patcher = _build_vector_service(tmp)
+-    _index_all(service, roots)
+-    print("All projects indexed with vectors.\n")
+-
+-    # Pre-compute MPNet scores for gold blocks to verify threshold applicability
+-    print("=" * 60)
+-    print("MPNet score check (gold blocks vs threshold)")
+-    print("=" * 60)
+-    for task in TYPER_TASKS + M15_DEV_TASKS:
+-        docs = documents_for(task["project"], manifest)
+-        # Find gold passage
+-        gold_text = ""
+-        for path, content in docs.items():
+-            for phrase in task["gold_phrases"]:
+-                if phrase in content:
+-                    # Extract the section containing the phrase
+-                    lines = content.split('\n')
+-                    for i, line in enumerate(lines):
+-                        if phrase in line:
+-                            gold_text = '\n'.join(lines[max(0,i-2):i+10])
+-                            break
+-                    if gold_text:
+-                        break
+-            if gold_text:
+-                break
+-        if gold_text:
+-            score = mpnet_scorer(task["question"], gold_text)
+-            above = score >= M2B_THRESHOLD
+-            print(f"  {task['id']} ({task['formulation']}): score={score:.4f} "
+-                  f"above_threshold={above} {'✓' if above else '✗'}")
+-        else:
+-            print(f"  {task['id']}: gold text not found")
+-
+-    # Run all tasks with real MPNet scorer
+-    print(f"\n{'='*60}")
+-    print("M5 with real MPNet scorer (frozen threshold 0.7453)")
+-    print(f"{'='*60}")
+-
+-    results = []
+-    for task in TYPER_TASKS + M15_DEV_TASKS:
+-        root = roots[task["project"]]
+-        request = {"question": task["question"], "project_path": root, "scope": "all"}
+-        with installed(mpnet_scorer, threshold=M2B_THRESHOLD, question=task["question"]):
+-            payload, trace = observe_call(service, request)
+-        r = _check_gold(payload, task)
+-        results.append(r)
+-        status = "PASS" if r["gold_found"] else "FAIL"
+-        print(f"  [{status}] {r['task_id']} ({r['formulation']}): "
+-              f"gold_found={r['gold_found']} sources={r['total_sources']} "
+-              f"budget={r['budget_tokens']} context_available={r['context_available']}")
+-
+-    # Summary
+-    print(f"\n{'='*60}")
+-    print("SUMMARY")
+-    print(f"{'='*60}")
+-    typer_results = [r for r in results if r["project"] == "typer"]
+-    m15_results = [r for r in results if r["project"] != "typer"]
+-    typer_pass = sum(1 for r in typer_results if r["gold_found"])
+-    m15_pass = sum(1 for r in m15_results if r["gold_found"])
+-    print(f"Typer (M0 target): {typer_pass}/{len(typer_results)}")
+-    print(f"M1.5 dev: {m15_pass}/{len(m15_results)}")
+-
+-    # Save
+-    output = {
+-        "scorer": model_identity(),
+-        "threshold": M2B_THRESHOLD,
+-        "results": results,
+-        "summary": {
+-            "typer_pass": typer_pass,
+-            "typer_total": len(typer_results),
+-            "m15_pass": m15_pass,
+-            "m15_total": len(m15_results),
+-        },
+-    }
+-    out_path = Path("experiments/crosslingual_relevance/m5_real_scorer_results.json")
+-    out_path.write_text(json.dumps(output, ensure_ascii=False, indent=2, default=str) + "\n",
+-                        encoding="utf-8")
+-    print(f"\nResults saved to {out_path}")
+-
+-    patcher.stop()
++    service, config, patcher = _build_vector_service(tmp, max_sections_per_source=max_sections_per_source)
++    try:
++        _index_all(service, roots)
++        print("All projects indexed with vectors.\n")
++
++        # No oracle-selected gold window is sent to the scorer. All recorded inputs
++        # below come from actual qualification/projection calls, with exact hashes.
++        # Run all tasks with real MPNet scorer
++        print(f"\n{'='*60}")
++        print("M5 with real MPNet scorer (frozen threshold 0.7453)")
++        print(f"{'='*60}")
++
++        results = []
++        executions = []
++        for task in TYPER_TASKS + M15_DEV_TASKS:
++            root = roots[task["project"]]
++            request = {"question": task["question"], "project_path": root, "scope": "all"}
++            from .context_rescue import BoundedScorer
++            from eval.evidence_quality_v2.run import audit_payload
++            bounded = BoundedScorer(mpnet_scorer, capture_text=True)
++            with installed(bounded, threshold=M2B_THRESHOLD, question=task["question"]):
++                payload, trace = observe_call(service, request)
++            errors = audit_payload(payload, trace["snapshot"], Path(root))
++            r = _check_gold(payload, task, audit_errors=errors)
++            r["scorer_executed"] = bounded.summary["evaluations"] > 0
++            r["scorer_degraded"] = bounded.degraded
++            r["scorer_model_verified"] = bounded.identity().get("verified") is True
++            r["context_pass_is_not_causal_model_gain"] = True
++            executions.append({"request":request,"payload":payload,"trace":trace,
++                               "scorer_events":bounded.events,"scorer_summary":bounded.summary})
++            results.append(r)
++            status = r["assessment"]["verdict"]
++            print(f"  [{status}] {r['task_id']} ({r['formulation']}): "
++                  f"gold_found={r['gold_found']} sources={r['total_sources']} "
++                  f"budget={r['budget_tokens']} context_available={r['context_available']}")
++
++        # Summary
++        print(f"\n{'='*60}")
++        print("SUMMARY")
++        print(f"{'='*60}")
++        typer_results = [r for r in results if r["project"] == "typer"]
++        m15_results = [r for r in results if r["project"] != "typer"]
++        typer_pass = sum(1 for r in typer_results if r["assessment"]["verdict"] == "PASS")
++        m15_pass = sum(1 for r in m15_results if r["assessment"]["verdict"] == "PASS")
++        print(f"Typer (M0 target): {typer_pass}/{len(typer_results)}")
++        print(f"M1.5 dev: {m15_pass}/{len(m15_results)}")
++
++        # Save
++        output = {
++            "schema_version":2,
++            "evaluation_kind":"real_model_with_canonical_claim_audit",
++            "max_sections_per_source":max_sections_per_source,
++            "gold_oracle_used":False,
++            "scorer": model_identity(),
++            "executions":executions,
++            "threshold": M2B_THRESHOLD,
++            "results": results,
++            "summary": {
++                "typer_pass": typer_pass,
++                "typer_total": len(typer_results),
++                "m15_pass": m15_pass,
++                "m15_total": len(m15_results),
++            },
++        }
++        from .evaluation_v2 import save_new_report
++        out_path = Path("experiments/crosslingual_relevance/review_runs") / f"m5-real-{uuid.uuid4().hex}.json"
++        save_new_report(out_path, json.loads(json.dumps(output,default=str)))
++        print(f"\nResults saved to {out_path}")
++    finally:
++        patcher.stop()
++
++
++
++def main():
++    import argparse
++    from .pinned_embedding_session import pinned_embeddings
++    parser=argparse.ArgumentParser(description=__doc__)
++    parser.add_argument('--max-sections-per-source',type=int,choices=(2,20),default=20)
++    args=parser.parse_args()
++    with pinned_embeddings():
++        _run(args.max_sections_per_source)
+ 
+ 
+ if __name__ == "__main__":
+diff --git a/experiments/crosslingual_relevance/m6_holdout.py b/experiments/crosslingual_relevance/m6_holdout.py
+index 762764ea..c877c548 100644
+--- a/experiments/crosslingual_relevance/m6_holdout.py
++++ b/experiments/crosslingual_relevance/m6_holdout.py
+@@ -1,42 +1,27 @@
+-"""M6 — holdout evaluation with dense + rescue.
++"""Replays inspected M1.5 tasks with a real scorer or EXPLICIT oracle plumbing.
+ 
+-Runs the M1.5 holdout split (4 tasks: httpx-mixed, ruff-EN, starlette-RU,
+-pydantic-mixed) through the same dense + rescue configuration as M5.
+-
+-Metrics (separate, not collapsed into one score):
+-  1. Document finding: did we reach the correct source?
+-  2. Fact range finding: did evidence arrive, not just filename?
+-  3. Admission errors: precision/recall of admission
+-  4. First packet completeness: what model gets immediately (budget ≤ 800)
+-  5. No source-policy violations, no irrelevant block admissions
+-
+-Four causal conditions on same corpus and budget:
+-  A. lexical + baseline  (M0 baseline)
+-  B. lexical + rescue    (no candidates to rescue)
+-  C. dense + baseline    (candidates found, filtered by qualification)
+-  D. dense + rescue      (target result)
+-
+-Usage:
+-    python -m experiments.crosslingual_relevance.m6_holdout
++The historical module name is retained for compatibility. These tasks are not
++an unseen-domain holdout. Default scoring is real; --oracle-plumbing is opt-in
++and its output cannot be promoted to model-quality evidence. Old artifacts and
++protocol locks are never overwritten.
+ """
+ from __future__ import annotations
+-
++import argparse
++from contextlib import nullcontext
+ import json
+-import os
+-import uuid
+ from pathlib import Path
++import tempfile
++import uuid
+ from typing import Any
+-from unittest.mock import patch
+ 
+-from eval.evidence_quality_v2.run import documents_for, load_protocol
+-from eval.evidence_quality_v2.runtime import write_project, isolated_service, index_project
+ from eval.evidence_quality_v2.observer import observe_call
++from eval.evidence_quality_v2.runtime import write_project, isolated_service, index_project
++from eval.evidence_quality_v2.run import documents_for, load_protocol, audit_payload
+ from docmancer.docs.application.model_visible_projection import docs_context_budget_tokens
+-
+-from experiments.crosslingual_relevance.context_rescue import installed, M2B_THRESHOLD
+-
+-DENSE_MODEL = "sentence-transformers/paraphrase-multilingual-mpnet-base-v2"
+-DENSE_DIM = 768
++from .context_rescue import installed, BoundedScorer, M2B_THRESHOLD
++from .mpnet_scorer import mpnet_scorer, model_identity, _get_model
++from .m5_real_scorer import _build_vector_service, _index_all
++from .evaluation_v2 import assess_packet, canonical_row, corpus_documents, save_new_report
+ 
+ # Holdout tasks from M1.5 frozen manifest
+ HOLDOUT_TASKS = [
+@@ -74,326 +59,112 @@ HOLDOUT_TASKS = [
+     },
+ ]
+ 
+-PROJECTS = ["httpx", "ruff", "starlette", "pydantic"]
+-
+ 
+ def _gold_scorer_factory(task):
+-    """Create a scorer that returns high score for gold passages."""
+-    phrases = task["gold_phrases"]
+-    def _scorer(question: str, evidence_text: str) -> float:
+-        if any(p in evidence_text for p in phrases):
+-            return 0.9
+-        return 0.1
+-    return _scorer
+-
+-
+-def _load_all_documents(root: Path) -> dict[str, dict[str, str]]:
+-    _, _, manifest = load_protocol()
+-    result = {}
+-    for project in PROJECTS:
+-        result[project] = documents_for(project, manifest)
+-    return result
+-
+-
+-def _write_projects(tmp: Path, docs_map: dict[str, dict[str, str]]) -> dict[str, str]:
+-    roots = {}
+-    for project, docs in docs_map.items():
+-        root = tmp / "projects" / project
+-        write_project(root, docs)
+-        roots[project] = str(root)
+-    return roots
+-
+-
+-def _build_vector_service(tmp: Path):
+-    """Build a LibraryDocsService with dense retrieval and vectors enabled."""
+-    import scripts.run_project_docs_self_host_gate as gate
+-    from docmancer.core.config import VectorStoreConfig
+-    from docmancer.core.product_identity import ensure_owned_home
+-
+-    state = tmp / "vstate"
+-    state.mkdir(parents=True, exist_ok=True)
+-    home_dir = tmp / "vhome"
+-    home_dir.mkdir(parents=True, exist_ok=True)
+-    env = {key: str(state / key.lower()) for key in
+-           ('HOME', 'XDG_CONFIG_HOME', 'XDG_CACHE_HOME', 'XDG_DATA_HOME')}
+-    env['DOCATLAS_HOME'] = str(home_dir)
+-    env['DOCATLAS_FASTEMBED_CACHE_DIR'] = "/tmp/fastembed_cache"
+-    env.update(DOCATLAS_OFFLINE='1', DOCATLAS_AUTO_VECTORS='1')
+-    for p in env.values():
+-        if p not in ('0', '1'):
+-            Path(p).mkdir(parents=True, exist_ok=True)
+-
+-    patcher = patch.dict(os.environ, env)
+-    patcher.start()
+-    try:
+-        ensure_owned_home(str(home_dir))
+-        config = gate.DocmancerConfig()
+-        config.index.db_path = str(state / 'index.db')
+-        config.index.extracted_dir = str(state / 'extracted')
+-        config.retrieval.default_mode = "dense"
+-        config.retrieval.max_sections_per_source = 20
+-        config.embeddings.provider = "fastembed"
+-        config.embeddings.model = DENSE_MODEL
+-        config.embeddings.dimensions = DENSE_DIM
+-        config.embeddings.sparse_model = None
+-        config.embeddings.cache = "/tmp/fastembed_cache"
+-        config.vector_store = VectorStoreConfig(
+-            provider="sqlite-vec",
+-            collection=f"m6_{uuid.uuid4().hex[:8]}",
+-        )
+-        service = gate.LibraryDocsService(
+-            config=config, config_source='explicit',
+-            registry=gate.LibraryRegistry(config.index.db_path),
+-            agent=gate.DocmancerAgent(config=config),
+-            job_tracker=gate.DocsJobTracker(),
+-        )
+-        return service, config, patcher
+-    except Exception:
+-        patcher.stop()
+-        raise
+-
+-
+-def _index_all_with_vectors(service, roots: dict[str, str]):
+-    for project, root in roots.items():
+-        result = service.sync_project_docs(root, with_vectors=True)
+-        if result.status != 'success':
+-            raise RuntimeError(f"index failed for {project}: {result.status}")
+-
+-
+-def _is_gold_source(source: dict, task: dict) -> bool:
+-    """Check if a source matches the task's gold path and line range."""
+-    path = source.get("path_or_url") or source.get("source_path") or ""
+-    snippet = source.get("snippet") or ""
+-    line_start = source.get("line_start")
+-    line_end = source.get("line_end")
+-    gold_path = task["gold_path"]
+-    # Path match
+-    if gold_path.split("/")[-1] not in path.split("/")[-1] and gold_path not in path:
+-        return False
+-    # Line overlap
+-    if line_start is not None and line_end is not None:
+-        for gl_start, gl_end in task["gold_lines"]:
+-            if line_start <= gl_end and line_end >= gl_start:
+-                return True
+-    # Snippet phrase match (fallback)
+-    if any(p in snippet for p in task["gold_phrases"]):
+-        return True
+-    return False
+-
+-
+-def _is_gold_in_candidates(trace: dict, task: dict) -> bool:
+-    """Check if gold block appears in retrieved_candidates stage."""
+-    rc = trace.get("stages", {}).get("retrieved_candidates", [])
+-    for entry in rc:
+-        for s in entry.get("sources", []):
+-            if isinstance(s, dict):
+-                snippet = s.get("snippet") or ""
+-                path = s.get("path_or_url") or ""
+-                if task["gold_path"].split("/")[-1] in path.split("/")[-1]:
+-                    if any(p in snippet for p in task["gold_phrases"]):
+-                        return True
+-    return False
+-
+-
+-def _run_condition(service, root: str, task: dict, condition: str) -> dict[str, Any]:
+-    """Run a single task under one condition and collect metrics."""
+-    request = {"question": task["question"], "project_path": root, "scope": "all"}
+-
+-    if condition in ("dense_rescue", "lexical_rescue"):
+-        scorer = _gold_scorer_factory(task)
+-        with installed(scorer, threshold=M2B_THRESHOLD, question=task["question"]):
+-            payload, trace = observe_call(service, request)
+-    else:
+-        payload, trace = observe_call(service, request)
+-
+-    sources = payload.get("sources", [])
+-    visible = "\n\n".join(s.get("snippet", "") for s in sources)
+-    gold_in_packet = any(p in visible for p in task["gold_phrases"])
+-    gold_in_candidates = _is_gold_in_candidates(trace, task)
+-    gold_sources = [
+-        {"rank": i + 1, "path": s.get("path_or_url"),
+-         "line_start": s.get("line_start"), "line_end": s.get("line_end")}
+-        for i, s in enumerate(sources) if _is_gold_source(s, task)
+-    ]
+-    budget = docs_context_budget_tokens(payload)
+-    answer_supported = payload.get("answer_supported", False)
+-    context_available = payload.get("context_available", False)
+-    covered = payload.get("covered_query_ids", [])
+-
+-    # Check for source-policy violations (wrong project blocks in sources)
+-    wrong_project = any(
+-        task["gold_path"].split("/")[-1] not in (s.get("path_or_url") or "").split("/")[-1]
+-        and not _is_gold_source(s, task)
+-        for s in sources
+-    )
+-
+-    return {
+-        "task_id": task["id"],
+-        "formulation": task["formulation"],
+-        "project": task["project"],
+-        "condition": condition,
+-        "document_found": gold_in_candidates,
+-        "fact_range_found": gold_in_packet,
+-        "gold_in_candidates": gold_in_candidates,
+-        "gold_in_packet": gold_in_packet,
+-        "gold_sources": gold_sources,
+-        "total_sources": len(sources),
+-        "budget_tokens": budget,
+-        "answer_supported": answer_supported,
+-        "context_available": context_available,
+-        "covered_query_ids": list(covered),
+-        "source_policy_violations": wrong_project,
+-        "admission_errors": {
+-            "false_admit": sum(1 for s in sources if not _is_gold_source(s, task)),
+-            "false_reject": 0 if gold_in_packet else (1 if gold_in_candidates else 0),
+-        },
+-    }
+-
+-
+-def main():
+-    import tempfile
+-    tmp = Path(tempfile.mkdtemp(prefix="m6-holdout-"))
+-    print(f"Working directory: {tmp}")
+-
+-    docs_map = _load_all_documents(tmp)
+-    roots = _write_projects(tmp, docs_map)
+-    print(f"Loaded {len(PROJECTS)} projects")
+-
+-    # Build vector service (for dense conditions)
+-    print("Building vector service...")
+-    vservice, vconfig, vpatcher = _build_vector_service(tmp)
+-    _index_all_with_vectors(vservice, roots)
+-    print("All projects indexed with vectors")
+-
+-    # Build lexical service (for baseline conditions)
+-    print("Building lexical service...")
+-    lex_state = tmp / "lex_state"
+-    lex_state.mkdir(parents=True, exist_ok=True)
+-    lex_results = {}
+-    with isolated_service(lex_state) as (lservice, lconfig):
+-        for project, root in roots.items():
+-            index_project(lservice, lconfig, Path(root))
+-        print("All projects indexed (lexical)")
+-
+-        # Condition A: lexical + baseline
+-        print(f"\n{'='*60}")
+-        print("CONDITION A: lexical + baseline")
+-        print(f"{'='*60}")
+-        for task in HOLDOUT_TASKS:
+-            r = _run_condition(lservice, roots[task["project"]], task, "lexical_baseline")
+-            lex_results[task["id"]] = r
+-            status = "PASS" if r["gold_in_packet"] else "FAIL"
+-            print(f"  [{status}] {r['task_id']} ({r['formulation']}): "
+-                  f"gold_in_candidates={r['gold_in_candidates']} "
+-                  f"gold_in_packet={r['gold_in_packet']} "
+-                  f"sources={r['total_sources']} budget={r['budget_tokens']}")
+-
+-    # Condition B: lexical + rescue (uses lexical service, but rescue installed)
+-    print(f"\n{'='*60}")
+-    print("CONDITION B: lexical + rescue")
+-    print(f"{'='*60}")
+-    lex_rescue_results = {}
+-    with isolated_service(lex_state) as (lservice, lconfig):
+-        for project, root in roots.items():
+-            index_project(lservice, lconfig, Path(root))
+-        for task in HOLDOUT_TASKS:
+-            r = _run_condition(lservice, roots[task["project"]], task, "lexical_rescue")
+-            lex_rescue_results[task["id"]] = r
+-            status = "PASS" if r["gold_in_packet"] else "FAIL"
+-            print(f"  [{status}] {r['task_id']} ({r['formulation']}): "
+-                  f"gold_in_candidates={r['gold_in_candidates']} "
+-                  f"gold_in_packet={r['gold_in_packet']} "
+-                  f"sources={r['total_sources']}")
+-
+-    # Condition C: dense + baseline
+-    print(f"\n{'='*60}")
+-    print("CONDITION C: dense + baseline")
+-    print(f"{'='*60}")
+-    dense_baseline_results = {}
+-    for task in HOLDOUT_TASKS:
+-        r = _run_condition(vservice, roots[task["project"]], task, "dense_baseline")
+-        dense_baseline_results[task["id"]] = r
+-        status = "PASS" if r["gold_in_packet"] else "FAIL"
+-        print(f"  [{status}] {r['task_id']} ({r['formulation']}): "
+-              f"gold_in_candidates={r['gold_in_candidates']} "
+-              f"gold_in_packet={r['gold_in_packet']} "
+-              f"sources={r['total_sources']}")
+-
+-    # Condition D: dense + rescue
+-    print(f"\n{'='*60}")
+-    print("CONDITION D: dense + rescue (target)")
+-    print(f"{'='*60}")
+-    dense_rescue_results = {}
+-    for task in HOLDOUT_TASKS:
+-        r = _run_condition(vservice, roots[task["project"]], task, "dense_rescue")
+-        dense_rescue_results[task["id"]] = r
+-        status = "PASS" if r["gold_in_packet"] else "FAIL"
+-        print(f"  [{status}] {r['task_id']} ({r['formulation']}): "
+-              f"gold_in_candidates={r['gold_in_candidates']} "
+-              f"gold_in_packet={r['gold_in_packet']} "
+-              f"sources={r['total_sources']} budget={r['budget_tokens']} "
+-              f"answer_supported={r['answer_supported']}")
+-
+-    vpatcher.stop()
+-
+-    # Summary
+-    print(f"\n{'='*60}")
+-    print("HOLDOUT SUMMARY")
+-    print(f"{'='*60}")
+-
+-    all_conditions = {
+-        "A_lexical_baseline": lex_results,
+-        "B_lexical_rescue": lex_rescue_results,
+-        "C_dense_baseline": dense_baseline_results,
+-        "D_dense_rescue": dense_rescue_results,
+-    }
+-
+-    for cond_name, results in all_conditions.items():
+-        total = len(results)
+-        doc_found = sum(1 for r in results.values() if r["gold_in_candidates"])
+-        fact_found = sum(1 for r in results.values() if r["gold_in_packet"])
+-        violations = sum(1 for r in results.values() if r["source_policy_violations"])
+-        false_admits = sum(r["admission_errors"]["false_admit"] for r in results.values())
+-        budget_ok = sum(1 for r in results.values() if r["budget_tokens"] <= 800)
+-        print(f"  {cond_name}:")
+-        print(f"    document_found: {doc_found}/{total}")
+-        print(f"    fact_range_found: {fact_found}/{total}")
+-        print(f"    source_policy_violations: {violations}")
+-        print(f"    false_admits: {false_admits}")
+-        print(f"    budget_ok: {budget_ok}/{total}")
+-
+-    # Per language group (condition D)
+-    print(f"\n  Condition D per language group:")
+-    by_form = {}
+-    for r in dense_rescue_results.values():
+-        by_form.setdefault(r["formulation"], []).append(r)
+-    for form, rs in sorted(by_form.items()):
+-        found = sum(1 for r in rs if r["gold_in_packet"])
+-        print(f"    {form}: {found}/{len(rs)}")
+-
+-    # Save
+-    output = {
+-        "condition_A_lexical_baseline": list(lex_results.values()),
+-        "condition_B_lexical_rescue": list(lex_rescue_results.values()),
+-        "condition_C_dense_baseline": list(dense_baseline_results.values()),
+-        "condition_D_dense_rescue": list(dense_rescue_results.values()),
+-        "summary": {
+-            cond_name: {
+-                "document_found": sum(1 for r in results.values() if r["gold_in_candidates"]),
+-                "fact_range_found": sum(1 for r in results.values() if r["gold_in_packet"]),
+-                "source_policy_violations": sum(1 for r in results.values() if r["source_policy_violations"]),
+-                "false_admits": sum(r["admission_errors"]["false_admit"] for r in results.values()),
+-                "budget_ok": sum(1 for r in results.values() if r["budget_tokens"] <= 800),
+-                "total": len(results),
+-            }
+-            for cond_name, results in all_conditions.items()
+-        },
+-    }
+-    out_path = Path("experiments/crosslingual_relevance/m6_holdout_results.json")
+-    out_path.write_text(json.dumps(output, ensure_ascii=False, indent=2, default=str) + "\n",
+-                        encoding="utf-8")
+-    print(f"\nResults saved to {out_path}")
+-
+-
+-if __name__ == "__main__":
++    """Oracle is only a plumbing control, never a relevance-model result."""
++    from .evaluation_v2 import required_claims
++    claims=required_claims(task)
++    def scorer(question, text):
++        return .9 if any(all(c in text for c in alt["clauses"])
++                         for claim in claims for alt in claim["alternatives"]) else .1
++    scorer.identity=lambda:{"kind":"oracle_plumbing","verified":False}
++    return scorer
++
++
++def _is_gold_source(source, task):
++    outcome=assess_packet({"sources":[source]},task)
++    return outcome["all_required_facts"] and not outcome["canonical_errors"]
++
++
++def _is_gold_in_candidates(trace, task):
++    rows=[s for e in trace.get("stages",{}).get("retrieved_candidates",[])
++          for s in e.get("sources",[]) if isinstance(s,dict)]
++    return assess_packet({"sources":rows},task)["all_required_facts"]
++
++
++def _run_condition(service, root: str, task: dict, condition: str, *, oracle_plumbing: bool=False):
++    request={"question":task["question"],"project_path":root,"scope":"all"}
++    use_rescue=condition in {"dense_rescue","lexical_rescue"}
++    scorer=_gold_scorer_factory(task) if oracle_plumbing else mpnet_scorer
++    bounded=BoundedScorer(scorer,capture_text=True)
++    context=installed(bounded,question=task["question"]) if use_rescue else nullcontext()
++    with context:
++        payload,trace=observe_call(service,request)
++    errors=audit_payload(payload,trace.get("snapshot",{}),Path(root))
++    assessment=assess_packet(payload,task,audit_errors=errors)
++    candidates=[s for e in trace.get("stages",{}).get("retrieved_candidates",[])
++                for s in e.get("sources",[]) if isinstance(s,dict)]
++    docs=corpus_documents(task["project"])
++    candidate_checks=[canonical_row(s,docs) for s in candidates]
++    return {"task_id":task["id"],"condition":condition,"formulation":task["formulation"],
++            "evaluation_kind":"oracle_plumbing" if oracle_plumbing else "real_model_replay",
++            "gold_oracle_used":oracle_plumbing and use_rescue,
++            "independent_holdout":False,
++            "model_executed":use_rescue and not oracle_plumbing and bounded.summary["evaluations"]>0,
++            "model_identity":bounded.identity(),
++            "document_found":any(s["status"]=="verified" for s in candidate_checks),
++            "all_required_in_candidates":_is_gold_in_candidates(trace,task),
++            "gold_in_packet":assessment["all_required_facts"],
++            "assessment":assessment,"budget_tokens":docs_context_budget_tokens(payload),
++            "admission_errors":{"false_admit":None,"false_reject":None,
++                                "reason":"requires_exhaustive_candidate_relevance_labels"},
++            "source_policy_errors":errors,
++            "payload":payload,"trace":trace,
++            "scorer_events":bounded.events,"scorer_summary":bounded.summary}
++
++
++def valid_for_model_quality(row: dict) -> bool:
++    return (row.get("evaluation_kind")=="real_model_replay"
++            and row.get("gold_oracle_used") is False
++            and row.get("model_executed") is True
++            and row.get("model_identity",{}).get("verified") is True
++            and not row.get("scorer_summary",{}).get("degraded")
++            and row.get("assessment",{}).get("source_policy_status")=="PASS")
++
++
++def main(argv=None):
++    parser=argparse.ArgumentParser(description=__doc__)
++    parser.add_argument('--oracle-plumbing',action='store_true')
++    parser.add_argument('--output',type=Path)
++    parser.add_argument('--max-sections-per-source',type=int,choices=(2,20),default=20)
++    args=parser.parse_args(argv)
++    root=Path(tempfile.mkdtemp(prefix='m6-reviewed-'))
++    manifest=load_protocol()[2]
++    roots={}
++    for project in {t['project'] for t in HOLDOUT_TASKS}:
++        path=root/'projects'/project
++        write_project(path,documents_for(project,manifest))
++        roots[project]=path
++    # Dense retrieval is real even for the explicit oracle scorer condition.
++    # Pin it to the same checked artifact as the MPNet scorer.
++    from .pinned_embedding_session import pinned_embeddings
++    results=[]
++    with pinned_embeddings():
++        vservice,vconfig,patcher=_build_vector_service(root/'dense',max_sections_per_source=args.max_sections_per_source)
++        vconfig.retrieval.max_sections_per_source=args.max_sections_per_source
++        try:
++            _index_all(vservice,{k:str(v) for k,v in roots.items()})
++            with isolated_service(root/'lexical') as (lservice,lconfig):
++                lconfig.retrieval.max_sections_per_source=args.max_sections_per_source
++                for path in roots.values(): index_project(lservice,lconfig,path)
++                for mode,service in [('lexical',lservice),('dense',vservice)]:
++                    for rescue in (False,True):
++                        for task in HOLDOUT_TASKS:
++                            results.append(_run_condition(service,str(roots[task['project']]),task,
++                                mode+('_rescue' if rescue else '_baseline'),
++                                oracle_plumbing=args.oracle_plumbing))
++        finally:
++            patcher.stop()
++    output={'schema_version':2,'evaluation_kind':'oracle_plumbing' if args.oracle_plumbing else 'real_model_replay',
++            'independent_holdout':False,'frozen_threshold':M2B_THRESHOLD,
++            'max_sections_per_source':args.max_sections_per_source,
++            'rows':results,'summary':{'all_required_first_packets':sum(r['gold_in_packet'] for r in results),
++                                    'total':len(results),
++                                    'model_quality_eligible_rows':sum(valid_for_model_quality(r) for r in results)}}
++    target=args.output or Path(__file__).parent/'review_runs'/f'm6-{output["evaluation_kind"]}-{uuid.uuid4().hex}.json'
++    save_new_report(target,json.loads(json.dumps(output,default=str)))
++    print(target)
++
++
++if __name__=='__main__':
+     main()
+diff --git a/experiments/crosslingual_relevance/model_manifest.py b/experiments/crosslingual_relevance/model_manifest.py
+new file mode 100644
+index 00000000..1e7faa29
+--- /dev/null
++++ b/experiments/crosslingual_relevance/model_manifest.py
+@@ -0,0 +1,85 @@
++"""Content-addressed LOCAL model inventory. No model download or freeze override."""
++from __future__ import annotations
++import argparse
++import hashlib
++import importlib.metadata
++import json
++from pathlib import Path, PurePosixPath
++
++MODEL_NAME = 'sentence-transformers/paraphrase-multilingual-mpnet-base-v2'
++REQUIRED = {'config.json','tokenizer.json','tokenizer_config.json','special_tokens_map.json','onnx/model.onnx'}
++DEPENDENCIES = ('fastembed','onnxruntime','tokenizers','numpy')
++INFERENCE = {'provider':'CPUExecutionProvider','threads':1,'pooling':'mean',
++             'scoring':'normalized-cosine-float32','expected_dimensions':768}
++
++
++def file_digest(path: Path) -> str:
++    digest=hashlib.sha256()
++    with path.open('rb') as stream:
++        for block in iter(lambda:stream.read(1024*1024),b''):
++            digest.update(block)
++    return digest.hexdigest()
++
++
++def canonical_digest(value) -> str:
++    return hashlib.sha256(json.dumps(value,sort_keys=True,ensure_ascii=False,separators=(',',':'),allow_nan=False).encode()).hexdigest()
++
++
++def _inventory(root: Path) -> dict[str,str]:
++    root=root.resolve(strict=True)
++    paths={p.relative_to(root).as_posix():p for p in root.rglob('*') if p.is_file()}
++    if not REQUIRED <= paths.keys():
++        raise ValueError(f'missing model files: {sorted(REQUIRED-paths.keys())}')
++    if len(paths)>256:
++        raise ValueError('model inventory exceeds 256 files')
++    if any(not p.resolve().is_relative_to(root) for p in paths.values()):
++        raise ValueError('export model symlinks as files before creating inventory')
++    return {name:file_digest(path) for name,path in sorted(paths.items())}
++
++
++def build_manifest(root: Path, revision: str | None = None) -> dict:
++    if revision is not None and (len(revision)!=40 or any(c not in '0123456789abcdef' for c in revision)):
++        raise ValueError('revision must be an immutable commit SHA, not a repository name')
++    body={'schema_version':1,'model_name':MODEL_NAME,'hub_revision':revision,
++          'files':_inventory(root),
++          'versions':{name:importlib.metadata.version(name) for name in DEPENDENCIES},
++          'inference':dict(INFERENCE),
++          'calibration_transfer_validated':False}
++    return {**body,'fingerprint':canonical_digest(body)}
++
++
++def verify_manifest(root: Path, manifest: dict) -> dict:
++    if manifest.get('schema_version')!=1 or manifest.get('model_name')!=MODEL_NAME:
++        raise ValueError('unsupported model manifest')
++    if manifest.get('inference') != INFERENCE:
++        raise ValueError('unsupported inference contract')
++    revision=manifest.get('hub_revision')
++    if revision is not None and (not isinstance(revision,str) or len(revision)!=40
++        or any(c not in '0123456789abcdef' for c in revision)):
++        raise ValueError('invalid immutable model revision')
++    body={k:v for k,v in manifest.items() if k!='fingerprint'}
++    if canonical_digest(body)!=manifest.get('fingerprint'):
++        raise ValueError('model manifest fingerprint mismatch')
++    if _inventory(root)!=manifest.get('files'):
++        raise ValueError('model file bytes do not match manifest')
++    if manifest.get('versions')!={name:importlib.metadata.version(name) for name in DEPENDENCIES}:
++        raise ValueError('model runtime versions do not match manifest')
++    return dict(manifest)
++
++
++def main():
++    parser=argparse.ArgumentParser(description=__doc__)
++    parser.add_argument('--model-dir',type=Path,required=True)
++    parser.add_argument('--output',type=Path,required=True)
++    parser.add_argument('--revision')
++    args=parser.parse_args()
++    if args.output.resolve().is_relative_to(args.model_dir.resolve()):
++        parser.error('manifest must be outside the model directory')
++    manifest=build_manifest(args.model_dir,args.revision)
++    from .evaluation_v2 import save_new_report
++    save_new_report(args.output,manifest)
++    print(manifest['fingerprint'])
++
++
++if __name__=='__main__':
++    main()
+diff --git a/experiments/crosslingual_relevance/mpnet_scorer.py b/experiments/crosslingual_relevance/mpnet_scorer.py
+index 793b45d6..1855b5f4 100644
+--- a/experiments/crosslingual_relevance/mpnet_scorer.py
++++ b/experiments/crosslingual_relevance/mpnet_scorer.py
+@@ -1,60 +1,106 @@
+-"""Real MPNet scorer for context rescue — uses frozen calibrated model.
++"""Real MPNet cosine scorer with pinned local files and actual input telemetry.
+ 
+-Model: sentence-transformers/paraphrase-multilingual-mpnet-base-v2
+-Threshold: 0.7453 (M2b frozen, zero FPR, recall=0.50 on calibration pool)
+-Scoring: cosine similarity between question and evidence text embeddings.
+-
+-The scorer is stateless (no cache — BoundedScorer handles caching).
++Cosine is in [-1, 1], NOT a probability. The archived 0.7453 threshold is not
++changed or declared transferable. New fingerprints cannot retrospectively prove
++which model bytes produced historical M2 scores.
+ """
+ from __future__ import annotations
+-
++from copy import deepcopy
+ import hashlib
++import json
+ import os
+ from pathlib import Path
+-
++import threading
+ import numpy as np
+ 
+-_MODEL_NAME = "sentence-transformers/paraphrase-multilingual-mpnet-base-v2"
+-_CACHE_DIR = os.environ.get(
+-    "DOCATLAS_FASTEMBED_CACHE_DIR",
+-    "/tmp/fastembed_cache",
+-)
++from .model_manifest import MODEL_NAME, canonical_digest, verify_manifest
+ 
+-_model: "TextEmbedding | None" = None  # type: ignore[name-defined]
++_MODEL_NAME=MODEL_NAME
++_model=None
++_identity=None
++_loaded_key=None
++_observation=threading.local()
+ 
+ 
+ def _get_model():
+-    """Lazy-load the fastembed model (singleton)."""
+-    global _model
+-    if _model is None:
+-        from fastembed import TextEmbedding
+-        _model = TextEmbedding(model_name=_MODEL_NAME, cache_dir=_CACHE_DIR)
++    global _model, _identity, _loaded_key
++    directory=os.environ.get('DOCATLAS_RELEVANCE_MODEL_DIR')
++    manifest_path=os.environ.get('DOCATLAS_RELEVANCE_MODEL_MANIFEST')
++    if not directory or not manifest_path:
++        raise RuntimeError('Pinned local model required: set DOCATLAS_RELEVANCE_MODEL_DIR and DOCATLAS_RELEVANCE_MODEL_MANIFEST')
++    root=Path(directory).resolve(strict=True)
++    manifest_bytes=Path(manifest_path).read_bytes()
++    key=(str(root),hashlib.sha256(manifest_bytes).hexdigest())
++    if _model is not None:
++        if key!=_loaded_key:
++            raise RuntimeError('model lock changed inside a process; start a new experiment')
++        return _model
++    manifest=verify_manifest(root,json.loads(manifest_bytes))
++    from fastembed import TextEmbedding
++    model=TextEmbedding(model_name=MODEL_NAME,specific_model_path=str(root),
++        local_files_only=True,providers=['CPUExecutionProvider'],threads=1)
++    tokenizer=model.model.tokenizer
++    if tokenizer is None:
++        raise RuntimeError('loaded scorer has no tokenizer')
++    identity={**manifest,'verified':True,'model_dir':str(root),
++              'runtime_tokenizer_sha256':hashlib.sha256(tokenizer.to_str().encode()).hexdigest(),
++              'runtime_truncation':tokenizer.truncation,'runtime_padding':tokenizer.padding,
++              'loaded_backend':type(model.model).__name__}
++    # Bind runtime tokenization/pooling state as well as the actual weight bytes.
++    identity['artifact_fingerprint']=manifest['fingerprint']
++    identity['fingerprint']=canonical_digest({k:v for k,v in identity.items() if k not in {'model_dir','fingerprint'}})
++    _model,_identity,_loaded_key=model,identity,key
+     return _model
+ 
+ 
++def token_observation(tokenizer, text: str) -> dict:
++    """Inspect the same tokenizer input, retaining a separate untruncated count."""
++    from tokenizers import Tokenizer
++    used=tokenizer.encode(text)
++    unbounded=Tokenizer.from_str(tokenizer.to_str())
++    unbounded.no_truncation();unbounded.no_padding()
++    full=unbounded.encode(text)
++    active=[(i,o) for i,o,m in zip(used.ids,used.offsets,used.attention_mask) if m]
++    return {'input_sha256':hashlib.sha256(text.encode()).hexdigest(),
++            'full_token_count':len(full.ids),'used_token_count':len(active),
++            'truncated':len(active)<len(full.ids),'truncation':tokenizer.truncation,
++            'consumed_ids':[i for i,_ in active], 'consumed_offsets':[list(o) for _,o in active]}
++
++
+ def _embed(text: str) -> np.ndarray:
+-    """Embed a single text, return normalised vector."""
+-    model = _get_model()
+-    vec = np.array(list(model.embed([text]))[0], dtype=np.float32)
+-    norm = np.linalg.norm(vec) + 1e-9
+-    return vec / norm
++    model=_get_model()
++    vector=np.asarray(list(model.embed([text]))[0],dtype=np.float32)
++    if vector.ndim!=1 or len(vector)!=768 or not np.all(np.isfinite(vector)):
++        raise ValueError('invalid model embedding shape or finite values')
++    norm=float(np.linalg.norm(vector))
++    if not np.isfinite(norm) or norm<=0:
++        raise ValueError('zero or invalid embedding norm')
++    return vector/norm
+ 
+ 
+ def mpnet_scorer(question: str, evidence_text: str) -> float:
+-    """Cosine similarity between question and evidence text.
+-
+-    Returns float in [0, 1] (MPNet embeddings are non-negative cosine).
+-    """
+-    q_vec = _embed(question)
+-    e_vec = _embed(evidence_text)
+-    return float(np.dot(q_vec, e_vec))
+-
+-
+-def model_identity() -> dict[str, str]:
+-    """Return model identity for traceability."""
+-    return {
+-        "model_name": _MODEL_NAME,
+-        "model_revision": "Xenova/paraphrase-multilingual-mpnet-base-v2",
+-        "cache_dir": _CACHE_DIR,
+-        "calibration_digest": "m2b-calibration-v1",
+-    }
++    model=_get_model()
++    _observation.value={'question':token_observation(model.model.tokenizer,question),
++                        'evidence':token_observation(model.model.tokenizer,evidence_text)}
++    score=float(np.dot(_embed(question),_embed(evidence_text)))
++    if not np.isfinite(score):
++        raise ValueError('nonfinite cosine')
++    # Only numerical roundoff of normalized float32 vectors is clipped.
++    if not -1.000001 <= score <= 1.000001:
++        raise ValueError('invalid cosine range')
++    return float(np.clip(score,-1,1))
++
++
++def model_identity() -> dict:
++    if _model is None or _identity is None:
++        return {'model_name':MODEL_NAME,'verified':False,'fingerprint':None,
++                'reason':'not_loaded_or_manifest_not_verified'}
++    return deepcopy(_identity)
++
++
++def last_observation() -> dict:
++    return deepcopy(getattr(_observation,'value',{}))
++
++
++mpnet_scorer.identity=model_identity
++mpnet_scorer.last_observation=last_observation
+diff --git a/experiments/crosslingual_relevance/pinned_embedding_session.py b/experiments/crosslingual_relevance/pinned_embedding_session.py
+new file mode 100644
+index 00000000..e6980243
+--- /dev/null
++++ b/experiments/crosslingual_relevance/pinned_embedding_session.py
+@@ -0,0 +1,46 @@
++"""Isolated experiment injection: index and scorer share checked model bytes.
++
++Not a production activation or a new provider registry. Other threads do not
++inherit this request's provider. A concurrent/nested experiment fails closed.
++"""
++from contextlib import contextmanager
++import threading
++import numpy as np
++from unittest.mock import patch
++from .mpnet_scorer import _get_model, model_identity, MODEL_NAME
++
++_LOCK=threading.Lock()
++
++@contextmanager
++def pinned_embeddings():
++    if not _LOCK.acquire(blocking=False):
++        raise RuntimeError('pinned embedding experiment is already active')
++    try:
++        model=_get_model()
++        identity=model_identity()
++        if not identity.get('verified'):
++            raise RuntimeError('model identity not verified')
++        import docmancer.embeddings as embedding_api
++        from docmancer.embeddings.fastembed_provider import FastEmbedProvider
++        original=embedding_api.get_embeddings_provider
++        owner=threading.get_ident()
++        def factory(config):
++            if threading.get_ident()!=owner or config.provider!='fastembed' or config.model!=MODEL_NAME:
++                return original(config)
++            provider=FastEmbedProvider(config)
++            provider._dense=model
++            # Production provider tolerates a failed dimension probe. This
++            # experiment must fail closed rather than retain a config hint.
++            vectors=list(model.embed(['dim-probe']))
++            if len(vectors)!=1:
++                raise ValueError('pinned model did not produce one probe vector')
++            vector=np.asarray(vectors[0],dtype=np.float32)
++            if vector.shape!=(768,) or not np.all(np.isfinite(vector)) or not np.linalg.norm(vector)>0:
++                raise ValueError('invalid pinned embedding probe')
++            provider.dimensions=768
++            provider._dimensions_resolved=True
++            return provider
++        with patch.object(embedding_api,'get_embeddings_provider',factory):
++            yield identity
++    finally:
++        _LOCK.release()
+diff --git a/experiments/crosslingual_relevance/run.py b/experiments/crosslingual_relevance/run.py
+index e2a4e674..f745cd5a 100644
+--- a/experiments/crosslingual_relevance/run.py
++++ b/experiments/crosslingual_relevance/run.py
+@@ -1,8 +1,8 @@
+ """M2 — cross-lingual relevance experiment: compare lexical (A) vs encoder (B) signals.
+ 
+ Runs on the frozen pool from pool.json (built from M1.5 manifest).
+-Variant A: lexical overlap ratio (same formula as evidence_qualification).
+-Variant B: multilingual encoder cosine similarity (paraphrase-multilingual-MiniLM-L12-v2).
++Variant A: diagnostic lexical overlap (not production qualification).
++Variant B: pinned multilingual MPNet cosine; all pool blocks ranked before judgments.
+ 
+ Records raw scores, model identity, runtime params, and per-task rankings.
+ Does NOT modify production code or indices.
+@@ -29,7 +29,7 @@ def _git_head() -> str:
+ 
+ 
+ def lexical_ratio(question: str, block_text: str) -> float:
+-    """Replicate the lexical overlap ratio from evidence_qualification.
++    """Diagnostic token overlap only; not the production qualifier.
+ 
+     terms = casefold tokens >= 4 chars from the question (with Cyrillic fallback).
+     matched = terms present in the block text (casefolded).
+@@ -49,16 +49,23 @@ def lexical_ratio(question: str, block_text: str) -> float:
+ def encoder_scores(questions: list[str], blocks: list[str], model_name: str) -> list[list[float]]:
+     """Compute cosine similarity matrix [question_i][block_j] via fastembed."""
+     import numpy as np
+-    from fastembed import TextEmbedding
+-
+-    model = TextEmbedding(model_name=model_name)
++    from .mpnet_scorer import _get_model
++    from .model_manifest import MODEL_NAME
++    if model_name != MODEL_NAME:
++        raise ValueError("the artifact lock permits only its declared model")
++    model = _get_model()
+     q_vecs = list(model.embed(questions))
+     b_vecs = list(model.embed(blocks))
+     q_arr = np.array(q_vecs, dtype=np.float32)
+     b_arr = np.array(b_vecs, dtype=np.float32)
+-    # Normalise
+-    q_norm = q_arr / (np.linalg.norm(q_arr, axis=1, keepdims=True) + 1e-9)
+-    b_norm = b_arr / (np.linalg.norm(b_arr, axis=1, keepdims=True) + 1e-9)
++    for array, count in ((q_arr, len(questions)), (b_arr, len(blocks))):
++        if array.shape != (count, 768) or not np.all(np.isfinite(array)):
++            raise ValueError("invalid embedding matrix")
++        norms = np.linalg.norm(array, axis=1)
++        if not np.all(np.isfinite(norms)) or np.any(norms <= 0):
++            raise ValueError("invalid embedding norms")
++    q_norm = q_arr / np.linalg.norm(q_arr, axis=1, keepdims=True)
++    b_norm = b_arr / np.linalg.norm(b_arr, axis=1, keepdims=True)
+     return (q_norm @ b_norm.T).tolist()
+ 
+ 
+@@ -71,8 +78,9 @@ def mrr_at_k(ranked_relevance: list[bool], k: int = 5) -> float:
+ 
+ 
+ def recall_at_k(ranked_relevance: list[bool], k: int = 5) -> float:
+-    """Recall@K: 1 if any relevant in top-K, 0 otherwise."""
+-    return 1.0 if any(ranked_relevance[:k]) else 0.0
++    """Fraction of judged positives recovered; not an any-positive hit rate."""
++    from .evaluation_v2 import recall_at_k as recall
++    return recall(ranked_relevance, k)
+ 
+ 
+ def run() -> dict:
+@@ -105,9 +113,8 @@ def run() -> dict:
+         b_time = time.perf_counter() - t0
+         b_status = "OK"
+         # Model identity
+-        model_hash = hashlib.sha256(
+-            json.dumps({"model": model_name, "dim": len(b_scores[0])}).encode()
+-        ).hexdigest()[:16]
++        from .mpnet_scorer import model_identity
++        model_hash = model_identity()["fingerprint"]
+     except Exception as exc:
+         b_scores = None
+         b_time = 0.0
+@@ -117,12 +124,6 @@ def run() -> dict:
+     # Build per-task results
+     task_results = []
+     for ti, task in enumerate(tasks):
+-        block_ids = [b["block_id"] for b in task["blocks"]]
+-        # Relevance labels for this task's blocks only
+-        relevance = {b["block_id"]: b["relevant_to_question"] for b in task["blocks"]}
+-        source_ok = {b["block_id"]: b["source_allowed"] for b in task["blocks"]}
+-        covered = {b["block_id"]: b["covered_fact_ids"] for b in task["blocks"]}
+-
+         for variant_name, scores in (("A_lexical", a_scores), ("B_encoder", b_scores)):
+             if scores is None:
+                 task_results.append({
+@@ -133,41 +134,15 @@ def run() -> dict:
+                     "variant": variant_name,
+                     "status": "BLOCKED",
+                     "block_scores": [],
+-                    "mrr_at_5": None,
+-                    "recall_at_5": None,
++                    "known_allowed_positive_recall_at_k": None,
+                 })
+                 continue
+ 
+-            # Rank this task's blocks by score
+-            scored = [
+-                (bid, scores[ti][blocks.index(next(b for b in blocks if b["block_id"] == bid))],
+-                 relevance[bid], source_ok[bid], covered[bid])
+-                for bid in block_ids
+-            ]
+-            ranked = sorted(scored, key=lambda x: -x[1])
+-            ranked_relevance = [r[2] for r in ranked]
+-
+-            task_results.append({
+-                "task_id": task["task_id"],
+-                "split": task["split"],
+-                "question": task["question"],
+-                "formulation": task["formulation"],
+-                "variant": variant_name,
+-                "status": "OK",
+-                "block_scores": [
+-                    {
+-                        "block_id": r[0],
+-                        "score": r[1],
+-                        "relevant": r[2],
+-                        "source_allowed": r[3],
+-                        "covered_fact_ids": r[4],
+-                        "rank": i + 1,
+-                    }
+-                    for i, r in enumerate(ranked)
+-                ],
+-                "mrr_at_5": mrr_at_k(ranked_relevance, 5),
+-                "recall_at_5": recall_at_k(ranked_relevance, 5),
+-            })
++            from .evaluation_v2 import rank_full_pool
++            ranked = rank_full_pool(blocks, scores[ti], task, k=5)
++            task_results.append({"task_id": task["task_id"], "split": task["split"],
++                "question":task["question"], "formulation":task["formulation"],
++                "variant":variant_name,"status":"OK", **ranked})
+ 
+     # Aggregate metrics per variant per split
+     summary = {}
+@@ -181,14 +156,20 @@ def run() -> dict:
+             if not s_results:
+                 continue
+             key = f"{variant}/{split}"
++            measurable = [r["known_allowed_positive_recall_at_k"] for r in s_results
++                          if r["known_allowed_positive_recall_at_k"] is not None]
+             summary[key] = {
+                 "n": len(s_results),
+-                "mrr_at_5": sum(r["mrr_at_5"] for r in s_results) / len(s_results),
+-                "recall_at_5": sum(r["recall_at_5"] for r in s_results) / len(s_results),
++                "mean_known_allowed_positive_recall_at_5": (
++                    sum(measurable) / len(measurable) if measurable else None),
++                "tasks_with_known_allowed_positive": len(measurable),
++                "all_pairs_judged": all(r["fully_judged"] for r in s_results),
++                "ranking_scope": "entire_fixed_pool_unjudged_labels_remain_unknown",
+             }
+ 
+     result = {
+-        "schema_version": 1,
++        "schema_version": 2,
++        "lexical_baseline_kind":"diagnostic_overlap_not_production_qualification",
+         "environment": environment,
+         "model_b": {
+             "name": model_name,
+@@ -203,7 +184,9 @@ def run() -> dict:
+         "summary": summary,
+     }
+ 
+-    RESULTS.write_text(json.dumps(result, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
++    from .evaluation_v2 import save_new_report
++    import uuid
++    save_new_report(HERE / "review_runs" / f"m2-{uuid.uuid4().hex}.json", result)
+     return result
+ 
+ 
+diff --git a/experiments/crosslingual_relevance/scorer_runtime.py b/experiments/crosslingual_relevance/scorer_runtime.py
+new file mode 100644
+index 00000000..d2d1f546
+--- /dev/null
++++ b/experiments/crosslingual_relevance/scorer_runtime.py
+@@ -0,0 +1,142 @@
++"""Bounded synchronous scoring for isolated experiments, not a serving backend.
++
++A cooperative stage deadline rejects late results and prevents subsequent calls.
++It cannot interrupt an in-flight native inference; a production worker must supply
++its own cancellation boundary. Cached successful results remain usable after an
++execution failure/limit, but every cache hit records the degraded state.
++"""
++from __future__ import annotations
++
++from copy import deepcopy
++import hashlib
++import math
++import time
++from typing import Callable, Mapping, Any
++
++
++def text_digest(text: str) -> str:
++    return hashlib.sha256(text.encode('utf-8')).hexdigest()
++
++
++class BoundedScorer:
++    def __init__(self, scorer: Callable[[str, str], float], *, max_evaluations: int = 60,
++                 timeout: float = 10.0, score_range: tuple[float, float] | None = (-1.0, 1.0),
++                 max_events: int = 256, capture_text: bool = False):
++        if type(max_evaluations) is not int or max_evaluations < 1:
++            raise ValueError('max_evaluations must be a positive integer')
++        if isinstance(timeout, bool) or not math.isfinite(timeout) or timeout <= 0:
++            raise ValueError('timeout must be positive and finite')
++        if type(max_events) is not int or max_events < 1:
++            raise ValueError('max_events must be a positive integer')
++        if score_range is not None and (len(score_range) != 2 or
++            not all(math.isfinite(x) for x in score_range) or score_range[0] >= score_range[1]):
++            raise ValueError('invalid score range')
++        self._scorer, self._max, self._timeout = scorer, max_evaluations, float(timeout)
++        self._score_range = score_range
++        self._count = 0
++        self._cache: dict[tuple[str, str], float] = {}
++        self._degraded = False
++        self._degraded_reason: str | None = None
++        self._started: float | None = None
++        self._events: list[dict[str, Any]] = []
++        self._max_events, self._capture_text = max_events, capture_text
++        self._dropped = 0
++
++    @property
++    def degraded(self) -> bool:
++        return self._degraded
++
++    @property
++    def degraded_reason(self) -> str | None:
++        return self._degraded_reason
++
++    @property
++    def events(self) -> tuple[dict[str, Any], ...]:
++        return tuple(deepcopy(self._events))
++
++    @property
++    def summary(self) -> dict[str, Any]:
++        return {'evaluations': self._count, 'cached_pairs': len(self._cache),
++                'degraded': self._degraded, 'degraded_reason': self._degraded_reason,
++                'events_dropped': self._dropped, 'timeout_seconds': self._timeout,
++                'timeout_kind': 'cooperative_stage_deadline_not_cancellation'}
++
++    def identity(self) -> dict[str, Any]:
++        provider = getattr(self._scorer, 'identity', None)
++        if callable(provider):
++            result = provider()
++            if not isinstance(result, Mapping):
++                raise ValueError('scorer identity must be a mapping')
++            result = deepcopy(dict(result))
++            if result.get('verified') is True:
++                fingerprint = result.get('fingerprint')
++                if (not isinstance(fingerprint, str) or len(fingerprint) != 64
++                    or any(c not in '0123456789abcdef' for c in fingerprint)):
++                    raise ValueError('verified scorer requires a content fingerprint')
++            return result
++        return {'kind': 'unverified_callable', 'verified': False}
++
++    def _record(self, outcome: str, question: str, text: str, **fields: Any) -> None:
++        if len(self._events) >= self._max_events:
++            self._dropped += 1
++            return
++        event = {'outcome': outcome, 'question_sha256': text_digest(question),
++                 'text_sha256': text_digest(text), 'text_chars': len(text),
++                 'text_utf8_bytes': len(text.encode('utf-8')), 'evaluations': self._count,
++                 'degraded': self.degraded, 'degraded_reason': self.degraded_reason, **fields}
++        if self._capture_text:
++            event.update(question=question, evidence_text=text)
++        self._events.append(event)
++
++    def record_decision(self, question: str, text: str, **fields: Any) -> None:
++        """Record source/phase bindings separately from query/text score cache."""
++        self._record('admission_decision', question, text, **fields)
++
++    def _fail(self, reason: str, question: str, text: str, **fields: Any) -> None:
++        self._degraded, self._degraded_reason = True, reason
++        self._record(reason, question, text, **fields)
++
++    def score(self, question: str, evidence_text: str) -> float | None:
++        key = (text_digest(question), text_digest(evidence_text))
++        if key in self._cache:
++            value = self._cache[key]
++            self._record('cache_hit', question, evidence_text, score=value)
++            return value
++        if self._degraded:
++            self._record('degraded_no_inference', question, evidence_text)
++            return None
++        now = time.monotonic()
++        if self._started is None:
++            self._started = now
++        if now - self._started >= self._timeout:
++            self._fail('stage_deadline_exceeded', question, evidence_text)
++            return None
++        if self._count >= self._max:
++            self._fail('evaluation_limit_reached', question, evidence_text)
++            return None
++        self._count += 1
++        try:
++            value = float(self._scorer(question, evidence_text))
++        except Exception as error:
++            self._fail('scorer_error', question, evidence_text, error_type=type(error).__name__)
++            return None
++        elapsed = time.monotonic() - self._started
++        if elapsed >= self._timeout:
++            self._fail('stage_deadline_exceeded', question, evidence_text, stage_elapsed_seconds=elapsed)
++            return None
++        if not math.isfinite(value):
++            self._fail('nonfinite_score', question, evidence_text)
++            return None
++        if self._score_range is not None and not self._score_range[0] <= value <= self._score_range[1]:
++            self._fail('score_out_of_range', question, evidence_text, score=value)
++            return None
++        observer = getattr(self._scorer, 'last_observation', None)
++        try:
++            observation = observer() if callable(observer) else None
++        except Exception as error:
++            self._fail('scorer_telemetry_error', question, evidence_text, error_type=type(error).__name__)
++            return None
++        self._cache[key] = value
++        self._record('scored', question, evidence_text, score=value, stage_elapsed_seconds=elapsed,
++                     input_observation=observation)
++        return value
+diff --git a/experiments/crosslingual_relevance/tests/test_review_audit_guards.py b/experiments/crosslingual_relevance/tests/test_review_audit_guards.py
+new file mode 100644
+index 00000000..ec64e2b9
+--- /dev/null
++++ b/experiments/crosslingual_relevance/tests/test_review_audit_guards.py
+@@ -0,0 +1,204 @@
++from concurrent.futures import ThreadPoolExecutor
++from copy import deepcopy
++import hashlib
++import json
++from pathlib import Path
++from types import SimpleNamespace
++from unittest.mock import patch
++
++import pytest
++from tokenizers import Tokenizer, models, pre_tokenizers
++from experiments.crosslingual_relevance.evaluation_v2 import (
++    rank_full_pool, save_new_report, canonical_row, assess_packet, corpus_documents,
++)
++from experiments.crosslingual_relevance.scorer_runtime import BoundedScorer
++from experiments.crosslingual_relevance.context_rescue import installed, apply_rescue
++from experiments.crosslingual_relevance.model_manifest import build_manifest, verify_manifest, REQUIRED
++from experiments.crosslingual_relevance.mpnet_scorer import token_observation
++from experiments.crosslingual_relevance.m6_holdout import valid_for_model_quality
++from docmancer.docs.domain.evidence_qualification import EvidenceQualification
++
++
++def blocks():
++    return [{'block_id':str(i),'path':'file','text':f'document {i}'} for i in range(8)]
++
++
++def judgments():
++    return {'blocks':[{'block_id':str(i),'relevant_to_question':i==7,'source_allowed':True,
++                      'covered_fact_ids':['fact'] if i==7 else []} for i in [0,1,2,7]]}
++
++
++def test_all_blocks_ranked_before_gold_labels_are_attached():
++    result=rank_full_pool(blocks(),[.9,.8,.7,.6,.5,.4,.3,.1],judgments())
++    assert result['pool_size']==8
++    assert result['known_allowed_positive_recall_at_k']==0
++    assert result['unjudged_in_top_k']==2
++    assert result['fully_judged'] is False
++    assert result['semantic_false_positive_rate'] is None
++
++
++def test_gold_first_input_does_not_bias_score_ties():
++    b=blocks(); t=judgments()
++    one=rank_full_pool(b,[.5]*8,t)['block_scores']
++    two=rank_full_pool(list(reversed(b)),[.5]*8,t)['block_scores']
++    assert one==two
++
++
++@pytest.mark.parametrize('bad',[float('nan'),float('inf'),-float('inf')])
++def test_ranking_rejects_nonfinite_rows(bad):
++    with pytest.raises(ValueError): rank_full_pool(blocks(),[bad]*8,judgments())
++
++
++def test_new_reports_cannot_overwrite_an_existing_result(tmp_path):
++    path=tmp_path/'results.json';path.write_text('archived')
++    with pytest.raises(FileExistsError): save_new_report(path,{'new':True})
++    assert path.read_text()=='archived'
++
++
++def test_nonfinite_metrics_are_not_written_as_json_nan(tmp_path):
++    path=tmp_path/'result.json'
++    with pytest.raises(ValueError): save_new_report(path,{'score':float('nan')})
++    assert not path.exists()
++
++
++def test_all_required_claims_are_anded_but_alternative_witnesses_are_ored():
++    raw=corpus_documents('httpx')['docs/advanced/timeouts.md']
++    # No text injection: actual canonical rule in actual cited lines.
++    row={'path_or_url':'docs/advanced/timeouts.md','snippet':'\n'.join(raw.splitlines()[:4]),
++         'line_start':1,'line_end':4}
++    task={'id':'m15-dev-01','project':'httpx'}
++    good=assess_packet({'sources':[row]},task,audit_errors=[])
++    assert good['required_count']==2 and good['supported_count']==2
++    assert good['verdict']=='PASS'
++    row['snippet']=raw.splitlines()[0]
++    partial=assess_packet({'sources':[row]},task,audit_errors=[])
++    assert partial['supported_count']==1 and partial['verdict']=='FAIL'
++    no_audit=assess_packet({'sources':[row]},task)
++    assert no_audit['source_policy_status']=='NOT_EVALUATED'
++
++
++@pytest.mark.parametrize('field,value',[('line_start',True),('line_start',0),('line_end',9999),
++ ('source_content_hash','0'*64),('path_or_url','timeouts.md')])
++def test_bad_source_coordinates_or_digest_are_never_gold(field,value):
++    docs=corpus_documents('httpx');raw=docs['docs/advanced/timeouts.md']
++    row={'path_or_url':'docs/advanced/timeouts.md','line_start':1,'line_end':4,
++         'snippet':'\n'.join(raw.splitlines()[:4])}
++    row[field]=value
++    assert canonical_row(row,docs)['status']!='verified'
++
++
++@pytest.fixture
++def model_dir(tmp_path):
++    root=tmp_path/'model'
++    for name in REQUIRED:
++        p=root/name;p.parent.mkdir(parents=True,exist_ok=True);p.write_bytes(('test:'+name).encode())
++    return root
++
++
++def test_model_manifest_binds_actual_files_not_block_count(model_dir):
++    manifest=build_manifest(model_dir)
++    assert len(manifest['fingerprint'])==64
++    assert manifest['inference']['expected_dimensions']==768
++    assert verify_manifest(model_dir,manifest)==manifest
++    assert manifest['hub_revision'] is None  # Never invent a repo commit.
++
++
++@pytest.mark.parametrize('name',sorted(REQUIRED))
++def test_model_file_tampering_is_rejected(model_dir,name):
++    manifest=build_manifest(model_dir)
++    (model_dir/name).write_bytes(b'changed')
++    with pytest.raises(ValueError): verify_manifest(model_dir,manifest)
++
++
++def test_extra_model_file_is_not_silently_unpinned(model_dir):
++    manifest=build_manifest(model_dir)
++    (model_dir/'extra.bin').write_bytes(b'additional weights')
++    with pytest.raises(ValueError): verify_manifest(model_dir,manifest)
++
++
++def test_corrupted_manifest_is_rejected(model_dir):
++    manifest=build_manifest(model_dir);manifest['inference']['pooling']='CLS'
++    with pytest.raises(ValueError): verify_manifest(model_dir,manifest)
++
++
++def test_repository_name_cannot_masquerade_as_revision(model_dir):
++    with pytest.raises(ValueError): build_manifest(model_dir,'Xenova/model')
++
++
++def test_external_model_symlink_is_rejected(model_dir,tmp_path):
++    outside=tmp_path/'outside';outside.write_text('weights')
++    (model_dir/'escape').symlink_to(outside)
++    with pytest.raises(ValueError): build_manifest(model_dir)
++
++
++def test_actual_tokenizer_used_length_is_separate_from_full_input():
++    tok=Tokenizer(models.WordLevel({'[UNK]':0,'a':1,'b':2,'c':3,'d':4},unk_token='[UNK]'))
++    tok.pre_tokenizer=pre_tokenizers.Whitespace()
++    tok.enable_truncation(max_length=3)
++    before=tok.to_str()
++    result=token_observation(tok,'a b c d')
++    assert result['full_token_count']==4 and result['used_token_count']==3
++    assert result['truncated'] is True
++    assert result['consumed_offsets']==[[0,1],[2,3],[4,5]]
++    assert tok.to_str()==before
++
++
++def test_other_threads_never_inherit_the_installing_question():
++    import docmancer.docs.domain.evidence_qualification as eq
++    calls=[]
++    def qualify():
++        return eq.qualify_evidence({'query_text':'question','query_terms':['zzzz']},
++            query_id='q',visible_text='A long enough but unrelated source sentence about settings.',
++            candidate={'project_identity':'local:test'})
++    with installed(lambda q,t:calls.append(q) or .9,question='owner-question'):
++        with ThreadPoolExecutor(max_workers=1) as executor:
++            result=executor.submit(qualify).result()
++        assert not result.qualified and calls==[]
++        result=qualify()
++        assert result.qualified and calls==['owner-question']
++
++
++def test_overlapping_installation_fails_without_leaking_patches():
++    def nested():
++        with installed(lambda q,t:.9,question='other'): pass
++    with installed(lambda q,t:.9,question='outer'):
++        with ThreadPoolExecutor(max_workers=1) as executor:
++            with pytest.raises(RuntimeError): executor.submit(nested).result()
++    # Lock restored even after rejected competing installations.
++    with installed(lambda q,t:.9,question='next'): pass
++
++
++def test_score_trace_is_bounded_and_explicit_about_dropped_events():
++    s=BoundedScorer(lambda q,t:.9,max_events=2)
++    s.score('q','text');s.score('q','text');s.score('q','text')
++    assert len(s.events)==2 and s.summary['events_dropped']==1
++    assert 'evidence_text' not in s.events[0]
++    events=s.events;events[0]['score']=0
++    assert s.events[0]['score']==.9
++
++
++def test_opt_in_actual_input_capture_and_source_binding():
++    s=BoundedScorer(lambda q,t:.9,capture_text=True)
++    eq=EvidenceQualification(False,(),None,'insufficient_visible_match',{})
++    result=apply_rescue(eq,query_id='query-original',question='unchanged',evidence_text='A short real rule.',
++        source_identity='local:test',source_binding={'path':'docs/a.md','snapshot':'fixed'},scorer=s)
++    assert result.trace['context_relevance_binding']['source_binding']['path']=='docs/a.md'
++    assert s.events[0]['evidence_text']=='A short real rule.'
++    assert result.covered_query_ids==() and result.trace['admission_only'] is True
++    assert result.trace['context_relevance_binding']['scorer_identity']['verified'] is False
++
++
++def test_logit_score_requires_explicit_unbounded_finite_score_contract():
++    s=BoundedScorer(lambda q,t:4.0,score_range=None)
++    assert s.score('q','text')==4.0
++
++
++def test_oracle_can_never_count_as_model_quality_even_when_all_claims_present():
++    row={'evaluation_kind':'oracle_plumbing','gold_oracle_used':True,'model_executed':True,
++         'model_identity':{'verified':True},'scorer_summary':{'degraded':False},
++         'assessment':{'source_policy_status':'PASS'}}
++    assert not valid_for_model_quality(row)
++    row.update(evaluation_kind='real_model_replay',gold_oracle_used=False)
++    assert valid_for_model_quality(row)
++    row['model_identity']['verified']=False
++    assert not valid_for_model_quality(row)
+diff --git a/experiments/crosslingual_relevance/tests/test_review_execution_modes.py b/experiments/crosslingual_relevance/tests/test_review_execution_modes.py
+new file mode 100644
+index 00000000..710dbb94
+--- /dev/null
++++ b/experiments/crosslingual_relevance/tests/test_review_execution_modes.py
+@@ -0,0 +1,47 @@
++"""Existing real/oracle entry points must not silently exchange their meaning."""
++import json
++from pathlib import Path
++from types import SimpleNamespace
++from unittest.mock import patch
++
++import numpy as np
++import pytest
++
++from experiments.crosslingual_relevance import m6_holdout as m6
++from experiments.crosslingual_relevance import mpnet_scorer as mp
++
++
++def test_default_m6_path_does_not_construct_gold_oracle(monkeypatch, tmp_path):
++    def forbidden(task):
++        raise AssertionError('gold oracle used by default real-model path')
++    monkeypatch.setattr(m6, '_gold_scorer_factory', forbidden)
++    monkeypatch.setattr(m6, 'observe_call', lambda *a,**k: ({'sources':[]}, {'snapshot':{}}))
++    monkeypatch.setattr('eval.evidence_quality_v2.run.audit_payload',lambda *a,**k: [])
++    result = m6._run_condition(object(),str(tmp_path),m6.HOLDOUT_TASKS[0],'dense_rescue')
++    assert result['gold_oracle_used'] is False
++    assert result['evaluation_kind'] == 'real_model_replay'
++
++
++def test_real_model_without_pinned_local_artifacts_fails_before_loading(monkeypatch):
++    monkeypatch.delenv('DOCATLAS_RELEVANCE_MODEL_MANIFEST',raising=False)
++    monkeypatch.delenv('DOCATLAS_RELEVANCE_MODEL_DIR',raising=False)
++    monkeypatch.setattr(mp,'_model',None)
++    calls=[]
++    monkeypatch.setattr('fastembed.TextEmbedding',lambda *a,**k: calls.append(k) or object())
++    with pytest.raises((ValueError,RuntimeError)):
++        mp._get_model()
++    assert calls == []
++
++
++def test_unloaded_model_is_not_advertised_as_pinned(monkeypatch):
++    monkeypatch.setattr(mp,'_model',None)
++    result=mp.model_identity()
++    assert result.get('verified') is False
++    assert result.get('fingerprint') is None
++
++
++def test_zero_embedding_is_not_a_valid_cosine_observation(monkeypatch):
++    fake=SimpleNamespace(embed=lambda inputs:[np.zeros(768,dtype=np.float32)])
++    monkeypatch.setattr(mp,'_get_model',lambda:fake)
++    with pytest.raises(ValueError):
++        mp._embed('Some complete evidence.')
+diff --git a/experiments/crosslingual_relevance/tests/test_review_metrics.py b/experiments/crosslingual_relevance/tests/test_review_metrics.py
+new file mode 100644
+index 00000000..82b06cba
+--- /dev/null
++++ b/experiments/crosslingual_relevance/tests/test_review_metrics.py
+@@ -0,0 +1,63 @@
++"""Tests of the actual existing M2/M4/M5 entry points, not replacement stubs."""
++from types import SimpleNamespace
++import hashlib
++import pytest
++
++from experiments.crosslingual_relevance.m4_dense_candidates import _is_gold_chunk, M15_DEV_TASKS
++from experiments.crosslingual_relevance.m5_real_scorer import _check_gold, TYPER_TASKS
++from experiments.crosslingual_relevance.run import recall_at_k
++from eval.evidence_quality_v2.run import documents_for, load_protocol
++
++
++def test_recall_is_not_hit_rate():
++    assert recall_at_k([True,False,True],k=1) == 0.5
++
++
++@pytest.mark.parametrize('metadata', [{}, {'source_path':'docs/advanced/timeouts.md'},
++    {'source_path':'timeouts.md','line_start':1,'line_end':4},
++    {'source_path':'docs/advanced/timeouts.md','line_start':3,'line_end':3},
++    {'source_path':'docs/advanced/timeouts.md','line_start':1,'line_end':4}])
++def test_file_or_overlap_without_canonical_fact_is_not_gold(metadata):
++    chunk = SimpleNamespace(metadata=metadata, text='Not the canonical timeout rule.')
++    assert not _is_gold_chunk(chunk, M15_DEV_TASKS[0])
++
++
++def test_correct_source_and_complete_witness_are_recognised():
++    _,_,manifest = load_protocol()
++    raw = documents_for('httpx', manifest)['docs/advanced/timeouts.md']
++    chunk = SimpleNamespace(text='\n'.join(raw.splitlines()[:4]), metadata={
++        'source_path':'docs/advanced/timeouts.md','line_start':1,'line_end':4,
++        'project_identity':'local:httpx',
++        'source_content_hash':hashlib.sha256(raw.encode()).hexdigest(),
++    })
++    task = {**M15_DEV_TASKS[0], 'expected_project_identity':'local:httpx'}
++    assert _is_gold_chunk(chunk, task)
++
++
++def test_wrong_project_cannot_borrow_same_file_path_and_text():
++    _,_,manifest = load_protocol()
++    raw = documents_for('httpx',manifest)['docs/advanced/timeouts.md']
++    chunk = SimpleNamespace(text='\n'.join(raw.splitlines()[:4]), metadata={
++        'source_path':'docs/advanced/timeouts.md','line_start':1,'line_end':4,
++        'project_identity':'local:foreign'})
++    assert not _is_gold_chunk(chunk, {**M15_DEV_TASKS[0], 'expected_project_identity':'local:httpx'})
++
++
++def test_one_typer_clause_is_not_the_entire_answer():
++    task = TYPER_TASKS[0]
++    result = _check_gold({'sources':[{'snippet':task['gold_phrases'][0]}]}, task)
++    assert result['gold_found'] is False
++
++
++def test_keyword_only_does_not_prove_teardown_order():
++    task = {'id':'m15-dev-03','project':'starlette','formulation':'RU',
++            'gold_phrases':['teardown','lifespan']}
++    result = _check_gold({'sources':[{'snippet':'The lifespan reference.'}]},task)
++    assert result['gold_found'] is False
++
++
++def test_default_duration_requires_exception_and_inactivity_not_just_number():
++    task={'id':'m15-dev-01','project':'httpx','formulation':'mixed',
++          'gold_phrases':['enforces timeouts','TimeoutException','5 seconds']}
++    result=_check_gold({'sources':[{'snippet':'The example sleeps for 5 seconds.'}]}, task)
++    assert result['gold_found'] is False
+diff --git a/experiments/crosslingual_relevance/tests/test_review_model_adapter.py b/experiments/crosslingual_relevance/tests/test_review_model_adapter.py
+new file mode 100644
+index 00000000..61e92413
+--- /dev/null
++++ b/experiments/crosslingual_relevance/tests/test_review_model_adapter.py
+@@ -0,0 +1,64 @@
++"""Local model adapter contracts; fake vectors test plumbing, not model quality."""
++from copy import deepcopy
++from types import SimpleNamespace
++
++import numpy as np
++import pytest
++
++from docmancer.core.config import EmbeddingsConfig
++from experiments.crosslingual_relevance import pinned_embedding_session as session
++from experiments.crosslingual_relevance.model_manifest import (
++    REQUIRED, MODEL_NAME, build_manifest, canonical_digest, verify_manifest,
++)
++from experiments.crosslingual_relevance.scorer_runtime import BoundedScorer
++
++
++def test_self_consistent_but_unsupported_inference_lock_is_rejected(tmp_path):
++    for name in REQUIRED:
++        path = tmp_path / name
++        path.parent.mkdir(parents=True, exist_ok=True)
++        path.write_text('dummy artifact for manifest-only test')
++    manifest = build_manifest(tmp_path)
++    manifest['inference']['pooling'] = 'invented-pooling'
++    manifest['fingerprint'] = canonical_digest({k:v for k,v in manifest.items() if k != 'fingerprint'})
++    with pytest.raises(ValueError, match='inference'):
++        verify_manifest(tmp_path, manifest)
++
++
++def prepare(monkeypatch, model):
++    monkeypatch.setattr(session, '_get_model', lambda:model)
++    monkeypatch.setattr(session, 'model_identity', lambda:{'verified':True,'fingerprint':'a'*64})
++    return EmbeddingsConfig(provider='fastembed', model=MODEL_NAME, dimensions=768)
++
++
++def test_real_provider_reuses_exact_checked_model_object(monkeypatch):
++    import docmancer.embeddings as api
++    model = SimpleNamespace(embed=lambda inputs, **kwargs:[np.ones(768,dtype=np.float32) for _ in inputs])
++    config = prepare(monkeypatch, model)
++    before = api.get_embeddings_provider
++    with session.pinned_embeddings():
++        provider = api.get_embeddings_provider(config)
++        assert provider._dense is model
++        assert len(provider.embed_query('a real query string')) == 768
++    assert api.get_embeddings_provider is before
++
++
++def test_invalid_provider_probe_cannot_silently_keep_declared_dimensions(monkeypatch):
++    import docmancer.embeddings as api
++    def broken(inputs):
++        raise ValueError('broken inference')
++    config = prepare(monkeypatch, SimpleNamespace(embed=broken))
++    with session.pinned_embeddings():
++        with pytest.raises(ValueError):
++            api.get_embeddings_provider(config)
++
++
++def test_token_telemetry_failure_fails_closed():
++    def scorer(q,t):
++        return .9
++    def broken():
++        raise RuntimeError('cannot observe tokenizer')
++    scorer.last_observation = broken
++    bounded = BoundedScorer(scorer)
++    assert bounded.score('q','text') is None
++    assert bounded.degraded_reason == 'scorer_telemetry_error'
+diff --git a/experiments/crosslingual_relevance/tests/test_review_scorer_contracts.py b/experiments/crosslingual_relevance/tests/test_review_scorer_contracts.py
+new file mode 100644
+index 00000000..57f7b496
+--- /dev/null
++++ b/experiments/crosslingual_relevance/tests/test_review_scorer_contracts.py
+@@ -0,0 +1,134 @@
++"""Regression tests for review findings; no embedding weights or oracle answers."""
++from dataclasses import dataclass
++from unittest.mock import patch
++import math
++import threading
++
++import pytest
++from docmancer.docs.domain.evidence_qualification import EvidenceQualification
++from experiments.crosslingual_relevance.context_rescue import BoundedScorer, apply_rescue, installed
++
++TEXT = 'A complete document sentence that must be assessed against its own original question. ' * 2
++
++
++def rejected():
++    return EvidenceQualification(False, (), None, 'insufficient_visible_match', {})
++
++
++def rescue(scorer, threshold=0.7453):
++    return apply_rescue(rejected(), query_id='query-original', question='question',
++                        evidence_text=TEXT, source_identity='local:test',
++                        scorer=scorer, threshold=threshold)
++
++
++@pytest.mark.parametrize('value', [float('nan'), float('inf'), -float('inf')])
++def test_nonfinite_scores_fail_closed(value):
++    scorer = BoundedScorer(lambda q, t: value)
++    result = rescue(scorer)
++    assert not result.qualified
++    assert scorer.degraded
++
++
++@pytest.mark.parametrize('threshold', [float('nan'), float('inf'), -float('inf')])
++def test_invalid_threshold_is_rejected_before_inference(threshold):
++    calls = []
++    with pytest.raises(ValueError):
++        rescue(BoundedScorer(lambda q,t: calls.append(t) or 0.9), threshold)
++    assert calls == []
++
++
++@pytest.mark.parametrize('value', [1.01, -1.01])
++def test_out_of_range_cosine_is_an_error(value):
++    scorer = BoundedScorer(lambda q,t: value)
++    assert not rescue(scorer).qualified
++    assert scorer.degraded
++
++
++def test_negative_cosine_is_valid_not_an_execution_error():
++    scorer = BoundedScorer(lambda q,t: -0.4)
++    assert scorer.score('q', TEXT) == -0.4
++    assert not scorer.degraded
++
++
++@pytest.mark.parametrize('kwargs', [{'max_evaluations': 0}, {'max_evaluations': -2},
++    {'max_evaluations': True}, {'max_evaluations': 2.5}, {'timeout': 0},
++    {'timeout': -1}, {'timeout': float('nan')}, {'timeout': float('inf')}])
++def test_invalid_execution_limits_are_rejected(kwargs):
++    with pytest.raises(ValueError):
++        BoundedScorer(lambda q,t: 0.9, **kwargs)
++
++
++def test_one_deadline_applies_to_the_stage_not_each_call():
++    now = [0.0]
++    calls = []
++    def slow(q, text):
++        calls.append(text)
++        now[0] += 6.0
++        return 0.9
++    with patch('experiments.crosslingual_relevance.context_rescue.time.monotonic', side_effect=lambda: now[0]):
++        scorer = BoundedScorer(slow, timeout=10)
++        assert scorer.score('q', TEXT + '1') == 0.9
++        assert scorer.score('q', TEXT + '2') is None
++        assert scorer.score('q', TEXT + '3') is None
++        # Proven earlier result remains usable; no extra inference or deadline reset.
++        assert scorer.score('q', TEXT + '1') == 0.9
++    assert len(calls) == 2
++    assert scorer.degraded
++
++
++def test_deadline_includes_idle_time_between_stage_calls():
++    now = [10.0]
++    calls = []
++    with patch('experiments.crosslingual_relevance.context_rescue.time.monotonic', side_effect=lambda: now[0]):
++        scorer = BoundedScorer(lambda q,t: calls.append(t) or 0.9, timeout=10)
++        assert scorer.score('q', TEXT) == 0.9
++        now[0] = 21.0
++        assert scorer.score('q', TEXT + 'changed') is None
++    assert len(calls) == 1
++
++
++def test_cache_hit_is_observable_and_does_not_consume_evaluation_budget():
++    scorer = BoundedScorer(lambda q,t: 0.9, max_evaluations=1)
++    assert scorer.score('q', TEXT) == 0.9
++    assert scorer.score('q', TEXT) == 0.9
++    assert scorer.score('q', TEXT + 'new') is None
++    assert scorer.score('q', TEXT) == 0.9
++    assert scorer.degraded_reason == 'evaluation_limit_reached'
++
++
++def test_short_rule_is_not_silently_discarded_by_arbitrary_80_character_cutoff():
++    calls = []
++    result = apply_rescue(rejected(), query_id='q', question='question',
++        evidence_text='The cursor expires after 60 seconds.', source_identity='local:test',
++        scorer=BoundedScorer(lambda q,t: calls.append(t) or 0.9))
++    assert calls
++    assert result.qualified
++    assert result.trace['admission_only'] is True
++    assert result.covered_query_ids == ()
++
++
++def test_nested_installation_fails_without_replacing_outer_question():
++    outer_calls = []
++    with installed(lambda q,t: outer_calls.append(q) or 0.9, question='outer'):
++        with pytest.raises(RuntimeError):
++            with installed(lambda q,t: 0.9, question='inner'):
++                pass
++
++
++def test_scoring_exception_fails_closed():
++    def bad(q,t):
++        raise RuntimeError('test')
++    scorer = BoundedScorer(bad)
++    assert not rescue(scorer).qualified
++    assert scorer.degraded_reason == 'scorer_error'
++
++
++def test_only_lexical_rejection_can_be_rescued():
++    for reason in ['wrong_project_identity','stale_evidence','missing_local_demand',
++                   'metadata_only_evidence','missing_exact_terms']:
++        calls = []
++        original = EvidenceQualification(False, (), None, reason, {})
++        got = apply_rescue(original, query_id='q', question='q', evidence_text=TEXT,
++            source_identity='local:test', scorer=BoundedScorer(lambda q,t: calls.append(t) or .99))
++        assert got is original
++        assert not calls
+diff --git a/experiments/crosslingual_relevance/tests/test_review_step2_metrics.py b/experiments/crosslingual_relevance/tests/test_review_step2_metrics.py
+new file mode 100644
+index 00000000..0119f7f8
+--- /dev/null
++++ b/experiments/crosslingual_relevance/tests/test_review_step2_metrics.py
+@@ -0,0 +1,17 @@
++"""The legacy step2 entry point must obey the same canonical evaluator."""
++import pytest
++from experiments.crosslingual_relevance.m4_step2_handler import _is_gold_source
++from experiments.crosslingual_relevance.m4_dense_candidates import M15_DEV_TASKS
++from experiments.crosslingual_relevance.evaluation_v2 import corpus_documents
++
++@pytest.mark.parametrize('row', [{}, {'path_or_url':'docs/advanced/timeouts.md'},
++    {'path_or_url':'docs/advanced/timeouts.md','line_start':3,'line_end':3,'snippet':'noise'}])
++def test_step2_does_not_certify_filename_or_overlap(row):
++    assert not _is_gold_source(row, M15_DEV_TASKS[0])
++
++
++def test_step2_accepts_complete_canonical_statement():
++    raw = corpus_documents('httpx')['docs/advanced/timeouts.md']
++    row = {'path_or_url':'docs/advanced/timeouts.md','line_start':1,'line_end':4,
++           'snippet':'\n'.join(raw.splitlines()[:4])}
++    assert _is_gold_source(row, M15_DEV_TASKS[0])
+diff --git a/tests/diagnostic_labels.task44_review.json b/tests/diagnostic_labels.task44_review.json
+new file mode 100644
+index 00000000..67d78769
+--- /dev/null
++++ b/tests/diagnostic_labels.task44_review.json
+@@ -0,0 +1,20 @@
++{
++  "schema_version": 1,
++  "module_labels": {
++    "experiments/crosslingual_relevance/tests/test_review_audit_guards.py": "behavioral",
++    "experiments/crosslingual_relevance/tests/test_review_execution_modes.py": "behavioral",
++    "experiments/crosslingual_relevance/tests/test_review_metrics.py": "behavioral",
++    "experiments/crosslingual_relevance/tests/test_review_model_adapter.py": "behavioral",
++    "experiments/crosslingual_relevance/tests/test_review_scorer_contracts.py": "behavioral",
++    "experiments/crosslingual_relevance/tests/test_review_step2_metrics.py": "behavioral"
++  },
++  "module_node_hashes": {
++    "experiments/crosslingual_relevance/tests/test_review_audit_guards.py": "bd6aab7c2dffd71a81ed9952d12d34a90403d1d8e8d64b04b93cc42dbb95e3cc",
++    "experiments/crosslingual_relevance/tests/test_review_execution_modes.py": "9588d2f0df5f37f26a1a57364e225da454b343ff655d10b5be8c8b19d5040a0b",
++    "experiments/crosslingual_relevance/tests/test_review_metrics.py": "bded6ce97801b23cec87e349dcc4d3c6ad86aa69e9031503df5149a8d185beac",
++    "experiments/crosslingual_relevance/tests/test_review_model_adapter.py": "1d11d8b0fa9b5c51b59cf2ba87d7795182159b9ad91775b3e876312a7c554755",
++    "experiments/crosslingual_relevance/tests/test_review_scorer_contracts.py": "73490c65b45022fbf22c785f377eca8d3440d99f27f594ce38497f5c7d8dc084",
++    "experiments/crosslingual_relevance/tests/test_review_step2_metrics.py": "4202bbcfca3c9985bcd4c5ddc705e795695f338de73ddab3c5364e78abe0ea40"
++  },
++  "node_overrides": {}
++}
