@@ -3,10 +3,9 @@
 Replaces the stub scorer with the real frozen MPNet model (threshold 0.7453).
 Tests both Typer (M0 RED target) and M1.5 development tasks.
 
-Expected:
-  - M1.5 dev tasks: gold scores above 0.7453 → rescue fires → PASS
-  - Typer tasks: gold scores 0.50-0.54 → below threshold → rescue does NOT fire → FAIL
-  - This is a legitimate finding: frozen threshold doesn't transfer to Typer
+Scores are recorded on the actual runtime evidence. Neither a manually selected
+gold window nor one matching keyword is proof of first-packet completeness.
+Historical scores are not predictions for the instrumented replay.
 
 Usage:
     python -m experiments.crosslingual_relevance.m5_real_scorer
@@ -53,7 +52,7 @@ TYPER_TASKS = [
     },
 ]
 
-# M1.5 development tasks (gold scores above threshold)
+# Existing M1.5 development tasks; no assumption about real scorer scores
 M15_DEV_TASKS = [
     {
         "id": "m15-dev-01", "project": "httpx", "formulation": "mixed",
@@ -80,7 +79,7 @@ M15_DEV_TASKS = [
 ALL_PROJECTS = ["httpx", "ruff", "starlette", "pydantic", "typer"]
 
 
-def _build_vector_service(tmp: Path):
+def _build_vector_service(tmp: Path, *, max_sections_per_source: int = 20):
     import scripts.run_project_docs_self_host_gate as gate
     from docmancer.core.config import VectorStoreConfig
     from docmancer.core.product_identity import ensure_owned_home
@@ -104,7 +103,7 @@ def _build_vector_service(tmp: Path):
         config.index.db_path = str(state / 'index.db')
         config.index.extracted_dir = str(state / 'extracted')
         config.retrieval.default_mode = "dense"
-        config.retrieval.max_sections_per_source = 20
+        config.retrieval.max_sections_per_source = max_sections_per_source
         config.embeddings.provider = "fastembed"
         config.embeddings.model = DENSE_MODEL
         config.embeddings.dimensions = DENSE_DIM
@@ -133,27 +132,24 @@ def _index_all(service, roots: dict[str, str]):
             raise RuntimeError(f"index failed for {project}: {result.status}")
 
 
-def _check_gold(payload, task) -> dict[str, Any]:
-    sources = payload.get("sources", [])
-    visible = "\n\n".join(s.get("snippet", "") for s in sources)
-    gold_found = any(p in visible for p in task["gold_phrases"])
-    budget = docs_context_budget_tokens(payload)
-    return {
-        "task_id": task["id"],
-        "formulation": task["formulation"],
-        "project": task["project"],
-        "gold_found": gold_found,
-        "total_sources": len(sources),
-        "budget_tokens": budget,
-        "answer_supported": payload.get("answer_supported", False),
-        "context_available": payload.get("context_available", False),
-    }
+def _check_gold(payload, task, *, audit_errors=None) -> dict[str, Any]:
+    from .evaluation_v2 import assess_packet
+    assessment = assess_packet(payload, task, audit_errors=audit_errors)
+    return {"task_id":task["id"], "formulation":task["formulation"], "project":task["project"],
+        "gold_found":assessment["all_required_facts"] and not assessment["canonical_errors"],
+        "total_sources":len(payload.get("sources",[])),
+        "budget_tokens":docs_context_budget_tokens(payload),
+        "answer_supported":payload.get("answer_supported",False),
+        "context_available":payload.get("context_available",False),
+        "assessment":assessment}
 
 
-def main():
+def _run(max_sections_per_source: int = 20):
     import tempfile
     tmp = Path(tempfile.mkdtemp(prefix="m5-real-"))
     print(f"Working directory: {tmp}")
+    from .mpnet_scorer import _get_model
+    _get_model()  # Verify the pinned local model before any indexing/experiment.
     print(f"Model: {model_identity()}")
     print(f"Threshold: {M2B_THRESHOLD}")
 
@@ -167,86 +163,87 @@ def main():
         roots[project] = str(root)
 
     print("Building vector service...")
-    service, config, patcher = _build_vector_service(tmp)
-    _index_all(service, roots)
-    print("All projects indexed with vectors.\n")
+    service, config, patcher = _build_vector_service(tmp, max_sections_per_source=max_sections_per_source)
+    try:
+        _index_all(service, roots)
+        print("All projects indexed with vectors.\n")
 
-    # Pre-compute MPNet scores for gold blocks to verify threshold applicability
-    print("=" * 60)
-    print("MPNet score check (gold blocks vs threshold)")
-    print("=" * 60)
-    for task in TYPER_TASKS + M15_DEV_TASKS:
-        docs = documents_for(task["project"], manifest)
-        # Find gold passage
-        gold_text = ""
-        for path, content in docs.items():
-            for phrase in task["gold_phrases"]:
-                if phrase in content:
-                    # Extract the section containing the phrase
-                    lines = content.split('\n')
-                    for i, line in enumerate(lines):
-                        if phrase in line:
-                            gold_text = '\n'.join(lines[max(0,i-2):i+10])
-                            break
-                    if gold_text:
-                        break
-            if gold_text:
-                break
-        if gold_text:
-            score = mpnet_scorer(task["question"], gold_text)
-            above = score >= M2B_THRESHOLD
-            print(f"  {task['id']} ({task['formulation']}): score={score:.4f} "
-                  f"above_threshold={above} {'✓' if above else '✗'}")
-        else:
-            print(f"  {task['id']}: gold text not found")
+        # No oracle-selected gold window is sent to the scorer. All recorded inputs
+        # below come from actual qualification/projection calls, with exact hashes.
+        # Run all tasks with real MPNet scorer
+        print(f"\n{'='*60}")
+        print("M5 with real MPNet scorer (frozen threshold 0.7453)")
+        print(f"{'='*60}")
 
-    # Run all tasks with real MPNet scorer
-    print(f"\n{'='*60}")
-    print("M5 with real MPNet scorer (frozen threshold 0.7453)")
-    print(f"{'='*60}")
+        results = []
+        executions = []
+        for task in TYPER_TASKS + M15_DEV_TASKS:
+            root = roots[task["project"]]
+            request = {"question": task["question"], "project_path": root, "scope": "all"}
+            from .context_rescue import BoundedScorer
+            from eval.evidence_quality_v2.run import audit_payload
+            bounded = BoundedScorer(mpnet_scorer, capture_text=True)
+            with installed(bounded, threshold=M2B_THRESHOLD, question=task["question"]):
+                payload, trace = observe_call(service, request)
+            errors = audit_payload(payload, trace["snapshot"], Path(root))
+            r = _check_gold(payload, task, audit_errors=errors)
+            r["scorer_executed"] = bounded.summary["evaluations"] > 0
+            r["scorer_degraded"] = bounded.degraded
+            r["scorer_model_verified"] = bounded.identity().get("verified") is True
+            r["context_pass_is_not_causal_model_gain"] = True
+            executions.append({"request":request,"payload":payload,"trace":trace,
+                               "scorer_events":bounded.events,"scorer_summary":bounded.summary})
+            results.append(r)
+            status = r["assessment"]["verdict"]
+            print(f"  [{status}] {r['task_id']} ({r['formulation']}): "
+                  f"gold_found={r['gold_found']} sources={r['total_sources']} "
+                  f"budget={r['budget_tokens']} context_available={r['context_available']}")
 
-    results = []
-    for task in TYPER_TASKS + M15_DEV_TASKS:
-        root = roots[task["project"]]
-        request = {"question": task["question"], "project_path": root, "scope": "all"}
-        with installed(mpnet_scorer, threshold=M2B_THRESHOLD, question=task["question"]):
-            payload, trace = observe_call(service, request)
-        r = _check_gold(payload, task)
-        results.append(r)
-        status = "PASS" if r["gold_found"] else "FAIL"
-        print(f"  [{status}] {r['task_id']} ({r['formulation']}): "
-              f"gold_found={r['gold_found']} sources={r['total_sources']} "
-              f"budget={r['budget_tokens']} context_available={r['context_available']}")
+        # Summary
+        print(f"\n{'='*60}")
+        print("SUMMARY")
+        print(f"{'='*60}")
+        typer_results = [r for r in results if r["project"] == "typer"]
+        m15_results = [r for r in results if r["project"] != "typer"]
+        typer_pass = sum(1 for r in typer_results if r["assessment"]["verdict"] == "PASS")
+        m15_pass = sum(1 for r in m15_results if r["assessment"]["verdict"] == "PASS")
+        print(f"Typer (M0 target): {typer_pass}/{len(typer_results)}")
+        print(f"M1.5 dev: {m15_pass}/{len(m15_results)}")
 
-    # Summary
-    print(f"\n{'='*60}")
-    print("SUMMARY")
-    print(f"{'='*60}")
-    typer_results = [r for r in results if r["project"] == "typer"]
-    m15_results = [r for r in results if r["project"] != "typer"]
-    typer_pass = sum(1 for r in typer_results if r["gold_found"])
-    m15_pass = sum(1 for r in m15_results if r["gold_found"])
-    print(f"Typer (M0 target): {typer_pass}/{len(typer_results)}")
-    print(f"M1.5 dev: {m15_pass}/{len(m15_results)}")
+        # Save
+        output = {
+            "schema_version":2,
+            "evaluation_kind":"real_model_with_canonical_claim_audit",
+            "max_sections_per_source":max_sections_per_source,
+            "gold_oracle_used":False,
+            "scorer": model_identity(),
+            "executions":executions,
+            "threshold": M2B_THRESHOLD,
+            "results": results,
+            "summary": {
+                "typer_pass": typer_pass,
+                "typer_total": len(typer_results),
+                "m15_pass": m15_pass,
+                "m15_total": len(m15_results),
+            },
+        }
+        from .evaluation_v2 import save_new_report
+        out_path = Path("experiments/crosslingual_relevance/review_runs") / f"m5-real-{uuid.uuid4().hex}.json"
+        save_new_report(out_path, json.loads(json.dumps(output,default=str)))
+        print(f"\nResults saved to {out_path}")
+    finally:
+        patcher.stop()
 
-    # Save
-    output = {
-        "scorer": model_identity(),
-        "threshold": M2B_THRESHOLD,
-        "results": results,
-        "summary": {
-            "typer_pass": typer_pass,
-            "typer_total": len(typer_results),
-            "m15_pass": m15_pass,
-            "m15_total": len(m15_results),
-        },
-    }
-    out_path = Path("experiments/crosslingual_relevance/m5_real_scorer_results.json")
-    out_path.write_text(json.dumps(output, ensure_ascii=False, indent=2, default=str) + "\n",
-                        encoding="utf-8")
-    print(f"\nResults saved to {out_path}")
 
-    patcher.stop()
+
+def main():
+    import argparse
+    from .pinned_embedding_session import pinned_embeddings
+    parser=argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--max-sections-per-source',type=int,choices=(2,20),default=20)
+    args=parser.parse_args()
+    with pinned_embeddings():
+        _run(args.max_sections_per_source)
 
 
 if __name__ == "__main__":

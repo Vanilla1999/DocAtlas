@@ -1,0 +1,20 @@
+{
+  "schema_version": 1,
+  "module_labels": {
+    "experiments/crosslingual_relevance/tests/test_review_audit_guards.py": "behavioral",
+    "experiments/crosslingual_relevance/tests/test_review_execution_modes.py": "behavioral",
+    "experiments/crosslingual_relevance/tests/test_review_metrics.py": "behavioral",
+    "experiments/crosslingual_relevance/tests/test_review_model_adapter.py": "behavioral",
+    "experiments/crosslingual_relevance/tests/test_review_scorer_contracts.py": "behavioral",
+    "experiments/crosslingual_relevance/tests/test_review_step2_metrics.py": "behavioral"
+  },
+  "module_node_hashes": {
+    "experiments/crosslingual_relevance/tests/test_review_audit_guards.py": "bd6aab7c2dffd71a81ed9952d12d34a90403d1d8e8d64b04b93cc42dbb95e3cc",
+    "experiments/crosslingual_relevance/tests/test_review_execution_modes.py": "9588d2f0df5f37f26a1a57364e225da454b343ff655d10b5be8c8b19d5040a0b",
+    "experiments/crosslingual_relevance/tests/test_review_metrics.py": "bded6ce97801b23cec87e349dcc4d3c6ad86aa69e9031503df5149a8d185beac",
+    "experiments/crosslingual_relevance/tests/test_review_model_adapter.py": "1d11d8b0fa9b5c51b59cf2ba87d7795182159b9ad91775b3e876312a7c554755",
+    "experiments/crosslingual_relevance/tests/test_review_scorer_contracts.py": "73490c65b45022fbf22c785f377eca8d3440d99f27f594ce38497f5c7d8dc084",
+    "experiments/crosslingual_relevance/tests/test_review_step2_metrics.py": "4202bbcfca3c9985bcd4c5ddc705e795695f338de73ddab3c5364e78abe0ea40"
+  },
+  "node_overrides": {}
+}

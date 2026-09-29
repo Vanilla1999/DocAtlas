@@ -1,42 +1,27 @@
-"""M6 — holdout evaluation with dense + rescue.
+"""Replays inspected M1.5 tasks with a real scorer or EXPLICIT oracle plumbing.
 
-Runs the M1.5 holdout split (4 tasks: httpx-mixed, ruff-EN, starlette-RU,
-pydantic-mixed) through the same dense + rescue configuration as M5.
-
-Metrics (separate, not collapsed into one score):
-  1. Document finding: did we reach the correct source?
-  2. Fact range finding: did evidence arrive, not just filename?
-  3. Admission errors: precision/recall of admission
-  4. First packet completeness: what model gets immediately (budget ≤ 800)
-  5. No source-policy violations, no irrelevant block admissions
-
-Four causal conditions on same corpus and budget:
-  A. lexical + baseline  (M0 baseline)
-  B. lexical + rescue    (no candidates to rescue)
-  C. dense + baseline    (candidates found, filtered by qualification)
-  D. dense + rescue      (target result)
-
-Usage:
-    python -m experiments.crosslingual_relevance.m6_holdout
+The historical module name is retained for compatibility. These tasks are not
+an unseen-domain holdout. Default scoring is real; --oracle-plumbing is opt-in
+and its output cannot be promoted to model-quality evidence. Old artifacts and
+protocol locks are never overwritten.
 """
 from __future__ import annotations
-
+import argparse
+from contextlib import nullcontext
 import json
-import os
-import uuid
 from pathlib import Path
+import tempfile
+import uuid
 from typing import Any
-from unittest.mock import patch
 
-from eval.evidence_quality_v2.run import documents_for, load_protocol
-from eval.evidence_quality_v2.runtime import write_project, isolated_service, index_project
 from eval.evidence_quality_v2.observer import observe_call
+from eval.evidence_quality_v2.runtime import write_project, isolated_service, index_project
+from eval.evidence_quality_v2.run import documents_for, load_protocol, audit_payload
 from docmancer.docs.application.model_visible_projection import docs_context_budget_tokens
-
-from experiments.crosslingual_relevance.context_rescue import installed, M2B_THRESHOLD
-
-DENSE_MODEL = "sentence-transformers/paraphrase-multilingual-mpnet-base-v2"
-DENSE_DIM = 768
+from .context_rescue import installed, BoundedScorer, M2B_THRESHOLD
+from .mpnet_scorer import mpnet_scorer, model_identity, _get_model
+from .m5_real_scorer import _build_vector_service, _index_all
+from .evaluation_v2 import assess_packet, canonical_row, corpus_documents, save_new_report
 
 # Holdout tasks from M1.5 frozen manifest
 HOLDOUT_TASKS = [
@@ -74,326 +59,112 @@ HOLDOUT_TASKS = [
     },
 ]
 
-PROJECTS = ["httpx", "ruff", "starlette", "pydantic"]
-
 
 def _gold_scorer_factory(task):
-    """Create a scorer that returns high score for gold passages."""
-    phrases = task["gold_phrases"]
-    def _scorer(question: str, evidence_text: str) -> float:
-        if any(p in evidence_text for p in phrases):
-            return 0.9
-        return 0.1
-    return _scorer
+    """Oracle is only a plumbing control, never a relevance-model result."""
+    from .evaluation_v2 import required_claims
+    claims=required_claims(task)
+    def scorer(question, text):
+        return .9 if any(all(c in text for c in alt["clauses"])
+                         for claim in claims for alt in claim["alternatives"]) else .1
+    scorer.identity=lambda:{"kind":"oracle_plumbing","verified":False}
+    return scorer
 
 
-def _load_all_documents(root: Path) -> dict[str, dict[str, str]]:
-    _, _, manifest = load_protocol()
-    result = {}
-    for project in PROJECTS:
-        result[project] = documents_for(project, manifest)
-    return result
+def _is_gold_source(source, task):
+    outcome=assess_packet({"sources":[source]},task)
+    return outcome["all_required_facts"] and not outcome["canonical_errors"]
 
 
-def _write_projects(tmp: Path, docs_map: dict[str, dict[str, str]]) -> dict[str, str]:
-    roots = {}
-    for project, docs in docs_map.items():
-        root = tmp / "projects" / project
-        write_project(root, docs)
-        roots[project] = str(root)
-    return roots
+def _is_gold_in_candidates(trace, task):
+    rows=[s for e in trace.get("stages",{}).get("retrieved_candidates",[])
+          for s in e.get("sources",[]) if isinstance(s,dict)]
+    return assess_packet({"sources":rows},task)["all_required_facts"]
 
 
-def _build_vector_service(tmp: Path):
-    """Build a LibraryDocsService with dense retrieval and vectors enabled."""
-    import scripts.run_project_docs_self_host_gate as gate
-    from docmancer.core.config import VectorStoreConfig
-    from docmancer.core.product_identity import ensure_owned_home
-
-    state = tmp / "vstate"
-    state.mkdir(parents=True, exist_ok=True)
-    home_dir = tmp / "vhome"
-    home_dir.mkdir(parents=True, exist_ok=True)
-    env = {key: str(state / key.lower()) for key in
-           ('HOME', 'XDG_CONFIG_HOME', 'XDG_CACHE_HOME', 'XDG_DATA_HOME')}
-    env['DOCATLAS_HOME'] = str(home_dir)
-    env['DOCATLAS_FASTEMBED_CACHE_DIR'] = "/tmp/fastembed_cache"
-    env.update(DOCATLAS_OFFLINE='1', DOCATLAS_AUTO_VECTORS='1')
-    for p in env.values():
-        if p not in ('0', '1'):
-            Path(p).mkdir(parents=True, exist_ok=True)
-
-    patcher = patch.dict(os.environ, env)
-    patcher.start()
-    try:
-        ensure_owned_home(str(home_dir))
-        config = gate.DocmancerConfig()
-        config.index.db_path = str(state / 'index.db')
-        config.index.extracted_dir = str(state / 'extracted')
-        config.retrieval.default_mode = "dense"
-        config.retrieval.max_sections_per_source = 20
-        config.embeddings.provider = "fastembed"
-        config.embeddings.model = DENSE_MODEL
-        config.embeddings.dimensions = DENSE_DIM
-        config.embeddings.sparse_model = None
-        config.embeddings.cache = "/tmp/fastembed_cache"
-        config.vector_store = VectorStoreConfig(
-            provider="sqlite-vec",
-            collection=f"m6_{uuid.uuid4().hex[:8]}",
-        )
-        service = gate.LibraryDocsService(
-            config=config, config_source='explicit',
-            registry=gate.LibraryRegistry(config.index.db_path),
-            agent=gate.DocmancerAgent(config=config),
-            job_tracker=gate.DocsJobTracker(),
-        )
-        return service, config, patcher
-    except Exception:
-        patcher.stop()
-        raise
+def _run_condition(service, root: str, task: dict, condition: str, *, oracle_plumbing: bool=False):
+    request={"question":task["question"],"project_path":root,"scope":"all"}
+    use_rescue=condition in {"dense_rescue","lexical_rescue"}
+    scorer=_gold_scorer_factory(task) if oracle_plumbing else mpnet_scorer
+    bounded=BoundedScorer(scorer,capture_text=True)
+    context=installed(bounded,question=task["question"]) if use_rescue else nullcontext()
+    with context:
+        payload,trace=observe_call(service,request)
+    errors=audit_payload(payload,trace.get("snapshot",{}),Path(root))
+    assessment=assess_packet(payload,task,audit_errors=errors)
+    candidates=[s for e in trace.get("stages",{}).get("retrieved_candidates",[])
+                for s in e.get("sources",[]) if isinstance(s,dict)]
+    docs=corpus_documents(task["project"])
+    candidate_checks=[canonical_row(s,docs) for s in candidates]
+    return {"task_id":task["id"],"condition":condition,"formulation":task["formulation"],
+            "evaluation_kind":"oracle_plumbing" if oracle_plumbing else "real_model_replay",
+            "gold_oracle_used":oracle_plumbing and use_rescue,
+            "independent_holdout":False,
+            "model_executed":use_rescue and not oracle_plumbing and bounded.summary["evaluations"]>0,
+            "model_identity":bounded.identity(),
+            "document_found":any(s["status"]=="verified" for s in candidate_checks),
+            "all_required_in_candidates":_is_gold_in_candidates(trace,task),
+            "gold_in_packet":assessment["all_required_facts"],
+            "assessment":assessment,"budget_tokens":docs_context_budget_tokens(payload),
+            "admission_errors":{"false_admit":None,"false_reject":None,
+                                "reason":"requires_exhaustive_candidate_relevance_labels"},
+            "source_policy_errors":errors,
+            "payload":payload,"trace":trace,
+            "scorer_events":bounded.events,"scorer_summary":bounded.summary}
 
 
-def _index_all_with_vectors(service, roots: dict[str, str]):
-    for project, root in roots.items():
-        result = service.sync_project_docs(root, with_vectors=True)
-        if result.status != 'success':
-            raise RuntimeError(f"index failed for {project}: {result.status}")
+def valid_for_model_quality(row: dict) -> bool:
+    return (row.get("evaluation_kind")=="real_model_replay"
+            and row.get("gold_oracle_used") is False
+            and row.get("model_executed") is True
+            and row.get("model_identity",{}).get("verified") is True
+            and not row.get("scorer_summary",{}).get("degraded")
+            and row.get("assessment",{}).get("source_policy_status")=="PASS")
 
 
-def _is_gold_source(source: dict, task: dict) -> bool:
-    """Check if a source matches the task's gold path and line range."""
-    path = source.get("path_or_url") or source.get("source_path") or ""
-    snippet = source.get("snippet") or ""
-    line_start = source.get("line_start")
-    line_end = source.get("line_end")
-    gold_path = task["gold_path"]
-    # Path match
-    if gold_path.split("/")[-1] not in path.split("/")[-1] and gold_path not in path:
-        return False
-    # Line overlap
-    if line_start is not None and line_end is not None:
-        for gl_start, gl_end in task["gold_lines"]:
-            if line_start <= gl_end and line_end >= gl_start:
-                return True
-    # Snippet phrase match (fallback)
-    if any(p in snippet for p in task["gold_phrases"]):
-        return True
-    return False
+def main(argv=None):
+    parser=argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--oracle-plumbing',action='store_true')
+    parser.add_argument('--output',type=Path)
+    parser.add_argument('--max-sections-per-source',type=int,choices=(2,20),default=20)
+    args=parser.parse_args(argv)
+    root=Path(tempfile.mkdtemp(prefix='m6-reviewed-'))
+    manifest=load_protocol()[2]
+    roots={}
+    for project in {t['project'] for t in HOLDOUT_TASKS}:
+        path=root/'projects'/project
+        write_project(path,documents_for(project,manifest))
+        roots[project]=path
+    # Dense retrieval is real even for the explicit oracle scorer condition.
+    # Pin it to the same checked artifact as the MPNet scorer.
+    from .pinned_embedding_session import pinned_embeddings
+    results=[]
+    with pinned_embeddings():
+        vservice,vconfig,patcher=_build_vector_service(root/'dense',max_sections_per_source=args.max_sections_per_source)
+        vconfig.retrieval.max_sections_per_source=args.max_sections_per_source
+        try:
+            _index_all(vservice,{k:str(v) for k,v in roots.items()})
+            with isolated_service(root/'lexical') as (lservice,lconfig):
+                lconfig.retrieval.max_sections_per_source=args.max_sections_per_source
+                for path in roots.values(): index_project(lservice,lconfig,path)
+                for mode,service in [('lexical',lservice),('dense',vservice)]:
+                    for rescue in (False,True):
+                        for task in HOLDOUT_TASKS:
+                            results.append(_run_condition(service,str(roots[task['project']]),task,
+                                mode+('_rescue' if rescue else '_baseline'),
+                                oracle_plumbing=args.oracle_plumbing))
+        finally:
+            patcher.stop()
+    output={'schema_version':2,'evaluation_kind':'oracle_plumbing' if args.oracle_plumbing else 'real_model_replay',
+            'independent_holdout':False,'frozen_threshold':M2B_THRESHOLD,
+            'max_sections_per_source':args.max_sections_per_source,
+            'rows':results,'summary':{'all_required_first_packets':sum(r['gold_in_packet'] for r in results),
+                                    'total':len(results),
+                                    'model_quality_eligible_rows':sum(valid_for_model_quality(r) for r in results)}}
+    target=args.output or Path(__file__).parent/'review_runs'/f'm6-{output["evaluation_kind"]}-{uuid.uuid4().hex}.json'
+    save_new_report(target,json.loads(json.dumps(output,default=str)))
+    print(target)
 
 
-def _is_gold_in_candidates(trace: dict, task: dict) -> bool:
-    """Check if gold block appears in retrieved_candidates stage."""
-    rc = trace.get("stages", {}).get("retrieved_candidates", [])
-    for entry in rc:
-        for s in entry.get("sources", []):
-            if isinstance(s, dict):
-                snippet = s.get("snippet") or ""
-                path = s.get("path_or_url") or ""
-                if task["gold_path"].split("/")[-1] in path.split("/")[-1]:
-                    if any(p in snippet for p in task["gold_phrases"]):
-                        return True
-    return False
-
-
-def _run_condition(service, root: str, task: dict, condition: str) -> dict[str, Any]:
-    """Run a single task under one condition and collect metrics."""
-    request = {"question": task["question"], "project_path": root, "scope": "all"}
-
-    if condition in ("dense_rescue", "lexical_rescue"):
-        scorer = _gold_scorer_factory(task)
-        with installed(scorer, threshold=M2B_THRESHOLD, question=task["question"]):
-            payload, trace = observe_call(service, request)
-    else:
-        payload, trace = observe_call(service, request)
-
-    sources = payload.get("sources", [])
-    visible = "\n\n".join(s.get("snippet", "") for s in sources)
-    gold_in_packet = any(p in visible for p in task["gold_phrases"])
-    gold_in_candidates = _is_gold_in_candidates(trace, task)
-    gold_sources = [
-        {"rank": i + 1, "path": s.get("path_or_url"),
-         "line_start": s.get("line_start"), "line_end": s.get("line_end")}
-        for i, s in enumerate(sources) if _is_gold_source(s, task)
-    ]
-    budget = docs_context_budget_tokens(payload)
-    answer_supported = payload.get("answer_supported", False)
-    context_available = payload.get("context_available", False)
-    covered = payload.get("covered_query_ids", [])
-
-    # Check for source-policy violations (wrong project blocks in sources)
-    wrong_project = any(
-        task["gold_path"].split("/")[-1] not in (s.get("path_or_url") or "").split("/")[-1]
-        and not _is_gold_source(s, task)
-        for s in sources
-    )
-
-    return {
-        "task_id": task["id"],
-        "formulation": task["formulation"],
-        "project": task["project"],
-        "condition": condition,
-        "document_found": gold_in_candidates,
-        "fact_range_found": gold_in_packet,
-        "gold_in_candidates": gold_in_candidates,
-        "gold_in_packet": gold_in_packet,
-        "gold_sources": gold_sources,
-        "total_sources": len(sources),
-        "budget_tokens": budget,
-        "answer_supported": answer_supported,
-        "context_available": context_available,
-        "covered_query_ids": list(covered),
-        "source_policy_violations": wrong_project,
-        "admission_errors": {
-            "false_admit": sum(1 for s in sources if not _is_gold_source(s, task)),
-            "false_reject": 0 if gold_in_packet else (1 if gold_in_candidates else 0),
-        },
-    }
-
-
-def main():
-    import tempfile
-    tmp = Path(tempfile.mkdtemp(prefix="m6-holdout-"))
-    print(f"Working directory: {tmp}")
-
-    docs_map = _load_all_documents(tmp)
-    roots = _write_projects(tmp, docs_map)
-    print(f"Loaded {len(PROJECTS)} projects")
-
-    # Build vector service (for dense conditions)
-    print("Building vector service...")
-    vservice, vconfig, vpatcher = _build_vector_service(tmp)
-    _index_all_with_vectors(vservice, roots)
-    print("All projects indexed with vectors")
-
-    # Build lexical service (for baseline conditions)
-    print("Building lexical service...")
-    lex_state = tmp / "lex_state"
-    lex_state.mkdir(parents=True, exist_ok=True)
-    lex_results = {}
-    with isolated_service(lex_state) as (lservice, lconfig):
-        for project, root in roots.items():
-            index_project(lservice, lconfig, Path(root))
-        print("All projects indexed (lexical)")
-
-        # Condition A: lexical + baseline
-        print(f"\n{'='*60}")
-        print("CONDITION A: lexical + baseline")
-        print(f"{'='*60}")
-        for task in HOLDOUT_TASKS:
-            r = _run_condition(lservice, roots[task["project"]], task, "lexical_baseline")
-            lex_results[task["id"]] = r
-            status = "PASS" if r["gold_in_packet"] else "FAIL"
-            print(f"  [{status}] {r['task_id']} ({r['formulation']}): "
-                  f"gold_in_candidates={r['gold_in_candidates']} "
-                  f"gold_in_packet={r['gold_in_packet']} "
-                  f"sources={r['total_sources']} budget={r['budget_tokens']}")
-
-    # Condition B: lexical + rescue (uses lexical service, but rescue installed)
-    print(f"\n{'='*60}")
-    print("CONDITION B: lexical + rescue")
-    print(f"{'='*60}")
-    lex_rescue_results = {}
-    with isolated_service(lex_state) as (lservice, lconfig):
-        for project, root in roots.items():
-            index_project(lservice, lconfig, Path(root))
-        for task in HOLDOUT_TASKS:
-            r = _run_condition(lservice, roots[task["project"]], task, "lexical_rescue")
-            lex_rescue_results[task["id"]] = r
-            status = "PASS" if r["gold_in_packet"] else "FAIL"
-            print(f"  [{status}] {r['task_id']} ({r['formulation']}): "
-                  f"gold_in_candidates={r['gold_in_candidates']} "
-                  f"gold_in_packet={r['gold_in_packet']} "
-                  f"sources={r['total_sources']}")
-
-    # Condition C: dense + baseline
-    print(f"\n{'='*60}")
-    print("CONDITION C: dense + baseline")
-    print(f"{'='*60}")
-    dense_baseline_results = {}
-    for task in HOLDOUT_TASKS:
-        r = _run_condition(vservice, roots[task["project"]], task, "dense_baseline")
-        dense_baseline_results[task["id"]] = r
-        status = "PASS" if r["gold_in_packet"] else "FAIL"
-        print(f"  [{status}] {r['task_id']} ({r['formulation']}): "
-              f"gold_in_candidates={r['gold_in_candidates']} "
-              f"gold_in_packet={r['gold_in_packet']} "
-              f"sources={r['total_sources']}")
-
-    # Condition D: dense + rescue
-    print(f"\n{'='*60}")
-    print("CONDITION D: dense + rescue (target)")
-    print(f"{'='*60}")
-    dense_rescue_results = {}
-    for task in HOLDOUT_TASKS:
-        r = _run_condition(vservice, roots[task["project"]], task, "dense_rescue")
-        dense_rescue_results[task["id"]] = r
-        status = "PASS" if r["gold_in_packet"] else "FAIL"
-        print(f"  [{status}] {r['task_id']} ({r['formulation']}): "
-              f"gold_in_candidates={r['gold_in_candidates']} "
-              f"gold_in_packet={r['gold_in_packet']} "
-              f"sources={r['total_sources']} budget={r['budget_tokens']} "
-              f"answer_supported={r['answer_supported']}")
-
-    vpatcher.stop()
-
-    # Summary
-    print(f"\n{'='*60}")
-    print("HOLDOUT SUMMARY")
-    print(f"{'='*60}")
-
-    all_conditions = {
-        "A_lexical_baseline": lex_results,
-        "B_lexical_rescue": lex_rescue_results,
-        "C_dense_baseline": dense_baseline_results,
-        "D_dense_rescue": dense_rescue_results,
-    }
-
-    for cond_name, results in all_conditions.items():
-        total = len(results)
-        doc_found = sum(1 for r in results.values() if r["gold_in_candidates"])
-        fact_found = sum(1 for r in results.values() if r["gold_in_packet"])
-        violations = sum(1 for r in results.values() if r["source_policy_violations"])
-        false_admits = sum(r["admission_errors"]["false_admit"] for r in results.values())
-        budget_ok = sum(1 for r in results.values() if r["budget_tokens"] <= 800)
-        print(f"  {cond_name}:")
-        print(f"    document_found: {doc_found}/{total}")
-        print(f"    fact_range_found: {fact_found}/{total}")
-        print(f"    source_policy_violations: {violations}")
-        print(f"    false_admits: {false_admits}")
-        print(f"    budget_ok: {budget_ok}/{total}")
-
-    # Per language group (condition D)
-    print(f"\n  Condition D per language group:")
-    by_form = {}
-    for r in dense_rescue_results.values():
-        by_form.setdefault(r["formulation"], []).append(r)
-    for form, rs in sorted(by_form.items()):
-        found = sum(1 for r in rs if r["gold_in_packet"])
-        print(f"    {form}: {found}/{len(rs)}")
-
-    # Save
-    output = {
-        "condition_A_lexical_baseline": list(lex_results.values()),
-        "condition_B_lexical_rescue": list(lex_rescue_results.values()),
-        "condition_C_dense_baseline": list(dense_baseline_results.values()),
-        "condition_D_dense_rescue": list(dense_rescue_results.values()),
-        "summary": {
-            cond_name: {
-                "document_found": sum(1 for r in results.values() if r["gold_in_candidates"]),
-                "fact_range_found": sum(1 for r in results.values() if r["gold_in_packet"]),
-                "source_policy_violations": sum(1 for r in results.values() if r["source_policy_violations"]),
-                "false_admits": sum(r["admission_errors"]["false_admit"] for r in results.values()),
-                "budget_ok": sum(1 for r in results.values() if r["budget_tokens"] <= 800),
-                "total": len(results),
-            }
-            for cond_name, results in all_conditions.items()
-        },
-    }
-    out_path = Path("experiments/crosslingual_relevance/m6_holdout_results.json")
-    out_path.write_text(json.dumps(output, ensure_ascii=False, indent=2, default=str) + "\n",
-                        encoding="utf-8")
-    print(f"\nResults saved to {out_path}")
-
-
-if __name__ == "__main__":
+if __name__=='__main__':
     main()

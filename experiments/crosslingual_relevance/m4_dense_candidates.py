@@ -120,7 +120,7 @@ def _load_all_documents(root: Path) -> dict[str, tuple[list[Document], str]]:
     return result
 
 
-def _build_agent(root: Path, all_docs: list[Document]) -> DocmancerAgent:
+def _build_agent(root: Path, all_docs: list[Document], *, max_sections_per_source: int = 20) -> DocmancerAgent:
     """Build an isolated DocmancerAgent with sqlite-vec vector store, dense-only."""
     config = DocmancerConfig()
     config.index.db_path = str(root / "index.sqlite")
@@ -128,7 +128,7 @@ def _build_agent(root: Path, all_docs: list[Document]) -> DocmancerAgent:
     config.retrieval.default_mode = "dense"
     config.retrieval.fusion.method = "rrf"
     config.retrieval.fusion.rrf_k = 60
-    config.retrieval.max_sections_per_source = 20
+    config.retrieval.max_sections_per_source = max_sections_per_source
     config.embeddings.provider = "fastembed"
     config.embeddings.model = DENSE_MODEL
     config.embeddings.dimensions = DENSE_DIM
@@ -146,23 +146,17 @@ def _build_agent(root: Path, all_docs: list[Document]) -> DocmancerAgent:
     return agent
 
 
+def _chunk_row(chunk: Any) -> dict:
+    meta = dict(chunk.metadata or {})
+    return {**meta, "path_or_url":meta.get("project_doc_path") or meta.get("source_path"),
+            "snippet":meta.get("display_text") or getattr(chunk, "text", "")}
+
+
 def _is_gold_chunk(chunk: Any, task: dict) -> bool:
-    """Check if a chunk matches any gold range for the task."""
-    path = chunk.metadata.get("project_doc_path") or chunk.metadata.get("source_path") or ""
-    line_start = chunk.metadata.get("line_start")
-    line_end = chunk.metadata.get("line_end")
-    # Match by path and line overlap
-    for gold_path in task["gold_paths"]:
-        if gold_path in path or path in gold_path:
-            if line_start is not None and line_end is not None:
-                for gl_start, gl_end in task["gold_lines"]:
-                    # Check line overlap
-                    if line_start <= gl_end and line_end >= gl_start:
-                        return True
-            else:
-                # If no line metadata, match by path only
-                return True
-    return False
+    """Require canonical bytes and all explicit v2 claims, never path-only success."""
+    from .evaluation_v2 import assess_packet
+    outcome = assess_packet({"sources":[_chunk_row(chunk)]}, task)
+    return outcome["all_required_facts"] and not outcome["canonical_errors"]
 
 
 def _run_step1(dispatcher, task: dict, project_identity: str) -> dict[str, Any]:
@@ -176,6 +170,7 @@ def _run_step1(dispatcher, task: dict, project_identity: str) -> dict[str, Any]:
         allow_degraded=False,
     )
     chunks = list(result.chunks)
+    task = {**task, "expected_project_identity":project_identity}
     contributions = {
         str(sid): dict(cr) for sid, cr in result.contributions.items()
     }
@@ -184,6 +179,8 @@ def _run_step1(dispatcher, task: dict, project_identity: str) -> dict[str, Any]:
         if _is_gold_chunk(chunk, task):
             gold_ranks.append(i + 1)
     return {
+        "metric_revision": "canonical-required-claims-v2",
+        "candidate_rows": [_chunk_row(chunk) for chunk in chunks],
         "task_id": task["id"],
         "formulation": task["formulation"],
         "project": task["project"],
@@ -195,6 +192,8 @@ def _run_step1(dispatcher, task: dict, project_identity: str) -> dict[str, Any]:
         "gold_found": len(gold_ranks) > 0,
         "gold_rank": gold_ranks[0] if gold_ranks else None,
         "gold_ranks": gold_ranks,
+        "rank_semantics": "first individually complete canonical witness, not filename overlap",
+        "model_configuration": {"max_sections_per_source": dispatcher.config.retrieval.max_sections_per_source, "top_k": TOP_K},
         "dense_contributed_to_gold": any(
             "dense" in contributions.get(str(chunk.metadata.get("section_id")), {})
             for chunk in chunks if _is_gold_chunk(chunk, task)
@@ -231,7 +230,7 @@ def _run_step1_wrong_project(dispatcher, task: dict, wrong_identity: str) -> dic
         }
 
 
-def main():
+def _run(max_sections_per_source: int = 20):
     tmp = Path(tempfile.mkdtemp(prefix="m4-full-"))
     print(f"Working directory: {tmp}")
 
@@ -246,7 +245,7 @@ def main():
 
     # Build agent with vectors
     print(f"\nBuilding agent with {len(all_docs)} documents...")
-    agent = _build_agent(tmp, all_docs)
+    agent = _build_agent(tmp, all_docs, max_sections_per_source=max_sections_per_source)
     dispatcher = dispatcher_for_agent(agent, mode="dense")
     print(f"Dispatcher ready (mode=dense)")
 
@@ -304,8 +303,8 @@ def main():
     total = len(step1_results)
     found_in_top5 = sum(1 for r in step1_results if r["gold_found"] and r["gold_rank"] <= 5)
     found_in_top20 = sum(1 for r in step1_results if r["gold_found"])
-    print(f"Recall@5: {found_in_top5}/{total} = {found_in_top5/total:.2f}")
-    print(f"Recall@20: {found_in_top20}/{total} = {found_in_top20/total:.2f}")
+    print(f"CompleteWitnessHit@5: {found_in_top5}/{total} = {found_in_top5/total:.2f}")
+    print(f"CompleteWitnessHit@20: {found_in_top20}/{total} = {found_in_top20/total:.2f}")
 
     # Per language group
     by_formulation = {}
@@ -332,15 +331,25 @@ def main():
         "hybrid_strict": hybrid_result,
         "summary": {
             "total_tasks": total,
-            "recall_at_5": found_in_top5 / total,
-            "recall_at_20": found_in_top20 / total,
+            "complete_witness_hit_at_5": found_in_top5 / total,
+            "complete_witness_hit_at_20": found_in_top20 / total,
             "degraded_runs": degraded_count,
         },
     }
-    out_path = Path("experiments/crosslingual_relevance/m4_dense_results.json")
-    out_path.write_text(json.dumps(output, ensure_ascii=False, indent=2, default=str) + "\n",
-                        encoding="utf-8")
+    from .evaluation_v2 import save_new_report
+    out_path = Path("experiments/crosslingual_relevance/review_runs") / f"m4-{uuid.uuid4().hex}.json"
+    save_new_report(out_path, output)
     print(f"\nResults saved to {out_path}")
+
+
+def main():
+    import argparse
+    from .pinned_embedding_session import pinned_embeddings
+    parser=argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--max-sections-per-source',type=int,choices=(2,20),default=20)
+    args=parser.parse_args()
+    with pinned_embeddings():
+        _run(args.max_sections_per_source)
 
 
 if __name__ == "__main__":

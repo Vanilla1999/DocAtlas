@@ -1,8 +1,8 @@
 """M2 — cross-lingual relevance experiment: compare lexical (A) vs encoder (B) signals.
 
 Runs on the frozen pool from pool.json (built from M1.5 manifest).
-Variant A: lexical overlap ratio (same formula as evidence_qualification).
-Variant B: multilingual encoder cosine similarity (paraphrase-multilingual-MiniLM-L12-v2).
+Variant A: diagnostic lexical overlap (not production qualification).
+Variant B: pinned multilingual MPNet cosine; all pool blocks ranked before judgments.
 
 Records raw scores, model identity, runtime params, and per-task rankings.
 Does NOT modify production code or indices.
@@ -29,7 +29,7 @@ def _git_head() -> str:
 
 
 def lexical_ratio(question: str, block_text: str) -> float:
-    """Replicate the lexical overlap ratio from evidence_qualification.
+    """Diagnostic token overlap only; not the production qualifier.
 
     terms = casefold tokens >= 4 chars from the question (with Cyrillic fallback).
     matched = terms present in the block text (casefolded).
@@ -49,16 +49,23 @@ def lexical_ratio(question: str, block_text: str) -> float:
 def encoder_scores(questions: list[str], blocks: list[str], model_name: str) -> list[list[float]]:
     """Compute cosine similarity matrix [question_i][block_j] via fastembed."""
     import numpy as np
-    from fastembed import TextEmbedding
-
-    model = TextEmbedding(model_name=model_name)
+    from .mpnet_scorer import _get_model
+    from .model_manifest import MODEL_NAME
+    if model_name != MODEL_NAME:
+        raise ValueError("the artifact lock permits only its declared model")
+    model = _get_model()
     q_vecs = list(model.embed(questions))
     b_vecs = list(model.embed(blocks))
     q_arr = np.array(q_vecs, dtype=np.float32)
     b_arr = np.array(b_vecs, dtype=np.float32)
-    # Normalise
-    q_norm = q_arr / (np.linalg.norm(q_arr, axis=1, keepdims=True) + 1e-9)
-    b_norm = b_arr / (np.linalg.norm(b_arr, axis=1, keepdims=True) + 1e-9)
+    for array, count in ((q_arr, len(questions)), (b_arr, len(blocks))):
+        if array.shape != (count, 768) or not np.all(np.isfinite(array)):
+            raise ValueError("invalid embedding matrix")
+        norms = np.linalg.norm(array, axis=1)
+        if not np.all(np.isfinite(norms)) or np.any(norms <= 0):
+            raise ValueError("invalid embedding norms")
+    q_norm = q_arr / np.linalg.norm(q_arr, axis=1, keepdims=True)
+    b_norm = b_arr / np.linalg.norm(b_arr, axis=1, keepdims=True)
     return (q_norm @ b_norm.T).tolist()
 
 
@@ -71,8 +78,9 @@ def mrr_at_k(ranked_relevance: list[bool], k: int = 5) -> float:
 
 
 def recall_at_k(ranked_relevance: list[bool], k: int = 5) -> float:
-    """Recall@K: 1 if any relevant in top-K, 0 otherwise."""
-    return 1.0 if any(ranked_relevance[:k]) else 0.0
+    """Fraction of judged positives recovered; not an any-positive hit rate."""
+    from .evaluation_v2 import recall_at_k as recall
+    return recall(ranked_relevance, k)
 
 
 def run() -> dict:
@@ -105,9 +113,8 @@ def run() -> dict:
         b_time = time.perf_counter() - t0
         b_status = "OK"
         # Model identity
-        model_hash = hashlib.sha256(
-            json.dumps({"model": model_name, "dim": len(b_scores[0])}).encode()
-        ).hexdigest()[:16]
+        from .mpnet_scorer import model_identity
+        model_hash = model_identity()["fingerprint"]
     except Exception as exc:
         b_scores = None
         b_time = 0.0
@@ -117,12 +124,6 @@ def run() -> dict:
     # Build per-task results
     task_results = []
     for ti, task in enumerate(tasks):
-        block_ids = [b["block_id"] for b in task["blocks"]]
-        # Relevance labels for this task's blocks only
-        relevance = {b["block_id"]: b["relevant_to_question"] for b in task["blocks"]}
-        source_ok = {b["block_id"]: b["source_allowed"] for b in task["blocks"]}
-        covered = {b["block_id"]: b["covered_fact_ids"] for b in task["blocks"]}
-
         for variant_name, scores in (("A_lexical", a_scores), ("B_encoder", b_scores)):
             if scores is None:
                 task_results.append({
@@ -133,41 +134,15 @@ def run() -> dict:
                     "variant": variant_name,
                     "status": "BLOCKED",
                     "block_scores": [],
-                    "mrr_at_5": None,
-                    "recall_at_5": None,
+                    "known_allowed_positive_recall_at_k": None,
                 })
                 continue
 
-            # Rank this task's blocks by score
-            scored = [
-                (bid, scores[ti][blocks.index(next(b for b in blocks if b["block_id"] == bid))],
-                 relevance[bid], source_ok[bid], covered[bid])
-                for bid in block_ids
-            ]
-            ranked = sorted(scored, key=lambda x: -x[1])
-            ranked_relevance = [r[2] for r in ranked]
-
-            task_results.append({
-                "task_id": task["task_id"],
-                "split": task["split"],
-                "question": task["question"],
-                "formulation": task["formulation"],
-                "variant": variant_name,
-                "status": "OK",
-                "block_scores": [
-                    {
-                        "block_id": r[0],
-                        "score": r[1],
-                        "relevant": r[2],
-                        "source_allowed": r[3],
-                        "covered_fact_ids": r[4],
-                        "rank": i + 1,
-                    }
-                    for i, r in enumerate(ranked)
-                ],
-                "mrr_at_5": mrr_at_k(ranked_relevance, 5),
-                "recall_at_5": recall_at_k(ranked_relevance, 5),
-            })
+            from .evaluation_v2 import rank_full_pool
+            ranked = rank_full_pool(blocks, scores[ti], task, k=5)
+            task_results.append({"task_id": task["task_id"], "split": task["split"],
+                "question":task["question"], "formulation":task["formulation"],
+                "variant":variant_name,"status":"OK", **ranked})
 
     # Aggregate metrics per variant per split
     summary = {}
@@ -181,14 +156,20 @@ def run() -> dict:
             if not s_results:
                 continue
             key = f"{variant}/{split}"
+            measurable = [r["known_allowed_positive_recall_at_k"] for r in s_results
+                          if r["known_allowed_positive_recall_at_k"] is not None]
             summary[key] = {
                 "n": len(s_results),
-                "mrr_at_5": sum(r["mrr_at_5"] for r in s_results) / len(s_results),
-                "recall_at_5": sum(r["recall_at_5"] for r in s_results) / len(s_results),
+                "mean_known_allowed_positive_recall_at_5": (
+                    sum(measurable) / len(measurable) if measurable else None),
+                "tasks_with_known_allowed_positive": len(measurable),
+                "all_pairs_judged": all(r["fully_judged"] for r in s_results),
+                "ranking_scope": "entire_fixed_pool_unjudged_labels_remain_unknown",
             }
 
     result = {
-        "schema_version": 1,
+        "schema_version": 2,
+        "lexical_baseline_kind":"diagnostic_overlap_not_production_qualification",
         "environment": environment,
         "model_b": {
             "name": model_name,
@@ -203,7 +184,9 @@ def run() -> dict:
         "summary": summary,
     }
 
-    RESULTS.write_text(json.dumps(result, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    from .evaluation_v2 import save_new_report
+    import uuid
+    save_new_report(HERE / "review_runs" / f"m2-{uuid.uuid4().hex}.json", result)
     return result
 
 

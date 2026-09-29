@@ -1,0 +1,177 @@
+{
+  "schema_version": 2,
+  "description": "External review rubric; does not replace M1.5 or protocol v3. Clauses within a witness must share one canonical quote. Not runtime input.",
+  "tasks": {
+    "typer-negative": [
+      {
+        "id": "typer-negative-claim-1",
+        "alternatives": [
+          {
+            "path": "docs/tutorial/parameter-types/bool.md",
+            "document_sha256": "c025b6f1d713e6e07925d2d724f8b97cf3f80cad86b363e5e89c4fc42d80821d",
+            "clauses": [
+              "you can declare only *CLI option* names to set the `False` value."
+            ]
+          }
+        ]
+      },
+      {
+        "id": "typer-negative-claim-2",
+        "alternatives": [
+          {
+            "path": "docs/tutorial/parameter-types/bool.md",
+            "document_sha256": "c025b6f1d713e6e07925d2d724f8b97cf3f80cad86b363e5e89c4fc42d80821d",
+            "clauses": [
+              "use a space and a single `/` and pass the negative name after:"
+            ]
+          }
+        ]
+      }
+    ],
+    "m15-dev-01": [
+      {
+        "id": "m15-dev-01-claim-1",
+        "alternatives": [
+          {
+            "path": "docs/advanced/timeouts.md",
+            "document_sha256": "48959a587ecc6430f9051ab1b1c76fcebc3f3e95ec01199281aab813a2dcfaa1",
+            "clauses": [
+              "HTTPX is careful to enforce timeouts everywhere by default."
+            ]
+          }
+        ]
+      },
+      {
+        "id": "m15-dev-01-claim-2",
+        "alternatives": [
+          {
+            "path": "docs/advanced/timeouts.md",
+            "document_sha256": "48959a587ecc6430f9051ab1b1c76fcebc3f3e95ec01199281aab813a2dcfaa1",
+            "clauses": [
+              "The default behavior is to raise a `TimeoutException` after 5 seconds of\nnetwork inactivity."
+            ]
+          }
+        ]
+      }
+    ],
+    "m15-dev-02": [
+      {
+        "id": "m15-dev-02-claim-1",
+        "alternatives": [
+          {
+            "path": "docs/preview.md",
+            "document_sha256": "cb4f7f28ec9856fa77493af0182794aa39265753d5ef7947aa36e7f9918a141d",
+            "clauses": [
+              "Enabling preview mode does not on its own enable all preview rules."
+            ]
+          }
+        ]
+      }
+    ],
+    "m15-dev-03": [
+      {
+        "id": "m15-dev-03-claim-1",
+        "alternatives": [
+          {
+            "path": "docs/lifespan.md",
+            "document_sha256": "a9de5de995935cfbd676335fbbbee6f87c96086174aff3d17ecdf89b6220e788",
+            "clauses": [
+              "The lifespan teardown will run once all connections have been closed, and\nany in-process background tasks have completed."
+            ]
+          }
+        ]
+      }
+    ],
+    "m15-dev-04": [
+      {
+        "id": "m15-dev-04-claim-1",
+        "alternatives": [
+          {
+            "path": "docs/concepts/alias.md",
+            "document_sha256": "0c65c7fddc78232eb17b34def5383402e8c2df715da9935ba3d97a98277233e0",
+            "clauses": [
+              "The `AliasPath` is used to specify a path to a field using aliases."
+            ]
+          }
+        ]
+      }
+    ],
+    "m15-hold-01": [
+      {
+        "id": "m15-hold-01-claim-1",
+        "alternatives": [
+          {
+            "path": "docs/advanced/timeouts.md",
+            "document_sha256": "48959a587ecc6430f9051ab1b1c76fcebc3f3e95ec01199281aab813a2dcfaa1",
+            "clauses": [
+              "Disable all timeouts by default.",
+              "httpx.Client(timeout=None)"
+            ]
+          }
+        ]
+      }
+    ],
+    "m15-hold-02": [
+      {
+        "id": "m15-hold-02-claim-1",
+        "alternatives": [
+          {
+            "path": "docs/preview.md",
+            "document_sha256": "cb4f7f28ec9856fa77493af0182794aa39265753d5ef7947aa36e7f9918a141d",
+            "clauses": [
+              "If preview mode is not enabled, this setting has no effect."
+            ]
+          }
+        ]
+      }
+    ],
+    "m15-hold-03": [
+      {
+        "id": "m15-hold-03-claim-1",
+        "alternatives": [
+          {
+            "path": "docs/lifespan.md",
+            "document_sha256": "a9de5de995935cfbd676335fbbbee6f87c96086174aff3d17ecdf89b6220e788",
+            "clauses": [
+              "You should use `TestClient` as a context manager, to ensure that the lifespan is called."
+            ]
+          }
+        ]
+      }
+    ],
+    "m15-hold-04": [
+      {
+        "id": "m15-hold-04-claim-1",
+        "alternatives": [
+          {
+            "path": "docs/concepts/alias.md",
+            "document_sha256": "0c65c7fddc78232eb17b34def5383402e8c2df715da9935ba3d97a98277233e0",
+            "clauses": [
+              "You can use an `AliasGenerator` to specify different alias generators for validation and serialization."
+            ]
+          }
+        ]
+      },
+      {
+        "id": "m15-hold-04-claim-2",
+        "alternatives": [
+          {
+            "path": "docs/concepts/alias.md",
+            "document_sha256": "0c65c7fddc78232eb17b34def5383402e8c2df715da9935ba3d97a98277233e0",
+            "clauses": [
+              "use different naming conventions for loading and saving data,"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "task_aliases": {
+    "typer-mixed-ru": "typer-negative",
+    "typer-pure-ru": "typer-negative",
+    "typer-en": "typer-negative",
+    "typer-05-en": "typer-negative",
+    "typer-05-mixed": "typer-negative",
+    "typer-05-ru": "typer-negative"
+  }
+}
