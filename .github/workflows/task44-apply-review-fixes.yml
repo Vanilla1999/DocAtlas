@@ -1,0 +1,52 @@
+name: Task44 apply verified local review patch
+on:
+  push:
+    branches:
+      - task-44-cross-lingual-retrieval
+
+permissions:
+  contents: write
+
+jobs:
+  apply-reviewed-patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: task-44-cross-lingual-retrieval
+          fetch-depth: 0
+          persist-credentials: true
+
+      - name: Verify staging state
+        shell: bash
+        run: |
+          set -euo pipefail
+          base=84938ab25c096257a7ad6af5f39b9d364e67b8e9
+          git merge-base --is-ancestor "$base" HEAD
+          actual="$(git diff --name-only "$base"..HEAD | sort)"
+          expected="$(printf '%s\n' '.github/workflows/task44-apply-review-fixes.yml' '.task44-review/task44-review-fixes.patch' | sort)"
+          test "$actual" = "$expected"
+          echo 'ea1545cc899fc3d8f418c2740f75c76955e4e66bf34eb866ab02fe80f5470d33  .task44-review/task44-review-fixes.patch' | sha256sum -c -
+
+      - name: Apply exact reviewed patch
+        shell: bash
+        run: |
+          set -euo pipefail
+          git apply --check .task44-review/task44-review-fixes.patch
+          git apply .task44-review/task44-review-fixes.patch
+          rm -rf .task44-review
+          rm -f .github/workflows/task44-apply-review-fixes.yml
+          git add -A
+          git diff --cached --check
+          tree="$(git write-tree)"
+          echo "tree=$tree"
+          test "$tree" = "ca5f3394f283c8ca01cb8e1860679b4384a42ebf"
+
+      - name: Commit verified tree
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "fix(task44): harden cross-lingual relevance experiment and metrics"
+          git push origin HEAD:task-44-cross-lingual-retrieval
