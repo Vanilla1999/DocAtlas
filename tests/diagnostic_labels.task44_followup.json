@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "module_labels": {
+    "tests/docs/test_task44_httpx_semantic_controls.py": "behavioral",
+    "tests/docs/test_task44_policy_controls.py": "behavioral",
+    "tests/docs/test_task44_rescue_decisions.py": "behavioral"
+  },
+  "node_overrides": {
+    "tests/docs/test_task44_httpx_semantic_controls.py::test_canonical_httpx_control_spans_contain_the_declared_facts": "artifact"
+  },
+  "module_node_hashes": {
+    "tests/docs/test_task44_httpx_semantic_controls.py": "041ace22ab7d838969ebee598525541579aa87c12099db28a586d2e9f2f4b1f9",
+    "tests/docs/test_task44_policy_controls.py": "d325ba1626cabb836f7c009490c7b3371e2f29deb236e392ec095f4d7c136281",
+    "tests/docs/test_task44_rescue_decisions.py": "31d27e03e0b7f1013fa9293bc6b26a7f4722cfe9425e316537e402f4e800bfe7"
+  }
+}

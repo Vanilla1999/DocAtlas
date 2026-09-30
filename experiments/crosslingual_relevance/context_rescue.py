@@ -147,16 +147,18 @@ def apply_rescue(
         if scorer.degraded_reason:
             patched_trace["context_relevance_degraded_reason"] = scorer.degraded_reason
         return replace(original, trace=patched_trace)
-    scorer.record_decision(question, evidence_text, query_id=query_id,
-        decision="below_threshold" if score < threshold else "context_only_relevance",
-        score=score, threshold=threshold, source_identity=source_identity,
-        source_binding=dict(source_binding or {}))
     if score < threshold:
+        scorer.record_decision(question, evidence_text, query_id=query_id,
+            decision="below_threshold", score=score, threshold=threshold,
+            source_identity=source_identity, source_binding=dict(source_binding or {}))
         return original
     binding = _build_binding(question, evidence_text, source_identity)
     try:
         binding["scorer_identity"] = scorer.identity()
     except Exception:
+        scorer.record_decision(question, evidence_text, query_id=query_id,
+            decision="scorer_identity_error", score=score, threshold=threshold,
+            source_identity=source_identity, source_binding=dict(source_binding or {}))
         return replace(original, trace={**result, "context_relevance_degraded": True,
             "context_relevance_degraded_reason": "scorer_identity_error"})
     binding["model_revision"] = (binding["scorer_identity"].get("hub_revision")
@@ -176,7 +178,7 @@ def apply_rescue(
         covered_query_ids=(),
         coverage_kind=None,
     )
-    return replace(
+    rescued = replace(
         original,
         qualified=True,
         covered_query_ids=(),
@@ -184,6 +186,12 @@ def apply_rescue(
         reason="context_only_relevance",
         trace=patched_trace,
     )
+    # Success telemetry must follow identity verification and result creation.
+    # A high score alone is only an attempted admission, not a successful rescue.
+    scorer.record_decision(question, evidence_text, query_id=query_id,
+        decision="context_only_relevance", score=score, threshold=threshold,
+        source_identity=source_identity, source_binding=dict(source_binding or {}))
+    return rescued
 
 
 # ---------------------------------------------------------------------------

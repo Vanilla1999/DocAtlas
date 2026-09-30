@@ -1,0 +1,14 @@
+{
+  "schema_version": 1,
+  "module_labels": {
+    "tests/docs/test_task44_m6_preparation.py": "behavioral",
+    "tests/docs/test_task44_calibration_artifacts.py": "behavioral",
+    "tests/docs/test_task44_regression_compare.py": "behavioral"
+  },
+  "node_overrides": {},
+  "module_node_hashes": {
+    "tests/docs/test_task44_m6_preparation.py": "943d1b164b1c2b30d37427827bc8c6975ec6b7a921f1413ac73e7019b32cbe3a",
+    "tests/docs/test_task44_calibration_artifacts.py": "0e6846bc432b5b42e0603a21f5092842414966e88d0a606f2fbd2afa82b5e3f4",
+    "tests/docs/test_task44_regression_compare.py": "17ef895bee57dbb915a0bf08b93fabbe4b0b428f84eb1d345af1b342366f1f77"
+  }
+}

@@ -348,8 +348,17 @@ def test_unavailable_scorer_fail_closed(tmp_path):
 def test_reranker_admission_no_answer_authority(tmp_path):
     """Case 10: scorer admission does not create answer/edit authority."""
     from experiments.crosslingual_relevance.bge_reranker_scorer import reranker_scorer
-    from experiments.crosslingual_relevance.context_rescue import installed
+    from experiments.crosslingual_relevance.context_rescue import installed, apply_rescue
     from experiments.crosslingual_relevance.scorer_runtime import BoundedScorer
+
+    admitted_results = []
+
+    def observe_rescue(*args, **kwargs):
+        # Observe the real result; do not synthesize qualification or scores.
+        result = apply_rescue(*args, **kwargs)
+        if result.qualified and result.reason == "context_only_relevance":
+            admitted_results.append((result, kwargs["evidence_text"]))
+        return result
 
     root = _typer_project(tmp_path)
     service, patcher = _build_dense_service(tmp_path)
@@ -357,15 +366,24 @@ def test_reranker_admission_no_answer_authority(tmp_path):
         _index_typer(service, root)
         bounded = BoundedScorer(reranker_scorer, score_range=(0.0, 1.0),
                                 max_evaluations=256, timeout=300.0)
-        with installed(bounded, threshold=RERANKER_THRESHOLD, question=MIXED_RU):
-            request = {"question": MIXED_RU, "project_path": str(root), "scope": "all"}
-            payload, _ = observe_call(service, request)
+        with patch("experiments.crosslingual_relevance.context_rescue.apply_rescue",
+                   side_effect=observe_rescue):
+            with installed(bounded, threshold=RERANKER_THRESHOLD, question=MIXED_RU):
+                request = {"question": MIXED_RU, "project_path": str(root), "scope": "all"}
+                payload, _ = observe_call(service, request)
     finally:
         patcher.stop()
+    # Prove actual context-only rescue and delivery BEFORE checking authority.
+    assert admitted_results, "no successful rescue result was returned"
+    assert any(all(phrase in text for phrase in GOLD_PHRASES)
+               for _, text in admitted_results), "the required witness was not rescued"
+    visible = "\n\n".join(s["snippet"] for s in payload.get("sources", []))
+    assert all(phrase in visible for phrase in GOLD_PHRASES)
+    assert all(result.trace.get("admission_only") is True
+               and result.covered_query_ids == () for result, _ in admitted_results)
+    assert docs_context_budget_tokens(payload) <= 800
     assert payload["answer_supported"] is False
     assert payload.get("edit_ready", False) is False
-    assert any(event.get("decision") == "context_only_relevance"
-               for event in bounded.events), "no rescue admission was exercised"
 
 
 # ---------------------------------------------------------------------------
