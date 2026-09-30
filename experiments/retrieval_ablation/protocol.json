@@ -1,0 +1,17 @@
+{
+  "schema_version": 1,
+  "state": "UNFROZEN",
+  "scope": "project_markdown_development",
+  "arms": ["P", "A"],
+  "raw_hits": 40,
+  "unique_candidates": 20,
+  "dto_tokens": 800,
+  "source_entries": 3,
+  "max_sections_per_source": 2,
+  "query_schedule": "equal-per-probe; remainder to earlier probes; AND consumes before OR; no refill",
+  "merge": "probe-order / AND-before-OR / first stable identity",
+  "representation": "current-valid-markdown-with-existing-context-prefix",
+  "quality_status": "UNJUDGED",
+  "independent_holdout": false,
+  "agent_evaluation": "ANSWER_EVALUATION_NOT_RUN"
+}
