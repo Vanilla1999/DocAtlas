@@ -6,6 +6,7 @@ from pathlib import Path
 from unittest.mock import patch
 from .baseline_probe import environment, write_report
 from .packing_experiment import packing_experiment
+from .flow_experiment import flow_experiment
 from .packing_probe import capture_packing_trace
 
 
@@ -16,7 +17,7 @@ def run_probe(output: Path) -> None:
     output.mkdir(parents=True, exist_ok=False)
     case = next(row for row in load_cases() if row['id'] == 'v2-natural-request-flow')
     original_call = gate._call_with_snapshot
-    for condition in ('baseline', 'packing'):
+    for condition in ('baseline', 'packing', 'flow'):
         observed = []
         def collect(arguments, service):
             with patch.object(gate, '_call_with_snapshot', original_call):
@@ -25,7 +26,9 @@ def run_probe(output: Path) -> None:
             observed.append({'arguments': arguments, 'payload': payload,
                              'trace': trace, 'packing_trace': packing})
             return {**payload, 'diagnostics': trace['bounded_diagnostics']}, trace['snapshot']
-        with (packing_experiment() if condition == 'packing' else nullcontext()):
+        intervention = (flow_experiment() if condition == 'flow' else
+                        packing_experiment() if condition == 'packing' else nullcontext())
+        with intervention:
             with patch.object(gate, '_call_with_snapshot', collect):
                 report = gate.run(cases=(gate.LiveCase(
                     case_id=case['id'], question=case['question'], relevant_paths=(),

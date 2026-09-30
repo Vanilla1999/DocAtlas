@@ -14,7 +14,8 @@ concurrency:
   cancel-in-progress: false
 jobs:
   real-agent:
-    if: github.event_name == 'workflow_dispatch' || github.event.pull_request.head.repo.full_name == github.repository
+    # Automatic evaluation is bound to the frozen pilot commit, not every docs push.
+    if: github.event_name == 'workflow_dispatch' || github.event.pull_request.head.sha == '2a927824bcbb9c6e4e124bd9916a37c025e0f866'
     runs-on: ubuntu-latest
     timeout-minutes: 35
     strategy:
