@@ -36,21 +36,34 @@ real supported `superseded` state without changing production rules.
 
 ## Actual executions
 
-The reviewed code `00e83b1334c883cea8f6c2b3512cdd00ee92a1c9` was sent to
-CI run [36781801281](https://github.com/Vanilla1999/DocAtlas/actions/runs/36781801281).
-At this report's inspection, the following job steps had completed successfully:
-frozen dependency installation; native/freeze/public-handler guard tests; and
-freeze plus separate real P and diagnostic A CLI executions. The combined
-base/head focused and full offline regression step was **IN_PROGRESS**. Its
-JUnit artifacts and final comparison were not yet available; this report does
-not claim a green full gate or absence of regressions from that unfinished pair.
+Completed CI run [36781801281](https://github.com/Vanilla1999/DocAtlas/actions/runs/36781801281)
+executed code `00e83b1334c883cea8f6c2b3512cdd00ee92a1c9` and ended **FAILURE**.
+The artifact was downloaded and its archive SHA-256 verified:
+`6495372806fcda3ce8ffeb915fb2aa43f9201855f3af3530d9f8dff7f660c222`.
+Python was 3.12.14, SQLite 3.45.1; the complete package inventory is retained.
 
-Earlier implementation run [36781428692](https://github.com/Vanilla1999/DocAtlas/actions/runs/36781428692)
-on `d60a9c0d3eb279858c0ab41913eaf6ac7097f2f0` had the same completed guard/smoke
-steps and was also still running the paired regression step. It is a distinct
-revision/run, not additional quality evidence. No success count from an earlier
-PR is substituted for either current run.
+| Execution | Base | Head | Interpretation |
+|---|---|---|---|
+| New guards plus existing SQLite tests | — | 74 passed | Includes both real-handler tests; 51 new and 23 existing cases. |
+| Focused product suite | 482 passed, 1 failed | 482 passed, 1 failed | Same 483 IDs; same failed assertion, raw failure messages differ in generator address. |
+| Full offline suite | 5,048 passed, 20 failed, 10 skipped | 5,097 passed, 22 failed, 10 skipped | 5,078 common IDs; 51 added tests passed; 2 existing cases passed on base and failed on head. |
+| Frozen P / A smoke | — | 2 EXECUTED | One synthetic English Markdown case, zero semantic evaluations. |
 
+Both full offline invocations also deselected 622 advanced/live cases. No
+existing IDs disappeared. All four focused/offline commands exited 1; those
+failures were not suppressed. The complete testcase comparison is retained in
+`paired-comparison.json`; human review is in PAIRED_REGRESSIONS.md.
+
+The two new head-only failures are **open blockers**, not proven flaky and not
+proven caused by this patch. Product source bytes are unchanged, but that alone
+does not prove absence of test-collection, ordering, path or runtime effects.
+There has been no isolated repeat that establishes their cause. Two previously
+failing full-suite cases also have changed observable failure content; these are
+reported separately rather than hidden in equal/near-equal totals.
+
+The earlier implementation CI on `d60a9c0d` is not substituted for the completed
+reviewed-code run. Reports originally recorded the in-progress state; this
+revision replaces it with downloaded final JUnit and packet evidence.
 
 Local commands used `DOCATLAS_OFFLINE=1 DOCATLAS_AUTO_VECTORS=0 PYTHONHASHSEED=0`:
 
@@ -76,11 +89,10 @@ module list in both worktrees. Full offline command in each worktree:
 python -m pytest tests/ -m 'not advanced and not live and not live_network' -q
 ```
 
-The workflow is configured to preserve actual exit status: old baseline failures
-are not waived to make a green gate. Its final always-upload step retains raw
-JUnit, logs, original packets, SQL lists, frozen inputs, package inventory and
-source bundle outside Git. That final artifact was not yet available at review.
-The delivered local evidence archive already contains the real RED/GREEN logs,
+The workflow preserved actual exit status and uploaded raw JUnit, logs, original
+packets, SQL lists, frozen inputs, package inventory and source bundle outside
+Git. Those artifacts were downloaded and inspected. The delivery archive includes
+their evidence files (excluding the large Git bundle), local RED/GREEN logs,
 72-test JUnit and the separate 23/23 native product comparison.
 
 ## Identity and unchanged boundaries
