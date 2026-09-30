@@ -155,3 +155,16 @@ Path('/output/result.json').write_text(json.dumps(r, default=lambda x: sorted(x)
 '''
     completed = run_isolated(code, app=app, public=public, output=output)
     assert completed.returncode == 0, completed.stderr
+
+
+def test_untracked_runtime_sidecar_is_not_a_frozen_worker_input(tmp_path):
+    import uuid
+    from experiments.retrieval_ablation.run import stage_worker, ROOT
+    sidecar = ROOT / 'docmancer' / ('_private_probe_' + uuid.uuid4().hex + '.json')
+    try:
+        sidecar.write_text('{"private_label":"not a runtime resource"}')
+        app = tmp_path / 'app'
+        stage_worker(app)
+        assert not (app / 'docmancer' / sidecar.name).exists()
+    finally:
+        sidecar.unlink(missing_ok=True)

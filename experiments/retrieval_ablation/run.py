@@ -205,8 +205,9 @@ def _execute_arm(corpus, spec, request, protocol, arm):
 
 
 def stage_worker(app: Path) -> str:
-    """Stage code/runtime resources, never test cases, .git or private review."""
+    """Stage tracked runtime resources, never untracked sidecars or private review."""
     app.mkdir()
+    tracked = set(_git('ls-files').splitlines())
     paths = [path for path in (ROOT / 'docmancer').rglob('*')
              if path.is_file() and '__pycache__' not in path.parts]
     for directory in ('experiments/retrieval_ablation',):
@@ -218,8 +219,10 @@ def stage_worker(app: Path) -> str:
                  for name in ('baseline_probe.py', 'reference_core.py'))
     inventory = []
     for path in sorted(paths):
-        _no_symlinks(path)
         rel = path.relative_to(ROOT)
+        if rel.as_posix() not in tracked:
+            continue
+        _no_symlinks(path)
         raw = path.read_bytes()
         target = app / rel
         target.parent.mkdir(parents=True, exist_ok=True)
