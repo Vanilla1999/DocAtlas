@@ -4,20 +4,24 @@ Base: `main` at `58c7f37c2a5ef686bcd6562abbade91ba94e347a`.
 Branch: `experiment/language-aware-context`.
 
 This is an isolated experiment, not product activation. No old task-44 commits
-are imported. Production code, the MCP surface, P0 and protocol v3 are unchanged.
+are imported. Retrieval runtime, the MCP surface, P0 and protocol v3 are unchanged.
+Installed skill templates now include a final-evidence completeness check.
 No MPNet/BGE inference is introduced.
 
 ## Current evidence
 
-Read [DEVELOPMENT_REPORT.md](DEVELOPMENT_REPORT.md), [CI_RESULTS.md](CI_RESULTS.md)
-and [STATUS.json](STATUS.json). A full source archive is now available locally;
-the native lexical handler ran both locally and in the frozen CI environment.
-On five already reviewed questions, manually supplied lookups changed complete
-packets from 2/5 to 4/5, with three gains **and one regression**. This is not A–E,
-not independent data and not proof of language-profile or assembly improvement.
-All 116 targeted tests passed locally and in diagnostic CI. Focused product tests
-passed 106/106 in both local archive variants. The full local suite is blocked by
-missing dependencies; overall repository CI is not asserted green.
+Read [FLOW_REPORT.md](FLOW_REPORT.md), [LIVE_PILOT_REPORT.md](LIVE_PILOT_REPORT.md),
+[STRONG_MODEL_REPORT.md](STRONG_MODEL_REPORT.md), the
+[skill smoke report](skill_smoke/README.md) and [STATUS.json](STATUS.json).
+The known flow regression improves from 482 PASS / 1 FAIL to 483 PASS / 0 FAIL
+with the explicit ordering hook. Weak Qwen showed no paired gain. The strong
+planner has a one-question profile-specific signal, with rubric-sensitive
+aggregate counts and no retained historical answer generations. The separate
+four-question smoke retains actual answers and final packets but has no
+skill-off control. Overall repository CI is not asserted green.
+
+[DEVELOPMENT_REPORT.md](DEVELOPMENT_REPORT.md) and [CI_RESULTS.md](CI_RESULTS.md)
+preserve historical viewed-task measurements, not independent acceptance data.
 
 ## Components
 
@@ -29,13 +33,16 @@ missing dependencies; overall repository CI is not asserted green.
   exclusive report writes and deterministic trace-ID-set serialization.
 - `ci_diagnostic.py`: actual Typer/HTTPX development calls and narrow canonical
   clause checks. Manual lookups are explicitly labelled; no generated answers.
-- Five registered test modules and diagnostic inventory shards.
+- Registered experiment tests and diagnostic inventory shards.
+- `skill_smoke_run.py`: source-hash-checked replay retaining complete raw traces;
+  no automatic semantic grading or model inference.
 - `protocol.proposed.json`: proposed parameters, NOT frozen evaluation data.
 
 Historical simulated 11/11 and Grounded-like 6/7 are NOT evidence for this PR.
 A must include the agent's existing lookups; A/C and B/D each reuse identical saved
-queries. E compares a generic RU/EN prompt with the profile. These arms still need
-real planner output, new scopes/labels, frozen parameters and blind judging.
+queries. E compares a generic RU/EN prompt with the profile. E ran in the strong
+pilot, not the weak pilot; neighbor assembly remains untested. Independent new
+scopes/labels, frozen parameters and external judging remain acceptance work.
 
 ## Reproduce development diagnostics
 

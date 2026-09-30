@@ -69,6 +69,11 @@ raw handler objects/traces and final blocks. It does **not** run an answer model
 copy old answers into new results or automatically grade semantic sufficiency.
 The language-flow workflow runs this replay and uploads its traces alongside the
 paired regression evidence. A replay does not create new independent tasks.
+The first follow-up replay is available in run
+[36732891557](https://github.com/Vanilla1999/DocAtlas/actions/runs/36732891557),
+artifact `11106300457`; see [AUDIT_FOLLOWUP.md](../AUDIT_FOLLOWUP.md) for checked
+results and the small fresh-01 packet difference. No new answers were generated
+by that workflow.
 
 ## What remains before activation
 

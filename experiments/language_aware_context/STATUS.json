@@ -14,7 +14,8 @@
     "flow": "FLOW_REPORT.md",
     "live_pilot": "LIVE_PILOT_REPORT.md",
     "strong_pilot": "STRONG_MODEL_REPORT.md",
-    "skill_smoke": "skill_smoke/README.md"
+    "skill_smoke": "skill_smoke/README.md",
+    "audit_followup": "AUDIT_FOLLOWUP.md"
   },
   "historical_reports": [
     "DEVELOPMENT_REPORT.md",
