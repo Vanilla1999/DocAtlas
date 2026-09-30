@@ -1,0 +1,31 @@
+name: Retrieval ablation diagnostics
+on:
+  push:
+    branches: ['experiment/retrieval-ablation-t00-t04']
+    paths: ['.github/workflows/retrieval-ablation.yml']
+permissions:
+  contents: read
+jobs:
+  offline:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      DOCATLAS_OFFLINE: '1'
+      DOCATLAS_AUTO_VECTORS: '0'
+      PYTHONHASHSEED: '0'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Preserve full checkout without credentials
+        run: |
+          mkdir -p "$RUNNER_TEMP/ablation"
+          git rev-parse HEAD > "$RUNNER_TEMP/ablation/head.txt"
+          git bundle create "$RUNNER_TEMP/ablation/checkout.bundle" HEAD
+          sha256sum "$RUNNER_TEMP/ablation/checkout.bundle" > "$RUNNER_TEMP/ablation/bundle.sha256"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: retrieval-ablation-checkout
+          path: ${{ runner.temp }}/ablation/
+          retention-days: 3
