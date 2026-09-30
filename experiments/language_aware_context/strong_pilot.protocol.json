@@ -26,7 +26,7 @@
       "repository": "django/django",
       "path": "docs/ref/models/querysets.txt",
       "blob": "cdab837328ccb8796989a6070729a3eccca615cf",
-      "local_path": "docs/querysets.txt",
+      "local_path": "docs/querysets.md",
       "language_label": "en"
     },
     {
