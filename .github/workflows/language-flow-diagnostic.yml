@@ -1,0 +1,76 @@
+name: Language flow investigation
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'experiments/language_aware_context/flow_probe.py'
+      - 'experiments/language_aware_context/flow_experiment.py'
+      - 'experiments/language_aware_context/flow_regressions.py'
+      - 'experiments/language_aware_context/pilot_review.py'
+      - 'experiments/language_aware_context/skill_smoke_run.py'
+      - 'experiments/language_aware_context/skill_smoke/**'
+      - 'docmancer/templates/*skill.md'
+      - 'tests/docs/test_language_pilot_review.py'
+      - 'tests/docs/test_language_flow_experiment.py'
+      - '.github/workflows/language-flow-diagnostic.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: language-flow-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+jobs:
+  observe-flow:
+    if: github.event_name == 'workflow_dispatch' || github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      DOCATLAS_OFFLINE: '1'
+      DOCATLAS_AUTO_VECTORS: '0'
+      PYTHONHASHSEED: '0'
+      DOCATLAS_REGISTRY_API_URL: 'http://127.0.0.1:1'
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          persist-credentials: false
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1
+        with:
+          python-version: '3.12'
+      - name: Frozen environment
+        run: |
+          python -m pip install uv==0.9.25
+          uv sync --frozen --extra dev
+      - name: Guard tests and unchanged frozen-case assertion
+        run: |
+          mkdir -p "$RUNNER_TEMP/flow-evidence"
+          .venv/bin/python -m pytest tests/docs/test_language_flow_experiment.py tests/docs/test_language_pilot_review.py -q --junitxml="$RUNNER_TEMP/flow-evidence/unit.xml"
+      - name: Observe unchanged frozen case
+        run: .venv/bin/python -m experiments.language_aware_context.flow_probe --output "$RUNNER_TEMP/flow-evidence/trace"
+      - name: Replay viewed skill smoke packets and retain raw traces
+        run: .venv/bin/python -m experiments.language_aware_context.skill_smoke_run --output "$RUNNER_TEMP/flow-evidence/skill-smoke"
+      - name: Paired unchanged regressions with baseline and flow ordering
+        run: |
+          set +e
+          .venv/bin/python -m experiments.language_aware_context.flow_regressions --condition baseline --junit "$RUNNER_TEMP/flow-evidence/regression-baseline.xml"
+          baseline=$?
+          .venv/bin/python -m experiments.language_aware_context.flow_regressions --condition flow --junit "$RUNNER_TEMP/flow-evidence/regression-flow.xml"
+          flow=$?
+          printf '{"baseline_exit":%s,"flow_exit":%s}\n' "$baseline" "$flow" > "$RUNNER_TEMP/flow-evidence/regression-exits.json"
+          # Keep this job red if either condition fails. A paired improvement is
+          # reported separately, never disguised as an all-green repository gate.
+          test "$baseline" -eq 0 && test "$flow" -eq 0
+      - name: Preserve exact source for offline reproduction
+        if: always()
+        run: |
+          mkdir -p "$RUNNER_TEMP/flow-evidence"
+          git archive HEAD | gzip > "$RUNNER_TEMP/flow-evidence/source.tar.gz"
+          git rev-parse HEAD > "$RUNNER_TEMP/flow-evidence/source-head.txt"
+      - name: Retain evidence including failures
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: language-flow-${{ github.event.pull_request.head.sha || github.sha }}
+          path: ${{ runner.temp }}/flow-evidence/
+          retention-days: 7
+          if-no-files-found: error

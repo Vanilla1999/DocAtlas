@@ -1,0 +1,156 @@
+{
+  "status": "DRAFT_FLOW_REPAIR_STRONG_PROFILE_SIGNAL_SKILL_SMOKE",
+  "base_branch": "main",
+  "base_revision": "58c7f37c2a5ef686bcd6562abbade91ba94e347a",
+  "old_task44_branch_imported": false,
+  "production_activation": false,
+  "merge_performed": false,
+  "default_runtime_modified": false,
+  "installed_skill_templates_modified": true,
+  "frozen_v3_and_p0_unchanged": true,
+  "checked_model_code_revision": "767faefef295cfdaa1931f3f9497150f003a7f8b",
+  "checked_flow_regression_revision": "16b00f9265d8ba96567c83c94bf6f42b216e2f05",
+  "reports": {
+    "flow": "FLOW_REPORT.md",
+    "live_pilot": "LIVE_PILOT_REPORT.md",
+    "strong_pilot": "STRONG_MODEL_REPORT.md",
+    "skill_smoke": "skill_smoke/README.md",
+    "audit_followup": "AUDIT_FOLLOWUP.md"
+  },
+  "historical_reports": [
+    "DEVELOPMENT_REPORT.md",
+    "CI_RESULTS.md",
+    "PACKING_REPORT.md"
+  ],
+  "historical_measurements_note": "Old 5/5 measured viewed manual lookups. New pilot results below supersede any inference of model/profile quality; historical reports are retained.",
+  "flow_regression": {
+    "run_id": 36712916587,
+    "artifact_id": 11094737012,
+    "artifact_sha256": "12d1385c6527b53f3b045b5906414d4948b06910256202c967dd8b7fe99ac0fa",
+    "commit": "16b00f9265d8ba96567c83c94bf6f42b216e2f05",
+    "source_files_matched": 2234,
+    "product_eval_files_matched": 1200,
+    "counts": {
+      "unit": {
+        "passed": 34,
+        "failure": 0,
+        "error": 0,
+        "skipped": 0
+      },
+      "regression-baseline": {
+        "passed": 482,
+        "failure": 1,
+        "error": 0,
+        "skipped": 0
+      },
+      "regression-flow": {
+        "passed": 483,
+        "failure": 0,
+        "error": 0,
+        "skipped": 0
+      }
+    },
+    "changes": [
+      {
+        "test": "tests.docs.test_context_projection_boundaries::test_frozen_request_flow_prefers_project_context_module_witnesses",
+        "baseline": "failure",
+        "flow": "passed"
+      }
+    ],
+    "exits": {
+      "baseline_exit": 1,
+      "flow_exit": 0
+    },
+    "workflow_conclusion": "failure",
+    "workflow_failure_reason": "baseline comparison retains existing failure; flow condition passes",
+    "whole_repository_gate_pass": false
+  },
+  "flow_obligations": {
+    "baseline_met": 2,
+    "candidate_met": 4,
+    "total": 4,
+    "baseline_dto_tokens": 798,
+    "candidate_dto_tokens": 796,
+    "new_authority": false
+  },
+  "flow_scope": "process-local opt-in ordering; no concurrent-server integration",
+  "pilot": {
+    "status": "EXPLORATORY_PILOT_NO_BENEFIT_DEMONSTRATED",
+    "run_id": 36711421082,
+    "artifacts": [
+      11094108970,
+      11093564528,
+      11094497087
+    ],
+    "model": "Qwen/Qwen2.5-1.5B-Instruct",
+    "model_revision": "989aa7980e4cf806f80c7fef2b1adb7bc71aa306",
+    "dtype": "float32",
+    "quantization": null,
+    "task_count": 9,
+    "family_count": 3,
+    "language_counts": {
+      "ru": 3,
+      "en": 3,
+      "mixed": 3
+    },
+    "positive_n": 7,
+    "negative_n": 2,
+    "fresh_source_task_separation": true,
+    "formal_independent_holdout": false,
+    "annotation": "same researcher, not independently human annotated",
+    "conditions": [
+      "A",
+      "B",
+      "A_packing",
+      "B_packing",
+      "oracle",
+      "no_context"
+    ],
+    "intervention": "language hint and previous single-host ordering; NOT multi-host flow or neighbor assembly",
+    "handler_calls": 36,
+    "handler_audit_errors": 0,
+    "max_dto_tokens": 755,
+    "authority_escalations": 0,
+    "real_planning_generations": 18,
+    "logical_answer_records": 54,
+    "unique_answer_generations": 24,
+    "verified_identical_input_reuses": 30,
+    "separate_health_generations": 6,
+    "conditions_A_B_Apacking_Bpacking": {
+      "complete_packet": 2,
+      "factual_answer": 1,
+      "grounded_cited_success": 0,
+      "correct_abstentions": 1
+    },
+    "oracle": {
+      "complete_packet": 6,
+      "factual_answer": 4,
+      "grounded_cited_success": 1,
+      "correct_abstentions": 1,
+      "known_incomplete_oracle": "uv --locked attribution missing"
+    },
+    "paired_positive_gains": 0,
+    "paired_positive_losses": 0,
+    "schema_valid_plans": {
+      "A": 7,
+      "B": 8
+    },
+    "schema_validity_is_semantic_validity": false,
+    "judgments": 24,
+    "external_independent_judges": 0,
+    "conditions_masked_before_join": true,
+    "judgment_sha256": "2f6e9a57f954a7ec663d3a8d9921dee3f1a1029d8d4cfbe479faafcbf7536d17",
+    "acceptance_pass": false,
+    "e_generic_bilingual": "NOT_RUN",
+    "neighbor_assembly": "NOT_RUN"
+  },
+  "hypotheses": {
+    "H1_language_profile": "NO_GAIN_OBSERVED_IN_SMALL_FROZEN_PILOT_NOT_UNIVERSAL_DISPROOF",
+    "H2_neighbor_assembly": null,
+    "H3_answer_gain": "NO_GAIN_OBSERVED_WEAK_ORACLE_ANSWERING_LIMITS_ATTRIBUTION"
+  },
+  "full_repository_regression_gate": "NOT_CLAIMED_PASS",
+  "product_profile_delivery": "NOT_IMPLEMENTED",
+  "competitor_run": "NOT_RUN",
+  "next_gate": "Disjoint planner/oracle controls, then new frozen sources with bilingual E and independent review; maintainer decision remains required"
+}

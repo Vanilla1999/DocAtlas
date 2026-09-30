@@ -1,0 +1,222 @@
+[
+  {
+    "id": "sol-01",
+    "family": "vue",
+    "scope": "vue-ru",
+    "query_language": "en",
+    "question": "Are Vue computed properties cached based on reactive dependencies, unlike method calls?",
+    "answerable": true,
+    "oracle": [
+      {
+        "source_id": "vue-computed-ru",
+        "quotes": [
+          "вычисляемые свойства кэшируются на основе своих реактивных зависимостей",
+          "Для сравнения, вызов метода **будет всегда запускать** функцию, когда происходит перерисовка."
+        ]
+      }
+    ],
+    "must_include": [
+      "вычисляемые свойства кэшируются",
+      "реактивных зависимостей"
+    ],
+    "plans": {
+      "A": "Vue computed properties cached reactive dependencies method calls",
+      "B": "Vue вычисляемые свойства кэшируются реактивные зависимости вызов метода",
+      "E": "Vue computed вычисляемые свойства cache кэшируются reactive реактивные dependencies зависимости method метод"
+    }
+  },
+  {
+    "id": "sol-02",
+    "family": "vue",
+    "scope": "vue-en",
+    "query_language": "ru",
+    "question": "Когда в Vue следует использовать watcher вместо computed property — например для async side effect после изменения состояния?",
+    "answerable": true,
+    "oracle": [
+      {
+        "source_id": "vue-watchers-en",
+        "quotes": [
+          "Computed properties allow us to declaratively compute derived values. However, there are cases where we need to perform \"side effects\" in reaction to state changes - for example, mutating the DOM, or changing another piece of state based on the result of an async operation."
+        ]
+      }
+    ],
+    "must_include": [
+      "side effects",
+      "state changes"
+    ],
+    "plans": {
+      "A": "Vue watcher computed async side effects after state changes",
+      "B": "Vue watcher computed async side effects after state changes",
+      "E": "Vue watcher computed side effects async state changes побочные эффекты изменение состояния"
+    }
+  },
+  {
+    "id": "sol-03",
+    "family": "vue",
+    "scope": "vue-mixed",
+    "query_language": "mixed",
+    "question": "Если reactive dependency у computed не меняется, будет ли getter запускаться при каждом re-render?",
+    "answerable": true,
+    "oracle": [
+      {
+        "source_id": "vue-computed-ru",
+        "quotes": [
+          "Вычисляемое свойство будет пересчитываться только при изменении одной из своих зависимостей.",
+          "Для сравнения, вызов метода **будет всегда запускать** функцию, когда происходит перерисовка."
+        ]
+      }
+    ],
+    "must_include": [
+      "пересчитываться только при изменении",
+      "реактив"
+    ],
+    "plans": {
+      "A": "Vue computed reactive dependency getter re-render cache",
+      "B": "Vue вычисляемое свойство реактивная зависимость пересчитывается перерисовка getter",
+      "E": "Vue computed вычисляемое свойство reactive реактивная dependency зависимость re-render перерисовка getter"
+    }
+  },
+  {
+    "id": "sol-04",
+    "family": "django",
+    "scope": "django",
+    "query_language": "ru",
+    "question": "`select_related()` делает SQL JOIN или отдельный запрос для каждого relationship?",
+    "answerable": true,
+    "oracle": [
+      {
+        "source_id": "django-querysets-en",
+        "quotes": [
+          "``select_related`` works by creating an SQL join and including the fields of the related object in the ``SELECT`` statement.",
+          "``select_related`` gets the related objects in the same database query."
+        ]
+      }
+    ],
+    "must_include": [
+      "SQL join",
+      "same database query"
+    ],
+    "plans": {
+      "A": "`select_related()` SQL JOIN separate query relationship Django",
+      "B": "`select_related()` SQL JOIN separate query relationship Django",
+      "E": "Django `select_related()` SQL JOIN отдельный запрос relationship связанный объект"
+    }
+  },
+  {
+    "id": "sol-05",
+    "family": "django",
+    "scope": "django",
+    "query_language": "en",
+    "question": "Can `select_related()` prefetch many-to-many relationships, or is it limited to single-valued relations?",
+    "answerable": true,
+    "oracle": [
+      {
+        "source_id": "django-querysets-en",
+        "quotes": [
+          "``select_related`` is limited to single-valued relationships - foreign key and one-to-one.",
+          "``prefetch_related``, on the other hand, does a separate lookup for each relationship, and does the 'joining' in Python. This allows it to prefetch many-to-many, many-to-one, and"
+        ]
+      }
+    ],
+    "must_include": [
+      "single-valued",
+      "many-to-many"
+    ],
+    "plans": {
+      "A": "Django `select_related()` many-to-many single-valued foreign key one-to-one",
+      "B": "Django `select_related()` many-to-many single-valued foreign key one-to-one",
+      "E": "Django `select_related()` many-to-many single-valued relations связи foreign key one-to-one"
+    }
+  },
+  {
+    "id": "sol-06",
+    "family": "django",
+    "scope": "django",
+    "query_language": "mixed",
+    "question": "Какой fixed maximum number of SQL queries гарантирует `prefetch_related()` для любых nested relations?",
+    "answerable": false,
+    "oracle": [],
+    "must_include": [],
+    "plans": {
+      "A": "Django `prefetch_related()` fixed maximum number SQL queries nested relations guarantee",
+      "B": "Django `prefetch_related()` fixed maximum number SQL queries nested relations guarantee",
+      "E": "Django `prefetch_related()` maximum SQL queries максимум запросов nested relations гарантия"
+    }
+  },
+  {
+    "id": "sol-07",
+    "family": "kotlin",
+    "scope": "kotlin",
+    "query_language": "ru",
+    "question": "Отмена coroutine в Kotlin cooperative: как long-running loop без suspension должен проверять cancellation?",
+    "answerable": true,
+    "oracle": [
+      {
+        "source_id": "kotlin-cancel-en",
+        "quotes": [
+          "In Kotlin, coroutine cancellation is _cooperative_.",
+          "You can check for cancellation explicitly, which lets long-running code react to cancellation without suspending."
+        ]
+      }
+    ],
+    "must_include": [
+      "cancellation is _cooperative_",
+      "check for cancellation explicitly"
+    ],
+    "plans": {
+      "A": "Kotlin coroutine cooperative cancellation long-running loop without suspension check cancellation",
+      "B": "Kotlin coroutine cooperative cancellation long-running loop without suspension check cancellation",
+      "E": "Kotlin coroutine cooperative cancellation кооперативная отмена long-running loop без suspension проверка cancellation"
+    }
+  },
+  {
+    "id": "sol-08",
+    "family": "kotlin",
+    "scope": "kotlin",
+    "query_language": "en",
+    "question": "What does `withTimeoutOrNull()` return when the timeout is exceeded?",
+    "answerable": true,
+    "oracle": [
+      {
+        "source_id": "kotlin-cancel-en",
+        "quotes": [
+          "If the timeout exceeds the specified `Duration`, `withTimeoutOrNull()` returns `null`."
+        ]
+      }
+    ],
+    "must_include": [
+      "withTimeoutOrNull() returns `null`"
+    ],
+    "plans": {
+      "A": "Kotlin `withTimeoutOrNull()` return when timeout exceeded",
+      "B": "Kotlin `withTimeoutOrNull()` return when timeout exceeded",
+      "E": "Kotlin `withTimeoutOrNull()` timeout exceeded превышен возвращает return"
+    }
+  },
+  {
+    "id": "sol-09",
+    "family": "kotlin",
+    "scope": "kotlin",
+    "query_language": "mixed",
+    "question": "Если coroutine canceled, `ensureActive()` возвращает false или throws CancellationException?",
+    "answerable": true,
+    "oracle": [
+      {
+        "source_id": "kotlin-cancel-en",
+        "quotes": [
+          "The [`isActive`](https://kotlinlang.org/api/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines/is-active.html) property returns `false` when the coroutine is canceled.",
+          "The [`ensureActive()`](https://kotlinlang.org/api/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines/ensure-active.html) function throws a `CancellationException` when the coroutine is canceled."
+        ]
+      }
+    ],
+    "must_include": [
+      "ensureActive()",
+      "CancellationException"
+    ],
+    "plans": {
+      "A": "Kotlin `ensureActive()` canceled returns false throws CancellationException",
+      "B": "Kotlin `ensureActive()` canceled returns false throws CancellationException",
+      "E": "Kotlin `ensureActive()` coroutine canceled отменена false или throws CancellationException"
+    }
+  }
+]

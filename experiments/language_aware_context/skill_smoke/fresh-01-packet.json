@@ -1,0 +1,20 @@
+{
+  "question": "В Python 3.13 чем Path.absolute() отличается от Path.resolve(): устраняют ли оба .. и разрешают ли оба символические ссылки?",
+  "evidence": [
+    {
+      "id": "S1",
+      "path": "docs/pathlib.md",
+      "text": ".. method:: Path.absolute()\n\n   Make the path absolute, without normalization or resolving symlinks.\n   Returns a new path object::\n\n      >>> p = Path('tests')\n      >>> p\n      PosixPath('tests')\n      >>> p.absolute()\n      PosixPath('/home/antoine/pathlib/tests')\n\n\n.. method:: Path.resolve(strict=False)"
+    },
+    {
+      "id": "S2",
+      "path": "docs/pathlib.md",
+      "text": "If you want to walk an arbitrary filesystem path upwards, it is\n      recommended to first call :meth:`Path.resolve` so as to resolve\n      symlinks and eliminate ``\"..\"`` components."
+    },
+    {
+      "id": "S3",
+      "path": "docs/pathlib.md",
+      "text": ".. versionchanged:: 3.13\n      The *follow_symlinks* parameter was added."
+    }
+  ]
+}

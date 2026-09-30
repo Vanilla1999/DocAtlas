@@ -1,0 +1,44 @@
+import hashlib
+import json
+from pathlib import Path
+import sys
+from datetime import datetime, timezone
+from urllib.request import urlopen
+
+ROOT = Path(__file__).resolve().parent
+REPO = Path('/tmp/opencode/DocAtlas-audit')
+sys.path.insert(0, str(REPO))
+from experiments.language_aware_context.baseline_probe import run, write_report, environment
+from experiments.language_aware_context.pilot_io import evidence_blocks
+
+def digest(raw):
+    return hashlib.sha256(raw).hexdigest()
+
+protocol = json.loads((ROOT / 'protocol.json').read_text())
+specs = {}
+for scope, source in protocol['sources'].items():
+    url = f"https://raw.githubusercontent.com/{protocol['source_repository']}/{protocol['source_commit']}/{source}"
+    raw = urlopen(url, timeout=40).read()
+    path = ROOT / 'corpora' / scope / 'docs' / (scope + '.md')
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with path.open('xb') as stream:
+        stream.write(raw)
+    specs[scope] = {'schema_version': 1, 'sources': [{'path': f'docs/{scope}.md', 'sha256': digest(raw)}]}
+
+frozen_paths = [ROOT / 'protocol.json', ROOT / 'run.py', REPO / 'uv.lock',
+                Path('/home/viadmin/.config/opencode/skills/docmancer/SKILL.md')]
+freeze = {'created_before_first_handler_call': datetime.now(timezone.utc).isoformat(),
+          'sha256': {str(p): digest(p.read_bytes()) for p in frozen_paths},
+          'sources': specs, 'environment': environment()}
+write_report(ROOT / 'freeze.json', freeze)
+print('FROZEN', digest((ROOT / 'freeze.json').read_bytes()), flush=True)
+for task in protocol['tasks']:
+    observed = run(ROOT / 'corpora' / task['scope'], specs[task['scope']],
+                   {'question': task['question'], 'lookup_queries': [task['lookup']]})
+    write_report(ROOT / (task['id'] + '-raw.json'), observed)
+    packet = {'question': task['question'], 'evidence': evidence_blocks(observed['payload'])}
+    write_report(ROOT / (task['id'] + '-packet.json'), packet)
+    print(task['id'], observed['status'], observed['budget_tokens'], flush=True)
+    if observed['status'] != 'EXECUTED':
+        raise RuntimeError('Handler/audit failure; retained, not scored as retrieval miss')
+assert freeze['sha256'] == {str(p): digest(p.read_bytes()) for p in frozen_paths}

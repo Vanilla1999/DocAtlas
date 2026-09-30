@@ -1,0 +1,10 @@
+{
+  "schema_version": 1,
+  "module_labels": {
+    "tests/docs/test_language_pilot_io.py": "behavioral"
+  },
+  "node_overrides": {},
+  "module_node_hashes": {
+    "tests/docs/test_language_pilot_io.py": "ed658b49e040189e7a5de8f5e92f7c7e78433602f837ca2ea55dd2282de6743e"
+  }
+}

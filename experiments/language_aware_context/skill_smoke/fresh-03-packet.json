@@ -1,0 +1,15 @@
+{
+  "question": "В Python 3.13 если отменить coroutine, ожидающую asyncio.shield(task), отменится ли сама task и получит ли ожидающая coroutine CancelledError?",
+  "evidence": [
+    {
+      "id": "S1",
+      "path": "docs/asyncio.md",
+      "text": "During asynchronous iteration, implicitly-created tasks will be yielded for\n   supplied awaitables that aren't tasks or futures.\n\n   When used as a plain iterator, each iteration yields a new coroutine that\n   returns the result or raises the exception of the next completed awaitable.\n   This pattern is compatible with Python versions older than 3.13::"
+    },
+    {
+      "id": "S2",
+      "path": "docs/asyncio.md",
+      "text": "Task Cancellation\n=================\n\nTasks can easily and safely be cancelled.\nWhen a task is cancelled, :exc:`asyncio.CancelledError` will be raised\nin the task at the next opportunity.\n\nIt is recommended that coroutines use ``try/finally`` blocks to robustly\nperform clean-up logic. In case :exc:`asyncio.CancelledError`\nis explicitly caught, it should generally be propagated when\nclean-up is complete. :exc:`asyncio.CancelledError` directly subclasses\n:exc:`BaseException` so most code will not need to be aware of it."
+    }
+  ]
+}
