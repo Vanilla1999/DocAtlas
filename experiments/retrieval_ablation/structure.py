@@ -28,6 +28,11 @@ def canonical_markdown(raw: str) -> dict:
     from markdown_it import MarkdownIt
     if not isinstance(raw, str) or '\x00' in raw:
         raise ValueError('expected UTF-8 Markdown without NUL')
+    # The unchanged product index uses Python splitlines, while CommonMark
+    # and the public audit use CR/LF and LF coordinates respectively. Refuse
+    # incompatible controls instead of deleting a declaration at a shifted map.
+    if re.search(r'[\v\f\x1c-\x1e\x85\u2028\u2029]|\r(?!\n)', raw):
+        raise ValueError('BLOCKED_REPRESENTATION: incompatible line boundaries')
     lines = raw.splitlines(keepends=True)
     offsets = [0]
     for line in lines:

@@ -11,6 +11,6 @@
     "tests/docs/test_retrieval_ablation_contract.py": "7f3c8e9fe7c371e43838e89d747dbae82d9361a493c5508cfdcc5606e82bcafe",
     "tests/docs/test_retrieval_ablation_integration.py": "3ef629bc9a0e3c0ff8eca2e4fe602a8b3dad761003b98ad8cd1d164c60470f1e",
     "tests/docs/test_retrieval_ablation_packet.py": "e9205ca08f12190c184dc45129498ff0e2eab84bd98278fa8451b0421acbbfc0",
-    "tests/docs/test_retrieval_ablation_structure.py": "34614daff8d4b3a90b51d3318825ec24a1014d44742311b63376e8b21d60e201"
+    "tests/docs/test_retrieval_ablation_structure.py": "c0c04954652109cccedf6e3ae8c6bc84d08568d13ba57cb9569fe374c34edfb8"
   }
 }

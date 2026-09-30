@@ -155,3 +155,12 @@ def test_disjoint_required_heading_remains_a_separate_counted_quote(tmp_path):
         assert packet['sources'][0]['line_end'] < packet['sources'][1]['line_start']
         limited = pack_native(store, native, sources=docs, question='Alpha.wait retry budget', assembly=True, source_entries=1)
         assert limited['model_visible_packet']['status'] == 'insufficient_evidence'
+
+
+@pytest.mark.parametrize('separator', ['\u2028', '\u2029', '\x85', '\r'])
+def test_incompatible_line_boundaries_cannot_erase_source_declarations(separator):
+    # Python splitlines and CommonMark disagree on these boundaries. The
+    # unchanged index/audit coordinate system cannot safely represent them.
+    raw = f'Preamble{separator}still prose.\n\nOwner.read\n----------\n\nDo not mutate.\n'
+    with pytest.raises(ValueError, match='BLOCKED_REPRESENTATION'):
+        canonical_markdown(raw)
