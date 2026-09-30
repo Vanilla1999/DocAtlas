@@ -1,0 +1,44 @@
+{
+  "status": "DRAFT_SCAFFOLD_BLOCKED_INTEGRATION",
+  "base_branch": "main",
+  "base_revision": "58c7f37c2a5ef686bcd6562abbade91ba94e347a",
+  "old_experimental_branch_imported": false,
+  "production_activation": false,
+  "validation": {
+    "scope": "isolated_staged_files_not_full_checkout",
+    "reference_unit_cases_passed": 37,
+    "probe_tdd_initial_failures": 20,
+    "probe_unit_cases_passed": 20,
+    "total_unit_cases_passed": 57,
+    "unit_failures_remaining": 0,
+    "unit_skips": 0,
+    "initial_collection_error": "reserved pytest parameter request; corrected before RED",
+    "inventory_hashes_match_actual_collection": true,
+    "compileall": "PASS"
+  },
+  "actual_handler_attempt": {
+    "status": "BLOCKED_IMPORT",
+    "missing_module": "eval",
+    "exit_code": 2
+  },
+  "environment_blockers": [
+    "full DocAtlas checkout unavailable locally",
+    "missing runtime dependencies",
+    "direct DNS unavailable"
+  ],
+  "t0": "BLOCKED_ENVIRONMENT",
+  "t1": "RUNNER_WRITTEN_INPUT_OUTPUT_TESTED_HANDLER_BLOCKED",
+  "t2_to_t5": "REFERENCE_HELPERS_ONLY_NOT_INTEGRATED",
+  "t6": "NOT_RUN",
+  "t7": "NO_INDEPENDENT_DATA",
+  "t8": "NOT_RUN",
+  "t9": "NOT_RUN",
+  "h1_profile_effect": null,
+  "h2_assembly_effect": null,
+  "h3_answer_effect": null,
+  "real_agent_responses": 0,
+  "blind_judgments": 0,
+  "independent_holdout": false,
+  "product_profile_delivery": "BLOCKED",
+  "competitor_run": "NOT_RUN"
+}

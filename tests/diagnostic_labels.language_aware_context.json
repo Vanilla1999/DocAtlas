@@ -1,0 +1,12 @@
+{
+  "schema_version": 1,
+  "module_labels": {
+    "tests/docs/test_language_aware_context_probe.py": "behavioral",
+    "tests/docs/test_language_aware_context_reference.py": "behavioral"
+  },
+  "node_overrides": {},
+  "module_node_hashes": {
+    "tests/docs/test_language_aware_context_probe.py": "75e4a3ce169317e98f247f2c4d3bb38ce0170a7810b1ae7e6f766d19ea76eddf",
+    "tests/docs/test_language_aware_context_reference.py": "e539a569fd105b542c43efa18edce1462cc77a24d2b3418eba04a35513ab9ee5"
+  }
+}
