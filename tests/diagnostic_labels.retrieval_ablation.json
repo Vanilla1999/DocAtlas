@@ -6,7 +6,7 @@
   },
   "node_overrides": {},
   "module_node_hashes": {
-    "tests/docs/test_retrieval_ablation_contract.py": "db1ce2ed4971cae1ef774a19ea4fb3ed2125908b5857ca03e487973294678b9a",
+    "tests/docs/test_retrieval_ablation_contract.py": "067099036ddd2fb7711611d64f0dbfedd3f31dc7b31d6a18f9caafc8aff4ed91",
     "tests/docs/test_retrieval_ablation_integration.py": "3ef629bc9a0e3c0ff8eca2e4fe602a8b3dad761003b98ad8cd1d164c60470f1e"
   }
 }

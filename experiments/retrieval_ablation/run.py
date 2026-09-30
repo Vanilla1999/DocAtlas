@@ -62,6 +62,8 @@ def runtime_identity() -> dict:
             'lock_sha256': sha256((ROOT / 'uv.lock').read_bytes()),
             'python': sys.version, 'sqlite': sqlite3.sqlite_version,
             'platform': platform.platform(),
+            'runtime_flags': {key: os.environ.get(key) for key in (
+                'DOCATLAS_OFFLINE', 'DOCATLAS_AUTO_VECTORS', 'PYTHONHASHSEED')},
             'packages': sorted({(d.metadata.get('Name', ''), d.version) for d in metadata.distributions()})}
 
 
@@ -71,6 +73,7 @@ def preflight() -> dict:
         conn.execute('CREATE VIRTUAL TABLE probe USING fts5(text)')
     return {'environment': environment, 'fts5': True,
             'offline': os.environ.get('DOCATLAS_OFFLINE') == '1',
+            'fixed_hash_seed': os.environ.get('PYTHONHASHSEED') == '0',
             'auto_vectors_disabled': os.environ.get('DOCATLAS_AUTO_VECTORS') == '0'}
 
 
@@ -87,8 +90,8 @@ def freeze_inputs(corpus: Path, spec: dict, request: dict, output: Path) -> dict
     validated_request(request, '/validation-only')
     documents, corpus_hash = load_sources(corpus, spec)
     environment = preflight()
-    if not environment['offline'] or not environment['auto_vectors_disabled']:
-        raise ValueError('set DOCATLAS_OFFLINE=1 and DOCATLAS_AUTO_VECTORS=0')
+    if not all(environment[key] for key in ('offline', 'auto_vectors_disabled', 'fixed_hash_seed')):
+        raise ValueError('set DOCATLAS_OFFLINE=1, DOCATLAS_AUTO_VECTORS=0, PYTHONHASHSEED=0')
     if output.absolute().resolve().is_relative_to(corpus.resolve()):
         raise ValueError('freeze output must be outside the corpus')
     output = _external_new_directory(output)
