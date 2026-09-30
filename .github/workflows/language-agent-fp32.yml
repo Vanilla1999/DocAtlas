@@ -1,12 +1,9 @@
+# Frozen pilot already executed: do not rerun viewed tasks on every PR commit.
 name: Language fresh FP32 agent pilot
 on:
   pull_request:
     branches: [main]
-    paths:
-      - 'experiments/language_aware_context/pilot_v2*'
-      - 'experiments/language_aware_context/pilot_fp32_agent.py'
-      - 'tests/docs/test_language_pilot_v2.py'
-      - '.github/workflows/language-agent-fp32.yml'
+    types: [labeled]
   workflow_dispatch:
 permissions:
   contents: read
@@ -15,7 +12,7 @@ concurrency:
   cancel-in-progress: false
 jobs:
   real-agent:
-    if: github.event_name == 'workflow_dispatch' || github.event.pull_request.head.repo.full_name == github.repository
+    if: github.event_name == 'workflow_dispatch' || (github.event.label.name == 'run-language-fp32-pilot' && github.event.pull_request.head.repo.full_name == github.repository)
     runs-on: ubuntu-latest
     timeout-minutes: 35
     strategy:

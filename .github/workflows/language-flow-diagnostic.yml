@@ -5,6 +5,9 @@ on:
     paths:
       - 'experiments/language_aware_context/flow_probe.py'
       - 'experiments/language_aware_context/flow_experiment.py'
+      - 'experiments/language_aware_context/flow_regressions.py'
+      - 'experiments/language_aware_context/pilot_review.py'
+      - 'tests/docs/test_language_pilot_review.py'
       - 'tests/docs/test_language_flow_experiment.py'
       - '.github/workflows/language-flow-diagnostic.yml'
   workflow_dispatch:
@@ -17,7 +20,7 @@ jobs:
   observe-flow:
     if: github.event_name == 'workflow_dispatch' || github.event.pull_request.head.repo.full_name == github.repository
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 20
     env:
       DOCATLAS_OFFLINE: '1'
       DOCATLAS_AUTO_VECTORS: '0'
@@ -36,9 +39,22 @@ jobs:
           python -m pip install uv==0.9.25
           uv sync --frozen --extra dev
       - name: Guard tests and unchanged frozen-case assertion
-        run: .venv/bin/python -m pytest tests/docs/test_language_flow_experiment.py -q
+        run: |
+          mkdir -p "$RUNNER_TEMP/flow-evidence"
+          .venv/bin/python -m pytest tests/docs/test_language_flow_experiment.py tests/docs/test_language_pilot_review.py -q --junitxml="$RUNNER_TEMP/flow-evidence/unit.xml"
       - name: Observe unchanged frozen case
         run: .venv/bin/python -m experiments.language_aware_context.flow_probe --output "$RUNNER_TEMP/flow-evidence/trace"
+      - name: Paired unchanged regressions with baseline and flow ordering
+        run: |
+          set +e
+          .venv/bin/python -m experiments.language_aware_context.flow_regressions --condition baseline --junit "$RUNNER_TEMP/flow-evidence/regression-baseline.xml"
+          baseline=$?
+          .venv/bin/python -m experiments.language_aware_context.flow_regressions --condition flow --junit "$RUNNER_TEMP/flow-evidence/regression-flow.xml"
+          flow=$?
+          printf '{"baseline_exit":%s,"flow_exit":%s}\n' "$baseline" "$flow" > "$RUNNER_TEMP/flow-evidence/regression-exits.json"
+          # Keep this job red if either condition fails. A paired improvement is
+          # reported separately, never disguised as an all-green repository gate.
+          test "$baseline" -eq 0 && test "$flow" -eq 0
       - name: Preserve exact source for offline reproduction
         if: always()
         run: |
