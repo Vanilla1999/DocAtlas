@@ -1,5 +1,9 @@
 # Decision after the T00–T04 diagnostic report
 
+> Historical initial-slice report. Subsequent local implementation, exact measured
+> revisions and still-open limits are recorded in [CONTINUATION_REPORT.md](CONTINUATION_REPORT.md).
+> The original observations below are preserved, not relabeled as new execution.
+
 This document follows ABLATION_REPORT.md. It is an engineering disposition for
 the delivered diagnostic slice, **not** the T12 decision after a completed
 retrieval-quality matrix. Reviewed code: `00e83b1334c883cea8f6c2b3512cdd00ee92a1c9`.

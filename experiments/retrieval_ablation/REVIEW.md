@@ -1,5 +1,9 @@
 # Implementation review
 
+> Historical initial-slice report. Subsequent local implementation, exact measured
+> revisions and still-open limits are recorded in [CONTINUATION_REPORT.md](CONTINUATION_REPORT.md).
+> The original observations below are preserved, not relabeled as new execution.
+
 Reviewed slice: T00–T04 internal diagnostics, not an alternate public retrieval
 runtime. Implementation commit `d60a9c0d3eb279858c0ab41913eaf6ac7097f2f0`;
 post-review corrections `00e83b1334c883cea8f6c2b3512cdd00ee92a1c9`.

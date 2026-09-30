@@ -1,5 +1,9 @@
 # T00–T04 stage report
 
+> Historical initial-slice report. Subsequent local implementation, exact measured
+> revisions and still-open limits are recorded in [CONTINUATION_REPORT.md](CONTINUATION_REPORT.md).
+> The original observations below are preserved, not relabeled as new execution.
+
 Base: `55637eb4d29a0d06c01714ee647a5b486a5be725` (current main at start;
 PR #204 was already merged). Branch: `experiment/retrieval-ablation-t00-t04`.
 Implementation: `d60a9c0d3eb279858c0ab41913eaf6ac7097f2f0`.

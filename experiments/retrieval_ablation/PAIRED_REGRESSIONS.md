@@ -1,5 +1,9 @@
 # Completed paired regression review
 
+> Historical initial-slice report. Subsequent local implementation, exact measured
+> revisions and still-open limits are recorded in [CONTINUATION_REPORT.md](CONTINUATION_REPORT.md).
+> The original observations below are preserved, not relabeled as new execution.
+
 Code `00e83b1334c883cea8f6c2b3512cdd00ee92a1c9` versus base
 `55637eb4d29a0d06c01714ee647a5b486a5be725`, CI run 36781801281.
 Final workflow conclusion: **FAILURE — not merge-ready**.

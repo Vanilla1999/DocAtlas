@@ -1,5 +1,9 @@
 # Ablation measurement report: diagnostic slice only
 
+> Historical initial-slice report. Subsequent local implementation, exact measured
+> revisions and still-open limits are recorded in [CONTINUATION_REPORT.md](CONTINUATION_REPORT.md).
+> The original observations below are preserved, not relabeled as new execution.
+
 ## Scope and outcome
 
 Base `55637eb4d29a0d06c01714ee647a5b486a5be725`; implementation `d60a9c0d`;
