@@ -21,6 +21,7 @@ jobs:
     env:
       DOCATLAS_OFFLINE: '1'
       DOCATLAS_AUTO_VECTORS: '0'
+      PYTHONHASHSEED: '0'
       DOCATLAS_REGISTRY_API_URL: 'http://127.0.0.1:1'
     steps:
       - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
@@ -40,9 +41,20 @@ jobs:
           python -m pip install uv==0.9.25
           uv sync --frozen --extra dev
       - name: Reference and reporting tests under the real test configuration
-        run: .venv/bin/python -m pytest tests/docs/test_language_aware_context_reference.py tests/docs/test_language_aware_context_probe.py tests/docs/test_language_ci_diagnostic.py tests/docs/test_language_source_profile.py tests/docs/test_language_trace_serialization.py -q --junitxml="$RUNNER_TEMP/language-evidence/unit-tests.xml"
+        run: .venv/bin/python -m pytest tests/docs/test_language_aware_context_reference.py tests/docs/test_language_aware_context_probe.py tests/docs/test_language_ci_diagnostic.py tests/docs/test_language_source_profile.py tests/docs/test_language_trace_serialization.py tests/docs/test_language_packing_experiment.py tests/docs/test_language_packing_trace.py -q --junitxml="$RUNNER_TEMP/language-evidence/unit-tests.xml"
       - name: Real lexical handler; no model or modified admission
         run: .venv/bin/python -m experiments.language_aware_context.ci_diagnostic --output "$RUNNER_TEMP/language-evidence/probes"
+      - name: Paired packing mechanism probe on identical supplied queries
+        run: .venv/bin/python -m experiments.language_aware_context.packing_probe --output "$RUNNER_TEMP/language-evidence/packing"
+      - name: Paired focused product regressions; retain failures in both conditions
+        run: |
+          set +e
+          .venv/bin/python -m experiments.language_aware_context.packing_regressions --condition baseline --junit "$RUNNER_TEMP/language-evidence/regression-baseline.xml"
+          baseline=$?
+          .venv/bin/python -m experiments.language_aware_context.packing_regressions --condition candidate --junit "$RUNNER_TEMP/language-evidence/regression-candidate.xml"
+          candidate=$?
+          printf '{"baseline_exit":%s,"candidate_exit":%s}\n' "$baseline" "$candidate" > "$RUNNER_TEMP/language-evidence/regression-exits.json"
+          test "$baseline" -eq 0 && test "$candidate" -eq 0
       - name: Upload revision-bound evidence, including failures
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02

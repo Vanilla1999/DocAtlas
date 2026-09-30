@@ -1,0 +1,10 @@
+{
+  "schema_version": 1,
+  "module_labels": {
+    "tests/docs/test_language_packing_trace.py": "behavioral"
+  },
+  "node_overrides": {},
+  "module_node_hashes": {
+    "tests/docs/test_language_packing_trace.py": "47df0923e006fddd6841217b5d850c36c47cbccf183d22d55499979e27e9782c"
+  }
+}
