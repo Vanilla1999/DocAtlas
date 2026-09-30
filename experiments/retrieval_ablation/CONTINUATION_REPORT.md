@@ -24,7 +24,9 @@ snapshot `56d2b6e`: его tree **точно совпадает** с tree уда
 - `9ecc38a31cbbb9f0dc5e80358deaf8aa872e296b`: ограниченный захват вывода при
   отделившемся дочернем процессе; дополнительный защитный тест.
 
-**Финально измеренный код — 9ecc38a.** Последующий отчётный commit не меняет код.
+- `926b8dbd41d7e18426a8c4a82a75ed3980cbe3e5`: staging берёт только tracked runtime-файлы; неотслеживаемый sidecar не может стать незамороженным входом.
+
+**Финально измеренный код — 926b8db.** Последующий отчётный commit не меняет код.
 В приложенном архиве — patch, изменённые файлы и фактические логи/JSON/JUnit.
 Новый workflow в GitHub не запускался; старый CI не считается новым прогоном.
 
@@ -113,18 +115,20 @@ inventory внутри каждой пары, `DOCATLAS_OFFLINE=1`, `DOCATLAS_AU
 
 | Проверка | Фактический результат | Ревизия/граница |
 |---|---|---|
-| Guards + native SQLite | **99 passed** | 9ecc38a; `verified-guards.xml` |
-| Из них новые continuation tests | **25 passed** | Входят в 99, не добавочные независимые случаи |
+| Guards + native SQLite | **100 passed** | исходники зафиксированы в 926b8db; `release-guards.xml` |
+| Из них новые continuation tests | **26 passed** | Входят в 100, не добавочные независимые случаи |
 | Два старых проблемных testcase IDs | **2 PASS в каждой из 4 ячеек** | base55637 / headbd12496, по два повтора, одинаковые пути |
 | Смежный observer/gate/protocol набор | **base 142 PASS / 1 FAIL; head 142 PASS / 1 FAIL** | Те же 143 IDs; нет различий статуса/сообщения; headbd12496 |
-| Final isolated P | **EXECUTED**, audit `[]`, **318 DTO tokens** | 9ecc38a, `verified-P/result.json` |
-| Final isolated A | **EXECUTED / VALIDATED_PROJECT_PACKET**, audit `[]`, **292 DTO tokens** | 9ecc38a, `verified-A/result.json` |
+| Final isolated P | **EXECUTED**, audit `[]`, **318 DTO tokens** | 926b8db, `release-P/result.json` |
+| Final isolated A | **EXECUTED / VALIDATED_PROJECT_PACKET**, audit `[]`, **289 DTO tokens** | 926b8db, `release-A/result.json` |
 | Full offline attempt | **BLOCKED_ENV, exit 4; 6 collection errors, 3 collection skips** | 9ecc38a; `verified-offline-attempt/` |
 | compileall / diff whitespace | PASS | Фактические команды выполнены |
 
-Последняя поправка после bd12496 меняет только timeout accounting и его guard;
-парные 143 и 2-ID результаты выше не переименованы в новые прогоны на 9ecc38a.
-99-test набор и оба финальных CLI запуска действительно повторены на 9ecc38a.
+Поправки после bd12496 меняют timeout accounting, tracked-only staging и их guards;
+парные 143 и 2-ID результаты выше не переименованы в новые прогоны на 926b8db.
+100-test набор проверил окончательные исходники перед commit; оба финальных CLI
+запуска выполнены из чистого checkout 926b8db. Попытка полного offline gate
+относится именно к 9ecc38a, до последнего ужесточения staging.
 
 Единственный FAIL смежной пары —
 `test_v2_inventory_lock_witnesses_and_report_only_lanes`: active witness document
@@ -144,7 +148,7 @@ revision mismatch. Он воспроизведён и на base, и на head с
 P/A — повтор одной уже просмотренной синтетической English Markdown fixture.
 Один original-only panel, 2 planned / 2 executed, 0 semantic evaluations,
 0 answer generations, 0 независимых новых quality cases. P/A имели 10/2 SQL
-searches и 10/2 raw hits. Эти числа и 318/292 токена — plumbing measurements,
+searches и 10/2 raw hits. Эти числа и 318/289 токена — plumbing measurements,
 не доказательство качества, скорости или равнобюджетного выигрыша A.
 
 ## Саморевью и исправления
@@ -156,6 +160,9 @@ searches и 10/2 raw hits. Эти числа и 318/292 токена — plumbin
 - Первая экстракция observer потеряла script-level dispatch seam: смежный набор
   дал 19 FAIL, включая один старый. Обёртка восстановила совместимость; все
   18 добавленных падений исчезли, подтверждено парой 142/1 против 142/1.
+- Проверка обнаружила копирование untracked sidecar из дерева runtime, которого
+  нет в frozen Git inventory. Tracked-only staging исключил этот вход; RED/GREEN
+  сохранены. Новые source/runtime файлы должны быть добавлены в Git index до freeze.
 - Отделившийся child удерживал stdout после group kill: реальный тест превысил
   допустимую длительность. Bounded capture исправлен и повторен GREEN.
 - Ошибки fixture/импорта и обращение к отсутствующему gold не выдаются за

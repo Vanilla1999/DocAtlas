@@ -100,7 +100,8 @@ Timeout kills the whole child process group. Missing dependencies and collection
 errors are blockers, never passing test results. No failures are waived.
 
 Sources: `{"schema_version":1,"sources":[{"path":"docs/example.md","sha256":"..."}]}`.
-Only manifest-listed `.md` bytes are staged. Requests accept `question` and
+Only manifest-listed `.md` bytes and tracked runtime files are staged; untracked
+sidecars are excluded. Add new runtime files to the Git index before freezing. Requests accept `question` and
 optional fixed `lookup_queries`, never gold or answer hints. Original-only and
 frozen-lookup panels remain separate. RST is not relabeled as Markdown.
 
