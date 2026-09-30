@@ -46,6 +46,10 @@ jobs:
         run: .venv/bin/python -m experiments.language_aware_context.ci_diagnostic --output "$RUNNER_TEMP/language-evidence/probes"
       - name: Paired packing mechanism probe on identical supplied queries
         run: .venv/bin/python -m experiments.language_aware_context.packing_probe --output "$RUNNER_TEMP/language-evidence/packing"
+      - name: Strong GPT planner retrieval pilot
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: .venv/bin/python -m experiments.language_aware_context.strong_pilot_run --output "$RUNNER_TEMP/language-evidence/strong-pilot"
       - name: Paired focused product regressions; retain failures in both conditions
         run: |
           set +e
