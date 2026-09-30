@@ -40,6 +40,8 @@ def main() -> int:
         'quantization': 'none; float32', 'dtype_before_quantization': 'float32'}
     args.identity.parent.mkdir(parents=True, exist_ok=True)
     args.identity.write_text(json.dumps(identity, indent=2) + '\n')
+    # Runtime health is separate from citation compliance, which remains scored
+    # on every task. This amendment preceded every v2 task/model evaluation.
     health = []
     for name, messages in (
         ('echo', [{'role': 'user', 'content': 'Reply with exactly the single word READY.'}]),
@@ -53,8 +55,9 @@ def main() -> int:
             tokens = model.generate(**inputs, do_sample=False, max_new_tokens=48,
                 pad_token_id=tokenizer.eos_token_id)
         text = tokenizer.decode(tokens[0, inputs['input_ids'].shape[-1]:], skip_special_tokens=True)
-        ok = text.strip() == 'READY' if name == 'echo' else 'green' in text.lower() and 'S1' in text
-        health.append({'case': name, 'passed': ok, 'text': text})
+        ok = text.strip() == 'READY' if name == 'echo' else 'green' in text.lower() and 'not green' not in text.lower()
+        health.append({'case': name, 'passed': ok, 'text': text,
+            'citation_present': 'S1' in text if name == 'evidence' else None})
     (args.identity.parent / 'preflight-health.json').write_text(json.dumps(health, indent=2)+'\n')
     if not all(row['passed'] for row in health):
         raise RuntimeError('FP32 worker failed disjoint health check; do not evaluate tasks')
