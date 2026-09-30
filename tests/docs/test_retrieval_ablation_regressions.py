@@ -51,3 +51,29 @@ def test_timeout_kills_descendants_holding_the_output_pipe(tmp_path):
     assert code == 124
     assert 'spawned' in log
     assert time.monotonic() - started < 5
+
+
+def test_timeout_also_bounds_capture_when_a_child_detaches(tmp_path):
+    import os
+    import signal
+    import sys
+    import time
+    from experiments.retrieval_ablation.regressions import run_command
+    pid_file = tmp_path / 'owned-child.pid'
+    child = "import time; time.sleep(12)"
+    script = ("import subprocess,sys,pathlib; p=subprocess.Popen([sys.executable,'-c',"
+              + repr(child) + "],start_new_session=True); pathlib.Path("
+              + repr(str(pid_file)) + ").write_text(str(p.pid)); print('detached',flush=True)")
+    started = time.monotonic()
+    try:
+        code, log = run_command([sys.executable, '-c', script], cwd=tmp_path,
+                                env=dict(os.environ), timeout=1)
+        assert code == 124
+        assert 'detached' in log
+        assert time.monotonic() - started < 7
+    finally:
+        if pid_file.exists():
+            try:
+                os.kill(int(pid_file.read_text()), signal.SIGKILL)
+            except ProcessLookupError:
+                pass

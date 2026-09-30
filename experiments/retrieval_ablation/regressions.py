@@ -40,7 +40,7 @@ def junit_cases(path):
 
 
 def run_command(cmd, *, cwd, env, timeout):
-    """Bound the whole subprocess tree, including inherited output pipes."""
+    """Bound the process group and output capture, including detached pipe holders."""
     if type(timeout) is not int or timeout < 1:
         raise ValueError('positive integer timeout required')
     process = subprocess.Popen(cmd, cwd=cwd, env=env, text=True,
@@ -56,7 +56,17 @@ def run_command(cmd, *, cwd, env, timeout):
             os.killpg(process.pid, signal.SIGKILL)
         except ProcessLookupError:
             pass
-        log, _ = process.communicate()
+        try:
+            log, _ = process.communicate(timeout=2)
+        except subprocess.TimeoutExpired as exc:
+            # A deliberately detached child is no longer in our process group.
+            # Do not wait indefinitely for its inherited pipe or kill unrelated
+            # processes. This trusted-test runner is not a sandbox boundary.
+            log = exc.stdout or ''
+            if isinstance(log, bytes):
+                log = log.decode('utf-8', errors='replace')
+            process.stdout.close()
+            log += '\n[ablation: detached output holder; bounded capture ended]\n'
         return 124, log
 
 
