@@ -31,6 +31,14 @@ production lifecycle policy was not weakened to make the test pass.
 
 ## Open blockers and limits
 
+**P1 — Completed paired CI is red, with two newly observed failures.** On 5,078
+common offline testcase IDs, base has 20 failures and head has 22; all 51 newly
+added tests passed. The two existing tests newly failing on head require a
+registered follow-up read but receive empty `read_next`. Their cause has not
+been isolated, so they are not dismissed as flakes or attributed to a component
+without evidence. Two old failures also show changed observable content. See
+PAIRED_REGRESSIONS.md and retained raw JUnit. This branch is not merge-ready.
+
 **P1 — No safe public packet adapter for A.** The diagnostic source checks are
 not the entire qualification/authorization contract. Reference/API ownership,
 combined-window validation and library-scope/version handling have not been
@@ -56,7 +64,8 @@ source scan construction is an experimental adapter, not a proposed default.
 
 ## Disposition
 
-Keep this branch as an opt-in diagnostic contribution. No product rules should
+Keep this branch as a work-in-progress opt-in diagnostic contribution, not a
+merge-ready change. The two new paired failures remain unresolved. No product rules should
 be deleted, thresholds changed, or public retrieval activated on these results.
 The full T00–T04 deliverable remains partial at the blockers above; T05–T12 are
 outside this first slice. Semantic quality and non-inferiority remain unmeasured.

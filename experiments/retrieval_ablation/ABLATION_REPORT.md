@@ -31,7 +31,7 @@ returns a model-visible packet or support/edit authorization.
 | Quantity | Observed status |
 |---|---|
 | Declared P/A smoke runs | 2 on one synthetic English Markdown fixture; original-only panel |
-| CI smoke execution | Freeze/P/A job step succeeded on reviewed code; raw result artifacts were not yet downloadable at report time |
+| CI smoke execution | 2 EXECUTED; final raw results downloaded and verified |
 | Independent quality cases | 0 |
 | Semantically evaluated packets | 0 |
 | Actual answer-model generations | 0 |
@@ -55,10 +55,22 @@ unchanged lock. The local selected set includes 49 new experiment cases plus 23
 existing native SQLite product tests. It is not 72 retrieval-quality examples.
 
 The same 23 existing native product testcase IDs passed on the initial base and
-on the implemented head, in one local environment. This is a small paired subset,
-not the full product gate. The current CI full focused/offline pair was still
-**IN_PROGRESS** when inspected, so new/old/fixed failure counts from that pair are
-not asserted. Current execution evidence is not replaced with old PR totals.
+on the implemented head, in one local environment. This small paired subset does
+not supersede the subsequently completed CI gate: **74 guard tests passed**, but
+the full workflow failed. Focused base/head each had 482 pass / 1 fail. Full
+offline base had 5,048 pass / 20 fail / 10 skip; head had 5,097 pass / 22 fail /
+10 skip. The 51 added tests all passed, while two existing cases newly failed on
+head. There are 5,078 common full-suite IDs and no removed IDs. Both head-only
+failures remain unresolved blockers; see PAIRED_REGRESSIONS.md for exact IDs,
+assertions and changes in previously failing cases.
+
+Raw completed P smoke output has `audit_errors=[]`, 323 DTO tokens, 10 SQL
+searches and 10 raw hits. A exposes two raw hits, one unique candidate and two SQL
+searches, with one policy-scan row (72 display bytes); it returns no public packet.
+Both have `quality_status=UNJUDGED`. These are one-case plumbing observations,
+not a retrieval-quality win or a fair performance comparison. The run's original
+request, source hashes, actual packets, SQL lanes and installed package inventory
+are retained. CI retrieval ran on Python 3.12.14 / SQLite 3.45.1.
 
 A real behavioral RED exposed 16 native rows against an intended total quota of
 4. The SQL-boundary quota made that same assertion GREEN. Review additionally
