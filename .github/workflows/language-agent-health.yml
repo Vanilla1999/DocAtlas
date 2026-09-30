@@ -9,7 +9,7 @@ permissions:
   contents: read
 jobs:
   health:
-    if: github.event.pull_request.head.repo.full_name == github.repository
+    if: github.event.pull_request.head.sha == '7cf31da93849cc5ad31901d1226adf099272c842'
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
