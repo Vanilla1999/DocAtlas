@@ -10,6 +10,7 @@ from experiments.retrieval_ablation.run import freeze_inputs, verify_frozen
 def fixture(tmp_path, monkeypatch):
     monkeypatch.setenv('DOCATLAS_OFFLINE', '1')
     monkeypatch.setenv('DOCATLAS_AUTO_VECTORS', '0')
+    monkeypatch.setenv('PYTHONHASHSEED', '0')
     corpus = tmp_path / 'corpus'
     corpus.mkdir()
     raw = b'# Retry\n\nDo not retry cancellation.\n'
@@ -123,6 +124,8 @@ def test_review_never_counts_diagnostics_as_packet_quality():
               'packet_status': 'BLOCKED_SAFE_PACKET_ADAPTER', 'model_visible_packet': None,
               'freeze_sha256': 'same'}
     summary = summarize([result])
+    assert summary['planned_runs'] == 2
+    assert summary['missing_arms'] == ['P']
     assert summary['semantic_evaluable'] == 0
     assert summary['quality_outcome'] == 'INCONCLUSIVE'
     assert summary['execution_counts'] == {'EXECUTED': 1}
@@ -140,3 +143,17 @@ def test_review_preserves_blockers_and_rejects_unpaired_runs():
         summarize([result, {**result, 'freeze_sha256': 'different'}])
     with pytest.raises(ValueError, match='no runs'):
         summarize([])
+    with pytest.raises(ValueError, match='duplicate'):
+        summarize([result, result])
+
+
+@pytest.mark.parametrize('key,value', [
+    ('DOCATLAS_OFFLINE', '0'), ('DOCATLAS_AUTO_VECTORS', '1'), ('PYTHONHASHSEED', '1'),
+])
+def test_changed_runtime_flags_fail_closed(tmp_path, monkeypatch, key, value):
+    corpus, spec = fixture(tmp_path, monkeypatch)
+    output = tmp_path / 'frozen'
+    freeze_inputs(corpus, spec, {'question': 'retry'}, output)
+    monkeypatch.setenv(key, value)
+    with pytest.raises(ValueError, match='runtime'):
+        verify_frozen(output)

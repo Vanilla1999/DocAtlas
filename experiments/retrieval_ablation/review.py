@@ -14,6 +14,9 @@ def summarize(results: list[dict]) -> dict:
     freezes = {r.get('freeze_sha256') for r in results}
     if None in freezes or len(freezes) != 1:
         raise ValueError('different or missing frozen inputs')
+    arms = [r.get('arm') for r in results]
+    if len(set(arms)) != len(arms):
+        raise ValueError('duplicate arm result for one freeze')
     records = []
     for result in results:
         if result.get('quality_status') != 'UNJUDGED':
@@ -36,7 +39,8 @@ def summarize(results: list[dict]) -> dict:
             'sql_searches': len(lanes),
             'raw_hits': sum(len(lane['rows']) for lane in lanes),
             'uncapped_incomplete_lanes': sum(not lane['uncapped_complete'] for lane in lanes)})
-    return {'planned_runs': len(results),
+    return {'planned_runs': 2, 'supplied_runs': len(results),
+            'missing_arms': sorted({'P', 'A'} - set(arms)),
             'execution_counts': dict(Counter(r['execution_status'] for r in records)),
             'semantic_evaluable': 0, 'quality_outcome': 'INCONCLUSIVE',
             'answer_evaluation': 'ANSWER_EVALUATION_NOT_RUN',
