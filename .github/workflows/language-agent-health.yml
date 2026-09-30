@@ -1,0 +1,41 @@
+name: Language agent disjoint health control
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'experiments/language_aware_context/agent_sanity.py'
+      - '.github/workflows/language-agent-health.yml'
+permissions:
+  contents: read
+jobs:
+  health:
+    if: github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          persist-credentials: false
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1
+        with:
+          python-version: '3.12'
+      - name: Install the same isolated worker dependencies
+        run: |
+          python -m venv "$RUNNER_TEMP/health-env"
+          "$RUNNER_TEMP/health-env/bin/pip" install torch==2.8.0 --index-url https://download.pytorch.org/whl/cpu
+          "$RUNNER_TEMP/health-env/bin/pip" install transformers==4.53.3
+      - name: Compare same disjoint prompts before and after quantization
+        env:
+          HF_HUB_DISABLE_IMPLICIT_TOKEN: '1'
+          PYTHONHASHSEED: '0'
+        run: >-
+          "$RUNNER_TEMP/health-env/bin/python" -m experiments.language_aware_context.agent_sanity
+          --output "$RUNNER_TEMP/health-evidence"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: agent-health-${{ github.event.pull_request.head.sha }}
+          path: ${{ runner.temp }}/health-evidence/
+          retention-days: 7
+          if-no-files-found: error
