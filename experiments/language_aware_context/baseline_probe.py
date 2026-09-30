@@ -110,7 +110,7 @@ def run(corpus: Path, spec: dict, supplied: dict) -> dict:
     documents, corpus_sha256 = load_sources(corpus, spec)
     from eval.evidence_quality_v2.runtime import write_project, isolated_service, index_project
     from eval.evidence_quality_v2.observer import observe_call
-    from eval.evidence_quality_v2.run import audit_payload
+    from eval.evidence_quality_v2.audit import audit_payload
     from docmancer.docs.application.model_visible_projection import docs_context_budget_tokens
 
     with tempfile.TemporaryDirectory(prefix='docatlas-language-baseline-') as tmp:

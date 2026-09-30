@@ -1,8 +1,11 @@
 {
-  "schema_version": 1,
+  "schema_version": 2,
   "state": "UNFROZEN",
   "scope": "project_markdown_development",
-  "arms": ["P", "A"],
+  "arms": [
+    "P",
+    "A"
+  ],
   "raw_hits": 40,
   "unique_candidates": 20,
   "dto_tokens": 800,
@@ -13,5 +16,9 @@
   "representation": "current-valid-markdown-with-existing-context-prefix",
   "quality_status": "UNJUDGED",
   "independent_holdout": false,
-  "agent_evaluation": "ANSWER_EVALUATION_NOT_RUN"
+  "agent_evaluation": "ANSWER_EVALUATION_NOT_RUN",
+  "isolation": "linux-user-mount-net-pid-v1-required",
+  "admission": "actual reference and qualification; only lexical-ratio rejection bypassed",
+  "packet": "real project renderer; whole children; no coverage/support grants",
+  "packet_scope": "unversioned explicit project_path/source_class/doc_scope only"
 }

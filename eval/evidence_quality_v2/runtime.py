@@ -38,7 +38,10 @@ def write_project(root: Path, documents: dict[str, str]) -> None:
 
 @contextmanager
 def isolated_service(state: Path):
-    import scripts.run_project_docs_self_host_gate as gate
+    from docmancer.agent import DocmancerAgent
+    from docmancer.core.config import DocmancerConfig
+    from docmancer.docs.registry import LibraryRegistry
+    from docmancer.docs.service import DocsJobTracker, LibraryDocsService
     state.mkdir(parents=True, exist_ok=True)
     env = {key: str(state / key.lower()) for key in ('HOME', 'XDG_CONFIG_HOME', 'XDG_CACHE_HOME', 'XDG_DATA_HOME', 'DOCATLAS_HOME')}
     env.update(DOCATLAS_OFFLINE='1', DOCATLAS_AUTO_VECTORS='0')
@@ -46,12 +49,12 @@ def isolated_service(state: Path):
         if path not in ('0', '1'):
             Path(path).mkdir(parents=True, exist_ok=True)
     with patch.dict(os.environ, env):
-        config = gate.DocmancerConfig()
+        config = DocmancerConfig()
         config.index.db_path = str(state / 'index.db')
         config.index.extracted_dir = str(state / 'extracted')
-        service = gate.LibraryDocsService(config=config, config_source='explicit',
-            registry=gate.LibraryRegistry(config.index.db_path),
-            agent=gate.DocmancerAgent(config=config), job_tracker=gate.DocsJobTracker())
+        service = LibraryDocsService(config=config, config_source='explicit',
+            registry=LibraryRegistry(config.index.db_path),
+            agent=DocmancerAgent(config=config), job_tracker=DocsJobTracker())
         yield service, config
 
 

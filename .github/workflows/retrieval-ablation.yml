@@ -8,6 +8,11 @@ on:
       - 'experiments/retrieval_ablation/protocol.json'
       - 'tests/docs/test_retrieval_ablation_*.py'
       - 'tests/diagnostic_labels.retrieval_ablation.json'
+      - 'eval/evidence_quality_v2/*.py'
+      - 'experiments/language_aware_context/baseline_probe.py'
+      - 'eval/evidence_quality_v2/runtime.py'
+      - 'eval/evidence_quality_v2/observer.py'
+      - 'scripts/run_project_docs_self_host_gate.py'
 permissions:
   contents: read
 jobs:
@@ -38,8 +43,8 @@ jobs:
       - name: Real native, freeze and public handler guards
         run: |
           set -o pipefail
-          .venv/bin/python -m pytest tests/docs/test_retrieval_ablation_contract.py tests/docs/test_retrieval_ablation_integration.py tests/test_sqlite_ranking_truth.py tests/test_sqlite_phrase_ranking.py -q --junitxml="$RUNNER_TEMP/ablation/guards.xml" 2>&1 | tee "$RUNNER_TEMP/ablation/guards.log"
-      - name: Freeze one synthetic mechanism fixture and execute P and diagnostic A
+          .venv/bin/python -m pytest tests/docs/test_retrieval_ablation_*.py tests/test_sqlite_ranking_truth.py tests/test_sqlite_phrase_ranking.py -q --junitxml="$RUNNER_TEMP/ablation/guards.xml" 2>&1 | tee "$RUNNER_TEMP/ablation/guards.log"
+      - name: Freeze one synthetic mechanism fixture and execute isolated P and project A
         run: |
           .venv/bin/python - <<'PYCODE'
           import hashlib, json, os
@@ -56,7 +61,12 @@ jobs:
           .venv/bin/python -m experiments.retrieval_ablation.run run --frozen "$RUNNER_TEMP/ablation/frozen" --arm P --output "$RUNNER_TEMP/ablation/P"
           .venv/bin/python -m experiments.retrieval_ablation.run run --frozen "$RUNNER_TEMP/ablation/frozen" --arm A --output "$RUNNER_TEMP/ablation/A"
           .venv/bin/python -m experiments.retrieval_ablation.review "$RUNNER_TEMP/ablation/P/result.json" "$RUNNER_TEMP/ablation/A/result.json" > "$RUNNER_TEMP/ablation/execution-review.json"
+      - name: Same-path fresh-process repeats of the two open blockers
+        if: always()
+        run: |
+          .venv/bin/python -m experiments.retrieval_ablation.run regressions --base 55637eb4d29a0d06c01714ee647a5b486a5be725 --head HEAD --output "$RUNNER_TEMP/ablation/same-path-repeats" --repeats 2 --timeout 180
       - name: Paired base and head product regressions, including full offline gate
+        if: always()
         run: |
           set +e
           PY="$GITHUB_WORKSPACE/.venv/bin/python"

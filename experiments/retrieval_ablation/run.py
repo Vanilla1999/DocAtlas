@@ -1,7 +1,8 @@
 """One CLI for freezing inputs and running the isolated T00--T04 diagnostic.
 
 Outputs must be outside the checkout. No gold, rubric, model, or packet override
-is accepted. The native arm is not suitable for answer generation.
+is accepted. Only explicit unversioned project snapshots have a validated native packet.
+No semantic or answer evaluation is implied.
 """
 from __future__ import annotations
 
@@ -175,34 +176,97 @@ def _native_fixture(corpus, spec, request, protocol):
                 raise ValueError('fixture project identity is not uniquely bound')
             started = time.perf_counter()
             result = native_diagnostic(store, [request['question'], *request.get('lookup_queries', [])],
-                filters={'project_identity': next(iter(identities))}, sources=documents,
+                filters={'project_identity': next(iter(identities)), 'project_path': str(project),
+                         'source_class': 'project_file', 'doc_scope': 'project'}, sources=documents,
                 raw_limit=protocol['raw_hits'], unique_limit=protocol['unique_candidates'])
             result.update(index=index, seconds=time.perf_counter() - started)
             return result
 
 
-def run_frozen(frozen: Path, output: Path, arm: str) -> dict:
-    if arm not in ('P', 'A'):
-        raise ValueError('only P and diagnostic A are implemented')
-    manifest = verify_frozen(frozen)
-    output = _external_new_directory(output)
-    request = json.loads((frozen / 'request.json').read_bytes())
-    spec = json.loads((frozen / 'source-manifest.json').read_bytes())
-    protocol = json.loads((frozen / 'protocol.json').read_bytes())
+def _execute_arm(corpus, spec, request, protocol, arm):
+    """Worker entry; no private review inputs and no unsandboxed CLI fallback."""
     try:
         if arm == 'P':
             from .adapters import product_probe
-            result = product_probe(frozen / 'corpus', spec, request)
+            result = product_probe(corpus, spec, request)
             result['execution_status'] = result['status']
+        elif arm == 'A':
+            result = _native_fixture(corpus, spec, request, protocol)
         else:
-            result = _native_fixture(frozen / 'corpus', spec, request, protocol)
+            raise ValueError('unknown arm')
     except ModuleNotFoundError as exc:
         result = {'arm': arm, 'execution_status': 'BLOCKED_ENV', 'missing_module': exc.name,
                   'quality_status': 'UNJUDGED'}
     except Exception as exc:
         result = {'arm': arm, 'execution_status': 'HANDLER_FAILED',
-                  'exception_type': type(exc).__name__, 'quality_status': 'UNJUDGED'}
-    # Detect unexpected code/input writes during the run before accepting it.
+                  'exception_type': type(exc).__name__, 'exception': str(exc),
+                  'quality_status': 'UNJUDGED'}
+    return result
+
+
+def stage_worker(app: Path) -> str:
+    """Stage code/runtime resources, never test cases, .git or private review."""
+    app.mkdir()
+    paths = [path for path in (ROOT / 'docmancer').rglob('*')
+             if path.is_file() and '__pycache__' not in path.parts]
+    for directory in ('experiments/retrieval_ablation',):
+        paths.extend(path for path in (ROOT / directory).glob('*.py')
+                     if path.name != 'review.py')
+    paths.extend(ROOT / 'eval/evidence_quality_v2' / name
+                 for name in ('audit.py', 'public_call.py', 'runtime.py', 'observer.py', 'trace.py'))
+    paths.extend(ROOT / 'experiments/language_aware_context' / name
+                 for name in ('baseline_probe.py', 'reference_core.py'))
+    inventory = []
+    for path in sorted(paths):
+        _no_symlinks(path)
+        rel = path.relative_to(ROOT)
+        raw = path.read_bytes()
+        target = app / rel
+        target.parent.mkdir(parents=True, exist_ok=True)
+        target.write_bytes(raw)
+        inventory.append((rel.as_posix(), sha256(raw)))
+    return sha256(_json(inventory))
+
+
+def run_frozen(frozen: Path, output: Path, arm: str) -> dict:
+    if arm not in ('P', 'A'):
+        raise ValueError('only P and A are implemented')
+    from .isolation import IsolationUnavailable, run_isolated
+    manifest = verify_frozen(frozen)
+    output = _external_new_directory(output)
+    with tempfile.TemporaryDirectory(prefix='docatlas-worker-inputs-') as tmp:
+        app, public = Path(tmp) / 'app', Path(tmp) / 'public'
+        code_hash = stage_worker(app)
+        public.mkdir()
+        # Use only the verified allowlist, not a directory copy containing gold.
+        for name in manifest['files']:
+            target = public / name
+            target.parent.mkdir(parents=True, exist_ok=True)
+            target.write_bytes((frozen / name).read_bytes())
+        code = """import json
+from pathlib import Path
+from experiments.retrieval_ablation.run import _execute_arm
+from experiments.language_aware_context.baseline_probe import write_report, environment
+p = Path('/public')
+r = _execute_arm(p/'corpus', json.loads((p/'source-manifest.json').read_bytes()),
+    json.loads((p/'request.json').read_bytes()), json.loads((p/'protocol.json').read_bytes()), ARM)
+r['worker_environment'] = environment()
+write_report(Path('/output/worker-result.json'), r)
+""".replace('ARM', repr(arm))
+        try:
+            completed = run_isolated(code, app=app, public=public, output=output, timeout=180)
+            (output / 'worker.stdout').write_text(completed.stdout)
+            (output / 'worker.stderr').write_text(completed.stderr)
+            if completed.returncode or not (output / 'worker-result.json').is_file():
+                result = {'arm': arm, 'execution_status': 'HANDLER_FAILED',
+                          'worker_returncode': completed.returncode, 'quality_status': 'UNJUDGED'}
+            else:
+                result = json.loads((output / 'worker-result.json').read_bytes())
+            result['isolation'] = {'status': 'ENFORCED', 'kind': 'linux-user-mount-net-pid-v1',
+                                   'staged_code_sha256': code_hash}
+        except IsolationUnavailable as exc:
+            result = {'arm': arm, 'execution_status': 'BLOCKED_ENV', 'quality_status': 'UNJUDGED',
+                      'isolation': {'status': 'BLOCKED', 'reason': str(exc)}}
     verify_frozen(frozen)
     result.update(freeze_sha256=sha256((frozen / 'freeze.json').read_bytes()),
                   panel=manifest['panel'], product_activation=False,
@@ -223,7 +287,20 @@ def main() -> int:
     run.add_argument('--frozen', type=Path, required=True)
     run.add_argument('--output', type=Path, required=True)
     run.add_argument('--arm', choices=['P', 'A'], required=True)
+    regression = commands.add_parser('regressions')
+    regression.add_argument('--base', required=True)
+    regression.add_argument('--head', required=True)
+    regression.add_argument('--output', type=Path, required=True)
+    regression.add_argument('--repeats', type=int, default=2)
+    regression.add_argument('--target-only', action='store_true')
+    regression.add_argument('--timeout', type=int, default=180)
     args = parser.parse_args()
+    if args.command == 'regressions':
+        from .regressions import repeat_pair
+        result = repeat_pair(ROOT, base=args.base, head=args.head, output=args.output, repeats=args.repeats,
+                             full_collection=not args.target_only, timeout=args.timeout)
+        return 0 if result['all_passed'] else 2 if any(
+            r['execution_status'] == 'BLOCKED_ENV' for r in result['records']) else 1
     if args.command == 'freeze':
         freeze_inputs(args.corpus_dir, json.loads(_no_symlinks(args.source_manifest).read_bytes()),
                       json.loads(_no_symlinks(args.request).read_bytes()), args.output)

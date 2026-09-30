@@ -1,4 +1,4 @@
-"""Test-only adapters. Native A is a diagnostic, NOT a model-visible packet.
+"""Test-only adapters. Only explicit unversioned project A can yield a packet.
 
 The real _search_rows frontend produces individual FTS5 lists. This adapter
 changes their exposure limits, not preprocessing, field weights, or BM25.
@@ -87,6 +87,9 @@ class ReadPort:
 
     def __getattr__(self, name):
         return getattr(self.store, name)
+
+    def active_generation_id(self):
+        return self.store._active_generation_id(self.connection)
 
     def _connect(self):
         return ReadConnection(self.connection, self.trace, quota=self.quota,
@@ -182,12 +185,16 @@ def native_diagnostic(store, queries, *, filters, sources, raw_limit=40, unique_
             'SELECT generation_id FROM retrieval_fts_projection_state WHERE singleton = 1').fetchone()
         if projection is None or projection['generation_id'] != generation:
             raise ValueError('active FTS projection mismatch')
+        from .packet import ProjectPacketPort
+        packet_port = (ProjectPacketPort(ReadPort(store, connection, trace), filters=filters, queries=queries)
+                       if ProjectPacketPort.supported(filters) else None)
         schedule = [raw_limit // len(queries) + (i < raw_limit % len(queries)) for i in range(len(queries))]
         for query, quota in zip(queries, schedule):
             if not quota:
                 continue
             start = len(trace.lanes)
-            port = ReadPort(store, connection, trace, quota=Quota(quota), allowed_ids=list(allowed))
+            query_allowed = (packet_port.allowed_ids(allowed, query) if packet_port else list(allowed))
+            port = ReadPort(store, connection, trace, quota=Quota(quota), allowed_ids=query_allowed)
             # Reuse exact query preprocessing, filter compiler, joins, and weights.
             # Deliberately discard the merged return: individual SQL lanes are retained.
             type(store)._search_rows(port, query, quota, filters=compile_backend_filters(filters))
@@ -205,7 +212,7 @@ def native_diagnostic(store, queries, *, filters, sources, raw_limit=40, unique_
                 if len(candidates) < unique_limit:
                     candidates.append({'lane': lane_index, 'rank_in_lane': rank,
                         'stable_chunk_id': identity, 'bm25_cost': row['rank'], 'row': row})
-        return {'arm': 'A', 'execution_status': 'EXECUTED',
+        result = {'arm': 'A', 'execution_status': 'EXECUTED',
             'packet_status': 'BLOCKED_SAFE_PACKET_ADAPTER', 'quality_status': 'UNJUDGED',
             'evaluation_kind': 'native_fts_diagnostic_only', 'model_visible_packet': None,
             'agent_evaluation': 'ANSWER_EVALUATION_NOT_RUN', 'generation_id': generation,
@@ -218,6 +225,10 @@ def native_diagnostic(store, queries, *, filters, sources, raw_limit=40, unique_
             'policy_rejections': rejected, 'search_count': len(trace.lanes),
             'source_text_bytes': sum(len(row['text'].encode('utf-8'))
                 for lane in trace.lanes for row in lane['rows'])}
+        if packet_port is not None:
+            result.update(packet_port.pack(candidates, trace.lanes))
+            result['evaluation_kind'] = 'native_fts_project_whole_child_packet'
+        return result
     finally:
         connection.rollback()
         connection.close()

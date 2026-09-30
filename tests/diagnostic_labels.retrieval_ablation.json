@@ -2,11 +2,17 @@
   "schema_version": 1,
   "module_labels": {
     "tests/docs/test_retrieval_ablation_contract.py": "behavioral",
-    "tests/docs/test_retrieval_ablation_integration.py": "behavioral"
+    "tests/docs/test_retrieval_ablation_integration.py": "behavioral",
+    "tests/docs/test_retrieval_ablation_packet.py": "behavioral",
+    "tests/docs/test_retrieval_ablation_isolation.py": "behavioral",
+    "tests/docs/test_retrieval_ablation_regressions.py": "behavioral"
   },
   "node_overrides": {},
   "module_node_hashes": {
     "tests/docs/test_retrieval_ablation_contract.py": "067099036ddd2fb7711611d64f0dbfedd3f31dc7b31d6a18f9caafc8aff4ed91",
-    "tests/docs/test_retrieval_ablation_integration.py": "3ef629bc9a0e3c0ff8eca2e4fe602a8b3dad761003b98ad8cd1d164c60470f1e"
+    "tests/docs/test_retrieval_ablation_integration.py": "3ef629bc9a0e3c0ff8eca2e4fe602a8b3dad761003b98ad8cd1d164c60470f1e",
+    "tests/docs/test_retrieval_ablation_packet.py": "1d46c18317c3afbb7eaff8dbd5b3ae815a7f3d1259e9ad577217c2fc490897b6",
+    "tests/docs/test_retrieval_ablation_isolation.py": "3c3ae6cd63e99a8a786ed63340da4adc000ee664b77b3fac1a0e7689fd9cec1c",
+    "tests/docs/test_retrieval_ablation_regressions.py": "a104071877b546ac1f2ad8fb18f08bf5d5d4e708ba5d7396a7be801c27010ad5"
   }
 }

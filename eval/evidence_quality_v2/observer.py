@@ -14,7 +14,7 @@ from eval.evidence_quality_v2.trace import bounded_completeness, source_span
 
 
 def observe_call(service: Any, arguments: dict) -> tuple[dict, dict]:
-    import scripts.run_project_docs_self_host_gate as gate
+    from eval.evidence_quality_v2.public_call import _call_with_snapshot
     from docmancer.docs.application import _project_docs_service_part03 as project
     from docmancer.docs.application import docs_context_projection as projection
     from docmancer.docs.interfaces.mcp import context_tools
@@ -82,7 +82,7 @@ def observe_call(service: Any, arguments: dict) -> tuple[dict, dict]:
           patch.object(projection, "_facet_aware_candidates", capture_rank),
           patch.object(projection, "_qualified_fragments", capture_fragments),
           patch.object(projection, "_expand_selected_snippets", capture_expand)):
-        observed, snapshot = gate._call_with_snapshot(arguments, service)
+        observed, snapshot = _call_with_snapshot(arguments, service)
     payload = dict(observed or {})
     bounded = payload.pop("diagnostics", {})
     record = {"schema_version": "evidence-quality-same-call-v2", "stages": stages,

@@ -26,7 +26,16 @@ def summarize(results: list[dict]) -> dict:
                 'EXECUTED', 'BLOCKED_ENV', 'HANDLER_FAILED', 'AUDIT_FAILED'):
             raise ValueError('unknown arm or execution status')
         if arm == 'A' and status == 'EXECUTED':
-            if (result.get('packet_status') != 'BLOCKED_SAFE_PACKET_ADAPTER'
+            if result.get('packet_status') == 'VALIDATED_PROJECT_PACKET':
+                from docmancer.docs.application.model_visible_projection import (
+                    validate_model_visible_projection, docs_context_budget_tokens)
+                packet = result.get('model_visible_packet')
+                errors = validate_model_visible_projection(packet,
+                    snapshot=result.get('packet_snapshot', {}), max_tokens=800)
+                if (errors or result.get('packet_audit_errors') != []
+                        or result.get('packet_budget_tokens') != docs_context_budget_tokens(packet)):
+                    raise ValueError('invalid native project packet artifact')
+            elif (result.get('packet_status') != 'BLOCKED_SAFE_PACKET_ADAPTER'
                     or result.get('model_visible_packet') is not None):
                 raise ValueError('diagnostic candidates are not a public packet')
         if arm == 'P' and status == 'EXECUTED':
