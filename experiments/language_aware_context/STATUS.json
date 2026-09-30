@@ -49,7 +49,7 @@
     "fixture_kind": "project_docs_unversioned",
     "installed_stdio_tested": false
   },
-  "t0": "SOURCE_ACCESS_RESOLVED_LOCAL_ENV_DIFFERS_FROM_FROZEN_CI",
+  "t0": "FULL_SOURCE_AND_FROZEN_CI_ENVIRONMENT_AVAILABLE",
   "t1": "REAL_DEVELOPMENT_HANDLER_EXECUTED_LIVE_AGENT_BASELINE_NOT_RUN",
   "t2": "PROSE_EXTRACTION_PROTOTYPE_TESTED_ACCURACY_NOT_MEASURED",
   "t3": "SNAPSHOT_BOUND_HELPERS_TESTED_PRODUCTION_RESOLVER_NOT_INTEGRATED",
@@ -65,5 +65,29 @@
   "independent_holdout": false,
   "product_profile_delivery": "NOT_IMPLEMENTED",
   "competitor_run": "NOT_RUN",
-  "report": "DEVELOPMENT_REPORT.md"
+  "report": "DEVELOPMENT_REPORT.md",
+  "ci_reproduction": {
+    "status": "SUCCESS",
+    "run_id": 36701177026,
+    "job_id": 109840717597,
+    "commit": "b54faee8780a6babac79a588d96861578079c7f2",
+    "artifact_id": 11090200607,
+    "artifact_sha256": "9bd5ce49e9a8d6dfd6ba2f688f5bc0b065f2d62ebb5e2f3fe965f72c1774440f",
+    "python": "3.12.14",
+    "dependency_install": "uv sync --frozen --extra dev",
+    "tests_passed": 116,
+    "tests_failed": 0,
+    "tests_skipped": 0,
+    "handler_executions": 10,
+    "original_only_complete": 2,
+    "supplied_lookup_complete": 4,
+    "gains": 3,
+    "losses": 1,
+    "max_dto_tokens": 798,
+    "clean_checkout": true,
+    "code_matches_locally_tested_files": true,
+    "independent_replication_dataset": false,
+    "full_repository_ci_claimed_pass": false
+  },
+  "ci_report": "CI_RESULTS.md"
 }
