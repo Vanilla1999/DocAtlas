@@ -54,7 +54,11 @@ def claim_check(result: dict, path: str, clauses: tuple[str, ...]) -> dict:
     if (result.get('status') != 'EXECUTED' or result.get('audit_errors') != []
             or type(budget) is not int or not 0 <= budget <= 800):
         return {'status': 'NOT_EVALUABLE', 'quality_evidence': False}
-    sources = result.get('payload', {}).get('sources')
+    payload = result.get('payload')
+    if not isinstance(payload, dict):
+        return {'status': 'NOT_EVALUABLE', 'quality_evidence': False}
+    # Terminal insufficient packets may legitimately omit the sources field.
+    sources = payload.get('sources', [])
     if not isinstance(sources, list):
         return {'status': 'NOT_EVALUABLE', 'quality_evidence': False}
     quotes = [s['snippet'] for s in sources if isinstance(s, dict)

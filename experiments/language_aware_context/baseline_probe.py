@@ -73,8 +73,19 @@ def validated_request(supplied: dict, project_path: str) -> dict:
                         project_path=project_path, scope='all')
 
 
+def _trace_json_default(value: object) -> list[str]:
+    """Observer requirement-ID sets have no order; encode them deterministically.
+
+    Do not use default=str: that would silently corrupt unknown trace objects.
+    """
+    if isinstance(value, (set, frozenset)) and all(isinstance(item, str) for item in value):
+        return sorted(value)
+    raise TypeError(f'unsupported trace value: {type(value).__name__}')
+
+
 def write_report(path: Path, result: dict) -> None:
-    encoded = json.dumps(result, ensure_ascii=False, indent=2, allow_nan=False) + '\n'
+    encoded = json.dumps(result, ensure_ascii=False, indent=2, allow_nan=False,
+                         default=_trace_json_default) + '\n'
     path.parent.mkdir(parents=True, exist_ok=True)
     with path.open('x', encoding='utf-8') as stream:
         stream.write(encoded)

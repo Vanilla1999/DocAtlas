@@ -40,7 +40,7 @@ jobs:
           python -m pip install uv==0.9.25
           uv sync --frozen --extra dev
       - name: Reference and reporting tests under the real test configuration
-        run: .venv/bin/python -m pytest tests/docs/test_language_aware_context_reference.py tests/docs/test_language_aware_context_probe.py tests/docs/test_language_ci_diagnostic.py tests/docs/test_language_source_profile.py -q
+        run: .venv/bin/python -m pytest tests/docs/test_language_aware_context_reference.py tests/docs/test_language_aware_context_probe.py tests/docs/test_language_ci_diagnostic.py tests/docs/test_language_source_profile.py tests/docs/test_language_trace_serialization.py -q --junitxml="$RUNNER_TEMP/language-evidence/unit-tests.xml"
       - name: Real lexical handler; no model or modified admission
         run: .venv/bin/python -m experiments.language_aware_context.ci_diagnostic --output "$RUNNER_TEMP/language-evidence/probes"
       - name: Upload revision-bound evidence, including failures

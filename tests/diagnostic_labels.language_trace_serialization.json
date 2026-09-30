@@ -1,0 +1,10 @@
+{
+  "schema_version": 1,
+  "module_labels": {
+    "tests/docs/test_language_trace_serialization.py": "serialization"
+  },
+  "node_overrides": {},
+  "module_node_hashes": {
+    "tests/docs/test_language_trace_serialization.py": "e0ad74df249a2e62fa4dd4ac7d54b04b59c920e5bd6cdce35672229db047e86b"
+  }
+}

@@ -55,3 +55,16 @@ def test_empty_or_invalid_labels_are_rejected(clauses):
 def test_keyword_alone_is_not_a_full_fact():
     packet = result([source('Use TimeoutException when configuring the client.')])
     assert claim_check(packet, PATH, CLAUSES)['status'] == 'PARTIAL'
+
+
+def test_valid_terminal_packet_without_sources_is_a_miss():
+    packet = result()
+    packet['payload'] = {'context_available': False}
+    assert claim_check(packet, PATH, CLAUSES)['status'] == 'ABSENT'
+
+
+@pytest.mark.parametrize('payload', [None, [], 'broken'])
+def test_invalid_payload_is_not_evaluable(payload):
+    packet = result()
+    packet['payload'] = payload
+    assert claim_check(packet, PATH, CLAUSES)['status'] == 'NOT_EVALUABLE'
