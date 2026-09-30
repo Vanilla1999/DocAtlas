@@ -157,3 +157,34 @@ def test_changed_runtime_flags_fail_closed(tmp_path, monkeypatch, key, value):
     monkeypatch.setenv(key, value)
     with pytest.raises(ValueError, match='runtime'):
         verify_frozen(output)
+
+
+def test_runtime_freeze_covers_untracked_runtime_modules(tmp_path, monkeypatch):
+    import uuid
+    from experiments.retrieval_ablation.run import ROOT
+    corpus, spec = fixture(tmp_path, monkeypatch)
+    module = ROOT / 'docmancer' / ('_ablation_guard_' + uuid.uuid4().hex + '.py')
+    try:
+        module.write_text('# Initial runtime source.\n')
+        frozen = tmp_path / 'frozen'
+        freeze_inputs(corpus, spec, {'question': 'retry'}, frozen)
+        module.write_text('# Changed runtime source.\n')
+        with pytest.raises(ValueError, match='runtime'):
+            verify_frozen(frozen)
+    finally:
+        module.unlink(missing_ok=True)
+
+
+def test_runtime_source_symlink_cannot_escape_frozen_inventory(tmp_path, monkeypatch):
+    import uuid
+    from experiments.retrieval_ablation.run import ROOT
+    corpus, spec = fixture(tmp_path, monkeypatch)
+    target = tmp_path / 'external.py'
+    target.write_text('# External runtime.\n')
+    module = ROOT / 'docmancer' / ('_ablation_guard_' + uuid.uuid4().hex + '.py')
+    try:
+        module.symlink_to(target)
+        with pytest.raises(ValueError, match='symlink'):
+            freeze_inputs(corpus, spec, {'question': 'retry'}, tmp_path / 'frozen')
+    finally:
+        module.unlink(missing_ok=True)

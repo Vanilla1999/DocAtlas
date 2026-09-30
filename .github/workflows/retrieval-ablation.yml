@@ -35,44 +35,81 @@ jobs:
           uv sync --frozen --extra dev
           uv pip freeze > "$RUNNER_TEMP/ablation/packages.txt"
           sha256sum uv.lock > "$RUNNER_TEMP/ablation/lock.sha256"
-      - name: Real native, freeze and public handler guards
+      - name: Real native, packet, structural and handler guards
         run: |
           set -o pipefail
-          .venv/bin/python -m pytest tests/docs/test_retrieval_ablation_contract.py tests/docs/test_retrieval_ablation_integration.py tests/test_sqlite_ranking_truth.py tests/test_sqlite_phrase_ranking.py -q --junitxml="$RUNNER_TEMP/ablation/guards.xml" 2>&1 | tee "$RUNNER_TEMP/ablation/guards.log"
-      - name: Freeze one synthetic mechanism fixture and execute P and diagnostic A
+          .venv/bin/python -m pytest tests/docs/test_retrieval_ablation_*.py tests/test_sqlite_ranking_truth.py tests/test_sqlite_phrase_ranking.py -q --junitxml="$RUNNER_TEMP/ablation/guards.xml" 2>&1 | tee "$RUNNER_TEMP/ablation/guards.log"
+      - name: Freeze four synthetic mechanisms before executing P A B D and gate
         run: |
           .venv/bin/python - <<'PYCODE'
           import hashlib, json, os
           from pathlib import Path
+          from experiments.retrieval_ablation.run import freeze_inputs
           root = Path(os.environ['RUNNER_TEMP']) / 'ablation'
-          corpus = root / 'input'
-          corpus.mkdir()
-          raw = b'# Retry\n\nThe retry budget is three attempts. Do not retry cancellation.\n'
-          (corpus / 'retry.md').write_bytes(raw)
-          (root / 'sources.json').write_text(json.dumps({'schema_version': 1, 'sources': [{'path': 'retry.md', 'sha256': hashlib.sha256(raw).hexdigest()}]}))
-          (root / 'request.json').write_text(json.dumps({'question': 'What is the retry budget?'}))
+          for case, owner, reverse in [('original', 'Alpha', False), ('renamed', 'Zeta', False), ('reordered', 'Alpha', True), ('renamed-reordered', 'Zeta', True)]:
+              base = root / case
+              corpus = base / 'input'
+              corpus.mkdir(parents=True)
+              target = owner + '.wait\n------------\n\n' + owner + '.wait has a retry budget. ' + 'The operation has a documented lifecycle. ' * 12 + '\n\nDo not restart cancelled work.\n'
+              other = 'Beta.wait\n---------\n\nAlways restart cancelled work.\n'
+              raw = ('\n'.join([other, target] if reverse else [target, other])).encode()
+              (corpus / 'methods.md').write_bytes(raw)
+              spec = {'schema_version': 1, 'sources': [{'path': 'methods.md', 'sha256': hashlib.sha256(raw).hexdigest()}]}
+              freeze_inputs(corpus, spec, {'question': owner + '.wait retry budget'}, base / 'frozen')
           PYCODE
-          .venv/bin/python -m experiments.retrieval_ablation.run freeze --corpus-dir "$RUNNER_TEMP/ablation/input" --source-manifest "$RUNNER_TEMP/ablation/sources.json" --request "$RUNNER_TEMP/ablation/request.json" --output "$RUNNER_TEMP/ablation/frozen"
-          .venv/bin/python -m experiments.retrieval_ablation.run run --frozen "$RUNNER_TEMP/ablation/frozen" --arm P --output "$RUNNER_TEMP/ablation/P"
-          .venv/bin/python -m experiments.retrieval_ablation.run run --frozen "$RUNNER_TEMP/ablation/frozen" --arm A --output "$RUNNER_TEMP/ablation/A"
-          .venv/bin/python -m experiments.retrieval_ablation.review "$RUNNER_TEMP/ablation/P/result.json" "$RUNNER_TEMP/ablation/A/result.json" > "$RUNNER_TEMP/ablation/execution-review.json"
-      - name: Paired base and head product regressions, including full offline gate
+          for case in original renamed reordered renamed-reordered; do
+            .venv/bin/python -m experiments.retrieval_ablation.run matrix --frozen "$RUNNER_TEMP/ablation/$case/frozen" --output "$RUNNER_TEMP/ablation/$case/results"
+            .venv/bin/python -m experiments.retrieval_ablation.review "$RUNNER_TEMP/ablation/$case/results/"*/result.json > "$RUNNER_TEMP/ablation/$case/review.json"
+          done
+      - name: Same-call budget observer for historical path investigation
+        run: |
+          cat > "$RUNNER_TEMP/ablation/path_observer.py" <<'PYCODE'
+          import json, os
+          from copy import deepcopy
+          from pathlib import Path
+          calls, current, original = [], None, None
+          def pytest_runtest_setup(item):
+              global current
+              current = item.nodeid
+          def pytest_sessionstart(session):
+              global original
+              from docmancer.docs.application import source_continuation as module
+              original = module.docs_context_budget_tokens
+              def cost(payload):
+                  value = original(payload)
+                  if payload.get('read_next'):
+                      calls.append({'test': current, 'tokens': value, 'payload': deepcopy(payload)})
+                  return value
+              module.docs_context_budget_tokens = cost
+          def pytest_sessionfinish(session, exitstatus):
+              from docmancer.docs.application import source_continuation as module
+              module.docs_context_budget_tokens = original
+              Path(os.environ['PATH_TRACE']).write_text(json.dumps({'exitstatus': int(exitstatus), 'calls': calls}, ensure_ascii=False, indent=2))
+          PYCODE
+      - name: Matched physical checkout and fixture paths for base and head
         run: |
           set +e
           PY="$GITHUB_WORKSPACE/.venv/bin/python"
-          git worktree add --detach "$RUNNER_TEMP/ablation-base" 55637eb4d29a0d06c01714ee647a5b486a5be725
-          setup=$?
-          test "$setup" -eq 0 || exit "$setup"
-          (cd "$RUNNER_TEMP/ablation-base" && "$PY" -m experiments.language_aware_context.flow_regressions --condition baseline --junit "$RUNNER_TEMP/ablation/focused-base.xml") > "$RUNNER_TEMP/ablation/focused-base.log" 2>&1
-          focused_base=$?
-          "$PY" -m experiments.language_aware_context.flow_regressions --condition baseline --junit "$RUNNER_TEMP/ablation/focused-head.xml" > "$RUNNER_TEMP/ablation/focused-head.log" 2>&1
-          focused_head=$?
-          (cd "$RUNNER_TEMP/ablation-base" && "$PY" -m pytest tests/ -m 'not advanced and not live and not live_network' -q --junitxml="$RUNNER_TEMP/ablation/offline-base.xml") > "$RUNNER_TEMP/ablation/offline-base.log" 2>&1
-          offline_base=$?
-          "$PY" -m pytest tests/ -m 'not advanced and not live and not live_network' -q --junitxml="$RUNNER_TEMP/ablation/offline-head.xml" > "$RUNNER_TEMP/ablation/offline-head.log" 2>&1
-          offline_head=$?
-          printf '{"focused_base":%s,"focused_head":%s,"offline_base":%s,"offline_head":%s}\n' "$focused_base" "$focused_head" "$offline_base" "$offline_head" > "$RUNNER_TEMP/ablation/exits.json"
-          test "$focused_base" -eq 0 && test "$focused_head" -eq 0 && test "$offline_base" -eq 0 && test "$offline_head" -eq 0
+          PAIR="$RUNNER_TEMP/ablation-paired"
+          HEAD=$(git rev-parse HEAD)
+          mkdir -p /tmp/pytest-of-runner
+          git clone --shared --no-checkout "$GITHUB_WORKSPACE" "$PAIR" || exit $?
+          for side in base head; do
+            REV=55637eb4d29a0d06c01714ee647a5b486a5be725
+            if [ "$side" = head ]; then REV="$HEAD"; fi
+            git -C "$PAIR" checkout --detach "$REV" || exit $?
+            for path in 3 4; do
+              (cd "$PAIR" && PYTHONPATH="$RUNNER_TEMP/ablation:$PAIR" PATH_TRACE="$RUNNER_TEMP/ablation/path-$side-$path.json" "$PY" -m pytest -p path_observer tests/docs/test_context_completion_followup.py::test_priority_rule_available_in_first_packet_or_one_registered_read tests/docs/test_contiguous_seed_envelope.py::test_old_inspection_uri_survives_replacement_of_unissued_draft_locators --basetemp="/tmp/pytest-of-runner/pytest-$path" -q --junitxml="$RUNNER_TEMP/ablation/path-$side-$path.xml") > "$RUNNER_TEMP/ablation/path-$side-$path.log" 2>&1
+              echo "$?" > "$RUNNER_TEMP/ablation/path-$side-$path.exit"
+            done
+            (cd "$PAIR" && PYTEST_ADDOPTS='--basetemp=/tmp/docatlas-ablation-focused' "$PY" -m experiments.language_aware_context.flow_regressions --condition baseline --junit "$RUNNER_TEMP/ablation/focused-$side.xml") > "$RUNNER_TEMP/ablation/focused-$side.log" 2>&1
+            echo "$?" > "$RUNNER_TEMP/ablation/focused-$side.exit"
+            (cd "$PAIR" && "$PY" -m pytest tests/ -m 'not advanced and not live and not live_network' --basetemp=/tmp/docatlas-ablation-offline -q --junitxml="$RUNNER_TEMP/ablation/offline-$side.xml") > "$RUNNER_TEMP/ablation/offline-$side.log" 2>&1
+            echo "$?" > "$RUNNER_TEMP/ablation/offline-$side.exit"
+          done
+          # Preserve red gates, even when base has known failures. Path replays
+          # are diagnostic and their nonzero statuses remain separate artifacts.
+          test "$(cat "$RUNNER_TEMP/ablation/focused-base.exit")" -eq 0 && test "$(cat "$RUNNER_TEMP/ablation/focused-head.exit")" -eq 0 && test "$(cat "$RUNNER_TEMP/ablation/offline-base.exit")" -eq 0 && test "$(cat "$RUNNER_TEMP/ablation/offline-head.exit")" -eq 0
       - name: Preserve source and verify no tracked writes
         if: always()
         run: |

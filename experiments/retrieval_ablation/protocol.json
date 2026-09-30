@@ -1,8 +1,14 @@
 {
-  "schema_version": 1,
+  "schema_version": 2,
   "state": "UNFROZEN",
-  "scope": "project_markdown_development",
-  "arms": ["P", "A"],
+  "scope": "current_unversioned_project_markdown_development",
+  "arms": [
+    "P",
+    "A",
+    "B",
+    "D_L",
+    "E_G_L"
+  ],
   "raw_hits": 40,
   "unique_candidates": 20,
   "dto_tokens": 800,
@@ -10,8 +16,30 @@
   "max_sections_per_source": 2,
   "query_schedule": "equal-per-probe; remainder to earlier probes; AND consumes before OR; no refill",
   "merge": "probe-order / AND-before-OR / first stable identity",
-  "representation": "current-valid-markdown-with-existing-context-prefix",
+  "representation": {
+    "A": "current-valid-markdown-with-existing-context-prefix",
+    "B": "commonmark-source-structure-v1; original chunk config and prefix"
+  },
   "quality_status": "UNJUDGED",
   "independent_holdout": false,
-  "agent_evaluation": "ANSWER_EVALUATION_NOT_RUN"
+  "agent_evaluation": "ANSWER_EVALUATION_NOT_RUN",
+  "assembly": {
+    "source": "saved native B pool",
+    "same_physical_A_B_fixture_path": true,
+    "neighbors_before": 1,
+    "neighbors_after": 1,
+    "required_heading": "separate citation when disjoint",
+    "atomic_overflow": "omit entire bundle; no clipping",
+    "ownerless": "unchanged admissible seed; not credited as assembly"
+  },
+  "relevance_gate": "actual qualify_evidence on identical D_L body input; source-bound headings retained as non-factual dependencies",
+  "gold_isolation": "NOT_IMPLEMENTED_DEVELOPMENT_ONLY",
+  "packet_contract": "source-bound-project-v1",
+  "unsupported": [
+    "HTML ingestion",
+    "RST ingestion",
+    "legacy ordering package E_GR_L",
+    "dense/hybrid",
+    "independent gold/answer evaluation"
+  ]
 }
