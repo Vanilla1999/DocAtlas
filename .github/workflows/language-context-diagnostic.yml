@@ -1,0 +1,51 @@
+name: Language context diagnostic
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'experiments/language_aware_context/**'
+      - 'tests/docs/test_language_*.py'
+      - 'tests/diagnostic_labels.language*.json'
+      - '.github/workflows/language-context-diagnostic.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: language-context-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+jobs:
+  development-probe:
+    if: github.event_name == 'workflow_dispatch' || github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      DOCATLAS_OFFLINE: '1'
+      DOCATLAS_AUTO_VECTORS: '0'
+      DOCATLAS_REGISTRY_API_URL: 'http://127.0.0.1:1'
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          persist-credentials: false
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1
+        with:
+          python-version: '3.12'
+      - name: Preserve exact tracked source snapshot
+        run: |
+          mkdir -p "$RUNNER_TEMP/language-evidence"
+          git rev-parse HEAD > "$RUNNER_TEMP/language-evidence/source-head.txt"
+          git archive --format=tar.gz HEAD > "$RUNNER_TEMP/language-evidence/source.tar.gz"
+      - name: Install the checkout for a development probe
+        run: python -m pip install -e '.[dev]'
+      - name: Reference and reporting tests under the real test configuration
+        run: python -m pytest tests/docs/test_language_aware_context_reference.py tests/docs/test_language_baseline_probe.py tests/docs/test_language_ci_diagnostic.py -q
+      - name: Real lexical handler; no model or modified admission
+        run: python -m experiments.language_aware_context.ci_diagnostic --output "$RUNNER_TEMP/language-evidence/probes"
+      - name: Upload revision-bound evidence, including failures
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: language-context-${{ github.event.pull_request.head.sha || github.sha }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/language-evidence/
+          retention-days: 7
+          if-no-files-found: error
