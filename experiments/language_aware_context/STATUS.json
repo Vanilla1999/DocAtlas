@@ -89,5 +89,69 @@
     "independent_replication_dataset": false,
     "full_repository_ci_claimed_pass": false
   },
-  "ci_report": "CI_RESULTS.md"
+  "ci_report": "CI_RESULTS.md",
+  "latest_followup_report": "PACKING_REPORT.md",
+  "historical_validation_note": "validation, actual_handler_attempt and ci_reproduction above describe the preceding b54/111 milestone; current packing results are in packing_followup.",
+  "packing_followup": {
+    "status": "DEVELOPMENT_REPAIR_REPRODUCED_CI_SHARED_REGRESSION_FAILURE",
+    "code_commit": "75cc12cdfb631bdffd59a3f155dba08fc4a6be5c",
+    "parent_commit": "111e1047c53846210523806394f0fa97c232ae1e",
+    "intervention": "single-host-original-protection-v1-development",
+    "activation": "explicit_sequential_process_local_only",
+    "production_files_changed": false,
+    "same_prepared_input_replay": "PASS",
+    "tdd_seed_0": {
+      "before": {
+        "passed": 9,
+        "failed": 2
+      },
+      "after": {
+        "passed": 11,
+        "failed": 0
+      }
+    },
+    "initial_unseeded_red": {
+      "passed": 10,
+      "failed": 1
+    },
+    "local_experiment_tests_passed": 131,
+    "ci_run_id": 36703938018,
+    "ci_job_id": 109849611300,
+    "ci_conclusion": "failure",
+    "ci_artifact_id": 11091019291,
+    "ci_artifact_sha256": "68a665dd104e73c2d48f50f277cbcab8952206253ee17664bd48567b31b17745",
+    "ci_python": "3.12.14",
+    "python_hash_seed": "0",
+    "ci_experiment_tests": {
+      "passed": 131,
+      "failed": 0,
+      "skipped": 0
+    },
+    "ci_paired_handler_executions": 20,
+    "manual_lookup_complete_claims": {
+      "baseline": 4,
+      "candidate": 5,
+      "viewed_questions": 5,
+      "losses": 0
+    },
+    "original_only_outcomes_unchanged": true,
+    "canonical_audit_errors": 0,
+    "ci_max_dto_tokens": 798,
+    "focused_regressions_both_local_and_ci": {
+      "cases_per_condition": 483,
+      "baseline_passed": 482,
+      "baseline_failed": 1,
+      "candidate_passed": 482,
+      "candidate_failed": 1,
+      "same_ids_and_statuses": true,
+      "new_failures": 0,
+      "shared_failing_test": "test_frozen_request_flow_prefers_project_context_module_witnesses",
+      "unmet_obligation": "flow_mcp"
+    },
+    "full_regression_gate_pass": false,
+    "independent_holdout": false,
+    "live_agent_answers": 0,
+    "product_activation": false,
+    "report": "PACKING_REPORT.md"
+  }
 }
