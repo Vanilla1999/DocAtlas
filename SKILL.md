@@ -157,6 +157,8 @@ A later query may use a discovered bridge value only with its returned source re
 
 ## Common Mistakes
 
+Before answering, check every requested fact, condition and comparison side against the final visible evidence. Retrieval success, keywords and source titles alone are not proof. Accept explicit logical implications and ignore incidental Markdown formatting; do not demand details the question did not ask for. Cite supported claims, name missing facts in partial answers, and abstain when needed. Do not fill gaps from memory, infer a negative from missing evidence, grant answer/edit authority or extend follow-up budgets.
+
 - Do not use `doc-atlas add` for new local files. Use `doc-atlas ingest <path>`.
 - Do not use `doc-atlas ingest` for URLs. Use `doc-atlas add <url>`.
 - Do not mix the legacy CLI list/query loop into an MCP-enabled coding task.

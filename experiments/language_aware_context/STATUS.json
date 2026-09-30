@@ -1,17 +1,20 @@
 {
-  "status": "DRAFT_FLOW_REPAIR_VERIFIED_PILOT_NO_BENEFIT_DEMONSTRATED",
+  "status": "DRAFT_FLOW_REPAIR_STRONG_PROFILE_SIGNAL_SKILL_SMOKE",
   "base_branch": "main",
   "base_revision": "58c7f37c2a5ef686bcd6562abbade91ba94e347a",
   "old_task44_branch_imported": false,
   "production_activation": false,
   "merge_performed": false,
   "default_runtime_modified": false,
+  "installed_skill_templates_modified": true,
   "frozen_v3_and_p0_unchanged": true,
   "checked_model_code_revision": "767faefef295cfdaa1931f3f9497150f003a7f8b",
   "checked_flow_regression_revision": "16b00f9265d8ba96567c83c94bf6f42b216e2f05",
   "reports": {
     "flow": "FLOW_REPORT.md",
-    "live_pilot": "LIVE_PILOT_REPORT.md"
+    "live_pilot": "LIVE_PILOT_REPORT.md",
+    "strong_pilot": "STRONG_MODEL_REPORT.md",
+    "skill_smoke": "skill_smoke/README.md"
   },
   "historical_reports": [
     "DEVELOPMENT_REPORT.md",

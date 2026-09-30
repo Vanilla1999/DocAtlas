@@ -7,6 +7,9 @@ on:
       - 'experiments/language_aware_context/flow_experiment.py'
       - 'experiments/language_aware_context/flow_regressions.py'
       - 'experiments/language_aware_context/pilot_review.py'
+      - 'experiments/language_aware_context/skill_smoke_run.py'
+      - 'experiments/language_aware_context/skill_smoke/**'
+      - 'docmancer/templates/*skill.md'
       - 'tests/docs/test_language_pilot_review.py'
       - 'tests/docs/test_language_flow_experiment.py'
       - '.github/workflows/language-flow-diagnostic.yml'
@@ -44,6 +47,8 @@ jobs:
           .venv/bin/python -m pytest tests/docs/test_language_flow_experiment.py tests/docs/test_language_pilot_review.py -q --junitxml="$RUNNER_TEMP/flow-evidence/unit.xml"
       - name: Observe unchanged frozen case
         run: .venv/bin/python -m experiments.language_aware_context.flow_probe --output "$RUNNER_TEMP/flow-evidence/trace"
+      - name: Replay viewed skill smoke packets and retain raw traces
+        run: .venv/bin/python -m experiments.language_aware_context.skill_smoke_run --output "$RUNNER_TEMP/flow-evidence/skill-smoke"
       - name: Paired unchanged regressions with baseline and flow ordering
         run: |
           set +e

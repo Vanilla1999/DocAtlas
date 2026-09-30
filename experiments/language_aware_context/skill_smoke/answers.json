@@ -1,0 +1,30 @@
+{
+  "author": "openai/gpt-6-astra in the current interactive session",
+  "generation_method": "Actual answers authored after reading the frozen final packets, before inspecting full source bytes for grading. Not an isolated or independently blinded model call.",
+  "answers": [
+    {
+      "id": "fresh-01",
+      "text": "Нет, они отличаются. Path.absolute() делает путь абсолютным без нормализации, то есть не устраняет .., и не разрешает символические ссылки [S1]. Path.resolve() разрешает символические ссылки и устраняет компоненты .. [S2].",
+      "evidence_assessment": "sufficient",
+      "citations": ["S1", "S2"]
+    },
+    {
+      "id": "fresh-02",
+      "text": "Да: при таймауте ожидаемый aw отменяется, а wait_for ждёт завершения этой отмены [S1]. Следовательно, указанный timeout не является жёстким пределом общего времени ожидания: после его наступления может потребоваться время на отмену [S1].",
+      "evidence_assessment": "sufficient",
+      "citations": ["S1"]
+    },
+    {
+      "id": "fresh-03",
+      "text": "Полностью ответить по этому пакету нельзя: поведение shield(task) в нём не описано. Есть только общее правило: при отмене задачи в ней при следующей возможности возникает asyncio.CancelledError [S2]. Применение этого правила к ожидающей coroutine и судьба защищённой task здесь прямо не разобраны, поэтому утверждать оба результата не буду.",
+      "evidence_assessment": "partial",
+      "citations": ["S2"]
+    },
+    {
+      "id": "fresh-04",
+      "text": "В предоставленном пакете нет гарантированного максимального времени в миллисекундах. По этим фрагментам назвать такую величину нельзя; это не утверждение об отсутствии гарантии во всей документации.",
+      "evidence_assessment": "insufficient",
+      "citations": []
+    }
+  ]
+}

@@ -63,9 +63,21 @@ assertion. Without changing the frozen task, semantically sufficient packets are
 | B | **5** | 1 |
 | E | 4 | 1 |
 
-Using only the public final evidence packets, GPT-5.6 Sol can answer every one of
-those sufficient cases correctly with evidence IDs and abstains on the single
-unanswerable case. This answer review is same-researcher, not blind.
+These are the original same-researcher semantic judgments, not independently
+verified answer scores. The committed runner performs no LLM inference and its
+CI artifact is explicitly `EXECUTED_NOT_ANSWER_SCORED`: it saves packets, not
+GPT-5.6 Sol answer generations. The abstention column describes the reviewer's
+judgment of appropriate behavior, not an observed saved answerer response.
+
+An audit found a rubric-sensitive case, `sol-02`: its visible paragraph describes
+side effects versus derived values but does not explicitly recommend a watcher.
+If section context is accepted, the original O/A/B/E totals are 3/4/5/4; requiring
+the recommendation in visible prose gives 3/3/4/3. These are sensitivity readings
+of viewed packets, not a retuned holdout. `sol-01-B` explicitly contrasts methods
+with computed caching and is sufficient for its actual question; demanding an
+additional statement about every re-render would add an unasked obligation.
+Both readings preserve a one-question A-to-B gain. Freeze the rubric before any
+new evaluation and keep evidence sufficiency separate from generated answers.
 
 ## Where the profile helped
 
@@ -95,15 +107,18 @@ Thus the strong-model result is not “profile always helps”. It is:
 - generic bilingual stuffing is not equivalent to a targeted source-language
   query.
 
-## Remaining failures are not planner-language failures
+## Remaining failures: location not established by final packets
 
-- The mixed Vue caching question retrieves `watchEffect` material instead of the
-  Russian computed-caching section in all conditions. This is ranking/scope
-  competition after a reasonable query.
-- Both Django questions fail in all conditions even with precise English queries.
-  The relevant text exists in the source but the final packet is filled by other
-  `select_related`/JOIN fragments. This is a retrieval/chunking/packing problem,
-  not a translation problem.
+- The mixed Vue caching question delivers `watchEffect` material instead of the
+  Russian computed-caching section in all conditions. Ranking/scope competition
+  is a hypothesis, not a traced first-loss boundary.
+- Both Django questions fail in all conditions even with reasonable English
+  queries. The relevant text exists in the source but the final packet contains
+  other `select_related`/JOIN fragments. The runner used for the reported CI did
+  not retain the observed raw handler trace, so that artifact cannot distinguish retrieval,
+  qualification, ranking and packing losses or rule out a better query.
+  The audit follow-up now saves `*-raw.json` for future runs; it does not
+  retroactively establish the historical first-loss boundary.
 - The Kotlin timeout case exposed a flaw in the experiment's string matcher, not
   in DocAtlas retrieval or in the answerer.
 
@@ -123,7 +138,7 @@ The next product-relevant work should focus on two things separately:
 1. define a robust contract for planner query preservation and source-language
    hint delivery, then evaluate it with the actual target coding-agent;
 2. fix/measure retrieval and packing for cases like Django and mixed-source Vue,
-   because a perfect translation alone does not solve them.
+   using candidate-level traces before attributing a cause.
 
 Keep the profile optional/hint-only until a larger independently reviewed
 A/B/E dataset demonstrates a repeatable gain.

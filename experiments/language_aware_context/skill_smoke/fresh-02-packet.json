@@ -1,0 +1,15 @@
+{
+  "question": "В Python 3.13 asyncio.wait_for() при таймауте отменяет ожидаемую задачу? Может ли общее ожидание превысить указанный timeout?",
+  "evidence": [
+    {
+      "id": "S1",
+      "path": "docs/asyncio.md",
+      "text": "async def main():\n           # Wait for at most 1 second\n           try:\n               await asyncio.wait_for(eternity(), timeout=1.0)\n           except TimeoutError:\n               print('timeout!')\n\n       asyncio.run(main())\n\n       # Expected output:\n       #\n       #     timeout!\n\n   .. versionchanged:: 3.7\n      When *aw* is cancelled due to a timeout, ``wait_for`` waits\n      for *aw* to be cancelled.  Previously, it raised\n      :exc:`TimeoutError` immediately."
+    },
+    {
+      "id": "S2",
+      "path": "docs/asyncio.md",
+      "text": "During asynchronous iteration, implicitly-created tasks will be yielded for\n   supplied awaitables that aren't tasks or futures.\n\n   When used as a plain iterator, each iteration yields a new coroutine that\n   returns the result or raises the exception of the next completed awaitable.\n   This pattern is compatible with Python versions older than 3.13::"
+    }
+  ]
+}

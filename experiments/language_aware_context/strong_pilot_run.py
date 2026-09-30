@@ -37,6 +37,9 @@ def main() -> int:
         for cond in protocol["conditions"]:
             queries=[] if cond=="O" else [task["plans"][cond]]
             observed=run(scope["root"],scope["spec"],{"question":task["question"],"lookup_queries":queries})
+            # Retain actual objects and the whole trace, not just success events
+            # or final blocks: first-loss attribution needs projector inputs.
+            write_report(out/f'{task["id"]}-{cond}-raw.json',observed)
             if observed["status"]!="EXECUTED":
                 write_report(out/f'{task["id"]}-{cond}-error.json',observed)
                 raise RuntimeError("handler/audit failed")

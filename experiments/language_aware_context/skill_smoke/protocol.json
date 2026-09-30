@@ -1,0 +1,24 @@
+{
+  "purpose": "Four fresh questions testing evidence completeness and evidence-only answering with the strengthened skill; not a language-profile A/B test or independent holdout",
+  "planner_answerer": "openai/gpt-6-astra, current interactive session, same author and reviewer; no independent judge or pinned inference replay",
+  "source_commit": "60403a5409ff2c3f3b07dd2ca91a7a3e096839c7",
+  "source_repository": "python/cpython",
+  "source_version": "3.13.0",
+  "sources": {"pathlib": "Doc/library/pathlib.rst", "asyncio": "Doc/library/asyncio-task.rst"},
+  "source_handling": "Original RST bytes stored under .md names to use the existing probe. No text conversion, pruning or oracle expansion. This ingestion limitation is part of the measured fixture.",
+  "retrieval": "PR HEAD baseline_probe.run, lexical, one frozen lookup per question, 800 DTO tokens, at most 3 sources and 2 sections/source, PYTHONHASHSEED=0; no retries or query edits after results",
+  "rubric": {
+    "sufficient": "Every listed obligation is supported semantically by visible evidence. Explicit logical implications count; verbatim phrasing is not required. Paths or titles alone cannot supply a missing relation. Do not demand details absent from the question.",
+    "partial": "At least one but not all obligations supported. Answer the supported part and state the missing part.",
+    "insufficient": "No requested behavior supported. Abstain without asserting the opposite.",
+    "answer_checks": ["factual correctness against visible evidence", "unsupported claims", "citation supports associated claim", "explicit uncertainty for missing obligations"],
+    "separate_denominators": "Evidence sufficiency, grounded answer correctness, citations and abstention reported separately. Handler errors are blockers, not retrieval misses. No hypothetical answer scores.",
+    "scope": "Skill-guided smoke test only; no claim of improvement without skill-off control. All prompts, source hashes, raw traces, packets and actual authored answers retained."
+  },
+  "tasks": [
+    {"id":"fresh-01", "scope":"pathlib", "question":"В Python 3.13 чем Path.absolute() отличается от Path.resolve(): устраняют ли оба .. и разрешают ли оба символические ссылки?", "lookup":"Python pathlib Path.absolute Path.resolve normalize eliminate .. resolve symlinks", "obligations":["absolute: treatment of ..", "absolute: treatment of symbolic links", "resolve: treatment of ..", "resolve: treatment of symbolic links"]},
+    {"id":"fresh-02", "scope":"asyncio", "question":"В Python 3.13 asyncio.wait_for() при таймауте отменяет ожидаемую задачу? Может ли общее ожидание превысить указанный timeout?", "lookup":"Python asyncio.wait_for timeout task cancelled wait cancellation total wait time exceed timeout", "obligations":["whether timeout cancels awaited task", "whether total elapsed waiting may exceed timeout and why"]},
+    {"id":"fresh-03", "scope":"asyncio", "question":"В Python 3.13 если отменить coroutine, ожидающую asyncio.shield(task), отменится ли сама task и получит ли ожидающая coroutine CancelledError?", "lookup":"Python asyncio.shield caller coroutine cancelled task cancellation await raises CancelledError", "obligations":["effect of caller cancellation on shielded task", "effect on caller awaiting shield, including CancelledError"]},
+    {"id":"fresh-04", "scope":"asyncio", "question":"Какую максимальную задержку в миллисекундах Python 3.13 гарантирует между вызовом Task.cancel() и остановкой coroutine на любой операционной системе?", "lookup":"Python asyncio Task.cancel guaranteed maximum cancellation latency milliseconds all operating systems", "obligations":["explicit universal numeric upper latency bound and its guarantee; if absent, do not invent a number or claim global nonexistence"]}
+  ]
+}
