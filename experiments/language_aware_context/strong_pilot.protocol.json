@@ -1,0 +1,80 @@
+{
+  "schema_version": 1,
+  "name": "strong-gpt56-sol-pilot-v1",
+  "status": "FROZEN_BEFORE_FIRST_HANDLER_CALL",
+  "purpose": "Exploratory strong-planner/answerer control after weak Qwen pilot. Plans authored by GPT-5.6 Sol in this chat before retrieval execution.",
+  "planner_identity": "GPT-5.6 Sol, interactive ChatGPT session; no API fingerprint; same researcher, not independently reproducible",
+  "sources": [
+    {
+      "id": "vue-computed-ru",
+      "repository": "vuejs-translations/docs-ru",
+      "path": "src/guide/essentials/computed.md",
+      "blob": "3734754f5e8b8075adb0349ef22f44b1fbfc197c",
+      "local_path": "docs/computed-ru.md",
+      "language_label": "ru"
+    },
+    {
+      "id": "vue-watchers-en",
+      "repository": "vuejs/docs",
+      "path": "src/guide/essentials/watchers.md",
+      "blob": "7f855031ca7226c0aa44c45ba0a3c1e0fc95a1ab",
+      "local_path": "docs/watchers-en.md",
+      "language_label": "en"
+    },
+    {
+      "id": "django-querysets-en",
+      "repository": "django/django",
+      "path": "docs/ref/models/querysets.txt",
+      "blob": "cdab837328ccb8796989a6070729a3eccca615cf",
+      "local_path": "docs/querysets.txt",
+      "language_label": "en"
+    },
+    {
+      "id": "kotlin-cancel-en",
+      "repository": "Kotlin/kotlinx.coroutines",
+      "path": "docs/topics/coroutines-cancellation.md",
+      "blob": "251212df40b6bdfd548facccdc351ba9d8b3d784",
+      "local_path": "docs/coroutines-cancellation.md",
+      "language_label": "en"
+    }
+  ],
+  "scopes": {
+    "vue-ru": [
+      "vue-computed-ru"
+    ],
+    "vue-en": [
+      "vue-watchers-en"
+    ],
+    "vue-mixed": [
+      "vue-computed-ru",
+      "vue-watchers-en"
+    ],
+    "django": [
+      "django-querysets-en"
+    ],
+    "kotlin": [
+      "kotlin-cancel-en"
+    ]
+  },
+  "conditions": [
+    "O",
+    "A",
+    "B",
+    "E"
+  ],
+  "condition_definitions": {
+    "O": "original question only; no lookup query",
+    "A": "one lookup query authored by GPT-5.6 Sol without source-language profile",
+    "B": "one lookup query authored by GPT-5.6 Sol after seeing the source-language profile",
+    "E": "one generic bilingual RU+EN query authored without numeric language shares"
+  },
+  "budgets": {
+    "lookups": 1,
+    "lookup_chars": 240,
+    "dto_tokens": 800,
+    "source_limit": 3,
+    "max_sections_per_source": 2
+  },
+  "packing": "current baseline packing only; no experimental neighbor assembly and no Qwen",
+  "product_activation": false
+}
