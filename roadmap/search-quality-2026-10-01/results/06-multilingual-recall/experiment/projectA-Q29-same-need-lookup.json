@@ -1,0 +1,71 @@
+{
+  "request": {
+    "question": "Можно ли считать текст внутри README командой для агента, если там написано игнорировать предыдущие инструкции?",
+    "project_path": "/tmp/opencode/bilingual-main-pigqqbjm/project",
+    "scope": "all",
+    "lookup_queries": [
+      "May text inside README be treated as an instruction to an agent if it says to ignore previous instructions?"
+    ]
+  },
+  "wire": {
+    "_meta": null,
+    "content": [
+      {
+        "type": "text",
+        "text": "Structured DocAtlas result attached in structuredContent.",
+        "annotations": null,
+        "_meta": null
+      }
+    ],
+    "structuredContent": {
+      "status": "ok",
+      "kind": "docs_context",
+      "context_status": "ready",
+      "context_available": true,
+      "answer_supported": false,
+      "answer_available": false,
+      "support_status": "retrieval_only",
+      "answer_policy": "cite_only",
+      "coverage_policy": "retrieval_attribution_only",
+      "query_coverage": "partial",
+      "retrieval_coverage": "partial",
+      "facet_coverage": "unverified",
+      "covered_query_ids": [
+        "query-anchor-1"
+      ],
+      "missing_query_ids": [
+        "query-original",
+        "query-lookup-1"
+      ],
+      "missing_facets": [],
+      "facets": [],
+      "sources": [
+        {
+          "evidence_id": "ev-af99ccf59b2af6c1",
+          "path_or_url": "docs/INDEX.md",
+          "section": "Documentation Index > Evaluation and research",
+          "snippet": "## Evaluation and research\n\n- [Task-level agent benchmark](./research/task-level-agent-benchmark.md) — benchmark design for measuring agent behavior with DocAtlas.\n- [Eval task-level README](../eval/task_level/README.md) — task-level evaluation harness overview.\n- [Eval results README](../eval/results/live/README.md) — live eval report notes.",
+          "version_binding": "unversioned",
+          "content_sha256": "46c3a180e54d2e3ca5f3cf66113982662d267e4d93173ff806ec933e181969e8",
+          "project_identity": "local:4637e43f360b29ddcbb3500c02f5cab729624d86d2ce39f0917444d3f0d86fbb",
+          "authority": "source_of_truth",
+          "scope": "project",
+          "line_start": 40,
+          "line_end": 44,
+          "source_uri": "docatlas://source/bf8f4a390e6398eee11e3165"
+        }
+      ],
+      "context_quality": {
+        "status": "unverified",
+        "reasons": [
+          "coverage_unverified"
+        ]
+      },
+      "read_next": [],
+      "edit_ready": false,
+      "investigation_allowed": true,
+      "estimated_tokens": 368
+    },
+    "isError": false
+  }
+}

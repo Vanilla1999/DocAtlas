@@ -1,0 +1,6 @@
+{
+  "schema_version": 1,
+  "module_labels": {"tests/test_multilingual_recall_diagnostic.py": "behavioral"},
+  "node_overrides": {},
+  "module_node_hashes": {"tests/test_multilingual_recall_diagnostic.py": "6775d71c191a3ec8af76678571afc7e5f93af6061155367b3526c5885bd46f74"}
+}

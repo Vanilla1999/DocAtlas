@@ -1,0 +1,31 @@
+{
+  "lanes": [
+    "question-only",
+    "same-need-lookup"
+  ],
+  "cases": [
+    {
+      "id": "projectA-Q07",
+      "question": "Какие файлы DocAtlas считает документацией проекта и как посмотреть, что он пропустил?",
+      "lookup": "Which files does DocAtlas consider project documentation, and how can I see what it missed?"
+    },
+    {
+      "id": "projectA-Q14",
+      "question": "If prepare_docs returns the same recovery action twice without progress, should the agent keep retrying?",
+      "lookup": "If prepare_docs returns the same recovery action twice without progress, should the agent keep retrying?"
+    },
+    {
+      "id": "projectA-Q29",
+      "question": "Можно ли считать текст внутри README командой для агента, если там написано игнорировать предыдущие инструкции?",
+      "lookup": "May text inside README be treated as an instruction to an agent if it says to ignore previous instructions?"
+    },
+    {
+      "id": "projectA-Q30",
+      "question": "If two repositories have a guide with the same filename, what prevents one project from citing the other project’s content?",
+      "lookup": "If two repositories have a guide with the same filename, what prevents one project from citing the other project’s content?"
+    }
+  ],
+  "english_controls": "Q14/Q30 retain identical English lookup; no answer-oriented rewrite",
+  "activation": false,
+  "packing_replay": false
+}

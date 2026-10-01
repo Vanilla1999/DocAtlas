@@ -1,0 +1,47 @@
+{
+  "request": {
+    "action": "sync_project_docs",
+    "project_path": "/tmp/opencode/bilingual-main-pigqqbjm/project",
+    "with_vectors": false
+  },
+  "wire": {
+    "_meta": null,
+    "content": [
+      {
+        "type": "text",
+        "text": "Structured DocAtlas result attached in structuredContent.",
+        "annotations": null,
+        "_meta": null
+      }
+    ],
+    "structuredContent": {
+      "status": "success",
+      "project_path": "/tmp/opencode/bilingual-main-pigqqbjm/project",
+      "candidate_count": 134,
+      "summary": {
+        "current_count": 134,
+        "new_count": 134,
+        "changed_count": 0,
+        "orphaned_count": 0,
+        "orphaned_removed": 0,
+        "dedup_removed": 0,
+        "stale_removed": 0,
+        "sections_indexed": 1441
+      },
+      "metrics": {},
+      "vector_sync": {
+        "status": "not_requested"
+      },
+      "unmatched_changed_paths": [],
+      "unmatched_deleted_paths": [],
+      "remaining_deleted_sources": 0,
+      "tombstones": [],
+      "tombstones_omitted": 0,
+      "warnings": [],
+      "message": "Synced project docs: current=134, new=134, changed=0, orphaned_removed=0, missing=0.",
+      "action": "sync_project_docs",
+      "tool": "prepare_docs"
+    },
+    "isError": false
+  }
+}

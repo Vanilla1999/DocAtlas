@@ -1,0 +1,80 @@
+{
+  "request": {
+    "question": "Какие файлы DocAtlas считает документацией проекта и как посмотреть, что он пропустил?",
+    "project_path": "/tmp/opencode/bilingual-main-pigqqbjm/project",
+    "scope": "all",
+    "lookup_queries": [
+      "Which files does DocAtlas consider project documentation, and how can I see what it missed?"
+    ]
+  },
+  "wire": {
+    "_meta": null,
+    "content": [
+      {
+        "type": "text",
+        "text": "Structured DocAtlas result attached in structuredContent.",
+        "annotations": null,
+        "_meta": null
+      }
+    ],
+    "structuredContent": {
+      "status": "ok",
+      "kind": "docs_context",
+      "context_status": "ready",
+      "context_available": true,
+      "answer_supported": false,
+      "answer_available": false,
+      "support_status": "retrieval_only",
+      "answer_policy": "cite_only",
+      "coverage_policy": "retrieval_attribution_only",
+      "query_coverage": "partial",
+      "retrieval_coverage": "partial",
+      "facet_coverage": "unverified",
+      "covered_query_ids": [
+        "query-lookup-1"
+      ],
+      "missing_query_ids": [
+        "query-original"
+      ],
+      "missing_facets": [],
+      "facets": [],
+      "sources": [
+        {
+          "evidence_id": "ev-1b285ab1641671b8",
+          "path_or_url": "wiki/Commands.md",
+          "section": "Commands > Core commands",
+          "snippet": "| `doc-atlas init` | Create a project-local `docatlas.yaml` for a project-specific index. |\n| `doc-atlas install <agent>` | Install a skill file for a single agent manually. See [Install Targets](./Install-Targets.md). |\n| `doc-atlas fetch <url>` | Download documentation to local Markdown files (default output dir `docatlas-docs/`). Does not update the SQLite index. |",
+          "version_binding": "unversioned",
+          "content_sha256": "3705d11b9b23d0ed0bbe28cdb4d8931287444ffde3b6e2a90a2a3eb02b27641e",
+          "project_identity": "local:4637e43f360b29ddcbb3500c02f5cab729624d86d2ce39f0917444d3f0d86fbb",
+          "authority": "source_of_truth",
+          "scope": "project",
+          "line_start": 18,
+          "line_end": 20,
+          "source_uri": "docatlas://source/6b54cae445e4306270caa0d3"
+        }
+      ],
+      "context_quality": {
+        "status": "unverified",
+        "reasons": [
+          "coverage_unverified"
+        ]
+      },
+      "read_next": [
+        {
+          "source_uri": "docatlas://source/ef0dc341e0101b660286a8a8",
+          "path": "wiki/Commands.md",
+          "project_identity": "local:4637e43f360b29ddcbb3500c02f5cab729624d86d2ce39f0917444d3f0d86fbb",
+          "snapshot_sha256": "sha256:8d889ac9ad8a29cb17d0101ff7722bebf9115da3055a8295c8ebf23c95e9699b",
+          "line_start": 7,
+          "line_end": 17,
+          "reason": "inspect_source_context"
+        }
+      ],
+      "edit_ready": false,
+      "investigation_allowed": true,
+      "estimated_tokens": 447
+    },
+    "isError": false
+  }
+}
