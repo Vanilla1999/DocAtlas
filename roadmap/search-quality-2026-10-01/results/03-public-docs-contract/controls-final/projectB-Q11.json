@@ -1,0 +1,51 @@
+{
+  "question": "Подготовка вернула job_id. Что делать до повторного исходного вопроса?",
+  "payload": {
+    "status": "ok",
+    "kind": "docs_context",
+    "context_status": "ready",
+    "context_available": true,
+    "answer_supported": false,
+    "answer_available": false,
+    "support_status": "retrieval_only",
+    "answer_policy": "cite_only",
+    "coverage_policy": "retrieval_attribution_only",
+    "query_coverage": "partial",
+    "retrieval_coverage": "partial",
+    "facet_coverage": "unverified",
+    "covered_query_ids": [
+      "query-anchor-1"
+    ],
+    "missing_query_ids": [
+      "query-original"
+    ],
+    "missing_facets": [],
+    "facets": [],
+    "sources": [
+      {
+        "evidence_id": "ev-1b49b7e1e1b31e0f",
+        "path_or_url": "SKILL.md",
+        "section": "DocAtlas > Workflow",
+        "snippet": "Request cancellation with `prepare_docs(action=\"cancel_docs_job\", job_id=...)` and inspect the terminal result with bounded `docs_status(action=\"job\", job_id=...)` polling. A `cancelling` acknowledgement is not completion.",
+        "version_binding": "unversioned",
+        "content_sha256": "b600cc2926ebff5a85424ae28951193ccce9df0781bbc2979cc3dd4ac93f121f",
+        "project_identity": "local:8a52252ff788684908b63f534c86bae96c7c6a2399f39683fbc1f8531daf4981",
+        "authority": "source_of_truth",
+        "scope": "project",
+        "line_start": 55,
+        "line_end": 55,
+        "source_uri": "docatlas://source/67f96f7a03b8ddd848597aaa"
+      }
+    ],
+    "context_quality": {
+      "status": "unverified",
+      "reasons": [
+        "coverage_unverified"
+      ]
+    },
+    "read_next": [],
+    "edit_ready": false,
+    "investigation_allowed": true,
+    "estimated_tokens": 324
+  }
+}

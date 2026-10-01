@@ -1,6 +1,6 @@
 # Исправление поиска DocAtlas: короткий TDD-план
 
-**Статус:** clean-Git recovery шага 01 исправлен; [проверки и ограничения](results/01-clean-project-recovery/README.md). Шаг 02 выполнен: [clear → rebuild и проверки](results/02-clear-rebuild-lifecycle/README.md). Шаги 03–10 не начаты. Выполнять по одному шагу, не весь план сразу.
+**Статус:** clean-Git recovery шага 01 исправлен; [проверки и ограничения](results/01-clean-project-recovery/README.md). Шаг 02 выполнен: [clear → rebuild и проверки](results/02-clear-rebuild-lifecycle/README.md). Шаг 03 выполнен: [текущий docs contract и ограничения](results/03-public-docs-contract/README.md). Шаг 04 выполнен: [catalog authority и history controls](results/04-corpus-authority/README.md). Шаги 05–10 не начаты. Выполнять по одному шагу, не весь план сразу.
 
 ## Порядок
 

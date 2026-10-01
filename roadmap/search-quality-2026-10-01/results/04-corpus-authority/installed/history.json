@@ -1,0 +1,78 @@
+{
+  "request": {
+    "project_path": "/tmp/opencode/authority-stdio-undlqjx5/project",
+    "question": "What did the historical project-answer surface v1 evaluation protocol freeze?"
+  },
+  "wire": {
+    "_meta": null,
+    "content": [
+      {
+        "type": "text",
+        "text": "Structured DocAtlas result attached in structuredContent.",
+        "annotations": null,
+        "_meta": null
+      }
+    ],
+    "structuredContent": {
+      "status": "ok",
+      "kind": "docs_context",
+      "context_status": "ready",
+      "context_available": true,
+      "answer_supported": false,
+      "answer_available": false,
+      "support_status": "retrieval_only",
+      "answer_policy": "cite_only",
+      "coverage_policy": "retrieval_attribution_only",
+      "query_coverage": "full",
+      "retrieval_coverage": "full",
+      "facet_coverage": "unverified",
+      "covered_query_ids": [
+        "query-original"
+      ],
+      "missing_query_ids": [],
+      "missing_facets": [],
+      "facets": [],
+      "sources": [
+        {
+          "evidence_id": "ev-8c180c1da338fbba",
+          "path_or_url": "eval/project_answer_surface_v1/README.md",
+          "section": "Project-answer surface regression protocol v1",
+          "snippet": "**Status: superseded** for project-chat acceptance by\n[ADR 0003](../../docs/adr/0003-context-first-project-reads.md) and the\n[current project-context quality protocol](../project_context_quality/README.md).\nThis retained parser-regression protocol is historical evidence, not the current operational contract\nfor project reads. Its frozen cases and commands remain available for historical\nevaluation and parser regression; they do not require current project reads to\nproduce a certified answer or abstain when supported snippets are available.\n\nThis protocol freezes the bounded natural-language surface contract for Project\nDocs question planning. It is not a claim that DocAtlas understands arbitrary\nEnglish or Russian. The supported product contract is a reviewed set of semantic\nintent families with stable EN/RU surface variants; everything outside that\ncontract must fail closed with an explicit diagnostic.",
+          "version_binding": "unversioned",
+          "content_sha256": "fa64c808cdd544204ea204ad583ac6b5f8c697df1b26ddf22a1eacc1f305e3a8",
+          "project_identity": "local:950e02ea912c7711ee4575b3b237ac6244081df697134058e06547346321204d",
+          "line_start": 3,
+          "line_end": 15,
+          "authority": "historical",
+          "scope": "project"
+        },
+        {
+          "evidence_id": "ev-31bbb2497cf5a24f",
+          "path_or_url": "eval/project_answer_surface_v1/README.md",
+          "section": "Project-answer surface regression protocol v1",
+          "snippet": "The EN/RU adapter is bounded and whole-question based. It only rewrites audited\nsurface families to canonical QuestionPlan questions and then rebinds the result\nto the complete original user span. Retrieval cannot use normalization to invent\nmissing obligations, and an unrecognized tail still makes the question\nunsupported.",
+          "version_binding": "unversioned",
+          "content_sha256": "558f0eca9d005d8fd45cf4697c04d622962c8fdea888c69cf9f42cc2d2270982",
+          "project_identity": "local:950e02ea912c7711ee4575b3b237ac6244081df697134058e06547346321204d",
+          "line_start": 24,
+          "line_end": 28,
+          "authority": "historical",
+          "scope": "project"
+        }
+      ],
+      "context_quality": {
+        "status": "unverified",
+        "reasons": [
+          "coverage_unverified",
+          "source_unavailable"
+        ]
+      },
+      "read_next": [],
+      "edit_ready": false,
+      "investigation_allowed": true,
+      "estimated_tokens": 703,
+      "recovery_reason_code": "source_unavailable"
+    },
+    "isError": false
+  }
+}

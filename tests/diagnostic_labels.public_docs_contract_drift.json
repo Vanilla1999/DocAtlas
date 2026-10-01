@@ -1,0 +1,6 @@
+{
+  "schema_version": 1,
+  "module_labels": {"tests/test_public_docs_contract_drift.py": "behavioral"},
+  "node_overrides": {},
+  "module_node_hashes": {"tests/test_public_docs_contract_drift.py": "545a5b639826a02bb1bac28d52103c7d640c7ca7f97cdf23234ecc93776aca52"}
+}

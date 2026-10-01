@@ -1,0 +1,65 @@
+{
+  "question": "A preparation request returned a job ID instead of documents. What is the expected polling and retry sequence?",
+  "payload": {
+    "status": "ok",
+    "kind": "docs_context",
+    "context_status": "ready",
+    "context_available": true,
+    "answer_supported": false,
+    "answer_available": false,
+    "support_status": "retrieval_only",
+    "answer_policy": "cite_only",
+    "coverage_policy": "retrieval_attribution_only",
+    "query_coverage": "partial",
+    "retrieval_coverage": "partial",
+    "facet_coverage": "unverified",
+    "covered_query_ids": [
+      "query-anchor-1"
+    ],
+    "missing_query_ids": [
+      "query-original"
+    ],
+    "missing_facets": [],
+    "facets": [],
+    "sources": [
+      {
+        "evidence_id": "ev-4eeeef16d9abe8df",
+        "path_or_url": "wiki/Architecture.md",
+        "section": "Architecture > Docs MCP runtime > Async prefetch and job tracking",
+        "snippet": "### Async prefetch and job tracking\n\nThe corresponding `prepare_docs` prefetch actions may start background work. When they do, the service:\n1. Creates a `DocsJob` entry with a UUID4 job ID and `pending` status\n2. Starts a daemon background thread to run the fetch/index pipeline\n3. Returns immediately with a `DocsJobStartResult` containing the `job_id`\n\nThe `DocsJobTracker` persists job state and events in SQLite, with configured terminal-history and retention limits. Each job tracks:\n- **Lifecycle**: `status` (pending/running/succeeded/partial/failed/cancelled), `phase` (validating/resolving/fetching/indexing/done), timestamps\n- **Progress**: `total_targets`, `completed_targets`, `failed_targets`, `current_target`, `current_url`\n- **Page tracking**: `discovered_pages`, `fetched_pages`, `indexed_pages`, `total_pages`, `completed_pages`, `failed_pages`, `total_chunks`, `completed_chunks`\n- **Events**: ordered event log with phase, URL, and message per target/page",
+        "version_binding": "unversioned",
+        "content_sha256": "15dd39431d35723a675150dbb628fcdd7ecf922be85a0e6290d5774bc5115ee9",
+        "project_identity": "local:ef9627fb567d7040287c9951a73f6baca583b6f373802959d2d887adffbc219b",
+        "line_start": 134,
+        "line_end": 145,
+        "authority": "source_of_truth",
+        "scope": "project",
+        "source_uri": "docatlas://source/293db93e0c972f686c9bd282"
+      },
+      {
+        "evidence_id": "ev-2e37682e3d93fc88",
+        "path_or_url": "wiki/Architecture.md",
+        "section": "Architecture",
+        "snippet": "DocAtlas is a local, version-aware documentation runtime for coding agents. Its primary product workflow is **DocAtlas Docs**; **DocAtlas MCP Packs** is a separate advanced API-action surface.",
+        "version_binding": "unversioned",
+        "content_sha256": "867b1115e2a6265168b1081a062f488e735c3675f1ec1e3f1186b0d4268fbd20",
+        "project_identity": "local:ef9627fb567d7040287c9951a73f6baca583b6f373802959d2d887adffbc219b",
+        "line_start": 3,
+        "line_end": 3,
+        "authority": "source_of_truth",
+        "scope": "project",
+        "source_uri": "docatlas://source/91ab193c87718161fec1e7b4"
+      }
+    ],
+    "context_quality": {
+      "status": "unverified",
+      "reasons": [
+        "coverage_unverified"
+      ]
+    },
+    "read_next": [],
+    "edit_ready": false,
+    "investigation_allowed": true,
+    "estimated_tokens": 691
+  }
+}

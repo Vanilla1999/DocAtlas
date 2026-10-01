@@ -162,7 +162,7 @@ You pointed `vector_store.collection` at a collection that docmancer did not cre
 
 ### `doc-atlas query --mode hybrid` says "lexical-fallback" or returns no contributions
 
-The dispatcher fell back to lexical because either the vector store could not be reached, the embeddings provider failed to load, or no Qdrant collection exists yet. Run `doc-atlas doctor` to see Qdrant + embeddings status, and `doc-atlas ingest --recreate` once to populate the collection.
+Requested non-lexical modes fail closed when a required vector capability is unavailable or fails. Fallback to remaining available signals requires explicit `--allow-degraded`; it is not automatic, and degraded lexical output does not establish semantic retrieval success. A lexical default query is a different mode, not a successful hybrid query. Run `doc-atlas doctor` to inspect Qdrant and embeddings status, then repair the missing capability or deliberately select lexical mode. Review any recreate operation before rebuilding an index.
 
 ### `Section count drifts from vector count after `ingest --recreate``
 

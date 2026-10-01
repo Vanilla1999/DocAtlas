@@ -1,0 +1,76 @@
+{
+  "question": "Can an inactive indexing generation change the ranking of active documentation?",
+  "payload": {
+    "status": "ok",
+    "kind": "docs_context",
+    "context_status": "ready",
+    "context_available": true,
+    "answer_supported": false,
+    "answer_available": false,
+    "support_status": "retrieval_only",
+    "answer_policy": "cite_only",
+    "coverage_policy": "retrieval_attribution_only",
+    "query_coverage": "full",
+    "retrieval_coverage": "full",
+    "facet_coverage": "unverified",
+    "covered_query_ids": [
+      "query-original"
+    ],
+    "missing_query_ids": [],
+    "missing_facets": [],
+    "facets": [],
+    "sources": [
+      {
+        "evidence_id": "ev-e1b850334f3074a9",
+        "path_or_url": "wiki/Architecture.md",
+        "section": "Architecture > Indexing",
+        "snippet": "Markdown indexing first normalizes fetched or local documentation into semantic parent sections based on heading structure. The production `parent-child-v1` chunker then splits each parent section into token-bounded child chunks (target 160 estimated visible tokens, hard maximum 512, zero visible overlap) while preserving the parent identity and source offsets. Retrieval ranks those child chunks and can hydrate parent or adjacent context without changing the exact display text.",
+        "version_binding": "unversioned",
+        "content_sha256": "b6ef10a46ea75fc5328020d51bdb92162dac22d652c00900ee8397a41b98cdb1",
+        "project_identity": "local:8a52252ff788684908b63f534c86bae96c7c6a2399f39683fbc1f8531daf4981",
+        "authority": "source_of_truth",
+        "scope": "project",
+        "line_start": 15,
+        "line_end": 15,
+        "source_uri": "docatlas://source/1f81441cc3270f5e71cd9c25"
+      },
+      {
+        "evidence_id": "ev-2e37682e3d93fc88",
+        "path_or_url": "wiki/Architecture.md",
+        "section": "Architecture",
+        "snippet": "DocAtlas is a local, version-aware documentation runtime for coding agents. Its primary product workflow is **DocAtlas Docs**; **DocAtlas MCP Packs** is a separate advanced API-action surface.",
+        "version_binding": "unversioned",
+        "content_sha256": "867b1115e2a6265168b1081a062f488e735c3675f1ec1e3f1186b0d4268fbd20",
+        "project_identity": "local:8a52252ff788684908b63f534c86bae96c7c6a2399f39683fbc1f8531daf4981",
+        "line_start": 3,
+        "line_end": 3,
+        "authority": "source_of_truth",
+        "scope": "project",
+        "source_uri": "docatlas://source/8099bec9391bac81c7c51b59"
+      },
+      {
+        "evidence_id": "ev-480eea06b20ee430",
+        "path_or_url": "wiki/Architecture.md",
+        "section": "Architecture > Indexing",
+        "snippet": "Alongside the FTS5 index, each section is embedded with FastEmbed (local dense + SPLADE sparse) and upserted into a managed local Qdrant. The dispatcher reads both stores at query time. For which documentation sites and file types work with `add`, see [Supported Sources](./Supported-Sources.md).",
+        "version_binding": "unversioned",
+        "content_sha256": "bcf649660231f38cf77e2540c0c4747ede34872062ba6f21917dd4f32615784b",
+        "project_identity": "local:8a52252ff788684908b63f534c86bae96c7c6a2399f39683fbc1f8531daf4981",
+        "line_start": 19,
+        "line_end": 19,
+        "authority": "source_of_truth",
+        "scope": "project"
+      }
+    ],
+    "context_quality": {
+      "status": "unverified",
+      "reasons": [
+        "coverage_unverified"
+      ]
+    },
+    "read_next": [],
+    "edit_ready": false,
+    "investigation_allowed": true,
+    "estimated_tokens": 725
+  }
+}

@@ -1,0 +1,26 @@
+.F..                                                                     [100%]
+=================================== FAILURES ===================================
+____ test_project_context_instructions_use_evidence_not_certification_gate _____
+
+    def test_project_context_instructions_use_evidence_not_certification_gate():
+        text = (REPO / "docs/mcp-docs-server.md").read_text()
+        assert "Project reads never produce `docs_answer`" in text
+        assert "`sources`" in text and "`evidence_id`" in text
+        assert "false answer flags do not prohibit" in text
+        assert "does not authorize an edit" in text
+        assert "The project answer contract requires" not in text
+>       assert "The host may answer only covered claims" not in text
+E       AssertionError: assert 'The host ma...vered claims' not in '# Docs MCP ... checkout.\n'
+E         
+E         'The host may answer only covered claims' is contained here:
+E           table ID. The host may answer only covered claims grounded in returned sources and must not claim completeness. Sources expose path, section, a contiguous verbatim snippet, line range, authority, scope, project identity, and content hash. BM25 values, query-term arrays, match traces, raw `context_pack`, full content, and retrieval diagnostics remain internal. The projection remains bounded to 800 estimated tokens and at most three sources.
+E         ?           +++++++++++++++++++++++++++++++++++++++
+E           
+E           Project reads ne...
+E         
+E         ...Full output truncated (55 lines hidden), use '-vv' to show
+
+tests/test_public_docs_contract_drift.py:29: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_public_docs_contract_drift.py::test_project_context_instructions_use_evidence_not_certification_gate
+1 failed, 3 passed in 0.45s

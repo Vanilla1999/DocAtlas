@@ -1,0 +1,74 @@
+{
+  "question": "A query reports full retrieval coverage but facet coverage is unverified. What can I safely conclude from that?",
+  "payload": {
+    "status": "ok",
+    "kind": "docs_context",
+    "context_status": "ready",
+    "context_available": true,
+    "answer_supported": false,
+    "answer_available": false,
+    "support_status": "retrieval_only",
+    "answer_policy": "cite_only",
+    "coverage_policy": "retrieval_attribution_only",
+    "query_coverage": "full",
+    "retrieval_coverage": "full",
+    "facet_coverage": "unverified",
+    "covered_query_ids": [
+      "query-original"
+    ],
+    "missing_query_ids": [],
+    "missing_facets": [],
+    "facets": [
+      {
+        "id": "intent-context:retrieval_pipeline",
+        "requirement_id": null,
+        "question": "lexical vector retrieval data flow",
+        "status": "retrieval_only",
+        "evidence_ids": [
+          "ev-8ab472f24f0ab11b"
+        ]
+      }
+    ],
+    "sources": [
+      {
+        "evidence_id": "ev-8ab472f24f0ab11b",
+        "path_or_url": "wiki/Configuration.md",
+        "section": "Configuration > Configuration Reference > Vector store",
+        "snippet": "A fresh configuration uses `retrieval.default_mode: lexical` for queries. Ingest can auto-start managed Qdrant and embed chunks with FastEmbed; the `vector_store:` block tunes that optional vector store. Select `dense`, `sparse`, or `hybrid` explicitly when vector retrieval is required. Those modes fail closed when required capabilities are unavailable unless the caller explicitly enables degraded fallback. Set `DOCATLAS_AUTO_VECTORS=0` (or run `doc-atlas ingest --no-vectors`) for FTS5-only ingestion.",
+        "version_binding": "unversioned",
+        "content_sha256": "1b4a59fd532899d3659c57543e895d6561d4336f16a784382986947c2312fbe6",
+        "project_identity": "local:e1a38e3e1e9541a2c1adead2bfba0072cd3e4ee1e7f5537523acea45b2780940",
+        "authority": "source_of_truth",
+        "scope": "project",
+        "line_start": 51,
+        "line_end": 51,
+        "source_uri": "docatlas://source/56f14e0004ba54b308d30fa4"
+      },
+      {
+        "evidence_id": "ev-f0e6a0d369f53229",
+        "path_or_url": "docs/mcp-docs-server.md",
+        "section": "Docs MCP server > Public tool contract",
+        "snippet": "It reports retrieval coverage separately from semantic facets: `facet_coverage` is `none`, `partial`, `full`, or `unverified`; each facet is `covered`, `missing`, or `retrieval_only` and binds covered evidence by immutable ID. The host may explain claims directly supported by returned snippets, even when facets are unverified, and must not claim completeness.",
+        "version_binding": "unversioned",
+        "content_sha256": "36ba1ba590e98a9662a0e00ffaffad18de99f385164f97eabd5faa4cfa2bee8b",
+        "project_identity": "local:e1a38e3e1e9541a2c1adead2bfba0072cd3e4ee1e7f5537523acea45b2780940",
+        "authority": "source_of_truth",
+        "scope": "project",
+        "line_start": 42,
+        "line_end": 42,
+        "source_uri": "docatlas://source/c00547c99a4595368529a03d"
+      }
+    ],
+    "context_quality": {
+      "status": "unverified",
+      "reasons": [
+        "coverage_unverified",
+        "budget_limited"
+      ]
+    },
+    "read_next": [],
+    "edit_ready": false,
+    "investigation_allowed": true,
+    "estimated_tokens": 661
+  }
+}

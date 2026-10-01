@@ -1,0 +1,28 @@
+FF.                                                                      [100%]
+=================================== FAILURES ===================================
+____________ test_retired_answer_protocol_is_not_current_authority _____________
+
+    def test_retired_answer_protocol_is_not_current_authority():
+        metadata = ProjectMetadataReader().read(REPO)
+        assert metadata.docs_catalog_valid
+        entries = {row.path: row for row in metadata.docs_candidates}
+        old = entries['eval/project_answer_surface_v1/README.md']
+>       assert (old.authority, old.lifecycle_status, old.impact_policy) == ('historical', 'superseded', 'search_only')
+E       AssertionError: assert ('source_of_t...'search_only') == ('historical'...'search_only')
+E         
+E         At index 0 diff: 'source_of_truth' != 'historical'
+E         Use -v to get more diff
+
+tests/test_corpus_authority_catalog.py:15: AssertionError
+_________ test_retired_protocol_has_lifecycle_notice_and_current_links _________
+
+    def test_retired_protocol_has_lifecycle_notice_and_current_links():
+        text = (REPO / 'eval/project_answer_surface_v1/README.md').read_text()
+>       assert 'Status: superseded' in text
+E       AssertionError: assert 'Status: superseded' in '# Project-answer surface regression protocol v1\n\nThis protocol freezes the bounded natural-language surface contrac... run prints a category summary followed by:\n\n```text\nquestion surface gate: PASS (100/100 expected outcomes)\n```\n'
+
+tests/test_corpus_authority_catalog.py:32: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_corpus_authority_catalog.py::test_retired_answer_protocol_is_not_current_authority
+FAILED tests/test_corpus_authority_catalog.py::test_retired_protocol_has_lifecycle_notice_and_current_links
+2 failed, 1 passed in 0.24s

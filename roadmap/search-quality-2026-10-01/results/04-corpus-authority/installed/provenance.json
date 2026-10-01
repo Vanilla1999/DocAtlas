@@ -1,0 +1,60 @@
+{
+  "head": "11ee5dbe067166e6d6ad5a108290fa5bafc0edf9",
+  "runtime_import": "/tmp/opencode/docatlas-ablation/.venv/lib/python3.12/site-packages/docmancer",
+  "version": "1.3.2",
+  "fixture": "/tmp/opencode/authority-stdio-undlqjx5/project",
+  "catalog_entries": [
+    {
+      "path": "eval/project_context_quality/README.md",
+      "role": "development",
+      "scope": "project",
+      "description": "RU/EN retrieval-first project-chat corpus and public-path gate.",
+      "authority": "source_of_truth",
+      "status": "active",
+      "impact": "search_only"
+    },
+    {
+      "path": "docs/adr/0003-context-first-project-reads.md",
+      "role": "development",
+      "scope": "project",
+      "description": "Decision record for retrieval-only project reads, host synthesis, and the three-tool public MCP surface.",
+      "authority": "source_of_truth",
+      "status": "active",
+      "impact": "track"
+    },
+    {
+      "path": "eval/project_answer_surface_v1/README.md",
+      "role": "development",
+      "scope": "project",
+      "description": "Retired project-answer v1 evaluation protocol; historical parser signatures, not the current project-chat operational contract.",
+      "authority": "historical",
+      "status": "superseded",
+      "impact": "search_only"
+    },
+    {
+      "path": "docs/mcp-docs-server.md",
+      "role": "api_contract",
+      "scope": "project",
+      "description": "Public three-tool Docs MCP contract, context-first lifecycle, routing, and quality gates.",
+      "authority": "source_of_truth",
+      "status": "active",
+      "impact": "track"
+    },
+    {
+      "path": "docs/adr/0002-context-retrieval-vs-answer-proof.md",
+      "role": "adr",
+      "scope": "project",
+      "description": "Retrieval-first project-chat delivery and strict answer-certification boundary.",
+      "authority": "historical",
+      "status": "superseded",
+      "impact": "search_only"
+    }
+  ],
+  "corpus_sha256": {
+    "docs/adr/0002-context-retrieval-vs-answer-proof.md": "2122003705212ff44b65e5322a927e53c3d04befccf2ca394d6d8ea6c289645b",
+    "docs/adr/0003-context-first-project-reads.md": "83f44d6cf026ba3aab066ede447e4c1aaa3802c58fffe5ac7fca85f7c0874ded",
+    "docs/mcp-docs-server.md": "deee073022b2da6d4f81c3007a446c14788e5aabc099865c5984641cf74e50dc",
+    "eval/project_answer_surface_v1/README.md": "288a0708bbb690db22b29a6bb3b7a8ec05267ca29a07fc18fd02f87315925c54",
+    "eval/project_context_quality/README.md": "ab9b2a9532b158281020a687ce35c8c4ea71950034e0cf6af02bd9fdf30336c3"
+  }
+}

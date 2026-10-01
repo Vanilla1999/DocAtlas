@@ -1,5 +1,13 @@
 # Project-answer surface regression protocol v1
 
+**Status: superseded** for project-chat acceptance by
+[ADR 0003](../../docs/adr/0003-context-first-project-reads.md) and the
+[current project-context quality protocol](../project_context_quality/README.md).
+This retained parser-regression protocol is historical evidence, not the current operational contract
+for project reads. Its frozen cases and commands remain available for historical
+evaluation and parser regression; they do not require current project reads to
+produce a certified answer or abstain when supported snippets are available.
+
 This protocol freezes the bounded natural-language surface contract for Project
 Docs question planning. It is not a claim that DocAtlas understands arbitrary
 English or Russian. The supported product contract is a reviewed set of semantic

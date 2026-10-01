@@ -1,0 +1,85 @@
+{
+  "question": "Когда нужен refresh, а когда sync_project_docs? Я путаю обновление библиотеки с обновлением своего репозитория.",
+  "payload": {
+    "status": "ok",
+    "kind": "docs_context",
+    "context_status": "ready",
+    "context_available": true,
+    "answer_supported": false,
+    "answer_available": false,
+    "support_status": "retrieval_only",
+    "answer_policy": "cite_only",
+    "coverage_policy": "retrieval_attribution_only",
+    "query_coverage": "partial",
+    "retrieval_coverage": "partial",
+    "facet_coverage": "unverified",
+    "covered_query_ids": [
+      "query-anchor-1"
+    ],
+    "missing_query_ids": [
+      "query-original"
+    ],
+    "missing_facets": [],
+    "facets": [
+      {
+        "id": "intent-context:project_docs_sync",
+        "requirement_id": null,
+        "question": "sync_project_docs lifecycle project documentation",
+        "status": "retrieval_only",
+        "evidence_ids": [
+          "ev-bc5a71393d9e1901"
+        ]
+      }
+    ],
+    "sources": [
+      {
+        "evidence_id": "ev-bc5a71393d9e1901",
+        "path_or_url": "docs/mcp-docs-server.md",
+        "section": "Docs MCP server > Project documentation",
+        "snippet": "For a repository question, call `get_docs_context` first. The call never reconciles the index itself. When committed project docs are stale or not yet indexed and the whole Git worktree is clean, the response returns a no-confirmation `prepare_docs(action=\"sync_project_docs\")` instruction bound to a preflight `plan_digest`. `prepare_docs` rechecks the clean worktree and accepted `HEAD` before mutation. Dirty or indeterminate Git state, placeholders, unsupported docs, config shadowing, and orphan pruning remain confirmation-gated.",
+        "version_binding": "unversioned",
+        "content_sha256": "a0d4983e82852f8005f8ace19f541c1988c6d7389f7aee25d4c7fc11b5013d46",
+        "project_identity": "local:e1a38e3e1e9541a2c1adead2bfba0072cd3e4ee1e7f5537523acea45b2780940",
+        "authority": "source_of_truth",
+        "scope": "project",
+        "line_start": 62,
+        "line_end": 62,
+        "source_uri": "docatlas://source/efcba7629376d2c7133dfcb6"
+      },
+      {
+        "evidence_id": "ev-f55b7fbc6503dac2",
+        "path_or_url": "docs/mcp-docs-server.md",
+        "section": "Docs MCP server",
+        "snippet": "This is the canonical detailed workflow reference for DocAtlas.",
+        "version_binding": "unversioned",
+        "content_sha256": "d3d99a9ebc90414efc1f5ad95a77aba090ce4799a463e40e3067a8c487a344ee",
+        "project_identity": "local:e1a38e3e1e9541a2c1adead2bfba0072cd3e4ee1e7f5537523acea45b2780940",
+        "line_start": 3,
+        "line_end": 3,
+        "authority": "source_of_truth",
+        "scope": "project",
+        "source_uri": "docatlas://source/14c09f82b04d963657c16886"
+      }
+    ],
+    "context_quality": {
+      "status": "partial",
+      "reasons": [
+        "requested_part_missing"
+      ]
+    },
+    "read_next": [
+      {
+        "source_uri": "docatlas://source/825734826e6e25815cb3661d",
+        "path": "docs/mcp-docs-server.md",
+        "project_identity": "local:e1a38e3e1e9541a2c1adead2bfba0072cd3e4ee1e7f5537523acea45b2780940",
+        "snapshot_sha256": "sha256:0ed0a352b1291047607229cd9ff14001a862e1b6b1f080a610ee254719a94ee2",
+        "line_start": 63,
+        "line_end": 72,
+        "reason": "inspect_source_context"
+      }
+    ],
+    "edit_ready": false,
+    "investigation_allowed": true,
+    "estimated_tokens": 675
+  }
+}

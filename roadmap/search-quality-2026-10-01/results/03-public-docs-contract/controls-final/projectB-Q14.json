@@ -1,0 +1,81 @@
+{
+  "question": "Does the output budget include citation metadata as well as document text?",
+  "payload": {
+    "status": "ok",
+    "kind": "docs_context",
+    "context_status": "ready",
+    "context_available": true,
+    "answer_supported": false,
+    "answer_available": false,
+    "support_status": "retrieval_only",
+    "answer_policy": "cite_only",
+    "coverage_policy": "retrieval_attribution_only",
+    "query_coverage": "partial",
+    "retrieval_coverage": "partial",
+    "facet_coverage": "unverified",
+    "covered_query_ids": [],
+    "missing_query_ids": [
+      "query-original"
+    ],
+    "missing_facets": [],
+    "facets": [
+      {
+        "id": "intent-context:context_budget",
+        "requirement_id": null,
+        "question": "context response token and source budgets",
+        "status": "retrieval_only",
+        "evidence_ids": [
+          "ev-176230138a1fcafe"
+        ]
+      }
+    ],
+    "sources": [
+      {
+        "evidence_id": "ev-176230138a1fcafe",
+        "path_or_url": "wiki/Architecture.md",
+        "section": "Architecture > Context packs",
+        "snippet": "## Context packs\n\nThe output of `doc-atlas query` is a compact context pack: the top matching sections, their heading paths, source URLs, version/timestamp metadata, and a token estimate. Each query also reports:\n\n- **Tokens saved** versus the raw full-page docs context\n- **Agentic runway multiplier** showing how much more context budget is available for actual work\n\nThis feedback loop makes the compression value visible on every query.",
+        "version_binding": "unversioned",
+        "content_sha256": "cf4e88885cb15453a41f3a8cd1cd65ec2dae79965064b9f1e6b237e1cb43c29d",
+        "project_identity": "local:8a52252ff788684908b63f534c86bae96c7c6a2399f39683fbc1f8531daf4981",
+        "authority": "source_of_truth",
+        "scope": "project",
+        "line_start": 57,
+        "line_end": 64
+      },
+      {
+        "evidence_id": "ev-d472078b61b33ab5",
+        "path_or_url": "SKILL.md",
+        "section": "DocAtlas > Core Commands > Query Documentation (CLI fallback)",
+        "snippet": "| Flag | Purpose |\n|------|---------|\n| `--budget <n>` | Max estimated output tokens |\n| `--limit <n>` | Max sections to return |\n| `--expand` | Include adjacent sections around matches |\n| `--expand page` | Include full page content within budget |\n| `--format <markdown\\|json>` | Output format |",
+        "version_binding": "unversioned",
+        "content_sha256": "bc328341f3cdc7ac948fe536912efe98afc02514071e8900abbf1bead028a94f",
+        "project_identity": "local:8a52252ff788684908b63f534c86bae96c7c6a2399f39683fbc1f8531daf4981",
+        "authority": "source_of_truth",
+        "scope": "project",
+        "line_start": 108,
+        "line_end": 114
+      }
+    ],
+    "context_quality": {
+      "status": "unverified",
+      "reasons": [
+        "coverage_unverified"
+      ]
+    },
+    "read_next": [
+      {
+        "source_uri": "docatlas://source/4f605e88f52c6f913d30b95b",
+        "path": "docs/source-continuation.md",
+        "project_identity": "local:8a52252ff788684908b63f534c86bae96c7c6a2399f39683fbc1f8531daf4981",
+        "snapshot_sha256": "sha256:00715dd09b8bcf6894ae65edaa0a5629c13e887887323724538968c2ea5b4a3a",
+        "line_start": 18,
+        "line_end": 23,
+        "reason": "inspect_source_context"
+      }
+    ],
+    "edit_ready": false,
+    "investigation_allowed": true,
+    "estimated_tokens": 683
+  }
+}

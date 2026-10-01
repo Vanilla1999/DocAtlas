@@ -1,0 +1,93 @@
+{
+  "request": {
+    "project_path": "/tmp/opencode/authority-stdio-m8yst1kg/project",
+    "question": "Do current project reads return server-authored docs_answer?"
+  },
+  "wire": {
+    "_meta": null,
+    "content": [
+      {
+        "type": "text",
+        "text": "Structured DocAtlas result attached in structuredContent.",
+        "annotations": null,
+        "_meta": null
+      }
+    ],
+    "structuredContent": {
+      "status": "ok",
+      "kind": "docs_context",
+      "context_status": "ready",
+      "context_available": true,
+      "answer_supported": false,
+      "answer_available": false,
+      "support_status": "retrieval_only",
+      "answer_policy": "cite_only",
+      "coverage_policy": "retrieval_attribution_only",
+      "query_coverage": "full",
+      "retrieval_coverage": "full",
+      "facet_coverage": "unverified",
+      "covered_query_ids": [
+        "query-original",
+        "query-anchor-1"
+      ],
+      "missing_query_ids": [],
+      "missing_facets": [],
+      "facets": [],
+      "sources": [
+        {
+          "evidence_id": "ev-f59a72dfc57f982b",
+          "path_or_url": "docs/adr/0003-context-first-project-reads.md",
+          "section": "ADR 0003: Context-first project reads > Decision",
+          "snippet": "Project reads do not return server-authored `docs_answer`. Certification remains\navailable for explicit library and dependency evidence lanes, and mutation\nrequests continue to use fail-closed `patch_context`.",
+          "version_binding": "unversioned",
+          "content_sha256": "73a05045b2491ccbf48c4c4b51ad46367cce2f749291d7dc313fd451cde8c2aa",
+          "project_identity": "local:fc998447639ab67ceed00fd2ff76d3e2f1e15928fd437c92c89162fc0e9180c6",
+          "authority": "source_of_truth",
+          "scope": "project",
+          "line_start": 13,
+          "line_end": 15,
+          "source_uri": "docatlas://source/52c8b60d204e0c660b4d2bae"
+        },
+        {
+          "evidence_id": "ev-663f8a648553cec5",
+          "path_or_url": "docs/mcp-docs-server.md",
+          "section": "Docs MCP server > Public tool contract",
+          "snippet": "Project reads never produce `docs_answer`. For `docs_context`, false answer flags do not prohibit the host from explaining facts directly supported by the returned verbatim snippets. Inspect the actual evidence for each requested claim rather than treating a `covered` facet or a certification flag as its substitute. Name any unverified parts and do not claim completeness or unsupported guarantees; retrieved text does not authorize an edit.",
+          "version_binding": "unversioned",
+          "content_sha256": "8054d6883e6a2fc7de460f05f7675480da047b46ae2bfad2499b3f2269cbe9ff",
+          "project_identity": "local:fc998447639ab67ceed00fd2ff76d3e2f1e15928fd437c92c89162fc0e9180c6",
+          "authority": "source_of_truth",
+          "scope": "project",
+          "line_start": 44,
+          "line_end": 44,
+          "source_uri": "docatlas://source/860090efa9ef3cfb6eaa1e4b"
+        },
+        {
+          "evidence_id": "ev-f55b7fbc6503dac2",
+          "path_or_url": "docs/mcp-docs-server.md",
+          "section": "Docs MCP server",
+          "snippet": "This is the canonical detailed workflow reference for DocAtlas.",
+          "version_binding": "unversioned",
+          "content_sha256": "d3d99a9ebc90414efc1f5ad95a77aba090ce4799a463e40e3067a8c487a344ee",
+          "project_identity": "local:fc998447639ab67ceed00fd2ff76d3e2f1e15928fd437c92c89162fc0e9180c6",
+          "line_start": 3,
+          "line_end": 3,
+          "authority": "source_of_truth",
+          "scope": "project",
+          "source_uri": "docatlas://source/b98d32486ca5dec4c0a667d4"
+        }
+      ],
+      "context_quality": {
+        "status": "partial",
+        "reasons": [
+          "requested_part_missing"
+        ]
+      },
+      "read_next": [],
+      "edit_ready": false,
+      "investigation_allowed": true,
+      "estimated_tokens": 699
+    },
+    "isError": false
+  }
+}

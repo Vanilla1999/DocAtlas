@@ -1,0 +1,6 @@
+{
+  "schema_version": 1,
+  "module_labels": {"tests/test_corpus_authority_catalog.py": "behavioral"},
+  "node_overrides": {},
+  "module_node_hashes": {"tests/test_corpus_authority_catalog.py": "88b3efd8335c0eb230d69e47253fba49f1d131ca0c13a28446dcb8f580530db7"}
+}

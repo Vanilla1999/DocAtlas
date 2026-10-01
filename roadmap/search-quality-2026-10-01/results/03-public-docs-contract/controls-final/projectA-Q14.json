@@ -1,0 +1,74 @@
+{
+  "question": "If prepare_docs returns the same recovery action twice without progress, should the agent keep retrying?",
+  "payload": {
+    "status": "ok",
+    "kind": "docs_context",
+    "context_status": "ready",
+    "context_available": true,
+    "answer_supported": false,
+    "answer_available": false,
+    "support_status": "retrieval_only",
+    "answer_policy": "cite_only",
+    "coverage_policy": "retrieval_attribution_only",
+    "query_coverage": "full",
+    "retrieval_coverage": "full",
+    "facet_coverage": "unverified",
+    "covered_query_ids": [
+      "query-original",
+      "query-anchor-1"
+    ],
+    "missing_query_ids": [],
+    "missing_facets": [],
+    "facets": [
+      {
+        "id": "intent-context:docs_mcp_tool_policy",
+        "requirement_id": null,
+        "question": "prepare_docs Docs MCP default use",
+        "status": "retrieval_only",
+        "evidence_ids": [
+          "ev-29991f84ece835bb"
+        ]
+      }
+    ],
+    "sources": [
+      {
+        "evidence_id": "ev-29991f84ece835bb",
+        "path_or_url": "docs/mcp-docs-server.md",
+        "section": "Docs MCP server > Public tool contract",
+        "snippet": "The three Docs MCP public tools are `get_docs_context`, `prepare_docs`, and `docs_status`. Use `get_docs_context` for bounded documentation questions, use `prepare_docs` for synchronization/prefetch lifecycle operations, and use `docs_status` for asynchronous job status.",
+        "version_binding": "unversioned",
+        "content_sha256": "410afd6cb13b0db5ca1cb6a8a1b5ee7893b847306f810df431189ae9f6c442e2",
+        "project_identity": "local:8a52252ff788684908b63f534c86bae96c7c6a2399f39683fbc1f8531daf4981",
+        "authority": "source_of_truth",
+        "scope": "project",
+        "line_start": 54,
+        "line_end": 54,
+        "source_uri": "docatlas://source/01a4f658c40d8a2d718d1415"
+      },
+      {
+        "evidence_id": "ev-dc5d905e058935e0",
+        "path_or_url": "docs/source-continuation.md",
+        "section": "Grounded partial answers and source continuation > Evidence delivery > Job cancellation and bounded retry",
+        "snippet": "### Job cancellation and bounded retry\n\nInspect a returned job with `docs_status(action=\"job\", job_id=...)`. A requested\ncancellation uses `prepare_docs(action=\"cancel_docs_job\", job_id=...)` and may\nreturn `cancelling`; this is an acknowledgement, not a terminal state. Poll the\nsame job with a bounded attempt/deadline policy. Terminal job statuses are\n`succeeded`, `partial`, `failed`, `cancelled`, and `interrupted`. A committing job\nmay be too late to cancel safely. Read the actual terminal result before deciding\nwhether to retry; never start an unbounded resubmit/poll loop. Retry the original\ndocumentation question after a successful preparation, preserving explicit scope.",
+        "version_binding": "unversioned",
+        "content_sha256": "3856065c3b1a9dca0a8dda4500623003f4e5e83bbbebcb61783d28df051a1a40",
+        "project_identity": "local:8a52252ff788684908b63f534c86bae96c7c6a2399f39683fbc1f8531daf4981",
+        "line_start": 60,
+        "line_end": 69,
+        "authority": "source_of_truth",
+        "scope": "project",
+        "source_uri": "docatlas://source/b7f2bf8bb5623727d0911291"
+      }
+    ],
+    "context_quality": {
+      "status": "unverified",
+      "reasons": [
+        "coverage_unverified"
+      ]
+    },
+    "read_next": [],
+    "edit_ready": false,
+    "investigation_allowed": true,
+    "estimated_tokens": 701
+  }
+}

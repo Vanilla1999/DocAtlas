@@ -132,9 +132,9 @@ documents:
   - path: eval/project_answer_surface_v1/README.md
     role: development
     scope: project
-    description: Frozen 100-case EN/RU question-surface protocol covering canonical signatures, ownership, and fail-closed unsupported outcomes.
-    authority: source_of_truth
-    status: active
+    description: Retired project-answer v1 evaluation protocol; historical parser signatures, not the current project-chat operational contract.
+    authority: historical
+    status: superseded
     impact: search_only
 
   - path: eval/task_level/README.md

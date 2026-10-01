@@ -1,0 +1,502 @@
+{
+  "head": "11ee5dbe067166e6d6ad5a108290fa5bafc0edf9",
+  "runtime_import": "/tmp/opencode/docatlas-ablation/.venv/lib/python3.12/site-packages/docmancer/__init__.py",
+  "fixture": "/tmp/opencode/docs-contract-controls-3x_ijo6_",
+  "corpus_sha256": {
+    "wiki/Architecture.md": "5b7f84447f7e8dc2ac7aa5fa3a256196786ccfaf089fd10dd793b8abaac3aa71",
+    "wiki/Troubleshooting.md": "501d97ac38bae41bff327a40f9e2d5527b5d0a47a30f35c2383d95b4bb88a38b",
+    "wiki/Configuration.md": "5a03fa2e07d5800069436d1cd7e2fde9b6c23d676380a79d38d49d4aa01dc82c",
+    "docs/mcp-docs-server.md": "deee073022b2da6d4f81c3007a446c14788e5aabc099865c5984641cf74e50dc",
+    "docs/source-continuation.md": "00715dd09b8bcf6894ae65edaa0a5629c13e887887323724538968c2ea5b4a3a",
+    "docs/AGENT_DOCS_WORKFLOW.md": "279c819a95f502e67d31a3a6b44726d18c4d34ce7d3a55bc5d5cefae25cf8a75",
+    "SKILL.md": "56d3f3405efd81f0be4175220a86075dbee3a6bf01c45dade6ba369e8a42aa77"
+  },
+  "tools": [
+    {
+      "name": "get_docs_context",
+      "description": "Source-grounded documentation tool. One call = one concrete question. Pass the original request unchanged; never substitute a benchmark/evaluation or documentation-governance meta-question. For onboarding/cross-module use scope=all without module filters (scope=\"all\"); use scope=\"project\" for repo policy and scope=\"module\" with exact module_path. module_path always implies module scope. Preserve explicit scope; never widen it. For module plus repo policy make two bounded calls (module then project). Lookups never authorize an answer or edit. hard_stop=true blocks edits.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "question": {
+            "type": "string",
+            "minLength": 1,
+            "description": "One concrete question; independent questions use separate calls."
+          },
+          "lookup_queries": {
+            "type": [
+              "array",
+              "null"
+            ],
+            "maxItems": 5,
+            "uniqueItems": true,
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 500
+            },
+            "description": "Same question only. For cross-language, comparison, conditional, or multiple dependent facets use 1–3 short lookups in the documentation language; simple single-facet questions need none. Keep the original question unchanged; preserve exact identifiers, versions, conditions, negation and comparison sides. Never batch independent questions, invent the expected answer, or use guessed source names."
+          },
+          "project_path": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "library": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "version": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Current project: omit. Set only for an explicit exact/historical version; re-query after lockfile changes."
+          },
+          "module_path": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Exact module path; always implies module scope."
+          },
+          "scope": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "enum": [
+              "project",
+              "module",
+              "all"
+            ],
+            "description": "project=repo-level docs only; module=one module; all=repo-level plus modules in the same repository; module_path limits to module."
+          }
+        },
+        "required": [
+          "question"
+        ]
+      },
+      "outputSchema": {
+        "type": "object",
+        "required": [
+          "status"
+        ],
+        "properties": {
+          "status": {
+            "enum": [
+              "ok",
+              "truncated",
+              "insufficient_evidence",
+              "failed"
+            ]
+          },
+          "kind": {
+            "enum": [
+              "docs_answer",
+              "docs_context",
+              "patch_context"
+            ]
+          },
+          "estimated_tokens": {
+            "type": "integer"
+          },
+          "context_quality": {
+            "type": "object"
+          },
+          "read_next": {
+            "type": "array",
+            "maxItems": 1,
+            "items": {
+              "type": "object"
+            }
+          },
+          "reason_code": {
+            "type": "string"
+          },
+          "operational_reason_code": {
+            "type": "string"
+          },
+          "documentation_supported": {
+            "type": "boolean"
+          },
+          "investigation_allowed": {
+            "type": "boolean"
+          },
+          "hard_stop": {
+            "type": "boolean"
+          },
+          "recovery_origin": {
+            "type": "string"
+          },
+          "recovery_reason_code": {
+            "type": "string"
+          },
+          "recovery_disposition": {
+            "type": "string"
+          },
+          "module_candidates": {
+            "type": "array",
+            "maxItems": 8,
+            "items": {
+              "type": "object",
+              "required": [
+                "module_path"
+              ],
+              "properties": {
+                "module_path": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "missing": {
+            "type": "array",
+            "maxItems": 5,
+            "items": {
+              "type": "string"
+            }
+          },
+          "recommended_next_action": {
+            "type": "object"
+          }
+        }
+      }
+    },
+    {
+      "name": "prepare_docs",
+      "description": "Call only from get_docs_context recommended_next_action or an explicit sync, refresh, index, or prefetch request. Honor approval; poll job_id with docs_status and retry unchanged only after success.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "action": {
+            "type": "string",
+            "enum": [
+              "sync_project_docs",
+              "prefetch_project_dependency_docs",
+              "prefetch_library_docs",
+              "discover_library_docs",
+              "inspect_docs_target",
+              "validate_docs_manifest",
+              "prefetch_docs_manifest",
+              "refresh_library_docs",
+              "prune_library_docs",
+              "remove_library_docs",
+              "clear_index",
+              "cancel_docs_job"
+            ]
+          },
+          "project_path": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "scope": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "enum": [
+              "project-local"
+            ]
+          },
+          "confirm": {
+            "type": [
+              "boolean",
+              "null"
+            ],
+            "description": "Second-call apply flag for action='clear_index' only; omit for every other action."
+          },
+          "plan_digest": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "allow_incomplete": {
+            "type": [
+              "boolean",
+              "null"
+            ]
+          },
+          "library": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "ecosystem": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "version": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "canonical_id": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "job_id": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "manifest_path": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "source_type": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "docs_url": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "question": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "include_flutter": {
+            "type": [
+              "boolean",
+              "null"
+            ]
+          },
+          "include_dart": {
+            "type": [
+              "boolean",
+              "null"
+            ]
+          },
+          "include_rust": {
+            "type": [
+              "boolean",
+              "null"
+            ]
+          },
+          "include_go": {
+            "type": [
+              "boolean",
+              "null"
+            ]
+          },
+          "include_packages": {
+            "type": [
+              "array",
+              "null"
+            ],
+            "items": {
+              "type": "string"
+            }
+          },
+          "with_vectors": {
+            "type": [
+              "boolean",
+              "null"
+            ],
+            "default": false
+          },
+          "force": {
+            "type": [
+              "boolean",
+              "null"
+            ]
+          },
+          "force_refresh": {
+            "type": [
+              "boolean",
+              "null"
+            ]
+          },
+          "continue_on_error": {
+            "type": [
+              "boolean",
+              "null"
+            ]
+          },
+          "dry_run": {
+            "type": [
+              "boolean",
+              "null"
+            ],
+            "default": true
+          },
+          "target": {
+            "type": [
+              "object",
+              "null"
+            ]
+          },
+          "max_pages": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 1,
+            "maximum": 5
+          }
+        },
+        "required": [
+          "action"
+        ],
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "action": {
+                  "const": "clear_index"
+                }
+              }
+            },
+            "then": {
+              "required": [
+                "scope",
+                "project_path"
+              ],
+              "properties": {
+                "scope": {
+                  "const": "project-local"
+                },
+                "project_path": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "action": {
+                  "const": "clear_index"
+                }
+              }
+            },
+            "else": {
+              "not": {
+                "required": [
+                  "confirm"
+                ]
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "action": {
+                  "const": "remove_library_docs"
+                }
+              }
+            },
+            "then": {
+              "required": [
+                "canonical_id",
+                "project_path"
+              ],
+              "properties": {
+                "canonical_id": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "project_path": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "docs_status",
+      "description": "Read-only status. Use when the user explicitly asks about health, freshness, indexing, or job progress, or to poll a returned job_id from prepare_docs.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "action": {
+            "type": "string",
+            "enum": [
+              "project",
+              "library",
+              "jobs",
+              "job"
+            ]
+          },
+          "project_path": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "canonical_id": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "job_id": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "status": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "limit": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 1,
+            "maximum": 200
+          },
+          "module": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 500
+          },
+          "details": {
+            "type": [
+              "boolean",
+              "null"
+            ]
+          }
+        },
+        "required": [
+          "action"
+        ]
+      }
+    }
+  ],
+  "question_count": 10,
+  "purpose": "Packet inspection for text consistency; not answer generation, recall comparison or independent gate"
+}
