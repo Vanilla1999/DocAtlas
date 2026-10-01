@@ -1,0 +1,79 @@
+{
+  "docatlas": {
+    "original": {
+      "sufficient": 45,
+      "needs_review": 16,
+      "insufficient": 19
+    },
+    "revised": {
+      "sufficient": 45,
+      "needs_review": 15,
+      "insufficient": 20
+    },
+    "changed_cases": [
+      "typer-06",
+      "httpx-02",
+      "mkdocs-06",
+      "uv-06"
+    ],
+    "review_queue_cases": {
+      "original": 51,
+      "revised": 50
+    }
+  },
+  "grounded-3": {
+    "original": {
+      "sufficient": 32,
+      "needs_review": 48
+    },
+    "revised": {
+      "sufficient": 39,
+      "needs_review": 41
+    },
+    "changed_cases": [
+      "fastapi-03",
+      "fastapi-05",
+      "starlette-06",
+      "typer-06",
+      "pydantic-05",
+      "httpx-02",
+      "httpx-05",
+      "uv-03",
+      "uv-04",
+      "uv-05",
+      "uv-06"
+    ],
+    "review_queue_cases": {
+      "original": 80,
+      "revised": 80
+    }
+  },
+  "grounded-5": {
+    "original": {
+      "sufficient": 32,
+      "needs_review": 48
+    },
+    "revised": {
+      "sufficient": 40,
+      "needs_review": 40
+    },
+    "changed_cases": [
+      "fastapi-03",
+      "fastapi-05",
+      "starlette-06",
+      "typer-05",
+      "typer-06",
+      "pydantic-05",
+      "httpx-02",
+      "httpx-05",
+      "uv-03",
+      "uv-04",
+      "uv-05",
+      "uv-06"
+    ],
+    "review_queue_cases": {
+      "original": 80,
+      "revised": 80
+    }
+  }
+}

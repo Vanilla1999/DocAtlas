@@ -20,6 +20,18 @@ def normalize_markdown(text: str) -> str:
     Identifiers, underscores, numbers and sentence punctuation are preserved.
     This is a declared matching normalization, not semantic paraphrase inference.
     """
+    # Whitespace inside code/quoted literals can be an API argument. Protect it
+    # before folding layout whitespace; backticks themselves are presentation.
+    literals = []
+    def protect(match):
+        token = f'\ue000{len(literals)}\ue001'
+        literals.append(match.group(1) if match.group(1) is not None else match.group(0))
+        return token
+    text = re.sub(r'(?m)^```[^\n]*\n[\s\S]*?^```[^\n]*$|^~~~[^\n]*\n[\s\S]*?^~~~[^\n]*$'
+                  r'|`+([^`\n]+)`+|"[^"\n]*"|(?<!\w)\'[^\'\n]*\'(?!\w)', protect, text)
+    text = re.sub(r'\[([^\]\n]+)\]\([^\n)]+\)', r'\1', text)
+    text = re.sub(r'(?<!\w)[*_]{1,2}([^\n]+?)[*_]{1,2}(?!\w)', r'\1', text)
+    text = re.sub(r'(?m)^\s*[-*+]\s+', '- ', text)
     lines = []
     for line in text.splitlines():
         if _TABLE_RULE.fullmatch(line):
@@ -28,10 +40,15 @@ def normalize_markdown(text: str) -> str:
         if "|" in line:
             line = "|".join(part.strip() for part in line.strip().strip("|").split("|"))
         lines.append(line)
-    return " ".join(" ".join(lines).split())
+    result = " ".join(" ".join(lines).split())
+    for index, literal in enumerate(literals):
+        result = result.replace(f'\ue000{index}\ue001', literal)
+    return result
 
 
 def _contains(snippet: str, text: str) -> bool:
+    if text and re.search(r"(?<!\w)" + re.escape(text) + r"(?!\w)", snippet) is not None:
+        return True
     value = normalize_markdown(text)
     return bool(value) and re.search(r"(?<!\w)" + re.escape(value) + r"(?!\w)", normalize_markdown(snippet)) is not None
 
@@ -90,28 +107,56 @@ def _part_matches(part: Mapping, source: Mapping) -> bool:
     return _contains(str(source.get("snippet") or ""), str(part.get("text") or ""))
 
 
-def _match_set(witness: Mapping, sources: list[dict]) -> tuple[bool, list[str]]:
+def _witness_parts(witness: Mapping) -> list[dict]:
     parts = witness.get("parts")
     if not isinstance(parts, list) or not parts or any(not p.get("text") for p in parts):
         raise ValueError("Each approved witness set requires nonempty complete span parts")
+    # A prose witness may span separate paragraphs delivered as separate
+    # citations. Match each complete paragraph independently, never concatenate
+    # source snippets or claim a fabricated contiguous quote. Fenced examples
+    # remain atomic: splitting a code block could remove a required condition.
+    expanded = []
+    for part in parts:
+        text = part['text']
+        if '\n\n' not in text or '```' in text or '~~~' in text:
+            expanded.append(part)
+            continue
+        offset = 0
+        for paragraph in text.split('\n\n'):
+            if paragraph.strip():
+                span = {**part, 'text': paragraph}
+                if 'line_start' in part:
+                    span['line_start'] = part['line_start'] + offset
+                    span['line_end'] = span['line_start'] + paragraph.count('\n')
+                expanded.append(span)
+            offset += paragraph.count('\n') + 2
+    return expanded
+
+
+def _match_set(witness: Mapping, sources: list[dict]) -> tuple[bool, list[str], list[dict]]:
+    parts = _witness_parts(witness)
     groups = [sources]
-    if witness.get("same_source"):
+    # A single originally contiguous witness cannot silently be reassembled
+    # across different files. Explicit multipart annotations may permit that.
+    if witness.get("same_source") or (len(witness['parts']) == 1 and len(parts) > 1):
         groups = [[s for s in sources if s["path_or_url"] == path]
                   for path in dict.fromkeys(s["path_or_url"] for s in sources)]
     for group in groups:
         matches = [[s["evidence_id"] for s in group if _part_matches(part, s)] for part in parts]
         if all(matches):
-            return True, list(dict.fromkeys(identity for ids in matches for identity in ids))
-    return False, []
+            bindings = [{'part': part, 'evidence_ids': ids} for part, ids in zip(parts, matches)]
+            return True, list(dict.fromkeys(identity for ids in matches for identity in ids)), bindings
+    return False, [], []
 
 
 def _claim_status(claim: Mapping, sources: list[dict], unreviewed: list[dict]) -> dict:
     supported, contradicted = [], []
     for sets, output in ((claim.get("witness_sets", []), supported), (claim.get("contradiction_sets", []), contradicted)):
         for witness in sets:
-            complete, evidence_ids = _match_set(witness, sources)
+            complete, evidence_ids, bindings = _match_set(witness, sources)
             if complete:
-                output.append({"evidence_ids": evidence_ids, "parts": witness["parts"]})
+                output.append({"evidence_ids": evidence_ids, "parts": [binding['part'] for binding in bindings],
+                               "citation_bindings": bindings})
     unknown = [s["evidence_id"] for s in unreviewed]
     for source in sources:
         # An explicitly reviewed irrelevant/partial span is not an unknown
@@ -120,7 +165,7 @@ def _claim_status(claim: Mapping, sources: list[dict], unreviewed: list[dict]) -
                     for text in claim.get("known_insufficient", []))
         known = known or any(_part_matches(part, source)
             for w in [*claim.get("witness_sets", []), *claim.get("contradiction_sets", [])]
-            for part in w["parts"])
+             for part in _witness_parts(w))
         if not known:
             unknown.append(source["evidence_id"])
     if contradicted:

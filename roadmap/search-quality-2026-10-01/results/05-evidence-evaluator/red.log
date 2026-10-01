@@ -1,0 +1,68 @@
+.............FF......F...........                                        [100%]
+=================================== FAILURES ===================================
+________ test_separate_citations_support_one_fact_without_joined_quote _________
+
+example = ({'id': 'neutral', 'policy': {'authority': 'source_of_truth', 'lifecycle': 'active', 'version': '2'}, 'project_group':...t': 1, 'path_or_url': 'a.md', ...}, {'evidence_id': 'b', 'line_end': 3, 'line_start': 3, 'path_or_url': 'a.md', ...}]})
+
+    def test_separate_citations_support_one_fact_without_joined_quote(example):
+        case, registry, payload = example
+        case['required_claims'][0]['witness_sets'] = [{'parts': [
+            {'path': 'a.md', 'text': 'Cells cannot contain blocks.\n\nBlank lines are required.',
+             'line_start': 1, 'line_end': 3}]}]
+        payload['sources'] = [dict(evidence_id='a', path_or_url='a.md',
+            snippet='Cells cannot contain blocks.', line_start=1, line_end=1),
+            dict(evidence_id='b', path_or_url='a.md', snippet='Blank lines are required.',
+                 line_start=3, line_end=3)]
+        before = deepcopy(payload)
+        result = assess_context(case, payload, registry)
+>       assert result['context_sufficiency'] == 'sufficient'
+E       AssertionError: assert 'needs_review' == 'sufficient'
+E         
+E         - sufficient
+E         + needs_review
+
+tests/evidence_quality_v2/test_measurement.py:64: AssertionError
+________________________ test_rendered_list_formatting _________________________
+
+example = ({'id': 'neutral', 'policy': {'authority': 'source_of_truth', 'lifecycle': 'active', 'version': '2'}, 'project_group':...ge', 'version': '2'}}, {'sources': [{'evidence_id': 'a', 'line_end': 1, 'line_start': 1, 'path_or_url': 'a.md', ...}]})
+
+    def test_rendered_list_formatting(example):
+        case, registry, payload = example
+        case['required_claims'][0]['witness_sets'] = [{'parts': [
+            {'text': 'Does not replace:\n- *compiler*\n- [debugger](https://example.invalid)'}]}]
+        payload['sources'][0]['snippet'] = 'Does not replace:\n* compiler\n* debugger'
+>       assert assess_context(case, payload, registry)['context_sufficiency'] == 'sufficient'
+E       AssertionError: assert 'needs_review' == 'sufficient'
+E         
+E         - sufficient
+E         + needs_review
+
+tests/evidence_quality_v2/test_measurement.py:76: AssertionError
+_____ test_meaning_mutations_are_not_formatting_equivalence[` /-S`-`/-S`] ______
+
+example = ({'id': 'neutral', 'policy': {'authority': 'source_of_truth', 'lifecycle': 'active', 'version': '2'}, 'project_group':...ge', 'version': '2'}}, {'sources': [{'evidence_id': 'a', 'line_end': 1, 'line_start': 1, 'path_or_url': 'a.md', ...}]})
+original = '` /-S`', mutation = '`/-S`'
+
+    @pytest.mark.parametrize('original,mutation', [
+        ('at most 3 sources', 'at most 4 sources'),
+        ('use docs_context', 'use docs_answer'),
+        ('must not edit', 'must edit'),
+        ('only after approval', 'after approval'),
+        ('version 1.6.1', 'version 1.6.2'),
+        ('" /-S"', '"/-S"'),
+        ('` /-S`', '`/-S`'),
+    ])
+    def test_meaning_mutations_are_not_formatting_equivalence(example, original, mutation):
+        case, registry, payload = example
+        case['required_claims'][0]['witness_sets'] = [{'parts': [{'text': original}]}]
+        payload['sources'][0]['snippet'] = mutation
+        result = assess_context(case, payload, registry)
+>       assert result['context_sufficiency'] != 'sufficient'
+E       AssertionError: assert 'sufficient' != 'sufficient'
+
+tests/evidence_quality_v2/test_measurement.py:93: AssertionError
+=========================== short test summary info ============================
+FAILED tests/evidence_quality_v2/test_measurement.py::test_separate_citations_support_one_fact_without_joined_quote
+FAILED tests/evidence_quality_v2/test_measurement.py::test_rendered_list_formatting
+FAILED tests/evidence_quality_v2/test_measurement.py::test_meaning_mutations_are_not_formatting_equivalence[` /-S`-`/-S`]
+3 failed, 30 passed in 1.09s

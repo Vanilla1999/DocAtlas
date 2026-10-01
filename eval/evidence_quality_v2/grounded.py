@@ -24,15 +24,12 @@ from urllib.parse import unquote,urlparse
 from eval.evidence_quality_v2.cost import count_input,model_visible_text,percentiles
 from eval.evidence_quality_v2.run import load_protocol,documents_for,registry_for
 from eval.evidence_quality_v2.runtime import save_json,digest
-from eval.evidence_quality_v2.semantic import assess_context
+from eval.evidence_quality_v2.semantic import assess_context, normalize_markdown
 
 
 def rendered_normalization(text: str) -> str:
     """Formatting only: no stemming, paraphrases, polarity or identifier changes."""
-    text=re.sub(r'\[([^\]]+)\]\([^\n)]+\)',r'\1',text)
-    text=re.sub(r'(?<!\w)[*_]{1,2}([^\n]+?)[*_]{1,2}(?!\w)',r'\1',text)
-    text=re.sub(r'(?m)^\s*[-*+]\s+', '- ', text)
-    return ' '.join(text.split())
+    return normalize_markdown(text)
 
 
 def paragraphs(text: str):

@@ -49,6 +49,95 @@ def test_formatting_only():
     assert normalize_markdown('| `kind` | `docs_context` |')==normalize_markdown('|kind|docs_context|')
     assert normalize_markdown('must not')!=normalize_markdown('must')
 
+
+def test_separate_citations_support_one_fact_without_joined_quote(example):
+    case, registry, payload = example
+    case['required_claims'][0]['witness_sets'] = [{'parts': [
+        {'path': 'a.md', 'text': 'Cells cannot contain blocks.\n\nBlank lines are required.',
+         'line_start': 1, 'line_end': 3}]}]
+    payload['sources'] = [dict(evidence_id='a', path_or_url='a.md',
+        snippet='Cells cannot contain blocks.', line_start=1, line_end=1),
+        dict(evidence_id='b', path_or_url='a.md', snippet='Blank lines are required.',
+             line_start=3, line_end=3)]
+    before = deepcopy(payload)
+    result = assess_context(case, payload, registry)
+    assert result['context_sufficiency'] == 'sufficient'
+    assert result['claims']['permission']['supporting_witnesses'][0]['evidence_ids'] == ['a', 'b']
+    bindings = result['claims']['permission']['supporting_witnesses'][0]['citation_bindings']
+    assert [b['part']['text'] for b in bindings] == ['Cells cannot contain blocks.', 'Blank lines are required.']
+    assert payload == before
+    payload['sources'][1]['path_or_url'] = 'b.md'
+    assert assess_context(case, payload, registry)['context_sufficiency'] != 'sufficient'
+    payload['sources'][1]['path_or_url'] = 'a.md'
+    payload['sources'].pop()
+    assert assess_context(case, payload, registry)['context_sufficiency'] != 'sufficient'
+
+
+def test_rendered_list_formatting(example):
+    case, registry, payload = example
+    case['required_claims'][0]['witness_sets'] = [{'parts': [
+        {'text': 'Does not replace:\n- *compiler*\n- [debugger](https://example.invalid)'}]}]
+    payload['sources'][0]['snippet'] = 'Does not replace:\n* compiler\n* debugger'
+    assert assess_context(case, payload, registry)['context_sufficiency'] == 'sufficient'
+
+
+@pytest.mark.parametrize('original,mutation', [
+    ('at most 3 sources', 'at most 4 sources'),
+    ('use docs_context', 'use docs_answer'),
+    ('must not edit', 'must edit'),
+    ('only after approval', 'after approval'),
+    ('version 1.6.1', 'version 1.6.2'),
+    ('" /-S"', '"/-S"'),
+    ('` /-S`', '`/-S`'),
+    ("' /-S'", "'/-S'"),
+    ('```python\nif allowed:\n    deploy()\n```', '```python\nif allowed:\ndeploy()\n```'),
+])
+def test_meaning_mutations_are_not_formatting_equivalence(example, original, mutation):
+    case, registry, payload = example
+    case['required_claims'][0]['witness_sets'] = [{'parts': [{'text': original}]}]
+    payload['sources'][0]['snippet'] = mutation
+    result = assess_context(case, payload, registry)
+    assert result['context_sufficiency'] != 'sufficient'
+    assert result['required_supported'] == 0
+
+
+@pytest.mark.parametrize('identity', ['mkdocs-06', 'uv-06'])
+def test_saved_responses_support_requested_facts(identity):
+    import json
+    from pathlib import Path
+    from eval.evidence_quality_v2.run import load_protocol, registry_for
+    from eval.evidence_quality_v2.revised_gold import revised_case
+    repo = Path(__file__).resolve().parents[2]
+    _, cases, manifest = load_protocol()
+    original = next(c for c in cases if c['id'] == identity)
+    case = revised_case(original)
+    assert case['question'] == original['question']
+    wire = json.loads((repo / 'roadmap/search-quality-2026-10-01/audit/raw/external80/native' / f'{identity}.json').read_text())['wire']
+    payload = wire.get('structuredContent') or json.loads(wire['content'][0]['text'])
+    assert assess_context(case, payload, registry_for(case['project_group'], manifest))['context_sufficiency'] == 'sufficient'
+
+
+def test_quote_integrity_remains_separate_from_semantic_equivalence(tmp_path):
+    from eval.evidence_quality_v2.runtime import write_project, isolated_service, index_project
+    from eval.evidence_quality_v2.observer import observe_call
+    from eval.evidence_quality_v2.audit import audit_payload
+    project = tmp_path / 'project'
+    write_project(project, {'docs/deploy.md': '# Deployment\n\nDeploy the release only after approval.\n'})
+    with isolated_service(tmp_path / 'state') as (service, config):
+        index_project(service, config, project)
+        payload, trace = observe_call(service, dict(question='When may I deploy the release?', project_path=str(project), scope='all'))
+    assert payload['sources']
+    assert not audit_payload(payload, trace['snapshot'], project)
+    import hashlib
+    source = payload['sources'][0]
+    assert source['content_sha256'] != hashlib.sha256((project / source['path_or_url']).read_bytes()).hexdigest()
+    for key, value in [('snippet', source['snippet'] + ' Invented.'),
+                       ('content_sha256', '0' * 64), ('evidence_id', 'not-bound'),
+                       ('path_or_url', '../elsewhere.md')]:
+        mutated = deepcopy(payload)
+        mutated['sources'][0][key] = value
+        assert audit_payload(mutated, trace['snapshot'], project), key
+
 @pytest.mark.parametrize('lost', range(7))
 def test_first_loss(lost):
     stages={name:dict(complete=True,presence='present' if i<lost else 'absent') for i,name in enumerate(STAGES)}

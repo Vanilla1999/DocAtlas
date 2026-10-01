@@ -1,0 +1,295 @@
+{
+  "checks": 48,
+  "violations": 0,
+  "rows": [
+    {
+      "id": "fastapi-01",
+      "projection": 0,
+      "trace_sha256": "3c38c49ccd2e38bf193d7a5bcb539a92f1a3ce326c0607f3bf628a301dfe016f",
+      "errors": []
+    },
+    {
+      "id": "fastapi-02",
+      "projection": 0,
+      "trace_sha256": "135f25a4cd102af15395d76632ad54f06c1b8050183eaede99f503d29b3af8de",
+      "errors": []
+    },
+    {
+      "id": "fastapi-03",
+      "projection": 0,
+      "trace_sha256": "5c93581c6622126121dda808e5046cd6beb5ebc8c4501986492051502de68b61",
+      "errors": []
+    },
+    {
+      "id": "fastapi-04",
+      "projection": 0,
+      "trace_sha256": "4ea8ca0dc460a2177d4664a042a976de2cb2675d8ea8a7402a2bc6c96c766f31",
+      "errors": []
+    },
+    {
+      "id": "fastapi-05",
+      "projection": 0,
+      "trace_sha256": "7f11123cbcdbe0e50675c321a69daa49fc10527429c1c2ce4b368acb656f8b82",
+      "errors": []
+    },
+    {
+      "id": "fastapi-06",
+      "projection": 0,
+      "trace_sha256": "794734ac2808148a587b10cb77556eca1b54dfda090b66a0d82620029ff8fc10",
+      "errors": []
+    },
+    {
+      "id": "httpx-01",
+      "projection": 0,
+      "trace_sha256": "deb72ab7fb41ae75ec406fd2dac49bcec9945247708a033c046f74d50845e66a",
+      "errors": []
+    },
+    {
+      "id": "httpx-02",
+      "projection": 0,
+      "trace_sha256": "a385659d1beb4c994b6cef170b4d8debfcaae8e03021516a159b0fa10184ec78",
+      "errors": []
+    },
+    {
+      "id": "httpx-03",
+      "projection": 0,
+      "trace_sha256": "d53d6b3b787992faf3022bfd0da6862876886b1d8859627a398a66b35d221a05",
+      "errors": []
+    },
+    {
+      "id": "httpx-04",
+      "projection": 0,
+      "trace_sha256": "4c76cbe0a3bc2ecee2f0d0124539d883c07954c9cc0c25fad8d1c1d852cc89e6",
+      "errors": []
+    },
+    {
+      "id": "httpx-05",
+      "projection": 0,
+      "trace_sha256": "e6a16685ed0d267d4abd6627f51dd419b9f864992b8808fdf6181771abd17460",
+      "errors": []
+    },
+    {
+      "id": "httpx-06",
+      "projection": 0,
+      "trace_sha256": "613099feb5b46a73e839832424f0447e63137c9208025f091616bc291985ce9a",
+      "errors": []
+    },
+    {
+      "id": "mkdocs-01",
+      "projection": 0,
+      "trace_sha256": "c044dd76db112f905040216149f187c2e16180cd0cf8168b84a3cfa551651337",
+      "errors": []
+    },
+    {
+      "id": "mkdocs-02",
+      "projection": 0,
+      "trace_sha256": "1b6fb1df05fd5cc61921ec81bd8279d5c573d7ea9092fb6a3d5735b4347c9edb",
+      "errors": []
+    },
+    {
+      "id": "mkdocs-03",
+      "projection": 0,
+      "trace_sha256": "2ec89cd624e4326f28700a21e444627dd24c361fd7c5d2d12c4e5fd4671f8fb9",
+      "errors": []
+    },
+    {
+      "id": "mkdocs-04",
+      "projection": 0,
+      "trace_sha256": "d1c64e5683d29daa7d6a0fa89b1c89784800aac2117800ae00c6d6589f5ddfb0",
+      "errors": []
+    },
+    {
+      "id": "mkdocs-05",
+      "projection": 0,
+      "trace_sha256": "1af827e716732798523f3303502a866ce7911789d6d84aab1d3c80a0bc5a526c",
+      "errors": []
+    },
+    {
+      "id": "mkdocs-06",
+      "projection": 0,
+      "trace_sha256": "f0faa55fbefbe8fdd5ae250a91671605eb90a8c067da677d342f70da39bf2d00",
+      "errors": []
+    },
+    {
+      "id": "pydantic-01",
+      "projection": 0,
+      "trace_sha256": "965ccba9f342ae4f06766ab64568b72789375ca7ac492007a619c9a8463605ca",
+      "errors": []
+    },
+    {
+      "id": "pydantic-02",
+      "projection": 0,
+      "trace_sha256": "a1592f727e4cf4dcb94786424ea770ad39a2a1694457af2e998b0a9da013646b",
+      "errors": []
+    },
+    {
+      "id": "pydantic-03",
+      "projection": 0,
+      "trace_sha256": "bf999d0db16d3f33b03cf14f00f5f3d78ff97814890268f65d25e8e219ffd5b0",
+      "errors": []
+    },
+    {
+      "id": "pydantic-04",
+      "projection": 0,
+      "trace_sha256": "c54f74858ec7a424bb840ed4803d1e5b09379e385aebc9ed6086853d45af6022",
+      "errors": []
+    },
+    {
+      "id": "pydantic-05",
+      "projection": 0,
+      "trace_sha256": "ea82ac20bf8e0cbee5237403f60f7cbf7d2accdbdf0e70ae0eea6d24b7a3f442",
+      "errors": []
+    },
+    {
+      "id": "pydantic-06",
+      "projection": 0,
+      "trace_sha256": "3cb0a76b3d5eec6ae3f53297729e912919a5d42b2017ef39ef9f79e84d81e2f0",
+      "errors": []
+    },
+    {
+      "id": "ruff-01",
+      "projection": 0,
+      "trace_sha256": "19867da5a078ce935e118028f42775b6de1c7e1d6d2e2a07c7efed8fb505734d",
+      "errors": []
+    },
+    {
+      "id": "ruff-02",
+      "projection": 0,
+      "trace_sha256": "7a5910ba13bf92805453f6dd557739608ea301f327d670f7054d7f5aa905b494",
+      "errors": []
+    },
+    {
+      "id": "ruff-03",
+      "projection": 0,
+      "trace_sha256": "0afc8210ec1084fc416d81adb99212ab043a87f2c73325d1182b56087f74b849",
+      "errors": []
+    },
+    {
+      "id": "ruff-04",
+      "projection": 0,
+      "trace_sha256": "f2c7b180918b6c74188e5fa053b7d80aa135d2bfb6a58c2bd5c46ad687fd3ab5",
+      "errors": []
+    },
+    {
+      "id": "ruff-05",
+      "projection": 0,
+      "trace_sha256": "432306f0c7611407d8ab35dbaec84797681fed7738b11ca4c0941510f732f490",
+      "errors": []
+    },
+    {
+      "id": "ruff-06",
+      "projection": 0,
+      "trace_sha256": "094df30c0e778b8181117d908b8677ed6181fdb8989b00ff807c4d696b834bd6",
+      "errors": []
+    },
+    {
+      "id": "starlette-01",
+      "projection": 0,
+      "trace_sha256": "e06a9fac5390b65a81a7d7b89a96f1395d934a2e5996656798084c4d11a6b5e0",
+      "errors": []
+    },
+    {
+      "id": "starlette-02",
+      "projection": 0,
+      "trace_sha256": "d718b31392f0ad7706839a2de765871b6424c6c943d369311109d9878164169e",
+      "errors": []
+    },
+    {
+      "id": "starlette-03",
+      "projection": 0,
+      "trace_sha256": "5eef2d95b0ddc9d57cf59425eeb928acef085e88a01bc9d66716b188143484c7",
+      "errors": []
+    },
+    {
+      "id": "starlette-04",
+      "projection": 0,
+      "trace_sha256": "162e785bd39cb341adc9596fc6ab0e0fd813089600b365bae04ad5b7f1f1d425",
+      "errors": []
+    },
+    {
+      "id": "starlette-05",
+      "projection": 0,
+      "trace_sha256": "2898c14337e2b2e820434a786233352ad60ff861f8245ab5536d4fff9d42faa2",
+      "errors": []
+    },
+    {
+      "id": "starlette-06",
+      "projection": 0,
+      "trace_sha256": "18182c176a7cbc243d8d017ee13a196118c04fd4196c2ec995b2cab811783d9f",
+      "errors": []
+    },
+    {
+      "id": "typer-01",
+      "projection": 0,
+      "trace_sha256": "e010cab184572f61bde49fab88e7a50e2bb2248d9b8883722f9d357ccb2eebd3",
+      "errors": []
+    },
+    {
+      "id": "typer-02",
+      "projection": 0,
+      "trace_sha256": "5cae6c2b3dd6a30892580081142d3ade6f2de582cb2a77c6b5f0e03ae06b1101",
+      "errors": []
+    },
+    {
+      "id": "typer-03",
+      "projection": 0,
+      "trace_sha256": "2e41ae81ace8de1a67304b1ce5045111793292f61584a249c8e80e01389f1316",
+      "errors": []
+    },
+    {
+      "id": "typer-04",
+      "projection": 0,
+      "trace_sha256": "b7bb94685a848f3c5ba2ba8b947b4e0c2d5187aeaadf264c32256528f7e4dfd1",
+      "errors": []
+    },
+    {
+      "id": "typer-05",
+      "projection": 0,
+      "trace_sha256": "6e5b122453887dec43f4e2733c71f37fcc9361ccfd3d7e179a1ea7c1a9c83475",
+      "errors": []
+    },
+    {
+      "id": "typer-06",
+      "projection": 0,
+      "trace_sha256": "67e2a91cde3d6ec8c566ca703bd687d5008b9ba66d8079f7ed0fabaa97f0a5b9",
+      "errors": []
+    },
+    {
+      "id": "uv-01",
+      "projection": 0,
+      "trace_sha256": "17dc72cea4a59111dd2aadfa423d4a9b215e742d941a55235608914844f2f897",
+      "errors": []
+    },
+    {
+      "id": "uv-02",
+      "projection": 0,
+      "trace_sha256": "6d55000c1386342a035f1dd440c7479c862dc9b5ab7cddf3b58529e169dfc066",
+      "errors": []
+    },
+    {
+      "id": "uv-03",
+      "projection": 0,
+      "trace_sha256": "2721dabf47af52e83fcde5ffa4c1f0579b0316e013cc624b86cb6d7e9830d412",
+      "errors": []
+    },
+    {
+      "id": "uv-04",
+      "projection": 0,
+      "trace_sha256": "e9efef53da29d0d823b6427ad3b55049c4b63557bab758dcd8ea5831feeed755",
+      "errors": []
+    },
+    {
+      "id": "uv-05",
+      "projection": 0,
+      "trace_sha256": "545505002c88ff35095069f3e720f2959c216ba8e185e72f97b69582ed978683",
+      "errors": []
+    },
+    {
+      "id": "uv-06",
+      "projection": 0,
+      "trace_sha256": "60eadfce8d88659d23e322bef5c12da572d0b2deea8dca9a6ed29eff34de0367",
+      "errors": []
+    }
+  ],
+  "digest_policy": "Snapshot evidence-material binding via canonical validator; raw file SHA is not content_sha256"
+}

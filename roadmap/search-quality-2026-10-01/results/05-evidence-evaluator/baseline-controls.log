@@ -1,0 +1,41 @@
+F.......F......                                                          [100%]
+=================================== FAILURES ===================================
+_ test_retrieved_safe_context_survives_unknown_question_class[What kind of interfaces does Pebble create, and how is it intended to compose them?-command line interfaces\nin a composable way] _
+
+tmp_path = PosixPath('/tmp/pytest-of-viadmin/pytest-84/test_retrieved_safe_context_su0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x764ad4d016a0>
+question = 'What kind of interfaces does Pebble create, and how is it intended to compose them?'
+expected = 'command line interfaces\nin a composable way'
+
+    @pytest.mark.parametrize('question,expected',CASES)
+    def test_retrieved_safe_context_survives_unknown_question_class(tmp_path,monkeypatch,question,expected):
+        service,root=_named_document_service(tmp_path,monkeypatch,['README.md'],{'README.md':TEXT})
+        payload,trace=capture(service,{'question':question,'project_path':root,'scope':'all'})
+        assert any(expected in s['snippet'] for r in trace['stages']['retrieved_candidates'] for s in r['sources'])
+>       assert payload.get('context_available') is True
+E       AssertionError: assert False is True
+E        +  where False = <built-in method get of dict object at 0x764ad6e92800>('context_available')
+E        +    where <built-in method get of dict object at 0x764ad6e92800> = {'answer_available': False, 'answer_supported': False, 'context_available': False, 'context_quality': {'reasons': ['source_unavailable'], 'status': 'unavailable'}, ...}.get
+
+tests/evidence_quality_v2/test_readme_neutral_context.py:50: AssertionError
+_ test_lookup_identical_to_original_is_not_a_new_requirement[What kind of interfaces does Pebble create, and how is it intended to compose them?-command line interfaces\nin a composable way] _
+
+tmp_path = PosixPath('/tmp/pytest-of-viadmin/pytest-84/test_lookup_identical_to_origi0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x764ad4c029c0>
+question = 'What kind of interfaces does Pebble create, and how is it intended to compose them?'
+expected = 'command line interfaces\nin a composable way'
+
+    @pytest.mark.parametrize('question,expected',CASES)
+    def test_lookup_identical_to_original_is_not_a_new_requirement(tmp_path,monkeypatch,question,expected):
+        service,root=_named_document_service(tmp_path,monkeypatch,['README.md'],{'README.md':TEXT})
+        args={'question':question,'project_path':root,'scope':'all'}
+        base,base_trace=capture(service,args)
+        duplicate,trace=capture(service,{**args,'lookup_queries':[question]})
+>       assert base['context_available'] is True
+E       assert False is True
+
+tests/evidence_quality_v2/test_readme_neutral_context.py:91: AssertionError
+=========================== short test summary info ============================
+FAILED tests/evidence_quality_v2/test_readme_neutral_context.py::test_retrieved_safe_context_survives_unknown_question_class[What kind of interfaces does Pebble create, and how is it intended to compose them?-command line interfaces\nin a composable way]
+FAILED tests/evidence_quality_v2/test_readme_neutral_context.py::test_lookup_identical_to_original_is_not_a_new_requirement[What kind of interfaces does Pebble create, and how is it intended to compose them?-command line interfaces\nin a composable way]
+2 failed, 13 passed in 2.64s
