@@ -206,9 +206,9 @@ def _native_fixture(corpus, spec, request, protocol, *, arm="A"):
 def _execute_arm(corpus, spec, request, protocol, arm):
     """Worker entry; no private review inputs and no unsandboxed CLI fallback."""
     try:
-        if arm == 'P':
+        if arm in ('P', 'P_MINUS_RATIO'):
             from .adapters import product_probe
-            result = product_probe(corpus, spec, request)
+            result = product_probe(corpus, spec, request, remove_ratio=(arm == 'P_MINUS_RATIO'))
             result['execution_status'] = result['status']
         elif arm in ('A', 'B', 'D_L', 'E_G_L', 'E_GR_L'):
             result = _native_fixture(corpus, spec, request, protocol, arm=arm)
@@ -252,7 +252,7 @@ def stage_worker(app: Path) -> str:
 
 
 def run_frozen(frozen: Path, output: Path, arm: str) -> dict:
-    if arm not in ('P', 'A', 'B', 'D_L', 'E_G_L', 'E_GR_L'):
+    if arm not in ('P', 'P_MINUS_RATIO', 'A', 'B', 'D_L', 'E_G_L', 'E_GR_L'):
         raise ValueError('unknown implemented arm')
     from .isolation import IsolationUnavailable, run_isolated
     manifest = verify_frozen(frozen)
@@ -309,7 +309,7 @@ def main() -> int:
     run = commands.add_parser('run')
     run.add_argument('--frozen', type=Path, required=True)
     run.add_argument('--output', type=Path, required=True)
-    run.add_argument('--arm', choices=['P', 'A', 'B', 'D_L', 'E_G_L', 'E_GR_L'], required=True)
+    run.add_argument('--arm', choices=['P', 'P_MINUS_RATIO', 'A', 'B', 'D_L', 'E_G_L', 'E_GR_L'], required=True)
     regression = commands.add_parser('regressions')
     regression.add_argument('--base', required=True)
     regression.add_argument('--head', required=True)

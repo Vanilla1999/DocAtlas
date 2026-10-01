@@ -5,6 +5,12 @@ patches now provide B/D_L/E_G_L; E_GR_L measures a real candidate-ordering pass,
 not the whole legacy packing package. Original T05 ownership work remains partial.
 The 72-run development replay used ordinary processes, not namespace isolation.
 
+Follow-up: [RATIO_REMOVE_ONE.md](RATIO_REMOVE_ONE.md). `P_MINUS_RATIO` runs the real
+P handler with a source-shape-checked, process-local ratio-only hook (missing
+parent exact terms retain the original test). 112 repeated development executions
+show three answerable wins and an added unanswerable false admission: not grounds
+for global removal. Run reviewer with `--planned-arms P P_MINUS_RATIO` for this pair.
+
 Opt-in experiments only. Product code, MCP schema, defaults, `uv.lock`, frozen
 protocols/labels and MPNet threshold are unchanged. Original base is
 `55637eb4d29a0d06c01714ee647a5b486a5be725`. Historical CI and its two unexplained

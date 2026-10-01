@@ -47,6 +47,15 @@ non-inferiority claim is approved by this report. A result of INCONCLUSIVE is no
 a finding of equivalence and not permission to remove all heuristics.
 # Local T07 development decision — 2026-10-01
 
+Updated by [RATIO_REMOVE_ONE.md](RATIO_REMOVE_ONE.md): the actual-P ratio-only
+control is now measured. On 23 answerable questions: 3 wins / 0 losses / 20 ties;
+on five unanswerable questions: one additional nonempty unsupported context.
+**KEEP the product ratio behavior for now; investigate separation of candidate
+admission from final coverage/certification, not blanket deletion.** Missing
+parent exact terms must retain their existing rejection path. Source policy and
+authority checks remain KEEP. Full ranker removal is still NOT_EVALUATED.
+The table below records the earlier T07 diagnostic decision.
+
 Evidence: [CONTINUATION_T07.md](CONTINUATION_T07.md), 11 answerable questions,
 same-author posthoc review, one public document. Not product acceptance.
 

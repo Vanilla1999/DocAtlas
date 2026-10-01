@@ -110,6 +110,55 @@ def test_legacy_ordering_calls_production_ranker_with_real_traces(tmp_path, monk
     assert summary['execution_counts'] == {'EXECUTED': 1}
 
 
+def test_ratio_hook_removes_only_threshold_and_retains_rejections():
+    from docmancer.docs.domain import evidence_qualification as gate
+    from experiments.retrieval_ablation.ratio_hook import without_ratio_threshold
+    probe = {'query_terms': ['storage', 'xenolith', 'marigold', 'zephyr']}
+    kwargs = {'query_id': 'q', 'visible_text': 'Storage persists records.'}
+    assert gate.qualify_evidence(probe, **kwargs).reason == 'insufficient_visible_match'
+    with without_ratio_threshold() as stats:
+        assert gate.qualify_evidence(probe, **kwargs).qualified
+        policies = [({'project_identity': 'foreign'}, 'wrong_project_identity'),
+                    ({'freshness': 'stale'}, 'stale_evidence'),
+                    ({'index_freshness': 'stale'}, 'unsynchronized_index'),
+                    ({'risk_flags': ['unsafe']}, 'unsafe_evidence'),
+                    ({'lifecycle_status': 'historical'}, 'lifecycle_not_allowed')]
+        for facts, reason in policies:
+            result = gate.qualify_evidence(probe, **kwargs,
+                candidate={'project_identity': 'repo', **facts}, expected_project_identity='repo')
+            assert not result.qualified and result.reason == reason
+        for other_probe, text in [
+            ({**probe, 'exact_terms': ['Client.beta']}, 'Storage persists records.'),
+            ({**probe, 'parent_exact_terms': ['Client.beta']}, 'Storage persists records.'),
+            ({**probe, 'bound_subjects': ['Client.beta']}, 'Storage persists records.'),
+            (probe, 'Unrelated prose.'),
+            (probe, '# Storage'),
+            ({**probe, 'forbidden_evidence_terms': ['storage']}, 'Storage persists records.')]:
+            result = gate.qualify_evidence(other_probe, query_id='q', visible_text=text)
+            assert not result.qualified, (other_probe, result)
+        assert stats['below_threshold_checks'] > 0
+        assert stats['parent_exact_preserved_checks'] > 0
+    assert not gate.qualify_evidence(probe, **kwargs).qualified
+
+
+def test_ratio_hook_restores_lazily_imported_alias_after_exception(monkeypatch):
+    import sys
+    from types import ModuleType
+    from docmancer.docs.domain import evidence_qualification as gate
+    from experiments.retrieval_ablation.ratio_hook import without_ratio_threshold
+    original = gate.qualify_evidence
+    name = 'docmancer._ablation_late_alias_test'
+    late = ModuleType(name)
+    with pytest.raises(RuntimeError, match='controlled failure'):
+        with without_ratio_threshold():
+            late.qualify = gate.qualify_evidence
+            monkeypatch.setitem(sys.modules, name, late)
+            assert late.qualify is not original
+            raise RuntimeError('controlled failure')
+    assert late.qualify is original
+    assert gate.qualify_evidence is original
+
+
 def test_native_project_packet_never_calls_custom_ordering(tmp_path, monkeypatch):
     store, sources, filters = project_store(tmp_path)
     def forbidden(*args, **kwargs):

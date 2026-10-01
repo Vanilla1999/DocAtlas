@@ -272,6 +272,31 @@ def test_e_gr_l_orders_real_gate_output_without_another_search(tmp_path):
     assert not result['model_visible_packet']['answer_supported']
 
 
+def test_product_ratio_remove_one_runs_real_handler_and_restores_gate(tmp_path):
+    from experiments.retrieval_ablation.run import _execute_arm
+    from docmancer.docs.domain import evidence_qualification
+    original = evidence_qualification.qualify_evidence
+    corpus = tmp_path / 'corpus'
+    corpus.mkdir()
+    raw = b'# Retry\n\nThe retry budget is three attempts. Do not retry cancellation.\n'
+    (corpus / 'retry.md').write_bytes(raw)
+    spec = {'schema_version': 1, 'sources': [
+        {'path': 'retry.md', 'sha256': hashlib.sha256(raw).hexdigest()}]}
+    result = _execute_arm(corpus, spec, {'question': 'retry budget'}, {}, 'P_MINUS_RATIO')
+    assert result['execution_status'] == 'EXECUTED', result
+    assert result['arm'] == 'P_MINUS_RATIO'
+    assert result['ablation_hook']['changed_comparisons'] == 1
+    assert result['ablation_hook']['qualification_calls'] > 0
+    assert result['audit_errors'] == []
+    assert result['budget_tokens'] <= 800
+    assert evidence_qualification.qualify_evidence is original
+    from experiments.retrieval_ablation.review import summarize
+    result['freeze_sha256'] = 'same'
+    summary = summarize([result], planned_arms=('P', 'P_MINUS_RATIO'))
+    assert summary['missing_arms'] == ['P']
+    assert summary['execution_counts'] == {'EXECUTED': 1}
+
+
 def test_d_l_reuses_b_candidate_pool_and_search_count(tmp_path):
     from experiments.retrieval_ablation.run import _execute_arm
     corpus = tmp_path / 'corpus'

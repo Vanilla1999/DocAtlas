@@ -113,6 +113,10 @@ remains NOT_EVALUATED. DECISION.md follows this evidence rather than selecting a
 winner in advance.
 # Latest local continuation
 
+Real-P remove-one follow-up: [RATIO_REMOVE_ONE.md](RATIO_REMOVE_ONE.md), 112
+executions over 28 development questions. The ratio filter has both a measured
+recall cost and a measured false-admission benefit; no global removal recommended.
+
 See [CONTINUATION_T07.md](CONTINUATION_T07.md) for the actual PR source-tree audit,
 restored staged implementation, T07 ordering diagnostic and 72 real development
 runs. The older report below is historical, not the current capability inventory.

@@ -11,7 +11,7 @@ def summarize(results: list[dict], *, planned_arms=('P', 'A')) -> dict:
     """Keep packet readiness, execution, and unmeasured quality separate."""
     if not results:
         raise ValueError('no runs to review')
-    supported = {'P', 'A', 'B', 'D_L', 'E_G_L', 'E_GR_L'}
+    supported = {'P', 'P_MINUS_RATIO', 'A', 'B', 'D_L', 'E_G_L', 'E_GR_L'}
     if (not planned_arms or len(set(planned_arms)) != len(planned_arms)
             or not set(planned_arms) <= supported):
         raise ValueError('invalid planned arms')
@@ -29,7 +29,7 @@ def summarize(results: list[dict], *, planned_arms=('P', 'A')) -> dict:
         if arm not in planned_arms or status not in (
                 'EXECUTED', 'BLOCKED_ENV', 'HANDLER_FAILED', 'AUDIT_FAILED'):
             raise ValueError('unknown arm or execution status')
-        if arm != 'P' and status == 'EXECUTED':
+        if arm not in ('P', 'P_MINUS_RATIO') and status == 'EXECUTED':
             if result.get('packet_status') == 'VALIDATED_PROJECT_PACKET':
                 from docmancer.docs.application.model_visible_projection import (
                     validate_model_visible_projection, docs_context_budget_tokens)
@@ -42,7 +42,7 @@ def summarize(results: list[dict], *, planned_arms=('P', 'A')) -> dict:
             elif (result.get('packet_status') != 'BLOCKED_SAFE_PACKET_ADAPTER'
                     or result.get('model_visible_packet') is not None):
                 raise ValueError('diagnostic candidates are not a public packet')
-        if arm == 'P' and status == 'EXECUTED':
+        if arm in ('P', 'P_MINUS_RATIO') and status == 'EXECUTED':
             if result.get('audit_errors') != [] or not 0 <= result['budget_tokens'] <= 800:
                 raise ValueError('executed P must pass the real audit and budget')
         lanes = result.get('lanes', result.get('raw_fts_lanes', []))

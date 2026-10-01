@@ -296,11 +296,18 @@ def observe_native_sql() -> Iterator[SQLTrace]:
         yield trace
 
 
-def product_probe(corpus, spec, request):
+def product_probe(corpus, spec, request, *, remove_ratio=False):
     from experiments.language_aware_context import baseline_probe
     with observe_native_sql() as trace:
-        result = baseline_probe.run(corpus, spec, request)
-    result.update(arm='P', raw_fts_lanes=trace.lanes, quality_status='UNJUDGED',
+        if remove_ratio:
+            from .ratio_hook import without_ratio_threshold
+            with without_ratio_threshold() as hook:
+                result = baseline_probe.run(corpus, spec, request)
+            result['ablation_hook'] = dict(hook)
+        else:
+            result = baseline_probe.run(corpus, spec, request)
+    result.update(arm='P_MINUS_RATIO' if remove_ratio else 'P',
+                  raw_fts_lanes=trace.lanes, quality_status='UNJUDGED',
                   resource_matched=False)
     return result
 
