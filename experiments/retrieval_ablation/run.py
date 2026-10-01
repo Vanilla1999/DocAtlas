@@ -151,10 +151,10 @@ def verify_frozen(root: Path) -> dict:
     return manifest
 
 
-def _native_fixture(corpus, spec, request, protocol):
+def _native_fixture(corpus, spec, request, protocol, *, arm="A"):
     from eval.evidence_quality_v2.runtime import write_project, isolated_service, index_project
     from docmancer.core.sqlite_store import SQLiteStore
-    from .adapters import native_diagnostic
+    from .adapters import native_diagnostic, reproject_structural_fts
 
     documents, _ = load_sources(corpus, spec)
     with tempfile.TemporaryDirectory(prefix='docatlas-ablation-') as tmp:
@@ -174,11 +174,26 @@ def _native_fixture(corpus, spec, request, protocol):
                     'SELECT DISTINCT project_identity FROM retrieval_children WHERE generation_id = ?', (generation,))}
             if len(identities) != 1 or not next(iter(identities)):
                 raise ValueError('fixture project identity is not uniquely bound')
+            representation_projection = None
+            assembly = 'none'
+            if arm in ('B', 'D_L'):
+                representation_projection = reproject_structural_fts(store)
+                if arm == 'D_L':
+                    assembly = 'owner_neighbors_v1'
+            elif arm != 'A':
+                raise ValueError('unsupported native arm')
             started = time.perf_counter()
             result = native_diagnostic(store, [request['question'], *request.get('lookup_queries', [])],
                 filters={'project_identity': next(iter(identities)), 'project_path': str(project),
                          'source_class': 'project_file', 'doc_scope': 'project'}, sources=documents,
-                raw_limit=protocol['raw_hits'], unique_limit=protocol['unique_candidates'])
+                raw_limit=protocol['raw_hits'], unique_limit=protocol['unique_candidates'],
+                assembly=assembly)
+            result['arm'] = arm
+            if representation_projection is not None:
+                result['representation_projection'] = representation_projection
+                result['evaluation_kind'] = ('structural_fts_project_owner_assembly_packet'
+                                             if arm == 'D_L'
+                                             else 'structural_fts_project_whole_child_packet')
             result.update(index=index, seconds=time.perf_counter() - started)
             return result
 
@@ -190,8 +205,8 @@ def _execute_arm(corpus, spec, request, protocol, arm):
             from .adapters import product_probe
             result = product_probe(corpus, spec, request)
             result['execution_status'] = result['status']
-        elif arm == 'A':
-            result = _native_fixture(corpus, spec, request, protocol)
+        elif arm in ('A', 'B', 'D_L'):
+            result = _native_fixture(corpus, spec, request, protocol, arm=arm)
         else:
             raise ValueError('unknown arm')
     except ModuleNotFoundError as exc:
@@ -232,8 +247,8 @@ def stage_worker(app: Path) -> str:
 
 
 def run_frozen(frozen: Path, output: Path, arm: str) -> dict:
-    if arm not in ('P', 'A'):
-        raise ValueError('only P and A are implemented')
+    if arm not in ('P', 'A', 'B', 'D_L'):
+        raise ValueError('only P, A, B and D_L are implemented')
     from .isolation import IsolationUnavailable, run_isolated
     manifest = verify_frozen(frozen)
     output = _external_new_directory(output)
@@ -289,7 +304,7 @@ def main() -> int:
     run = commands.add_parser('run')
     run.add_argument('--frozen', type=Path, required=True)
     run.add_argument('--output', type=Path, required=True)
-    run.add_argument('--arm', choices=['P', 'A'], required=True)
+    run.add_argument('--arm', choices=['P', 'A', 'B', 'D_L'], required=True)
     regression = commands.add_parser('regressions')
     regression.add_argument('--base', required=True)
     regression.add_argument('--head', required=True)

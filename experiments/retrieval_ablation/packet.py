@@ -183,3 +183,135 @@ class ProjectPacketPort:
                 'admission_scan_display_bytes': self.admission_scan_bytes,
                 'soft_ablation': 'lexical_ratio_only; other rejection reasons retained',
                 'qualification_traces': [dict(q.trace) for _, q in self.prepared.values()]}
+
+    @staticmethod
+    def _assembled_identity(row, start, end):
+        import hashlib
+        payload = f"{row['source_identity']}\0{row['parent_logical_id']}\0{start}\0{end}"
+        return 'assembly-' + hashlib.sha256(payload.encode('utf-8')).hexdigest()[:40]
+
+    @staticmethod
+    def _assembled_row(row, raw, start, end):
+        import hashlib
+        from docmancer.core.structured_chunking import estimate_utf8_tokens
+        assembled = dict(row)
+        text = raw[start:end]
+        assembled.update(
+            stable_chunk_id=ProjectPacketPort._assembled_identity(row, start, end),
+            display_text=text, text=text, retrieval_text=text,
+            display_content_hash=hashlib.sha256(text.encode('utf-8')).hexdigest(),
+            retrieval_content_hash=hashlib.sha256(text.encode('utf-8')).hexdigest(),
+            display_token_estimate=estimate_utf8_tokens(text),
+            retrieval_token_estimate=estimate_utf8_tokens(text),
+            token_estimate=estimate_utf8_tokens(text),
+            char_start=start, char_end=end,
+            byte_start=len(raw[:start].encode('utf-8')),
+            byte_end=len(raw[:end].encode('utf-8')),
+            line_start=raw.count('\n', 0, start) + 1,
+            line_end=raw.count('\n', 0, max(start, end - 1)) + 1,
+            atom_type='structural_bundle',
+        )
+        return assembled
+
+    def pack_structural(self, candidates, lanes):
+        """Pack the exact B ranked pool after one bounded owner-local closure.
+
+        The closure performs no retrieval and has no access to review labels. For
+        each seed it considers at most the immediately previous and next stored
+        child of the same canonical parent, in source order.  A bundle remains an
+        exact contiguous source slice and is capped at the existing 512-token
+        child hard limit.  If the expanded unit fails the same reference/hard
+        admission checks, the already-admitted seed is used unchanged.
+        """
+        from docmancer.core.structured_chunking import estimate_utf8_tokens
+
+        parent_cache = {}
+        assembly_reads = 0
+        decisions = []
+        assembled_candidates = []
+        generation = self.store.active_generation_id()
+
+        for candidate in candidates:
+            seed = candidate['row']
+            query = lanes[candidate['lane']]['query']
+            cache_key = (seed['source'], seed['parent_logical_id'])
+            if cache_key not in parent_cache:
+                with self.store._connect() as conn:
+                    siblings = [dict(row) for row in conn.execute(
+                        'SELECT * FROM retrieval_children '
+                        'WHERE generation_id = ? AND source = ? AND parent_logical_id = ? '
+                        'ORDER BY char_start, char_end, stable_chunk_id',
+                        (generation, seed['source'], seed['parent_logical_id']),
+                    )]
+                parent_cache[cache_key] = siblings
+                assembly_reads += 1
+            siblings = parent_cache[cache_key]
+            positions = [i for i, row in enumerate(siblings)
+                         if row['stable_chunk_id'] == seed['stable_chunk_id']]
+            document = self.context._document(seed['source'])
+            if len(positions) != 1 or not document:
+                raise ValueError('assembly seed is not uniquely bound to current source')
+            raw, parents, _ = document
+            parent_matches = [p for p in parents if p.logical_id == seed['parent_logical_id']]
+            if len(parent_matches) != 1:
+                raise ValueError('assembly parent is not uniquely bound')
+            parent = parent_matches[0]
+            index = positions[0]
+            start, end = seed['char_start'], seed['char_end']
+            included = [seed['stable_chunk_id']]
+
+            def fits(a, b):
+                return (parent.char_start <= a <= b <= parent.char_end
+                        and estimate_utf8_tokens(raw[a:b]) <= 512)
+
+            if index > 0:
+                previous = siblings[index - 1]
+                if (previous['char_end'] <= start
+                        and not raw[previous['char_end']:start].strip()
+                        and fits(previous['char_start'], end)):
+                    start = previous['char_start']
+                    included.insert(0, previous['stable_chunk_id'])
+            if index + 1 < len(siblings):
+                following = siblings[index + 1]
+                if (end <= following['char_start']
+                        and not raw[end:following['char_start']].strip()
+                        and fits(start, following['char_end'])):
+                    end = following['char_end']
+                    included.append(following['stable_chunk_id'])
+
+            chosen = seed
+            expanded = start != seed['char_start'] or end != seed['char_end']
+            fallback_reason = None
+            if expanded:
+                proposal = self._assembled_row(seed, raw, start, end)
+                _, reason = self.prepare(proposal, query)
+                if reason is None:
+                    chosen = proposal
+                else:
+                    fallback_reason = reason
+                    start, end = seed['char_start'], seed['char_end']
+                    included = [seed['stable_chunk_id']]
+                    expanded = False
+            selected = dict(candidate)
+            selected['row'] = chosen
+            selected['stable_chunk_id'] = chosen['stable_chunk_id']
+            assembled_candidates.append(selected)
+            decisions.append({
+                'seed_stable_chunk_id': seed['stable_chunk_id'],
+                'assembled_stable_chunk_id': chosen['stable_chunk_id'],
+                'parent_logical_id': seed['parent_logical_id'],
+                'assembled_parent_logical_id': chosen['parent_logical_id'],
+                'parent_char_start': parent.char_start,
+                'parent_char_end': parent.char_end,
+                'assembled_char_start': start,
+                'assembled_char_end': end,
+                'included_child_ids': included,
+                'expanded': expanded,
+                'fallback_reason': fallback_reason,
+            })
+
+        result = self.pack(assembled_candidates, lanes)
+        result.update(assembly_policy='owner_neighbors_v1', assembly_reads=assembly_reads,
+                      assembly_decisions=decisions,
+                      assembled_candidate_count=len(assembled_candidates))
+        return result

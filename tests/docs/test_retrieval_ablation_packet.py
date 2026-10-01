@@ -155,3 +155,45 @@ def test_reviewer_revalidates_native_packet_and_keeps_quality_unmeasured(tmp_pat
     result['packet_budget_tokens'] += 1
     with pytest.raises(ValueError, match='invalid native'):
         summarize([result])
+
+
+def test_structural_assembly_expands_only_within_same_owner_without_new_search(tmp_path):
+    from experiments.retrieval_ablation.adapters import SQLTrace, ReadPort, _eligible_rows
+    from experiments.retrieval_ablation.packet import ProjectPacketPort
+    text = '# API\n\n' + ('intro words ' * 45) + '\n\n' + ('target contract ' * 45) + '\n\n' + ('condition detail ' * 45) + '\n\n## Foreign\n\nforeign target contract\n'
+    store, sources, filters = project_store(tmp_path, {'docs/api.md': text})
+    trace = SQLTrace()
+    with store._connect() as conn:
+        _, allowed, _, _, _, _ = _eligible_rows(store, conn, trace, filters, sources)
+        port = ProjectPacketPort(ReadPort(store, conn, trace), filters=filters, queries=('target contract',))
+        ids = port.allowed_ids(allowed, 'target contract')
+        rows = store._search_rows('target contract', 20, filters=filters)
+        candidates = []
+        for rank, row in enumerate(rows, 1):
+            if row['id'] not in ids:
+                continue
+            candidates.append({'lane': 0, 'rank_in_lane': rank,
+                               'stable_chunk_id': row['stable_chunk_id'],
+                               'bm25_cost': row['rank'], 'row': row})
+        assert candidates
+        lanes = [{'query': 'target contract'}]
+        result = port.pack_structural(candidates, lanes)
+    assert result['assembly_reads'] > 0
+    assert result['assembly_decisions']
+    assert any(d['expanded'] for d in result['assembly_decisions'])
+    assert all(d['parent_logical_id'] == d['assembled_parent_logical_id']
+               for d in result['assembly_decisions'])
+    assert result['packet_audit_errors'] == []
+
+
+def test_structural_assembly_never_crosses_heading_owner(tmp_path):
+    from experiments.retrieval_ablation.adapters import native_diagnostic
+    text = '# One\n\n' + ('alpha target ' * 55) + '\n\n' + ('alpha condition ' * 45) + '\n\n## Two\n\n' + ('target foreign ' * 40) + '\n'
+    store, sources, filters = project_store(tmp_path, {'docs/api.md': text})
+    result = native_diagnostic(store, ['alpha target'], filters=filters, sources=sources,
+                               assembly='owner_neighbors_v1')
+    for decision in result['assembly_decisions']:
+        assert decision['parent_logical_id'] == decision['assembled_parent_logical_id']
+        assert decision['assembled_char_start'] >= decision['parent_char_start']
+        assert decision['assembled_char_end'] <= decision['parent_char_end']
+    assert result['packet_audit_errors'] == []

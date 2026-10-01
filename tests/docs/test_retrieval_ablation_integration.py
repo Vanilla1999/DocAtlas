@@ -199,3 +199,73 @@ def test_public_handler_product_probe_is_real_and_audited(tmp_path):
     assert result['audit_errors'] == []
     assert result['budget_tokens'] <= 800
     assert result['raw_fts_lanes']
+
+
+def test_structural_representation_changes_only_fts_projection(tmp_path):
+    from experiments.retrieval_ablation.adapters import reproject_structural_fts
+    store, _ = make_store(tmp_path, 1)
+    with store._connect() as conn:
+        generation = store._active_generation_id(conn)
+        before = [dict(row) for row in conn.execute(
+            'SELECT * FROM retrieval_children WHERE generation_id = ? ORDER BY id', (generation,))]
+    assert store._search_rows('source_of_truth', 10)
+    manifest = reproject_structural_fts(store)
+    with store._connect() as conn:
+        after = [dict(row) for row in conn.execute(
+            'SELECT * FROM retrieval_children WHERE generation_id = ? ORDER BY id', (generation,))]
+    assert after == before
+    assert manifest['representation'] == 'source_bound_structural_v1'
+    assert manifest['rows']
+    assert store._search_rows('source_of_truth', 10) == []
+
+
+def test_structural_representation_is_query_independent_and_owner_bound(tmp_path):
+    from experiments.retrieval_ablation.adapters import reproject_structural_fts
+    text = '# Client\n\nintro\n\n## Timeouts\n\nbase text\n\n### Pool\n\npool waiting contract\n'
+    store = SQLiteStore(tmp_path / 'index.db')
+    store.add_documents([Document(source='docs/client.md', content=text, metadata={
+        'format': 'markdown', 'project_identity': 'repo', 'source_class': 'project_doc',
+        'authority': 'source_of_truth',
+    })], recreate=True)
+    manifest = reproject_structural_fts(store)
+    pool = next(row for row in manifest['rows'] if row['heading_path'] == ['Client', 'Timeouts', 'Pool'])
+    assert pool['fts_title'] == 'Client > Timeouts > Pool'
+    assert pool['body_sha256'] == hashlib.sha256('### Pool\n\npool waiting contract\n'.encode()).hexdigest()
+    # The representation is a pure function of indexed source structure, not a query/gold input.
+    assert set(pool) == {'stable_chunk_id', 'heading_path', 'fts_title', 'body_sha256', 'fts_text_sha256'}
+
+
+def test_b_arm_reuses_native_pipeline_with_only_structural_fts_change(tmp_path):
+    from experiments.retrieval_ablation.run import _execute_arm
+    corpus = tmp_path / 'corpus'
+    corpus.mkdir()
+    raw = b'# Retry\n\nThe retry budget is three attempts.\n'
+    (corpus / 'retry.md').write_bytes(raw)
+    spec = {'schema_version': 1, 'sources': [
+        {'path': 'retry.md', 'sha256': hashlib.sha256(raw).hexdigest()}]}
+    protocol = {'max_sections_per_source': 2, 'raw_hits': 40, 'unique_candidates': 20}
+    result = _execute_arm(corpus, spec, {'question': 'What is the retry budget?'}, protocol, 'B')
+    assert result['execution_status'] == 'EXECUTED'
+    assert result['arm'] == 'B'
+    assert result['representation_projection']['representation'] == 'source_bound_structural_v1'
+    assert result['packet_audit_errors'] == []
+
+
+def test_d_l_reuses_b_candidate_pool_and_search_count(tmp_path):
+    from experiments.retrieval_ablation.run import _execute_arm
+    corpus = tmp_path / 'corpus'
+    corpus.mkdir()
+    raw = ('# API\n\n' + ('target contract ' * 60) + '\n\n' + ('condition detail ' * 60) + '\n').encode()
+    (corpus / 'api.md').write_bytes(raw)
+    spec = {'schema_version': 1, 'sources': [
+        {'path': 'api.md', 'sha256': hashlib.sha256(raw).hexdigest()}]}
+    request = {'question': 'target contract'}
+    protocol = {'max_sections_per_source': 2, 'raw_hits': 40, 'unique_candidates': 20}
+    b = _execute_arm(corpus, spec, request, protocol, 'B')
+    d = _execute_arm(corpus, spec, request, protocol, 'D_L')
+    assert b['execution_status'] == d['execution_status'] == 'EXECUTED'
+    assert b['candidate_pool_sha256'] == d['candidate_pool_sha256']
+    assert b['search_count'] == d['search_count']
+    assert d['arm'] == 'D_L'
+    assert d['assembly_policy'] == 'owner_neighbors_v1'
+    assert d['packet_audit_errors'] == []

@@ -157,7 +157,7 @@ def _eligible_rows(store, connection, trace, filters, sources):
         len(row['display_text'].encode('utf-8')) for row in rows)
 
 
-def native_diagnostic(store, queries, *, filters, sources, raw_limit=40, unique_limit=20):
+def native_diagnostic(store, queries, *, filters, sources, raw_limit=40, unique_limit=20, assembly='none'):
     """A's native scorer diagnostic, with policy BEFORE bounded exposure.
 
     Scope is intentionally limited to isolated, manifest-listed project docs.
@@ -174,6 +174,8 @@ def native_diagnostic(store, queries, *, filters, sources, raw_limit=40, unique_
         raise ValueError('explicit project identity required')
     if any(type(n) is not int or n <= 0 for n in (raw_limit, unique_limit)):
         raise ValueError('positive integer budgets required')
+    if assembly not in ('none', 'owner_neighbors_v1'):
+        raise ValueError('unknown assembly policy')
     filters, sources = deepcopy(filters), deepcopy(sources)
     trace = SQLTrace()
     connection = store._connect()
@@ -212,6 +214,22 @@ def native_diagnostic(store, queries, *, filters, sources, raw_limit=40, unique_
                 if len(candidates) < unique_limit:
                     candidates.append({'lane': lane_index, 'rank_in_lane': rank,
                         'stable_chunk_id': identity, 'bm25_cost': row['rank'], 'row': row})
+        # Stable across isolated worktrees/temp project roots: product stable_chunk_id
+        # intentionally binds to source identity, which includes the temporary project
+        # identity.  B and D_L must instead prove they saw the same source slice in
+        # the same lane/rank without treating sandbox location as a changed candidate.
+        pool_payload = [
+            (
+                c['lane'], c['rank_in_lane'],
+                str(c['row'].get('source_path') or c['row'].get('source') or ''),
+                int(c['row'].get('char_start') or 0), int(c['row'].get('char_end') or 0),
+                str(c['row'].get('display_content_hash') or c['row'].get('content_hash') or ''),
+                c['bm25_cost'],
+            )
+            for c in candidates
+        ]
+        candidate_pool_sha256 = _digest(json.dumps(pool_payload, ensure_ascii=False,
+                                                   separators=(',', ':')))
         result = {'arm': 'A', 'execution_status': 'EXECUTED',
             'packet_status': 'BLOCKED_SAFE_PACKET_ADAPTER', 'quality_status': 'UNJUDGED',
             'evaluation_kind': 'native_fts_diagnostic_only', 'model_visible_packet': None,
@@ -221,13 +239,19 @@ def native_diagnostic(store, queries, *, filters, sources, raw_limit=40, unique_
             'raw_limit': raw_limit, 'unique_limit': unique_limit,
             'raw_hits': sum(len(lane['rows']) for lane in trace.lanes),
             'unique_exposed': len(seen), 'candidates': candidates, 'lanes': trace.lanes,
+            'candidate_pool_sha256': candidate_pool_sha256, 'assembly': assembly,
             'policy_scan_rows': scanned, 'policy_scan_display_bytes': scanned_bytes,
             'policy_rejections': rejected, 'search_count': len(trace.lanes),
             'source_text_bytes': sum(len(row['text'].encode('utf-8'))
                 for lane in trace.lanes for row in lane['rows'])}
         if packet_port is not None:
-            result.update(packet_port.pack(candidates, trace.lanes))
-            result['evaluation_kind'] = 'native_fts_project_whole_child_packet'
+            packet_result = (packet_port.pack_structural(candidates, trace.lanes)
+                             if assembly == 'owner_neighbors_v1'
+                             else packet_port.pack(candidates, trace.lanes))
+            result.update(packet_result)
+            result['evaluation_kind'] = ('native_fts_project_structural_assembly_packet'
+                                         if assembly == 'owner_neighbors_v1'
+                                         else 'native_fts_project_whole_child_packet')
         return result
     finally:
         connection.rollback()
@@ -259,3 +283,66 @@ def product_probe(corpus, spec, request):
     result.update(arm='P', raw_fts_lanes=trace.lanes, quality_status='UNJUDGED',
                   resource_matched=False)
     return result
+
+
+def reproject_structural_fts(store):
+    """Rebuild only the active FTS projection from canonical source structure.
+
+    T05/B keeps every stored child, display span, filter, identifier and packet
+    contract byte-for-byte.  Only the strings indexed by FTS change: the high-
+    weight title becomes the full source-derived heading path and the body field
+    contains the exact display slice, without project/version/authority boilerplate.
+    No query, label or expected answer is an input to this transformation.
+    """
+    with store._connect() as connection:
+        generation = store._active_generation_id(connection)
+        if not generation:
+            raise ValueError("active generation required")
+        projection = connection.execute(
+            "SELECT generation_id FROM retrieval_fts_projection_state WHERE singleton = 1"
+        ).fetchone()
+        if projection is None or projection["generation_id"] != generation:
+            raise ValueError("active FTS projection mismatch")
+        rows = [dict(row) for row in connection.execute(
+            "SELECT id, stable_chunk_id, title, retrieval_text, display_text, source, metadata_json "
+            "FROM retrieval_children WHERE generation_id = ? ORDER BY id",
+            (generation,),
+        )]
+        manifest = []
+        for row in rows:
+            metadata = json.loads(row["metadata_json"] or "{}")
+            heading = metadata.get("heading_path") or ()
+            if not isinstance(heading, (list, tuple)) or not all(
+                isinstance(part, str) and part.strip() for part in heading
+            ):
+                heading = (str(row["title"] or "Document"),)
+            heading = tuple(part.strip() for part in heading)
+            fts_title = " > ".join(heading)
+            fts_text = str(row["display_text"])
+            # FTS5 external-content indexes require the old indexed values on
+            # the delete command.  The content table itself is intentionally
+            # untouched, so canonical/reference validation sees identical rows.
+            connection.execute(
+                "INSERT INTO retrieval_children_fts("
+                "retrieval_children_fts, rowid, title, retrieval_text, source) "
+                "VALUES ('delete', ?, ?, ?, ?)",
+                (row["id"], row["title"], row["retrieval_text"], row["source"]),
+            )
+            connection.execute(
+                "INSERT INTO retrieval_children_fts(rowid, title, retrieval_text, source) "
+                "VALUES (?, ?, ?, ?)",
+                (row["id"], fts_title, fts_text, row["source"]),
+            )
+            manifest.append({
+                "stable_chunk_id": row["stable_chunk_id"],
+                "heading_path": list(heading),
+                "fts_title": fts_title,
+                "body_sha256": _digest(fts_text),
+                "fts_text_sha256": _digest(fts_text),
+            })
+    return {
+        "schema_version": 1,
+        "representation": "source_bound_structural_v1",
+        "generation_id": generation,
+        "rows": manifest,
+    }
