@@ -1,0 +1,26 @@
+{
+  "tool": "get_docs_context",
+  "request": {
+    "question": "В рабочей директории есть мои незакоммиченные правки. Может ли MCP сам пересобрать индекс?",
+    "project_path": "/tmp/opencode/docatlas-ablation",
+    "scope": "all",
+    "lookup_queries": [
+      "When does a dirty worktree require confirmation before project synchronization?"
+    ]
+  },
+  "seconds": 0.8643070179969072,
+  "is_error": false,
+  "wire": {
+    "_meta": null,
+    "content": [
+      {
+        "type": "text",
+        "text": "{\"status\": \"ok\", \"kind\": \"docs_context\", \"context_status\": \"ready\", \"context_available\": true, \"answer_supported\": false, \"answer_available\": false, \"support_status\": \"retrieval_only\", \"answer_policy\": \"cite_only\", \"coverage_policy\": \"retrieval_attribution_only\", \"query_coverage\": \"partial\", \"retrieval_coverage\": \"partial\", \"facet_coverage\": \"unverified\", \"covered_query_ids\": [\"query-lookup-1\"], \"missing_query_ids\": [\"query-original\"], \"missing_facets\": [], \"facets\": [], \"sources\": [{\"evidence_id\": \"ev-bc5a71393d9e1901\", \"path_or_url\": \"docs/mcp-docs-server.md\", \"section\": \"Docs MCP server > Project documentation\", \"snippet\": \"For a repository question, call `get_docs_context` first. The call never reconciles the index itself. When committed project docs are stale or not yet indexed and the whole Git worktree is clean, the response returns a no-confirmation `prepare_docs(action=\\\"sync_project_docs\\\")` instruction bound to a preflight `plan_digest`. `prepare_docs` rechecks the clean worktree and accepted `HEAD` before mutation. Dirty or indeterminate Git state, placeholders, unsupported docs, config shadowing, and orphan pruning remain confirmation-gated.\", \"version_binding\": \"unversioned\", \"content_sha256\": \"a0d4983e82852f8005f8ace19f541c1988c6d7389f7aee25d4c7fc11b5013d46\", \"project_identity\": \"local:48277f62f8b4ff92ba1c60c082f92a43817f9e1c5ba4ea27e12cd77a76421585\", \"authority\": \"source_of_truth\", \"scope\": \"project\", \"line_start\": 61, \"line_end\": 61, \"source_uri\": \"docatlas://source/974053f43e384b022aef99bd\"}], \"context_quality\": {\"status\": \"unverified\", \"reasons\": [\"coverage_unverified\"]}, \"read_next\": [], \"edit_ready\": false, \"investigation_allowed\": true, \"estimated_tokens\": 411}",
+        "annotations": null,
+        "_meta": null
+      }
+    ],
+    "structuredContent": null,
+    "isError": false
+  }
+}

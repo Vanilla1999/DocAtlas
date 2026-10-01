@@ -1,0 +1,23 @@
+{
+  "tool": "get_docs_context",
+  "request": {
+    "question": "After changing a Markdown file, the agent cites old text. How should I update the index and repeat the question?",
+    "project_path": "/tmp/opencode/docatlas-ablation",
+    "scope": "all"
+  },
+  "seconds": 1.1493042860020068,
+  "is_error": false,
+  "wire": {
+    "_meta": null,
+    "content": [
+      {
+        "type": "text",
+        "text": "{\"status\": \"ok\", \"kind\": \"docs_context\", \"context_status\": \"ready\", \"context_available\": true, \"answer_supported\": false, \"answer_available\": false, \"support_status\": \"retrieval_only\", \"answer_policy\": \"cite_only\", \"coverage_policy\": \"retrieval_attribution_only\", \"query_coverage\": \"full\", \"retrieval_coverage\": \"full\", \"facet_coverage\": \"unverified\", \"covered_query_ids\": [\"query-original\"], \"missing_query_ids\": [], \"missing_facets\": [], \"facets\": [{\"id\": \"intent-context:project_docs_sync\", \"requirement_id\": null, \"question\": \"project docs sync lifecycle project documentation\", \"status\": \"retrieval_only\", \"evidence_ids\": [\"ev-74c59717cf5c280c\"]}], \"sources\": [{\"evidence_id\": \"ev-74c59717cf5c280c\", \"path_or_url\": \"docs/project-docs-mcp-workflow.md\", \"section\": \"Project docs MCP workflow > Canonical lifecycle: sync\", \"snippet\": \"## Canonical lifecycle: sync\\n\\nAfter editing project documentation files, refresh the repository index with the\\nreturned `prepare_docs(action=\\\"sync_project_docs\\\")` action. This is the canonical\\nworkflow for reconciling changed files before retrying `get_docs_context`.\", \"version_binding\": \"unversioned\", \"content_sha256\": \"c2db5d6306c2cc3a2d9590dc648cac1d7018b49e53e07b178dc811c9939c8684\", \"project_identity\": \"local:48277f62f8b4ff92ba1c60c082f92a43817f9e1c5ba4ea27e12cd77a76421585\", \"authority\": \"source_of_truth\", \"scope\": \"project\", \"line_start\": 17, \"line_end\": 21, \"source_uri\": \"docatlas://source/701300fce03bad8b2bf2dad9\"}, {\"evidence_id\": \"ev-628259aa8c202b7b\", \"path_or_url\": \"docs/INDEX.md\", \"section\": \"Documentation Index > Maintenance rules\", \"snippet\": \"## Maintenance rules\\n\\n- Keep this index limited to maintained, reviewable documentation.\\n- Prefer links to repository-owned docs over generated hidden summaries.\\n- Update this file when adding architecture docs, runbooks, ADRs, workflow docs, or new user-facing references.\\n- After documentation changes, call `get_docs_context`; when it recommends synchronization, run the returned `prepare_docs(action=\\\"sync_project_docs\\\")` action and retry the original question unchanged.\\n- The bounded result union is `docs_answer`, `docs_context`, `patch_context`, or `insufficient_evidence`; broad questions use cited `docs_context`, while only narrow relation-specific proof authorizes `docs_answer`.\", \"version_binding\": \"unversioned\", \"content_sha256\": \"5e6a5db92caf7db7e5953a74d0bbdfc4968a8acd5c6f7f15d3ab535f52998cac\", \"project_identity\": \"local:48277f62f8b4ff92ba1c60c082f92a43817f9e1c5ba4ea27e12cd77a76421585\", \"line_start\": 50, \"line_end\": 56, \"authority\": \"source_of_truth\", \"scope\": \"project\", \"source_uri\": \"docatlas://source/ba2966f9916d8a9b78881fec\"}], \"context_quality\": {\"status\": \"unverified\", \"reasons\": [\"coverage_unverified\"]}, \"read_next\": [], \"edit_ready\": false, \"investigation_allowed\": true, \"estimated_tokens\": 687}",
+        "annotations": null,
+        "_meta": null
+      }
+    ],
+    "structuredContent": null,
+    "isError": false
+  }
+}

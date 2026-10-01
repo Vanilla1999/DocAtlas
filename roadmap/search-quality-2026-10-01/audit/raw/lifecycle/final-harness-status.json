@@ -1,0 +1,10 @@
+{
+  "origin":"Final actual OpenCode docs_status tool output; summarized payload, not serialized MCP wire",
+  "tool":"docs_status",
+  "action":"project",
+  "project_path":"/tmp/opencode/docatlas-ablation",
+  "reason_code":"project_docs_ready",
+  "source_summary":{"candidates":134,"indexed":134,"stale":0,"ignored":0},
+  "module_count":4,
+  "active_index":{"db_path":"/tmp/opencode/docatlas-ablation/.docatlas/docatlas.db","config_source":"project_local","retrieval_mode":"lexical"}
+}

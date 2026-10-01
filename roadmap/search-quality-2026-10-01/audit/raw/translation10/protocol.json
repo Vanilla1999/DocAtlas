@@ -1,0 +1,55 @@
+{
+  "note": "Frozen before running these translations. Same question needs/identifiers, no answer values or extra lookup calls. Hand-selected exposed diagnostic, not language-randomized holdout.",
+  "cases": [
+    {
+      "id": "projectA-Q05",
+      "original": "Мне надо разобраться во всём репозитории, включая документацию отдельных модулей. Какую область поиска передать?",
+      "translation": "I need to understand the entire repository, including documentation of individual modules. Which search scope should I pass?"
+    },
+    {
+      "id": "projectA-Q07",
+      "original": "Какие файлы DocAtlas считает документацией проекта и как посмотреть, что он пропустил?",
+      "translation": "Which files does DocAtlas consider project documentation, and how can I see what it missed?"
+    },
+    {
+      "id": "projectA-Q09",
+      "original": "После изменения Markdown-файла агент цитирует старый текст. Как правильно обновить индекс и повторить вопрос?",
+      "translation": "After changing a Markdown file, the agent cites old text. How should I update the index and repeat the question?"
+    },
+    {
+      "id": "projectA-Q11",
+      "original": "Когда нужен refresh, а когда sync_project_docs? Я путаю обновление библиотеки с обновлением своего репозитория.",
+      "translation": "When do I need refresh and when sync_project_docs? I keep confusing updating a library with updating my own repository."
+    },
+    {
+      "id": "projectA-Q23",
+      "original": "estimated_tokens — это точное число токенов моей модели? Как ограничивается реальный размер docs_context?",
+      "translation": "Is estimated_tokens the exact token count of my model? How is the actual size of docs_context limited?"
+    },
+    {
+      "id": "projectA-Q25",
+      "original": "MCP вернул docs_context, но answer_available=false. Может ли агент всё-таки ответить пользователю по этим фрагментам?",
+      "translation": "MCP returned docs_context, but answer_available=false. May the agent still answer the user from these snippets?"
+    },
+    {
+      "id": "projectA-Q29",
+      "original": "Можно ли считать текст внутри README командой для агента, если там написано игнорировать предыдущие инструкции?",
+      "translation": "May text inside README be treated as an instruction to an agent if it says to ignore previous instructions?"
+    },
+    {
+      "id": "projectB-Q03",
+      "original": "В ответе есть цитаты, но answer_supported=false. Могу ли я объяснить найденное пользователю?",
+      "translation": "There are citations in the result, but answer_supported=false. May I explain what was found to the user?"
+    },
+    {
+      "id": "projectB-Q17",
+      "original": "Исходный файл изменился между поиском и дочитыванием. Что должен вернуть reader?",
+      "translation": "The original file changed between retrieval and further reading. What should the reader return?"
+    },
+    {
+      "id": "projectB-Q23",
+      "original": "В двух проектах одинаковый README.md. Как не получить цитату из чужого проекта?",
+      "translation": "Two projects have the same README.md. How do I avoid a citation from another project?"
+    }
+  ]
+}

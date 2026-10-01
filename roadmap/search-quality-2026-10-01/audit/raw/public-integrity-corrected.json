@@ -1,0 +1,2711 @@
+{
+  "correction": "Initial observer incorrectly treated content_sha256 as raw file SHA256. Production hashes canonical evidence material. Original raw results retained unchanged. Corrected public checks verify digest shape, file scope, verbatim bytes and line spans. Full snapshot binding is assessed separately on observed trace calls.",
+  "panels": {
+    "project80": {
+      "rows": 240,
+      "violations": 0,
+      "rows_detail": [
+        {
+          "id": "projectA-Q01",
+          "lane": "default",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/wiki/Commands.md",
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/docs/mcp-docs-server.md"
+          ]
+        },
+        {
+          "id": "projectA-Q02",
+          "lane": "default",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/docs/project-docs-mcp-workflow.md",
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/docs/context7-docmancer-comparison.md",
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/wiki/Architecture.md"
+          ]
+        },
+        {
+          "id": "projectA-Q03",
+          "lane": "default",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/wiki/Commands.md",
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/wiki/Commands.md"
+          ]
+        },
+        {
+          "id": "projectA-Q04",
+          "lane": "default",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/README.md",
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/README.md"
+          ]
+        },
+        {
+          "id": "projectA-Q05",
+          "lane": "default",
+          "errors": [],
+          "original_false_file_hash_errors": []
+        },
+        {
+          "id": "projectA-Q06",
+          "lane": "default",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/docs/INDEX.md",
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/docs/INDEX.md"
+          ]
+        },
+        {
+          "id": "projectA-Q07",
+          "lane": "default",
+          "errors": [],
+          "original_false_file_hash_errors": []
+        },
+        {
+          "id": "projectA-Q08",
+          "lane": "default",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/wiki/Configuration.md",
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/docs/index-cleanup.md",
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/wiki/Troubleshooting.md"
+          ]
+        },
+        {
+          "id": "projectA-Q09",
+          "lane": "default",
+          "errors": [],
+          "original_false_file_hash_errors": []
+        },
+        {
+          "id": "projectA-Q10",
+          "lane": "default",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/docs/change-aware-docs.md",
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/docs/change-aware-docs.md",
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/docs/change-aware-docs.md"
+          ]
+        },
+        {
+          "id": "projectA-Q11",
+          "lane": "default",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/docs/project-docs-mcp-workflow.md",
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/docs/project-docs-mcp-workflow.md"
+          ]
+        },
+        {
+          "id": "projectA-Q12",
+          "lane": "default",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/wiki/Architecture.md",
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/wiki/Commands.md",
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/docs/mcp-response-contract.md"
+          ]
+        },
+        {
+          "id": "projectA-Q13",
+          "lane": "default",
+          "errors": [],
+          "original_false_file_hash_errors": []
+        },
+        {
+          "id": "projectA-Q14",
+          "lane": "default",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/docs/project-docs-mcp-workflow.md",
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/docs/project-docs-mcp-workflow.md",
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/docs/AGENT_DOCS_WORKFLOW.md"
+          ]
+        },
+        {
+          "id": "projectA-Q15",
+          "lane": "default",
+          "errors": [],
+          "original_false_file_hash_errors": []
+        },
+        {
+          "id": "projectA-Q16",
+          "lane": "default",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/wiki/Architecture.md",
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/docs/index-cleanup.md",
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/wiki/Architecture.md"
+          ]
+        },
+        {
+          "id": "projectA-Q17",
+          "lane": "default",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/wiki/Configuration.md",
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/docs/project-docs-mcp-workflow.md"
+          ]
+        },
+        {
+          "id": "projectA-Q18",
+          "lane": "default",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/wiki/Configuration.md",
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/wiki/Architecture.md"
+          ]
+        },
+        {
+          "id": "projectA-Q19",
+          "lane": "default",
+          "errors": [],
+          "original_false_file_hash_errors": []
+        },
+        {
+          "id": "projectA-Q20",
+          "lane": "default",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/wiki/Architecture.md",
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/wiki/Architecture.md"
+          ]
+        },
+        {
+          "id": "projectA-Q21",
+          "lane": "default",
+          "errors": [],
+          "original_false_file_hash_errors": []
+        },
+        {
+          "id": "projectA-Q22",
+          "lane": "default",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/docs/retrieval-boundaries.md",
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/README.md"
+          ]
+        },
+        {
+          "id": "projectA-Q23",
+          "lane": "default",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/docs/retrieval-boundaries.md",
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/CONTRIBUTING.md"
+          ]
+        },
+        {
+          "id": "projectA-Q24",
+          "lane": "default",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/README.md",
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/README.md"
+          ]
+        },
+        {
+          "id": "projectA-Q25",
+          "lane": "default",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/docs/source-continuation.md",
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/CONTRIBUTING.md"
+          ]
+        },
+        {
+          "id": "projectA-Q26",
+          "lane": "default",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/wiki/Configuration.md",
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/docs/modules/evidence-selection.md"
+          ]
+        },
+        {
+          "id": "projectA-Q27",
+          "lane": "default",
+          "errors": [],
+          "original_false_file_hash_errors": []
+        },
+        {
+          "id": "projectA-Q28",
+          "lane": "default",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/docs/development/python-module-size-policy.md",
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/wiki/Supported-Sources.md",
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/docs/development/python-module-size-policy.md"
+          ]
+        },
+        {
+          "id": "projectA-Q29",
+          "lane": "default",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/docs/INDEX.md",
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/docs/INDEX.md"
+          ]
+        },
+        {
+          "id": "projectA-Q30",
+          "lane": "default",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/docs/RELEASE_CHECKLIST.md",
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/docs/RELEASE_CHECKLIST.md"
+          ]
+        },
+        {
+          "id": "projectA-Q31",
+          "lane": "default",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/CHANGELOG.md"
+          ]
+        },
+        {
+          "id": "projectA-Q32",
+          "lane": "default",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/docs/modules/patch-request-planning.md"
+          ]
+        },
+        {
+          "id": "projectA-Q33",
+          "lane": "default",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/wiki/Configuration.md"
+          ]
+        },
+        {
+          "id": "projectA-Q34",
+          "lane": "default",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/docs/index-cleanup.md",
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/docs/index-cleanup.md"
+          ]
+        },
+        {
+          "id": "projectA-Q35",
+          "lane": "default",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/docs/index-cleanup.md",
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/docs/index-cleanup.md"
+          ]
+        },
+        {
+          "id": "projectA-Q36",
+          "lane": "default",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/docs/retrieval-boundaries.md",
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/docs/retrieval-boundaries.md"
+          ]
+        },
+        {
+          "id": "projectA-Q37",
+          "lane": "default",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/wiki/Configuration.md",
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/wiki/Configuration.md"
+          ]
+        },
+        {
+          "id": "projectA-Q38",
+          "lane": "default",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/docs/adr/0002-evidence-authority-direction.md",
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/docs/adr/0002-evidence-authority-direction.md"
+          ]
+        },
+        {
+          "id": "projectA-Q39",
+          "lane": "default",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/wiki/Configuration.md",
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/wiki/Architecture.md",
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/wiki/Architecture.md"
+          ]
+        },
+        {
+          "id": "projectA-Q40",
+          "lane": "default",
+          "errors": [],
+          "original_false_file_hash_errors": []
+        },
+        {
+          "id": "projectB-Q01",
+          "lane": "default",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/docs/mcp-docs-server.md",
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/docs/mcp-docs-server.md",
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/docs/mcp-docs-server.md"
+          ]
+        },
+        {
+          "id": "projectB-Q02",
+          "lane": "default",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/SKILL.md"
+          ]
+        },
+        {
+          "id": "projectB-Q03",
+          "lane": "default",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/docs/mcp-docs-server.md",
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/docs/mcp-docs-server.md"
+          ]
+        },
+        {
+          "id": "projectB-Q04",
+          "lane": "default",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/docs/mcp-quickstart-example.md",
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/wiki/Architecture.md",
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/docs/project-docs-mcp-workflow.md"
+          ]
+        },
+        {
+          "id": "projectB-Q05",
+          "lane": "default",
+          "errors": [],
+          "original_false_file_hash_errors": []
+        },
+        {
+          "id": "projectB-Q06",
+          "lane": "default",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/README.md"
+          ]
+        },
+        {
+          "id": "projectB-Q07",
+          "lane": "default",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/wiki/Configuration.md",
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/wiki/Architecture.md"
+          ]
+        },
+        {
+          "id": "projectB-Q08",
+          "lane": "default",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/docs/INDEX.md",
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/docs/RELEASE_CHECKLIST.md"
+          ]
+        },
+        {
+          "id": "projectB-Q09",
+          "lane": "default",
+          "errors": [],
+          "original_false_file_hash_errors": []
+        },
+        {
+          "id": "projectB-Q10",
+          "lane": "default",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/README.md",
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/docs/mcp-docs-server.md"
+          ]
+        },
+        {
+          "id": "projectB-Q11",
+          "lane": "default",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/wiki/Architecture.md",
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/wiki/Architecture.md"
+          ]
+        },
+        {
+          "id": "projectB-Q12",
+          "lane": "default",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/docs/grounded-host-session.md",
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/docs/grounded-host-session.md"
+          ]
+        },
+        {
+          "id": "projectB-Q13",
+          "lane": "default",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/docs/retrieval-boundaries.md",
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/CONTRIBUTING.md"
+          ]
+        },
+        {
+          "id": "projectB-Q14",
+          "lane": "default",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/SKILL.md",
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/SKILL.md"
+          ]
+        },
+        {
+          "id": "projectB-Q15",
+          "lane": "default",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/docs/source-continuation.md"
+          ]
+        },
+        {
+          "id": "projectB-Q16",
+          "lane": "default",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/docs/index-cleanup.md",
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/docs/index-cleanup.md"
+          ]
+        },
+        {
+          "id": "projectB-Q17",
+          "lane": "default",
+          "errors": [],
+          "original_false_file_hash_errors": []
+        },
+        {
+          "id": "projectB-Q18",
+          "lane": "default",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/docs/grounded-host-session.md",
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/docs/grounded-host-session.md"
+          ]
+        },
+        {
+          "id": "projectB-Q19",
+          "lane": "default",
+          "errors": [],
+          "original_false_file_hash_errors": []
+        },
+        {
+          "id": "projectB-Q20",
+          "lane": "default",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/SKILL.md",
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/SKILL.md",
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/docs/grounded-host-session.md"
+          ]
+        },
+        {
+          "id": "projectB-Q21",
+          "lane": "default",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/docs/security/mcp-runtime-threat-model.md",
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/docs/security/mcp-runtime-threat-model.md"
+          ]
+        },
+        {
+          "id": "projectB-Q22",
+          "lane": "default",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/SKILL.md",
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/docs/one-call-agent-loop.md"
+          ]
+        },
+        {
+          "id": "projectB-Q23",
+          "lane": "default",
+          "errors": [],
+          "original_false_file_hash_errors": []
+        },
+        {
+          "id": "projectB-Q24",
+          "lane": "default",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/eval/project_context_quality/README.md",
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/wiki/Architecture.md"
+          ]
+        },
+        {
+          "id": "projectB-Q25",
+          "lane": "default",
+          "errors": [],
+          "original_false_file_hash_errors": []
+        },
+        {
+          "id": "projectB-Q26",
+          "lane": "default",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/docs/retrieval-boundaries.md",
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/wiki/Architecture.md"
+          ]
+        },
+        {
+          "id": "projectB-Q27",
+          "lane": "default",
+          "errors": [],
+          "original_false_file_hash_errors": []
+        },
+        {
+          "id": "projectB-Q28",
+          "lane": "default",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/docs/grounded-host-session.md",
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/docs/grounded-host-session.md"
+          ]
+        },
+        {
+          "id": "projectB-Q29",
+          "lane": "default",
+          "errors": [],
+          "original_false_file_hash_errors": []
+        },
+        {
+          "id": "projectB-Q30",
+          "lane": "default",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/docs/DOCMANCER_PRODUCT_BRIEF.md",
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/docs/project-docs-mcp-workflow.md"
+          ]
+        },
+        {
+          "id": "projectB-Q31",
+          "lane": "default",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/README.md",
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/README.md"
+          ]
+        },
+        {
+          "id": "projectB-Q32",
+          "lane": "default",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/docs/index-cleanup.md",
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/README.md"
+          ]
+        },
+        {
+          "id": "projectB-Q33",
+          "lane": "default",
+          "errors": [],
+          "original_false_file_hash_errors": []
+        },
+        {
+          "id": "projectB-Q34",
+          "lane": "default",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/docs/DOCMANCER_PRODUCT_BRIEF.md",
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/README.md"
+          ]
+        },
+        {
+          "id": "projectB-Q35",
+          "lane": "default",
+          "errors": [],
+          "original_false_file_hash_errors": []
+        },
+        {
+          "id": "projectB-Q36",
+          "lane": "default",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/docs/testing.md",
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/CONTRIBUTING.md",
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/docs/testing.md"
+          ]
+        },
+        {
+          "id": "projectB-Q37",
+          "lane": "default",
+          "errors": [],
+          "original_false_file_hash_errors": []
+        },
+        {
+          "id": "projectB-Q38",
+          "lane": "default",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/docs/source-continuation.md",
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/docs/source-continuation.md"
+          ]
+        },
+        {
+          "id": "projectB-Q39",
+          "lane": "default",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/README.md"
+          ]
+        },
+        {
+          "id": "projectB-Q40",
+          "lane": "default",
+          "errors": [],
+          "original_false_file_hash_errors": []
+        },
+        {
+          "id": "projectA-Q01",
+          "lane": "all",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/wiki/Commands.md",
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/docs/mcp-docs-server.md"
+          ]
+        },
+        {
+          "id": "projectA-Q02",
+          "lane": "all",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/docs/project-docs-mcp-workflow.md",
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/docs/context7-docmancer-comparison.md",
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/wiki/Architecture.md"
+          ]
+        },
+        {
+          "id": "projectA-Q03",
+          "lane": "all",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/wiki/Commands.md",
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/wiki/Commands.md"
+          ]
+        },
+        {
+          "id": "projectA-Q04",
+          "lane": "all",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/README.md",
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/README.md"
+          ]
+        },
+        {
+          "id": "projectA-Q05",
+          "lane": "all",
+          "errors": [],
+          "original_false_file_hash_errors": []
+        },
+        {
+          "id": "projectA-Q06",
+          "lane": "all",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/docs/INDEX.md",
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/docs/INDEX.md"
+          ]
+        },
+        {
+          "id": "projectA-Q07",
+          "lane": "all",
+          "errors": [],
+          "original_false_file_hash_errors": []
+        },
+        {
+          "id": "projectA-Q08",
+          "lane": "all",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/wiki/Configuration.md",
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/docs/index-cleanup.md",
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/wiki/Troubleshooting.md"
+          ]
+        },
+        {
+          "id": "projectA-Q09",
+          "lane": "all",
+          "errors": [],
+          "original_false_file_hash_errors": []
+        },
+        {
+          "id": "projectA-Q10",
+          "lane": "all",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/docs/change-aware-docs.md",
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/docs/change-aware-docs.md",
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/docs/change-aware-docs.md"
+          ]
+        },
+        {
+          "id": "projectA-Q11",
+          "lane": "all",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/docs/project-docs-mcp-workflow.md",
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/docs/project-docs-mcp-workflow.md"
+          ]
+        },
+        {
+          "id": "projectA-Q12",
+          "lane": "all",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/wiki/Architecture.md",
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/wiki/Commands.md",
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/docs/mcp-response-contract.md"
+          ]
+        },
+        {
+          "id": "projectA-Q13",
+          "lane": "all",
+          "errors": [],
+          "original_false_file_hash_errors": []
+        },
+        {
+          "id": "projectA-Q14",
+          "lane": "all",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/docs/project-docs-mcp-workflow.md",
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/docs/project-docs-mcp-workflow.md",
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/docs/AGENT_DOCS_WORKFLOW.md"
+          ]
+        },
+        {
+          "id": "projectA-Q15",
+          "lane": "all",
+          "errors": [],
+          "original_false_file_hash_errors": []
+        },
+        {
+          "id": "projectA-Q16",
+          "lane": "all",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/wiki/Architecture.md",
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/docs/index-cleanup.md",
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/wiki/Architecture.md"
+          ]
+        },
+        {
+          "id": "projectA-Q17",
+          "lane": "all",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/wiki/Configuration.md",
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/docs/project-docs-mcp-workflow.md"
+          ]
+        },
+        {
+          "id": "projectA-Q18",
+          "lane": "all",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/wiki/Configuration.md",
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/wiki/Architecture.md"
+          ]
+        },
+        {
+          "id": "projectA-Q19",
+          "lane": "all",
+          "errors": [],
+          "original_false_file_hash_errors": []
+        },
+        {
+          "id": "projectA-Q20",
+          "lane": "all",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/wiki/Architecture.md",
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/wiki/Architecture.md"
+          ]
+        },
+        {
+          "id": "projectA-Q21",
+          "lane": "all",
+          "errors": [],
+          "original_false_file_hash_errors": []
+        },
+        {
+          "id": "projectA-Q22",
+          "lane": "all",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/docs/retrieval-boundaries.md",
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/README.md"
+          ]
+        },
+        {
+          "id": "projectA-Q23",
+          "lane": "all",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/docs/retrieval-boundaries.md",
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/CONTRIBUTING.md"
+          ]
+        },
+        {
+          "id": "projectA-Q24",
+          "lane": "all",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/README.md",
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/README.md"
+          ]
+        },
+        {
+          "id": "projectA-Q25",
+          "lane": "all",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/docs/source-continuation.md",
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/CONTRIBUTING.md"
+          ]
+        },
+        {
+          "id": "projectA-Q26",
+          "lane": "all",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/wiki/Configuration.md",
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/docs/modules/evidence-selection.md"
+          ]
+        },
+        {
+          "id": "projectA-Q27",
+          "lane": "all",
+          "errors": [],
+          "original_false_file_hash_errors": []
+        },
+        {
+          "id": "projectA-Q28",
+          "lane": "all",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/docs/development/python-module-size-policy.md",
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/wiki/Supported-Sources.md",
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/docs/development/python-module-size-policy.md"
+          ]
+        },
+        {
+          "id": "projectA-Q29",
+          "lane": "all",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/docs/INDEX.md",
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/docs/INDEX.md"
+          ]
+        },
+        {
+          "id": "projectA-Q30",
+          "lane": "all",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/docs/RELEASE_CHECKLIST.md",
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/docs/RELEASE_CHECKLIST.md"
+          ]
+        },
+        {
+          "id": "projectA-Q31",
+          "lane": "all",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/CHANGELOG.md"
+          ]
+        },
+        {
+          "id": "projectA-Q32",
+          "lane": "all",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/docs/modules/patch-request-planning.md"
+          ]
+        },
+        {
+          "id": "projectA-Q33",
+          "lane": "all",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/wiki/Configuration.md"
+          ]
+        },
+        {
+          "id": "projectA-Q34",
+          "lane": "all",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/docs/index-cleanup.md",
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/docs/index-cleanup.md"
+          ]
+        },
+        {
+          "id": "projectA-Q35",
+          "lane": "all",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/docs/index-cleanup.md",
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/docs/index-cleanup.md"
+          ]
+        },
+        {
+          "id": "projectA-Q36",
+          "lane": "all",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/docs/retrieval-boundaries.md",
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/docs/retrieval-boundaries.md"
+          ]
+        },
+        {
+          "id": "projectA-Q37",
+          "lane": "all",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/wiki/Configuration.md",
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/wiki/Configuration.md"
+          ]
+        },
+        {
+          "id": "projectA-Q38",
+          "lane": "all",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/docs/adr/0002-evidence-authority-direction.md",
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/docs/adr/0002-evidence-authority-direction.md"
+          ]
+        },
+        {
+          "id": "projectA-Q39",
+          "lane": "all",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/wiki/Configuration.md",
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/wiki/Architecture.md",
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/wiki/Architecture.md"
+          ]
+        },
+        {
+          "id": "projectA-Q40",
+          "lane": "all",
+          "errors": [],
+          "original_false_file_hash_errors": []
+        },
+        {
+          "id": "projectB-Q01",
+          "lane": "all",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/docs/mcp-docs-server.md",
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/docs/mcp-docs-server.md",
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/docs/mcp-docs-server.md"
+          ]
+        },
+        {
+          "id": "projectB-Q02",
+          "lane": "all",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/SKILL.md"
+          ]
+        },
+        {
+          "id": "projectB-Q03",
+          "lane": "all",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/docs/mcp-docs-server.md",
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/docs/mcp-docs-server.md"
+          ]
+        },
+        {
+          "id": "projectB-Q04",
+          "lane": "all",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/docs/mcp-quickstart-example.md",
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/wiki/Architecture.md",
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/docs/project-docs-mcp-workflow.md"
+          ]
+        },
+        {
+          "id": "projectB-Q05",
+          "lane": "all",
+          "errors": [],
+          "original_false_file_hash_errors": []
+        },
+        {
+          "id": "projectB-Q06",
+          "lane": "all",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/README.md"
+          ]
+        },
+        {
+          "id": "projectB-Q07",
+          "lane": "all",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/wiki/Configuration.md",
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/wiki/Architecture.md"
+          ]
+        },
+        {
+          "id": "projectB-Q08",
+          "lane": "all",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/docs/INDEX.md",
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/docs/RELEASE_CHECKLIST.md"
+          ]
+        },
+        {
+          "id": "projectB-Q09",
+          "lane": "all",
+          "errors": [],
+          "original_false_file_hash_errors": []
+        },
+        {
+          "id": "projectB-Q10",
+          "lane": "all",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/README.md",
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/docs/mcp-docs-server.md"
+          ]
+        },
+        {
+          "id": "projectB-Q11",
+          "lane": "all",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/wiki/Architecture.md",
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/wiki/Architecture.md"
+          ]
+        },
+        {
+          "id": "projectB-Q12",
+          "lane": "all",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/docs/grounded-host-session.md",
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/docs/grounded-host-session.md"
+          ]
+        },
+        {
+          "id": "projectB-Q13",
+          "lane": "all",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/docs/retrieval-boundaries.md",
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/CONTRIBUTING.md"
+          ]
+        },
+        {
+          "id": "projectB-Q14",
+          "lane": "all",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/SKILL.md",
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/SKILL.md"
+          ]
+        },
+        {
+          "id": "projectB-Q15",
+          "lane": "all",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/docs/source-continuation.md"
+          ]
+        },
+        {
+          "id": "projectB-Q16",
+          "lane": "all",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/docs/index-cleanup.md",
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/docs/index-cleanup.md"
+          ]
+        },
+        {
+          "id": "projectB-Q17",
+          "lane": "all",
+          "errors": [],
+          "original_false_file_hash_errors": []
+        },
+        {
+          "id": "projectB-Q18",
+          "lane": "all",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/docs/grounded-host-session.md",
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/docs/grounded-host-session.md"
+          ]
+        },
+        {
+          "id": "projectB-Q19",
+          "lane": "all",
+          "errors": [],
+          "original_false_file_hash_errors": []
+        },
+        {
+          "id": "projectB-Q20",
+          "lane": "all",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/SKILL.md",
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/SKILL.md",
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/docs/grounded-host-session.md"
+          ]
+        },
+        {
+          "id": "projectB-Q21",
+          "lane": "all",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/docs/security/mcp-runtime-threat-model.md",
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/docs/security/mcp-runtime-threat-model.md"
+          ]
+        },
+        {
+          "id": "projectB-Q22",
+          "lane": "all",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/SKILL.md",
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/docs/one-call-agent-loop.md"
+          ]
+        },
+        {
+          "id": "projectB-Q23",
+          "lane": "all",
+          "errors": [],
+          "original_false_file_hash_errors": []
+        },
+        {
+          "id": "projectB-Q24",
+          "lane": "all",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/eval/project_context_quality/README.md",
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/wiki/Architecture.md"
+          ]
+        },
+        {
+          "id": "projectB-Q25",
+          "lane": "all",
+          "errors": [],
+          "original_false_file_hash_errors": []
+        },
+        {
+          "id": "projectB-Q26",
+          "lane": "all",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/docs/retrieval-boundaries.md",
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/wiki/Architecture.md"
+          ]
+        },
+        {
+          "id": "projectB-Q27",
+          "lane": "all",
+          "errors": [],
+          "original_false_file_hash_errors": []
+        },
+        {
+          "id": "projectB-Q28",
+          "lane": "all",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/docs/grounded-host-session.md",
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/docs/grounded-host-session.md"
+          ]
+        },
+        {
+          "id": "projectB-Q29",
+          "lane": "all",
+          "errors": [],
+          "original_false_file_hash_errors": []
+        },
+        {
+          "id": "projectB-Q30",
+          "lane": "all",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/docs/DOCMANCER_PRODUCT_BRIEF.md",
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/docs/project-docs-mcp-workflow.md"
+          ]
+        },
+        {
+          "id": "projectB-Q31",
+          "lane": "all",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/README.md",
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/README.md"
+          ]
+        },
+        {
+          "id": "projectB-Q32",
+          "lane": "all",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/docs/index-cleanup.md",
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/README.md"
+          ]
+        },
+        {
+          "id": "projectB-Q33",
+          "lane": "all",
+          "errors": [],
+          "original_false_file_hash_errors": []
+        },
+        {
+          "id": "projectB-Q34",
+          "lane": "all",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/docs/DOCMANCER_PRODUCT_BRIEF.md",
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/README.md"
+          ]
+        },
+        {
+          "id": "projectB-Q35",
+          "lane": "all",
+          "errors": [],
+          "original_false_file_hash_errors": []
+        },
+        {
+          "id": "projectB-Q36",
+          "lane": "all",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/docs/testing.md",
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/CONTRIBUTING.md",
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/docs/testing.md"
+          ]
+        },
+        {
+          "id": "projectB-Q37",
+          "lane": "all",
+          "errors": [],
+          "original_false_file_hash_errors": []
+        },
+        {
+          "id": "projectB-Q38",
+          "lane": "all",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/docs/source-continuation.md",
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/docs/source-continuation.md"
+          ]
+        },
+        {
+          "id": "projectB-Q39",
+          "lane": "all",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/README.md"
+          ]
+        },
+        {
+          "id": "projectB-Q40",
+          "lane": "all",
+          "errors": [],
+          "original_false_file_hash_errors": []
+        },
+        {
+          "id": "projectA-Q01",
+          "lane": "guided",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/wiki/Commands.md",
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/SKILL.md"
+          ]
+        },
+        {
+          "id": "projectA-Q02",
+          "lane": "guided",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/SKILL.md"
+          ]
+        },
+        {
+          "id": "projectA-Q03",
+          "lane": "guided",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/SKILL.md",
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/SKILL.md"
+          ]
+        },
+        {
+          "id": "projectA-Q04",
+          "lane": "guided",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/README.md",
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/docs/mcp-docs-server.md",
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/docs/security/mcp-runtime-threat-model.md"
+          ]
+        },
+        {
+          "id": "projectA-Q05",
+          "lane": "guided",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/docs/mcp-quickstart-example.md"
+          ]
+        },
+        {
+          "id": "projectA-Q06",
+          "lane": "guided",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/docs/INDEX.md",
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/docs/mcp-quickstart-example.md"
+          ]
+        },
+        {
+          "id": "projectA-Q07",
+          "lane": "guided",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/docs/project-docs-mcp-workflow.md",
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/docs/project-docs-mcp-workflow.md"
+          ]
+        },
+        {
+          "id": "projectA-Q08",
+          "lane": "guided",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/wiki/Configuration.md",
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/docs/project-docs-mcp-workflow.md",
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/docs/adr/0002-evidence-authority-direction.md"
+          ]
+        },
+        {
+          "id": "projectA-Q09",
+          "lane": "guided",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/docs/development/python-module-size-policy.md",
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/CONTRIBUTING.md"
+          ]
+        },
+        {
+          "id": "projectA-Q10",
+          "lane": "guided",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/docs/product-scope.md",
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/wiki/Architecture.md",
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/docs/change-aware-docs.md"
+          ]
+        },
+        {
+          "id": "projectA-Q11",
+          "lane": "guided",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/docs/DOCMANCER_PRODUCT_BRIEF.md",
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/docs/project-docs-mcp-workflow.md",
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/docs/project-docs-mcp-workflow.md"
+          ]
+        },
+        {
+          "id": "projectA-Q12",
+          "lane": "guided",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/wiki/Architecture.md",
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/docs/project-docs-mcp-workflow.md"
+          ]
+        },
+        {
+          "id": "projectA-Q13",
+          "lane": "guided",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/docs/source-continuation.md"
+          ]
+        },
+        {
+          "id": "projectA-Q14",
+          "lane": "guided",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/docs/INDEX.md",
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/SKILL.md"
+          ]
+        },
+        {
+          "id": "projectA-Q15",
+          "lane": "guided",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/README.md",
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/README.md"
+          ]
+        },
+        {
+          "id": "projectA-Q16",
+          "lane": "guided",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/README.md",
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/README.md"
+          ]
+        },
+        {
+          "id": "projectA-Q17",
+          "lane": "guided",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/README.md",
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/docs/modules/question-planning.md"
+          ]
+        },
+        {
+          "id": "projectA-Q18",
+          "lane": "guided",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/wiki/Configuration.md",
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/wiki/Architecture.md"
+          ]
+        },
+        {
+          "id": "projectA-Q19",
+          "lane": "guided",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/docs/retrieval-boundaries.md"
+          ]
+        },
+        {
+          "id": "projectA-Q20",
+          "lane": "guided",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/wiki/Architecture.md",
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/docs/retrieval-boundaries.md"
+          ]
+        },
+        {
+          "id": "projectA-Q21",
+          "lane": "guided",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/docs/adr/0001-mcp-boundary-contracts.md",
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/docs/AGENT_DOCS_WORKFLOW.md"
+          ]
+        },
+        {
+          "id": "projectA-Q22",
+          "lane": "guided",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/wiki/Configuration.md"
+          ]
+        },
+        {
+          "id": "projectA-Q23",
+          "lane": "guided",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/docs/retrieval-boundaries.md",
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/README.md"
+          ]
+        },
+        {
+          "id": "projectA-Q24",
+          "lane": "guided",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/docs/modules/evidence-selection.md",
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/docs/adr/0003-context-first-project-reads.md",
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/docs/mcp-docs-server.md"
+          ]
+        },
+        {
+          "id": "projectA-Q25",
+          "lane": "guided",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/docs/source-continuation.md",
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/docs/mcp-docs-server.md"
+          ]
+        },
+        {
+          "id": "projectA-Q26",
+          "lane": "guided",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/docs/mcp-docs-server.md",
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/docs/modules/evidence-selection.md"
+          ]
+        },
+        {
+          "id": "projectA-Q27",
+          "lane": "guided",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/docs/grounded-host-session.md",
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/docs/mcp-docs-server.md",
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/README.md"
+          ]
+        },
+        {
+          "id": "projectA-Q28",
+          "lane": "guided",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/docs/project-docs-mcp-workflow.md",
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/docs/DOCMANCER_PRODUCT_BRIEF.md"
+          ]
+        },
+        {
+          "id": "projectA-Q29",
+          "lane": "guided",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/docs/INDEX.md"
+          ]
+        },
+        {
+          "id": "projectA-Q30",
+          "lane": "guided",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/docs/RELEASE_CHECKLIST.md"
+          ]
+        },
+        {
+          "id": "projectA-Q31",
+          "lane": "guided",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/docs/project-docs-mcp-workflow.md",
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/CHANGELOG.md",
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/CHANGELOG.md"
+          ]
+        },
+        {
+          "id": "projectA-Q32",
+          "lane": "guided",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/README.md",
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/SKILL.md"
+          ]
+        },
+        {
+          "id": "projectA-Q33",
+          "lane": "guided",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/docs/index-cleanup.md",
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/wiki/Configuration.md"
+          ]
+        },
+        {
+          "id": "projectA-Q34",
+          "lane": "guided",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/docs/index-cleanup.md",
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/docs/index-cleanup.md"
+          ]
+        },
+        {
+          "id": "projectA-Q35",
+          "lane": "guided",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/docs/index-cleanup.md",
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/README.md"
+          ]
+        },
+        {
+          "id": "projectA-Q36",
+          "lane": "guided",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/CONTRIBUTING.md",
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/docs/source-continuation.md",
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/docs/testing.md"
+          ]
+        },
+        {
+          "id": "projectA-Q37",
+          "lane": "guided",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/wiki/Configuration.md",
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/wiki/Configuration.md"
+          ]
+        },
+        {
+          "id": "projectA-Q38",
+          "lane": "guided",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/docs/source-continuation.md",
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/docs/analysis/p0-governance-value-proof-remediation.md"
+          ]
+        },
+        {
+          "id": "projectA-Q39",
+          "lane": "guided",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/wiki/Configuration.md",
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/wiki/Configuration.md",
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/wiki/Architecture.md"
+          ]
+        },
+        {
+          "id": "projectA-Q40",
+          "lane": "guided",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/wiki/Architecture.md"
+          ]
+        },
+        {
+          "id": "projectB-Q01",
+          "lane": "guided",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/docs/mcp-docs-server.md",
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/README.md"
+          ]
+        },
+        {
+          "id": "projectB-Q02",
+          "lane": "guided",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/SKILL.md"
+          ]
+        },
+        {
+          "id": "projectB-Q03",
+          "lane": "guided",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/docs/mcp-docs-server.md",
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/docs/AGENT_DOCS_WORKFLOW.md"
+          ]
+        },
+        {
+          "id": "projectB-Q04",
+          "lane": "guided",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/docs/mcp-quickstart-example.md",
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/wiki/Architecture.md",
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/docs/project-docs-mcp-workflow.md"
+          ]
+        },
+        {
+          "id": "projectB-Q05",
+          "lane": "guided",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/docs/security/mcp-runtime-threat-model.md",
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/README.md"
+          ]
+        },
+        {
+          "id": "projectB-Q06",
+          "lane": "guided",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/README.md",
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/wiki/Configuration.md"
+          ]
+        },
+        {
+          "id": "projectB-Q07",
+          "lane": "guided",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/wiki/Configuration.md",
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/wiki/Configuration.md"
+          ]
+        },
+        {
+          "id": "projectB-Q08",
+          "lane": "guided",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/docs/INDEX.md",
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/docs/RELEASE_CHECKLIST.md"
+          ]
+        },
+        {
+          "id": "projectB-Q09",
+          "lane": "guided",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/docs/mcp-docs-server.md"
+          ]
+        },
+        {
+          "id": "projectB-Q10",
+          "lane": "guided",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/README.md",
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/docs/mcp-docs-server.md"
+          ]
+        },
+        {
+          "id": "projectB-Q11",
+          "lane": "guided",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/docs/AGENT_DOCS_WORKFLOW.md",
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/docs/project-docs-mcp-workflow.md"
+          ]
+        },
+        {
+          "id": "projectB-Q12",
+          "lane": "guided",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/docs/grounded-host-session.md",
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/docs/source-continuation.md"
+          ]
+        },
+        {
+          "id": "projectB-Q13",
+          "lane": "guided",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/docs/retrieval-boundaries.md",
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/CONTRIBUTING.md"
+          ]
+        },
+        {
+          "id": "projectB-Q14",
+          "lane": "guided",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/SKILL.md"
+          ]
+        },
+        {
+          "id": "projectB-Q15",
+          "lane": "guided",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/docs/source-continuation.md",
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/docs/AGENT_DOCS_WORKFLOW.md",
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/README.md"
+          ]
+        },
+        {
+          "id": "projectB-Q16",
+          "lane": "guided",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/docs/index-cleanup.md",
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/docs/source-continuation.md"
+          ]
+        },
+        {
+          "id": "projectB-Q17",
+          "lane": "guided",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/docs/source-continuation.md",
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/docs/source-continuation.md"
+          ]
+        },
+        {
+          "id": "projectB-Q18",
+          "lane": "guided",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/docs/grounded-host-session.md",
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/docs/source-continuation.md"
+          ]
+        },
+        {
+          "id": "projectB-Q19",
+          "lane": "guided",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/docs/grounded-host-session.md",
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/docs/grounded-host-session.md"
+          ]
+        },
+        {
+          "id": "projectB-Q20",
+          "lane": "guided",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/SKILL.md",
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/SKILL.md",
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/docs/mcp-docs-server.md"
+          ]
+        },
+        {
+          "id": "projectB-Q21",
+          "lane": "guided",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/docs/security/mcp-runtime-threat-model.md"
+          ]
+        },
+        {
+          "id": "projectB-Q22",
+          "lane": "guided",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/README.md",
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/SKILL.md",
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/docs/one-call-agent-loop.md"
+          ]
+        },
+        {
+          "id": "projectB-Q23",
+          "lane": "guided",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/wiki/Architecture.md"
+          ]
+        },
+        {
+          "id": "projectB-Q24",
+          "lane": "guided",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/wiki/Architecture.md",
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/eval/project_context_quality/README.md"
+          ]
+        },
+        {
+          "id": "projectB-Q25",
+          "lane": "guided",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/wiki/Architecture.md"
+          ]
+        },
+        {
+          "id": "projectB-Q26",
+          "lane": "guided",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/docs/retrieval-boundaries.md",
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/wiki/Architecture.md"
+          ]
+        },
+        {
+          "id": "projectB-Q27",
+          "lane": "guided",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/docs/mcp-docs-server.md"
+          ]
+        },
+        {
+          "id": "projectB-Q28",
+          "lane": "guided",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/docs/grounded-host-session.md",
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/wiki/Supported-Sources.md"
+          ]
+        },
+        {
+          "id": "projectB-Q29",
+          "lane": "guided",
+          "errors": [],
+          "original_false_file_hash_errors": []
+        },
+        {
+          "id": "projectB-Q30",
+          "lane": "guided",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/docs/DOCMANCER_PRODUCT_BRIEF.md",
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/docs/project-docs-mcp-workflow.md"
+          ]
+        },
+        {
+          "id": "projectB-Q31",
+          "lane": "guided",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/README.md",
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/wiki/Architecture.md"
+          ]
+        },
+        {
+          "id": "projectB-Q32",
+          "lane": "guided",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/docs/index-cleanup.md",
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/docs/index-cleanup.md",
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/docs/index-cleanup.md"
+          ]
+        },
+        {
+          "id": "projectB-Q33",
+          "lane": "guided",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/docs/mcp-docs-server.md"
+          ]
+        },
+        {
+          "id": "projectB-Q34",
+          "lane": "guided",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/docs/DOCMANCER_PRODUCT_BRIEF.md",
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/README.md",
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/docs/RELEASE_CHECKLIST.md"
+          ]
+        },
+        {
+          "id": "projectB-Q35",
+          "lane": "guided",
+          "errors": [],
+          "original_false_file_hash_errors": []
+        },
+        {
+          "id": "projectB-Q36",
+          "lane": "guided",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/docs/testing.md",
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/CONTRIBUTING.md",
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/docs/testing.md"
+          ]
+        },
+        {
+          "id": "projectB-Q37",
+          "lane": "guided",
+          "errors": [],
+          "original_false_file_hash_errors": []
+        },
+        {
+          "id": "projectB-Q38",
+          "lane": "guided",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/docs/source-continuation.md"
+          ]
+        },
+        {
+          "id": "projectB-Q39",
+          "lane": "guided",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/README.md"
+          ]
+        },
+        {
+          "id": "projectB-Q40",
+          "lane": "guided",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/docatlas-ablation/docs/modules/question-planning.md"
+          ]
+        }
+      ]
+    },
+    "external80": {
+      "rows": 80,
+      "violations": 0,
+      "rows_detail": [
+        {
+          "id": "fastapi-01",
+          "lane": "native",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/search-audit-work-20261001/fixtures/fastapi/docs/en/docs/tutorial/background-tasks.md",
+            "hash_mismatch:/tmp/opencode/search-audit-work-20261001/fixtures/fastapi/docs/en/docs/tutorial/background-tasks.md"
+          ]
+        },
+        {
+          "id": "fastapi-02",
+          "lane": "native",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/search-audit-work-20261001/fixtures/fastapi/docs/en/docs/tutorial/background-tasks.md",
+            "hash_mismatch:/tmp/opencode/search-audit-work-20261001/fixtures/fastapi/docs/en/docs/tutorial/background-tasks.md",
+            "hash_mismatch:/tmp/opencode/search-audit-work-20261001/fixtures/fastapi/docs/en/docs/tutorial/background-tasks.md"
+          ]
+        },
+        {
+          "id": "fastapi-03",
+          "lane": "native",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/search-audit-work-20261001/fixtures/fastapi/docs/en/docs/tutorial/background-tasks.md",
+            "hash_mismatch:/tmp/opencode/search-audit-work-20261001/fixtures/fastapi/docs/en/docs/tutorial/background-tasks.md",
+            "hash_mismatch:/tmp/opencode/search-audit-work-20261001/fixtures/fastapi/docs/en/docs/tutorial/background-tasks.md"
+          ]
+        },
+        {
+          "id": "fastapi-04",
+          "lane": "native",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/search-audit-work-20261001/fixtures/fastapi/docs/en/docs/tutorial/cors.md",
+            "hash_mismatch:/tmp/opencode/search-audit-work-20261001/fixtures/fastapi/docs/en/docs/tutorial/cors.md"
+          ]
+        },
+        {
+          "id": "fastapi-05",
+          "lane": "native",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/search-audit-work-20261001/fixtures/fastapi/docs/en/docs/tutorial/cors.md",
+            "hash_mismatch:/tmp/opencode/search-audit-work-20261001/fixtures/fastapi/docs/en/docs/tutorial/cors.md",
+            "hash_mismatch:/tmp/opencode/search-audit-work-20261001/fixtures/fastapi/docs/en/docs/tutorial/cors.md"
+          ]
+        },
+        {
+          "id": "fastapi-06",
+          "lane": "native",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/search-audit-work-20261001/fixtures/fastapi/docs/en/docs/tutorial/cors.md",
+            "hash_mismatch:/tmp/opencode/search-audit-work-20261001/fixtures/fastapi/docs/en/docs/tutorial/cors.md"
+          ]
+        },
+        {
+          "id": "fastapi-07",
+          "lane": "native",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/search-audit-work-20261001/fixtures/fastapi/docs/en/docs/tutorial/background-tasks.md",
+            "hash_mismatch:/tmp/opencode/search-audit-work-20261001/fixtures/fastapi/docs/en/docs/tutorial/background-tasks.md"
+          ]
+        },
+        {
+          "id": "fastapi-08",
+          "lane": "native",
+          "errors": [],
+          "original_false_file_hash_errors": []
+        },
+        {
+          "id": "fastapi-09",
+          "lane": "native",
+          "errors": [],
+          "original_false_file_hash_errors": []
+        },
+        {
+          "id": "fastapi-10",
+          "lane": "native",
+          "errors": [],
+          "original_false_file_hash_errors": []
+        },
+        {
+          "id": "httpx-01",
+          "lane": "native",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/search-audit-work-20261001/fixtures/httpx/docs/advanced/timeouts.md",
+            "hash_mismatch:/tmp/opencode/search-audit-work-20261001/fixtures/httpx/docs/advanced/timeouts.md"
+          ]
+        },
+        {
+          "id": "httpx-02",
+          "lane": "native",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/search-audit-work-20261001/fixtures/httpx/docs/environment_variables.md",
+            "hash_mismatch:/tmp/opencode/search-audit-work-20261001/fixtures/httpx/docs/advanced/timeouts.md"
+          ]
+        },
+        {
+          "id": "httpx-03",
+          "lane": "native",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/search-audit-work-20261001/fixtures/httpx/docs/advanced/timeouts.md"
+          ]
+        },
+        {
+          "id": "httpx-04",
+          "lane": "native",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/search-audit-work-20261001/fixtures/httpx/docs/advanced/timeouts.md"
+          ]
+        },
+        {
+          "id": "httpx-05",
+          "lane": "native",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/search-audit-work-20261001/fixtures/httpx/docs/environment_variables.md",
+            "hash_mismatch:/tmp/opencode/search-audit-work-20261001/fixtures/httpx/docs/advanced/timeouts.md"
+          ]
+        },
+        {
+          "id": "httpx-06",
+          "lane": "native",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/search-audit-work-20261001/fixtures/httpx/docs/environment_variables.md"
+          ]
+        },
+        {
+          "id": "httpx-07",
+          "lane": "native",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/search-audit-work-20261001/fixtures/httpx/docs/advanced/timeouts.md",
+            "hash_mismatch:/tmp/opencode/search-audit-work-20261001/fixtures/httpx/docs/advanced/timeouts.md"
+          ]
+        },
+        {
+          "id": "httpx-08",
+          "lane": "native",
+          "errors": [],
+          "original_false_file_hash_errors": []
+        },
+        {
+          "id": "httpx-09",
+          "lane": "native",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/search-audit-work-20261001/fixtures/httpx/docs/advanced/timeouts.md",
+            "hash_mismatch:/tmp/opencode/search-audit-work-20261001/fixtures/httpx/docs/advanced/timeouts.md"
+          ]
+        },
+        {
+          "id": "httpx-10",
+          "lane": "native",
+          "errors": [],
+          "original_false_file_hash_errors": []
+        },
+        {
+          "id": "mkdocs-01",
+          "lane": "native",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/search-audit-work-20261001/fixtures/mkdocs/docs/user-guide/writing-your-docs.md",
+            "hash_mismatch:/tmp/opencode/search-audit-work-20261001/fixtures/mkdocs/docs/user-guide/writing-your-docs.md"
+          ]
+        },
+        {
+          "id": "mkdocs-02",
+          "lane": "native",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/search-audit-work-20261001/fixtures/mkdocs/docs/user-guide/writing-your-docs.md",
+            "hash_mismatch:/tmp/opencode/search-audit-work-20261001/fixtures/mkdocs/docs/user-guide/writing-your-docs.md"
+          ]
+        },
+        {
+          "id": "mkdocs-03",
+          "lane": "native",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/search-audit-work-20261001/fixtures/mkdocs/docs/user-guide/writing-your-docs.md",
+            "hash_mismatch:/tmp/opencode/search-audit-work-20261001/fixtures/mkdocs/docs/user-guide/writing-your-docs.md",
+            "hash_mismatch:/tmp/opencode/search-audit-work-20261001/fixtures/mkdocs/docs/user-guide/writing-your-docs.md"
+          ]
+        },
+        {
+          "id": "mkdocs-04",
+          "lane": "native",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/search-audit-work-20261001/fixtures/mkdocs/docs/user-guide/writing-your-docs.md",
+            "hash_mismatch:/tmp/opencode/search-audit-work-20261001/fixtures/mkdocs/docs/user-guide/writing-your-docs.md"
+          ]
+        },
+        {
+          "id": "mkdocs-05",
+          "lane": "native",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/search-audit-work-20261001/fixtures/mkdocs/docs/user-guide/writing-your-docs.md"
+          ]
+        },
+        {
+          "id": "mkdocs-06",
+          "lane": "native",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/search-audit-work-20261001/fixtures/mkdocs/docs/user-guide/writing-your-docs.md",
+            "hash_mismatch:/tmp/opencode/search-audit-work-20261001/fixtures/mkdocs/docs/user-guide/writing-your-docs.md",
+            "hash_mismatch:/tmp/opencode/search-audit-work-20261001/fixtures/mkdocs/docs/user-guide/writing-your-docs.md"
+          ]
+        },
+        {
+          "id": "mkdocs-07",
+          "lane": "native",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/search-audit-work-20261001/fixtures/mkdocs/docs/user-guide/writing-your-docs.md",
+            "hash_mismatch:/tmp/opencode/search-audit-work-20261001/fixtures/mkdocs/docs/user-guide/writing-your-docs.md"
+          ]
+        },
+        {
+          "id": "mkdocs-08",
+          "lane": "native",
+          "errors": [],
+          "original_false_file_hash_errors": []
+        },
+        {
+          "id": "mkdocs-09",
+          "lane": "native",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/search-audit-work-20261001/fixtures/mkdocs/docs/user-guide/writing-your-docs.md",
+            "hash_mismatch:/tmp/opencode/search-audit-work-20261001/fixtures/mkdocs/docs/user-guide/writing-your-docs.md"
+          ]
+        },
+        {
+          "id": "mkdocs-10",
+          "lane": "native",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/search-audit-work-20261001/fixtures/mkdocs/docs/user-guide/writing-your-docs.md",
+            "hash_mismatch:/tmp/opencode/search-audit-work-20261001/fixtures/mkdocs/docs/user-guide/writing-your-docs.md",
+            "hash_mismatch:/tmp/opencode/search-audit-work-20261001/fixtures/mkdocs/docs/user-guide/writing-your-docs.md"
+          ]
+        },
+        {
+          "id": "pydantic-01",
+          "lane": "native",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/search-audit-work-20261001/fixtures/pydantic/docs/concepts/strict_mode.md",
+            "hash_mismatch:/tmp/opencode/search-audit-work-20261001/fixtures/pydantic/docs/concepts/strict_mode.md"
+          ]
+        },
+        {
+          "id": "pydantic-02",
+          "lane": "native",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/search-audit-work-20261001/fixtures/pydantic/docs/concepts/strict_mode.md",
+            "hash_mismatch:/tmp/opencode/search-audit-work-20261001/fixtures/pydantic/docs/concepts/alias.md"
+          ]
+        },
+        {
+          "id": "pydantic-03",
+          "lane": "native",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/search-audit-work-20261001/fixtures/pydantic/docs/concepts/strict_mode.md",
+            "hash_mismatch:/tmp/opencode/search-audit-work-20261001/fixtures/pydantic/docs/concepts/strict_mode.md"
+          ]
+        },
+        {
+          "id": "pydantic-04",
+          "lane": "native",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/search-audit-work-20261001/fixtures/pydantic/docs/concepts/alias.md"
+          ]
+        },
+        {
+          "id": "pydantic-05",
+          "lane": "native",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/search-audit-work-20261001/fixtures/pydantic/docs/concepts/alias.md",
+            "hash_mismatch:/tmp/opencode/search-audit-work-20261001/fixtures/pydantic/docs/concepts/alias.md"
+          ]
+        },
+        {
+          "id": "pydantic-06",
+          "lane": "native",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/search-audit-work-20261001/fixtures/pydantic/docs/concepts/alias.md"
+          ]
+        },
+        {
+          "id": "pydantic-07",
+          "lane": "native",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/search-audit-work-20261001/fixtures/pydantic/docs/concepts/strict_mode.md",
+            "hash_mismatch:/tmp/opencode/search-audit-work-20261001/fixtures/pydantic/docs/concepts/strict_mode.md"
+          ]
+        },
+        {
+          "id": "pydantic-08",
+          "lane": "native",
+          "errors": [],
+          "original_false_file_hash_errors": []
+        },
+        {
+          "id": "pydantic-09",
+          "lane": "native",
+          "errors": [],
+          "original_false_file_hash_errors": []
+        },
+        {
+          "id": "pydantic-10",
+          "lane": "native",
+          "errors": [],
+          "original_false_file_hash_errors": []
+        },
+        {
+          "id": "ruff-01",
+          "lane": "native",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/search-audit-work-20261001/fixtures/ruff/docs/preview.md",
+            "hash_mismatch:/tmp/opencode/search-audit-work-20261001/fixtures/ruff/docs/preview.md"
+          ]
+        },
+        {
+          "id": "ruff-02",
+          "lane": "native",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/search-audit-work-20261001/fixtures/ruff/docs/preview.md",
+            "hash_mismatch:/tmp/opencode/search-audit-work-20261001/fixtures/ruff/docs/configuration.md"
+          ]
+        },
+        {
+          "id": "ruff-03",
+          "lane": "native",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/search-audit-work-20261001/fixtures/ruff/docs/preview.md",
+            "hash_mismatch:/tmp/opencode/search-audit-work-20261001/fixtures/ruff/docs/preview.md"
+          ]
+        },
+        {
+          "id": "ruff-04",
+          "lane": "native",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/search-audit-work-20261001/fixtures/ruff/docs/preview.md",
+            "hash_mismatch:/tmp/opencode/search-audit-work-20261001/fixtures/ruff/docs/preview.md"
+          ]
+        },
+        {
+          "id": "ruff-05",
+          "lane": "native",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/search-audit-work-20261001/fixtures/ruff/docs/preview.md",
+            "hash_mismatch:/tmp/opencode/search-audit-work-20261001/fixtures/ruff/docs/preview.md"
+          ]
+        },
+        {
+          "id": "ruff-06",
+          "lane": "native",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/search-audit-work-20261001/fixtures/ruff/docs/configuration.md",
+            "hash_mismatch:/tmp/opencode/search-audit-work-20261001/fixtures/ruff/docs/configuration.md"
+          ]
+        },
+        {
+          "id": "ruff-07",
+          "lane": "native",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/search-audit-work-20261001/fixtures/ruff/docs/preview.md",
+            "hash_mismatch:/tmp/opencode/search-audit-work-20261001/fixtures/ruff/docs/preview.md"
+          ]
+        },
+        {
+          "id": "ruff-08",
+          "lane": "native",
+          "errors": [],
+          "original_false_file_hash_errors": []
+        },
+        {
+          "id": "ruff-09",
+          "lane": "native",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/search-audit-work-20261001/fixtures/ruff/docs/configuration.md",
+            "hash_mismatch:/tmp/opencode/search-audit-work-20261001/fixtures/ruff/docs/configuration.md"
+          ]
+        },
+        {
+          "id": "ruff-10",
+          "lane": "native",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/search-audit-work-20261001/fixtures/ruff/docs/configuration.md",
+            "hash_mismatch:/tmp/opencode/search-audit-work-20261001/fixtures/ruff/docs/configuration.md",
+            "hash_mismatch:/tmp/opencode/search-audit-work-20261001/fixtures/ruff/docs/configuration.md"
+          ]
+        },
+        {
+          "id": "starlette-01",
+          "lane": "native",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/search-audit-work-20261001/fixtures/starlette/docs/background.md"
+          ]
+        },
+        {
+          "id": "starlette-02",
+          "lane": "native",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/search-audit-work-20261001/fixtures/starlette/docs/lifespan.md",
+            "hash_mismatch:/tmp/opencode/search-audit-work-20261001/fixtures/starlette/docs/lifespan.md"
+          ]
+        },
+        {
+          "id": "starlette-03",
+          "lane": "native",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/search-audit-work-20261001/fixtures/starlette/docs/lifespan.md",
+            "hash_mismatch:/tmp/opencode/search-audit-work-20261001/fixtures/starlette/docs/lifespan.md"
+          ]
+        },
+        {
+          "id": "starlette-04",
+          "lane": "native",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/search-audit-work-20261001/fixtures/starlette/docs/lifespan.md"
+          ]
+        },
+        {
+          "id": "starlette-05",
+          "lane": "native",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/search-audit-work-20261001/fixtures/starlette/docs/lifespan.md",
+            "hash_mismatch:/tmp/opencode/search-audit-work-20261001/fixtures/starlette/docs/lifespan.md"
+          ]
+        },
+        {
+          "id": "starlette-06",
+          "lane": "native",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/search-audit-work-20261001/fixtures/starlette/docs/background.md",
+            "hash_mismatch:/tmp/opencode/search-audit-work-20261001/fixtures/starlette/docs/background.md"
+          ]
+        },
+        {
+          "id": "starlette-07",
+          "lane": "native",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/search-audit-work-20261001/fixtures/starlette/docs/background.md"
+          ]
+        },
+        {
+          "id": "starlette-08",
+          "lane": "native",
+          "errors": [],
+          "original_false_file_hash_errors": []
+        },
+        {
+          "id": "starlette-09",
+          "lane": "native",
+          "errors": [],
+          "original_false_file_hash_errors": []
+        },
+        {
+          "id": "starlette-10",
+          "lane": "native",
+          "errors": [],
+          "original_false_file_hash_errors": []
+        },
+        {
+          "id": "typer-01",
+          "lane": "native",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/search-audit-work-20261001/fixtures/typer/docs/tutorial/terminating.md",
+            "hash_mismatch:/tmp/opencode/search-audit-work-20261001/fixtures/typer/docs/tutorial/terminating.md"
+          ]
+        },
+        {
+          "id": "typer-02",
+          "lane": "native",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/search-audit-work-20261001/fixtures/typer/docs/tutorial/terminating.md",
+            "hash_mismatch:/tmp/opencode/search-audit-work-20261001/fixtures/typer/docs/tutorial/terminating.md",
+            "hash_mismatch:/tmp/opencode/search-audit-work-20261001/fixtures/typer/docs/tutorial/terminating.md"
+          ]
+        },
+        {
+          "id": "typer-03",
+          "lane": "native",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/search-audit-work-20261001/fixtures/typer/docs/tutorial/terminating.md",
+            "hash_mismatch:/tmp/opencode/search-audit-work-20261001/fixtures/typer/docs/tutorial/terminating.md"
+          ]
+        },
+        {
+          "id": "typer-04",
+          "lane": "native",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/search-audit-work-20261001/fixtures/typer/docs/tutorial/parameter-types/bool.md",
+            "hash_mismatch:/tmp/opencode/search-audit-work-20261001/fixtures/typer/docs/tutorial/parameter-types/bool.md"
+          ]
+        },
+        {
+          "id": "typer-05",
+          "lane": "native",
+          "errors": [],
+          "original_false_file_hash_errors": []
+        },
+        {
+          "id": "typer-06",
+          "lane": "native",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/search-audit-work-20261001/fixtures/typer/docs/tutorial/parameter-types/bool.md"
+          ]
+        },
+        {
+          "id": "typer-07",
+          "lane": "native",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/search-audit-work-20261001/fixtures/typer/docs/tutorial/terminating.md",
+            "hash_mismatch:/tmp/opencode/search-audit-work-20261001/fixtures/typer/docs/tutorial/terminating.md"
+          ]
+        },
+        {
+          "id": "typer-08",
+          "lane": "native",
+          "errors": [],
+          "original_false_file_hash_errors": []
+        },
+        {
+          "id": "typer-09",
+          "lane": "native",
+          "errors": [],
+          "original_false_file_hash_errors": []
+        },
+        {
+          "id": "typer-10",
+          "lane": "native",
+          "errors": [],
+          "original_false_file_hash_errors": []
+        },
+        {
+          "id": "uv-01",
+          "lane": "native",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/search-audit-work-20261001/fixtures/uv/docs/pip/compatibility.md",
+            "hash_mismatch:/tmp/opencode/search-audit-work-20261001/fixtures/uv/docs/pip/compatibility.md",
+            "hash_mismatch:/tmp/opencode/search-audit-work-20261001/fixtures/uv/docs/pip/compatibility.md"
+          ]
+        },
+        {
+          "id": "uv-02",
+          "lane": "native",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/search-audit-work-20261001/fixtures/uv/docs/pip/compatibility.md",
+            "hash_mismatch:/tmp/opencode/search-audit-work-20261001/fixtures/uv/docs/pip/compatibility.md"
+          ]
+        },
+        {
+          "id": "uv-03",
+          "lane": "native",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/search-audit-work-20261001/fixtures/uv/docs/pip/compatibility.md",
+            "hash_mismatch:/tmp/opencode/search-audit-work-20261001/fixtures/uv/docs/pip/compatibility.md"
+          ]
+        },
+        {
+          "id": "uv-04",
+          "lane": "native",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/search-audit-work-20261001/fixtures/uv/docs/pip/compatibility.md"
+          ]
+        },
+        {
+          "id": "uv-05",
+          "lane": "native",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/search-audit-work-20261001/fixtures/uv/docs/pip/compatibility.md",
+            "hash_mismatch:/tmp/opencode/search-audit-work-20261001/fixtures/uv/docs/pip/compatibility.md"
+          ]
+        },
+        {
+          "id": "uv-06",
+          "lane": "native",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/search-audit-work-20261001/fixtures/uv/docs/pip/compatibility.md",
+            "hash_mismatch:/tmp/opencode/search-audit-work-20261001/fixtures/uv/docs/pip/compatibility.md"
+          ]
+        },
+        {
+          "id": "uv-07",
+          "lane": "native",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/search-audit-work-20261001/fixtures/uv/docs/pip/compatibility.md",
+            "hash_mismatch:/tmp/opencode/search-audit-work-20261001/fixtures/uv/docs/pip/compatibility.md",
+            "hash_mismatch:/tmp/opencode/search-audit-work-20261001/fixtures/uv/docs/pip/compatibility.md"
+          ]
+        },
+        {
+          "id": "uv-08",
+          "lane": "native",
+          "errors": [],
+          "original_false_file_hash_errors": []
+        },
+        {
+          "id": "uv-09",
+          "lane": "native",
+          "errors": [],
+          "original_false_file_hash_errors": []
+        },
+        {
+          "id": "uv-10",
+          "lane": "native",
+          "errors": [],
+          "original_false_file_hash_errors": [
+            "hash_mismatch:/tmp/opencode/search-audit-work-20261001/fixtures/uv/docs/pip/compatibility.md",
+            "hash_mismatch:/tmp/opencode/search-audit-work-20261001/fixtures/uv/docs/pip/compatibility.md"
+          ]
+        }
+      ]
+    }
+  }
+}

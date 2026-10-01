@@ -1,0 +1,548 @@
+[
+  {
+    "stable_chunk_id": "child-dfeb0aa37c6e5daa6382058389d57a543a91415b",
+    "source_path": "docs/configuration.md",
+    "display_text": "# Configuring Ruff\n\nRuff can be configured through a `pyproject.toml`, `ruff.toml`, or `.ruff.toml` file.\n\nWhether you're using Ruff as a linter, formatter, or both, the underlying configuration strategy and\nsemantics are the same.\n\nFor a complete enumeration of the available configuration options, see [_Settings_](settings.md).\n\nIf left unspecified, Ruff's default configuration is equivalent to:\n\n=== \"pyproject.toml\"\n\n",
+    "line_start": 1,
+    "line_end": 13
+  },
+  {
+    "stable_chunk_id": "child-e91aa32dcf91b521261c1f9bd036ae39a8fec4eb",
+    "source_path": "docs/configuration.md",
+    "display_text": "    ```toml\n    [tool.ruff]\n    # Exclude a variety of commonly ignored directories.\n    exclude = [\n        \".bzr\",\n        \".direnv\",\n        \".eggs\",\n        \".git\",\n        \".git-rewrite\",\n        \".hg\",\n        \".ipynb_checkpoints\",\n        \".mypy_cache\",\n        \".nox\",\n        \".pants.d\",\n        \".pyenv\",\n        \".pytest_cache\",\n        \".pytype\",\n        \".ruff_cache\",\n        \".svn\",\n        \".tox\",\n        \".venv\",\n        \".vscode\",\n        \"__pypackages__\",\n        \"_build\",\n        \"buck-out\",\n        \"build\",\n        \"dist\",\n        \"node_modules\",\n        \"site-packages\",\n        \"venv\",\n    ]\n\n",
+    "line_start": 14,
+    "line_end": 45
+  },
+  {
+    "stable_chunk_id": "child-643938f35e311d34bc91c6aebf1339131e5627e7",
+    "source_path": "docs/configuration.md",
+    "display_text": "    # Same as Black.\n    line-length = 88\n    indent-width = 4\n\n    # Assume Python 3.8\n    target-version = \"py38\"\n\n    [tool.ruff.lint]\n    # Enable Pyflakes (`F`) and a subset of the pycodestyle (`E`)  codes by default.\n    # Unlike Flake8, Ruff doesn't enable pycodestyle warnings (`W`) or\n    # McCabe complexity (`C901`) by default.\n    select = [\"E4\", \"E7\", \"E9\", \"F\"]\n    ignore = []\n\n",
+    "line_start": 46,
+    "line_end": 59
+  },
+  {
+    "stable_chunk_id": "child-a06db1b23b2ab9b255ce3ee15363c53598622d1b",
+    "source_path": "docs/configuration.md",
+    "display_text": "    # Allow fix for all enabled rules (when `--fix`) is provided.\n    fixable = [\"ALL\"]\n    unfixable = []\n\n    # Allow unused variables when underscore-prefixed.\n    dummy-variable-rgx = \"^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$\"\n\n    [tool.ruff.format]\n    # Like Black, use double quotes for strings.\n    quote-style = \"double\"\n\n    # Like Black, indent with spaces, rather than tabs.\n    indent-style = \"space\"\n\n",
+    "line_start": 60,
+    "line_end": 73
+  },
+  {
+    "stable_chunk_id": "child-540f23ccbd78112cfc14d60d1a99cf17f8bd9af2",
+    "source_path": "docs/configuration.md",
+    "display_text": "    # Like Black, respect magic trailing commas.\n    skip-magic-trailing-comma = false\n\n    # Like Black, automatically detect the appropriate line ending.\n    line-ending = \"auto\"\n\n    # Enable auto-formatting of code examples in docstrings. Markdown,\n    # reStructuredText code/literal blocks and doctests are all supported.\n    #\n    # This is currently disabled by default, but it is planned for this\n    # to be opt-out in the future.\n    docstring-code-format = false\n\n",
+    "line_start": 74,
+    "line_end": 86
+  },
+  {
+    "stable_chunk_id": "child-1bb7924e9264b5735c732423346a6ff5bc33c54d",
+    "source_path": "docs/configuration.md",
+    "display_text": "    # Set the line length limit used when formatting code snippets in\n    # docstrings.\n    #\n    # This only has an effect when the `docstring-code-format` setting is\n    # enabled.\n    docstring-code-line-length = \"dynamic\"\n    ```\n\n=== \"ruff.toml\"\n\n",
+    "line_start": 87,
+    "line_end": 96
+  },
+  {
+    "stable_chunk_id": "child-340ab39f1d09eb50068b612342978eefa024b67a",
+    "source_path": "docs/configuration.md",
+    "display_text": "    ```toml\n    # Exclude a variety of commonly ignored directories.\n    exclude = [\n        \".bzr\",\n        \".direnv\",\n        \".eggs\",\n        \".git\",\n        \".git-rewrite\",\n        \".hg\",\n        \".ipynb_checkpoints\",\n        \".mypy_cache\",\n        \".nox\",\n        \".pants.d\",\n        \".pyenv\",\n        \".pytest_cache\",\n        \".pytype\",\n        \".ruff_cache\",\n        \".svn\",\n        \".tox\",\n        \".venv\",\n        \".vscode\",\n        \"__pypackages__\",\n        \"_build\",\n        \"buck-out\",\n        \"build\",\n        \"dist\",\n        \"node_modules\",\n        \"site-packages\",\n        \"venv\",\n    ]\n\n",
+    "line_start": 97,
+    "line_end": 127
+  },
+  {
+    "stable_chunk_id": "child-47f2d2cda20ef963439cb39be5d41809db9f1971",
+    "source_path": "docs/configuration.md",
+    "display_text": "    # Same as Black.\n    line-length = 88\n    indent-width = 4\n\n    # Assume Python 3.8\n    target-version = \"py38\"\n\n    [lint]\n    # Enable Pyflakes (`F`) and a subset of the pycodestyle (`E`)  codes by default.\n    # Unlike Flake8, Ruff doesn't enable pycodestyle warnings (`W`) or\n    # McCabe complexity (`C901`) by default.\n    select = [\"E4\", \"E7\", \"E9\", \"F\"]\n    ignore = []\n\n    # Allow fix for all enabled rules (when `--fix`) is provided.\n    fixable = [\"ALL\"]\n    unfixable = []\n\n",
+    "line_start": 128,
+    "line_end": 145
+  },
+  {
+    "stable_chunk_id": "child-9bf39a193a91cc17244ddb76f177a18b31c9093d",
+    "source_path": "docs/configuration.md",
+    "display_text": "    # Allow unused variables when underscore-prefixed.\n    dummy-variable-rgx = \"^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$\"\n\n    [format]\n    # Like Black, use double quotes for strings.\n    quote-style = \"double\"\n\n    # Like Black, indent with spaces, rather than tabs.\n    indent-style = \"space\"\n\n    # Like Black, respect magic trailing commas.\n    skip-magic-trailing-comma = false\n\n    # Like Black, automatically detect the appropriate line ending.\n    line-ending = \"auto\"\n\n",
+    "line_start": 146,
+    "line_end": 161
+  },
+  {
+    "stable_chunk_id": "child-adb75e904513b28d4850f6b18416358e967d4c5c",
+    "source_path": "docs/configuration.md",
+    "display_text": "    # Enable auto-formatting of code examples in docstrings. Markdown,\n    # reStructuredText code/literal blocks and doctests are all supported.\n    #\n    # This is currently disabled by default, but it is planned for this\n    # to be opt-out in the future.\n    docstring-code-format = false\n\n",
+    "line_start": 162,
+    "line_end": 168
+  },
+  {
+    "stable_chunk_id": "child-2f228b6256050dcbf90f7fb25e5c93bdfb03637f",
+    "source_path": "docs/configuration.md",
+    "display_text": "    # Set the line length limit used when formatting code snippets in\n    # docstrings.\n    #\n    # This only has an effect when the `docstring-code-format` setting is\n    # enabled.\n    docstring-code-line-length = \"dynamic\"\n    ```\n\nAs an example, the following would configure Ruff to:\n\n=== \"pyproject.toml\"\n\n    ```toml\n    [tool.ruff.lint]\n    # 1. Enable flake8-bugbear (`B`) rules, in addition to the defaults.\n    select = [\"E4\", \"E7\", \"E9\", \"F\", \"B\"]\n\n",
+    "line_start": 169,
+    "line_end": 185
+  },
+  {
+    "stable_chunk_id": "child-d122ff82a80f79f059cf917fe97b3648e04d77f3",
+    "source_path": "docs/configuration.md",
+    "display_text": "    # 2. Avoid enforcing line-length violations (`E501`)\n    ignore = [\"E501\"]\n\n    # 3. Avoid trying to fix flake8-bugbear (`B`) violations.\n    unfixable = [\"B\"]\n\n    # 4. Ignore `E402` (import violations) in all `__init__.py` files, and in selected subdirectories.\n    [tool.ruff.lint.per-file-ignores]\n    \"__init__.py\" = [\"E402\"]\n    \"**/{tests,docs,tools}/*\" = [\"E402\"]\n\n    [tool.ruff.format]\n    # 5. Use single quotes in `ruff format`.\n    quote-style = \"single\"\n    ```\n\n",
+    "line_start": 186,
+    "line_end": 201
+  },
+  {
+    "stable_chunk_id": "child-5c0b2b13130d512b6784837fdce07d13e235c64b",
+    "source_path": "docs/configuration.md",
+    "display_text": "=== \"ruff.toml\"\n\n    ```toml\n    [lint]\n    # 1. Enable flake8-bugbear (`B`) rules, in addition to the defaults.\n    select = [\"E4\", \"E7\", \"E9\", \"F\", \"B\"]\n\n    # 2. Avoid enforcing line-length violations (`E501`)\n    ignore = [\"E501\"]\n\n    # 3. Avoid trying to fix flake8-bugbear (`B`) violations.\n    unfixable = [\"B\"]\n\n",
+    "line_start": 202,
+    "line_end": 214
+  },
+  {
+    "stable_chunk_id": "child-a00641b67571353b6f960895a69260ae0b5abfe2",
+    "source_path": "docs/configuration.md",
+    "display_text": "    # 4. Ignore `E402` (import violations) in all `__init__.py` files, and in selected subdirectories.\n    [lint.per-file-ignores]\n    \"__init__.py\" = [\"E402\"]\n    \"**/{tests,docs,tools}/*\" = [\"E402\"]\n\n    [format]\n    # 5. Use single quotes in `ruff format`.\n    quote-style = \"single\"\n    ```\n\nLinter plugin configurations are expressed as subsections, e.g.:\n\n=== \"pyproject.toml\"\n\n",
+    "line_start": 215,
+    "line_end": 228
+  },
+  {
+    "stable_chunk_id": "child-8ff161d27421eaf87b7b3e182bc62c4ac081b6f3",
+    "source_path": "docs/configuration.md",
+    "display_text": "    ```toml\n    [tool.ruff.lint]\n    # Add \"Q\" to the list of enabled codes.\n    select = [\"E4\", \"E7\", \"E9\", \"F\", \"Q\"]\n\n    [tool.ruff.lint.flake8-quotes]\n    docstring-quotes = \"double\"\n    ```\n\n=== \"ruff.toml\"\n\n    ```toml\n    [lint]\n    # Add \"Q\" to the list of enabled codes.\n    select = [\"E4\", \"E7\", \"E9\", \"F\", \"Q\"]\n\n    [lint.flake8-quotes]\n    docstring-quotes = \"double\"\n    ```\n\n",
+    "line_start": 229,
+    "line_end": 248
+  },
+  {
+    "stable_chunk_id": "child-8d425015ff63f6ef7ad1de87b2802f84f98f8750",
+    "source_path": "docs/configuration.md",
+    "display_text": "Ruff respects `pyproject.toml`, `ruff.toml`, and `.ruff.toml` files. All three implement an\nequivalent schema (though in the `ruff.toml` and `.ruff.toml` versions, the `[tool.ruff]` header and\n`tool.ruff` section prefix is omitted).\n\nFor a complete enumeration of the available configuration options, see [_Settings_](settings.md).\n\n",
+    "line_start": 249,
+    "line_end": 254
+  },
+  {
+    "stable_chunk_id": "child-1178a66d9307901c427d8387b9793fee291ddbe4",
+    "source_path": "docs/configuration.md",
+    "display_text": "## Config file discovery\n\nSimilar to [ESLint](https://eslint.org/docs/latest/use/configure/configuration-files#cascading-configuration-objects),\nRuff supports hierarchical configuration, such that the \"closest\" config file in the\ndirectory hierarchy is used for every individual file, with all paths in the config file\n(e.g., `exclude` globs, `src` paths) being resolved relative to the directory containing that\nconfig file.\n\n",
+    "line_start": 255,
+    "line_end": 262
+  },
+  {
+    "stable_chunk_id": "child-0a8b30c801b68f0dd2e61c78d33c4f27d5409148",
+    "source_path": "docs/configuration.md",
+    "display_text": "There are a few exceptions to these rules:\n\n1. In locating the \"closest\" `pyproject.toml` file for a given path, Ruff ignores any\n    `pyproject.toml` files that lack a `[tool.ruff]` section.\n1. If a configuration file is passed directly via `--config`, those settings are used for _all_\n    analyzed files, and any relative paths in that configuration file (like `exclude` globs or\n    `src` paths) are resolved relative to the _current_ working directory.\n1. If no config file is found in the filesystem hierarchy, Ruff will fall back to using\n    a default configuration. If a user-specific configuration file exists\n    at `${config_dir}/ruff/pyproject.toml`, that file will be used instead of the default\n    configuration, with `${config_dir}` being determined via [`etcetera`'s native strategy](https://docs.rs/etcetera/latest/etcetera/#native-strategy),\n    and all relative paths being again resolved relative to the _current working directory_.\n1. Any config-file-supported settings that are provided on the command-line (e.g., via\n    `--select`) will override the settings in _every_ resolved configuration file.\n\n",
+    "line_start": 263,
+    "line_end": 277
+  },
+  {
+    "stable_chunk_id": "child-8553fa001a152fc20149d30b2a15ba125ca1e7a9",
+    "source_path": "docs/configuration.md",
+    "display_text": "Unlike [ESLint](https://eslint.org/docs/latest/use/configure/configuration-files#cascading-configuration-objects),\nRuff does not merge settings across configuration files; instead, the \"closest\" configuration file\nis used, and any parent configuration files are ignored. In lieu of this implicit cascade, Ruff\nsupports an [`extend`](settings.md#extend) field, which allows you to inherit the settings from another\nconfig file, like so:\n\n=== \"pyproject.toml\"\n\n",
+    "line_start": 278,
+    "line_end": 285
+  },
+  {
+    "stable_chunk_id": "child-f91a455e42cb2411cf45234cd35237a201ba8337",
+    "source_path": "docs/configuration.md",
+    "display_text": "    ```toml\n    [tool.ruff]\n    # Extend the `pyproject.toml` file in the parent directory...\n    extend = \"../pyproject.toml\"\n\n    # ...but use a different line length.\n    line-length = 100\n    ```\n\n=== \"ruff.toml\"\n\n    ```toml\n    # Extend the `ruff.toml` file in the parent directory...\n    extend = \"../ruff.toml\"\n\n    # ...but use a different line length.\n    line-length = 100\n    ```\n\n",
+    "line_start": 286,
+    "line_end": 304
+  },
+  {
+    "stable_chunk_id": "child-c33351aa2c301e85e17cfc62d4963b9148923230",
+    "source_path": "docs/configuration.md",
+    "display_text": "All of the above rules apply equivalently to `pyproject.toml`, `ruff.toml`, and `.ruff.toml` files.\nIf Ruff detects multiple configuration files in the same directory, the `.ruff.toml` file will take\nprecedence over the `ruff.toml` file, and the `ruff.toml` file will take precedence over\nthe `pyproject.toml` file.\n\n",
+    "line_start": 305,
+    "line_end": 309
+  },
+  {
+    "stable_chunk_id": "child-4d17a390b8011f5a0a97971c2c5fa09d08a4d024",
+    "source_path": "docs/configuration.md",
+    "display_text": "## Python file discovery\n\nWhen passed a path on the command-line, Ruff will automatically discover all Python files in that\npath, taking into account the [`exclude`](settings.md#exclude) and [`extend-exclude`](settings.md#extend-exclude)\nsettings in each directory's configuration file.\n\n",
+    "line_start": 310,
+    "line_end": 315
+  },
+  {
+    "stable_chunk_id": "child-a81db5c8d348fa66f8444df2d3b6166534f504eb",
+    "source_path": "docs/configuration.md",
+    "display_text": "Files can also be selectively excluded from linting or formatting by scoping the `exclude` setting\nto the tool-specific configuration tables. For example, the following would prevent `ruff` from\nformatting `.pyi` files, but would continue to include them in linting:\n\n=== \"pyproject.toml\"\n\n    ```toml\n    [tool.ruff.format]\n    exclude = [\"*.pyi\"]\n    ```\n\n=== \"ruff.toml\"\n\n    ```toml\n    [format]\n    exclude = [\"*.pyi\"]\n    ```\n\n",
+    "line_start": 316,
+    "line_end": 333
+  },
+  {
+    "stable_chunk_id": "child-0dbbc340352e7395ee8159e7de3f9fe68681eccc",
+    "source_path": "docs/configuration.md",
+    "display_text": "By default, Ruff will also skip any files that are omitted via `.ignore`, `.gitignore`,\n`.git/info/exclude`, and global `gitignore` files (see: [`respect-gitignore`](settings.md#respect-gitignore)).\n\nFiles that are passed to `ruff` directly are always analyzed, regardless of the above criteria.\nFor example, `ruff check /path/to/excluded/file.py` will always lint `file.py`.\n\n",
+    "line_start": 334,
+    "line_end": 339
+  },
+  {
+    "stable_chunk_id": "child-0e53af5f3a1ff7cead584e5e19022ce2cd51239a",
+    "source_path": "docs/configuration.md",
+    "display_text": "### Default inclusions\n\nBy default, Ruff will discover files matching `*.py`, `*.pyi`, `*.ipynb`, or `pyproject.toml`.\n\nTo lint or format files with additional file extensions, use the [`extend-include`](settings.md#extend-include) setting.\nYou can also change the default selection using the [`include`](settings.md#include) setting.\n\n\n=== \"pyproject.toml\"\n\n",
+    "line_start": 340,
+    "line_end": 349
+  },
+  {
+    "stable_chunk_id": "child-29e6c4f59f848fbef837157465e546cb157d78aa",
+    "source_path": "docs/configuration.md",
+    "display_text": "    ```toml\n    [tool.ruff]\n    include = [\"pyproject.toml\", \"src/**/*.py\", \"scripts/**/*.py\"]\n    ```\n\n=== \"ruff.toml\"\n\n    ```toml\n    include = [\"pyproject.toml\", \"src/**/*.py\", \"scripts/**/*.py\"]\n    ```\n\n!!! warning\n    Paths provided to `include` _must_ match files. For example, `include = [\"src\"]` will fail since it\n    matches a directory.\n\n",
+    "line_start": 350,
+    "line_end": 364
+  },
+  {
+    "stable_chunk_id": "child-bc6685577c9c75f40baf422e210cc5e076fd72c6",
+    "source_path": "docs/configuration.md",
+    "display_text": "## Jupyter Notebook discovery\n\nRuff has built-in support for linting and formatting [Jupyter Notebooks](https://jupyter.org/),\nwhich are linted and formatted by default on version `0.6.0` and higher.\n\nIf you'd prefer to either only lint or only format Jupyter Notebook files, you can use the\nsection-specific `exclude` option to do so. For example, the following would only lint Jupyter\nNotebook files and not format them:\n\n=== \"pyproject.toml\"\n\n",
+    "line_start": 365,
+    "line_end": 375
+  },
+  {
+    "stable_chunk_id": "child-a26fb5ba59f6184dd3286607d36a73310b35a071",
+    "source_path": "docs/configuration.md",
+    "display_text": "    ```toml\n    [tool.ruff.format]\n    exclude = [\"*.ipynb\"]\n    ```\n\n=== \"ruff.toml\"\n\n    ```toml\n    [format]\n    exclude = [\"*.ipynb\"]\n    ```\n\nAnd, conversely, the following would only format Jupyter Notebook files and not lint them:\n\n=== \"pyproject.toml\"\n\n    ```toml\n    [tool.ruff.lint]\n    exclude = [\"*.ipynb\"]\n    ```\n\n=== \"ruff.toml\"\n\n    ```toml\n    [lint]\n    exclude = [\"*.ipynb\"]\n    ```\n\n",
+    "line_start": 376,
+    "line_end": 403
+  },
+  {
+    "stable_chunk_id": "child-a0348b604ca2b7787ab6c12b0798a6cbfbd7ad52",
+    "source_path": "docs/configuration.md",
+    "display_text": "You can completely disable Jupyter Notebook support by updating the\n[`extend-exclude`](settings.md#extend-exclude) setting:\n\n=== \"pyproject.toml\"\n\n    ```toml\n    [tool.ruff]\n    extend-exclude = [\"*.ipynb\"]\n    ```\n\n=== \"ruff.toml\"\n\n    ```toml\n    extend-exclude = [\"*.ipynb\"]\n    ```\n\nIf you'd like to ignore certain rules specifically for Jupyter Notebook files, you can do so by\nusing the [`per-file-ignores`](settings.md#per-file-ignores) setting:\n\n",
+    "line_start": 404,
+    "line_end": 422
+  },
+  {
+    "stable_chunk_id": "child-c9998fc7b13475fef2c72e83bccff2410e49c790",
+    "source_path": "docs/configuration.md",
+    "display_text": "=== \"pyproject.toml\"\n\n    ```toml\n    [tool.ruff.lint.per-file-ignores]\n    \"*.ipynb\" = [\"T20\"]\n    ```\n\n=== \"ruff.toml\"\n\n    ```toml\n    [lint.per-file-ignores]\n    \"*.ipynb\" = [\"T20\"]\n    ```\n\n",
+    "line_start": 423,
+    "line_end": 436
+  },
+  {
+    "stable_chunk_id": "child-037af0543899eb07f516467b4ac1130ffd7da4ec",
+    "source_path": "docs/configuration.md",
+    "display_text": "Some rules have different behavior when applied to Jupyter Notebook files. For\nexample, when applied to `.py` files the\n[`module-import-not-at-top-of-file` (`E402`)](rules/module-import-not-at-top-of-file.md)\nrule detect imports at the top of a file, but for notebooks it detects imports at the top of a\n**cell**. For a given rule, the rule's documentation will always specify if it has different\nbehavior when applied to Jupyter Notebook files.\n\n",
+    "line_start": 437,
+    "line_end": 443
+  },
+  {
+    "stable_chunk_id": "child-d27748b887434a3b41bc0607d464189feca8a097",
+    "source_path": "docs/configuration.md",
+    "display_text": "## Command-line interface\n\nSome configuration options can be provided or overridden via dedicated flags on the command line.\nThis includes those related to rule enablement and disablement,\nfile discovery, logging level, and more:\n\n```console\n$ ruff check path/to/code/ --select F401 --select F403 --quiet\n```\n\nAll other configuration options can be set via the command line\nusing the `--config` flag, detailed below.\n\n",
+    "line_start": 444,
+    "line_end": 456
+  },
+  {
+    "stable_chunk_id": "child-56f9526e43554eb95bc62fa675e665cf8fa9d7c5",
+    "source_path": "docs/configuration.md",
+    "display_text": "### The `--config` CLI flag\n\nThe `--config` flag has two uses. It is most often used to point to the\nconfiguration file that you would like Ruff to use, for example:\n\n```console\n$ ruff check path/to/directory --config path/to/ruff.toml\n```\n\n",
+    "line_start": 457,
+    "line_end": 465
+  },
+  {
+    "stable_chunk_id": "child-20a0fe124498fc182c4ed9ec73d5c1ee7bcc87a0",
+    "source_path": "docs/configuration.md",
+    "display_text": "However, the `--config` flag can also be used to provide arbitrary\noverrides of configuration settings using TOML `<KEY> = <VALUE>` pairs.\nThis is mostly useful in situations where you wish to override a configuration setting\nthat does not have a dedicated command-line flag.\n\n",
+    "line_start": 466,
+    "line_end": 470
+  },
+  {
+    "stable_chunk_id": "child-5f4a2a543a2612d54dadffdd8c9cf69bbda78baa",
+    "source_path": "docs/configuration.md",
+    "display_text": "In the below example, the `--config` flag is the only way of overriding the\n`dummy-variable-rgx` configuration setting from the command line,\nsince this setting has no dedicated CLI flag. The `per-file-ignores` setting\ncould also have been overridden via the `--per-file-ignores` dedicated flag,\nbut using `--config` to override the setting is also fine:\n\n",
+    "line_start": 471,
+    "line_end": 476
+  },
+  {
+    "stable_chunk_id": "child-a39273052a69351c682d642b4cc571d56c79922e",
+    "source_path": "docs/configuration.md",
+    "display_text": "```console\n$ ruff check path/to/file --config path/to/ruff.toml --config \"lint.dummy-variable-rgx = '__.*'\" --config \"lint.per-file-ignores = {'some_file.py' = ['F841']}\"\n```\n\n",
+    "line_start": 477,
+    "line_end": 480
+  },
+  {
+    "stable_chunk_id": "child-be0e097beee946454ed12880c7d237b6bb99cb2f",
+    "source_path": "docs/configuration.md",
+    "display_text": "Configuration options passed to `--config` are parsed in the same way\nas configuration options in a `ruff.toml` file.\nAs such, options specific to the Ruff linter need to be prefixed with `lint.`\n(`--config \"lint.dummy-variable-rgx = '__.*'\"` rather than simply\n`--config \"dummy-variable-rgx = '__.*'\"`), and options specific to the Ruff formatter\nneed to be prefixed with `format.`.\n\n",
+    "line_start": 481,
+    "line_end": 487
+  },
+  {
+    "stable_chunk_id": "child-c3c5c6d5335ae82c17e67109801e5538d301e335",
+    "source_path": "docs/configuration.md",
+    "display_text": "If a specific configuration option is simultaneously overridden by\na dedicated flag and by the `--config` flag, the dedicated flag\ntakes priority. In this example, the maximum permitted line length\nwill be set to 90, not 100:\n\n```console\n$ ruff format path/to/file --line-length=90 --config \"line-length=100\"\n```\n\n",
+    "line_start": 488,
+    "line_end": 496
+  },
+  {
+    "stable_chunk_id": "child-1c5ab8213ef9c824066b32847190ed0051fc4e36",
+    "source_path": "docs/configuration.md",
+    "display_text": "Specifying `--config \"line-length=90\"` will override the `line-length`\nsetting from *all* configuration files detected by Ruff,\nincluding configuration files discovered in subdirectories.\nIn this respect, specifying `--config \"line-length=90\"` has\nthe same effect as specifying `--line-length=90`,\nwhich will similarly override the `line-length` setting from\nall configuration files detected by Ruff, regardless of where\na specific configuration file is located.\n\n",
+    "line_start": 497,
+    "line_end": 505
+  },
+  {
+    "stable_chunk_id": "child-f2a0d24dcbcf112dc57d2c1f2334817ea77713e1",
+    "source_path": "docs/configuration.md",
+    "display_text": "### Full command-line interface\n\nSee `ruff help` for the full list of Ruff's top-level commands:\n\n<!-- Begin auto-generated command help. -->\n\n",
+    "line_start": 506,
+    "line_end": 511
+  },
+  {
+    "stable_chunk_id": "child-f7128c2cca99af4511529989b6085726d202c446",
+    "source_path": "docs/configuration.md",
+    "display_text": "```text\nRuff: An extremely fast Python linter and code formatter.\n\nUsage: ruff [OPTIONS] <COMMAND>\n\nCommands:\n  check    Run Ruff on the given files or directories (default)\n  rule     Explain a rule (or all rules)\n  config   List or describe the available configuration options\n  linter   List all supported upstream linters\n  clean    Clear any caches in the current directory and any subdirectories\n  format   Run the Ruff formatter on the given files or directories\n  server   Run the language server\n  analyze  Run analysis over Python source code\n  version  Display Ruff's version\n  help     Print this message or the help of the given subcommand(s)\n\nOptions:\n  -h, --help     Print help\n  -V, --version  Print version\n\nLog levels:\n  -v, --verbose  Enable verbose logging\n  -q, --quiet    Print diagnostics, but nothing else\n  -s, --silent   Disable all logging (but still exit with status code \"1\" upon\n                 detecting diagnostics)\n\nGlobal options:\n      --config <CONFIG_OPTION>\n          Either a path to a TOML configuration file (`pyproject.toml` or\n          `ruff.toml`), or a TOML `<KEY> = <VALUE>` pair (such as you might\n          find in a `ruff.toml` configuration file) overriding a specific\n          configuration option. Overrides of individual settings using this\n          option always take precedence over all configuration files, including\n          configuration files that were also specified using `--config`\n      --isolated\n          Ignore all configuration files\n\nFor help with a specific command, see: `ruff help <command>`.\n```\n\n",
+    "line_start": 512,
+    "line_end": 552
+  },
+  {
+    "stable_chunk_id": "child-4c655bd0d62641a5ddaecbe2b1973422f7799f29",
+    "source_path": "docs/configuration.md",
+    "display_text": "<!-- End auto-generated command help. -->\n\nOr `ruff help check` for more on the linting command:\n\n<!-- Begin auto-generated check help. -->\n\n",
+    "line_start": 553,
+    "line_end": 558
+  },
+  {
+    "stable_chunk_id": "child-f9c97e612cb064b6b353a9ee211cd55b80419d07",
+    "source_path": "docs/configuration.md",
+    "display_text": "```text\nRun Ruff on the given files or directories (default)\n\nUsage: ruff check [OPTIONS] [FILES]...\n\nArguments:\n  [FILES]...  List of files or directories to check [default: .]\n\nOptions:\n      --fix\n          Apply fixes to resolve lint violations. Use `--no-fix` to disable or\n          `--unsafe-fixes` to include unsafe fixes\n      --unsafe-fixes\n          Include fixes that may not retain the original intent of the code.\n",
+    "line_start": 559,
+    "line_end": 572
+  },
+  {
+    "stable_chunk_id": "child-9780de401107a301a7cd5370f9cfd190d7221f83",
+    "source_path": "docs/configuration.md",
+    "display_text": "          Use `--no-unsafe-fixes` to disable\n      --show-fixes\n          Show an enumeration of all fixed lint violations. Use\n          `--no-show-fixes` to disable\n      --diff\n          Avoid writing any fixed files back; instead, output a diff for each\n          changed file to stdout, and exit 0 if there are no diffs. Implies\n          `--fix-only`\n  -w, --watch\n          Run in watch mode by re-running whenever files change\n",
+    "line_start": 573,
+    "line_end": 582
+  },
+  {
+    "stable_chunk_id": "child-28ddee785b047b021852b197adc01bc6375a7a84",
+    "source_path": "docs/configuration.md",
+    "display_text": "      --fix-only\n          Apply fixes to resolve lint violations, but don't report on, or exit\n          non-zero for, leftover violations. Implies `--fix`. Use\n          `--no-fix-only` to disable or `--unsafe-fixes` to include unsafe\n          fixes\n      --ignore-noqa\n          Ignore any `# noqa` comments\n      --output-format <OUTPUT_FORMAT>\n          Output serialization format for violations. The default serialization\n",
+    "line_start": 583,
+    "line_end": 591
+  },
+  {
+    "stable_chunk_id": "child-f8cada24d69843d488c3db01cdc64cec3852f33a",
+    "source_path": "docs/configuration.md",
+    "display_text": "          format is \"full\" [env: RUFF_OUTPUT_FORMAT=] [possible values: text,\n          concise, full, json, json-lines, junit, grouped, github, gitlab,\n          pylint, rdjson, azure, sarif]\n  -o, --output-file <OUTPUT_FILE>\n          Specify file to write the linter output to (default: stdout) [env:\n          RUFF_OUTPUT_FILE=]\n      --target-version <TARGET_VERSION>\n",
+    "line_start": 592,
+    "line_end": 598
+  },
+  {
+    "stable_chunk_id": "child-3cf2a14b7343165dd6767817616d7ce5716dab38",
+    "source_path": "docs/configuration.md",
+    "display_text": "          The minimum Python version that should be supported [possible values:\n          py37, py38, py39, py310, py311, py312, py313]\n      --preview\n          Enable preview mode; checks will include unstable rules and fixes.\n          Use `--no-preview` to disable\n      --extension <EXTENSION>\n          List of mappings from file extension to language (one of `python`,\n",
+    "line_start": 599,
+    "line_end": 605
+  },
+  {
+    "stable_chunk_id": "child-3a072e97df8e49550e75036e45879ab68887a14e",
+    "source_path": "docs/configuration.md",
+    "display_text": "          `ipynb`, `pyi`). For example, to treat `.ipy` files as IPython\n          notebooks, use `--extension ipy:ipynb`\n      --statistics\n          Show counts for every rule with at least one violation\n      --add-noqa\n          Enable automatic additions of `noqa` directives to failing lines\n      --show-files\n          See the files Ruff will be run against with the current settings\n      --show-settings\n",
+    "line_start": 606,
+    "line_end": 614
+  },
+  {
+    "stable_chunk_id": "child-18753bfda623d1398232c8952e212057a5f879bc",
+    "source_path": "docs/configuration.md",
+    "display_text": "          See the settings Ruff will use to lint a given Python file\n  -h, --help\n          Print help\n\nRule selection:\n      --select <RULE_CODE>\n          Comma-separated list of rule codes to enable (or ALL, to enable all\n          rules)\n      --ignore <RULE_CODE>\n          Comma-separated list of rule codes to disable\n      --extend-select <RULE_CODE>\n          Like --select, but adds additional rule codes on top of those already\n",
+    "line_start": 615,
+    "line_end": 626
+  },
+  {
+    "stable_chunk_id": "child-f001e566bc0af2e8789eca56c46b3e1561505730",
+    "source_path": "docs/configuration.md",
+    "display_text": "          specified\n      --per-file-ignores <PER_FILE_IGNORES>\n          List of mappings from file pattern to code to exclude\n      --extend-per-file-ignores <EXTEND_PER_FILE_IGNORES>\n          Like `--per-file-ignores`, but adds additional ignores on top of\n          those already specified\n      --fixable <RULE_CODE>\n          List of rule codes to treat as eligible for fix. Only applicable when\n",
+    "line_start": 627,
+    "line_end": 634
+  },
+  {
+    "stable_chunk_id": "child-2c305c53426ddacd90a8da63d71c6195333b2d64",
+    "source_path": "docs/configuration.md",
+    "display_text": "          fix itself is enabled (e.g., via `--fix`)\n      --unfixable <RULE_CODE>\n          List of rule codes to treat as ineligible for fix. Only applicable\n          when fix itself is enabled (e.g., via `--fix`)\n      --extend-fixable <RULE_CODE>\n          Like --fixable, but adds additional rule codes on top of those\n          already specified\n\nFile selection:\n      --exclude <FILE_PATTERN>\n",
+    "line_start": 635,
+    "line_end": 644
+  },
+  {
+    "stable_chunk_id": "child-b1aeea65985563f752ccc123dc12d286c6002671",
+    "source_path": "docs/configuration.md",
+    "display_text": "          List of paths, used to omit files and/or directories from analysis\n      --extend-exclude <FILE_PATTERN>\n          Like --exclude, but adds additional files and directories on top of\n          those already excluded\n      --respect-gitignore\n          Respect file exclusions via `.gitignore` and other standard ignore\n          files. Use `--no-respect-gitignore` to disable\n      --force-exclude\n",
+    "line_start": 645,
+    "line_end": 652
+  },
+  {
+    "stable_chunk_id": "child-9e488f8a89632c9abded3816ccb87c2a9ad4dbdd",
+    "source_path": "docs/configuration.md",
+    "display_text": "          Enforce exclusions, even for paths passed to Ruff directly on the\n          command-line. Use `--no-force-exclude` to disable\n\nMiscellaneous:\n  -n, --no-cache\n          Disable cache reads [env: RUFF_NO_CACHE=]\n      --cache-dir <CACHE_DIR>\n          Path to the cache directory [env: RUFF_CACHE_DIR=]\n      --stdin-filename <STDIN_FILENAME>\n          The name of the file when passing it through stdin\n  -e, --exit-zero\n",
+    "line_start": 653,
+    "line_end": 663
+  },
+  {
+    "stable_chunk_id": "child-484ba766270077d0cb932bed54d3b61de08511e3",
+    "source_path": "docs/configuration.md",
+    "display_text": "          Exit with status code \"0\", even upon detecting lint violations\n      --exit-non-zero-on-fix\n          Exit with a non-zero status code if any files were modified via fix,\n          even if no lint violations remain\n\nLog levels:\n  -v, --verbose  Enable verbose logging\n  -q, --quiet    Print diagnostics, but nothing else\n  -s, --silent   Disable all logging (but still exit with status code \"1\" upon\n",
+    "line_start": 664,
+    "line_end": 672
+  },
+  {
+    "stable_chunk_id": "child-a1f88b88204b640f37899e120ea4d1d89f1a37cb",
+    "source_path": "docs/configuration.md",
+    "display_text": "                 detecting diagnostics)\n\nGlobal options:\n      --config <CONFIG_OPTION>\n          Either a path to a TOML configuration file (`pyproject.toml` or\n          `ruff.toml`), or a TOML `<KEY> = <VALUE>` pair (such as you might\n          find in a `ruff.toml` configuration file) overriding a specific\n          configuration option. Overrides of individual settings using this\n",
+    "line_start": 673,
+    "line_end": 680
+  },
+  {
+    "stable_chunk_id": "child-4a9f02acbec247c5f86e07b97860c6aaf19d4680",
+    "source_path": "docs/configuration.md",
+    "display_text": "          option always take precedence over all configuration files, including\n          configuration files that were also specified using `--config`\n      --isolated\n          Ignore all configuration files\n```\n\n<!-- End auto-generated check help. -->\n\nOr `ruff help format` for more on the formatting command:\n\n<!-- Begin auto-generated format help. -->\n\n",
+    "line_start": 681,
+    "line_end": 692
+  },
+  {
+    "stable_chunk_id": "child-5bd8486d4c22ebfa4901bee7c6eeeebc0695f342",
+    "source_path": "docs/configuration.md",
+    "display_text": "```text\nRun the Ruff formatter on the given files or directories\n\nUsage: ruff format [OPTIONS] [FILES]...\n\nArguments:\n  [FILES]...  List of files or directories to format [default: .]\n\nOptions:\n      --check\n          Avoid writing any formatted files back; instead, exit with a non-zero\n          status code if any files would have been modified, and zero otherwise\n      --diff\n",
+    "line_start": 693,
+    "line_end": 705
+  },
+  {
+    "stable_chunk_id": "child-2bfc4c0fc7e5c7f63c2ce873304669a5c70b592a",
+    "source_path": "docs/configuration.md",
+    "display_text": "          Avoid writing any formatted files back; instead, exit with a non-zero\n          status code and the difference between the current file and how the\n          formatted file would look like\n      --extension <EXTENSION>\n          List of mappings from file extension to language (one of `python`,\n          `ipynb`, `pyi`). For example, to treat `.ipy` files as IPython\n          notebooks, use `--extension ipy:ipynb`\n",
+    "line_start": 706,
+    "line_end": 712
+  },
+  {
+    "stable_chunk_id": "child-b0449037979160c54f8999f1f89b210a832e64c2",
+    "source_path": "docs/configuration.md",
+    "display_text": "      --target-version <TARGET_VERSION>\n          The minimum Python version that should be supported [possible values:\n          py37, py38, py39, py310, py311, py312, py313]\n      --preview\n          Enable preview mode; enables unstable formatting. Use `--no-preview`\n          to disable\n  -h, --help\n          Print help (see more with '--help')\n\nMiscellaneous:\n  -n, --no-cache\n          Disable cache reads [env: RUFF_NO_CACHE=]\n",
+    "line_start": 713,
+    "line_end": 724
+  },
+  {
+    "stable_chunk_id": "child-636e9ee894284b6e26930fe7412a0dcc1d1b937d",
+    "source_path": "docs/configuration.md",
+    "display_text": "      --cache-dir <CACHE_DIR>\n          Path to the cache directory [env: RUFF_CACHE_DIR=]\n      --stdin-filename <STDIN_FILENAME>\n          The name of the file when passing it through stdin\n\nFile selection:\n      --respect-gitignore\n          Respect file exclusions via `.gitignore` and other standard ignore\n          files. Use `--no-respect-gitignore` to disable\n      --exclude <FILE_PATTERN>\n",
+    "line_start": 725,
+    "line_end": 734
+  },
+  {
+    "stable_chunk_id": "child-e964e3f0bac043d680eb678aff589e0032b939b2",
+    "source_path": "docs/configuration.md",
+    "display_text": "          List of paths, used to omit files and/or directories from analysis\n      --force-exclude\n          Enforce exclusions, even for paths passed to Ruff directly on the\n          command-line. Use `--no-force-exclude` to disable\n\nFormat configuration:\n      --line-length <LINE_LENGTH>  Set the line-length\n\nEditor options:\n      --range <RANGE>  When specified, Ruff will try to only format the code in\n",
+    "line_start": 735,
+    "line_end": 744
+  },
+  {
+    "stable_chunk_id": "child-f0aaf550d3128789e45c980900eda88f2436cadb",
+    "source_path": "docs/configuration.md",
+    "display_text": "                       the given range.\n                       It might be necessary to extend the start backwards or\n                       the end forwards, to fully enclose a logical line.\n                       The `<RANGE>` uses the format\n                       `<start_line>:<start_column>-<end_line>:<end_column>`.\n\nLog levels:\n  -v, --verbose  Enable verbose logging\n  -q, --quiet    Print diagnostics, but nothing else\n",
+    "line_start": 745,
+    "line_end": 753
+  },
+  {
+    "stable_chunk_id": "child-b128baa7ccbd729ad135a4079199c16dcae7aacd",
+    "source_path": "docs/configuration.md",
+    "display_text": "  -s, --silent   Disable all logging (but still exit with status code \"1\" upon\n                 detecting diagnostics)\n\nGlobal options:\n      --config <CONFIG_OPTION>\n          Either a path to a TOML configuration file (`pyproject.toml` or\n          `ruff.toml`), or a TOML `<KEY> = <VALUE>` pair (such as you might\n          find in a `ruff.toml` configuration file) overriding a specific\n",
+    "line_start": 754,
+    "line_end": 761
+  },
+  {
+    "stable_chunk_id": "child-ff82d554451aff67256b3e592f242358c2c30a84",
+    "source_path": "docs/configuration.md",
+    "display_text": "          configuration option. Overrides of individual settings using this\n          option always take precedence over all configuration files, including\n          configuration files that were also specified using `--config`\n      --isolated\n          Ignore all configuration files\n```\n\n<!-- End auto-generated format help. -->\n\n",
+    "line_start": 762,
+    "line_end": 770
+  },
+  {
+    "stable_chunk_id": "child-fa0f4c4101a3712f03c8b65d3a3f8c7c5a498d5c",
+    "source_path": "docs/configuration.md",
+    "display_text": "## Shell autocompletion\n\nRuff supports autocompletion for most shells. A shell-specific completion script can be generated\nby `ruff generate-shell-completion <SHELL>`, where `<SHELL>` is one of `bash`, `elvish`, `fig`, `fish`,\n`powershell`, or `zsh`.\n\n",
+    "line_start": 771,
+    "line_end": 776
+  },
+  {
+    "stable_chunk_id": "child-056855b5fc9dbfeee2fac3e8a5f2424e8d248554",
+    "source_path": "docs/configuration.md",
+    "display_text": "The exact steps required to enable autocompletion will vary by shell. For example instructions,\nsee the [Poetry](https://python-poetry.org/docs/#enable-tab-completion-for-bash-fish-or-zsh) or\n[ripgrep](https://github.com/BurntSushi/ripgrep/blob/master/FAQ.md#complete) documentation.\n\n",
+    "line_start": 777,
+    "line_end": 780
+  },
+  {
+    "stable_chunk_id": "child-543c995b2f8bf2fcc25e346a26e1cee3702c28d9",
+    "source_path": "docs/configuration.md",
+    "display_text": "As an example: to enable autocompletion for Zsh, run\n`ruff generate-shell-completion zsh > ~/.zfunc/_ruff`. Then add the following line to your\n`~/.zshrc` file, if they're not already present:\n\n```zsh\nfpath+=~/.zfunc\nautoload -Uz compinit && compinit\n```\n",
+    "line_start": 781,
+    "line_end": 788
+  },
+  {
+    "stable_chunk_id": "child-6ce73a37d02889903e86e3b0654785adbf2c8404",
+    "source_path": "docs/preview.md",
+    "display_text": "# Preview\n\nRuff includes an opt-in preview mode to provide an opportunity for community feedback and increase confidence that\nchanges are a net-benefit before enabling them for everyone.\n\nPreview mode enables a collection of unstable features such as new lint rules and fixes, formatter style changes, interface updates, and more. Warnings about deprecated features may turn into errors when using preview mode.\n\n",
+    "line_start": 1,
+    "line_end": 7
+  },
+  {
+    "stable_chunk_id": "child-87c14b4e703b456bd0f88087aec8fd10cf22f2f7",
+    "source_path": "docs/preview.md",
+    "display_text": "Enabling preview mode does not on its own enable all preview rules. See the [rules section](#using-rules-that-are-in-preview) for details on selecting preview rules.\n\n",
+    "line_start": 8,
+    "line_end": 9
+  },
+  {
+    "stable_chunk_id": "child-80f02b41458f8736b053b6cce125f11addeb000b",
+    "source_path": "docs/preview.md",
+    "display_text": "## Enabling preview mode\n\nPreview mode can be enabled with the `--preview` flag on the CLI or by setting `preview = true` in your Ruff\nconfiguration file.\n\nPreview mode can be configured separately for linting and formatting (requires Ruff v0.1.1+). To enable preview lint rules without preview style formatting:\n\n=== \"pyproject.toml\"\n\n    ```toml\n    [tool.ruff.lint]\n    preview = true\n    ```\n\n=== \"ruff.toml\"\n\n    ```toml\n    [lint]\n    preview = true\n    ```\n\n=== \"CLI\"\n\n",
+    "line_start": 10,
+    "line_end": 32
+  },
+  {
+    "stable_chunk_id": "child-1f1939468bf841c0d2e9a56b55fa4005f3db9186",
+    "source_path": "docs/preview.md",
+    "display_text": "    ```console\n    ruff check --preview\n    ```\n\n\nTo enable preview style formatting without enabling any preview lint rules:\n\n=== \"pyproject.toml\"\n\n    ```toml\n    [tool.ruff.format]\n    preview = true\n    ```\n\n=== \"ruff.toml\"\n\n    ```toml\n    [format]\n    preview = true\n    ```\n\n=== \"CLI\"\n\n    ```console\n    ruff format --preview\n    ```\n\n",
+    "line_start": 33,
+    "line_end": 59
+  },
+  {
+    "stable_chunk_id": "child-dd8406aad0a3781393670d4ef1996ca66cf2b9e4",
+    "source_path": "docs/preview.md",
+    "display_text": "## Using rules that are in preview\n\nIf a rule is marked as preview, it can only be selected if preview mode is enabled. For example, consider a\nhypothetical rule, `HYP001`. If `HYP001` were in preview, it would _not_ be enabled by adding it to the selected rule set.\n\n=== \"pyproject.toml\"\n\n    ```toml\n    [tool.ruff.lint]\n    extend-select = [\"HYP001\"]\n    ```\n\n=== \"ruff.toml\"\n\n    ```toml\n    [lint]\n    extend-select = [\"HYP001\"]\n    ```\n\n=== \"CLI\"\n\n",
+    "line_start": 60,
+    "line_end": 80
+  },
+  {
+    "stable_chunk_id": "child-1f7e1a5ea9a73b23de6b36f1361bc746ed1920b9",
+    "source_path": "docs/preview.md",
+    "display_text": "    ```console\n    ruff check --extend-select HYP001\n    ```\n\n\nIt also would _not_ be enabled by selecting the `HYP` category, like so:\n\n=== \"pyproject.toml\"\n\n    ```toml\n    [tool.ruff.lint]\n    extend-select = [\"HYP\"]\n    ```\n\n=== \"ruff.toml\"\n\n    ```toml\n    [lint]\n    extend-select = [\"HYP\"]\n    ```\n\n=== \"CLI\"\n\n    ```console\n    ruff check --extend-select HYP\n    ```\n\n\nSimilarly, it would _not_ be enabled via the `ALL` selector:\n\n=== \"pyproject.toml\"\n\n",
+    "line_start": 81,
+    "line_end": 112
+  },
+  {
+    "stable_chunk_id": "child-88967bc07ea3d1460595637af841a144607e4db9",
+    "source_path": "docs/preview.md",
+    "display_text": "    ```toml\n    [tool.ruff.lint]\n    select = [\"ALL\"]\n    ```\n\n=== \"ruff.toml\"\n\n    ```toml\n    [lint]\n    select = [\"ALL\"]\n    ```\n\n=== \"CLI\"\n\n    ```console\n    ruff check --select ALL\n    ```\n\nHowever, it _would_ be enabled in any of the above cases if you enabled preview mode:\n\n=== \"pyproject.toml\"\n\n    ```toml\n    [tool.ruff.lint]\n    extend-select = [\"HYP\"]\n    preview = true\n    ```\n\n=== \"ruff.toml\"\n\n",
+    "line_start": 113,
+    "line_end": 142
+  },
+  {
+    "stable_chunk_id": "child-f193f668bd01f92c11aeef94290bcdd290b8a5b1",
+    "source_path": "docs/preview.md",
+    "display_text": "    ```toml\n    [lint]\n    extend-select = [\"HYP\"]\n    preview = true\n    ```\n\n=== \"CLI\"\n\n    ```console\n    ruff check --extend-select HYP --preview\n    ```\n\nTo see which rules are currently in preview, visit the [rules reference](rules.md).\n\n",
+    "line_start": 143,
+    "line_end": 156
+  },
+  {
+    "stable_chunk_id": "child-7926514fd614b2d8cc1d734339015511b660bf25",
+    "source_path": "docs/preview.md",
+    "display_text": "## Selecting single preview rules\n\nWhen preview mode is enabled, selecting rule categories or prefixes will include all preview rules that match.\nIf you'd prefer to opt in to each preview rule individually, you can toggle the `explicit-preview-rules`\nsetting in your configuration file:\n\n=== \"pyproject.toml\"\n\n    ```toml\n    [tool.ruff.lint]\n    preview = true\n    explicit-preview-rules = true\n    ```\n\n=== \"ruff.toml\"\n\n",
+    "line_start": 157,
+    "line_end": 172
+  },
+  {
+    "stable_chunk_id": "child-040e9877a526835154805694ac03f7453fb505fc",
+    "source_path": "docs/preview.md",
+    "display_text": "    ```toml\n    [lint]\n    preview = true\n    explicit-preview-rules = true\n    ```\n\nIn our previous example, `--select` with `ALL` `HYP`, `HYP0`, or `HYP00` would not enable `HYP001`. Each preview\nrule will need to be selected with its exact code, e.g. `--select ALL,HYP001`.\n\nIf preview mode is not enabled, this setting has no effect.\n\n",
+    "line_start": 173,
+    "line_end": 183
+  },
+  {
+    "stable_chunk_id": "child-f254b5c9bb4924455954c213bbd8838c6e76c006",
+    "source_path": "docs/preview.md",
+    "display_text": "## Deprecated rules\n\nWhen preview mode is enabled, deprecated rules will be disabled. If a deprecated rule is selected explicitly, an\nerror will be raised. Deprecated rules will not be included if selected via a rule category or prefix.\n",
+    "line_start": 184,
+    "line_end": 187
+  }
+]

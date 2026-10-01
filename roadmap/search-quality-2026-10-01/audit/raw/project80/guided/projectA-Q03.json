@@ -1,0 +1,27 @@
+{
+  "tool": "get_docs_context",
+  "request": {
+    "question": "Чем Docs MCP отличается от Packs MCP и какой из них подключать для вопросов по репозиторию?",
+    "project_path": "/tmp/opencode/docatlas-ablation",
+    "scope": "all",
+    "lookup_queries": [
+      "What is the boundary between Docs MCP and Packs MCP?",
+      "Which MCP surface answers repository documentation questions?"
+    ]
+  },
+  "seconds": 1.4167054159988766,
+  "is_error": false,
+  "wire": {
+    "_meta": null,
+    "content": [
+      {
+        "type": "text",
+        "text": "{\"status\": \"ok\", \"kind\": \"docs_context\", \"context_status\": \"ready\", \"context_available\": true, \"answer_supported\": false, \"answer_available\": false, \"support_status\": \"retrieval_only\", \"answer_policy\": \"cite_only\", \"coverage_policy\": \"retrieval_attribution_only\", \"query_coverage\": \"partial\", \"retrieval_coverage\": \"partial\", \"facet_coverage\": \"unverified\", \"covered_query_ids\": [\"query-lookup-1\", \"query-lookup-2\"], \"missing_query_ids\": [\"query-original\"], \"missing_facets\": [], \"facets\": [], \"sources\": [{\"evidence_id\": \"ev-a5d3220f93684dad\", \"path_or_url\": \"SKILL.md\", \"section\": \"DocAtlas > Recommended MCP Docs Workflow for Agents\", \"snippet\": \"Treat `CHANGELOG.md` as primary only for release-history/change questions.\\n7. Only unbounded exploration exposes `answer_outline`, `trust_contract`, and `context_pack`; there, prefer nested source and section metadata.\\n8. If the user asks vaguely about \\\"the MCP server\\\", distinguish `doc-atlas mcp docs-serve` (the three-tool documentation surface) from `doc-atlas mcp packs-serve` (advanced installed API-action packs).\", \"version_binding\": \"unversioned\", \"content_sha256\": \"d9d999fea197cb4e64d9348921ade8ec316718265dc5f9b6c815a0e6b4067ba6\", \"project_identity\": \"local:48277f62f8b4ff92ba1c60c082f92a43817f9e1c5ba4ea27e12cd77a76421585\", \"authority\": \"source_of_truth\", \"scope\": \"project\", \"line_start\": 144, \"line_end\": 146, \"source_uri\": \"docatlas://source/2825e483faca482c7bb0c91b\"}, {\"evidence_id\": \"ev-9f2e09d419950450\", \"path_or_url\": \"SKILL.md\", \"section\": \"Documentation context runtime for coding agents\", \"snippet\": \"# Documentation context runtime for coding agents\\n\\nDocAtlas is the source-grounded documentation entry point for repository, library, dependency, and mixed questions.\\n\\nThe advertised runtime ToolSpec contract is the schema source of truth. Installed skills carry the `docatlas-agent-contract-v1` SHA-256 identity.\", \"version_binding\": \"unversioned\", \"content_sha256\": \"0d7602bc755efe19863e460c88a2c5ae83f02c39fa780ab82852a4e4ee49e217\", \"project_identity\": \"local:48277f62f8b4ff92ba1c60c082f92a43817f9e1c5ba4ea27e12cd77a76421585\", \"authority\": \"source_of_truth\", \"scope\": \"project\", \"line_start\": 15, \"line_end\": 19, \"source_uri\": \"docatlas://source/8c6cabc1c03b9651e887debd\"}], \"context_quality\": {\"status\": \"partial\", \"reasons\": [\"requested_part_missing\"]}, \"read_next\": [{\"source_uri\": \"docatlas://source/4194fc60fa4d7a49e69d23b1\", \"path\": \"SKILL.md\", \"project_identity\": \"local:48277f62f8b4ff92ba1c60c082f92a43817f9e1c5ba4ea27e12cd77a76421585\", \"snapshot_sha256\": \"sha256:cc5203eb2a8c0728b14401fb305c7b19498e14838a390965545967d77fe9de96\", \"line_start\": 137, \"line_end\": 143, \"reason\": \"inspect_source_context\"}], \"edit_ready\": false, \"investigation_allowed\": true, \"estimated_tokens\": 668}",
+        "annotations": null,
+        "_meta": null
+      }
+    ],
+    "structuredContent": null,
+    "isError": false
+  }
+}

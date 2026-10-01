@@ -1,0 +1,32 @@
+{
+  "id": "pydantic-06",
+  "project": "pydantic",
+  "family": "polarity",
+  "answerability": "within_budget",
+  "limit": 5,
+  "request": {
+    "library": "pydantic",
+    "query": "В чём различие alias_priority=1 и alias_priority=2?",
+    "limit": 5
+  },
+  "seconds": 0.001540935001685284,
+  "is_error": false,
+  "wire": {
+    "_meta": null,
+    "content": [
+      {
+        "type": "text",
+        "text": "\n------------------------------------------------------------\nResult 1: file:///tmp/opencode/search-audit-work-20261001/grounded/corpus/pydantic/docs/concepts/alias.md\n\n## Alias Precedence\nIf you specify an `alias` on the \\[`Field`\\]\\[pydantic.fields.Field\\], it will take precedence over the generated alias by default:\n```py\nfrom pydantic import BaseModel, ConfigDict, Field\n\n\ndef to_camel(string: str) -> str:\n    return ''.join(word.capitalize() for word in string.split('_'))\n\n\nclass Voice(BaseModel):\n    model_config = ConfigDict(alias_generator=to_camel)\n\n    name: str\n    language_code: str = Field(alias='lang')\n\n\nvoice = Voice(Name='Filiz', lang='tr-TR')\nprint(voice.language_code)\n#> tr-TR\nprint(voice.model_dump(by_alias=True))\n#> {'Name': 'Filiz', 'lang': 'tr-TR'}\n```\n### Alias Priority\nYou may set `alias_priority` on a field to change this behavior:\n-   `alias_priority=2` the alias will _not_ be overridden by the alias generator.\n-   `alias_priority=1` the alias _will_ be overridden by the alias generator.\n-   `alias_priority` not set:\n    -   alias is set: the alias will _not_ be overridden by the alias generator.\n    -   alias is not set: the alias _will_ be overridden by the alias generator.\nThe same precedence applies to `validation_alias` and `serialization_alias`. See more about the different field aliases under [field aliases](../concepts/fields.md#field-aliases).\n",
+        "annotations": null,
+        "_meta": null
+      }
+    ],
+    "structuredContent": null,
+    "isError": false
+  },
+  "native_size": {
+    "utf8_bytes": 1400,
+    "actual_tokens": 350,
+    "tokenizer": "docatlas-offline:o200k_base"
+  }
+}

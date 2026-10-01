@@ -1,0 +1,32 @@
+{
+  "id": "uv-09",
+  "project": "uv",
+  "family": "ambiguous",
+  "answerability": "ambiguous",
+  "limit": 3,
+  "request": {
+    "library": "uv",
+    "query": "Which uv configuration is best for our service? Our workload and deployment constraints are not specified.",
+    "limit": 3
+  },
+  "seconds": 0.0025003549963003024,
+  "is_error": false,
+  "wire": {
+    "_meta": null,
+    "content": [
+      {
+        "type": "text",
+        "text": "\n------------------------------------------------------------\nResult 1: file:///tmp/opencode/search-audit-work-20261001/grounded/corpus/uv/docs/pip/compatibility.md\n\n## Transitive direct URL dependencies for constraints and overrides\nWhile uv does support URL dependencies (e.g., `black @ https://...`), it does not support _transitive_ (i.e., \"nested\") direct URL dependencies for constraints and overrides.\nSpecifically, if a constraint or override is defined using a direct URL dependency, and the constrained package has a direct URL dependency of its own, uv _may_ reject that transitive direct URL dependency during resolution.\nuv also makes the assumption that non-URL dependencies won't introduce URL dependencies (i.e., that dependencies fetched from a registry will not themselves have direct URL dependencies). If a non-URL dependency _does_ introduce a URL dependency, uv will reject the URL dependency during resolution.\nIf uv rejects a transitive URL dependency in either case, the best course of action is to provide the URL dependency as a direct dependency in the `requirements.in` file, rather than as a constraint, override, or transitive dependency.\n\n------------------------------------------------------------\nResult 2: file:///tmp/opencode/search-audit-work-20261001/grounded/corpus/uv/docs/pip/compatibility.md\n\n## Build constraints\nWhen constraints are provided via `--constraint` (or `UV_CONSTRAINT`), uv will _not_ apply the constraints when resolving build dependencies (i.e., to build a source distribution). Instead, build constraints should be provided via the dedicated `--build-constraint` (or `UV_BUILD_CONSTRAINT`) setting.\npip, meanwhile, applies constraints to build dependencies when specified via `PIP_CONSTRAINT`, but not when provided via `--constraint` on the command line.\nFor example, to ensure that `setuptools 60.0.0` is used to build any packages with a build dependency on `setuptools`, use `--build-constraint`, rather than `--constraint`.\n\n------------------------------------------------------------\nResult 3: file:///tmp/opencode/search-audit-work-20261001/grounded/corpus/uv/docs/pip/compatibility.md\n\n## Bytecode compilation\nUnlike pip, uv does not compile `.py` files to `.pyc` files during installation by default (i.e., uv does not create or populate `__pycache__` directories). To enable bytecode compilation during installs, pass the `--compile-bytecode` flag to `uv pip install` or `uv pip sync`.\n## Strictness and spec enforcement\nuv tends to be stricter than `pip`, and will often reject packages that `pip` would install. For example, uv omits packages with invalid version specifiers in its metadata, which `pip` similarly plans to exclude in a [future release](https://github.com/pypa/pip/issues/12063).\nIn some cases, uv implements lenient behavior for popular packages that are known to have specific spec compliance issues.\nIf uv rejects a package that `pip` would install due to a spec violation, the best course of action is to first attempt to install a newer version of the package; and, if that fails, to report the issue to the package maintainer.\n",
+        "annotations": null,
+        "_meta": null
+      }
+    ],
+    "structuredContent": null,
+    "isError": false
+  },
+  "native_size": {
+    "utf8_bytes": 3122,
+    "actual_tokens": 665,
+    "tokenizer": "docatlas-offline:o200k_base"
+  }
+}

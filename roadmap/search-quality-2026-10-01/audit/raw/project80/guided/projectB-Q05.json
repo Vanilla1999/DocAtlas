@@ -1,0 +1,26 @@
+{
+  "tool": "get_docs_context",
+  "request": {
+    "question": "Мне нужны только общие документы репозитория, без module-документов. Как ограничить поиск?",
+    "project_path": "/tmp/opencode/docatlas-ablation",
+    "scope": "all",
+    "lookup_queries": [
+      "Which scope selects only repository-level documentation?"
+    ]
+  },
+  "seconds": 0.8120286280027358,
+  "is_error": false,
+  "wire": {
+    "_meta": null,
+    "content": [
+      {
+        "type": "text",
+        "text": "{\"status\": \"ok\", \"kind\": \"docs_context\", \"context_status\": \"ready\", \"context_available\": true, \"answer_supported\": false, \"answer_available\": false, \"support_status\": \"retrieval_only\", \"answer_policy\": \"cite_only\", \"coverage_policy\": \"retrieval_attribution_only\", \"query_coverage\": \"partial\", \"retrieval_coverage\": \"partial\", \"facet_coverage\": \"unverified\", \"covered_query_ids\": [\"query-lookup-1\"], \"missing_query_ids\": [\"query-original\"], \"missing_facets\": [], \"facets\": [], \"sources\": [{\"evidence_id\": \"ev-1a722cd318071d8c\", \"path_or_url\": \"docs/security/mcp-runtime-threat-model.md\", \"section\": \"MCP runtime threat model > Trust boundaries > Documentation instruction-trust contract\", \"snippet\": \"Exact official documentation remains\\n  untrusted document data.\\n- Ordinary repository Markdown is cited data. Only explicit agent policy files\\n  inside the configured repository authority receive scoped policy status, and\\n  they cannot override system, user, tool or runtime safety policy.\\n- Returned document content is delimited from generated warnings, metadata and\\n  typed next actions. Indexed prose never selects `prepare_docs`, network,\\n  filesystem, shell or credential actions.\", \"version_binding\": \"unversioned\", \"content_sha256\": \"e7ee8448b7b4e6a1355a90fc11871050d2ed36378ab56db5008304d45e6cbbad\", \"project_identity\": \"local:48277f62f8b4ff92ba1c60c082f92a43817f9e1c5ba4ea27e12cd77a76421585\", \"authority\": \"supporting\", \"scope\": \"project\", \"line_start\": 27, \"line_end\": 34}, {\"evidence_id\": \"ev-4aef6ace421b38b8\", \"path_or_url\": \"README.md\", \"section\": \"DocAtlas > Project-docs MCP server > When to use each tool\", \"snippet\": \"Use `scope=\\\"project\\\"` for repository-level policy only. For onboarding and cross-module overviews, `scope=\\\"all\\\"` includes repository and module docs; an explicit `module_path` still limits retrieval to that module.\", \"version_binding\": \"unversioned\", \"content_sha256\": \"b71788e22bc1afaa91311b41e283f19f8d97454aeec9e43aa2a87887c92faf5a\", \"project_identity\": \"local:48277f62f8b4ff92ba1c60c082f92a43817f9e1c5ba4ea27e12cd77a76421585\", \"authority\": \"source_of_truth\", \"scope\": \"project\", \"line_start\": 190, \"line_end\": 190, \"source_uri\": \"docatlas://source/c383ce91d086fc2276c4c544\"}], \"context_quality\": {\"status\": \"unverified\", \"reasons\": [\"coverage_unverified\", \"source_unavailable\"]}, \"read_next\": [], \"edit_ready\": false, \"investigation_allowed\": true, \"estimated_tokens\": 595, \"recovery_reason_code\": \"source_unavailable\"}",
+        "annotations": null,
+        "_meta": null
+      }
+    ],
+    "structuredContent": null,
+    "isError": false
+  }
+}

@@ -1,0 +1,110 @@
+{
+  "fastapi": {
+    "expected_urls": [
+      "file:///tmp/opencode/search-audit-work-20261001/grounded/corpus/fastapi/docs/en/docs/tutorial/background-tasks.md",
+      "file:///tmp/opencode/search-audit-work-20261001/grounded/corpus/fastapi/docs/en/docs/tutorial/cors.md"
+    ],
+    "indexed_urls": [
+      "file:///tmp/opencode/search-audit-work-20261001/grounded/corpus/fastapi/docs/en/docs/tutorial/background-tasks.md",
+      "file:///tmp/opencode/search-audit-work-20261001/grounded/corpus/fastapi/docs/en/docs/tutorial/cors.md"
+    ],
+    "missing": [],
+    "unexpected": [],
+    "non_null_embeddings": 0,
+    "chunks": 11
+  },
+  "httpx": {
+    "expected_urls": [
+      "file:///tmp/opencode/search-audit-work-20261001/grounded/corpus/httpx/docs/advanced/timeouts.md",
+      "file:///tmp/opencode/search-audit-work-20261001/grounded/corpus/httpx/docs/environment_variables.md"
+    ],
+    "indexed_urls": [
+      "file:///tmp/opencode/search-audit-work-20261001/grounded/corpus/httpx/docs/advanced/timeouts.md",
+      "file:///tmp/opencode/search-audit-work-20261001/grounded/corpus/httpx/docs/environment_variables.md"
+    ],
+    "missing": [],
+    "unexpected": [],
+    "non_null_embeddings": 0,
+    "chunks": 4
+  },
+  "mkdocs": {
+    "expected_urls": [
+      "file:///tmp/opencode/search-audit-work-20261001/grounded/corpus/mkdocs/docs/user-guide/writing-your-docs.md"
+    ],
+    "indexed_urls": [
+      "file:///tmp/opencode/search-audit-work-20261001/grounded/corpus/mkdocs/docs/user-guide/writing-your-docs.md"
+    ],
+    "missing": [],
+    "unexpected": [],
+    "non_null_embeddings": 0,
+    "chunks": 7
+  },
+  "pydantic": {
+    "expected_urls": [
+      "file:///tmp/opencode/search-audit-work-20261001/grounded/corpus/pydantic/docs/concepts/alias.md",
+      "file:///tmp/opencode/search-audit-work-20261001/grounded/corpus/pydantic/docs/concepts/strict_mode.md"
+    ],
+    "indexed_urls": [
+      "file:///tmp/opencode/search-audit-work-20261001/grounded/corpus/pydantic/docs/concepts/alias.md",
+      "file:///tmp/opencode/search-audit-work-20261001/grounded/corpus/pydantic/docs/concepts/strict_mode.md"
+    ],
+    "missing": [],
+    "unexpected": [],
+    "non_null_embeddings": 0,
+    "chunks": 15
+  },
+  "ruff": {
+    "expected_urls": [
+      "file:///tmp/opencode/search-audit-work-20261001/grounded/corpus/ruff/docs/configuration.md",
+      "file:///tmp/opencode/search-audit-work-20261001/grounded/corpus/ruff/docs/preview.md"
+    ],
+    "indexed_urls": [
+      "file:///tmp/opencode/search-audit-work-20261001/grounded/corpus/ruff/docs/configuration.md",
+      "file:///tmp/opencode/search-audit-work-20261001/grounded/corpus/ruff/docs/preview.md"
+    ],
+    "missing": [],
+    "unexpected": [],
+    "non_null_embeddings": 0,
+    "chunks": 16
+  },
+  "starlette": {
+    "expected_urls": [
+      "file:///tmp/opencode/search-audit-work-20261001/grounded/corpus/starlette/docs/background.md",
+      "file:///tmp/opencode/search-audit-work-20261001/grounded/corpus/starlette/docs/lifespan.md"
+    ],
+    "indexed_urls": [
+      "file:///tmp/opencode/search-audit-work-20261001/grounded/corpus/starlette/docs/background.md",
+      "file:///tmp/opencode/search-audit-work-20261001/grounded/corpus/starlette/docs/lifespan.md"
+    ],
+    "missing": [],
+    "unexpected": [],
+    "non_null_embeddings": 0,
+    "chunks": 5
+  },
+  "typer": {
+    "expected_urls": [
+      "file:///tmp/opencode/search-audit-work-20261001/grounded/corpus/typer/docs/tutorial/parameter-types/bool.md",
+      "file:///tmp/opencode/search-audit-work-20261001/grounded/corpus/typer/docs/tutorial/terminating.md"
+    ],
+    "indexed_urls": [
+      "file:///tmp/opencode/search-audit-work-20261001/grounded/corpus/typer/docs/tutorial/parameter-types/bool.md",
+      "file:///tmp/opencode/search-audit-work-20261001/grounded/corpus/typer/docs/tutorial/terminating.md"
+    ],
+    "missing": [],
+    "unexpected": [],
+    "non_null_embeddings": 0,
+    "chunks": 7
+  },
+  "uv": {
+    "expected_urls": [
+      "file:///tmp/opencode/search-audit-work-20261001/grounded/corpus/uv/docs/pip/compatibility.md"
+    ],
+    "indexed_urls": [
+      "file:///tmp/opencode/search-audit-work-20261001/grounded/corpus/uv/docs/pip/compatibility.md"
+    ],
+    "missing": [],
+    "unexpected": [],
+    "non_null_embeddings": 0,
+    "chunks": 22
+  }
+}

@@ -1,0 +1,26 @@
+{
+  "tool": "get_docs_context",
+  "request": {
+    "question": "Подготовка вернула job_id. Что делать до повторного исходного вопроса?",
+    "project_path": "/tmp/opencode/docatlas-ablation",
+    "scope": "all",
+    "lookup_queries": [
+      "How should an agent poll a preparation job and retry the original query?"
+    ]
+  },
+  "seconds": 0.7993251370062353,
+  "is_error": false,
+  "wire": {
+    "_meta": null,
+    "content": [
+      {
+        "type": "text",
+        "text": "{\"status\": \"ok\", \"kind\": \"docs_context\", \"context_status\": \"ready\", \"context_available\": true, \"answer_supported\": false, \"answer_available\": false, \"support_status\": \"retrieval_only\", \"answer_policy\": \"cite_only\", \"coverage_policy\": \"retrieval_attribution_only\", \"query_coverage\": \"partial\", \"retrieval_coverage\": \"partial\", \"facet_coverage\": \"unverified\", \"covered_query_ids\": [\"query-anchor-1\", \"query-lookup-1\"], \"missing_query_ids\": [\"query-original\"], \"missing_facets\": [], \"facets\": [], \"sources\": [{\"evidence_id\": \"ev-20e41df4610c5b09\", \"path_or_url\": \"docs/AGENT_DOCS_WORKFLOW.md\", \"section\": \"Agent documentation workflow > Repository questions\", \"snippet\": \"3. Call `prepare_docs` only from `recommended_next_action`, or when the user explicitly requests documentation lifecycle work such as sync, refresh, index, or prefetch. After preparation succeeds, retry the original `get_docs_context` question unchanged. If a `job_id` is returned, poll `docs_status(action=\\\"job\\\", job_id=...)` within a bounded attempt/deadline policy and inspect the terminal result. A running, failed or cancelled job is not readiness;\", \"version_binding\": \"unversioned\", \"content_sha256\": \"a390ac87b03bd20b705324f8a1bd4beb29f194c304f2f21b26dae610e64641f4\", \"project_identity\": \"local:48277f62f8b4ff92ba1c60c082f92a43817f9e1c5ba4ea27e12cd77a76421585\", \"authority\": \"supporting\", \"scope\": \"project\", \"line_start\": 11, \"line_end\": 11}, {\"evidence_id\": \"ev-fb8195e3bcc94c7d\", \"path_or_url\": \"docs/project-docs-mcp-workflow.md\", \"section\": \"Project docs MCP workflow > Creating `ARCHITECTURE.md`\", \"snippet\": \"If approved, the coding agent should:\\n\\n1. inspect the codebase;\\n2. write `ARCHITECTURE.md` as a normal repository file;\\n3. call `get_docs_context` for the original question;\\n4. run its returned `prepare_docs(action=\\\"sync_project_docs\\\")` action when requested;\\n5. retry the original `get_docs_context(scope=\\\"all\\\", question=...)` question unchanged.\", \"version_binding\": \"unversioned\", \"content_sha256\": \"2f38deda9e006670fc289786d3d5fe037152b1bed85c3bb542f7348244bbc7b2\", \"project_identity\": \"local:48277f62f8b4ff92ba1c60c082f92a43817f9e1c5ba4ea27e12cd77a76421585\", \"authority\": \"source_of_truth\", \"scope\": \"project\", \"line_start\": 160, \"line_end\": 166}], \"context_quality\": {\"status\": \"unverified\", \"reasons\": [\"coverage_unverified\"]}, \"read_next\": [{\"source_uri\": \"docatlas://source/cc4e83dc498c1dbc32d653a8\", \"path\": \"wiki/Architecture.md\", \"project_identity\": \"local:48277f62f8b4ff92ba1c60c082f92a43817f9e1c5ba4ea27e12cd77a76421585\", \"snapshot_sha256\": \"sha256:52c2f45b10ab9c053d2846d6b6deada9a220495358cce66be75d63ad2ce77074\", \"line_start\": 147, \"line_end\": 148, \"reason\": \"inspect_source_context\"}], \"edit_ready\": false, \"investigation_allowed\": true, \"estimated_tokens\": 671}",
+        "annotations": null,
+        "_meta": null
+      }
+    ],
+    "structuredContent": null,
+    "isError": false
+  }
+}

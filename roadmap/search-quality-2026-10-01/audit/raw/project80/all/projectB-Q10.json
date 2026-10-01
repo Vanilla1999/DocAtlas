@@ -1,0 +1,23 @@
+{
+  "tool": "get_docs_context",
+  "request": {
+    "question": "Can get_docs_context change the index by itself?",
+    "project_path": "/tmp/opencode/docatlas-ablation",
+    "scope": "all"
+  },
+  "seconds": 1.1846009549990413,
+  "is_error": false,
+  "wire": {
+    "_meta": null,
+    "content": [
+      {
+        "type": "text",
+        "text": "{\"status\": \"ok\", \"kind\": \"docs_context\", \"context_status\": \"ready\", \"context_available\": true, \"answer_supported\": false, \"answer_available\": false, \"support_status\": \"retrieval_only\", \"answer_policy\": \"cite_only\", \"coverage_policy\": \"retrieval_attribution_only\", \"query_coverage\": \"full\", \"retrieval_coverage\": \"full\", \"facet_coverage\": \"unverified\", \"covered_query_ids\": [\"query-original\", \"query-anchor-1\"], \"missing_query_ids\": [], \"missing_facets\": [], \"facets\": [], \"sources\": [{\"evidence_id\": \"ev-b4c3b6df1625e8fa\", \"path_or_url\": \"README.md\", \"section\": \"DocAtlas > Project-docs MCP server > When to use each tool\", \"snippet\": \"### When to use each tool\\n\\n| Situation | Tool |\\n|---|---|\\n| First time in a repo | `get_docs_context`; follow its `next_action` if preparation is needed |\\n| Check what docs are relevant | `get_docs_context` |\\n| Check health, freshness, or a job | `docs_status` |\\n| Reconcile after file changes | `prepare_docs(action=\\\"sync_project_docs\\\")` |\\n| Answer \\\"how does this repo work?\\\" | `get_docs_context(question=\\\"How does this repository work?\\\", scope=\\\"all\\\")` with the repository's `project_path` |\\n\\nUse `scope=\\\"project\\\"` for repository-level policy only. For onboarding and cross-module overviews, `scope=\\\"all\\\"` includes repository and module docs; an explicit `module_path` still limits retrieval to that module.\", \"version_binding\": \"unversioned\", \"content_sha256\": \"01a4c586d189f415a6f1161fc0072e8e2ef5b6e73b668e89cf839bdf80c82179\", \"project_identity\": \"local:48277f62f8b4ff92ba1c60c082f92a43817f9e1c5ba4ea27e12cd77a76421585\", \"line_start\": 180, \"line_end\": 190, \"authority\": \"source_of_truth\", \"scope\": \"project\", \"source_uri\": \"docatlas://source/6204a6724d0c3e7398fa0c7a\"}, {\"evidence_id\": \"ev-bc5a71393d9e1901\", \"path_or_url\": \"docs/mcp-docs-server.md\", \"section\": \"Docs MCP server > Project documentation\", \"snippet\": \"For a repository question, call `get_docs_context` first. The call never reconciles the index itself. When committed project docs are stale or not yet indexed and the whole Git worktree is clean, the response returns a no-confirmation `prepare_docs(action=\\\"sync_project_docs\\\")` instruction bound to a preflight `plan_digest`. `prepare_docs` rechecks the clean worktree and accepted `HEAD` before mutation. Dirty or indeterminate Git state, placeholders, unsupported docs, config shadowing, and orphan pruning remain confirmation-gated.\", \"version_binding\": \"unversioned\", \"content_sha256\": \"a0d4983e82852f8005f8ace19f541c1988c6d7389f7aee25d4c7fc11b5013d46\", \"project_identity\": \"local:48277f62f8b4ff92ba1c60c082f92a43817f9e1c5ba4ea27e12cd77a76421585\", \"authority\": \"source_of_truth\", \"scope\": \"project\", \"line_start\": 61, \"line_end\": 61, \"source_uri\": \"docatlas://source/974053f43e384b022aef99bd\"}], \"context_quality\": {\"status\": \"unverified\", \"reasons\": [\"coverage_unverified\"]}, \"read_next\": [], \"edit_ready\": false, \"investigation_allowed\": true, \"estimated_tokens\": 716}",
+        "annotations": null,
+        "_meta": null
+      }
+    ],
+    "structuredContent": null,
+    "isError": false
+  }
+}

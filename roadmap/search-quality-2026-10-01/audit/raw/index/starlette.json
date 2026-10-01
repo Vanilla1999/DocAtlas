@@ -1,0 +1,107 @@
+{
+  "db_path": "/tmp/opencode/search-audit-work-20261001/fixtures/starlette/.docatlas/docatlas.db",
+  "counts": {
+    "sources": 2,
+    "retrieval_children": 12,
+    "retrieval_parents": 6
+  },
+  "integrity_check": "ok",
+  "manifest": [
+    {
+      "path": "docs/background.md",
+      "sha256": "e2c622d46ad52bf7d90abe62fd75f355c1ff6f46a0b8a1d55d18e3875bbece63",
+      "bytes": 1961
+    },
+    {
+      "path": "docs/lifespan.md",
+      "sha256": "a9de5de995935cfbd676335fbbbee6f87c96086174aff3d17ecdf89b6220e788",
+      "bytes": 2366
+    }
+  ],
+  "rows": [
+    {
+      "stable_chunk_id": "child-d002923a8bcf5781d22563f7d3ffc99ff8b5dcc7",
+      "source_path": "docs/background.md",
+      "display_text": "\nStarlette includes a `BackgroundTask` class for in-process background tasks.\n\nA background task should be attached to a response, and will run only once\nthe response has been sent.\n\n",
+      "line_start": 1,
+      "line_end": 6
+    },
+    {
+      "stable_chunk_id": "child-511e376df36ef5adef81fb07711539c07b3c2d6c",
+      "source_path": "docs/background.md",
+      "display_text": "### Background Task\n\nUsed to add a single background task to a response.\n\nSignature: `BackgroundTask(func, *args, **kwargs)`\n\n",
+      "line_start": 7,
+      "line_end": 12
+    },
+    {
+      "stable_chunk_id": "child-98cefa2e7e046987095d22e508ee3e550eb21649",
+      "source_path": "docs/background.md",
+      "display_text": "```python\nfrom starlette.applications import Starlette\nfrom starlette.responses import JSONResponse\nfrom starlette.routing import Route\nfrom starlette.background import BackgroundTask\n\n\n...\n\nasync def signup(request):\n    data = await request.json()\n    username = data['username']\n    email = data['email']\n    task = BackgroundTask(send_welcome_email, to_address=email)\n    message = {'status': 'Signup successful'}\n    return JSONResponse(message, background=task)\n\nasync def send_welcome_email(to_address):\n    ...\n\n\nroutes = [\n    ...\n    Route('/user/signup', endpoint=signup, methods=['POST'])\n]\n\napp = Starlette(routes=routes)\n```\n\n",
+      "line_start": 13,
+      "line_end": 41
+    },
+    {
+      "stable_chunk_id": "child-c34c8fbe6e703cd4d1a84a627d9608a64a1126e9",
+      "source_path": "docs/background.md",
+      "display_text": "### BackgroundTasks\n\nUsed to add multiple background tasks to a response.\n\nSignature: `BackgroundTasks(tasks=[])`\n\n",
+      "line_start": 42,
+      "line_end": 47
+    },
+    {
+      "stable_chunk_id": "child-09ca3477430fa1bf391404d7db247b09749cf6c9",
+      "source_path": "docs/background.md",
+      "display_text": "```python\nfrom starlette.applications import Starlette\nfrom starlette.responses import JSONResponse\nfrom starlette.background import BackgroundTasks\n\nasync def signup(request):\n    data = await request.json()\n    username = data['username']\n    email = data['email']\n    tasks = BackgroundTasks()\n    tasks.add_task(send_welcome_email, to_address=email)\n    tasks.add_task(send_admin_notification, username=username)\n    message = {'status': 'Signup successful'}\n    return JSONResponse(message, background=tasks)\n\nasync def send_welcome_email(to_address):\n    ...\n\nasync def send_admin_notification(username):\n    ...\n\nroutes = [\n    Route('/user/signup', endpoint=signup, methods=['POST'])\n]\n\napp = Starlette(routes=routes)\n```\n\n",
+      "line_start": 48,
+      "line_end": 75
+    },
+    {
+      "stable_chunk_id": "child-c48f7c612f87639f90b2dd7e5684adc57df0935b",
+      "source_path": "docs/background.md",
+      "display_text": "!!! important\n    The tasks are executed in order. In case one of the tasks raises\n    an exception, the following tasks will not get the opportunity to be executed.\n",
+      "line_start": 76,
+      "line_end": 78
+    },
+    {
+      "stable_chunk_id": "child-c7621b8bbd344d1c5e1c944c0b441f84cd60faa2",
+      "source_path": "docs/lifespan.md",
+      "display_text": "\nStarlette applications can register a lifespan handler for dealing with\ncode that needs to run before the application starts up, or when the application\nis shutting down.\n\n```python\nimport contextlib\n\nfrom starlette.applications import Starlette\n\n\n@contextlib.asynccontextmanager\nasync def lifespan(app):\n    async with some_async_resource():\n        print(\"Run at startup!\")\n        yield\n        print(\"Run on shutdown!\")\n\n\nroutes = [\n    ...\n]\n\napp = Starlette(routes=routes, lifespan=lifespan)\n```\n\n",
+      "line_start": 1,
+      "line_end": 26
+    },
+    {
+      "stable_chunk_id": "child-be5b4aacc4e227714e6d9c99b5a9bad2776b6061",
+      "source_path": "docs/lifespan.md",
+      "display_text": "Starlette will not start serving any incoming requests until the lifespan has been run.\n\nThe lifespan teardown will run once all connections have been closed, and\nany in-process background tasks have completed.\n\nConsider using [`anyio.create_task_group()`](https://anyio.readthedocs.io/en/stable/tasks.html)\nfor managing asynchronous tasks.\n\n",
+      "line_start": 27,
+      "line_end": 34
+    },
+    {
+      "stable_chunk_id": "child-5443576bae042458126c4b64fc1cc1595bdfb6d3",
+      "source_path": "docs/lifespan.md",
+      "display_text": "## Lifespan State\n\nThe lifespan has the concept of `state`, which is a dictionary that\ncan be used to share the objects between the lifespan, and the requests.\n\n",
+      "line_start": 35,
+      "line_end": 39
+    },
+    {
+      "stable_chunk_id": "child-f43ea6af7d308296c3b4193e6b7c9bcf76185577",
+      "source_path": "docs/lifespan.md",
+      "display_text": "```python\nimport contextlib\nfrom typing import AsyncIterator, TypedDict\n\nimport httpx\nfrom starlette.applications import Starlette\nfrom starlette.requests import Request\nfrom starlette.responses import PlainTextResponse\nfrom starlette.routing import Route\n\n\nclass State(TypedDict):\n    http_client: httpx.AsyncClient\n\n\n@contextlib.asynccontextmanager\nasync def lifespan(app: Starlette) -> AsyncIterator[State]:\n    async with httpx.AsyncClient() as client:\n        yield {\"http_client\": client}\n\n\nasync def homepage(request: Request) -> PlainTextResponse:\n    client = request.state.http_client\n    response = await client.get(\"https://www.example.com\")\n    return PlainTextResponse(response.text)\n\n\napp = Starlette(\n    lifespan=lifespan,\n    routes=[Route(\"/\", homepage)]\n)\n```\n\n",
+      "line_start": 40,
+      "line_end": 72
+    },
+    {
+      "stable_chunk_id": "child-66145e2a3c8e1ff88bd5df3b545bf437da609bf8",
+      "source_path": "docs/lifespan.md",
+      "display_text": "The `state` received on the requests is a **shallow** copy of the state received on the\nlifespan handler.\n\n",
+      "line_start": 73,
+      "line_end": 75
+    },
+    {
+      "stable_chunk_id": "child-7dc0c9ca38d11da2a296de95dafd738ed189e818",
+      "source_path": "docs/lifespan.md",
+      "display_text": "## Running lifespan in tests\n\nYou should use `TestClient` as a context manager, to ensure that the lifespan is called.\n\n```python\nfrom example import app\nfrom starlette.testclient import TestClient\n\n\ndef test_homepage():\n    with TestClient(app) as client:\n        # Application's lifespan is called on entering the block.\n        response = client.get(\"/\")\n        assert response.status_code == 200\n\n    # And the lifespan's teardown is run when exiting the block.\n```\n",
+      "line_start": 76,
+      "line_end": 92
+    }
+  ]
+}

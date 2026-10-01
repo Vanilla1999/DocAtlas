@@ -1,0 +1,326 @@
+{
+  "equal": 80,
+  "cases": 80,
+  "rows": [
+    {
+      "id": "projectA-Q01",
+      "same_without_source_uri": true
+    },
+    {
+      "id": "projectA-Q02",
+      "same_without_source_uri": true
+    },
+    {
+      "id": "projectA-Q03",
+      "same_without_source_uri": true
+    },
+    {
+      "id": "projectA-Q04",
+      "same_without_source_uri": true
+    },
+    {
+      "id": "projectA-Q05",
+      "same_without_source_uri": true
+    },
+    {
+      "id": "projectA-Q06",
+      "same_without_source_uri": true
+    },
+    {
+      "id": "projectA-Q07",
+      "same_without_source_uri": true
+    },
+    {
+      "id": "projectA-Q08",
+      "same_without_source_uri": true
+    },
+    {
+      "id": "projectA-Q09",
+      "same_without_source_uri": true
+    },
+    {
+      "id": "projectA-Q10",
+      "same_without_source_uri": true
+    },
+    {
+      "id": "projectA-Q11",
+      "same_without_source_uri": true
+    },
+    {
+      "id": "projectA-Q12",
+      "same_without_source_uri": true
+    },
+    {
+      "id": "projectA-Q13",
+      "same_without_source_uri": true
+    },
+    {
+      "id": "projectA-Q14",
+      "same_without_source_uri": true
+    },
+    {
+      "id": "projectA-Q15",
+      "same_without_source_uri": true
+    },
+    {
+      "id": "projectA-Q16",
+      "same_without_source_uri": true
+    },
+    {
+      "id": "projectA-Q17",
+      "same_without_source_uri": true
+    },
+    {
+      "id": "projectA-Q18",
+      "same_without_source_uri": true
+    },
+    {
+      "id": "projectA-Q19",
+      "same_without_source_uri": true
+    },
+    {
+      "id": "projectA-Q20",
+      "same_without_source_uri": true
+    },
+    {
+      "id": "projectA-Q21",
+      "same_without_source_uri": true
+    },
+    {
+      "id": "projectA-Q22",
+      "same_without_source_uri": true
+    },
+    {
+      "id": "projectA-Q23",
+      "same_without_source_uri": true
+    },
+    {
+      "id": "projectA-Q24",
+      "same_without_source_uri": true
+    },
+    {
+      "id": "projectA-Q25",
+      "same_without_source_uri": true
+    },
+    {
+      "id": "projectA-Q26",
+      "same_without_source_uri": true
+    },
+    {
+      "id": "projectA-Q27",
+      "same_without_source_uri": true
+    },
+    {
+      "id": "projectA-Q28",
+      "same_without_source_uri": true
+    },
+    {
+      "id": "projectA-Q29",
+      "same_without_source_uri": true
+    },
+    {
+      "id": "projectA-Q30",
+      "same_without_source_uri": true
+    },
+    {
+      "id": "projectA-Q31",
+      "same_without_source_uri": true
+    },
+    {
+      "id": "projectA-Q32",
+      "same_without_source_uri": true
+    },
+    {
+      "id": "projectA-Q33",
+      "same_without_source_uri": true
+    },
+    {
+      "id": "projectA-Q34",
+      "same_without_source_uri": true
+    },
+    {
+      "id": "projectA-Q35",
+      "same_without_source_uri": true
+    },
+    {
+      "id": "projectA-Q36",
+      "same_without_source_uri": true
+    },
+    {
+      "id": "projectA-Q37",
+      "same_without_source_uri": true
+    },
+    {
+      "id": "projectA-Q38",
+      "same_without_source_uri": true
+    },
+    {
+      "id": "projectA-Q39",
+      "same_without_source_uri": true
+    },
+    {
+      "id": "projectA-Q40",
+      "same_without_source_uri": true
+    },
+    {
+      "id": "projectB-Q01",
+      "same_without_source_uri": true
+    },
+    {
+      "id": "projectB-Q02",
+      "same_without_source_uri": true
+    },
+    {
+      "id": "projectB-Q03",
+      "same_without_source_uri": true
+    },
+    {
+      "id": "projectB-Q04",
+      "same_without_source_uri": true
+    },
+    {
+      "id": "projectB-Q05",
+      "same_without_source_uri": true
+    },
+    {
+      "id": "projectB-Q06",
+      "same_without_source_uri": true
+    },
+    {
+      "id": "projectB-Q07",
+      "same_without_source_uri": true
+    },
+    {
+      "id": "projectB-Q08",
+      "same_without_source_uri": true
+    },
+    {
+      "id": "projectB-Q09",
+      "same_without_source_uri": true
+    },
+    {
+      "id": "projectB-Q10",
+      "same_without_source_uri": true
+    },
+    {
+      "id": "projectB-Q11",
+      "same_without_source_uri": true
+    },
+    {
+      "id": "projectB-Q12",
+      "same_without_source_uri": true
+    },
+    {
+      "id": "projectB-Q13",
+      "same_without_source_uri": true
+    },
+    {
+      "id": "projectB-Q14",
+      "same_without_source_uri": true
+    },
+    {
+      "id": "projectB-Q15",
+      "same_without_source_uri": true
+    },
+    {
+      "id": "projectB-Q16",
+      "same_without_source_uri": true
+    },
+    {
+      "id": "projectB-Q17",
+      "same_without_source_uri": true
+    },
+    {
+      "id": "projectB-Q18",
+      "same_without_source_uri": true
+    },
+    {
+      "id": "projectB-Q19",
+      "same_without_source_uri": true
+    },
+    {
+      "id": "projectB-Q20",
+      "same_without_source_uri": true
+    },
+    {
+      "id": "projectB-Q21",
+      "same_without_source_uri": true
+    },
+    {
+      "id": "projectB-Q22",
+      "same_without_source_uri": true
+    },
+    {
+      "id": "projectB-Q23",
+      "same_without_source_uri": true
+    },
+    {
+      "id": "projectB-Q24",
+      "same_without_source_uri": true
+    },
+    {
+      "id": "projectB-Q25",
+      "same_without_source_uri": true
+    },
+    {
+      "id": "projectB-Q26",
+      "same_without_source_uri": true
+    },
+    {
+      "id": "projectB-Q27",
+      "same_without_source_uri": true
+    },
+    {
+      "id": "projectB-Q28",
+      "same_without_source_uri": true
+    },
+    {
+      "id": "projectB-Q29",
+      "same_without_source_uri": true
+    },
+    {
+      "id": "projectB-Q30",
+      "same_without_source_uri": true
+    },
+    {
+      "id": "projectB-Q31",
+      "same_without_source_uri": true
+    },
+    {
+      "id": "projectB-Q32",
+      "same_without_source_uri": true
+    },
+    {
+      "id": "projectB-Q33",
+      "same_without_source_uri": true
+    },
+    {
+      "id": "projectB-Q34",
+      "same_without_source_uri": true
+    },
+    {
+      "id": "projectB-Q35",
+      "same_without_source_uri": true
+    },
+    {
+      "id": "projectB-Q36",
+      "same_without_source_uri": true
+    },
+    {
+      "id": "projectB-Q37",
+      "same_without_source_uri": true
+    },
+    {
+      "id": "projectB-Q38",
+      "same_without_source_uri": true
+    },
+    {
+      "id": "projectB-Q39",
+      "same_without_source_uri": true
+    },
+    {
+      "id": "projectB-Q40",
+      "same_without_source_uri": true
+    }
+  ]
+}

@@ -1,0 +1,671 @@
+{
+  "note": "45 automatic witness-complete plus two explicitly adjudicated cases. Single reviewer, not blind answer model.",
+  "rows": [
+    {
+      "id": "fastapi-01",
+      "grade": "full",
+      "note": "Все размеченные required witnesses распознаны в видимом packet.",
+      "evidence_ids": [
+        "ev-080d179288afc9f8",
+        "ev-d54cad302c01a4b5"
+      ]
+    },
+    {
+      "id": "fastapi-02",
+      "grade": "full",
+      "note": "Все размеченные required witnesses распознаны в видимом packet.",
+      "evidence_ids": [
+        "ev-5e0211d1bafcbad0",
+        "ev-d54cad302c01a4b5",
+        "ev-4296ea1458f5c867"
+      ]
+    },
+    {
+      "id": "fastapi-03",
+      "grade": "full",
+      "note": "Все размеченные required witnesses распознаны в видимом packet.",
+      "evidence_ids": [
+        "ev-11989e749735d1c1",
+        "ev-d54cad302c01a4b5",
+        "ev-15017cc98cf10bbc"
+      ]
+    },
+    {
+      "id": "fastapi-04",
+      "grade": "full",
+      "note": "Все размеченные required witnesses распознаны в видимом packet.",
+      "evidence_ids": [
+        "ev-9f0a1822f7bc33d2",
+        "ev-aceb1a2fb8fc25da"
+      ]
+    },
+    {
+      "id": "fastapi-05",
+      "grade": "full",
+      "note": "Все размеченные required witnesses распознаны в видимом packet.",
+      "evidence_ids": [
+        "ev-6de6bc0ae3f24d21",
+        "ev-dab20c170aacb814",
+        "ev-32b7cbbf9839b813"
+      ]
+    },
+    {
+      "id": "fastapi-06",
+      "grade": "full",
+      "note": "Все размеченные required witnesses распознаны в видимом packet.",
+      "evidence_ids": [
+        "ev-2ead1adbc09b7e0c",
+        "ev-6de6bc0ae3f24d21"
+      ]
+    },
+    {
+      "id": "fastapi-07",
+      "grade": "control",
+      "note": "Не входит в знаменатель полноты. Нет certified answer; невозможно выводить private/ambiguous/oversized requested facts из retrieved related text.",
+      "evidence_ids": [
+        "ev-080d179288afc9f8",
+        "ev-d54cad302c01a4b5"
+      ]
+    },
+    {
+      "id": "fastapi-08",
+      "grade": "control",
+      "note": "Не входит в знаменатель полноты. Нет certified answer; невозможно выводить private/ambiguous/oversized requested facts из retrieved related text.",
+      "evidence_ids": []
+    },
+    {
+      "id": "fastapi-09",
+      "grade": "control",
+      "note": "Не входит в знаменатель полноты. Нет certified answer; невозможно выводить private/ambiguous/oversized requested facts из retrieved related text.",
+      "evidence_ids": []
+    },
+    {
+      "id": "fastapi-10",
+      "grade": "control",
+      "note": "Не входит в знаменатель полноты. Нет certified answer; невозможно выводить private/ambiguous/oversized requested facts из retrieved related text.",
+      "evidence_ids": []
+    },
+    {
+      "id": "httpx-01",
+      "grade": "full",
+      "note": "Все размеченные required witnesses распознаны в видимом packet.",
+      "evidence_ids": [
+        "ev-e6bf514bc9f82bb4",
+        "ev-2b82b0ec455ec94b"
+      ]
+    },
+    {
+      "id": "httpx-02",
+      "grade": "full",
+      "note": "Все размеченные required witnesses распознаны в видимом packet.",
+      "evidence_ids": [
+        "ev-8b598c29adc11290",
+        "ev-51d6621852b37b16"
+      ]
+    },
+    {
+      "id": "httpx-03",
+      "grade": "full",
+      "note": "Все размеченные required witnesses распознаны в видимом packet.",
+      "evidence_ids": [
+        "ev-798926cd56d07f52"
+      ]
+    },
+    {
+      "id": "httpx-04",
+      "grade": "full",
+      "note": "Все размеченные required witnesses распознаны в видимом packet.",
+      "evidence_ids": [
+        "ev-2770bad8115e0c20"
+      ]
+    },
+    {
+      "id": "httpx-05",
+      "grade": "full",
+      "note": "Все размеченные required witnesses распознаны в видимом packet.",
+      "evidence_ids": [
+        "ev-8b598c29adc11290",
+        "ev-0f68e1b349b0def4"
+      ]
+    },
+    {
+      "id": "httpx-06",
+      "grade": "full",
+      "note": "Все размеченные required witnesses распознаны в видимом packet.",
+      "evidence_ids": [
+        "ev-c874ec3ce899b52e"
+      ]
+    },
+    {
+      "id": "httpx-07",
+      "grade": "control",
+      "note": "Не входит в знаменатель полноты. Нет certified answer; невозможно выводить private/ambiguous/oversized requested facts из retrieved related text.",
+      "evidence_ids": [
+        "ev-e6bf514bc9f82bb4",
+        "ev-798926cd56d07f52"
+      ]
+    },
+    {
+      "id": "httpx-08",
+      "grade": "control",
+      "note": "Не входит в знаменатель полноты. Нет certified answer; невозможно выводить private/ambiguous/oversized requested facts из retrieved related text.",
+      "evidence_ids": []
+    },
+    {
+      "id": "httpx-09",
+      "grade": "control",
+      "note": "Не входит в знаменатель полноты. Нет certified answer; невозможно выводить private/ambiguous/oversized requested facts из retrieved related text.",
+      "evidence_ids": [
+        "ev-2770bad8115e0c20",
+        "ev-285f6a8bdcb80740"
+      ]
+    },
+    {
+      "id": "httpx-10",
+      "grade": "control",
+      "note": "Не входит в знаменатель полноты. Нет certified answer; невозможно выводить private/ambiguous/oversized requested facts из retrieved related text.",
+      "evidence_ids": []
+    },
+    {
+      "id": "mkdocs-01",
+      "grade": "full",
+      "note": "Все размеченные required witnesses распознаны в видимом packet.",
+      "evidence_ids": [
+        "ev-f5735719638696d5",
+        "ev-4cf8e5306e5cb13b"
+      ]
+    },
+    {
+      "id": "mkdocs-02",
+      "grade": "full",
+      "note": "Все размеченные required witnesses распознаны в видимом packet.",
+      "evidence_ids": [
+        "ev-e65396b0c03a2cc3",
+        "ev-4cf8e5306e5cb13b"
+      ]
+    },
+    {
+      "id": "mkdocs-03",
+      "grade": "full",
+      "note": "Все размеченные required witnesses распознаны в видимом packet.",
+      "evidence_ids": [
+        "ev-470d3c53d52311b2",
+        "ev-4cf8e5306e5cb13b",
+        "ev-cd4144a594f4ee13"
+      ]
+    },
+    {
+      "id": "mkdocs-04",
+      "grade": "full",
+      "note": "Все размеченные required witnesses распознаны в видимом packet.",
+      "evidence_ids": [
+        "ev-7691af36b747d26e",
+        "ev-18a7ffe19e2cc1a6"
+      ]
+    },
+    {
+      "id": "mkdocs-05",
+      "grade": "full",
+      "note": "Все размеченные required witnesses распознаны в видимом packet.",
+      "evidence_ids": [
+        "ev-955bb21c6dd839ad"
+      ]
+    },
+    {
+      "id": "mkdocs-06",
+      "grade": "full",
+      "note": "Оба ограничения (block/multiline cells и blank lines) видны в двух отдельных цитатах. Frozen witness требует одну contiguous строку.",
+      "evidence_ids": [
+        "ev-9b17044532ddadd8",
+        "ev-dfcd81827c6df16e"
+      ]
+    },
+    {
+      "id": "mkdocs-07",
+      "grade": "control",
+      "note": "Не входит в знаменатель полноты. Нет certified answer; невозможно выводить private/ambiguous/oversized requested facts из retrieved related text.",
+      "evidence_ids": [
+        "ev-f5735719638696d5",
+        "ev-f0c8a5940579c536"
+      ]
+    },
+    {
+      "id": "mkdocs-08",
+      "grade": "control",
+      "note": "Не входит в знаменатель полноты. Нет certified answer; невозможно выводить private/ambiguous/oversized requested facts из retrieved related text.",
+      "evidence_ids": []
+    },
+    {
+      "id": "mkdocs-09",
+      "grade": "control",
+      "note": "Не входит в знаменатель полноты. Нет certified answer; невозможно выводить private/ambiguous/oversized requested facts из retrieved related text.",
+      "evidence_ids": [
+        "ev-c8f530704ac9c2e2",
+        "ev-d03b8650191486b2"
+      ]
+    },
+    {
+      "id": "mkdocs-10",
+      "grade": "control",
+      "note": "Не входит в знаменатель полноты. Нет certified answer; невозможно выводить private/ambiguous/oversized requested facts из retrieved related text.",
+      "evidence_ids": [
+        "ev-e65396b0c03a2cc3",
+        "ev-4cf8e5306e5cb13b",
+        "ev-1aa11e079e5e8b7b"
+      ]
+    },
+    {
+      "id": "pydantic-01",
+      "grade": "full",
+      "note": "Все размеченные required witnesses распознаны в видимом packet.",
+      "evidence_ids": [
+        "ev-74376a861e944808",
+        "ev-e2ab0c1c0082fa38"
+      ]
+    },
+    {
+      "id": "pydantic-02",
+      "grade": "full",
+      "note": "Все размеченные required witnesses распознаны в видимом packet.",
+      "evidence_ids": [
+        "ev-67d9f8005a96517c",
+        "ev-f4693d357f776f62"
+      ]
+    },
+    {
+      "id": "pydantic-03",
+      "grade": "full",
+      "note": "Все размеченные required witnesses распознаны в видимом packet.",
+      "evidence_ids": [
+        "ev-18e54bbfdd6572d3",
+        "ev-0b7cd36b44a08b6e"
+      ]
+    },
+    {
+      "id": "pydantic-04",
+      "grade": "full",
+      "note": "Все размеченные required witnesses распознаны в видимом packet.",
+      "evidence_ids": [
+        "ev-7e7bf1b907a7b508"
+      ]
+    },
+    {
+      "id": "pydantic-05",
+      "grade": "full",
+      "note": "Все размеченные required witnesses распознаны в видимом packet.",
+      "evidence_ids": [
+        "ev-ca1ca86b55d144d7",
+        "ev-623985bb7e7c2f60"
+      ]
+    },
+    {
+      "id": "pydantic-06",
+      "grade": "full",
+      "note": "Все размеченные required witnesses распознаны в видимом packet.",
+      "evidence_ids": [
+        "ev-b3d11adf6387257c"
+      ]
+    },
+    {
+      "id": "pydantic-07",
+      "grade": "control",
+      "note": "Не входит в знаменатель полноты. Нет certified answer; невозможно выводить private/ambiguous/oversized requested facts из retrieved related text.",
+      "evidence_ids": [
+        "ev-74376a861e944808",
+        "ev-1876e72dea33bf14"
+      ]
+    },
+    {
+      "id": "pydantic-08",
+      "grade": "control",
+      "note": "Не входит в знаменатель полноты. Нет certified answer; невозможно выводить private/ambiguous/oversized requested facts из retrieved related text.",
+      "evidence_ids": []
+    },
+    {
+      "id": "pydantic-09",
+      "grade": "control",
+      "note": "Не входит в знаменатель полноты. Нет certified answer; невозможно выводить private/ambiguous/oversized requested facts из retrieved related text.",
+      "evidence_ids": []
+    },
+    {
+      "id": "pydantic-10",
+      "grade": "control",
+      "note": "Не входит в знаменатель полноты. Нет certified answer; невозможно выводить private/ambiguous/oversized requested facts из retrieved related text.",
+      "evidence_ids": []
+    },
+    {
+      "id": "ruff-01",
+      "grade": "full",
+      "note": "Все размеченные required witnesses распознаны в видимом packet.",
+      "evidence_ids": [
+        "ev-ab9581eed2cb4a7a",
+        "ev-fb320b2f94366ac5"
+      ]
+    },
+    {
+      "id": "ruff-02",
+      "grade": "full",
+      "note": "Все размеченные required witnesses распознаны в видимом packet.",
+      "evidence_ids": [
+        "ev-2d65cbf1b39c6b82",
+        "ev-35c17e80339be3f4"
+      ]
+    },
+    {
+      "id": "ruff-03",
+      "grade": "full",
+      "note": "Все размеченные required witnesses распознаны в видимом packet.",
+      "evidence_ids": [
+        "ev-2d65cbf1b39c6b82",
+        "ev-e081e303d3286032"
+      ]
+    },
+    {
+      "id": "ruff-04",
+      "grade": "full",
+      "note": "Все размеченные required witnesses распознаны в видимом packet.",
+      "evidence_ids": [
+        "ev-8ee9e21ecceea04a",
+        "ev-9d008170edd1aa2b"
+      ]
+    },
+    {
+      "id": "ruff-05",
+      "grade": "full",
+      "note": "Все размеченные required witnesses распознаны в видимом packet.",
+      "evidence_ids": [
+        "ev-0723c5d05595b31d",
+        "ev-2d65cbf1b39c6b82"
+      ]
+    },
+    {
+      "id": "ruff-06",
+      "grade": "full",
+      "note": "Все размеченные required witnesses распознаны в видимом packet.",
+      "evidence_ids": [
+        "ev-87de3ef6dfabb4dc",
+        "ev-34be0b533748c74d"
+      ]
+    },
+    {
+      "id": "ruff-07",
+      "grade": "control",
+      "note": "Не входит в знаменатель полноты. Нет certified answer; невозможно выводить private/ambiguous/oversized requested facts из retrieved related text.",
+      "evidence_ids": [
+        "ev-ab9581eed2cb4a7a",
+        "ev-6cdcfb282ef09277"
+      ]
+    },
+    {
+      "id": "ruff-08",
+      "grade": "control",
+      "note": "Не входит в знаменатель полноты. Нет certified answer; невозможно выводить private/ambiguous/oversized requested facts из retrieved related text.",
+      "evidence_ids": []
+    },
+    {
+      "id": "ruff-09",
+      "grade": "control",
+      "note": "Не входит в знаменатель полноты. Нет certified answer; невозможно выводить private/ambiguous/oversized requested facts из retrieved related text.",
+      "evidence_ids": [
+        "ev-87de3ef6dfabb4dc",
+        "ev-c780bd9eaafddae3"
+      ]
+    },
+    {
+      "id": "ruff-10",
+      "grade": "control",
+      "note": "Не входит в знаменатель полноты. Нет certified answer; невозможно выводить private/ambiguous/oversized requested facts из retrieved related text.",
+      "evidence_ids": [
+        "ev-dbde4700908e6713",
+        "ev-34be0b533748c74d",
+        "ev-178026c49448826a"
+      ]
+    },
+    {
+      "id": "starlette-01",
+      "grade": "full",
+      "note": "Все размеченные required witnesses распознаны в видимом packet.",
+      "evidence_ids": [
+        "ev-1ce809145540b11e"
+      ]
+    },
+    {
+      "id": "starlette-02",
+      "grade": "full",
+      "note": "Все размеченные required witnesses распознаны в видимом packet.",
+      "evidence_ids": [
+        "ev-5378ef6855bc5fc5",
+        "ev-930f76fcb36d2872"
+      ]
+    },
+    {
+      "id": "starlette-03",
+      "grade": "full",
+      "note": "Все размеченные required witnesses распознаны в видимом packet.",
+      "evidence_ids": [
+        "ev-5378ef6855bc5fc5",
+        "ev-f111b9899e3cdc84"
+      ]
+    },
+    {
+      "id": "starlette-04",
+      "grade": "full",
+      "note": "Все размеченные required witnesses распознаны в видимом packet.",
+      "evidence_ids": [
+        "ev-df694d349767dda3"
+      ]
+    },
+    {
+      "id": "starlette-05",
+      "grade": "full",
+      "note": "Все размеченные required witnesses распознаны в видимом packet.",
+      "evidence_ids": [
+        "ev-2bfb60a53a77a17b",
+        "ev-2aeee75548d06ed6"
+      ]
+    },
+    {
+      "id": "starlette-06",
+      "grade": "full",
+      "note": "Все размеченные required witnesses распознаны в видимом packet.",
+      "evidence_ids": [
+        "ev-eeaf186ba495480c",
+        "ev-7f03ef7bf22ca28b"
+      ]
+    },
+    {
+      "id": "starlette-07",
+      "grade": "control",
+      "note": "Не входит в знаменатель полноты. Нет certified answer; невозможно выводить private/ambiguous/oversized requested facts из retrieved related text.",
+      "evidence_ids": [
+        "ev-1ce809145540b11e"
+      ]
+    },
+    {
+      "id": "starlette-08",
+      "grade": "control",
+      "note": "Не входит в знаменатель полноты. Нет certified answer; невозможно выводить private/ambiguous/oversized requested facts из retrieved related text.",
+      "evidence_ids": []
+    },
+    {
+      "id": "starlette-09",
+      "grade": "control",
+      "note": "Не входит в знаменатель полноты. Нет certified answer; невозможно выводить private/ambiguous/oversized requested facts из retrieved related text.",
+      "evidence_ids": []
+    },
+    {
+      "id": "starlette-10",
+      "grade": "control",
+      "note": "Не входит в знаменатель полноты. Нет certified answer; невозможно выводить private/ambiguous/oversized requested facts из retrieved related text.",
+      "evidence_ids": []
+    },
+    {
+      "id": "typer-01",
+      "grade": "full",
+      "note": "Все размеченные required witnesses распознаны в видимом packet.",
+      "evidence_ids": [
+        "ev-3bbf46f1bc2eb616",
+        "ev-7237798629984896"
+      ]
+    },
+    {
+      "id": "typer-02",
+      "grade": "full",
+      "note": "Все размеченные required witnesses распознаны в видимом packet.",
+      "evidence_ids": [
+        "ev-3bbf46f1bc2eb616",
+        "ev-6cef0e03d1ce740c",
+        "ev-45ee9abf27f20a40"
+      ]
+    },
+    {
+      "id": "typer-03",
+      "grade": "full",
+      "note": "Все размеченные required witnesses распознаны в видимом packet.",
+      "evidence_ids": [
+        "ev-fcbfb8a32c4d36fb",
+        "ev-3bbf46f1bc2eb616"
+      ]
+    },
+    {
+      "id": "typer-04",
+      "grade": "full",
+      "note": "Все размеченные required witnesses распознаны в видимом packet.",
+      "evidence_ids": [
+        "ev-11142eb895795ae2",
+        "ev-64402492f6618e6b"
+      ]
+    },
+    {
+      "id": "typer-05",
+      "grade": "none",
+      "note": "Отсутствует space-before-slash rule, нет источников в packet.",
+      "evidence_ids": []
+    },
+    {
+      "id": "typer-06",
+      "grade": "full",
+      "note": "Все размеченные required witnesses распознаны в видимом packet.",
+      "evidence_ids": [
+        "ev-08190cf04943767b"
+      ]
+    },
+    {
+      "id": "typer-07",
+      "grade": "control",
+      "note": "Не входит в знаменатель полноты. Нет certified answer; невозможно выводить private/ambiguous/oversized requested facts из retrieved related text.",
+      "evidence_ids": [
+        "ev-3bbf46f1bc2eb616",
+        "ev-6cef0e03d1ce740c"
+      ]
+    },
+    {
+      "id": "typer-08",
+      "grade": "control",
+      "note": "Не входит в знаменатель полноты. Нет certified answer; невозможно выводить private/ambiguous/oversized requested facts из retrieved related text.",
+      "evidence_ids": []
+    },
+    {
+      "id": "typer-09",
+      "grade": "control",
+      "note": "Не входит в знаменатель полноты. Нет certified answer; невозможно выводить private/ambiguous/oversized requested facts из retrieved related text.",
+      "evidence_ids": []
+    },
+    {
+      "id": "typer-10",
+      "grade": "control",
+      "note": "Не входит в знаменатель полноты. Нет certified answer; невозможно выводить private/ambiguous/oversized requested facts из retrieved related text.",
+      "evidence_ids": []
+    },
+    {
+      "id": "uv-01",
+      "grade": "full",
+      "note": "Все размеченные required witnesses распознаны в видимом packet.",
+      "evidence_ids": [
+        "ev-5337c0d893f921a2",
+        "ev-ee1426f03f51280d",
+        "ev-0b099daaa196a8fc"
+      ]
+    },
+    {
+      "id": "uv-02",
+      "grade": "full",
+      "note": "Все размеченные required witnesses распознаны в видимом packet.",
+      "evidence_ids": [
+        "ev-25e7648611b43284",
+        "ev-ee1426f03f51280d"
+      ]
+    },
+    {
+      "id": "uv-03",
+      "grade": "full",
+      "note": "Все размеченные required witnesses распознаны в видимом packet.",
+      "evidence_ids": [
+        "ev-0e08f1266975a05c",
+        "ev-a9b637265d1b5050"
+      ]
+    },
+    {
+      "id": "uv-04",
+      "grade": "full",
+      "note": "Все размеченные required witnesses распознаны в видимом packet.",
+      "evidence_ids": [
+        "ev-cd10c71db758b505"
+      ]
+    },
+    {
+      "id": "uv-05",
+      "grade": "full",
+      "note": "Все размеченные required witnesses распознаны в видимом packet.",
+      "evidence_ids": [
+        "ev-cd10c71db758b505",
+        "ev-ee1426f03f51280d"
+      ]
+    },
+    {
+      "id": "uv-06",
+      "grade": "full",
+      "note": "Вопрос требует default build isolation и preinstall build dependencies. Оба факта видны; specific code example из gold вопрос не запрашивает.",
+      "evidence_ids": [
+        "ev-c002f69df094246b",
+        "ev-4928b1add037a7a4"
+      ]
+    },
+    {
+      "id": "uv-07",
+      "grade": "control",
+      "note": "Не входит в знаменатель полноты. Нет certified answer; невозможно выводить private/ambiguous/oversized requested facts из retrieved related text.",
+      "evidence_ids": [
+        "ev-5337c0d893f921a2",
+        "ev-ee1426f03f51280d",
+        "ev-be8b2102a68eab15"
+      ]
+    },
+    {
+      "id": "uv-08",
+      "grade": "control",
+      "note": "Не входит в знаменатель полноты. Нет certified answer; невозможно выводить private/ambiguous/oversized requested facts из retrieved related text.",
+      "evidence_ids": []
+    },
+    {
+      "id": "uv-09",
+      "grade": "control",
+      "note": "Не входит в знаменатель полноты. Нет certified answer; невозможно выводить private/ambiguous/oversized requested facts из retrieved related text.",
+      "evidence_ids": []
+    },
+    {
+      "id": "uv-10",
+      "grade": "control",
+      "note": "Не входит в знаменатель полноты. Нет certified answer; невозможно выводить private/ambiguous/oversized requested facts из retrieved related text.",
+      "evidence_ids": [
+        "ev-c17ac28a618bafa7",
+        "ev-ee1426f03f51280d"
+      ]
+    }
+  ],
+  "positive_full": 47,
+  "grounded_formatting_summary": {
+    "3": 42,
+    "5": 43
+  }
+}

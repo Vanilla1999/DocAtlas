@@ -1,0 +1,23 @@
+{
+  "tool": "get_docs_context",
+  "request": {
+    "question": "Какая сигнатура BackgroundTask добавляет одну фоновую задачу к response?",
+    "project_path": "/tmp/opencode/search-audit-work-20261001/fixtures/starlette",
+    "scope": "all"
+  },
+  "seconds": 0.1686537340065115,
+  "is_error": false,
+  "wire": {
+    "_meta": null,
+    "content": [
+      {
+        "type": "text",
+        "text": "{\"status\": \"ok\", \"kind\": \"docs_context\", \"context_status\": \"ready\", \"context_available\": true, \"answer_supported\": false, \"answer_available\": false, \"support_status\": \"retrieval_only\", \"answer_policy\": \"cite_only\", \"coverage_policy\": \"retrieval_attribution_only\", \"query_coverage\": \"partial\", \"retrieval_coverage\": \"partial\", \"facet_coverage\": \"unverified\", \"covered_query_ids\": [\"query-anchor-1\"], \"missing_query_ids\": [\"query-original\"], \"missing_facets\": [], \"facets\": [], \"sources\": [{\"evidence_id\": \"ev-eeaf186ba495480c\", \"path_or_url\": \"docs/background.md\", \"section\": \"Background Task\", \"snippet\": \"### Background Task\\n\\nUsed to add a single background task to a response.\\n\\nSignature: `BackgroundTask(func, *args, **kwargs)`\\n\\n```python\\nfrom starlette.applications import Starlette\\nfrom starlette.responses import JSONResponse\\nfrom starlette.routing import Route\\nfrom starlette.background import BackgroundTask\\n\\n\\n...\\n\\nasync def signup(request):\\n    data = await request.json()\\n    username = data['username']\\n    email = data['email']\\n    task = BackgroundTask(send_welcome_email, to_address=email)\\n    message = {'status': 'Signup successful'}\\n    return JSONResponse(message, background=task)\\n\\nasync def send_welcome_email(to_address):\\n    ...\\n\\n\\nroutes = [\\n    ...\\n    Route('/user/signup', endpoint=signup, methods=['POST'])\\n]\\n\\napp = Starlette(routes=routes)\\n```\", \"version_binding\": \"unversioned\", \"content_sha256\": \"577f83b2b0b0d4d4daed8bfe01da227c9a29b588c20481bc8051b21e4fa21619\", \"project_identity\": \"local:49e9d0d4675482def440e8469c311fbd21c7134a17c652920e474a9e3b812930\", \"line_start\": 7, \"line_end\": 40, \"authority\": \"source_of_truth\", \"scope\": \"project\", \"source_uri\": \"docatlas://source/548e2cbec37ac6670f884401\"}, {\"evidence_id\": \"ev-7f03ef7bf22ca28b\", \"path_or_url\": \"docs/background.md\", \"section\": \"Introduction\", \"snippet\": \"Starlette includes a `BackgroundTask` class for in-process background tasks.\\n\\nA background task should be attached to a response, and will run only once\\nthe response has been sent.\", \"version_binding\": \"unversioned\", \"content_sha256\": \"142e91e046d32eda9022dfe9a81824b94156842a92ad9f44922808056c4dad30\", \"project_identity\": \"local:49e9d0d4675482def440e8469c311fbd21c7134a17c652920e474a9e3b812930\", \"authority\": \"source_of_truth\", \"scope\": \"project\", \"line_start\": 2, \"line_end\": 5, \"source_uri\": \"docatlas://source/13b89f7e5c9a800b3a31c149\"}], \"context_quality\": {\"status\": \"unverified\", \"reasons\": [\"coverage_unverified\"]}, \"read_next\": [], \"edit_ready\": false, \"investigation_allowed\": true, \"estimated_tokens\": 627}",
+        "annotations": null,
+        "_meta": null
+      }
+    ],
+    "structuredContent": null,
+    "isError": false
+  }
+}

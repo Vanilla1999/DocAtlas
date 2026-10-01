@@ -1,0 +1,27 @@
+{
+  "tool": "get_docs_context",
+  "request": {
+    "question": "Я клонировал репозиторий и хочу задать первый вопрос по его документации без облачного сервиса. Какие действия нужны?",
+    "project_path": "/tmp/opencode/docatlas-ablation",
+    "scope": "all",
+    "lookup_queries": [
+      "How do I prepare local project documentation for a first question?",
+      "Can local project documentation be indexed without an external model?"
+    ]
+  },
+  "seconds": 1.5316269880058826,
+  "is_error": false,
+  "wire": {
+    "_meta": null,
+    "content": [
+      {
+        "type": "text",
+        "text": "{\"status\": \"ok\", \"kind\": \"docs_context\", \"context_status\": \"ready\", \"context_available\": true, \"answer_supported\": false, \"answer_available\": false, \"support_status\": \"retrieval_only\", \"answer_policy\": \"cite_only\", \"coverage_policy\": \"retrieval_attribution_only\", \"query_coverage\": \"full\", \"retrieval_coverage\": \"full\", \"facet_coverage\": \"unverified\", \"covered_query_ids\": [\"query-original\", \"query-lookup-1\", \"query-lookup-2\"], \"missing_query_ids\": [], \"missing_facets\": [], \"facets\": [{\"id\": \"intent-context:getting_started\", \"requirement_id\": null, \"question\": \"command line help setup initialization workflow\", \"status\": \"retrieval_only\", \"evidence_ids\": [\"ev-b96657827b8741a6\"]}], \"sources\": [{\"evidence_id\": \"ev-b96657827b8741a6\", \"path_or_url\": \"wiki/Commands.md\", \"section\": \"Commands > Docs MCP server\", \"snippet\": \"## Docs MCP server\\n\\n`doc-atlas mcp docs-serve` runs the local Docs MCP server. Find the command with `doc-atlas --help` followed by `doc-atlas mcp --help`.\\n\\nIts public workflow has exactly three tools:\\n\\n- `get_docs_context` — first documentation question;\\n- `prepare_docs` — a returned or explicitly approved sync/prefetch action;\\n- `docs_status` — a returned job, health, or freshness request.\", \"version_binding\": \"unversioned\", \"content_sha256\": \"42fd95efcf51a8b5164c5ff6a4ca89be2f86848889e005bcc075d4639208b616\", \"project_identity\": \"local:48277f62f8b4ff92ba1c60c082f92a43817f9e1c5ba4ea27e12cd77a76421585\", \"authority\": \"source_of_truth\", \"scope\": \"project\", \"line_start\": 65, \"line_end\": 73}, {\"evidence_id\": \"ev-415e2b79b4914a68\", \"path_or_url\": \"SKILL.md\", \"section\": \"DocAtlas > Core Commands > Manage Sources\", \"snippet\": \"| Command | Purpose |\\n|------|---------|\\n| `doc-atlas list` | Show indexed documentation sources |\\n| `doc-atlas list --all` | Show every stored page or file |\\n| `doc-atlas inspect` | Show index stats, format counts, and extract locations |\\n| `doc-atlas remove <source>` | Remove a source or docset root |\\n| `doc-atlas remove --all` | Clear the entire index |\\n| `doc-atlas update [source]` | Re-fetch and re-index all sources, or one specific source |\\n| `doc-atlas doctor` | Check config, loader availability, index health, and agent skill installs |\\n| `doc-atlas init` | Create project-local `docatlas.yaml` |\\n| `doc-atlas fetch <url> --output <dir>` | Download docs to markdown files without indexing |\", \"version_binding\": \"unversioned\", \"content_sha256\": \"ac36d207a08deae309d083372934a6d84937741d32bb4953bb446fcbe7fa3f46\", \"project_identity\": \"local:48277f62f8b4ff92ba1c60c082f92a43817f9e1c5ba4ea27e12cd77a76421585\", \"authority\": \"source_of_truth\", \"scope\": \"project\", \"line_start\": 114, \"line_end\": 124}], \"context_quality\": {\"status\": \"unverified\", \"reasons\": [\"coverage_unverified\", \"budget_limited\"]}, \"read_next\": [], \"edit_ready\": false, \"investigation_allowed\": true, \"estimated_tokens\": 696}",
+        "annotations": null,
+        "_meta": null
+      }
+    ],
+    "structuredContent": null,
+    "isError": false
+  }
+}

@@ -1,0 +1,144 @@
+INGEST fastapi 11
+INGEST httpx 4
+INGEST mkdocs 7
+INGEST pydantic 15
+INGEST ruff 16
+INGEST starlette 5
+INGEST typer 7
+INGEST uv 22
+GROUNDED fastapi-01 [(3, 'sufficient'), (5, 'sufficient')]
+GROUNDED fastapi-02 [(3, 'sufficient'), (5, 'sufficient')]
+GROUNDED fastapi-03 [(3, 'needs_review'), (5, 'needs_review')]
+GROUNDED fastapi-04 [(3, 'needs_review'), (5, 'needs_review')]
+GROUNDED fastapi-05 [(3, 'needs_review'), (5, 'needs_review')]
+GROUNDED fastapi-06 [(3, 'sufficient'), (5, 'sufficient')]
+GROUNDED fastapi-07 [(3, 'needs_review'), (5, 'needs_review')]
+GROUNDED fastapi-08 [(3, 'needs_review'), (5, 'needs_review')]
+GROUNDED fastapi-09 [(3, 'needs_review'), (5, 'needs_review')]
+GROUNDED fastapi-10 [(3, 'needs_review'), (5, 'needs_review')]
+GROUNDED starlette-01 [(3, 'sufficient'), (5, 'sufficient')]
+GROUNDED starlette-02 [(3, 'sufficient'), (5, 'sufficient')]
+GROUNDED starlette-03 [(3, 'sufficient'), (5, 'sufficient')]
+GROUNDED starlette-04 [(3, 'sufficient'), (5, 'sufficient')]
+GROUNDED starlette-05 [(3, 'sufficient'), (5, 'sufficient')]
+GROUNDED starlette-06 [(3, 'needs_review'), (5, 'needs_review')]
+GROUNDED starlette-07 [(3, 'needs_review'), (5, 'needs_review')]
+GROUNDED starlette-08 [(3, 'needs_review'), (5, 'needs_review')]
+GROUNDED starlette-09 [(3, 'needs_review'), (5, 'needs_review')]
+GROUNDED starlette-10 [(3, 'needs_review'), (5, 'needs_review')]
+GROUNDED typer-01 [(3, 'sufficient'), (5, 'sufficient')]
+GROUNDED typer-02 [(3, 'sufficient'), (5, 'sufficient')]
+GROUNDED typer-03 [(3, 'sufficient'), (5, 'sufficient')]
+GROUNDED typer-04 [(3, 'sufficient'), (5, 'sufficient')]
+GROUNDED typer-05 [(3, 'needs_review'), (5, 'needs_review')]
+GROUNDED typer-06 [(3, 'sufficient'), (5, 'sufficient')]
+GROUNDED typer-07 [(3, 'needs_review'), (5, 'needs_review')]
+GROUNDED typer-08 [(3, 'needs_review'), (5, 'needs_review')]
+GROUNDED typer-09 [(3, 'needs_review'), (5, 'needs_review')]
+GROUNDED typer-10 [(3, 'needs_review'), (5, 'needs_review')]
+GROUNDED pydantic-01 [(3, 'sufficient'), (5, 'sufficient')]
+GROUNDED pydantic-02 [(3, 'sufficient'), (5, 'sufficient')]
+GROUNDED pydantic-03 [(3, 'sufficient'), (5, 'sufficient')]
+GROUNDED pydantic-04 [(3, 'sufficient'), (5, 'sufficient')]
+GROUNDED pydantic-05 [(3, 'needs_review'), (5, 'needs_review')]
+GROUNDED pydantic-06 [(3, 'needs_review'), (5, 'needs_review')]
+GROUNDED pydantic-07 [(3, 'needs_review'), (5, 'needs_review')]
+GROUNDED pydantic-08 [(3, 'needs_review'), (5, 'needs_review')]
+GROUNDED pydantic-09 [(3, 'needs_review'), (5, 'needs_review')]
+GROUNDED pydantic-10 [(3, 'needs_review'), (5, 'needs_review')]
+GROUNDED httpx-01 [(3, 'sufficient'), (5, 'sufficient')]
+GROUNDED httpx-02 [(3, 'sufficient'), (5, 'sufficient')]
+GROUNDED httpx-03 [(3, 'needs_review'), (5, 'needs_review')]
+GROUNDED httpx-04 [(3, 'needs_review'), (5, 'needs_review')]
+GROUNDED httpx-05 [(3, 'needs_review'), (5, 'needs_review')]
+GROUNDED httpx-06 [(3, 'sufficient'), (5, 'sufficient')]
+GROUNDED httpx-07 [(3, 'needs_review'), (5, 'needs_review')]
+GROUNDED httpx-08 [(3, 'needs_review'), (5, 'needs_review')]
+GROUNDED httpx-09 [(3, 'needs_review'), (5, 'needs_review')]
+GROUNDED httpx-10 [(3, 'needs_review'), (5, 'needs_review')]
+GROUNDED mkdocs-01 [(3, 'sufficient'), (5, 'sufficient')]
+GROUNDED mkdocs-02 [(3, 'sufficient'), (5, 'sufficient')]
+GROUNDED mkdocs-03 [(3, 'sufficient'), (5, 'sufficient')]
+GROUNDED mkdocs-04 [(3, 'sufficient'), (5, 'sufficient')]
+GROUNDED mkdocs-05 [(3, 'sufficient'), (5, 'sufficient')]
+GROUNDED mkdocs-06 [(3, 'needs_review'), (5, 'needs_review')]
+GROUNDED mkdocs-07 [(3, 'needs_review'), (5, 'needs_review')]
+GROUNDED mkdocs-08 [(3, 'needs_review'), (5, 'needs_review')]
+GROUNDED mkdocs-09 [(3, 'needs_review'), (5, 'needs_review')]
+GROUNDED mkdocs-10 [(3, 'needs_review'), (5, 'needs_review')]
+GROUNDED ruff-01 [(3, 'sufficient'), (5, 'sufficient')]
+GROUNDED ruff-02 [(3, 'sufficient'), (5, 'sufficient')]
+GROUNDED ruff-03 [(3, 'sufficient'), (5, 'sufficient')]
+GROUNDED ruff-04 [(3, 'sufficient'), (5, 'sufficient')]
+GROUNDED ruff-05 [(3, 'sufficient'), (5, 'sufficient')]
+GROUNDED ruff-06 [(3, 'sufficient'), (5, 'sufficient')]
+GROUNDED ruff-07 [(3, 'needs_review'), (5, 'needs_review')]
+GROUNDED ruff-08 [(3, 'needs_review'), (5, 'needs_review')]
+GROUNDED ruff-09 [(3, 'needs_review'), (5, 'needs_review')]
+GROUNDED ruff-10 [(3, 'needs_review'), (5, 'needs_review')]
+GROUNDED uv-01 [(3, 'sufficient'), (5, 'sufficient')]
+GROUNDED uv-02 [(3, 'needs_review'), (5, 'needs_review')]
+GROUNDED uv-03 [(3, 'needs_review'), (5, 'needs_review')]
+GROUNDED uv-04 [(3, 'needs_review'), (5, 'needs_review')]
+GROUNDED uv-05 [(3, 'needs_review'), (5, 'needs_review')]
+GROUNDED uv-06 [(3, 'needs_review'), (5, 'needs_review')]
+GROUNDED uv-07 [(3, 'needs_review'), (5, 'needs_review')]
+GROUNDED uv-08 [(3, 'needs_review'), (5, 'needs_review')]
+GROUNDED uv-09 [(3, 'needs_review'), (5, 'needs_review')]
+GROUNDED uv-10 [(3, 'needs_review'), (5, 'needs_review')]
+{
+  "3": {
+    "cases": 80,
+    "positives": 48,
+    "recognized_sufficient": 32,
+    "controlled_recognized_sufficient": 8,
+    "assessments": {
+      "sufficient": 32,
+      "needs_review": 48
+    },
+    "controlled_assessments": {
+      "sufficient": 8,
+      "needs_review": 72
+    },
+    "tokens": {
+      "n": 80,
+      "p50": 1234,
+      "p95": 3087
+    },
+    "latency": {
+      "n": 80,
+      "p50": 0.002344981003261637,
+      "p95": 0.002838199994585011
+    },
+    "unmapped_results": 0,
+    "binding_errors": 0,
+    "tool_errors": 0
+  },
+  "5": {
+    "cases": 80,
+    "positives": 48,
+    "recognized_sufficient": 32,
+    "controlled_recognized_sufficient": 8,
+    "assessments": {
+      "sufficient": 32,
+      "needs_review": 48
+    },
+    "controlled_assessments": {
+      "sufficient": 8,
+      "needs_review": 72
+    },
+    "tokens": {
+      "n": 80,
+      "p50": 1873,
+      "p95": 4709
+    },
+    "latency": {
+      "n": 80,
+      "p50": 0.0027031060017179698,
+      "p95": 0.0032445600008941256
+    },
+    "unmapped_results": 0,
+    "binding_errors": 0,
+    "tool_errors": 0
+  }
+}

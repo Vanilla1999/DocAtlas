@@ -1,0 +1,23 @@
+{
+  "tool": "docs_status",
+  "request": {
+    "action": "project",
+    "project_path": "/tmp/opencode/docatlas-ablation",
+    "details": true
+  },
+  "seconds": 0.10672671900101705,
+  "is_error": false,
+  "wire": {
+    "_meta": null,
+    "content": [
+      {
+        "type": "text",
+        "text": "{\"tool\": \"docs_status\", \"action\": \"project\", \"project\": {\"project_path\": \"/tmp/opencode/docatlas-ablation\", \"project_detected\": true, \"reason_code\": \"project_docs_ready\", \"arguments_patch\": {\"project_path\": \"/tmp/opencode/docatlas-ablation\"}, \"source_summary\": {\"candidates\": 134, \"indexed\": 134, \"stale\": 0, \"ignored\": 0}, \"project_docs\": {\"module_count\": 4, \"modules\": [{\"module_id\": \"docmancer\", \"module_name\": \"docmancer\", \"module_path\": \"docmancer\", \"module_type\": \"catalog_module\", \"doc_count\": 3}, {\"module_id\": \"docmancer/docs/application\", \"module_name\": \"application\", \"module_path\": \"docmancer/docs/application\", \"module_type\": \"catalog_module\", \"doc_count\": 2}, {\"module_id\": \"docmancer/docs/domain\", \"module_name\": \"domain\", \"module_path\": \"docmancer/docs/domain\", \"module_type\": \"catalog_module\", \"doc_count\": 2}, {\"module_id\": \"docmancer/docs/infrastructure\", \"module_name\": \"infrastructure\", \"module_path\": \"docmancer/docs/infrastructure\", \"module_type\": \"catalog_module\", \"doc_count\": 1}], \"modules_omitted\": 0}, \"diagnostics\": {\"active_index\": {\"db_path\": \"/tmp/opencode/docatlas-ablation/.docatlas/docatlas.db\", \"config_source\": \"project_local\", \"config_path\": \"/tmp/opencode/docatlas-ablation/docatlas.yaml\", \"retrieval_mode\": \"lexical\"}}}}",
+        "annotations": null,
+        "_meta": null
+      }
+    ],
+    "structuredContent": null,
+    "isError": false
+  }
+}

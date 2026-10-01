@@ -1,0 +1,436 @@
+[
+  {
+    "stable_chunk_id": "child-8270f48635e22eef8db60cc580ba79ab6a4a38b9",
+    "source_path": "docs/user-guide/writing-your-docs.md",
+    "display_text": "# Writing your docs\n\nHow to layout and write your Markdown source files.\n\n---\n\n",
+    "line_start": 1,
+    "line_end": 6
+  },
+  {
+    "stable_chunk_id": "child-51c15d49a86df271df3549df3b5a7adb57eb4083",
+    "source_path": "docs/user-guide/writing-your-docs.md",
+    "display_text": "## File layout\n\nYour documentation source should be written as regular Markdown files (see\n[Writing with Markdown](#writing-with-markdown) below), and placed in the\n[documentation directory](configuration.md#docs_dir). By default, this directory\nwill be named `docs` and will exist at the top level of your project, alongside\nthe `mkdocs.yml` configuration file.\n\nThe simplest project you can create will look something like this:\n\n",
+    "line_start": 7,
+    "line_end": 16
+  },
+  {
+    "stable_chunk_id": "child-8ef8df521f5a92ca7efc917c2e8ce2b6902f1c2e",
+    "source_path": "docs/user-guide/writing-your-docs.md",
+    "display_text": "```text\nmkdocs.yml\ndocs/\n    index.md\n```\n\nBy convention your project homepage should be named `index.md` (see [Index\npages](#index-pages) below for details). Any of the following file\nextensions may be used for your Markdown source files: `markdown`, `mdown`,\n`mkdn`, `mkd`, `md`. All Markdown files included in your documentation\ndirectory will be rendered in the built site regardless of any settings.\n\n",
+    "line_start": 17,
+    "line_end": 28
+  },
+  {
+    "stable_chunk_id": "child-b3ce41eb762cca327b09c89666f2ab952239ace6",
+    "source_path": "docs/user-guide/writing-your-docs.md",
+    "display_text": "NOTE:\nFiles and directories with names which begin with a dot (for example: `.foo.md` or `.bar/baz.md`) are ignored by MkDocs. This can be overridden with the [`exclude_docs` config](configuration.md#exclude_docs).\n\nYou can also create multi-page documentation, by creating several Markdown\nfiles:\n\n```text\nmkdocs.yml\ndocs/\n    index.md\n    about.md\n    license.md\n```\n\n",
+    "line_start": 29,
+    "line_end": 42
+  },
+  {
+    "stable_chunk_id": "child-1dddcbc07f2c47f5ffc063264bd09594ad8dda54",
+    "source_path": "docs/user-guide/writing-your-docs.md",
+    "display_text": "The file layout you use determines the URLs that are used for the generated\npages. Given the above layout, pages would be generated for the following URLs:\n\n```text\n/\n/about/\n/license/\n```\n\nYou can also include your Markdown files in nested directories if that better\nsuits your documentation layout.\n\n```text\ndocs/\n    index.md\n    user-guide/getting-started.md\n    user-guide/configuration-options.md\n    license.md\n```\n\n",
+    "line_start": 43,
+    "line_end": 62
+  },
+  {
+    "stable_chunk_id": "child-722038a564d17d74c8dd56e3acdd5273dc5894ae",
+    "source_path": "docs/user-guide/writing-your-docs.md",
+    "display_text": "Source files inside nested directories will cause pages to be generated with\nnested URLs, like so:\n\n```text\n/\n/user-guide/getting-started/\n/user-guide/configuration-options/\n/license/\n```\n\n",
+    "line_start": 63,
+    "line_end": 72
+  },
+  {
+    "stable_chunk_id": "child-de23a3a7761c2ffdfd5ecaac784589c1d16d525f",
+    "source_path": "docs/user-guide/writing-your-docs.md",
+    "display_text": "Any files which are not identified as Markdown files (by their file extension)\nwithin the [documentation directory](configuration.md#docs_dir) are copied by\nMkDocs to the built site unaltered. See\n[how to link to images and media](#linking-to-images-and-media) below for details.\n\n",
+    "line_start": 73,
+    "line_end": 77
+  },
+  {
+    "stable_chunk_id": "child-c099942700f2fb6f4ff4b1a270c4552fb54aa9b1",
+    "source_path": "docs/user-guide/writing-your-docs.md",
+    "display_text": "### Index pages\n\nWhen a directory is requested, by default, most web servers will return an index\nfile (usually named `index.html`) contained within that directory if one exists.\nFor that reason, the homepage in all of the examples above has been named\n`index.md`, which MkDocs will render to `index.html` when building the site.\n\n",
+    "line_start": 78,
+    "line_end": 84
+  },
+  {
+    "stable_chunk_id": "child-3e24c45bba206001dee2c61493db26ef5b7213e5",
+    "source_path": "docs/user-guide/writing-your-docs.md",
+    "display_text": "Many repository hosting sites provide special treatment for README files by\ndisplaying the contents of the README file when browsing the contents of a\ndirectory. Therefore, MkDocs will allow you to name your index pages as\n`README.md` instead of `index.md`. In that way, when users are browsing your\nsource code, the repository host can display the index page of that directory as\nit is a README file. However, when MkDocs renders your site, the file will be\nrenamed to `index.html` so that the server will serve it as a proper index file.\n\n",
+    "line_start": 85,
+    "line_end": 92
+  },
+  {
+    "stable_chunk_id": "child-51ed3b789d7b9918d338358e1b0b1196d50a8610",
+    "source_path": "docs/user-guide/writing-your-docs.md",
+    "display_text": "If both an `index.md` file and a `README.md` file are found in the same\ndirectory, then the `index.md` file is used and the `README.md` file is\nignored.\n\n",
+    "line_start": 93,
+    "line_end": 96
+  },
+  {
+    "stable_chunk_id": "child-b4f434812427d8330c1317ac2cd8fb10aeac7812",
+    "source_path": "docs/user-guide/writing-your-docs.md",
+    "display_text": "### Configure Pages and Navigation\n\n",
+    "line_start": 97,
+    "line_end": 98
+  },
+  {
+    "stable_chunk_id": "child-29cd07f82aa7e40602754d29278e65aa7bfe38fa",
+    "source_path": "docs/user-guide/writing-your-docs.md",
+    "display_text": "The [nav](configuration.md#nav) configuration setting in your `mkdocs.yml` file\ndefines which pages are included in the global site navigation menu as well as\nthe structure of that menu. If not provided, the navigation will be\nautomatically created by discovering all the Markdown files in the\n[documentation directory](configuration.md#docs_dir). An automatically created\nnavigation configuration will always be sorted alphanumerically by file name\n(except that index files will always be listed first within a sub-section). You\nwill need to manually define your navigation configuration if you would like\nyour navigation menu sorted differently.\n\n",
+    "line_start": 99,
+    "line_end": 108
+  },
+  {
+    "stable_chunk_id": "child-22d10458cf49964013b36d61fac209d75f4f8238",
+    "source_path": "docs/user-guide/writing-your-docs.md",
+    "display_text": "A minimal navigation configuration could look like this:\n\n```yaml\nnav:\n  - index.md\n  - about.md\n```\n\nAll paths in the navigation configuration must be relative to the `docs_dir`\nconfiguration option. If that option is set to the default value, `docs`, the\nsource files for the above configuration would be located at `docs/index.md` and\n`docs/about.md`.\n\n",
+    "line_start": 109,
+    "line_end": 121
+  },
+  {
+    "stable_chunk_id": "child-841d1fd671ad441f47ec8f12dca435d8a9c003ef",
+    "source_path": "docs/user-guide/writing-your-docs.md",
+    "display_text": "The above example will result in two navigation items being created at the top\nlevel and with their titles inferred from the contents of the Markdown file or,\nif no title is defined within the file, of the file name. To override the title\nin the `nav` setting add a title right before the filename.\n\n```yaml\nnav:\n  - Home: index.md\n  - About: about.md\n```\n\n",
+    "line_start": 122,
+    "line_end": 132
+  },
+  {
+    "stable_chunk_id": "child-b724fc53e54d011152bebb30fd6a517120e9d568",
+    "source_path": "docs/user-guide/writing-your-docs.md",
+    "display_text": "Note that if a title is defined for a page in the navigation, that title will be\nused throughout the site for that page and will override any title defined\nwithin the page itself.\n\nNavigation sub-sections can be created by listing related pages together under a\nsection title. For example:\n\n",
+    "line_start": 133,
+    "line_end": 139
+  },
+  {
+    "stable_chunk_id": "child-b1b97e78faeef57512f8f62708ad46a6d5bbcc4c",
+    "source_path": "docs/user-guide/writing-your-docs.md",
+    "display_text": "```yaml\nnav:\n  - Home: index.md\n  - User Guide:\n    - Writing your docs: writing-your-docs.md\n    - Styling your docs: styling-your-docs.md\n  - About:\n    - License: license.md\n    - Release Notes: release-notes.md\n```\n\n",
+    "line_start": 140,
+    "line_end": 150
+  },
+  {
+    "stable_chunk_id": "child-2bacabf6383dab4d37215fb65a7c7b6d1ed1b04f",
+    "source_path": "docs/user-guide/writing-your-docs.md",
+    "display_text": "With the above configuration we have three top level items: \"Home\", \"User Guide\"\nand \"About.\" \"Home\" is a link to the homepage for the site. Under the \"User\nGuide\" section two pages are listed: \"Writing your docs\" and \"Styling your\ndocs.\" Under the \"About\" section two more pages are listed: \"License\" and\n\"Release Notes.\"\n\n",
+    "line_start": 151,
+    "line_end": 156
+  },
+  {
+    "stable_chunk_id": "child-507fe234fc6bc0dc066dc65f3fba28263e5fdd37",
+    "source_path": "docs/user-guide/writing-your-docs.md",
+    "display_text": "Note that a section cannot have a page assigned to it. Sections are only\ncontainers for child pages and sub-sections. You may nest sections as deeply as\nyou like. However, be careful that you don't make it too difficult for your\nusers to navigate through the site navigation by over-complicating the nesting.\nWhile sections may mirror your directory structure, they do not have to.\n\n",
+    "line_start": 157,
+    "line_end": 162
+  },
+  {
+    "stable_chunk_id": "child-4e0a1c84a9e468dc187e417e739edaac3e6fe77a",
+    "source_path": "docs/user-guide/writing-your-docs.md",
+    "display_text": "Any pages not listed in your navigation configuration will still be rendered and\nincluded with the built site, however, they will not be linked from the global\nnavigation and will not be included in the `previous` and `next` links. Such\npages will be \"hidden\" unless linked to directly.\n\n",
+    "line_start": 163,
+    "line_end": 167
+  },
+  {
+    "stable_chunk_id": "child-b58480f4b24cc3ab354011049b0769e94b92901c",
+    "source_path": "docs/user-guide/writing-your-docs.md",
+    "display_text": "## Writing with Markdown\n\nMkDocs pages must be authored in [Markdown][md], a lightweight markup language\nwhich results in easy-to-read, easy-to-write plain text documents that can be\nconverted to valid HTML documents in a predictable manner.\n\n",
+    "line_start": 168,
+    "line_end": 173
+  },
+  {
+    "stable_chunk_id": "child-08a21b4412f8948ce20c5f2699ab1a6275288163",
+    "source_path": "docs/user-guide/writing-your-docs.md",
+    "display_text": "MkDocs uses the [Python-Markdown] library to render Markdown documents to HTML.\nPython-Markdown is almost completely compliant with the [reference\nimplementation][md], although there are a few very minor [differences].\n\n",
+    "line_start": 174,
+    "line_end": 177
+  },
+  {
+    "stable_chunk_id": "child-4ba1248340ebf208b00ec9e3fb9e4f67c0b80d7d",
+    "source_path": "docs/user-guide/writing-your-docs.md",
+    "display_text": "In addition to the base Markdown [syntax] which is common across all Markdown\nimplementations, MkDocs includes support for extending the Markdown syntax with\nPython-Markdown [extensions]. See the MkDocs' [markdown_extensions]\nconfiguration setting for details on how to enable extensions.\n\nMkDocs includes some extensions by default, which are highlighted below.\n\n",
+    "line_start": 178,
+    "line_end": 184
+  },
+  {
+    "stable_chunk_id": "child-1781c400ac9e4fc96ef4ef3a9d32cd9692d10204",
+    "source_path": "docs/user-guide/writing-your-docs.md",
+    "display_text": "[Python-Markdown]: https://python-markdown.github.io/\n[md]: https://daringfireball.net/projects/markdown/\n[differences]: https://python-markdown.github.io/#differences\n[syntax]: https://daringfireball.net/projects/markdown/syntax\n[extensions]: https://python-markdown.github.io/extensions/\n[markdown_extensions]: configuration.md#markdown_extensions\n\n",
+    "line_start": 185,
+    "line_end": 191
+  },
+  {
+    "stable_chunk_id": "child-326a93884730bcad9f6a77dc8bae86a3772becde",
+    "source_path": "docs/user-guide/writing-your-docs.md",
+    "display_text": "### Internal links\n\nMkDocs allows you to interlink your documentation by using regular Markdown\n[links]. However, there are a few additional benefits to formatting those links\nspecifically for MkDocs as outlined below.\n\n[links]: https://daringfireball.net/projects/markdown/syntax#link\n\n",
+    "line_start": 192,
+    "line_end": 199
+  },
+  {
+    "stable_chunk_id": "child-66f2bba6d943b7eb14b4327914e6194d708df09f",
+    "source_path": "docs/user-guide/writing-your-docs.md",
+    "display_text": "#### Linking to pages\n\nWhen linking between pages in the documentation you can simply use the regular\nMarkdown [linking][links] syntax, including the *relative path* to the Markdown\ndocument you wish to link to.\n\n```markdown\nPlease see the [project license](license.md) for further details.\n```\n\n",
+    "line_start": 200,
+    "line_end": 209
+  },
+  {
+    "stable_chunk_id": "child-21ebc4d28ca78d06b8b59651316004f88f5987eb",
+    "source_path": "docs/user-guide/writing-your-docs.md",
+    "display_text": "When the MkDocs build runs, these Markdown links will automatically be\ntransformed into an HTML hyperlink to the appropriate HTML page.\n\n",
+    "line_start": 210,
+    "line_end": 212
+  },
+  {
+    "stable_chunk_id": "child-6b5120bd442cbad024f461caea69866f5483ac2d",
+    "source_path": "docs/user-guide/writing-your-docs.md",
+    "display_text": "WARNING:\nUsing absolute paths with links is not officially supported. Relative paths\nare adjusted by MkDocs to ensure they are always relative to the page. Absolute\npaths are not modified at all. This means that your links using absolute paths\nmight work fine in your local environment but they might break once you deploy\nthem to your production server.\n\n",
+    "line_start": 213,
+    "line_end": 219
+  },
+  {
+    "stable_chunk_id": "child-f4e142af42c89ada5b141a687c5e0d3c3547b1e9",
+    "source_path": "docs/user-guide/writing-your-docs.md",
+    "display_text": "If the target documentation file is in another directory you'll need to make\nsure to include any relative directory path in the link.\n\n```markdown\nPlease see the [project license](../about/license.md) for further details.\n```\n\n",
+    "line_start": 220,
+    "line_end": 226
+  },
+  {
+    "stable_chunk_id": "child-a2d3d583d9cf4505a92e384d40b4f5c55cd1d066",
+    "source_path": "docs/user-guide/writing-your-docs.md",
+    "display_text": "The [toc] extension is used by MkDocs to generate an ID for every header in your\nMarkdown documents. You can use that ID to link to a section within a target\ndocument by using an anchor link. The generated HTML will correctly transform\nthe path portion of the link, and leave the anchor portion intact.\n\n```markdown\nPlease see the [project license](about.md#license) for further details.\n```\n\n",
+    "line_start": 227,
+    "line_end": 235
+  },
+  {
+    "stable_chunk_id": "child-113ed476ab13ed8edd42a50eb18388e13581564c",
+    "source_path": "docs/user-guide/writing-your-docs.md",
+    "display_text": "Note that IDs are created from the text of a header. All text is converted to\nlowercase and any disallowed characters, including white-space, are converted to\ndashes. Consecutive dashes are then reduced to a single dash.\n\nThere are a few configuration settings provided by the toc extension which you\ncan set in your `mkdocs.yml` configuration file to alter the default behavior:\n\n*   **`permalink`**\n\n",
+    "line_start": 236,
+    "line_end": 244
+  },
+  {
+    "stable_chunk_id": "child-4f5eeeb0de611f7c29d9bed8246348b307b2060f",
+    "source_path": "docs/user-guide/writing-your-docs.md",
+    "display_text": "    Generate permanent links at the end of each header. Default: `False`.\n\n    When set to True the paragraph symbol (&para; or `&para;`) is used as the\n    link text. When set to a string, the provided string is used as the link\n    text. For example, to use the hash symbol (`#`) instead, do:\n\n    ```yaml\n    markdown_extensions:\n      - toc:\n          permalink: \"#\"\n    ```\n\n*   **`baselevel`**\n\n",
+    "line_start": 245,
+    "line_end": 258
+  },
+  {
+    "stable_chunk_id": "child-72ab4c5c5e3a4b62c1a5706171d7ffa18301f133",
+    "source_path": "docs/user-guide/writing-your-docs.md",
+    "display_text": "    Base level for headers. Default: `1`.\n\n    This setting allows the header levels to be automatically adjusted to fit\n    within the hierarchy of your HTML templates. For example, if the Markdown\n    text for a page should not contain any headers higher than level 2 (`<h2>`),\n    do:\n\n    ```yaml\n    markdown_extensions:\n      - toc:\n          baselevel: 2\n    ```\n\n",
+    "line_start": 259,
+    "line_end": 271
+  },
+  {
+    "stable_chunk_id": "child-3314704548994c9e41cfdf6b512546ca3c61eb59",
+    "source_path": "docs/user-guide/writing-your-docs.md",
+    "display_text": "    Then any headers in your document would be increased by 1. For example, the\n    header `# Header` would be rendered as a level 2 header (`<h2>`) in the HTML\n    output.\n\n*   **`separator`**\n\n    Word separator. Default: `-`.\n\n    Character which replaces white-space in generated IDs. If you prefer\n    underscores, then do:\n\n    ```yaml\n    markdown_extensions:\n      - toc:\n          separator: \"_\"\n    ```\n\n",
+    "line_start": 272,
+    "line_end": 288
+  },
+  {
+    "stable_chunk_id": "child-35b7155274ba6af7e5a11e9199158bf6c9539ad6",
+    "source_path": "docs/user-guide/writing-your-docs.md",
+    "display_text": "Note that if you would like to define multiple of the above settings, you must\ndo so under a single `toc` entry in the `markdown_extensions` configuration\noption.\n\n```yml\nmarkdown_extensions:\n  - toc:\n      permalink: \"#\"\n      baselevel: 2\n      separator: \"_\"\n```\n\n[toc]: https://python-markdown.github.io/extensions/toc/\n\n",
+    "line_start": 289,
+    "line_end": 302
+  },
+  {
+    "stable_chunk_id": "child-21c63752facf7bdfbdaaa7419fca69c4bfa30366",
+    "source_path": "docs/user-guide/writing-your-docs.md",
+    "display_text": "#### Linking to images and media\n\nAs well as the Markdown source files, you can also include other file types in\nyour documentation, which will be copied across when generating your\ndocumentation site. These might include images and other media.\n\n",
+    "line_start": 303,
+    "line_end": 308
+  },
+  {
+    "stable_chunk_id": "child-e9375d32941b4327d60ad7e6131c19b08fa92ebe",
+    "source_path": "docs/user-guide/writing-your-docs.md",
+    "display_text": "For example, if your project documentation needed to include a [GitHub Pages\nCNAME file] and a PNG formatted screenshot image then your file layout might\nlook as follows:\n\n```text\nmkdocs.yml\ndocs/\n    CNAME\n    index.md\n    about.md\n    license.md\n    img/\n        screenshot.png\n```\n\nTo include images in your documentation source files, simply use any of the\nregular Markdown image syntaxes:\n\n",
+    "line_start": 309,
+    "line_end": 326
+  },
+  {
+    "stable_chunk_id": "child-9d8fa0910a673d691ef15cb7f3a049730ce19277",
+    "source_path": "docs/user-guide/writing-your-docs.md",
+    "display_text": "```Markdown\nCupcake indexer is a snazzy new project for indexing small cakes.\n\n![Screenshot](img/screenshot.png)\n\n*Above: Cupcake indexer in progress*\n```\n\nYour image will now be embedded when you build the documentation, and should\nalso be previewed if you're working on the documentation with a Markdown editor.\n\n",
+    "line_start": 327,
+    "line_end": 337
+  },
+  {
+    "stable_chunk_id": "child-7f08147bc76f47cfaa7a9d629760ebbd599f617d",
+    "source_path": "docs/user-guide/writing-your-docs.md",
+    "display_text": "[GitHub Pages CNAME file]: https://help.github.com/articles/using-a-custom-domain-with-github-pages/\n\n",
+    "line_start": 338,
+    "line_end": 339
+  },
+  {
+    "stable_chunk_id": "child-51dd22276e7894709a31dbd4a8b89562a25497bd",
+    "source_path": "docs/user-guide/writing-your-docs.md",
+    "display_text": "#### Linking from raw HTML\n\n",
+    "line_start": 340,
+    "line_end": 341
+  },
+  {
+    "stable_chunk_id": "child-73f603e7fd694afb02bf3f517cf3342ebbf65053",
+    "source_path": "docs/user-guide/writing-your-docs.md",
+    "display_text": "Markdown allows document authors to fall back to raw HTML when the Markdown\nsyntax does not meets the author's needs. MkDocs does not limit Markdown in this\nregard. However, as all raw HTML is ignored by the Markdown parser, MkDocs is\nnot able to validate or convert links contained in raw HTML. When including\ninternal links within raw HTML, you will need to manually format the link\nappropriately for the rendered document.\n\n",
+    "line_start": 342,
+    "line_end": 348
+  },
+  {
+    "stable_chunk_id": "child-102afe9ecbc47c87146a72acc184aa538f1e4b4d",
+    "source_path": "docs/user-guide/writing-your-docs.md",
+    "display_text": "### Meta-Data\n\n",
+    "line_start": 349,
+    "line_end": 350
+  },
+  {
+    "stable_chunk_id": "child-cffdb479421ea5a0feb082b2086bb21efd2ca599",
+    "source_path": "docs/user-guide/writing-your-docs.md",
+    "display_text": "MkDocs includes support for both YAML and MultiMarkdown style meta-data (often\ncalled front-matter). Meta-data consists of a series of keywords and values\ndefined at the beginning of a Markdown document, which are stripped from the\ndocument prior to it being processing by Python-Markdown. The key/value pairs\nare passed by MkDocs to the page template. Therefore, if a theme includes\nsupport, the values of any keys can be displayed on the page or used to control\nthe page rendering. See your theme's documentation for information about which\nkeys may be supported, if any.\n\n",
+    "line_start": 351,
+    "line_end": 359
+  },
+  {
+    "stable_chunk_id": "child-138eec1117eb0827a4c76adb95c57caef7f23524",
+    "source_path": "docs/user-guide/writing-your-docs.md",
+    "display_text": "In addition to displaying information in a template, MkDocs includes support for\na few predefined meta-data keys which can alter the behavior of MkDocs for that\nspecific page. The following keys are supported:\n\n*   **`template`**\n\n    The template to use with the current page.\n\n",
+    "line_start": 360,
+    "line_end": 367
+  },
+  {
+    "stable_chunk_id": "child-ad971e65673ee7be94290bc95b35ec2007f36655",
+    "source_path": "docs/user-guide/writing-your-docs.md",
+    "display_text": "    By default, MkDocs uses the `main.html` template of a theme to render\n    Markdown pages. You can use the `template` meta-data key to define a\n    different template file for that specific page. The template file must be\n    available on the path(s) defined in the theme's environment.\n\n*   **`title`**\n\n    The \"title\" to use for the document.\n\n",
+    "line_start": 368,
+    "line_end": 376
+  },
+  {
+    "stable_chunk_id": "child-6f582a6260a68638c565ea72439cd836e18e0f3e",
+    "source_path": "docs/user-guide/writing-your-docs.md",
+    "display_text": "    MkDocs will attempt to determine the title of a document in the following\n    ways, in order:\n\n    1.  A title defined in the [nav] configuration setting for a document.\n\n    2.  A title defined in the `title` meta-data key of a document.\n\n    3.  A level 1 Markdown header on the first line of the document body.  \n        ([Setext-style] headers are supported *only since MkDocs 1.5*.)\n\n    4.  The filename of a document.\n\n",
+    "line_start": 377,
+    "line_end": 388
+  },
+  {
+    "stable_chunk_id": "child-eb205992535b9f02790048201aa4589aa08c0131",
+    "source_path": "docs/user-guide/writing-your-docs.md",
+    "display_text": "    Upon finding a title for a page, MkDoc does not continue checking any\n    additional sources in the above list.\n\n[Setext-style]: https://daringfireball.net/projects/markdown/syntax#header\n\n",
+    "line_start": 389,
+    "line_end": 393
+  },
+  {
+    "stable_chunk_id": "child-a4d9f37cde97913ce11528de7895acb78eb5d9ac",
+    "source_path": "docs/user-guide/writing-your-docs.md",
+    "display_text": "#### YAML Style Meta-Data\n\nYAML style meta-data consists of [YAML] key/value pairs wrapped in YAML style\ndelimiters to mark the start and/or end of the meta-data. The first line of\na document must be `---`. The meta-data ends at the first line containing an\nend deliminator (either `---` or `...`). The content between the delimiters is\nparsed as [YAML].\n\n",
+    "line_start": 394,
+    "line_end": 401
+  },
+  {
+    "stable_chunk_id": "child-1f54fcece16dcea69cabdd240bd56348b9550064",
+    "source_path": "docs/user-guide/writing-your-docs.md",
+    "display_text": "```text\n---\ntitle: My Document\nsummary: A brief description of my document.\nauthors:\n    - Waylan Limberg\n    - Tom Christie\ndate: 2018-07-10\nsome_url: https://example.com\n---\nThis is the first paragraph of the document.\n```\n\n",
+    "line_start": 402,
+    "line_end": 414
+  },
+  {
+    "stable_chunk_id": "child-f0ad5270e789e265f406046fac144f14f522e9a7",
+    "source_path": "docs/user-guide/writing-your-docs.md",
+    "display_text": "YAML is able to detect data types. Therefore, in the above example, the values\nof `title`, `summary` and `some_url` are strings, the value of `authors` is a\nlist of strings and the value of `date` is a `datetime.date` object. Note that\nthe YAML keys are case sensitive and MkDocs expects keys to be all lowercase.\nThe top level of the YAML must be a collection of key/value pairs, which results\nin a Python `dict` being returned. If any other type is returned or the YAML\nparser encounters an error, then MkDocs does not recognize the section as\nmeta-data, the page's `meta` attribute will be empty, and the section is not\nremoved from the document.\n\n",
+    "line_start": 415,
+    "line_end": 424
+  },
+  {
+    "stable_chunk_id": "child-c9ddb1ea9253152d517077b2730a105cfeb8ebd9",
+    "source_path": "docs/user-guide/writing-your-docs.md",
+    "display_text": "#### MultiMarkdown Style Meta-Data\n\nMultiMarkdown style meta-data uses a format first introduced by the\n[MultiMarkdown] project. The data consists of a series of keywords and values\ndefined at the beginning of a Markdown document, like this:\n\n",
+    "line_start": 425,
+    "line_end": 430
+  },
+  {
+    "stable_chunk_id": "child-897d13deaf5896b18512ba572a98ccaca8018315",
+    "source_path": "docs/user-guide/writing-your-docs.md",
+    "display_text": "```text\nTitle:   My Document\nSummary: A brief description of my document.\nAuthors: Waylan Limberg\n         Tom Christie\nDate:    January 23, 2018\nblank-value:\nsome_url: https://example.com\n\nThis is the first paragraph of the document.\n```\n\n",
+    "line_start": 431,
+    "line_end": 442
+  },
+  {
+    "stable_chunk_id": "child-028b75c41a430a768e6eebcd0276f3089145d63e",
+    "source_path": "docs/user-guide/writing-your-docs.md",
+    "display_text": "The keywords are case-insensitive and may consist of letters, numbers,\nunderscores and dashes and must end with a colon. The values consist of anything\nfollowing the colon on the line and may even be blank.\n\n",
+    "line_start": 443,
+    "line_end": 446
+  },
+  {
+    "stable_chunk_id": "child-816bde99a146a41eed61bbda927b8364cc94887b",
+    "source_path": "docs/user-guide/writing-your-docs.md",
+    "display_text": "If a line is indented by 4 or more spaces, that line is assumed to be an\nadditional line of the value for the previous keyword. A keyword may have as\nmany lines as desired. All lines are joined into a single string.\n\nThe first blank line ends all meta-data for the document. Therefore, the first\nline of a document must not be blank.\n\n",
+    "line_start": 447,
+    "line_end": 453
+  },
+  {
+    "stable_chunk_id": "child-1d6df644086f96bd7a6c77348a80d19521b21a4c",
+    "source_path": "docs/user-guide/writing-your-docs.md",
+    "display_text": "NOTE:\nMkDocs does not support YAML style delimiters (`---` or `...`) for\nMultiMarkdown style meta-data. In fact, MkDocs relies on the the presence or\nabsence of the delimiters to determine whether YAML style meta-data or\nMultiMarkdown style meta-data is being used. If the delimiters are\ndetected, but the content between the delimiters is not valid YAML\nmeta-data, MkDocs does not attempt to parse the content as MultiMarkdown\nstyle meta-data.\n\n",
+    "line_start": 454,
+    "line_end": 462
+  },
+  {
+    "stable_chunk_id": "child-03a822ed9156ab0c592112a0d8112dfd4ef15a78",
+    "source_path": "docs/user-guide/writing-your-docs.md",
+    "display_text": "[YAML]: https://yaml.org\n[MultiMarkdown]: https://fletcherpenney.net/MultiMarkdown_Syntax_Guide#metadata\n[nav]: configuration.md#nav\n\n",
+    "line_start": 463,
+    "line_end": 466
+  },
+  {
+    "stable_chunk_id": "child-739e6c2e0f594487d79ea4716d8080d1d7c6e253",
+    "source_path": "docs/user-guide/writing-your-docs.md",
+    "display_text": "### Tables\n\nThe [tables] extension adds a basic table syntax to Markdown which is popular\nacross multiple implementations. The syntax is rather simple and is generally\nonly useful for simple tabular data.\n\nA simple table looks like this:\n\n```markdown\nFirst Header | Second Header | Third Header\n------------ | ------------- | ------------\nContent Cell | Content Cell  | Content Cell\nContent Cell | Content Cell  | Content Cell\n```\n\n",
+    "line_start": 467,
+    "line_end": 481
+  },
+  {
+    "stable_chunk_id": "child-e12bb044032f37f1b784e36dc401fe91df48668d",
+    "source_path": "docs/user-guide/writing-your-docs.md",
+    "display_text": "If you wish, you can add a leading and tailing pipe to each line of the table:\n\n```markdown\n| First Header | Second Header | Third Header |\n| ------------ | ------------- | ------------ |\n| Content Cell | Content Cell  | Content Cell |\n| Content Cell | Content Cell  | Content Cell |\n```\n\nSpecify alignment for each column by adding colons to separator lines:\n\n",
+    "line_start": 482,
+    "line_end": 492
+  },
+  {
+    "stable_chunk_id": "child-d68d65a5428f13e84da88887f9446059e7f8a36a",
+    "source_path": "docs/user-guide/writing-your-docs.md",
+    "display_text": "```markdown\nFirst Header | Second Header | Third Header\n:----------- |:-------------:| -----------:\nLeft         | Center        | Right\nLeft         | Center        | Right\n```\n\nNote that table cells cannot contain any block level elements and cannot contain\nmultiple lines of text. They can, however, include inline Markdown as defined in\nMarkdown's [syntax] rules.\n\n",
+    "line_start": 493,
+    "line_end": 503
+  },
+  {
+    "stable_chunk_id": "child-4abac75771fbcd0c6b6296ae382ac52c0c1ba213",
+    "source_path": "docs/user-guide/writing-your-docs.md",
+    "display_text": "Additionally, a table must be surrounded by blank lines. There must be a blank\nline before and after the table.\n\n[tables]: https://python-markdown.github.io/extensions/tables/\n\n",
+    "line_start": 504,
+    "line_end": 508
+  },
+  {
+    "stable_chunk_id": "child-537657dd4ed51288a11bdaa4674383367ec88634",
+    "source_path": "docs/user-guide/writing-your-docs.md",
+    "display_text": "### Fenced code blocks\n\nThe [fenced code blocks] extension adds an alternate method of defining code\nblocks without indentation.\n\nThe first line should contain 3 or more backtick (`` ` ``) characters, and the\nlast line should contain the same number of backtick characters (`` ` ``):\n\n",
+    "line_start": 509,
+    "line_end": 516
+  },
+  {
+    "stable_chunk_id": "child-c016b972037375d2c23fc9e3220408aa5bd4fbfa",
+    "source_path": "docs/user-guide/writing-your-docs.md",
+    "display_text": "````markdown\n```\nFenced code blocks are like Standard\nMarkdown’s regular code blocks, except that\nthey’re not indented and instead rely on\nstart and end fence lines to delimit the\ncode block.\n```\n````\n\nWith this approach, the language can optionally be specified on the first line\nafter the backticks which informs any syntax highlighters of the language used:\n\n````markdown\n```python\ndef fn():\n    pass\n```\n````\n\n",
+    "line_start": 517,
+    "line_end": 536
+  },
+  {
+    "stable_chunk_id": "child-3c77be1dac65b5e56eeb9beeaabc7c845b8ffd4e",
+    "source_path": "docs/user-guide/writing-your-docs.md",
+    "display_text": "Note that fenced code blocks can not be indented. Therefore, they cannot be\nnested inside list items, blockquotes, etc.\n\n[fenced code blocks]: https://python-markdown.github.io/extensions/fenced_code_blocks/\n",
+    "line_start": 537,
+    "line_end": 540
+  }
+]

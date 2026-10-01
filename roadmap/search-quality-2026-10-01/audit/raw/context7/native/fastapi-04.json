@@ -1,0 +1,33 @@
+{
+  "id": "fastapi-04",
+  "question": "Can allow_credentials work with allow_origins=[\"*\"] in CORSMiddleware, and what is the default?",
+  "library_id": "/websites/fastapi_tiangolo",
+  "request": {
+    "libraryId": "/websites/fastapi_tiangolo",
+    "query": "Can allow_credentials work with allow_origins=[\"*\"] in CORSMiddleware, and what is the default?"
+  },
+  "seconds": 2.968309465999482,
+  "is_error": false,
+  "wire": {
+    "_meta": null,
+    "content": [
+      {
+        "type": "text",
+        "text": "### Configure CORSMiddleware in FastAPI\n\nSource: https://fastapi.tiangolo.com/tutorial/cors\n\nRegisters CORSMiddleware to allow cross-origin requests from specific origins with credentials and standard HTTP methods/headers.\n\n```python\nfrom fastapi import FastAPI\nfrom fastapi.middleware.cors import CORSMiddleware\n\napp = FastAPI()\n\norigins = [\n    \"http://localhost.tiangolo.com\",\n    \"https://localhost.tiangolo.com\",\n    \"http://localhost\",\n    \"http://localhost:8080\",\n]\n\napp.add_middleware(\n    CORSMiddleware,\n    allow_origins=origins,\n    allow_credentials=True,\n    allow_methods=[\"*\"],\n    allow_headers=[\"*\"],\n)\n\n\n@app.get(\"/\")\nasync def main():\n    return {\"message\": \"Hello World\"}\n\n```\n\n--------------------------------\n\n### Access allow_credentials Attribute in Python\n\nSource: https://fastapi.tiangolo.com/reference/middleware\n\nFlag indicating whether cookies and credentials are allowed in CORS requests.\n\n```python\nallow_credentials = allow_credentials\n\n```\n\n--------------------------------\n\n### Access allow_origins Attribute in Python\n\nSource: https://fastapi.tiangolo.com/reference/middleware\n\nList of origins allowed to perform cross-origin requests.\n\n```python\nallow_origins = allow_origins\n\n```\n\n--------------------------------\n\n### Access allow_all_origins Attribute in Python\n\nSource: https://fastapi.tiangolo.com/reference/middleware\n\nFlag indicating whether wildcard access is permitted across all origin domains.\n\n```python\nallow_all_origins = allow_all_origins\n\n```\n\n### Use CORSMiddleware\n\nSource: https://fastapi.tiangolo.com/tutorial/cors\n\nCORS can be configured in FastAPI using CORSMiddleware. Default parameters are restrictive, requiring origins, methods, or headers to be explicitly enabled for cross-domain browser requests. Configurable arguments include allow_origins, allow_origin_regex, allow_methods (defaults to GET), allow_headers (defaults to empty list), allow_credentials (defaults to False), expose_headers, and max_age (defaults to 600 seconds). If allow_credentials is set to True, wildcards cannot be used for origins, methods, or headers.",
+        "annotations": null,
+        "_meta": null
+      }
+    ],
+    "structuredContent": null,
+    "isError": false
+  },
+  "text": "### Configure CORSMiddleware in FastAPI\n\nSource: https://fastapi.tiangolo.com/tutorial/cors\n\nRegisters CORSMiddleware to allow cross-origin requests from specific origins with credentials and standard HTTP methods/headers.\n\n```python\nfrom fastapi import FastAPI\nfrom fastapi.middleware.cors import CORSMiddleware\n\napp = FastAPI()\n\norigins = [\n    \"http://localhost.tiangolo.com\",\n    \"https://localhost.tiangolo.com\",\n    \"http://localhost\",\n    \"http://localhost:8080\",\n]\n\napp.add_middleware(\n    CORSMiddleware,\n    allow_origins=origins,\n    allow_credentials=True,\n    allow_methods=[\"*\"],\n    allow_headers=[\"*\"],\n)\n\n\n@app.get(\"/\")\nasync def main():\n    return {\"message\": \"Hello World\"}\n\n```\n\n--------------------------------\n\n### Access allow_credentials Attribute in Python\n\nSource: https://fastapi.tiangolo.com/reference/middleware\n\nFlag indicating whether cookies and credentials are allowed in CORS requests.\n\n```python\nallow_credentials = allow_credentials\n\n```\n\n--------------------------------\n\n### Access allow_origins Attribute in Python\n\nSource: https://fastapi.tiangolo.com/reference/middleware\n\nList of origins allowed to perform cross-origin requests.\n\n```python\nallow_origins = allow_origins\n\n```\n\n--------------------------------\n\n### Access allow_all_origins Attribute in Python\n\nSource: https://fastapi.tiangolo.com/reference/middleware\n\nFlag indicating whether wildcard access is permitted across all origin domains.\n\n```python\nallow_all_origins = allow_all_origins\n\n```\n\n### Use CORSMiddleware\n\nSource: https://fastapi.tiangolo.com/tutorial/cors\n\nCORS can be configured in FastAPI using CORSMiddleware. Default parameters are restrictive, requiring origins, methods, or headers to be explicitly enabled for cross-domain browser requests. Configurable arguments include allow_origins, allow_origin_regex, allow_methods (defaults to GET), allow_headers (defaults to empty list), allow_credentials (defaults to False), expose_headers, and max_age (defaults to 600 seconds). If allow_credentials is set to True, wildcards cannot be used for origins, methods, or headers.",
+  "size": {
+    "utf8_bytes": 2092,
+    "actual_tokens": 436,
+    "tokenizer": "docatlas-offline:o200k_base"
+  },
+  "version_matched": false,
+  "source_matched": false,
+  "semantic_assessment": "manual; separate from frozen witness matching"
+}

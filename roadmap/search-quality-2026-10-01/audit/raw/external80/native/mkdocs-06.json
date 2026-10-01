@@ -1,0 +1,23 @@
+{
+  "tool": "get_docs_context",
+  "request": {
+    "question": "Can table cells contain block elements or multiple lines, and are blank lines around a table required?",
+    "project_path": "/tmp/opencode/search-audit-work-20261001/fixtures/mkdocs",
+    "scope": "all"
+  },
+  "seconds": 0.43107866500213277,
+  "is_error": false,
+  "wire": {
+    "_meta": null,
+    "content": [
+      {
+        "type": "text",
+        "text": "{\"status\": \"ok\", \"kind\": \"docs_context\", \"context_status\": \"ready\", \"context_available\": true, \"answer_supported\": false, \"answer_available\": false, \"support_status\": \"retrieval_only\", \"answer_policy\": \"cite_only\", \"coverage_policy\": \"retrieval_attribution_only\", \"query_coverage\": \"full\", \"retrieval_coverage\": \"full\", \"facet_coverage\": \"unverified\", \"covered_query_ids\": [\"query-original\"], \"missing_query_ids\": [], \"missing_facets\": [], \"facets\": [{\"id\": \"retrieval-need:need-2\", \"requirement_id\": null, \"question\": \"are blank lines around a table required?\", \"status\": \"retrieval_only\", \"evidence_ids\": [\"ev-9b17044532ddadd8\"]}], \"sources\": [{\"evidence_id\": \"ev-9b17044532ddadd8\", \"path_or_url\": \"docs/user-guide/writing-your-docs.md\", \"section\": \"Writing your docs > Writing with Markdown > Tables\", \"snippet\": \"Additionally, a table must be surrounded by blank lines. There must be a blank\\nline before and after the table.\\n\\n[tables]: https://python-markdown.github.io/extensions/tables/\", \"version_binding\": \"unversioned\", \"content_sha256\": \"ba8f1df5650e944057a863fbbaf124cb9fa5c8ba615f3223a2a130d81431e485\", \"project_identity\": \"local:fd4807fa34128ed0db2e2162d3b5c0a37c7992656c9c7ac093ec283fb925d818\", \"authority\": \"source_of_truth\", \"scope\": \"project\", \"line_start\": 504, \"line_end\": 507}, {\"evidence_id\": \"ev-dfcd81827c6df16e\", \"path_or_url\": \"docs/user-guide/writing-your-docs.md\", \"section\": \"Writing your docs > Writing with Markdown > Tables\", \"snippet\": \"```markdown\\nFirst Header | Second Header | Third Header\\n:----------- |:-------------:| -----------:\\nLeft         | Center        | Right\\nLeft         | Center        | Right\\n```\\n\\nNote that table cells cannot contain any block level elements and cannot contain\\nmultiple lines of text. They can, however, include inline Markdown as defined in\\nMarkdown's [syntax] rules.\", \"version_binding\": \"unversioned\", \"content_sha256\": \"0a5affc89cb8763190c5b17c8c3ac3c189b04f9947755190445d280b34ed445d\", \"project_identity\": \"local:fd4807fa34128ed0db2e2162d3b5c0a37c7992656c9c7ac093ec283fb925d818\", \"authority\": \"source_of_truth\", \"scope\": \"project\", \"line_start\": 493, \"line_end\": 502}, {\"evidence_id\": \"ev-4cf8e5306e5cb13b\", \"path_or_url\": \"docs/user-guide/writing-your-docs.md\", \"section\": \"Writing your docs\", \"snippet\": \"How to layout and write your Markdown source files.\", \"version_binding\": \"unversioned\", \"content_sha256\": \"98f63b31a57425b238fde37fcf951b3fd19d65a6dd94c986cb7a7e74d11d6f80\", \"project_identity\": \"local:fd4807fa34128ed0db2e2162d3b5c0a37c7992656c9c7ac093ec283fb925d818\", \"line_start\": 3, \"line_end\": 3, \"authority\": \"source_of_truth\", \"scope\": \"project\"}], \"context_quality\": {\"status\": \"unverified\", \"reasons\": [\"coverage_unverified\"]}, \"read_next\": [], \"edit_ready\": false, \"investigation_allowed\": true, \"estimated_tokens\": 675}",
+        "annotations": null,
+        "_meta": null
+      }
+    ],
+    "structuredContent": null,
+    "isError": false
+  }
+}

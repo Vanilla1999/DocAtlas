@@ -1,0 +1,59 @@
+{
+  "method": "Single-reviewer posthoc review of native visible text, not generated answers. Context7 uses hosted current sources/versions; Grounded uses the same pinned files as DocAtlas. Conservative formatting check is separate from semantic adjudication. No equality/parity claim from unmatched outputs.",
+  "grounded_native": {
+    "limit3_full": 47,
+    "limit3_positive_total": 48,
+    "limit5_full": 48,
+    "limit5_positive_total": 48,
+    "formatting_check_resolved": {"3": 42, "5": 43},
+    "semantic_adjudications_beyond_formatting": {
+      "fastapi-04": "Native CORS parameter list explicitly gives allow_credentials False and prohibition on wildcard origins/methods/headers when True. List rendering/reference formatting defeated matching.",
+      "pydantic-06": "Native Alias Priority list explicitly distinguishes alias_priority=2 versus 1 and not-set. Escaped/reference markup defeats raw witness equality, not requested facts.",
+      "httpx-03": "Native lists connect/read/write/pool with all four definitions; Markdown bullet/paragraph segmentation differs from witness.",
+      "mkdocs-06": "Native Table section explicitly gives no block elements, no multiline cells, blank lines before/after. Resolved reference-style syntax link differs from original [syntax] reference.",
+      "uv-02": "Native Pre-release compatibility lists both permitted default cases. List/italic formatting differs, facts complete."
+    },
+    "typer-05": {
+      "limit3": "No preceding-space rule; related boolean options do not answer this specific request.",
+      "limit5": "Frozen witness matches native Result text under formatting-only normalization; the additional result contains the required space-before-slash rule."
+    },
+    "controlled_adapter": "8/48 recognized sufficient in 800-token/3-paragraph first-visible-block adapter. This is NOT a Grounded product mode and NOT a complete semantic rating of all adapted packets. It only diagnoses loss from naive budget packing."
+  },
+  "context7": [
+    {"id":"fastapi-02","grade":"full","reason":"Normal def write_notification is registered with BackgroundTasks.add_task; demonstrates requested possibility."},
+    {"id":"fastapi-04","grade":"full","reason":"Use CORSMiddleware prose explicitly states allow_credentials False default and no wildcards when True. Example uses wildcard methods/headers, so prose/example consistency should be reviewed separately."},
+    {"id":"starlette-03","grade":"full","reason":"Explicit teardown after all connections closed and in-process background tasks completed."},
+    {"id":"typer-01","grade":"partial","reason":"Exit without error and code=0 means success are stated. Numeric default for an omitted code is not explicitly bound in returned text; logical inference may support it, but reviewer conservatively leaves this facet uncertain."},
+    {"id":"pydantic-02","grade":"partial","reason":"Python strict/no coercion and JSON conversion distinction supported. Specific UUID-string JSON strict acceptance not directly demonstrated; returned examples cover date and malformed UUID. Possible stronger implication is left for independent review."},
+    {"id":"pydantic-03","grade":"full","reason":"Explicit validation-call > Field > model_config precedence and code examples."},
+    {"id":"httpx-03","grade":"full","reason":"All four timeout names and distinct limiting operations directly described."},
+    {"id":"mkdocs-05","grade":"full","reason":"nav > title metadata > first-line H1 > filename, stop at first found; setext version caveat included."},
+    {"id":"ruff-01","grade":"full","reason":"Closest config for each file and no implicit config merging; explicit extend mechanism."},
+    {"id":"uv-05","grade":"full","reason":"Explicit pip combined indexes versus uv first-index behavior; current source uses first-index name instead of older snapshot first-match, not version-matched."}
+  ],
+  "grounded_project20": {
+    "notice":"Native unfiltered lexical search across all 134 source files. Not an authority-matched alternative: this server was not given DocAtlas active/completed/superseded/catalog policy.",
+    "observations": {
+      "projectA-Q02":"README contains sync_project_docs and lifecycle workflow; broader usable workflow than native compact DocAtlas packet, but more text.",
+      "projectA-Q05":"Only old readiness review, not scope=all rule.",
+      "projectA-Q07":"Only old readiness review, not discovery/inspection contract.",
+      "projectA-Q09":"Old release repair/publisher review, not stale Markdown reconciliation.",
+      "projectA-Q11":"Library retrieval implementation plan plus no-doc/dependency prefetch examples; not complete refresh versus sync distinction.",
+      "projectA-Q14":"Runtime/tool/job description and historical first-divergence task atlas, no direct stop-on-repeated-action answer.",
+      "projectA-Q18":"Configuration has lexical/vector modes and fail-closed policy; troubleshooting simultaneously advertises older fallback behavior.",
+      "projectA-Q23":"Old readiness review, not byte/token metadata budget.",
+      "projectA-Q25":"Old readiness review, not host answering despite false flags.",
+      "projectA-Q29":"Old readiness review, not indexed-document instruction trust boundary.",
+      "projectB-Q03":"Old readiness review, not host synthesis from sources.",
+      "projectB-Q04":"SKILL scope=all coding workflow is usable navigation; explicit entire-repository/module semantics less clear than DocAtlas quickstart quote.",
+      "projectB-Q08":"README explicitly delivers sync action/reconciliation of changed files, which native and guided DocAtlas packets missed. Changelog/planning distractors also present.",
+      "projectB-Q10":"Canonical Docs server explicitly says query never reconciles; also returns superseded ADR as distractor.",
+      "projectB-Q14":"Old budget/index roadmaps rather than current whole-response citation-metadata admission rule.",
+      "projectB-Q17":"Old readiness review, not source_changed reader contract.",
+      "projectB-Q20":"Grounded host-session Final handoff contains supported-part/unknown/next-step policy; useful, and guided DocAtlas lost it.",
+      "projectB-Q23":"Old readiness review, not same-filename project isolation.",
+      "projectB-Q28":"Historical planning documents discuss title-only relevance/proof issue; they are not current authoritative runtime proof.",
+      "projectB-Q34":"Product brief says check installed version; actual editor process/command verification remains missing."
+    }
+  }
+}

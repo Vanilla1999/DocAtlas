@@ -1,0 +1,33 @@
+{
+  "id": "mkdocs-05",
+  "question": "Which page title wins when the navigation configuration and Markdown content define different titles?",
+  "library_id": "/mkdocs/mkdocs",
+  "request": {
+    "libraryId": "/mkdocs/mkdocs",
+    "query": "Which page title wins when the navigation configuration and Markdown content define different titles?"
+  },
+  "seconds": 2.340131915996608,
+  "is_error": false,
+  "wire": {
+    "_meta": null,
+    "content": [
+      {
+        "type": "text",
+        "text": "### Navigation with custom titles in mkdocs.yml\n\nSource: https://github.com/mkdocs/mkdocs/blob/master/docs/user-guide/writing-your-docs.md\n\nOverrides page titles by adding a title before the filename in the nav list. This title is used site-wide and overrides any title defined within the page itself.\n\n```yaml\nnav:\n  - Home: index.md\n  - About: about.md\n```\n\n### Configure Pages and Navigation\n\nSource: https://github.com/mkdocs/mkdocs/blob/master/docs/user-guide/writing-your-docs.md\n\nThe above example will result in two navigation items being created at the top\nlevel and with their titles inferred from the contents of the Markdown file or,\nif no title is defined within the file, of the file name. To override the title\nin the `nav` setting add a title right before the filename.\n\n--------------------------------\n\n### Configure Pages and Navigation\n\nSource: https://github.com/mkdocs/mkdocs/blob/master/docs/user-guide/writing-your-docs.md\n\nNote that if a title is defined for a page in the navigation, that title will be\nused throughout the site for that page and will override any title defined\nwithin the page itself.\n\n--------------------------------\n\n### Meta-Data\n\nSource: https://github.com/mkdocs/mkdocs/blob/master/docs/user-guide/writing-your-docs.md\n\nIn addition to displaying information in a template, MkDocs includes support for a few predefined meta-data keys which can alter the behavior of MkDocs for that specific page. The following keys are supported:\n\n*   **`template`**\n\n    The template to use with the current page.\n\n    By default, MkDocs uses the `main.html` template of a theme to render Markdown pages. You can use the `template` meta-data key to define a different template file for that specific page. The template file must be available on the path(s) defined in the theme's environment.\n\n*   **`title`**\n\n    The \"title\" to use for the document.\n\n    MkDocs will attempt to determine the title of a document in the following ways, in order:\n\n    1.  A title defined in the [nav] configuration setting for a document.\n\n    2.  A title defined in the `title` meta-data key of a document.\n\n    3.  A level 1 Markdown header on the first line of the document body.  \n        ([Setext-style] headers are supported *only since MkDocs 1.5*.)\n\n    4.  The filename of a document.\n\n    Upon finding a title for a page, MkDoc does not continue checking any additional sources in the above list.",
+        "annotations": null,
+        "_meta": null
+      }
+    ],
+    "structuredContent": null,
+    "isError": false
+  },
+  "text": "### Navigation with custom titles in mkdocs.yml\n\nSource: https://github.com/mkdocs/mkdocs/blob/master/docs/user-guide/writing-your-docs.md\n\nOverrides page titles by adding a title before the filename in the nav list. This title is used site-wide and overrides any title defined within the page itself.\n\n```yaml\nnav:\n  - Home: index.md\n  - About: about.md\n```\n\n### Configure Pages and Navigation\n\nSource: https://github.com/mkdocs/mkdocs/blob/master/docs/user-guide/writing-your-docs.md\n\nThe above example will result in two navigation items being created at the top\nlevel and with their titles inferred from the contents of the Markdown file or,\nif no title is defined within the file, of the file name. To override the title\nin the `nav` setting add a title right before the filename.\n\n--------------------------------\n\n### Configure Pages and Navigation\n\nSource: https://github.com/mkdocs/mkdocs/blob/master/docs/user-guide/writing-your-docs.md\n\nNote that if a title is defined for a page in the navigation, that title will be\nused throughout the site for that page and will override any title defined\nwithin the page itself.\n\n--------------------------------\n\n### Meta-Data\n\nSource: https://github.com/mkdocs/mkdocs/blob/master/docs/user-guide/writing-your-docs.md\n\nIn addition to displaying information in a template, MkDocs includes support for a few predefined meta-data keys which can alter the behavior of MkDocs for that specific page. The following keys are supported:\n\n*   **`template`**\n\n    The template to use with the current page.\n\n    By default, MkDocs uses the `main.html` template of a theme to render Markdown pages. You can use the `template` meta-data key to define a different template file for that specific page. The template file must be available on the path(s) defined in the theme's environment.\n\n*   **`title`**\n\n    The \"title\" to use for the document.\n\n    MkDocs will attempt to determine the title of a document in the following ways, in order:\n\n    1.  A title defined in the [nav] configuration setting for a document.\n\n    2.  A title defined in the `title` meta-data key of a document.\n\n    3.  A level 1 Markdown header on the first line of the document body.  \n        ([Setext-style] headers are supported *only since MkDocs 1.5*.)\n\n    4.  The filename of a document.\n\n    Upon finding a title for a page, MkDoc does not continue checking any additional sources in the above list.",
+  "size": {
+    "utf8_bytes": 2423,
+    "actual_tokens": 548,
+    "tokenizer": "docatlas-offline:o200k_base"
+  },
+  "version_matched": false,
+  "source_matched": false,
+  "semantic_assessment": "manual; separate from frozen witness matching"
+}

@@ -1,0 +1,23 @@
+{
+  "tool": "get_docs_context",
+  "request": {
+    "question": "Which files does DocAtlas consider project documentation, and how can I see what it missed?",
+    "project_path": "/tmp/opencode/docatlas-ablation",
+    "scope": "all"
+  },
+  "seconds": 0.878978319997259,
+  "is_error": false,
+  "wire": {
+    "_meta": null,
+    "content": [
+      {
+        "type": "text",
+        "text": "{\"status\": \"ok\", \"kind\": \"docs_context\", \"context_status\": \"ready\", \"context_available\": true, \"answer_supported\": false, \"answer_available\": false, \"support_status\": \"retrieval_only\", \"answer_policy\": \"cite_only\", \"coverage_policy\": \"retrieval_attribution_only\", \"query_coverage\": \"full\", \"retrieval_coverage\": \"full\", \"facet_coverage\": \"unverified\", \"covered_query_ids\": [\"query-original\"], \"missing_query_ids\": [], \"missing_facets\": [], \"facets\": [], \"sources\": [{\"evidence_id\": \"ev-1b285ab1641671b8\", \"path_or_url\": \"wiki/Commands.md\", \"section\": \"Commands > Core commands\", \"snippet\": \"## Core commands\\n\\n| Command | Description |\\n|---------|-------------|\\n| `doc-atlas setup` | Create config and SQLite database, auto-detect installed agents, and install skill files. Use `--all` for non-interactive installation. |\\n| `doc-atlas ingest <path>` | Index local files or directories. Supports Markdown, text, HTML, PDF, DOCX, and RTF out of the box. Embeds and upserts vectors alongside FTS5 by default; add `--no-vectors` for FTS5-only. |\\n| `doc-atlas add <url>` | Fetch URL documentation, normalize into sections, and index with SQLite FTS5. Supports GitBook, Mintlify, generic web, and GitHub. See [Supported Sources](./Supported-Sources.md). |\\n| `doc-atlas update` | Re-fetch and re-index all existing docs sources. Pass a specific source to update only that one. |\\n| `doc-atlas query \\\"<text>\\\"` | Search the index and return a compact context pack within a token budget. Shows token savings and agentic runway. |\\n| `doc-atlas list` | List indexed docsets with ingestion dates. Use `--all` to show individual sources. |\\n| `doc-atlas inspect` | Show SQLite index stats, source counts, and extract locations. |\\n| `doc-atlas remove [source]` | Remove an indexed source or docset root. Use `--all` to clear everything. |\\n| `doc-atlas doctor` | Health check: config, SQLite FTS5 availability, index stats, and installed agent skills. |\\n| `doc-atlas init` | Create a project-local `docatlas.yaml` for a project-specific index. |\\n| `doc-atlas install <agent>` | Install a skill file for a single agent manually. See [Install Targets](./Install-Targets.md). |\\n| `doc-atlas fetch <url>` | Download documentation to local Markdown files (default output dir `docatlas-docs/`). Does not update the SQLite index. |\\n| `doc-atlas qdrant {up,down,status,upgrade,logs}` | Manage the local Qdrant process used for dense + sparse + hybrid retrieval. See [Qdrant lifecycle](#qdrant-lifecycle) below. |\", \"version_binding\": \"unversioned\", \"content_sha256\": \"fb68c8f82cdfe451a2bb3022f9e5dd59fce8832f6f26f17a5c9cde2d2563c74f\", \"project_identity\": \"local:48277f62f8b4ff92ba1c60c082f92a43817f9e1c5ba4ea27e12cd77a76421585\", \"line_start\": 5, \"line_end\": 21, \"authority\": \"source_of_truth\", \"scope\": \"project\"}], \"context_quality\": {\"status\": \"unverified\", \"reasons\": [\"coverage_unverified\"]}, \"read_next\": [], \"edit_ready\": false, \"investigation_allowed\": true, \"estimated_tokens\": 729}",
+        "annotations": null,
+        "_meta": null
+      }
+    ],
+    "structuredContent": null,
+    "isError": false
+  }
+}

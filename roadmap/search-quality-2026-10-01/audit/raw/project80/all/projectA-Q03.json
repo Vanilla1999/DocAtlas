@@ -1,0 +1,23 @@
+{
+  "tool": "get_docs_context",
+  "request": {
+    "question": "Чем Docs MCP отличается от Packs MCP и какой из них подключать для вопросов по репозиторию?",
+    "project_path": "/tmp/opencode/docatlas-ablation",
+    "scope": "all"
+  },
+  "seconds": 0.9101562779978849,
+  "is_error": false,
+  "wire": {
+    "_meta": null,
+    "content": [
+      {
+        "type": "text",
+        "text": "{\"status\": \"ok\", \"kind\": \"docs_context\", \"context_status\": \"ready\", \"context_available\": true, \"answer_supported\": false, \"answer_available\": false, \"support_status\": \"retrieval_only\", \"answer_policy\": \"cite_only\", \"coverage_policy\": \"retrieval_attribution_only\", \"query_coverage\": \"partial\", \"retrieval_coverage\": \"partial\", \"facet_coverage\": \"unverified\", \"covered_query_ids\": [], \"missing_query_ids\": [\"query-original\"], \"missing_facets\": [], \"facets\": [], \"sources\": [{\"evidence_id\": \"ev-257e7697739a8660\", \"path_or_url\": \"wiki/Commands.md\", \"section\": \"Commands > MCP pack commands\", \"snippet\": \"## MCP pack commands\\n\\n`doc-atlas install-pack` installs version-pinned API MCP packs, and `doc-atlas mcp` manages the local MCP server and installed packs. This is an advanced surface that is not required for local docs retrieval. See [MCP Packs](./MCP-Packs.md) for the full reference and [Architecture > Packs MCP runtime](./Architecture.md#packs-mcp-runtime) for dispatch internals.\", \"version_binding\": \"unversioned\", \"content_sha256\": \"93d48c6a5358e8dc0e650df4e10193d6a72af9291907c48d320d278ee2c0a5d9\", \"line_start\": 77, \"line_end\": 79, \"project_identity\": \"local:48277f62f8b4ff92ba1c60c082f92a43817f9e1c5ba4ea27e12cd77a76421585\", \"authority\": \"source_of_truth\", \"scope\": \"project\", \"source_uri\": \"docatlas://source/7de2b1e3bffee3b40dc83f7e\"}, {\"evidence_id\": \"ev-b6c005fa05e1c299\", \"path_or_url\": \"wiki/Commands.md\", \"section\": \"Commands\", \"snippet\": \"Reference for the main DocAtlas documentation runtime commands, vector lifecycle commands, Docs MCP tools, and advanced MCP Pack commands. For how these fit into the overall system, see [Architecture](./Architecture.md). For configuration that affects command defaults, see [Configuration](./Configuration.md).\", \"version_binding\": \"unversioned\", \"content_sha256\": \"f91c87883c399748764661b31d174633dd04ecee10c24a8d46589f470d2c3ddd\", \"project_identity\": \"local:48277f62f8b4ff92ba1c60c082f92a43817f9e1c5ba4ea27e12cd77a76421585\", \"line_start\": 3, \"line_end\": 3, \"authority\": \"source_of_truth\", \"scope\": \"project\", \"source_uri\": \"docatlas://source/cdd8e1ef8d88daceba45c053\"}], \"context_quality\": {\"status\": \"partial\", \"reasons\": [\"requested_part_missing\"]}, \"read_next\": [{\"source_uri\": \"docatlas://source/5d6022839a661ba51eca198d\", \"path\": \"wiki/Commands.md\", \"project_identity\": \"local:48277f62f8b4ff92ba1c60c082f92a43817f9e1c5ba4ea27e12cd77a76421585\", \"snapshot_sha256\": \"sha256:8d889ac9ad8a29cb17d0101ff7722bebf9115da3055a8295c8ebf23c95e9699b\", \"line_start\": 80, \"line_end\": 89, \"reason\": \"inspect_source_context\"}], \"edit_ready\": false, \"investigation_allowed\": true, \"estimated_tokens\": 637}",
+        "annotations": null,
+        "_meta": null
+      }
+    ],
+    "structuredContent": null,
+    "isError": false
+  }
+}

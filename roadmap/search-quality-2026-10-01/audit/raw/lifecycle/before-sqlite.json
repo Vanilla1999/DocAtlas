@@ -1,0 +1,30 @@
+{
+  "db_path": "/tmp/opencode/docatlas-ablation/.docatlas/docatlas.db",
+  "counts": {
+    "doc_libraries": 0,
+    "docs_job_schema": 1,
+    "docs_jobs": 0,
+    "embedding_upserts": 0,
+    "generation_sources": 0,
+    "generation_vector_upserts": 0,
+    "index_generations": 0,
+    "index_state": 1,
+    "parent_sections": 0,
+    "retrieval_children": 0,
+    "retrieval_children_fts": 0,
+    "retrieval_children_fts_config": 1,
+    "retrieval_children_fts_data": 2,
+    "retrieval_children_fts_docsize": 0,
+    "retrieval_children_fts_idx": 0,
+    "retrieval_fts_projection_state": 1,
+    "retrieval_parents": 0,
+    "sections": 0,
+    "sections_fts": 0,
+    "sections_fts_config": 1,
+    "sections_fts_data": 2,
+    "sections_fts_docsize": 0,
+    "sections_fts_idx": 0,
+    "sources": 0,
+    "sqlite_sequence": 0
+  }
+}

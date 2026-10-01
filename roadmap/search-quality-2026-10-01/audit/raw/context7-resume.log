@@ -1,0 +1,8 @@
+starlette-03 /kludex/starlette 287 error= False
+typer-01 /websites/typer_tiangolo 469 error= False
+pydantic-02 /pydantic/pydantic 785 error= False
+pydantic-03 /pydantic/pydantic 947 error= False
+httpx-03 /encode/httpx 807 error= False
+mkdocs-05 /mkdocs/mkdocs 548 error= False
+ruff-01 /astral-sh/ruff 542 error= False
+uv-05 /websites/astral_sh_uv 1124 error= False

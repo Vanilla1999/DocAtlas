@@ -1,0 +1,27 @@
+{
+  "tool": "get_docs_context",
+  "request": {
+    "question": "После изменения Markdown-файла агент цитирует старый текст. Как правильно обновить индекс и повторить вопрос?",
+    "project_path": "/tmp/opencode/docatlas-ablation",
+    "scope": "all",
+    "lookup_queries": [
+      "How are edited project documents synchronized?",
+      "What should an agent do after project documentation synchronization?"
+    ]
+  },
+  "seconds": 1.3134503990004305,
+  "is_error": false,
+  "wire": {
+    "_meta": null,
+    "content": [
+      {
+        "type": "text",
+        "text": "{\"status\": \"ok\", \"kind\": \"docs_context\", \"context_status\": \"ready\", \"context_available\": true, \"answer_supported\": false, \"answer_available\": false, \"support_status\": \"retrieval_only\", \"answer_policy\": \"cite_only\", \"coverage_policy\": \"retrieval_attribution_only\", \"query_coverage\": \"partial\", \"retrieval_coverage\": \"partial\", \"facet_coverage\": \"unverified\", \"covered_query_ids\": [\"query-lookup-1\", \"query-lookup-2\"], \"missing_query_ids\": [\"query-original\"], \"missing_facets\": [], \"facets\": [], \"sources\": [{\"evidence_id\": \"ev-94c255a8d2e17ee6\", \"path_or_url\": \"docs/development/python-module-size-policy.md\", \"section\": \"Python module size and responsibility policy > Documentation contract for modules\", \"snippet\": \"Architecturally important modules should have a maintained Markdown contract and be registered in `docatlas.project-docs.yaml`. Use `scope: module` plus `module_path` so DocAtlas can filter module documentation during project retrieval. A module document should state responsibility, public boundary, invariants, neighboring modules, failure policy, and the tests that protect the boundary.\", \"version_binding\": \"unversioned\", \"content_sha256\": \"16640ae35c8014ee3c5657dce7655093a0ab7d5c1d7531a7899b9f32b25ebfa7\", \"project_identity\": \"local:48277f62f8b4ff92ba1c60c082f92a43817f9e1c5ba4ea27e12cd77a76421585\", \"authority\": \"source_of_truth\", \"scope\": \"project\", \"line_start\": 27, \"line_end\": 27, \"source_uri\": \"docatlas://source/b9ad03f82d6ae9c0966f63cd\"}, {\"evidence_id\": \"ev-564efa444a55bf0c\", \"path_or_url\": \"CONTRIBUTING.md\", \"section\": \"Contributing to DocAtlas > Project structure\", \"snippet\": \"```text\\ndocmancer/\\n  agent.py              # DocmancerAgent compatibility facade and component wiring\\n  core/\\n    config.py           # DocmancerConfig (pydantic-settings)\\n    models.py           # Document, Chunk, RetrievedChunk\\n    chunking.py         # Text/markdown chunking\\n  connectors/           # Fetchers, document parsing, and optional retrieval backends\\n  docs/                 # Project/library documentation application and domain services\\n  mcp/                  # Docs MCP and advanced compatibility runtime\\n  cli/\\n    commands.py         # Click commands\\n    __main__.py         # CLI entry point\\ntests/                  # pytest tests (mirror docmancer/ where useful)\\n```\", \"version_binding\": \"unversioned\", \"content_sha256\": \"09524928250331e36c27678e422325eeff8b489e22cb0eb6ae0e4677bc54ac4b\", \"project_identity\": \"local:48277f62f8b4ff92ba1c60c082f92a43817f9e1c5ba4ea27e12cd77a76421585\", \"authority\": \"source_of_truth\", \"scope\": \"project\", \"line_start\": 13, \"line_end\": 27, \"source_uri\": \"docatlas://source/a555049de81549cbea99aba2\"}], \"context_quality\": {\"status\": \"unverified\", \"reasons\": [\"coverage_unverified\", \"budget_limited\"]}, \"read_next\": [], \"edit_ready\": false, \"investigation_allowed\": true, \"estimated_tokens\": 695}",
+        "annotations": null,
+        "_meta": null
+      }
+    ],
+    "structuredContent": null,
+    "isError": false
+  }
+}

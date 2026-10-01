@@ -1,0 +1,21 @@
+{
+  "request": {
+    "libraryName": "starlette",
+    "query": "Когда начинается lifespan teardown относительно connections и background tasks?"
+  },
+  "seconds": 1.92992444599804,
+  "wire": {
+    "_meta": null,
+    "content": [
+      {
+        "type": "text",
+        "text": "Available Libraries:\n\n- Title: Starlette\n- Context7-compatible library ID: /kludex/starlette\n- Description: Starlette is a lightweight ASGI framework and toolkit for building fast async web services in Python with WebSocket support, middleware, and 100% type coverage.\n- Code Snippets: 505\n- Source Reputation: High\n- Benchmark Score: 86.93\n----------\n- Title: Starlette\n- Context7-compatible library ID: /websites/starlette_io\n- Description: Starlette is a lightweight ASGI framework/toolkit for building production-ready async web services in Python with WebSocket support, background tasks, and extensive middleware.\n- Code Snippets: 8\n- Source Reputation: High\n- Benchmark Score: 20.36\n----------\n- Title: Starlette (Deepwiki)\n- Context7-compatible library ID: /websites/deepwiki_encode_starlette\n- Description: Starlette is a lightweight ASGI framework and toolkit for building high-performance asynchronous web services in Python.\n- Code Snippets: 587\n- Source Reputation: High\n- Benchmark Score: 82.6\n----------\n- Title: SSE Starlette\n- Context7-compatible library ID: /sysid/sse-starlette\n- Description: SSE Starlette provides a production-ready, standards-compliant implementation of Server-Sent Events for Starlette and FastAPI, offering features like connection management, graceful shutdown, and multi-loop support.\n- Code Snippets: 202\n- Source Reputation: High\n- Benchmark Score: 91.56\n----------\n- Title: Starlette Context\n- Context7-compatible library ID: /tomwojcik/starlette-context\n- Description: Starlette Context is middleware for Starlette that allows storing and accessing context data throughout a request's lifecycle, enabling automatic inclusion of request headers like correlation IDs in logging.\n- Code Snippets: 184\n- Source Reputation: High\n- Benchmark Score: 96",
+        "annotations": null,
+        "_meta": null
+      }
+    ],
+    "structuredContent": null,
+    "isError": false
+  },
+  "is_error": false
+}

@@ -1,0 +1,23 @@
+{
+  "tool": "get_docs_context",
+  "request": {
+    "question": "Почему estimated_tokens может отличаться от бюджета допуска docs_context?",
+    "project_path": "/tmp/opencode/docatlas-ablation",
+    "scope": "all"
+  },
+  "seconds": 0.7437978849993669,
+  "is_error": false,
+  "wire": {
+    "_meta": null,
+    "content": [
+      {
+        "type": "text",
+        "text": "{\"status\": \"ok\", \"kind\": \"docs_context\", \"context_status\": \"ready\", \"context_available\": true, \"answer_supported\": false, \"answer_available\": false, \"support_status\": \"retrieval_only\", \"answer_policy\": \"cite_only\", \"coverage_policy\": \"retrieval_attribution_only\", \"query_coverage\": \"partial\", \"retrieval_coverage\": \"partial\", \"facet_coverage\": \"unverified\", \"covered_query_ids\": [\"query-anchor-1\", \"query-anchor-2\"], \"missing_query_ids\": [\"query-original\"], \"missing_facets\": [], \"facets\": [], \"sources\": [{\"evidence_id\": \"ev-5b00a0b7e2c7179b\", \"path_or_url\": \"docs/retrieval-boundaries.md\", \"section\": \"Retrieval and admission boundaries > Whole-response token budget\", \"snippet\": \"## Whole-response token budget\\n\\nThe public `estimated_tokens` retains its compatible estimate: the ceiling of\\ncanonical UTF-8 JSON bytes divided by four. Admission of `docs_context` separately\\ntakes the maximum of that estimate and the pinned offline `o200k_base` token count\\nover the entire canonical JSON, including metadata and optional locators, within\\n800 tokens and three sources. Neither number promises the exact count of every\\nclient model.\\nDo not change the public estimate globally to simulate this internal admission\\npolicy. A shorter snippet still must retain a qualified contiguous source span.\", \"version_binding\": \"unversioned\", \"content_sha256\": \"f388aa83cc93af310d26159e25deede3547823424ceda16fb9eb963d2b9cb05d\", \"project_identity\": \"local:48277f62f8b4ff92ba1c60c082f92a43817f9e1c5ba4ea27e12cd77a76421585\", \"line_start\": 21, \"line_end\": 30, \"authority\": \"source_of_truth\", \"scope\": \"module\", \"source_uri\": \"docatlas://source/4182b88b17747c33d97f7105\"}, {\"evidence_id\": \"ev-9ac525f0c65304ac\", \"path_or_url\": \"CONTRIBUTING.md\", \"section\": \"Contributing to DocAtlas > Documentation MCP changes\", \"snippet\": \"The bounded `get_docs_context` result union is `docs_answer`, `docs_context`, `patch_context`, or `insufficient_evidence`. Preserve the conservative boundary: only narrow relation-specific proof may authorize `docs_answer`; broad onboarding, overview, and explanatory questions remain `docs_context`.\", \"version_binding\": \"unversioned\", \"content_sha256\": \"092c0320ace41bf4c9edec38709c1dd2dd3cde4b09524cbfbb6f9845638bff35\", \"project_identity\": \"local:48277f62f8b4ff92ba1c60c082f92a43817f9e1c5ba4ea27e12cd77a76421585\", \"authority\": \"source_of_truth\", \"scope\": \"project\", \"line_start\": 38, \"line_end\": 38, \"source_uri\": \"docatlas://source/5ee69c1aa0b81e30b7edae1b\"}], \"context_quality\": {\"status\": \"unverified\", \"reasons\": [\"coverage_unverified\"]}, \"read_next\": [], \"edit_ready\": false, \"investigation_allowed\": true, \"estimated_tokens\": 640}",
+        "annotations": null,
+        "_meta": null
+      }
+    ],
+    "structuredContent": null,
+    "isError": false
+  }
+}

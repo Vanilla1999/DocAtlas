@@ -1,0 +1,16 @@
+{
+  "evidence_id": "ev-5f69e31889b4d3d4",
+  "uri": "docatlas://source/033b026d58984690612fee1d",
+  "seconds": 0.031127155998547096,
+  "wire": {
+    "_meta": null,
+    "contents": [
+      {
+        "uri": "docatlas://source/033b026d58984690612fee1d",
+        "mimeType": "text/plain",
+        "_meta": null,
+        "text": "{\"content_sha256\":\"sha256:0cf46d66962abf7c0461a57faf5af154ba24757473aef0602a6a27c31484e4e8\",\"continuation\":\"docatlas://source/dcf6a0824ddd0d3bfeca6e89\",\"line_end\":63,\"line_start\":28,\"path\":\"docs/grounded-host-session.md\",\"project_identity\":\"local:48277f62f8b4ff92ba1c60c082f92a43817f9e1c5ba4ea27e12cd77a76421585\",\"snippet\":\"\\nThere are at most two extra actions per question, each admitting at most 600\\ntokens of serialized evidence. Source reads and local recovery share this action\\nceiling. The primary context remains bounded to 800 tokens. These are evidence\\nbudgets, not an estimate of the host's total conversation or reasoning tokens.\\n\\nUse `session.evidence` to obtain retained citation IDs for subsequent judgments.\\nDo not append the entire retained collection to model history after every read;\\ndeliver the primary payload once and only new excerpts after explicit reads.\\n\\n## Failed reads and bounded local recovery\\n\\nA transport failure, changed snapshot or repeated locator leaves previously\\nsupported facts intact. The failed attempt consumes an action. Repeating the\\nsame locator cannot cause another read.\\n\\n`await session.recover(search_local_source)` can execute one advertised\\n`code_search` / `search_local_source` recommendation that requires no confirmation.\\nThe host-owned asynchronous callback receives the unchanged project path and\\nbounded query terms, and must enforce its existing local read permissions.\\nIt returns `{\\\"sources\\\": [{\\\"path_or_url\\\": \\\"relative/path\\\", \\\"snippet\\\": \\\"...\\\"}]}`,\\nwithin 600 serialized tokens. Absolute paths, traversal, empty/duplicate results,\\noversized results and repeat recovery are rejected. Recovery cannot invoke\\npreparation, arbitrary shell commands, editing or network acquisition.\\n\\nThe adapter does not provide a code-search engine or grant file access. A client\\nwithout an authorized local search callback leaves the recommendation as a next\\nstep. Preparation requiring confirmation remains a separate host decision.\\n\\n## Final handoff\\n\\n`finish()` returns the known quotes, their citation IDs, the human-readable\\nmissing facts and an unconsumed next step when available. Its status is:\\n\\n- `host_assessed_complete`: the host supplied a quoted judgment for every fact;\\n- `partial`: at least one fact has a quoted judgment and others remain missing;\",\"status\":\"truncated\"}"
+      }
+    ]
+  }
+}

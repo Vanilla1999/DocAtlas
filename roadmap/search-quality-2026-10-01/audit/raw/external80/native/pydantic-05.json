@@ -1,0 +1,23 @@
+{
+  "tool": "get_docs_context",
+  "request": {
+    "question": "How does AliasGenerator help use different naming conventions when loading and saving?",
+    "project_path": "/tmp/opencode/search-audit-work-20261001/fixtures/pydantic",
+    "scope": "all"
+  },
+  "seconds": 0.2307974059949629,
+  "is_error": false,
+  "wire": {
+    "_meta": null,
+    "content": [
+      {
+        "type": "text",
+        "text": "{\"status\": \"ok\", \"kind\": \"docs_context\", \"context_status\": \"ready\", \"context_available\": true, \"answer_supported\": false, \"answer_available\": false, \"support_status\": \"retrieval_only\", \"answer_policy\": \"cite_only\", \"coverage_policy\": \"retrieval_attribution_only\", \"query_coverage\": \"partial\", \"retrieval_coverage\": \"partial\", \"facet_coverage\": \"unverified\", \"covered_query_ids\": [\"query-anchor-1\"], \"missing_query_ids\": [\"query-original\"], \"missing_facets\": [], \"facets\": [], \"sources\": [{\"evidence_id\": \"ev-ca1ca86b55d144d7\", \"path_or_url\": \"docs/concepts/alias.md\", \"section\": \"Using alias generators > Using an `AliasGenerator`\", \"snippet\": \"### Using an `AliasGenerator`\\n\\n??? api \\\"API Documentation\\\"\\n\\n    [`pydantic.aliases.AliasGenerator`][pydantic.aliases.AliasGenerator]<br>\\n\\n\\n`AliasGenerator` is a class that allows you to specify multiple alias generators for a model.\\nYou can use an `AliasGenerator` to specify different alias generators for validation and serialization.\\n\\nThis is particularly useful if you need to use different naming conventions for loading and saving data,\\nbut you don't want to specify the validation and serialization aliases for each field individually.\\n\\nFor example:\\n\\n```py\\nfrom pydantic import AliasGenerator, BaseModel, ConfigDict\\n\\n\\nclass Tree(BaseModel):\\n    model_config = ConfigDict(\\n        alias_generator=AliasGenerator(\\n            validation_alias=lambda field_name: field_name.upper(),\\n            serialization_alias=lambda field_name: field_name.title(),\\n        )\\n    )\\n\\n    age: int\\n    height: float\\n    kind: str\\n\\n\\nt = Tree.model_validate({'AGE': 12, 'HEIGHT': 1.2, 'KIND': 'oak'})\\nprint(t.model_dump(by_alias=True))\\n#> {'Age': 12, 'Height': 1.2, 'Kind': 'oak'}\\n```\", \"version_binding\": \"unversioned\", \"content_sha256\": \"37ae055ff667b7eca53110676856524708f5226dddf7247155c106065a58f29d\", \"project_identity\": \"local:dee89d9b00c29f8b46038582d3569cd8157162fec6f171d84685bc8b23f83a09\", \"line_start\": 129, \"line_end\": 164, \"authority\": \"source_of_truth\", \"scope\": \"project\", \"source_uri\": \"docatlas://source/e58eafb08d9e75d8f9bef5a4\"}, {\"evidence_id\": \"ev-623985bb7e7c2f60\", \"path_or_url\": \"docs/concepts/alias.md\", \"section\": \"Introduction\", \"snippet\": \"An alias is an alternative name for a field, used when serializing and deserializing data.\", \"version_binding\": \"unversioned\", \"content_sha256\": \"7055b7b5e3c28df2f7e5ed1fea0d237ada5affee4c2bb534c8cceb7b83b6c3ea\", \"project_identity\": \"local:dee89d9b00c29f8b46038582d3569cd8157162fec6f171d84685bc8b23f83a09\", \"line_start\": 1, \"line_end\": 1, \"authority\": \"source_of_truth\", \"scope\": \"project\", \"source_uri\": \"docatlas://source/7c6e969136d11068fc98cdc9\"}], \"context_quality\": {\"status\": \"partial\", \"reasons\": [\"requested_part_missing\"]}, \"read_next\": [], \"edit_ready\": false, \"investigation_allowed\": true, \"estimated_tokens\": 694}",
+        "annotations": null,
+        "_meta": null
+      }
+    ],
+    "structuredContent": null,
+    "isError": false
+  }
+}

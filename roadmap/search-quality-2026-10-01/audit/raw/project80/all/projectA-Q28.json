@@ -1,0 +1,23 @@
+{
+  "tool": "get_docs_context",
+  "request": {
+    "question": "Are source paths and line numbers enough to reopen the exact text that produced a snippet after the file changes?",
+    "project_path": "/tmp/opencode/docatlas-ablation",
+    "scope": "all"
+  },
+  "seconds": 2.1203199130031862,
+  "is_error": false,
+  "wire": {
+    "_meta": null,
+    "content": [
+      {
+        "type": "text",
+        "text": "{\"status\": \"ok\", \"kind\": \"docs_context\", \"context_status\": \"ready\", \"context_available\": true, \"answer_supported\": false, \"answer_available\": false, \"support_status\": \"retrieval_only\", \"answer_policy\": \"cite_only\", \"coverage_policy\": \"retrieval_attribution_only\", \"query_coverage\": \"partial\", \"retrieval_coverage\": \"partial\", \"facet_coverage\": \"unverified\", \"covered_query_ids\": [], \"missing_query_ids\": [\"query-original\"], \"missing_facets\": [], \"facets\": [], \"sources\": [{\"evidence_id\": \"ev-d5b225465a5a3d93\", \"path_or_url\": \"docs/development/python-module-size-policy.md\", \"section\": \"Python module size and responsibility policy > Design target\", \"snippet\": \"Prefer modules in the **200–700 line** range when practical. Split on reasons to change, not on arbitrary line numbers. Good boundaries include domain models, parsing, persistence, transport, orchestration, formatting, and compatibility façades. Avoid `part1.py`, `misc.py`, and `utils2.py` as permanent architecture; implementation shards should have a named responsibility or remain private compatibility shards behind a stable façade.\", \"version_binding\": \"unversioned\", \"content_sha256\": \"304a8c6b6378e7d5bae5339b6d4738a1d0af4e49935ae6b3092c5cd988787ae6\", \"project_identity\": \"local:48277f62f8b4ff92ba1c60c082f92a43817f9e1c5ba4ea27e12cd77a76421585\", \"authority\": \"source_of_truth\", \"scope\": \"project\", \"line_start\": 9, \"line_end\": 9, \"source_uri\": \"docatlas://source/f046fce33ea0df0153c69dac\"}, {\"evidence_id\": \"ev-8ef111732c24e323\", \"path_or_url\": \"wiki/Supported-Sources.md\", \"section\": \"Supported Sources > Docs Source Types\", \"snippet\": \"## Docs Source Types\\n\\nDocAtlas Docs supports exactly five source types: `GitBook sites`, `Mintlify sites`, `Generic web docs`, `GitHub repos`, and `Local files`.\", \"version_binding\": \"unversioned\", \"content_sha256\": \"3cb02b021f0306b1ba4845b87337a202d16ecdf265944a24597ced026fdc64f8\", \"project_identity\": \"local:48277f62f8b4ff92ba1c60c082f92a43817f9e1c5ba4ea27e12cd77a76421585\", \"authority\": \"source_of_truth\", \"scope\": \"project\", \"line_start\": 10, \"line_end\": 12}, {\"evidence_id\": \"ev-e932d60bcde13c17\", \"path_or_url\": \"docs/development/python-module-size-policy.md\", \"section\": \"Python module size and responsibility policy\", \"snippet\": \"`PythonModuleSizePolicy` is the repository guardrail that limits every hand-written Python file to at most 1,000 physical lines and requires responsibility-based splitting before merge.\", \"version_binding\": \"unversioned\", \"content_sha256\": \"2e8ea2fb9d27a6c9c5810b92e2c1b6d9f4446cd41a30f4451972c15f7b1b9814\", \"project_identity\": \"local:48277f62f8b4ff92ba1c60c082f92a43817f9e1c5ba4ea27e12cd77a76421585\", \"line_start\": 3, \"line_end\": 3, \"authority\": \"source_of_truth\", \"scope\": \"project\"}], \"context_quality\": {\"status\": \"unverified\", \"reasons\": [\"coverage_unverified\"]}, \"read_next\": [], \"edit_ready\": false, \"investigation_allowed\": true, \"estimated_tokens\": 701}",
+        "annotations": null,
+        "_meta": null
+      }
+    ],
+    "structuredContent": null,
+    "isError": false
+  }
+}

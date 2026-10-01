@@ -1,0 +1,23 @@
+{
+  "tool": "get_docs_context",
+  "request": {
+    "question": "Will Starlette serve incoming requests before its lifespan handler has run?",
+    "project_path": "/tmp/opencode/search-audit-work-20261001/fixtures/starlette",
+    "scope": "all"
+  },
+  "seconds": 0.22974601600435562,
+  "is_error": false,
+  "wire": {
+    "_meta": null,
+    "content": [
+      {
+        "type": "text",
+        "text": "{\"status\": \"ok\", \"kind\": \"docs_context\", \"context_status\": \"ready\", \"context_available\": true, \"answer_supported\": false, \"answer_available\": false, \"support_status\": \"retrieval_only\", \"answer_policy\": \"cite_only\", \"coverage_policy\": \"retrieval_attribution_only\", \"query_coverage\": \"full\", \"retrieval_coverage\": \"full\", \"facet_coverage\": \"unverified\", \"covered_query_ids\": [\"query-original\"], \"missing_query_ids\": [], \"missing_facets\": [], \"facets\": [], \"sources\": [{\"evidence_id\": \"ev-5378ef6855bc5fc5\", \"path_or_url\": \"docs/lifespan.md\", \"section\": \"Introduction\", \"snippet\": \"Starlette applications can register a lifespan handler for dealing with\\ncode that needs to run before the application starts up, or when the application\\nis shutting down.\\n\\n```python\\nimport contextlib\\n\\nfrom starlette.applications import Starlette\\n\\n\\n@contextlib.asynccontextmanager\\nasync def lifespan(app):\\n    async with some_async_resource():\\n        print(\\\"Run at startup!\\\")\\n        yield\\n        print(\\\"Run on shutdown!\\\")\\n\\n\\nroutes = [\\n    ...\\n]\\n\\napp = Starlette(routes=routes, lifespan=lifespan)\\n```\\n\\nStarlette will not start serving any incoming requests until the lifespan has been run.\\n\\nThe lifespan teardown will run once all connections have been closed, and\\nany in-process background tasks have completed.\\n\\nConsider using [`anyio.create_task_group()`](https://anyio.readthedocs.io/en/stable/tasks.html)\\nfor managing asynchronous tasks.\", \"version_binding\": \"unversioned\", \"content_sha256\": \"34e7e46d04097cf5ffc690e150434cbf24287d5b93eabbca4c9daecde8d6b218\", \"project_identity\": \"local:49e9d0d4675482def440e8469c311fbd21c7134a17c652920e474a9e3b812930\", \"line_start\": 2, \"line_end\": 33, \"authority\": \"source_of_truth\", \"scope\": \"project\", \"source_uri\": \"docatlas://source/5ec5ac1733419d110ddd34c4\"}, {\"evidence_id\": \"ev-930f76fcb36d2872\", \"path_or_url\": \"docs/lifespan.md\", \"section\": \"Lifespan State\", \"snippet\": \"The `state` received on the requests is a **shallow** copy of the state received on the\\nlifespan handler.\", \"version_binding\": \"unversioned\", \"content_sha256\": \"6f998b1ad0eaad435915203176ad769548742abdbd2f78bf7a46f0e3d1a29a5c\", \"project_identity\": \"local:49e9d0d4675482def440e8469c311fbd21c7134a17c652920e474a9e3b812930\", \"line_start\": 73, \"line_end\": 74, \"authority\": \"source_of_truth\", \"scope\": \"project\", \"source_uri\": \"docatlas://source/0abd9dbc836113c38666913b\"}], \"context_quality\": {\"status\": \"unverified\", \"reasons\": [\"coverage_unverified\"]}, \"read_next\": [], \"edit_ready\": false, \"investigation_allowed\": true, \"estimated_tokens\": 622}",
+        "annotations": null,
+        "_meta": null
+      }
+    ],
+    "structuredContent": null,
+    "isError": false
+  }
+}

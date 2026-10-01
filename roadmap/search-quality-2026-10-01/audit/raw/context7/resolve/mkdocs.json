@@ -1,0 +1,21 @@
+{
+  "request": {
+    "libraryName": "mkdocs",
+    "query": "Which page title wins when the navigation configuration and Markdown content define different titles?"
+  },
+  "seconds": 2.191607895998459,
+  "wire": {
+    "_meta": null,
+    "content": [
+      {
+        "type": "text",
+        "text": "Available Libraries:\n\n- Title: MkDocs\n- Context7-compatible library ID: /mkdocs/mkdocs\n- Description: MkDocs is a fast, simple, and gorgeous static site generator for building project documentation with Markdown and a YAML configuration file, extensible with themes and plugins.\n- Code Snippets: 1100\n- Source Reputation: High\n- Benchmark Score: 84.56\n----------\n- Title: MkDocs\n- Context7-compatible library ID: /websites/mkdocs\n- Description: MkDocs is a fast, simple, and gorgeous static site generator geared towards building project documentation from Markdown source files, offering great themes, easy customization, live preview, and static HTML output.\n- Code Snippets: 614\n- Source Reputation: High\n- Benchmark Score: 53.75\n----------\n- Title: MkDocs Macros\n- Context7-compatible library ID: /fralau/mkdocs-macros-plugin\n- Description: MkDocs Macros is a plugin that enables variables, macros, and Jinja2 templating in MkDocs documentation, automating tasks and enhancing markdown pages with dynamic content.\n- Code Snippets: 376\n- Source Reputation: High\n- Benchmark Score: 84\n----------\n- Title: Material for MkDocs\n- Context7-compatible library ID: /squidfunk/mkdocs-material\n- Description: A powerful documentation framework on top of MkDocs that allows you to create professional, searchable, and customizable static sites for your projects.\n- Code Snippets: 2133\n- Source Reputation: Low\n- Benchmark Score: 81.21\n----------\n- Title: Material for MkDocs\n- Context7-compatible library ID: /websites/squidfunk_github_io_mkdocs-material\n- Description: Material for MkDocs is an open-source theme that transforms Markdown documentation into professional, searchable, and customizable static sites, offering features like built-in search, code annotations, and social cards.\n- Code Snippets: 1995\n- Source Reputation: High\n- Benchmark Score: 78.77",
+        "annotations": null,
+        "_meta": null
+      }
+    ],
+    "structuredContent": null,
+    "isError": false
+  },
+  "is_error": false
+}

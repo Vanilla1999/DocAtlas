@@ -1,0 +1,23 @@
+{
+  "tool": "get_docs_context",
+  "request": {
+    "question": "What happens if a deprecated rule is explicitly selected while preview is enabled?",
+    "project_path": "/tmp/opencode/search-audit-work-20261001/fixtures/ruff",
+    "scope": "all"
+  },
+  "seconds": 0.32214494600339094,
+  "is_error": false,
+  "wire": {
+    "_meta": null,
+    "content": [
+      {
+        "type": "text",
+        "text": "{\"status\": \"ok\", \"kind\": \"docs_context\", \"context_status\": \"ready\", \"context_available\": true, \"answer_supported\": false, \"answer_available\": false, \"support_status\": \"retrieval_only\", \"answer_policy\": \"cite_only\", \"coverage_policy\": \"retrieval_attribution_only\", \"query_coverage\": \"full\", \"retrieval_coverage\": \"full\", \"facet_coverage\": \"none\", \"covered_query_ids\": [\"query-original\"], \"missing_query_ids\": [], \"missing_facets\": [], \"facets\": [{\"id\": \"retrieval-need:need-1\", \"requirement_id\": null, \"question\": \"What happens if a deprecated rule is explicitly selected while preview is enabled?\", \"status\": \"retrieval_only\", \"evidence_ids\": [\"ev-8ee9e21ecceea04a\", \"ev-9d008170edd1aa2b\"]}], \"sources\": [{\"evidence_id\": \"ev-8ee9e21ecceea04a\", \"path_or_url\": \"docs/preview.md\", \"section\": \"Preview > Deprecated rules\", \"snippet\": \"## Deprecated rules\\n\\nWhen preview mode is enabled, deprecated rules will be disabled. If a deprecated rule is selected explicitly, an\\nerror will be raised. Deprecated rules will not be included if selected via a rule category or prefix.\", \"version_binding\": \"unversioned\", \"content_sha256\": \"143619d513c7511a31cf14a99564f350cf7b876daddeafdc470d847c6286c3cb\", \"project_identity\": \"local:4e2639e05c3b04e0e17b9c400ffaba505bafec956146f653f20929673ee9776b\", \"authority\": \"source_of_truth\", \"scope\": \"project\", \"line_start\": 184, \"line_end\": 187, \"source_uri\": \"docatlas://source/5b9a6ce68fea6a9ed20bfef1\"}, {\"evidence_id\": \"ev-9d008170edd1aa2b\", \"path_or_url\": \"docs/preview.md\", \"section\": \"Preview > Using rules that are in preview\", \"snippet\": \"## Using rules that are in preview\\n\\nIf a rule is marked as preview, it can only be selected if preview mode is enabled. For example, consider a\\nhypothetical rule, `HYP001`. If `HYP001` were in preview, it would _not_ be enabled by adding it to the selected rule set.\\n\\n=== \\\"pyproject.toml\\\"\\n\\n    ```toml\\n    [tool.ruff.lint]\\n    extend-select = [\\\"HYP001\\\"]\\n    ```\\n\\n=== \\\"ruff.toml\\\"\\n\\n    ```toml\\n    [lint]\\n    extend-select = [\\\"HYP001\\\"]\\n    ```\\n\\n=== \\\"CLI\\\"\", \"version_binding\": \"unversioned\", \"content_sha256\": \"f1231cc1f5c9f9b35776e13f2231e389ed466eaca5c6a40bb324c1b877dde102\", \"project_identity\": \"local:4e2639e05c3b04e0e17b9c400ffaba505bafec956146f653f20929673ee9776b\", \"authority\": \"source_of_truth\", \"scope\": \"project\", \"line_start\": 60, \"line_end\": 79, \"source_uri\": \"docatlas://source/f6a8f72bf39b4d0f14f496ba\"}], \"context_quality\": {\"status\": \"partial\", \"reasons\": [\"requested_part_missing\"]}, \"read_next\": [], \"edit_ready\": false, \"investigation_allowed\": true, \"estimated_tokens\": 624}",
+        "annotations": null,
+        "_meta": null
+      }
+    ],
+    "structuredContent": null,
+    "isError": false
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "tool": "get_docs_context",
+  "request": {
+    "question": "Может ли task function для BackgroundTasks быть обычной def, а не async def?",
+    "project_path": "/tmp/opencode/search-audit-work-20261001/fixtures/fastapi",
+    "scope": "all"
+  },
+  "seconds": 0.26233968599990476,
+  "is_error": false,
+  "wire": {
+    "_meta": null,
+    "content": [
+      {
+        "type": "text",
+        "text": "{\"status\": \"ok\", \"kind\": \"docs_context\", \"context_status\": \"ready\", \"context_available\": true, \"answer_supported\": false, \"answer_available\": false, \"support_status\": \"retrieval_only\", \"answer_policy\": \"cite_only\", \"coverage_policy\": \"retrieval_attribution_only\", \"query_coverage\": \"full\", \"retrieval_coverage\": \"full\", \"facet_coverage\": \"unverified\", \"covered_query_ids\": [\"query-original\", \"query-anchor-1\"], \"missing_query_ids\": [], \"missing_facets\": [], \"facets\": [], \"sources\": [{\"evidence_id\": \"ev-5e0211d1bafcbad0\", \"path_or_url\": \"docs/en/docs/tutorial/background-tasks.md\", \"section\": \"Background Tasks > Dependency Injection\", \"snippet\": \"## Dependency Injection\\n\\nUsing `BackgroundTasks` also works with the dependency injection system, you can declare a parameter of type `BackgroundTasks` at multiple levels: in a *path operation function*, in a dependency (dependable), in a sub-dependency, etc.\\n\\n**FastAPI** knows what to do in each case and how to reuse the same object, so that all the background tasks are merged together and are run in the background afterwards:\", \"version_binding\": \"unversioned\", \"content_sha256\": \"ea1574b9170d33e6c0c831e479e911357c80b29631bfb529aa8cd02af845b275\", \"project_identity\": \"local:1b00d8fdd42cb375d06726b788509794c8b320b1ccfe59b08e6881c10ebd0618\", \"authority\": \"source_of_truth\", \"scope\": \"project\", \"line_start\": 54, \"line_end\": 58, \"source_uri\": \"docatlas://source/f79bc35ca5cd42bf9fdced61\"}, {\"evidence_id\": \"ev-d54cad302c01a4b5\", \"path_or_url\": \"docs/en/docs/tutorial/background-tasks.md\", \"section\": \"Background Tasks\", \"snippet\": \"You can define background tasks to be run *after* returning a response.\", \"version_binding\": \"unversioned\", \"content_sha256\": \"cd0a44992f5d7d6ab5b3c9747c3a743bac5fd49d4a4ebe7d267925f7815bd742\", \"project_identity\": \"local:1b00d8fdd42cb375d06726b788509794c8b320b1ccfe59b08e6881c10ebd0618\", \"line_start\": 3, \"line_end\": 3, \"authority\": \"source_of_truth\", \"scope\": \"project\", \"source_uri\": \"docatlas://source/9c0973dae04aafe689e4caef\"}, {\"evidence_id\": \"ev-4296ea1458f5c867\", \"path_or_url\": \"docs/en/docs/tutorial/background-tasks.md\", \"section\": \"Background Tasks > Create a task function\", \"snippet\": \"It can be an `async def` or normal `def` function, **FastAPI** will know how to handle it correctly.\", \"version_binding\": \"unversioned\", \"content_sha256\": \"e0c006c1fe2cb934a6ae38fd47b7685c3272fa57fd83074c497bb2ebccb6d327\", \"project_identity\": \"local:1b00d8fdd42cb375d06726b788509794c8b320b1ccfe59b08e6881c10ebd0618\", \"line_start\": 30, \"line_end\": 30, \"authority\": \"source_of_truth\", \"scope\": \"project\", \"source_uri\": \"docatlas://source/fb20846c1ce5631b8a4adcbf\"}], \"context_quality\": {\"status\": \"unverified\", \"reasons\": [\"coverage_unverified\"]}, \"read_next\": [], \"edit_ready\": false, \"investigation_allowed\": true, \"estimated_tokens\": 678}",
+        "annotations": null,
+        "_meta": null
+      }
+    ],
+    "structuredContent": null,
+    "isError": false
+  }
+}

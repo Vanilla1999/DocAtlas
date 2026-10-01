@@ -1,0 +1,513 @@
+[
+  {
+    "stable_chunk_id": "child-1890559f21ed4dff7930906b1cc60ff2d489d573",
+    "source_path": "docs/pip/compatibility.md",
+    "display_text": "# Compatibility with `pip` and `pip-tools`\n\nuv is designed as a drop-in replacement for common `pip` and `pip-tools` workflows.\n\nInformally, the intent is such that existing `pip` and `pip-tools` users can switch to uv without\nmaking meaningful changes to their packaging workflows; and, in most cases, swapping out\n`pip install` for `uv pip install` should \"just work\".\n\n",
+    "line_start": 1,
+    "line_end": 8
+  },
+  {
+    "stable_chunk_id": "child-da3fe2226f3a207d3cfe9d3e7dc99223df1f5d29",
+    "source_path": "docs/pip/compatibility.md",
+    "display_text": "However, uv is _not_ intended to be an _exact_ clone of `pip`, and the further you stray from common\n`pip` workflows, the more likely you are to encounter differences in behavior. In some cases, those\ndifferences may be known and intentional; in others, they may be the result of implementation\ndetails; and in others, they may be bugs.\n\n",
+    "line_start": 9,
+    "line_end": 13
+  },
+  {
+    "stable_chunk_id": "child-08542cfd02cb4fd55f7e16968f1bcec45a0c547c",
+    "source_path": "docs/pip/compatibility.md",
+    "display_text": "This document outlines the known differences between uv and `pip`, along with rationale,\nworkarounds, and a statement of intent for compatibility in the future.\n\n",
+    "line_start": 14,
+    "line_end": 16
+  },
+  {
+    "stable_chunk_id": "child-d06c2bf5950794b1a5c6cad41a7641706104914b",
+    "source_path": "docs/pip/compatibility.md",
+    "display_text": "## Configuration files and environment variables\n\nuv does not read configuration files or environment variables that are specific to `pip`, like\n`pip.conf` or `PIP_INDEX_URL`.\n\n",
+    "line_start": 17,
+    "line_end": 21
+  },
+  {
+    "stable_chunk_id": "child-38321e589a1380a7bc176869f31ba4090bdd2ba6",
+    "source_path": "docs/pip/compatibility.md",
+    "display_text": "Reading configuration files and environment variables intended for other tools has a number of\ndrawbacks:\n\n1. It requires bug-for-bug compatibility with the target tool, since users end up relying on bugs in\n   the format, the parser, etc.\n2. If the target tool _changes_ the format in some way, uv is then locked-in to changing it in\n   equivalent ways.\n3. If that configuration is versioned in some way, uv would need to know _which version_ of the\n   target tool the user is expecting to use.\n4. It prevents uv from introducing any settings or configuration that don't exist in the target\n   tool, since otherwise `pip.conf` (or similar) would no longer be usable with `pip`.\n5. It can lead to user confusion, since uv would be reading settings that don't actually affect its\n   behavior, and many users may _not_ expect uv to read configuration files intended for other\n   tools.\n\n",
+    "line_start": 22,
+    "line_end": 36
+  },
+  {
+    "stable_chunk_id": "child-0422adb6830cbc8f2e46707432f0a696856826cb",
+    "source_path": "docs/pip/compatibility.md",
+    "display_text": "Instead, uv supports its own environment variables, like `UV_INDEX_URL`. uv also supports persistent\nconfiguration in a `uv.toml` file or a `[tool.uv.pip]` section of `pyproject.toml`. For more\ninformation, see [Configuration files](../configuration/files.md).\n\n",
+    "line_start": 37,
+    "line_end": 40
+  },
+  {
+    "stable_chunk_id": "child-e1c90f0bf0955601850c5e651c8d3edb66329168",
+    "source_path": "docs/pip/compatibility.md",
+    "display_text": "## Pre-release compatibility\n\nBy default, uv will accept pre-release versions during dependency resolution in two cases:\n\n1. If the package is a direct dependency, and its version markers include a pre-release specifier\n   (e.g., `flask>=2.0.0rc1`).\n1. If _all_ published versions of a package are pre-releases.\n\n",
+    "line_start": 41,
+    "line_end": 48
+  },
+  {
+    "stable_chunk_id": "child-d9ecaf4bae01b0c6a74f0342daf853eee6f6c431",
+    "source_path": "docs/pip/compatibility.md",
+    "display_text": "If dependency resolution fails due to a transitive pre-release, uv will prompt the user to re-run\nwith `--prerelease allow`, to allow pre-releases for all dependencies.\n\nAlternatively, you can add the transitive dependency to your `requirements.in` file with pre-release\nspecifier (e.g., `flask>=2.0.0rc1`) to opt in to pre-release support for that specific dependency.\n\n",
+    "line_start": 49,
+    "line_end": 54
+  },
+  {
+    "stable_chunk_id": "child-a94e2b7e779a711cf55ec053f07f56d1a81ec5c3",
+    "source_path": "docs/pip/compatibility.md",
+    "display_text": "In sum, uv needs to know upfront whether the resolver should accept pre-releases for a given\npackage. `pip`, meanwhile, _may_ respect pre-release identifiers in transitive dependencies\ndepending on the order in which the resolver encounters the relevant specifiers\n([#1641](https://github.com/astral-sh/uv/issues/1641#issuecomment-1981402429)).\n\n",
+    "line_start": 55,
+    "line_end": 59
+  },
+  {
+    "stable_chunk_id": "child-036c9fa7088575fda000ac40176f40d99d59198e",
+    "source_path": "docs/pip/compatibility.md",
+    "display_text": "Pre-releases are\n[notoriously difficult](https://pubgrub-rs-guide.netlify.app/limitations/prerelease_versions) to\nmodel, and are a frequent source of bugs in packaging tools. Even `pip`, which is viewed as a\nreference implementation, has a number of open questions around pre-release handling\n([#12469](https://github.com/pypa/pip/issues/12469),\n[#12470](https://github.com/pypa/pip/issues/12470),\n[#40505](https://discuss.python.org/t/handling-of-pre-releases-when-backtracking/40505/20), etc.).\nuv's pre-release handling is _intentionally_ limited and _intentionally_ requires user opt-in for\npre-releases, to ensure correctness.\n\n",
+    "line_start": 60,
+    "line_end": 69
+  },
+  {
+    "stable_chunk_id": "child-93309002617c75db8429465eb5cf3fa4d7edb4f3",
+    "source_path": "docs/pip/compatibility.md",
+    "display_text": "In the future, uv _may_ support pre-release identifiers in transitive dependencies. However, it's\nlikely contingent on evolution in the Python packaging specifications. The existing PEPs\n[do not cover \"dependency resolution\"](https://discuss.python.org/t/handling-of-pre-releases-when-backtracking/40505/17)\nand are instead focused on behavior for a _single_ version specifier. As such, there are unresolved\nquestions around the correct and intended behavior for pre-releases in the packaging ecosystem more\nbroadly.\n\n",
+    "line_start": 70,
+    "line_end": 76
+  },
+  {
+    "stable_chunk_id": "child-5de7cd19d18e0789bfe2af8054e0153a8c0134f5",
+    "source_path": "docs/pip/compatibility.md",
+    "display_text": "## Local version identifiers\n\nuv does not implement spec-compliant handling of local version identifiers (e.g., `1.2.3+local`).\nThis is considered a known limitation. Although local version identifiers are rare in published\npackages (and, e.g., disallowed on PyPI), they're common in the PyTorch ecosystem, and uv's approach\nto local versions _does_ support typical PyTorch workflows to succeed out-of-the-box.\n\n",
+    "line_start": 77,
+    "line_end": 83
+  },
+  {
+    "stable_chunk_id": "child-960a9220005011aa723c59bf57055754c698110f",
+    "source_path": "docs/pip/compatibility.md",
+    "display_text": "[PEP 440](https://peps.python.org/pep-0440/#version-specifiers) specifies that the local version\nsegment should typically be ignored when evaluating version specifiers, with a few exceptions. For\nexample, `foo==1.2.3` should accept `1.2.3+local`, but `foo==1.2.3+local` should _not_ accept\n`1.2.3`. These asymmetries are hard to model in a resolution algorithm. As such, uv treats `1.2.3`\nand `1.2.3+local` as entirely separate versions, but respects local versions provided as direct\ndependencies throughout the resolution, such that if you provide `foo==1.2.3+local` as a direct\ndependency, `1.2.3+local` _will_ be accepted for any transitive dependencies that request\n`foo==1.2.3`.\n\n",
+    "line_start": 84,
+    "line_end": 92
+  },
+  {
+    "stable_chunk_id": "child-7ee10125b84e3bb4390ce68ef58add45848a45d4",
+    "source_path": "docs/pip/compatibility.md",
+    "display_text": "To take an example from the PyTorch ecosystem, it's common to specify `torch==2.0.0+cu118` and\n`torchvision==0.15.1+cu118` as direct dependencies. `torchvision @ 0.15.1+cu118` declares a\ndependency on `torch==2.0.0`. In this case, uv would recognize that `torch==2.0.0+cu118` satisfies\nthe specifier, since it was provided as a direct dependency.\n\n",
+    "line_start": 93,
+    "line_end": 97
+  },
+  {
+    "stable_chunk_id": "child-23fd668363e40e7d77eb7e0100e7346f6639e2d1",
+    "source_path": "docs/pip/compatibility.md",
+    "display_text": "As compared to pip, the main differences in observed behavior are as follows:\n\n- In general, local versions must be provided as direct dependencies. Resolution may succeed for\n  transitive dependencies that request a non-local version, but this is not guaranteed.\n- If _only_ local versions exist for a package `foo` at a given version (e.g., `1.2.3+local` exists,\n  but `1.2.3` does not), `uv pip install foo==1.2.3` will fail, while `pip install foo==1.2.3` will\n  resolve to an arbitrary local version.\n\n",
+    "line_start": 98,
+    "line_end": 105
+  },
+  {
+    "stable_chunk_id": "child-d1d544d5188f34138bbc27ecb5d0148964c6095f",
+    "source_path": "docs/pip/compatibility.md",
+    "display_text": "## Packages that exist on multiple indexes\n\nIn both uv and `pip`, users can specify multiple package indexes from which to search for the\navailable versions of a given package. However, uv and `pip` differ in how they handle packages that\nexist on multiple indexes.\n\n",
+    "line_start": 106,
+    "line_end": 111
+  },
+  {
+    "stable_chunk_id": "child-f710decdd0d4e97e37cf698b7b3ac6701cdbf59b",
+    "source_path": "docs/pip/compatibility.md",
+    "display_text": "For example, imagine that a company publishes an internal version of `requests` on a private index\n(`--extra-index-url`), but also allows installing packages from PyPI by default. In this case, the\nprivate `requests` would conflict with the public [`requests`](https://pypi.org/project/requests/)\non PyPI.\n\n",
+    "line_start": 112,
+    "line_end": 116
+  },
+  {
+    "stable_chunk_id": "child-222112ac115f900ab15ab4f3247b2a8337f5a5fc",
+    "source_path": "docs/pip/compatibility.md",
+    "display_text": "When uv searches for a package across multiple indexes, it will iterate over the indexes in order\n(preferring the `--extra-index-url` over the default index), and stop searching as soon as it finds\na match. This means that if a package exists on multiple indexes, uv will limit its candidate\nversions to those present in the first index that contains the package.\n\n",
+    "line_start": 117,
+    "line_end": 121
+  },
+  {
+    "stable_chunk_id": "child-4e7e31c284459e4aea330755c88720f42a7fc289",
+    "source_path": "docs/pip/compatibility.md",
+    "display_text": "`pip`, meanwhile, will combine the candidate versions from all indexes, and select the best version\nfrom the combined set, though it makes\n[no guarantees around the order](https://github.com/pypa/pip/issues/5045#issuecomment-369521345) in\nwhich it searches indexes, and expects that packages are unique up to name and version, even across\nindexes.\n\n",
+    "line_start": 122,
+    "line_end": 127
+  },
+  {
+    "stable_chunk_id": "child-069622a9400bb010c7ba47e580a087f44f248515",
+    "source_path": "docs/pip/compatibility.md",
+    "display_text": "uv's behavior is such that if a package exists on an internal index, it should always be installed\nfrom the internal index, and never from PyPI. The intent is to prevent \"dependency confusion\"\nattacks, in which an attacker publishes a malicious package on PyPI with the same name as an\ninternal package, thus causing the malicious package to be installed instead of the internal\npackage. See, for example,\n[the `torchtriton` attack](https://pytorch.org/blog/compromised-nightly-dependency/) from\nDecember 2022.\n\n",
+    "line_start": 128,
+    "line_end": 135
+  },
+  {
+    "stable_chunk_id": "child-5dd33a864f93f5b1cef7b1bdc8d09e7759f07002",
+    "source_path": "docs/pip/compatibility.md",
+    "display_text": "As of v0.1.39, users can opt in to `pip`-style behavior for multiple indexes via the\n`--index-strategy` command-line option, or the `UV_INDEX_STRATEGY` environment variable, which\nsupports the following values:\n\n- `first-match` (default): Search for each package across all indexes, limiting the candidate\n  versions to those present in the first index that contains the package, prioritizing the\n  `--extra-index-url` indexes over the default index URL.\n- `unsafe-first-match`: Search for each package across all indexes, but prefer the first index with\n  a compatible version, even if newer versions are available on other indexes.\n- `unsafe-best-match`: Search for each package across all indexes, and select the best version from\n  the combined set of candidate versions.\n\n",
+    "line_start": 136,
+    "line_end": 147
+  },
+  {
+    "stable_chunk_id": "child-a608ffed306d22ff7726a4d5b24447ded77318fc",
+    "source_path": "docs/pip/compatibility.md",
+    "display_text": "While `unsafe-best-match` is the closest to `pip`'s behavior, it exposes users to the risk of\n\"dependency confusion\" attacks.\n\n",
+    "line_start": 148,
+    "line_end": 150
+  },
+  {
+    "stable_chunk_id": "child-23154a67bdc059dcd04ed9a6df36dcf9e0e3190a",
+    "source_path": "docs/pip/compatibility.md",
+    "display_text": "In the future, uv will support pinning packages to dedicated indexes (see:\n[#171](https://github.com/astral-sh/uv/issues/171)). Additionally,\n[PEP 708](https://peps.python.org/pep-0708/) is a provisional standard that aims to address the\n\"dependency confusion\" issue across package registries and installers.\n\n",
+    "line_start": 151,
+    "line_end": 155
+  },
+  {
+    "stable_chunk_id": "child-28529ecd0407295219f01a844ef7eb56acc3ce9b",
+    "source_path": "docs/pip/compatibility.md",
+    "display_text": "## PEP 517 build isolation\n\nuv uses [PEP 517](https://peps.python.org/pep-0517/) build isolation by default (akin to\n`pip install --use-pep517`), following `pypa/build` and in anticipation of `pip` defaulting to PEP\n517 builds in the future ([pypa/pip#9175](https://github.com/pypa/pip/issues/9175)).\n\n",
+    "line_start": 156,
+    "line_end": 161
+  },
+  {
+    "stable_chunk_id": "child-d6244ca300c86b36936e42ddb2f0230457d2ca05",
+    "source_path": "docs/pip/compatibility.md",
+    "display_text": "If a package fails to install due to a missing build-time dependency, try using a newer version of\nthe package; if the problem persists, consider filing an issue with the package maintainer,\nrequesting that they update the packaging setup to declare the correct PEP 517 build-time\ndependencies.\n\nAs an escape hatch, you can preinstall a package's build dependencies, then run `uv pip install`\nwith `--no-build-isolation`, as in:\n\n",
+    "line_start": 162,
+    "line_end": 169
+  },
+  {
+    "stable_chunk_id": "child-5f240c90cb4076d0239d7cb3dc4fb65b06489ae2",
+    "source_path": "docs/pip/compatibility.md",
+    "display_text": "```shell\nuv pip install wheel && uv pip install --no-build-isolation biopython==1.77\n```\n\nFor a list of packages that are known to fail under PEP 517 build isolation, see\n[#2252](https://github.com/astral-sh/uv/issues/2252).\n\n",
+    "line_start": 170,
+    "line_end": 176
+  },
+  {
+    "stable_chunk_id": "child-06dba3a66ce93798ce1179fcdfa5e97fbefa4bdc",
+    "source_path": "docs/pip/compatibility.md",
+    "display_text": "## Transitive direct URL dependencies for constraints and overrides\n\nWhile uv does support URL dependencies (e.g., `black @ https://...`), it does not support\n_transitive_ (i.e., \"nested\") direct URL dependencies for constraints and overrides.\n\n",
+    "line_start": 177,
+    "line_end": 181
+  },
+  {
+    "stable_chunk_id": "child-55bf84e04c2697245fe6bdd18d9f188c2684a983",
+    "source_path": "docs/pip/compatibility.md",
+    "display_text": "Specifically, if a constraint or override is defined using a direct URL dependency, and the\nconstrained package has a direct URL dependency of its own, uv _may_ reject that transitive direct\nURL dependency during resolution.\n\n",
+    "line_start": 182,
+    "line_end": 185
+  },
+  {
+    "stable_chunk_id": "child-52cd3384ae2ee7989146941383347fe1102727e3",
+    "source_path": "docs/pip/compatibility.md",
+    "display_text": "uv also makes the assumption that non-URL dependencies won't introduce URL dependencies (i.e., that\ndependencies fetched from a registry will not themselves have direct URL dependencies). If a non-URL\ndependency _does_ introduce a URL dependency, uv will reject the URL dependency during resolution.\n\n",
+    "line_start": 186,
+    "line_end": 189
+  },
+  {
+    "stable_chunk_id": "child-a1046f241fbe2b8b790a7daaa3552e619c1d269e",
+    "source_path": "docs/pip/compatibility.md",
+    "display_text": "If uv rejects a transitive URL dependency in either case, the best course of action is to provide\nthe URL dependency as a direct dependency in the `requirements.in` file, rather than as a\nconstraint, override, or transitive dependency.\n\n",
+    "line_start": 190,
+    "line_end": 193
+  },
+  {
+    "stable_chunk_id": "child-9fdb776eb9dd3b5dc746b60c3c8b410442cf8db8",
+    "source_path": "docs/pip/compatibility.md",
+    "display_text": "## Virtual environments by default\n\n`uv pip install` and `uv pip sync` are designed to work with virtual environments by default.\n\nSpecifically, uv will always install packages into the currently active virtual environment, or\nsearch for a virtual environment named `.venv` in the current directory or any parent directory\n(even if it is not activated).\n\n",
+    "line_start": 194,
+    "line_end": 201
+  },
+  {
+    "stable_chunk_id": "child-f84d906f1a71f29ddd1fc79bd1d38f8740b040a6",
+    "source_path": "docs/pip/compatibility.md",
+    "display_text": "This differs from `pip`, which will install packages into a global environment if no virtual\nenvironment is active, and will not search for inactive virtual environments.\n\nIn uv, you can install into non-virtual environments by providing a path to a Python executable via\nthe `--python /path/to/python` option, or via the `--system` flag, which installs into the first\nPython interpreter found on the `PATH`, like `pip`.\n\n",
+    "line_start": 202,
+    "line_end": 208
+  },
+  {
+    "stable_chunk_id": "child-3adb2eed3b2a930a4d166cdb894615e0a18a5b97",
+    "source_path": "docs/pip/compatibility.md",
+    "display_text": "In other words, uv inverts the default, requiring explicit opt-in to installing into the system\nPython, which can lead to breakages and other complications, and should only be done in limited\ncircumstances.\n\nFor more, see\n[\"Using arbitrary Python environments\"](./environments.md#using-arbitrary-python-environments).\n\n",
+    "line_start": 209,
+    "line_end": 215
+  },
+  {
+    "stable_chunk_id": "child-af8bf6724b2500916f1971c374012f51974c5844",
+    "source_path": "docs/pip/compatibility.md",
+    "display_text": "## Resolution strategy\n\nFor a given set of dependency specifiers, it's often the case that there is no single \"correct\" set\nof packages to install. Instead, there are many valid sets of packages that satisfy the specifiers.\n\n",
+    "line_start": 216,
+    "line_end": 220
+  },
+  {
+    "stable_chunk_id": "child-3782bb96228152b6e819993767bdeea65c33ff92",
+    "source_path": "docs/pip/compatibility.md",
+    "display_text": "Neither `pip` nor uv make any guarantees about the _exact_ set of packages that will be installed;\nonly that the resolution will be consistent, deterministic, and compliant with the specifiers. As\nsuch, in some cases, `pip` and uv will yield different resolutions; however, both resolutions\n_should_ be equally valid.\n\nFor example, consider:\n\n```python title=\"requirements.in\"\nstarlette\nfastapi\n```\n\n",
+    "line_start": 221,
+    "line_end": 232
+  },
+  {
+    "stable_chunk_id": "child-cb0a56d6ab7bb3639005beab756949eb86e8394a",
+    "source_path": "docs/pip/compatibility.md",
+    "display_text": "At time of writing, the most recent `starlette` version is `0.37.2`, and the most recent `fastapi`\nversion is `0.110.0`. However, `fastapi==0.110.0` also depends on `starlette`, and introduces an\nupper bound: `starlette>=0.36.3,<0.37.0`.\n\n",
+    "line_start": 233,
+    "line_end": 236
+  },
+  {
+    "stable_chunk_id": "child-860e48ad1fba797a917af289d4dfd694f26f9646",
+    "source_path": "docs/pip/compatibility.md",
+    "display_text": "If a resolver prioritizes including the most recent version of `starlette`, it would need to use an\nolder version of `fastapi` that excludes the upper bound on `starlette`. In practice, this requires\nfalling back to `fastapi==0.1.17`:\n\n",
+    "line_start": 237,
+    "line_end": 240
+  },
+  {
+    "stable_chunk_id": "child-285190571cac77abefcbe087bb8c716090b736e2",
+    "source_path": "docs/pip/compatibility.md",
+    "display_text": "```python title=\"requirements.txt\"\n# This file was autogenerated by uv via the following command:\n#    uv pip compile requirements.in\nannotated-types==0.6.0\n    # via pydantic\nanyio==4.3.0\n    # via starlette\nfastapi==0.1.17\nidna==3.6\n    # via anyio\npydantic==2.6.3\n    # via fastapi\npydantic-core==2.16.3\n    # via pydantic\nsniffio==1.3.1\n    # via anyio\nstarlette==0.37.2\n    # via fastapi\ntyping-extensions==4.10.0\n    # via\n    #   pydantic\n    #   pydantic-core\n```\n\n",
+    "line_start": 241,
+    "line_end": 264
+  },
+  {
+    "stable_chunk_id": "child-606883061ace749b6e291ae560e257603c945f82",
+    "source_path": "docs/pip/compatibility.md",
+    "display_text": "Alternatively, if a resolver prioritizes including the most recent version of `fastapi`, it would\nneed to use an older version of `starlette` that satisfies the upper bound. In practice, this\nrequires falling back to `starlette==0.36.3`:\n\n",
+    "line_start": 265,
+    "line_end": 268
+  },
+  {
+    "stable_chunk_id": "child-e5c2ff7efb9141667f1f8825d5d554faf9ba1613",
+    "source_path": "docs/pip/compatibility.md",
+    "display_text": "```python title=\"requirements.txt\"\n# This file was autogenerated by uv via the following command:\n#    uv pip compile requirements.in\nannotated-types==0.6.0\n    # via pydantic\nanyio==4.3.0\n    # via starlette\nfastapi==0.110.0\nidna==3.6\n    # via anyio\npydantic==2.6.3\n    # via fastapi\npydantic-core==2.16.3\n    # via pydantic\nsniffio==1.3.1\n    # via anyio\nstarlette==0.36.3\n    # via fastapi\ntyping-extensions==4.10.0\n    # via\n    #   fastapi\n    #   pydantic\n    #   pydantic-core\n```\n\n",
+    "line_start": 269,
+    "line_end": 293
+  },
+  {
+    "stable_chunk_id": "child-64bdc1b3af2a505e3dc6d9425b786005c5efb3a2",
+    "source_path": "docs/pip/compatibility.md",
+    "display_text": "When uv resolutions differ from `pip` in undesirable ways, it's often a sign that the specifiers are\ntoo loose, and that the user should consider tightening them. For example, in the case of\n`starlette` and `fastapi`, the user could require `fastapi>=0.110.0`.\n\n",
+    "line_start": 294,
+    "line_end": 297
+  },
+  {
+    "stable_chunk_id": "child-5cff7252d45381cfd211d1783f365b53be43f61f",
+    "source_path": "docs/pip/compatibility.md",
+    "display_text": "## `pip check`\n\n",
+    "line_start": 298,
+    "line_end": 299
+  },
+  {
+    "stable_chunk_id": "child-0dba53a4a7f3ca83b82b8acfbfb8d10f083c0733",
+    "source_path": "docs/pip/compatibility.md",
+    "display_text": "At present, `uv pip check` will surface the following diagnostics:\n\n- A package has no `METADATA` file, or the `METADATA` file can't be parsed.\n- A package has a `Requires-Python` that doesn't match the Python version of the running\n  interpreter.\n- A package has a dependency on a package that isn't installed.\n- A package has a dependency on a package that's installed, but at an incompatible version.\n- Multiple versions of a package are installed in the virtual environment.\n\n",
+    "line_start": 300,
+    "line_end": 308
+  },
+  {
+    "stable_chunk_id": "child-605f21b9f4e6105f1a596fb58d610544e4d1c048",
+    "source_path": "docs/pip/compatibility.md",
+    "display_text": "In some cases, `uv pip check` will surface diagnostics that `pip check` does not, and vice versa.\nFor example, unlike `uv pip check`, `pip check` will _not_ warn when multiple versions of a package\nare installed in the current environment.\n\n",
+    "line_start": 309,
+    "line_end": 312
+  },
+  {
+    "stable_chunk_id": "child-26b34b87169f6ea374f87068066ac28a8732aa74",
+    "source_path": "docs/pip/compatibility.md",
+    "display_text": "## `--user` and the `user` install scheme\n\nuv does not support the `--user` flag, which installs packages based on the `user` install scheme.\nInstead, we recommend the use of virtual environments to isolate package installations.\n\n",
+    "line_start": 313,
+    "line_end": 317
+  },
+  {
+    "stable_chunk_id": "child-bdf1516b51d4f46ad9b529c7bb6db75b25df3667",
+    "source_path": "docs/pip/compatibility.md",
+    "display_text": "Additionally, pip will fall back to the `user` install scheme if it detects that the user does not\nhave write permissions to the target directory, as is the case on some systems when installing into\nthe system Python. uv does not implement any such fallback.\n\nFor more, see [#2077](https://github.com/astral-sh/uv/issues/2077).\n\n",
+    "line_start": 318,
+    "line_end": 323
+  },
+  {
+    "stable_chunk_id": "child-29223e3055375dc532bad3d305a440b8339d0935",
+    "source_path": "docs/pip/compatibility.md",
+    "display_text": "## `--only-binary` enforcement\n\nThe `--only-binary` argument is used to restrict installation to pre-built binary distributions.\nWhen `--only-binary :all:` is provided, both pip and uv will refuse to build source distributions\nfrom PyPI and other registries.\n\n",
+    "line_start": 324,
+    "line_end": 329
+  },
+  {
+    "stable_chunk_id": "child-0a6a6bfcf9c237eca36baeb32e87fadb01a1e91c",
+    "source_path": "docs/pip/compatibility.md",
+    "display_text": "However, when a dependency is provided as a direct URL (e.g., `uv pip install https://...`), pip\ndoes _not_ enforce `--only-binary`, and will build source distributions for all such packages.\n\n",
+    "line_start": 330,
+    "line_end": 332
+  },
+  {
+    "stable_chunk_id": "child-7d83bb98bcad0896becadd311856cec42c31b26a",
+    "source_path": "docs/pip/compatibility.md",
+    "display_text": "uv, meanwhile, _does_ enforce `--only-binary` for direct URL dependencies, with one exception: given\n`uv pip install https://... --only-binary flask`, uv _will_ build the source distribution at the\ngiven URL if it cannot infer the package name ahead of time, since uv can't determine whether the\npackage is \"allowed\" in such cases without building its metadata.\n\n",
+    "line_start": 333,
+    "line_end": 337
+  },
+  {
+    "stable_chunk_id": "child-4767ddd42d1eac61d549ef958070c501d37ac813",
+    "source_path": "docs/pip/compatibility.md",
+    "display_text": "Both pip and uv allow editables requirements to be built and installed even when `--only-binary` is\nprovided. For example, `uv pip install -e . --only-binary :all:` is allowed.\n\n",
+    "line_start": 338,
+    "line_end": 340
+  },
+  {
+    "stable_chunk_id": "child-ce0dcbf5322085cc2215b465d86ea1ed69fdc903",
+    "source_path": "docs/pip/compatibility.md",
+    "display_text": "## `--no-binary` enforcement\n\nThe `--no-binary` argument is used to restrict installation to source distributions. When\n`--no-binary` is provided, uv will refuse to install pre-built binary distributions, but _will_\nreuse any binary distributions that are already present in the local cache.\n\nAdditionally, and in contrast to pip, uv's resolver will still read metadata from pre-built binary\ndistributions when `--no-binary` is provided.\n\n",
+    "line_start": 341,
+    "line_end": 349
+  },
+  {
+    "stable_chunk_id": "child-31f383e1e60e477bb5c4231259f52d661473884e",
+    "source_path": "docs/pip/compatibility.md",
+    "display_text": "## `manylinux_compatible` enforcement\n\n[PEP 600](https://peps.python.org/pep-0600/#package-installers) describes a mechanism through which\nPython distributors can opt out of `manylinux` compatibility by defining a `manylinux_compatible`\nfunction on the `_manylinux` standard library module.\n\n",
+    "line_start": 350,
+    "line_end": 355
+  },
+  {
+    "stable_chunk_id": "child-56143c7e40301946092e49e36022a0df12ff63c0",
+    "source_path": "docs/pip/compatibility.md",
+    "display_text": "uv respects `manylinux_compatible`, but only tests against the current glibc version, and applies\nthe return value of `manylinux_compatible` globally.\n\nIn other words, if `manylinux_compatible` returns `True`, uv will treat the system as\n`manylinux`-compatible; if it returns `False`, uv will treat the system as `manylinux`-incompatible,\nwithout calling `manylinux_compatible` for every glibc version.\n\n",
+    "line_start": 356,
+    "line_end": 362
+  },
+  {
+    "stable_chunk_id": "child-d487ff1692bf0735eb1f33f1a4999b61ff12f885",
+    "source_path": "docs/pip/compatibility.md",
+    "display_text": "This approach is not a complete implementation of the spec, but is compatible with common blanket\n`manylinux_compatible` implementations like\n[`no-manylinux`](https://pypi.org/project/no-manylinux/):\n\n```python\nfrom __future__ import annotations\nmanylinux1_compatible = False\nmanylinux2010_compatible = False\nmanylinux2014_compatible = False\n\n\ndef manylinux_compatible(*_, **__):  # PEP 600\n    return False\n```\n\n",
+    "line_start": 363,
+    "line_end": 377
+  },
+  {
+    "stable_chunk_id": "child-fcdd67b837dd08f168d38a0e869ae1a6e1df177b",
+    "source_path": "docs/pip/compatibility.md",
+    "display_text": "## Bytecode compilation\n\nUnlike pip, uv does not compile `.py` files to `.pyc` files during installation by default (i.e., uv\ndoes not create or populate `__pycache__` directories). To enable bytecode compilation during\ninstalls, pass the `--compile-bytecode` flag to `uv pip install` or `uv pip sync`.\n\n",
+    "line_start": 378,
+    "line_end": 383
+  },
+  {
+    "stable_chunk_id": "child-3cc82f5f2b2d0b7110ee4bf5794df22fcc7fe6c7",
+    "source_path": "docs/pip/compatibility.md",
+    "display_text": "## Strictness and spec enforcement\n\nuv tends to be stricter than `pip`, and will often reject packages that `pip` would install. For\nexample, uv omits packages with invalid version specifiers in its metadata, which `pip` similarly\nplans to exclude in a [future release](https://github.com/pypa/pip/issues/12063).\n\n",
+    "line_start": 384,
+    "line_end": 389
+  },
+  {
+    "stable_chunk_id": "child-052e5dff4047cfe06363ff255c4f75e8353502a8",
+    "source_path": "docs/pip/compatibility.md",
+    "display_text": "In some cases, uv implements lenient behavior for popular packages that are known to have specific\nspec compliance issues.\n\nIf uv rejects a package that `pip` would install due to a spec violation, the best course of action\nis to first attempt to install a newer version of the package; and, if that fails, to report the\nissue to the package maintainer.\n\n",
+    "line_start": 390,
+    "line_end": 396
+  },
+  {
+    "stable_chunk_id": "child-640ee9bbf011490b1994e263abacc0b9fc9fb2f7",
+    "source_path": "docs/pip/compatibility.md",
+    "display_text": "## `pip` command-line options and subcommands\n\nuv does not support the complete set of `pip`'s command-line options and subcommands, although it\ndoes support a large subset.\n\n",
+    "line_start": 397,
+    "line_end": 401
+  },
+  {
+    "stable_chunk_id": "child-bf46df58925f9c079a58abaf3c833c574a4784dc",
+    "source_path": "docs/pip/compatibility.md",
+    "display_text": "Missing options and subcommands are prioritized based on user demand and the complexity of the\nimplementation, and tend to be tracked in individual issues. For example:\n\n- [`--trusted-host`](https://github.com/astral-sh/uv/issues/1339)\n- [`--user`](https://github.com/astral-sh/uv/issues/2077)\n\n",
+    "line_start": 402,
+    "line_end": 407
+  },
+  {
+    "stable_chunk_id": "child-f56797b44aa58ae0f3a79c99991d4ac456e9f8c4",
+    "source_path": "docs/pip/compatibility.md",
+    "display_text": "If you encounter a missing option or subcommand, please search the issue tracker to see if it has\nalready been reported, and if not, consider opening a new issue. Feel free to upvote any existing\nissues to convey your interest.\n\n",
+    "line_start": 408,
+    "line_end": 411
+  },
+  {
+    "stable_chunk_id": "child-184766b5193f2344a6dca5d4c58feab6f1327458",
+    "source_path": "docs/pip/compatibility.md",
+    "display_text": "## Registry authentication\n\nuv does not support `pip`'s `auto` or `import` options for `--keyring-provider`. At present, only\nthe `subprocess` option is supported.\n\nUnlike `pip`, uv does not enable keyring authentication by default.\n\nUnlike `pip`, uv does not wait until a request returns a HTTP 401 before searching for\nauthentication. uv attaches authentication to all requests for hosts with credentials available.\n\n",
+    "line_start": 412,
+    "line_end": 421
+  },
+  {
+    "stable_chunk_id": "child-c405d766d75ea11cf455690800e97bd74cff1930",
+    "source_path": "docs/pip/compatibility.md",
+    "display_text": "## `egg` support\n\nuv does not support features that are considered legacy or deprecated in `pip`. For example, uv does\nnot support `.egg`-style distributions.\n\nHowever, uv does have partial support for (1) `.egg-info`-style distributions (which are\noccasionally found in Docker images and Conda environments) and (2) legacy editable\n`.egg-link`-style distributions.\n\n",
+    "line_start": 422,
+    "line_end": 430
+  },
+  {
+    "stable_chunk_id": "child-6428e7297e46be3bcdffdce9f7d3a1feb83dd26e",
+    "source_path": "docs/pip/compatibility.md",
+    "display_text": "Specifically, uv does not support installing new `.egg-info`- or `.egg-link`-style distributions,\nbut will respect any such existing distributions during resolution, list them with `uv pip list` and\n`uv pip freeze`, and uninstall them with `uv pip uninstall`.\n\n",
+    "line_start": 431,
+    "line_end": 434
+  },
+  {
+    "stable_chunk_id": "child-21d2d7f0dc77a41f63cacc8c7db102ee0c49949a",
+    "source_path": "docs/pip/compatibility.md",
+    "display_text": "## Build constraints\n\nWhen constraints are provided via `--constraint` (or `UV_CONSTRAINT`), uv will _not_ apply the\nconstraints when resolving build dependencies (i.e., to build a source distribution). Instead, build\nconstraints should be provided via the dedicated `--build-constraint` (or `UV_BUILD_CONSTRAINT`)\nsetting.\n\n",
+    "line_start": 435,
+    "line_end": 441
+  },
+  {
+    "stable_chunk_id": "child-c4a384af72fc4ddf61097faf2dbfd0fe0418a616",
+    "source_path": "docs/pip/compatibility.md",
+    "display_text": "pip, meanwhile, applies constraints to build dependencies when specified via `PIP_CONSTRAINT`, but\nnot when provided via `--constraint` on the command line.\n\nFor example, to ensure that `setuptools 60.0.0` is used to build any packages with a build\ndependency on `setuptools`, use `--build-constraint`, rather than `--constraint`.\n\n",
+    "line_start": 442,
+    "line_end": 447
+  },
+  {
+    "stable_chunk_id": "child-a45b199106d85bd13fd4308416f7803e7dc47199",
+    "source_path": "docs/pip/compatibility.md",
+    "display_text": "## `pip compile` defaults\n\nThere are a few small but notable differences in the default behaviors of `pip compile` and\n`pip-tools`.\n\nBy default, uv does not write the compiled requirements to an output file. Instead, uv requires that\nthe user specify an output file explicitly with the `-o` or `--output-file` option.\n\n",
+    "line_start": 448,
+    "line_end": 455
+  },
+  {
+    "stable_chunk_id": "child-611853432116d30669b72eacd1094dab3049c6e7",
+    "source_path": "docs/pip/compatibility.md",
+    "display_text": "By default, uv strips extras when outputting the compiled requirements. In other words, uv defaults\nto `--strip-extras`, while `pip-compile` defaults to `--no-strip-extras`. `pip-compile` is scheduled\nto change this default in the next major release (v8.0.0), at which point both tools will default to\n`--strip-extras`. To retain extras with uv, pass the `--no-strip-extras` flag to `uv pip compile`.\n\n",
+    "line_start": 456,
+    "line_end": 460
+  },
+  {
+    "stable_chunk_id": "child-6af1abeb6237a8d3f7e585688f2d24738726f5b6",
+    "source_path": "docs/pip/compatibility.md",
+    "display_text": "By default, uv does not write any index URLs to the output file, while `pip-compile` outputs any\n`--index-url` or `--extra-index-url` that does not match the default (PyPI). To include index URLs\nin the output file, pass the `--emit-index-url` flag to `uv pip compile`. Unlike `pip-compile`, uv\nwill include all index URLs when `--emit-index-url` is passed, including the default index URL.\n\n",
+    "line_start": 461,
+    "line_end": 465
+  },
+  {
+    "stable_chunk_id": "child-001fcd2ed0d891a70cf23f893bd8dd783c61cf2f",
+    "source_path": "docs/pip/compatibility.md",
+    "display_text": "## `requires-python` enforcement\n\nWhen evaluating Python versions against `requires-python` specifiers, uv truncates the candidate\nversion to the major, minor, and patch components, ignoring (e.g.) pre-release and post-release\nidentifiers.\n\n",
+    "line_start": 466,
+    "line_end": 471
+  },
+  {
+    "stable_chunk_id": "child-248290aa44307db40ada178f8683c906b453cec0",
+    "source_path": "docs/pip/compatibility.md",
+    "display_text": "For example, a project that declares `requires-python: >=3.13` will accept Python 3.13.0b1. While\n3.13.0b1 is not strictly greater than 3.13, it is greater than 3.13 when the pre-release identifier\nis omitted.\n\nWhile this is not strictly compliant with [PEP 440](https://peps.python.org/pep-0440/), it _is_\nconsistent with\n[pip](https://github.com/pypa/pip/blob/24.1.1/src/pip/_internal/resolution/resolvelib/candidates.py#L540).\n\n",
+    "line_start": 472,
+    "line_end": 479
+  },
+  {
+    "stable_chunk_id": "child-c6f35ba80b778b0b279b9fea1f91fc22ea415921",
+    "source_path": "docs/pip/compatibility.md",
+    "display_text": "## Package priority\n\n",
+    "line_start": 480,
+    "line_end": 481
+  },
+  {
+    "stable_chunk_id": "child-3b2cdd30fe41c475860f1b3de9a6c514b83aa189",
+    "source_path": "docs/pip/compatibility.md",
+    "display_text": "There are usually many possible solutions given a set of requirements, and a resolver must choose\nbetween them. uv's resolver and pip's resolver have a different set of package priorities. While\nboth resolvers use the user-provided order as one of their priorities, pip has additional\n[priorities](https://pip.pypa.io/en/stable/topics/more-dependency-resolution/#the-resolver-algorithm)\nthat uv does not have. Hence, uv is more likely to be affected by a change in user order than pip\nis.\n\n",
+    "line_start": 482,
+    "line_end": 488
+  },
+  {
+    "stable_chunk_id": "child-5de501c062aab39b75bfc4ba0e8ae63a6d2bf335",
+    "source_path": "docs/pip/compatibility.md",
+    "display_text": "For example, `uv pip install foo bar` prioritizes newer versions of `foo` over `bar` and could\nresult in a different resolution than `uv pip install bar foo`. Similarly, this behavior applies to\nthe ordering of requirements in input files for `uv pip compile`.\n",
+    "line_start": 489,
+    "line_end": 491
+  }
+]

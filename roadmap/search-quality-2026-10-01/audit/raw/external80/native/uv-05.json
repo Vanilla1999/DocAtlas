@@ -1,0 +1,23 @@
+{
+  "tool": "get_docs_context",
+  "request": {
+    "question": "Compare first-match, unsafe-first-match and unsafe-best-match index strategies.",
+    "project_path": "/tmp/opencode/search-audit-work-20261001/fixtures/uv",
+    "scope": "all"
+  },
+  "seconds": 0.2673865239994484,
+  "is_error": false,
+  "wire": {
+    "_meta": null,
+    "content": [
+      {
+        "type": "text",
+        "text": "{\"status\": \"ok\", \"kind\": \"docs_context\", \"context_status\": \"ready\", \"context_available\": true, \"answer_supported\": false, \"answer_available\": false, \"support_status\": \"retrieval_only\", \"answer_policy\": \"cite_only\", \"coverage_policy\": \"retrieval_attribution_only\", \"query_coverage\": \"full\", \"retrieval_coverage\": \"full\", \"facet_coverage\": \"unverified\", \"covered_query_ids\": [\"query-original\"], \"missing_query_ids\": [], \"missing_facets\": [], \"facets\": [], \"sources\": [{\"evidence_id\": \"ev-cd10c71db758b505\", \"path_or_url\": \"docs/pip/compatibility.md\", \"section\": \"Packages that exist on multiple indexes\", \"snippet\": \"As of v0.1.39, users can opt in to `pip`-style behavior for multiple indexes via the\\n`--index-strategy` command-line option, or the `UV_INDEX_STRATEGY` environment variable, which\\nsupports the following values:\\n\\n- `first-match` (default): Search for each package across all indexes, limiting the candidate\\n  versions to those present in the first index that contains the package, prioritizing the\\n  `--extra-index-url` indexes over the default index URL.\\n- `unsafe-first-match`: Search for each package across all indexes, but prefer the first index with\\n  a compatible version, even if newer versions are available on other indexes.\\n- `unsafe-best-match`: Search for each package across all indexes, and select the best version from\\n  the combined set of candidate versions.\\n\\nWhile `unsafe-best-match` is the closest to `pip`'s behavior, it exposes users to the risk of\\n\\\"dependency confusion\\\" attacks.\", \"version_binding\": \"unversioned\", \"content_sha256\": \"db2174e9335f05268a9b64ead3b99ba22295e98332ed5d7d2d9eb9e9a8b0e3a9\", \"project_identity\": \"local:e65d484943b04206e676f1b569d594fafedcdaf92efb305771c46aba30d34f5c\", \"line_start\": 136, \"line_end\": 149, \"authority\": \"source_of_truth\", \"scope\": \"project\"}, {\"evidence_id\": \"ev-ee1426f03f51280d\", \"path_or_url\": \"docs/pip/compatibility.md\", \"section\": \"Compatibility with `pip` and `pip-tools`\", \"snippet\": \"uv is designed as a drop-in replacement for common `pip` and `pip-tools` workflows.\", \"version_binding\": \"unversioned\", \"content_sha256\": \"77bac67fb157bd5c1e518f1eaa799909087befd4071a56d65c56185cf9e1de87\", \"project_identity\": \"local:e65d484943b04206e676f1b569d594fafedcdaf92efb305771c46aba30d34f5c\", \"line_start\": 3, \"line_end\": 3, \"authority\": \"source_of_truth\", \"scope\": \"project\"}], \"context_quality\": {\"status\": \"unverified\", \"reasons\": [\"coverage_unverified\"]}, \"read_next\": [{\"source_uri\": \"docatlas://source/7511fe7728eca2ac0db03539\", \"path\": \"docs/pip/compatibility.md\", \"project_identity\": \"local:e65d484943b04206e676f1b569d594fafedcdaf92efb305771c46aba30d34f5c\", \"snapshot_sha256\": \"sha256:193d4e4f575ae0975b66b76d4ea93b15aaede550b85de37989caef9f6f494923\", \"line_start\": 150, \"line_end\": 154, \"reason\": \"inspect_source_context\"}], \"edit_ready\": false, \"investigation_allowed\": true, \"estimated_tokens\": 701}",
+        "annotations": null,
+        "_meta": null
+      }
+    ],
+    "structuredContent": null,
+    "isError": false
+  }
+}

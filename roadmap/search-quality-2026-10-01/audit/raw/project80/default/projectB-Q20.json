@@ -1,0 +1,22 @@
+{
+  "tool": "get_docs_context",
+  "request": {
+    "question": "What should the agent say when documentation covers only one part of my question?",
+    "project_path": "/tmp/opencode/docatlas-ablation"
+  },
+  "seconds": 0.8276075140020112,
+  "is_error": false,
+  "wire": {
+    "_meta": null,
+    "content": [
+      {
+        "type": "text",
+        "text": "{\"status\": \"ok\", \"kind\": \"docs_context\", \"context_status\": \"ready\", \"context_available\": true, \"answer_supported\": false, \"answer_available\": false, \"support_status\": \"retrieval_only\", \"answer_policy\": \"cite_only\", \"coverage_policy\": \"retrieval_attribution_only\", \"query_coverage\": \"full\", \"retrieval_coverage\": \"full\", \"facet_coverage\": \"unverified\", \"covered_query_ids\": [\"query-original\"], \"missing_query_ids\": [], \"missing_facets\": [], \"facets\": [], \"sources\": [{\"evidence_id\": \"ev-6526ca044d0c3b9b\", \"path_or_url\": \"SKILL.md\", \"section\": \"Documentation context runtime for coding agents\", \"snippet\": \"The default Docs MCP surface has exactly three tools:\\n\\n1. Start with `get_docs_context` for normal documentation questions.\\n2. Call `prepare_docs` only from bounded `recommended_next_action`, unbounded `next_action`, or an explicit sync, refresh, index, or prefetch request.\\n3. Call `docs_status` only for explicit health, freshness, index, or job-status requests.\\n\\nAdvanced patch and inspection tools are not part of the public agent workflow.\", \"version_binding\": \"unversioned\", \"content_sha256\": \"03210fdbb7e3e012fb8b08c49ac6fa21fe67fa9cefdd99759fd0d73e7c1434ec\", \"project_identity\": \"local:48277f62f8b4ff92ba1c60c082f92a43817f9e1c5ba4ea27e12cd77a76421585\", \"authority\": \"source_of_truth\", \"scope\": \"project\", \"line_start\": 21, \"line_end\": 27}, {\"evidence_id\": \"ev-6ff3dc33a15d2912\", \"path_or_url\": \"SKILL.md\", \"section\": \"DocAtlas > Core Commands > Query Documentation (CLI fallback)\", \"snippet\": \"### Query Documentation (CLI fallback)\\n\\n```bash\\ndoc-atlas query \\\"<question>\\\"\\n```\\n\\nReturns a compact markdown context pack with source attribution and token savings for CLI-only workflows. MCP-enabled agents should use `get_docs_context` instead.\", \"version_binding\": \"unversioned\", \"content_sha256\": \"3f48b2d487bb322802ec590136e084487499353eabdbe733e697e62d0752a29e\", \"project_identity\": \"local:48277f62f8b4ff92ba1c60c082f92a43817f9e1c5ba4ea27e12cd77a76421585\", \"authority\": \"source_of_truth\", \"scope\": \"project\", \"line_start\": 96, \"line_end\": 102}, {\"evidence_id\": \"ev-d6821cc55bf2b657\", \"path_or_url\": \"docs/grounded-host-session.md\", \"section\": \"Grounded host sessions over MCP > Final handoff\", \"snippet\": \"The host should state the\\nsupported part, explicitly name what is unknown and provide a feasible next\\nstep or a necessary clarifying question. Unknown private configuration is never\\ninferred from a general documentation quote.\", \"version_binding\": \"unversioned\", \"content_sha256\": \"0bc5fe3a2c1cfd53fa893d9108ef24da0c8d5b0234c3ba47ecb21d6b7e012c58\", \"project_identity\": \"local:48277f62f8b4ff92ba1c60c082f92a43817f9e1c5ba4ea27e12cd77a76421585\", \"authority\": \"source_of_truth\", \"scope\": \"module\", \"line_start\": 67, \"line_end\": 70}], \"context_quality\": {\"status\": \"unverified\", \"reasons\": [\"coverage_unverified\"]}, \"read_next\": [], \"edit_ready\": false, \"investigation_allowed\": true, \"estimated_tokens\": 708}",
+        "annotations": null,
+        "_meta": null
+      }
+    ],
+    "structuredContent": null,
+    "isError": false
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "tool": "get_docs_context",
+  "request": {
+    "question": "Which arguments does .add_task() receive and in what roles?",
+    "project_path": "/tmp/opencode/search-audit-work-20261001/fixtures/fastapi",
+    "scope": "all"
+  },
+  "seconds": 0.20379431300534634,
+  "is_error": false,
+  "wire": {
+    "_meta": null,
+    "content": [
+      {
+        "type": "text",
+        "text": "{\"status\": \"ok\", \"kind\": \"docs_context\", \"context_status\": \"ready\", \"context_available\": true, \"answer_supported\": false, \"answer_available\": false, \"support_status\": \"retrieval_only\", \"answer_policy\": \"cite_only\", \"coverage_policy\": \"retrieval_attribution_only\", \"query_coverage\": \"partial\", \"retrieval_coverage\": \"partial\", \"facet_coverage\": \"unverified\", \"covered_query_ids\": [], \"missing_query_ids\": [\"query-original\", \"query-anchor-1\"], \"missing_facets\": [], \"facets\": [], \"sources\": [{\"evidence_id\": \"ev-11989e749735d1c1\", \"path_or_url\": \"docs/en/docs/tutorial/background-tasks.md\", \"section\": \"Background Tasks > Add the background task\", \"snippet\": \"`.add_task()` receives as arguments:\\n\\n* A task function to be run in the background (`write_notification`).\\n* Any sequence of arguments that should be passed to the task function in order (`email`).\\n* Any keyword arguments that should be passed to the task function (`message=\\\"some notification\\\"`).\", \"version_binding\": \"unversioned\", \"content_sha256\": \"e2f4e61696d8329bc33e4b5c3beb10cdfcdad0e1a4e10d345305fa313e617bcd\", \"project_identity\": \"local:1b00d8fdd42cb375d06726b788509794c8b320b1ccfe59b08e6881c10ebd0618\", \"authority\": \"source_of_truth\", \"scope\": \"project\", \"line_start\": 48, \"line_end\": 52, \"source_uri\": \"docatlas://source/93390dfab64b579e63745452\"}, {\"evidence_id\": \"ev-d54cad302c01a4b5\", \"path_or_url\": \"docs/en/docs/tutorial/background-tasks.md\", \"section\": \"Background Tasks\", \"snippet\": \"You can define background tasks to be run *after* returning a response.\", \"version_binding\": \"unversioned\", \"content_sha256\": \"cd0a44992f5d7d6ab5b3c9747c3a743bac5fd49d4a4ebe7d267925f7815bd742\", \"project_identity\": \"local:1b00d8fdd42cb375d06726b788509794c8b320b1ccfe59b08e6881c10ebd0618\", \"line_start\": 3, \"line_end\": 3, \"authority\": \"source_of_truth\", \"scope\": \"project\", \"source_uri\": \"docatlas://source/9c0973dae04aafe689e4caef\"}, {\"evidence_id\": \"ev-15017cc98cf10bbc\", \"path_or_url\": \"docs/en/docs/tutorial/background-tasks.md\", \"section\": \"Background Tasks > Create a task function\", \"snippet\": \"It is just a standard function that can receive parameters.\", \"version_binding\": \"unversioned\", \"content_sha256\": \"bcda3a337292d88df4f5479cde0fc632434c6855e3c8093b3151f50a913fe14e\", \"project_identity\": \"local:1b00d8fdd42cb375d06726b788509794c8b320b1ccfe59b08e6881c10ebd0618\", \"line_start\": 28, \"line_end\": 28, \"authority\": \"source_of_truth\", \"scope\": \"project\", \"source_uri\": \"docatlas://source/b1f4c042c983e8b9630a4dae\"}], \"context_quality\": {\"status\": \"unverified\", \"reasons\": [\"coverage_unverified\"]}, \"read_next\": [], \"edit_ready\": false, \"investigation_allowed\": true, \"estimated_tokens\": 637}",
+        "annotations": null,
+        "_meta": null
+      }
+    ],
+    "structuredContent": null,
+    "isError": false
+  }
+}

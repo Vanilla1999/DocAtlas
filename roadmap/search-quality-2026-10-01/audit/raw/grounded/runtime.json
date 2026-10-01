@@ -1,0 +1,195 @@
+{
+  "package": {
+    "name": "@arabold/docs-mcp-server",
+    "version": "3.2.1",
+    "description": "MCP server for fetching and searching documentation",
+    "type": "module",
+    "bin": {
+      "docs-mcp-server": "dist/index.js"
+    },
+    "license": "MIT",
+    "author": "grounded.tools",
+    "repository": {
+      "type": "git",
+      "url": "git+https://github.com/arabold/docs-mcp-server.git"
+    },
+    "files": [
+      "dist",
+      "public",
+      "db",
+      "README.md",
+      "LICENSE",
+      "package.json"
+    ],
+    "scripts": {
+      "prepare": "husky || true",
+      "build": "vite build --config vite.config.web.ts && vite build",
+      "start": "node --enable-source-maps dist/index.js",
+      "cli": "node --enable-source-maps dist/index.js",
+      "server": "node --enable-source-maps dist/index.ts",
+      "web": "node --enable-source-maps dist/index.ts web",
+      "dev": "npm-run-all --parallel dev:server dev:web",
+      "dev:server": "vite-node --watch src/index.ts",
+      "dev:web": "vite build --config vite.config.web.ts --watch",
+      "test": "vitest run --exclude test/docker-e2e.test.ts",
+      "test:watch": "vitest",
+      "test:coverage": "vitest run --coverage --exclude test/docker-e2e.test.ts",
+      "test:unit": "vitest run src",
+      "pretest:e2e": "npm run build",
+      "test:e2e": "vitest run --exclude test/docker-e2e.test.ts test",
+      "test:docker": "vitest run test/docker-e2e.test.ts",
+      "evaluate:search": "vite-node tests/search-eval/run.ts --measure",
+      "evaluate:search:baseline": "vite-node tests/search-eval/run.ts --baseline",
+      "evaluate:search:preflight": "vite-node tests/search-eval/cli/preflight.ts",
+      "test:live": "vitest run --config vite.config.live.ts test/html-pipeline-live-e2e.test.ts",
+      "lint": "biome check .",
+      "lint:fix": "biome check . --fix",
+      "typecheck": "npx tsc --noEmit",
+      "typecheck:build": "npx tsc --noEmit --project tsconfig.build.json",
+      "format": "biome format . --write",
+      "postinstall": "echo 'Skipping Playwright browser install. See README.md for details.'"
+    },
+    "dependencies": {
+      "@fastify/formbody": "^8.0.2",
+      "@fastify/static": "^10.1.0",
+      "@joplin/turndown-plugin-gfm": "^1.0.67",
+      "@langchain/aws": "^1.4.3",
+      "@langchain/core": "^1.2.3",
+      "@langchain/google-genai": "^2.2.0",
+      "@langchain/google-vertexai": "^2.2.0",
+      "@langchain/openai": "^1.5.5",
+      "@langchain/textsplitters": "^1.0.1",
+      "@modelcontextprotocol/sdk": "^1.29.0",
+      "@tanstack/react-query": "^5.101.4",
+      "@toon-format/toon": "^2.3.1",
+      "@trpc/client": "^11.18.0",
+      "@trpc/react-query": "^11.18.0",
+      "@trpc/server": "^11.4.4",
+      "@types/yargs": "^17.0.35",
+      "@xberg-io/xberg": "~1.0.14",
+      "axios": "^1.18.1",
+      "axios-retry": "^4.5.0",
+      "better-sqlite3": "^12.11.1",
+      "cheerio": "^1.2.0",
+      "defuddle": "^0.19.1",
+      "dompurify": "^3.4.12",
+      "dotenv": "^17.4.2",
+      "env-paths": "^4.0.0",
+      "fastify": "^5.10.0",
+      "fuse.js": "^7.5.0",
+      "gray-matter": "^4.0.3",
+      "header-generator": "^2.1.82",
+      "iconv-lite": "^0.7.3",
+      "jose": "^6.2.3",
+      "jsdom": "^29.1.1",
+      "langchain": "^1.5.3",
+      "linkedom": "^0.18.13",
+      "mime": "^4.1.0",
+      "minimatch": "^10.2.5",
+      "playwright": "^1.61.1",
+      "posthog-node": "^5.45.2",
+      "psl": "^1.15.0",
+      "react": "^19.2.8",
+      "react-dom": "^19.2.8",
+      "react-markdown": "^10.1.0",
+      "react-router-dom": "^7.18.2",
+      "remark": "^15.0.1",
+      "remark-gfm": "^4.0.1",
+      "remark-html": "^16.0.1",
+      "remark-parse": "^11.0.0",
+      "semver": "^7.8.5",
+      "sqlite-vec": "^0.1.9",
+      "superjson": "^2.2.6",
+      "tar": "^7.5.20",
+      "tree-sitter": "^0.21.1",
+      "tree-sitter-javascript": "^0.23.1",
+      "tree-sitter-python": "^0.21.0",
+      "tree-sitter-typescript": "^0.23.2",
+      "turndown": "^7.2.4",
+      "unified": "^11.0.5",
+      "uuid": "^14.0.1",
+      "ws": "^8.21.1",
+      "yaml": "^2.9.0",
+      "yargs": "^18.0.0",
+      "yauzl": "^3.4.0",
+      "zod": "^4.4.3"
+    },
+    "devDependencies": {
+      "@biomejs/biome": "^2.5.4",
+      "@commitlint/cli": "^21.2.1",
+      "@commitlint/config-conventional": "^21.2.0",
+      "@commitlint/types": "^21.2.0",
+      "@semantic-release/changelog": "^6.0.3",
+      "@semantic-release/git": "^10.0.1",
+      "@semantic-release/github": "^12.0.9",
+      "@semantic-release/npm": "^13.1.5",
+      "@types/archiver": "^8.0.0",
+      "@types/better-sqlite3": "^7.6.13",
+      "@types/jsdom": "^28.0.3",
+      "@types/lint-staged": "~13.3.0",
+      "@types/node": "^26.1.1",
+      "@types/node-fetch": "^2.6.13",
+      "@types/psl": "^1.1.3",
+      "@types/react": "^19.2.18",
+      "@types/react-dom": "^19.2.4",
+      "@types/semver": "^7.7.1",
+      "@types/tar": "^6.1.13",
+      "@types/turndown": "^5.0.6",
+      "@types/ws": "^8.18.1",
+      "@types/yauzl": "^3.4.0",
+      "@vitejs/plugin-react": "^6.0.5",
+      "archiver": "^8.0.0",
+      "domhandler": "^6.0.1",
+      "husky": "^9.1.7",
+      "lint-staged": "^17.1.0",
+      "memfs": "^4.64.0",
+      "msw": "^2.15.0",
+      "nock": "^14.0.16",
+      "npm-run-all": "^4.1.5",
+      "semantic-release": "^25.0.8",
+      "typescript": "^5.9.3",
+      "vite": "^8.1.5",
+      "vite-node": "^6.0.0",
+      "vite-plugin-dts": "^5.0.3",
+      "vitest": "^4.1.10"
+    },
+    "engines": {
+      "node": ">=22"
+    },
+    "overrides": {
+      "npm": "10.9.3"
+    },
+    "lint-staged": {
+      "*.{js,ts,jsx,tsx,json,md}": [
+        "biome check --write --no-errors-on-unmatched",
+        "biome format --write --no-errors-on-unmatched"
+      ]
+    }
+  },
+  "command": [
+    "node",
+    "/tmp/opencode/search-audit-tools-20261001/node_modules/@arabold/docs-mcp-server/dist/index.js"
+  ],
+  "config": {
+    "app": {
+      "storePath": "/tmp/opencode/search-audit-work-20261001/grounded/store",
+      "telemetryEnabled": false
+    },
+    "scraper": {
+      "maxPages": 10000,
+      "maxDepth": 30,
+      "security": {
+        "fileAccess": {
+          "mode": "allowedRoots",
+          "allowedRoots": [
+            "/tmp/opencode/search-audit-work-20261001/grounded/corpus"
+          ],
+          "includeHidden": true,
+          "followSymlinks": false
+        }
+      }
+    }
+  },
+  "mode": "no embedding provider; FTS-only, checked in database",
+  "comparison": "same bytes; native output plus non-product common 800-token/3-block adapter"
+}

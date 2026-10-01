@@ -1,0 +1,50 @@
+[
+  {
+    "command": [
+      "node",
+      "/tmp/opencode/search-audit-tools-20261001/node_modules/@arabold/docs-mcp-server/dist/index.js",
+      "scrape",
+      "pydantic",
+      "file:///tmp/opencode/search-audit-work-20261001/grounded/corpus/pydantic/docs/concepts/strict_mode.md",
+      "--max-pages",
+      "1",
+      "--max-depth",
+      "1",
+      "--no-clean",
+      "--config",
+      "/tmp/opencode/search-audit-work-20261001/grounded/config.json",
+      "--store-path",
+      "/tmp/opencode/search-audit-work-20261001/grounded/store",
+      "--no-telemetry",
+      "--no-logo"
+    ],
+    "returncode": 0,
+    "seconds": 1.2481936299955123,
+    "stdout": "Successfully scraped 1 pages\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "node",
+      "/tmp/opencode/search-audit-tools-20261001/node_modules/@arabold/docs-mcp-server/dist/index.js",
+      "scrape",
+      "pydantic",
+      "file:///tmp/opencode/search-audit-work-20261001/grounded/corpus/pydantic/docs/concepts/alias.md",
+      "--max-pages",
+      "1",
+      "--max-depth",
+      "1",
+      "--no-clean",
+      "--config",
+      "/tmp/opencode/search-audit-work-20261001/grounded/config.json",
+      "--store-path",
+      "/tmp/opencode/search-audit-work-20261001/grounded/store",
+      "--no-telemetry",
+      "--no-logo"
+    ],
+    "returncode": 0,
+    "seconds": 1.2010061379987746,
+    "stdout": "Successfully scraped 1 pages\n",
+    "stderr": ""
+  }
+]

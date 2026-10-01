@@ -1,0 +1,33 @@
+{
+  "id": "ruff-01",
+  "question": "Does enabling preview automatically enable all preview rules?",
+  "library_id": "/astral-sh/ruff",
+  "request": {
+    "libraryId": "/astral-sh/ruff",
+    "query": "Does enabling preview automatically enable all preview rules?"
+  },
+  "seconds": 2.434261702997901,
+  "is_error": false,
+  "wire": {
+    "_meta": null,
+    "content": [
+      {
+        "type": "text",
+        "text": "### Enable preview mode with rule selection in ruff.toml\n\nSource: https://github.com/astral-sh/ruff/blob/main/docs/preview.md\n\nConfiguration showing that a preview rule is enabled when preview mode is enabled alongside rule selection.\n\n```toml\n[lint]\nextend-select = [\"HYP\"]\npreview = true\n\n```\n\n--------------------------------\n\n### Enable preview lint rules in ruff.toml\n\nSource: https://github.com/astral-sh/ruff/blob/main/docs/preview.md\n\nConfiguration for enabling preview lint rules without preview style formatting in a ruff.toml file.\n\n```toml\n[lint]\npreview = true\n\n```\n\n--------------------------------\n\n### Select ALL rules in ruff.toml\n\nSource: https://github.com/astral-sh/ruff/blob/main/docs/preview.md\n\nConfiguration showing that a preview rule is not enabled via the ALL selector without preview mode.\n\n```toml\n[lint]\nselect = [\"ALL\"]\n\n```\n\n### Preview\n\nSource: https://github.com/astral-sh/ruff/blob/main/docs/preview.md\n\nRuff includes an opt-in preview mode to provide an opportunity for community feedback and increase confidence that\nchanges are a net-benefit before enabling them for everyone.\n\nPreview mode enables a collection of unstable features such as new lint rules and fixes, formatter style changes, interface updates, and more. Warnings about deprecated features may turn into errors when using preview mode.\n\nEnabling preview mode does not on its own enable all preview rules. See the [rules section](#using-rules-that-are-in-preview) for details on selecting preview rules.\n\n--------------------------------\n\n### Preview > Selecting single preview rules\n\nSource: https://github.com/astral-sh/ruff/blob/main/docs/preview.md\n\nWhen preview mode is enabled, selecting rule categories or prefixes will include all preview rules that match.\nIf you'd prefer to opt in to each preview rule individually, you can toggle the `explicit-preview-rules`\nsetting in your configuration file:\n\n=== \"pyproject.toml\"\n\n    ```toml\n    [tool.ruff.lint]\n    preview = true\n    explicit-preview-rules = true\n    ```\n\n=== \"ruff.toml\"\n\n    ```toml\n    [lint]\n    preview = true\n    explicit-preview-rules = true\n    ```\n\nIn our previous example, `--select` with `ALL` `HYP`, `HYP0`, or `HYP00` would not enable `HYP001`. Each preview\nrule will need to be selected with its exact code: for example, `--select ALL,HYP001`.\n\nIf preview mode is not enabled, this setting has no effect.",
+        "annotations": null,
+        "_meta": null
+      }
+    ],
+    "structuredContent": null,
+    "isError": false
+  },
+  "text": "### Enable preview mode with rule selection in ruff.toml\n\nSource: https://github.com/astral-sh/ruff/blob/main/docs/preview.md\n\nConfiguration showing that a preview rule is enabled when preview mode is enabled alongside rule selection.\n\n```toml\n[lint]\nextend-select = [\"HYP\"]\npreview = true\n\n```\n\n--------------------------------\n\n### Enable preview lint rules in ruff.toml\n\nSource: https://github.com/astral-sh/ruff/blob/main/docs/preview.md\n\nConfiguration for enabling preview lint rules without preview style formatting in a ruff.toml file.\n\n```toml\n[lint]\npreview = true\n\n```\n\n--------------------------------\n\n### Select ALL rules in ruff.toml\n\nSource: https://github.com/astral-sh/ruff/blob/main/docs/preview.md\n\nConfiguration showing that a preview rule is not enabled via the ALL selector without preview mode.\n\n```toml\n[lint]\nselect = [\"ALL\"]\n\n```\n\n### Preview\n\nSource: https://github.com/astral-sh/ruff/blob/main/docs/preview.md\n\nRuff includes an opt-in preview mode to provide an opportunity for community feedback and increase confidence that\nchanges are a net-benefit before enabling them for everyone.\n\nPreview mode enables a collection of unstable features such as new lint rules and fixes, formatter style changes, interface updates, and more. Warnings about deprecated features may turn into errors when using preview mode.\n\nEnabling preview mode does not on its own enable all preview rules. See the [rules section](#using-rules-that-are-in-preview) for details on selecting preview rules.\n\n--------------------------------\n\n### Preview > Selecting single preview rules\n\nSource: https://github.com/astral-sh/ruff/blob/main/docs/preview.md\n\nWhen preview mode is enabled, selecting rule categories or prefixes will include all preview rules that match.\nIf you'd prefer to opt in to each preview rule individually, you can toggle the `explicit-preview-rules`\nsetting in your configuration file:\n\n=== \"pyproject.toml\"\n\n    ```toml\n    [tool.ruff.lint]\n    preview = true\n    explicit-preview-rules = true\n    ```\n\n=== \"ruff.toml\"\n\n    ```toml\n    [lint]\n    preview = true\n    explicit-preview-rules = true\n    ```\n\nIn our previous example, `--select` with `ALL` `HYP`, `HYP0`, or `HYP00` would not enable `HYP001`. Each preview\nrule will need to be selected with its exact code: for example, `--select ALL,HYP001`.\n\nIf preview mode is not enabled, this setting has no effect.",
+  "size": {
+    "utf8_bytes": 2389,
+    "actual_tokens": 542,
+    "tokenizer": "docatlas-offline:o200k_base"
+  },
+  "version_matched": false,
+  "source_matched": false,
+  "semantic_assessment": "manual; separate from frozen witness matching"
+}

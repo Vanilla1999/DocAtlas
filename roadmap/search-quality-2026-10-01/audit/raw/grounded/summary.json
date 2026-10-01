@@ -1,0 +1,56 @@
+{
+  "3": {
+    "cases": 80,
+    "positives": 48,
+    "recognized_sufficient": 32,
+    "controlled_recognized_sufficient": 8,
+    "assessments": {
+      "sufficient": 32,
+      "needs_review": 48
+    },
+    "controlled_assessments": {
+      "sufficient": 8,
+      "needs_review": 72
+    },
+    "tokens": {
+      "n": 80,
+      "p50": 1234,
+      "p95": 3087
+    },
+    "latency": {
+      "n": 80,
+      "p50": 0.002344981003261637,
+      "p95": 0.002838199994585011
+    },
+    "unmapped_results": 0,
+    "binding_errors": 0,
+    "tool_errors": 0
+  },
+  "5": {
+    "cases": 80,
+    "positives": 48,
+    "recognized_sufficient": 32,
+    "controlled_recognized_sufficient": 8,
+    "assessments": {
+      "sufficient": 32,
+      "needs_review": 48
+    },
+    "controlled_assessments": {
+      "sufficient": 8,
+      "needs_review": 72
+    },
+    "tokens": {
+      "n": 80,
+      "p50": 1873,
+      "p95": 4709
+    },
+    "latency": {
+      "n": 80,
+      "p50": 0.0027031060017179698,
+      "p95": 0.0032445600008941256
+    },
+    "unmapped_results": 0,
+    "binding_errors": 0,
+    "tool_errors": 0
+  }
+}

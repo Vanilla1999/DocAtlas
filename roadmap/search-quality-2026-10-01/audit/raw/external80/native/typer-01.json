@@ -1,0 +1,23 @@
+{
+  "tool": "get_docs_context",
+  "request": {
+    "question": "Does raising typer.Exit() itself imply an error, and what is its default exit code?",
+    "project_path": "/tmp/opencode/search-audit-work-20261001/fixtures/typer",
+    "scope": "all"
+  },
+  "seconds": 0.5645502260013018,
+  "is_error": false,
+  "wire": {
+    "_meta": null,
+    "content": [
+      {
+        "type": "text",
+        "text": "{\"status\": \"ok\", \"kind\": \"docs_context\", \"context_status\": \"ready\", \"context_available\": true, \"answer_supported\": false, \"answer_available\": false, \"support_status\": \"retrieval_only\", \"answer_policy\": \"cite_only\", \"coverage_policy\": \"retrieval_attribution_only\", \"query_coverage\": \"full\", \"retrieval_coverage\": \"full\", \"facet_coverage\": \"unverified\", \"covered_query_ids\": [\"query-original\", \"query-anchor-1\"], \"missing_query_ids\": [], \"missing_facets\": [{\"id\": \"retrieval-need:need-2\", \"requirement_id\": null, \"question\": \"Does raising typer.Exit() itself imply an error what is its default exit code?\", \"status\": \"missing\", \"evidence_ids\": []}], \"facets\": [{\"id\": \"retrieval-need:need-2\", \"requirement_id\": null, \"question\": \"Does raising typer.Exit() itself imply an error what is its default exit code?\", \"status\": \"missing\", \"evidence_ids\": []}], \"sources\": [{\"evidence_id\": \"ev-3bbf46f1bc2eb616\", \"path_or_url\": \"docs/tutorial/terminating.md\", \"section\": \"Terminating > Exit with an error\", \"snippet\": \"## Exit with an error\\n\\n`typer.Exit()` takes an optional `code` parameter. By default, `code` is `0`, meaning there was no error.\\n\\nYou can pass a `code` with a number other than `0` to tell the terminal that there was an error in the execution of the program:\\n\\n```Python hl_lines=\\\"7\\\"\\n{!../docs_src/terminating/tutorial002.py!}\\n```\\n\\nCheck it:\\n\\n<div class=\\\"termy\\\">\", \"version_binding\": \"unversioned\", \"content_sha256\": \"94332dd50260a35e4b28afe305a6e8f22a8640fd2e5f16945b370539ec44f3fa\", \"project_identity\": \"local:f7cc72468d7207460aab3dacc26f8d12d54043247e98b916126b775c8ec7da89\", \"authority\": \"source_of_truth\", \"scope\": \"project\", \"line_start\": 55, \"line_end\": 67, \"source_uri\": \"docatlas://source/bf1163e6ed9fce533fb245a9\"}, {\"evidence_id\": \"ev-7237798629984896\", \"path_or_url\": \"docs/tutorial/terminating.md\", \"section\": \"Terminating > `Exit` a CLI program\", \"snippet\": \"## `Exit` a CLI program\\n\\nYou can normally just let the code of your CLI program finish its execution, but in some scenarios, you might want to terminate at some point in the middle of it. And prevent any subsequent code to run.\\n\\nThis doesn't have to mean that there's an error, just that nothing else needs to be executed.\\n\\nIn that case, you can raise a `typer.Exit()` exception:\\n\\n```Python hl_lines=\\\"9\\\"\\n{!../docs_src/terminating/tutorial001.py!}\\n```\", \"version_binding\": \"unversioned\", \"content_sha256\": \"c42844a564a85241eebdd6914a8fc6fc871b8ce8870c1fc037bdc76ee2b402e5\", \"project_identity\": \"local:f7cc72468d7207460aab3dacc26f8d12d54043247e98b916126b775c8ec7da89\", \"authority\": \"source_of_truth\", \"scope\": \"project\", \"line_start\": 7, \"line_end\": 17}], \"context_quality\": {\"status\": \"unverified\", \"reasons\": [\"coverage_unverified\", \"budget_limited\"]}, \"read_next\": [], \"edit_ready\": false, \"investigation_allowed\": true, \"estimated_tokens\": 686}",
+        "annotations": null,
+        "_meta": null
+      }
+    ],
+    "structuredContent": null,
+    "isError": false
+  }
+}

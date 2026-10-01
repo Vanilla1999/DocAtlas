@@ -1,0 +1,23 @@
+{
+  "tool": "get_docs_context",
+  "request": {
+    "question": "What can strict mode be enabled on, and what happens instead of coercing an incorrect type?",
+    "project_path": "/tmp/opencode/search-audit-work-20261001/fixtures/pydantic",
+    "scope": "all"
+  },
+  "seconds": 0.25376047400641255,
+  "is_error": false,
+  "wire": {
+    "_meta": null,
+    "content": [
+      {
+        "type": "text",
+        "text": "{\"status\": \"ok\", \"kind\": \"docs_context\", \"context_status\": \"ready\", \"context_available\": true, \"answer_supported\": false, \"answer_available\": false, \"support_status\": \"retrieval_only\", \"answer_policy\": \"cite_only\", \"coverage_policy\": \"retrieval_attribution_only\", \"query_coverage\": \"full\", \"retrieval_coverage\": \"full\", \"facet_coverage\": \"unverified\", \"covered_query_ids\": [\"query-original\"], \"missing_query_ids\": [], \"missing_facets\": [], \"facets\": [], \"sources\": [{\"evidence_id\": \"ev-74376a861e944808\", \"path_or_url\": \"docs/concepts/strict_mode.md\", \"section\": \"Introduction\", \"snippet\": \"However, there are also situations where this is not desirable, and you want Pydantic to error instead of coercing data.\\n\\nTo better support this use case, Pydantic provides a \\\"strict mode\\\" that can be enabled on a per-model, per-field, or\\neven per-validation-call basis. When strict mode is enabled, Pydantic will be much less lenient when coercing data,\\nand will instead error if the data is not of the correct type.\", \"version_binding\": \"unversioned\", \"content_sha256\": \"8c17926dc2f83d257b210fd57f4d8a6a45073634889d98229362a28c43ea2d1b\", \"project_identity\": \"local:dee89d9b00c29f8b46038582d3569cd8157162fec6f171d84685bc8b23f83a09\", \"authority\": \"source_of_truth\", \"scope\": \"project\", \"line_start\": 9, \"line_end\": 13, \"source_uri\": \"docatlas://source/b7a7dd069af446f58265ab19\"}, {\"evidence_id\": \"ev-e2ab0c1c0082fa38\", \"path_or_url\": \"docs/concepts/strict_mode.md\", \"section\": \"Strict mode with `ConfigDict` > `BaseModel`\", \"snippet\": \"If this is undesirable, you should make sure that strict mode is enabled for all the types involved.\\nFor example, this can be done for model classes by using a shared base class with\\n`model_config = ConfigDict(strict=True)`:\", \"version_binding\": \"unversioned\", \"content_sha256\": \"40179e2bc383ddf619a8681e6ff179376293137bb7d1330debdad64dd51a47dd\", \"project_identity\": \"local:dee89d9b00c29f8b46038582d3569cd8157162fec6f171d84685bc8b23f83a09\", \"line_start\": 401, \"line_end\": 403, \"authority\": \"source_of_truth\", \"scope\": \"project\", \"source_uri\": \"docatlas://source/7046ec7a82225cfbcdedd901\"}], \"context_quality\": {\"status\": \"unverified\", \"reasons\": [\"coverage_unverified\"]}, \"read_next\": [{\"source_uri\": \"docatlas://source/c7bee5e762301268bc98eb81\", \"path\": \"docs/concepts/strict_mode.md\", \"project_identity\": \"local:dee89d9b00c29f8b46038582d3569cd8157162fec6f171d84685bc8b23f83a09\", \"snapshot_sha256\": \"sha256:06e00a3e114c85ff31286640cb9842a99209d4112d5cb4812b47d4bf556f2b71\", \"line_start\": 14, \"line_end\": 46, \"reason\": \"inspect_source_context\"}], \"edit_ready\": false, \"investigation_allowed\": true, \"estimated_tokens\": 638}",
+        "annotations": null,
+        "_meta": null
+      }
+    ],
+    "structuredContent": null,
+    "isError": false
+  }
+}

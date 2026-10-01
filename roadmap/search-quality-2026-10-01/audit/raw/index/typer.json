@@ -1,0 +1,184 @@
+{
+  "db_path": "/tmp/opencode/search-audit-work-20261001/fixtures/typer/.docatlas/docatlas.db",
+  "counts": {
+    "sources": 2,
+    "retrieval_children": 23,
+    "retrieval_parents": 9
+  },
+  "integrity_check": "ok",
+  "manifest": [
+    {
+      "path": "docs/tutorial/parameter-types/bool.md",
+      "sha256": "c025b6f1d713e6e07925d2d724f8b97cf3f80cad86b363e5e89c4fc42d80821d",
+      "bytes": 4277
+    },
+    {
+      "path": "docs/tutorial/terminating.md",
+      "sha256": "efa52652496e4c6a872b340a8bb0fc884d4e48b05540569b687a1063677c6a09",
+      "bytes": 3024
+    }
+  ],
+  "rows": [
+    {
+      "stable_chunk_id": "child-9658a401003120a21edf9c8b4df4a517f3935188",
+      "source_path": "docs/tutorial/parameter-types/bool.md",
+      "display_text": "# Boolean CLI Options\n\nWe have seen some examples of *CLI options* with `bool`, and how **Typer** creates `--something` and `--no-something` automatically.\n\nBut we can customize those names.\n\n",
+      "line_start": 1,
+      "line_end": 6
+    },
+    {
+      "stable_chunk_id": "child-eb796715e9229806e145ce11844561aea459d574",
+      "source_path": "docs/tutorial/parameter-types/bool.md",
+      "display_text": "## Only `--force`\n\nLet's say that we want a `--force` *CLI option* only, we want to discard `--no-force`.\n\nWe can do that by specifying the exact name we want:\n\n//// tab | Python 3.7+\n\n```Python hl_lines=\"5\"\n{!> ../docs_src/parameter_types/bool/tutorial001_an.py!}\n```\n\n////\n\n//// tab | Python 3.7+ non-Annotated\n\n/// tip\n\nPrefer to use the `Annotated` version if possible.\n\n///\n\n",
+      "line_start": 7,
+      "line_end": 28
+    },
+    {
+      "stable_chunk_id": "child-c9fb9b02c1c5a07045a0eca7ce1a7bc0052600d1",
+      "source_path": "docs/tutorial/parameter-types/bool.md",
+      "display_text": "```Python hl_lines=\"4\"\n{!> ../docs_src/parameter_types/bool/tutorial001.py!}\n```\n\n////\n\nNow there's only a `--force` *CLI option*:\n\n<div class=\"termy\">\n\n",
+      "line_start": 29,
+      "line_end": 38
+    },
+    {
+      "stable_chunk_id": "child-f69e7eb8d942da0842b0d098ba3dc81c175f7f04",
+      "source_path": "docs/tutorial/parameter-types/bool.md",
+      "display_text": "```console\n// Check the help\n$ python main.py --help\n\n// Notice there's only --force, we no longer have --no-force\nUsage: main.py [OPTIONS]\n\nOptions:\n  --force               [default: False]\n  --help                Show this message and exit.\n\n// Try it:\n$ python main.py\n\nNot forcing\n\n// Now add --force\n$ python main.py --force\n\nForcing operation\n\n// And --no-force no longer exists ⛔️\n$ python main.py --no-force\n\nUsage: main.py [OPTIONS]\nTry \"main.py --help\" for help.\n\nError: No such option: --no-force\n```\n\n",
+      "line_start": 39,
+      "line_end": 68
+    },
+    {
+      "stable_chunk_id": "child-d46b4d4b5ab865642de97cae48e9cd3f7847a5e2",
+      "source_path": "docs/tutorial/parameter-types/bool.md",
+      "display_text": "</div>\n\n",
+      "line_start": 69,
+      "line_end": 70
+    },
+    {
+      "stable_chunk_id": "child-499e35655fc771cd8e7a30c9eec6eb911c64089c",
+      "source_path": "docs/tutorial/parameter-types/bool.md",
+      "display_text": "## Alternative names\n\nNow let's imagine we have a *CLI option* `--accept`.\n\nAnd we want to allow setting `--accept` or the contrary, but `--no-accept` looks ugly.\n\nWe might want to instead have `--accept` and `--reject`.\n\nWe can do that by passing a single `str` with the 2 names for the `bool` *CLI option* separated by `/`:\n\n//// tab | Python 3.7+\n\n```Python hl_lines=\"7\"\n{!> ../docs_src/parameter_types/bool/tutorial002_an.py!}\n```\n\n////\n\n",
+      "line_start": 71,
+      "line_end": 88
+    },
+    {
+      "stable_chunk_id": "child-0a4650f548246dd51e7e6736ea4d2c451ece8102",
+      "source_path": "docs/tutorial/parameter-types/bool.md",
+      "display_text": "//// tab | Python 3.7+ non-Annotated\n\n/// tip\n\nPrefer to use the `Annotated` version if possible.\n\n///\n\n```Python hl_lines=\"6\"\n{!> ../docs_src/parameter_types/bool/tutorial002.py!}\n```\n\n////\n\nCheck it:\n\n<div class=\"termy\">\n\n",
+      "line_start": 89,
+      "line_end": 106
+    },
+    {
+      "stable_chunk_id": "child-58e24d1b8e68bea906a9d4d2210e7ccdbb9f6493",
+      "source_path": "docs/tutorial/parameter-types/bool.md",
+      "display_text": "```console\n// Check the help\n$ python main.py --help\n\n// Notice the --accept / --reject\nUsage: main.py [OPTIONS]\n\nOptions:\n  --accept / --reject\n  --help                Show this message and exit.\n\n// Try it\n$ python main.py\n\nI don't know what you want yet\n\n// Now pass --accept\n$ python main.py --accept\n\nAccepting!\n\n// And --reject\n$ python main.py --reject\n\nRejecting!\n```\n\n</div>\n\n",
+      "line_start": 107,
+      "line_end": 135
+    },
+    {
+      "stable_chunk_id": "child-3501fa191fdb49d5286fb51ea06b2c3a7bf0e396",
+      "source_path": "docs/tutorial/parameter-types/bool.md",
+      "display_text": "## Short names\n\nThe same way, you can declare short versions of the names for these *CLI options*.\n\nFor example, let's say we want `-f` for `--force` and `-F` for `--no-force`:\n\n//// tab | Python 3.7+\n\n```Python hl_lines=\"5\"\n{!> ../docs_src/parameter_types/bool/tutorial003_an.py!}\n```\n\n////\n\n//// tab | Python 3.7+ non-Annotated\n\n/// tip\n\nPrefer to use the `Annotated` version if possible.\n\n///\n\n",
+      "line_start": 136,
+      "line_end": 157
+    },
+    {
+      "stable_chunk_id": "child-9bdb204583d48176e0fc3af4cf24c2dca18e8c0b",
+      "source_path": "docs/tutorial/parameter-types/bool.md",
+      "display_text": "```Python hl_lines=\"4\"\n{!> ../docs_src/parameter_types/bool/tutorial003.py!}\n```\n\n////\n\nCheck it:\n\n<div class=\"termy\">\n\n",
+      "line_start": 158,
+      "line_end": 167
+    },
+    {
+      "stable_chunk_id": "child-8e0a6f5ec04862990eaa75b3d480974761e89e14",
+      "source_path": "docs/tutorial/parameter-types/bool.md",
+      "display_text": "```console\n// Check the help\n$ python main.py --help\n\n// Notice the -f, --force / -F, --no-force\nUsage: main.py [OPTIONS]\n\nOptions:\n  -f, --force / -F, --no-force  [default: False]\n  --help                        Show this message and exit.\n\n// Try with the short name -f\n$ python main.py -f\n\nForcing operation\n\n// Try with the short name -F\n$ python main.py -F\n\nNot forcing\n```\n\n</div>\n\n",
+      "line_start": 168,
+      "line_end": 191
+    },
+    {
+      "stable_chunk_id": "child-ad2031e3acf8b581a7b5ab7a84847ece28d1988b",
+      "source_path": "docs/tutorial/parameter-types/bool.md",
+      "display_text": "## Only names for `False`\n\nIf you want to (although it might not be a good idea), you can declare only *CLI option* names to set the `False` value.\n\nTo do that, use a space and a single `/` and pass the negative name after:\n\n//// tab | Python 3.7+\n\n```Python hl_lines=\"5\"\n{!> ../docs_src/parameter_types/bool/tutorial004_an.py!}\n```\n\n////\n\n//// tab | Python 3.7+ non-Annotated\n\n/// tip\n\nPrefer to use the `Annotated` version if possible.\n\n///\n\n",
+      "line_start": 192,
+      "line_end": 213
+    },
+    {
+      "stable_chunk_id": "child-c013208db4a30b41df3e1130193534208ad2a3a1",
+      "source_path": "docs/tutorial/parameter-types/bool.md",
+      "display_text": "```Python hl_lines=\"4\"\n{!> ../docs_src/parameter_types/bool/tutorial004.py!}\n```\n\n////\n\n/// tip\n\nHave in mind that it's a string with a preceding space and then a `/`.\n\nSo, it's `\" /-S\"` not `\"/-S\"`.\n\n///\n\nCheck it:\n\n<div class=\"termy\">\n\n",
+      "line_start": 214,
+      "line_end": 231
+    },
+    {
+      "stable_chunk_id": "child-c130c08c595ddb935527b724e26f653a348fe1f3",
+      "source_path": "docs/tutorial/parameter-types/bool.md",
+      "display_text": "```console\n// Check the help\n$ python main.py --help\n\n// Notice the / -d, --demo\nUsage: main.py [OPTIONS]\n\nOptions:\n   / -d, --demo         [default: True]\n  --help                Show this message and exit.\n\n// Try it\n$ python main.py\n\nRunning in production\n\n// Now pass --demo\n$ python main.py --demo\n\nRunning demo\n\n// And the short version\n$ python main.py -d\n\nRunning demo\n```\n\n</div>\n",
+      "line_start": 232,
+      "line_end": 259
+    },
+    {
+      "stable_chunk_id": "child-bd46de6fe74c6b824f962f546dde1150edb0489c",
+      "source_path": "docs/tutorial/terminating.md",
+      "display_text": "# Terminating\n\nThere are some cases where you might want to terminate a command at some point, and stop all subsequent execution.\n\nIt could be that your code determined that the program completed successfully, or it could be an operation aborted.\n\n",
+      "line_start": 1,
+      "line_end": 6
+    },
+    {
+      "stable_chunk_id": "child-2ef81949215c2fc3e93083699a39770d415665b2",
+      "source_path": "docs/tutorial/terminating.md",
+      "display_text": "## `Exit` a CLI program\n\nYou can normally just let the code of your CLI program finish its execution, but in some scenarios, you might want to terminate at some point in the middle of it. And prevent any subsequent code to run.\n\nThis doesn't have to mean that there's an error, just that nothing else needs to be executed.\n\nIn that case, you can raise a `typer.Exit()` exception:\n\n```Python hl_lines=\"9\"\n{!../docs_src/terminating/tutorial001.py!}\n```\n\n",
+      "line_start": 7,
+      "line_end": 18
+    },
+    {
+      "stable_chunk_id": "child-9ec746858253a427991f201da4c4eb153a6ff88b",
+      "source_path": "docs/tutorial/terminating.md",
+      "display_text": "There are several things to see in this example.\n\n* The CLI program is the function `main()`, not the others. This is the one that takes a *CLI argument*.\n* The function `maybe_create_user()` can terminate the program by raising `typer.Exit()`.\n* If the program is terminated by `maybe_create_user()` then `send_new_user_notification()` will never execute inside of `main()`.\n\nCheck it:\n\n<div class=\"termy\">\n\n",
+      "line_start": 19,
+      "line_end": 28
+    },
+    {
+      "stable_chunk_id": "child-84be1779504c483d522e6331a70599353e0cc77b",
+      "source_path": "docs/tutorial/terminating.md",
+      "display_text": "```console\n$ python main.py Camila\n\nUser created: Camila\nNotification sent for new user: Camila\n\n// Try with an existing user\n$ python main.py rick\n\nThe user already exists\n\n// Notice that the notification code was never run, the second message is not printed\n```\n\n</div>\n\n/// tip\n\nEven though you are raising an exception, it doesn't necessarily mean there's an error.\n\nThis is done with an exception because it works as an \"error\" and stops all execution.\n\n",
+      "line_start": 29,
+      "line_end": 50
+    },
+    {
+      "stable_chunk_id": "child-1e801c1621234f8530916581bf69bc8030baebad",
+      "source_path": "docs/tutorial/terminating.md",
+      "display_text": "But then **Typer** (actually Click) catches it and just terminates the program normally.\n\n///\n\n",
+      "line_start": 51,
+      "line_end": 54
+    },
+    {
+      "stable_chunk_id": "child-e193ef86628f7cb51ce71a3bde1c2293a28269a7",
+      "source_path": "docs/tutorial/terminating.md",
+      "display_text": "## Exit with an error\n\n`typer.Exit()` takes an optional `code` parameter. By default, `code` is `0`, meaning there was no error.\n\nYou can pass a `code` with a number other than `0` to tell the terminal that there was an error in the execution of the program:\n\n```Python hl_lines=\"7\"\n{!../docs_src/terminating/tutorial002.py!}\n```\n\nCheck it:\n\n<div class=\"termy\">\n\n",
+      "line_start": 55,
+      "line_end": 68
+    },
+    {
+      "stable_chunk_id": "child-9e8134ea6b666fa718ea190ba715bfc66256412c",
+      "source_path": "docs/tutorial/terminating.md",
+      "display_text": "```console\n$ python main.py Camila\n\nNew user created: Camila\n\n// Print the result code of the last program executed\n$ echo $?\n\n0\n\n// Now make it exit with an error\n$ python main.py root\n\nThe root user is reserved\n\n// Print the result code of the last program executed\n$ echo $?\n\n1\n\n// 1 means there was an error, 0 means no errors.\n```\n\n</div>\n\n/// tip\n\nThe error code might be used by other programs (for example a Bash script) that execute your CLI program.\n\n///\n\n",
+      "line_start": 69,
+      "line_end": 99
+    },
+    {
+      "stable_chunk_id": "child-b391e01d79cd7f8e38928baf2095dafdbcfcb028",
+      "source_path": "docs/tutorial/terminating.md",
+      "display_text": "## Abort\n\nThere's a special exception that you can use to \"abort\" a program.\n\nIt works more or less the same as `typer.Exit()` but will print `\"Aborted!\"` to the screen and can be useful in certain cases later to make it explicit that the execution was aborted:\n\n```Python hl_lines=\"7\"\n{!../docs_src/terminating/tutorial003.py!}\n```\n\nCheck it:\n\n<div class=\"termy\">\n\n",
+      "line_start": 100,
+      "line_end": 113
+    },
+    {
+      "stable_chunk_id": "child-01044ed33fd1dffb6733a025dffa057e2a1d4876",
+      "source_path": "docs/tutorial/terminating.md",
+      "display_text": "```console\n$ python main.py Camila\n\nNew user created: Camila\n\n// Now make it exit with an error\n$ python main.py root\n\nThe root user is reserved\nAborted!\n```\n\n</div>\n",
+      "line_start": 114,
+      "line_end": 126
+    }
+  ]
+}

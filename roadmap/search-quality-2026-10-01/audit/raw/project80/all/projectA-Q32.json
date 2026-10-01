@@ -1,0 +1,23 @@
+{
+  "tool": "get_docs_context",
+  "request": {
+    "question": "Does a well-cited documentation answer authorize an agent to edit files or apply a cleanup operation?",
+    "project_path": "/tmp/opencode/docatlas-ablation",
+    "scope": "all"
+  },
+  "seconds": 0.7326873370038811,
+  "is_error": false,
+  "wire": {
+    "_meta": null,
+    "content": [
+      {
+        "type": "text",
+        "text": "{\"status\": \"ok\", \"kind\": \"docs_context\", \"context_status\": \"ready\", \"context_available\": true, \"answer_supported\": false, \"answer_available\": false, \"support_status\": \"retrieval_only\", \"answer_policy\": \"cite_only\", \"coverage_policy\": \"retrieval_attribution_only\", \"query_coverage\": \"partial\", \"retrieval_coverage\": \"partial\", \"facet_coverage\": \"unverified\", \"covered_query_ids\": [], \"missing_query_ids\": [\"query-original\"], \"missing_facets\": [], \"facets\": [], \"sources\": [{\"evidence_id\": \"ev-f4ec12532fa8d2f3\", \"path_or_url\": \"docs/modules/patch-request-planning.md\", \"section\": \"Patch request planning module\", \"snippet\": \"# Patch request planning module\\n\\n`PatchRequestPlan` is the bounded, polarity-aware interpretation contract for\\nreviewed imperative change requests. It is independent from `QuestionPlan`:\\ndocumentation-answer obligations cannot authorize a patch, and patch\\nrequirements cannot authorize a documentation answer.\\n\\n## Responsibility\\n\\n`docmancer/docs/domain/patch_request_plan.py` parses only complete reviewed EN\\nand RU imperative surfaces. It records the operation, mutation and preserve\\ntargets, destination or parent context, behavioral and acceptance clauses,\\nexact source spans, provenance, and unresolved residue. Unsupported grammar,\\nimplicit targets, overflow, and polarity conflicts fail closed.\", \"version_binding\": \"unversioned\", \"content_sha256\": \"d4c87c4d98f674c99668d1523e6f19d0b300e5f0543d13ef82f89b43c0d35b12\", \"project_identity\": \"local:48277f62f8b4ff92ba1c60c082f92a43817f9e1c5ba4ea27e12cd77a76421585\", \"line_start\": 1, \"line_end\": 14, \"authority\": \"source_of_truth\", \"scope\": \"module\", \"source_uri\": \"docatlas://source/058f220998fd54fad65dabdd\"}], \"context_quality\": {\"status\": \"unverified\", \"reasons\": [\"coverage_unverified\"]}, \"read_next\": [{\"source_uri\": \"docatlas://source/5309f9e7b685ae4f82e62d2c\", \"path\": \"docs/modules/patch-request-planning.md\", \"project_identity\": \"local:48277f62f8b4ff92ba1c60c082f92a43817f9e1c5ba4ea27e12cd77a76421585\", \"snapshot_sha256\": \"sha256:18951186dd0587b700b72f8ce1f2c5042649e1d88f06a576345c65617a6c923a\", \"line_start\": 15, \"line_end\": 20, \"reason\": \"inspect_source_context\"}], \"edit_ready\": false, \"investigation_allowed\": true, \"estimated_tokens\": 540}",
+        "annotations": null,
+        "_meta": null
+      }
+    ],
+    "structuredContent": null,
+    "isError": false
+  }
+}

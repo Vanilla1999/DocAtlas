@@ -1,0 +1,23 @@
+{
+  "tool": "get_docs_context",
+  "request": {
+    "question": "Когда начинается lifespan teardown относительно connections и background tasks?",
+    "project_path": "/tmp/opencode/search-audit-work-20261001/fixtures/starlette",
+    "scope": "all"
+  },
+  "seconds": 0.1744893069990212,
+  "is_error": false,
+  "wire": {
+    "_meta": null,
+    "content": [
+      {
+        "type": "text",
+        "text": "{\"status\": \"ok\", \"kind\": \"docs_context\", \"context_status\": \"ready\", \"context_available\": true, \"answer_supported\": false, \"answer_available\": false, \"support_status\": \"retrieval_only\", \"answer_policy\": \"cite_only\", \"coverage_policy\": \"retrieval_attribution_only\", \"query_coverage\": \"full\", \"retrieval_coverage\": \"full\", \"facet_coverage\": \"unverified\", \"covered_query_ids\": [\"query-original\"], \"missing_query_ids\": [], \"missing_facets\": [], \"facets\": [], \"sources\": [{\"evidence_id\": \"ev-5378ef6855bc5fc5\", \"path_or_url\": \"docs/lifespan.md\", \"section\": \"Introduction\", \"snippet\": \"Starlette applications can register a lifespan handler for dealing with\\ncode that needs to run before the application starts up, or when the application\\nis shutting down.\\n\\n```python\\nimport contextlib\\n\\nfrom starlette.applications import Starlette\\n\\n\\n@contextlib.asynccontextmanager\\nasync def lifespan(app):\\n    async with some_async_resource():\\n        print(\\\"Run at startup!\\\")\\n        yield\\n        print(\\\"Run on shutdown!\\\")\\n\\n\\nroutes = [\\n    ...\\n]\\n\\napp = Starlette(routes=routes, lifespan=lifespan)\\n```\\n\\nStarlette will not start serving any incoming requests until the lifespan has been run.\\n\\nThe lifespan teardown will run once all connections have been closed, and\\nany in-process background tasks have completed.\\n\\nConsider using [`anyio.create_task_group()`](https://anyio.readthedocs.io/en/stable/tasks.html)\\nfor managing asynchronous tasks.\", \"version_binding\": \"unversioned\", \"content_sha256\": \"3b5225b014e690ec356b4a1a738821bf515807ab61c5b10df6bb5ab85798aba8\", \"project_identity\": \"local:49e9d0d4675482def440e8469c311fbd21c7134a17c652920e474a9e3b812930\", \"line_start\": 1, \"line_end\": 33, \"authority\": \"source_of_truth\", \"scope\": \"project\", \"source_uri\": \"docatlas://source/39f1ec6c2a3f73c043f119bc\"}, {\"evidence_id\": \"ev-f111b9899e3cdc84\", \"path_or_url\": \"docs/lifespan.md\", \"section\": \"Running lifespan in tests\", \"snippet\": \"```python\\nfrom example import app\\nfrom starlette.testclient import TestClient\\n\\n\\ndef test_homepage():\\n    with TestClient(app) as client:\\n        # Application's lifespan is called on entering the block.\\n        response = client.get(\\\"/\\\")\\n        assert response.status_code == 200\\n\\n    # And the lifespan's teardown is run when exiting the block.\\n```\", \"version_binding\": \"unversioned\", \"content_sha256\": \"2e2451dba1c35e614746123416e7e72db4d472361fb0fcd73ea8fb248f892a65\", \"project_identity\": \"local:49e9d0d4675482def440e8469c311fbd21c7134a17c652920e474a9e3b812930\", \"line_start\": 80, \"line_end\": 92, \"authority\": \"source_of_truth\", \"scope\": \"project\", \"source_uri\": \"docatlas://source/21e2ad9bfe39e28ccf93cded\"}], \"context_quality\": {\"status\": \"unverified\", \"reasons\": [\"coverage_unverified\"]}, \"read_next\": [], \"edit_ready\": false, \"investigation_allowed\": true, \"estimated_tokens\": 689}",
+        "annotations": null,
+        "_meta": null
+      }
+    ],
+    "structuredContent": null,
+    "isError": false
+  }
+}

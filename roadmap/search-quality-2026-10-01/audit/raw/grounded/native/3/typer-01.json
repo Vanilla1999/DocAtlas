@@ -1,0 +1,32 @@
+{
+  "id": "typer-01",
+  "project": "typer",
+  "family": "polarity",
+  "answerability": "within_budget",
+  "limit": 3,
+  "request": {
+    "library": "typer",
+    "query": "Does raising typer.Exit() itself imply an error, and what is its default exit code?",
+    "limit": 3
+  },
+  "seconds": 0.0023798599941073917,
+  "is_error": false,
+  "wire": {
+    "_meta": null,
+    "content": [
+      {
+        "type": "text",
+        "text": "\n------------------------------------------------------------\nResult 1: file:///tmp/opencode/search-audit-work-20261001/grounded/corpus/typer/docs/tutorial/terminating.md\n\n# Terminating\nThere are some cases where you might want to terminate a command at some point, and stop all subsequent execution.\nIt could be that your code determined that the program completed successfully, or it could be an operation aborted.\n## Exit a CLI program\nYou can normally just let the code of your CLI program finish its execution, but in some scenarios, you might want to terminate at some point in the middle of it. And prevent any subsequent code to run.\nThis doesn't have to mean that there's an error, just that nothing else needs to be executed.\nIn that case, you can raise a `typer.Exit()` exception:\n```Python\n{!../docs_src/terminating/tutorial001.py!}\n```\nThere are several things to see in this example.\n-   The CLI program is the function `main()`, not the others. This is the one that takes a _CLI argument_.\n-   The function `maybe_create_user()` can terminate the program by raising `typer.Exit()`.\n-   If the program is terminated by `maybe_create_user()` then `send_new_user_notification()` will never execute inside of `main()`.\nCheck it:\n```console\n$ python main.py Camila\n\nUser created: Camila\nNotification sent for new user: Camila\n\n// Try with an existing user\n$ python main.py rick\n\nThe user already exists\n\n// Notice that the notification code was never run, the second message is not printed\n```\n/// tip\nEven though you are raising an exception, it doesn't necessarily mean there's an error.\nThis is done with an exception because it works as an \"error\" and stops all execution.\nBut then **Typer** (actually Click) catches it and just terminates the program normally.\n///\n\n------------------------------------------------------------\nResult 2: file:///tmp/opencode/search-audit-work-20261001/grounded/corpus/typer/docs/tutorial/terminating.md\n\n## Exit with an error\n`typer.Exit()` takes an optional `code` parameter. By default, `code` is `0`, meaning there was no error.\nYou can pass a `code` with a number other than `0` to tell the terminal that there was an error in the execution of the program:\n```Python\n{!../docs_src/terminating/tutorial002.py!}\n```\nCheck it:\n```console\n$ python main.py Camila\n\nNew user created: Camila\n\n// Print the result code of the last program executed\n$ echo $?\n\n0\n\n// Now make it exit with an error\n$ python main.py root\n\nThe root user is reserved\n\n// Print the result code of the last program executed\n$ echo $?\n\n1\n\n// 1 means there was an error, 0 means no errors.\n```\n/// tip\nThe error code might be used by other programs (for example a Bash script) that execute your CLI program.\n///\n\n------------------------------------------------------------\nResult 3: file:///tmp/opencode/search-audit-work-20261001/grounded/corpus/typer/docs/tutorial/terminating.md\n\n## Abort\nThere's a special exception that you can use to \"abort\" a program.\nIt works more or less the same as `typer.Exit()` but will print `\"Aborted!\"` to the screen and can be useful in certain cases later to make it explicit that the execution was aborted:\n```Python\n{!../docs_src/terminating/tutorial003.py!}\n```\nCheck it:\n```console\n$ python main.py Camila\n\nNew user created: Camila\n\n// Now make it exit with an error\n$ python main.py root\n\nThe root user is reserved\nAborted!\n```\n",
+        "annotations": null,
+        "_meta": null
+      }
+    ],
+    "structuredContent": null,
+    "isError": false
+  },
+  "native_size": {
+    "utf8_bytes": 3387,
+    "actual_tokens": 787,
+    "tokenizer": "docatlas-offline:o200k_base"
+  }
+}

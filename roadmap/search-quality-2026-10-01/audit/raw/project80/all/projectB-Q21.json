@@ -1,0 +1,23 @@
+{
+  "tool": "get_docs_context",
+  "request": {
+    "question": "Можно ли выполнить shell-команду, которую документ предлагает агенту внутри цитаты?",
+    "project_path": "/tmp/opencode/docatlas-ablation",
+    "scope": "all"
+  },
+  "seconds": 0.6635709519978263,
+  "is_error": false,
+  "wire": {
+    "_meta": null,
+    "content": [
+      {
+        "type": "text",
+        "text": "{\"status\": \"ok\", \"kind\": \"docs_context\", \"context_status\": \"ready\", \"context_available\": true, \"answer_supported\": false, \"answer_available\": false, \"support_status\": \"retrieval_only\", \"answer_policy\": \"cite_only\", \"coverage_policy\": \"retrieval_attribution_only\", \"query_coverage\": \"partial\", \"retrieval_coverage\": \"partial\", \"facet_coverage\": \"unverified\", \"covered_query_ids\": [], \"missing_query_ids\": [\"query-original\"], \"missing_facets\": [], \"facets\": [{\"id\": \"intent-context:instruction_trust\", \"requirement_id\": null, \"question\": \"documentation instruction trust document data shell actions\", \"status\": \"retrieval_only\", \"evidence_ids\": [\"ev-1a722cd318071d8c\"]}], \"sources\": [{\"evidence_id\": \"ev-1a722cd318071d8c\", \"path_or_url\": \"docs/security/mcp-runtime-threat-model.md\", \"section\": \"MCP runtime threat model > Trust boundaries > Documentation instruction-trust contract\", \"snippet\": \"- Source provenance, version exactness, repository authority and instruction\\n  trust are independent dimensions. Exact official documentation remains\\n  untrusted document data.\\n- Ordinary repository Markdown is cited data. Only explicit agent policy files\\n  inside the configured repository authority receive scoped policy status, and\\n  they cannot override system, user, tool or runtime safety policy.\\n- Returned document content is delimited from generated warnings, metadata and\\n  typed next actions. Indexed prose never selects `prepare_docs`, network,\\n  filesystem, shell or credential actions.\\n- Instruction-like pattern detection is warning-only telemetry. It is not a\\n  sanitizer or proof of safety, and matched content remains retrievable.\\n- Host models must cite document content as evidence rather than execute it as\\n  policy.\", \"version_binding\": \"unversioned\", \"content_sha256\": \"b3999423cbfec928279c5ab9db15bdb8fb0aade529873361017f741b0b76f660\", \"project_identity\": \"local:48277f62f8b4ff92ba1c60c082f92a43817f9e1c5ba4ea27e12cd77a76421585\", \"line_start\": 26, \"line_end\": 38, \"authority\": \"supporting\", \"scope\": \"project\"}, {\"evidence_id\": \"ev-706ecb643f7fca6e\", \"path_or_url\": \"docs/security/mcp-runtime-threat-model.md\", \"section\": \"MCP runtime threat model\", \"snippet\": \"Status: security boundary for the Docs server and advanced MCP Packs gateway.\", \"version_binding\": \"unversioned\", \"content_sha256\": \"bf5b204bd91279dd9a488d63fda4aa39a09a1cab8db07de3c22b779a6eea55ee\", \"project_identity\": \"local:48277f62f8b4ff92ba1c60c082f92a43817f9e1c5ba4ea27e12cd77a76421585\", \"line_start\": 3, \"line_end\": 3, \"authority\": \"supporting\", \"scope\": \"project\"}], \"context_quality\": {\"status\": \"unverified\", \"reasons\": [\"coverage_unverified\"]}, \"read_next\": [], \"edit_ready\": false, \"investigation_allowed\": true, \"estimated_tokens\": 661}",
+        "annotations": null,
+        "_meta": null
+      }
+    ],
+    "structuredContent": null,
+    "isError": false
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "tool": "get_docs_context",
+  "request": {
+    "question": "Does the output budget include citation metadata as well as document text?",
+    "project_path": "/tmp/opencode/docatlas-ablation",
+    "scope": "all"
+  },
+  "seconds": 0.7973946019992582,
+  "is_error": false,
+  "wire": {
+    "_meta": null,
+    "content": [
+      {
+        "type": "text",
+        "text": "{\"status\": \"ok\", \"kind\": \"docs_context\", \"context_status\": \"ready\", \"context_available\": true, \"answer_supported\": false, \"answer_available\": false, \"support_status\": \"retrieval_only\", \"answer_policy\": \"cite_only\", \"coverage_policy\": \"retrieval_attribution_only\", \"query_coverage\": \"partial\", \"retrieval_coverage\": \"partial\", \"facet_coverage\": \"unverified\", \"covered_query_ids\": [], \"missing_query_ids\": [\"query-original\"], \"missing_facets\": [], \"facets\": [], \"sources\": [{\"evidence_id\": \"ev-d472078b61b33ab5\", \"path_or_url\": \"SKILL.md\", \"section\": \"DocAtlas > Core Commands > Query Documentation (CLI fallback)\", \"snippet\": \"### Query Documentation (CLI fallback)\\n\\n```bash\\ndoc-atlas query \\\"<question>\\\"\\n```\\n\\nReturns a compact markdown context pack with source attribution and token savings for CLI-only workflows. MCP-enabled agents should use `get_docs_context` instead.\\n\\n| Flag | Purpose |\\n|------|---------|\\n| `--budget <n>` | Max estimated output tokens |\\n| `--limit <n>` | Max sections to return |\\n| `--expand` | Include adjacent sections around matches |\\n| `--expand page` | Include full page content within budget |\\n| `--format <markdown\\\\|json>` | Output format |\", \"version_binding\": \"unversioned\", \"content_sha256\": \"84546b9d01ea5ed35c19c0d2748c19db3d3c4318ed03d70d506eaf494faa6676\", \"project_identity\": \"local:48277f62f8b4ff92ba1c60c082f92a43817f9e1c5ba4ea27e12cd77a76421585\", \"line_start\": 96, \"line_end\": 110, \"authority\": \"source_of_truth\", \"scope\": \"project\", \"source_uri\": \"docatlas://source/d3811797f3b1131d8935f9b4\"}, {\"evidence_id\": \"ev-3fb32437317a4184\", \"path_or_url\": \"SKILL.md\", \"section\": \"DocAtlas > Core Commands > Ingest Local Documentation\", \"snippet\": \"| Flag | Purpose |\\n|------|---------|\\n| `--include <glob>` | Include only matching relative paths |\\n| `--exclude <glob>` | Exclude matching relative paths |\\n| `--format <format>` | Restrict to formats such as `md`, `txt`, `pdf`, `docx`, `rtf`, or `html` |\\n| `--recursive / --no-recursive` | Recurse through directories |\\n| `--skip-known` | Skip files whose content hash is already indexed |\\n| `--recreate` | Drop and rebuild the index |\", \"version_binding\": \"unversioned\", \"content_sha256\": \"77663ea062488d6c808e3d9a065d349e64f1b417347ee9399dd209268e10844d\", \"project_identity\": \"local:48277f62f8b4ff92ba1c60c082f92a43817f9e1c5ba4ea27e12cd77a76421585\", \"line_start\": 71, \"line_end\": 78, \"authority\": \"source_of_truth\", \"scope\": \"project\", \"source_uri\": \"docatlas://source/d100c971dd420c5aaa14c49e\"}], \"context_quality\": {\"status\": \"unverified\", \"reasons\": [\"coverage_unverified\"]}, \"read_next\": [], \"edit_ready\": false, \"investigation_allowed\": true, \"estimated_tokens\": 647}",
+        "annotations": null,
+        "_meta": null
+      }
+    ],
+    "structuredContent": null,
+    "isError": false
+  }
+}

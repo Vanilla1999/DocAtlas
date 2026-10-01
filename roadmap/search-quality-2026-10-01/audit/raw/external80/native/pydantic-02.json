@@ -1,0 +1,23 @@
+{
+  "tool": "get_docs_context",
+  "request": {
+    "question": "Does a UUID string pass strict validation from JSON and from Python in the same way?",
+    "project_path": "/tmp/opencode/search-audit-work-20261001/fixtures/pydantic",
+    "scope": "all"
+  },
+  "seconds": 0.3593795900014811,
+  "is_error": false,
+  "wire": {
+    "_meta": null,
+    "content": [
+      {
+        "type": "text",
+        "text": "{\"status\": \"ok\", \"kind\": \"docs_context\", \"context_status\": \"ready\", \"context_available\": true, \"answer_supported\": false, \"answer_available\": false, \"support_status\": \"retrieval_only\", \"answer_policy\": \"cite_only\", \"coverage_policy\": \"retrieval_attribution_only\", \"query_coverage\": \"partial\", \"retrieval_coverage\": \"partial\", \"facet_coverage\": \"unverified\", \"covered_query_ids\": [\"query-original\", \"query-anchor-1\"], \"missing_query_ids\": [\"query-anchor-2\"], \"missing_facets\": [], \"facets\": [], \"sources\": [{\"evidence_id\": \"ev-67d9f8005a96517c\", \"path_or_url\": \"docs/concepts/strict_mode.md\", \"section\": \"Type coercions in strict mode\", \"snippet\": \"Note that we are looser when validating data from JSON in strict mode. For example, when validating a `UUID` field,\\ninstances of `str` will be accepted when validating from JSON, but not from python:\", \"version_binding\": \"unversioned\", \"content_sha256\": \"2c50ee695c842eb2f359f899239b6a2bc09100cbdef0d0e25c89142983975150\", \"project_identity\": \"local:dee89d9b00c29f8b46038582d3569cd8157162fec6f171d84685bc8b23f83a09\", \"authority\": \"source_of_truth\", \"scope\": \"project\", \"line_start\": 54, \"line_end\": 55, \"source_uri\": \"docatlas://source/41ebbfcd1a6f8b0a7e0aa1ab\"}, {\"evidence_id\": \"ev-f4693d357f776f62\", \"path_or_url\": \"docs/concepts/alias.md\", \"section\": \"Alias Precedence\", \"snippet\": \"```py\\nfrom pydantic import BaseModel, ConfigDict, Field\\n\\n\\ndef to_camel(string: str) -> str:\\n    return ''.join(word.capitalize() for word in string.split('_'))\\n\\n\\nclass Voice(BaseModel):\\n    model_config = ConfigDict(alias_generator=to_camel)\\n\\n    name: str\\n    language_code: str = Field(alias='lang')\\n\\n\\nvoice = Voice(Name='Filiz', lang='tr-TR')\\nprint(voice.language_code)\\n#> tr-TR\\nprint(voice.model_dump(by_alias=True))\\n#> {'Name': 'Filiz', 'lang': 'tr-TR'}\\n```\", \"version_binding\": \"unversioned\", \"content_sha256\": \"554892861b1e754fdb1cc765378ae0da4683340d3defdaa387e64e01661f04cc\", \"project_identity\": \"local:dee89d9b00c29f8b46038582d3569cd8157162fec6f171d84685bc8b23f83a09\", \"authority\": \"source_of_truth\", \"scope\": \"project\", \"line_start\": 170, \"line_end\": 190}], \"context_quality\": {\"status\": \"unverified\", \"reasons\": [\"coverage_unverified\"]}, \"read_next\": [{\"source_uri\": \"docatlas://source/23ed2da073fc6c3fc17c6288\", \"path\": \"docs/concepts/strict_mode.md\", \"project_identity\": \"local:dee89d9b00c29f8b46038582d3569cd8157162fec6f171d84685bc8b23f83a09\", \"snapshot_sha256\": \"sha256:06e00a3e114c85ff31286640cb9842a99209d4112d5cb4812b47d4bf556f2b71\", \"line_start\": 57, \"line_end\": 96, \"reason\": \"inspect_source_context\"}], \"edit_ready\": false, \"investigation_allowed\": true, \"estimated_tokens\": 638}",
+        "annotations": null,
+        "_meta": null
+      }
+    ],
+    "structuredContent": null,
+    "isError": false
+  }
+}

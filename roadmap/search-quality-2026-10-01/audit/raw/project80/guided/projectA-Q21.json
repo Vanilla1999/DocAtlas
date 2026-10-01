@@ -1,0 +1,27 @@
+{
+  "tool": "get_docs_context",
+  "request": {
+    "question": "Если нужное объяснение длиннее лимита MCP, что сохраняется в ответе и как получить оставшуюся часть?",
+    "project_path": "/tmp/opencode/docatlas-ablation",
+    "scope": "all",
+    "lookup_queries": [
+      "How does Docs MCP handle evidence longer than its output budget?",
+      "How can a caller retrieve omitted source context?"
+    ]
+  },
+  "seconds": 1.1010482239944395,
+  "is_error": false,
+  "wire": {
+    "_meta": null,
+    "content": [
+      {
+        "type": "text",
+        "text": "{\"status\": \"ok\", \"kind\": \"docs_context\", \"context_status\": \"ready\", \"context_available\": true, \"answer_supported\": false, \"answer_available\": false, \"support_status\": \"retrieval_only\", \"answer_policy\": \"cite_only\", \"coverage_policy\": \"retrieval_attribution_only\", \"query_coverage\": \"partial\", \"retrieval_coverage\": \"partial\", \"facet_coverage\": \"unverified\", \"covered_query_ids\": [\"query-lookup-1\", \"query-lookup-2\"], \"missing_query_ids\": [\"query-original\"], \"missing_facets\": [], \"facets\": [], \"sources\": [{\"evidence_id\": \"ev-c62ba46b3e1f0953\", \"path_or_url\": \"docs/adr/0001-mcp-boundary-contracts.md\", \"section\": \"ADR 0001: MCP boundary owns transport contracts > Consequences\", \"snippet\": \"- New MCP contract helpers live under `docmancer/docs/interfaces/mcp/`.\\n- Structured errors keep legacy top-level `status`, `reason_code`, and `message` for backward compatibility.\\n- Compact output preserves useful context summaries and pagination guidance rather than silently dropping all evidence.\\n- Further service facade cleanup is intentionally out of scope for this ADR and should happen in smaller compatibility-preserving steps.\", \"version_binding\": \"unversioned\", \"content_sha256\": \"33beed651e8008ef08e576cf73d8515392e3343eca7dd972c1d5f2b63730b142\", \"project_identity\": \"local:48277f62f8b4ff92ba1c60c082f92a43817f9e1c5ba4ea27e12cd77a76421585\", \"authority\": \"source_of_truth\", \"scope\": \"project\", \"line_start\": 23, \"line_end\": 26, \"source_uri\": \"docatlas://source/f513e1fbe713d2cae778a568\"}, {\"evidence_id\": \"ev-baf07e0d8cd4a015\", \"path_or_url\": \"docs/AGENT_DOCS_WORKFLOW.md\", \"section\": \"Agent documentation workflow > Patch tasks\", \"snippet\": \"## Patch tasks\\n\\nDocumentation context is evidence, not proof that a patch is correct. Retrieve the required documentation evidence before editing and still run the project's source search, tests, linters, and review after editing.\", \"version_binding\": \"unversioned\", \"content_sha256\": \"f176581ce1e41c93d9882073b509e5cb43565157ae21b63e699f2ae4f2cc93d0\", \"project_identity\": \"local:48277f62f8b4ff92ba1c60c082f92a43817f9e1c5ba4ea27e12cd77a76421585\", \"authority\": \"supporting\", \"scope\": \"project\", \"line_start\": 43, \"line_end\": 45}], \"context_quality\": {\"status\": \"unverified\", \"reasons\": [\"coverage_unverified\"]}, \"read_next\": [], \"edit_ready\": false, \"investigation_allowed\": true, \"estimated_tokens\": 566}",
+        "annotations": null,
+        "_meta": null
+      }
+    ],
+    "structuredContent": null,
+    "isError": false
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "tool": "get_docs_context",
+  "request": {
+    "question": "How does uv restrict candidate versions across multiple indexes and why?",
+    "project_path": "/tmp/opencode/search-audit-work-20261001/fixtures/uv",
+    "scope": "all"
+  },
+  "seconds": 0.5377519060057239,
+  "is_error": false,
+  "wire": {
+    "_meta": null,
+    "content": [
+      {
+        "type": "text",
+        "text": "{\"status\": \"ok\", \"kind\": \"docs_context\", \"context_status\": \"ready\", \"context_available\": true, \"answer_supported\": false, \"answer_available\": false, \"support_status\": \"retrieval_only\", \"answer_policy\": \"cite_only\", \"coverage_policy\": \"retrieval_attribution_only\", \"query_coverage\": \"full\", \"retrieval_coverage\": \"full\", \"facet_coverage\": \"unverified\", \"covered_query_ids\": [\"query-original\"], \"missing_query_ids\": [], \"missing_facets\": [], \"facets\": [], \"sources\": [{\"evidence_id\": \"ev-cd10c71db758b505\", \"path_or_url\": \"docs/pip/compatibility.md\", \"section\": \"Compatibility with `pip` and `pip-tools` > Packages that exist on multiple indexes\", \"snippet\": \"When uv searches for a package across multiple indexes, it will iterate over the indexes in order\\n(preferring the `--extra-index-url` over the default index), and stop searching as soon as it finds\\na match. This means that if a package exists on multiple indexes, uv will limit its candidate\\nversions to those present in the first index that contains the package.\\n\\n`pip`, meanwhile, will combine the candidate versions from all indexes, and select the best version\\nfrom the combined set, though it makes\\n[no guarantees around the order](https://github.com/pypa/pip/issues/5045#issuecomment-369521345) in\\nwhich it searches indexes, and expects that packages are unique up to name and version, even across\\nindexes.\\n\\nuv's behavior is such that if a package exists on an internal index, it should always be installed\\nfrom the internal index, and never from PyPI. The intent is to prevent \\\"dependency confusion\\\"\\nattacks, in which an attacker publishes a malicious package on PyPI with the same name as an\\ninternal package, thus causing the malicious package to be installed instead of the internal\\npackage. See, for example,\\n[the `torchtriton` attack](https://pytorch.org/blog/compromised-nightly-dependency/) from\\nDecember 2022.\\n\\nAs of v0.1.39, users can opt in to `pip`-style behavior for multiple indexes via the\\n`--index-strategy` command-line option, or the `UV_INDEX_STRATEGY` environment variable, which\\nsupports the following values:\\n\\n- `first-match` (default): Search for each package across all indexes, limiting the candidate\\n  versions to those present in the first index that contains the package, prioritizing the\\n  `--extra-index-url` indexes over the default index URL.\\n- `unsafe-first-match`: Search for each package across all indexes, but prefer the first index with\\n  a compatible version, even if newer versions are available on other indexes.\\n- `unsafe-best-match`: Search for each package across all indexes, and select the best version from\\n  the combined set of candidate versions.\", \"version_binding\": \"unversioned\", \"content_sha256\": \"c85e88dc446620322ff79f648d20f5f31626d15815e31fe9ef05daa219142707\", \"project_identity\": \"local:e65d484943b04206e676f1b569d594fafedcdaf92efb305771c46aba30d34f5c\", \"line_start\": 117, \"line_end\": 146, \"authority\": \"source_of_truth\", \"scope\": \"project\", \"source_uri\": \"docatlas://source/260d47cf6819cfae4155cb70\"}], \"context_quality\": {\"status\": \"unverified\", \"reasons\": [\"coverage_unverified\"]}, \"read_next\": [], \"edit_ready\": false, \"investigation_allowed\": true, \"estimated_tokens\": 791}",
+        "annotations": null,
+        "_meta": null
+      }
+    ],
+    "structuredContent": null,
+    "isError": false
+  }
+}

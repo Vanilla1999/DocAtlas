@@ -1,0 +1,25 @@
+{
+  "ids": [
+    "projectA-Q02",
+    "projectA-Q05",
+    "projectA-Q07",
+    "projectA-Q09",
+    "projectA-Q11",
+    "projectA-Q14",
+    "projectA-Q18",
+    "projectA-Q23",
+    "projectA-Q25",
+    "projectA-Q29",
+    "projectB-Q03",
+    "projectB-Q04",
+    "projectB-Q08",
+    "projectB-Q10",
+    "projectB-Q14",
+    "projectB-Q17",
+    "projectB-Q20",
+    "projectB-Q23",
+    "projectB-Q28",
+    "projectB-Q34"
+  ],
+  "note": "Chosen mechanism cases before Grounded run; 10 RU and 10 EN, not random holdout."
+}

@@ -1,0 +1,23 @@
+{
+  "tool": "get_docs_context",
+  "request": {
+    "question": "Is estimated_tokens the exact token count of my model? How is the actual size of docs_context limited?",
+    "project_path": "/tmp/opencode/docatlas-ablation",
+    "scope": "all"
+  },
+  "seconds": 1.340139549000014,
+  "is_error": false,
+  "wire": {
+    "_meta": null,
+    "content": [
+      {
+        "type": "text",
+        "text": "{\"status\": \"ok\", \"kind\": \"docs_context\", \"context_status\": \"ready\", \"context_available\": true, \"answer_supported\": false, \"answer_available\": false, \"support_status\": \"retrieval_only\", \"answer_policy\": \"cite_only\", \"coverage_policy\": \"retrieval_attribution_only\", \"query_coverage\": \"partial\", \"retrieval_coverage\": \"partial\", \"facet_coverage\": \"unverified\", \"covered_query_ids\": [\"query-original\", \"query-anchor-1\"], \"missing_query_ids\": [\"query-anchor-2\"], \"missing_facets\": [], \"facets\": [], \"sources\": [{\"evidence_id\": \"ev-5b00a0b7e2c7179b\", \"path_or_url\": \"docs/retrieval-boundaries.md\", \"section\": \"Retrieval and admission boundaries > Whole-response token budget\", \"snippet\": \"## Whole-response token budget\\n\\nThe public `estimated_tokens` retains its compatible estimate: the ceiling of\\ncanonical UTF-8 JSON bytes divided by four. Admission of `docs_context` separately\\ntakes the maximum of that estimate and the pinned offline `o200k_base` token count\\nover the entire canonical JSON, including metadata and optional locators, within\\n800 tokens and three sources. Neither number promises the exact count of every\\nclient model.\\nDo not change the public estimate globally to simulate this internal admission\\npolicy. A shorter snippet still must retain a qualified contiguous source span.\", \"version_binding\": \"unversioned\", \"content_sha256\": \"f388aa83cc93af310d26159e25deede3547823424ceda16fb9eb963d2b9cb05d\", \"project_identity\": \"local:48277f62f8b4ff92ba1c60c082f92a43817f9e1c5ba4ea27e12cd77a76421585\", \"line_start\": 21, \"line_end\": 30, \"authority\": \"source_of_truth\", \"scope\": \"module\", \"source_uri\": \"docatlas://source/4182b88b17747c33d97f7105\"}, {\"evidence_id\": \"ev-61e3cf4de7158274\", \"path_or_url\": \"docs/project-docs-mcp-workflow.md\", \"section\": \"Project docs MCP workflow > Advanced low-level flow\", \"snippet\": \"After sync, proceed to:\\n\\n```text\\nget_docs_context(project_path=..., question=..., scope=\\\"all\\\")\\n```\\n\\n`get_docs_context(project_path=..., scope=\\\"all\\\", question=...)` returns retrieval-only `docs_context` for project reads, source-bound `patch_context` for an explicit change task, or fail-closed `insufficient_evidence` when no safe project source exists. Certified `docs_answer` remains limited to library, dependency, and mixed evidence lanes.\\n\\nFor module-specific queries, use exact module filters:\", \"version_binding\": \"unversioned\", \"content_sha256\": \"71fcdd237934e581b36bb315cb1b3630958e9ffebc2bdfbb91766aa5895967a1\", \"project_identity\": \"local:48277f62f8b4ff92ba1c60c082f92a43817f9e1c5ba4ea27e12cd77a76421585\", \"line_start\": 73, \"line_end\": 81, \"authority\": \"source_of_truth\", \"scope\": \"project\", \"source_uri\": \"docatlas://source/7422b42e686d69752873b1d9\"}], \"context_quality\": {\"status\": \"unverified\", \"reasons\": [\"coverage_unverified\"]}, \"read_next\": [], \"edit_ready\": false, \"investigation_allowed\": true, \"estimated_tokens\": 697}",
+        "annotations": null,
+        "_meta": null
+      }
+    ],
+    "structuredContent": null,
+    "isError": false
+  }
+}

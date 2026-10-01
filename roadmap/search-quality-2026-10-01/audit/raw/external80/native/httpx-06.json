@@ -1,0 +1,23 @@
+{
+  "tool": "get_docs_context",
+  "request": {
+    "question": "Какие переменные задают прокси для http, https и всех запросов?",
+    "project_path": "/tmp/opencode/search-audit-work-20261001/fixtures/httpx",
+    "scope": "all"
+  },
+  "seconds": 0.1713948300021002,
+  "is_error": false,
+  "wire": {
+    "_meta": null,
+    "content": [
+      {
+        "type": "text",
+        "text": "{\"status\": \"ok\", \"kind\": \"docs_context\", \"context_status\": \"ready\", \"context_available\": true, \"answer_supported\": false, \"answer_available\": false, \"support_status\": \"retrieval_only\", \"answer_policy\": \"cite_only\", \"coverage_policy\": \"retrieval_attribution_only\", \"query_coverage\": \"full\", \"retrieval_coverage\": \"full\", \"facet_coverage\": \"unverified\", \"covered_query_ids\": [\"query-original\"], \"missing_query_ids\": [], \"missing_facets\": [], \"facets\": [{\"id\": \"retrieval-need:need-1\", \"requirement_id\": null, \"question\": \"Какие переменные задают прокси для http, https и всех запросов?\", \"status\": \"retrieval_only\", \"evidence_ids\": [\"ev-c874ec3ce899b52e\"]}], \"sources\": [{\"evidence_id\": \"ev-c874ec3ce899b52e\", \"path_or_url\": \"docs/environment_variables.md\", \"section\": \"Environment Variables > Proxies\", \"snippet\": \"For more information on using proxies in HTTPX, see [HTTP Proxying](advanced/proxies.md#http-proxying).\\n\\n### `HTTP_PROXY`, `HTTPS_PROXY`, `ALL_PROXY`\\n\\nValid values: A URL to a proxy\\n\\n`HTTP_PROXY`, `HTTPS_PROXY`, `ALL_PROXY` set the proxy to be used for `http`, `https`, or all requests respectively.\\n\\n```bash\\nexport HTTP_PROXY=http://my-external-proxy.com:1234\\n\\n# This request will be sent through the proxy\\npython -c \\\"import httpx; httpx.get('http://example.com')\\\"\\n\\n# This request will be sent directly, as we set `trust_env=False`\\npython -c \\\"import httpx; httpx.get('http://example.com', trust_env=False)\\\"\\n\\n```\", \"version_binding\": \"unversioned\", \"content_sha256\": \"7648859cab930aa13fb594455fc1b3449e18fb45fe48765792d61c1ddd4ee635\", \"project_identity\": \"local:8cb756392a06b5929cccc7f21e226fea445751f0d8e07285f2b940cee43cfdc6\", \"line_start\": 18, \"line_end\": 35, \"authority\": \"source_of_truth\", \"scope\": \"project\", \"source_uri\": \"docatlas://source/6c3287ff67272035265bc96d\"}], \"context_quality\": {\"status\": \"unverified\", \"reasons\": [\"coverage_unverified\"]}, \"read_next\": [{\"source_uri\": \"docatlas://source/a3163a586012978870283188\", \"path\": \"docs/environment_variables.md\", \"project_identity\": \"local:8cb756392a06b5929cccc7f21e226fea445751f0d8e07285f2b940cee43cfdc6\", \"snapshot_sha256\": \"sha256:d0cdf4d740dc3ed8b21c4ee45735551e05d4e57d0fda05a2f18c4684197a27eb\", \"line_start\": 13, \"line_end\": 17, \"reason\": \"inspect_source_context\"}], \"edit_ready\": false, \"investigation_allowed\": true, \"estimated_tokens\": 575}",
+        "annotations": null,
+        "_meta": null
+      }
+    ],
+    "structuredContent": null,
+    "isError": false
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "tool": "get_docs_context",
+  "request": {
+    "question": "Provide every documented workflow, caveat and complete code example verbatim from all uv source files in this snapshot, without omissions.",
+    "project_path": "/tmp/opencode/search-audit-work-20261001/fixtures/uv",
+    "scope": "all"
+  },
+  "seconds": 0.32447632899857126,
+  "is_error": false,
+  "wire": {
+    "_meta": null,
+    "content": [
+      {
+        "type": "text",
+        "text": "{\"status\": \"ok\", \"kind\": \"docs_context\", \"context_status\": \"ready\", \"context_available\": true, \"answer_supported\": false, \"answer_available\": false, \"support_status\": \"retrieval_only\", \"answer_policy\": \"cite_only\", \"coverage_policy\": \"retrieval_attribution_only\", \"query_coverage\": \"partial\", \"retrieval_coverage\": \"partial\", \"facet_coverage\": \"unverified\", \"covered_query_ids\": [], \"missing_query_ids\": [\"query-original\"], \"missing_facets\": [], \"facets\": [], \"sources\": [{\"evidence_id\": \"ev-c17ac28a618bafa7\", \"path_or_url\": \"docs/pip/compatibility.md\", \"section\": \"Local version identifiers\", \"snippet\": \"[PEP 440](https://peps.python.org/pep-0440/#version-specifiers) specifies that the local version\\nsegment should typically be ignored when evaluating version specifiers, with a few exceptions. For\\nexample, `foo==1.2.3` should accept `1.2.3+local`, but `foo==1.2.3+local` should _not_ accept\\n`1.2.3`. These asymmetries are hard to model in a resolution algorithm. As such, uv treats `1.2.3`\\nand `1.2.3+local` as entirely separate versions, but respects local versions provided as direct\\ndependencies throughout the resolution, such that if you provide `foo==1.2.3+local` as a direct\\ndependency, `1.2.3+local` _will_ be accepted for any transitive dependencies that request\\n`foo==1.2.3`.\", \"version_binding\": \"unversioned\", \"content_sha256\": \"93a5ba3e8d210a53ebf3857701fe20e7792f3312c93a1ba1aec9e07499f2a4aa\", \"project_identity\": \"local:e65d484943b04206e676f1b569d594fafedcdaf92efb305771c46aba30d34f5c\", \"line_start\": 84, \"line_end\": 91, \"authority\": \"source_of_truth\", \"scope\": \"project\"}, {\"evidence_id\": \"ev-ee1426f03f51280d\", \"path_or_url\": \"docs/pip/compatibility.md\", \"section\": \"Compatibility with `pip` and `pip-tools`\", \"snippet\": \"uv is designed as a drop-in replacement for common `pip` and `pip-tools` workflows.\", \"version_binding\": \"unversioned\", \"content_sha256\": \"77bac67fb157bd5c1e518f1eaa799909087befd4071a56d65c56185cf9e1de87\", \"project_identity\": \"local:e65d484943b04206e676f1b569d594fafedcdaf92efb305771c46aba30d34f5c\", \"line_start\": 3, \"line_end\": 3, \"authority\": \"source_of_truth\", \"scope\": \"project\"}], \"context_quality\": {\"status\": \"partial\", \"reasons\": [\"requested_part_missing\"]}, \"read_next\": [{\"source_uri\": \"docatlas://source/f419f62fbabf8161a6b0c83b\", \"path\": \"docs/pip/compatibility.md\", \"project_identity\": \"local:e65d484943b04206e676f1b569d594fafedcdaf92efb305771c46aba30d34f5c\", \"snapshot_sha256\": \"sha256:193d4e4f575ae0975b66b76d4ea93b15aaede550b85de37989caef9f6f494923\", \"line_start\": 359, \"line_end\": 376, \"reason\": \"inspect_source_context\"}], \"edit_ready\": false, \"investigation_allowed\": true, \"estimated_tokens\": 642}",
+        "annotations": null,
+        "_meta": null
+      }
+    ],
+    "structuredContent": null,
+    "isError": false
+  }
+}

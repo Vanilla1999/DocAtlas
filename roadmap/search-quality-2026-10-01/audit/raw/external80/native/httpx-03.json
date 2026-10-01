@@ -1,0 +1,23 @@
+{
+  "tool": "get_docs_context",
+  "request": {
+    "question": "Назови четыре типа timeout в HTTPX и объясни, что ограничивает каждый.",
+    "project_path": "/tmp/opencode/search-audit-work-20261001/fixtures/httpx",
+    "scope": "all"
+  },
+  "seconds": 0.24854170400067233,
+  "is_error": false,
+  "wire": {
+    "_meta": null,
+    "content": [
+      {
+        "type": "text",
+        "text": "{\"status\": \"ok\", \"kind\": \"docs_context\", \"context_status\": \"ready\", \"context_available\": true, \"answer_supported\": false, \"answer_available\": false, \"support_status\": \"retrieval_only\", \"answer_policy\": \"cite_only\", \"coverage_policy\": \"retrieval_attribution_only\", \"query_coverage\": \"partial\", \"retrieval_coverage\": \"partial\", \"facet_coverage\": \"unverified\", \"covered_query_ids\": [\"query-anchor-1\"], \"missing_query_ids\": [\"query-original\"], \"missing_facets\": [], \"facets\": [], \"sources\": [{\"evidence_id\": \"ev-798926cd56d07f52\", \"path_or_url\": \"docs/advanced/timeouts.md\", \"section\": \"Fine tuning the configuration\", \"snippet\": \"## Fine tuning the configuration\\n\\nHTTPX also allows you to specify the timeout behavior in more fine grained detail.\\n\\nThere are four different types of timeouts that may occur. These are **connect**,\\n**read**, **write**, and **pool** timeouts.\\n\\n* The **connect** timeout specifies the maximum amount of time to wait until\\na socket connection to the requested host is established. If HTTPX is unable to connect\\nwithin this time frame, a `ConnectTimeout` exception is raised.\\n* The **read** timeout specifies the maximum duration to wait for a chunk of\\ndata to be received (for example, a chunk of the response body). If HTTPX is\\nunable to receive data within this time frame, a `ReadTimeout` exception is raised.\\n* The **write** timeout specifies the maximum duration to wait for a chunk of\\ndata to be sent (for example, a chunk of the request body). If HTTPX is unable\\nto send data within this time frame, a `WriteTimeout` exception is raised.\\n* The **pool** timeout specifies the maximum duration to wait for acquiring\\na connection from the connection pool. If HTTPX is unable to acquire a connection\\nwithin this time frame, a `PoolTimeout` exception is raised. A related\\nconfiguration here is the maximum number of allowable connections in the\\nconnection pool, which is configured by the `limits` argument.\\n\\nYou can configure the timeout behavior for any of these values...\\n\\n```python\\n# A client with a 60s timeout for connecting, and a 10s timeout elsewhere.\\ntimeout = httpx.Timeout(10.0, connect=60.0)\\nclient = httpx.Client(timeout=timeout)\\n\\nresponse = client.get('http://example.com/')\\n```\", \"version_binding\": \"unversioned\", \"content_sha256\": \"f2e97c733f9ffef158df7f0199850c8f1e07ae96bcda10e832dc9c0982a7b5f1\", \"project_identity\": \"local:8cb756392a06b5929cccc7f21e226fea445751f0d8e07285f2b940cee43cfdc6\", \"line_start\": 41, \"line_end\": 71, \"authority\": \"source_of_truth\", \"scope\": \"project\"}], \"context_quality\": {\"status\": \"unverified\", \"reasons\": [\"coverage_unverified\"]}, \"read_next\": [{\"source_uri\": \"docatlas://source/e05436e4f4177df75a89dccb\", \"path\": \"docs/advanced/timeouts.md\", \"project_identity\": \"local:8cb756392a06b5929cccc7f21e226fea445751f0d8e07285f2b940cee43cfdc6\", \"snapshot_sha256\": \"sha256:48959a587ecc6430f9051ab1b1c76fcebc3f3e95ec01199281aab813a2dcfaa1\", \"line_start\": 1, \"line_end\": 4, \"reason\": \"inspect_source_context\"}], \"edit_ready\": false, \"investigation_allowed\": true, \"estimated_tokens\": 751}",
+        "annotations": null,
+        "_meta": null
+      }
+    ],
+    "structuredContent": null,
+    "isError": false
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "tool": "get_docs_context",
+  "request": {
+    "question": "I renamed a guide and removed another one. What reconciles the index with those filesystem changes?",
+    "project_path": "/tmp/opencode/docatlas-ablation"
+  },
+  "seconds": 0.8715789929992752,
+  "is_error": false,
+  "wire": {
+    "_meta": null,
+    "content": [
+      {
+        "type": "text",
+        "text": "{\"status\": \"ok\", \"kind\": \"docs_context\", \"context_status\": \"ready\", \"context_available\": true, \"answer_supported\": false, \"answer_available\": false, \"support_status\": \"retrieval_only\", \"answer_policy\": \"cite_only\", \"coverage_policy\": \"retrieval_attribution_only\", \"query_coverage\": \"partial\", \"retrieval_coverage\": \"partial\", \"facet_coverage\": \"unverified\", \"covered_query_ids\": [], \"missing_query_ids\": [\"query-original\"], \"missing_facets\": [], \"facets\": [], \"sources\": [{\"evidence_id\": \"ev-040b013ac1d62329\", \"path_or_url\": \"docs/change-aware-docs.md\", \"section\": \"Change-aware documentation review > Local use\", \"snippet\": \"Use `--format json` for CI integrations. With `--base`, DocAtlas reads added, copied, modified, deleted, and renamed paths from `git diff`; `--changed-file` is useful when the caller already has a changed-file list.\", \"version_binding\": \"unversioned\", \"content_sha256\": \"a7fd5e5585916368153bd99a47a2bd20161445c7d5693475c7ebe03803a57081\", \"project_identity\": \"local:48277f62f8b4ff92ba1c60c082f92a43817f9e1c5ba4ea27e12cd77a76421585\", \"authority\": \"supporting\", \"scope\": \"project\", \"line_start\": 14, \"line_end\": 14}, {\"evidence_id\": \"ev-e58e5bef8bfa606b\", \"path_or_url\": \"docs/change-aware-docs.md\", \"section\": \"Change-aware documentation review\", \"snippet\": \"DocAtlas can inspect a diff and report which maintained documentation should be reviewed. The feature is intentionally advisory: it does not generate or modify repository docs on its own.\", \"version_binding\": \"unversioned\", \"content_sha256\": \"4228c81e222023463229e6f67d6dc046142b0e30249f7de7444a5806e19d09d1\", \"project_identity\": \"local:48277f62f8b4ff92ba1c60c082f92a43817f9e1c5ba4ea27e12cd77a76421585\", \"line_start\": 3, \"line_end\": 3, \"authority\": \"supporting\", \"scope\": \"project\"}, {\"evidence_id\": \"ev-463a10526e12abcd\", \"path_or_url\": \"docs/change-aware-docs.md\", \"section\": \"Change-aware documentation review > Local use\", \"snippet\": \"`--sync-saved-docs` is an optional local CI adapter. It requires `--base/--head` so rename and deletion status comes from exact Git evidence. It may index files already present in that accepted snapshot, but does not author files, commit, push, post comments, or access the network.\", \"version_binding\": \"unversioned\", \"content_sha256\": \"921dd3a044622c32e368aa17f3af8380076606459223648a36a31823842068fd\", \"project_identity\": \"local:48277f62f8b4ff92ba1c60c082f92a43817f9e1c5ba4ea27e12cd77a76421585\", \"line_start\": 20, \"line_end\": 20, \"authority\": \"supporting\", \"scope\": \"project\"}], \"context_quality\": {\"status\": \"unverified\", \"reasons\": [\"coverage_unverified\"]}, \"read_next\": [], \"edit_ready\": false, \"investigation_allowed\": true, \"estimated_tokens\": 642}",
+        "annotations": null,
+        "_meta": null
+      }
+    ],
+    "structuredContent": null,
+    "isError": false
+  }
+}

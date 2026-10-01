@@ -1,0 +1,23 @@
+{
+  "tool": "get_docs_context",
+  "request": {
+    "question": "Which ruff configuration is best for our service? Our workload and deployment constraints are not specified.",
+    "project_path": "/tmp/opencode/search-audit-work-20261001/fixtures/ruff",
+    "scope": "all"
+  },
+  "seconds": 0.4148757029979606,
+  "is_error": false,
+  "wire": {
+    "_meta": null,
+    "content": [
+      {
+        "type": "text",
+        "text": "{\"status\": \"ok\", \"kind\": \"docs_context\", \"context_status\": \"ready\", \"context_available\": true, \"answer_supported\": false, \"answer_available\": false, \"support_status\": \"retrieval_only\", \"answer_policy\": \"cite_only\", \"coverage_policy\": \"retrieval_attribution_only\", \"query_coverage\": \"partial\", \"retrieval_coverage\": \"partial\", \"facet_coverage\": \"unverified\", \"covered_query_ids\": [], \"missing_query_ids\": [\"query-original\"], \"missing_facets\": [], \"facets\": [], \"sources\": [{\"evidence_id\": \"ev-87de3ef6dfabb4dc\", \"path_or_url\": \"docs/configuration.md\", \"section\": \"Configuring Ruff > Config file discovery\", \"snippet\": \"Unlike [ESLint](https://eslint.org/docs/latest/use/configure/configuration-files#cascading-configuration-objects),\\nRuff does not merge settings across configuration files; instead, the \\\"closest\\\" configuration file\\nis used, and any parent configuration files are ignored. In lieu of this implicit cascade, Ruff\\nsupports an [`extend`](settings.md#extend) field, which allows you to inherit the settings from another\\nconfig file, like so:\\n\\n=== \\\"pyproject.toml\\\"\", \"version_binding\": \"unversioned\", \"content_sha256\": \"a3c23716bd74dabf6370582de93d7f5c0bfe34f62577e446dce85860d75dd613\", \"project_identity\": \"local:4e2639e05c3b04e0e17b9c400ffaba505bafec956146f653f20929673ee9776b\", \"authority\": \"source_of_truth\", \"scope\": \"project\", \"line_start\": 278, \"line_end\": 284, \"source_uri\": \"docatlas://source/02db01be471a4200ba9e6c8c\"}, {\"evidence_id\": \"ev-c780bd9eaafddae3\", \"path_or_url\": \"docs/configuration.md\", \"section\": \"Configuring Ruff\", \"snippet\": \"Ruff respects `pyproject.toml`, `ruff.toml`, and `.ruff.toml` files. All three implement an\\nequivalent schema (though in the `ruff.toml` and `.ruff.toml` versions, the `[tool.ruff]` header and\\n`tool.ruff` section prefix is omitted).\\n\\nFor a complete enumeration of the available configuration options, see [_Settings_](settings.md).\", \"version_binding\": \"unversioned\", \"content_sha256\": \"39012d8e66b992769743abf2710728438258ae9eac3ddb3d26b1e02a95406cd7\", \"project_identity\": \"local:4e2639e05c3b04e0e17b9c400ffaba505bafec956146f653f20929673ee9776b\", \"authority\": \"source_of_truth\", \"scope\": \"project\", \"line_start\": 249, \"line_end\": 253}], \"context_quality\": {\"status\": \"unverified\", \"reasons\": [\"coverage_unverified\"]}, \"read_next\": [{\"source_uri\": \"docatlas://source/7b8636912bcaf092b865dd7a\", \"path\": \"docs/configuration.md\", \"project_identity\": \"local:4e2639e05c3b04e0e17b9c400ffaba505bafec956146f653f20929673ee9776b\", \"snapshot_sha256\": \"sha256:bf1f9a85b89c749f9a17d2fee5af4630cb894fdbbee134ec7a635e4a1bc3b9ad\", \"line_start\": 1, \"line_end\": 13, \"reason\": \"inspect_source_context\"}], \"edit_ready\": false, \"investigation_allowed\": true, \"estimated_tokens\": 659}",
+        "annotations": null,
+        "_meta": null
+      }
+    ],
+    "structuredContent": null,
+    "isError": false
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "tool": "get_docs_context",
+  "request": {
+    "question": "estimated_tokens — это точное число токенов моей модели? Как ограничивается реальный размер docs_context?",
+    "project_path": "/tmp/opencode/docatlas-ablation",
+    "scope": "all",
+    "lookup_queries": [
+      "What does estimated_tokens measure?",
+      "How is the docs_context admission token budget enforced?"
+    ]
+  },
+  "seconds": 0.9944253339999705,
+  "is_error": false,
+  "wire": {
+    "_meta": null,
+    "content": [
+      {
+        "type": "text",
+        "text": "{\"status\": \"ok\", \"kind\": \"docs_context\", \"context_status\": \"ready\", \"context_available\": true, \"answer_supported\": false, \"answer_available\": false, \"support_status\": \"retrieval_only\", \"answer_policy\": \"cite_only\", \"coverage_policy\": \"retrieval_attribution_only\", \"query_coverage\": \"partial\", \"retrieval_coverage\": \"partial\", \"facet_coverage\": \"unverified\", \"covered_query_ids\": [\"query-anchor-1\", \"query-lookup-2\"], \"missing_query_ids\": [\"query-original\", \"query-anchor-2\", \"query-lookup-1\"], \"missing_facets\": [], \"facets\": [], \"sources\": [{\"evidence_id\": \"ev-5b00a0b7e2c7179b\", \"path_or_url\": \"docs/retrieval-boundaries.md\", \"section\": \"Retrieval and admission boundaries > Whole-response token budget\", \"snippet\": \"The public `estimated_tokens` retains its compatible estimate: the ceiling of\\ncanonical UTF-8 JSON bytes divided by four. Admission of `docs_context` separately\\ntakes the maximum of that estimate and the pinned offline `o200k_base` token count\\nover the entire canonical JSON, including metadata and optional locators, within\\n800 tokens and three sources. Neither number promises the exact count of every\\nclient model.\\nDo not change the public estimate globally to simulate this internal admission\\npolicy. A shorter snippet still must retain a qualified contiguous source span.\", \"version_binding\": \"unversioned\", \"content_sha256\": \"99bf1558d810dbe5657f53aa39dbde420347201ac8a23a2a033d8b5ea8b1391c\", \"project_identity\": \"local:48277f62f8b4ff92ba1c60c082f92a43817f9e1c5ba4ea27e12cd77a76421585\", \"authority\": \"source_of_truth\", \"scope\": \"module\", \"line_start\": 23, \"line_end\": 30, \"source_uri\": \"docatlas://source/b3939e49d39c277653d9ea70\"}, {\"evidence_id\": \"ev-a23b8dfc205a1884\", \"path_or_url\": \"README.md\", \"section\": \"DocAtlas > Project-docs MCP server > Recommended workflow\", \"snippet\": \"This makes `get_docs_context` the single high-level entry point. Natural-language project questions retrieve bounded current repository documentation first. Narrow typed questions with complete relation-specific proof receive `docs_answer`; broader questions receive cited retrieval-only `docs_context`; coding and patch tasks receive source-bound `patch_context`; missing safe evidence returns fail-closed `insufficient_evidence`. Parser uncertainty blocks answer certification, not safe project-scoped retrieval. Retrieval-only aliases never authorize an answer or edit. Delivery strategy, debug shape, and packet budget are server-owned policy.\", \"version_binding\": \"unversioned\", \"content_sha256\": \"69fc064ac640aa737bd66d82085fab355bfaeb79a97a5a1e41c7e3329a90ef9b\", \"project_identity\": \"local:48277f62f8b4ff92ba1c60c082f92a43817f9e1c5ba4ea27e12cd77a76421585\", \"authority\": \"source_of_truth\", \"scope\": \"project\", \"line_start\": 136, \"line_end\": 136, \"source_uri\": \"docatlas://source/93867125be488261b62cb36e\"}], \"context_quality\": {\"status\": \"unverified\", \"reasons\": [\"coverage_unverified\", \"budget_limited\"]}, \"read_next\": [], \"edit_ready\": false, \"investigation_allowed\": true, \"estimated_tokens\": 732}",
+        "annotations": null,
+        "_meta": null
+      }
+    ],
+    "structuredContent": null,
+    "isError": false
+  }
+}

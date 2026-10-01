@@ -1,0 +1,26 @@
+{
+  "tool": "get_docs_context",
+  "request": {
+    "question": "Я впервые подключил MCP. Нужно ли каждый вопрос начинать с docs_status?",
+    "project_path": "/tmp/opencode/docatlas-ablation",
+    "scope": "all",
+    "lookup_queries": [
+      "When should an agent call docs_status instead of get_docs_context?"
+    ]
+  },
+  "seconds": 1.168695303000277,
+  "is_error": false,
+  "wire": {
+    "_meta": null,
+    "content": [
+      {
+        "type": "text",
+        "text": "{\"status\": \"ok\", \"kind\": \"docs_context\", \"context_status\": \"ready\", \"context_available\": true, \"answer_supported\": false, \"answer_available\": false, \"support_status\": \"retrieval_only\", \"answer_policy\": \"cite_only\", \"coverage_policy\": \"retrieval_attribution_only\", \"query_coverage\": \"partial\", \"retrieval_coverage\": \"partial\", \"facet_coverage\": \"unverified\", \"covered_query_ids\": [\"query-anchor-1\", \"query-lookup-1\"], \"missing_query_ids\": [\"query-original\"], \"missing_facets\": [], \"facets\": [], \"sources\": [{\"evidence_id\": \"ev-5e9fe788120ffba3\", \"path_or_url\": \"docs/mcp-docs-server.md\", \"section\": \"Docs MCP server > Public tool contract\", \"snippet\": \"The normal flow is:\\n\\n```text\\nget_docs_context(question, project_path)\\n→ returned recommended_next_action? obtain confirmation and call that exact action\\n→ if a job was returned, poll docs_status(job_id)\\n→ retry the original bounded get_docs_context question\\n```\", \"version_binding\": \"unversioned\", \"content_sha256\": \"21ce6116392e9451d384a9d030da13cb7e4f8f08a4b3ef8a1c4e6d13bdce9fd8\", \"project_identity\": \"local:48277f62f8b4ff92ba1c60c082f92a43817f9e1c5ba4ea27e12cd77a76421585\", \"authority\": \"source_of_truth\", \"scope\": \"project\", \"line_start\": 33, \"line_end\": 40, \"source_uri\": \"docatlas://source/225b038ce5c1b8119fdaad64\"}, {\"evidence_id\": \"ev-4894e9170acd01af\", \"path_or_url\": \"README.md\", \"section\": \"DocAtlas > Project-docs MCP server > Agent contract for a local project\", \"snippet\": \"The contract is read-only. For an explicit health, freshness, index, or job-status request, agents use `docs_status`; otherwise they start with `get_docs_context`. Agents call `prepare_docs` only when that tool returns it as `next_action`, or when a user explicitly requests a refresh or sync.\", \"version_binding\": \"unversioned\", \"content_sha256\": \"45ab416f911a2b2402340090a90438c16d74023f595a8395ac03c0bfce74ab8a\", \"project_identity\": \"local:48277f62f8b4ff92ba1c60c082f92a43817f9e1c5ba4ea27e12cd77a76421585\", \"authority\": \"source_of_truth\", \"scope\": \"project\", \"line_start\": 225, \"line_end\": 225, \"source_uri\": \"docatlas://source/04e22a52e82d22dcc2e87aef\"}], \"context_quality\": {\"status\": \"unverified\", \"reasons\": [\"coverage_unverified\"]}, \"read_next\": [{\"source_uri\": \"docatlas://source/402239855c032312730f76ce\", \"path\": \"SKILL.md\", \"project_identity\": \"local:48277f62f8b4ff92ba1c60c082f92a43817f9e1c5ba4ea27e12cd77a76421585\", \"snapshot_sha256\": \"sha256:cc5203eb2a8c0728b14401fb305c7b19498e14838a390965545967d77fe9de96\", \"line_start\": 21, \"line_end\": 29, \"reason\": \"inspect_source_context\"}], \"edit_ready\": false, \"investigation_allowed\": true, \"estimated_tokens\": 630}",
+        "annotations": null,
+        "_meta": null
+      }
+    ],
+    "structuredContent": null,
+    "isError": false
+  }
+}

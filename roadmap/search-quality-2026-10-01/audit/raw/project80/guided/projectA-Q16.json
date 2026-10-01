@@ -1,0 +1,27 @@
+{
+  "tool": "get_docs_context",
+  "request": {
+    "question": "Can I index and query project documents with networking disabled, and which optional features would remain unavailable?",
+    "project_path": "/tmp/opencode/docatlas-ablation",
+    "scope": "all",
+    "lookup_queries": [
+      "Which project documentation operations work offline?",
+      "Which documentation features require networking or model providers?"
+    ]
+  },
+  "seconds": 1.592200633000175,
+  "is_error": false,
+  "wire": {
+    "_meta": null,
+    "content": [
+      {
+        "type": "text",
+        "text": "{\"status\": \"ok\", \"kind\": \"docs_context\", \"context_status\": \"ready\", \"context_available\": true, \"answer_supported\": false, \"answer_available\": false, \"support_status\": \"retrieval_only\", \"answer_policy\": \"cite_only\", \"coverage_policy\": \"retrieval_attribution_only\", \"query_coverage\": \"partial\", \"retrieval_coverage\": \"partial\", \"facet_coverage\": \"unverified\", \"covered_query_ids\": [\"query-lookup-1\", \"query-lookup-2\"], \"missing_query_ids\": [\"query-original\"], \"missing_facets\": [], \"facets\": [], \"sources\": [{\"evidence_id\": \"ev-8d053ebfe16a00b5\", \"path_or_url\": \"README.md\", \"section\": \"DocAtlas > Project-docs MCP server\", \"snippet\": \"| Tool | Purpose |\\n|---|---|\\n| `get_docs_context` | Default first call for project, library, dependency, or mixed documentation questions. It performs read-only preflight and returns the next action when preparation is required. |\\n| `prepare_docs` | Lifecycle work only: sync, refresh, index, or prefetch. Call it from bounded `recommended_next_action`, unbounded `next_action`, or an explicit user request. Network actions require approval. |\\n| `docs_status` | Explicit health, freshness, index, or background-job status requests only. It is not a discovery step. |\", \"version_binding\": \"unversioned\", \"content_sha256\": \"307fabfe2a95f611216d755bcbbf214f230dbadd51acda23fd1579ee12524ead\", \"project_identity\": \"local:48277f62f8b4ff92ba1c60c082f92a43817f9e1c5ba4ea27e12cd77a76421585\", \"authority\": \"source_of_truth\", \"scope\": \"project\", \"line_start\": 120, \"line_end\": 124, \"source_uri\": \"docatlas://source/052ef79f7768a7ee23474160\"}, {\"evidence_id\": \"ev-0d3fbb087d9ca510\", \"path_or_url\": \"README.md\", \"section\": \"DocAtlas > Project-docs MCP server > Change-aware documentation review\", \"snippet\": \"The report includes a bounded authoring brief for the host model: exact files/sections it may edit, repository facts it must verify, and claims it must not invent. After the documentation patch is reviewed and saved, `prepare_docs(action=\\\"sync_project_docs\\\", changed_paths=..., deleted_paths=..., renamed_paths=...)` updates only affected index rows. The optional `--sync-saved-docs` CI mode performs that local indexing step from an exact Git diff; it never edits, commits, comments, or fetches from the network.\", \"version_binding\": \"unversioned\", \"content_sha256\": \"bda125e7aed25f1650672ceb81e592df680fcad57018b92414bab178e6fe781e\", \"project_identity\": \"local:48277f62f8b4ff92ba1c60c082f92a43817f9e1c5ba4ea27e12cd77a76421585\", \"authority\": \"source_of_truth\", \"scope\": \"project\", \"line_start\": 202, \"line_end\": 202, \"source_uri\": \"docatlas://source/3ba28ff550ad2332d584e24a\"}], \"context_quality\": {\"status\": \"unverified\", \"reasons\": [\"coverage_unverified\", \"budget_limited\"]}, \"read_next\": [], \"edit_ready\": false, \"investigation_allowed\": true, \"estimated_tokens\": 679}",
+        "annotations": null,
+        "_meta": null
+      }
+    ],
+    "structuredContent": null,
+    "isError": false
+  }
+}

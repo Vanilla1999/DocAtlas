@@ -1,0 +1,26 @@
+{
+  "tool": "get_docs_context",
+  "request": {
+    "question": "Can an inactive indexing generation change the ranking of active documentation?",
+    "project_path": "/tmp/opencode/docatlas-ablation",
+    "scope": "all",
+    "lookup_queries": [
+      "How are inactive generations isolated from active BM25 statistics?"
+    ]
+  },
+  "seconds": 0.8091579430038109,
+  "is_error": false,
+  "wire": {
+    "_meta": null,
+    "content": [
+      {
+        "type": "text",
+        "text": "{\"status\": \"ok\", \"kind\": \"docs_context\", \"context_status\": \"ready\", \"context_available\": true, \"answer_supported\": false, \"answer_available\": false, \"support_status\": \"retrieval_only\", \"answer_policy\": \"cite_only\", \"coverage_policy\": \"retrieval_attribution_only\", \"query_coverage\": \"full\", \"retrieval_coverage\": \"full\", \"facet_coverage\": \"unverified\", \"covered_query_ids\": [\"query-original\", \"query-lookup-1\"], \"missing_query_ids\": [], \"missing_facets\": [], \"facets\": [], \"sources\": [{\"evidence_id\": \"ev-57b8b76e50d160c7\", \"path_or_url\": \"docs/retrieval-boundaries.md\", \"section\": \"Retrieval and admission boundaries > Active-only lexical statistics\", \"snippet\": \"The active-generation lexical index isolates FTS/BM25 document-frequency and\\ncorpus-length statistics from inactive and candidate generations. A not-yet-promoted\\nindex must not change the active search ranking merely by existing. Source-policy\\nchecks apply to expanded candidates before text hydration; a second check after\\nhydration remains defense in depth. Promotion and active-generation tests protect\\nthis boundary.\", \"version_binding\": \"unversioned\", \"content_sha256\": \"6d0626e07457aa7ca74f2a1963474b03dacbdddc899727db4a0328c896f04540\", \"project_identity\": \"local:48277f62f8b4ff92ba1c60c082f92a43817f9e1c5ba4ea27e12cd77a76421585\", \"authority\": \"source_of_truth\", \"scope\": \"module\", \"line_start\": 5, \"line_end\": 10, \"source_uri\": \"docatlas://source/782c5e644f7a725f10efee04\"}, {\"evidence_id\": \"ev-e1b850334f3074a9\", \"path_or_url\": \"wiki/Architecture.md\", \"section\": \"Architecture > Indexing\", \"snippet\": \"Markdown indexing first normalizes fetched or local documentation into semantic parent sections based on heading structure. The production `parent-child-v1` chunker then splits each parent section into token-bounded child chunks (target 160 estimated visible tokens, hard maximum 512, zero visible overlap) while preserving the parent identity and source offsets. Retrieval ranks those child chunks and can hydrate parent or adjacent context without changing the exact display text.\", \"version_binding\": \"unversioned\", \"content_sha256\": \"b6ef10a46ea75fc5328020d51bdb92162dac22d652c00900ee8397a41b98cdb1\", \"project_identity\": \"local:48277f62f8b4ff92ba1c60c082f92a43817f9e1c5ba4ea27e12cd77a76421585\", \"authority\": \"source_of_truth\", \"scope\": \"project\", \"line_start\": 15, \"line_end\": 15, \"source_uri\": \"docatlas://source/4e1702bc2aff79668007c731\"}], \"context_quality\": {\"status\": \"unverified\", \"reasons\": [\"coverage_unverified\", \"source_unavailable\"]}, \"read_next\": [], \"edit_ready\": false, \"investigation_allowed\": true, \"estimated_tokens\": 643, \"recovery_reason_code\": \"source_unavailable\"}",
+        "annotations": null,
+        "_meta": null
+      }
+    ],
+    "structuredContent": null,
+    "isError": false
+  }
+}

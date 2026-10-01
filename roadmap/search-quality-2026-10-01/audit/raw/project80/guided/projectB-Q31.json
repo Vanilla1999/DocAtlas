@@ -1,0 +1,26 @@
+{
+  "tool": "get_docs_context",
+  "request": {
+    "question": "Можно ли использовать документацию latest как доказательство поведения установленной версии?",
+    "project_path": "/tmp/opencode/docatlas-ablation",
+    "scope": "all",
+    "lookup_queries": [
+      "How do exact dependency versions differ from latest documentation in evidence binding?"
+    ]
+  },
+  "seconds": 1.093079022000893,
+  "is_error": false,
+  "wire": {
+    "_meta": null,
+    "content": [
+      {
+        "type": "text",
+        "text": "{\"status\": \"ok\", \"kind\": \"docs_context\", \"context_status\": \"ready\", \"context_available\": true, \"answer_supported\": false, \"answer_available\": false, \"support_status\": \"retrieval_only\", \"answer_policy\": \"cite_only\", \"coverage_policy\": \"retrieval_attribution_only\", \"query_coverage\": \"partial\", \"retrieval_coverage\": \"partial\", \"facet_coverage\": \"unverified\", \"covered_query_ids\": [\"query-lookup-1\"], \"missing_query_ids\": [\"query-original\"], \"missing_facets\": [], \"facets\": [{\"id\": \"intent-context:installation_verification\", \"requirement_id\": null, \"question\": \"install command line help\", \"status\": \"retrieval_only\", \"evidence_ids\": [\"ev-848dea5ff0c19302\"]}], \"sources\": [{\"evidence_id\": \"ev-848dea5ff0c19302\", \"path_or_url\": \"README.md\", \"section\": \"DocAtlas > One-line install\", \"snippet\": \"## One-line install\\n\\nInstall `uv`, the `doc-atlas` CLI, and register the docs MCP server into your agent — in a single command:\\n\\n```bash\\ncurl -LsSf https://raw.githubusercontent.com/Vanilla1999/DocAtlas/main/scripts/install.sh | sh\\n```\", \"version_binding\": \"unversioned\", \"content_sha256\": \"f7116d0a99f8fb65dfcc8bb15e90a66be84ac4f968faacf117ce7b7bb58d1fda\", \"project_identity\": \"local:48277f62f8b4ff92ba1c60c082f92a43817f9e1c5ba4ea27e12cd77a76421585\", \"authority\": \"source_of_truth\", \"scope\": \"project\", \"line_start\": 70, \"line_end\": 76}, {\"evidence_id\": \"ev-9a03f176e224353f\", \"path_or_url\": \"wiki/Architecture.md\", \"section\": \"Architecture > Version-aware dependency resolution\", \"snippet\": \"The `ProjectMetadataReader` inspects project metadata to choose the exact documentation version the project uses:\\n\\n- **`.fvmrc`** — reads Flutter SDK version or channel (stable/beta/main). Determines which `api.flutter.dev` docs to fetch.\\n- **`pubspec.lock`** — extracts pinned package versions from `packages` map. Used as exact version sources for pub.dev Dartdoc and docs.rs bindings.\\n- **`pubspec.yaml`** — reads direct dependencies and specifier kinds (exact, range, path, git).\", \"version_binding\": \"unversioned\", \"content_sha256\": \"2c58a643cd187b7ecfe744574c95898766b77fbc3eab259a8be57207db9d1418\", \"project_identity\": \"local:48277f62f8b4ff92ba1c60c082f92a43817f9e1c5ba4ea27e12cd77a76421585\", \"authority\": \"source_of_truth\", \"scope\": \"project\", \"line_start\": 94, \"line_end\": 98}], \"context_quality\": {\"status\": \"unverified\", \"reasons\": [\"coverage_unverified\"]}, \"read_next\": [{\"source_uri\": \"docatlas://source/6add9a453eae8e540bb14271\", \"path\": \"README.md\", \"project_identity\": \"local:48277f62f8b4ff92ba1c60c082f92a43817f9e1c5ba4ea27e12cd77a76421585\", \"snapshot_sha256\": \"sha256:82975e09e63a5897c0f0867fbf370af4038360e489a3baa71d6378b98f2498bb\", \"line_start\": 29, \"line_end\": 35, \"reason\": \"inspect_source_context\"}], \"edit_ready\": false, \"investigation_allowed\": true, \"estimated_tokens\": 674}",
+        "annotations": null,
+        "_meta": null
+      }
+    ],
+    "structuredContent": null,
+    "isError": false
+  }
+}

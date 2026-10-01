@@ -1,0 +1,23 @@
+{
+  "tool": "get_docs_context",
+  "request": {
+    "question": "Can allow_credentials work with allow_origins=[\"*\"] in CORSMiddleware, and what is the default?",
+    "project_path": "/tmp/opencode/search-audit-work-20261001/fixtures/fastapi",
+    "scope": "all"
+  },
+  "seconds": 0.751816053998482,
+  "is_error": false,
+  "wire": {
+    "_meta": null,
+    "content": [
+      {
+        "type": "text",
+        "text": "{\"status\": \"ok\", \"kind\": \"docs_context\", \"context_status\": \"ready\", \"context_available\": true, \"answer_supported\": false, \"answer_available\": false, \"support_status\": \"retrieval_only\", \"answer_policy\": \"cite_only\", \"coverage_policy\": \"retrieval_attribution_only\", \"query_coverage\": \"partial\", \"retrieval_coverage\": \"partial\", \"facet_coverage\": \"unverified\", \"covered_query_ids\": [\"query-anchor-1\", \"query-anchor-2\", \"query-anchor-3\"], \"missing_query_ids\": [\"query-original\"], \"missing_facets\": [{\"id\": \"retrieval-need:need-2\", \"requirement_id\": null, \"question\": \"Can allow_credentials work with allow_origins=[\\\"*\\\"] in CORSMiddleware what is the default?\", \"status\": \"missing\", \"evidence_ids\": []}], \"facets\": [{\"id\": \"retrieval-need:need-2\", \"requirement_id\": null, \"question\": \"Can allow_credentials work with allow_origins=[\\\"*\\\"] in CORSMiddleware what is the default?\", \"status\": \"missing\", \"evidence_ids\": []}], \"sources\": [{\"evidence_id\": \"ev-9f0a1822f7bc33d2\", \"path_or_url\": \"docs/en/docs/tutorial/cors.md\", \"section\": \"CORS (Cross-Origin Resource Sharing) > Use `CORSMiddleware`\", \"snippet\": \"The `Accept`, `Accept-Language`, `Content-Language` and `Content-Type` headers are always allowed for <a href=\\\"https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS#simple_requests\\\" class=\\\"external-link\\\" rel=\\\"noopener\\\" target=\\\"_blank\\\">simple CORS requests</a>.\\n* `allow_credentials` - Indicate that cookies should be supported for cross-origin requests. Defaults to `False`. Also, `allow_origins` cannot be set to `['*']` for credentials to be allowed, origins must be specified.\", \"version_binding\": \"unversioned\", \"content_sha256\": \"44977def88a9ff9b25bdf934461a54ab097f06a6c07d58d41fd7a642d3fec790\", \"project_identity\": \"local:1b00d8fdd42cb375d06726b788509794c8b320b1ccfe59b08e6881c10ebd0618\", \"authority\": \"source_of_truth\", \"scope\": \"project\", \"line_start\": 60, \"line_end\": 61, \"source_uri\": \"docatlas://source/6950024ef053c05889acb969\"}, {\"evidence_id\": \"ev-aceb1a2fb8fc25da\", \"path_or_url\": \"docs/en/docs/tutorial/cors.md\", \"section\": \"CORS (Cross-Origin Resource Sharing) > Use `CORSMiddleware`\", \"snippet\": \"The default parameters used by the `CORSMiddleware` implementation are restrictive by default, so you'll need to explicitly enable particular origins, methods, or headers, in order for browsers to be permitted to use them in a Cross-Domain context.\", \"version_binding\": \"unversioned\", \"content_sha256\": \"8c844934fcbbf53f09af7a10ab69fbe52a379e361a4d0bce59a9c1b4a3964019\", \"project_identity\": \"local:1b00d8fdd42cb375d06726b788509794c8b320b1ccfe59b08e6881c10ebd0618\", \"authority\": \"source_of_truth\", \"scope\": \"project\", \"line_start\": 53, \"line_end\": 53, \"source_uri\": \"docatlas://source/78385c3cfef98a211f08c677\"}], \"context_quality\": {\"status\": \"unverified\", \"reasons\": [\"coverage_unverified\", \"budget_limited\"]}, \"read_next\": [], \"edit_ready\": false, \"investigation_allowed\": true, \"estimated_tokens\": 706}",
+        "annotations": null,
+        "_meta": null
+      }
+    ],
+    "structuredContent": null,
+    "isError": false
+  }
+}

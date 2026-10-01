@@ -1,0 +1,21 @@
+{
+  "request": {
+    "libraryName": "httpx",
+    "query": "Назови четыре типа timeout в HTTPX и объясни, что ограничивает каждый."
+  },
+  "seconds": 2.3232370870027808,
+  "wire": {
+    "_meta": null,
+    "content": [
+      {
+        "type": "text",
+        "text": "Available Libraries:\n\n- Title: HTTPX\n- Context7-compatible library ID: /encode/httpx\n- Description: A next generation HTTP client for Python. 🦋\n- Code Snippets: 315\n- Source Reputation: High\n- Benchmark Score: 88.47\n- Versions: 0.27.2\n----------\n- Title: HTTPX\n- Context7-compatible library ID: /websites/python-httpx\n- Description: HTTPX is a fully-featured HTTP client for Python 3 that provides sync and async APIs, and support for both HTTP/1.1 and HTTP/2.\n- Code Snippets: 454\n- Source Reputation: High\n- Benchmark Score: 86.52\n----------\n- Title: HTTPX\n- Context7-compatible library ID: /honeyryderchuck/httpx\n- Description: HTTPX is a Ruby HTTP client library with support for HTTP/2, concurrent requests, advanced authentication, compression, proxying, and a lightweight plugin-based architecture.\n- Code Snippets: 401\n- Source Reputation: High\n- Benchmark Score: 65.73\n----------\n- Title: HTTPX Retries\n- Context7-compatible library ID: /will-ockmore/httpx-retries\n- Description: HTTPX Retries is a retry layer for the HTTPX library, designed to handle flaky and unreliable APIs by retrying failed requests automatically.\n- Code Snippets: 253\n- Source Reputation: High\n- Benchmark Score: 83.58\n----------\n- Title: pytest-httpx\n- Context7-compatible library ID: /colin-b/pytest_httpx\n- Description: pytest-httpx is a pytest fixture for mocking httpx requests in tests, allowing you to register custom responses for both sync and async HTTP calls.\n- Code Snippets: 505\n- Source Reputation: High\n- Benchmark Score: 91.58",
+        "annotations": null,
+        "_meta": null
+      }
+    ],
+    "structuredContent": null,
+    "isError": false
+  },
+  "is_error": false
+}

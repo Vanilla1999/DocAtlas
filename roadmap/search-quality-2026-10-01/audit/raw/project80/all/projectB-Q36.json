@@ -1,0 +1,23 @@
+{
+  "tool": "get_docs_context",
+  "request": {
+    "question": "Do successful provider-free tests prove that real agents spend fewer task tokens?",
+    "project_path": "/tmp/opencode/docatlas-ablation",
+    "scope": "all"
+  },
+  "seconds": 1.3834992640040582,
+  "is_error": false,
+  "wire": {
+    "_meta": null,
+    "content": [
+      {
+        "type": "text",
+        "text": "{\"status\": \"ok\", \"kind\": \"docs_context\", \"context_status\": \"ready\", \"context_available\": true, \"answer_supported\": false, \"answer_available\": false, \"support_status\": \"retrieval_only\", \"answer_policy\": \"cite_only\", \"coverage_policy\": \"retrieval_attribution_only\", \"query_coverage\": \"full\", \"retrieval_coverage\": \"full\", \"facet_coverage\": \"unverified\", \"covered_query_ids\": [\"query-original\"], \"missing_query_ids\": [], \"missing_facets\": [], \"facets\": [{\"id\": \"intent-context:testing_contribution\", \"requirement_id\": null, \"question\": \"contributor full test suite before pull request\", \"status\": \"retrieval_only\", \"evidence_ids\": [\"ev-bf81fc44f9c226ab\", \"ev-b5440bc2f89c7200\", \"ev-f82eea255a6b1f2d\"]}], \"sources\": [{\"evidence_id\": \"ev-b5440bc2f89c7200\", \"path_or_url\": \"docs/testing.md\", \"section\": \"Complete pytest marker inventory and test tiers\", \"snippet\": \"# Complete pytest marker inventory and test tiers\\n\\nThe complete pytest marker inventory is `integration`, `advanced`, `live`, and `live_network`. The test suite markers are `integration`, `advanced`, `live`, and `live_network`. Core tests without those optional markers remain in the default suite.\", \"version_binding\": \"unversioned\", \"content_sha256\": \"725ec8f348e01f4f7437123a0dddee1990b20ed0a9adf3b4907c2cf9b0eb9bdc\", \"project_identity\": \"local:48277f62f8b4ff92ba1c60c082f92a43817f9e1c5ba4ea27e12cd77a76421585\", \"authority\": \"source_of_truth\", \"scope\": \"project\", \"line_start\": 1, \"line_end\": 3}, {\"evidence_id\": \"ev-bf81fc44f9c226ab\", \"path_or_url\": \"CONTRIBUTING.md\", \"section\": \"Contributing to DocAtlas > Submitting a PR\", \"snippet\": \"- Branch name: `feat/<topic>` or `fix/<description>`\\n- Run the full test suite before opening the PR\\n- New connectors or fetchers should include tests where practical\", \"version_binding\": \"unversioned\", \"content_sha256\": \"f9eb9fb093ffbc808f434cc8bcf04daad5a5146eb408570dbc07a182be6d3f06\", \"project_identity\": \"local:48277f62f8b4ff92ba1c60c082f92a43817f9e1c5ba4ea27e12cd77a76421585\", \"line_start\": 61, \"line_end\": 63, \"authority\": \"source_of_truth\", \"scope\": \"project\"}, {\"evidence_id\": \"ev-f82eea255a6b1f2d\", \"path_or_url\": \"docs/testing.md\", \"section\": \"Complete pytest marker inventory and test tiers\", \"snippet\": \"Run the fail-closed offline suite with `DOCATLAS_OFFLINE=1 pytest tests/ -m \\\"not advanced and not live and not live_network\\\"`.\", \"version_binding\": \"unversioned\", \"content_sha256\": \"c7cc9d1fad198dc4666920ccd1966adfc52e06805fab8413f72337e022ef01cb\", \"project_identity\": \"local:48277f62f8b4ff92ba1c60c082f92a43817f9e1c5ba4ea27e12cd77a76421585\", \"authority\": \"source_of_truth\", \"scope\": \"project\", \"line_start\": 5, \"line_end\": 5}], \"context_quality\": {\"status\": \"unverified\", \"reasons\": [\"coverage_unverified\"]}, \"read_next\": [], \"edit_ready\": false, \"investigation_allowed\": true, \"estimated_tokens\": 677}",
+        "annotations": null,
+        "_meta": null
+      }
+    ],
+    "structuredContent": null,
+    "isError": false
+  }
+}

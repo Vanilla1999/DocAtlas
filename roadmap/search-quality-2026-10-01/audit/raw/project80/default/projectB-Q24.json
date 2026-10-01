@@ -1,0 +1,22 @@
+{
+  "tool": "get_docs_context",
+  "request": {
+    "question": "Are evaluation reports eligible evidence for an ordinary operational question?",
+    "project_path": "/tmp/opencode/docatlas-ablation"
+  },
+  "seconds": 0.9370231530047022,
+  "is_error": false,
+  "wire": {
+    "_meta": null,
+    "content": [
+      {
+        "type": "text",
+        "text": "{\"status\": \"ok\", \"kind\": \"docs_context\", \"context_status\": \"ready\", \"context_available\": true, \"answer_supported\": false, \"answer_available\": false, \"support_status\": \"retrieval_only\", \"answer_policy\": \"cite_only\", \"coverage_policy\": \"retrieval_attribution_only\", \"query_coverage\": \"full\", \"retrieval_coverage\": \"full\", \"facet_coverage\": \"unverified\", \"covered_query_ids\": [\"query-original\"], \"missing_query_ids\": [], \"missing_facets\": [], \"facets\": [], \"sources\": [{\"evidence_id\": \"ev-0935e1988f820752\", \"path_or_url\": \"eval/project_context_quality/README.md\", \"section\": \"Project context quality protocol > Claim boundaries\", \"snippet\": \"Stage 10 separates primary, question-only, and independent paraphrase reports.\\nThe latter two are initially report-only, never release-gate evidence. Their\\nJSON verdict, failed checks, raw payloads, and numeric threshold errors remain\\nunchanged even when the CLI returns zero to allow report capture. Exceptions\\nstill fail the process. The frozen lanes were subsequently executed; the latest\\nresults are recorded in `IMPLEMENTATION_REPORT.md`.\", \"version_binding\": \"unversioned\", \"content_sha256\": \"c974a9bf061cca0a6ff96627615e98085db19048cd275e65db07b79137964593\", \"project_identity\": \"local:48277f62f8b4ff92ba1c60c082f92a43817f9e1c5ba4ea27e12cd77a76421585\", \"authority\": \"source_of_truth\", \"scope\": \"project\", \"line_start\": 16, \"line_end\": 21}, {\"evidence_id\": \"ev-32f41c85e7d6a0ef\", \"path_or_url\": \"wiki/Architecture.md\", \"section\": \"Architecture > Docs MCP runtime\", \"snippet\": \"For repository coding and patch tasks, agents call `get_docs_context(project_path=..., question=...)` first. Project reads return bounded `docs_context`; explicit changes return `patch_context`; absent safe evidence returns `insufficient_evidence`. Certified `docs_answer` is reserved for library, dependency, and mixed lanes. Operational retrieval excludes evaluation, planning, and history lanes unless explicitly requested. Follow a bounded `recommended_next_action` when reconciliation is needed, then retry the same request. `docs_status` is reserved for explicit health, freshness, index, and job-status requests.\", \"version_binding\": \"unversioned\", \"content_sha256\": \"d45f79d56e94fc635cc84e05381842de498a60b830e75de49f192f8f234812b4\", \"project_identity\": \"local:48277f62f8b4ff92ba1c60c082f92a43817f9e1c5ba4ea27e12cd77a76421585\", \"authority\": \"source_of_truth\", \"scope\": \"project\", \"line_start\": 108, \"line_end\": 108, \"source_uri\": \"docatlas://source/3581f407fee21955263fc69f\"}], \"context_quality\": {\"status\": \"unverified\", \"reasons\": [\"coverage_unverified\"]}, \"read_next\": [{\"source_uri\": \"docatlas://source/854998d602ab4abee56266a9\", \"path\": \"docs/adr/0003-context-first-project-reads.md\", \"project_identity\": \"local:48277f62f8b4ff92ba1c60c082f92a43817f9e1c5ba4ea27e12cd77a76421585\", \"snapshot_sha256\": \"sha256:83f44d6cf026ba3aab066ede447e4c1aaa3802c58fffe5ac7fca85f7c0874ded\", \"line_start\": 24, \"line_end\": 46, \"reason\": \"inspect_source_context\"}], \"edit_ready\": false, \"investigation_allowed\": true, \"estimated_tokens\": 740}",
+        "annotations": null,
+        "_meta": null
+      }
+    ],
+    "structuredContent": null,
+    "isError": false
+  }
+}

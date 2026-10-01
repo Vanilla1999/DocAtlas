@@ -1,0 +1,23 @@
+{
+  "tool": "get_docs_context",
+  "request": {
+    "question": "Относительно чего задаются пути в nav и где лежат index.md и about.md при docs_dir=docs?",
+    "project_path": "/tmp/opencode/search-audit-work-20261001/fixtures/mkdocs",
+    "scope": "all"
+  },
+  "seconds": 0.5754391379959998,
+  "is_error": false,
+  "wire": {
+    "_meta": null,
+    "content": [
+      {
+        "type": "text",
+        "text": "{\"status\": \"ok\", \"kind\": \"docs_context\", \"context_status\": \"ready\", \"context_available\": true, \"answer_supported\": false, \"answer_available\": false, \"support_status\": \"retrieval_only\", \"answer_policy\": \"cite_only\", \"coverage_policy\": \"retrieval_attribution_only\", \"query_coverage\": \"partial\", \"retrieval_coverage\": \"partial\", \"facet_coverage\": \"unverified\", \"covered_query_ids\": [\"query-original\", \"query-anchor-1\", \"query-anchor-2\"], \"missing_query_ids\": [\"query-anchor-3\"], \"missing_facets\": [], \"facets\": [], \"sources\": [{\"evidence_id\": \"ev-7691af36b747d26e\", \"path_or_url\": \"docs/user-guide/writing-your-docs.md\", \"section\": \"Writing your docs > File layout > Configure Pages and Navigation\", \"snippet\": \"A minimal navigation configuration could look like this:\\n\\n```yaml\\nnav:\\n  - index.md\\n  - about.md\\n```\\n\\nAll paths in the navigation configuration must be relative to the `docs_dir`\\nconfiguration option. If that option is set to the default value, `docs`, the\\nsource files for the above configuration would be located at `docs/index.md` and\\n`docs/about.md`.\", \"version_binding\": \"unversioned\", \"content_sha256\": \"e035809b750ba6e1b968264e2be5a83f3d561e283e9386a9501a371081a4b304\", \"project_identity\": \"local:fd4807fa34128ed0db2e2162d3b5c0a37c7992656c9c7ac093ec283fb925d818\", \"authority\": \"source_of_truth\", \"scope\": \"project\", \"line_start\": 109, \"line_end\": 120}, {\"evidence_id\": \"ev-18a7ffe19e2cc1a6\", \"path_or_url\": \"docs/user-guide/writing-your-docs.md\", \"section\": \"Writing your docs > File layout > Index pages\", \"snippet\": \"### Index pages\\n\\nWhen a directory is requested, by default, most web servers will return an index\\nfile (usually named `index.html`) contained within that directory if one exists.\\nFor that reason, the homepage in all of the examples above has been named\\n`index.md`, which MkDocs will render to `index.html` when building the site.\\n\\nMany repository hosting sites provide special treatment for README files by\\ndisplaying the contents of the README file when browsing the contents of a\\ndirectory. Therefore, MkDocs will allow you to name your index pages as\\n`README.md` instead of `index.md`. In that way, when users are browsing your\\nsource code, the repository host can display the index page of that directory as\\nit is a README file. However, when MkDocs renders your site, the file will be\\nrenamed to `index.html` so that the server will serve it as a proper index file.\\n\\nIf both an `index.md` file and a `README.md` file are found in the same\\ndirectory, then the `index.md` file is used and the `README.md` file is\\nignored.\", \"version_binding\": \"unversioned\", \"content_sha256\": \"40596a1c7c630434c778822338a265df895546c3a3766faf25278bea5d2720c8\", \"project_identity\": \"local:fd4807fa34128ed0db2e2162d3b5c0a37c7992656c9c7ac093ec283fb925d818\", \"line_start\": 78, \"line_end\": 95, \"authority\": \"source_of_truth\", \"scope\": \"project\"}], \"context_quality\": {\"status\": \"unverified\", \"reasons\": [\"coverage_unverified\"]}, \"read_next\": [], \"edit_ready\": false, \"investigation_allowed\": true, \"estimated_tokens\": 744}",
+        "annotations": null,
+        "_meta": null
+      }
+    ],
+    "structuredContent": null,
+    "isError": false
+  }
+}

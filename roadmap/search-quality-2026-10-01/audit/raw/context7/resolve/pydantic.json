@@ -1,0 +1,21 @@
+{
+  "request": {
+    "libraryName": "pydantic",
+    "query": "Does a UUID string pass strict validation from JSON and from Python in the same way?"
+  },
+  "seconds": 1.929523305996554,
+  "wire": {
+    "_meta": null,
+    "content": [
+      {
+        "type": "text",
+        "text": "Available Libraries:\n\n- Title: Pydantic\n- Context7-compatible library ID: /pydantic/pydantic\n- Description: Pydantic is a data validation library for Python that uses type hints to define data schemas, offering fast and extensible validation for applications.\n- Code Snippets: 2446\n- Source Reputation: High\n- Benchmark Score: 89.09\n- Versions: v2.9.2\n----------\n- Title: Pydantic\n- Context7-compatible library ID: /websites/pydantic_dev_validation\n- Description: Pydantic is the most widely used data validation library for Python, providing fast and extensible schema validation powered by type hints and Rust core logic.\n- Code Snippets: 2805\n- Source Reputation: High\n- Benchmark Score: 84.8\n----------\n- Title: Pydantic\n- Context7-compatible library ID: /websites/pydantic_dev_1_10\n- Description: Pydantic enforces type hints at runtime and provides user-friendly errors when data is invalid, enabling data validation and settings management using Python type annotations.\n- Code Snippets: 648\n- Source Reputation: High\n- Benchmark Score: 70.19\n----------\n- Title: Pydantic\n- Context7-compatible library ID: /llmstxt/pydantic_dev_ai_llms-full_txt\n- Description: Pydantic is a data validation and settings management library for Python that uses Python type hints to define data schemas and ensures data integrity at runtime.\n- Code Snippets: 25603\n- Source Reputation: High\n- Benchmark Score: 70.32\n----------\n- Title: Pydantic Settings\n- Context7-compatible library ID: /pydantic/pydantic-settings\n- Description: Pydantic-settings is a library for managing application settings using Pydantic, enabling easy configuration loading from various sources.\n- Code Snippets: 468\n- Source Reputation: High\n- Benchmark Score: 90.82",
+        "annotations": null,
+        "_meta": null
+      }
+    ],
+    "structuredContent": null,
+    "isError": false
+  },
+  "is_error": false
+}

@@ -1,0 +1,27 @@
+{
+  "tool": "get_docs_context",
+  "request": {
+    "question": "Why does DocAtlas check relevance again after trimming a snippet instead of trusting the original search score?",
+    "project_path": "/tmp/opencode/docatlas-ablation",
+    "scope": "all",
+    "lookup_queries": [
+      "Why are visible snippets requalified after projection?",
+      "What is the difference between retrieval relevance and answer proof?"
+    ]
+  },
+  "seconds": 2.3141364179973607,
+  "is_error": false,
+  "wire": {
+    "_meta": null,
+    "content": [
+      {
+        "type": "text",
+        "text": "{\"status\": \"ok\", \"kind\": \"docs_context\", \"context_status\": \"ready\", \"context_available\": true, \"answer_supported\": false, \"answer_available\": false, \"support_status\": \"retrieval_only\", \"answer_policy\": \"cite_only\", \"coverage_policy\": \"retrieval_attribution_only\", \"query_coverage\": \"partial\", \"retrieval_coverage\": \"partial\", \"facet_coverage\": \"unverified\", \"covered_query_ids\": [\"query-lookup-1\", \"query-lookup-2\"], \"missing_query_ids\": [\"query-original\"], \"missing_facets\": [], \"facets\": [], \"sources\": [{\"evidence_id\": \"ev-753fe14c0c752072\", \"path_or_url\": \"docs/modules/evidence-selection.md\", \"section\": \"Evidence selection module > Invariants\", \"snippet\": \"- a retrieval hit is not proof;\\n- complete exact proof outranks generic or partial evidence;\", \"version_binding\": \"unversioned\", \"content_sha256\": \"5da6e608594750372585488be8c2084ca2a5e020454734a0e7c1511e581e6e84\", \"project_identity\": \"local:48277f62f8b4ff92ba1c60c082f92a43817f9e1c5ba4ea27e12cd77a76421585\", \"authority\": \"source_of_truth\", \"scope\": \"module\", \"line_start\": 21, \"line_end\": 22}, {\"evidence_id\": \"ev-d15f77a0a6bd4701\", \"path_or_url\": \"docs/adr/0003-context-first-project-reads.md\", \"section\": \"ADR 0003: Context-first project reads > Invariants\", \"snippet\": \"- Audited domain-owned rewrites may attribute derived retrieval coverage to the\\n  original question. Arbitrary host lookups cannot, and derived coverage never\\n  becomes answer proof or edit authorization.\\n- Candidate metadata may improve recall, but public coverage is recalculated\\n  from the final visible path, section, and snippet.\\n- Compound projection maximizes distinct lookup coverage within 800 estimated\\n  tokens and three sources by selecting compact witnesses before expanding\\n  their contiguous snippets.\", \"version_binding\": \"unversioned\", \"content_sha256\": \"463984ebbfc81ac8367d721ab93919ff87b2b2f5ae600e5bab3e0a15af3fdcfd\", \"project_identity\": \"local:48277f62f8b4ff92ba1c60c082f92a43817f9e1c5ba4ea27e12cd77a76421585\", \"authority\": \"source_of_truth\", \"scope\": \"project\", \"line_start\": 34, \"line_end\": 41}, {\"evidence_id\": \"ev-b529e359106cbb6a\", \"path_or_url\": \"docs/mcp-docs-server.md\", \"section\": \"Docs MCP server > Public tool contract\", \"snippet\": \"Audited domain-owned rewrites may provide derived retrieval coverage for the original question, but their internal IDs never appear as public covered or missing query IDs and the result remains retrieval-only. Compound projection selects compact witnesses for distinct lookup IDs before expanding snippets with remaining capacity, then requalifies coverage against the visible path, section, and snippet.\", \"version_binding\": \"unversioned\", \"content_sha256\": \"5a64b9ce4db9d5b0c5bde6c5c6600472aec537898390af70bbed0fa1477fd133\", \"project_identity\": \"local:48277f62f8b4ff92ba1c60c082f92a43817f9e1c5ba4ea27e12cd77a76421585\", \"authority\": \"source_of_truth\", \"scope\": \"project\", \"line_start\": 47, \"line_end\": 47}], \"context_quality\": {\"status\": \"partial\", \"reasons\": [\"requested_part_missing\"]}, \"read_next\": [], \"edit_ready\": false, \"investigation_allowed\": true, \"estimated_tokens\": 746}",
+        "annotations": null,
+        "_meta": null
+      }
+    ],
+    "structuredContent": null,
+    "isError": false
+  }
+}

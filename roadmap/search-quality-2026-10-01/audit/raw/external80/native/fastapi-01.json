@@ -1,0 +1,23 @@
+{
+  "tool": "get_docs_context",
+  "request": {
+    "question": "When do FastAPI background tasks run relative to returning the response?",
+    "project_path": "/tmp/opencode/search-audit-work-20261001/fixtures/fastapi",
+    "scope": "all"
+  },
+  "seconds": 0.3233969720022287,
+  "is_error": false,
+  "wire": {
+    "_meta": null,
+    "content": [
+      {
+        "type": "text",
+        "text": "{\"status\": \"ok\", \"kind\": \"docs_context\", \"context_status\": \"ready\", \"context_available\": true, \"answer_supported\": false, \"answer_available\": false, \"support_status\": \"retrieval_only\", \"answer_policy\": \"cite_only\", \"coverage_policy\": \"retrieval_attribution_only\", \"query_coverage\": \"partial\", \"retrieval_coverage\": \"partial\", \"facet_coverage\": \"unverified\", \"covered_query_ids\": [\"query-anchor-1\"], \"missing_query_ids\": [\"query-original\"], \"missing_facets\": [{\"id\": \"retrieval-need:need-1\", \"requirement_id\": null, \"question\": \"When do FastAPI background tasks run relative to returning the response?\", \"status\": \"missing\", \"evidence_ids\": []}], \"facets\": [{\"id\": \"retrieval-need:need-1\", \"requirement_id\": null, \"question\": \"When do FastAPI background tasks run relative to returning the response?\", \"status\": \"missing\", \"evidence_ids\": []}], \"sources\": [{\"evidence_id\": \"ev-080d179288afc9f8\", \"path_or_url\": \"docs/en/docs/tutorial/background-tasks.md\", \"section\": \"Technical Details\", \"snippet\": \"By only using `BackgroundTasks` (and not `BackgroundTask`), it's then possible to use it as a *path operation function* parameter and have **FastAPI** handle the rest for you, just like when using the `Request` object directly.\\n\\nIt's still possible to use `BackgroundTask` alone in FastAPI, but you have to create the object in your code and return a Starlette `Response` including it.\", \"version_binding\": \"unversioned\", \"content_sha256\": \"9f42a04ee09c956d130b3ac01c33a5b4449a6831a6433a47c9297422196c51dc\", \"project_identity\": \"local:1b00d8fdd42cb375d06726b788509794c8b320b1ccfe59b08e6881c10ebd0618\", \"authority\": \"source_of_truth\", \"scope\": \"project\", \"line_start\": 124, \"line_end\": 126}, {\"evidence_id\": \"ev-d54cad302c01a4b5\", \"path_or_url\": \"docs/en/docs/tutorial/background-tasks.md\", \"section\": \"Background Tasks\", \"snippet\": \"You can define background tasks to be run *after* returning a response.\", \"version_binding\": \"unversioned\", \"content_sha256\": \"cd0a44992f5d7d6ab5b3c9747c3a743bac5fd49d4a4ebe7d267925f7815bd742\", \"project_identity\": \"local:1b00d8fdd42cb375d06726b788509794c8b320b1ccfe59b08e6881c10ebd0618\", \"line_start\": 3, \"line_end\": 3, \"authority\": \"source_of_truth\", \"scope\": \"project\"}], \"context_quality\": {\"status\": \"unverified\", \"reasons\": [\"coverage_unverified\"]}, \"read_next\": [{\"source_uri\": \"docatlas://source/caf16934fb9e51cff42cd827\", \"path\": \"docs/en/docs/tutorial/background-tasks.md\", \"project_identity\": \"local:1b00d8fdd42cb375d06726b788509794c8b320b1ccfe59b08e6881c10ebd0618\", \"snapshot_sha256\": \"sha256:d59a2e7da8f947e53a509efda0acf74dee093799710878dfc7abf09e3e4de89a\", \"line_start\": 58, \"line_end\": 96, \"reason\": \"inspect_source_context\"}], \"edit_ready\": false, \"investigation_allowed\": true, \"estimated_tokens\": 659}",
+        "annotations": null,
+        "_meta": null
+      }
+    ],
+    "structuredContent": null,
+    "isError": false
+  }
+}

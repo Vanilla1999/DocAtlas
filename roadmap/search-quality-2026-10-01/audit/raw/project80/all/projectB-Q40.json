@@ -1,0 +1,23 @@
+{
+  "tool": "get_docs_context",
+  "request": {
+    "question": "Where is mandatory ninety-day retention of every conversation specified?",
+    "project_path": "/tmp/opencode/docatlas-ablation",
+    "scope": "all"
+  },
+  "seconds": 3.761584303996642,
+  "is_error": false,
+  "wire": {
+    "_meta": null,
+    "content": [
+      {
+        "type": "text",
+        "text": "{\"status\": \"insufficient_evidence\", \"kind\": \"docs_context\", \"missing\": [\"No safe, current, project-scoped documentation context was retrieved.\"], \"estimated_tokens\": 236, \"context_quality\": {\"status\": \"unavailable\", \"reasons\": [\"source_unavailable\"]}, \"read_next\": [], \"recommended_next_action\": {\"tool\": \"code_search\", \"type\": \"search_local_source\", \"handled_by\": \"coding_agent\", \"requires_confirmation\": false, \"reason\": \"evidence_rejected\", \"query_terms\": [\"Where is mandatory ninety-day retention of every conversation specified\"], \"repeat_docs_context\": false, \"auto_execute\": false}, \"context_available\": false, \"recovery_origin\": \"eligibility\", \"recovery_reason_code\": \"evidence_rejected\", \"recovery_disposition\": \"search_local_source\", \"disposition\": \"search_local_source\", \"edit_ready\": false, \"investigation_allowed\": true, \"source_search_status\": \"required\", \"requires_confirmation\": false, \"answer_supported\": false, \"answer_available\": false, \"support_status\": \"insufficient_evidence\"}",
+        "annotations": null,
+        "_meta": null
+      }
+    ],
+    "structuredContent": null,
+    "isError": false
+  }
+}

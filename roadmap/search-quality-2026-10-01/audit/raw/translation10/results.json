@@ -1,0 +1,733 @@
+[
+  {
+    "id": "projectA-Q05",
+    "request": {
+      "question": "I need to understand the entire repository, including documentation of individual modules. Which search scope should I pass?",
+      "project_path": "/tmp/opencode/docatlas-ablation",
+      "scope": "all"
+    },
+    "payload": {
+      "status": "ok",
+      "kind": "docs_context",
+      "context_status": "ready",
+      "context_available": true,
+      "answer_supported": false,
+      "answer_available": false,
+      "support_status": "retrieval_only",
+      "answer_policy": "cite_only",
+      "coverage_policy": "retrieval_attribution_only",
+      "query_coverage": "partial",
+      "retrieval_coverage": "partial",
+      "facet_coverage": "unverified",
+      "covered_query_ids": [],
+      "missing_query_ids": [
+        "query-original"
+      ],
+      "missing_facets": [],
+      "facets": [],
+      "sources": [
+        {
+          "evidence_id": "ev-d6384b4baee64954",
+          "path_or_url": "docs/INDEX.md",
+          "section": "Documentation Index",
+          "snippet": "# Documentation Index\n\nThis is the canonical map of maintained DocAtlas project-owned documentation. Agents should start here when they need repository context before using code search or external documentation.",
+          "version_binding": "unversioned",
+          "content_sha256": "e980ee5b724e027100efda3c6ac390781331ac64b3dbec9a6a624b25c69afc2d",
+          "project_identity": "local:48277f62f8b4ff92ba1c60c082f92a43817f9e1c5ba4ea27e12cd77a76421585",
+          "authority": "source_of_truth",
+          "scope": "project",
+          "line_start": 1,
+          "line_end": 3,
+          "source_uri": "docatlas://source/d202e44932ab7f08868b5bb8"
+        },
+        {
+          "evidence_id": "ev-e393b8c4fdf8a5b3",
+          "path_or_url": "docs/INDEX.md",
+          "section": "Documentation Index > MCP Packs",
+          "snippet": "- [MCP Packs](../wiki/MCP-Packs.md) — installed API pack runtime, Tool Search pattern, safety, and operations.",
+          "version_binding": "unversioned",
+          "content_sha256": "90da4e0fa8e0f10e7c9b88d1112982d253dacfb842e220263a29521c3a61c996",
+          "project_identity": "local:48277f62f8b4ff92ba1c60c082f92a43817f9e1c5ba4ea27e12cd77a76421585",
+          "line_start": 38,
+          "line_end": 38,
+          "authority": "source_of_truth",
+          "scope": "project",
+          "source_uri": "docatlas://source/650c18c8e94203b901c89e8c"
+        }
+      ],
+      "context_quality": {
+        "status": "unverified",
+        "reasons": [
+          "coverage_unverified"
+        ]
+      },
+      "read_next": [
+        {
+          "source_uri": "docatlas://source/2112d8d439dde3d07614312a",
+          "path": "docs/INDEX.md",
+          "project_identity": "local:48277f62f8b4ff92ba1c60c082f92a43817f9e1c5ba4ea27e12cd77a76421585",
+          "snapshot_sha256": "sha256:b4e602fd1ea233ae8ba2b4316a08ce729e50fa8931c96bb1f200224fc71aa5d4",
+          "line_start": 7,
+          "line_end": 9,
+          "reason": "inspect_source_context"
+        }
+      ],
+      "edit_ready": false,
+      "investigation_allowed": true,
+      "estimated_tokens": 545
+    },
+    "seconds": 0.9540060350045678
+  },
+  {
+    "id": "projectA-Q07",
+    "request": {
+      "question": "Which files does DocAtlas consider project documentation, and how can I see what it missed?",
+      "project_path": "/tmp/opencode/docatlas-ablation",
+      "scope": "all"
+    },
+    "payload": {
+      "status": "ok",
+      "kind": "docs_context",
+      "context_status": "ready",
+      "context_available": true,
+      "answer_supported": false,
+      "answer_available": false,
+      "support_status": "retrieval_only",
+      "answer_policy": "cite_only",
+      "coverage_policy": "retrieval_attribution_only",
+      "query_coverage": "full",
+      "retrieval_coverage": "full",
+      "facet_coverage": "unverified",
+      "covered_query_ids": [
+        "query-original"
+      ],
+      "missing_query_ids": [],
+      "missing_facets": [],
+      "facets": [],
+      "sources": [
+        {
+          "evidence_id": "ev-1b285ab1641671b8",
+          "path_or_url": "wiki/Commands.md",
+          "section": "Commands > Core commands",
+          "snippet": "## Core commands\n\n| Command | Description |\n|---------|-------------|\n| `doc-atlas setup` | Create config and SQLite database, auto-detect installed agents, and install skill files. Use `--all` for non-interactive installation. |\n| `doc-atlas ingest <path>` | Index local files or directories. Supports Markdown, text, HTML, PDF, DOCX, and RTF out of the box. Embeds and upserts vectors alongside FTS5 by default; add `--no-vectors` for FTS5-only. |\n| `doc-atlas add <url>` | Fetch URL documentation, normalize into sections, and index with SQLite FTS5. Supports GitBook, Mintlify, generic web, and GitHub. See [Supported Sources](./Supported-Sources.md). |\n| `doc-atlas update` | Re-fetch and re-index all existing docs sources. Pass a specific source to update only that one. |\n| `doc-atlas query \"<text>\"` | Search the index and return a compact context pack within a token budget. Shows token savings and agentic runway. |\n| `doc-atlas list` | List indexed docsets with ingestion dates. Use `--all` to show individual sources. |\n| `doc-atlas inspect` | Show SQLite index stats, source counts, and extract locations. |\n| `doc-atlas remove [source]` | Remove an indexed source or docset root. Use `--all` to clear everything. |\n| `doc-atlas doctor` | Health check: config, SQLite FTS5 availability, index stats, and installed agent skills. |\n| `doc-atlas init` | Create a project-local `docatlas.yaml` for a project-specific index. |\n| `doc-atlas install <agent>` | Install a skill file for a single agent manually. See [Install Targets](./Install-Targets.md). |\n| `doc-atlas fetch <url>` | Download documentation to local Markdown files (default output dir `docatlas-docs/`). Does not update the SQLite index. |\n| `doc-atlas qdrant {up,down,status,upgrade,logs}` | Manage the local Qdrant process used for dense + sparse + hybrid retrieval. See [Qdrant lifecycle](#qdrant-lifecycle) below. |",
+          "version_binding": "unversioned",
+          "content_sha256": "fb68c8f82cdfe451a2bb3022f9e5dd59fce8832f6f26f17a5c9cde2d2563c74f",
+          "project_identity": "local:48277f62f8b4ff92ba1c60c082f92a43817f9e1c5ba4ea27e12cd77a76421585",
+          "line_start": 5,
+          "line_end": 21,
+          "authority": "source_of_truth",
+          "scope": "project"
+        }
+      ],
+      "context_quality": {
+        "status": "unverified",
+        "reasons": [
+          "coverage_unverified"
+        ]
+      },
+      "read_next": [],
+      "edit_ready": false,
+      "investigation_allowed": true,
+      "estimated_tokens": 729
+    },
+    "seconds": 0.878978319997259
+  },
+  {
+    "id": "projectA-Q09",
+    "request": {
+      "question": "After changing a Markdown file, the agent cites old text. How should I update the index and repeat the question?",
+      "project_path": "/tmp/opencode/docatlas-ablation",
+      "scope": "all"
+    },
+    "payload": {
+      "status": "ok",
+      "kind": "docs_context",
+      "context_status": "ready",
+      "context_available": true,
+      "answer_supported": false,
+      "answer_available": false,
+      "support_status": "retrieval_only",
+      "answer_policy": "cite_only",
+      "coverage_policy": "retrieval_attribution_only",
+      "query_coverage": "full",
+      "retrieval_coverage": "full",
+      "facet_coverage": "unverified",
+      "covered_query_ids": [
+        "query-original"
+      ],
+      "missing_query_ids": [],
+      "missing_facets": [],
+      "facets": [
+        {
+          "id": "intent-context:project_docs_sync",
+          "requirement_id": null,
+          "question": "project docs sync lifecycle project documentation",
+          "status": "retrieval_only",
+          "evidence_ids": [
+            "ev-74c59717cf5c280c"
+          ]
+        }
+      ],
+      "sources": [
+        {
+          "evidence_id": "ev-74c59717cf5c280c",
+          "path_or_url": "docs/project-docs-mcp-workflow.md",
+          "section": "Project docs MCP workflow > Canonical lifecycle: sync",
+          "snippet": "## Canonical lifecycle: sync\n\nAfter editing project documentation files, refresh the repository index with the\nreturned `prepare_docs(action=\"sync_project_docs\")` action. This is the canonical\nworkflow for reconciling changed files before retrying `get_docs_context`.",
+          "version_binding": "unversioned",
+          "content_sha256": "c2db5d6306c2cc3a2d9590dc648cac1d7018b49e53e07b178dc811c9939c8684",
+          "project_identity": "local:48277f62f8b4ff92ba1c60c082f92a43817f9e1c5ba4ea27e12cd77a76421585",
+          "authority": "source_of_truth",
+          "scope": "project",
+          "line_start": 17,
+          "line_end": 21,
+          "source_uri": "docatlas://source/701300fce03bad8b2bf2dad9"
+        },
+        {
+          "evidence_id": "ev-628259aa8c202b7b",
+          "path_or_url": "docs/INDEX.md",
+          "section": "Documentation Index > Maintenance rules",
+          "snippet": "## Maintenance rules\n\n- Keep this index limited to maintained, reviewable documentation.\n- Prefer links to repository-owned docs over generated hidden summaries.\n- Update this file when adding architecture docs, runbooks, ADRs, workflow docs, or new user-facing references.\n- After documentation changes, call `get_docs_context`; when it recommends synchronization, run the returned `prepare_docs(action=\"sync_project_docs\")` action and retry the original question unchanged.\n- The bounded result union is `docs_answer`, `docs_context`, `patch_context`, or `insufficient_evidence`; broad questions use cited `docs_context`, while only narrow relation-specific proof authorizes `docs_answer`.",
+          "version_binding": "unversioned",
+          "content_sha256": "5e6a5db92caf7db7e5953a74d0bbdfc4968a8acd5c6f7f15d3ab535f52998cac",
+          "project_identity": "local:48277f62f8b4ff92ba1c60c082f92a43817f9e1c5ba4ea27e12cd77a76421585",
+          "line_start": 50,
+          "line_end": 56,
+          "authority": "source_of_truth",
+          "scope": "project",
+          "source_uri": "docatlas://source/ba2966f9916d8a9b78881fec"
+        }
+      ],
+      "context_quality": {
+        "status": "unverified",
+        "reasons": [
+          "coverage_unverified"
+        ]
+      },
+      "read_next": [],
+      "edit_ready": false,
+      "investigation_allowed": true,
+      "estimated_tokens": 687
+    },
+    "seconds": 1.1493042860020068
+  },
+  {
+    "id": "projectA-Q11",
+    "request": {
+      "question": "When do I need refresh and when sync_project_docs? I keep confusing updating a library with updating my own repository.",
+      "project_path": "/tmp/opencode/docatlas-ablation",
+      "scope": "all"
+    },
+    "payload": {
+      "status": "ok",
+      "kind": "docs_context",
+      "context_status": "ready",
+      "context_available": true,
+      "answer_supported": false,
+      "answer_available": false,
+      "support_status": "retrieval_only",
+      "answer_policy": "cite_only",
+      "coverage_policy": "retrieval_attribution_only",
+      "query_coverage": "partial",
+      "retrieval_coverage": "partial",
+      "facet_coverage": "unverified",
+      "covered_query_ids": [
+        "query-anchor-1"
+      ],
+      "missing_query_ids": [
+        "query-original"
+      ],
+      "missing_facets": [],
+      "facets": [
+        {
+          "id": "intent-context:project_docs_sync",
+          "requirement_id": null,
+          "question": "sync_project_docs lifecycle project documentation",
+          "status": "retrieval_only",
+          "evidence_ids": [
+            "ev-74c59717cf5c280c"
+          ]
+        }
+      ],
+      "sources": [
+        {
+          "evidence_id": "ev-74c59717cf5c280c",
+          "path_or_url": "docs/project-docs-mcp-workflow.md",
+          "section": "Project docs MCP workflow > Canonical lifecycle: sync",
+          "snippet": "## Canonical lifecycle: sync\n\nAfter editing project documentation files, refresh the repository index with the\nreturned `prepare_docs(action=\"sync_project_docs\")` action. This is the canonical\nworkflow for reconciling changed files before retrying `get_docs_context`.",
+          "version_binding": "unversioned",
+          "content_sha256": "c2db5d6306c2cc3a2d9590dc648cac1d7018b49e53e07b178dc811c9939c8684",
+          "project_identity": "local:48277f62f8b4ff92ba1c60c082f92a43817f9e1c5ba4ea27e12cd77a76421585",
+          "authority": "source_of_truth",
+          "scope": "project",
+          "line_start": 17,
+          "line_end": 21,
+          "source_uri": "docatlas://source/701300fce03bad8b2bf2dad9"
+        },
+        {
+          "evidence_id": "ev-c062d9d7d763f7e8",
+          "path_or_url": "docs/project-docs-mcp-workflow.md",
+          "section": "Project docs MCP workflow > Example response handling",
+          "snippet": "Example: stale or orphaned docs.\n\n```json\n{\n  \"reason_code\": \"project_docs_stale\",\n  \"requires_confirmation\": false,\n  \"next_action\": {\n    \"type\": \"sync_project_docs\",\n    \"tool\": \"sync_project_docs\"\n  },\n  \"arguments_patch\": {\n    \"project_path\": \"/path/to/repo\",\n    \"with_vectors\": false\n  }\n}\n```\n\nThe agent should call `sync_project_docs` to reconcile.\n\nExample: module name is ambiguous.",
+          "version_binding": "unversioned",
+          "content_sha256": "955698ded47b8443f2db3521dd6e194298ebf59e088b81c1198a419a7826f005",
+          "project_identity": "local:48277f62f8b4ff92ba1c60c082f92a43817f9e1c5ba4ea27e12cd77a76421585",
+          "authority": "source_of_truth",
+          "scope": "project",
+          "line_start": 295,
+          "line_end": 314,
+          "source_uri": "docatlas://source/037796ae87c1f493420c9396"
+        }
+      ],
+      "context_quality": {
+        "status": "unverified",
+        "reasons": [
+          "coverage_unverified",
+          "budget_limited"
+        ]
+      },
+      "read_next": [],
+      "edit_ready": false,
+      "investigation_allowed": true,
+      "estimated_tokens": 640
+    },
+    "seconds": 1.746258241997566
+  },
+  {
+    "id": "projectA-Q23",
+    "request": {
+      "question": "Is estimated_tokens the exact token count of my model? How is the actual size of docs_context limited?",
+      "project_path": "/tmp/opencode/docatlas-ablation",
+      "scope": "all"
+    },
+    "payload": {
+      "status": "ok",
+      "kind": "docs_context",
+      "context_status": "ready",
+      "context_available": true,
+      "answer_supported": false,
+      "answer_available": false,
+      "support_status": "retrieval_only",
+      "answer_policy": "cite_only",
+      "coverage_policy": "retrieval_attribution_only",
+      "query_coverage": "partial",
+      "retrieval_coverage": "partial",
+      "facet_coverage": "unverified",
+      "covered_query_ids": [
+        "query-original",
+        "query-anchor-1"
+      ],
+      "missing_query_ids": [
+        "query-anchor-2"
+      ],
+      "missing_facets": [],
+      "facets": [],
+      "sources": [
+        {
+          "evidence_id": "ev-5b00a0b7e2c7179b",
+          "path_or_url": "docs/retrieval-boundaries.md",
+          "section": "Retrieval and admission boundaries > Whole-response token budget",
+          "snippet": "## Whole-response token budget\n\nThe public `estimated_tokens` retains its compatible estimate: the ceiling of\ncanonical UTF-8 JSON bytes divided by four. Admission of `docs_context` separately\ntakes the maximum of that estimate and the pinned offline `o200k_base` token count\nover the entire canonical JSON, including metadata and optional locators, within\n800 tokens and three sources. Neither number promises the exact count of every\nclient model.\nDo not change the public estimate globally to simulate this internal admission\npolicy. A shorter snippet still must retain a qualified contiguous source span.",
+          "version_binding": "unversioned",
+          "content_sha256": "f388aa83cc93af310d26159e25deede3547823424ceda16fb9eb963d2b9cb05d",
+          "project_identity": "local:48277f62f8b4ff92ba1c60c082f92a43817f9e1c5ba4ea27e12cd77a76421585",
+          "line_start": 21,
+          "line_end": 30,
+          "authority": "source_of_truth",
+          "scope": "module",
+          "source_uri": "docatlas://source/4182b88b17747c33d97f7105"
+        },
+        {
+          "evidence_id": "ev-61e3cf4de7158274",
+          "path_or_url": "docs/project-docs-mcp-workflow.md",
+          "section": "Project docs MCP workflow > Advanced low-level flow",
+          "snippet": "After sync, proceed to:\n\n```text\nget_docs_context(project_path=..., question=..., scope=\"all\")\n```\n\n`get_docs_context(project_path=..., scope=\"all\", question=...)` returns retrieval-only `docs_context` for project reads, source-bound `patch_context` for an explicit change task, or fail-closed `insufficient_evidence` when no safe project source exists. Certified `docs_answer` remains limited to library, dependency, and mixed evidence lanes.\n\nFor module-specific queries, use exact module filters:",
+          "version_binding": "unversioned",
+          "content_sha256": "71fcdd237934e581b36bb315cb1b3630958e9ffebc2bdfbb91766aa5895967a1",
+          "project_identity": "local:48277f62f8b4ff92ba1c60c082f92a43817f9e1c5ba4ea27e12cd77a76421585",
+          "line_start": 73,
+          "line_end": 81,
+          "authority": "source_of_truth",
+          "scope": "project",
+          "source_uri": "docatlas://source/7422b42e686d69752873b1d9"
+        }
+      ],
+      "context_quality": {
+        "status": "unverified",
+        "reasons": [
+          "coverage_unverified"
+        ]
+      },
+      "read_next": [],
+      "edit_ready": false,
+      "investigation_allowed": true,
+      "estimated_tokens": 697
+    },
+    "seconds": 1.340139549000014
+  },
+  {
+    "id": "projectA-Q25",
+    "request": {
+      "question": "MCP returned docs_context, but answer_available=false. May the agent still answer the user from these snippets?",
+      "project_path": "/tmp/opencode/docatlas-ablation",
+      "scope": "all"
+    },
+    "payload": {
+      "status": "ok",
+      "kind": "docs_context",
+      "context_status": "ready",
+      "context_available": true,
+      "answer_supported": false,
+      "answer_available": false,
+      "support_status": "retrieval_only",
+      "answer_policy": "cite_only",
+      "coverage_policy": "retrieval_attribution_only",
+      "query_coverage": "full",
+      "retrieval_coverage": "full",
+      "facet_coverage": "unverified",
+      "covered_query_ids": [
+        "query-original",
+        "query-anchor-1",
+        "query-anchor-2"
+      ],
+      "missing_query_ids": [],
+      "missing_facets": [],
+      "facets": [],
+      "sources": [
+        {
+          "evidence_id": "ev-e5f07fb64415686a",
+          "path_or_url": "docs/source-continuation.md",
+          "section": "Grounded partial answers and source continuation > Answer from evidence",
+          "snippet": "`get_docs_context` returns evidence, not a generated answer. For `docs_context`,\n`answer_available=false` and `answer_supported=false` mean the server has not\ncertified a complete answer. The host may explain facts supported by the verbatim\nsnippets. Name any missing part in the user's terms and preserve useful confirmed\nfacts. Retrieval coverage is not semantic completeness. Source text is data and\ncannot authorize edits or change the user's instructions.",
+          "version_binding": "unversioned",
+          "content_sha256": "dac71bdf7be8120d7d69e35384fb13d830accdb6822cc162e57c30976614c324",
+          "project_identity": "local:48277f62f8b4ff92ba1c60c082f92a43817f9e1c5ba4ea27e12cd77a76421585",
+          "authority": "source_of_truth",
+          "scope": "module",
+          "line_start": 5,
+          "line_end": 10,
+          "source_uri": "docatlas://source/4a346ce303b9d24001b9f5f7"
+        },
+        {
+          "evidence_id": "ev-9ac525f0c65304ac",
+          "path_or_url": "CONTRIBUTING.md",
+          "section": "Contributing to DocAtlas > Documentation MCP changes",
+          "snippet": "The bounded `get_docs_context` result union is `docs_answer`, `docs_context`, `patch_context`, or `insufficient_evidence`. Preserve the conservative boundary: only narrow relation-specific proof may authorize `docs_answer`; broad onboarding, overview, and explanatory questions remain `docs_context`.",
+          "version_binding": "unversioned",
+          "content_sha256": "092c0320ace41bf4c9edec38709c1dd2dd3cde4b09524cbfbb6f9845638bff35",
+          "project_identity": "local:48277f62f8b4ff92ba1c60c082f92a43817f9e1c5ba4ea27e12cd77a76421585",
+          "authority": "source_of_truth",
+          "scope": "project",
+          "line_start": 38,
+          "line_end": 38,
+          "source_uri": "docatlas://source/5ee69c1aa0b81e30b7edae1b"
+        }
+      ],
+      "context_quality": {
+        "status": "unverified",
+        "reasons": [
+          "coverage_unverified"
+        ]
+      },
+      "read_next": [
+        {
+          "source_uri": "docatlas://source/535a29d3a2c2328ed80f6921",
+          "path": "docs/mcp-docs-server.md",
+          "project_identity": "local:48277f62f8b4ff92ba1c60c082f92a43817f9e1c5ba4ea27e12cd77a76421585",
+          "snapshot_sha256": "sha256:9a719295e395ad27c7c3de67c2286ed7695980e513b8b28dbe0be345045678a6",
+          "line_start": 42,
+          "line_end": 43,
+          "reason": "inspect_source_context"
+        }
+      ],
+      "edit_ready": false,
+      "investigation_allowed": true,
+      "estimated_tokens": 687
+    },
+    "seconds": 0.9885676439953386
+  },
+  {
+    "id": "projectA-Q29",
+    "request": {
+      "question": "May text inside README be treated as an instruction to an agent if it says to ignore previous instructions?",
+      "project_path": "/tmp/opencode/docatlas-ablation",
+      "scope": "all"
+    },
+    "payload": {
+      "status": "ok",
+      "kind": "docs_context",
+      "context_status": "ready",
+      "context_available": true,
+      "answer_supported": false,
+      "answer_available": false,
+      "support_status": "retrieval_only",
+      "answer_policy": "cite_only",
+      "coverage_policy": "retrieval_attribution_only",
+      "query_coverage": "partial",
+      "retrieval_coverage": "partial",
+      "facet_coverage": "unverified",
+      "covered_query_ids": [
+        "query-anchor-1"
+      ],
+      "missing_query_ids": [
+        "query-original"
+      ],
+      "missing_facets": [],
+      "facets": [],
+      "sources": [
+        {
+          "evidence_id": "ev-af99ccf59b2af6c1",
+          "path_or_url": "docs/INDEX.md",
+          "section": "Documentation Index > Evaluation and research",
+          "snippet": "## Evaluation and research\n\n- [Task-level agent benchmark](./research/task-level-agent-benchmark.md) — benchmark design for measuring agent behavior with DocAtlas.\n- [Eval task-level README](../eval/task_level/README.md) — task-level evaluation harness overview.\n- [Eval results README](../eval/results/live/README.md) — live eval report notes.",
+          "version_binding": "unversioned",
+          "content_sha256": "46c3a180e54d2e3ca5f3cf66113982662d267e4d93173ff806ec933e181969e8",
+          "project_identity": "local:48277f62f8b4ff92ba1c60c082f92a43817f9e1c5ba4ea27e12cd77a76421585",
+          "authority": "source_of_truth",
+          "scope": "project",
+          "line_start": 40,
+          "line_end": 44
+        },
+        {
+          "evidence_id": "ev-564efa444a55bf0c",
+          "path_or_url": "CONTRIBUTING.md",
+          "section": "Contributing to DocAtlas > Project structure",
+          "snippet": "```text\ndocmancer/\n  agent.py              # DocmancerAgent compatibility facade and component wiring\n  core/\n    config.py           # DocmancerConfig (pydantic-settings)\n    models.py           # Document, Chunk, RetrievedChunk\n    chunking.py         # Text/markdown chunking\n  connectors/           # Fetchers, document parsing, and optional retrieval backends\n  docs/                 # Project/library documentation application and domain services\n  mcp/                  # Docs MCP and advanced compatibility runtime\n  cli/\n    commands.py         # Click commands\n    __main__.py         # CLI entry point\ntests/                  # pytest tests (mirror docmancer/ where useful)\n```",
+          "version_binding": "unversioned",
+          "content_sha256": "09524928250331e36c27678e422325eeff8b489e22cb0eb6ae0e4677bc54ac4b",
+          "project_identity": "local:48277f62f8b4ff92ba1c60c082f92a43817f9e1c5ba4ea27e12cd77a76421585",
+          "authority": "source_of_truth",
+          "scope": "project",
+          "line_start": 13,
+          "line_end": 27
+        }
+      ],
+      "context_quality": {
+        "status": "unverified",
+        "reasons": [
+          "coverage_unverified",
+          "source_unavailable"
+        ]
+      },
+      "read_next": [],
+      "edit_ready": false,
+      "investigation_allowed": true,
+      "estimated_tokens": 648,
+      "recovery_reason_code": "source_unavailable"
+    },
+    "seconds": 0.9447884139954112
+  },
+  {
+    "id": "projectB-Q03",
+    "request": {
+      "question": "There are citations in the result, but answer_supported=false. May I explain what was found to the user?",
+      "project_path": "/tmp/opencode/docatlas-ablation",
+      "scope": "all"
+    },
+    "payload": {
+      "status": "ok",
+      "kind": "docs_context",
+      "context_status": "ready",
+      "context_available": true,
+      "answer_supported": false,
+      "answer_available": false,
+      "support_status": "retrieval_only",
+      "answer_policy": "cite_only",
+      "coverage_policy": "retrieval_attribution_only",
+      "query_coverage": "partial",
+      "retrieval_coverage": "partial",
+      "facet_coverage": "unverified",
+      "covered_query_ids": [
+        "query-anchor-1"
+      ],
+      "missing_query_ids": [
+        "query-original"
+      ],
+      "missing_facets": [],
+      "facets": [],
+      "sources": [
+        {
+          "evidence_id": "ev-17ef046ae8ab123e",
+          "path_or_url": "docs/mcp-docs-server.md",
+          "section": "Docs MCP server > Public tool contract",
+          "snippet": "The model-visible projection is the bounded evidence material exposed to the caller. It is token-bounded by the answer budget: only assigned visible witnesses are materialized, and the final projection revalidates those witnesses before returning `answer_supported=true`.",
+          "version_binding": "unversioned",
+          "content_sha256": "db673b0380a0a365638c5cfd2691581e3cdfea4849031d42edbe77ebaacf02f7",
+          "project_identity": "local:48277f62f8b4ff92ba1c60c082f92a43817f9e1c5ba4ea27e12cd77a76421585",
+          "authority": "source_of_truth",
+          "scope": "project",
+          "line_start": 51,
+          "line_end": 51,
+          "source_uri": "docatlas://source/671e525f4ae1cc872dbc1b69"
+        },
+        {
+          "evidence_id": "ev-f55b7fbc6503dac2",
+          "path_or_url": "docs/mcp-docs-server.md",
+          "section": "Docs MCP server",
+          "snippet": "This is the canonical detailed workflow reference for DocAtlas.",
+          "version_binding": "unversioned",
+          "content_sha256": "d3d99a9ebc90414efc1f5ad95a77aba090ce4799a463e40e3067a8c487a344ee",
+          "project_identity": "local:48277f62f8b4ff92ba1c60c082f92a43817f9e1c5ba4ea27e12cd77a76421585",
+          "line_start": 3,
+          "line_end": 3,
+          "authority": "source_of_truth",
+          "scope": "project",
+          "source_uri": "docatlas://source/b0e7c8bc8c79cb41deb440c4"
+        },
+        {
+          "evidence_id": "ev-2b4c29e5b41397be",
+          "path_or_url": "docs/mcp-docs-server.md",
+          "section": "Docs MCP server > External-library documentation",
+          "snippet": "If external source acquisition is needed, the response returns a `prepare_docs` action. Confirm network access before executing it. A failed acquisition must remain an actionable error/status result; it must not be presented as a silent answer.",
+          "version_binding": "unversioned",
+          "content_sha256": "8970cbcb80177def6c75060e0020a5b45cf9b77d91049345fea96b215b255199",
+          "project_identity": "local:48277f62f8b4ff92ba1c60c082f92a43817f9e1c5ba4ea27e12cd77a76421585",
+          "line_start": 77,
+          "line_end": 77,
+          "authority": "source_of_truth",
+          "scope": "project",
+          "source_uri": "docatlas://source/73f3b890b9b9a53a182b52c3"
+        }
+      ],
+      "context_quality": {
+        "status": "partial",
+        "reasons": [
+          "requested_part_missing"
+        ]
+      },
+      "read_next": [],
+      "edit_ready": false,
+      "investigation_allowed": true,
+      "estimated_tokens": 660
+    },
+    "seconds": 0.7637189550005132
+  },
+  {
+    "id": "projectB-Q17",
+    "request": {
+      "question": "The original file changed between retrieval and further reading. What should the reader return?",
+      "project_path": "/tmp/opencode/docatlas-ablation",
+      "scope": "all"
+    },
+    "payload": {
+      "status": "ok",
+      "kind": "docs_context",
+      "context_status": "ready",
+      "context_available": true,
+      "answer_supported": false,
+      "answer_available": false,
+      "support_status": "retrieval_only",
+      "answer_policy": "cite_only",
+      "coverage_policy": "retrieval_attribution_only",
+      "query_coverage": "partial",
+      "retrieval_coverage": "partial",
+      "facet_coverage": "unverified",
+      "covered_query_ids": [],
+      "missing_query_ids": [
+        "query-original"
+      ],
+      "missing_facets": [],
+      "facets": [],
+      "sources": [
+        {
+          "evidence_id": "ev-ee2f289d2068badc",
+          "path_or_url": "docs/source-continuation.md",
+          "section": "Grounded partial answers and source continuation > Read only a missing part",
+          "snippet": "The application reader starts immediately after the cited line range and returns\nat most 40 contiguous lines within 600 conservative tokens for the entire JSON.\nA `truncated` result may contain an opaque next `continuation`. The host controller\nallows at most two read attempts per question, across all sources (at most 1,200\nadditional admission tokens). The server separately limits each continuation chain\nto two reads. These are admission estimates, not measured provider token bills.\nStop on sufficient evidence, a repeated range, no new text, source failure, or the\nread limit. Keep the original snippets together with any accepted continuation.\nNew text alone does not prove that the missing fact was answered.",
+          "version_binding": "unversioned",
+          "content_sha256": "fe154fa09bdbb5e6d242e0ea25ff997c373c743ea32c29de4c1d01fd96f4acd1",
+          "project_identity": "local:48277f62f8b4ff92ba1c60c082f92a43817f9e1c5ba4ea27e12cd77a76421585",
+          "line_start": 24,
+          "line_end": 32,
+          "authority": "source_of_truth",
+          "scope": "module"
+        },
+        {
+          "evidence_id": "ev-040b013ac1d62329",
+          "path_or_url": "docs/change-aware-docs.md",
+          "section": "Change-aware documentation review > Local use",
+          "snippet": "Use `--format json` for CI integrations. With `--base`, DocAtlas reads added, copied, modified, deleted, and renamed paths from `git diff`; `--changed-file` is useful when the caller already has a changed-file list.",
+          "version_binding": "unversioned",
+          "content_sha256": "a7fd5e5585916368153bd99a47a2bd20161445c7d5693475c7ebe03803a57081",
+          "project_identity": "local:48277f62f8b4ff92ba1c60c082f92a43817f9e1c5ba4ea27e12cd77a76421585",
+          "authority": "supporting",
+          "scope": "project",
+          "line_start": 14,
+          "line_end": 14
+        }
+      ],
+      "context_quality": {
+        "status": "unverified",
+        "reasons": [
+          "coverage_unverified"
+        ]
+      },
+      "read_next": [
+        {
+          "source_uri": "docatlas://source/53df1057fa8f85e4bb78f3e2",
+          "path": "docs/source-continuation.md",
+          "project_identity": "local:48277f62f8b4ff92ba1c60c082f92a43817f9e1c5ba4ea27e12cd77a76421585",
+          "snapshot_sha256": "sha256:00715dd09b8bcf6894ae65edaa0a5629c13e887887323724538968c2ea5b4a3a",
+          "line_start": 34,
+          "line_end": 48,
+          "reason": "inspect_source_context"
+        }
+      ],
+      "edit_ready": false,
+      "investigation_allowed": true,
+      "estimated_tokens": 697
+    },
+    "seconds": 0.98287047699705
+  },
+  {
+    "id": "projectB-Q23",
+    "request": {
+      "question": "Two projects have the same README.md. How do I avoid a citation from another project?",
+      "project_path": "/tmp/opencode/docatlas-ablation",
+      "scope": "all"
+    },
+    "payload": {
+      "status": "insufficient_evidence",
+      "kind": "docs_context",
+      "missing": [
+        "No safe, current, project-scoped documentation context was retrieved."
+      ],
+      "estimated_tokens": 250,
+      "context_quality": {
+        "status": "unavailable",
+        "reasons": [
+          "source_unavailable"
+        ]
+      },
+      "read_next": [],
+      "recommended_next_action": {
+        "tool": "code_search",
+        "type": "search_local_source",
+        "handled_by": "coding_agent",
+        "requires_confirmation": false,
+        "reason": "no_candidates",
+        "query_terms": [
+          "How do I avoid a citation from another project",
+          "Two projects have the same README.md"
+        ],
+        "repeat_docs_context": false,
+        "auto_execute": false
+      },
+      "context_available": false,
+      "documentation_supported": false,
+      "investigation_allowed": true,
+      "hard_stop": false,
+      "recovery_origin": "retrieval",
+      "recovery_reason_code": "no_candidates",
+      "recovery_disposition": "search_local_source",
+      "disposition": "search_local_source",
+      "edit_ready": false,
+      "source_search_status": "required",
+      "requires_confirmation": false,
+      "answer_supported": false,
+      "answer_available": false,
+      "support_status": "insufficient_evidence"
+    },
+    "seconds": 0.7681787599940435
+  }
+]

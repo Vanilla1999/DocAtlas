@@ -1,0 +1,23 @@
+{
+  "tool": "get_docs_context",
+  "request": {
+    "question": "If one BackgroundTasks function raises an exception, what happens to later tasks and their ordering? Also identify the exact value chosen in our private production deployment.",
+    "project_path": "/tmp/opencode/search-audit-work-20261001/fixtures/starlette",
+    "scope": "all"
+  },
+  "seconds": 0.27040888600458857,
+  "is_error": false,
+  "wire": {
+    "_meta": null,
+    "content": [
+      {
+        "type": "text",
+        "text": "{\"status\": \"ok\", \"kind\": \"docs_context\", \"context_status\": \"ready\", \"context_available\": true, \"answer_supported\": false, \"answer_available\": false, \"support_status\": \"retrieval_only\", \"answer_policy\": \"cite_only\", \"coverage_policy\": \"retrieval_attribution_only\", \"query_coverage\": \"partial\", \"retrieval_coverage\": \"partial\", \"facet_coverage\": \"unverified\", \"covered_query_ids\": [\"query-anchor-1\"], \"missing_query_ids\": [\"query-original\"], \"missing_facets\": [], \"facets\": [], \"sources\": [{\"evidence_id\": \"ev-1ce809145540b11e\", \"path_or_url\": \"docs/background.md\", \"section\": \"BackgroundTasks\", \"snippet\": \"### BackgroundTasks\\n\\nUsed to add multiple background tasks to a response.\\n\\nSignature: `BackgroundTasks(tasks=[])`\\n\\n```python\\nfrom starlette.applications import Starlette\\nfrom starlette.responses import JSONResponse\\nfrom starlette.background import BackgroundTasks\\n\\nasync def signup(request):\\n    data = await request.json()\\n    username = data['username']\\n    email = data['email']\\n    tasks = BackgroundTasks()\\n    tasks.add_task(send_welcome_email, to_address=email)\\n    tasks.add_task(send_admin_notification, username=username)\\n    message = {'status': 'Signup successful'}\\n    return JSONResponse(message, background=tasks)\\n\\nasync def send_welcome_email(to_address):\\n    ...\\n\\nasync def send_admin_notification(username):\\n    ...\\n\\nroutes = [\\n    Route('/user/signup', endpoint=signup, methods=['POST'])\\n]\\n\\napp = Starlette(routes=routes)\\n```\\n\\n!!! important\\n    The tasks are executed in order. In case one of the tasks raises\\n    an exception, the following tasks will not get the opportunity to be executed.\", \"version_binding\": \"unversioned\", \"content_sha256\": \"a3ff76c8779d47fbcbd1e58c3541897dc8ddbd3ae0503f11423994a0af786411\", \"project_identity\": \"local:49e9d0d4675482def440e8469c311fbd21c7134a17c652920e474a9e3b812930\", \"line_start\": 42, \"line_end\": 78, \"authority\": \"source_of_truth\", \"scope\": \"project\", \"source_uri\": \"docatlas://source/0bdf408b0c128f82bbd9c041\"}], \"context_quality\": {\"status\": \"unverified\", \"reasons\": [\"coverage_unverified\"]}, \"read_next\": [], \"edit_ready\": false, \"investigation_allowed\": true, \"estimated_tokens\": 531}",
+        "annotations": null,
+        "_meta": null
+      }
+    ],
+    "structuredContent": null,
+    "isError": false
+  }
+}

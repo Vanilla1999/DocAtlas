@@ -1,0 +1,23 @@
+{
+  "tool": "get_docs_context",
+  "request": {
+    "question": "If I only want repository-wide rules, how do I keep module-specific documentation out of the results?",
+    "project_path": "/tmp/opencode/docatlas-ablation",
+    "scope": "all"
+  },
+  "seconds": 0.7298909169985563,
+  "is_error": false,
+  "wire": {
+    "_meta": null,
+    "content": [
+      {
+        "type": "text",
+        "text": "{\"status\": \"ok\", \"kind\": \"docs_context\", \"context_status\": \"ready\", \"context_available\": true, \"answer_supported\": false, \"answer_available\": false, \"support_status\": \"retrieval_only\", \"answer_policy\": \"cite_only\", \"coverage_policy\": \"retrieval_attribution_only\", \"query_coverage\": \"full\", \"retrieval_coverage\": \"full\", \"facet_coverage\": \"unverified\", \"covered_query_ids\": [\"query-original\"], \"missing_query_ids\": [], \"missing_facets\": [], \"facets\": [], \"sources\": [{\"evidence_id\": \"ev-628259aa8c202b7b\", \"path_or_url\": \"docs/INDEX.md\", \"section\": \"External docs manifest\", \"snippet\": \"- [docatlas.docs.yaml](../docatlas.docs.yaml) — repeatable manifest of external documentation targets for validation and prefetch.\\n\\n## Maintenance rules\\n\\n- Keep this index limited to maintained, reviewable documentation.\\n- Prefer links to repository-owned docs over generated hidden summaries.\\n- Update this file when adding architecture docs, runbooks, ADRs, workflow docs, or new user-facing references.\\n- After documentation changes, call `get_docs_context`; when it recommends synchronization, run the returned `prepare_docs(action=\\\"sync_project_docs\\\")` action and retry the original question unchanged.\\n- The bounded result union is `docs_answer`, `docs_context`, `patch_context`, or `insufficient_evidence`; broad questions use cited `docs_context`, while only narrow relation-specific proof authorizes `docs_answer`.\", \"version_binding\": \"unversioned\", \"content_sha256\": \"85c2b1119001471f7c351e17feb561addd42aab4e96a8fb9d27873f99a8bad92\", \"project_identity\": \"local:48277f62f8b4ff92ba1c60c082f92a43817f9e1c5ba4ea27e12cd77a76421585\", \"line_start\": 48, \"line_end\": 56, \"authority\": \"source_of_truth\", \"scope\": \"project\"}, {\"evidence_id\": \"ev-94c12ccadf987a58\", \"path_or_url\": \"docs/INDEX.md\", \"section\": \"Documentation Index\", \"snippet\": \"This is the canonical map of maintained DocAtlas project-owned documentation. Agents should start here when they need repository context before using code search or external documentation.\", \"version_binding\": \"unversioned\", \"content_sha256\": \"b4023e7d19d3a348a673326097a22cbd9e42a9faa5017c1cb286dc93e0c3e6ad\", \"project_identity\": \"local:48277f62f8b4ff92ba1c60c082f92a43817f9e1c5ba4ea27e12cd77a76421585\", \"line_start\": 3, \"line_end\": 3, \"authority\": \"source_of_truth\", \"scope\": \"project\"}], \"context_quality\": {\"status\": \"unverified\", \"reasons\": [\"coverage_unverified\"]}, \"read_next\": [{\"source_uri\": \"docatlas://source/b4f24fef9ffeb3e11b64022e\", \"path\": \"docs/INDEX.md\", \"project_identity\": \"local:48277f62f8b4ff92ba1c60c082f92a43817f9e1c5ba4ea27e12cd77a76421585\", \"snapshot_sha256\": \"sha256:b4e602fd1ea233ae8ba2b4316a08ce729e50fa8931c96bb1f200224fc71aa5d4\", \"line_start\": 42, \"line_end\": 44, \"reason\": \"inspect_source_context\"}], \"edit_ready\": false, \"investigation_allowed\": true, \"estimated_tokens\": 687}",
+        "annotations": null,
+        "_meta": null
+      }
+    ],
+    "structuredContent": null,
+    "isError": false
+  }
+}

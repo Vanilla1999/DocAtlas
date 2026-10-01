@@ -1,0 +1,33 @@
+{
+  "id": "typer-01",
+  "question": "Does raising typer.Exit() itself imply an error, and what is its default exit code?",
+  "library_id": "/websites/typer_tiangolo",
+  "request": {
+    "libraryId": "/websites/typer_tiangolo",
+    "query": "Does raising typer.Exit() itself imply an error, and what is its default exit code?"
+  },
+  "seconds": 2.718265504001465,
+  "is_error": false,
+  "wire": {
+    "_meta": null,
+    "content": [
+      {
+        "type": "text",
+        "text": "### Exit CLI with custom error code\n\nSource: https://typer.tiangolo.com/tutorial/terminating\n\nPass a non-zero integer to the code parameter of typer.Exit() to signal an error to the terminal.\n\n```python\nimport typer\n\napp = typer.Typer()\n\n\n@app.command()\ndef main(username: str):\n    if username == \"root\":\n        print(\"The root user is reserved\")\n        raise typer.Exit(code=1)\n    print(f\"New user created: {username}\")\n\n\nif __name__ == \"__main__\":\n    app()\n```\n\n--------------------------------\n\n### Terminate CLI execution with typer.Exit()\n\nSource: https://typer.tiangolo.com/tutorial/terminating\n\nUse typer.Exit() to stop program execution at any point without indicating an error.\n\n```python\nimport typer\n\nexisting_usernames = [\"rick\", \"morty\"]\n\n\ndef maybe_create_user(username: str):\n    if username in existing_usernames:\n        print(\"The user already exists\")\n        raise typer.Exit()\n    else:\n        print(f\"User created: {username}\")\n\n\ndef send_new_user_notification(username: str):\n    # Somehow send a notification here for the new user, maybe an email\n    print(f\"Notification sent for new user: {username}\")\n\n\napp = typer.Typer()\n\n\n@app.command()\ndef main(username: str):\n    maybe_create_user(username=username)\n    send_new_user_notification(username=username)\n\n\nif __name__ == \"__main__\":\n    app()\n```\n\n### Terminating > Exit with an error\n\nSource: https://typer.tiangolo.com/tutorial/terminating\n\nThe typer.Exit() exception accepts an optional code parameter to signal the program's exit status to the terminal. A code of 0 indicates success, while any non-zero value indicates an error. This is particularly useful for integration with other tools like Bash scripts that rely on exit codes to determine the success or failure of a command.\n\n--------------------------------\n\n### Terminating > Exit a CLI program\n\nSource: https://typer.tiangolo.com/tutorial/terminating\n\nYou can terminate a CLI program mid-execution by raising a typer.Exit() exception. This prevents any subsequent code from running, which is useful when a program completes successfully or needs to stop early without necessarily indicating an error. Typer catches this exception to terminate the program normally.",
+        "annotations": null,
+        "_meta": null
+      }
+    ],
+    "structuredContent": null,
+    "isError": false
+  },
+  "text": "### Exit CLI with custom error code\n\nSource: https://typer.tiangolo.com/tutorial/terminating\n\nPass a non-zero integer to the code parameter of typer.Exit() to signal an error to the terminal.\n\n```python\nimport typer\n\napp = typer.Typer()\n\n\n@app.command()\ndef main(username: str):\n    if username == \"root\":\n        print(\"The root user is reserved\")\n        raise typer.Exit(code=1)\n    print(f\"New user created: {username}\")\n\n\nif __name__ == \"__main__\":\n    app()\n```\n\n--------------------------------\n\n### Terminate CLI execution with typer.Exit()\n\nSource: https://typer.tiangolo.com/tutorial/terminating\n\nUse typer.Exit() to stop program execution at any point without indicating an error.\n\n```python\nimport typer\n\nexisting_usernames = [\"rick\", \"morty\"]\n\n\ndef maybe_create_user(username: str):\n    if username in existing_usernames:\n        print(\"The user already exists\")\n        raise typer.Exit()\n    else:\n        print(f\"User created: {username}\")\n\n\ndef send_new_user_notification(username: str):\n    # Somehow send a notification here for the new user, maybe an email\n    print(f\"Notification sent for new user: {username}\")\n\n\napp = typer.Typer()\n\n\n@app.command()\ndef main(username: str):\n    maybe_create_user(username=username)\n    send_new_user_notification(username=username)\n\n\nif __name__ == \"__main__\":\n    app()\n```\n\n### Terminating > Exit with an error\n\nSource: https://typer.tiangolo.com/tutorial/terminating\n\nThe typer.Exit() exception accepts an optional code parameter to signal the program's exit status to the terminal. A code of 0 indicates success, while any non-zero value indicates an error. This is particularly useful for integration with other tools like Bash scripts that rely on exit codes to determine the success or failure of a command.\n\n--------------------------------\n\n### Terminating > Exit a CLI program\n\nSource: https://typer.tiangolo.com/tutorial/terminating\n\nYou can terminate a CLI program mid-execution by raising a typer.Exit() exception. This prevents any subsequent code from running, which is useful when a program completes successfully or needs to stop early without necessarily indicating an error. Typer catches this exception to terminate the program normally.",
+  "size": {
+    "utf8_bytes": 2214,
+    "actual_tokens": 469,
+    "tokenizer": "docatlas-offline:o200k_base"
+  },
+  "version_matched": false,
+  "source_matched": false,
+  "semantic_assessment": "manual; separate from frozen witness matching"
+}

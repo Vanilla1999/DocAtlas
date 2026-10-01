@@ -1,0 +1,27 @@
+{
+  "tool": "get_docs_context",
+  "request": {
+    "question": "A query reports full retrieval coverage but facet coverage is unverified. What can I safely conclude from that?",
+    "project_path": "/tmp/opencode/docatlas-ablation",
+    "scope": "all",
+    "lookup_queries": [
+      "What does full retrieval coverage establish?",
+      "How does facet coverage differ from retrieval attribution?"
+    ]
+  },
+  "seconds": 1.1289146600029198,
+  "is_error": false,
+  "wire": {
+    "_meta": null,
+    "content": [
+      {
+        "type": "text",
+        "text": "{\"status\": \"ok\", \"kind\": \"docs_context\", \"context_status\": \"ready\", \"context_available\": true, \"answer_supported\": false, \"answer_available\": false, \"support_status\": \"retrieval_only\", \"answer_policy\": \"cite_only\", \"coverage_policy\": \"retrieval_attribution_only\", \"query_coverage\": \"full\", \"retrieval_coverage\": \"full\", \"facet_coverage\": \"unverified\", \"covered_query_ids\": [\"query-original\", \"query-lookup-1\", \"query-lookup-2\"], \"missing_query_ids\": [], \"missing_facets\": [], \"facets\": [{\"id\": \"intent-context:retrieval_pipeline\", \"requirement_id\": null, \"question\": \"retrieval pipeline query planning ranking evidence selection\", \"status\": \"retrieval_only\", \"evidence_ids\": [\"ev-278e9d1d7b0db0c8\"]}], \"sources\": [{\"evidence_id\": \"ev-91c715e077a03ede\", \"path_or_url\": \"docs/mcp-docs-server.md\", \"section\": \"Docs MCP server > Public tool contract\", \"snippet\": \"It reports retrieval coverage separately from semantic facets: `facet_coverage` is `none`, `partial`, `full`, or `unverified`; each facet is `covered`, `missing`, or `retrieval_only` and binds covered evidence by immutable ID.\", \"version_binding\": \"unversioned\", \"content_sha256\": \"e08439f6858f73fd4377117abd26e06bd9763e1594fd16682279acd0c6b3c512\", \"project_identity\": \"local:48277f62f8b4ff92ba1c60c082f92a43817f9e1c5ba4ea27e12cd77a76421585\", \"authority\": \"source_of_truth\", \"scope\": \"project\", \"line_start\": 42, \"line_end\": 42, \"source_uri\": \"docatlas://source/25280c825bca2f931cb59a02\"}, {\"evidence_id\": \"ev-278e9d1d7b0db0c8\", \"path_or_url\": \"docs/modules/evidence-selection.md\", \"section\": \"Evidence selection module > Responsibility\", \"snippet\": \"## Responsibility\\n\\nThe evidence-selection module turns bounded candidates into an auditable certification decision. Project-only reads bypass answer certification and use `ContextSelectionDecision`, which reports retrieval coverage without a support verdict.\\n\\nCandidate normalization, requirement compilation, proof matching, ranking, budget fitting, and projection identity are separate responsibilities even though they cooperate in one pipeline.\", \"version_binding\": \"unversioned\", \"content_sha256\": \"995bff14c06a441fc27e5e1a08e399b36a736675be0c3ed4d90649d4896c9ba0\", \"project_identity\": \"local:48277f62f8b4ff92ba1c60c082f92a43817f9e1c5ba4ea27e12cd77a76421585\", \"authority\": \"source_of_truth\", \"scope\": \"module\", \"line_start\": 7, \"line_end\": 11}], \"context_quality\": {\"status\": \"unverified\", \"reasons\": [\"coverage_unverified\"]}, \"read_next\": [{\"source_uri\": \"docatlas://source/470b250eb0fc312c7d3fdd07\", \"path\": \"wiki/Configuration.md\", \"project_identity\": \"local:48277f62f8b4ff92ba1c60c082f92a43817f9e1c5ba4ea27e12cd77a76421585\", \"snapshot_sha256\": \"sha256:5a03fa2e07d5800069436d1cd7e2fde9b6c23d676380a79d38d49d4aa01dc82c\", \"line_start\": 51, \"line_end\": 52, \"reason\": \"inspect_source_context\"}], \"edit_ready\": false, \"investigation_allowed\": true, \"estimated_tokens\": 694}",
+        "annotations": null,
+        "_meta": null
+      }
+    ],
+    "structuredContent": null,
+    "isError": false
+  }
+}

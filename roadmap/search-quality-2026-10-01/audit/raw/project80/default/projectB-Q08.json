@@ -1,0 +1,22 @@
+{
+  "tool": "get_docs_context",
+  "request": {
+    "question": "I committed a README change. How does the next documentation query become current?",
+    "project_path": "/tmp/opencode/docatlas-ablation"
+  },
+  "seconds": 0.9689003809980932,
+  "is_error": false,
+  "wire": {
+    "_meta": null,
+    "content": [
+      {
+        "type": "text",
+        "text": "{\"status\": \"ok\", \"kind\": \"docs_context\", \"context_status\": \"ready\", \"context_available\": true, \"answer_supported\": false, \"answer_available\": false, \"support_status\": \"retrieval_only\", \"answer_policy\": \"cite_only\", \"coverage_policy\": \"retrieval_attribution_only\", \"query_coverage\": \"full\", \"retrieval_coverage\": \"full\", \"facet_coverage\": \"unverified\", \"covered_query_ids\": [\"query-original\", \"query-anchor-1\"], \"missing_query_ids\": [], \"missing_facets\": [], \"facets\": [], \"sources\": [{\"evidence_id\": \"ev-af99ccf59b2af6c1\", \"path_or_url\": \"docs/INDEX.md\", \"section\": \"Documentation Index > Evaluation and research\", \"snippet\": \"## Evaluation and research\\n\\n- [Task-level agent benchmark](./research/task-level-agent-benchmark.md) — benchmark design for measuring agent behavior with DocAtlas.\\n- [Eval task-level README](../eval/task_level/README.md) — task-level evaluation harness overview.\\n- [Eval results README](../eval/results/live/README.md) — live eval report notes.\", \"version_binding\": \"unversioned\", \"content_sha256\": \"46c3a180e54d2e3ca5f3cf66113982662d267e4d93173ff806ec933e181969e8\", \"project_identity\": \"local:48277f62f8b4ff92ba1c60c082f92a43817f9e1c5ba4ea27e12cd77a76421585\", \"authority\": \"source_of_truth\", \"scope\": \"project\", \"line_start\": 40, \"line_end\": 44}, {\"evidence_id\": \"ev-da9e1d6c3a23a58f\", \"path_or_url\": \"docs/RELEASE_CHECKLIST.md\", \"section\": \"DocAtlas release checklist > Version and documentation\", \"snippet\": \"## Version and documentation\\n\\n- [ ] `docmancer/_version.py`, release tag, and changelog heading name the same version.\\n- [ ] README install text matches the version that the installer actually resolves.\\n- [ ] README, product brief, [Docs MCP reference](./mcp-docs-server.md), wiki command/troubleshooting pages, and changelog agree that the public Docs MCP tools are `get_docs_context`, `prepare_docs`, and `docs_status`.\\n- [ ] Advanced Packs and patch constraints are labelled advanced/advisory.\\n- [ ] Current docs and the support inventory advertise only surfaces shipped by this release; no retired alias or compatibility window is promised.\\n- [ ] Package metadata and import smoke confirm that the Python namespace remains `docmancer` while the distribution and CLI are `doc-atlas`.\\n- [ ] New active documentation is tracked by Git and does not duplicate the canonical Docs MCP workflow.\\n- [ ] The canonical user-facing release set (`README.md`, product brief, Docs MCP reference, capability reference, release checklist) is at most 1,000 lines, or this release records a reviewed exception and removal plan.\\n- [ ] Product claims remain inside the current evidence boundary: no Context7 parity, proven patch-improvement, or Stable claim is introduced without its named decision gate.\", \"version_binding\": \"unversioned\", \"content_sha256\": \"54edb4c41586035b849eccc9e957ca9b00a1cbd5907550126dbfa32845b9e97a\", \"project_identity\": \"local:48277f62f8b4ff92ba1c60c082f92a43817f9e1c5ba4ea27e12cd77a76421585\", \"line_start\": 7, \"line_end\": 17, \"authority\": \"supporting\", \"scope\": \"project\"}], \"context_quality\": {\"status\": \"unverified\", \"reasons\": [\"coverage_unverified\"]}, \"read_next\": [], \"edit_ready\": false, \"investigation_allowed\": true, \"estimated_tokens\": 783}",
+        "annotations": null,
+        "_meta": null
+      }
+    ],
+    "structuredContent": null,
+    "isError": false
+  }
+}

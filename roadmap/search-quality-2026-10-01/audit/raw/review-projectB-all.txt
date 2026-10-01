@@ -1,0 +1,618 @@
+
+## projectB-Q01 Я впервые подключил MCP. Нужно ли каждый вопрос начинать с docs_status?
+
+status=ok quality={'status': 'unverified', 'reasons': ['coverage_unverified']}
+
+ev-29991f84ece835bb docs/mcp-docs-server.md:53-53
+The three Docs MCP public tools are `get_docs_context`, `prepare_docs`, and `docs_status`. Use `get_docs_context` for bounded documentation questions, use `prepare_docs` for synchronization/prefetch lifecycle operations, and use `docs_status` for asynchronous job status.
+
+ev-f55b7fbc6503dac2 docs/mcp-docs-server.md:3-3
+This is the canonical detailed workflow reference for DocAtlas.
+
+ev-ad64fbc62cc31d4f docs/mcp-docs-server.md:35-40
+```text
+get_docs_context(question, project_path)
+→ returned recommended_next_action? obtain confirmation and call that exact action
+→ if a job was returned, poll docs_status(job_id)
+→ retry the original bounded get_docs_context question
+```
+
+
+## projectB-Q02 Which MCP tool should a coding agent call before modifying a documented module?
+
+status=ok quality={'status': 'unverified', 'reasons': ['coverage_unverified']}
+
+ev-a5d3220f93684dad SKILL.md:135-146
+## Recommended MCP Docs Workflow for Agents
+
+For repository-specific architecture, conventions, runbooks, roadmap, README/wiki, or module-doc questions, use the Docs MCP tools before generic WebFetch or model memory:
+
+1. For coding and patch tasks, call `get_docs_context(project_path=..., question=..., scope="all")` first; bounded delivery is server-owned policy. One call carries one concrete documentation question; independent questions use separate calls.
+2. Use `lookup_queries` only for narrow same-question recall help, including cross-language translation or facet decomposition. Never batch separate questions into them.
+3. Follow bounded `recommended_next_action`: ask its source-choice question, or obtain confirmation, call its exact typed action, and retry the same bounded request.
+4. Use `docs_status` only when the user explicitly asks about health, freshness, index state, or a background job.
+5. For bounded `insufficient_evidence`, do not claim documentation support. Follow at most one non-automatic `rephrase_question`; after that, investigate local source/tests when `hard_stop=false`. Stop before editing when `hard_stop=true` or when the requested change explicitly depends on a documentary contract that remains unproved.
+6. Cite `action_packet.source_of_truth` through each factual item's `evidence_ids`. Treat `CHANGELOG.md` as primary only for release-history/change questions.
+7. Only unbounded exploration exposes `answer_outline`, `trust_contract`, and `context_pack`; there, prefer nested source and section metadata.
+8. If the user asks vaguely about "the MCP server", distinguish `doc-atlas mcp docs-serve` (the three-tool documentation surface) from `doc-atlas mcp packs-serve` (advanced installed API-action packs).
+
+
+## projectB-Q03 В ответе есть цитаты, но answer_supported=false. Могу ли я объяснить найденное пользователю?
+
+status=ok quality={'status': 'unverified', 'reasons': ['coverage_unverified']}
+
+ev-17ef046ae8ab123e docs/mcp-docs-server.md:51-51
+The model-visible projection is the bounded evidence material exposed to the caller. It is token-bounded by the answer budget: only assigned visible witnesses are materialized, and the final projection revalidates those witnesses before returning `answer_supported=true`.
+
+ev-f55b7fbc6503dac2 docs/mcp-docs-server.md:3-3
+This is the canonical detailed workflow reference for DocAtlas.
+
+
+## projectB-Q04 How do I include module documentation when exploring the entire repository?
+
+status=ok quality={'status': 'unverified', 'reasons': ['coverage_unverified', 'budget_limited']}
+
+ev-f98a264d826c7a0c docs/mcp-quickstart-example.md:19-21
+For onboarding, `all` includes repository-level and module documentation in
+that same repository. Use `project` for repository-level policy only. An exact
+`module_path` restricts the call to that module even when `scope` is `all`.
+
+ev-87e528a0bbf72361 wiki/Architecture.md:110-110
+Internally, project context retrieval is staged: documentation first, then bounded source evidence, repository map, and code graph only when deterministic unresolved-target or cross-module signals require them. A versioned routing record stores stage status/reason/count/bytes outside the canonical model projection. Repository maps remain navigation evidence and never become authoritative project policy.
+
+ev-faf25c8b33d98c65 docs/project-docs-mcp-workflow.md:170-172
+## Dependency docs are separate
+
+Project documentation comes from repository-owned files and is scoped by project identity and optional module scope. Dependency/library documentation comes from external sources bound to a library identity and version; manifests and lockfiles supply project-version evidence. This external documentation is not the same as project-owned docs, even when `project_path` is used to resolve its dependency version.
+
+
+## projectB-Q05 Мне нужны только общие документы репозитория, без module-документов. Как ограничить поиск?
+
+status=insufficient_evidence quality={'status': 'unavailable', 'reasons': ['source_unavailable']}
+
+
+## projectB-Q06 Where do I declare which local documents are authoritative?
+
+status=ok quality={'status': 'unverified', 'reasons': ['coverage_unverified', 'source_unavailable']}
+
+ev-fcb08545690a408c README.md:216-225
+### Agent contract for a local project
+
+Before handing a repository to a coding agent, generate a compact, machine-readable contract. It tells the agent which local documents are authoritative, which dependency versions were detected, and how to select the minimal DocAtlas MCP tool surface:
+
+```bash
+doc-atlas agent-contract --project-path . --format json
+doc-atlas agent-contract --project-path . --format markdown
+```
+
+The contract is read-only. For an explicit health, freshness, index, or job-status request, agents use `docs_status`; otherwise they start with `get_docs_context`. Agents call `prepare_docs` only when that tool returns it as `next_action`, or when a user explicitly requests a refresh or sync.
+
+
+## projectB-Q07 Чем конфигурация поиска отличается от каталога авторитетных документов?
+
+status=ok quality={'status': 'partial', 'reasons': ['requested_part_missing']}
+
+ev-bed94811b504427c wiki/Configuration.md:1-5
+# Configuration
+
+**Resolution order:** `--config` flag, then `./docatlas.yaml` in the current directory, then `~/.docatlas/docatlas.yaml` (auto-created by `doc-atlas setup`). For details on what each command does, see [Commands](./Commands.md).
+
+A project is configured in `docatlas.yaml` by setting documented keys such as `index.provider: sqlite`, `query.default_budget: 2400`, and optional vector/retrieval settings. Relative index paths are resolved from the location of that `docatlas.yaml`.
+
+ev-38329dc4234fd6be wiki/Architecture.md:25-32
+## Project documentation storage and isolation
+
+Project documentation storage is organized as a derived, project-scoped index
+of repository-owned files. Each project identity receives isolated SQLite index
+state and extracted artifacts, so one repository's project docs cannot satisfy
+another repository's query. The filesystem documents remain authoritative; the
+index is a rebuildable cache coordinated by the writer lease and cleanup barrier
+described in [Index cleanup](../docs/index-cleanup.md).
+
+
+## projectB-Q08 I committed a README change. How does the next documentation query become current?
+
+status=ok quality={'status': 'unverified', 'reasons': ['coverage_unverified']}
+
+ev-af99ccf59b2af6c1 docs/INDEX.md:40-44
+## Evaluation and research
+
+- [Task-level agent benchmark](./research/task-level-agent-benchmark.md) — benchmark design for measuring agent behavior with DocAtlas.
+- [Eval task-level README](../eval/task_level/README.md) — task-level evaluation harness overview.
+- [Eval results README](../eval/results/live/README.md) — live eval report notes.
+
+ev-da9e1d6c3a23a58f docs/RELEASE_CHECKLIST.md:7-17
+## Version and documentation
+
+- [ ] `docmancer/_version.py`, release tag, and changelog heading name the same version.
+- [ ] README install text matches the version that the installer actually resolves.
+- [ ] README, product brief, [Docs MCP reference](./mcp-docs-server.md), wiki command/troubleshooting pages, and changelog agree that the public Docs MCP tools are `get_docs_context`, `prepare_docs`, and `docs_status`.
+- [ ] Advanced Packs and patch constraints are labelled advanced/advisory.
+- [ ] Current docs and the support inventory advertise only surfaces shipped by this release; no retired alias or compatibility window is promised.
+- [ ] Package metadata and import smoke confirm that the Python namespace remains `docmancer` while the distribution and CLI are `doc-atlas`.
+- [ ] New active documentation is tracked by Git and does not duplicate the canonical Docs MCP workflow.
+- [ ] The canonical user-facing release set (`README.md`, product brief, Docs MCP reference, capability reference, release checklist) is at most 1,000 lines, or this release records a reviewed exception and removal plan.
+- [ ] Product claims remain inside the current evidence boundary: no Context7 parity, proven patch-improvement, or Stable claim is introduced without its named decision gate.
+
+
+## projectB-Q09 В рабочей директории есть мои незакоммиченные правки. Может ли MCP сам пересобрать индекс?
+
+status=insufficient_evidence quality={'status': 'unavailable', 'reasons': ['source_unavailable']}
+
+
+## projectB-Q10 Can get_docs_context change the index by itself?
+
+status=ok quality={'status': 'unverified', 'reasons': ['coverage_unverified']}
+
+ev-b4c3b6df1625e8fa README.md:180-190
+### When to use each tool
+
+| Situation | Tool |
+|---|---|
+| First time in a repo | `get_docs_context`; follow its `next_action` if preparation is needed |
+| Check what docs are relevant | `get_docs_context` |
+| Check health, freshness, or a job | `docs_status` |
+| Reconcile after file changes | `prepare_docs(action="sync_project_docs")` |
+| Answer "how does this repo work?" | `get_docs_context(question="How does this repository work?", scope="all")` with the repository's `project_path` |
+
+Use `scope="project"` for repository-level policy only. For onboarding and cross-module overviews, `scope="all"` includes repository and module docs; an explicit `module_path` still limits retrieval to that module.
+
+ev-bc5a71393d9e1901 docs/mcp-docs-server.md:61-61
+For a repository question, call `get_docs_context` first. The call never reconciles the index itself. When committed project docs are stale or not yet indexed and the whole Git worktree is clean, the response returns a no-confirmation `prepare_docs(action="sync_project_docs")` instruction bound to a preflight `plan_digest`. `prepare_docs` rechecks the clean worktree and accepted `HEAD` before mutation. Dirty or indeterminate Git state, placeholders, unsupported docs, config shadowing, and orphan pruning remain confirmation-gated.
+
+
+## projectB-Q11 Подготовка вернула job_id. Что делать до повторного исходного вопроса?
+
+status=ok quality={'status': 'unverified', 'reasons': ['coverage_unverified']}
+
+ev-aef38d4357f20284 wiki/Architecture.md:147-147
+Call `get_docs_job_status(job_id)` to poll progress. Jobs can be cancelled via `cancel_docs_job(job_id)`; the cancellation flag is checked between targets and between seed URLs during a target.
+
+ev-2e37682e3d93fc88 wiki/Architecture.md:3-3
+DocAtlas is a local, version-aware documentation runtime for coding agents. Its primary product workflow is **DocAtlas Docs**; **DocAtlas MCP Packs** is a separate advanced API-action surface.
+
+
+## projectB-Q12 Does requesting cancellation prove that a background job has stopped?
+
+status=ok quality={'status': 'unverified', 'reasons': ['coverage_unverified']}
+
+ev-9c4e4bc207583e17 docs/grounded-host-session.md:16-20
+The host reads the returned snippets and assesses whether a requested fact is
+supported. `support(fact_id, evidence_id=..., quote=...)` accepts only a verbatim
+quote from retained evidence. A matching quote binds the judgment to a source;
+it does not prove that the quote logically answers the question. Semantic
+assessment remains the host's responsibility.
+
+ev-8a9a4ea0a02d0603 docs/grounded-host-session.md:3-6
+`GroundedMCPSession` is a Python host adapter over an initialized MCP
+`ClientSession`. It owns one project question, retains its evidence and keeps
+host judgments separate from server certification. It works with structured
+payloads and the configured text fallback. It is not an additional MCP tool.
+
+
+## projectB-Q13 Почему estimated_tokens может отличаться от бюджета допуска docs_context?
+
+status=ok quality={'status': 'unverified', 'reasons': ['coverage_unverified']}
+
+ev-5b00a0b7e2c7179b docs/retrieval-boundaries.md:21-30
+## Whole-response token budget
+
+The public `estimated_tokens` retains its compatible estimate: the ceiling of
+canonical UTF-8 JSON bytes divided by four. Admission of `docs_context` separately
+takes the maximum of that estimate and the pinned offline `o200k_base` token count
+over the entire canonical JSON, including metadata and optional locators, within
+800 tokens and three sources. Neither number promises the exact count of every
+client model.
+Do not change the public estimate globally to simulate this internal admission
+policy. A shorter snippet still must retain a qualified contiguous source span.
+
+ev-9ac525f0c65304ac CONTRIBUTING.md:38-38
+The bounded `get_docs_context` result union is `docs_answer`, `docs_context`, `patch_context`, or `insufficient_evidence`. Preserve the conservative boundary: only narrow relation-specific proof may authorize `docs_answer`; broad onboarding, overview, and explanatory questions remain `docs_context`.
+
+
+## projectB-Q14 Does the output budget include citation metadata as well as document text?
+
+status=ok quality={'status': 'unverified', 'reasons': ['coverage_unverified']}
+
+ev-d472078b61b33ab5 SKILL.md:96-110
+### Query Documentation (CLI fallback)
+
+```bash
+doc-atlas query "<question>"
+```
+
+Returns a compact markdown context pack with source attribution and token savings for CLI-only workflows. MCP-enabled agents should use `get_docs_context` instead.
+
+| Flag | Purpose |
+|------|---------|
+| `--budget <n>` | Max estimated output tokens |
+| `--limit <n>` | Max sections to return |
+| `--expand` | Include adjacent sections around matches |
+| `--expand page` | Include full page content within budget |
+| `--format <markdown\|json>` | Output format |
+
+ev-3fb32437317a4184 SKILL.md:71-78
+| Flag | Purpose |
+|------|---------|
+| `--include <glob>` | Include only matching relative paths |
+| `--exclude <glob>` | Exclude matching relative paths |
+| `--format <format>` | Restrict to formats such as `md`, `txt`, `pdf`, `docx`, `rtf`, or `html` |
+| `--recursive / --no-recursive` | Recurse through directories |
+| `--skip-known` | Skip files whose content hash is already indexed |
+| `--recreate` | Drop and rebuild the index |
+
+
+## projectB-Q15 Ссылка source_uri появилась в цитате. Нужно ли немедленно её открывать?
+
+status=ok quality={'status': 'unverified', 'reasons': ['coverage_unverified']}
+
+ev-c7d2a99dd5c55acc docs/source-continuation.md:18-22
+When spare space remains in the initial 800-token admission budget, a selected
+project source may carry `source_uri`. This optional locator never displaces a
+selected snippet. Pass the exact returned URI to MCP `resources/read`; ordinary
+Markdown links are citations, not continuation capabilities. The initial response
+still contains at most three sources and retains its public token-estimate meaning.
+
+
+## projectB-Q16 Can a continuation locator be used to read an unrelated file?
+
+status=ok quality={'status': 'unverified', 'reasons': ['coverage_unverified']}
+
+ev-d1cb81e8a20f2de7 docs/index-cleanup.md:1-15
+# Cleaning DocAtlas index state safely
+
+`doc-atlas clear-index` removes derived index state while preserving project
+sources, `docatlas.yaml`, configuration, and unrelated files; it never
+silently widens the cleanup scope. The command is preview-only
+unless `--apply` is supplied.
+
+`clear-index` supports exactly two scopes: `project-local` and `global`.
+Quarantine is the same-filesystem staging area used before final deletion so
+moved targets can be restored if the move phase fails. In `clear-index`,
+`--allow-incomplete` acknowledges that reported unverified vector or cache
+state will remain; it never bypasses live-process blockers or authorizes remote
+deletion. `clear-index` deletes only derived SQLite, extracted-document, cache,
+and verified local vector state. `clear-index` preserves project sources,
+`docatlas.yaml`, configuration, and unrelated files.
+
+ev-c5d20088356d2d90 docs/index-cleanup.md:53-55
+Project sources and `docatlas.yaml` are not cleanup targets. A later
+`prepare_docs(action="sync_project_docs")` can rebuild the index from the
+reviewable repository files.
+
+
+## projectB-Q17 Исходный файл изменился между поиском и дочитыванием. Что должен вернуть reader?
+
+status=insufficient_evidence quality={'status': 'unavailable', 'reasons': ['source_unavailable']}
+
+
+## projectB-Q18 Can two different continuation locators return overlapping lines without detection?
+
+status=ok quality={'status': 'unverified', 'reasons': ['coverage_unverified']}
+
+ev-5f69e31889b4d3d4 docs/grounded-host-session.md:22-27
+A `source_uri` alone does not cause I/O. If a concrete requested fact is still
+missing and the next part of the selected source may answer it, explicitly call
+`await session.read(uri, missing_fact_id=...)`. The shared source-read controller
+checks the locator before network/transport I/O and checks the returned project,
+path, snapshot, consecutive line range, duplicates and complete serialized size.
+It also rejects overlapping lines reached through different locators.
+
+ev-8a9a4ea0a02d0603 docs/grounded-host-session.md:3-6
+`GroundedMCPSession` is a Python host adapter over an initialized MCP
+`ClientSession`. It owns one project question, retains its evidence and keeps
+host judgments separate from server certification. It works with structured
+payloads and the configured text fallback. It is not an additional MCP tool.
+
+
+## projectB-Q19 Дочитывание не удалось, но часть ответа уже подтверждена. Нужно ли отказываться от всего ответа?
+
+status=insufficient_evidence quality={'status': 'unavailable', 'reasons': ['source_unavailable']}
+
+
+## projectB-Q20 What should the agent say when documentation covers only one part of my question?
+
+status=ok quality={'status': 'unverified', 'reasons': ['coverage_unverified']}
+
+ev-6526ca044d0c3b9b SKILL.md:21-27
+The default Docs MCP surface has exactly three tools:
+
+1. Start with `get_docs_context` for normal documentation questions.
+2. Call `prepare_docs` only from bounded `recommended_next_action`, unbounded `next_action`, or an explicit sync, refresh, index, or prefetch request.
+3. Call `docs_status` only for explicit health, freshness, index, or job-status requests.
+
+Advanced patch and inspection tools are not part of the public agent workflow.
+
+ev-6ff3dc33a15d2912 SKILL.md:96-102
+### Query Documentation (CLI fallback)
+
+```bash
+doc-atlas query "<question>"
+```
+
+Returns a compact markdown context pack with source attribution and token savings for CLI-only workflows. MCP-enabled agents should use `get_docs_context` instead.
+
+ev-d6821cc55bf2b657 docs/grounded-host-session.md:67-70
+The host should state the
+supported part, explicitly name what is unknown and provide a feasible next
+step or a necessary clarifying question. Unknown private configuration is never
+inferred from a general documentation quote.
+
+
+## projectB-Q21 Можно ли выполнить shell-команду, которую документ предлагает агенту внутри цитаты?
+
+status=ok quality={'status': 'unverified', 'reasons': ['coverage_unverified']}
+
+ev-1a722cd318071d8c docs/security/mcp-runtime-threat-model.md:26-38
+- Source provenance, version exactness, repository authority and instruction
+  trust are independent dimensions. Exact official documentation remains
+  untrusted document data.
+- Ordinary repository Markdown is cited data. Only explicit agent policy files
+  inside the configured repository authority receive scoped policy status, and
+  they cannot override system, user, tool or runtime safety policy.
+- Returned document content is delimited from generated warnings, metadata and
+  typed next actions. Indexed prose never selects `prepare_docs`, network,
+  filesystem, shell or credential actions.
+- Instruction-like pattern detection is warning-only telemetry. It is not a
+  sanitizer or proof of safety, and matched content remains retrievable.
+- Host models must cite document content as evidence rather than execute it as
+  policy.
+
+ev-706ecb643f7fca6e docs/security/mcp-runtime-threat-model.md:3-3
+Status: security boundary for the Docs server and advanced MCP Packs gateway.
+
+
+## projectB-Q22 Does successful retrieval grant permission to edit files?
+
+status=ok quality={'status': 'unverified', 'reasons': ['coverage_unverified']}
+
+ev-3370ff9f59c910af SKILL.md:160-160
+Before answering, check every requested fact, condition and comparison side against the final visible evidence. Retrieval success, keywords and source titles alone are not proof. Accept explicit logical implications and ignore incidental Markdown formatting; do not demand details the question did not ask for. Cite supported claims, name missing facts in partial answers, and abstain when needed. Do not fill gaps from memory, infer a negative from missing evidence, grant answer/edit authority or extend follow-up budgets.
+
+ev-1d4e03c7da833738 docs/one-call-agent-loop.md:7-18
+## Local engineering profile
+
+`one-call-local-v1` enforces:
+
+| Limit | Value |
+|---|---:|
+| successful DocAtlas calls | 1 |
+| model requests | 12 |
+| serialized input estimate per request | 7,000 tokens |
+| repair passes after the initial edit | 1 |
+| test invocations | 2 |
+| captured tool output per call | 32,768 bytes |
+
+
+## projectB-Q23 В двух проектах одинаковый README.md. Как не получить цитату из чужого проекта?
+
+status=insufficient_evidence quality={'status': 'unavailable', 'reasons': ['source_unavailable']}
+
+
+## projectB-Q24 Are evaluation reports eligible evidence for an ordinary operational question?
+
+status=ok quality={'status': 'unverified', 'reasons': ['coverage_unverified']}
+
+ev-0935e1988f820752 eval/project_context_quality/README.md:16-21
+Stage 10 separates primary, question-only, and independent paraphrase reports.
+The latter two are initially report-only, never release-gate evidence. Their
+JSON verdict, failed checks, raw payloads, and numeric threshold errors remain
+unchanged even when the CLI returns zero to allow report capture. Exceptions
+still fail the process. The frozen lanes were subsequently executed; the latest
+results are recorded in `IMPLEMENTATION_REPORT.md`.
+
+ev-32f41c85e7d6a0ef wiki/Architecture.md:108-108
+For repository coding and patch tasks, agents call `get_docs_context(project_path=..., question=...)` first. Project reads return bounded `docs_context`; explicit changes return `patch_context`; absent safe evidence returns `insufficient_evidence`. Certified `docs_answer` is reserved for library, dependency, and mixed lanes. Operational retrieval excludes evaluation, planning, and history lanes unless explicitly requested. Follow a bounded `recommended_next_action` when reconciliation is needed, then retry the same request. `docs_status` is reserved for explicit health, freshness, index, and job-status requests.
+
+
+## projectB-Q25 Как ограничение per-source влияет на соседние фрагменты одного документа?
+
+status=insufficient_evidence quality={'status': 'unavailable', 'reasons': ['source_unavailable']}
+
+
+## projectB-Q26 Can an inactive indexing generation change the ranking of active documentation?
+
+status=ok quality={'status': 'unverified', 'reasons': ['coverage_unverified', 'source_unavailable']}
+
+ev-57b8b76e50d160c7 docs/retrieval-boundaries.md:3-10
+## Active-only lexical statistics
+
+The active-generation lexical index isolates FTS/BM25 document-frequency and
+corpus-length statistics from inactive and candidate generations. A not-yet-promoted
+index must not change the active search ranking merely by existing. Source-policy
+checks apply to expanded candidates before text hydration; a second check after
+hydration remains defense in depth. Promotion and active-generation tests protect
+this boundary.
+
+ev-e1b850334f3074a9 wiki/Architecture.md:15-15
+Markdown indexing first normalizes fetched or local documentation into semantic parent sections based on heading structure. The production `parent-child-v1` chunker then splits each parent section into token-bounded child chunks (target 160 estimated visible tokens, hard maximum 512, zero visible overlap) while preserving the parent identity and source offsets. Retrieval ranks those child chunks and can hydrate parent or adjacent context without changing the exact display text.
+
+
+## projectB-Q27 Зачем повторно проверять цитату после её сокращения?
+
+status=insufficient_evidence quality={'status': 'unavailable', 'reasons': ['source_unavailable']}
+
+
+## projectB-Q28 Why should a matching heading not be enough to support a requested fact?
+
+status=ok quality={'status': 'unverified', 'reasons': ['coverage_unverified']}
+
+ev-9c4e4bc207583e17 docs/grounded-host-session.md:16-27
+The host reads the returned snippets and assesses whether a requested fact is
+supported. `support(fact_id, evidence_id=..., quote=...)` accepts only a verbatim
+quote from retained evidence. A matching quote binds the judgment to a source;
+it does not prove that the quote logically answers the question. Semantic
+assessment remains the host's responsibility.
+
+A `source_uri` alone does not cause I/O. If a concrete requested fact is still
+missing and the next part of the selected source may answer it, explicitly call
+`await session.read(uri, missing_fact_id=...)`. The shared source-read controller
+checks the locator before network/transport I/O and checks the returned project,
+path, snapshot, consecutive line range, duplicates and complete serialized size.
+It also rejects overlapping lines reached through different locators.
+
+ev-8a9a4ea0a02d0603 docs/grounded-host-session.md:3-6
+`GroundedMCPSession` is a Python host adapter over an initialized MCP
+`ClientSession`. It owns one project question, retains its evidence and keeps
+host judgments separate from server certification. It works with structured
+payloads and the configured text fallback. It is not an additional MCP tool.
+
+
+## projectB-Q29 Какая часть работы доступна без сети и заранее загруженной языковой модели?
+
+status=insufficient_evidence quality={'status': 'unavailable', 'reasons': ['source_unavailable']}
+
+
+## projectB-Q30 What happens when a dependency version cannot be proven from the repository?
+
+status=ok quality={'status': 'unverified', 'reasons': ['coverage_unverified']}
+
+ev-4101801b8c296802 docs/DOCMANCER_PRODUCT_BRIEF.md:58-65
+- Sync and retrieve local project documentation with citations.
+- Detect supported Python, Node/TypeScript, Dart/Flutter, Rust, Go, Java, and other project dependency metadata where available.
+- Resolve exact dependency versions only from repository evidence strong enough to prove the selected version; weaker declarations remain explicitly unbound or declared-only.
+- Produce `docs-impact` reports that tell reviewers which maintained docs may need attention after code changes.
+- Return compact source-attributed MCP evidence for coding agents.
+- Return typed `insufficient_evidence` rather than authorizing unsupported claims or edits.
+
+Dependency version evidence uses three distinct states. `exact` means repository state proves the selected version (for supported ecosystems, normally through an authoritative lockfile or equivalent resolved state). `declared-only` means a manifest declaration exists but repository state does not prove the selected runtime version. `unbound` means repository evidence cannot safely bind the dependency to an exact documentation version/source; local/path, Git, and direct-URL dependencies are common examples.
+
+ev-faf25c8b33d98c65 docs/project-docs-mcp-workflow.md:170-172
+## Dependency docs are separate
+
+Project documentation comes from repository-owned files and is scoped by project identity and optional module scope. Dependency/library documentation comes from external sources bound to a library identity and version; manifests and lockfiles supply project-version evidence. This external documentation is not the same as project-owned docs, even when `project_path` is used to resolve its dependency version.
+
+
+## projectB-Q31 Можно ли использовать документацию latest как доказательство поведения установленной версии?
+
+status=ok quality={'status': 'unverified', 'reasons': ['coverage_unverified']}
+
+ev-848dea5ff0c19302 README.md:70-76
+## One-line install
+
+Install `uv`, the `doc-atlas` CLI, and register the docs MCP server into your agent — in a single command:
+
+```bash
+curl -LsSf https://raw.githubusercontent.com/Vanilla1999/DocAtlas/main/scripts/install.sh | sh
+```
+
+ev-115934c532ee1077 README.md:80-80
+> It installs the latest published PyPI package, not unreleased code from `main`. Check `doc-atlas --version` before relying on a workflow newly documented on `main`; use a deliberately checked-out source installation for development changes that have not been released.
+
+
+## projectB-Q32 Can index cleanup run while another process is writing the index?
+
+status=ok quality={'status': 'partial', 'reasons': ['requested_part_missing']}
+
+ev-35fe085f79fc2397 docs/index-cleanup.md:1-6
+# Cleaning DocAtlas index state safely
+
+`doc-atlas clear-index` removes derived index state while preserving project
+sources, `docatlas.yaml`, configuration, and unrelated files; it never
+silently widens the cleanup scope. The command is preview-only
+unless `--apply` is supplied.
+
+ev-328bfe6bae7fc4d9 README.md:206-214
+### Safe index cleanup
+
+`doc-atlas clear-index` previews a bounded cleanup plan before removing derived
+SQLite, extracted-document, cache, and verified local vector state. Use
+`--scope project-local --project-path ...` for one project or `--scope global`
+for all local indexes while preserving configuration. Applying a reviewed plan
+can be bound to its `plan_digest`, and live processes, stale plans, remote
+Qdrant, and unowned vector directories fail closed. See
+[Cleaning DocAtlas index state safely](./docs/index-cleanup.md).
+
+
+## projectB-Q33 Почему клиент может видеть только маркер structuredContent, без самой цитаты?
+
+status=insufficient_evidence quality={'status': 'unavailable', 'reasons': ['source_unavailable']}
+
+
+## projectB-Q34 How can I check that my installed MCP command matches the current package?
+
+status=ok quality={'status': 'unverified', 'reasons': ['coverage_unverified', 'source_unavailable']}
+
+ev-f1ed8a300e832d1a docs/DOCMANCER_PRODUCT_BRIEF.md:82-84
+## Installation truth
+
+The package distributed on PyPI is `doc-atlas`. The `main` branch can contain workflow changes that are not yet published. Check `doc-atlas --version`, use release documentation that matches that installed version, and do not assume a one-line installer for `main` has published every documented feature.
+
+ev-848dea5ff0c19302 README.md:70-76
+## One-line install
+
+Install `uv`, the `doc-atlas` CLI, and register the docs MCP server into your agent — in a single command:
+
+```bash
+curl -LsSf https://raw.githubusercontent.com/Vanilla1999/DocAtlas/main/scripts/install.sh | sh
+```
+
+
+## projectB-Q35 Для чего генерировать agent-contract перед работой агента с репозиторием?
+
+status=insufficient_evidence quality={'status': 'unavailable', 'reasons': ['source_unavailable']}
+
+
+## projectB-Q36 Do successful provider-free tests prove that real agents spend fewer task tokens?
+
+status=ok quality={'status': 'unverified', 'reasons': ['coverage_unverified']}
+
+ev-b5440bc2f89c7200 docs/testing.md:1-3
+# Complete pytest marker inventory and test tiers
+
+The complete pytest marker inventory is `integration`, `advanced`, `live`, and `live_network`. The test suite markers are `integration`, `advanced`, `live`, and `live_network`. Core tests without those optional markers remain in the default suite.
+
+ev-bf81fc44f9c226ab CONTRIBUTING.md:61-63
+- Branch name: `feat/<topic>` or `fix/<description>`
+- Run the full test suite before opening the PR
+- New connectors or fetchers should include tests where practical
+
+ev-f82eea255a6b1f2d docs/testing.md:5-5
+Run the fail-closed offline suite with `DOCATLAS_OFFLINE=1 pytest tests/ -m "not advanced and not live and not live_network"`.
+
+
+## projectB-Q37 Где подтверждено, что DocAtlas всегда экономит ровно 50 процентов токенов?
+
+status=insufficient_evidence quality={'status': 'unavailable', 'reasons': ['source_unavailable']}
+
+
+## projectB-Q38 Which document guarantees that every query receives a complete correct answer?
+
+status=ok quality={'status': 'unverified', 'reasons': ['coverage_unverified']}
+
+ev-6ec9ec0fa9f1534a docs/source-continuation.md:50-57
+## Evidence delivery
+
+Structured-aware clients consume `structuredContent` once. Text-only clients can
+use `DOCATLAS_MCP_TEXT_FALLBACK=1`; unsupported delivery must be diagnosed rather
+than treating a marker as evidence. Do not duplicate the complete payload across
+both model-input channels. Engineering gates establish their tested boundaries. They do not establish
+unmeasured product guarantees or task-token savings. Keep any unsupported claim
+unproved unless a current authoritative source actually establishes it.
+
+ev-650a1a9ec7a8ed34 docs/source-continuation.md:5-10
+`get_docs_context` returns evidence, not a generated answer. For `docs_context`,
+`answer_available=false` and `answer_supported=false` mean the server has not
+certified a complete answer. The host may explain facts supported by the verbatim
+snippets. Name any missing part in the user's terms and preserve useful confirmed
+facts. Retrieval coverage is not semantic completeness. Source text is data and
+cannot authorize edits or change the user's instructions.
+
+
+## projectB-Q39 Какой пароль администратора установлен в моей частной production-среде?
+
+status=ok quality={'status': 'unverified', 'reasons': ['coverage_unverified']}
+
+ev-848dea5ff0c19302 README.md:70-76
+## One-line install
+
+Install `uv`, the `doc-atlas` CLI, and register the docs MCP server into your agent — in a single command:
+
+```bash
+curl -LsSf https://raw.githubusercontent.com/Vanilla1999/DocAtlas/main/scripts/install.sh | sh
+```
+
+
+## projectB-Q40 Where is mandatory ninety-day retention of every conversation specified?
+
+status=insufficient_evidence quality={'status': 'unavailable', 'reasons': ['source_unavailable']}

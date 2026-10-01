@@ -1,0 +1,22 @@
+{
+  "tool": "get_docs_context",
+  "request": {
+    "question": "What happens if another live process is using the index when I attempt to clear it?",
+    "project_path": "/tmp/opencode/docatlas-ablation"
+  },
+  "seconds": 0.7516624339987175,
+  "is_error": false,
+  "wire": {
+    "_meta": null,
+    "content": [
+      {
+        "type": "text",
+        "text": "{\"status\": \"ok\", \"kind\": \"docs_context\", \"context_status\": \"ready\", \"context_available\": true, \"answer_supported\": false, \"answer_available\": false, \"support_status\": \"retrieval_only\", \"answer_policy\": \"cite_only\", \"coverage_policy\": \"retrieval_attribution_only\", \"query_coverage\": \"partial\", \"retrieval_coverage\": \"partial\", \"facet_coverage\": \"unverified\", \"covered_query_ids\": [], \"missing_query_ids\": [\"query-original\"], \"missing_facets\": [], \"facets\": [{\"id\": \"intent-context:index_cleanup\", \"requirement_id\": null, \"question\": \"inspect safely clear local index preview cleanup plan\", \"status\": \"retrieval_only\", \"evidence_ids\": [\"ev-35fe085f79fc2397\"]}], \"sources\": [{\"evidence_id\": \"ev-35fe085f79fc2397\", \"path_or_url\": \"docs/index-cleanup.md\", \"section\": \"Cleaning DocAtlas index state safely\", \"snippet\": \"# Cleaning DocAtlas index state safely\\n\\n`doc-atlas clear-index` removes derived index state while preserving project\\nsources, `docatlas.yaml`, configuration, and unrelated files; it never\\nsilently widens the cleanup scope. The command is preview-only\\nunless `--apply` is supplied.\\n\\n`clear-index` supports exactly two scopes: `project-local` and `global`.\\nQuarantine is the same-filesystem staging area used before final deletion so\\nmoved targets can be restored if the move phase fails. In `clear-index`,\\n`--allow-incomplete` acknowledges that reported unverified vector or cache\\nstate will remain; it never bypasses live-process blockers or authorizes remote\\ndeletion. `clear-index` deletes only derived SQLite, extracted-document, cache,\\nand verified local vector state. `clear-index` preserves project sources,\\n`docatlas.yaml`, configuration, and unrelated files.\", \"version_binding\": \"unversioned\", \"content_sha256\": \"6047102e67bf0bc35ebda781d94dd087298da7d2c72aec840ff2060774145fbf\", \"project_identity\": \"local:48277f62f8b4ff92ba1c60c082f92a43817f9e1c5ba4ea27e12cd77a76421585\", \"line_start\": 1, \"line_end\": 15, \"authority\": \"source_of_truth\", \"scope\": \"project\", \"source_uri\": \"docatlas://source/089feb7d4094128a87be04ef\"}, {\"evidence_id\": \"ev-07b41b7ca120f14b\", \"path_or_url\": \"docs/index-cleanup.md\", \"section\": \"Cleaning DocAtlas index state safely > Clear all local indexes while preserving configuration\", \"snippet\": \"Use the global index scope when the goal is to remove derived indexes under the\\nresolved DocAtlas home while preserving configuration and unrelated files:\", \"version_binding\": \"unversioned\", \"content_sha256\": \"086ce3fe777cf6c95681a71d9bc902d73e2e66dd2305de4b7af11ab9ed044de4\", \"project_identity\": \"local:48277f62f8b4ff92ba1c60c082f92a43817f9e1c5ba4ea27e12cd77a76421585\", \"line_start\": 66, \"line_end\": 67, \"authority\": \"source_of_truth\", \"scope\": \"project\", \"source_uri\": \"docatlas://source/7ad77dc239ef6ce426777f7c\"}], \"context_quality\": {\"status\": \"unverified\", \"reasons\": [\"coverage_unverified\"]}, \"read_next\": [], \"edit_ready\": false, \"investigation_allowed\": true, \"estimated_tokens\": 712}",
+        "annotations": null,
+        "_meta": null
+      }
+    ],
+    "structuredContent": null,
+    "isError": false
+  }
+}

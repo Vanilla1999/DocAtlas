@@ -1,0 +1,32 @@
+{
+  "id": "fastapi-10",
+  "project": "fastapi",
+  "family": "over_budget",
+  "answerability": "over_budget",
+  "limit": 3,
+  "request": {
+    "library": "fastapi",
+    "query": "Provide every documented workflow, caveat and complete code example verbatim from all fastapi source files in this snapshot, without omissions.",
+    "limit": 3
+  },
+  "seconds": 0.0021160789983696304,
+  "is_error": false,
+  "wire": {
+    "_meta": null,
+    "content": [
+      {
+        "type": "text",
+        "text": "\n------------------------------------------------------------\nResult 1: file:///tmp/opencode/search-audit-work-20261001/grounded/corpus/fastapi/docs/en/docs/tutorial/background-tasks.md\n\n## Caveat\nIf you need to perform heavy background computation and you don't necessarily need it to be run by the same process (for example, you don't need to share memory, variables, etc), you might benefit from using other bigger tools like Celery.\nThey tend to require more complex configurations, a message/job queue manager, like RabbitMQ or Redis, but they allow you to run background tasks in multiple processes, and especially, in multiple servers.\nTo see an example, check the [Project Generators](../project-generation.md){.internal-link target=\\_blank}, they all include Celery already configured.\nBut if you need to access variables and objects from the same **FastAPI** app, or you need to perform small background tasks (like sending an email notification), you can simply just use `BackgroundTasks`.\n\n------------------------------------------------------------\nResult 2: file:///tmp/opencode/search-audit-work-20261001/grounded/corpus/fastapi/docs/en/docs/tutorial/background-tasks.md\n\n## Technical Details\nThe class `BackgroundTasks` comes directly from `starlette.background`.\nIt is imported/included directly into FastAPI so that you can import it from `fastapi` and avoid accidentally importing the alternative `BackgroundTask` (without the `s` at the end) from `starlette.background`.\nBy only using `BackgroundTasks` (and not `BackgroundTask`), it's then possible to use it as a _path operation function_ parameter and have **FastAPI** handle the rest for you, just like when using the `Request` object directly.\nIt's still possible to use `BackgroundTask` alone in FastAPI, but you have to create the object in your code and return a Starlette `Response` including it.\nYou can see more details in Starlette's official docs for Background Tasks.\n\n------------------------------------------------------------\nResult 3: file:///tmp/opencode/search-audit-work-20261001/grounded/corpus/fastapi/docs/en/docs/tutorial/cors.md\n\n## More info\nFor more info about CORS, check the Mozilla CORS documentation.\n/// note | \"Technical Details\"\nYou could also use `from starlette.middleware.cors import CORSMiddleware`.\n**FastAPI** provides several middlewares in `fastapi.middleware` just as a convenience for you, the developer. But most of the available middlewares come directly from Starlette.\n///\n",
+        "annotations": null,
+        "_meta": null
+      }
+    ],
+    "structuredContent": null,
+    "isError": false
+  },
+  "native_size": {
+    "utf8_bytes": 2494,
+    "actual_tokens": 518,
+    "tokenizer": "docatlas-offline:o200k_base"
+  }
+}

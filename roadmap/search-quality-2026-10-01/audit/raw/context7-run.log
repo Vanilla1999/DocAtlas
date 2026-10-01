@@ -1,0 +1,127 @@
+fastapi-02 /websites/fastapi_tiangolo 624 error= False
+fastapi-04 /websites/fastapi_tiangolo 436 error= False
+  + Exception Group Traceback (most recent call last):
+  |   File "/tmp/opencode/docatlas-ablation/reviews/search-audit-2026-10-01/run_context7.py", line 62, in <module>
+  |     asyncio.run(run())
+  |     ~~~~~~~~~~~^^^^^^^
+  |   File "/home/viadmin/.local/share/uv/python/cpython-3.13.12-linux-x86_64-gnu/lib/python3.13/asyncio/runners.py", line 195, in run
+  |     return runner.run(main)
+  |            ~~~~~~~~~~^^^^^^
+  |   File "/home/viadmin/.local/share/uv/python/cpython-3.13.12-linux-x86_64-gnu/lib/python3.13/asyncio/runners.py", line 118, in run
+  |     return self._loop.run_until_complete(task)
+  |            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^
+  |   File "/home/viadmin/.local/share/uv/python/cpython-3.13.12-linux-x86_64-gnu/lib/python3.13/asyncio/base_events.py", line 725, in run_until_complete
+  |     return future.result()
+  |            ~~~~~~~~~~~~~^^
+  |   File "/tmp/opencode/docatlas-ablation/reviews/search-audit-2026-10-01/run_context7.py", line 21, in run
+  |     async with streamablehttp_client('https://mcp.context7.com/mcp') as (read,write,_):
+  |                ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  |   File "/home/viadmin/.local/share/uv/python/cpython-3.13.12-linux-x86_64-gnu/lib/python3.13/contextlib.py", line 235, in __aexit__
+  |     await self.gen.athrow(value)
+  |   File "/home/viadmin/.local/share/uv/tools/doc-atlas/lib/python3.13/site-packages/mcp/client/streamable_http.py", line 742, in streamablehttp_client
+  |     async with streamable_http_client(
+  |                ~~~~~~~~~~~~~~~~~~~~~~^
+  |         url,
+  |         ^^^^
+  |         http_client=client,
+  |         ^^^^^^^^^^^^^^^^^^^
+  |         terminate_on_close=terminate_on_close,
+  |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  |     ) as streams:
+  |     ^
+  |   File "/home/viadmin/.local/share/uv/python/cpython-3.13.12-linux-x86_64-gnu/lib/python3.13/contextlib.py", line 235, in __aexit__
+  |     await self.gen.athrow(value)
+  |   File "/home/viadmin/.local/share/uv/tools/doc-atlas/lib/python3.13/site-packages/mcp/client/streamable_http.py", line 672, in streamable_http_client
+  |     async with anyio.create_task_group() as tg:
+  |                ~~~~~~~~~~~~~~~~~~~~~~~^^
+  |   File "/home/viadmin/.local/share/uv/tools/doc-atlas/lib/python3.13/site-packages/anyio/_backends/_asyncio.py", line 847, in __aexit__
+  |     raise BaseExceptionGroup(
+  |         "unhandled errors in a TaskGroup", self._exceptions
+  |     ) from None
+  | ExceptionGroup: unhandled errors in a TaskGroup (1 sub-exception)
+  +-+---------------- 1 ----------------
+    | Traceback (most recent call last):
+    |   File "/home/viadmin/.local/share/uv/tools/doc-atlas/lib/python3.13/site-packages/httpx/_transports/default.py", line 101, in map_httpcore_exceptions
+    |     yield
+    |   File "/home/viadmin/.local/share/uv/tools/doc-atlas/lib/python3.13/site-packages/httpx/_transports/default.py", line 394, in handle_async_request
+    |     resp = await self._pool.handle_async_request(req)
+    |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/home/viadmin/.local/share/uv/tools/doc-atlas/lib/python3.13/site-packages/httpcore/_async/connection_pool.py", line 256, in handle_async_request
+    |     raise exc from None
+    |   File "/home/viadmin/.local/share/uv/tools/doc-atlas/lib/python3.13/site-packages/httpcore/_async/connection_pool.py", line 236, in handle_async_request
+    |     response = await connection.handle_async_request(
+    |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |         pool_request.request
+    |         ^^^^^^^^^^^^^^^^^^^^
+    |     )
+    |     ^
+    |   File "/home/viadmin/.local/share/uv/tools/doc-atlas/lib/python3.13/site-packages/httpcore/_async/connection.py", line 101, in handle_async_request
+    |     raise exc
+    |   File "/home/viadmin/.local/share/uv/tools/doc-atlas/lib/python3.13/site-packages/httpcore/_async/connection.py", line 78, in handle_async_request
+    |     stream = await self._connect(request)
+    |              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/home/viadmin/.local/share/uv/tools/doc-atlas/lib/python3.13/site-packages/httpcore/_async/connection.py", line 156, in _connect
+    |     stream = await stream.start_tls(**kwargs)
+    |              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/home/viadmin/.local/share/uv/tools/doc-atlas/lib/python3.13/site-packages/httpcore/_backends/anyio.py", line 67, in start_tls
+    |     with map_exceptions(exc_map):
+    |          ~~~~~~~~~~~~~~^^^^^^^^^
+    |   File "/home/viadmin/.local/share/uv/python/cpython-3.13.12-linux-x86_64-gnu/lib/python3.13/contextlib.py", line 162, in __exit__
+    |     self.gen.throw(value)
+    |     ~~~~~~~~~~~~~~^^^^^^^
+    |   File "/home/viadmin/.local/share/uv/tools/doc-atlas/lib/python3.13/site-packages/httpcore/_exceptions.py", line 14, in map_exceptions
+    |     raise to_exc(exc) from exc
+    | httpcore.ConnectTimeout
+    | 
+    | The above exception was the direct cause of the following exception:
+    | 
+    | Traceback (most recent call last):
+    |   File "/home/viadmin/.local/share/uv/tools/doc-atlas/lib/python3.13/site-packages/anyio/_core/_tasks.py", line 327, in _run_coro
+    |     retval = await self._coro
+    |              ^^^^^^^^^^^^^^^^
+    |   File "/home/viadmin/.local/share/uv/tools/doc-atlas/lib/python3.13/site-packages/mcp/client/streamable_http.py", line 583, in handle_request_async
+    |     await self._handle_post_request(ctx)
+    |   File "/home/viadmin/.local/share/uv/tools/doc-atlas/lib/python3.13/site-packages/mcp/client/streamable_http.py", line 361, in _handle_post_request
+    |     async with stream_within_origin(
+    |                ~~~~~~~~~~~~~~~~~~~~^
+    |         ctx.client,
+    |         ^^^^^^^^^^^
+    |     ...<3 lines>...
+    |         headers=headers,
+    |         ^^^^^^^^^^^^^^^^
+    |     ) as response:
+    |     ^
+    |   File "/home/viadmin/.local/share/uv/python/cpython-3.13.12-linux-x86_64-gnu/lib/python3.13/contextlib.py", line 214, in __aenter__
+    |     return await anext(self.gen)
+    |            ^^^^^^^^^^^^^^^^^^^^^
+    |   File "/home/viadmin/.local/share/uv/tools/doc-atlas/lib/python3.13/site-packages/mcp/shared/_httpx_utils.py", line 132, in stream_within_origin
+    |     response = await client.send(request, stream=True, follow_redirects=False)
+    |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/home/viadmin/.local/share/uv/tools/doc-atlas/lib/python3.13/site-packages/httpx/_client.py", line 1629, in send
+    |     response = await self._send_handling_auth(
+    |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |     ...<4 lines>...
+    |     )
+    |     ^
+    |   File "/home/viadmin/.local/share/uv/tools/doc-atlas/lib/python3.13/site-packages/httpx/_client.py", line 1657, in _send_handling_auth
+    |     response = await self._send_handling_redirects(
+    |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |     ...<3 lines>...
+    |     )
+    |     ^
+    |   File "/home/viadmin/.local/share/uv/tools/doc-atlas/lib/python3.13/site-packages/httpx/_client.py", line 1694, in _send_handling_redirects
+    |     response = await self._send_single_request(request)
+    |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/home/viadmin/.local/share/uv/tools/doc-atlas/lib/python3.13/site-packages/httpx/_client.py", line 1730, in _send_single_request
+    |     response = await transport.handle_async_request(request)
+    |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/home/viadmin/.local/share/uv/tools/doc-atlas/lib/python3.13/site-packages/httpx/_transports/default.py", line 393, in handle_async_request
+    |     with map_httpcore_exceptions():
+    |          ~~~~~~~~~~~~~~~~~~~~~~~^^
+    |   File "/home/viadmin/.local/share/uv/python/cpython-3.13.12-linux-x86_64-gnu/lib/python3.13/contextlib.py", line 162, in __exit__
+    |     self.gen.throw(value)
+    |     ~~~~~~~~~~~~~~^^^^^^^
+    |   File "/home/viadmin/.local/share/uv/tools/doc-atlas/lib/python3.13/site-packages/httpx/_transports/default.py", line 118, in map_httpcore_exceptions
+    |     raise mapped_exc(message) from exc
+    | httpx.ConnectTimeout
+    +------------------------------------

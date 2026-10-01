@@ -1,0 +1,23 @@
+{
+  "tool": "get_docs_context",
+  "request": {
+    "question": "What is AliasPath used to specify for validation aliases?",
+    "project_path": "/tmp/opencode/search-audit-work-20261001/fixtures/pydantic",
+    "scope": "all"
+  },
+  "seconds": 0.6137133040028857,
+  "is_error": false,
+  "wire": {
+    "_meta": null,
+    "content": [
+      {
+        "type": "text",
+        "text": "{\"status\": \"ok\", \"kind\": \"docs_context\", \"context_status\": \"ready\", \"context_available\": true, \"answer_supported\": false, \"answer_available\": false, \"support_status\": \"retrieval_only\", \"answer_policy\": \"cite_only\", \"coverage_policy\": \"retrieval_attribution_only\", \"query_coverage\": \"full\", \"retrieval_coverage\": \"full\", \"facet_coverage\": \"unverified\", \"covered_query_ids\": [\"query-original\", \"query-anchor-1\"], \"missing_query_ids\": [], \"missing_facets\": [], \"facets\": [], \"sources\": [{\"evidence_id\": \"ev-7e7bf1b907a7b508\", \"path_or_url\": \"docs/concepts/alias.md\", \"section\": \"`AliasPath` and `AliasChoices`\", \"snippet\": \"## `AliasPath` and `AliasChoices`\\n\\n??? api \\\"API Documentation\\\"\\n\\n    [`pydantic.aliases.AliasPath`][pydantic.aliases.AliasPath]<br>\\n    [`pydantic.aliases.AliasChoices`][pydantic.aliases.AliasChoices]<br>\\n\\nPydantic provides two special types for convenience when using `validation_alias`: `AliasPath` and `AliasChoices`.\\n\\nThe `AliasPath` is used to specify a path to a field using aliases. For example:\\n\\n```py lint=\\\"skip\\\"\\nfrom pydantic import BaseModel, Field, AliasPath\\n\\n\\nclass User(BaseModel):\\n    first_name: str = Field(validation_alias=AliasPath('names', 0))\\n    last_name: str = Field(validation_alias=AliasPath('names', 1))\\n\\nuser = User.model_validate({'names': ['John', 'Doe']})  # (1)!\\nprint(user)\\n#> first_name='John' last_name='Doe'\\n```\\n\\n1. We are using `model_validate` to validate a dictionary using the field aliases.\", \"version_binding\": \"unversioned\", \"content_sha256\": \"5202b8d51449709ea19003d01496ab50f90fcb630e5240b88244b8487ac299ea\", \"project_identity\": \"local:dee89d9b00c29f8b46038582d3569cd8157162fec6f171d84685bc8b23f83a09\", \"line_start\": 16, \"line_end\": 40, \"authority\": \"source_of_truth\", \"scope\": \"project\", \"source_uri\": \"docatlas://source/9251100b836849e7167a72e1\"}], \"context_quality\": {\"status\": \"unverified\", \"reasons\": [\"coverage_unverified\"]}, \"read_next\": [{\"source_uri\": \"docatlas://source/981f86f1061e775dd45af805\", \"path\": \"docs/concepts/alias.md\", \"project_identity\": \"local:dee89d9b00c29f8b46038582d3569cd8157162fec6f171d84685bc8b23f83a09\", \"snapshot_sha256\": \"sha256:0c65c7fddc78232eb17b34def5383402e8c2df715da9935ba3d97a98277233e0\", \"line_start\": 47, \"line_end\": 86, \"reason\": \"inspect_source_context\"}], \"edit_ready\": false, \"investigation_allowed\": true, \"estimated_tokens\": 572}",
+        "annotations": null,
+        "_meta": null
+      }
+    ],
+    "structuredContent": null,
+    "isError": false
+  }
+}

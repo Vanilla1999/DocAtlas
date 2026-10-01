@@ -1,0 +1,23 @@
+{
+  "tool": "get_docs_context",
+  "request": {
+    "question": "Перечисли способы включить strict mode, включая field, annotation, config и validation call.",
+    "project_path": "/tmp/opencode/search-audit-work-20261001/fixtures/pydantic",
+    "scope": "all"
+  },
+  "seconds": 0.2823561530021834,
+  "is_error": false,
+  "wire": {
+    "_meta": null,
+    "content": [
+      {
+        "type": "text",
+        "text": "{\"status\": \"ok\", \"kind\": \"docs_context\", \"context_status\": \"ready\", \"context_available\": true, \"answer_supported\": false, \"answer_available\": false, \"support_status\": \"retrieval_only\", \"answer_policy\": \"cite_only\", \"coverage_policy\": \"retrieval_attribution_only\", \"query_coverage\": \"full\", \"retrieval_coverage\": \"full\", \"facet_coverage\": \"unverified\", \"covered_query_ids\": [\"query-original\"], \"missing_query_ids\": [], \"missing_facets\": [], \"facets\": [], \"sources\": [{\"evidence_id\": \"ev-18e54bbfdd6572d3\", \"path_or_url\": \"docs/concepts/strict_mode.md\", \"section\": \"Introduction\", \"snippet\": \"There are various ways to get strict-mode validation while using Pydantic, which will be discussed in more detail below:\\n\\n* [Passing `strict=True` to the validation methods](#strict-mode-in-method-calls), such as `BaseModel.model_validate`,\\n  `TypeAdapter.validate_python`, and similar for JSON\\n* [Using `Field(strict=True)`](#strict-mode-with-field) with fields of a `BaseModel`, `dataclass`, or `TypedDict`\\n* [Using `pydantic.types.Strict` as a type annotation](#strict-mode-with-annotated-strict) on a field\\n  * Pydantic provides some type aliases that are already annotated with `Strict`, such as `pydantic.types.StrictInt`\\n* [Using `ConfigDict(strict=True)`](#strict-mode-with-configdict)\", \"version_binding\": \"unversioned\", \"content_sha256\": \"1fad0d1da2fbd8a73ac045f126d3af5df68f440da4558f146c5e7b7f79e67c05\", \"project_identity\": \"local:dee89d9b00c29f8b46038582d3569cd8157162fec6f171d84685bc8b23f83a09\", \"authority\": \"source_of_truth\", \"scope\": \"project\", \"line_start\": 39, \"line_end\": 46}, {\"evidence_id\": \"ev-0b7cd36b44a08b6e\", \"path_or_url\": \"docs/concepts/strict_mode.md\", \"section\": \"Strict mode with `Field` > Using `Field` as an annotation\", \"snippet\": \"Note that `Field(strict=True)` (or with any other keyword arguments) can be used as an annotation if necessary, e.g.,\\nwhen working with `TypedDict`:\", \"version_binding\": \"unversioned\", \"content_sha256\": \"9a434ba1821d27323f72148725a8c9298194d5dc3c396705649a05809668bec7\", \"project_identity\": \"local:dee89d9b00c29f8b46038582d3569cd8157162fec6f171d84685bc8b23f83a09\", \"line_start\": 261, \"line_end\": 262, \"authority\": \"source_of_truth\", \"scope\": \"project\"}], \"context_quality\": {\"status\": \"unverified\", \"reasons\": [\"coverage_unverified\"]}, \"read_next\": [{\"source_uri\": \"docatlas://source/30cbf0fb357edc451f37cc25\", \"path\": \"docs/concepts/strict_mode.md\", \"project_identity\": \"local:dee89d9b00c29f8b46038582d3569cd8157162fec6f171d84685bc8b23f83a09\", \"snapshot_sha256\": \"sha256:06e00a3e114c85ff31286640cb9842a99209d4112d5cb4812b47d4bf556f2b71\", \"line_start\": 263, \"line_end\": 283, \"reason\": \"inspect_source_context\"}], \"edit_ready\": false, \"investigation_allowed\": true, \"estimated_tokens\": 664}",
+        "annotations": null,
+        "_meta": null
+      }
+    ],
+    "structuredContent": null,
+    "isError": false
+  }
+}

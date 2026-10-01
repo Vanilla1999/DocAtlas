@@ -1,0 +1,23 @@
+{
+  "tool": "get_docs_context",
+  "request": {
+    "question": "Which build isolation mode does uv use by default and what is the escape hatch for a missing build dependency?",
+    "project_path": "/tmp/opencode/search-audit-work-20261001/fixtures/uv",
+    "scope": "all"
+  },
+  "seconds": 0.35511863300052937,
+  "is_error": false,
+  "wire": {
+    "_meta": null,
+    "content": [
+      {
+        "type": "text",
+        "text": "{\"status\": \"ok\", \"kind\": \"docs_context\", \"context_status\": \"ready\", \"context_available\": true, \"answer_supported\": false, \"answer_available\": false, \"support_status\": \"retrieval_only\", \"answer_policy\": \"cite_only\", \"coverage_policy\": \"retrieval_attribution_only\", \"query_coverage\": \"full\", \"retrieval_coverage\": \"full\", \"facet_coverage\": \"unverified\", \"covered_query_ids\": [\"query-original\"], \"missing_query_ids\": [], \"missing_facets\": [], \"facets\": [{\"id\": \"retrieval-need:need-1\", \"requirement_id\": null, \"question\": \"Which build isolation mode does uv use by default\", \"status\": \"retrieval_only\", \"evidence_ids\": [\"ev-c002f69df094246b\"]}], \"sources\": [{\"evidence_id\": \"ev-c002f69df094246b\", \"path_or_url\": \"docs/pip/compatibility.md\", \"section\": \"Compatibility with `pip` and `pip-tools` > PEP 517 build isolation\", \"snippet\": \"## PEP 517 build isolation\\n\\nuv uses [PEP 517](https://peps.python.org/pep-0517/) build isolation by default (akin to\\n`pip install --use-pep517`), following `pypa/build` and in anticipation of `pip` defaulting to PEP\\n517 builds in the future ([pypa/pip#9175](https://github.com/pypa/pip/issues/9175)).\\n\\nIf a package fails to install due to a missing build-time dependency, try using a newer version of\\nthe package; if the problem persists, consider filing an issue with the package maintainer,\\nrequesting that they update the packaging setup to declare the correct PEP 517 build-time\\ndependencies.\\n\\nAs an escape hatch, you can preinstall a package's build dependencies, then run `uv pip install`\\nwith `--no-build-isolation`, as in:\", \"version_binding\": \"unversioned\", \"content_sha256\": \"1abe3b760f7f9efa8e38b056bc72fb79a7c36e873b53729a86ce50543a255727\", \"project_identity\": \"local:e65d484943b04206e676f1b569d594fafedcdaf92efb305771c46aba30d34f5c\", \"line_start\": 156, \"line_end\": 168, \"authority\": \"source_of_truth\", \"scope\": \"project\"}, {\"evidence_id\": \"ev-4928b1add037a7a4\", \"path_or_url\": \"docs/pip/compatibility.md\", \"section\": \"PEP 517 build isolation\", \"snippet\": \"If a package fails to install due to a missing build-time dependency, try using a newer version of\\nthe package; if the problem persists, consider filing an issue with the package maintainer,\\nrequesting that they update the packaging setup to declare the correct PEP 517 build-time\\ndependencies.\\n\\nAs an escape hatch, you can preinstall a package's build dependencies, then run `uv pip install`\\nwith `--no-build-isolation`, as in:\", \"version_binding\": \"unversioned\", \"content_sha256\": \"b44553f2f2de7c3a5a1bc9ac1f7edf528b61786a6b53d82399680ce48f634a8c\", \"project_identity\": \"local:e65d484943b04206e676f1b569d594fafedcdaf92efb305771c46aba30d34f5c\", \"authority\": \"source_of_truth\", \"scope\": \"project\", \"line_start\": 162, \"line_end\": 168}], \"context_quality\": {\"status\": \"unverified\", \"reasons\": [\"coverage_unverified\"]}, \"read_next\": [], \"edit_ready\": false, \"investigation_allowed\": true, \"estimated_tokens\": 708}",
+        "annotations": null,
+        "_meta": null
+      }
+    ],
+    "structuredContent": null,
+    "isError": false
+  }
+}

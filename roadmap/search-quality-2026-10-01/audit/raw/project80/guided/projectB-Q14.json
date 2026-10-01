@@ -1,0 +1,26 @@
+{
+  "tool": "get_docs_context",
+  "request": {
+    "question": "Does the output budget include citation metadata as well as document text?",
+    "project_path": "/tmp/opencode/docatlas-ablation",
+    "scope": "all",
+    "lookup_queries": [
+      "What fields count toward the complete serialized context budget?"
+    ]
+  },
+  "seconds": 0.900115543998254,
+  "is_error": false,
+  "wire": {
+    "_meta": null,
+    "content": [
+      {
+        "type": "text",
+        "text": "{\"status\": \"ok\", \"kind\": \"docs_context\", \"context_status\": \"ready\", \"context_available\": true, \"answer_supported\": false, \"answer_available\": false, \"support_status\": \"retrieval_only\", \"answer_policy\": \"cite_only\", \"coverage_policy\": \"retrieval_attribution_only\", \"query_coverage\": \"partial\", \"retrieval_coverage\": \"partial\", \"facet_coverage\": \"unverified\", \"covered_query_ids\": [], \"missing_query_ids\": [\"query-original\", \"query-lookup-1\"], \"missing_facets\": [], \"facets\": [], \"sources\": [{\"evidence_id\": \"ev-d472078b61b33ab5\", \"path_or_url\": \"SKILL.md\", \"section\": \"DocAtlas > Core Commands > Query Documentation (CLI fallback)\", \"snippet\": \"| Flag | Purpose |\\n|------|---------|\\n| `--budget <n>` | Max estimated output tokens |\\n| `--limit <n>` | Max sections to return |\\n| `--expand` | Include adjacent sections around matches |\\n| `--expand page` | Include full page content within budget |\\n| `--format <markdown\\\\|json>` | Output format |\", \"version_binding\": \"unversioned\", \"content_sha256\": \"bc328341f3cdc7ac948fe536912efe98afc02514071e8900abbf1bead028a94f\", \"project_identity\": \"local:48277f62f8b4ff92ba1c60c082f92a43817f9e1c5ba4ea27e12cd77a76421585\", \"authority\": \"source_of_truth\", \"scope\": \"project\", \"line_start\": 104, \"line_end\": 110, \"source_uri\": \"docatlas://source/2e3f771bf5f36c7580e1384e\"}], \"context_quality\": {\"status\": \"unverified\", \"reasons\": [\"coverage_unverified\"]}, \"read_next\": [], \"edit_ready\": false, \"investigation_allowed\": true, \"estimated_tokens\": 355}",
+        "annotations": null,
+        "_meta": null
+      }
+    ],
+    "structuredContent": null,
+    "isError": false
+  }
+}

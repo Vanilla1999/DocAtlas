@@ -1,0 +1,423 @@
+{
+  "meta": null,
+  "nextCursor": null,
+  "tools": [
+    {
+      "name": "get_docs_context",
+      "title": null,
+      "description": "Source-grounded documentation tool. One call = one concrete question. Pass the original request unchanged; never substitute a benchmark/evaluation or documentation-governance meta-question. For onboarding/cross-module use scope=all without module filters (scope=\"all\"); use scope=\"project\" for repo policy and scope=\"module\" with exact module_path. module_path always implies module scope. Preserve explicit scope; never widen it. For module plus repo policy make two bounded calls (module then project). Lookups never authorize an answer or edit. hard_stop=true blocks edits.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "question": {
+            "type": "string",
+            "minLength": 1,
+            "description": "One concrete question; independent questions use separate calls."
+          },
+          "lookup_queries": {
+            "type": [
+              "array",
+              "null"
+            ],
+            "maxItems": 5,
+            "uniqueItems": true,
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 500
+            },
+            "description": "Same question only. For cross-language, comparison, conditional, or multiple dependent facets use 1–3 short lookups in the documentation language; simple single-facet questions need none. Keep the original question unchanged; preserve exact identifiers, versions, conditions, negation and comparison sides. Never batch independent questions, invent the expected answer, or use guessed source names."
+          },
+          "project_path": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "library": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "version": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Current project: omit. Set only for an explicit exact/historical version; re-query after lockfile changes."
+          },
+          "module_path": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Exact module path; always implies module scope."
+          },
+          "scope": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "enum": [
+              "project",
+              "module",
+              "all"
+            ],
+            "description": "project=repo-level docs only; module=one module; all=repo-level plus modules in the same repository; module_path limits to module."
+          }
+        },
+        "required": [
+          "question"
+        ]
+      },
+      "outputSchema": null,
+      "icons": null,
+      "annotations": null,
+      "meta": null,
+      "execution": null
+    },
+    {
+      "name": "prepare_docs",
+      "title": null,
+      "description": "Call only from get_docs_context recommended_next_action or an explicit sync, refresh, index, or prefetch request. Honor approval; poll job_id with docs_status and retry unchanged only after success.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "action": {
+            "type": "string",
+            "enum": [
+              "sync_project_docs",
+              "prefetch_project_dependency_docs",
+              "prefetch_library_docs",
+              "discover_library_docs",
+              "inspect_docs_target",
+              "validate_docs_manifest",
+              "prefetch_docs_manifest",
+              "refresh_library_docs",
+              "prune_library_docs",
+              "remove_library_docs",
+              "clear_index",
+              "cancel_docs_job"
+            ]
+          },
+          "project_path": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "scope": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "enum": [
+              "project-local"
+            ]
+          },
+          "confirm": {
+            "type": [
+              "boolean",
+              "null"
+            ],
+            "description": "Second-call apply flag for action='clear_index' only; omit for every other action."
+          },
+          "plan_digest": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "allow_incomplete": {
+            "type": [
+              "boolean",
+              "null"
+            ]
+          },
+          "library": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "ecosystem": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "version": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "canonical_id": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "job_id": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "manifest_path": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "source_type": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "docs_url": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "question": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "include_flutter": {
+            "type": [
+              "boolean",
+              "null"
+            ]
+          },
+          "include_dart": {
+            "type": [
+              "boolean",
+              "null"
+            ]
+          },
+          "include_rust": {
+            "type": [
+              "boolean",
+              "null"
+            ]
+          },
+          "include_go": {
+            "type": [
+              "boolean",
+              "null"
+            ]
+          },
+          "include_packages": {
+            "type": [
+              "array",
+              "null"
+            ],
+            "items": {
+              "type": "string"
+            }
+          },
+          "with_vectors": {
+            "type": [
+              "boolean",
+              "null"
+            ],
+            "default": false
+          },
+          "force": {
+            "type": [
+              "boolean",
+              "null"
+            ]
+          },
+          "force_refresh": {
+            "type": [
+              "boolean",
+              "null"
+            ]
+          },
+          "continue_on_error": {
+            "type": [
+              "boolean",
+              "null"
+            ]
+          },
+          "dry_run": {
+            "type": [
+              "boolean",
+              "null"
+            ],
+            "default": true
+          },
+          "target": {
+            "type": [
+              "object",
+              "null"
+            ]
+          },
+          "max_pages": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 1,
+            "maximum": 5
+          }
+        },
+        "required": [
+          "action"
+        ],
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "action": {
+                  "const": "clear_index"
+                }
+              }
+            },
+            "then": {
+              "required": [
+                "scope",
+                "project_path"
+              ],
+              "properties": {
+                "scope": {
+                  "const": "project-local"
+                },
+                "project_path": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "action": {
+                  "const": "clear_index"
+                }
+              }
+            },
+            "else": {
+              "not": {
+                "required": [
+                  "confirm"
+                ]
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "action": {
+                  "const": "remove_library_docs"
+                }
+              }
+            },
+            "then": {
+              "required": [
+                "canonical_id",
+                "project_path"
+              ],
+              "properties": {
+                "canonical_id": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "project_path": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              }
+            }
+          }
+        ]
+      },
+      "outputSchema": null,
+      "icons": null,
+      "annotations": null,
+      "meta": null,
+      "execution": null
+    },
+    {
+      "name": "docs_status",
+      "title": null,
+      "description": "Read-only status. Use when the user explicitly asks about health, freshness, indexing, or job progress, or to poll a returned job_id from prepare_docs.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "action": {
+            "type": "string",
+            "enum": [
+              "project",
+              "library",
+              "jobs",
+              "job"
+            ]
+          },
+          "project_path": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "canonical_id": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "job_id": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "status": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "limit": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 1,
+            "maximum": 200
+          },
+          "module": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 500
+          },
+          "details": {
+            "type": [
+              "boolean",
+              "null"
+            ]
+          }
+        },
+        "required": [
+          "action"
+        ]
+      },
+      "outputSchema": null,
+      "icons": null,
+      "annotations": null,
+      "meta": null,
+      "execution": null
+    }
+  ]
+}

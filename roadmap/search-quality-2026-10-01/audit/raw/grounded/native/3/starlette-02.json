@@ -1,0 +1,32 @@
+{
+  "id": "starlette-02",
+  "project": "starlette",
+  "family": "polarity",
+  "answerability": "within_budget",
+  "limit": 3,
+  "request": {
+    "library": "starlette",
+    "query": "Will Starlette serve incoming requests before its lifespan handler has run?",
+    "limit": 3
+  },
+  "seconds": 0.0020802009967155755,
+  "is_error": false,
+  "wire": {
+    "_meta": null,
+    "content": [
+      {
+        "type": "text",
+        "text": "\n------------------------------------------------------------\nResult 1: file:///tmp/opencode/search-audit-work-20261001/grounded/corpus/starlette/docs/lifespan.md\n\nStarlette applications can register a lifespan handler for dealing with code that needs to run before the application starts up, or when the application is shutting down.\n```python\nimport contextlib\n\nfrom starlette.applications import Starlette\n\n\n@contextlib.asynccontextmanager\nasync def lifespan(app):\n    async with some_async_resource():\n        print(\"Run at startup!\")\n        yield\n        print(\"Run on shutdown!\")\n\n\nroutes = [\n    ...\n]\n\napp = Starlette(routes=routes, lifespan=lifespan)\n```\nStarlette will not start serving any incoming requests until the lifespan has been run.\nThe lifespan teardown will run once all connections have been closed, and any in-process background tasks have completed.\nConsider using [`anyio.create_task_group()`](https://anyio.readthedocs.io/en/stable/tasks.html) for managing asynchronous tasks.\n## Lifespan State\nThe lifespan has the concept of `state`, which is a dictionary that can be used to share the objects between the lifespan, and the requests.\n\n```python\nimport contextlib\nfrom typing import AsyncIterator, TypedDict\n\nimport httpx\nfrom starlette.applications import Starlette\nfrom starlette.requests import Request\nfrom starlette.responses import PlainTextResponse\nfrom starlette.routing import Route\n\n\nclass State(TypedDict):\n    http_client: httpx.AsyncClient\n\n\n@contextlib.asynccontextmanager\nasync def lifespan(app: Starlette) -> AsyncIterator[State]:\n    async with httpx.AsyncClient() as client:\n        yield {\"http_client\": client}\n\n\nasync def homepage(request: Request) -> PlainTextResponse:\n    client = request.state.http_client\n    response = await client.get(\"https://www.example.com\")\n    return PlainTextResponse(response.text)\n\n\napp = Starlette(\n    lifespan=lifespan,\n    routes=[Route(\"/\", homepage)]\n)\n```\nThe `state` received on the requests is a **shallow** copy of the state received on the lifespan handler.\n\n------------------------------------------------------------\nResult 2: file:///tmp/opencode/search-audit-work-20261001/grounded/corpus/starlette/docs/lifespan.md\n\nStarlette applications can register a lifespan handler for dealing with code that needs to run before the application starts up, or when the application is shutting down.\n```python\nimport contextlib\n\nfrom starlette.applications import Starlette\n\n\n@contextlib.asynccontextmanager\nasync def lifespan(app):\n    async with some_async_resource():\n        print(\"Run at startup!\")\n        yield\n        print(\"Run on shutdown!\")\n\n\nroutes = [\n    ...\n]\n\napp = Starlette(routes=routes, lifespan=lifespan)\n```\nStarlette will not start serving any incoming requests until the lifespan has been run.\nThe lifespan teardown will run once all connections have been closed, and any in-process background tasks have completed.\nConsider using [`anyio.create_task_group()`](https://anyio.readthedocs.io/en/stable/tasks.html) for managing asynchronous tasks.\n## Lifespan State\nThe lifespan has the concept of `state`, which is a dictionary that can be used to share the objects between the lifespan, and the requests.\n\n```python\nimport contextlib\nfrom typing import AsyncIterator, TypedDict\n\nimport httpx\nfrom starlette.applications import Starlette\nfrom starlette.requests import Request\nfrom starlette.responses import PlainTextResponse\nfrom starlette.routing import Route\n\n\nclass State(TypedDict):\n    http_client: httpx.AsyncClient\n\n\n@contextlib.asynccontextmanager\nasync def lifespan(app: Starlette) -> AsyncIterator[State]:\n    async with httpx.AsyncClient() as client:\n        yield {\"http_client\": client}\n\n\nasync def homepage(request: Request) -> PlainTextResponse:\n    client = request.state.http_client\n    response = await client.get(\"https://www.example.com\")\n    return PlainTextResponse(response.text)\n\n\napp = Starlette(\n    lifespan=lifespan,\n    routes=[Route(\"/\", homepage)]\n)\n```\nThe `state` received on the requests is a **shallow** copy of the state received on the lifespan handler.\n\n------------------------------------------------------------\nResult 3: file:///tmp/opencode/search-audit-work-20261001/grounded/corpus/starlette/docs/lifespan.md\n\n## Running lifespan in tests\nYou should use `TestClient` as a context manager, to ensure that the lifespan is called.\n```python\nfrom example import app\nfrom starlette.testclient import TestClient\n\n\ndef test_homepage():\n    with TestClient(app) as client:\n        # Application's lifespan is called on entering the block.\n        response = client.get(\"/\")\n        assert response.status_code == 200\n\n    # And the lifespan's teardown is run when exiting the block.\n```\n",
+        "annotations": null,
+        "_meta": null
+      }
+    ],
+    "structuredContent": null,
+    "isError": false
+  },
+  "native_size": {
+    "utf8_bytes": 4733,
+    "actual_tokens": 999,
+    "tokenizer": "docatlas-offline:o200k_base"
+  }
+}

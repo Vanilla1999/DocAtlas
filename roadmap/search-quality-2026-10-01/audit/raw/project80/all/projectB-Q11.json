@@ -1,0 +1,23 @@
+{
+  "tool": "get_docs_context",
+  "request": {
+    "question": "Подготовка вернула job_id. Что делать до повторного исходного вопроса?",
+    "project_path": "/tmp/opencode/docatlas-ablation",
+    "scope": "all"
+  },
+  "seconds": 0.5137557380003273,
+  "is_error": false,
+  "wire": {
+    "_meta": null,
+    "content": [
+      {
+        "type": "text",
+        "text": "{\"status\": \"ok\", \"kind\": \"docs_context\", \"context_status\": \"ready\", \"context_available\": true, \"answer_supported\": false, \"answer_available\": false, \"support_status\": \"retrieval_only\", \"answer_policy\": \"cite_only\", \"coverage_policy\": \"retrieval_attribution_only\", \"query_coverage\": \"partial\", \"retrieval_coverage\": \"partial\", \"facet_coverage\": \"unverified\", \"covered_query_ids\": [\"query-anchor-1\"], \"missing_query_ids\": [\"query-original\"], \"missing_facets\": [], \"facets\": [], \"sources\": [{\"evidence_id\": \"ev-aef38d4357f20284\", \"path_or_url\": \"wiki/Architecture.md\", \"section\": \"Architecture > Docs MCP runtime > Async prefetch and job tracking\", \"snippet\": \"Call `get_docs_job_status(job_id)` to poll progress. Jobs can be cancelled via `cancel_docs_job(job_id)`; the cancellation flag is checked between targets and between seed URLs during a target.\", \"version_binding\": \"unversioned\", \"content_sha256\": \"a5b75902d0b1f4620c87f51e645c1f5be2c542331e7776c154c0c301b7c21d99\", \"project_identity\": \"local:48277f62f8b4ff92ba1c60c082f92a43817f9e1c5ba4ea27e12cd77a76421585\", \"authority\": \"source_of_truth\", \"scope\": \"project\", \"line_start\": 147, \"line_end\": 147, \"source_uri\": \"docatlas://source/43a51d9bc1dcd96b58fe0b16\"}, {\"evidence_id\": \"ev-2e37682e3d93fc88\", \"path_or_url\": \"wiki/Architecture.md\", \"section\": \"Architecture\", \"snippet\": \"DocAtlas is a local, version-aware documentation runtime for coding agents. Its primary product workflow is **DocAtlas Docs**; **DocAtlas MCP Packs** is a separate advanced API-action surface.\", \"version_binding\": \"unversioned\", \"content_sha256\": \"867b1115e2a6265168b1081a062f488e735c3675f1ec1e3f1186b0d4268fbd20\", \"project_identity\": \"local:48277f62f8b4ff92ba1c60c082f92a43817f9e1c5ba4ea27e12cd77a76421585\", \"line_start\": 3, \"line_end\": 3, \"authority\": \"source_of_truth\", \"scope\": \"project\", \"source_uri\": \"docatlas://source/eeb763d283106b1c80f7d387\"}], \"context_quality\": {\"status\": \"unverified\", \"reasons\": [\"coverage_unverified\"]}, \"read_next\": [], \"edit_ready\": false, \"investigation_allowed\": true, \"estimated_tokens\": 493}",
+        "annotations": null,
+        "_meta": null
+      }
+    ],
+    "structuredContent": null,
+    "isError": false
+  }
+}

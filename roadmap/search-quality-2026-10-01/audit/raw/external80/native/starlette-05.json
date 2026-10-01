@@ -1,0 +1,23 @@
+{
+  "tool": "get_docs_context",
+  "request": {
+    "question": "How should I use TestClient to ensure lifespan runs in tests?",
+    "project_path": "/tmp/opencode/search-audit-work-20261001/fixtures/starlette",
+    "scope": "all"
+  },
+  "seconds": 0.17087377400457626,
+  "is_error": false,
+  "wire": {
+    "_meta": null,
+    "content": [
+      {
+        "type": "text",
+        "text": "{\"status\": \"ok\", \"kind\": \"docs_context\", \"context_status\": \"ready\", \"context_available\": true, \"answer_supported\": false, \"answer_available\": false, \"support_status\": \"retrieval_only\", \"answer_policy\": \"cite_only\", \"coverage_policy\": \"retrieval_attribution_only\", \"query_coverage\": \"full\", \"retrieval_coverage\": \"full\", \"facet_coverage\": \"unverified\", \"covered_query_ids\": [\"query-original\", \"query-anchor-1\"], \"missing_query_ids\": [], \"missing_facets\": [], \"facets\": [], \"sources\": [{\"evidence_id\": \"ev-2bfb60a53a77a17b\", \"path_or_url\": \"docs/lifespan.md\", \"section\": \"Running lifespan in tests\", \"snippet\": \"## Running lifespan in tests\\n\\nYou should use `TestClient` as a context manager, to ensure that the lifespan is called.\\n\\n```python\\nfrom example import app\\nfrom starlette.testclient import TestClient\\n\\n\\ndef test_homepage():\\n    with TestClient(app) as client:\\n        # Application's lifespan is called on entering the block.\\n        response = client.get(\\\"/\\\")\\n        assert response.status_code == 200\\n\\n    # And the lifespan's teardown is run when exiting the block.\\n```\", \"version_binding\": \"unversioned\", \"content_sha256\": \"12cf5c45ff0d14e682f6d5b4c669efcb10a1757e6a8b51d14f5d036543979f8e\", \"project_identity\": \"local:49e9d0d4675482def440e8469c311fbd21c7134a17c652920e474a9e3b812930\", \"authority\": \"source_of_truth\", \"scope\": \"project\", \"line_start\": 76, \"line_end\": 92, \"source_uri\": \"docatlas://source/767e2979cf232aefb54145b7\"}, {\"evidence_id\": \"ev-2aeee75548d06ed6\", \"path_or_url\": \"docs/lifespan.md\", \"section\": \"Lifespan State\", \"snippet\": \"The lifespan has the concept of `state`, which is a dictionary that\\ncan be used to share the objects between the lifespan, and the requests.\", \"version_binding\": \"unversioned\", \"content_sha256\": \"1f9ce547e2422ce76d13e8554ec2cbffd3c3f45e7f5f3a1e7914ab5547938a76\", \"project_identity\": \"local:49e9d0d4675482def440e8469c311fbd21c7134a17c652920e474a9e3b812930\", \"line_start\": 37, \"line_end\": 38, \"authority\": \"source_of_truth\", \"scope\": \"project\", \"source_uri\": \"docatlas://source/b958f6efb3e863267e542fce\"}], \"context_quality\": {\"status\": \"partial\", \"reasons\": [\"requested_part_missing\"]}, \"read_next\": [{\"source_uri\": \"docatlas://source/84cdd4a3806159ca4c0daf29\", \"path\": \"docs/lifespan.md\", \"project_identity\": \"local:49e9d0d4675482def440e8469c311fbd21c7134a17c652920e474a9e3b812930\", \"snapshot_sha256\": \"sha256:a9de5de995935cfbd676335fbbbee6f87c96086174aff3d17ecdf89b6220e788\", \"line_start\": 39, \"line_end\": 74, \"reason\": \"inspect_source_context\"}], \"edit_ready\": false, \"investigation_allowed\": true, \"estimated_tokens\": 624}",
+        "annotations": null,
+        "_meta": null
+      }
+    ],
+    "structuredContent": null,
+    "isError": false
+  }
+}

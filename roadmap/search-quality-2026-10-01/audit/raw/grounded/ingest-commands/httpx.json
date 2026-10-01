@@ -1,0 +1,50 @@
+[
+  {
+    "command": [
+      "node",
+      "/tmp/opencode/search-audit-tools-20261001/node_modules/@arabold/docs-mcp-server/dist/index.js",
+      "scrape",
+      "httpx",
+      "file:///tmp/opencode/search-audit-work-20261001/grounded/corpus/httpx/docs/advanced/timeouts.md",
+      "--max-pages",
+      "1",
+      "--max-depth",
+      "1",
+      "--no-clean",
+      "--config",
+      "/tmp/opencode/search-audit-work-20261001/grounded/config.json",
+      "--store-path",
+      "/tmp/opencode/search-audit-work-20261001/grounded/store",
+      "--no-telemetry",
+      "--no-logo"
+    ],
+    "returncode": 0,
+    "seconds": 1.227817608996702,
+    "stdout": "Successfully scraped 1 pages\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "node",
+      "/tmp/opencode/search-audit-tools-20261001/node_modules/@arabold/docs-mcp-server/dist/index.js",
+      "scrape",
+      "httpx",
+      "file:///tmp/opencode/search-audit-work-20261001/grounded/corpus/httpx/docs/environment_variables.md",
+      "--max-pages",
+      "1",
+      "--max-depth",
+      "1",
+      "--no-clean",
+      "--config",
+      "/tmp/opencode/search-audit-work-20261001/grounded/config.json",
+      "--store-path",
+      "/tmp/opencode/search-audit-work-20261001/grounded/store",
+      "--no-telemetry",
+      "--no-logo"
+    ],
+    "returncode": 0,
+    "seconds": 1.2002324069981114,
+    "stdout": "Successfully scraped 1 pages\n",
+    "stderr": ""
+  }
+]

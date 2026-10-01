@@ -1,0 +1,26 @@
+{
+  "tool": "get_docs_context",
+  "request": {
+    "question": "Дочитывание не удалось, но часть ответа уже подтверждена. Нужно ли отказываться от всего ответа?",
+    "project_path": "/tmp/opencode/docatlas-ablation",
+    "scope": "all",
+    "lookup_queries": [
+      "How should a host preserve grounded partial facts after a source read failure?"
+    ]
+  },
+  "seconds": 0.6805815170009737,
+  "is_error": false,
+  "wire": {
+    "_meta": null,
+    "content": [
+      {
+        "type": "text",
+        "text": "{\"status\": \"ok\", \"kind\": \"docs_context\", \"context_status\": \"ready\", \"context_available\": true, \"answer_supported\": false, \"answer_available\": false, \"support_status\": \"retrieval_only\", \"answer_policy\": \"cite_only\", \"coverage_policy\": \"retrieval_attribution_only\", \"query_coverage\": \"partial\", \"retrieval_coverage\": \"partial\", \"facet_coverage\": \"unverified\", \"covered_query_ids\": [\"query-lookup-1\"], \"missing_query_ids\": [\"query-original\"], \"missing_facets\": [], \"facets\": [], \"sources\": [{\"evidence_id\": \"ev-d6821cc55bf2b657\", \"path_or_url\": \"docs/grounded-host-session.md\", \"section\": \"Grounded host sessions over MCP > Final handoff\", \"snippet\": \"`answer_supported` remains false in all three states. A read failure cannot turn\\nan existing partial answer into an empty refusal. The host should state the\\nsupported part, explicitly name what is unknown and provide a feasible next\\nstep or a necessary clarifying question. Unknown private configuration is never\\ninferred from a general documentation quote.\", \"version_binding\": \"unversioned\", \"content_sha256\": \"0bc5fe3a2c1cfd53fa893d9108ef24da0c8d5b0234c3ba47ecb21d6b7e012c58\", \"project_identity\": \"local:48277f62f8b4ff92ba1c60c082f92a43817f9e1c5ba4ea27e12cd77a76421585\", \"authority\": \"source_of_truth\", \"scope\": \"module\", \"line_start\": 66, \"line_end\": 70, \"source_uri\": \"docatlas://source/430178c1e2b0de584b4d408a\"}, {\"evidence_id\": \"ev-b370d114df13998e\", \"path_or_url\": \"docs/grounded-host-session.md\", \"section\": \"Grounded host sessions over MCP > Partial answers and source reads\", \"snippet\": \"## Partial answers and source reads\\n\\nDeclare one to three concrete facts to investigate before the first call. Call\\n`GroundedMCPSession.start(client, arguments=..., requested_facts=...)` once.\\nThe arguments are the normal `get_docs_context` arguments, including the original\\nquestion, project path, scope and optional documentation-language lookups.\\nThe adapter preserves the original question and never silently retries it.\", \"version_binding\": \"unversioned\", \"content_sha256\": \"dc22d8b242ae73f03feefc0352fa60a96f07ca80e6fb21ef595212c8492f7efd\", \"project_identity\": \"local:48277f62f8b4ff92ba1c60c082f92a43817f9e1c5ba4ea27e12cd77a76421585\", \"authority\": \"source_of_truth\", \"scope\": \"module\", \"line_start\": 8, \"line_end\": 14}], \"context_quality\": {\"status\": \"unverified\", \"reasons\": [\"coverage_unverified\", \"source_unavailable\"]}, \"read_next\": [], \"edit_ready\": false, \"investigation_allowed\": true, \"estimated_tokens\": 609, \"recovery_reason_code\": \"source_unavailable\"}",
+        "annotations": null,
+        "_meta": null
+      }
+    ],
+    "structuredContent": null,
+    "isError": false
+  }
+}

@@ -1,0 +1,26 @@
+{
+  "tool": "get_docs_context",
+  "request": {
+    "question": "What happens if another live process is using the index when I attempt to clear it?",
+    "project_path": "/tmp/opencode/docatlas-ablation",
+    "scope": "all",
+    "lookup_queries": [
+      "How does index cleanup handle live processes and writer leases?"
+    ]
+  },
+  "seconds": 0.9142546779985423,
+  "is_error": false,
+  "wire": {
+    "_meta": null,
+    "content": [
+      {
+        "type": "text",
+        "text": "{\"status\": \"ok\", \"kind\": \"docs_context\", \"context_status\": \"ready\", \"context_available\": true, \"answer_supported\": false, \"answer_available\": false, \"support_status\": \"retrieval_only\", \"answer_policy\": \"cite_only\", \"coverage_policy\": \"retrieval_attribution_only\", \"query_coverage\": \"partial\", \"retrieval_coverage\": \"partial\", \"facet_coverage\": \"unverified\", \"covered_query_ids\": [\"query-lookup-1\"], \"missing_query_ids\": [\"query-original\"], \"missing_facets\": [], \"facets\": [{\"id\": \"intent-context:index_cleanup\", \"requirement_id\": null, \"question\": \"inspect safely clear local index preview cleanup plan\", \"status\": \"retrieval_only\", \"evidence_ids\": [\"ev-35fe085f79fc2397\"]}], \"sources\": [{\"evidence_id\": \"ev-35fe085f79fc2397\", \"path_or_url\": \"docs/index-cleanup.md\", \"section\": \"Cleaning DocAtlas index state safely\", \"snippet\": \"# Cleaning DocAtlas index state safely\\n\\n`doc-atlas clear-index` removes derived index state while preserving project\\nsources, `docatlas.yaml`, configuration, and unrelated files; it never\\nsilently widens the cleanup scope. The command is preview-only\\nunless `--apply` is supplied.\", \"version_binding\": \"unversioned\", \"content_sha256\": \"533d6432cadb8bf35ba1016d1c012f3422a8a2a4cdf00b91b3aa8d3f42e7ea84\", \"project_identity\": \"local:48277f62f8b4ff92ba1c60c082f92a43817f9e1c5ba4ea27e12cd77a76421585\", \"authority\": \"source_of_truth\", \"scope\": \"project\", \"line_start\": 1, \"line_end\": 6}, {\"evidence_id\": \"ev-ef889aef8d491c36\", \"path_or_url\": \"docs/index-cleanup.md\", \"section\": \"Cleaning DocAtlas index state safely > Safety rules > Coordination with index writers\", \"snippet\": \"The short per-database mutation lock is used only around publication/removal, so independent fetch/staging work is not serialized for its full duration. `remove_library_docs` refuses removal while a library-refresh writer lease is active; after the barrier is clear it takes the per-index mutation lock before deleting SQLite/extracted state. Writer leases from dead processes are cleaned during the barrier check; an unreadable lease remains a blocker rather than being ignored.\", \"version_binding\": \"unversioned\", \"content_sha256\": \"7671389d36669420f305df00182d8e46ddd367f0f7d8522747a5ce1ba693081d\", \"project_identity\": \"local:48277f62f8b4ff92ba1c60c082f92a43817f9e1c5ba4ea27e12cd77a76421585\", \"authority\": \"source_of_truth\", \"scope\": \"project\", \"line_start\": 106, \"line_end\": 106}], \"context_quality\": {\"status\": \"unverified\", \"reasons\": [\"coverage_unverified\"]}, \"read_next\": [{\"source_uri\": \"docatlas://source/d1ae9d79f3a7164c735e8dcf\", \"path\": \"docs/index-cleanup.md\", \"project_identity\": \"local:48277f62f8b4ff92ba1c60c082f92a43817f9e1c5ba4ea27e12cd77a76421585\", \"snapshot_sha256\": \"sha256:aa0a4e6202a92b7e7d28c6d896f53cec6933297aee91fdb430fabb1c132d9420\", \"line_start\": 29, \"line_end\": 42, \"reason\": \"inspect_source_context\"}], \"edit_ready\": false, \"investigation_allowed\": true, \"estimated_tokens\": 702}",
+        "annotations": null,
+        "_meta": null
+      }
+    ],
+    "structuredContent": null,
+    "isError": false
+  }
+}

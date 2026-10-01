@@ -1,0 +1,23 @@
+{
+  "tool": "get_docs_context",
+  "request": {
+    "question": "How can I disable all timeouts by default on an HTTPX Client?",
+    "project_path": "/tmp/opencode/search-audit-work-20261001/fixtures/httpx",
+    "scope": "all"
+  },
+  "seconds": 0.3999929970013909,
+  "is_error": false,
+  "wire": {
+    "_meta": null,
+    "content": [
+      {
+        "type": "text",
+        "text": "{\"status\": \"ok\", \"kind\": \"docs_context\", \"context_status\": \"ready\", \"context_available\": true, \"answer_supported\": false, \"answer_available\": false, \"support_status\": \"retrieval_only\", \"answer_policy\": \"cite_only\", \"coverage_policy\": \"retrieval_attribution_only\", \"query_coverage\": \"full\", \"retrieval_coverage\": \"full\", \"facet_coverage\": \"unverified\", \"covered_query_ids\": [\"query-original\", \"query-anchor-1\"], \"missing_query_ids\": [], \"missing_facets\": [{\"id\": \"retrieval-need:need-1\", \"requirement_id\": null, \"question\": \"How can I disable all timeouts by default on an HTTPX Client?\", \"status\": \"missing\", \"evidence_ids\": []}], \"facets\": [{\"id\": \"retrieval-need:need-1\", \"requirement_id\": null, \"question\": \"How can I disable all timeouts by default on an HTTPX Client?\", \"status\": \"missing\", \"evidence_ids\": []}], \"sources\": [{\"evidence_id\": \"ev-8b598c29adc11290\", \"path_or_url\": \"docs/environment_variables.md\", \"section\": \"Environment Variables\", \"snippet\": \"# Environment Variables\\n\\nThe HTTPX library can be configured via environment variables.\\nEnvironment variables are used by default. To ignore environment variables, `trust_env` has to be set `False`. There are two ways to set `trust_env` to disable environment variables:\\n\\n* On the client via `httpx.Client(trust_env=False)`.\\n* Using the top-level API, such as `httpx.get(\\\"<url>\\\", trust_env=False)`.\\n\\nHere is a list of environment variables that HTTPX recognizes and what function they serve:\", \"version_binding\": \"unversioned\", \"content_sha256\": \"e46b0412cde670f01d6a9c9300b04297ed530e8672cb86607249009b5413d1c9\", \"project_identity\": \"local:8cb756392a06b5929cccc7f21e226fea445751f0d8e07285f2b940cee43cfdc6\", \"line_start\": 1, \"line_end\": 9, \"authority\": \"source_of_truth\", \"scope\": \"project\", \"source_uri\": \"docatlas://source/6eb4d9fc6bf56a4035fd777e\"}, {\"evidence_id\": \"ev-51d6621852b37b16\", \"path_or_url\": \"docs/advanced/timeouts.md\", \"section\": \"Setting a default timeout on a client\", \"snippet\": \"## Setting a default timeout on a client\\n\\nYou can set a timeout on a client instance, which results in the given\\n`timeout` being used as the default for requests made with this client:\\n\\n```python\\nclient = httpx.Client()              # Use a default 5s timeout everywhere.\\nclient = httpx.Client(timeout=10.0)  # Use a default 10s timeout everywhere.\\nclient = httpx.Client(timeout=None)  # Disable all timeouts by default.\\n```\", \"version_binding\": \"unversioned\", \"content_sha256\": \"166129fa3e25157c4a31897d383c3a5f3e53f55cc4b5c35330e6e616974465fd\", \"project_identity\": \"local:8cb756392a06b5929cccc7f21e226fea445751f0d8e07285f2b940cee43cfdc6\", \"authority\": \"source_of_truth\", \"scope\": \"project\", \"line_start\": 30, \"line_end\": 39, \"source_uri\": \"docatlas://source/564b883d3ee66e016c66fed7\"}], \"context_quality\": {\"status\": \"unverified\", \"reasons\": [\"coverage_unverified\"]}, \"read_next\": [], \"edit_ready\": false, \"investigation_allowed\": true, \"estimated_tokens\": 709}",
+        "annotations": null,
+        "_meta": null
+      }
+    ],
+    "structuredContent": null,
+    "isError": false
+  }
+}

@@ -1,0 +1,26 @@
+{
+  "tool": "get_docs_context",
+  "request": {
+    "question": "Where do I declare which local documents are authoritative?",
+    "project_path": "/tmp/opencode/docatlas-ablation",
+    "scope": "all",
+    "lookup_queries": [
+      "Which configuration declares project documentation authority?"
+    ]
+  },
+  "seconds": 3.9763206350035034,
+  "is_error": false,
+  "wire": {
+    "_meta": null,
+    "content": [
+      {
+        "type": "text",
+        "text": "{\"status\": \"ok\", \"kind\": \"docs_context\", \"context_status\": \"ready\", \"context_available\": true, \"answer_supported\": false, \"answer_available\": false, \"support_status\": \"retrieval_only\", \"answer_policy\": \"cite_only\", \"coverage_policy\": \"retrieval_attribution_only\", \"query_coverage\": \"full\", \"retrieval_coverage\": \"full\", \"facet_coverage\": \"unverified\", \"covered_query_ids\": [\"query-original\", \"query-lookup-1\"], \"missing_query_ids\": [], \"missing_facets\": [], \"facets\": [], \"sources\": [{\"evidence_id\": \"ev-fcb08545690a408c\", \"path_or_url\": \"README.md\", \"section\": \"DocAtlas > Project-docs MCP server > Agent contract for a local project\", \"snippet\": \"### Agent contract for a local project\\n\\nBefore handing a repository to a coding agent, generate a compact, machine-readable contract. It tells the agent which local documents are authoritative, which dependency versions were detected, and how to select the minimal DocAtlas MCP tool surface:\\n\\n```bash\\ndoc-atlas agent-contract --project-path . --format json\\ndoc-atlas agent-contract --project-path . --format markdown\\n```\", \"version_binding\": \"unversioned\", \"content_sha256\": \"f04eb3c48a6160c66f23db29e8afe65bd79f3e1f6f2a7ff976fc8fe14435da1a\", \"project_identity\": \"local:48277f62f8b4ff92ba1c60c082f92a43817f9e1c5ba4ea27e12cd77a76421585\", \"authority\": \"source_of_truth\", \"scope\": \"project\", \"line_start\": 216, \"line_end\": 223, \"source_uri\": \"docatlas://source/a1876243fc01428be4f604cc\"}, {\"evidence_id\": \"ev-42aab85940e49cc9\", \"path_or_url\": \"wiki/Configuration.md\", \"section\": \"Configuration\", \"snippet\": \"Project documentation configuration for a repository is defined by the\\nrepository's `docatlas.project-docs.yaml` catalog. Runtime index and retrieval\\ndefaults remain in `docatlas.yaml`; the project-doc catalog defines which\\nreviewable files are authoritative for project questions.\", \"version_binding\": \"unversioned\", \"content_sha256\": \"1e21073972f0a75fa878832ac38ede5a34433514b7f7db5108fc0ab1e38079e7\", \"project_identity\": \"local:48277f62f8b4ff92ba1c60c082f92a43817f9e1c5ba4ea27e12cd77a76421585\", \"authority\": \"source_of_truth\", \"scope\": \"project\", \"line_start\": 7, \"line_end\": 10, \"source_uri\": \"docatlas://source/7eaabf1c94447045ce07b93a\"}], \"context_quality\": {\"status\": \"unverified\", \"reasons\": [\"coverage_unverified\"]}, \"read_next\": [{\"source_uri\": \"docatlas://source/fb326db196c5056aa43c0939\", \"path\": \"docs/project-docs-mcp-workflow.md\", \"project_identity\": \"local:48277f62f8b4ff92ba1c60c082f92a43817f9e1c5ba4ea27e12cd77a76421585\", \"snapshot_sha256\": \"sha256:4478411a57217bd30378f232641481a5b8773dadda37f555204f724753c6fafa\", \"line_start\": 95, \"line_end\": 102, \"reason\": \"inspect_source_context\"}], \"edit_ready\": false, \"investigation_allowed\": true, \"estimated_tokens\": 660}",
+        "annotations": null,
+        "_meta": null
+      }
+    ],
+    "structuredContent": null,
+    "isError": false
+  }
+}

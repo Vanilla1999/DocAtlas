@@ -1,0 +1,23 @@
+{
+  "tool": "get_docs_context",
+  "request": {
+    "question": "В каких двух случаях uv принимает pre-release версии по умолчанию?",
+    "project_path": "/tmp/opencode/search-audit-work-20261001/fixtures/uv",
+    "scope": "all"
+  },
+  "seconds": 0.33844107100594556,
+  "is_error": false,
+  "wire": {
+    "_meta": null,
+    "content": [
+      {
+        "type": "text",
+        "text": "{\"status\": \"ok\", \"kind\": \"docs_context\", \"context_status\": \"ready\", \"context_available\": true, \"answer_supported\": false, \"answer_available\": false, \"support_status\": \"retrieval_only\", \"answer_policy\": \"cite_only\", \"coverage_policy\": \"retrieval_attribution_only\", \"query_coverage\": \"partial\", \"retrieval_coverage\": \"partial\", \"facet_coverage\": \"unverified\", \"covered_query_ids\": [], \"missing_query_ids\": [\"query-original\"], \"missing_facets\": [], \"facets\": [{\"id\": \"intent-context:default_behavior\", \"requirement_id\": null, \"question\": \"pre-release default\", \"status\": \"retrieval_only\", \"evidence_ids\": [\"ev-25e7648611b43284\"]}], \"sources\": [{\"evidence_id\": \"ev-25e7648611b43284\", \"path_or_url\": \"docs/pip/compatibility.md\", \"section\": \"Compatibility with `pip` and `pip-tools` > Pre-release compatibility\", \"snippet\": \"## Pre-release compatibility\\n\\nBy default, uv will accept pre-release versions during dependency resolution in two cases:\\n\\n1. If the package is a direct dependency, and its version markers include a pre-release specifier\\n   (e.g., `flask>=2.0.0rc1`).\\n1. If _all_ published versions of a package are pre-releases.\\n\\nIf dependency resolution fails due to a transitive pre-release, uv will prompt the user to re-run\\nwith `--prerelease allow`, to allow pre-releases for all dependencies.\", \"version_binding\": \"unversioned\", \"content_sha256\": \"03ad6697bc7c21374feef916bdfb1661fb990b612df6efa2820ad6522a151ad5\", \"project_identity\": \"local:e65d484943b04206e676f1b569d594fafedcdaf92efb305771c46aba30d34f5c\", \"line_start\": 41, \"line_end\": 50, \"authority\": \"source_of_truth\", \"scope\": \"project\", \"source_uri\": \"docatlas://source/493bb4a7dd0c40d2185c3770\"}, {\"evidence_id\": \"ev-ee1426f03f51280d\", \"path_or_url\": \"docs/pip/compatibility.md\", \"section\": \"Compatibility with `pip` and `pip-tools`\", \"snippet\": \"uv is designed as a drop-in replacement for common `pip` and `pip-tools` workflows.\", \"version_binding\": \"unversioned\", \"content_sha256\": \"77bac67fb157bd5c1e518f1eaa799909087befd4071a56d65c56185cf9e1de87\", \"project_identity\": \"local:e65d484943b04206e676f1b569d594fafedcdaf92efb305771c46aba30d34f5c\", \"line_start\": 3, \"line_end\": 3, \"authority\": \"source_of_truth\", \"scope\": \"project\", \"source_uri\": \"docatlas://source/b695389f97ed8d6f83a32c1c\"}], \"context_quality\": {\"status\": \"unverified\", \"reasons\": [\"coverage_unverified\"]}, \"read_next\": [{\"source_uri\": \"docatlas://source/c026864932fb8016d2a3ca4e\", \"path\": \"docs/pip/compatibility.md\", \"project_identity\": \"local:e65d484943b04206e676f1b569d594fafedcdaf92efb305771c46aba30d34f5c\", \"snapshot_sha256\": \"sha256:193d4e4f575ae0975b66b76d4ea93b15aaede550b85de37989caef9f6f494923\", \"line_start\": 52, \"line_end\": 75, \"reason\": \"inspect_source_context\"}], \"edit_ready\": false, \"investigation_allowed\": true, \"estimated_tokens\": 671}",
+        "annotations": null,
+        "_meta": null
+      }
+    ],
+    "structuredContent": null,
+    "isError": false
+  }
+}

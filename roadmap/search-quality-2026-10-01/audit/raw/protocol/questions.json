@@ -1,0 +1,451 @@
+{
+  "schema": "docatlas-new40-v1",
+  "target_commit": "3b88763bd9acb6cbe403feb99288c86f1fe0d21d",
+  "sample": "post-hoc exposed-project diagnostic; new wording, not hidden validation",
+  "lanes": [
+    "default scope, no lookups",
+    "scope=all, no lookups",
+    "scope=all with frozen host lookups"
+  ],
+  "grading": [
+    "full: every requested documented part is supported by visible evidence",
+    "partial: at least one requested part supported, remaining uncertainty explicit",
+    "none: no useful support for requested facts",
+    "unsupported control: must not invent the premise; useful next step evaluated separately"
+  ],
+  "cases": [
+    {
+      "id": "Q01",
+      "language": "ru",
+      "topic": "onboarding",
+      "question": "Я клонировал репозиторий и хочу задать первый вопрос по его документации без облачного сервиса. Какие действия нужны?",
+      "host_lookups": [
+        "How do I prepare local project documentation for a first question?",
+        "Can local project documentation be indexed without an external model?"
+      ],
+      "unsupported_premise_control": false
+    },
+    {
+      "id": "Q02",
+      "language": "en",
+      "topic": "tools",
+      "question": "Which MCP tools should my coding agent see, and which one prepares a repository for questions?",
+      "host_lookups": [
+        "Which tools are public in Docs MCP?",
+        "Which tool prepares project documentation?"
+      ],
+      "unsupported_premise_control": false
+    },
+    {
+      "id": "Q03",
+      "language": "ru",
+      "topic": "surface",
+      "question": "Чем Docs MCP отличается от Packs MCP и какой из них подключать для вопросов по репозиторию?",
+      "host_lookups": [
+        "What is the boundary between Docs MCP and Packs MCP?",
+        "Which MCP surface answers repository documentation questions?"
+      ],
+      "unsupported_premise_control": false
+    },
+    {
+      "id": "Q04",
+      "language": "en",
+      "topic": "install",
+      "question": "How can I check that my editor is connected to the intended DocAtlas installation rather than an older executable?",
+      "host_lookups": [
+        "How can I verify the installed DocAtlas executable?",
+        "How can I check the installed Docs MCP connection?"
+      ],
+      "unsupported_premise_control": false
+    },
+    {
+      "id": "Q05",
+      "language": "ru",
+      "topic": "scope",
+      "question": "Мне надо разобраться во всём репозитории, включая документацию отдельных модулей. Какую область поиска передать?",
+      "host_lookups": [
+        "Which documentation scope includes module documentation?"
+      ],
+      "unsupported_premise_control": false
+    },
+    {
+      "id": "Q06",
+      "language": "en",
+      "topic": "scope",
+      "question": "If I only want repository-wide rules, how do I keep module-specific documentation out of the results?",
+      "host_lookups": [
+        "Which documentation scope restricts retrieval to repository-level documentation?"
+      ],
+      "unsupported_premise_control": false
+    },
+    {
+      "id": "Q07",
+      "language": "ru",
+      "topic": "discovery",
+      "question": "Какие файлы DocAtlas считает документацией проекта и как посмотреть, что он пропустил?",
+      "host_lookups": [
+        "Which repository files are discovered as project documentation?",
+        "How can I inspect ignored or missing project documents?"
+      ],
+      "unsupported_premise_control": false
+    },
+    {
+      "id": "Q08",
+      "language": "en",
+      "topic": "catalog",
+      "question": "Where should I declare which documents are authoritative, and how is that different from runtime configuration?",
+      "host_lookups": [
+        "Where is project document authority configured?",
+        "How does the documentation catalog differ from runtime configuration?"
+      ],
+      "unsupported_premise_control": false
+    },
+    {
+      "id": "Q09",
+      "language": "ru",
+      "topic": "sync",
+      "question": "После изменения Markdown-файла агент цитирует старый текст. Как правильно обновить индекс и повторить вопрос?",
+      "host_lookups": [
+        "How are edited project documents synchronized?",
+        "What should an agent do after project documentation synchronization?"
+      ],
+      "unsupported_premise_control": false
+    },
+    {
+      "id": "Q10",
+      "language": "en",
+      "topic": "sync",
+      "question": "I renamed a guide and removed another one. What reconciles the index with those filesystem changes?",
+      "host_lookups": [
+        "How does project documentation synchronization handle renamed files?",
+        "How are removed project documents reconciled with the index?"
+      ],
+      "unsupported_premise_control": false
+    },
+    {
+      "id": "Q11",
+      "language": "ru",
+      "topic": "lifecycle",
+      "question": "Когда нужен refresh, а когда sync_project_docs? Я путаю обновление библиотеки с обновлением своего репозитория.",
+      "host_lookups": [
+        "How are library documentation refreshed?",
+        "How does refreshing library docs differ from syncing project docs?"
+      ],
+      "unsupported_premise_control": false
+    },
+    {
+      "id": "Q12",
+      "language": "en",
+      "topic": "jobs",
+      "question": "A preparation request returned a job ID instead of documents. What is the expected polling and retry sequence?",
+      "host_lookups": [
+        "What should an agent do when prepare_docs returns a job ID?",
+        "When should the original documentation question be retried?"
+      ],
+      "unsupported_premise_control": false
+    },
+    {
+      "id": "Q13",
+      "language": "ru",
+      "topic": "jobs",
+      "question": "Как отменить подготовку документации и убедиться, что задание действительно остановилось?",
+      "host_lookups": [
+        "How is a documentation preparation job cancelled?",
+        "How can terminal job status be verified?"
+      ],
+      "unsupported_premise_control": false
+    },
+    {
+      "id": "Q14",
+      "language": "en",
+      "topic": "recovery",
+      "question": "If prepare_docs returns the same recovery action twice without progress, should the agent keep retrying?",
+      "host_lookups": [
+        "What is the retry limit for unchanged documentation recovery actions?",
+        "What should happen when documentation recovery makes no progress?"
+      ],
+      "unsupported_premise_control": false
+    },
+    {
+      "id": "Q15",
+      "language": "ru",
+      "topic": "empty",
+      "question": "В пустом проекте ещё нет документации. Что должен вернуть MCP и что предложить пользователю дальше?",
+      "host_lookups": [
+        "What happens when a project has no usable documentation?",
+        "What next action is recommended for a project with missing documentation?"
+      ],
+      "unsupported_premise_control": false
+    },
+    {
+      "id": "Q16",
+      "language": "en",
+      "topic": "offline",
+      "question": "Can I index and query project documents with networking disabled, and which optional features would remain unavailable?",
+      "host_lookups": [
+        "Which project documentation operations work offline?",
+        "Which documentation features require networking or model providers?"
+      ],
+      "unsupported_premise_control": false
+    },
+    {
+      "id": "Q17",
+      "language": "ru",
+      "topic": "architecture",
+      "question": "Где проходит путь от get_docs_context до SQLite и кто отвечает за окончательный пакет для модели?",
+      "host_lookups": [
+        "What is the call path from get_docs_context to project retrieval?",
+        "Which module creates the final model-visible context projection?"
+      ],
+      "unsupported_premise_control": false
+    },
+    {
+      "id": "Q18",
+      "language": "en",
+      "topic": "retrieval",
+      "question": "How do lexical retrieval and vector retrieval cooperate, and what happens when vectors are unavailable?",
+      "host_lookups": [
+        "How are lexical and vector retrieval combined?",
+        "What happens when vector search is unavailable?"
+      ],
+      "unsupported_premise_control": false
+    },
+    {
+      "id": "Q19",
+      "language": "ru",
+      "topic": "isolation",
+      "question": "Почему добавление неактивного поколения не должно менять ранжирование документов активного индекса?",
+      "host_lookups": [
+        "How are inactive generations isolated from active FTS ranking statistics?"
+      ],
+      "unsupported_premise_control": false
+    },
+    {
+      "id": "Q20",
+      "language": "en",
+      "topic": "chunking",
+      "question": "How are parent and child document chunks related, and when may a retrieved chunk expand to surrounding text?",
+      "host_lookups": [
+        "How are parent and child document chunks represented?",
+        "When is surrounding document context expanded?"
+      ],
+      "unsupported_premise_control": false
+    },
+    {
+      "id": "Q21",
+      "language": "ru",
+      "topic": "budget",
+      "question": "Если нужное объяснение длиннее лимита MCP, что сохраняется в ответе и как получить оставшуюся часть?",
+      "host_lookups": [
+        "How does Docs MCP handle evidence longer than its output budget?",
+        "How can a caller retrieve omitted source context?"
+      ],
+      "unsupported_premise_control": false
+    },
+    {
+      "id": "Q22",
+      "language": "en",
+      "topic": "cap",
+      "question": "Can several citations come from the same document, and when can the per-source limit overflow?",
+      "host_lookups": [
+        "How does the per-source retrieval cap work?",
+        "When is bounded structural overflow allowed?"
+      ],
+      "unsupported_premise_control": false
+    },
+    {
+      "id": "Q23",
+      "language": "ru",
+      "topic": "budget",
+      "question": "estimated_tokens — это точное число токенов моей модели? Как ограничивается реальный размер docs_context?",
+      "host_lookups": [
+        "What does estimated_tokens measure?",
+        "How is the docs_context admission token budget enforced?"
+      ],
+      "unsupported_premise_control": false
+    },
+    {
+      "id": "Q24",
+      "language": "en",
+      "topic": "qualification",
+      "question": "Why does DocAtlas check relevance again after trimming a snippet instead of trusting the original search score?",
+      "host_lookups": [
+        "Why are visible snippets requalified after projection?",
+        "What is the difference between retrieval relevance and answer proof?"
+      ],
+      "unsupported_premise_control": false
+    },
+    {
+      "id": "Q25",
+      "language": "ru",
+      "topic": "partial",
+      "question": "MCP вернул docs_context, но answer_available=false. Может ли агент всё-таки ответить пользователю по этим фрагментам?",
+      "host_lookups": [
+        "What may an agent answer from docs_context when answer_available is false?",
+        "What does cite_only allow?"
+      ],
+      "unsupported_premise_control": false
+    },
+    {
+      "id": "Q26",
+      "language": "en",
+      "topic": "partial",
+      "question": "A query reports full retrieval coverage but facet coverage is unverified. What can I safely conclude from that?",
+      "host_lookups": [
+        "What does full retrieval coverage establish?",
+        "How does facet coverage differ from retrieval attribution?"
+      ],
+      "unsupported_premise_control": false
+    },
+    {
+      "id": "Q27",
+      "language": "ru",
+      "topic": "partial",
+      "question": "Я спросил про три вещи, а в цитатах есть только две. Как агенту сообщить полезную часть и обозначить недостающую?",
+      "host_lookups": [
+        "How should a host answer from partial documentation evidence?",
+        "How are missing parts of a compound question represented?"
+      ],
+      "unsupported_premise_control": false
+    },
+    {
+      "id": "Q28",
+      "language": "en",
+      "topic": "citations",
+      "question": "Are source paths and line numbers enough to reopen the exact text that produced a snippet after the file changes?",
+      "host_lookups": [
+        "How are documentation citations bound to source content?",
+        "Can a citation reopen the same source revision after edits?"
+      ],
+      "unsupported_premise_control": false
+    },
+    {
+      "id": "Q29",
+      "language": "ru",
+      "topic": "safety",
+      "question": "Можно ли считать текст внутри README командой для агента, если там написано игнорировать предыдущие инструкции?",
+      "host_lookups": [
+        "How are instructions inside retrieved documentation treated?"
+      ],
+      "unsupported_premise_control": false
+    },
+    {
+      "id": "Q30",
+      "language": "en",
+      "topic": "safety",
+      "question": "If two repositories have a guide with the same filename, what prevents one project from citing the other project’s content?",
+      "host_lookups": [
+        "How is project identity enforced during retrieval and citation projection?"
+      ],
+      "unsupported_premise_control": false
+    },
+    {
+      "id": "Q31",
+      "language": "ru",
+      "topic": "lifecycle",
+      "question": "Как запросить старое поведение из CHANGELOG, не подмешивая устаревшие документы в обычные вопросы?",
+      "host_lookups": [
+        "How are historical documentation questions routed?",
+        "How are historical sources excluded from current-behavior questions?"
+      ],
+      "unsupported_premise_control": false
+    },
+    {
+      "id": "Q32",
+      "language": "en",
+      "topic": "mutation",
+      "question": "Does a well-cited documentation answer authorize an agent to edit files or apply a cleanup operation?",
+      "host_lookups": [
+        "Does a documentation answer grant edit authorization?",
+        "What approval is needed before applying cleanup?"
+      ],
+      "unsupported_premise_control": false
+    },
+    {
+      "id": "Q33",
+      "language": "ru",
+      "topic": "cleanup",
+      "question": "Хочу освободить место от индексов, сохранив исходники и настройки. Как сначала проверить план удаления?",
+      "host_lookups": [
+        "How can index cleanup be previewed?",
+        "Which user files and configuration are preserved during cleanup?"
+      ],
+      "unsupported_premise_control": false
+    },
+    {
+      "id": "Q34",
+      "language": "en",
+      "topic": "cleanup",
+      "question": "What happens if another live process is using the index when I attempt to clear it?",
+      "host_lookups": [
+        "How does index cleanup handle live processes and writer leases?"
+      ],
+      "unsupported_premise_control": false
+    },
+    {
+      "id": "Q35",
+      "language": "ru",
+      "topic": "cleanup",
+      "question": "Я просмотрел план очистки, но содержимое индекса уже изменилось. Можно ли применить старый план?",
+      "host_lookups": [
+        "How are stale index cleanup plans detected?",
+        "What binds cleanup application to the reviewed plan?"
+      ],
+      "unsupported_premise_control": false
+    },
+    {
+      "id": "Q36",
+      "language": "en",
+      "topic": "testing",
+      "question": "Which checks should I run before submitting a retrieval change, and which results actually establish answer usefulness?",
+      "host_lookups": [
+        "Which tests gate retrieval changes?",
+        "Which evaluations measure documentation context usefulness?"
+      ],
+      "unsupported_premise_control": false
+    },
+    {
+      "id": "Q37",
+      "language": "ru",
+      "topic": "unsupported",
+      "question": "Каким алгоритмом DocAtlas шифрует локальную SQLite-базу и где поменять ключ шифрования?",
+      "host_lookups": [
+        "What encryption-at-rest algorithm and key configuration does DocAtlas document?"
+      ],
+      "unsupported_premise_control": true
+    },
+    {
+      "id": "Q38",
+      "language": "en",
+      "topic": "unsupported",
+      "question": "Which published benchmark guarantees that DocAtlas always reduces the total token bill of a coding agent?",
+      "host_lookups": [
+        "What evidence establishes total coding-agent task-token savings?",
+        "Are any token-saving guarantees documented?"
+      ],
+      "unsupported_premise_control": true
+    },
+    {
+      "id": "Q39",
+      "language": "ru",
+      "topic": "unsupported",
+      "question": "Какой у DocAtlas гарантированный срок хранения удалённых документов и где настроить ровно 90 дней?",
+      "host_lookups": [
+        "What guaranteed retention period is documented for deleted project documentation?",
+        "Is a ninety-day document retention setting documented?"
+      ],
+      "unsupported_premise_control": true
+    },
+    {
+      "id": "Q40",
+      "language": "en",
+      "topic": "unsupported",
+      "question": "What does the documentation say about automatic per-tenant row-level permissions in a shared DocAtlas server?",
+      "host_lookups": [
+        "Are automatic multi-tenant row-level permissions documented?",
+        "What project isolation guarantees are documented?"
+      ],
+      "unsupported_premise_control": true
+    }
+  ]
+}

@@ -1,0 +1,609 @@
+
+## projectB-Q01 Я впервые подключил MCP. Нужно ли каждый вопрос начинать с docs_status?
+status=ok
+
+docs/mcp-docs-server.md:33-40
+The normal flow is:
+
+```text
+get_docs_context(question, project_path)
+→ returned recommended_next_action? obtain confirmation and call that exact action
+→ if a job was returned, poll docs_status(job_id)
+→ retry the original bounded get_docs_context question
+```
+
+README.md:225-225
+The contract is read-only. For an explicit health, freshness, index, or job-status request, agents use `docs_status`; otherwise they start with `get_docs_context`. Agents call `prepare_docs` only when that tool returns it as `next_action`, or when a user explicitly requests a refresh or sync.
+
+
+## projectB-Q02 Which MCP tool should a coding agent call before modifying a documented module?
+status=ok
+
+SKILL.md:137-146
+For repository-specific architecture, conventions, runbooks, roadmap, README/wiki, or module-doc questions, use the Docs MCP tools before generic WebFetch or model memory:
+
+1. For coding and patch tasks, call `get_docs_context(project_path=..., question=..., scope="all")` first; bounded delivery is server-owned policy. One call carries one concrete documentation question; independent questions use separate calls.
+2. Use `lookup_queries` only for narrow same-question recall help, including cross-language translation or facet decomposition. Never batch separate questions into them.
+3. Follow bounded `recommended_next_action`: ask its source-choice question, or obtain confirmation, call its exact typed action, and retry the same bounded request.
+4. Use `docs_status` only when the user explicitly asks about health, freshness, index state, or a background job.
+5. For bounded `insufficient_evidence`, do not claim documentation support. Follow at most one non-automatic `rephrase_question`; after that, investigate local source/tests when `hard_stop=false`. Stop before editing when `hard_stop=true` or when the requested change explicitly depends on a documentary contract that remains unproved.
+6. Cite `action_packet.source_of_truth` through each factual item's `evidence_ids`. Treat `CHANGELOG.md` as primary only for release-history/change questions.
+7. Only unbounded exploration exposes `answer_outline`, `trust_contract`, and `context_pack`; there, prefer nested source and section metadata.
+8. If the user asks vaguely about "the MCP server", distinguish `doc-atlas mcp docs-serve` (the three-tool documentation surface) from `doc-atlas mcp packs-serve` (advanced installed API-action packs).
+
+
+## projectB-Q03 В ответе есть цитаты, но answer_supported=false. Могу ли я объяснить найденное пользователю?
+status=ok
+
+docs/mcp-docs-server.md:51-51
+The model-visible projection is the bounded evidence material exposed to the caller. It is token-bounded by the answer budget: only assigned visible witnesses are materialized, and the final projection revalidates those witnesses before returning `answer_supported=true`.
+
+docs/AGENT_DOCS_WORKFLOW.md:22-27
+## Answering from retrieved context
+
+For `docs_context`, false answer flags mean that the server has not certified an
+answer. The host may still synthesize claims directly supported by the snippets.
+Preserve useful partial answers, cite their sources, and name the concrete facts
+that remain unknown. Retrieval coverage is not semantic completeness.
+
+
+## projectB-Q04 How do I include module documentation when exploring the entire repository?
+status=ok
+
+docs/mcp-quickstart-example.md:19-21
+For onboarding, `all` includes repository-level and module documentation in
+that same repository. Use `project` for repository-level policy only. An exact
+`module_path` restricts the call to that module even when `scope` is `all`.
+
+wiki/Architecture.md:110-110
+Internally, project context retrieval is staged: documentation first, then bounded source evidence, repository map, and code graph only when deterministic unresolved-target or cross-module signals require them. A versioned routing record stores stage status/reason/count/bytes outside the canonical model projection. Repository maps remain navigation evidence and never become authoritative project policy.
+
+docs/project-docs-mcp-workflow.md:172-172
+Project documentation comes from repository-owned files and is scoped by project identity and optional module scope. Dependency/library documentation comes from external sources bound to a library identity and version; manifests and lockfiles supply project-version evidence. This external documentation is not the same as project-owned docs, even when `project_path` is used to resolve its dependency version.
+
+
+## projectB-Q05 Мне нужны только общие документы репозитория, без module-документов. Как ограничить поиск?
+status=ok
+
+docs/security/mcp-runtime-threat-model.md:27-34
+Exact official documentation remains
+  untrusted document data.
+- Ordinary repository Markdown is cited data. Only explicit agent policy files
+  inside the configured repository authority receive scoped policy status, and
+  they cannot override system, user, tool or runtime safety policy.
+- Returned document content is delimited from generated warnings, metadata and
+  typed next actions. Indexed prose never selects `prepare_docs`, network,
+  filesystem, shell or credential actions.
+
+README.md:190-190
+Use `scope="project"` for repository-level policy only. For onboarding and cross-module overviews, `scope="all"` includes repository and module docs; an explicit `module_path` still limits retrieval to that module.
+
+
+## projectB-Q06 Where do I declare which local documents are authoritative?
+status=ok
+
+README.md:216-223
+### Agent contract for a local project
+
+Before handing a repository to a coding agent, generate a compact, machine-readable contract. It tells the agent which local documents are authoritative, which dependency versions were detected, and how to select the minimal DocAtlas MCP tool surface:
+
+```bash
+doc-atlas agent-contract --project-path . --format json
+doc-atlas agent-contract --project-path . --format markdown
+```
+
+wiki/Configuration.md:7-10
+Project documentation configuration for a repository is defined by the
+repository's `docatlas.project-docs.yaml` catalog. Runtime index and retrieval
+defaults remain in `docatlas.yaml`; the project-doc catalog defines which
+reviewable files are authoritative for project questions.
+
+
+## projectB-Q07 Чем конфигурация поиска отличается от каталога авторитетных документов?
+status=ok
+
+wiki/Configuration.md:7-10
+Project documentation configuration for a repository is defined by the
+repository's `docatlas.project-docs.yaml` catalog. Runtime index and retrieval
+defaults remain in `docatlas.yaml`; the project-doc catalog defines which
+reviewable files are authoritative for project questions.
+
+wiki/Configuration.md:1-5
+# Configuration
+
+**Resolution order:** `--config` flag, then `./docatlas.yaml` in the current directory, then `~/.docatlas/docatlas.yaml` (auto-created by `doc-atlas setup`). For details on what each command does, see [Commands](./Commands.md).
+
+A project is configured in `docatlas.yaml` by setting documented keys such as `index.provider: sqlite`, `query.default_budget: 2400`, and optional vector/retrieval settings. Relative index paths are resolved from the location of that `docatlas.yaml`.
+
+
+## projectB-Q08 I committed a README change. How does the next documentation query become current?
+status=ok
+
+docs/INDEX.md:43-44
+- [Eval task-level README](../eval/task_level/README.md) — task-level evaluation harness overview.
+- [Eval results README](../eval/results/live/README.md) — live eval report notes.
+
+docs/RELEASE_CHECKLIST.md:9-17
+- [ ] `docmancer/_version.py`, release tag, and changelog heading name the same version.
+- [ ] README install text matches the version that the installer actually resolves.
+- [ ] README, product brief, [Docs MCP reference](./mcp-docs-server.md), wiki command/troubleshooting pages, and changelog agree that the public Docs MCP tools are `get_docs_context`, `prepare_docs`, and `docs_status`.
+- [ ] Advanced Packs and patch constraints are labelled advanced/advisory.
+- [ ] Current docs and the support inventory advertise only surfaces shipped by this release; no retired alias or compatibility window is promised.
+- [ ] Package metadata and import smoke confirm that the Python namespace remains `docmancer` while the distribution and CLI are `doc-atlas`.
+- [ ] New active documentation is tracked by Git and does not duplicate the canonical Docs MCP workflow.
+- [ ] The canonical user-facing release set (`README.md`, product brief, Docs MCP reference, capability reference, release checklist) is at most 1,000 lines, or this release records a reviewed exception and removal plan.
+- [ ] Product claims remain inside the current evidence boundary: no Context7 parity, proven patch-improvement, or Stable claim is introduced without its named decision gate.
+
+
+## projectB-Q09 В рабочей директории есть мои незакоммиченные правки. Может ли MCP сам пересобрать индекс?
+status=ok
+
+docs/mcp-docs-server.md:61-61
+For a repository question, call `get_docs_context` first. The call never reconciles the index itself. When committed project docs are stale or not yet indexed and the whole Git worktree is clean, the response returns a no-confirmation `prepare_docs(action="sync_project_docs")` instruction bound to a preflight `plan_digest`. `prepare_docs` rechecks the clean worktree and accepted `HEAD` before mutation. Dirty or indeterminate Git state, placeholders, unsupported docs, config shadowing, and orphan pruning remain confirmation-gated.
+
+
+## projectB-Q10 Can get_docs_context change the index by itself?
+status=ok
+
+README.md:182-188
+| Situation | Tool |
+|---|---|
+| First time in a repo | `get_docs_context`; follow its `next_action` if preparation is needed |
+| Check what docs are relevant | `get_docs_context` |
+| Check health, freshness, or a job | `docs_status` |
+| Reconcile after file changes | `prepare_docs(action="sync_project_docs")` |
+| Answer "how does this repo work?" | `get_docs_context(question="How does this repository work?", scope="all")` with the repository's `project_path` |
+
+docs/mcp-docs-server.md:61-61
+For a repository question, call `get_docs_context` first. The call never reconciles the index itself. When committed project docs are stale or not yet indexed and the whole Git worktree is clean, the response returns a no-confirmation `prepare_docs(action="sync_project_docs")` instruction bound to a preflight `plan_digest`. `prepare_docs` rechecks the clean worktree and accepted `HEAD` before mutation. Dirty or indeterminate Git state, placeholders, unsupported docs, config shadowing, and orphan pruning remain confirmation-gated.
+
+
+## projectB-Q11 Подготовка вернула job_id. Что делать до повторного исходного вопроса?
+status=ok
+
+docs/AGENT_DOCS_WORKFLOW.md:11-11
+3. Call `prepare_docs` only from `recommended_next_action`, or when the user explicitly requests documentation lifecycle work such as sync, refresh, index, or prefetch. After preparation succeeds, retry the original `get_docs_context` question unchanged. If a `job_id` is returned, poll `docs_status(action="job", job_id=...)` within a bounded attempt/deadline policy and inspect the terminal result. A running, failed or cancelled job is not readiness;
+
+docs/project-docs-mcp-workflow.md:160-166
+If approved, the coding agent should:
+
+1. inspect the codebase;
+2. write `ARCHITECTURE.md` as a normal repository file;
+3. call `get_docs_context` for the original question;
+4. run its returned `prepare_docs(action="sync_project_docs")` action when requested;
+5. retry the original `get_docs_context(scope="all", question=...)` question unchanged.
+
+
+## projectB-Q12 Does requesting cancellation prove that a background job has stopped?
+status=ok
+
+docs/grounded-host-session.md:16-20
+The host reads the returned snippets and assesses whether a requested fact is
+supported. `support(fact_id, evidence_id=..., quote=...)` accepts only a verbatim
+quote from retained evidence. A matching quote binds the judgment to a source;
+it does not prove that the quote logically answers the question. Semantic
+assessment remains the host's responsibility.
+
+docs/source-continuation.md:62-69
+Inspect a returned job with `docs_status(action="job", job_id=...)`. A requested
+cancellation uses `prepare_docs(action="cancel_docs_job", job_id=...)` and may
+return `cancelling`; this is an acknowledgement, not a terminal state. Poll the
+same job with a bounded attempt/deadline policy. Terminal job statuses are
+`succeeded`, `partial`, `failed`, `cancelled`, and `interrupted`. A committing job
+may be too late to cancel safely. Read the actual terminal result before deciding
+whether to retry; never start an unbounded resubmit/poll loop. Retry the original
+documentation question after a successful preparation, preserving explicit scope.
+
+
+## projectB-Q13 Почему estimated_tokens может отличаться от бюджета допуска docs_context?
+status=ok
+
+docs/retrieval-boundaries.md:23-30
+The public `estimated_tokens` retains its compatible estimate: the ceiling of
+canonical UTF-8 JSON bytes divided by four. Admission of `docs_context` separately
+takes the maximum of that estimate and the pinned offline `o200k_base` token count
+over the entire canonical JSON, including metadata and optional locators, within
+800 tokens and three sources. Neither number promises the exact count of every
+client model.
+Do not change the public estimate globally to simulate this internal admission
+policy. A shorter snippet still must retain a qualified contiguous source span.
+
+CONTRIBUTING.md:38-38
+The bounded `get_docs_context` result union is `docs_answer`, `docs_context`, `patch_context`, or `insufficient_evidence`. Preserve the conservative boundary: only narrow relation-specific proof may authorize `docs_answer`; broad onboarding, overview, and explanatory questions remain `docs_context`.
+
+
+## projectB-Q14 Does the output budget include citation metadata as well as document text?
+status=ok
+
+SKILL.md:104-110
+| Flag | Purpose |
+|------|---------|
+| `--budget <n>` | Max estimated output tokens |
+| `--limit <n>` | Max sections to return |
+| `--expand` | Include adjacent sections around matches |
+| `--expand page` | Include full page content within budget |
+| `--format <markdown\|json>` | Output format |
+
+
+## projectB-Q15 Ссылка source_uri появилась в цитате. Нужно ли немедленно её открывать?
+status=ok
+
+docs/source-continuation.md:18-22
+When spare space remains in the initial 800-token admission budget, a selected
+project source may carry `source_uri`. This optional locator never displaces a
+selected snippet. Pass the exact returned URI to MCP `resources/read`; ordinary
+Markdown links are citations, not continuation capabilities. The initial response
+still contains at most three sources and retains its public token-estimate meaning.
+
+docs/AGENT_DOCS_WORKFLOW.md:22-27
+## Answering from retrieved context
+
+For `docs_context`, false answer flags mean that the server has not certified an
+answer. The host may still synthesize claims directly supported by the snippets.
+Preserve useful partial answers, cite their sources, and name the concrete facts
+that remain unknown. Retrieval coverage is not semantic completeness.
+
+README.md:17-17
+It retrieves compact evidence from reviewable project docs and version-aware dependency documentation so the host model can answer from the sources your project actually uses — instead of stale model memory or oversized prompt dumps.
+
+
+## projectB-Q16 Can a continuation locator be used to read an unrelated file?
+status=ok
+
+docs/index-cleanup.md:8-15
+`clear-index` supports exactly two scopes: `project-local` and `global`.
+Quarantine is the same-filesystem staging area used before final deletion so
+moved targets can be restored if the move phase fails. In `clear-index`,
+`--allow-incomplete` acknowledges that reported unverified vector or cache
+state will remain; it never bypasses live-process blockers or authorizes remote
+deletion. `clear-index` deletes only derived SQLite, extracted-document, cache,
+and verified local vector state. `clear-index` preserves project sources,
+`docatlas.yaml`, configuration, and unrelated files.
+
+docs/source-continuation.md:26-31
+A `truncated` result may contain an opaque next `continuation`. The host controller
+allows at most two read attempts per question, across all sources (at most 1,200
+additional admission tokens). The server separately limits each continuation chain
+to two reads. These are admission estimates, not measured provider token bills.
+Stop on sufficient evidence, a repeated range, no new text, source failure, or the
+read limit.
+
+
+## projectB-Q17 Исходный файл изменился между поиском и дочитыванием. Что должен вернуть reader?
+status=ok
+
+docs/source-continuation.md:34-41
+References expire after ten minutes, are session-local, and may be evicted after
+128 references. Restart invalidates them. Each read checks repository identity,
+explicit active catalog entry, authority, scope, active-index metadata, and the
+original full-file snapshot digest. Text is opened without following symlinks and
+is never fetched from the network. A changed snapshot returns `source_changed`;
+an unavailable, expired, or disallowed source returns `source_unavailable`.
+Neither result silently opens the latest file. Explain the missing fact and a
+concrete next step instead of inventing an answer.
+
+docs/source-continuation.md:18-22
+When spare space remains in the initial 800-token admission budget, a selected
+project source may carry `source_uri`. This optional locator never displaces a
+selected snippet. Pass the exact returned URI to MCP `resources/read`; ordinary
+Markdown links are citations, not continuation capabilities. The initial response
+still contains at most three sources and retains its public token-estimate meaning.
+
+
+## projectB-Q18 Can two different continuation locators return overlapping lines without detection?
+status=ok
+
+docs/grounded-host-session.md:22-27
+A `source_uri` alone does not cause I/O. If a concrete requested fact is still
+missing and the next part of the selected source may answer it, explicitly call
+`await session.read(uri, missing_fact_id=...)`. The shared source-read controller
+checks the locator before network/transport I/O and checks the returned project,
+path, snapshot, consecutive line range, duplicates and complete serialized size.
+It also rejects overlapping lines reached through different locators.
+
+docs/source-continuation.md:26-31
+A `truncated` result may contain an opaque next `continuation`. The host controller
+allows at most two read attempts per question, across all sources (at most 1,200
+additional admission tokens). The server separately limits each continuation chain
+to two reads. These are admission estimates, not measured provider token bills.
+Stop on sufficient evidence, a repeated range, no new text, source failure, or the
+read limit.
+
+
+## projectB-Q19 Дочитывание не удалось, но часть ответа уже подтверждена. Нужно ли отказываться от всего ответа?
+status=ok
+
+docs/grounded-host-session.md:66-70
+`answer_supported` remains false in all three states. A read failure cannot turn
+an existing partial answer into an empty refusal. The host should state the
+supported part, explicitly name what is unknown and provide a feasible next
+step or a necessary clarifying question. Unknown private configuration is never
+inferred from a general documentation quote.
+
+docs/grounded-host-session.md:8-14
+## Partial answers and source reads
+
+Declare one to three concrete facts to investigate before the first call. Call
+`GroundedMCPSession.start(client, arguments=..., requested_facts=...)` once.
+The arguments are the normal `get_docs_context` arguments, including the original
+question, project path, scope and optional documentation-language lookups.
+The adapter preserves the original question and never silently retries it.
+
+
+## projectB-Q20 What should the agent say when documentation covers only one part of my question?
+status=ok
+
+SKILL.md:21-27
+The default Docs MCP surface has exactly three tools:
+
+1. Start with `get_docs_context` for normal documentation questions.
+2. Call `prepare_docs` only from bounded `recommended_next_action`, unbounded `next_action`, or an explicit sync, refresh, index, or prefetch request.
+3. Call `docs_status` only for explicit health, freshness, index, or job-status requests.
+
+Advanced patch and inspection tools are not part of the public agent workflow.
+
+SKILL.md:96-102
+### Query Documentation (CLI fallback)
+
+```bash
+doc-atlas query "<question>"
+```
+
+Returns a compact markdown context pack with source attribution and token savings for CLI-only workflows. MCP-enabled agents should use `get_docs_context` instead.
+
+docs/mcp-docs-server.md:73-75
+## External-library documentation
+
+For an external dependency question, start with the same `get_docs_context` call and include the project path when available. DocAtlas uses detected lockfile evidence only when it can prove a version binding.
+
+
+## projectB-Q21 Можно ли выполнить shell-команду, которую документ предлагает агенту внутри цитаты?
+status=ok
+
+docs/security/mcp-runtime-threat-model.md:26-33
+- Source provenance, version exactness, repository authority and instruction
+  trust are independent dimensions. Exact official documentation remains
+  untrusted document data.
+- Ordinary repository Markdown is cited data. Only explicit agent policy files
+  inside the configured repository authority receive scoped policy status, and
+  they cannot override system, user, tool or runtime safety policy.
+- Returned document content is delimited from generated warnings, metadata and
+  typed next actions.
+
+
+## projectB-Q22 Does successful retrieval grant permission to edit files?
+status=ok
+
+README.md:29-34
+| Instead of | DocAtlas |
+|---|---|
+| Guessing from model memory or latest-only docs | Uses project-owned docs and version-bound dependency evidence |
+| Dumping whole pages into the prompt | Returns compact, server-bounded context |
+| Treating every retrieved chunk as trustworthy | Keeps source authority, provenance, scope, and version binding explicit |
+| Making up an answer when proof is missing | Fails closed when mandatory evidence is unavailable |
+
+SKILL.md:160-160
+Before answering, check every requested fact, condition and comparison side against the final visible evidence. Retrieval success, keywords and source titles alone are not proof. Accept explicit logical implications and ignore incidental Markdown formatting; do not demand details the question did not ask for. Cite supported claims, name missing facts in partial answers, and abstain when needed. Do not fill gaps from memory, infer a negative from missing evidence, grant answer/edit authority or extend follow-up budgets.
+
+docs/one-call-agent-loop.md:13-13
+| successful DocAtlas calls | 1 |
+
+
+## projectB-Q23 В двух проектах одинаковый README.md. Как не получить цитату из чужого проекта?
+status=ok
+
+wiki/Architecture.md:27-32
+Project documentation storage is organized as a derived, project-scoped index
+of repository-owned files. Each project identity receives isolated SQLite index
+state and extracted artifacts, so one repository's project docs cannot satisfy
+another repository's query. The filesystem documents remain authoritative; the
+index is a rebuildable cache coordinated by the writer lease and cleanup barrier
+described in [Index cleanup](../docs/index-cleanup.md).
+
+
+## projectB-Q24 Are evaluation reports eligible evidence for an ordinary operational question?
+status=ok
+
+wiki/Architecture.md:108-108
+For repository coding and patch tasks, agents call `get_docs_context(project_path=..., question=...)` first. Project reads return bounded `docs_context`; explicit changes return `patch_context`; absent safe evidence returns `insufficient_evidence`. Certified `docs_answer` is reserved for library, dependency, and mixed lanes. Operational retrieval excludes evaluation, planning, and history lanes unless explicitly requested. Follow a bounded `recommended_next_action` when reconciliation is needed, then retry the same request. `docs_status` is reserved for explicit health, freshness, index, and job-status requests.
+
+eval/project_context_quality/README.md:16-21
+Stage 10 separates primary, question-only, and independent paraphrase reports.
+The latter two are initially report-only, never release-gate evidence. Their
+JSON verdict, failed checks, raw payloads, and numeric threshold errors remain
+unchanged even when the CLI returns zero to allow report capture. Exceptions
+still fail the process. The frozen lanes were subsequently executed; the latest
+results are recorded in `IMPLEMENTATION_REPORT.md`.
+
+
+## projectB-Q25 Как ограничение per-source влияет на соседние фрагменты одного документа?
+status=ok
+
+wiki/Architecture.md:15-15
+Markdown indexing first normalizes fetched or local documentation into semantic parent sections based on heading structure. The production `parent-child-v1` chunker then splits each parent section into token-bounded child chunks (target 160 estimated visible tokens, hard maximum 512, zero visible overlap) while preserving the parent identity and source offsets. Retrieval ranks those child chunks and can hydrate parent or adjacent context without changing the exact display text.
+
+
+## projectB-Q26 Can an inactive indexing generation change the ranking of active documentation?
+status=ok
+
+docs/retrieval-boundaries.md:5-10
+The active-generation lexical index isolates FTS/BM25 document-frequency and
+corpus-length statistics from inactive and candidate generations. A not-yet-promoted
+index must not change the active search ranking merely by existing. Source-policy
+checks apply to expanded candidates before text hydration; a second check after
+hydration remains defense in depth. Promotion and active-generation tests protect
+this boundary.
+
+wiki/Architecture.md:15-15
+Markdown indexing first normalizes fetched or local documentation into semantic parent sections based on heading structure. The production `parent-child-v1` chunker then splits each parent section into token-bounded child chunks (target 160 estimated visible tokens, hard maximum 512, zero visible overlap) while preserving the parent identity and source offsets. Retrieval ranks those child chunks and can hydrate parent or adjacent context without changing the exact display text.
+
+
+## projectB-Q27 Зачем повторно проверять цитату после её сокращения?
+status=ok
+
+docs/mcp-docs-server.md:47-47
+Compound projection selects compact witnesses for distinct lookup IDs before expanding snippets with remaining capacity, then requalifies coverage against the visible path, section, and snippet.
+
+
+## projectB-Q28 Why should a matching heading not be enough to support a requested fact?
+status=ok
+
+docs/grounded-host-session.md:16-20
+The host reads the returned snippets and assesses whether a requested fact is
+supported. `support(fact_id, evidence_id=..., quote=...)` accepts only a verbatim
+quote from retained evidence. A matching quote binds the judgment to a source;
+it does not prove that the quote logically answers the question. Semantic
+assessment remains the host's responsibility.
+
+wiki/Supported-Sources.md:37-44
+## Local Ingest Options
+
+- `--include <glob>` includes only matching paths relative to the ingest root.
+- `--exclude <glob>` excludes matching paths relative to the ingest root.
+- `--format <format>` restricts ingest to one or more supported file formats.
+- `--recursive / --no-recursive` controls directory traversal.
+- `--skip-known` skips files whose content hash is already indexed.
+- `--no-vectors` skips the embedding + vector upsert path for FTS5-only ingest.
+
+
+## projectB-Q29 Какая часть работы доступна без сети и заранее загруженной языковой модели?
+status=insufficient_evidence
+
+
+## projectB-Q30 What happens when a dependency version cannot be proven from the repository?
+status=ok
+
+docs/DOCMANCER_PRODUCT_BRIEF.md:65-65
+Dependency version evidence uses three distinct states. `exact` means repository state proves the selected version (for supported ecosystems, normally through an authoritative lockfile or equivalent resolved state). `declared-only` means a manifest declaration exists but repository state does not prove the selected runtime version. `unbound` means repository evidence cannot safely bind the dependency to an exact documentation version/source; local/path, Git, and direct-URL dependencies are common examples.
+
+docs/project-docs-mcp-workflow.md:170-172
+## Dependency docs are separate
+
+Project documentation comes from repository-owned files and is scoped by project identity and optional module scope. Dependency/library documentation comes from external sources bound to a library identity and version; manifests and lockfiles supply project-version evidence. This external documentation is not the same as project-owned docs, even when `project_path` is used to resolve its dependency version.
+
+
+## projectB-Q31 Можно ли использовать документацию latest как доказательство поведения установленной версии?
+status=ok
+
+README.md:70-76
+## One-line install
+
+Install `uv`, the `doc-atlas` CLI, and register the docs MCP server into your agent — in a single command:
+
+```bash
+curl -LsSf https://raw.githubusercontent.com/Vanilla1999/DocAtlas/main/scripts/install.sh | sh
+```
+
+wiki/Architecture.md:94-98
+The `ProjectMetadataReader` inspects project metadata to choose the exact documentation version the project uses:
+
+- **`.fvmrc`** — reads Flutter SDK version or channel (stable/beta/main). Determines which `api.flutter.dev` docs to fetch.
+- **`pubspec.lock`** — extracts pinned package versions from `packages` map. Used as exact version sources for pub.dev Dartdoc and docs.rs bindings.
+- **`pubspec.yaml`** — reads direct dependencies and specifier kinds (exact, range, path, git).
+
+
+## projectB-Q32 Can index cleanup run while another process is writing the index?
+status=ok
+
+docs/index-cleanup.md:3-6
+`doc-atlas clear-index` removes derived index state while preserving project
+sources, `docatlas.yaml`, configuration, and unrelated files; it never
+silently widens the cleanup scope. The command is preview-only
+unless `--apply` is supplied.
+
+docs/index-cleanup.md:102-104
+### Coordination with index writers
+
+Storage mutation coordination is fail-closed: a project sync or library refresh registers a writer lease, while `clear-index` takes the cleanup barrier and refuses cleanup while any live writer lease exists.
+
+docs/index-cleanup.md:17-20
+## Clear one project-local index
+
+A project-local cleanup requires a project whose `docatlas.yaml` resolves to
+that project's `.docatlas` directory:
+
+
+## projectB-Q33 Почему клиент может видеть только маркер structuredContent, без самой цитаты?
+status=ok
+
+docs/mcp-docs-server.md:91-91
+By default, the full result is attached only as MCP `structuredContent`; text contains a short constant marker. OpenCode registration automatically sets `DOCATLAS_MCP_TEXT_FALLBACK=1` because OpenCode currently does not preserve structured content in model-visible tool output; manual OpenCode configurations must set it too. Other clients retain the default structured lane. Fallback mode sends the full JSON in text and omits `structuredContent`, so the payload is never duplicated across both channels.
+
+
+## projectB-Q34 How can I check that my installed MCP command matches the current package?
+status=ok
+
+docs/DOCMANCER_PRODUCT_BRIEF.md:82-84
+## Installation truth
+
+The package distributed on PyPI is `doc-atlas`. The `main` branch can contain workflow changes that are not yet published. Check `doc-atlas --version`, use release documentation that matches that installed version, and do not assume a one-line installer for `main` has published every documented feature.
+
+README.md:70-72
+## One-line install
+
+Install `uv`, the `doc-atlas` CLI, and register the docs MCP server into your agent — in a single command:
+
+docs/RELEASE_CHECKLIST.md:25-25
+- [ ] Fresh installs use `DOCATLAS_HOME`, `~/.docatlas`, `docatlas.yaml`, and the `docatlas` MCP registration identity.
+
+
+## projectB-Q35 Для чего генерировать agent-contract перед работой агента с репозиторием?
+status=insufficient_evidence
+
+
+## projectB-Q36 Do successful provider-free tests prove that real agents spend fewer task tokens?
+status=ok
+
+docs/testing.md:1-3
+# Complete pytest marker inventory and test tiers
+
+The complete pytest marker inventory is `integration`, `advanced`, `live`, and `live_network`. The test suite markers are `integration`, `advanced`, `live`, and `live_network`. Core tests without those optional markers remain in the default suite.
+
+CONTRIBUTING.md:62-63
+- Run the full test suite before opening the PR
+- New connectors or fetchers should include tests where practical
+
+docs/testing.md:5-5
+Run the fail-closed offline suite with `DOCATLAS_OFFLINE=1 pytest tests/ -m "not advanced and not live and not live_network"`.
+
+
+## projectB-Q37 Где подтверждено, что DocAtlas всегда экономит ровно 50 процентов токенов?
+status=insufficient_evidence
+
+
+## projectB-Q38 Which document guarantees that every query receives a complete correct answer?
+status=ok
+
+docs/source-continuation.md:52-57
+Structured-aware clients consume `structuredContent` once. Text-only clients can
+use `DOCATLAS_MCP_TEXT_FALLBACK=1`; unsupported delivery must be diagnosed rather
+than treating a marker as evidence. Do not duplicate the complete payload across
+both model-input channels. Engineering gates establish their tested boundaries. They do not establish
+unmeasured product guarantees or task-token savings. Keep any unsupported claim
+unproved unless a current authoritative source actually establishes it.
+
+
+## projectB-Q39 Какой пароль администратора установлен в моей частной production-среде?
+status=ok
+
+README.md:70-76
+## One-line install
+
+Install `uv`, the `doc-atlas` CLI, and register the docs MCP server into your agent — in a single command:
+
+```bash
+curl -LsSf https://raw.githubusercontent.com/Vanilla1999/DocAtlas/main/scripts/install.sh | sh
+```
+
+
+## projectB-Q40 Where is mandatory ninety-day retention of every conversation specified?
+status=ok
+
+docs/modules/question-planning.md:23-29
+## Public boundary
+
+The durable output is the project-answer requirement contract: resolved subjects, intents, mandatory facets, conditions, technical identities, parse trace, and unresolved parts. Retrieval ranking is not owned here.
+
+Imperative edits are outside this boundary. They are owned by
+`PatchRequestPlan` and the patch-specific requirement pipeline documented in
+`patch-request-planning.md`; one request must never pass through both systems.

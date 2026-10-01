@@ -1,0 +1,23 @@
+{
+  "tool": "get_docs_context",
+  "request": {
+    "question": "Does uv read pip.conf or PIP_INDEX_URL? Also identify the exact value chosen in our private production deployment.",
+    "project_path": "/tmp/opencode/search-audit-work-20261001/fixtures/uv",
+    "scope": "all"
+  },
+  "seconds": 0.44331097199756186,
+  "is_error": false,
+  "wire": {
+    "_meta": null,
+    "content": [
+      {
+        "type": "text",
+        "text": "{\"status\": \"ok\", \"kind\": \"docs_context\", \"context_status\": \"ready\", \"context_available\": true, \"answer_supported\": false, \"answer_available\": false, \"support_status\": \"retrieval_only\", \"answer_policy\": \"cite_only\", \"coverage_policy\": \"retrieval_attribution_only\", \"query_coverage\": \"partial\", \"retrieval_coverage\": \"partial\", \"facet_coverage\": \"unverified\", \"covered_query_ids\": [\"query-anchor-1\", \"query-anchor-2\"], \"missing_query_ids\": [\"query-original\"], \"missing_facets\": [], \"facets\": [], \"sources\": [{\"evidence_id\": \"ev-5337c0d893f921a2\", \"path_or_url\": \"docs/pip/compatibility.md\", \"section\": \"Compatibility with `pip` and `pip-tools` > Configuration files and environment variables\", \"snippet\": \"## Configuration files and environment variables\\n\\nuv does not read configuration files or environment variables that are specific to `pip`, like\\n`pip.conf` or `PIP_INDEX_URL`.\", \"version_binding\": \"unversioned\", \"content_sha256\": \"93af256b8fa27c1a987238ed0cad6e7a65a4106025e2f2c37111566b6a4da485\", \"project_identity\": \"local:e65d484943b04206e676f1b569d594fafedcdaf92efb305771c46aba30d34f5c\", \"authority\": \"source_of_truth\", \"scope\": \"project\", \"line_start\": 17, \"line_end\": 20, \"source_uri\": \"docatlas://source/35c8b747d7aa8f0d2d6fa1ee\"}, {\"evidence_id\": \"ev-ee1426f03f51280d\", \"path_or_url\": \"docs/pip/compatibility.md\", \"section\": \"Compatibility with `pip` and `pip-tools`\", \"snippet\": \"uv is designed as a drop-in replacement for common `pip` and `pip-tools` workflows.\", \"version_binding\": \"unversioned\", \"content_sha256\": \"77bac67fb157bd5c1e518f1eaa799909087befd4071a56d65c56185cf9e1de87\", \"project_identity\": \"local:e65d484943b04206e676f1b569d594fafedcdaf92efb305771c46aba30d34f5c\", \"line_start\": 3, \"line_end\": 3, \"authority\": \"source_of_truth\", \"scope\": \"project\", \"source_uri\": \"docatlas://source/b695389f97ed8d6f83a32c1c\"}, {\"evidence_id\": \"ev-be8b2102a68eab15\", \"path_or_url\": \"docs/pip/compatibility.md\", \"section\": \"Compatibility with `pip` and `pip-tools` > Packages that exist on multiple indexes\", \"snippet\": \"For example, imagine that a company publishes an internal version of `requests` on a private index\\n(`--extra-index-url`), but also allows installing packages from PyPI by default. In this case, the\\nprivate `requests` would conflict with the public [`requests`](https://pypi.org/project/requests/)\\non PyPI.\", \"version_binding\": \"unversioned\", \"content_sha256\": \"603cd9bcb2691eb9886abd4fc940b8c7f794b382db5b487e88b1c3a3004f2f8e\", \"project_identity\": \"local:e65d484943b04206e676f1b569d594fafedcdaf92efb305771c46aba30d34f5c\", \"line_start\": 112, \"line_end\": 115, \"authority\": \"source_of_truth\", \"scope\": \"project\"}], \"context_quality\": {\"status\": \"unverified\", \"reasons\": [\"coverage_unverified\"]}, \"read_next\": [], \"edit_ready\": false, \"investigation_allowed\": true, \"estimated_tokens\": 677}",
+        "annotations": null,
+        "_meta": null
+      }
+    ],
+    "structuredContent": null,
+    "isError": false
+  }
+}

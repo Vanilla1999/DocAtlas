@@ -1,0 +1,27 @@
+{
+  "tool": "get_docs_context",
+  "request": {
+    "question": "Когда нужен refresh, а когда sync_project_docs? Я путаю обновление библиотеки с обновлением своего репозитория.",
+    "project_path": "/tmp/opencode/docatlas-ablation",
+    "scope": "all",
+    "lookup_queries": [
+      "How are library documentation refreshed?",
+      "How does refreshing library docs differ from syncing project docs?"
+    ]
+  },
+  "seconds": 1.8620515540023916,
+  "is_error": false,
+  "wire": {
+    "_meta": null,
+    "content": [
+      {
+        "type": "text",
+        "text": "{\"status\": \"ok\", \"kind\": \"docs_context\", \"context_status\": \"ready\", \"context_available\": true, \"answer_supported\": false, \"answer_available\": false, \"support_status\": \"retrieval_only\", \"answer_policy\": \"cite_only\", \"coverage_policy\": \"retrieval_attribution_only\", \"query_coverage\": \"partial\", \"retrieval_coverage\": \"partial\", \"facet_coverage\": \"unverified\", \"covered_query_ids\": [\"query-anchor-1\", \"query-lookup-1\", \"query-lookup-2\"], \"missing_query_ids\": [\"query-original\"], \"missing_facets\": [], \"facets\": [{\"id\": \"intent-context:project_docs_sync\", \"requirement_id\": null, \"question\": \"sync_project_docs lifecycle project documentation\", \"status\": \"retrieval_only\", \"evidence_ids\": [\"ev-ea6cd43d58747d0b\"]}], \"sources\": [{\"evidence_id\": \"ev-775a05a31e48dad8\", \"path_or_url\": \"docs/DOCMANCER_PRODUCT_BRIEF.md\", \"section\": \"DocAtlas product brief > Primary user journey\", \"snippet\": \"| Tool | Use it for |\\n|---|---|\\n| `get_docs_context` | The first call for project, dependency, library, or mixed documentation questions. |\\n| `prepare_docs` | Explicit lifecycle work such as syncing accepted project docs or fetching an approved external source. |\\n| `docs_status` | A returned job, freshness, health, or index-status question. |\", \"version_binding\": \"unversioned\", \"content_sha256\": \"a35a44883aa80530b187d303e6874680c167c604cc4ff3ebc42cafa0a9fd1301\", \"project_identity\": \"local:48277f62f8b4ff92ba1c60c082f92a43817f9e1c5ba4ea27e12cd77a76421585\", \"authority\": \"source_of_truth\", \"scope\": \"project\", \"line_start\": 21, \"line_end\": 25}, {\"evidence_id\": \"ev-c062d9d7d763f7e8\", \"path_or_url\": \"docs/project-docs-mcp-workflow.md\", \"section\": \"Project docs MCP workflow > Example response handling\", \"snippet\": \"The agent should call `sync_project_docs` to reconcile.\", \"version_binding\": \"unversioned\", \"content_sha256\": \"955698ded47b8443f2db3521dd6e194298ebf59e088b81c1198a419a7826f005\", \"project_identity\": \"local:48277f62f8b4ff92ba1c60c082f92a43817f9e1c5ba4ea27e12cd77a76421585\", \"authority\": \"source_of_truth\", \"scope\": \"project\", \"line_start\": 312, \"line_end\": 312}, {\"evidence_id\": \"ev-ea6cd43d58747d0b\", \"path_or_url\": \"docs/project-docs-mcp-workflow.md\", \"section\": \"Project docs MCP workflow > Canonical lifecycle: sync\", \"snippet\": \"`sync_project_docs` is the recommended lifecycle action.\", \"version_binding\": \"unversioned\", \"content_sha256\": \"79c3149984df25afbd05171b9f1f15b588d7d64862f511d34971fef144f0bc97\", \"project_identity\": \"local:48277f62f8b4ff92ba1c60c082f92a43817f9e1c5ba4ea27e12cd77a76421585\", \"authority\": \"source_of_truth\", \"scope\": \"project\", \"line_start\": 23, \"line_end\": 23}], \"context_quality\": {\"status\": \"unverified\", \"reasons\": [\"coverage_unverified\", \"budget_limited\"]}, \"read_next\": [], \"edit_ready\": false, \"investigation_allowed\": true, \"estimated_tokens\": 668}",
+        "annotations": null,
+        "_meta": null
+      }
+    ],
+    "structuredContent": null,
+    "isError": false
+  }
+}

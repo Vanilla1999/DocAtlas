@@ -1,0 +1,26 @@
+{
+  "tool": "prepare_docs",
+  "request": {
+    "action": "clear_index",
+    "scope": "project-local",
+    "project_path": "/tmp/opencode/search-audit-work-20261001/lifecycle-fixture",
+    "plan_digest": "324f002a452276bb5dac686855f8c98acb4d0cf00884d6f564a6538fd3f126b4",
+    "confirm": true,
+    "allow_incomplete": true
+  },
+  "seconds": 0.017197204993863124,
+  "is_error": false,
+  "wire": {
+    "_meta": null,
+    "content": [
+      {
+        "type": "text",
+        "text": "{\"scope\": \"project-local\", \"config_source\": \"project_local\", \"storage_root\": \"/tmp/opencode/search-audit-work-20261001/lifecycle-fixture/.docatlas\", \"db_path\": \"/tmp/opencode/search-audit-work-20261001/lifecycle-fixture/.docatlas/docatlas.db\", \"extracted_dir\": \"/tmp/opencode/search-audit-work-20261001/lifecycle-fixture/.docatlas/extracted\", \"plan\": [\"/tmp/opencode/search-audit-work-20261001/lifecycle-fixture/.docatlas/docatlas.db\", \"/tmp/opencode/search-audit-work-20261001/lifecycle-fixture/.docatlas/extracted\"], \"targets\": [{\"path\": \"/tmp/opencode/search-audit-work-20261001/lifecycle-fixture/.docatlas/docatlas.db\", \"kind\": \"sqlite_index\", \"fingerprint\": \"6210a9f2319dc8187360799685a28975066f9b99bcf6071b70007900574eb9d9\", \"exists\": true, \"size_bytes\": 229376}, {\"path\": \"/tmp/opencode/search-audit-work-20261001/lifecycle-fixture/.docatlas/extracted\", \"kind\": \"extracted_documents\", \"fingerprint\": \"9def9a62f6665fa7ba3627ab732d45c7394d5697152c6e108f8d3795f8839d28\", \"exists\": true, \"size_bytes\": 2315}], \"plan_digest\": \"324f002a452276bb5dac686855f8c98acb4d0cf00884d6f564a6538fd3f126b4\", \"incomplete_reasons\": [], \"blocking_reasons\": [], \"status\": \"applied\", \"removed\": [\"/tmp/opencode/search-audit-work-20261001/lifecycle-fixture/.docatlas/docatlas.db\", \"/tmp/opencode/search-audit-work-20261001/lifecycle-fixture/.docatlas/extracted\"], \"quarantine_retained\": null, \"retained_incomplete_state\": [], \"action\": \"clear_index\", \"tool\": \"prepare_docs\"}",
+        "annotations": null,
+        "_meta": null
+      }
+    ],
+    "structuredContent": null,
+    "isError": false
+  }
+}

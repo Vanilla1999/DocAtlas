@@ -1,0 +1,23 @@
+{
+  "tool": "get_docs_context",
+  "request": {
+    "question": "В чём различие alias_priority=1 и alias_priority=2?",
+    "project_path": "/tmp/opencode/search-audit-work-20261001/fixtures/pydantic",
+    "scope": "all"
+  },
+  "seconds": 0.13117687100020703,
+  "is_error": false,
+  "wire": {
+    "_meta": null,
+    "content": [
+      {
+        "type": "text",
+        "text": "{\"status\": \"ok\", \"kind\": \"docs_context\", \"context_status\": \"ready\", \"context_available\": true, \"answer_supported\": false, \"answer_available\": false, \"support_status\": \"retrieval_only\", \"answer_policy\": \"cite_only\", \"coverage_policy\": \"retrieval_attribution_only\", \"query_coverage\": \"full\", \"retrieval_coverage\": \"full\", \"facet_coverage\": \"unverified\", \"covered_query_ids\": [\"query-original\", \"query-anchor-1\"], \"missing_query_ids\": [], \"missing_facets\": [], \"facets\": [], \"sources\": [{\"evidence_id\": \"ev-b3d11adf6387257c\", \"path_or_url\": \"docs/concepts/alias.md\", \"section\": \"Alias Precedence > Alias Priority\", \"snippet\": \"### Alias Priority\\n\\nYou may set `alias_priority` on a field to change this behavior:\\n\\n* `alias_priority=2` the alias will *not* be overridden by the alias generator.\\n* `alias_priority=1` the alias *will* be overridden by the alias generator.\\n* `alias_priority` not set:\\n    * alias is set: the alias will *not* be overridden by the alias generator.\\n    * alias is not set: the alias *will* be overridden by the alias generator.\\n\\nThe same precedence applies to `validation_alias` and `serialization_alias`.\\nSee more about the different field aliases under [field aliases](../concepts/fields.md#field-aliases).\", \"version_binding\": \"unversioned\", \"content_sha256\": \"174e0c9b2fdfcc91f3f394a96e8e037efd22ffb14be2b5c949aef11a486292f3\", \"project_identity\": \"local:dee89d9b00c29f8b46038582d3569cd8157162fec6f171d84685bc8b23f83a09\", \"line_start\": 192, \"line_end\": 203, \"authority\": \"source_of_truth\", \"scope\": \"project\", \"source_uri\": \"docatlas://source/b975cf093c60003b3b6709de\"}], \"context_quality\": {\"status\": \"unverified\", \"reasons\": [\"coverage_unverified\"]}, \"read_next\": [], \"edit_ready\": false, \"investigation_allowed\": true, \"estimated_tokens\": 429}",
+        "annotations": null,
+        "_meta": null
+      }
+    ],
+    "structuredContent": null,
+    "isError": false
+  }
+}

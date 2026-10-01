@@ -1,0 +1,1061 @@
+{
+  "note": "Second diagnostic observer for rendered raw text. Formatting normalization is from existing eval helper; no private source content is added to native output.",
+  "rows": [
+    {
+      "id": "fastapi-01",
+      "limit": 3,
+      "all_required_matched": true,
+      "claims": [
+        {
+          "claim_id": "required",
+          "supported": true
+        }
+      ]
+    },
+    {
+      "id": "fastapi-01",
+      "limit": 5,
+      "all_required_matched": true,
+      "claims": [
+        {
+          "claim_id": "required",
+          "supported": true
+        }
+      ]
+    },
+    {
+      "id": "fastapi-02",
+      "limit": 3,
+      "all_required_matched": true,
+      "claims": [
+        {
+          "claim_id": "required",
+          "supported": true
+        }
+      ]
+    },
+    {
+      "id": "fastapi-02",
+      "limit": 5,
+      "all_required_matched": true,
+      "claims": [
+        {
+          "claim_id": "required",
+          "supported": true
+        }
+      ]
+    },
+    {
+      "id": "fastapi-03",
+      "limit": 3,
+      "all_required_matched": true,
+      "claims": [
+        {
+          "claim_id": "required",
+          "supported": true
+        }
+      ]
+    },
+    {
+      "id": "fastapi-03",
+      "limit": 5,
+      "all_required_matched": true,
+      "claims": [
+        {
+          "claim_id": "required",
+          "supported": true
+        }
+      ]
+    },
+    {
+      "id": "fastapi-04",
+      "limit": 3,
+      "all_required_matched": false,
+      "claims": [
+        {
+          "claim_id": "required",
+          "supported": false
+        }
+      ]
+    },
+    {
+      "id": "fastapi-04",
+      "limit": 5,
+      "all_required_matched": false,
+      "claims": [
+        {
+          "claim_id": "required",
+          "supported": false
+        }
+      ]
+    },
+    {
+      "id": "fastapi-05",
+      "limit": 3,
+      "all_required_matched": true,
+      "claims": [
+        {
+          "claim_id": "required",
+          "supported": true
+        }
+      ]
+    },
+    {
+      "id": "fastapi-05",
+      "limit": 5,
+      "all_required_matched": true,
+      "claims": [
+        {
+          "claim_id": "required",
+          "supported": true
+        }
+      ]
+    },
+    {
+      "id": "fastapi-06",
+      "limit": 3,
+      "all_required_matched": true,
+      "claims": [
+        {
+          "claim_id": "required",
+          "supported": true
+        }
+      ]
+    },
+    {
+      "id": "fastapi-06",
+      "limit": 5,
+      "all_required_matched": true,
+      "claims": [
+        {
+          "claim_id": "required",
+          "supported": true
+        }
+      ]
+    },
+    {
+      "id": "starlette-01",
+      "limit": 3,
+      "all_required_matched": true,
+      "claims": [
+        {
+          "claim_id": "required",
+          "supported": true
+        }
+      ]
+    },
+    {
+      "id": "starlette-01",
+      "limit": 5,
+      "all_required_matched": true,
+      "claims": [
+        {
+          "claim_id": "required",
+          "supported": true
+        }
+      ]
+    },
+    {
+      "id": "starlette-02",
+      "limit": 3,
+      "all_required_matched": true,
+      "claims": [
+        {
+          "claim_id": "required",
+          "supported": true
+        }
+      ]
+    },
+    {
+      "id": "starlette-02",
+      "limit": 5,
+      "all_required_matched": true,
+      "claims": [
+        {
+          "claim_id": "required",
+          "supported": true
+        }
+      ]
+    },
+    {
+      "id": "starlette-03",
+      "limit": 3,
+      "all_required_matched": true,
+      "claims": [
+        {
+          "claim_id": "required",
+          "supported": true
+        }
+      ]
+    },
+    {
+      "id": "starlette-03",
+      "limit": 5,
+      "all_required_matched": true,
+      "claims": [
+        {
+          "claim_id": "required",
+          "supported": true
+        }
+      ]
+    },
+    {
+      "id": "starlette-04",
+      "limit": 3,
+      "all_required_matched": true,
+      "claims": [
+        {
+          "claim_id": "required",
+          "supported": true
+        }
+      ]
+    },
+    {
+      "id": "starlette-04",
+      "limit": 5,
+      "all_required_matched": true,
+      "claims": [
+        {
+          "claim_id": "required",
+          "supported": true
+        }
+      ]
+    },
+    {
+      "id": "starlette-05",
+      "limit": 3,
+      "all_required_matched": true,
+      "claims": [
+        {
+          "claim_id": "required",
+          "supported": true
+        }
+      ]
+    },
+    {
+      "id": "starlette-05",
+      "limit": 5,
+      "all_required_matched": true,
+      "claims": [
+        {
+          "claim_id": "required",
+          "supported": true
+        }
+      ]
+    },
+    {
+      "id": "starlette-06",
+      "limit": 3,
+      "all_required_matched": true,
+      "claims": [
+        {
+          "claim_id": "required",
+          "supported": true
+        }
+      ]
+    },
+    {
+      "id": "starlette-06",
+      "limit": 5,
+      "all_required_matched": true,
+      "claims": [
+        {
+          "claim_id": "required",
+          "supported": true
+        }
+      ]
+    },
+    {
+      "id": "typer-01",
+      "limit": 3,
+      "all_required_matched": true,
+      "claims": [
+        {
+          "claim_id": "required",
+          "supported": true
+        }
+      ]
+    },
+    {
+      "id": "typer-01",
+      "limit": 5,
+      "all_required_matched": true,
+      "claims": [
+        {
+          "claim_id": "required",
+          "supported": true
+        }
+      ]
+    },
+    {
+      "id": "typer-02",
+      "limit": 3,
+      "all_required_matched": true,
+      "claims": [
+        {
+          "claim_id": "required",
+          "supported": true
+        }
+      ]
+    },
+    {
+      "id": "typer-02",
+      "limit": 5,
+      "all_required_matched": true,
+      "claims": [
+        {
+          "claim_id": "required",
+          "supported": true
+        }
+      ]
+    },
+    {
+      "id": "typer-03",
+      "limit": 3,
+      "all_required_matched": true,
+      "claims": [
+        {
+          "claim_id": "required",
+          "supported": true
+        }
+      ]
+    },
+    {
+      "id": "typer-03",
+      "limit": 5,
+      "all_required_matched": true,
+      "claims": [
+        {
+          "claim_id": "required",
+          "supported": true
+        }
+      ]
+    },
+    {
+      "id": "typer-04",
+      "limit": 3,
+      "all_required_matched": true,
+      "claims": [
+        {
+          "claim_id": "required",
+          "supported": true
+        }
+      ]
+    },
+    {
+      "id": "typer-04",
+      "limit": 5,
+      "all_required_matched": true,
+      "claims": [
+        {
+          "claim_id": "required",
+          "supported": true
+        }
+      ]
+    },
+    {
+      "id": "typer-05",
+      "limit": 3,
+      "all_required_matched": false,
+      "claims": [
+        {
+          "claim_id": "required",
+          "supported": false
+        }
+      ]
+    },
+    {
+      "id": "typer-05",
+      "limit": 5,
+      "all_required_matched": true,
+      "claims": [
+        {
+          "claim_id": "required",
+          "supported": true
+        }
+      ]
+    },
+    {
+      "id": "typer-06",
+      "limit": 3,
+      "all_required_matched": true,
+      "claims": [
+        {
+          "claim_id": "required",
+          "supported": true
+        }
+      ]
+    },
+    {
+      "id": "typer-06",
+      "limit": 5,
+      "all_required_matched": true,
+      "claims": [
+        {
+          "claim_id": "required",
+          "supported": true
+        }
+      ]
+    },
+    {
+      "id": "pydantic-01",
+      "limit": 3,
+      "all_required_matched": true,
+      "claims": [
+        {
+          "claim_id": "required",
+          "supported": true
+        }
+      ]
+    },
+    {
+      "id": "pydantic-01",
+      "limit": 5,
+      "all_required_matched": true,
+      "claims": [
+        {
+          "claim_id": "required",
+          "supported": true
+        }
+      ]
+    },
+    {
+      "id": "pydantic-02",
+      "limit": 3,
+      "all_required_matched": true,
+      "claims": [
+        {
+          "claim_id": "required",
+          "supported": true
+        }
+      ]
+    },
+    {
+      "id": "pydantic-02",
+      "limit": 5,
+      "all_required_matched": true,
+      "claims": [
+        {
+          "claim_id": "required",
+          "supported": true
+        }
+      ]
+    },
+    {
+      "id": "pydantic-03",
+      "limit": 3,
+      "all_required_matched": true,
+      "claims": [
+        {
+          "claim_id": "required",
+          "supported": true
+        }
+      ]
+    },
+    {
+      "id": "pydantic-03",
+      "limit": 5,
+      "all_required_matched": true,
+      "claims": [
+        {
+          "claim_id": "required",
+          "supported": true
+        }
+      ]
+    },
+    {
+      "id": "pydantic-04",
+      "limit": 3,
+      "all_required_matched": true,
+      "claims": [
+        {
+          "claim_id": "required",
+          "supported": true
+        }
+      ]
+    },
+    {
+      "id": "pydantic-04",
+      "limit": 5,
+      "all_required_matched": true,
+      "claims": [
+        {
+          "claim_id": "required",
+          "supported": true
+        }
+      ]
+    },
+    {
+      "id": "pydantic-05",
+      "limit": 3,
+      "all_required_matched": true,
+      "claims": [
+        {
+          "claim_id": "required",
+          "supported": true
+        }
+      ]
+    },
+    {
+      "id": "pydantic-05",
+      "limit": 5,
+      "all_required_matched": true,
+      "claims": [
+        {
+          "claim_id": "required",
+          "supported": true
+        }
+      ]
+    },
+    {
+      "id": "pydantic-06",
+      "limit": 3,
+      "all_required_matched": false,
+      "claims": [
+        {
+          "claim_id": "required",
+          "supported": false
+        }
+      ]
+    },
+    {
+      "id": "pydantic-06",
+      "limit": 5,
+      "all_required_matched": false,
+      "claims": [
+        {
+          "claim_id": "required",
+          "supported": false
+        }
+      ]
+    },
+    {
+      "id": "httpx-01",
+      "limit": 3,
+      "all_required_matched": true,
+      "claims": [
+        {
+          "claim_id": "required",
+          "supported": true
+        }
+      ]
+    },
+    {
+      "id": "httpx-01",
+      "limit": 5,
+      "all_required_matched": true,
+      "claims": [
+        {
+          "claim_id": "required",
+          "supported": true
+        }
+      ]
+    },
+    {
+      "id": "httpx-02",
+      "limit": 3,
+      "all_required_matched": true,
+      "claims": [
+        {
+          "claim_id": "required",
+          "supported": true
+        }
+      ]
+    },
+    {
+      "id": "httpx-02",
+      "limit": 5,
+      "all_required_matched": true,
+      "claims": [
+        {
+          "claim_id": "required",
+          "supported": true
+        }
+      ]
+    },
+    {
+      "id": "httpx-03",
+      "limit": 3,
+      "all_required_matched": false,
+      "claims": [
+        {
+          "claim_id": "required",
+          "supported": false
+        }
+      ]
+    },
+    {
+      "id": "httpx-03",
+      "limit": 5,
+      "all_required_matched": false,
+      "claims": [
+        {
+          "claim_id": "required",
+          "supported": false
+        }
+      ]
+    },
+    {
+      "id": "httpx-04",
+      "limit": 3,
+      "all_required_matched": true,
+      "claims": [
+        {
+          "claim_id": "required",
+          "supported": true
+        }
+      ]
+    },
+    {
+      "id": "httpx-04",
+      "limit": 5,
+      "all_required_matched": true,
+      "claims": [
+        {
+          "claim_id": "required",
+          "supported": true
+        }
+      ]
+    },
+    {
+      "id": "httpx-05",
+      "limit": 3,
+      "all_required_matched": true,
+      "claims": [
+        {
+          "claim_id": "required",
+          "supported": true
+        }
+      ]
+    },
+    {
+      "id": "httpx-05",
+      "limit": 5,
+      "all_required_matched": true,
+      "claims": [
+        {
+          "claim_id": "required",
+          "supported": true
+        }
+      ]
+    },
+    {
+      "id": "httpx-06",
+      "limit": 3,
+      "all_required_matched": true,
+      "claims": [
+        {
+          "claim_id": "required",
+          "supported": true
+        }
+      ]
+    },
+    {
+      "id": "httpx-06",
+      "limit": 5,
+      "all_required_matched": true,
+      "claims": [
+        {
+          "claim_id": "required",
+          "supported": true
+        }
+      ]
+    },
+    {
+      "id": "mkdocs-01",
+      "limit": 3,
+      "all_required_matched": true,
+      "claims": [
+        {
+          "claim_id": "required",
+          "supported": true
+        }
+      ]
+    },
+    {
+      "id": "mkdocs-01",
+      "limit": 5,
+      "all_required_matched": true,
+      "claims": [
+        {
+          "claim_id": "required",
+          "supported": true
+        }
+      ]
+    },
+    {
+      "id": "mkdocs-02",
+      "limit": 3,
+      "all_required_matched": true,
+      "claims": [
+        {
+          "claim_id": "required",
+          "supported": true
+        }
+      ]
+    },
+    {
+      "id": "mkdocs-02",
+      "limit": 5,
+      "all_required_matched": true,
+      "claims": [
+        {
+          "claim_id": "required",
+          "supported": true
+        }
+      ]
+    },
+    {
+      "id": "mkdocs-03",
+      "limit": 3,
+      "all_required_matched": true,
+      "claims": [
+        {
+          "claim_id": "required",
+          "supported": true
+        }
+      ]
+    },
+    {
+      "id": "mkdocs-03",
+      "limit": 5,
+      "all_required_matched": true,
+      "claims": [
+        {
+          "claim_id": "required",
+          "supported": true
+        }
+      ]
+    },
+    {
+      "id": "mkdocs-04",
+      "limit": 3,
+      "all_required_matched": true,
+      "claims": [
+        {
+          "claim_id": "required",
+          "supported": true
+        }
+      ]
+    },
+    {
+      "id": "mkdocs-04",
+      "limit": 5,
+      "all_required_matched": true,
+      "claims": [
+        {
+          "claim_id": "required",
+          "supported": true
+        }
+      ]
+    },
+    {
+      "id": "mkdocs-05",
+      "limit": 3,
+      "all_required_matched": true,
+      "claims": [
+        {
+          "claim_id": "required",
+          "supported": true
+        }
+      ]
+    },
+    {
+      "id": "mkdocs-05",
+      "limit": 5,
+      "all_required_matched": true,
+      "claims": [
+        {
+          "claim_id": "required",
+          "supported": true
+        }
+      ]
+    },
+    {
+      "id": "mkdocs-06",
+      "limit": 3,
+      "all_required_matched": false,
+      "claims": [
+        {
+          "claim_id": "required",
+          "supported": false
+        }
+      ]
+    },
+    {
+      "id": "mkdocs-06",
+      "limit": 5,
+      "all_required_matched": false,
+      "claims": [
+        {
+          "claim_id": "required",
+          "supported": false
+        }
+      ]
+    },
+    {
+      "id": "ruff-01",
+      "limit": 3,
+      "all_required_matched": true,
+      "claims": [
+        {
+          "claim_id": "required",
+          "supported": true
+        }
+      ]
+    },
+    {
+      "id": "ruff-01",
+      "limit": 5,
+      "all_required_matched": true,
+      "claims": [
+        {
+          "claim_id": "required",
+          "supported": true
+        }
+      ]
+    },
+    {
+      "id": "ruff-02",
+      "limit": 3,
+      "all_required_matched": true,
+      "claims": [
+        {
+          "claim_id": "required",
+          "supported": true
+        }
+      ]
+    },
+    {
+      "id": "ruff-02",
+      "limit": 5,
+      "all_required_matched": true,
+      "claims": [
+        {
+          "claim_id": "required",
+          "supported": true
+        }
+      ]
+    },
+    {
+      "id": "ruff-03",
+      "limit": 3,
+      "all_required_matched": true,
+      "claims": [
+        {
+          "claim_id": "required",
+          "supported": true
+        }
+      ]
+    },
+    {
+      "id": "ruff-03",
+      "limit": 5,
+      "all_required_matched": true,
+      "claims": [
+        {
+          "claim_id": "required",
+          "supported": true
+        }
+      ]
+    },
+    {
+      "id": "ruff-04",
+      "limit": 3,
+      "all_required_matched": true,
+      "claims": [
+        {
+          "claim_id": "required",
+          "supported": true
+        }
+      ]
+    },
+    {
+      "id": "ruff-04",
+      "limit": 5,
+      "all_required_matched": true,
+      "claims": [
+        {
+          "claim_id": "required",
+          "supported": true
+        }
+      ]
+    },
+    {
+      "id": "ruff-05",
+      "limit": 3,
+      "all_required_matched": true,
+      "claims": [
+        {
+          "claim_id": "required",
+          "supported": true
+        }
+      ]
+    },
+    {
+      "id": "ruff-05",
+      "limit": 5,
+      "all_required_matched": true,
+      "claims": [
+        {
+          "claim_id": "required",
+          "supported": true
+        }
+      ]
+    },
+    {
+      "id": "ruff-06",
+      "limit": 3,
+      "all_required_matched": true,
+      "claims": [
+        {
+          "claim_id": "required",
+          "supported": true
+        }
+      ]
+    },
+    {
+      "id": "ruff-06",
+      "limit": 5,
+      "all_required_matched": true,
+      "claims": [
+        {
+          "claim_id": "required",
+          "supported": true
+        }
+      ]
+    },
+    {
+      "id": "uv-01",
+      "limit": 3,
+      "all_required_matched": true,
+      "claims": [
+        {
+          "claim_id": "required",
+          "supported": true
+        }
+      ]
+    },
+    {
+      "id": "uv-01",
+      "limit": 5,
+      "all_required_matched": true,
+      "claims": [
+        {
+          "claim_id": "required",
+          "supported": true
+        }
+      ]
+    },
+    {
+      "id": "uv-02",
+      "limit": 3,
+      "all_required_matched": false,
+      "claims": [
+        {
+          "claim_id": "required",
+          "supported": false
+        }
+      ]
+    },
+    {
+      "id": "uv-02",
+      "limit": 5,
+      "all_required_matched": false,
+      "claims": [
+        {
+          "claim_id": "required",
+          "supported": false
+        }
+      ]
+    },
+    {
+      "id": "uv-03",
+      "limit": 3,
+      "all_required_matched": true,
+      "claims": [
+        {
+          "claim_id": "required",
+          "supported": true
+        }
+      ]
+    },
+    {
+      "id": "uv-03",
+      "limit": 5,
+      "all_required_matched": true,
+      "claims": [
+        {
+          "claim_id": "required",
+          "supported": true
+        }
+      ]
+    },
+    {
+      "id": "uv-04",
+      "limit": 3,
+      "all_required_matched": true,
+      "claims": [
+        {
+          "claim_id": "required",
+          "supported": true
+        }
+      ]
+    },
+    {
+      "id": "uv-04",
+      "limit": 5,
+      "all_required_matched": true,
+      "claims": [
+        {
+          "claim_id": "required",
+          "supported": true
+        }
+      ]
+    },
+    {
+      "id": "uv-05",
+      "limit": 3,
+      "all_required_matched": true,
+      "claims": [
+        {
+          "claim_id": "required",
+          "supported": true
+        }
+      ]
+    },
+    {
+      "id": "uv-05",
+      "limit": 5,
+      "all_required_matched": true,
+      "claims": [
+        {
+          "claim_id": "required",
+          "supported": true
+        }
+      ]
+    },
+    {
+      "id": "uv-06",
+      "limit": 3,
+      "all_required_matched": true,
+      "claims": [
+        {
+          "claim_id": "required",
+          "supported": true
+        }
+      ]
+    },
+    {
+      "id": "uv-06",
+      "limit": 5,
+      "all_required_matched": true,
+      "claims": [
+        {
+          "claim_id": "required",
+          "supported": true
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,33 @@
+{
+  "id": "starlette-03",
+  "question": "Когда начинается lifespan teardown относительно connections и background tasks?",
+  "library_id": "/kludex/starlette",
+  "request": {
+    "libraryId": "/kludex/starlette",
+    "query": "Когда начинается lifespan teardown относительно connections и background tasks?"
+  },
+  "seconds": 2.5573670769954333,
+  "is_error": false,
+  "wire": {
+    "_meta": null,
+    "content": [
+      {
+        "type": "text",
+        "text": "### Basic lifespan handler with contextlib.asynccontextmanager\n\nSource: https://github.com/kludex/starlette/blob/main/docs/lifespan.md\n\nDefines a lifespan handler that runs startup and shutdown code. The handler must be an async context manager; code before 'yield' runs at startup, code after runs on shutdown. Starlette waits for lifespan completion before serving requests and runs teardown after all connections close and background tasks finish.\n\n```python\nimport contextlib\n\nfrom starlette.applications import Starlette\n\n\n@contextlib.asynccontextmanager\nasync def lifespan(app):\n    async with some_async_resource():\n        print(\"Run at startup!\")\n        yield\n        print(\"Run on shutdown!\")\n\n\nroutes = [\n    ...\n]\n\napp = Starlette(routes=routes, lifespan=lifespan)\n```\n\n### Lifespan\n\nSource: https://github.com/kludex/starlette/blob/main/docs/lifespan.md\n\nStarlette applications can register a lifespan handler for dealing with\ncode that needs to run before the application starts up, or when the application\nis shutting down.\n\nStarlette will not start serving any incoming requests until the lifespan has been run.\n\nThe lifespan teardown will run once all connections have been closed, and\nany in-process background tasks have completed.\n\nConsider using [`anyio.create_task_group()`](https://anyio.readthedocs.io/en/stable/tasks.html)\nfor managing asynchronous tasks.",
+        "annotations": null,
+        "_meta": null
+      }
+    ],
+    "structuredContent": null,
+    "isError": false
+  },
+  "text": "### Basic lifespan handler with contextlib.asynccontextmanager\n\nSource: https://github.com/kludex/starlette/blob/main/docs/lifespan.md\n\nDefines a lifespan handler that runs startup and shutdown code. The handler must be an async context manager; code before 'yield' runs at startup, code after runs on shutdown. Starlette waits for lifespan completion before serving requests and runs teardown after all connections close and background tasks finish.\n\n```python\nimport contextlib\n\nfrom starlette.applications import Starlette\n\n\n@contextlib.asynccontextmanager\nasync def lifespan(app):\n    async with some_async_resource():\n        print(\"Run at startup!\")\n        yield\n        print(\"Run on shutdown!\")\n\n\nroutes = [\n    ...\n]\n\napp = Starlette(routes=routes, lifespan=lifespan)\n```\n\n### Lifespan\n\nSource: https://github.com/kludex/starlette/blob/main/docs/lifespan.md\n\nStarlette applications can register a lifespan handler for dealing with\ncode that needs to run before the application starts up, or when the application\nis shutting down.\n\nStarlette will not start serving any incoming requests until the lifespan has been run.\n\nThe lifespan teardown will run once all connections have been closed, and\nany in-process background tasks have completed.\n\nConsider using [`anyio.create_task_group()`](https://anyio.readthedocs.io/en/stable/tasks.html)\nfor managing asynchronous tasks.",
+  "size": {
+    "utf8_bytes": 1381,
+    "actual_tokens": 287,
+    "tokenizer": "docatlas-offline:o200k_base"
+  },
+  "version_matched": false,
+  "source_matched": false,
+  "semantic_assessment": "manual; separate from frozen witness matching"
+}

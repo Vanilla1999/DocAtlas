@@ -1,0 +1,27 @@
+{
+  "tool": "get_docs_context",
+  "request": {
+    "question": "How can I check that my editor is connected to the intended DocAtlas installation rather than an older executable?",
+    "project_path": "/tmp/opencode/docatlas-ablation",
+    "scope": "all",
+    "lookup_queries": [
+      "How can I verify the installed DocAtlas executable?",
+      "How can I check the installed Docs MCP connection?"
+    ]
+  },
+  "seconds": 2.1286372059985297,
+  "is_error": false,
+  "wire": {
+    "_meta": null,
+    "content": [
+      {
+        "type": "text",
+        "text": "{\"status\": \"ok\", \"kind\": \"docs_context\", \"context_status\": \"ready\", \"context_available\": true, \"answer_supported\": false, \"answer_available\": false, \"support_status\": \"retrieval_only\", \"answer_policy\": \"cite_only\", \"coverage_policy\": \"retrieval_attribution_only\", \"query_coverage\": \"partial\", \"retrieval_coverage\": \"partial\", \"facet_coverage\": \"unverified\", \"covered_query_ids\": [\"query-lookup-1\", \"query-lookup-2\"], \"missing_query_ids\": [\"query-original\"], \"missing_facets\": [], \"facets\": [{\"id\": \"intent-context:installation_verification\", \"requirement_id\": null, \"question\": \"DocAtlas install command line help\", \"status\": \"retrieval_only\", \"evidence_ids\": [\"ev-848dea5ff0c19302\"]}], \"sources\": [{\"evidence_id\": \"ev-848dea5ff0c19302\", \"path_or_url\": \"README.md\", \"section\": \"DocAtlas > One-line install\", \"snippet\": \"## One-line install\\n\\nInstall `uv`, the `doc-atlas` CLI, and register the docs MCP server into your agent — in a single command:\\n\\n```bash\\ncurl -LsSf https://raw.githubusercontent.com/Vanilla1999/DocAtlas/main/scripts/install.sh | sh\\n```\", \"version_binding\": \"unversioned\", \"content_sha256\": \"f7116d0a99f8fb65dfcc8bb15e90a66be84ac4f968faacf117ce7b7bb58d1fda\", \"project_identity\": \"local:48277f62f8b4ff92ba1c60c082f92a43817f9e1c5ba4ea27e12cd77a76421585\", \"authority\": \"source_of_truth\", \"scope\": \"project\", \"line_start\": 70, \"line_end\": 76}, {\"evidence_id\": \"ev-5cbb2a113ae23e4a\", \"path_or_url\": \"docs/mcp-docs-server.md\", \"section\": \"Docs MCP server > Release and support\", \"snippet\": \"The PyPI package is `doc-atlas`; the Python import namespace remains `docmancer`. Check the installed version before relying on a workflow documented on `main`.\\n\\nBefore a release, follow [the release checklist](./RELEASE_CHECKLIST.md). The release gate verifies the installed wheel's primary Docs MCP flow rather than only an editable checkout.\", \"version_binding\": \"unversioned\", \"content_sha256\": \"f67fccaba7fa71bd2c7d909a90550818786074b6cfaee8b4a200a6afe33c6cdf\", \"project_identity\": \"local:48277f62f8b4ff92ba1c60c082f92a43817f9e1c5ba4ea27e12cd77a76421585\", \"authority\": \"source_of_truth\", \"scope\": \"project\", \"line_start\": 95, \"line_end\": 97}, {\"evidence_id\": \"ev-d4590446882e1d20\", \"path_or_url\": \"docs/security/mcp-runtime-threat-model.md\", \"section\": \"MCP runtime threat model > Non-goals\", \"snippet\": \"- proving that an installed executable pack is benign;\", \"version_binding\": \"unversioned\", \"content_sha256\": \"889936c7bccbcb5447662a8959be196888d628a76d6b1b1bb9386eef73d02cfa\", \"project_identity\": \"local:48277f62f8b4ff92ba1c60c082f92a43817f9e1c5ba4ea27e12cd77a76421585\", \"authority\": \"supporting\", \"scope\": \"project\", \"line_start\": 81, \"line_end\": 81}], \"context_quality\": {\"status\": \"unverified\", \"reasons\": [\"coverage_unverified\"]}, \"read_next\": [], \"edit_ready\": false, \"investigation_allowed\": true, \"estimated_tokens\": 683}",
+        "annotations": null,
+        "_meta": null
+      }
+    ],
+    "structuredContent": null,
+    "isError": false
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "ids": [
+    "fastapi-02",
+    "fastapi-04",
+    "starlette-03",
+    "typer-01",
+    "pydantic-02",
+    "pydantic-03",
+    "httpx-03",
+    "mkdocs-05",
+    "ruff-01",
+    "uv-05"
+  ],
+  "note": "Hand-selected development diagnostics; hosted current corpus is not pinned upstream snapshot. No answer model."
+}

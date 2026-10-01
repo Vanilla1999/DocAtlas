@@ -1,0 +1,23 @@
+{
+  "tool": "get_docs_context",
+  "request": {
+    "question": "Which MCP tools should my coding agent see, and which one prepares a repository for questions?",
+    "project_path": "/tmp/opencode/docatlas-ablation",
+    "scope": "all"
+  },
+  "seconds": 1.206350635002309,
+  "is_error": false,
+  "wire": {
+    "_meta": null,
+    "content": [
+      {
+        "type": "text",
+        "text": "{\"status\": \"ok\", \"kind\": \"docs_context\", \"context_status\": \"ready\", \"context_available\": true, \"answer_supported\": false, \"answer_available\": false, \"support_status\": \"retrieval_only\", \"answer_policy\": \"cite_only\", \"coverage_policy\": \"retrieval_attribution_only\", \"query_coverage\": \"full\", \"retrieval_coverage\": \"full\", \"facet_coverage\": \"unverified\", \"covered_query_ids\": [\"query-original\"], \"missing_query_ids\": [], \"missing_facets\": [], \"facets\": [], \"sources\": [{\"evidence_id\": \"ev-fb8195e3bcc94c7d\", \"path_or_url\": \"docs/project-docs-mcp-workflow.md\", \"section\": \"Project docs MCP workflow > Creating `ARCHITECTURE.md`\", \"snippet\": \"If approved, the coding agent should:\\n\\n1. inspect the codebase;\\n2. write `ARCHITECTURE.md` as a normal repository file;\\n3. call `get_docs_context` for the original question;\\n4. run its returned `prepare_docs(action=\\\"sync_project_docs\\\")` action when requested;\\n5. retry the original `get_docs_context(scope=\\\"all\\\", question=...)` question unchanged.\", \"version_binding\": \"unversioned\", \"content_sha256\": \"2f38deda9e006670fc289786d3d5fe037152b1bed85c3bb542f7348244bbc7b2\", \"project_identity\": \"local:48277f62f8b4ff92ba1c60c082f92a43817f9e1c5ba4ea27e12cd77a76421585\", \"authority\": \"source_of_truth\", \"scope\": \"project\", \"line_start\": 160, \"line_end\": 166}, {\"evidence_id\": \"ev-8555f13ce0818b33\", \"path_or_url\": \"docs/context7-docmancer-comparison.md\", \"section\": \"DocAtlas MCP vs Context7 — comparison report > Product interpretation > DocAtlas MCP's best lane\", \"snippet\": \"It is particularly valuable when:\\n\\n- the repository has README/docs/ADR/wiki that should guide the answer;\\n- dependency versions matter;\\n- private/local docs are involved;\\n- the agent will ask many related docs questions during a coding task;\\n- offline/reproducible docs context matters;\\n- token budget needs to be managed explicitly.\", \"version_binding\": \"unversioned\", \"content_sha256\": \"1d74f0146fbd906c3c5fef801f925123035baae50aac47342437f578b4ef4fb5\", \"project_identity\": \"local:48277f62f8b4ff92ba1c60c082f92a43817f9e1c5ba4ea27e12cd77a76421585\", \"authority\": \"supporting\", \"scope\": \"project\", \"line_start\": 224, \"line_end\": 231}, {\"evidence_id\": \"ev-32f41c85e7d6a0ef\", \"path_or_url\": \"wiki/Architecture.md\", \"section\": \"Architecture > Docs MCP runtime\", \"snippet\": \"For repository coding and patch tasks, agents call `get_docs_context(project_path=..., question=...)` first.\", \"version_binding\": \"unversioned\", \"content_sha256\": \"d45f79d56e94fc635cc84e05381842de498a60b830e75de49f192f8f234812b4\", \"project_identity\": \"local:48277f62f8b4ff92ba1c60c082f92a43817f9e1c5ba4ea27e12cd77a76421585\", \"authority\": \"source_of_truth\", \"scope\": \"project\", \"line_start\": 108, \"line_end\": 108}], \"context_quality\": {\"status\": \"unverified\", \"reasons\": [\"coverage_unverified\", \"budget_limited\"]}, \"read_next\": [], \"edit_ready\": false, \"investigation_allowed\": true, \"estimated_tokens\": 699}",
+        "annotations": null,
+        "_meta": null
+      }
+    ],
+    "structuredContent": null,
+    "isError": false
+  }
+}

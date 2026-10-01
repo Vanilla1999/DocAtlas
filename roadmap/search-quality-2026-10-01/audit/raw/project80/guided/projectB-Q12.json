@@ -1,0 +1,26 @@
+{
+  "tool": "get_docs_context",
+  "request": {
+    "question": "Does requesting cancellation prove that a background job has stopped?",
+    "project_path": "/tmp/opencode/docatlas-ablation",
+    "scope": "all",
+    "lookup_queries": [
+      "How are cancellation requests distinguished from terminal job states?"
+    ]
+  },
+  "seconds": 0.8103053910017479,
+  "is_error": false,
+  "wire": {
+    "_meta": null,
+    "content": [
+      {
+        "type": "text",
+        "text": "{\"status\": \"ok\", \"kind\": \"docs_context\", \"context_status\": \"ready\", \"context_available\": true, \"answer_supported\": false, \"answer_available\": false, \"support_status\": \"retrieval_only\", \"answer_policy\": \"cite_only\", \"coverage_policy\": \"retrieval_attribution_only\", \"query_coverage\": \"full\", \"retrieval_coverage\": \"full\", \"facet_coverage\": \"unverified\", \"covered_query_ids\": [\"query-original\", \"query-lookup-1\"], \"missing_query_ids\": [], \"missing_facets\": [], \"facets\": [], \"sources\": [{\"evidence_id\": \"ev-9c4e4bc207583e17\", \"path_or_url\": \"docs/grounded-host-session.md\", \"section\": \"Grounded host sessions over MCP > Partial answers and source reads\", \"snippet\": \"The host reads the returned snippets and assesses whether a requested fact is\\nsupported. `support(fact_id, evidence_id=..., quote=...)` accepts only a verbatim\\nquote from retained evidence. A matching quote binds the judgment to a source;\\nit does not prove that the quote logically answers the question. Semantic\\nassessment remains the host's responsibility.\", \"version_binding\": \"unversioned\", \"content_sha256\": \"51d4ac03bfd81bcaca873455dd1c81acf7ec6f79e96985c220eba0d19bb974ad\", \"project_identity\": \"local:48277f62f8b4ff92ba1c60c082f92a43817f9e1c5ba4ea27e12cd77a76421585\", \"authority\": \"source_of_truth\", \"scope\": \"module\", \"line_start\": 16, \"line_end\": 20, \"source_uri\": \"docatlas://source/ccb96648a21378df3a40ed9a\"}, {\"evidence_id\": \"ev-dc5d905e058935e0\", \"path_or_url\": \"docs/source-continuation.md\", \"section\": \"Grounded partial answers and source continuation > Evidence delivery > Job cancellation and bounded retry\", \"snippet\": \"Inspect a returned job with `docs_status(action=\\\"job\\\", job_id=...)`. A requested\\ncancellation uses `prepare_docs(action=\\\"cancel_docs_job\\\", job_id=...)` and may\\nreturn `cancelling`; this is an acknowledgement, not a terminal state. Poll the\\nsame job with a bounded attempt/deadline policy. Terminal job statuses are\\n`succeeded`, `partial`, `failed`, `cancelled`, and `interrupted`. A committing job\\nmay be too late to cancel safely. Read the actual terminal result before deciding\\nwhether to retry; never start an unbounded resubmit/poll loop. Retry the original\\ndocumentation question after a successful preparation, preserving explicit scope.\", \"version_binding\": \"unversioned\", \"content_sha256\": \"d94756750885510547488a819d38855181f26ab7c89ab06c183ef5446206f835\", \"project_identity\": \"local:48277f62f8b4ff92ba1c60c082f92a43817f9e1c5ba4ea27e12cd77a76421585\", \"authority\": \"source_of_truth\", \"scope\": \"module\", \"line_start\": 62, \"line_end\": 69, \"source_uri\": \"docatlas://source/fb2f8dd9f6875c0a3b38692b\"}], \"context_quality\": {\"status\": \"unverified\", \"reasons\": [\"coverage_unverified\", \"budget_limited\"]}, \"read_next\": [], \"edit_ready\": false, \"investigation_allowed\": true, \"estimated_tokens\": 681}",
+        "annotations": null,
+        "_meta": null
+      }
+    ],
+    "structuredContent": null,
+    "isError": false
+  }
+}

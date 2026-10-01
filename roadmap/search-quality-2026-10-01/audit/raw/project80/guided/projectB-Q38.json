@@ -1,0 +1,26 @@
+{
+  "tool": "get_docs_context",
+  "request": {
+    "question": "Which document guarantees that every query receives a complete correct answer?",
+    "project_path": "/tmp/opencode/docatlas-ablation",
+    "scope": "all",
+    "lookup_queries": [
+      "Does the product guarantee universally complete and correct answers?"
+    ]
+  },
+  "seconds": 0.8868698890000815,
+  "is_error": false,
+  "wire": {
+    "_meta": null,
+    "content": [
+      {
+        "type": "text",
+        "text": "{\"status\": \"ok\", \"kind\": \"docs_context\", \"context_status\": \"ready\", \"context_available\": true, \"answer_supported\": false, \"answer_available\": false, \"support_status\": \"retrieval_only\", \"answer_policy\": \"cite_only\", \"coverage_policy\": \"retrieval_attribution_only\", \"query_coverage\": \"partial\", \"retrieval_coverage\": \"partial\", \"facet_coverage\": \"unverified\", \"covered_query_ids\": [], \"missing_query_ids\": [\"query-original\", \"query-lookup-1\"], \"missing_facets\": [], \"facets\": [], \"sources\": [{\"evidence_id\": \"ev-6ec9ec0fa9f1534a\", \"path_or_url\": \"docs/source-continuation.md\", \"section\": \"Grounded partial answers and source continuation > Evidence delivery\", \"snippet\": \"Structured-aware clients consume `structuredContent` once. Text-only clients can\\nuse `DOCATLAS_MCP_TEXT_FALLBACK=1`; unsupported delivery must be diagnosed rather\\nthan treating a marker as evidence. Do not duplicate the complete payload across\\nboth model-input channels. Engineering gates establish their tested boundaries. They do not establish\\nunmeasured product guarantees or task-token savings. Keep any unsupported claim\\nunproved unless a current authoritative source actually establishes it.\", \"version_binding\": \"unversioned\", \"content_sha256\": \"59f1241999475d021d1d6e043949e9e901318baedf1bacd264704342b525ca79\", \"project_identity\": \"local:48277f62f8b4ff92ba1c60c082f92a43817f9e1c5ba4ea27e12cd77a76421585\", \"authority\": \"source_of_truth\", \"scope\": \"module\", \"line_start\": 52, \"line_end\": 57, \"source_uri\": \"docatlas://source/bcde71468e1b9aa2bd386e51\"}], \"context_quality\": {\"status\": \"unverified\", \"reasons\": [\"coverage_unverified\"]}, \"read_next\": [], \"edit_ready\": false, \"investigation_allowed\": true, \"estimated_tokens\": 410}",
+        "annotations": null,
+        "_meta": null
+      }
+    ],
+    "structuredContent": null,
+    "isError": false
+  }
+}

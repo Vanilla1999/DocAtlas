@@ -1,0 +1,23 @@
+{
+  "tool": "get_docs_context",
+  "request": {
+    "question": "How are parent and child document chunks related, and when may a retrieved chunk expand to surrounding text?",
+    "project_path": "/tmp/opencode/docatlas-ablation",
+    "scope": "all"
+  },
+  "seconds": 0.9726035879939445,
+  "is_error": false,
+  "wire": {
+    "_meta": null,
+    "content": [
+      {
+        "type": "text",
+        "text": "{\"status\": \"ok\", \"kind\": \"docs_context\", \"context_status\": \"ready\", \"context_available\": true, \"answer_supported\": false, \"answer_available\": false, \"support_status\": \"retrieval_only\", \"answer_policy\": \"cite_only\", \"coverage_policy\": \"retrieval_attribution_only\", \"query_coverage\": \"partial\", \"retrieval_coverage\": \"partial\", \"facet_coverage\": \"unverified\", \"covered_query_ids\": [], \"missing_query_ids\": [\"query-original\"], \"missing_facets\": [], \"facets\": [{\"id\": \"intent-context:index_chunking\", \"requirement_id\": null, \"question\": \"documentation headings semantic parent sections\", \"status\": \"retrieval_only\", \"evidence_ids\": [\"ev-e1b850334f3074a9\"]}], \"sources\": [{\"evidence_id\": \"ev-e1b850334f3074a9\", \"path_or_url\": \"wiki/Architecture.md\", \"section\": \"Architecture > Indexing\", \"snippet\": \"Markdown indexing first normalizes fetched or local documentation into semantic parent sections based on heading structure. The production `parent-child-v1` chunker then splits each parent section into token-bounded child chunks (target 160 estimated visible tokens, hard maximum 512, zero visible overlap) while preserving the parent identity and source offsets. Retrieval ranks those child chunks and can hydrate parent or adjacent context without changing the exact display text.\\n\\nEach section/chunk identity is stored in SQLite with its title, heading path, source URL, content hash, offsets, and token estimate. A FTS5 virtual table indexes retrieval text for fast full-text search. Extracted markdown and JSON files are written to `.docmancer/extracted/` so the indexed content is always inspectable on disk.\", \"version_binding\": \"unversioned\", \"content_sha256\": \"a34ee6fdfa629c4a3a97acacc73afe64a1a8fcfa4a0fd871922cd0a5bb1ce0f6\", \"project_identity\": \"local:48277f62f8b4ff92ba1c60c082f92a43817f9e1c5ba4ea27e12cd77a76421585\", \"line_start\": 15, \"line_end\": 17, \"authority\": \"source_of_truth\", \"scope\": \"project\", \"source_uri\": \"docatlas://source/6f19b82f791d689b52d9291f\"}, {\"evidence_id\": \"ev-2e37682e3d93fc88\", \"path_or_url\": \"wiki/Architecture.md\", \"section\": \"Architecture\", \"snippet\": \"DocAtlas is a local, version-aware documentation runtime for coding agents. Its primary product workflow is **DocAtlas Docs**; **DocAtlas MCP Packs** is a separate advanced API-action surface.\", \"version_binding\": \"unversioned\", \"content_sha256\": \"867b1115e2a6265168b1081a062f488e735c3675f1ec1e3f1186b0d4268fbd20\", \"project_identity\": \"local:48277f62f8b4ff92ba1c60c082f92a43817f9e1c5ba4ea27e12cd77a76421585\", \"line_start\": 3, \"line_end\": 3, \"authority\": \"source_of_truth\", \"scope\": \"project\", \"source_uri\": \"docatlas://source/eeb763d283106b1c80f7d387\"}], \"context_quality\": {\"status\": \"unverified\", \"reasons\": [\"coverage_unverified\"]}, \"read_next\": [], \"edit_ready\": false, \"investigation_allowed\": true, \"estimated_tokens\": 680}",
+        "annotations": null,
+        "_meta": null
+      }
+    ],
+    "structuredContent": null,
+    "isError": false
+  }
+}

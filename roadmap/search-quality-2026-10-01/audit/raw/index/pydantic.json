@@ -1,0 +1,422 @@
+{
+  "db_path": "/tmp/opencode/search-audit-work-20261001/fixtures/pydantic/.docatlas/docatlas.db",
+  "counts": {
+    "sources": 2,
+    "retrieval_children": 57,
+    "retrieval_parents": 18
+  },
+  "integrity_check": "ok",
+  "manifest": [
+    {
+      "path": "docs/concepts/alias.md",
+      "sha256": "0c65c7fddc78232eb17b34def5383402e8c2df715da9935ba3d97a98277233e0",
+      "bytes": 6864
+    },
+    {
+      "path": "docs/concepts/strict_mode.md",
+      "sha256": "06e00a3e114c85ff31286640cb9842a99209d4112d5cb4812b47d4bf556f2b71",
+      "bytes": 14364
+    }
+  ],
+  "rows": [
+    {
+      "stable_chunk_id": "child-c4ab8fec6806433e731e68c4c74bb7a902e907a5",
+      "source_path": "docs/concepts/alias.md",
+      "display_text": "An alias is an alternative name for a field, used when serializing and deserializing data.\n\n",
+      "line_start": 1,
+      "line_end": 2
+    },
+    {
+      "stable_chunk_id": "child-1d46a77e9dfd3e564a0f84ea09bcef2f259e7b7d",
+      "source_path": "docs/concepts/alias.md",
+      "display_text": "You can specify an alias in the following ways:\n\n* `alias` on the [`Field`][pydantic.fields.Field]\n    * must be a `str`\n* `validation_alias` on the [`Field`][pydantic.fields.Field]\n    * can be an instance of `str`, [`AliasPath`][pydantic.aliases.AliasPath], or [`AliasChoices`][pydantic.aliases.AliasChoices]\n* `serialization_alias` on the [`Field`][pydantic.fields.Field]\n    * must be a `str`\n* `alias_generator` on the [`Config`][pydantic.config.ConfigDict.alias_generator]\n    * can be a callable or an instance of [`AliasGenerator`][pydantic.aliases.AliasGenerator]\n\n",
+      "line_start": 3,
+      "line_end": 13
+    },
+    {
+      "stable_chunk_id": "child-9ac17c6f7beb686256480bb5ff9a54b14edd813d",
+      "source_path": "docs/concepts/alias.md",
+      "display_text": "For examples of how to use `alias`, `validation_alias`, and `serialization_alias`, see [Field aliases](../concepts/fields.md#field-aliases).\n\n",
+      "line_start": 14,
+      "line_end": 15
+    },
+    {
+      "stable_chunk_id": "child-849507c8e0e15423b606adedbb4e029811c483bd",
+      "source_path": "docs/concepts/alias.md",
+      "display_text": "## `AliasPath` and `AliasChoices`\n\n??? api \"API Documentation\"\n\n    [`pydantic.aliases.AliasPath`][pydantic.aliases.AliasPath]<br>\n    [`pydantic.aliases.AliasChoices`][pydantic.aliases.AliasChoices]<br>\n\nPydantic provides two special types for convenience when using `validation_alias`: `AliasPath` and `AliasChoices`.\n\nThe `AliasPath` is used to specify a path to a field using aliases. For example:\n\n",
+      "line_start": 16,
+      "line_end": 26
+    },
+    {
+      "stable_chunk_id": "child-a28cb9f5d14c2a2fcc4efd0cf3c288f67e1a74ee",
+      "source_path": "docs/concepts/alias.md",
+      "display_text": "```py lint=\"skip\"\nfrom pydantic import BaseModel, Field, AliasPath\n\n\nclass User(BaseModel):\n    first_name: str = Field(validation_alias=AliasPath('names', 0))\n    last_name: str = Field(validation_alias=AliasPath('names', 1))\n\nuser = User.model_validate({'names': ['John', 'Doe']})  # (1)!\nprint(user)\n#> first_name='John' last_name='Doe'\n```\n\n1. We are using `model_validate` to validate a dictionary using the field aliases.\n\n",
+      "line_start": 27,
+      "line_end": 41
+    },
+    {
+      "stable_chunk_id": "child-0467fe3a181092a6b195ef0f726b0475e4f413cc",
+      "source_path": "docs/concepts/alias.md",
+      "display_text": "    You can see more details about [`model_validate`][pydantic.main.BaseModel.model_validate] in the API reference.\n\nIn the `'first_name'` field, we are using the alias `'names'` and the index `0` to specify the path to the first name.\nIn the `'last_name'` field, we are using the alias `'names'` and the index `1` to specify the path to the last name.\n\n`AliasChoices` is used to specify a choice of aliases. For example:\n\n",
+      "line_start": 42,
+      "line_end": 48
+    },
+    {
+      "stable_chunk_id": "child-b3661db5a12c1d8ab8d14f2a01427c49d06074c8",
+      "source_path": "docs/concepts/alias.md",
+      "display_text": "```py lint=\"skip\"\nfrom pydantic import BaseModel, Field, AliasChoices\n\n\nclass User(BaseModel):\n    first_name: str = Field(validation_alias=AliasChoices('first_name', 'fname'))\n    last_name: str = Field(validation_alias=AliasChoices('last_name', 'lname'))\n\nuser = User.model_validate({'fname': 'John', 'lname': 'Doe'})  # (1)!\nprint(user)\n#> first_name='John' last_name='Doe'\nuser = User.model_validate({'first_name': 'John', 'lname': 'Doe'})  # (2)!\nprint(user)\n#> first_name='John' last_name='Doe'\n```\n\n",
+      "line_start": 49,
+      "line_end": 64
+    },
+    {
+      "stable_chunk_id": "child-4f92a8eeaee628ccbdcf88520467405ac3eaae9b",
+      "source_path": "docs/concepts/alias.md",
+      "display_text": "1. We are using the second alias choice for both fields.\n2. We are using the first alias choice for the field `'first_name'` and the second alias choice\n   for the field `'last_name'`.\n\nYou can also use `AliasChoices` with `AliasPath`:\n\n",
+      "line_start": 65,
+      "line_end": 70
+    },
+    {
+      "stable_chunk_id": "child-188399ca9809879d915e4c2e3e207268c8fa0151",
+      "source_path": "docs/concepts/alias.md",
+      "display_text": "```py lint=\"skip\"\nfrom pydantic import BaseModel, Field, AliasPath, AliasChoices\n\n\nclass User(BaseModel):\n    first_name: str = Field(validation_alias=AliasChoices('first_name', AliasPath('names', 0)))\n    last_name: str = Field(validation_alias=AliasChoices('last_name', AliasPath('names', 1)))\n\n\nuser = User.model_validate({'first_name': 'John', 'last_name': 'Doe'})\nprint(user)\n#> first_name='John' last_name='Doe'\nuser = User.model_validate({'names': ['John', 'Doe']})\nprint(user)\n#> first_name='John' last_name='Doe'\nuser = User.model_validate({'names': ['John'], 'last_name': 'Doe'})\nprint(user)\n#> first_name='John' last_name='Doe'\n```\n\n",
+      "line_start": 71,
+      "line_end": 90
+    },
+    {
+      "stable_chunk_id": "child-a89013c82e5f6fe88ea7a2ba7df21de5badac334",
+      "source_path": "docs/concepts/alias.md",
+      "display_text": "## Using alias generators\n\nYou can use the `alias_generator` parameter of [`Config`][pydantic.config.ConfigDict.alias_generator] to specify\na callable (or group of callables, via `AliasGenerator`) that will generate aliases for all fields in a model.\nThis is useful if you want to use a consistent naming convention for all fields in a model, but do not\nwant to specify the alias for each field individually.\n\n",
+      "line_start": 91,
+      "line_end": 97
+    },
+    {
+      "stable_chunk_id": "child-a4a7da7c86762b0d95b54ea99dc848d9d28c903c",
+      "source_path": "docs/concepts/alias.md",
+      "display_text": "!!! note\n    Pydantic offers three built-in alias generators that you can use out of the box:\n\n    [`to_pascal`][pydantic.alias_generators.to_pascal]<br>\n    [`to_camel`][pydantic.alias_generators.to_camel]<br>\n    [`to_snake`][pydantic.alias_generators.to_snake]<br>\n\n\n",
+      "line_start": 98,
+      "line_end": 105
+    },
+    {
+      "stable_chunk_id": "child-9065800dae91e4b92807fa9cb1d5026ebb1b0997",
+      "source_path": "docs/concepts/alias.md",
+      "display_text": "### Using a callable\n\nHere's a basic example using a callable:\n\n```py\nfrom pydantic import BaseModel, ConfigDict\n\n\nclass Tree(BaseModel):\n    model_config = ConfigDict(\n        alias_generator=lambda field_name: field_name.upper()\n    )\n\n    age: int\n    height: float\n    kind: str\n\n\nt = Tree.model_validate({'AGE': 12, 'HEIGHT': 1.2, 'KIND': 'oak'})\nprint(t.model_dump(by_alias=True))\n#> {'AGE': 12, 'HEIGHT': 1.2, 'KIND': 'oak'}\n```\n\n",
+      "line_start": 106,
+      "line_end": 128
+    },
+    {
+      "stable_chunk_id": "child-4d7d81f1262206c0698119593d421510a20bd21c",
+      "source_path": "docs/concepts/alias.md",
+      "display_text": "### Using an `AliasGenerator`\n\n??? api \"API Documentation\"\n\n    [`pydantic.aliases.AliasGenerator`][pydantic.aliases.AliasGenerator]<br>\n\n\n`AliasGenerator` is a class that allows you to specify multiple alias generators for a model.\nYou can use an `AliasGenerator` to specify different alias generators for validation and serialization.\n\n",
+      "line_start": 129,
+      "line_end": 138
+    },
+    {
+      "stable_chunk_id": "child-d91bce6d9e19fa4ccbf1634fb487d0af2235e7ac",
+      "source_path": "docs/concepts/alias.md",
+      "display_text": "This is particularly useful if you need to use different naming conventions for loading and saving data,\nbut you don't want to specify the validation and serialization aliases for each field individually.\n\nFor example:\n\n",
+      "line_start": 139,
+      "line_end": 143
+    },
+    {
+      "stable_chunk_id": "child-fd9e5739318c878cc434c0928ccd97541682e1c9",
+      "source_path": "docs/concepts/alias.md",
+      "display_text": "```py\nfrom pydantic import AliasGenerator, BaseModel, ConfigDict\n\n\nclass Tree(BaseModel):\n    model_config = ConfigDict(\n        alias_generator=AliasGenerator(\n            validation_alias=lambda field_name: field_name.upper(),\n            serialization_alias=lambda field_name: field_name.title(),\n        )\n    )\n\n    age: int\n    height: float\n    kind: str\n\n\nt = Tree.model_validate({'AGE': 12, 'HEIGHT': 1.2, 'KIND': 'oak'})\nprint(t.model_dump(by_alias=True))\n#> {'Age': 12, 'Height': 1.2, 'Kind': 'oak'}\n```\n\n",
+      "line_start": 144,
+      "line_end": 165
+    },
+    {
+      "stable_chunk_id": "child-742228cd5924dfb30e464e6aa31d4d27ab413ee8",
+      "source_path": "docs/concepts/alias.md",
+      "display_text": "## Alias Precedence\n\nIf you specify an `alias` on the [`Field`][pydantic.fields.Field], it will take precedence over the generated alias by default:\n\n",
+      "line_start": 166,
+      "line_end": 169
+    },
+    {
+      "stable_chunk_id": "child-8ab06ed326604bd78d0bfe89776aaf235fc7eb20",
+      "source_path": "docs/concepts/alias.md",
+      "display_text": "```py\nfrom pydantic import BaseModel, ConfigDict, Field\n\n\ndef to_camel(string: str) -> str:\n    return ''.join(word.capitalize() for word in string.split('_'))\n\n\nclass Voice(BaseModel):\n    model_config = ConfigDict(alias_generator=to_camel)\n\n    name: str\n    language_code: str = Field(alias='lang')\n\n\nvoice = Voice(Name='Filiz', lang='tr-TR')\nprint(voice.language_code)\n#> tr-TR\nprint(voice.model_dump(by_alias=True))\n#> {'Name': 'Filiz', 'lang': 'tr-TR'}\n```\n\n",
+      "line_start": 170,
+      "line_end": 191
+    },
+    {
+      "stable_chunk_id": "child-250a42c7dad69cae69055acd362e171977aa8429",
+      "source_path": "docs/concepts/alias.md",
+      "display_text": "### Alias Priority\n\nYou may set `alias_priority` on a field to change this behavior:\n\n* `alias_priority=2` the alias will *not* be overridden by the alias generator.\n* `alias_priority=1` the alias *will* be overridden by the alias generator.\n* `alias_priority` not set:\n    * alias is set: the alias will *not* be overridden by the alias generator.\n    * alias is not set: the alias *will* be overridden by the alias generator.\n\n",
+      "line_start": 192,
+      "line_end": 201
+    },
+    {
+      "stable_chunk_id": "child-84ee9f53442294bbe7d393ae45632eba44cb79c5",
+      "source_path": "docs/concepts/alias.md",
+      "display_text": "The same precedence applies to `validation_alias` and `serialization_alias`.\nSee more about the different field aliases under [field aliases](../concepts/fields.md#field-aliases).\n",
+      "line_start": 202,
+      "line_end": 203
+    },
+    {
+      "stable_chunk_id": "child-37a709de964eaa0181103d795ff7b630525d1aae",
+      "source_path": "docs/concepts/strict_mode.md",
+      "display_text": "??? api \"API Documentation\"\n    [`pydantic.types.Strict`][pydantic.types.Strict]<br>\n\nBy default, Pydantic will attempt to coerce values to the desired type when possible.\nFor example, you can pass the string `\"123\"` as the input to an `int` field, and it will be converted to `123`.\nThis coercion behavior is useful in many scenarios — think: UUIDs, URL parameters, HTTP headers, environment variables,\nuser input, etc.\n\n",
+      "line_start": 1,
+      "line_end": 8
+    },
+    {
+      "stable_chunk_id": "child-ef0389fc71cd0455e8a1c0d64ddea27aff2d0213",
+      "source_path": "docs/concepts/strict_mode.md",
+      "display_text": "However, there are also situations where this is not desirable, and you want Pydantic to error instead of coercing data.\n\nTo better support this use case, Pydantic provides a \"strict mode\" that can be enabled on a per-model, per-field, or\neven per-validation-call basis. When strict mode is enabled, Pydantic will be much less lenient when coercing data,\nand will instead error if the data is not of the correct type.\n\n",
+      "line_start": 9,
+      "line_end": 14
+    },
+    {
+      "stable_chunk_id": "child-2d73398934f930949085b008767736f938755663",
+      "source_path": "docs/concepts/strict_mode.md",
+      "display_text": "Here is a brief example showing the difference between validation behavior in strict and the default/\"lax\" mode:\n\n",
+      "line_start": 15,
+      "line_end": 16
+    },
+    {
+      "stable_chunk_id": "child-b3ef0f066754246eab9cd3d4535769c7e4f725d2",
+      "source_path": "docs/concepts/strict_mode.md",
+      "display_text": "```py\nfrom pydantic import BaseModel, ValidationError\n\n\nclass MyModel(BaseModel):\n    x: int\n\n\nprint(MyModel.model_validate({'x': '123'}))  # lax mode\n#> x=123\n\ntry:\n    MyModel.model_validate({'x': '123'}, strict=True)  # strict mode\nexcept ValidationError as exc:\n    print(exc)\n    \"\"\"\n    1 validation error for MyModel\n    x\n      Input should be a valid integer [type=int_type, input_value='123', input_type=str]\n    \"\"\"\n```\n\n",
+      "line_start": 17,
+      "line_end": 38
+    },
+    {
+      "stable_chunk_id": "child-04b9ad57c14a005141e7b60bc7dfde6d5d678135",
+      "source_path": "docs/concepts/strict_mode.md",
+      "display_text": "There are various ways to get strict-mode validation while using Pydantic, which will be discussed in more detail below:\n\n* [Passing `strict=True` to the validation methods](#strict-mode-in-method-calls), such as `BaseModel.model_validate`,\n  `TypeAdapter.validate_python`, and similar for JSON\n* [Using `Field(strict=True)`](#strict-mode-with-field) with fields of a `BaseModel`, `dataclass`, or `TypedDict`\n* [Using `pydantic.types.Strict` as a type annotation](#strict-mode-with-annotated-strict) on a field\n  * Pydantic provides some type aliases that are already annotated with `Strict`, such as `pydantic.types.StrictInt`\n* [Using `ConfigDict(strict=True)`](#strict-mode-with-configdict)\n\n",
+      "line_start": 39,
+      "line_end": 47
+    },
+    {
+      "stable_chunk_id": "child-a70dac54b1eedb955703a8c42efadeabb80e18c8",
+      "source_path": "docs/concepts/strict_mode.md",
+      "display_text": "## Type coercions in strict mode\n\nFor most types, when validating data from python in strict mode, only the instances of the exact types are accepted.\nFor example, when validating an `int` field, only instances of `int` are accepted; passing instances of `float` or `str`\nwill result in raising a `ValidationError`.\n\n",
+      "line_start": 48,
+      "line_end": 53
+    },
+    {
+      "stable_chunk_id": "child-f603cc85add0569dd47cf593bcf1a7eddbe5fe66",
+      "source_path": "docs/concepts/strict_mode.md",
+      "display_text": "Note that we are looser when validating data from JSON in strict mode. For example, when validating a `UUID` field,\ninstances of `str` will be accepted when validating from JSON, but not from python:\n\n",
+      "line_start": 54,
+      "line_end": 56
+    },
+    {
+      "stable_chunk_id": "child-11905e36389a302b5d7db91c1b1cb8343b10192f",
+      "source_path": "docs/concepts/strict_mode.md",
+      "display_text": "```py\nimport json\nfrom uuid import UUID\n\nfrom pydantic import BaseModel, ValidationError\n\n\nclass MyModel(BaseModel):\n    guid: UUID\n\n\ndata = {'guid': '12345678-1234-1234-1234-123456789012'}\n\nprint(MyModel.model_validate(data))  # OK: lax\n#> guid=UUID('12345678-1234-1234-1234-123456789012')\n\nprint(\n    MyModel.model_validate_json(json.dumps(data), strict=True)\n)  # OK: strict, but from json\n#> guid=UUID('12345678-1234-1234-1234-123456789012')\n\ntry:\n    MyModel.model_validate(data, strict=True)  # Not OK: strict, from python\nexcept ValidationError as exc:\n    print(exc.errors(include_url=False))\n    \"\"\"\n    [\n        {\n            'type': 'is_instance_of',\n            'loc': ('guid',),\n            'msg': 'Input should be an instance of UUID',\n            'input': '12345678-1234-1234-1234-123456789012',\n            'ctx': {'class': 'UUID'},\n        }\n    ]\n    \"\"\"\n```\n\n",
+      "line_start": 57,
+      "line_end": 94
+    },
+    {
+      "stable_chunk_id": "child-49ff424b913dfb6310ae6bf8d75a79c0bc477a2c",
+      "source_path": "docs/concepts/strict_mode.md",
+      "display_text": "For more details about what types are allowed as inputs in strict mode, you can review the\n[Conversion Table](conversion_table.md).\n\n",
+      "line_start": 95,
+      "line_end": 97
+    },
+    {
+      "stable_chunk_id": "child-dbfbf332fc76a8d25e33d51daa9491aa12c25144",
+      "source_path": "docs/concepts/strict_mode.md",
+      "display_text": "## Strict mode in method calls\n\nAll the examples included so far get strict-mode validation through the use of `strict=True` as a keyword argument to\nthe validation methods. While we have shown this for `BaseModel.model_validate`, this also works with arbitrary types\nthrough the use of `TypeAdapter`:\n\n",
+      "line_start": 98,
+      "line_end": 103
+    },
+    {
+      "stable_chunk_id": "child-867536b809fe29374dcbf5c133117ea92bdcdf7e",
+      "source_path": "docs/concepts/strict_mode.md",
+      "display_text": "```python\nfrom pydantic import TypeAdapter, ValidationError\n\nprint(TypeAdapter(bool).validate_python('yes'))  # OK: lax\n#> True\n\ntry:\n    TypeAdapter(bool).validate_python('yes', strict=True)  # Not OK: strict\nexcept ValidationError as exc:\n    print(exc)\n    \"\"\"\n    1 validation error for bool\n      Input should be a valid boolean [type=bool_type, input_value='yes', input_type=str]\n    \"\"\"\n```\n\nNote this also works even when using more \"complex\" types in `TypeAdapter`:\n",
+      "line_start": 104,
+      "line_end": 120
+    },
+    {
+      "stable_chunk_id": "child-5ee22062f3488681cd68d8a9a73aedc6635baf51",
+      "source_path": "docs/concepts/strict_mode.md",
+      "display_text": "```python\nfrom dataclasses import dataclass\n\nfrom pydantic import TypeAdapter, ValidationError\n\n\n@dataclass\nclass MyDataclass:\n    x: int\n\n\ntry:\n    TypeAdapter(MyDataclass).validate_python({'x': '123'}, strict=True)\nexcept ValidationError as exc:\n    print(exc)\n    \"\"\"\n    1 validation error for MyDataclass\n      Input should be an instance of MyDataclass [type=dataclass_exact_type, input_value={'x': '123'}, input_type=dict]\n    \"\"\"\n```\n\n",
+      "line_start": 121,
+      "line_end": 141
+    },
+    {
+      "stable_chunk_id": "child-8ec1be8dea77c2d655b381b9b97ec531a5c01e61",
+      "source_path": "docs/concepts/strict_mode.md",
+      "display_text": "This also works with the `TypeAdapter.validate_json` and `BaseModel.model_validate_json` methods:\n\n",
+      "line_start": 142,
+      "line_end": 143
+    },
+    {
+      "stable_chunk_id": "child-9400c1fecac165d7a5a12d93ba31c25a6987e8f0",
+      "source_path": "docs/concepts/strict_mode.md",
+      "display_text": "```python\nimport json\nfrom typing import List\nfrom uuid import UUID\n\nfrom pydantic import BaseModel, TypeAdapter, ValidationError\n\ntry:\n    TypeAdapter(List[int]).validate_json('[\"1\", 2, \"3\"]', strict=True)\nexcept ValidationError as exc:\n    print(exc)\n    \"\"\"\n    2 validation errors for list[int]\n    0\n      Input should be a valid integer [type=int_type, input_value='1', input_type=str]\n    2\n      Input should be a valid integer [type=int_type, input_value='3', input_type=str]\n    \"\"\"\n\n\nclass Model(BaseModel):\n    x: int\n    y: UUID\n\n\ndata = {'x': '1', 'y': '12345678-1234-1234-1234-123456789012'}\ntry:\n    Model.model_validate(data, strict=True)\nexcept ValidationError as exc:\n    # Neither x nor y are valid in strict mode from python:\n    print(exc)\n    \"\"\"\n    2 validation errors for Model\n    x\n      Input should be a valid integer [type=int_type, input_value='1', input_type=str]\n    y\n      Input should be an instance of UUID [type=is_instance_of, input_value='12345678-1234-1234-1234-123456789012', input_type=str]\n    \"\"\"\n\njson_data = json.dumps(data)\ntry:\n    Model.model_validate_json(json_data, strict=True)\nexcept ValidationError as exc:\n    # From JSON, x is still not valid in strict mode, but y is:\n    print(exc)\n    \"\"\"\n    1 validation error for Model\n    x\n      Input should be a valid integer [type=int_type, input_value='1', input_type=str]\n    \"\"\"\n```\n\n\n",
+      "line_start": 144,
+      "line_end": 196
+    },
+    {
+      "stable_chunk_id": "child-1b837faa1302241720440de51f69919497395b36",
+      "source_path": "docs/concepts/strict_mode.md",
+      "display_text": "## Strict mode with `Field`\n\nFor individual fields on a model, you can [set `strict=True` on the field](../api/fields.md#pydantic.fields.Field).\nThis will cause strict-mode validation to be used for that field, even when the validation methods are called without\n`strict=True`.\n\nOnly the fields for which `strict=True` is set will be affected:\n\n",
+      "line_start": 197,
+      "line_end": 204
+    },
+    {
+      "stable_chunk_id": "child-feb38651df1df80d4ace320361a93d580e2458e8",
+      "source_path": "docs/concepts/strict_mode.md",
+      "display_text": "```python\nfrom pydantic import BaseModel, Field, ValidationError\n\n\nclass User(BaseModel):\n    name: str\n    age: int\n    n_pets: int\n\n\nuser = User(name='John', age='42', n_pets='1')\nprint(user)\n#> name='John' age=42 n_pets=1\n\n\nclass AnotherUser(BaseModel):\n    name: str\n    age: int = Field(strict=True)\n    n_pets: int\n\n\ntry:\n    anotheruser = AnotherUser(name='John', age='42', n_pets='1')\nexcept ValidationError as e:\n    print(e)\n    \"\"\"\n    1 validation error for AnotherUser\n    age\n      Input should be a valid integer [type=int_type, input_value='42', input_type=str]\n    \"\"\"\n```\n\n",
+      "line_start": 205,
+      "line_end": 236
+    },
+    {
+      "stable_chunk_id": "child-93f0b705a670e606fc4dbcb69f76bd2fbf98bc49",
+      "source_path": "docs/concepts/strict_mode.md",
+      "display_text": "Note that making fields strict will also affect the validation performed when instantiating the model class:\n\n",
+      "line_start": 237,
+      "line_end": 238
+    },
+    {
+      "stable_chunk_id": "child-b0caf2a82a7c2c9b2a2ec9a6aa10fc95d5e96c39",
+      "source_path": "docs/concepts/strict_mode.md",
+      "display_text": "```python\nfrom pydantic import BaseModel, Field, ValidationError\n\n\nclass Model(BaseModel):\n    x: int = Field(strict=True)\n    y: int = Field(strict=False)\n\n\ntry:\n    Model(x='1', y='2')\nexcept ValidationError as exc:\n    print(exc)\n    \"\"\"\n    1 validation error for Model\n    x\n      Input should be a valid integer [type=int_type, input_value='1', input_type=str]\n    \"\"\"\n```\n\n",
+      "line_start": 239,
+      "line_end": 258
+    },
+    {
+      "stable_chunk_id": "child-db709b6a278419cf3dc99f06019e2b631d7e3310",
+      "source_path": "docs/concepts/strict_mode.md",
+      "display_text": "### Using `Field` as an annotation\n\nNote that `Field(strict=True)` (or with any other keyword arguments) can be used as an annotation if necessary, e.g.,\nwhen working with `TypedDict`:\n\n",
+      "line_start": 259,
+      "line_end": 263
+    },
+    {
+      "stable_chunk_id": "child-db1ddd8a1ca73a3814f205400e778b6121063812",
+      "source_path": "docs/concepts/strict_mode.md",
+      "display_text": "```python\nfrom typing_extensions import Annotated, TypedDict\n\nfrom pydantic import Field, TypeAdapter, ValidationError\n\n\nclass MyDict(TypedDict):\n    x: Annotated[int, Field(strict=True)]\n\n\ntry:\n    TypeAdapter(MyDict).validate_python({'x': '1'})\nexcept ValidationError as exc:\n    print(exc)\n    \"\"\"\n    1 validation error for typed-dict\n    x\n      Input should be a valid integer [type=int_type, input_value='1', input_type=str]\n    \"\"\"\n```\n\n",
+      "line_start": 264,
+      "line_end": 284
+    },
+    {
+      "stable_chunk_id": "child-8e9c7612380b7f8b3d954a0279c7d8e48b21e474",
+      "source_path": "docs/concepts/strict_mode.md",
+      "display_text": "## Strict mode with `Annotated[..., Strict()]`\n\n??? api \"API Documentation\"\n    [`pydantic.types.Strict`][pydantic.types.Strict]<br>\n\nPydantic also provides the [`Strict`](../api/types.md#pydantic.types.Strict) class, which is intended for use as\nmetadata with [`typing.Annotated`][] class; this annotation indicates that the annotated field should be validated in\nstrict mode:\n\n",
+      "line_start": 285,
+      "line_end": 293
+    },
+    {
+      "stable_chunk_id": "child-516d15bd4119c3a95f555a273b32a0be2d490569",
+      "source_path": "docs/concepts/strict_mode.md",
+      "display_text": "```python\nfrom typing_extensions import Annotated\n\nfrom pydantic import BaseModel, Strict, ValidationError\n\n\nclass User(BaseModel):\n    name: str\n    age: int\n    is_active: Annotated[bool, Strict()]\n\n\nUser(name='David', age=33, is_active=True)\ntry:\n    User(name='David', age=33, is_active='True')\nexcept ValidationError as exc:\n    print(exc)\n    \"\"\"\n    1 validation error for User\n    is_active\n      Input should be a valid boolean [type=bool_type, input_value='True', input_type=str]\n    \"\"\"\n```\n\n",
+      "line_start": 294,
+      "line_end": 317
+    },
+    {
+      "stable_chunk_id": "child-b3d585167baf46f432d653887d493e9e259f0834",
+      "source_path": "docs/concepts/strict_mode.md",
+      "display_text": "This is, in fact, the method used to implement some of the strict-out-of-the-box types provided by Pydantic,\nsuch as [`StrictInt`](../api/types.md#pydantic.types.StrictInt).\n\n",
+      "line_start": 318,
+      "line_end": 320
+    },
+    {
+      "stable_chunk_id": "child-00290121c0469d92011b2a2dd03ac0e9e868fb6f",
+      "source_path": "docs/concepts/strict_mode.md",
+      "display_text": "## Strict mode with `ConfigDict`\n\n",
+      "line_start": 321,
+      "line_end": 322
+    },
+    {
+      "stable_chunk_id": "child-770c46abc7b346c363c14bb2db84e37bc2a7c86a",
+      "source_path": "docs/concepts/strict_mode.md",
+      "display_text": "### `BaseModel`\n\nIf you want to enable strict mode for all fields on a complex input type, you can use\n[`ConfigDict(strict=True)`](../api/config.md#pydantic.config.ConfigDict) in the `model_config`:\n\n",
+      "line_start": 323,
+      "line_end": 327
+    },
+    {
+      "stable_chunk_id": "child-79cdea317477213d7e2b9c91eefc45d039e868f3",
+      "source_path": "docs/concepts/strict_mode.md",
+      "display_text": "```py\nfrom pydantic import BaseModel, ConfigDict, ValidationError\n\n\nclass User(BaseModel):\n    model_config = ConfigDict(strict=True)\n\n    name: str\n    age: int\n    is_active: bool\n\n\ntry:\n    User(name='David', age='33', is_active='yes')\nexcept ValidationError as exc:\n    print(exc)\n    \"\"\"\n    2 validation errors for User\n    age\n      Input should be a valid integer [type=int_type, input_value='33', input_type=str]\n    is_active\n      Input should be a valid boolean [type=bool_type, input_value='yes', input_type=str]\n    \"\"\"\n```\n\n",
+      "line_start": 328,
+      "line_end": 352
+    },
+    {
+      "stable_chunk_id": "child-b8c51b3285571b4c415c4bad1115c02f2d49a1f6",
+      "source_path": "docs/concepts/strict_mode.md",
+      "display_text": "!!! note\n    When using `strict=True` through a model's `model_config`, you can still override the strictness\n    of individual fields by setting `strict=False` on individual fields:\n\n    ```py\n    from pydantic import BaseModel, ConfigDict, Field\n\n\n    class User(BaseModel):\n        model_config = ConfigDict(strict=True)\n\n        name: str\n        age: int = Field(strict=False)\n    ```\n\n",
+      "line_start": 353,
+      "line_end": 367
+    },
+    {
+      "stable_chunk_id": "child-31b2132a15a50ea7d6f8a2d40a410f583f72bf0a",
+      "source_path": "docs/concepts/strict_mode.md",
+      "display_text": "Note that strict mode is not recursively applied to nested model fields:\n\n",
+      "line_start": 368,
+      "line_end": 369
+    },
+    {
+      "stable_chunk_id": "child-feb8069acb27745ae2e64682a08069340bdb3dc3",
+      "source_path": "docs/concepts/strict_mode.md",
+      "display_text": "```python\nfrom pydantic import BaseModel, ConfigDict, ValidationError\n\n\nclass Inner(BaseModel):\n    y: int\n\n\nclass Outer(BaseModel):\n    model_config = ConfigDict(strict=True)\n\n    x: int\n    inner: Inner\n\n\nprint(Outer(x=1, inner=Inner(y='2')))\n#> x=1 inner=Inner(y=2)\n\ntry:\n    Outer(x='1', inner=Inner(y='2'))\nexcept ValidationError as exc:\n    print(exc)\n    \"\"\"\n    1 validation error for Outer\n    x\n      Input should be a valid integer [type=int_type, input_value='1', input_type=str]\n    \"\"\"\n```\n\n",
+      "line_start": 370,
+      "line_end": 398
+    },
+    {
+      "stable_chunk_id": "child-25b9268ccbe0317a76a4c5ea6be28d3d28435c00",
+      "source_path": "docs/concepts/strict_mode.md",
+      "display_text": "(This is also the case for dataclasses and `TypedDict`.)\n\nIf this is undesirable, you should make sure that strict mode is enabled for all the types involved.\nFor example, this can be done for model classes by using a shared base class with\n`model_config = ConfigDict(strict=True)`:\n\n",
+      "line_start": 399,
+      "line_end": 404
+    },
+    {
+      "stable_chunk_id": "child-632b5aaf6e80eb56de472f1d2ed8cdeea49c33fe",
+      "source_path": "docs/concepts/strict_mode.md",
+      "display_text": "```python\nfrom pydantic import BaseModel, ConfigDict, ValidationError\n\n\nclass MyBaseModel(BaseModel):\n    model_config = ConfigDict(strict=True)\n\n\nclass Inner(MyBaseModel):\n    y: int\n\n\nclass Outer(MyBaseModel):\n    x: int\n    inner: Inner\n\n\ntry:\n    Outer.model_validate({'x': 1, 'inner': {'y': '2'}})\nexcept ValidationError as exc:\n    print(exc)\n    \"\"\"\n    1 validation error for Outer\n    inner.y\n      Input should be a valid integer [type=int_type, input_value='2', input_type=str]\n    \"\"\"\n```\n\n",
+      "line_start": 405,
+      "line_end": 432
+    },
+    {
+      "stable_chunk_id": "child-ebe9330bf2626384f13fbccb25d9233043395353",
+      "source_path": "docs/concepts/strict_mode.md",
+      "display_text": "### Dataclasses and `TypedDict`\n\nPydantic dataclasses behave similarly to the examples shown above with `BaseModel`, just that instead of `model_config`\nyou should use the `config` keyword argument to the `@pydantic.dataclasses.dataclass` decorator.\n\n",
+      "line_start": 433,
+      "line_end": 437
+    },
+    {
+      "stable_chunk_id": "child-f1897216cd4a379d08efc8798c4411a259d5dac7",
+      "source_path": "docs/concepts/strict_mode.md",
+      "display_text": "When possible, you can achieve nested strict mode for vanilla dataclasses or `TypedDict` subclasses by annotating fields\nwith the [`pydantic.types.Strict` annotation](#strict-mode-with-annotated-strict).\n\nHowever, if this is _not_ possible (e.g., when working with third-party types), you can set the config that Pydantic\nshould use for the type by setting the `__pydantic_config__` attribute on the type:\n\n",
+      "line_start": 438,
+      "line_end": 443
+    },
+    {
+      "stable_chunk_id": "child-4956da65176f31f2019bbdbf9df7527baa9d4f05",
+      "source_path": "docs/concepts/strict_mode.md",
+      "display_text": "```python\nfrom typing_extensions import TypedDict\n\nfrom pydantic import ConfigDict, TypeAdapter, ValidationError\n\n\nclass Inner(TypedDict):\n    y: int\n\n\nInner.__pydantic_config__ = ConfigDict(strict=True)\n\n\nclass Outer(TypedDict):\n    x: int\n    inner: Inner\n\n\nadapter = TypeAdapter(Outer)\nprint(adapter.validate_python({'x': '1', 'inner': {'y': 2}}))\n#> {'x': 1, 'inner': {'y': 2}}\n\n\ntry:\n    adapter.validate_python({'x': '1', 'inner': {'y': '2'}})\nexcept ValidationError as exc:\n    print(exc)\n    \"\"\"\n    1 validation error for typed-dict\n    inner.y\n      Input should be a valid integer [type=int_type, input_value='2', input_type=str]\n    \"\"\"\n```\n\n",
+      "line_start": 444,
+      "line_end": 477
+    },
+    {
+      "stable_chunk_id": "child-d33bbb1a5ff5e3438366084a92551992dfade8d3",
+      "source_path": "docs/concepts/strict_mode.md",
+      "display_text": "### `TypeAdapter`\n\nYou can also get strict mode through the use of the config keyword argument to the\n[`TypeAdapter`](../api/type_adapter.md) class:\n\n",
+      "line_start": 478,
+      "line_end": 482
+    },
+    {
+      "stable_chunk_id": "child-124578b54f412a61da5737bd6e380c537078f259",
+      "source_path": "docs/concepts/strict_mode.md",
+      "display_text": "```python\nfrom pydantic import ConfigDict, TypeAdapter, ValidationError\n\nadapter = TypeAdapter(bool, config=ConfigDict(strict=True))\n\ntry:\n    adapter.validate_python('yes')\nexcept ValidationError as exc:\n    print(exc)\n    \"\"\"\n    1 validation error for bool\n      Input should be a valid boolean [type=bool_type, input_value='yes', input_type=str]\n    \"\"\"\n```\n\n",
+      "line_start": 483,
+      "line_end": 497
+    },
+    {
+      "stable_chunk_id": "child-92d1408d75484da34fbbcfb354bde7a59a853553",
+      "source_path": "docs/concepts/strict_mode.md",
+      "display_text": "### `@validate_call`\n\nStrict mode is also usable with the [`@validate_call`](../api/validate_call.md#pydantic.validate_call_decorator.validate_call)\ndecorator by passing the `config` keyword argument:\n\n",
+      "line_start": 498,
+      "line_end": 502
+    },
+    {
+      "stable_chunk_id": "child-ffb029afbde14d7acc092f32b88d3633e229136a",
+      "source_path": "docs/concepts/strict_mode.md",
+      "display_text": "```python\nfrom pydantic import ConfigDict, ValidationError, validate_call\n\n\n@validate_call(config=ConfigDict(strict=True))\ndef foo(x: int) -> int:\n    return x\n\n\ntry:\n    foo('1')\nexcept ValidationError as exc:\n    print(exc)\n    \"\"\"\n    1 validation error for foo\n    0\n      Input should be a valid integer [type=int_type, input_value='1', input_type=str]\n    \"\"\"\n```\n",
+      "line_start": 503,
+      "line_end": 521
+    }
+  ]
+}

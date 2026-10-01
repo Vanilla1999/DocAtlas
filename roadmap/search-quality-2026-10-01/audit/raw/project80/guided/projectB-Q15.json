@@ -1,0 +1,26 @@
+{
+  "tool": "get_docs_context",
+  "request": {
+    "question": "Ссылка source_uri появилась в цитате. Нужно ли немедленно её открывать?",
+    "project_path": "/tmp/opencode/docatlas-ablation",
+    "scope": "all",
+    "lookup_queries": [
+      "When should a host use a source continuation instead of answering from existing snippets?"
+    ]
+  },
+  "seconds": 0.8345772219981882,
+  "is_error": false,
+  "wire": {
+    "_meta": null,
+    "content": [
+      {
+        "type": "text",
+        "text": "{\"status\": \"ok\", \"kind\": \"docs_context\", \"context_status\": \"ready\", \"context_available\": true, \"answer_supported\": false, \"answer_available\": false, \"support_status\": \"retrieval_only\", \"answer_policy\": \"cite_only\", \"coverage_policy\": \"retrieval_attribution_only\", \"query_coverage\": \"partial\", \"retrieval_coverage\": \"partial\", \"facet_coverage\": \"unverified\", \"covered_query_ids\": [\"query-anchor-1\", \"query-lookup-1\"], \"missing_query_ids\": [\"query-original\"], \"missing_facets\": [], \"facets\": [], \"sources\": [{\"evidence_id\": \"ev-c7d2a99dd5c55acc\", \"path_or_url\": \"docs/source-continuation.md\", \"section\": \"Grounded partial answers and source continuation > Read only a missing part\", \"snippet\": \"When spare space remains in the initial 800-token admission budget, a selected\\nproject source may carry `source_uri`. This optional locator never displaces a\\nselected snippet. Pass the exact returned URI to MCP `resources/read`; ordinary\\nMarkdown links are citations, not continuation capabilities. The initial response\\nstill contains at most three sources and retains its public token-estimate meaning.\", \"version_binding\": \"unversioned\", \"content_sha256\": \"5777063b692b8532c3ef4344efa5f505b9890adb5c58cd741f05f795b8d0d33d\", \"project_identity\": \"local:48277f62f8b4ff92ba1c60c082f92a43817f9e1c5ba4ea27e12cd77a76421585\", \"authority\": \"source_of_truth\", \"scope\": \"module\", \"line_start\": 18, \"line_end\": 22}, {\"evidence_id\": \"ev-868f70b4f4e29a0d\", \"path_or_url\": \"docs/AGENT_DOCS_WORKFLOW.md\", \"section\": \"Agent documentation workflow > Answering from retrieved context\", \"snippet\": \"## Answering from retrieved context\\n\\nFor `docs_context`, false answer flags mean that the server has not certified an\\nanswer. The host may still synthesize claims directly supported by the snippets.\\nPreserve useful partial answers, cite their sources, and name the concrete facts\\nthat remain unknown. Retrieval coverage is not semantic completeness.\", \"version_binding\": \"unversioned\", \"content_sha256\": \"f1a0de99ed255987bd7378e977f22aadde5a2633235e4c0437d2bfdf552dc6d7\", \"project_identity\": \"local:48277f62f8b4ff92ba1c60c082f92a43817f9e1c5ba4ea27e12cd77a76421585\", \"authority\": \"supporting\", \"scope\": \"project\", \"line_start\": 22, \"line_end\": 27}, {\"evidence_id\": \"ev-c2e7ecffbcf3e7e9\", \"path_or_url\": \"README.md\", \"section\": \"DocAtlas\", \"snippet\": \"It retrieves compact evidence from reviewable project docs and version-aware dependency documentation so the host model can answer from the sources your project actually uses — instead of stale model memory or oversized prompt dumps.\", \"version_binding\": \"unversioned\", \"content_sha256\": \"872b194461c95e06cbedac8c69e2226ea041d4d2309c05299b589733762d8d58\", \"project_identity\": \"local:48277f62f8b4ff92ba1c60c082f92a43817f9e1c5ba4ea27e12cd77a76421585\", \"authority\": \"source_of_truth\", \"scope\": \"project\", \"line_start\": 17, \"line_end\": 17}], \"context_quality\": {\"status\": \"unverified\", \"reasons\": [\"coverage_unverified\", \"budget_limited\"]}, \"read_next\": [], \"edit_ready\": false, \"investigation_allowed\": true, \"estimated_tokens\": 738}",
+        "annotations": null,
+        "_meta": null
+      }
+    ],
+    "structuredContent": null,
+    "isError": false
+  }
+}

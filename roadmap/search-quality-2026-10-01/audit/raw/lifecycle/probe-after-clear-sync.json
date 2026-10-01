@@ -1,0 +1,23 @@
+{
+  "tool": "prepare_docs",
+  "request": {
+    "action": "sync_project_docs",
+    "project_path": "/tmp/opencode/search-audit-work-20261001/lifecycle-fixture",
+    "with_vectors": false
+  },
+  "seconds": 0.027333878999343142,
+  "is_error": true,
+  "wire": {
+    "_meta": null,
+    "content": [
+      {
+        "type": "text",
+        "text": "{\"status\": \"failed\", \"error\": {\"reason_code\": \"handler_exception\", \"message\": \"handler_exception: request failed\", \"exception_type\": \"OperationalError\", \"retryable\": false, \"where\": {\"tool\": \"prepare_docs\", \"handler\": null, \"phase\": \"execution\"}, \"hints\": [\"Check diagnostics/logs; retry only after the underlying handler issue is fixed.\"], \"traceback\": \"<redacted traceback>\"}, \"warnings\": []}",
+        "annotations": null,
+        "_meta": null
+      }
+    ],
+    "structuredContent": null,
+    "isError": true
+  }
+}

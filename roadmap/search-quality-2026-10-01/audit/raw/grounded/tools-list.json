@@ -1,0 +1,149 @@
+{
+  "meta": null,
+  "nextCursor": null,
+  "tools": [
+    {
+      "name": "search_docs",
+      "title": null,
+      "description": "Search up-to-date documentation for a library or package. Examples:\n\n- {library: \"react\", query: \"hooks lifecycle\"} -> matches latest version of React\n- {library: \"react\", version: \"18.0.0\", query: \"hooks lifecycle\"} -> matches React 18.0.0 or earlier\n- {library: \"typescript\", version: \"5.x\", query: \"ReturnType example\"} -> any TypeScript 5.x.x version\n- {library: \"typescript\", version: \"5.2.x\", query: \"ReturnType example\"} -> any TypeScript 5.2.x version",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "library": {
+            "type": "string",
+            "description": "Library name."
+          },
+          "version": {
+            "type": "string",
+            "description": "Library version (exact or X-Range, optional)."
+          },
+          "query": {
+            "type": "string",
+            "description": "Documentation search query."
+          },
+          "limit": {
+            "type": "number",
+            "default": 5,
+            "description": "Maximum number of results."
+          }
+        },
+        "required": [
+          "library",
+          "query"
+        ],
+        "additionalProperties": false,
+        "$schema": "http://json-schema.org/draft-07/schema#"
+      },
+      "outputSchema": null,
+      "icons": null,
+      "annotations": {
+        "title": "Search Library Documentation",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": null,
+        "openWorldHint": null
+      },
+      "meta": null,
+      "execution": {
+        "taskSupport": "forbidden"
+      }
+    },
+    {
+      "name": "list_libraries",
+      "title": null,
+      "description": "List all indexed libraries.",
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "type": "object",
+        "properties": {}
+      },
+      "outputSchema": null,
+      "icons": null,
+      "annotations": {
+        "title": "List Libraries",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": null,
+        "openWorldHint": null
+      },
+      "meta": null,
+      "execution": {
+        "taskSupport": "forbidden"
+      }
+    },
+    {
+      "name": "find_version",
+      "title": null,
+      "description": "Find the best matching version for a library. Use to identify available or closest versions.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "library": {
+            "type": "string",
+            "description": "Library name."
+          },
+          "targetVersion": {
+            "type": "string",
+            "description": "Version pattern to match (exact or X-Range, optional)."
+          }
+        },
+        "required": [
+          "library"
+        ],
+        "additionalProperties": false,
+        "$schema": "http://json-schema.org/draft-07/schema#"
+      },
+      "outputSchema": null,
+      "icons": null,
+      "annotations": {
+        "title": "Find Library Version",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": null,
+        "openWorldHint": null
+      },
+      "meta": null,
+      "execution": {
+        "taskSupport": "forbidden"
+      }
+    },
+    {
+      "name": "fetch_url",
+      "title": null,
+      "description": "Fetch a single URL and convert its content to Markdown. Use this tool to read the content of any web page.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "url": {
+            "type": "string",
+            "format": "uri",
+            "description": "URL to fetch and convert to Markdown."
+          },
+          "followRedirects": {
+            "type": "boolean",
+            "default": true,
+            "description": "Follow HTTP redirects (3xx responses)."
+          }
+        },
+        "required": [
+          "url"
+        ],
+        "additionalProperties": false,
+        "$schema": "http://json-schema.org/draft-07/schema#"
+      },
+      "outputSchema": null,
+      "icons": null,
+      "annotations": {
+        "title": "Fetch URL",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": null,
+        "openWorldHint": true
+      },
+      "meta": null,
+      "execution": {
+        "taskSupport": "forbidden"
+      }
+    }
+  ]
+}

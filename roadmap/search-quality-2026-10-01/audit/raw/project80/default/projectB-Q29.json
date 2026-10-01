@@ -1,0 +1,22 @@
+{
+  "tool": "get_docs_context",
+  "request": {
+    "question": "Какая часть работы доступна без сети и заранее загруженной языковой модели?",
+    "project_path": "/tmp/opencode/docatlas-ablation"
+  },
+  "seconds": 0.39233540699933656,
+  "is_error": false,
+  "wire": {
+    "_meta": null,
+    "content": [
+      {
+        "type": "text",
+        "text": "{\"status\": \"insufficient_evidence\", \"kind\": \"docs_context\", \"missing\": [\"No safe, current, project-scoped documentation context was retrieved.\"], \"estimated_tokens\": 263, \"context_quality\": {\"status\": \"unavailable\", \"reasons\": [\"source_unavailable\"]}, \"read_next\": [], \"recommended_next_action\": {\"tool\": \"code_search\", \"type\": \"search_local_source\", \"handled_by\": \"coding_agent\", \"requires_confirmation\": false, \"reason\": \"no_candidates\", \"query_terms\": [\"Какая часть работы доступна без сети и заранее загруженной языковой модели\"], \"repeat_docs_context\": false, \"auto_execute\": false}, \"context_available\": false, \"documentation_supported\": false, \"investigation_allowed\": true, \"hard_stop\": false, \"recovery_origin\": \"retrieval\", \"recovery_reason_code\": \"no_candidates\", \"recovery_disposition\": \"search_local_source\", \"disposition\": \"search_local_source\", \"edit_ready\": false, \"source_search_status\": \"required\", \"requires_confirmation\": false, \"answer_supported\": false, \"answer_available\": false, \"support_status\": \"insufficient_evidence\"}",
+        "annotations": null,
+        "_meta": null
+      }
+    ],
+    "structuredContent": null,
+    "isError": false
+  }
+}

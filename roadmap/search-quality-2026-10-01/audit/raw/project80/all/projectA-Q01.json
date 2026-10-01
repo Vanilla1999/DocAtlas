@@ -1,0 +1,23 @@
+{
+  "tool": "get_docs_context",
+  "request": {
+    "question": "Я клонировал репозиторий и хочу задать первый вопрос по его документации без облачного сервиса. Какие действия нужны?",
+    "project_path": "/tmp/opencode/docatlas-ablation",
+    "scope": "all"
+  },
+  "seconds": 0.5332759700031602,
+  "is_error": false,
+  "wire": {
+    "_meta": null,
+    "content": [
+      {
+        "type": "text",
+        "text": "{\"status\": \"ok\", \"kind\": \"docs_context\", \"context_status\": \"ready\", \"context_available\": true, \"answer_supported\": false, \"answer_available\": false, \"support_status\": \"retrieval_only\", \"answer_policy\": \"cite_only\", \"coverage_policy\": \"retrieval_attribution_only\", \"query_coverage\": \"full\", \"retrieval_coverage\": \"full\", \"facet_coverage\": \"unverified\", \"covered_query_ids\": [\"query-original\"], \"missing_query_ids\": [], \"missing_facets\": [], \"facets\": [{\"id\": \"intent-context:getting_started\", \"requirement_id\": null, \"question\": \"command line help setup initialization workflow\", \"status\": \"retrieval_only\", \"evidence_ids\": [\"ev-b96657827b8741a6\", \"ev-bc89dfb55c5a3cdb\"]}], \"sources\": [{\"evidence_id\": \"ev-b96657827b8741a6\", \"path_or_url\": \"wiki/Commands.md\", \"section\": \"Commands > Docs MCP server\", \"snippet\": \"## Docs MCP server\\n\\n`doc-atlas mcp docs-serve` runs the local Docs MCP server. Find the command with `doc-atlas --help` followed by `doc-atlas mcp --help`.\\n\\nIts public workflow has exactly three tools:\\n\\n- `get_docs_context` — first documentation question;\\n- `prepare_docs` — a returned or explicitly approved sync/prefetch action;\\n- `docs_status` — a returned job, health, or freshness request.\\n\\nThe normal sequence is `get_docs_context → prepare_docs when returned → retry get_docs_context`. See [Docs MCP server](../docs/mcp-docs-server.md) for the canonical contract. Only the currently advertised three-tool surface is supported.\", \"version_binding\": \"unversioned\", \"content_sha256\": \"ad9b33b30f2b4af1685ed0e06a2d5929a196cc59203852b7c4ccecb350d5ec28\", \"project_identity\": \"local:48277f62f8b4ff92ba1c60c082f92a43817f9e1c5ba4ea27e12cd77a76421585\", \"line_start\": 65, \"line_end\": 75, \"authority\": \"source_of_truth\", \"scope\": \"project\", \"source_uri\": \"docatlas://source/2a2f3656f99cffebb0686d26\"}, {\"evidence_id\": \"ev-bc89dfb55c5a3cdb\", \"path_or_url\": \"docs/mcp-docs-server.md\", \"section\": \"Docs MCP server\", \"snippet\": \"# Docs MCP server\\n\\nThis is the canonical detailed workflow reference for DocAtlas.\\n\\nStart the local stdio server with:\\n\\n```bash\\ndoc-atlas mcp docs-serve\\n```\\n\\nFind this command from the root CLI help:\\n\\n```bash\\ndoc-atlas --help\\ndoc-atlas mcp --help\\n```\", \"version_binding\": \"unversioned\", \"content_sha256\": \"539d042122a4b7b10899f297b4d478f85ba723532655d4077e901bc857ff0fce\", \"project_identity\": \"local:48277f62f8b4ff92ba1c60c082f92a43817f9e1c5ba4ea27e12cd77a76421585\", \"authority\": \"source_of_truth\", \"scope\": \"project\", \"line_start\": 1, \"line_end\": 16, \"source_uri\": \"docatlas://source/17277e0701ca7a13db1b42d5\"}], \"context_quality\": {\"status\": \"unverified\", \"reasons\": [\"coverage_unverified\"]}, \"read_next\": [], \"edit_ready\": false, \"investigation_allowed\": true, \"estimated_tokens\": 663}",
+        "annotations": null,
+        "_meta": null
+      }
+    ],
+    "structuredContent": null,
+    "isError": false
+  }
+}

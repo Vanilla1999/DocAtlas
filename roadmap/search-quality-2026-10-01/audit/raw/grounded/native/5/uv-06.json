@@ -1,0 +1,32 @@
+{
+  "id": "uv-06",
+  "project": "uv",
+  "family": "workflow",
+  "answerability": "within_budget",
+  "limit": 5,
+  "request": {
+    "library": "uv",
+    "query": "Which build isolation mode does uv use by default and what is the escape hatch for a missing build dependency?",
+    "limit": 5
+  },
+  "seconds": 0.003213356998458039,
+  "is_error": false,
+  "wire": {
+    "_meta": null,
+    "content": [
+      {
+        "type": "text",
+        "text": "\n------------------------------------------------------------\nResult 1: file:///tmp/opencode/search-audit-work-20261001/grounded/corpus/uv/docs/pip/compatibility.md\n\n## PEP 517 build isolation\nuv uses [PEP 517](https://peps.python.org/pep-0517/) build isolation by default (akin to `pip install --use-pep517`), following `pypa/build` and in anticipation of `pip` defaulting to PEP 517 builds in the future ([pypa/pip#9175](https://github.com/pypa/pip/issues/9175)).\nIf a package fails to install due to a missing build-time dependency, try using a newer version of the package; if the problem persists, consider filing an issue with the package maintainer, requesting that they update the packaging setup to declare the correct PEP 517 build-time dependencies.\nAs an escape hatch, you can preinstall a package's build dependencies, then run `uv pip install` with `--no-build-isolation`, as in:\n```shell\nuv pip install wheel && uv pip install --no-build-isolation biopython==1.77\n```\nFor a list of packages that are known to fail under PEP 517 build isolation, see [#2252](https://github.com/astral-sh/uv/issues/2252).\n\n------------------------------------------------------------\nResult 2: file:///tmp/opencode/search-audit-work-20261001/grounded/corpus/uv/docs/pip/compatibility.md\n\n## --only-binary enforcement\nThe `--only-binary` argument is used to restrict installation to pre-built binary distributions. When `--only-binary :all:` is provided, both pip and uv will refuse to build source distributions from PyPI and other registries.\nHowever, when a dependency is provided as a direct URL (e.g., `uv pip install https://...`), pip does _not_ enforce `--only-binary`, and will build source distributions for all such packages.\nuv, meanwhile, _does_ enforce `--only-binary` for direct URL dependencies, with one exception: given `uv pip install https://... --only-binary flask`, uv _will_ build the source distribution at the given URL if it cannot infer the package name ahead of time, since uv can't determine whether the package is \"allowed\" in such cases without building its metadata.\nBoth pip and uv allow editables requirements to be built and installed even when `--only-binary` is provided. For example, `uv pip install -e . --only-binary :all:` is allowed.\n\n------------------------------------------------------------\nResult 3: file:///tmp/opencode/search-audit-work-20261001/grounded/corpus/uv/docs/pip/compatibility.md\n\n## Build constraints\nWhen constraints are provided via `--constraint` (or `UV_CONSTRAINT`), uv will _not_ apply the constraints when resolving build dependencies (i.e., to build a source distribution). Instead, build constraints should be provided via the dedicated `--build-constraint` (or `UV_BUILD_CONSTRAINT`) setting.\npip, meanwhile, applies constraints to build dependencies when specified via `PIP_CONSTRAINT`, but not when provided via `--constraint` on the command line.\nFor example, to ensure that `setuptools 60.0.0` is used to build any packages with a build dependency on `setuptools`, use `--build-constraint`, rather than `--constraint`.\n\n------------------------------------------------------------\nResult 4: file:///tmp/opencode/search-audit-work-20261001/grounded/corpus/uv/docs/pip/compatibility.md\n\n## pip command-line options and subcommands\nuv does not support the complete set of `pip`'s command-line options and subcommands, although it does support a large subset.\nMissing options and subcommands are prioritized based on user demand and the complexity of the implementation, and tend to be tracked in individual issues. For example:\n-   [`--trusted-host`](https://github.com/astral-sh/uv/issues/1339)\n-   [`--user`](https://github.com/astral-sh/uv/issues/2077)\nIf you encounter a missing option or subcommand, please search the issue tracker to see if it has already been reported, and if not, consider opening a new issue. Feel free to upvote any existing issues to convey your interest.\n\n------------------------------------------------------------\nResult 5: file:///tmp/opencode/search-audit-work-20261001/grounded/corpus/uv/docs/pip/compatibility.md\n\n## --user and the user install scheme\nuv does not support the `--user` flag, which installs packages based on the `user` install scheme. Instead, we recommend the use of virtual environments to isolate package installations.\nAdditionally, pip will fall back to the `user` install scheme if it detects that the user does not have write permissions to the target directory, as is the case on some systems when installing into the system Python. uv does not implement any such fallback.\nFor more, see [#2077](https://github.com/astral-sh/uv/issues/2077).\n",
+        "annotations": null,
+        "_meta": null
+      }
+    ],
+    "structuredContent": null,
+    "isError": false
+  },
+  "native_size": {
+    "utf8_bytes": 4670,
+    "actual_tokens": 1068,
+    "tokenizer": "docatlas-offline:o200k_base"
+  }
+}

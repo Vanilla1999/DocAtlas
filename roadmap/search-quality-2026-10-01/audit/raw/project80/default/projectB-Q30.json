@@ -1,0 +1,22 @@
+{
+  "tool": "get_docs_context",
+  "request": {
+    "question": "What happens when a dependency version cannot be proven from the repository?",
+    "project_path": "/tmp/opencode/docatlas-ablation"
+  },
+  "seconds": 1.5486255970026832,
+  "is_error": false,
+  "wire": {
+    "_meta": null,
+    "content": [
+      {
+        "type": "text",
+        "text": "{\"status\": \"ok\", \"kind\": \"docs_context\", \"context_status\": \"ready\", \"context_available\": true, \"answer_supported\": false, \"answer_available\": false, \"support_status\": \"retrieval_only\", \"answer_policy\": \"cite_only\", \"coverage_policy\": \"retrieval_attribution_only\", \"query_coverage\": \"full\", \"retrieval_coverage\": \"full\", \"facet_coverage\": \"unverified\", \"covered_query_ids\": [\"query-original\"], \"missing_query_ids\": [], \"missing_facets\": [], \"facets\": [], \"sources\": [{\"evidence_id\": \"ev-4101801b8c296802\", \"path_or_url\": \"docs/DOCMANCER_PRODUCT_BRIEF.md\", \"section\": \"DocAtlas product brief > Current capabilities\", \"snippet\": \"- Sync and retrieve local project documentation with citations.\\n- Detect supported Python, Node/TypeScript, Dart/Flutter, Rust, Go, Java, and other project dependency metadata where available.\\n- Resolve exact dependency versions only from repository evidence strong enough to prove the selected version; weaker declarations remain explicitly unbound or declared-only.\\n- Produce `docs-impact` reports that tell reviewers which maintained docs may need attention after code changes.\\n- Return compact source-attributed MCP evidence for coding agents.\\n- Return typed `insufficient_evidence` rather than authorizing unsupported claims or edits.\\n\\nDependency version evidence uses three distinct states. `exact` means repository state proves the selected version (for supported ecosystems, normally through an authoritative lockfile or equivalent resolved state). `declared-only` means a manifest declaration exists but repository state does not prove the selected runtime version. `unbound` means repository evidence cannot safely bind the dependency to an exact documentation version/source; local/path, Git, and direct-URL dependencies are common examples.\", \"version_binding\": \"unversioned\", \"content_sha256\": \"8beb7653b85efc617eaf9777bdcd131762e6aefcc80aeb275ec5fbe49713e0c9\", \"project_identity\": \"local:48277f62f8b4ff92ba1c60c082f92a43817f9e1c5ba4ea27e12cd77a76421585\", \"line_start\": 58, \"line_end\": 65, \"authority\": \"source_of_truth\", \"scope\": \"project\", \"source_uri\": \"docatlas://source/4e69378076b430d613c66efa\"}, {\"evidence_id\": \"ev-faf25c8b33d98c65\", \"path_or_url\": \"docs/project-docs-mcp-workflow.md\", \"section\": \"Project docs MCP workflow > Dependency docs are separate\", \"snippet\": \"## Dependency docs are separate\\n\\nProject documentation comes from repository-owned files and is scoped by project identity and optional module scope. Dependency/library documentation comes from external sources bound to a library identity and version; manifests and lockfiles supply project-version evidence. This external documentation is not the same as project-owned docs, even when `project_path` is used to resolve its dependency version.\", \"version_binding\": \"unversioned\", \"content_sha256\": \"9f52a16ab22b3e5610ddf074cc876c9fa328de754209a84f8c09e65cf4de8aac\", \"project_identity\": \"local:48277f62f8b4ff92ba1c60c082f92a43817f9e1c5ba4ea27e12cd77a76421585\", \"authority\": \"source_of_truth\", \"scope\": \"project\", \"line_start\": 170, \"line_end\": 172}], \"context_quality\": {\"status\": \"unverified\", \"reasons\": [\"coverage_unverified\"]}, \"read_next\": [], \"edit_ready\": false, \"investigation_allowed\": true, \"estimated_tokens\": 790}",
+        "annotations": null,
+        "_meta": null
+      }
+    ],
+    "structuredContent": null,
+    "isError": false
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "tool": "get_docs_context",
+  "request": {
+    "question": "How do I give a boolean option alternative positive and negative names such as --accept and --reject?",
+    "project_path": "/tmp/opencode/search-audit-work-20261001/fixtures/typer",
+    "scope": "all"
+  },
+  "seconds": 0.38159752200590447,
+  "is_error": false,
+  "wire": {
+    "_meta": null,
+    "content": [
+      {
+        "type": "text",
+        "text": "{\"status\": \"ok\", \"kind\": \"docs_context\", \"context_status\": \"ready\", \"context_available\": true, \"answer_supported\": false, \"answer_available\": false, \"support_status\": \"retrieval_only\", \"answer_policy\": \"cite_only\", \"coverage_policy\": \"retrieval_attribution_only\", \"query_coverage\": \"full\", \"retrieval_coverage\": \"full\", \"facet_coverage\": \"unverified\", \"covered_query_ids\": [\"query-original\", \"query-anchor-1\", \"query-anchor-2\"], \"missing_query_ids\": [], \"missing_facets\": [], \"facets\": [], \"sources\": [{\"evidence_id\": \"ev-11142eb895795ae2\", \"path_or_url\": \"docs/tutorial/parameter-types/bool.md\", \"section\": \"Boolean CLI Options > Alternative names\", \"snippet\": \"## Alternative names\\n\\nNow let's imagine we have a *CLI option* `--accept`.\\n\\nAnd we want to allow setting `--accept` or the contrary, but `--no-accept` looks ugly.\\n\\nWe might want to instead have `--accept` and `--reject`.\\n\\nWe can do that by passing a single `str` with the 2 names for the `bool` *CLI option* separated by `/`:\\n\\n//// tab | Python 3.7+\\n\\n```Python hl_lines=\\\"7\\\"\\n{!> ../docs_src/parameter_types/bool/tutorial002_an.py!}\\n```\\n\\n////\", \"version_binding\": \"unversioned\", \"content_sha256\": \"8b3a7f8102f373aa4414791f59b76ed34d4567926d89b7902e4528ca97251f6d\", \"project_identity\": \"local:f7cc72468d7207460aab3dacc26f8d12d54043247e98b916126b775c8ec7da89\", \"authority\": \"source_of_truth\", \"scope\": \"project\", \"line_start\": 71, \"line_end\": 87, \"source_uri\": \"docatlas://source/a0137c59f3f8a3559ef7fd20\"}, {\"evidence_id\": \"ev-64402492f6618e6b\", \"path_or_url\": \"docs/tutorial/parameter-types/bool.md\", \"section\": \"Boolean CLI Options\", \"snippet\": \"We have seen some examples of *CLI options* with `bool`, and how **Typer** creates `--something` and `--no-something` automatically.\", \"version_binding\": \"unversioned\", \"content_sha256\": \"8ccb0055d56848e34968a64fd3ad2cccda8c55164c0bc7051aaae6d00d0e5111\", \"project_identity\": \"local:f7cc72468d7207460aab3dacc26f8d12d54043247e98b916126b775c8ec7da89\", \"line_start\": 3, \"line_end\": 3, \"authority\": \"source_of_truth\", \"scope\": \"project\", \"source_uri\": \"docatlas://source/0cf062859b1247854fa1b899\"}], \"context_quality\": {\"status\": \"unverified\", \"reasons\": [\"coverage_unverified\"]}, \"read_next\": [{\"source_uri\": \"docatlas://source/47ee156b757cd2c113eeb083\", \"path\": \"docs/tutorial/parameter-types/bool.md\", \"project_identity\": \"local:f7cc72468d7207460aab3dacc26f8d12d54043247e98b916126b775c8ec7da89\", \"snapshot_sha256\": \"sha256:c025b6f1d713e6e07925d2d724f8b97cf3f80cad86b363e5e89c4fc42d80821d\", \"line_start\": 88, \"line_end\": 112, \"reason\": \"inspect_source_context\"}], \"edit_ready\": false, \"investigation_allowed\": true, \"estimated_tokens\": 639}",
+        "annotations": null,
+        "_meta": null
+      }
+    ],
+    "structuredContent": null,
+    "isError": false
+  }
+}

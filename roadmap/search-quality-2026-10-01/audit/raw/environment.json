@@ -1,0 +1,9 @@
+{
+  "project_path": "/tmp/opencode/docatlas-ablation",
+  "project_head": "2847799264685baa4773f3af5452f6b3716dc74a",
+  "main_head": "d2ed5c4c73dc3b7d56276fc37591cba8a4ae123c",
+  "initial_git_status": "## experiment/retrieval-ablation-continuation...origin/experiment/retrieval-ablation-continuation [впереди 1]\n?? reviews/search-audit-2026-10-01/\n",
+  "cli": "/home/viadmin/.local/bin/doc-atlas",
+  "installed_version": "1.3.2",
+  "report_scope": "fresh live MCP diagnostic; exposed development questions, not holdout; no product edits"
+}

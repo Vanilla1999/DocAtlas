@@ -1,0 +1,22 @@
+{
+  "tool": "get_docs_context",
+  "request": {
+    "question": "Where do I declare which local documents are authoritative?",
+    "project_path": "/tmp/opencode/docatlas-ablation"
+  },
+  "seconds": 3.8157875450051506,
+  "is_error": false,
+  "wire": {
+    "_meta": null,
+    "content": [
+      {
+        "type": "text",
+        "text": "{\"status\": \"ok\", \"kind\": \"docs_context\", \"context_status\": \"ready\", \"context_available\": true, \"answer_supported\": false, \"answer_available\": false, \"support_status\": \"retrieval_only\", \"answer_policy\": \"cite_only\", \"coverage_policy\": \"retrieval_attribution_only\", \"query_coverage\": \"full\", \"retrieval_coverage\": \"full\", \"facet_coverage\": \"unverified\", \"covered_query_ids\": [\"query-original\"], \"missing_query_ids\": [], \"missing_facets\": [], \"facets\": [], \"sources\": [{\"evidence_id\": \"ev-fcb08545690a408c\", \"path_or_url\": \"README.md\", \"section\": \"DocAtlas > Project-docs MCP server > Agent contract for a local project\", \"snippet\": \"### Agent contract for a local project\\n\\nBefore handing a repository to a coding agent, generate a compact, machine-readable contract. It tells the agent which local documents are authoritative, which dependency versions were detected, and how to select the minimal DocAtlas MCP tool surface:\\n\\n```bash\\ndoc-atlas agent-contract --project-path . --format json\\ndoc-atlas agent-contract --project-path . --format markdown\\n```\\n\\nThe contract is read-only. For an explicit health, freshness, index, or job-status request, agents use `docs_status`; otherwise they start with `get_docs_context`. Agents call `prepare_docs` only when that tool returns it as `next_action`, or when a user explicitly requests a refresh or sync.\", \"version_binding\": \"unversioned\", \"content_sha256\": \"8e92058671f8ad307d5037674b53457e668dd77eb66fbf1803d728448823fee3\", \"project_identity\": \"local:48277f62f8b4ff92ba1c60c082f92a43817f9e1c5ba4ea27e12cd77a76421585\", \"line_start\": 216, \"line_end\": 225, \"authority\": \"source_of_truth\", \"scope\": \"project\", \"source_uri\": \"docatlas://source/04b128d4bd52d3e50c802534\"}], \"context_quality\": {\"status\": \"unverified\", \"reasons\": [\"coverage_unverified\", \"source_unavailable\"]}, \"read_next\": [], \"edit_ready\": false, \"investigation_allowed\": true, \"estimated_tokens\": 473, \"recovery_reason_code\": \"source_unavailable\"}",
+        "annotations": null,
+        "_meta": null
+      }
+    ],
+    "structuredContent": null,
+    "isError": false
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "tool": "get_docs_context",
+  "request": {
+    "question": "Does enabling preview automatically enable all preview rules?",
+    "project_path": "/tmp/opencode/search-audit-work-20261001/fixtures/ruff",
+    "scope": "all"
+  },
+  "seconds": 0.7066149340025731,
+  "is_error": false,
+  "wire": {
+    "_meta": null,
+    "content": [
+      {
+        "type": "text",
+        "text": "{\"status\": \"ok\", \"kind\": \"docs_context\", \"context_status\": \"ready\", \"context_available\": true, \"answer_supported\": false, \"answer_available\": false, \"support_status\": \"retrieval_only\", \"answer_policy\": \"cite_only\", \"coverage_policy\": \"retrieval_attribution_only\", \"query_coverage\": \"full\", \"retrieval_coverage\": \"full\", \"facet_coverage\": \"unverified\", \"covered_query_ids\": [\"query-original\"], \"missing_query_ids\": [], \"missing_facets\": [], \"facets\": [], \"sources\": [{\"evidence_id\": \"ev-ab9581eed2cb4a7a\", \"path_or_url\": \"docs/preview.md\", \"section\": \"Preview\", \"snippet\": \"Enabling preview mode does not on its own enable all preview rules. See the [rules section](#using-rules-that-are-in-preview) for details on selecting preview rules.\", \"version_binding\": \"unversioned\", \"content_sha256\": \"621dd8094f8fbdc888b51d937ec137c87a7e1a780f8ba8097a74c1528f41163a\", \"project_identity\": \"local:4e2639e05c3b04e0e17b9c400ffaba505bafec956146f653f20929673ee9776b\", \"authority\": \"source_of_truth\", \"scope\": \"project\", \"line_start\": 8, \"line_end\": 8, \"source_uri\": \"docatlas://source/85b15d796591c88df6498120\"}, {\"evidence_id\": \"ev-fb320b2f94366ac5\", \"path_or_url\": \"docs/preview.md\", \"section\": \"Preview > Enabling preview mode\", \"snippet\": \"## Enabling preview mode\\n\\nPreview mode can be enabled with the `--preview` flag on the CLI or by setting `preview = true` in your Ruff\\nconfiguration file.\\n\\nPreview mode can be configured separately for linting and formatting (requires Ruff v0.1.1+). To enable preview lint rules without preview style formatting:\\n\\n=== \\\"pyproject.toml\\\"\\n\\n    ```toml\\n    [tool.ruff.lint]\\n    preview = true\\n    ```\\n\\n=== \\\"ruff.toml\\\"\\n\\n    ```toml\\n    [lint]\\n    preview = true\\n    ```\\n\\n=== \\\"CLI\\\"\\n\\n    ```console\\n    ruff check --preview\\n    ```\\n\\n\\nTo enable preview style formatting without enabling any preview lint rules:\\n\\n=== \\\"pyproject.toml\\\"\\n\\n    ```toml\\n    [tool.ruff.format]\\n    preview = true\\n    ```\\n\\n=== \\\"ruff.toml\\\"\\n\\n    ```toml\\n    [format]\\n    preview = true\\n    ```\\n\\n=== \\\"CLI\\\"\\n\\n    ```console\\n    ruff format --preview\\n    ```\", \"version_binding\": \"unversioned\", \"content_sha256\": \"fdf701a0c1f7f4cbc63cbf74fd8613d548b9070aef63727d32fcb8e3f112b9ac\", \"project_identity\": \"local:4e2639e05c3b04e0e17b9c400ffaba505bafec956146f653f20929673ee9776b\", \"line_start\": 10, \"line_end\": 58, \"authority\": \"source_of_truth\", \"scope\": \"project\", \"source_uri\": \"docatlas://source/526572bcbaa0af5f920483d9\"}], \"context_quality\": {\"status\": \"unverified\", \"reasons\": [\"coverage_unverified\"]}, \"read_next\": [], \"edit_ready\": false, \"investigation_allowed\": true, \"estimated_tokens\": 639}",
+        "annotations": null,
+        "_meta": null
+      }
+    ],
+    "structuredContent": null,
+    "isError": false
+  }
+}

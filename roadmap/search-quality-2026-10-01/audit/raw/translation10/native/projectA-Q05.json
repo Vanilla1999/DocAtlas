@@ -1,0 +1,23 @@
+{
+  "tool": "get_docs_context",
+  "request": {
+    "question": "I need to understand the entire repository, including documentation of individual modules. Which search scope should I pass?",
+    "project_path": "/tmp/opencode/docatlas-ablation",
+    "scope": "all"
+  },
+  "seconds": 0.9540060350045678,
+  "is_error": false,
+  "wire": {
+    "_meta": null,
+    "content": [
+      {
+        "type": "text",
+        "text": "{\"status\": \"ok\", \"kind\": \"docs_context\", \"context_status\": \"ready\", \"context_available\": true, \"answer_supported\": false, \"answer_available\": false, \"support_status\": \"retrieval_only\", \"answer_policy\": \"cite_only\", \"coverage_policy\": \"retrieval_attribution_only\", \"query_coverage\": \"partial\", \"retrieval_coverage\": \"partial\", \"facet_coverage\": \"unverified\", \"covered_query_ids\": [], \"missing_query_ids\": [\"query-original\"], \"missing_facets\": [], \"facets\": [], \"sources\": [{\"evidence_id\": \"ev-d6384b4baee64954\", \"path_or_url\": \"docs/INDEX.md\", \"section\": \"Documentation Index\", \"snippet\": \"# Documentation Index\\n\\nThis is the canonical map of maintained DocAtlas project-owned documentation. Agents should start here when they need repository context before using code search or external documentation.\", \"version_binding\": \"unversioned\", \"content_sha256\": \"e980ee5b724e027100efda3c6ac390781331ac64b3dbec9a6a624b25c69afc2d\", \"project_identity\": \"local:48277f62f8b4ff92ba1c60c082f92a43817f9e1c5ba4ea27e12cd77a76421585\", \"authority\": \"source_of_truth\", \"scope\": \"project\", \"line_start\": 1, \"line_end\": 3, \"source_uri\": \"docatlas://source/d202e44932ab7f08868b5bb8\"}, {\"evidence_id\": \"ev-e393b8c4fdf8a5b3\", \"path_or_url\": \"docs/INDEX.md\", \"section\": \"Documentation Index > MCP Packs\", \"snippet\": \"- [MCP Packs](../wiki/MCP-Packs.md) — installed API pack runtime, Tool Search pattern, safety, and operations.\", \"version_binding\": \"unversioned\", \"content_sha256\": \"90da4e0fa8e0f10e7c9b88d1112982d253dacfb842e220263a29521c3a61c996\", \"project_identity\": \"local:48277f62f8b4ff92ba1c60c082f92a43817f9e1c5ba4ea27e12cd77a76421585\", \"line_start\": 38, \"line_end\": 38, \"authority\": \"source_of_truth\", \"scope\": \"project\", \"source_uri\": \"docatlas://source/650c18c8e94203b901c89e8c\"}], \"context_quality\": {\"status\": \"unverified\", \"reasons\": [\"coverage_unverified\"]}, \"read_next\": [{\"source_uri\": \"docatlas://source/2112d8d439dde3d07614312a\", \"path\": \"docs/INDEX.md\", \"project_identity\": \"local:48277f62f8b4ff92ba1c60c082f92a43817f9e1c5ba4ea27e12cd77a76421585\", \"snapshot_sha256\": \"sha256:b4e602fd1ea233ae8ba2b4316a08ce729e50fa8931c96bb1f200224fc71aa5d4\", \"line_start\": 7, \"line_end\": 9, \"reason\": \"inspect_source_context\"}], \"edit_ready\": false, \"investigation_allowed\": true, \"estimated_tokens\": 545}",
+        "annotations": null,
+        "_meta": null
+      }
+    ],
+    "structuredContent": null,
+    "isError": false
+  }
+}

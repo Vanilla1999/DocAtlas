@@ -1,0 +1,26 @@
+[
+  {
+    "command": [
+      "node",
+      "/tmp/opencode/search-audit-tools-20261001/node_modules/@arabold/docs-mcp-server/dist/index.js",
+      "scrape",
+      "docatlas",
+      "file:///tmp/opencode/search-audit-work-20261001/corpus/docatlas-project/CHANGELOG.md",
+      "--max-pages",
+      "1",
+      "--max-depth",
+      "1",
+      "--no-clean",
+      "--config",
+      "/tmp/opencode/search-audit-work-20261001/grounded/project-config.json",
+      "--store-path",
+      "/tmp/opencode/search-audit-work-20261001/grounded/project-store",
+      "--no-telemetry",
+      "--no-logo"
+    ],
+    "seconds": 1.410358922999876,
+    "returncode": 0,
+    "stdout": "Successfully scraped 1 pages\n",
+    "stderr": ""
+  }
+]

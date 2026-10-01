@@ -1,0 +1,26 @@
+{
+  "tool": "get_docs_context",
+  "request": {
+    "question": "Where is mandatory ninety-day retention of every conversation specified?",
+    "project_path": "/tmp/opencode/docatlas-ablation",
+    "scope": "all",
+    "lookup_queries": [
+      "Is mandatory ninety-day conversation retention part of the documented contract?"
+    ]
+  },
+  "seconds": 3.917147683998337,
+  "is_error": false,
+  "wire": {
+    "_meta": null,
+    "content": [
+      {
+        "type": "text",
+        "text": "{\"status\": \"ok\", \"kind\": \"docs_context\", \"context_status\": \"ready\", \"context_available\": true, \"answer_supported\": false, \"answer_available\": false, \"support_status\": \"retrieval_only\", \"answer_policy\": \"cite_only\", \"coverage_policy\": \"retrieval_attribution_only\", \"query_coverage\": \"partial\", \"retrieval_coverage\": \"partial\", \"facet_coverage\": \"unverified\", \"covered_query_ids\": [\"query-lookup-1\"], \"missing_query_ids\": [\"query-original\"], \"missing_facets\": [], \"facets\": [], \"sources\": [{\"evidence_id\": \"ev-8c2a832e1b68357d\", \"path_or_url\": \"docs/modules/question-planning.md\", \"section\": \"Question planning module > Public boundary\", \"snippet\": \"## Public boundary\\n\\nThe durable output is the project-answer requirement contract: resolved subjects, intents, mandatory facets, conditions, technical identities, parse trace, and unresolved parts. Retrieval ranking is not owned here.\\n\\nImperative edits are outside this boundary. They are owned by\\n`PatchRequestPlan` and the patch-specific requirement pipeline documented in\\n`patch-request-planning.md`; one request must never pass through both systems.\", \"version_binding\": \"unversioned\", \"content_sha256\": \"8a5a3dacbdb4c0e06ae26eec029b521c90d15e7f2fe60b597a64b1738825d4c9\", \"project_identity\": \"local:48277f62f8b4ff92ba1c60c082f92a43817f9e1c5ba4ea27e12cd77a76421585\", \"authority\": \"source_of_truth\", \"scope\": \"module\", \"line_start\": 23, \"line_end\": 29, \"source_uri\": \"docatlas://source/5a6cadacda349441ffacbc59\"}], \"context_quality\": {\"status\": \"partial\", \"reasons\": [\"requested_part_missing\"]}, \"read_next\": [], \"edit_ready\": false, \"investigation_allowed\": true, \"estimated_tokens\": 394}",
+        "annotations": null,
+        "_meta": null
+      }
+    ],
+    "structuredContent": null,
+    "isError": false
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "request": {
+    "libraryName": "typer",
+    "query": "Does raising typer.Exit() itself imply an error, and what is its default exit code?"
+  },
+  "seconds": 2.2047244000059436,
+  "wire": {
+    "_meta": null,
+    "content": [
+      {
+        "type": "text",
+        "text": "Available Libraries:\n\n- Title: Typer\n- Context7-compatible library ID: /websites/typer_tiangolo\n- Description: Typer is a library for building command-line interfaces (CLIs) in Python, leveraging type hints for easy code development.\n- Code Snippets: 1019\n- Source Reputation: High\n- Benchmark Score: 82.94\n----------\n- Title: Typer\n- Context7-compatible library ID: /fastapi/typer\n- Description: Typer, build great CLIs. Easy to code. Based on Python type hints.\n- Code Snippets: 619\n- Source Reputation: Medium\n- Benchmark Score: 78.19\n- Versions: 0.21.1",
+        "annotations": null,
+        "_meta": null
+      }
+    ],
+    "structuredContent": null,
+    "isError": false
+  },
+  "is_error": false
+}

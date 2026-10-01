@@ -1,0 +1,22 @@
+{
+  "tool": "get_docs_context",
+  "request": {
+    "question": "Ссылка source_uri появилась в цитате. Нужно ли немедленно её открывать?",
+    "project_path": "/tmp/opencode/docatlas-ablation"
+  },
+  "seconds": 0.41479749300197,
+  "is_error": false,
+  "wire": {
+    "_meta": null,
+    "content": [
+      {
+        "type": "text",
+        "text": "{\"status\": \"ok\", \"kind\": \"docs_context\", \"context_status\": \"ready\", \"context_available\": true, \"answer_supported\": false, \"answer_available\": false, \"support_status\": \"retrieval_only\", \"answer_policy\": \"cite_only\", \"coverage_policy\": \"retrieval_attribution_only\", \"query_coverage\": \"partial\", \"retrieval_coverage\": \"partial\", \"facet_coverage\": \"unverified\", \"covered_query_ids\": [\"query-anchor-1\"], \"missing_query_ids\": [\"query-original\"], \"missing_facets\": [], \"facets\": [], \"sources\": [{\"evidence_id\": \"ev-c7d2a99dd5c55acc\", \"path_or_url\": \"docs/source-continuation.md\", \"section\": \"Grounded partial answers and source continuation > Read only a missing part\", \"snippet\": \"When spare space remains in the initial 800-token admission budget, a selected\\nproject source may carry `source_uri`. This optional locator never displaces a\\nselected snippet. Pass the exact returned URI to MCP `resources/read`; ordinary\\nMarkdown links are citations, not continuation capabilities. The initial response\\nstill contains at most three sources and retains its public token-estimate meaning.\", \"version_binding\": \"unversioned\", \"content_sha256\": \"5777063b692b8532c3ef4344efa5f505b9890adb5c58cd741f05f795b8d0d33d\", \"project_identity\": \"local:48277f62f8b4ff92ba1c60c082f92a43817f9e1c5ba4ea27e12cd77a76421585\", \"authority\": \"source_of_truth\", \"scope\": \"module\", \"line_start\": 18, \"line_end\": 22, \"source_uri\": \"docatlas://source/1441a3b405597b7763fe2a97\"}], \"context_quality\": {\"status\": \"unverified\", \"reasons\": [\"coverage_unverified\"]}, \"read_next\": [{\"source_uri\": \"docatlas://source/63f526019a686ed1e3b20aaf\", \"path\": \"docs/source-continuation.md\", \"project_identity\": \"local:48277f62f8b4ff92ba1c60c082f92a43817f9e1c5ba4ea27e12cd77a76421585\", \"snapshot_sha256\": \"sha256:00715dd09b8bcf6894ae65edaa0a5629c13e887887323724538968c2ea5b4a3a\", \"line_start\": 23, \"line_end\": 48, \"reason\": \"inspect_source_context\"}], \"edit_ready\": false, \"investigation_allowed\": true, \"estimated_tokens\": 474}",
+        "annotations": null,
+        "_meta": null
+      }
+    ],
+    "structuredContent": null,
+    "isError": false
+  }
+}

@@ -1,0 +1,26 @@
+{
+  "tool": "get_docs_context",
+  "request": {
+    "question": "Где подтверждено, что DocAtlas всегда экономит ровно 50 процентов токенов?",
+    "project_path": "/tmp/opencode/docatlas-ablation",
+    "scope": "all",
+    "lookup_queries": [
+      "Is a fixed fifty-percent task-token saving guaranteed?"
+    ]
+  },
+  "seconds": 4.077628556995478,
+  "is_error": false,
+  "wire": {
+    "_meta": null,
+    "content": [
+      {
+        "type": "text",
+        "text": "{\"status\": \"insufficient_evidence\", \"kind\": \"docs_context\", \"missing\": [\"No safe, current, project-scoped documentation context was retrieved.\"], \"estimated_tokens\": 263, \"context_quality\": {\"status\": \"unavailable\", \"reasons\": [\"source_unavailable\"]}, \"read_next\": [], \"recommended_next_action\": {\"tool\": \"code_search\", \"type\": \"search_local_source\", \"handled_by\": \"coding_agent\", \"requires_confirmation\": false, \"reason\": \"evidence_rejected\", \"query_terms\": [\"Где подтверждено\", \"что DocAtlas всегда экономит ровно 50 процентов токенов\"], \"repeat_docs_context\": false, \"auto_execute\": false}, \"context_available\": false, \"documentation_supported\": false, \"investigation_allowed\": true, \"hard_stop\": false, \"recovery_origin\": \"eligibility\", \"recovery_reason_code\": \"evidence_rejected\", \"recovery_disposition\": \"search_local_source\", \"disposition\": \"search_local_source\", \"edit_ready\": false, \"source_search_status\": \"required\", \"requires_confirmation\": false, \"answer_supported\": false, \"answer_available\": false, \"support_status\": \"insufficient_evidence\"}",
+        "annotations": null,
+        "_meta": null
+      }
+    ],
+    "structuredContent": null,
+    "isError": false
+  }
+}

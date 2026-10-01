@@ -1,0 +1,26 @@
+[
+  {
+    "command": [
+      "node",
+      "/tmp/opencode/search-audit-tools-20261001/node_modules/@arabold/docs-mcp-server/dist/index.js",
+      "scrape",
+      "mkdocs",
+      "file:///tmp/opencode/search-audit-work-20261001/grounded/corpus/mkdocs/docs/user-guide/writing-your-docs.md",
+      "--max-pages",
+      "1",
+      "--max-depth",
+      "1",
+      "--no-clean",
+      "--config",
+      "/tmp/opencode/search-audit-work-20261001/grounded/config.json",
+      "--store-path",
+      "/tmp/opencode/search-audit-work-20261001/grounded/store",
+      "--no-telemetry",
+      "--no-logo"
+    ],
+    "returncode": 0,
+    "seconds": 1.260391798998171,
+    "stdout": "Successfully scraped 1 pages\n",
+    "stderr": ""
+  }
+]

@@ -1,0 +1,16 @@
+{
+  "id": "projectB-Q28",
+  "uri": "docatlas://source/de42ce35f7694b98a1ff494d",
+  "seconds": 0.0005998620035825297,
+  "wire": {
+    "meta": null,
+    "contents": [
+      {
+        "uri": "docatlas://source/de42ce35f7694b98a1ff494d",
+        "mimeType": "text/plain",
+        "meta": null,
+        "text": "{\"reason_code\":\"unknown_or_expired_reference\",\"status\":\"source_unavailable\"}"
+      }
+    ]
+  }
+}

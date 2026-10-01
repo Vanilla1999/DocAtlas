@@ -1,0 +1,22 @@
+{
+  "tool": "get_docs_context",
+  "request": {
+    "question": "Как запросить старое поведение из CHANGELOG, не подмешивая устаревшие документы в обычные вопросы?",
+    "project_path": "/tmp/opencode/docatlas-ablation"
+  },
+  "seconds": 0.6456265130036627,
+  "is_error": false,
+  "wire": {
+    "_meta": null,
+    "content": [
+      {
+        "type": "text",
+        "text": "{\"status\": \"ok\", \"kind\": \"docs_context\", \"context_status\": \"ready\", \"context_available\": true, \"answer_supported\": false, \"answer_available\": false, \"support_status\": \"retrieval_only\", \"answer_policy\": \"cite_only\", \"coverage_policy\": \"retrieval_attribution_only\", \"query_coverage\": \"partial\", \"retrieval_coverage\": \"partial\", \"facet_coverage\": \"unverified\", \"covered_query_ids\": [\"query-anchor-1\"], \"missing_query_ids\": [\"query-original\"], \"missing_facets\": [], \"facets\": [], \"sources\": [{\"evidence_id\": \"ev-07e22591bab2c936\", \"path_or_url\": \"CHANGELOG.md\", \"section\": \"Changelog\", \"snippet\": \"# Changelog\\n\\nAll notable changes to this project will be documented in this file.\\n\\nThe format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).\", \"version_binding\": \"unversioned\", \"content_sha256\": \"a040b3d088fa1787bb50da3bc8673845c837e059e7b5f4f1d853bd4aba9c6d7d\", \"project_identity\": \"local:48277f62f8b4ff92ba1c60c082f92a43817f9e1c5ba4ea27e12cd77a76421585\", \"authority\": \"historical\", \"scope\": \"project\", \"line_start\": 1, \"line_end\": 5}], \"context_quality\": {\"status\": \"unverified\", \"reasons\": [\"coverage_unverified\"]}, \"read_next\": [], \"edit_ready\": false, \"investigation_allowed\": true, \"estimated_tokens\": 314}",
+        "annotations": null,
+        "_meta": null
+      }
+    ],
+    "structuredContent": null,
+    "isError": false
+  }
+}

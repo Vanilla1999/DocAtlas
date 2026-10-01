@@ -1,0 +1,23 @@
+{
+  "tool": "get_docs_context",
+  "request": {
+    "question": "Where do documentation sources and mkdocs.yml live by default? Also identify the exact value chosen in our private production deployment.",
+    "project_path": "/tmp/opencode/search-audit-work-20261001/fixtures/mkdocs",
+    "scope": "all"
+  },
+  "seconds": 0.5521546740055783,
+  "is_error": false,
+  "wire": {
+    "_meta": null,
+    "content": [
+      {
+        "type": "text",
+        "text": "{\"status\": \"ok\", \"kind\": \"docs_context\", \"context_status\": \"ready\", \"context_available\": true, \"answer_supported\": false, \"answer_available\": false, \"support_status\": \"retrieval_only\", \"answer_policy\": \"cite_only\", \"coverage_policy\": \"retrieval_attribution_only\", \"query_coverage\": \"partial\", \"retrieval_coverage\": \"partial\", \"facet_coverage\": \"unverified\", \"covered_query_ids\": [\"query-anchor-1\"], \"missing_query_ids\": [\"query-original\"], \"missing_facets\": [], \"facets\": [{\"id\": \"retrieval-need:need-1\", \"requirement_id\": null, \"question\": \"Where do documentation sources and mkdocs.yml live by default?\", \"status\": \"retrieval_only\", \"evidence_ids\": [\"ev-f5735719638696d5\"]}], \"sources\": [{\"evidence_id\": \"ev-f5735719638696d5\", \"path_or_url\": \"docs/user-guide/writing-your-docs.md\", \"section\": \"Writing your docs > File layout\", \"snippet\": \"## File layout\\n\\nYour documentation source should be written as regular Markdown files (see\\n[Writing with Markdown](#writing-with-markdown) below), and placed in the\\n[documentation directory](configuration.md#docs_dir). By default, this directory\\nwill be named `docs` and will exist at the top level of your project, alongside\\nthe `mkdocs.yml` configuration file.\\n\\nThe simplest project you can create will look something like this:\", \"version_binding\": \"unversioned\", \"content_sha256\": \"7698a21b792c2abd6ddf67ee1d9eadb2ab5c612f4c3ad3b86d4a663b13a27e6e\", \"project_identity\": \"local:fd4807fa34128ed0db2e2162d3b5c0a37c7992656c9c7ac093ec283fb925d818\", \"authority\": \"source_of_truth\", \"scope\": \"project\", \"line_start\": 7, \"line_end\": 15}, {\"evidence_id\": \"ev-f0c8a5940579c536\", \"path_or_url\": \"docs/user-guide/writing-your-docs.md\", \"section\": \"Writing your docs > Writing with Markdown > Internal links > Linking to images and media\", \"snippet\": \"#### Linking to images and media\\n\\nAs well as the Markdown source files, you can also include other file types in\\nyour documentation, which will be copied across when generating your\\ndocumentation site. These might include images and other media.\", \"version_binding\": \"unversioned\", \"content_sha256\": \"b4a4b3c8ed97acd90ae49db3fb85919cf2368a727e85d906940abe06d0ec04f1\", \"project_identity\": \"local:fd4807fa34128ed0db2e2162d3b5c0a37c7992656c9c7ac093ec283fb925d818\", \"authority\": \"source_of_truth\", \"scope\": \"project\", \"line_start\": 303, \"line_end\": 307}], \"context_quality\": {\"status\": \"unverified\", \"reasons\": [\"coverage_unverified\"]}, \"read_next\": [{\"source_uri\": \"docatlas://source/e374b37e7afa74e09468510e\", \"path\": \"docs/user-guide/writing-your-docs.md\", \"project_identity\": \"local:fd4807fa34128ed0db2e2162d3b5c0a37c7992656c9c7ac093ec283fb925d818\", \"snapshot_sha256\": \"sha256:a6b69d1318ae84455bae021b6655b71274f29c19ba43d021d872d100b7b38cba\", \"line_start\": 32, \"line_end\": 71, \"reason\": \"inspect_source_context\"}], \"edit_ready\": false, \"investigation_allowed\": true, \"estimated_tokens\": 695}",
+        "annotations": null,
+        "_meta": null
+      }
+    ],
+    "structuredContent": null,
+    "isError": false
+  }
+}

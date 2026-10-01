@@ -1,0 +1,86 @@
+[
+  {
+    "stable_chunk_id": "child-13b63955c4148d054bb02cad6c4dda8c83bf0aee",
+    "source_path": "docs/background.md",
+    "display_text": "\nStarlette includes a `BackgroundTask` class for in-process background tasks.\n\nA background task should be attached to a response, and will run only once\nthe response has been sent.\n\n",
+    "line_start": 1,
+    "line_end": 6
+  },
+  {
+    "stable_chunk_id": "child-07075ff071d76b659fbfe36aae7a6544c31e78b1",
+    "source_path": "docs/background.md",
+    "display_text": "### Background Task\n\nUsed to add a single background task to a response.\n\nSignature: `BackgroundTask(func, *args, **kwargs)`\n\n",
+    "line_start": 7,
+    "line_end": 12
+  },
+  {
+    "stable_chunk_id": "child-3cd2bca9992cfbc8b7b39ba73b22c3ef7599298a",
+    "source_path": "docs/background.md",
+    "display_text": "```python\nfrom starlette.applications import Starlette\nfrom starlette.responses import JSONResponse\nfrom starlette.routing import Route\nfrom starlette.background import BackgroundTask\n\n\n...\n\nasync def signup(request):\n    data = await request.json()\n    username = data['username']\n    email = data['email']\n    task = BackgroundTask(send_welcome_email, to_address=email)\n    message = {'status': 'Signup successful'}\n    return JSONResponse(message, background=task)\n\nasync def send_welcome_email(to_address):\n    ...\n\n\nroutes = [\n    ...\n    Route('/user/signup', endpoint=signup, methods=['POST'])\n]\n\napp = Starlette(routes=routes)\n```\n\n",
+    "line_start": 13,
+    "line_end": 41
+  },
+  {
+    "stable_chunk_id": "child-6c283f497fef69b18f5c4b1bfd20885c83e22b56",
+    "source_path": "docs/background.md",
+    "display_text": "### BackgroundTasks\n\nUsed to add multiple background tasks to a response.\n\nSignature: `BackgroundTasks(tasks=[])`\n\n",
+    "line_start": 42,
+    "line_end": 47
+  },
+  {
+    "stable_chunk_id": "child-dbf64d3e4c5ca292e1e48eace0dba3cc5112f380",
+    "source_path": "docs/background.md",
+    "display_text": "```python\nfrom starlette.applications import Starlette\nfrom starlette.responses import JSONResponse\nfrom starlette.background import BackgroundTasks\n\nasync def signup(request):\n    data = await request.json()\n    username = data['username']\n    email = data['email']\n    tasks = BackgroundTasks()\n    tasks.add_task(send_welcome_email, to_address=email)\n    tasks.add_task(send_admin_notification, username=username)\n    message = {'status': 'Signup successful'}\n    return JSONResponse(message, background=tasks)\n\nasync def send_welcome_email(to_address):\n    ...\n\nasync def send_admin_notification(username):\n    ...\n\nroutes = [\n    Route('/user/signup', endpoint=signup, methods=['POST'])\n]\n\napp = Starlette(routes=routes)\n```\n\n",
+    "line_start": 48,
+    "line_end": 75
+  },
+  {
+    "stable_chunk_id": "child-4150098baa28854ebf1b7980c628f6dd03f3d51d",
+    "source_path": "docs/background.md",
+    "display_text": "!!! important\n    The tasks are executed in order. In case one of the tasks raises\n    an exception, the following tasks will not get the opportunity to be executed.\n",
+    "line_start": 76,
+    "line_end": 78
+  },
+  {
+    "stable_chunk_id": "child-f4b036bd42c20fd4ba40524736850c857a9915e6",
+    "source_path": "docs/lifespan.md",
+    "display_text": "\nStarlette applications can register a lifespan handler for dealing with\ncode that needs to run before the application starts up, or when the application\nis shutting down.\n\n```python\nimport contextlib\n\nfrom starlette.applications import Starlette\n\n\n@contextlib.asynccontextmanager\nasync def lifespan(app):\n    async with some_async_resource():\n        print(\"Run at startup!\")\n        yield\n        print(\"Run on shutdown!\")\n\n\nroutes = [\n    ...\n]\n\napp = Starlette(routes=routes, lifespan=lifespan)\n```\n\n",
+    "line_start": 1,
+    "line_end": 26
+  },
+  {
+    "stable_chunk_id": "child-45a989a379d6074eb756a24b0e746601531d1c3d",
+    "source_path": "docs/lifespan.md",
+    "display_text": "Starlette will not start serving any incoming requests until the lifespan has been run.\n\nThe lifespan teardown will run once all connections have been closed, and\nany in-process background tasks have completed.\n\nConsider using [`anyio.create_task_group()`](https://anyio.readthedocs.io/en/stable/tasks.html)\nfor managing asynchronous tasks.\n\n",
+    "line_start": 27,
+    "line_end": 34
+  },
+  {
+    "stable_chunk_id": "child-3d6c154188e302fd1e543f6dd7214f704c2eb0b9",
+    "source_path": "docs/lifespan.md",
+    "display_text": "## Lifespan State\n\nThe lifespan has the concept of `state`, which is a dictionary that\ncan be used to share the objects between the lifespan, and the requests.\n\n",
+    "line_start": 35,
+    "line_end": 39
+  },
+  {
+    "stable_chunk_id": "child-8f4a4973d035eb54933aa680232a1fda71cbbd8c",
+    "source_path": "docs/lifespan.md",
+    "display_text": "```python\nimport contextlib\nfrom typing import AsyncIterator, TypedDict\n\nimport httpx\nfrom starlette.applications import Starlette\nfrom starlette.requests import Request\nfrom starlette.responses import PlainTextResponse\nfrom starlette.routing import Route\n\n\nclass State(TypedDict):\n    http_client: httpx.AsyncClient\n\n\n@contextlib.asynccontextmanager\nasync def lifespan(app: Starlette) -> AsyncIterator[State]:\n    async with httpx.AsyncClient() as client:\n        yield {\"http_client\": client}\n\n\nasync def homepage(request: Request) -> PlainTextResponse:\n    client = request.state.http_client\n    response = await client.get(\"https://www.example.com\")\n    return PlainTextResponse(response.text)\n\n\napp = Starlette(\n    lifespan=lifespan,\n    routes=[Route(\"/\", homepage)]\n)\n```\n\n",
+    "line_start": 40,
+    "line_end": 72
+  },
+  {
+    "stable_chunk_id": "child-8c70af49b480b64061ab1f797abd595783a26cd2",
+    "source_path": "docs/lifespan.md",
+    "display_text": "The `state` received on the requests is a **shallow** copy of the state received on the\nlifespan handler.\n\n",
+    "line_start": 73,
+    "line_end": 75
+  },
+  {
+    "stable_chunk_id": "child-9bb2f13838976d2d391254b0b88ff4c538b552fa",
+    "source_path": "docs/lifespan.md",
+    "display_text": "## Running lifespan in tests\n\nYou should use `TestClient` as a context manager, to ensure that the lifespan is called.\n\n```python\nfrom example import app\nfrom starlette.testclient import TestClient\n\n\ndef test_homepage():\n    with TestClient(app) as client:\n        # Application's lifespan is called on entering the block.\n        response = client.get(\"/\")\n        assert response.status_code == 200\n\n    # And the lifespan's teardown is run when exiting the block.\n```\n",
+    "line_start": 76,
+    "line_end": 92
+  }
+]

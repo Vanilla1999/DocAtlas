@@ -1,0 +1,23 @@
+{
+  "tool": "get_docs_context",
+  "request": {
+    "question": "What is HTTPX default timeout behavior: how long and which exception? Also identify the exact value chosen in our private production deployment.",
+    "project_path": "/tmp/opencode/search-audit-work-20261001/fixtures/httpx",
+    "scope": "all"
+  },
+  "seconds": 0.5759476059974986,
+  "is_error": false,
+  "wire": {
+    "_meta": null,
+    "content": [
+      {
+        "type": "text",
+        "text": "{\"status\": \"ok\", \"kind\": \"docs_context\", \"context_status\": \"ready\", \"context_available\": true, \"answer_supported\": false, \"answer_available\": false, \"support_status\": \"retrieval_only\", \"answer_policy\": \"cite_only\", \"coverage_policy\": \"retrieval_attribution_only\", \"query_coverage\": \"partial\", \"retrieval_coverage\": \"partial\", \"facet_coverage\": \"unverified\", \"covered_query_ids\": [\"query-anchor-1\"], \"missing_query_ids\": [\"query-original\"], \"missing_facets\": [], \"facets\": [{\"id\": \"retrieval-need:need-1\", \"requirement_id\": null, \"question\": \"What is HTTPX default timeout behavior\", \"status\": \"retrieval_only\", \"evidence_ids\": [\"ev-e6bf514bc9f82bb4\"]}, {\"id\": \"retrieval-need:need-3\", \"requirement_id\": null, \"question\": \"What is HTTPX default timeout behavior which exception?\", \"status\": \"retrieval_only\", \"evidence_ids\": [\"ev-e6bf514bc9f82bb4\"]}], \"sources\": [{\"evidence_id\": \"ev-e6bf514bc9f82bb4\", \"path_or_url\": \"docs/advanced/timeouts.md\", \"section\": \"Introduction\", \"snippet\": \"HTTPX is careful to enforce timeouts everywhere by default.\\n\\nThe default behavior is to raise a `TimeoutException` after 5 seconds of\\nnetwork inactivity.\", \"version_binding\": \"unversioned\", \"content_sha256\": \"e25e6dfe4ab4f9738a6454908e6bdafbd3961abbb365f64d9b60b52fbc6213a7\", \"project_identity\": \"local:8cb756392a06b5929cccc7f21e226fea445751f0d8e07285f2b940cee43cfdc6\", \"authority\": \"source_of_truth\", \"scope\": \"project\", \"line_start\": 1, \"line_end\": 4, \"source_uri\": \"docatlas://source/c6409a3d0d09095b062216f4\"}, {\"evidence_id\": \"ev-798926cd56d07f52\", \"path_or_url\": \"docs/advanced/timeouts.md\", \"section\": \"Fine tuning the configuration\", \"snippet\": \"```python\\n# A client with a 60s timeout for connecting, and a 10s timeout elsewhere.\\ntimeout = httpx.Timeout(10.0, connect=60.0)\\nclient = httpx.Client(timeout=timeout)\\n\\nresponse = client.get('http://example.com/')\\n```\", \"version_binding\": \"unversioned\", \"content_sha256\": \"249f58b0bf23a1afb955471cdc38a90d22a5a2ba24448e03ccc11f23cb85d37d\", \"project_identity\": \"local:8cb756392a06b5929cccc7f21e226fea445751f0d8e07285f2b940cee43cfdc6\", \"authority\": \"source_of_truth\", \"scope\": \"project\", \"line_start\": 65, \"line_end\": 71}], \"context_quality\": {\"status\": \"unverified\", \"reasons\": [\"coverage_unverified\"]}, \"read_next\": [{\"source_uri\": \"docatlas://source/bf0b58019afd9767d4b00d8f\", \"path\": \"docs/environment_variables.md\", \"project_identity\": \"local:8cb756392a06b5929cccc7f21e226fea445751f0d8e07285f2b940cee43cfdc6\", \"snapshot_sha256\": \"sha256:d0cdf4d740dc3ed8b21c4ee45735551e05d4e57d0fda05a2f18c4684197a27eb\", \"line_start\": 1, \"line_end\": 8, \"reason\": \"inspect_source_context\"}], \"edit_ready\": false, \"investigation_allowed\": true, \"estimated_tokens\": 645}",
+        "annotations": null,
+        "_meta": null
+      }
+    ],
+    "structuredContent": null,
+    "isError": false
+  }
+}

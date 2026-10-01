@@ -1,0 +1,27 @@
+{
+  "tool": "get_docs_context",
+  "request": {
+    "question": "Я спросил про три вещи, а в цитатах есть только две. Как агенту сообщить полезную часть и обозначить недостающую?",
+    "project_path": "/tmp/opencode/docatlas-ablation",
+    "scope": "all",
+    "lookup_queries": [
+      "How should a host answer from partial documentation evidence?",
+      "How are missing parts of a compound question represented?"
+    ]
+  },
+  "seconds": 1.0181890779931564,
+  "is_error": false,
+  "wire": {
+    "_meta": null,
+    "content": [
+      {
+        "type": "text",
+        "text": "{\"status\": \"ok\", \"kind\": \"docs_context\", \"context_status\": \"ready\", \"context_available\": true, \"answer_supported\": false, \"answer_available\": false, \"support_status\": \"retrieval_only\", \"answer_policy\": \"cite_only\", \"coverage_policy\": \"retrieval_attribution_only\", \"query_coverage\": \"partial\", \"retrieval_coverage\": \"partial\", \"facet_coverage\": \"unverified\", \"covered_query_ids\": [\"query-lookup-1\", \"query-lookup-2\"], \"missing_query_ids\": [\"query-original\"], \"missing_facets\": [], \"facets\": [], \"sources\": [{\"evidence_id\": \"ev-d6821cc55bf2b657\", \"path_or_url\": \"docs/grounded-host-session.md\", \"section\": \"Grounded host sessions over MCP > Final handoff\", \"snippet\": \"`answer_supported` remains false in all three states. A read failure cannot turn\\nan existing partial answer into an empty refusal. The host should state the\\nsupported part, explicitly name what is unknown and provide a feasible next\\nstep or a necessary clarifying question. Unknown private configuration is never\\ninferred from a general documentation quote.\", \"version_binding\": \"unversioned\", \"content_sha256\": \"0bc5fe3a2c1cfd53fa893d9108ef24da0c8d5b0234c3ba47ecb21d6b7e012c58\", \"project_identity\": \"local:48277f62f8b4ff92ba1c60c082f92a43817f9e1c5ba4ea27e12cd77a76421585\", \"authority\": \"source_of_truth\", \"scope\": \"module\", \"line_start\": 66, \"line_end\": 70}, {\"evidence_id\": \"ev-b529e359106cbb6a\", \"path_or_url\": \"docs/mcp-docs-server.md\", \"section\": \"Docs MCP server > Public tool contract\", \"snippet\": \"Audited domain-owned rewrites may provide derived retrieval coverage for the original question, but their internal IDs never appear as public covered or missing query IDs and the result remains retrieval-only. Compound projection selects compact witnesses for distinct lookup IDs before expanding snippets with remaining capacity, then requalifies coverage against the visible path, section, and snippet.\", \"version_binding\": \"unversioned\", \"content_sha256\": \"5a64b9ce4db9d5b0c5bde6c5c6600472aec537898390af70bbed0fa1477fd133\", \"project_identity\": \"local:48277f62f8b4ff92ba1c60c082f92a43817f9e1c5ba4ea27e12cd77a76421585\", \"authority\": \"source_of_truth\", \"scope\": \"project\", \"line_start\": 47, \"line_end\": 47}, {\"evidence_id\": \"ev-c2e7ecffbcf3e7e9\", \"path_or_url\": \"README.md\", \"section\": \"DocAtlas\", \"snippet\": \"It retrieves compact evidence from reviewable project docs and version-aware dependency documentation so the host model can answer from the sources your project actually uses — instead of stale model memory or oversized prompt dumps.\", \"version_binding\": \"unversioned\", \"content_sha256\": \"872b194461c95e06cbedac8c69e2226ea041d4d2309c05299b589733762d8d58\", \"project_identity\": \"local:48277f62f8b4ff92ba1c60c082f92a43817f9e1c5ba4ea27e12cd77a76421585\", \"authority\": \"source_of_truth\", \"scope\": \"project\", \"line_start\": 17, \"line_end\": 17}], \"context_quality\": {\"status\": \"unverified\", \"reasons\": [\"coverage_unverified\", \"budget_limited\"]}, \"read_next\": [], \"edit_ready\": false, \"investigation_allowed\": true, \"estimated_tokens\": 727}",
+        "annotations": null,
+        "_meta": null
+      }
+    ],
+    "structuredContent": null,
+    "isError": false
+  }
+}

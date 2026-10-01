@@ -1,0 +1,18 @@
+{
+  "method":"Same-meaning question-only EN translations of ten predeclared Russian cases, no lookups. Single-reviewer posthoc diagnostics; not hidden bilingual acceptance.",
+  "rows":[
+    {"id":"projectA-Q05","grade":"none","reason":"Nonempty docs index does not give requested search scope."},
+    {"id":"projectA-Q07","grade":"partial","reason":"Core commands provide ingest formats/list/inspect navigation, not full project candidate/ignored discovery contract."},
+    {"id":"projectA-Q09","grade":"full","reason":"Exact sync_project_docs and original-question retry workflow now delivered."},
+    {"id":"projectA-Q11","grade":"partial","reason":"Sync local changes explicit, external refresh half still absent."},
+    {"id":"projectA-Q23","grade":"full","reason":"Whole-response metadata admission and estimate distinction retained."},
+    {"id":"projectA-Q25","grade":"full","reason":"Host synthesis despite false flags retained."},
+    {"id":"projectA-Q29","grade":"none","reason":"Still documentation index/source tree, not instruction trust policy."},
+    {"id":"projectB-Q03","grade":"none","reason":"Still old answer-supported=true projection description, not supported-parts synthesis."},
+    {"id":"projectB-Q17","grade":"none","reason":"Reader budgets/stop policy instead of changed-snapshot result."},
+    {"id":"projectB-Q23","grade":"none","reason":"Still empty for cross-project isolation."}
+  ],
+  "original":{"nonempty":5,"full":2,"partial":1,"none":7},
+  "translated":{"nonempty":9,"full":3,"partial":2,"none":5},
+  "interpretation":"Translation alone improves availability much more than semantic utility. It is a recall lever, not a sufficient cure for qualification/ranking/packing or conflicting corpus contracts."
+}

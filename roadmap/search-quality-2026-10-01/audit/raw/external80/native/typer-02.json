@@ -1,0 +1,23 @@
+{
+  "tool": "get_docs_context",
+  "request": {
+    "question": "Как через typer.Exit сообщить терминалу об ошибке?",
+    "project_path": "/tmp/opencode/search-audit-work-20261001/fixtures/typer",
+    "scope": "all"
+  },
+  "seconds": 0.38604581500112545,
+  "is_error": false,
+  "wire": {
+    "_meta": null,
+    "content": [
+      {
+        "type": "text",
+        "text": "{\"status\": \"ok\", \"kind\": \"docs_context\", \"context_status\": \"ready\", \"context_available\": true, \"answer_supported\": false, \"answer_available\": false, \"support_status\": \"retrieval_only\", \"answer_policy\": \"cite_only\", \"coverage_policy\": \"retrieval_attribution_only\", \"query_coverage\": \"partial\", \"retrieval_coverage\": \"partial\", \"facet_coverage\": \"unverified\", \"covered_query_ids\": [\"query-anchor-1\"], \"missing_query_ids\": [\"query-original\"], \"missing_facets\": [], \"facets\": [], \"sources\": [{\"evidence_id\": \"ev-3bbf46f1bc2eb616\", \"path_or_url\": \"docs/tutorial/terminating.md\", \"section\": \"Terminating > Exit with an error\", \"snippet\": \"## Exit with an error\\n\\n`typer.Exit()` takes an optional `code` parameter. By default, `code` is `0`, meaning there was no error.\\n\\nYou can pass a `code` with a number other than `0` to tell the terminal that there was an error in the execution of the program:\\n\\n```Python hl_lines=\\\"7\\\"\\n{!../docs_src/terminating/tutorial002.py!}\\n```\\n\\nCheck it:\\n\\n<div class=\\\"termy\\\">\", \"version_binding\": \"unversioned\", \"content_sha256\": \"94332dd50260a35e4b28afe305a6e8f22a8640fd2e5f16945b370539ec44f3fa\", \"project_identity\": \"local:f7cc72468d7207460aab3dacc26f8d12d54043247e98b916126b775c8ec7da89\", \"authority\": \"source_of_truth\", \"scope\": \"project\", \"line_start\": 55, \"line_end\": 67, \"source_uri\": \"docatlas://source/bf1163e6ed9fce533fb245a9\"}, {\"evidence_id\": \"ev-6cef0e03d1ce740c\", \"path_or_url\": \"docs/tutorial/terminating.md\", \"section\": \"Terminating\", \"snippet\": \"There are some cases where you might want to terminate a command at some point, and stop all subsequent execution.\", \"version_binding\": \"unversioned\", \"content_sha256\": \"82bac305bbf80e74488a411eab8400a343e268928b471b39cd63f1811fe50bf3\", \"project_identity\": \"local:f7cc72468d7207460aab3dacc26f8d12d54043247e98b916126b775c8ec7da89\", \"line_start\": 3, \"line_end\": 3, \"authority\": \"source_of_truth\", \"scope\": \"project\", \"source_uri\": \"docatlas://source/175fd77abb02544bd27c290a\"}, {\"evidence_id\": \"ev-45ee9abf27f20a40\", \"path_or_url\": \"docs/tutorial/terminating.md\", \"section\": \"Terminating > `Exit` a CLI program\", \"snippet\": \"In that case, you can raise a `typer.Exit()` exception:\", \"version_binding\": \"unversioned\", \"content_sha256\": \"4a5350742bb21b75c52e22689e780f5ce00541bb35d33bc95100f8cbe5785106\", \"project_identity\": \"local:f7cc72468d7207460aab3dacc26f8d12d54043247e98b916126b775c8ec7da89\", \"line_start\": 13, \"line_end\": 13, \"authority\": \"source_of_truth\", \"scope\": \"project\", \"source_uri\": \"docatlas://source/32d9ddc81e248a7a559c554b\"}], \"context_quality\": {\"status\": \"unverified\", \"reasons\": [\"coverage_unverified\"]}, \"read_next\": [], \"edit_ready\": false, \"investigation_allowed\": true, \"estimated_tokens\": 650}",
+        "annotations": null,
+        "_meta": null
+      }
+    ],
+    "structuredContent": null,
+    "isError": false
+  }
+}

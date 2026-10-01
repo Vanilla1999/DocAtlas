@@ -1,0 +1,23 @@
+{
+  "tool": "get_docs_context",
+  "request": {
+    "question": "Why does DocAtlas check relevance again after trimming a snippet instead of trusting the original search score?",
+    "project_path": "/tmp/opencode/docatlas-ablation",
+    "scope": "all"
+  },
+  "seconds": 0.8615277970020543,
+  "is_error": false,
+  "wire": {
+    "_meta": null,
+    "content": [
+      {
+        "type": "text",
+        "text": "{\"status\": \"ok\", \"kind\": \"docs_context\", \"context_status\": \"ready\", \"context_available\": true, \"answer_supported\": false, \"answer_available\": false, \"support_status\": \"retrieval_only\", \"answer_policy\": \"cite_only\", \"coverage_policy\": \"retrieval_attribution_only\", \"query_coverage\": \"partial\", \"retrieval_coverage\": \"partial\", \"facet_coverage\": \"unverified\", \"covered_query_ids\": [], \"missing_query_ids\": [\"query-original\"], \"missing_facets\": [], \"facets\": [], \"sources\": [{\"evidence_id\": \"ev-b4c3b6df1625e8fa\", \"path_or_url\": \"README.md\", \"section\": \"DocAtlas > Project-docs MCP server > When to use each tool\", \"snippet\": \"### When to use each tool\\n\\n| Situation | Tool |\\n|---|---|\\n| First time in a repo | `get_docs_context`; follow its `next_action` if preparation is needed |\\n| Check what docs are relevant | `get_docs_context` |\\n| Check health, freshness, or a job | `docs_status` |\\n| Reconcile after file changes | `prepare_docs(action=\\\"sync_project_docs\\\")` |\\n| Answer \\\"how does this repo work?\\\" | `get_docs_context(question=\\\"How does this repository work?\\\", scope=\\\"all\\\")` with the repository's `project_path` |\\n\\nUse `scope=\\\"project\\\"` for repository-level policy only. For onboarding and cross-module overviews, `scope=\\\"all\\\"` includes repository and module docs; an explicit `module_path` still limits retrieval to that module.\", \"version_binding\": \"unversioned\", \"content_sha256\": \"01a4c586d189f415a6f1161fc0072e8e2ef5b6e73b668e89cf839bdf80c82179\", \"project_identity\": \"local:48277f62f8b4ff92ba1c60c082f92a43817f9e1c5ba4ea27e12cd77a76421585\", \"line_start\": 180, \"line_end\": 190, \"authority\": \"source_of_truth\", \"scope\": \"project\", \"source_uri\": \"docatlas://source/6204a6724d0c3e7398fa0c7a\"}, {\"evidence_id\": \"ev-71cea1245e00a5e4\", \"path_or_url\": \"README.md\", \"section\": \"DocAtlas > Project-docs MCP server > Recommended workflow\", \"snippet\": \"For an unknown library, DocAtlas does not guess a documentation site silently. It asks for a source and offers `prepare_docs(action=\\\"discover_library_docs\\\", ...)`. After approval, this action reads bounded package-registry metadata (PyPI or npm) or constructs the canonical Pub/docs.rs API URL, returns reviewable candidates, and requires confirmation before indexing one. If registry metadata has no authoritative docs URL, the response explains that `docs_url` must be supplied manually.\", \"version_binding\": \"unversioned\", \"content_sha256\": \"215775177a36d32d538ed9bc6ecad97115cd4be83b50aa442ed4484560c3ffed\", \"project_identity\": \"local:48277f62f8b4ff92ba1c60c082f92a43817f9e1c5ba4ea27e12cd77a76421585\", \"line_start\": 149, \"line_end\": 149, \"authority\": \"source_of_truth\", \"scope\": \"project\", \"source_uri\": \"docatlas://source/48ca885c4531d2b578711fde\"}], \"context_quality\": {\"status\": \"partial\", \"reasons\": [\"requested_part_missing\"]}, \"read_next\": [], \"edit_ready\": false, \"investigation_allowed\": true, \"estimated_tokens\": 703}",
+        "annotations": null,
+        "_meta": null
+      }
+    ],
+    "structuredContent": null,
+    "isError": false
+  }
+}

@@ -1,0 +1,32 @@
+{
+  "id": "fastapi-04",
+  "project": "fastapi",
+  "family": "conditional",
+  "answerability": "within_budget",
+  "limit": 3,
+  "request": {
+    "library": "fastapi",
+    "query": "Can allow_credentials work with allow_origins=[\"*\"] in CORSMiddleware, and what is the default?",
+    "limit": 3
+  },
+  "seconds": 0.0023998350006877445,
+  "is_error": false,
+  "wire": {
+    "_meta": null,
+    "content": [
+      {
+        "type": "text",
+        "text": "\n------------------------------------------------------------\nResult 1: file:///tmp/opencode/search-audit-work-20261001/grounded/corpus/fastapi/docs/en/docs/tutorial/cors.md\n\n## Wildcards\nIt's also possible to declare the list as `\"*\"` (a \"wildcard\") to say that all are allowed.\nBut that will only allow certain types of communication, excluding everything that involves credentials: Cookies, Authorization headers like those used with Bearer Tokens, etc.\nSo, for everything to work correctly, it's better to specify explicitly the allowed origins.\n## Use CORSMiddleware\nYou can configure it in your **FastAPI** application using the `CORSMiddleware`.\n-   Import `CORSMiddleware`.\n-   Create a list of allowed origins (as strings).\n-   Add it as a \"middleware\" to your **FastAPI** application.\nYou can also specify whether your backend allows:\n-   Credentials (Authorization headers, Cookies, etc).\n-   Specific HTTP methods (`POST`, `PUT`) or all of them with the wildcard `\"*\"`.\n-   Specific HTTP headers or all of them with the wildcard `\"*\"`.\n```Python\n{!../../../docs_src/cors/tutorial001.py!}\n```\nThe default parameters used by the `CORSMiddleware` implementation are restrictive by default, so you'll need to explicitly enable particular origins, methods, or headers, in order for browsers to be permitted to use them in a Cross-Domain context.\nThe following arguments are supported:\n\n------------------------------------------------------------\nResult 2: file:///tmp/opencode/search-audit-work-20261001/grounded/corpus/fastapi/docs/en/docs/tutorial/cors.md\n\n## Wildcards\nIt's also possible to declare the list as `\"*\"` (a \"wildcard\") to say that all are allowed.\nBut that will only allow certain types of communication, excluding everything that involves credentials: Cookies, Authorization headers like those used with Bearer Tokens, etc.\nSo, for everything to work correctly, it's better to specify explicitly the allowed origins.\n## Use CORSMiddleware\nYou can configure it in your **FastAPI** application using the `CORSMiddleware`.\n-   Import `CORSMiddleware`.\n-   Create a list of allowed origins (as strings).\n-   Add it as a \"middleware\" to your **FastAPI** application.\nYou can also specify whether your backend allows:\n-   Credentials (Authorization headers, Cookies, etc).\n-   Specific HTTP methods (`POST`, `PUT`) or all of them with the wildcard `\"*\"`.\n-   Specific HTTP headers or all of them with the wildcard `\"*\"`.\n```Python\n{!../../../docs_src/cors/tutorial001.py!}\n```\nThe default parameters used by the `CORSMiddleware` implementation are restrictive by default, so you'll need to explicitly enable particular origins, methods, or headers, in order for browsers to be permitted to use them in a Cross-Domain context.\nThe following arguments are supported:\n\n-   `allow_origins` - A list of origins that should be permitted to make cross-origin requests. E.g. `['https://example.org', 'https://www.example.org']`. You can use `['*']` to allow any origin.\n-   `allow_origin_regex` - A regex string to match against origins that should be permitted to make cross-origin requests. e.g. `'https://.*\\.example\\.org'`.\n-   `allow_methods` - A list of HTTP methods that should be allowed for cross-origin requests. Defaults to `['GET']`. You can use `['*']` to allow all standard methods.\n-   `allow_headers` - A list of HTTP request headers that should be supported for cross-origin requests. Defaults to `[]`. You can use `['*']` to allow all headers. The `Accept`, `Accept-Language`, `Content-Language` and `Content-Type` headers are always allowed for simple CORS requests.\n-   `allow_credentials` - Indicate that cookies should be supported for cross-origin requests. Defaults to `False`. Also, `allow_origins` cannot be set to `['*']` for credentials to be allowed, origins must be specified.\n-   `expose_headers` - Indicate any response headers that should be made accessible to the browser. Defaults to `[]`.\n-   `max_age` - Sets a maximum time in seconds for browsers to cache CORS responses. Defaults to `600`.\nThe middleware responds to two particular types of HTTP request...\n### CORS preflight requests\nThese are any `OPTIONS` request with `Origin` and `Access-Control-Request-Method` headers.\nIn this case the middleware will intercept the incoming request and respond with appropriate CORS headers, and either a `200` or `400` response for informational purposes.\n### Simple requests\nAny request with an `Origin` header. In this case the middleware will pass the request through as normal, but will include appropriate CORS headers on the response.\n\n------------------------------------------------------------\nResult 3: file:///tmp/opencode/search-audit-work-20261001/grounded/corpus/fastapi/docs/en/docs/tutorial/cors.md\n\n## Steps\nSo, let's say you have a frontend running in your browser at `http://localhost:8080`, and its JavaScript is trying to communicate with a backend running at `http://localhost` (because we don't specify a port, the browser will assume the default port `80`).\nThen, the browser will send an HTTP `OPTIONS` request to the `:80`\\-backend, and if the backend sends the appropriate headers authorizing the communication from this different origin (`http://localhost:8080`) then the `:8080`\\-browser will let the JavaScript in the frontend send its request to the `:80`\\-backend.\nTo achieve this, the `:80`\\-backend must have a list of \"allowed origins\".\nIn this case, the list would have to include `http://localhost:8080` for the `:8080`\\-frontend to work correctly.\n",
+        "annotations": null,
+        "_meta": null
+      }
+    ],
+    "structuredContent": null,
+    "isError": false
+  },
+  "native_size": {
+    "utf8_bytes": 5528,
+    "actual_tokens": 1234,
+    "tokenizer": "docatlas-offline:o200k_base"
+  }
+}

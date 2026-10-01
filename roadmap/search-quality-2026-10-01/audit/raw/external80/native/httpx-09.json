@@ -1,0 +1,23 @@
+{
+  "tool": "get_docs_context",
+  "request": {
+    "question": "Which httpx configuration is best for our service? Our workload and deployment constraints are not specified.",
+    "project_path": "/tmp/opencode/search-audit-work-20261001/fixtures/httpx",
+    "scope": "all"
+  },
+  "seconds": 0.19780191199970432,
+  "is_error": false,
+  "wire": {
+    "_meta": null,
+    "content": [
+      {
+        "type": "text",
+        "text": "{\"status\": \"ok\", \"kind\": \"docs_context\", \"context_status\": \"ready\", \"context_available\": true, \"answer_supported\": false, \"answer_available\": false, \"support_status\": \"retrieval_only\", \"answer_policy\": \"cite_only\", \"coverage_policy\": \"retrieval_attribution_only\", \"query_coverage\": \"partial\", \"retrieval_coverage\": \"partial\", \"facet_coverage\": \"unverified\", \"covered_query_ids\": [], \"missing_query_ids\": [\"query-original\"], \"missing_facets\": [], \"facets\": [], \"sources\": [{\"evidence_id\": \"ev-2770bad8115e0c20\", \"path_or_url\": \"docs/advanced/timeouts.md\", \"section\": \"Fine tuning the configuration\", \"snippet\": \"* The **connect** timeout specifies the maximum amount of time to wait until\\na socket connection to the requested host is established. If HTTPX is unable to connect\\nwithin this time frame, a `ConnectTimeout` exception is raised.\\n* The **read** timeout specifies the maximum duration to wait for a chunk of\\ndata to be received (for example, a chunk of the response body). If HTTPX is\\nunable to receive data within this time frame, a `ReadTimeout` exception is raised.\\n* The **write** timeout specifies the maximum duration to wait for a chunk of\\ndata to be sent (for example, a chunk of the request body). If HTTPX is unable\\nto send data within this time frame, a `WriteTimeout` exception is raised.\\n* The **pool** timeout specifies the maximum duration to wait for acquiring\\na connection from the connection pool. If HTTPX is unable to acquire a connection\\nwithin this time frame, a `PoolTimeout` exception is raised. A related\\nconfiguration here is the maximum number of allowable connections in the\\nconnection pool, which is configured by the `limits` argument.\\n\\nYou can configure the timeout behavior for any of these values...\", \"version_binding\": \"unversioned\", \"content_sha256\": \"967a819c9653e653c5646db19dd83921f58b7745200a1fbfebefad0465ab94a6\", \"project_identity\": \"local:8cb756392a06b5929cccc7f21e226fea445751f0d8e07285f2b940cee43cfdc6\", \"line_start\": 48, \"line_end\": 63, \"authority\": \"source_of_truth\", \"scope\": \"project\", \"source_uri\": \"docatlas://source/751b1fb44f1ed41130fdd2b0\"}, {\"evidence_id\": \"ev-285f6a8bdcb80740\", \"path_or_url\": \"docs/advanced/timeouts.md\", \"section\": \"Fine tuning the configuration\", \"snippet\": \"HTTPX also allows you to specify the timeout behavior in more fine grained detail.\", \"version_binding\": \"unversioned\", \"content_sha256\": \"f0acf47a0adcf31106fd9dfef50edc930cbe3d3ab9f5d9fa767a849189467f9b\", \"project_identity\": \"local:8cb756392a06b5929cccc7f21e226fea445751f0d8e07285f2b940cee43cfdc6\", \"line_start\": 43, \"line_end\": 43, \"authority\": \"source_of_truth\", \"scope\": \"project\", \"source_uri\": \"docatlas://source/5bf14c08e568d79da44ec3d6\"}], \"context_quality\": {\"status\": \"unverified\", \"reasons\": [\"coverage_unverified\"]}, \"read_next\": [], \"edit_ready\": false, \"investigation_allowed\": true, \"estimated_tokens\": 697}",
+        "annotations": null,
+        "_meta": null
+      }
+    ],
+    "structuredContent": null,
+    "isError": false
+  }
+}

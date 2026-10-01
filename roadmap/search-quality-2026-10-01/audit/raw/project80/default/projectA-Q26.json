@@ -1,0 +1,22 @@
+{
+  "tool": "get_docs_context",
+  "request": {
+    "question": "A query reports full retrieval coverage but facet coverage is unverified. What can I safely conclude from that?",
+    "project_path": "/tmp/opencode/docatlas-ablation"
+  },
+  "seconds": 1.1035175470024114,
+  "is_error": false,
+  "wire": {
+    "_meta": null,
+    "content": [
+      {
+        "type": "text",
+        "text": "{\"status\": \"ok\", \"kind\": \"docs_context\", \"context_status\": \"ready\", \"context_available\": true, \"answer_supported\": false, \"answer_available\": false, \"support_status\": \"retrieval_only\", \"answer_policy\": \"cite_only\", \"coverage_policy\": \"retrieval_attribution_only\", \"query_coverage\": \"full\", \"retrieval_coverage\": \"full\", \"facet_coverage\": \"unverified\", \"covered_query_ids\": [\"query-original\"], \"missing_query_ids\": [], \"missing_facets\": [], \"facets\": [{\"id\": \"intent-context:retrieval_pipeline\", \"requirement_id\": null, \"question\": \"retrieval pipeline query planning ranking evidence selection\", \"status\": \"retrieval_only\", \"evidence_ids\": [\"ev-278e9d1d7b0db0c8\", \"ev-8ab472f24f0ab11b\"]}], \"sources\": [{\"evidence_id\": \"ev-8ab472f24f0ab11b\", \"path_or_url\": \"wiki/Configuration.md\", \"section\": \"Configuration > Configuration Reference > Vector store\", \"snippet\": \"A fresh configuration uses `retrieval.default_mode: lexical` for queries. Ingest can auto-start managed Qdrant and embed chunks with FastEmbed; the `vector_store:` block tunes that optional vector store. Select `dense`, `sparse`, or `hybrid` explicitly when vector retrieval is required. Those modes fail closed when required capabilities are unavailable unless the caller explicitly enables degraded fallback. Set `DOCATLAS_AUTO_VECTORS=0` (or run `doc-atlas ingest --no-vectors`) for FTS5-only ingestion.\", \"version_binding\": \"unversioned\", \"content_sha256\": \"1b4a59fd532899d3659c57543e895d6561d4336f16a784382986947c2312fbe6\", \"project_identity\": \"local:48277f62f8b4ff92ba1c60c082f92a43817f9e1c5ba4ea27e12cd77a76421585\", \"authority\": \"source_of_truth\", \"scope\": \"project\", \"line_start\": 51, \"line_end\": 51, \"source_uri\": \"docatlas://source/1a0acedbecf02fe611586006\"}, {\"evidence_id\": \"ev-278e9d1d7b0db0c8\", \"path_or_url\": \"docs/modules/evidence-selection.md\", \"section\": \"Evidence selection module > Responsibility\", \"snippet\": \"## Responsibility\\n\\nThe evidence-selection module turns bounded candidates into an auditable certification decision. Project-only reads bypass answer certification and use `ContextSelectionDecision`, which reports retrieval coverage without a support verdict.\\n\\nCandidate normalization, requirement compilation, proof matching, ranking, budget fitting, and projection identity are separate responsibilities even though they cooperate in one pipeline.\\n\\n## Contract with question planning\\n\\nThe module consumes the project-answer requirement contract emitted by question planning. It may only mark a mandatory facet covered when a model-visible answer unit locally proves that exact obligation. It does not broaden subjects or replace unresolved question semantics.\", \"version_binding\": \"unversioned\", \"content_sha256\": \"7e5b5b296833672a43ee44d2de1b5b9bafdb8676b9db72305d599f0effe7de3b\", \"project_identity\": \"local:48277f62f8b4ff92ba1c60c082f92a43817f9e1c5ba4ea27e12cd77a76421585\", \"line_start\": 7, \"line_end\": 15, \"authority\": \"source_of_truth\", \"scope\": \"module\", \"source_uri\": \"docatlas://source/9252841191e123cbaf3b602a\"}], \"context_quality\": {\"status\": \"unverified\", \"reasons\": [\"coverage_unverified\"]}, \"read_next\": [], \"edit_ready\": false, \"investigation_allowed\": true, \"estimated_tokens\": 774}",
+        "annotations": null,
+        "_meta": null
+      }
+    ],
+    "structuredContent": null,
+    "isError": false
+  }
+}

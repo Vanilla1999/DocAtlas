@@ -1,0 +1,413 @@
+PROJECT default projectA-Q01 ok 2
+PROJECT default projectA-Q02 ok 3
+PROJECT default projectA-Q03 ok 2
+PROJECT default projectA-Q04 ok 2
+PROJECT default projectA-Q05 insufficient_evidence 0
+PROJECT default projectA-Q06 ok 2
+PROJECT default projectA-Q07 insufficient_evidence 0
+PROJECT default projectA-Q08 ok 3
+PROJECT default projectA-Q09 insufficient_evidence 0
+PROJECT default projectA-Q10 ok 3
+PROJECT default projectA-Q11 ok 2
+PROJECT default projectA-Q12 ok 3
+PROJECT default projectA-Q13 insufficient_evidence 0
+PROJECT default projectA-Q14 ok 3
+PROJECT default projectA-Q15 insufficient_evidence 0
+PROJECT default projectA-Q16 ok 3
+PROJECT default projectA-Q17 ok 2
+PROJECT default projectA-Q18 ok 2
+PROJECT default projectA-Q19 insufficient_evidence 0
+PROJECT default projectA-Q20 ok 2
+PROJECT default projectA-Q21 insufficient_evidence 0
+PROJECT default projectA-Q22 ok 2
+PROJECT default projectA-Q23 ok 2
+PROJECT default projectA-Q24 ok 2
+PROJECT default projectA-Q25 ok 2
+PROJECT default projectA-Q26 ok 2
+PROJECT default projectA-Q27 insufficient_evidence 0
+PROJECT default projectA-Q28 ok 3
+PROJECT default projectA-Q29 ok 2
+PROJECT default projectA-Q30 ok 2
+PROJECT default projectA-Q31 ok 1
+PROJECT default projectA-Q32 ok 1
+PROJECT default projectA-Q33 ok 1
+PROJECT default projectA-Q34 ok 2
+PROJECT default projectA-Q35 ok 2
+PROJECT default projectA-Q36 ok 2
+PROJECT default projectA-Q37 ok 2
+PROJECT default projectA-Q38 ok 2
+PROJECT default projectA-Q39 ok 3
+PROJECT default projectA-Q40 insufficient_evidence 0
+PROJECT default projectB-Q01 ok 3
+PROJECT default projectB-Q02 ok 1
+PROJECT default projectB-Q03 ok 2
+PROJECT default projectB-Q04 ok 3
+PROJECT default projectB-Q05 insufficient_evidence 0
+PROJECT default projectB-Q06 ok 1
+PROJECT default projectB-Q07 ok 2
+PROJECT default projectB-Q08 ok 2
+PROJECT default projectB-Q09 insufficient_evidence 0
+PROJECT default projectB-Q10 ok 2
+PROJECT default projectB-Q11 ok 2
+PROJECT default projectB-Q12 ok 2
+PROJECT default projectB-Q13 ok 2
+PROJECT default projectB-Q14 ok 2
+PROJECT default projectB-Q15 ok 1
+PROJECT default projectB-Q16 ok 2
+PROJECT default projectB-Q17 insufficient_evidence 0
+PROJECT default projectB-Q18 ok 2
+PROJECT default projectB-Q19 insufficient_evidence 0
+PROJECT default projectB-Q20 ok 3
+PROJECT default projectB-Q21 ok 2
+PROJECT default projectB-Q22 ok 2
+PROJECT default projectB-Q23 insufficient_evidence 0
+PROJECT default projectB-Q24 ok 2
+PROJECT default projectB-Q25 insufficient_evidence 0
+PROJECT default projectB-Q26 ok 2
+PROJECT default projectB-Q27 insufficient_evidence 0
+PROJECT default projectB-Q28 ok 2
+PROJECT default projectB-Q29 insufficient_evidence 0
+PROJECT default projectB-Q30 ok 2
+PROJECT default projectB-Q31 ok 2
+PROJECT default projectB-Q32 ok 2
+PROJECT default projectB-Q33 insufficient_evidence 0
+PROJECT default projectB-Q34 ok 2
+PROJECT default projectB-Q35 insufficient_evidence 0
+PROJECT default projectB-Q36 ok 3
+PROJECT default projectB-Q37 insufficient_evidence 0
+PROJECT default projectB-Q38 ok 2
+PROJECT default projectB-Q39 ok 1
+PROJECT default projectB-Q40 insufficient_evidence 0
+PROJECT all projectA-Q01 ok 2
+PROJECT all projectA-Q02 ok 3
+PROJECT all projectA-Q03 ok 2
+PROJECT all projectA-Q04 ok 2
+PROJECT all projectA-Q05 insufficient_evidence 0
+PROJECT all projectA-Q06 ok 2
+PROJECT all projectA-Q07 insufficient_evidence 0
+PROJECT all projectA-Q08 ok 3
+PROJECT all projectA-Q09 insufficient_evidence 0
+PROJECT all projectA-Q10 ok 3
+PROJECT all projectA-Q11 ok 2
+PROJECT all projectA-Q12 ok 3
+PROJECT all projectA-Q13 insufficient_evidence 0
+PROJECT all projectA-Q14 ok 3
+PROJECT all projectA-Q15 insufficient_evidence 0
+PROJECT all projectA-Q16 ok 3
+PROJECT all projectA-Q17 ok 2
+PROJECT all projectA-Q18 ok 2
+PROJECT all projectA-Q19 insufficient_evidence 0
+PROJECT all projectA-Q20 ok 2
+PROJECT all projectA-Q21 insufficient_evidence 0
+PROJECT all projectA-Q22 ok 2
+PROJECT all projectA-Q23 ok 2
+PROJECT all projectA-Q24 ok 2
+PROJECT all projectA-Q25 ok 2
+PROJECT all projectA-Q26 ok 2
+PROJECT all projectA-Q27 insufficient_evidence 0
+PROJECT all projectA-Q28 ok 3
+PROJECT all projectA-Q29 ok 2
+PROJECT all projectA-Q30 ok 2
+PROJECT all projectA-Q31 ok 1
+PROJECT all projectA-Q32 ok 1
+PROJECT all projectA-Q33 ok 1
+PROJECT all projectA-Q34 ok 2
+PROJECT all projectA-Q35 ok 2
+PROJECT all projectA-Q36 ok 2
+PROJECT all projectA-Q37 ok 2
+PROJECT all projectA-Q38 ok 2
+PROJECT all projectA-Q39 ok 3
+PROJECT all projectA-Q40 insufficient_evidence 0
+PROJECT all projectB-Q01 ok 3
+PROJECT all projectB-Q02 ok 1
+PROJECT all projectB-Q03 ok 2
+PROJECT all projectB-Q04 ok 3
+PROJECT all projectB-Q05 insufficient_evidence 0
+PROJECT all projectB-Q06 ok 1
+PROJECT all projectB-Q07 ok 2
+PROJECT all projectB-Q08 ok 2
+PROJECT all projectB-Q09 insufficient_evidence 0
+PROJECT all projectB-Q10 ok 2
+PROJECT all projectB-Q11 ok 2
+PROJECT all projectB-Q12 ok 2
+PROJECT all projectB-Q13 ok 2
+PROJECT all projectB-Q14 ok 2
+PROJECT all projectB-Q15 ok 1
+PROJECT all projectB-Q16 ok 2
+PROJECT all projectB-Q17 insufficient_evidence 0
+PROJECT all projectB-Q18 ok 2
+PROJECT all projectB-Q19 insufficient_evidence 0
+PROJECT all projectB-Q20 ok 3
+PROJECT all projectB-Q21 ok 2
+PROJECT all projectB-Q22 ok 2
+PROJECT all projectB-Q23 insufficient_evidence 0
+PROJECT all projectB-Q24 ok 2
+PROJECT all projectB-Q25 insufficient_evidence 0
+PROJECT all projectB-Q26 ok 2
+PROJECT all projectB-Q27 insufficient_evidence 0
+PROJECT all projectB-Q28 ok 2
+PROJECT all projectB-Q29 insufficient_evidence 0
+PROJECT all projectB-Q30 ok 2
+PROJECT all projectB-Q31 ok 2
+PROJECT all projectB-Q32 ok 2
+PROJECT all projectB-Q33 insufficient_evidence 0
+PROJECT all projectB-Q34 ok 2
+PROJECT all projectB-Q35 insufficient_evidence 0
+PROJECT all projectB-Q36 ok 3
+PROJECT all projectB-Q37 insufficient_evidence 0
+PROJECT all projectB-Q38 ok 2
+PROJECT all projectB-Q39 ok 1
+PROJECT all projectB-Q40 insufficient_evidence 0
+PROJECT guided projectA-Q01 ok 2
+PROJECT guided projectA-Q02 ok 1
+PROJECT guided projectA-Q03 ok 2
+PROJECT guided projectA-Q04 ok 3
+PROJECT guided projectA-Q05 ok 1
+PROJECT guided projectA-Q06 ok 2
+PROJECT guided projectA-Q07 ok 2
+PROJECT guided projectA-Q08 ok 3
+PROJECT guided projectA-Q09 ok 2
+PROJECT guided projectA-Q10 ok 3
+PROJECT guided projectA-Q11 ok 3
+PROJECT guided projectA-Q12 ok 2
+PROJECT guided projectA-Q13 ok 1
+PROJECT guided projectA-Q14 ok 2
+PROJECT guided projectA-Q15 ok 2
+PROJECT guided projectA-Q16 ok 2
+PROJECT guided projectA-Q17 ok 2
+PROJECT guided projectA-Q18 ok 2
+PROJECT guided projectA-Q19 ok 1
+PROJECT guided projectA-Q20 ok 2
+PROJECT guided projectA-Q21 ok 2
+PROJECT guided projectA-Q22 ok 1
+PROJECT guided projectA-Q23 ok 2
+PROJECT guided projectA-Q24 ok 3
+PROJECT guided projectA-Q25 ok 2
+PROJECT guided projectA-Q26 ok 2
+PROJECT guided projectA-Q27 ok 3
+PROJECT guided projectA-Q28 ok 2
+PROJECT guided projectA-Q29 ok 1
+PROJECT guided projectA-Q30 ok 1
+PROJECT guided projectA-Q31 ok 3
+PROJECT guided projectA-Q32 ok 2
+PROJECT guided projectA-Q33 ok 2
+PROJECT guided projectA-Q34 ok 2
+PROJECT guided projectA-Q35 ok 2
+PROJECT guided projectA-Q36 ok 3
+PROJECT guided projectA-Q37 ok 2
+PROJECT guided projectA-Q38 ok 2
+PROJECT guided projectA-Q39 ok 3
+PROJECT guided projectA-Q40 ok 1
+PROJECT guided projectB-Q01 ok 2
+PROJECT guided projectB-Q02 ok 1
+PROJECT guided projectB-Q03 ok 2
+PROJECT guided projectB-Q04 ok 3
+PROJECT guided projectB-Q05 ok 2
+PROJECT guided projectB-Q06 ok 2
+PROJECT guided projectB-Q07 ok 2
+PROJECT guided projectB-Q08 ok 2
+PROJECT guided projectB-Q09 ok 1
+PROJECT guided projectB-Q10 ok 2
+PROJECT guided projectB-Q11 ok 2
+PROJECT guided projectB-Q12 ok 2
+PROJECT guided projectB-Q13 ok 2
+PROJECT guided projectB-Q14 ok 1
+PROJECT guided projectB-Q15 ok 3
+PROJECT guided projectB-Q16 ok 2
+PROJECT guided projectB-Q17 ok 2
+PROJECT guided projectB-Q18 ok 2
+PROJECT guided projectB-Q19 ok 2
+PROJECT guided projectB-Q20 ok 3
+PROJECT guided projectB-Q21 ok 1
+PROJECT guided projectB-Q22 ok 3
+PROJECT guided projectB-Q23 ok 1
+PROJECT guided projectB-Q24 ok 2
+PROJECT guided projectB-Q25 ok 1
+PROJECT guided projectB-Q26 ok 2
+PROJECT guided projectB-Q27 ok 1
+PROJECT guided projectB-Q28 ok 2
+PROJECT guided projectB-Q29 insufficient_evidence 0
+PROJECT guided projectB-Q30 ok 2
+PROJECT guided projectB-Q31 ok 2
+PROJECT guided projectB-Q32 ok 3
+PROJECT guided projectB-Q33 ok 1
+PROJECT guided projectB-Q34 ok 3
+PROJECT guided projectB-Q35 insufficient_evidence 0
+PROJECT guided projectB-Q36 ok 3
+PROJECT guided projectB-Q37 insufficient_evidence 0
+PROJECT guided projectB-Q38 ok 1
+PROJECT guided projectB-Q39 ok 1
+PROJECT guided projectB-Q40 ok 1
+EXTERNAL fastapi-01 sufficient
+EXTERNAL fastapi-02 sufficient
+EXTERNAL fastapi-03 sufficient
+EXTERNAL fastapi-04 sufficient
+EXTERNAL fastapi-05 sufficient
+EXTERNAL fastapi-06 sufficient
+EXTERNAL fastapi-07 needs_review
+EXTERNAL fastapi-08 insufficient
+EXTERNAL fastapi-09 insufficient
+EXTERNAL fastapi-10 insufficient
+EXTERNAL httpx-01 sufficient
+EXTERNAL httpx-02 sufficient
+EXTERNAL httpx-03 sufficient
+EXTERNAL httpx-04 sufficient
+EXTERNAL httpx-05 sufficient
+EXTERNAL httpx-06 sufficient
+EXTERNAL httpx-07 needs_review
+EXTERNAL httpx-08 insufficient
+EXTERNAL httpx-09 needs_review
+EXTERNAL httpx-10 insufficient
+EXTERNAL mkdocs-01 sufficient
+EXTERNAL mkdocs-02 sufficient
+EXTERNAL mkdocs-03 sufficient
+EXTERNAL mkdocs-04 sufficient
+EXTERNAL mkdocs-05 sufficient
+EXTERNAL mkdocs-06 needs_review
+EXTERNAL mkdocs-07 needs_review
+EXTERNAL mkdocs-08 insufficient
+EXTERNAL mkdocs-09 needs_review
+EXTERNAL mkdocs-10 needs_review
+EXTERNAL pydantic-01 sufficient
+EXTERNAL pydantic-02 sufficient
+EXTERNAL pydantic-03 sufficient
+EXTERNAL pydantic-04 sufficient
+EXTERNAL pydantic-05 sufficient
+EXTERNAL pydantic-06 sufficient
+EXTERNAL pydantic-07 needs_review
+EXTERNAL pydantic-08 insufficient
+EXTERNAL pydantic-09 insufficient
+EXTERNAL pydantic-10 insufficient
+EXTERNAL ruff-01 sufficient
+EXTERNAL ruff-02 sufficient
+EXTERNAL ruff-03 sufficient
+EXTERNAL ruff-04 sufficient
+EXTERNAL ruff-05 sufficient
+EXTERNAL ruff-06 sufficient
+EXTERNAL ruff-07 needs_review
+EXTERNAL ruff-08 insufficient
+EXTERNAL ruff-09 needs_review
+EXTERNAL ruff-10 needs_review
+EXTERNAL starlette-01 sufficient
+EXTERNAL starlette-02 sufficient
+EXTERNAL starlette-03 sufficient
+EXTERNAL starlette-04 sufficient
+EXTERNAL starlette-05 sufficient
+EXTERNAL starlette-06 sufficient
+EXTERNAL starlette-07 needs_review
+EXTERNAL starlette-08 insufficient
+EXTERNAL starlette-09 insufficient
+EXTERNAL starlette-10 insufficient
+EXTERNAL typer-01 sufficient
+EXTERNAL typer-02 sufficient
+EXTERNAL typer-03 sufficient
+EXTERNAL typer-04 sufficient
+EXTERNAL typer-05 insufficient
+EXTERNAL typer-06 sufficient
+EXTERNAL typer-07 needs_review
+EXTERNAL typer-08 insufficient
+EXTERNAL typer-09 insufficient
+EXTERNAL typer-10 insufficient
+EXTERNAL uv-01 sufficient
+EXTERNAL uv-02 sufficient
+EXTERNAL uv-03 sufficient
+EXTERNAL uv-04 sufficient
+EXTERNAL uv-05 sufficient
+EXTERNAL uv-06 needs_review
+EXTERNAL uv-07 needs_review
+EXTERNAL uv-08 insufficient
+EXTERNAL uv-09 insufficient
+EXTERNAL uv-10 needs_review
+{
+  "project80": {
+    "default": {
+      "cases": 80,
+      "statuses": {
+        "ok": 59,
+        "insufficient_evidence": 21
+      },
+      "kinds": {
+        "docs_context": 80
+      },
+      "nonempty": 59,
+      "integrity_violations": 59,
+      "tokens": {
+        "n": 80,
+        "p50": 722,
+        "p95": 799
+      },
+      "latency": {
+        "n": 80,
+        "p50": 0.7660818549993564,
+        "p95": 3.865989575999265
+      }
+    },
+    "all": {
+      "cases": 80,
+      "statuses": {
+        "ok": 59,
+        "insufficient_evidence": 21
+      },
+      "kinds": {
+        "docs_context": 80
+      },
+      "nonempty": 59,
+      "integrity_violations": 59,
+      "tokens": {
+        "n": 80,
+        "p50": 722,
+        "p95": 799
+      },
+      "latency": {
+        "n": 80,
+        "p50": 0.7858938680001302,
+        "p95": 4.010620459994243
+      }
+    },
+    "guided": {
+      "cases": 80,
+      "statuses": {
+        "ok": 77,
+        "insufficient_evidence": 3
+      },
+      "kinds": {
+        "docs_context": 80
+      },
+      "nonempty": 77,
+      "integrity_violations": 77,
+      "tokens": {
+        "n": 80,
+        "p50": 744,
+        "p95": 799
+      },
+      "latency": {
+        "n": 80,
+        "p50": 1.0576659700018354,
+        "p95": 4.46349431300041
+      }
+    }
+  },
+  "external80": {
+    "cases": 80,
+    "positives": 48,
+    "recognized_sufficient": 45,
+    "assessments": {
+      "sufficient": 45,
+      "needs_review": 16,
+      "insufficient": 19
+    },
+    "required_supported": 53,
+    "required_count": 88,
+    "integrity_violations": 61,
+    "tokens": {
+      "n": 80,
+      "p50": 765,
+      "p95": 797
+    },
+    "latency": {
+      "n": 80,
+      "p50": 0.2794827319958131,
+      "p95": 0.7431342700001551
+    }
+  }
+}

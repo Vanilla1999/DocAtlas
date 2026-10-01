@@ -1,0 +1,26 @@
+{
+  "tool": "get_docs_context",
+  "request": {
+    "question": "Почему клиент может видеть только маркер structuredContent, без самой цитаты?",
+    "project_path": "/tmp/opencode/docatlas-ablation",
+    "scope": "all",
+    "lookup_queries": [
+      "How does a text-only MCP client receive the factual payload?"
+    ]
+  },
+  "seconds": 0.6077213680036948,
+  "is_error": false,
+  "wire": {
+    "_meta": null,
+    "content": [
+      {
+        "type": "text",
+        "text": "{\"status\": \"ok\", \"kind\": \"docs_context\", \"context_status\": \"ready\", \"context_available\": true, \"answer_supported\": false, \"answer_available\": false, \"support_status\": \"retrieval_only\", \"answer_policy\": \"cite_only\", \"coverage_policy\": \"retrieval_attribution_only\", \"query_coverage\": \"partial\", \"retrieval_coverage\": \"partial\", \"facet_coverage\": \"unverified\", \"covered_query_ids\": [\"query-lookup-1\"], \"missing_query_ids\": [\"query-original\"], \"missing_facets\": [], \"facets\": [], \"sources\": [{\"evidence_id\": \"ev-20f47c72fa36382b\", \"path_or_url\": \"docs/mcp-docs-server.md\", \"section\": \"Docs MCP server > Advanced surfaces\", \"snippet\": \"By default, the full result is attached only as MCP `structuredContent`; text contains a short constant marker. OpenCode registration automatically sets `DOCATLAS_MCP_TEXT_FALLBACK=1` because OpenCode currently does not preserve structured content in model-visible tool output; manual OpenCode configurations must set it too. Other clients retain the default structured lane. Fallback mode sends the full JSON in text and omits `structuredContent`, so the payload is never duplicated across both channels.\", \"version_binding\": \"unversioned\", \"content_sha256\": \"cfa8accf654119ee21de9c56e6fc45ba28fd9c371e22c987422fb82a391b59e2\", \"project_identity\": \"local:48277f62f8b4ff92ba1c60c082f92a43817f9e1c5ba4ea27e12cd77a76421585\", \"authority\": \"source_of_truth\", \"scope\": \"project\", \"line_start\": 91, \"line_end\": 91, \"source_uri\": \"docatlas://source/4e85b7b0bea66eccc2783607\"}], \"context_quality\": {\"status\": \"unverified\", \"reasons\": [\"coverage_unverified\"]}, \"read_next\": [], \"edit_ready\": false, \"investigation_allowed\": true, \"estimated_tokens\": 402}",
+        "annotations": null,
+        "_meta": null
+      }
+    ],
+    "structuredContent": null,
+    "isError": false
+  }
+}

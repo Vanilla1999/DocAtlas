@@ -1,0 +1,21 @@
+{
+  "request": {
+    "libraryName": "fastapi",
+    "query": "Может ли task function для BackgroundTasks быть обычной def, а не async def?"
+  },
+  "seconds": 2.4582495219947305,
+  "wire": {
+    "_meta": null,
+    "content": [
+      {
+        "type": "text",
+        "text": "Available Libraries:\n\n- Title: FastAPI\n- Context7-compatible library ID: /websites/fastapi_tiangolo\n- Description: FastAPI is a modern, high-performance web framework for building APIs with Python, known for its speed, ease of use, and automatic interactive documentation based on OpenAPI standards.\n- Code Snippets: 2377\n- Source Reputation: High\n- Benchmark Score: 86.82\n----------\n- Title: FastAPI\n- Context7-compatible library ID: /websites/fastapi_tiangolo_reference\n- Description: FastAPI is a modern Python web framework for building fast APIs with automatic interactive documentation and built-in validation using Python type hints.\n- Code Snippets: 1402\n- Source Reputation: High\n- Benchmark Score: 74.54\n----------\n- Title: FastAPI (Deepwiki)\n- Context7-compatible library ID: /websites/deepwiki_fastapi_fastapi\n- Description: FastAPI is a high-performance web framework for building APIs with Python based on standard Python type hints, Starlette, and Pydantic.\n- Code Snippets: 1022\n- Source Reputation: High\n- Benchmark Score: 61.7\n----------\n- Title: FastAPI Tips\n- Context7-compatible library ID: /kludex/fastapi-tips\n- Description: This repository provides a collection of tips and tricks for optimizing and effectively using the FastAPI web framework.\n- Code Snippets: 44\n- Source Reputation: High\n- Benchmark Score: 76.76\n----------\n- Title: FastAPI Users\n- Context7-compatible library ID: /fastapi-users/fastapi-users\n- Description: Ready-to-use and customizable users management for FastAPI\n- Code Snippets: 360\n- Source Reputation: High\n- Benchmark Score: 72.57",
+        "annotations": null,
+        "_meta": null
+      }
+    ],
+    "structuredContent": null,
+    "isError": false
+  },
+  "is_error": false
+}

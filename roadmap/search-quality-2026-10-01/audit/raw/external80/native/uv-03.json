@@ -1,0 +1,23 @@
+{
+  "tool": "get_docs_context",
+  "request": {
+    "question": "What can I do when dependency resolution fails due to a transitive pre-release?",
+    "project_path": "/tmp/opencode/search-audit-work-20261001/fixtures/uv",
+    "scope": "all"
+  },
+  "seconds": 0.6488797179990797,
+  "is_error": false,
+  "wire": {
+    "_meta": null,
+    "content": [
+      {
+        "type": "text",
+        "text": "{\"status\": \"ok\", \"kind\": \"docs_context\", \"context_status\": \"ready\", \"context_available\": true, \"answer_supported\": false, \"answer_available\": false, \"support_status\": \"retrieval_only\", \"answer_policy\": \"cite_only\", \"coverage_policy\": \"retrieval_attribution_only\", \"query_coverage\": \"full\", \"retrieval_coverage\": \"full\", \"facet_coverage\": \"unverified\", \"covered_query_ids\": [\"query-original\"], \"missing_query_ids\": [], \"missing_facets\": [], \"facets\": [], \"sources\": [{\"evidence_id\": \"ev-0e08f1266975a05c\", \"path_or_url\": \"docs/pip/compatibility.md\", \"section\": \"Compatibility with `pip` and `pip-tools` > Pre-release compatibility\", \"snippet\": \"If dependency resolution fails due to a transitive pre-release, uv will prompt the user to re-run\\nwith `--prerelease allow`, to allow pre-releases for all dependencies.\\n\\nAlternatively, you can add the transitive dependency to your `requirements.in` file with pre-release\\nspecifier (e.g., `flask>=2.0.0rc1`) to opt in to pre-release support for that specific dependency.\", \"version_binding\": \"unversioned\", \"content_sha256\": \"8dae65cef31414b58de9974315774d3a0e6b454056ffcdfb774a6f66eeaf6141\", \"project_identity\": \"local:e65d484943b04206e676f1b569d594fafedcdaf92efb305771c46aba30d34f5c\", \"authority\": \"source_of_truth\", \"scope\": \"project\", \"line_start\": 49, \"line_end\": 53}, {\"evidence_id\": \"ev-a9b637265d1b5050\", \"path_or_url\": \"docs/pip/compatibility.md\", \"section\": \"Compatibility with `pip` and `pip-tools` > Pre-release compatibility\", \"snippet\": \"In the future, uv _may_ support pre-release identifiers in transitive dependencies. However, it's\\nlikely contingent on evolution in the Python packaging specifications. The existing PEPs\\n[do not cover \\\"dependency resolution\\\"](https://discuss.python.org/t/handling-of-pre-releases-when-backtracking/40505/17)\\nand are instead focused on behavior for a _single_ version specifier. As such, there are unresolved\\nquestions around the correct and intended behavior for pre-releases in the packaging ecosystem more\\nbroadly.\", \"version_binding\": \"unversioned\", \"content_sha256\": \"b793b128d76f11826d188d44317782266c06e3afba0563ab6b4fd5ba2a0fa1ec\", \"project_identity\": \"local:e65d484943b04206e676f1b569d594fafedcdaf92efb305771c46aba30d34f5c\", \"authority\": \"source_of_truth\", \"scope\": \"project\", \"line_start\": 70, \"line_end\": 75}], \"context_quality\": {\"status\": \"unverified\", \"reasons\": [\"coverage_unverified\"]}, \"read_next\": [{\"source_uri\": \"docatlas://source/025340ec490e87f0faf635c9\", \"path\": \"docs/pip/compatibility.md\", \"project_identity\": \"local:e65d484943b04206e676f1b569d594fafedcdaf92efb305771c46aba30d34f5c\", \"snapshot_sha256\": \"sha256:193d4e4f575ae0975b66b76d4ea93b15aaede550b85de37989caef9f6f494923\", \"line_start\": 54, \"line_end\": 69, \"reason\": \"inspect_source_context\"}], \"edit_ready\": false, \"investigation_allowed\": true, \"estimated_tokens\": 689}",
+        "annotations": null,
+        "_meta": null
+      }
+    ],
+    "structuredContent": null,
+    "isError": false
+  }
+}

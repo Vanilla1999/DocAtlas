@@ -1,0 +1,26 @@
+{
+  "tool": "get_docs_context",
+  "request": {
+    "question": "Мне надо разобраться во всём репозитории, включая документацию отдельных модулей. Какую область поиска передать?",
+    "project_path": "/tmp/opencode/docatlas-ablation",
+    "scope": "all",
+    "lookup_queries": [
+      "Which documentation scope includes module documentation?"
+    ]
+  },
+  "seconds": 0.8028100579977036,
+  "is_error": false,
+  "wire": {
+    "_meta": null,
+    "content": [
+      {
+        "type": "text",
+        "text": "{\"status\": \"ok\", \"kind\": \"docs_context\", \"context_status\": \"ready\", \"context_available\": true, \"answer_supported\": false, \"answer_available\": false, \"support_status\": \"retrieval_only\", \"answer_policy\": \"cite_only\", \"coverage_policy\": \"retrieval_attribution_only\", \"query_coverage\": \"partial\", \"retrieval_coverage\": \"partial\", \"facet_coverage\": \"unverified\", \"covered_query_ids\": [\"query-lookup-1\"], \"missing_query_ids\": [\"query-original\"], \"missing_facets\": [], \"facets\": [], \"sources\": [{\"evidence_id\": \"ev-f98a264d826c7a0c\", \"path_or_url\": \"docs/mcp-quickstart-example.md\", \"section\": \"Complete project-context request\", \"snippet\": \"```json\\n{\\n  \\\"tool\\\": \\\"get_docs_context\\\",\\n  \\\"arguments\\\": {\\n    \\\"question\\\": \\\"How does this repository work?\\\",\\n    \\\"project_path\\\": \\\".\\\",\\n    \\\"scope\\\": \\\"all\\\"\\n  }\\n}\\n```\\n\\nFor onboarding, `all` includes repository-level and module documentation in\\nthat same repository. Use `project` for repository-level policy only. An exact\\n`module_path` restricts the call to that module even when `scope` is `all`.\", \"version_binding\": \"unversioned\", \"content_sha256\": \"34f62e8c9d5428276c8ffc7ef5b82618e58281cc9a8ce7daa510d2c9c9df9ce3\", \"project_identity\": \"local:48277f62f8b4ff92ba1c60c082f92a43817f9e1c5ba4ea27e12cd77a76421585\", \"authority\": \"supporting\", \"scope\": \"project\", \"line_start\": 8, \"line_end\": 21}], \"context_quality\": {\"status\": \"unverified\", \"reasons\": [\"coverage_unverified\"]}, \"read_next\": [], \"edit_ready\": false, \"investigation_allowed\": true, \"estimated_tokens\": 366}",
+        "annotations": null,
+        "_meta": null
+      }
+    ],
+    "structuredContent": null,
+    "isError": false
+  }
+}

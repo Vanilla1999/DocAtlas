@@ -1,0 +1,23 @@
+{
+  "tool": "get_docs_context",
+  "request": {
+    "question": "Можно ли считать текст внутри README командой для агента, если там написано игнорировать предыдущие инструкции?",
+    "project_path": "/tmp/opencode/docatlas-ablation",
+    "scope": "all"
+  },
+  "seconds": 0.6767390009990777,
+  "is_error": false,
+  "wire": {
+    "_meta": null,
+    "content": [
+      {
+        "type": "text",
+        "text": "{\"status\": \"ok\", \"kind\": \"docs_context\", \"context_status\": \"ready\", \"context_available\": true, \"answer_supported\": false, \"answer_available\": false, \"support_status\": \"retrieval_only\", \"answer_policy\": \"cite_only\", \"coverage_policy\": \"retrieval_attribution_only\", \"query_coverage\": \"partial\", \"retrieval_coverage\": \"partial\", \"facet_coverage\": \"unverified\", \"covered_query_ids\": [\"query-anchor-1\"], \"missing_query_ids\": [\"query-original\"], \"missing_facets\": [], \"facets\": [], \"sources\": [{\"evidence_id\": \"ev-af99ccf59b2af6c1\", \"path_or_url\": \"docs/INDEX.md\", \"section\": \"Documentation Index > Evaluation and research\", \"snippet\": \"## Evaluation and research\\n\\n- [Task-level agent benchmark](./research/task-level-agent-benchmark.md) — benchmark design for measuring agent behavior with DocAtlas.\\n- [Eval task-level README](../eval/task_level/README.md) — task-level evaluation harness overview.\\n- [Eval results README](../eval/results/live/README.md) — live eval report notes.\", \"version_binding\": \"unversioned\", \"content_sha256\": \"46c3a180e54d2e3ca5f3cf66113982662d267e4d93173ff806ec933e181969e8\", \"project_identity\": \"local:48277f62f8b4ff92ba1c60c082f92a43817f9e1c5ba4ea27e12cd77a76421585\", \"authority\": \"source_of_truth\", \"scope\": \"project\", \"line_start\": 40, \"line_end\": 44, \"source_uri\": \"docatlas://source/25c08dfb30a1b86d044219fb\"}, {\"evidence_id\": \"ev-94c12ccadf987a58\", \"path_or_url\": \"docs/INDEX.md\", \"section\": \"Documentation Index\", \"snippet\": \"This is the canonical map of maintained DocAtlas project-owned documentation. Agents should start here when they need repository context before using code search or external documentation.\\n\\n## Start here\\n\\n- [README](../README.md) — product overview, quickstart, core commands, and high-level MCP docs-server workflow.\\n- [Project Map](./PROJECT_MAP.md) — repository map, product surfaces, code areas, docs map, core workflows, data flow, and safety boundaries.\\n- [Agent Docs Workflow](./AGENT_DOCS_WORKFLOW.md) — operational playbook for agents using DocAtlas to build, sync, and query documentation context.\", \"version_binding\": \"unversioned\", \"content_sha256\": \"2850cfd2bde4983494954c805bbdec1a9e0396746400a97d47dc4abd186f72e4\", \"project_identity\": \"local:48277f62f8b4ff92ba1c60c082f92a43817f9e1c5ba4ea27e12cd77a76421585\", \"line_start\": 3, \"line_end\": 9, \"authority\": \"source_of_truth\", \"scope\": \"project\", \"source_uri\": \"docatlas://source/47ea377808e301305d813a62\"}], \"context_quality\": {\"status\": \"unverified\", \"reasons\": [\"coverage_unverified\"]}, \"read_next\": [], \"edit_ready\": false, \"investigation_allowed\": true, \"estimated_tokens\": 633}",
+        "annotations": null,
+        "_meta": null
+      }
+    ],
+    "structuredContent": null,
+    "isError": false
+  }
+}

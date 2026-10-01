@@ -1,0 +1,23 @@
+{
+  "tool": "get_docs_context",
+  "request": {
+    "question": "Which page title wins when the navigation configuration and Markdown content define different titles?",
+    "project_path": "/tmp/opencode/search-audit-work-20261001/fixtures/mkdocs",
+    "scope": "all"
+  },
+  "seconds": 1.1941414589964552,
+  "is_error": false,
+  "wire": {
+    "_meta": null,
+    "content": [
+      {
+        "type": "text",
+        "text": "{\"status\": \"ok\", \"kind\": \"docs_context\", \"context_status\": \"ready\", \"context_available\": true, \"answer_supported\": false, \"answer_available\": false, \"support_status\": \"retrieval_only\", \"answer_policy\": \"cite_only\", \"coverage_policy\": \"retrieval_attribution_only\", \"query_coverage\": \"partial\", \"retrieval_coverage\": \"partial\", \"facet_coverage\": \"unverified\", \"covered_query_ids\": [], \"missing_query_ids\": [\"query-original\"], \"missing_facets\": [], \"facets\": [], \"sources\": [{\"evidence_id\": \"ev-955bb21c6dd839ad\", \"path_or_url\": \"docs/user-guide/writing-your-docs.md\", \"section\": \"Writing your docs > File layout > Configure Pages and Navigation\", \"snippet\": \"The [nav](configuration.md#nav) configuration setting in your `mkdocs.yml` file\\ndefines which pages are included in the global site navigation menu as well as\\nthe structure of that menu. If not provided, the navigation will be\\nautomatically created by discovering all the Markdown files in the\\n[documentation directory](configuration.md#docs_dir). An automatically created\\nnavigation configuration will always be sorted alphanumerically by file name\\n(except that index files will always be listed first within a sub-section). You\\nwill need to manually define your navigation configuration if you would like\\nyour navigation menu sorted differently.\\n\\nA minimal navigation configuration could look like this:\\n\\n```yaml\\nnav:\\n  - index.md\\n  - about.md\\n```\\n\\nAll paths in the navigation configuration must be relative to the `docs_dir`\\nconfiguration option. If that option is set to the default value, `docs`, the\\nsource files for the above configuration would be located at `docs/index.md` and\\n`docs/about.md`.\\n\\nThe above example will result in two navigation items being created at the top\\nlevel and with their titles inferred from the contents of the Markdown file or,\\nif no title is defined within the file, of the file name. To override the title\\nin the `nav` setting add a title right before the filename.\\n\\n```yaml\\nnav:\\n  - Home: index.md\\n  - About: about.md\\n```\\n\\nNote that if a title is defined for a page in the navigation, that title will be\\nused throughout the site for that page and will override any title defined\\nwithin the page itself.\", \"version_binding\": \"unversioned\", \"content_sha256\": \"afb845fca7b0c87e3b861d63a67a6c0e1218dd7cc4d1be008ce9109275388e43\", \"project_identity\": \"local:fd4807fa34128ed0db2e2162d3b5c0a37c7992656c9c7ac093ec283fb925d818\", \"line_start\": 99, \"line_end\": 135, \"authority\": \"source_of_truth\", \"scope\": \"project\"}], \"context_quality\": {\"status\": \"partial\", \"reasons\": [\"requested_part_missing\"]}, \"read_next\": [{\"source_uri\": \"docatlas://source/a748dbb227822bdcc51f55a8\", \"path\": \"docs/user-guide/writing-your-docs.md\", \"project_identity\": \"local:fd4807fa34128ed0db2e2162d3b5c0a37c7992656c9c7ac093ec283fb925d818\", \"snapshot_sha256\": \"sha256:a6b69d1318ae84455bae021b6655b71274f29c19ba43d021d872d100b7b38cba\", \"line_start\": 136, \"line_end\": 138, \"reason\": \"inspect_source_context\"}], \"edit_ready\": false, \"investigation_allowed\": true, \"estimated_tokens\": 751}",
+        "annotations": null,
+        "_meta": null
+      }
+    ],
+    "structuredContent": null,
+    "isError": false
+  }
+}

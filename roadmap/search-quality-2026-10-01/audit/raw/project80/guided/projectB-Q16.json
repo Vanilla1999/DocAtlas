@@ -1,0 +1,26 @@
+{
+  "tool": "get_docs_context",
+  "request": {
+    "question": "Can a continuation locator be used to read an unrelated file?",
+    "project_path": "/tmp/opencode/docatlas-ablation",
+    "scope": "all",
+    "lookup_queries": [
+      "What source and project boundaries apply to continuation reads?"
+    ]
+  },
+  "seconds": 1.1165822260009008,
+  "is_error": false,
+  "wire": {
+    "_meta": null,
+    "content": [
+      {
+        "type": "text",
+        "text": "{\"status\": \"ok\", \"kind\": \"docs_context\", \"context_status\": \"ready\", \"context_available\": true, \"answer_supported\": false, \"answer_available\": false, \"support_status\": \"retrieval_only\", \"answer_policy\": \"cite_only\", \"coverage_policy\": \"retrieval_attribution_only\", \"query_coverage\": \"full\", \"retrieval_coverage\": \"full\", \"facet_coverage\": \"unverified\", \"covered_query_ids\": [\"query-original\", \"query-lookup-1\"], \"missing_query_ids\": [], \"missing_facets\": [], \"facets\": [], \"sources\": [{\"evidence_id\": \"ev-d1cb81e8a20f2de7\", \"path_or_url\": \"docs/index-cleanup.md\", \"section\": \"Cleaning DocAtlas index state safely\", \"snippet\": \"`clear-index` supports exactly two scopes: `project-local` and `global`.\\nQuarantine is the same-filesystem staging area used before final deletion so\\nmoved targets can be restored if the move phase fails. In `clear-index`,\\n`--allow-incomplete` acknowledges that reported unverified vector or cache\\nstate will remain; it never bypasses live-process blockers or authorizes remote\\ndeletion. `clear-index` deletes only derived SQLite, extracted-document, cache,\\nand verified local vector state. `clear-index` preserves project sources,\\n`docatlas.yaml`, configuration, and unrelated files.\", \"version_binding\": \"unversioned\", \"content_sha256\": \"41519994d695415ac912b4e34fe7b27722f0de50e65206f7bc4399b5b33321e6\", \"project_identity\": \"local:48277f62f8b4ff92ba1c60c082f92a43817f9e1c5ba4ea27e12cd77a76421585\", \"authority\": \"source_of_truth\", \"scope\": \"project\", \"line_start\": 8, \"line_end\": 15, \"source_uri\": \"docatlas://source/62a22759188fd6ec696320c2\"}, {\"evidence_id\": \"ev-ee2f289d2068badc\", \"path_or_url\": \"docs/source-continuation.md\", \"section\": \"Grounded partial answers and source continuation > Read only a missing part\", \"snippet\": \"A `truncated` result may contain an opaque next `continuation`. The host controller\\nallows at most two read attempts per question, across all sources (at most 1,200\\nadditional admission tokens). The server separately limits each continuation chain\\nto two reads. These are admission estimates, not measured provider token bills.\\nStop on sufficient evidence, a repeated range, no new text, source failure, or the\\nread limit.\", \"version_binding\": \"unversioned\", \"content_sha256\": \"8add01b0fd3a4f829bf219de0bc01c1ad6003aa1f52c65b9f56ec7c8bf66242f\", \"project_identity\": \"local:48277f62f8b4ff92ba1c60c082f92a43817f9e1c5ba4ea27e12cd77a76421585\", \"authority\": \"source_of_truth\", \"scope\": \"module\", \"line_start\": 26, \"line_end\": 31, \"source_uri\": \"docatlas://source/a96fc099da3f4a1b412a6476\"}], \"context_quality\": {\"status\": \"unverified\", \"reasons\": [\"coverage_unverified\", \"budget_limited\"]}, \"read_next\": [], \"edit_ready\": false, \"investigation_allowed\": true, \"estimated_tokens\": 664}",
+        "annotations": null,
+        "_meta": null
+      }
+    ],
+    "structuredContent": null,
+    "isError": false
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "tool": "prepare_docs",
+  "request": {
+    "action": "sync_project_docs",
+    "project_path": "/tmp/opencode/search-audit-work-20261001/lifecycle-fixture",
+    "with_vectors": false
+  },
+  "seconds": 0.1798093949983013,
+  "is_error": false,
+  "wire": {
+    "_meta": null,
+    "content": [
+      {
+        "type": "text",
+        "text": "{\"status\": \"success\", \"project_path\": \"/tmp/opencode/search-audit-work-20261001/lifecycle-fixture\", \"candidate_count\": 1, \"summary\": {\"current_count\": 1, \"new_count\": 1, \"changed_count\": 0, \"orphaned_count\": 0, \"orphaned_removed\": 0, \"dedup_removed\": 0, \"stale_removed\": 0, \"sections_indexed\": 1}, \"metrics\": {}, \"vector_sync\": {\"status\": \"not_requested\"}, \"unmatched_changed_paths\": [], \"unmatched_deleted_paths\": [], \"remaining_deleted_sources\": 0, \"tombstones\": [], \"tombstones_omitted\": 0, \"warnings\": [], \"message\": \"Synced project docs: current=1, new=1, changed=0, orphaned_removed=0, missing=0.\", \"action\": \"sync_project_docs\", \"tool\": \"prepare_docs\"}",
+        "annotations": null,
+        "_meta": null
+      }
+    ],
+    "structuredContent": null,
+    "isError": false
+  }
+}

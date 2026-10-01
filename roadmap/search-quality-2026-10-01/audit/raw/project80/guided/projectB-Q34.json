@@ -1,0 +1,26 @@
+{
+  "tool": "get_docs_context",
+  "request": {
+    "question": "How can I check that my installed MCP command matches the current package?",
+    "project_path": "/tmp/opencode/docatlas-ablation",
+    "scope": "all",
+    "lookup_queries": [
+      "How is the installed executable and MCP registration verified?"
+    ]
+  },
+  "seconds": 1.452532120005344,
+  "is_error": false,
+  "wire": {
+    "_meta": null,
+    "content": [
+      {
+        "type": "text",
+        "text": "{\"status\": \"ok\", \"kind\": \"docs_context\", \"context_status\": \"ready\", \"context_available\": true, \"answer_supported\": false, \"answer_available\": false, \"support_status\": \"retrieval_only\", \"answer_policy\": \"cite_only\", \"coverage_policy\": \"retrieval_attribution_only\", \"query_coverage\": \"full\", \"retrieval_coverage\": \"full\", \"facet_coverage\": \"unverified\", \"covered_query_ids\": [\"query-original\", \"query-lookup-1\"], \"missing_query_ids\": [], \"missing_facets\": [], \"facets\": [{\"id\": \"intent-context:installation_verification\", \"requirement_id\": null, \"question\": \"install command line help\", \"status\": \"retrieval_only\", \"evidence_ids\": [\"ev-848dea5ff0c19302\"]}], \"sources\": [{\"evidence_id\": \"ev-f1ed8a300e832d1a\", \"path_or_url\": \"docs/DOCMANCER_PRODUCT_BRIEF.md\", \"section\": \"DocAtlas product brief > Installation truth\", \"snippet\": \"## Installation truth\\n\\nThe package distributed on PyPI is `doc-atlas`. The `main` branch can contain workflow changes that are not yet published. Check `doc-atlas --version`, use release documentation that matches that installed version, and do not assume a one-line installer for `main` has published every documented feature.\", \"version_binding\": \"unversioned\", \"content_sha256\": \"4bccf8e18ca893a5a9f922e0c3e8e7a27370dfeab84ee6cd73592f7b2ee36f7f\", \"project_identity\": \"local:48277f62f8b4ff92ba1c60c082f92a43817f9e1c5ba4ea27e12cd77a76421585\", \"authority\": \"source_of_truth\", \"scope\": \"project\", \"line_start\": 82, \"line_end\": 84}, {\"evidence_id\": \"ev-848dea5ff0c19302\", \"path_or_url\": \"README.md\", \"section\": \"DocAtlas > One-line install\", \"snippet\": \"## One-line install\\n\\nInstall `uv`, the `doc-atlas` CLI, and register the docs MCP server into your agent — in a single command:\", \"version_binding\": \"unversioned\", \"content_sha256\": \"f7116d0a99f8fb65dfcc8bb15e90a66be84ac4f968faacf117ce7b7bb58d1fda\", \"project_identity\": \"local:48277f62f8b4ff92ba1c60c082f92a43817f9e1c5ba4ea27e12cd77a76421585\", \"authority\": \"source_of_truth\", \"scope\": \"project\", \"line_start\": 70, \"line_end\": 72}, {\"evidence_id\": \"ev-0de07617bdcacb64\", \"path_or_url\": \"docs/RELEASE_CHECKLIST.md\", \"section\": \"DocAtlas release checklist > P0 public-truth prerequisites\", \"snippet\": \"- [ ] Fresh installs use `DOCATLAS_HOME`, `~/.docatlas`, `docatlas.yaml`, and the `docatlas` MCP registration identity.\", \"version_binding\": \"unversioned\", \"content_sha256\": \"48cc7a221e7db15d6e3b64a965daf2028e87952c50d8245ac8cbe42b5e2ed869\", \"project_identity\": \"local:48277f62f8b4ff92ba1c60c082f92a43817f9e1c5ba4ea27e12cd77a76421585\", \"authority\": \"supporting\", \"scope\": \"project\", \"line_start\": 25, \"line_end\": 25}], \"context_quality\": {\"status\": \"unverified\", \"reasons\": [\"coverage_unverified\", \"budget_limited\"]}, \"read_next\": [], \"edit_ready\": false, \"investigation_allowed\": true, \"estimated_tokens\": 669}",
+        "annotations": null,
+        "_meta": null
+      }
+    ],
+    "structuredContent": null,
+    "isError": false
+  }
+}

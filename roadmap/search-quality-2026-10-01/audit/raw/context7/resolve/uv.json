@@ -1,0 +1,21 @@
+{
+  "request": {
+    "libraryName": "uv",
+    "query": "Compare first-match, unsafe-first-match and unsafe-best-match index strategies."
+  },
+  "seconds": 2.1209293630017783,
+  "wire": {
+    "_meta": null,
+    "content": [
+      {
+        "type": "text",
+        "text": "Available Libraries:\n\n- Title: uv\n- Context7-compatible library ID: /websites/astral_sh_uv\n- Description: uv is an extremely fast Python package and project manager written in Rust that replaces pip, poetry, pipx, and other tools with 10-100x faster performance.\n- Code Snippets: 2163\n- Source Reputation: High\n- Benchmark Score: 84.92\n----------\n- Title: Uv\n- Context7-compatible library ID: /astral-sh/uv\n- Description: uv is an extremely fast Python package and project manager written in Rust, designed to replace tools like pip, pip-tools, pipx, poetry, and more, offering enhanced speed and comprehensive project management features.\n- Code Snippets: 1379\n- Source Reputation: High\n- Benchmark Score: 80.1\n----------\n- Title: uv\n- Context7-compatible library ID: /llmstxt/astral_sh_uv_llms_txt\n- Description: uv is an extremely fast Python package and project manager, written in Rust, capable of replacing pip, poetry, pyenv, and more, offering both a pip-compatible CLI and a project interface.\n- Code Snippets: 1651\n- Source Reputation: High\n- Benchmark Score: 80.47\n----------\n- Title: uv (DeepWiki)\n- Context7-compatible library ID: /websites/deepwiki_astral-sh_uv\n- Description: uv is an extremely fast Python package and project manager written in Rust, designed to manage dependencies, virtual environments, Python versions, and tools.\n- Code Snippets: 650\n- Source Reputation: High\n----------\n- Title: uv Docker Example\n- Context7-compatible library ID: /astral-sh/uv-docker-example\n- Description: An example project demonstrating best practices for integrating the `uv` Python package installer and resolver within Docker images, focusing on development workflows with mounted projects and optimized Dockerfiles.\n- Code Snippets: 12\n- Source Reputation: High\n- Benchmark Score: 87.61",
+        "annotations": null,
+        "_meta": null
+      }
+    ],
+    "structuredContent": null,
+    "isError": false
+  },
+  "is_error": false
+}

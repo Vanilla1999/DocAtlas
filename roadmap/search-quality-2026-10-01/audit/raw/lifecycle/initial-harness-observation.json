@@ -1,0 +1,31 @@
+{
+  "origin": "live OpenCode tool calls before independent stdio run; recorded observation, not full wire capture",
+  "project_path": "/tmp/opencode/docatlas-ablation",
+  "initial_status": {
+    "reason_code": "project_docs_found_not_indexed",
+    "source_summary": {"candidates": 134, "indexed": 0, "stale": 0, "ignored": 0},
+    "retrieval_mode": "lexical",
+    "recommended_action": "sync_project_docs"
+  },
+  "first_query": {
+    "question": "Какие файлы DocAtlas считает документацией проекта и как посмотреть, что он пропустил?",
+    "scope": "all",
+    "status": "insufficient_evidence",
+    "recovery_reason_code": "evidence_rejected",
+    "recommended_action": "search_local_source"
+  },
+  "cleanup": {
+    "plan_digest": "6fecada1323cdbd6cbde75a9ed21f95b1e45205de52a40ea2005fcc17648c9e0",
+    "status": "applied",
+    "removed": [".docatlas/docatlas.db", ".docatlas/extracted"],
+    "retained_incomplete_state": ["shared_local_qdrant_state_not_deleted"],
+    "backup": "backup/project-before.sqlite"
+  },
+  "same_process_sync_after_cleanup": {
+    "status": "failed",
+    "reason_code": "handler_exception",
+    "exception_type": "OperationalError",
+    "retryable": false
+  },
+  "post_failure_db": {"integrity_check": "ok", "tables": []}
+}

@@ -1,0 +1,95 @@
+{
+  "project80": {
+    "default": {
+      "cases": 80,
+      "statuses": {
+        "ok": 59,
+        "insufficient_evidence": 21
+      },
+      "kinds": {
+        "docs_context": 80
+      },
+      "nonempty": 59,
+      "integrity_violations": 0,
+      "tokens": {
+        "n": 80,
+        "p50": 722,
+        "p95": 799
+      },
+      "latency": {
+        "n": 80,
+        "p50": 0.7660818549993564,
+        "p95": 3.865989575999265
+      }
+    },
+    "all": {
+      "cases": 80,
+      "statuses": {
+        "ok": 59,
+        "insufficient_evidence": 21
+      },
+      "kinds": {
+        "docs_context": 80
+      },
+      "nonempty": 59,
+      "integrity_violations": 0,
+      "tokens": {
+        "n": 80,
+        "p50": 722,
+        "p95": 799
+      },
+      "latency": {
+        "n": 80,
+        "p50": 0.7858938680001302,
+        "p95": 4.010620459994243
+      }
+    },
+    "guided": {
+      "cases": 80,
+      "statuses": {
+        "ok": 77,
+        "insufficient_evidence": 3
+      },
+      "kinds": {
+        "docs_context": 80
+      },
+      "nonempty": 77,
+      "integrity_violations": 0,
+      "tokens": {
+        "n": 80,
+        "p50": 744,
+        "p95": 799
+      },
+      "latency": {
+        "n": 80,
+        "p50": 1.0576659700018354,
+        "p95": 4.46349431300041
+      }
+    }
+  },
+  "external80": {
+    "cases": 80,
+    "positives": 48,
+    "recognized_sufficient": 45,
+    "assessments": {
+      "sufficient": 45,
+      "needs_review": 16,
+      "insufficient": 19
+    },
+    "required_supported": 53,
+    "required_count": 88,
+    "integrity_violations": 0,
+    "tokens": {
+      "n": 80,
+      "p50": 765,
+      "p95": 797
+    },
+    "latency": {
+      "n": 80,
+      "p50": 0.2794827319958131,
+      "p95": 0.7431342700001551
+    }
+  },
+  "integrity_observer_corrected": true,
+  "integrity_note": "Original file-hash assumption was wrong. See public-integrity-corrected.json; no changes to official wire outputs."
+}

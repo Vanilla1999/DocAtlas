@@ -1,0 +1,21 @@
+{
+  "request": {
+    "libraryName": "ruff",
+    "query": "Does enabling preview automatically enable all preview rules?"
+  },
+  "seconds": 2.265039327998238,
+  "wire": {
+    "_meta": null,
+    "content": [
+      {
+        "type": "text",
+        "text": "Available Libraries:\n\n- Title: Ruff\n- Context7-compatible library ID: /astral-sh/ruff\n- Description: Ruff is an extremely fast Python linter and code formatter, written in Rust, offering broad compatibility with existing tools and extensive rule support.\n- Code Snippets: 22033\n- Source Reputation: High\n- Benchmark Score: 78.71\n- Versions: v0.4.10\n----------\n- Title: Ruff\n- Context7-compatible library ID: /websites/astral_sh_ruff\n- Description: Ruff is an extremely fast Python linter and code formatter written in Rust, offering 10-100x performance improvements over tools like Flake8 and Black while providing drop-in compatibility with multiple Python development tools.\n- Code Snippets: 6375\n- Source Reputation: High\n- Benchmark Score: 83.41\n----------\n- Title: Astral Documentation\n- Context7-compatible library ID: /astral-sh/docs\n- Description: Comprehensive documentation for the Astral toolchain: Ruff (a fast Python linter and formatter), uv (a fast Python package manager), and ty (a fast Python type checker).\n- Code Snippets: 13811\n- Source Reputation: High\n- Benchmark Score: 83.83",
+        "annotations": null,
+        "_meta": null
+      }
+    ],
+    "structuredContent": null,
+    "isError": false
+  },
+  "is_error": false
+}

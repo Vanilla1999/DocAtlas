@@ -1,0 +1,26 @@
+{
+  "tool": "get_docs_context",
+  "request": {
+    "question": "What should the agent say when documentation covers only one part of my question?",
+    "project_path": "/tmp/opencode/docatlas-ablation",
+    "scope": "all",
+    "lookup_queries": [
+      "How should a grounded partial answer communicate known facts and missing information?"
+    ]
+  },
+  "seconds": 0.9082674200035399,
+  "is_error": false,
+  "wire": {
+    "_meta": null,
+    "content": [
+      {
+        "type": "text",
+        "text": "{\"status\": \"ok\", \"kind\": \"docs_context\", \"context_status\": \"ready\", \"context_available\": true, \"answer_supported\": false, \"answer_available\": false, \"support_status\": \"retrieval_only\", \"answer_policy\": \"cite_only\", \"coverage_policy\": \"retrieval_attribution_only\", \"query_coverage\": \"partial\", \"retrieval_coverage\": \"partial\", \"facet_coverage\": \"unverified\", \"covered_query_ids\": [\"query-original\"], \"missing_query_ids\": [\"query-lookup-1\"], \"missing_facets\": [], \"facets\": [], \"sources\": [{\"evidence_id\": \"ev-6526ca044d0c3b9b\", \"path_or_url\": \"SKILL.md\", \"section\": \"Documentation context runtime for coding agents\", \"snippet\": \"The default Docs MCP surface has exactly three tools:\\n\\n1. Start with `get_docs_context` for normal documentation questions.\\n2. Call `prepare_docs` only from bounded `recommended_next_action`, unbounded `next_action`, or an explicit sync, refresh, index, or prefetch request.\\n3. Call `docs_status` only for explicit health, freshness, index, or job-status requests.\\n\\nAdvanced patch and inspection tools are not part of the public agent workflow.\", \"version_binding\": \"unversioned\", \"content_sha256\": \"03210fdbb7e3e012fb8b08c49ac6fa21fe67fa9cefdd99759fd0d73e7c1434ec\", \"project_identity\": \"local:48277f62f8b4ff92ba1c60c082f92a43817f9e1c5ba4ea27e12cd77a76421585\", \"authority\": \"source_of_truth\", \"scope\": \"project\", \"line_start\": 21, \"line_end\": 27}, {\"evidence_id\": \"ev-6ff3dc33a15d2912\", \"path_or_url\": \"SKILL.md\", \"section\": \"DocAtlas > Core Commands > Query Documentation (CLI fallback)\", \"snippet\": \"### Query Documentation (CLI fallback)\\n\\n```bash\\ndoc-atlas query \\\"<question>\\\"\\n```\\n\\nReturns a compact markdown context pack with source attribution and token savings for CLI-only workflows. MCP-enabled agents should use `get_docs_context` instead.\", \"version_binding\": \"unversioned\", \"content_sha256\": \"3f48b2d487bb322802ec590136e084487499353eabdbe733e697e62d0752a29e\", \"project_identity\": \"local:48277f62f8b4ff92ba1c60c082f92a43817f9e1c5ba4ea27e12cd77a76421585\", \"authority\": \"source_of_truth\", \"scope\": \"project\", \"line_start\": 96, \"line_end\": 102}, {\"evidence_id\": \"ev-8cecf6996400b5ad\", \"path_or_url\": \"docs/mcp-docs-server.md\", \"section\": \"Docs MCP server > External-library documentation\", \"snippet\": \"## External-library documentation\\n\\nFor an external dependency question, start with the same `get_docs_context` call and include the project path when available. DocAtlas uses detected lockfile evidence only when it can prove a version binding.\", \"version_binding\": \"unversioned\", \"content_sha256\": \"6662773e958ce5363966af96b6c95bee6f6466a00f74413047cb0e498a8e4478\", \"project_identity\": \"local:48277f62f8b4ff92ba1c60c082f92a43817f9e1c5ba4ea27e12cd77a76421585\", \"authority\": \"source_of_truth\", \"scope\": \"project\", \"line_start\": 73, \"line_end\": 75}], \"context_quality\": {\"status\": \"unverified\", \"reasons\": [\"coverage_unverified\"]}, \"read_next\": [], \"edit_ready\": false, \"investigation_allowed\": true, \"estimated_tokens\": 716}",
+        "annotations": null,
+        "_meta": null
+      }
+    ],
+    "structuredContent": null,
+    "isError": false
+  }
+}

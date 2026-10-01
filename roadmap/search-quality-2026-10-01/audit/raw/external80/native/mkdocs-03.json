@@ -1,0 +1,23 @@
+{
+  "tool": "get_docs_context",
+  "request": {
+    "question": "Are pages absent from nav still built, and what navigation links do they lose?",
+    "project_path": "/tmp/opencode/search-audit-work-20261001/fixtures/mkdocs",
+    "scope": "all"
+  },
+  "seconds": 0.24869569099973887,
+  "is_error": false,
+  "wire": {
+    "_meta": null,
+    "content": [
+      {
+        "type": "text",
+        "text": "{\"status\": \"ok\", \"kind\": \"docs_context\", \"context_status\": \"ready\", \"context_available\": true, \"answer_supported\": false, \"answer_available\": false, \"support_status\": \"retrieval_only\", \"answer_policy\": \"cite_only\", \"coverage_policy\": \"retrieval_attribution_only\", \"query_coverage\": \"full\", \"retrieval_coverage\": \"full\", \"facet_coverage\": \"unverified\", \"covered_query_ids\": [\"query-original\"], \"missing_query_ids\": [], \"missing_facets\": [], \"facets\": [], \"sources\": [{\"evidence_id\": \"ev-470d3c53d52311b2\", \"path_or_url\": \"docs/user-guide/writing-your-docs.md\", \"section\": \"Writing your docs > File layout > Configure Pages and Navigation\", \"snippet\": \"Any pages not listed in your navigation configuration will still be rendered and\\nincluded with the built site, however, they will not be linked from the global\\nnavigation and will not be included in the `previous` and `next` links. Such\\npages will be \\\"hidden\\\" unless linked to directly.\", \"version_binding\": \"unversioned\", \"content_sha256\": \"a7e74b22b3067bc7c841c3822f94adc995a06d244f8a3b3bff3b4f40dc50490c\", \"project_identity\": \"local:fd4807fa34128ed0db2e2162d3b5c0a37c7992656c9c7ac093ec283fb925d818\", \"authority\": \"source_of_truth\", \"scope\": \"project\", \"line_start\": 163, \"line_end\": 166, \"source_uri\": \"docatlas://source/0795420480e43a95887407e6\"}, {\"evidence_id\": \"ev-4cf8e5306e5cb13b\", \"path_or_url\": \"docs/user-guide/writing-your-docs.md\", \"section\": \"Writing your docs\", \"snippet\": \"How to layout and write your Markdown source files.\", \"version_binding\": \"unversioned\", \"content_sha256\": \"98f63b31a57425b238fde37fcf951b3fd19d65a6dd94c986cb7a7e74d11d6f80\", \"project_identity\": \"local:fd4807fa34128ed0db2e2162d3b5c0a37c7992656c9c7ac093ec283fb925d818\", \"line_start\": 3, \"line_end\": 3, \"authority\": \"source_of_truth\", \"scope\": \"project\", \"source_uri\": \"docatlas://source/97599a87222565aab4f33c83\"}, {\"evidence_id\": \"ev-cd4144a594f4ee13\", \"path_or_url\": \"docs/user-guide/writing-your-docs.md\", \"section\": \"Writing your docs > Writing with Markdown > Internal links > Linking to pages\", \"snippet\": \"WARNING:\\nUsing absolute paths with links is not officially supported. Relative paths\\nare adjusted by MkDocs to ensure they are always relative to the page. Absolute\\npaths are not modified at all. This means that your links using absolute paths\\nmight work fine in your local environment but they might break once you deploy\\nthem to your production server.\", \"version_binding\": \"unversioned\", \"content_sha256\": \"5d5e091ee200f3e2c2e6634edff3750b2ae24ce963400b7ea1ff46bca921ab62\", \"project_identity\": \"local:fd4807fa34128ed0db2e2162d3b5c0a37c7992656c9c7ac093ec283fb925d818\", \"line_start\": 213, \"line_end\": 218, \"authority\": \"source_of_truth\", \"scope\": \"project\"}], \"context_quality\": {\"status\": \"unverified\", \"reasons\": [\"coverage_unverified\"]}, \"read_next\": [], \"edit_ready\": false, \"investigation_allowed\": true, \"estimated_tokens\": 696}",
+        "annotations": null,
+        "_meta": null
+      }
+    ],
+    "structuredContent": null,
+    "isError": false
+  }
+}

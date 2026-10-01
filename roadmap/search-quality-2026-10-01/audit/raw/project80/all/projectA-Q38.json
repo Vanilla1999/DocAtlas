@@ -1,0 +1,23 @@
+{
+  "tool": "get_docs_context",
+  "request": {
+    "question": "Which published benchmark guarantees that DocAtlas always reduces the total token bill of a coding agent?",
+    "project_path": "/tmp/opencode/docatlas-ablation",
+    "scope": "all"
+  },
+  "seconds": 0.8137486359992181,
+  "is_error": false,
+  "wire": {
+    "_meta": null,
+    "content": [
+      {
+        "type": "text",
+        "text": "{\"status\": \"ok\", \"kind\": \"docs_context\", \"context_status\": \"ready\", \"context_available\": true, \"answer_supported\": false, \"answer_available\": false, \"support_status\": \"retrieval_only\", \"answer_policy\": \"cite_only\", \"coverage_policy\": \"retrieval_attribution_only\", \"query_coverage\": \"full\", \"retrieval_coverage\": \"full\", \"facet_coverage\": \"unverified\", \"covered_query_ids\": [\"query-original\"], \"missing_query_ids\": [], \"missing_facets\": [], \"facets\": [], \"sources\": [{\"evidence_id\": \"ev-028217ff5c053444\", \"path_or_url\": \"docs/adr/0002-evidence-authority-direction.md\", \"section\": \"ADR 0002: DocAtlas is the documentation authority and evidence delivery layer > Product success criteria\", \"snippet\": \"## Product success criteria\\n\\nInfrastructure correctness is necessary but no longer sufficient. New product work is judged in this order:\\n\\n1. **Public truth:** protected source, published artifact, installed behavior, and documentation agree.\\n2. **Agent truth:** a real coding model can acquire the intended evidence through the installed public MCP contract.\\n3. **Product truth:** DocAtlas improves real coding outcomes or materially reduces unsupported/wrong-version claims at acceptable total trajectory cost.\\n\\nThe primary future product KPI is patch/task correctness. Supporting metrics include unsupported claims, wrong-version claims, cross-source attribution errors, files unnecessarily touched, tests passed, model-visible tokens, total system tokens, tool calls, and latency.\", \"version_binding\": \"unversioned\", \"content_sha256\": \"dbd8266d65b784a47d6f69c61e3d31ed27fcfac765eab12ae4e5e631d8ce390e\", \"project_identity\": \"local:48277f62f8b4ff92ba1c60c082f92a43817f9e1c5ba4ea27e12cd77a76421585\", \"line_start\": 54, \"line_end\": 62, \"authority\": \"supporting\", \"scope\": \"project\"}, {\"evidence_id\": \"ev-0eff1fde7658d429\", \"path_or_url\": \"docs/adr/0002-evidence-authority-direction.md\", \"section\": \"Roadmap consequences\", \"snippet\": \"After P0, the next R&D work is an installed-MCP live benchmark and a first-divergence analysis of the historical 0/11 Agent Developer result. Agent Contract v2 changes are hypotheses to test after that analysis, not assumptions to merge first.\", \"version_binding\": \"unversioned\", \"content_sha256\": \"c73a9898dae042de1dee7f57df2a49a08e8a3bccde0a9ef3c232dfe49fd6bb16\", \"project_identity\": \"local:48277f62f8b4ff92ba1c60c082f92a43817f9e1c5ba4ea27e12cd77a76421585\", \"line_start\": 75, \"line_end\": 75, \"authority\": \"supporting\", \"scope\": \"project\"}], \"context_quality\": {\"status\": \"unverified\", \"reasons\": [\"coverage_unverified\", \"source_unavailable\"]}, \"read_next\": [], \"edit_ready\": false, \"investigation_allowed\": true, \"estimated_tokens\": 659, \"recovery_reason_code\": \"source_unavailable\"}",
+        "annotations": null,
+        "_meta": null
+      }
+    ],
+    "structuredContent": null,
+    "isError": false
+  }
+}

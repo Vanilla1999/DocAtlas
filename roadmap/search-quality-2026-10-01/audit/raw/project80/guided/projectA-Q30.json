@@ -1,0 +1,26 @@
+{
+  "tool": "get_docs_context",
+  "request": {
+    "question": "If two repositories have a guide with the same filename, what prevents one project from citing the other project’s content?",
+    "project_path": "/tmp/opencode/docatlas-ablation",
+    "scope": "all",
+    "lookup_queries": [
+      "How is project identity enforced during retrieval and citation projection?"
+    ]
+  },
+  "seconds": 1.0339375469993684,
+  "is_error": false,
+  "wire": {
+    "_meta": null,
+    "content": [
+      {
+        "type": "text",
+        "text": "{\"status\": \"ok\", \"kind\": \"docs_context\", \"context_status\": \"ready\", \"context_available\": true, \"answer_supported\": false, \"answer_available\": false, \"support_status\": \"retrieval_only\", \"answer_policy\": \"cite_only\", \"coverage_policy\": \"retrieval_attribution_only\", \"query_coverage\": \"partial\", \"retrieval_coverage\": \"partial\", \"facet_coverage\": \"unverified\", \"covered_query_ids\": [\"query-original\"], \"missing_query_ids\": [\"query-lookup-1\"], \"missing_facets\": [], \"facets\": [], \"sources\": [{\"evidence_id\": \"ev-e90f9271aade59ac\", \"path_or_url\": \"docs/RELEASE_CHECKLIST.md\", \"section\": \"DocAtlas release checklist > Release controls > `invalid-publisher` recovery\", \"snippet\": \"When PyPI returns `invalid-publisher` after `required-release` succeeds:\\n\\n- [ ] Record the exact workflow run/job, immutable tag object and target, non-secret OIDC claims, gated artifact hashes, and the fact that upload did not start.\\n- [ ] Do not move, delete, or recreate the release tag and do not introduce `PYPI_API_TOKEN` as a fallback.\\n- [ ] Open the **Publishing** page for the existing `doc-atlas` project and verify that owner, repository, workflow filename, and environment exactly match the claims printed by the failed action.\\n- [ ] Remove or replace stale/wrong publisher entries rather than adding another speculative workflow identity.\\n- [ ] Re-check that the public version is still absent and that the original run's tag target and artifacts remain exact.\\n- [ ] Retry only the failed jobs of the original canonical run so its source/provenance context remains unchanged; do not replace it with a dispatch from a newer `main` commit and call that the same reviewed release.\\n- [ ] Treat a second identical rejection as evidence that the external publisher still does not match; do not keep retrying without a visible configuration correction.\\n- [ ] If the public version appears before retry, stop publication and use verify-only handling; PyPI files are immutable and must never be overwritten.\\n- [ ] Keep P0.6 `INCOMPLETE` until exact public hashes, installed MCP behavior, and all three public platform smokes are green.\", \"version_binding\": \"unversioned\", \"content_sha256\": \"1b7f73dcd00666e5519b545cae16f811c59791d36979292ca7bd1661e72aeac8\", \"project_identity\": \"local:48277f62f8b4ff92ba1c60c082f92a43817f9e1c5ba4ea27e12cd77a76421585\", \"authority\": \"supporting\", \"scope\": \"project\", \"line_start\": 61, \"line_end\": 71}], \"context_quality\": {\"status\": \"unverified\", \"reasons\": [\"coverage_unverified\"]}, \"read_next\": [{\"source_uri\": \"docatlas://source/e29146c07e7f476413e8d29d\", \"path\": \"docs/modules/evidence-selection.md\", \"project_identity\": \"local:48277f62f8b4ff92ba1c60c082f92a43817f9e1c5ba4ea27e12cd77a76421585\", \"snapshot_sha256\": \"sha256:b4140aa497f287ea08fd4c10ff8673084383440d093aa4f38da89f7113f91dc1\", \"line_start\": 7, \"line_end\": 12, \"reason\": \"inspect_source_context\"}], \"edit_ready\": false, \"investigation_allowed\": true, \"estimated_tokens\": 720}",
+        "annotations": null,
+        "_meta": null
+      }
+    ],
+    "structuredContent": null,
+    "isError": false
+  }
+}

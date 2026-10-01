@@ -1,0 +1,107 @@
+[
+  {
+    "stable_chunk_id": "child-3a84b4f3883cf9b614786cdae572052ebe259cc1",
+    "source_path": "docs/advanced/timeouts.md",
+    "display_text": "HTTPX is careful to enforce timeouts everywhere by default.\n\nThe default behavior is to raise a `TimeoutException` after 5 seconds of\nnetwork inactivity.\n\n",
+    "line_start": 1,
+    "line_end": 5
+  },
+  {
+    "stable_chunk_id": "child-b03930f429c04252f14ff4f930431fcc87c176e4",
+    "source_path": "docs/advanced/timeouts.md",
+    "display_text": "## Setting and disabling timeouts\n\nYou can set timeouts for an individual request:\n\n```python\n# Using the top-level API:\nhttpx.get('http://example.com/api/v1/example', timeout=10.0)\n\n# Using a client instance:\nwith httpx.Client() as client:\n    client.get(\"http://example.com/api/v1/example\", timeout=10.0)\n```\n\nOr disable timeouts for an individual request:\n\n",
+    "line_start": 6,
+    "line_end": 20
+  },
+  {
+    "stable_chunk_id": "child-46b605767662879b6eaccfe40c0e8f25fe9c5065",
+    "source_path": "docs/advanced/timeouts.md",
+    "display_text": "```python\n# Using the top-level API:\nhttpx.get('http://example.com/api/v1/example', timeout=None)\n\n# Using a client instance:\nwith httpx.Client() as client:\n    client.get(\"http://example.com/api/v1/example\", timeout=None)\n```\n\n",
+    "line_start": 21,
+    "line_end": 29
+  },
+  {
+    "stable_chunk_id": "child-5ceda13655538c66fa952c65435c8ae1dbb6e1a4",
+    "source_path": "docs/advanced/timeouts.md",
+    "display_text": "## Setting a default timeout on a client\n\nYou can set a timeout on a client instance, which results in the given\n`timeout` being used as the default for requests made with this client:\n\n```python\nclient = httpx.Client()              # Use a default 5s timeout everywhere.\nclient = httpx.Client(timeout=10.0)  # Use a default 10s timeout everywhere.\nclient = httpx.Client(timeout=None)  # Disable all timeouts by default.\n```\n\n",
+    "line_start": 30,
+    "line_end": 40
+  },
+  {
+    "stable_chunk_id": "child-26a321dd32f3164c66d9c3c87ec93edeebaee8f7",
+    "source_path": "docs/advanced/timeouts.md",
+    "display_text": "## Fine tuning the configuration\n\nHTTPX also allows you to specify the timeout behavior in more fine grained detail.\n\nThere are four different types of timeouts that may occur. These are **connect**,\n**read**, **write**, and **pool** timeouts.\n\n* The **connect** timeout specifies the maximum amount of time to wait until\na socket connection to the requested host is established. If HTTPX is unable to connect\nwithin this time frame, a `ConnectTimeout` exception is raised.\n",
+    "line_start": 41,
+    "line_end": 50
+  },
+  {
+    "stable_chunk_id": "child-5e9419171e99346c867ee3349e1ca8d4ed2956f4",
+    "source_path": "docs/advanced/timeouts.md",
+    "display_text": "* The **read** timeout specifies the maximum duration to wait for a chunk of\ndata to be received (for example, a chunk of the response body). If HTTPX is\nunable to receive data within this time frame, a `ReadTimeout` exception is raised.\n* The **write** timeout specifies the maximum duration to wait for a chunk of\ndata to be sent (for example, a chunk of the request body). If HTTPX is unable\nto send data within this time frame, a `WriteTimeout` exception is raised.\n",
+    "line_start": 51,
+    "line_end": 56
+  },
+  {
+    "stable_chunk_id": "child-4770b0472f8cf7e9e521c1eff8c45b5309fdb1e3",
+    "source_path": "docs/advanced/timeouts.md",
+    "display_text": "* The **pool** timeout specifies the maximum duration to wait for acquiring\na connection from the connection pool. If HTTPX is unable to acquire a connection\nwithin this time frame, a `PoolTimeout` exception is raised. A related\nconfiguration here is the maximum number of allowable connections in the\nconnection pool, which is configured by the `limits` argument.\n\nYou can configure the timeout behavior for any of these values...\n\n",
+    "line_start": 57,
+    "line_end": 64
+  },
+  {
+    "stable_chunk_id": "child-adbc185a898cd122f3a48d6240c249d45c7a5253",
+    "source_path": "docs/advanced/timeouts.md",
+    "display_text": "```python\n# A client with a 60s timeout for connecting, and a 10s timeout elsewhere.\ntimeout = httpx.Timeout(10.0, connect=60.0)\nclient = httpx.Client(timeout=timeout)\n\nresponse = client.get('http://example.com/')\n```",
+    "line_start": 65,
+    "line_end": 71
+  },
+  {
+    "stable_chunk_id": "child-3b828a0d1b62cb788d501797c35106a2d49fdc0e",
+    "source_path": "docs/environment_variables.md",
+    "display_text": "# Environment Variables\n\nThe HTTPX library can be configured via environment variables.\nEnvironment variables are used by default. To ignore environment variables, `trust_env` has to be set `False`. There are two ways to set `trust_env` to disable environment variables:\n\n* On the client via `httpx.Client(trust_env=False)`.\n* Using the top-level API, such as `httpx.get(\"<url>\", trust_env=False)`.\n\n",
+    "line_start": 1,
+    "line_end": 8
+  },
+  {
+    "stable_chunk_id": "child-71224ac2e88fef7559ed3fca11d436ac15d6b2aa",
+    "source_path": "docs/environment_variables.md",
+    "display_text": "Here is a list of environment variables that HTTPX recognizes and what function they serve:\n\n",
+    "line_start": 9,
+    "line_end": 10
+  },
+  {
+    "stable_chunk_id": "child-9f9cb949b05c88440af0823cd803fbbec53ca100",
+    "source_path": "docs/environment_variables.md",
+    "display_text": "## Proxies\n\nThe environment variables documented below are used as a convention by various HTTP tooling, including:\n\n* [cURL](https://github.com/curl/curl/blob/master/docs/MANUAL.md#environment-variables)\n* [requests](https://github.com/psf/requests/blob/master/docs/user/advanced.rst#proxies)\n\nFor more information on using proxies in HTTPX, see [HTTP Proxying](advanced/proxies.md#http-proxying).\n\n",
+    "line_start": 11,
+    "line_end": 19
+  },
+  {
+    "stable_chunk_id": "child-a07afa00f2866eef49bb3b507921096cfef1a4da",
+    "source_path": "docs/environment_variables.md",
+    "display_text": "### `HTTP_PROXY`, `HTTPS_PROXY`, `ALL_PROXY`\n\nValid values: A URL to a proxy\n\n`HTTP_PROXY`, `HTTPS_PROXY`, `ALL_PROXY` set the proxy to be used for `http`, `https`, or all requests respectively.\n\n",
+    "line_start": 20,
+    "line_end": 25
+  },
+  {
+    "stable_chunk_id": "child-101e1030d273f134ff3c9ecfd2bfb4bd194404e8",
+    "source_path": "docs/environment_variables.md",
+    "display_text": "```bash\nexport HTTP_PROXY=http://my-external-proxy.com:1234\n\n# This request will be sent through the proxy\npython -c \"import httpx; httpx.get('http://example.com')\"\n\n# This request will be sent directly, as we set `trust_env=False`\npython -c \"import httpx; httpx.get('http://example.com', trust_env=False)\"\n\n```\n\n",
+    "line_start": 26,
+    "line_end": 36
+  },
+  {
+    "stable_chunk_id": "child-d98b7ac241cc501614f4c7b244e066ed43a23548",
+    "source_path": "docs/environment_variables.md",
+    "display_text": "### `NO_PROXY`\n\nValid values: a comma-separated list of hostnames/urls\n\n`NO_PROXY` disables the proxy for specific urls\n\n",
+    "line_start": 37,
+    "line_end": 42
+  },
+  {
+    "stable_chunk_id": "child-69db3807381c4235ccb5e689365580c414e0f94c",
+    "source_path": "docs/environment_variables.md",
+    "display_text": "```bash\nexport HTTP_PROXY=http://my-external-proxy.com:1234\nexport NO_PROXY=http://127.0.0.1,python-httpx.org\n\n# As in the previous example, this request will be sent through the proxy\npython -c \"import httpx; httpx.get('http://example.com')\"\n\n# These requests will be sent directly, bypassing the proxy\npython -c \"import httpx; httpx.get('http://127.0.0.1:5000/my-api')\"\npython -c \"import httpx; httpx.get('https://www.python-httpx.org')\"\n```\n",
+    "line_start": 43,
+    "line_end": 53
+  }
+]

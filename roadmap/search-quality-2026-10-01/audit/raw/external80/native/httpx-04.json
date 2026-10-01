@@ -1,0 +1,23 @@
+{
+  "tool": "get_docs_context",
+  "request": {
+    "question": "What does pool timeout wait for, which exception is raised, and which argument limits connections?",
+    "project_path": "/tmp/opencode/search-audit-work-20261001/fixtures/httpx",
+    "scope": "all"
+  },
+  "seconds": 0.23318653299793368,
+  "is_error": false,
+  "wire": {
+    "_meta": null,
+    "content": [
+      {
+        "type": "text",
+        "text": "{\"status\": \"ok\", \"kind\": \"docs_context\", \"context_status\": \"ready\", \"context_available\": true, \"answer_supported\": false, \"answer_available\": false, \"support_status\": \"retrieval_only\", \"answer_policy\": \"cite_only\", \"coverage_policy\": \"retrieval_attribution_only\", \"query_coverage\": \"full\", \"retrieval_coverage\": \"full\", \"facet_coverage\": \"unverified\", \"covered_query_ids\": [\"query-original\"], \"missing_query_ids\": [], \"missing_facets\": [], \"facets\": [{\"id\": \"retrieval-need:need-2\", \"requirement_id\": null, \"question\": \"What does pool timeout wait for which exception is raised,\", \"status\": \"retrieval_only\", \"evidence_ids\": [\"ev-2770bad8115e0c20\"]}], \"sources\": [{\"evidence_id\": \"ev-2770bad8115e0c20\", \"path_or_url\": \"docs/advanced/timeouts.md\", \"section\": \"Fine tuning the configuration\", \"snippet\": \"There are four different types of timeouts that may occur. These are **connect**,\\n**read**, **write**, and **pool** timeouts.\\n\\n* The **connect** timeout specifies the maximum amount of time to wait until\\na socket connection to the requested host is established. If HTTPX is unable to connect\\nwithin this time frame, a `ConnectTimeout` exception is raised.\\n* The **read** timeout specifies the maximum duration to wait for a chunk of\\ndata to be received (for example, a chunk of the response body). If HTTPX is\\nunable to receive data within this time frame, a `ReadTimeout` exception is raised.\\n* The **write** timeout specifies the maximum duration to wait for a chunk of\\ndata to be sent (for example, a chunk of the request body). If HTTPX is unable\\nto send data within this time frame, a `WriteTimeout` exception is raised.\\n* The **pool** timeout specifies the maximum duration to wait for acquiring\\na connection from the connection pool. If HTTPX is unable to acquire a connection\\nwithin this time frame, a `PoolTimeout` exception is raised. A related\\nconfiguration here is the maximum number of allowable connections in the\\nconnection pool, which is configured by the `limits` argument.\\n\\nYou can configure the timeout behavior for any of these values...\", \"version_binding\": \"unversioned\", \"content_sha256\": \"e2afcffb9d1d8179434adb5d67aeef61bddce449ef39e9c90f6087b28f1402a5\", \"project_identity\": \"local:8cb756392a06b5929cccc7f21e226fea445751f0d8e07285f2b940cee43cfdc6\", \"line_start\": 45, \"line_end\": 63, \"authority\": \"source_of_truth\", \"scope\": \"project\", \"source_uri\": \"docatlas://source/1c080517c6d34bb3bb4ee992\"}], \"context_quality\": {\"status\": \"unverified\", \"reasons\": [\"coverage_unverified\"]}, \"read_next\": [{\"source_uri\": \"docatlas://source/e40e0516707c92dd120bec21\", \"path\": \"docs/advanced/timeouts.md\", \"project_identity\": \"local:8cb756392a06b5929cccc7f21e226fea445751f0d8e07285f2b940cee43cfdc6\", \"snapshot_sha256\": \"sha256:48959a587ecc6430f9051ab1b1c76fcebc3f3e95ec01199281aab813a2dcfaa1\", \"line_start\": 64, \"line_end\": 71, \"reason\": \"inspect_source_context\"}], \"edit_ready\": false, \"investigation_allowed\": true, \"estimated_tokens\": 721}",
+        "annotations": null,
+        "_meta": null
+      }
+    ],
+    "structuredContent": null,
+    "isError": false
+  }
+}

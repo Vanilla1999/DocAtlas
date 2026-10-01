@@ -1,0 +1,23 @@
+{
+  "tool": "get_docs_context",
+  "request": {
+    "question": "What identifies a CORS preflight request and which response status codes can the middleware return?",
+    "project_path": "/tmp/opencode/search-audit-work-20261001/fixtures/fastapi",
+    "scope": "all"
+  },
+  "seconds": 0.18171422500017798,
+  "is_error": false,
+  "wire": {
+    "_meta": null,
+    "content": [
+      {
+        "type": "text",
+        "text": "{\"status\": \"ok\", \"kind\": \"docs_context\", \"context_status\": \"ready\", \"context_available\": true, \"answer_supported\": false, \"answer_available\": false, \"support_status\": \"retrieval_only\", \"answer_policy\": \"cite_only\", \"coverage_policy\": \"retrieval_attribution_only\", \"query_coverage\": \"full\", \"retrieval_coverage\": \"full\", \"facet_coverage\": \"unverified\", \"covered_query_ids\": [\"query-original\", \"query-anchor-1\"], \"missing_query_ids\": [], \"missing_facets\": [], \"facets\": [], \"sources\": [{\"evidence_id\": \"ev-6de6bc0ae3f24d21\", \"path_or_url\": \"docs/en/docs/tutorial/cors.md\", \"section\": \"Use `CORSMiddleware` > CORS preflight requests\", \"snippet\": \"### CORS preflight requests\\n\\nThese are any `OPTIONS` request with `Origin` and `Access-Control-Request-Method` headers.\\n\\nIn this case the middleware will intercept the incoming request and respond with appropriate CORS headers, and either a `200` or `400` response for informational purposes.\", \"version_binding\": \"unversioned\", \"content_sha256\": \"93733a3c76fc3f23806cd6fd079775b0a14ed9ff8fcd7c11df0245d61a2e9890\", \"project_identity\": \"local:1b00d8fdd42cb375d06726b788509794c8b320b1ccfe59b08e6881c10ebd0618\", \"authority\": \"source_of_truth\", \"scope\": \"project\", \"line_start\": 67, \"line_end\": 71}, {\"evidence_id\": \"ev-dab20c170aacb814\", \"path_or_url\": \"docs/en/docs/tutorial/cors.md\", \"section\": \"Use `CORSMiddleware` > Simple requests\", \"snippet\": \"### Simple requests\\n\\nAny request with an `Origin` header. In this case the middleware will pass the request through as normal, but will include appropriate CORS headers on the response.\", \"version_binding\": \"unversioned\", \"content_sha256\": \"cdc4b65a951a32b53fa9fe4babde2aac61f30399af17b2eb954a325ed47d9b25\", \"project_identity\": \"local:1b00d8fdd42cb375d06726b788509794c8b320b1ccfe59b08e6881c10ebd0618\", \"authority\": \"source_of_truth\", \"scope\": \"project\", \"line_start\": 73, \"line_end\": 75}, {\"evidence_id\": \"ev-32b7cbbf9839b813\", \"path_or_url\": \"docs/en/docs/tutorial/cors.md\", \"section\": \"CORS (Cross-Origin Resource Sharing)\", \"snippet\": \"<a href=\\\"https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS\\\" class=\\\"external-link\\\" target=\\\"_blank\\\">CORS or \\\"Cross-Origin Resource Sharing\\\"</a> refers to the situations when a frontend running in a browser has JavaScript code that communicates with a backend, and the backend is in a different \\\"origin\\\" than the frontend.\", \"version_binding\": \"unversioned\", \"content_sha256\": \"78a40eadcfe22b911d472cbeb5e41a479d74eebb4c709f6ad0ca4aeb1d5fc28c\", \"project_identity\": \"local:1b00d8fdd42cb375d06726b788509794c8b320b1ccfe59b08e6881c10ebd0618\", \"line_start\": 3, \"line_end\": 3, \"authority\": \"source_of_truth\", \"scope\": \"project\"}], \"context_quality\": {\"status\": \"unverified\", \"reasons\": [\"coverage_unverified\"]}, \"read_next\": [], \"edit_ready\": false, \"investigation_allowed\": true, \"estimated_tokens\": 684}",
+        "annotations": null,
+        "_meta": null
+      }
+    ],
+    "structuredContent": null,
+    "isError": false
+  }
+}

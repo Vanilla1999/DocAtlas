@@ -1,0 +1,23 @@
+{
+  "tool": "get_docs_context",
+  "request": {
+    "question": "Чем конфигурация поиска отличается от каталога авторитетных документов?",
+    "project_path": "/tmp/opencode/docatlas-ablation",
+    "scope": "all"
+  },
+  "seconds": 0.5310746699979063,
+  "is_error": false,
+  "wire": {
+    "_meta": null,
+    "content": [
+      {
+        "type": "text",
+        "text": "{\"status\": \"ok\", \"kind\": \"docs_context\", \"context_status\": \"ready\", \"context_available\": true, \"answer_supported\": false, \"answer_available\": false, \"support_status\": \"retrieval_only\", \"answer_policy\": \"cite_only\", \"coverage_policy\": \"retrieval_attribution_only\", \"query_coverage\": \"full\", \"retrieval_coverage\": \"full\", \"facet_coverage\": \"unverified\", \"covered_query_ids\": [\"query-original\"], \"missing_query_ids\": [], \"missing_facets\": [], \"facets\": [{\"id\": \"intent-context:project_docs_configuration\", \"requirement_id\": null, \"question\": \"configure project documentation catalog and index settings\", \"status\": \"retrieval_only\", \"evidence_ids\": [\"ev-bed94811b504427c\", \"ev-38329dc4234fd6be\"]}], \"sources\": [{\"evidence_id\": \"ev-bed94811b504427c\", \"path_or_url\": \"wiki/Configuration.md\", \"section\": \"Configuration\", \"snippet\": \"# Configuration\\n\\n**Resolution order:** `--config` flag, then `./docatlas.yaml` in the current directory, then `~/.docatlas/docatlas.yaml` (auto-created by `doc-atlas setup`). For details on what each command does, see [Commands](./Commands.md).\\n\\nA project is configured in `docatlas.yaml` by setting documented keys such as `index.provider: sqlite`, `query.default_budget: 2400`, and optional vector/retrieval settings. Relative index paths are resolved from the location of that `docatlas.yaml`.\", \"version_binding\": \"unversioned\", \"content_sha256\": \"388e49cd2e9ad4ae94c1f5af908959e57571ffc2379bd0b9f00631f62ce98580\", \"project_identity\": \"local:48277f62f8b4ff92ba1c60c082f92a43817f9e1c5ba4ea27e12cd77a76421585\", \"authority\": \"source_of_truth\", \"scope\": \"project\", \"line_start\": 1, \"line_end\": 5, \"source_uri\": \"docatlas://source/f7e90fd00a3b3fa078b3a4a6\"}, {\"evidence_id\": \"ev-38329dc4234fd6be\", \"path_or_url\": \"wiki/Architecture.md\", \"section\": \"Architecture > Project documentation storage and isolation\", \"snippet\": \"## Project documentation storage and isolation\\n\\nProject documentation storage is organized as a derived, project-scoped index\\nof repository-owned files. Each project identity receives isolated SQLite index\\nstate and extracted artifacts, so one repository's project docs cannot satisfy\\nanother repository's query. The filesystem documents remain authoritative; the\\nindex is a rebuildable cache coordinated by the writer lease and cleanup barrier\\ndescribed in [Index cleanup](../docs/index-cleanup.md).\", \"version_binding\": \"unversioned\", \"content_sha256\": \"eb3b0d54b97e0db3228a7f1235a4a59711aa54073810c467a1cb83a2ebde1dc3\", \"project_identity\": \"local:48277f62f8b4ff92ba1c60c082f92a43817f9e1c5ba4ea27e12cd77a76421585\", \"line_start\": 25, \"line_end\": 32, \"authority\": \"source_of_truth\", \"scope\": \"project\", \"source_uri\": \"docatlas://source/00478eff8d13e1b85d82ec16\"}], \"context_quality\": {\"status\": \"partial\", \"reasons\": [\"requested_part_missing\"]}, \"read_next\": [], \"edit_ready\": false, \"investigation_allowed\": true, \"estimated_tokens\": 699}",
+        "annotations": null,
+        "_meta": null
+      }
+    ],
+    "structuredContent": null,
+    "isError": false
+  }
+}

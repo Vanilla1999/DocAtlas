@@ -1,0 +1,26 @@
+{
+  "tool": "get_docs_context",
+  "request": {
+    "question": "Исходный файл изменился между поиском и дочитыванием. Что должен вернуть reader?",
+    "project_path": "/tmp/opencode/docatlas-ablation",
+    "scope": "all",
+    "lookup_queries": [
+      "What happens when the source snapshot changes before a continuation read?"
+    ]
+  },
+  "seconds": 0.6807688050030265,
+  "is_error": false,
+  "wire": {
+    "_meta": null,
+    "content": [
+      {
+        "type": "text",
+        "text": "{\"status\": \"ok\", \"kind\": \"docs_context\", \"context_status\": \"ready\", \"context_available\": true, \"answer_supported\": false, \"answer_available\": false, \"support_status\": \"retrieval_only\", \"answer_policy\": \"cite_only\", \"coverage_policy\": \"retrieval_attribution_only\", \"query_coverage\": \"partial\", \"retrieval_coverage\": \"partial\", \"facet_coverage\": \"unverified\", \"covered_query_ids\": [\"query-lookup-1\"], \"missing_query_ids\": [\"query-original\"], \"missing_facets\": [], \"facets\": [], \"sources\": [{\"evidence_id\": \"ev-f978797d60370d91\", \"path_or_url\": \"docs/source-continuation.md\", \"section\": \"Grounded partial answers and source continuation > Read only a missing part\", \"snippet\": \"References expire after ten minutes, are session-local, and may be evicted after\\n128 references. Restart invalidates them. Each read checks repository identity,\\nexplicit active catalog entry, authority, scope, active-index metadata, and the\\noriginal full-file snapshot digest. Text is opened without following symlinks and\\nis never fetched from the network. A changed snapshot returns `source_changed`;\\nan unavailable, expired, or disallowed source returns `source_unavailable`.\\nNeither result silently opens the latest file. Explain the missing fact and a\\nconcrete next step instead of inventing an answer.\", \"version_binding\": \"unversioned\", \"content_sha256\": \"9e422c49790b50f847560451eaa7d25605be216fda6af14be6958d5561893cf6\", \"project_identity\": \"local:48277f62f8b4ff92ba1c60c082f92a43817f9e1c5ba4ea27e12cd77a76421585\", \"authority\": \"source_of_truth\", \"scope\": \"module\", \"line_start\": 34, \"line_end\": 41}, {\"evidence_id\": \"ev-c7d2a99dd5c55acc\", \"path_or_url\": \"docs/source-continuation.md\", \"section\": \"Grounded partial answers and source continuation > Read only a missing part\", \"snippet\": \"When spare space remains in the initial 800-token admission budget, a selected\\nproject source may carry `source_uri`. This optional locator never displaces a\\nselected snippet. Pass the exact returned URI to MCP `resources/read`; ordinary\\nMarkdown links are citations, not continuation capabilities. The initial response\\nstill contains at most three sources and retains its public token-estimate meaning.\", \"version_binding\": \"unversioned\", \"content_sha256\": \"5777063b692b8532c3ef4344efa5f505b9890adb5c58cd741f05f795b8d0d33d\", \"project_identity\": \"local:48277f62f8b4ff92ba1c60c082f92a43817f9e1c5ba4ea27e12cd77a76421585\", \"authority\": \"source_of_truth\", \"scope\": \"module\", \"line_start\": 18, \"line_end\": 22}], \"context_quality\": {\"status\": \"unverified\", \"reasons\": [\"coverage_unverified\"]}, \"read_next\": [{\"source_uri\": \"docatlas://source/dbbfa27ce651a3c230b1c0d5\", \"path\": \"docs/grounded-host-session.md\", \"project_identity\": \"local:48277f62f8b4ff92ba1c60c082f92a43817f9e1c5ba4ea27e12cd77a76421585\", \"snapshot_sha256\": \"sha256:0cf46d66962abf7c0461a57faf5af154ba24757473aef0602a6a27c31484e4e8\", \"line_start\": 22, \"line_end\": 28, \"reason\": \"inspect_source_context\"}], \"edit_ready\": false, \"investigation_allowed\": true, \"estimated_tokens\": 731}",
+        "annotations": null,
+        "_meta": null
+      }
+    ],
+    "structuredContent": null,
+    "isError": false
+  }
+}

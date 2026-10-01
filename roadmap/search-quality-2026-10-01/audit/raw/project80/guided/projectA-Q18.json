@@ -1,0 +1,27 @@
+{
+  "tool": "get_docs_context",
+  "request": {
+    "question": "How do lexical retrieval and vector retrieval cooperate, and what happens when vectors are unavailable?",
+    "project_path": "/tmp/opencode/docatlas-ablation",
+    "scope": "all",
+    "lookup_queries": [
+      "How are lexical and vector retrieval combined?",
+      "What happens when vector search is unavailable?"
+    ]
+  },
+  "seconds": 1.112805330005358,
+  "is_error": false,
+  "wire": {
+    "_meta": null,
+    "content": [
+      {
+        "type": "text",
+        "text": "{\"status\": \"ok\", \"kind\": \"docs_context\", \"context_status\": \"ready\", \"context_available\": true, \"answer_supported\": false, \"answer_available\": false, \"support_status\": \"retrieval_only\", \"answer_policy\": \"cite_only\", \"coverage_policy\": \"retrieval_attribution_only\", \"query_coverage\": \"full\", \"retrieval_coverage\": \"full\", \"facet_coverage\": \"unverified\", \"covered_query_ids\": [\"query-original\", \"query-lookup-1\", \"query-lookup-2\"], \"missing_query_ids\": [], \"missing_facets\": [], \"facets\": [], \"sources\": [{\"evidence_id\": \"ev-8ab472f24f0ab11b\", \"path_or_url\": \"wiki/Configuration.md\", \"section\": \"Configuration > Configuration Reference > Vector store\", \"snippet\": \"A fresh configuration uses `retrieval.default_mode: lexical` for queries. Ingest can auto-start managed Qdrant and embed chunks with FastEmbed; the `vector_store:` block tunes that optional vector store. Select `dense`, `sparse`, or `hybrid` explicitly when vector retrieval is required. Those modes fail closed when required capabilities are unavailable unless the caller explicitly enables degraded fallback. Set `DOCATLAS_AUTO_VECTORS=0` (or run `doc-atlas ingest --no-vectors`) for FTS5-only ingestion.\", \"version_binding\": \"unversioned\", \"content_sha256\": \"1b4a59fd532899d3659c57543e895d6561d4336f16a784382986947c2312fbe6\", \"project_identity\": \"local:48277f62f8b4ff92ba1c60c082f92a43817f9e1c5ba4ea27e12cd77a76421585\", \"authority\": \"source_of_truth\", \"scope\": \"project\", \"line_start\": 51, \"line_end\": 51}, {\"evidence_id\": \"ev-555bbd0e47e89b22\", \"path_or_url\": \"wiki/Architecture.md\", \"section\": \"Architecture > Hybrid retrieval\", \"snippet\": \"## Hybrid retrieval\\n\\nA fresh configuration queries the FTS5 index in `lexical` mode by default. Ingest may also populate dense FastEmbed and SPLADE sparse vectors in Qdrant; select `dense`, `sparse`, or `hybrid` explicitly or set `retrieval.default_mode`. Non-lexical retrieval fails closed when a required capability is unavailable unless the caller opts into degraded fallback with `--allow-degraded`.\", \"version_binding\": \"unversioned\", \"content_sha256\": \"8ee5632f91a802f7c5e105561b590be26e230115295c60bb7c7347e580794fa3\", \"project_identity\": \"local:48277f62f8b4ff92ba1c60c082f92a43817f9e1c5ba4ea27e12cd77a76421585\", \"authority\": \"source_of_truth\", \"scope\": \"project\", \"line_start\": 40, \"line_end\": 42}], \"context_quality\": {\"status\": \"unverified\", \"reasons\": [\"coverage_unverified\"]}, \"read_next\": [{\"source_uri\": \"docatlas://source/dfea5730d1fa506024740d1c\", \"path\": \"wiki/Commands.md\", \"project_identity\": \"local:48277f62f8b4ff92ba1c60c082f92a43817f9e1c5ba4ea27e12cd77a76421585\", \"snapshot_sha256\": \"sha256:8d889ac9ad8a29cb17d0101ff7722bebf9115da3055a8295c8ebf23c95e9699b\", \"line_start\": 25, \"line_end\": 35, \"reason\": \"inspect_source_context\"}], \"edit_ready\": false, \"investigation_allowed\": true, \"estimated_tokens\": 684}",
+        "annotations": null,
+        "_meta": null
+      }
+    ],
+    "structuredContent": null,
+    "isError": false
+  }
+}

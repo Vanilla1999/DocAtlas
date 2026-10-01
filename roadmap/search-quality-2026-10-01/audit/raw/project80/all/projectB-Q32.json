@@ -1,0 +1,23 @@
+{
+  "tool": "get_docs_context",
+  "request": {
+    "question": "Can index cleanup run while another process is writing the index?",
+    "project_path": "/tmp/opencode/docatlas-ablation",
+    "scope": "all"
+  },
+  "seconds": 0.9432947199966293,
+  "is_error": false,
+  "wire": {
+    "_meta": null,
+    "content": [
+      {
+        "type": "text",
+        "text": "{\"status\": \"ok\", \"kind\": \"docs_context\", \"context_status\": \"ready\", \"context_available\": true, \"answer_supported\": false, \"answer_available\": false, \"support_status\": \"retrieval_only\", \"answer_policy\": \"cite_only\", \"coverage_policy\": \"retrieval_attribution_only\", \"query_coverage\": \"full\", \"retrieval_coverage\": \"full\", \"facet_coverage\": \"unverified\", \"covered_query_ids\": [\"query-original\"], \"missing_query_ids\": [], \"missing_facets\": [], \"facets\": [{\"id\": \"intent-context:index_cleanup\", \"requirement_id\": null, \"question\": \"inspect safely clear local index preview cleanup plan\", \"status\": \"retrieval_only\", \"evidence_ids\": [\"ev-35fe085f79fc2397\"]}], \"sources\": [{\"evidence_id\": \"ev-35fe085f79fc2397\", \"path_or_url\": \"docs/index-cleanup.md\", \"section\": \"Cleaning DocAtlas index state safely\", \"snippet\": \"# Cleaning DocAtlas index state safely\\n\\n`doc-atlas clear-index` removes derived index state while preserving project\\nsources, `docatlas.yaml`, configuration, and unrelated files; it never\\nsilently widens the cleanup scope. The command is preview-only\\nunless `--apply` is supplied.\", \"version_binding\": \"unversioned\", \"content_sha256\": \"533d6432cadb8bf35ba1016d1c012f3422a8a2a4cdf00b91b3aa8d3f42e7ea84\", \"project_identity\": \"local:48277f62f8b4ff92ba1c60c082f92a43817f9e1c5ba4ea27e12cd77a76421585\", \"authority\": \"source_of_truth\", \"scope\": \"project\", \"line_start\": 1, \"line_end\": 6, \"source_uri\": \"docatlas://source/500728dcdd7519009b04ecdf\"}, {\"evidence_id\": \"ev-328bfe6bae7fc4d9\", \"path_or_url\": \"README.md\", \"section\": \"DocAtlas > Project-docs MCP server > Safe index cleanup\", \"snippet\": \"### Safe index cleanup\\n\\n`doc-atlas clear-index` previews a bounded cleanup plan before removing derived\\nSQLite, extracted-document, cache, and verified local vector state. Use\\n`--scope project-local --project-path ...` for one project or `--scope global`\\nfor all local indexes while preserving configuration. Applying a reviewed plan\\ncan be bound to its `plan_digest`, and live processes, stale plans, remote\\nQdrant, and unowned vector directories fail closed. See\\n[Cleaning DocAtlas index state safely](./docs/index-cleanup.md).\", \"version_binding\": \"unversioned\", \"content_sha256\": \"79394b43aa2aeef73d4721781eb0707d39636700133e080b867079ffc7d24e37\", \"project_identity\": \"local:48277f62f8b4ff92ba1c60c082f92a43817f9e1c5ba4ea27e12cd77a76421585\", \"line_start\": 206, \"line_end\": 214, \"authority\": \"source_of_truth\", \"scope\": \"project\", \"source_uri\": \"docatlas://source/f67653f5ed89df6233d2e7db\"}], \"context_quality\": {\"status\": \"partial\", \"reasons\": [\"requested_part_missing\"]}, \"read_next\": [], \"edit_ready\": false, \"investigation_allowed\": true, \"estimated_tokens\": 645}",
+        "annotations": null,
+        "_meta": null
+      }
+    ],
+    "structuredContent": null,
+    "isError": false
+  }
+}

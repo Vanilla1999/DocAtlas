@@ -1,0 +1,23 @@
+{
+  "tool": "docs_status",
+  "request": {
+    "action": "project",
+    "project_path": "/tmp/opencode/search-audit-work-20261001/clean-preflight-fixture",
+    "details": true
+  },
+  "seconds": 0.17359301300166408,
+  "is_error": false,
+  "wire": {
+    "_meta": null,
+    "content": [
+      {
+        "type": "text",
+        "text": "{\"tool\": \"docs_status\", \"action\": \"project\", \"project\": {\"project_path\": \"/tmp/opencode/search-audit-work-20261001/clean-preflight-fixture\", \"project_detected\": true, \"reason_code\": \"project_docs_found_not_indexed\", \"next_action\": {\"type\": \"prepare_docs\", \"tool\": \"prepare_docs\", \"requires_confirmation\": false, \"arguments_patch\": {\"action\": \"sync_project_docs\", \"project_path\": \"/tmp/opencode/search-audit-work-20261001/clean-preflight-fixture\", \"with_vectors\": false, \"plan_digest\": \"5c3043cf10fa6def857d8883df41cbd642b62c794871718a2985b326d5a08b0f\"}}, \"arguments_patch\": {\"action\": \"sync_project_docs\", \"project_path\": \"/tmp/opencode/search-audit-work-20261001/clean-preflight-fixture\", \"with_vectors\": false, \"plan_digest\": \"5c3043cf10fa6def857d8883df41cbd642b62c794871718a2985b326d5a08b0f\"}, \"source_summary\": {\"candidates\": 1, \"indexed\": 0, \"stale\": 0, \"ignored\": 0}, \"project_docs\": {\"module_count\": 0, \"modules\": [], \"modules_omitted\": 0}, \"diagnostics\": {\"active_index\": {\"db_path\": \"/tmp/opencode/search-audit-work-20261001/clean-preflight-fixture/.docatlas/docatlas.db\", \"config_source\": \"project_local\", \"config_path\": \"/tmp/opencode/search-audit-work-20261001/clean-preflight-fixture/docatlas.yaml\", \"retrieval_mode\": \"lexical\"}}}}",
+        "annotations": null,
+        "_meta": null
+      }
+    ],
+    "structuredContent": null,
+    "isError": false
+  }
+}

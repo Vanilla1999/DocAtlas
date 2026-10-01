@@ -1,0 +1,23 @@
+{
+  "tool": "get_docs_context",
+  "request": {
+    "question": "Which mkdocs configuration is best for our service? Our workload and deployment constraints are not specified.",
+    "project_path": "/tmp/opencode/search-audit-work-20261001/fixtures/mkdocs",
+    "scope": "all"
+  },
+  "seconds": 0.41769322600157466,
+  "is_error": false,
+  "wire": {
+    "_meta": null,
+    "content": [
+      {
+        "type": "text",
+        "text": "{\"status\": \"ok\", \"kind\": \"docs_context\", \"context_status\": \"ready\", \"context_available\": true, \"answer_supported\": false, \"answer_available\": false, \"support_status\": \"retrieval_only\", \"answer_policy\": \"cite_only\", \"coverage_policy\": \"retrieval_attribution_only\", \"query_coverage\": \"partial\", \"retrieval_coverage\": \"partial\", \"facet_coverage\": \"unverified\", \"covered_query_ids\": [], \"missing_query_ids\": [\"query-original\"], \"missing_facets\": [], \"facets\": [], \"sources\": [{\"evidence_id\": \"ev-c8f530704ac9c2e2\", \"path_or_url\": \"docs/user-guide/writing-your-docs.md\", \"section\": \"File layout > Configure Pages and Navigation\", \"snippet\": \"The [nav](configuration.md#nav) configuration setting in your `mkdocs.yml` file\\ndefines which pages are included in the global site navigation menu as well as\\nthe structure of that menu. If not provided, the navigation will be\\nautomatically created by discovering all the Markdown files in the\\n[documentation directory](configuration.md#docs_dir). An automatically created\\nnavigation configuration will always be sorted alphanumerically by file name\\n(except that index files will always be listed first within a sub-section). You\\nwill need to manually define your navigation configuration if you would like\\nyour navigation menu sorted differently.\", \"version_binding\": \"unversioned\", \"content_sha256\": \"65b05f94be66f70e50b66c5a29ae42c18b1d63ab674ea292faefb57cba3bbf99\", \"project_identity\": \"local:fd4807fa34128ed0db2e2162d3b5c0a37c7992656c9c7ac093ec283fb925d818\", \"authority\": \"source_of_truth\", \"scope\": \"project\", \"line_start\": 99, \"line_end\": 107}, {\"evidence_id\": \"ev-d03b8650191486b2\", \"path_or_url\": \"docs/user-guide/writing-your-docs.md\", \"section\": \"Writing your docs > Writing with Markdown\", \"snippet\": \"In addition to the base Markdown [syntax] which is common across all Markdown\\nimplementations, MkDocs includes support for extending the Markdown syntax with\\nPython-Markdown [extensions]. See the MkDocs' [markdown_extensions]\\nconfiguration setting for details on how to enable extensions.\\n\\nMkDocs includes some extensions by default, which are highlighted below.\", \"version_binding\": \"unversioned\", \"content_sha256\": \"be34396bfcbbb29252edc7f9b844c00d716a97ad2c95d1f64dc8047e65ad17be\", \"project_identity\": \"local:fd4807fa34128ed0db2e2162d3b5c0a37c7992656c9c7ac093ec283fb925d818\", \"authority\": \"source_of_truth\", \"scope\": \"project\", \"line_start\": 178, \"line_end\": 183}], \"context_quality\": {\"status\": \"unverified\", \"reasons\": [\"coverage_unverified\"]}, \"read_next\": [{\"source_uri\": \"docatlas://source/b01a5b40a489230bd87bc5ad\", \"path\": \"docs/user-guide/writing-your-docs.md\", \"project_identity\": \"local:fd4807fa34128ed0db2e2162d3b5c0a37c7992656c9c7ac093ec283fb925d818\", \"snapshot_sha256\": \"sha256:a6b69d1318ae84455bae021b6655b71274f29c19ba43d021d872d100b7b38cba\", \"line_start\": 184, \"line_end\": 190, \"reason\": \"inspect_source_context\"}], \"edit_ready\": false, \"investigation_allowed\": true, \"estimated_tokens\": 719}",
+        "annotations": null,
+        "_meta": null
+      }
+    ],
+    "structuredContent": null,
+    "isError": false
+  }
+}

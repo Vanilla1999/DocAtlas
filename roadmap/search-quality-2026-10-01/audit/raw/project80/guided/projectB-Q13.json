@@ -1,0 +1,26 @@
+{
+  "tool": "get_docs_context",
+  "request": {
+    "question": "Почему estimated_tokens может отличаться от бюджета допуска docs_context?",
+    "project_path": "/tmp/opencode/docatlas-ablation",
+    "scope": "all",
+    "lookup_queries": [
+      "How do the public token estimate and conservative context admission budget differ?"
+    ]
+  },
+  "seconds": 0.8623565660018357,
+  "is_error": false,
+  "wire": {
+    "_meta": null,
+    "content": [
+      {
+        "type": "text",
+        "text": "{\"status\": \"ok\", \"kind\": \"docs_context\", \"context_status\": \"ready\", \"context_available\": true, \"answer_supported\": false, \"answer_available\": false, \"support_status\": \"retrieval_only\", \"answer_policy\": \"cite_only\", \"coverage_policy\": \"retrieval_attribution_only\", \"query_coverage\": \"partial\", \"retrieval_coverage\": \"partial\", \"facet_coverage\": \"unverified\", \"covered_query_ids\": [\"query-anchor-1\", \"query-anchor-2\", \"query-lookup-1\"], \"missing_query_ids\": [\"query-original\"], \"missing_facets\": [], \"facets\": [], \"sources\": [{\"evidence_id\": \"ev-5b00a0b7e2c7179b\", \"path_or_url\": \"docs/retrieval-boundaries.md\", \"section\": \"Retrieval and admission boundaries > Whole-response token budget\", \"snippet\": \"The public `estimated_tokens` retains its compatible estimate: the ceiling of\\ncanonical UTF-8 JSON bytes divided by four. Admission of `docs_context` separately\\ntakes the maximum of that estimate and the pinned offline `o200k_base` token count\\nover the entire canonical JSON, including metadata and optional locators, within\\n800 tokens and three sources. Neither number promises the exact count of every\\nclient model.\\nDo not change the public estimate globally to simulate this internal admission\\npolicy. A shorter snippet still must retain a qualified contiguous source span.\", \"version_binding\": \"unversioned\", \"content_sha256\": \"99bf1558d810dbe5657f53aa39dbde420347201ac8a23a2a033d8b5ea8b1391c\", \"project_identity\": \"local:48277f62f8b4ff92ba1c60c082f92a43817f9e1c5ba4ea27e12cd77a76421585\", \"authority\": \"source_of_truth\", \"scope\": \"module\", \"line_start\": 23, \"line_end\": 30, \"source_uri\": \"docatlas://source/b3939e49d39c277653d9ea70\"}, {\"evidence_id\": \"ev-9ac525f0c65304ac\", \"path_or_url\": \"CONTRIBUTING.md\", \"section\": \"Contributing to DocAtlas > Documentation MCP changes\", \"snippet\": \"The bounded `get_docs_context` result union is `docs_answer`, `docs_context`, `patch_context`, or `insufficient_evidence`. Preserve the conservative boundary: only narrow relation-specific proof may authorize `docs_answer`; broad onboarding, overview, and explanatory questions remain `docs_context`.\", \"version_binding\": \"unversioned\", \"content_sha256\": \"092c0320ace41bf4c9edec38709c1dd2dd3cde4b09524cbfbb6f9845638bff35\", \"project_identity\": \"local:48277f62f8b4ff92ba1c60c082f92a43817f9e1c5ba4ea27e12cd77a76421585\", \"authority\": \"source_of_truth\", \"scope\": \"project\", \"line_start\": 38, \"line_end\": 38}], \"context_quality\": {\"status\": \"unverified\", \"reasons\": [\"coverage_unverified\"]}, \"read_next\": [{\"source_uri\": \"docatlas://source/14926aef7a6b30239f68808f\", \"path\": \"docs/source-continuation.md\", \"project_identity\": \"local:48277f62f8b4ff92ba1c60c082f92a43817f9e1c5ba4ea27e12cd77a76421585\", \"snapshot_sha256\": \"sha256:00715dd09b8bcf6894ae65edaa0a5629c13e887887323724538968c2ea5b4a3a\", \"line_start\": 18, \"line_end\": 23, \"reason\": \"inspect_source_context\"}], \"edit_ready\": false, \"investigation_allowed\": true, \"estimated_tokens\": 708}",
+        "annotations": null,
+        "_meta": null
+      }
+    ],
+    "structuredContent": null,
+    "isError": false
+  }
+}

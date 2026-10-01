@@ -1,0 +1,8 @@
+{
+  "production_module": "/home/viadmin/.local/share/uv/tools/doc-atlas/lib/python3.13/site-packages/docmancer/__init__.py",
+  "version": "1.3.2",
+  "executable": "/home/viadmin/.local/share/uv/tools/doc-atlas/bin/python",
+  "transport": "actual installed executable over MCP stdio",
+  "network": "offline environment flags, no OS-enforced network isolation",
+  "scoring": "frozen known witnesses; needs_review is not failure or success"
+}

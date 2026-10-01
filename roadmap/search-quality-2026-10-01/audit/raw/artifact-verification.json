@@ -1,0 +1,43 @@
+{
+  "status": "PASS",
+  "main_stdio_questions": 320,
+  "project_lanes": 3,
+  "external_cases": 80,
+  "grounded_searches": 180,
+  "context7_queries": 10,
+  "translation_queries": 10,
+  "same_call_traces": 76,
+  "preserved_corpus_files": 148,
+  "reports": [
+    "ANALYSIS_RU.md",
+    "ACTION_PLAN_RU.md",
+    "COMPARATORS_RU.md",
+    "PROJECT_80_REVIEW_RU.md",
+    "EXTERNAL_80_REVIEW_RU.md"
+  ],
+  "local_markdown_links": [
+    {
+      "file": "ANALYSIS_RU.md",
+      "link": "PROJECT_80_REVIEW_RU.md"
+    },
+    {
+      "file": "ANALYSIS_RU.md",
+      "link": "EXTERNAL_80_REVIEW_RU.md"
+    },
+    {
+      "file": "ANALYSIS_RU.md",
+      "link": "COMPARATORS_RU.md"
+    },
+    {
+      "file": "ANALYSIS_RU.md",
+      "link": "ACTION_PLAN_RU.md"
+    },
+    {
+      "file": "ANALYSIS_RU.md",
+      "link": "ACTION_PLAN_RU.md"
+    }
+  ],
+  "production_tracked_diff": [],
+  "source_config_unchanged": true,
+  "note": "Artifact/method verification, not new product tests or independent semantic acceptance."
+}

@@ -1,0 +1,26 @@
+{
+  "tool": "get_docs_context",
+  "request": {
+    "question": "Can index cleanup run while another process is writing the index?",
+    "project_path": "/tmp/opencode/docatlas-ablation",
+    "scope": "all",
+    "lookup_queries": [
+      "How do writer leases and the cleanup barrier coordinate storage mutation?"
+    ]
+  },
+  "seconds": 1.3129880330016022,
+  "is_error": false,
+  "wire": {
+    "_meta": null,
+    "content": [
+      {
+        "type": "text",
+        "text": "{\"status\": \"ok\", \"kind\": \"docs_context\", \"context_status\": \"ready\", \"context_available\": true, \"answer_supported\": false, \"answer_available\": false, \"support_status\": \"retrieval_only\", \"answer_policy\": \"cite_only\", \"coverage_policy\": \"retrieval_attribution_only\", \"query_coverage\": \"full\", \"retrieval_coverage\": \"full\", \"facet_coverage\": \"unverified\", \"covered_query_ids\": [\"query-original\", \"query-lookup-1\"], \"missing_query_ids\": [], \"missing_facets\": [], \"facets\": [{\"id\": \"intent-context:index_cleanup\", \"requirement_id\": null, \"question\": \"inspect safely clear local index preview cleanup plan\", \"status\": \"retrieval_only\", \"evidence_ids\": [\"ev-35fe085f79fc2397\", \"ev-94dc926d3c644390\"]}], \"sources\": [{\"evidence_id\": \"ev-35fe085f79fc2397\", \"path_or_url\": \"docs/index-cleanup.md\", \"section\": \"Cleaning DocAtlas index state safely\", \"snippet\": \"`doc-atlas clear-index` removes derived index state while preserving project\\nsources, `docatlas.yaml`, configuration, and unrelated files; it never\\nsilently widens the cleanup scope. The command is preview-only\\nunless `--apply` is supplied.\", \"version_binding\": \"unversioned\", \"content_sha256\": \"533d6432cadb8bf35ba1016d1c012f3422a8a2a4cdf00b91b3aa8d3f42e7ea84\", \"project_identity\": \"local:48277f62f8b4ff92ba1c60c082f92a43817f9e1c5ba4ea27e12cd77a76421585\", \"authority\": \"source_of_truth\", \"scope\": \"project\", \"line_start\": 3, \"line_end\": 6}, {\"evidence_id\": \"ev-4ea4070129065ca3\", \"path_or_url\": \"docs/index-cleanup.md\", \"section\": \"Cleaning DocAtlas index state safely > Safety rules > Coordination with index writers\", \"snippet\": \"### Coordination with index writers\\n\\nStorage mutation coordination is fail-closed: a project sync or library refresh registers a writer lease, while `clear-index` takes the cleanup barrier and refuses cleanup while any live writer lease exists.\", \"version_binding\": \"unversioned\", \"content_sha256\": \"eff4f5203f2ccc9f3eb01c5c56d8b57c9347f14a80937d975df903f1019be7ff\", \"project_identity\": \"local:48277f62f8b4ff92ba1c60c082f92a43817f9e1c5ba4ea27e12cd77a76421585\", \"authority\": \"source_of_truth\", \"scope\": \"project\", \"line_start\": 102, \"line_end\": 104}, {\"evidence_id\": \"ev-94dc926d3c644390\", \"path_or_url\": \"docs/index-cleanup.md\", \"section\": \"Cleaning DocAtlas index state safely > Clear one project-local index\", \"snippet\": \"## Clear one project-local index\\n\\nA project-local cleanup requires a project whose `docatlas.yaml` resolves to\\nthat project's `.docatlas` directory:\", \"version_binding\": \"unversioned\", \"content_sha256\": \"fe49ee1bc049c3d7a7a2dd779eddecc6df0178ca42a48bde45493951b6daaff2\", \"project_identity\": \"local:48277f62f8b4ff92ba1c60c082f92a43817f9e1c5ba4ea27e12cd77a76421585\", \"authority\": \"source_of_truth\", \"scope\": \"project\", \"line_start\": 17, \"line_end\": 20}], \"context_quality\": {\"status\": \"partial\", \"reasons\": [\"requested_part_missing\"]}, \"read_next\": [], \"edit_ready\": false, \"investigation_allowed\": true, \"estimated_tokens\": 705}",
+        "annotations": null,
+        "_meta": null
+      }
+    ],
+    "structuredContent": null,
+    "isError": false
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "tool": "get_docs_context",
+  "request": {
+    "question": "Как записать только отрицательное имя boolean option: важен ли пробел перед /?",
+    "project_path": "/tmp/opencode/search-audit-work-20261001/fixtures/typer",
+    "scope": "all"
+  },
+  "seconds": 0.12772494299861137,
+  "is_error": false,
+  "wire": {
+    "_meta": null,
+    "content": [
+      {
+        "type": "text",
+        "text": "{\"status\": \"insufficient_evidence\", \"kind\": \"docs_context\", \"missing\": [\"No safe, current, project-scoped documentation context was retrieved.\"], \"estimated_tokens\": 262, \"context_quality\": {\"status\": \"unavailable\", \"reasons\": [\"source_unavailable\"]}, \"read_next\": [{\"source_uri\": \"docatlas://source/1038e804ab815f196250f81e\", \"path\": \"docs/tutorial/parameter-types/bool.md\", \"project_identity\": \"local:f7cc72468d7207460aab3dacc26f8d12d54043247e98b916126b775c8ec7da89\", \"snapshot_sha256\": \"sha256:c025b6f1d713e6e07925d2d724f8b97cf3f80cad86b363e5e89c4fc42d80821d\", \"line_start\": 196, \"line_end\": 234, \"reason\": \"inspect_source_context\"}], \"context_available\": false, \"documentation_supported\": false, \"investigation_allowed\": true, \"hard_stop\": false, \"recovery_origin\": \"eligibility\", \"recovery_reason_code\": \"evidence_rejected\", \"recovery_disposition\": \"search_local_source\", \"disposition\": \"search_local_source\", \"edit_ready\": false, \"source_search_status\": \"required\", \"requires_confirmation\": false, \"answer_supported\": false, \"answer_available\": false, \"support_status\": \"insufficient_evidence\"}",
+        "annotations": null,
+        "_meta": null
+      }
+    ],
+    "structuredContent": null,
+    "isError": false
+  }
+}

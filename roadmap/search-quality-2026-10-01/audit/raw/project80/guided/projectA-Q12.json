@@ -1,0 +1,27 @@
+{
+  "tool": "get_docs_context",
+  "request": {
+    "question": "A preparation request returned a job ID instead of documents. What is the expected polling and retry sequence?",
+    "project_path": "/tmp/opencode/docatlas-ablation",
+    "scope": "all",
+    "lookup_queries": [
+      "What should an agent do when prepare_docs returns a job ID?",
+      "When should the original documentation question be retried?"
+    ]
+  },
+  "seconds": 1.6334750550013268,
+  "is_error": false,
+  "wire": {
+    "_meta": null,
+    "content": [
+      {
+        "type": "text",
+        "text": "{\"status\": \"ok\", \"kind\": \"docs_context\", \"context_status\": \"ready\", \"context_available\": true, \"answer_supported\": false, \"answer_available\": false, \"support_status\": \"retrieval_only\", \"answer_policy\": \"cite_only\", \"coverage_policy\": \"retrieval_attribution_only\", \"query_coverage\": \"partial\", \"retrieval_coverage\": \"partial\", \"facet_coverage\": \"unverified\", \"covered_query_ids\": [\"query-lookup-1\", \"query-lookup-2\"], \"missing_query_ids\": [\"query-original\", \"query-anchor-1\"], \"missing_facets\": [], \"facets\": [], \"sources\": [{\"evidence_id\": \"ev-4eeeef16d9abe8df\", \"path_or_url\": \"wiki/Architecture.md\", \"section\": \"Architecture > Docs MCP runtime > Async prefetch and job tracking\", \"snippet\": \"### Async prefetch and job tracking\\n\\nThe corresponding `prepare_docs` prefetch actions may start background work. When they do, the service:\\n1. Creates a `DocsJob` entry with a UUID4 job ID and `pending` status\\n2. Starts a daemon background thread to run the fetch/index pipeline\\n3. Returns immediately with a `DocsJobStartResult` containing the `job_id`\", \"version_binding\": \"unversioned\", \"content_sha256\": \"057f123ca2a1afbf26797aef3ca288db4364d48bb3fa84b75d12fdd80d4df214\", \"project_identity\": \"local:48277f62f8b4ff92ba1c60c082f92a43817f9e1c5ba4ea27e12cd77a76421585\", \"authority\": \"source_of_truth\", \"scope\": \"project\", \"line_start\": 134, \"line_end\": 139, \"source_uri\": \"docatlas://source/f2e7dc3e18c6c57592587170\"}, {\"evidence_id\": \"ev-fb8195e3bcc94c7d\", \"path_or_url\": \"docs/project-docs-mcp-workflow.md\", \"section\": \"Project docs MCP workflow > Creating `ARCHITECTURE.md`\", \"snippet\": \"If approved, the coding agent should:\\n\\n1. inspect the codebase;\\n2. write `ARCHITECTURE.md` as a normal repository file;\\n3. call `get_docs_context` for the original question;\\n4. run its returned `prepare_docs(action=\\\"sync_project_docs\\\")` action when requested;\\n5. retry the original `get_docs_context(scope=\\\"all\\\", question=...)` question unchanged.\", \"version_binding\": \"unversioned\", \"content_sha256\": \"2f38deda9e006670fc289786d3d5fe037152b1bed85c3bb542f7348244bbc7b2\", \"project_identity\": \"local:48277f62f8b4ff92ba1c60c082f92a43817f9e1c5ba4ea27e12cd77a76421585\", \"authority\": \"source_of_truth\", \"scope\": \"project\", \"line_start\": 160, \"line_end\": 166}], \"context_quality\": {\"status\": \"unverified\", \"reasons\": [\"coverage_unverified\"]}, \"read_next\": [{\"source_uri\": \"docatlas://source/7ed688985553912e99224ef1\", \"path\": \"wiki/Architecture.md\", \"project_identity\": \"local:48277f62f8b4ff92ba1c60c082f92a43817f9e1c5ba4ea27e12cd77a76421585\", \"snapshot_sha256\": \"sha256:52c2f45b10ab9c053d2846d6b6deada9a220495358cce66be75d63ad2ce77074\", \"line_start\": 88, \"line_end\": 91, \"reason\": \"inspect_source_context\"}], \"edit_ready\": false, \"investigation_allowed\": true, \"estimated_tokens\": 669}",
+        "annotations": null,
+        "_meta": null
+      }
+    ],
+    "structuredContent": null,
+    "isError": false
+  }
+}

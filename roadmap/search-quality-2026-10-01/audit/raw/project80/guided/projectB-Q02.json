@@ -1,0 +1,26 @@
+{
+  "tool": "get_docs_context",
+  "request": {
+    "question": "Which MCP tool should a coding agent call before modifying a documented module?",
+    "project_path": "/tmp/opencode/docatlas-ablation",
+    "scope": "all",
+    "lookup_queries": [
+      "What is the first documentation call for repository coding tasks?"
+    ]
+  },
+  "seconds": 1.0317741920007393,
+  "is_error": false,
+  "wire": {
+    "_meta": null,
+    "content": [
+      {
+        "type": "text",
+        "text": "{\"status\": \"ok\", \"kind\": \"docs_context\", \"context_status\": \"ready\", \"context_available\": true, \"answer_supported\": false, \"answer_available\": false, \"support_status\": \"retrieval_only\", \"answer_policy\": \"cite_only\", \"coverage_policy\": \"retrieval_attribution_only\", \"query_coverage\": \"full\", \"retrieval_coverage\": \"full\", \"facet_coverage\": \"unverified\", \"covered_query_ids\": [\"query-original\", \"query-lookup-1\"], \"missing_query_ids\": [], \"missing_facets\": [], \"facets\": [], \"sources\": [{\"evidence_id\": \"ev-a5d3220f93684dad\", \"path_or_url\": \"SKILL.md\", \"section\": \"DocAtlas > Recommended MCP Docs Workflow for Agents\", \"snippet\": \"For repository-specific architecture, conventions, runbooks, roadmap, README/wiki, or module-doc questions, use the Docs MCP tools before generic WebFetch or model memory:\\n\\n1. For coding and patch tasks, call `get_docs_context(project_path=..., question=..., scope=\\\"all\\\")` first; bounded delivery is server-owned policy. One call carries one concrete documentation question; independent questions use separate calls.\\n2. Use `lookup_queries` only for narrow same-question recall help, including cross-language translation or facet decomposition. Never batch separate questions into them.\\n3. Follow bounded `recommended_next_action`: ask its source-choice question, or obtain confirmation, call its exact typed action, and retry the same bounded request.\\n4. Use `docs_status` only when the user explicitly asks about health, freshness, index state, or a background job.\\n5. For bounded `insufficient_evidence`, do not claim documentation support. Follow at most one non-automatic `rephrase_question`; after that, investigate local source/tests when `hard_stop=false`. Stop before editing when `hard_stop=true` or when the requested change explicitly depends on a documentary contract that remains unproved.\\n6. Cite `action_packet.source_of_truth` through each factual item's `evidence_ids`. Treat `CHANGELOG.md` as primary only for release-history/change questions.\\n7. Only unbounded exploration exposes `answer_outline`, `trust_contract`, and `context_pack`; there, prefer nested source and section metadata.\\n8. If the user asks vaguely about \\\"the MCP server\\\", distinguish `doc-atlas mcp docs-serve` (the three-tool documentation surface) from `doc-atlas mcp packs-serve` (advanced installed API-action packs).\", \"version_binding\": \"unversioned\", \"content_sha256\": \"d9d999fea197cb4e64d9348921ade8ec316718265dc5f9b6c815a0e6b4067ba6\", \"project_identity\": \"local:48277f62f8b4ff92ba1c60c082f92a43817f9e1c5ba4ea27e12cd77a76421585\", \"authority\": \"source_of_truth\", \"scope\": \"project\", \"line_start\": 137, \"line_end\": 146}], \"context_quality\": {\"status\": \"unverified\", \"reasons\": [\"coverage_unverified\"]}, \"read_next\": [{\"source_uri\": \"docatlas://source/ca782e544e947bf2f5826695\", \"path\": \"README.md\", \"project_identity\": \"local:48277f62f8b4ff92ba1c60c082f92a43817f9e1c5ba4ea27e12cd77a76421585\", \"snapshot_sha256\": \"sha256:82975e09e63a5897c0f0867fbf370af4038360e489a3baa71d6378b98f2498bb\", \"line_start\": 216, \"line_end\": 224, \"reason\": \"inspect_source_context\"}], \"edit_ready\": false, \"investigation_allowed\": true, \"estimated_tokens\": 773}",
+        "annotations": null,
+        "_meta": null
+      }
+    ],
+    "structuredContent": null,
+    "isError": false
+  }
+}

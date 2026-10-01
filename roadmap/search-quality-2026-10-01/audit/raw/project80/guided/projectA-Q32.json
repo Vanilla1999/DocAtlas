@@ -1,0 +1,27 @@
+{
+  "tool": "get_docs_context",
+  "request": {
+    "question": "Does a well-cited documentation answer authorize an agent to edit files or apply a cleanup operation?",
+    "project_path": "/tmp/opencode/docatlas-ablation",
+    "scope": "all",
+    "lookup_queries": [
+      "Does a documentation answer grant edit authorization?",
+      "What approval is needed before applying cleanup?"
+    ]
+  },
+  "seconds": 1.3612643929955084,
+  "is_error": false,
+  "wire": {
+    "_meta": null,
+    "content": [
+      {
+        "type": "text",
+        "text": "{\"status\": \"ok\", \"kind\": \"docs_context\", \"context_status\": \"ready\", \"context_available\": true, \"answer_supported\": false, \"answer_available\": false, \"support_status\": \"retrieval_only\", \"answer_policy\": \"cite_only\", \"coverage_policy\": \"retrieval_attribution_only\", \"query_coverage\": \"partial\", \"retrieval_coverage\": \"partial\", \"facet_coverage\": \"unverified\", \"covered_query_ids\": [\"query-lookup-1\", \"query-lookup-2\"], \"missing_query_ids\": [\"query-original\"], \"missing_facets\": [], \"facets\": [], \"sources\": [{\"evidence_id\": \"ev-328bfe6bae7fc4d9\", \"path_or_url\": \"README.md\", \"section\": \"DocAtlas > Project-docs MCP server > Safe index cleanup\", \"snippet\": \"`doc-atlas clear-index` previews a bounded cleanup plan before removing derived\\nSQLite, extracted-document, cache, and verified local vector state. Use\\n`--scope project-local --project-path ...` for one project or `--scope global`\\nfor all local indexes while preserving configuration. Applying a reviewed plan\\ncan be bound to its `plan_digest`, and live processes, stale plans, remote\\nQdrant, and unowned vector directories fail closed. See\\n[Cleaning DocAtlas index state safely](./docs/index-cleanup.md).\", \"version_binding\": \"unversioned\", \"content_sha256\": \"bba79f75783ac634864930e3b6f4c103f279915bab59adb6c31218950c689fe3\", \"project_identity\": \"local:48277f62f8b4ff92ba1c60c082f92a43817f9e1c5ba4ea27e12cd77a76421585\", \"authority\": \"source_of_truth\", \"scope\": \"project\", \"line_start\": 208, \"line_end\": 214}, {\"evidence_id\": \"ev-3370ff9f59c910af\", \"path_or_url\": \"SKILL.md\", \"section\": \"DocAtlas > Common Mistakes\", \"snippet\": \"Before answering, check every requested fact, condition and comparison side against the final visible evidence. Retrieval success, keywords and source titles alone are not proof. Accept explicit logical implications and ignore incidental Markdown formatting; do not demand details the question did not ask for. Cite supported claims, name missing facts in partial answers, and abstain when needed. Do not fill gaps from memory, infer a negative from missing evidence, grant answer/edit authority or extend follow-up budgets.\", \"version_binding\": \"unversioned\", \"content_sha256\": \"2b0ff531c1067491a629fcf63d97d3a2f3606de350fbd3aee4a583c160d6b0a7\", \"project_identity\": \"local:48277f62f8b4ff92ba1c60c082f92a43817f9e1c5ba4ea27e12cd77a76421585\", \"authority\": \"source_of_truth\", \"scope\": \"project\", \"line_start\": 160, \"line_end\": 160}], \"context_quality\": {\"status\": \"unverified\", \"reasons\": [\"coverage_unverified\"]}, \"read_next\": [{\"source_uri\": \"docatlas://source/253bf2dd9be451e417231d4e\", \"path\": \"README.md\", \"project_identity\": \"local:48277f62f8b4ff92ba1c60c082f92a43817f9e1c5ba4ea27e12cd77a76421585\", \"snapshot_sha256\": \"sha256:82975e09e63a5897c0f0867fbf370af4038360e489a3baa71d6378b98f2498bb\", \"line_start\": 136, \"line_end\": 137, \"reason\": \"inspect_source_context\"}], \"edit_ready\": false, \"investigation_allowed\": true, \"estimated_tokens\": 709}",
+        "annotations": null,
+        "_meta": null
+      }
+    ],
+    "structuredContent": null,
+    "isError": false
+  }
+}

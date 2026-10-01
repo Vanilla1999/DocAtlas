@@ -1,0 +1,23 @@
+{
+  "tool": "get_docs_context",
+  "request": {
+    "question": "Does requesting cancellation prove that a background job has stopped?",
+    "project_path": "/tmp/opencode/docatlas-ablation",
+    "scope": "all"
+  },
+  "seconds": 0.6551039089972619,
+  "is_error": false,
+  "wire": {
+    "_meta": null,
+    "content": [
+      {
+        "type": "text",
+        "text": "{\"status\": \"ok\", \"kind\": \"docs_context\", \"context_status\": \"ready\", \"context_available\": true, \"answer_supported\": false, \"answer_available\": false, \"support_status\": \"retrieval_only\", \"answer_policy\": \"cite_only\", \"coverage_policy\": \"retrieval_attribution_only\", \"query_coverage\": \"full\", \"retrieval_coverage\": \"full\", \"facet_coverage\": \"unverified\", \"covered_query_ids\": [\"query-original\"], \"missing_query_ids\": [], \"missing_facets\": [], \"facets\": [], \"sources\": [{\"evidence_id\": \"ev-9c4e4bc207583e17\", \"path_or_url\": \"docs/grounded-host-session.md\", \"section\": \"Grounded host sessions over MCP > Partial answers and source reads\", \"snippet\": \"The host reads the returned snippets and assesses whether a requested fact is\\nsupported. `support(fact_id, evidence_id=..., quote=...)` accepts only a verbatim\\nquote from retained evidence. A matching quote binds the judgment to a source;\\nit does not prove that the quote logically answers the question. Semantic\\nassessment remains the host's responsibility.\", \"version_binding\": \"unversioned\", \"content_sha256\": \"51d4ac03bfd81bcaca873455dd1c81acf7ec6f79e96985c220eba0d19bb974ad\", \"project_identity\": \"local:48277f62f8b4ff92ba1c60c082f92a43817f9e1c5ba4ea27e12cd77a76421585\", \"authority\": \"source_of_truth\", \"scope\": \"module\", \"line_start\": 16, \"line_end\": 20, \"source_uri\": \"docatlas://source/ccb96648a21378df3a40ed9a\"}, {\"evidence_id\": \"ev-8a9a4ea0a02d0603\", \"path_or_url\": \"docs/grounded-host-session.md\", \"section\": \"Grounded host sessions over MCP\", \"snippet\": \"`GroundedMCPSession` is a Python host adapter over an initialized MCP\\n`ClientSession`. It owns one project question, retains its evidence and keeps\\nhost judgments separate from server certification. It works with structured\\npayloads and the configured text fallback. It is not an additional MCP tool.\", \"version_binding\": \"unversioned\", \"content_sha256\": \"efdd61fb3f82fe905e0caff2648baaf5c7dd44d97f9ce1c391f7f20c8f65d4aa\", \"project_identity\": \"local:48277f62f8b4ff92ba1c60c082f92a43817f9e1c5ba4ea27e12cd77a76421585\", \"line_start\": 3, \"line_end\": 6, \"authority\": \"source_of_truth\", \"scope\": \"module\", \"source_uri\": \"docatlas://source/e3a9b37f4443da0db03cb99a\"}], \"context_quality\": {\"status\": \"unverified\", \"reasons\": [\"coverage_unverified\"]}, \"read_next\": [{\"source_uri\": \"docatlas://source/2a93a5b79dbbd10525683b27\", \"path\": \"docs/grounded-host-session.md\", \"project_identity\": \"local:48277f62f8b4ff92ba1c60c082f92a43817f9e1c5ba4ea27e12cd77a76421585\", \"snapshot_sha256\": \"sha256:0cf46d66962abf7c0461a57faf5af154ba24757473aef0602a6a27c31484e4e8\", \"line_start\": 21, \"line_end\": 36, \"reason\": \"inspect_source_context\"}], \"edit_ready\": false, \"investigation_allowed\": true, \"estimated_tokens\": 652}",
+        "annotations": null,
+        "_meta": null
+      }
+    ],
+    "structuredContent": null,
+    "isError": false
+  }
+}

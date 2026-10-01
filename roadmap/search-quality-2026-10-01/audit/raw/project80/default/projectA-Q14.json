@@ -1,0 +1,22 @@
+{
+  "tool": "get_docs_context",
+  "request": {
+    "question": "If prepare_docs returns the same recovery action twice without progress, should the agent keep retrying?",
+    "project_path": "/tmp/opencode/docatlas-ablation"
+  },
+  "seconds": 1.3387331960038864,
+  "is_error": false,
+  "wire": {
+    "_meta": null,
+    "content": [
+      {
+        "type": "text",
+        "text": "{\"status\": \"ok\", \"kind\": \"docs_context\", \"context_status\": \"ready\", \"context_available\": true, \"answer_supported\": false, \"answer_available\": false, \"support_status\": \"retrieval_only\", \"answer_policy\": \"cite_only\", \"coverage_policy\": \"retrieval_attribution_only\", \"query_coverage\": \"full\", \"retrieval_coverage\": \"full\", \"facet_coverage\": \"unverified\", \"covered_query_ids\": [\"query-original\", \"query-anchor-1\"], \"missing_query_ids\": [], \"missing_facets\": [], \"facets\": [{\"id\": \"intent-context:docs_mcp_tool_policy\", \"requirement_id\": null, \"question\": \"prepare_docs Docs MCP default use\", \"status\": \"retrieval_only\", \"evidence_ids\": [\"ev-583cd57c2c02e63e\"]}], \"sources\": [{\"evidence_id\": \"ev-8c837d2c714332b9\", \"path_or_url\": \"docs/project-docs-mcp-workflow.md\", \"section\": \"Project docs MCP workflow > Example response handling\", \"snippet\": \"The agent should call `prepare_docs` with the provided arguments.\", \"version_binding\": \"unversioned\", \"content_sha256\": \"0fcdd37333b7822a64c0265ede6e9bca00fbe014ce0db0c14cf0c70f35e0ef6f\", \"project_identity\": \"local:48277f62f8b4ff92ba1c60c082f92a43817f9e1c5ba4ea27e12cd77a76421585\", \"authority\": \"source_of_truth\", \"scope\": \"project\", \"line_start\": 293, \"line_end\": 293}, {\"evidence_id\": \"ev-fb8195e3bcc94c7d\", \"path_or_url\": \"docs/project-docs-mcp-workflow.md\", \"section\": \"Project docs MCP workflow > Creating `ARCHITECTURE.md`\", \"snippet\": \"If approved, the coding agent should:\\n\\n1. inspect the codebase;\\n2. write `ARCHITECTURE.md` as a normal repository file;\\n3. call `get_docs_context` for the original question;\\n4. run its returned `prepare_docs(action=\\\"sync_project_docs\\\")` action when requested;\\n5. retry the original `get_docs_context(scope=\\\"all\\\", question=...)` question unchanged.\", \"version_binding\": \"unversioned\", \"content_sha256\": \"2f38deda9e006670fc289786d3d5fe037152b1bed85c3bb542f7348244bbc7b2\", \"project_identity\": \"local:48277f62f8b4ff92ba1c60c082f92a43817f9e1c5ba4ea27e12cd77a76421585\", \"authority\": \"source_of_truth\", \"scope\": \"project\", \"line_start\": 160, \"line_end\": 166}, {\"evidence_id\": \"ev-583cd57c2c02e63e\", \"path_or_url\": \"docs/AGENT_DOCS_WORKFLOW.md\", \"section\": \"Agent documentation workflow > Tool boundary\", \"snippet\": \"The default Docs MCP surface consists only of `get_docs_context`, `prepare_docs`, and `docs_status`. Normal-agent guidance must use only arguments advertised by the current runtime schemas.\", \"version_binding\": \"unversioned\", \"content_sha256\": \"0067d213b7203d8a809db19a520df0341890c477495bb169086bd591f131729d\", \"project_identity\": \"local:48277f62f8b4ff92ba1c60c082f92a43817f9e1c5ba4ea27e12cd77a76421585\", \"line_start\": 49, \"line_end\": 49, \"authority\": \"supporting\", \"scope\": \"project\"}], \"context_quality\": {\"status\": \"unverified\", \"reasons\": [\"coverage_unverified\"]}, \"read_next\": [], \"edit_ready\": false, \"investigation_allowed\": true, \"estimated_tokens\": 687}",
+        "annotations": null,
+        "_meta": null
+      }
+    ],
+    "structuredContent": null,
+    "isError": false
+  }
+}

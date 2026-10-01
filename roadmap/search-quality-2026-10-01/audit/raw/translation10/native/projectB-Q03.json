@@ -1,0 +1,23 @@
+{
+  "tool": "get_docs_context",
+  "request": {
+    "question": "There are citations in the result, but answer_supported=false. May I explain what was found to the user?",
+    "project_path": "/tmp/opencode/docatlas-ablation",
+    "scope": "all"
+  },
+  "seconds": 0.7637189550005132,
+  "is_error": false,
+  "wire": {
+    "_meta": null,
+    "content": [
+      {
+        "type": "text",
+        "text": "{\"status\": \"ok\", \"kind\": \"docs_context\", \"context_status\": \"ready\", \"context_available\": true, \"answer_supported\": false, \"answer_available\": false, \"support_status\": \"retrieval_only\", \"answer_policy\": \"cite_only\", \"coverage_policy\": \"retrieval_attribution_only\", \"query_coverage\": \"partial\", \"retrieval_coverage\": \"partial\", \"facet_coverage\": \"unverified\", \"covered_query_ids\": [\"query-anchor-1\"], \"missing_query_ids\": [\"query-original\"], \"missing_facets\": [], \"facets\": [], \"sources\": [{\"evidence_id\": \"ev-17ef046ae8ab123e\", \"path_or_url\": \"docs/mcp-docs-server.md\", \"section\": \"Docs MCP server > Public tool contract\", \"snippet\": \"The model-visible projection is the bounded evidence material exposed to the caller. It is token-bounded by the answer budget: only assigned visible witnesses are materialized, and the final projection revalidates those witnesses before returning `answer_supported=true`.\", \"version_binding\": \"unversioned\", \"content_sha256\": \"db673b0380a0a365638c5cfd2691581e3cdfea4849031d42edbe77ebaacf02f7\", \"project_identity\": \"local:48277f62f8b4ff92ba1c60c082f92a43817f9e1c5ba4ea27e12cd77a76421585\", \"authority\": \"source_of_truth\", \"scope\": \"project\", \"line_start\": 51, \"line_end\": 51, \"source_uri\": \"docatlas://source/671e525f4ae1cc872dbc1b69\"}, {\"evidence_id\": \"ev-f55b7fbc6503dac2\", \"path_or_url\": \"docs/mcp-docs-server.md\", \"section\": \"Docs MCP server\", \"snippet\": \"This is the canonical detailed workflow reference for DocAtlas.\", \"version_binding\": \"unversioned\", \"content_sha256\": \"d3d99a9ebc90414efc1f5ad95a77aba090ce4799a463e40e3067a8c487a344ee\", \"project_identity\": \"local:48277f62f8b4ff92ba1c60c082f92a43817f9e1c5ba4ea27e12cd77a76421585\", \"line_start\": 3, \"line_end\": 3, \"authority\": \"source_of_truth\", \"scope\": \"project\", \"source_uri\": \"docatlas://source/b0e7c8bc8c79cb41deb440c4\"}, {\"evidence_id\": \"ev-2b4c29e5b41397be\", \"path_or_url\": \"docs/mcp-docs-server.md\", \"section\": \"Docs MCP server > External-library documentation\", \"snippet\": \"If external source acquisition is needed, the response returns a `prepare_docs` action. Confirm network access before executing it. A failed acquisition must remain an actionable error/status result; it must not be presented as a silent answer.\", \"version_binding\": \"unversioned\", \"content_sha256\": \"8970cbcb80177def6c75060e0020a5b45cf9b77d91049345fea96b215b255199\", \"project_identity\": \"local:48277f62f8b4ff92ba1c60c082f92a43817f9e1c5ba4ea27e12cd77a76421585\", \"line_start\": 77, \"line_end\": 77, \"authority\": \"source_of_truth\", \"scope\": \"project\", \"source_uri\": \"docatlas://source/73f3b890b9b9a53a182b52c3\"}], \"context_quality\": {\"status\": \"partial\", \"reasons\": [\"requested_part_missing\"]}, \"read_next\": [], \"edit_ready\": false, \"investigation_allowed\": true, \"estimated_tokens\": 660}",
+        "annotations": null,
+        "_meta": null
+      }
+    ],
+    "structuredContent": null,
+    "isError": false
+  }
+}
