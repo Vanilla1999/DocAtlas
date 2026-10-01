@@ -7,6 +7,7 @@ No semantic or answer evaluation is implied.
 from __future__ import annotations
 
 import argparse
+from contextlib import nullcontext
 import hashlib
 from importlib import metadata
 import json
@@ -155,9 +156,11 @@ def _native_fixture(corpus, spec, request, protocol, *, arm="A"):
     from eval.evidence_quality_v2.runtime import write_project, isolated_service, index_project
     from docmancer.core.sqlite_store import SQLiteStore
     from .adapters import native_diagnostic, reproject_structural_fts
+    from .structure import source_structure_parser
 
     documents, _ = load_sources(corpus, spec)
-    with tempfile.TemporaryDirectory(prefix='docatlas-ablation-') as tmp:
+    parser = source_structure_parser() if arm in ('B', 'D_L', 'E_G_L', 'E_GR_L') else nullcontext(None)
+    with parser as parser_identity, tempfile.TemporaryDirectory(prefix='docatlas-ablation-') as tmp:
         base = Path(tmp)
         project = base / 'project'
         write_project(project, documents)
@@ -174,15 +177,16 @@ def _native_fixture(corpus, spec, request, protocol, *, arm="A"):
                     'SELECT DISTINCT project_identity FROM retrieval_children WHERE generation_id = ?', (generation,))}
             if len(identities) != 1 or not next(iter(identities)):
                 raise ValueError('fixture project identity is not uniquely bound')
-            representation_projection = None
+            representation_projection = parser_identity
             assembly = 'none'
             soft_gate = 'ablate'
             if arm in ('B', 'D_L', 'E_G_L', 'E_GR_L'):
-                representation_projection = reproject_structural_fts(store)
                 if arm in ('D_L', 'E_G_L', 'E_GR_L'):
                     assembly = 'owner_neighbors_v1'
                 if arm in ('E_G_L', 'E_GR_L'):
                     soft_gate = 'legacy'
+            elif arm == 'B_FTS':
+                representation_projection = reproject_structural_fts(store)
             elif arm != 'A':
                 raise ValueError('unsupported native arm')
             started = time.perf_counter()
@@ -210,7 +214,7 @@ def _execute_arm(corpus, spec, request, protocol, arm):
             from .adapters import product_probe
             result = product_probe(corpus, spec, request, remove_ratio=(arm == 'P_MINUS_RATIO'))
             result['execution_status'] = result['status']
-        elif arm in ('A', 'B', 'D_L', 'E_G_L', 'E_GR_L'):
+        elif arm in ('A', 'B', 'B_FTS', 'D_L', 'E_G_L', 'E_GR_L'):
             result = _native_fixture(corpus, spec, request, protocol, arm=arm)
         else:
             raise ValueError('unknown arm')
@@ -252,7 +256,7 @@ def stage_worker(app: Path) -> str:
 
 
 def run_frozen(frozen: Path, output: Path, arm: str) -> dict:
-    if arm not in ('P', 'P_MINUS_RATIO', 'A', 'B', 'D_L', 'E_G_L', 'E_GR_L'):
+    if arm not in ('P', 'P_MINUS_RATIO', 'A', 'B', 'B_FTS', 'D_L', 'E_G_L', 'E_GR_L'):
         raise ValueError('unknown implemented arm')
     from .isolation import IsolationUnavailable, run_isolated
     manifest = verify_frozen(frozen)
@@ -309,7 +313,7 @@ def main() -> int:
     run = commands.add_parser('run')
     run.add_argument('--frozen', type=Path, required=True)
     run.add_argument('--output', type=Path, required=True)
-    run.add_argument('--arm', choices=['P', 'P_MINUS_RATIO', 'A', 'B', 'D_L', 'E_G_L', 'E_GR_L'], required=True)
+    run.add_argument('--arm', choices=['P', 'P_MINUS_RATIO', 'A', 'B', 'B_FTS', 'D_L', 'E_G_L', 'E_GR_L'], required=True)
     regression = commands.add_parser('regressions')
     regression.add_argument('--base', required=True)
     regression.add_argument('--head', required=True)

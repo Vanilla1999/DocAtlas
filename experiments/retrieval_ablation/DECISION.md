@@ -1,5 +1,9 @@
 # Decision after the T00–T04 diagnostic report
 
+> **Текущее итоговое решение: [FINAL_REPORT.md](FINAL_REPORT.md). Development-фаза
+> завершена; расширение серии остановлено.** Приведённые ниже таблицы и next steps
+> исторические; они не заменяют итоговый отчёт и не запускают новые эксперименты.
+
 > Historical initial-slice report. Subsequent local implementation, exact measured
 > revisions and still-open limits are recorded in [CONTINUATION_REPORT.md](CONTINUATION_REPORT.md).
 > The original observations below are preserved, not relabeled as new execution.
@@ -46,6 +50,15 @@ No simplification patch, threshold change, product activation, merge or quality
 non-inferiority claim is approved by this report. A result of INCONCLUSIVE is not
 a finding of equivalence and not permission to remove all heuristics.
 # Local T07 development decision — 2026-10-01
+
+Latest T05/T06 measurement: [STRUCTURE_T05_REPORT.md](STRUCTURE_T05_REPORT.md).
+KEEP the hard-policy neighbor allowlist repair in the experimental harness.
+Native CommonMark representation: OPTIONAL experimental / no product replacement
+decision; source owners improve, final packet quality is not improved generally.
+Bounded assembly: OPTIONAL, with 3 real wins / 1 real budget loss, not safe to
+activate as a default. Investigate verified heading-identity versus soft overlap
+coupling and budget loss separately. HTML/RST and complete API ownership remain
+NOT_EVALUATED. Historical decisions below use their original arm definitions.
 
 Updated by [RATIO_REMOVE_ONE.md](RATIO_REMOVE_ONE.md): the actual-P ratio-only
 control is now measured. On 23 answerable questions: 3 wins / 0 losses / 20 ties;

@@ -1,5 +1,8 @@
 # Ablation measurement report: diagnostic slice only
 
+> Итог текущей серии: [FINAL_REPORT.md](FINAL_REPORT.md). Development-фаза
+> завершена; ниже сохранён исторический отчёт, не активный план продолжения.
+
 > Historical initial-slice report. Subsequent local implementation, exact measured
 > revisions and still-open limits are recorded in [CONTINUATION_REPORT.md](CONTINUATION_REPORT.md).
 > The original observations below are preserved, not relabeled as new execution.
@@ -112,6 +115,11 @@ Consequently every proposed deletion/replacement of a retrieval mechanism
 remains NOT_EVALUATED. DECISION.md follows this evidence rather than selecting a
 winner in advance.
 # Latest local continuation
+
+Latest stage: [STRUCTURE_T05_REPORT.md](STRUCTURE_T05_REPORT.md). Native CommonMark
+B and shared-policy neighbor safety are implemented; 204 final development
+executions show no A/B change on real ATX controls, one synthetic B loss, and
+3 assembly wins / 1 budget loss on answerable real questions. Not acceptance.
 
 Real-P remove-one follow-up: [RATIO_REMOVE_ONE.md](RATIO_REMOVE_ONE.md), 112
 executions over 28 development questions. The ratio filter has both a measured

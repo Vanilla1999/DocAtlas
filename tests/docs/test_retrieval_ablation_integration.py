@@ -235,7 +235,7 @@ def test_structural_representation_is_query_independent_and_owner_bound(tmp_path
     assert set(pool) == {'stable_chunk_id', 'heading_path', 'fts_title', 'body_sha256', 'fts_text_sha256'}
 
 
-def test_b_arm_reuses_native_pipeline_with_only_structural_fts_change(tmp_path):
+def test_b_fts_arm_reuses_native_pipeline_with_only_structural_fts_change(tmp_path):
     from experiments.retrieval_ablation.run import _execute_arm
     corpus = tmp_path / 'corpus'
     corpus.mkdir()
@@ -244,9 +244,9 @@ def test_b_arm_reuses_native_pipeline_with_only_structural_fts_change(tmp_path):
     spec = {'schema_version': 1, 'sources': [
         {'path': 'retry.md', 'sha256': hashlib.sha256(raw).hexdigest()}]}
     protocol = {'max_sections_per_source': 2, 'raw_hits': 40, 'unique_candidates': 20}
-    result = _execute_arm(corpus, spec, {'question': 'What is the retry budget?'}, protocol, 'B')
+    result = _execute_arm(corpus, spec, {'question': 'What is the retry budget?'}, protocol, 'B_FTS')
     assert result['execution_status'] == 'EXECUTED'
-    assert result['arm'] == 'B'
+    assert result['arm'] == 'B_FTS'
     assert result['representation_projection']['representation'] == 'source_bound_structural_v1'
     assert result['packet_audit_errors'] == []
 
@@ -297,8 +297,76 @@ def test_product_ratio_remove_one_runs_real_handler_and_restores_gate(tmp_path):
     assert summary['execution_counts'] == {'EXECUTED': 1}
 
 
-def test_d_l_reuses_b_candidate_pool_and_search_count(tmp_path):
+def test_b_indexes_setext_api_owners_without_changing_fts_policy(tmp_path):
     from experiments.retrieval_ablation.run import _execute_arm
+    corpus = tmp_path / 'corpus'
+    corpus.mkdir()
+    raw = ("Client.alpha()\n==============\n\n"
+           "This method raises ErrAlpha on cancellation. See Client.beta().\n\n"
+           "Client.beta()\n=============\n\n"
+           "This method returns normally on shutdown.\n").encode()
+    (corpus / 'api.md').write_bytes(raw)
+    spec = {'schema_version': 1, 'sources': [
+        {'path': 'api.md', 'sha256': hashlib.sha256(raw).hexdigest()}]}
+    protocol = {'max_sections_per_source': 2, 'raw_hits': 40, 'unique_candidates': 20}
+    result = _execute_arm(corpus, spec, {'question': 'cancellation'}, protocol, 'B')
+    assert result['execution_status'] == 'EXECUTED', result
+    assert result['candidates']
+    assert {c['row']['title'] for c in result['candidates']} == {'Client.alpha()'}
+    assert all('returns normally' not in c['row']['display_text'] for c in result['candidates'])
+    assert result['representation_projection']['kind'] == 'commonmark_source_structure'
+    assert result['representation_projection']['contextual_prefix'] == 'production_unchanged'
+    assert result['packet_audit_errors'] == []
+
+
+def test_b_does_not_change_product_p_after_parser_hook_restoration(tmp_path, monkeypatch):
+    from contextlib import contextmanager
+    import shutil
+    from types import SimpleNamespace
+    from experiments.language_aware_context import baseline_probe
+    from experiments.retrieval_ablation.run import _execute_arm
+    corpus = tmp_path / 'corpus'
+    corpus.mkdir()
+    raw = b'# Retry\n\nThe retry budget is three attempts. Do not retry cancellation.\n'
+    (corpus / 'retry.md').write_bytes(raw)
+    spec = {'schema_version': 1, 'sources': [
+        {'path': 'retry.md', 'sha256': hashlib.sha256(raw).hexdigest()}]}
+    protocol = {'max_sections_per_source': 2, 'raw_hits': 40, 'unique_candidates': 20}
+    @contextmanager
+    def fixed_root(**kwargs):
+        root = tmp_path / 'owned-runtime'
+        root.mkdir()
+        try:
+            yield str(root)
+        finally:
+            shutil.rmtree(root)
+    monkeypatch.setattr(baseline_probe, 'tempfile', SimpleNamespace(TemporaryDirectory=fixed_root))
+    request = {'question': 'retry budget'}
+    before = _execute_arm(corpus, spec, request, protocol, 'P')
+    b = _execute_arm(corpus, spec, request, protocol, 'B')
+    after = _execute_arm(corpus, spec, request, protocol, 'P')
+    assert before['execution_status'] == b['execution_status'] == after['execution_status'] == 'EXECUTED'
+    assert before['payload'] == after['payload']
+    assert len(before['raw_fts_lanes']) == len(after['raw_fts_lanes'])
+
+
+def test_d_l_reuses_b_candidate_pool_and_search_count(tmp_path, monkeypatch):
+    from contextlib import contextmanager
+    import shutil
+    from types import SimpleNamespace
+    from experiments.retrieval_ablation import run as ablation_run
+    from experiments.retrieval_ablation.run import _execute_arm
+    @contextmanager
+    def fixed_root(**kwargs):
+        root = tmp_path / 'owned-runtime'
+        root.mkdir()
+        try:
+            yield str(root)
+        finally:
+            shutil.rmtree(root)
+    # Retaining the real contextual prefix also retains its source identity.
+    # Compare B/D at the same fixture root, not two random temporary paths.
+    monkeypatch.setattr(ablation_run, 'tempfile', SimpleNamespace(TemporaryDirectory=fixed_root))
     corpus = tmp_path / 'corpus'
     corpus.mkdir()
     raw = ('# API\n\n' + ('target contract ' * 60) + '\n\n' + ('condition detail ' * 60) + '\n').encode()

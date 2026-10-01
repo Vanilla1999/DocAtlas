@@ -1,5 +1,24 @@
 # Retrieval ablation: isolated T00–T04 project slice
 
+## Итог: development-фаза завершена
+
+**Основной отчёт: [FINAL_REPORT.md](FINAL_REPORT.md).** Production defaults
+оставить прежними; экспериментальные replacements не активировать. Расширение
+серии остановлено, это не полная T12-приёмка. Поэтапные материалы ниже — история
+и доказательства; их «next steps» не являются активным планом.
+
+Completed native-project T06 deliverable: [SAVED_POOL_T06.md](SAVED_POOL_T06.md).
+HTML original/canonical adapter: [HTML_PROVENANCE_T05.md](HTML_PROVENANCE_T05.md).
+Full-gate paired baseline: [FULL_OFFLINE_GATE.md](FULL_OFFLINE_GATE.md).
+Real-P ratio phase separation: [P_RATIO_PHASES_T07.md](P_RATIO_PHASES_T07.md).
+Evidence/reader development evaluation: [EVALUATOR_READER_T09_T10.md](EVALUATOR_READER_T09_T10.md).
+
+Latest: [STRUCTURE_T05_REPORT.md](STRUCTURE_T05_REPORT.md). B now measures native
+CommonMark source structure; historical FTS-only B is explicitly **B_FTS**.
+Production prefix, field weights and gates stay unchanged. D_L additionally
+enforces the shared hard-policy allowlist on neighbors. All older reports retain
+their original arm definitions; do not combine their B numbers with new B runs.
+
 Current continuation: [CONTINUATION_T07.md](CONTINUATION_T07.md). Applied staging
 patches now provide B/D_L/E_G_L; E_GR_L measures a real candidate-ordering pass,
 not the whole legacy packing package. Original T05 ownership work remains partial.

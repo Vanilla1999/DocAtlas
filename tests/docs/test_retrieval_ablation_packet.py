@@ -139,6 +139,15 @@ def test_ratio_hook_removes_only_threshold_and_retains_rejections():
         assert stats['below_threshold_checks'] > 0
         assert stats['parent_exact_preserved_checks'] > 0
     assert not gate.qualify_evidence(probe, **kwargs).qualified
+    for phase in ('tagging', 'final'):
+        with without_ratio_threshold(phase=phase) as stats:
+            assert not gate.qualify_evidence(probe, **kwargs).qualified
+            assert stats['phase'] == phase
+            assert all(c['active_calls'] == c['gained'] == c['lost'] == 0
+                       for c in stats['call_sites'].values())
+    with pytest.raises(ValueError, match='unsupported'):
+        with without_ratio_threshold(phase='unknown'):
+            pass
 
 
 def test_ratio_hook_restores_lazily_imported_alias_after_exception(monkeypatch):
@@ -157,6 +166,56 @@ def test_ratio_hook_restores_lazily_imported_alias_after_exception(monkeypatch):
             raise RuntimeError('controlled failure')
     assert late.qualify is original
     assert gate.qualify_evidence is original
+
+
+def test_structural_assembly_cannot_restore_an_unsafe_neighbor_filtered_before_search(tmp_path):
+    import json
+    text = '# API\n\n' + ('target contract ' * 45) + '\n\n' + ('unsafe neighbor condition ' * 45) + '\n'
+    store, sources, filters = project_store(tmp_path, {'docs/api.md': text})
+    with store._connect() as conn:
+        rows = conn.execute('SELECT id, metadata_json, display_text FROM retrieval_children').fetchall()
+        unsafe = [row for row in rows if 'unsafe neighbor condition' in row['display_text']]
+        assert unsafe
+        for row in unsafe:
+            metadata = json.loads(row['metadata_json'])
+            metadata['risk_flags'] = ['unsafe']
+            conn.execute('UPDATE retrieval_children SET metadata_json=? WHERE id=?',
+                         (json.dumps(metadata), row['id']))
+    result = native_diagnostic(store, ['target contract'], filters=filters, sources=sources,
+                              assembly='owner_neighbors_v1')
+    assert any(r['reason'] == 'unsafe_evidence' for r in result['policy_rejections'])
+    assert result['model_visible_packet']['sources']
+    assert all('unsafe neighbor condition' not in s['snippet']
+               for s in result['model_visible_packet']['sources'])
+    assert result['assembly_denied_neighbor_ids']
+
+
+def test_structural_assembly_revalidates_neighbor_version_and_source_heading(tmp_path):
+    import json
+    for index, mutation in enumerate(['version', 'heading']):
+        case = tmp_path / str(index)
+        case.mkdir()
+        text = '# API\n\n' + ('target contract ' * 45) + '\n\n' + ('forbidden neighbor condition ' * 45) + '\n'
+        store, sources, filters = project_store(case, {'docs/api.md': text})
+        with store._connect() as conn:
+            rows = conn.execute('SELECT id, metadata_json, display_text FROM retrieval_children').fetchall()
+            for row in rows:
+                if 'forbidden neighbor condition' not in row['display_text']:
+                    continue
+                metadata = json.loads(row['metadata_json'])
+                if mutation == 'version':
+                    metadata['resolved_version'] = 'foreign-version'
+                    conn.execute('UPDATE retrieval_children SET resolved_version=? WHERE id=?',
+                                 ('foreign-version', row['id']))
+                else:
+                    metadata['heading_path'] = ['Forged owner']
+                conn.execute('UPDATE retrieval_children SET metadata_json=? WHERE id=?',
+                             (json.dumps(metadata), row['id']))
+        result = native_diagnostic(store, ['target contract'], filters=filters, sources=sources,
+                                  assembly='owner_neighbors_v1')
+        assert result['model_visible_packet']['sources']
+        assert all('forbidden neighbor condition' not in s['snippet']
+                   for s in result['model_visible_packet']['sources']), mutation
 
 
 def test_native_project_packet_never_calls_custom_ordering(tmp_path, monkeypatch):
@@ -261,7 +320,8 @@ def test_structural_assembly_expands_only_within_same_owner_without_new_search(t
                                'bm25_cost': row['rank'], 'row': row})
         assert candidates
         lanes = [{'query': 'target contract'}]
-        result = port.pack_structural(candidates, lanes)
+        result = port.pack_structural(candidates, lanes,
+            hard_eligible_ids={row['stable_chunk_id'] for row in allowed.values()})
     assert result['assembly_reads'] > 0
     assert result['assembly_decisions']
     assert any(d['expanded'] for d in result['assembly_decisions'])

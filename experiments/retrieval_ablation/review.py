@@ -11,7 +11,7 @@ def summarize(results: list[dict], *, planned_arms=('P', 'A')) -> dict:
     """Keep packet readiness, execution, and unmeasured quality separate."""
     if not results:
         raise ValueError('no runs to review')
-    supported = {'P', 'P_MINUS_RATIO', 'A', 'B', 'D_L', 'E_G_L', 'E_GR_L'}
+    supported = {'P', 'P_MINUS_RATIO', 'A', 'B', 'B_FTS', 'D_L', 'E_G_L', 'E_GR_L'}
     if (not planned_arms or len(set(planned_arms)) != len(planned_arms)
             or not set(planned_arms) <= supported):
         raise ValueError('invalid planned arms')

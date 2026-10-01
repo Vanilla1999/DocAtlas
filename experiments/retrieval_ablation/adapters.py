@@ -255,7 +255,9 @@ def native_diagnostic(store, queries, *, filters, sources, raw_limit=40, unique_
                 # project identity changes, so they are not the causal control.
                 paired_control = deepcopy(packet_port.pack(candidates, trace.lanes))
                 packet_result = packet_port.pack_structural(
-                    candidates, trace.lanes, strict_soft_gate=(soft_gate == 'legacy'),
+                    candidates, trace.lanes,
+                    hard_eligible_ids={row['stable_chunk_id'] for row in allowed.values()},
+                    strict_soft_gate=(soft_gate == 'legacy'),
                     legacy_ordering=legacy_ordering)
                 result['paired_B_control'] = paired_control
                 result['paired_B_candidate_pool_sha256'] = candidate_pool_sha256

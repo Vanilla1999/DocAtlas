@@ -263,7 +263,7 @@ class ProjectPacketPort:
         )
         return assembled
 
-    def pack_structural(self, candidates, lanes, *, strict_soft_gate=False, legacy_ordering=False):
+    def pack_structural(self, candidates, lanes, *, hard_eligible_ids, strict_soft_gate=False, legacy_ordering=False):
         """Pack the exact B ranked pool after one bounded owner-local closure.
 
         The closure performs no retrieval and has no access to review labels. For
@@ -279,10 +279,14 @@ class ProjectPacketPort:
         assembly_reads = 0
         decisions = []
         assembled_candidates = []
+        denied_neighbors = []
+        hard_eligible_ids = frozenset(hard_eligible_ids)
         generation = self.store.active_generation_id()
 
         for candidate in candidates:
             seed = candidate['row']
+            if seed['stable_chunk_id'] not in hard_eligible_ids:
+                raise ValueError('assembly seed failed the shared hard policy')
             query = lanes[candidate['lane']]['query']
             cache_key = (seed['source'], seed['parent_logical_id'])
             if cache_key not in parent_cache:
@@ -314,16 +318,27 @@ class ProjectPacketPort:
                 return (parent.char_start <= a <= b <= parent.char_end
                         and estimate_utf8_tokens(raw[a:b]) <= 512)
 
+            def neighbor_allowed(row):
+                metadata = json.loads(row['metadata_json'])
+                return (row['stable_chunk_id'] in hard_eligible_ids
+                        and row.get('resolved_version') == seed.get('resolved_version')
+                        and metadata.get('resolved_version') == json.loads(seed['metadata_json']).get('resolved_version')
+                        and metadata.get('heading_path') == list(parent.heading_path))
+
             if index > 0:
                 previous = siblings[index - 1]
-                if (previous['char_end'] <= start
+                if not neighbor_allowed(previous):
+                    denied_neighbors.append(previous['stable_chunk_id'])
+                elif (previous['char_end'] <= start
                         and not raw[previous['char_end']:start].strip()
                         and fits(previous['char_start'], end)):
                     start = previous['char_start']
                     included.insert(0, previous['stable_chunk_id'])
             if index + 1 < len(siblings):
                 following = siblings[index + 1]
-                if (end <= following['char_start']
+                if not neighbor_allowed(following):
+                    denied_neighbors.append(following['stable_chunk_id'])
+                elif (end <= following['char_start']
                         and not raw[end:following['char_start']].strip()
                         and fits(start, following['char_end'])):
                     end = following['char_end']
@@ -371,6 +386,7 @@ class ProjectPacketPort:
         else:
             result = self.pack(assembled_candidates, lanes, strict_soft_gate=False)
         result.update(assembly_policy='owner_neighbors_v1', assembly_reads=assembly_reads,
+                      assembly_denied_neighbor_ids=sorted(set(denied_neighbors)),
                       assembly_decisions=decisions,
                       assembled_candidate_count=len(assembled_candidates))
         return result

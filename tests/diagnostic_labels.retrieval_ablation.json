@@ -1,18 +1,26 @@
 {
   "schema_version": 1,
   "module_labels": {
+    "tests/docs/test_retrieval_ablation_source_artifact.py": "behavioral",
+    "tests/docs/test_retrieval_ablation_saved_pool.py": "behavioral",
+    "tests/docs/test_retrieval_ablation_compare.py": "behavioral",
     "tests/docs/test_retrieval_ablation_contract.py": "behavioral",
     "tests/docs/test_retrieval_ablation_integration.py": "behavioral",
     "tests/docs/test_retrieval_ablation_packet.py": "behavioral",
     "tests/docs/test_retrieval_ablation_isolation.py": "behavioral",
-    "tests/docs/test_retrieval_ablation_regressions.py": "behavioral"
+    "tests/docs/test_retrieval_ablation_regressions.py": "behavioral",
+    "tests/docs/test_retrieval_ablation_structure.py": "behavioral"
   },
   "node_overrides": {},
   "module_node_hashes": {
+    "tests/docs/test_retrieval_ablation_source_artifact.py": "fd15cd348a8ecc7b24f4037c035906ae340d86978fb7b63553859e5c73865d26",
+    "tests/docs/test_retrieval_ablation_saved_pool.py": "947c5b57de26ea46bce60cd22c6e33a11ba18f6079ca8faa2522115a408908c8",
+    "tests/docs/test_retrieval_ablation_compare.py": "5b24f698fa3d3d6875a27e48b9ddcbbb78c1ecfccbbbc276e27fa5179283716b",
     "tests/docs/test_retrieval_ablation_contract.py": "067099036ddd2fb7711611d64f0dbfedd3f31dc7b31d6a18f9caafc8aff4ed91",
-    "tests/docs/test_retrieval_ablation_integration.py": "f7e69401242906423c6362c970b00bbd86ba9dff6cebc9452ec98bbe89c65db5",
-    "tests/docs/test_retrieval_ablation_packet.py": "6186b6b02abefd84d9e80c9d1e35f7567038ec444b6d80e61da5c24bb227dbbf",
+    "tests/docs/test_retrieval_ablation_integration.py": "16c0828abad72d64bcde6d0eeb43a64921be93160a353b2fefdd6d74472fafda",
+    "tests/docs/test_retrieval_ablation_packet.py": "17b2ff579ccd73e50f6b06214d14f9c3c499dced74432ef5fc11daf500567191",
     "tests/docs/test_retrieval_ablation_isolation.py": "7d1f83e3760f37242fdfb84acf5ae120a98e74b33aed4dfbd8713f75b2b6dc89",
-    "tests/docs/test_retrieval_ablation_regressions.py": "34b817aaf1411bba527a104598593d6fdc09d2eaa70ccd32b1bf5e0b55c61297"
+    "tests/docs/test_retrieval_ablation_regressions.py": "34b817aaf1411bba527a104598593d6fdc09d2eaa70ccd32b1bf5e0b55c61297",
+    "tests/docs/test_retrieval_ablation_structure.py": "cf74e57dbc426babd7ba19520298baf31904680e95897625323b978b25fbb394"
   }
 }
