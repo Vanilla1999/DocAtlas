@@ -1,0 +1,89 @@
+name: Retrieval ablation diagnostics
+on:
+  push:
+    branches: ['experiment/retrieval-ablation-t00-t04']
+    paths:
+      - '.github/workflows/retrieval-ablation.yml'
+      - 'experiments/retrieval_ablation/*.py'
+      - 'experiments/retrieval_ablation/protocol.json'
+      - 'tests/docs/test_retrieval_ablation_*.py'
+      - 'tests/diagnostic_labels.retrieval_ablation.json'
+permissions:
+  contents: read
+jobs:
+  offline:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    env:
+      DOCATLAS_OFFLINE: '1'
+      DOCATLAS_AUTO_VECTORS: '0'
+      PYTHONHASHSEED: '0'
+      DOCATLAS_REGISTRY_API_URL: 'http://127.0.0.1:1'
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1
+        with:
+          python-version: '3.12'
+      - name: Frozen environment
+        run: |
+          mkdir -p "$RUNNER_TEMP/ablation"
+          git rev-parse HEAD > "$RUNNER_TEMP/ablation/head.txt"
+          python -m pip install uv==0.9.25
+          uv sync --frozen --extra dev
+          uv pip freeze > "$RUNNER_TEMP/ablation/packages.txt"
+          sha256sum uv.lock > "$RUNNER_TEMP/ablation/lock.sha256"
+      - name: Real native, freeze and public handler guards
+        run: |
+          set -o pipefail
+          .venv/bin/python -m pytest tests/docs/test_retrieval_ablation_contract.py tests/docs/test_retrieval_ablation_integration.py tests/test_sqlite_ranking_truth.py tests/test_sqlite_phrase_ranking.py -q --junitxml="$RUNNER_TEMP/ablation/guards.xml" 2>&1 | tee "$RUNNER_TEMP/ablation/guards.log"
+      - name: Freeze one synthetic mechanism fixture and execute P and diagnostic A
+        run: |
+          .venv/bin/python - <<'PYCODE'
+          import hashlib, json, os
+          from pathlib import Path
+          root = Path(os.environ['RUNNER_TEMP']) / 'ablation'
+          corpus = root / 'input'
+          corpus.mkdir()
+          raw = b'# Retry\n\nThe retry budget is three attempts. Do not retry cancellation.\n'
+          (corpus / 'retry.md').write_bytes(raw)
+          (root / 'sources.json').write_text(json.dumps({'schema_version': 1, 'sources': [{'path': 'retry.md', 'sha256': hashlib.sha256(raw).hexdigest()}]}))
+          (root / 'request.json').write_text(json.dumps({'question': 'What is the retry budget?'}))
+          PYCODE
+          .venv/bin/python -m experiments.retrieval_ablation.run freeze --corpus-dir "$RUNNER_TEMP/ablation/input" --source-manifest "$RUNNER_TEMP/ablation/sources.json" --request "$RUNNER_TEMP/ablation/request.json" --output "$RUNNER_TEMP/ablation/frozen"
+          .venv/bin/python -m experiments.retrieval_ablation.run run --frozen "$RUNNER_TEMP/ablation/frozen" --arm P --output "$RUNNER_TEMP/ablation/P"
+          .venv/bin/python -m experiments.retrieval_ablation.run run --frozen "$RUNNER_TEMP/ablation/frozen" --arm A --output "$RUNNER_TEMP/ablation/A"
+          .venv/bin/python -m experiments.retrieval_ablation.review "$RUNNER_TEMP/ablation/P/result.json" "$RUNNER_TEMP/ablation/A/result.json" > "$RUNNER_TEMP/ablation/execution-review.json"
+      - name: Paired base and head product regressions, including full offline gate
+        run: |
+          set +e
+          PY="$GITHUB_WORKSPACE/.venv/bin/python"
+          git worktree add --detach "$RUNNER_TEMP/ablation-base" 55637eb4d29a0d06c01714ee647a5b486a5be725
+          setup=$?
+          test "$setup" -eq 0 || exit "$setup"
+          (cd "$RUNNER_TEMP/ablation-base" && "$PY" -m experiments.language_aware_context.flow_regressions --condition baseline --junit "$RUNNER_TEMP/ablation/focused-base.xml") > "$RUNNER_TEMP/ablation/focused-base.log" 2>&1
+          focused_base=$?
+          "$PY" -m experiments.language_aware_context.flow_regressions --condition baseline --junit "$RUNNER_TEMP/ablation/focused-head.xml" > "$RUNNER_TEMP/ablation/focused-head.log" 2>&1
+          focused_head=$?
+          (cd "$RUNNER_TEMP/ablation-base" && "$PY" -m pytest tests/ -m 'not advanced and not live and not live_network' -q --junitxml="$RUNNER_TEMP/ablation/offline-base.xml") > "$RUNNER_TEMP/ablation/offline-base.log" 2>&1
+          offline_base=$?
+          "$PY" -m pytest tests/ -m 'not advanced and not live and not live_network' -q --junitxml="$RUNNER_TEMP/ablation/offline-head.xml" > "$RUNNER_TEMP/ablation/offline-head.log" 2>&1
+          offline_head=$?
+          printf '{"focused_base":%s,"focused_head":%s,"offline_base":%s,"offline_head":%s}\n' "$focused_base" "$focused_head" "$offline_base" "$offline_head" > "$RUNNER_TEMP/ablation/exits.json"
+          test "$focused_base" -eq 0 && test "$focused_head" -eq 0 && test "$offline_base" -eq 0 && test "$offline_head" -eq 0
+      - name: Preserve source and verify no tracked writes
+        if: always()
+        run: |
+          mkdir -p "$RUNNER_TEMP/ablation"
+          git bundle create "$RUNNER_TEMP/ablation/checkout.bundle" HEAD
+          git diff --exit-code
+      - name: Preserve evidence, including failures
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: retrieval-ablation-${{ github.sha }}
+          path: ${{ runner.temp }}/ablation/
+          retention-days: 7
+          if-no-files-found: error

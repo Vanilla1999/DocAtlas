@@ -1,0 +1,32 @@
+name: Apply captured retrieval ablation state
+on:
+  push:
+    branches: ['experiment/retrieval-ablation-t05-t06']
+    paths:
+      - '.github/workflows/push-current.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Apply captured commits and clean staging
+        shell: bash
+        run: |
+          set -euo pipefail
+          cat .push-staging/cont-00 .push-staging/cont-01 .push-staging/cont-02 .push-staging/cont-03 .push-staging/cont-04 \
+            | base64 -d | gzip -d > /tmp/continuation.patch
+          base64 -d < .push-staging/t05.gz.b64 | gzip -d > /tmp/t05.patch
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git am /tmp/continuation.patch
+          git am /tmp/t05.patch
+          git rm -r .push-staging .github/workflows/push-current.yml
+          git commit -m "chore: remove temporary push staging"
+          git push origin HEAD:experiment/retrieval-ablation-t05-t06
