@@ -176,10 +176,13 @@ def _native_fixture(corpus, spec, request, protocol, *, arm="A"):
                 raise ValueError('fixture project identity is not uniquely bound')
             representation_projection = None
             assembly = 'none'
-            if arm in ('B', 'D_L'):
+            soft_gate = 'ablate'
+            if arm in ('B', 'D_L', 'E_G_L'):
                 representation_projection = reproject_structural_fts(store)
-                if arm == 'D_L':
+                if arm in ('D_L', 'E_G_L'):
                     assembly = 'owner_neighbors_v1'
+                if arm == 'E_G_L':
+                    soft_gate = 'legacy'
             elif arm != 'A':
                 raise ValueError('unsupported native arm')
             started = time.perf_counter()
@@ -187,13 +190,14 @@ def _native_fixture(corpus, spec, request, protocol, *, arm="A"):
                 filters={'project_identity': next(iter(identities)), 'project_path': str(project),
                          'source_class': 'project_file', 'doc_scope': 'project'}, sources=documents,
                 raw_limit=protocol['raw_hits'], unique_limit=protocol['unique_candidates'],
-                assembly=assembly)
+                assembly=assembly, soft_gate=soft_gate)
             result['arm'] = arm
             if representation_projection is not None:
                 result['representation_projection'] = representation_projection
-                result['evaluation_kind'] = ('structural_fts_project_owner_assembly_packet'
-                                             if arm == 'D_L'
-                                             else 'structural_fts_project_whole_child_packet')
+                result['evaluation_kind'] = (
+                    'structural_fts_project_owner_assembly_legacy_soft_gate_packet' if arm == 'E_G_L'
+                    else 'structural_fts_project_owner_assembly_packet' if arm == 'D_L'
+                    else 'structural_fts_project_whole_child_packet')
             result.update(index=index, seconds=time.perf_counter() - started)
             return result
 
@@ -205,7 +209,7 @@ def _execute_arm(corpus, spec, request, protocol, arm):
             from .adapters import product_probe
             result = product_probe(corpus, spec, request)
             result['execution_status'] = result['status']
-        elif arm in ('A', 'B', 'D_L'):
+        elif arm in ('A', 'B', 'D_L', 'E_G_L'):
             result = _native_fixture(corpus, spec, request, protocol, arm=arm)
         else:
             raise ValueError('unknown arm')
@@ -247,8 +251,8 @@ def stage_worker(app: Path) -> str:
 
 
 def run_frozen(frozen: Path, output: Path, arm: str) -> dict:
-    if arm not in ('P', 'A', 'B', 'D_L'):
-        raise ValueError('only P, A, B and D_L are implemented')
+    if arm not in ('P', 'A', 'B', 'D_L', 'E_G_L'):
+        raise ValueError('only P, A, B, D_L and E_G_L are implemented')
     from .isolation import IsolationUnavailable, run_isolated
     manifest = verify_frozen(frozen)
     output = _external_new_directory(output)
@@ -304,7 +308,7 @@ def main() -> int:
     run = commands.add_parser('run')
     run.add_argument('--frozen', type=Path, required=True)
     run.add_argument('--output', type=Path, required=True)
-    run.add_argument('--arm', choices=['P', 'A', 'B', 'D_L'], required=True)
+    run.add_argument('--arm', choices=['P', 'A', 'B', 'D_L', 'E_G_L'], required=True)
     regression = commands.add_parser('regressions')
     regression.add_argument('--base', required=True)
     regression.add_argument('--head', required=True)

@@ -272,3 +272,23 @@ def test_d_l_reuses_b_candidate_pool_and_search_count(tmp_path):
     assert d['paired_B_control']['packet_audit_errors'] == []
     assert d['paired_B_control']['packet_status'] == 'VALIDATED_PROJECT_PACKET'
     assert d['packet_audit_errors'] == []
+
+
+def test_e_g_l_reuses_d_pool_and_assembly_before_legacy_soft_gate(tmp_path):
+    from experiments.retrieval_ablation.run import _execute_arm
+    corpus = tmp_path / 'corpus'
+    corpus.mkdir()
+    raw = ('# Retry\n\nThe retry budget is three attempts. Do not retry cancellation.\n').encode()
+    (corpus / 'retry.md').write_bytes(raw)
+    spec = {'schema_version': 1, 'sources': [
+        {'path': 'retry.md', 'sha256': hashlib.sha256(raw).hexdigest()}]}
+    protocol = {'max_sections_per_source': 2, 'raw_hits': 40, 'unique_candidates': 20}
+    result = _execute_arm(corpus, spec,
+        {'question': 'retry xenolith marigold zephyr cobalt verdigris'}, protocol, 'E_G_L')
+    assert result['execution_status'] == 'EXECUTED'
+    assert result['arm'] == 'E_G_L'
+    assert result['paired_D_candidate_pool_sha256'] == result['candidate_pool_sha256']
+    assert result['paired_D_control']['model_visible_packet']['sources']
+    assert result['model_visible_packet']['status'] == 'insufficient_evidence'
+    assert result['search_count'] == result['paired_D_search_count']
+    assert result['packet_audit_errors'] == []

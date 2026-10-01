@@ -117,8 +117,8 @@ class ProjectPacketPort:
                 allowed.append(key)
         return allowed
 
-    def pack(self, candidates, lanes):
-        """No selection heuristics: rank order, whole children, skip oversized."""
+    def pack(self, candidates, lanes, *, strict_soft_gate=False):
+        """Rank-order whole units; optionally restore the legacy visible-match gate."""
         from docmancer.docs.application._docs_context_payload import _payload
         from docmancer.docs.application.context_selection import context_selection_decision
         from docmancer.docs.application.model_visible_projection import (
@@ -152,10 +152,16 @@ class ProjectPacketPort:
                     reason = 'duplicate'
                 elif len(sources) >= 3 or counts.get(public['path_or_url'], 0) >= 2:
                     reason = 'source_entry_or_section_cap'
-                elif not self.hard_pass(self.qualify(original, query)):
-                    reason = 'final_hard_gate_rejected'
-                elif docs_context_budget_tokens(render([*sources, public])) > 800:
-                    reason = 'whole_child_exceeds_dto_budget'
+                else:
+                    final_qualification = self.qualify(original, query)
+                    accepted = (final_qualification.qualified if strict_soft_gate
+                                else self.hard_pass(final_qualification))
+                    if not accepted:
+                        reason = ('legacy_soft_relevance_gate' if strict_soft_gate
+                                  and final_qualification.reason == 'insufficient_visible_match'
+                                  else 'final_hard_gate_rejected')
+                    elif docs_context_budget_tokens(render([*sources, public])) > 800:
+                        reason = 'whole_child_exceeds_dto_budget'
             if reason:
                 omissions.append({'stable_chunk_id': row['stable_chunk_id'], 'reason': reason})
                 continue
@@ -170,7 +176,10 @@ class ProjectPacketPort:
             recommended_next_action=None, max_tokens=800)
         # Revalidate the entire final visible set, not only each proposed append.
         for original, query in originals:
-            if not self.hard_pass(self.qualify(original, query)):
+            final_qualification = self.qualify(original, query)
+            accepted = (final_qualification.qualified if strict_soft_gate
+                        else self.hard_pass(final_qualification))
+            if not accepted:
                 raise ValueError('final whole-packet source/reference validation failed')
         errors = validate_model_visible_projection(packet, snapshot=snapshot, max_tokens=800)
         if errors:
@@ -181,7 +190,9 @@ class ProjectPacketPort:
                 'packet_omissions': omissions, 'admission_rejections': self.rejections,
                 'admission_scan_rows': self.admission_scan_rows,
                 'admission_scan_display_bytes': self.admission_scan_bytes,
-                'soft_ablation': 'lexical_ratio_only; other rejection reasons retained',
+                'soft_ablation': ('none; legacy visible-match gate restored' if strict_soft_gate
+                                  else 'lexical_ratio_only; other rejection reasons retained'),
+                'soft_relevance_mode': 'legacy' if strict_soft_gate else 'ratio_ablation',
                 'qualification_traces': [dict(q.trace) for _, q in self.prepared.values()]}
 
     @staticmethod
@@ -213,7 +224,7 @@ class ProjectPacketPort:
         )
         return assembled
 
-    def pack_structural(self, candidates, lanes):
+    def pack_structural(self, candidates, lanes, *, strict_soft_gate=False):
         """Pack the exact B ranked pool after one bounded owner-local closure.
 
         The closure performs no retrieval and has no access to review labels. For
@@ -310,7 +321,12 @@ class ProjectPacketPort:
                 'fallback_reason': fallback_reason,
             })
 
-        result = self.pack(assembled_candidates, lanes)
+        if strict_soft_gate:
+            paired_d_control = deepcopy(self.pack(assembled_candidates, lanes, strict_soft_gate=False))
+            result = self.pack(assembled_candidates, lanes, strict_soft_gate=True)
+            result['paired_D_control'] = paired_d_control
+        else:
+            result = self.pack(assembled_candidates, lanes, strict_soft_gate=False)
         result.update(assembly_policy='owner_neighbors_v1', assembly_reads=assembly_reads,
                       assembly_decisions=decisions,
                       assembled_candidate_count=len(assembled_candidates))
