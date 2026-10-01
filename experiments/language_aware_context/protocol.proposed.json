@@ -1,0 +1,36 @@
+{
+  "schema_version": 1,
+  "status": "PROPOSED_NOT_FROZEN",
+  "base_revision": "58c7f37c2a5ef686bcd6562abbade91ba94e347a",
+  "arms": {
+    "A": "existing_host_lookups_current_lexical",
+    "B": "profile_host_lookups_current_lexical",
+    "C": "replay_A_with_assembly",
+    "D": "replay_B_with_assembly",
+    "E": "generic_ru_en_host_lookups_current_lexical"
+  },
+  "reuse_queries": {
+    "C": "A",
+    "D": "B"
+  },
+  "budgets": {
+    "lookups": 3,
+    "lookup_characters": 240,
+    "candidates_total": 20,
+    "seeds": 4,
+    "preceding_neighbors": 1,
+    "following_neighbors": 1,
+    "same_parent": true,
+    "max_sections_per_source": 2,
+    "packet_dto_tokens": 800,
+    "hint_tokens": 128
+  },
+  "evidence": {
+    "dataset_manifest_sha256": null,
+    "labels_sha256": null,
+    "host_model_identity": null,
+    "judge_identity": null,
+    "independent_evaluation": false
+  },
+  "product_activation": false
+}

@@ -1,0 +1,63 @@
+# Frozen pilot already executed: do not rerun viewed tasks on every PR commit.
+name: Language fresh FP32 agent pilot
+on:
+  pull_request:
+    branches: [main]
+    types: [labeled]
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: language-fp32-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: false
+jobs:
+  real-agent:
+    if: github.event_name == 'workflow_dispatch' || (github.event.label.name == 'run-language-fp32-pilot' && github.event.pull_request.head.repo.full_name == github.repository)
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [0, 1, 2]
+    env:
+      DOCATLAS_OFFLINE: '1'
+      DOCATLAS_AUTO_VECTORS: '0'
+      DOCATLAS_REGISTRY_API_URL: 'http://127.0.0.1:1'
+      PYTHONHASHSEED: '0'
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          persist-credentials: false
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1
+        with:
+          python-version: '3.12'
+      - name: Frozen DocAtlas and isolated real CPU agent
+        run: |
+          python -m pip install uv==0.9.25
+          uv sync --frozen --extra dev
+          python -m venv "$RUNNER_TEMP/fp32-agent"
+          "$RUNNER_TEMP/fp32-agent/bin/pip" install torch==2.8.0 --index-url https://download.pytorch.org/whl/cpu
+          "$RUNNER_TEMP/fp32-agent/bin/pip" install transformers==4.53.3
+          mkdir -p "$RUNNER_TEMP/fp32-evidence"
+          "$RUNNER_TEMP/fp32-agent/bin/pip" freeze > "$RUNNER_TEMP/fp32-evidence/agent-packages.txt"
+          git rev-parse HEAD > "$RUNNER_TEMP/fp32-evidence/source-head.txt"
+          git archive HEAD | gzip > "$RUNNER_TEMP/fp32-evidence/source.tar.gz"
+      - name: Pre-evaluation boundary tests
+        run: .venv/bin/python -m pytest tests/docs/test_language_pilot_io.py tests/docs/test_language_pilot_v2.py -q --junitxml="$RUNNER_TEMP/fp32-evidence/unit.xml"
+      - name: Freeze unseen source bytes, pass health gate, generate actual plans and answers
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: >-
+          .venv/bin/python -m experiments.language_aware_context.pilot_v2_run
+          --shard ${{ matrix.shard }}
+          --agent-python "$RUNNER_TEMP/fp32-agent/bin/python"
+          --output "$RUNNER_TEMP/fp32-evidence/run"
+      - name: Preserve every attempted result, excluding weights and credentials
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: language-fp32-${{ github.event.pull_request.head.sha || github.sha }}-${{ matrix.shard }}
+          path: ${{ runner.temp }}/fp32-evidence/
+          retention-days: 7
+          if-no-files-found: error

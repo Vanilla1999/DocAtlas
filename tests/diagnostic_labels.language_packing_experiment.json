@@ -1,0 +1,10 @@
+{
+  "schema_version": 1,
+  "module_labels": {
+    "tests/docs/test_language_packing_experiment.py": "behavioral"
+  },
+  "node_overrides": {},
+  "module_node_hashes": {
+    "tests/docs/test_language_packing_experiment.py": "b6a42deaa78f9429aa85a314521d560169b444d05217dba7fc45e67ba72e0ef0"
+  }
+}

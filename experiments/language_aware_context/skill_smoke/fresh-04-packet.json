@@ -1,0 +1,15 @@
+{
+  "question": "Какую максимальную задержку в миллисекундах Python 3.13 гарантирует между вызовом Task.cancel() и остановкой coroutine на любой операционной системе?",
+  "evidence": [
+    {
+      "id": "S1",
+      "path": "docs/asyncio.md",
+      "text": "During asynchronous iteration, implicitly-created tasks will be yielded for\n   supplied awaitables that aren't tasks or futures.\n\n   When used as a plain iterator, each iteration yields a new coroutine that\n   returns the result or raises the exception of the next completed awaitable.\n   This pattern is compatible with Python versions older than 3.13::"
+    },
+    {
+      "id": "S2",
+      "path": "docs/asyncio.md",
+      "text": "task.cancel()\n              try:\n                  await task\n              except asyncio.CancelledError:\n                  print(\"main(): cancel_me is cancelled now\")\n\n          asyncio.run(main())\n\n          # Expected output:\n          #\n          #     cancel_me(): before sleep\n          #     cancel_me(): cancel sleep\n          #     cancel_me(): after sleep\n          #     main(): cancel_me is cancelled now\n\n   .. method:: cancelled()\n\n      Return ``True`` if the Task is *cancelled*."
+    }
+  ]
+}
