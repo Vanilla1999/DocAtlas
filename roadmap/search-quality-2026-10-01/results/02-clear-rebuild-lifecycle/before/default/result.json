@@ -1,0 +1,7 @@
+{
+  "status": "PASS",
+  "phase": "before",
+  "mode": "default",
+  "same_session": true,
+  "fixture": "/tmp/opencode/clear-rebuild-default-exq2hz7w/target"
+}

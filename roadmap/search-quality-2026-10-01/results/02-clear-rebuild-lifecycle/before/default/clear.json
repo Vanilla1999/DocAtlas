@@ -1,0 +1,60 @@
+{
+  "request": {
+    "action": "clear_index",
+    "scope": "project-local",
+    "project_path": "/tmp/opencode/clear-rebuild-default-exq2hz7w/target",
+    "plan_digest": "95b28016b97701c9543b23a41f0f15cb90bc432b01a71c4bab7a9b1c3b1a9df4",
+    "confirm": true
+  },
+  "wire": {
+    "_meta": null,
+    "content": [
+      {
+        "type": "text",
+        "text": "Structured DocAtlas result attached in structuredContent.",
+        "annotations": null,
+        "_meta": null
+      }
+    ],
+    "structuredContent": {
+      "scope": "project-local",
+      "config_source": "project_local",
+      "storage_root": "/tmp/opencode/clear-rebuild-default-exq2hz7w/target/.docatlas",
+      "db_path": "/tmp/opencode/clear-rebuild-default-exq2hz7w/target/.docatlas/project.db",
+      "extracted_dir": "/tmp/opencode/clear-rebuild-default-exq2hz7w/target/.docatlas/extracted",
+      "plan": [
+        "/tmp/opencode/clear-rebuild-default-exq2hz7w/target/.docatlas/project.db",
+        "/tmp/opencode/clear-rebuild-default-exq2hz7w/target/.docatlas/extracted"
+      ],
+      "targets": [
+        {
+          "path": "/tmp/opencode/clear-rebuild-default-exq2hz7w/target/.docatlas/project.db",
+          "kind": "sqlite_index",
+          "fingerprint": "ba3db653fd63d58d30977bc9baf88db4180eed488e37b5f1ee503360e6bb6088",
+          "exists": true,
+          "size_bytes": 229376
+        },
+        {
+          "path": "/tmp/opencode/clear-rebuild-default-exq2hz7w/target/.docatlas/extracted",
+          "kind": "extracted_documents",
+          "fingerprint": "bb63e91e90cb007baa27edf8dbc43f8dc57916c75a41e113bf776fff1524ec26",
+          "exists": true,
+          "size_bytes": 2333
+        }
+      ],
+      "plan_digest": "95b28016b97701c9543b23a41f0f15cb90bc432b01a71c4bab7a9b1c3b1a9df4",
+      "incomplete_reasons": [],
+      "blocking_reasons": [],
+      "status": "applied",
+      "removed": [
+        "/tmp/opencode/clear-rebuild-default-exq2hz7w/target/.docatlas/project.db",
+        "/tmp/opencode/clear-rebuild-default-exq2hz7w/target/.docatlas/extracted"
+      ],
+      "quarantine_retained": null,
+      "retained_incomplete_state": [],
+      "action": "clear_index",
+      "tool": "prepare_docs"
+    },
+    "isError": false
+  }
+}

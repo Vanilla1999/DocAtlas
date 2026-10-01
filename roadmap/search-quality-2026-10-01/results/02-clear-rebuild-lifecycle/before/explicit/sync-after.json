@@ -1,0 +1,37 @@
+{
+  "request": {
+    "action": "sync_project_docs",
+    "project_path": "/tmp/opencode/clear-rebuild-explicit-o04sce8b/target",
+    "with_vectors": false
+  },
+  "wire": {
+    "_meta": null,
+    "content": [
+      {
+        "type": "text",
+        "text": "Structured DocAtlas result attached in structuredContent.",
+        "annotations": null,
+        "_meta": null
+      }
+    ],
+    "structuredContent": {
+      "status": "failed",
+      "error": {
+        "reason_code": "handler_exception",
+        "message": "handler_exception: request failed",
+        "exception_type": "OperationalError",
+        "retryable": false,
+        "where": {
+          "tool": "prepare_docs",
+          "handler": null,
+          "phase": "execution"
+        },
+        "hints": [
+          "Check diagnostics/logs; retry only after the underlying handler issue is fixed."
+        ]
+      },
+      "warnings": []
+    },
+    "isError": true
+  }
+}

@@ -1,0 +1,7 @@
+{
+  "status": "PASS",
+  "phase": "after",
+  "mode": "default",
+  "same_session": true,
+  "fixture": "/tmp/opencode/clear-rebuild-default-uwpf16df/target"
+}

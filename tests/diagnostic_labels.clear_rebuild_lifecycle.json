@@ -1,0 +1,6 @@
+{
+  "schema_version": 1,
+  "module_labels": {"tests/test_clear_rebuild_lifecycle.py": "behavioral"},
+  "node_overrides": {},
+  "module_node_hashes": {"tests/test_clear_rebuild_lifecycle.py": "c0e84d4c18c0f02c19ed2a51f4ab2bbaab2a50684a3bc88f31b725228e73e1b3"}
+}

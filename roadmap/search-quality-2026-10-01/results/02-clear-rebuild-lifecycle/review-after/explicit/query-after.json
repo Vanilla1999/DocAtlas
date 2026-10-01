@@ -1,0 +1,63 @@
+{
+  "request": {
+    "question": "How do I prepare local project documentation?",
+    "project_path": "/tmp/opencode/clear-rebuild-explicit-fodtqjy1/target"
+  },
+  "wire": {
+    "_meta": null,
+    "content": [
+      {
+        "type": "text",
+        "text": "Structured DocAtlas result attached in structuredContent.",
+        "annotations": null,
+        "_meta": null
+      }
+    ],
+    "structuredContent": {
+      "status": "ok",
+      "kind": "docs_context",
+      "context_status": "ready",
+      "context_available": true,
+      "answer_supported": false,
+      "answer_available": false,
+      "support_status": "retrieval_only",
+      "answer_policy": "cite_only",
+      "coverage_policy": "retrieval_attribution_only",
+      "query_coverage": "full",
+      "retrieval_coverage": "full",
+      "facet_coverage": "unverified",
+      "covered_query_ids": [
+        "query-original"
+      ],
+      "missing_query_ids": [],
+      "missing_facets": [],
+      "facets": [],
+      "sources": [
+        {
+          "evidence_id": "ev-a6c60b6e5cf15123",
+          "path_or_url": "README.md",
+          "section": "Local documentation",
+          "snippet": "# Local documentation\n\nTo prepare local project documentation, call prepare_docs(action=\"sync_project_docs\").",
+          "version_binding": "unversioned",
+          "content_sha256": "66c84ea74e672c95d07e998297a176e5b8c378295c8514efacdf15ee7892a27f",
+          "project_identity": "local:1c25b1867c794e7e33a405d2ab15bf47bf2bbb5a8f4691b50d9dae9c7d5a2c30",
+          "authority": "primary",
+          "scope": "project",
+          "line_start": 1,
+          "line_end": 3
+        }
+      ],
+      "context_quality": {
+        "status": "unverified",
+        "reasons": [
+          "coverage_unverified"
+        ]
+      },
+      "read_next": [],
+      "edit_ready": false,
+      "investigation_allowed": true,
+      "estimated_tokens": 274
+    },
+    "isError": false
+  }
+}

@@ -1,0 +1,7 @@
+{
+  "status": "PASS",
+  "phase": "after",
+  "mode": "explicit",
+  "same_session": true,
+  "fixture": "/tmp/opencode/clear-rebuild-explicit-fodtqjy1/target"
+}

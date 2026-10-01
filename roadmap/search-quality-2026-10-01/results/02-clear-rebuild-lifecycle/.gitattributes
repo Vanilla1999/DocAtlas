@@ -1,0 +1,2 @@
+# Keep original pytest output unchanged.
+*.log whitespace=-blank-at-eol

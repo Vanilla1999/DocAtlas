@@ -42,6 +42,7 @@ def _service_for_project_path(
         return service
     if not isinstance(service, LibraryDocsService):
         return service
+    service = _live_storage_service(service)
     project_path = arguments.get("project_path")
     if not isinstance(project_path, str) or not project_path.strip():
         return service
@@ -59,6 +60,8 @@ def _service_for_project_path(
     with lock:
         cached = cache.get(cache_key)
         if cached is not None:
+            cached = _live_storage_service(cached)
+            cache[cache_key] = cached
             cache.move_to_end(cache_key)
             return cached
         # A changed resolved config invalidates the prior service for this root.
@@ -77,6 +80,61 @@ def _service_for_project_path(
         while len(cache) > 8:
             cache.popitem(last=False)
         return project_service
+
+
+def _live_storage_service(service: LibraryDocsService) -> LibraryDocsService:
+    """Reconstruct detached index owners lazily, not while clearing storage."""
+    with service._project_service_cache_lock:
+        replacement = getattr(service, "_cleared_storage_replacement", None)
+        if replacement is not None:
+            replacement = _live_storage_service(replacement)
+            service._cleared_storage_replacement = replacement
+            return replacement
+        if not getattr(service, "_storage_cleared", False):
+            return service
+        replacement = LibraryDocsService(
+            config=service.config,
+            config_source=service.config_source,
+            config_path=service.config_path,
+            agent_factory=service.agent_gateway._agent_factory,
+            project_reader=service.project_reader,
+            stale_after_days=service.stale_after_days,
+            library_index_root=service.agent_gateway._library_index_root,
+        )
+        # Other roots and their source capabilities remain owned by the same
+        # live services. Only the detached owner gets fresh registry/jobs/agent.
+        replacement._project_service_cache = service._project_service_cache
+        replacement._project_service_cache_lock = service._project_service_cache_lock
+        service._cleared_storage_replacement = replacement
+        return replacement
+
+
+def _invalidate_cleared_storage(service: LibraryDocsService, payload: dict[str, Any]) -> None:
+    """Invalidate every cached identity overlapping successfully removed paths."""
+    if not isinstance(service, LibraryDocsService):
+        return
+    removed = [Path(path).expanduser().resolve() for path in payload.get("removed", [])]
+    if not removed:
+        return
+    with service._project_service_cache_lock:
+        pending = [service]
+        seen: set[int] = set()
+        while pending:
+            owner = pending.pop()
+            while getattr(owner, "_cleared_storage_replacement", None) is not None:
+                owner = owner._cleared_storage_replacement
+            if id(owner) in seen:
+                continue
+            seen.add(id(owner))
+            with owner._project_service_cache_lock:
+                pending.extend(owner._project_service_cache.values())
+            paths = [owner.config.index.db_path, owner.config.index.extracted_dir,
+                     owner.agent_gateway._library_index_root]
+            if any(
+                Path(path).expanduser().resolve().is_relative_to(target)
+                for path in paths if path for target in removed
+            ):
+                owner._storage_cleared = True
 
 
 def _destructive_project_scope_error(name: str, arguments: dict[str, Any]) -> str | None:
@@ -158,6 +216,11 @@ def call_docs_tool_payload(
             tool=name,
             phase="validation",
         )
+    if (
+        args.get("action") == "clear_index"
+        and payload.get("status") in {"applied", "applied_with_quarantine_retained"}
+    ):
+        _invalidate_cleared_storage(service, payload)
     if payload.get("status") == "error" and isinstance(payload.get("reason_code"), str):
         return build_mcp_error_payload(
             reason_code=payload["reason_code"],
@@ -175,6 +238,10 @@ def read_docs_resource(uri: str, service: LibraryDocsService | None = None) -> d
             with service._project_service_cache_lock:
                 services = [service, *service._project_service_cache.values()]
             for owner in services:
+                while getattr(owner, "_cleared_storage_replacement", None) is not None:
+                    owner = owner._cleared_storage_replacement
+                if getattr(owner, "_storage_cleared", False):
+                    continue
                 reader = owner.source_reader
                 if reader.has_reference(uri):
                     result = reader.read(uri)

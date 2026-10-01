@@ -1,0 +1,60 @@
+{
+  "request": {
+    "action": "clear_index",
+    "scope": "project-local",
+    "project_path": "/tmp/opencode/clear-rebuild-explicit-o04sce8b/target",
+    "plan_digest": "92a5e1682e4b2e8e077688e3dc06916bf36e50ae90840915d06f68d8bdb62adf",
+    "confirm": true
+  },
+  "wire": {
+    "_meta": null,
+    "content": [
+      {
+        "type": "text",
+        "text": "Structured DocAtlas result attached in structuredContent.",
+        "annotations": null,
+        "_meta": null
+      }
+    ],
+    "structuredContent": {
+      "scope": "project-local",
+      "config_source": "project_local",
+      "storage_root": "/tmp/opencode/clear-rebuild-explicit-o04sce8b/target/.docatlas",
+      "db_path": "/tmp/opencode/clear-rebuild-explicit-o04sce8b/target/.docatlas/project.db",
+      "extracted_dir": "/tmp/opencode/clear-rebuild-explicit-o04sce8b/target/.docatlas/extracted",
+      "plan": [
+        "/tmp/opencode/clear-rebuild-explicit-o04sce8b/target/.docatlas/project.db",
+        "/tmp/opencode/clear-rebuild-explicit-o04sce8b/target/.docatlas/extracted"
+      ],
+      "targets": [
+        {
+          "path": "/tmp/opencode/clear-rebuild-explicit-o04sce8b/target/.docatlas/project.db",
+          "kind": "sqlite_index",
+          "fingerprint": "ff55a3fab823dba07417b30513078bc6112ee050fef3c3c25d01401dbbe47d2f",
+          "exists": true,
+          "size_bytes": 229376
+        },
+        {
+          "path": "/tmp/opencode/clear-rebuild-explicit-o04sce8b/target/.docatlas/extracted",
+          "kind": "extracted_documents",
+          "fingerprint": "0ad161c7392654140c2f69d556a6f27de414a78b96cd9541607903da90fac5bb",
+          "exists": true,
+          "size_bytes": 2336
+        }
+      ],
+      "plan_digest": "92a5e1682e4b2e8e077688e3dc06916bf36e50ae90840915d06f68d8bdb62adf",
+      "incomplete_reasons": [],
+      "blocking_reasons": [],
+      "status": "applied",
+      "removed": [
+        "/tmp/opencode/clear-rebuild-explicit-o04sce8b/target/.docatlas/project.db",
+        "/tmp/opencode/clear-rebuild-explicit-o04sce8b/target/.docatlas/extracted"
+      ],
+      "quarantine_retained": null,
+      "retained_incomplete_state": [],
+      "action": "clear_index",
+      "tool": "prepare_docs"
+    },
+    "isError": false
+  }
+}

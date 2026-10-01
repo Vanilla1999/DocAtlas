@@ -1,0 +1,98 @@
+FF                                                                       [100%]
+=================================== FAILURES ===================================
+________ test_cached_service_sync_clear_rebuild_without_restart[False] _________
+
+tmp_path = PosixPath('/tmp/pytest-of-viadmin/pytest-67/test_cached_service_sync_clear0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7326d270b440>
+explicit = False
+
+    @pytest.mark.parametrize("explicit", [False, True])
+    def test_cached_service_sync_clear_rebuild_without_restart(tmp_path, monkeypatch, explicit):
+        monkeypatch.setenv("DOCATLAS_HOME", str(tmp_path / "home"))
+        project = tmp_path / "project"
+        project.mkdir()
+        readme = "# Local documentation\n\nTo prepare local project documentation, call prepare_docs(action=\"sync_project_docs\").\n"
+        (project / "README.md").write_text(readme)
+        (project / ".gitignore").write_text(".docatlas/\n")
+        config_path = project / "docatlas.yaml"
+        config_path.write_text("index:\n  db_path: .docatlas/project.db\n  extracted_dir: .docatlas/extracted\n")
+        _commit_project(project)
+        if explicit:
+            from docmancer.core.storage_topology import StorageTopologyResolver
+            topology = StorageTopologyResolver().resolve(project)
+            service = LibraryDocsService(config=topology.config, config_source="explicit", config_path=config_path)
+        else:
+            service = LibraryDocsService()
+    
+        def call(tool, **args):
+            return call_docs_tool_payload(tool, {"project_path": str(project), **args}, service)
+    
+        assert call("prepare_docs", action="sync_project_docs", with_vectors=False)["status"] == "success"
+        owner = _service_for_project_path(service, {"project_path": str(project)})
+        assert owner._agent_instance() is owner._agent_instance()
+        question = "How do I prepare local project documentation?"
+        before = call("get_docs_context", question=question)
+        assert before["status"] == "ok", before
+        preview = call("prepare_docs", action="clear_index", scope="project-local")
+        assert preview["status"] == "confirmation_required", preview
+        applied = call_docs_tool_payload("prepare_docs", preview["arguments_patch"], service)
+        assert applied["status"] == "applied", applied
+        rebuilt = call("prepare_docs", action="sync_project_docs", with_vectors=False)
+>       assert rebuilt["status"] == "success", rebuilt
+E       AssertionError: {'error': {'exception_type': 'OperationalError', 'hints': ['Check diagnostics/logs; retry only after the underlying ha...ge': 'handler_exception: request failed', 'reason_code': 'handler_exception', ...}, 'status': 'failed', 'warnings': []}
+E       assert 'failed' == 'success'
+E         
+E         - success
+E         + failed
+
+tests/test_clear_rebuild_lifecycle.py:42: AssertionError
+_________ test_cached_service_sync_clear_rebuild_without_restart[True] _________
+
+tmp_path = PosixPath('/tmp/pytest-of-viadmin/pytest-67/test_cached_service_sync_clear1')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7326d2373140>
+explicit = True
+
+    @pytest.mark.parametrize("explicit", [False, True])
+    def test_cached_service_sync_clear_rebuild_without_restart(tmp_path, monkeypatch, explicit):
+        monkeypatch.setenv("DOCATLAS_HOME", str(tmp_path / "home"))
+        project = tmp_path / "project"
+        project.mkdir()
+        readme = "# Local documentation\n\nTo prepare local project documentation, call prepare_docs(action=\"sync_project_docs\").\n"
+        (project / "README.md").write_text(readme)
+        (project / ".gitignore").write_text(".docatlas/\n")
+        config_path = project / "docatlas.yaml"
+        config_path.write_text("index:\n  db_path: .docatlas/project.db\n  extracted_dir: .docatlas/extracted\n")
+        _commit_project(project)
+        if explicit:
+            from docmancer.core.storage_topology import StorageTopologyResolver
+            topology = StorageTopologyResolver().resolve(project)
+            service = LibraryDocsService(config=topology.config, config_source="explicit", config_path=config_path)
+        else:
+            service = LibraryDocsService()
+    
+        def call(tool, **args):
+            return call_docs_tool_payload(tool, {"project_path": str(project), **args}, service)
+    
+        assert call("prepare_docs", action="sync_project_docs", with_vectors=False)["status"] == "success"
+        owner = _service_for_project_path(service, {"project_path": str(project)})
+        assert owner._agent_instance() is owner._agent_instance()
+        question = "How do I prepare local project documentation?"
+        before = call("get_docs_context", question=question)
+        assert before["status"] == "ok", before
+        preview = call("prepare_docs", action="clear_index", scope="project-local")
+        assert preview["status"] == "confirmation_required", preview
+        applied = call_docs_tool_payload("prepare_docs", preview["arguments_patch"], service)
+        assert applied["status"] == "applied", applied
+        rebuilt = call("prepare_docs", action="sync_project_docs", with_vectors=False)
+>       assert rebuilt["status"] == "success", rebuilt
+E       AssertionError: {'error': {'exception_type': 'OperationalError', 'hints': ['Check diagnostics/logs; retry only after the underlying ha...ge': 'handler_exception: request failed', 'reason_code': 'handler_exception', ...}, 'status': 'failed', 'warnings': []}
+E       assert 'failed' == 'success'
+E         
+E         - success
+E         + failed
+
+tests/test_clear_rebuild_lifecycle.py:42: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_clear_rebuild_lifecycle.py::test_cached_service_sync_clear_rebuild_without_restart[False]
+FAILED tests/test_clear_rebuild_lifecycle.py::test_cached_service_sync_clear_rebuild_without_restart[True]
+2 failed in 1.11s

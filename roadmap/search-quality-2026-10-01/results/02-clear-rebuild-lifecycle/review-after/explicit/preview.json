@@ -1,0 +1,60 @@
+{
+  "request": {
+    "action": "clear_index",
+    "scope": "project-local",
+    "project_path": "/tmp/opencode/clear-rebuild-explicit-fodtqjy1/target"
+  },
+  "wire": {
+    "_meta": null,
+    "content": [
+      {
+        "type": "text",
+        "text": "Structured DocAtlas result attached in structuredContent.",
+        "annotations": null,
+        "_meta": null
+      }
+    ],
+    "structuredContent": {
+      "scope": "project-local",
+      "config_source": "project_local",
+      "storage_root": "/tmp/opencode/clear-rebuild-explicit-fodtqjy1/target/.docatlas",
+      "db_path": "/tmp/opencode/clear-rebuild-explicit-fodtqjy1/target/.docatlas/project.db",
+      "extracted_dir": "/tmp/opencode/clear-rebuild-explicit-fodtqjy1/target/.docatlas/extracted",
+      "plan": [
+        "/tmp/opencode/clear-rebuild-explicit-fodtqjy1/target/.docatlas/project.db",
+        "/tmp/opencode/clear-rebuild-explicit-fodtqjy1/target/.docatlas/extracted"
+      ],
+      "targets": [
+        {
+          "path": "/tmp/opencode/clear-rebuild-explicit-fodtqjy1/target/.docatlas/project.db",
+          "kind": "sqlite_index",
+          "fingerprint": "4a3ec390b9c68734fbeaf3ddf19da6b311bd73bfa03b7589036366f1778cf931",
+          "exists": true,
+          "size_bytes": 229376
+        },
+        {
+          "path": "/tmp/opencode/clear-rebuild-explicit-fodtqjy1/target/.docatlas/extracted",
+          "kind": "extracted_documents",
+          "fingerprint": "765222c603918820633daed49cb8e8424562d13828543fe96b212d280438f006",
+          "exists": true,
+          "size_bytes": 2336
+        }
+      ],
+      "plan_digest": "2b1a4a162d7112cf3231e3833eb52085399ca0e6ae3479a34c518924c7274c49",
+      "incomplete_reasons": [],
+      "blocking_reasons": [],
+      "status": "confirmation_required",
+      "requires_confirmation": true,
+      "arguments_patch": {
+        "action": "clear_index",
+        "scope": "project-local",
+        "project_path": "/tmp/opencode/clear-rebuild-explicit-fodtqjy1/target",
+        "plan_digest": "2b1a4a162d7112cf3231e3833eb52085399ca0e6ae3479a34c518924c7274c49",
+        "confirm": true
+      },
+      "action": "clear_index",
+      "tool": "prepare_docs"
+    },
+    "isError": false
+  }
+}
