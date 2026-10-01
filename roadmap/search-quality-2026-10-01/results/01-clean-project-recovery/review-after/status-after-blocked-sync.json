@@ -1,0 +1,67 @@
+{
+  "tool": "docs_status",
+  "request": {
+    "action": "project",
+    "project_path": "/tmp/opencode/p0-after-evd2h7nd/repo",
+    "details": true
+  },
+  "wire": {
+    "_meta": null,
+    "content": [
+      {
+        "type": "text",
+        "text": "Structured DocAtlas result attached in structuredContent.",
+        "annotations": null,
+        "_meta": null
+      }
+    ],
+    "structuredContent": {
+      "tool": "docs_status",
+      "action": "project",
+      "project": {
+        "project_path": "/tmp/opencode/p0-after-evd2h7nd/repo",
+        "project_detected": true,
+        "reason_code": "project_docs_preflight_confirmation_required",
+        "next_action": {
+          "type": "ask_user_to_update_or_confirm_project_docs",
+          "handled_by": "coding_agent",
+          "requires_confirmation": true,
+          "confirmation_reason": "project_docs_preflight",
+          "risk_codes": [
+            "git_worktree_not_clean"
+          ],
+          "tool_after_confirmation": "sync_project_docs",
+          "arguments_patch_after_confirmation": {
+            "project_path": "/tmp/opencode/p0-after-evd2h7nd/repo",
+            "with_vectors": false
+          }
+        },
+        "arguments_patch": {
+          "project_path": "/tmp/opencode/p0-after-evd2h7nd/repo"
+        },
+        "source_summary": {
+          "candidates": 1,
+          "indexed": 0,
+          "stale": 0,
+          "ignored": 0
+        },
+        "project_docs": {
+          "module_count": 0,
+          "modules": [],
+          "modules_omitted": 0
+        },
+        "diagnostics": {
+          "active_index": {
+            "db_path": "/tmp/opencode/p0-after-evd2h7nd/repo/.docatlas/docatlas.db",
+            "config_source": "project_local",
+            "config_path": "/tmp/opencode/p0-after-evd2h7nd/repo/docatlas.yaml",
+            "retrieval_mode": "lexical"
+          }
+        },
+        "requires_confirmation": true,
+        "confirmation_reason": "project_docs_preflight"
+      }
+    },
+    "isError": false
+  }
+}

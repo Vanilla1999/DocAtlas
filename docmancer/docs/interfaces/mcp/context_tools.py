@@ -64,6 +64,8 @@ def _bounded_project_operational_diagnostics(payload: dict[str, Any]) -> dict[st
     lanes = payload.get("lanes") if isinstance(payload.get("lanes"), dict) else {}
     project = lanes.get("project") if isinstance(lanes.get("project"), dict) else {}
     reason = str(project.get("reason_code") or "").strip()
+    if reason == "project_docs_found_not_indexed":
+        return {"operational_reason_code": reason}
     if reason not in _MODULE_RECOVERY_REASON_CODES:
         return {}
     result: dict[str, Any] = {"operational_reason_code": reason}
@@ -750,7 +752,11 @@ def _bounded_recovery_action(payload: dict[str, Any]) -> dict[str, Any] | None:
             and not rephrase
         ):
             continue
-        if tool == "prepare_docs" and source_search_required and not payload.get("requires_confirmation"):
+        if (
+            tool == "prepare_docs" and source_search_required
+            and not payload.get("requires_confirmation")
+            and operational_reason != "project_docs_found_not_indexed"
+        ):
             arguments = action.get("arguments_patch") if isinstance(action.get("arguments_patch"), dict) else {}
             if arguments.get("action") == "sync_project_docs":
                 continue

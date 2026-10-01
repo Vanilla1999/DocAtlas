@@ -1,0 +1,65 @@
+{
+  "tool": "docs_status",
+  "request": {
+    "action": "project",
+    "project_path": "/tmp/opencode/p0-before-uzyk8_0r/repo",
+    "details": true
+  },
+  "wire": {
+    "_meta": null,
+    "content": [
+      {
+        "type": "text",
+        "text": "Structured DocAtlas result attached in structuredContent.",
+        "annotations": null,
+        "_meta": null
+      }
+    ],
+    "structuredContent": {
+      "tool": "docs_status",
+      "action": "project",
+      "project": {
+        "project_path": "/tmp/opencode/p0-before-uzyk8_0r/repo",
+        "project_detected": true,
+        "reason_code": "project_docs_found_not_indexed",
+        "next_action": {
+          "type": "prepare_docs",
+          "tool": "prepare_docs",
+          "requires_confirmation": false,
+          "arguments_patch": {
+            "action": "sync_project_docs",
+            "project_path": "/tmp/opencode/p0-before-uzyk8_0r/repo",
+            "with_vectors": false,
+            "plan_digest": "01d375db562a6eb9467a57dbbefc7979e261fbdbe0b60c1d790375c5f59dd718"
+          }
+        },
+        "arguments_patch": {
+          "action": "sync_project_docs",
+          "project_path": "/tmp/opencode/p0-before-uzyk8_0r/repo",
+          "with_vectors": false,
+          "plan_digest": "01d375db562a6eb9467a57dbbefc7979e261fbdbe0b60c1d790375c5f59dd718"
+        },
+        "source_summary": {
+          "candidates": 1,
+          "indexed": 0,
+          "stale": 0,
+          "ignored": 0
+        },
+        "project_docs": {
+          "module_count": 0,
+          "modules": [],
+          "modules_omitted": 0
+        },
+        "diagnostics": {
+          "active_index": {
+            "db_path": "/tmp/opencode/p0-before-uzyk8_0r/repo/.docatlas/docatlas.db",
+            "config_source": "project_local",
+            "config_path": "/tmp/opencode/p0-before-uzyk8_0r/repo/docatlas.yaml",
+            "retrieval_mode": "lexical"
+          }
+        }
+      }
+    },
+    "isError": false
+  }
+}

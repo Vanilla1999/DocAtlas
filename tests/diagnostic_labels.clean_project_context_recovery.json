@@ -1,0 +1,10 @@
+{
+  "schema_version": 1,
+  "module_labels": {
+    "tests/test_clean_project_context_recovery.py": "behavioral"
+  },
+  "node_overrides": {},
+  "module_node_hashes": {
+    "tests/test_clean_project_context_recovery.py": "ae90675f1172f5fd124f6b40fa1deda29e361a454d5f3a79811d76dff00f7227"
+  }
+}

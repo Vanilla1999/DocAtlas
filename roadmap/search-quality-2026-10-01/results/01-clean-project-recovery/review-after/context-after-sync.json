@@ -1,0 +1,65 @@
+{
+  "tool": "get_docs_context",
+  "request": {
+    "question": "How do I prepare local project documentation?",
+    "project_path": "/tmp/opencode/p0-after-evd2h7nd/repo",
+    "scope": "all"
+  },
+  "wire": {
+    "_meta": null,
+    "content": [
+      {
+        "type": "text",
+        "text": "Structured DocAtlas result attached in structuredContent.",
+        "annotations": null,
+        "_meta": null
+      }
+    ],
+    "structuredContent": {
+      "status": "ok",
+      "kind": "docs_context",
+      "context_status": "ready",
+      "context_available": true,
+      "answer_supported": false,
+      "answer_available": false,
+      "support_status": "retrieval_only",
+      "answer_policy": "cite_only",
+      "coverage_policy": "retrieval_attribution_only",
+      "query_coverage": "full",
+      "retrieval_coverage": "full",
+      "facet_coverage": "unverified",
+      "covered_query_ids": [
+        "query-original"
+      ],
+      "missing_query_ids": [],
+      "missing_facets": [],
+      "facets": [],
+      "sources": [
+        {
+          "evidence_id": "ev-6224a105a31f85b0",
+          "path_or_url": "README.md",
+          "section": "Local project documentation",
+          "snippet": "# Local project documentation\n\nTo prepare local project documentation, call prepare_docs(action=\"sync_project_docs\"). This indexes repository docs before retrieval.",
+          "version_binding": "unversioned",
+          "content_sha256": "58c17f532f9d60b85589072485ab4005e1da35161e4069e3351ffe36bd6add0d",
+          "project_identity": "local:1b71e94960e0efaf3ba589ba478a2061b5ab5691eb81bfc04e9213b3b9308dc9",
+          "authority": "primary",
+          "scope": "project",
+          "line_start": 1,
+          "line_end": 3
+        }
+      ],
+      "context_quality": {
+        "status": "unverified",
+        "reasons": [
+          "coverage_unverified"
+        ]
+      },
+      "read_next": [],
+      "edit_ready": false,
+      "investigation_allowed": true,
+      "estimated_tokens": 290
+    },
+    "isError": false
+  }
+}

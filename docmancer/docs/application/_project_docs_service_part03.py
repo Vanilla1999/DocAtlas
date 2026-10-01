@@ -553,6 +553,7 @@ class _ProjectDocsServicePart03:
                     message=f"Module {resolved_module_path!r} exists, but no module docs were discovered for this scope.",
                 )
 
+        inspect_result: ProjectDocsInspectResult | None = None
         preflight_inspect: ProjectDocsInspectResult | None = None
         if not indexed_sources_all or stale_sources or ignored_sources:
             inspect_result = self.inspect_project_docs(str(root))
@@ -625,6 +626,15 @@ class _ProjectDocsServicePart03:
                 root=root,
                 query=query,
             )
+            if (
+                inspect_result is not None
+                and inspect_result.reason_code == "project_docs_found_not_indexed"
+                and (inspect_result.diagnostics.get("preflight") or {}).get("auto_sync_eligible")
+            ):
+                # Preserve the exact clean-Git witness already checked by
+                # inspection; rebuilding a generic sync action loses its digest.
+                next_action = inspect_result.next_action
+                arguments_patch = inspect_result.arguments_patch
             return ProjectDocsResult(
                 project_path=str(root),
                 query=query,
@@ -638,13 +648,11 @@ class _ProjectDocsServicePart03:
                 answer_available=False,
                 warnings=metadata.warnings,
                 candidate_sources=candidate_sources,
+                diagnostics=inspect_result.diagnostics if inspect_result is not None else {},
                 next_actions=[{
                     "tool": "prepare_docs",
                     "requires_confirmation": False,
-                    "arguments_patch": {
-                        "action": "sync_project_docs",
-                        **self._project_sync_arguments(root),
-                    },
+                    "arguments_patch": dict(next_action["arguments_patch"]),
                     "reason": "Project docs candidates were discovered but have not been indexed; reconcile the index.",
                 }],
                 message="Project docs candidates exist but are not indexed. Run sync_project_docs, then retry get_project_docs.",

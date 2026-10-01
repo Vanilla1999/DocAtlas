@@ -1,0 +1,7 @@
+{
+  "status": "PASS",
+  "phase": "before",
+  "recovery_tool": "code_search",
+  "recovery_reason_code": "no_candidates",
+  "fixture": "/tmp/opencode/p0-before-uzyk8_0r/repo"
+}

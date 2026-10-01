@@ -1,0 +1,31 @@
+{
+  "tool": "prepare_docs",
+  "request": {
+    "action": "sync_project_docs",
+    "plan_digest": "593abb68c71ae23fb966e0fda2ff03e31f088fed9d273580c1d8c1d97230df68",
+    "project_path": "/tmp/opencode/p0-after-evd2h7nd/repo",
+    "with_vectors": false
+  },
+  "wire": {
+    "_meta": null,
+    "content": [
+      {
+        "type": "text",
+        "text": "Structured DocAtlas result attached in structuredContent.",
+        "annotations": null,
+        "_meta": null
+      }
+    ],
+    "structuredContent": {
+      "status": "precondition_failed",
+      "reason_code": "clean_git_auto_sync_precondition_failed",
+      "requires_confirmation": true,
+      "confirmation_reason": "project_docs_preflight",
+      "git_status": "dirty",
+      "message": "Git HEAD, worktree cleanliness, or project-doc preflight changed before synchronization; no index mutation was performed.",
+      "action": "sync_project_docs",
+      "tool": "prepare_docs"
+    },
+    "isError": false
+  }
+}

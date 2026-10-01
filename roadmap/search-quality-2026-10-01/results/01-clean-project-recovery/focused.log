@@ -1,0 +1,187 @@
+........................................................................ [ 24%]
+..................F......F.............................................. [ 48%]
+........................................................................ [ 73%]
+........................................................................ [ 97%]
+......F                                                                  [100%]
+=================================== FAILURES ===================================
+_ test_query_project_docs_attributes_generic_retrieval_hints_without_covering_original _
+
+tmp_path = PosixPath('/tmp/pytest-of-viadmin/pytest-62/test_query_project_docs_attrib0')
+
+    def test_query_project_docs_attributes_generic_retrieval_hints_without_covering_original(tmp_path):
+        from docmancer.docs.application.evidence_selection import build_requirements
+    
+        project = tmp_path / "generic-hint"
+        project.mkdir()
+        question = "How are NebulaLedger orbital telemetry snapshots persisted?"
+    
+        class Agent:
+            config = SimpleNamespace(query=SimpleNamespace(default_limit=5))
+    
+            def query(self, query, *, limit, budget, expand, filters):
+                if query == "NebulaLedger":
+                    return [RetrievedChunk(
+                        source="docs/nebula.md",
+                        chunk_index=0,
+                        text="NebulaLedger persists orbital telemetry snapshots in SQLite.",
+                        score=1.0,
+                        metadata={
+                            "project_identity": filters["project_identity"],
+                            "token_estimate": 20,
+                            "lexical_match": {"qualified": True, "mode": "and"},
+                        },
+                    )]
+                return []
+    
+        class Facade:
+            def _agent_instance(self):
+                return Agent()
+    
+        chunks = ProjectDocsService(Facade()).query_project_docs(
+            str(project),
+            question,
+            requirements=build_requirements(question, profile="project_docs_answer"),
+        )
+    
+        assert len(chunks) == 1
+>       assert "query-hint-1" in chunks[0].metadata["retrieval_query_ids"]
+E       AssertionError: assert 'query-hint-1' in ('query-anchor-1', 'query-original')
+
+tests/test_docs_service_part02.py:782: AssertionError
+_____ test_project_query_does_not_return_non_project_docs_with_same_terms ______
+
+tmp_path = PosixPath('/tmp/pytest-of-viadmin/pytest-62/test_project_query_does_not_re0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7aecdc2ccec0>
+
+    def test_project_query_does_not_return_non_project_docs_with_same_terms(tmp_path, monkeypatch):
+        project = tmp_path / "app"
+        project.mkdir()
+        docs = project / "docs"
+        docs.mkdir()
+        distractor = (
+            "# Presentation plan notes\n\n"
+            "Phase 2.3 presentation-only snippets mention EvidenceRequirementSet, "
+            "SupportDecision, and decision_hash, but this supporting note does not "
+            "define the acceptance contract.\n"
+        )
+        for index in range(24):
+            (docs / f"note-{index:02d}.md").write_text(distractor, encoding="utf-8")
+        (project / "zz-authoritative-plan.md").write_text(
+            """# Approved retrieval plan
+    
+    ## Phase 2.3: presentation-only snippets
+    
+    EvidenceRequirementSet and SupportDecision are canonical selector inputs.
+    Presentation cannot determine support or drop a mandatory-facet witness.
+    Every public mode preserves the same decision_hash and selected evidence IDs.
+    
+    ## Phase 3.1: dispatcher reuse
+    
+    Library lexical retrieval invokes RetrievalDispatcher with the raw topic unchanged.
+    EvidenceRequirementSet supplies recall hints but never a second support decision.
+    The first production mode remains lexical and must not call vectors or embeddings.
+    
+    ## Phase 3.1: index-witness retrieval-miss classification
+    
+    Files:
+    
+    - docmancer/docs/application/library_docs_service.py
+    - docmancer/docs/infrastructure/agent_index_gateway.py
+    
+    Classify retrieval_miss only when the complete same-library, exact-version corpus
+    contains mandatory-requirement witnesses confirmed by a bounded index-level probe
+    outside the selected candidates. Never infer retrieval_miss from an empty candidate
+    list. Keep the default lexical path provider-free: it makes no vector, embedding,
+    or provider calls.
+    """,
+            encoding="utf-8",
+        )
+        (project / "README.md").write_text(
+            "# Project overview\n\nThis repository owns the approved retrieval plan.\n",
+            encoding="utf-8",
+        )
+        (project / "docatlas.project-docs.yaml").write_text(
+            """schema_version: 1
+    documents:
+      - path: zz-authoritative-plan.md
+        role: development
+        scope: project
+        description: Approved implementation plan and acceptance contract.
+        authority: source_of_truth
+        status: active
+        impact: track
+      - path: README.md
+        role: overview
+        scope: project
+        description: Project overview.
+        authority: supporting
+        status: active
+        impact: track
+    roots:
+      - path: docs
+        scope: project
+        authority: supporting
+    """,
+            encoding="utf-8",
+        )
+        service = _service_with_real_agent(tmp_path, monkeypatch)
+        ingest = service.ingest_project_docs(str(project), with_vectors=False)
+        assert ingest.status == "success", ingest.message
+    
+        question = (
+            "What exact Phase 2.3 presentation-only snippet contract governs "
+            "EvidenceRequirementSet, SupportDecision, and decision_hash?"
+        )
+        payload = handle_context_tool(
+            "get_docs_context",
+            {
+                "question": question,
+                "project_path": str(project),
+                "mode": "project",
+                "delivery_strategy": "bounded_direct",
+            },
+            service,
+        )
+    
+        assert payload is not None
+        assert payload["status"] == "ok"
+        assert payload["kind"] == "docs_context"
+        assert payload["answer_supported"] is False
+        assert payload["edit_ready"] is False
+        assert payload["sources"][0]["path_or_url"] == "zz-authoritative-plan.md"
+>       assert all(
+            not source["path_or_url"].startswith("docs/note-")
+            for source in payload["sources"]
+        ), payload["sources"]
+E       AssertionError: [{'authority': 'source_of_truth', 'content_sha256': 'd801250345513d303b5ead308ca62734b3c97afab19a9edc0f05c82c6c790490'...75fb0a8782287248a8765340e92389614462c52f71edbd73e06d18c89b', 'evidence_id': 'ev-15e6e8c0a49d2b83', 'line_end': 3, ...}]
+E       assert False
+E        +  where False = all(<generator object test_project_query_does_not_return_non_project_docs_with_same_terms.<locals>.<genexpr> at 0x7aecdc31b920>)
+
+tests/test_docs_service_part03.py:101: AssertionError
+______ test_frozen_request_flow_prefers_project_context_module_witnesses _______
+
+    def test_frozen_request_flow_prefers_project_context_module_witnesses():
+        from eval.project_context_quality_v2_protocol import evaluate_case, load_cases
+        from scripts.run_project_docs_self_host_gate import LiveCase, run
+    
+        case = next(row for row in load_cases() if row["id"] == "v2-natural-request-flow")
+        result = run(cases=(LiveCase(
+            case_id=case["id"], question=case["question"], relevant_paths=(),
+            lookup_queries=tuple(case["lookup_queries"]), scope=case["scope"],
+        ),), negative_cases=())
+        payload = result["results"][0]["payload"]
+        verdict = evaluate_case(case, payload)
+        assert "docs/modules/project-context-retrieval.md" in {
+            source["path_or_url"] for source in payload["sources"]
+        }
+>       assert all(row["met"] for row in verdict["obligations"]), verdict["obligations"]
+E       AssertionError: [{'id': 'flow_mcp', 'lookup_query_ids': ['query-lookup-1'], 'met': False, 'visible_witnesses': []}, {'id': 'flow_appli...ible_witnesses': [{'evidence_id': 'ev-8ae1789c9c28bae9', 'path_or_url': 'docs/modules/project-context-retrieval.md'}]}]
+E       assert False
+E        +  where False = all(<generator object test_frozen_request_flow_prefers_project_context_module_witnesses.<locals>.<genexpr> at 0x7aecdc6c5220>)
+
+tests/docs/test_context_projection_boundaries.py:236: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_docs_service_part02.py::test_query_project_docs_attributes_generic_retrieval_hints_without_covering_original
+FAILED tests/test_docs_service_part03.py::test_project_query_does_not_return_non_project_docs_with_same_terms
+FAILED tests/docs/test_context_projection_boundaries.py::test_frozen_request_flow_prefers_project_context_module_witnesses
+3 failed, 292 passed in 48.25s

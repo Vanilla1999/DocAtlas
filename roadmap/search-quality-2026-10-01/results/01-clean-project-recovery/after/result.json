@@ -1,0 +1,7 @@
+{
+  "status": "PASS",
+  "phase": "after",
+  "recovery_tool": "prepare_docs",
+  "recovery_reason_code": "project_docs_found_not_indexed",
+  "fixture": "/tmp/opencode/p0-after-9uvltm4f/repo"
+}

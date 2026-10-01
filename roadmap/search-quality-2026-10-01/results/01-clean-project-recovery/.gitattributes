@@ -1,0 +1,2 @@
+# Preserve verbatim pytest output, including its whitespace-only lines.
+*.log whitespace=-blank-at-eol

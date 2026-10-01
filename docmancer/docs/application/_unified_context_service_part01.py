@@ -244,6 +244,18 @@ class _UnifiedDocsContextServicePart01:
             operational_reason_code, module_candidates = _project_module_recovery_metadata(
                 project_result, module=module, module_path=module_path,
             )
+            project_docs = getattr(project_result, "project_docs", None)
+            if (
+                mode_selected == "project"
+                and not project_items
+                and not project_result.requires_confirmation
+                and project_docs is not None
+                and project_docs.reason_code == "project_docs_found_not_indexed"
+                and (project_docs.diagnostics.get("preflight") or {}).get("auto_sync_eligible")
+            ):
+                # An empty clean project index is a readiness failure, not a
+                # semantic retrieval miss. Keep its checked preparation reason.
+                operational_reason_code = project_docs.reason_code
             lanes["project"] = {
                 "status": project_result.status,
                 "source_count": len([i for i in project_items if i.get("doc_scope") in {"project", "module"}]),

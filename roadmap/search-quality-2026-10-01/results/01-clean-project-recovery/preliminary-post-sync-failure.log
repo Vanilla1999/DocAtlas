@@ -1,0 +1,28 @@
+...................F                                                     [100%]
+=================================== FAILURES ===================================
+__________ test_public_recovery_sync_then_retry_returns_current_quote __________
+
+tmp_path = PosixPath('/tmp/pytest-of-viadmin/pytest-58/test_public_recovery_sync_then0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x76bf47eb3e00>
+
+    def test_public_recovery_sync_then_retry_returns_current_quote(tmp_path, monkeypatch):
+        root = _project(tmp_path)
+        service = _service_with_real_agent(tmp_path, monkeypatch)
+        payload = _context(service, root, scope="all")
+        action = payload["recommended_next_action"]
+        assert action["tool"] == "prepare_docs"
+    
+        prepared = handle_prefetch_tool(action["tool"], action["arguments_patch"], service)
+        assert prepared is not None and prepared["status"] == "success"
+        retried = _context(service, root, scope="all")
+    
+>       assert retried["status"] == "ok"
+E       AssertionError: assert 'insufficient_evidence' == 'ok'
+E         
+E         - ok
+E         + insufficient_evidence
+
+tests/test_clean_project_context_recovery.py:193: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_clean_project_context_recovery.py::test_public_recovery_sync_then_retry_returns_current_quote
+1 failed, 19 passed in 4.43s

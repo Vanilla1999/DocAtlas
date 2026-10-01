@@ -1,0 +1,58 @@
+{
+  "tool": "get_docs_context",
+  "request": {
+    "question": "How do I prepare local project documentation?",
+    "project_path": "/tmp/opencode/p0-after-evd2h7nd/repo",
+    "scope": "all"
+  },
+  "wire": {
+    "_meta": null,
+    "content": [
+      {
+        "type": "text",
+        "text": "Structured DocAtlas result attached in structuredContent.",
+        "annotations": null,
+        "_meta": null
+      }
+    ],
+    "structuredContent": {
+      "status": "insufficient_evidence",
+      "kind": "docs_context",
+      "missing": [
+        "No safe, current, project-scoped documentation context was retrieved."
+      ],
+      "estimated_tokens": 263,
+      "context_quality": {
+        "status": "unavailable",
+        "reasons": [
+          "source_unavailable"
+        ]
+      },
+      "read_next": [],
+      "recommended_next_action": {
+        "tool": "prepare_docs",
+        "arguments_patch": {
+          "action": "sync_project_docs",
+          "plan_digest": "593abb68c71ae23fb966e0fda2ff03e31f088fed9d273580c1d8c1d97230df68",
+          "project_path": "/tmp/opencode/p0-after-evd2h7nd/repo",
+          "with_vectors": false
+        },
+        "requires_confirmation": false,
+        "reason": "Project docs candidates were discovered but have not been indexed; reconcile the index.",
+        "auto_execute": false
+      },
+      "operational_reason_code": "project_docs_found_not_indexed",
+      "context_available": false,
+      "documentation_supported": false,
+      "investigation_allowed": true,
+      "hard_stop": false,
+      "recovery_origin": "operational",
+      "recovery_reason_code": "project_docs_found_not_indexed",
+      "recovery_disposition": "use_operational_recovery",
+      "answer_supported": false,
+      "answer_available": false,
+      "support_status": "insufficient_evidence"
+    },
+    "isError": false
+  }
+}
