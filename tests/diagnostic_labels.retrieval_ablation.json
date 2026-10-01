@@ -10,8 +10,8 @@
   "node_overrides": {},
   "module_node_hashes": {
     "tests/docs/test_retrieval_ablation_contract.py": "067099036ddd2fb7711611d64f0dbfedd3f31dc7b31d6a18f9caafc8aff4ed91",
-    "tests/docs/test_retrieval_ablation_integration.py": "86652bbfb6f64907893135dc109116f42525243cc2aa81015a04718c36a3eff9",
-    "tests/docs/test_retrieval_ablation_packet.py": "d6bf8b6d0670e144aa541581541c4157fdcc0e342b57ad1c3cb4e80c43afeb32",
+    "tests/docs/test_retrieval_ablation_integration.py": "f865e8653f6e7a93a2c91747b2b77bf9e79cccc1aace5bde73c7c9272eabf438",
+    "tests/docs/test_retrieval_ablation_packet.py": "539086c25df1cf0618023117e73ff9e117c7878002d6a6b50fa3166363b2ed45",
     "tests/docs/test_retrieval_ablation_isolation.py": "7d1f83e3760f37242fdfb84acf5ae120a98e74b33aed4dfbd8713f75b2b6dc89",
     "tests/docs/test_retrieval_ablation_regressions.py": "34b817aaf1411bba527a104598593d6fdc09d2eaa70ccd32b1bf5e0b55c61297"
   }

@@ -251,6 +251,27 @@ def test_b_arm_reuses_native_pipeline_with_only_structural_fts_change(tmp_path):
     assert result['packet_audit_errors'] == []
 
 
+def test_e_gr_l_orders_real_gate_output_without_another_search(tmp_path):
+    from experiments.retrieval_ablation.run import _execute_arm
+    corpus = tmp_path / 'corpus'
+    corpus.mkdir()
+    raw = b'# Retry\n\nThe retry budget is three attempts. Do not retry cancellation.\n'
+    (corpus / 'retry.md').write_bytes(raw)
+    spec = {'schema_version': 1, 'sources': [
+        {'path': 'retry.md', 'sha256': hashlib.sha256(raw).hexdigest()}]}
+    protocol = {'max_sections_per_source': 2, 'raw_hits': 40, 'unique_candidates': 20}
+    result = _execute_arm(corpus, spec, {'question': 'retry budget'}, protocol, 'E_GR_L')
+    assert result['execution_status'] == 'EXECUTED', result
+    assert result['ordering_component'] == 'context_candidate_ranking._facet_aware_candidates'
+    assert result['paired_E_G_candidate_pool_sha256'] == result['candidate_pool_sha256']
+    assert result['paired_E_G_control']['packet_audit_errors'] == []
+    assert result['gate_output_sha256'] == result['paired_E_G_control']['gate_output_sha256']
+    assert result['search_count'] == result['paired_E_G_search_count']
+    assert result['packet_audit_errors'] == []
+    assert all(t['qualified'] for t in result['ordering_qualification_traces'])
+    assert not result['model_visible_packet']['answer_supported']
+
+
 def test_d_l_reuses_b_candidate_pool_and_search_count(tmp_path):
     from experiments.retrieval_ablation.run import _execute_arm
     corpus = tmp_path / 'corpus'

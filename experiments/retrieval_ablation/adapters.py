@@ -157,7 +157,7 @@ def _eligible_rows(store, connection, trace, filters, sources):
         len(row['display_text'].encode('utf-8')) for row in rows)
 
 
-def native_diagnostic(store, queries, *, filters, sources, raw_limit=40, unique_limit=20, assembly='none', soft_gate='ablate'):
+def native_diagnostic(store, queries, *, filters, sources, raw_limit=40, unique_limit=20, assembly='none', soft_gate='ablate', legacy_ordering=False):
     """A's native scorer diagnostic, with policy BEFORE bounded exposure.
 
     Scope is intentionally limited to isolated, manifest-listed project docs.
@@ -255,12 +255,16 @@ def native_diagnostic(store, queries, *, filters, sources, raw_limit=40, unique_
                 # project identity changes, so they are not the causal control.
                 paired_control = deepcopy(packet_port.pack(candidates, trace.lanes))
                 packet_result = packet_port.pack_structural(
-                    candidates, trace.lanes, strict_soft_gate=(soft_gate == 'legacy'))
+                    candidates, trace.lanes, strict_soft_gate=(soft_gate == 'legacy'),
+                    legacy_ordering=legacy_ordering)
                 result['paired_B_control'] = paired_control
                 result['paired_B_candidate_pool_sha256'] = candidate_pool_sha256
                 if soft_gate == 'legacy':
                     result['paired_D_candidate_pool_sha256'] = candidate_pool_sha256
                     result['paired_D_search_count'] = result['search_count']
+                if legacy_ordering:
+                    result['paired_E_G_candidate_pool_sha256'] = candidate_pool_sha256
+                    result['paired_E_G_search_count'] = result['search_count']
             else:
                 packet_result = packet_port.pack(candidates, trace.lanes,
                                                  strict_soft_gate=(soft_gate == 'legacy'))

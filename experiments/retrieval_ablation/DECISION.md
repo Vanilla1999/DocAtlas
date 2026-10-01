@@ -45,3 +45,20 @@ A new freeze is required whenever code, inputs or parameters change.
 No simplification patch, threshold change, product activation, merge or quality
 non-inferiority claim is approved by this report. A result of INCONCLUSIVE is not
 a finding of equivalence and not permission to remove all heuristics.
+# Local T07 development decision — 2026-10-01
+
+Evidence: [CONTINUATION_T07.md](CONTINUATION_T07.md), 11 answerable questions,
+same-author posthoc review, one public document. Not product acceptance.
+
+| Block | Decision | Evidence / next patch |
+|---|---|---|
+| Source, reference, canonical, authority checks | KEEP | All 72 packets audit-clean; no authorization granted. |
+| FTS representation B | NOT_EVALUATED for ownership repair | 8/11 like A; only index fields changed, original T05 incomplete. |
+| Bounded owner-local assembly | OPTIONAL experimental | Same-call +1/0/10; test further families, do not activate yet. |
+| Lexical ratio gate | KEEP pending remove-one | Same-call 0/2/9; investigate ratio-only removal on actual P without changing hard checks. |
+| Candidate ordering pass | NOT_EVALUATED for removal | 0/0/11 is inconclusive, not equivalence; full legacy packing not measured. |
+| Dense/hybrid and answerer | NOT_EVALUATED | Not run, no models downloaded. |
+
+No product defaults changed or heuristic deletions proposed for merge. The next
+minimal experimental patch is a real-P ratio-only remove-one control for cases
+4/6, followed by multiple document families. Historical decisions follow.

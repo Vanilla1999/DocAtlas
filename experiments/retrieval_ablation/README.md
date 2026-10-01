@@ -1,5 +1,10 @@
 # Retrieval ablation: isolated T00–T04 project slice
 
+Current continuation: [CONTINUATION_T07.md](CONTINUATION_T07.md). Applied staging
+patches now provide B/D_L/E_G_L; E_GR_L measures a real candidate-ordering pass,
+not the whole legacy packing package. Original T05 ownership work remains partial.
+The 72-run development replay used ordinary processes, not namespace isolation.
+
 Opt-in experiments only. Product code, MCP schema, defaults, `uv.lock`, frozen
 protocols/labels and MPNet threshold are unchanged. Original base is
 `55637eb4d29a0d06c01714ee647a5b486a5be725`. Historical CI and its two unexplained

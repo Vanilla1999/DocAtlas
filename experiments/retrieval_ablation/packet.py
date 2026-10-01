@@ -117,7 +117,7 @@ class ProjectPacketPort:
                 allowed.append(key)
         return allowed
 
-    def pack(self, candidates, lanes, *, strict_soft_gate=False):
+    def pack(self, candidates, lanes, *, strict_soft_gate=False, legacy_ordering=False):
         """Rank-order whole units; optionally restore the legacy visible-match gate."""
         from docmancer.docs.application._docs_context_payload import _payload
         from docmancer.docs.application.context_selection import context_selection_decision
@@ -130,6 +130,39 @@ class ProjectPacketPort:
         seen = set()
         counts = {}
         requested_ids = ['query-original', *[f'query-host-{i}' for i in range(1, len(self.queries))]]
+        ordering_traces = []
+        gate_output_sha256 = None
+        ranked_inputs = []
+        if strict_soft_gate:
+            for index, candidate in enumerate(candidates):
+                row = candidate['row']
+                query = lanes[candidate['lane']]['query']
+                original, _ = self.prepared[(row['stable_chunk_id'], query)]
+                qualification = self.qualify(original, query)
+                if not qualification.qualified:
+                    continue
+                query_id = requested_ids[self.queries.index(query)]
+                trace = deepcopy(qualification.trace)
+                ordering_traces.append(trace)
+                ranked_inputs.append({**deepcopy(original),
+                    'retrieval_query_matches': {query_id: trace}, '_ablation_index': index})
+            import hashlib
+            gate_output_sha256 = hashlib.sha256(json.dumps(ranked_inputs, sort_keys=True,
+                ensure_ascii=False, default=str).encode('utf-8')).hexdigest()
+        if legacy_ordering:
+            if not strict_soft_gate:
+                raise ValueError('legacy ordering requires the real legacy gate')
+            from docmancer.docs.application.context_candidate_ranking import _facet_aware_candidates
+            ranked = _facet_aware_candidates(ranked_inputs,
+                query_text=dict(zip(requested_ids, self.queries)),
+                required_query_ids=set(requested_ids),
+                host_query_ids=set(requested_ids[1:]))
+            # Reorder only. Real traces remain private; the public packet never
+            # receives certification from this diagnostic preference component.
+            ordered_indices = [item['_ablation_index'] for item in ranked]
+            admitted = set(ordered_indices)
+            candidates = [candidates[i] for i in ordered_indices] + [
+                c for i, c in enumerate(candidates) if i not in admitted]
 
         def render(rows):
             return _payload(rows, decision=context_selection_decision(rows, requested_ids))
@@ -193,7 +226,13 @@ class ProjectPacketPort:
                 'soft_ablation': ('none; legacy visible-match gate restored' if strict_soft_gate
                                   else 'lexical_ratio_only; other rejection reasons retained'),
                 'soft_relevance_mode': 'legacy' if strict_soft_gate else 'ratio_ablation',
-                'qualification_traces': [dict(q.trace) for _, q in self.prepared.values()]}
+                'qualification_traces': [dict(q.trace) for _, q in self.prepared.values()],
+                'ordering_component': ('context_candidate_ranking._facet_aware_candidates'
+                                       if legacy_ordering else 'rank_order'),
+                'ordering_qualification_traces': ordering_traces,
+                'gate_output_sha256': gate_output_sha256,
+                'gate_output_count': len(ranked_inputs) if strict_soft_gate else None,
+                'ordering_scope': 'single candidate ordering pass; whole-unit packer unchanged'}
 
     @staticmethod
     def _assembled_identity(row, start, end):
@@ -224,7 +263,7 @@ class ProjectPacketPort:
         )
         return assembled
 
-    def pack_structural(self, candidates, lanes, *, strict_soft_gate=False):
+    def pack_structural(self, candidates, lanes, *, strict_soft_gate=False, legacy_ordering=False):
         """Pack the exact B ranked pool after one bounded owner-local closure.
 
         The closure performs no retrieval and has no access to review labels. For
@@ -323,8 +362,12 @@ class ProjectPacketPort:
 
         if strict_soft_gate:
             paired_d_control = deepcopy(self.pack(assembled_candidates, lanes, strict_soft_gate=False))
-            result = self.pack(assembled_candidates, lanes, strict_soft_gate=True)
+            paired_e_g_control = deepcopy(self.pack(assembled_candidates, lanes, strict_soft_gate=True))
+            result = (self.pack(assembled_candidates, lanes, strict_soft_gate=True, legacy_ordering=True)
+                      if legacy_ordering else deepcopy(paired_e_g_control))
             result['paired_D_control'] = paired_d_control
+            if legacy_ordering:
+                result['paired_E_G_control'] = paired_e_g_control
         else:
             result = self.pack(assembled_candidates, lanes, strict_soft_gate=False)
         result.update(assembly_policy='owner_neighbors_v1', assembly_reads=assembly_reads,

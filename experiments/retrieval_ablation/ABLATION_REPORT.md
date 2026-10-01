@@ -111,3 +111,8 @@ quality confidence interval, remove-one-on-P result, or production cost study.
 Consequently every proposed deletion/replacement of a retrieval mechanism
 remains NOT_EVALUATED. DECISION.md follows this evidence rather than selecting a
 winner in advance.
+# Latest local continuation
+
+See [CONTINUATION_T07.md](CONTINUATION_T07.md) for the actual PR source-tree audit,
+restored staged implementation, T07 ordering diagnostic and 72 real development
+runs. The older report below is historical, not the current capability inventory.

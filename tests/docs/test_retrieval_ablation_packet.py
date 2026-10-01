@@ -75,6 +75,41 @@ def test_whole_units_skip_oversized_without_truncating_conditions(tmp_path):
     assert result['packet_audit_errors'] == []
 
 
+def test_legacy_ordering_calls_production_ranker_with_real_traces(tmp_path, monkeypatch):
+    from docmancer.docs.application import context_candidate_ranking
+    store, sources, filters = project_store(tmp_path, {
+        'docs/one.md': '# Retry\n\nThe retry budget is three attempts.\n',
+        'docs/two.md': '# Retry\n\nUse the retry budget only for transient failures.\n'})
+    called = []
+    ranker = context_candidate_ranking._facet_aware_candidates
+
+    def observe(candidates, **kwargs):
+        called.append(deepcopy(candidates))
+        assert all(c['retrieval_query_matches']['query-original']['qualified'] for c in candidates)
+        return ranker(candidates, **kwargs)
+
+    monkeypatch.setattr(context_candidate_ranking, '_facet_aware_candidates', observe)
+    def forbidden(*args, **kwargs):
+        raise AssertionError('another product retrieval was called')
+    monkeypatch.setattr(SQLiteStore, 'query', forbidden)
+    from experiments.retrieval_ablation.adapters import reproject_structural_fts
+    reproject_structural_fts(store)
+    result = native_diagnostic(store, ['retry budget'], filters=filters, sources=sources,
+                              assembly='owner_neighbors_v1', soft_gate='legacy', legacy_ordering=True)
+    assert len(called) == 1 and len(called[0]) == 2
+    assert result['paired_E_G_control']['model_visible_packet']['sources']
+    assert result['ordering_qualification_traces'] == [
+        c['retrieval_query_matches']['query-original'] for c in called[0]]
+    assert result['packet_audit_errors'] == []
+    assert result['model_visible_packet']['covered_query_ids'] == []
+    from experiments.retrieval_ablation.review import summarize
+    result.update(arm='E_GR_L', freeze_sha256='same')
+    summary = summarize([result], planned_arms=('B', 'D_L', 'E_G_L', 'E_GR_L'))
+    assert summary['planned_runs'] == 4
+    assert summary['missing_arms'] == ['B', 'D_L', 'E_G_L']
+    assert summary['execution_counts'] == {'EXECUTED': 1}
+
+
 def test_native_project_packet_never_calls_custom_ordering(tmp_path, monkeypatch):
     store, sources, filters = project_store(tmp_path)
     def forbidden(*args, **kwargs):
