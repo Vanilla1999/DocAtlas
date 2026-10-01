@@ -268,4 +268,7 @@ def test_d_l_reuses_b_candidate_pool_and_search_count(tmp_path):
     assert b['search_count'] == d['search_count']
     assert d['arm'] == 'D_L'
     assert d['assembly_policy'] == 'owner_neighbors_v1'
+    assert d['paired_B_candidate_pool_sha256'] == d['candidate_pool_sha256']
+    assert d['paired_B_control']['packet_audit_errors'] == []
+    assert d['paired_B_control']['packet_status'] == 'VALIDATED_PROJECT_PACKET'
     assert d['packet_audit_errors'] == []

@@ -245,9 +245,18 @@ def native_diagnostic(store, queries, *, filters, sources, raw_limit=40, unique_
             'source_text_bytes': sum(len(row['text'].encode('utf-8'))
                 for lane in trace.lanes for row in lane['rows'])}
         if packet_port is not None:
-            packet_result = (packet_port.pack_structural(candidates, trace.lanes)
-                             if assembly == 'owner_neighbors_v1'
-                             else packet_port.pack(candidates, trace.lanes))
+            if assembly == 'owner_neighbors_v1':
+                # T06 is a packing contrast, not a second retrieval.  Preserve the
+                # exact unassembled B packet from this same candidate list before
+                # any owner-local reads mutate packet-port diagnostics.  Standalone
+                # B runs may receive a different stable tie order when their temp
+                # project identity changes, so they are not the causal control.
+                paired_control = deepcopy(packet_port.pack(candidates, trace.lanes))
+                packet_result = packet_port.pack_structural(candidates, trace.lanes)
+                result['paired_B_control'] = paired_control
+                result['paired_B_candidate_pool_sha256'] = candidate_pool_sha256
+            else:
+                packet_result = packet_port.pack(candidates, trace.lanes)
             result.update(packet_result)
             result['evaluation_kind'] = ('native_fts_project_structural_assembly_packet'
                                          if assembly == 'owner_neighbors_v1'
