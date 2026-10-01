@@ -359,6 +359,23 @@ def project_docs_context(
         for variant in variants:
             prepared.append(variant)
             variant_inputs[id(variant)] = (original, raw_snippet, focus_queries, assigned_requirement_ids)
+    # Context proposals join the same finite pool before selection. Their
+    # source/identity/condition admission is recomputed, not copied from flags.
+    from .need_context_projection import precedence_context_variants, set_context_variants
+    context_needs = {}
+    selected_context_needs: set[str] = set()
+    context_candidates = [item for item in initially_ranked if isinstance(item, dict)
+                          and (not explicit_paths or
+                               _normalized_path(item.get('path') or '') in explicit_paths)]
+    for propose in (precedence_context_variants, set_context_variants):
+        for original, variant, needs in propose(
+            context_candidates, query_plan=query_plan,
+            expected_project_identity=expected_project_identity,
+            max_tokens=max_tokens, diagnostics=projection_diagnostics,
+        ):
+            prepared.append(variant)
+            variant_inputs[id(variant)] = (original, variant['snippet'], (), ())
+            context_needs[id(variant)] = frozenset(needs)
     selected_host_query_ids: set[str] = set()
     while prepared:
         decision_trace.state["variant_attempts"] += 1
@@ -415,8 +432,35 @@ def project_docs_context(
             missing_mandatory_ids=missing_required_ids,
             missing_component_ids=mandatory_component_ids - selected_components,
         )
+        # Preserve already proven components before spending budget on a
+        # context-only relation. Prefer an intact compact relation to topic-only
+        # lexical hits; this preference supplies no public attribution/proof.
+        if context_needs:
+            prepared.sort(key=lambda item: (
+                bool(component_witnesses(item, obligations)),
+                bool(context_needs.get(id(item), frozenset()) - selected_context_needs),
+                -len(item['snippet']) if id(item) in context_needs else 0,
+            ), reverse=True)
         variant = prepared.pop(0)
         original, raw_snippet, focus_queries, assigned_requirement_ids = variant_inputs[id(variant)]
+        if id(variant) in context_needs:
+            novel = context_needs[id(variant)] - selected_context_needs
+            if not novel or len(sources) >= MAX_DOCS_SOURCES or variant['evidence_id'] in seen_ids:
+                continue
+            candidate_sources = [*sources, variant]
+            decision = context_selection_decision(candidate_sources, public_query_ids)
+            packet_cost = docs_context_budget_tokens(_payload(
+                candidate_sources, decision=decision, query_plan=query_plan,
+            ))
+            if packet_cost > max_tokens:
+                continue
+            sources = candidate_sources
+            snapshot[variant['evidence_id']] = _snapshot_entry(original, variant)
+            seen_ids[variant['evidence_id']] = len(sources) - 1
+            selected_context_needs.update(novel)
+            decision_trace.record('selection', 'accepted', 'checked_context', original,
+                                  variant, budget_tokens=packet_cost)
+            continue
         candidate_footprint = variant_footprints.get(id(variant))
         candidate_id = _internal_candidate_id(original)
         existing_index = seen_ids.get(variant["evidence_id"])
@@ -618,6 +662,15 @@ def project_docs_context(
         if candidate_footprint is not None:
             selected_footprints[evidence_id] = candidate_footprint
         selected_host_query_ids.update(host_ids)
+    if not sources and (_allow_context_hints or not fallback_ids):
+        from .need_context_projection import project_need_context_fallback
+        contextual = project_need_context_fallback(
+            initially_ranked, query_plan=query_plan,
+            expected_project_identity=expected_project_identity,
+            max_tokens=max_tokens, diagnostics=projection_diagnostics,
+        )
+        if contextual is not None:
+            return contextual
     if not sources:
         if fallback_ids and not _allow_context_hints:
             # Decide fallback after visible qualification and complete DTO

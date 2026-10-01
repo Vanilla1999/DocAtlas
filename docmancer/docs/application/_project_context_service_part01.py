@@ -69,6 +69,9 @@ class _ProjectContextServicePart01:
             explicit_path=evidence_path,
             requirements=canonical_requirements,
         )
+        from .need_query_schedule import scheduled_plan, requirement_search_probes
+        documentation_query_plan, _ = scheduled_plan(documentation_query_plan,
+            supplemental_queries=requirement_search_probes(canonical_requirements))
         metadata = self.facade.read_project_metadata(str(root))
         project_docs = None
         if mode in {"auto", "project-only"}:
@@ -97,6 +100,18 @@ class _ProjectContextServicePart01:
                             if normalize_doc_path(chunk.path) == normalized_evidence_path
                         ],
                     )
+                from .need_context_projection import set_context_variants
+                checked_sets = {
+                    original.get('stable_chunk_id')
+                    for original, _, _ in set_context_variants(
+                        project_context_pack(question=question, project_docs=project_docs, dependency_docs=None),
+                        query_plan=documentation_query_plan.as_payload(),
+                        expected_project_identity=project_docs.results[0].project_identity,
+                        max_tokens=800, diagnostics={},
+                    )
+                }
+                context_candidate_ids = frozenset(id(chunk) for chunk in project_docs.results
+                                                 if chunk.stable_chunk_id in checked_sets)
                 project_docs = replace(
                     project_docs,
                     results=rerank_project_doc_chunks(
@@ -106,6 +121,7 @@ class _ProjectContextServicePart01:
                         limit=limit,
                         broad_max_per_source=4 if evidence_path else 2,
                         lifecycle_intent_value=canonical_requirements.lifecycle_intent,
+                        context_candidate_ids=context_candidate_ids,
                     ),
                 )
                 routing_stage_observed["project_docs"] = list(project_docs.results)

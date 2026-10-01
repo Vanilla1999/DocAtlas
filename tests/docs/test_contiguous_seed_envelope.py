@@ -85,8 +85,13 @@ def test_old_inspection_uri_survives_replacement_of_unissued_draft_locators(tmp_
     request = {'question': case['question'], 'project_path': str(root), 'scope': 'all'}
     with isolated_service(tmp_path / 'state') as (service, config):
         index_project(service, config, root)
-        with patch('docmancer.docs.application.query_block_recovery.select_query_block_recovery',
-                   side_effect=lambda p, b, r, **kw: (p, b)):
+        # Force the old draft shape only on the first call. Otherwise early
+        # delivery already supplies the rule and both calls issue the same
+        # idempotent, single-use continuation: that is not a replacement test.
+        with (patch('docmancer.docs.application.query_block_recovery.select_query_block_recovery',
+                    side_effect=lambda p, b, r, **kw: (p, b)),
+              patch('docmancer.docs.application.need_context_projection.precedence_context_variants',
+                    side_effect=lambda *args, **kwargs: iter(()))):
             before, _ = observe_call(service, request)
         if before.get('read_next'):
             old = before['read_next'][0]
@@ -94,13 +99,32 @@ def test_old_inspection_uri_survives_replacement_of_unissued_draft_locators(tmp_
             source = next(s for s in before['sources'] if s.get('source_uri'))
             old = {'source_uri': source['source_uri'], 'path': source['path_or_url'],
                    'line_start': source['line_end'] + 1}
-        after, _ = observe_call(service, request)
-        assert after['read_next']
+        after, trace = observe_call(service, request)
+        fact = case['required_claims'][0]['witness_sets'][0]['parts'][0]['text']
+        assert any(fact in s['snippet'] for s in after['sources'])
+        assert audit_payload(after, trace['snapshot'], root) == []
+        assert docs_context_budget_tokens(after) <= 800
+        assert len(after['sources']) <= 3
+        assert all(after[key] is False for key in ('answer_supported', 'answer_available', 'edit_ready'))
+        if after.get('read_next'):
+            new = after['read_next'][0]
+        else:
+            source = next(s for s in after['sources'] if s.get('source_uri'))
+            new = {'source_uri': source['source_uri'], 'path': source['path_or_url'],
+                   'line_start': source['line_end'] + 1}
+        assert old['source_uri'] != new['source_uri'], 'scenario must actually replace a locator'
         previous_read = json.loads(read_docs_resource(old['source_uri'], service)['text'])
         assert previous_read['line_start'] == old['line_start']
         raw = docs[old['path']]
         assert previous_read['snippet'] in '\n'.join(raw.splitlines()[previous_read['line_start']-1:previous_read['line_end']])
-        new = after['read_next'][0]
+        replay = json.loads(read_docs_resource(old['source_uri'], service)['text'])
+        assert replay['status'] == 'source_unavailable'
+        assert replay['reason_code'] == 'unknown_or_expired_reference'
         current_read = json.loads(read_docs_resource(new['source_uri'], service)['text'])
-        fact = case['required_claims'][0]['witness_sets'][0]['parts'][0]['text']
-        assert fact in current_read['snippet']
+        assert current_read['line_start'] == new['line_start']
+        raw = docs[new['path']]
+        assert current_read['snippet'] in '\n'.join(
+            raw.splitlines()[current_read['line_start']-1:current_read['line_end']])
+        replay = json.loads(read_docs_resource(new['source_uri'], service)['text'])
+        assert replay['status'] == 'source_unavailable'
+        assert replay['reason_code'] == 'unknown_or_expired_reference'
