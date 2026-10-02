@@ -21,6 +21,16 @@ class _RetrievalDispatcherPart01:
         self.collection = collection
         self._auto_hierarchical_cache: bool | None = None
 
+    def run_project_passages(self, question, *, project_identity, filters=None,
+                             limit=12, budget=2400):
+        if self.config.retrieval.budget is not None:
+            budget = min(budget, self.config.retrieval.budget)
+        if self.config.retrieval.limit is not None:
+            limit = min(limit, self.config.retrieval.limit)
+        return self.store.query_passages(question, filters={
+            **(filters or {}), 'project_identity': project_identity}, limit=limit,
+            budget=budget, max_per_source=self.config.retrieval.max_sections_per_source or 2)
+
     def vector_readiness(self, mode: str | None = None) -> dict[str, Any]:
         """Return the versioned bounded public readiness contract."""
         effective_mode = str(mode or self.config.retrieval.default_mode or "lexical").lower()

@@ -13,8 +13,9 @@ from ._sqlite_store_part03 import _SQLiteStorePart03
 from ._sqlite_store_part04 import _SQLiteStorePart04
 
 from ._sqlite_store_part05 import _SQLiteStorePart05
+from ._sqlite_store_passages import _SQLiteStorePassages
 
-class SQLiteStore(_SQLiteStoreActiveFTS, _SQLiteStoreFilterMetadata, _SQLiteStorePart01, _SQLiteStorePart02, _SQLiteStorePart03, _SQLiteStorePart04, _SQLiteStorePart05):
+class SQLiteStore(_SQLiteStorePassages, _SQLiteStoreActiveFTS, _SQLiteStoreFilterMetadata, _SQLiteStorePart01, _SQLiteStorePart02, _SQLiteStorePart03, _SQLiteStorePart04, _SQLiteStorePart05):
 
     pass
 

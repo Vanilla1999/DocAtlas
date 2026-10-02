@@ -168,6 +168,8 @@ class _SQLiteStorePart03:
                 (child_id, row["title"], row["retrieval_text"], row["source"]),
             )
         config = self._chunking_config_from_generation(previous)
+        if self.passage_profile is not None:
+            self._build_passage_generation(conn, generation_id)
         validation = self._validate_generation(
             conn, generation_id, config, ContextConfig()
         )

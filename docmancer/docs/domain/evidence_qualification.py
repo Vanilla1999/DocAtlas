@@ -304,21 +304,18 @@ def qualify_evidence(
         "need_witness_spans", "need_witness_source_key", "_admission_demands",
         "context_eligible", "context_need_ids", "_need_context",
     }}
-    result = dict(probe)
-    policy_reason = evidence_policy_rejection_reason(
+    body = evidence_text if evidence_text is not None else visible_text
+    from .source_window_eligibility import prepare_source_probe
+    probe, source_reason = prepare_source_probe(
         probe, visible_text=visible_text, catalog_role=catalog_role,
+        evidence_text=body,
         forbidden_catalog_roles=forbidden_catalog_roles,
         forbidden_evidence_terms=forbidden_evidence_terms, candidate=candidate,
         expected_project_identity=expected_project_identity, lifecycle_intent=lifecycle_intent,
     )
-    if policy_reason is not None:
-        return _rejected(result, policy_reason)
-    body = evidence_text if evidence_text is not None else visible_text
-    from .query_reference_binding import prepare_reference_probe
-    probe, reference_reason = prepare_reference_probe(probe, candidate=candidate, evidence_text=body)
     result = dict(probe)
-    if reference_reason is not None:
-        return _rejected(result, reference_reason)
+    if source_reason is not None:
+        return _rejected(result, source_reason)
     lines = body.splitlines()
     substantive_lines = []
     heading_lines = []

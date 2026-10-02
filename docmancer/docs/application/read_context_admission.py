@@ -23,6 +23,20 @@ class ReadContextAdmission:
     reason: str
 
 
+@dataclass(frozen=True, slots=True)
+class ReadWindowDecision:
+    state: str
+    reason: str
+    span: tuple[int, int] | None = None
+
+
+def decide_read_window(candidate: Mapping[str, Any], *, question: str,
+                       expected_project_identity: str | None,
+                       lifecycle_intent: str = 'current') -> ReadWindowDecision:
+    """Opt-in window decision; does not alter legacy callers or proof flags."""
+    return ReadWindowDecision('unknown', 'not_implemented')
+
+
 def read_context_admission(candidate: Mapping[str, Any], *, question: str,
                            expected_project_identity: str | None,
                            lifecycle_intent: str = 'current') -> ReadContextAdmission:

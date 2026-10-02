@@ -5,12 +5,16 @@ from ._sqlite_store_shared import *  # noqa: F401,F403
 
 
 class _SQLiteStorePart01:
-    def __init__(self, db_path: str | Path, extracted_dir: str | Path | None = None):
+    def __init__(self, db_path: str | Path, extracted_dir: str | Path | None = None,
+                 *, passage_profile=None):
+        self.passage_profile = passage_profile
         self.db_path = Path(db_path).expanduser()
         self.extracted_dir = Path(extracted_dir).expanduser() if extracted_dir else self.db_path.parent / "extracted"
         self.db_path.parent.mkdir(parents=True, exist_ok=True)
         self.extracted_dir.mkdir(parents=True, exist_ok=True)
         self._ensure_schema()
+        if passage_profile is not None:
+            self._ensure_passage_schema()
 
     def _connect(self) -> sqlite3.Connection:
         conn = sqlite3.connect(self.db_path)

@@ -1,0 +1,10 @@
+{
+  "schema_version": 1,
+  "module_labels": {
+    "tests/docs/test_source_window_eligibility.py": "behavioral"
+  },
+  "node_overrides": {},
+  "module_node_hashes": {
+    "tests/docs/test_source_window_eligibility.py": "d3e6ca2cea3f3e6d25aff4d79a9b73fb427880f208d8c472fff1f84ed42056f0"
+  }
+}

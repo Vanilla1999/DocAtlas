@@ -349,6 +349,8 @@ class _SQLiteStorePart02:
                     (int(child_id), parent.title, retrieval_text, doc.source),
                 )
 
+        if self.passage_profile is not None:
+            self._build_passage_generation(conn, generation_id)
         validation = self._validate_generation(
             conn, generation_id, config, context_config
         )
