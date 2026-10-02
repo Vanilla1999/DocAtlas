@@ -80,6 +80,12 @@ def iter_need_context_variants(
     for original in candidates[:24]:
         if not isinstance(original, Mapping) or original.get('source_class') != 'project_doc':
             continue
+        # Check supplied candidate identity/risk before normalization: assigning
+        # the expected identity to a projected DTO must not repair a forged
+        # original or erase instruction-risk flags.
+        if (original.get('project_identity') != expected_project_identity
+                or original.get('instruction_risk_flags')):
+            continue
         root = original.get('_reference_root_plan')
         evidence = original.get('_reference_evidence')
         if not isinstance(root, Mapping) or not isinstance(evidence, Mapping):
@@ -158,13 +164,28 @@ def precedence_context_variants(candidates, **kwargs):
     identities and conditions have already been rechecked by the classifier.
     Topic-only Navigation passages do not receive this preference.
     """
+    from .read_context_admission import local_topic_witness
+
+    question = str(kwargs['query_plan'].get('original_question') or '')
+    terms = set(documentation_query_terms(question))
+    relation = re.compile(r'\b(?:overrides?|takes?\s+precedence|wins?|has\s+priority)\b', re.I)
     for original, variant, contracts, dispositions in iter_need_context_variants(candidates, **kwargs):
         needs = {row.need_id for row in dispositions}
         wanted = tuple(contract.need.need_id for contract in contracts
                        if contract.need.relation == 'precedence' and contract.need.need_id in needs)
-        if wanted and re.search(r'\b(?:overrides?|takes?\s+precedence|wins?|has\s+priority)\b',
-                                variant['snippet'], re.I):
+        if wanted and local_topic_witness(variant['snippet'], question=question,
+                terms=terms, require_pair=False, sentence_pattern=relation):
             yield original, variant, wanted
+
+
+def preferred_context_variants(candidates, **kwargs):
+    """Shared guarded proposal inventory; preferences never certify coverage.
+
+    Prefit must preserve exactly the request shapes offered to final selection,
+    not every permissive topic-only fallback from the typed classifier.
+    """
+    yield from precedence_context_variants(candidates, **kwargs)
+    yield from set_context_variants(candidates, **kwargs)
 
 
 def project_need_context_fallback(candidates, **kwargs):

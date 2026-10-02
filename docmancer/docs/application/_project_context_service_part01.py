@@ -111,27 +111,18 @@ class _ProjectContextServicePart01:
                             if normalize_doc_path(chunk.path) == normalized_evidence_path
                         ],
                     )
-                from .need_context_projection import set_context_variants
-                from .read_context_admission import iter_read_context_variants
+                from .read_context_admission import iter_prefit_context_variants
                 prepared_context = project_context_pack(question=question, project_docs=project_docs, dependency_docs=None)
                 checked_sets = {
                     original.get('stable_chunk_id')
-                    for original, _, _ in set_context_variants(
+                    for original, _ in iter_prefit_context_variants(
                         prepared_context,
                         query_plan=documentation_query_plan.as_payload(),
                         expected_project_identity=project_docs.results[0].project_identity,
                         max_tokens=800, diagnostics={},
-                    )
-                }
-                checked_sets.update(
-                    original.get('stable_chunk_id')
-                    for original, _ in iter_read_context_variants(
-                        prepared_context, query_plan=documentation_query_plan.as_payload(),
-                        expected_project_identity=project_docs.results[0].project_identity,
-                        max_tokens=800, diagnostics={},
                         lifecycle_intent=canonical_requirements.lifecycle_intent,
                     )
-                )
+                }
                 context_candidate_ids = frozenset(id(chunk) for chunk in project_docs.results
                                                  if chunk.stable_chunk_id and chunk.stable_chunk_id in checked_sets)
                 project_docs = replace(

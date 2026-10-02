@@ -361,21 +361,20 @@ def project_docs_context(
             variant_inputs[id(variant)] = (original, raw_snippet, focus_queries, assigned_requirement_ids)
     # Context proposals join the same finite pool before selection. Their
     # source/identity/condition admission is recomputed, not copied from flags.
-    from .need_context_projection import precedence_context_variants, set_context_variants
+    from .need_context_projection import preferred_context_variants
     context_needs = {}
     selected_context_needs: set[str] = set()
     context_candidates = [item for item in initially_ranked if isinstance(item, dict)
                           and (not explicit_paths or
                                _normalized_path(item.get('path') or '') in explicit_paths)]
-    for propose in (precedence_context_variants, set_context_variants):
-        for original, variant, needs in propose(
-            context_candidates, query_plan=query_plan,
-            expected_project_identity=expected_project_identity,
-            max_tokens=max_tokens, diagnostics=projection_diagnostics,
-        ):
-            prepared.append(variant)
-            variant_inputs[id(variant)] = (original, variant['snippet'], (), ())
-            context_needs[id(variant)] = frozenset(needs)
+    for original, variant, needs in preferred_context_variants(
+        context_candidates, query_plan=query_plan,
+        expected_project_identity=expected_project_identity,
+        max_tokens=max_tokens, diagnostics=projection_diagnostics,
+    ):
+        prepared.append(variant)
+        variant_inputs[id(variant)] = (original, variant['snippet'], (), ())
+        context_needs[id(variant)] = frozenset(needs)
     selected_host_query_ids: set[str] = set()
     while prepared:
         decision_trace.state["variant_attempts"] += 1

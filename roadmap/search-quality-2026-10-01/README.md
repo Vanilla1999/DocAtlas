@@ -32,6 +32,12 @@
 
 ## Материалы
 
+- **Новый M2 design без моделей:** [исследование](M2_MODEL_FREE_RETRIEVAL_RESEARCH_RU.md),
+  [контракт](M2_SIMPLIFICATION_CONTRACT_RU.md),
+  [пошаговый TDD-план](M2_MODEL_FREE_RETRIEVAL_TDD_RU.md). Для его реализации
+  начинать с шага 00 нового плана, не выполнять одновременно старые 07–09.
+  Принятые lifecycle/catalog contracts и независимый gate сохраняются;
+  остановленный шаг 06 не объявляется принятым или возобновлённым.
 - [Анализ причин и ограничений](audit/ANALYSIS_RU.md).
 - [Исходный общий план](audit/ACTION_PLAN_RU.md) — справочный архив; исполнительные задания находятся в `steps/`.
 - [Оценки вопросов по проекту](audit/PROJECT_80_REVIEW_RU.md), [библиотекам](audit/EXTERNAL_80_REVIEW_RU.md), [сравнения](audit/COMPARATORS_RU.md).

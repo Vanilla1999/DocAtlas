@@ -86,6 +86,20 @@ def read_context_admission(candidate: Mapping[str, Any], *, question: str,
         if contract.constraint_spans and not _applicable_context(contract, question, body):
             return reject('condition_support_unavailable')
     terms = {str(t).casefold() for t in checked.trace.get('body_matched_terms') or ()}
+    if local_topic_witness(body, question=question, terms=terms):
+        return ReadContextAdmission(True, 'bound_local_topic_context')
+    return reject('no_local_topic_witness')
+
+
+def local_topic_witness(body: str, *, question: str, terms: set[str],
+                        require_pair: bool = True,
+                        sentence_pattern: re.Pattern[str] | None = None) -> bool:
+    """Shared substantive locality/echo checks, never source eligibility or proof.
+
+    Original reads still require an adjacent pair. A separately checked typed
+    relation preference may supply its own relation anchor instead; it cannot
+    bypass the substantive sentence, three-term or question-echo checks.
+    """
     query_words = re.findall(r'\w+(?:[.-]\w+)*', question.casefold())
     pairs = set(zip(query_words, query_words[1:]))
     # Local sentence evidence cannot be borrowed from headings, paths or other
@@ -97,15 +111,18 @@ def read_context_admission(candidate: Mapping[str, Any], *, question: str,
                  and not re.fullmatch(r'[=-]{3,}', line.strip())
                  and not (index + 1 < len(raw_lines)
                           and re.fullmatch(r'[=-]{3,}', raw_lines[index + 1].strip()))]
-        for sentence in re.split(r'(?<=[.!?])\s+|\n', '\n'.join(lines)):
+        prose = ' '.join(lines) if sentence_pattern is not None else '\n'.join(lines)
+        for sentence in re.split(r'(?<=[.!?])\s+|\n', prose):
             words = re.findall(r'\w+(?:[.-]\w+)*', sentence.casefold())
             local = terms & set(words)
             if ('?' in sentence or len(local) < 3
                     or ' '.join(words) in ' '.join(query_words)):
                 continue
-            if any(a in local and b in local for a, b in pairs & set(zip(words, words[1:]))):
-                return ReadContextAdmission(True, 'bound_local_topic_context')
-    return reject('no_local_topic_witness')
+            if sentence_pattern is not None and not sentence_pattern.search(sentence):
+                continue
+            if not require_pair or any(a in local and b in local for a, b in pairs & set(zip(words, words[1:]))):
+                return True
+    return False
 
 
 def iter_read_context_variants(candidates, *, query_plan, expected_project_identity,
@@ -174,6 +191,20 @@ def project_read_context_fallback(candidates, **kwargs):
         kwargs['diagnostics']['final_visible_evidence_ids'] = [public['evidence_id']]
         return payload, {public['evidence_id']: _snapshot_entry(original, public)}
     return None
+
+
+def iter_prefit_context_variants(candidates, *, lifecycle_intent='current', **kwargs):
+    """Preserve final-selection proposals and independently checked read windows.
+
+    Do not union the unrestricted typed topical fallback: question echoes and
+    scattered terms must not gain prefit eligibility from a weaker route.
+    Every final window is checked again; this iterator grants no public credit.
+    """
+    from .need_context_projection import preferred_context_variants
+
+    for original, variant, _ in preferred_context_variants(candidates, **kwargs):
+        yield original, variant
+    yield from iter_read_context_variants(candidates, lifecycle_intent=lifecycle_intent, **kwargs)
 
 
 def project_checked_context_fallback(candidates, *, lifecycle_intent='current', **kwargs):

@@ -1,0 +1,10 @@
+{
+  "schema_version": 1,
+  "module_labels": {
+    "tests/docs/test_shared_context_proposals.py": "behavioral"
+  },
+  "node_overrides": {},
+  "module_node_hashes": {
+    "tests/docs/test_shared_context_proposals.py": "c4fc7047ce6a906b0856671584586cbad17364edf839575187572905a91ee464"
+  }
+}
