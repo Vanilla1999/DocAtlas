@@ -439,3 +439,16 @@ asyncio_mode warning; оба exit 1. Это controls, не completed regression 
 Новый research этап автоматически не назначается. Возобновление требует отдельного
 запроса/согласованного контракта. Это не математическое доказательство невозможности
 model-free design и не закрытие M2. Независимая приёмка/rollout не выполнялись.
+
+## Закрепление 01–04 после checkpoint
+
+По запросу пользователя выполнена [изолированная проверка 01–04](ISOLATED_01_04_VALIDATION_RU.md).
+Candidate `3dc6a17b`; baseline `30056be8`. Новые четыре API test modules:
+**29 passed**. Одинаковые 16 legacy modules в обоих checkout: **195 passed,
+3 failed**, идентичные failing node IDs (прежний precedence и два vector failures).
+Новых failing nodes нет; full output parity/full regression не заявлены.
+Артефакты `isolated-01-04-*.log` и `isolated-01-04-comparison.json` в прежнем
+external log directory. Runtime/storage/defaults не менялись.
+
+Gate A остаётся blocked. Запрошенный пользователем Gate B отсутствует в roadmap:
+следующий переход ожидает определения/ссылки, не обхода Gate A.
