@@ -652,6 +652,8 @@ def build_documentation_query_plan(
         if (
             text.casefold() in seen
             or not supplemental_query_is_useful(text)
+            or (relation_groups and len(re.findall(r"\w+", text)) == 1
+                and not documentation_technical_anchors(text))
             or optional_count >= 4
         ):
             continue

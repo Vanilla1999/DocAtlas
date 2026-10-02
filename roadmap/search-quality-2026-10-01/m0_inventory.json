@@ -1,0 +1,430 @@
+{
+  "definitions": [
+    {
+      "path": "docmancer/docs/application/_docs_context_projection_core.py",
+      "line": 65,
+      "symbol": "project_docs_context"
+    },
+    {
+      "path": "docmancer/docs/application/_docs_context_projection_core.py",
+      "line": 868,
+      "symbol": "_requalify_visible_source"
+    },
+    {
+      "path": "docmancer/docs/application/docs_context_projection.py",
+      "line": 210,
+      "symbol": "project_docs_context"
+    },
+    {
+      "path": "docmancer/docs/application/model_visible_projection.py",
+      "line": 170,
+      "symbol": "project_docs_answer"
+    },
+    {
+      "path": "docmancer/docs/domain/_project_answer_contract_part01.py",
+      "line": 195,
+      "symbol": "lifecycle_intent_for_question"
+    },
+    {
+      "path": "docmancer/docs/domain/context_hint_policy.py",
+      "line": 34,
+      "symbol": "has_context_hint_support"
+    },
+    {
+      "path": "docmancer/docs/domain/documentation_query_plan.py",
+      "line": 383,
+      "symbol": "build_documentation_query_plan"
+    },
+    {
+      "path": "docmancer/docs/domain/evidence_qualification.py",
+      "line": 202,
+      "symbol": "source_metadata_rejection_reason"
+    },
+    {
+      "path": "docmancer/docs/domain/evidence_qualification.py",
+      "line": 231,
+      "symbol": "evidence_policy_rejection_reason"
+    },
+    {
+      "path": "docmancer/docs/domain/evidence_qualification.py",
+      "line": 291,
+      "symbol": "qualify_evidence"
+    },
+    {
+      "path": "docmancer/docs/domain/evidence_qualification.py",
+      "line": 527,
+      "symbol": "qualify_visible_trace"
+    },
+    {
+      "path": "docmancer/docs/domain/mutation_intent.py",
+      "line": 171,
+      "symbol": "build_mutation_intent"
+    },
+    {
+      "path": "docmancer/docs/domain/project_retrieval_intent.py",
+      "line": 135,
+      "symbol": "build_project_retrieval_aliases"
+    },
+    {
+      "path": "docmancer/docs/domain/query_reference_binding.py",
+      "line": 242,
+      "symbol": "prepare_reference_probe"
+    },
+    {
+      "path": "docmancer/docs/domain/request_intent.py",
+      "line": 183,
+      "symbol": "is_change_request"
+    }
+  ],
+  "calls": [
+    {
+      "path": "docmancer/docs/application/_action_packet_part03.py",
+      "line": 38,
+      "symbol": "build_mutation_intent",
+      "boundary": "mutation contract"
+    },
+    {
+      "path": "docmancer/docs/application/_action_packet_part03.py",
+      "line": 461,
+      "symbol": "is_change_request",
+      "boundary": "NL read/mutation routing"
+    },
+    {
+      "path": "docmancer/docs/application/_docs_context_projection_core.py",
+      "line": 238,
+      "symbol": "_requalify_visible_source",
+      "boundary": "visible-window qualification"
+    },
+    {
+      "path": "docmancer/docs/application/_docs_context_projection_core.py",
+      "line": 761,
+      "symbol": "project_docs_context",
+      "boundary": "project read projection"
+    },
+    {
+      "path": "docmancer/docs/application/_docs_context_projection_core.py",
+      "line": 908,
+      "symbol": "qualify_evidence",
+      "boundary": "mixed eligibility/relevance/support"
+    },
+    {
+      "path": "docmancer/docs/application/_docs_context_projection_core.py",
+      "line": 489,
+      "symbol": "_requalify_visible_source",
+      "boundary": "visible-window qualification"
+    },
+    {
+      "path": "docmancer/docs/application/_docs_context_projection_core.py",
+      "line": 680,
+      "symbol": "project_docs_context",
+      "boundary": "project read projection"
+    },
+    {
+      "path": "docmancer/docs/application/_docs_context_projection_core.py",
+      "line": 841,
+      "symbol": "_requalify_visible_source",
+      "boundary": "visible-window qualification"
+    },
+    {
+      "path": "docmancer/docs/application/_docs_context_projection_core.py",
+      "line": 273,
+      "symbol": "has_context_hint_support",
+      "boundary": "hint relevance preference"
+    },
+    {
+      "path": "docmancer/docs/application/_project_context_service_part01.py",
+      "line": 55,
+      "symbol": "is_change_request",
+      "boundary": "NL read/mutation routing"
+    },
+    {
+      "path": "docmancer/docs/application/_project_context_service_part01.py",
+      "line": 66,
+      "symbol": "build_documentation_query_plan",
+      "boundary": "query planning"
+    },
+    {
+      "path": "docmancer/docs/application/_project_context_service_part01.py",
+      "line": 39,
+      "symbol": "build_mutation_intent",
+      "boundary": "mutation contract"
+    },
+    {
+      "path": "docmancer/docs/application/_project_context_service_shared.py",
+      "line": 169,
+      "symbol": "lifecycle_intent_for_question",
+      "boundary": "NL lifecycle inference"
+    },
+    {
+      "path": "docmancer/docs/application/_project_docs_service_part03.py",
+      "line": 178,
+      "symbol": "build_documentation_query_plan",
+      "boundary": "query planning"
+    },
+    {
+      "path": "docmancer/docs/application/_project_docs_service_part03.py",
+      "line": 308,
+      "symbol": "build_project_retrieval_aliases",
+      "boundary": "NL retrieval hypotheses"
+    },
+    {
+      "path": "docmancer/docs/application/_project_docs_service_part03.py",
+      "line": 693,
+      "symbol": "build_documentation_query_plan",
+      "boundary": "query planning"
+    },
+    {
+      "path": "docmancer/docs/application/_unified_context_service_part01.py",
+      "line": 87,
+      "symbol": "build_mutation_intent",
+      "boundary": "mutation contract"
+    },
+    {
+      "path": "docmancer/docs/application/action_packet.py",
+      "line": 157,
+      "symbol": "build_mutation_intent",
+      "boundary": "mutation contract"
+    },
+    {
+      "path": "docmancer/docs/application/context_candidate_ranking.py",
+      "line": 649,
+      "symbol": "qualify_evidence",
+      "boundary": "mixed eligibility/relevance/support"
+    },
+    {
+      "path": "docmancer/docs/application/context_candidate_ranking.py",
+      "line": 671,
+      "symbol": "qualify_evidence",
+      "boundary": "mixed eligibility/relevance/support"
+    },
+    {
+      "path": "docmancer/docs/application/context_candidate_ranking.py",
+      "line": 369,
+      "symbol": "qualify_evidence",
+      "boundary": "mixed eligibility/relevance/support"
+    },
+    {
+      "path": "docmancer/docs/application/context_query_probes.py",
+      "line": 84,
+      "symbol": "evidence_policy_rejection_reason",
+      "boundary": "metadata plus legacy exclusions"
+    },
+    {
+      "path": "docmancer/docs/application/context_query_probes.py",
+      "line": 34,
+      "symbol": "qualify_evidence",
+      "boundary": "mixed eligibility/relevance/support"
+    },
+    {
+      "path": "docmancer/docs/application/context_query_probes.py",
+      "line": 89,
+      "symbol": "prepare_reference_probe",
+      "boundary": "reference identity/snapshot binding"
+    },
+    {
+      "path": "docmancer/docs/application/context_query_probes.py",
+      "line": 66,
+      "symbol": "qualify_evidence",
+      "boundary": "mixed eligibility/relevance/support"
+    },
+    {
+      "path": "docmancer/docs/application/docs_context_projection.py",
+      "line": 202,
+      "symbol": "project_docs_context",
+      "boundary": "project read projection"
+    },
+    {
+      "path": "docmancer/docs/application/inspection_recovery_seeds.py",
+      "line": 47,
+      "symbol": "_requalify_visible_source",
+      "boundary": "visible-window qualification"
+    },
+    {
+      "path": "docmancer/docs/application/joint_context_candidates.py",
+      "line": 33,
+      "symbol": "prepare_reference_probe",
+      "boundary": "reference identity/snapshot binding"
+    },
+    {
+      "path": "docmancer/docs/application/joint_context_candidates.py",
+      "line": 60,
+      "symbol": "prepare_reference_probe",
+      "boundary": "reference identity/snapshot binding"
+    },
+    {
+      "path": "docmancer/docs/application/joint_context_candidates.py",
+      "line": 65,
+      "symbol": "evidence_policy_rejection_reason",
+      "boundary": "metadata plus legacy exclusions"
+    },
+    {
+      "path": "docmancer/docs/application/joint_context_selection.py",
+      "line": 121,
+      "symbol": "_requalify_visible_source",
+      "boundary": "visible-window qualification"
+    },
+    {
+      "path": "docmancer/docs/application/joint_context_selection.py",
+      "line": 113,
+      "symbol": "evidence_policy_rejection_reason",
+      "boundary": "metadata plus legacy exclusions"
+    },
+    {
+      "path": "docmancer/docs/application/need_context_disposition.py",
+      "line": 130,
+      "symbol": "qualify_evidence",
+      "boundary": "mixed eligibility/relevance/support"
+    },
+    {
+      "path": "docmancer/docs/application/need_context_disposition.py",
+      "line": 165,
+      "symbol": "qualify_evidence",
+      "boundary": "mixed eligibility/relevance/support"
+    },
+    {
+      "path": "docmancer/docs/application/query_block_bridge.py",
+      "line": 43,
+      "symbol": "_requalify_visible_source",
+      "boundary": "visible-window qualification"
+    },
+    {
+      "path": "docmancer/docs/application/query_block_context.py",
+      "line": 123,
+      "symbol": "prepare_reference_probe",
+      "boundary": "reference identity/snapshot binding"
+    },
+    {
+      "path": "docmancer/docs/application/query_block_recovery.py",
+      "line": 84,
+      "symbol": "prepare_reference_probe",
+      "boundary": "reference identity/snapshot binding"
+    },
+    {
+      "path": "docmancer/docs/application/reference_query_tagging.py",
+      "line": 62,
+      "symbol": "qualify_evidence",
+      "boundary": "mixed eligibility/relevance/support"
+    },
+    {
+      "path": "docmancer/docs/domain/_project_answer_contract_part02.py",
+      "line": 107,
+      "symbol": "lifecycle_intent_for_question",
+      "boundary": "NL lifecycle inference"
+    },
+    {
+      "path": "docmancer/docs/domain/context_hint_policy.py",
+      "line": 47,
+      "symbol": "qualify_evidence",
+      "boundary": "mixed eligibility/relevance/support"
+    },
+    {
+      "path": "docmancer/docs/domain/documentation_query_plan.py",
+      "line": 216,
+      "symbol": "build_project_retrieval_aliases",
+      "boundary": "NL retrieval hypotheses"
+    },
+    {
+      "path": "docmancer/docs/domain/documentation_query_plan.py",
+      "line": 217,
+      "symbol": "build_project_retrieval_aliases",
+      "boundary": "NL retrieval hypotheses"
+    },
+    {
+      "path": "docmancer/docs/domain/documentation_query_plan.py",
+      "line": 276,
+      "symbol": "build_project_retrieval_aliases",
+      "boundary": "NL retrieval hypotheses"
+    },
+    {
+      "path": "docmancer/docs/domain/documentation_query_plan.py",
+      "line": 387,
+      "symbol": "build_project_retrieval_aliases",
+      "boundary": "NL retrieval hypotheses"
+    },
+    {
+      "path": "docmancer/docs/domain/documentation_query_plan.py",
+      "line": 464,
+      "symbol": "build_project_retrieval_aliases",
+      "boundary": "NL retrieval hypotheses"
+    },
+    {
+      "path": "docmancer/docs/domain/evidence_qualification.py",
+      "line": 240,
+      "symbol": "source_metadata_rejection_reason",
+      "boundary": "metadata eligibility"
+    },
+    {
+      "path": "docmancer/docs/domain/evidence_qualification.py",
+      "line": 308,
+      "symbol": "evidence_policy_rejection_reason",
+      "boundary": "metadata plus legacy exclusions"
+    },
+    {
+      "path": "docmancer/docs/domain/evidence_qualification.py",
+      "line": 318,
+      "symbol": "prepare_reference_probe",
+      "boundary": "reference identity/snapshot binding"
+    },
+    {
+      "path": "docmancer/docs/domain/evidence_qualification.py",
+      "line": 531,
+      "symbol": "qualify_evidence",
+      "boundary": "mixed eligibility/relevance/support"
+    },
+    {
+      "path": "docmancer/docs/domain/lifecycle_policy.py",
+      "line": 39,
+      "symbol": "lifecycle_intent_for_question",
+      "boundary": "NL lifecycle inference"
+    },
+    {
+      "path": "docmancer/docs/domain/mutation_intent.py",
+      "line": 211,
+      "symbol": "is_change_request",
+      "boundary": "NL read/mutation routing"
+    },
+    {
+      "path": "docmancer/docs/domain/project_retrieval_intent.py",
+      "line": 740,
+      "symbol": "build_project_retrieval_aliases",
+      "boundary": "NL retrieval hypotheses"
+    },
+    {
+      "path": "docmancer/docs/domain/retrieval_routing.py",
+      "line": 76,
+      "symbol": "is_change_request",
+      "boundary": "NL read/mutation routing"
+    },
+    {
+      "path": "docmancer/docs/domain/retrieval_routing.py",
+      "line": 143,
+      "symbol": "is_change_request",
+      "boundary": "NL read/mutation routing"
+    },
+    {
+      "path": "docmancer/docs/interfaces/mcp/context_tools.py",
+      "line": 305,
+      "symbol": "build_mutation_intent",
+      "boundary": "mutation contract"
+    },
+    {
+      "path": "docmancer/docs/interfaces/mcp/context_tools.py",
+      "line": 306,
+      "symbol": "is_change_request",
+      "boundary": "NL read/mutation routing"
+    },
+    {
+      "path": "docmancer/docs/interfaces/mcp/context_tools.py",
+      "line": 403,
+      "symbol": "project_docs_context",
+      "boundary": "project read projection"
+    },
+    {
+      "path": "docmancer/docs/interfaces/mcp/context_tools.py",
+      "line": 413,
+      "symbol": "project_docs_answer",
+      "boundary": "answer certification projection"
+    }
+  ],
+  "limitations": "Static names; aliases and dynamic callbacks require source review."
+}

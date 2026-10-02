@@ -105,7 +105,11 @@ def documentation_technical_anchors(question: str, *, limit: int = 12) -> tuple[
 
 @lru_cache(maxsize=512)
 def documentation_query_terms(question: str) -> tuple[str, ...]:
-    """Bounded lexical probe terms, excluding standalone request connectors."""
+    """Bounded Unicode lexical probes with legacy request-connector filtering.
+
+    Word characters preserve scripts and accents; they do not provide translation
+    or word segmentation for scripts without spaces.
+    """
     # A leading enumeration imperative describes answer presentation, not a
     # fact that documentation must repeat. Keep the public question, interior
     # occurrences, exact identities and all condition words unchanged.
@@ -114,7 +118,7 @@ def documentation_query_terms(question: str) -> tuple[str, ...]:
     )
     return tuple(dict.fromkeys(
         token.casefold()
-        for token in re.findall(r"[A-Za-zА-Яа-яЁё0-9_.:/+-]+", lexical_question)
+        for token in re.findall(r"[\w.:/+-]+", lexical_question)
         if token.casefold() not in _REQUEST_FRAMING_TERMS
         and (len(token) >= 4 or is_exact_technical_token(token))
     ))[:32]
@@ -206,25 +210,15 @@ __all__ = [
 
 # Used only to admit an OPTIONAL lookup, never to rewrite the public question
 # or to decide whether its conditions/negation have been semantically covered.
-_SUPPLEMENTAL_FUNCTION_WORDS = frozenset({
-    "i", "a", "an", "the", "in", "on", "at", "so", "to", "of", "for", "from",
-    "by", "as", "and", "or", "do", "does", "did", "we", "it", "its", "is", "are",
-    "was", "were", "be", "been", "this", "that", "these", "those", "with", "about",
-    "what", "which", "how", "when", "where", "why", "who", "should", "would",
-    "happen", "happens", "happened",
-    "can", "could", "will", "shall", "must", "not", "only", "if", "unless", "without",
-    "я", "мы", "он", "она", "оно", "они", "в", "во", "на", "от", "по", "за",
-    "к", "ко", "с", "со", "из", "до", "для", "о", "об", "и", "или", "а", "но",
-    "что", "как", "где", "когда", "кто", "это", "этот", "эти", "так", "же", "бы",
-    "не", "нет", "если", "без", "только", "должен", "нужно", "надо",
-})
-
-
 def supplemental_query_is_useful(text: str) -> bool:
-    """Reject empty/function-word residue without destroying technical identity."""
+    """Apply a structural probe floor, not a language-specific usefulness claim.
+
+    Match the existing four-character lexical floor; exact technical anchors
+    remain exempt. Relevance must be checked downstream, not inferred here.
+    """
     if documentation_technical_anchors(text):
         return True
     return any(
-        token.casefold() not in _SUPPLEMENTAL_FUNCTION_WORDS
+        len(token) >= 4
         for token in re.findall(r"[\w]+(?:[.:/+-][\w-]+)*", str(text or ""))
     )

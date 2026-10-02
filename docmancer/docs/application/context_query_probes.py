@@ -13,7 +13,7 @@ from docmancer.docs.domain.evidence_qualification import qualify_evidence
 def independent_query_probes(source, query_plan):
     matches = dict(source.get('retrieval_query_matches') or {})
     queries = [q for q in query_plan.get('queries') or () if q.get('origin') in {'original', 'host_lookup', 'retrieval_need'} and not q.get('public_parent_query_id')]
-    terms = {q['query_id']: set(re.findall(r'[A-Za-zА-Яа-яЁё0-9_.-]{4,}', str(q.get('text') or '').casefold())) for q in queries}
+    terms = {q['query_id']: set(re.findall(r'[\w.-]{4,}', str(q.get('text') or '').casefold())) for q in queries}
     for query in queries:
         query_id = str(query.get('query_id') or '')
         if not query_id or query_id in matches:

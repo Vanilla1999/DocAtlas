@@ -1,0 +1,29 @@
+........................................................................ [ 33%]
+........................................F............................... [ 67%]
+....................................................................     [100%]
+=================================== FAILURES ===================================
+______ test_frozen_request_flow_prefers_project_context_module_witnesses _______
+
+    def test_frozen_request_flow_prefers_project_context_module_witnesses():
+        from eval.project_context_quality_v2_protocol import evaluate_case, load_cases
+        from scripts.run_project_docs_self_host_gate import LiveCase, run
+    
+        case = next(row for row in load_cases() if row["id"] == "v2-natural-request-flow")
+        result = run(cases=(LiveCase(
+            case_id=case["id"], question=case["question"], relevant_paths=(),
+            lookup_queries=tuple(case["lookup_queries"]), scope=case["scope"],
+        ),), negative_cases=())
+        payload = result["results"][0]["payload"]
+        verdict = evaluate_case(case, payload)
+        assert "docs/modules/project-context-retrieval.md" in {
+            source["path_or_url"] for source in payload["sources"]
+        }
+>       assert all(row["met"] for row in verdict["obligations"]), verdict["obligations"]
+E       AssertionError: [{'id': 'flow_mcp', 'lookup_query_ids': ['query-lookup-1'], 'met': False, 'visible_witnesses': []}, {'id': 'flow_appli...ible_witnesses': [{'evidence_id': 'ev-8ae1789c9c28bae9', 'path_or_url': 'docs/modules/project-context-retrieval.md'}]}]
+E       assert False
+E        +  where False = all(<generator object test_frozen_request_flow_prefers_project_context_module_witnesses.<locals>.<genexpr> at 0x79bdb2b03d30>)
+
+tests/docs/test_context_projection_boundaries.py:236: AssertionError
+=========================== short test summary info ============================
+FAILED tests/docs/test_context_projection_boundaries.py::test_frozen_request_flow_prefers_project_context_module_witnesses
+1 failed, 211 passed in 47.80s

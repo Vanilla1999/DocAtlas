@@ -199,15 +199,17 @@ class EvidenceQualification:
     trace: Mapping[str, Any]
 
 
-def evidence_policy_rejection_reason(
-    probe: Mapping[str, Any], *, visible_text: str, catalog_role: str = "",
-    forbidden_catalog_roles: tuple[str, ...] = (),
-    forbidden_evidence_terms: tuple[str, ...] = (),
+def source_metadata_rejection_reason(
+    *,
     candidate: Mapping[str, Any] | None = None,
     expected_project_identity: str | None = None,
     lifecycle_intent: LifecycleIntent = "current",
 ) -> str | None:
-    """Return the source/policy rejection independently of lexical matching."""
+    """Check existing source metadata guards without interpreting query prose.
+
+    This is not complete source validation: version, scope and snapshot checks
+    performed by callers remain required.
+    """
     if candidate is not None or expected_project_identity:
         candidate = candidate or {}
         identity = str(candidate.get("project_identity") or "").strip()
@@ -223,6 +225,24 @@ def evidence_policy_rejection_reason(
             return "unsafe_evidence"
         if not lifecycle_allows(candidate, lifecycle_intent):
             return "lifecycle_not_allowed"
+    return None
+
+
+def evidence_policy_rejection_reason(
+    probe: Mapping[str, Any], *, visible_text: str, catalog_role: str = "",
+    forbidden_catalog_roles: tuple[str, ...] = (),
+    forbidden_evidence_terms: tuple[str, ...] = (),
+    candidate: Mapping[str, Any] | None = None,
+    expected_project_identity: str | None = None,
+    lifecycle_intent: LifecycleIntent = "current",
+) -> str | None:
+    """Preserve metadata guards and legacy text/catalog exclusions in order."""
+    reason = source_metadata_rejection_reason(
+        candidate=candidate, expected_project_identity=expected_project_identity,
+        lifecycle_intent=lifecycle_intent,
+    )
+    if reason is not None:
+        return reason
     normalized_visible = visible_text.casefold()
     forbidden_terms = tuple(dict.fromkeys((
         *(str(value) for value in probe.get("forbidden_evidence_terms") or ()),
@@ -383,7 +403,7 @@ def qualify_evidence(
         terms = tuple(dict.fromkeys(
             token.casefold()
             for token in re.findall(
-                r"[A-Za-zА-Яа-яЁё0-9_.-]{4,}", str(probe.get("query_text") or ""),
+                r"[\w.-]{4,}", str(probe.get("query_text") or ""),
             )
         ))
     if comparison_relation:

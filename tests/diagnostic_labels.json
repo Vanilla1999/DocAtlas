@@ -1,5 +1,6 @@
 {
   "module_labels": {
+    "tests/test_source_metadata_eligibility.py": "behavioral",
     "tests/docs/test_action_packet.py": "behavioral",
     "tests/docs/test_action_packet_part02.py": "behavioral",
     "tests/docs/test_agent_index_gateway.py": "behavioral",
@@ -261,6 +262,7 @@
     "tests/test_web_fetcher.py": "behavioral"
   },
   "module_node_hashes": {
+    "tests/test_source_metadata_eligibility.py": "2cb73700fe4a65895b6d4b02a70026cc61c8ed7d205687fa155568a60e38aabb",
     "tests/docs/test_action_packet.py": "24c5657a625d74a7e39e4d966448aee249c0d3a1e79b2ff039d0ca5a472a7ee5",
     "tests/docs/test_action_packet_part02.py": "467dae63190cfd59dde1faaf957a9d5b8f91c6a31385f5c63134533a226ac556",
     "tests/docs/test_agent_index_gateway.py": "ae2cd24888017334357e866593c1adf91e89930396bbc80e76c950b5e1ed7556",
