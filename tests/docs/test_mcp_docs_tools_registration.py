@@ -624,6 +624,7 @@ def test_mcp_exposes_three_public_tools_with_mutually_exclusive_guidance():
     assert set(context_properties) == {
         "question", "lookup_queries", "project_path", "library", "version",
         "module_path", "scope",
+        "request_intent", "lifecycle_intent",
     }
     assert "always implies module scope" in context_properties["module_path"]["description"]
     assert "repo-level docs only" in context_properties["scope"]["description"]

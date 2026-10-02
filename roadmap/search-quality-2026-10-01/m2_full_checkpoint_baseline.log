@@ -1,0 +1,2530 @@
+........................................................................ [  2%]
+........................................................................ [  4%]
+........................................................................ [  6%]
+........................................................................ [  8%]
+........................................................................ [ 10%]
+......................................FFFFFFFFFFFFFFF.F...FFFFFFFF...... [ 12%]
+........................................................................ [ 14%]
+...........................F............................................ [ 16%]
+........................................................................ [ 18%]
+........................................................................ [ 20%]
+............F........................................................... [ 22%]
+............................F........................................... [ 24%]
+........................................................................ [ 26%]
+........................................................................ [ 28%]
+........................................................................ [ 30%]
+........................................................................ [ 32%]
+........................................................................ [ 34%]
+........................................................................ [ 36%]
+........................................................................ [ 38%]
+........................................................................ [ 41%]
+........................................................................ [ 43%]
+............................FF....FFFF.................................. [ 45%]
+.............F.......................................................... [ 47%]
+........................................................................ [ 49%]
+........................................................................ [ 51%]
+........................................................................ [ 53%]
+........................................................................ [ 55%]
+.......................F................................................ [ 57%]
+........................................................................ [ 59%]
+...........................................F............................ [ 61%]
+........................................................................ [ 63%]
+........................................................................ [ 65%]
+........................................................................ [ 67%]
+........................................................................ [ 69%]
+....................................................................F... [ 71%]
+........................................................................ [ 73%]
+........................................................................ [ 75%]
+........................................................................ [ 77%]
+........................................................................ [ 79%]
+........................................................................ [ 82%]
+.............................................F.......................... [ 84%]
+................................................................FFFFF.FF [ 86%]
+F....................................................................... [ 88%]
+.............................................FF..FF..................... [ 90%]
+........................................................................ [ 92%]
+........................................................................ [ 94%]
+........................................................................ [ 96%]
+........................................................................ [ 98%]
+.......................................................                  [100%]
+=================================== FAILURES ===================================
+___ test_plan_keeps_literal_command_option_value[archive-tool --format json] ___
+
+literal = 'archive-tool --format json'
+
+    @pytest.mark.parametrize("literal", [
+        "archive-tool --format json", "cache-store --zone remote",
+        "backup-tool --copies 3", "archive-tool --format=json",
+    ])
+    def test_plan_keeps_literal_command_option_value(literal):
+>       literal_lookup(f"Объясни поведение {literal} без изменения файлов?", literal)
+
+tests/docs/test_cli_literal_query_binding.py:32: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/docs/test_cli_literal_query_binding.py:14: in literal_lookup
+    plan = build_documentation_query_plan(question)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+docmancer/docs/domain/documentation_query_plan.py:399: in build_documentation_query_plan
+    question_roles = query_constraint_roles(question)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+docmancer/docs/domain/query_terms.py:174: in query_constraint_roles
+    mentions = query_mentions(question)
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+docmancer/docs/domain/query_reference_binding.py:142: in query_mentions
+    for value in sorted(documentation_technical_anchors(question), key=lambda value: (-len(value), value)):
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+question = 'Объясни поведение archive-tool --format json без изменения файлов?'
+
+    def documentation_technical_anchors(question: str, *, limit: int = 12) -> tuple[str, ...]:
+        """Extract bounded exact anchors without depending on retrieval infrastructure."""
+        values: list[str] = []
+        for match in _COMMAND_OPTION_VALUE_RE.finditer(question):
+>           if match.group("value").casefold() in _SUPPLEMENTAL_FUNCTION_WORDS:
+                                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           NameError: name '_SUPPLEMENTAL_FUNCTION_WORDS' is not defined
+
+docmancer/docs/domain/query_terms.py:70: NameError
+___ test_plan_keeps_literal_command_option_value[cache-store --zone remote] ____
+
+literal = 'cache-store --zone remote'
+
+    @pytest.mark.parametrize("literal", [
+        "archive-tool --format json", "cache-store --zone remote",
+        "backup-tool --copies 3", "archive-tool --format=json",
+    ])
+    def test_plan_keeps_literal_command_option_value(literal):
+>       literal_lookup(f"Объясни поведение {literal} без изменения файлов?", literal)
+
+tests/docs/test_cli_literal_query_binding.py:32: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/docs/test_cli_literal_query_binding.py:14: in literal_lookup
+    plan = build_documentation_query_plan(question)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+docmancer/docs/domain/documentation_query_plan.py:399: in build_documentation_query_plan
+    question_roles = query_constraint_roles(question)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+docmancer/docs/domain/query_terms.py:174: in query_constraint_roles
+    mentions = query_mentions(question)
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+docmancer/docs/domain/query_reference_binding.py:142: in query_mentions
+    for value in sorted(documentation_technical_anchors(question), key=lambda value: (-len(value), value)):
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+question = 'Объясни поведение cache-store --zone remote без изменения файлов?'
+
+    def documentation_technical_anchors(question: str, *, limit: int = 12) -> tuple[str, ...]:
+        """Extract bounded exact anchors without depending on retrieval infrastructure."""
+        values: list[str] = []
+        for match in _COMMAND_OPTION_VALUE_RE.finditer(question):
+>           if match.group("value").casefold() in _SUPPLEMENTAL_FUNCTION_WORDS:
+                                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           NameError: name '_SUPPLEMENTAL_FUNCTION_WORDS' is not defined
+
+docmancer/docs/domain/query_terms.py:70: NameError
+_____ test_plan_keeps_literal_command_option_value[backup-tool --copies 3] _____
+
+literal = 'backup-tool --copies 3'
+
+    @pytest.mark.parametrize("literal", [
+        "archive-tool --format json", "cache-store --zone remote",
+        "backup-tool --copies 3", "archive-tool --format=json",
+    ])
+    def test_plan_keeps_literal_command_option_value(literal):
+>       literal_lookup(f"Объясни поведение {literal} без изменения файлов?", literal)
+
+tests/docs/test_cli_literal_query_binding.py:32: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/docs/test_cli_literal_query_binding.py:14: in literal_lookup
+    plan = build_documentation_query_plan(question)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+docmancer/docs/domain/documentation_query_plan.py:399: in build_documentation_query_plan
+    question_roles = query_constraint_roles(question)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+docmancer/docs/domain/query_terms.py:174: in query_constraint_roles
+    mentions = query_mentions(question)
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+docmancer/docs/domain/query_reference_binding.py:142: in query_mentions
+    for value in sorted(documentation_technical_anchors(question), key=lambda value: (-len(value), value)):
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+question = 'Объясни поведение backup-tool --copies 3 без изменения файлов?'
+
+    def documentation_technical_anchors(question: str, *, limit: int = 12) -> tuple[str, ...]:
+        """Extract bounded exact anchors without depending on retrieval infrastructure."""
+        values: list[str] = []
+        for match in _COMMAND_OPTION_VALUE_RE.finditer(question):
+>           if match.group("value").casefold() in _SUPPLEMENTAL_FUNCTION_WORDS:
+                                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           NameError: name '_SUPPLEMENTAL_FUNCTION_WORDS' is not defined
+
+docmancer/docs/domain/query_terms.py:70: NameError
+___ test_plan_keeps_literal_command_option_value[archive-tool --format=json] ___
+
+literal = 'archive-tool --format=json'
+
+    @pytest.mark.parametrize("literal", [
+        "archive-tool --format json", "cache-store --zone remote",
+        "backup-tool --copies 3", "archive-tool --format=json",
+    ])
+    def test_plan_keeps_literal_command_option_value(literal):
+>       literal_lookup(f"Объясни поведение {literal} без изменения файлов?", literal)
+
+tests/docs/test_cli_literal_query_binding.py:32: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/docs/test_cli_literal_query_binding.py:14: in literal_lookup
+    plan = build_documentation_query_plan(question)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+docmancer/docs/domain/documentation_query_plan.py:399: in build_documentation_query_plan
+    question_roles = query_constraint_roles(question)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+docmancer/docs/domain/query_terms.py:174: in query_constraint_roles
+    mentions = query_mentions(question)
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+docmancer/docs/domain/query_reference_binding.py:142: in query_mentions
+    for value in sorted(documentation_technical_anchors(question), key=lambda value: (-len(value), value)):
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+question = 'Объясни поведение archive-tool --format=json без изменения файлов?'
+
+    def documentation_technical_anchors(question: str, *, limit: int = 12) -> tuple[str, ...]:
+        """Extract bounded exact anchors without depending on retrieval infrastructure."""
+        values: list[str] = []
+        for match in _COMMAND_OPTION_VALUE_RE.finditer(question):
+>           if match.group("value").casefold() in _SUPPLEMENTAL_FUNCTION_WORDS:
+                                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           NameError: name '_SUPPLEMENTAL_FUNCTION_WORDS' is not defined
+
+docmancer/docs/domain/query_terms.py:70: NameError
+_ test_literal_probe_requires_same_visible_command_not_bag_of_tokens[Use archive-tool --format json to preserve the manifest.-True] _
+
+body = 'Use archive-tool --format json to preserve the manifest.'
+expected = True
+
+    @pytest.mark.parametrize("body,expected", [
+        ("Use archive-tool --format json to preserve the manifest.", True),
+        ("Use archive-tool --format text to preserve the manifest.", False),
+        ("archive-tool is described here; json is used by another tool --format text.", False),
+        ("# archive-tool --format json\n\nUnrelated prose follows.", False),
+        ("[archive-tool --format json](https://example.invalid/ref)", False),
+        ("Use other-tool --format json to preserve the manifest.", False),
+        ("Use archive-tool --format jsonl to preserve the manifest.", False),
+    ])
+    def test_literal_probe_requires_same_visible_command_not_bag_of_tokens(body, expected):
+>       lookup = literal_lookup("Объясни archive-tool --format json?", "archive-tool --format json")
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/docs/test_cli_literal_query_binding.py:45: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/docs/test_cli_literal_query_binding.py:14: in literal_lookup
+    plan = build_documentation_query_plan(question)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+docmancer/docs/domain/documentation_query_plan.py:399: in build_documentation_query_plan
+    question_roles = query_constraint_roles(question)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+docmancer/docs/domain/query_terms.py:174: in query_constraint_roles
+    mentions = query_mentions(question)
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+docmancer/docs/domain/query_reference_binding.py:142: in query_mentions
+    for value in sorted(documentation_technical_anchors(question), key=lambda value: (-len(value), value)):
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+question = 'Объясни archive-tool --format json?'
+
+    def documentation_technical_anchors(question: str, *, limit: int = 12) -> tuple[str, ...]:
+        """Extract bounded exact anchors without depending on retrieval infrastructure."""
+        values: list[str] = []
+        for match in _COMMAND_OPTION_VALUE_RE.finditer(question):
+>           if match.group("value").casefold() in _SUPPLEMENTAL_FUNCTION_WORDS:
+                                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           NameError: name '_SUPPLEMENTAL_FUNCTION_WORDS' is not defined
+
+docmancer/docs/domain/query_terms.py:70: NameError
+_ test_literal_probe_requires_same_visible_command_not_bag_of_tokens[Use archive-tool --format text to preserve the manifest.-False] _
+
+body = 'Use archive-tool --format text to preserve the manifest.'
+expected = False
+
+    @pytest.mark.parametrize("body,expected", [
+        ("Use archive-tool --format json to preserve the manifest.", True),
+        ("Use archive-tool --format text to preserve the manifest.", False),
+        ("archive-tool is described here; json is used by another tool --format text.", False),
+        ("# archive-tool --format json\n\nUnrelated prose follows.", False),
+        ("[archive-tool --format json](https://example.invalid/ref)", False),
+        ("Use other-tool --format json to preserve the manifest.", False),
+        ("Use archive-tool --format jsonl to preserve the manifest.", False),
+    ])
+    def test_literal_probe_requires_same_visible_command_not_bag_of_tokens(body, expected):
+>       lookup = literal_lookup("Объясни archive-tool --format json?", "archive-tool --format json")
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/docs/test_cli_literal_query_binding.py:45: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/docs/test_cli_literal_query_binding.py:14: in literal_lookup
+    plan = build_documentation_query_plan(question)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+docmancer/docs/domain/documentation_query_plan.py:399: in build_documentation_query_plan
+    question_roles = query_constraint_roles(question)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+docmancer/docs/domain/query_terms.py:174: in query_constraint_roles
+    mentions = query_mentions(question)
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+docmancer/docs/domain/query_reference_binding.py:142: in query_mentions
+    for value in sorted(documentation_technical_anchors(question), key=lambda value: (-len(value), value)):
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+question = 'Объясни archive-tool --format json?'
+
+    def documentation_technical_anchors(question: str, *, limit: int = 12) -> tuple[str, ...]:
+        """Extract bounded exact anchors without depending on retrieval infrastructure."""
+        values: list[str] = []
+        for match in _COMMAND_OPTION_VALUE_RE.finditer(question):
+>           if match.group("value").casefold() in _SUPPLEMENTAL_FUNCTION_WORDS:
+                                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           NameError: name '_SUPPLEMENTAL_FUNCTION_WORDS' is not defined
+
+docmancer/docs/domain/query_terms.py:70: NameError
+_ test_literal_probe_requires_same_visible_command_not_bag_of_tokens[archive-tool is described here; json is used by another tool --format text.-False] _
+
+body = 'archive-tool is described here; json is used by another tool --format text.'
+expected = False
+
+    @pytest.mark.parametrize("body,expected", [
+        ("Use archive-tool --format json to preserve the manifest.", True),
+        ("Use archive-tool --format text to preserve the manifest.", False),
+        ("archive-tool is described here; json is used by another tool --format text.", False),
+        ("# archive-tool --format json\n\nUnrelated prose follows.", False),
+        ("[archive-tool --format json](https://example.invalid/ref)", False),
+        ("Use other-tool --format json to preserve the manifest.", False),
+        ("Use archive-tool --format jsonl to preserve the manifest.", False),
+    ])
+    def test_literal_probe_requires_same_visible_command_not_bag_of_tokens(body, expected):
+>       lookup = literal_lookup("Объясни archive-tool --format json?", "archive-tool --format json")
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/docs/test_cli_literal_query_binding.py:45: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/docs/test_cli_literal_query_binding.py:14: in literal_lookup
+    plan = build_documentation_query_plan(question)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+docmancer/docs/domain/documentation_query_plan.py:399: in build_documentation_query_plan
+    question_roles = query_constraint_roles(question)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+docmancer/docs/domain/query_terms.py:174: in query_constraint_roles
+    mentions = query_mentions(question)
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+docmancer/docs/domain/query_reference_binding.py:142: in query_mentions
+    for value in sorted(documentation_technical_anchors(question), key=lambda value: (-len(value), value)):
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+question = 'Объясни archive-tool --format json?'
+
+    def documentation_technical_anchors(question: str, *, limit: int = 12) -> tuple[str, ...]:
+        """Extract bounded exact anchors without depending on retrieval infrastructure."""
+        values: list[str] = []
+        for match in _COMMAND_OPTION_VALUE_RE.finditer(question):
+>           if match.group("value").casefold() in _SUPPLEMENTAL_FUNCTION_WORDS:
+                                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           NameError: name '_SUPPLEMENTAL_FUNCTION_WORDS' is not defined
+
+docmancer/docs/domain/query_terms.py:70: NameError
+_ test_literal_probe_requires_same_visible_command_not_bag_of_tokens[# archive-tool --format json\n\nUnrelated prose follows.-False] _
+
+body = '# archive-tool --format json\n\nUnrelated prose follows.'
+expected = False
+
+    @pytest.mark.parametrize("body,expected", [
+        ("Use archive-tool --format json to preserve the manifest.", True),
+        ("Use archive-tool --format text to preserve the manifest.", False),
+        ("archive-tool is described here; json is used by another tool --format text.", False),
+        ("# archive-tool --format json\n\nUnrelated prose follows.", False),
+        ("[archive-tool --format json](https://example.invalid/ref)", False),
+        ("Use other-tool --format json to preserve the manifest.", False),
+        ("Use archive-tool --format jsonl to preserve the manifest.", False),
+    ])
+    def test_literal_probe_requires_same_visible_command_not_bag_of_tokens(body, expected):
+>       lookup = literal_lookup("Объясни archive-tool --format json?", "archive-tool --format json")
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/docs/test_cli_literal_query_binding.py:45: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/docs/test_cli_literal_query_binding.py:14: in literal_lookup
+    plan = build_documentation_query_plan(question)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+docmancer/docs/domain/documentation_query_plan.py:399: in build_documentation_query_plan
+    question_roles = query_constraint_roles(question)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+docmancer/docs/domain/query_terms.py:174: in query_constraint_roles
+    mentions = query_mentions(question)
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+docmancer/docs/domain/query_reference_binding.py:142: in query_mentions
+    for value in sorted(documentation_technical_anchors(question), key=lambda value: (-len(value), value)):
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+question = 'Объясни archive-tool --format json?'
+
+    def documentation_technical_anchors(question: str, *, limit: int = 12) -> tuple[str, ...]:
+        """Extract bounded exact anchors without depending on retrieval infrastructure."""
+        values: list[str] = []
+        for match in _COMMAND_OPTION_VALUE_RE.finditer(question):
+>           if match.group("value").casefold() in _SUPPLEMENTAL_FUNCTION_WORDS:
+                                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           NameError: name '_SUPPLEMENTAL_FUNCTION_WORDS' is not defined
+
+docmancer/docs/domain/query_terms.py:70: NameError
+_ test_literal_probe_requires_same_visible_command_not_bag_of_tokens[[archive-tool --format json](https://example.invalid/ref)-False] _
+
+body = '[archive-tool --format json](https://example.invalid/ref)'
+expected = False
+
+    @pytest.mark.parametrize("body,expected", [
+        ("Use archive-tool --format json to preserve the manifest.", True),
+        ("Use archive-tool --format text to preserve the manifest.", False),
+        ("archive-tool is described here; json is used by another tool --format text.", False),
+        ("# archive-tool --format json\n\nUnrelated prose follows.", False),
+        ("[archive-tool --format json](https://example.invalid/ref)", False),
+        ("Use other-tool --format json to preserve the manifest.", False),
+        ("Use archive-tool --format jsonl to preserve the manifest.", False),
+    ])
+    def test_literal_probe_requires_same_visible_command_not_bag_of_tokens(body, expected):
+>       lookup = literal_lookup("Объясни archive-tool --format json?", "archive-tool --format json")
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/docs/test_cli_literal_query_binding.py:45: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/docs/test_cli_literal_query_binding.py:14: in literal_lookup
+    plan = build_documentation_query_plan(question)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+docmancer/docs/domain/documentation_query_plan.py:399: in build_documentation_query_plan
+    question_roles = query_constraint_roles(question)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+docmancer/docs/domain/query_terms.py:174: in query_constraint_roles
+    mentions = query_mentions(question)
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+docmancer/docs/domain/query_reference_binding.py:142: in query_mentions
+    for value in sorted(documentation_technical_anchors(question), key=lambda value: (-len(value), value)):
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+question = 'Объясни archive-tool --format json?'
+
+    def documentation_technical_anchors(question: str, *, limit: int = 12) -> tuple[str, ...]:
+        """Extract bounded exact anchors without depending on retrieval infrastructure."""
+        values: list[str] = []
+        for match in _COMMAND_OPTION_VALUE_RE.finditer(question):
+>           if match.group("value").casefold() in _SUPPLEMENTAL_FUNCTION_WORDS:
+                                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           NameError: name '_SUPPLEMENTAL_FUNCTION_WORDS' is not defined
+
+docmancer/docs/domain/query_terms.py:70: NameError
+_ test_literal_probe_requires_same_visible_command_not_bag_of_tokens[Use other-tool --format json to preserve the manifest.-False] _
+
+body = 'Use other-tool --format json to preserve the manifest.'
+expected = False
+
+    @pytest.mark.parametrize("body,expected", [
+        ("Use archive-tool --format json to preserve the manifest.", True),
+        ("Use archive-tool --format text to preserve the manifest.", False),
+        ("archive-tool is described here; json is used by another tool --format text.", False),
+        ("# archive-tool --format json\n\nUnrelated prose follows.", False),
+        ("[archive-tool --format json](https://example.invalid/ref)", False),
+        ("Use other-tool --format json to preserve the manifest.", False),
+        ("Use archive-tool --format jsonl to preserve the manifest.", False),
+    ])
+    def test_literal_probe_requires_same_visible_command_not_bag_of_tokens(body, expected):
+>       lookup = literal_lookup("Объясни archive-tool --format json?", "archive-tool --format json")
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/docs/test_cli_literal_query_binding.py:45: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/docs/test_cli_literal_query_binding.py:14: in literal_lookup
+    plan = build_documentation_query_plan(question)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+docmancer/docs/domain/documentation_query_plan.py:399: in build_documentation_query_plan
+    question_roles = query_constraint_roles(question)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+docmancer/docs/domain/query_terms.py:174: in query_constraint_roles
+    mentions = query_mentions(question)
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+docmancer/docs/domain/query_reference_binding.py:142: in query_mentions
+    for value in sorted(documentation_technical_anchors(question), key=lambda value: (-len(value), value)):
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+question = 'Объясни archive-tool --format json?'
+
+    def documentation_technical_anchors(question: str, *, limit: int = 12) -> tuple[str, ...]:
+        """Extract bounded exact anchors without depending on retrieval infrastructure."""
+        values: list[str] = []
+        for match in _COMMAND_OPTION_VALUE_RE.finditer(question):
+>           if match.group("value").casefold() in _SUPPLEMENTAL_FUNCTION_WORDS:
+                                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           NameError: name '_SUPPLEMENTAL_FUNCTION_WORDS' is not defined
+
+docmancer/docs/domain/query_terms.py:70: NameError
+_ test_literal_probe_requires_same_visible_command_not_bag_of_tokens[Use archive-tool --format jsonl to preserve the manifest.-False] _
+
+body = 'Use archive-tool --format jsonl to preserve the manifest.'
+expected = False
+
+    @pytest.mark.parametrize("body,expected", [
+        ("Use archive-tool --format json to preserve the manifest.", True),
+        ("Use archive-tool --format text to preserve the manifest.", False),
+        ("archive-tool is described here; json is used by another tool --format text.", False),
+        ("# archive-tool --format json\n\nUnrelated prose follows.", False),
+        ("[archive-tool --format json](https://example.invalid/ref)", False),
+        ("Use other-tool --format json to preserve the manifest.", False),
+        ("Use archive-tool --format jsonl to preserve the manifest.", False),
+    ])
+    def test_literal_probe_requires_same_visible_command_not_bag_of_tokens(body, expected):
+>       lookup = literal_lookup("Объясни archive-tool --format json?", "archive-tool --format json")
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/docs/test_cli_literal_query_binding.py:45: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/docs/test_cli_literal_query_binding.py:14: in literal_lookup
+    plan = build_documentation_query_plan(question)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+docmancer/docs/domain/documentation_query_plan.py:399: in build_documentation_query_plan
+    question_roles = query_constraint_roles(question)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+docmancer/docs/domain/query_terms.py:174: in query_constraint_roles
+    mentions = query_mentions(question)
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+docmancer/docs/domain/query_reference_binding.py:142: in query_mentions
+    for value in sorted(documentation_technical_anchors(question), key=lambda value: (-len(value), value)):
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+question = 'Объясни archive-tool --format json?'
+
+    def documentation_technical_anchors(question: str, *, limit: int = 12) -> tuple[str, ...]:
+        """Extract bounded exact anchors without depending on retrieval infrastructure."""
+        values: list[str] = []
+        for match in _COMMAND_OPTION_VALUE_RE.finditer(question):
+>           if match.group("value").casefold() in _SUPPLEMENTAL_FUNCTION_WORDS:
+                                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           NameError: name '_SUPPLEMENTAL_FUNCTION_WORDS' is not defined
+
+docmancer/docs/domain/query_terms.py:70: NameError
+_________ test_command_literal_never_bypasses_source_policy[metadata0] _________
+
+metadata = {'project_identity': 'foreign'}
+
+    @pytest.mark.parametrize("metadata", [
+        {"project_identity": "foreign"}, {"stale": True},
+        {"lifecycle_status": "deprecated"}, {"risk_flags": ["unsafe"]},
+    ])
+    def test_command_literal_never_bypasses_source_policy(metadata):
+>       lookup = literal_lookup("Объясни archive-tool --format json?", "archive-tool --format json")
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/docs/test_cli_literal_query_binding.py:63: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/docs/test_cli_literal_query_binding.py:14: in literal_lookup
+    plan = build_documentation_query_plan(question)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+docmancer/docs/domain/documentation_query_plan.py:399: in build_documentation_query_plan
+    question_roles = query_constraint_roles(question)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+docmancer/docs/domain/query_terms.py:174: in query_constraint_roles
+    mentions = query_mentions(question)
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+docmancer/docs/domain/query_reference_binding.py:142: in query_mentions
+    for value in sorted(documentation_technical_anchors(question), key=lambda value: (-len(value), value)):
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+question = 'Объясни archive-tool --format json?'
+
+    def documentation_technical_anchors(question: str, *, limit: int = 12) -> tuple[str, ...]:
+        """Extract bounded exact anchors without depending on retrieval infrastructure."""
+        values: list[str] = []
+        for match in _COMMAND_OPTION_VALUE_RE.finditer(question):
+>           if match.group("value").casefold() in _SUPPLEMENTAL_FUNCTION_WORDS:
+                                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           NameError: name '_SUPPLEMENTAL_FUNCTION_WORDS' is not defined
+
+docmancer/docs/domain/query_terms.py:70: NameError
+_________ test_command_literal_never_bypasses_source_policy[metadata1] _________
+
+metadata = {'stale': True}
+
+    @pytest.mark.parametrize("metadata", [
+        {"project_identity": "foreign"}, {"stale": True},
+        {"lifecycle_status": "deprecated"}, {"risk_flags": ["unsafe"]},
+    ])
+    def test_command_literal_never_bypasses_source_policy(metadata):
+>       lookup = literal_lookup("Объясни archive-tool --format json?", "archive-tool --format json")
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/docs/test_cli_literal_query_binding.py:63: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/docs/test_cli_literal_query_binding.py:14: in literal_lookup
+    plan = build_documentation_query_plan(question)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+docmancer/docs/domain/documentation_query_plan.py:399: in build_documentation_query_plan
+    question_roles = query_constraint_roles(question)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+docmancer/docs/domain/query_terms.py:174: in query_constraint_roles
+    mentions = query_mentions(question)
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+docmancer/docs/domain/query_reference_binding.py:142: in query_mentions
+    for value in sorted(documentation_technical_anchors(question), key=lambda value: (-len(value), value)):
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+question = 'Объясни archive-tool --format json?'
+
+    def documentation_technical_anchors(question: str, *, limit: int = 12) -> tuple[str, ...]:
+        """Extract bounded exact anchors without depending on retrieval infrastructure."""
+        values: list[str] = []
+        for match in _COMMAND_OPTION_VALUE_RE.finditer(question):
+>           if match.group("value").casefold() in _SUPPLEMENTAL_FUNCTION_WORDS:
+                                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           NameError: name '_SUPPLEMENTAL_FUNCTION_WORDS' is not defined
+
+docmancer/docs/domain/query_terms.py:70: NameError
+_________ test_command_literal_never_bypasses_source_policy[metadata2] _________
+
+metadata = {'lifecycle_status': 'deprecated'}
+
+    @pytest.mark.parametrize("metadata", [
+        {"project_identity": "foreign"}, {"stale": True},
+        {"lifecycle_status": "deprecated"}, {"risk_flags": ["unsafe"]},
+    ])
+    def test_command_literal_never_bypasses_source_policy(metadata):
+>       lookup = literal_lookup("Объясни archive-tool --format json?", "archive-tool --format json")
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/docs/test_cli_literal_query_binding.py:63: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/docs/test_cli_literal_query_binding.py:14: in literal_lookup
+    plan = build_documentation_query_plan(question)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+docmancer/docs/domain/documentation_query_plan.py:399: in build_documentation_query_plan
+    question_roles = query_constraint_roles(question)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+docmancer/docs/domain/query_terms.py:174: in query_constraint_roles
+    mentions = query_mentions(question)
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+docmancer/docs/domain/query_reference_binding.py:142: in query_mentions
+    for value in sorted(documentation_technical_anchors(question), key=lambda value: (-len(value), value)):
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+question = 'Объясни archive-tool --format json?'
+
+    def documentation_technical_anchors(question: str, *, limit: int = 12) -> tuple[str, ...]:
+        """Extract bounded exact anchors without depending on retrieval infrastructure."""
+        values: list[str] = []
+        for match in _COMMAND_OPTION_VALUE_RE.finditer(question):
+>           if match.group("value").casefold() in _SUPPLEMENTAL_FUNCTION_WORDS:
+                                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           NameError: name '_SUPPLEMENTAL_FUNCTION_WORDS' is not defined
+
+docmancer/docs/domain/query_terms.py:70: NameError
+_________ test_command_literal_never_bypasses_source_policy[metadata3] _________
+
+metadata = {'risk_flags': ['unsafe']}
+
+    @pytest.mark.parametrize("metadata", [
+        {"project_identity": "foreign"}, {"stale": True},
+        {"lifecycle_status": "deprecated"}, {"risk_flags": ["unsafe"]},
+    ])
+    def test_command_literal_never_bypasses_source_policy(metadata):
+>       lookup = literal_lookup("Объясни archive-tool --format json?", "archive-tool --format json")
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/docs/test_cli_literal_query_binding.py:63: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/docs/test_cli_literal_query_binding.py:14: in literal_lookup
+    plan = build_documentation_query_plan(question)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+docmancer/docs/domain/documentation_query_plan.py:399: in build_documentation_query_plan
+    question_roles = query_constraint_roles(question)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+docmancer/docs/domain/query_terms.py:174: in query_constraint_roles
+    mentions = query_mentions(question)
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+docmancer/docs/domain/query_reference_binding.py:142: in query_mentions
+    for value in sorted(documentation_technical_anchors(question), key=lambda value: (-len(value), value)):
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+question = 'Объясни archive-tool --format json?'
+
+    def documentation_technical_anchors(question: str, *, limit: int = 12) -> tuple[str, ...]:
+        """Extract bounded exact anchors without depending on retrieval infrastructure."""
+        values: list[str] = []
+        for match in _COMMAND_OPTION_VALUE_RE.finditer(question):
+>           if match.group("value").casefold() in _SUPPLEMENTAL_FUNCTION_WORDS:
+                                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           NameError: name '_SUPPLEMENTAL_FUNCTION_WORDS' is not defined
+
+docmancer/docs/domain/query_terms.py:70: NameError
+_ test_ambiguous_or_boolean_options_do_not_invent_values[Explain cache-store --verbose and its output.] _
+
+question = 'Explain cache-store --verbose and its output.'
+
+    @pytest.mark.parametrize("question", [
+        "Does --verbose delete files?", "Explain cache-store --verbose and its output.",
+        "Explain cache-store --dry-run?", "Explain ordinary prose with no command.",
+        "Explain cache-store\n--zone remote?",
+    ])
+    def test_ambiguous_or_boolean_options_do_not_invent_values(question):
+        assert not any(q.text.startswith("`") and " --" in q.text
+>                      for q in build_documentation_query_plan(question).queries
+                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                       if q.origin == "exact_anchor")
+
+tests/docs/test_cli_literal_query_binding.py:79: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+docmancer/docs/domain/documentation_query_plan.py:399: in build_documentation_query_plan
+    question_roles = query_constraint_roles(question)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+docmancer/docs/domain/query_terms.py:174: in query_constraint_roles
+    mentions = query_mentions(question)
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+docmancer/docs/domain/query_reference_binding.py:142: in query_mentions
+    for value in sorted(documentation_technical_anchors(question), key=lambda value: (-len(value), value)):
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+question = 'Explain cache-store --verbose and its output.'
+
+    def documentation_technical_anchors(question: str, *, limit: int = 12) -> tuple[str, ...]:
+        """Extract bounded exact anchors without depending on retrieval infrastructure."""
+        values: list[str] = []
+        for match in _COMMAND_OPTION_VALUE_RE.finditer(question):
+>           if match.group("value").casefold() in _SUPPLEMENTAL_FUNCTION_WORDS:
+                                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           NameError: name '_SUPPLEMENTAL_FUNCTION_WORDS' is not defined
+
+docmancer/docs/domain/query_terms.py:70: NameError
+_____________________ test_literal_probe_budget_is_bounded _____________________
+
+    def test_literal_probe_budget_is_bounded():
+        question = " ".join(f"cache-tool --zone r{i}" for i in range(20))
+>       anchors = technical_anchors(question)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/docs/test_cli_literal_query_binding.py:85: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+docmancer/docs/domain/documentation_query_plan.py:732: in technical_anchors
+    value for value in documentation_technical_anchors(question)
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+question = 'cache-tool --zone r0 cache-tool --zone r1 cache-tool --zone r2 cache-tool --zone r3 cache-tool --zone r4 cache-tool -...zone r14 cache-tool --zone r15 cache-tool --zone r16 cache-tool --zone r17 cache-tool --zone r18 cache-tool --zone r19'
+
+    def documentation_technical_anchors(question: str, *, limit: int = 12) -> tuple[str, ...]:
+        """Extract bounded exact anchors without depending on retrieval infrastructure."""
+        values: list[str] = []
+        for match in _COMMAND_OPTION_VALUE_RE.finditer(question):
+>           if match.group("value").casefold() in _SUPPLEMENTAL_FUNCTION_WORDS:
+                                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           NameError: name '_SUPPLEMENTAL_FUNCTION_WORDS' is not defined
+
+docmancer/docs/domain/query_terms.py:70: NameError
+___________________ test_original_question_retains_negation ____________________
+
+    def test_original_question_retains_negation():
+        question = "Почему archive-tool --format json не удаляет manifest?"
+>       literal_lookup(question, "archive-tool --format json")
+
+tests/docs/test_cli_literal_query_binding.py:93: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/docs/test_cli_literal_query_binding.py:14: in literal_lookup
+    plan = build_documentation_query_plan(question)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+docmancer/docs/domain/documentation_query_plan.py:399: in build_documentation_query_plan
+    question_roles = query_constraint_roles(question)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+docmancer/docs/domain/query_terms.py:174: in query_constraint_roles
+    mentions = query_mentions(question)
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+docmancer/docs/domain/query_reference_binding.py:142: in query_mentions
+    for value in sorted(documentation_technical_anchors(question), key=lambda value: (-len(value), value)):
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+question = 'Почему archive-tool --format json не удаляет manifest?'
+
+    def documentation_technical_anchors(question: str, *, limit: int = 12) -> tuple[str, ...]:
+        """Extract bounded exact anchors without depending on retrieval infrastructure."""
+        values: list[str] = []
+        for match in _COMMAND_OPTION_VALUE_RE.finditer(question):
+>           if match.group("value").casefold() in _SUPPLEMENTAL_FUNCTION_WORDS:
+                                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           NameError: name '_SUPPLEMENTAL_FUNCTION_WORDS' is not defined
+
+docmancer/docs/domain/query_terms.py:70: NameError
+___________________ test_literal_respects_requested_limit[1] ___________________
+
+limit = 1
+
+    @pytest.mark.parametrize('limit',[1,2,3,4,12])
+    def test_literal_respects_requested_limit(limit):
+        q=' '.join(f'cache-tool --zone r{i}' for i in range(20))
+>       assert len(documentation_technical_anchors(q,limit=limit))<=limit
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/docs/test_cli_literal_query_limits.py:8: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+question = 'cache-tool --zone r0 cache-tool --zone r1 cache-tool --zone r2 cache-tool --zone r3 cache-tool --zone r4 cache-tool -...zone r14 cache-tool --zone r15 cache-tool --zone r16 cache-tool --zone r17 cache-tool --zone r18 cache-tool --zone r19'
+
+    def documentation_technical_anchors(question: str, *, limit: int = 12) -> tuple[str, ...]:
+        """Extract bounded exact anchors without depending on retrieval infrastructure."""
+        values: list[str] = []
+        for match in _COMMAND_OPTION_VALUE_RE.finditer(question):
+>           if match.group("value").casefold() in _SUPPLEMENTAL_FUNCTION_WORDS:
+                                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           NameError: name '_SUPPLEMENTAL_FUNCTION_WORDS' is not defined
+
+docmancer/docs/domain/query_terms.py:70: NameError
+___________________ test_literal_respects_requested_limit[2] ___________________
+
+limit = 2
+
+    @pytest.mark.parametrize('limit',[1,2,3,4,12])
+    def test_literal_respects_requested_limit(limit):
+        q=' '.join(f'cache-tool --zone r{i}' for i in range(20))
+>       assert len(documentation_technical_anchors(q,limit=limit))<=limit
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/docs/test_cli_literal_query_limits.py:8: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+question = 'cache-tool --zone r0 cache-tool --zone r1 cache-tool --zone r2 cache-tool --zone r3 cache-tool --zone r4 cache-tool -...zone r14 cache-tool --zone r15 cache-tool --zone r16 cache-tool --zone r17 cache-tool --zone r18 cache-tool --zone r19'
+
+    def documentation_technical_anchors(question: str, *, limit: int = 12) -> tuple[str, ...]:
+        """Extract bounded exact anchors without depending on retrieval infrastructure."""
+        values: list[str] = []
+        for match in _COMMAND_OPTION_VALUE_RE.finditer(question):
+>           if match.group("value").casefold() in _SUPPLEMENTAL_FUNCTION_WORDS:
+                                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           NameError: name '_SUPPLEMENTAL_FUNCTION_WORDS' is not defined
+
+docmancer/docs/domain/query_terms.py:70: NameError
+___________________ test_literal_respects_requested_limit[3] ___________________
+
+limit = 3
+
+    @pytest.mark.parametrize('limit',[1,2,3,4,12])
+    def test_literal_respects_requested_limit(limit):
+        q=' '.join(f'cache-tool --zone r{i}' for i in range(20))
+>       assert len(documentation_technical_anchors(q,limit=limit))<=limit
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/docs/test_cli_literal_query_limits.py:8: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+question = 'cache-tool --zone r0 cache-tool --zone r1 cache-tool --zone r2 cache-tool --zone r3 cache-tool --zone r4 cache-tool -...zone r14 cache-tool --zone r15 cache-tool --zone r16 cache-tool --zone r17 cache-tool --zone r18 cache-tool --zone r19'
+
+    def documentation_technical_anchors(question: str, *, limit: int = 12) -> tuple[str, ...]:
+        """Extract bounded exact anchors without depending on retrieval infrastructure."""
+        values: list[str] = []
+        for match in _COMMAND_OPTION_VALUE_RE.finditer(question):
+>           if match.group("value").casefold() in _SUPPLEMENTAL_FUNCTION_WORDS:
+                                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           NameError: name '_SUPPLEMENTAL_FUNCTION_WORDS' is not defined
+
+docmancer/docs/domain/query_terms.py:70: NameError
+___________________ test_literal_respects_requested_limit[4] ___________________
+
+limit = 4
+
+    @pytest.mark.parametrize('limit',[1,2,3,4,12])
+    def test_literal_respects_requested_limit(limit):
+        q=' '.join(f'cache-tool --zone r{i}' for i in range(20))
+>       assert len(documentation_technical_anchors(q,limit=limit))<=limit
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/docs/test_cli_literal_query_limits.py:8: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+question = 'cache-tool --zone r0 cache-tool --zone r1 cache-tool --zone r2 cache-tool --zone r3 cache-tool --zone r4 cache-tool -...zone r14 cache-tool --zone r15 cache-tool --zone r16 cache-tool --zone r17 cache-tool --zone r18 cache-tool --zone r19'
+
+    def documentation_technical_anchors(question: str, *, limit: int = 12) -> tuple[str, ...]:
+        """Extract bounded exact anchors without depending on retrieval infrastructure."""
+        values: list[str] = []
+        for match in _COMMAND_OPTION_VALUE_RE.finditer(question):
+>           if match.group("value").casefold() in _SUPPLEMENTAL_FUNCTION_WORDS:
+                                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           NameError: name '_SUPPLEMENTAL_FUNCTION_WORDS' is not defined
+
+docmancer/docs/domain/query_terms.py:70: NameError
+__________________ test_literal_respects_requested_limit[12] ___________________
+
+limit = 12
+
+    @pytest.mark.parametrize('limit',[1,2,3,4,12])
+    def test_literal_respects_requested_limit(limit):
+        q=' '.join(f'cache-tool --zone r{i}' for i in range(20))
+>       assert len(documentation_technical_anchors(q,limit=limit))<=limit
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/docs/test_cli_literal_query_limits.py:8: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+question = 'cache-tool --zone r0 cache-tool --zone r1 cache-tool --zone r2 cache-tool --zone r3 cache-tool --zone r4 cache-tool -...zone r14 cache-tool --zone r15 cache-tool --zone r16 cache-tool --zone r17 cache-tool --zone r18 cache-tool --zone r19'
+
+    def documentation_technical_anchors(question: str, *, limit: int = 12) -> tuple[str, ...]:
+        """Extract bounded exact anchors without depending on retrieval infrastructure."""
+        values: list[str] = []
+        for match in _COMMAND_OPTION_VALUE_RE.finditer(question):
+>           if match.group("value").casefold() in _SUPPLEMENTAL_FUNCTION_WORDS:
+                                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           NameError: name '_SUPPLEMENTAL_FUNCTION_WORDS' is not defined
+
+docmancer/docs/domain/query_terms.py:70: NameError
+________ test_overlong_literal_is_not_admitted_without_exact_constraint ________
+
+    def test_overlong_literal_is_not_admitted_without_exact_constraint():
+        question='tool-'+('a'*140)+' --zone '+('b'*60)
+>       literals=[x for x in documentation_technical_anchors(question) if x.startswith('`')]
+                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/docs/test_cli_literal_query_limits.py:12: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+question = 'tool-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa --zone bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb'
+
+    def documentation_technical_anchors(question: str, *, limit: int = 12) -> tuple[str, ...]:
+        """Extract bounded exact anchors without depending on retrieval infrastructure."""
+        values: list[str] = []
+        for match in _COMMAND_OPTION_VALUE_RE.finditer(question):
+>           if match.group("value").casefold() in _SUPPLEMENTAL_FUNCTION_WORDS:
+                                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           NameError: name '_SUPPLEMENTAL_FUNCTION_WORDS' is not defined
+
+docmancer/docs/domain/query_terms.py:70: NameError
+_ test_visible_component_novelty_follows_exact_constraints_before_public_queries[projection_clip] _
+
+loss = 'projection_clip'
+
+    @pytest.mark.parametrize("loss", [None, "clip", "projection_clip", "budget", "unknown"])
+    def test_visible_component_novelty_follows_exact_constraints_before_public_queries(loss):
+        question = "What should I read in OrionRepo and what should I test?"
+        plan = build_documentation_query_plan(
+            question, requirements=build_requirements(question, profile="project_docs_answer"),
+        ).as_payload()
+        # Use a compact public plan to put four competing sources under the real cap.
+        plan.update(
+            public_query_ids=["query-anchor", "query-original", "query-lookup-1"],
+            queries=[
+                {"query_id": "query-anchor", "text": "EXACT_KEY", "origin": "exact_anchor"},
+                {"query_id": "query-original", "text": "contributor overview", "origin": "original"},
+                {"query_id": "query-lookup-1", "text": "general background", "origin": "host_lookup"},
+            ],
+        )
+        reading = "For OrionRepo, first read README.md, then read docs/architecture.md."
+        testing = "For OrionRepo, run pytest tests/docs before opening a pull request."
+        components = {row["relation"]: row["component_id"] for row in plan["_component_contract"]}
+    
+        def source(identity, content, matches):
+            return {
+                "stable_id": identity, "source_class": "project_doc", "path": f"docs/{identity}.md",
+                "content": content, "project_identity": "repo", "authority": "source_of_truth",
+                "freshness": "current", "index_freshness": "synchronized", "lifecycle_status": "active",
+                "line_start": 1, "retrieval_query_matches": matches,
+            }
+    
+        candidates = [
+            source("reading", reading + " Contributor overview.", {"query-original": {"query_text": "contributor overview"}}),
+            source("duplicate", reading + " General background.", {"query-lookup-1": {"query_text": "general background"}}),
+            source("testing", testing, {components["testing"]: {"query_text": "OrionRepo testing"}}),
+            source("exact", "EXACT_KEY selects the local contributor configuration.", {"query-anchor": {"query_text": "EXACT_KEY"}}),
+        ]
+        if loss == "clip":
+            candidates[2]["content"] = "For OrionRepo, run"
+        elif loss == "projection_clip":
+            candidates[2]["content"] = "For OrionRepo, " + "background " * 55 + "run pytest tests/docs before opening a pull request."
+        elif loss == "budget":
+            candidates[2]["path"] = "docs/" + "oversized" * 500 + ".md"
+        elif loss == "unknown":
+            plan["_component_contract"] = [row for row in plan["_component_contract"] if row["relation"] != "testing"]
+        diagnostics = {}
+        projection, snapshot = project_docs_context(retrieval={
+            "context_pack": candidates, "documentation_query_plan": plan,
+        }, selection_diagnostics=diagnostics)
+        paths = [source["path_or_url"] for source in projection["sources"]]
+        assert paths[0] == "docs/exact.md"
+        assert len(paths) == 3
+        assert projection["estimated_tokens"] <= 800
+        assert projection["answer_supported"] is False and projection["edit_ready"] is False
+        assert "project_answer:" not in str(projection)
+        if loss is None:
+            assert set(paths) == {"docs/exact.md", "docs/reading.md", "docs/testing.md"}
+            assert diagnostics["component_coverage"]["status"] == "full"
+            assert "query-lookup-1" in projection["missing_query_ids"]
+        else:
+>           assert "docs/testing.md" not in paths
+E           AssertionError: assert 'docs/testing.md' not in ['docs/exact.md', 'docs/reading.md', 'docs/testing.md']
+
+tests/docs/test_component_coverage.py:278: AssertionError
+______ test_frozen_request_flow_prefers_project_context_module_witnesses _______
+
+    def test_frozen_request_flow_prefers_project_context_module_witnesses():
+        from eval.project_context_quality_v2_protocol import evaluate_case, load_cases
+        from scripts.run_project_docs_self_host_gate import LiveCase, run
+    
+        case = next(row for row in load_cases() if row["id"] == "v2-natural-request-flow")
+        result = run(cases=(LiveCase(
+            case_id=case["id"], question=case["question"], relevant_paths=(),
+            lookup_queries=tuple(case["lookup_queries"]), scope=case["scope"],
+        ),), negative_cases=())
+        payload = result["results"][0]["payload"]
+        verdict = evaluate_case(case, payload)
+        assert "docs/modules/project-context-retrieval.md" in {
+            source["path_or_url"] for source in payload["sources"]
+        }
+>       assert all(row["met"] for row in verdict["obligations"]), verdict["obligations"]
+E       AssertionError: [{'id': 'flow_mcp', 'lookup_query_ids': ['query-lookup-1'], 'met': False, 'visible_witnesses': []}, {'id': 'flow_appli...ible_witnesses': [{'evidence_id': 'ev-8ae1789c9c28bae9', 'path_or_url': 'docs/modules/project-context-retrieval.md'}]}]
+E       assert False
+E        +  where False = all(<generator object test_frozen_request_flow_prefers_project_context_module_witnesses.<locals>.<genexpr> at 0x76ef7dcb76b0>)
+
+tests/docs/test_context_projection_boundaries.py:236: AssertionError
+_ test_direct_docatlas_questions_15_visible_context_covers_all_required_facts __
+
+    def test_direct_docatlas_questions_15_visible_context_covers_all_required_facts():
+>       _assert_direct_15_sidecar()
+
+tests/docs/test_direct_docatlas_questions_15.py:181: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def _assert_direct_15_sidecar() -> None:
+        sidecar = _direct_15_payload()
+        assert sidecar["baseline_commit"] == "e179471527e009c88f77acbdaeeeeb8ad1c8d316"
+        assert sidecar["request_contract"] == {
+            "scope": "all",
+            "lookup_queries": "absent",
+            "maximum_sources": 3,
+            "maximum_estimated_tokens": 800,
+        }
+        assert [row["id"] for row in sidecar["cases"]] == [
+            f"Q{index:02d}" for index in range(1, 16)
+        ]
+    
+        for source_path, metadata in sidecar["sources"].items():
+            path = _REPO_ROOT / source_path
+            assert path.is_file(), source_path
+>           assert _git_blob_sha(path) == metadata["git_blob_sha"], source_path
+E           AssertionError: README.md
+E           assert '9678dd4d10ca...e0db1c7539772' == '1a1975b2ffaf...cdb20e7a88468'
+E             
+E             - 1a1975b2ffaf587f3b752c1966acdb20e7a88468
+E             + 9678dd4d10ca77856e33393ffa8e0db1c7539772
+
+tests/docs/test_direct_docatlas_questions_15.py:45: AssertionError
+________________ test_stale_health_live_status_sync_and_removal ________________
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x76ef7e1fd1d0>
+
+    def test_stale_health_live_status_sync_and_removal(monkeypatch):
+        from eval.project_context_quality_v2_protocol import load_cases, validate_corpus, evaluate_case, _witness_visible
+        from scripts.run_project_docs_self_host_gate import LiveCase, run
+    
+>       validate_corpus()
+
+tests/docs/test_generic_context_workflows.py:60: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def validate_corpus() -> dict[str, Any]:
+        rows = load_cases()
+        catalog = _catalog()
+        lock = json.loads(LOCK_PATH.read_text(encoding="utf-8"))
+        migration = json.loads(MIGRATION_PATH.read_text(encoding="utf-8"))["crosswalk"]
+        if {row["v2_id"] for row in migration} != {row["id"] for row in rows}:
+            raise ValueError("v2 migration crosswalk is incomplete")
+        witness_paths: set[str] = set()
+        lane_counts: Counter[str] = Counter()
+        type_counts: Counter[str] = Counter()
+        for case in rows:
+            lane_counts[case["lane"]] += 1
+            case_type = case.get("case_type", "positive" if case["expected_kind"] == "docs_context" else "strict_negative")
+            type_counts[case_type] += 1
+            if case["question"] != case["original_question"]:
+                raise ValueError(f"original prompt changed: {case['id']}")
+            if case.get("case_type", "positive" if case["expected_kind"] == "docs_context" else "strict_negative") == "positive" and not case["obligations"]:
+                raise ValueError(f"positive case has no obligations: {case['id']}")
+            if len(case["lookup_queries"]) != len(case["lookup_query_ids"]):
+                raise ValueError(f"lookup inventory mismatch: {case['id']}")
+            for obligation in case["obligations"]:
+                if not obligation.get("accepted_witnesses") or not obligation.get("lookup_query_ids"):
+                    raise ValueError(f"incomplete obligation: {case['id']}/{obligation['id']}")
+                if obligation["id"] in case["lookup_query_ids"]:
+                    raise ValueError(f"semantic obligation reuses a lookup id: {case['id']}/{obligation['id']}")
+                for witness in obligation["accepted_witnesses"]:
+                    path = witness["path"]
+                    metadata = catalog.get(path)
+                    if metadata is None:
+                        raise ValueError(f"witness is not an active catalog document: {path}")
+                    if metadata["authority"] not in obligation["accepted_authorities"] or metadata["scope"] not in obligation["accepted_scopes"]:
+                        raise ValueError(f"witness authority/scope mismatch: {path}")
+                    if normalize_prose(witness["text"]) not in normalize_prose((ROOT / path).read_text(encoding="utf-8")):
+>                       raise ValueError(f"witness text is absent from active document: {path}")
+E                       ValueError: witness text is absent from active document: docs/mcp-docs-server.md
+
+eval/project_context_quality_v2_protocol.py:168: ValueError
+________________________ test_first_session_live_query _________________________
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x76ef7c578210>
+
+    def test_first_session_live_query(monkeypatch):
+        from copy import deepcopy
+        from eval.project_context_quality_v2_protocol import load_cases, validate_corpus, evaluate_case
+        from scripts.run_project_docs_self_host_gate import LiveCase, run
+    
+>       validate_corpus()
+
+tests/docs/test_generic_context_workflows.py:109: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def validate_corpus() -> dict[str, Any]:
+        rows = load_cases()
+        catalog = _catalog()
+        lock = json.loads(LOCK_PATH.read_text(encoding="utf-8"))
+        migration = json.loads(MIGRATION_PATH.read_text(encoding="utf-8"))["crosswalk"]
+        if {row["v2_id"] for row in migration} != {row["id"] for row in rows}:
+            raise ValueError("v2 migration crosswalk is incomplete")
+        witness_paths: set[str] = set()
+        lane_counts: Counter[str] = Counter()
+        type_counts: Counter[str] = Counter()
+        for case in rows:
+            lane_counts[case["lane"]] += 1
+            case_type = case.get("case_type", "positive" if case["expected_kind"] == "docs_context" else "strict_negative")
+            type_counts[case_type] += 1
+            if case["question"] != case["original_question"]:
+                raise ValueError(f"original prompt changed: {case['id']}")
+            if case.get("case_type", "positive" if case["expected_kind"] == "docs_context" else "strict_negative") == "positive" and not case["obligations"]:
+                raise ValueError(f"positive case has no obligations: {case['id']}")
+            if len(case["lookup_queries"]) != len(case["lookup_query_ids"]):
+                raise ValueError(f"lookup inventory mismatch: {case['id']}")
+            for obligation in case["obligations"]:
+                if not obligation.get("accepted_witnesses") or not obligation.get("lookup_query_ids"):
+                    raise ValueError(f"incomplete obligation: {case['id']}/{obligation['id']}")
+                if obligation["id"] in case["lookup_query_ids"]:
+                    raise ValueError(f"semantic obligation reuses a lookup id: {case['id']}/{obligation['id']}")
+                for witness in obligation["accepted_witnesses"]:
+                    path = witness["path"]
+                    metadata = catalog.get(path)
+                    if metadata is None:
+                        raise ValueError(f"witness is not an active catalog document: {path}")
+                    if metadata["authority"] not in obligation["accepted_authorities"] or metadata["scope"] not in obligation["accepted_scopes"]:
+                        raise ValueError(f"witness authority/scope mismatch: {path}")
+                    if normalize_prose(witness["text"]) not in normalize_prose((ROOT / path).read_text(encoding="utf-8")):
+>                       raise ValueError(f"witness text is absent from active document: {path}")
+E                       ValueError: witness text is absent from active document: docs/mcp-docs-server.md
+
+eval/project_context_quality_v2_protocol.py:168: ValueError
+___________________ test_contributor_live_reading_and_tests ____________________
+
+    def test_contributor_live_reading_and_tests():
+        from eval.project_context_quality_v2_protocol import load_cases, validate_corpus, evaluate_case
+        from scripts.run_project_docs_self_host_gate import LiveCase, run
+    
+>       validate_corpus()
+
+tests/docs/test_generic_context_workflows.py:220: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def validate_corpus() -> dict[str, Any]:
+        rows = load_cases()
+        catalog = _catalog()
+        lock = json.loads(LOCK_PATH.read_text(encoding="utf-8"))
+        migration = json.loads(MIGRATION_PATH.read_text(encoding="utf-8"))["crosswalk"]
+        if {row["v2_id"] for row in migration} != {row["id"] for row in rows}:
+            raise ValueError("v2 migration crosswalk is incomplete")
+        witness_paths: set[str] = set()
+        lane_counts: Counter[str] = Counter()
+        type_counts: Counter[str] = Counter()
+        for case in rows:
+            lane_counts[case["lane"]] += 1
+            case_type = case.get("case_type", "positive" if case["expected_kind"] == "docs_context" else "strict_negative")
+            type_counts[case_type] += 1
+            if case["question"] != case["original_question"]:
+                raise ValueError(f"original prompt changed: {case['id']}")
+            if case.get("case_type", "positive" if case["expected_kind"] == "docs_context" else "strict_negative") == "positive" and not case["obligations"]:
+                raise ValueError(f"positive case has no obligations: {case['id']}")
+            if len(case["lookup_queries"]) != len(case["lookup_query_ids"]):
+                raise ValueError(f"lookup inventory mismatch: {case['id']}")
+            for obligation in case["obligations"]:
+                if not obligation.get("accepted_witnesses") or not obligation.get("lookup_query_ids"):
+                    raise ValueError(f"incomplete obligation: {case['id']}/{obligation['id']}")
+                if obligation["id"] in case["lookup_query_ids"]:
+                    raise ValueError(f"semantic obligation reuses a lookup id: {case['id']}/{obligation['id']}")
+                for witness in obligation["accepted_witnesses"]:
+                    path = witness["path"]
+                    metadata = catalog.get(path)
+                    if metadata is None:
+                        raise ValueError(f"witness is not an active catalog document: {path}")
+                    if metadata["authority"] not in obligation["accepted_authorities"] or metadata["scope"] not in obligation["accepted_scopes"]:
+                        raise ValueError(f"witness authority/scope mismatch: {path}")
+                    if normalize_prose(witness["text"]) not in normalize_prose((ROOT / path).read_text(encoding="utf-8")):
+>                       raise ValueError(f"witness text is absent from active document: {path}")
+E                       ValueError: witness text is absent from active document: docs/mcp-docs-server.md
+
+eval/project_context_quality_v2_protocol.py:168: ValueError
+____ test_remaining_live_workflow_witnesses[v2-natural-evidence-selection] _____
+
+case_id = 'v2-natural-evidence-selection'
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x76ef7ce08910>
+
+    @pytest.mark.parametrize("case_id", [
+        "v2-natural-evidence-selection", "v2-natural-offline", "v2-paraphrase-local-trial",
+    ])
+    def test_remaining_live_workflow_witnesses(case_id, monkeypatch):
+        import hashlib
+        from eval.project_context_quality_v2_protocol import load_cases, validate_corpus, evaluate_case
+        from scripts.run_project_docs_self_host_gate import LiveCase, run
+        from docmancer.docs.application.model_visible_projection import validate_model_visible_projection
+    
+>       validate_corpus()
+
+tests/docs/test_generic_context_workflows.py:245: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def validate_corpus() -> dict[str, Any]:
+        rows = load_cases()
+        catalog = _catalog()
+        lock = json.loads(LOCK_PATH.read_text(encoding="utf-8"))
+        migration = json.loads(MIGRATION_PATH.read_text(encoding="utf-8"))["crosswalk"]
+        if {row["v2_id"] for row in migration} != {row["id"] for row in rows}:
+            raise ValueError("v2 migration crosswalk is incomplete")
+        witness_paths: set[str] = set()
+        lane_counts: Counter[str] = Counter()
+        type_counts: Counter[str] = Counter()
+        for case in rows:
+            lane_counts[case["lane"]] += 1
+            case_type = case.get("case_type", "positive" if case["expected_kind"] == "docs_context" else "strict_negative")
+            type_counts[case_type] += 1
+            if case["question"] != case["original_question"]:
+                raise ValueError(f"original prompt changed: {case['id']}")
+            if case.get("case_type", "positive" if case["expected_kind"] == "docs_context" else "strict_negative") == "positive" and not case["obligations"]:
+                raise ValueError(f"positive case has no obligations: {case['id']}")
+            if len(case["lookup_queries"]) != len(case["lookup_query_ids"]):
+                raise ValueError(f"lookup inventory mismatch: {case['id']}")
+            for obligation in case["obligations"]:
+                if not obligation.get("accepted_witnesses") or not obligation.get("lookup_query_ids"):
+                    raise ValueError(f"incomplete obligation: {case['id']}/{obligation['id']}")
+                if obligation["id"] in case["lookup_query_ids"]:
+                    raise ValueError(f"semantic obligation reuses a lookup id: {case['id']}/{obligation['id']}")
+                for witness in obligation["accepted_witnesses"]:
+                    path = witness["path"]
+                    metadata = catalog.get(path)
+                    if metadata is None:
+                        raise ValueError(f"witness is not an active catalog document: {path}")
+                    if metadata["authority"] not in obligation["accepted_authorities"] or metadata["scope"] not in obligation["accepted_scopes"]:
+                        raise ValueError(f"witness authority/scope mismatch: {path}")
+                    if normalize_prose(witness["text"]) not in normalize_prose((ROOT / path).read_text(encoding="utf-8")):
+>                       raise ValueError(f"witness text is absent from active document: {path}")
+E                       ValueError: witness text is absent from active document: docs/mcp-docs-server.md
+
+eval/project_context_quality_v2_protocol.py:168: ValueError
+__________ test_remaining_live_workflow_witnesses[v2-natural-offline] __________
+
+case_id = 'v2-natural-offline'
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x76ef7d07f620>
+
+    @pytest.mark.parametrize("case_id", [
+        "v2-natural-evidence-selection", "v2-natural-offline", "v2-paraphrase-local-trial",
+    ])
+    def test_remaining_live_workflow_witnesses(case_id, monkeypatch):
+        import hashlib
+        from eval.project_context_quality_v2_protocol import load_cases, validate_corpus, evaluate_case
+        from scripts.run_project_docs_self_host_gate import LiveCase, run
+        from docmancer.docs.application.model_visible_projection import validate_model_visible_projection
+    
+>       validate_corpus()
+
+tests/docs/test_generic_context_workflows.py:245: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def validate_corpus() -> dict[str, Any]:
+        rows = load_cases()
+        catalog = _catalog()
+        lock = json.loads(LOCK_PATH.read_text(encoding="utf-8"))
+        migration = json.loads(MIGRATION_PATH.read_text(encoding="utf-8"))["crosswalk"]
+        if {row["v2_id"] for row in migration} != {row["id"] for row in rows}:
+            raise ValueError("v2 migration crosswalk is incomplete")
+        witness_paths: set[str] = set()
+        lane_counts: Counter[str] = Counter()
+        type_counts: Counter[str] = Counter()
+        for case in rows:
+            lane_counts[case["lane"]] += 1
+            case_type = case.get("case_type", "positive" if case["expected_kind"] == "docs_context" else "strict_negative")
+            type_counts[case_type] += 1
+            if case["question"] != case["original_question"]:
+                raise ValueError(f"original prompt changed: {case['id']}")
+            if case.get("case_type", "positive" if case["expected_kind"] == "docs_context" else "strict_negative") == "positive" and not case["obligations"]:
+                raise ValueError(f"positive case has no obligations: {case['id']}")
+            if len(case["lookup_queries"]) != len(case["lookup_query_ids"]):
+                raise ValueError(f"lookup inventory mismatch: {case['id']}")
+            for obligation in case["obligations"]:
+                if not obligation.get("accepted_witnesses") or not obligation.get("lookup_query_ids"):
+                    raise ValueError(f"incomplete obligation: {case['id']}/{obligation['id']}")
+                if obligation["id"] in case["lookup_query_ids"]:
+                    raise ValueError(f"semantic obligation reuses a lookup id: {case['id']}/{obligation['id']}")
+                for witness in obligation["accepted_witnesses"]:
+                    path = witness["path"]
+                    metadata = catalog.get(path)
+                    if metadata is None:
+                        raise ValueError(f"witness is not an active catalog document: {path}")
+                    if metadata["authority"] not in obligation["accepted_authorities"] or metadata["scope"] not in obligation["accepted_scopes"]:
+                        raise ValueError(f"witness authority/scope mismatch: {path}")
+                    if normalize_prose(witness["text"]) not in normalize_prose((ROOT / path).read_text(encoding="utf-8")):
+>                       raise ValueError(f"witness text is absent from active document: {path}")
+E                       ValueError: witness text is absent from active document: docs/mcp-docs-server.md
+
+eval/project_context_quality_v2_protocol.py:168: ValueError
+______ test_remaining_live_workflow_witnesses[v2-paraphrase-local-trial] _______
+
+case_id = 'v2-paraphrase-local-trial'
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x76ef7e07c360>
+
+    @pytest.mark.parametrize("case_id", [
+        "v2-natural-evidence-selection", "v2-natural-offline", "v2-paraphrase-local-trial",
+    ])
+    def test_remaining_live_workflow_witnesses(case_id, monkeypatch):
+        import hashlib
+        from eval.project_context_quality_v2_protocol import load_cases, validate_corpus, evaluate_case
+        from scripts.run_project_docs_self_host_gate import LiveCase, run
+        from docmancer.docs.application.model_visible_projection import validate_model_visible_projection
+    
+>       validate_corpus()
+
+tests/docs/test_generic_context_workflows.py:245: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def validate_corpus() -> dict[str, Any]:
+        rows = load_cases()
+        catalog = _catalog()
+        lock = json.loads(LOCK_PATH.read_text(encoding="utf-8"))
+        migration = json.loads(MIGRATION_PATH.read_text(encoding="utf-8"))["crosswalk"]
+        if {row["v2_id"] for row in migration} != {row["id"] for row in rows}:
+            raise ValueError("v2 migration crosswalk is incomplete")
+        witness_paths: set[str] = set()
+        lane_counts: Counter[str] = Counter()
+        type_counts: Counter[str] = Counter()
+        for case in rows:
+            lane_counts[case["lane"]] += 1
+            case_type = case.get("case_type", "positive" if case["expected_kind"] == "docs_context" else "strict_negative")
+            type_counts[case_type] += 1
+            if case["question"] != case["original_question"]:
+                raise ValueError(f"original prompt changed: {case['id']}")
+            if case.get("case_type", "positive" if case["expected_kind"] == "docs_context" else "strict_negative") == "positive" and not case["obligations"]:
+                raise ValueError(f"positive case has no obligations: {case['id']}")
+            if len(case["lookup_queries"]) != len(case["lookup_query_ids"]):
+                raise ValueError(f"lookup inventory mismatch: {case['id']}")
+            for obligation in case["obligations"]:
+                if not obligation.get("accepted_witnesses") or not obligation.get("lookup_query_ids"):
+                    raise ValueError(f"incomplete obligation: {case['id']}/{obligation['id']}")
+                if obligation["id"] in case["lookup_query_ids"]:
+                    raise ValueError(f"semantic obligation reuses a lookup id: {case['id']}/{obligation['id']}")
+                for witness in obligation["accepted_witnesses"]:
+                    path = witness["path"]
+                    metadata = catalog.get(path)
+                    if metadata is None:
+                        raise ValueError(f"witness is not an active catalog document: {path}")
+                    if metadata["authority"] not in obligation["accepted_authorities"] or metadata["scope"] not in obligation["accepted_scopes"]:
+                        raise ValueError(f"witness authority/scope mismatch: {path}")
+                    if normalize_prose(witness["text"]) not in normalize_prose((ROOT / path).read_text(encoding="utf-8")):
+>                       raise ValueError(f"witness text is absent from active document: {path}")
+E                       ValueError: witness text is absent from active document: docs/mcp-docs-server.md
+
+eval/project_context_quality_v2_protocol.py:168: ValueError
+______________________ test_catalog_live_invalid_behavior ______________________
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x76ef7e2e07c0>
+
+    def test_catalog_live_invalid_behavior(monkeypatch):
+        from eval.project_context_quality_v2_protocol import load_cases, validate_corpus, evaluate_case
+        from scripts.run_project_docs_self_host_gate import LiveCase, run
+    
+>       validate_corpus()
+
+tests/docs/test_generic_context_workflows.py:520: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def validate_corpus() -> dict[str, Any]:
+        rows = load_cases()
+        catalog = _catalog()
+        lock = json.loads(LOCK_PATH.read_text(encoding="utf-8"))
+        migration = json.loads(MIGRATION_PATH.read_text(encoding="utf-8"))["crosswalk"]
+        if {row["v2_id"] for row in migration} != {row["id"] for row in rows}:
+            raise ValueError("v2 migration crosswalk is incomplete")
+        witness_paths: set[str] = set()
+        lane_counts: Counter[str] = Counter()
+        type_counts: Counter[str] = Counter()
+        for case in rows:
+            lane_counts[case["lane"]] += 1
+            case_type = case.get("case_type", "positive" if case["expected_kind"] == "docs_context" else "strict_negative")
+            type_counts[case_type] += 1
+            if case["question"] != case["original_question"]:
+                raise ValueError(f"original prompt changed: {case['id']}")
+            if case.get("case_type", "positive" if case["expected_kind"] == "docs_context" else "strict_negative") == "positive" and not case["obligations"]:
+                raise ValueError(f"positive case has no obligations: {case['id']}")
+            if len(case["lookup_queries"]) != len(case["lookup_query_ids"]):
+                raise ValueError(f"lookup inventory mismatch: {case['id']}")
+            for obligation in case["obligations"]:
+                if not obligation.get("accepted_witnesses") or not obligation.get("lookup_query_ids"):
+                    raise ValueError(f"incomplete obligation: {case['id']}/{obligation['id']}")
+                if obligation["id"] in case["lookup_query_ids"]:
+                    raise ValueError(f"semantic obligation reuses a lookup id: {case['id']}/{obligation['id']}")
+                for witness in obligation["accepted_witnesses"]:
+                    path = witness["path"]
+                    metadata = catalog.get(path)
+                    if metadata is None:
+                        raise ValueError(f"witness is not an active catalog document: {path}")
+                    if metadata["authority"] not in obligation["accepted_authorities"] or metadata["scope"] not in obligation["accepted_scopes"]:
+                        raise ValueError(f"witness authority/scope mismatch: {path}")
+                    if normalize_prose(witness["text"]) not in normalize_prose((ROOT / path).read_text(encoding="utf-8")):
+>                       raise ValueError(f"witness text is absent from active document: {path}")
+E                       ValueError: witness text is absent from active document: docs/mcp-docs-server.md
+
+eval/project_context_quality_v2_protocol.py:168: ValueError
+____ test_docs_context_is_retrieval_only_snapshot_bound_and_not_edit_ready _____
+
+    def test_docs_context_is_retrieval_only_snapshot_bound_and_not_edit_ready():
+        retrieval = {
+            "context_pack": [{
+                "source_class": "project_doc",
+                "path": "docs/architecture.md",
+                "heading_path": "Request flow",
+                "content": "Requests enter through the MCP router and then reach the project retrieval service.",
+                "project_identity": "git:example/project",
+                "line_start": 12,
+                "line_end": 14,
+                "authority": "source_of_truth",
+                "doc_scope": "project",
+                "lifecycle_status": "active",
+                "freshness": "current",
+                "index_freshness": "synchronized",
+                "risk_flags": [],
+                "retrieval_query_ids": ["query-original"],
+                "retrieval_query_matches": {
+                    "query-original": {"qualified": True, "mode": "and"},
+                },
+            }],
+            "documentation_query_plan": {"query_ids": ["query-original", "query-lookup-1"], "queries": [
+                {"query_id": "query-original", "text": "How does the MCP router work?", "origin": "original"},
+                {
+                    "query_id": "query-lookup-1",
+                    "text": "retrieval lifecycle",
+                    "origin": "mandatory_facet",
+                    "facet_id": "facet-routing-lifecycle",
+                    "requirement_id": "project_answer:routing-lifecycle",
+                },
+            ]},
+        }
+        projection, snapshot = project_docs_context(retrieval=retrieval)
+>       assert projection["status"] == "ok"
+E       AssertionError: assert 'insufficient_evidence' == 'ok'
+E         
+E         - ok
+E         + insufficient_evidence
+
+tests/docs/test_model_visible_projection.py:63: AssertionError
+____________ test_v3_does_not_reclassify_frozen_v2_config_questions ____________
+
+    def test_v3_does_not_reclassify_frozen_v2_config_questions():
+        expected = {
+            "What is the default query budget in docmancer.yaml?": (
+                "fdc51fc235885c6af48517d9a85f653793ab3a5410d9e02c0a90a7d02d98ad20",
+                "872c4a962af59af8078cfc62075a04c56b6bcfce7aed6c4a191ae61027196313",
+            ),
+            "What is the default indexing provider in docmancer.yaml?": (
+                "5a5b5fdd3cfc118d625d0d6c6e776a201a6116dff7ca38374c0f6030353d0577",
+                "e55ff49411a7977dd77e9573a2580701ce69fa6496cc95dac63e35f3da4e5286",
+            ),
+        }
+        for question, (contract_hash, requirements_hash) in expected.items():
+            contract = build_project_answer_contract(question)
+            requirements = build_requirements(question, profile="project_docs_answer")
+            assert contract.schema_version == PROJECT_ANSWER_CONTRACT_SCHEMA_V2
+>           assert contract.contract_hash == contract_hash
+E           AssertionError: assert '2a14b99f1a7e...47131635d5c66' == 'fdc51fc23588...0a7d02d98ad20'
+E             
+E             - fdc51fc235885c6af48517d9a85f653793ab3a5410d9e02c0a90a7d02d98ad20
+E             + 2a14b99f1a7e8ee520b742976057f21ccd7f10842d8f6830a4e47131635d5c66
+
+tests/docs/test_project_answer_contract_v3.py:96: AssertionError
+______ test_question_plan_splits_compound_questions_into_mandatory_facets ______
+
+    def test_question_plan_splits_compound_questions_into_mandatory_facets():
+        retrieval_plan = build_documentation_query_plan(
+            "What are the public tools and when should each tool be used?"
+        )
+>       assert [(query.text, query.origin) for query in retrieval_plan.queries] == [
+            ("What are the public tools and when should each tool be used?", "original"),
+        ]
+E       AssertionError: assert [('What are t...ical_intent')] == [('What are t..., 'original')]
+E         
+E         Left contains one more item: ('should each tool be used', 'canonical_intent')
+E         Use -v to get more diff
+
+tests/docs/test_question_plan_v4.py:67: AssertionError
+________ test_request_flow_public_contract_remains_four_fact_fail_safe _________
+
+    def test_request_flow_public_contract_remains_four_fact_fail_safe():
+        from eval.project_context_quality_v2_protocol import evaluate_case, load_cases
+        from scripts.run_project_docs_self_host_gate import LiveCase, run
+    
+        case = next(row for row in load_cases() if row["id"] == "v2-natural-request-flow")
+        result = run(cases=(LiveCase(
+            case_id=case["id"], question=case["question"], relevant_paths=(),
+            lookup_queries=tuple(case["lookup_queries"]), scope=case["scope"],
+        ),), negative_cases=())
+        payload = result["results"][0]["payload"]
+        verdict = evaluate_case(case, payload)
+>       assert {row["id"] for row in verdict["obligations"] if row["met"]} == {
+            "flow_mcp", "flow_application", "flow_gateway", "flow_selection",
+        }
+E       AssertionError: assert {'flow_applic...ow_selection'} == {'flow_applic...ow_selection'}
+E         
+E         Extra items in the right set:
+E         'flow_mcp'
+E         Use -v to get more diff
+
+tests/docs/test_request_flow_lineage.py:104: AssertionError
+______ test_real_worker_cannot_read_private_labels_even_by_absolute_path _______
+
+tmp_path = PosixPath('/tmp/pytest-of-viadmin/pytest-47/test_real_worker_cannot_read_p0')
+
+    def test_real_worker_cannot_read_private_labels_even_by_absolute_path(tmp_path):
+        app, public, output = layout(tmp_path)
+        gold = tmp_path / 'private-labels.json'
+        gold.write_text('THE_HIDDEN_ANSWER')
+        code = f'''from pathlib import Path
+    try:
+        Path({str(gold)!r}).read_text()
+    except (FileNotFoundError, PermissionError):
+        pass
+    else:
+        raise AssertionError("worker can read gold")
+    '''
+>       result = run_isolated(code, app=app, public=public, output=output)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/docs/test_retrieval_ablation_isolation.py:32: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+code = 'from pathlib import Path\ntry:\n    Path(\'/tmp/pytest-of-viadmin/pytest-47/test_real_worker_cannot_read_p0/private-l...t()\nexcept (FileNotFoundError, PermissionError):\n    pass\nelse:\n    raise AssertionError("worker can read gold")\n'
+
+    def run_isolated(code: str, *, app: Path, public: Path, output: Path,
+                     timeout: int = 120) -> subprocess.CompletedProcess:
+        """Run trusted Python code; close inherited FDs, scrub env, drop all caps."""
+        if sys.platform != 'linux':
+            raise IsolationUnavailable('Linux namespace worker required')
+        if not isinstance(code, str) or type(timeout) is not int or timeout < 1:
+            raise ValueError('invalid worker code/timeout')
+        tools = {name: shutil.which(name) for name in ('unshare', 'mount', 'chroot', 'setpriv')}
+        if not all(tools.values()):
+            raise IsolationUnavailable('unshare, mount, chroot and setpriv are required')
+        app, public, output = map(_literal_path, (app, public, output))
+        for left, right in ((app, public), (app, output), (public, output)):
+            if left.is_relative_to(right) or right.is_relative_to(left):
+                raise ValueError('sandbox mounts must be disjoint')
+        # Only runtime roots are exposed. Never bind host /, /home, /tmp or /proc.
+        runtimes = sorted({Path('/usr'), Path(sys.prefix), Path(sys.base_prefix)}, key=lambda p: len(p.parts))
+        for path in runtimes:
+            if path in (Path('/'), Path('/home'), Path('/tmp'), Path('/mnt')):
+                raise IsolationUnavailable('runtime prefix is too broad')
+            if any(p.is_relative_to(path) or path.is_relative_to(p) for p in (app, public, output)):
+                raise ValueError('runtime and data mounts must be disjoint')
+        runtimes = [p for i, p in enumerate(runtimes) if not any(p.is_relative_to(q) for q in runtimes[:i])]
+        q = shlex.quote
+        with tempfile.TemporaryDirectory(prefix='docatlas-isolation-') as temporary:
+            root = Path(temporary) / 'root'
+            root.mkdir()
+            commands = [f'{q(tools["mount"])} --make-rprivate /',
+                        f'{q(tools["mount"])} -t tmpfs -o nosuid tmpfs {q(str(root))}']
+    
+            def bind(source, target, readonly=True):
+                dest = str(root) + str(target)
+                commands.append('mkdir -p ' + q(dest))
+                commands.append(f'{q(tools["mount"])} --bind {q(str(source))} {q(dest)}')
+                opts = 'remount,bind,nosuid' + (',ro' if readonly else '')
+                commands.append(f'{q(tools["mount"])} -o {opts} {q(dest)}')
+    
+            for prefix in runtimes:
+                bind(prefix, prefix)
+            for name in ('bin', 'sbin', 'lib', 'lib64'):
+                host = Path('/') / name
+                if host.is_symlink():
+                    commands.append(f'ln -s {q(os.readlink(host))} {q(str(root / name))}')
+                elif host.exists():
+                    bind(host, host)
+            bind(app, '/app')
+            bind(public, '/public')
+            bind(output, '/output', readonly=False)
+            commands.append('mkdir -p ' + ' '.join(q(str(root / name)) for name in ('tmp/home', 'dev')))
+            for name in ('null', 'urandom'):
+                dest = root / 'dev' / name
+                commands.extend((f'touch {q(str(dest))}',
+                    f'{q(tools["mount"])} --bind /dev/{name} {q(str(dest))}'))
+            # No host procfs; no inherited directory descriptors; all capabilities
+            # dropped after chroot, so the worker cannot remount or escape the root.
+            inside = 'cd /app; printf ' + q(_READY) + '; exec ' + shlex.join([sys.executable, '-c', code])
+            commands.append('exec ' + shlex.join([tools['chroot'], str(root), tools['setpriv'],
+                '--no-new-privs', '--bounding-set=-all', '--inh-caps=-all', '--ambient-caps=-all',
+                '/bin/sh', '-ceu', inside]))
+            env = {'PATH': '/usr/bin:/usr/sbin:/bin:/sbin', 'HOME': '/tmp/home', 'TMPDIR': '/tmp',
+                   'LANG': 'C.UTF-8', 'PYTHONPATH': '/app', 'PYTHONNOUSERSITE': '1',
+                   'PYTHONDONTWRITEBYTECODE': '1', 'PYTHONHASHSEED': '0',
+                   'DOCATLAS_OFFLINE': '1', 'DOCATLAS_AUTO_VECTORS': '0',
+                   'DOCATLAS_REGISTRY_API_URL': 'http://127.0.0.1:1'}
+            cmd = [tools['unshare'], '--user', '--map-root-user', '--mount', '--net',
+                   '--pid', '--fork', '--kill-child=KILL', '/bin/sh', '-ceu', '\n'.join(commands)]
+            process = subprocess.Popen(cmd, env=env, stdin=subprocess.DEVNULL,
+                stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True,
+                close_fds=True, start_new_session=True)
+            try:
+                stdout, stderr = process.communicate(timeout=timeout)
+            except subprocess.TimeoutExpired:
+                os.killpg(process.pid, signal.SIGKILL)
+                process.communicate()
+                raise IsolationUnavailable('isolated worker timeout; process group killed') from None
+            if not stdout.startswith(_READY):
+>               raise IsolationUnavailable('namespace setup failed: ' + stderr[-2000:])
+E               experiments.retrieval_ablation.isolation.IsolationUnavailable: namespace setup failed: unshare: write failed /proc/self/uid_map: Operation not permitted
+
+experiments/retrieval_ablation/isolation.py:110: IsolationUnavailable
+_________ test_public_inputs_are_readonly_and_only_output_is_writable __________
+
+tmp_path = PosixPath('/tmp/pytest-of-viadmin/pytest-47/test_public_inputs_are_readonl0')
+
+    def test_public_inputs_are_readonly_and_only_output_is_writable(tmp_path):
+        app, public, output = layout(tmp_path)
+>       result = run_isolated('''from pathlib import Path
+    assert Path('/public/source.md').read_text() == 'Public source bytes.'
+    try:
+        Path('/public/source.md').write_text('tampered')
+    except OSError:
+        pass
+    else:
+        raise AssertionError('input is writable')
+    Path('/output/ok').write_text('executed')
+    ''', app=app, public=public, output=output)
+
+tests/docs/test_retrieval_ablation_isolation.py:38: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+code = "from pathlib import Path\nassert Path('/public/source.md').read_text() == 'Public source bytes.'\ntry:\n    Path('/pu... OSError:\n    pass\nelse:\n    raise AssertionError('input is writable')\nPath('/output/ok').write_text('executed')\n"
+
+    def run_isolated(code: str, *, app: Path, public: Path, output: Path,
+                     timeout: int = 120) -> subprocess.CompletedProcess:
+        """Run trusted Python code; close inherited FDs, scrub env, drop all caps."""
+        if sys.platform != 'linux':
+            raise IsolationUnavailable('Linux namespace worker required')
+        if not isinstance(code, str) or type(timeout) is not int or timeout < 1:
+            raise ValueError('invalid worker code/timeout')
+        tools = {name: shutil.which(name) for name in ('unshare', 'mount', 'chroot', 'setpriv')}
+        if not all(tools.values()):
+            raise IsolationUnavailable('unshare, mount, chroot and setpriv are required')
+        app, public, output = map(_literal_path, (app, public, output))
+        for left, right in ((app, public), (app, output), (public, output)):
+            if left.is_relative_to(right) or right.is_relative_to(left):
+                raise ValueError('sandbox mounts must be disjoint')
+        # Only runtime roots are exposed. Never bind host /, /home, /tmp or /proc.
+        runtimes = sorted({Path('/usr'), Path(sys.prefix), Path(sys.base_prefix)}, key=lambda p: len(p.parts))
+        for path in runtimes:
+            if path in (Path('/'), Path('/home'), Path('/tmp'), Path('/mnt')):
+                raise IsolationUnavailable('runtime prefix is too broad')
+            if any(p.is_relative_to(path) or path.is_relative_to(p) for p in (app, public, output)):
+                raise ValueError('runtime and data mounts must be disjoint')
+        runtimes = [p for i, p in enumerate(runtimes) if not any(p.is_relative_to(q) for q in runtimes[:i])]
+        q = shlex.quote
+        with tempfile.TemporaryDirectory(prefix='docatlas-isolation-') as temporary:
+            root = Path(temporary) / 'root'
+            root.mkdir()
+            commands = [f'{q(tools["mount"])} --make-rprivate /',
+                        f'{q(tools["mount"])} -t tmpfs -o nosuid tmpfs {q(str(root))}']
+    
+            def bind(source, target, readonly=True):
+                dest = str(root) + str(target)
+                commands.append('mkdir -p ' + q(dest))
+                commands.append(f'{q(tools["mount"])} --bind {q(str(source))} {q(dest)}')
+                opts = 'remount,bind,nosuid' + (',ro' if readonly else '')
+                commands.append(f'{q(tools["mount"])} -o {opts} {q(dest)}')
+    
+            for prefix in runtimes:
+                bind(prefix, prefix)
+            for name in ('bin', 'sbin', 'lib', 'lib64'):
+                host = Path('/') / name
+                if host.is_symlink():
+                    commands.append(f'ln -s {q(os.readlink(host))} {q(str(root / name))}')
+                elif host.exists():
+                    bind(host, host)
+            bind(app, '/app')
+            bind(public, '/public')
+            bind(output, '/output', readonly=False)
+            commands.append('mkdir -p ' + ' '.join(q(str(root / name)) for name in ('tmp/home', 'dev')))
+            for name in ('null', 'urandom'):
+                dest = root / 'dev' / name
+                commands.extend((f'touch {q(str(dest))}',
+                    f'{q(tools["mount"])} --bind /dev/{name} {q(str(dest))}'))
+            # No host procfs; no inherited directory descriptors; all capabilities
+            # dropped after chroot, so the worker cannot remount or escape the root.
+            inside = 'cd /app; printf ' + q(_READY) + '; exec ' + shlex.join([sys.executable, '-c', code])
+            commands.append('exec ' + shlex.join([tools['chroot'], str(root), tools['setpriv'],
+                '--no-new-privs', '--bounding-set=-all', '--inh-caps=-all', '--ambient-caps=-all',
+                '/bin/sh', '-ceu', inside]))
+            env = {'PATH': '/usr/bin:/usr/sbin:/bin:/sbin', 'HOME': '/tmp/home', 'TMPDIR': '/tmp',
+                   'LANG': 'C.UTF-8', 'PYTHONPATH': '/app', 'PYTHONNOUSERSITE': '1',
+                   'PYTHONDONTWRITEBYTECODE': '1', 'PYTHONHASHSEED': '0',
+                   'DOCATLAS_OFFLINE': '1', 'DOCATLAS_AUTO_VECTORS': '0',
+                   'DOCATLAS_REGISTRY_API_URL': 'http://127.0.0.1:1'}
+            cmd = [tools['unshare'], '--user', '--map-root-user', '--mount', '--net',
+                   '--pid', '--fork', '--kill-child=KILL', '/bin/sh', '-ceu', '\n'.join(commands)]
+            process = subprocess.Popen(cmd, env=env, stdin=subprocess.DEVNULL,
+                stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True,
+                close_fds=True, start_new_session=True)
+            try:
+                stdout, stderr = process.communicate(timeout=timeout)
+            except subprocess.TimeoutExpired:
+                os.killpg(process.pid, signal.SIGKILL)
+                process.communicate()
+                raise IsolationUnavailable('isolated worker timeout; process group killed') from None
+            if not stdout.startswith(_READY):
+>               raise IsolationUnavailable('namespace setup failed: ' + stderr[-2000:])
+E               experiments.retrieval_ablation.isolation.IsolationUnavailable: namespace setup failed: unshare: write failed /proc/self/uid_map: Operation not permitted
+
+experiments/retrieval_ablation/isolation.py:110: IsolationUnavailable
+____________ test_worker_has_no_host_loopback_network_or_host_proc _____________
+
+tmp_path = PosixPath('/tmp/pytest-of-viadmin/pytest-47/test_worker_has_no_host_loopba0')
+
+    def test_worker_has_no_host_loopback_network_or_host_proc(tmp_path):
+        app, public, output = layout(tmp_path)
+        with socket.socket() as listener:
+            listener.bind(('127.0.0.1', 0))
+            listener.listen()
+            port = listener.getsockname()[1]
+>           result = run_isolated(f'''import socket, pathlib
+    assert not pathlib.Path('/proc/1/root').exists()
+    s = socket.socket()
+    s.settimeout(0.2)
+    try:
+        s.connect(('127.0.0.1', {port}))
+    except OSError:
+        pass
+    else:
+        raise AssertionError('host loopback is reachable')
+    ''', app=app, public=public, output=output)
+
+tests/docs/test_retrieval_ablation_isolation.py:59: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+code = "import socket, pathlib\nassert not pathlib.Path('/proc/1/root').exists()\ns = socket.socket()\ns.settimeout(0.2)\ntry...nect(('127.0.0.1', 47583))\nexcept OSError:\n    pass\nelse:\n    raise AssertionError('host loopback is reachable')\n"
+
+    def run_isolated(code: str, *, app: Path, public: Path, output: Path,
+                     timeout: int = 120) -> subprocess.CompletedProcess:
+        """Run trusted Python code; close inherited FDs, scrub env, drop all caps."""
+        if sys.platform != 'linux':
+            raise IsolationUnavailable('Linux namespace worker required')
+        if not isinstance(code, str) or type(timeout) is not int or timeout < 1:
+            raise ValueError('invalid worker code/timeout')
+        tools = {name: shutil.which(name) for name in ('unshare', 'mount', 'chroot', 'setpriv')}
+        if not all(tools.values()):
+            raise IsolationUnavailable('unshare, mount, chroot and setpriv are required')
+        app, public, output = map(_literal_path, (app, public, output))
+        for left, right in ((app, public), (app, output), (public, output)):
+            if left.is_relative_to(right) or right.is_relative_to(left):
+                raise ValueError('sandbox mounts must be disjoint')
+        # Only runtime roots are exposed. Never bind host /, /home, /tmp or /proc.
+        runtimes = sorted({Path('/usr'), Path(sys.prefix), Path(sys.base_prefix)}, key=lambda p: len(p.parts))
+        for path in runtimes:
+            if path in (Path('/'), Path('/home'), Path('/tmp'), Path('/mnt')):
+                raise IsolationUnavailable('runtime prefix is too broad')
+            if any(p.is_relative_to(path) or path.is_relative_to(p) for p in (app, public, output)):
+                raise ValueError('runtime and data mounts must be disjoint')
+        runtimes = [p for i, p in enumerate(runtimes) if not any(p.is_relative_to(q) for q in runtimes[:i])]
+        q = shlex.quote
+        with tempfile.TemporaryDirectory(prefix='docatlas-isolation-') as temporary:
+            root = Path(temporary) / 'root'
+            root.mkdir()
+            commands = [f'{q(tools["mount"])} --make-rprivate /',
+                        f'{q(tools["mount"])} -t tmpfs -o nosuid tmpfs {q(str(root))}']
+    
+            def bind(source, target, readonly=True):
+                dest = str(root) + str(target)
+                commands.append('mkdir -p ' + q(dest))
+                commands.append(f'{q(tools["mount"])} --bind {q(str(source))} {q(dest)}')
+                opts = 'remount,bind,nosuid' + (',ro' if readonly else '')
+                commands.append(f'{q(tools["mount"])} -o {opts} {q(dest)}')
+    
+            for prefix in runtimes:
+                bind(prefix, prefix)
+            for name in ('bin', 'sbin', 'lib', 'lib64'):
+                host = Path('/') / name
+                if host.is_symlink():
+                    commands.append(f'ln -s {q(os.readlink(host))} {q(str(root / name))}')
+                elif host.exists():
+                    bind(host, host)
+            bind(app, '/app')
+            bind(public, '/public')
+            bind(output, '/output', readonly=False)
+            commands.append('mkdir -p ' + ' '.join(q(str(root / name)) for name in ('tmp/home', 'dev')))
+            for name in ('null', 'urandom'):
+                dest = root / 'dev' / name
+                commands.extend((f'touch {q(str(dest))}',
+                    f'{q(tools["mount"])} --bind /dev/{name} {q(str(dest))}'))
+            # No host procfs; no inherited directory descriptors; all capabilities
+            # dropped after chroot, so the worker cannot remount or escape the root.
+            inside = 'cd /app; printf ' + q(_READY) + '; exec ' + shlex.join([sys.executable, '-c', code])
+            commands.append('exec ' + shlex.join([tools['chroot'], str(root), tools['setpriv'],
+                '--no-new-privs', '--bounding-set=-all', '--inh-caps=-all', '--ambient-caps=-all',
+                '/bin/sh', '-ceu', inside]))
+            env = {'PATH': '/usr/bin:/usr/sbin:/bin:/sbin', 'HOME': '/tmp/home', 'TMPDIR': '/tmp',
+                   'LANG': 'C.UTF-8', 'PYTHONPATH': '/app', 'PYTHONNOUSERSITE': '1',
+                   'PYTHONDONTWRITEBYTECODE': '1', 'PYTHONHASHSEED': '0',
+                   'DOCATLAS_OFFLINE': '1', 'DOCATLAS_AUTO_VECTORS': '0',
+                   'DOCATLAS_REGISTRY_API_URL': 'http://127.0.0.1:1'}
+            cmd = [tools['unshare'], '--user', '--map-root-user', '--mount', '--net',
+                   '--pid', '--fork', '--kill-child=KILL', '/bin/sh', '-ceu', '\n'.join(commands)]
+            process = subprocess.Popen(cmd, env=env, stdin=subprocess.DEVNULL,
+                stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True,
+                close_fds=True, start_new_session=True)
+            try:
+                stdout, stderr = process.communicate(timeout=timeout)
+            except subprocess.TimeoutExpired:
+                os.killpg(process.pid, signal.SIGKILL)
+                process.communicate()
+                raise IsolationUnavailable('isolated worker timeout; process group killed') from None
+            if not stdout.startswith(_READY):
+>               raise IsolationUnavailable('namespace setup failed: ' + stderr[-2000:])
+E               experiments.retrieval_ablation.isolation.IsolationUnavailable: namespace setup failed: unshare: write failed /proc/self/uid_map: Operation not permitted
+
+experiments/retrieval_ablation/isolation.py:110: IsolationUnavailable
+_______________ test_worker_cannot_remount_readonly_public_tree ________________
+
+tmp_path = PosixPath('/tmp/pytest-of-viadmin/pytest-47/test_worker_cannot_remount_rea0')
+
+    def test_worker_cannot_remount_readonly_public_tree(tmp_path):
+        app, public, output = layout(tmp_path)
+>       result = run_isolated('''import subprocess
+    p = subprocess.run(['/usr/bin/mount', '-o', 'remount,rw', '/public'], capture_output=True)
+    assert p.returncode != 0
+    ''', app=app, public=public, output=output)
+
+tests/docs/test_retrieval_ablation_isolation.py:75: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+code = "import subprocess\np = subprocess.run(['/usr/bin/mount', '-o', 'remount,rw', '/public'], capture_output=True)\nassert p.returncode != 0\n"
+
+    def run_isolated(code: str, *, app: Path, public: Path, output: Path,
+                     timeout: int = 120) -> subprocess.CompletedProcess:
+        """Run trusted Python code; close inherited FDs, scrub env, drop all caps."""
+        if sys.platform != 'linux':
+            raise IsolationUnavailable('Linux namespace worker required')
+        if not isinstance(code, str) or type(timeout) is not int or timeout < 1:
+            raise ValueError('invalid worker code/timeout')
+        tools = {name: shutil.which(name) for name in ('unshare', 'mount', 'chroot', 'setpriv')}
+        if not all(tools.values()):
+            raise IsolationUnavailable('unshare, mount, chroot and setpriv are required')
+        app, public, output = map(_literal_path, (app, public, output))
+        for left, right in ((app, public), (app, output), (public, output)):
+            if left.is_relative_to(right) or right.is_relative_to(left):
+                raise ValueError('sandbox mounts must be disjoint')
+        # Only runtime roots are exposed. Never bind host /, /home, /tmp or /proc.
+        runtimes = sorted({Path('/usr'), Path(sys.prefix), Path(sys.base_prefix)}, key=lambda p: len(p.parts))
+        for path in runtimes:
+            if path in (Path('/'), Path('/home'), Path('/tmp'), Path('/mnt')):
+                raise IsolationUnavailable('runtime prefix is too broad')
+            if any(p.is_relative_to(path) or path.is_relative_to(p) for p in (app, public, output)):
+                raise ValueError('runtime and data mounts must be disjoint')
+        runtimes = [p for i, p in enumerate(runtimes) if not any(p.is_relative_to(q) for q in runtimes[:i])]
+        q = shlex.quote
+        with tempfile.TemporaryDirectory(prefix='docatlas-isolation-') as temporary:
+            root = Path(temporary) / 'root'
+            root.mkdir()
+            commands = [f'{q(tools["mount"])} --make-rprivate /',
+                        f'{q(tools["mount"])} -t tmpfs -o nosuid tmpfs {q(str(root))}']
+    
+            def bind(source, target, readonly=True):
+                dest = str(root) + str(target)
+                commands.append('mkdir -p ' + q(dest))
+                commands.append(f'{q(tools["mount"])} --bind {q(str(source))} {q(dest)}')
+                opts = 'remount,bind,nosuid' + (',ro' if readonly else '')
+                commands.append(f'{q(tools["mount"])} -o {opts} {q(dest)}')
+    
+            for prefix in runtimes:
+                bind(prefix, prefix)
+            for name in ('bin', 'sbin', 'lib', 'lib64'):
+                host = Path('/') / name
+                if host.is_symlink():
+                    commands.append(f'ln -s {q(os.readlink(host))} {q(str(root / name))}')
+                elif host.exists():
+                    bind(host, host)
+            bind(app, '/app')
+            bind(public, '/public')
+            bind(output, '/output', readonly=False)
+            commands.append('mkdir -p ' + ' '.join(q(str(root / name)) for name in ('tmp/home', 'dev')))
+            for name in ('null', 'urandom'):
+                dest = root / 'dev' / name
+                commands.extend((f'touch {q(str(dest))}',
+                    f'{q(tools["mount"])} --bind /dev/{name} {q(str(dest))}'))
+            # No host procfs; no inherited directory descriptors; all capabilities
+            # dropped after chroot, so the worker cannot remount or escape the root.
+            inside = 'cd /app; printf ' + q(_READY) + '; exec ' + shlex.join([sys.executable, '-c', code])
+            commands.append('exec ' + shlex.join([tools['chroot'], str(root), tools['setpriv'],
+                '--no-new-privs', '--bounding-set=-all', '--inh-caps=-all', '--ambient-caps=-all',
+                '/bin/sh', '-ceu', inside]))
+            env = {'PATH': '/usr/bin:/usr/sbin:/bin:/sbin', 'HOME': '/tmp/home', 'TMPDIR': '/tmp',
+                   'LANG': 'C.UTF-8', 'PYTHONPATH': '/app', 'PYTHONNOUSERSITE': '1',
+                   'PYTHONDONTWRITEBYTECODE': '1', 'PYTHONHASHSEED': '0',
+                   'DOCATLAS_OFFLINE': '1', 'DOCATLAS_AUTO_VECTORS': '0',
+                   'DOCATLAS_REGISTRY_API_URL': 'http://127.0.0.1:1'}
+            cmd = [tools['unshare'], '--user', '--map-root-user', '--mount', '--net',
+                   '--pid', '--fork', '--kill-child=KILL', '/bin/sh', '-ceu', '\n'.join(commands)]
+            process = subprocess.Popen(cmd, env=env, stdin=subprocess.DEVNULL,
+                stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True,
+                close_fds=True, start_new_session=True)
+            try:
+                stdout, stderr = process.communicate(timeout=timeout)
+            except subprocess.TimeoutExpired:
+                os.killpg(process.pid, signal.SIGKILL)
+                process.communicate()
+                raise IsolationUnavailable('isolated worker timeout; process group killed') from None
+            if not stdout.startswith(_READY):
+>               raise IsolationUnavailable('namespace setup failed: ' + stderr[-2000:])
+E               experiments.retrieval_ablation.isolation.IsolationUnavailable: namespace setup failed: unshare: write failed /proc/self/uid_map: Operation not permitted
+
+experiments/retrieval_ablation/isolation.py:110: IsolationUnavailable
+___________________ test_host_credentials_are_not_inherited ____________________
+
+tmp_path = PosixPath('/tmp/pytest-of-viadmin/pytest-47/test_host_credentials_are_not_0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x76ef7c546040>
+
+    def test_host_credentials_are_not_inherited(tmp_path, monkeypatch):
+        app, public, output = layout(tmp_path)
+        monkeypatch.setenv('TEST_PRIVATE_TOKEN', 'must-not-reach-worker')
+>       result = run_isolated("import os; assert 'TEST_PRIVATE_TOKEN' not in os.environ",
+                              app=app, public=public, output=output)
+
+tests/docs/test_retrieval_ablation_isolation.py:85: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+code = "import os; assert 'TEST_PRIVATE_TOKEN' not in os.environ"
+
+    def run_isolated(code: str, *, app: Path, public: Path, output: Path,
+                     timeout: int = 120) -> subprocess.CompletedProcess:
+        """Run trusted Python code; close inherited FDs, scrub env, drop all caps."""
+        if sys.platform != 'linux':
+            raise IsolationUnavailable('Linux namespace worker required')
+        if not isinstance(code, str) or type(timeout) is not int or timeout < 1:
+            raise ValueError('invalid worker code/timeout')
+        tools = {name: shutil.which(name) for name in ('unshare', 'mount', 'chroot', 'setpriv')}
+        if not all(tools.values()):
+            raise IsolationUnavailable('unshare, mount, chroot and setpriv are required')
+        app, public, output = map(_literal_path, (app, public, output))
+        for left, right in ((app, public), (app, output), (public, output)):
+            if left.is_relative_to(right) or right.is_relative_to(left):
+                raise ValueError('sandbox mounts must be disjoint')
+        # Only runtime roots are exposed. Never bind host /, /home, /tmp or /proc.
+        runtimes = sorted({Path('/usr'), Path(sys.prefix), Path(sys.base_prefix)}, key=lambda p: len(p.parts))
+        for path in runtimes:
+            if path in (Path('/'), Path('/home'), Path('/tmp'), Path('/mnt')):
+                raise IsolationUnavailable('runtime prefix is too broad')
+            if any(p.is_relative_to(path) or path.is_relative_to(p) for p in (app, public, output)):
+                raise ValueError('runtime and data mounts must be disjoint')
+        runtimes = [p for i, p in enumerate(runtimes) if not any(p.is_relative_to(q) for q in runtimes[:i])]
+        q = shlex.quote
+        with tempfile.TemporaryDirectory(prefix='docatlas-isolation-') as temporary:
+            root = Path(temporary) / 'root'
+            root.mkdir()
+            commands = [f'{q(tools["mount"])} --make-rprivate /',
+                        f'{q(tools["mount"])} -t tmpfs -o nosuid tmpfs {q(str(root))}']
+    
+            def bind(source, target, readonly=True):
+                dest = str(root) + str(target)
+                commands.append('mkdir -p ' + q(dest))
+                commands.append(f'{q(tools["mount"])} --bind {q(str(source))} {q(dest)}')
+                opts = 'remount,bind,nosuid' + (',ro' if readonly else '')
+                commands.append(f'{q(tools["mount"])} -o {opts} {q(dest)}')
+    
+            for prefix in runtimes:
+                bind(prefix, prefix)
+            for name in ('bin', 'sbin', 'lib', 'lib64'):
+                host = Path('/') / name
+                if host.is_symlink():
+                    commands.append(f'ln -s {q(os.readlink(host))} {q(str(root / name))}')
+                elif host.exists():
+                    bind(host, host)
+            bind(app, '/app')
+            bind(public, '/public')
+            bind(output, '/output', readonly=False)
+            commands.append('mkdir -p ' + ' '.join(q(str(root / name)) for name in ('tmp/home', 'dev')))
+            for name in ('null', 'urandom'):
+                dest = root / 'dev' / name
+                commands.extend((f'touch {q(str(dest))}',
+                    f'{q(tools["mount"])} --bind /dev/{name} {q(str(dest))}'))
+            # No host procfs; no inherited directory descriptors; all capabilities
+            # dropped after chroot, so the worker cannot remount or escape the root.
+            inside = 'cd /app; printf ' + q(_READY) + '; exec ' + shlex.join([sys.executable, '-c', code])
+            commands.append('exec ' + shlex.join([tools['chroot'], str(root), tools['setpriv'],
+                '--no-new-privs', '--bounding-set=-all', '--inh-caps=-all', '--ambient-caps=-all',
+                '/bin/sh', '-ceu', inside]))
+            env = {'PATH': '/usr/bin:/usr/sbin:/bin:/sbin', 'HOME': '/tmp/home', 'TMPDIR': '/tmp',
+                   'LANG': 'C.UTF-8', 'PYTHONPATH': '/app', 'PYTHONNOUSERSITE': '1',
+                   'PYTHONDONTWRITEBYTECODE': '1', 'PYTHONHASHSEED': '0',
+                   'DOCATLAS_OFFLINE': '1', 'DOCATLAS_AUTO_VECTORS': '0',
+                   'DOCATLAS_REGISTRY_API_URL': 'http://127.0.0.1:1'}
+            cmd = [tools['unshare'], '--user', '--map-root-user', '--mount', '--net',
+                   '--pid', '--fork', '--kill-child=KILL', '/bin/sh', '-ceu', '\n'.join(commands)]
+            process = subprocess.Popen(cmd, env=env, stdin=subprocess.DEVNULL,
+                stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True,
+                close_fds=True, start_new_session=True)
+            try:
+                stdout, stderr = process.communicate(timeout=timeout)
+            except subprocess.TimeoutExpired:
+                os.killpg(process.pid, signal.SIGKILL)
+                process.communicate()
+                raise IsolationUnavailable('isolated worker timeout; process group killed') from None
+            if not stdout.startswith(_READY):
+>               raise IsolationUnavailable('namespace setup failed: ' + stderr[-2000:])
+E               experiments.retrieval_ablation.isolation.IsolationUnavailable: namespace setup failed: unshare: write failed /proc/self/uid_map: Operation not permitted
+
+experiments/retrieval_ablation/isolation.py:110: IsolationUnavailable
+_________ test_real_sqlite_and_packet_modules_execute_inside_namespace _________
+
+tmp_path = PosixPath('/tmp/pytest-of-viadmin/pytest-47/test_real_sqlite_and_packet_mo0')
+
+    def test_real_sqlite_and_packet_modules_execute_inside_namespace(tmp_path):
+        from experiments.retrieval_ablation.run import stage_worker
+        app, public, output = [tmp_path / name for name in ('app', 'public', 'output')]
+        stage_worker(app)
+        public.mkdir()
+        output.mkdir()
+        code = '''import json, hashlib
+    from pathlib import Path
+    from docmancer.core.models import Document
+    from docmancer.core.sqlite_store import SQLiteStore
+    from experiments.retrieval_ablation.adapters import native_diagnostic
+    text = '# Retry\\n\\nThe retry budget is three attempts.\\n'
+    filters = {'project_identity':'test','project_path':'/tmp/project','source_class':'project_doc','doc_scope':'project'}
+    metadata = {**filters, 'source_path':'retry.md','project_doc_path':'retry.md',
+                'project_doc_content_hash':hashlib.sha256(text.encode()).hexdigest(),
+                'authority':'source_of_truth','format':'markdown'}
+    store = SQLiteStore(Path('/tmp/index.db'))
+    store.add_documents([Document(source='retry.md',content=text,metadata=metadata)],recreate=True)
+    r = native_diagnostic(store,['What is the retry budget?'],filters=filters,sources={'retry.md':text})
+    assert r['model_visible_packet'].get('sources'), r
+    assert r['packet_audit_errors'] == []
+    Path('/output/result.json').write_text(json.dumps(r))
+    '''
+>       result = run_isolated(code, app=app, public=public, output=output)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/docs/test_retrieval_ablation_isolation.py:129: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+code = "import json, hashlib\nfrom pathlib import Path\nfrom docmancer.core.models import Document\nfrom docmancer.core.sqlit...et'].get('sources'), r\nassert r['packet_audit_errors'] == []\nPath('/output/result.json').write_text(json.dumps(r))\n"
+
+    def run_isolated(code: str, *, app: Path, public: Path, output: Path,
+                     timeout: int = 120) -> subprocess.CompletedProcess:
+        """Run trusted Python code; close inherited FDs, scrub env, drop all caps."""
+        if sys.platform != 'linux':
+            raise IsolationUnavailable('Linux namespace worker required')
+        if not isinstance(code, str) or type(timeout) is not int or timeout < 1:
+            raise ValueError('invalid worker code/timeout')
+        tools = {name: shutil.which(name) for name in ('unshare', 'mount', 'chroot', 'setpriv')}
+        if not all(tools.values()):
+            raise IsolationUnavailable('unshare, mount, chroot and setpriv are required')
+        app, public, output = map(_literal_path, (app, public, output))
+        for left, right in ((app, public), (app, output), (public, output)):
+            if left.is_relative_to(right) or right.is_relative_to(left):
+                raise ValueError('sandbox mounts must be disjoint')
+        # Only runtime roots are exposed. Never bind host /, /home, /tmp or /proc.
+        runtimes = sorted({Path('/usr'), Path(sys.prefix), Path(sys.base_prefix)}, key=lambda p: len(p.parts))
+        for path in runtimes:
+            if path in (Path('/'), Path('/home'), Path('/tmp'), Path('/mnt')):
+                raise IsolationUnavailable('runtime prefix is too broad')
+            if any(p.is_relative_to(path) or path.is_relative_to(p) for p in (app, public, output)):
+                raise ValueError('runtime and data mounts must be disjoint')
+        runtimes = [p for i, p in enumerate(runtimes) if not any(p.is_relative_to(q) for q in runtimes[:i])]
+        q = shlex.quote
+        with tempfile.TemporaryDirectory(prefix='docatlas-isolation-') as temporary:
+            root = Path(temporary) / 'root'
+            root.mkdir()
+            commands = [f'{q(tools["mount"])} --make-rprivate /',
+                        f'{q(tools["mount"])} -t tmpfs -o nosuid tmpfs {q(str(root))}']
+    
+            def bind(source, target, readonly=True):
+                dest = str(root) + str(target)
+                commands.append('mkdir -p ' + q(dest))
+                commands.append(f'{q(tools["mount"])} --bind {q(str(source))} {q(dest)}')
+                opts = 'remount,bind,nosuid' + (',ro' if readonly else '')
+                commands.append(f'{q(tools["mount"])} -o {opts} {q(dest)}')
+    
+            for prefix in runtimes:
+                bind(prefix, prefix)
+            for name in ('bin', 'sbin', 'lib', 'lib64'):
+                host = Path('/') / name
+                if host.is_symlink():
+                    commands.append(f'ln -s {q(os.readlink(host))} {q(str(root / name))}')
+                elif host.exists():
+                    bind(host, host)
+            bind(app, '/app')
+            bind(public, '/public')
+            bind(output, '/output', readonly=False)
+            commands.append('mkdir -p ' + ' '.join(q(str(root / name)) for name in ('tmp/home', 'dev')))
+            for name in ('null', 'urandom'):
+                dest = root / 'dev' / name
+                commands.extend((f'touch {q(str(dest))}',
+                    f'{q(tools["mount"])} --bind /dev/{name} {q(str(dest))}'))
+            # No host procfs; no inherited directory descriptors; all capabilities
+            # dropped after chroot, so the worker cannot remount or escape the root.
+            inside = 'cd /app; printf ' + q(_READY) + '; exec ' + shlex.join([sys.executable, '-c', code])
+            commands.append('exec ' + shlex.join([tools['chroot'], str(root), tools['setpriv'],
+                '--no-new-privs', '--bounding-set=-all', '--inh-caps=-all', '--ambient-caps=-all',
+                '/bin/sh', '-ceu', inside]))
+            env = {'PATH': '/usr/bin:/usr/sbin:/bin:/sbin', 'HOME': '/tmp/home', 'TMPDIR': '/tmp',
+                   'LANG': 'C.UTF-8', 'PYTHONPATH': '/app', 'PYTHONNOUSERSITE': '1',
+                   'PYTHONDONTWRITEBYTECODE': '1', 'PYTHONHASHSEED': '0',
+                   'DOCATLAS_OFFLINE': '1', 'DOCATLAS_AUTO_VECTORS': '0',
+                   'DOCATLAS_REGISTRY_API_URL': 'http://127.0.0.1:1'}
+            cmd = [tools['unshare'], '--user', '--map-root-user', '--mount', '--net',
+                   '--pid', '--fork', '--kill-child=KILL', '/bin/sh', '-ceu', '\n'.join(commands)]
+            process = subprocess.Popen(cmd, env=env, stdin=subprocess.DEVNULL,
+                stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True,
+                close_fds=True, start_new_session=True)
+            try:
+                stdout, stderr = process.communicate(timeout=timeout)
+            except subprocess.TimeoutExpired:
+                os.killpg(process.pid, signal.SIGKILL)
+                process.communicate()
+                raise IsolationUnavailable('isolated worker timeout; process group killed') from None
+            if not stdout.startswith(_READY):
+>               raise IsolationUnavailable('namespace setup failed: ' + stderr[-2000:])
+E               experiments.retrieval_ablation.isolation.IsolationUnavailable: namespace setup failed: unshare: write failed /proc/self/uid_map: Operation not permitted
+
+experiments/retrieval_ablation/isolation.py:110: IsolationUnavailable
+________ test_actual_fixture_handler_executes_without_any_gold_files[P] ________
+
+tmp_path = PosixPath('/tmp/pytest-of-viadmin/pytest-47/test_actual_fixture_handler_ex0')
+arm = 'P'
+
+    @pytest.mark.parametrize('arm', ['P', 'A'])
+    def test_actual_fixture_handler_executes_without_any_gold_files(tmp_path, arm):
+        from experiments.retrieval_ablation.run import stage_worker
+        app, public, output = [tmp_path / name for name in ('app', 'public', 'output')]
+        stage_worker(app)
+        public.mkdir()
+        output.mkdir()
+        (public / 'retry.md').write_text('# Retry\n\nThe retry budget is three attempts. Do not retry cancellation.\n')
+        code = f'''import hashlib, json
+    from pathlib import Path
+    from experiments.retrieval_ablation.run import _execute_arm
+    p=Path('/public')
+    assert not Path('/app/eval/project_context_quality/cases.json').exists()
+    r=_execute_arm(p, {{'schema_version':1, 'sources':[{{'path':'retry.md', 'sha256':hashlib.sha256((p/'retry.md').read_bytes()).hexdigest()}}]}},
+        {{'question':'What is the retry budget?'}}, {{'max_sections_per_source':2,'raw_hits':40,'unique_candidates':20}}, {arm!r})
+    assert r['execution_status'] == 'EXECUTED', r
+    assert r.get('packet_audit_errors', r.get('audit_errors')) == [], r
+    if {arm!r} == 'A':
+        assert r['packet_status'] == 'VALIDATED_PROJECT_PACKET'
+        assert r['model_visible_packet'].get('sources'), r
+    Path('/output/result.json').write_text(json.dumps(r, default=lambda x: sorted(x)))
+    '''
+>       completed = run_isolated(code, app=app, public=public, output=output)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/docs/test_retrieval_ablation_isolation.py:156: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+code = "import hashlib, json\nfrom pathlib import Path\nfrom experiments.retrieval_ablation.run import _execute_arm\np=Path('...sible_packet'].get('sources'), r\nPath('/output/result.json').write_text(json.dumps(r, default=lambda x: sorted(x)))\n"
+
+    def run_isolated(code: str, *, app: Path, public: Path, output: Path,
+                     timeout: int = 120) -> subprocess.CompletedProcess:
+        """Run trusted Python code; close inherited FDs, scrub env, drop all caps."""
+        if sys.platform != 'linux':
+            raise IsolationUnavailable('Linux namespace worker required')
+        if not isinstance(code, str) or type(timeout) is not int or timeout < 1:
+            raise ValueError('invalid worker code/timeout')
+        tools = {name: shutil.which(name) for name in ('unshare', 'mount', 'chroot', 'setpriv')}
+        if not all(tools.values()):
+            raise IsolationUnavailable('unshare, mount, chroot and setpriv are required')
+        app, public, output = map(_literal_path, (app, public, output))
+        for left, right in ((app, public), (app, output), (public, output)):
+            if left.is_relative_to(right) or right.is_relative_to(left):
+                raise ValueError('sandbox mounts must be disjoint')
+        # Only runtime roots are exposed. Never bind host /, /home, /tmp or /proc.
+        runtimes = sorted({Path('/usr'), Path(sys.prefix), Path(sys.base_prefix)}, key=lambda p: len(p.parts))
+        for path in runtimes:
+            if path in (Path('/'), Path('/home'), Path('/tmp'), Path('/mnt')):
+                raise IsolationUnavailable('runtime prefix is too broad')
+            if any(p.is_relative_to(path) or path.is_relative_to(p) for p in (app, public, output)):
+                raise ValueError('runtime and data mounts must be disjoint')
+        runtimes = [p for i, p in enumerate(runtimes) if not any(p.is_relative_to(q) for q in runtimes[:i])]
+        q = shlex.quote
+        with tempfile.TemporaryDirectory(prefix='docatlas-isolation-') as temporary:
+            root = Path(temporary) / 'root'
+            root.mkdir()
+            commands = [f'{q(tools["mount"])} --make-rprivate /',
+                        f'{q(tools["mount"])} -t tmpfs -o nosuid tmpfs {q(str(root))}']
+    
+            def bind(source, target, readonly=True):
+                dest = str(root) + str(target)
+                commands.append('mkdir -p ' + q(dest))
+                commands.append(f'{q(tools["mount"])} --bind {q(str(source))} {q(dest)}')
+                opts = 'remount,bind,nosuid' + (',ro' if readonly else '')
+                commands.append(f'{q(tools["mount"])} -o {opts} {q(dest)}')
+    
+            for prefix in runtimes:
+                bind(prefix, prefix)
+            for name in ('bin', 'sbin', 'lib', 'lib64'):
+                host = Path('/') / name
+                if host.is_symlink():
+                    commands.append(f'ln -s {q(os.readlink(host))} {q(str(root / name))}')
+                elif host.exists():
+                    bind(host, host)
+            bind(app, '/app')
+            bind(public, '/public')
+            bind(output, '/output', readonly=False)
+            commands.append('mkdir -p ' + ' '.join(q(str(root / name)) for name in ('tmp/home', 'dev')))
+            for name in ('null', 'urandom'):
+                dest = root / 'dev' / name
+                commands.extend((f'touch {q(str(dest))}',
+                    f'{q(tools["mount"])} --bind /dev/{name} {q(str(dest))}'))
+            # No host procfs; no inherited directory descriptors; all capabilities
+            # dropped after chroot, so the worker cannot remount or escape the root.
+            inside = 'cd /app; printf ' + q(_READY) + '; exec ' + shlex.join([sys.executable, '-c', code])
+            commands.append('exec ' + shlex.join([tools['chroot'], str(root), tools['setpriv'],
+                '--no-new-privs', '--bounding-set=-all', '--inh-caps=-all', '--ambient-caps=-all',
+                '/bin/sh', '-ceu', inside]))
+            env = {'PATH': '/usr/bin:/usr/sbin:/bin:/sbin', 'HOME': '/tmp/home', 'TMPDIR': '/tmp',
+                   'LANG': 'C.UTF-8', 'PYTHONPATH': '/app', 'PYTHONNOUSERSITE': '1',
+                   'PYTHONDONTWRITEBYTECODE': '1', 'PYTHONHASHSEED': '0',
+                   'DOCATLAS_OFFLINE': '1', 'DOCATLAS_AUTO_VECTORS': '0',
+                   'DOCATLAS_REGISTRY_API_URL': 'http://127.0.0.1:1'}
+            cmd = [tools['unshare'], '--user', '--map-root-user', '--mount', '--net',
+                   '--pid', '--fork', '--kill-child=KILL', '/bin/sh', '-ceu', '\n'.join(commands)]
+            process = subprocess.Popen(cmd, env=env, stdin=subprocess.DEVNULL,
+                stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True,
+                close_fds=True, start_new_session=True)
+            try:
+                stdout, stderr = process.communicate(timeout=timeout)
+            except subprocess.TimeoutExpired:
+                os.killpg(process.pid, signal.SIGKILL)
+                process.communicate()
+                raise IsolationUnavailable('isolated worker timeout; process group killed') from None
+            if not stdout.startswith(_READY):
+>               raise IsolationUnavailable('namespace setup failed: ' + stderr[-2000:])
+E               experiments.retrieval_ablation.isolation.IsolationUnavailable: namespace setup failed: unshare: write failed /proc/self/uid_map: Operation not permitted
+
+experiments/retrieval_ablation/isolation.py:110: IsolationUnavailable
+________ test_actual_fixture_handler_executes_without_any_gold_files[A] ________
+
+tmp_path = PosixPath('/tmp/pytest-of-viadmin/pytest-47/test_actual_fixture_handler_ex1')
+arm = 'A'
+
+    @pytest.mark.parametrize('arm', ['P', 'A'])
+    def test_actual_fixture_handler_executes_without_any_gold_files(tmp_path, arm):
+        from experiments.retrieval_ablation.run import stage_worker
+        app, public, output = [tmp_path / name for name in ('app', 'public', 'output')]
+        stage_worker(app)
+        public.mkdir()
+        output.mkdir()
+        (public / 'retry.md').write_text('# Retry\n\nThe retry budget is three attempts. Do not retry cancellation.\n')
+        code = f'''import hashlib, json
+    from pathlib import Path
+    from experiments.retrieval_ablation.run import _execute_arm
+    p=Path('/public')
+    assert not Path('/app/eval/project_context_quality/cases.json').exists()
+    r=_execute_arm(p, {{'schema_version':1, 'sources':[{{'path':'retry.md', 'sha256':hashlib.sha256((p/'retry.md').read_bytes()).hexdigest()}}]}},
+        {{'question':'What is the retry budget?'}}, {{'max_sections_per_source':2,'raw_hits':40,'unique_candidates':20}}, {arm!r})
+    assert r['execution_status'] == 'EXECUTED', r
+    assert r.get('packet_audit_errors', r.get('audit_errors')) == [], r
+    if {arm!r} == 'A':
+        assert r['packet_status'] == 'VALIDATED_PROJECT_PACKET'
+        assert r['model_visible_packet'].get('sources'), r
+    Path('/output/result.json').write_text(json.dumps(r, default=lambda x: sorted(x)))
+    '''
+>       completed = run_isolated(code, app=app, public=public, output=output)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/docs/test_retrieval_ablation_isolation.py:156: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+code = "import hashlib, json\nfrom pathlib import Path\nfrom experiments.retrieval_ablation.run import _execute_arm\np=Path('...sible_packet'].get('sources'), r\nPath('/output/result.json').write_text(json.dumps(r, default=lambda x: sorted(x)))\n"
+
+    def run_isolated(code: str, *, app: Path, public: Path, output: Path,
+                     timeout: int = 120) -> subprocess.CompletedProcess:
+        """Run trusted Python code; close inherited FDs, scrub env, drop all caps."""
+        if sys.platform != 'linux':
+            raise IsolationUnavailable('Linux namespace worker required')
+        if not isinstance(code, str) or type(timeout) is not int or timeout < 1:
+            raise ValueError('invalid worker code/timeout')
+        tools = {name: shutil.which(name) for name in ('unshare', 'mount', 'chroot', 'setpriv')}
+        if not all(tools.values()):
+            raise IsolationUnavailable('unshare, mount, chroot and setpriv are required')
+        app, public, output = map(_literal_path, (app, public, output))
+        for left, right in ((app, public), (app, output), (public, output)):
+            if left.is_relative_to(right) or right.is_relative_to(left):
+                raise ValueError('sandbox mounts must be disjoint')
+        # Only runtime roots are exposed. Never bind host /, /home, /tmp or /proc.
+        runtimes = sorted({Path('/usr'), Path(sys.prefix), Path(sys.base_prefix)}, key=lambda p: len(p.parts))
+        for path in runtimes:
+            if path in (Path('/'), Path('/home'), Path('/tmp'), Path('/mnt')):
+                raise IsolationUnavailable('runtime prefix is too broad')
+            if any(p.is_relative_to(path) or path.is_relative_to(p) for p in (app, public, output)):
+                raise ValueError('runtime and data mounts must be disjoint')
+        runtimes = [p for i, p in enumerate(runtimes) if not any(p.is_relative_to(q) for q in runtimes[:i])]
+        q = shlex.quote
+        with tempfile.TemporaryDirectory(prefix='docatlas-isolation-') as temporary:
+            root = Path(temporary) / 'root'
+            root.mkdir()
+            commands = [f'{q(tools["mount"])} --make-rprivate /',
+                        f'{q(tools["mount"])} -t tmpfs -o nosuid tmpfs {q(str(root))}']
+    
+            def bind(source, target, readonly=True):
+                dest = str(root) + str(target)
+                commands.append('mkdir -p ' + q(dest))
+                commands.append(f'{q(tools["mount"])} --bind {q(str(source))} {q(dest)}')
+                opts = 'remount,bind,nosuid' + (',ro' if readonly else '')
+                commands.append(f'{q(tools["mount"])} -o {opts} {q(dest)}')
+    
+            for prefix in runtimes:
+                bind(prefix, prefix)
+            for name in ('bin', 'sbin', 'lib', 'lib64'):
+                host = Path('/') / name
+                if host.is_symlink():
+                    commands.append(f'ln -s {q(os.readlink(host))} {q(str(root / name))}')
+                elif host.exists():
+                    bind(host, host)
+            bind(app, '/app')
+            bind(public, '/public')
+            bind(output, '/output', readonly=False)
+            commands.append('mkdir -p ' + ' '.join(q(str(root / name)) for name in ('tmp/home', 'dev')))
+            for name in ('null', 'urandom'):
+                dest = root / 'dev' / name
+                commands.extend((f'touch {q(str(dest))}',
+                    f'{q(tools["mount"])} --bind /dev/{name} {q(str(dest))}'))
+            # No host procfs; no inherited directory descriptors; all capabilities
+            # dropped after chroot, so the worker cannot remount or escape the root.
+            inside = 'cd /app; printf ' + q(_READY) + '; exec ' + shlex.join([sys.executable, '-c', code])
+            commands.append('exec ' + shlex.join([tools['chroot'], str(root), tools['setpriv'],
+                '--no-new-privs', '--bounding-set=-all', '--inh-caps=-all', '--ambient-caps=-all',
+                '/bin/sh', '-ceu', inside]))
+            env = {'PATH': '/usr/bin:/usr/sbin:/bin:/sbin', 'HOME': '/tmp/home', 'TMPDIR': '/tmp',
+                   'LANG': 'C.UTF-8', 'PYTHONPATH': '/app', 'PYTHONNOUSERSITE': '1',
+                   'PYTHONDONTWRITEBYTECODE': '1', 'PYTHONHASHSEED': '0',
+                   'DOCATLAS_OFFLINE': '1', 'DOCATLAS_AUTO_VECTORS': '0',
+                   'DOCATLAS_REGISTRY_API_URL': 'http://127.0.0.1:1'}
+            cmd = [tools['unshare'], '--user', '--map-root-user', '--mount', '--net',
+                   '--pid', '--fork', '--kill-child=KILL', '/bin/sh', '-ceu', '\n'.join(commands)]
+            process = subprocess.Popen(cmd, env=env, stdin=subprocess.DEVNULL,
+                stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True,
+                close_fds=True, start_new_session=True)
+            try:
+                stdout, stderr = process.communicate(timeout=timeout)
+            except subprocess.TimeoutExpired:
+                os.killpg(process.pid, signal.SIGKILL)
+                process.communicate()
+                raise IsolationUnavailable('isolated worker timeout; process group killed') from None
+            if not stdout.startswith(_READY):
+>               raise IsolationUnavailable('namespace setup failed: ' + stderr[-2000:])
+E               experiments.retrieval_ablation.isolation.IsolationUnavailable: namespace setup failed: unshare: write failed /proc/self/uid_map: Operation not permitted
+
+experiments/retrieval_ablation/isolation.py:110: IsolationUnavailable
+_ test_public_projection_prioritizes_public_queries_not_audited_alias_count[False-256-1] _
+
+aliases = 1, budget = 256, reverse = False
+
+    @pytest.mark.parametrize("aliases", [1, 2])
+    @pytest.mark.parametrize("budget", [256, 800])
+    @pytest.mark.parametrize("reverse", [False, True])
+    def test_public_projection_prioritizes_public_queries_not_audited_alias_count(aliases, budget, reverse):
+        retrieval = _host_lookup_context_retrieval()
+        single, diverse = retrieval["context_pack"][:2]
+        queries = [{"query_id": "query-original", "origin": "original", "text": "Explain the processing directions."}]
+        queries.extend({"query_id": f"query-lookup-{index}", "origin": "host_lookup", "text": text}
+                       for index, text in enumerate(("amber", "indigo", "cobalt"), 1))
+        queries.extend({
+            "query_id": f"query-host-rewrite-{index}", "origin": "canonical_intent", "text": text,
+            "relation": "audited_rewrite", "public_parent_query_id": "query-lookup-1",
+        } for index, text in enumerate(("copper", "silver")[:aliases], 1))
+        single.update(path="docs/single.md", content="Amber copper silver.", retrieval_query_matches={})
+        diverse.update(path="docs/diverse.md", content="Indigo cobalt.", retrieval_query_matches={})
+        for query in queries[1:]:
+            source = single if query.get("public_parent_query_id") or query["text"] == "amber" else diverse
+            source["retrieval_query_matches"][query["query_id"]] = {
+                "query_text": query["text"], "qualified": True,
+                "relation": query.get("relation", "host_lookup"),
+                "public_parent_query_id": query.get("public_parent_query_id"),
+            }
+        retrieval["context_pack"] = [diverse, single] if reverse else [single, diverse]
+        retrieval["documentation_query_plan"] = {"queries": queries, "required_query_ids": []}
+        payload, snapshot = project_docs_context(retrieval=retrieval, max_tokens=budget)
+>       assert payload["sources"][0]["path_or_url"] == "docs/diverse.md"
+               ^^^^^^^^^^^^^^^^^^
+E       KeyError: 'sources'
+
+tests/docs/test_review_boundary_semantics.py:141: KeyError
+_ test_public_projection_prioritizes_public_queries_not_audited_alias_count[False-256-2] _
+
+aliases = 2, budget = 256, reverse = False
+
+    @pytest.mark.parametrize("aliases", [1, 2])
+    @pytest.mark.parametrize("budget", [256, 800])
+    @pytest.mark.parametrize("reverse", [False, True])
+    def test_public_projection_prioritizes_public_queries_not_audited_alias_count(aliases, budget, reverse):
+        retrieval = _host_lookup_context_retrieval()
+        single, diverse = retrieval["context_pack"][:2]
+        queries = [{"query_id": "query-original", "origin": "original", "text": "Explain the processing directions."}]
+        queries.extend({"query_id": f"query-lookup-{index}", "origin": "host_lookup", "text": text}
+                       for index, text in enumerate(("amber", "indigo", "cobalt"), 1))
+        queries.extend({
+            "query_id": f"query-host-rewrite-{index}", "origin": "canonical_intent", "text": text,
+            "relation": "audited_rewrite", "public_parent_query_id": "query-lookup-1",
+        } for index, text in enumerate(("copper", "silver")[:aliases], 1))
+        single.update(path="docs/single.md", content="Amber copper silver.", retrieval_query_matches={})
+        diverse.update(path="docs/diverse.md", content="Indigo cobalt.", retrieval_query_matches={})
+        for query in queries[1:]:
+            source = single if query.get("public_parent_query_id") or query["text"] == "amber" else diverse
+            source["retrieval_query_matches"][query["query_id"]] = {
+                "query_text": query["text"], "qualified": True,
+                "relation": query.get("relation", "host_lookup"),
+                "public_parent_query_id": query.get("public_parent_query_id"),
+            }
+        retrieval["context_pack"] = [diverse, single] if reverse else [single, diverse]
+        retrieval["documentation_query_plan"] = {"queries": queries, "required_query_ids": []}
+        payload, snapshot = project_docs_context(retrieval=retrieval, max_tokens=budget)
+>       assert payload["sources"][0]["path_or_url"] == "docs/diverse.md"
+               ^^^^^^^^^^^^^^^^^^
+E       KeyError: 'sources'
+
+tests/docs/test_review_boundary_semantics.py:141: KeyError
+_ test_public_projection_prioritizes_public_queries_not_audited_alias_count[True-256-1] _
+
+aliases = 1, budget = 256, reverse = True
+
+    @pytest.mark.parametrize("aliases", [1, 2])
+    @pytest.mark.parametrize("budget", [256, 800])
+    @pytest.mark.parametrize("reverse", [False, True])
+    def test_public_projection_prioritizes_public_queries_not_audited_alias_count(aliases, budget, reverse):
+        retrieval = _host_lookup_context_retrieval()
+        single, diverse = retrieval["context_pack"][:2]
+        queries = [{"query_id": "query-original", "origin": "original", "text": "Explain the processing directions."}]
+        queries.extend({"query_id": f"query-lookup-{index}", "origin": "host_lookup", "text": text}
+                       for index, text in enumerate(("amber", "indigo", "cobalt"), 1))
+        queries.extend({
+            "query_id": f"query-host-rewrite-{index}", "origin": "canonical_intent", "text": text,
+            "relation": "audited_rewrite", "public_parent_query_id": "query-lookup-1",
+        } for index, text in enumerate(("copper", "silver")[:aliases], 1))
+        single.update(path="docs/single.md", content="Amber copper silver.", retrieval_query_matches={})
+        diverse.update(path="docs/diverse.md", content="Indigo cobalt.", retrieval_query_matches={})
+        for query in queries[1:]:
+            source = single if query.get("public_parent_query_id") or query["text"] == "amber" else diverse
+            source["retrieval_query_matches"][query["query_id"]] = {
+                "query_text": query["text"], "qualified": True,
+                "relation": query.get("relation", "host_lookup"),
+                "public_parent_query_id": query.get("public_parent_query_id"),
+            }
+        retrieval["context_pack"] = [diverse, single] if reverse else [single, diverse]
+        retrieval["documentation_query_plan"] = {"queries": queries, "required_query_ids": []}
+        payload, snapshot = project_docs_context(retrieval=retrieval, max_tokens=budget)
+>       assert payload["sources"][0]["path_or_url"] == "docs/diverse.md"
+               ^^^^^^^^^^^^^^^^^^
+E       KeyError: 'sources'
+
+tests/docs/test_review_boundary_semantics.py:141: KeyError
+_ test_public_projection_prioritizes_public_queries_not_audited_alias_count[True-256-2] _
+
+aliases = 2, budget = 256, reverse = True
+
+    @pytest.mark.parametrize("aliases", [1, 2])
+    @pytest.mark.parametrize("budget", [256, 800])
+    @pytest.mark.parametrize("reverse", [False, True])
+    def test_public_projection_prioritizes_public_queries_not_audited_alias_count(aliases, budget, reverse):
+        retrieval = _host_lookup_context_retrieval()
+        single, diverse = retrieval["context_pack"][:2]
+        queries = [{"query_id": "query-original", "origin": "original", "text": "Explain the processing directions."}]
+        queries.extend({"query_id": f"query-lookup-{index}", "origin": "host_lookup", "text": text}
+                       for index, text in enumerate(("amber", "indigo", "cobalt"), 1))
+        queries.extend({
+            "query_id": f"query-host-rewrite-{index}", "origin": "canonical_intent", "text": text,
+            "relation": "audited_rewrite", "public_parent_query_id": "query-lookup-1",
+        } for index, text in enumerate(("copper", "silver")[:aliases], 1))
+        single.update(path="docs/single.md", content="Amber copper silver.", retrieval_query_matches={})
+        diverse.update(path="docs/diverse.md", content="Indigo cobalt.", retrieval_query_matches={})
+        for query in queries[1:]:
+            source = single if query.get("public_parent_query_id") or query["text"] == "amber" else diverse
+            source["retrieval_query_matches"][query["query_id"]] = {
+                "query_text": query["text"], "qualified": True,
+                "relation": query.get("relation", "host_lookup"),
+                "public_parent_query_id": query.get("public_parent_query_id"),
+            }
+        retrieval["context_pack"] = [diverse, single] if reverse else [single, diverse]
+        retrieval["documentation_query_plan"] = {"queries": queries, "required_query_ids": []}
+        payload, snapshot = project_docs_context(retrieval=retrieval, max_tokens=budget)
+>       assert payload["sources"][0]["path_or_url"] == "docs/diverse.md"
+               ^^^^^^^^^^^^^^^^^^
+E       KeyError: 'sources'
+
+tests/docs/test_review_boundary_semantics.py:141: KeyError
+=========================== short test summary info ============================
+FAILED tests/docs/test_cli_literal_query_binding.py::test_plan_keeps_literal_command_option_value[archive-tool --format json]
+FAILED tests/docs/test_cli_literal_query_binding.py::test_plan_keeps_literal_command_option_value[cache-store --zone remote]
+FAILED tests/docs/test_cli_literal_query_binding.py::test_plan_keeps_literal_command_option_value[backup-tool --copies 3]
+FAILED tests/docs/test_cli_literal_query_binding.py::test_plan_keeps_literal_command_option_value[archive-tool --format=json]
+FAILED tests/docs/test_cli_literal_query_binding.py::test_literal_probe_requires_same_visible_command_not_bag_of_tokens[Use archive-tool --format json to preserve the manifest.-True]
+FAILED tests/docs/test_cli_literal_query_binding.py::test_literal_probe_requires_same_visible_command_not_bag_of_tokens[Use archive-tool --format text to preserve the manifest.-False]
+FAILED tests/docs/test_cli_literal_query_binding.py::test_literal_probe_requires_same_visible_command_not_bag_of_tokens[archive-tool is described here; json is used by another tool --format text.-False]
+FAILED tests/docs/test_cli_literal_query_binding.py::test_literal_probe_requires_same_visible_command_not_bag_of_tokens[# archive-tool --format json\n\nUnrelated prose follows.-False]
+FAILED tests/docs/test_cli_literal_query_binding.py::test_literal_probe_requires_same_visible_command_not_bag_of_tokens[[archive-tool --format json](https://example.invalid/ref)-False]
+FAILED tests/docs/test_cli_literal_query_binding.py::test_literal_probe_requires_same_visible_command_not_bag_of_tokens[Use other-tool --format json to preserve the manifest.-False]
+FAILED tests/docs/test_cli_literal_query_binding.py::test_literal_probe_requires_same_visible_command_not_bag_of_tokens[Use archive-tool --format jsonl to preserve the manifest.-False]
+FAILED tests/docs/test_cli_literal_query_binding.py::test_command_literal_never_bypasses_source_policy[metadata0]
+FAILED tests/docs/test_cli_literal_query_binding.py::test_command_literal_never_bypasses_source_policy[metadata1]
+FAILED tests/docs/test_cli_literal_query_binding.py::test_command_literal_never_bypasses_source_policy[metadata2]
+FAILED tests/docs/test_cli_literal_query_binding.py::test_command_literal_never_bypasses_source_policy[metadata3]
+FAILED tests/docs/test_cli_literal_query_binding.py::test_ambiguous_or_boolean_options_do_not_invent_values[Explain cache-store --verbose and its output.]
+FAILED tests/docs/test_cli_literal_query_binding.py::test_literal_probe_budget_is_bounded
+FAILED tests/docs/test_cli_literal_query_binding.py::test_original_question_retains_negation
+FAILED tests/docs/test_cli_literal_query_limits.py::test_literal_respects_requested_limit[1]
+FAILED tests/docs/test_cli_literal_query_limits.py::test_literal_respects_requested_limit[2]
+FAILED tests/docs/test_cli_literal_query_limits.py::test_literal_respects_requested_limit[3]
+FAILED tests/docs/test_cli_literal_query_limits.py::test_literal_respects_requested_limit[4]
+FAILED tests/docs/test_cli_literal_query_limits.py::test_literal_respects_requested_limit[12]
+FAILED tests/docs/test_cli_literal_query_limits.py::test_overlong_literal_is_not_admitted_without_exact_constraint
+FAILED tests/docs/test_component_coverage.py::test_visible_component_novelty_follows_exact_constraints_before_public_queries[projection_clip]
+FAILED tests/docs/test_context_projection_boundaries.py::test_frozen_request_flow_prefers_project_context_module_witnesses
+FAILED tests/docs/test_direct_docatlas_questions_15.py::test_direct_docatlas_questions_15_visible_context_covers_all_required_facts
+FAILED tests/docs/test_generic_context_workflows.py::test_stale_health_live_status_sync_and_removal
+FAILED tests/docs/test_generic_context_workflows.py::test_first_session_live_query
+FAILED tests/docs/test_generic_context_workflows.py::test_contributor_live_reading_and_tests
+FAILED tests/docs/test_generic_context_workflows.py::test_remaining_live_workflow_witnesses[v2-natural-evidence-selection]
+FAILED tests/docs/test_generic_context_workflows.py::test_remaining_live_workflow_witnesses[v2-natural-offline]
+FAILED tests/docs/test_generic_context_workflows.py::test_remaining_live_workflow_witnesses[v2-paraphrase-local-trial]
+FAILED tests/docs/test_generic_context_workflows.py::test_catalog_live_invalid_behavior
+FAILED tests/docs/test_model_visible_projection.py::test_docs_context_is_retrieval_only_snapshot_bound_and_not_edit_ready
+FAILED tests/docs/test_project_answer_contract_v3.py::test_v3_does_not_reclassify_frozen_v2_config_questions
+FAILED tests/docs/test_question_plan_v4.py::test_question_plan_splits_compound_questions_into_mandatory_facets
+FAILED tests/docs/test_request_flow_lineage.py::test_request_flow_public_contract_remains_four_fact_fail_safe
+FAILED tests/docs/test_retrieval_ablation_isolation.py::test_real_worker_cannot_read_private_labels_even_by_absolute_path
+FAILED tests/docs/test_retrieval_ablation_isolation.py::test_public_inputs_are_readonly_and_only_output_is_writable
+FAILED tests/docs/test_retrieval_ablation_isolation.py::test_worker_has_no_host_loopback_network_or_host_proc
+FAILED tests/docs/test_retrieval_ablation_isolation.py::test_worker_cannot_remount_readonly_public_tree
+FAILED tests/docs/test_retrieval_ablation_isolation.py::test_host_credentials_are_not_inherited
+FAILED tests/docs/test_retrieval_ablation_isolation.py::test_real_sqlite_and_packet_modules_execute_inside_namespace
+FAILED tests/docs/test_retrieval_ablation_isolation.py::test_actual_fixture_handler_executes_without_any_gold_files[P]
+FAILED tests/docs/test_retrieval_ablation_isolation.py::test_actual_fixture_handler_executes_without_any_gold_files[A]
+FAILED tests/docs/test_review_boundary_semantics.py::test_public_projection_prioritizes_public_queries_not_audited_alias_count[False-256-1]
+FAILED tests/docs/test_review_boundary_semantics.py::test_public_projection_prioritizes_public_queries_not_audited_alias_count[False-256-2]
+FAILED tests/docs/test_review_boundary_semantics.py::test_public_projection_prioritizes_public_queries_not_audited_alias_count[True-256-1]
+FAILED tests/docs/test_review_boundary_semantics.py::test_public_projection_prioritizes_public_queries_not_audited_alias_count[True-256-2]
+50 failed, 3461 passed in 193.38s (0:03:13)

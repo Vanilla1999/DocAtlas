@@ -249,7 +249,26 @@ class _RetrievalDispatcherPart02:
         for chunk in chunks:
             source = str((chunk.metadata or {}).get('canonical_url') or chunk.source)
             groups.setdefault(source, []).append(chunk)
-        queues = {source: iter(sorted(group, key=key, reverse=True)) for source, group in groups.items()}
+        def diverse(group: list[Any]) -> list[Any]:
+            ranked = sorted(group, key=key, reverse=True)
+            if not all((chunk.metadata or {}).get("parent_logical_id") for chunk in ranked):
+                return ranked
+            # Spend the existing source quota across indexed parents rather
+            # than several children of the same section. Never trade a harder
+            # exact-identity match for diversity; unknown parents retain order.
+            first, repeats, seen = [], [], set()
+            best_exact = key(ranked[0])[0]
+            for chunk in ranked:
+                parent = str((chunk.metadata or {}).get("parent_logical_id") or "")
+                if key(chunk)[0] != best_exact or not key(chunk)[1]:
+                    repeats.append(chunk)
+                elif parent in seen:
+                    repeats.append(chunk)
+                else:
+                    seen.add(parent)
+                    first.append(chunk)
+            return first + repeats if seen else ranked
+        queues = {source: iter(diverse(group)) for source, group in groups.items()}
         return [next(queues[str((chunk.metadata or {}).get('canonical_url') or chunk.source)]) for chunk in chunks]
 
     def _rerank_intent_matches(self, query: str, chunks: list[Any], *, expand: str | None = None) -> list[Any]:

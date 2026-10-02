@@ -7,14 +7,19 @@ import pytest
 
 from docmancer.docs.application.docs_context_projection import _requalify_visible_source
 from tests.docs._reference_binding_fixtures import capture_reference_case
-from tests.docs.test_admission_guard_composition import QUESTION, FACT
+from tests.docs.test_admission_guard_composition import QUESTION, FACT, need_probe
 
 
 @pytest.fixture
 def indexed_source(tmp_path):
-    cap = capture_reference_case(tmp_path, {'Guide.md': '# Settings\n\n' + FACT}, QUESTION)
+    cap = capture_reference_case(tmp_path, {'Guide.md': '# Settings\n\n' + FACT}, QUESTION,
+        lookups=('What is RelayClient default timeout?',))
     entry = next(iter(cap['projection_attempts'][-1]['snapshot'].values()))
     raw = deepcopy(entry['source'])
+    # Explicit typed-demand fixture over a native indexed source. The public
+    # planner no longer invents this demand; requalification must still reject
+    # stale approvals, cropped facts and source substitutions for existing callers.
+    raw.setdefault('retrieval_query_matches', {})['query-need-1'] = need_probe()
     return {
         **raw, 'path_or_url': entry['path_or_url'], 'snippet': entry['snippet'],
         '_qualification_candidate': raw,

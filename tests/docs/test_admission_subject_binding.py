@@ -35,7 +35,8 @@ def test_fabricated_owner_cannot_bind_a_current_body(tmp_path, tamper):
     question = 'When do QueueTasks tasks run relative to returning the response?'
     cap = capture_reference_case(tmp_path, {'Guide.md':
         '# OtherTasks\n\nTasks run after returning the response.\n'},
-        'When do OtherTasks tasks run relative to returning the response?')
+        'When do OtherTasks tasks run relative to returning the response?',
+        lookups=('Tasks run after returning the response',))
     rows = cap['projection_attempts'][0]['before_projection']['context_pack']
     source = deepcopy(rows[0])
     evidence = source['_reference_evidence']

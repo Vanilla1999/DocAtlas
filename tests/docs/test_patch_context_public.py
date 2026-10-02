@@ -67,6 +67,7 @@ def test_project_docs_and_source_hints_do_not_authorize_cross_module_editing() -
         "get_docs_context",
         {
             "question": question,
+            "request_intent": "change",
             "project_path": "/repo",
             "delivery_strategy": "bounded_direct",
             "packet_tokens": 2_000,
@@ -84,6 +85,7 @@ def test_source_search_recovery_never_authorizes_editing() -> None:
         "get_docs_context",
         {
             "question": "Fix MissingPermissionGate.",
+            "request_intent": "change",
             "project_path": "/repo",
             "delivery_strategy": "bounded_direct",
         },
@@ -102,6 +104,7 @@ def test_missing_cross_module_proof_requires_source_search_despite_resolved_targ
         "get_docs_context",
         {
             "question": "Fix partial permission handling in BrowserPermissionGate and PermissionService.",
+            "request_intent": "change",
             "project_path": "/repo",
             "delivery_strategy": "bounded_direct",
         },
@@ -122,6 +125,7 @@ def test_project_docs_cannot_authorize_source_mutation_target() -> None:
         "get_docs_context",
         {
             "question": "Fix BrowserPermissionGate.",
+            "request_intent": "change",
             "project_path": "/repo",
             "delivery_strategy": "bounded_direct",
         },
@@ -146,6 +150,7 @@ def test_project_doc_source_filename_alias_cannot_authorize_mutation() -> None:
         "get_docs_context",
         {
             "question": "Fix BrowserPermissionGate.",
+            "request_intent": "change",
             "project_path": "/repo",
             "delivery_strategy": "bounded_direct",
         },
@@ -168,6 +173,7 @@ def test_source_recovery_prioritizes_unresolved_target_after_first_eight() -> No
         "get_docs_context",
         {
             "question": "Fix " + ", ".join(paths) + ".",
+            "request_intent": "change",
             "project_path": "/repo",
             "delivery_strategy": "bounded_direct",
         },
@@ -237,6 +243,7 @@ must not be edited directly.
                 "without changing permission_result.freezed.dart."
             ),
             "project_path": str(project),
+            "request_intent": "change",
             "mode": "project",
             "delivery_strategy": "bounded_direct",
             "packet_tokens": 2_000,

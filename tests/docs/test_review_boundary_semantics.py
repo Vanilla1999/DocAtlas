@@ -76,24 +76,6 @@ def test_qualified_or_compound_host_lookups_cannot_gain_unqualified_audits(looku
                 and query.public_parent_query_id == "query-lookup-1"]
 
 
-@pytest.mark.parametrize("lookup", [
-    "What does the documentation request boundary accept?",
-    "Which inputs does the request boundary accept?",
-    "What arguments are accepted by the documentation request boundary?",
-    "How do retrieved chunks become selected visible sources?",
-    "How does retrieval select source chunks?",
-    "How are retrieved candidates selected as visible sources?",
-])
-def test_complete_positive_host_lookup_families_still_gain_bounded_audits(lookup):
-    plan = build_documentation_query_plan("Explain get_docs_context request flow.", lookup_queries=(lookup,))
-    audits = [query for query in plan.queries if query.relation == "audited_rewrite"
-              and query.public_parent_query_id == "query-lookup-1"]
-    assert 1 <= len(audits) <= 2
-    public = plan.as_payload()["public_query_ids"]
-    assert "query-lookup-1" in public
-    assert not any(query.query_id in public for query in audits)
-
-
 @pytest.mark.parametrize("literal", [r"\|", r"\\\|"])
 def test_escaped_pipe_prose_does_not_become_an_oversized_table(literal):
     text = "Background " * 60 + literal + " ordinary text. ResetAgent requires approval."

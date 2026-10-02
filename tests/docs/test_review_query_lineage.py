@@ -19,16 +19,16 @@ def test_host_lookups_cannot_replace_original_alias_exact_terms(lookups):
     question = "Explain FooEngine architecture."
     baseline = build_documentation_query_plan(question)
     with_lookups = build_documentation_query_plan(question, lookup_queries=lookups)
-    original_aliases = {
-        query.query_id: query.parent_exact_terms
-        for query in baseline.queries if query.query_id.startswith("query-intent-")
-    }
-    assert original_aliases
-    assert all("fooengine" in terms for terms in original_aliases.values())
-    assert {
-        query.query_id: query.parent_exact_terms
-        for query in with_lookups.queries if query.query_id.startswith("query-intent-")
-    } == original_aliases
+    # Original aliases are retired; keep the underlying identity-isolation
+    # control against actual raw question and exact locators instead.
+    original_anchors = tuple(query for query in baseline.queries if query.origin == "exact_anchor")
+    assert any(query.text == "FooEngine" for query in original_anchors)
+    assert tuple(query for query in with_lookups.queries if query.origin == "exact_anchor") == original_anchors
+    assert with_lookups.queries[0] == baseline.queries[0]
+    assert with_lookups.original_question == question
+    assert not any(query.query_id.startswith("query-intent-") for query in with_lookups.queries)
+    assert all(query.public_parent_query_id is None and not query.parent_exact_terms
+               for query in with_lookups.queries if query.origin == "host_lookup")
 
 
 @pytest.mark.parametrize("negation", ["doesn't", "doesn’t", "cannot", "can't", "can’t", "won't"])

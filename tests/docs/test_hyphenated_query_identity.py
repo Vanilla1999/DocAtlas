@@ -9,7 +9,9 @@ from docmancer.docs.domain.technical_terms import extract_technical_terms
 def test_unquoted_prose_modifier_remains_a_lexical_topic(modifier):
     question = f"How does {modifier} documentation retrieval preserve useful evidence?"
     assert modifier not in technical_anchors(question)
-    assert any(q.text == modifier and q.origin == "lexical_topic" for q in build_documentation_query_plan(question).queries)
+    plan = build_documentation_query_plan(question)
+    assert plan.queries[0].text == question
+    assert not any(q.text == modifier for q in plan.queries[1:])
     terms = [term for term in extract_technical_terms(question) if term.raw == modifier]
     assert len(terms) == 1
     assert terms[0].kind == "plain_term"
@@ -55,7 +57,9 @@ def test_former_prose_prefix_can_be_a_real_explicit_command():
 ])
 def test_borrowed_latin_topic_is_retained_without_claiming_command_identity(question):
     assert "preview-build" not in technical_anchors(question)
-    assert any(q.text == "preview-build" and q.origin == "lexical_topic" for q in build_documentation_query_plan(question).queries)
+    plan = build_documentation_query_plan(question)
+    assert plan.queries[0].text == question
+    assert not any(q.text == "preview-build" for q in plan.queries[1:])
     terms = [term for term in extract_technical_terms(question) if term.raw == "preview-build"]
     assert len(terms) == 1
     assert terms[0].kind == "plain_term"

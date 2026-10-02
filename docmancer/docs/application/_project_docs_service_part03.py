@@ -17,7 +17,6 @@ from docmancer.docs.domain.evidence_qualification import (
     qualify_evidence,
 )
 from docmancer.docs.domain.project_doc_ranking import condition_lead_priority
-from docmancer.docs.domain.project_retrieval_intent import build_project_retrieval_aliases
 from docmancer.docs.application.retrieval_need_support import apply_retrieval_need_witness
 from docmancer.docs.domain.query_terms import (
     documentation_query_terms,
@@ -107,30 +106,41 @@ def _qualify_candidate_lookups(
     chunks: list[Any], plan: DocumentationQueryPlan, *,
     expected_project_identity: str, lifecycle_intent: str,
 ) -> list[Any]:
-    """Check independent public lookups before admission, across discovery lanes.
+    """Check public lookups and literal anchors across discovery lanes.
 
     No extra retrieval is performed and no original/parent coverage is derived.
+    Exact anchors retain their own IDs; their parent is provenance, not proof.
     Existing discovery traces keep their scores; a cross-check has no BM25 score.
     """
-    lookups = [item for item in plan.queries
-               if item.origin in {"original", "host_lookup", "retrieval_need"} and not item.public_parent_query_id]
-    result = []
-    for chunk in chunks:
-        for lookup in lookups:
-            if lookup.query_id in (chunk.metadata or {}).get("retrieval_query_matches", {}):
-                continue
-            chunk = _tag_retrieval_query(
-                [chunk], lookup.query_id, lookup.text, lookup,
-                expected_project_identity=expected_project_identity,
-                lifecycle_intent=lifecycle_intent,
-            )[0]
-            trace = chunk.metadata["retrieval_query_matches"][lookup.query_id]
-            for field in ("bm25_cost", "field_matches", "mode"):
-                trace.pop(field, None)
-            trace.update(lexical_score=0.0, qualification_route="cross_lane_body",
-                         query_term_count=len(trace.get("query_terms") or ()))
-            if lookup.origin == "original": trace["admission_only"] = True
-        result.append(chunk)
+    public = [item for item in plan.queries
+              if item.origin in {"original", "host_lookup", "retrieval_need"} and not item.public_parent_query_id]
+    anchors = [item for item in plan.queries if item.origin == "exact_anchor" and item.relation == "exact_anchor"]
+    public_ids = {item.query_id for item in public}
+    result = list(chunks)
+    for lookups in (public, anchors):
+        # Literal rescue must not compete with an independently qualified
+        # public packet. Anchor coverage remains search direction, not proof.
+        if lookups is anchors and any(public_ids.intersection(
+                (chunk.metadata or {}).get("retrieval_query_ids", ())) for chunk in result):
+            break
+        checked = []
+        for chunk in result:
+            for lookup in lookups:
+                if lookup.query_id in (chunk.metadata or {}).get("retrieval_query_matches", {}):
+                    continue
+                chunk = _tag_retrieval_query(
+                    [chunk], lookup.query_id, lookup.text, lookup,
+                    expected_project_identity=expected_project_identity,
+                    lifecycle_intent=lifecycle_intent,
+                )[0]
+                trace = chunk.metadata["retrieval_query_matches"][lookup.query_id]
+                for field in ("bm25_cost", "field_matches", "mode"):
+                    trace.pop(field, None)
+                trace.update(lexical_score=0.0, qualification_route="cross_lane_body",
+                             query_term_count=len(trace.get("query_terms") or ()))
+                if lookup.origin == "original": trace["admission_only"] = True
+            checked.append(chunk)
+        result = checked
     return result
 class _ProjectDocsServicePart03:
     def query_project_docs(
@@ -152,7 +162,7 @@ class _ProjectDocsServicePart03:
     ):
         root = validate_project_path(project_path).path
         answer_lifecycle_intent = str(
-            getattr(requirements, "lifecycle_intent", "") or lifecycle_intent(query)
+            getattr(requirements, "lifecycle_intent", "") or "current"
         )
         filters: dict[str, Any] = {
             "project_path": str(root),
@@ -179,9 +189,8 @@ class _ProjectDocsServicePart03:
             query, lookup_queries=lookup_queries, explicit_path=evidence_path,
             requirements=requirements,
         )
-        from .need_query_schedule import scheduled_plan, requirement_search_probes
-        documentation_query_plan, scheduled_lookups = scheduled_plan(documentation_query_plan,
-            supplemental_queries=requirement_search_probes(requirements))
+        from .need_query_schedule import scheduled_plan
+        documentation_query_plan, scheduled_lookups = scheduled_plan(documentation_query_plan)
         reference_context = SourceReferenceContext(getattr(agent, "store", None), question=query,
             queries=documentation_query_plan.queries, filters=filters, lifecycle_intent=answer_lifecycle_intent)
         lookup_by_id = {
@@ -303,31 +312,17 @@ class _ProjectDocsServicePart03:
                         anchor_lookup,
                         expected_project_identity=filters["project_identity"], lifecycle_intent=answer_lifecycle_intent,
                     )
-        same_atom_canonical_texts = {
-            alias.text
-            for alias in build_project_retrieval_aliases(query)
-            if alias.intent_id == "fail_closed_workflow"
-        }
         supplemental_chunks_by_query = {}
         for supplemental_query in supplemental_queries:
             lookups = [item for item in documentation_query_plan.queries if item.text == supplemental_query]
             public_lookup = requirements is not None and any(item.origin == "host_lookup" for item in lookups)
             # Public lookups need the same pre-qualification candidate window
             # as the original question; projection owns the public budget.
-            preserve_canonical_neighbors = any(
-                item.origin == "canonical_intent"
-                and item.text in same_atom_canonical_texts
-                for item in lookups
-            )
             lane = _run(
                 supplemental_query,
                 query_limit=effective_limit if public_lookup else 4,
-                query_budget=(
-                    budget if public_lookup else
-                    min(budget, max(800, supplemental_budget))
-                    if preserve_canonical_neighbors else supplemental_budget
-                ),
-                query_expand="adjacent" if preserve_canonical_neighbors else "none",
+                query_budget=budget if public_lookup else supplemental_budget,
+                query_expand="none",
                 query_filters=filters,
             )
             if not lookups:
@@ -699,20 +694,20 @@ class _ProjectDocsServicePart03:
             if resolved_module_path: exact_filters["module_path"] = resolved_module_path
             exact_context = SourceReferenceContext(self._agent_instance().store, question=query,
                 queries=exact_plan.queries, filters=exact_filters,
-                lifecycle_intent=str(getattr(requirements, "lifecycle_intent", "") or lifecycle_intent(query)))
+                lifecycle_intent=str(getattr(requirements, "lifecycle_intent", "") or "current"))
             exact_chunks = exact_context.prepare(exact_chunks)
             for lookup in exact_plan.queries:
                 exact_chunks = _tag_retrieval_query(
                     exact_chunks, lookup.query_id, lookup.text, lookup=lookup,
                     expected_project_identity=self._repository_identity(root),
-                    lifecycle_intent=str(getattr(requirements, "lifecycle_intent", "") or lifecycle_intent(query)),
+                    lifecycle_intent=str(getattr(requirements, "lifecycle_intent", "") or "current"),
                 )
             chunks = [*exact_chunks, *chunks]
             exact_document_fallback_used = bool(exact_chunks)
         safe_chunks = []
         dropped_placeholder_chunks = 0
         answer_lifecycle_intent = str(
-            getattr(requirements, "lifecycle_intent", "") or lifecycle_intent(query)
+            getattr(requirements, "lifecycle_intent", "") or "current"
         )
         for chunk in chunks:
             metadata_for_chunk = chunk.metadata or {}

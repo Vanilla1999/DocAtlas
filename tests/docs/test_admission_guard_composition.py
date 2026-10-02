@@ -6,7 +6,7 @@ import pytest
 from docmancer.docs.domain.admission_contract import (
     HardGuards, LocalWitnessDecision, choose_admission,
 )
-from docmancer.docs.domain.documentation_query_plan import build_documentation_query_plan
+from docmancer.docs.domain.documentation_query_plan import DocumentationLookup, build_documentation_query_plan
 from docmancer.docs.domain.evidence_qualification import qualify_evidence, derived_parent_trace
 from docmancer.docs.domain.query_terms import documentation_query_terms, query_constraint_roles
 from tests.docs._reference_binding_fixtures import capture_reference_case, visible
@@ -17,8 +17,11 @@ FACT = 'RelayClient default timeout is 7 seconds.'
 
 
 def need_probe(question=QUESTION):
+    # Typed-admission unit fixture: no NL planner is allowed to mint this demand.
     plan = build_documentation_query_plan(question)
-    need = next(q for q in plan.queries if q.origin == 'retrieval_need')
+    assert not any(q.origin == 'retrieval_need' for q in plan.queries)
+    need = DocumentationLookup('query-need-1', question, 'retrieval_need', False,
+        relation='host_lookup', need_subject='RelayClient', need_relation='default')
     probe = asdict(need)
     probe.update(query_text=need.text, query_origin=need.origin,
                  query_terms=list(documentation_query_terms(need.text)),
@@ -131,11 +134,13 @@ def test_forged_approval_and_old_body_span_are_recomputed():
 
 
 def test_native_indexed_need_is_qualified_without_claiming_a_complete_answer(tmp_path):
-    cap = capture_reference_case(tmp_path, {'Guide.md': '# Settings\n\n' + FACT}, QUESTION)
+    cap = capture_reference_case(tmp_path, {'Guide.md': '# Settings\n\n' + FACT}, QUESTION,
+        lookups=('What is RelayClient default timeout?',))
     assert FACT in visible(cap)
     sources = cap['projection_attempts'][-1]['snapshot'].values()
-    traces = [row['source'].get('retrieval_query_matches', {}).get('query-need-1', {})
+    traces = [row['source'].get('retrieval_query_matches', {}).get('query-lookup-1', {})
               for row in sources]
-    assert any(t.get('qualified') and t.get('admission_route') == 'typed_local' for t in traces)
+    assert any(t.get('qualified') for t in traces)
+    assert all(not t.get('derived_from_query_ids') for t in traces)
     assert all(cap['public_payload'][key] is False
                for key in ('answer_supported', 'answer_available', 'edit_ready'))

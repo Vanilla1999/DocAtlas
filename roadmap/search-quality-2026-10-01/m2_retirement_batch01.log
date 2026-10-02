@@ -1,0 +1,146 @@
+........................................................................ [ 45%]
+..............................FF..FF.................................... [ 91%]
+..............                                                           [100%]
+=================================== FAILURES ===================================
+_ test_public_projection_prioritizes_public_queries_not_audited_alias_count[False-256-1] _
+
+aliases = 1, budget = 256, reverse = False
+
+    @pytest.mark.parametrize("aliases", [1, 2])
+    @pytest.mark.parametrize("budget", [256, 800])
+    @pytest.mark.parametrize("reverse", [False, True])
+    def test_public_projection_prioritizes_public_queries_not_audited_alias_count(aliases, budget, reverse):
+        retrieval = _host_lookup_context_retrieval()
+        single, diverse = retrieval["context_pack"][:2]
+        queries = [{"query_id": "query-original", "origin": "original", "text": "Explain the processing directions."}]
+        queries.extend({"query_id": f"query-lookup-{index}", "origin": "host_lookup", "text": text}
+                       for index, text in enumerate(("amber", "indigo", "cobalt"), 1))
+        queries.extend({
+            "query_id": f"query-host-rewrite-{index}", "origin": "canonical_intent", "text": text,
+            "relation": "audited_rewrite", "public_parent_query_id": "query-lookup-1",
+        } for index, text in enumerate(("copper", "silver")[:aliases], 1))
+        single.update(path="docs/single.md", content="Amber copper silver.", retrieval_query_matches={})
+        diverse.update(path="docs/diverse.md", content="Indigo cobalt.", retrieval_query_matches={})
+        for query in queries[1:]:
+            source = single if query.get("public_parent_query_id") or query["text"] == "amber" else diverse
+            source["retrieval_query_matches"][query["query_id"]] = {
+                "query_text": query["text"], "qualified": True,
+                "relation": query.get("relation", "host_lookup"),
+                "public_parent_query_id": query.get("public_parent_query_id"),
+            }
+        retrieval["context_pack"] = [diverse, single] if reverse else [single, diverse]
+        retrieval["documentation_query_plan"] = {"queries": queries, "required_query_ids": []}
+        payload, snapshot = project_docs_context(retrieval=retrieval, max_tokens=budget)
+>       assert payload["sources"][0]["path_or_url"] == "docs/diverse.md"
+               ^^^^^^^^^^^^^^^^^^
+E       KeyError: 'sources'
+
+tests/docs/test_review_boundary_semantics.py:123: KeyError
+_ test_public_projection_prioritizes_public_queries_not_audited_alias_count[False-256-2] _
+
+aliases = 2, budget = 256, reverse = False
+
+    @pytest.mark.parametrize("aliases", [1, 2])
+    @pytest.mark.parametrize("budget", [256, 800])
+    @pytest.mark.parametrize("reverse", [False, True])
+    def test_public_projection_prioritizes_public_queries_not_audited_alias_count(aliases, budget, reverse):
+        retrieval = _host_lookup_context_retrieval()
+        single, diverse = retrieval["context_pack"][:2]
+        queries = [{"query_id": "query-original", "origin": "original", "text": "Explain the processing directions."}]
+        queries.extend({"query_id": f"query-lookup-{index}", "origin": "host_lookup", "text": text}
+                       for index, text in enumerate(("amber", "indigo", "cobalt"), 1))
+        queries.extend({
+            "query_id": f"query-host-rewrite-{index}", "origin": "canonical_intent", "text": text,
+            "relation": "audited_rewrite", "public_parent_query_id": "query-lookup-1",
+        } for index, text in enumerate(("copper", "silver")[:aliases], 1))
+        single.update(path="docs/single.md", content="Amber copper silver.", retrieval_query_matches={})
+        diverse.update(path="docs/diverse.md", content="Indigo cobalt.", retrieval_query_matches={})
+        for query in queries[1:]:
+            source = single if query.get("public_parent_query_id") or query["text"] == "amber" else diverse
+            source["retrieval_query_matches"][query["query_id"]] = {
+                "query_text": query["text"], "qualified": True,
+                "relation": query.get("relation", "host_lookup"),
+                "public_parent_query_id": query.get("public_parent_query_id"),
+            }
+        retrieval["context_pack"] = [diverse, single] if reverse else [single, diverse]
+        retrieval["documentation_query_plan"] = {"queries": queries, "required_query_ids": []}
+        payload, snapshot = project_docs_context(retrieval=retrieval, max_tokens=budget)
+>       assert payload["sources"][0]["path_or_url"] == "docs/diverse.md"
+               ^^^^^^^^^^^^^^^^^^
+E       KeyError: 'sources'
+
+tests/docs/test_review_boundary_semantics.py:123: KeyError
+_ test_public_projection_prioritizes_public_queries_not_audited_alias_count[True-256-1] _
+
+aliases = 1, budget = 256, reverse = True
+
+    @pytest.mark.parametrize("aliases", [1, 2])
+    @pytest.mark.parametrize("budget", [256, 800])
+    @pytest.mark.parametrize("reverse", [False, True])
+    def test_public_projection_prioritizes_public_queries_not_audited_alias_count(aliases, budget, reverse):
+        retrieval = _host_lookup_context_retrieval()
+        single, diverse = retrieval["context_pack"][:2]
+        queries = [{"query_id": "query-original", "origin": "original", "text": "Explain the processing directions."}]
+        queries.extend({"query_id": f"query-lookup-{index}", "origin": "host_lookup", "text": text}
+                       for index, text in enumerate(("amber", "indigo", "cobalt"), 1))
+        queries.extend({
+            "query_id": f"query-host-rewrite-{index}", "origin": "canonical_intent", "text": text,
+            "relation": "audited_rewrite", "public_parent_query_id": "query-lookup-1",
+        } for index, text in enumerate(("copper", "silver")[:aliases], 1))
+        single.update(path="docs/single.md", content="Amber copper silver.", retrieval_query_matches={})
+        diverse.update(path="docs/diverse.md", content="Indigo cobalt.", retrieval_query_matches={})
+        for query in queries[1:]:
+            source = single if query.get("public_parent_query_id") or query["text"] == "amber" else diverse
+            source["retrieval_query_matches"][query["query_id"]] = {
+                "query_text": query["text"], "qualified": True,
+                "relation": query.get("relation", "host_lookup"),
+                "public_parent_query_id": query.get("public_parent_query_id"),
+            }
+        retrieval["context_pack"] = [diverse, single] if reverse else [single, diverse]
+        retrieval["documentation_query_plan"] = {"queries": queries, "required_query_ids": []}
+        payload, snapshot = project_docs_context(retrieval=retrieval, max_tokens=budget)
+>       assert payload["sources"][0]["path_or_url"] == "docs/diverse.md"
+               ^^^^^^^^^^^^^^^^^^
+E       KeyError: 'sources'
+
+tests/docs/test_review_boundary_semantics.py:123: KeyError
+_ test_public_projection_prioritizes_public_queries_not_audited_alias_count[True-256-2] _
+
+aliases = 2, budget = 256, reverse = True
+
+    @pytest.mark.parametrize("aliases", [1, 2])
+    @pytest.mark.parametrize("budget", [256, 800])
+    @pytest.mark.parametrize("reverse", [False, True])
+    def test_public_projection_prioritizes_public_queries_not_audited_alias_count(aliases, budget, reverse):
+        retrieval = _host_lookup_context_retrieval()
+        single, diverse = retrieval["context_pack"][:2]
+        queries = [{"query_id": "query-original", "origin": "original", "text": "Explain the processing directions."}]
+        queries.extend({"query_id": f"query-lookup-{index}", "origin": "host_lookup", "text": text}
+                       for index, text in enumerate(("amber", "indigo", "cobalt"), 1))
+        queries.extend({
+            "query_id": f"query-host-rewrite-{index}", "origin": "canonical_intent", "text": text,
+            "relation": "audited_rewrite", "public_parent_query_id": "query-lookup-1",
+        } for index, text in enumerate(("copper", "silver")[:aliases], 1))
+        single.update(path="docs/single.md", content="Amber copper silver.", retrieval_query_matches={})
+        diverse.update(path="docs/diverse.md", content="Indigo cobalt.", retrieval_query_matches={})
+        for query in queries[1:]:
+            source = single if query.get("public_parent_query_id") or query["text"] == "amber" else diverse
+            source["retrieval_query_matches"][query["query_id"]] = {
+                "query_text": query["text"], "qualified": True,
+                "relation": query.get("relation", "host_lookup"),
+                "public_parent_query_id": query.get("public_parent_query_id"),
+            }
+        retrieval["context_pack"] = [diverse, single] if reverse else [single, diverse]
+        retrieval["documentation_query_plan"] = {"queries": queries, "required_query_ids": []}
+        payload, snapshot = project_docs_context(retrieval=retrieval, max_tokens=budget)
+>       assert payload["sources"][0]["path_or_url"] == "docs/diverse.md"
+               ^^^^^^^^^^^^^^^^^^
+E       KeyError: 'sources'
+
+tests/docs/test_review_boundary_semantics.py:123: KeyError
+=========================== short test summary info ============================
+FAILED tests/docs/test_review_boundary_semantics.py::test_public_projection_prioritizes_public_queries_not_audited_alias_count[False-256-1]
+FAILED tests/docs/test_review_boundary_semantics.py::test_public_projection_prioritizes_public_queries_not_audited_alias_count[False-256-2]
+FAILED tests/docs/test_review_boundary_semantics.py::test_public_projection_prioritizes_public_queries_not_audited_alias_count[True-256-1]
+FAILED tests/docs/test_review_boundary_semantics.py::test_public_projection_prioritizes_public_queries_not_audited_alias_count[True-256-2]
+4 failed, 154 passed in 0.55s

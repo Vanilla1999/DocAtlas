@@ -43,8 +43,7 @@ from docmancer.docs.interfaces.mcp.docs_context_routing import (
     refresh_projection_estimate as _refresh_projection_estimate,
     tuple_value as _tuple_value,
 )
-from docmancer.docs.domain.mutation_intent import build_mutation_intent
-from docmancer.docs.domain.request_intent import is_change_request
+from .context_intents import InvalidContextIntent, normalize_context_intents
 from docmancer.docs.domain.tool_selection import normalize_public_docs_actions
 from docmancer.docs.domain.retrieval_routing import validate_routing_record
 from docmancer.docs.service import LibraryDocsService
@@ -52,9 +51,7 @@ from docmancer.docs.interfaces.mcp.project_tools import _bad_request, _bounded_i
 
 CONTEXT_TOOL_NAMES = {"get_docs_context"}
 DOCUMENT_CONTENT_POLICY = {
-    "role": "cited_untrusted_document_data",
-    "actionable": False,
-    "actions_source": "typed_top_level_fields_only",
+    "role": "cited_untrusted_document_data", "actionable": False, "actions_source": "typed_top_level_fields_only",
 }
 BOUNDED_STRUCTURED_CONTENT_MARKER = "Structured DocAtlas result attached in structuredContent."
 
@@ -296,14 +293,17 @@ def _align_trust_contract_with_snippets(payload: dict[str, Any]) -> dict[str, An
 def handle_context_tool(name: str, args: dict[str, Any], service: LibraryDocsService) -> dict[str, Any] | None:
     if name != "get_docs_context":
         return None
-    question = _clean_string(args.get("question"))
-    if not question:
+    question = args.get("question")
+    if not isinstance(question, str) or not question.strip():
         return _bad_request("empty_question", "question must not be empty. Examples: 'Flutter Riverpod providers', 'Firebase Auth signIn', 'How to use go_router redirect', 'FastAPI dependency injection', 'patch_constraints for adding a service'")
     lookup_queries, lookup_error = normalize_lookup_queries(args.get("lookup_queries"))
     if lookup_error:
         return _bad_request("invalid_lookup_queries", lookup_error)
-    mutation_intent = build_mutation_intent(question)
-    kind = "patch_context" if is_change_request(question) else "docs_answer"
+    try:
+        request_intent, lifecycle_intent, project_only, mutation_intent = normalize_context_intents(args, question)
+    except InvalidContextIntent as exc:
+        return _bad_request(exc.reason_code, str(exc))
+    kind = "patch_context" if request_intent == "change" else "docs_answer"
     maintenance = args.get("maintenance")
     if maintenance is not None:
         return _handle_maintenance_context(args, maintenance, service)
@@ -335,6 +335,8 @@ def handle_context_tool(name: str, args: dict[str, Any], service: LibraryDocsSer
         response_style=args.get("response_style"),
         mutation_intent=mutation_intent,
         lookup_queries=lookup_queries,
+        **({"request_intent": request_intent} if project_only else {}),
+        **({"lifecycle_intent": lifecycle_intent} if lifecycle_intent is not None else {}),
     )
     canonical_selection = (
         result.get("selection_decision")

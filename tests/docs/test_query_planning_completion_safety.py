@@ -100,5 +100,6 @@ def test_reviewed_nonconditional_host_rewrite_still_derives_original_lineage():
         lookup_queries=("project documentation storage index isolation",),
     )
     host = next(row for row in plan.queries if row.query_id == "query-lookup-1")
-    assert host.relation == "audited_rewrite"
-    assert host.public_parent_query_id == "query-original"
+    # Previously reviewed EN/RU rewrites are no longer an inference route.
+    assert host.relation == "host_lookup"
+    assert host.public_parent_query_id is None

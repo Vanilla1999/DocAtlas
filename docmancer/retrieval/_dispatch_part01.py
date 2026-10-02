@@ -114,6 +114,7 @@ class _RetrievalDispatcherPart01:
             "post_fusion": {
                 "exact_supplement": "api-term-supplement-v2",
                 "intent_rerank": "intent-metadata-rerank-v2",
+                "project_body_rerank": "literal-terms-parent-diversity-v2",
                 "expand": retrieval_expand,
                 "max_sections_per_source": getattr(
                     self.config.retrieval, "max_sections_per_source", None

@@ -1,0 +1,480 @@
+[
+  {
+    "case_id": "httpx-07",
+    "question": "What is HTTPX default timeout behavior: how long and which exception? Also identify the exact value chosen in our private production deployment.",
+    "corpus_hash": "64b250a091a500bf60557ddf94f047d8fbdafecd8657f1b60774f1503ff760b3",
+    "quota_stages": [
+      {
+        "before_count": 13,
+        "after_count": 6,
+        "witness_before": true,
+        "witness_after": true
+      },
+      {
+        "before_count": 13,
+        "after_count": 6,
+        "witness_before": true,
+        "witness_after": true
+      },
+      {
+        "before_count": 5,
+        "after_count": 4,
+        "witness_before": false,
+        "witness_after": false
+      }
+    ],
+    "rerank_stages": [
+      {
+        "before_count": 7,
+        "after_count": 7,
+        "witness_before": true,
+        "witness_after": true,
+        "qualified_before": [
+          [
+            "query-anchor-1"
+          ],
+          [
+            "query-anchor-1"
+          ],
+          [
+            "query-anchor-1"
+          ],
+          [
+            "query-anchor-1"
+          ],
+          [
+            "query-anchor-1"
+          ],
+          [
+            "query-anchor-1"
+          ],
+          [
+            "query-anchor-1"
+          ]
+        ],
+        "context_candidate_count": 0
+      }
+    ],
+    "qualification_reasons": {
+      "insufficient_visible_match": 16,
+      "visible_fields": 16
+    },
+    "witness_tagging": [
+      {
+        "query_id": "query-original",
+        "reason": "insufficient_visible_match",
+        "query_terms": [
+          "httpx",
+          "default",
+          "timeout",
+          "behavior",
+          "long",
+          "exception",
+          "also",
+          "identify",
+          "exact",
+          "value",
+          "chosen",
+          "private",
+          "production",
+          "deployment"
+        ],
+        "matched_terms": [
+          "httpx",
+          "default",
+          "timeout",
+          "behavior"
+        ],
+        "missing_exact": [],
+        "match_ratio": 0.2857,
+        "qualified": false
+      },
+      {
+        "query_id": "query-original",
+        "reason": "insufficient_visible_match",
+        "query_terms": [
+          "httpx",
+          "default",
+          "timeout",
+          "behavior",
+          "long",
+          "exception",
+          "also",
+          "identify",
+          "exact",
+          "value",
+          "chosen",
+          "private",
+          "production",
+          "deployment"
+        ],
+        "matched_terms": [
+          "httpx",
+          "default",
+          "timeout",
+          "behavior"
+        ],
+        "missing_exact": [],
+        "match_ratio": 0.2857,
+        "qualified": false
+      },
+      {
+        "query_id": "query-anchor-1",
+        "reason": "visible_fields",
+        "query_terms": [
+          "httpx"
+        ],
+        "matched_terms": [
+          "httpx"
+        ],
+        "missing_exact": [],
+        "match_ratio": 1.0,
+        "qualified": true
+      },
+      {
+        "query_id": "query-anchor-1",
+        "reason": "visible_fields",
+        "query_terms": [
+          "httpx"
+        ],
+        "matched_terms": [
+          "httpx"
+        ],
+        "missing_exact": [],
+        "match_ratio": 1.0,
+        "qualified": true
+      }
+    ],
+    "projection_attempts": [
+      {
+        "query_origins": [
+          "original",
+          "exact_anchor"
+        ],
+        "candidates": 7,
+        "witness_in_pack": true,
+        "rejections": {},
+        "need_disposition_reasons": {
+          "current_topic_without_complete_proof": 19,
+          "insufficient_topic_context": 37,
+          "missing_bound_subject": 8
+        },
+        "need_disposition_states": {
+          "retrieval_only": 19,
+          "blocked": 45
+        },
+        "fallback_outcome_count": 32,
+        "projected_sources": 2
+      }
+    ],
+    "required_status": "supported",
+    "visible_sources": 2,
+    "witness_visible": true,
+    "answer_supported": false,
+    "edit_ready": false
+  },
+  {
+    "case_id": "pydantic-07",
+    "question": "What can strict mode be enabled on, and what happens instead of coercing an incorrect type? Also identify the exact value chosen in our private production deployment.",
+    "corpus_hash": "441aa90c1f720566990fd8f643aea9bbd6d1629a27335b34d2b27f23d0a031a8",
+    "quota_stages": [
+      {
+        "before_count": 42,
+        "after_count": 6,
+        "witness_before": true,
+        "witness_after": true
+      },
+      {
+        "before_count": 42,
+        "after_count": 6,
+        "witness_before": true,
+        "witness_after": true
+      }
+    ],
+    "rerank_stages": [
+      {
+        "before_count": 6,
+        "after_count": 0,
+        "witness_before": true,
+        "witness_after": false,
+        "qualified_before": [
+          [],
+          [],
+          [],
+          [],
+          [],
+          []
+        ],
+        "context_candidate_count": 0
+      }
+    ],
+    "qualification_reasons": {
+      "insufficient_visible_match": 12
+    },
+    "witness_tagging": [
+      {
+        "query_id": "query-original",
+        "reason": "insufficient_visible_match",
+        "query_terms": [
+          "strict",
+          "mode",
+          "enabled",
+          "happens",
+          "instead",
+          "coercing",
+          "incorrect",
+          "type",
+          "also",
+          "identify",
+          "exact",
+          "value",
+          "chosen",
+          "private",
+          "production",
+          "deployment"
+        ],
+        "matched_terms": [
+          "strict",
+          "mode",
+          "enabled",
+          "instead",
+          "coercing",
+          "type",
+          "also"
+        ],
+        "missing_exact": [],
+        "match_ratio": 0.4375,
+        "qualified": false
+      },
+      {
+        "query_id": "query-original",
+        "reason": "insufficient_visible_match",
+        "query_terms": [
+          "strict",
+          "mode",
+          "enabled",
+          "happens",
+          "instead",
+          "coercing",
+          "incorrect",
+          "type",
+          "also",
+          "identify",
+          "exact",
+          "value",
+          "chosen",
+          "private",
+          "production",
+          "deployment"
+        ],
+        "matched_terms": [
+          "strict",
+          "mode",
+          "enabled",
+          "instead",
+          "coercing",
+          "type",
+          "also"
+        ],
+        "missing_exact": [],
+        "match_ratio": 0.4375,
+        "qualified": false
+      }
+    ],
+    "projection_attempts": [
+      {
+        "query_origins": [
+          "original"
+        ],
+        "candidates": 0,
+        "witness_in_pack": false,
+        "rejections": {},
+        "need_disposition_reasons": {},
+        "need_disposition_states": {},
+        "fallback_outcome_count": 0,
+        "projected_sources": 0
+      }
+    ],
+    "required_status": "missing",
+    "visible_sources": 0,
+    "witness_visible": false,
+    "answer_supported": false,
+    "edit_ready": false
+  },
+  {
+    "case_id": "ruff-07",
+    "question": "Does enabling preview automatically enable all preview rules? Also identify the exact value chosen in our private production deployment.",
+    "corpus_hash": "d460de54d4e134f2ba965a940ddf9b379a501ed621fe5ea948cd61858defcb64",
+    "quota_stages": [
+      {
+        "before_count": 37,
+        "after_count": 6,
+        "witness_before": true,
+        "witness_after": true
+      },
+      {
+        "before_count": 37,
+        "after_count": 6,
+        "witness_before": true,
+        "witness_after": true
+      }
+    ],
+    "rerank_stages": [
+      {
+        "before_count": 6,
+        "after_count": 0,
+        "witness_before": true,
+        "witness_after": false,
+        "qualified_before": [
+          [],
+          [],
+          [],
+          [],
+          [],
+          []
+        ],
+        "context_candidate_count": 0
+      }
+    ],
+    "qualification_reasons": {
+      "insufficient_visible_match": 12
+    },
+    "witness_tagging": [
+      {
+        "query_id": "query-original",
+        "reason": "insufficient_visible_match",
+        "query_terms": [
+          "does",
+          "enabling",
+          "preview",
+          "automatically",
+          "enable",
+          "rules",
+          "also",
+          "identify",
+          "exact",
+          "value",
+          "chosen",
+          "private",
+          "production",
+          "deployment"
+        ],
+        "matched_terms": [
+          "does",
+          "enabling",
+          "preview",
+          "enable",
+          "rules"
+        ],
+        "missing_exact": [],
+        "match_ratio": 0.3571,
+        "qualified": false
+      },
+      {
+        "query_id": "query-original",
+        "reason": "insufficient_visible_match",
+        "query_terms": [
+          "does",
+          "enabling",
+          "preview",
+          "automatically",
+          "enable",
+          "rules",
+          "also",
+          "identify",
+          "exact",
+          "value",
+          "chosen",
+          "private",
+          "production",
+          "deployment"
+        ],
+        "matched_terms": [
+          "does",
+          "enabling",
+          "preview",
+          "enable",
+          "rules"
+        ],
+        "missing_exact": [],
+        "match_ratio": 0.3571,
+        "qualified": false
+      }
+    ],
+    "projection_attempts": [
+      {
+        "query_origins": [
+          "original"
+        ],
+        "candidates": 0,
+        "witness_in_pack": false,
+        "rejections": {},
+        "need_disposition_reasons": {},
+        "need_disposition_states": {},
+        "fallback_outcome_count": 0,
+        "projected_sources": 0
+      }
+    ],
+    "required_status": "missing",
+    "visible_sources": 0,
+    "witness_visible": false,
+    "answer_supported": false,
+    "edit_ready": false
+  },
+  {
+    "case_id": "mkdocs-05",
+    "question": "Which page title wins when the navigation configuration and Markdown content define different titles?",
+    "corpus_hash": "8cd3601264f74664fecd51dcd467b7de369d44e9b09bd2751f242dd6a6ddab3d",
+    "quota_stages": [
+      {
+        "before_count": 51,
+        "after_count": 3,
+        "witness_before": true,
+        "witness_after": false
+      },
+      {
+        "before_count": 51,
+        "after_count": 3,
+        "witness_before": true,
+        "witness_after": false
+      }
+    ],
+    "rerank_stages": [
+      {
+        "before_count": 3,
+        "after_count": 0,
+        "witness_before": false,
+        "witness_after": false,
+        "qualified_before": [
+          [],
+          [],
+          []
+        ],
+        "context_candidate_count": 0
+      }
+    ],
+    "qualification_reasons": {
+      "insufficient_visible_match": 6
+    },
+    "witness_tagging": [],
+    "projection_attempts": [
+      {
+        "query_origins": [
+          "original"
+        ],
+        "candidates": 0,
+        "witness_in_pack": false,
+        "rejections": {},
+        "need_disposition_reasons": {},
+        "need_disposition_states": {},
+        "fallback_outcome_count": 0,
+        "projected_sources": 0
+      }
+    ],
+    "required_status": "missing",
+    "visible_sources": 0,
+    "witness_visible": false,
+    "answer_supported": false,
+    "edit_ready": false
+  }
+]

@@ -34,14 +34,21 @@ class _ProjectContextServicePart01:
         allow_network: bool = False,
         mutation_intent: MutationIntentContract | None = None,
         lookup_queries: tuple[str, ...] = (),
+        request_intent: str | None = None,
+        lifecycle_intent: str | None = None,
     ) -> ProjectContextResult:
         response_style = validate_response_style(response_style)
-        mutation_intent = mutation_intent or build_mutation_intent(question)
+        if request_intent is None or request_intent == "read":
+            mutation_intent = MutationIntentContract(operation="none", artifact_kind="unknown", requested_targets=())
+        else:
+            mutation_intent = mutation_intent or build_mutation_intent(question)
         routing_budget_issues: list[str] = []
         routing_stage_observed: dict[str, list[Any]] = {}
         mode = mode.lower()
         if mode not in {"auto", "project-only", "deps-only", "public-docs"}:
             raise ValueError("mode must be one of: auto, project-only, deps-only, public-docs")
+        if (request_intent is not None or lifecycle_intent is not None) and mode not in {"auto", "project-only"}:
+            raise ValueError("explicit intent parameters require project-only context")
         root = Path(project_path).expanduser().resolve()
         intent = classify_project_query_intent(question)
         evidence_path = extract_document_locator(question)
@@ -52,7 +59,11 @@ class _ProjectContextServicePart01:
             and mutation_intent.operation in {"modify", "delete", "rename"}
             and target.value.casefold() != str(mutation_intent.destination or "").casefold()
         )
-        patch_request = is_change_request(question)
+        if request_intent is not None and request_intent not in ("read", "change"):
+            raise ValueError("request_intent must be read or change")
+        if lifecycle_intent is not None and lifecycle_intent not in ("current", "historical", "either"):
+            raise ValueError("lifecycle_intent must be current, historical or either")
+        patch_request = request_intent == "change"
         canonical_requirements = (
             build_patch_evidence_requirements(mutation_intent.request_plan)
             if patch_request and mutation_intent.request_plan is not None
@@ -63,15 +74,15 @@ class _ProjectContextServicePart01:
                 profile="project_document_answer" if evidence_path else "project_docs_answer",
             )
         )
+        canonical_requirements = replace(canonical_requirements, lifecycle_intent=lifecycle_intent or "current")
         documentation_query_plan = build_documentation_query_plan(
             question,
             lookup_queries=lookup_queries,
             explicit_path=evidence_path,
             requirements=canonical_requirements,
         )
-        from .need_query_schedule import scheduled_plan, requirement_search_probes
-        documentation_query_plan, _ = scheduled_plan(documentation_query_plan,
-            supplemental_queries=requirement_search_probes(canonical_requirements))
+        from .need_query_schedule import scheduled_plan
+        documentation_query_plan, _ = scheduled_plan(documentation_query_plan)
         metadata = self.facade.read_project_metadata(str(root))
         project_docs = None
         if mode in {"auto", "project-only"}:
@@ -101,17 +112,28 @@ class _ProjectContextServicePart01:
                         ],
                     )
                 from .need_context_projection import set_context_variants
+                from .read_context_admission import iter_read_context_variants
+                prepared_context = project_context_pack(question=question, project_docs=project_docs, dependency_docs=None)
                 checked_sets = {
                     original.get('stable_chunk_id')
                     for original, _, _ in set_context_variants(
-                        project_context_pack(question=question, project_docs=project_docs, dependency_docs=None),
+                        prepared_context,
                         query_plan=documentation_query_plan.as_payload(),
                         expected_project_identity=project_docs.results[0].project_identity,
                         max_tokens=800, diagnostics={},
                     )
                 }
+                checked_sets.update(
+                    original.get('stable_chunk_id')
+                    for original, _ in iter_read_context_variants(
+                        prepared_context, query_plan=documentation_query_plan.as_payload(),
+                        expected_project_identity=project_docs.results[0].project_identity,
+                        max_tokens=800, diagnostics={},
+                        lifecycle_intent=canonical_requirements.lifecycle_intent,
+                    )
+                )
                 context_candidate_ids = frozenset(id(chunk) for chunk in project_docs.results
-                                                 if chunk.stable_chunk_id in checked_sets)
+                                                 if chunk.stable_chunk_id and chunk.stable_chunk_id in checked_sets)
                 project_docs = replace(
                     project_docs,
                     results=rerank_project_doc_chunks(

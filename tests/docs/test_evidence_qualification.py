@@ -59,15 +59,17 @@ def test_supplemental_without_lookup_requalifies_visible_content():
     assert not tagged[0].metadata["retrieval_query_matches"]["query-supplemental-1"]["qualified"]
 
 
-@pytest.mark.parametrize("status,question,expected", [
-    ("current", "storage", "ok"),
-    ("historical", "historical storage", "ok"),
-    ("completed", "historical storage", "ok"),
-    ("historical", "storage", "insufficient_evidence"),
+@pytest.mark.parametrize("status,question,intent,expected", [
+    ("current", "storage", "current", "ok"),
+    ("historical", "historical storage", "historical", "ok"),
+    ("completed", "historical storage", "historical", "ok"),
+    ("historical", "storage", "current", "insufficient_evidence"),
+    ("historical", "historical storage", "current", "insufficient_evidence"),
 ])
-def test_projection_preserves_lifecycle_facts(status, question, expected):
+def test_projection_preserves_lifecycle_facts(status, question, intent, expected):
     projection, _ = project_docs_context(retrieval={
         "project_identity": "repo",
+        "requirements": {"lifecycle_intent": intent},
         "documentation_query_plan": {
             "original_question": question,
             "queries": [{"query_id": "query-original", "text": question, "origin": "original"}],

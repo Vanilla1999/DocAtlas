@@ -1,0 +1,10 @@
+{
+  "schema_version": 1,
+  "module_labels": {
+    "tests/docs/test_explicit_anchor_discovery_boundary.py": "behavioral"
+  },
+  "node_overrides": {},
+  "module_node_hashes": {
+    "tests/docs/test_explicit_anchor_discovery_boundary.py": "f2ed0e3d2cf861041ff6a728cb425936aaa55868ef6df20f0b343ed325a27e32"
+  }
+}

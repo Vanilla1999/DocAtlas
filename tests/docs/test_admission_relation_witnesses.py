@@ -1,7 +1,8 @@
 """Source-local relations, both answers, independent lanes and hard negatives."""
 from dataclasses import asdict
 import pytest
-from docmancer.docs.domain.documentation_query_plan import build_documentation_query_plan
+from docmancer.docs.domain.documentation_query_plan import DocumentationLookup, build_documentation_query_plan
+from docmancer.docs.domain.question_plan import retrieval_needs
 from docmancer.docs.domain.evidence_qualification import qualify_evidence
 from docmancer.docs.domain.query_terms import documentation_query_terms, query_constraint_roles
 from tests.docs._reference_binding_fixtures import capture_reference_case, visible
@@ -30,7 +31,20 @@ CASES = [
 
 def probe(question, origin='retrieval_need'):
     plan = build_documentation_query_plan(question)
-    query = next(q for q in plan.queries if q.origin == origin)
+    if origin == 'retrieval_need':
+        # These are qualifier/parser unit controls, not public planner tests.
+        # The retained certification parser owns this typed fixture; explicit
+        # read planning must never mint its demands or derive parent coverage.
+        assert not any(q.origin == 'retrieval_need' for q in plan.queries)
+        need = next(iter(retrieval_needs(question)))
+        text = ' '.join(value for value in (need.context, need.query_span_text) if value).strip()
+        if need.subject and need.subject.casefold() not in text.casefold():
+            text = f'{need.subject} {text}'
+        query = DocumentationLookup('query-need-1', text, 'retrieval_need', False,
+            relation='host_lookup', need_subject=need.subject or None,
+            need_relation=need.relation, need_context=need.context or None)
+    else:
+        query = next(q for q in plan.queries if q.origin == origin)
     roles = query_constraint_roles(query.text)
     return {**asdict(query), 'query_text': query.text, 'query_origin': query.origin,
             'query_terms': list(documentation_query_terms(query.text)),
@@ -109,6 +123,9 @@ def test_native_pipeline_keeps_real_need_and_false_answer_flags(tmp_path, questi
     assert cap['public_payload'].get('sources'), cap['public_payload']
     traces = [trace for row in cap['projection_attempts'][-1]['snapshot'].values()
               for trace in row['source'].get('retrieval_query_matches', {}).values()]
-    assert any(t.get('qualified') and t.get('admission_route') == 'typed_local'
-               and t.get('need_relation') == operator for t in traces)
+    # Public planning no longer emits the parser's inferred need. Keep the
+    # real delivery assertion and false authority flags, not the retired trace.
+    assert body in visible(cap)
+    assert any(t.get('qualified') for t in traces)
+    assert not any(t.get('query_origin') == 'retrieval_need' for t in traces)
     assert all(cap['public_payload'][key] is False for key in ('answer_supported', 'answer_available', 'edit_ready'))

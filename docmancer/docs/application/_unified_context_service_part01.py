@@ -82,9 +82,18 @@ class _UnifiedDocsContextServicePart01:
         response_style: str | None = None,
         mutation_intent: MutationIntentContract | None = None,
         lookup_queries: tuple[str, ...] = (),
+        request_intent: str | None = None,
+        lifecycle_intent: str | None = None,
     ) -> UnifiedDocsContextResult:
         response_style = validate_response_style(response_style)
-        mutation_intent = mutation_intent or build_mutation_intent(question)
+        if request_intent is not None and request_intent not in ("read", "change"):
+            raise ValueError("request_intent must be read or change")
+        if lifecycle_intent is not None and lifecycle_intent not in ("current", "historical", "either"):
+            raise ValueError("lifecycle_intent must be current, historical or either")
+        if request_intent is None or request_intent == "read":
+            mutation_intent = MutationIntentContract(operation="none", artifact_kind="unknown", requested_targets=())
+        else:
+            mutation_intent = mutation_intent or build_mutation_intent(question)
         mode_requested = (mode or "auto").lower()
         prepare_project_docs = True if prepare_project_docs is None else bool(prepare_project_docs)
         allow_network = bool(allow_network) if allow_network is not None else False
@@ -100,6 +109,8 @@ class _UnifiedDocsContextServicePart01:
             return invalid
 
         mode_selected, reason_code = self._select_mode(mode_requested, project_path, libs)
+        if (request_intent is not None or lifecycle_intent is not None) and mode_selected != "project":
+            raise ValueError("explicit intent parameters require project-only context")
         routing = {
             "reason_code": reason_code,
             "project_path_used": bool(project_path),
@@ -171,7 +182,9 @@ class _UnifiedDocsContextServicePart01:
         if mode_selected == "project":
             delegated_mode = "auto" if project_auto else "project-only"
             routing["delegated_mode"] = delegated_mode
-            project_result = self.service.get_project_context(project_path, question, tokens=tokens, limit=limit, expand=expand, module=module, module_path=module_path, scope=scope, mode=delegated_mode, response_style=response_style, allow_network=effective_allow_network, mutation_intent=mutation_intent, lookup_queries=lookup_queries)
+            project_result = self.service.get_project_context(project_path, question, tokens=tokens, limit=limit, expand=expand, module=module, module_path=module_path, scope=scope, mode=delegated_mode, response_style=response_style, allow_network=effective_allow_network, mutation_intent=mutation_intent, lookup_queries=lookup_queries,
+                **({"request_intent": request_intent} if request_intent is not None else {}),
+                **({"lifecycle_intent": lifecycle_intent} if lifecycle_intent is not None else {}))
         elif mode_selected == "dependency":
             if not effective_allow_network and self._dependency_prefetch_needed(project_path):
                 lanes["dependency"] = {"status": "confirmation_required", "source_count": 0}

@@ -17,9 +17,13 @@ def test_plain_compounds_keep_recall_without_exact_identity(word):
     question = f'Explain the {word} behavior.'
     plan = build_documentation_query_plan(question).as_payload()
     assert word not in technical_anchors(question)
-    lookups = [q for q in plan['queries'] if q['text'] == word]
-    assert lookups and all(q['origin'] == 'lexical_topic' for q in lookups)
-    assert all(q['query_id'] not in plan['public_query_ids'] for q in lookups)
+    assert plan['queries'][0]['text'] == question
+    assert not any(q['text'] == word for q in plan['queries'])
+    explicit = build_documentation_query_plan(question, lookup_queries=(word,)).as_payload()
+    lookups = [q for q in explicit['queries'] if q['text'] == word]
+    assert lookups and all(q['origin'] == 'host_lookup' for q in lookups)
+    assert all(q['relation'] == 'host_lookup' and q['public_parent_query_id'] is None
+               for q in lookups)
 
 
 def test_default_lookup_preserves_a_prose_topic_without_claiming_identity():

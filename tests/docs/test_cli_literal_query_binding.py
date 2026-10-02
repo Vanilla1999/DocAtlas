@@ -27,6 +27,7 @@ def literal_lookup(question, literal):
 @pytest.mark.parametrize("literal", [
     "archive-tool --format json", "cache-store --zone remote",
     "backup-tool --copies 3", "archive-tool --format=json",
+    "cache-store\t--zone\tremote", "cache-store  --zone  remote",
 ])
 def test_plan_keeps_literal_command_option_value(literal):
     literal_lookup(f"Объясни поведение {literal} без изменения файлов?", literal)
@@ -75,9 +76,25 @@ def test_command_literal_never_bypasses_source_policy(metadata):
     "Explain cache-store\n--zone remote?",
 ])
 def test_ambiguous_or_boolean_options_do_not_invent_values(question):
-    assert not any(q.text.startswith("`") and " --" in q.text
-                   for q in build_documentation_query_plan(question).queries
-                   if q.origin == "exact_anchor")
+    plan = build_documentation_query_plan(question)
+    commands = [q for q in plan.queries if q.origin == "exact_anchor"
+                and q.text.startswith("`") and " --" in q.text]
+    if "cache-store --verbose and" not in question:
+        assert commands == []
+    else:
+        # This exact substring is a search hypothesis, not a claim that a
+        # boolean flag accepts "and" as its value. No NL connector dictionary.
+        assert [q.text for q in commands] == ["`cache-store --verbose and`"]
+        assert all(not q.coverage_required and q.need_relation is None for q in commands)
+        lookup = commands[0]
+        chunk = RetrievedChunk(source="docs/reference.md", chunk_index=0,
+            text="cache-store --verbose and its output are documented here.", score=7,
+            metadata={"source_class": "project_doc", "project_identity": "repo"})
+        out = _tag_retrieval_query([chunk], lookup.query_id, lookup.text, lookup,
+                                  expected_project_identity="repo")[0]
+        assert "query-original" not in out.metadata["retrieval_query_ids"]
+        assert "query-original" not in out.metadata["retrieval_query_matches"]
+    assert plan.original_question == question
 
 
 def test_literal_probe_budget_is_bounded():

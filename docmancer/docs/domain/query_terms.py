@@ -14,7 +14,7 @@ _REQUEST_FRAMING_TERMS = frozenset({
 })
 # A shaped command followed by one explicit long-option value is a literal
 # retrieval hypothesis, not a claim about option arity or answer sufficiency.
-# Do not consume natural-language connectors or cross a physical line.
+# It binds a literal source span, not an option's arity. Do not cross a line.
 _COMMAND_OPTION_VALUE_RE = re.compile(
     r"(?<![\w./-])[a-z][a-z0-9]*(?:-[a-z0-9]+)+[ \t]+"
     r"--[A-Za-z][A-Za-z0-9-]{1,118}(?:[ \t]+|=)"
@@ -67,11 +67,9 @@ def documentation_technical_anchors(question: str, *, limit: int = 12) -> tuple[
     """Extract bounded exact anchors without depending on retrieval infrastructure."""
     values: list[str] = []
     for match in _COMMAND_OPTION_VALUE_RE.finditer(question):
-        if match.group("value").casefold() in _SUPPLEMENTAL_FUNCTION_WORDS:
-            continue
         # Use the existing quoted-exact constraint so a wrong option value,
         # split mentions, or another command cannot qualify this extra probe.
-        literal = "`" + " ".join(match.group(0).split()) + "`"
+        literal = "`" + match.group(0) + "`"
         if len(literal) - 2 > 160:
             continue
         if literal not in values:
@@ -116,9 +114,22 @@ def documentation_query_terms(question: str) -> tuple[str, ...]:
     lexical_question = re.sub(
         r"^\s*(?:перечисли(?:те)?|enumerate)\s+(?=\S)", "", question, count=1, flags=re.I,
     )
+    quoted_spans = [match.span() for match in re.finditer(r'`[^`\n]+`|"[^"\n]+"', lexical_question)]
+    tokens = []
+    for match in re.finditer(r"[\w.:/+-]+", lexical_question):
+        token = match.group(0)
+        stem = token.rstrip(".:")
+        shaped_identity = (any(char in stem for char in "._/:+-")
+                           or any(char.isupper() for char in stem[1:]))
+        # Sentence separators are not part of a prose search term. Explicit
+        # quoted literals, paths and namespace delimiters keep their bytes.
+        if (not any(start <= match.start() and match.end() <= end for start, end in quoted_spans)
+                and not shaped_identity and not token.endswith("::")):
+            token = stem
+        tokens.append(token)
     return tuple(dict.fromkeys(
         token.casefold()
-        for token in re.findall(r"[\w.:/+-]+", lexical_question)
+        for token in tokens
         if token.casefold() not in _REQUEST_FRAMING_TERMS
         and (len(token) >= 4 or is_exact_technical_token(token))
     ))[:32]

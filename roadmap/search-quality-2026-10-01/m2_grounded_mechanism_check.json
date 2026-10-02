@@ -1,0 +1,677 @@
+{
+  "case_id": "mkdocs-05",
+  "date": "2026-10-02",
+  "package_version": "3.2.1",
+  "source_ref": "f2938c47bb8937c650f0d5ddb614f867773b29f4",
+  "source_manifest_sha256": "f0395dcc526161b51d9378ef3ac6d4c8a1a1bd2e323be0c4c6cff58f783b0985",
+  "question": "Which page title wins when the navigation configuration and Markdown content define different titles?",
+  "raw_artifact": "/tmp/opencode/grounded-mechanism-20261002/mechanism.json",
+  "raw_artifact_sha256": "e5cb202c1b5b979d0f4966f9d8ba55e6e746f56a0539713c673e0a6c41ebc837",
+  "corpus": [
+    {
+      "project": "fastapi",
+      "path": "docs/en/docs/tutorial/background-tasks.md",
+      "sha256": "d59a2e7da8f947e53a509efda0acf74dee093799710878dfc7abf09e3e4de89a"
+    },
+    {
+      "project": "fastapi",
+      "path": "docs/en/docs/tutorial/cors.md",
+      "sha256": "8ef62d49193d8cce86697211badd2a71e720b3d56cdde6266c516f432c152b76"
+    },
+    {
+      "project": "httpx",
+      "path": "docs/advanced/timeouts.md",
+      "sha256": "48959a587ecc6430f9051ab1b1c76fcebc3f3e95ec01199281aab813a2dcfaa1"
+    },
+    {
+      "project": "httpx",
+      "path": "docs/environment_variables.md",
+      "sha256": "d0cdf4d740dc3ed8b21c4ee45735551e05d4e57d0fda05a2f18c4684197a27eb"
+    },
+    {
+      "project": "mkdocs",
+      "path": "docs/user-guide/writing-your-docs.md",
+      "sha256": "a6b69d1318ae84455bae021b6655b71274f29c19ba43d021d872d100b7b38cba"
+    },
+    {
+      "project": "pydantic",
+      "path": "docs/concepts/strict_mode.md",
+      "sha256": "06e00a3e114c85ff31286640cb9842a99209d4112d5cb4812b47d4bf556f2b71"
+    },
+    {
+      "project": "pydantic",
+      "path": "docs/concepts/alias.md",
+      "sha256": "0c65c7fddc78232eb17b34def5383402e8c2df715da9935ba3d97a98277233e0"
+    },
+    {
+      "project": "ruff",
+      "path": "docs/preview.md",
+      "sha256": "cb4f7f28ec9856fa77493af0182794aa39265753d5ef7947aa36e7f9918a141d"
+    },
+    {
+      "project": "ruff",
+      "path": "docs/configuration.md",
+      "sha256": "bf1f9a85b89c749f9a17d2fee5af4630cb894fdbbee134ec7a635e4a1bc3b9ad"
+    },
+    {
+      "project": "starlette",
+      "path": "docs/background.md",
+      "sha256": "e2c622d46ad52bf7d90abe62fd75f355c1ff6f46a0b8a1d55d18e3875bbece63"
+    },
+    {
+      "project": "starlette",
+      "path": "docs/lifespan.md",
+      "sha256": "a9de5de995935cfbd676335fbbbee6f87c96086174aff3d17ecdf89b6220e788"
+    },
+    {
+      "project": "typer",
+      "path": "docs/tutorial/parameter-types/bool.md",
+      "sha256": "c025b6f1d713e6e07925d2d724f8b97cf3f80cad86b363e5e89c4fc42d80821d"
+    },
+    {
+      "project": "typer",
+      "path": "docs/tutorial/terminating.md",
+      "sha256": "efa52652496e4c6a872b340a8bb0fc884d4e48b05540569b687a1063677c6a09"
+    },
+    {
+      "project": "uv",
+      "path": "docs/pip/compatibility.md",
+      "sha256": "193d4e4f575ae0975b66b76d4ea93b15aaede550b85de37989caef9f6f494923"
+    }
+  ],
+  "ingest": [
+    {
+      "name": "fastapi",
+      "chunks": 11,
+      "non_null_embeddings": 0,
+      "urls": 2
+    },
+    {
+      "name": "httpx",
+      "chunks": 4,
+      "non_null_embeddings": 0,
+      "urls": 2
+    },
+    {
+      "name": "mkdocs",
+      "chunks": 7,
+      "non_null_embeddings": 0,
+      "urls": 1
+    },
+    {
+      "name": "pydantic",
+      "chunks": 15,
+      "non_null_embeddings": 0,
+      "urls": 2
+    },
+    {
+      "name": "ruff",
+      "chunks": 16,
+      "non_null_embeddings": 0,
+      "urls": 2
+    },
+    {
+      "name": "starlette",
+      "chunks": 5,
+      "non_null_embeddings": 0,
+      "urls": 2
+    },
+    {
+      "name": "typer",
+      "chunks": 7,
+      "non_null_embeddings": 0,
+      "urls": 2
+    },
+    {
+      "name": "uv",
+      "chunks": 22,
+      "non_null_embeddings": 0,
+      "urls": 1
+    }
+  ],
+  "fts_query": "\"Which page title wins when the navigation configuration and Markdown content define different titles?\" OR \"Which\" OR \"page\" OR \"title\" OR \"wins\" OR \"when\" OR \"the\" OR \"navigation\" OR \"configuration\" OR \"and\" OR \"Markdown\" OR \"content\" OR \"define\" OR \"different\" OR \"titles?\"",
+  "initial_hits": [
+    {
+      "id": 17,
+      "rank": 1,
+      "sort_order": 1,
+      "fts_score": -46.8029223765853,
+      "witness": true,
+      "metadata": {
+        "types": [
+          "text",
+          "heading",
+          "code"
+        ],
+        "level": 3,
+        "path": [
+          "Writing your docs",
+          "File layout",
+          "Configure Pages and Navigation"
+        ]
+      },
+      "size": {
+        "utf8_bytes": 3583,
+        "actual_tokens": 769,
+        "tokenizer": "docatlas-offline:o200k_base",
+        "ceil_utf8_bytes_over_4": 896
+      },
+      "content_sha256": "5365fc54b7e2f89a18e5577d8fb098f61ffc06e94bedeb1c0443684e18777211"
+    },
+    {
+      "id": 21,
+      "rank": 2,
+      "sort_order": 5,
+      "fts_score": -36.319114682057126,
+      "witness": false,
+      "metadata": {
+        "types": [
+          "list",
+          "heading",
+          "text",
+          "code"
+        ],
+        "level": 3,
+        "path": [
+          "Writing your docs",
+          "Writing with Markdown",
+          "Meta-Data",
+          "YAML Style Meta-Data"
+        ]
+      },
+      "size": {
+        "utf8_bytes": 1701,
+        "actual_tokens": 417,
+        "tokenizer": "docatlas-offline:o200k_base",
+        "ceil_utf8_bytes_over_4": 426
+      },
+      "content_sha256": "3696f8651d872a91390bed1bd932c5a1f067e8194cf3201ff3cb373fa3437066"
+    },
+    {
+      "id": 22,
+      "rank": 3,
+      "sort_order": 6,
+      "fts_score": -31.743421948160965,
+      "witness": false,
+      "metadata": {
+        "types": [
+          "text",
+          "heading",
+          "code"
+        ],
+        "level": 3,
+        "path": [
+          "Writing your docs",
+          "Writing with Markdown",
+          "Fenced code blocks"
+        ]
+      },
+      "size": {
+        "utf8_bytes": 4429,
+        "actual_tokens": 969,
+        "tokenizer": "docatlas-offline:o200k_base",
+        "ceil_utf8_bytes_over_4": 1108
+      },
+      "content_sha256": "6a755fb259bd9bdedeed1f33bdf860b49aa66e51d7b9b628102a47a23d1a1ee0"
+    },
+    {
+      "id": 19,
+      "rank": 4,
+      "sort_order": 3,
+      "fts_score": -17.235299779649743,
+      "witness": false,
+      "metadata": {
+        "types": [
+          "list",
+          "text",
+          "code",
+          "heading"
+        ],
+        "level": 3,
+        "path": [
+          "Writing your docs",
+          "Writing with Markdown"
+        ]
+      },
+      "size": {
+        "utf8_bytes": 2974,
+        "actual_tokens": 666,
+        "tokenizer": "docatlas-offline:o200k_base",
+        "ceil_utf8_bytes_over_4": 744
+      },
+      "content_sha256": "c5fd673da241da458f38cb5d0c47aab11e14c0ec8f2b30d398b23a47c295e9aa"
+    },
+    {
+      "id": 18,
+      "rank": 5,
+      "sort_order": 2,
+      "fts_score": -16.22604403021388,
+      "witness": false,
+      "metadata": {
+        "types": [
+          "heading",
+          "text",
+          "code"
+        ],
+        "level": 2,
+        "path": [
+          "Writing your docs",
+          "Writing with Markdown",
+          "Internal links",
+          "Linking to pages"
+        ]
+      },
+      "size": {
+        "utf8_bytes": 3287,
+        "actual_tokens": 660,
+        "tokenizer": "docatlas-offline:o200k_base",
+        "ceil_utf8_bytes_over_4": 822
+      },
+      "content_sha256": "11b0d479d8c52256a2ef0e952973e63b349c3cb773f6bc34a0af8cc0c0b8deca"
+    },
+    {
+      "id": 20,
+      "rank": 6,
+      "sort_order": 4,
+      "fts_score": -15.491876434727457,
+      "witness": false,
+      "metadata": {
+        "types": [
+          "text"
+        ],
+        "level": 3,
+        "path": [
+          "Writing your docs",
+          "Writing with Markdown",
+          "Meta-Data"
+        ]
+      },
+      "size": {
+        "utf8_bytes": 783,
+        "actual_tokens": 152,
+        "tokenizer": "docatlas-offline:o200k_base",
+        "ceil_utf8_bytes_over_4": 196
+      },
+      "content_sha256": "a7d184d7799148de003d48e8694bab3bbe9779f2ff84e641f827b360abff5a15"
+    },
+    {
+      "id": 16,
+      "rank": 7,
+      "sort_order": 0,
+      "fts_score": -13.853029961480948,
+      "witness": false,
+      "metadata": {
+        "types": [
+          "heading",
+          "text",
+          "code"
+        ],
+        "level": 1,
+        "path": [
+          "Writing your docs",
+          "File layout",
+          "Index pages"
+        ]
+      },
+      "size": {
+        "utf8_bytes": 2486,
+        "actual_tokens": 545,
+        "tokenizer": "docatlas-offline:o200k_base",
+        "ceil_utf8_bytes_over_4": 622
+      },
+      "content_sha256": "cc84753e8465a5d45a7035cac2caa6301e447bc631c65621d9eda31bfc188ef9"
+    }
+  ],
+  "top_hit_content": "Many repository hosting sites provide special treatment for README files by displaying the contents of the README file when browsing the contents of a directory. Therefore, MkDocs will allow you to name your index pages as `README.md` instead of `index.md`. In that way, when users are browsing your source code, the repository host can display the index page of that directory as it is a README file. However, when MkDocs renders your site, the file will be renamed to `index.html` so that the server will serve it as a proper index file.\nIf both an `index.md` file and a `README.md` file are found in the same directory, then the `index.md` file is used and the `README.md` file is ignored.\n### Configure Pages and Navigation\nThe [nav](configuration.md#nav) configuration setting in your `mkdocs.yml` file defines which pages are included in the global site navigation menu as well as the structure of that menu. If not provided, the navigation will be automatically created by discovering all the Markdown files in the [documentation directory](configuration.md#docs_dir). An automatically created navigation configuration will always be sorted alphanumerically by file name (except that index files will always be listed first within a sub-section). You will need to manually define your navigation configuration if you would like your navigation menu sorted differently.\nA minimal navigation configuration could look like this:\n```yaml\nnav:\n  - index.md\n  - about.md\n```\nAll paths in the navigation configuration must be relative to the `docs_dir` configuration option. If that option is set to the default value, `docs`, the source files for the above configuration would be located at `docs/index.md` and `docs/about.md`.\nThe above example will result in two navigation items being created at the top level and with their titles inferred from the contents of the Markdown file or, if no title is defined within the file, of the file name. To override the title in the `nav` setting add a title right before the filename.\n```yaml\nnav:\n  - Home: index.md\n  - About: about.md\n```\nNote that if a title is defined for a page in the navigation, that title will be used throughout the site for that page and will override any title defined within the page itself.\nNavigation sub-sections can be created by listing related pages together under a section title. For example:\n```yaml\nnav:\n  - Home: index.md\n  - User Guide:\n    - Writing your docs: writing-your-docs.md\n    - Styling your docs: styling-your-docs.md\n  - About:\n    - License: license.md\n    - Release Notes: release-notes.md\n```\nWith the above configuration we have three top level items: \"Home\", \"User Guide\" and \"About.\" \"Home\" is a link to the homepage for the site. Under the \"User Guide\" section two pages are listed: \"Writing your docs\" and \"Styling your docs.\" Under the \"About\" section two more pages are listed: \"License\" and \"Release Notes.\"\nNote that a section cannot have a page assigned to it. Sections are only containers for child pages and sub-sections. You may nest sections as deeply as you like. However, be careful that you don't make it too difficult for your users to navigate through the site navigation by over-complicating the nesting. While sections may mirror your directory structure, they do not have to.\nAny pages not listed in your navigation configuration will still be rendered and included with the built site, however, they will not be linked from the global navigation and will not be included in the `previous` and `next` links. Such pages will be \"hidden\" unless linked to directly.",
+  "checks": {
+    "top_hit_equals_first_assembled_body": true,
+    "limit1_equals_limit3_first_result": true,
+    "no_neighbors_first_result_unchanged": true,
+    "old_native_equal_after_url_prefix_normalization": {
+      "3": true,
+      "5": true
+    },
+    "zero_embeddings_all_libraries": true
+  },
+  "result_chunks": {
+    "1": [
+      {
+        "score": 46.8029223765853,
+        "witness": true,
+        "chunk_ids": [
+          17
+        ],
+        "chars": 3583
+      }
+    ],
+    "3": [
+      {
+        "score": 46.8029223765853,
+        "witness": true,
+        "chunk_ids": [
+          17
+        ],
+        "chars": 3583
+      },
+      {
+        "score": 36.319114682057126,
+        "witness": false,
+        "chunk_ids": [
+          20,
+          21
+        ],
+        "chars": 2486
+      },
+      {
+        "score": 31.743421948160965,
+        "witness": false,
+        "chunk_ids": [
+          19,
+          22
+        ],
+        "chars": 7400
+      }
+    ],
+    "5": [
+      {
+        "score": 46.8029223765853,
+        "witness": true,
+        "chunk_ids": [
+          17
+        ],
+        "chars": 3583
+      },
+      {
+        "score": 36.319114682057126,
+        "witness": false,
+        "chunk_ids": [
+          20,
+          21
+        ],
+        "chars": 2486
+      },
+      {
+        "score": 31.743421948160965,
+        "witness": false,
+        "chunk_ids": [
+          19,
+          22
+        ],
+        "chars": 7400
+      },
+      {
+        "score": 17.235299779649743,
+        "witness": false,
+        "chunk_ids": [
+          19
+        ],
+        "chars": 2973
+      },
+      {
+        "score": 16.22604403021388,
+        "witness": false,
+        "chunk_ids": [
+          18
+        ],
+        "chars": 3287
+      }
+    ]
+  },
+  "native_sizes_new_url": {
+    "1": {
+      "utf8_bytes": 3757,
+      "actual_tokens": 806,
+      "tokenizer": "docatlas-offline:o200k_base",
+      "ceil_utf8_bytes_over_4": 940
+    },
+    "3": {
+      "utf8_bytes": 13996,
+      "actual_tokens": 3084,
+      "tokenizer": "docatlas-offline:o200k_base",
+      "ceil_utf8_bytes_over_4": 3499
+    },
+    "5": {
+      "utf8_bytes": 20605,
+      "actual_tokens": 4483,
+      "tokenizer": "docatlas-offline:o200k_base",
+      "ceil_utf8_bytes_over_4": 5152
+    }
+  },
+  "native_sizes_old_url": {
+    "1": {
+      "utf8_bytes": 3765,
+      "actual_tokens": 807,
+      "tokenizer": "docatlas-offline:o200k_base",
+      "ceil_utf8_bytes_over_4": 942
+    },
+    "3": {
+      "utf8_bytes": 14020,
+      "actual_tokens": 3087,
+      "tokenizer": "docatlas-offline:o200k_base",
+      "ceil_utf8_bytes_over_4": 3505
+    },
+    "5": {
+      "utf8_bytes": 20645,
+      "actual_tokens": 4488,
+      "tokenizer": "docatlas-offline:o200k_base",
+      "ceil_utf8_bytes_over_4": 5162
+    }
+  },
+  "docatlas_recheck": {
+    "docatlas-native": {
+      "diagnostic_mode": "native_observation",
+      "corpus_hash": "8cd3601264f74664fecd51dcd467b7de369d44e9b09bd2751f242dd6a6ddab3d",
+      "summary": [
+        {
+          "stage": "exact_supplement",
+          "before_count": 51,
+          "after_count": 51,
+          "witness_ranks_before": [
+            4
+          ],
+          "witness_ranks_after": [
+            4
+          ]
+        },
+        {
+          "stage": "project_body_rank",
+          "before_count": 51,
+          "after_count": 51,
+          "witness_ranks_before": [
+            4
+          ],
+          "witness_ranks_after": [
+            15
+          ]
+        },
+        {
+          "stage": "source_quota",
+          "before_count": 51,
+          "after_count": 3,
+          "witness_ranks_before": [
+            15
+          ],
+          "witness_ranks_after": []
+        },
+        {
+          "stage": "exact_supplement",
+          "before_count": 51,
+          "after_count": 51,
+          "witness_ranks_before": [
+            4
+          ],
+          "witness_ranks_after": [
+            4
+          ]
+        },
+        {
+          "stage": "project_body_rank",
+          "before_count": 51,
+          "after_count": 51,
+          "witness_ranks_before": [
+            4
+          ],
+          "witness_ranks_after": [
+            15
+          ]
+        },
+        {
+          "stage": "source_quota",
+          "before_count": 51,
+          "after_count": 3,
+          "witness_ranks_before": [
+            15
+          ],
+          "witness_ranks_after": []
+        }
+      ],
+      "projection_candidate_counts": [
+        0
+      ],
+      "visible_sources": 0,
+      "answer_supported": false,
+      "edit_ready": false,
+      "witness_qualifications": [],
+      "witness_context_checks": []
+    },
+    "docatlas-ablation": {
+      "diagnostic_mode": "no_parent_diversity_ablation",
+      "corpus_hash": "8cd3601264f74664fecd51dcd467b7de369d44e9b09bd2751f242dd6a6ddab3d",
+      "summary": [
+        {
+          "stage": "exact_supplement",
+          "before_count": 51,
+          "after_count": 51,
+          "witness_ranks_before": [
+            4
+          ],
+          "witness_ranks_after": [
+            4
+          ]
+        },
+        {
+          "stage": "project_body_rank",
+          "before_count": 51,
+          "after_count": 51,
+          "witness_ranks_before": [
+            4
+          ],
+          "witness_ranks_after": [
+            4
+          ]
+        },
+        {
+          "stage": "source_quota",
+          "before_count": 51,
+          "after_count": 3,
+          "witness_ranks_before": [
+            4
+          ],
+          "witness_ranks_after": [
+            3
+          ]
+        },
+        {
+          "stage": "exact_supplement",
+          "before_count": 51,
+          "after_count": 51,
+          "witness_ranks_before": [
+            4
+          ],
+          "witness_ranks_after": [
+            4
+          ]
+        },
+        {
+          "stage": "project_body_rank",
+          "before_count": 51,
+          "after_count": 51,
+          "witness_ranks_before": [
+            4
+          ],
+          "witness_ranks_after": [
+            4
+          ]
+        },
+        {
+          "stage": "source_quota",
+          "before_count": 51,
+          "after_count": 3,
+          "witness_ranks_before": [
+            4
+          ],
+          "witness_ranks_after": [
+            3
+          ]
+        }
+      ],
+      "projection_candidate_counts": [
+        0
+      ],
+      "visible_sources": 0,
+      "answer_supported": false,
+      "edit_ready": false,
+      "witness_qualifications": [
+        {
+          "reason": "insufficient_visible_match",
+          "matched_terms": [
+            "page",
+            "title",
+            "navigation"
+          ],
+          "match_ratio": 0.2727,
+          "missing_exact_terms": []
+        },
+        {
+          "reason": "insufficient_visible_match",
+          "matched_terms": [
+            "page",
+            "title",
+            "navigation"
+          ],
+          "match_ratio": 0.2727,
+          "missing_exact_terms": []
+        }
+      ],
+      "witness_context_checks": [
+        {
+          "route": "typed_need_context",
+          "witness": true,
+          "state": "retrieval_only",
+          "reason": "current_topic_without_complete_proof",
+          "need_subject": "",
+          "need_relation": "precedence",
+          "hard_exact": []
+        },
+        {
+          "route": "typed_need_context",
+          "witness": true,
+          "state": "retrieval_only",
+          "reason": "current_topic_without_complete_proof",
+          "need_subject": "",
+          "need_relation": "precedence",
+          "hard_exact": []
+        },
+        {
+          "route": "original_read_context",
+          "witness": true,
+          "allowed": false,
+          "reason": "no_local_topic_witness"
+        },
+        {
+          "route": "original_read_context",
+          "witness": true,
+          "allowed": false,
+          "reason": "no_local_topic_witness"
+        }
+      ]
+    }
+  },
+  "limitations": [
+    "Same source bytes and query, not identical chunking or budget.",
+    "Initial-hit ranking is a read-only SQL replay; assembled output is an actual packaged CLI run.",
+    "MCP formatting is reconstructed from pinned mcpServer.ts; not a new MCP transport run.",
+    "No-neighbors configuration leaves parent lookup enabled; exact body equality independently excludes added parent bytes for Result 1.",
+    "No LLM reader answer evaluated; no aggregate quality claim."
+  ]
+}

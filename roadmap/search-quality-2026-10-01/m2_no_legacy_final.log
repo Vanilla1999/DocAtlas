@@ -1,0 +1,99 @@
+........................................................................ [ 13%]
+........................................................................ [ 26%]
+........................................................................ [ 39%]
+........................................................................ [ 52%]
+........................................................................ [ 65%]
+........................................................................ [ 78%]
+........................................................................ [ 92%]
+...F.................F.............F....FF.                              [100%]
+=================================== FAILURES ===================================
+_____ test_existing_requested_fact_is_retained_on_exposed_corpus[httpx-07] _____
+
+tmp_path = PosixPath('/tmp/pytest-of-viadmin/pytest-33/test_existing_requested_fact_i1')
+case_id = 'httpx-07'
+
+    @pytest.mark.parametrize("case_id", ["typer-01", "httpx-07"])
+    def test_existing_requested_fact_is_retained_on_exposed_corpus(tmp_path, case_id):
+        _, cases, manifest = load_protocol()
+        case = next(case for case in cases if case["id"] == case_id)
+        project = case["project_group"]
+        cap = capture_reference_case(tmp_path, documents_for(project, manifest), case["question"])
+        result = assess_context(case, cap["public_payload"], registry_for(project, manifest))
+>       assert result["claims"]["required"]["status"] == "supported", result["claims"]
+E       AssertionError: {'private_configuration': {'contradicting_witnesses': [], 'status': 'missing', 'supporting_witnesses': [], 'unreviewed...ired': {'contradicting_witnesses': [], 'status': 'missing', 'supporting_witnesses': [], 'unreviewed_evidence_ids': []}}
+E       assert 'missing' == 'supported'
+E         
+E         - supported
+E         + missing
+
+tests/docs/test_reference_transfer_regressions.py:15: AssertionError
+______ test_full_list_beats_incomplete_alternatives_without_answer_labels ______
+
+seed = ({'answer_available': False, 'answer_policy': 'cite_only', 'answer_supported': False, 'context_available': True, ...},...get(\'http://127.0.0.1:5000/my-api\')"\npython -c "import httpx; httpx.get(\'https://www.python-httpx.org\')"\n```\n'})
+
+    def test_full_list_beats_incomplete_alternatives_without_answer_labels(seed):
+        payload, snapshot, retrieval, project, docs = seed
+        out, bindings = select_joint_context(payload, snapshot, deepcopy(retrieval), max_tokens=800)
+        raw = docs['docs/advanced/timeouts.md']
+        expected = raw[raw.index('* The **connect**'):raw.index('\n\nYou can configure')]
+>       assert any(expected in s['snippet'] for s in out['sources'])
+E       assert False
+E        +  where False = any(<generator object test_full_list_beats_incomplete_alternatives_without_answer_labels.<locals>.<genexpr> at 0x78661f18d1c0>)
+
+tests/docs/test_joint_context_invariants.py:59: AssertionError
+_______________ test_added_text_gets_policy_check_not_only_seed ________________
+
+seed = ({'answer_available': False, 'answer_policy': 'cite_only', 'answer_supported': False, 'context_available': True, ...},...get(\'http://127.0.0.1:5000/my-api\')"\npython -c "import httpx; httpx.get(\'https://www.python-httpx.org\')"\n```\n'})
+
+    def test_added_text_gets_policy_check_not_only_seed(seed):
+        payload, snapshot, retrieval, _, _ = seed
+>       assert all('acquiring' not in s['snippet'] for s in payload['sources'])
+E       assert False
+E        +  where False = all(<generator object test_added_text_gets_policy_check_not_only_seed.<locals>.<genexpr> at 0x78661b3cfc60>)
+
+tests/docs/test_joint_context_invariants.py:105: AssertionError
+________ test_more_citations_cannot_outvote_completion_of_a_seed[False] ________
+
+seed = ({'answer_available': False, 'answer_policy': 'cite_only', 'answer_supported': False, 'context_available': True, ...},...get(\'http://127.0.0.1:5000/my-api\')"\npython -c "import httpx; httpx.get(\'https://www.python-httpx.org\')"\n```\n'})
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x78661ede96a0>
+reverse = False
+
+    @pytest.mark.parametrize('reverse', [False, True])
+    def test_more_citations_cannot_outvote_completion_of_a_seed(seed, monkeypatch, reverse):
+        from docmancer.docs.application import joint_context_selection as joint
+        payload, snapshot, retrieval, project, docs = seed
+        raw = docs['docs/advanced/timeouts.md']
+        block = raw[raw.index('* The **connect**'):raw.index('\n\nYou can configure')]
+        candidates = list(packet_alternatives(payload, snapshot, retrieval, max_tokens=800))
+>       complete = next(c for c in candidates if len(c[0]['sources']) == 1
+                        and block in c[0]['sources'][0]['snippet'])
+E       StopIteration
+
+tests/docs/test_joint_context_invariants.py:197: StopIteration
+________ test_more_citations_cannot_outvote_completion_of_a_seed[True] _________
+
+seed = ({'answer_available': False, 'answer_policy': 'cite_only', 'answer_supported': False, 'context_available': True, ...},...get(\'http://127.0.0.1:5000/my-api\')"\npython -c "import httpx; httpx.get(\'https://www.python-httpx.org\')"\n```\n'})
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x78661f079d30>
+reverse = True
+
+    @pytest.mark.parametrize('reverse', [False, True])
+    def test_more_citations_cannot_outvote_completion_of_a_seed(seed, monkeypatch, reverse):
+        from docmancer.docs.application import joint_context_selection as joint
+        payload, snapshot, retrieval, project, docs = seed
+        raw = docs['docs/advanced/timeouts.md']
+        block = raw[raw.index('* The **connect**'):raw.index('\n\nYou can configure')]
+        candidates = list(packet_alternatives(payload, snapshot, retrieval, max_tokens=800))
+        complete = next(c for c in candidates if len(c[0]['sources']) == 1
+                        and block in c[0]['sources'][0]['snippet'])
+>       incomplete = next(c for c in candidates if len(c[0]['sources']) > 1
+                          and not any(block in row['snippet'] for row in c[0]['sources']))
+E       StopIteration
+
+tests/docs/test_joint_context_invariants.py:199: StopIteration
+=========================== short test summary info ============================
+FAILED tests/docs/test_reference_transfer_regressions.py::test_existing_requested_fact_is_retained_on_exposed_corpus[httpx-07]
+FAILED tests/docs/test_joint_context_invariants.py::test_full_list_beats_incomplete_alternatives_without_answer_labels
+FAILED tests/docs/test_joint_context_invariants.py::test_added_text_gets_policy_check_not_only_seed
+FAILED tests/docs/test_joint_context_invariants.py::test_more_citations_cannot_outvote_completion_of_a_seed[False]
+FAILED tests/docs/test_joint_context_invariants.py::test_more_citations_cannot_outvote_completion_of_a_seed[True]
+5 failed, 542 passed in 22.18s

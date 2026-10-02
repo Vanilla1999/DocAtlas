@@ -1,0 +1,383 @@
+{
+  "case_id": "httpx-07",
+  "request": {
+    "project_path": "/tmp/opencode/tmp5uz6ll1z/corpus",
+    "scope": "project",
+    "question": "What is HTTPX default timeout behavior: how long and which exception? Also identify the exact value chosen in our private production deployment."
+  },
+  "public_payload": {
+    "status": "insufficient_evidence",
+    "kind": "docs_context",
+    "missing": [
+      "No safe, current, project-scoped documentation context was retrieved."
+    ],
+    "estimated_tokens": 241,
+    "context_quality": {
+      "status": "unavailable",
+      "reasons": [
+        "source_unavailable"
+      ]
+    },
+    "read_next": [],
+    "recommended_next_action": {
+      "tool": "code_search",
+      "type": "search_local_source",
+      "handled_by": "coding_agent",
+      "requires_confirmation": false,
+      "reason": "no_candidates",
+      "query_terms": [
+        "What is HTTPX default timeout behavior",
+        "how long"
+      ],
+      "repeat_docs_context": false,
+      "auto_execute": false
+    },
+    "context_available": false,
+    "documentation_supported": false,
+    "investigation_allowed": true,
+    "hard_stop": false,
+    "recovery_origin": "retrieval",
+    "recovery_reason_code": "no_candidates",
+    "recovery_disposition": "search_local_source",
+    "disposition": "search_local_source",
+    "edit_ready": false,
+    "source_search_status": "required",
+    "requires_confirmation": false,
+    "answer_supported": false,
+    "answer_available": false,
+    "support_status": "insufficient_evidence"
+  },
+  "query_project_docs_stages": [
+    {
+      "selected_chunk_count": 5,
+      "diagnostics": {
+        "planned_query_ids": [
+          "query-original"
+        ],
+        "retrieved_candidates": [
+          {
+            "stable_chunk_id": "child-f7ffc802ff3554ed181563ae70001b3878902ec3",
+            "document_id": "/tmp/opencode/tmp5uz6ll1z/corpus/docs/advanced/timeouts.md",
+            "parent_logical_id": "parent-2c7745421e160197356ee9abf2d6e225"
+          },
+          {
+            "stable_chunk_id": "child-f134706ae0fd6c5db30d9fd3cdf7a0784955d5a4",
+            "document_id": "/tmp/opencode/tmp5uz6ll1z/corpus/docs/advanced/timeouts.md",
+            "parent_logical_id": "parent-2c7745421e160197356ee9abf2d6e225"
+          },
+          {
+            "stable_chunk_id": "child-8842bbfa5a98adac7a62bb84c8b863fb70e24644",
+            "document_id": "/tmp/opencode/tmp5uz6ll1z/corpus/docs/environment_variables.md",
+            "parent_logical_id": "parent-c2bbea6b98394b73d116bd8f79e3f4d9"
+          },
+          {
+            "stable_chunk_id": "child-592f75ecafb02c77a1cb4d3134fb62c7e2fd9869",
+            "document_id": "/tmp/opencode/tmp5uz6ll1z/corpus/docs/environment_variables.md",
+            "parent_logical_id": "parent-c2bbea6b98394b73d116bd8f79e3f4d9"
+          },
+          {
+            "stable_chunk_id": "child-e898c1ba816261ee5752f371ea2d62a2a176f35c",
+            "document_id": "/tmp/opencode/tmp5uz6ll1z/corpus/docs/advanced/timeouts.md",
+            "parent_logical_id": "parent-2c7745421e160197356ee9abf2d6e225"
+          },
+          {
+            "stable_chunk_id": "child-f7ffc802ff3554ed181563ae70001b3878902ec3",
+            "document_id": "/tmp/opencode/tmp5uz6ll1z/corpus/docs/advanced/timeouts.md",
+            "parent_logical_id": "parent-2c7745421e160197356ee9abf2d6e225"
+          },
+          {
+            "stable_chunk_id": "child-f134706ae0fd6c5db30d9fd3cdf7a0784955d5a4",
+            "document_id": "/tmp/opencode/tmp5uz6ll1z/corpus/docs/advanced/timeouts.md",
+            "parent_logical_id": "parent-2c7745421e160197356ee9abf2d6e225"
+          },
+          {
+            "stable_chunk_id": "child-8842bbfa5a98adac7a62bb84c8b863fb70e24644",
+            "document_id": "/tmp/opencode/tmp5uz6ll1z/corpus/docs/environment_variables.md",
+            "parent_logical_id": "parent-c2bbea6b98394b73d116bd8f79e3f4d9"
+          },
+          {
+            "stable_chunk_id": "child-592f75ecafb02c77a1cb4d3134fb62c7e2fd9869",
+            "document_id": "/tmp/opencode/tmp5uz6ll1z/corpus/docs/environment_variables.md",
+            "parent_logical_id": "parent-c2bbea6b98394b73d116bd8f79e3f4d9"
+          },
+          {
+            "stable_chunk_id": "child-e898c1ba816261ee5752f371ea2d62a2a176f35c",
+            "document_id": "/tmp/opencode/tmp5uz6ll1z/corpus/docs/advanced/timeouts.md",
+            "parent_logical_id": "parent-2c7745421e160197356ee9abf2d6e225"
+          }
+        ],
+        "qualification_outcomes": [
+          {
+            "stable_chunk_id": "child-f7ffc802ff3554ed181563ae70001b3878902ec3",
+            "document_id": "/tmp/opencode/tmp5uz6ll1z/corpus/docs/advanced/timeouts.md",
+            "parent_logical_id": "parent-2c7745421e160197356ee9abf2d6e225",
+            "query_id": "query-original",
+            "outcome": "rejected",
+            "reason": "insufficient_visible_match"
+          },
+          {
+            "stable_chunk_id": "child-f134706ae0fd6c5db30d9fd3cdf7a0784955d5a4",
+            "document_id": "/tmp/opencode/tmp5uz6ll1z/corpus/docs/advanced/timeouts.md",
+            "parent_logical_id": "parent-2c7745421e160197356ee9abf2d6e225",
+            "query_id": "query-original",
+            "outcome": "rejected",
+            "reason": "insufficient_visible_match"
+          },
+          {
+            "stable_chunk_id": "child-8842bbfa5a98adac7a62bb84c8b863fb70e24644",
+            "document_id": "/tmp/opencode/tmp5uz6ll1z/corpus/docs/environment_variables.md",
+            "parent_logical_id": "parent-c2bbea6b98394b73d116bd8f79e3f4d9",
+            "query_id": "query-original",
+            "outcome": "rejected",
+            "reason": "insufficient_visible_match"
+          },
+          {
+            "stable_chunk_id": "child-592f75ecafb02c77a1cb4d3134fb62c7e2fd9869",
+            "document_id": "/tmp/opencode/tmp5uz6ll1z/corpus/docs/environment_variables.md",
+            "parent_logical_id": "parent-c2bbea6b98394b73d116bd8f79e3f4d9",
+            "query_id": "query-original",
+            "outcome": "rejected",
+            "reason": "insufficient_visible_match"
+          },
+          {
+            "stable_chunk_id": "child-e898c1ba816261ee5752f371ea2d62a2a176f35c",
+            "document_id": "/tmp/opencode/tmp5uz6ll1z/corpus/docs/advanced/timeouts.md",
+            "parent_logical_id": "parent-2c7745421e160197356ee9abf2d6e225",
+            "query_id": "query-original",
+            "outcome": "rejected",
+            "reason": "insufficient_visible_match"
+          },
+          {
+            "stable_chunk_id": "child-f7ffc802ff3554ed181563ae70001b3878902ec3",
+            "document_id": "/tmp/opencode/tmp5uz6ll1z/corpus/docs/advanced/timeouts.md",
+            "parent_logical_id": "parent-2c7745421e160197356ee9abf2d6e225",
+            "query_id": "query-original",
+            "outcome": "rejected",
+            "reason": "insufficient_visible_match"
+          },
+          {
+            "stable_chunk_id": "child-f134706ae0fd6c5db30d9fd3cdf7a0784955d5a4",
+            "document_id": "/tmp/opencode/tmp5uz6ll1z/corpus/docs/advanced/timeouts.md",
+            "parent_logical_id": "parent-2c7745421e160197356ee9abf2d6e225",
+            "query_id": "query-original",
+            "outcome": "rejected",
+            "reason": "insufficient_visible_match"
+          },
+          {
+            "stable_chunk_id": "child-8842bbfa5a98adac7a62bb84c8b863fb70e24644",
+            "document_id": "/tmp/opencode/tmp5uz6ll1z/corpus/docs/environment_variables.md",
+            "parent_logical_id": "parent-c2bbea6b98394b73d116bd8f79e3f4d9",
+            "query_id": "query-original",
+            "outcome": "rejected",
+            "reason": "insufficient_visible_match"
+          },
+          {
+            "stable_chunk_id": "child-592f75ecafb02c77a1cb4d3134fb62c7e2fd9869",
+            "document_id": "/tmp/opencode/tmp5uz6ll1z/corpus/docs/environment_variables.md",
+            "parent_logical_id": "parent-c2bbea6b98394b73d116bd8f79e3f4d9",
+            "query_id": "query-original",
+            "outcome": "rejected",
+            "reason": "insufficient_visible_match"
+          },
+          {
+            "stable_chunk_id": "child-e898c1ba816261ee5752f371ea2d62a2a176f35c",
+            "document_id": "/tmp/opencode/tmp5uz6ll1z/corpus/docs/advanced/timeouts.md",
+            "parent_logical_id": "parent-2c7745421e160197356ee9abf2d6e225",
+            "query_id": "query-original",
+            "outcome": "rejected",
+            "reason": "insufficient_visible_match"
+          }
+        ]
+      }
+    }
+  ],
+  "before_projection": {
+    "context_pack": [],
+    "requirements": {
+      "requirements": [
+        {
+          "requirement_id": "unresolved:0:unresolved_question_clause:What is HTTPX default timeout behavior",
+          "kind": "unsupported_query",
+          "value": "unresolved_question_clause:What is HTTPX default timeout behavior",
+          "mandatory": true,
+          "public_provenance": "query_exact_term",
+          "source_path": null,
+          "target_path": null,
+          "version_binding": null,
+          "query_extraction_kind": "unresolved_question_clause:What is HTTPX default timeout behavior",
+          "query_span_start": null,
+          "query_span_end": null,
+          "query_span_text": null,
+          "proof_role": "generic_fact",
+          "qualifiers": [],
+          "obligation_kind": null,
+          "subject": null,
+          "attribute": null,
+          "relation": null,
+          "obligation_target": null,
+          "value_kind": null,
+          "expected_value": null,
+          "item_kind": null,
+          "cardinality": null,
+          "response_mode": "value",
+          "subject_kind": null,
+          "subject_aliases": [],
+          "context": null,
+          "lifecycle_intent": "current"
+        },
+        {
+          "requirement_id": "unresolved:1:unresolved_question_clause:how long",
+          "kind": "unsupported_query",
+          "value": "unresolved_question_clause:how long",
+          "mandatory": true,
+          "public_provenance": "query_exact_term",
+          "source_path": null,
+          "target_path": null,
+          "version_binding": null,
+          "query_extraction_kind": "unresolved_question_clause:how long",
+          "query_span_start": null,
+          "query_span_end": null,
+          "query_span_text": null,
+          "proof_role": "generic_fact",
+          "qualifiers": [],
+          "obligation_kind": null,
+          "subject": null,
+          "attribute": null,
+          "relation": null,
+          "obligation_target": null,
+          "value_kind": null,
+          "expected_value": null,
+          "item_kind": null,
+          "cardinality": null,
+          "response_mode": "value",
+          "subject_kind": null,
+          "subject_aliases": [],
+          "context": null,
+          "lifecycle_intent": "current"
+        },
+        {
+          "requirement_id": "unresolved:2:unresolved_question_clause:which exception? Also identify the exact value chosen in our private production deployment",
+          "kind": "unsupported_query",
+          "value": "unresolved_question_clause:which exception? Also identify the exact value chosen in our private production deployment",
+          "mandatory": true,
+          "public_provenance": "query_exact_term",
+          "source_path": null,
+          "target_path": null,
+          "version_binding": null,
+          "query_extraction_kind": "unresolved_question_clause:which exception? Also identify the exact value chosen in our private production deployment",
+          "query_span_start": null,
+          "query_span_end": null,
+          "query_span_text": null,
+          "proof_role": "generic_fact",
+          "qualifiers": [],
+          "obligation_kind": null,
+          "subject": null,
+          "attribute": null,
+          "relation": null,
+          "obligation_target": null,
+          "value_kind": null,
+          "expected_value": null,
+          "item_kind": null,
+          "cardinality": null,
+          "response_mode": "value",
+          "subject_kind": null,
+          "subject_aliases": [],
+          "context": null,
+          "lifecycle_intent": "current"
+        }
+      ],
+      "required_entities": [],
+      "required_facets": [],
+      "query_extraction_provenance": [
+        [
+          "unresolved:0:unresolved_question_clause:What is HTTPX default timeout behavior",
+          "unresolved_question_clause:What is HTTPX default timeout behavior",
+          "unresolved_question_clause:what is httpx default timeout behavior"
+        ],
+        [
+          "unresolved:1:unresolved_question_clause:how long",
+          "unresolved_question_clause:how long",
+          "unresolved_question_clause:how long"
+        ],
+        [
+          "unresolved:2:unresolved_question_clause:which exception? Also identify the exact value chosen in our private production deployment",
+          "unresolved_question_clause:which exception? Also identify the exact value chosen in our private production deployment",
+          "unresolved_question_clause:which exception? also identify the exact value chosen in our private production deployment"
+        ]
+      ],
+      "query_requirement_spans": [],
+      "retrieval_hints": [
+        "HTTPX",
+        "default",
+        "timeout",
+        "behavior",
+        "long",
+        "and",
+        "exception",
+        "Also",
+        "identify",
+        "exact",
+        "value",
+        "chosen",
+        "our",
+        "private",
+        "production",
+        "deployment"
+      ],
+      "concept_queries": [
+        "in"
+      ],
+      "answer_contract_hash": "695c9c836e8bfaad1bc7b218c11b0b7f5c45e8df9a0da093bc65a5ea26b20a43",
+      "lifecycle_intent": "current",
+      "parse_trace": [
+        "fail_closed:unresolved_compound"
+      ],
+      "unresolved_parts": [
+        "unresolved_question_clause:What is HTTPX default timeout behavior",
+        "unresolved_question_clause:how long",
+        "unresolved_question_clause:which exception? Also identify the exact value chosen in our private production deployment"
+      ],
+      "component_scope_complete": false
+    },
+    "documentation_query_plan": {
+      "schema_version": "documentation-query-plan-v2",
+      "original_question": "What is HTTPX default timeout behavior: how long and which exception? Also identify the exact value chosen in our private production deployment.",
+      "query_ids": [
+        "query-original"
+      ],
+      "required_query_ids": [
+        "query-original"
+      ],
+      "public_query_ids": [
+        "query-original"
+      ],
+      "queries": [
+        {
+          "query_id": "query-original",
+          "text": "What is HTTPX default timeout behavior: how long and which exception? Also identify the exact value chosen in our private production deployment.",
+          "origin": "original",
+          "coverage_required": true,
+          "facet_id": null,
+          "requirement_id": null,
+          "relation": "direct",
+          "public_parent_query_id": null,
+          "preferred_catalog_roles": [],
+          "forbidden_catalog_roles": [],
+          "forbidden_evidence_terms": [],
+          "parent_exact_terms": [],
+          "need_subject": null,
+          "need_relation": null,
+          "need_context": null
+        }
+      ],
+      "explicit_paths": [],
+      "unresolved_parts": [
+        "semantic_scope_unverified"
+      ],
+      "_component_contract": [],
+      "component_scope_complete": false
+    },
+    "source_search_status": "required",
+    "reason_code": "required_evidence_missing"
+  }
+}

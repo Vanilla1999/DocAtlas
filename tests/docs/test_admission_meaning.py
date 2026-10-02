@@ -95,21 +95,22 @@ def test_mismatched_reference_plan_cannot_verify_a_rewrite():
     ('Which ways enable strict mode?', 'enumeration'),
     ('How do transport keys map to protocols?', 'mapping'),
 ])
-def test_actual_query_planner_emits_original_derived_need(question, operator):
+def test_actual_query_planner_does_not_emit_inferred_need(question, operator):
     from docmancer.docs.domain.documentation_query_plan import build_documentation_query_plan
     plan = build_documentation_query_plan(question)
     rows = [q for q in plan.queries if q.origin == 'retrieval_need' and q.need_relation == operator]
-    assert len(rows) == 1 and rows[0].text == question
+    assert rows == []
+    assert plan.queries[0].text == question
+    assert demand(question).operator == operator  # parser controls stay separate
 
 
-def test_only_fully_verified_reformulation_can_derive_original():
+def test_even_parser_verified_reformulation_cannot_derive_original():
     from docmancer.docs.domain.documentation_query_plan import build_documentation_query_plan
     original = 'Which takes precedence: nav title or page title?'
     good = 'Что имеет приоритет: nav title или page title?'
     changed = 'Что имеет приоритет: nav title или page title только для admins?'
     plan = build_documentation_query_plan(original, lookup_queries=(good, changed))
     lookups = [q for q in plan.queries if q.origin == 'host_lookup']
-    assert lookups[0].relation == 'audited_rewrite'
-    assert lookups[0].public_parent_query_id == 'query-original'
-    assert lookups[1].relation == 'host_lookup'
-    assert lookups[1].public_parent_query_id is None
+    assert same_supported_meaning(demand(original), demand(good))
+    assert all(q.relation == 'host_lookup' and q.public_parent_query_id is None for q in lookups)
+    assert [q.text for q in lookups] == [good, changed]

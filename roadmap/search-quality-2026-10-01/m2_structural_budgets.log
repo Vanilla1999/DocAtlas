@@ -1,0 +1,26 @@
+F..........F                                                             [100%]
+=================================== FAILURES ===================================
+_______ test_all_repository_python_modules_stay_within_hard_line_budget ________
+
+    def test_all_repository_python_modules_stay_within_hard_line_budget():
+>       assert oversized_modules(ROOT, DEFAULT_MAX_LINES) == []
+E       AssertionError: assert [(1022, 'docm...xt_tools.py')] == []
+E         
+E         Left contains one more item: (1022, 'docmancer/docs/interfaces/mcp/context_tools.py')
+E         Use -v to get more diff
+
+tests/docs/test_python_module_policy_and_manifest.py:13: AssertionError
+_______ test_default_public_catalog_meets_task35_hard_and_target_budgets _______
+
+    def test_default_public_catalog_meets_task35_hard_and_target_budgets():
+        report = build_footprint_report(current_tools({}), representative_response_fixtures())
+    
+        assert report["public_tool_count"] == 3
+>       assert report["mcp_tools_list_bytes"] <= 6 * 1024
+E       assert 6455 <= (6 * 1024)
+
+tests/docs/test_mcp_token_footprint.py:119: AssertionError
+=========================== short test summary info ============================
+FAILED tests/docs/test_python_module_policy_and_manifest.py::test_all_repository_python_modules_stay_within_hard_line_budget
+FAILED tests/docs/test_mcp_token_footprint.py::test_default_public_catalog_meets_task35_hard_and_target_budgets
+2 failed, 10 passed in 0.48s

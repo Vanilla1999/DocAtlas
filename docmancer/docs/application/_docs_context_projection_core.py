@@ -185,7 +185,7 @@ def project_docs_context(
         expected_project_identity = next(iter(selected_project_identities))
     request_lifecycle_intent = (
         requirements.get("lifecycle_intent") if isinstance(requirements, dict) else None
-    ) or lifecycle_intent(original_question)
+    ) or "current"
     explicit_paths = {
         _normalized_path(value) for value in query_plan.get("explicit_paths") or ()
         if str(value).strip()
@@ -663,10 +663,10 @@ def project_docs_context(
             selected_footprints[evidence_id] = candidate_footprint
         selected_host_query_ids.update(host_ids)
     if not sources and (_allow_context_hints or not fallback_ids):
-        from .need_context_projection import project_need_context_fallback
-        contextual = project_need_context_fallback(
+        from .read_context_admission import project_checked_context_fallback
+        contextual = project_checked_context_fallback(
             initially_ranked, query_plan=query_plan,
-            expected_project_identity=expected_project_identity,
+            expected_project_identity=expected_project_identity, lifecycle_intent=request_lifecycle_intent,
             max_tokens=max_tokens, diagnostics=projection_diagnostics,
         )
         if contextual is not None:

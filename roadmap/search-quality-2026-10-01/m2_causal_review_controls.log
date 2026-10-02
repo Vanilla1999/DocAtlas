@@ -1,0 +1,26 @@
+........................................................................ [ 62%]
+..........................................F.                             [100%]
+=================================== FAILURES ===================================
+_____ test_existing_requested_fact_is_retained_on_exposed_corpus[httpx-07] _____
+
+tmp_path = PosixPath('/tmp/pytest-of-viadmin/pytest-56/test_existing_requested_fact_i1')
+case_id = 'httpx-07'
+
+    @pytest.mark.parametrize("case_id", ["typer-01", "httpx-07"])
+    def test_existing_requested_fact_is_retained_on_exposed_corpus(tmp_path, case_id):
+        _, cases, manifest = load_protocol()
+        case = next(case for case in cases if case["id"] == case_id)
+        project = case["project_group"]
+        cap = capture_reference_case(tmp_path, documents_for(project, manifest), case["question"])
+        result = assess_context(case, cap["public_payload"], registry_for(project, manifest))
+>       assert result["claims"]["required"]["status"] == "supported", result["claims"]
+E       AssertionError: {'private_configuration': {'contradicting_witnesses': [], 'status': 'needs_review', 'supporting_witnesses': [], 'unrev...nesses': [], 'status': 'needs_review', 'supporting_witnesses': [], 'unreviewed_evidence_ids': ['ev-798926cd56d07f52']}}
+E       assert 'needs_review' == 'supported'
+E         
+E         - supported
+E         + needs_review
+
+tests/docs/test_reference_transfer_regressions.py:15: AssertionError
+=========================== short test summary info ============================
+FAILED tests/docs/test_reference_transfer_regressions.py::test_existing_requested_fact_is_retained_on_exposed_corpus[httpx-07]
+1 failed, 115 passed in 1.84s

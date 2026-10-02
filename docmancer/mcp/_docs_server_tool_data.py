@@ -26,7 +26,9 @@ Agent workflow:
             "type": "object",
             "properties": {
                 "question": {"type": "string"},
-                "lookup_queries": {"type": ["array", "null"], "maxItems": 5, "uniqueItems": True, "items": {"type": "string", "minLength": 1, "maxLength": 500}, "description": "Optional same-question retrieval hypotheses. For cross-language, comparison, conditional, or multiple dependent facets, use 1–3 short lookups in the documentation language; simple single-facet questions need none. Keep the original question unchanged; preserve exact identifiers, versions, conditions, negation and comparison sides; never invent the expected answer or use guessed source names."},
+                "lookup_queries": {"type": ["array", "null"], "maxItems": 5, "uniqueItems": True, "items": {"type": "string", "minLength": 1, "maxLength": 500}, "description": "Same question only. Cross-language/complex: use 1–3 short lookups in the documentation language; simple queries need none. Preserve original question, identifiers, versions, negation, conditions and comparison sides. Never batch independent questions, invent answers or guess source names."},
+                "request_intent": {"type": ["string", "null"], "enum": ["read", "change", None]},
+                "lifecycle_intent": {"type": ["string", "null"], "enum": ["current", "historical", "either", None]},
                 "project_path": {"type": ["string", "null"]},
                 "library": {"type": ["string", "null"]},
                 "version": {"type": ["string", "null"]},
@@ -591,7 +593,9 @@ PUBLIC_ADVERTISED_INPUT_SCHEMAS: dict[str, dict[str, Any]] = {
         "type": "object",
         "properties": {
             "question": {"type": "string", "minLength": 1},
-            "lookup_queries": {"type": ["array", "null"], "maxItems": 5, "uniqueItems": True, "items": {"type": "string", "minLength": 1, "maxLength": 500}, "description": "Same question only. For cross-language, comparison, conditional, or multiple dependent facets use 1–3 short lookups in the documentation language; simple single-facet questions need none. Keep the original question unchanged; preserve exact identifiers, versions, conditions, negation and comparison sides. Never batch independent questions, invent the expected answer, or use guessed source names."},
+            "lookup_queries": {"type": ["array", "null"], "maxItems": 5, "uniqueItems": True, "items": {"type": "string", "minLength": 1, "maxLength": 500}, "description": "Same question only. Cross-language/complex: use 1–3 short lookups in the documentation language; simple queries need none. Preserve original question, identifiers, versions, negation, conditions and comparison sides. Never batch independent questions, invent answers or guess source names."},
+            "request_intent": {"type": ["string", "null"], "enum": ["read", "change", None], "description": "Project-only; default read. No edit permission."},
+            "lifecycle_intent": {"type": ["string", "null"], "enum": ["current", "historical", "either", None], "description": "Project-only; default current."},
             "project_path": {"type": ["string", "null"]},
             "library": {"type": ["string", "null"]},
             "version": {"type": ["string", "null"], "description": "Current project: omit. Set only for an explicit exact/historical version; re-query after lockfile changes."},

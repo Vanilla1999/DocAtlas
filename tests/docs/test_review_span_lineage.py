@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 from copy import deepcopy
+from dataclasses import replace
 from hashlib import sha256
 
 import pytest
@@ -9,7 +10,7 @@ import pytest
 from docmancer.docs.application.context_selection import qualified_query_ids, visible_assignment_hashes
 from docmancer.docs.application.docs_context_projection import _requalify_visible_source, project_docs_context
 from docmancer.docs.application.model_visible_projection import validate_model_visible_projection
-from docmancer.docs.domain.documentation_query_plan import build_documentation_query_plan
+from docmancer.docs.domain.documentation_query_plan import DocumentationLookup, build_documentation_query_plan
 from tests.docs.test_docs_context_compound_projection import _host_lookup_context_retrieval
 
 
@@ -19,8 +20,15 @@ def _boundary_source(reverse: bool, direct: bool = False):
         lookup_queries=("What does the documentation request boundary accept?",),
     )
     parent = next(query for query in plan.queries if query.origin == "host_lookup")
-    child = next(query for query in plan.queries if query.relation == "audited_rewrite"
-                 and query.public_parent_query_id == parent.query_id)
+    # Requalification/lineage unit fixture, not a public rewrite generator.
+    # Keep merge, permutation, clipping and false-authority controls for the
+    # retained downstream trace contract without restoring planner inference.
+    assert not any(query.relation == "audited_rewrite" for query in plan.queries)
+    child = DocumentationLookup(
+        "query-host-rewrite-1", "get_docs_context question project_path lookup_queries module_path scope",
+        "canonical_intent", False, relation="audited_rewrite", public_parent_query_id=parent.query_id,
+    )
+    plan = replace(plan, queries=(*plan.queries, child))
     pairs = (child, parent) if reverse else (parent, child)
     source = _host_lookup_context_retrieval()["context_pack"][0]
     source.update(

@@ -1,0 +1,34 @@
+[
+  {
+    "disabled": "none",
+    "required": "supported",
+    "private": "needs_review",
+    "answer_supported": false,
+    "edit_ready": false,
+    "default_paragraph_visible": true
+  },
+  {
+    "disabled": "punctuation",
+    "required": "needs_review",
+    "private": "needs_review",
+    "answer_supported": false,
+    "edit_ready": false,
+    "default_paragraph_visible": false
+  },
+  {
+    "disabled": "parent_diversity",
+    "required": "needs_review",
+    "private": "needs_review",
+    "answer_supported": false,
+    "edit_ready": false,
+    "default_paragraph_visible": false
+  },
+  {
+    "disabled": "anchor_cross_check",
+    "required": "needs_review",
+    "private": "needs_review",
+    "answer_supported": false,
+    "edit_ready": false,
+    "default_paragraph_visible": false
+  }
+]

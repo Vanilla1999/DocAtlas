@@ -316,6 +316,7 @@ def test_patch_handler_uses_action_packet_completeness_for_explicit_target():
                 "for shared browser and scan preflight policy"
             ),
             "project_path": "/repo",
+            "request_intent": "change",
             "delivery_strategy": "bounded_direct",
         },
         Facade(),
@@ -354,6 +355,7 @@ def test_untargeted_patch_recovery_includes_safe_document_navigation():
         "get_docs_context",
         {
             "question": "Fix shared permission preflight policy",
+            "request_intent": "change",
             "project_path": "/repo",
             "delivery_strategy": "bounded_direct",
         },
@@ -542,7 +544,7 @@ def test_bounded_direct_is_one_existing_tool_call_and_returns_only_action_packet
     tool = next(item for item in TOOLS if item["name"] == "get_docs_context")
     assert set(tool["inputSchema"]["properties"]) == {
         "question", "project_path", "library", "version", "module_path",
-        "scope", "lookup_queries",
+            "scope", "lookup_queries", "request_intent", "lifecycle_intent",
     }
     assert "delivery_strategy" not in tool["inputSchema"]["properties"]
     assert tool["outputSchema"]["properties"]["kind"]["enum"] == [
@@ -592,6 +594,7 @@ def test_bounded_direct_is_one_existing_tool_call_and_returns_only_action_packet
     backend = Backend()
     result = handle_context_tool("get_docs_context", {
         "question": "Implement bounded retrieval",
+        "request_intent": "change",
         "project_path": "/repo",
         "delivery_strategy": "bounded_direct",
         "output_mode": "full",
@@ -632,6 +635,7 @@ def test_bounded_direct_is_one_existing_tool_call_and_returns_only_action_packet
 
     packet_without_strategy = call_docs_tool_payload("get_docs_context", {
         "question": "Implement bounded context", "project_path": "/repo",
+        "request_intent": "change",
     }, UnifiedDocsContextService(backend))
     assert packet_without_strategy["kind"] == "patch_context"
     assert packet_without_strategy["status"] == "insufficient_evidence"
@@ -705,6 +709,7 @@ def test_bounded_direct_is_one_existing_tool_call_and_returns_only_action_packet
 
     partial = handle_context_tool("get_docs_context", {
         "question": "Change navigation", "project_path": "/repo",
+        "request_intent": "change",
         "delivery_strategy": "bounded_direct",
     }, PartialFacade())
     assert partial["status"] == "insufficient_evidence"
@@ -726,6 +731,7 @@ def test_bounded_direct_is_one_existing_tool_call_and_returns_only_action_packet
 
     legacy = handle_context_tool("get_docs_context", {
         "question": "Change legacy", "project_path": "/repo", "delivery_strategy": "bounded_direct",
+        "request_intent": "change",
     }, LegacyProjectFacade())
     assert legacy["status"] == "insufficient_evidence"
     assert any("patch_surface_not_supported" in item for item in legacy["missing"])
@@ -757,6 +763,7 @@ def test_bounded_direct_is_one_existing_tool_call_and_returns_only_action_packet
 
     multi_chunk_result = handle_context_tool("get_docs_context", {
         "question": "Edit shared", "project_path": "/repo", "delivery_strategy": "bounded_direct",
+        "request_intent": "change",
     }, UnifiedDocsContextService(MultiChunkBackend()))
     assert multi_chunk_result["status"] == "insufficient_evidence"
     assert multi_chunk_result["missing"]

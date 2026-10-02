@@ -10,7 +10,8 @@ from docmancer.docs.domain.documentation_query_plan import build_documentation_q
 @pytest.mark.parametrize('junk', ['I a in so', 'в от', 'по'])
 def test_service_word_residue_does_not_take_a_lookup_slot(junk):
     requirements = SimpleNamespace(concept_queries=(junk,), retrieval_hints=('cache freshness',))
-    plan = build_documentation_query_plan('Explain cache freshness', requirements=requirements)
+    plan = build_documentation_query_plan('Explain cache freshness', requirements=requirements,
+        lookup_queries=('cache freshness',))
     assert not any(q.text == junk for q in plan.queries[1:])
     assert any(q.text == 'cache freshness' for q in plan.queries)
 
@@ -21,7 +22,8 @@ def test_subject_group_uses_dependency_and_lockfile_within_existing_slots():
     plan = build_documentation_query_plan(question, requirements=requirements)
     optional = [q.text for q in plan.queries if q.origin in {'concept_alias', 'retrieval_hint', 'component_rewrite'}]
     assert len(optional) <= 4
-    assert any(all(term in text for term in ['dependency', 'version', 'pubspec.lock']) for text in optional)
+    assert optional == []
+    assert any(q.text == 'pubspec.lock' and q.origin == 'exact_anchor' for q in plan.queries)
     assert not any(text == 'I a in do we' for text in optional)
     assert plan.original_question == question
     assert plan == build_documentation_query_plan(question, requirements=requirements)
@@ -53,7 +55,8 @@ def test_application_does_not_reintroduce_rejected_residue(tmp_path, junk):
     requirements = build_requirements('Explain cached documentation', profile='project_docs_answer')
     from dataclasses import replace
     requirements = replace(requirements, concept_queries=(junk,), retrieval_hints=('cache freshness',))
-    service.query_project_docs(str(tmp_path), 'Explain cached documentation', requirements=requirements, tokens=800, limit=3)
+    service.query_project_docs(str(tmp_path), 'Explain cached documentation', requirements=requirements,
+        lookup_queries=('cache freshness',), tokens=800, limit=3)
     texts = [text for text, _ in calls]
     assert junk not in texts
     assert 'cache freshness' in texts
@@ -76,10 +79,8 @@ def test_comparison_uses_subject_bearing_side_probes_before_single_word_hints():
     relation = [q.text.casefold() for q in optional if q.query_id.startswith("query-relation-")]
 
     assert len(optional) <= 4
-    assert "project documentation dependency documentation different separate" in relation
-    assert "project documentation library documentation" in relation
-    assert "project documentation retrieval scope provenance" in relation
-    assert "dependency library documentation retrieval scope provenance" in relation
+    assert relation == []
+    assert plan.queries[0].text == question
     assert not any(q.text.casefold() == "differ" for q in optional)
 
 
@@ -94,8 +95,8 @@ def test_conditional_relation_keeps_subject_and_negative_states_in_existing_slot
         q.text.casefold() for q in plan.queries if q.query_id.startswith("query-relation-")
     ]
 
-    assert "documentation needed question not prefetched" in relation
-    assert "documentation needed question not indexed" in relation
+    assert relation == []
+    assert plan.queries[0].text == question
     assert not any(q.text.casefold() == "happens" for q in plan.queries)
     assert len([
         q for q in plan.queries

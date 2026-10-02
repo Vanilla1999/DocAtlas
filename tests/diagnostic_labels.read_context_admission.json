@@ -1,0 +1,10 @@
+{
+  "schema_version": 1,
+  "module_labels": {
+    "tests/docs/test_read_context_admission_boundary.py": "behavioral"
+  },
+  "node_overrides": {},
+  "module_node_hashes": {
+    "tests/docs/test_read_context_admission_boundary.py": "20032a189d0ac7f1d311b990319e40663b69ae6597c619f69d738b23002f1edc"
+  }
+}
