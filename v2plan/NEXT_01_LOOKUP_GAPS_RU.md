@@ -1,6 +1,7 @@
 # 01. Поиск только недостающей части
 
-Статус: TODO. Выполнять первым. Это проверка existing lookup, не новый механизм.
+Статус: DONE (ограниченная диагностика четырёх synthetic scenarios). Это проверка
+existing lookup, не новый механизм; не unseen validation.
 
 ## Цель
 
@@ -55,4 +56,67 @@ tests проходят. Нет бесконечного retry. Новый зап
 
 ## Результат
 
-Пока не выполнено. Здесь записать команды, артефакты, итог и статус DONE/BLOCKED.
+### Этап 1 — DONE, expectations до запуска
+
+Общий original question: `What is OrbitClient default timeout and what timeout
+is configured for OrbitClient in production?`
+Known source `defaults.md`: `OrbitClient default timeout is 5 seconds.`
+Focused lookup: `OrbitClient timeout configured in production`.
+Это уточнение того же вопроса, а не отдельный need вне original question.
+
+Четыре isolated corpora (в каждом также known source):
+
+| Сценарий | Второй source `deployment.md` | Ожидаемые facts |
+|---|---|---|
+| both | `OrbitClient timeout configured in production is 12 seconds.` | known 5; missing 12 доступен для поиска |
+| absent | `Production deployment uses three replicas.` | known 5; production timeout unknown |
+| wrong | `NovaClient timeout configured in staging is 12 seconds.` | known 5; нельзя приписать 12 OrbitClient production |
+| partial | `OrbitClient timeout configured in production is managed by the deployment owner.` | known 5; owner fact полезен, численное значение unknown |
+
+Sources оформлены Markdown с нейтральным heading `Guide`. Expectations — только
+в этом документе/оценке, не в indexed corpus или запросе. Проверяем exact sentences
+в delivered snippets и actual flags; delivery предложения не приравниваем к proof.
+Обе стороны используют один индекс своего corpus и native defaults.
+
+### Этап 2 — DONE
+
+Команда: `PYTHONPATH=. .venv/bin/python v2plan/lookup_gap_probe.py --output
+/tmp/opencode/lookup-gaps-01`. Восемь full-native calls; same index внутри пары,
+без runtime patches. Raw payload/trace/request и ingest находятся в output.
+
+| Сценарий | Без lookup | Focused lookup | Первый наблюдаемый барьер |
+|---|---|---|---|
+| both | только default 5 | default 5 + production 12 | A: после retrieval/query window и qualification, до final packet; B: дошёл |
+| absent | только default 5 | только default 5 | нужного численного факта нет в corpus |
+| wrong | только default 5 | только default 5 | нужного факта нет; чужой subject/environment не доставлен |
+| partial | только default 5 | default 5 + owner fact | A: после retrieval/query window и qualification; B: partial дошёл, число отсутствует в corpus |
+
+Known sentence доставлена во всех 8 calls. `answer_supported=false`,
+`edit_ready=false`, `support_status=retrieval_only` во всех calls. Это source
+witness delivery, не независимая проверка claim-support evaluator. `query_coverage`
+не трактуется как полнота ответа. Численное unknown устанавливается по fixtures,
+а не по автоматически составленному runtime списку пробелов.
+
+В both/partial без lookup deployment sentence уже присутствует в retrieved
+candidates и query window, `qualification_reason=visible_fields`, а явных
+`projection_rejections` нет. Поэтому **не доказан admission refusal**: локализуем
+потерю только в дальнейшей projection/selection delivery. Lookup меняет query
+lanes/ordering; его результат не доказывает, что admission стал правильнее.
+
+### Этап 3 — DONE: existing lookup оставить, передать delivery conflict в 02
+
+Для этих controls механизм достаточен: focused lookup доставляет missing/partial
+fact без потери known и без чужого ответа. Новый follow-up API, retry loop,
+compiler/fallback не нужны. Использование: original question остаётся прежним,
+lookup спрашивает только missing part с subject/environment/conditions.
+Если данных нет — partial/unknown и запрос источника у пользователя.
+
+В план 02 передаём both/partial как **delivery conflict**, не как установленный
+locality defect. Следующая диагностика должна назвать конкретную ветку, где
+пропадает уже найденный qualified witness; удалять gates по этой таблице нельзя.
+Production instructions/defaults не менялись. На этом план 01 остановлен.
+Regression control: `tests/docs/test_lookup_gap_probe.py`.
+`.venv/bin/python -m pytest -q tests/docs/test_lookup_gap_probe.py
+tests/docs/test_unified_read_admission_probe.py`: **34 passed**.
+Первый collection остановлен diagnostic inventory guard; добавлен behavioral
+manifest для нового test module, guard не отключался.
