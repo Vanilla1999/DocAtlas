@@ -20,18 +20,30 @@
 05 выполнен частично, BLOCKED: footprint 6143 bytes, routing исправлен;
 128 offline failures, adversarial/question-surface gates и 0/8 ответов остаются.
 06 сохраняет очередь решений по tests, gates и изолированному runner.
-06 не завершён: после test-contract trials 6124 PASS / 94 FAIL / 10 SKIP,
-новых failing nodes нет; 34 baseline nodes заменены passing checks без удаления
+06 не завершён: свежий полный offline rerun 6125 PASS / 93 FAIL / 10 SKIP,
+новых failing nodes нет; 35 baseline nodes заменены passing checks без удаления
 tests и изменения runtime. Последующий focused trial: ledger 81 UNRESOLVED,
-4 KEEP_FIX_RUNTIME, 8 ENV_BLOCKED, 35 REWRITE; full rerun после него не выполнен.
+4 KEEP_FIX_RUNTIME, 8 ENV_BLOCKED, 35 REWRITE; full rerun подтверждает 93 failures
+в первых трёх группах и отсутствие новых failing nodes вне baseline ledger.
 Native delivery кандидата отклонена (LeaseClient); миграция historical gates
 требует выяснения действующего parser/acceptance contract. Namespace isolation
 недоступна; восемь ответов проверены в чате (не isolated model run), полный
 per-node разбор ещё не выполнен. Подробные основания — в плане 06.
 49 → 45 относится только к отклонённой ablation, не к принятому runtime patch.
-07 — новый ограниченный маршрут по запросу пользователя: сначала подтвердить
-причины потери и контракт, затем выбрать одну ответственность либо остановиться.
-План 07 пока PLANNED, не закрывает 06 и не разрешает unified replacement/rollout.
+07 — активный ограниченный эксперимент; текущий этап **07.1: заморозить спецификацию
+двух bindings и проверку feasibility**. Рабочая инструкция — «Активный короткий
+план» в начале 07: пять этапов с DONE/STOP, один candidate и конечный verdict.
+Цель — полезный bounded context с источниками, без обещания полного ответа.
+07 начат после `c49e5221`: baseline 74 PASS / 2 FAIL; 15 diagnostic calls.
+Пользователь согласовал узкое расширение condition scope в существующем compiler;
+следующий scope trial NOT_RUN, границы и критерии записаны в плане 07.
+Таблица scope examples и consumer audit выполнены: read-admission проверяет
+все conditions против каждого окна; COMPATIBILITY BLOCKED до нового candidate.
+Source applicability/read-context контракт B3 этим автоматически не реализован.
+Isolated compiler-preservation trial: native 5/7, candidate 6/7; REJECTED —
+expiration всё ещё прикреплён к default. Новый scope binding не реализован;
+production compiler/defaults не менялись, native delivery не исправлена.
+Не закрывает 06 и не разрешает unified replacement/rollout.
 Admission/selection research за пределами границ 07 автоматически не продолжать.
 Критерии DONE/BLOCKED/REJECTED находятся внутри.
 Результаты дописывать в соответствующий план, не создавать новый на каждый прогон.

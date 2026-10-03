@@ -1,7 +1,98 @@
 # 07. Проверить причины потери read context и выбрать одну замену
 
-Статус: **PLANNED; runtime trial не выбран; исправление не выполнено**.
+Статус: **активен этап 07.1 ниже; feasibility не доказана; runtime не исправлен**.
 Дата: 2026-10-04. План создан по запросу пользователя, не разрешает rollout.
+
+## Активный короткий план — выполнить и вынести решение
+
+Этот раздел — текущий маршрут. Разделы ниже сохраняют историю, результаты и
+детальные checks; прежние указания «следующее действие» не запускают отдельные
+циклы. Не создавать план 08 вместо завершения этого решения.
+
+### Цель и честное обещание
+
+Возвращать полезные найденные материалы с источниками и сохранёнными условиями
+в пределах **800 tokens / 3 sources**, не обещая «это всё» или полный ответ.
+«Показывать всё, что можно» означает полезный bounded context, а не все hits
+и не обход guards. Полнота и применимость могут оставаться неизвестными.
+В отчёте различать: доставлено / не подтверждено / не поместилось, если причина
+известна. Не выдумывать причины отсутствия и не вводить автоматически новые API fields.
+
+Неполнота ответа сама по себе не означает бесполезность context. При этом
+identity, source/security, scope/version/freshness/snapshot/span/exact guards,
+сохранение ограничений и запрет proof/edit authority обязательны. Unknown нельзя
+выдавать за applicability. Проценты уверенности без калибровки запрещены.
+
+### Текущий вывод, который нельзя забывать
+
+- Per-need admission — **гипотеза**, не доказанно лучший алгоритм. Трудность —
+  получить правильные связи «условие → часть» и «окно → часть», а не записать IDs.
+- Preservation trial 6/7 не доказывает feasibility scope binding: он заведомо
+  сохранял root constraints. Не повторять его как новый кандидат.
+- Зависимость compiler → admission ожидаема. Она требует отдельных patch stages,
+  но не доказывает невозможность compiler. Смешивать слои в одном trial нельзя;
+  требовать полной native recovery от каждого промежуточного stage тоже нельзя.
+- Надёжность исполнения заданных bindings и надёжность их извлечения из языка —
+  разные результаты. Ручные bindings не доказывают native recovery.
+
+### Порядок работы и критерии
+
+| Этап | Что сделать | DONE / переход |
+|---|---|---|
+| **07.1 — заморозить эксперимент (сейчас)** | В этом плане записать поддерживаемые формы, outputs local/shared/unknown, основание window→need binding, список файлов и последовательность заменяемых обязанностей. Зафиксировать baseline commit+dirty patch, development/проверочный inventories и критерии до кода. | Есть конечная спецификация обоих bindings без case exceptions. Если её нет — BLOCKED с конкретным недостающим правилом; не писать очередной wrapper. |
+| **07.2 — проверить механизм** | На явно размеченных bindings проверить применение local/shared/unknown и source guards, включая wrong subject/state и clipping. | Все обязательные controls проходят. Это только mechanism evidence, не NLP и не final packet. |
+| **07.3 — один candidate извлечения** | Реализовать зафиксированные общие формы в существующем compiler; unsupported → unknown. Проверить обязательные positives и перенос на другие имена/отношения/формулировки, отрицания, quotes и shared/trailing restrictions. | Нет неверных разрешающих bindings; обязательные positives не заменены unknown; root obligations сохранены. На независимом наборе оценить также unknown/потери полезных фактов. После раскрытия ошибок правила под этот набор не подстраивать. |
+| **07.4 — последовательная интеграция** | Только после 07.3: отдельные compiler/admission/selector patches, каждый с фиксированной заменяемой ответственностью и regression checks. Использовать existing capture/assessor. Новую границу admission/selector оформить до соответствующего patch, не считать её уже разрешённой этим планом. | Native root-only LeaseClient доставляет оба факта в обоих существующих параметрах; subject/условия сохранены. Если нужен rescue или другая policy сверх записанной — REJECTED, не расширять patch. |
+| **07.5 — приёмка и конец** | Fresh paired 80-case replay; сохранить ранее подтверждённые 49 claim IDs и полезные partial facts; negative/guard/budget checks, focused tests, затем required gates и один полный offline suite. | Нет утраченных обязательных фактов, новых forbidden packets или failing nodes; ограничения и flags честные. Известные blockers 06 не превращаются в PASS. |
+
+Для 07.1: baseline сейчас **6125 PASS / 93 FAIL / 10 SKIP**; 93 failures состоят
+из 81 UNRESOLVED, 8 ENV_BLOCKED, 4 KEEP_FIX_RUNTIME. Это отправная точка, не цель
+«оставить 93». Подтверждённый target defect должен закрыться по final bytes.
+80 frozen cases и уже просмотренные fixtures — development/regression evidence,
+не unseen. Если независимой проверки нет — явно BLOCKED для вывода об обобщении.
+
+### Правила против бесконечной доработки
+
+1. Один зафиксированный candidate, не серия новых grammar/thresholds после failures.
+   Техническую ошибку harness исправить можно, сохранив исходный invalid run.
+2. Перед каждым patch: обязанность → allowed files → ожидаемые positive/negative
+   outcomes → команда проверки. Не менять чужой dirty baseline.
+3. Не менять frozen labels, budgets, expectations, markers или required gates
+   ради результата. Не добавлять fallback/rescue, library dictionaries и модель.
+4. Не требовать доказанной полноты ответа от retrieval context; не выдавать
+   отсутствие proof за разрешение игнорировать relevance или source restrictions.
+5. После failing acceptance — записать контрпример и закончить verdict. Не
+   компенсировать потерю одного факта приобретением другого или суммой PASS.
+6. Не запускать уже выполненные проверки повторно без изменения или нового concern.
+   При отсутствии модели/изоляции сохранить blocker; ручной ответ не model run.
+7. Финал обязателен: **VALIDATED_LOCAL / REJECTED / BLOCKED**, выполненные этапы,
+   recovered/lost facts, нарушения guards, список not_run и один следующий шаг.
+   BLOCKED завершает попытку, но не исправление. Новая попытка — отдельное решение.
+
+**Завершение 07:** вынесен обоснованный verdict по одной конечной попытке.
+**Исправление LeaseClient:** только native delivery и сохранение guards/facts.
+**Завершение 06:** отдельно закрыты решения по всем nodes и required acceptance;
+локальный успех 07 не равен READY и не разрешает rollout.
+
+### Исследования: основания и границы, не обещание результата
+
+- [Break / QDMR (2020)](https://aclanthology.org/2020.tacl-1.13/): decomposition
+  полезна; получение структуры исследуется как обучаемая задача, не доказательство
+  универсального rule-based scope/binding.
+- [Sufficient Context (2025), §3–5](https://arxiv.org/html/2411.06037v3): полезный
+  context может быть неполным; autorater использует модель. Это не готовый
+  model-free admission и не гарантия правильного ответа с источниками.
+- [ALCE (2023)](https://aclanthology.org/2023.emnlp-main.398/): правильность ответа
+  и качество подтверждения цитатами оцениваются отдельно.
+- [CheckList (2020)](https://aclanthology.org/2020.acl-main.442/): behavioral checks
+  выявляют ошибки за общей accuracy; это метод проверки, не доказательство полноты.
+
+В этих источниках не установлено превосходство нашего per-need candidate.
+Исследование обосновывает конечную проверку гипотезы, не бесконечное расширение parser.
+
+---
+
+## Предыдущая детализация и история (не отдельная очередь исполнения)
 
 ## 0. Задача и самокритика
 
@@ -43,7 +134,142 @@ implementation, записать границы зависимостей. Не �
   unknown condition scope. Docs о generated aliases могут описывать старый путь;
   текущего producer проверять по коду, не объявлять весь документ неверным.
 
+### Зафиксированное правило: источники вместо некалиброванной confidence
+
+По согласованию с пользователем: указывать проверяемые источники, сохранять
+условия/subject и явно различать происхождение, применимость и полноту ответа.
+Неизвестная применимость не становится подтверждённой; отсутствие условия
+не означает ни соответствие, ни противоречие. Вывод требует evidence.
+
+Проценты уверенности запрещены без определённого оцениваемого события и
+независимой held-out калибровки. Lexical score, match ratio и retrieval coverage
+не являются вероятностью правильности. Измеренные доли покрытия с явным
+знаменателем можно показывать только как coverage, не как confidence.
+False proof/edit flags также не устанавливают применимость отдельной цитаты.
+
+Постоянное правило: [AGENTS.md](AGENTS.md#источники-и-неопределённость-обязательное-правило).
+Это не implementation semantic classifier, не снятие blockers B3/C и не
+разрешение на новую schema, runtime-модель или ослабление guards.
+
 ## 1. Правила исполнения для модели
+
+### Согласование scope trial
+
+Пользователь явно выбрал **«Узкое расширение»**. Это отдельное разрешение после
+отклонённого preservation trial. Оно снимает запрет на новые scope-правила
+внутри существующего compiler только в границах ниже; прежние результаты сохраняются.
+
+**Ответственность:** определение того, к каким частям исходного вопроса относится
+условие. Заменить неразличённое распространение root constraint на все части
+явным local/shared/unknown binding. Не добавлять параллельную разрешающую ветку.
+
+**Разрешено:** расширить существующие compiler-правила и внутренние структуры
+для condition span, target part IDs и scope verdict. Точные поля, формы grammar
+и affected callers фиксируются до кода. Scope verdict описывает вопрос, а не
+применимость документа; даже известный scope не повышает interpretation до
+`supported` и не даёт proof/coverage/edit permission.
+
+**Не разрешено:** новый parser, library/relation exceptions, словари, fallback,
+threshold tuning, изменение retrieval/admission/selector, guards, budgets,
+public schema, frozen expectations или переключение production/defaults.
+Неизвестный scope не даёт разрешения снять constraint с какого-либо need.
+
+Порядок следующего trial:
+
+1. Составить таблицу вход → точные part/condition spans → local/shared/unknown
+   → target IDs. Зафиксировать исчерпывающую поддержанную форму каждого правила,
+   не список названий клиентов. Остальные формы — unknown.
+2. Обязательные acceptance examples:
+   - LeaseClient default + exception when operation expires: два parts;
+     expiration относится к exception, default не получает это условие.
+   - `When preview is disabled, what is RelayClient default timeout and which
+     exception is raised?`: shared condition на обе части.
+   - Тот же compound с `, only for administrators?` в конце: unknown scope,
+     условие сохранено; default не становится безусловно разрешённым.
+3. До реализации добавить отрицательные controls: вложенные/несколько условий,
+   перенос prefix в trailing position, отрицание, разделители внутри quotes,
+   другой subject второй части, exact identities и reference mismatch.
+   Unknown — допустимый результат неподдержанной формы, но не замена ожидаемого
+   local/shared в обязательных positives. Не выводить scope только из близости spans.
+4. Проверить consumers: могут ли они безопасно сохранить unknown без изменений
+   admission/selector. Если необходим второй policy-слой — STOP, описать зависимость.
+   Не выдавать новые поля, которые старый consumer игнорирует, за исправление.
+5. Выполнить один isolated compiler candidate поверх зафиксированного baseline.
+   Проверить regression tests, существующие compiler/condition controls и
+   отсутствие потери root obligations/точных offsets. Нет нового input — нет
+   основания повторять отклонённый trial с подогнанными правилами.
+
+**DONE этого trial:** обязательные local/shared/unknown examples и negative
+controls проходят; constraints/subject/exact identities не потеряны; новые
+scope assertions не дают source applicability или support; изменён один слой.
+Это `COMPILER_VALIDATED_LOCAL`, не `FIX_VALIDATED_LOCAL`.
+
+**STOP/REJECTED:** ошибка области действия, новое разрешение из unknown, потеря
+guard/constraint, исключение под fixture или необходимость менять второй слой.
+После compiler приёмки native LeaseClient packet проверяется отдельно. Admission
+и selector требуют собственных trial boundaries; rollout не разрешён.
+
+Следующее действие: зафиксировать таблицу форм/outputs и consumer compatibility,
+затем failing regression tests. Исследование и implementation пока NOT_RUN.
+
+### Общие правила
+
+#### Scope contract table и consumer compatibility — выполнено до candidate
+
+Все spans ниже `[start,end)` в неизменённом original question. IDs `part-1/2`
+обозначают исходные части, не независимые proof obligations. Предлагаемый
+внутренний binding: `condition_span`, `scope=local|shared|unknown`, `target_need_ids`.
+Для unknown список targets отсутствует (не пустой список «ни к чему не относится»);
+legacy constraint сохраняется консервативно. Это спецификация, не новые runtime fields.
+
+| Input form / пример | Scope / targets | Обязательные ограничения |
+|---|---|---|
+| `What is LeaseClient default timeout duration for requests and which exception is raised when an operation expires?` | local → part-2; condition `[88,114)` | part-1 `[0,57)`, part-2 `[62,114)`; exact subject сохранён; binding не доказывает, какую exception возвращает источник |
+| `When preview is disabled, what is RelayClient default timeout and which exception is raised?` | shared → обе части; prefix `[0,25)` | Условие должно быть доступно обеим частям; context не превращается в proof |
+| `What is RelayClient default timeout and which exception is raised, only for administrators?` | unknown; restriction `[67,91)` | Не объявлять local только потому, что restriction находится в конце второй части; не снимать constraint с default |
+| Две явные части без condition cues | Без condition binding | Сохранить parts/subject/context и root exact obligations; interpretation остаётся unresolved |
+| Condition marker/separator внутри backticks, quotes или link | Не condition / не новая boundary | Existing protected-span handling; значимые bytes остаются частью exact identities |
+| Вложенные/несколько условий; отрицание; prefix, перенесённый в trailing position; другой subject | unknown до явно зафиксированного общего grammar rule | Не выводить local/shared из близости, совпадения subject, очередности spans или retrieval score |
+
+Эта таблица фиксирует expected examples, **но не завершённую grammar**: перед
+candidate требуется точная общая production, различающая local event clause от
+ambiguous trailing modifier без library-specific словаря. Пример не означает
+разрешение special-case `LeaseClient`, `expiration` или relation `exception`.
+
+Consumer audit (текущий код, без runtime подмен):
+
+| Consumer | Фактическое использование | Совместимость |
+|---|---|---|
+| `source_reference_evidence.py:62–66` | Сохраняет compiled contracts для prepared source routing | Producer может хранить binding; это не enforcement |
+| `evidence_set_validation.py:109+` | Проверяет source/span/dependency integrity; proposed need IDs — routing hints | Не устанавливает condition scope или applicability |
+| `need_context_disposition.py:50–76` | Смотрит наличие constraints, затем заново парсит текст отдельного need; общего prefix в `need.context` для condition frame не использует | Shared condition в context не будет автоматически понят; неизвестная форма остаётся blocked |
+| `need_context_projection.py:141–149` | Вычисляет disposition для каждого need и допускает окно при любом non-blocked need | Per-need route существует; новые scope targets сами по себе не потребляются |
+| `read_context_admission.py:105–107` | Проверяет **каждый** constrained need против **каждого** body; один отказ запрещает всё окно | **Несовместим с целью local scope:** exception constraint продолжает запрещать independent default |
+
+Проверка на предполагаемом compiler output: у default пустые constraints,
+у exception `[88,114)`, body `The default timeout is 17 seconds.`.
+Existing `_applicable_context` возвращает True для default, False для exception.
+Actual read consumer применяет второй verdict к тому же body и всё равно
+возвращает `condition_support_unavailable`. Результат probe сохранён в
+`artifacts/next07/scope-consumer-compatibility-20261004.json`.
+
+**COMPATIBILITY BLOCKED / STOP перед новым candidate.** Для native эффекта
+нужна отдельная ответственность admission: выбирать, какой need относится
+к окну, и проверять только его constraints, не ослабляя shared/unknown veto.
+Один compiler-only patch не может исправить этот consumer. Изменять его в этом
+trial запрещено. Не добавляем игнорируемые поля ради green syntax tests.
+
+Новый candidate и новые grammar regression tests **NOT_RUN**: остановка по
+пункту 4 согласованной границы до реализации. Предыдущие красные tests и
+REJECTED preservation candidate сохранены. Следующее решение — согласовать
+отдельный per-need admission consumer contract и последовательность его trial,
+либо оставить compiler исследованием без заявления native recovery.
+
+Уточнение по согласованной последовательной работе: допускаются отдельные
+compiler → admission → selector trials, каждый с собственным решением C и
+проверками. Необходимость следующего слоя не делает промежуточный trial полным
+исправлением и не разрешает смешивать слои в одном patch. Новый trial не
+начинается автоматически после regression или неопределённого scope.
 
 1. Выполнять этапы A → B → C → D → E. Следующий этап разрешён только после DONE
    предыдущего. Заполнять журнал в конце **этого** документа.
@@ -435,6 +661,54 @@ PASS и не подбирать второй вариант автоматиче
 
 ## Журнал исполнения
 
+### Compiler-only trial: сохранение существующих RetrievalNeed
+
+Заменяемая ответственность: сворачивание нескольких существующих retrieval
+parts в один unresolved `requested_part` при enrichment. Остальные compiler
+ветки и все runtime consumers неизменны. Candidate исследуется только через
+отдельную функцию в `next07_compiler_trial.py`; defaults не переключаются.
+
+Проверяемое общее правило: сохранить существующие части/subject/context/offsets,
+root exact obligations и unresolved interpretation. Existing root constraints
+сохранять консервативно, пока существующий parser не подтвердил их область.
+Не выводить scope из порядка слов и не вводить новый grammar/condition classifier.
+
+Проверка: `test_next07_compiler_trial.py` — локальное expiration, global prefix,
+ambiguous trailing restriction, exact identities, quotation shielding и
+reference mismatch. Обязательный acceptance: expiration не переносится на default.
+Если candidate его не выполняет, trial отклоняется, а не ослабляет guard.
+
+Allowed files: этот план, `next07_compiler_trial.py`,
+`test_next07_compiler_trial.py`, `artifacts/next07/`, строка статуса в README.
+Production compiler/admission/retrieval/selector/budgets не изменяются.
+Это trial формирования контрактов, не проверка native recovery.
+
+**Результат:** native **5 PASS / 2 FAIL**, isolated candidate **6 PASS / 1 FAIL**
+(общий запуск 11 PASS / 3 FAIL). Baseline не сохраняет два retrieval parts;
+candidate сохраняет parts, subjects, original offsets и exact obligations,
+оставляя interpretation unresolved. Global/ambiguous restrictions, quoted
+separator и mismatch controls проходят в обоих arms. Это syntax controls,
+не полная приёмка source/security guards и не native delivery.
+
+Обязательный локальный condition test у candidate падает: `default.constraint_spans`
+всё ещё содержит `when an operation expires?`. Existing `RetrievalNeed` даёт
+границы частей и эвристический context, но не certificate области действия
+условия; `NeedContract` имеет constraint spans без отдельного scope verdict.
+Копировать constraints всем частям безопаснее снятия veto, но не выполняет цель.
+Раздать их только по пересечению spans — новая неподтверждённая scope-политика:
+она могла бы снять общий trailing restriction с первой части.
+
+**Verdict: REJECTED для этого candidate; D/E native acceptance NOT_RUN.**
+Tests не ослаблены, candidate не подключён к consumers/defaults. Сохранён как
+отрицательный research результат, не production fix. Artifacts:
+`artifacts/next07/compiler-preservation-20261004/` — XML, обоих arms contracts,
+summary с hashes и command. Текущие 93 offline failures этим не закрыты.
+
+**STOP:** до следующего trial требуется основание для binding condition scope,
+которого в existing parser нет. Ни span proximity, ни порядковое положение
+условия, ни confidence не заменяют его. Переход к admission/selector сейчас
+маскировал бы compiler failure, поэтому автоматически не выполняется.
+
 Заполнять здесь, прошлые результаты не перезаписывать:
 
 ```text
@@ -449,3 +723,53 @@ LeaseClient fixed: yes | no | not_verified
 remaining plan-06 blockers:
 next action: <одно действие либо STOP с точной причиной>
 ```
+
+### Выполнение 2026-10-04 после коммита плана
+
+- План закоммичен первым: `c49e5221`; baseline включает сохранённый tracked dirty
+  patch и hashes untracked inputs. Остальные изменения пользователя не отменены.
+- Artifacts: `artifacts/next07/20261004-baseline-c49e5221/`.
+- **A DONE:** fresh focused run **74 PASS / 2 FAIL**, оба LeaseClient parameters
+  потеряли timeout; packet содержит overview. XML: `baseline-focused.xml`.
+  Syntax diagnostic подтверждён также actual prepared root plans, не только
+  пустым catalog: два RetrievalNeed → один unresolved requested_part с condition.
+- **B1/B2 observed:** 15 calls, 9 development cases; для двух LeaseClient cases
+  выполнены все четыре arms. В обоих factual sources точные heading-inclusive и
+  body-only окна получают `condition_support_unavailable`; при bypass condition
+  получают `no_local_topic_witness`. При обходе обоих veto или сохранении всех
+  chunks на rerank они достигают projector и получают candidate rejection
+  **`no_visible_qualification`**. Они не достигают обычной selection. Overview
+  accepted/replaced; read fallback не вызывается при непустом sources (code-derived).
+  Следовательно, финальный барьер здесь не `no_new_direction` из исследования 02.
+- **B3 observed:** global-condition доставляет disabled **и enabled** цитаты;
+  wrong-state-only доставляет enabled; missing-state доставляет безусловный default;
+  unknown administrators scope также доставляет безусловный default. Во всех
+  случаях proof/edit flags false. Restriction-tail final сохраняет `Only when
+  preview is disabled.`. Missing-error и foreign-subject LeaseClient packets пусты.
+  Все 15 captures проходят existing projection validator на 800/3.
+- Это не доказательство condition safety: validator проверяет другой контракт.
+  Возврат enabled quote с целым условием может быть contrasting read context,
+  но его допустимость не установлена. Не называем его applicable/answer proof.
+- **B не полностью DONE:** новые clipping/exact/version/source mutation controls
+  для B3 ещё не выполнены; existing source/snapshot/request/unsafe controls
+  присутствуют в passing A2, но не заменяют будущую candidate приёмку.
+- Первый `trace/` run технически не собрал actual plans: dataclass chunks до
+  rerank не содержат `_reference_root_plan`. Observer исправлен на prepared read
+  candidates; повтор `trace-with-plans/` сохранён отдельно. Первый run не удалён,
+  его пустые `actual_plans` не используются для conclusions о source binding.
+- **C NOT_SELECTED / BLOCKED:** compiler-only оставляет lexical и projection
+  barriers; admission-only оставляет projection qualification; selector-only
+  не получает законно admitted factual windows на native prefit. Общей безопасной
+  replacement rule сейчас нет. Mechanical refactor не выбран вместо recovery.
+- **D/E NOT_RUN:** runtime/defaults, expectations и frozen labels не менялись;
+  full suite и 80-case candidate acceptance не запускались без candidate.
+- **Verdict: IMPLEMENTATION_BLOCKED; анализ B частичный, не ANALYSIS_COMPLETE.**
+  LeaseClient fixed: **no**. Plan-06 blockers остаются открытыми.
+- **STOP / следующий один вопрос:** разрешается ли возвращать attributed read
+  context с неприменимым либо неподтверждённым условием (например enabled quote
+  на disabled request / unconditional default на administrators request), если
+  условия источника сохранены, applicability не заявляется и proof/edit false?
+  Если да, требуется отдельно определить, как packet сообщает это ограничение;
+  текущие false flags сами по себе этого не обеспечивают. Если нет, такой veto
+  должен действовать на все delivery routes, а не только на read fallback.
+  Ни один вариант не даёт автоматического разрешения multi-layer patch.
