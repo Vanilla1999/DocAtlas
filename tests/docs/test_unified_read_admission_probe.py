@@ -33,8 +33,13 @@ def prepared(tmp_path, question=QUESTION,
 
 
 def decide(candidate, question=QUESTION):
-    return unified_read_admission(candidate, question=question,
-                                  expected_project_identity=candidate['project_identity'])
+    from docmancer.docs.application.read_context_admission import read_context_admission
+    research = unified_read_admission(candidate, question=question,
+                                     expected_project_identity=candidate['project_identity'])
+    native = read_context_admission(candidate, question=question,
+                                    expected_project_identity=candidate['project_identity'])
+    assert native.allowed == research.allowed
+    return native
 
 
 def test_partial_context_is_read_only_and_has_one_decision(tmp_path):
@@ -51,7 +56,9 @@ def test_read_decision_never_calls_proof_qualification(tmp_path, monkeypatch):
         raise AssertionError('proof qualification used as read decision')
     monkeypatch.setattr(qualification, 'qualify_evidence', forbidden)
     import docmancer.docs.application.read_context_admission as native
-    monkeypatch.setattr(native, 'qualify_evidence', forbidden)
+    monkeypatch.setattr(native, 'qualify_evidence', forbidden, raising=False)
+    assert native.read_context_admission(candidate, question=QUESTION,
+                                         expected_project_identity=candidate['project_identity']).allowed
     assert decide(candidate).allowed
 
 
@@ -63,6 +70,9 @@ def test_read_decision_never_calls_proof_qualification(tmp_path, monkeypatch):
     ('storage retention behavior.', False),
     ('storage is documented. retention is documented. behavior is documented.', False),
     ('storage behavior retention is documented.', False),
+    ('Storage retention behavior never deletes active records.', True),
+    ('# Storage retention behavior\n\nTransport retries use exponential backoff.', False),
+    ('Storage retention behavior is documented? Consult your deployment owner.', False),
 ])
 def test_one_existing_locality_rule_without_polarity_proof(tmp_path, body, allowed):
     _, candidate, _ = prepared(tmp_path, body=body)
@@ -79,6 +89,9 @@ def test_source_guards_stay_closed(tmp_path, change):
     _, candidate, _ = prepared(tmp_path)
     identity = candidate['project_identity']
     candidate.update(change)
+    from docmancer.docs.application.read_context_admission import read_context_admission
+    assert not read_context_admission(candidate, question=QUESTION,
+                                      expected_project_identity=identity).allowed
     assert not unified_read_admission(candidate, question=QUESTION,
                                      expected_project_identity=identity).allowed
 
@@ -115,6 +128,8 @@ def test_clipping_does_not_inherit_read_approval(tmp_path):
     ('When preview is enabled, OrbitClient default timeout is 7 seconds.', False),
     ('OrbitClient default timeout is 7 seconds.', False),
     ('When preview is disabled, OtherClient default timeout is 7 seconds.', False),
+    ('When preview is disabled, OrbitClient default timeout is not configurable.', True),
+    ('When preview is enabled, OrbitClient default timeout is not configurable.', False),
 ])
 def test_existing_state_applicability_is_preserved(tmp_path, body, allowed):
     question = 'What is OrbitClient default timeout when preview is disabled?'

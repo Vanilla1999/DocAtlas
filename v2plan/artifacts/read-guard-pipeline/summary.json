@@ -1,0 +1,11 @@
+{
+  "cases": 80,
+  "baseline_commit": "fed1898e",
+  "identical_payload_cases": 80,
+  "arms": {
+    "baseline": {"supported": 49, "claim_statuses": {"supported": 49, "missing": 29, "needs_review": 10}, "negative_packets": []},
+    "candidate": {"supported": 49, "claim_statuses": {"supported": 49, "missing": 29, "needs_review": 10}, "negative_packets": []}
+  },
+  "lost": [],
+  "changed_flags": []
+}

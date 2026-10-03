@@ -9,7 +9,8 @@ from dataclasses import dataclass
 import re
 from typing import Any, Mapping
 
-from docmancer.docs.domain.evidence_qualification import qualify_evidence, _substantive_markdown_line
+from docmancer.docs.domain.evidence_qualification import _substantive_markdown_line, _visible_term_present
+from docmancer.docs.domain.source_window_eligibility import prepare_source_probe
 from docmancer.docs.domain.query_terms import documentation_query_terms, query_constraint_roles
 from docmancer.docs.domain.need_contracts import compile_need_contracts
 from docmancer.docs.domain.source_dependency_graph import digest
@@ -77,29 +78,36 @@ def read_context_admission(candidate: Mapping[str, Any], *, question: str,
             or not evidence['char_start'] <= span[0] < span[1] <= evidence['char_end']):
         return reject('source_window_mismatch')
     roles = query_constraint_roles(question)
-    checked = qualify_evidence(
+    prepared, reason = prepare_source_probe(
         {'query_text': question, 'query_origin': 'original',
          'query_terms': list(documentation_query_terms(question)),
          'exact_terms': list(roles.hard_exact), 'bound_subjects': list(roles.bound_subjects)},
-        query_id='query-original', visible_text=body, evidence_text=body,
+        visible_text=body, evidence_text=body,
         candidate=candidate, expected_project_identity=expected_project_identity,
         lifecycle_intent=lifecycle_intent,
         catalog_role=str(candidate.get('catalog_role') or ''),
     )
-    # Only the lexical ratio refusal is eligible for this separate route.
-    # Unknown reference/source/semantic refusals fail closed.
-    if checked.reason not in {'visible_fields', 'insufficient_visible_match'}:
-        return reject(checked.reason)
-    if checked.trace.get('missing_exact_terms') or checked.trace.get('missing_bound_subjects'):
-        return reject('missing_exact_or_subject')
-    if not checked.trace.get('reference_visible_span'):
+    if reason is not None:
+        return reject(reason)
+    if not prepared.get('reference_visible_span'):
         return reject('source_window_mismatch')
+    normalized = body.casefold()
+    exact_terms = tuple(str(t).casefold() for t in prepared.get('exact_terms') or ())
+    if any(not _visible_term_present(t, normalized, exact=True) for t in exact_terms):
+        return reject('missing_exact_terms')
+    owner = str(prepared.get('bound_subject_context') or '').casefold()
+    if any(not _visible_term_present(str(t).casefold(), normalized, exact=True)
+           and not _visible_term_present(str(t).casefold(), owner, exact=True)
+           for t in prepared.get('bound_subjects') or ()):
+        return reject('missing_bound_subject')
     # Existing constraint interpretation is a veto only, never a generated
     # retrieval probe or a topic/proof witness. Unresolved conditions stay closed.
     for contract in compile_need_contracts(question, plan):
         if contract.constraint_spans and not _applicable_context(contract, question, body):
             return reject('condition_support_unavailable')
-    terms = {str(t).casefold() for t in checked.trace.get('body_matched_terms') or ()}
+    terms = {str(t).casefold() for t in prepared.get('query_terms') or ()
+             if _visible_term_present(str(t).casefold(), normalized,
+                                      exact=str(t).casefold() in exact_terms)}
     if local_topic_witness(body, question=question, terms=terms):
         return ReadContextAdmission(True, 'bound_local_topic_context')
     return reject('no_local_topic_witness')

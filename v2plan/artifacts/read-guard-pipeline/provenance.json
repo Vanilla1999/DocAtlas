@@ -1,0 +1,7 @@
+{
+  "baseline_commit": "fed1898efbad986220e514bcf0e8ba72a9aaa172",
+  "candidate_read_sha256": "38fb0c095bd3ae564e569b913bae0c1f314d56bf258d5ed20af4df98a7ebe830",
+  "runner_sha256": "0489eea8348417845478808c8f60739a06f162054078cb88bb68e22549b02aeb",
+  "scope": "paired full native calls, same index, service defaults unchanged",
+  "validation": "exposed frozen corpus; not unseen"
+}

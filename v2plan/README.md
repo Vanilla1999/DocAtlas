@@ -8,6 +8,7 @@
 - [Что отбрасывается и где конкурируют read решения](ADMISSION_CONFLICT_AUDIT_RU.md).
 - [Exact-window сравнение: измеренные расхождения и граница удаления обязанностей](EXACT_WINDOW_CONFLICT_RESULT_RU.md).
 - [Решение: что удалять первым и что сохранять](ADMISSION_REMOVAL_DECISION_RU.md).
+- [Первый patch: read без proof qualification, native pipeline проверки](READ_GUARD_PATCH_RESULT_RU.md).
 
 - [Admission: Kotlin, Markdown, исследования и направление упрощения](ADMISSION_DIRECTION_REVIEW_RU.md).
 

@@ -1,0 +1,12 @@
+{
+  "baseline_commit": "fed1898e",
+  "interpreter": "project .venv/bin/python",
+  "baseline": {"tests": 6216, "passed": 6076, "failed": 130, "skipped": 10, "errors": 0},
+  "candidate": {"tests": 6216, "passed": 6076, "failed": 130, "skipped": 10, "errors": 0},
+  "new_failing_nodes": [],
+  "removed_failing_nodes": [],
+  "final_focused_passed": 120,
+  "full_suite_green": false,
+  "unseen_validation": "NOT_MEASURED",
+  "rollout_approved": false
+}
