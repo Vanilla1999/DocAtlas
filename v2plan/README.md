@@ -2,6 +2,34 @@
 
 Планы и результаты model-free / Grounded-style исследования.
 
+## Рабочий маршрут сейчас
+
+1. [01 — existing lookup для недостающей части](NEXT_01_LOOKUP_GAPS_RU.md).
+2. [02 — удаление одной конкурирующей admission-обязанности](NEXT_02_ADMISSION_SIMPLIFICATION_RU.md).
+
+Выполнять последовательно; критерии DONE/BLOCKED/REJECTED находятся внутри.
+Результаты дописывать в эти два файла, не создавать очередной план на каждый прогон.
+`AGENTS.md` обязателен. Актуальные опорные отчёты: `READ_GUARD_PATCH_RESULT_RU.md`,
+`EXACT_WINDOW_CONFLICT_RESULT_RU.md`, `ADMISSION_REMOVAL_DECISION_RU.md`,
+`ADMISSION_DIRECTION_REVIEW_RU.md`. Остальные материалы ниже — история, не очередь задач.
+
+## Кандидаты на уборку (пока не удалены)
+
+Неактивные планы, кандидаты на архивирование/удаление из рабочей папки:
+`M2_MODEL_FREE_RETRIEVAL_RESEARCH_RU.md`, `M2_MODEL_FREE_RETRIEVAL_TDD_RU.md`,
+`M2_HEURISTICS_RESEARCH_ANALYSIS_RU.md`, `M2_SIMPLIFICATION_CONTRACT_RU.md`,
+`M2_GROUNDED_BUDGET_EXPERIMENT_RU.md`, `GATE_R_PROPOSAL_RU.md`,
+`UNIFIED_READ_CONTRACT_RU.md`. Они не являются текущими implementation instructions.
+
+Gate/experiment result отчёты — исторические свидетельства, не мусор:
+хранить в архиве при уборке. `EXECUTION_RU.md` — historical log, не текущий план.
+Не удалять `*.py`, `artifacts/`, `AGENTS.md` или `M2_GROUNDED_MECHANISM_CHECK_RU.md`
+вместе со старыми планами: есть test imports, provenance и ссылки на доказательства.
+Перед физическим удалением проверить references и поправить ссылки; snapshots
+сохранены в git. `experiments/crosslingual_relevance/` не относится к этой уборке.
+
+## Исторические материалы и опорные отчёты
+
 - [Один read decision: контракт до реализации](UNIFIED_READ_CONTRACT_RU.md).
 - [Пункт 5: реализация, native-inventory replay и границы результата](UNIFIED_READ_RESULT_RU.md).
 - [Обязательные правила против переусложнения](AGENTS.md).
@@ -27,7 +55,9 @@
 - [Execution status](EXECUTION_RU.md).
 - [Сохранённые 01–04](ISOLATED_01_04_VALIDATION_RU.md).
 
-Статус: 01–04 сохранены изолированно, replacement не принят, production не менялся.
+Статус: 01–04 сохранены изолированно, replacement не принят. Original-read изменён
+в `152a4c7b`; rollout не выполнен. Старые заявления «production не менялся» относятся
+к соответствующим историческим исследованиям, не к текущему исходному коду.
 Исторические планы не являются разрешением на rollout.
 
 Research scripts: `grounded_budget_probe.py`, `grounded_loss_audit.py`.
