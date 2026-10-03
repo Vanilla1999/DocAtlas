@@ -2,6 +2,17 @@
 from __future__ import annotations
 from ._docs_server_schema import *  # noqa: F401,F403
 
+FOCUSED_LOOKUP_GUIDANCE = (
+    "Separate supported facts from the concrete missing requested fact. Within existing call/recovery limits, "
+    "keep the original question unchanged and target lookup_queries only at that missing part; preserve subject, "
+    "environment, version, negation and conditions without guessing an answer. Independent questions need separate calls. "
+    "Retain supported facts with their source references and applicability conditions across calls: a later packet need not "
+    "repeat them, and omission does not refute them. Do not merge conflicting evidence. If focused lookup adds no information, "
+    "report partial/unknown and do not repeat the same query; continue only within existing limits with a concretely justified "
+    "new formulation or a new source. Ask for required user data. Not found in available context does not mean data does not exist. "
+    "Context and query coverage do not certify answer support or edit permission."
+)
+
 RAW_TOOLS: list[dict[str, Any]] = [
     {
         "name": "get_docs_context",
@@ -576,7 +587,8 @@ PUBLIC_ADVERTISED_DESCRIPTIONS: dict[str, str] = {
         "Source-grounded documentation tool. One call = one concrete question. Pass the original request unchanged; "
         "never substitute a benchmark/evaluation or documentation-governance meta-question. For cross-module use "
         "scope=all without module filters; module_path always implies module scope. For module plus repo policy make two "
-        "bounded calls (module then project). Lookups never authorize an answer or edit. hard_stop=true blocks edits."
+        "bounded calls (module then project). Lookups never authorize an answer or edit. hard_stop=true blocks edits. "
+        + FOCUSED_LOOKUP_GUIDANCE
     ),
     "prepare_docs": (
         "Call only from get_docs_context recommended_next_action or an explicit sync, refresh, index, or prefetch request. "

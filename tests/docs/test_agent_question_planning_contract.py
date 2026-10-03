@@ -162,3 +162,21 @@ def test_agent_surfaces_repeat_gap_directed_follow_up_rule() -> None:
         assert "unverified" in lowered and "does not require" in lowered
         assert "do not pre-split" in lowered
         assert "first packet" in lowered
+    from docmancer.mcp._docs_server_tool_data import FOCUSED_LOOKUP_GUIDANCE
+
+    tool = _get_docs_context_tool()
+    quickstart = next(
+        item["text"] for item in MCP_RESOURCES
+        if item["uri"] == "docmancer://agent/quickstart"
+    )
+    for text in (tool["description"], quickstart):
+        assert FOCUSED_LOOKUP_GUIDANCE in text
+        assert "omission does not refute" in text
+        assert "Do not merge conflicting evidence" in text
+        assert "report partial/unknown and do not repeat the same query" in text
+        assert "does not mean data does not exist" in text
+        assert "Context and query coverage do not certify" in text
+    lookup = tool["inputSchema"]["properties"]["lookup_queries"]["description"]
+    assert "target only the missing part" in lookup
+    assert "preserve subject and environment" in lookup
+    assert "existing call/recovery limits" in lookup

@@ -15,7 +15,7 @@ _GET_DOCS_CONTEXT_QUESTION_DESCRIPTION = (
     "One concrete question; independent questions use separate calls."
 )
 _GET_DOCS_CONTEXT_LOOKUP_DESCRIPTION = (
-    "Same question only. Cross-language/comparison/conditional: 1–3 lookups in documentation language; simple single-facet needs none. Keep original question unchanged, exact identifiers, versions, negation, conditions and comparison sides. Never batch independent questions, invent expected answers or use guessed source names."
+    "Same question only. Cross-language/comparison/conditional: 1–3 lookups in documentation language; simple single-facet needs none. Keep original question unchanged, exact identifiers, versions, negation, conditions and comparison sides. Never batch independent questions, invent expected answers or use guessed source names. For a concrete gap, target only the missing part and preserve subject and environment within existing call/recovery limits."
 )
 _GET_DOCS_CONTEXT_SCOPE_GUIDANCE = (
     'For onboarding/cross-module use scope=all without module filters (scope="all"); use scope="project" for repo policy and '
