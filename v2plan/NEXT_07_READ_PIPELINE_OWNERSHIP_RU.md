@@ -1,9 +1,87 @@
 # 07. Проверить причины потери read context и выбрать одну замену
 
-Статус: **активен этап 07.1 ниже; feasibility не доказана; runtime не исправлен**.
+Статус: **попытка завершена BLOCKED на 07.1; feasibility не доказана; runtime не исправлен**.
 Дата: 2026-10-04. План создан по запросу пользователя, не разрешает rollout.
 
 ## Активный короткий план — выполнить и вынести решение
+
+### Итог исполнения текущей попытки — BLOCKED
+
+Проверка 07.1 закончена по STOP-критерию; DONE 07.1 не достигнут. Это конечный
+результат попытки, **не выполнение всех этапов и не исправление**.
+
+Baseline: HEAD `669a991a`; полный tracked binary patch, архив untracked inputs
+и manifest с hashes сохранены до diagnostic run в
+`/tmp/opencode/next07-feasibility-baseline-20261004/`.
+Архив локальный, не долговременный committed artifact. Runtime files не изменены.
+Outputs и source hashes: `artifacts/next07/feasibility-audit-20261004.json`.
+
+**Проверенный контракт и его граница:**
+
+1. `condition → need`: local действует на связанный need; shared на все;
+   unknown сохраняется без разрешающего target. Mandatory inputs/offsets —
+   в scope table ниже. Их expected outputs не изменены.
+2. `window → need`: routing IDs, score, соседство spans и два topic terms не
+   устанавливают смысловую связь. Existing typed local witness может служить
+   основанием только для поддержанного relation, с source/identity/dependency
+   и visible-span checks. Unsupported relation остаётся unknown.
+3. Этот консервативный контракт не удовлетворяет mandatory exception positive:
+   existing grammar не представляет event-condition. Объявить его достаточным
+   означало бы заранее заменить обязательный positive на unknown.
+
+**Конкретный blocker, не утверждение общей невозможности:**
+
+- `admission_grammar.py` не возвращает frame для
+  `which exception is raised when an operation expires?`.
+- Даже при вручную заданном local binding `_applicable_context` возвращает False
+  для exception на body
+  `When an operation expires, LeaseClient raises OperationExpiredError.`.
+- На default и exception bodies matrix `[default,exception]` одинакова:
+  `[True,False]`. True означает отсутствие constraint, **не relevance и не
+  permission**. Это development diagnostic без source admission, не native test.
+- Поэтому замены all-conditions loop недостаточно. Нужен общий event-condition
+  witness/eligibility contract, отсутствующий в разрешённом scope-only trial.
+  Compiler scope не может сам установить применимость source event clause.
+
+**Inventory:** три известные local/shared/unknown questions — development;
+два synthetic bodies — diagnostics, не acceptance. 80 frozen cases, 49 claim IDs
+и прежние trial tests — regression, не unseen. Независимый набор не подготовлен
+и не запускался; обобщение не заявляется.
+
+**Изменённые файлы этого исполнения:** этот план, README,
+`next07_feasibility_audit.py`, `test_next07_feasibility_audit.py` и новый JSON.
+Diagnostic измеряет existing capabilities; не заменяет runtime decision и не
+является candidate/rescue. Allowed runtime files не зафиксированы: достаточного
+контракта нет, поэтому implementation STOP.
+
+**Проверки:**
+
+```sh
+.venv/bin/python -m v2plan.next07_feasibility_audit v2plan/artifacts/next07/feasibility-audit-20261004.json
+.venv/bin/pytest v2plan/test_next07_feasibility_audit.py -q
+```
+
+Audit пишет эксклюзивно: при повторе выбрать новый путь, не перезаписывать evidence.
+Diagnostic tests: **2 PASS** — проверены blocker report и offsets, не recovery.
+
+| Этап | Итог |
+|---|---|
+| 07.1 | BLOCKED: достаточная спецификация обоих bindings не получена |
+| 07.2 | NOT_RUN: diagnostic не заменяет полную acceptance механизма |
+| 07.3 | NOT_RUN: candidate не создан; прежний REJECTED не переименован |
+| 07.4 | NOT_RUN: runtime/defaults/admission/selector не менялись |
+| 07.5 | NOT_RUN: без candidate повтор replay/gates/full suite не обоснован |
+
+Recovered/lost facts: новых native packets нет, recovery не доказана; baseline
+факты этой попыткой не менялись. Guard regressions не измерялись end-to-end;
+runtime patch отсутствует. Красные gates и failures 06 остаются открытыми.
+
+**Один следующий шаг, только при отдельно разрешённом продолжении:** определить
+общий event-condition source witness/eligibility contract: subject/event/polarity,
+visible clause, clipping, неизвестные формы и независимая проверка. Не добавлять
+regex под LeaseClient и не начинать новый trial автоматически. Если контракт
+неприемлем в границах проекта, маршрут остаётся BLOCKED без обещания recovery.
+Модель, новый parser и ослабление conditions этим итогом не разрешены.
 
 Этот раздел — текущий маршрут. Разделы ниже сохраняют историю, результаты и
 детальные checks; прежние указания «следующее действие» не запускают отдельные

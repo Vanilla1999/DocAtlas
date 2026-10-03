@@ -30,9 +30,10 @@ Native delivery кандидата отклонена (LeaseClient); мигра�
 недоступна; восемь ответов проверены в чате (не isolated model run), полный
 per-node разбор ещё не выполнен. Подробные основания — в плане 06.
 49 → 45 относится только к отклонённой ablation, не к принятому runtime patch.
-07 — активный ограниченный эксперимент; текущий этап **07.1: заморозить спецификацию
-двух bindings и проверку feasibility**. Рабочая инструкция — «Активный короткий
-план» в начале 07: пять этапов с DONE/STOP, один candidate и конечный verdict.
+07 — текущая попытка завершена **BLOCKED на 07.1**: existing grammar/consumer
+не поддерживают mandatory event-condition даже при заданном local binding.
+Read-only audit и 2 diagnostic tests выполнены; 07.2–07.5 NOT_RUN.
+Evidence и конечный verdict — в начале плана 07. Runtime не изменён.
 Цель — полезный bounded context с источниками, без обещания полного ответа.
 07 начат после `c49e5221`: baseline 74 PASS / 2 FAIL; 15 diagnostic calls.
 Пользователь согласовал узкое расширение condition scope в существующем compiler;
