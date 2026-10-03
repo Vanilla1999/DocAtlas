@@ -1,0 +1,175 @@
+{
+  "protocol": {
+    "schema_version": "evidence-quality-protocol-v2",
+    "baseline_code_sha": "e1daf4fa68f16f626068f2c58646e2ebfd4293f7",
+    "split_state": "frozen_development_benchmark; validation visible to implementing agent",
+    "unseen_validation": "NOT_MEASURED",
+    "case_count": 80,
+    "split_counts": {
+      "development": 40,
+      "frozen_validation_exposed": 40
+    },
+    "primary_outcome": "full approved evidence on within_budget cases; needs_review never PASS",
+    "secondary": "required fact coverage, separate literal score and non-full categories",
+    "variants": [
+      "A-current",
+      "B-no-canonical",
+      "C-lexical-replay",
+      "D-no-expansion-replay",
+      "L-explicit",
+      "L-duplicate",
+      "L-nearby"
+    ],
+    "grounded": {
+      "package": "@arabold/docs-mcp-server",
+      "version": "3.1.0",
+      "mode": "FTS-only",
+      "native_limits": [
+        1,
+        3,
+        5
+      ],
+      "controlled": "source-preserving adapter with 800 actual o200k_base tokens and <=3 blocks; reject unmappable reassembly, never invent contiguous ranges"
+    },
+    "tokenizer": {
+      "package": "tiktoken",
+      "version": "0.11.0",
+      "encoding": "o200k_base"
+    },
+    "promotion_thresholds": {
+      "observed_safety_violations": 0,
+      "p95_actual_tokens_ratio_max": 1.1,
+      "p95_query_latency_ratio_max": 1.25,
+      "primary_loss_max": 0
+    },
+    "bootstrap": {
+      "unit": "project_group",
+      "resamples": 2000,
+      "seed": 20260910,
+      "claim": "few groups; interval including zero is INCONCLUSIVE"
+    },
+    "host_control": {
+      "cases": [
+        "fastapi-04",
+        "starlette-03",
+        "typer-01",
+        "pydantic-02"
+      ],
+      "orders": [
+        "original",
+        "reverse",
+        "rotate_one"
+      ],
+      "repeats": 2,
+      "no_live_connection": "deterministic input assembly only; model outcomes and positional sensitivity NOT_MEASURED"
+    },
+    "safety": "unchanged production limits, authority, scope, version, support flags and frozen gates",
+    "source_sha256": "f0395dcc526161b51d9378ef3ac6d4c8a1a1bd2e323be0c4c6cff58f783b0985",
+    "cases_sha256": "4b01b66609f1a04a067062556c97de1e2fcccc41359ecabcb75ee1154fc0d67d",
+    "implementation_clarifications": [
+      {
+        "topic": "valid original duplicate",
+        "reason": "tools/list lookup_queries has uniqueItems=true; two identical array items are a validation-negative control, not a retrieval ablation",
+        "valid_L_duplicate": "one lookup equal to original question",
+        "algorithm_or_corpus_change": false
+      },
+      {
+        "topic": "Grounded incremental per-file ingest",
+        "reason": "CLI scrape defaults clean=true; use official --no-clean to retain the same selected document manifest",
+        "algorithm_or_corpus_change": false
+      }
+    ]
+  },
+  "native_capture_hashes": {
+    "fastapi-01": "23e93142f7fa630976da568664a6d1bd51bd6c63bb146d78c32b6a9658825dbd",
+    "fastapi-02": "1972a4c9ed4c2f815f6da421632176f5d91031690fd15b1a4a5e0445b1bbf488",
+    "fastapi-03": "1f67936a18fc1873afcbaba026b15b560b3a19918a73bfdea8d88a0c9a53b5d2",
+    "fastapi-04": "98365c1bdd3676168209b077d3b5728e6d12d718d3ca26f9f087ba3eb0246676",
+    "fastapi-05": "b24191c10d20ff64af8919ab2b8da6d6d3f98848fd4121a1e5286f95b4cd03ad",
+    "fastapi-06": "ee75fbf7861190feb22df30cf4e78627022a7a3b8378360ef3f56dba1afaed11",
+    "fastapi-07": "e9ae711391e6840872bb0f1b8fedcac2d6ae7f34bfd1e42782405abd602de909",
+    "fastapi-08": "5d9163973070e48cffd85fc026453c559ad020014f3612079f5629c3f606a228",
+    "fastapi-09": "a08ff54af346cafe7a4d49ad785efde8c2da58938ab948fec8e39fb284304238",
+    "fastapi-10": "6f1fe1467016b9f3df17ad6e2e96ff05976b69cae242e0c3ec93849c1ea665b1",
+    "starlette-01": "f9b206fc00d333ce54e3857e564acfb94197594bdb996fb93f0fb8167f4d508f",
+    "starlette-02": "fdf40c359d569e433aac122764c1fe71ca9617d170db8d37cd1c352b160dfde2",
+    "starlette-03": "e0c383c64b7c7fa67896f59827539ce2b34bcd9a559fe784ca251e807bcef1d6",
+    "starlette-04": "b38da350585f77fd3d8c176c10ef82d7d2658a2bbccf188cb7fb1b2a0648aa42",
+    "starlette-05": "75de2e71cea230e1f32b49d8a2b1b7503645a1da3ca9c6223e81a89819092016",
+    "starlette-06": "ac1367d4e939fe084df571c9df7c25a697b4b6c2ffe882313a36735558ebe723",
+    "starlette-07": "8ee95d648c9f93896176ba306407422948800e9151420f1845ed1811b99d7781",
+    "starlette-08": "77307c5b5a1bce25995b6b2cd1492df650d916a4e232711ed34e49e066688d96",
+    "starlette-09": "26f1f976ac0c67b045481c2bf73e8d1318e03c02d11933009bd6f93ca322fbab",
+    "starlette-10": "53d69434f9cb5b985617e58f5f18980d333805de9536c7d32401f36a65598b7d",
+    "typer-01": "d422c59b532e9e9a38961b4fb29d4723f7ad90ada5cedad686a04b70be3e693c",
+    "typer-02": "10dc2243c1f8c8acb27cafe19d98f6e126bf69471d194b0731d50e4bd72ecfe0",
+    "typer-03": "02102475fe017c21b073e37dd008cda8ee4d386287c0cec895f35a78b3ea5c2f",
+    "typer-04": "a047f03e65e9ed48bd5ac6fc7599146cbb9eac0b04a302bbbacc4069a522d91a",
+    "typer-05": "cd307ce366cf056d724e2f458bc8fd9b8645702bbdff98634d20cd5c41af5ca6",
+    "typer-06": "dabb07366cccd71f9388e2a1b2bd603c86783c2b866a779d4d1d6166fae42060",
+    "typer-07": "2a6438c9cbe4a6045126a49feb2d0fa51fe3045f657aa8a8070425c774a41122",
+    "typer-08": "4e0d0ccc819d10a601259590f690015769f7f71de6e05f23e0cbb3777a6e4acd",
+    "typer-09": "2d47531ad413c3e0ff7c2921e38ec6c45f58b3fef42fd556271fbcdb61498334",
+    "typer-10": "1e58084259713971ef6ef74d5d9e1a7863928c7424dde3512d3e637ddd01f993",
+    "pydantic-01": "028629cc1e5dbe31c8d85305aaafb48bf1c99dac5404674f2d33821db903f5cf",
+    "pydantic-02": "b6dba75a24f0e011089ada4bec764e1a8cead3965abc5848b49e31db4cf4be12",
+    "pydantic-03": "67b18f454d75e24c9207fe144b93a2beca5979a89c8d5f905cc0fd8586ff3467",
+    "pydantic-04": "dd87153b9fd1bdebc56bff4c3c87c026b034dc661401b7192a54a72f312094d3",
+    "pydantic-05": "2278b58793d7b83a720d90a72b5a053978b861c3c9f641a53837a160bef145b2",
+    "pydantic-06": "dfc67c7595be6608e43b248c251394341025d587ed48c123300324b3c9e8aa46",
+    "pydantic-07": "956b09ea8d409c0af84dfb7bf60d5e01befd16193024d75bdb6d554f1b3a3df8",
+    "pydantic-08": "981d32160598213ae4783741a0aec3346a2a23ba9b53e5ad7fc432a474c39af2",
+    "pydantic-09": "7ea4b48da444336d33965d64b63fbb60bcc74fe36581be25de91d7b1cf914a7a",
+    "pydantic-10": "cb6093bd73da856d112ea2b9cd775889fa34cc4b709c62fa5b67dbbef09bffcf",
+    "httpx-01": "b9451f670d7e171676326584552d06ee1ed78749d05823c9d740f3ea1840e306",
+    "httpx-02": "db16dbaa050cc394d4e6521ef1fcebc03594e010ea76b712cf3b55364a916bb7",
+    "httpx-03": "ebbe6a0012dba9b61f92d7d3bb67866c7c7cc89fcd1920e1facb031c54c8a67f",
+    "httpx-04": "ef21b1ad683934ad9e8bce45710251fcd70c5c23f00b92210b80c4ef4fb8c218",
+    "httpx-05": "4a16d9531dc2f19cdbd32b2343b93a6fcf32cefb619c49e32d39133307be7442",
+    "httpx-06": "8f599c2ed0940321778b89af89e48cc74b7fdd854c38f2bc316b5d59871dac88",
+    "httpx-07": "35720e5aa1e51bcfc20e050c57e80dd4120256ff7ed5b59aea235df454c7a6e6",
+    "httpx-08": "5a98f419b5f73c15aad07482cb6d1203ed8f7321d6f30aa8ee5187bdfd329da8",
+    "httpx-09": "e0b34af223a5fa790cbe6041e4329d615e00fd2774f7313286973c04023f3d7a",
+    "httpx-10": "9e7f4f9a5fcdfdb2346f40097f32e8e819d407c6f2b79fc5a2854767c7720870",
+    "mkdocs-01": "a0129b71aad35dd118def10719ea92f76a3636ee2d8dcd7e711534ed6fc05dbd",
+    "mkdocs-02": "3ac9471ac69ce91e6f294122c89253ee2d589b3dfcafa886e30c56ad07818314",
+    "mkdocs-03": "5a44d051d97d69f4a6077d2205033cadb7750d686a5ad7a6d4ca60359a490bd6",
+    "mkdocs-04": "d155a973d5974bf32d23f3d0c9cb97aecc05a5a8241a0304e84f6b0c9294a63c",
+    "mkdocs-05": "f95ff684e02ad262fc24b7d095bfedfbc530554491c9f871cca0c9e1ec7481d1",
+    "mkdocs-06": "40cd45a80e0f6faeb8c55037002a17fe78ccc5b27161766cf42037eddf6a2e64",
+    "mkdocs-07": "4cd50f1d4e90a9c9c5b2d809e0d3c50d9bfe153d489380b4d36c012fee6616b9",
+    "mkdocs-08": "e72548032338776a3f1487d71ce144a1c08cc28cbe9f3373404984d550fcd99e",
+    "mkdocs-09": "50483d142c0e2b859a8a3744a872f23e97918324d98fcdb3c3f5e7b78fd9fbc5",
+    "mkdocs-10": "62a0e40a495cfc05c6737922e765f58012a6e0ad373b5e12800489e39ee0c242",
+    "ruff-01": "e64408d401b5b4d98cb1af86abccb7121c7135031231220a6a81031645f18d18",
+    "ruff-02": "891b2c284b58dbe72947e09385dbbbc5fc875e75ae4934b28f945582b71f1bc6",
+    "ruff-03": "678eb69930caafcd1fda3f903aab363dc4eb2bf7545eef6015448c41db030122",
+    "ruff-04": "83281d66ad5e80f2c2916f955f3988c5ae9235b8c3efb18f241279058b733f3c",
+    "ruff-05": "cd57e499c543bf56b4ecab1d75f7e546c07e64dae71afd2882e618ccac29f099",
+    "ruff-06": "55e543e3f3172de7d57be2f16a4d0a938fb8db6df2aa7b1d3a6dc8671f5a1afb",
+    "ruff-07": "367a5c85f8223a014b43ab4099bb9f4efdf8b25923a67d916c578a49e75ad6b3",
+    "ruff-08": "ac894ab1d8d13344d8fb57c9905d4ac598d914ab7fccd86dfeae2ea52482a6ca",
+    "ruff-09": "ed132d0fa22de779018e5dc613523caef6f8df36b9204b88aac41c0de6d59ba3",
+    "ruff-10": "a09c294c2f535abb4f1b0315740a9dc49028693007c44882918456127025db3d",
+    "uv-01": "2b6d36624478f915049aff176e1dd57e17c236e40c3268c1cad9603fd99f313e",
+    "uv-02": "46acaedcbeeea7a040123c2e2665a671848ec10cde4074d3b90b876ad1e5faaa",
+    "uv-03": "60ff004aa152e2796f8279a8d0dd9164813e13efcb67de26f78a271a87c8db1b",
+    "uv-04": "3f4f2b477309d9b2c72243e9f9e1c4adcb634b8484b86076f540d8a945c55517",
+    "uv-05": "f3529ac569044eab935184ca60856937fe15e8e7a1cfbe173b108db7ef1387fc",
+    "uv-06": "6c6914ff850ca71835d9b03781b9e4699232cb823e854708f56348922449d22c",
+    "uv-07": "5a117dfe011cbd4b7918d86f72f0d7000bb6da391e21ce0b8f3e39ebe44818ec",
+    "uv-08": "5c63845cc6890badd48e92c8b0375fcbc00a8afb4255624e52ed2f1ab8d27d68",
+    "uv-09": "561584fab4836a9b27c766e614a1497078321692ce49450f323bbf40cd2d832a",
+    "uv-10": "e013d8f8195f7b18c37a01fdb0c52586df63010d7bcdf14abc2393fdc1681cd3"
+  },
+  "code_hashes": {
+    "unified_read_admission.py": "627cc31395596bb68adff42c00f9d12103e97962febe5bffc939e24167a6bf8a",
+    "unified_read_replay.py": "85ffa75e662a9a8827ac1f7b4bb632dffc04b022e9e3413ab8e9cae1466795fb",
+    "grounded_budget_probe.py": "35d12d5c07c35cf91b555d5e7964bf9655e8dda94e9c7dbe71974ea23343a133"
+  },
+  "input": "/home/viadmin/.cache/docatlas-experiments/grounded-budget-20261003-06",
+  "retrieval_replayed": false,
+  "compiler_changed": false,
+  "source_reads": "archived read-only snapshots",
+  "scope": "isolated read arms, not full native pipeline"
+}

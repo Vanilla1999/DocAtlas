@@ -1,0 +1,14 @@
+{
+  "code_hashes": {
+    "typed_constraint_compiler.py": "3e52f7ac32d980cfae04b2236969d592324955db154e3c5bb9ec44c93b06da42",
+    "typed_constraint_replay.py": "85346f0768401814ab21ae6990fc40e918611216f6a1d7065f479f48aaa6aabd",
+    "temporal_condition_probe.py": "b54517021dbc83d98a76da0abfd1f74f46f8ff16ce95bb0e97c8236c13aa3f7a"
+  },
+  "previous_results_sha256": "ad92e36e1735657c38a83186348da4f8f5e219e181922b6d97a41324281e9be3",
+  "substitution": [
+    "read_context_admission.compile_need_contracts",
+    "admission_layer_probe.compile_need_contracts"
+  ],
+  "restored": true,
+  "diagnostic_only": true
+}

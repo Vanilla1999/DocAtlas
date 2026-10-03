@@ -1,0 +1,15 @@
+{
+  "synthetic_pairs": 14,
+  "frozen_cases_with_constraints": 13,
+  "temporal_case_ids": [
+    "fastapi-01",
+    "fastapi-07",
+    "starlette-03"
+  ],
+  "temporal_corrected_first_veto": {
+    "missing_bound_subject": 5,
+    "missing_local_demand": 1,
+    "condition_support_unavailable": 6
+  },
+  "note": "Labels are post-hoc diagnostics only. No oracle-conditioned admission or replay with removed veto."
+}

@@ -1,0 +1,118 @@
+============================= test session starts ==============================
+platform linux -- Python 3.13.12, pytest-9.0.3, pluggy-1.6.0 -- /home/viadmin/StudioProjects/hermes/docmancer/.venv/bin/python
+cachedir: .pytest_cache
+rootdir: /home/viadmin/StudioProjects/hermes/docmancer
+configfile: pytest.ini
+plugins: anyio-4.13.0, asyncio-1.4.0
+asyncio: mode=Mode.AUTO, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collecting ... collected 89 items
+
+tests/docs/test_reranker_rescue.py::test_mixed_ru_typer_gold_outranks_distractor SKIPPED [  1%]
+tests/docs/test_reranker_rescue.py::test_pure_ru_typer_gold_outranks_distractor SKIPPED [  2%]
+tests/docs/test_reranker_rescue.py::test_en_control_not_degraded PASSED  [  3%]
+tests/docs/test_reranker_rescue.py::test_wrong_project_rejected_with_reranker SKIPPED [  4%]
+tests/docs/test_reranker_rescue.py::test_nan_scorer_fail_closed PASSED   [  5%]
+tests/docs/test_reranker_rescue.py::test_unavailable_scorer_fail_closed PASSED [  6%]
+tests/docs/test_reranker_rescue.py::test_reranker_admission_no_answer_authority SKIPPED [  7%]
+tests/docs/test_reranker_rescue.py::test_literal_space_slash_preserved SKIPPED [  8%]
+tests/docs/test_multilingual_first_packet.py::test_mixed_russian_first_packet_carries_negative_name_rule FAILED [ 10%]
+tests/docs/test_multilingual_first_packet.py::test_pure_russian_first_packet_carries_negative_name_rule FAILED [ 11%]
+tests/docs/test_multilingual_first_packet.py::test_english_first_packet_control PASSED [ 12%]
+tests/docs/test_multilingual_first_packet.py::test_packaging_control_english_projector_output PASSED [ 13%]
+experiments/crosslingual_relevance/tests/test_review_audit_guards.py::test_all_blocks_ranked_before_gold_labels_are_attached PASSED [ 14%]
+experiments/crosslingual_relevance/tests/test_review_audit_guards.py::test_gold_first_input_does_not_bias_score_ties PASSED [ 15%]
+experiments/crosslingual_relevance/tests/test_review_audit_guards.py::test_ranking_rejects_nonfinite_rows[nan] PASSED [ 16%]
+experiments/crosslingual_relevance/tests/test_review_audit_guards.py::test_ranking_rejects_nonfinite_rows[inf] PASSED [ 17%]
+experiments/crosslingual_relevance/tests/test_review_audit_guards.py::test_ranking_rejects_nonfinite_rows[-inf] PASSED [ 19%]
+experiments/crosslingual_relevance/tests/test_review_audit_guards.py::test_new_reports_cannot_overwrite_an_existing_result PASSED [ 20%]
+experiments/crosslingual_relevance/tests/test_review_audit_guards.py::test_nonfinite_metrics_are_not_written_as_json_nan PASSED [ 21%]
+experiments/crosslingual_relevance/tests/test_review_audit_guards.py::test_all_required_claims_are_anded_but_alternative_witnesses_are_ored PASSED [ 22%]
+experiments/crosslingual_relevance/tests/test_review_audit_guards.py::test_bad_source_coordinates_or_digest_are_never_gold[line_start-True] PASSED [ 23%]
+experiments/crosslingual_relevance/tests/test_review_audit_guards.py::test_bad_source_coordinates_or_digest_are_never_gold[line_start-0] PASSED [ 24%]
+experiments/crosslingual_relevance/tests/test_review_audit_guards.py::test_bad_source_coordinates_or_digest_are_never_gold[line_end-9999] PASSED [ 25%]
+experiments/crosslingual_relevance/tests/test_review_audit_guards.py::test_bad_source_coordinates_or_digest_are_never_gold[source_content_hash-0000000000000000000000000000000000000000000000000000000000000000] PASSED [ 26%]
+experiments/crosslingual_relevance/tests/test_review_audit_guards.py::test_bad_source_coordinates_or_digest_are_never_gold[path_or_url-timeouts.md] PASSED [ 28%]
+experiments/crosslingual_relevance/tests/test_review_audit_guards.py::test_model_manifest_binds_actual_files_not_block_count PASSED [ 29%]
+experiments/crosslingual_relevance/tests/test_review_audit_guards.py::test_model_file_tampering_is_rejected[config.json] PASSED [ 30%]
+experiments/crosslingual_relevance/tests/test_review_audit_guards.py::test_model_file_tampering_is_rejected[onnx/model.onnx] PASSED [ 31%]
+experiments/crosslingual_relevance/tests/test_review_audit_guards.py::test_model_file_tampering_is_rejected[special_tokens_map.json] PASSED [ 32%]
+experiments/crosslingual_relevance/tests/test_review_audit_guards.py::test_model_file_tampering_is_rejected[tokenizer.json] PASSED [ 33%]
+experiments/crosslingual_relevance/tests/test_review_audit_guards.py::test_model_file_tampering_is_rejected[tokenizer_config.json] PASSED [ 34%]
+experiments/crosslingual_relevance/tests/test_review_audit_guards.py::test_extra_model_file_is_not_silently_unpinned PASSED [ 35%]
+experiments/crosslingual_relevance/tests/test_review_audit_guards.py::test_corrupted_manifest_is_rejected PASSED [ 37%]
+experiments/crosslingual_relevance/tests/test_review_audit_guards.py::test_repository_name_cannot_masquerade_as_revision PASSED [ 38%]
+experiments/crosslingual_relevance/tests/test_review_audit_guards.py::test_external_model_symlink_is_rejected PASSED [ 39%]
+experiments/crosslingual_relevance/tests/test_review_audit_guards.py::test_actual_tokenizer_used_length_is_separate_from_full_input PASSED [ 40%]
+experiments/crosslingual_relevance/tests/test_review_audit_guards.py::test_other_threads_never_inherit_the_installing_question PASSED [ 41%]
+experiments/crosslingual_relevance/tests/test_review_audit_guards.py::test_overlapping_installation_fails_without_leaking_patches PASSED [ 42%]
+experiments/crosslingual_relevance/tests/test_review_audit_guards.py::test_score_trace_is_bounded_and_explicit_about_dropped_events PASSED [ 43%]
+experiments/crosslingual_relevance/tests/test_review_audit_guards.py::test_opt_in_actual_input_capture_and_source_binding PASSED [ 44%]
+experiments/crosslingual_relevance/tests/test_review_audit_guards.py::test_logit_score_requires_explicit_unbounded_finite_score_contract PASSED [ 46%]
+experiments/crosslingual_relevance/tests/test_review_audit_guards.py::test_oracle_can_never_count_as_model_quality_even_when_all_claims_present PASSED [ 47%]
+experiments/crosslingual_relevance/tests/test_review_execution_modes.py::test_default_m6_path_does_not_construct_gold_oracle PASSED [ 48%]
+experiments/crosslingual_relevance/tests/test_review_execution_modes.py::test_real_model_without_pinned_local_artifacts_fails_before_loading PASSED [ 49%]
+experiments/crosslingual_relevance/tests/test_review_execution_modes.py::test_unloaded_model_is_not_advertised_as_pinned PASSED [ 50%]
+experiments/crosslingual_relevance/tests/test_review_execution_modes.py::test_zero_embedding_is_not_a_valid_cosine_observation PASSED [ 51%]
+experiments/crosslingual_relevance/tests/test_review_metrics.py::test_recall_is_not_hit_rate PASSED [ 52%]
+experiments/crosslingual_relevance/tests/test_review_metrics.py::test_file_or_overlap_without_canonical_fact_is_not_gold[metadata0] PASSED [ 53%]
+experiments/crosslingual_relevance/tests/test_review_metrics.py::test_file_or_overlap_without_canonical_fact_is_not_gold[metadata1] PASSED [ 55%]
+experiments/crosslingual_relevance/tests/test_review_metrics.py::test_file_or_overlap_without_canonical_fact_is_not_gold[metadata2] PASSED [ 56%]
+experiments/crosslingual_relevance/tests/test_review_metrics.py::test_file_or_overlap_without_canonical_fact_is_not_gold[metadata3] PASSED [ 57%]
+experiments/crosslingual_relevance/tests/test_review_metrics.py::test_file_or_overlap_without_canonical_fact_is_not_gold[metadata4] PASSED [ 58%]
+experiments/crosslingual_relevance/tests/test_review_metrics.py::test_correct_source_and_complete_witness_are_recognised PASSED [ 59%]
+experiments/crosslingual_relevance/tests/test_review_metrics.py::test_wrong_project_cannot_borrow_same_file_path_and_text PASSED [ 60%]
+experiments/crosslingual_relevance/tests/test_review_metrics.py::test_one_typer_clause_is_not_the_entire_answer PASSED [ 61%]
+experiments/crosslingual_relevance/tests/test_review_metrics.py::test_keyword_only_does_not_prove_teardown_order PASSED [ 62%]
+experiments/crosslingual_relevance/tests/test_review_metrics.py::test_default_duration_requires_exception_and_inactivity_not_just_number PASSED [ 64%]
+experiments/crosslingual_relevance/tests/test_review_model_adapter.py::test_self_consistent_but_unsupported_inference_lock_is_rejected PASSED [ 65%]
+experiments/crosslingual_relevance/tests/test_review_model_adapter.py::test_real_provider_reuses_exact_checked_model_object PASSED [ 66%]
+experiments/crosslingual_relevance/tests/test_review_model_adapter.py::test_invalid_provider_probe_cannot_silently_keep_declared_dimensions PASSED [ 67%]
+experiments/crosslingual_relevance/tests/test_review_model_adapter.py::test_token_telemetry_failure_fails_closed PASSED [ 68%]
+experiments/crosslingual_relevance/tests/test_review_scorer_contracts.py::test_nonfinite_scores_fail_closed[nan] PASSED [ 69%]
+experiments/crosslingual_relevance/tests/test_review_scorer_contracts.py::test_nonfinite_scores_fail_closed[inf] PASSED [ 70%]
+experiments/crosslingual_relevance/tests/test_review_scorer_contracts.py::test_nonfinite_scores_fail_closed[-inf] PASSED [ 71%]
+experiments/crosslingual_relevance/tests/test_review_scorer_contracts.py::test_invalid_threshold_is_rejected_before_inference[nan] PASSED [ 73%]
+experiments/crosslingual_relevance/tests/test_review_scorer_contracts.py::test_invalid_threshold_is_rejected_before_inference[inf] PASSED [ 74%]
+experiments/crosslingual_relevance/tests/test_review_scorer_contracts.py::test_invalid_threshold_is_rejected_before_inference[-inf] PASSED [ 75%]
+experiments/crosslingual_relevance/tests/test_review_scorer_contracts.py::test_out_of_range_cosine_is_an_error[1.01] PASSED [ 76%]
+experiments/crosslingual_relevance/tests/test_review_scorer_contracts.py::test_out_of_range_cosine_is_an_error[-1.01] PASSED [ 77%]
+experiments/crosslingual_relevance/tests/test_review_scorer_contracts.py::test_negative_cosine_is_valid_not_an_execution_error PASSED [ 78%]
+experiments/crosslingual_relevance/tests/test_review_scorer_contracts.py::test_invalid_execution_limits_are_rejected[kwargs0] PASSED [ 79%]
+experiments/crosslingual_relevance/tests/test_review_scorer_contracts.py::test_invalid_execution_limits_are_rejected[kwargs1] PASSED [ 80%]
+experiments/crosslingual_relevance/tests/test_review_scorer_contracts.py::test_invalid_execution_limits_are_rejected[kwargs2] PASSED [ 82%]
+experiments/crosslingual_relevance/tests/test_review_scorer_contracts.py::test_invalid_execution_limits_are_rejected[kwargs3] PASSED [ 83%]
+experiments/crosslingual_relevance/tests/test_review_scorer_contracts.py::test_invalid_execution_limits_are_rejected[kwargs4] PASSED [ 84%]
+experiments/crosslingual_relevance/tests/test_review_scorer_contracts.py::test_invalid_execution_limits_are_rejected[kwargs5] PASSED [ 85%]
+experiments/crosslingual_relevance/tests/test_review_scorer_contracts.py::test_invalid_execution_limits_are_rejected[kwargs6] PASSED [ 86%]
+experiments/crosslingual_relevance/tests/test_review_scorer_contracts.py::test_invalid_execution_limits_are_rejected[kwargs7] PASSED [ 87%]
+experiments/crosslingual_relevance/tests/test_review_scorer_contracts.py::test_one_deadline_applies_to_the_stage_not_each_call PASSED [ 88%]
+experiments/crosslingual_relevance/tests/test_review_scorer_contracts.py::test_deadline_includes_idle_time_between_stage_calls PASSED [ 89%]
+experiments/crosslingual_relevance/tests/test_review_scorer_contracts.py::test_cache_hit_is_observable_and_does_not_consume_evaluation_budget PASSED [ 91%]
+experiments/crosslingual_relevance/tests/test_review_scorer_contracts.py::test_short_rule_is_not_silently_discarded_by_arbitrary_80_character_cutoff PASSED [ 92%]
+experiments/crosslingual_relevance/tests/test_review_scorer_contracts.py::test_nested_installation_fails_without_replacing_outer_question PASSED [ 93%]
+experiments/crosslingual_relevance/tests/test_review_scorer_contracts.py::test_scoring_exception_fails_closed PASSED [ 94%]
+experiments/crosslingual_relevance/tests/test_review_scorer_contracts.py::test_only_lexical_rejection_can_be_rescued PASSED [ 95%]
+experiments/crosslingual_relevance/tests/test_review_step2_metrics.py::test_step2_does_not_certify_filename_or_overlap[row0] PASSED [ 96%]
+experiments/crosslingual_relevance/tests/test_review_step2_metrics.py::test_step2_does_not_certify_filename_or_overlap[row1] PASSED [ 97%]
+experiments/crosslingual_relevance/tests/test_review_step2_metrics.py::test_step2_does_not_certify_filename_or_overlap[row2] PASSED [ 98%]
+experiments/crosslingual_relevance/tests/test_review_step2_metrics.py::test_step2_accepts_complete_canonical_statement PASSED [100%]
+
+=================================== FAILURES ===================================
+__________ test_mixed_russian_first_packet_carries_negative_name_rule __________
+tests/docs/test_multilingual_first_packet.py:72: in test_mixed_russian_first_packet_carries_negative_name_rule
+    _assert_gold_in_first_packet(payload)
+tests/docs/test_multilingual_first_packet.py:58: in _assert_gold_in_first_packet
+    assert phrase in visible, f"gold phrase missing from first packet: {phrase!r}"
+E   AssertionError: gold phrase missing from first packet: 'only *CLI option* names to set the `False` value'
+E   assert 'only *CLI option* names to set the `False` value' in ''
+__________ test_pure_russian_first_packet_carries_negative_name_rule ___________
+tests/docs/test_multilingual_first_packet.py:83: in test_pure_russian_first_packet_carries_negative_name_rule
+    _assert_gold_in_first_packet(payload)
+tests/docs/test_multilingual_first_packet.py:58: in _assert_gold_in_first_packet
+    assert phrase in visible, f"gold phrase missing from first packet: {phrase!r}"
+E   AssertionError: gold phrase missing from first packet: 'only *CLI option* names to set the `False` value'
+E   assert 'only *CLI option* names to set the `False` value' in ''
+=========================== short test summary info ============================
+FAILED tests/docs/test_multilingual_first_packet.py::test_mixed_russian_first_packet_carries_negative_name_rule
+FAILED tests/docs/test_multilingual_first_packet.py::test_pure_russian_first_packet_carries_negative_name_rule
+=================== 2 failed, 82 passed, 5 skipped in 2.67s ====================

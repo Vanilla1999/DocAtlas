@@ -1,0 +1,568 @@
+[
+  {
+    "id": "temporal-en",
+    "diagnostic_label": "temporal_question",
+    "question": "When do QueueTasks run relative to returning the response?",
+    "body": "QueueTasks run only after the response has been sent.",
+    "contracts": [
+      {
+        "need_id": "sentence-1",
+        "query_span": "When do QueueTasks run relative to returning the response?",
+        "compiler_interpretation": "supported",
+        "constraint_spans": [
+          {
+            "start": 0,
+            "end": 58
+          }
+        ],
+        "constraint_text": [
+          "When do QueueTasks run relative to returning the response?"
+        ],
+        "parsed_frame": {
+          "operator": "temporal_order",
+          "arguments": [
+            {
+              "role": "subject",
+              "start": 8,
+              "end": 18,
+              "text": "QueueTasks",
+              "canonical": "QueueTasks"
+            },
+            {
+              "role": "event",
+              "start": 35,
+              "end": 57,
+              "text": "returning the response",
+              "canonical": "returning the response"
+            }
+          ],
+          "constraints": []
+        },
+        "existing_applicability": false
+      }
+    ],
+    "diagnostic_only": true
+  },
+  {
+    "id": "temporal-ru",
+    "diagnostic_label": "temporal_question",
+    "question": "Когда начинается lifespan teardown относительно connections и background tasks?",
+    "body": "The lifespan teardown will run once all connections have been closed, and any in-process background tasks have completed.",
+    "contracts": [
+      {
+        "need_id": "sentence-1",
+        "query_span": "Когда начинается lifespan teardown относительно connections и background tasks?",
+        "compiler_interpretation": "unresolved",
+        "constraint_spans": [
+          {
+            "start": 0,
+            "end": 79
+          }
+        ],
+        "constraint_text": [
+          "Когда начинается lifespan teardown относительно connections и background tasks?"
+        ],
+        "parsed_frame": null,
+        "existing_applicability": false
+      }
+    ],
+    "diagnostic_only": true
+  },
+  {
+    "id": "temporal-with-state",
+    "diagnostic_label": "temporal_and_scenario",
+    "question": "When do QueueTasks run when preview is disabled?",
+    "body": "When preview is disabled, QueueTasks run after the response.",
+    "contracts": [
+      {
+        "need_id": "sentence-1",
+        "query_span": "When do QueueTasks run when preview is disabled?",
+        "compiler_interpretation": "unresolved",
+        "constraint_spans": [
+          {
+            "start": 0,
+            "end": 48
+          }
+        ],
+        "constraint_text": [
+          "When do QueueTasks run when preview is disabled?"
+        ],
+        "parsed_frame": null,
+        "existing_applicability": false
+      }
+    ],
+    "diagnostic_only": true
+  },
+  {
+    "id": "temporal-unless",
+    "diagnostic_label": "temporal_and_exception",
+    "question": "When do QueueTasks run unless preview is enabled?",
+    "body": "QueueTasks run after the response unless preview is enabled.",
+    "contracts": [
+      {
+        "need_id": "sentence-1",
+        "query_span": "When do QueueTasks run unless preview is enabled?",
+        "compiler_interpretation": "unresolved",
+        "constraint_spans": [
+          {
+            "start": 0,
+            "end": 49
+          }
+        ],
+        "constraint_text": [
+          "When do QueueTasks run unless preview is enabled?"
+        ],
+        "parsed_frame": null,
+        "existing_applicability": false
+      }
+    ],
+    "diagnostic_only": true
+  },
+  {
+    "id": "scenario-default-match",
+    "diagnostic_label": "state_condition",
+    "question": "What is OrbitClient default timeout when preview is disabled?",
+    "body": "When preview is disabled, OrbitClient default timeout is 7 seconds.",
+    "contracts": [
+      {
+        "need_id": "sentence-1",
+        "query_span": "What is OrbitClient default timeout when preview is disabled?",
+        "compiler_interpretation": "supported",
+        "constraint_spans": [
+          {
+            "start": 36,
+            "end": 61
+          }
+        ],
+        "constraint_text": [
+          "when preview is disabled?"
+        ],
+        "parsed_frame": {
+          "operator": "default",
+          "arguments": [
+            {
+              "role": "subject",
+              "start": 8,
+              "end": 19,
+              "text": "OrbitClient",
+              "canonical": "OrbitClient"
+            },
+            {
+              "role": "attribute",
+              "start": 28,
+              "end": 35,
+              "text": "timeout",
+              "canonical": "timeout"
+            }
+          ],
+          "constraints": [
+            {
+              "role": "condition_subject",
+              "start": 41,
+              "end": 48,
+              "text": "preview",
+              "canonical": "preview"
+            },
+            {
+              "role": "condition_state",
+              "start": 52,
+              "end": 60,
+              "text": "disabled",
+              "canonical": "disabled"
+            }
+          ]
+        },
+        "existing_applicability": true
+      }
+    ],
+    "diagnostic_only": true
+  },
+  {
+    "id": "scenario-default-wrong-state",
+    "diagnostic_label": "state_condition",
+    "question": "What is OrbitClient default timeout when preview is disabled?",
+    "body": "When preview is enabled, OrbitClient default timeout is 7 seconds.",
+    "contracts": [
+      {
+        "need_id": "sentence-1",
+        "query_span": "What is OrbitClient default timeout when preview is disabled?",
+        "compiler_interpretation": "supported",
+        "constraint_spans": [
+          {
+            "start": 36,
+            "end": 61
+          }
+        ],
+        "constraint_text": [
+          "when preview is disabled?"
+        ],
+        "parsed_frame": {
+          "operator": "default",
+          "arguments": [
+            {
+              "role": "subject",
+              "start": 8,
+              "end": 19,
+              "text": "OrbitClient",
+              "canonical": "OrbitClient"
+            },
+            {
+              "role": "attribute",
+              "start": 28,
+              "end": 35,
+              "text": "timeout",
+              "canonical": "timeout"
+            }
+          ],
+          "constraints": [
+            {
+              "role": "condition_subject",
+              "start": 41,
+              "end": 48,
+              "text": "preview",
+              "canonical": "preview"
+            },
+            {
+              "role": "condition_state",
+              "start": 52,
+              "end": 60,
+              "text": "disabled",
+              "canonical": "disabled"
+            }
+          ]
+        },
+        "existing_applicability": false
+      }
+    ],
+    "diagnostic_only": true
+  },
+  {
+    "id": "scenario-default-missing-state",
+    "diagnostic_label": "state_condition",
+    "question": "What is OrbitClient default timeout when preview is disabled?",
+    "body": "OrbitClient default timeout is 7 seconds.",
+    "contracts": [
+      {
+        "need_id": "sentence-1",
+        "query_span": "What is OrbitClient default timeout when preview is disabled?",
+        "compiler_interpretation": "supported",
+        "constraint_spans": [
+          {
+            "start": 36,
+            "end": 61
+          }
+        ],
+        "constraint_text": [
+          "when preview is disabled?"
+        ],
+        "parsed_frame": {
+          "operator": "default",
+          "arguments": [
+            {
+              "role": "subject",
+              "start": 8,
+              "end": 19,
+              "text": "OrbitClient",
+              "canonical": "OrbitClient"
+            },
+            {
+              "role": "attribute",
+              "start": 28,
+              "end": 35,
+              "text": "timeout",
+              "canonical": "timeout"
+            }
+          ],
+          "constraints": [
+            {
+              "role": "condition_subject",
+              "start": 41,
+              "end": 48,
+              "text": "preview",
+              "canonical": "preview"
+            },
+            {
+              "role": "condition_state",
+              "start": 52,
+              "end": 60,
+              "text": "disabled",
+              "canonical": "disabled"
+            }
+          ]
+        },
+        "existing_applicability": false
+      }
+    ],
+    "diagnostic_only": true
+  },
+  {
+    "id": "scenario-default-wrong-subject",
+    "diagnostic_label": "state_condition",
+    "question": "What is OrbitClient default timeout when preview is disabled?",
+    "body": "When preview is disabled, OtherClient default timeout is 7 seconds.",
+    "contracts": [
+      {
+        "need_id": "sentence-1",
+        "query_span": "What is OrbitClient default timeout when preview is disabled?",
+        "compiler_interpretation": "supported",
+        "constraint_spans": [
+          {
+            "start": 36,
+            "end": 61
+          }
+        ],
+        "constraint_text": [
+          "when preview is disabled?"
+        ],
+        "parsed_frame": {
+          "operator": "default",
+          "arguments": [
+            {
+              "role": "subject",
+              "start": 8,
+              "end": 19,
+              "text": "OrbitClient",
+              "canonical": "OrbitClient"
+            },
+            {
+              "role": "attribute",
+              "start": 28,
+              "end": 35,
+              "text": "timeout",
+              "canonical": "timeout"
+            }
+          ],
+          "constraints": [
+            {
+              "role": "condition_subject",
+              "start": 41,
+              "end": 48,
+              "text": "preview",
+              "canonical": "preview"
+            },
+            {
+              "role": "condition_state",
+              "start": 52,
+              "end": 60,
+              "text": "disabled",
+              "canonical": "disabled"
+            }
+          ]
+        },
+        "existing_applicability": false
+      }
+    ],
+    "diagnostic_only": true
+  },
+  {
+    "id": "scenario-negated-state-match",
+    "diagnostic_label": "negated_state_condition",
+    "question": "What is OrbitClient default timeout when preview is not enabled?",
+    "body": "When preview is disabled, OrbitClient default timeout is 7 seconds.",
+    "contracts": [
+      {
+        "need_id": "sentence-1",
+        "query_span": "What is OrbitClient default timeout when preview is not enabled?",
+        "compiler_interpretation": "supported",
+        "constraint_spans": [
+          {
+            "start": 36,
+            "end": 64
+          }
+        ],
+        "constraint_text": [
+          "when preview is not enabled?"
+        ],
+        "parsed_frame": {
+          "operator": "default",
+          "arguments": [
+            {
+              "role": "subject",
+              "start": 8,
+              "end": 19,
+              "text": "OrbitClient",
+              "canonical": "OrbitClient"
+            },
+            {
+              "role": "attribute",
+              "start": 28,
+              "end": 35,
+              "text": "timeout",
+              "canonical": "timeout"
+            }
+          ],
+          "constraints": [
+            {
+              "role": "condition_subject",
+              "start": 41,
+              "end": 48,
+              "text": "preview",
+              "canonical": "preview"
+            },
+            {
+              "role": "condition_state",
+              "start": 52,
+              "end": 63,
+              "text": "not enabled",
+              "canonical": "disabled"
+            }
+          ]
+        },
+        "existing_applicability": true
+      }
+    ],
+    "diagnostic_only": true
+  },
+  {
+    "id": "scenario-negated-state-wrong",
+    "diagnostic_label": "negated_state_condition",
+    "question": "What is OrbitClient default timeout when preview is not enabled?",
+    "body": "When preview is enabled, OrbitClient default timeout is 7 seconds.",
+    "contracts": [
+      {
+        "need_id": "sentence-1",
+        "query_span": "What is OrbitClient default timeout when preview is not enabled?",
+        "compiler_interpretation": "supported",
+        "constraint_spans": [
+          {
+            "start": 36,
+            "end": 64
+          }
+        ],
+        "constraint_text": [
+          "when preview is not enabled?"
+        ],
+        "parsed_frame": {
+          "operator": "default",
+          "arguments": [
+            {
+              "role": "subject",
+              "start": 8,
+              "end": 19,
+              "text": "OrbitClient",
+              "canonical": "OrbitClient"
+            },
+            {
+              "role": "attribute",
+              "start": 28,
+              "end": 35,
+              "text": "timeout",
+              "canonical": "timeout"
+            }
+          ],
+          "constraints": [
+            {
+              "role": "condition_subject",
+              "start": 41,
+              "end": 48,
+              "text": "preview",
+              "canonical": "preview"
+            },
+            {
+              "role": "condition_state",
+              "start": 52,
+              "end": 63,
+              "text": "not enabled",
+              "canonical": "disabled"
+            }
+          ]
+        },
+        "existing_applicability": false
+      }
+    ],
+    "diagnostic_only": true
+  },
+  {
+    "id": "scenario-exception",
+    "diagnostic_label": "exception_condition",
+    "question": "What is OrbitClient default timeout except when preview is enabled?",
+    "body": "OrbitClient default timeout is 7 seconds except when preview is enabled.",
+    "contracts": [
+      {
+        "need_id": "sentence-1",
+        "query_span": "What is OrbitClient default timeout except when preview is enabled?",
+        "compiler_interpretation": "unresolved",
+        "constraint_spans": [
+          {
+            "start": 36,
+            "end": 67
+          }
+        ],
+        "constraint_text": [
+          "except when preview is enabled?"
+        ],
+        "parsed_frame": null,
+        "existing_applicability": false
+      }
+    ],
+    "diagnostic_only": true
+  },
+  {
+    "id": "scenario-if-event",
+    "diagnostic_label": "event_condition",
+    "question": "If one QueueTasks function raises an exception, what happens to later tasks?",
+    "body": "If one QueueTasks function raises an exception, later tasks are not executed.",
+    "contracts": [
+      {
+        "need_id": "sentence-1",
+        "query_span": "If one QueueTasks function raises an exception, what happens to later tasks?",
+        "compiler_interpretation": "unresolved",
+        "constraint_spans": [
+          {
+            "start": 0,
+            "end": 76
+          }
+        ],
+        "constraint_text": [
+          "If one QueueTasks function raises an exception, what happens to later tasks?"
+        ],
+        "parsed_frame": null,
+        "existing_applicability": false
+      }
+    ],
+    "diagnostic_only": true
+  },
+  {
+    "id": "scenario-if-event-wrong-polarity",
+    "diagnostic_label": "event_condition",
+    "question": "If one QueueTasks function raises an exception, what happens to later tasks?",
+    "body": "If one QueueTasks function raises an exception, later tasks are executed.",
+    "contracts": [
+      {
+        "need_id": "sentence-1",
+        "query_span": "If one QueueTasks function raises an exception, what happens to later tasks?",
+        "compiler_interpretation": "unresolved",
+        "constraint_spans": [
+          {
+            "start": 0,
+            "end": 76
+          }
+        ],
+        "constraint_text": [
+          "If one QueueTasks function raises an exception, what happens to later tasks?"
+        ],
+        "parsed_frame": null,
+        "existing_applicability": false
+      }
+    ],
+    "diagnostic_only": true
+  },
+  {
+    "id": "quoted-marker",
+    "diagnostic_label": "literal_identity",
+    "question": "What does `when` mean?",
+    "body": "The literal when is a parameter.",
+    "contracts": [
+      {
+        "need_id": "sentence-1",
+        "query_span": "What does `when` mean?",
+        "compiler_interpretation": "unresolved",
+        "constraint_spans": [],
+        "constraint_text": [],
+        "parsed_frame": null,
+        "existing_applicability": true
+      }
+    ],
+    "diagnostic_only": true
+  }
+]

@@ -1,0 +1,6771 @@
+{
+  "schema_version": 2,
+  "lexical_baseline_kind": "diagnostic_overlap_not_production_qualification",
+  "environment": {
+    "python": "3.13.12 (main, Mar 24 2026, 22:49:35) [Clang 22.1.1 ]",
+    "platform": "Linux-7.0.0-34-generic-x86_64-with-glibc2.39",
+    "git_head": "3e3699508c4052ff57a6ebf390144c3048369660",
+    "timestamp": "2026-09-29T12:29:32Z"
+  },
+  "model_b": {
+    "name": "sentence-transformers/paraphrase-multilingual-mpnet-base-v2",
+    "status": "OK",
+    "model_hash": "114efcec9d2a27d491472fa87998a4ac1464d254f3b013d0133a788875314cdc",
+    "inference_seconds": 15.779540103001636
+  },
+  "lexical_a": {
+    "inference_seconds": 0.001660169000388123
+  },
+  "pool_blocks": 29,
+  "pool_tasks": 12,
+  "task_results": [
+    {
+      "task_id": "m15-dev-01",
+      "split": "development",
+      "question": "Какое поведение timeout по умолчанию в HTTPX: сколько секунд и какое исключение?",
+      "formulation": "mixed",
+      "variant": "A_lexical",
+      "status": "OK",
+      "block_scores": [
+        {
+          "block_id": "b018",
+          "score": 0.25,
+          "rank": 1,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b001",
+          "score": 0.25,
+          "rank": 2,
+          "judgment": "JUDGED",
+          "relevant": true,
+          "source_allowed": true,
+          "covered_fact_ids": [
+            "httpx-default-timeout"
+          ]
+        },
+        {
+          "block_id": "b015",
+          "score": 0.25,
+          "rank": 3,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b002",
+          "score": 0.25,
+          "rank": 4,
+          "judgment": "JUDGED",
+          "relevant": false,
+          "source_allowed": true,
+          "covered_fact_ids": []
+        },
+        {
+          "block_id": "b022",
+          "score": 0.25,
+          "rank": 5,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b016",
+          "score": 0.25,
+          "rank": 6,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b029",
+          "score": 0.125,
+          "rank": 7,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b020",
+          "score": 0.0,
+          "rank": 8,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b010",
+          "score": 0.0,
+          "rank": 9,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b017",
+          "score": 0.0,
+          "rank": 10,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b005",
+          "score": 0.0,
+          "rank": 11,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b004",
+          "score": 0.0,
+          "rank": 12,
+          "judgment": "JUDGED",
+          "relevant": false,
+          "source_allowed": false,
+          "covered_fact_ids": []
+        },
+        {
+          "block_id": "b006",
+          "score": 0.0,
+          "rank": 13,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b012",
+          "score": 0.0,
+          "rank": 14,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b024",
+          "score": 0.0,
+          "rank": 15,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b025",
+          "score": 0.0,
+          "rank": 16,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b003",
+          "score": 0.0,
+          "rank": 17,
+          "judgment": "JUDGED",
+          "relevant": false,
+          "source_allowed": false,
+          "covered_fact_ids": []
+        },
+        {
+          "block_id": "b028",
+          "score": 0.0,
+          "rank": 18,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b009",
+          "score": 0.0,
+          "rank": 19,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b008",
+          "score": 0.0,
+          "rank": 20,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b026",
+          "score": 0.0,
+          "rank": 21,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b027",
+          "score": 0.0,
+          "rank": 22,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b021",
+          "score": 0.0,
+          "rank": 23,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b011",
+          "score": 0.0,
+          "rank": 24,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b007",
+          "score": 0.0,
+          "rank": 25,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b019",
+          "score": 0.0,
+          "rank": 26,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b014",
+          "score": 0.0,
+          "rank": 27,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b023",
+          "score": 0.0,
+          "rank": 28,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b013",
+          "score": 0.0,
+          "rank": 29,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        }
+      ],
+      "pool_size": 29,
+      "judged_pairs": 4,
+      "unjudged_in_top_k": 3,
+      "known_allowed_positive_recall_at_k": 1.0,
+      "fully_judged": false,
+      "semantic_false_positive_rate": null
+    },
+    {
+      "task_id": "m15-dev-01",
+      "split": "development",
+      "question": "Какое поведение timeout по умолчанию в HTTPX: сколько секунд и какое исключение?",
+      "formulation": "mixed",
+      "variant": "B_encoder",
+      "status": "OK",
+      "block_scores": [
+        {
+          "block_id": "b001",
+          "score": 0.8617662191390991,
+          "rank": 1,
+          "judgment": "JUDGED",
+          "relevant": true,
+          "source_allowed": true,
+          "covered_fact_ids": [
+            "httpx-default-timeout"
+          ]
+        },
+        {
+          "block_id": "b018",
+          "score": 0.7448154091835022,
+          "rank": 2,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b016",
+          "score": 0.6328227519989014,
+          "rank": 3,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b002",
+          "score": 0.6282598972320557,
+          "rank": 4,
+          "judgment": "JUDGED",
+          "relevant": false,
+          "source_allowed": true,
+          "covered_fact_ids": []
+        },
+        {
+          "block_id": "b022",
+          "score": 0.6167094707489014,
+          "rank": 5,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b015",
+          "score": 0.5516283512115479,
+          "rank": 6,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b029",
+          "score": 0.5495328903198242,
+          "rank": 7,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b004",
+          "score": 0.443909227848053,
+          "rank": 8,
+          "judgment": "JUDGED",
+          "relevant": false,
+          "source_allowed": false,
+          "covered_fact_ids": []
+        },
+        {
+          "block_id": "b007",
+          "score": 0.3627650737762451,
+          "rank": 9,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b009",
+          "score": 0.34591150283813477,
+          "rank": 10,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b027",
+          "score": 0.3435644805431366,
+          "rank": 11,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b008",
+          "score": 0.326098769903183,
+          "rank": 12,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b005",
+          "score": 0.2577849328517914,
+          "rank": 13,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b019",
+          "score": 0.2543114125728607,
+          "rank": 14,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b026",
+          "score": 0.2327580451965332,
+          "rank": 15,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b017",
+          "score": 0.2281249314546585,
+          "rank": 16,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b020",
+          "score": 0.22391149401664734,
+          "rank": 17,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b006",
+          "score": 0.1974889636039734,
+          "rank": 18,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b024",
+          "score": 0.19500331580638885,
+          "rank": 19,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b003",
+          "score": 0.18085592985153198,
+          "rank": 20,
+          "judgment": "JUDGED",
+          "relevant": false,
+          "source_allowed": false,
+          "covered_fact_ids": []
+        },
+        {
+          "block_id": "b014",
+          "score": 0.17395445704460144,
+          "rank": 21,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b025",
+          "score": 0.14729531109333038,
+          "rank": 22,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b011",
+          "score": 0.13418355584144592,
+          "rank": 23,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b012",
+          "score": 0.13041800260543823,
+          "rank": 24,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b028",
+          "score": 0.09824535250663757,
+          "rank": 25,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b021",
+          "score": 0.09613430500030518,
+          "rank": 26,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b023",
+          "score": 0.07695041596889496,
+          "rank": 27,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b010",
+          "score": 0.04749235510826111,
+          "rank": 28,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b013",
+          "score": 0.022325139492750168,
+          "rank": 29,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        }
+      ],
+      "pool_size": 29,
+      "judged_pairs": 4,
+      "unjudged_in_top_k": 3,
+      "known_allowed_positive_recall_at_k": 1.0,
+      "fully_judged": false,
+      "semantic_false_positive_rate": null
+    },
+    {
+      "task_id": "m15-dev-02",
+      "split": "development",
+      "question": "Does enabling preview automatically enable all preview rules?",
+      "formulation": "EN",
+      "variant": "A_lexical",
+      "status": "OK",
+      "block_scores": [
+        {
+          "block_id": "b003",
+          "score": 0.8333333333333334,
+          "rank": 1,
+          "judgment": "JUDGED",
+          "relevant": true,
+          "source_allowed": true,
+          "covered_fact_ids": [
+            "ruff-preview-not-automatic"
+          ]
+        },
+        {
+          "block_id": "b017",
+          "score": 0.5,
+          "rank": 2,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b006",
+          "score": 0.5,
+          "rank": 3,
+          "judgment": "JUDGED",
+          "relevant": false,
+          "source_allowed": true,
+          "covered_fact_ids": []
+        },
+        {
+          "block_id": "b025",
+          "score": 0.5,
+          "rank": 4,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b005",
+          "score": 0.3333333333333333,
+          "rank": 5,
+          "judgment": "JUDGED",
+          "relevant": true,
+          "source_allowed": true,
+          "covered_fact_ids": [
+            "ruff-preview-not-automatic"
+          ]
+        },
+        {
+          "block_id": "b024",
+          "score": 0.3333333333333333,
+          "rank": 6,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b023",
+          "score": 0.3333333333333333,
+          "rank": 7,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b020",
+          "score": 0.0,
+          "rank": 8,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b010",
+          "score": 0.0,
+          "rank": 9,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b004",
+          "score": 0.0,
+          "rank": 10,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b012",
+          "score": 0.0,
+          "rank": 11,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b018",
+          "score": 0.0,
+          "rank": 12,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b028",
+          "score": 0.0,
+          "rank": 13,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b009",
+          "score": 0.0,
+          "rank": 14,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b008",
+          "score": 0.0,
+          "rank": 15,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b026",
+          "score": 0.0,
+          "rank": 16,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b027",
+          "score": 0.0,
+          "rank": 17,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b021",
+          "score": 0.0,
+          "rank": 18,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b011",
+          "score": 0.0,
+          "rank": 19,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b007",
+          "score": 0.0,
+          "rank": 20,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b019",
+          "score": 0.0,
+          "rank": 21,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b001",
+          "score": 0.0,
+          "rank": 22,
+          "judgment": "JUDGED",
+          "relevant": false,
+          "source_allowed": false,
+          "covered_fact_ids": []
+        },
+        {
+          "block_id": "b015",
+          "score": 0.0,
+          "rank": 23,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b002",
+          "score": 0.0,
+          "rank": 24,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b022",
+          "score": 0.0,
+          "rank": 25,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b014",
+          "score": 0.0,
+          "rank": 26,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b029",
+          "score": 0.0,
+          "rank": 27,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b016",
+          "score": 0.0,
+          "rank": 28,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b013",
+          "score": 0.0,
+          "rank": 29,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        }
+      ],
+      "pool_size": 29,
+      "judged_pairs": 4,
+      "unjudged_in_top_k": 2,
+      "known_allowed_positive_recall_at_k": 1.0,
+      "fully_judged": false,
+      "semantic_false_positive_rate": null
+    },
+    {
+      "task_id": "m15-dev-02",
+      "split": "development",
+      "question": "Does enabling preview automatically enable all preview rules?",
+      "formulation": "EN",
+      "variant": "B_encoder",
+      "status": "OK",
+      "block_scores": [
+        {
+          "block_id": "b025",
+          "score": 0.8010610938072205,
+          "rank": 1,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b005",
+          "score": 0.7571396827697754,
+          "rank": 2,
+          "judgment": "JUDGED",
+          "relevant": true,
+          "source_allowed": true,
+          "covered_fact_ids": [
+            "ruff-preview-not-automatic"
+          ]
+        },
+        {
+          "block_id": "b017",
+          "score": 0.6871106624603271,
+          "rank": 3,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b024",
+          "score": 0.6836361885070801,
+          "rank": 4,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b006",
+          "score": 0.621966540813446,
+          "rank": 5,
+          "judgment": "JUDGED",
+          "relevant": false,
+          "source_allowed": true,
+          "covered_fact_ids": []
+        },
+        {
+          "block_id": "b003",
+          "score": 0.6085551381111145,
+          "rank": 6,
+          "judgment": "JUDGED",
+          "relevant": true,
+          "source_allowed": true,
+          "covered_fact_ids": [
+            "ruff-preview-not-automatic"
+          ]
+        },
+        {
+          "block_id": "b023",
+          "score": 0.5707211494445801,
+          "rank": 7,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b022",
+          "score": 0.3172139525413513,
+          "rank": 8,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b002",
+          "score": 0.3057446777820587,
+          "rank": 9,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b015",
+          "score": 0.2867295444011688,
+          "rank": 10,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b029",
+          "score": 0.27221179008483887,
+          "rank": 11,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b020",
+          "score": 0.25720882415771484,
+          "rank": 12,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b016",
+          "score": 0.2407018393278122,
+          "rank": 13,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b001",
+          "score": 0.239950031042099,
+          "rank": 14,
+          "judgment": "JUDGED",
+          "relevant": false,
+          "source_allowed": false,
+          "covered_fact_ids": []
+        },
+        {
+          "block_id": "b018",
+          "score": 0.23896506428718567,
+          "rank": 15,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b007",
+          "score": 0.22320853173732758,
+          "rank": 16,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b021",
+          "score": 0.21938221156597137,
+          "rank": 17,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b004",
+          "score": 0.218049556016922,
+          "rank": 18,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b013",
+          "score": 0.17963609099388123,
+          "rank": 19,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b012",
+          "score": 0.17132806777954102,
+          "rank": 20,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b027",
+          "score": 0.16526080667972565,
+          "rank": 21,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b010",
+          "score": 0.159626767039299,
+          "rank": 22,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b009",
+          "score": 0.15698379278182983,
+          "rank": 23,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b011",
+          "score": 0.14708583056926727,
+          "rank": 24,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b028",
+          "score": 0.14180812239646912,
+          "rank": 25,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b026",
+          "score": 0.1388225555419922,
+          "rank": 26,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b008",
+          "score": 0.138811394572258,
+          "rank": 27,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b019",
+          "score": 0.12787093222141266,
+          "rank": 28,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b014",
+          "score": 0.032521143555641174,
+          "rank": 29,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        }
+      ],
+      "pool_size": 29,
+      "judged_pairs": 4,
+      "unjudged_in_top_k": 3,
+      "known_allowed_positive_recall_at_k": 0.5,
+      "fully_judged": false,
+      "semantic_false_positive_rate": null
+    },
+    {
+      "task_id": "m15-dev-03",
+      "split": "development",
+      "question": "Когда выполняется teardown lifespan относительно соединений и фоновых задач?",
+      "formulation": "RU",
+      "variant": "A_lexical",
+      "status": "OK",
+      "block_scores": [
+        {
+          "block_id": "b004",
+          "score": 0.25,
+          "rank": 1,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b009",
+          "score": 0.25,
+          "rank": 2,
+          "judgment": "JUDGED",
+          "relevant": false,
+          "source_allowed": true,
+          "covered_fact_ids": []
+        },
+        {
+          "block_id": "b027",
+          "score": 0.25,
+          "rank": 3,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b007",
+          "score": 0.25,
+          "rank": 4,
+          "judgment": "JUDGED",
+          "relevant": true,
+          "source_allowed": true,
+          "covered_fact_ids": [
+            "starlette-teardown-ordering"
+          ]
+        },
+        {
+          "block_id": "b008",
+          "score": 0.125,
+          "rank": 5,
+          "judgment": "JUDGED",
+          "relevant": false,
+          "source_allowed": true,
+          "covered_fact_ids": []
+        },
+        {
+          "block_id": "b026",
+          "score": 0.125,
+          "rank": 6,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b019",
+          "score": 0.125,
+          "rank": 7,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b014",
+          "score": 0.125,
+          "rank": 8,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b020",
+          "score": 0.0,
+          "rank": 9,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b010",
+          "score": 0.0,
+          "rank": 10,
+          "judgment": "JUDGED",
+          "relevant": false,
+          "source_allowed": false,
+          "covered_fact_ids": []
+        },
+        {
+          "block_id": "b017",
+          "score": 0.0,
+          "rank": 11,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b005",
+          "score": 0.0,
+          "rank": 12,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b006",
+          "score": 0.0,
+          "rank": 13,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b012",
+          "score": 0.0,
+          "rank": 14,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b024",
+          "score": 0.0,
+          "rank": 15,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b018",
+          "score": 0.0,
+          "rank": 16,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b025",
+          "score": 0.0,
+          "rank": 17,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b003",
+          "score": 0.0,
+          "rank": 18,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b028",
+          "score": 0.0,
+          "rank": 19,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b021",
+          "score": 0.0,
+          "rank": 20,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b011",
+          "score": 0.0,
+          "rank": 21,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b001",
+          "score": 0.0,
+          "rank": 22,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b015",
+          "score": 0.0,
+          "rank": 23,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b002",
+          "score": 0.0,
+          "rank": 24,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b022",
+          "score": 0.0,
+          "rank": 25,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b029",
+          "score": 0.0,
+          "rank": 26,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b023",
+          "score": 0.0,
+          "rank": 27,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b016",
+          "score": 0.0,
+          "rank": 28,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b013",
+          "score": 0.0,
+          "rank": 29,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        }
+      ],
+      "pool_size": 29,
+      "judged_pairs": 4,
+      "unjudged_in_top_k": 2,
+      "known_allowed_positive_recall_at_k": 1.0,
+      "fully_judged": false,
+      "semantic_false_positive_rate": null
+    },
+    {
+      "task_id": "m15-dev-03",
+      "split": "development",
+      "question": "Когда выполняется teardown lifespan относительно соединений и фоновых задач?",
+      "formulation": "RU",
+      "variant": "B_encoder",
+      "status": "OK",
+      "block_scores": [
+        {
+          "block_id": "b007",
+          "score": 0.7829900979995728,
+          "rank": 1,
+          "judgment": "JUDGED",
+          "relevant": true,
+          "source_allowed": true,
+          "covered_fact_ids": [
+            "starlette-teardown-ordering"
+          ]
+        },
+        {
+          "block_id": "b004",
+          "score": 0.6332053542137146,
+          "rank": 2,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b009",
+          "score": 0.5140796303749084,
+          "rank": 3,
+          "judgment": "JUDGED",
+          "relevant": false,
+          "source_allowed": true,
+          "covered_fact_ids": []
+        },
+        {
+          "block_id": "b026",
+          "score": 0.4997372031211853,
+          "rank": 4,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b029",
+          "score": 0.4984278678894043,
+          "rank": 5,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b027",
+          "score": 0.4957943260669708,
+          "rank": 6,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b014",
+          "score": 0.43628352880477905,
+          "rank": 7,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b019",
+          "score": 0.4295007586479187,
+          "rank": 8,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b016",
+          "score": 0.4016297459602356,
+          "rank": 9,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b008",
+          "score": 0.3944028913974762,
+          "rank": 10,
+          "judgment": "JUDGED",
+          "relevant": false,
+          "source_allowed": true,
+          "covered_fact_ids": []
+        },
+        {
+          "block_id": "b018",
+          "score": 0.38477271795272827,
+          "rank": 11,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b001",
+          "score": 0.3460569381713867,
+          "rank": 12,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b015",
+          "score": 0.3393695056438446,
+          "rank": 13,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b003",
+          "score": 0.30883777141571045,
+          "rank": 14,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b017",
+          "score": 0.3024994432926178,
+          "rank": 15,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b002",
+          "score": 0.295398086309433,
+          "rank": 16,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b022",
+          "score": 0.2872317433357239,
+          "rank": 17,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b023",
+          "score": 0.24464154243469238,
+          "rank": 18,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b005",
+          "score": 0.22092384099960327,
+          "rank": 19,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b025",
+          "score": 0.18694466352462769,
+          "rank": 20,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b024",
+          "score": 0.15684859454631805,
+          "rank": 21,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b006",
+          "score": 0.15570220351219177,
+          "rank": 22,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b028",
+          "score": 0.1387009620666504,
+          "rank": 23,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b013",
+          "score": 0.12852813303470612,
+          "rank": 24,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b020",
+          "score": 0.11723072081804276,
+          "rank": 25,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b011",
+          "score": 0.053554948419332504,
+          "rank": 26,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b010",
+          "score": 0.05208929255604744,
+          "rank": 27,
+          "judgment": "JUDGED",
+          "relevant": false,
+          "source_allowed": false,
+          "covered_fact_ids": []
+        },
+        {
+          "block_id": "b012",
+          "score": 0.03655477240681648,
+          "rank": 28,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b021",
+          "score": 0.026747532188892365,
+          "rank": 29,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        }
+      ],
+      "pool_size": 29,
+      "judged_pairs": 4,
+      "unjudged_in_top_k": 3,
+      "known_allowed_positive_recall_at_k": 1.0,
+      "fully_judged": false,
+      "semantic_false_positive_rate": null
+    },
+    {
+      "task_id": "m15-dev-04",
+      "split": "development",
+      "question": "Что specifies AliasPath: какой path to a field using aliases?",
+      "formulation": "mixed",
+      "variant": "A_lexical",
+      "status": "OK",
+      "block_scores": [
+        {
+          "block_id": "b011",
+          "score": 0.7142857142857143,
+          "rank": 1,
+          "judgment": "JUDGED",
+          "relevant": true,
+          "source_allowed": true,
+          "covered_fact_ids": [
+            "pydantic-aliaspath-purpose"
+          ]
+        },
+        {
+          "block_id": "b010",
+          "score": 0.5714285714285714,
+          "rank": 2,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b028",
+          "score": 0.5714285714285714,
+          "rank": 3,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b012",
+          "score": 0.42857142857142855,
+          "rank": 4,
+          "judgment": "JUDGED",
+          "relevant": true,
+          "source_allowed": true,
+          "covered_fact_ids": [
+            "pydantic-aliaspath-purpose"
+          ]
+        },
+        {
+          "block_id": "b013",
+          "score": 0.2857142857142857,
+          "rank": 5,
+          "judgment": "JUDGED",
+          "relevant": false,
+          "source_allowed": true,
+          "covered_fact_ids": []
+        },
+        {
+          "block_id": "b020",
+          "score": 0.14285714285714285,
+          "rank": 6,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b018",
+          "score": 0.14285714285714285,
+          "rank": 7,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b003",
+          "score": 0.14285714285714285,
+          "rank": 8,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b021",
+          "score": 0.14285714285714285,
+          "rank": 9,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b015",
+          "score": 0.14285714285714285,
+          "rank": 10,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b022",
+          "score": 0.14285714285714285,
+          "rank": 11,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b017",
+          "score": 0.0,
+          "rank": 12,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b005",
+          "score": 0.0,
+          "rank": 13,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b004",
+          "score": 0.0,
+          "rank": 14,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b006",
+          "score": 0.0,
+          "rank": 15,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b024",
+          "score": 0.0,
+          "rank": 16,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b025",
+          "score": 0.0,
+          "rank": 17,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b009",
+          "score": 0.0,
+          "rank": 18,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b008",
+          "score": 0.0,
+          "rank": 19,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b026",
+          "score": 0.0,
+          "rank": 20,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b027",
+          "score": 0.0,
+          "rank": 21,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b007",
+          "score": 0.0,
+          "rank": 22,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b019",
+          "score": 0.0,
+          "rank": 23,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b001",
+          "score": 0.0,
+          "rank": 24,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b002",
+          "score": 0.0,
+          "rank": 25,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b014",
+          "score": 0.0,
+          "rank": 26,
+          "judgment": "JUDGED",
+          "relevant": false,
+          "source_allowed": false,
+          "covered_fact_ids": []
+        },
+        {
+          "block_id": "b029",
+          "score": 0.0,
+          "rank": 27,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b023",
+          "score": 0.0,
+          "rank": 28,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b016",
+          "score": 0.0,
+          "rank": 29,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        }
+      ],
+      "pool_size": 29,
+      "judged_pairs": 4,
+      "unjudged_in_top_k": 2,
+      "known_allowed_positive_recall_at_k": 1.0,
+      "fully_judged": false,
+      "semantic_false_positive_rate": null
+    },
+    {
+      "task_id": "m15-dev-04",
+      "split": "development",
+      "question": "Что specifies AliasPath: какой path to a field using aliases?",
+      "formulation": "mixed",
+      "variant": "B_encoder",
+      "status": "OK",
+      "block_scores": [
+        {
+          "block_id": "b011",
+          "score": 0.937690019607544,
+          "rank": 1,
+          "judgment": "JUDGED",
+          "relevant": true,
+          "source_allowed": true,
+          "covered_fact_ids": [
+            "pydantic-aliaspath-purpose"
+          ]
+        },
+        {
+          "block_id": "b021",
+          "score": 0.7745330333709717,
+          "rank": 2,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b010",
+          "score": 0.761950671672821,
+          "rank": 3,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b020",
+          "score": 0.6583774089813232,
+          "rank": 4,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b012",
+          "score": 0.6505783796310425,
+          "rank": 5,
+          "judgment": "JUDGED",
+          "relevant": true,
+          "source_allowed": true,
+          "covered_fact_ids": [
+            "pydantic-aliaspath-purpose"
+          ]
+        },
+        {
+          "block_id": "b013",
+          "score": 0.6346871852874756,
+          "rank": 6,
+          "judgment": "JUDGED",
+          "relevant": false,
+          "source_allowed": true,
+          "covered_fact_ids": []
+        },
+        {
+          "block_id": "b028",
+          "score": 0.6219413876533508,
+          "rank": 7,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b025",
+          "score": 0.28193172812461853,
+          "rank": 8,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b005",
+          "score": 0.22901739180088043,
+          "rank": 9,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b006",
+          "score": 0.22727316617965698,
+          "rank": 10,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b003",
+          "score": 0.22276413440704346,
+          "rank": 11,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b023",
+          "score": 0.20445354282855988,
+          "rank": 12,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b017",
+          "score": 0.19572345912456512,
+          "rank": 13,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b027",
+          "score": 0.1839640736579895,
+          "rank": 14,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b022",
+          "score": 0.18248435854911804,
+          "rank": 15,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b002",
+          "score": 0.16807271540164948,
+          "rank": 16,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b009",
+          "score": 0.1653529405593872,
+          "rank": 17,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b018",
+          "score": 0.15293356776237488,
+          "rank": 18,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b019",
+          "score": 0.14551043510437012,
+          "rank": 19,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b015",
+          "score": 0.1364535391330719,
+          "rank": 20,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b014",
+          "score": 0.13070166110992432,
+          "rank": 21,
+          "judgment": "JUDGED",
+          "relevant": false,
+          "source_allowed": false,
+          "covered_fact_ids": []
+        },
+        {
+          "block_id": "b016",
+          "score": 0.12918764352798462,
+          "rank": 22,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b026",
+          "score": 0.12578943371772766,
+          "rank": 23,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b001",
+          "score": 0.12421064078807831,
+          "rank": 24,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b029",
+          "score": 0.09470304101705551,
+          "rank": 25,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b024",
+          "score": 0.08562794327735901,
+          "rank": 26,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b004",
+          "score": 0.06810247898101807,
+          "rank": 27,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b008",
+          "score": 0.039320968091487885,
+          "rank": 28,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b007",
+          "score": 0.012239120900630951,
+          "rank": 29,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        }
+      ],
+      "pool_size": 29,
+      "judged_pairs": 4,
+      "unjudged_in_top_k": 3,
+      "known_allowed_positive_recall_at_k": 1.0,
+      "fully_judged": false,
+      "semantic_false_positive_rate": null
+    },
+    {
+      "task_id": "m15-cal-01",
+      "split": "calibration",
+      "question": "Назови четыре типа timeout в HTTPX и объясни, что ограничивает каждый.",
+      "formulation": "RU",
+      "variant": "A_lexical",
+      "status": "OK",
+      "block_scores": [
+        {
+          "block_id": "b018",
+          "score": 0.25,
+          "rank": 1,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b001",
+          "score": 0.25,
+          "rank": 2,
+          "judgment": "JUDGED",
+          "relevant": false,
+          "source_allowed": true,
+          "covered_fact_ids": []
+        },
+        {
+          "block_id": "b015",
+          "score": 0.25,
+          "rank": 3,
+          "judgment": "JUDGED",
+          "relevant": true,
+          "source_allowed": true,
+          "covered_fact_ids": [
+            "httpx-four-timeout-types"
+          ]
+        },
+        {
+          "block_id": "b002",
+          "score": 0.25,
+          "rank": 4,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b022",
+          "score": 0.25,
+          "rank": 5,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b016",
+          "score": 0.25,
+          "rank": 6,
+          "judgment": "JUDGED",
+          "relevant": false,
+          "source_allowed": true,
+          "covered_fact_ids": []
+        },
+        {
+          "block_id": "b029",
+          "score": 0.125,
+          "rank": 7,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b020",
+          "score": 0.0,
+          "rank": 8,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b010",
+          "score": 0.0,
+          "rank": 9,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b017",
+          "score": 0.0,
+          "rank": 10,
+          "judgment": "JUDGED",
+          "relevant": false,
+          "source_allowed": false,
+          "covered_fact_ids": []
+        },
+        {
+          "block_id": "b005",
+          "score": 0.0,
+          "rank": 11,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b004",
+          "score": 0.0,
+          "rank": 12,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b006",
+          "score": 0.0,
+          "rank": 13,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b012",
+          "score": 0.0,
+          "rank": 14,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b024",
+          "score": 0.0,
+          "rank": 15,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b025",
+          "score": 0.0,
+          "rank": 16,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b003",
+          "score": 0.0,
+          "rank": 17,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b028",
+          "score": 0.0,
+          "rank": 18,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b009",
+          "score": 0.0,
+          "rank": 19,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b008",
+          "score": 0.0,
+          "rank": 20,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b026",
+          "score": 0.0,
+          "rank": 21,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b027",
+          "score": 0.0,
+          "rank": 22,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b021",
+          "score": 0.0,
+          "rank": 23,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b011",
+          "score": 0.0,
+          "rank": 24,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b007",
+          "score": 0.0,
+          "rank": 25,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b019",
+          "score": 0.0,
+          "rank": 26,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b014",
+          "score": 0.0,
+          "rank": 27,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b023",
+          "score": 0.0,
+          "rank": 28,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b013",
+          "score": 0.0,
+          "rank": 29,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        }
+      ],
+      "pool_size": 29,
+      "judged_pairs": 4,
+      "unjudged_in_top_k": 3,
+      "known_allowed_positive_recall_at_k": 1.0,
+      "fully_judged": false,
+      "semantic_false_positive_rate": null
+    },
+    {
+      "task_id": "m15-cal-01",
+      "split": "calibration",
+      "question": "Назови четыре типа timeout в HTTPX и объясни, что ограничивает каждый.",
+      "formulation": "RU",
+      "variant": "B_encoder",
+      "status": "OK",
+      "block_scores": [
+        {
+          "block_id": "b001",
+          "score": 0.6738238334655762,
+          "rank": 1,
+          "judgment": "JUDGED",
+          "relevant": false,
+          "source_allowed": true,
+          "covered_fact_ids": []
+        },
+        {
+          "block_id": "b029",
+          "score": 0.6428664326667786,
+          "rank": 2,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b018",
+          "score": 0.6208037734031677,
+          "rank": 3,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b015",
+          "score": 0.5598639249801636,
+          "rank": 4,
+          "judgment": "JUDGED",
+          "relevant": true,
+          "source_allowed": true,
+          "covered_fact_ids": [
+            "httpx-four-timeout-types"
+          ]
+        },
+        {
+          "block_id": "b016",
+          "score": 0.5393065214157104,
+          "rank": 5,
+          "judgment": "JUDGED",
+          "relevant": false,
+          "source_allowed": true,
+          "covered_fact_ids": []
+        },
+        {
+          "block_id": "b022",
+          "score": 0.5221952199935913,
+          "rank": 6,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b002",
+          "score": 0.5186246037483215,
+          "rank": 7,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b004",
+          "score": 0.36795464158058167,
+          "rank": 8,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b007",
+          "score": 0.3662782907485962,
+          "rank": 9,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b025",
+          "score": 0.295107364654541,
+          "rank": 10,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b026",
+          "score": 0.27121850848197937,
+          "rank": 11,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b006",
+          "score": 0.27111172676086426,
+          "rank": 12,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b017",
+          "score": 0.2603219151496887,
+          "rank": 13,
+          "judgment": "JUDGED",
+          "relevant": false,
+          "source_allowed": false,
+          "covered_fact_ids": []
+        },
+        {
+          "block_id": "b027",
+          "score": 0.25922495126724243,
+          "rank": 14,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b005",
+          "score": 0.2590956687927246,
+          "rank": 15,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b008",
+          "score": 0.2512440085411072,
+          "rank": 16,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b019",
+          "score": 0.24823403358459473,
+          "rank": 17,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b009",
+          "score": 0.23751965165138245,
+          "rank": 18,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b014",
+          "score": 0.21826812624931335,
+          "rank": 19,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b020",
+          "score": 0.21516633033752441,
+          "rank": 20,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b012",
+          "score": 0.17523184418678284,
+          "rank": 21,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b011",
+          "score": 0.17321904003620148,
+          "rank": 22,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b003",
+          "score": 0.16774098575115204,
+          "rank": 23,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b013",
+          "score": 0.16369658708572388,
+          "rank": 24,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b028",
+          "score": 0.14745579659938812,
+          "rank": 25,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b021",
+          "score": 0.140614852309227,
+          "rank": 26,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b024",
+          "score": 0.12509503960609436,
+          "rank": 27,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b010",
+          "score": 0.11096877604722977,
+          "rank": 28,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b023",
+          "score": 0.07744348794221878,
+          "rank": 29,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        }
+      ],
+      "pool_size": 29,
+      "judged_pairs": 4,
+      "unjudged_in_top_k": 2,
+      "known_allowed_positive_recall_at_k": 1.0,
+      "fully_judged": false,
+      "semantic_false_positive_rate": null
+    },
+    {
+      "task_id": "m15-cal-02",
+      "split": "calibration",
+      "question": "Что happens to deprecated rules когда preview mode enabled: will an error be raised?",
+      "formulation": "mixed",
+      "variant": "A_lexical",
+      "status": "OK",
+      "block_scores": [
+        {
+          "block_id": "b017",
+          "score": 0.8,
+          "rank": 1,
+          "judgment": "JUDGED",
+          "relevant": true,
+          "source_allowed": true,
+          "covered_fact_ids": [
+            "ruff-deprecated-in-preview"
+          ]
+        },
+        {
+          "block_id": "b006",
+          "score": 0.5,
+          "rank": 2,
+          "judgment": "JUDGED",
+          "relevant": false,
+          "source_allowed": true,
+          "covered_fact_ids": []
+        },
+        {
+          "block_id": "b025",
+          "score": 0.5,
+          "rank": 3,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b003",
+          "score": 0.5,
+          "rank": 4,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b005",
+          "score": 0.3,
+          "rank": 5,
+          "judgment": "JUDGED",
+          "relevant": false,
+          "source_allowed": true,
+          "covered_fact_ids": []
+        },
+        {
+          "block_id": "b024",
+          "score": 0.3,
+          "rank": 6,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b023",
+          "score": 0.3,
+          "rank": 7,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b020",
+          "score": 0.1,
+          "rank": 8,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b004",
+          "score": 0.1,
+          "rank": 9,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b018",
+          "score": 0.1,
+          "rank": 10,
+          "judgment": "JUDGED",
+          "relevant": false,
+          "source_allowed": false,
+          "covered_fact_ids": []
+        },
+        {
+          "block_id": "b028",
+          "score": 0.1,
+          "rank": 11,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b008",
+          "score": 0.1,
+          "rank": 12,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b021",
+          "score": 0.1,
+          "rank": 13,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b007",
+          "score": 0.1,
+          "rank": 14,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b015",
+          "score": 0.1,
+          "rank": 15,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b013",
+          "score": 0.1,
+          "rank": 16,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b010",
+          "score": 0.0,
+          "rank": 17,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b012",
+          "score": 0.0,
+          "rank": 18,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b009",
+          "score": 0.0,
+          "rank": 19,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b026",
+          "score": 0.0,
+          "rank": 20,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b027",
+          "score": 0.0,
+          "rank": 21,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b011",
+          "score": 0.0,
+          "rank": 22,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b019",
+          "score": 0.0,
+          "rank": 23,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b001",
+          "score": 0.0,
+          "rank": 24,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b002",
+          "score": 0.0,
+          "rank": 25,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b022",
+          "score": 0.0,
+          "rank": 26,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b014",
+          "score": 0.0,
+          "rank": 27,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b029",
+          "score": 0.0,
+          "rank": 28,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b016",
+          "score": 0.0,
+          "rank": 29,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        }
+      ],
+      "pool_size": 29,
+      "judged_pairs": 4,
+      "unjudged_in_top_k": 2,
+      "known_allowed_positive_recall_at_k": 1.0,
+      "fully_judged": false,
+      "semantic_false_positive_rate": null
+    },
+    {
+      "task_id": "m15-cal-02",
+      "split": "calibration",
+      "question": "Что happens to deprecated rules когда preview mode enabled: will an error be raised?",
+      "formulation": "mixed",
+      "variant": "B_encoder",
+      "status": "OK",
+      "block_scores": [
+        {
+          "block_id": "b017",
+          "score": 0.9058583974838257,
+          "rank": 1,
+          "judgment": "JUDGED",
+          "relevant": true,
+          "source_allowed": true,
+          "covered_fact_ids": [
+            "ruff-deprecated-in-preview"
+          ]
+        },
+        {
+          "block_id": "b024",
+          "score": 0.7431316375732422,
+          "rank": 2,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b005",
+          "score": 0.7235790491104126,
+          "rank": 3,
+          "judgment": "JUDGED",
+          "relevant": false,
+          "source_allowed": true,
+          "covered_fact_ids": []
+        },
+        {
+          "block_id": "b025",
+          "score": 0.603092610836029,
+          "rank": 4,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b003",
+          "score": 0.601015031337738,
+          "rank": 5,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b023",
+          "score": 0.5372189879417419,
+          "rank": 6,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b006",
+          "score": 0.5223289132118225,
+          "rank": 7,
+          "judgment": "JUDGED",
+          "relevant": false,
+          "source_allowed": true,
+          "covered_fact_ids": []
+        },
+        {
+          "block_id": "b015",
+          "score": 0.3741043210029602,
+          "rank": 8,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b029",
+          "score": 0.321737676858902,
+          "rank": 9,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b018",
+          "score": 0.3204084634780884,
+          "rank": 10,
+          "judgment": "JUDGED",
+          "relevant": false,
+          "source_allowed": false,
+          "covered_fact_ids": []
+        },
+        {
+          "block_id": "b004",
+          "score": 0.3190142512321472,
+          "rank": 11,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b027",
+          "score": 0.31332632899284363,
+          "rank": 12,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b022",
+          "score": 0.3096902370452881,
+          "rank": 13,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b009",
+          "score": 0.301755428314209,
+          "rank": 14,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b001",
+          "score": 0.29687923192977905,
+          "rank": 15,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b002",
+          "score": 0.2755430340766907,
+          "rank": 16,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b016",
+          "score": 0.27389827370643616,
+          "rank": 17,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b007",
+          "score": 0.2689402997493744,
+          "rank": 18,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b019",
+          "score": 0.25667107105255127,
+          "rank": 19,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b020",
+          "score": 0.25032904744148254,
+          "rank": 20,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b008",
+          "score": 0.22398650646209717,
+          "rank": 21,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b026",
+          "score": 0.18860356509685516,
+          "rank": 22,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b021",
+          "score": 0.16544269025325775,
+          "rank": 23,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b028",
+          "score": 0.15476301312446594,
+          "rank": 24,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b010",
+          "score": 0.15259967744350433,
+          "rank": 25,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b013",
+          "score": 0.1351279765367508,
+          "rank": 26,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b011",
+          "score": 0.07505324482917786,
+          "rank": 27,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b012",
+          "score": 0.06795293837785721,
+          "rank": 28,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b014",
+          "score": 0.06365969777107239,
+          "rank": 29,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        }
+      ],
+      "pool_size": 29,
+      "judged_pairs": 4,
+      "unjudged_in_top_k": 3,
+      "known_allowed_positive_recall_at_k": 1.0,
+      "fully_judged": false,
+      "semantic_false_positive_rate": null
+    },
+    {
+      "task_id": "m15-cal-03",
+      "split": "calibration",
+      "question": "Is the request state a deep or shallow copy of the lifespan state?",
+      "formulation": "EN",
+      "variant": "A_lexical",
+      "status": "OK",
+      "block_scores": [
+        {
+          "block_id": "b019",
+          "score": 0.8333333333333334,
+          "rank": 1,
+          "judgment": "JUDGED",
+          "relevant": true,
+          "source_allowed": true,
+          "covered_fact_ids": [
+            "starlette-state-shallow-copy"
+          ]
+        },
+        {
+          "block_id": "b014",
+          "score": 0.5,
+          "rank": 2,
+          "judgment": "JUDGED",
+          "relevant": true,
+          "source_allowed": true,
+          "covered_fact_ids": []
+        },
+        {
+          "block_id": "b004",
+          "score": 0.3333333333333333,
+          "rank": 3,
+          "judgment": "JUDGED",
+          "relevant": false,
+          "source_allowed": true,
+          "covered_fact_ids": []
+        },
+        {
+          "block_id": "b008",
+          "score": 0.3333333333333333,
+          "rank": 4,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b009",
+          "score": 0.16666666666666666,
+          "rank": 5,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b026",
+          "score": 0.16666666666666666,
+          "rank": 6,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b027",
+          "score": 0.16666666666666666,
+          "rank": 7,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b007",
+          "score": 0.16666666666666666,
+          "rank": 8,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b015",
+          "score": 0.16666666666666666,
+          "rank": 9,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b002",
+          "score": 0.16666666666666666,
+          "rank": 10,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b022",
+          "score": 0.16666666666666666,
+          "rank": 11,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b020",
+          "score": 0.0,
+          "rank": 12,
+          "judgment": "JUDGED",
+          "relevant": false,
+          "source_allowed": false,
+          "covered_fact_ids": []
+        },
+        {
+          "block_id": "b010",
+          "score": 0.0,
+          "rank": 13,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b017",
+          "score": 0.0,
+          "rank": 14,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b005",
+          "score": 0.0,
+          "rank": 15,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b006",
+          "score": 0.0,
+          "rank": 16,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b012",
+          "score": 0.0,
+          "rank": 17,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b024",
+          "score": 0.0,
+          "rank": 18,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b018",
+          "score": 0.0,
+          "rank": 19,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b025",
+          "score": 0.0,
+          "rank": 20,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b003",
+          "score": 0.0,
+          "rank": 21,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b028",
+          "score": 0.0,
+          "rank": 22,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b021",
+          "score": 0.0,
+          "rank": 23,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b011",
+          "score": 0.0,
+          "rank": 24,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b001",
+          "score": 0.0,
+          "rank": 25,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b029",
+          "score": 0.0,
+          "rank": 26,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b023",
+          "score": 0.0,
+          "rank": 27,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b016",
+          "score": 0.0,
+          "rank": 28,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b013",
+          "score": 0.0,
+          "rank": 29,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        }
+      ],
+      "pool_size": 29,
+      "judged_pairs": 4,
+      "unjudged_in_top_k": 2,
+      "known_allowed_positive_recall_at_k": 1.0,
+      "fully_judged": false,
+      "semantic_false_positive_rate": null
+    },
+    {
+      "task_id": "m15-cal-03",
+      "split": "calibration",
+      "question": "Is the request state a deep or shallow copy of the lifespan state?",
+      "formulation": "EN",
+      "variant": "B_encoder",
+      "status": "OK",
+      "block_scores": [
+        {
+          "block_id": "b019",
+          "score": 0.7453125715255737,
+          "rank": 1,
+          "judgment": "JUDGED",
+          "relevant": true,
+          "source_allowed": true,
+          "covered_fact_ids": [
+            "starlette-state-shallow-copy"
+          ]
+        },
+        {
+          "block_id": "b014",
+          "score": 0.716445803642273,
+          "rank": 2,
+          "judgment": "JUDGED",
+          "relevant": true,
+          "source_allowed": true,
+          "covered_fact_ids": []
+        },
+        {
+          "block_id": "b026",
+          "score": 0.5272494554519653,
+          "rank": 3,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b008",
+          "score": 0.5078492760658264,
+          "rank": 4,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b004",
+          "score": 0.46236956119537354,
+          "rank": 5,
+          "judgment": "JUDGED",
+          "relevant": false,
+          "source_allowed": true,
+          "covered_fact_ids": []
+        },
+        {
+          "block_id": "b009",
+          "score": 0.4329017102718353,
+          "rank": 6,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b027",
+          "score": 0.4082318842411041,
+          "rank": 7,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b007",
+          "score": 0.3761558532714844,
+          "rank": 8,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b018",
+          "score": 0.3419763445854187,
+          "rank": 9,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b029",
+          "score": 0.327836275100708,
+          "rank": 10,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b015",
+          "score": 0.2775743007659912,
+          "rank": 11,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b016",
+          "score": 0.24458059668540955,
+          "rank": 12,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b001",
+          "score": 0.23659521341323853,
+          "rank": 13,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b005",
+          "score": 0.23211020231246948,
+          "rank": 14,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b003",
+          "score": 0.22790832817554474,
+          "rank": 15,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b022",
+          "score": 0.22037941217422485,
+          "rank": 16,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b017",
+          "score": 0.20585554838180542,
+          "rank": 17,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b002",
+          "score": 0.1854991316795349,
+          "rank": 18,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b023",
+          "score": 0.17868739366531372,
+          "rank": 19,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b025",
+          "score": 0.10489693284034729,
+          "rank": 20,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b006",
+          "score": 0.09538216888904572,
+          "rank": 21,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b024",
+          "score": 0.08753015100955963,
+          "rank": 22,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b013",
+          "score": 0.07960581034421921,
+          "rank": 23,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b020",
+          "score": 0.07492142915725708,
+          "rank": 24,
+          "judgment": "JUDGED",
+          "relevant": false,
+          "source_allowed": false,
+          "covered_fact_ids": []
+        },
+        {
+          "block_id": "b028",
+          "score": 0.05985264480113983,
+          "rank": 25,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b011",
+          "score": 0.04893667250871658,
+          "rank": 26,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b012",
+          "score": 0.048220932483673096,
+          "rank": 27,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b010",
+          "score": 0.00687415711581707,
+          "rank": 28,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b021",
+          "score": 0.00486379861831665,
+          "rank": 29,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        }
+      ],
+      "pool_size": 29,
+      "judged_pairs": 4,
+      "unjudged_in_top_k": 2,
+      "known_allowed_positive_recall_at_k": 1.0,
+      "fully_judged": false,
+      "semantic_false_positive_rate": null
+    },
+    {
+      "task_id": "m15-cal-04",
+      "split": "calibration",
+      "question": "В чём различие alias_priority=1 и alias_priority=2?",
+      "formulation": "RU",
+      "variant": "A_lexical",
+      "status": "OK",
+      "block_scores": [
+        {
+          "block_id": "b020",
+          "score": 0.5,
+          "rank": 1,
+          "judgment": "JUDGED",
+          "relevant": true,
+          "source_allowed": true,
+          "covered_fact_ids": [
+            "pydantic-alias-priority"
+          ]
+        },
+        {
+          "block_id": "b010",
+          "score": 0.0,
+          "rank": 2,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b017",
+          "score": 0.0,
+          "rank": 3,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b005",
+          "score": 0.0,
+          "rank": 4,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b004",
+          "score": 0.0,
+          "rank": 5,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b006",
+          "score": 0.0,
+          "rank": 6,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b012",
+          "score": 0.0,
+          "rank": 7,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b024",
+          "score": 0.0,
+          "rank": 8,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b018",
+          "score": 0.0,
+          "rank": 9,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b025",
+          "score": 0.0,
+          "rank": 10,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b003",
+          "score": 0.0,
+          "rank": 11,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b028",
+          "score": 0.0,
+          "rank": 12,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b009",
+          "score": 0.0,
+          "rank": 13,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b008",
+          "score": 0.0,
+          "rank": 14,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b026",
+          "score": 0.0,
+          "rank": 15,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b027",
+          "score": 0.0,
+          "rank": 16,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b021",
+          "score": 0.0,
+          "rank": 17,
+          "judgment": "JUDGED",
+          "relevant": true,
+          "source_allowed": true,
+          "covered_fact_ids": []
+        },
+        {
+          "block_id": "b011",
+          "score": 0.0,
+          "rank": 18,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b007",
+          "score": 0.0,
+          "rank": 19,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b019",
+          "score": 0.0,
+          "rank": 20,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b001",
+          "score": 0.0,
+          "rank": 21,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b015",
+          "score": 0.0,
+          "rank": 22,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b002",
+          "score": 0.0,
+          "rank": 23,
+          "judgment": "JUDGED",
+          "relevant": false,
+          "source_allowed": false,
+          "covered_fact_ids": []
+        },
+        {
+          "block_id": "b022",
+          "score": 0.0,
+          "rank": 24,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b014",
+          "score": 0.0,
+          "rank": 25,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b029",
+          "score": 0.0,
+          "rank": 26,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b023",
+          "score": 0.0,
+          "rank": 27,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b016",
+          "score": 0.0,
+          "rank": 28,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b013",
+          "score": 0.0,
+          "rank": 29,
+          "judgment": "JUDGED",
+          "relevant": false,
+          "source_allowed": true,
+          "covered_fact_ids": []
+        }
+      ],
+      "pool_size": 29,
+      "judged_pairs": 4,
+      "unjudged_in_top_k": 4,
+      "known_allowed_positive_recall_at_k": 0.5,
+      "fully_judged": false,
+      "semantic_false_positive_rate": null
+    },
+    {
+      "task_id": "m15-cal-04",
+      "split": "calibration",
+      "question": "В чём различие alias_priority=1 и alias_priority=2?",
+      "formulation": "RU",
+      "variant": "B_encoder",
+      "status": "OK",
+      "block_scores": [
+        {
+          "block_id": "b020",
+          "score": 0.7558257579803467,
+          "rank": 1,
+          "judgment": "JUDGED",
+          "relevant": true,
+          "source_allowed": true,
+          "covered_fact_ids": [
+            "pydantic-alias-priority"
+          ]
+        },
+        {
+          "block_id": "b012",
+          "score": 0.6496049761772156,
+          "rank": 2,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b021",
+          "score": 0.6199774146080017,
+          "rank": 3,
+          "judgment": "JUDGED",
+          "relevant": true,
+          "source_allowed": true,
+          "covered_fact_ids": []
+        },
+        {
+          "block_id": "b010",
+          "score": 0.5998966693878174,
+          "rank": 4,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b011",
+          "score": 0.5767409205436707,
+          "rank": 5,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b013",
+          "score": 0.5150278806686401,
+          "rank": 6,
+          "judgment": "JUDGED",
+          "relevant": false,
+          "source_allowed": true,
+          "covered_fact_ids": []
+        },
+        {
+          "block_id": "b028",
+          "score": 0.5049174427986145,
+          "rank": 7,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b001",
+          "score": 0.2655530869960785,
+          "rank": 8,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b003",
+          "score": 0.25424814224243164,
+          "rank": 9,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b005",
+          "score": 0.252297043800354,
+          "rank": 10,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b017",
+          "score": 0.2402593344449997,
+          "rank": 11,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b025",
+          "score": 0.23803535103797913,
+          "rank": 12,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b015",
+          "score": 0.2331332117319107,
+          "rank": 13,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b018",
+          "score": 0.22873517870903015,
+          "rank": 14,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b022",
+          "score": 0.2249975949525833,
+          "rank": 15,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b029",
+          "score": 0.21392878890037537,
+          "rank": 16,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b006",
+          "score": 0.20065626502037048,
+          "rank": 17,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b002",
+          "score": 0.19330871105194092,
+          "rank": 18,
+          "judgment": "JUDGED",
+          "relevant": false,
+          "source_allowed": false,
+          "covered_fact_ids": []
+        },
+        {
+          "block_id": "b016",
+          "score": 0.1779208928346634,
+          "rank": 19,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b019",
+          "score": 0.16797618567943573,
+          "rank": 20,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b023",
+          "score": 0.16775649785995483,
+          "rank": 21,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b014",
+          "score": 0.1666564792394638,
+          "rank": 22,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b026",
+          "score": 0.1569490134716034,
+          "rank": 23,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b009",
+          "score": 0.13046644628047943,
+          "rank": 24,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b027",
+          "score": 0.12191618978977203,
+          "rank": 25,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b004",
+          "score": 0.0979473888874054,
+          "rank": 26,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b024",
+          "score": 0.08165062218904495,
+          "rank": 27,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b007",
+          "score": 0.05941203609108925,
+          "rank": 28,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b008",
+          "score": 0.050538863986730576,
+          "rank": 29,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        }
+      ],
+      "pool_size": 29,
+      "judged_pairs": 4,
+      "unjudged_in_top_k": 3,
+      "known_allowed_positive_recall_at_k": 1.0,
+      "fully_judged": false,
+      "semantic_false_positive_rate": null
+    },
+    {
+      "task_id": "m15-hold-01",
+      "split": "holdout",
+      "question": "Как отключить all timeouts для HTTPX Client: какой аргумент передать?",
+      "formulation": "mixed",
+      "variant": "A_lexical",
+      "status": "OK",
+      "block_scores": [
+        {
+          "block_id": "b002",
+          "score": 0.42857142857142855,
+          "rank": 1,
+          "judgment": "JUDGED",
+          "relevant": true,
+          "source_allowed": true,
+          "covered_fact_ids": [
+            "httpx-disable-timeouts"
+          ]
+        },
+        {
+          "block_id": "b022",
+          "score": 0.42857142857142855,
+          "rank": 2,
+          "judgment": "JUDGED",
+          "relevant": true,
+          "source_allowed": true,
+          "covered_fact_ids": []
+        },
+        {
+          "block_id": "b001",
+          "score": 0.2857142857142857,
+          "rank": 3,
+          "judgment": "JUDGED",
+          "relevant": false,
+          "source_allowed": true,
+          "covered_fact_ids": []
+        },
+        {
+          "block_id": "b015",
+          "score": 0.2857142857142857,
+          "rank": 4,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b016",
+          "score": 0.2857142857142857,
+          "rank": 5,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b018",
+          "score": 0.14285714285714285,
+          "rank": 6,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b009",
+          "score": 0.14285714285714285,
+          "rank": 7,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b026",
+          "score": 0.14285714285714285,
+          "rank": 8,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b027",
+          "score": 0.14285714285714285,
+          "rank": 9,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b029",
+          "score": 0.14285714285714285,
+          "rank": 10,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b020",
+          "score": 0.0,
+          "rank": 11,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b010",
+          "score": 0.0,
+          "rank": 12,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b017",
+          "score": 0.0,
+          "rank": 13,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b005",
+          "score": 0.0,
+          "rank": 14,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b004",
+          "score": 0.0,
+          "rank": 15,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b006",
+          "score": 0.0,
+          "rank": 16,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b012",
+          "score": 0.0,
+          "rank": 17,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b024",
+          "score": 0.0,
+          "rank": 18,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b025",
+          "score": 0.0,
+          "rank": 19,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b003",
+          "score": 0.0,
+          "rank": 20,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b028",
+          "score": 0.0,
+          "rank": 21,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b008",
+          "score": 0.0,
+          "rank": 22,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b021",
+          "score": 0.0,
+          "rank": 23,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b011",
+          "score": 0.0,
+          "rank": 24,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b007",
+          "score": 0.0,
+          "rank": 25,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b019",
+          "score": 0.0,
+          "rank": 26,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b014",
+          "score": 0.0,
+          "rank": 27,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b023",
+          "score": 0.0,
+          "rank": 28,
+          "judgment": "JUDGED",
+          "relevant": false,
+          "source_allowed": false,
+          "covered_fact_ids": []
+        },
+        {
+          "block_id": "b013",
+          "score": 0.0,
+          "rank": 29,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        }
+      ],
+      "pool_size": 29,
+      "judged_pairs": 4,
+      "unjudged_in_top_k": 2,
+      "known_allowed_positive_recall_at_k": 1.0,
+      "fully_judged": false,
+      "semantic_false_positive_rate": null
+    },
+    {
+      "task_id": "m15-hold-01",
+      "split": "holdout",
+      "question": "Как отключить all timeouts для HTTPX Client: какой аргумент передать?",
+      "formulation": "mixed",
+      "variant": "B_encoder",
+      "status": "OK",
+      "block_scores": [
+        {
+          "block_id": "b001",
+          "score": 0.8166946172714233,
+          "rank": 1,
+          "judgment": "JUDGED",
+          "relevant": false,
+          "source_allowed": true,
+          "covered_fact_ids": []
+        },
+        {
+          "block_id": "b022",
+          "score": 0.7233761548995972,
+          "rank": 2,
+          "judgment": "JUDGED",
+          "relevant": true,
+          "source_allowed": true,
+          "covered_fact_ids": []
+        },
+        {
+          "block_id": "b002",
+          "score": 0.6985926628112793,
+          "rank": 3,
+          "judgment": "JUDGED",
+          "relevant": true,
+          "source_allowed": true,
+          "covered_fact_ids": [
+            "httpx-disable-timeouts"
+          ]
+        },
+        {
+          "block_id": "b018",
+          "score": 0.6870883703231812,
+          "rank": 4,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b016",
+          "score": 0.6583702564239502,
+          "rank": 5,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b015",
+          "score": 0.5367493033409119,
+          "rank": 6,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b004",
+          "score": 0.4830920696258545,
+          "rank": 7,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b029",
+          "score": 0.4703711271286011,
+          "rank": 8,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b007",
+          "score": 0.3932027518749237,
+          "rank": 9,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b008",
+          "score": 0.35675477981567383,
+          "rank": 10,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b027",
+          "score": 0.31779831647872925,
+          "rank": 11,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b009",
+          "score": 0.2968030273914337,
+          "rank": 12,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b020",
+          "score": 0.26959744095802307,
+          "rank": 13,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b017",
+          "score": 0.25169357657432556,
+          "rank": 14,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b006",
+          "score": 0.23264507949352264,
+          "rank": 15,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b005",
+          "score": 0.2209012508392334,
+          "rank": 16,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b024",
+          "score": 0.20959648489952087,
+          "rank": 17,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b019",
+          "score": 0.20158207416534424,
+          "rank": 18,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b026",
+          "score": 0.18726909160614014,
+          "rank": 19,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b011",
+          "score": 0.16381026804447174,
+          "rank": 20,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b021",
+          "score": 0.15849481523036957,
+          "rank": 21,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b025",
+          "score": 0.15521518886089325,
+          "rank": 22,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b003",
+          "score": 0.14280399680137634,
+          "rank": 23,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b028",
+          "score": 0.13465538620948792,
+          "rank": 24,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b012",
+          "score": 0.11794829368591309,
+          "rank": 25,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b010",
+          "score": 0.11123653501272202,
+          "rank": 26,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b013",
+          "score": 0.07114996016025543,
+          "rank": 27,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b014",
+          "score": 0.06700452417135239,
+          "rank": 28,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b023",
+          "score": 0.05403327941894531,
+          "rank": 29,
+          "judgment": "JUDGED",
+          "relevant": false,
+          "source_allowed": false,
+          "covered_fact_ids": []
+        }
+      ],
+      "pool_size": 29,
+      "judged_pairs": 4,
+      "unjudged_in_top_k": 2,
+      "known_allowed_positive_recall_at_k": 1.0,
+      "fully_judged": false,
+      "semantic_false_positive_rate": null
+    },
+    {
+      "task_id": "m15-hold-02",
+      "split": "holdout",
+      "question": "What happens to explicit-preview-rules setting when preview mode is not enabled?",
+      "formulation": "EN",
+      "variant": "A_lexical",
+      "status": "OK",
+      "block_scores": [
+        {
+          "block_id": "b006",
+          "score": 0.75,
+          "rank": 1,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b025",
+          "score": 0.75,
+          "rank": 2,
+          "judgment": "JUDGED",
+          "relevant": true,
+          "source_allowed": true,
+          "covered_fact_ids": []
+        },
+        {
+          "block_id": "b017",
+          "score": 0.5,
+          "rank": 3,
+          "judgment": "JUDGED",
+          "relevant": false,
+          "source_allowed": true,
+          "covered_fact_ids": []
+        },
+        {
+          "block_id": "b024",
+          "score": 0.5,
+          "rank": 4,
+          "judgment": "JUDGED",
+          "relevant": true,
+          "source_allowed": true,
+          "covered_fact_ids": [
+            "ruff-explicit-preview-no-effect"
+          ]
+        },
+        {
+          "block_id": "b023",
+          "score": 0.5,
+          "rank": 5,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b005",
+          "score": 0.375,
+          "rank": 6,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b003",
+          "score": 0.375,
+          "rank": 7,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b010",
+          "score": 0.125,
+          "rank": 8,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b028",
+          "score": 0.125,
+          "rank": 9,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b009",
+          "score": 0.125,
+          "rank": 10,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b027",
+          "score": 0.125,
+          "rank": 11,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b013",
+          "score": 0.125,
+          "rank": 12,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b020",
+          "score": 0.0,
+          "rank": 13,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b004",
+          "score": 0.0,
+          "rank": 14,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b012",
+          "score": 0.0,
+          "rank": 15,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b018",
+          "score": 0.0,
+          "rank": 16,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b008",
+          "score": 0.0,
+          "rank": 17,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b026",
+          "score": 0.0,
+          "rank": 18,
+          "judgment": "JUDGED",
+          "relevant": false,
+          "source_allowed": false,
+          "covered_fact_ids": []
+        },
+        {
+          "block_id": "b021",
+          "score": 0.0,
+          "rank": 19,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b011",
+          "score": 0.0,
+          "rank": 20,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b007",
+          "score": 0.0,
+          "rank": 21,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b019",
+          "score": 0.0,
+          "rank": 22,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b001",
+          "score": 0.0,
+          "rank": 23,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b015",
+          "score": 0.0,
+          "rank": 24,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b002",
+          "score": 0.0,
+          "rank": 25,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b022",
+          "score": 0.0,
+          "rank": 26,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b014",
+          "score": 0.0,
+          "rank": 27,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b029",
+          "score": 0.0,
+          "rank": 28,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b016",
+          "score": 0.0,
+          "rank": 29,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        }
+      ],
+      "pool_size": 29,
+      "judged_pairs": 4,
+      "unjudged_in_top_k": 2,
+      "known_allowed_positive_recall_at_k": 1.0,
+      "fully_judged": false,
+      "semantic_false_positive_rate": null
+    },
+    {
+      "task_id": "m15-hold-02",
+      "split": "holdout",
+      "question": "What happens to explicit-preview-rules setting when preview mode is not enabled?",
+      "formulation": "EN",
+      "variant": "B_encoder",
+      "status": "OK",
+      "block_scores": [
+        {
+          "block_id": "b024",
+          "score": 0.8543798327445984,
+          "rank": 1,
+          "judgment": "JUDGED",
+          "relevant": true,
+          "source_allowed": true,
+          "covered_fact_ids": [
+            "ruff-explicit-preview-no-effect"
+          ]
+        },
+        {
+          "block_id": "b005",
+          "score": 0.7956772446632385,
+          "rank": 2,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b017",
+          "score": 0.7906296253204346,
+          "rank": 3,
+          "judgment": "JUDGED",
+          "relevant": false,
+          "source_allowed": true,
+          "covered_fact_ids": []
+        },
+        {
+          "block_id": "b025",
+          "score": 0.7872353792190552,
+          "rank": 4,
+          "judgment": "JUDGED",
+          "relevant": true,
+          "source_allowed": true,
+          "covered_fact_ids": []
+        },
+        {
+          "block_id": "b023",
+          "score": 0.6709058284759521,
+          "rank": 5,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b003",
+          "score": 0.6501566171646118,
+          "rank": 6,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b006",
+          "score": 0.6041779518127441,
+          "rank": 7,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b015",
+          "score": 0.31922638416290283,
+          "rank": 8,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b022",
+          "score": 0.2910277545452118,
+          "rank": 9,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b002",
+          "score": 0.2899089753627777,
+          "rank": 10,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b029",
+          "score": 0.2881940007209778,
+          "rank": 11,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b020",
+          "score": 0.2755669951438904,
+          "rank": 12,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b018",
+          "score": 0.2602505087852478,
+          "rank": 13,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b004",
+          "score": 0.24355408549308777,
+          "rank": 14,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b027",
+          "score": 0.23605778813362122,
+          "rank": 15,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b001",
+          "score": 0.22981271147727966,
+          "rank": 16,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b009",
+          "score": 0.22967307269573212,
+          "rank": 17,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b021",
+          "score": 0.22538146376609802,
+          "rank": 18,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b016",
+          "score": 0.22515824437141418,
+          "rank": 19,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b007",
+          "score": 0.2012019157409668,
+          "rank": 20,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b013",
+          "score": 0.1835448443889618,
+          "rank": 21,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b010",
+          "score": 0.1769384890794754,
+          "rank": 22,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b008",
+          "score": 0.17370480298995972,
+          "rank": 23,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b026",
+          "score": 0.17005644738674164,
+          "rank": 24,
+          "judgment": "JUDGED",
+          "relevant": false,
+          "source_allowed": false,
+          "covered_fact_ids": []
+        },
+        {
+          "block_id": "b011",
+          "score": 0.1628149002790451,
+          "rank": 25,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b019",
+          "score": 0.1587105095386505,
+          "rank": 26,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b012",
+          "score": 0.15097083151340485,
+          "rank": 27,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b028",
+          "score": 0.14733505249023438,
+          "rank": 28,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b014",
+          "score": 0.024608055129647255,
+          "rank": 29,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        }
+      ],
+      "pool_size": 29,
+      "judged_pairs": 4,
+      "unjudged_in_top_k": 2,
+      "known_allowed_positive_recall_at_k": 1.0,
+      "fully_judged": false,
+      "semantic_false_positive_rate": null
+    },
+    {
+      "task_id": "m15-hold-03",
+      "split": "holdout",
+      "question": "Как использовать TestClient, чтобы lifespan выполнился в тестах?",
+      "formulation": "RU",
+      "variant": "A_lexical",
+      "status": "OK",
+      "block_scores": [
+        {
+          "block_id": "b009",
+          "score": 0.3333333333333333,
+          "rank": 1,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b026",
+          "score": 0.3333333333333333,
+          "rank": 2,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b027",
+          "score": 0.3333333333333333,
+          "rank": 3,
+          "judgment": "JUDGED",
+          "relevant": true,
+          "source_allowed": true,
+          "covered_fact_ids": [
+            "starlette-testclient-context-manager"
+          ]
+        },
+        {
+          "block_id": "b004",
+          "score": 0.16666666666666666,
+          "rank": 4,
+          "judgment": "JUDGED",
+          "relevant": false,
+          "source_allowed": true,
+          "covered_fact_ids": []
+        },
+        {
+          "block_id": "b008",
+          "score": 0.16666666666666666,
+          "rank": 5,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b007",
+          "score": 0.16666666666666666,
+          "rank": 6,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b019",
+          "score": 0.16666666666666666,
+          "rank": 7,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b014",
+          "score": 0.16666666666666666,
+          "rank": 8,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b020",
+          "score": 0.0,
+          "rank": 9,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b010",
+          "score": 0.0,
+          "rank": 10,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b017",
+          "score": 0.0,
+          "rank": 11,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b005",
+          "score": 0.0,
+          "rank": 12,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b006",
+          "score": 0.0,
+          "rank": 13,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b012",
+          "score": 0.0,
+          "rank": 14,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b024",
+          "score": 0.0,
+          "rank": 15,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b018",
+          "score": 0.0,
+          "rank": 16,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b025",
+          "score": 0.0,
+          "rank": 17,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b003",
+          "score": 0.0,
+          "rank": 18,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b028",
+          "score": 0.0,
+          "rank": 19,
+          "judgment": "JUDGED",
+          "relevant": false,
+          "source_allowed": false,
+          "covered_fact_ids": []
+        },
+        {
+          "block_id": "b021",
+          "score": 0.0,
+          "rank": 20,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b011",
+          "score": 0.0,
+          "rank": 21,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b001",
+          "score": 0.0,
+          "rank": 22,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b015",
+          "score": 0.0,
+          "rank": 23,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b002",
+          "score": 0.0,
+          "rank": 24,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b022",
+          "score": 0.0,
+          "rank": 25,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b029",
+          "score": 0.0,
+          "rank": 26,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b023",
+          "score": 0.0,
+          "rank": 27,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b016",
+          "score": 0.0,
+          "rank": 28,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b013",
+          "score": 0.0,
+          "rank": 29,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        }
+      ],
+      "pool_size": 29,
+      "judged_pairs": 3,
+      "unjudged_in_top_k": 3,
+      "known_allowed_positive_recall_at_k": 1.0,
+      "fully_judged": false,
+      "semantic_false_positive_rate": null
+    },
+    {
+      "task_id": "m15-hold-03",
+      "split": "holdout",
+      "question": "Как использовать TestClient, чтобы lifespan выполнился в тестах?",
+      "formulation": "RU",
+      "variant": "B_encoder",
+      "status": "OK",
+      "block_scores": [
+        {
+          "block_id": "b026",
+          "score": 0.7436467409133911,
+          "rank": 1,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b009",
+          "score": 0.7011106014251709,
+          "rank": 2,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b027",
+          "score": 0.661882221698761,
+          "rank": 3,
+          "judgment": "JUDGED",
+          "relevant": true,
+          "source_allowed": true,
+          "covered_fact_ids": [
+            "starlette-testclient-context-manager"
+          ]
+        },
+        {
+          "block_id": "b014",
+          "score": 0.460915207862854,
+          "rank": 4,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b019",
+          "score": 0.432354211807251,
+          "rank": 5,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b004",
+          "score": 0.4114567041397095,
+          "rank": 6,
+          "judgment": "JUDGED",
+          "relevant": false,
+          "source_allowed": true,
+          "covered_fact_ids": []
+        },
+        {
+          "block_id": "b008",
+          "score": 0.4108768105506897,
+          "rank": 7,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b007",
+          "score": 0.3825558125972748,
+          "rank": 8,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b016",
+          "score": 0.33229973912239075,
+          "rank": 9,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b029",
+          "score": 0.3201151192188263,
+          "rank": 10,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b018",
+          "score": 0.2975507974624634,
+          "rank": 11,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b001",
+          "score": 0.2633592486381531,
+          "rank": 12,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b015",
+          "score": 0.23176676034927368,
+          "rank": 13,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b002",
+          "score": 0.2272525578737259,
+          "rank": 14,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b023",
+          "score": 0.22650665044784546,
+          "rank": 15,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b022",
+          "score": 0.21053585410118103,
+          "rank": 16,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b005",
+          "score": 0.20953647792339325,
+          "rank": 17,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b003",
+          "score": 0.20868206024169922,
+          "rank": 18,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b017",
+          "score": 0.16336245834827423,
+          "rank": 19,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b006",
+          "score": 0.1333695650100708,
+          "rank": 20,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b025",
+          "score": 0.10569723695516586,
+          "rank": 21,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b013",
+          "score": 0.10008814185857773,
+          "rank": 22,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b028",
+          "score": 0.09314437210559845,
+          "rank": 23,
+          "judgment": "JUDGED",
+          "relevant": false,
+          "source_allowed": false,
+          "covered_fact_ids": []
+        },
+        {
+          "block_id": "b024",
+          "score": 0.08813999593257904,
+          "rank": 24,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b020",
+          "score": 0.027074294164776802,
+          "rank": 25,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b011",
+          "score": 0.00861547514796257,
+          "rank": 26,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b010",
+          "score": -0.015935253351926804,
+          "rank": 27,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b021",
+          "score": -0.020035255700349808,
+          "rank": 28,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b012",
+          "score": -0.036109719425439835,
+          "rank": 29,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        }
+      ],
+      "pool_size": 29,
+      "judged_pairs": 3,
+      "unjudged_in_top_k": 4,
+      "known_allowed_positive_recall_at_k": 1.0,
+      "fully_judged": false,
+      "semantic_false_positive_rate": null
+    },
+    {
+      "task_id": "m15-hold-04",
+      "split": "holdout",
+      "question": "Как AliasGenerator помогает use different naming conventions при loading and saving?",
+      "formulation": "mixed",
+      "variant": "A_lexical",
+      "status": "OK",
+      "block_scores": [
+        {
+          "block_id": "b013",
+          "score": 0.8571428571428571,
+          "rank": 1,
+          "judgment": "JUDGED",
+          "relevant": true,
+          "source_allowed": true,
+          "covered_fact_ids": [
+            "pydantic-aliasgenerator-purpose"
+          ]
+        },
+        {
+          "block_id": "b010",
+          "score": 0.14285714285714285,
+          "rank": 2,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b015",
+          "score": 0.14285714285714285,
+          "rank": 3,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b029",
+          "score": 0.14285714285714285,
+          "rank": 4,
+          "judgment": "JUDGED",
+          "relevant": false,
+          "source_allowed": false,
+          "covered_fact_ids": []
+        },
+        {
+          "block_id": "b020",
+          "score": 0.0,
+          "rank": 5,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b017",
+          "score": 0.0,
+          "rank": 6,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b005",
+          "score": 0.0,
+          "rank": 7,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b004",
+          "score": 0.0,
+          "rank": 8,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b006",
+          "score": 0.0,
+          "rank": 9,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b012",
+          "score": 0.0,
+          "rank": 10,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b024",
+          "score": 0.0,
+          "rank": 11,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b018",
+          "score": 0.0,
+          "rank": 12,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b025",
+          "score": 0.0,
+          "rank": 13,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b003",
+          "score": 0.0,
+          "rank": 14,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b028",
+          "score": 0.0,
+          "rank": 15,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b009",
+          "score": 0.0,
+          "rank": 16,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b008",
+          "score": 0.0,
+          "rank": 17,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b026",
+          "score": 0.0,
+          "rank": 18,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b027",
+          "score": 0.0,
+          "rank": 19,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b021",
+          "score": 0.0,
+          "rank": 20,
+          "judgment": "JUDGED",
+          "relevant": false,
+          "source_allowed": true,
+          "covered_fact_ids": []
+        },
+        {
+          "block_id": "b011",
+          "score": 0.0,
+          "rank": 21,
+          "judgment": "JUDGED",
+          "relevant": false,
+          "source_allowed": true,
+          "covered_fact_ids": []
+        },
+        {
+          "block_id": "b007",
+          "score": 0.0,
+          "rank": 22,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b019",
+          "score": 0.0,
+          "rank": 23,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b001",
+          "score": 0.0,
+          "rank": 24,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b002",
+          "score": 0.0,
+          "rank": 25,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b022",
+          "score": 0.0,
+          "rank": 26,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b014",
+          "score": 0.0,
+          "rank": 27,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b023",
+          "score": 0.0,
+          "rank": 28,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b016",
+          "score": 0.0,
+          "rank": 29,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        }
+      ],
+      "pool_size": 29,
+      "judged_pairs": 4,
+      "unjudged_in_top_k": 3,
+      "known_allowed_positive_recall_at_k": 1.0,
+      "fully_judged": false,
+      "semantic_false_positive_rate": null
+    },
+    {
+      "task_id": "m15-hold-04",
+      "split": "holdout",
+      "question": "Как AliasGenerator помогает use different naming conventions при loading and saving?",
+      "formulation": "mixed",
+      "variant": "B_encoder",
+      "status": "OK",
+      "block_scores": [
+        {
+          "block_id": "b013",
+          "score": 0.6689448356628418,
+          "rank": 1,
+          "judgment": "JUDGED",
+          "relevant": true,
+          "source_allowed": true,
+          "covered_fact_ids": [
+            "pydantic-aliasgenerator-purpose"
+          ]
+        },
+        {
+          "block_id": "b010",
+          "score": 0.5124472379684448,
+          "rank": 2,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b021",
+          "score": 0.48070472478866577,
+          "rank": 3,
+          "judgment": "JUDGED",
+          "relevant": false,
+          "source_allowed": true,
+          "covered_fact_ids": []
+        },
+        {
+          "block_id": "b011",
+          "score": 0.46368175745010376,
+          "rank": 4,
+          "judgment": "JUDGED",
+          "relevant": false,
+          "source_allowed": true,
+          "covered_fact_ids": []
+        },
+        {
+          "block_id": "b012",
+          "score": 0.4435603618621826,
+          "rank": 5,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b020",
+          "score": 0.43268126249313354,
+          "rank": 6,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b028",
+          "score": 0.41948387026786804,
+          "rank": 7,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b025",
+          "score": 0.3748805522918701,
+          "rank": 8,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b017",
+          "score": 0.3114219903945923,
+          "rank": 9,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b027",
+          "score": 0.2744346857070923,
+          "rank": 10,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b023",
+          "score": 0.267014741897583,
+          "rank": 11,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b026",
+          "score": 0.2628840506076813,
+          "rank": 12,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b006",
+          "score": 0.26096075773239136,
+          "rank": 13,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b003",
+          "score": 0.2505347430706024,
+          "rank": 14,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b009",
+          "score": 0.23984575271606445,
+          "rank": 15,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b005",
+          "score": 0.22458016872406006,
+          "rank": 16,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b024",
+          "score": 0.17612582445144653,
+          "rank": 17,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b002",
+          "score": 0.16622298955917358,
+          "rank": 18,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b019",
+          "score": 0.16611261665821075,
+          "rank": 19,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b016",
+          "score": 0.155379980802536,
+          "rank": 20,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b015",
+          "score": 0.14714230597019196,
+          "rank": 21,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b022",
+          "score": 0.13282081484794617,
+          "rank": 22,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b029",
+          "score": 0.12464191764593124,
+          "rank": 23,
+          "judgment": "JUDGED",
+          "relevant": false,
+          "source_allowed": false,
+          "covered_fact_ids": []
+        },
+        {
+          "block_id": "b014",
+          "score": 0.11395520716905594,
+          "rank": 24,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b004",
+          "score": 0.07895489037036896,
+          "rank": 25,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b018",
+          "score": 0.07536513358354568,
+          "rank": 26,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b001",
+          "score": 0.053904544562101364,
+          "rank": 27,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b007",
+          "score": 0.04165216535329819,
+          "rank": 28,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        },
+        {
+          "block_id": "b008",
+          "score": 0.03780340030789375,
+          "rank": 29,
+          "judgment": "UNJUDGED",
+          "relevant": null,
+          "source_allowed": null,
+          "covered_fact_ids": null
+        }
+      ],
+      "pool_size": 29,
+      "judged_pairs": 4,
+      "unjudged_in_top_k": 2,
+      "known_allowed_positive_recall_at_k": 1.0,
+      "fully_judged": false,
+      "semantic_false_positive_rate": null
+    }
+  ],
+  "summary": {
+    "A_lexical/development": {
+      "n": 4,
+      "mean_known_allowed_positive_recall_at_5": 1.0,
+      "tasks_with_known_allowed_positive": 4,
+      "all_pairs_judged": false,
+      "ranking_scope": "entire_fixed_pool_unjudged_labels_remain_unknown"
+    },
+    "A_lexical/calibration": {
+      "n": 4,
+      "mean_known_allowed_positive_recall_at_5": 0.875,
+      "tasks_with_known_allowed_positive": 4,
+      "all_pairs_judged": false,
+      "ranking_scope": "entire_fixed_pool_unjudged_labels_remain_unknown"
+    },
+    "A_lexical/holdout": {
+      "n": 4,
+      "mean_known_allowed_positive_recall_at_5": 1.0,
+      "tasks_with_known_allowed_positive": 4,
+      "all_pairs_judged": false,
+      "ranking_scope": "entire_fixed_pool_unjudged_labels_remain_unknown"
+    },
+    "B_encoder/development": {
+      "n": 4,
+      "mean_known_allowed_positive_recall_at_5": 0.875,
+      "tasks_with_known_allowed_positive": 4,
+      "all_pairs_judged": false,
+      "ranking_scope": "entire_fixed_pool_unjudged_labels_remain_unknown"
+    },
+    "B_encoder/calibration": {
+      "n": 4,
+      "mean_known_allowed_positive_recall_at_5": 1.0,
+      "tasks_with_known_allowed_positive": 4,
+      "all_pairs_judged": false,
+      "ranking_scope": "entire_fixed_pool_unjudged_labels_remain_unknown"
+    },
+    "B_encoder/holdout": {
+      "n": 4,
+      "mean_known_allowed_positive_recall_at_5": 1.0,
+      "tasks_with_known_allowed_positive": 4,
+      "all_pairs_judged": false,
+      "ranking_scope": "entire_fixed_pool_unjudged_labels_remain_unknown"
+    }
+  }
+}

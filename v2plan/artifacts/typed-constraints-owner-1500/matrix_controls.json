@@ -1,0 +1,1304 @@
+[
+  {
+    "id": "temporal-en",
+    "label": "temporal_question",
+    "question": "When do QueueTasks run relative to returning the response?",
+    "body": "QueueTasks run only after the response has been sent.",
+    "native": [
+      {
+        "contract": {
+          "need": {
+            "need_id": "sentence-1",
+            "query_span_start": 0,
+            "query_span_end": 58,
+            "query_span_text": "When do QueueTasks run relative to returning the response?",
+            "subject": "QueueTasks",
+            "relation": "temporal_order",
+            "context": "",
+            "hard_exact": []
+          },
+          "focus_spans": [
+            {
+              "start": 8,
+              "end": 18
+            }
+          ],
+          "constraint_spans": [
+            {
+              "start": 0,
+              "end": 58
+            }
+          ],
+          "prerequisite_need_ids": [],
+          "requirement": "scalar",
+          "expected_count": null,
+          "interpretation": "supported",
+          "alternative_spans": [],
+          "category_spans": []
+        },
+        "applicable": false
+      }
+    ],
+    "research": [
+      {
+        "contract": {
+          "need": {
+            "need_id": "sentence-1",
+            "query_span_start": 0,
+            "query_span_end": 58,
+            "query_span_text": "When do QueueTasks run relative to returning the response?",
+            "subject": "QueueTasks",
+            "relation": "temporal_order",
+            "context": "",
+            "hard_exact": []
+          },
+          "focus_spans": [
+            {
+              "start": 8,
+              "end": 18
+            }
+          ],
+          "constraint_spans": [],
+          "prerequisite_need_ids": [],
+          "requirement": "scalar",
+          "expected_count": null,
+          "interpretation": "supported",
+          "alternative_spans": [],
+          "category_spans": []
+        },
+        "applicable": true
+      }
+    ]
+  },
+  {
+    "id": "temporal-ru",
+    "label": "temporal_question",
+    "question": "Когда начинается lifespan teardown относительно connections и background tasks?",
+    "body": "The lifespan teardown will run once all connections have been closed, and any in-process background tasks have completed.",
+    "native": [
+      {
+        "contract": {
+          "need": {
+            "need_id": "sentence-1",
+            "query_span_start": 0,
+            "query_span_end": 79,
+            "query_span_text": "Когда начинается lifespan teardown относительно connections и background tasks?",
+            "subject": "",
+            "relation": "requested_part",
+            "context": "",
+            "hard_exact": []
+          },
+          "focus_spans": [],
+          "constraint_spans": [
+            {
+              "start": 0,
+              "end": 79
+            }
+          ],
+          "prerequisite_need_ids": [],
+          "requirement": "unknown",
+          "expected_count": null,
+          "interpretation": "unresolved",
+          "alternative_spans": [],
+          "category_spans": []
+        },
+        "applicable": false
+      }
+    ],
+    "research": [
+      {
+        "contract": {
+          "need": {
+            "need_id": "sentence-1",
+            "query_span_start": 0,
+            "query_span_end": 79,
+            "query_span_text": "Когда начинается lifespan teardown относительно connections и background tasks?",
+            "subject": "",
+            "relation": "requested_part",
+            "context": "",
+            "hard_exact": []
+          },
+          "focus_spans": [],
+          "constraint_spans": [
+            {
+              "start": 0,
+              "end": 79
+            }
+          ],
+          "prerequisite_need_ids": [],
+          "requirement": "unknown",
+          "expected_count": null,
+          "interpretation": "unresolved",
+          "alternative_spans": [],
+          "category_spans": []
+        },
+        "applicable": false
+      }
+    ]
+  },
+  {
+    "id": "temporal-ru-supported",
+    "label": "temporal_question",
+    "question": "Когда выполняются QueueTasks относительно отправки ответа?",
+    "body": "QueueTasks выполняются после отправки ответа.",
+    "native": [
+      {
+        "contract": {
+          "need": {
+            "need_id": "sentence-1",
+            "query_span_start": 0,
+            "query_span_end": 58,
+            "query_span_text": "Когда выполняются QueueTasks относительно отправки ответа?",
+            "subject": "QueueTasks",
+            "relation": "temporal_order",
+            "context": "",
+            "hard_exact": [
+              "queuetasks"
+            ]
+          },
+          "focus_spans": [
+            {
+              "start": 18,
+              "end": 28
+            }
+          ],
+          "constraint_spans": [
+            {
+              "start": 0,
+              "end": 58
+            }
+          ],
+          "prerequisite_need_ids": [],
+          "requirement": "scalar",
+          "expected_count": null,
+          "interpretation": "supported",
+          "alternative_spans": [],
+          "category_spans": []
+        },
+        "applicable": false
+      }
+    ],
+    "research": [
+      {
+        "contract": {
+          "need": {
+            "need_id": "sentence-1",
+            "query_span_start": 0,
+            "query_span_end": 58,
+            "query_span_text": "Когда выполняются QueueTasks относительно отправки ответа?",
+            "subject": "QueueTasks",
+            "relation": "temporal_order",
+            "context": "",
+            "hard_exact": [
+              "queuetasks"
+            ]
+          },
+          "focus_spans": [
+            {
+              "start": 18,
+              "end": 28
+            }
+          ],
+          "constraint_spans": [],
+          "prerequisite_need_ids": [],
+          "requirement": "scalar",
+          "expected_count": null,
+          "interpretation": "supported",
+          "alternative_spans": [],
+          "category_spans": []
+        },
+        "applicable": true
+      }
+    ]
+  },
+  {
+    "id": "temporal-parsed-state-match",
+    "label": "temporal_and_scenario",
+    "question": "When do QueueTasks run relative to returning the response when preview is disabled?",
+    "body": "When preview is disabled, QueueTasks run after the response.",
+    "native": [
+      {
+        "contract": {
+          "need": {
+            "need_id": "sentence-1",
+            "query_span_start": 0,
+            "query_span_end": 83,
+            "query_span_text": "When do QueueTasks run relative to returning the response when preview is disabled?",
+            "subject": "QueueTasks",
+            "relation": "temporal_order",
+            "context": "",
+            "hard_exact": []
+          },
+          "focus_spans": [
+            {
+              "start": 8,
+              "end": 18
+            }
+          ],
+          "constraint_spans": [
+            {
+              "start": 0,
+              "end": 83
+            }
+          ],
+          "prerequisite_need_ids": [],
+          "requirement": "scalar",
+          "expected_count": null,
+          "interpretation": "supported",
+          "alternative_spans": [],
+          "category_spans": []
+        },
+        "applicable": true
+      }
+    ],
+    "research": [
+      {
+        "contract": {
+          "need": {
+            "need_id": "sentence-1",
+            "query_span_start": 0,
+            "query_span_end": 83,
+            "query_span_text": "When do QueueTasks run relative to returning the response when preview is disabled?",
+            "subject": "QueueTasks",
+            "relation": "temporal_order",
+            "context": "",
+            "hard_exact": []
+          },
+          "focus_spans": [
+            {
+              "start": 8,
+              "end": 18
+            }
+          ],
+          "constraint_spans": [
+            {
+              "start": 63,
+              "end": 70
+            },
+            {
+              "start": 74,
+              "end": 82
+            }
+          ],
+          "prerequisite_need_ids": [],
+          "requirement": "scalar",
+          "expected_count": null,
+          "interpretation": "supported",
+          "alternative_spans": [],
+          "category_spans": []
+        },
+        "applicable": true
+      }
+    ]
+  },
+  {
+    "id": "temporal-parsed-state-wrong",
+    "label": "temporal_and_scenario",
+    "question": "When do QueueTasks run relative to returning the response when preview is disabled?",
+    "body": "When preview is enabled, QueueTasks run after the response.",
+    "native": [
+      {
+        "contract": {
+          "need": {
+            "need_id": "sentence-1",
+            "query_span_start": 0,
+            "query_span_end": 83,
+            "query_span_text": "When do QueueTasks run relative to returning the response when preview is disabled?",
+            "subject": "QueueTasks",
+            "relation": "temporal_order",
+            "context": "",
+            "hard_exact": []
+          },
+          "focus_spans": [
+            {
+              "start": 8,
+              "end": 18
+            }
+          ],
+          "constraint_spans": [
+            {
+              "start": 0,
+              "end": 83
+            }
+          ],
+          "prerequisite_need_ids": [],
+          "requirement": "scalar",
+          "expected_count": null,
+          "interpretation": "supported",
+          "alternative_spans": [],
+          "category_spans": []
+        },
+        "applicable": false
+      }
+    ],
+    "research": [
+      {
+        "contract": {
+          "need": {
+            "need_id": "sentence-1",
+            "query_span_start": 0,
+            "query_span_end": 83,
+            "query_span_text": "When do QueueTasks run relative to returning the response when preview is disabled?",
+            "subject": "QueueTasks",
+            "relation": "temporal_order",
+            "context": "",
+            "hard_exact": []
+          },
+          "focus_spans": [
+            {
+              "start": 8,
+              "end": 18
+            }
+          ],
+          "constraint_spans": [
+            {
+              "start": 63,
+              "end": 70
+            },
+            {
+              "start": 74,
+              "end": 82
+            }
+          ],
+          "prerequisite_need_ids": [],
+          "requirement": "scalar",
+          "expected_count": null,
+          "interpretation": "supported",
+          "alternative_spans": [],
+          "category_spans": []
+        },
+        "applicable": false
+      }
+    ]
+  },
+  {
+    "id": "temporal-with-state",
+    "label": "temporal_and_scenario",
+    "question": "When do QueueTasks run when preview is disabled?",
+    "body": "When preview is disabled, QueueTasks run after the response.",
+    "native": [
+      {
+        "contract": {
+          "need": {
+            "need_id": "sentence-1",
+            "query_span_start": 0,
+            "query_span_end": 48,
+            "query_span_text": "When do QueueTasks run when preview is disabled?",
+            "subject": "QueueTasks",
+            "relation": "requested_part",
+            "context": "",
+            "hard_exact": []
+          },
+          "focus_spans": [
+            {
+              "start": 8,
+              "end": 18
+            }
+          ],
+          "constraint_spans": [
+            {
+              "start": 0,
+              "end": 48
+            }
+          ],
+          "prerequisite_need_ids": [],
+          "requirement": "unknown",
+          "expected_count": null,
+          "interpretation": "unresolved",
+          "alternative_spans": [],
+          "category_spans": []
+        },
+        "applicable": false
+      }
+    ],
+    "research": [
+      {
+        "contract": {
+          "need": {
+            "need_id": "sentence-1",
+            "query_span_start": 0,
+            "query_span_end": 48,
+            "query_span_text": "When do QueueTasks run when preview is disabled?",
+            "subject": "QueueTasks",
+            "relation": "requested_part",
+            "context": "",
+            "hard_exact": []
+          },
+          "focus_spans": [
+            {
+              "start": 8,
+              "end": 18
+            }
+          ],
+          "constraint_spans": [
+            {
+              "start": 0,
+              "end": 48
+            }
+          ],
+          "prerequisite_need_ids": [],
+          "requirement": "unknown",
+          "expected_count": null,
+          "interpretation": "unresolved",
+          "alternative_spans": [],
+          "category_spans": []
+        },
+        "applicable": false
+      }
+    ]
+  },
+  {
+    "id": "temporal-unless",
+    "label": "temporal_and_exception",
+    "question": "When do QueueTasks run unless preview is enabled?",
+    "body": "QueueTasks run after the response unless preview is enabled.",
+    "native": [
+      {
+        "contract": {
+          "need": {
+            "need_id": "sentence-1",
+            "query_span_start": 0,
+            "query_span_end": 49,
+            "query_span_text": "When do QueueTasks run unless preview is enabled?",
+            "subject": "QueueTasks",
+            "relation": "requested_part",
+            "context": "",
+            "hard_exact": []
+          },
+          "focus_spans": [
+            {
+              "start": 8,
+              "end": 18
+            }
+          ],
+          "constraint_spans": [
+            {
+              "start": 0,
+              "end": 49
+            }
+          ],
+          "prerequisite_need_ids": [],
+          "requirement": "unknown",
+          "expected_count": null,
+          "interpretation": "unresolved",
+          "alternative_spans": [],
+          "category_spans": []
+        },
+        "applicable": false
+      }
+    ],
+    "research": [
+      {
+        "contract": {
+          "need": {
+            "need_id": "sentence-1",
+            "query_span_start": 0,
+            "query_span_end": 49,
+            "query_span_text": "When do QueueTasks run unless preview is enabled?",
+            "subject": "QueueTasks",
+            "relation": "requested_part",
+            "context": "",
+            "hard_exact": []
+          },
+          "focus_spans": [
+            {
+              "start": 8,
+              "end": 18
+            }
+          ],
+          "constraint_spans": [
+            {
+              "start": 0,
+              "end": 49
+            }
+          ],
+          "prerequisite_need_ids": [],
+          "requirement": "unknown",
+          "expected_count": null,
+          "interpretation": "unresolved",
+          "alternative_spans": [],
+          "category_spans": []
+        },
+        "applicable": false
+      }
+    ]
+  },
+  {
+    "id": "scenario-default-match",
+    "label": "state_condition",
+    "question": "What is OrbitClient default timeout when preview is disabled?",
+    "body": "When preview is disabled, OrbitClient default timeout is 7 seconds.",
+    "native": [
+      {
+        "contract": {
+          "need": {
+            "need_id": "sentence-1",
+            "query_span_start": 0,
+            "query_span_end": 61,
+            "query_span_text": "What is OrbitClient default timeout when preview is disabled?",
+            "subject": "OrbitClient",
+            "relation": "default",
+            "context": "",
+            "hard_exact": []
+          },
+          "focus_spans": [
+            {
+              "start": 8,
+              "end": 19
+            }
+          ],
+          "constraint_spans": [
+            {
+              "start": 36,
+              "end": 61
+            }
+          ],
+          "prerequisite_need_ids": [],
+          "requirement": "scalar",
+          "expected_count": null,
+          "interpretation": "supported",
+          "alternative_spans": [],
+          "category_spans": []
+        },
+        "applicable": true
+      }
+    ],
+    "research": [
+      {
+        "contract": {
+          "need": {
+            "need_id": "sentence-1",
+            "query_span_start": 0,
+            "query_span_end": 61,
+            "query_span_text": "What is OrbitClient default timeout when preview is disabled?",
+            "subject": "OrbitClient",
+            "relation": "default",
+            "context": "",
+            "hard_exact": []
+          },
+          "focus_spans": [
+            {
+              "start": 8,
+              "end": 19
+            }
+          ],
+          "constraint_spans": [
+            {
+              "start": 41,
+              "end": 48
+            },
+            {
+              "start": 52,
+              "end": 60
+            }
+          ],
+          "prerequisite_need_ids": [],
+          "requirement": "scalar",
+          "expected_count": null,
+          "interpretation": "supported",
+          "alternative_spans": [],
+          "category_spans": []
+        },
+        "applicable": true
+      }
+    ]
+  },
+  {
+    "id": "scenario-default-wrong-state",
+    "label": "state_condition",
+    "question": "What is OrbitClient default timeout when preview is disabled?",
+    "body": "When preview is enabled, OrbitClient default timeout is 7 seconds.",
+    "native": [
+      {
+        "contract": {
+          "need": {
+            "need_id": "sentence-1",
+            "query_span_start": 0,
+            "query_span_end": 61,
+            "query_span_text": "What is OrbitClient default timeout when preview is disabled?",
+            "subject": "OrbitClient",
+            "relation": "default",
+            "context": "",
+            "hard_exact": []
+          },
+          "focus_spans": [
+            {
+              "start": 8,
+              "end": 19
+            }
+          ],
+          "constraint_spans": [
+            {
+              "start": 36,
+              "end": 61
+            }
+          ],
+          "prerequisite_need_ids": [],
+          "requirement": "scalar",
+          "expected_count": null,
+          "interpretation": "supported",
+          "alternative_spans": [],
+          "category_spans": []
+        },
+        "applicable": false
+      }
+    ],
+    "research": [
+      {
+        "contract": {
+          "need": {
+            "need_id": "sentence-1",
+            "query_span_start": 0,
+            "query_span_end": 61,
+            "query_span_text": "What is OrbitClient default timeout when preview is disabled?",
+            "subject": "OrbitClient",
+            "relation": "default",
+            "context": "",
+            "hard_exact": []
+          },
+          "focus_spans": [
+            {
+              "start": 8,
+              "end": 19
+            }
+          ],
+          "constraint_spans": [
+            {
+              "start": 41,
+              "end": 48
+            },
+            {
+              "start": 52,
+              "end": 60
+            }
+          ],
+          "prerequisite_need_ids": [],
+          "requirement": "scalar",
+          "expected_count": null,
+          "interpretation": "supported",
+          "alternative_spans": [],
+          "category_spans": []
+        },
+        "applicable": false
+      }
+    ]
+  },
+  {
+    "id": "scenario-default-missing-state",
+    "label": "state_condition",
+    "question": "What is OrbitClient default timeout when preview is disabled?",
+    "body": "OrbitClient default timeout is 7 seconds.",
+    "native": [
+      {
+        "contract": {
+          "need": {
+            "need_id": "sentence-1",
+            "query_span_start": 0,
+            "query_span_end": 61,
+            "query_span_text": "What is OrbitClient default timeout when preview is disabled?",
+            "subject": "OrbitClient",
+            "relation": "default",
+            "context": "",
+            "hard_exact": []
+          },
+          "focus_spans": [
+            {
+              "start": 8,
+              "end": 19
+            }
+          ],
+          "constraint_spans": [
+            {
+              "start": 36,
+              "end": 61
+            }
+          ],
+          "prerequisite_need_ids": [],
+          "requirement": "scalar",
+          "expected_count": null,
+          "interpretation": "supported",
+          "alternative_spans": [],
+          "category_spans": []
+        },
+        "applicable": false
+      }
+    ],
+    "research": [
+      {
+        "contract": {
+          "need": {
+            "need_id": "sentence-1",
+            "query_span_start": 0,
+            "query_span_end": 61,
+            "query_span_text": "What is OrbitClient default timeout when preview is disabled?",
+            "subject": "OrbitClient",
+            "relation": "default",
+            "context": "",
+            "hard_exact": []
+          },
+          "focus_spans": [
+            {
+              "start": 8,
+              "end": 19
+            }
+          ],
+          "constraint_spans": [
+            {
+              "start": 41,
+              "end": 48
+            },
+            {
+              "start": 52,
+              "end": 60
+            }
+          ],
+          "prerequisite_need_ids": [],
+          "requirement": "scalar",
+          "expected_count": null,
+          "interpretation": "supported",
+          "alternative_spans": [],
+          "category_spans": []
+        },
+        "applicable": false
+      }
+    ]
+  },
+  {
+    "id": "scenario-default-wrong-subject",
+    "label": "state_condition",
+    "question": "What is OrbitClient default timeout when preview is disabled?",
+    "body": "When preview is disabled, OtherClient default timeout is 7 seconds.",
+    "native": [
+      {
+        "contract": {
+          "need": {
+            "need_id": "sentence-1",
+            "query_span_start": 0,
+            "query_span_end": 61,
+            "query_span_text": "What is OrbitClient default timeout when preview is disabled?",
+            "subject": "OrbitClient",
+            "relation": "default",
+            "context": "",
+            "hard_exact": []
+          },
+          "focus_spans": [
+            {
+              "start": 8,
+              "end": 19
+            }
+          ],
+          "constraint_spans": [
+            {
+              "start": 36,
+              "end": 61
+            }
+          ],
+          "prerequisite_need_ids": [],
+          "requirement": "scalar",
+          "expected_count": null,
+          "interpretation": "supported",
+          "alternative_spans": [],
+          "category_spans": []
+        },
+        "applicable": false
+      }
+    ],
+    "research": [
+      {
+        "contract": {
+          "need": {
+            "need_id": "sentence-1",
+            "query_span_start": 0,
+            "query_span_end": 61,
+            "query_span_text": "What is OrbitClient default timeout when preview is disabled?",
+            "subject": "OrbitClient",
+            "relation": "default",
+            "context": "",
+            "hard_exact": []
+          },
+          "focus_spans": [
+            {
+              "start": 8,
+              "end": 19
+            }
+          ],
+          "constraint_spans": [
+            {
+              "start": 41,
+              "end": 48
+            },
+            {
+              "start": 52,
+              "end": 60
+            }
+          ],
+          "prerequisite_need_ids": [],
+          "requirement": "scalar",
+          "expected_count": null,
+          "interpretation": "supported",
+          "alternative_spans": [],
+          "category_spans": []
+        },
+        "applicable": false
+      }
+    ]
+  },
+  {
+    "id": "scenario-negated-state-match",
+    "label": "negated_state_condition",
+    "question": "What is OrbitClient default timeout when preview is not enabled?",
+    "body": "When preview is disabled, OrbitClient default timeout is 7 seconds.",
+    "native": [
+      {
+        "contract": {
+          "need": {
+            "need_id": "sentence-1",
+            "query_span_start": 0,
+            "query_span_end": 64,
+            "query_span_text": "What is OrbitClient default timeout when preview is not enabled?",
+            "subject": "OrbitClient",
+            "relation": "default",
+            "context": "",
+            "hard_exact": []
+          },
+          "focus_spans": [
+            {
+              "start": 8,
+              "end": 19
+            }
+          ],
+          "constraint_spans": [
+            {
+              "start": 36,
+              "end": 64
+            }
+          ],
+          "prerequisite_need_ids": [],
+          "requirement": "scalar",
+          "expected_count": null,
+          "interpretation": "supported",
+          "alternative_spans": [],
+          "category_spans": []
+        },
+        "applicable": true
+      }
+    ],
+    "research": [
+      {
+        "contract": {
+          "need": {
+            "need_id": "sentence-1",
+            "query_span_start": 0,
+            "query_span_end": 64,
+            "query_span_text": "What is OrbitClient default timeout when preview is not enabled?",
+            "subject": "OrbitClient",
+            "relation": "default",
+            "context": "",
+            "hard_exact": []
+          },
+          "focus_spans": [
+            {
+              "start": 8,
+              "end": 19
+            }
+          ],
+          "constraint_spans": [
+            {
+              "start": 41,
+              "end": 48
+            },
+            {
+              "start": 52,
+              "end": 63
+            }
+          ],
+          "prerequisite_need_ids": [],
+          "requirement": "scalar",
+          "expected_count": null,
+          "interpretation": "supported",
+          "alternative_spans": [],
+          "category_spans": []
+        },
+        "applicable": true
+      }
+    ]
+  },
+  {
+    "id": "scenario-negated-state-wrong",
+    "label": "negated_state_condition",
+    "question": "What is OrbitClient default timeout when preview is not enabled?",
+    "body": "When preview is enabled, OrbitClient default timeout is 7 seconds.",
+    "native": [
+      {
+        "contract": {
+          "need": {
+            "need_id": "sentence-1",
+            "query_span_start": 0,
+            "query_span_end": 64,
+            "query_span_text": "What is OrbitClient default timeout when preview is not enabled?",
+            "subject": "OrbitClient",
+            "relation": "default",
+            "context": "",
+            "hard_exact": []
+          },
+          "focus_spans": [
+            {
+              "start": 8,
+              "end": 19
+            }
+          ],
+          "constraint_spans": [
+            {
+              "start": 36,
+              "end": 64
+            }
+          ],
+          "prerequisite_need_ids": [],
+          "requirement": "scalar",
+          "expected_count": null,
+          "interpretation": "supported",
+          "alternative_spans": [],
+          "category_spans": []
+        },
+        "applicable": false
+      }
+    ],
+    "research": [
+      {
+        "contract": {
+          "need": {
+            "need_id": "sentence-1",
+            "query_span_start": 0,
+            "query_span_end": 64,
+            "query_span_text": "What is OrbitClient default timeout when preview is not enabled?",
+            "subject": "OrbitClient",
+            "relation": "default",
+            "context": "",
+            "hard_exact": []
+          },
+          "focus_spans": [
+            {
+              "start": 8,
+              "end": 19
+            }
+          ],
+          "constraint_spans": [
+            {
+              "start": 41,
+              "end": 48
+            },
+            {
+              "start": 52,
+              "end": 63
+            }
+          ],
+          "prerequisite_need_ids": [],
+          "requirement": "scalar",
+          "expected_count": null,
+          "interpretation": "supported",
+          "alternative_spans": [],
+          "category_spans": []
+        },
+        "applicable": false
+      }
+    ]
+  },
+  {
+    "id": "scenario-exception",
+    "label": "exception_condition",
+    "question": "What is OrbitClient default timeout except when preview is enabled?",
+    "body": "OrbitClient default timeout is 7 seconds except when preview is enabled.",
+    "native": [
+      {
+        "contract": {
+          "need": {
+            "need_id": "sentence-1",
+            "query_span_start": 0,
+            "query_span_end": 67,
+            "query_span_text": "What is OrbitClient default timeout except when preview is enabled?",
+            "subject": "OrbitClient",
+            "relation": "default",
+            "context": "",
+            "hard_exact": []
+          },
+          "focus_spans": [
+            {
+              "start": 8,
+              "end": 19
+            }
+          ],
+          "constraint_spans": [
+            {
+              "start": 36,
+              "end": 67
+            }
+          ],
+          "prerequisite_need_ids": [],
+          "requirement": "unknown",
+          "expected_count": null,
+          "interpretation": "unresolved",
+          "alternative_spans": [],
+          "category_spans": []
+        },
+        "applicable": false
+      }
+    ],
+    "research": [
+      {
+        "contract": {
+          "need": {
+            "need_id": "sentence-1",
+            "query_span_start": 0,
+            "query_span_end": 67,
+            "query_span_text": "What is OrbitClient default timeout except when preview is enabled?",
+            "subject": "OrbitClient",
+            "relation": "default",
+            "context": "",
+            "hard_exact": []
+          },
+          "focus_spans": [
+            {
+              "start": 8,
+              "end": 19
+            }
+          ],
+          "constraint_spans": [
+            {
+              "start": 36,
+              "end": 67
+            }
+          ],
+          "prerequisite_need_ids": [],
+          "requirement": "unknown",
+          "expected_count": null,
+          "interpretation": "unresolved",
+          "alternative_spans": [],
+          "category_spans": []
+        },
+        "applicable": false
+      }
+    ]
+  },
+  {
+    "id": "scenario-if-event",
+    "label": "event_condition",
+    "question": "If one QueueTasks function raises an exception, what happens to later tasks?",
+    "body": "If one QueueTasks function raises an exception, later tasks are not executed.",
+    "native": [
+      {
+        "contract": {
+          "need": {
+            "need_id": "sentence-1",
+            "query_span_start": 0,
+            "query_span_end": 76,
+            "query_span_text": "If one QueueTasks function raises an exception, what happens to later tasks?",
+            "subject": "later",
+            "relation": "behavior",
+            "context": "",
+            "hard_exact": []
+          },
+          "focus_spans": [
+            {
+              "start": 7,
+              "end": 17
+            }
+          ],
+          "constraint_spans": [
+            {
+              "start": 0,
+              "end": 76
+            }
+          ],
+          "prerequisite_need_ids": [],
+          "requirement": "unknown",
+          "expected_count": null,
+          "interpretation": "unresolved",
+          "alternative_spans": [],
+          "category_spans": []
+        },
+        "applicable": false
+      }
+    ],
+    "research": [
+      {
+        "contract": {
+          "need": {
+            "need_id": "sentence-1",
+            "query_span_start": 0,
+            "query_span_end": 76,
+            "query_span_text": "If one QueueTasks function raises an exception, what happens to later tasks?",
+            "subject": "later",
+            "relation": "behavior",
+            "context": "",
+            "hard_exact": []
+          },
+          "focus_spans": [
+            {
+              "start": 7,
+              "end": 17
+            }
+          ],
+          "constraint_spans": [
+            {
+              "start": 0,
+              "end": 76
+            }
+          ],
+          "prerequisite_need_ids": [],
+          "requirement": "unknown",
+          "expected_count": null,
+          "interpretation": "unresolved",
+          "alternative_spans": [],
+          "category_spans": []
+        },
+        "applicable": false
+      }
+    ]
+  },
+  {
+    "id": "scenario-if-event-wrong-polarity",
+    "label": "event_condition",
+    "question": "If one QueueTasks function raises an exception, what happens to later tasks?",
+    "body": "If one QueueTasks function raises an exception, later tasks are executed.",
+    "native": [
+      {
+        "contract": {
+          "need": {
+            "need_id": "sentence-1",
+            "query_span_start": 0,
+            "query_span_end": 76,
+            "query_span_text": "If one QueueTasks function raises an exception, what happens to later tasks?",
+            "subject": "later",
+            "relation": "behavior",
+            "context": "",
+            "hard_exact": []
+          },
+          "focus_spans": [
+            {
+              "start": 7,
+              "end": 17
+            }
+          ],
+          "constraint_spans": [
+            {
+              "start": 0,
+              "end": 76
+            }
+          ],
+          "prerequisite_need_ids": [],
+          "requirement": "unknown",
+          "expected_count": null,
+          "interpretation": "unresolved",
+          "alternative_spans": [],
+          "category_spans": []
+        },
+        "applicable": false
+      }
+    ],
+    "research": [
+      {
+        "contract": {
+          "need": {
+            "need_id": "sentence-1",
+            "query_span_start": 0,
+            "query_span_end": 76,
+            "query_span_text": "If one QueueTasks function raises an exception, what happens to later tasks?",
+            "subject": "later",
+            "relation": "behavior",
+            "context": "",
+            "hard_exact": []
+          },
+          "focus_spans": [
+            {
+              "start": 7,
+              "end": 17
+            }
+          ],
+          "constraint_spans": [
+            {
+              "start": 0,
+              "end": 76
+            }
+          ],
+          "prerequisite_need_ids": [],
+          "requirement": "unknown",
+          "expected_count": null,
+          "interpretation": "unresolved",
+          "alternative_spans": [],
+          "category_spans": []
+        },
+        "applicable": false
+      }
+    ]
+  },
+  {
+    "id": "quoted-marker",
+    "label": "literal_identity",
+    "question": "What does `when` mean?",
+    "body": "The literal when is a parameter.",
+    "native": [
+      {
+        "contract": {
+          "need": {
+            "need_id": "sentence-1",
+            "query_span_start": 0,
+            "query_span_end": 22,
+            "query_span_text": "What does `when` mean?",
+            "subject": "when",
+            "relation": "requested_part",
+            "context": "",
+            "hard_exact": [
+              "when"
+            ]
+          },
+          "focus_spans": [
+            {
+              "start": 11,
+              "end": 15
+            }
+          ],
+          "constraint_spans": [],
+          "prerequisite_need_ids": [],
+          "requirement": "unknown",
+          "expected_count": null,
+          "interpretation": "unresolved",
+          "alternative_spans": [],
+          "category_spans": []
+        },
+        "applicable": true
+      }
+    ],
+    "research": [
+      {
+        "contract": {
+          "need": {
+            "need_id": "sentence-1",
+            "query_span_start": 0,
+            "query_span_end": 22,
+            "query_span_text": "What does `when` mean?",
+            "subject": "when",
+            "relation": "requested_part",
+            "context": "",
+            "hard_exact": [
+              "when"
+            ]
+          },
+          "focus_spans": [
+            {
+              "start": 11,
+              "end": 15
+            }
+          ],
+          "constraint_spans": [],
+          "prerequisite_need_ids": [],
+          "requirement": "unknown",
+          "expected_count": null,
+          "interpretation": "unresolved",
+          "alternative_spans": [],
+          "category_spans": []
+        },
+        "applicable": true
+      }
+    ]
+  }
+]

@@ -1,0 +1,1098 @@
+[
+  {
+    "case_id": "fastapi-01",
+    "annotated_temporal_question": true,
+    "claims": [
+      {
+        "claim_id": "required",
+        "baseline": "supported",
+        "historical": "missing",
+        "corrected": "missing",
+        "attribution": "read_admission_loss",
+        "literal_groups": {
+          "source": [
+            0
+          ],
+          "retrieval": [
+            0
+          ],
+          "proposals": [
+            0
+          ],
+          "admitted": [],
+          "final": []
+        }
+      }
+    ],
+    "proposals": [
+      {
+        "proposal_id": "a2b1906d9b98784c0ff357d78b882f1ecbffbc56674091eac85729fafd78839a",
+        "conditions": [
+          {
+            "need_id": "sentence-1",
+            "query_span": "When do FastAPI background tasks run relative to returning the response?",
+            "constraints": [
+              "When do FastAPI background tasks run relative to returning the response?"
+            ],
+            "state": "unresolved_or_inapplicable"
+          }
+        ],
+        "topic_locality": true,
+        "native_read_reason": "missing_bound_subject",
+        "corrected_reason": "missing_bound_subject"
+      },
+      {
+        "proposal_id": "3d57f642850cf47f5ff891461db28d337d409ba7a346383c2d577a4688324172",
+        "conditions": [
+          {
+            "need_id": "sentence-1",
+            "query_span": "When do FastAPI background tasks run relative to returning the response?",
+            "constraints": [
+              "When do FastAPI background tasks run relative to returning the response?"
+            ],
+            "state": "unresolved_or_inapplicable"
+          }
+        ],
+        "topic_locality": true,
+        "native_read_reason": "missing_local_demand",
+        "corrected_reason": "missing_local_demand"
+      },
+      {
+        "proposal_id": "e4a8855b19f30de07ae665ab1c5e29344a99633eba4df2cf3c766e9375900b7b",
+        "conditions": [
+          {
+            "need_id": "sentence-1",
+            "query_span": "When do FastAPI background tasks run relative to returning the response?",
+            "constraints": [
+              "When do FastAPI background tasks run relative to returning the response?"
+            ],
+            "state": "unresolved_or_inapplicable"
+          }
+        ],
+        "topic_locality": false,
+        "native_read_reason": "missing_bound_subject",
+        "corrected_reason": "missing_bound_subject"
+      },
+      {
+        "proposal_id": "cd7a162a971787e28648ab561fa240cad2472e5638ad6a3d22261c7f57196f76",
+        "conditions": [
+          {
+            "need_id": "sentence-1",
+            "query_span": "When do FastAPI background tasks run relative to returning the response?",
+            "constraints": [
+              "When do FastAPI background tasks run relative to returning the response?"
+            ],
+            "state": "unresolved_or_inapplicable"
+          }
+        ],
+        "topic_locality": false,
+        "native_read_reason": "missing_bound_subject",
+        "corrected_reason": "missing_bound_subject"
+      }
+    ]
+  },
+  {
+    "case_id": "fastapi-07",
+    "annotated_temporal_question": true,
+    "claims": [
+      {
+        "claim_id": "required",
+        "baseline": "supported",
+        "historical": "missing",
+        "corrected": "missing",
+        "attribution": "read_admission_loss",
+        "literal_groups": {
+          "source": [
+            0
+          ],
+          "retrieval": [
+            0
+          ],
+          "proposals": [
+            0
+          ],
+          "admitted": [],
+          "final": []
+        }
+      },
+      {
+        "claim_id": "private_configuration",
+        "baseline": "needs_review",
+        "historical": "missing",
+        "corrected": "missing",
+        "attribution": "source_witness_unobserved",
+        "literal_groups": {
+          "source": [],
+          "retrieval": [],
+          "proposals": [],
+          "admitted": [],
+          "final": []
+        }
+      }
+    ],
+    "proposals": [
+      {
+        "proposal_id": "a2b1906d9b98784c0ff357d78b882f1ecbffbc56674091eac85729fafd78839a",
+        "conditions": [
+          {
+            "need_id": "sentence-1",
+            "query_span": "When do FastAPI background tasks run relative to returning the response?",
+            "constraints": [
+              "When do FastAPI background tasks run relative to returning the response?"
+            ],
+            "state": "unresolved_or_inapplicable"
+          }
+        ],
+        "topic_locality": true,
+        "native_read_reason": "missing_bound_subject",
+        "corrected_reason": "missing_bound_subject"
+      },
+      {
+        "proposal_id": "3d57f642850cf47f5ff891461db28d337d409ba7a346383c2d577a4688324172",
+        "conditions": [
+          {
+            "need_id": "sentence-1",
+            "query_span": "When do FastAPI background tasks run relative to returning the response?",
+            "constraints": [
+              "When do FastAPI background tasks run relative to returning the response?"
+            ],
+            "state": "unresolved_or_inapplicable"
+          }
+        ],
+        "topic_locality": true,
+        "native_read_reason": "condition_support_unavailable",
+        "corrected_reason": "condition_support_unavailable"
+      },
+      {
+        "proposal_id": "e4a8855b19f30de07ae665ab1c5e29344a99633eba4df2cf3c766e9375900b7b",
+        "conditions": [
+          {
+            "need_id": "sentence-1",
+            "query_span": "When do FastAPI background tasks run relative to returning the response?",
+            "constraints": [
+              "When do FastAPI background tasks run relative to returning the response?"
+            ],
+            "state": "unresolved_or_inapplicable"
+          }
+        ],
+        "topic_locality": false,
+        "native_read_reason": "missing_bound_subject",
+        "corrected_reason": "missing_bound_subject"
+      },
+      {
+        "proposal_id": "db8f956a7be62b6ef21adf4c54db67e8df1574ab24579a703d7233fa7a66cb62",
+        "conditions": [
+          {
+            "need_id": "sentence-1",
+            "query_span": "When do FastAPI background tasks run relative to returning the response?",
+            "constraints": [
+              "When do FastAPI background tasks run relative to returning the response?"
+            ],
+            "state": "unresolved_or_inapplicable"
+          }
+        ],
+        "topic_locality": false,
+        "native_read_reason": "condition_support_unavailable",
+        "corrected_reason": "condition_support_unavailable"
+      }
+    ]
+  },
+  {
+    "case_id": "starlette-01",
+    "annotated_temporal_question": false,
+    "claims": [
+      {
+        "claim_id": "required",
+        "baseline": "supported",
+        "historical": "missing",
+        "corrected": "missing",
+        "attribution": "read_admission_loss",
+        "literal_groups": {
+          "source": [
+            0
+          ],
+          "retrieval": [
+            0
+          ],
+          "proposals": [
+            0
+          ],
+          "admitted": [],
+          "final": []
+        }
+      }
+    ],
+    "proposals": [
+      {
+        "proposal_id": "a6f88a6402fda852ed4b3bd7d672029c2fb940730308ef8bb2d4b7d6901e2780",
+        "conditions": [
+          {
+            "need_id": "sentence-1",
+            "query_span": "If one BackgroundTasks function raises an exception, what happens to later tasks and their ordering?",
+            "constraints": [
+              "If one BackgroundTasks function raises an exception, what happens to later tasks and their ordering?"
+            ],
+            "state": "unresolved_or_inapplicable"
+          }
+        ],
+        "topic_locality": false,
+        "native_read_reason": "condition_support_unavailable",
+        "corrected_reason": "condition_support_unavailable"
+      },
+      {
+        "proposal_id": "3c1f515409a87bbdc1196840910333cd1f17e9cb0ea3708812b7a57b60b61579",
+        "conditions": [
+          {
+            "need_id": "sentence-1",
+            "query_span": "If one BackgroundTasks function raises an exception, what happens to later tasks and their ordering?",
+            "constraints": [
+              "If one BackgroundTasks function raises an exception, what happens to later tasks and their ordering?"
+            ],
+            "state": "unresolved_or_inapplicable"
+          }
+        ],
+        "topic_locality": false,
+        "native_read_reason": "missing_bound_subject",
+        "corrected_reason": "missing_bound_subject"
+      },
+      {
+        "proposal_id": "8b2feb70736d5fa8d2ad407122ba3b00ce940d1fa7750cb7efcb7a0feae8dcfa",
+        "conditions": [
+          {
+            "need_id": "sentence-1",
+            "query_span": "If one BackgroundTasks function raises an exception, what happens to later tasks and their ordering?",
+            "constraints": [
+              "If one BackgroundTasks function raises an exception, what happens to later tasks and their ordering?"
+            ],
+            "state": "unresolved_or_inapplicable"
+          }
+        ],
+        "topic_locality": false,
+        "native_read_reason": "missing_bound_subject",
+        "corrected_reason": "missing_bound_subject"
+      },
+      {
+        "proposal_id": "24805457b80b47eccf721d1c710bb84681994fbef4e6befa73ce23715f487bff",
+        "conditions": [
+          {
+            "need_id": "sentence-1",
+            "query_span": "If one BackgroundTasks function raises an exception, what happens to later tasks and their ordering?",
+            "constraints": [
+              "If one BackgroundTasks function raises an exception, what happens to later tasks and their ordering?"
+            ],
+            "state": "unresolved_or_inapplicable"
+          }
+        ],
+        "topic_locality": false,
+        "native_read_reason": "missing_bound_subject",
+        "corrected_reason": "missing_bound_subject"
+      }
+    ]
+  },
+  {
+    "case_id": "starlette-03",
+    "annotated_temporal_question": true,
+    "claims": [
+      {
+        "claim_id": "required",
+        "baseline": "supported",
+        "historical": "missing",
+        "corrected": "missing",
+        "attribution": "read_admission_loss",
+        "literal_groups": {
+          "source": [
+            0
+          ],
+          "retrieval": [
+            0
+          ],
+          "proposals": [
+            0
+          ],
+          "admitted": [],
+          "final": []
+        }
+      }
+    ],
+    "proposals": [
+      {
+        "proposal_id": "8b2feb70736d5fa8d2ad407122ba3b00ce940d1fa7750cb7efcb7a0feae8dcfa",
+        "conditions": [
+          {
+            "need_id": "sentence-1",
+            "query_span": "Когда начинается lifespan teardown относительно connections и background tasks?",
+            "constraints": [
+              "Когда начинается lifespan teardown относительно connections и background tasks?"
+            ],
+            "state": "unresolved_or_inapplicable"
+          }
+        ],
+        "topic_locality": true,
+        "native_read_reason": "condition_support_unavailable",
+        "corrected_reason": "condition_support_unavailable"
+      },
+      {
+        "proposal_id": "24805457b80b47eccf721d1c710bb84681994fbef4e6befa73ce23715f487bff",
+        "conditions": [
+          {
+            "need_id": "sentence-1",
+            "query_span": "Когда начинается lifespan teardown относительно connections и background tasks?",
+            "constraints": [
+              "Когда начинается lifespan teardown относительно connections и background tasks?"
+            ],
+            "state": "unresolved_or_inapplicable"
+          }
+        ],
+        "topic_locality": false,
+        "native_read_reason": "condition_support_unavailable",
+        "corrected_reason": "condition_support_unavailable"
+      },
+      {
+        "proposal_id": "a6f88a6402fda852ed4b3bd7d672029c2fb940730308ef8bb2d4b7d6901e2780",
+        "conditions": [
+          {
+            "need_id": "sentence-1",
+            "query_span": "Когда начинается lifespan teardown относительно connections и background tasks?",
+            "constraints": [
+              "Когда начинается lifespan teardown относительно connections и background tasks?"
+            ],
+            "state": "unresolved_or_inapplicable"
+          }
+        ],
+        "topic_locality": false,
+        "native_read_reason": "condition_support_unavailable",
+        "corrected_reason": "condition_support_unavailable"
+      },
+      {
+        "proposal_id": "3c1f515409a87bbdc1196840910333cd1f17e9cb0ea3708812b7a57b60b61579",
+        "conditions": [
+          {
+            "need_id": "sentence-1",
+            "query_span": "Когда начинается lifespan teardown относительно connections и background tasks?",
+            "constraints": [
+              "Когда начинается lifespan teardown относительно connections и background tasks?"
+            ],
+            "state": "unresolved_or_inapplicable"
+          }
+        ],
+        "topic_locality": false,
+        "native_read_reason": "condition_support_unavailable",
+        "corrected_reason": "condition_support_unavailable"
+      }
+    ]
+  },
+  {
+    "case_id": "starlette-07",
+    "annotated_temporal_question": false,
+    "claims": [
+      {
+        "claim_id": "required",
+        "baseline": "supported",
+        "historical": "missing",
+        "corrected": "missing",
+        "attribution": "read_admission_loss",
+        "literal_groups": {
+          "source": [
+            0
+          ],
+          "retrieval": [
+            0
+          ],
+          "proposals": [
+            0
+          ],
+          "admitted": [],
+          "final": []
+        }
+      },
+      {
+        "claim_id": "private_configuration",
+        "baseline": "needs_review",
+        "historical": "missing",
+        "corrected": "missing",
+        "attribution": "source_witness_unobserved",
+        "literal_groups": {
+          "source": [],
+          "retrieval": [],
+          "proposals": [],
+          "admitted": [],
+          "final": []
+        }
+      }
+    ],
+    "proposals": [
+      {
+        "proposal_id": "a6f88a6402fda852ed4b3bd7d672029c2fb940730308ef8bb2d4b7d6901e2780",
+        "conditions": [
+          {
+            "need_id": "sentence-1",
+            "query_span": "If one BackgroundTasks function raises an exception, what happens to later tasks and their ordering? Also identify the exact value chosen in our private production deployment.",
+            "constraints": [
+              "If one BackgroundTasks function raises an exception, what happens to later tasks and their ordering? Also identify the exact value chosen in our private production deployment."
+            ],
+            "state": "unresolved_or_inapplicable"
+          }
+        ],
+        "topic_locality": false,
+        "native_read_reason": "condition_support_unavailable",
+        "corrected_reason": "condition_support_unavailable"
+      },
+      {
+        "proposal_id": "3c1f515409a87bbdc1196840910333cd1f17e9cb0ea3708812b7a57b60b61579",
+        "conditions": [
+          {
+            "need_id": "sentence-1",
+            "query_span": "If one BackgroundTasks function raises an exception, what happens to later tasks and their ordering? Also identify the exact value chosen in our private production deployment.",
+            "constraints": [
+              "If one BackgroundTasks function raises an exception, what happens to later tasks and their ordering? Also identify the exact value chosen in our private production deployment."
+            ],
+            "state": "unresolved_or_inapplicable"
+          }
+        ],
+        "topic_locality": false,
+        "native_read_reason": "missing_bound_subject",
+        "corrected_reason": "missing_bound_subject"
+      },
+      {
+        "proposal_id": "8b2feb70736d5fa8d2ad407122ba3b00ce940d1fa7750cb7efcb7a0feae8dcfa",
+        "conditions": [
+          {
+            "need_id": "sentence-1",
+            "query_span": "If one BackgroundTasks function raises an exception, what happens to later tasks and their ordering? Also identify the exact value chosen in our private production deployment.",
+            "constraints": [
+              "If one BackgroundTasks function raises an exception, what happens to later tasks and their ordering? Also identify the exact value chosen in our private production deployment."
+            ],
+            "state": "unresolved_or_inapplicable"
+          }
+        ],
+        "topic_locality": false,
+        "native_read_reason": "missing_bound_subject",
+        "corrected_reason": "missing_bound_subject"
+      },
+      {
+        "proposal_id": "24805457b80b47eccf721d1c710bb84681994fbef4e6befa73ce23715f487bff",
+        "conditions": [
+          {
+            "need_id": "sentence-1",
+            "query_span": "If one BackgroundTasks function raises an exception, what happens to later tasks and their ordering? Also identify the exact value chosen in our private production deployment.",
+            "constraints": [
+              "If one BackgroundTasks function raises an exception, what happens to later tasks and their ordering? Also identify the exact value chosen in our private production deployment."
+            ],
+            "state": "unresolved_or_inapplicable"
+          }
+        ],
+        "topic_locality": false,
+        "native_read_reason": "missing_bound_subject",
+        "corrected_reason": "missing_bound_subject"
+      }
+    ]
+  },
+  {
+    "case_id": "typer-05",
+    "annotated_temporal_question": false,
+    "claims": [
+      {
+        "claim_id": "required",
+        "baseline": "missing",
+        "historical": "missing",
+        "corrected": "missing",
+        "attribution": "discovery_pool_loss",
+        "literal_groups": {
+          "source": [
+            0
+          ],
+          "retrieval": [],
+          "proposals": [],
+          "admitted": [],
+          "final": []
+        }
+      }
+    ],
+    "proposals": [
+      {
+        "proposal_id": "68c1dff34157ba18abd1b26530bc77b8981b330a8caede6621d47e3f2dfe972c",
+        "conditions": [
+          {
+            "need_id": "sentence-1",
+            "query_span": "Как записать только отрицательное имя boolean option: важен ли пробел перед /?",
+            "constraints": [
+              "только отрицательное имя boolean option: важен ли пробел перед /?"
+            ],
+            "state": "unresolved_or_inapplicable"
+          }
+        ],
+        "topic_locality": false,
+        "native_read_reason": "condition_support_unavailable",
+        "corrected_reason": "condition_support_unavailable"
+      },
+      {
+        "proposal_id": "a3921ee106a5ea35b7f48bb5f9b6a029e3a987b0c46b32582952911a819ab0b0",
+        "conditions": [
+          {
+            "need_id": "sentence-1",
+            "query_span": "Как записать только отрицательное имя boolean option: важен ли пробел перед /?",
+            "constraints": [
+              "только отрицательное имя boolean option: важен ли пробел перед /?"
+            ],
+            "state": "unresolved_or_inapplicable"
+          }
+        ],
+        "topic_locality": false,
+        "native_read_reason": "condition_support_unavailable",
+        "corrected_reason": "condition_support_unavailable"
+      }
+    ]
+  },
+  {
+    "case_id": "typer-06",
+    "annotated_temporal_question": false,
+    "claims": [
+      {
+        "claim_id": "required",
+        "baseline": "supported",
+        "historical": "missing",
+        "corrected": "missing",
+        "attribution": "read_admission_loss",
+        "literal_groups": {
+          "source": [
+            0
+          ],
+          "retrieval": [
+            0
+          ],
+          "proposals": [
+            0
+          ],
+          "admitted": [],
+          "final": []
+        }
+      }
+    ],
+    "proposals": [
+      {
+        "proposal_id": "a3921ee106a5ea35b7f48bb5f9b6a029e3a987b0c46b32582952911a819ab0b0",
+        "conditions": [
+          {
+            "need_id": "sentence-1",
+            "query_span": "What happens to --no-force when I declare only the --force option?",
+            "constraints": [
+              "when I declare only the --force option?"
+            ],
+            "state": "unresolved_or_inapplicable"
+          }
+        ],
+        "topic_locality": false,
+        "native_read_reason": "condition_support_unavailable",
+        "corrected_reason": "condition_support_unavailable"
+      },
+      {
+        "proposal_id": "c61fac44d6fe79316c4bc2d7fef6bfa04ef6f60556377fabbc5fc6a4803a0ae2",
+        "conditions": [
+          {
+            "need_id": "sentence-1",
+            "query_span": "What happens to --no-force when I declare only the --force option?",
+            "constraints": [
+              "when I declare only the --force option?"
+            ],
+            "state": "unresolved_or_inapplicable"
+          }
+        ],
+        "topic_locality": false,
+        "native_read_reason": "condition_support_unavailable",
+        "corrected_reason": "condition_support_unavailable"
+      },
+      {
+        "proposal_id": "3085be87f41a794b113fcb7dea2cf35cfaffc4094ce1081e7c146a220ed00755",
+        "conditions": [
+          {
+            "need_id": "sentence-1",
+            "query_span": "What happens to --no-force when I declare only the --force option?",
+            "constraints": [
+              "when I declare only the --force option?"
+            ],
+            "state": "unresolved_or_inapplicable"
+          }
+        ],
+        "topic_locality": false,
+        "native_read_reason": "missing_exact_terms",
+        "corrected_reason": "missing_exact_terms"
+      },
+      {
+        "proposal_id": "780e9bff88c5d7d44f9bd1030ef57b3ec38154b863d7694a13594af342cb66f4",
+        "conditions": [
+          {
+            "need_id": "sentence-1",
+            "query_span": "What happens to --no-force when I declare only the --force option?",
+            "constraints": [
+              "when I declare only the --force option?"
+            ],
+            "state": "unresolved_or_inapplicable"
+          }
+        ],
+        "topic_locality": false,
+        "native_read_reason": "missing_exact_terms",
+        "corrected_reason": "missing_exact_terms"
+      }
+    ]
+  },
+  {
+    "case_id": "pydantic-05",
+    "annotated_temporal_question": false,
+    "claims": [
+      {
+        "claim_id": "required",
+        "baseline": "supported",
+        "historical": "missing",
+        "corrected": "missing",
+        "attribution": "read_admission_loss",
+        "literal_groups": {
+          "source": [
+            0
+          ],
+          "retrieval": [
+            0
+          ],
+          "proposals": [
+            0
+          ],
+          "admitted": [],
+          "final": []
+        }
+      }
+    ],
+    "proposals": [
+      {
+        "proposal_id": "86ee9ca3f82c63ebd871999fc098f4d236e89326a8b9e91984064c04ef243c32",
+        "conditions": [
+          {
+            "need_id": "sentence-1",
+            "query_span": "How does AliasGenerator help use different naming conventions when loading and saving?",
+            "constraints": [
+              "when loading and saving?"
+            ],
+            "state": "unresolved_or_inapplicable"
+          }
+        ],
+        "topic_locality": true,
+        "native_read_reason": "condition_support_unavailable",
+        "corrected_reason": "condition_support_unavailable"
+      },
+      {
+        "proposal_id": "94753ede8a4ed837abc7d5ce76d3062fb0dc5517bc7a4aac781e398b9d95162a",
+        "conditions": [
+          {
+            "need_id": "sentence-1",
+            "query_span": "How does AliasGenerator help use different naming conventions when loading and saving?",
+            "constraints": [
+              "when loading and saving?"
+            ],
+            "state": "unresolved_or_inapplicable"
+          }
+        ],
+        "topic_locality": false,
+        "native_read_reason": "condition_support_unavailable",
+        "corrected_reason": "condition_support_unavailable"
+      },
+      {
+        "proposal_id": "848e6e87d245dd38a7e23baba3ffc867bd3ab8b8bff022d338d4a74b9834141f",
+        "conditions": [
+          {
+            "need_id": "sentence-1",
+            "query_span": "How does AliasGenerator help use different naming conventions when loading and saving?",
+            "constraints": [
+              "when loading and saving?"
+            ],
+            "state": "unresolved_or_inapplicable"
+          }
+        ],
+        "topic_locality": false,
+        "native_read_reason": "missing_exact_terms",
+        "corrected_reason": "missing_exact_terms"
+      },
+      {
+        "proposal_id": "7b491036dae9ae2bada96e6bdb5cd6ac5c575faff45faf778e70a66771768681",
+        "conditions": [
+          {
+            "need_id": "sentence-1",
+            "query_span": "How does AliasGenerator help use different naming conventions when loading and saving?",
+            "constraints": [
+              "when loading and saving?"
+            ],
+            "state": "unresolved_or_inapplicable"
+          }
+        ],
+        "topic_locality": false,
+        "native_read_reason": "missing_exact_terms",
+        "corrected_reason": "missing_exact_terms"
+      }
+    ]
+  },
+  {
+    "case_id": "mkdocs-02",
+    "annotated_temporal_question": false,
+    "claims": [
+      {
+        "claim_id": "required",
+        "baseline": "supported",
+        "historical": "missing",
+        "corrected": "missing",
+        "attribution": "read_admission_loss",
+        "literal_groups": {
+          "source": [
+            0
+          ],
+          "retrieval": [
+            0
+          ],
+          "proposals": [
+            0
+          ],
+          "admitted": [],
+          "final": []
+        }
+      }
+    ],
+    "proposals": [
+      {
+        "proposal_id": "5605b9f547b25c64880e9dc7ed9c3c565418cfc3121eaf6f888e353d1c42e3cd",
+        "conditions": [
+          {
+            "need_id": "sentence-1",
+            "query_span": "What happens when index.md and README.md are in the same directory?",
+            "constraints": [
+              "when index.md and README.md are in the same directory?"
+            ],
+            "state": "unresolved_or_inapplicable"
+          }
+        ],
+        "topic_locality": false,
+        "native_read_reason": "condition_support_unavailable",
+        "corrected_reason": "condition_support_unavailable"
+      },
+      {
+        "proposal_id": "f17d96f625e01b498e5e8e026bc0d57a94f8c941399b1e6d428af8e6241e907a",
+        "conditions": [
+          {
+            "need_id": "sentence-1",
+            "query_span": "What happens when index.md and README.md are in the same directory?",
+            "constraints": [
+              "when index.md and README.md are in the same directory?"
+            ],
+            "state": "unresolved_or_inapplicable"
+          }
+        ],
+        "topic_locality": false,
+        "native_read_reason": "missing_exact_terms",
+        "corrected_reason": "missing_exact_terms"
+      }
+    ]
+  },
+  {
+    "case_id": "mkdocs-05",
+    "annotated_temporal_question": false,
+    "claims": [
+      {
+        "claim_id": "required",
+        "baseline": "missing",
+        "historical": "supported",
+        "corrected": "supported",
+        "attribution": "literal_visible",
+        "literal_groups": {
+          "source": [
+            0
+          ],
+          "retrieval": [
+            0
+          ],
+          "proposals": [
+            0
+          ],
+          "admitted": [
+            0
+          ],
+          "final": [
+            0
+          ]
+        }
+      }
+    ],
+    "proposals": [
+      {
+        "proposal_id": "3811c69dbba1d17feb18563cffbec07aaeb66fe23fb2c1f828d29fff217643fc",
+        "conditions": [
+          {
+            "need_id": "sentence-1:part-1",
+            "query_span": "Which page title wins when the navigation configuration and Markdown content define different titles?",
+            "constraints": [
+              "when the navigation configuration and Markdown content define different titles"
+            ],
+            "state": "recognized_applicable"
+          }
+        ],
+        "topic_locality": true,
+        "native_read_reason": "bound_local_topic_context",
+        "corrected_reason": null
+      },
+      {
+        "proposal_id": "07c49b05ffd10c10c38422bf2a29a0d6d73f9c79b5361dfbf0ee2ccb7f87233d",
+        "conditions": [
+          {
+            "need_id": "sentence-1:part-1",
+            "query_span": "Which page title wins when the navigation configuration and Markdown content define different titles?",
+            "constraints": [
+              "when the navigation configuration and Markdown content define different titles"
+            ],
+            "state": "recognized_applicable"
+          }
+        ],
+        "topic_locality": false,
+        "native_read_reason": "no_local_topic_witness",
+        "corrected_reason": "no_local_topic_witness"
+      }
+    ]
+  },
+  {
+    "case_id": "ruff-04",
+    "annotated_temporal_question": false,
+    "claims": [
+      {
+        "claim_id": "required",
+        "baseline": "supported",
+        "historical": "missing",
+        "corrected": "missing",
+        "attribution": "read_admission_loss",
+        "literal_groups": {
+          "source": [
+            0
+          ],
+          "retrieval": [
+            0
+          ],
+          "proposals": [
+            0
+          ],
+          "admitted": [],
+          "final": []
+        }
+      }
+    ],
+    "proposals": [
+      {
+        "proposal_id": "a86b95970c9cff1dbca1cdb408866656cfab349ed0547eb4eee1db228946c9de",
+        "conditions": [
+          {
+            "need_id": "sentence-1",
+            "query_span": "What happens if a deprecated rule is explicitly selected while preview is enabled?",
+            "constraints": [
+              "if a deprecated rule is explicitly selected while preview is enabled?"
+            ],
+            "state": "unresolved_or_inapplicable"
+          }
+        ],
+        "topic_locality": true,
+        "native_read_reason": "condition_support_unavailable",
+        "corrected_reason": "condition_support_unavailable"
+      },
+      {
+        "proposal_id": "826f78ba2991677e64046a572416b34768812cd10868ba3b79b697137453b8f8",
+        "conditions": [
+          {
+            "need_id": "sentence-1",
+            "query_span": "What happens if a deprecated rule is explicitly selected while preview is enabled?",
+            "constraints": [
+              "if a deprecated rule is explicitly selected while preview is enabled?"
+            ],
+            "state": "unresolved_or_inapplicable"
+          }
+        ],
+        "topic_locality": false,
+        "native_read_reason": "condition_support_unavailable",
+        "corrected_reason": "condition_support_unavailable"
+      },
+      {
+        "proposal_id": "a7a170df9256bf6dd5be313191c3d1dc6c55598b30ce31b055f44f02003a4aa2",
+        "conditions": [
+          {
+            "need_id": "sentence-1",
+            "query_span": "What happens if a deprecated rule is explicitly selected while preview is enabled?",
+            "constraints": [
+              "if a deprecated rule is explicitly selected while preview is enabled?"
+            ],
+            "state": "unresolved_or_inapplicable"
+          }
+        ],
+        "topic_locality": false,
+        "native_read_reason": "condition_support_unavailable",
+        "corrected_reason": "condition_support_unavailable"
+      },
+      {
+        "proposal_id": "b8f9ba4745257047d7a7243b51fde714879b0679ad2c66981d0e14c80101ee11",
+        "conditions": [
+          {
+            "need_id": "sentence-1",
+            "query_span": "What happens if a deprecated rule is explicitly selected while preview is enabled?",
+            "constraints": [
+              "if a deprecated rule is explicitly selected while preview is enabled?"
+            ],
+            "state": "unresolved_or_inapplicable"
+          }
+        ],
+        "topic_locality": false,
+        "native_read_reason": "condition_support_unavailable",
+        "corrected_reason": "condition_support_unavailable"
+      }
+    ]
+  },
+  {
+    "case_id": "ruff-05",
+    "annotated_temporal_question": false,
+    "claims": [
+      {
+        "claim_id": "required",
+        "baseline": "needs_review",
+        "historical": "missing",
+        "corrected": "missing",
+        "attribution": "read_admission_loss",
+        "literal_groups": {
+          "source": [
+            0
+          ],
+          "retrieval": [
+            0
+          ],
+          "proposals": [
+            0
+          ],
+          "admitted": [],
+          "final": []
+        }
+      }
+    ],
+    "proposals": [
+      {
+        "proposal_id": "e7be14dc8752c823fa5081a59395b4c133a540940315e68ebbb18baf192a38af",
+        "conditions": [
+          {
+            "need_id": "sentence-1",
+            "query_span": "What happens to explicit-preview-rules when preview mode is disabled?",
+            "constraints": [
+              "when preview mode is disabled?"
+            ],
+            "state": "unresolved_or_inapplicable"
+          }
+        ],
+        "topic_locality": true,
+        "native_read_reason": "condition_support_unavailable",
+        "corrected_reason": "condition_support_unavailable"
+      },
+      {
+        "proposal_id": "a86b95970c9cff1dbca1cdb408866656cfab349ed0547eb4eee1db228946c9de",
+        "conditions": [
+          {
+            "need_id": "sentence-1",
+            "query_span": "What happens to explicit-preview-rules when preview mode is disabled?",
+            "constraints": [
+              "when preview mode is disabled?"
+            ],
+            "state": "unresolved_or_inapplicable"
+          }
+        ],
+        "topic_locality": true,
+        "native_read_reason": "condition_support_unavailable",
+        "corrected_reason": "condition_support_unavailable"
+      },
+      {
+        "proposal_id": "316f904e730e591dd522a3eceede42af843d6da50a7b32353b7b931f7c62a086",
+        "conditions": [
+          {
+            "need_id": "sentence-1",
+            "query_span": "What happens to explicit-preview-rules when preview mode is disabled?",
+            "constraints": [
+              "when preview mode is disabled?"
+            ],
+            "state": "unresolved_or_inapplicable"
+          }
+        ],
+        "topic_locality": false,
+        "native_read_reason": "condition_support_unavailable",
+        "corrected_reason": "condition_support_unavailable"
+      },
+      {
+        "proposal_id": "a7a170df9256bf6dd5be313191c3d1dc6c55598b30ce31b055f44f02003a4aa2",
+        "conditions": [
+          {
+            "need_id": "sentence-1",
+            "query_span": "What happens to explicit-preview-rules when preview mode is disabled?",
+            "constraints": [
+              "when preview mode is disabled?"
+            ],
+            "state": "unresolved_or_inapplicable"
+          }
+        ],
+        "topic_locality": false,
+        "native_read_reason": "condition_support_unavailable",
+        "corrected_reason": "condition_support_unavailable"
+      }
+    ]
+  },
+  {
+    "case_id": "uv-03",
+    "annotated_temporal_question": false,
+    "claims": [
+      {
+        "claim_id": "required",
+        "baseline": "supported",
+        "historical": "missing",
+        "corrected": "missing",
+        "attribution": "read_admission_loss",
+        "literal_groups": {
+          "source": [
+            0
+          ],
+          "retrieval": [
+            0
+          ],
+          "proposals": [
+            0
+          ],
+          "admitted": [],
+          "final": []
+        }
+      }
+    ],
+    "proposals": [
+      {
+        "proposal_id": "152c68b381f70ed84fb35d597175b5780cf5b456e2a5b791fd1e43fcfc752bc6",
+        "conditions": [
+          {
+            "need_id": "sentence-1",
+            "query_span": "What can I do when dependency resolution fails due to a transitive pre-release?",
+            "constraints": [
+              "when dependency resolution fails due to a transitive pre-release?"
+            ],
+            "state": "unresolved_or_inapplicable"
+          }
+        ],
+        "topic_locality": true,
+        "native_read_reason": "condition_support_unavailable",
+        "corrected_reason": "condition_support_unavailable"
+      },
+      {
+        "proposal_id": "0ce40c505762b6ddc6b0cdaee2f2257c82353c39bf1d532d5c8c52b2f76905e6",
+        "conditions": [
+          {
+            "need_id": "sentence-1",
+            "query_span": "What can I do when dependency resolution fails due to a transitive pre-release?",
+            "constraints": [
+              "when dependency resolution fails due to a transitive pre-release?"
+            ],
+            "state": "unresolved_or_inapplicable"
+          }
+        ],
+        "topic_locality": false,
+        "native_read_reason": "condition_support_unavailable",
+        "corrected_reason": "condition_support_unavailable"
+      }
+    ]
+  }
+]

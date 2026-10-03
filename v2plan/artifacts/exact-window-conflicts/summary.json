@@ -1,0 +1,18 @@
+{
+  "cases": 80,
+  "windows_per_proposal": 2159,
+  "unique_request_windows": 2159,
+  "read_vs_typed": {
+    "(False, False)": 1493,
+    "(False, True)": 586,
+    "(True, True)": 80
+  },
+  "read_vs_unified": {
+    "(False, False)": 2079,
+    "(True, True)": 80
+  },
+  "typed_proposals_not_prefit": 434,
+  "ambiguous_membership_rows": 0,
+  "witness_typed_only": 64,
+  "scope": "per-candidate proposals, not full orchestrator selection or delivered packets"
+}

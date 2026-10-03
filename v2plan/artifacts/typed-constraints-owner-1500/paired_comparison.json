@@ -1,0 +1,24 @@
+{
+  "cases": 80,
+  "budget": 1500,
+  "policy": "owner",
+  "previous_packets": 18,
+  "research_packets": 19,
+  "recovered_vs_corrected": [],
+  "lost_vs_corrected": [],
+  "admission_transitions": [
+    {
+      "case_id": "fastapi-07",
+      "proposal_id": "3d57f642850cf47f5ff891461db28d337d409ba7a346383c2d577a4688324172",
+      "before": "condition_support_unavailable",
+      "after": null
+    },
+    {
+      "case_id": "fastapi-07",
+      "proposal_id": "db8f956a7be62b6ef21adf4c54db67e8df1574ab24579a703d7233fa7a66cb62",
+      "before": "condition_support_unavailable",
+      "after": "no_local_topic_witness"
+    }
+  ],
+  "scope": "Only two research-process compiler references replaced; production files unchanged."
+}

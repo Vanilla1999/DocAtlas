@@ -1,0 +1,27 @@
+/home/viadmin/StudioProjects/hermes/docmancer/experiments/crosslingual_relevance/mpnet_scorer.py:40: UserWarning: The model sentence-transformers/paraphrase-multilingual-mpnet-base-v2 now uses mean pooling instead of CLS embedding. In order to preserve the previous behaviour, consider either pinning fastembed version to 0.5.1 or using `add_custom_model` functionality.
+  model=TextEmbedding(model_name=MODEL_NAME,specific_model_path=str(root),
+Working directory: /tmp/m5-reranker-9uxz49wh
+Model: {'model_name': 'BAAI/bge-reranker-v2-m3', 'onnx_source': 'EmbeddedLLM/bge-reranker-v2-m3-onnx-o3-cpu', 'fingerprint': '09123dea4ee9ceb8217d374c9caf14533b0a5deb25bde7883b052230620b7c06', 'verified': True, 'scoring': 'cross-encoder-sigmoid-float32'}
+Threshold: 0.01
+Building vector service...
+All projects indexed with vectors.
+
+
+============================================================
+M5 with BGE reranker scorer
+============================================================
+  [PASS] typer-mixed-ru (mixed): gold_found=True sources=2 budget=753 context_available=True
+  [PASS] typer-pure-ru (RU): gold_found=True sources=2 budget=662 context_available=True
+  [PASS] typer-en (EN): gold_found=True sources=2 budget=753 context_available=True
+  [FAIL] m15-dev-01 (mixed): gold_found=False sources=2 budget=781 context_available=True
+  [PASS] m15-dev-02 (EN): gold_found=True sources=2 budget=779 context_available=True
+  [PASS] m15-dev-03 (RU): gold_found=True sources=2 budget=787 context_available=True
+  [PASS] m15-dev-04 (mixed): gold_found=True sources=1 budget=686 context_available=True
+
+============================================================
+SUMMARY
+============================================================
+Typer (M0 target): 3/3
+M1.5 dev: 3/4
+
+Results saved to experiments/crosslingual_relevance/review_runs/m5-reranker-9622578c21224775bdce167a9cb27457.json

@@ -1,0 +1,159 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-09-29T15:40:00Z",
+  "git_head": "3e3699508c4052ff57a6ebf390144c3048369660",
+  "model_fingerprint": "8dbc6f35492a9eec9dbed46dae4d45033f4fca0969239dbc04905634b33dc932",
+  "threshold": 0.7453,
+  "tasks": {
+    "typer-mixed-ru": {
+      "question": "Как записать только отрицательное имя boolean option: важен ли пробел перед /?",
+      "gold_block": {
+        "path": "docs/tutorial/parameter-types/bool.md",
+        "line_span": [192, 213],
+        "text_chars": 444,
+        "text_sha256_prefix": "1805e7acc454",
+        "full_token_count": 148,
+        "used_token_count": 148,
+        "truncated": false,
+        "mpnet_cosine": 0.5186,
+        "dense_rank": 2,
+        "scorer_evaluated": true,
+        "qualification_result": "insufficient_visible_match → rescue → score 0.5186 < 0.7453 → rejected",
+        "rescue_result": "rejected_below_threshold",
+        "final_packet": false,
+        "packet_budget_tokens": 278
+      },
+      "best_non_gold": {
+        "text_sha256_prefix": "39f9a56b3fa2",
+        "text_preview": "# Boolean CLI Options\n\nWe have seen some examples of *CLI options*...",
+        "mpnet_cosine": 0.5450,
+        "dense_rank": 1,
+        "qualification_result": "insufficient_visible_match → rescue → score 0.5450 < 0.7453 → rejected"
+      },
+      "inversion": true,
+      "inversion_gap": 0.0264,
+      "unique_evidence_texts_evaluated": 11,
+      "total_scorer_events": 83
+    },
+    "typer-pure-ru": {
+      "question": "Как записать только отрицательное имя логического параметра: важен ли пробел перед косой чертой?",
+      "gold_block": {
+        "path": "docs/tutorial/parameter-types/bool.md",
+        "line_span": [192, 213],
+        "text_chars": 444,
+        "text_sha256_prefix": "1805e7acc454",
+        "full_token_count": 148,
+        "used_token_count": 148,
+        "truncated": false,
+        "mpnet_cosine": 0.4994,
+        "dense_rank": 1,
+        "scorer_evaluated": true,
+        "qualification_result": "insufficient_visible_match → rescue → score 0.4994 < 0.7453 → rejected",
+        "rescue_result": "rejected_below_threshold",
+        "final_packet": false,
+        "packet_budget_tokens": 273
+      },
+      "best_non_gold": {
+        "mpnet_cosine": 0.4122,
+        "dense_rank": 2
+      },
+      "inversion": false,
+      "unique_evidence_texts_evaluated": 8,
+      "total_scorer_events": 78
+    },
+    "typer-en": {
+      "question": "How to declare only the negative name for a boolean option: is the space before / significant?",
+      "gold_block": {
+        "path": "docs/tutorial/parameter-types/bool.md",
+        "line_span": [192, 213],
+        "scorer_evaluated": false,
+        "qualification_result": "lexical_pass (EN terms match) → admitted without rescue",
+        "rescue_result": "not_needed",
+        "final_packet": true,
+        "packet_budget_tokens": 786,
+        "claims_supported": "2/2"
+      },
+      "inversion": false,
+      "total_scorer_events": 123
+    },
+    "httpx-four-timeout-types": {
+      "source": "M2 pool, m15-cal-01 (RU, calibration)",
+      "question": "Назови четыре типа timeout в HTTPX и объясни, что ограничивает каждый.",
+      "positive_block": {
+        "block_id": "b015",
+        "mpnet_cosine": 0.5599,
+        "dense_rank": 4,
+        "relevant": true,
+        "source_allowed": true
+      },
+      "hard_negative_block": {
+        "block_id": "b001",
+        "mpnet_cosine": 0.6738,
+        "dense_rank": 1,
+        "relevant": false,
+        "source_allowed": true,
+        "note": "default-timeout block, semantically close to all timeout questions"
+      },
+      "inversion": true,
+      "inversion_gap": 0.1139
+    },
+    "httpx-default-timeout": {
+      "source": "M2 pool, m15-dev-01 (mixed, development)",
+      "question": "Какое поведение timeout по умолчанию в HTTPX: сколько секунд и какое исключение?",
+      "positive_block": {
+        "block_id": "b001",
+        "mpnet_cosine": 0.8618,
+        "dense_rank": 1,
+        "relevant": true,
+        "source_allowed": true,
+        "note": "default-timeout block is the correct answer here"
+      },
+      "hard_negative_block": {
+        "block_id": "b002",
+        "mpnet_cosine": 0.6283,
+        "dense_rank": 4,
+        "relevant": false,
+        "source_allowed": true
+      },
+      "inversion": false,
+      "note": "No inversion for this question; gold is rank 1"
+    },
+    "httpx-disable-all-timeouts": {
+      "source": "M2 pool, m15-hold-01 (mixed, holdout)",
+      "question": "Как отключить all timeouts для HTTPX Client: какой аргумент передать?",
+      "positive_block": {
+        "block_id": "b022",
+        "mpnet_cosine": 0.7234,
+        "dense_rank": 2,
+        "relevant": true,
+        "source_allowed": true
+      },
+      "hard_negative_block": {
+        "block_id": "b001",
+        "mpnet_cosine": 0.8167,
+        "dense_rank": 1,
+        "relevant": false,
+        "source_allowed": true,
+        "note": "default-timeout block scores above the correct disable-timeouts block"
+      },
+      "inversion": true,
+      "inversion_gap": 0.0933
+    }
+  },
+  "threshold_separability": {
+    "conclusion": "NO scalar threshold T exists that separates all positives from all hard negatives",
+    "confirmed_inversions": [
+      {"task": "typer-mixed-ru", "negative_score": 0.5450, "positive_score": 0.5186, "gap": 0.0264},
+      {"task": "httpx-four-timeout-types (m15-cal-01)", "negative_score": 0.6738, "positive_score": 0.5599, "gap": 0.1139},
+      {"task": "httpx-disable-all-timeouts (m15-hold-01)", "negative_score": 0.8167, "positive_score": 0.7234, "gap": 0.0933}
+    ]
+  },
+  "truncation_check": {
+    "all_inputs_fit": true,
+    "max_length": 512,
+    "largest_evidence_tokens": 148,
+    "truncation_observed": false
+  },
+  "cross_encoder_status": "BLOCKED",
+  "cross_encoder_reason": "BAAI/bge-reranker-v2-m3 not available locally; fastembed 0.8.0 has no TextCrossEncoder; offline mode prevents download"
+}

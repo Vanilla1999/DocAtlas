@@ -1,0 +1,123 @@
+{
+  "cases": 80,
+  "budget": 1500,
+  "inventory": "captured_native_retrieved_candidates",
+  "arms": {
+    "native_read": {
+      "packets": 18,
+      "supported": 11,
+      "review_cases": [
+        "starlette-02",
+        "pydantic-01",
+        "pydantic-02",
+        "pydantic-07",
+        "httpx-01",
+        "httpx-05",
+        "httpx-07",
+        "mkdocs-05",
+        "ruff-02",
+        "ruff-07",
+        "uv-06"
+      ],
+      "unanswerable_packets": [],
+      "refusals": {
+        "missing_local_demand": 9,
+        "missing_bound_subject": 15,
+        "no_local_topic_witness": 265,
+        "missing_exact_terms": 71,
+        "condition_support_unavailable": 44,
+        "verified_local_demand": 1
+      }
+    },
+    "unified_read": {
+      "packets": 18,
+      "supported": 11,
+      "review_cases": [
+        "starlette-02",
+        "pydantic-01",
+        "pydantic-02",
+        "pydantic-07",
+        "httpx-01",
+        "httpx-05",
+        "httpx-07",
+        "mkdocs-05",
+        "ruff-02",
+        "ruff-07",
+        "uv-06"
+      ],
+      "unanswerable_packets": [],
+      "refusals": {
+        "condition_support_unavailable": 48,
+        "missing_bound_subject": 15,
+        "no_local_topic_witness": 271,
+        "missing_exact_terms": 71
+      }
+    }
+  },
+  "recovered": [],
+  "lost": [],
+  "transitions": [
+    {
+      "case_id": "fastapi-01",
+      "proposal_id": "child-a171758aad3d28e4f3dc1ef7d41c62522f3d0f24",
+      "before": "missing_local_demand",
+      "after": "condition_support_unavailable"
+    },
+    {
+      "case_id": "fastapi-01",
+      "proposal_id": "child-763508cdd9aa5559756de0476606c64e940e38dc",
+      "before": "missing_local_demand",
+      "after": "condition_support_unavailable"
+    },
+    {
+      "case_id": "fastapi-01",
+      "proposal_id": "child-68abf812b231be62d13b84adb14ed181be3e43ea",
+      "before": "missing_local_demand",
+      "after": "condition_support_unavailable"
+    },
+    {
+      "case_id": "fastapi-01",
+      "proposal_id": "child-a5e2a5ec60aa80a7a988fabd496f4cf1f051c9b6",
+      "before": "missing_local_demand",
+      "after": "condition_support_unavailable"
+    },
+    {
+      "case_id": "httpx-06",
+      "proposal_id": "child-ac6eb264814c87baac2f58ba2e2774029b801427",
+      "before": "verified_local_demand",
+      "after": "no_local_topic_witness"
+    },
+    {
+      "case_id": "httpx-06",
+      "proposal_id": "child-b077ca8e4164e04d7aa28b0859147de220fe4362",
+      "before": "missing_local_demand",
+      "after": "no_local_topic_witness"
+    },
+    {
+      "case_id": "httpx-06",
+      "proposal_id": "child-9cd37aa0f639a5d46c4e6101f676dcdedd6b1342",
+      "before": "missing_local_demand",
+      "after": "no_local_topic_witness"
+    },
+    {
+      "case_id": "httpx-06",
+      "proposal_id": "child-3da2905a7cec28b4ab6008bfc9e931056354dcbe",
+      "before": "missing_local_demand",
+      "after": "no_local_topic_witness"
+    },
+    {
+      "case_id": "httpx-06",
+      "proposal_id": "child-8208057df2eb710ab06a5a351b03a6ed3e3bc439",
+      "before": "missing_local_demand",
+      "after": "no_local_topic_witness"
+    },
+    {
+      "case_id": "httpx-06",
+      "proposal_id": "child-7f1afff53ba7aa11cb693719ee60ea45dcecc94c",
+      "before": "missing_local_demand",
+      "after": "no_local_topic_witness"
+    }
+  ],
+  "production_changed": false,
+  "eligible_for_rollout": false
+}

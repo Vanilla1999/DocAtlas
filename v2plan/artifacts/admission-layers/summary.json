@@ -1,0 +1,34 @@
+{
+  "all_proposals": {
+    "count": 269,
+    "subject_unresolved": 17,
+    "subject_from_owner": 0,
+    "literal_missing": 61,
+    "condition_unresolved": 42,
+    "topic_false": 240,
+    "native_allowed": 21,
+    "research_refusals": {
+      "missing_exact_or_subject": 78,
+      "no_local_topic_witness": 147,
+      "condition_support_unavailable": 19,
+      "verified_local_demand": 1,
+      "missing_local_demand": 3,
+      "missing_exact_terms": 1
+    }
+  },
+  "complete_witness_proposals": {
+    "count": 52,
+    "subject_unresolved": 6,
+    "subject_from_owner": 0,
+    "literal_missing": 13,
+    "condition_unresolved": 11,
+    "topic_false": 30,
+    "native_allowed": 16,
+    "research_refusals": {
+      "missing_exact_or_subject": 19,
+      "condition_support_unavailable": 5,
+      "no_local_topic_witness": 11,
+      "verified_local_demand": 1
+    }
+  }
+}

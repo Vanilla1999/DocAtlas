@@ -1,0 +1,29 @@
+============================= test session starts ==============================
+platform linux -- Python 3.13.12, pytest-9.0.3, pluggy-1.6.0 -- /home/viadmin/StudioProjects/hermes/docmancer/.venv/bin/python
+cachedir: .pytest_cache
+rootdir: /home/viadmin/StudioProjects/hermes/docmancer
+configfile: pytest.ini
+plugins: anyio-4.13.0, asyncio-1.4.0
+asyncio: mode=Mode.AUTO, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collecting ... collected 8 items
+
+tests/docs/test_reranker_rescue.py::test_mixed_ru_typer_gold_outranks_distractor PASSED [ 12%]
+tests/docs/test_reranker_rescue.py::test_pure_ru_typer_gold_outranks_distractor PASSED [ 25%]
+tests/docs/test_reranker_rescue.py::test_en_control_not_degraded PASSED  [ 37%]
+tests/docs/test_reranker_rescue.py::test_wrong_project_rejected_with_reranker PASSED [ 50%]
+tests/docs/test_reranker_rescue.py::test_nan_scorer_fail_closed PASSED   [ 62%]
+tests/docs/test_reranker_rescue.py::test_unavailable_scorer_fail_closed PASSED [ 75%]
+tests/docs/test_reranker_rescue.py::test_reranker_admission_no_answer_authority PASSED [ 87%]
+tests/docs/test_reranker_rescue.py::test_literal_space_slash_preserved PASSED [100%]
+
+=============================== warnings summary ===============================
+tests/docs/test_reranker_rescue.py::test_mixed_ru_typer_gold_outranks_distractor
+tests/docs/test_reranker_rescue.py::test_pure_ru_typer_gold_outranks_distractor
+tests/docs/test_reranker_rescue.py::test_wrong_project_rejected_with_reranker
+tests/docs/test_reranker_rescue.py::test_reranker_admission_no_answer_authority
+tests/docs/test_reranker_rescue.py::test_literal_space_slash_preserved
+  /home/viadmin/StudioProjects/hermes/docmancer/docmancer/embeddings/fastembed_provider.py:69: UserWarning: The model sentence-transformers/paraphrase-multilingual-mpnet-base-v2 now uses mean pooling instead of CLS embedding. In order to preserve the previous behaviour, consider either pinning fastembed version to 0.5.1 or using `add_custom_model` functionality.
+    self._dense = TextEmbedding(model_name=self.model_name, cache_dir=cache_dir)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=================== 8 passed, 5 warnings in 72.14s (0:01:12) ===================

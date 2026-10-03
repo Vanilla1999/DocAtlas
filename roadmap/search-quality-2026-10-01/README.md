@@ -32,9 +32,9 @@
 
 ## Материалы
 
-- **Новый M2 design без моделей:** [исследование](M2_MODEL_FREE_RETRIEVAL_RESEARCH_RU.md),
-  [контракт](M2_SIMPLIFICATION_CONTRACT_RU.md),
-  [пошаговый TDD-план](M2_MODEL_FREE_RETRIEVAL_TDD_RU.md). Для его реализации
+- **Новый M2 design без моделей:** [исследование](../../v2plan/M2_MODEL_FREE_RETRIEVAL_RESEARCH_RU.md),
+  [контракт](../../v2plan/M2_SIMPLIFICATION_CONTRACT_RU.md),
+  [пошаговый TDD-план](../../v2plan/M2_MODEL_FREE_RETRIEVAL_TDD_RU.md). Для его реализации
   начинать с шага 00 нового плана, не выполнять одновременно старые 07–09.
   Принятые lifecycle/catalog contracts и независимый gate сохраняются;
   остановленный шаг 06 не объявляется принятым или возобновлённым.

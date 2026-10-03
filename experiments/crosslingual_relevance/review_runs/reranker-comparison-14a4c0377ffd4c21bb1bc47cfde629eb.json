@@ -1,0 +1,1176 @@
+{
+  "schema_version": 1,
+  "comparison": "MPNet_bi-encoder_vs_BGE_reranker_v2_m3",
+  "pool_blocks": 29,
+  "pool_tasks": 12,
+  "summary": {
+    "MPNet": {
+      "mean_mrr": 0.7986111111111112,
+      "mean_recall_at_5": 0.9583333333333334,
+      "total_inversions": 5,
+      "tasks_with_first_positive": 12,
+      "latency_seconds": 20.203114532003383,
+      "identity": {
+        "schema_version": 1,
+        "model_name": "sentence-transformers/paraphrase-multilingual-mpnet-base-v2",
+        "hub_revision": null,
+        "files": {
+          "config.json": "14533f158fb2476510b3a83256386b983daa8cfa799ea35217c89947be63835e",
+          "onnx/model.onnx": "92f682c55d39e728187c6bffd488f17462d4e05e3c5fe86ef9ba6f38d66122ed",
+          "special_tokens_map.json": "06e405a36dfe4b9604f484f6a1e619af1a7f7d09e34a8555eb0b77b66318067f",
+          "tokenizer.json": "b60b6b43406a48bf3638526314f3d232d97058bc93472ff2de930d43686fa441",
+          "tokenizer_config.json": "efb5c0d09722e5fe59a462cd2a9976ee216d55b037597d997cd3fe833216da15"
+        },
+        "versions": {
+          "fastembed": "0.8.0",
+          "onnxruntime": "1.26.0",
+          "tokenizers": "0.23.1",
+          "numpy": "2.4.6"
+        },
+        "inference": {
+          "provider": "CPUExecutionProvider",
+          "threads": 1,
+          "pooling": "mean",
+          "scoring": "normalized-cosine-float32",
+          "expected_dimensions": 768
+        },
+        "calibration_transfer_validated": false,
+        "fingerprint": "114efcec9d2a27d491472fa87998a4ac1464d254f3b013d0133a788875314cdc",
+        "verified": true,
+        "model_dir": "/tmp/opencode/mpnet-export",
+        "runtime_tokenizer_sha256": "966351efe8cf74f0295dde6c14352246b311ed4fca8932abc7ed49b2f703b517",
+        "runtime_truncation": {
+          "max_length": 512,
+          "stride": 0,
+          "strategy": "longest_first",
+          "direction": "right"
+        },
+        "runtime_padding": {
+          "length": null,
+          "pad_to_multiple_of": null,
+          "pad_id": 1,
+          "pad_token": "<pad>",
+          "pad_type_id": 0,
+          "direction": "right"
+        },
+        "loaded_backend": "PooledEmbedding",
+        "artifact_fingerprint": "8dbc6f35492a9eec9dbed46dae4d45033f4fca0969239dbc04905634b33dc932"
+      }
+    },
+    "BGE_reranker": {
+      "mean_mrr": 0.9583333333333334,
+      "mean_recall_at_5": 0.9583333333333334,
+      "total_inversions": 3,
+      "tasks_with_first_positive": 12,
+      "latency_seconds": 179.68830333500227,
+      "identity": {
+        "model_name": "BAAI/bge-reranker-v2-m3",
+        "onnx_source": "EmbeddedLLM/bge-reranker-v2-m3-onnx-o3-cpu",
+        "fingerprint": "09123dea4ee9ceb8217d374c9caf14533b0a5deb25bde7883b052230620b7c06",
+        "verified": true,
+        "scoring": "cross-encoder-sigmoid-float32"
+      }
+    }
+  },
+  "task_results": [
+    {
+      "task_id": "m15-dev-01",
+      "split": "development",
+      "formulation": "mixed",
+      "variant": "MPNet",
+      "first_positive_rank": 1,
+      "mrr": 1.0,
+      "known_positive_recall_at_5": 1.0,
+      "inversions": [],
+      "allowed_irrelevant_above_first_positive": [],
+      "top_5": [
+        {
+          "block_id": "b001",
+          "score": 0.8617662191390991,
+          "rel": true,
+          "allowed": true
+        },
+        {
+          "block_id": "b018",
+          "score": 0.7448154091835022,
+          "rel": null,
+          "allowed": null
+        },
+        {
+          "block_id": "b016",
+          "score": 0.6328227519989014,
+          "rel": null,
+          "allowed": null
+        },
+        {
+          "block_id": "b002",
+          "score": 0.6282598972320557,
+          "rel": false,
+          "allowed": true
+        },
+        {
+          "block_id": "b022",
+          "score": 0.6167094707489014,
+          "rel": null,
+          "allowed": null
+        }
+      ]
+    },
+    {
+      "task_id": "m15-dev-01",
+      "split": "development",
+      "formulation": "mixed",
+      "variant": "BGE_reranker",
+      "first_positive_rank": 1,
+      "mrr": 1.0,
+      "known_positive_recall_at_5": 1.0,
+      "inversions": [],
+      "allowed_irrelevant_above_first_positive": [],
+      "top_5": [
+        {
+          "block_id": "b001",
+          "score": 0.9980564838162007,
+          "rel": true,
+          "allowed": true
+        },
+        {
+          "block_id": "b015",
+          "score": 0.8350963449906905,
+          "rel": null,
+          "allowed": null
+        },
+        {
+          "block_id": "b018",
+          "score": 0.7110162857045388,
+          "rel": null,
+          "allowed": null
+        },
+        {
+          "block_id": "b016",
+          "score": 0.426304099523381,
+          "rel": null,
+          "allowed": null
+        },
+        {
+          "block_id": "b002",
+          "score": 0.28837718807130963,
+          "rel": false,
+          "allowed": true
+        }
+      ]
+    },
+    {
+      "task_id": "m15-dev-02",
+      "split": "development",
+      "formulation": "EN",
+      "variant": "MPNet",
+      "first_positive_rank": 2,
+      "mrr": 0.5,
+      "known_positive_recall_at_5": 0.5,
+      "inversions": [
+        {
+          "negative": "b006",
+          "negative_score": 0.621966540813446,
+          "positive": "b003",
+          "positive_score": 0.6085551381111145,
+          "gap": 0.013411402702331543
+        }
+      ],
+      "allowed_irrelevant_above_first_positive": [],
+      "top_5": [
+        {
+          "block_id": "b025",
+          "score": 0.8010610938072205,
+          "rel": null,
+          "allowed": null
+        },
+        {
+          "block_id": "b005",
+          "score": 0.7571396827697754,
+          "rel": true,
+          "allowed": true
+        },
+        {
+          "block_id": "b017",
+          "score": 0.6871106624603271,
+          "rel": null,
+          "allowed": null
+        },
+        {
+          "block_id": "b024",
+          "score": 0.6836361885070801,
+          "rel": null,
+          "allowed": null
+        },
+        {
+          "block_id": "b006",
+          "score": 0.621966540813446,
+          "rel": false,
+          "allowed": true
+        }
+      ]
+    },
+    {
+      "task_id": "m15-dev-02",
+      "split": "development",
+      "formulation": "EN",
+      "variant": "BGE_reranker",
+      "first_positive_rank": 1,
+      "mrr": 1.0,
+      "known_positive_recall_at_5": 1.0,
+      "inversions": [
+        {
+          "negative": "b006",
+          "negative_score": 0.9916307850926072,
+          "positive": "b005",
+          "positive_score": 0.9363891237421595,
+          "gap": 0.05524166135044761
+        }
+      ],
+      "allowed_irrelevant_above_first_positive": [],
+      "top_5": [
+        {
+          "block_id": "b003",
+          "score": 0.998852444313103,
+          "rel": true,
+          "allowed": true
+        },
+        {
+          "block_id": "b025",
+          "score": 0.9933809462744336,
+          "rel": null,
+          "allowed": null
+        },
+        {
+          "block_id": "b006",
+          "score": 0.9916307850926072,
+          "rel": false,
+          "allowed": true
+        },
+        {
+          "block_id": "b005",
+          "score": 0.9363891237421595,
+          "rel": true,
+          "allowed": true
+        },
+        {
+          "block_id": "b017",
+          "score": 0.9045961460560873,
+          "rel": null,
+          "allowed": null
+        }
+      ]
+    },
+    {
+      "task_id": "m15-dev-03",
+      "split": "development",
+      "formulation": "RU",
+      "variant": "MPNet",
+      "first_positive_rank": 1,
+      "mrr": 1.0,
+      "known_positive_recall_at_5": 1.0,
+      "inversions": [],
+      "allowed_irrelevant_above_first_positive": [],
+      "top_5": [
+        {
+          "block_id": "b007",
+          "score": 0.7829900979995728,
+          "rel": true,
+          "allowed": true
+        },
+        {
+          "block_id": "b004",
+          "score": 0.6332053542137146,
+          "rel": null,
+          "allowed": null
+        },
+        {
+          "block_id": "b009",
+          "score": 0.5140796303749084,
+          "rel": false,
+          "allowed": true
+        },
+        {
+          "block_id": "b026",
+          "score": 0.4997372031211853,
+          "rel": null,
+          "allowed": null
+        },
+        {
+          "block_id": "b029",
+          "score": 0.4984278678894043,
+          "rel": null,
+          "allowed": null
+        }
+      ]
+    },
+    {
+      "task_id": "m15-dev-03",
+      "split": "development",
+      "formulation": "RU",
+      "variant": "BGE_reranker",
+      "first_positive_rank": 1,
+      "mrr": 1.0,
+      "known_positive_recall_at_5": 1.0,
+      "inversions": [],
+      "allowed_irrelevant_above_first_positive": [],
+      "top_5": [
+        {
+          "block_id": "b007",
+          "score": 0.9563199356907038,
+          "rel": true,
+          "allowed": true
+        },
+        {
+          "block_id": "b004",
+          "score": 0.8602864523683902,
+          "rel": null,
+          "allowed": null
+        },
+        {
+          "block_id": "b027",
+          "score": 0.07462754707767065,
+          "rel": null,
+          "allowed": null
+        },
+        {
+          "block_id": "b009",
+          "score": 0.046492611875788355,
+          "rel": false,
+          "allowed": true
+        },
+        {
+          "block_id": "b008",
+          "score": 0.0003805547514893434,
+          "rel": false,
+          "allowed": true
+        }
+      ]
+    },
+    {
+      "task_id": "m15-dev-04",
+      "split": "development",
+      "formulation": "mixed",
+      "variant": "MPNet",
+      "first_positive_rank": 1,
+      "mrr": 1.0,
+      "known_positive_recall_at_5": 1.0,
+      "inversions": [],
+      "allowed_irrelevant_above_first_positive": [],
+      "top_5": [
+        {
+          "block_id": "b011",
+          "score": 0.937690019607544,
+          "rel": true,
+          "allowed": true
+        },
+        {
+          "block_id": "b021",
+          "score": 0.7745330333709717,
+          "rel": null,
+          "allowed": null
+        },
+        {
+          "block_id": "b010",
+          "score": 0.761950671672821,
+          "rel": null,
+          "allowed": null
+        },
+        {
+          "block_id": "b020",
+          "score": 0.6583774089813232,
+          "rel": null,
+          "allowed": null
+        },
+        {
+          "block_id": "b012",
+          "score": 0.6505783796310425,
+          "rel": true,
+          "allowed": true
+        }
+      ]
+    },
+    {
+      "task_id": "m15-dev-04",
+      "split": "development",
+      "formulation": "mixed",
+      "variant": "BGE_reranker",
+      "first_positive_rank": 1,
+      "mrr": 1.0,
+      "known_positive_recall_at_5": 1.0,
+      "inversions": [],
+      "allowed_irrelevant_above_first_positive": [],
+      "top_5": [
+        {
+          "block_id": "b011",
+          "score": 0.9885269802464371,
+          "rel": true,
+          "allowed": true
+        },
+        {
+          "block_id": "b010",
+          "score": 0.9023965625849719,
+          "rel": null,
+          "allowed": null
+        },
+        {
+          "block_id": "b028",
+          "score": 0.7303559504730417,
+          "rel": null,
+          "allowed": null
+        },
+        {
+          "block_id": "b012",
+          "score": 0.554615123029583,
+          "rel": true,
+          "allowed": true
+        },
+        {
+          "block_id": "b021",
+          "score": 0.034414571865380675,
+          "rel": null,
+          "allowed": null
+        }
+      ]
+    },
+    {
+      "task_id": "m15-cal-01",
+      "split": "calibration",
+      "formulation": "RU",
+      "variant": "MPNet",
+      "first_positive_rank": 4,
+      "mrr": 0.25,
+      "known_positive_recall_at_5": 1.0,
+      "inversions": [
+        {
+          "negative": "b001",
+          "negative_score": 0.6738238334655762,
+          "positive": "b015",
+          "positive_score": 0.5598639249801636,
+          "gap": 0.1139599084854126
+        }
+      ],
+      "allowed_irrelevant_above_first_positive": [
+        "b001"
+      ],
+      "top_5": [
+        {
+          "block_id": "b001",
+          "score": 0.6738238334655762,
+          "rel": false,
+          "allowed": true
+        },
+        {
+          "block_id": "b029",
+          "score": 0.6428664326667786,
+          "rel": null,
+          "allowed": null
+        },
+        {
+          "block_id": "b018",
+          "score": 0.6208037734031677,
+          "rel": null,
+          "allowed": null
+        },
+        {
+          "block_id": "b015",
+          "score": 0.5598639249801636,
+          "rel": true,
+          "allowed": true
+        },
+        {
+          "block_id": "b016",
+          "score": 0.5393065214157104,
+          "rel": false,
+          "allowed": true
+        }
+      ]
+    },
+    {
+      "task_id": "m15-cal-01",
+      "split": "calibration",
+      "formulation": "RU",
+      "variant": "BGE_reranker",
+      "first_positive_rank": 1,
+      "mrr": 1.0,
+      "known_positive_recall_at_5": 1.0,
+      "inversions": [],
+      "allowed_irrelevant_above_first_positive": [],
+      "top_5": [
+        {
+          "block_id": "b015",
+          "score": 0.9896442731200382,
+          "rel": true,
+          "allowed": true
+        },
+        {
+          "block_id": "b029",
+          "score": 0.9294131146158092,
+          "rel": null,
+          "allowed": null
+        },
+        {
+          "block_id": "b018",
+          "score": 0.23426877259013967,
+          "rel": null,
+          "allowed": null
+        },
+        {
+          "block_id": "b001",
+          "score": 0.20669371891359511,
+          "rel": false,
+          "allowed": true
+        },
+        {
+          "block_id": "b016",
+          "score": 0.05442036735092278,
+          "rel": false,
+          "allowed": true
+        }
+      ]
+    },
+    {
+      "task_id": "m15-cal-02",
+      "split": "calibration",
+      "formulation": "mixed",
+      "variant": "MPNet",
+      "first_positive_rank": 1,
+      "mrr": 1.0,
+      "known_positive_recall_at_5": 1.0,
+      "inversions": [],
+      "allowed_irrelevant_above_first_positive": [],
+      "top_5": [
+        {
+          "block_id": "b017",
+          "score": 0.9058583974838257,
+          "rel": true,
+          "allowed": true
+        },
+        {
+          "block_id": "b024",
+          "score": 0.7431316375732422,
+          "rel": null,
+          "allowed": null
+        },
+        {
+          "block_id": "b005",
+          "score": 0.7235790491104126,
+          "rel": false,
+          "allowed": true
+        },
+        {
+          "block_id": "b025",
+          "score": 0.603092610836029,
+          "rel": null,
+          "allowed": null
+        },
+        {
+          "block_id": "b003",
+          "score": 0.601015031337738,
+          "rel": null,
+          "allowed": null
+        }
+      ]
+    },
+    {
+      "task_id": "m15-cal-02",
+      "split": "calibration",
+      "formulation": "mixed",
+      "variant": "BGE_reranker",
+      "first_positive_rank": 1,
+      "mrr": 1.0,
+      "known_positive_recall_at_5": 1.0,
+      "inversions": [],
+      "allowed_irrelevant_above_first_positive": [],
+      "top_5": [
+        {
+          "block_id": "b017",
+          "score": 0.9998271857256795,
+          "rel": true,
+          "allowed": true
+        },
+        {
+          "block_id": "b003",
+          "score": 0.9770235720858671,
+          "rel": null,
+          "allowed": null
+        },
+        {
+          "block_id": "b006",
+          "score": 0.6242131152489632,
+          "rel": false,
+          "allowed": true
+        },
+        {
+          "block_id": "b005",
+          "score": 0.5322287329382657,
+          "rel": false,
+          "allowed": true
+        },
+        {
+          "block_id": "b025",
+          "score": 0.5247633732141046,
+          "rel": null,
+          "allowed": null
+        }
+      ]
+    },
+    {
+      "task_id": "m15-cal-03",
+      "split": "calibration",
+      "formulation": "EN",
+      "variant": "MPNet",
+      "first_positive_rank": 1,
+      "mrr": 1.0,
+      "known_positive_recall_at_5": 1.0,
+      "inversions": [],
+      "allowed_irrelevant_above_first_positive": [],
+      "top_5": [
+        {
+          "block_id": "b019",
+          "score": 0.7453125715255737,
+          "rel": true,
+          "allowed": true
+        },
+        {
+          "block_id": "b014",
+          "score": 0.716445803642273,
+          "rel": true,
+          "allowed": true
+        },
+        {
+          "block_id": "b026",
+          "score": 0.5272494554519653,
+          "rel": null,
+          "allowed": null
+        },
+        {
+          "block_id": "b008",
+          "score": 0.5078492760658264,
+          "rel": null,
+          "allowed": null
+        },
+        {
+          "block_id": "b004",
+          "score": 0.46236956119537354,
+          "rel": false,
+          "allowed": true
+        }
+      ]
+    },
+    {
+      "task_id": "m15-cal-03",
+      "split": "calibration",
+      "formulation": "EN",
+      "variant": "BGE_reranker",
+      "first_positive_rank": 1,
+      "mrr": 1.0,
+      "known_positive_recall_at_5": 1.0,
+      "inversions": [],
+      "allowed_irrelevant_above_first_positive": [],
+      "top_5": [
+        {
+          "block_id": "b019",
+          "score": 0.9763440099431432,
+          "rel": true,
+          "allowed": true
+        },
+        {
+          "block_id": "b014",
+          "score": 0.4716944679187187,
+          "rel": true,
+          "allowed": true
+        },
+        {
+          "block_id": "b027",
+          "score": 0.0017678282107102487,
+          "rel": null,
+          "allowed": null
+        },
+        {
+          "block_id": "b004",
+          "score": 0.0015041599699652864,
+          "rel": false,
+          "allowed": true
+        },
+        {
+          "block_id": "b026",
+          "score": 0.0006860988505333837,
+          "rel": null,
+          "allowed": null
+        }
+      ]
+    },
+    {
+      "task_id": "m15-cal-04",
+      "split": "calibration",
+      "formulation": "RU",
+      "variant": "MPNet",
+      "first_positive_rank": 1,
+      "mrr": 1.0,
+      "known_positive_recall_at_5": 1.0,
+      "inversions": [],
+      "allowed_irrelevant_above_first_positive": [],
+      "top_5": [
+        {
+          "block_id": "b020",
+          "score": 0.7558257579803467,
+          "rel": true,
+          "allowed": true
+        },
+        {
+          "block_id": "b012",
+          "score": 0.6496049761772156,
+          "rel": null,
+          "allowed": null
+        },
+        {
+          "block_id": "b021",
+          "score": 0.6199774146080017,
+          "rel": true,
+          "allowed": true
+        },
+        {
+          "block_id": "b010",
+          "score": 0.5998966693878174,
+          "rel": null,
+          "allowed": null
+        },
+        {
+          "block_id": "b011",
+          "score": 0.5767409205436707,
+          "rel": null,
+          "allowed": null
+        }
+      ]
+    },
+    {
+      "task_id": "m15-cal-04",
+      "split": "calibration",
+      "formulation": "RU",
+      "variant": "BGE_reranker",
+      "first_positive_rank": 1,
+      "mrr": 1.0,
+      "known_positive_recall_at_5": 1.0,
+      "inversions": [],
+      "allowed_irrelevant_above_first_positive": [],
+      "top_5": [
+        {
+          "block_id": "b020",
+          "score": 0.9916894026898951,
+          "rel": true,
+          "allowed": true
+        },
+        {
+          "block_id": "b010",
+          "score": 0.003358027051127681,
+          "rel": null,
+          "allowed": null
+        },
+        {
+          "block_id": "b021",
+          "score": 0.0031444962034974907,
+          "rel": true,
+          "allowed": true
+        },
+        {
+          "block_id": "b028",
+          "score": 0.0009077170307964091,
+          "rel": null,
+          "allowed": null
+        },
+        {
+          "block_id": "b012",
+          "score": 0.0006507287557669623,
+          "rel": null,
+          "allowed": null
+        }
+      ]
+    },
+    {
+      "task_id": "m15-hold-01",
+      "split": "holdout",
+      "formulation": "mixed",
+      "variant": "MPNet",
+      "first_positive_rank": 2,
+      "mrr": 0.5,
+      "known_positive_recall_at_5": 1.0,
+      "inversions": [
+        {
+          "negative": "b001",
+          "negative_score": 0.8166946172714233,
+          "positive": "b022",
+          "positive_score": 0.7233761548995972,
+          "gap": 0.09331846237182617
+        },
+        {
+          "negative": "b001",
+          "negative_score": 0.8166946172714233,
+          "positive": "b002",
+          "positive_score": 0.6985926628112793,
+          "gap": 0.11810195446014404
+        }
+      ],
+      "allowed_irrelevant_above_first_positive": [
+        "b001"
+      ],
+      "top_5": [
+        {
+          "block_id": "b001",
+          "score": 0.8166946172714233,
+          "rel": false,
+          "allowed": true
+        },
+        {
+          "block_id": "b022",
+          "score": 0.7233761548995972,
+          "rel": true,
+          "allowed": true
+        },
+        {
+          "block_id": "b002",
+          "score": 0.6985926628112793,
+          "rel": true,
+          "allowed": true
+        },
+        {
+          "block_id": "b018",
+          "score": 0.6870883703231812,
+          "rel": null,
+          "allowed": null
+        },
+        {
+          "block_id": "b016",
+          "score": 0.6583702564239502,
+          "rel": null,
+          "allowed": null
+        }
+      ]
+    },
+    {
+      "task_id": "m15-hold-01",
+      "split": "holdout",
+      "formulation": "mixed",
+      "variant": "BGE_reranker",
+      "first_positive_rank": 1,
+      "mrr": 1.0,
+      "known_positive_recall_at_5": 0.5,
+      "inversions": [
+        {
+          "negative": "b001",
+          "negative_score": 0.19302266106713567,
+          "positive": "b022",
+          "positive_score": 0.11393740271983382,
+          "gap": 0.07908525834730185
+        }
+      ],
+      "allowed_irrelevant_above_first_positive": [],
+      "top_5": [
+        {
+          "block_id": "b002",
+          "score": 0.779144511338992,
+          "rel": true,
+          "allowed": true
+        },
+        {
+          "block_id": "b015",
+          "score": 0.605787065890899,
+          "rel": null,
+          "allowed": null
+        },
+        {
+          "block_id": "b001",
+          "score": 0.19302266106713567,
+          "rel": false,
+          "allowed": true
+        },
+        {
+          "block_id": "b018",
+          "score": 0.18508781434143173,
+          "rel": null,
+          "allowed": null
+        },
+        {
+          "block_id": "b016",
+          "score": 0.14756366986809621,
+          "rel": null,
+          "allowed": null
+        }
+      ]
+    },
+    {
+      "task_id": "m15-hold-02",
+      "split": "holdout",
+      "formulation": "EN",
+      "variant": "MPNet",
+      "first_positive_rank": 1,
+      "mrr": 1.0,
+      "known_positive_recall_at_5": 1.0,
+      "inversions": [
+        {
+          "negative": "b017",
+          "negative_score": 0.7906296253204346,
+          "positive": "b025",
+          "positive_score": 0.7872353792190552,
+          "gap": 0.0033942461013793945
+        }
+      ],
+      "allowed_irrelevant_above_first_positive": [],
+      "top_5": [
+        {
+          "block_id": "b024",
+          "score": 0.8543798327445984,
+          "rel": true,
+          "allowed": true
+        },
+        {
+          "block_id": "b005",
+          "score": 0.7956772446632385,
+          "rel": null,
+          "allowed": null
+        },
+        {
+          "block_id": "b017",
+          "score": 0.7906296253204346,
+          "rel": false,
+          "allowed": true
+        },
+        {
+          "block_id": "b025",
+          "score": 0.7872353792190552,
+          "rel": true,
+          "allowed": true
+        },
+        {
+          "block_id": "b023",
+          "score": 0.6709058284759521,
+          "rel": null,
+          "allowed": null
+        }
+      ]
+    },
+    {
+      "task_id": "m15-hold-02",
+      "split": "holdout",
+      "formulation": "EN",
+      "variant": "BGE_reranker",
+      "first_positive_rank": 2,
+      "mrr": 0.5,
+      "known_positive_recall_at_5": 1.0,
+      "inversions": [
+        {
+          "negative": "b017",
+          "negative_score": 0.9503578343720153,
+          "positive": "b025",
+          "positive_score": 0.9431905318221978,
+          "gap": 0.007167302549817456
+        }
+      ],
+      "allowed_irrelevant_above_first_positive": [],
+      "top_5": [
+        {
+          "block_id": "b006",
+          "score": 0.9976286396485402,
+          "rel": null,
+          "allowed": null
+        },
+        {
+          "block_id": "b024",
+          "score": 0.9684622076507002,
+          "rel": true,
+          "allowed": true
+        },
+        {
+          "block_id": "b017",
+          "score": 0.9503578343720153,
+          "rel": false,
+          "allowed": true
+        },
+        {
+          "block_id": "b025",
+          "score": 0.9431905318221978,
+          "rel": true,
+          "allowed": true
+        },
+        {
+          "block_id": "b005",
+          "score": 0.9096481936137084,
+          "rel": null,
+          "allowed": null
+        }
+      ]
+    },
+    {
+      "task_id": "m15-hold-03",
+      "split": "holdout",
+      "formulation": "RU",
+      "variant": "MPNet",
+      "first_positive_rank": 3,
+      "mrr": 0.3333333333333333,
+      "known_positive_recall_at_5": 1.0,
+      "inversions": [],
+      "allowed_irrelevant_above_first_positive": [],
+      "top_5": [
+        {
+          "block_id": "b026",
+          "score": 0.7436467409133911,
+          "rel": null,
+          "allowed": null
+        },
+        {
+          "block_id": "b009",
+          "score": 0.7011106014251709,
+          "rel": null,
+          "allowed": null
+        },
+        {
+          "block_id": "b027",
+          "score": 0.661882221698761,
+          "rel": true,
+          "allowed": true
+        },
+        {
+          "block_id": "b014",
+          "score": 0.460915207862854,
+          "rel": null,
+          "allowed": null
+        },
+        {
+          "block_id": "b019",
+          "score": 0.432354211807251,
+          "rel": null,
+          "allowed": null
+        }
+      ]
+    },
+    {
+      "task_id": "m15-hold-03",
+      "split": "holdout",
+      "formulation": "RU",
+      "variant": "BGE_reranker",
+      "first_positive_rank": 1,
+      "mrr": 1.0,
+      "known_positive_recall_at_5": 1.0,
+      "inversions": [],
+      "allowed_irrelevant_above_first_positive": [],
+      "top_5": [
+        {
+          "block_id": "b027",
+          "score": 0.9927455443415982,
+          "rel": true,
+          "allowed": true
+        },
+        {
+          "block_id": "b009",
+          "score": 0.9870352468486433,
+          "rel": null,
+          "allowed": null
+        },
+        {
+          "block_id": "b026",
+          "score": 0.9520584942251423,
+          "rel": null,
+          "allowed": null
+        },
+        {
+          "block_id": "b014",
+          "score": 0.0052115849600111105,
+          "rel": null,
+          "allowed": null
+        },
+        {
+          "block_id": "b007",
+          "score": 0.0021897523432582414,
+          "rel": null,
+          "allowed": null
+        }
+      ]
+    },
+    {
+      "task_id": "m15-hold-04",
+      "split": "holdout",
+      "formulation": "mixed",
+      "variant": "MPNet",
+      "first_positive_rank": 1,
+      "mrr": 1.0,
+      "known_positive_recall_at_5": 1.0,
+      "inversions": [],
+      "allowed_irrelevant_above_first_positive": [],
+      "top_5": [
+        {
+          "block_id": "b013",
+          "score": 0.6689448356628418,
+          "rel": true,
+          "allowed": true
+        },
+        {
+          "block_id": "b010",
+          "score": 0.5124472379684448,
+          "rel": null,
+          "allowed": null
+        },
+        {
+          "block_id": "b021",
+          "score": 0.48070472478866577,
+          "rel": false,
+          "allowed": true
+        },
+        {
+          "block_id": "b011",
+          "score": 0.46368175745010376,
+          "rel": false,
+          "allowed": true
+        },
+        {
+          "block_id": "b012",
+          "score": 0.4435603618621826,
+          "rel": null,
+          "allowed": null
+        }
+      ]
+    },
+    {
+      "task_id": "m15-hold-04",
+      "split": "holdout",
+      "formulation": "mixed",
+      "variant": "BGE_reranker",
+      "first_positive_rank": 1,
+      "mrr": 1.0,
+      "known_positive_recall_at_5": 1.0,
+      "inversions": [],
+      "allowed_irrelevant_above_first_positive": [],
+      "top_5": [
+        {
+          "block_id": "b013",
+          "score": 0.9988109669686448,
+          "rel": true,
+          "allowed": true
+        },
+        {
+          "block_id": "b010",
+          "score": 0.23581480871693253,
+          "rel": null,
+          "allowed": null
+        },
+        {
+          "block_id": "b020",
+          "score": 0.006397589373586444,
+          "rel": null,
+          "allowed": null
+        },
+        {
+          "block_id": "b028",
+          "score": 0.0007676156649153171,
+          "rel": null,
+          "allowed": null
+        },
+        {
+          "block_id": "b021",
+          "score": 0.00041647562150279495,
+          "rel": false,
+          "allowed": true
+        }
+      ]
+    }
+  ]
+}
