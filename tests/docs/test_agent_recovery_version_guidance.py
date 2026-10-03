@@ -24,7 +24,8 @@ def test_machine_contract_disambiguates_preparation_success_and_version_state():
 def test_advertised_tool_guidance_matches_installed_recovery_and_question_rules():
     tools = {tool["name"]: tool for tool in runtime_public_tool_dicts()}
     lookup = tools["get_docs_context"]["inputSchema"]["properties"]["lookup_queries"]["description"]
-    assert "conditions" in lookup and "negation" in lookup
+    guidance = tools["get_docs_context"]["description"]
+    assert "conditions" in guidance and "negation" in guidance
     assert "same question" in lookup.lower()
     assert "only after success" in tools["prepare_docs"]["description"]
     assert "returned job_id" in tools["docs_status"]["description"]

@@ -26,9 +26,10 @@ def test_public_tool_and_agent_template_explain_scope_without_hidden_widening():
     description = tools["get_docs_context"]["description"]
     schema_scope = tools["get_docs_context"]["inputSchema"]["properties"]["scope"]
 
-    assert 'scope="project"' in description
-    assert 'scope="module"' in description
-    assert 'scope="all"' in description
+    assert 'Module plus repo policy: separate bounded calls' in description
+    assert 'module_path implies module' in description
+    assert 'onboarding/cross-module: all without filters' in description
+    assert 'Preserve explicit scope' in description
     assert "repo-level docs only" in schema_scope["description"]
     assert "repo-level plus modules" in schema_scope["description"]
 

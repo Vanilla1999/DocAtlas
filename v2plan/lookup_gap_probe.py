@@ -1,6 +1,7 @@
 """Four synthetic same-question lookup pairs; native runtime remains unchanged."""
 import argparse
 from pathlib import Path
+from unittest.mock import patch
 
 from eval.evidence_quality_v2.observer import observe_call
 from eval.evidence_quality_v2.runtime import index_project, isolated_service, save_json, write_project
@@ -19,6 +20,7 @@ CASES = {
 
 
 def run(output):
+    from docmancer.docs.application.projection_decision_trace import ProjectionDecisionTrace
     output.mkdir(parents=True, exist_ok=False)
     rows = []
     for name, sentence in CASES.items():
@@ -31,7 +33,19 @@ def run(output):
                 request = {'project_path': str(root), 'scope': 'project', 'question': QUESTION}
                 if arm == 'focused':
                     request['lookup_queries'] = [LOOKUP]
-                payload, trace = observe_call(service, request)
+                decisions = []
+                original_record = ProjectionDecisionTrace.record
+
+                def record(instance, stage, decision, reason, candidate, variant=None, **kwargs):
+                    decisions.append({'stage': stage, 'decision': decision, 'reason': reason,
+                                      'candidate_path': candidate.get('path_or_url', candidate.get('path'))
+                                      if isinstance(candidate, dict) else None,
+                                      'snippet': (variant or {}).get('snippet')})
+                    return original_record(instance, stage, decision, reason, candidate, variant, **kwargs)
+
+                with patch.object(ProjectionDecisionTrace, 'record', record):
+                    payload, trace = observe_call(service, request)
+                trace['executed_decisions'] = decisions
                 save_json(output / name / (arm + '.json'), {'request': request, 'payload': payload, 'trace': trace})
                 rows.append({'case': name, 'arm': arm, 'sources': payload.get('sources', []),
                              'flags': {k: v for k, v in payload.items() if k != 'sources'}})

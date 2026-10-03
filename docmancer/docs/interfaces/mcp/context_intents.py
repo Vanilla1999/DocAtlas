@@ -19,7 +19,9 @@ def normalize_context_intents(
         raise InvalidContextIntent("invalid_request_intent", "request_intent must be read or change")
     if lifecycle is not None and lifecycle not in ("current", "historical", "either"):
         raise InvalidContextIntent("invalid_lifecycle_intent", "lifecycle_intent must be current, historical or either")
-    project_only = bool(args.get("project_path")) and not args.get("library") and not args.get("libraries")
+    project_only = (bool(args.get("project_path"))
+                    and not args.get("library") and not args.get("libraries")
+                    and (args.get("mode") or "auto") in ("auto", "project"))
     if request is not None and not project_only:
         raise InvalidContextIntent("invalid_request_intent_scope", "request_intent requires project-only context")
     if lifecycle is not None and not project_only:

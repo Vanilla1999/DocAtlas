@@ -21,17 +21,15 @@ def test_runtime_tool_teaches_one_concrete_question_per_call() -> None:
     lookup_description = str(properties["lookup_queries"]["description"]).casefold()
 
     assert "one call = one concrete question" in description
-    assert "original request unchanged" in description
-    assert "benchmark/evaluation" in description
-    assert "documentation-governance meta-question" in description
+    assert "original question unchanged" in description
+    assert "no benchmark/governance substitute" in description
 
     assert "one concrete question" in question_description
     assert "independent questions" in question_description
     assert "separate" in question_description
 
     assert "same question" in lookup_description
-    assert "independent questions" in lookup_description
-    assert "never batch" in lookup_description
+    assert "independent questions use separate calls" in question_description
 
 
 def test_agent_contract_forbids_batching_independent_questions_into_lookups() -> None:
@@ -114,13 +112,13 @@ def test_runtime_lookup_schema_teaches_when_to_add_lookups_without_changing_orig
     assert "conditional" in lowered
     assert "documentation language" in lowered
     assert "simple single-facet" in lowered
-    assert "original question" in lowered and "unchanged" in lowered
+    guidance = str(tool["description"]).casefold()
+    assert "original question unchanged" in guidance
     assert "exact identifiers" in lowered
     assert "versions" in lowered
-    assert "negation" in lowered
+    assert "conditions and negation" in guidance
     assert "comparison sides" in lowered
-    assert "expected answer" in lowered
-    assert "guessed source" in lowered
+    assert "no guessed answers/source names" in lowered
 
 def test_host_gap_policy_preserves_question_and_targets_missing_fact() -> None:
     workflow = public_agent_contract()["workflow"]
@@ -171,12 +169,12 @@ def test_agent_surfaces_repeat_gap_directed_follow_up_rule() -> None:
     )
     for text in (tool["description"], quickstart):
         assert FOCUSED_LOOKUP_GUIDANCE in text
-        assert "omission does not refute" in text
-        assert "Do not merge conflicting evidence" in text
-        assert "report partial/unknown and do not repeat the same query" in text
-        assert "does not mean data does not exist" in text
-        assert "Context and query coverage do not certify" in text
+        assert "omission is not refutation" in text
+        assert "Never merge conflicts" in text
+        assert "report partial/unknown, never repeat" in text
+        assert "not found does not mean nonexistent" in text
+        assert "Coverage grants no proof/edit permission" in text
     lookup = tool["inputSchema"]["properties"]["lookup_queries"]["description"]
-    assert "target only the missing part" in lookup
-    assert "preserve subject and environment" in lookup
-    assert "existing call/recovery limits" in lookup
+    assert "Preserve exact identifiers, versions and comparison sides" in lookup
+    assert "Lookup only missing facts within call/recovery limits" in tool["description"]
+    assert "preserve subject, environment, conditions and negation" in tool["description"]

@@ -15,9 +15,11 @@ def test_get_docs_context_schema():
     assert {"allow_network", "force_refresh", "prefetch_auto", "prepare_project_docs"}.isdisjoint(schema["properties"])
     assert set(schema["properties"]) == {
         "question", "project_path", "library", "version", "module_path",
-        "scope", "lookup_queries",
+        "scope", "lookup_queries", "request_intent", "lifecycle_intent",
     }
     assert schema["properties"]["scope"]["enum"] == ["project", "module", "all"]
+    assert schema["properties"]["request_intent"]["enum"] == ["read", "change"]
+    assert schema["properties"]["lifecycle_intent"]["enum"] == ["current", "historical", "either"]
 
 
 def test_get_docs_context_output_schema_accepts_only_current_statuses():

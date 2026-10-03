@@ -26,3 +26,7 @@ def test_native_focused_lookup_delivers_missing_part(tmp_path):
             candidates = [s for batch in raw['trace']['stages']['retrieved_candidates']
                           for s in batch['sources']]
             assert any(probe.CASES[row['case']] in s['snippet'] for s in candidates)
+            decisions = raw['trace']['executed_decisions']
+            assert any(probe.CASES[row['case']] in (event['snippet'] or '')
+                       and event['reason'] == ('no_new_direction' if row['arm'] == 'original' else 'accepted')
+                       for event in decisions)

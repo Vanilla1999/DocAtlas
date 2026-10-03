@@ -260,7 +260,7 @@ def test_agent_templates_include_three_tool_selection_guidance():
     advertised = runtime_tools["get_docs_context"]["description"]
     assert "Stop before editing on insufficient_evidence" not in advertised
     assert "hard_stop=true" in advertised
-    assert "documentation-governance meta-question" in advertised
+    assert "no benchmark/governance substitute" in advertised
 
     for name in (
         "skill.md", "claude_code_skill.md", "claude_desktop_skill.md",
@@ -613,10 +613,10 @@ def test_mcp_exposes_three_public_tools_with_mutually_exclusive_guidance():
 
     assert set(tools) == PUBLIC_TOOL_NAMES
     context_tool = tools["get_docs_context"]
-    assert "Source-grounded documentation tool" in context_tool["description"]
-    assert 'module_path always implies module scope' in context_tool["description"]
-    assert 'make two bounded calls (module then project)' in context_tool["description"]
-    assert 'scope=all without module filters' in context_tool["description"]
+    assert "Source-grounded docs" in context_tool["description"]
+    assert 'module_path implies module' in context_tool["description"]
+    assert 'Module plus repo policy: separate bounded calls' in context_tool["description"]
+    assert 'onboarding/cross-module: all without filters' in context_tool["description"]
     context_properties = context_tool["inputSchema"]["properties"]
     assert {"output_mode", "delivery_strategy", "packet_tokens"}.isdisjoint(
         context_properties
@@ -628,8 +628,8 @@ def test_mcp_exposes_three_public_tools_with_mutually_exclusive_guidance():
     }
     assert "always implies module scope" in context_properties["module_path"]["description"]
     assert "repo-level docs only" in context_properties["scope"]["description"]
-    assert "original request unchanged" in context_tool["description"]
-    assert "never authorize an answer or edit" in context_tool["description"]
+    assert "Original question unchanged" in context_tool["description"]
+    assert "Coverage grants no proof/edit permission" in context_tool["description"]
     output_properties = context_tool["outputSchema"]["properties"]
     assert output_properties["module_candidates"]["maxItems"] == 8
     assert output_properties["module_candidates"]["items"]["required"] == ["module_path"]

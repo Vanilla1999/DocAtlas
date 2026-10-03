@@ -3,14 +3,10 @@ from __future__ import annotations
 from ._docs_server_schema import *  # noqa: F401,F403
 
 FOCUSED_LOOKUP_GUIDANCE = (
-    "Separate supported facts from the concrete missing requested fact. Within existing call/recovery limits, "
-    "keep the original question unchanged and target lookup_queries only at that missing part; preserve subject, "
-    "environment, version, negation and conditions without guessing an answer. Independent questions need separate calls. "
-    "Retain supported facts with their source references and applicability conditions across calls: a later packet need not "
-    "repeat them, and omission does not refute them. Do not merge conflicting evidence. If focused lookup adds no information, "
-    "report partial/unknown and do not repeat the same query; continue only within existing limits with a concretely justified "
-    "new formulation or a new source. Ask for required user data. Not found in available context does not mean data does not exist. "
-    "Context and query coverage do not certify answer support or edit permission."
+    "Lookup only missing facts within call/recovery limits; preserve subject, environment, conditions and negation. "
+    "Retain sourced facts and applicability; omission is not refutation. Never merge conflicts. "
+    "No progress: report partial/unknown, never repeat; continue only with justified new query/source within limits. "
+    "Ask for missing user data; not found does not mean nonexistent. Coverage grants no proof/edit permission."
 )
 
 RAW_TOOLS: list[dict[str, Any]] = [
@@ -584,10 +580,9 @@ RAW_TOOLS = [tool for tool in RAW_TOOLS if tool["name"] in CLASSIFIED_TOOL_NAMES
 
 PUBLIC_ADVERTISED_DESCRIPTIONS: dict[str, str] = {
     "get_docs_context": (
-        "Source-grounded documentation tool. One call = one concrete question. Pass the original request unchanged; "
-        "never substitute a benchmark/evaluation or documentation-governance meta-question. For cross-module use "
-        "scope=all without module filters; module_path always implies module scope. For module plus repo policy make two "
-        "bounded calls (module then project). Lookups never authorize an answer or edit. hard_stop=true blocks edits. "
+        "Source-grounded docs: one call = one concrete question. Original question unchanged; no benchmark/governance substitute. "
+        "Preserve explicit scope; onboarding/cross-module: all without filters; module_path implies module. "
+        "Module plus repo policy: separate bounded calls. hard_stop=true blocks edits. "
         + FOCUSED_LOOKUP_GUIDANCE
     ),
     "prepare_docs": (

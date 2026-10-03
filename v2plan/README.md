@@ -6,9 +6,23 @@
 
 1. [01 — existing lookup для недостающей части](NEXT_01_LOOKUP_GAPS_RU.md).
 2. [02 — удаление одной конкурирующей admission-обязанности](NEXT_02_ADMISSION_SIMPLIFICATION_RU.md).
+3. [03 — инструкция focused lookup и завершение работы](NEXT_03_FOCUSED_LOOKUP_WORKFLOW_RU.md).
+4. [04 — приёмка текущей версии для выпуска](NEXT_04_PROD_CANDIDATE_EVALUATION_RU.md).
+5. [05 — исправление блокеров и завершение приёмки](NEXT_05_RELEASE_BLOCKERS_RU.md).
+6. [06 — тестовые контракты и оставшиеся блокеры](NEXT_06_TEST_CONTRACTS_AND_AGENT_ACCEPTANCE_RU.md).
 
-Выполнять последовательно; критерии DONE/BLOCKED/REJECTED находятся внутри.
-Результаты дописывать в эти два файла, не создавать очередной план на каждый прогон.
+01 завершён. 02 законсервирован: простое удаление gate отклонено (49 → 45 claims).
+03 завершён. Восстанавливать prod для приёмки не требуется.
+04 проверен в доступной части, BLOCKED: 49 claims сохранены, но required checks
+красные, tools/list превышает byte budget; реальные ответы агента не проверены.
+05: два локальных исправления и завершение проверок.
+05 выполнен частично, BLOCKED: footprint 6143 bytes, routing исправлен;
+128 offline failures, adversarial/question-surface gates и 0/8 ответов остаются.
+Следующий активный план — 06: решения по tests, два gates и изолированный runner.
+49 → 45 относится только к отклонённой ablation, не к принятому runtime patch.
+Admission/selection research автоматически не продолжать.
+Критерии DONE/BLOCKED/REJECTED находятся внутри.
+Результаты дописывать в соответствующий план, не создавать новый на каждый прогон.
 `AGENTS.md` обязателен. Актуальные опорные отчёты: `READ_GUARD_PATCH_RESULT_RU.md`,
 `EXACT_WINDOW_CONFLICT_RESULT_RU.md`, `ADMISSION_REMOVAL_DECISION_RU.md`,
 `ADMISSION_DIRECTION_REVIEW_RU.md`. Остальные материалы ниже — история, не очередь задач.

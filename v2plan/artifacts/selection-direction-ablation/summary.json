@@ -1,0 +1,19 @@
+{
+  "baseline_commit": "3c2ef231",
+  "intervention": "remove only no_new_direction branch in memory",
+  "pairs": 84,
+  "frozen_cases": 80,
+  "development_controls": 4,
+  "identical_payloads": 61,
+  "changed_payloads": 23,
+  "required_supported": {"baseline": 49, "ablation": 45},
+  "lost_claim_cases": ["fastapi-01", "fastapi-02", "fastapi-07", "httpx-03"],
+  "gained_frozen_claims": [],
+  "synthetic_recovery": ["both", "partial"],
+  "negative_packets": {"baseline": [], "ablation": []},
+  "changed_flags": [],
+  "decision": "REJECTED",
+  "runtime_files_changed": false,
+  "unseen_validation": "NOT_MEASURED",
+  "raw_artifacts": "/tmp/opencode/no-new-direction-ablation-01"
+}

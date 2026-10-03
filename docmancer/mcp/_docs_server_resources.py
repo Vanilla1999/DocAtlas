@@ -66,6 +66,8 @@ Before retrieval, identify what the user actually requests without guessing the 
 
 """ + FOCUSED_LOOKUP_GUIDANCE + """
 
+Separate supported facts from the concrete missing requested fact. Keep the original question unchanged and target lookup_queries only at that missing part; preserve subject, environment, version, negation and conditions without guessing an answer. Independent questions need separate calls. Retain supported facts with their source references and applicability conditions across calls: a later packet need not repeat them, and omission does not refute them. Do not merge conflicting evidence. If focused lookup adds no information, report partial/unknown and do not repeat the same query; continue only within existing call/recovery limits with a concretely justified new formulation or a new source. Ask for required user data. Not found in available context does not mean data does not exist. Context and query coverage do not certify answer support or edit permission.
+
 A later query may use a discovered bridge value only with its returned source reference. For a sufficient visible packet, stop even when `context_quality` is unverified; an unverified flag alone does not require another read. Stop on sufficient evidence or no progress. Do not reread the same span or replenish task budgets by renaming a subquestion.
 
 ## Context7-like library workflow
