@@ -10,6 +10,7 @@
 4. [04 — приёмка текущей версии для выпуска](NEXT_04_PROD_CANDIDATE_EVALUATION_RU.md).
 5. [05 — исправление блокеров и завершение приёмки](NEXT_05_RELEASE_BLOCKERS_RU.md).
 6. [06 — тестовые контракты и оставшиеся блокеры](NEXT_06_TEST_CONTRACTS_AND_AGENT_ACCEPTANCE_RU.md).
+7. [07 — причины потери read context и одна проверяемая замена](NEXT_07_READ_PIPELINE_OWNERSHIP_RU.md).
 
 01 завершён. 02 законсервирован: простое удаление gate отклонено (49 → 45 claims).
 03 завершён. Восстанавливать prod для приёмки не требуется.
@@ -18,9 +19,20 @@
 05: два локальных исправления и завершение проверок.
 05 выполнен частично, BLOCKED: footprint 6143 bytes, routing исправлен;
 128 offline failures, adversarial/question-surface gates и 0/8 ответов остаются.
-Следующий активный план — 06: решения по tests, два gates и изолированный runner.
+06 сохраняет очередь решений по tests, gates и изолированному runner.
+06 не завершён: после test-contract trials 6124 PASS / 94 FAIL / 10 SKIP,
+новых failing nodes нет; 34 baseline nodes заменены passing checks без удаления
+tests и изменения runtime. Последующий focused trial: ledger 81 UNRESOLVED,
+4 KEEP_FIX_RUNTIME, 8 ENV_BLOCKED, 35 REWRITE; full rerun после него не выполнен.
+Native delivery кандидата отклонена (LeaseClient); миграция historical gates
+требует выяснения действующего parser/acceptance contract. Namespace isolation
+недоступна; восемь ответов проверены в чате (не isolated model run), полный
+per-node разбор ещё не выполнен. Подробные основания — в плане 06.
 49 → 45 относится только к отклонённой ablation, не к принятому runtime patch.
-Admission/selection research автоматически не продолжать.
+07 — новый ограниченный маршрут по запросу пользователя: сначала подтвердить
+причины потери и контракт, затем выбрать одну ответственность либо остановиться.
+План 07 пока PLANNED, не закрывает 06 и не разрешает unified replacement/rollout.
+Admission/selection research за пределами границ 07 автоматически не продолжать.
 Критерии DONE/BLOCKED/REJECTED находятся внутри.
 Результаты дописывать в соответствующий план, не создавать новый на каждый прогон.
 `AGENTS.md` обязателен. Актуальные опорные отчёты: `READ_GUARD_PATCH_RESULT_RU.md`,
