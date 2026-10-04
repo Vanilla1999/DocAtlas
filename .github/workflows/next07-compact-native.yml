@@ -5,6 +5,7 @@ on:
     branches: [next07-feasibility-audit]
     paths:
       - '.github/workflows/next07-compact-native.yml'
+      - 'v2plan/test_next07_scope_native.py'
 
 permissions:
   contents: read
