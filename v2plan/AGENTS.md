@@ -1,103 +1,78 @@
 # Research: обязательная граница упрощения
 
-## Восстановление scope и диагностики без локального 3026969d
+## Текущее состояние — прочитать до старых шагов плана
 
-Пользователь разрешил заново восстановить недостающий код на опубликованной
-ветке. Текущая проводка передаёт project/all/module_path через штатный
-get_project_docs, а не эмулирует low-level scope filters. Новый corpus runner
-`next07_diagnostic_scope` исполняет все 80 N/C пар и использует existing assessor.
-Это не восстановление потерянных artifacts 3026969d и не новый semantic fix.
+Ветка `next07-feasibility-audit`, НЕ main.
+Актуальное закрытие технических задач и граница следующей работы:
+[NEXT_07_VERIFIED_STATE_RU.md](NEXT_07_VERIFIED_STATE_RU.md).
+Оно имеет приоритет над устаревшими текущими статусами и командами повторного
+старта в плане 07. Исторические NOT_RUN/BLOCKED/REJECTED не переписываются.
 
-Для этой отдельной диагностики quality failures не останавливают остальные
-случаи. Case-local invalid сохраняется отдельно при восстановленной изоляции;
-повреждение изоляции/замороженных inputs останавливает замер. Native scope smoke
-и corpus replay ещё требуют полного project environment. Код алгоритма,
-first_fit, source guards и старые frozen labels неизменны; N10 остаётся REJECTED.
-Отчёт: [scope rebuild](artifacts/next07/scope-rebuild-ef6a4980/SUMMARY_RU.md).
+Настоящий run 37231552540 на ea7eef38 подтвердил wiring, scope transport в
+проверенных current-read сценариях, empty DTO, line-range audit, снятие output
+800/3, LeaseClient P1/P2/P3 и исполнение 80/80 N/C пар. Эти технические задачи
+закрыты; не переписывать их ради следующего эксперимента. Регрессионная проверка
+после изменения потребителя допустима. Это НЕ принятие качества или rollout.
 
-## Уточнение 2026-10-04: compact-read после решения пользователя
+Пользователь разрешил следующий порядок: source-owner fix → review → запуск
+без N10. Заменяется только формирование и проверка delivery unit после прежнего
+retrieval order. Подробности и критерии до кода:
+[owner protocol](artifacts/next07/owner-delivery-20261004/PROTOCOL_RU.md).
+N10 = EXCLUDED_BY_USER / NOT_RUN в этой работе; исторический REJECTED сохраняется.
+Не удалять его test/gold, не добавлять allowlist и не объявлять PASS по исключению.
 
-Пользователь снял фиксированный бюджет 800 tokens / 3 sources для новой версии
-исследовательского read-path. Исполнение и границы — в
-[отчёте compact-read](artifacts/next07/compact-read-20261004/SUMMARY_RU.md).
-Это явное исключение из старых budget-пунктов плана 07, не их скрытый обход.
-`--compact-read` / `COMPACT_READ_LIMITS` включает отсутствие продуктовых output
-лимитов в caller-owned context; source metadata не может выбрать политику.
-Старый режим N и запуск без этого флага сохраняются как bounded comparator.
-Production/defaults, proof/edit budgets и public schema не переключены.
+## Неизменные границы
 
-Empty DTO и newline audit исправлены отдельно от size-policy. Старые evidence,
-N10 REJECTED и labels неизменны; новые результаты не переименовывают старые.
-Снятие output caps не чинит N10, не разрешает резать условия и не доказывает
-retention. Ресурсные limits retrieval/splitter и existing owner guards сохранены.
-Краткость: без дублей и без потери исходных ограничений; универсальный минимальный
-контекст не обещается. Полный native/80/49-ID replay этой правкой не выполнен.
-
-## Действующий маршрут с 2026-10-04
-
-Рабочая ветка: `next07-feasibility-audit`, не `main`.
-Единственная исполняемая инструкция — [план 07](NEXT_07_READ_PIPELINE_OWNERSHIP_RU.md),
-раздел «Grounded-first: инструкция исполнителю», с budget-уточнением выше.
-Сначала часть I без LLM, затем отдельно выбранное уточнение части II.
-Наличие плана не означает, что эксперимент выполнен или runtime исправлен.
-
-Предыдущая compiler-only попытка завершена BLOCKED и сохранена без изменений
-в [истории 07](NEXT_07_SCOPE_TRIAL_HISTORY_20261004_RU.md). Её «следующие действия»
-и прежнее разрешение расширять condition grammar больше не активный маршрут.
-Не возобновлять event-condition/compiler trial и не создавать план 08.
-
-## Обязательные границы
-
-- Новая правка заменяет названную ответственность, а не добавляет fallback/rescue.
-- Пользователь выбрал эксперимент с Grounded-подобным read context. В его isolated
-  candidate отсутствие semantic proof/applicability само по себе не запрещает
-  исходный материал. Это не разрешение объявлять unknown подтверждённым.
-- Source/security/identity/scope/version/freshness/lifecycle/snapshot/span/exact
-  guards обязательны с первой стадии нашего candidate; они не «уточнение потом».
-  Сохранение исходных условий, subject и отрицаний обязательно. Проверенное
-  несоответствие не превращать в unknown. False от старого смешанного predicate
-  не является самостоятельным доказательством противоречия.
-- Для compact-read output limits не фиксированы числом 800/3. Измерять фактический
-  объём и количество источников. Не расширять ресурсы поиска/чтения автоматически.
-  Старый 800/3 comparator и его результаты не объявлять новым режимом.
+- Новая правка заменяет названную ответственность, не добавляет fallback/rescue.
+- Read context — материал для чтения. Отсутствие semantic/applicability proof
+  само по себе не запрещает источник; unknown не означает applicable.
+- Source/security/identity/scope/version/freshness/lifecycle/snapshot/hash/span/
+  request/exact guards обязательны. Проверенное несоответствие не становится unknown.
+- Subject, условия и отрицания сохраняются в исходных цитатах. Полный Markdown
+  owner не доказывает все смысловые зависимости. Не приписывать ему такую гарантию.
+- COMPACT_READ_LIMITS / --compact-read — caller-owned отсутствие фиксированного
+  output лимита tokens/sources/snippet chars. Метаданные источника не выбирают
+  политику. Измерять фактический размер, не заменять лимит большим числом.
+- Краткость: исходные цитаты без точных дублей, не semantic compression.
+  Retrieval/hydration/call/resource caps не повышать автоматически.
 - Нет LLM, embeddings, нового natural-language parser, aliases, library-specific
-  словарей, threshold tuning, generated lookups, бюджетной сетки и hidden rescue.
-  Pinned структурное Markdown-разбиение и FTS-механизм Grounded разрешены только
-  в объявленном research scope. Это не новый parser смысла вопроса.
-- Разрешено заимствовать код из проверенного upstream pin с сохранением лицензии,
-  copyright, пути, SHA и описания адаптаций. Нормализованный upstream text не
-  выдавать за точную цитату оригинала без проверенной привязки.
-- Retrieval, read decision и packing заменять последовательными отдельными
-  patches/trials; не смешивать их в одной правке. Промежуточный PASS не recovery.
-- Frozen corpus/labels, обязательные factual positives, security negatives и
-  прежние evidence не изменять. Разницу read-policy описать до кода. Старые
-  policy tests запускать и показывать отдельно, не переписывать ради PASS.
-  Неразрешённый конфликт acceptance закрывает путь к native acceptance/rollout.
-- Только реальные packaged runs называются Grounded run. SQL reconstruction,
-  Python-port, unit checks и ответ текущего чат-агента — другие виды evidence.
-- Один frozen candidate; после содержательного failing acceptance — REJECTED
-  и остановка. Часть II не используется для автоматического спасения части I.
-  Технически invalid run можно повторить один раз после исправления harness,
-  сохранив первый run и не меняя алгоритм/корпус/ожидания.
-- Production/defaults, `main`, release/CI policy не переключать. Не применять
-  reset/stash/clean к пользовательской работе. Не коммитить посторонние файлы.
+  словарей, threshold tuning, generated lookups, guessed answers или hidden rescue.
+- Не менять ранжирование под отдельный пример. Routing IDs, lexical match,
+  retrieval/BM25 score не являются смысловым witness или вероятностью правильности.
+- Не добавлять проценты confidence без независимой калибровки. Доли измеренного
+  покрытия с явным знаменателем — другая метрика, не confidence.
+- Retrieval/read/packing изменения разделять. Source-owner materialization и
+  проверка её canonical bounds — одна обязанность producer/consumer, не новая policy.
+- Frozen corpus/labels/ожидания, factual positives, security negatives и прежние
+  evidence не изменять. Gains не компенсируют lost IDs; needs_review не равен supported.
+- Заимствование upstream кода только с лицензией/copyright/SHA. Нормализованный
+  текст не выдавать за точные original bytes. Grounded run — только actual package.
+- Production/defaults/main, proof/edit budgets, public schema и release/CI policy
+  не переключать. Isolated workflow измерения не является новым required gate.
+- Никакого reset/stash/clean пользовательской работы, git add . или force-push.
+  Коммитить только относящиеся к задаче файлы; не включать secrets и случайные DB.
 
-## Источники и неопределённость: обязательное правило
+## Порядок проверки
 
-- Для факта указывать проверяемый источник и точную цитату/строки; версию или
-  snapshot — если доступны. Отсутствующие данные не выдумывать.
-- Разделять происхождение, применимость к условиям вопроса и полноту ответа.
-  Проверенный источник сам по себе не доказывает применимость или полноту.
-- Условия и subject сохранять вместе с цитатой. Неизвестная применимость
-  остаётся неизвестной; отсутствие условия не доказывает его выполнение
-  или противоречие. Вывод о применимости/противоречии требует основания.
-- Не выдавать lexical score, match ratio, retrieval coverage или false-флаги
-  proof/edit за вероятность правильности ответа или применимости факта.
-- Не добавлять проценты уверенности без независимой калибровки: определить,
-  какое событие оценивается, и на held-out наборе проверить соответствие
-  заявленных вероятностей фактической частоте правильных результатов.
-- Измеренные доли покрытия допустимы с явным знаменателем и названием метрики;
-  это не confidence. Без калибровки показывать источники и известные ограничения.
-- Исходный текст, честные flags и structural closure не гарантируют правильный
-  ответ downstream reader. Source integrity, retrieval usefulness, applicability
-  и reader correctness оценивать раздельно.
+Перед runtime запуском сохранить scope, frozen baseline/inputs и review diff.
+Review авторский, не выдавать его за независимый внешний аудит. После meaningful
+failure не менять алгоритм/ожидания в том же замере и не спасать его частью II.
+В отдельной диагностике quality FAIL записывается и не обрывает другие случаи.
+Case-local invalid сохраняется отдельно при восстановленной изоляции; изменение
+замороженного кода/данных или повреждение изоляции прекращает затронутый замер.
+Ошибки технического стенда исправлять отдельной revision с сохранением raw outputs;
+не называть отказ алгоритма ошибкой harness и не превращать пустую выдачу в guard PASS.
+
+Закрытые обязанности, локальный успех новой правки, полнота диагностики и общая
+продуктовая приёмка — разные verdicts. False answer/edit flags не гарантируют
+правильность ответа downstream reader. Полный rollout требует отдельного решения.
+
+## История, не очередь повторного исполнения
+
+[План 07](NEXT_07_READ_PIPELINE_OWNERSHIP_RU.md) и его journal сохраняют прошлые
+попытки; не начинать снова с I.0 только из-за старого заголовка статуса.
+[Прежний compiler-only план](NEXT_07_SCOPE_TRIAL_HISTORY_20261004_RU.md) завершён
+BLOCKED. Не возобновлять event-condition/compiler маршрут и не создавать план 08.
+[Compact fix](artifacts/next07/compact-read-20261004/SUMMARY_RU.md) и
+[scope rebuild](artifacts/next07/scope-rebuild-ef6a4980/SUMMARY_RU.md) описывают
+границы своих старых запусков, а не отменяют более позднее evidence.
