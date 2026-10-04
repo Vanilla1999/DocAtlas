@@ -1,853 +1,591 @@
-# 07. Проверить причины потери read context и выбрать одну замену
+# 07. Grounded-first: инструкция исполнителю
 
-Статус: **попытка завершена BLOCKED на 07.1; feasibility не доказана; runtime не исправлен**.
-Дата: 2026-10-04. План создан по запросу пользователя, не разрешает rollout.
+Статус: **PLANNED / NOT_RUN**. Дата решения: 2026-10-04.
+Ветка: **next07-feasibility-audit**, не main. Пользователь проводит эксперимент.
+Этот документ — план выполнения, не отчёт об успешном запуске и не разрешение rollout.
 
-## Активный короткий план — выполнить и вынести решение
+## Прочитать сначала
 
-### Итог исполнения текущей попытки — BLOCKED
+Пользователь выбрал порядок: **сначала простой Grounded-подобный read context без
+LLM; затем наши дополнительные уточнения, по одному**. Не возвращаться к поиску
+универсального event-condition parser перед выдачей документации.
 
-Проверка 07.1 закончена по STOP-критерию; DONE 07.1 не достигнут. Это конечный
-результат попытки, **не выполнение всех этапов и не исправление**.
+Предыдущая попытка 07.1 завершена BLOCKED и НЕ переименована в PASS.
+Полный прежний план сохранён без изменения bytes в
+[NEXT_07_SCOPE_TRIAL_HISTORY_20261004_RU.md](NEXT_07_SCOPE_TRIAL_HISTORY_20261004_RU.md).
+Его старые команды «следующее действие» — история, не параллельная очередь работ.
+[Feasibility evidence](artifacts/next07/feasibility-audit-20261004.json) не менять.
 
-Baseline: HEAD `669a991a`; полный tracked binary patch, архив untracked inputs
-и manifest с hashes сохранены до diagnostic run в
-`/tmp/opencode/next07-feasibility-baseline-20261004/`.
-Архив локальный, не долговременный committed artifact. Runtime files не изменены.
-Outputs и source hashes: `artifacts/next07/feasibility-audit-20261004.json`.
+### Карточка запуска для coding-агента
 
-**Проверенный контракт и его граница:**
+1. Прочитать `v2plan/AGENTS.md` и этот план. Выполнять I.0 → I.6 по порядку.
+2. Сейчас разрешён только текущий шаг; не писать код последующих слоёв заранее.
+3. До patch записать: шаг, заменяемую обязанность, allowed files и проверку.
+4. Выполнить проверку, сохранить исходные outputs и verdict шага.
+5. При DONE шага перейти к следующему. При REJECTED/BLOCKED закончить попытку.
+6. В конце обязательно выдать итог по шаблону ниже, даже при ранней остановке.
 
-1. `condition → need`: local действует на связанный need; shared на все;
-   unknown сохраняется без разрешающего target. Mandatory inputs/offsets —
-   в scope table ниже. Их expected outputs не изменены.
-2. `window → need`: routing IDs, score, соседство spans и два topic terms не
-   устанавливают смысловую связь. Existing typed local witness может служить
-   основанием только для поддержанного relation, с source/identity/dependency
-   и visible-span checks. Unsupported relation остаётся unknown.
-3. Этот консервативный контракт не удовлетворяет mandatory exception positive:
-   existing grammar не представляет event-condition. Объявить его достаточным
-   означало бы заранее заменить обязательный positive на unknown.
+**Не начинать с полного pytest, новой модели, compiler, словаря, удаления gates
+или переписывания failing tests. Начать с baseline и настоящего Grounded run.**
 
-**Конкретный blocker, не утверждение общей невозможности:**
+## 1. Что именно проверяем
 
-- `admission_grammar.py` не возвращает frame для
-  `which exception is raised when an operation expires?`.
-- Даже при вручную заданном local binding `_applicable_context` возвращает False
-  для exception на body
-  `When an operation expires, LeaseClient raises OperationExpiredError.`.
-- На default и exception bodies matrix `[default,exception]` одинакова:
-  `[True,False]`. True означает отсутствие constraint, **не relevance и не
-  permission**. Это development diagnostic без source admission, не native test.
-- Поэтому замены all-conditions loop недостаточно. Нужен общий event-condition
-  witness/eligibility contract, отсутствующий в разрешённом scope-only trial.
-  Compiler scope не может сам установить применимость source event clause.
+Гипотеза: часть полезных фактов теряется не в поиске, а при попытке доказать
+соответствие каждого короткого окна вопросу. Проверяем замену read-маршрута:
 
-**Inventory:** три известные local/shared/unknown questions — development;
-два synthetic bodies — diagnostics, не acceptance. 80 frozen cases, 49 claim IDs
-и прежние trial tests — regression, не unseen. Независимый набор не подготовлен
-и не запускался; обобщение не заявляется.
-
-**Изменённые файлы этого исполнения:** этот план, README,
-`next07_feasibility_audit.py`, `test_next07_feasibility_audit.py` и новый JSON.
-Diagnostic измеряет existing capabilities; не заменяет runtime decision и не
-является candidate/rescue. Allowed runtime files не зафиксированы: достаточного
-контракта нет, поэтому implementation STOP.
-
-**Проверки:**
-
-```sh
-.venv/bin/python -m v2plan.next07_feasibility_audit v2plan/artifacts/next07/feasibility-audit-20261004.json
-.venv/bin/pytest v2plan/test_next07_feasibility_audit.py -q
+```text
+проверенный исходный corpus и scope
+  → структурные source-bound passages
+  → один FTS5/BM25 порядок
+  → целые цитируемые окна
+  → упаковка в 800 / 3
+  → final source/span/budget checks
+  → retrieval_only context
 ```
 
-Audit пишет эксклюзивно: при повторе выбрать новый путь, не перезаписывать evidence.
-Diagnostic tests: **2 PASS** — проверены blocker report и offsets, не recovery.
+Не обещаем полный или безошибочный ответ. Не обещаем, что Grounded всегда лучше.
+Grounded здесь — поставщик контекста, а не генерирующая ответы LLM.
+Для LeaseClient в этой попытке нужен конкретный результат: оба исходных факта
+видны в возвращённом packet, а не только в hits, snapshot или read_next.
 
-| Этап | Итог |
+### 1.1. Четыре независимые обязанности
+
+| Обязанность | Правило candidate |
 |---|---|
-| 07.1 | BLOCKED: достаточная спецификация обоих bindings не получена |
-| 07.2 | NOT_RUN: diagnostic не заменяет полную acceptance механизма |
-| 07.3 | NOT_RUN: candidate не создан; прежний REJECTED не переименован |
-| 07.4 | NOT_RUN: runtime/defaults/admission/selector не менялись |
-| 07.5 | NOT_RUN: без candidate повтор replay/gates/full suite не обоснован |
+| Безопасность и происхождение | Проверяются всегда; никакая relevance оценка не даёт исключений |
+| Полезность для чтения | Grounded-подобный lexical order; это предложение материала, не proof |
+| Применимость утверждения | Неизвестная остаётся неизвестной; нет автоматического support credit |
+| Полнота ответа | Не является условием выдачи полезного частичного контекста |
 
-Recovered/lost facts: новых native packets нет, recovery не доказана; baseline
-факты этой попыткой не менялись. Guard regressions не измерялись end-to-end;
-runtime patch отсутствует. Красные gates и failures 06 остаются открытыми.
+### 1.2. Явное изменение read-policy в этом эксперименте
 
-**Один следующий шаг, только при отдельно разрешённом продолжении:** определить
-общий event-condition source witness/eligibility contract: subject/event/polarity,
-visible clause, clipping, неизвестные формы и независимая проверка. Не добавлять
-regex под LeaseClient и не начинать новый trial автоматически. Если контракт
-неприемлем в границах проекта, маршрут остаётся BLOCKED без обещания recovery.
-Модель, новый parser и ослабление conditions этим итогом не разрешены.
+В isolated candidate отсутствие semantic/applicability proof само по себе НЕ
+является причиной запрета исходного материала. `3 terms + adjacent pair` и
+проверка всех constrained needs против каждого body больше не определяют
+право обычного read-окна участвовать в selection. Не менять 3 на 2.
 
-Этот раздел — текущий маршрут. Разделы ниже сохраняют историю, результаты и
-детальные checks; прежние указания «следующее действие» не запускают отдельные
-циклы. Не создавать план 08 вместо завершения этого решения.
+Это изменение политики, а не behavior-preserving refactor. Оно не означает
+`unknown = applicable`, не переносит condition exception на default и не
+разрешает утверждать факт о production/environment, не названном источником.
+Не присваивать routing IDs, lexical score или BM25 статус смыслового witness.
 
-### Цель и честное обещание
+Подтверждённое несоответствие source/identity/scope/version и существующий
+надёжно установленный explicit condition mismatch не разрешаются. Отсутствие
+frame, отсутствие condition в source и установленное противоречие — разные
+ситуации. Нельзя назвать любой False старой `_applicable_context` противоречием:
+она также возвращает False для unsupported. Не создавать новый semantic
+classifier для противоречий в этой попытке; использовать только уже проверяемое
+основание, а непредставленные случаи оставлять unknown.
 
-Возвращать полезные найденные материалы с источниками и сохранёнными условиями
-в пределах **800 tokens / 3 sources**, не обещая «это всё» или полный ответ.
-«Показывать всё, что можно» означает полезный bounded context, а не все hits
-и не обход guards. Полнота и применимость могут оставаться неизвестными.
-В отчёте различать: доставлено / не подтверждено / не поместилось, если причина
-известна. Не выдумывать причины отсутствия и не вводить автоматически новые API fields.
+### 1.3. Неизменные границы
 
-Неполнота ответа сама по себе не означает бесполезность context. При этом
-identity, source/security, scope/version/freshness/snapshot/span/exact guards,
-сохранение ограничений и запрет proof/edit authority обязательны. Unknown нельзя
-выдавать за applicability. Проценты уверенности без калибровки запрещены.
+- 800 **whole-DTO admission tokens** через existing `docs_context_budget_tokens`;
+  максимум 3 source rows. Tokenizer count и bytes/4 дополнительно, не вместо него.
+- Source/security/project identity/module scope/version/freshness/lifecycle/
+  snapshot/hash/span/request/exact guards. Сохранять их реальные параметры.
+- Условия, отрицания и source subject сохраняются с цитатой. Не отдавать число
+  или имя exception отдельно от ограничивающего текста.
+- Нет новых моделей, embeddings, natural-language parser, aliases, tuning,
+  library-specific правил, guessed answer values или дополнительных lookup.
+- Не расширять existing candidate/hydration/source/call caps. Pinned профиль
+  структурного разбиения — объявленная переменная research-индекса, не изменение
+  всех production budgets. Все внутренние caps записать в I.0; при их превышении
+  фиксировать omission, не поднимать предел.
+- Не изменять production/defaults/main, public schema и release policy.
+- Не считать false proof/edit flags или Markdown boundaries доказательством
+  сохранения всех смысловых ограничений. Нужны source checks и negative controls.
 
-### Текущий вывод, который нельзя забывать
+### 1.4. Старые tests: не прятать смену политики
 
-- Per-need admission — **гипотеза**, не доказанно лучший алгоритм. Трудность —
-  получить правильные связи «условие → часть» и «окно → часть», а не записать IDs.
-- Preservation trial 6/7 не доказывает feasibility scope binding: он заведомо
-  сохранял root constraints. Не повторять его как новый кандидат.
-- Зависимость compiler → admission ожидаема. Она требует отдельных patch stages,
-  но не доказывает невозможность compiler. Смешивать слои в одном trial нельзя;
-  требовать полной native recovery от каждого промежуточного stage тоже нельзя.
-- Надёжность исполнения заданных bindings и надёжность их извлечения из языка —
-  разные результаты. Ручные bindings не доказывают native recovery.
+До candidate создать `policy-delta.json`: exact node ID, старое обязательство,
+новое ожидаемое поведение, причина, остающиеся защиты. Получить node IDs через
+pytest collection, не угадывать parametrized ID.
 
-### Порядок работы и критерии
+Разрешённая смысловая разница — read context может появиться при unknown
+applicability или без three-term/pair witness, не получая proof/coverage/edit.
+У `tests/docs/test_read_context_admission_boundary.py` отдельно разобрать
+condition-параметр `test_added_identity_or_condition_does_not_preserve_context`
+и lexical-only параметры `test_local_topic_witness_rejects_heading_echo_and_scattered_terms`.
+Параметр с чужой exact identity и реальные security/source negatives НЕ мигрируют
+вместе с соседними policy-параметрами. Не разрешать heading-only/echo механически
+только потому, что тест находится в той же функции.
 
-| Этап | Что сделать | DONE / переход |
+В этом эксперименте старые tests и frozen labels НЕ редактировать. Добавить
+новые candidate controls отдельно и запускать старые тоже. До кода зафиксировать
+конечный allowlist только намеренных policy-различий; после результатов не
+расширять его. Непредусмотренные failures — REJECTED.
+
+80-case frozen suite остаётся отдельным неизменным acceptance, включая прежние
+expected-empty negatives. Появившийся там packet может оказаться policy-конфликтом,
+а не утечкой или ложным ответом: описать его правильно, но не засчитать PASS и
+не менять gold. Требуется новое продуктовое решение вне этой попытки.
+Native acceptance не равна зелёному required CI; нерешённая миграция старых checks
+и блокеры 06 остаются блокерами rollout.
+
+## 2. Что брать из Grounded
+
+**Reference:** `@arabold/docs-mcp-server@3.2.1`, source tag `v3.2.1`, commit
+`f2938c47bb8937c650f0d5ddb614f867773b29f4`.
+Не заменять pin на latest. Проверить версию установленного package, lock,
+registry integrity и source ref; записать результат. Название версии само по
+себе не доказывает равенство локальных bytes опубликованному package.
+
+Проверенные первичные файлы на этом commit:
+
+- [MarkdownPipeline](https://github.com/arabold/docs-mcp-server/blob/f2938c47bb8937c650f0d5ddb614f867773b29f4/src/scraper/pipelines/MarkdownPipeline.ts)
+- [GreedySplitter](https://github.com/arabold/docs-mcp-server/blob/f2938c47bb8937c650f0d5ddb614f867773b29f4/src/splitter/GreedySplitter.ts)
+- [DocumentStore: query construction и FTS-only ranking](https://github.com/arabold/docs-mcp-server/blob/f2938c47bb8937c650f0d5ddb614f867773b29f4/src/store/DocumentStore.ts)
+- [FTS schema](https://github.com/arabold/docs-mcp-server/blob/f2938c47bb8937c650f0d5ddb614f867773b29f4/db/migrations/009-add-pages-table.sql)
+- [SearchTool](https://github.com/arabold/docs-mcp-server/blob/f2938c47bb8937c650f0d5ddb614f867773b29f4/src/tools/SearchTool.ts)
+- [Assembly](https://github.com/arabold/docs-mcp-server/blob/f2938c47bb8937c650f0d5ddb614f867773b29f4/src/store/assembly/strategies/MarkdownAssemblyStrategy.ts)
+- [MIT license](https://github.com/arabold/docs-mcp-server/blob/f2938c47bb8937c650f0d5ddb614f867773b29f4/LICENSE)
+
+Заимствовать можно чистые части: FTS escaping, SQL ranking, greedy structural
+packing. Для кода сохранять `Copyright (c) 2025 Andre Rabold`, MIT notice,
+upstream path/ref/blob SHA и diff адаптаций в `v2plan/third_party/grounded-3.2.1/`.
+Не копировать чужие credentials/config/store и весь server stack в production.
+
+Grounded может нормализовать Markdown через HTML. Его rendered content НЕ
+автоматически точные bytes исходного файла. Для DocAtlas нужен sidecar с
+original source identity и offsets; при неоднозначном mapping — отказ от окна.
+Запрещено сочинять spans, искать похожую цитату в другом месте или незаметно
+подставлять весь parent. Совпадение document ID не доказывает span mapping.
+
+**Важно:** предыдущий ответ в чате про LeaseClient был реконструкцией FTS,
+не packaged Grounded run и не ответом LLM-reader. Ранг `error/overview/default`
+не ожидаемый результат теста. В этой попытке установить реальные outputs.
+Сохранённый `M2_GROUNDED_MECHANISM_CHECK_RU.md` касается mkdocs-05, не LeaseClient.
+
+## 3. Три разных результата, не смешивать
+
+| Имя | Что исполняется | Что можно заявить |
 |---|---|---|
-| **07.1 — заморозить эксперимент (сейчас)** | В этом плане записать поддерживаемые формы, outputs local/shared/unknown, основание window→need binding, список файлов и последовательность заменяемых обязанностей. Зафиксировать baseline commit+dirty patch, development/проверочный inventories и критерии до кода. | Есть конечная спецификация обоих bindings без case exceptions. Если её нет — BLOCKED с конкретным недостающим правилом; не писать очередной wrapper. |
-| **07.2 — проверить механизм** | На явно размеченных bindings проверить применение local/shared/unknown и source guards, включая wrong subject/state и clipping. | Все обязательные controls проходят. Это только mechanism evidence, не NLP и не final packet. |
-| **07.3 — один candidate извлечения** | Реализовать зафиксированные общие формы в существующем compiler; unsupported → unknown. Проверить обязательные positives и перенос на другие имена/отношения/формулировки, отрицания, quotes и shared/trailing restrictions. | Нет неверных разрешающих bindings; обязательные positives не заменены unknown; root obligations сохранены. На независимом наборе оценить также unknown/потери полезных фактов. После раскрытия ошибок правила под этот набор не подстраивать. |
-| **07.4 — последовательная интеграция** | Только после 07.3: отдельные compiler/admission/selector patches, каждый с фиксированной заменяемой ответственностью и regression checks. Использовать existing capture/assessor. Новую границу admission/selector оформить до соответствующего patch, не считать её уже разрешённой этим планом. | Native root-only LeaseClient доставляет оба факта в обоих существующих параметрах; subject/условия сохранены. Если нужен rescue или другая policy сверх записанной — REJECTED, не расширять patch. |
-| **07.5 — приёмка и конец** | Fresh paired 80-case replay; сохранить ранее подтверждённые 49 claim IDs и полезные partial facts; negative/guard/budget checks, focused tests, затем required gates и один полный offline suite. | Нет утраченных обязательных фактов, новых forbidden packets или failing nodes; ограничения и flags честные. Известные blockers 06 не превращаются в PASS. |
+| N — native baseline | Текущая ветка через existing public-call harness | Нынешний возвращённый packet |
+| G — upstream reference | Настоящий pinned npm CLI/MCP Grounded, FTS-only | Реальная выдача Grounded; не parity с бюджетом DocAtlas |
+| C — Grounded-like candidate | Source-bound адаптация, наши guards, public path и 800/3 | Только измеренный candidate result |
 
-Для 07.1: baseline сейчас **6125 PASS / 93 FAIL / 10 SKIP**; 93 failures состоят
-из 81 UNRESOLVED, 8 ENV_BLOCKED, 4 KEEP_FIX_RUNTIME. Это отправная точка, не цель
-«оставить 93». Подтверждённый target defect должен закрыться по final bytes.
-80 frozen cases и уже просмотренные fixtures — development/regression evidence,
-не unseen. Если независимой проверки нет — явно BLOCKED для вывода об обобщении.
+G search limit=3 ограничивает initial hits, не полный размер вывода. G нельзя
+назвать прошедшим 800/3 без измерения. Его не обрезать вручную для удобного PASS.
+SQL replay и прямой вызов Python helper остаются diagnostics, не G или C native.
+Ответ reader-модели в эту model-free попытку не входит; не писать его от её имени.
 
-### Правила против бесконечной доработки
+# Часть I. Минимальная основа без LLM и наших relevance-уточнений
 
-1. Один зафиксированный candidate, не серия новых grammar/thresholds после failures.
-   Техническую ошибку harness исправить можно, сохранив исходный invalid run.
-2. Перед каждым patch: обязанность → allowed files → ожидаемые positive/negative
-   outcomes → команда проверки. Не менять чужой dirty baseline.
-3. Не менять frozen labels, budgets, expectations, markers или required gates
-   ради результата. Не добавлять fallback/rescue, library dictionaries и модель.
-4. Не требовать доказанной полноты ответа от retrieval context; не выдавать
-   отсутствие proof за разрешение игнорировать relevance или source restrictions.
-5. После failing acceptance — записать контрпример и закончить verdict. Не
-   компенсировать потерю одного факта приобретением другого или суммой PASS.
-6. Не запускать уже выполненные проверки повторно без изменения или нового concern.
-   При отсутствии модели/изоляции сохранить blocker; ручной ответ не model run.
-7. Финал обязателен: **VALIDATED_LOCAL / REJECTED / BLOCKED**, выполненные этапы,
-   recovered/lost facts, нарушения guards, список not_run и один следующий шаг.
-   BLOCKED завершает попытку, но не исправление. Новая попытка — отдельное решение.
+## I.0. Заморозить входы и исполнение
 
-**Завершение 07:** вынесен обоснованный verdict по одной конечной попытке.
-**Исправление LeaseClient:** только native delivery и сохранение guards/facts.
-**Завершение 06:** отдельно закрыты решения по всем nodes и required acceptance;
-локальный успех 07 не равен READY и не разрешает rollout.
+**Изменяемая ответственность:** нет; только protocol/capture.
+**Allowed:** research runner/tests, новые artifacts, журнал этого плана.
 
-### Исследования: основания и границы, не обещание результата
-
-- [Break / QDMR (2020)](https://aclanthology.org/2020.tacl-1.13/): decomposition
-  полезна; получение структуры исследуется как обучаемая задача, не доказательство
-  универсального rule-based scope/binding.
-- [Sufficient Context (2025), §3–5](https://arxiv.org/html/2411.06037v3): полезный
-  context может быть неполным; autorater использует модель. Это не готовый
-  model-free admission и не гарантия правильного ответа с источниками.
-- [ALCE (2023)](https://aclanthology.org/2023.emnlp-main.398/): правильность ответа
-  и качество подтверждения цитатами оцениваются отдельно.
-- [CheckList (2020)](https://aclanthology.org/2020.acl-main.442/): behavioral checks
-  выявляют ошибки за общей accuracy; это метод проверки, не доказательство полноты.
-
-В этих источниках не установлено превосходство нашего per-need candidate.
-Исследование обосновывает конечную проверку гипотезы, не бесконечное расширение parser.
-
----
-
-## Предыдущая детализация и история (не отдельная очередь исполнения)
-
-## 0. Задача и самокритика
-
-Задача: объяснить потерю LeaseClient timeout/exception в полном native pipeline,
-определить одну ошибочную ответственность и проверить её замену без новых rescue.
-Если исправление требует нескольких одновременно изменяемых слоёв — остановить
-implementation, записать границы зависимостей. Не выдавать анализ за исправление.
-
-Что было слишком уверенно в предыдущем выводе:
-
-1. **«Два решения расходятся, значит одно лишнее» — неверно.** Qualification
-   оценивает соответствие query, read-admission — допустимость partial window.
-   Сравнивать можно только одинаковые request/source/span, scope и полномочия.
-2. **«Compiler не умеет разделить вопрос» — неточно.** `retrieval_needs()` уже
-   выделяет default и exception. `compile_need_contracts()` в этом случае создаёт
-   один unresolved requested_part. Первый разбор эвристический; переносить его
-   результат в trusted applicability без проверки нельзя.
-3. **«Одна admission-правка исправит LeaseClient» — опровергнуто диагностикой.**
-   Даже после временного пропуска condition/locality в read route оба документа
-   доходят до projector, но packet содержит overview. Общий read fallback в core
-   вызывается при пустых sources; специальные proposals имеют другой путь.
-   Это описание конкретного пути, не утверждение, что все supplements запрещены.
-4. **«Один pool/selector» — цель, не алгоритм.** Как отличать полезное дополнение
-   от дубля и не вытеснять факты, пока не установлено. Нельзя писать новый framework
-   под этот лозунг. Qualification содержит typed witnesses, не только overlap.
-5. **«Меньше проверок = лучше» — неверно.** Повторная проверка изменённых bytes
-   обязательна. Повторную подготовку одинаковых окон можно исследовать отдельно,
-   но такой refactor не доказывает recovery фактов.
-
-История, обязательная к чтению до правки:
-- `NEXT_02_ADMISSION_SIMPLIFICATION_RU.md`: удаление `no_new_direction` дало
-  recovery synthetic controls, но **49 → 45** frozen claims. Вариант отклонён.
-- `UNIFIED_READ_RESULT_RU.md`: isolated read **11 → 11** при budget 1500 — не
-  parity с полным native pipeline на 800. Unified replacement не принят.
-- `ADMISSION_REMOVAL_DECISION_RU.md`: source guards не заменяют relevance,
-  расхождение verdicts не доказывает избыточность всех veto.
-- `docs/adr/0003-context-first-project-reads.md`: partial context допустим,
-  но docs_context не даёт answer/edit authority. ADR не задаёт готовую политику
-  unknown condition scope. Docs о generated aliases могут описывать старый путь;
-  текущего producer проверять по коду, не объявлять весь документ неверным.
-
-### Зафиксированное правило: источники вместо некалиброванной confidence
-
-По согласованию с пользователем: указывать проверяемые источники, сохранять
-условия/subject и явно различать происхождение, применимость и полноту ответа.
-Неизвестная применимость не становится подтверждённой; отсутствие условия
-не означает ни соответствие, ни противоречие. Вывод требует evidence.
-
-Проценты уверенности запрещены без определённого оцениваемого события и
-независимой held-out калибровки. Lexical score, match ratio и retrieval coverage
-не являются вероятностью правильности. Измеренные доли покрытия с явным
-знаменателем можно показывать только как coverage, не как confidence.
-False proof/edit flags также не устанавливают применимость отдельной цитаты.
-
-Постоянное правило: [AGENTS.md](AGENTS.md#источники-и-неопределённость-обязательное-правило).
-Это не implementation semantic classifier, не снятие blockers B3/C и не
-разрешение на новую schema, runtime-модель или ослабление guards.
-
-## 1. Правила исполнения для модели
-
-### Согласование scope trial
-
-Пользователь явно выбрал **«Узкое расширение»**. Это отдельное разрешение после
-отклонённого preservation trial. Оно снимает запрет на новые scope-правила
-внутри существующего compiler только в границах ниже; прежние результаты сохраняются.
-
-**Ответственность:** определение того, к каким частям исходного вопроса относится
-условие. Заменить неразличённое распространение root constraint на все части
-явным local/shared/unknown binding. Не добавлять параллельную разрешающую ветку.
-
-**Разрешено:** расширить существующие compiler-правила и внутренние структуры
-для condition span, target part IDs и scope verdict. Точные поля, формы grammar
-и affected callers фиксируются до кода. Scope verdict описывает вопрос, а не
-применимость документа; даже известный scope не повышает interpretation до
-`supported` и не даёт proof/coverage/edit permission.
-
-**Не разрешено:** новый parser, library/relation exceptions, словари, fallback,
-threshold tuning, изменение retrieval/admission/selector, guards, budgets,
-public schema, frozen expectations или переключение production/defaults.
-Неизвестный scope не даёт разрешения снять constraint с какого-либо need.
-
-Порядок следующего trial:
-
-1. Составить таблицу вход → точные part/condition spans → local/shared/unknown
-   → target IDs. Зафиксировать исчерпывающую поддержанную форму каждого правила,
-   не список названий клиентов. Остальные формы — unknown.
-2. Обязательные acceptance examples:
-   - LeaseClient default + exception when operation expires: два parts;
-     expiration относится к exception, default не получает это условие.
-   - `When preview is disabled, what is RelayClient default timeout and which
-     exception is raised?`: shared condition на обе части.
-   - Тот же compound с `, only for administrators?` в конце: unknown scope,
-     условие сохранено; default не становится безусловно разрешённым.
-3. До реализации добавить отрицательные controls: вложенные/несколько условий,
-   перенос prefix в trailing position, отрицание, разделители внутри quotes,
-   другой subject второй части, exact identities и reference mismatch.
-   Unknown — допустимый результат неподдержанной формы, но не замена ожидаемого
-   local/shared в обязательных positives. Не выводить scope только из близости spans.
-4. Проверить consumers: могут ли они безопасно сохранить unknown без изменений
-   admission/selector. Если необходим второй policy-слой — STOP, описать зависимость.
-   Не выдавать новые поля, которые старый consumer игнорирует, за исправление.
-5. Выполнить один isolated compiler candidate поверх зафиксированного baseline.
-   Проверить regression tests, существующие compiler/condition controls и
-   отсутствие потери root obligations/точных offsets. Нет нового input — нет
-   основания повторять отклонённый trial с подогнанными правилами.
-
-**DONE этого trial:** обязательные local/shared/unknown examples и negative
-controls проходят; constraints/subject/exact identities не потеряны; новые
-scope assertions не дают source applicability или support; изменён один слой.
-Это `COMPILER_VALIDATED_LOCAL`, не `FIX_VALIDATED_LOCAL`.
-
-**STOP/REJECTED:** ошибка области действия, новое разрешение из unknown, потеря
-guard/constraint, исключение под fixture или необходимость менять второй слой.
-После compiler приёмки native LeaseClient packet проверяется отдельно. Admission
-и selector требуют собственных trial boundaries; rollout не разрешён.
-
-Следующее действие: зафиксировать таблицу форм/outputs и consumer compatibility,
-затем failing regression tests. Исследование и implementation пока NOT_RUN.
-
-### Общие правила
-
-#### Scope contract table и consumer compatibility — выполнено до candidate
-
-Все spans ниже `[start,end)` в неизменённом original question. IDs `part-1/2`
-обозначают исходные части, не независимые proof obligations. Предлагаемый
-внутренний binding: `condition_span`, `scope=local|shared|unknown`, `target_need_ids`.
-Для unknown список targets отсутствует (не пустой список «ни к чему не относится»);
-legacy constraint сохраняется консервативно. Это спецификация, не новые runtime fields.
-
-| Input form / пример | Scope / targets | Обязательные ограничения |
-|---|---|---|
-| `What is LeaseClient default timeout duration for requests and which exception is raised when an operation expires?` | local → part-2; condition `[88,114)` | part-1 `[0,57)`, part-2 `[62,114)`; exact subject сохранён; binding не доказывает, какую exception возвращает источник |
-| `When preview is disabled, what is RelayClient default timeout and which exception is raised?` | shared → обе части; prefix `[0,25)` | Условие должно быть доступно обеим частям; context не превращается в proof |
-| `What is RelayClient default timeout and which exception is raised, only for administrators?` | unknown; restriction `[67,91)` | Не объявлять local только потому, что restriction находится в конце второй части; не снимать constraint с default |
-| Две явные части без condition cues | Без condition binding | Сохранить parts/subject/context и root exact obligations; interpretation остаётся unresolved |
-| Condition marker/separator внутри backticks, quotes или link | Не condition / не новая boundary | Existing protected-span handling; значимые bytes остаются частью exact identities |
-| Вложенные/несколько условий; отрицание; prefix, перенесённый в trailing position; другой subject | unknown до явно зафиксированного общего grammar rule | Не выводить local/shared из близости, совпадения subject, очередности spans или retrieval score |
-
-Эта таблица фиксирует expected examples, **но не завершённую grammar**: перед
-candidate требуется точная общая production, различающая local event clause от
-ambiguous trailing modifier без library-specific словаря. Пример не означает
-разрешение special-case `LeaseClient`, `expiration` или relation `exception`.
-
-Consumer audit (текущий код, без runtime подмен):
-
-| Consumer | Фактическое использование | Совместимость |
-|---|---|---|
-| `source_reference_evidence.py:62–66` | Сохраняет compiled contracts для prepared source routing | Producer может хранить binding; это не enforcement |
-| `evidence_set_validation.py:109+` | Проверяет source/span/dependency integrity; proposed need IDs — routing hints | Не устанавливает condition scope или applicability |
-| `need_context_disposition.py:50–76` | Смотрит наличие constraints, затем заново парсит текст отдельного need; общего prefix в `need.context` для condition frame не использует | Shared condition в context не будет автоматически понят; неизвестная форма остаётся blocked |
-| `need_context_projection.py:141–149` | Вычисляет disposition для каждого need и допускает окно при любом non-blocked need | Per-need route существует; новые scope targets сами по себе не потребляются |
-| `read_context_admission.py:105–107` | Проверяет **каждый** constrained need против **каждого** body; один отказ запрещает всё окно | **Несовместим с целью local scope:** exception constraint продолжает запрещать independent default |
-
-Проверка на предполагаемом compiler output: у default пустые constraints,
-у exception `[88,114)`, body `The default timeout is 17 seconds.`.
-Existing `_applicable_context` возвращает True для default, False для exception.
-Actual read consumer применяет второй verdict к тому же body и всё равно
-возвращает `condition_support_unavailable`. Результат probe сохранён в
-`artifacts/next07/scope-consumer-compatibility-20261004.json`.
-
-**COMPATIBILITY BLOCKED / STOP перед новым candidate.** Для native эффекта
-нужна отдельная ответственность admission: выбирать, какой need относится
-к окну, и проверять только его constraints, не ослабляя shared/unknown veto.
-Один compiler-only patch не может исправить этот consumer. Изменять его в этом
-trial запрещено. Не добавляем игнорируемые поля ради green syntax tests.
-
-Новый candidate и новые grammar regression tests **NOT_RUN**: остановка по
-пункту 4 согласованной границы до реализации. Предыдущие красные tests и
-REJECTED preservation candidate сохранены. Следующее решение — согласовать
-отдельный per-need admission consumer contract и последовательность его trial,
-либо оставить compiler исследованием без заявления native recovery.
-
-Уточнение по согласованной последовательной работе: допускаются отдельные
-compiler → admission → selector trials, каждый с собственным решением C и
-проверками. Необходимость следующего слоя не делает промежуточный trial полным
-исправлением и не разрешает смешивать слои в одном patch. Новый trial не
-начинается автоматически после regression или неопределённого scope.
-
-1. Выполнять этапы A → B → C → D → E. Следующий этап разрешён только после DONE
-   предыдущего. Заполнять журнал в конце **этого** документа.
-2. Сейчас разрешены observer, fixtures и analysis. Runtime trial разрешён только
-   после заполненного решения C. Новый product contract не принимать молча.
-3. Один trial = одна ответственность в одном слое: compiler **или** admission
-   **или** selector. Retrieval, budgets, ranking и другие слои фиксированы.
-   Механический refactor выполняется отдельно и не считается defect fix.
-4. Не добавлять OR fallback, rescue, relation/library exceptions, aliases,
-   словари синонимов, semantic model, новый compiler или threshold tuning.
-5. Не удалять guards, не заменять их флагами `qualified/context_eligible`.
-   Source/security/version/scope/freshness/span/request, identity, exact и
-   applicability сохраняются. Unknown не становится applicable.
-6. Не изменять failing expectations LeaseClient, frozen corpus/labels, limits,
-   CI markers, skips/xfails ради PASS. Explicit lookup не заменяет root-only test.
-7. Не трогать 81 UNRESOLVED node, runner/provider, historical gate migrations
-   и публикацию: это незавершённый план 06, не scope 07.
-8. Не использовать gold claims, имена fixtures или ожидаемые числа в runtime.
-   Они доступны только evaluator после получения packet.
-9. Existing dirty files — baseline/user work. Не reset/stash/clean, не коммитить
-   автоматически. Research substitutions только внутри process/context manager;
-   production/defaults автоматически не переключать.
-10. Один кандидат после C. При потере claim, нарушении guard или необходимости
-    второй policy-правки — REJECTED/BLOCKED, сохранить данные и остановиться.
-    Техническую ошибку harness можно исправить, сохранив invalid run; это не
-    повод повторять valid неудачу с подстроенными параметрами.
-11. Не создавать новый eval engine. Использовать existing observers, index,
-    assessor и validator. Подмена gate для диагностики не является кандидатом.
-12. Нет подтверждения — писать `unknown/not_run`, а не PASS. Результаты на
-    просмотренных fixtures — development evidence, не blind/held-out оценка.
-
-## A. Зафиксировать baseline и воспроизвести потерю
-
-### A1. Provenance
-
-Из корня repo записать в новый `v2plan/artifacts/next07/<run-id>/`:
-commit, `git status --short`, tracked diff, hashes untracked файлов, hashes
-изменяемых runtime modules, corpus/protocol и точные команды. Не включать secrets.
-Не перезаписывать старый каталог. Для временных DB использовать `/tmp/opencode`.
-
-Команды наблюдения:
+Проверить checkout. Не делать reset/stash/clean и не переключать грязный checkout.
 
 ```bash
+git branch --show-current
 git rev-parse HEAD
 git status --short
-git diff --stat
 git diff --check
 ```
 
-### A2. Native baseline, без подмен и дополнительных lookup
+Runtime anchor до этого docs-only плана: `4dac4d7dbbca55beb400dc6503ab54872f766f01`.
+Зафиксировать реальный стартовый HEAD, полный tracked binary diff и hashes
+untracked inputs. Сохранить копию baseline для парной проверки; HEAD без dirty
+patch не считается тем же baseline. Работать в isolated checkout/process.
+
+Новый output: `v2plan/artifacts/next07/grounded-first/<run-id>/`, exclusive create.
+Временные DB/package installation — снаружи repo. Сохранить protocol с question,
+source hashes, package/config/interpreter versions, caps, candidate algorithm,
+allowlist policy-delta и всеми criteria ДО реализации C.
+
+Проверить `.venv/bin/python`; если отсутствует, выбрать один имеющийся проектный
+интерпретатор и записать его. Не считать shell Python эквивалентом project env.
+Сеть допустима для отдельной установки pinned package. Сам benchmark — только
+локальный frozen corpus, без внешних запросов, API keys, embeddings и telemetry.
+Не ослаблять изоляцию при ошибке установки; BLOCKED_ENV.
+
+**DONE I.0:** provenance/protocol/policy-delta созданы; inputs доступны; baseline
+не затронут. Отсутствующий полный архив 49 claims отметить сейчас, не в конце.
+
+## I.1. Реальный Grounded на исходном LeaseClient
+
+**Изменяемая ответственность:** нет; comparator.
+**Allowed:** `v2plan/next07_grounded_reference.py`, `v2plan/test_next07_grounded_first.py`,
+новые artifacts и third-party notices. Runtime DocAtlas не менять.
+
+Взять точные fixtures из `tests/docs/test_need_local_admission.py`, не переписать
+их в более удобный язык. Обязательны оба параметра `(17, LeaseExpired)` и
+`(29, WaitExpired)`. Question неизменён:
+
+```text
+What is LeaseClient default timeout duration for requests and which exception is raised when an operation expires?
+```
+
+Три отдельных исходных файла, включая overview:
+
+```text
+default.md:  # LeaseClient\n\nThe default timeout is 17 seconds.\n
+error.md:    # LeaseClient\n\nAn expired operation raises `LeaseExpired`.\n
+overview.md: # Overview\n\nLeaseClient default timeout duration requests exception operation behavior documentation.\n
+```
+
+Строки выше обозначают bytes с `\n`, а не буквальные backslash в файле.
+Второй параметр меняет только исходные value/error согласно existing test.
+
+Отдельные свежие stores для двух параметров; никакого corpus с обоими ответами
+в одном индексе. Все три файла — одна library/version. Не индексировать только
+полезные файлы, не удалять overview, не подсказывать answer в query/title.
+
+Использовать installation/config шаблон из
+`roadmap/search-quality-2026-10-01/m2_grounded_mechanism_probe.py`, но НЕ запускать
+его mkdocs-main как LeaseClient experiment. Создать узкий runner для этих inputs.
+Проверить реальные CLI flags через `--help`. После установки типовой вызов:
 
 ```bash
-DOCATLAS_OFFLINE=1 .venv/bin/pytest -q \
+node "$ENTRY" scrape lease-fixture "$FILE_URI" --max-pages 1 --max-depth 1 --no-clean --config "$CONFIG" --store-path "$STORE" --no-telemetry --no-logo
+node "$ENTRY" search lease-fixture "$QUESTION" --limit 3 --output json --config "$CONFIG" --store-path "$STORE" --no-telemetry --no-logo
+```
+
+Scrape вызвать по одному разу для каждого из трёх файлов; file-access разрешён
+только для fixture-root, symlinks выключены. Записать stdout/stderr/exit code,
+реальные chunks, порядок results, citations, размеры и zero-embedding check.
+CLI использует SearchTool, но не выдавать CLI capture за новый MCP transport run.
+
+Тем же corpus получить N через existing `capture_fixture`/`capture_public_call`.
+Если reused capture не соответствует source/config/runtime hashes, сделать fresh.
+
+**DONE I.1:** реальный G содержит оба факта с заголовком/условием для обоих
+параметров; N и G сохранены. Успех G ещё не C recovery.
+**REJECTED:** валидный G не доставляет обязательный факт — сохранить реальный
+контрпример, не менять запрос/limit/chunks и не переходить к копированию как к
+доказанному решению. **BLOCKED:** package/run недоступен. SQL-подмена не разрешена.
+
+## I.2. Source-bound retrieval: одна замена, пока без нового admission
+
+**Заменяем:** формирование initial read-candidates, не proof/selector.
+**Allowed:** `v2plan/next07_grounded_candidate.py`, разрешённые pure ports в
+`v2plan/third_party/grounded-3.2.1/`, candidate tests и artifacts.
+
+Строить отдельный research FTS index только из проверенного current corpus,
+с теми же source identities/scope/version. Не запускать поиск по outputs старого
+projector: он уже мог удалить default/error. Для native integration inventory
+брать на границе `query_project_docs` до qualification/rerank, не финальный context_pack.
+
+Зафиксированный начальный алгоритм C:
+
+1. Структурные Markdown units с original offsets. Greedy границы по pinned
+   Grounded: min 500 / preferred 1500 / hard max 5000 символов. Это structural
+   профиль, не token budget. Сохранять original bytes и heading ownership;
+   не требовать нового natural-language parser. Превышающие существующий resource
+   cap units отмечать omitted, не увеличивать cap и не делать parent rescue.
+2. Query construction — pinned full phrase OR escaped terms; tokenizer
+   `porter unicode61`; BM25 weights `(10.0, 1.0, 5.0, 1.0)` для content/title/url/path.
+   Никаких stopword/alias additions под кейс. Не менять weights после results.
+3. Один order, без component/need/facet boosts и query rewrites. Initial pool —
+   не больше 20 и не больше меньшего existing cap из I.0. Tie-break: canonical
+   source identity, original start/end; не answer values и не fixture names.
+4. Привязать proposals к current snapshot и точным original spans. Internal row:
+   source key, snapshot hash, start/end, original text, owner/dependency spans,
+   retrieval order. IDs и score служат адресации/порядку, не approval.
+
+Предпочтительно переиспользовать existing structural/span utilities. Если нужен
+порт upstream splitter, сохранять лицензию и явно показать differences: original
+byte preservation вместо upstream normalized Markdown. Python-port не называть
+native Grounded. Проверить query/ranking parity с G на одинаковых индексных
+строках; отличия разбиения фиксировать отдельно, не скрывать «почти parity».
+
+Нельзя из span-unavailable сделать полный raw document как запасной результат.
+Короткий документ допустим целиком, если он с самого начала один индексный unit.
+Нельзя вручную конструировать default/error proposals из ожидаемого ответа.
+
+**DONE I.2:** source-bound proposals воспроизводимы; в LeaseClient оба факта
+присутствуют; bytes/offsets и лимиты проверены. Downstream N пока может отказать —
+это не провал isolated retrieval stage и не recovery. Ошибочный span — REJECTED.
+
+## I.3. Read decision: заменить semantic permission, не безопасность
+
+**Заменяем:** competing read-permission decisions, не retrieval order/packing.
+**Allowed:** research candidate adapter и tests. Для isolated runtime patch:
+`docmancer/docs/application/read_context_admission.py` и
+`docmancer/docs/application/need_context_disposition.py` — только read responsibility.
+Не импортировать v2plan из production modules; research runner устанавливает
+scoped replacements, восстанавливая их при выходе.
+
+Один owner проверяет конкретные proposals I.2: source guards, exact/subject,
+current request/snapshot/span и видимость известных зависимостей. Переиспользовать
+existing `prepare_source_probe`/reference binding, не подделывать qualified flags.
+
+Не использовать `qualify_evidence` reason whitelist, compiler success, all-needs
+condition loop и three-term/pair floor как повторное read permission.
+Proof consumers вне read-candidate остаются неизменными. Старое mixed False
+не превращается в известный mismatch; known mismatch требует своего проверяемого
+основания. Unsupported остаётся unknown, а не supported.
+
+Окно включает subject/owner и известные ограничивающие dependencies. Structural
+closure проверяет только распознаваемые связи; отсутствие edge не доказывает
+отсутствие условия. Поэтому проверяются отдельные trailing/cross-paragraph
+controls из §4. Если их сохранность не обеспечена — REJECTED, не новый regex.
+
+**DONE I.3:** обязательные короткие source-bound positives разрешены как context;
+source/exact/mismatch/clipping controls запрещены; ни один факт не получил
+нового applicability/support/coverage/edit credit.
+
+## I.4. Packing и native wiring: одна selection-замена
+
+**Заменяем:** отбор read packet, включая empty-only доступ generic proposals.
+**Allowed:** research runner/candidate/tests. Из runtime только wiring в
+`_project_docs_service_part03.py`, `_project_context_service_part01.py`,
+`need_context_projection.py`, `_docs_context_projection_core.py`,
+`docs_context_projection.py` внутри `docmancer/docs/application/`.
+Изменять их не все сразу: отдельный wiring patch на границу, без новой ranking
+policy. `project_doc_ranking.py` можно менять только для проведения уже checked
+read-proposals без требования qualified IDs; его proof/legacy поведение не менять.
+
+Это opt-in isolated candidate, не новая production/default OR fallback.
+Источник не может включить candidate метаданными. Existing N запускается
+отдельно на идентичном corpus, не как скрытый fallback C.
+
+Зафиксированный packer C — **first-fit по единственному order I.2**:
+
+1. Перебирать уже source-checked предложения; только точные duplicate/contained
+   spans той же identity/snapshot убрать. Не объединять разные версии/документы.
+2. Предлагать целое original окно вместе с обязательными owner/dependencies.
+   Нет budget-driven clipping предложения, summarization и поиска answer substring.
+   Несмежные spans не выдавать за одну непрерывную цитату с выдуманными lines.
+3. Вычислить стоимость полного serialized DTO с metadata. Если окно не помещается
+   или превышает 3 source rows, записать omission и перейти к следующему.
+   Не сокращать уже принятые факты, не поднимать budget.
+4. Пересчитать source/span checks на final bytes. Пустой результат честно
+   insufficient, не «ответа в документации нет».
+
+First-fit выбран как простой фиксированный comparator, НЕ как оптимальный
+packer. Утрата прежних фактов из-за этой простоты — измеримый результат, а не
+повод добавлять в ту же попытку knapsack, novelty thresholds или rescue.
+
+Native C должен пройти реальный `get_docs_context`/MCP handler и existing
+`validate_model_visible_projection`, а не только experimental renderer.
+Prefit/rerank обязаны передать этот же законный inventory; не ставить exemptions
+всем hit IDs. Трассировать actual calls, включая facade динамические hooks.
+
+В C не выполнять старые secondary relevance/selection passes поверх нового
+order. В частности, `select_joint_context`, `select_query_block_context` и
+`select_query_block_recovery` не должны незаметно менять C packet. Их ordering/
+exploratory функции выключаются только в isolated selection arm, не глобально.
+Source binding, serialization, validation и capability/security checks НЕ
+выключать вместе с ними. Обычный N остаётся неизменным.
+
+Сохранять для N/C: prefit input/output, rerank output, proposed/selected windows,
+core output, output после facade, payload непосредственно перед возвратом MCP.
+Наличие факта в `read_next`/snapshot не считается доставкой в sources.
+
+**DONE I.4:** оба native параметра доставлены в final C, цитаты и ограничения
+верны, DTO валиден и <=800/3. Это пока target-local success, не общий acceptance.
+Если для проводки понадобилась новая обязанность вне списка — BLOCKED, не
+редактировать другие слои без границы. Если meaningful C не прошёл — REJECTED.
+
+## I.5. Одна парная приёмка, без подбора кандидата
+
+**Allowed:** runner/tests, новый artifacts directory. Algorithm заморожен.
+Переиспользовать `load_protocol`, `documents_for`, `isolated_service`,
+`index_project`, `capture_public_call`/`observe_call`, `assess_context`,
+`audit_payload`. Не писать новый evaluator и не вызывать старый rejected
+`selection_direction_ablation.candidate_function()`.
+
+Сначала обязательные controls §4. Затем один paired N/C replay всех 80 frozen
+cases с одинаковыми исходными bytes/config и честной разницей retrieval profiles.
+Corpus split/grouping и BM25 statistics записать; не сравнивать scores разных
+индексов как одну шкалу. Исторические чужие runs не подменяют fresh N.
+
+Сохранить множества `(case_id, claim_id)`, не только сумму:
+
+```python
+lost = baseline_supported_ids - candidate_supported_ids
+gained = candidate_supported_ids - baseline_supported_ids
+assert not lost
+```
+
+Отдельно сохранить все ранее подтверждённые 49 claim IDs из versioned evidence
+и полезные partial facts. Если доступна лишь сумма 49 без списка/provenance,
+историческая retention остаётся BLOCKED; не восстанавливать IDs догадкой.
+Fresh baseline уже потерял прежний факт — отдельный blocker, не новая норма.
+`needs_review` не автоматически PASS и не автоматически ложное утверждение.
+
+Старые expected-empty frozen negatives не менять. При новом packet указать,
+это source violation, false assertion, irrelevant context или конфликт старой
+abstention policy; по текущему frozen acceptance всё равно не PASS.
+
+Focused tests запускать project interpreter, сохранив exit code/log/JUnit:
+
+```bash
+DOCATLAS_OFFLINE=1 "$PY" -m pytest -q \
+  tests/docs/test_need_local_admission.py \
   tests/docs/test_read_context_admission_boundary.py \
   tests/docs/test_admission_guard_composition.py \
-  tests/docs/test_evidence_set_disposition.py \
-  tests/docs/test_need_local_admission.py \
-  --junitxml=/tmp/opencode/next07-baseline-focused.xml
+  tests/docs/test_source_window_eligibility.py \
+  tests/docs/test_requested_evidence_retention.py \
+  tests/docs/test_shared_context_proposals.py \
+  tests/docs/test_evidence_set_context_delivery.py \
+  tests/docs/test_evidence_set_delivery_acceptance.py \
+  v2plan/test_next07_grounded_first.py \
+  --junitxml="$OUT/focused.xml"
 ```
 
-Последнее наблюдение: 74 PASS / 2 LeaseClient FAIL. Не вписывать эти числа как
-новый результат. Перенести новый XML и log в artifacts; exit=1 не скрывать.
+`$PY` и `$OUT` фиксируются в I.0. Новый test module создаётся этим экспериментом;
+команда не утверждает, что он уже существует. Candidate должен быть установлен
+в том же pytest process; завершившийся monkeypatch script не влияет на новый
+процесс. Проверить импортированные function origins/hashes перед run.
+Manifest новых tests обновлять по существующим правилам, не relabel старые nodes.
 
-### A3. Разделить синтаксис и applicability
-
-Выполнить этот diagnostic код, сохранить stdout. Это **не новый test contract**:
-
-```python
-from dataclasses import asdict
-from docmancer.docs.domain.question_retrieval_needs import retrieval_needs
-from docmancer.docs.domain.need_contracts import compile_need_contracts
-from docmancer.docs.domain.query_reference_binding import ScopeKey, resolve_references
-
-question = (
-    "What is LeaseClient default timeout duration for requests and "
-    "which exception is raised when an operation expires?"
-)
-references = resolve_references(
-    question, catalog=(), scope=ScopeKey("diagnostic", "", "snapshot-1"),
-)
-print([asdict(row) for row in retrieval_needs(question)])
-print([asdict(row) for row in compile_need_contracts(question, references)])
-```
-
-Пустой catalog проверяет только syntax. Для выводов о source binding использовать
-actual `_reference_root_plan` из native capture, а не этот diagnostic ScopeKey.
-
-**DONE A:** новая native потеря воспроизведена; оба параметра 17/LeaseExpired и
-29/WaitExpired учтены; baseline provenance и выходы сохранены. Если поведение
-изменилось — сначала объяснить delta, не применять старый диагноз автоматически.
-
-## B. Карта решений на одних и тех же данных
-
-### B1. Где наблюдать
-
-| Слой | Функции / файлы | Что записать |
-|---|---|---|
-| Retrieval | `_project_docs_service_part03.py`: `query_project_docs`, `SourceReferenceContext.prepare` | Query, filters, полученные source IDs, исходные bytes и bounds |
-| Query qualification | `evidence_qualification.qualify_evidence`, `admission_contract.choose_need_admission` | Query scope, exact/subject checks, matched terms, typed/legacy route, reason |
-| Read proposals | `read_context_admission.iter_prefit_context_variants`; `need_context_projection.preferred_context_variants` | Какие окна предложены, condition/locality verdict, кто не создал proposal |
-| Early removal | `project_doc_ranking.rerank_project_doc_chunks`; `_project_context_service_part01.py` | Before/after, context_candidate_ids; qualification reject отдельно от caps/budget |
-| Final selection | `_docs_context_projection_core.project_docs_context` и `ProjectionDecisionTrace.record` | Actual attempted window, rejection/acceptance, занят ли packet, почему fallback пропущен |
-| Final boundary | `docs_context_projection.project_docs_context`, public handler | После supplements: sources, restrictions, flags, validator, budget |
-
-Одна строка трассы: request hash + project/version/snapshot + canonical path +
-content hash + точный `[start,end)` + query/need ID + stage + outcome + reason.
-Если span отсутствует, записать `unknown`; не восстанавливать его первым
-`raw.find(snippet)` — в документе могут быть повторяющиеся фразы.
-Различать `rejected`, `not_proposed`, `not_reached`, `budget_limited`.
-
-Пример observer: выполнить после A3 в том же script (`question` уже определён).
-Делегирует исходной функции, не меняет результат.
-
-```python
-from unittest.mock import patch
-from pathlib import Path
-from tempfile import TemporaryDirectory
-from docmancer.docs.application import read_context_admission as module
-from tests.docs._global_evidence_fixtures import capture_fixture
-
-events = []
-original = module.read_context_admission
-
-def observe(candidate, **kwargs):
-    decision = original(candidate, **kwargs)
-    events.append({
-        "path": candidate.get("path"),
-        "span": candidate.get("char_span"),
-        "snippet": candidate.get("snippet"),
-        "allowed": decision.allowed,
-        "reason": decision.reason,
-    })
-    return decision
-
-documents = {
-    "default.md": "# LeaseClient\n\nThe default timeout is 17 seconds.\n",
-    "error.md": "# LeaseClient\n\nAn expired operation raises `LeaseExpired`.\n",
-    "overview.md": "# Overview\n\nLeaseClient default timeout duration "
-                   "requests exception operation behavior documentation.\n",
-}
-with TemporaryDirectory(dir="/tmp/opencode") as directory:
-    with patch.object(module, "read_context_admission", observe):
-        capture = capture_fixture(Path(directory), documents, question)
-assert events, "observer was not reached"
-print(events)
-print(capture["public_payload"])
-```
-
-Остальные поля identity добавить из actual prepared candidate в полную трассу.
-Для bypass arms B2 использовать `capture_public_call` напрямую: сохранить
-validator errors, которые `capture_fixture` иначе остановит assertion-ом.
-Сначала native positive fixture,
-затем source/request damage controls; пустой pipeline не доказывает работу guard.
-
-### B2. Ограниченная причинная диагностика
-
-Повторить четыре arms на одинаковом request/corpus, budget 800 и cap 3:
-
-1. Native без подмен.
-2. Только read `_applicable_context` временно возвращает True.
-3. Дополнительно только read `local_topic_witness` временно возвращает True.
-4. Отдельно от 2–3: только rerank получает все текущие candidate IDs как exemptions.
-
-Arms 2–4 намеренно отключают проверки и **никогда не являются безопасным fix**.
-Не переносить подмены в runtime. Записать, что arm 3 — последовательный
-диагностический bypass двух veto одного read route, не допустимый patch trial.
-Остальные lanes не менять. Сохранить полные captures и validation errors.
-
-Проверяемая гипотеза из предыдущего анализа: 2 останавливается на locality;
-3 и 4 сохраняют factual candidates до projector, но final оставляет overview.
-Нельзя считать отсутствующий final факт прямым доказательством конкретного veto:
-нужен actual selection event или подтверждённое `not_proposed/not_reached`.
-
-Дополнительный прежний arm «убрать overview и пропустить оба veto» дал invalid
-projection: отсутствовали authority/project_identity/scope. Это не recovery PASS
-и не native regression. Сохранить как ограничение диагностической подмены;
-не чинить serializer в рамках этого исследования.
-
-### B3. Проверить три области действия условия
-
-До нового runtime trial зафиксировать fixtures и expected visible facts:
-
-| Ситуация | Вопрос / источники | Допустимый final результат |
-|---|---|---|
-| Условие только второй части | Исходный LeaseClient вопрос; отдельные default и expired-operation docs | Default и exception доступны вместе со своим subject; нельзя перенести условие expiration на default или потерять его у exception |
-| Условие всего вопроса | `When preview is disabled, what is RelayClient default timeout and which exception is raised?`; источники с explicit disabled/enabled clauses | Только применимые disabled facts с сохранённым условием; enabled факт не выдавать как ответ о disabled |
-| Область действия неизвестна | `What is RelayClient default timeout and which exception is raised, only for administrators?`; source содержит только безусловный default | Не объявлять applicability/full support. Разрешено ли такое окно как read context — **открытый контракт**, а не автоматически empty или automatically allowed |
-
-Добавить controls к тем же fixtures: отсутствует второй факт; чужой subject;
-wrong/missing state; restriction после factual sentence; clipped restriction;
-точный identifier/version не совпадает; unsafe/stale/snapshot/request mutation.
-Для restriction использовать явный текст, например `Only when preview is disabled.`
-в исходном source; clipped вариант должен действительно удалять эту строку.
-Проверять final bytes и source scope, а не только `answer_supported=false`.
-
-По неизвестному scope выписать конкретный допустимый/недопустимый packet и
-основание из принятого контракта. Если основания нет — BLOCKED на C, вынести
-один конкретный policy-вопрос пользователю. Не сочинять новое правило самому.
-
-**DONE B:** таблица stages заполнена для обоих factual sources и overview;
-различены все veto, отсутствие proposals и scope; три ситуации сопоставлены;
-каждый вывод помечен `observed`, `code-derived` или `hypothesis` с артефактом.
-
-## C. Выбрать ровно одну ответственность либо остановиться
-
-Заполнить перед implementation:
-
-```text
-trial_type: behavior_preserving_refactor | behavior_fix
-layer: compiler | admission | selector
-removed_responsibility: <конкретная функция/ветка и её прежнее решение>
-remaining_owner: <существующий владелец, не новый wrapper над всеми veto>
-replacement_rule: <общее правило без case names и новой grammar>
-contract_basis: <accepted doc/test; новый policy-вопрос должен быть решён явно>
-positive_final_packet: <что станет видно и почему>
-negative_controls: <IDs и запрещённые bytes/permissions>
-allowed_files: <точный список>
-unchanged_layers: <остальные слои>
-stop_condition: <как обнаружить необходимость второй policy-правки>
-```
-
-Возможные результаты, не автоматическая очередь патчей:
-
-- **Compiler:** выяснить, должен ли enrichment сохранять найденные части без
-  повышения их interpretation до supported. Сам факт двух RetrievalNeed этого
-  не доказывает. Если locality/selection всё равно блокируют delivery, такой
-  patch нельзя объявить исправлением LeaseClient.
-- **Admission:** заменить одну конкурирующую read-политику только при полном
-  контракте applicability/locality и доказанном участии разрешённых окон в final.
-  Не решать проблему простым `return True` или 3 terms → 2 terms.
-- **Selector:** допустимо исследовать замену выбранной ответственности только
-  если окна уже законно admitted. Нельзя принять bypassed arms B2 как такой вход.
-  Не повторять удаление `no_new_direction`: известны четыре потери из плана 02.
-- **Mechanical:** повторные проходы `iter_need_context_variants` в precedence/set
-  могут быть объединены лишь при сохранении порядка, окон, dispositions и
-  diagnostics. Упрощение не обещает новый recall; не выполнять его вместо fix
-  без явного выбора этого результата.
-
-**DONE C:** выбран один trial с существующими законно admitted positives и
-полным правилом; пользовательские решения о новом контракте зафиксированы.
-**BLOCKED:** один слой не может обеспечить заявленное исправление. Указать
-независимые необходимые изменения, не выполнять их общим patch. Закончить анализ
-и предложить точную границу следующего решения, не запускать ещё один поиск policy.
-
-## D. Изолированная реализация выбранного trial
-
-1. Использовать отдельный research candidate / отдельный patch поверх сохранённого
-   dirty baseline. Не подключать его к production/defaults. Не переносить сюда
-   historical unified compiler/renderer как будто это existing native behavior.
-2. Добавить минимальный regression test именно выбранной обязанности, плюс
-   negative controls B3. Для fix сначала получить meaningful FAIL на baseline.
-   Для mechanical refactor требовать parity, не искусственно создавать bug test.
-3. Заменить выбранную ветку; не оставить старый veto и не добавить новую OR lane.
-4. Запустить focused tests. Проверить diff на новые budgets, grammar, fallback,
-   source reads, approvals, runtime fixture names и изменение второго слоя.
-5. Если native defect остаётся, записать оставшуюся стадию. Не расширять patch
-   до следующего слоя. Уточнение hypothesis не является PASS fix.
-
-Минимальная проверка native цели (existing helper; не assisted-запрос):
-
-```python
-from tests.docs._global_evidence_fixtures import capture_fixture, visible
-
-def assert_lease_delivery(tmp_path, value, error):
-    capture = capture_fixture(tmp_path, {
-        "default.md": f"# LeaseClient\n\nThe default timeout is {value} seconds.\n",
-        "error.md": f"# LeaseClient\n\nAn expired operation raises `{error}`.\n",
-        "overview.md": "# Overview\n\nLeaseClient default timeout duration "
-                       "requests exception operation behavior documentation.\n",
-    }, "What is LeaseClient default timeout duration for requests and "
-       "which exception is raised when an operation expires?")
-    text = visible(capture)
-    assert f"{value} seconds" in text
-    assert f"An expired operation raises `{error}`." in text
-    assert all(capture["public_payload"][key] is False
-               for key in ("answer_supported", "answer_available", "edit_ready"))
-```
-
-Использовать оба существующих параметра; не заменять existing test этим helper.
-Helper уже проверяет source bounds, schema, 800 tokens и ≤3 sources. Дополнительно
-проверить subject binding и restrictions по captured source. Появление числа
-в другом документе или другой версии не выполняет assert по смыслу.
-
-Новые test roots регистрировать по existing diagnostic manifest rules, label
-`behavioral` для runtime checks. Hash обновлять только из фактического inventory;
-не менять labels/markers существующих failures.
-
-**DONE D:** одна обязанность заменена; regression и guards проходят; нет diff
-второго policy-слоя. Сокращение показать конкретно: какая ветка/повторный проход
-исчезли. Новый wrapper без удаления ответственности не считается сокращением.
-
-## E. Приёмка candidate, не выпуск
-
-### E1. Fresh paired native replay
-
-Использовать existing `load_protocol`, `documents_for`, `isolated_service`,
-`index_project`, `observe_call`, `assess_context`, `audit_payload`.
-Пример группировки/сохранения arms есть в `selection_direction_ablation.py`;
-**не вызывать его `candidate_function()`**: он повторяет отклонённое удаление.
-Не использовать старую reference read-function как весь current baseline.
-
-- 80 frozen cases: одинаковый corpus/index/config на baseline и candidate arm;
-  одна зафиксированная candidate policy, root questions неизменны.
-- Четыре controls `both/partial/absent/wrong` из `lookup_gap_probe.py`: сохранить
-  исходные native/assisted lanes отдельно; результат assisted не заменяет native.
-- B3 и LeaseClient: отдельный development inventory, не прибавлять к 49 claims.
-- Сохранить полные packets, snapshots, validator errors, assessment и traces.
-  Budget **800**, cap **3**; без исследования сетки 800/1500/3000.
-
-Проверять IDs, а не равенство суммы:
-
-```python
-def supported_ids(rows):
-    return {
-        (row["case_id"], claim_id)
-        for row in rows
-        for claim_id, result in row["assessment"]["claims"].items()
-        if result["status"] == "supported"
-    }
-
-# rows — явно нормализованный summary existing assessor, не его raw schema.
-lost = supported_ids(baseline_rows) - supported_ids(candidate_rows)
-gained = supported_ids(candidate_rows) - supported_ids(baseline_rows)
-assert not lost, sorted(lost)
-```
-
-Исторические 49 IDs также сверить с сохранённой приёмкой next04/next05. Если
-fresh baseline уже их потерял, это отдельный blocker, а не разрешение понизить
-планку. Сохранять полезные partial facts, даже если весь case не `sufficient`.
-Changed snippets проверить по смыслу с exact source citations; `needs_review`
-не считать ни автоматически PASS, ни автоматически ложным ответом.
-New negative sources разобрать по действующему frozen contract; при нарушении
-отклонить candidate, не менять label unanswerable или expected empty packet.
-
-### E2. Guards и общий regression
-
-Повторить A2 с подключённым isolated candidate; добавить existing модули:
-
-```text
-tests/docs/test_shared_context_proposals.py
-tests/docs/test_evidence_set_context_delivery.py
-tests/docs/test_evidence_set_delivery_acceptance.py
-tests/docs/test_requested_evidence_retention.py
-tests/docs/test_source_window_eligibility.py
-```
-
-Pre-existing failures сравнить по node IDs с fresh baseline; не исключать их
-из запуска. Changed reason/count при unchanged forbidden outcome не доказывает
-сохранение guard: нужны положительные и повреждённые inputs, clipping и budgets.
-
-Только если E1 и focused candidate checks не выявили регрессий, выполнить один
-full offline run **в checkout/process, где действительно исполняется candidate**:
+Только после successful controls/retention — один парный full offline run N/C:
 
 ```bash
-DOCATLAS_OFFLINE=1 .venv/bin/pytest tests/ -m 'not live and not live_network' -q \
-  --junitxml=/tmp/opencode/next07-candidate-full.xml
+DOCATLAS_OFFLINE=1 "$PY" -m pytest tests/ -m 'not live and not live_network' -q --junitxml="$OUT/full.xml"
 ```
 
-In-memory monkeypatch из завершившегося script не действует на новый pytest.
-Зафиксировать механизм подключения candidate и hashes; иначе run = baseline,
-не candidate verification. Для отдельного checkout перенести полный сохранённый
-baseline patch/untracked inputs, не только HEAD. Не потерять работу пользователя.
+N и C имеют разные OUT. Required gates/stdio/schema/footprint/quality-lineage/
+mutation commands брать из pinned workflows/scripts и записать в I.0, не
+изобретать флаги. Блокеры плана 06 не чинить и не прятать в этом trial.
+Unseen validation не выполнена этим exposed replay; не заявлять обобщение.
 
-Для runtime candidate повторить existing checks согласно актуальному CI:
-recovery contract/mutation, agent-developer/adversarial (включая mutation),
-question-surface, schema/footprint и stdio smoke. Точные команды/CLI взять из
-текущих scripts/workflows до запуска; не выдумывать flags.
-Красные gates из 06 остаются красными. Namespace/model blockers не лечить здесь.
+## I.6. Конечный verdict части I
 
-**DONE E:** нет lost required IDs/partial facts, новых forbidden packets,
-source/condition/schema/budget/permission regressions или новых failing nodes;
-все changed packets разобраны. Target outcome выбранного trial выполнен.
-Известные required blockers записаны отдельно; локальная parity их не закрывает.
-
-## Итоговые критерии и остановка
-
-| Статус | Условие |
+| Verdict | Заранее заданное условие |
 |---|---|
-| ANALYSIS_COMPLETE / IMPLEMENTATION_BLOCKED | A–B выполнены; C объясняет, почему одного допустимого trial нет. Это завершённое исследование, **не исправление** |
-| REFACTOR_VALIDATED_LOCAL | Выбран mechanical trial; доказаны parity и реальное сокращение. LeaseClient defect остаётся открытым |
-| FIX_VALIDATED_LOCAL | C–E выполнены; оба native LeaseClient tests и B3 проходят без помощи lookup, выбранная ответственность заменена, факты/guards сохранены |
-| REJECTED | Есть regression, false applicability/support, потеря обязательного факта, новый rescue/threshold или изменение нескольких слоёв |
-| NOT_DONE | Не хватает capture, unknown contract, не выполнен необходимый check или changed packet не разобран |
+| **DONE / VALIDATED_LOCAL** | Есть настоящий G; native C доставляет оба LeaseClient параметра и partial positive; не теряет fresh baseline и исторические 49 IDs/partial facts; source/condition/clipping negatives соблюдены; frozen negatives без новых forbidden packets; DTO <=800/3; нет непредусмотренных failing nodes; удалена названная read-ответственность, а не добавлен fallback |
+| **REJECTED** | Валидный candidate нарушил хотя бы один обязательный positive/negative, потерял факт, превысил лимит, подменил source/span, добавил неподтверждённый credit либо потребовал case/tuning/rescue для PASS |
+| **BLOCKED** | Не хватает исполняемой среды/pin/corpus/provenance/исторических IDs; невозможно проверить mapping или требуемый caller вне allowed scope; обязательная проверка не запускалась. Это отсутствие достаточной проверки, не доказательство невозможности метода |
 
-Даже FIX_VALIDATED_LOCAL не означает release READY: план 06, required gates,
-runner isolation и модельная приёмка остаются отдельными обязательствами.
-После первого доказанного regression не запускать дорогие проверки ради суммы
-PASS и не подбирать второй вариант автоматически.
+Давать отдельные статусы G, source mapping, C native, retention, regression,
+held-out. Не прятать valid failure под BLOCKED_ENV другого этапа.
+DONE здесь — локальная приёмка конкретного candidate, не READY/rollout.
+Предсуществующие 06 failures и обязательность CI остаются открытыми.
 
-## Журнал исполнения
+# 4. Обязательные positives/negatives для C
 
-### Compiler-only trial: сохранение существующих RetrievalNeed
+Fixtures и expected outcomes заморозить в I.0. Не использовать их значения
+в runtime. Существующие tests остаются; новые controls не заменяют их.
 
-Заменяемая ответственность: сворачивание нескольких существующих retrieval
-parts в один unresolved `requested_part` при enrichment. Остальные compiler
-ветки и все runtime consumers неизменны. Candidate исследуется только через
-отдельную функцию в `next07_compiler_trial.py`; defaults не переключаются.
+| ID | Input | Обязательный outcome |
+|---|---|---|
+| P1/P2 | Исходные separate default/error + overview, оба параметра | Оба факта в final sources, правильный owner и expiration сохранены |
+| P3 | Тот же root, default есть, error отсутствует | Default доставлен; exception не выдумана; нет full support |
+| P4 | Неподдержанная грамматическая формулировка, тот же источник | Parser failure сам по себе не создаёт empty; exact constraints не ослаблены |
+| P5 | Неизвестный scope `only for administrators`, безусловный source | Допустим исходный context без утверждения admin applicability; unknown не получает credit; это заявленная policy delta |
+| N1 | Чужой project/module/subject/owner либо exact/version mismatch | Чужой факт не доставлен через C |
+| N2 | Stale/archived при current intent, dirty index, unsafe/injection | Существующие source guards запрещают повреждённый вариант |
+| N3 | Mutation request/snapshot/hash/path/document ID/start/end | Final validator запрещает источник, не чинит metadata нормализацией |
+| N4 | Поддержанная форма: requested disabled, source явно enabled | Не выдать enabled как подходящий disabled fact; existing known-mismatch expectation сохраняется |
+| N5 | `When X happens, A does not raise E.` | Не доставить positive `A raises E`; отрицание остаётся в исходной цитате |
+| N6 | `A raises E. Only when X happens.` и вариант с restriction в следующем абзаце | Если факт доставлен, соответствующая restriction тоже видна; нельзя выдавать clipped версию как целую |
+| N7 | Subject/condition только в owner/introduction; удалённая dependency | Нет допуска по скрытой dependency; нужен видимый bound source context |
+| N8 | Тот же ответный токен в чужом subject/source рядом с правильными keywords | Token overlap не выполняет P1/P2 и не чинит identity |
+| N9 | Очень маленький packet budget и oversized целый unit | Нет clipping/rescue; честный omission/insufficient, guards не переиспользованы |
+| N10 | Heading-only, question echo, рассыпанные keywords | Не засчитывать как factual recovery; запрещённые старым контрактом outputs отдельно в policy ledger, не прятать под общим PASS |
 
-Проверяемое общее правило: сохранить существующие части/subject/context/offsets,
-root exact obligations и unresolved interpretation. Existing root constraints
-сохранять консервативно, пока существующий parser не подтвердил их область.
-Не выводить scope из порядка слов и не вводить новый grammar/condition classifier.
+Для negative-control сначала подтвердить рабочий positive, затем менять один
+фактор. Пустой pipeline не доказывает работу guard. Правильный факт может
+соседствовать с лишним overview: это не делает delivery ложной, но трату бюджета
+и irrelevant material учитывать отдельно. Не требовать заранее конкретный rank.
 
-Проверка: `test_next07_compiler_trial.py` — локальное expiration, global prefix,
-ambiguous trailing restriction, exact identities, quotation shielding и
-reference mismatch. Обязательный acceptance: expiration не переносится на default.
-Если candidate его не выполняет, trial отклоняется, а не ослабляет guard.
+# Часть II. Наши уточнения — только поверх сохранённого простого baseline
 
-Allowed files: этот план, `next07_compiler_trial.py`,
-`test_next07_compiler_trial.py`, `artifacts/next07/`, строка статуса в README.
-Production compiler/admission/retrieval/selector/budgets не изменяются.
-Это trial формирования контрактов, не проверка native recovery.
+**Не запускать до DONE I.6. Не использовать для исправления REJECTED части I.**
+Если I завершена REJECTED/BLOCKED, сохранить результат и закончить; следующий
+эксперимент требует отдельного решения, а не автоматического расширения правил.
 
-**Результат:** native **5 PASS / 2 FAIL**, isolated candidate **6 PASS / 1 FAIL**
-(общий запуск 11 PASS / 3 FAIL). Baseline не сохраняет два retrieval parts;
-candidate сохраняет parts, subjects, original offsets и exact obligations,
-оставляя interpretation unresolved. Global/ambiguous restrictions, quoted
-separator и mismatch controls проходят в обоих arms. Это syntax controls,
-не полная приёмка source/security guards и не native delivery.
+Сохранить C0 как неизменный baseline. Уточнения не обязательны: при отсутствии
+конкретного пробела завершить II как `DONE / NO_CHANGE`, без искусственной правки.
 
-Обязательный локальный condition test у candidate падает: `default.constraint_spans`
-всё ещё содержит `when an operation expires?`. Existing `RetrievalNeed` даёт
-границы частей и эвристический context, но не certificate области действия
-условия; `NeedContract` имеет constraint spans без отдельного scope verdict.
-Копировать constraints всем частям безопаснее снятия veto, но не выполняет цель.
-Раздать их только по пересечению spans — новая неподтверждённая scope-политика:
-она могла бы снять общий trailing restriction с первой части.
+## II.1. Existing source continuation, без вытеснения цитат
 
-**Verdict: REJECTED для этого candidate; D/E native acceptance NOT_RUN.**
-Tests не ослаблены, candidate не подключён к consumers/defaults. Сохранён как
-отрицательный research результат, не production fix. Artifacts:
-`artifacts/next07/compiler-preservation-20261004/` — XML, обоих arms contracts,
-summary с hashes и command. Текущие 93 offline failures этим не закрыты.
+Проверить, доступны ли уже существующие bounded `read_next`/source continuation
+для недоставленного материала. Если да — no-op с evidence. Иначе подключить
+только existing механизм к C0. Не писать новый recovery engine и не расширять
+источники, scope, budgets или tool permissions.
 
-**STOP:** до следующего trial требуется основание для binding condition scope,
-которого в existing parser нет. Ни span proximity, ни порядковое положение
-условия, ни confidence не заменяют его. Переход к admission/selector сейчас
-маскировал бы compiler failure, поэтому автоматически не выполняется.
+**Allowed:** wiring `docs_context_projection.py`; existing `source_continuation.py`
+только подключение, не security/lifecycle/capability logic; related tests.
+**Заменяемая обязанность:** подключение существующего read-next к новому packer,
+не новая relevance policy. Отдельный patch, не вместе с II.2.
 
-Заполнять здесь, прошлые результаты не перезаписывать:
+**DONE:** все C0 sources/facts/conditions сохранены; metadata помещается в те же
+800; capability/source guards прежние; существующий reader получает правильный
+непрочитанный range. Если metadata не помещается — не вытеснять факт ради неё.
+Новый retrieval/search/fallback или потеря C0 факта — REJECTED уточнения, вернуть
+C0 в isolated run, сохранив failed result. C0 этим не объявляется плохим.
+
+## II.2. Existing focused lookup workflow
+
+Проверить действующую инструкцию из NEXT_03 и `_docs_server_tool_data.py` /
+`_docs_server_resources.py`. Она должна сохранять исходный вопрос, subject,
+environment, conditions, negation и известные sourced facts между вызовами;
+no progress → partial/unknown, без повторов и расширения call limits.
+
+Использовать существующие `lookup_gap_probe.py` и tests, четыре сценария
+both/partial/absent/wrong. Native root-only и assisted lookup результаты хранить
+отдельно. Модель для генерации lookup не добавлять. Ручной lookup не доказывает
+улучшение поведения реального агента и не заменяет P1/P2.
+
+**Allowed:** только существующие instruction fields и related tests, если найдён
+реальный пробел; retrieval/admission/selector не менять.
+**DONE:** действующий workflow согласован и bounded follow-up controls прошли,
+или доказан NO_CHANGE. Missing value остаётся unknown, wrong source не появляется,
+flags и budgets прежние. Нужен новый semantic parser/LLM/ranking — STOP вне scope.
+
+После II.2 завершить работу. Не восстанавливать старые all-needs/three-term veto
+под названием «уточнение». Facet boosts, compound coverage optimizer, новая
+compression policy и LLM-reranker — не автоматические следующие стадии.
+
+## 5. Allowed files и запись результатов
+
+Research additions этой попытки:
 
 ```text
-run_id / baseline commit+patch hashes:
-A: NOT_RUN / artifact paths:
-B: NOT_RUN / observed vs hypotheses:
-C: NOT_SELECTED / owner, rule, allowed files, contract decision:
-D: NOT_RUN / removed responsibility:
-E: NOT_RUN / claim IDs, partial facts, negative packets, guards, test delta:
-verdict:
-LeaseClient fixed: yes | no | not_verified
-remaining plan-06 blockers:
-next action: <одно действие либо STOP с точной причиной>
+v2plan/next07_grounded_reference.py
+v2plan/next07_grounded_candidate.py
+v2plan/next07_grounded_run.py
+v2plan/test_next07_grounded_first.py
+v2plan/third_party/grounded-3.2.1/NOTICE.md
+v2plan/third_party/grounded-3.2.1/LICENSE
+v2plan/third_party/grounded-3.2.1/manifest.json
+v2plan/third_party/grounded-3.2.1/fts_query.py
+v2plan/third_party/grounded-3.2.1/passage_splitter.py
+v2plan/artifacts/next07/grounded-first/<run-id>/
 ```
 
-### Выполнение 2026-10-04 после коммита плана
+Создавать только нужные файлы. Pure ports не нужны при прямом reuse upstream.
+Не складывать npm/node_modules/DB в git. Runtime allowed files заданы по стадиям
+выше: это не разрешение менять их одновременно. Остальные runtime, parser,
+schema, frozen labels, historical reports и unrelated dirty files неизменны.
 
-- План закоммичен первым: `c49e5221`; baseline включает сохранённый tracked dirty
-  patch и hashes untracked inputs. Остальные изменения пользователя не отменены.
-- Artifacts: `artifacts/next07/20261004-baseline-c49e5221/`.
-- **A DONE:** fresh focused run **74 PASS / 2 FAIL**, оба LeaseClient parameters
-  потеряли timeout; packet содержит overview. XML: `baseline-focused.xml`.
-  Syntax diagnostic подтверждён также actual prepared root plans, не только
-  пустым catalog: два RetrievalNeed → один unresolved requested_part с condition.
-- **B1/B2 observed:** 15 calls, 9 development cases; для двух LeaseClient cases
-  выполнены все четыре arms. В обоих factual sources точные heading-inclusive и
-  body-only окна получают `condition_support_unavailable`; при bypass condition
-  получают `no_local_topic_witness`. При обходе обоих veto или сохранении всех
-  chunks на rerank они достигают projector и получают candidate rejection
-  **`no_visible_qualification`**. Они не достигают обычной selection. Overview
-  accepted/replaced; read fallback не вызывается при непустом sources (code-derived).
-  Следовательно, финальный барьер здесь не `no_new_direction` из исследования 02.
-- **B3 observed:** global-condition доставляет disabled **и enabled** цитаты;
-  wrong-state-only доставляет enabled; missing-state доставляет безусловный default;
-  unknown administrators scope также доставляет безусловный default. Во всех
-  случаях proof/edit flags false. Restriction-tail final сохраняет `Only when
-  preview is disabled.`. Missing-error и foreign-subject LeaseClient packets пусты.
-  Все 15 captures проходят existing projection validator на 800/3.
-- Это не доказательство condition safety: validator проверяет другой контракт.
-  Возврат enabled quote с целым условием может быть contrasting read context,
-  но его допустимость не установлена. Не называем его applicable/answer proof.
-- **B не полностью DONE:** новые clipping/exact/version/source mutation controls
-  для B3 ещё не выполнены; existing source/snapshot/request/unsafe controls
-  присутствуют в passing A2, но не заменяют будущую candidate приёмку.
-- Первый `trace/` run технически не собрал actual plans: dataclass chunks до
-  rerank не содержат `_reference_root_plan`. Observer исправлен на prepared read
-  candidates; повтор `trace-with-plans/` сохранён отдельно. Первый run не удалён,
-  его пустые `actual_plans` не используются для conclusions о source binding.
-- **C NOT_SELECTED / BLOCKED:** compiler-only оставляет lexical и projection
-  barriers; admission-only оставляет projection qualification; selector-only
-  не получает законно admitted factual windows на native prefit. Общей безопасной
-  replacement rule сейчас нет. Mechanical refactor не выбран вместо recovery.
-- **D/E NOT_RUN:** runtime/defaults, expectations и frozen labels не менялись;
-  full suite и 80-case candidate acceptance не запускались без candidate.
-- **Verdict: IMPLEMENTATION_BLOCKED; анализ B частичный, не ANALYSIS_COMPLETE.**
-  LeaseClient fixed: **no**. Plan-06 blockers остаются открытыми.
-- **STOP / следующий один вопрос:** разрешается ли возвращать attributed read
-  context с неприменимым либо неподтверждённым условием (например enabled quote
-  на disabled request / unconditional default на administrators request), если
-  условия источника сохранены, applicability не заявляется и proof/edit false?
-  Если да, требуется отдельно определить, как packet сообщает это ограничение;
-  текущие false flags сами по себе этого не обеспечивают. Если нет, такой veto
-  должен действовать на все delivery routes, а не только на read fallback.
-  Ни один вариант не даёт автоматического разрешения multi-layer patch.
+Minimum artifacts: `protocol.json`, `provenance.json`, `policy-delta.json`,
+source/package/code manifests, G raw stdout/stderr, N/C public packets,
+snapshots, stage traces, final validator errors, paired claim IDs, lost/gained/
+partial tables, commands/exit codes/JUnit, `SUMMARY_RU.md`.
+Большой архив допустим с durable location+hash; один локальный `/tmp` не итоговая
+доказательная база. Secrets не коммитить. Original failures не перезаписывать.
+
+### Финальный ответ исполнителя
+
+```text
+Branch / baseline HEAD+patch / candidate HEAD+patch:
+Последний выполненный шаг:
+G actual package run: DONE | REJECTED | BLOCKED
+C final packet: DONE | REJECTED | BLOCKED | NOT_RUN
+Часть I verdict: DONE | REJECTED | BLOCKED
+Часть II: DONE | NO_CHANGE | REJECTED | NOT_RUN
+LeaseClient P1/P2/P3: фактически доставленные source snippets + conditions
+Recovered / lost / retained partial fact IDs:
+Hard guard / budget / span violations:
+Policy conflicts и старые failing nodes, не скрытые из отчёта:
+Unseen / reader evaluation: NOT_RUN, если не выполнены отдельно
+Изменённая и удалённая ответственность:
+Changed files / exact commands / artifacts:
+Not_run и причина:
+Один следующий шаг или «эксперимент завершён, rollout не разрешён»:
+```
+
+## 6. Статус на момент записи этого плана
+
+Все I.0–I.6 и II.1–II.2: **NOT_RUN**. Создан только план и согласован маршрут.
+Код, guards, fixtures, budgets и старое evidence этой записью не изменены.
+Предыдущие 2 diagnostic PASS и 07.1 BLOCKED — исторический результат, не новая
+приёмка. Успех Grounded на LeaseClient, native recovery и сохранение 49 facts
+предстоит измерить; они не выводятся из этого документа.

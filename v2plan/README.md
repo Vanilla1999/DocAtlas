@@ -4,53 +4,73 @@
 
 ## Рабочий маршрут сейчас
 
+**[07 — Grounded-first: инструкция исполнителю](NEXT_07_READ_PIPELINE_OWNERSHIP_RU.md)**
+— единственный активный план. Ветка `next07-feasibility-audit`, не `main`.
+Статус нового эксперимента: **PLANNED / NOT_RUN**.
+
+Порядок по решению пользователя от 2026-10-04:
+
+1. Реальный pinned Grounded 3.2.1 на исходном LeaseClient, затем минимальный
+   Grounded-подобный source-bound read candidate без LLM, с прежними guards и
+   полным DTO budget **800 tokens / 3 sources**.
+2. Только после локальной приёмки основы — existing source continuation и
+   focused lookup workflow, по одному; NO_CHANGE допустим, новые эвристики нет.
+
+План содержит I.0–I.6, II.1–II.2, allowed files, fixed initial algorithm,
+обязательные positives/negatives, protocol policy-delta, actual final packet,
+retention исторических 49 claim IDs, DONE / REJECTED / BLOCKED и stop rules.
+Не начинать с compiler/event-condition expansion. Не добавлять LLM/reranker.
+
+Read-policy candidate явно отличается от старой: unknown applicability сама
+по себе не запрещает исходный context, но не получает applicability/support
+credit. Source/security/identity/scope/version/freshness/snapshot/span/exact
+guards и сохранение условий обязательны с начала, а не добавляются «потом».
+Старые tests/frozen labels не переписывать ради результата. Намеренные policy
+различия фиксируются до кода; frozen acceptance и блокеры 06 не исчезают.
+
+Ни один G/C run новым планом не выполнен. Предыдущая реконструкция FTS LeaseClient
+в чате не является real Grounded capture. Эксперимент запускает пользователь.
+Эта запись не меняет runtime/defaults, не разрешает rollout и не закрывает 06.
+
+## История планов 01–07
+
 1. [01 — existing lookup для недостающей части](NEXT_01_LOOKUP_GAPS_RU.md).
 2. [02 — удаление одной конкурирующей admission-обязанности](NEXT_02_ADMISSION_SIMPLIFICATION_RU.md).
 3. [03 — инструкция focused lookup и завершение работы](NEXT_03_FOCUSED_LOOKUP_WORKFLOW_RU.md).
 4. [04 — приёмка текущей версии для выпуска](NEXT_04_PROD_CANDIDATE_EVALUATION_RU.md).
 5. [05 — исправление блокеров и завершение приёмки](NEXT_05_RELEASE_BLOCKERS_RU.md).
 6. [06 — тестовые контракты и оставшиеся блокеры](NEXT_06_TEST_CONTRACTS_AND_AGENT_ACCEPTANCE_RU.md).
-7. [07 — причины потери read context и одна проверяемая замена](NEXT_07_READ_PIPELINE_OWNERSHIP_RU.md).
+7. [07 — прежний scope/compiler trial и feasibility BLOCKED](NEXT_07_SCOPE_TRIAL_HISTORY_20261004_RU.md).
 
 01 завершён. 02 законсервирован: простое удаление gate отклонено (49 → 45 claims).
 03 завершён. Восстанавливать prod для приёмки не требуется.
 04 проверен в доступной части, BLOCKED: 49 claims сохранены, но required checks
 красные, tools/list превышает byte budget; реальные ответы агента не проверены.
-05: два локальных исправления и завершение проверок.
 05 выполнен частично, BLOCKED: footprint 6143 bytes, routing исправлен;
-128 offline failures, adversarial/question-surface gates и 0/8 ответов остаются.
+128 offline failures, adversarial/question-surface gates и 0/8 ответов оставались.
 06 сохраняет очередь решений по tests, gates и изолированному runner.
-06 не завершён: свежий полный offline rerun 6125 PASS / 93 FAIL / 10 SKIP,
+Его сохранённый полный offline rerun: 6125 PASS / 93 FAIL / 10 SKIP,
 новых failing nodes нет; 35 baseline nodes заменены passing checks без удаления
-tests и изменения runtime. Последующий focused trial: ledger 81 UNRESOLVED,
-4 KEEP_FIX_RUNTIME, 8 ENV_BLOCKED, 35 REWRITE; full rerun подтверждает 93 failures
-в первых трёх группах и отсутствие новых failing nodes вне baseline ledger.
-Native delivery кандидата отклонена (LeaseClient); миграция historical gates
-требует выяснения действующего parser/acceptance contract. Namespace isolation
-недоступна; восемь ответов проверены в чате (не isolated model run), полный
-per-node разбор ещё не выполнен. Подробные основания — в плане 06.
-49 → 45 относится только к отклонённой ablation, не к принятому runtime patch.
-07 — текущая попытка завершена **BLOCKED на 07.1**: existing grammar/consumer
-не поддерживают mandatory event-condition даже при заданном local binding.
-Read-only audit и 2 diagnostic tests выполнены; 07.2–07.5 NOT_RUN.
-Evidence и конечный verdict — в начале плана 07. Runtime не изменён.
-Цель — полезный bounded context с источниками, без обещания полного ответа.
-07 начат после `c49e5221`: baseline 74 PASS / 2 FAIL; 15 diagnostic calls.
-Пользователь согласовал узкое расширение condition scope в существующем compiler;
-следующий scope trial NOT_RUN, границы и критерии записаны в плане 07.
-Таблица scope examples и consumer audit выполнены: read-admission проверяет
-все conditions против каждого окна; COMPATIBILITY BLOCKED до нового candidate.
-Source applicability/read-context контракт B3 этим автоматически не реализован.
-Isolated compiler-preservation trial: native 5/7, candidate 6/7; REJECTED —
-expiration всё ещё прикреплён к default. Новый scope binding не реализован;
-production compiler/defaults не менялись, native delivery не исправлена.
-Не закрывает 06 и не разрешает unified replacement/rollout.
-Admission/selection research за пределами границ 07 автоматически не продолжать.
-Критерии DONE/BLOCKED/REJECTED находятся внутри.
-Результаты дописывать в соответствующий план, не создавать новый на каждый прогон.
-`AGENTS.md` обязателен. Актуальные опорные отчёты: `READ_GUARD_PATCH_RESULT_RU.md`,
-`EXACT_WINDOW_CONFLICT_RESULT_RU.md`, `ADMISSION_REMOVAL_DECISION_RU.md`,
-`ADMISSION_DIRECTION_REVIEW_RU.md`. Остальные материалы ниже — история, не очередь задач.
+tests и изменения runtime. Ledger: 81 UNRESOLVED, 4 KEEP_FIX_RUNTIME,
+8 ENV_BLOCKED, 35 REWRITE. Это исторические результаты, не свежий run плана 07.
+
+Native delivery прежнего кандидата отклонена (LeaseClient); миграция historical
+gates требует выяснения parser/acceptance contract. Namespace isolation была
+недоступна; восемь ответов проверены в чате, не isolated model run.
+49 → 45 относится к отклонённой ablation, не к принятому runtime patch.
+
+**Предыдущая попытка 07 окончательно BLOCKED на 07.1**: existing grammar/consumer
+не поддерживают mandatory event-condition даже при local binding. Diagnostic
+2 PASS проверяли blocker report, не recovery; 07.2–07.5 NOT_RUN.
+[JSON evidence](artifacts/next07/feasibility-audit-20261004.json) неизменён.
+Полный старый план скопирован в history byte-for-byte; прежний verdict сохранён.
+Preservation trial native 5/7 → candidate 6/7 остаётся REJECTED: expiration
+прикреплён к default. Не возобновлять этот маршрут автоматически.
+
+`AGENTS.md` обязателен. Новые результаты писать в существующий активный 07 и
+новый `artifacts/next07/grounded-first/<run-id>/`. Старые captures не перезаписывать.
+Не создавать отдельный план на каждый прогон. История не является implementation
+очередью и не отменяет нынешнюю границу эксперимента.
 
 ## Кандидаты на уборку (пока не удалены)
 
@@ -62,52 +82,43 @@ Admission/selection research за пределами границ 07 автом�
 
 Gate/experiment result отчёты — исторические свидетельства, не мусор:
 хранить в архиве при уборке. `EXECUTION_RU.md` — historical log, не текущий план.
-Не удалять `*.py`, `artifacts/`, `AGENTS.md` или `M2_GROUNDED_MECHANISM_CHECK_RU.md`
-вместе со старыми планами: есть test imports, provenance и ссылки на доказательства.
-Перед физическим удалением проверить references и поправить ссылки; snapshots
-сохранены в git. `experiments/crosslingual_relevance/` не относится к этой уборке.
+Не удалять `*.py`, `artifacts/`, `AGENTS.md`, history 07 или
+`M2_GROUNDED_MECHANISM_CHECK_RU.md` вместе со старыми планами: есть test imports,
+provenance и ссылки. Перед удалением проверить references; snapshots сохранить.
+`experiments/crosslingual_relevance/` не относится к этой уборке.
 
 ## Исторические материалы и опорные отчёты
 
-- [Один read decision: контракт до реализации](UNIFIED_READ_CONTRACT_RU.md).
-- [Пункт 5: реализация, native-inventory replay и границы результата](UNIFIED_READ_RESULT_RU.md).
-- [Обязательные правила против переусложнения](AGENTS.md).
-- [Что отбрасывается и где конкурируют read решения](ADMISSION_CONFLICT_AUDIT_RU.md).
-- [Exact-window сравнение: измеренные расхождения и граница удаления обязанностей](EXACT_WINDOW_CONFLICT_RESULT_RU.md).
-- [Решение: что удалять первым и что сохранять](ADMISSION_REMOVAL_DECISION_RU.md).
-- [Первый patch: read без proof qualification, native pipeline проверки](READ_GUARD_PATCH_RESULT_RU.md).
-
-- [Admission: Kotlin, Markdown, исследования и направление упрощения](ADMISSION_DIRECTION_REVIEW_RU.md).
-
-- [Typed compiler: реализация и результат paired owner/1500 replay](TYPED_CONSTRAINT_COMPILER_RESULT_RU.md).
-
-- [Temporal question vs condition: root cause и controls](TEMPORAL_CONDITION_REVIEW_RU.md).
-
-- [Исправленный isolated candidate: результат одного прогона 1500](CORRECTED_OWNER_1500_RESULT_RU.md).
-
-- [Subject / literal / condition / topic: уточнённый разбор](ADMISSION_LAYERS_REVIEW_RU.md).
-
-- [Текущий вывод: причины потерь](GROUNDED_LOSS_ATTRIBUTION_RU.md).
-- [Результаты budgets 800 / 1500 / 3000](GROUNDED_BUDGET_RESULT_RU.md).
-- [План budget эксперимента](M2_GROUNDED_BUDGET_EXPERIMENT_RU.md).
+- [Grounded 3.2.1: проверка механизма на mkdocs-05](M2_GROUNDED_MECHANISM_CHECK_RU.md).
+- [Один read decision: прежний isolated контракт](UNIFIED_READ_CONTRACT_RU.md).
+- [Его результат и границы](UNIFIED_READ_RESULT_RU.md).
+- [Правила против переусложнения](AGENTS.md).
+- [Конкурирующие read решения](ADMISSION_CONFLICT_AUDIT_RU.md).
+- [Exact-window сравнение](EXACT_WINDOW_CONFLICT_RESULT_RU.md).
+- [Прежнее решение по удалению обязанностей](ADMISSION_REMOVAL_DECISION_RU.md).
+- [Первый patch: read без proof qualification](READ_GUARD_PATCH_RESULT_RU.md).
+- [Admission: исследования и направление упрощения](ADMISSION_DIRECTION_REVIEW_RU.md).
+- [Typed compiler и paired owner/1500 replay](TYPED_CONSTRAINT_COMPILER_RESULT_RU.md).
+- [Temporal question vs condition](TEMPORAL_CONDITION_REVIEW_RU.md).
+- [Corrected isolated candidate 1500](CORRECTED_OWNER_1500_RESULT_RU.md).
+- [Subject / literal / condition / topic](ADMISSION_LAYERS_REVIEW_RU.md).
+- [Причины потерь](GROUNDED_LOSS_ATTRIBUTION_RU.md).
+- [Исторические budgets 800 / 1500 / 3000](GROUNDED_BUDGET_RESULT_RU.md).
+- [Прежний budget эксперимент](M2_GROUNDED_BUDGET_EXPERIMENT_RU.md).
 - [Исходный TDD-план 01–09](M2_MODEL_FREE_RETRIEVAL_TDD_RU.md).
-- [Execution status](EXECUTION_RU.md).
+- [Execution history](EXECUTION_RU.md).
 - [Сохранённые 01–04](ISOLATED_01_04_VALIDATION_RU.md).
 
-Статус: 01–04 сохранены изолированно, replacement не принят. Original-read изменён
+01–04 сохранены изолированно, replacement не принят. Original-read изменён
 в `152a4c7b`; rollout не выполнен. Старые заявления «production не менялся» относятся
 к соответствующим историческим исследованиям, не к текущему исходному коду.
-Исторические планы не являются разрешением на rollout.
 
 Research scripts: `grounded_budget_probe.py`, `grounded_loss_audit.py`.
-Tests остаются в `tests/docs/test_grounded_budget_probe.py`.
+Tests: `tests/docs/test_grounded_budget_probe.py`.
+JSON-результаты находятся в `artifacts/budget/` и `artifacts/loss-attribution/`.
+Они сохранены без изменения provenance/hash/path. Полные fixture DB, corpus
+copies и native observer captures остаются по внешнему пути из отчёта;
+наличие лишь summary не считать наличием полного исполняемого baseline.
 
-Сохранённые JSON-результаты находятся в `artifacts/budget/` и
-`artifacts/loss-attribution/`. Они скопированы без изменения из последнего полного
-прогона; исходные provenance/hash/path значения сохранены как исторические.
-Полные fixture DB, corpus copies и native baseline observer captures остаются
-по внешнему пути из отчёта: для повторного read-only audit нужен этот archive.
-Для нового исследования можно воспроизвести archive budget probe, не меняя runtime.
-
-Исторический Gate A prototype и прежние comparator scripts остаются в
-`roadmap/search-quality-2026-10-01/`; ссылки в документах исправлены.
+Исторический Gate A prototype и comparator scripts остаются в
+`roadmap/search-quality-2026-10-01/`. Они не подключаются к candidate автоматически.
