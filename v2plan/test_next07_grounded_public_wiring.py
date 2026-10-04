@@ -55,7 +55,7 @@ def setup(monkeypatch):
              'doc_scope': 'project', 'path': 'guide.md', 'snippet': 'original bytes'}]
     calls = []
 
-    def prepared(*args):
+    def prepared(*args, **kwargs):
         calls.append(args)
         return deepcopy(rows)
 
@@ -187,8 +187,9 @@ def test_next_request_cannot_reuse_previous_identity(setup):
 
 
 @pytest.mark.parametrize('arguments', [
-    {'scope': 'module'}, {'scope': 'all'}, {'scope': None},
-    {'scope': 'project', 'module_path': 'packages/other'},
+    {'scope': 'invalid'}, {'scope': 'project', 'module': 'legacy-name'},
+    {'scope': 'project', 'mode': 'deps-only'},
+    {'scope': 'project', 'library': 'external-library'},
     {'scope': 'project', 'lookup_queries': ('another request',)},
     {'scope': 'project', 'lifecycle_intent': 'historical'},
     {'scope': 'project', 'request_intent': 'change'},
@@ -197,7 +198,7 @@ def test_unsupported_scope_does_not_silently_run_project_preparation(setup, argu
     service, _, _, calls = setup
     trace = {}
     with wiring.installed(service, trace):
-        with pytest.raises(NotImplementedError, match='root-only'):
+        with pytest.raises(NotImplementedError, match='project-document'):
             service.get_project_context('/repo', 'question', **arguments)
     assert not calls
     assert not service.calls

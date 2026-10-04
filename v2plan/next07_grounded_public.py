@@ -24,7 +24,7 @@ from docmancer.docs.application.model_visible_projection_helpers import docs_con
 from docmancer.docs.interfaces.mcp import context_tools
 
 
-def prepared(service, root, question, trace):
+def prepared(service, root, question, trace, *, scope='project', module_path=None):
     original = SourceReferenceContext.prepare
     inventory, bound = {}, {}
 
@@ -42,8 +42,15 @@ def prepared(service, root, question, trace):
             bound[chunk.source] = context, chunk, args, kwargs
         return result
 
+    # get_project_docs owns public scope normalization: 'all' becomes no
+    # doc_scope filter, and module_path is resolved against the current catalog.
+    # Passing scope='all' straight to query_project_docs would search for rows
+    # literally tagged 'all'. Do not duplicate that normalization here.
+    source_arguments = {'scope': scope, 'module_path': module_path}
+    trace['source_request'] = deepcopy(source_arguments)
     with patch.object(SourceReferenceContext, 'prepare', observe):
-        service.query_project_docs(root, question, scope='project')
+        discovery = service.get_project_docs(root, question, **source_arguments)
+    trace['discovery_result'] = asdict(discovery)
     ranked, omissions = proposals(list(inventory.values()), question)
     trace.update(input=list(inventory.values()), proposed=ranked, omissions=omissions)
     lookup = {d['identity']: key for key, d in inventory.items()}
@@ -54,7 +61,7 @@ def prepared(service, root, question, trace):
             **chunk.metadata, 'char_span': [row['start'], row['end']]}})
         rebound.extend(original(context, [unit], *args, **kwargs))
     with patch.object(service.project_docs, 'query_project_docs', return_value=rebound):
-        result = service.get_project_docs(root, question, scope='project')
+        result = service.get_project_docs(root, question, **source_arguments)
     trace['current_catalog_result'] = asdict(result)
     rows = project_context_pack(question=question, project_docs=result, dependency_docs=None)
     return [{**row, 'snippet': row['display_text'],
@@ -145,18 +152,20 @@ def _replace_context_pack(result, rows):
 
 
 def _check_supported_request(arguments):
-    """This existing harness prepares root-only, current project documentation.
+    """Check this research adapter's envelope, not a document's eligibility.
 
-    Do not silently widen a module request with prepared(scope='project'), or
-    drop explicit lookup/lifecycle semantics. These routes need separate wiring;
-    failure here is NOT successful source-guard or native acceptance evidence.
+    Scope semantics belong to get_project_docs. Preserve public all/project/
+    module_path requests; do not infer a sibling path or drop a restriction.
+    Unimplemented assisted/historical/change lanes still fail explicitly.
     """
-    if (arguments.get('scope') != 'project'
-            or arguments.get('module') or arguments.get('module_path')
+    if (arguments.get('scope') not in (None, 'project', 'module', 'all')
+            or arguments.get('module')
             or arguments.get('lookup_queries')
             or arguments.get('lifecycle_intent') not in (None, 'current')
-            or arguments.get('request_intent') not in (None, 'read')):
-        raise NotImplementedError('I.4 wiring requires an explicit root-only current project read')
+            or arguments.get('request_intent') not in (None, 'read')
+            or arguments.get('mode') not in (None, 'auto', 'project-only')
+            or arguments.get('library') or arguments.get('libraries')):
+        raise NotImplementedError('research wiring supports current project-document reads only')
 
 
 @contextmanager
@@ -177,7 +186,8 @@ def installed(service, trace, *, delivery_limits=None):
             _check_supported_request(kwargs)
             result = native_context(project_path, question, **kwargs)
             root = project_path
-            rows = prepared(service, root, question, trace)
+            rows = prepared(service, root, question, trace,
+                scope=kwargs.get('scope'), module_path=kwargs.get('module_path'))
             request.update(question=question,
                 identity=rows[0]['project_identity'] if rows else None)
             trace['native_orchestration'] = asdict(result) if is_dataclass(result) else repr(result)
@@ -194,7 +204,6 @@ def installed(service, trace, *, delivery_limits=None):
         try:
             return native_unified(*args, **kwargs)
         except Exception as exc:
-            # Capture before the MCP dispatcher sanitizes handler exceptions.
             _record_exception(trace, 'unified_context', exc)
             raise
 
