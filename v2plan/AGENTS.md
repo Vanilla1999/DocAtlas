@@ -1,5 +1,20 @@
 # Research: обязательная граница упрощения
 
+## Восстановление scope и диагностики без локального 3026969d
+
+Пользователь разрешил заново восстановить недостающий код на опубликованной
+ветке. Текущая проводка передаёт project/all/module_path через штатный
+get_project_docs, а не эмулирует low-level scope filters. Новый corpus runner
+`next07_diagnostic_scope` исполняет все 80 N/C пар и использует existing assessor.
+Это не восстановление потерянных artifacts 3026969d и не новый semantic fix.
+
+Для этой отдельной диагностики quality failures не останавливают остальные
+случаи. Case-local invalid сохраняется отдельно при восстановленной изоляции;
+повреждение изоляции/замороженных inputs останавливает замер. Native scope smoke
+и corpus replay ещё требуют полного project environment. Код алгоритма,
+first_fit, source guards и старые frozen labels неизменны; N10 остаётся REJECTED.
+Отчёт: [scope rebuild](artifacts/next07/scope-rebuild-ef6a4980/SUMMARY_RU.md).
+
 ## Уточнение 2026-10-04: compact-read после решения пользователя
 
 Пользователь снял фиксированный бюджет 800 tokens / 3 sources для новой версии

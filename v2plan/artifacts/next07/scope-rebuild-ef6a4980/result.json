@@ -1,0 +1,53 @@
+{
+  "base": "ef6a498046039f6e615f1928dd6539f046b327ab",
+  "missing_local_commit_required": false,
+  "local_contract_tests": {
+    "passed": 120,
+    "failed": 0,
+    "compact_contracts": 60,
+    "wiring_contracts": 26,
+    "new_scope_contracts": 21,
+    "new_diagnostic_contracts": 13
+  },
+  "test_mode": "dependency-isolated; service/preparation/packing spies; synthetic 80-case loop; no native MCP calls",
+  "candidate_unchanged_sha256": "5ac8e2600a12d216070087a50c9ddc64c8efaaff2f399d70e2b345db0bf71ff7",
+  "first_fit_ast_unchanged": true,
+  "production_changes": false,
+  "native_scope_tests": "NOT_RUN (5 added)",
+  "native_LeaseClient": "NOT_RUN",
+  "paired_80_native": "NOT_RUN",
+  "historical_49_retention": "NOT_RUN",
+  "historical_partial_retention": "NOT_RUN",
+  "candidate_verdict": "REJECTED_N10_UNCHANGED",
+  "rollout": "NOT_AUTHORIZED",
+  "files": {
+    "v2plan/next07_grounded_public.py": {
+      "sha256": "1b4ab774766942a1a290e0ec03115e13ff74fa555a7f8bd40c936e0022965ba0",
+      "git_blob": "d967139e48d2b9fe456b5edc46b1f6cd61c3e8c8"
+    },
+    "v2plan/test_next07_grounded_public_wiring.py": {
+      "sha256": "3506aa3fb2240d39d62e026feed40a532ebd07b3a0d82cf9dca88327c5c0d3c1",
+      "git_blob": "8e946afadd2b5ecca40714cfda28cfd3f8b6242f"
+    },
+    "v2plan/test_next07_scope_rebuild.py": {
+      "sha256": "23dc3d1a8db588a52f59402ce181c1771c66d917774af5563506451561d11cfe",
+      "git_blob": "ad447baef4859c1db50d5616c6b3d5b566e9de1b"
+    },
+    "v2plan/test_next07_scope_native.py": {
+      "sha256": "3e1b9f2813a293b05290ae80f9675fa92dd21b166f687d36d9308d3e96111b86",
+      "git_blob": "ec801fad41de27c86b38ac8c0f926b705a5ac828"
+    },
+    "v2plan/next07_diagnostic_scope.py": {
+      "sha256": "3e85e1fe3ab2c0744a79b60a72f8e5a2d3494447eae0c9d2a5f48d602fb745bc",
+      "git_blob": "1021be52a7a80118b43350c7b2efafeccdf91237"
+    },
+    "v2plan/test_next07_diagnostic_runner.py": {
+      "sha256": "56a315682035c62cebb1281bc758ecae893f6dee7d3c954a724da0be31998f15",
+      "git_blob": "ce8d0fb2b7a647482cda43a3e02ccbdbbbd27fa5"
+    },
+    "v2plan/AGENTS.md": {
+      "sha256": "e8ce9b8eaae937f6493dc212b888ed8ca912ed7d8bc425de591b478d0c885169",
+      "git_blob": "869586c8d65fb042020795ad2638ad77733152d6"
+    }
+  }
+}
