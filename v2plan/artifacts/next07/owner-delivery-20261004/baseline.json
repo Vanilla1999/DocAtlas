@@ -1,0 +1,19 @@
+{
+  "baseline": "ea7eef380eb2b0a11b0216063939b2b8ae1773de",
+  "run_id": 37231552540,
+  "artifact_id": 11314256764,
+  "artifact_sha256": "3c963d4579149a73a76c7ca16a7d93ba84d50f3402cb47799f0fe38bbf19fe7d",
+  "candidate_supported_ids": [
+    ["fastapi-01", "required"], ["fastapi-06", "required"], ["fastapi-07", "required"],
+    ["httpx-01", "required"], ["httpx-02", "required"], ["httpx-03", "required"],
+    ["httpx-04", "required"], ["httpx-05", "required"], ["httpx-06", "required"], ["httpx-07", "required"],
+    ["pydantic-06", "required"], ["ruff-01", "required"], ["ruff-02", "required"],
+    ["ruff-03", "required"], ["ruff-04", "required"], ["ruff-05", "required"], ["ruff-07", "required"],
+    ["starlette-05", "required"], ["typer-01", "required"], ["typer-02", "required"],
+    ["typer-03", "required"], ["typer-04", "required"], ["typer-05", "required"],
+    ["typer-06", "required"], ["typer-07", "required"], ["uv-06", "required"]
+  ],
+  "fresh_counts": {"retained": 23, "lost": 27, "gained": 3},
+  "historical_counts": {"retained": 22, "lost": 15, "UNKNOWN": 12},
+  "N10": "historical REJECTED; excluded from next owner-delivery run by user"
+}

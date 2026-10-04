@@ -1,0 +1,125 @@
+name: Next07 reviewed owner delivery (no N10)
+
+on:
+  push:
+    branches: [next07-feasibility-audit]
+    paths:
+      - '.github/workflows/next07-owner-delivery.yml'
+
+permissions:
+  contents: read
+
+env:
+  DOCATLAS_OFFLINE: '1'
+  DOCATLAS_AUTO_VECTORS: '0'
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: 'true'
+
+jobs:
+  owner-evidence:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1
+        with:
+          python-version: '3.12'
+      - name: Verify reviewed code and closed responsibilities
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/owner-evidence"
+          git rev-parse HEAD > "$RUNNER_TEMP/owner-evidence/head.txt"
+          git diff --exit-code ea7eef380eb2b0a11b0216063939b2b8ae1773de HEAD -- docmancer eval tests v2plan/third_party v2plan/next07_grounded_public.py v2plan/next07_diagnostic_scope.py
+          test -f v2plan/artifacts/next07/owner-delivery-20261004/REVIEW_RU.md
+          python - <<'PY'
+          import hashlib
+          from pathlib import Path
+          expected = {
+              'v2plan/next07_owner_delivery.py': '8950a4c4cc7d7f5b5e4a42c96825edd5dd57e124bbd40c04ebac4c1b3448fe63',
+              'v2plan/next07_grounded_candidate.py': '19ba718c15da60a2dcdff42f1a3796136d50b6fa3d554407bc0cfdc94daf90d3',
+              'v2plan/test_next07_owner_delivery.py': 'f937d6b5192595c1bfc1f8d0cc0a43f7c34412ce4036872328b452e76f6a4690',
+          }
+          for name, digest in expected.items():
+              assert hashlib.sha256(Path(name).read_bytes()).hexdigest() == digest, name
+          PY
+      - name: Install complete project environment
+        run: |
+          python -m pip install -e '.[dev]' > "$RUNNER_TEMP/owner-evidence/pip-install.log" 2>&1
+          python -m pip freeze > "$RUNNER_TEMP/owner-evidence/pip-freeze.txt"
+      - name: Structural and unchanged source/wiring regression (no N10 module)
+        shell: bash
+        run: |
+          set +e
+          python -m pytest -q \
+            v2plan/test_next07_owner_delivery.py \
+            v2plan/test_next07_grounded_first.py \
+            v2plan/test_next07_compact_delivery.py \
+            v2plan/test_next07_grounded_public_wiring.py \
+            v2plan/test_next07_scope_rebuild.py \
+            v2plan/test_next07_diagnostic_runner.py \
+            v2plan/test_next07_scope_native.py \
+            --junitxml="$RUNNER_TEMP/owner-evidence/tests.xml" \
+            > "$RUNNER_TEMP/owner-evidence/tests.log" 2>&1
+          rc=$?
+          echo "$rc" > "$RUNNER_TEMP/owner-evidence/tests-exit.txt"
+          exit "$rc"
+      - name: Real compact LeaseClient P1 P2 P3
+        shell: bash
+        run: |
+          set +e
+          python -m v2plan.next07_grounded_final_run --compact-read \
+            --out "$RUNNER_TEMP/owner-evidence/target" \
+            > "$RUNNER_TEMP/owner-evidence/target.log" 2>&1
+          rc=$?
+          echo "$rc" > "$RUNNER_TEMP/owner-evidence/target-exit.txt"
+          exit "$rc"
+      - name: Unchanged 80-pair corpus (N10 standalone not invoked)
+        shell: bash
+        run: |
+          set +e
+          python -m v2plan.next07_diagnostic_scope --compact-read \
+            --out "$RUNNER_TEMP/owner-evidence/corpus-replay" \
+            > "$RUNNER_TEMP/owner-evidence/corpus.log" 2>&1
+          rc=$?
+          echo "$rc" > "$RUNNER_TEMP/owner-evidence/corpus-exit.txt"
+          exit "$rc"
+      - name: Record results without promoting general acceptance
+        if: always()
+        shell: bash
+        run: |
+          python - <<'PY'
+          import json, os
+          from pathlib import Path
+          root = Path(os.environ['RUNNER_TEMP']) / 'owner-evidence'
+          root.mkdir(parents=True, exist_ok=True)
+          def load(name):
+              p = root / name
+              return json.loads(p.read_text()) if p.exists() else None
+          result = {'N10': 'EXCLUDED_BY_USER_NOT_RUN', 'rollout': 'NOT_AUTHORIZED',
+                    'target': load('target/result.json'), 'corpus': load('corpus-replay/result.json')}
+          for key in ['tests', 'target', 'corpus']:
+              p = root / (key + '-exit.txt')
+              result[key + '_exit'] = int(p.read_text()) if p.exists() else None
+          corpus = result['corpus']
+          baseline = json.loads(Path('v2plan/artifacts/next07/owner-delivery-20261004/baseline.json').read_text())
+          if corpus and corpus.get('valid_pairs') == 80:
+              fresh = corpus['fresh_assessor_only']
+              current = {tuple(x) for x in fresh['retained'] + fresh['gained']}
+              previous = {tuple(x) for x in baseline['candidate_supported_ids']}
+              result['lost_previous_C_ids'] = sorted(previous - current)
+              result['gained_previous_C_ids'] = sorted(current - previous)
+              result['baseline_comparison'] = 'assessor matches; require clean source audits separately'
+          (root / 'summary.json').write_text(json.dumps(result, ensure_ascii=False, indent=2) + '\n')
+          print(json.dumps({k: v for k, v in result.items() if k not in ('corpus', 'target')}, indent=2))
+          PY
+      - name: Preserve complete raw evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: next07-owner-delivery-${{ github.sha }}
+          path: ${{ runner.temp }}/owner-evidence/
+          include-hidden-files: true
+          if-no-files-found: error
+          retention-days: 14
