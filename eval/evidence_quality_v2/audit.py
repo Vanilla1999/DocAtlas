@@ -1,6 +1,7 @@
 """Existing canonical payload audit, independent of labels and semantic review."""
 from __future__ import annotations
 from pathlib import Path
+from docmancer.docs.domain.source_coordinates import source_line_text
 
 
 def audit_payload(payload: dict, snapshot: dict, root: Path) -> list[str]:
@@ -11,13 +12,16 @@ def audit_payload(payload: dict, snapshot: dict, root: Path) -> list[str]:
         if not path.is_relative_to(root.resolve()) or not path.is_file():
             errors.append('source escapes the isolated corpus')
             continue
-        text = path.read_text(encoding='utf-8')
+        text = path.read_bytes().decode('utf-8')
         start, end = source.get('line_start'), source.get('line_end')
         snippet = str(source.get('snippet') or '')
-        if type(start) is not int or type(end) is not int or start < 1 or end < start:
+        try:
+            claimed_text = source_line_text(text, start, end)
+        except ValueError:
             errors.append('invalid source line range')
-        elif snippet not in '\n'.join(text.splitlines()[start-1:end]):
-            errors.append('source span does not occur inside claimed line range')
+        else:
+            if snippet not in claimed_text:
+                errors.append('source span does not occur inside claimed line range')
         if not snippet or snippet not in text:
             errors.append('noncontiguous or nonexistent source snippet')
         if payload.get('kind') == 'docs_context' and any(payload.get(k) is not False for k in ('answer_supported','answer_available','edit_ready')):
