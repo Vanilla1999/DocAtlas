@@ -26,6 +26,7 @@ from docmancer.docs.application.evidence_selection import (
 )
 from docmancer.docs.domain.answer_units import materialize_answer_units
 from docmancer.docs.domain.context_budget import PROJECT_CONTEXT_BUDGET
+from docmancer.docs.domain.read_delivery_limits import current_read_delivery_limits
 from docmancer.docs.application.insufficient_projection import (
     apply_terminal_insufficient_projection,
     bounded_missing_value,
@@ -660,18 +661,24 @@ def validate_model_visible_projection(
         errors.append("invalid projection kind")
     if status not in {"ok", "truncated", "insufficient_evidence"}:
         errors.append("invalid projection status")
+    # The caller's explicit read-output policy is shared by packing and this
+    # final validator. Never read a policy/approval from the payload or source.
+    read_limits = current_read_delivery_limits() if kind == "docs_context" else None
+    token_limit = read_limits.max_tokens if read_limits is not None else max_tokens
     limit = (
-        min(INSUFFICIENT_EVIDENCE_MAX_TOKENS, max_tokens)
+        min(INSUFFICIENT_EVIDENCE_MAX_TOKENS,
+            token_limit if token_limit is not None else INSUFFICIENT_EVIDENCE_MAX_TOKENS)
         if status == "insufficient_evidence"
-        else max_tokens
+        else token_limit
     )
     actual = estimate_projection_tokens(payload)
-    if payload.get("estimated_tokens") != actual or actual > limit:
+    if payload.get("estimated_tokens") != actual or (limit is not None and actual > limit):
         errors.append("projection estimate mismatch or budget exceeded")
     if (
         kind == "docs_context"
         and status in {"ok", "truncated"}
-        and docs_context_budget_tokens(payload) > max_tokens
+        and token_limit is not None
+        and docs_context_budget_tokens(payload) > token_limit
     ):
         errors.append("docs_context conservative budget exceeded")
     if status == "insufficient_evidence":
@@ -715,7 +722,9 @@ def validate_model_visible_projection(
     if not isinstance(sources, list) or not sources:
         errors.append("successful projections require sources")
         return errors
-    if kind in {"docs_answer", "docs_context"} and len(sources) > MAX_DOCS_SOURCES:
+    source_limit = read_limits.max_sources if read_limits is not None else MAX_DOCS_SOURCES
+    if (kind in {"docs_answer", "docs_context"} and source_limit is not None
+            and len(sources) > source_limit):
         errors.append(f"{kind} exceeds source limit")
     ids: set[str] = set()
     allowed_fields = (
@@ -845,6 +854,7 @@ def _docs_candidates(retrieval: dict[str, Any]) -> list[dict[str, Any]]:
 def _docs_source(
     item: dict[str, Any], *, evidence_id: str | None = None,
     display_snippet: str | None = None,
+    max_snippet_chars: int | None = 3_000,
 ) -> dict[str, Any] | None:
     path = str(item.get("source_url") or item.get("url") or item.get("path") or item.get("source") or "").strip()
     section = str(item.get("heading_path") or item.get("title") or "document").strip()
@@ -858,7 +868,8 @@ def _docs_source(
     version = str(item.get("version_binding") or item.get("version") or item.get("requested_version") or "unversioned")
     if (
         not path or not snippet or len(path) > 500 or len(section) > 300
-        or len(snippet) > 3_000 or len(version) > 100
+        or (max_snippet_chars is not None and len(snippet) > max_snippet_chars)
+        or len(version) > 100
     ):
         return None
     digest = _source_digest(item)

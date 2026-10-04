@@ -1,0 +1,24 @@
+{
+  "baseline": "5a60ba404b9b296736880769f7e89c5ac8ccc982",
+  "unavailable_local_commit": "3026969d",
+  "changes": [
+    "empty read-result contract",
+    "newline-preserving source audit",
+    "explicit caller-owned optional output limits for isolated docs_context"
+  ],
+  "unchanged": [
+    "candidate/read_decision",
+    "FTS/ranking/ports",
+    "source/security guards",
+    "owner preservation",
+    "old evidence/labels",
+    "production defaults",
+    "proof/edit budgets"
+  ],
+  "compact_policy": {
+    "max_tokens": null,
+    "max_sources": null,
+    "max_snippet_chars": null
+  },
+  "not_a_claim": "No native replay, retention or N10 recovery until actually measured."
+}

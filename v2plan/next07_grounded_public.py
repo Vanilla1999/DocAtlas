@@ -10,6 +10,10 @@ from pathlib import Path
 from unittest.mock import patch
 
 from v2plan.next07_grounded_candidate import proposals, read_decision
+from docmancer.docs.domain.read_delivery_limits import (
+    current_read_delivery_limits, use_read_delivery_limits,
+)
+from docmancer.docs.domain.source_coordinates import source_line_range
 from docmancer.docs.application.source_reference_evidence import SourceReferenceContext
 from docmancer.docs.application._project_context_service_shared import project_context_pack
 from docmancer.docs.application._docs_context_payload import _payload
@@ -58,7 +62,13 @@ def prepared(service, root, question, trace):
 
 
 def first_fit(rows, question, identity, trace, max_tokens=800):
+    limits = current_read_delivery_limits()
+    token_limit = limits.max_tokens if limits is not None else min(800, max_tokens)
+    source_limit = limits.max_sources if limits is not None else 3
+    snippet_limit = limits.max_snippet_chars if limits is not None else 3_000
     sources, snapshot, spans = [], {}, []
+    trace['delivery_limits'] = dict(max_tokens=token_limit, max_sources=source_limit,
+                                    max_snippet_chars=snippet_limit)
     trace['decisions'] = []
     for row in rows:
         decision = read_decision(row, question=question, expected_project_identity=identity)
@@ -74,7 +84,22 @@ def first_fit(rows, question, identity, trace, max_tokens=800):
         if any(k == key and a <= start and end <= b for k, a, b in spans):
             event['stage'] = 'duplicate_contained'
             continue
-        visible = _docs_source(row, display_snippet=row['snippet'])
+        # Verify coordinates against the original slice, not a text search.
+        # Do not repair a mutated line range to make it pass.
+        raw = row['_reference_evidence']['raw_document']
+        actual_lines = source_line_range(raw, start, end)
+        if (raw[start:end] != row['snippet']
+                or actual_lines != (row['line_start'], row['line_end'])):
+            event['stage'] = 'invalid_source'
+            event['reason'] = 'source_coordinate_mismatch'
+            continue
+        source_kwargs = {} if limits is None else {'max_snippet_chars': snippet_limit}
+        if limits is not None:
+            # Equal text at different original offsets is not the same citation.
+            citation = json.dumps({'source': source_identity, 'span': [start, end]},
+                                  ensure_ascii=False, sort_keys=True, separators=(',', ':'))
+            source_kwargs['evidence_id'] = 'ev-' + hashlib.sha256(citation.encode()).hexdigest()[:16]
+        visible = _docs_source(row, display_snippet=row['snippet'], **source_kwargs)
         if visible is None:
             event['stage'] = 'invalid_source'
             continue
@@ -85,7 +110,8 @@ def first_fit(rows, question, identity, trace, max_tokens=800):
         packet = _payload(sources + [visible])
         cost = docs_context_budget_tokens(packet)
         event['whole_dto_cost'] = cost
-        if len(sources) >= 3 or cost > min(800, max_tokens):
+        if ((source_limit is not None and len(sources) >= source_limit)
+                or (token_limit is not None and cost > token_limit)):
             event['stage'] = 'budget_omission'
             continue
         event['stage'] = 'selected'
@@ -134,7 +160,7 @@ def _check_supported_request(arguments):
 
 
 @contextmanager
-def installed(service, trace):
+def installed(service, trace, *, delivery_limits=None):
     """Typed research wiring; handler/source guards/validation remain native."""
     native_context = service.get_project_context
     native_projection = context_tools.project_docs_context
@@ -195,6 +221,9 @@ def installed(service, trace):
         trace.setdefault('handler_validation', []).append({
             'errors': list(errors), 'max_tokens': kwargs.get('max_tokens'),
         })
+        # Final handler snapshot, after any capability binding. Offline audit
+        # must not use an earlier snapshot with different source_uri fields.
+        trace['final_snapshot'] = deepcopy(kwargs.get('snapshot') or {})
         return errors
 
     trace['origins'] = dict(context=str(native_context), projection=str(native_projection),
@@ -203,6 +232,8 @@ def installed(service, trace):
     trace['restored'] = False
     try:
         with ExitStack() as stack:
+            if delivery_limits is not None:
+                stack.enter_context(use_read_delivery_limits(delivery_limits))
             stack.enter_context(patch.object(service, 'get_project_context', context))
             stack.enter_context(patch.object(app, 'get_docs_context', unified))
             stack.enter_context(patch.object(context_tools, 'project_docs_context', projection))

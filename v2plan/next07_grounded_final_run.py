@@ -1,5 +1,7 @@
 """One I.4 public-boundary measurement; no retries or algorithm changes."""
 import hashlib
+from dataclasses import asdict
+from docmancer.docs.domain.read_delivery_limits import COMPACT_READ_LIMITS
 import json
 import os
 from pathlib import Path
@@ -17,7 +19,8 @@ def _save(path, data):
     path.write_text(json.dumps(data, ensure_ascii=False, indent=2, default=str) + '\n')
 
 
-def _assess_capture(capture, trace, documents, value, error, *, partial=False):
+def _assess_capture(capture, trace, documents, value, error, *, partial=False,
+                    delivery_limits=None):
     """Check the returned MCP bytes, not just the pre-handler packer trace."""
     payload = (capture or {}).get('public_payload') or {}
     sources = payload.get('sources') or []
@@ -45,6 +48,14 @@ def _assess_capture(capture, trace, documents, value, error, *, partial=False):
             s.get('path_or_url') == 'default.md' and '# LeaseClient' in s.get('snippet', '')
             and f'The default timeout is {value} seconds.' in s.get('snippet', '') for s in sources),
     }
+    if delivery_limits is not None:
+        # A named new policy, never a relabel of the historical 800/3 trial.
+        checks.pop('whole_dto_800')
+        checks.pop('source_cap_3')
+        checks['caller_token_limit'] = cost is not None and (
+            delivery_limits.max_tokens is None or cost <= delivery_limits.max_tokens)
+        checks['caller_source_limit'] = bool(sources) and (
+            delivery_limits.max_sources is None or len(sources) <= delivery_limits.max_sources)
     if partial:
         checks['missing_exception_not_fabricated'] = error not in visible and all(
             s.get('path_or_url') != 'error.md' for s in sources)
@@ -66,7 +77,11 @@ def main():
     import argparse
     parser = argparse.ArgumentParser()
     parser.add_argument('--out', type=Path, required=True)
-    out = parser.parse_args().out.resolve()
+    parser.add_argument('--compact-read', action='store_true',
+        help='Explicit new read policy: no fixed token/source/snippet-size caps; no rollout.')
+    args = parser.parse_args()
+    delivery_limits = COMPACT_READ_LIMITS if args.compact_read else None
+    out = args.out.resolve()
     out.mkdir(parents=True, exist_ok=False)
     os.environ['DOCATLAS_OFFLINE'] = '1'
     _save(out / 'run.json', {
@@ -75,6 +90,8 @@ def main():
         'code_sha256': {name: hashlib.sha256(Path(__file__).with_name(name).read_bytes()).hexdigest()
             for name in ('next07_grounded_candidate.py', 'next07_grounded_public.py',
                          'next07_grounded_final_run.py')},
+        'read_delivery_policy': asdict(delivery_limits) if delivery_limits is not None else 'legacy_800_3',
+        'previous_candidate_verdict': 'REJECTED_N10_UNCHANGED',
         'automatic_retries': 0, 'retention_and_full_suite': 'NOT_RUN by this target-local runner',
     })
     fixtures = fixture_inputs(ROOT)
@@ -96,24 +113,35 @@ def main():
                 index_project(service, config, root)
                 request = dict(project_path=str(root), question=question, scope='project')
                 native = capture_public_call(service, request)
-                with installed(service, trace):
+                with installed(service, trace, delivery_limits=delivery_limits):
                     candidate = capture_public_call(service, request)
         except Exception as exc:
             _record_exception(trace, 'runner', exc)
         finally:
             for filename, data in [('N', native), ('C', candidate), ('trace', trace)]:
                 _save(p / (filename + '.json'), data)
-        result = _assess_capture(candidate, trace, docs, value, error, partial=partial)
+        result = _assess_capture(candidate, trace, docs, value, error, partial=partial,
+                                 delivery_limits=delivery_limits)
+        if delivery_limits is not None and candidate is not None and result['valid']:
+            from eval.evidence_quality_v2.audit import audit_payload
+            audit_errors = audit_payload(candidate['public_payload'],
+                trace.get('final_snapshot') or {}, root, delivery_limits=delivery_limits)
+            result['source_audit_errors'] = audit_errors
+            result['checks']['source_audit_clean'] = not audit_errors
+            result['passed'] = result['passed'] and not audit_errors
         results.append(dict(case=name, **result))
         if not result['passed']:
             break
     verdict = 'VALIDATED_LOCAL_I4' if len(results) == 3 and all(r['passed'] for r in results) else (
         'REJECTED' if results and results[-1]['valid'] else 'BLOCKED_INVALID')
+    if delivery_limits is not None and verdict == 'VALIDATED_LOCAL_I4':
+        verdict = 'VALIDATED_LOCAL_COMPACT_TARGET'
     summary = dict(verdict=verdict, cases=results, I5='NOT_RUN', I6='NOT_RUN',
+        previous_candidate_verdict='REJECTED_N10_UNCHANGED',
         rollout='NOT_AUTHORIZED')
     _save(out / 'result.json', summary)
     print(json.dumps(summary, ensure_ascii=False, indent=2))
-    return 0 if verdict == 'VALIDATED_LOCAL_I4' else 1 if verdict == 'REJECTED' else 2
+    return 0 if verdict in {'VALIDATED_LOCAL_I4', 'VALIDATED_LOCAL_COMPACT_TARGET'} else 1 if verdict == 'REJECTED' else 2
 
 
 if __name__ == '__main__':

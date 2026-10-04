@@ -1,12 +1,17 @@
 """Existing canonical payload audit, independent of labels and semantic review."""
 from __future__ import annotations
 from pathlib import Path
+from contextlib import nullcontext
+from docmancer.docs.domain.read_delivery_limits import ReadDeliveryLimits, use_read_delivery_limits
 from docmancer.docs.domain.source_coordinates import source_line_text
 
 
-def audit_payload(payload: dict, snapshot: dict, root: Path) -> list[str]:
+def audit_payload(payload: dict, snapshot: dict, root: Path, *,
+                  delivery_limits: ReadDeliveryLimits | None = None) -> list[str]:
     from docmancer.docs.application.model_visible_projection import validate_model_visible_projection
-    errors = validate_model_visible_projection(payload, snapshot=snapshot, max_tokens=800)
+    # The manifest/caller selects the policy; payload fields cannot relax it.
+    with use_read_delivery_limits(delivery_limits) if delivery_limits is not None else nullcontext():
+        errors = validate_model_visible_projection(payload, snapshot=snapshot, max_tokens=800)
     for source in payload.get('sources') or []:
         path = (root / str(source.get('path_or_url') or '')).resolve()
         if not path.is_relative_to(root.resolve()) or not path.is_file():

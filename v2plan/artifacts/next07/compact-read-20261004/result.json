@@ -1,0 +1,61 @@
+{
+  "baseline": "5a60ba404b9b296736880769f7e89c5ac8ccc982",
+  "unavailable_commit": "3026969d",
+  "mode": "dependency-isolated; not native acceptance",
+  "passed": 86,
+  "new_tests": 60,
+  "existing_wiring_tests": 26,
+  "red": {
+    "failed": 7,
+    "passed": 1,
+    "kind": "old empty DTO / newline audit regressions"
+  },
+  "execution_limits": [
+    "No full checkout: GitHub DNS failed in executable container.",
+    "Exact validator/payload/first_fit code executed via dependency-isolated loader.",
+    "Packing read_decision is an explicit test spy, not an eligibility certificate.",
+    "Token cost uses UTF-8 byte lower bound; pinned codec unavailable.",
+    "Nontrivial coverage and proof/assignment paths not exercised."
+  ],
+  "candidate_sha256": "5ac8e2600a12d216070087a50c9ddc64c8efaaff2f399d70e2b345db0bf71ff7",
+  "candidate_unchanged": true,
+  "native_MCP": "NOT_RUN",
+  "paired_80": "NOT_RUN",
+  "historical_49": "NOT_RUN",
+  "N10": "NOT_FIXED; old REJECTED unchanged",
+  "rollout": "NOT_AUTHORIZED",
+  "files": {
+    "docmancer/docs/application/_docs_context_payload.py": {
+      "sha256": "ed9950c5f99a8dbc19e1f743987b50735a8c158cf7459462614e9dfb833e96d8",
+      "git_blob": "02b30f8f0c16d9abcb6771725e0b2cfc6f83bb4b"
+    },
+    "docmancer/docs/application/model_visible_projection.py": {
+      "sha256": "e9bd4ed2681dc678f85d49c673928c9b8d898d73d9620d7b7cdabda6dbf832a4",
+      "git_blob": "a1314bb68bc69196480f51003fe15cd272277a9a"
+    },
+    "docmancer/docs/domain/source_coordinates.py": {
+      "sha256": "52e49495ab2a1aae7205b1123b28ce24bec3d95937de126ca414ddf3280d03f3",
+      "git_blob": "52e39538fe67734bfb477d6a7384598ea3db573b"
+    },
+    "docmancer/docs/domain/read_delivery_limits.py": {
+      "sha256": "7565e02a7139a178d86805e12c98836bcb8b60bce6ea82cb3866616984c12699",
+      "git_blob": "0f25478423ffdbfd82fec40f9385fbc3763297b3"
+    },
+    "eval/evidence_quality_v2/audit.py": {
+      "sha256": "005d71ee596f3711d5f6455c284b0813ca31cf14b1d018a3f39adf22ea4690c4",
+      "git_blob": "0224db0be57cfa630039adb01ae9c8fe07aeb7bf"
+    },
+    "v2plan/next07_grounded_public.py": {
+      "sha256": "38887eb2f4c3128a05a5955423b810950c671df88727174b878c235e6403dc4a",
+      "git_blob": "a01cad71ce968614c137c49b647beefa631dc9e7"
+    },
+    "v2plan/next07_grounded_final_run.py": {
+      "sha256": "17c02bfbf246031662512ae475d8212a3ce7696aafb5460c40010f3baf56de34",
+      "git_blob": "7c8507e969153d6eff14e5a0abae0ea1aac4e102"
+    },
+    "v2plan/test_next07_compact_delivery.py": {
+      "sha256": "1a7873b2e4c3138661fc7a987069632019bceb00639e7127bbc937a28ac0a556",
+      "git_blob": "0d0ed0f79b8137ed4193a124f491de92d6ee2c70"
+    }
+  }
+}
