@@ -1,0 +1,50 @@
+{
+  "baseline": "0f4b5847b2e2a7d7509c33ca39865ffa8706e0f7",
+  "full_native_run": "NOT_RUN",
+  "test_mode": "dependency-isolated contract tests; prepared/packing spies; exact DTO/normalizer definitions",
+  "red": {
+    "exit": 1,
+    "tests": 2,
+    "failures": 2,
+    "deselected": 24,
+    "exception": "AttributeError: 'dict' object has no attribute 'context_pack'"
+  },
+  "green": {
+    "exit": 0,
+    "tests": 26,
+    "failures": 0
+  },
+  "commands": [
+    "python patches/run_contract_tests.py --red",
+    "python patches/run_contract_tests.py"
+  ],
+  "checks": {
+    "first_fit_ast_unchanged": true,
+    "prepared_ast_unchanged": true
+  },
+  "files": {
+    "v2plan/next07_grounded_public.py": {
+      "sha256": "fe2c073e9abd15084cae90ddff15c5058b163f58d8c8daed2f1da79c6d65c529",
+      "git_blob": "341df83f46a2b717c68c94b47dd0ba03277a5a54"
+    },
+    "v2plan/test_next07_grounded_public_wiring.py": {
+      "sha256": "c8f98d453588d95743729fb606f957abcb957b09a97c28f076d3bbe9eeeedccf",
+      "git_blob": "acb59d571e2ef2bb1762255161bcf7fac05a4ff1"
+    },
+    "v2plan/next07_grounded_candidate.py": {
+      "sha256": "5ac8e2600a12d216070087a50c9ddc64c8efaaff2f399d70e2b345db0bf71ff7",
+      "git_blob": "d05bfd1232012059e63940cb91548b2ac979d8ee"
+    },
+    "v2plan/next07_grounded_final_run.py": {
+      "sha256": "86fa8c403dbe03945ae38a9dae98bbfe1eb1456685a8c88aba52753ceef32b14",
+      "git_blob": "84af1911867e20b3aba80c45eadc0f87b88b3121"
+    }
+  },
+  "sources": {
+    "public_old_blob": "338f7208ae5ec7507578438893743ef338b981c0",
+    "runner_old_blob": "4217605cb892ad1ff9ce040c2b0618cc3ddbbcbc",
+    "models_definition_source_blob": "d3c38323818400afee55c1c602bbf59d65d1128f",
+    "normalizer_definition_source_blob": "5fd22b87453745d536b6dd6097c7890a2fcd2c24"
+  },
+  "rollout": "NOT_AUTHORIZED"
+}

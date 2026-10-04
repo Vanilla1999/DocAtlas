@@ -1,9 +1,11 @@
 """Scoped research selection replacement; real MCP serialization/validation."""
-from contextlib import contextmanager
+from contextlib import ExitStack, contextmanager
 from copy import deepcopy
-from dataclasses import asdict, is_dataclass
+from dataclasses import asdict, is_dataclass, replace
 import hashlib
 import json
+import traceback
+from functools import wraps
 from pathlib import Path
 from unittest.mock import patch
 
@@ -97,33 +99,119 @@ def first_fit(rows, question, identity, trace, max_tokens=800):
     return payload, snapshot
 
 
+def _record_exception(trace, stage, exc):
+    """Private diagnostic only: no locals or traceback in the public DTO."""
+    trace.setdefault('exceptions', []).append({
+        'stage': stage,
+        'exception_type': type(exc).__name__,
+        'message': str(exc),
+        'traceback': ''.join(traceback.format_exception(type(exc), exc, exc.__traceback__)),
+    })
+
+
+def _replace_context_pack(result, rows):
+    """Retain the service's typed contract and all nested canonical decisions."""
+    if not is_dataclass(result) or isinstance(result, type):
+        raise TypeError('get_project_context must return a dataclass, not a serialized DTO')
+    # asdict is for diagnostic serialization, never the value returned to the
+    # unified service. That service reads .context_pack, .status, .project_docs.
+    return replace(result, context_pack=rows)
+
+
+def _check_supported_request(arguments):
+    """This existing harness prepares root-only, current project documentation.
+
+    Do not silently widen a module request with prepared(scope='project'), or
+    drop explicit lookup/lifecycle semantics. These routes need separate wiring;
+    failure here is NOT successful source-guard or native acceptance evidence.
+    """
+    if (arguments.get('scope') != 'project'
+            or arguments.get('module') or arguments.get('module_path')
+            or arguments.get('lookup_queries')
+            or arguments.get('lifecycle_intent') not in (None, 'current')
+            or arguments.get('request_intent') not in (None, 'read')):
+        raise NotImplementedError('I.4 wiring requires an explicit root-only current project read')
+
+
 @contextmanager
 def installed(service, trace):
-    """Caller-controlled opt-in, never document-controlled; no payload handler patch."""
+    """Typed research wiring; handler/source guards/validation remain native."""
     native_context = service.get_project_context
     native_projection = context_tools.project_docs_context
-    rows, request = [], {}
+    native_validator = context_tools.validate_model_visible_projection
+    app = service.unified_context
+    native_unified = app.get_docs_context
+    request = {}
 
-    def context(*args, **kwargs):
-        retrieval = native_context(*args, **kwargs)
-        root = kwargs.get('project_path') or args[0]
-        question = kwargs.get('question') or args[1]
-        if is_dataclass(retrieval):
-            retrieval = asdict(retrieval)
-        rows[:] = prepared(service, root, question, trace)
-        request.update(question=question, identity=rows[0]['project_identity'] if rows else retrieval.get('project_identity'))
-        trace['native_orchestration'] = deepcopy(retrieval)
-        # Discard competing native selection, not a fallback or merged packet.
-        retrieval['context_pack'] = rows
-        return retrieval
+    @wraps(native_context)
+    def context(project_path, question, **kwargs):
+        try:
+            # The public facade is a variadic forwarder; its signature does
+            # not expose project_path/question as named binding parameters.
+            _check_supported_request(kwargs)
+            result = native_context(project_path, question, **kwargs)
+            root = project_path
+            rows = prepared(service, root, question, trace)
+            request.update(question=question,
+                identity=rows[0]['project_identity'] if rows else None)
+            trace['native_orchestration'] = asdict(result) if is_dataclass(result) else repr(result)
+            trace['context_result_type'] = type(result).__qualname__
+            return _replace_context_pack(result, rows)
+        except Exception as exc:
+            _record_exception(trace, 'project_context', exc)
+            raise
+
+    @wraps(native_unified)
+    def unified(*args, **kwargs):
+        # An early operational result must not reuse another request's rows.
+        request.clear()
+        try:
+            return native_unified(*args, **kwargs)
+        except Exception as exc:
+            # Capture before the MCP dispatcher sanitizes handler exceptions.
+            _record_exception(trace, 'unified_context', exc)
+            raise
 
     def projection(*, retrieval, max_tokens=800, **kwargs):
-        trace['projection_calls'] = trace.get('projection_calls', 0) + 1
-        return first_fit(rows, request['question'], request['identity'], trace, max_tokens)
+        try:
+            trace['projection_calls'] = trace.get('projection_calls', 0) + 1
+            if 'question' not in request:
+                raise RuntimeError('candidate project context was not reached for this request')
+            rows = retrieval.get('context_pack')
+            if not isinstance(rows, list):
+                raise TypeError('project projection requires the guarded context_pack list')
+            # Read actual post-unified/handler input, not cached pre-guard rows.
+            # This preserves source removals and trust annotations from the
+            # native path. first_fit and read_decision are not changed here.
+            trace['projection_input'] = deepcopy(rows)
+            return first_fit(rows, request['question'], request['identity'], trace, max_tokens)
+        except Exception as exc:
+            _record_exception(trace, 'projection', exc)
+            raise
+
+    @wraps(native_validator)
+    def validator(*args, **kwargs):
+        errors = native_validator(*args, **kwargs)
+        trace.setdefault('handler_validation', []).append({
+            'errors': list(errors), 'max_tokens': kwargs.get('max_tokens'),
+        })
+        return errors
 
     trace['origins'] = dict(context=str(native_context), projection=str(native_projection),
+        unified=str(native_unified), validator=str(native_validator),
         candidate_sha256=hashlib.sha256(Path(__file__).with_name('next07_grounded_candidate.py').read_bytes()).hexdigest())
-    with patch.object(service, 'get_project_context', context), patch.object(
-            context_tools, 'project_docs_context', projection):
-        yield
-    trace['restored'] = service.get_project_context == native_context and context_tools.project_docs_context is native_projection
+    trace['restored'] = False
+    try:
+        with ExitStack() as stack:
+            stack.enter_context(patch.object(service, 'get_project_context', context))
+            stack.enter_context(patch.object(app, 'get_docs_context', unified))
+            stack.enter_context(patch.object(context_tools, 'project_docs_context', projection))
+            stack.enter_context(patch.object(context_tools, 'validate_model_visible_projection', validator))
+            yield
+    finally:
+        trace['restored'] = (
+            service.get_project_context == native_context
+            and app.get_docs_context == native_unified
+            and context_tools.project_docs_context is native_projection
+            and context_tools.validate_model_visible_projection is native_validator
+        )

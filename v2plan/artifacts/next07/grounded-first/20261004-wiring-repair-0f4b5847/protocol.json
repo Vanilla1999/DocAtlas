@@ -1,0 +1,11 @@
+{
+  "baseline": "0f4b5847b2e2a7d7509c33ca39865ffa8706e0f7",
+  "scope": "research wiring repair only; no runtime or policy changes",
+  "frozen_candidate_sha256": "5ac8e2600a12d216070087a50c9ddc64c8efaaff2f399d70e2b345db0bf71ff7",
+  "replacements": ["preserve typed ProjectContextResult; asdict for log only", "send post-guard context_pack to existing first_fit", "observe real unified exceptions and handler validator; restore hooks in finally", "evaluate returned public payload, not intermediate trace; nonzero failure exit"],
+  "unchanged": ["proposals", "read_decision", "structural splitter", "BM25", "first_fit algorithm", "source guards", "existing 53 tests", "historical evidence", "budgets 800/3"],
+  "controls_before_code": ["old dict output reproduces AttributeError at actual normalizer", "replace preserves dataclass/nested objects", "positional and keyword calling conventions", "guard-filtered row not resurrected; guard annotations retained", "exceptions captured with traceback and reraised", "hooks restored on successful and failing body", "runner rejects wrong flags or oversized final bytes; final handler errors count", "unmeasured or invalid native run not counted as recovery"],
+  "execution_environment": {"full_checkout": false, "git_dns": "Could not resolve host: github.com"},
+  "native_I4": "NOT_RUN",
+  "no_automatic_retry": true
+}
