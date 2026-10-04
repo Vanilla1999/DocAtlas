@@ -1,0 +1,171 @@
+name: Next07 atomic transport integrity (no N10)
+
+on:
+  push:
+    branches: [next07-feasibility-audit]
+    paths:
+      - '.github/workflows/next07-transport-integrity.yml'
+
+permissions:
+  contents: read
+
+env:
+  DOCATLAS_OFFLINE: '1'
+  DOCATLAS_AUTO_VECTORS: '0'
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: 'true'
+
+jobs:
+  transport-evidence:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1
+        with:
+          python-version: '3.12'
+      - name: Verify review freeze and unchanged retrieval responsibilities
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/transport-evidence"
+          git rev-parse HEAD > "$RUNNER_TEMP/transport-evidence/head.txt"
+          git status --short > "$RUNNER_TEMP/transport-evidence/status-before.txt"
+          git diff --exit-code 3f82cae4c31de69e4c4df920a1d211e2f37bb6e2 HEAD -- docmancer/core docmancer/docs/application docmancer/mcp eval tests v2plan/third_party v2plan/next07_grounded_candidate.py v2plan/next07_owner_delivery.py v2plan/next07_grounded_public.py v2plan/next07_diagnostic_scope.py
+          test -f v2plan/artifacts/next07/transport-integrity-20261004/REVIEW_RU.md
+          python - <<'PY'
+          import hashlib, subprocess
+          from pathlib import Path
+          expected = {
+              'docmancer/docs/interfaces/mcp/output_contract.py': 'e2849ce892175fc0237126d623a9a144a92ddeee6a1964d3fb9eed27f9f41432',
+              'docmancer/docs/domain/read_delivery_limits.py': 'f65b1f8faff06f29f654d381acef04b26d7ed44cf6307c707ea96dad304f9bf1',
+              'v2plan/test_next07_compact_delivery.py': '38d3cc35d1adf20f5c3ff0ba1df9f13426eaf89d1973068f41fe97b0bc1e134b',
+              'v2plan/test_next07_transport_integrity.py': '21752376fa7a81c1c57ada41177ac3a58343be23caf72e4f58b7349ed2119347',
+          }
+          for name, digest in expected.items():
+              assert hashlib.sha256(Path(name).read_bytes()).hexdigest() == digest, name
+          changed = subprocess.check_output(['git','diff','--name-only','3f82cae4c31de69e4c4df920a1d211e2f37bb6e2','HEAD','--','docmancer'], text=True).splitlines()
+          assert set(changed) == {name for name in expected if name.startswith('docmancer/')}, changed
+          PY
+      - name: Install complete project environment
+        run: |
+          python -m pip install -e '.[dev]' > "$RUNNER_TEMP/transport-evidence/pip-install.log" 2>&1
+          python -m pip freeze > "$RUNNER_TEMP/transport-evidence/pip-freeze.txt"
+      - name: Transport, native SDK and unchanged source regression
+        shell: bash
+        run: |
+          set +e
+          python -m pytest -q \
+            v2plan/test_next07_transport_integrity.py \
+            v2plan/test_next07_owner_delivery.py \
+            v2plan/test_next07_grounded_first.py \
+            v2plan/test_next07_compact_delivery.py \
+            v2plan/test_next07_grounded_public_wiring.py \
+            v2plan/test_next07_scope_rebuild.py \
+            v2plan/test_next07_diagnostic_runner.py \
+            v2plan/test_next07_scope_native.py \
+            tests/docs/test_mcp_output_contract.py \
+            tests/docs/test_project_context_compact_output.py \
+            --junitxml="$RUNNER_TEMP/transport-evidence/tests.xml" \
+            > "$RUNNER_TEMP/transport-evidence/tests.log" 2>&1
+          rc=$?
+          echo "$rc" > "$RUNNER_TEMP/transport-evidence/tests-exit.txt"
+          exit "$rc"
+      - name: Actual compact LeaseClient P1 P2 P3
+        shell: bash
+        run: |
+          set +e
+          python -m v2plan.next07_grounded_final_run --compact-read \
+            --out "$RUNNER_TEMP/transport-evidence/target" \
+            > "$RUNNER_TEMP/transport-evidence/target.log" 2>&1
+          rc=$?
+          echo "$rc" > "$RUNNER_TEMP/transport-evidence/target-exit.txt"
+          exit "$rc"
+      - name: Unchanged native 80 N C pairs
+        shell: bash
+        run: |
+          set +e
+          python -m v2plan.next07_diagnostic_scope --compact-read \
+            --out "$RUNNER_TEMP/transport-evidence/corpus-replay" \
+            > "$RUNNER_TEMP/transport-evidence/corpus.log" 2>&1
+          rc=$?
+          echo "$rc" > "$RUNNER_TEMP/transport-evidence/corpus-exit.txt"
+          exit "$rc"
+      - name: Audit actual SDK JSON representation for every saved final packet
+        shell: bash
+        run: |
+          python - <<'PY'
+          import hashlib, json, os
+          from contextlib import nullcontext
+          from pathlib import Path
+          import mcp.types as mcp_types
+          from docmancer.mcp.docs_server import _mcp_tool_result
+          from docmancer.docs.domain.read_delivery_limits import COMPACT_READ_LIMITS, use_read_delivery_limits
+          from eval.evidence_quality_v2.audit import audit_payload
+          root = Path(os.environ['RUNNER_TEMP']) / 'transport-evidence'
+          results = []
+          for path in sorted((root/'corpus-replay/cases').glob('*/*/capture.json')):
+              record = json.loads(path.read_text())
+              capture = record.get('capture')
+              row = {'case': path.parent.parent.name, 'arm': path.parent.name, 'modes': []}
+              if not record.get('valid_execution') or not capture:
+                  row['invalid'] = True
+                  results.append(row)
+                  continue
+              payload = capture['public_payload']
+              limits = COMPACT_READ_LIMITS if row['arm']=='C' else None
+              snapshot = record['trace']['final_snapshot']
+              for fallback in (False, True):
+                  with use_read_delivery_limits(limits) if limits is not None else nullcontext():
+                      sdk = _mcp_tool_result(mcp_types, payload, text_fallback=fallback)
+                      final = json.loads(sdk.content[0].text) if fallback else json.loads(sdk.model_dump_json())['structuredContent']
+                  errors = audit_payload(final, snapshot, Path(capture['request']['project_path']), delivery_limits=limits)
+                  mode = {'text_fallback': fallback, 'same_payload': final==payload, 'audit_errors': errors,
+                          'serialized_sha256': hashlib.sha256(sdk.model_dump_json().encode()).hexdigest()}
+                  row['modes'].append(mode)
+              results.append(row)
+          valid = len(results)==160 and all(not r.get('invalid') and len(r['modes'])==2 and all(
+              m['same_payload'] and not m['audit_errors'] for m in r['modes']) for r in results)
+          (root/'terminal-sdk.json').write_text(json.dumps({'passed':valid,'count':len(results),'results':results},indent=2))
+          print('Terminal SDK:',len(results),'packets; two representations each; passed=',valid)
+          assert valid, 'terminal SDK/citation integrity failure; see terminal-sdk.json'
+          PY
+      - name: Record result without claiming general candidate acceptance
+        if: always()
+        shell: bash
+        run: |
+          python - <<'PY'
+          import json, os
+          from pathlib import Path
+          root = Path(os.environ['RUNNER_TEMP']) / 'transport-evidence'
+          root.mkdir(parents=True, exist_ok=True)
+          def load(name):
+              p=root/name
+              return json.loads(p.read_text()) if p.exists() else None
+          result={'N10':'NOT_RUN_UNCHANGED','rollout':'NOT_AUTHORIZED',
+                  'head':(root/'head.txt').read_text().strip() if (root/'head.txt').exists() else None,
+                  'target':load('target/result.json'),'corpus':load('corpus-replay/result.json')}
+          for key in ('tests','target','corpus'):
+              p=root/(key+'-exit.txt');result[key+'_exit']=int(p.read_text()) if p.exists() else None
+          terminal=load('terminal-sdk.json')
+          result['terminal_sdk_passed']=bool(terminal and terminal.get('passed'))
+          corpus=result['corpus'] or {}
+          result['transport_verdict']='TRANSPORT_VALIDATED' if (
+              all(result[k+'_exit']==0 for k in ('tests','target','corpus'))
+              and corpus.get('valid_pairs')==80 and result['terminal_sdk_passed']
+              and not any(corpus.get('audit_failure_case_ids',{}).values())
+              and corpus.get('frozen_inputs_unchanged') is True) else 'TRANSPORT_NOT_VALIDATED'
+          (root/'summary.json').write_text(json.dumps(result,ensure_ascii=False,indent=2)+'\n')
+          print(json.dumps({k:v for k,v in result.items() if k not in ('target','corpus')},indent=2))
+          PY
+          git status --short > "$RUNNER_TEMP/transport-evidence/status-after.txt"
+      - name: Preserve full logs and evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: next07-transport-integrity-${{ github.sha }}
+          path: ${{ runner.temp }}/transport-evidence/
+          include-hidden-files: true
+          if-no-files-found: error
+          retention-days: 14
