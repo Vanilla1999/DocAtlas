@@ -1,0 +1,20 @@
+{
+  "app": {
+    "storePath": "/tmp/opencode/next07-20261004-1b1cf6b7-reference/17/store",
+    "telemetryEnabled": false
+  },
+  "scraper": {
+    "maxPages": 1,
+    "maxDepth": 1,
+    "security": {
+      "fileAccess": {
+        "mode": "allowedRoots",
+        "allowedRoots": [
+          "/tmp/opencode/next07-20261004-1b1cf6b7-reference/17/corpus"
+        ],
+        "includeHidden": false,
+        "followSymlinks": false
+      }
+    }
+  }
+}

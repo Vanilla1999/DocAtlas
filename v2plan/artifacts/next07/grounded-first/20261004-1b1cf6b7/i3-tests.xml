@@ -1,0 +1,601 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="16" skipped="0" tests="24" time="3.610" timestamp="2026-10-04T11:02:24.614805+03:00" hostname="ViPC"><testcase classname="v2plan.test_next07_grounded_first" name="test_pinned_query[foo bar-&quot;foo bar&quot; OR &quot;foo&quot; OR &quot;bar&quot;]" time="0.000" /><testcase classname="v2plan.test_next07_grounded_first" name="test_pinned_query[&quot;hello world&quot;-&quot;hello world&quot;]" time="0.000" /><testcase classname="v2plan.test_next07_grounded_first" name="test_pinned_query[test &quot;exact phrase&quot; word-&quot;test exact phrase word&quot; OR &quot;test&quot; OR &quot;exact phrase&quot; OR &quot;word&quot;]" time="0.000" /><testcase classname="v2plan.test_next07_grounded_first" name="test_pinned_query[-&quot;&quot;]" time="0.000" /><testcase classname="v2plan.test_next07_grounded_first" name="test_i2_original_fixture_spans[0]" time="0.001" /><testcase classname="v2plan.test_next07_grounded_first" name="test_i2_original_fixture_spans[1]" time="0.001" /><testcase classname="v2plan.test_next07_grounded_first" name="test_i2_no_clipping_oversized_atom" time="0.000" /><testcase classname="v2plan.test_next07_grounded_first" name="test_i2_repeated_unicode_offsets" time="0.000" /><testcase classname="v2plan.test_next07_grounded_first" name="test_i3_original_fact_context[0]" time="0.676"><failure message="AttributeError: 'ReadContextAdmission' object has no attribute '__dict__'. Did you mean: '__dir__'?">tmp_path = PosixPath('/tmp/pytest-of-viadmin/pytest-0/test_i3_original_fact_context_0')
+index = 0
+
+    @pytest.mark.parametrize('index', [0, 1])
+    def test_i3_original_fact_context(tmp_path, index):
+        value, error, docs, question = fixture_inputs(ROOT)[index]
+        rows, _ = prepared_units(tmp_path, docs, question)
+        for needle in (f'{value} seconds', f'An expired operation raises `{error}`.'):
+            matches = [r for r in rows if needle in r['snippet']]
+            assert matches
+&gt;           assert any(decision(r, question).allowed for r in matches)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+v2plan/test_next07_grounded_first.py:107: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+v2plan/test_next07_grounded_first.py:107: in &lt;genexpr&gt;
+    assert any(decision(r, question).allowed for r in matches)
+               ^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+row = {'_evidence_sets': [{'edges': [['heading', 0, 1, 'markdown-owning-heading-v1']], 'member_spans': [[0, 13, '1ec9d6586bb...73882d1a823d75f3b685d621effc780e49c7400c', 'snapshot_id': 'gen-ad669b05e97541b8ba774caea8aa6c13', 'version': ''}}, ...}
+question = 'What is LeaseClient default timeout duration for requests and which exception is raised when an operation expires?'
+identity = None
+
+    def decision(row, question, identity=None):
+        result = read_decision(row, question=question,
+            expected_project_identity=identity or row['project_identity'])
+        if directory := os.environ.get('NEXT07_CONTROL_OUT'):
+            target = Path(directory)
+            target.mkdir(parents=True, exist_ok=True)
+            # One append-only diagnostic row, including source bytes and guard inputs.
+            with (target / 'decisions.jsonl').open('a') as stream:
+                stream.write(json.dumps({'question': question, 'candidate': row,
+&gt;                   'decision': result.__dict__}, ensure_ascii=False, default=str) + '\n')
+                                ^^^^^^^^^^^^^^^
+E               AttributeError: 'ReadContextAdmission' object has no attribute '__dict__'. Did you mean: '__dir__'?
+
+v2plan/test_next07_grounded_first.py:57: AttributeError</failure></testcase><testcase classname="v2plan.test_next07_grounded_first" name="test_i3_original_fact_context[1]" time="0.173"><failure message="AttributeError: 'ReadContextAdmission' object has no attribute '__dict__'. Did you mean: '__dir__'?">tmp_path = PosixPath('/tmp/pytest-of-viadmin/pytest-0/test_i3_original_fact_context_1')
+index = 1
+
+    @pytest.mark.parametrize('index', [0, 1])
+    def test_i3_original_fact_context(tmp_path, index):
+        value, error, docs, question = fixture_inputs(ROOT)[index]
+        rows, _ = prepared_units(tmp_path, docs, question)
+        for needle in (f'{value} seconds', f'An expired operation raises `{error}`.'):
+            matches = [r for r in rows if needle in r['snippet']]
+            assert matches
+&gt;           assert any(decision(r, question).allowed for r in matches)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+v2plan/test_next07_grounded_first.py:107: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+v2plan/test_next07_grounded_first.py:107: in &lt;genexpr&gt;
+    assert any(decision(r, question).allowed for r in matches)
+               ^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+row = {'_evidence_sets': [{'edges': [['heading', 0, 1, 'markdown-owning-heading-v1']], 'member_spans': [[0, 13, '1ec9d6586bb...d174d87bc712e410fc3463134af30cddc722fadf', 'snapshot_id': 'gen-1005e39a6201420ea011143da3fe848f', 'version': ''}}, ...}
+question = 'What is LeaseClient default timeout duration for requests and which exception is raised when an operation expires?'
+identity = None
+
+    def decision(row, question, identity=None):
+        result = read_decision(row, question=question,
+            expected_project_identity=identity or row['project_identity'])
+        if directory := os.environ.get('NEXT07_CONTROL_OUT'):
+            target = Path(directory)
+            target.mkdir(parents=True, exist_ok=True)
+            # One append-only diagnostic row, including source bytes and guard inputs.
+            with (target / 'decisions.jsonl').open('a') as stream:
+                stream.write(json.dumps({'question': question, 'candidate': row,
+&gt;                   'decision': result.__dict__}, ensure_ascii=False, default=str) + '\n')
+                                ^^^^^^^^^^^^^^^
+E               AttributeError: 'ReadContextAdmission' object has no attribute '__dict__'. Did you mean: '__dir__'?
+
+v2plan/test_next07_grounded_first.py:57: AttributeError</failure></testcase><testcase classname="v2plan.test_next07_grounded_first" name="test_i3_guard_mutations[change0]" time="0.190"><failure message="AttributeError: 'ReadContextAdmission' object has no attribute '__dict__'. Did you mean: '__dir__'?">tmp_path = PosixPath('/tmp/pytest-of-viadmin/pytest-0/test_i3_guard_mutations_change0')
+change = {'project_identity': 'other'}
+
+    @pytest.mark.parametrize('change', [
+        {'project_identity': 'other'}, {'repository_identity': 'other'},
+        {'freshness': 'stale'}, {'index_freshness': 'dirty'},
+        {'risk_flags': ['unsafe']}, {'instruction_risk_flags': ['injection']},
+        {'lifecycle_status': 'archived'}, {'char_span': [0, 1]},
+        {'resolved_version': 'wrong'}, {'generation_id': 'wrong'},
+        {'path': 'docs/other.md'}, {'source_class': 'library_doc'},
+    ])
+    def test_i3_guard_mutations(tmp_path, change):
+        _, _, docs, question = fixture_inputs(ROOT)[0]
+        rows, _ = prepared_units(tmp_path, docs, question)
+        row = next(r for r in rows if '17 seconds' in r['snippet'])
+&gt;       assert decision(row, question).allowed
+               ^^^^^^^^^^^^^^^^^^^^^^^
+
+v2plan/test_next07_grounded_first.py:122: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+row = {'_evidence_sets': [{'edges': [['heading', 0, 1, 'markdown-owning-heading-v1']], 'member_spans': [[0, 13, '1ec9d6586bb...b81fe1b3674c53af13e015a358cd68f8c54d1cdd', 'snapshot_id': 'gen-06d58d073b564759af4b16da7ed9b273', 'version': ''}}, ...}
+question = 'What is LeaseClient default timeout duration for requests and which exception is raised when an operation expires?'
+identity = None
+
+    def decision(row, question, identity=None):
+        result = read_decision(row, question=question,
+            expected_project_identity=identity or row['project_identity'])
+        if directory := os.environ.get('NEXT07_CONTROL_OUT'):
+            target = Path(directory)
+            target.mkdir(parents=True, exist_ok=True)
+            # One append-only diagnostic row, including source bytes and guard inputs.
+            with (target / 'decisions.jsonl').open('a') as stream:
+                stream.write(json.dumps({'question': question, 'candidate': row,
+&gt;                   'decision': result.__dict__}, ensure_ascii=False, default=str) + '\n')
+                                ^^^^^^^^^^^^^^^
+E               AttributeError: 'ReadContextAdmission' object has no attribute '__dict__'. Did you mean: '__dir__'?
+
+v2plan/test_next07_grounded_first.py:57: AttributeError</failure></testcase><testcase classname="v2plan.test_next07_grounded_first" name="test_i3_guard_mutations[change1]" time="0.180"><failure message="AttributeError: 'ReadContextAdmission' object has no attribute '__dict__'. Did you mean: '__dir__'?">tmp_path = PosixPath('/tmp/pytest-of-viadmin/pytest-0/test_i3_guard_mutations_change1')
+change = {'repository_identity': 'other'}
+
+    @pytest.mark.parametrize('change', [
+        {'project_identity': 'other'}, {'repository_identity': 'other'},
+        {'freshness': 'stale'}, {'index_freshness': 'dirty'},
+        {'risk_flags': ['unsafe']}, {'instruction_risk_flags': ['injection']},
+        {'lifecycle_status': 'archived'}, {'char_span': [0, 1]},
+        {'resolved_version': 'wrong'}, {'generation_id': 'wrong'},
+        {'path': 'docs/other.md'}, {'source_class': 'library_doc'},
+    ])
+    def test_i3_guard_mutations(tmp_path, change):
+        _, _, docs, question = fixture_inputs(ROOT)[0]
+        rows, _ = prepared_units(tmp_path, docs, question)
+        row = next(r for r in rows if '17 seconds' in r['snippet'])
+&gt;       assert decision(row, question).allowed
+               ^^^^^^^^^^^^^^^^^^^^^^^
+
+v2plan/test_next07_grounded_first.py:122: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+row = {'_evidence_sets': [{'edges': [['heading', 0, 1, 'markdown-owning-heading-v1']], 'member_spans': [[0, 13, '1ec9d6586bb...bffb4a56f8c294cbac54926053198e3080be3796', 'snapshot_id': 'gen-a7e832e0a201450c8b979e746fefdadb', 'version': ''}}, ...}
+question = 'What is LeaseClient default timeout duration for requests and which exception is raised when an operation expires?'
+identity = None
+
+    def decision(row, question, identity=None):
+        result = read_decision(row, question=question,
+            expected_project_identity=identity or row['project_identity'])
+        if directory := os.environ.get('NEXT07_CONTROL_OUT'):
+            target = Path(directory)
+            target.mkdir(parents=True, exist_ok=True)
+            # One append-only diagnostic row, including source bytes and guard inputs.
+            with (target / 'decisions.jsonl').open('a') as stream:
+                stream.write(json.dumps({'question': question, 'candidate': row,
+&gt;                   'decision': result.__dict__}, ensure_ascii=False, default=str) + '\n')
+                                ^^^^^^^^^^^^^^^
+E               AttributeError: 'ReadContextAdmission' object has no attribute '__dict__'. Did you mean: '__dir__'?
+
+v2plan/test_next07_grounded_first.py:57: AttributeError</failure></testcase><testcase classname="v2plan.test_next07_grounded_first" name="test_i3_guard_mutations[change2]" time="0.163"><failure message="AttributeError: 'ReadContextAdmission' object has no attribute '__dict__'. Did you mean: '__dir__'?">tmp_path = PosixPath('/tmp/pytest-of-viadmin/pytest-0/test_i3_guard_mutations_change2')
+change = {'freshness': 'stale'}
+
+    @pytest.mark.parametrize('change', [
+        {'project_identity': 'other'}, {'repository_identity': 'other'},
+        {'freshness': 'stale'}, {'index_freshness': 'dirty'},
+        {'risk_flags': ['unsafe']}, {'instruction_risk_flags': ['injection']},
+        {'lifecycle_status': 'archived'}, {'char_span': [0, 1]},
+        {'resolved_version': 'wrong'}, {'generation_id': 'wrong'},
+        {'path': 'docs/other.md'}, {'source_class': 'library_doc'},
+    ])
+    def test_i3_guard_mutations(tmp_path, change):
+        _, _, docs, question = fixture_inputs(ROOT)[0]
+        rows, _ = prepared_units(tmp_path, docs, question)
+        row = next(r for r in rows if '17 seconds' in r['snippet'])
+&gt;       assert decision(row, question).allowed
+               ^^^^^^^^^^^^^^^^^^^^^^^
+
+v2plan/test_next07_grounded_first.py:122: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+row = {'_evidence_sets': [{'edges': [['heading', 0, 1, 'markdown-owning-heading-v1']], 'member_spans': [[0, 13, '1ec9d6586bb...05ef51a28d6e1b1a83015912e1f2d03246add369', 'snapshot_id': 'gen-6f529526600c46c58b08378a62b75f65', 'version': ''}}, ...}
+question = 'What is LeaseClient default timeout duration for requests and which exception is raised when an operation expires?'
+identity = None
+
+    def decision(row, question, identity=None):
+        result = read_decision(row, question=question,
+            expected_project_identity=identity or row['project_identity'])
+        if directory := os.environ.get('NEXT07_CONTROL_OUT'):
+            target = Path(directory)
+            target.mkdir(parents=True, exist_ok=True)
+            # One append-only diagnostic row, including source bytes and guard inputs.
+            with (target / 'decisions.jsonl').open('a') as stream:
+                stream.write(json.dumps({'question': question, 'candidate': row,
+&gt;                   'decision': result.__dict__}, ensure_ascii=False, default=str) + '\n')
+                                ^^^^^^^^^^^^^^^
+E               AttributeError: 'ReadContextAdmission' object has no attribute '__dict__'. Did you mean: '__dir__'?
+
+v2plan/test_next07_grounded_first.py:57: AttributeError</failure></testcase><testcase classname="v2plan.test_next07_grounded_first" name="test_i3_guard_mutations[change3]" time="0.191"><failure message="AttributeError: 'ReadContextAdmission' object has no attribute '__dict__'. Did you mean: '__dir__'?">tmp_path = PosixPath('/tmp/pytest-of-viadmin/pytest-0/test_i3_guard_mutations_change3')
+change = {'index_freshness': 'dirty'}
+
+    @pytest.mark.parametrize('change', [
+        {'project_identity': 'other'}, {'repository_identity': 'other'},
+        {'freshness': 'stale'}, {'index_freshness': 'dirty'},
+        {'risk_flags': ['unsafe']}, {'instruction_risk_flags': ['injection']},
+        {'lifecycle_status': 'archived'}, {'char_span': [0, 1]},
+        {'resolved_version': 'wrong'}, {'generation_id': 'wrong'},
+        {'path': 'docs/other.md'}, {'source_class': 'library_doc'},
+    ])
+    def test_i3_guard_mutations(tmp_path, change):
+        _, _, docs, question = fixture_inputs(ROOT)[0]
+        rows, _ = prepared_units(tmp_path, docs, question)
+        row = next(r for r in rows if '17 seconds' in r['snippet'])
+&gt;       assert decision(row, question).allowed
+               ^^^^^^^^^^^^^^^^^^^^^^^
+
+v2plan/test_next07_grounded_first.py:122: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+row = {'_evidence_sets': [{'edges': [['heading', 0, 1, 'markdown-owning-heading-v1']], 'member_spans': [[0, 13, '1ec9d6586bb...06e439c6948ed848b020080b1859df77cbfd9327', 'snapshot_id': 'gen-31639606961e40aea7dda577853433b9', 'version': ''}}, ...}
+question = 'What is LeaseClient default timeout duration for requests and which exception is raised when an operation expires?'
+identity = None
+
+    def decision(row, question, identity=None):
+        result = read_decision(row, question=question,
+            expected_project_identity=identity or row['project_identity'])
+        if directory := os.environ.get('NEXT07_CONTROL_OUT'):
+            target = Path(directory)
+            target.mkdir(parents=True, exist_ok=True)
+            # One append-only diagnostic row, including source bytes and guard inputs.
+            with (target / 'decisions.jsonl').open('a') as stream:
+                stream.write(json.dumps({'question': question, 'candidate': row,
+&gt;                   'decision': result.__dict__}, ensure_ascii=False, default=str) + '\n')
+                                ^^^^^^^^^^^^^^^
+E               AttributeError: 'ReadContextAdmission' object has no attribute '__dict__'. Did you mean: '__dir__'?
+
+v2plan/test_next07_grounded_first.py:57: AttributeError</failure></testcase><testcase classname="v2plan.test_next07_grounded_first" name="test_i3_guard_mutations[change4]" time="0.191"><failure message="AttributeError: 'ReadContextAdmission' object has no attribute '__dict__'. Did you mean: '__dir__'?">tmp_path = PosixPath('/tmp/pytest-of-viadmin/pytest-0/test_i3_guard_mutations_change4')
+change = {'risk_flags': ['unsafe']}
+
+    @pytest.mark.parametrize('change', [
+        {'project_identity': 'other'}, {'repository_identity': 'other'},
+        {'freshness': 'stale'}, {'index_freshness': 'dirty'},
+        {'risk_flags': ['unsafe']}, {'instruction_risk_flags': ['injection']},
+        {'lifecycle_status': 'archived'}, {'char_span': [0, 1]},
+        {'resolved_version': 'wrong'}, {'generation_id': 'wrong'},
+        {'path': 'docs/other.md'}, {'source_class': 'library_doc'},
+    ])
+    def test_i3_guard_mutations(tmp_path, change):
+        _, _, docs, question = fixture_inputs(ROOT)[0]
+        rows, _ = prepared_units(tmp_path, docs, question)
+        row = next(r for r in rows if '17 seconds' in r['snippet'])
+&gt;       assert decision(row, question).allowed
+               ^^^^^^^^^^^^^^^^^^^^^^^
+
+v2plan/test_next07_grounded_first.py:122: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+row = {'_evidence_sets': [{'edges': [['heading', 0, 1, 'markdown-owning-heading-v1']], 'member_spans': [[0, 13, '1ec9d6586bb...47e6e800360301a9b302779c909e5fa3f10707de', 'snapshot_id': 'gen-de07e81ad7e545809185c7b7c8cd5530', 'version': ''}}, ...}
+question = 'What is LeaseClient default timeout duration for requests and which exception is raised when an operation expires?'
+identity = None
+
+    def decision(row, question, identity=None):
+        result = read_decision(row, question=question,
+            expected_project_identity=identity or row['project_identity'])
+        if directory := os.environ.get('NEXT07_CONTROL_OUT'):
+            target = Path(directory)
+            target.mkdir(parents=True, exist_ok=True)
+            # One append-only diagnostic row, including source bytes and guard inputs.
+            with (target / 'decisions.jsonl').open('a') as stream:
+                stream.write(json.dumps({'question': question, 'candidate': row,
+&gt;                   'decision': result.__dict__}, ensure_ascii=False, default=str) + '\n')
+                                ^^^^^^^^^^^^^^^
+E               AttributeError: 'ReadContextAdmission' object has no attribute '__dict__'. Did you mean: '__dir__'?
+
+v2plan/test_next07_grounded_first.py:57: AttributeError</failure></testcase><testcase classname="v2plan.test_next07_grounded_first" name="test_i3_guard_mutations[change5]" time="0.184"><failure message="AttributeError: 'ReadContextAdmission' object has no attribute '__dict__'. Did you mean: '__dir__'?">tmp_path = PosixPath('/tmp/pytest-of-viadmin/pytest-0/test_i3_guard_mutations_change5')
+change = {'instruction_risk_flags': ['injection']}
+
+    @pytest.mark.parametrize('change', [
+        {'project_identity': 'other'}, {'repository_identity': 'other'},
+        {'freshness': 'stale'}, {'index_freshness': 'dirty'},
+        {'risk_flags': ['unsafe']}, {'instruction_risk_flags': ['injection']},
+        {'lifecycle_status': 'archived'}, {'char_span': [0, 1]},
+        {'resolved_version': 'wrong'}, {'generation_id': 'wrong'},
+        {'path': 'docs/other.md'}, {'source_class': 'library_doc'},
+    ])
+    def test_i3_guard_mutations(tmp_path, change):
+        _, _, docs, question = fixture_inputs(ROOT)[0]
+        rows, _ = prepared_units(tmp_path, docs, question)
+        row = next(r for r in rows if '17 seconds' in r['snippet'])
+&gt;       assert decision(row, question).allowed
+               ^^^^^^^^^^^^^^^^^^^^^^^
+
+v2plan/test_next07_grounded_first.py:122: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+row = {'_evidence_sets': [{'edges': [['heading', 0, 1, 'markdown-owning-heading-v1']], 'member_spans': [[0, 13, '1ec9d6586bb...53b6c76addd96cf8a62b1305f395e750de998a0f', 'snapshot_id': 'gen-0ea0784cc039468f9cc472248807b2fb', 'version': ''}}, ...}
+question = 'What is LeaseClient default timeout duration for requests and which exception is raised when an operation expires?'
+identity = None
+
+    def decision(row, question, identity=None):
+        result = read_decision(row, question=question,
+            expected_project_identity=identity or row['project_identity'])
+        if directory := os.environ.get('NEXT07_CONTROL_OUT'):
+            target = Path(directory)
+            target.mkdir(parents=True, exist_ok=True)
+            # One append-only diagnostic row, including source bytes and guard inputs.
+            with (target / 'decisions.jsonl').open('a') as stream:
+                stream.write(json.dumps({'question': question, 'candidate': row,
+&gt;                   'decision': result.__dict__}, ensure_ascii=False, default=str) + '\n')
+                                ^^^^^^^^^^^^^^^
+E               AttributeError: 'ReadContextAdmission' object has no attribute '__dict__'. Did you mean: '__dir__'?
+
+v2plan/test_next07_grounded_first.py:57: AttributeError</failure></testcase><testcase classname="v2plan.test_next07_grounded_first" name="test_i3_guard_mutations[change6]" time="0.181"><failure message="AttributeError: 'ReadContextAdmission' object has no attribute '__dict__'. Did you mean: '__dir__'?">tmp_path = PosixPath('/tmp/pytest-of-viadmin/pytest-0/test_i3_guard_mutations_change6')
+change = {'lifecycle_status': 'archived'}
+
+    @pytest.mark.parametrize('change', [
+        {'project_identity': 'other'}, {'repository_identity': 'other'},
+        {'freshness': 'stale'}, {'index_freshness': 'dirty'},
+        {'risk_flags': ['unsafe']}, {'instruction_risk_flags': ['injection']},
+        {'lifecycle_status': 'archived'}, {'char_span': [0, 1]},
+        {'resolved_version': 'wrong'}, {'generation_id': 'wrong'},
+        {'path': 'docs/other.md'}, {'source_class': 'library_doc'},
+    ])
+    def test_i3_guard_mutations(tmp_path, change):
+        _, _, docs, question = fixture_inputs(ROOT)[0]
+        rows, _ = prepared_units(tmp_path, docs, question)
+        row = next(r for r in rows if '17 seconds' in r['snippet'])
+&gt;       assert decision(row, question).allowed
+               ^^^^^^^^^^^^^^^^^^^^^^^
+
+v2plan/test_next07_grounded_first.py:122: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+row = {'_evidence_sets': [{'edges': [['heading', 0, 1, 'markdown-owning-heading-v1']], 'member_spans': [[0, 13, '1ec9d6586bb...a5dc3788bed4285707bd6db65829ba645a933469', 'snapshot_id': 'gen-b59a0ce4a8be4a50b0d80d668fadb3e4', 'version': ''}}, ...}
+question = 'What is LeaseClient default timeout duration for requests and which exception is raised when an operation expires?'
+identity = None
+
+    def decision(row, question, identity=None):
+        result = read_decision(row, question=question,
+            expected_project_identity=identity or row['project_identity'])
+        if directory := os.environ.get('NEXT07_CONTROL_OUT'):
+            target = Path(directory)
+            target.mkdir(parents=True, exist_ok=True)
+            # One append-only diagnostic row, including source bytes and guard inputs.
+            with (target / 'decisions.jsonl').open('a') as stream:
+                stream.write(json.dumps({'question': question, 'candidate': row,
+&gt;                   'decision': result.__dict__}, ensure_ascii=False, default=str) + '\n')
+                                ^^^^^^^^^^^^^^^
+E               AttributeError: 'ReadContextAdmission' object has no attribute '__dict__'. Did you mean: '__dir__'?
+
+v2plan/test_next07_grounded_first.py:57: AttributeError</failure></testcase><testcase classname="v2plan.test_next07_grounded_first" name="test_i3_guard_mutations[change7]" time="0.185"><failure message="AttributeError: 'ReadContextAdmission' object has no attribute '__dict__'. Did you mean: '__dir__'?">tmp_path = PosixPath('/tmp/pytest-of-viadmin/pytest-0/test_i3_guard_mutations_change7')
+change = {'char_span': [0, 1]}
+
+    @pytest.mark.parametrize('change', [
+        {'project_identity': 'other'}, {'repository_identity': 'other'},
+        {'freshness': 'stale'}, {'index_freshness': 'dirty'},
+        {'risk_flags': ['unsafe']}, {'instruction_risk_flags': ['injection']},
+        {'lifecycle_status': 'archived'}, {'char_span': [0, 1]},
+        {'resolved_version': 'wrong'}, {'generation_id': 'wrong'},
+        {'path': 'docs/other.md'}, {'source_class': 'library_doc'},
+    ])
+    def test_i3_guard_mutations(tmp_path, change):
+        _, _, docs, question = fixture_inputs(ROOT)[0]
+        rows, _ = prepared_units(tmp_path, docs, question)
+        row = next(r for r in rows if '17 seconds' in r['snippet'])
+&gt;       assert decision(row, question).allowed
+               ^^^^^^^^^^^^^^^^^^^^^^^
+
+v2plan/test_next07_grounded_first.py:122: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+row = {'_evidence_sets': [{'edges': [['heading', 0, 1, 'markdown-owning-heading-v1']], 'member_spans': [[0, 13, '1ec9d6586bb...53b5f548b01c8e964055a6350c1ebc0b0cee5129', 'snapshot_id': 'gen-a6453024903f48d9bc68f7235c77ed56', 'version': ''}}, ...}
+question = 'What is LeaseClient default timeout duration for requests and which exception is raised when an operation expires?'
+identity = None
+
+    def decision(row, question, identity=None):
+        result = read_decision(row, question=question,
+            expected_project_identity=identity or row['project_identity'])
+        if directory := os.environ.get('NEXT07_CONTROL_OUT'):
+            target = Path(directory)
+            target.mkdir(parents=True, exist_ok=True)
+            # One append-only diagnostic row, including source bytes and guard inputs.
+            with (target / 'decisions.jsonl').open('a') as stream:
+                stream.write(json.dumps({'question': question, 'candidate': row,
+&gt;                   'decision': result.__dict__}, ensure_ascii=False, default=str) + '\n')
+                                ^^^^^^^^^^^^^^^
+E               AttributeError: 'ReadContextAdmission' object has no attribute '__dict__'. Did you mean: '__dir__'?
+
+v2plan/test_next07_grounded_first.py:57: AttributeError</failure></testcase><testcase classname="v2plan.test_next07_grounded_first" name="test_i3_guard_mutations[change8]" time="0.193"><failure message="AttributeError: 'ReadContextAdmission' object has no attribute '__dict__'. Did you mean: '__dir__'?">tmp_path = PosixPath('/tmp/pytest-of-viadmin/pytest-0/test_i3_guard_mutations_change8')
+change = {'resolved_version': 'wrong'}
+
+    @pytest.mark.parametrize('change', [
+        {'project_identity': 'other'}, {'repository_identity': 'other'},
+        {'freshness': 'stale'}, {'index_freshness': 'dirty'},
+        {'risk_flags': ['unsafe']}, {'instruction_risk_flags': ['injection']},
+        {'lifecycle_status': 'archived'}, {'char_span': [0, 1]},
+        {'resolved_version': 'wrong'}, {'generation_id': 'wrong'},
+        {'path': 'docs/other.md'}, {'source_class': 'library_doc'},
+    ])
+    def test_i3_guard_mutations(tmp_path, change):
+        _, _, docs, question = fixture_inputs(ROOT)[0]
+        rows, _ = prepared_units(tmp_path, docs, question)
+        row = next(r for r in rows if '17 seconds' in r['snippet'])
+&gt;       assert decision(row, question).allowed
+               ^^^^^^^^^^^^^^^^^^^^^^^
+
+v2plan/test_next07_grounded_first.py:122: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+row = {'_evidence_sets': [{'edges': [['heading', 0, 1, 'markdown-owning-heading-v1']], 'member_spans': [[0, 13, '1ec9d6586bb...c17c1c2ae8a36c72c71cb6889df44891c1c2ffb8', 'snapshot_id': 'gen-7ea2242a539945ba87387ecf1bdfcf30', 'version': ''}}, ...}
+question = 'What is LeaseClient default timeout duration for requests and which exception is raised when an operation expires?'
+identity = None
+
+    def decision(row, question, identity=None):
+        result = read_decision(row, question=question,
+            expected_project_identity=identity or row['project_identity'])
+        if directory := os.environ.get('NEXT07_CONTROL_OUT'):
+            target = Path(directory)
+            target.mkdir(parents=True, exist_ok=True)
+            # One append-only diagnostic row, including source bytes and guard inputs.
+            with (target / 'decisions.jsonl').open('a') as stream:
+                stream.write(json.dumps({'question': question, 'candidate': row,
+&gt;                   'decision': result.__dict__}, ensure_ascii=False, default=str) + '\n')
+                                ^^^^^^^^^^^^^^^
+E               AttributeError: 'ReadContextAdmission' object has no attribute '__dict__'. Did you mean: '__dir__'?
+
+v2plan/test_next07_grounded_first.py:57: AttributeError</failure></testcase><testcase classname="v2plan.test_next07_grounded_first" name="test_i3_guard_mutations[change9]" time="0.198"><failure message="AttributeError: 'ReadContextAdmission' object has no attribute '__dict__'. Did you mean: '__dir__'?">tmp_path = PosixPath('/tmp/pytest-of-viadmin/pytest-0/test_i3_guard_mutations_change9')
+change = {'generation_id': 'wrong'}
+
+    @pytest.mark.parametrize('change', [
+        {'project_identity': 'other'}, {'repository_identity': 'other'},
+        {'freshness': 'stale'}, {'index_freshness': 'dirty'},
+        {'risk_flags': ['unsafe']}, {'instruction_risk_flags': ['injection']},
+        {'lifecycle_status': 'archived'}, {'char_span': [0, 1]},
+        {'resolved_version': 'wrong'}, {'generation_id': 'wrong'},
+        {'path': 'docs/other.md'}, {'source_class': 'library_doc'},
+    ])
+    def test_i3_guard_mutations(tmp_path, change):
+        _, _, docs, question = fixture_inputs(ROOT)[0]
+        rows, _ = prepared_units(tmp_path, docs, question)
+        row = next(r for r in rows if '17 seconds' in r['snippet'])
+&gt;       assert decision(row, question).allowed
+               ^^^^^^^^^^^^^^^^^^^^^^^
+
+v2plan/test_next07_grounded_first.py:122: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+row = {'_evidence_sets': [{'edges': [['heading', 0, 1, 'markdown-owning-heading-v1']], 'member_spans': [[0, 13, '1ec9d6586bb...8d54592ff7f9f6f10aced75d28ead20094e4fbb4', 'snapshot_id': 'gen-a54e33a931b5498e9128af0e1a12d195', 'version': ''}}, ...}
+question = 'What is LeaseClient default timeout duration for requests and which exception is raised when an operation expires?'
+identity = None
+
+    def decision(row, question, identity=None):
+        result = read_decision(row, question=question,
+            expected_project_identity=identity or row['project_identity'])
+        if directory := os.environ.get('NEXT07_CONTROL_OUT'):
+            target = Path(directory)
+            target.mkdir(parents=True, exist_ok=True)
+            # One append-only diagnostic row, including source bytes and guard inputs.
+            with (target / 'decisions.jsonl').open('a') as stream:
+                stream.write(json.dumps({'question': question, 'candidate': row,
+&gt;                   'decision': result.__dict__}, ensure_ascii=False, default=str) + '\n')
+                                ^^^^^^^^^^^^^^^
+E               AttributeError: 'ReadContextAdmission' object has no attribute '__dict__'. Did you mean: '__dir__'?
+
+v2plan/test_next07_grounded_first.py:57: AttributeError</failure></testcase><testcase classname="v2plan.test_next07_grounded_first" name="test_i3_guard_mutations[change10]" time="0.206"><failure message="AttributeError: 'ReadContextAdmission' object has no attribute '__dict__'. Did you mean: '__dir__'?">tmp_path = PosixPath('/tmp/pytest-of-viadmin/pytest-0/test_i3_guard_mutations_change10')
+change = {'path': 'docs/other.md'}
+
+    @pytest.mark.parametrize('change', [
+        {'project_identity': 'other'}, {'repository_identity': 'other'},
+        {'freshness': 'stale'}, {'index_freshness': 'dirty'},
+        {'risk_flags': ['unsafe']}, {'instruction_risk_flags': ['injection']},
+        {'lifecycle_status': 'archived'}, {'char_span': [0, 1]},
+        {'resolved_version': 'wrong'}, {'generation_id': 'wrong'},
+        {'path': 'docs/other.md'}, {'source_class': 'library_doc'},
+    ])
+    def test_i3_guard_mutations(tmp_path, change):
+        _, _, docs, question = fixture_inputs(ROOT)[0]
+        rows, _ = prepared_units(tmp_path, docs, question)
+        row = next(r for r in rows if '17 seconds' in r['snippet'])
+&gt;       assert decision(row, question).allowed
+               ^^^^^^^^^^^^^^^^^^^^^^^
+
+v2plan/test_next07_grounded_first.py:122: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+row = {'_evidence_sets': [{'edges': [['heading', 0, 1, 'markdown-owning-heading-v1']], 'member_spans': [[0, 13, '1ec9d6586bb...f35ffcffd1e3f1e1ff7c0131aff561d86b096532', 'snapshot_id': 'gen-646ee58820c64d989d819aec00dbec6a', 'version': ''}}, ...}
+question = 'What is LeaseClient default timeout duration for requests and which exception is raised when an operation expires?'
+identity = None
+
+    def decision(row, question, identity=None):
+        result = read_decision(row, question=question,
+            expected_project_identity=identity or row['project_identity'])
+        if directory := os.environ.get('NEXT07_CONTROL_OUT'):
+            target = Path(directory)
+            target.mkdir(parents=True, exist_ok=True)
+            # One append-only diagnostic row, including source bytes and guard inputs.
+            with (target / 'decisions.jsonl').open('a') as stream:
+                stream.write(json.dumps({'question': question, 'candidate': row,
+&gt;                   'decision': result.__dict__}, ensure_ascii=False, default=str) + '\n')
+                                ^^^^^^^^^^^^^^^
+E               AttributeError: 'ReadContextAdmission' object has no attribute '__dict__'. Did you mean: '__dir__'?
+
+v2plan/test_next07_grounded_first.py:57: AttributeError</failure></testcase><testcase classname="v2plan.test_next07_grounded_first" name="test_i3_guard_mutations[change11]" time="0.190"><failure message="AttributeError: 'ReadContextAdmission' object has no attribute '__dict__'. Did you mean: '__dir__'?">tmp_path = PosixPath('/tmp/pytest-of-viadmin/pytest-0/test_i3_guard_mutations_change11')
+change = {'source_class': 'library_doc'}
+
+    @pytest.mark.parametrize('change', [
+        {'project_identity': 'other'}, {'repository_identity': 'other'},
+        {'freshness': 'stale'}, {'index_freshness': 'dirty'},
+        {'risk_flags': ['unsafe']}, {'instruction_risk_flags': ['injection']},
+        {'lifecycle_status': 'archived'}, {'char_span': [0, 1]},
+        {'resolved_version': 'wrong'}, {'generation_id': 'wrong'},
+        {'path': 'docs/other.md'}, {'source_class': 'library_doc'},
+    ])
+    def test_i3_guard_mutations(tmp_path, change):
+        _, _, docs, question = fixture_inputs(ROOT)[0]
+        rows, _ = prepared_units(tmp_path, docs, question)
+        row = next(r for r in rows if '17 seconds' in r['snippet'])
+&gt;       assert decision(row, question).allowed
+               ^^^^^^^^^^^^^^^^^^^^^^^
+
+v2plan/test_next07_grounded_first.py:122: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+row = {'_evidence_sets': [{'edges': [['heading', 0, 1, 'markdown-owning-heading-v1']], 'member_spans': [[0, 13, '1ec9d6586bb...944e0483e4753b3ea9a842b2cd1d59189b3d5c72', 'snapshot_id': 'gen-ea97b279462b42518bb54a43a8192884', 'version': ''}}, ...}
+question = 'What is LeaseClient default timeout duration for requests and which exception is raised when an operation expires?'
+identity = None
+
+    def decision(row, question, identity=None):
+        result = read_decision(row, question=question,
+            expected_project_identity=identity or row['project_identity'])
+        if directory := os.environ.get('NEXT07_CONTROL_OUT'):
+            target = Path(directory)
+            target.mkdir(parents=True, exist_ok=True)
+            # One append-only diagnostic row, including source bytes and guard inputs.
+            with (target / 'decisions.jsonl').open('a') as stream:
+                stream.write(json.dumps({'question': question, 'candidate': row,
+&gt;                   'decision': result.__dict__}, ensure_ascii=False, default=str) + '\n')
+                                ^^^^^^^^^^^^^^^
+E               AttributeError: 'ReadContextAdmission' object has no attribute '__dict__'. Did you mean: '__dir__'?
+
+v2plan/test_next07_grounded_first.py:57: AttributeError</failure></testcase><testcase classname="v2plan.test_next07_grounded_first" name="test_i3_existing_disabled_enabled_negative" time="0.188"><failure message="AttributeError: 'ReadContextAdmission' object has no attribute '__dict__'. Did you mean: '__dir__'?">tmp_path = PosixPath('/tmp/pytest-of-viadmin/pytest-0/test_i3_existing_disabled_enab0')
+
+    def test_i3_existing_disabled_enabled_negative(tmp_path):
+        # Existing supported state control, not a new condition language.
+        question = 'What is OrbitClient default timeout when preview is disabled?'
+        allowed = '# OrbitClient\n\nWhen preview is disabled, OrbitClient default timeout is 7 seconds.\n'
+        forbidden = allowed.replace('preview is disabled', 'preview is enabled')
+        rows, _ = prepared_units(tmp_path / 'positive', {'guide.md': allowed}, question)
+&gt;       assert any(decision(r, question).allowed for r in rows)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+v2plan/test_next07_grounded_first.py:135: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+v2plan/test_next07_grounded_first.py:135: in &lt;genexpr&gt;
+    assert any(decision(r, question).allowed for r in rows)
+               ^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+row = {'_evidence_sets': [{'edges': [['heading', 0, 1, 'markdown-owning-heading-v1']], 'member_spans': [[0, 13, 'e837900d92b...313b92c3680ae7a27bde1351b294f0263e87ef10', 'snapshot_id': 'gen-fd3106bd0ec84d8c8b9c8885670124f7', 'version': ''}}, ...}
+question = 'What is OrbitClient default timeout when preview is disabled?'
+identity = None
+
+    def decision(row, question, identity=None):
+        result = read_decision(row, question=question,
+            expected_project_identity=identity or row['project_identity'])
+        if directory := os.environ.get('NEXT07_CONTROL_OUT'):
+            target = Path(directory)
+            target.mkdir(parents=True, exist_ok=True)
+            # One append-only diagnostic row, including source bytes and guard inputs.
+            with (target / 'decisions.jsonl').open('a') as stream:
+                stream.write(json.dumps({'question': question, 'candidate': row,
+&gt;                   'decision': result.__dict__}, ensure_ascii=False, default=str) + '\n')
+                                ^^^^^^^^^^^^^^^
+E               AttributeError: 'ReadContextAdmission' object has no attribute '__dict__'. Did you mean: '__dir__'?
+
+v2plan/test_next07_grounded_first.py:57: AttributeError</failure></testcase><testcase classname="v2plan.test_next07_grounded_first" name="test_i3_trailing_restriction_across_structural_boundary" time="0.220"><failure message="AttributeError: 'ReadContextAdmission' object has no attribute '__dict__'. Did you mean: '__dir__'?">tmp_path = PosixPath('/tmp/pytest-of-viadmin/pytest-0/test_i3_trailing_restriction_a0')
+
+    def test_i3_trailing_restriction_across_structural_boundary(tmp_path):
+        question = 'Which exception does LeaseClient raise when an operation expires?'
+        # Fixed hard-max boundary control: the source's restriction follows a long
+        # intervening paragraph in the same heading section. No algorithm tuning.
+        raw = ('# LeaseClient\n\nLeaseClient raises `LeaseExpired`.\n\n'
+            + 'Documentation. ' * 330 + '\n\nOnly when an operation expires.\n')
+        rows, _ = prepared_units(tmp_path, {'guide.md': raw}, question)
+        facts = [r for r in rows if 'LeaseClient raises `LeaseExpired`.' in r['snippet']]
+        assert facts
+        for row in facts:
+&gt;           if decision(row, question).allowed:
+               ^^^^^^^^^^^^^^^^^^^^^^^
+
+v2plan/test_next07_grounded_first.py:151: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+row = {'_evidence_sets': [{'edges': [['heading', 0, 1, 'markdown-owning-heading-v1']], 'member_spans': [[0, 13, '1ec9d6586bb...05a87910d9acfc7d8d7a773ca5d93e309c3041b5', 'snapshot_id': 'gen-1898fc03f8bd49a68778c5b593424497', 'version': ''}}, ...}
+question = 'Which exception does LeaseClient raise when an operation expires?'
+identity = None
+
+    def decision(row, question, identity=None):
+        result = read_decision(row, question=question,
+            expected_project_identity=identity or row['project_identity'])
+        if directory := os.environ.get('NEXT07_CONTROL_OUT'):
+            target = Path(directory)
+            target.mkdir(parents=True, exist_ok=True)
+            # One append-only diagnostic row, including source bytes and guard inputs.
+            with (target / 'decisions.jsonl').open('a') as stream:
+                stream.write(json.dumps({'question': question, 'candidate': row,
+&gt;                   'decision': result.__dict__}, ensure_ascii=False, default=str) + '\n')
+                                ^^^^^^^^^^^^^^^
+E               AttributeError: 'ReadContextAdmission' object has no attribute '__dict__'. Did you mean: '__dir__'?
+
+v2plan/test_next07_grounded_first.py:57: AttributeError</failure></testcase></testsuite></testsuites>

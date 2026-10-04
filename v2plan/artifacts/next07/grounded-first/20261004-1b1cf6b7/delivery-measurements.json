@@ -1,0 +1,56 @@
+[
+  {
+    "parameter": 17,
+    "G_raw_json": {
+      "utf8_bytes": 879,
+      "actual_tokens": 270,
+      "tokenizer": "docatlas-offline:o200k_base"
+    },
+    "G_ceil_utf8_bytes_over_4": 220,
+    "N_whole_dto_tokens": 313,
+    "N_sources": [
+      {
+        "evidence_id": "ev-bb33851b177d7041",
+        "path_or_url": "overview.md",
+        "section": "Overview",
+        "snippet": "# Overview\n\nLeaseClient default timeout duration requests exception operation behavior documentation.",
+        "version_binding": "unversioned",
+        "content_sha256": "d4bb4e555badad846e9199af90dbc759fe1f316ddd2dafd72ac44f597af4683f",
+        "project_identity": "local:caba215133612cb3f776e6029ec2f6ac59e93775f5d288fb67538bff1ed7f5c6",
+        "authority": "source_of_truth",
+        "scope": "project",
+        "line_start": 1,
+        "line_end": 3,
+        "source_uri": "docatlas://source/09d2c57d203bef1d9282faa6"
+      }
+    ],
+    "C_final_packet": "NOT_RUN"
+  },
+  {
+    "parameter": 29,
+    "G_raw_json": {
+      "utf8_bytes": 878,
+      "actual_tokens": 270,
+      "tokenizer": "docatlas-offline:o200k_base"
+    },
+    "G_ceil_utf8_bytes_over_4": 220,
+    "N_whole_dto_tokens": 314,
+    "N_sources": [
+      {
+        "evidence_id": "ev-bb33851b177d7041",
+        "path_or_url": "overview.md",
+        "section": "Overview",
+        "snippet": "# Overview\n\nLeaseClient default timeout duration requests exception operation behavior documentation.",
+        "version_binding": "unversioned",
+        "content_sha256": "d4bb4e555badad846e9199af90dbc759fe1f316ddd2dafd72ac44f597af4683f",
+        "project_identity": "local:dea061fffdf1cac3fe379442cd47f0b65cf2a18c3da9db74b05470444d60f249",
+        "authority": "source_of_truth",
+        "scope": "project",
+        "line_start": 1,
+        "line_end": 3,
+        "source_uri": "docatlas://source/7a83f77fece4d35d9c3c717b"
+      }
+    ],
+    "C_final_packet": "NOT_RUN"
+  }
+]

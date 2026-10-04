@@ -1,0 +1,16 @@
+{
+  "final_research_code_sha256": {
+    "v2plan/next07_grounded_run.py": "d790285392fad8a45e7e6ea952aac824aa35b9e93e9b8c63ad06132e6db1f858",
+    "v2plan/next07_grounded_reference.py": "046083781c8454637cc0811a5b4f7dae97b2454fc4321cf59fae9f783be87e02",
+    "v2plan/next07_grounded_candidate.py": "86069e6196b448da907a4f91d31207cdfe907da9b69adfe2fdd4b735e66f7436",
+    "v2plan/test_next07_grounded_first.py": "5d0910419455e0643d8ef0a63ed05cbdcab088fde0e6a2602ed4e19651366cd4",
+    "v2plan/third_party/grounded-3.2.1/LICENSE": "e6cb7201b3a7a41503859e0761ac5f2f755392c6e0826ae81e5a1beadf918a31",
+    "v2plan/third_party/grounded-3.2.1/NOTICE.md": "a0f4e44bd0fdd1bb69b73847ab89de1bb6bde45eea0732af196f3eca665c9133",
+    "v2plan/third_party/grounded-3.2.1/fts_query.py": "854cbbf8b74a2655aef1bb0a2583a181749fc472c005582e2631306f8410f95a",
+    "v2plan/third_party/grounded-3.2.1/manifest.json": "a14be5a861e880b65b80054cb3629157d57d09e215cd67a41584b565d21ea335",
+    "v2plan/third_party/grounded-3.2.1/passage_splitter.py": "9cf1320784290243a038afd9adda7f737b8377bbc88fa1aabd7f896f463f7968"
+  },
+  "runtime_patch": null,
+  "native_candidate": "NOT_RUN",
+  "code_status": "not accepted; retain original negative/invalid evidence"
+}

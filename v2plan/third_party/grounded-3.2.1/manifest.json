@@ -1,0 +1,28 @@
+{
+  "commit": "f2938c47bb8937c650f0d5ddb614f867773b29f4",
+  "tag": "v3.2.1",
+  "copyright": "Copyright (c) 2025 Andre Rabold",
+  "license": "MIT",
+  "files": {
+    "LICENSE": {
+      "sha256": "e6cb7201b3a7a41503859e0761ac5f2f755392c6e0826ae81e5a1beadf918a31",
+      "git_blob_sha": "6270acc55df686edf3123943d339548bff917e3e"
+    },
+    "src/splitter/GreedySplitter.ts": {
+      "sha256": "b583a1d05f5ef1dee4fe560da77bd43f502b4b6349e400b2c46a3702e1d3392c",
+      "git_blob_sha": "12e1e3ad40509ab6c4fe5dc9b72318ff99672602"
+    },
+    "src/store/DocumentStore.ts": {
+      "sha256": "7de2af2418c1cd1b9bd8f7f5420ebeff6747c486b25cddde9e3236848c10a4df",
+      "git_blob_sha": "3455b6e92ae469a0d685dd0f0048c356554fddbf"
+    },
+    "db/migrations/009-add-pages-table.sql": {
+      "sha256": "cce4b99e0d5dfa8d5507b722a440e1fb2b8f8b0ba1720881bc50012f48e2d5f2",
+      "git_blob_sha": "6a628461ede89d62cd9126c522b7763347d47e25"
+    }
+  },
+  "adaptations": {
+    "passage_splitter.py": "9cf1320784290243a038afd9adda7f737b8377bbc88fa1aabd7f896f463f7968",
+    "fts_query.py": "854cbbf8b74a2655aef1bb0a2583a181749fc472c005582e2631306f8410f95a"
+  }
+}

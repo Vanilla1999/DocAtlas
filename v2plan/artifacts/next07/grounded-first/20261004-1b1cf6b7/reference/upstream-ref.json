@@ -1,0 +1,12 @@
+{
+  "command": [
+    "git",
+    "ls-remote",
+    "https://github.com/arabold/docs-mcp-server.git",
+    "refs/tags/v3.2.1",
+    "refs/tags/v3.2.1^{}"
+  ],
+  "returncode": 0,
+  "stdout": "f2938c47bb8937c650f0d5ddb614f867773b29f4\trefs/tags/v3.2.1\n",
+  "stderr": ""
+}

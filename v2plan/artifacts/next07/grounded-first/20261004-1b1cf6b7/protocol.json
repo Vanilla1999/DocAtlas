@@ -1,0 +1,54 @@
+{
+  "step": "I.0",
+  "question": "What is LeaseClient default timeout duration for requests and which exception is raised when an operation expires?",
+  "parameters": [
+    [
+      17,
+      "LeaseExpired"
+    ],
+    [
+      29,
+      "WaitExpired"
+    ]
+  ],
+  "fixture_path": "tests/docs/test_need_local_admission.py",
+  "fixture_sha256": "bd6f8f6dcb7b8b0485913583a59542707c2bd86d5927510f6d2ddeb4ee636649",
+  "python": "/home/viadmin/StudioProjects/hermes/docmancer/.venv/bin/python",
+  "versions": {
+    "python": "Python 3.13.12",
+    "node": "v22.22.2",
+    "npm": "10.9.7"
+  },
+  "grounded": {
+    "package": "@arabold/docs-mcp-server",
+    "version": "3.2.1",
+    "source_sha": "f2938c47bb8937c650f0d5ddb614f867773b29f4"
+  },
+  "candidate": {
+    "structural_chars": [
+      500,
+      1500,
+      5000
+    ],
+    "tokenizer": "porter unicode61",
+    "bm25": [
+      10.0,
+      1.0,
+      5.0,
+      1.0
+    ],
+    "pool_max": 20,
+    "packer": "whole-window first-fit; no clipping/rescue",
+    "admission_budget": 800,
+    "source_rows": 3,
+    "runtime_implementation": "NOT_RUN"
+  },
+  "controls_and_criteria": "frozen-plan.md sections I.0–I.6 and 4; no changes allowed",
+  "caps_and_required_commands": "Candidate-specific inventory NOT_RUN; must be completed before I.2, no cap increase authorized",
+  "isolation": {
+    "checkout": "/tmp/opencode/next07-20261004-1b1cf6b7-baseline",
+    "benchmark": "local corpus only; no API keys/embeddings/telemetry"
+  },
+  "historical_inventory": "historical-claims.json",
+  "policy_delta": "policy-delta.json"
+}

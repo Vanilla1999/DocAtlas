@@ -1,0 +1,55 @@
+{
+  "allowlist": [
+    {
+      "node_id": "tests/docs/test_read_context_admission_boundary.py::test_local_topic_witness_rejects_heading_echo_and_scattered_terms[storage retention details are documented.]",
+      "old_obligation": "empty read context without condition proof or lexical floor",
+      "new_expectation": "source-bound context may be delivered; no applicability/support/edit credit",
+      "reason": "approved isolated read-policy delta",
+      "remaining_guards": "source/security/identity/scope/version/freshness/snapshot/span/exact and known mismatch"
+    },
+    {
+      "node_id": "tests/docs/test_read_context_admission_boundary.py::test_local_topic_witness_rejects_heading_echo_and_scattered_terms[storage is documented. retention is documented. behavior is documented.]",
+      "old_obligation": "empty read context without condition proof or lexical floor",
+      "new_expectation": "source-bound context may be delivered; no applicability/support/edit credit",
+      "reason": "approved isolated read-policy delta",
+      "remaining_guards": "source/security/identity/scope/version/freshness/snapshot/span/exact and known mismatch"
+    },
+    {
+      "node_id": "tests/docs/test_read_context_admission_boundary.py::test_local_topic_witness_rejects_heading_echo_and_scattered_terms[storage behavior retention is documented.]",
+      "old_obligation": "empty read context without condition proof or lexical floor",
+      "new_expectation": "source-bound context may be delivered; no applicability/support/edit credit",
+      "reason": "approved isolated read-policy delta",
+      "remaining_guards": "source/security/identity/scope/version/freshness/snapshot/span/exact and known mismatch"
+    },
+    {
+      "node_id": "tests/docs/test_read_context_admission_boundary.py::test_added_identity_or_condition_does_not_preserve_context[When caching is disabled, what is storage retention behavior? Also identify private production deployment configuration credentials owner selected runtime settings.]",
+      "old_obligation": "empty read context without condition proof or lexical floor",
+      "new_expectation": "source-bound context may be delivered; no applicability/support/edit credit",
+      "reason": "approved isolated read-policy delta",
+      "remaining_guards": "source/security/identity/scope/version/freshness/snapshot/span/exact and known mismatch"
+    }
+  ],
+  "other_nodes": [
+    "tests/docs/test_read_context_admission_boundary.py::test_original_partial_query_retains_read_context_without_coverage",
+    "tests/docs/test_read_context_admission_boundary.py::test_topic_context_cannot_bypass_source_guards[change0]",
+    "tests/docs/test_read_context_admission_boundary.py::test_topic_context_cannot_bypass_source_guards[change1]",
+    "tests/docs/test_read_context_admission_boundary.py::test_topic_context_cannot_bypass_source_guards[change2]",
+    "tests/docs/test_read_context_admission_boundary.py::test_topic_context_cannot_bypass_source_guards[change3]",
+    "tests/docs/test_read_context_admission_boundary.py::test_topic_context_cannot_bypass_source_guards[change4]",
+    "tests/docs/test_read_context_admission_boundary.py::test_topic_context_cannot_bypass_source_guards[change5]",
+    "tests/docs/test_read_context_admission_boundary.py::test_topic_context_cannot_bypass_source_guards[change6]",
+    "tests/docs/test_read_context_admission_boundary.py::test_snapshot_and_question_binding_are_recomputed",
+    "tests/docs/test_read_context_admission_boundary.py::test_clipped_topic_and_tiny_budget_cannot_reuse_approval",
+    "tests/docs/test_read_context_admission_boundary.py::test_local_topic_witness_rejects_heading_echo_and_scattered_terms[# storage retention behavior\\n\\nUnrelated network details.]",
+    "tests/docs/test_read_context_admission_boundary.py::test_local_topic_witness_rejects_heading_echo_and_scattered_terms[storage retention behavior\\n==========================\\n\\nstorage is documented. retention is documented. behavior is documented.]",
+    "tests/docs/test_read_context_admission_boundary.py::test_local_topic_witness_rejects_heading_echo_and_scattered_terms[storage retention behavior?]",
+    "tests/docs/test_read_context_admission_boundary.py::test_local_topic_witness_rejects_heading_echo_and_scattered_terms[storage retention behavior.]",
+    "tests/docs/test_read_context_admission_boundary.py::test_unicode_original_topic_is_not_translated",
+    "tests/docs/test_read_context_admission_boundary.py::test_prepared_source_identity_cannot_be_forged[canonical_path-docs/other.md]",
+    "tests/docs/test_read_context_admission_boundary.py::test_prepared_source_identity_cannot_be_forged[content_sha256-0000000000000000000000000000000000000000000000000000000000000000]",
+    "tests/docs/test_read_context_admission_boundary.py::test_prepared_source_identity_cannot_be_forged[document_id-other]",
+    "tests/docs/test_read_context_admission_boundary.py::test_added_identity_or_condition_does_not_preserve_context[`OtherEngine` storage retention behavior. Also identify private production deployment configuration credentials owner selected runtime settings.]"
+  ],
+  "frozen_80_expectations": "unchanged; conflicts are not PASS",
+  "status": "frozen before candidate"
+}

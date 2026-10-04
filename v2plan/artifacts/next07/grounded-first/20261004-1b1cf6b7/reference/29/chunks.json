@@ -1,0 +1,23 @@
+[
+  {
+    "id": 1,
+    "content": "# LeaseClient\nThe default timeout is 29 seconds.",
+    "metadata": "{\"types\":[\"heading\",\"text\"],\"level\":1,\"path\":[\"LeaseClient\"]}",
+    "sort_order": 0,
+    "url": "file:///tmp/opencode/next07-20261004-1b1cf6b7-reference/29/corpus/default.md"
+  },
+  {
+    "id": 2,
+    "content": "# LeaseClient\nAn expired operation raises `WaitExpired`.",
+    "metadata": "{\"types\":[\"heading\",\"text\"],\"level\":1,\"path\":[\"LeaseClient\"]}",
+    "sort_order": 0,
+    "url": "file:///tmp/opencode/next07-20261004-1b1cf6b7-reference/29/corpus/error.md"
+  },
+  {
+    "id": 3,
+    "content": "# Overview\nLeaseClient default timeout duration requests exception operation behavior documentation.",
+    "metadata": "{\"types\":[\"heading\",\"text\"],\"level\":1,\"path\":[\"Overview\"]}",
+    "sort_order": 0,
+    "url": "file:///tmp/opencode/next07-20261004-1b1cf6b7-reference/29/corpus/overview.md"
+  }
+]

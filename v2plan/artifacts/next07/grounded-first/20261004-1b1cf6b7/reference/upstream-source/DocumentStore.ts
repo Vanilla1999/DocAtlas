@@ -1,0 +1,2971 @@
+import { statSync } from "node:fs";
+import type { Embeddings } from "@langchain/core/embeddings";
+import Database, { type Database as DatabaseType } from "better-sqlite3";
+import * as sqliteVec from "sqlite-vec";
+import type { ScrapeResult, ScraperOptions } from "../scraper/types";
+import { type AppConfig, isVectorDimensionExplicit } from "../utils/config";
+import { logger } from "../utils/logger";
+import { MimeTypeUtils } from "../utils/mimeTypeUtils";
+import { compareVersionsDescending } from "../utils/version";
+import { applyMigrations } from "./applyMigrations";
+import { EmbeddingConfig, type EmbeddingModelConfig } from "./embeddings/EmbeddingConfig";
+import {
+  areCredentialsAvailable,
+  createEmbeddingModel,
+  ModelConfigurationError,
+  UnsupportedProviderError,
+} from "./embeddings/EmbeddingFactory";
+import { FixedDimensionEmbeddings } from "./embeddings/FixedDimensionEmbeddings";
+import {
+  ConnectionError,
+  DimensionError,
+  EmbeddingModelChangedError,
+  StoreError,
+} from "./errors";
+import type {
+  ActivityHistory,
+  CompactResult,
+  DbChunkMetadata,
+  DbChunkRank,
+  LibraryVersionSummary,
+  ListVersionChunksOptions,
+  ListVersionChunksResult,
+  StoredScraperOptions,
+  VersionChunkListItem,
+  VersionChunkStats,
+  VersionComposition,
+} from "./types";
+import {
+  type DbChunk,
+  type DbLibraryVersion,
+  type DbPage,
+  type DbPageChunk,
+  type DbQueryResult,
+  type DbVersion,
+  type DbVersionWithLibrary,
+  denormalizeVersionName,
+  normalizeLibraryName,
+  normalizeVersionLabel,
+  normalizeVersionName,
+  type VersionScraperOptions,
+  type VersionStatus,
+} from "./types";
+
+interface RawSearchResult extends DbChunk {
+  // Page fields joined from pages table
+  url?: string;
+  title?: string | null;
+  source_content_type?: string | null;
+  content_type?: string | null;
+  // Search scoring fields
+  vec_score?: number;
+  fts_score?: number;
+}
+
+interface RankedResult extends RawSearchResult {
+  vec_rank?: number;
+  fts_rank?: number;
+  rrf_score: number;
+}
+
+interface EmbeddingBatchContext {
+  url: string;
+  batchIndex: number;
+  batchTextCount: number;
+  batchChars: number;
+  totalChunks: number;
+}
+
+/**
+ * Whether a competing representation should be turned away.
+ *
+ * A page reachable as both a published Markdown file and an HTML page produces
+ * two writes under one identity, and which arrives last is an accident of crawl
+ * order. Markdown the site publishes is what its authors wrote for machine
+ * consumption, so it wins; converting HTML ourselves is the fallback for sites
+ * offering nothing better. A `.md` URL answered as `text/plain` counts as
+ * Markdown — see `WebScraperStrategy.asMarkdownRepresentation`.
+ *
+ * Only applies between representations seen in the same crawl. A first write
+ * for an identity always lands, so a later crawl's answer supersedes an earlier
+ * crawl's rather than being blocked by it.
+ */
+function losesToStoredRepresentation(
+  stored: PageIdRow | undefined,
+  incomingSourceContentType: string | null | undefined,
+  isAdditionalRepresentation: boolean | undefined,
+): boolean {
+  if (!stored || !isAdditionalRepresentation) return false;
+  return (
+    MimeTypeUtils.isMarkdown(stored.source_content_type ?? "") &&
+    !MimeTypeUtils.isMarkdown(incomingSourceContentType ?? "")
+  );
+}
+
+/** The row `getPageId` returns. Declared once so its two readers agree. */
+interface PageIdRow {
+  id: number;
+  source_content_type: string | null;
+}
+
+/**
+ * Manages document storage and retrieval using SQLite with vector and full-text search capabilities.
+ * Provides direct access to SQLite with prepared statements to store and query document
+ * embeddings along with their metadata. Supports versioned storage of documents for different
+ * libraries, enabling version-specific document retrieval and searches.
+ */
+export class DocumentStore {
+  private readonly config: AppConfig;
+  private readonly dbPath: string;
+
+  private readonly db: DatabaseType;
+  private embeddings: Embeddings | null = null;
+  private dbDimension: number;
+  private readonly searchWeightVec: number;
+  private readonly searchWeightFts: number;
+  private readonly searchOverfetchFactor: number;
+  private readonly vectorSearchMultiplier: number;
+  private readonly splitterMaxChunkSize: number;
+  private readonly embeddingBatchSize: number;
+  private readonly embeddingBatchChars: number;
+  private readonly embeddingInitTimeoutMs: number;
+  private modelDimension: number | null = null;
+  private readonly embeddingConfig?: EmbeddingModelConfig | null;
+  private isVectorSearchEnabled: boolean = false;
+
+  /**
+   * Returns the active embedding configuration if vector search is enabled,
+   * or null if embeddings are disabled (no config provided or credentials unavailable).
+   */
+  getActiveEmbeddingConfig(): EmbeddingModelConfig | null {
+    if (!this.isVectorSearchEnabled || !this.embeddingConfig) {
+      return null;
+    }
+    return this.embeddingConfig;
+  }
+
+  private statements!: {
+    getById: Database.Statement<[bigint]>;
+    // Updated for new schema - documents table now uses page_id
+    insertDocument: Database.Statement<[number, string, string, number]>;
+    // Updated for new schema - embeddings stored directly in documents table
+    insertEmbedding: Database.Statement<[string, bigint]>;
+    // New statement for pages table
+    insertPage: Database.Statement<
+      [
+        number,
+        string,
+        string,
+        string | null,
+        string | null,
+        string | null,
+        string | null,
+        number | null,
+        string | null,
+      ]
+    >;
+    getPageId: Database.Statement<[number, string]>;
+    deleteDocuments: Database.Statement<[string, string]>;
+    deleteDocumentsByPageId: Database.Statement<[number]>;
+    deletePage: Database.Statement<[number]>;
+    deletePages: Database.Statement<[string, string]>;
+    queryVersions: Database.Statement<[string]>;
+    checkExists: Database.Statement<[string, string]>;
+    queryLibraryVersions: Database.Statement<[]>;
+    getChildChunks: Database.Statement<
+      [string, string, string, number, string, bigint, number]
+    >;
+    getPrecedingSiblings: Database.Statement<
+      [string, string, string, bigint, string, number]
+    >;
+    getSubsequentSiblings: Database.Statement<
+      [string, string, string, bigint, string, number]
+    >;
+    getParentChunk: Database.Statement<[string, string, string, string, bigint]>;
+    insertLibrary: Database.Statement<[string]>;
+    getLibraryIdByName: Database.Statement<[string]>;
+    getLibraryById: Database.Statement<[number]>;
+    // New version-related statements
+    insertVersion: Database.Statement<[number, string | null]>;
+    resolveVersionId: Database.Statement<[number, string | null]>;
+    getVersionById: Database.Statement<[number]>;
+    queryVersionsByLibraryId: Database.Statement<[number]>;
+    // Status tracking statements
+    updateVersionStatus: Database.Statement<[string, string | null, number]>;
+    updateVersionProgress: Database.Statement<[number, number, number | null, number]>;
+    getVersionsByStatus: Database.Statement<string[]>;
+    // Scraper options statements
+    updateVersionScraperOptions: Database.Statement<[string, string, number]>;
+    getVersionWithOptions: Database.Statement<[number]>;
+    getVersionsBySourceUrl: Database.Statement<[string]>;
+    // Version and library deletion statements
+    deleteVersionById: Database.Statement<[number]>;
+    deleteLibraryById: Database.Statement<[number]>;
+    countVersionsByLibraryId: Database.Statement<[number]>;
+    getVersionId: Database.Statement<[string, string]>;
+    getPagesByVersionId: Database.Statement<[number]>;
+  };
+
+  /**
+   * Calculates Reciprocal Rank Fusion score for a result with configurable weights
+   */
+  private calculateRRF(vecRank?: number, ftsRank?: number, k = 60): number {
+    let rrf = 0;
+    if (vecRank !== undefined) {
+      rrf += this.searchWeightVec / (k + vecRank);
+    }
+    if (ftsRank !== undefined) {
+      rrf += this.searchWeightFts / (k + ftsRank);
+    }
+    return rrf;
+  }
+
+  /**
+   * Assigns ranks to search results based on their scores
+   */
+  private assignRanks(results: RawSearchResult[]): RankedResult[] {
+    // Create maps to store ranks
+    const vecRanks = new Map<number, number>();
+    const ftsRanks = new Map<number, number>();
+
+    // Sort by vector scores and assign ranks
+    results
+      .filter((r) => r.vec_score !== undefined)
+      .sort((a, b) => (b.vec_score ?? 0) - (a.vec_score ?? 0))
+      .forEach((result, index) => {
+        vecRanks.set(Number(result.id), index + 1);
+      });
+
+    // Sort by BM25 scores and assign ranks
+    results
+      .filter((r) => r.fts_score !== undefined)
+      .sort((a, b) => (b.fts_score ?? 0) - (a.fts_score ?? 0))
+      .forEach((result, index) => {
+        ftsRanks.set(Number(result.id), index + 1);
+      });
+
+    // Combine results with ranks and calculate RRF
+    return results.map((result) => ({
+      ...result,
+      vec_rank: vecRanks.get(Number(result.id)),
+      fts_rank: ftsRanks.get(Number(result.id)),
+      rrf_score: this.calculateRRF(
+        vecRanks.get(Number(result.id)),
+        ftsRanks.get(Number(result.id)),
+      ),
+    }));
+  }
+
+  constructor(dbPath: string, appConfig: AppConfig) {
+    if (!dbPath) {
+      throw new StoreError("Missing required database path");
+    }
+    this.dbPath = dbPath;
+    this.config = appConfig;
+    this.dbDimension = this.config.embeddings.vectorDimension;
+    this.searchWeightVec = this.config.search.weightVec;
+    this.searchWeightFts = this.config.search.weightFts;
+    this.searchOverfetchFactor = this.config.search.overfetchFactor;
+    this.vectorSearchMultiplier = this.config.search.vectorMultiplier;
+    this.splitterMaxChunkSize = this.config.splitter.maxChunkSize;
+    this.embeddingBatchSize = this.config.embeddings.batchSize;
+    this.embeddingBatchChars = this.config.embeddings.batchChars;
+    this.embeddingInitTimeoutMs = this.config.embeddings.initTimeoutMs;
+
+    // Only establish database connection in constructor
+    this.db = new Database(dbPath);
+
+    // Store embedding config for later initialization
+    this.embeddingConfig = this.resolveEmbeddingConfig(appConfig.app.embeddingModel);
+  }
+
+  private resolveEmbeddingConfig(modelSpec: string): EmbeddingModelConfig | null {
+    const resolvedSpec = modelSpec;
+    if (!resolvedSpec) {
+      logger.debug("No embedding model specified. Embeddings are disabled.");
+      return null;
+    }
+
+    try {
+      logger.debug(`Resolving embedding configuration for model: ${resolvedSpec}`);
+      return EmbeddingConfig.parseEmbeddingConfig(resolvedSpec);
+    } catch (error) {
+      logger.debug(`Failed to resolve embedding configuration: ${error}`);
+      return null;
+    }
+  }
+
+  /**
+   * Sets up prepared statements for database queries
+   */
+  private prepareStatements(): void {
+    const statements = {
+      getById: this.db.prepare<[bigint]>(
+        `SELECT d.id, d.page_id, d.content, json(d.metadata) as metadata, d.sort_order, d.embedding, d.created_at, p.url, p.title, p.source_content_type, p.content_type, p.content_url 
+         FROM documents d
+         JOIN pages p ON d.page_id = p.id
+         WHERE d.id = ?`,
+      ),
+      // Updated for new schema
+      insertDocument: this.db.prepare<[number, string, string, number]>(
+        "INSERT INTO documents (page_id, content, metadata, sort_order) VALUES (?, ?, ?, ?)",
+      ),
+      insertEmbedding: this.db.prepare<[string, bigint]>(
+        "UPDATE documents SET embedding = ? WHERE id = ?",
+      ),
+      insertPage: this.db.prepare<
+        [
+          number,
+          string,
+          string,
+          string | null,
+          string | null,
+          string | null,
+          string | null,
+          number | null,
+          string | null,
+        ]
+      >(
+        "INSERT INTO pages (version_id, url, title, etag, last_modified, source_content_type, content_type, depth, content_url) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?) ON CONFLICT(version_id, url) DO UPDATE SET title = excluded.title, source_content_type = excluded.source_content_type, content_type = excluded.content_type, etag = excluded.etag, last_modified = excluded.last_modified, depth = excluded.depth, content_url = excluded.content_url",
+      ),
+      // Returns the row shape described by `PageIdRow`.
+      getPageId: this.db.prepare<[number, string]>(
+        "SELECT id, source_content_type FROM pages WHERE version_id = ? AND url = ?",
+      ),
+      insertLibrary: this.db.prepare<[string]>(
+        "INSERT INTO libraries (name) VALUES (?) ON CONFLICT(name) DO NOTHING",
+      ),
+      getLibraryIdByName: this.db.prepare<[string]>(
+        "SELECT id FROM libraries WHERE name = ?",
+      ),
+      getLibraryById: this.db.prepare<[number]>("SELECT * FROM libraries WHERE id = ?"),
+      // New version-related statements
+      insertVersion: this.db.prepare<[number, string]>(
+        "INSERT INTO versions (library_id, name, status) VALUES (?, ?, 'not_indexed') ON CONFLICT(library_id, name) DO NOTHING",
+      ),
+      resolveVersionId: this.db.prepare<[number, string]>(
+        "SELECT id FROM versions WHERE library_id = ? AND name = ?",
+      ),
+      getVersionById: this.db.prepare<[number]>("SELECT * FROM versions WHERE id = ?"),
+      queryVersionsByLibraryId: this.db.prepare<[number]>(
+        "SELECT * FROM versions WHERE library_id = ? ORDER BY name",
+      ),
+      deleteDocuments: this.db.prepare<[string, string]>(
+        `DELETE FROM documents 
+         WHERE page_id IN (
+           SELECT p.id FROM pages p
+           JOIN versions v ON p.version_id = v.id
+           JOIN libraries l ON v.library_id = l.id
+           WHERE l.name = ? AND COALESCE(v.name, '') = COALESCE(?, '')
+         )`,
+      ),
+      deleteDocumentsByPageId: this.db.prepare<[number]>(
+        "DELETE FROM documents WHERE page_id = ?",
+      ),
+      deletePage: this.db.prepare<[number]>("DELETE FROM pages WHERE id = ?"),
+      deletePages: this.db.prepare<[string, string]>(
+        `DELETE FROM pages 
+         WHERE version_id IN (
+           SELECT v.id FROM versions v
+           JOIN libraries l ON v.library_id = l.id
+           WHERE l.name = ? AND COALESCE(v.name, '') = COALESCE(?, '')
+         )`,
+      ),
+      getDocumentBySort: this.db.prepare<[string, string]>(
+        `SELECT d.id
+         FROM documents d
+         JOIN pages p ON d.page_id = p.id
+         JOIN versions v ON p.version_id = v.id
+         JOIN libraries l ON v.library_id = l.id
+         WHERE l.name = ?
+         AND COALESCE(v.name, '') = COALESCE(?, '')
+         LIMIT 1`,
+      ),
+      queryVersions: this.db.prepare<[string]>(
+        `SELECT DISTINCT v.name
+         FROM versions v
+         JOIN libraries l ON v.library_id = l.id
+         WHERE l.name = ?
+         ORDER BY v.name`,
+      ),
+      checkExists: this.db.prepare<[string, string]>(
+        `SELECT d.id FROM documents d
+         JOIN pages p ON d.page_id = p.id
+         JOIN versions v ON p.version_id = v.id
+         JOIN libraries l ON v.library_id = l.id
+         WHERE l.name = ?
+         AND COALESCE(v.name, '') = COALESCE(?, '')
+         LIMIT 1`,
+      ),
+      // Library/version aggregation including versions without documents and status/progress fields
+      queryLibraryVersions: this.db.prepare<[]>(
+        `SELECT
+          l.name as library,
+          COALESCE(v.name, '') as version,
+          v.id as versionId,
+          v.status as status,
+          v.error_message as errorMessage,
+          v.progress_pages as progressPages,
+          v.progress_max_pages as progressMaxPages,
+          v.progress_pages_indexed as progressPagesIndexed,
+          v.source_url as sourceUrl,
+          -- "Last indexed" = when the version was last (re)indexed. Use the
+          -- version's updated_at (bumped on every status/progress change during
+          -- a run, including refreshes) rather than MIN(p.created_at), which is
+          -- the *first*-index time and never moves on refresh. Fall back to the
+          -- oldest page for versions that predate status tracking.
+          COALESCE(v.updated_at, MIN(p.created_at)) as indexedAt,
+          COUNT(d.id) as documentCount,
+          COUNT(DISTINCT p.url) as uniqueUrlCount
+        FROM versions v
+        JOIN libraries l ON v.library_id = l.id
+        LEFT JOIN pages p ON p.version_id = v.id
+        LEFT JOIN documents d ON d.page_id = p.id
+        GROUP BY v.id
+        ORDER BY l.name, version`,
+      ),
+      getChildChunks: this.db.prepare<
+        [string, string, string, number, string, bigint, number]
+      >(`
+        SELECT d.id, d.page_id, d.content, json(d.metadata) as metadata, d.sort_order, d.embedding, d.created_at, p.url, p.title, p.source_content_type, p.content_type, p.content_url FROM documents d
+        JOIN pages p ON d.page_id = p.id
+        JOIN versions v ON p.version_id = v.id
+        JOIN libraries l ON v.library_id = l.id
+        WHERE l.name = ?
+        AND COALESCE(v.name, '') = COALESCE(?, '')
+        AND p.url = ?
+        AND json_array_length(json_extract(d.metadata, '$.path')) = ?
+        AND json_extract(d.metadata, '$.path') LIKE ? || '%'
+        AND d.sort_order > (SELECT sort_order FROM documents WHERE id = ?)
+        ORDER BY d.sort_order
+        LIMIT ?
+      `),
+      getPrecedingSiblings: this.db.prepare<
+        [string, string, string, bigint, string, number]
+      >(`
+        SELECT d.id, d.page_id, d.content, json(d.metadata) as metadata, d.sort_order, d.embedding, d.created_at, p.url, p.title, p.source_content_type, p.content_type, p.content_url FROM documents d
+        JOIN pages p ON d.page_id = p.id
+        JOIN versions v ON p.version_id = v.id
+        JOIN libraries l ON v.library_id = l.id
+        WHERE l.name = ?
+        AND COALESCE(v.name, '') = COALESCE(?, '')
+        AND p.url = ?
+        AND d.sort_order < (SELECT sort_order FROM documents WHERE id = ?)
+        AND json_extract(d.metadata, '$.path') = ?
+        ORDER BY d.sort_order DESC
+        LIMIT ?
+      `),
+      getSubsequentSiblings: this.db.prepare<
+        [string, string, string, bigint, string, number]
+      >(`
+        SELECT d.id, d.page_id, d.content, json(d.metadata) as metadata, d.sort_order, d.embedding, d.created_at, p.url, p.title, p.source_content_type, p.content_type, p.content_url FROM documents d
+        JOIN pages p ON d.page_id = p.id
+        JOIN versions v ON p.version_id = v.id
+        JOIN libraries l ON v.library_id = l.id
+        WHERE l.name = ?
+        AND COALESCE(v.name, '') = COALESCE(?, '')
+        AND p.url = ?
+        AND d.sort_order > (SELECT sort_order FROM documents WHERE id = ?)
+        AND json_extract(d.metadata, '$.path') = ?
+        ORDER BY d.sort_order
+        LIMIT ?
+      `),
+      getParentChunk: this.db.prepare<[string, string, string, string, bigint]>(`
+        SELECT d.id, d.page_id, d.content, json(d.metadata) as metadata, d.sort_order, d.embedding, d.created_at, p.url, p.title, p.source_content_type, p.content_type, p.content_url FROM documents d
+        JOIN pages p ON d.page_id = p.id
+        JOIN versions v ON p.version_id = v.id
+        JOIN libraries l ON v.library_id = l.id
+        WHERE l.name = ?
+        AND COALESCE(v.name, '') = COALESCE(?, '')
+        AND p.url = ?
+        AND json_extract(d.metadata, '$.path') = ?
+        AND d.sort_order < (SELECT sort_order FROM documents WHERE id = ?)
+        ORDER BY d.sort_order DESC
+        LIMIT 1
+      `),
+      // Status tracking statements
+      updateVersionStatus: this.db.prepare<[string, string | null, number]>(
+        "UPDATE versions SET status = ?, error_message = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?",
+      ),
+      updateVersionProgress: this.db.prepare<[number, number, number | null, number]>(
+        "UPDATE versions SET progress_pages = ?, progress_max_pages = ?, progress_pages_indexed = COALESCE(?, progress_pages_indexed), updated_at = CURRENT_TIMESTAMP WHERE id = ?",
+      ),
+      getVersionsByStatus: this.db.prepare<[string]>(
+        "SELECT v.*, l.name as library_name FROM versions v JOIN libraries l ON v.library_id = l.id WHERE v.status IN (SELECT value FROM json_each(?))",
+      ),
+      // Scraper options statements
+      updateVersionScraperOptions: this.db.prepare<[string, string, number]>(
+        "UPDATE versions SET source_url = ?, scraper_options = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?",
+      ),
+      getVersionWithOptions: this.db.prepare<[number]>(
+        "SELECT * FROM versions WHERE id = ?",
+      ),
+      getVersionsBySourceUrl: this.db.prepare<[string]>(
+        "SELECT v.*, l.name as library_name FROM versions v JOIN libraries l ON v.library_id = l.id WHERE v.source_url = ? ORDER BY v.created_at DESC",
+      ),
+      // Version and library deletion statements
+      deleteVersionById: this.db.prepare<[number]>("DELETE FROM versions WHERE id = ?"),
+      deleteLibraryById: this.db.prepare<[number]>("DELETE FROM libraries WHERE id = ?"),
+      countVersionsByLibraryId: this.db.prepare<[number]>(
+        "SELECT COUNT(*) as count FROM versions WHERE library_id = ?",
+      ),
+      getVersionId: this.db.prepare<[string, string]>(
+        `SELECT v.id, v.library_id FROM versions v
+         JOIN libraries l ON v.library_id = l.id
+         WHERE l.name = ? AND COALESCE(v.name, '') = COALESCE(?, '')`,
+      ),
+      getPagesByVersionId: this.db.prepare<[number]>(
+        "SELECT * FROM pages WHERE version_id = ?",
+      ),
+    };
+    this.statements = statements;
+  }
+
+  /**
+   * Pads a vector to the fixed database dimension by appending zeros.
+   * Throws an error if the input vector is longer than the database dimension.
+   */
+  private padVector(vector: number[]): number[] {
+    if (vector.length > this.dbDimension) {
+      throw new Error(
+        `Vector dimension ${vector.length} exceeds database dimension ${this.dbDimension}`,
+      );
+    }
+    if (vector.length === this.dbDimension) {
+      return vector;
+    }
+    return [...vector, ...new Array(this.dbDimension - vector.length).fill(0)];
+  }
+
+  /**
+   * Reads the stored embedding model and dimension from the metadata table.
+   * Returns null for each value that doesn't exist (e.g., first run or pre-metadata database).
+   */
+  getEmbeddingMetadata(): { model: string | null; dimension: string | null } {
+    // Uses inline db.prepare() so this method works before prepareStatements() is called.
+    // This is necessary because checkEmbeddingModelChange() runs before ensureVectorTable(),
+    // and prepareStatements() cannot run until documents_vec exists (triggers reference it).
+    const modelRow = this.db
+      .prepare<[string]>("SELECT value FROM metadata WHERE key = ?")
+      .get("embedding_model") as { value: string } | undefined;
+    const dimensionRow = this.db
+      .prepare<[string]>("SELECT value FROM metadata WHERE key = ?")
+      .get("embedding_dimension") as { value: string } | undefined;
+    return {
+      model: modelRow?.value ?? null,
+      dimension: dimensionRow?.value ?? null,
+    };
+  }
+
+  /**
+   * Persists the active embedding model and dimension to the metadata table.
+   * Uses upsert (INSERT ON CONFLICT UPDATE) so it works for both first-run and subsequent updates.
+   * Uses inline db.prepare() so this method works before prepareStatements() is called.
+   */
+  setEmbeddingMetadata(model: string, dimension: number): void {
+    const stmt = this.db.prepare<[string, string]>(
+      "INSERT INTO metadata (key, value) VALUES (?, ?) ON CONFLICT(key) DO UPDATE SET value = excluded.value",
+    );
+    const persist = this.db.transaction(() => {
+      stmt.run("embedding_model", model);
+      stmt.run("embedding_dimension", String(dimension));
+    });
+    persist();
+  }
+
+  private getStoredDimensionForCurrentModel(): number | null {
+    const config = this.embeddingConfig;
+    if (!config) {
+      return null;
+    }
+
+    const stored = this.getEmbeddingMetadata();
+    if (stored.model !== config.modelSpec || stored.dimension === null) {
+      return null;
+    }
+
+    const dimension = Number(stored.dimension);
+    return Number.isInteger(dimension) && dimension >= 1 ? dimension : null;
+  }
+
+  /**
+   * Compares the configured embedding model and dimension against stored metadata.
+   * Throws EmbeddingModelChangedError if either has changed since the last run.
+   *
+   * Skipped when:
+   * - No metadata exists (first run / upgrade from pre-metadata DB → silent initialization)
+   * - No embedding model is configured (FTS-only mode)
+   * - Credentials are unavailable for the configured provider (will fall back to FTS-only)
+   */
+  checkEmbeddingModelChange(): void {
+    // Skip if no embedding config (FTS-only mode)
+    if (!this.embeddingConfig) {
+      return;
+    }
+
+    // Skip if credentials are unavailable (will fall back to FTS-only in initializeEmbeddings)
+    if (!areCredentialsAvailable(this.embeddingConfig.provider)) {
+      return;
+    }
+
+    const stored = this.getEmbeddingMetadata();
+
+    // First run: no stored metadata → skip check (silent initialization)
+    if (stored.model === null) {
+      return;
+    }
+
+    const currentModel = this.embeddingConfig.modelSpec;
+    const currentDimension = String(this.dbDimension);
+
+    const modelChanged = stored.model !== currentModel;
+    const dimensionChanged =
+      stored.dimension !== null && stored.dimension !== currentDimension;
+
+    if (modelChanged || dimensionChanged) {
+      throw new EmbeddingModelChangedError(
+        stored.model,
+        stored.dimension ?? "unknown",
+        currentModel,
+        currentDimension,
+      );
+    }
+  }
+
+  /**
+   * Invalidates all existing embedding vectors after a confirmed model/dimension change.
+   * Sets all document embeddings to NULL, drops and recreates the vec table as empty,
+   * and updates the metadata with the new model and dimension.
+   *
+   * After invalidation, FTS search continues working; vector search returns no results
+   * until libraries are re-scraped.
+   */
+  invalidateAllVectors(newModel: string, newDimension: number): void {
+    logger.warn(
+      `⚠️  Invalidating all embedding vectors due to model/dimension change.\n` +
+        `   All libraries must be re-scraped to restore vector search.\n` +
+        `   Full-text search remains available for all existing documents.`,
+    );
+
+    // Clear all stored embedding blobs
+    this.db.exec("UPDATE documents SET embedding = NULL");
+
+    // Drop and recreate vec table as empty with the new dimension
+    this.db.exec("DROP TABLE IF EXISTS documents_vec");
+    this.createVectorTable(newDimension);
+
+    // Update metadata to reflect the new configuration
+    this.setEmbeddingMetadata(newModel, newDimension);
+
+    logger.info(
+      `✅ Embedding vectors invalidated. Metadata updated to: ${newModel} (${newDimension}d)`,
+    );
+  }
+
+  /**
+   * Initialize the embeddings client using the provided config.
+   * If no embedding config is provided (null or undefined), embeddings will not be initialized.
+   * This allows DocumentStore to be used without embeddings for FTS-only operations.
+   *
+   * Environment variables per provider:
+   * - openai: OPENAI_API_KEY (and optionally OPENAI_API_BASE, OPENAI_ORG_ID)
+   * - vertex: GOOGLE_APPLICATION_CREDENTIALS (path to service account JSON)
+   * - gemini: GOOGLE_API_KEY
+   * - aws: AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_REGION
+   * - microsoft: Azure OpenAI credentials (AZURE_OPENAI_API_*)
+   */
+  private async initializeEmbeddings(): Promise<void> {
+    // If embedding config is explicitly null or undefined, skip embedding initialization
+    if (this.embeddingConfig === null || this.embeddingConfig === undefined) {
+      logger.debug(
+        "Embedding initialization skipped (no config provided - FTS-only mode)",
+      );
+      return;
+    }
+
+    const config = this.embeddingConfig;
+
+    // Check if credentials are available for the provider
+    if (!areCredentialsAvailable(config.provider)) {
+      logger.warn(
+        `⚠️  No credentials found for ${config.provider} embedding provider. Vector search is disabled.\n` +
+          `   Only full-text search will be available. To enable vector search, please configure the required\n` +
+          `   environment variables for ${config.provider} or choose a different provider.\n` +
+          `   See README.md for configuration options or run with --help for more details.`,
+      );
+      return; // Skip initialization, keep isVectorSearchEnabled = false
+    }
+
+    // Create embedding model
+    try {
+      if (this.embeddings === null) {
+        this.embeddings = this.createEmbeddingClient(this.dbDimension);
+      }
+
+      const modelDimension = this.modelDimension ?? this.dbDimension;
+
+      // For models wrapped in FixedDimensionEmbeddings with truncation enabled
+      // (e.g., Gemini with MRL support), the effective output dimension is capped
+      // at the target dimension. Use the effective dimension for validation.
+      if (
+        this.embeddings instanceof FixedDimensionEmbeddings &&
+        this.embeddings.allowTruncate
+      ) {
+        this.modelDimension = Math.min(modelDimension, this.dbDimension);
+      } else {
+        this.modelDimension = modelDimension;
+      }
+
+      if (this.modelDimension > this.dbDimension) {
+        throw new DimensionError(config.modelSpec, this.modelDimension, this.dbDimension);
+      }
+
+      // If we reach here, embeddings are successfully initialized
+      this.isVectorSearchEnabled = true;
+      logger.debug(
+        `Embeddings initialized: ${config.provider}:${config.model} (${this.dbDimension}d)`,
+      );
+
+      // Persist the active embedding model identity for change detection on next startup
+      this.setEmbeddingMetadata(config.modelSpec, this.dbDimension);
+    } catch (error) {
+      this.throwEmbeddingInitializationError(error, config);
+    }
+  }
+
+  private createEmbeddingClient(vectorDimension: number): Embeddings {
+    const config = this.embeddingConfig;
+    if (!config) {
+      throw new StoreError("Cannot create embedding client without configuration");
+    }
+
+    return createEmbeddingModel(config.modelSpec, {
+      requestTimeoutMs: this.config.embeddings.requestTimeoutMs,
+      vectorDimension,
+    });
+  }
+
+  private async detectEmbeddingDimension(embeddings: Embeddings): Promise<number> {
+    const testPromise = embeddings.embedQuery("test");
+    let timeoutId: NodeJS.Timeout | undefined;
+    const timeoutPromise = new Promise<never>((_, reject) => {
+      timeoutId = setTimeout(() => {
+        reject(
+          new Error(
+            `Embedding service connection timed out after ${this.embeddingInitTimeoutMs / 1000} seconds`,
+          ),
+        );
+      }, this.embeddingInitTimeoutMs);
+    });
+
+    try {
+      const testVector = await Promise.race([testPromise, timeoutPromise]);
+      return testVector.length;
+    } finally {
+      if (timeoutId !== undefined) {
+        clearTimeout(timeoutId);
+      }
+    }
+  }
+
+  private async resolveEffectiveEmbeddingDimension(
+    options: { ignoreStoredMetadata?: boolean } = {},
+  ): Promise<void> {
+    this.validateVectorDimension(this.dbDimension);
+
+    if (this.embeddingConfig === null || this.embeddingConfig === undefined) {
+      return;
+    }
+
+    const config = this.embeddingConfig;
+    if (!areCredentialsAvailable(config.provider)) {
+      return;
+    }
+
+    try {
+      const storedDimension = options.ignoreStoredMetadata
+        ? null
+        : this.getStoredDimensionForCurrentModel();
+      if (storedDimension !== null) {
+        if (!isVectorDimensionExplicit(this.config)) {
+          this.dbDimension = storedDimension;
+        }
+        this.modelDimension = this.dbDimension;
+        logger.debug(
+          `Vector dimension loaded from metadata: ${this.dbDimension} for ${config.provider}:${config.model}`,
+        );
+        return;
+      }
+
+      const stored = this.getEmbeddingMetadata();
+      if (
+        !options.ignoreStoredMetadata &&
+        stored.model !== null &&
+        stored.model !== config.modelSpec
+      ) {
+        if (!isVectorDimensionExplicit(this.config) && config.dimensions !== null) {
+          this.validateDetectedVectorDimension(
+            config.dimensions,
+            "known model dimension lookup",
+          );
+          this.dbDimension = config.dimensions;
+          this.modelDimension = config.dimensions;
+        }
+        return;
+      }
+
+      let nativeDimension = config.dimensions;
+      let nativeDimensionSource = "known model dimension lookup";
+
+      if (nativeDimension === null) {
+        this.embeddings = this.createEmbeddingClient(this.dbDimension);
+        nativeDimension = await this.detectEmbeddingDimension(this.embeddings);
+        nativeDimensionSource = "embedding provider probe";
+      }
+
+      this.validateDetectedVectorDimension(nativeDimension, nativeDimensionSource);
+
+      if (config.dimensions === null) {
+        EmbeddingConfig.setKnownModelDimensions(config.model, nativeDimension);
+      }
+
+      this.modelDimension = nativeDimension;
+
+      if (!isVectorDimensionExplicit(this.config)) {
+        this.dbDimension = nativeDimension;
+        logger.info(
+          `📐 Vector dimension auto-resolved to ${this.dbDimension} for ${config.provider}:${config.model}`,
+        );
+      }
+    } catch (error) {
+      this.throwEmbeddingInitializationError(error, config);
+    }
+  }
+
+  private validateVectorDimension(dim: number): void {
+    if (typeof dim !== "number" || !Number.isInteger(dim) || dim < 1) {
+      throw new StoreError(
+        `Invalid embeddings.vectorDimension: ${dim}. Must be a positive integer.`,
+      );
+    }
+  }
+
+  private validateDetectedVectorDimension(dim: number, source: string): void {
+    if (typeof dim !== "number" || !Number.isInteger(dim) || dim < 1) {
+      throw new StoreError(
+        `Invalid detected embedding dimension from ${source}: ${dim}. Must be a positive integer.`,
+      );
+    }
+  }
+
+  private throwEmbeddingInitializationError(
+    error: unknown,
+    config: EmbeddingModelConfig,
+  ): never {
+    if (error instanceof Error) {
+      if (
+        error.message.includes("does not exist") ||
+        error.message.includes("MODEL_NOT_FOUND")
+      ) {
+        throw new ModelConfigurationError(
+          `Invalid embedding model: ${config.model}\n` +
+            `   The model "${config.model}" is not available or you don't have access to it.\n` +
+            "   See README.md for supported models or run with --help for more details.",
+        );
+      }
+      if (
+        error.message.includes("API key") ||
+        error.message.includes("401") ||
+        error.message.includes("authentication")
+      ) {
+        throw new ModelConfigurationError(
+          `Authentication failed for ${config.provider} embedding provider\n` +
+            "   Please check your API key configuration.\n" +
+            "   See README.md for configuration options or run with --help for more details.",
+        );
+      }
+      if (
+        error.message.includes("timed out") ||
+        error.message.includes("ECONNREFUSED") ||
+        error.message.includes("ENOTFOUND") ||
+        error.message.includes("ETIMEDOUT") ||
+        error.message.includes("ECONNRESET") ||
+        error.message.includes("network") ||
+        error.message.includes("fetch failed")
+      ) {
+        throw new ModelConfigurationError(
+          `Failed to connect to ${config.provider} embedding service\n` +
+            `   ${error.message}\n` +
+            `   Please check that the embedding service is running and accessible.\n` +
+            `   If using a local model (e.g., Ollama), ensure the service is started.`,
+        );
+      }
+    }
+
+    throw error;
+  }
+
+  /**
+   * Generates a safe FTS query by tokenizing the input and escaping for FTS5.
+   *
+   * Strategy:
+   * - Quotes toggle between "phrase mode" and "word mode" (simple state machine)
+   * - Text inside quotes becomes a single phrase token
+   * - Text outside quotes is split by whitespace into word tokens
+   * - All tokens are escaped (double quotes -> "") and wrapped in quotes for safety
+   *
+   * This prevents FTS5 syntax errors while supporting intuitive phrase searches.
+   *
+   * Query construction:
+   * - Exact match of full input: `"escaped full query"`
+   * - Individual terms: `"term1" OR "term2" OR "phrase"`
+   * - Combined: `"full query" OR "term1" OR "term2"`
+   *
+   * Examples:
+   * - `foo bar` -> `"foo bar" OR "foo" OR "bar"`
+   * - `"hello world"` -> `"hello world"`
+   * - `test "exact phrase" word` -> `"test exact phrase word" OR "test" OR "exact phrase" OR "word"`
+   */
+  private escapeFtsQuery(query: string): string {
+    // Tokenize the query using a simple quote-toggle state machine
+    const tokens: string[] = [];
+    let currentToken = "";
+    let inQuote = false;
+
+    for (let i = 0; i < query.length; i++) {
+      const char = query[i];
+
+      if (char === '"') {
+        // Toggle quote mode
+        if (inQuote) {
+          // Closing quote: save the current phrase token
+          if (currentToken.length > 0) {
+            tokens.push(currentToken);
+            currentToken = "";
+          }
+          inQuote = false;
+        } else {
+          // Opening quote: save any accumulated word token first
+          if (currentToken.length > 0) {
+            tokens.push(currentToken);
+            currentToken = "";
+          }
+          inQuote = true;
+        }
+      } else if (char === " " && !inQuote) {
+        // Whitespace outside quotes: token separator
+        if (currentToken.length > 0) {
+          tokens.push(currentToken);
+          currentToken = "";
+        }
+      } else {
+        // Regular character: accumulate
+        currentToken += char;
+      }
+    }
+
+    // Save any remaining token
+    if (currentToken.length > 0) {
+      tokens.push(currentToken);
+    }
+
+    // Handle empty query or only whitespace
+    if (tokens.length === 0) {
+      return '""';
+    }
+
+    // Escape and quote each token for FTS5 safety
+    const escapedTokens = tokens.map((token) => {
+      const escaped = token.replace(/"/g, '""');
+      return `"${escaped}"`;
+    });
+
+    // If single token, just return it
+    if (escapedTokens.length === 1) {
+      return escapedTokens[0];
+    }
+
+    // Build query: (Exact match of semantic content) OR (Terms ORed together)
+    // Join tokens with space to match the semantic phrase, not the syntactic quotes
+    const exactMatch = `"${tokens.join(" ").replace(/"/g, '""')}"`;
+    const termsQuery = escapedTokens.join(" OR ");
+
+    return `${exactMatch} OR ${termsQuery}`;
+  }
+
+  /**
+   * Escapes SQL LIKE wildcard characters (`%`, `_`) and the escape character
+   * itself so a user-supplied filter is matched as a literal substring rather
+   * than interpreted as a pattern. Pair with `LIKE ? ESCAPE '\'`.
+   */
+  private escapeLikePattern(value: string): string {
+    return value.replace(/[\\%_]/g, (match) => `\\${match}`);
+  }
+
+  /**
+   * Initializes database connection and ensures readiness
+   */
+  async initialize(): Promise<void> {
+    try {
+      // 1. Load extensions first (moved before migrations)
+      sqliteVec.load(this.db);
+
+      // 2. Apply migrations (after extensions are loaded, includes metadata table creation)
+      await applyMigrations(this.db, {
+        maxRetries: this.config.db.migrationMaxRetries,
+        retryDelayMs: this.config.db.migrationRetryDelayMs,
+      });
+
+      // 3. Resolve the effective vector dimension before metadata checks or table DDL.
+      await this.resolveEffectiveEmbeddingDimension();
+
+      // 4. Check embedding model/dimension metadata for changes
+      //    Uses inline db.prepare() so it works before prepareStatements().
+      //    Throws EmbeddingModelChangedError if mismatch detected.
+      //    The CLI layer catches this to prompt (TTY) or fail (non-interactive).
+      this.checkEmbeddingModelChange();
+
+      // 5. Create vector table at runtime with resolved dimension
+      //    Must run before prepareStatements() because triggers on `documents`
+      //    reference `documents_vec`.
+      this.ensureVectorTable();
+
+      // 6. Initialize prepared statements (after vec table exists)
+      this.prepareStatements();
+
+      // 7. Initialize embeddings client (await to catch errors)
+      //    On success, persists model identity to metadata table.
+      await this.initializeEmbeddings();
+    } catch (error) {
+      // Re-throw StoreError, ModelConfigurationError, and UnsupportedProviderError directly
+      if (
+        error instanceof StoreError ||
+        error instanceof ModelConfigurationError ||
+        error instanceof UnsupportedProviderError
+      ) {
+        throw error;
+      }
+      throw new ConnectionError("Failed to initialize database connection", error);
+    }
+  }
+
+  /**
+   * Resolves a model change by invalidating all vectors and completing initialization.
+   * Called by the CLI layer after the user confirms a model/dimension change.
+   * Assumes initialize() was previously called and threw EmbeddingModelChangedError,
+   * meaning steps 1-2 (load extensions, apply migrations) completed successfully.
+   * Steps 3+ (ensureVectorTable, prepareStatements, initializeEmbeddings) are
+   * completed here after invalidation.
+   */
+  async resolveModelChange(): Promise<void> {
+    await this.resolveEffectiveEmbeddingDimension({ ignoreStoredMetadata: true });
+
+    const currentModel = this.config.app.embeddingModel;
+    const currentDimension = this.dbDimension;
+
+    // Invalidate all existing vectors and update metadata
+    this.invalidateAllVectors(currentModel, currentDimension);
+
+    // Complete the remaining initialization steps that were skipped when
+    // checkEmbeddingModelChange() threw in initialize():
+
+    // Re-create vector table (no-op since invalidateAllVectors already did it with correct dimension)
+    this.ensureVectorTable();
+
+    // Initialize prepared statements (must run after vec table exists)
+    this.prepareStatements();
+
+    // Initialize embeddings client (will also persist metadata on success)
+    await this.initializeEmbeddings();
+  }
+
+  /**
+   * Gracefully closes database connections
+   */
+  async shutdown(): Promise<void> {
+    this.db.close();
+  }
+
+  /**
+   * Combined on-disk size of the database file plus WAL and SHM sidecars.
+   */
+  private getOnDiskSizeBytes(): number {
+    if (this.dbPath === ":memory:") {
+      return 0;
+    }
+
+    let total = 0;
+    for (const filePath of [this.dbPath, `${this.dbPath}-wal`, `${this.dbPath}-shm`]) {
+      try {
+        total += statSync(filePath).size;
+      } catch (error) {
+        if (!(error instanceof Error && "code" in error && error.code === "ENOENT")) {
+          throw error;
+        }
+      }
+    }
+    return total;
+  }
+
+  /**
+   * Runs VACUUM with temp storage on disk so large stores do not duplicate the
+   * compacted database in process memory.
+   */
+  private vacuumWithFileTempStore(): void {
+    const prevTempStore = Number(this.db.pragma("temp_store", { simple: true }) ?? 0);
+    this.db.pragma("temp_store = FILE");
+    try {
+      this.db.exec("VACUUM");
+    } finally {
+      this.db.pragma(`temp_store = ${prevTempStore}`);
+    }
+  }
+
+  /**
+   * Reclaims unused SQLite pages and truncates the WAL file.
+   * In-memory databases are skipped.
+   *
+   * VACUUM takes an exclusive lock and blocks readers, so it runs only when
+   * `vacuum` is not `false` (the explicit compact path). After deletes, pass
+   * `{ vacuum: false }` to checkpoint with PASSIVE, which never waits on
+   * readers or writers.
+   *
+   * @param options.force Always VACUUM even if no free pages are detected
+   * @param options.vacuum When `false`, only run a non-blocking WAL checkpoint
+   * @returns Size before/after compaction and whether VACUUM ran
+   */
+  async compact(options?: { force?: boolean; vacuum?: boolean }): Promise<CompactResult> {
+    if (this.dbPath === ":memory:") {
+      return {
+        skipped: true,
+        vacuumed: false,
+        beforeBytes: 0,
+        afterBytes: 0,
+        reclaimedBytes: 0,
+      };
+    }
+
+    try {
+      const force = options?.force === true;
+      const allowVacuum = options?.vacuum !== false;
+      const beforeBytes = this.getOnDiskSizeBytes();
+
+      // PASSIVE never waits; TRUNCATE is reserved for the exclusive compact path.
+      this.db.pragma(
+        allowVacuum ? "wal_checkpoint(TRUNCATE)" : "wal_checkpoint(PASSIVE)",
+      );
+
+      const freelistCount = Number(
+        this.db.pragma("freelist_count", { simple: true }) ?? 0,
+      );
+      const shouldVacuum = allowVacuum && (force || freelistCount > 0);
+
+      if (shouldVacuum) {
+        this.vacuumWithFileTempStore();
+        this.db.pragma("journal_mode = WAL");
+        this.db.pragma("wal_autocheckpoint = 1000");
+        this.db.pragma("wal_checkpoint(TRUNCATE)");
+      }
+
+      const afterBytes = this.getOnDiskSizeBytes();
+      return {
+        skipped: false,
+        vacuumed: shouldVacuum,
+        beforeBytes,
+        afterBytes,
+        reclaimedBytes: Math.max(0, beforeBytes - afterBytes),
+      };
+    } catch (error) {
+      throw new ConnectionError("Failed to compact document store", error);
+    }
+  }
+
+  /**
+   * Creates or reconciles the documents_vec virtual table with configurable dimension.
+   * Called after migrations and model change detection. The table is initially created
+   * by migrations with a fixed 1536 dimension; this method reconciles it at runtime
+   * if the configured dimension or partition-key schema differs.
+   * Idempotent: if the table already has the expected dimension and partition keys,
+   * no-op; otherwise, drops and recreates so any embedding provider works and KNN
+   * queries can use selective partition filters.
+   *
+   * Compatible existing vectors are preserved, and missing rows are backfilled from
+   * documents.embedding when available. Old vectors from a different dimension or model
+   * are handled by the model change detection system (checkEmbeddingModelChange).
+   */
+  private ensureVectorTable(): void {
+    const dim = this.dbDimension;
+    this.validateVectorDimension(dim);
+
+    const existingSql = this.db
+      .prepare(
+        "SELECT sql FROM sqlite_master WHERE type = 'table' AND name = 'documents_vec';",
+      )
+      .get() as { sql: string } | undefined;
+
+    if (existingSql) {
+      const match = existingSql.sql.match(/embedding\s+FLOAT\s*\[\s*(\d+)\s*]/i);
+      const existingDim = match ? Number(match[1]) : null;
+      if (existingDim === dim && this.hasVectorPartitionKeys(existingSql.sql)) {
+        return;
+      }
+    }
+
+    logger.info(
+      existingSql
+        ? "🔄 Rebuilding vector index with partition-key schema"
+        : "🔄 Creating vector index with partition-key schema",
+    );
+    this.rebuildVectorTable(dim, Boolean(existingSql));
+  }
+
+  private hasVectorPartitionKeys(sql: string): boolean {
+    return (
+      this.hasVectorPartitionKeyColumn(sql, "library_id") &&
+      this.hasVectorPartitionKeyColumn(sql, "version_id")
+    );
+  }
+
+  private hasVectorPartitionKeyColumn(sql: string, columnName: string): boolean {
+    const quotedColumnName = columnName.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    const columnDefinition = sql.match(
+      new RegExp(
+        String.raw`(?:^|[(,])\s*(?:"${quotedColumnName}"|\[${quotedColumnName}\]|${quotedColumnName})\s+([^,]*)`,
+        "i",
+      ),
+    )?.[1];
+
+    return (
+      columnDefinition !== undefined &&
+      /\bINTEGER\b/i.test(columnDefinition) &&
+      /\bpartition\s+key\b/i.test(columnDefinition)
+    );
+  }
+
+  private createVectorTable(dimension: number): void {
+    this.db.exec(`
+      CREATE VIRTUAL TABLE documents_vec USING vec0(
+        library_id INTEGER partition key,
+        version_id INTEGER partition key,
+        embedding FLOAT[${dimension}]
+      );
+    `);
+  }
+
+  private backfillVectorTable(dimension: number): void {
+    this.db
+      .prepare<[number]>(`
+        INSERT OR REPLACE INTO documents_vec (rowid, library_id, version_id, embedding)
+        SELECT
+          d.id,
+          v.library_id,
+          v.id,
+          json_extract(d.embedding, '$')
+        FROM documents d
+        JOIN pages p ON d.page_id = p.id
+        JOIN versions v ON p.version_id = v.id
+        WHERE d.embedding IS NOT NULL
+          AND vec_length(json_extract(d.embedding, '$')) = ?
+          AND NOT EXISTS (
+            SELECT 1 FROM documents_vec existing WHERE existing.rowid = d.id
+          )
+      `)
+      .run(dimension);
+  }
+
+  private rebuildVectorTable(dimension: number, preserveExisting: boolean): void {
+    const transaction = this.db.transaction(() => {
+      this.db.exec("DROP TABLE IF EXISTS _documents_vec_migration");
+
+      if (preserveExisting) {
+        this.db
+          .prepare<[number]>(`
+            CREATE TABLE _documents_vec_migration AS
+            SELECT
+              d.id AS rowid,
+              v.library_id,
+              v.id AS version_id,
+              dv.embedding
+            FROM documents_vec dv
+            JOIN documents d ON dv.rowid = d.id
+            JOIN pages p ON d.page_id = p.id
+            JOIN versions v ON p.version_id = v.id
+            WHERE vec_length(dv.embedding) = ?
+          `)
+          .run(dimension);
+        this.db.exec("DROP TABLE documents_vec");
+      } else {
+        this.db.exec(`
+          CREATE TABLE _documents_vec_migration(
+            rowid INTEGER PRIMARY KEY,
+            library_id INTEGER NOT NULL,
+            version_id INTEGER NOT NULL,
+            embedding BLOB NOT NULL
+          )
+        `);
+      }
+
+      this.createVectorTable(dimension);
+
+      this.db.exec(`
+        INSERT OR REPLACE INTO documents_vec (rowid, library_id, version_id, embedding)
+        SELECT rowid, library_id, version_id, embedding
+        FROM _documents_vec_migration
+      `);
+      this.backfillVectorTable(dimension);
+      this.db.exec("DROP TABLE _documents_vec_migration");
+    });
+
+    transaction();
+  }
+
+  /**
+   * Resolves a library name and version string to version_id.
+   * Creates library and version records if they don't exist.
+   */
+  async resolveVersionId(library: string, version: string): Promise<number> {
+    const normalizedLibrary = normalizeLibraryName(library);
+    // Last point every write passes through: apply the single version label
+    // contract here so an entry point that forgets to normalize cannot create a
+    // duplicate bucket (e.g. " 1.0.0 " alongside "1.0.0").
+    const normalizedVersion = denormalizeVersionName(normalizeVersionLabel(version));
+
+    // Insert or get library_id
+    this.statements.insertLibrary.run(normalizedLibrary);
+    const libraryIdRow = this.statements.getLibraryIdByName.get(normalizedLibrary) as
+      | { id: number }
+      | undefined;
+    if (!libraryIdRow || typeof libraryIdRow.id !== "number") {
+      throw new StoreError(`Failed to resolve library_id for library: ${library}`);
+    }
+    const libraryId = libraryIdRow.id;
+
+    // Insert or get version_id
+    // Reuse existing unversioned entry if present; storing '' ensures UNIQUE constraint applies
+    this.statements.insertVersion.run(libraryId, normalizedVersion);
+    const versionIdRow = this.statements.resolveVersionId.get(
+      libraryId,
+      normalizedVersion,
+    ) as { id: number } | undefined;
+    if (!versionIdRow || typeof versionIdRow.id !== "number") {
+      throw new StoreError(
+        `Failed to resolve version_id for library: ${library}, version: ${version}`,
+      );
+    }
+
+    return versionIdRow.id;
+  }
+
+  /**
+   * Retrieves all unique versions for a specific library
+   */
+  async queryUniqueVersions(library: string): Promise<string[]> {
+    try {
+      const rows = this.statements.queryVersions.all(
+        normalizeLibraryName(library),
+      ) as Array<{
+        name: string | null;
+      }>;
+      return rows.map((row) => normalizeVersionName(row.name));
+    } catch (error) {
+      throw new ConnectionError("Failed to query versions", error);
+    }
+  }
+
+  /**
+   * Updates the status of a version record in the database.
+   * @param versionId The version ID to update
+   * @param status The new status to set
+   * @param errorMessage Optional error message for failed statuses
+   */
+  async updateVersionStatus(
+    versionId: number,
+    status: VersionStatus,
+    errorMessage?: string,
+  ): Promise<void> {
+    try {
+      this.statements.updateVersionStatus.run(status, errorMessage ?? null, versionId);
+    } catch (error) {
+      throw new StoreError(`Failed to update version status: ${error}`);
+    }
+  }
+
+  /**
+   * Updates the progress counters for a version being indexed.
+   * @param versionId The version ID to update
+   * @param pages Current number of pages processed
+   * @param maxPages Total number of pages to process
+   */
+  async updateVersionProgress(
+    versionId: number,
+    pages: number,
+    maxPages: number,
+    /** Omit or pass null to leave the stored value untouched. */
+    pagesIndexed: number | null = null,
+  ): Promise<void> {
+    try {
+      this.statements.updateVersionProgress.run(pages, maxPages, pagesIndexed, versionId);
+    } catch (error) {
+      throw new StoreError(`Failed to update version progress: ${error}`);
+    }
+  }
+
+  /**
+   * Retrieves versions by their status.
+   * @param statuses Array of statuses to filter by
+   * @returns Array of version records matching the statuses
+   */
+  async getVersionsByStatus(statuses: VersionStatus[]): Promise<DbVersionWithLibrary[]> {
+    try {
+      const statusJson = JSON.stringify(statuses);
+      const rows = this.statements.getVersionsByStatus.all(
+        statusJson,
+      ) as DbVersionWithLibrary[];
+      return rows;
+    } catch (error) {
+      throw new StoreError(`Failed to get versions by status: ${error}`);
+    }
+  }
+
+  /**
+   * Retrieves a version by its ID.
+   * @param versionId The version ID to retrieve
+   * @returns The version record, or null if not found
+   */
+  async getVersionById(versionId: number): Promise<DbVersion | null> {
+    try {
+      const row = this.statements.getVersionById.get(versionId) as DbVersion | undefined;
+      return row || null;
+    } catch (error) {
+      throw new StoreError(`Failed to get version by ID: ${error}`);
+    }
+  }
+
+  /**
+   * Retrieves a library by its ID.
+   * @param libraryId The library ID to retrieve
+   * @returns The library record, or null if not found
+   */
+  async getLibraryById(libraryId: number): Promise<{ id: number; name: string } | null> {
+    try {
+      const row = this.statements.getLibraryById.get(libraryId) as
+        | { id: number; name: string }
+        | undefined;
+      return row || null;
+    } catch (error) {
+      throw new StoreError(`Failed to get library by ID: ${error}`);
+    }
+  }
+
+  /**
+   * Retrieves a library by its name.
+   * @param name The library name to retrieve
+   * @returns The library record, or null if not found
+   */
+  async getLibrary(name: string): Promise<{ id: number; name: string } | null> {
+    try {
+      const normalizedName = normalizeLibraryName(name);
+      const row = this.statements.getLibraryIdByName.get(normalizedName) as
+        | { id: number }
+        | undefined;
+      if (!row) {
+        return null;
+      }
+      return { id: row.id, name: normalizedName };
+    } catch (error) {
+      throw new StoreError(`Failed to get library by name: ${error}`);
+    }
+  }
+
+  /**
+   * Deletes a library by its ID.
+   * This should only be called when the library has no remaining versions.
+   * @param libraryId The library ID to delete
+   */
+  async deleteLibrary(libraryId: number): Promise<void> {
+    try {
+      this.statements.deleteLibraryById.run(libraryId);
+    } catch (error) {
+      throw new StoreError(`Failed to delete library: ${error}`);
+    }
+  }
+
+  /**
+   * Stores scraper options for a version to enable reproducible indexing.
+   * @param versionId The version ID to update
+   * @param options Complete scraper options used for indexing
+   */
+  async storeScraperOptions(versionId: number, options: ScraperOptions): Promise<void> {
+    try {
+      // Extract source URL and exclude runtime-only fields using destructuring
+      const {
+        url: source_url,
+        library: _library,
+        version: _version,
+        signal: _signal,
+        initialQueue: _initialQueue,
+        isRefresh: _isRefresh,
+        ...scraper_options
+      } = options;
+
+      const optionsJson = JSON.stringify(scraper_options);
+      this.statements.updateVersionScraperOptions.run(source_url, optionsJson, versionId);
+    } catch (error) {
+      throw new StoreError(`Failed to store scraper options: ${error}`);
+    }
+  }
+
+  /**
+   * Retrieves stored scraping configuration (source URL and options) for a version.
+   * Returns null when no source URL is recorded (not re-indexable).
+   */
+  async getScraperOptions(versionId: number): Promise<StoredScraperOptions | null> {
+    try {
+      const row = this.statements.getVersionWithOptions.get(versionId) as
+        | DbVersion
+        | undefined;
+
+      if (!row?.source_url) {
+        return null;
+      }
+
+      let parsed: VersionScraperOptions = {} as VersionScraperOptions;
+      if (row.scraper_options) {
+        try {
+          parsed = JSON.parse(row.scraper_options) as VersionScraperOptions;
+        } catch (e) {
+          logger.warn(`⚠️  Invalid scraper_options JSON for version ${versionId}: ${e}`);
+          parsed = {} as VersionScraperOptions;
+        }
+      }
+
+      return { sourceUrl: row.source_url, options: parsed };
+    } catch (error) {
+      throw new StoreError(`Failed to get scraper options: ${error}`);
+    }
+  }
+
+  /**
+   * Finds versions that were indexed from the same source URL.
+   * Useful for finding similar configurations or detecting duplicates.
+   * @param url Source URL to search for
+   * @returns Array of versions with the same source URL
+   */
+  async findVersionsBySourceUrl(url: string): Promise<DbVersionWithLibrary[]> {
+    try {
+      const rows = this.statements.getVersionsBySourceUrl.all(
+        url,
+      ) as DbVersionWithLibrary[];
+      return rows;
+    } catch (error) {
+      throw new StoreError(`Failed to find versions by source URL: ${error}`);
+    }
+  }
+
+  /**
+   * Verifies existence of documents for a specific library version
+   */
+  async checkDocumentExists(library: string, version: string): Promise<boolean> {
+    try {
+      const normalizedVersion = normalizeVersionLabel(version);
+      const result = this.statements.checkExists.get(
+        normalizeLibraryName(library),
+        normalizedVersion,
+      );
+      return result !== undefined;
+    } catch (error) {
+      throw new ConnectionError("Failed to check document existence", error);
+    }
+  }
+
+  /**
+   * Retrieves a mapping of all libraries to their available versions with details.
+   */
+  async queryLibraryVersions(): Promise<Map<string, Array<LibraryVersionSummary>>> {
+    try {
+      const rows = this.statements.queryLibraryVersions.all() as DbLibraryVersion[];
+      const libraryMap = new Map<string, Array<LibraryVersionSummary>>();
+
+      for (const row of rows) {
+        // Process all rows, including those where version is "" (unversioned)
+        const library = row.library;
+        if (!libraryMap.has(library)) {
+          libraryMap.set(library, []);
+        }
+
+        // Format indexedAt to ISO string if available
+        const indexedAtISO = row.indexedAt ? new Date(row.indexedAt).toISOString() : null;
+
+        libraryMap.get(library)?.push({
+          version: row.version,
+          versionId: row.versionId,
+          // Preserve raw string status here; DocumentManagementService will cast to VersionStatus
+          status: row.status,
+          errorMessage: row.errorMessage,
+          progressPages: row.progressPages,
+          progressMaxPages: row.progressMaxPages,
+          progressPagesIndexed: row.progressPagesIndexed ?? null,
+          sourceUrl: row.sourceUrl,
+          documentCount: row.documentCount,
+          uniqueUrlCount: row.uniqueUrlCount,
+          indexedAt: indexedAtISO,
+        });
+      }
+
+      // Sort versions within each library: descending (latest first), unversioned is "latest"
+      for (const versions of libraryMap.values()) {
+        versions.sort((a, b) => compareVersionsDescending(a.version, b.version));
+      }
+
+      return libraryMap;
+    } catch (error) {
+      throw new ConnectionError("Failed to query library versions", error);
+    }
+  }
+
+  /**
+   * Helper method to detect if an error is related to input size limits.
+   * Checks for common error messages from various embedding providers.
+   */
+  private isInputSizeError(error: unknown): boolean {
+    if (!(error instanceof Error)) return false;
+
+    const message = error.message.toLowerCase();
+    return (
+      message.includes("maximum context length") ||
+      message.includes("too long") ||
+      message.includes("token limit") ||
+      message.includes("input is too large") ||
+      message.includes("exceeds") ||
+      (message.includes("max") && message.includes("token"))
+    );
+  }
+
+  private getEmbeddingErrorHint(error: unknown): string | null {
+    if (this.isInputSizeError(error)) {
+      return "The embedding input appears to exceed provider or model limits. Check model context size and reduce embedding batch size if needed.";
+    }
+
+    if (error instanceof Error) {
+      const message = error.message.toLowerCase();
+      if (message.includes("rate limit") || message.includes("429")) {
+        return "The embedding provider appears to be rate limiting requests. Reduce concurrency or retry after the provider quota resets.";
+      }
+      if (
+        message.includes("timed out") ||
+        message.includes("econnrefused") ||
+        message.includes("enotfound") ||
+        message.includes("etimedout") ||
+        message.includes("econnreset") ||
+        message.includes("network") ||
+        message.includes("fetch failed")
+      ) {
+        return "The embedding service appears unreachable. Check that the provider endpoint is running and accessible.";
+      }
+    }
+
+    return null;
+  }
+
+  private createEmbeddingConnectionError(
+    error: unknown,
+    context: EmbeddingBatchContext,
+  ): ConnectionError {
+    const modelSpec = this.embeddingConfig?.modelSpec ?? "unknown";
+    const errorHint = this.getEmbeddingErrorHint(error);
+    const providerHint = this.embeddingConfig
+      ? "Verify embedding provider configuration, model availability, credentials, quota, request size, and backend logs."
+      : null;
+    const hints = [errorHint, providerHint].filter((hint) => hint !== null);
+    const hintText = hints.length > 0 ? `\n   ${hints.join("\n   ")}` : "";
+
+    return new ConnectionError(
+      `Failed to generate embeddings for ${context.url} using ${modelSpec}.\n` +
+        `   Batch ${context.batchIndex}: ${context.batchTextCount} text(s), ${context.batchChars} chars, ${context.totalChunks} page chunk(s).\n` +
+        `   Config: batchSize=${this.embeddingBatchSize}, batchChars=${this.embeddingBatchChars}, vectorDimension=${this.dbDimension}.` +
+        hintText,
+      error,
+    );
+  }
+
+  /**
+   * Creates embeddings for an array of texts with automatic retry logic for size-related errors.
+   * If a batch fails due to size limits:
+   * - Batches with multiple texts are split in half and retried recursively
+   * - Single texts that are too large are truncated and retried once
+   *
+   * @param texts Array of texts to embed
+   * @param isRetry Internal flag to prevent duplicate warning logs
+   * @param hasTruncatedSingleText Whether a single text has already been truncated once
+   * @returns Array of embedding vectors
+   */
+  private async embedDocumentsWithRetry(
+    texts: string[],
+    isRetry = false,
+    hasTruncatedSingleText = false,
+  ): Promise<number[][]> {
+    if (texts.length === 0) {
+      return [];
+    }
+
+    try {
+      // Try to embed the batch normally
+      const embeddings = this.embeddings;
+      if (embeddings === null) {
+        throw new StoreError("Embeddings are not initialized");
+      }
+      return await embeddings.embedDocuments(texts);
+    } catch (error) {
+      // Check if this is a size-related error
+      if (this.isInputSizeError(error)) {
+        if (texts.length > 1) {
+          // Split batch in half and retry each half recursively
+          const midpoint = Math.floor(texts.length / 2);
+          const firstHalf = texts.slice(0, midpoint);
+          const secondHalf = texts.slice(midpoint);
+
+          // Only log if this is not already a retry
+          if (!isRetry) {
+            logger.warn(
+              `⚠️  Batch of ${texts.length} texts exceeded size limit, splitting into ${firstHalf.length} + ${secondHalf.length}`,
+            );
+          }
+
+          const [firstEmbeddings, secondEmbeddings] = await Promise.all([
+            this.embedDocumentsWithRetry(firstHalf, true, false),
+            this.embedDocumentsWithRetry(secondHalf, true, false),
+          ]);
+
+          return [...firstEmbeddings, ...secondEmbeddings];
+        } else {
+          // Single text that's too large - split in half and retry
+          if (hasTruncatedSingleText) {
+            throw error;
+          }
+
+          const text = texts[0];
+          const midpoint = Math.floor(text.length / 2);
+          const firstHalf = text.substring(0, midpoint);
+
+          // Only log once for the original text
+          if (!isRetry) {
+            logger.warn(
+              `⚠️  Single text exceeded embedding size limit (${text.length} chars).`,
+            );
+          }
+
+          try {
+            // Recursively retry with first half only (mark as retry to prevent duplicate logs)
+            // This preserves the beginning of the text which typically contains the most important context
+            const embedding = await this.embedDocumentsWithRetry([firstHalf], true, true);
+            return embedding;
+          } catch (retryError) {
+            // If even split text fails, log error and throw
+            logger.error(
+              `❌ Failed to embed even after splitting. Original length: ${text.length}`,
+            );
+            throw retryError;
+          }
+        }
+      }
+
+      // Not a size error, re-throw
+      throw error;
+    }
+  }
+
+  /**
+   * Removes the row a refreshed page was read from, when it is not the row now
+   * being written.
+   *
+   * A refresh carries the id of the page it is re-fetching, and that page can
+   * move: a redirect renames it, and resolving a `.md` URL to the page it
+   * represents folds it onto another row. Either way the old row is stale. When
+   * the id names the row being written it is the same page, not a stale one, and
+   * deleting it would throw away the very content the write is competing with.
+   *
+   * Runs inside the caller's transaction so the decision and the write cannot be
+   * separated by another representation landing in between.
+   *
+   * @param previousPageId Page the refresh item was read from, if any.
+   * @param current The row presently stored under the URL being written.
+   */
+  private retirePreviousPage(
+    previousPageId: number | undefined,
+    current: PageIdRow | undefined,
+  ): void {
+    if (previousPageId === undefined || previousPageId === current?.id) return;
+    this.statements.deleteDocumentsByPageId.run(previousPageId);
+    const deleted = this.statements.deletePage.run(previousPageId);
+    if (deleted.changes > 0) {
+      logger.debug(`Retired page ${previousPageId}, superseded by another URL`);
+    }
+  }
+
+  /**
+   * Records a page that exists but holds no content.
+   *
+   * A successful fetch that yields no extractable text is a statement about the
+   * page, not an absence of information, so it replaces whatever was stored
+   * rather than leaving stale content behind. Callers withhold `etag` and
+   * `lastModified` when extraction failed, which keeps the next refresh
+   * unconditional instead of caching a failure against the server's validator.
+   *
+   * @param library Library name.
+   * @param version Version string.
+   * @param depth Crawl depth the page was found at.
+   * @param page Page identity and optional validators.
+   */
+  async addEmptyPage(
+    library: string,
+    version: string,
+    depth: number,
+    page: {
+      url: string;
+      contentUrl?: string;
+      title: string;
+      sourceContentType: string | null;
+      contentType: string | null;
+      etag: string | null;
+      lastModified: string | null;
+      isAdditionalRepresentation?: boolean;
+    },
+    previousPageId?: number,
+  ): Promise<void> {
+    try {
+      const versionId = await this.resolveVersionId(library, version);
+      this.db.transaction(() => {
+        const current = this.statements.getPageId.get(versionId, page.url) as
+          | PageIdRow
+          | undefined;
+
+        // An empty representation is still a representation, and it competes on
+        // the same terms: an HTML twin that extracted nothing must not erase the
+        // Markdown this crawl already stored under the same identity.
+        if (
+          losesToStoredRepresentation(
+            current,
+            page.sourceContentType,
+            page.isAdditionalRepresentation,
+          )
+        ) {
+          logger.debug(
+            `Keeping stored ${current?.source_content_type} representation of ${page.url}; ignoring empty ${page.sourceContentType} version`,
+          );
+          this.retirePreviousPage(previousPageId, current);
+          return;
+        }
+
+        this.retirePreviousPage(previousPageId, current);
+
+        this.statements.insertPage.run(
+          versionId,
+          page.url,
+          page.title || "",
+          page.etag,
+          page.lastModified,
+          page.sourceContentType,
+          page.contentType,
+          depth,
+          page.contentUrl ?? null,
+        );
+
+        // Clear any chunks the page had before it became empty. Without this the
+        // old content keeps matching searches while the row carries the new
+        // validator, so the next refresh answers 304 and it never self-corrects.
+        //
+        // `current` is reused when it exists: `insertPage` upserts, so the row
+        // keeps its id. Only a page that did not exist before needs looking up.
+        const stored =
+          current ??
+          (this.statements.getPageId.get(versionId, page.url) as PageIdRow | undefined);
+        if (stored) {
+          this.statements.deleteDocumentsByPageId.run(stored.id);
+        }
+      })();
+    } catch (error) {
+      throw new StoreError(`Failed to record empty page: ${error}`);
+    }
+  }
+
+  /**
+   * Stores documents with library and version metadata, generating embeddings
+   * for vector similarity search. Uses the new pages table to normalize page-level
+   * metadata and avoid duplication across document chunks.
+   */
+  async addDocuments(
+    library: string,
+    version: string,
+    depth: number,
+    result: ScrapeResult,
+    previousPageId?: number,
+  ): Promise<void> {
+    try {
+      const { title, url, chunks } = result;
+      if (chunks.length === 0) {
+        return;
+      }
+
+      // Resolve library and version IDs (creates them if they don't exist)
+      const versionId = await this.resolveVersionId(library, version);
+      const existingPage = this.statements.getPageId.get(versionId, url) as
+        | PageIdRow
+        | undefined;
+
+      // Checked here as an optimisation only — a write that is going to be
+      // dropped should not first pay for a billed embedding round-trip. The
+      // authoritative check is repeated inside the write transaction below,
+      // because this snapshot is taken before the embedding await and a
+      // concurrent write for the same identity can land in between.
+      //
+      // Taken only when this write has no previous row to retire. Retiring has
+      // to happen inside that transaction, so returning early with one pending
+      // would strand it: the losing write is the only thing that knows the old
+      // spelling folded into this identity, and the row would stay searchable
+      // and lose again on every later refresh.
+      if (
+        previousPageId === undefined &&
+        losesToStoredRepresentation(
+          existingPage,
+          result.sourceContentType,
+          result.isAdditionalRepresentation,
+        )
+      ) {
+        logger.debug(
+          `Keeping stored ${existingPage?.source_content_type} representation of ${url}; ignoring ${result.sourceContentType} version`,
+        );
+        return;
+      }
+
+      // Generate embeddings in batch only if vector search is enabled
+      let paddedEmbeddings: number[][] = [];
+
+      if (this.isVectorSearchEnabled) {
+        const texts = chunks.map((chunk) => {
+          const header = `<title>${title}</title>\n<url>${url}</url>\n<path>${(chunk.section.path || []).join(" / ")}</path>\n`;
+          return `${header}${chunk.content}`;
+        });
+
+        // Validate chunk body sizes before creating embeddings.
+        // Note: We compare the chunk body (without the metadata header) against maxChunkSize,
+        // because the splitter's size budget applies to the content body only. The metadata
+        // header (title, URL, path) is expected overhead added after splitting.
+        for (let i = 0; i < chunks.length; i++) {
+          const bodySize = chunks[i].content.length;
+          if (bodySize > this.splitterMaxChunkSize) {
+            logger.warn(
+              `⚠️  Chunk ${i + 1}/${chunks.length} body exceeds max size: ${bodySize} > ${this.splitterMaxChunkSize} chars (URL: ${url})`,
+            );
+          }
+        }
+
+        // Batch embedding creation to avoid token limit errors
+        const maxBatchChars = this.embeddingBatchChars;
+        const rawEmbeddings: number[][] = [];
+
+        let currentBatch: string[] = [];
+        let currentBatchSize = 0;
+        let batchCount = 0;
+
+        const processEmbeddingBatch = async (isFinalBatch = false) => {
+          batchCount++;
+          const batchTexts = currentBatch;
+          const batchChars = currentBatchSize;
+          logger.debug(
+            `Processing ${isFinalBatch ? "final " : ""}embedding batch ${batchCount}: ${batchTexts.length} texts, ${batchChars} chars`,
+          );
+
+          try {
+            const batchEmbeddings = await this.embedDocumentsWithRetry(batchTexts);
+            rawEmbeddings.push(...batchEmbeddings);
+          } catch (error) {
+            throw this.createEmbeddingConnectionError(error, {
+              url,
+              batchIndex: batchCount,
+              batchTextCount: batchTexts.length,
+              batchChars,
+              totalChunks: chunks.length,
+            });
+          }
+
+          currentBatch = [];
+          currentBatchSize = 0;
+        };
+
+        for (const text of texts) {
+          const textSize = text.length;
+
+          // If adding this text would exceed the limit, process the current batch first
+          if (currentBatchSize + textSize > maxBatchChars && currentBatch.length > 0) {
+            await processEmbeddingBatch();
+          }
+
+          // Add text to current batch
+          currentBatch.push(text);
+          currentBatchSize += textSize;
+
+          // Also respect the count-based limit for APIs that have per-request item limits
+          if (currentBatch.length >= this.embeddingBatchSize) {
+            await processEmbeddingBatch();
+          }
+        }
+
+        // Process any remaining texts in the final batch
+        if (currentBatch.length > 0) {
+          await processEmbeddingBatch(true);
+        }
+        paddedEmbeddings = rawEmbeddings.map((vector) => this.padVector(vector));
+      }
+
+      // Insert documents in a transaction
+      const transaction = this.db.transaction((): boolean => {
+        // Re-read inside the transaction. The snapshot above predates the
+        // embedding await, so when both representations of one identity are
+        // processed concurrently each can observe no row, and both would insert
+        // — leaving two chunk sets under one page. Reading and writing in the
+        // same synchronous transaction closes that window.
+        const current = this.statements.getPageId.get(versionId, url) as
+          | PageIdRow
+          | undefined;
+
+        if (
+          losesToStoredRepresentation(
+            current,
+            result.sourceContentType,
+            result.isAdditionalRepresentation,
+          )
+        ) {
+          logger.debug(
+            `Keeping stored ${current?.source_content_type} representation of ${url}; ignoring ${result.sourceContentType} version`,
+          );
+          // The row this write came from is still retired below: this crawl has
+          // decided that URL folds into `url`, so leaving it would keep a second
+          // copy of the page under its old spelling.
+          this.retirePreviousPage(previousPageId, current);
+          return false;
+        }
+
+        this.retirePreviousPage(previousPageId, current);
+
+        if (current) {
+          const deleted = this.statements.deleteDocumentsByPageId.run(current.id);
+          if (deleted.changes > 0) {
+            logger.debug(`Deleted ${deleted.changes} existing documents for URL: ${url}`);
+          }
+        }
+
+        // Extract content type from metadata if available
+        const sourceContentType = result.sourceContentType || result.contentType || null;
+        const contentType = result.contentType || result.sourceContentType || null;
+
+        // Extract etag from document metadata if available
+        const etag = result.etag || null;
+
+        // Extract lastModified from document metadata if available
+        const lastModified = result.lastModified || null;
+
+        // Insert or update page record
+        this.statements.insertPage.run(
+          versionId,
+          url,
+          title || "",
+          etag,
+          lastModified,
+          sourceContentType,
+          contentType,
+          depth,
+          // NULL means "retrieved from its own URL"; the strategy reports this
+          // only when the two genuinely differ.
+          result.contentUrl ?? null,
+        );
+
+        // Query for the page ID since we can't use RETURNING
+        const insertedPage = this.statements.getPageId.get(versionId, url) as
+          | PageIdRow
+          | undefined;
+        if (!insertedPage) {
+          throw new StoreError(`Failed to get page ID for URL: ${url}`);
+        }
+        const pageId = insertedPage.id;
+
+        // Then insert document chunks linked to their pages
+        let docIndex = 0;
+        for (let i = 0; i < chunks.length; i++) {
+          const chunk = chunks[i];
+
+          // Insert document chunk
+          const result = this.statements.insertDocument.run(
+            pageId,
+            chunk.content,
+            JSON.stringify({
+              types: chunk.types,
+              level: chunk.section.level,
+              path: chunk.section.path,
+            } satisfies DbChunkMetadata),
+            i, // sort_order within this page
+          );
+          const rowId = result.lastInsertRowid;
+
+          // Insert into vector table only if vector search is enabled
+          if (this.isVectorSearchEnabled && paddedEmbeddings.length > 0) {
+            this.statements.insertEmbedding.run(
+              JSON.stringify(paddedEmbeddings[docIndex]),
+              BigInt(rowId),
+            );
+          }
+
+          docIndex++;
+        }
+        return true;
+      });
+
+      transaction();
+    } catch (error) {
+      if (error instanceof StoreError) {
+        throw error;
+      }
+      throw new ConnectionError("Failed to add documents to store", error);
+    }
+  }
+
+  /**
+   * Removes documents and pages matching specified library and version.
+   * This consolidated method deletes both documents and their associated pages.
+   * @returns Number of documents deleted
+   */
+  async deletePages(library: string, version: string): Promise<number> {
+    try {
+      const normalizedVersion = normalizeVersionLabel(version);
+
+      // First delete documents
+      const result = this.statements.deleteDocuments.run(
+        normalizeLibraryName(library),
+        normalizedVersion,
+      );
+
+      // Then delete the pages (after documents are gone, due to foreign key constraints)
+      this.statements.deletePages.run(normalizeLibraryName(library), normalizedVersion);
+
+      return result.changes;
+    } catch (error) {
+      throw new ConnectionError("Failed to delete documents", error);
+    }
+  }
+
+  /**
+   * Deletes a page and all its associated document chunks.
+   * Performs manual deletion in the correct order to satisfy foreign key constraints:
+   * 1. Delete document chunks (page_id references pages.id)
+   * 2. Delete page record
+   *
+   * This method is used during refresh operations when a page returns 404 Not Found.
+   */
+  async deletePage(pageId: number): Promise<void> {
+    try {
+      // Delete documents first (due to foreign key constraint)
+      const docResult = this.statements.deleteDocumentsByPageId.run(pageId);
+      logger.debug(`Deleted ${docResult.changes} document(s) for page ID ${pageId}`);
+
+      // Then delete the page record
+      const pageResult = this.statements.deletePage.run(pageId);
+      if (pageResult.changes > 0) {
+        logger.debug(`Deleted page record for page ID ${pageId}`);
+      }
+    } catch (error) {
+      throw new ConnectionError(`Failed to delete page ${pageId}`, error);
+    }
+  }
+
+  /**
+   * Retrieves all pages for a specific version ID with their metadata.
+   * Used for refresh operations to get existing pages with their ETags and depths.
+   * @returns Array of page records
+   */
+  async getPagesByVersionId(versionId: number): Promise<DbPage[]> {
+    try {
+      const result = this.statements.getPagesByVersionId.all(versionId) as DbPage[];
+      return result;
+    } catch (error) {
+      throw new ConnectionError("Failed to get pages by version ID", error);
+    }
+  }
+
+  /**
+   * Completely removes a library version and all associated documents.
+   * Optionally removes the library if no other versions remain.
+   * @param library Library name
+   * @param version Version string (empty string for unversioned)
+   * @param removeLibraryIfEmpty Whether to remove the library if no versions remain
+   * @returns Object with counts of deleted documents, version deletion status, and library deletion status
+   */
+  async removeVersion(
+    library: string,
+    version: string,
+    removeLibraryIfEmpty = true,
+  ): Promise<{
+    documentsDeleted: number;
+    versionDeleted: boolean;
+    libraryDeleted: boolean;
+  }> {
+    try {
+      const normalizedLibrary = normalizeLibraryName(library);
+      const normalizedVersion = normalizeVersionLabel(version);
+
+      // First, get the version ID and library ID
+      const versionResult = this.statements.getVersionId.get(
+        normalizedLibrary,
+        normalizedVersion,
+      ) as { id: number; library_id: number } | undefined;
+
+      if (!versionResult) {
+        // Version doesn't exist, return zero counts
+        return { documentsDeleted: 0, versionDeleted: false, libraryDeleted: false };
+      }
+
+      const { id: versionId, library_id: libraryId } = versionResult;
+
+      // Delete in order to respect foreign key constraints:
+      // 1. documents (page_id → pages.id)
+      // 2. pages (version_id → versions.id)
+      // 3. versions (library_id → libraries.id)
+      // 4. libraries (if empty)
+
+      // Delete all documents for this version
+      const documentsDeleted = await this.deletePages(library, version);
+
+      // Delete all pages for this version (must be done after documents, before version)
+      this.statements.deletePages.run(normalizedLibrary, normalizedVersion);
+
+      // Delete the version record
+      const versionDeleteResult = this.statements.deleteVersionById.run(versionId);
+      const versionDeleted = versionDeleteResult.changes > 0;
+
+      let libraryDeleted = false;
+
+      // Check if we should remove the library
+      if (removeLibraryIfEmpty && versionDeleted) {
+        // Count remaining versions for this library
+        const countResult = this.statements.countVersionsByLibraryId.get(libraryId) as
+          | { count: number }
+          | undefined;
+        const remainingVersions = countResult?.count ?? 0;
+
+        if (remainingVersions === 0) {
+          // No versions left, delete the library
+          const libraryDeleteResult = this.statements.deleteLibraryById.run(libraryId);
+          libraryDeleted = libraryDeleteResult.changes > 0;
+        }
+      }
+
+      return { documentsDeleted, versionDeleted, libraryDeleted };
+    } catch (error) {
+      throw new ConnectionError("Failed to remove version", error);
+    }
+  }
+
+  /**
+   * Parses the metadata field from a JSON string to an object.
+   * This is necessary because better-sqlite3's json() function returns a string, not an object.
+   */
+  private parseMetadata<M extends {}, T extends { metadata: M }>(row: T): T {
+    if (row.metadata && typeof row.metadata === "string") {
+      try {
+        row.metadata = JSON.parse(row.metadata);
+      } catch (error) {
+        logger.warn(`Failed to parse metadata JSON: ${error}`);
+        row.metadata = {} as M;
+      }
+    }
+    return row;
+  }
+
+  /**
+   * Parses metadata for an array of rows.
+   */
+  private parseMetadataArray<M extends {}, T extends { metadata: M }>(rows: T[]): T[] {
+    return rows.map((row) => this.parseMetadata(row));
+  }
+
+  /**
+   * Retrieves a document by its ID.
+   * @param id The ID of the document.
+   * @returns The document, or null if not found.
+   */
+  async getById(id: string): Promise<DbPageChunk | null> {
+    try {
+      const row = this.statements.getById.get(BigInt(id)) as DbQueryResult<DbPageChunk>;
+      if (!row) {
+        return null;
+      }
+
+      return this.parseMetadata(row);
+    } catch (error) {
+      throw new ConnectionError(`Failed to get document by ID ${id}`, error);
+    }
+  }
+
+  /**
+   * Finds documents matching a text query using hybrid search when vector search is enabled,
+   * or falls back to full-text search only when vector search is disabled.
+   * Uses Reciprocal Rank Fusion for hybrid search or simple FTS ranking for fallback mode.
+   */
+  async findByContent(
+    library: string,
+    version: string,
+    query: string,
+    limit: number,
+  ): Promise<(DbPageChunk & DbChunkRank)[]> {
+    try {
+      // Return empty array for empty or whitespace-only queries
+      if (!query || typeof query !== "string" || query.trim().length === 0) {
+        return [];
+      }
+
+      const ftsQuery = this.escapeFtsQuery(query);
+      const normalizedVersion = normalizeVersionLabel(version);
+
+      // Resolve library/version upfront so we can short-circuit missing versions
+      // and constrain FTS queries by version_id.
+      const versionRow = this.statements.getVersionId.get(
+        normalizeLibraryName(library),
+        normalizedVersion,
+      ) as { id: number; library_id: number } | undefined;
+
+      if (!versionRow) {
+        return [];
+      }
+
+      const { id: versionId, library_id: libraryId } = versionRow;
+
+      if (this.isVectorSearchEnabled && this.embeddings !== null) {
+        // Hybrid search: vector + full-text search with RRF ranking
+        const rawEmbedding = await this.embeddings.embedQuery(query);
+        const embedding = this.padVector(rawEmbedding);
+
+        // Apply overfetch factor to both vector and FTS searches for better recall
+        const overfetchLimit = Math.max(1, limit * this.searchOverfetchFactor);
+
+        // Use a multiplier to cast a wider net in vector search before final ranking
+        const vectorSearchK = overfetchLimit * this.vectorSearchMultiplier;
+
+        const stmt = this.db.prepare(`
+          WITH vec_distances AS MATERIALIZED (
+            SELECT
+              dv.rowid as id,
+              dv.distance as vec_distance
+            FROM documents_vec dv
+            WHERE dv.library_id = ?
+              AND dv.version_id = ?
+              AND dv.embedding MATCH ?
+              AND dv.k = ?
+            ORDER BY dv.distance
+          ),
+          fts_scores AS MATERIALIZED (
+            SELECT
+              f.rowid as id,
+              bm25(documents_fts, 10.0, 1.0, 5.0, 1.0) as fts_score
+            FROM documents_fts f
+            JOIN documents d ON f.rowid = d.id
+            JOIN pages p ON d.page_id = p.id
+            WHERE p.version_id = ?
+              AND documents_fts MATCH ?
+            ORDER BY fts_score
+            LIMIT ?
+          ),
+          candidates AS (
+            -- Union of vector and full-text candidate ids so the final query is
+            -- driven by the small match set instead of scanning the entire
+            -- documents table. Keeps search cost proportional to matches, not
+            -- total database size.
+            --
+            -- Both source CTEs are referenced twice (here and in the LEFT JOINs
+            -- below) and are pinned with MATERIALIZED so they are evaluated
+            -- exactly once. Leaving this to the query planner is what caused
+            -- the search regression in #454.
+            SELECT id FROM vec_distances
+            UNION
+            SELECT id FROM fts_scores
+          )
+          SELECT
+            d.id,
+            d.content,
+            d.metadata,
+            p.url as url,
+            p.title as title,
+            p.source_content_type as source_content_type,
+            p.content_type as content_type,
+            COALESCE(1 / (1 + v.vec_distance), 0) as vec_score,
+            COALESCE(-MIN(f.fts_score, 0), 0) as fts_score
+          FROM candidates c
+          JOIN documents d ON d.id = c.id
+          JOIN pages p ON d.page_id = p.id
+          LEFT JOIN vec_distances v ON d.id = v.id
+          LEFT JOIN fts_scores f ON d.id = f.id
+          WHERE NOT EXISTS (
+            SELECT 1 FROM json_each(json_extract(d.metadata, '$.types')) je
+            WHERE je.value = 'structural'
+          )
+        `);
+
+        const rawResults = stmt.all(
+          libraryId,
+          versionId,
+          JSON.stringify(embedding),
+          vectorSearchK,
+          versionId,
+          ftsQuery,
+          overfetchLimit,
+        ) as RawSearchResult[];
+
+        // Apply RRF ranking with configurable weights
+        const rankedResults = this.assignRanks(rawResults);
+
+        // Sort by RRF score and take top results (truncate to original limit)
+        const topResults = rankedResults
+          .sort((a, b) => b.rrf_score - a.rrf_score)
+          .slice(0, limit);
+
+        return topResults.map((row) => {
+          const result: DbPageChunk = {
+            ...row,
+            url: row.url || "", // Ensure url is never undefined
+            title: row.title || null,
+            source_content_type: row.source_content_type || null,
+            content_type: row.content_type || null,
+          };
+          // Add search scores as additional properties (not in metadata)
+          return Object.assign(result, {
+            score: row.rrf_score,
+            vec_rank: row.vec_rank,
+            fts_rank: row.fts_rank,
+          });
+        });
+      } else {
+        // Fallback: full-text search only
+        const stmt = this.db.prepare(`
+          SELECT
+            d.id,
+            d.content,
+            d.metadata,
+            p.url as url,
+            p.title as title,
+            p.source_content_type as source_content_type,
+            p.content_type as content_type,
+            bm25(documents_fts, 10.0, 1.0, 5.0, 1.0) as fts_score
+          FROM documents_fts f
+          JOIN documents d ON f.rowid = d.id
+          JOIN pages p ON d.page_id = p.id
+          WHERE p.version_id = ?
+            AND documents_fts MATCH ?
+            AND NOT EXISTS (
+              SELECT 1 FROM json_each(json_extract(d.metadata, '$.types')) je
+              WHERE je.value = 'structural'
+            )
+          ORDER BY fts_score
+          LIMIT ?
+        `);
+
+        const rawResults = stmt.all(versionId, ftsQuery, limit) as (RawSearchResult & {
+          fts_score: number;
+        })[];
+
+        // Assign FTS ranks based on order (best score = rank 1)
+        return rawResults.map((row, index) => {
+          const result: DbPageChunk = {
+            ...row,
+            url: row.url || "", // Ensure url is never undefined
+            title: row.title || null,
+            source_content_type: row.source_content_type || null,
+            content_type: row.content_type || null,
+          };
+          // Add search scores as additional properties (not in metadata)
+          return Object.assign(result, {
+            score: -row.fts_score, // Convert BM25 score to positive value for consistency
+            fts_rank: index + 1, // Assign rank based on order (1-based)
+          });
+        });
+      }
+    } catch (error) {
+      throw new ConnectionError(
+        `Failed to find documents by content with query "${query}"`,
+        error,
+      );
+    }
+  }
+
+  /**
+   * Finds child chunks of a given document based on path hierarchy.
+   */
+  async findChildChunks(
+    library: string,
+    version: string,
+    id: string,
+    limit: number,
+  ): Promise<DbPageChunk[]> {
+    try {
+      const parent = await this.getById(id);
+      if (!parent) {
+        return [];
+      }
+
+      const parentPath = parent.metadata.path ?? [];
+      const normalizedVersion = normalizeVersionLabel(version);
+
+      const result = this.statements.getChildChunks.all(
+        normalizeLibraryName(library),
+        normalizedVersion,
+        parent.url,
+        parentPath.length + 1,
+        JSON.stringify(parentPath),
+        BigInt(id),
+        limit,
+      ) as Array<DbPageChunk>;
+
+      return this.parseMetadataArray(result);
+    } catch (error) {
+      throw new ConnectionError(`Failed to find child chunks for ID ${id}`, error);
+    }
+  }
+
+  /**
+   * Finds preceding sibling chunks of a given document.
+   */
+  async findPrecedingSiblingChunks(
+    library: string,
+    version: string,
+    id: string,
+    limit: number,
+  ): Promise<DbPageChunk[]> {
+    try {
+      const reference = await this.getById(id);
+      if (!reference) {
+        return [];
+      }
+
+      const normalizedVersion = normalizeVersionLabel(version);
+
+      const result = this.statements.getPrecedingSiblings.all(
+        normalizeLibraryName(library),
+        normalizedVersion,
+        reference.url,
+        BigInt(id),
+        JSON.stringify(reference.metadata.path),
+        limit,
+      ) as Array<DbPageChunk>;
+
+      return this.parseMetadataArray(result).reverse();
+    } catch (error) {
+      throw new ConnectionError(
+        `Failed to find preceding sibling chunks for ID ${id}`,
+        error,
+      );
+    }
+  }
+
+  /**
+   * Finds subsequent sibling chunks of a given document.
+   */
+  async findSubsequentSiblingChunks(
+    library: string,
+    version: string,
+    id: string,
+    limit: number,
+  ): Promise<DbPageChunk[]> {
+    try {
+      const reference = await this.getById(id);
+      if (!reference) {
+        return [];
+      }
+
+      const normalizedVersion = normalizeVersionLabel(version);
+
+      const result = this.statements.getSubsequentSiblings.all(
+        normalizeLibraryName(library),
+        normalizedVersion,
+        reference.url,
+        BigInt(id),
+        JSON.stringify(reference.metadata.path),
+        limit,
+      ) as Array<DbPageChunk>;
+
+      return this.parseMetadataArray(result);
+    } catch (error) {
+      throw new ConnectionError(
+        `Failed to find subsequent sibling chunks for ID ${id}`,
+        error,
+      );
+    }
+  }
+
+  /**
+   * Finds the parent chunk of a given document.
+   * Returns null if no parent is found or if there's a database error.
+   * Database errors are logged but not thrown to maintain consistent behavior.
+   */
+  async findParentChunk(
+    library: string,
+    version: string,
+    id: string,
+  ): Promise<DbPageChunk | null> {
+    try {
+      const child = await this.getById(id);
+      if (!child) {
+        return null;
+      }
+
+      const path = child.metadata.path ?? [];
+      const parentPath = path.slice(0, -1);
+
+      if (parentPath.length === 0) {
+        return null;
+      }
+
+      const normalizedVersion = normalizeVersionLabel(version);
+      const result = this.statements.getParentChunk.get(
+        normalizeLibraryName(library),
+        normalizedVersion,
+        child.url,
+        JSON.stringify(parentPath),
+        BigInt(id),
+      ) as DbQueryResult<DbPageChunk>;
+
+      if (!result) {
+        return null;
+      }
+
+      return this.parseMetadata(result);
+    } catch (error) {
+      logger.warn(`Failed to find parent chunk for ID ${id}: ${error}`);
+      return null;
+    }
+  }
+
+  /**
+   * Fetches multiple documents by their IDs in a single call.
+   * Returns an array of DbPageChunk objects, sorted by their sort_order.
+   */
+  async findChunksByIds(
+    library: string,
+    version: string,
+    ids: string[],
+  ): Promise<DbPageChunk[]> {
+    if (!ids.length) return [];
+    try {
+      const normalizedVersion = normalizeVersionLabel(version);
+      // Use parameterized query for variable number of IDs
+      const placeholders = ids.map(() => "?").join(",");
+      const stmt = this.db.prepare(
+        `SELECT d.id, d.page_id, d.content, json(d.metadata) as metadata, d.sort_order, d.embedding, d.created_at, p.url, p.title, p.source_content_type, p.content_type, p.content_url FROM documents d
+         JOIN pages p ON d.page_id = p.id
+         JOIN versions v ON p.version_id = v.id
+         JOIN libraries l ON v.library_id = l.id
+         WHERE l.name = ? 
+           AND COALESCE(v.name, '') = COALESCE(?, '')
+           AND d.id IN (${placeholders}) 
+         ORDER BY d.sort_order`,
+      );
+      const rows = stmt.all(
+        normalizeLibraryName(library),
+        normalizedVersion,
+        ...ids,
+      ) as DbPageChunk[];
+      return this.parseMetadataArray(rows);
+    } catch (error) {
+      throw new ConnectionError("Failed to fetch documents by IDs", error);
+    }
+  }
+
+  /**
+   * Fetches all document chunks for a specific URL within a library and version.
+   * Returns DbPageChunk objects sorted by their sort_order for proper reassembly.
+   */
+  async findChunksByUrl(
+    library: string,
+    version: string,
+    url: string,
+  ): Promise<DbPageChunk[]> {
+    try {
+      const normalizedVersion = normalizeVersionLabel(version);
+      const stmt = this.db.prepare(
+        `SELECT d.id, d.page_id, d.content, json(d.metadata) as metadata, d.sort_order, d.embedding, d.created_at, p.url, p.title, p.source_content_type, p.content_type, p.content_url FROM documents d
+         JOIN pages p ON d.page_id = p.id
+         JOIN versions v ON p.version_id = v.id
+         JOIN libraries l ON v.library_id = l.id
+         WHERE l.name = ? 
+           AND COALESCE(v.name, '') = COALESCE(?, '')
+           AND p.url = ?
+         ORDER BY d.sort_order`,
+      );
+      const rows = stmt.all(
+        normalizeLibraryName(library),
+        normalizedVersion,
+        url,
+      ) as DbPageChunk[];
+      return this.parseMetadataArray(rows);
+    } catch (error) {
+      throw new ConnectionError(`Failed to fetch documents by URL ${url}`, error);
+    }
+  }
+
+  /**
+   * Lists stored chunks for a library version with pagination and an optional
+   * case-insensitive content filter. Powers the admin dashboard's chunk explorer.
+   *
+   * Position (`chunkIndex`/`pageChunkCount`) is computed with window functions
+   * over `sort_order` rather than trusted verbatim, so results stay correct
+   * even if a page's chunks were ever stored with non-contiguous ordering.
+   * Token counts are never fabricated: the current schema has no per-chunk
+   * token column, so every item's `tokenCount` is `null`.
+   *
+   * @param library Library name (case-insensitive).
+   * @param version Version string (empty string for unversioned).
+   * @param options Pagination (`limit`/`offset`) and optional content `filter`.
+   * @returns The requested page of chunks plus the total count matching the filter.
+   */
+  async listVersionChunks(
+    library: string,
+    version: string,
+    options: ListVersionChunksOptions,
+  ): Promise<ListVersionChunksResult> {
+    try {
+      const normalizedVersion = normalizeVersionLabel(version);
+      const versionRow = this.statements.getVersionId.get(
+        normalizeLibraryName(library),
+        normalizedVersion,
+      ) as { id: number; library_id: number } | undefined;
+
+      if (!versionRow) {
+        return { chunks: [], total: 0 };
+      }
+
+      const offset = options.offset ?? 0;
+      const trimmedFilter = options.filter?.trim();
+
+      const whereParams: (string | number)[] = [versionRow.id];
+      let whereClause = "WHERE p.version_id = ?";
+      if (trimmedFilter) {
+        whereClause += " AND LOWER(d.content) LIKE LOWER(?) ESCAPE '\\'";
+        whereParams.push(`%${this.escapeLikePattern(trimmedFilter)}%`);
+      }
+
+      const countStmt = this.db.prepare(
+        `SELECT COUNT(*) as count
+         FROM documents d
+         JOIN pages p ON d.page_id = p.id
+         ${whereClause}`,
+      );
+      const countRow = countStmt.get(...whereParams) as { count: number };
+      const total = countRow.count;
+
+      const dataStmt = this.db.prepare(
+        `SELECT
+           d.id,
+           d.content,
+           (d.embedding IS NOT NULL) as has_embedding,
+           p.url as url,
+           p.content_type as mime_type,
+           ROW_NUMBER() OVER (PARTITION BY d.page_id ORDER BY d.sort_order, d.id) as chunk_index,
+           COUNT(*) OVER (PARTITION BY d.page_id) as page_chunk_count
+         FROM documents d
+         JOIN pages p ON d.page_id = p.id
+         ${whereClause}
+         ORDER BY p.url, d.sort_order, d.id
+         LIMIT ? OFFSET ?`,
+      );
+      const rows = dataStmt.all(...whereParams, options.limit, offset) as Array<{
+        id: number;
+        content: string;
+        has_embedding: number;
+        url: string;
+        mime_type: string | null;
+        chunk_index: number;
+        page_chunk_count: number;
+      }>;
+
+      const chunks: VersionChunkListItem[] = rows.map((row) => ({
+        id: String(row.id),
+        url: row.url,
+        content: row.content,
+        mimeType: row.mime_type,
+        chunkIndex: row.chunk_index,
+        pageChunkCount: row.page_chunk_count,
+        charCount: row.content.length,
+        tokenCount: null,
+        hasEmbedding: Boolean(row.has_embedding),
+      }));
+
+      return { chunks, total };
+    } catch (error) {
+      throw new ConnectionError("Failed to list version chunks", error);
+    }
+  }
+
+  /**
+   * Computes aggregate chunk/page/embedding statistics for a library version,
+   * for the chunk explorer's header strip.
+   *
+   * `avgTokensPerChunk` is always `null`: the schema does not persist
+   * per-chunk token counts, so this is reported as unavailable rather than
+   * fabricated from character counts.
+   *
+   * @param library Library name (case-insensitive).
+   * @param version Version string (empty string for unversioned).
+   * @returns Aggregate statistics, or all-zero/`null` values if the version doesn't exist.
+   */
+  async getVersionStats(library: string, version: string): Promise<VersionChunkStats> {
+    try {
+      const normalizedVersion = normalizeVersionLabel(version);
+      const versionRow = this.statements.getVersionId.get(
+        normalizeLibraryName(library),
+        normalizedVersion,
+      ) as { id: number; library_id: number } | undefined;
+
+      if (!versionRow) {
+        return {
+          pageCount: 0,
+          chunkCount: 0,
+          avgChunksPerPage: null,
+          avgTokensPerChunk: null,
+          embeddedChunkCount: 0,
+        };
+      }
+
+      const stmt = this.db.prepare(
+        `SELECT
+           COUNT(DISTINCT p.id) as page_count,
+           COUNT(d.id) as chunk_count,
+           SUM(CASE WHEN d.embedding IS NOT NULL THEN 1 ELSE 0 END) as embedded_chunk_count
+         FROM pages p
+         LEFT JOIN documents d ON d.page_id = p.id
+         WHERE p.version_id = ?`,
+      );
+      const row = stmt.get(versionRow.id) as {
+        page_count: number;
+        chunk_count: number;
+        embedded_chunk_count: number | null;
+      };
+
+      return {
+        pageCount: row.page_count,
+        chunkCount: row.chunk_count,
+        avgChunksPerPage: row.page_count > 0 ? row.chunk_count / row.page_count : null,
+        avgTokensPerChunk: null,
+        embeddedChunkCount: row.embedded_chunk_count ?? 0,
+      };
+    } catch (error) {
+      throw new ConnectionError("Failed to get version stats", error);
+    }
+  }
+
+  /**
+   * Returns per-day indexing activity over the trailing `days`-day window,
+   * derived from the `created_at` timestamps already stored on pages and
+   * chunks. Days with no activity are zero-filled so the returned series is
+   * contiguous.
+   *
+   * Rows are grouped by UTC calendar day to match SQLite's `date('now')`.
+   * `created_at` reflects first insertion, so a refresh that only updates
+   * existing pages does not inflate the counts (it is genuinely new content,
+   * not re-touched content, that registers as activity).
+   *
+   * @param days - Window length in days; clamped to 1..366.
+   */
+  async getActivityHistory(days: number): Promise<ActivityHistory> {
+    try {
+      const windowDays = Math.max(1, Math.min(366, Math.floor(days) || 1));
+      // A recursive calendar drives the zero-fill: every day in the window is
+      // emitted even when neither `pages` nor `documents` has a row for it.
+      const stmt = this.db.prepare(
+        `WITH RECURSIVE calendar(day) AS (
+           SELECT date('now', '-' || (@days - 1) || ' days')
+           UNION ALL
+           SELECT date(day, '+1 day') FROM calendar WHERE day < date('now')
+         )
+         SELECT
+           calendar.day AS date,
+           COALESCE(pg.cnt, 0) AS pages,
+           COALESCE(ch.cnt, 0) AS chunks
+         FROM calendar
+         LEFT JOIN (
+           SELECT date(created_at) AS d, COUNT(*) AS cnt
+           FROM pages
+           WHERE created_at >= date('now', '-' || (@days - 1) || ' days')
+           GROUP BY d
+         ) pg ON pg.d = calendar.day
+         LEFT JOIN (
+           SELECT date(created_at) AS d, COUNT(*) AS cnt
+           FROM documents
+           WHERE created_at >= date('now', '-' || (@days - 1) || ' days')
+           GROUP BY d
+         ) ch ON ch.d = calendar.day
+         ORDER BY calendar.day`,
+      );
+      const rows = stmt.all({ days: windowDays }) as Array<{
+        date: string;
+        pages: number;
+        chunks: number;
+      }>;
+
+      let totalPages = 0;
+      let totalChunks = 0;
+      for (const row of rows) {
+        totalPages += row.pages;
+        totalChunks += row.chunks;
+      }
+
+      return {
+        days: rows.map((row) => ({
+          date: row.date,
+          pages: row.pages,
+          chunks: row.chunks,
+        })),
+        since: rows[0]?.date ?? "",
+        until: rows[rows.length - 1]?.date ?? "",
+        totalPages,
+        totalChunks,
+      };
+    } catch (error) {
+      throw new ConnectionError("Failed to get activity history", error);
+    }
+  }
+
+  /**
+   * Returns a per-version content-type breakdown: pages grouped by MIME type
+   * (`content_type`, falling back to `source_content_type`, else `unknown`),
+   * most common first. Derived from the stored pages.
+   *
+   * @param library - Library name (case-insensitive).
+   * @param version - Version name (empty string for unversioned).
+   */
+  async getVersionComposition(
+    library: string,
+    version: string,
+  ): Promise<VersionComposition> {
+    try {
+      const versionRow = this.statements.getVersionId.get(
+        normalizeLibraryName(library),
+        normalizeVersionLabel(version),
+      ) as { id: number } | undefined;
+
+      if (!versionRow) return { mimeTypes: [] };
+
+      const mimeRows = this.db
+        .prepare(
+          `SELECT
+             COALESCE(NULLIF(p.content_type, ''), NULLIF(p.source_content_type, ''), 'unknown') AS label,
+             COUNT(*) AS pages
+           FROM pages p
+           WHERE p.version_id = ?
+           GROUP BY label
+           ORDER BY pages DESC, label`,
+        )
+        .all(versionRow.id) as Array<{ label: string; pages: number }>;
+
+      return {
+        mimeTypes: mimeRows.map((row) => ({ label: row.label, pages: row.pages })),
+      };
+    } catch (error) {
+      throw new ConnectionError("Failed to get version composition", error);
+    }
+  }
+}

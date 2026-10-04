@@ -1,0 +1,30 @@
+ M eval/task_level/runners/opencode.py
+ M tests/diagnostic_labels.component_coverage.json
+ M tests/diagnostic_labels.evidence_sets.json
+ M tests/diagnostic_labels.global_evidence.json
+ M tests/diagnostic_labels.json
+ M tests/diagnostic_labels.request_flow_lineage.json
+ M tests/diagnostic_labels.script_recovery.json
+ M tests/docs/test_component_completeness.py
+ M tests/docs/test_component_coverage.py
+ M tests/docs/test_context_completion_guards.py
+ M tests/docs/test_evidence_set_compositional_frames.py
+ M tests/docs/test_evidence_set_need_composition.py
+ M tests/docs/test_evidence_set_private_plan.py
+ M tests/docs/test_mixed_script_recovery.py
+ M tests/docs/test_need_local_admission.py
+ M tests/docs/test_request_flow_lineage.py
+ M tests/test_clean_project_context_recovery.py
+ M v2plan/NEXT_06_TEST_CONTRACTS_AND_AGENT_ACCEPTANCE_RU.md
+?? tests/docs/_component_contract_fixtures.py
+?? tests/task_level/test_opencode_next06.py
+?? v2plan/artifacts/next06/
+?? v2plan/artifacts/next07/20261004-baseline-c49e5221/
+?? v2plan/artifacts/next07/compiler-preservation-20261004/
+?? v2plan/artifacts/next07/grounded-first/
+?? v2plan/artifacts/next07/scope-consumer-compatibility-20261004.json
+?? v2plan/next06_capture_blockers.py
+?? v2plan/next07_compiler_trial.py
+?? v2plan/next07_grounded_run.py
+?? v2plan/next07_read_trace.py
+?? v2plan/test_next07_compiler_trial.py

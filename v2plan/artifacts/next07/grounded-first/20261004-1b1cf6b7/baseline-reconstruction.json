@@ -1,0 +1,15 @@
+{
+  "durable_head": "git commit 1b1cf6b70b7467950447a9bf930fccda8affa8b5",
+  "durable_dirty_patch": "baseline.patch",
+  "durable_untracked_executable_inputs": "untracked-inputs.tar.gz",
+  "untracked_nonexecutables": "provenance.json hash inventory; historical outputs not baseline executable inputs",
+  "archive_cache": "/tmp/opencode/next07-20261004-1b1cf6b7-baseline-head.tar.gz",
+  "archive_sha256": "15f71f0895a4a115f851181e290ef1f88621de66a7936e60f45b57eb8ab4a8b1",
+  "archive_cache_not_durable": true,
+  "restore_commands": [
+    "git archive --format=tar.gz 1b1cf6b70b7467950447a9bf930fccda8affa8b5 > head.tar.gz",
+    "extract head.tar.gz and untracked-inputs.tar.gz into an empty checkout",
+    "git apply baseline.patch"
+  ],
+  "note": "The complete tracked source already exists in versioned Git; no 40 MB duplicate is committed. Patch and executable untracked inputs are durable artifacts."
+}

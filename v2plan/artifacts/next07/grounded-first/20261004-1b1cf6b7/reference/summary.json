@@ -1,0 +1,90 @@
+{
+  "rows": [
+    {
+      "parameter": [
+        17,
+        "LeaseExpired"
+      ],
+      "checks": {
+        "default": true,
+        "exception_with_condition": true,
+        "owners": true,
+        "zero_embeddings": true
+      },
+      "native_exit": 0,
+      "results": [
+        {
+          "url": "file:///tmp/opencode/next07-20261004-1b1cf6b7-reference/17/corpus/error.md",
+          "content": "# LeaseClient\nAn expired operation raises `LeaseExpired`.",
+          "score": 3.0298611449184785,
+          "mimeType": "text/markdown",
+          "sourceMimeType": "text/markdown"
+        },
+        {
+          "url": "file:///tmp/opencode/next07-20261004-1b1cf6b7-reference/17/corpus/overview.md",
+          "content": "# Overview\nLeaseClient default timeout duration requests exception operation behavior documentation.",
+          "score": 2.9831652753681093,
+          "mimeType": "text/markdown",
+          "sourceMimeType": "text/markdown"
+        },
+        {
+          "url": "file:///tmp/opencode/next07-20261004-1b1cf6b7-reference/17/corpus/default.md",
+          "content": "# LeaseClient\nThe default timeout is 17 seconds.",
+          "score": 2.0120364817669145,
+          "mimeType": "text/markdown",
+          "sourceMimeType": "text/markdown"
+        }
+      ],
+      "size": {
+        "raw_json_utf8_bytes": 879,
+        "raw_json_chars": 879
+      },
+      "grounded_budget_parity": "NOT_CLAIMED; search limit is not whole-DTO budget"
+    },
+    {
+      "parameter": [
+        29,
+        "WaitExpired"
+      ],
+      "checks": {
+        "default": true,
+        "exception_with_condition": true,
+        "owners": true,
+        "zero_embeddings": true
+      },
+      "native_exit": 0,
+      "results": [
+        {
+          "url": "file:///tmp/opencode/next07-20261004-1b1cf6b7-reference/29/corpus/error.md",
+          "content": "# LeaseClient\nAn expired operation raises `WaitExpired`.",
+          "score": 3.0298611449184785,
+          "mimeType": "text/markdown",
+          "sourceMimeType": "text/markdown"
+        },
+        {
+          "url": "file:///tmp/opencode/next07-20261004-1b1cf6b7-reference/29/corpus/overview.md",
+          "content": "# Overview\nLeaseClient default timeout duration requests exception operation behavior documentation.",
+          "score": 2.9831652753681093,
+          "mimeType": "text/markdown",
+          "sourceMimeType": "text/markdown"
+        },
+        {
+          "url": "file:///tmp/opencode/next07-20261004-1b1cf6b7-reference/29/corpus/default.md",
+          "content": "# LeaseClient\nThe default timeout is 29 seconds.",
+          "score": 2.0120364817669145,
+          "mimeType": "text/markdown",
+          "sourceMimeType": "text/markdown"
+        }
+      ],
+      "size": {
+        "raw_json_utf8_bytes": 878,
+        "raw_json_chars": 878
+      },
+      "grounded_budget_parity": "NOT_CLAIMED; search limit is not whole-DTO budget"
+    }
+  ],
+  "verdict": "DONE",
+  "transport": "actual packaged CLI SearchTool; not MCP transport",
+  "reader": "NOT_RUN",
+  "normalized_output": "not attested as original spans"
+}

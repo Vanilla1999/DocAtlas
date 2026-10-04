@@ -1,0 +1,23 @@
+{
+  "command": [
+    "node",
+    "/tmp/opencode/next07-grounded-321-20261004/node_modules/@arabold/docs-mcp-server/dist/index.js",
+    "scrape",
+    "lease-fixture",
+    "file:///tmp/opencode/next07-20261004-1b1cf6b7-reference/29/corpus/overview.md",
+    "--max-pages",
+    "1",
+    "--max-depth",
+    "1",
+    "--no-clean",
+    "--config",
+    "/tmp/opencode/next07-20261004-1b1cf6b7-reference/29/config.json",
+    "--store-path",
+    "/tmp/opencode/next07-20261004-1b1cf6b7-reference/29/store",
+    "--no-telemetry",
+    "--no-logo"
+  ],
+  "returncode": 0,
+  "stdout": "Successfully scraped 1 pages\n",
+  "stderr": ""
+}

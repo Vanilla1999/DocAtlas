@@ -1,0 +1,344 @@
+{
+  "rows": [
+    {
+      "parameter": [
+        17,
+        "LeaseExpired"
+      ],
+      "same_index_rows_parity": true,
+      "normalized_upstream_rows": [
+        {
+          "rowid": 1,
+          "content": "# LeaseClient\nThe default timeout is 17 seconds.",
+          "title": "LeaseClient",
+          "url": "file:///tmp/opencode/next07-20261004-1b1cf6b7-reference/17/corpus/default.md",
+          "path": "[\"LeaseClient\"]",
+          "identity": "file:///tmp/opencode/next07-20261004-1b1cf6b7-reference/17/corpus/default.md",
+          "start": 0,
+          "end": 48
+        },
+        {
+          "rowid": 2,
+          "content": "# LeaseClient\nAn expired operation raises `LeaseExpired`.",
+          "title": "LeaseClient",
+          "url": "file:///tmp/opencode/next07-20261004-1b1cf6b7-reference/17/corpus/error.md",
+          "path": "[\"LeaseClient\"]",
+          "identity": "file:///tmp/opencode/next07-20261004-1b1cf6b7-reference/17/corpus/error.md",
+          "start": 0,
+          "end": 57
+        },
+        {
+          "rowid": 3,
+          "content": "# Overview\nLeaseClient default timeout duration requests exception operation behavior documentation.",
+          "title": "Overview",
+          "url": "file:///tmp/opencode/next07-20261004-1b1cf6b7-reference/17/corpus/overview.md",
+          "path": "[\"Overview\"]",
+          "identity": "file:///tmp/opencode/next07-20261004-1b1cf6b7-reference/17/corpus/overview.md",
+          "start": 0,
+          "end": 100
+        }
+      ],
+      "upstream_order": [
+        {
+          "rowid": 2,
+          "score": -3.0298611449184785
+        },
+        {
+          "rowid": 3,
+          "score": -2.9831652753681093
+        },
+        {
+          "rowid": 1,
+          "score": -2.0120364817669145
+        }
+      ],
+      "ported_order": [
+        {
+          "rowid": 2,
+          "content": "# LeaseClient\nAn expired operation raises `LeaseExpired`.",
+          "title": "LeaseClient",
+          "url": "file:///tmp/opencode/next07-20261004-1b1cf6b7-reference/17/corpus/error.md",
+          "path": "[\"LeaseClient\"]",
+          "identity": "file:///tmp/opencode/next07-20261004-1b1cf6b7-reference/17/corpus/error.md",
+          "start": 0,
+          "end": 57,
+          "bm25_order_score": -3.0298611449184785,
+          "retrieval_order": 0
+        },
+        {
+          "rowid": 3,
+          "content": "# Overview\nLeaseClient default timeout duration requests exception operation behavior documentation.",
+          "title": "Overview",
+          "url": "file:///tmp/opencode/next07-20261004-1b1cf6b7-reference/17/corpus/overview.md",
+          "path": "[\"Overview\"]",
+          "identity": "file:///tmp/opencode/next07-20261004-1b1cf6b7-reference/17/corpus/overview.md",
+          "start": 0,
+          "end": 100,
+          "bm25_order_score": -2.9831652753681093,
+          "retrieval_order": 1
+        },
+        {
+          "rowid": 1,
+          "content": "# LeaseClient\nThe default timeout is 17 seconds.",
+          "title": "LeaseClient",
+          "url": "file:///tmp/opencode/next07-20261004-1b1cf6b7-reference/17/corpus/default.md",
+          "path": "[\"LeaseClient\"]",
+          "identity": "file:///tmp/opencode/next07-20261004-1b1cf6b7-reference/17/corpus/default.md",
+          "start": 0,
+          "end": 48,
+          "bm25_order_score": -2.0120364817669145,
+          "retrieval_order": 2
+        }
+      ],
+      "original_span_proposals": [
+        {
+          "identity": "file:///tmp/opencode/next07-20261004-1b1cf6b7-reference/17/corpus/error.md",
+          "canonical_path": "error.md",
+          "raw": "# LeaseClient\n\nAn expired operation raises `LeaseExpired`.\n",
+          "title": "LeaseClient",
+          "url": "file:///tmp/opencode/next07-20261004-1b1cf6b7-reference/17/corpus/error.md",
+          "snapshot_id": "fixture-sha256:c3c5b5cd1185e7cc00475011818fecbf13dbc497dc05495a9cf8360870171607",
+          "start": 0,
+          "end": 59,
+          "content": "# LeaseClient\n\nAn expired operation raises `LeaseExpired`.\n",
+          "path": "[\"LeaseClient\"]",
+          "source_sha256": "c3c5b5cd1185e7cc00475011818fecbf13dbc497dc05495a9cf8360870171607",
+          "owner_spans": [
+            [
+              0,
+              59
+            ]
+          ],
+          "dependency_spans": "NOT_PREPARED until scoped source preparation in I.3; not approval",
+          "byte_start": 0,
+          "byte_end": 59,
+          "bm25_order_score": -3.0298611449184785,
+          "retrieval_order": 0
+        },
+        {
+          "identity": "file:///tmp/opencode/next07-20261004-1b1cf6b7-reference/17/corpus/overview.md",
+          "canonical_path": "overview.md",
+          "raw": "# Overview\n\nLeaseClient default timeout duration requests exception operation behavior documentation.\n",
+          "title": "Overview",
+          "url": "file:///tmp/opencode/next07-20261004-1b1cf6b7-reference/17/corpus/overview.md",
+          "snapshot_id": "fixture-sha256:5c648f5bbcff05d88435308f9cb2a3851fc5cee7a1bf66c1f96fe9670b988f76",
+          "start": 0,
+          "end": 102,
+          "content": "# Overview\n\nLeaseClient default timeout duration requests exception operation behavior documentation.\n",
+          "path": "[\"Overview\"]",
+          "source_sha256": "5c648f5bbcff05d88435308f9cb2a3851fc5cee7a1bf66c1f96fe9670b988f76",
+          "owner_spans": [
+            [
+              0,
+              102
+            ]
+          ],
+          "dependency_spans": "NOT_PREPARED until scoped source preparation in I.3; not approval",
+          "byte_start": 0,
+          "byte_end": 102,
+          "bm25_order_score": -2.9831652753681093,
+          "retrieval_order": 1
+        },
+        {
+          "identity": "file:///tmp/opencode/next07-20261004-1b1cf6b7-reference/17/corpus/default.md",
+          "canonical_path": "default.md",
+          "raw": "# LeaseClient\n\nThe default timeout is 17 seconds.\n",
+          "title": "LeaseClient",
+          "url": "file:///tmp/opencode/next07-20261004-1b1cf6b7-reference/17/corpus/default.md",
+          "snapshot_id": "fixture-sha256:50fc5ae5565ed3949aba18fba3617bdec0a9732f2aafe8ec04488ebf8c69814d",
+          "start": 0,
+          "end": 50,
+          "content": "# LeaseClient\n\nThe default timeout is 17 seconds.\n",
+          "path": "[\"LeaseClient\"]",
+          "source_sha256": "50fc5ae5565ed3949aba18fba3617bdec0a9732f2aafe8ec04488ebf8c69814d",
+          "owner_spans": [
+            [
+              0,
+              50
+            ]
+          ],
+          "dependency_spans": "NOT_PREPARED until scoped source preparation in I.3; not approval",
+          "byte_start": 0,
+          "byte_end": 50,
+          "bm25_order_score": -2.0120364817669145,
+          "retrieval_order": 2
+        }
+      ],
+      "omissions": [],
+      "facts_present": true,
+      "mapping": "original spans by construction; normalized G is not source evidence",
+      "scope": "fixture-only retrieval diagnostic; native admission not run"
+    },
+    {
+      "parameter": [
+        29,
+        "WaitExpired"
+      ],
+      "same_index_rows_parity": true,
+      "normalized_upstream_rows": [
+        {
+          "rowid": 1,
+          "content": "# LeaseClient\nThe default timeout is 29 seconds.",
+          "title": "LeaseClient",
+          "url": "file:///tmp/opencode/next07-20261004-1b1cf6b7-reference/29/corpus/default.md",
+          "path": "[\"LeaseClient\"]",
+          "identity": "file:///tmp/opencode/next07-20261004-1b1cf6b7-reference/29/corpus/default.md",
+          "start": 0,
+          "end": 48
+        },
+        {
+          "rowid": 2,
+          "content": "# LeaseClient\nAn expired operation raises `WaitExpired`.",
+          "title": "LeaseClient",
+          "url": "file:///tmp/opencode/next07-20261004-1b1cf6b7-reference/29/corpus/error.md",
+          "path": "[\"LeaseClient\"]",
+          "identity": "file:///tmp/opencode/next07-20261004-1b1cf6b7-reference/29/corpus/error.md",
+          "start": 0,
+          "end": 56
+        },
+        {
+          "rowid": 3,
+          "content": "# Overview\nLeaseClient default timeout duration requests exception operation behavior documentation.",
+          "title": "Overview",
+          "url": "file:///tmp/opencode/next07-20261004-1b1cf6b7-reference/29/corpus/overview.md",
+          "path": "[\"Overview\"]",
+          "identity": "file:///tmp/opencode/next07-20261004-1b1cf6b7-reference/29/corpus/overview.md",
+          "start": 0,
+          "end": 100
+        }
+      ],
+      "upstream_order": [
+        {
+          "rowid": 2,
+          "score": -3.0298611449184785
+        },
+        {
+          "rowid": 3,
+          "score": -2.9831652753681093
+        },
+        {
+          "rowid": 1,
+          "score": -2.0120364817669145
+        }
+      ],
+      "ported_order": [
+        {
+          "rowid": 2,
+          "content": "# LeaseClient\nAn expired operation raises `WaitExpired`.",
+          "title": "LeaseClient",
+          "url": "file:///tmp/opencode/next07-20261004-1b1cf6b7-reference/29/corpus/error.md",
+          "path": "[\"LeaseClient\"]",
+          "identity": "file:///tmp/opencode/next07-20261004-1b1cf6b7-reference/29/corpus/error.md",
+          "start": 0,
+          "end": 56,
+          "bm25_order_score": -3.0298611449184785,
+          "retrieval_order": 0
+        },
+        {
+          "rowid": 3,
+          "content": "# Overview\nLeaseClient default timeout duration requests exception operation behavior documentation.",
+          "title": "Overview",
+          "url": "file:///tmp/opencode/next07-20261004-1b1cf6b7-reference/29/corpus/overview.md",
+          "path": "[\"Overview\"]",
+          "identity": "file:///tmp/opencode/next07-20261004-1b1cf6b7-reference/29/corpus/overview.md",
+          "start": 0,
+          "end": 100,
+          "bm25_order_score": -2.9831652753681093,
+          "retrieval_order": 1
+        },
+        {
+          "rowid": 1,
+          "content": "# LeaseClient\nThe default timeout is 29 seconds.",
+          "title": "LeaseClient",
+          "url": "file:///tmp/opencode/next07-20261004-1b1cf6b7-reference/29/corpus/default.md",
+          "path": "[\"LeaseClient\"]",
+          "identity": "file:///tmp/opencode/next07-20261004-1b1cf6b7-reference/29/corpus/default.md",
+          "start": 0,
+          "end": 48,
+          "bm25_order_score": -2.0120364817669145,
+          "retrieval_order": 2
+        }
+      ],
+      "original_span_proposals": [
+        {
+          "identity": "file:///tmp/opencode/next07-20261004-1b1cf6b7-reference/29/corpus/error.md",
+          "canonical_path": "error.md",
+          "raw": "# LeaseClient\n\nAn expired operation raises `WaitExpired`.\n",
+          "title": "LeaseClient",
+          "url": "file:///tmp/opencode/next07-20261004-1b1cf6b7-reference/29/corpus/error.md",
+          "snapshot_id": "fixture-sha256:94a7f65a7c8f688ca4c91aa84f3754d8ba406d6570367dc7aece99fc0898b093",
+          "start": 0,
+          "end": 58,
+          "content": "# LeaseClient\n\nAn expired operation raises `WaitExpired`.\n",
+          "path": "[\"LeaseClient\"]",
+          "source_sha256": "94a7f65a7c8f688ca4c91aa84f3754d8ba406d6570367dc7aece99fc0898b093",
+          "owner_spans": [
+            [
+              0,
+              58
+            ]
+          ],
+          "dependency_spans": "NOT_PREPARED until scoped source preparation in I.3; not approval",
+          "byte_start": 0,
+          "byte_end": 58,
+          "bm25_order_score": -3.0298611449184785,
+          "retrieval_order": 0
+        },
+        {
+          "identity": "file:///tmp/opencode/next07-20261004-1b1cf6b7-reference/29/corpus/overview.md",
+          "canonical_path": "overview.md",
+          "raw": "# Overview\n\nLeaseClient default timeout duration requests exception operation behavior documentation.\n",
+          "title": "Overview",
+          "url": "file:///tmp/opencode/next07-20261004-1b1cf6b7-reference/29/corpus/overview.md",
+          "snapshot_id": "fixture-sha256:5c648f5bbcff05d88435308f9cb2a3851fc5cee7a1bf66c1f96fe9670b988f76",
+          "start": 0,
+          "end": 102,
+          "content": "# Overview\n\nLeaseClient default timeout duration requests exception operation behavior documentation.\n",
+          "path": "[\"Overview\"]",
+          "source_sha256": "5c648f5bbcff05d88435308f9cb2a3851fc5cee7a1bf66c1f96fe9670b988f76",
+          "owner_spans": [
+            [
+              0,
+              102
+            ]
+          ],
+          "dependency_spans": "NOT_PREPARED until scoped source preparation in I.3; not approval",
+          "byte_start": 0,
+          "byte_end": 102,
+          "bm25_order_score": -2.9831652753681093,
+          "retrieval_order": 1
+        },
+        {
+          "identity": "file:///tmp/opencode/next07-20261004-1b1cf6b7-reference/29/corpus/default.md",
+          "canonical_path": "default.md",
+          "raw": "# LeaseClient\n\nThe default timeout is 29 seconds.\n",
+          "title": "LeaseClient",
+          "url": "file:///tmp/opencode/next07-20261004-1b1cf6b7-reference/29/corpus/default.md",
+          "snapshot_id": "fixture-sha256:8874f936ef509c4d5ef03a2c6d3a6740232a9db24098251ecbe3acfe40617440",
+          "start": 0,
+          "end": 50,
+          "content": "# LeaseClient\n\nThe default timeout is 29 seconds.\n",
+          "path": "[\"LeaseClient\"]",
+          "source_sha256": "8874f936ef509c4d5ef03a2c6d3a6740232a9db24098251ecbe3acfe40617440",
+          "owner_spans": [
+            [
+              0,
+              50
+            ]
+          ],
+          "dependency_spans": "NOT_PREPARED until scoped source preparation in I.3; not approval",
+          "byte_start": 0,
+          "byte_end": 50,
+          "bm25_order_score": -2.0120364817669145,
+          "retrieval_order": 2
+        }
+      ],
+      "omissions": [],
+      "facts_present": true,
+      "mapping": "original spans by construction; normalized G is not source evidence",
+      "scope": "fixture-only retrieval diagnostic; native admission not run"
+    }
+  ],
+  "verdict": "DONE",
+  "native_recovery": "NOT_RUN"
+}

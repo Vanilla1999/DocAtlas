@@ -1,7 +1,6 @@
 # 07. Grounded-first: инструкция исполнителю
 
-Статус: **попытка завершена BLOCKED при проверке I.3; native C NOT_RUN**.
-Дата решения и исполнения: 2026-10-04.
+Статус: **PLANNED / NOT_RUN**. Дата решения: 2026-10-04.
 Ветка: **next07-feasibility-audit**, не main. Пользователь проводит эксперимент.
 Этот документ — план выполнения, не отчёт об успешном запуске и не разрешение rollout.
 
@@ -590,43 +589,3 @@ Not_run и причина:
 Предыдущие 2 diagnostic PASS и 07.1 BLOCKED — исторический результат, не новая
 приёмка. Успех Grounded на LeaseClient, native recovery и сохранение 49 facts
 предстоит измерить; они не выводятся из этого документа.
-
-## 7. Журнал исполнения 2026-10-04 — BLOCKED
-
-Baseline: `1b1cf6b7` + исходный dirty patch, ветка `next07-feasibility-audit`.
-Evidence: [SUMMARY_RU.md](artifacts/next07/grounded-first/20261004-1b1cf6b7/SUMMARY_RU.md).
-Runtime/defaults и чужие dirty files не изменены; прежняя compiler-only попытка
-не возобновлялась. Historical BLOCKED остаётся отдельным результатом.
-
-| Шаг | Измеренный результат |
-|---|---|
-| I.0 | Baseline archive/patch/hashes, isolated checkout, protocol, collected policy allowlist и 49 historical IDs сохранены. Полная предварительная заморозка конкретных новых controls не завершена: это ограничение исполнения, не полный DONE I.0. |
-| I.1 | G actual package run DONE: оба факта и owner/expiration видны для обоих параметров. Fresh N captures сохранены. Package integrity, installed/tarball bytes и upstream tag/SHA проверены. |
-| I.2 | Isolated retrieval diagnostics: 8 PASS; оба факта в original spans; same-index-row BM25/rank parity. Current-source native integration не проверена; полный source-bound DONE не заявляется. |
-| I.3 | BLOCKED: harness передал index DTO `project_file` вместо подготовленного read DTO `project_doc`; обязательный рабочий positive не получен. |
-| I.4–I.6 | NOT_RUN: переход запрещён без корректной проверки I.3. Итог части I — BLOCKED, не recovery. |
-| II.1–II.2 | NOT_RUN: DONE части I отсутствует. |
-
-Первый I.3 run invalid: logger использовал `__dict__` для slots dataclass.
-Единственный разрешённый повтор исправил только logging через `asdict`:
-**9 PASS / 15 FAIL**, но positive остановлен с `missing_project_request` до
-read-policy. Twelve mutation tests остановились на своих positive preconditions;
-restriction test отказал пустым pipeline и **не доказывает сохранность restriction**.
-Это не valid algorithm rejection и не успешная guard acceptance. Второго
-исправления harness, подмены source_class, расширения candidate или rescue нет.
-
-Новые control fixtures были конкретизированы после I.0, а I.2 proposals ещё не
-имели доказанной native source eligibility. Поэтому порядок предварительной
-заморозки/переходов выполнен не полностью. Эти diagnostics не повышаются до
-acceptance; это дополнительное основание не заявлять VALIDATED_LOCAL.
-
-G: реальный CLI SearchTool, **не новый MCP transport**; нормализованный текст не
-аттестован как original spans. N final sources содержат overview; бюджет 313/314
-whole-DTO admission tokens. C final packet, retention 49 IDs/partial facts,
-frozen replay, old-policy regression, required gates, full suite и unseen/reader
-evaluation NOT_RUN. Никакая часть плана 06 не закрыта этим исполнением.
-
-Один следующий шаг, только новым решением: исправить research DTO-boundary и
-завершить предварительную заморозку controls до новой попытки. Использовать
-existing authenticated conversion, не переписывать source_class и не ослаблять
-guard. Текущая попытка завершена; rollout не разрешён.

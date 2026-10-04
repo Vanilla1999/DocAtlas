@@ -1,0 +1,22 @@
+{
+  "command": [
+    "node",
+    "/tmp/opencode/next07-grounded-321-20261004/node_modules/@arabold/docs-mcp-server/dist/index.js",
+    "search",
+    "lease-fixture",
+    "What is LeaseClient default timeout duration for requests and which exception is raised when an operation expires?",
+    "--limit",
+    "3",
+    "--output",
+    "json",
+    "--config",
+    "/tmp/opencode/next07-20261004-1b1cf6b7-reference/29/config.json",
+    "--store-path",
+    "/tmp/opencode/next07-20261004-1b1cf6b7-reference/29/store",
+    "--no-telemetry",
+    "--no-logo"
+  ],
+  "returncode": 0,
+  "stdout": "[\n  {\n    \"url\": \"file:///tmp/opencode/next07-20261004-1b1cf6b7-reference/29/corpus/error.md\",\n    \"content\": \"# LeaseClient\\nAn expired operation raises `WaitExpired`.\",\n    \"score\": 3.0298611449184785,\n    \"mimeType\": \"text/markdown\",\n    \"sourceMimeType\": \"text/markdown\"\n  },\n  {\n    \"url\": \"file:///tmp/opencode/next07-20261004-1b1cf6b7-reference/29/corpus/overview.md\",\n    \"content\": \"# Overview\\nLeaseClient default timeout duration requests exception operation behavior documentation.\",\n    \"score\": 2.9831652753681093,\n    \"mimeType\": \"text/markdown\",\n    \"sourceMimeType\": \"text/markdown\"\n  },\n  {\n    \"url\": \"file:///tmp/opencode/next07-20261004-1b1cf6b7-reference/29/corpus/default.md\",\n    \"content\": \"# LeaseClient\\nThe default timeout is 29 seconds.\",\n    \"score\": 2.0120364817669145,\n    \"mimeType\": \"text/markdown\",\n    \"sourceMimeType\": \"text/markdown\"\n  }\n]\n",
+  "stderr": ""
+}

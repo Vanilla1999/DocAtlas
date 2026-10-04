@@ -1,0 +1,10 @@
+{
+  "command": [
+    "/home/viadmin/StudioProjects/hermes/docmancer/.venv/bin/python",
+    "-c",
+    "import json; from pathlib import Path; from tests.docs._global_evidence_fixtures import capture_fixture; docs={'default.md': '# LeaseClient\\n\\nThe default timeout is 29 seconds.\\n', 'error.md': '# LeaseClient\\n\\nAn expired operation raises `WaitExpired`.\\n', 'overview.md': '# Overview\\n\\nLeaseClient default timeout duration requests exception operation behavior documentation.\\n'}; capture=capture_fixture(Path('/tmp/opencode/next07-20261004-1b1cf6b7-reference/29/native'), docs, 'What is LeaseClient default timeout duration for requests and which exception is raised when an operation expires?'); Path('/home/viadmin/StudioProjects/hermes/docmancer/v2plan/artifacts/next07/grounded-first/20261004-1b1cf6b7/reference/29/native-capture.json').write_text(json.dumps(capture,ensure_ascii=False,indent=2,default=str)+\"\\n\")"
+  ],
+  "returncode": 0,
+  "stdout": "",
+  "stderr": ""
+}

@@ -1,0 +1,28 @@
+{
+  "verdict": "BLOCKED",
+  "last_attempted_step": "I.3",
+  "G": "DONE",
+  "I.0": "provenance captured; full concrete-control freeze incomplete",
+  "I.2": "isolated retrieval diagnostics; native eligibility not verified",
+  "I.3": "BLOCKED_INVALID_HARNESS",
+  "C_final_packet": "NOT_RUN",
+  "retention": "NOT_RUN",
+  "guard_acceptance": "NOT_MEASURED",
+  "I.4-I.6": "NOT_RUN",
+  "II": "NOT_RUN",
+  "invalid_runs": [
+    {
+      "path": "i3-tests.json",
+      "reason": "slots logger serialization"
+    },
+    {
+      "path": "i3-retry/run.json",
+      "reason": "index project_file DTO passed to project_doc read guard",
+      "tests_passed": 9,
+      "tests_failed": 15,
+      "restriction_pass_is_vacuous": true
+    }
+  ],
+  "allowed_harness_retry_used": 1,
+  "no_further_trial": true
+}
