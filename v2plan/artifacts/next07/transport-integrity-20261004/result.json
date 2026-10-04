@@ -1,0 +1,52 @@
+{
+  "code_commit": "4b37ba3a6fc1b5314f25f7ea26a55e5ea3341581",
+  "review_commit": "2d5ad6f77a8c26b3c636c57a42999f2f96278eff",
+  "tested_commit": "5f878b206b18ca8e5bc97624744fe78e00124680",
+  "run_id": 37235320731,
+  "artifact_id": 11315507040,
+  "artifact_sha256": "9ddda9b2e2f72b3cd153af755891b84dc31e09716a9e6d587f137b85e1f7703d",
+  "transport_verdict": "TRANSPORT_VALIDATED",
+  "research_native_tests_passed": 212,
+  "existing_product_tests_passed": 13,
+  "valid_pairs": 80,
+  "audit_failure_case_ids": {"N": [], "C": []},
+  "terminal_sdk": {"packets": 160, "encodings_each": 2, "all_equal": true, "audit_failures": 0},
+  "frozen_inputs_unchanged": true,
+  "target": [
+    {"case": "P1", "passed": true, "tokens": 608, "sources": 3},
+    {"case": "P2", "passed": true, "tokens": 618, "sources": 3},
+    {"case": "P3", "passed": true, "tokens": 442, "sources": 2}
+  ],
+  "fresh_counts": {"retained": 48, "lost_recognized_support": 1, "gained": 6},
+  "fresh_lost_recognized_support": [["fastapi-02", "required"]],
+  "fresh_gained": [["mkdocs-05", "required"], ["ruff-05", "required"], ["typer-03", "required"], ["typer-05", "required"], ["uv-02", "required"], ["uv-06", "required"]],
+  "historical_49": {
+    "retained": [
+      ["fastapi-01", "required"], ["fastapi-04", "required"], ["fastapi-05", "required"], ["fastapi-06", "required"], ["fastapi-07", "required"],
+      ["httpx-01", "required"], ["httpx-02", "required"], ["httpx-03", "required"], ["httpx-04", "required"], ["httpx-05", "required"], ["httpx-06", "required"], ["httpx-07", "required"],
+      ["mkdocs-01", "required"], ["mkdocs-02", "required"], ["mkdocs-03", "required"], ["mkdocs-04", "required"], ["mkdocs-06", "required"], ["mkdocs-07", "required"],
+      ["pydantic-01", "required"], ["pydantic-02", "required"], ["pydantic-03", "required"], ["pydantic-04", "required"], ["pydantic-05", "required"], ["pydantic-06", "required"], ["pydantic-07", "required"],
+      ["ruff-01", "required"], ["ruff-02", "required"], ["ruff-03", "required"], ["ruff-04", "required"], ["ruff-06", "required"], ["ruff-07", "required"],
+      ["starlette-01", "required"], ["starlette-02", "required"], ["starlette-03", "required"], ["starlette-04", "required"], ["starlette-05", "required"], ["starlette-06", "required"], ["starlette-07", "required"],
+      ["typer-01", "required"], ["typer-02", "required"], ["typer-04", "required"], ["typer-06", "required"], ["typer-07", "required"],
+      ["uv-01", "required"], ["uv-03", "required"], ["uv-04", "required"], ["uv-05", "required"], ["uv-07", "required"]
+    ],
+    "lost": [],
+    "UNKNOWN": [["fastapi-02", "required"]],
+    "unknown_reason": "needs_review; supporting input row rejected before transport by missing_visible_exact_or_subject"
+  },
+  "compared_to_previous_owner_run": {
+    "baseline_run_id": 37233045584,
+    "lost_previous_C_supported_ids": [],
+    "gained_previous_C_supported_ids": [["ruff-06", "required"], ["uv-05", "required"]],
+    "selected_source_sets_changed_case_ids": [],
+    "N_assessor_status_changes_case_ids": [],
+    "final_C_vs_selected_source_sets_mismatch_case_ids": []
+  },
+  "C_size": {"median_tokens": 3386.5, "max_tokens": 15294, "max_utf8_json_bytes": 56937, "max_sources": 19, "over_32000_bytes_cases": 17},
+  "N10": "NOT_RUN_UNCHANGED",
+  "historical_partial_retention": "NOT_MEASURED: separate explicit ledger required",
+  "full_product_suite": "NOT_RUN",
+  "live_stdio_session": "NOT_RUN; actual handler and SDK representations tested",
+  "rollout": "NOT_AUTHORIZED"
+}
