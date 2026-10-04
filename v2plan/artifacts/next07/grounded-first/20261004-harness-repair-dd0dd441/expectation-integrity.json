@@ -1,0 +1,9 @@
+{
+  "test_i3_original_fact_context": true,
+  "test_i3_guard_mutations": true,
+  "test_i3_existing_disabled_enabled_negative": true,
+  "restriction_question_unchanged": true,
+  "restriction_raw_unchanged": true,
+  "restriction_assertion_strengthened": "working short-source positive + eligible input + exact refusal reason; original boundary source unchanged",
+  "candidate_sha256_unchanged": true
+}

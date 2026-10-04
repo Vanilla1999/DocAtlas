@@ -1,0 +1,11 @@
+{
+  "command": [
+    ".venv/bin/python",
+    "-c",
+    "from pathlib import Path\nimport json\nfrom tempfile import TemporaryDirectory\nfrom v2plan.test_next07_grounded_first import prepared_units, decision\nfrom v2plan.next07_grounded_reference import fixture_inputs\nfrom v2plan.next07_grounded_run import ROOT\n_,_,docs,question=fixture_inputs(ROOT)[0]\nwith TemporaryDirectory(dir='/tmp/opencode') as temporary:\n    rows,_=prepared_units(Path(temporary),docs,question)\n    row=next(r for r in rows if '17 seconds' in r['snippet'])\n    result=decision(row,question)\n    assert result.allowed,result.reason\n    print(json.dumps({'source_class':row['source_class'],'span':row['char_span'],'source_identity':row['_reference_evidence']['source'],'decision':{'allowed':result.allowed,'reason':result.reason}}))\n"
+  ],
+  "returncode": 0,
+  "stdout": "{\"source_class\": \"project_doc\", \"span\": [0, 50], \"source_identity\": {\"document_id\": \"project_file:local:49524dba4d93bebf6fbd8f922f23476b2ba804abd5aa9f22cdf80ba1b99e76bd:default.md\", \"scope\": {\"project_id\": \"local:49524dba4d93bebf6fbd8f922f23476b2ba804abd5aa9f22cdf80ba1b99e76bd\", \"version\": \"\", \"snapshot_id\": \"gen-c18c9809918f4f41b2c99eeb3e24fb76\"}, \"canonical_path\": \"default.md\", \"content_sha256\": \"50fc5ae5565ed3949aba18fba3617bdec0a9732f2aafe8ec04488ebf8c69814d\"}, \"decision\": {\"allowed\": true, \"reason\": \"source_bound_retrieval_only_unknown_applicability\"}}\n",
+  "stderr": "",
+  "harness_fix": "ProjectDocsResult is dataclass; logging uses asdict"
+}

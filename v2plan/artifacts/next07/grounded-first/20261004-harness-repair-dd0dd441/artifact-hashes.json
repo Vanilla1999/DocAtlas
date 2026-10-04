@@ -1,0 +1,21 @@
+{
+  "SUMMARY_RU.md": "968b804c288984212d043f878a54b08d1c3653b92eb8d04e12b92960f4780e4b",
+  "baseline-status.txt": "85d9187106586b9ed186b2a86b4c6517a7560bc2a311d2d1867b2a495f144923",
+  "baseline.patch": "ea2b27bb24a48ab367e9ac6d386b7a38978c32498cc5f013c1dcfb634ebbe224",
+  "controls/decisions.jsonl": "6301ef381885b301bb4ee7a270d4ccf4183a33299a970b64ec8a9014cac03d0f",
+  "controls/preparation.jsonl": "978a0a4d167f46fa2c837c6e8d37dda4b04599506835c7631d7ed84903dfdcca",
+  "expectation-integrity.json": "5b0d9003b6e909bfab0bcea706b4ee9efa5b0eb2bb2ca76621a8bd72ff808c93",
+  "frozen-harness.py": "ac0360bcf66c934f9f6326fbd8b89498e82be2af6fb8ac210b3400088896d167",
+  "historical-evidence-unchanged.json": "12ab6e85d3dfb05c0b7058e610b89fa67be5bde7e6ee60cd57da8c993f0f9f4a",
+  "pre-run-manifest.json": "e7cce1ea68e7aafea3d682a459a5a7f0fa07b029a492a4efe0edd236e776250d",
+  "protocol.json": "224ebda687ad8d9cfbb9f93bd2f17c93c166c7ce5fb6960873a9d4c59f38014d",
+  "reference-integrity.json": "bfa142bdfa5f3f2b31a11f5139cdec9e44c830fcad44da1d4f42a35897820c39",
+  "result.json": "1b7533cce7e3d2efedb300ca62a9c4e1fe8c476d53a8dbc2aa3a0c76bae3a0e9",
+  "smoke-command.json": "fcac0c22f8944eac9c1d62d7a04f631fc2db83114f1ffc6596b16da2a2a97611",
+  "smoke-controls/preparation.jsonl": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "smoke-repaired-command.json": "11dcd47200dd1d49e825b1c34ac1787e935d4ffd2b84dc48265d85e182f5a6d0",
+  "smoke-repaired-controls/decisions.jsonl": "6db6dfad678eb2e44b28dd0205f0e125e73b3da6efea2db71e46c22ee9652786",
+  "smoke-repaired-controls/preparation.jsonl": "41c01c10631dda312a2b757dede15f76c81150acb7819e11500d83905e876951",
+  "tests.json": "c8186c33dc0ac11c2b98a0f2e013fd0332f86c0824f15d1282bec813967448e4",
+  "tests.xml": "ded14015d0556b20a0cad3cea7b0e97274fe977caae1fb52e299bab803a9929b"
+}

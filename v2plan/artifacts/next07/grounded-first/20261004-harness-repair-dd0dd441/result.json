@@ -1,0 +1,573 @@
+{
+  "harness": "VALIDATED_LOCAL",
+  "candidate": "REJECTED",
+  "last_step": "I.3",
+  "tests": {
+    "passed": 22,
+    "failed": 2,
+    "I.2": 8,
+    "LeaseClient_positives": 2,
+    "mutation_controls": 12,
+    "wrong_state": "FAIL",
+    "trailing_restriction": "FAIL"
+  },
+  "candidate_ports_and_original_fixture_unchanged": {
+    "v2plan/next07_grounded_candidate.py": true,
+    "v2plan/third_party/grounded-3.2.1/fts_query.py": true,
+    "v2plan/third_party/grounded-3.2.1/passage_splitter.py": true,
+    "tests/docs/test_need_local_admission.py": true
+  },
+  "runtime_unchanged": true,
+  "wrong_state_counterexamples": [
+    {
+      "question": "What is OrbitClient default timeout when preview is disabled?",
+      "candidate": {
+        "stable_chunk_id": "child-9eafd0bc060734887c0aec2ed33b7d4af3bed79c",
+        "parent_logical_id": "parent-fc5d9f522458ffed1c636a9be66282ca",
+        "display_content_hash": "b7ec551a05ea2bed235f7afe195a33f7ebc99b945d35ea49e1e6c6208527803f",
+        "_source_snapshot_sha256": "sha256:b7ec551a05ea2bed235f7afe195a33f7ebc99b945d35ea49e1e6c6208527803f",
+        "_reference_evidence": {
+          "schema_version": 1,
+          "source": {
+            "document_id": "project_file:local:2e3af0edd65c8689a618608a9782feb11a4fd8d35152701162cc36d62648672e:guide.md",
+            "scope": {
+              "project_id": "local:2e3af0edd65c8689a618608a9782feb11a4fd8d35152701162cc36d62648672e",
+              "version": "",
+              "snapshot_id": "gen-e599b85ddcd043fdb4ecd33a8834477d"
+            },
+            "canonical_path": "guide.md",
+            "content_sha256": "b7ec551a05ea2bed235f7afe195a33f7ebc99b945d35ea49e1e6c6208527803f"
+          },
+          "project_doc_content_hash": "sha256:b7ec551a05ea2bed235f7afe195a33f7ebc99b945d35ea49e1e6c6208527803f",
+          "char_start": 0,
+          "char_end": 82,
+          "text": "# OrbitClient\n\nWhen preview is enabled, OrbitClient default timeout is 7 seconds.\n",
+          "raw_document": "# OrbitClient\n\nWhen preview is enabled, OrbitClient default timeout is 7 seconds.\n",
+          "owner": {
+            "text": "# OrbitClient\n",
+            "char_start": 0,
+            "char_end": 14,
+            "scope_start": 0,
+            "scope_end": 82,
+            "logical_id": "parent-fc5d9f522458ffed1c636a9be66282ca"
+          }
+        },
+        "_reference_root_plan": {
+          "question": "What is OrbitClient default timeout when preview is disabled?",
+          "references": [
+            {
+              "mention": {
+                "mention_id": "abffb89b24192106cb6deda10b6f3d5d0ed622358cfb395936e9400de7dd4f4e:8:19",
+                "start": 8,
+                "end": 19,
+                "text": "OrbitClient",
+                "syntax_role": "semantic_subject",
+                "explicit": true
+              },
+              "role": "semantic_subject",
+              "state": "resolved",
+              "source_ids": [],
+              "reason": "explicit_reference_role"
+            }
+          ],
+          "scope": {
+            "project_id": "local:2e3af0edd65c8689a618608a9782feb11a4fd8d35152701162cc36d62648672e",
+            "version": "",
+            "snapshot_id": "gen-e599b85ddcd043fdb4ecd33a8834477d"
+          },
+          "catalog_complete": true
+        },
+        "_reference_plans": {
+          "What is OrbitClient default timeout when preview is disabled?": {
+            "question": "What is OrbitClient default timeout when preview is disabled?",
+            "references": [
+              {
+                "mention": {
+                  "mention_id": "abffb89b24192106cb6deda10b6f3d5d0ed622358cfb395936e9400de7dd4f4e:8:19",
+                  "start": 8,
+                  "end": 19,
+                  "text": "OrbitClient",
+                  "syntax_role": "semantic_subject",
+                  "explicit": true
+                },
+                "role": "semantic_subject",
+                "state": "resolved",
+                "source_ids": [],
+                "reason": "explicit_reference_role"
+              }
+            ],
+            "scope": {
+              "project_id": "local:2e3af0edd65c8689a618608a9782feb11a4fd8d35152701162cc36d62648672e",
+              "version": "",
+              "snapshot_id": "gen-e599b85ddcd043fdb4ecd33a8834477d"
+            },
+            "catalog_complete": true
+          },
+          "OrbitClient": {
+            "question": "OrbitClient",
+            "references": [
+              {
+                "mention": {
+                  "mention_id": "15acae28ec2d29440f064db3884c27aaf7fba053b4483a023e9c727ec37b0066:0:11",
+                  "start": 0,
+                  "end": 11,
+                  "text": "OrbitClient",
+                  "syntax_role": "unresolved",
+                  "explicit": false
+                },
+                "role": "unresolved",
+                "state": "unresolved",
+                "source_ids": [],
+                "reason": "unresolved_reference_role"
+              }
+            ],
+            "scope": {
+              "project_id": "local:2e3af0edd65c8689a618608a9782feb11a4fd8d35152701162cc36d62648672e",
+              "version": "",
+              "snapshot_id": "gen-e599b85ddcd043fdb4ecd33a8834477d"
+            },
+            "catalog_complete": true
+          }
+        },
+        "_evidence_sets": [
+          {
+            "schema_version": "source-dependency-proposal-v1",
+            "set_id": "evidence-set:04f09502fa3a9b7a6a7b3e24a82fb2020a1aab7a88406d0d01d745822dc3016b",
+            "member_spans": [
+              [
+                0,
+                13,
+                "e837900d92be63cbe685b10311d3a3b6822f7bd8675e494eda8646ae91801fae"
+              ],
+              [
+                15,
+                81,
+                "fa0fff1d78e3ad09bb7987c4697fc6190a1bf510605fe591c476f7bd8faac124"
+              ]
+            ],
+            "edges": [
+              [
+                "heading",
+                0,
+                1,
+                "markdown-owning-heading-v1"
+              ]
+            ],
+            "proposed_need_ids": [
+              "sentence-1"
+            ]
+          }
+        ],
+        "generation_id": "gen-e599b85ddcd043fdb4ecd33a8834477d",
+        "resolved_version": "",
+        "_source_catalog_hash": "sha256:9962b2db79869f680462e4eafc308c1408f03cf7356d4899a4da31fba09974ad",
+        "char_start": 0,
+        "char_end": 82,
+        "line_start": 1,
+        "line_end": 3,
+        "source_class": "project_doc",
+        "source_type": "project_doc",
+        "source_kind": "project_doc",
+        "authority": "source_of_truth",
+        "risk_flags": [],
+        "doc_scope": "project",
+        "module_id": "",
+        "module_name": null,
+        "module_path": null,
+        "module_type": null,
+        "description": "Pinned documentation source",
+        "catalog_role": "other",
+        "lifecycle_status": "active",
+        "temporal_relevance": "current",
+        "index_freshness": "synchronized",
+        "impact_policy": "track",
+        "project_identity": "local:2e3af0edd65c8689a618608a9782feb11a4fd8d35152701162cc36d62648672e",
+        "retrieval_query_ids": [],
+        "retrieval_query_matches": {},
+        "project_ranking": {},
+        "path": "guide.md",
+        "url": null,
+        "title": "OrbitClient",
+        "heading_path": "OrbitClient",
+        "freshness": "current",
+        "why_selected": "selected because it matched repo-owned project documentation for the question",
+        "content": "# OrbitClient\n\nWhen preview is enabled, OrbitClient default timeout is 7 seconds.\n",
+        "display_text": "# OrbitClient\n\nWhen preview is enabled, OrbitClient default timeout is 7 seconds.\n",
+        "token_estimate": 20,
+        "source": {
+          "source_class": "project_doc",
+          "source_type": "project_doc",
+          "source_kind": "project_doc",
+          "authority": "source_of_truth",
+          "risk_flags": [],
+          "doc_scope": "project",
+          "module_id": "",
+          "module_name": null,
+          "module_path": null,
+          "module_type": null,
+          "description": "Pinned documentation source",
+          "lifecycle_status": "active",
+          "temporal_relevance": "current",
+          "index_freshness": "synchronized",
+          "impact_policy": "track",
+          "project_identity": "local:2e3af0edd65c8689a618608a9782feb11a4fd8d35152701162cc36d62648672e",
+          "path": "guide.md",
+          "url": null,
+          "title": "OrbitClient"
+        },
+        "section": {
+          "title": "OrbitClient",
+          "heading_path": "OrbitClient",
+          "freshness": "current"
+        },
+        "snippet": "# OrbitClient\n\nWhen preview is enabled, OrbitClient default timeout is 7 seconds.\n",
+        "char_span": [
+          0,
+          82
+        ]
+      },
+      "decision": {
+        "allowed": true,
+        "reason": "source_bound_retrieval_only_unknown_applicability"
+      }
+    }
+  ],
+  "restriction_counterexamples": [
+    {
+      "question": "Which exception does LeaseClient raise when an operation expires?",
+      "candidate": {
+        "stable_chunk_id": "child-032ed7e962d1bfbab70836d6f6b4557da6b7adee",
+        "parent_logical_id": "parent-332e7ddcd069d9f8a12358d1ec785304",
+        "display_content_hash": "722505b54fa9e96899ddc3c1dd0f9917d0f83017815dbd0f716cf39daa88c114",
+        "_source_snapshot_sha256": "sha256:cfa75ac031ae174274bb10000e5ae5a93977c13648eb31049cdcd94895200f92",
+        "_reference_evidence": {
+          "schema_version": 1,
+          "source": {
+            "document_id": "project_file:local:dc0925762be547e7b34a2703047ffe57bfc2a992127a7f1b1eecf211fb78703d:guide.md",
+            "scope": {
+              "project_id": "local:dc0925762be547e7b34a2703047ffe57bfc2a992127a7f1b1eecf211fb78703d",
+              "version": "",
+              "snapshot_id": "gen-54931e79269d42caa15ccccca7daddd2"
+            },
+            "canonical_path": "guide.md",
+            "content_sha256": "cfa75ac031ae174274bb10000e5ae5a93977c13648eb31049cdcd94895200f92"
+          },
+          "project_doc_content_hash": "sha256:cfa75ac031ae174274bb10000e5ae5a93977c13648eb31049cdcd94895200f92",
+          "char_start": 0,
+          "char_end": 51,
+          "text": "# LeaseClient\n\nLeaseClient raises `LeaseExpired`.\n\n",
+          "raw_document": "# LeaseClient\n\nLeaseClient raises `LeaseExpired`.\n\nDocumentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. Documentation. \n\nOnly when an operation expires.\n",
+          "owner": {
+            "text": "# LeaseClient\n",
+            "char_start": 0,
+            "char_end": 14,
+            "scope_start": 0,
+            "scope_end": 5035,
+            "logical_id": "parent-332e7ddcd069d9f8a12358d1ec785304"
+          }
+        },
+        "_reference_root_plan": {
+          "question": "Which exception does LeaseClient raise when an operation expires?",
+          "references": [
+            {
+              "mention": {
+                "mention_id": "fd1903ee54334db40693356e2f5bb04c6e744c857dc4daeb2896df3afaffa4e5:21:32",
+                "start": 21,
+                "end": 32,
+                "text": "LeaseClient",
+                "syntax_role": "unresolved",
+                "explicit": false
+              },
+              "role": "unresolved",
+              "state": "unresolved",
+              "source_ids": [],
+              "reason": "unresolved_reference_role"
+            }
+          ],
+          "scope": {
+            "project_id": "local:dc0925762be547e7b34a2703047ffe57bfc2a992127a7f1b1eecf211fb78703d",
+            "version": "",
+            "snapshot_id": "gen-54931e79269d42caa15ccccca7daddd2"
+          },
+          "catalog_complete": true
+        },
+        "_reference_plans": {
+          "Which exception does LeaseClient raise when an operation expires?": {
+            "question": "Which exception does LeaseClient raise when an operation expires?",
+            "references": [
+              {
+                "mention": {
+                  "mention_id": "fd1903ee54334db40693356e2f5bb04c6e744c857dc4daeb2896df3afaffa4e5:21:32",
+                  "start": 21,
+                  "end": 32,
+                  "text": "LeaseClient",
+                  "syntax_role": "unresolved",
+                  "explicit": false
+                },
+                "role": "unresolved",
+                "state": "unresolved",
+                "source_ids": [],
+                "reason": "unresolved_reference_role"
+              }
+            ],
+            "scope": {
+              "project_id": "local:dc0925762be547e7b34a2703047ffe57bfc2a992127a7f1b1eecf211fb78703d",
+              "version": "",
+              "snapshot_id": "gen-54931e79269d42caa15ccccca7daddd2"
+            },
+            "catalog_complete": true
+          },
+          "LeaseClient": {
+            "question": "LeaseClient",
+            "references": [
+              {
+                "mention": {
+                  "mention_id": "32e483d4c43cb0e9d5c96fd8add7aee6ae264acff99c7b5d27290b8d66cf45fe:0:11",
+                  "start": 0,
+                  "end": 11,
+                  "text": "LeaseClient",
+                  "syntax_role": "unresolved",
+                  "explicit": false
+                },
+                "role": "unresolved",
+                "state": "unresolved",
+                "source_ids": [],
+                "reason": "unresolved_reference_role"
+              }
+            ],
+            "scope": {
+              "project_id": "local:dc0925762be547e7b34a2703047ffe57bfc2a992127a7f1b1eecf211fb78703d",
+              "version": "",
+              "snapshot_id": "gen-54931e79269d42caa15ccccca7daddd2"
+            },
+            "catalog_complete": true
+          }
+        },
+        "_evidence_sets": [
+          {
+            "schema_version": "source-dependency-proposal-v1",
+            "set_id": "evidence-set:47dfff1faafdb1d037f0a56b45079c56c5fe5203550e223194ac789b6c059d30",
+            "member_spans": [
+              [
+                0,
+                13,
+                "1ec9d6586bb31572e21ae67e93a1f190d8f312b0e1c5f8a17bd9c075a0e95620"
+              ],
+              [
+                15,
+                49,
+                "0eab70ce912ee115209abee7d3ba9a993d63cca32a6134baa204417189e4e94d"
+              ]
+            ],
+            "edges": [
+              [
+                "heading",
+                0,
+                1,
+                "markdown-owning-heading-v1"
+              ]
+            ],
+            "proposed_need_ids": [
+              "sentence-1"
+            ]
+          }
+        ],
+        "generation_id": "gen-54931e79269d42caa15ccccca7daddd2",
+        "resolved_version": "",
+        "_source_catalog_hash": "sha256:9962b2db79869f680462e4eafc308c1408f03cf7356d4899a4da31fba09974ad",
+        "char_start": 0,
+        "char_end": 51,
+        "line_start": 1,
+        "line_end": 4,
+        "source_class": "project_doc",
+        "source_type": "project_doc",
+        "source_kind": "project_doc",
+        "authority": "source_of_truth",
+        "risk_flags": [],
+        "doc_scope": "project",
+        "module_id": "",
+        "module_name": null,
+        "module_path": null,
+        "module_type": null,
+        "description": "Pinned documentation source",
+        "catalog_role": "other",
+        "lifecycle_status": "active",
+        "temporal_relevance": "current",
+        "index_freshness": "synchronized",
+        "impact_policy": "track",
+        "project_identity": "local:dc0925762be547e7b34a2703047ffe57bfc2a992127a7f1b1eecf211fb78703d",
+        "retrieval_query_ids": [],
+        "retrieval_query_matches": {},
+        "project_ranking": {},
+        "path": "guide.md",
+        "url": null,
+        "title": "LeaseClient",
+        "heading_path": "LeaseClient",
+        "freshness": "current",
+        "why_selected": "selected because it matched repo-owned project documentation for the question",
+        "content": "# LeaseClient\n\nLeaseClient raises `LeaseExpired`.\n\n",
+        "display_text": "# LeaseClient\n\nLeaseClient raises `LeaseExpired`.\n\n",
+        "token_estimate": 12,
+        "source": {
+          "source_class": "project_doc",
+          "source_type": "project_doc",
+          "source_kind": "project_doc",
+          "authority": "source_of_truth",
+          "risk_flags": [],
+          "doc_scope": "project",
+          "module_id": "",
+          "module_name": null,
+          "module_path": null,
+          "module_type": null,
+          "description": "Pinned documentation source",
+          "lifecycle_status": "active",
+          "temporal_relevance": "current",
+          "index_freshness": "synchronized",
+          "impact_policy": "track",
+          "project_identity": "local:dc0925762be547e7b34a2703047ffe57bfc2a992127a7f1b1eecf211fb78703d",
+          "path": "guide.md",
+          "url": null,
+          "title": "LeaseClient"
+        },
+        "section": {
+          "title": "LeaseClient",
+          "heading_path": "LeaseClient",
+          "freshness": "current"
+        },
+        "snippet": "# LeaseClient\n\nLeaseClient raises `LeaseExpired`.\n\n",
+        "char_span": [
+          0,
+          51
+        ]
+      },
+      "decision": {
+        "allowed": true,
+        "reason": "source_bound_retrieval_only_unknown_applicability"
+      }
+    }
+  ],
+  "mutation_execution": [
+    {
+      "change": {
+        "project_identity": "other"
+      },
+      "observed_reasons": [
+        "wrong_project_identity"
+      ],
+      "negative_executed": true
+    },
+    {
+      "change": {
+        "repository_identity": "other"
+      },
+      "observed_reasons": [
+        "reference_project_mismatch"
+      ],
+      "negative_executed": true
+    },
+    {
+      "change": {
+        "freshness": "stale"
+      },
+      "observed_reasons": [
+        "stale_evidence"
+      ],
+      "negative_executed": true
+    },
+    {
+      "change": {
+        "index_freshness": "dirty"
+      },
+      "observed_reasons": [
+        "unsynchronized_index"
+      ],
+      "negative_executed": true
+    },
+    {
+      "change": {
+        "risk_flags": [
+          "unsafe"
+        ]
+      },
+      "observed_reasons": [
+        "unsafe_evidence"
+      ],
+      "negative_executed": true
+    },
+    {
+      "change": {
+        "instruction_risk_flags": [
+          "injection"
+        ]
+      },
+      "observed_reasons": [
+        "unsafe_evidence"
+      ],
+      "negative_executed": true
+    },
+    {
+      "change": {
+        "lifecycle_status": "archived"
+      },
+      "observed_reasons": [
+        "lifecycle_not_allowed"
+      ],
+      "negative_executed": true
+    },
+    {
+      "change": {
+        "char_span": [
+          0,
+          1
+        ]
+      },
+      "observed_reasons": [
+        "source_window_mismatch"
+      ],
+      "negative_executed": true
+    },
+    {
+      "change": {
+        "resolved_version": "wrong"
+      },
+      "observed_reasons": [
+        "reference_version_mismatch"
+      ],
+      "negative_executed": true
+    },
+    {
+      "change": {
+        "generation_id": "wrong"
+      },
+      "observed_reasons": [
+        "reference_snapshot_mismatch"
+      ],
+      "negative_executed": true
+    },
+    {
+      "change": {
+        "path": "docs/other.md"
+      },
+      "observed_reasons": [
+        "reference_path_mismatch"
+      ],
+      "negative_executed": true
+    },
+    {
+      "change": {
+        "source_class": "library_doc"
+      },
+      "observed_reasons": [
+        "missing_project_request"
+      ],
+      "negative_executed": true
+    }
+  ],
+  "C_final_packet": "NOT_RUN",
+  "I.4-I.6": "NOT_RUN",
+  "II": "NOT_RUN",
+  "native_recovery": "NOT_CLAIMED",
+  "G": "reused verified original evidence, not rerun",
+  "claim_retention": "NOT_RUN",
+  "remaining_controls": "NOT_RUN after substantive failure"
+}

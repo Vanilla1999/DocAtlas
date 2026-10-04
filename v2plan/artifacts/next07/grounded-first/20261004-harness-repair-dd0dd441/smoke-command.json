@@ -1,0 +1,10 @@
+{
+  "command": [
+    ".venv/bin/python",
+    "-c",
+    "from pathlib import Path\nimport json\nfrom tempfile import TemporaryDirectory\nfrom v2plan.test_next07_grounded_first import prepared_units, decision\nfrom v2plan.next07_grounded_reference import fixture_inputs\nfrom v2plan.next07_grounded_run import ROOT\n_,_,docs,question=fixture_inputs(ROOT)[0]\nwith TemporaryDirectory(dir='/tmp/opencode') as temporary:\n    rows,_=prepared_units(Path(temporary),docs,question)\n    row=next(r for r in rows if '17 seconds' in r['snippet'])\n    result=decision(row,question)\n    assert result.allowed,result.reason\n    print(json.dumps({'source_class':row['source_class'],'span':row['char_span'],'source_identity':row['_reference_evidence']['source'],'decision':{'allowed':result.allowed,'reason':result.reason}}))\n"
+  ],
+  "returncode": 1,
+  "stdout": "",
+  "stderr": "Traceback (most recent call last):\n  File \"<string>\", line 9, in <module>\n    rows,_=prepared_units(Path(temporary),docs,question)\n           ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/viadmin/StudioProjects/hermes/docmancer/v2plan/test_next07_grounded_first.py\", line 79, in prepared_units\n    'project_docs': project_docs.model_dump(mode='json'), 'read_dtos': rows},\n                    ^^^^^^^^^^^^^^^^^^^^^^^\nAttributeError: 'ProjectDocsResult' object has no attribute 'model_dump'\n"
+}

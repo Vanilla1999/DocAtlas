@@ -1,6 +1,6 @@
 # 07. Grounded-first: инструкция исполнителю
 
-Статус: **попытка завершена BLOCKED при проверке I.3; native C NOT_RUN**.
+Статус: **harness исправлен отдельным разрешением; неизменённый candidate REJECTED на валидной I.3; native C NOT_RUN**.
 Дата решения и исполнения: 2026-10-04.
 Ветка: **next07-feasibility-audit**, не main. Пользователь проводит эксперимент.
 Этот документ — план выполнения, не отчёт об успешном запуске и не разрешение rollout.
@@ -630,3 +630,52 @@ evaluation NOT_RUN. Никакая часть плана 06 не закрыта 
 завершить предварительную заморозку controls до новой попытки. Использовать
 existing authenticated conversion, не переписывать source_class и не ослаблять
 guard. Текущая попытка завершена; rollout не разрешён.
+
+## 8. Ремонт harness по отдельному разрешению пользователя — валидная I.3
+
+Пользователь после `dd0dd441` разрешил ремонт конкретной тестовой границы,
+сохранение invalid runs и один содержательный прогон **без изменения candidate**.
+Это отдельное разрешение на технический ремонт после прежнего retry-limit,
+не автоматическое возобновление завершённой попытки и не смена алгоритма.
+Разрешены research test harness, новые artifacts и журнал; runtime, candidate,
+ports, исходные fixtures/negative expectations не меняются. Заменяемая
+ответственность — изготовление read DTO в harness, не read permission.
+
+Evidence: [отчёт ремонта](artifacts/next07/grounded-first/20261004-harness-repair-dd0dd441/SUMMARY_RU.md).
+
+Исправленный путь: наблюдение immutable prepared inventory → существующие
+ranked proposals I.2 → штатный `get_project_docs` с current catalog/hash/lifecycle
+checks → `ProjectDocsChunk` → `project_context_pack` → whole-original-span read
+window. `source_class`, authority, freshness и snapshot не подделываются.
+Каждый исходный DTO проверяется через `source_window_eligibility`; raw slice
+должен совпадать с исходными offsets. Это local research wiring, не final C.
+
+Первый smoke обнаружил только неверную сериализацию dataclass
+`ProjectDocsResult` через `model_dump`; исходный output сохранён. Logger
+исправлен на `asdict`, candidate не менялся. Исправленный smoke подтвердил
+eligible original `project_doc` и разрешённый read default.
+
+Один содержательный run: **22 PASS / 2 FAIL**, exit 1:
+
+- 8 isolated I.2 checks PASS;
+- оба LeaseClient read positives PASS (оба facts доступны как local context);
+- 12 mutation controls PASS **после успешного positive**, все negative decisions
+  сохранены: project/repository identity, freshness/index freshness, risk/injection,
+  lifecycle, span, version/snapshot, path, source class;
+- **wrong-state FAIL:** при вопросе disabled допускается исходный enabled default;
+  `relation_local_witness` не поддерживает operator `default` этой проверки;
+- **restriction FAIL:** после успешного short-source positive допускается unit
+  `# LeaseClient\n\nLeaseClient raises \`LeaseExpired\`.\n\n` без поздней строки
+  `Only when an operation expires.` из того же источника. Целостность unit и
+  известные structural edges не обеспечили сохранение межфрагментного ограничения.
+
+Итог: **harness VALIDATED_LOCAL; текущий неизменённый candidate REJECTED**.
+Последние два результата — наблюдения local read decision, не native final
+packet и не production leakage. Кандидат/grammar/splitter после failure не
+исправлялись. I.4–I.6 и II NOT_RUN; сохранение 49 IDs/partial facts, budget C,
+required gates/full suite/unseen/reader NOT_RUN. Grounded evidence переиспользовано
+после проверки hashes; нового G run не было. История BLOCKED не переписана.
+
+Один следующий шаг — отдельное решение о новой версии candidate с явно
+названными обязанностями wrong-state и preservation; не добавлять regex/rescue
+или ослаблять negatives автоматически. Текущий замер завершён, rollout запрещён.

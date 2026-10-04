@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="2" skipped="0" tests="24" time="3.044" timestamp="2026-10-04T13:41:18.148883+03:00" hostname="ViPC"><testcase classname="v2plan.test_next07_grounded_first" name="test_pinned_query[foo bar-&quot;foo bar&quot; OR &quot;foo&quot; OR &quot;bar&quot;]" time="0.000" /><testcase classname="v2plan.test_next07_grounded_first" name="test_pinned_query[&quot;hello world&quot;-&quot;hello world&quot;]" time="0.000" /><testcase classname="v2plan.test_next07_grounded_first" name="test_pinned_query[test &quot;exact phrase&quot; word-&quot;test exact phrase word&quot; OR &quot;test&quot; OR &quot;exact phrase&quot; OR &quot;word&quot;]" time="0.000" /><testcase classname="v2plan.test_next07_grounded_first" name="test_pinned_query[-&quot;&quot;]" time="0.000" /><testcase classname="v2plan.test_next07_grounded_first" name="test_i2_original_fixture_spans[0]" time="0.001" /><testcase classname="v2plan.test_next07_grounded_first" name="test_i2_original_fixture_spans[1]" time="0.001" /><testcase classname="v2plan.test_next07_grounded_first" name="test_i2_no_clipping_oversized_atom" time="0.000" /><testcase classname="v2plan.test_next07_grounded_first" name="test_i2_repeated_unicode_offsets" time="0.000" /><testcase classname="v2plan.test_next07_grounded_first" name="test_i3_original_fact_context[0]" time="0.483" /><testcase classname="v2plan.test_next07_grounded_first" name="test_i3_original_fact_context[1]" time="0.157" /><testcase classname="v2plan.test_next07_grounded_first" name="test_i3_guard_mutations[change0]" time="0.153" /><testcase classname="v2plan.test_next07_grounded_first" name="test_i3_guard_mutations[change1]" time="0.143" /><testcase classname="v2plan.test_next07_grounded_first" name="test_i3_guard_mutations[change2]" time="0.143" /><testcase classname="v2plan.test_next07_grounded_first" name="test_i3_guard_mutations[change3]" time="0.150" /><testcase classname="v2plan.test_next07_grounded_first" name="test_i3_guard_mutations[change4]" time="0.151" /><testcase classname="v2plan.test_next07_grounded_first" name="test_i3_guard_mutations[change5]" time="0.152" /><testcase classname="v2plan.test_next07_grounded_first" name="test_i3_guard_mutations[change6]" time="0.143" /><testcase classname="v2plan.test_next07_grounded_first" name="test_i3_guard_mutations[change7]" time="0.144" /><testcase classname="v2plan.test_next07_grounded_first" name="test_i3_guard_mutations[change8]" time="0.150" /><testcase classname="v2plan.test_next07_grounded_first" name="test_i3_guard_mutations[change9]" time="0.150" /><testcase classname="v2plan.test_next07_grounded_first" name="test_i3_guard_mutations[change10]" time="0.148" /><testcase classname="v2plan.test_next07_grounded_first" name="test_i3_guard_mutations[change11]" time="0.144" /><testcase classname="v2plan.test_next07_grounded_first" name="test_i3_existing_disabled_enabled_negative" time="0.294"><failure message="assert not True&#10; +  where True = any(&lt;generator object test_i3_existing_disabled_enabled_negative.&lt;locals&gt;.&lt;genexpr&gt; at 0x797792f5be60&gt;)">tmp_path = PosixPath('/tmp/pytest-of-viadmin/pytest-2/test_i3_existing_disabled_enab0')
+
+    def test_i3_existing_disabled_enabled_negative(tmp_path):
+        # Existing supported state control, not a new condition language.
+        question = 'What is OrbitClient default timeout when preview is disabled?'
+        allowed = '# OrbitClient\n\nWhen preview is disabled, OrbitClient default timeout is 7 seconds.\n'
+        forbidden = allowed.replace('preview is disabled', 'preview is enabled')
+        rows, _ = prepared_units(tmp_path / 'positive', {'guide.md': allowed}, question)
+        assert any(decision(r, question).allowed for r in rows)
+        rows, _ = prepared_units(tmp_path / 'negative', {'guide.md': forbidden}, question)
+        assert rows
+&gt;       assert not any(decision(r, question).allowed for r in rows)
+E       assert not True
+E        +  where True = any(&lt;generator object test_i3_existing_disabled_enabled_negative.&lt;locals&gt;.&lt;genexpr&gt; at 0x797792f5be60&gt;)
+
+v2plan/test_next07_grounded_first.py:174: AssertionError</failure></testcase><testcase classname="v2plan.test_next07_grounded_first" name="test_i3_trailing_restriction_across_structural_boundary" time="0.282"><failure message="AssertionError: assert 'Only when an operation expires.' in '# LeaseClient\n\nLeaseClient raises `LeaseExpired`.\n\n'">tmp_path = PosixPath('/tmp/pytest-of-viadmin/pytest-2/test_i3_trailing_restriction_a0')
+
+    def test_i3_trailing_restriction_across_structural_boundary(tmp_path):
+        question = 'Which exception does LeaseClient raise when an operation expires?'
+        positive = '# LeaseClient\n\nLeaseClient raises `LeaseExpired`.\n\nOnly when an operation expires.\n'
+        rows, _ = prepared_units(tmp_path / 'positive', {'guide.md': positive}, question)
+        assert rows
+        assert any(decision(row, question).allowed and 'Only when an operation expires.' in row['snippet']
+            for row in rows)
+        # Fixed hard-max boundary control: the source's restriction follows a long
+        # intervening paragraph in the same heading section. No algorithm tuning.
+        raw = ('# LeaseClient\n\nLeaseClient raises `LeaseExpired`.\n\n'
+            + 'Documentation. ' * 330 + '\n\nOnly when an operation expires.\n')
+        rows, _ = prepared_units(tmp_path / 'boundary', {'guide.md': raw}, question)
+        facts = [r for r in rows if 'LeaseClient raises `LeaseExpired`.' in r['snippet']]
+        assert facts
+        for row in facts:
+            result = decision(row, question)
+            if result.allowed:
+&gt;               assert 'Only when an operation expires.' in row['snippet']
+E               AssertionError: assert 'Only when an operation expires.' in '# LeaseClient\n\nLeaseClient raises `LeaseExpired`.\n\n'
+
+v2plan/test_next07_grounded_first.py:194: AssertionError</failure></testcase></testsuite></testsuites>

@@ -1,0 +1,15 @@
+{
+  "head": "dd0dd441f106a233acc6d74dc635a7320580abc0",
+  "scope": "user-authorized harness-only repair and one unchanged-candidate meaningful I.3 run; no candidate/matcher/splitter fix",
+  "sha256_before": {
+    "v2plan/next07_grounded_candidate.py": "86069e6196b448da907a4f91d31207cdfe907da9b69adfe2fdd4b735e66f7436",
+    "v2plan/third_party/grounded-3.2.1/fts_query.py": "854cbbf8b74a2655aef1bb0a2583a181749fc472c005582e2631306f8410f95a",
+    "v2plan/third_party/grounded-3.2.1/passage_splitter.py": "9cf1320784290243a038afd9adda7f737b8377bbc88fa1aabd7f896f463f7968",
+    "v2plan/test_next07_grounded_first.py": "5d0910419455e0643d8ef0a63ed05cbdcab088fde0e6a2602ed4e19651366cd4",
+    "tests/docs/test_need_local_admission.py": "bd6f8f6dcb7b8b0485913583a59542707c2bd86d5927510f6d2ddeb4ee636649"
+  },
+  "expectations": "same mandatory positives/negatives; source eligibility positive precondition and non-vacuous restriction check added; no weakened assertions",
+  "source_inputs": "unchanged original fixtures and existing wrong-state/boundary restriction inputs",
+  "G": "reuse dd0dd441 evidence only after artifact integrity verification",
+  "stop": "valid I.3 failure => REJECTED; no I.4 or algorithm patch"
+}
