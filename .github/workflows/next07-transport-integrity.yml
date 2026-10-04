@@ -52,7 +52,7 @@ jobs:
         run: |
           python -m pip install -e '.[dev]' > "$RUNNER_TEMP/transport-evidence/pip-install.log" 2>&1
           python -m pip freeze > "$RUNNER_TEMP/transport-evidence/pip-freeze.txt"
-      - name: Transport, native SDK and unchanged source regression
+      - name: Transport, native SDK and unchanged research regression
         shell: bash
         run: |
           set +e
@@ -65,12 +65,22 @@ jobs:
             v2plan/test_next07_scope_rebuild.py \
             v2plan/test_next07_diagnostic_runner.py \
             v2plan/test_next07_scope_native.py \
-            tests/docs/test_mcp_output_contract.py \
-            tests/docs/test_project_context_compact_output.py \
             --junitxml="$RUNNER_TEMP/transport-evidence/tests.xml" \
             > "$RUNNER_TEMP/transport-evidence/tests.log" 2>&1
           rc=$?
           echo "$rc" > "$RUNNER_TEMP/transport-evidence/tests-exit.txt"
+          exit "$rc"
+      - name: Existing product output contracts in their classified test process
+        shell: bash
+        run: |
+          set +e
+          python -m pytest -q \
+            tests/docs/test_mcp_output_contract.py \
+            tests/docs/test_project_context_compact_output.py \
+            --junitxml="$RUNNER_TEMP/transport-evidence/legacy.xml" \
+            > "$RUNNER_TEMP/transport-evidence/legacy.log" 2>&1
+          rc=$?
+          echo "$rc" > "$RUNNER_TEMP/transport-evidence/legacy-exit.txt"
           exit "$rc"
       - name: Actual compact LeaseClient P1 P2 P3
         shell: bash
@@ -146,13 +156,13 @@ jobs:
           result={'N10':'NOT_RUN_UNCHANGED','rollout':'NOT_AUTHORIZED',
                   'head':(root/'head.txt').read_text().strip() if (root/'head.txt').exists() else None,
                   'target':load('target/result.json'),'corpus':load('corpus-replay/result.json')}
-          for key in ('tests','target','corpus'):
+          for key in ('tests','legacy','target','corpus'):
               p=root/(key+'-exit.txt');result[key+'_exit']=int(p.read_text()) if p.exists() else None
           terminal=load('terminal-sdk.json')
           result['terminal_sdk_passed']=bool(terminal and terminal.get('passed'))
           corpus=result['corpus'] or {}
           result['transport_verdict']='TRANSPORT_VALIDATED' if (
-              all(result[k+'_exit']==0 for k in ('tests','target','corpus'))
+              all(result[k+'_exit']==0 for k in ('tests','legacy','target','corpus'))
               and corpus.get('valid_pairs')==80 and result['terminal_sdk_passed']
               and not any(corpus.get('audit_failure_case_ids',{}).values())
               and corpus.get('frozen_inputs_unchanged') is True) else 'TRANSPORT_NOT_VALIDATED'
