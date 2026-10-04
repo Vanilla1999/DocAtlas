@@ -1,0 +1,3814 @@
+{
+  "request": {
+    "project_path": "/home/viadmin/StudioProjects/hermes/docmancer/v2plan/artifacts/next07/grounded-first/diagnostic-bb81525d-20261004/corpus",
+    "scope": "project",
+    "question": "storage retention behavior. Also identify private production deployment configuration credentials owner selected runtime settings."
+  },
+  "public_payload": {
+    "status": "ok",
+    "kind": "docs_context",
+    "context_status": "ready",
+    "context_available": true,
+    "answer_supported": false,
+    "answer_available": false,
+    "support_status": "retrieval_only",
+    "answer_policy": "cite_only",
+    "coverage_policy": "retrieval_attribution_only",
+    "query_coverage": "partial",
+    "retrieval_coverage": "partial",
+    "facet_coverage": "unverified",
+    "covered_query_ids": [],
+    "missing_query_ids": [],
+    "missing_facets": [],
+    "facets": [],
+    "sources": [
+      {
+        "evidence_id": "ev-075a79a2d19aaa70",
+        "path_or_url": "docs/guide.md",
+        "section": "Guide",
+        "snippet": "# Guide\n\nstorage retention behavior is documented in this current guide.\n",
+        "version_binding": "unversioned",
+        "content_sha256": "a8edf02d5f3d2f138ebc97b0855ff95bd906b370e08ac1e0dff2e62f382eac15",
+        "project_identity": "local:cb9a242ac16e104e5974ef5a7993672d98a3528981d0b9a003e8e5f7efb1000c",
+        "authority": "source_of_truth",
+        "scope": "project",
+        "line_start": 1,
+        "line_end": 3
+      }
+    ],
+    "context_quality": {
+      "status": "unverified",
+      "reasons": [
+        "coverage_unverified"
+      ]
+    },
+    "read_next": [],
+    "edit_ready": false,
+    "investigation_allowed": true,
+    "estimated_tokens": 262
+  },
+  "projection_attempts": [
+    {
+      "before_projection": {
+        "tool": "get_docs_context",
+        "status": "partial_success",
+        "question": "storage retention behavior. Also identify private production deployment configuration credentials owner selected runtime settings.",
+        "mode_requested": "auto",
+        "mode_selected": "project",
+        "routing": {
+          "reason_code": "project_context_auto",
+          "project_path_used": true,
+          "libraries_requested": [],
+          "dependency_detected": false,
+          "delegated_mode": "auto",
+          "evidence_scopes": [
+            "project"
+          ]
+        },
+        "answer_available": false,
+        "context_available": true,
+        "answer_supported": false,
+        "support_status": "insufficient_evidence",
+        "missing_requirement_ids": [
+          "project_answer_requirement",
+          "unsupported_answer_authorization:unresolved_query"
+        ],
+        "satisfied_requirement_ids": [],
+        "mandatory_requirement_ids": [],
+        "mandatory_coverage": 1.0,
+        "selected_evidence_ids": [],
+        "decision_hash": "b44009a5c55661773a1e1eead7a0c95e34e3bbde78c6fed502da9842fd8fa6b6",
+        "assignment_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "selection_decision": {
+          "status": "insufficient_evidence",
+          "selected_candidates": [
+            {
+              "stable_id": "child-acd334d5a362efe40eae612ec149a5adfaaca3fc",
+              "evidence_id": "",
+              "hydration_id": null,
+              "identity_kind": "stable_child",
+              "source_identity": "docs/guide.md",
+              "identity_aliases": [
+                "docs/guide.md",
+                "{'source_class': 'project_doc', 'source_type': 'docs', 'source_kind': 'docs', 'authority': 'source_of_truth', 'risk_flags': [], 'doc_scope': 'project', 'module_id': '', 'module_name': none, 'module_path': none, 'module_type': none, 'description': 'pinned documentation source', 'lifecycle_status': 'active', 'temporal_relevance': 'current', 'index_freshness': 'synchronized', 'impact_policy': 'track', 'project_identity': 'local:cb9a242ac16e104e5974ef5a7993672d98a3528981d0b9a003e8e5f7efb1000c', 'path': 'docs/guide.md', 'url': none, 'title': 'guide'}"
+              ],
+              "path_or_url": "docs/guide.md",
+              "section": "Guide",
+              "parent_logical_id": "parent-388c23e8b4dd2ca774a8cbb6423459cd",
+              "content_sha256": "59f9d33995af39ce9916a8bc2ab92719a4c0bbd9a0b1222b75bc4483f4f03203",
+              "display_text": "# Guide\n\nstorage retention behavior is documented in this current guide.\n",
+              "projected_text": "# Guide\n\nstorage retention behavior is documented in this current guide.\n",
+              "token_estimate": 19,
+              "fit_token_estimate": 99,
+              "reported_token_estimate": 18,
+              "char_start": 0,
+              "char_end": 73,
+              "line_start": 1,
+              "line_end": 3,
+              "retrieval_rank": 10000,
+              "component_ranks": [],
+              "relevance_millis": 0,
+              "authority": "canonical",
+              "source_class": "project_doc",
+              "version_binding": "not_applicable",
+              "resolved_version": "",
+              "docs_snapshot_exact": null,
+              "project_identity": "local:cb9a242ac16e104e5974ef5a7993672d98a3528981d0b9a003e8e5f7efb1000c",
+              "module_id": "",
+              "doc_scope": "project",
+              "symbols": [],
+              "exact_terms": [],
+              "instruction_risk_flags": [],
+              "freshness": "current",
+              "navigation_only": false,
+              "answer_units": [
+                {
+                  "unit_id": "unit-0e00cf397941953791bb",
+                  "kind": "heading_context",
+                  "text": "# Guide\n\nstorage retention behavior is documented in this current guide.",
+                  "char_start": 0,
+                  "char_end": 72,
+                  "content_sha256": "cee3fcae1eba0eb27efa9659d7085b25e59f3be7231a42303edf7769169bb149",
+                  "proposition": true,
+                  "source_field": null
+                },
+                {
+                  "unit_id": "unit-3b73ad14beeaf2b35ce6",
+                  "kind": "sentence",
+                  "text": "storage retention behavior is documented in this current guide.",
+                  "char_start": 9,
+                  "char_end": 72,
+                  "content_sha256": "c3cf768666f0bd7a7bbef7338a6745138a7b7c0c1cd14fa0edfbae3d7e3897de",
+                  "proposition": true,
+                  "source_field": null
+                },
+                {
+                  "unit_id": "unit-b3d5ace26f4885d65c56",
+                  "kind": "source_field",
+                  "text": "docs/guide.md",
+                  "char_start": null,
+                  "char_end": null,
+                  "content_sha256": "07fdd026b11c494c3b62c97f764f6939803c453389ebefd6b05e6f187d44859a",
+                  "proposition": true,
+                  "source_field": "path_or_url"
+                },
+                {
+                  "unit_id": "unit-36126def7d5426292e63",
+                  "kind": "source_field",
+                  "text": "Guide",
+                  "char_start": null,
+                  "char_end": null,
+                  "content_sha256": "8dd65d0952ed144ccf6e76ebf8aa45644afb2b9236762c414d07e813d42f588e",
+                  "proposition": true,
+                  "source_field": "section"
+                }
+              ],
+              "requirement_witnesses": [],
+              "covered_requirement_ids": [],
+              "original": {
+                "stable_chunk_id": "child-acd334d5a362efe40eae612ec149a5adfaaca3fc",
+                "parent_logical_id": "parent-388c23e8b4dd2ca774a8cbb6423459cd",
+                "display_content_hash": "59f9d33995af39ce9916a8bc2ab92719a4c0bbd9a0b1222b75bc4483f4f03203",
+                "_source_snapshot_sha256": "sha256:59f9d33995af39ce9916a8bc2ab92719a4c0bbd9a0b1222b75bc4483f4f03203",
+                "_reference_evidence": {
+                  "schema_version": 1,
+                  "source": {
+                    "document_id": "project_file:local:cb9a242ac16e104e5974ef5a7993672d98a3528981d0b9a003e8e5f7efb1000c:docs/guide.md",
+                    "scope": {
+                      "project_id": "local:cb9a242ac16e104e5974ef5a7993672d98a3528981d0b9a003e8e5f7efb1000c",
+                      "version": "",
+                      "snapshot_id": "gen-2c46e20dfd9e4bddbc57dcb16838199e"
+                    },
+                    "canonical_path": "docs/guide.md",
+                    "content_sha256": "59f9d33995af39ce9916a8bc2ab92719a4c0bbd9a0b1222b75bc4483f4f03203"
+                  },
+                  "project_doc_content_hash": "sha256:59f9d33995af39ce9916a8bc2ab92719a4c0bbd9a0b1222b75bc4483f4f03203",
+                  "char_start": 0,
+                  "char_end": 73,
+                  "text": "# Guide\n\nstorage retention behavior is documented in this current guide.\n",
+                  "raw_document": "# Guide\n\nstorage retention behavior is documented in this current guide.\n",
+                  "owner": {
+                    "text": "# Guide\n",
+                    "char_start": 0,
+                    "char_end": 8,
+                    "scope_start": 0,
+                    "scope_end": 73,
+                    "logical_id": "parent-388c23e8b4dd2ca774a8cbb6423459cd"
+                  }
+                },
+                "_reference_root_plan": {
+                  "question": "storage retention behavior. Also identify private production deployment configuration credentials owner selected runtime settings.",
+                  "references": [],
+                  "scope": {
+                    "project_id": "local:cb9a242ac16e104e5974ef5a7993672d98a3528981d0b9a003e8e5f7efb1000c",
+                    "version": "",
+                    "snapshot_id": "gen-2c46e20dfd9e4bddbc57dcb16838199e"
+                  },
+                  "catalog_complete": true
+                },
+                "_reference_plans": {
+                  "storage retention behavior. Also identify private production deployment configuration credentials owner selected runtime settings.": {
+                    "question": "storage retention behavior. Also identify private production deployment configuration credentials owner selected runtime settings.",
+                    "references": [],
+                    "scope": {
+                      "project_id": "local:cb9a242ac16e104e5974ef5a7993672d98a3528981d0b9a003e8e5f7efb1000c",
+                      "version": "",
+                      "snapshot_id": "gen-2c46e20dfd9e4bddbc57dcb16838199e"
+                    },
+                    "catalog_complete": true
+                  }
+                },
+                "_evidence_sets": [
+                  {
+                    "schema_version": "source-dependency-proposal-v1",
+                    "set_id": "evidence-set:daab23dae997f2d9e9aec2beabd7beee1e211f4080e2bbb6680494443107a3cc",
+                    "member_spans": [
+                      [
+                        0,
+                        7,
+                        "ca85e859db5c1f8ab39081106a1ccbe7e2a618fac858824eb09033b48ea7ce05"
+                      ],
+                      [
+                        9,
+                        72,
+                        "c3cf768666f0bd7a7bbef7338a6745138a7b7c0c1cd14fa0edfbae3d7e3897de"
+                      ]
+                    ],
+                    "edges": [
+                      [
+                        "heading",
+                        0,
+                        1,
+                        "markdown-owning-heading-v1"
+                      ]
+                    ],
+                    "proposed_need_ids": [
+                      "sentence-1"
+                    ]
+                  }
+                ],
+                "generation_id": "gen-2c46e20dfd9e4bddbc57dcb16838199e",
+                "resolved_version": "",
+                "_source_catalog_hash": "sha256:b9366e1658387043c943be7f03f91f44a6af9d611c90bb6ad473aa65b6e9b96f",
+                "char_start": 0,
+                "char_end": 73,
+                "line_start": 1,
+                "line_end": 3,
+                "source_class": "project_doc",
+                "source_type": "docs",
+                "source_kind": "docs",
+                "authority": "source_of_truth",
+                "risk_flags": [],
+                "doc_scope": "project",
+                "module_id": "",
+                "module_name": null,
+                "module_path": null,
+                "module_type": null,
+                "description": "Pinned documentation source",
+                "catalog_role": "other",
+                "lifecycle_status": "active",
+                "temporal_relevance": "current",
+                "index_freshness": "synchronized",
+                "impact_policy": "track",
+                "project_identity": "local:cb9a242ac16e104e5974ef5a7993672d98a3528981d0b9a003e8e5f7efb1000c",
+                "retrieval_query_ids": [],
+                "retrieval_query_matches": {
+                  "query-original": {
+                    "mode": "or_fallback",
+                    "query_terms": [
+                      "storage",
+                      "retention",
+                      "behavior",
+                      "also",
+                      "identify",
+                      "private",
+                      "production",
+                      "deployment",
+                      "configuration",
+                      "credentials",
+                      "owner",
+                      "selected",
+                      "runtime",
+                      "settings"
+                    ],
+                    "matched_terms": [
+                      "storage",
+                      "retention",
+                      "behavior"
+                    ],
+                    "exact_terms": [],
+                    "missing_exact_terms": [],
+                    "query_term_count": 14,
+                    "matched_term_count": 3,
+                    "match_ratio": 0.2143,
+                    "bm25_cost": -4.125e-06,
+                    "lexical_score": 4.125e-06,
+                    "field_matches": {
+                      "title": [],
+                      "body": [
+                        "storage",
+                        "retention",
+                        "behavior"
+                      ],
+                      "retrieval_text": [
+                        "storage",
+                        "retention",
+                        "behavior"
+                      ]
+                    },
+                    "bound_subjects": [],
+                    "retrieval_anchors": [],
+                    "query_text": "storage retention behavior. Also identify private production deployment configuration credentials owner selected runtime settings.",
+                    "query_origin": "original",
+                    "relation": "direct",
+                    "public_parent_query_id": null,
+                    "preferred_catalog_roles": [],
+                    "forbidden_catalog_roles": [],
+                    "forbidden_evidence_terms": [],
+                    "parent_exact_terms": [],
+                    "need_subject": null,
+                    "need_relation": null,
+                    "need_context": null,
+                    "reference_body_query": "storage retention behavior. Also identify private production deployment configuration credentials owner selected runtime settings.",
+                    "bound_subject_context": "# Guide\n",
+                    "reference_bindings": [],
+                    "reference_visible_span": [
+                      0,
+                      72
+                    ],
+                    "body_matched_terms": [
+                      "storage",
+                      "retention",
+                      "behavior"
+                    ],
+                    "heading_context_used": false,
+                    "table_context_used": false,
+                    "missing_parent_exact_terms": [],
+                    "qualified": false,
+                    "qualification_reason": "insufficient_visible_match",
+                    "coverage_kinds": []
+                  }
+                },
+                "project_ranking": {
+                  "query_intent": "how_to",
+                  "base_score": 1.0,
+                  "final_score": 1.4,
+                  "original_rank": 0,
+                  "selected_rank": 1,
+                  "source_weight_reason": "boosted as practical implementation/usage evidence for the how-to query",
+                  "requirement_reason": null,
+                  "selected_by": "ranking",
+                  "diversity_relaxed": false,
+                  "reasons": [
+                    "boosted as practical implementation/usage evidence for the how-to query"
+                  ]
+                },
+                "path": "docs/guide.md",
+                "url": null,
+                "title": "Guide",
+                "heading_path": "Guide",
+                "freshness": "current",
+                "why_selected": "selected because it matched repo-owned project documentation for the question; boosted as practical implementation/usage evidence for the how-to query",
+                "content": "# Guide\n\nstorage retention behavior is documented in this current guide.\n",
+                "display_text": "# Guide\n\nstorage retention behavior is documented in this current guide.\n",
+                "token_estimate": 18,
+                "source": {
+                  "source_class": "project_doc",
+                  "source_type": "docs",
+                  "source_kind": "docs",
+                  "authority": "source_of_truth",
+                  "risk_flags": [],
+                  "doc_scope": "project",
+                  "module_id": "",
+                  "module_name": null,
+                  "module_path": null,
+                  "module_type": null,
+                  "description": "Pinned documentation source",
+                  "lifecycle_status": "active",
+                  "temporal_relevance": "current",
+                  "index_freshness": "synchronized",
+                  "impact_policy": "track",
+                  "project_identity": "local:cb9a242ac16e104e5974ef5a7993672d98a3528981d0b9a003e8e5f7efb1000c",
+                  "path": "docs/guide.md",
+                  "url": null,
+                  "title": "Guide"
+                },
+                "section": {
+                  "title": "Guide",
+                  "heading_path": "Guide",
+                  "freshness": "current"
+                },
+                "source_provenance": {
+                  "owner": "configured_repository",
+                  "origin_lane": null
+                },
+                "version_exactness": "not_applicable",
+                "repository_authority": "ordinary_repository_document",
+                "instruction_trust": "untrusted_data",
+                "content_boundary": {
+                  "role": "cited_document_data",
+                  "schema": "docmancer-document-data-v1",
+                  "executable_policy": false
+                },
+                "document_data": {
+                  "schema": "docmancer-document-data-v1",
+                  "instruction_trust": "untrusted_data",
+                  "content": "# Guide\n\nstorage retention behavior is documented in this current guide.\n"
+                },
+                "authority_root": null,
+                "policy_scope": null,
+                "scope_verified": false,
+                "instruction_risk_flags": []
+              }
+            }
+          ],
+          "omissions": [],
+          "missing_requirements": [
+            "project_answer_requirement",
+            "unsupported_answer_authorization:unresolved_query"
+          ],
+          "unresolved_conflicts": [],
+          "metrics": {
+            "candidate_count": 1,
+            "eligible_count": 1,
+            "selected_count": 1,
+            "selected_sources": 1,
+            "selected_documents": 1,
+            "max_documents": 3,
+            "max_spans": 6,
+            "selected_tokens": 19,
+            "wrapper_reserve_tokens": 120,
+            "projected_total_tokens": 139,
+            "serialized_projected_tokens": 449,
+            "hard_tokens": 800,
+            "mandatory_requirements": 0,
+            "mandatory_covered": 0,
+            "mandatory_coverage_millis": 0,
+            "requirements_hash": "2a741d07657546a1b4275341875e1d02422222a8d7f2e04faa77196fd8a7e22b",
+            "omission_counts": {},
+            "selected_parents": 1,
+            "selected_children": 1,
+            "required_facts_per_1000_tokens_millis": 0,
+            "redundant_visible_token_ratio_millis": 0,
+            "cache": "disabled",
+            "selected_feature_trace": [
+              {
+                "stable_id": "child-acd334d5a362efe40eae612ec149a5adfaaca3fc",
+                "retrieval_relevance": 0,
+                "exact_term_coverage": 0,
+                "mandatory_requirement_coverage": 0,
+                "authority": 1000,
+                "version_exactness": 0,
+                "usable_snippet": 1000,
+                "new_source_fact_terms": 8,
+                "new_module_coverage": 0,
+                "new_target_symbols": 0,
+                "new_source": 1,
+                "novelty_millis": 1000,
+                "token_cost": 19,
+                "expansion_cost": 0,
+                "stale_risk": 0,
+                "generic_source_penalty": 0,
+                "ambiguity_penalty": 0
+              }
+            ],
+            "candidate_to_selected_ratio_millis": 1000,
+            "reported_token_mismatches": 1
+          },
+          "selector_config_hash": "23cf8aa2f77c1b7e9b9d00819a1d05c14e198272ad91516b5a75c5f641963edd",
+          "eligibility_contract_hash": "9029235a905a4a9995b051224b705bb7a307a7d5894cce2b361a10da5b0ffbd8",
+          "candidate_trace_hash": "f7c77159a9a788b9798b9b3e2729c8d27f82a3a4336b507e7a6e0b8a38bbf1e7",
+          "selection_hash": "1eac41d7dc34a794383b5401d57e81e69e4f28f12142cb123212701a0faaf782",
+          "assignments": [],
+          "support_decision": {
+            "answer_supported": false,
+            "support_status": "insufficient_evidence",
+            "reason_code": "required_evidence_missing",
+            "missing_requirement_ids": [
+              "project_answer_requirement",
+              "unsupported_answer_authorization:unresolved_query"
+            ],
+            "satisfied_requirement_ids": [],
+            "mandatory_requirement_ids": [],
+            "mandatory_coverage": 1.0,
+            "selected_evidence_ids": [],
+            "requirements_hash": "2a741d07657546a1b4275341875e1d02422222a8d7f2e04faa77196fd8a7e22b",
+            "selector_config_hash": "23cf8aa2f77c1b7e9b9d00819a1d05c14e198272ad91516b5a75c5f641963edd",
+            "eligibility_contract_hash": "9029235a905a4a9995b051224b705bb7a307a7d5894cce2b361a10da5b0ffbd8",
+            "candidate_trace_hash": "f7c77159a9a788b9798b9b3e2729c8d27f82a3a4336b507e7a6e0b8a38bbf1e7",
+            "selection_hash": "1eac41d7dc34a794383b5401d57e81e69e4f28f12142cb123212701a0faaf782",
+            "assignment_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "decision_hash": "b44009a5c55661773a1e1eead7a0c95e34e3bbde78c6fed502da9842fd8fa6b6",
+            "requirements": {
+              "requirements": [],
+              "required_entities": [],
+              "required_facets": [],
+              "query_extraction_provenance": [],
+              "query_requirement_spans": [],
+              "retrieval_hints": [
+                "Also",
+                "storage",
+                "retention",
+                "behavior",
+                "identify",
+                "private",
+                "production",
+                "deployment",
+                "configuration",
+                "credentials",
+                "owner",
+                "selected",
+                "runtime",
+                "settings"
+              ],
+              "concept_queries": [],
+              "answer_contract_hash": "131395c05f6bf74505f4836962b7a8df09193f76be5f084a38e8799b5ebd10db",
+              "lifecycle_intent": "current",
+              "parse_trace": [
+                "fallback:generic_project_terms"
+              ],
+              "unresolved_parts": [
+                "unsupported_query:generic_free_form_relation"
+              ],
+              "component_scope_complete": false
+            }
+          },
+          "requirements": {
+            "requirements": [],
+            "required_entities": [],
+            "required_facets": [],
+            "query_extraction_provenance": [],
+            "query_requirement_spans": [],
+            "retrieval_hints": [
+              "Also",
+              "storage",
+              "retention",
+              "behavior",
+              "identify",
+              "private",
+              "production",
+              "deployment",
+              "configuration",
+              "credentials",
+              "owner",
+              "selected",
+              "runtime",
+              "settings"
+            ],
+            "concept_queries": [],
+            "answer_contract_hash": "131395c05f6bf74505f4836962b7a8df09193f76be5f084a38e8799b5ebd10db",
+            "lifecycle_intent": "current",
+            "parse_trace": [
+              "fallback:generic_project_terms"
+            ],
+            "unresolved_parts": [
+              "unsupported_query:generic_free_form_relation"
+            ],
+            "component_scope_complete": false
+          }
+        },
+        "support_decision": {
+          "answer_supported": false,
+          "support_status": "insufficient_evidence",
+          "reason_code": "required_evidence_missing",
+          "missing_requirement_ids": [
+            "project_answer_requirement",
+            "unsupported_answer_authorization:unresolved_query"
+          ],
+          "satisfied_requirement_ids": [],
+          "mandatory_requirement_ids": [],
+          "mandatory_coverage": 1.0,
+          "selected_evidence_ids": [],
+          "requirements_hash": "2a741d07657546a1b4275341875e1d02422222a8d7f2e04faa77196fd8a7e22b",
+          "selector_config_hash": "23cf8aa2f77c1b7e9b9d00819a1d05c14e198272ad91516b5a75c5f641963edd",
+          "eligibility_contract_hash": "9029235a905a4a9995b051224b705bb7a307a7d5894cce2b361a10da5b0ffbd8",
+          "candidate_trace_hash": "f7c77159a9a788b9798b9b3e2729c8d27f82a3a4336b507e7a6e0b8a38bbf1e7",
+          "selection_hash": "1eac41d7dc34a794383b5401d57e81e69e4f28f12142cb123212701a0faaf782",
+          "assignment_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+          "decision_hash": "b44009a5c55661773a1e1eead7a0c95e34e3bbde78c6fed502da9842fd8fa6b6",
+          "requirements": {
+            "requirements": [],
+            "required_entities": [],
+            "required_facets": [],
+            "query_extraction_provenance": [],
+            "query_requirement_spans": [],
+            "retrieval_hints": [
+              "Also",
+              "storage",
+              "retention",
+              "behavior",
+              "identify",
+              "private",
+              "production",
+              "deployment",
+              "configuration",
+              "credentials",
+              "owner",
+              "selected",
+              "runtime",
+              "settings"
+            ],
+            "concept_queries": [],
+            "answer_contract_hash": "131395c05f6bf74505f4836962b7a8df09193f76be5f084a38e8799b5ebd10db",
+            "lifecycle_intent": "current",
+            "parse_trace": [
+              "fallback:generic_project_terms"
+            ],
+            "unresolved_parts": [
+              "unsupported_query:generic_free_form_relation"
+            ],
+            "component_scope_complete": false
+          }
+        },
+        "delivery_decision": {
+          "deliverable": false,
+          "reason_code": "required_evidence_missing"
+        },
+        "answer_type": "partial",
+        "answer_completeness": {
+          "schema_version": "answer-completeness-1.0",
+          "status": "partial",
+          "answer_type": "partial",
+          "coverage_score": 1.0,
+          "matched_terms": [
+            "storage",
+            "retention",
+            "behavior"
+          ],
+          "missing_terms": [
+            "identify",
+            "private",
+            "production",
+            "deployment",
+            "configuration"
+          ],
+          "coverage_by_requirement": [
+            {
+              "term": "storage",
+              "matched": true,
+              "source_paths": [
+                "docs/guide.md"
+              ]
+            },
+            {
+              "term": "retention",
+              "matched": true,
+              "source_paths": [
+                "docs/guide.md"
+              ]
+            },
+            {
+              "term": "behavior",
+              "matched": true,
+              "source_paths": [
+                "docs/guide.md"
+              ]
+            },
+            {
+              "term": "identify",
+              "matched": false,
+              "source_paths": []
+            },
+            {
+              "term": "private",
+              "matched": false,
+              "source_paths": []
+            },
+            {
+              "term": "production",
+              "matched": false,
+              "source_paths": []
+            },
+            {
+              "term": "deployment",
+              "matched": false,
+              "source_paths": []
+            },
+            {
+              "term": "configuration",
+              "matched": false,
+              "source_paths": []
+            }
+          ],
+          "source_search_required": true,
+          "source_search_status": "required",
+          "disposition": "search_local_source",
+          "edit_ready": true,
+          "reason_codes": [
+            "no_trusted_context",
+            "story_terms_missing_from_source_evidence",
+            "high_signal_query_terms_missing_from_context"
+          ],
+          "canonical_support": {
+            "answer_supported": false,
+            "mandatory_requirement_ids": [],
+            "assigned_requirement_ids": []
+          },
+          "legacy_diagnostics": {
+            "schema_version": "answer-completeness-1.0",
+            "status": "unavailable",
+            "answer_type": "unavailable",
+            "coverage_score": 0.375,
+            "matched_terms": [
+              "storage",
+              "retention",
+              "behavior"
+            ],
+            "missing_terms": [
+              "identify",
+              "private",
+              "production",
+              "deployment",
+              "configuration"
+            ],
+            "coverage_by_requirement": [
+              {
+                "term": "storage",
+                "matched": true,
+                "source_paths": [
+                  "docs/guide.md"
+                ]
+              },
+              {
+                "term": "retention",
+                "matched": true,
+                "source_paths": [
+                  "docs/guide.md"
+                ]
+              },
+              {
+                "term": "behavior",
+                "matched": true,
+                "source_paths": [
+                  "docs/guide.md"
+                ]
+              },
+              {
+                "term": "identify",
+                "matched": false,
+                "source_paths": []
+              },
+              {
+                "term": "private",
+                "matched": false,
+                "source_paths": []
+              },
+              {
+                "term": "production",
+                "matched": false,
+                "source_paths": []
+              },
+              {
+                "term": "deployment",
+                "matched": false,
+                "source_paths": []
+              },
+              {
+                "term": "configuration",
+                "matched": false,
+                "source_paths": []
+              }
+            ],
+            "source_search_required": true,
+            "source_search_status": "required",
+            "disposition": "search_local_source",
+            "edit_ready": true,
+            "reason_codes": [
+              "no_trusted_context",
+              "story_terms_missing_from_source_evidence",
+              "high_signal_query_terms_missing_from_context"
+            ]
+          }
+        },
+        "disposition": "search_local_source",
+        "edit_ready": true,
+        "source_search_status": "required",
+        "documentation_query_plan": {
+          "schema_version": "documentation-query-plan-v2",
+          "original_question": "storage retention behavior. Also identify private production deployment configuration credentials owner selected runtime settings.",
+          "query_ids": [
+            "query-original"
+          ],
+          "required_query_ids": [
+            "query-original"
+          ],
+          "public_query_ids": [
+            "query-original"
+          ],
+          "queries": [
+            {
+              "query_id": "query-original",
+              "text": "storage retention behavior. Also identify private production deployment configuration credentials owner selected runtime settings.",
+              "origin": "original",
+              "coverage_required": true,
+              "facet_id": null,
+              "requirement_id": null,
+              "relation": "direct",
+              "public_parent_query_id": null,
+              "preferred_catalog_roles": [],
+              "forbidden_catalog_roles": [],
+              "forbidden_evidence_terms": [],
+              "parent_exact_terms": [],
+              "need_subject": null,
+              "need_relation": null,
+              "need_context": null
+            }
+          ],
+          "explicit_paths": [],
+          "unresolved_parts": [
+            "semantic_scope_unverified"
+          ],
+          "_component_contract": [],
+          "component_scope_complete": false
+        },
+        "context_pack": [
+          {
+            "stable_chunk_id": "child-acd334d5a362efe40eae612ec149a5adfaaca3fc",
+            "parent_logical_id": "parent-388c23e8b4dd2ca774a8cbb6423459cd",
+            "display_content_hash": "59f9d33995af39ce9916a8bc2ab92719a4c0bbd9a0b1222b75bc4483f4f03203",
+            "_source_snapshot_sha256": "sha256:59f9d33995af39ce9916a8bc2ab92719a4c0bbd9a0b1222b75bc4483f4f03203",
+            "_reference_evidence": {
+              "schema_version": 1,
+              "source": {
+                "document_id": "project_file:local:cb9a242ac16e104e5974ef5a7993672d98a3528981d0b9a003e8e5f7efb1000c:docs/guide.md",
+                "scope": {
+                  "project_id": "local:cb9a242ac16e104e5974ef5a7993672d98a3528981d0b9a003e8e5f7efb1000c",
+                  "version": "",
+                  "snapshot_id": "gen-2c46e20dfd9e4bddbc57dcb16838199e"
+                },
+                "canonical_path": "docs/guide.md",
+                "content_sha256": "59f9d33995af39ce9916a8bc2ab92719a4c0bbd9a0b1222b75bc4483f4f03203"
+              },
+              "project_doc_content_hash": "sha256:59f9d33995af39ce9916a8bc2ab92719a4c0bbd9a0b1222b75bc4483f4f03203",
+              "char_start": 0,
+              "char_end": 73,
+              "text": "# Guide\n\nstorage retention behavior is documented in this current guide.\n",
+              "raw_document": "# Guide\n\nstorage retention behavior is documented in this current guide.\n",
+              "owner": {
+                "text": "# Guide\n",
+                "char_start": 0,
+                "char_end": 8,
+                "scope_start": 0,
+                "scope_end": 73,
+                "logical_id": "parent-388c23e8b4dd2ca774a8cbb6423459cd"
+              }
+            },
+            "_reference_root_plan": {
+              "question": "storage retention behavior. Also identify private production deployment configuration credentials owner selected runtime settings.",
+              "references": [],
+              "scope": {
+                "project_id": "local:cb9a242ac16e104e5974ef5a7993672d98a3528981d0b9a003e8e5f7efb1000c",
+                "version": "",
+                "snapshot_id": "gen-2c46e20dfd9e4bddbc57dcb16838199e"
+              },
+              "catalog_complete": true
+            },
+            "_reference_plans": {
+              "storage retention behavior. Also identify private production deployment configuration credentials owner selected runtime settings.": {
+                "question": "storage retention behavior. Also identify private production deployment configuration credentials owner selected runtime settings.",
+                "references": [],
+                "scope": {
+                  "project_id": "local:cb9a242ac16e104e5974ef5a7993672d98a3528981d0b9a003e8e5f7efb1000c",
+                  "version": "",
+                  "snapshot_id": "gen-2c46e20dfd9e4bddbc57dcb16838199e"
+                },
+                "catalog_complete": true
+              }
+            },
+            "_evidence_sets": [
+              {
+                "schema_version": "source-dependency-proposal-v1",
+                "set_id": "evidence-set:daab23dae997f2d9e9aec2beabd7beee1e211f4080e2bbb6680494443107a3cc",
+                "member_spans": [
+                  [
+                    0,
+                    7,
+                    "ca85e859db5c1f8ab39081106a1ccbe7e2a618fac858824eb09033b48ea7ce05"
+                  ],
+                  [
+                    9,
+                    72,
+                    "c3cf768666f0bd7a7bbef7338a6745138a7b7c0c1cd14fa0edfbae3d7e3897de"
+                  ]
+                ],
+                "edges": [
+                  [
+                    "heading",
+                    0,
+                    1,
+                    "markdown-owning-heading-v1"
+                  ]
+                ],
+                "proposed_need_ids": [
+                  "sentence-1"
+                ]
+              }
+            ],
+            "generation_id": "gen-2c46e20dfd9e4bddbc57dcb16838199e",
+            "resolved_version": "",
+            "_source_catalog_hash": "sha256:b9366e1658387043c943be7f03f91f44a6af9d611c90bb6ad473aa65b6e9b96f",
+            "char_start": 0,
+            "char_end": 73,
+            "line_start": 1,
+            "line_end": 3,
+            "source_class": "project_doc",
+            "source_type": "docs",
+            "source_kind": "docs",
+            "authority": "source_of_truth",
+            "risk_flags": [],
+            "doc_scope": "project",
+            "module_id": "",
+            "module_name": null,
+            "module_path": null,
+            "module_type": null,
+            "description": "Pinned documentation source",
+            "catalog_role": "other",
+            "lifecycle_status": "active",
+            "temporal_relevance": "current",
+            "index_freshness": "synchronized",
+            "impact_policy": "track",
+            "project_identity": "local:cb9a242ac16e104e5974ef5a7993672d98a3528981d0b9a003e8e5f7efb1000c",
+            "retrieval_query_ids": [],
+            "retrieval_query_matches": {},
+            "project_ranking": {},
+            "path": "docs/guide.md",
+            "url": null,
+            "title": "Guide",
+            "heading_path": "Guide",
+            "freshness": "current",
+            "why_selected": "selected because it matched repo-owned project documentation for the question",
+            "content": "# Guide\n\nstorage retention behavior is documented in this current guide.\n",
+            "display_text": "# Guide\n\nstorage retention behavior is documented in this current guide.\n",
+            "token_estimate": 18,
+            "source": {
+              "source_class": "project_doc",
+              "source_type": "docs",
+              "source_kind": "docs",
+              "authority": "source_of_truth",
+              "risk_flags": [],
+              "doc_scope": "project",
+              "module_id": "",
+              "module_name": null,
+              "module_path": null,
+              "module_type": null,
+              "description": "Pinned documentation source",
+              "lifecycle_status": "active",
+              "temporal_relevance": "current",
+              "index_freshness": "synchronized",
+              "impact_policy": "track",
+              "project_identity": "local:cb9a242ac16e104e5974ef5a7993672d98a3528981d0b9a003e8e5f7efb1000c",
+              "path": "docs/guide.md",
+              "url": null,
+              "title": "Guide"
+            },
+            "section": {
+              "title": "Guide",
+              "heading_path": "Guide",
+              "freshness": "current"
+            },
+            "snippet": "# Guide\n\nstorage retention behavior is documented in this current guide.\n",
+            "char_span": [
+              0,
+              73
+            ],
+            "origin_lane": "project",
+            "canonical_id": null,
+            "library_id": null,
+            "version": null,
+            "source_provenance": {
+              "owner": "configured_repository",
+              "origin_lane": "project"
+            },
+            "version_exactness": "not_applicable",
+            "repository_authority": "ordinary_repository_document",
+            "instruction_trust": "untrusted_data",
+            "content_boundary": {
+              "role": "cited_document_data",
+              "schema": "docmancer-document-data-v1",
+              "executable_policy": false
+            },
+            "document_data": {
+              "schema": "docmancer-document-data-v1",
+              "instruction_trust": "untrusted_data",
+              "content": "# Guide\n\nstorage retention behavior is documented in this current guide.\n"
+            },
+            "authority_root": null,
+            "policy_scope": null,
+            "scope_verified": false,
+            "instruction_risk_flags": []
+          }
+        ],
+        "lanes": {
+          "project": {
+            "status": "confirmation_required",
+            "source_count": 1,
+            "reason_code": "partial_navigational_context",
+            "next_action": null
+          },
+          "library": {
+            "status": "not_requested",
+            "source_count": 0,
+            "canonical_ids": [],
+            "next_action": null
+          },
+          "dependency": {
+            "status": "not_requested",
+            "source_count": 0,
+            "next_action": null
+          }
+        },
+        "source_summary": {
+          "project": 1,
+          "library": 0,
+          "dependency": 0,
+          "rejected": 0,
+          "risky": 0
+        },
+        "trust_contract": {
+          "schema_version": "trust-contract-1.2",
+          "sources": {
+            "selected": [
+              {
+                "source": {
+                  "source_class": "project_doc",
+                  "source_type": "docs",
+                  "source_kind": "docs",
+                  "authority": "source_of_truth",
+                  "risk_flags": [],
+                  "doc_scope": "project",
+                  "module_id": "",
+                  "module_name": null,
+                  "module_path": null,
+                  "module_type": null,
+                  "description": "Pinned documentation source",
+                  "lifecycle_status": "active",
+                  "temporal_relevance": "current",
+                  "index_freshness": "synchronized",
+                  "impact_policy": "track",
+                  "project_identity": "local:cb9a242ac16e104e5974ef5a7993672d98a3528981d0b9a003e8e5f7efb1000c",
+                  "path": "docs/guide.md",
+                  "url": null,
+                  "title": "Guide"
+                },
+                "doc_scope": "project",
+                "origin_lane": "project",
+                "why_selected": "selected because it matched repo-owned project documentation for the question",
+                "freshness": "current",
+                "version_binding": null,
+                "source_provenance": {
+                  "owner": "configured_repository",
+                  "origin_lane": "project"
+                },
+                "repository_authority": "ordinary_repository_document",
+                "instruction_trust": "untrusted_data",
+                "content_boundary": {
+                  "role": "cited_document_data",
+                  "schema": "docmancer-document-data-v1",
+                  "executable_policy": false
+                },
+                "risk_flags": []
+              }
+            ],
+            "rejected": [],
+            "risky": []
+          },
+          "source_dimensions": [
+            "source_provenance",
+            "version_exactness",
+            "repository_authority",
+            "instruction_trust"
+          ],
+          "policy": {
+            "document_content": "cited_data_never_lifecycle_instruction",
+            "typed_lifecycle_actions_only": true
+          }
+        },
+        "dependency_docs": {},
+        "exact_version": null,
+        "reason_code": "required_evidence_missing",
+        "message": null,
+        "required_one_of": [],
+        "examples": [],
+        "requires_confirmation": true,
+        "confirmation_reason": "repo_write",
+        "next_action": {
+          "action": "create_reviewable_project_doc",
+          "requires_confirmation": true,
+          "preferred_path": "ARCHITECTURE.md",
+          "suggested_paths": [
+            "ARCHITECTURE.md",
+            "README.md",
+            "docs/architecture.md"
+          ],
+          "reason": "Project docs exist, but no high-level architecture or overview document was discovered. Ask the user before creating a reviewable ARCHITECTURE.md file.",
+          "agent_guidance": "If the user approves, inspect the listed evidence, create ARCHITECTURE.md as a normal reviewable file, then use the returned public prepare_docs action before retrying get_docs_context.",
+          "documentation_gap": {
+            "suggested_path": "ARCHITECTURE.md",
+            "required_sections": [
+              {
+                "name": "purpose",
+                "state": "missing",
+                "evidence": [
+                  "manifests",
+                  "root entrypoints"
+                ],
+                "evidence_paths": [],
+                "facts": [],
+                "missing_evidence": [
+                  "manifests",
+                  "root entrypoints"
+                ],
+                "discovery_suggestions": [
+                  "Inspect repository files for manifests; keep the claim unknown if no evidence is found.",
+                  "Inspect repository files for root entrypoints; keep the claim unknown if no evidence is found."
+                ]
+              },
+              {
+                "name": "entrypoints",
+                "state": "missing",
+                "evidence": [
+                  "root entrypoints",
+                  "runtime configuration"
+                ],
+                "evidence_paths": [],
+                "facts": [],
+                "missing_evidence": [
+                  "root entrypoints",
+                  "runtime configuration"
+                ],
+                "discovery_suggestions": [
+                  "Inspect repository files for root entrypoints; keep the claim unknown if no evidence is found.",
+                  "Inspect repository files for runtime configuration; keep the claim unknown if no evidence is found."
+                ]
+              },
+              {
+                "name": "modules",
+                "state": "missing",
+                "evidence": [
+                  "module directories",
+                  "module imports"
+                ],
+                "evidence_paths": [],
+                "facts": [],
+                "missing_evidence": [
+                  "module directories",
+                  "module imports"
+                ],
+                "discovery_suggestions": [
+                  "Inspect repository files for module directories; keep the claim unknown if no evidence is found.",
+                  "Inspect repository files for module imports; keep the claim unknown if no evidence is found."
+                ]
+              },
+              {
+                "name": "runtime flow",
+                "state": "missing",
+                "evidence": [
+                  "entrypoints",
+                  "module imports",
+                  "runtime configuration"
+                ],
+                "evidence_paths": [],
+                "facts": [],
+                "missing_evidence": [
+                  "entrypoints",
+                  "module imports",
+                  "runtime configuration"
+                ],
+                "discovery_suggestions": [
+                  "Inspect repository files for entrypoints; keep the claim unknown if no evidence is found.",
+                  "Inspect repository files for module imports; keep the claim unknown if no evidence is found.",
+                  "Inspect repository files for runtime configuration; keep the claim unknown if no evidence is found."
+                ]
+              },
+              {
+                "name": "development commands",
+                "state": "missing",
+                "evidence": [
+                  "manifests",
+                  "test and build configuration"
+                ],
+                "evidence_paths": [],
+                "facts": [],
+                "missing_evidence": [
+                  "manifests",
+                  "test and build configuration"
+                ],
+                "discovery_suggestions": [
+                  "Inspect repository files for manifests; keep the claim unknown if no evidence is found.",
+                  "Inspect repository files for test and build configuration; keep the claim unknown if no evidence is found."
+                ]
+              }
+            ],
+            "evidence_to_collect": [],
+            "evidence_complete": false,
+            "rules": [
+              "do not invent unsupported facts",
+              "cite repository paths for factual claims",
+              "mark uncertain claims as unknown"
+            ],
+            "missing_evidence": [
+              "manifests",
+              "root entrypoints",
+              "runtime configuration",
+              "module directories",
+              "module imports",
+              "entrypoints",
+              "test and build configuration"
+            ],
+            "bounds": {
+              "max_serialized_bytes": 12288,
+              "serialized_bytes": 3908,
+              "truncated": false,
+              "omitted_counts": {}
+            }
+          },
+          "after_file_change": {
+            "tool": "prepare_docs",
+            "arguments_patch": {
+              "action": "sync_project_docs",
+              "project_path": "/home/viadmin/StudioProjects/hermes/docmancer/v2plan/artifacts/next07/grounded-first/diagnostic-bb81525d-20261004/corpus"
+            }
+          },
+          "after": [
+            {
+              "tool": "prepare_docs",
+              "requires_confirmation": false,
+              "arguments_patch": {
+                "action": "sync_project_docs",
+                "project_path": "/home/viadmin/StudioProjects/hermes/docmancer/v2plan/artifacts/next07/grounded-first/diagnostic-bb81525d-20261004/corpus"
+              }
+            },
+            {
+              "tool": "get_docs_context",
+              "requires_confirmation": false,
+              "arguments_patch": {
+                "project_path": "/home/viadmin/StudioProjects/hermes/docmancer/v2plan/artifacts/next07/grounded-first/diagnostic-bb81525d-20261004/corpus"
+              }
+            }
+          ]
+        },
+        "next_actions": [
+          {
+            "action": "create_reviewable_project_doc",
+            "requires_confirmation": true,
+            "preferred_path": "ARCHITECTURE.md",
+            "suggested_paths": [
+              "ARCHITECTURE.md",
+              "README.md",
+              "docs/architecture.md"
+            ],
+            "reason": "Project docs exist, but no high-level architecture or overview document was discovered. Ask the user before creating a reviewable ARCHITECTURE.md file.",
+            "agent_guidance": "If the user approves, inspect the listed evidence, create ARCHITECTURE.md as a normal reviewable file, then use the returned public prepare_docs action before retrying get_docs_context.",
+            "documentation_gap": {
+              "suggested_path": "ARCHITECTURE.md",
+              "required_sections": [
+                {
+                  "name": "purpose",
+                  "state": "missing",
+                  "evidence": [
+                    "manifests",
+                    "root entrypoints"
+                  ],
+                  "evidence_paths": [],
+                  "facts": [],
+                  "missing_evidence": [
+                    "manifests",
+                    "root entrypoints"
+                  ],
+                  "discovery_suggestions": [
+                    "Inspect repository files for manifests; keep the claim unknown if no evidence is found.",
+                    "Inspect repository files for root entrypoints; keep the claim unknown if no evidence is found."
+                  ]
+                },
+                {
+                  "name": "entrypoints",
+                  "state": "missing",
+                  "evidence": [
+                    "root entrypoints",
+                    "runtime configuration"
+                  ],
+                  "evidence_paths": [],
+                  "facts": [],
+                  "missing_evidence": [
+                    "root entrypoints",
+                    "runtime configuration"
+                  ],
+                  "discovery_suggestions": [
+                    "Inspect repository files for root entrypoints; keep the claim unknown if no evidence is found.",
+                    "Inspect repository files for runtime configuration; keep the claim unknown if no evidence is found."
+                  ]
+                },
+                {
+                  "name": "modules",
+                  "state": "missing",
+                  "evidence": [
+                    "module directories",
+                    "module imports"
+                  ],
+                  "evidence_paths": [],
+                  "facts": [],
+                  "missing_evidence": [
+                    "module directories",
+                    "module imports"
+                  ],
+                  "discovery_suggestions": [
+                    "Inspect repository files for module directories; keep the claim unknown if no evidence is found.",
+                    "Inspect repository files for module imports; keep the claim unknown if no evidence is found."
+                  ]
+                },
+                {
+                  "name": "runtime flow",
+                  "state": "missing",
+                  "evidence": [
+                    "entrypoints",
+                    "module imports",
+                    "runtime configuration"
+                  ],
+                  "evidence_paths": [],
+                  "facts": [],
+                  "missing_evidence": [
+                    "entrypoints",
+                    "module imports",
+                    "runtime configuration"
+                  ],
+                  "discovery_suggestions": [
+                    "Inspect repository files for entrypoints; keep the claim unknown if no evidence is found.",
+                    "Inspect repository files for module imports; keep the claim unknown if no evidence is found.",
+                    "Inspect repository files for runtime configuration; keep the claim unknown if no evidence is found."
+                  ]
+                },
+                {
+                  "name": "development commands",
+                  "state": "missing",
+                  "evidence": [
+                    "manifests",
+                    "test and build configuration"
+                  ],
+                  "evidence_paths": [],
+                  "facts": [],
+                  "missing_evidence": [
+                    "manifests",
+                    "test and build configuration"
+                  ],
+                  "discovery_suggestions": [
+                    "Inspect repository files for manifests; keep the claim unknown if no evidence is found.",
+                    "Inspect repository files for test and build configuration; keep the claim unknown if no evidence is found."
+                  ]
+                }
+              ],
+              "evidence_to_collect": [],
+              "evidence_complete": false,
+              "rules": [
+                "do not invent unsupported facts",
+                "cite repository paths for factual claims",
+                "mark uncertain claims as unknown"
+              ],
+              "missing_evidence": [
+                "manifests",
+                "root entrypoints",
+                "runtime configuration",
+                "module directories",
+                "module imports",
+                "entrypoints",
+                "test and build configuration"
+              ],
+              "bounds": {
+                "max_serialized_bytes": 12288,
+                "serialized_bytes": 3908,
+                "truncated": false,
+                "omitted_counts": {}
+              }
+            },
+            "after_file_change": {
+              "tool": "prepare_docs",
+              "arguments_patch": {
+                "action": "sync_project_docs",
+                "project_path": "/home/viadmin/StudioProjects/hermes/docmancer/v2plan/artifacts/next07/grounded-first/diagnostic-bb81525d-20261004/corpus"
+              }
+            },
+            "after": [
+              {
+                "tool": "prepare_docs",
+                "requires_confirmation": false,
+                "arguments_patch": {
+                  "action": "sync_project_docs",
+                  "project_path": "/home/viadmin/StudioProjects/hermes/docmancer/v2plan/artifacts/next07/grounded-first/diagnostic-bb81525d-20261004/corpus"
+                }
+              },
+              {
+                "tool": "get_docs_context",
+                "requires_confirmation": false,
+                "arguments_patch": {
+                  "project_path": "/home/viadmin/StudioProjects/hermes/docmancer/v2plan/artifacts/next07/grounded-first/diagnostic-bb81525d-20261004/corpus"
+                }
+              }
+            ]
+          },
+          {
+            "action": "search_project_sources",
+            "tool": "code_search",
+            "type": "search_local_source",
+            "handled_by": "coding_agent",
+            "requires_confirmation": false,
+            "repeat_docs_context": false,
+            "auto_execute": false,
+            "reason": "Selected docs are partial/navigational; exact story-specific terms are missing from source-backed snippets.",
+            "query_terms": [
+              "identify",
+              "private",
+              "production",
+              "deployment",
+              "configuration"
+            ],
+            "suggested_doc_paths": [
+              "docs/guide.md"
+            ],
+            "suggested_symbols": [
+              "docs/guide.md",
+              "guide.md"
+            ],
+            "suggested_layers": []
+          }
+        ],
+        "arguments_patch": {
+          "project_path": "/home/viadmin/StudioProjects/hermes/docmancer/v2plan/artifacts/next07/grounded-first/diagnostic-bb81525d-20261004/corpus"
+        },
+        "warnings": [],
+        "response_style": "evidence-first",
+        "primary_snippet": null,
+        "supporting_snippets": [],
+        "primary_snippets": [],
+        "primary_snippet_confidence": null,
+        "primary_snippet_selection_reason": null,
+        "primary_snippet_alternatives": [],
+        "snippet_metrics": {
+          "candidates_found": 0,
+          "usable_candidates": 0,
+          "primary_selected": false,
+          "supporting_selected": 0,
+          "duplicates_dropped": 0,
+          "noise_dropped": 0,
+          "truncations": 0,
+          "primary_language": null,
+          "primary_lane": null,
+          "primary_source_correct": null,
+          "primary_exact_version_match": null,
+          "primary_snippet_confidence": null,
+          "primary_snippet_alternatives": 0,
+          "snippet_first_applied": false,
+          "requested_response_style": "auto"
+        },
+        "presentation": {
+          "project_constraints_count": 1,
+          "primary_snippet_lane": null,
+          "project_evidence_primary": true
+        },
+        "metrics": {
+          "context_pack_items": 1,
+          "snippet_metrics": {
+            "candidates_found": 0,
+            "usable_candidates": 0,
+            "primary_selected": false,
+            "supporting_selected": 0,
+            "duplicates_dropped": 0,
+            "noise_dropped": 0,
+            "truncations": 0,
+            "primary_language": null,
+            "primary_lane": null,
+            "primary_source_correct": null,
+            "primary_exact_version_match": null,
+            "primary_snippet_confidence": null,
+            "primary_snippet_alternatives": 0,
+            "snippet_first_applied": false,
+            "requested_response_style": "auto"
+          }
+        },
+        "contamination": {
+          "detected": false,
+          "dropped_count": 0,
+          "reason_codes": []
+        },
+        "deduplication": {
+          "dropped_count": 0,
+          "reason_codes": []
+        },
+        "lane_details": {},
+        "ingestion_diagnostics": {
+          "project": {
+            "query_intent": "how_to",
+            "retrieval_routing": {
+              "schema_version": 2,
+              "intent": "docs",
+              "stages": {
+                "project_docs": {
+                  "status": "used",
+                  "reason": "selected project documentation mode",
+                  "item_count": 1,
+                  "budget_projection_bytes": 242,
+                  "estimated_tokens": 61,
+                  "observed_item_count": 1,
+                  "observed_budget_projection_bytes": 242,
+                  "budget_exceeded": false
+                },
+                "dependency_docs": {
+                  "status": "skipped",
+                  "reason": "dependency documentation not selected or not available",
+                  "item_count": 0,
+                  "budget_projection_bytes": 0,
+                  "estimated_tokens": 0,
+                  "observed_item_count": 0,
+                  "observed_budget_projection_bytes": 0,
+                  "budget_exceeded": false
+                },
+                "source_evidence": {
+                  "status": "skipped",
+                  "reason": "complete documentation/API intent does not require source evidence",
+                  "item_count": 0,
+                  "budget_projection_bytes": 0,
+                  "estimated_tokens": 0,
+                  "observed_item_count": 0,
+                  "observed_budget_projection_bytes": 0,
+                  "budget_exceeded": false
+                },
+                "repo_map": {
+                  "status": "insufficient",
+                  "reason": "missing project documentation requires bounded authoring evidence",
+                  "item_count": 0,
+                  "budget_projection_bytes": 0,
+                  "estimated_tokens": 0,
+                  "observed_item_count": 0,
+                  "observed_budget_projection_bytes": 0,
+                  "budget_exceeded": false
+                },
+                "code_graph": {
+                  "status": "insufficient",
+                  "reason": "missing project documentation requires bounded module evidence",
+                  "item_count": 0,
+                  "budget_projection_bytes": 0,
+                  "estimated_tokens": 0,
+                  "observed_item_count": 0,
+                  "observed_budget_projection_bytes": 0,
+                  "budget_exceeded": false
+                }
+              },
+              "budget_projection_bytes": 242,
+              "model_visible_bytes": 0
+            },
+            "same_call_pipeline": {
+              "planned_query_ids": [
+                "query-original"
+              ],
+              "retrieved_candidates": [
+                {
+                  "stable_chunk_id": "child-acd334d5a362efe40eae612ec149a5adfaaca3fc",
+                  "document_id": "/home/viadmin/StudioProjects/hermes/docmancer/v2plan/artifacts/next07/grounded-first/diagnostic-bb81525d-20261004/corpus/docs/guide.md",
+                  "parent_logical_id": "parent-388c23e8b4dd2ca774a8cbb6423459cd"
+                },
+                {
+                  "stable_chunk_id": "child-acd334d5a362efe40eae612ec149a5adfaaca3fc",
+                  "document_id": "/home/viadmin/StudioProjects/hermes/docmancer/v2plan/artifacts/next07/grounded-first/diagnostic-bb81525d-20261004/corpus/docs/guide.md",
+                  "parent_logical_id": "parent-388c23e8b4dd2ca774a8cbb6423459cd"
+                }
+              ],
+              "qualification_outcomes": [
+                {
+                  "stable_chunk_id": "child-acd334d5a362efe40eae612ec149a5adfaaca3fc",
+                  "document_id": "/home/viadmin/StudioProjects/hermes/docmancer/v2plan/artifacts/next07/grounded-first/diagnostic-bb81525d-20261004/corpus/docs/guide.md",
+                  "parent_logical_id": "parent-388c23e8b4dd2ca774a8cbb6423459cd",
+                  "query_id": "query-original",
+                  "outcome": "rejected",
+                  "reason": "insufficient_visible_match"
+                },
+                {
+                  "stable_chunk_id": "child-acd334d5a362efe40eae612ec149a5adfaaca3fc",
+                  "document_id": "/home/viadmin/StudioProjects/hermes/docmancer/v2plan/artifacts/next07/grounded-first/diagnostic-bb81525d-20261004/corpus/docs/guide.md",
+                  "parent_logical_id": "parent-388c23e8b4dd2ca774a8cbb6423459cd",
+                  "query_id": "query-original",
+                  "outcome": "rejected",
+                  "reason": "insufficient_visible_match"
+                }
+              ]
+            },
+            "active_index": {
+              "project_path": "/home/viadmin/StudioProjects/hermes/docmancer/v2plan/artifacts/next07/grounded-first/diagnostic-bb81525d-20261004/corpus",
+              "db_path": "/home/viadmin/StudioProjects/hermes/docmancer/v2plan/artifacts/next07/grounded-first/diagnostic-bb81525d-20261004/state/index.db",
+              "db_exists": true,
+              "index_state": "available",
+              "index_ownership": "project_owned",
+              "extracted_dir": "v2plan/artifacts/next07/grounded-first/diagnostic-bb81525d-20261004/state/extracted",
+              "config_source": "explicit",
+              "config_path": null,
+              "retrieval_mode": "lexical",
+              "docatlas_home": "v2plan/artifacts/next07/grounded-first/diagnostic-bb81525d-20261004/state/docatlas_home",
+              "index_counts": {
+                "sources": 1,
+                "sections": 1
+              },
+              "project_index_counts": {
+                "sources": 1,
+                "sections": 1
+              },
+              "shared_index_counts": {
+                "sources": 1,
+                "sections": 1
+              },
+              "warnings": [],
+              "vector_readiness": {
+                "status": "not_required",
+                "mode": "lexical"
+              },
+              "project_local_config": {
+                "present": false
+              }
+            },
+            "relevance_gate": {
+              "passed": true,
+              "reason": "weighted_relevance_sufficient",
+              "required_terms": [
+                "storage",
+                "retention",
+                "behavior",
+                "identify",
+                "private",
+                "production",
+                "deployment",
+                "configuration"
+              ],
+              "matched_terms": [
+                "storage",
+                "retention",
+                "behavior"
+              ],
+              "missing_terms": [
+                "identify",
+                "private",
+                "production",
+                "deployment",
+                "configuration"
+              ],
+              "matched_details": [
+                {
+                  "term": "storage",
+                  "weight": 3.0,
+                  "fields": [
+                    "content"
+                  ]
+                },
+                {
+                  "term": "retention",
+                  "weight": 3.0,
+                  "fields": [
+                    "content"
+                  ]
+                },
+                {
+                  "term": "behavior",
+                  "weight": 3.0,
+                  "fields": [
+                    "content"
+                  ]
+                }
+              ],
+              "weighted_score": 9.0,
+              "matched_term_count": 3,
+              "required_term_count": 8
+            },
+            "trust_decision": {
+              "answer_available": false,
+              "reason": "partial_navigational_context",
+              "confidence": "partial",
+              "passed_relevance_gate": true,
+              "max_project_score": 1.4,
+              "query_terms_matched": [
+                "storage",
+                "retention",
+                "behavior"
+              ],
+              "query_terms_missing": [
+                "identify",
+                "private",
+                "production",
+                "deployment",
+                "configuration"
+              ]
+            }
+          }
+        },
+        "retrieval_diagnostics": {},
+        "retrieval_routing": {
+          "schema_version": 2,
+          "intent": "docs",
+          "stages": {
+            "project_docs": {
+              "status": "used",
+              "reason": "selected project documentation mode",
+              "item_count": 1,
+              "budget_projection_bytes": 242,
+              "estimated_tokens": 61,
+              "observed_item_count": 1,
+              "observed_budget_projection_bytes": 242,
+              "budget_exceeded": false
+            },
+            "dependency_docs": {
+              "status": "skipped",
+              "reason": "dependency documentation not selected or not available",
+              "item_count": 0,
+              "budget_projection_bytes": 0,
+              "estimated_tokens": 0,
+              "observed_item_count": 0,
+              "observed_budget_projection_bytes": 0,
+              "budget_exceeded": false
+            },
+            "source_evidence": {
+              "status": "skipped",
+              "reason": "complete documentation/API intent does not require source evidence",
+              "item_count": 0,
+              "budget_projection_bytes": 0,
+              "estimated_tokens": 0,
+              "observed_item_count": 0,
+              "observed_budget_projection_bytes": 0,
+              "budget_exceeded": false
+            },
+            "repo_map": {
+              "status": "insufficient",
+              "reason": "missing project documentation requires bounded authoring evidence",
+              "item_count": 0,
+              "budget_projection_bytes": 0,
+              "estimated_tokens": 0,
+              "observed_item_count": 0,
+              "observed_budget_projection_bytes": 0,
+              "budget_exceeded": false
+            },
+            "code_graph": {
+              "status": "insufficient",
+              "reason": "missing project documentation requires bounded module evidence",
+              "item_count": 0,
+              "budget_projection_bytes": 0,
+              "estimated_tokens": 0,
+              "observed_item_count": 0,
+              "observed_budget_projection_bytes": 0,
+              "budget_exceeded": false
+            }
+          },
+          "budget_projection_bytes": 242,
+          "model_visible_bytes": 0
+        },
+        "requirements": {
+          "requirements": [],
+          "required_entities": [],
+          "required_facets": [],
+          "query_extraction_provenance": [],
+          "query_requirement_spans": [],
+          "retrieval_hints": [
+            "Also",
+            "storage",
+            "retention",
+            "behavior",
+            "identify",
+            "private",
+            "production",
+            "deployment",
+            "configuration",
+            "credentials",
+            "owner",
+            "selected",
+            "runtime",
+            "settings"
+          ],
+          "concept_queries": [],
+          "answer_contract_hash": "131395c05f6bf74505f4836962b7a8df09193f76be5f084a38e8799b5ebd10db",
+          "lifecycle_intent": "current",
+          "parse_trace": [
+            "fallback:generic_project_terms"
+          ],
+          "unresolved_parts": [
+            "unsupported_query:generic_free_form_relation"
+          ],
+          "component_scope_complete": false
+        },
+        "decision": "insufficient_evidence",
+        "evidence_coverage": 1.0,
+        "requirements_hash": "2a741d07657546a1b4275341875e1d02422222a8d7f2e04faa77196fd8a7e22b",
+        "selector_config_hash": "23cf8aa2f77c1b7e9b9d00819a1d05c14e198272ad91516b5a75c5f641963edd",
+        "eligibility_contract_hash": "9029235a905a4a9995b051224b705bb7a307a7d5894cce2b361a10da5b0ffbd8",
+        "candidate_trace_hash": "f7c77159a9a788b9798b9b3e2729c8d27f82a3a4336b507e7a6e0b8a38bbf1e7",
+        "selection_hash": "1eac41d7dc34a794383b5401d57e81e69e4f28f12142cb123212701a0faaf782",
+        "document_content_policy": {
+          "role": "cited_untrusted_document_data",
+          "actionable": false,
+          "actions_source": "typed_top_level_fields_only"
+        },
+        "documentation_supported": false,
+        "investigation_allowed": true,
+        "hard_stop": false,
+        "recovery_origin": "operational",
+        "recovery_reason_code": "operational_recovery_precedence",
+        "recovery_disposition": "use_operational_recovery",
+        "_source_continuation_project_root": "/home/viadmin/StudioProjects/hermes/docmancer/v2plan/artifacts/next07/grounded-first/diagnostic-bb81525d-20261004/corpus"
+      },
+      "after_projection": {
+        "tool": "get_docs_context",
+        "status": "partial_success",
+        "question": "storage retention behavior. Also identify private production deployment configuration credentials owner selected runtime settings.",
+        "mode_requested": "auto",
+        "mode_selected": "project",
+        "routing": {
+          "reason_code": "project_context_auto",
+          "project_path_used": true,
+          "libraries_requested": [],
+          "dependency_detected": false,
+          "delegated_mode": "auto",
+          "evidence_scopes": [
+            "project"
+          ]
+        },
+        "answer_available": false,
+        "context_available": true,
+        "answer_supported": false,
+        "support_status": "insufficient_evidence",
+        "missing_requirement_ids": [
+          "project_answer_requirement",
+          "unsupported_answer_authorization:unresolved_query"
+        ],
+        "satisfied_requirement_ids": [],
+        "mandatory_requirement_ids": [],
+        "mandatory_coverage": 1.0,
+        "selected_evidence_ids": [],
+        "decision_hash": "b44009a5c55661773a1e1eead7a0c95e34e3bbde78c6fed502da9842fd8fa6b6",
+        "assignment_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "selection_decision": {
+          "status": "insufficient_evidence",
+          "selected_candidates": [
+            {
+              "stable_id": "child-acd334d5a362efe40eae612ec149a5adfaaca3fc",
+              "evidence_id": "",
+              "hydration_id": null,
+              "identity_kind": "stable_child",
+              "source_identity": "docs/guide.md",
+              "identity_aliases": [
+                "docs/guide.md",
+                "{'source_class': 'project_doc', 'source_type': 'docs', 'source_kind': 'docs', 'authority': 'source_of_truth', 'risk_flags': [], 'doc_scope': 'project', 'module_id': '', 'module_name': none, 'module_path': none, 'module_type': none, 'description': 'pinned documentation source', 'lifecycle_status': 'active', 'temporal_relevance': 'current', 'index_freshness': 'synchronized', 'impact_policy': 'track', 'project_identity': 'local:cb9a242ac16e104e5974ef5a7993672d98a3528981d0b9a003e8e5f7efb1000c', 'path': 'docs/guide.md', 'url': none, 'title': 'guide'}"
+              ],
+              "path_or_url": "docs/guide.md",
+              "section": "Guide",
+              "parent_logical_id": "parent-388c23e8b4dd2ca774a8cbb6423459cd",
+              "content_sha256": "59f9d33995af39ce9916a8bc2ab92719a4c0bbd9a0b1222b75bc4483f4f03203",
+              "display_text": "# Guide\n\nstorage retention behavior is documented in this current guide.\n",
+              "projected_text": "# Guide\n\nstorage retention behavior is documented in this current guide.\n",
+              "token_estimate": 19,
+              "fit_token_estimate": 99,
+              "reported_token_estimate": 18,
+              "char_start": 0,
+              "char_end": 73,
+              "line_start": 1,
+              "line_end": 3,
+              "retrieval_rank": 10000,
+              "component_ranks": [],
+              "relevance_millis": 0,
+              "authority": "canonical",
+              "source_class": "project_doc",
+              "version_binding": "not_applicable",
+              "resolved_version": "",
+              "docs_snapshot_exact": null,
+              "project_identity": "local:cb9a242ac16e104e5974ef5a7993672d98a3528981d0b9a003e8e5f7efb1000c",
+              "module_id": "",
+              "doc_scope": "project",
+              "symbols": [],
+              "exact_terms": [],
+              "instruction_risk_flags": [],
+              "freshness": "current",
+              "navigation_only": false,
+              "answer_units": [
+                {
+                  "unit_id": "unit-0e00cf397941953791bb",
+                  "kind": "heading_context",
+                  "text": "# Guide\n\nstorage retention behavior is documented in this current guide.",
+                  "char_start": 0,
+                  "char_end": 72,
+                  "content_sha256": "cee3fcae1eba0eb27efa9659d7085b25e59f3be7231a42303edf7769169bb149",
+                  "proposition": true,
+                  "source_field": null
+                },
+                {
+                  "unit_id": "unit-3b73ad14beeaf2b35ce6",
+                  "kind": "sentence",
+                  "text": "storage retention behavior is documented in this current guide.",
+                  "char_start": 9,
+                  "char_end": 72,
+                  "content_sha256": "c3cf768666f0bd7a7bbef7338a6745138a7b7c0c1cd14fa0edfbae3d7e3897de",
+                  "proposition": true,
+                  "source_field": null
+                },
+                {
+                  "unit_id": "unit-b3d5ace26f4885d65c56",
+                  "kind": "source_field",
+                  "text": "docs/guide.md",
+                  "char_start": null,
+                  "char_end": null,
+                  "content_sha256": "07fdd026b11c494c3b62c97f764f6939803c453389ebefd6b05e6f187d44859a",
+                  "proposition": true,
+                  "source_field": "path_or_url"
+                },
+                {
+                  "unit_id": "unit-36126def7d5426292e63",
+                  "kind": "source_field",
+                  "text": "Guide",
+                  "char_start": null,
+                  "char_end": null,
+                  "content_sha256": "8dd65d0952ed144ccf6e76ebf8aa45644afb2b9236762c414d07e813d42f588e",
+                  "proposition": true,
+                  "source_field": "section"
+                }
+              ],
+              "requirement_witnesses": [],
+              "covered_requirement_ids": [],
+              "original": {
+                "stable_chunk_id": "child-acd334d5a362efe40eae612ec149a5adfaaca3fc",
+                "parent_logical_id": "parent-388c23e8b4dd2ca774a8cbb6423459cd",
+                "display_content_hash": "59f9d33995af39ce9916a8bc2ab92719a4c0bbd9a0b1222b75bc4483f4f03203",
+                "_source_snapshot_sha256": "sha256:59f9d33995af39ce9916a8bc2ab92719a4c0bbd9a0b1222b75bc4483f4f03203",
+                "_reference_evidence": {
+                  "schema_version": 1,
+                  "source": {
+                    "document_id": "project_file:local:cb9a242ac16e104e5974ef5a7993672d98a3528981d0b9a003e8e5f7efb1000c:docs/guide.md",
+                    "scope": {
+                      "project_id": "local:cb9a242ac16e104e5974ef5a7993672d98a3528981d0b9a003e8e5f7efb1000c",
+                      "version": "",
+                      "snapshot_id": "gen-2c46e20dfd9e4bddbc57dcb16838199e"
+                    },
+                    "canonical_path": "docs/guide.md",
+                    "content_sha256": "59f9d33995af39ce9916a8bc2ab92719a4c0bbd9a0b1222b75bc4483f4f03203"
+                  },
+                  "project_doc_content_hash": "sha256:59f9d33995af39ce9916a8bc2ab92719a4c0bbd9a0b1222b75bc4483f4f03203",
+                  "char_start": 0,
+                  "char_end": 73,
+                  "text": "# Guide\n\nstorage retention behavior is documented in this current guide.\n",
+                  "raw_document": "# Guide\n\nstorage retention behavior is documented in this current guide.\n",
+                  "owner": {
+                    "text": "# Guide\n",
+                    "char_start": 0,
+                    "char_end": 8,
+                    "scope_start": 0,
+                    "scope_end": 73,
+                    "logical_id": "parent-388c23e8b4dd2ca774a8cbb6423459cd"
+                  }
+                },
+                "_reference_root_plan": {
+                  "question": "storage retention behavior. Also identify private production deployment configuration credentials owner selected runtime settings.",
+                  "references": [],
+                  "scope": {
+                    "project_id": "local:cb9a242ac16e104e5974ef5a7993672d98a3528981d0b9a003e8e5f7efb1000c",
+                    "version": "",
+                    "snapshot_id": "gen-2c46e20dfd9e4bddbc57dcb16838199e"
+                  },
+                  "catalog_complete": true
+                },
+                "_reference_plans": {
+                  "storage retention behavior. Also identify private production deployment configuration credentials owner selected runtime settings.": {
+                    "question": "storage retention behavior. Also identify private production deployment configuration credentials owner selected runtime settings.",
+                    "references": [],
+                    "scope": {
+                      "project_id": "local:cb9a242ac16e104e5974ef5a7993672d98a3528981d0b9a003e8e5f7efb1000c",
+                      "version": "",
+                      "snapshot_id": "gen-2c46e20dfd9e4bddbc57dcb16838199e"
+                    },
+                    "catalog_complete": true
+                  }
+                },
+                "_evidence_sets": [
+                  {
+                    "schema_version": "source-dependency-proposal-v1",
+                    "set_id": "evidence-set:daab23dae997f2d9e9aec2beabd7beee1e211f4080e2bbb6680494443107a3cc",
+                    "member_spans": [
+                      [
+                        0,
+                        7,
+                        "ca85e859db5c1f8ab39081106a1ccbe7e2a618fac858824eb09033b48ea7ce05"
+                      ],
+                      [
+                        9,
+                        72,
+                        "c3cf768666f0bd7a7bbef7338a6745138a7b7c0c1cd14fa0edfbae3d7e3897de"
+                      ]
+                    ],
+                    "edges": [
+                      [
+                        "heading",
+                        0,
+                        1,
+                        "markdown-owning-heading-v1"
+                      ]
+                    ],
+                    "proposed_need_ids": [
+                      "sentence-1"
+                    ]
+                  }
+                ],
+                "generation_id": "gen-2c46e20dfd9e4bddbc57dcb16838199e",
+                "resolved_version": "",
+                "_source_catalog_hash": "sha256:b9366e1658387043c943be7f03f91f44a6af9d611c90bb6ad473aa65b6e9b96f",
+                "char_start": 0,
+                "char_end": 73,
+                "line_start": 1,
+                "line_end": 3,
+                "source_class": "project_doc",
+                "source_type": "docs",
+                "source_kind": "docs",
+                "authority": "source_of_truth",
+                "risk_flags": [],
+                "doc_scope": "project",
+                "module_id": "",
+                "module_name": null,
+                "module_path": null,
+                "module_type": null,
+                "description": "Pinned documentation source",
+                "catalog_role": "other",
+                "lifecycle_status": "active",
+                "temporal_relevance": "current",
+                "index_freshness": "synchronized",
+                "impact_policy": "track",
+                "project_identity": "local:cb9a242ac16e104e5974ef5a7993672d98a3528981d0b9a003e8e5f7efb1000c",
+                "retrieval_query_ids": [],
+                "retrieval_query_matches": {
+                  "query-original": {
+                    "mode": "or_fallback",
+                    "query_terms": [
+                      "storage",
+                      "retention",
+                      "behavior",
+                      "also",
+                      "identify",
+                      "private",
+                      "production",
+                      "deployment",
+                      "configuration",
+                      "credentials",
+                      "owner",
+                      "selected",
+                      "runtime",
+                      "settings"
+                    ],
+                    "matched_terms": [
+                      "storage",
+                      "retention",
+                      "behavior"
+                    ],
+                    "exact_terms": [],
+                    "missing_exact_terms": [],
+                    "query_term_count": 14,
+                    "matched_term_count": 3,
+                    "match_ratio": 0.2143,
+                    "bm25_cost": -4.125e-06,
+                    "lexical_score": 4.125e-06,
+                    "field_matches": {
+                      "title": [],
+                      "body": [
+                        "storage",
+                        "retention",
+                        "behavior"
+                      ],
+                      "retrieval_text": [
+                        "storage",
+                        "retention",
+                        "behavior"
+                      ]
+                    },
+                    "bound_subjects": [],
+                    "retrieval_anchors": [],
+                    "query_text": "storage retention behavior. Also identify private production deployment configuration credentials owner selected runtime settings.",
+                    "query_origin": "original",
+                    "relation": "direct",
+                    "public_parent_query_id": null,
+                    "preferred_catalog_roles": [],
+                    "forbidden_catalog_roles": [],
+                    "forbidden_evidence_terms": [],
+                    "parent_exact_terms": [],
+                    "need_subject": null,
+                    "need_relation": null,
+                    "need_context": null,
+                    "reference_body_query": "storage retention behavior. Also identify private production deployment configuration credentials owner selected runtime settings.",
+                    "bound_subject_context": "# Guide\n",
+                    "reference_bindings": [],
+                    "reference_visible_span": [
+                      0,
+                      72
+                    ],
+                    "body_matched_terms": [
+                      "storage",
+                      "retention",
+                      "behavior"
+                    ],
+                    "heading_context_used": false,
+                    "table_context_used": false,
+                    "missing_parent_exact_terms": [],
+                    "qualified": false,
+                    "qualification_reason": "insufficient_visible_match",
+                    "coverage_kinds": []
+                  }
+                },
+                "project_ranking": {
+                  "query_intent": "how_to",
+                  "base_score": 1.0,
+                  "final_score": 1.4,
+                  "original_rank": 0,
+                  "selected_rank": 1,
+                  "source_weight_reason": "boosted as practical implementation/usage evidence for the how-to query",
+                  "requirement_reason": null,
+                  "selected_by": "ranking",
+                  "diversity_relaxed": false,
+                  "reasons": [
+                    "boosted as practical implementation/usage evidence for the how-to query"
+                  ]
+                },
+                "path": "docs/guide.md",
+                "url": null,
+                "title": "Guide",
+                "heading_path": "Guide",
+                "freshness": "current",
+                "why_selected": "selected because it matched repo-owned project documentation for the question; boosted as practical implementation/usage evidence for the how-to query",
+                "content": "# Guide\n\nstorage retention behavior is documented in this current guide.\n",
+                "display_text": "# Guide\n\nstorage retention behavior is documented in this current guide.\n",
+                "token_estimate": 18,
+                "source": {
+                  "source_class": "project_doc",
+                  "source_type": "docs",
+                  "source_kind": "docs",
+                  "authority": "source_of_truth",
+                  "risk_flags": [],
+                  "doc_scope": "project",
+                  "module_id": "",
+                  "module_name": null,
+                  "module_path": null,
+                  "module_type": null,
+                  "description": "Pinned documentation source",
+                  "lifecycle_status": "active",
+                  "temporal_relevance": "current",
+                  "index_freshness": "synchronized",
+                  "impact_policy": "track",
+                  "project_identity": "local:cb9a242ac16e104e5974ef5a7993672d98a3528981d0b9a003e8e5f7efb1000c",
+                  "path": "docs/guide.md",
+                  "url": null,
+                  "title": "Guide"
+                },
+                "section": {
+                  "title": "Guide",
+                  "heading_path": "Guide",
+                  "freshness": "current"
+                },
+                "source_provenance": {
+                  "owner": "configured_repository",
+                  "origin_lane": null
+                },
+                "version_exactness": "not_applicable",
+                "repository_authority": "ordinary_repository_document",
+                "instruction_trust": "untrusted_data",
+                "content_boundary": {
+                  "role": "cited_document_data",
+                  "schema": "docmancer-document-data-v1",
+                  "executable_policy": false
+                },
+                "document_data": {
+                  "schema": "docmancer-document-data-v1",
+                  "instruction_trust": "untrusted_data",
+                  "content": "# Guide\n\nstorage retention behavior is documented in this current guide.\n"
+                },
+                "authority_root": null,
+                "policy_scope": null,
+                "scope_verified": false,
+                "instruction_risk_flags": []
+              }
+            }
+          ],
+          "omissions": [],
+          "missing_requirements": [
+            "project_answer_requirement",
+            "unsupported_answer_authorization:unresolved_query"
+          ],
+          "unresolved_conflicts": [],
+          "metrics": {
+            "candidate_count": 1,
+            "eligible_count": 1,
+            "selected_count": 1,
+            "selected_sources": 1,
+            "selected_documents": 1,
+            "max_documents": 3,
+            "max_spans": 6,
+            "selected_tokens": 19,
+            "wrapper_reserve_tokens": 120,
+            "projected_total_tokens": 139,
+            "serialized_projected_tokens": 449,
+            "hard_tokens": 800,
+            "mandatory_requirements": 0,
+            "mandatory_covered": 0,
+            "mandatory_coverage_millis": 0,
+            "requirements_hash": "2a741d07657546a1b4275341875e1d02422222a8d7f2e04faa77196fd8a7e22b",
+            "omission_counts": {},
+            "selected_parents": 1,
+            "selected_children": 1,
+            "required_facts_per_1000_tokens_millis": 0,
+            "redundant_visible_token_ratio_millis": 0,
+            "cache": "disabled",
+            "selected_feature_trace": [
+              {
+                "stable_id": "child-acd334d5a362efe40eae612ec149a5adfaaca3fc",
+                "retrieval_relevance": 0,
+                "exact_term_coverage": 0,
+                "mandatory_requirement_coverage": 0,
+                "authority": 1000,
+                "version_exactness": 0,
+                "usable_snippet": 1000,
+                "new_source_fact_terms": 8,
+                "new_module_coverage": 0,
+                "new_target_symbols": 0,
+                "new_source": 1,
+                "novelty_millis": 1000,
+                "token_cost": 19,
+                "expansion_cost": 0,
+                "stale_risk": 0,
+                "generic_source_penalty": 0,
+                "ambiguity_penalty": 0
+              }
+            ],
+            "candidate_to_selected_ratio_millis": 1000,
+            "reported_token_mismatches": 1
+          },
+          "selector_config_hash": "23cf8aa2f77c1b7e9b9d00819a1d05c14e198272ad91516b5a75c5f641963edd",
+          "eligibility_contract_hash": "9029235a905a4a9995b051224b705bb7a307a7d5894cce2b361a10da5b0ffbd8",
+          "candidate_trace_hash": "f7c77159a9a788b9798b9b3e2729c8d27f82a3a4336b507e7a6e0b8a38bbf1e7",
+          "selection_hash": "1eac41d7dc34a794383b5401d57e81e69e4f28f12142cb123212701a0faaf782",
+          "assignments": [],
+          "support_decision": {
+            "answer_supported": false,
+            "support_status": "insufficient_evidence",
+            "reason_code": "required_evidence_missing",
+            "missing_requirement_ids": [
+              "project_answer_requirement",
+              "unsupported_answer_authorization:unresolved_query"
+            ],
+            "satisfied_requirement_ids": [],
+            "mandatory_requirement_ids": [],
+            "mandatory_coverage": 1.0,
+            "selected_evidence_ids": [],
+            "requirements_hash": "2a741d07657546a1b4275341875e1d02422222a8d7f2e04faa77196fd8a7e22b",
+            "selector_config_hash": "23cf8aa2f77c1b7e9b9d00819a1d05c14e198272ad91516b5a75c5f641963edd",
+            "eligibility_contract_hash": "9029235a905a4a9995b051224b705bb7a307a7d5894cce2b361a10da5b0ffbd8",
+            "candidate_trace_hash": "f7c77159a9a788b9798b9b3e2729c8d27f82a3a4336b507e7a6e0b8a38bbf1e7",
+            "selection_hash": "1eac41d7dc34a794383b5401d57e81e69e4f28f12142cb123212701a0faaf782",
+            "assignment_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "decision_hash": "b44009a5c55661773a1e1eead7a0c95e34e3bbde78c6fed502da9842fd8fa6b6",
+            "requirements": {
+              "requirements": [],
+              "required_entities": [],
+              "required_facets": [],
+              "query_extraction_provenance": [],
+              "query_requirement_spans": [],
+              "retrieval_hints": [
+                "Also",
+                "storage",
+                "retention",
+                "behavior",
+                "identify",
+                "private",
+                "production",
+                "deployment",
+                "configuration",
+                "credentials",
+                "owner",
+                "selected",
+                "runtime",
+                "settings"
+              ],
+              "concept_queries": [],
+              "answer_contract_hash": "131395c05f6bf74505f4836962b7a8df09193f76be5f084a38e8799b5ebd10db",
+              "lifecycle_intent": "current",
+              "parse_trace": [
+                "fallback:generic_project_terms"
+              ],
+              "unresolved_parts": [
+                "unsupported_query:generic_free_form_relation"
+              ],
+              "component_scope_complete": false
+            }
+          },
+          "requirements": {
+            "requirements": [],
+            "required_entities": [],
+            "required_facets": [],
+            "query_extraction_provenance": [],
+            "query_requirement_spans": [],
+            "retrieval_hints": [
+              "Also",
+              "storage",
+              "retention",
+              "behavior",
+              "identify",
+              "private",
+              "production",
+              "deployment",
+              "configuration",
+              "credentials",
+              "owner",
+              "selected",
+              "runtime",
+              "settings"
+            ],
+            "concept_queries": [],
+            "answer_contract_hash": "131395c05f6bf74505f4836962b7a8df09193f76be5f084a38e8799b5ebd10db",
+            "lifecycle_intent": "current",
+            "parse_trace": [
+              "fallback:generic_project_terms"
+            ],
+            "unresolved_parts": [
+              "unsupported_query:generic_free_form_relation"
+            ],
+            "component_scope_complete": false
+          }
+        },
+        "support_decision": {
+          "answer_supported": false,
+          "support_status": "insufficient_evidence",
+          "reason_code": "required_evidence_missing",
+          "missing_requirement_ids": [
+            "project_answer_requirement",
+            "unsupported_answer_authorization:unresolved_query"
+          ],
+          "satisfied_requirement_ids": [],
+          "mandatory_requirement_ids": [],
+          "mandatory_coverage": 1.0,
+          "selected_evidence_ids": [],
+          "requirements_hash": "2a741d07657546a1b4275341875e1d02422222a8d7f2e04faa77196fd8a7e22b",
+          "selector_config_hash": "23cf8aa2f77c1b7e9b9d00819a1d05c14e198272ad91516b5a75c5f641963edd",
+          "eligibility_contract_hash": "9029235a905a4a9995b051224b705bb7a307a7d5894cce2b361a10da5b0ffbd8",
+          "candidate_trace_hash": "f7c77159a9a788b9798b9b3e2729c8d27f82a3a4336b507e7a6e0b8a38bbf1e7",
+          "selection_hash": "1eac41d7dc34a794383b5401d57e81e69e4f28f12142cb123212701a0faaf782",
+          "assignment_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+          "decision_hash": "b44009a5c55661773a1e1eead7a0c95e34e3bbde78c6fed502da9842fd8fa6b6",
+          "requirements": {
+            "requirements": [],
+            "required_entities": [],
+            "required_facets": [],
+            "query_extraction_provenance": [],
+            "query_requirement_spans": [],
+            "retrieval_hints": [
+              "Also",
+              "storage",
+              "retention",
+              "behavior",
+              "identify",
+              "private",
+              "production",
+              "deployment",
+              "configuration",
+              "credentials",
+              "owner",
+              "selected",
+              "runtime",
+              "settings"
+            ],
+            "concept_queries": [],
+            "answer_contract_hash": "131395c05f6bf74505f4836962b7a8df09193f76be5f084a38e8799b5ebd10db",
+            "lifecycle_intent": "current",
+            "parse_trace": [
+              "fallback:generic_project_terms"
+            ],
+            "unresolved_parts": [
+              "unsupported_query:generic_free_form_relation"
+            ],
+            "component_scope_complete": false
+          }
+        },
+        "delivery_decision": {
+          "deliverable": false,
+          "reason_code": "required_evidence_missing"
+        },
+        "answer_type": "partial",
+        "answer_completeness": {
+          "schema_version": "answer-completeness-1.0",
+          "status": "partial",
+          "answer_type": "partial",
+          "coverage_score": 1.0,
+          "matched_terms": [
+            "storage",
+            "retention",
+            "behavior"
+          ],
+          "missing_terms": [
+            "identify",
+            "private",
+            "production",
+            "deployment",
+            "configuration"
+          ],
+          "coverage_by_requirement": [
+            {
+              "term": "storage",
+              "matched": true,
+              "source_paths": [
+                "docs/guide.md"
+              ]
+            },
+            {
+              "term": "retention",
+              "matched": true,
+              "source_paths": [
+                "docs/guide.md"
+              ]
+            },
+            {
+              "term": "behavior",
+              "matched": true,
+              "source_paths": [
+                "docs/guide.md"
+              ]
+            },
+            {
+              "term": "identify",
+              "matched": false,
+              "source_paths": []
+            },
+            {
+              "term": "private",
+              "matched": false,
+              "source_paths": []
+            },
+            {
+              "term": "production",
+              "matched": false,
+              "source_paths": []
+            },
+            {
+              "term": "deployment",
+              "matched": false,
+              "source_paths": []
+            },
+            {
+              "term": "configuration",
+              "matched": false,
+              "source_paths": []
+            }
+          ],
+          "source_search_required": true,
+          "source_search_status": "required",
+          "disposition": "search_local_source",
+          "edit_ready": true,
+          "reason_codes": [
+            "no_trusted_context",
+            "story_terms_missing_from_source_evidence",
+            "high_signal_query_terms_missing_from_context"
+          ],
+          "canonical_support": {
+            "answer_supported": false,
+            "mandatory_requirement_ids": [],
+            "assigned_requirement_ids": []
+          },
+          "legacy_diagnostics": {
+            "schema_version": "answer-completeness-1.0",
+            "status": "unavailable",
+            "answer_type": "unavailable",
+            "coverage_score": 0.375,
+            "matched_terms": [
+              "storage",
+              "retention",
+              "behavior"
+            ],
+            "missing_terms": [
+              "identify",
+              "private",
+              "production",
+              "deployment",
+              "configuration"
+            ],
+            "coverage_by_requirement": [
+              {
+                "term": "storage",
+                "matched": true,
+                "source_paths": [
+                  "docs/guide.md"
+                ]
+              },
+              {
+                "term": "retention",
+                "matched": true,
+                "source_paths": [
+                  "docs/guide.md"
+                ]
+              },
+              {
+                "term": "behavior",
+                "matched": true,
+                "source_paths": [
+                  "docs/guide.md"
+                ]
+              },
+              {
+                "term": "identify",
+                "matched": false,
+                "source_paths": []
+              },
+              {
+                "term": "private",
+                "matched": false,
+                "source_paths": []
+              },
+              {
+                "term": "production",
+                "matched": false,
+                "source_paths": []
+              },
+              {
+                "term": "deployment",
+                "matched": false,
+                "source_paths": []
+              },
+              {
+                "term": "configuration",
+                "matched": false,
+                "source_paths": []
+              }
+            ],
+            "source_search_required": true,
+            "source_search_status": "required",
+            "disposition": "search_local_source",
+            "edit_ready": true,
+            "reason_codes": [
+              "no_trusted_context",
+              "story_terms_missing_from_source_evidence",
+              "high_signal_query_terms_missing_from_context"
+            ]
+          }
+        },
+        "disposition": "search_local_source",
+        "edit_ready": true,
+        "source_search_status": "required",
+        "documentation_query_plan": {
+          "schema_version": "documentation-query-plan-v2",
+          "original_question": "storage retention behavior. Also identify private production deployment configuration credentials owner selected runtime settings.",
+          "query_ids": [
+            "query-original"
+          ],
+          "required_query_ids": [
+            "query-original"
+          ],
+          "public_query_ids": [
+            "query-original"
+          ],
+          "queries": [
+            {
+              "query_id": "query-original",
+              "text": "storage retention behavior. Also identify private production deployment configuration credentials owner selected runtime settings.",
+              "origin": "original",
+              "coverage_required": true,
+              "facet_id": null,
+              "requirement_id": null,
+              "relation": "direct",
+              "public_parent_query_id": null,
+              "preferred_catalog_roles": [],
+              "forbidden_catalog_roles": [],
+              "forbidden_evidence_terms": [],
+              "parent_exact_terms": [],
+              "need_subject": null,
+              "need_relation": null,
+              "need_context": null
+            }
+          ],
+          "explicit_paths": [],
+          "unresolved_parts": [
+            "semantic_scope_unverified"
+          ],
+          "_component_contract": [],
+          "component_scope_complete": false
+        },
+        "context_pack": [
+          {
+            "stable_chunk_id": "child-acd334d5a362efe40eae612ec149a5adfaaca3fc",
+            "parent_logical_id": "parent-388c23e8b4dd2ca774a8cbb6423459cd",
+            "display_content_hash": "59f9d33995af39ce9916a8bc2ab92719a4c0bbd9a0b1222b75bc4483f4f03203",
+            "_source_snapshot_sha256": "sha256:59f9d33995af39ce9916a8bc2ab92719a4c0bbd9a0b1222b75bc4483f4f03203",
+            "_reference_evidence": {
+              "schema_version": 1,
+              "source": {
+                "document_id": "project_file:local:cb9a242ac16e104e5974ef5a7993672d98a3528981d0b9a003e8e5f7efb1000c:docs/guide.md",
+                "scope": {
+                  "project_id": "local:cb9a242ac16e104e5974ef5a7993672d98a3528981d0b9a003e8e5f7efb1000c",
+                  "version": "",
+                  "snapshot_id": "gen-2c46e20dfd9e4bddbc57dcb16838199e"
+                },
+                "canonical_path": "docs/guide.md",
+                "content_sha256": "59f9d33995af39ce9916a8bc2ab92719a4c0bbd9a0b1222b75bc4483f4f03203"
+              },
+              "project_doc_content_hash": "sha256:59f9d33995af39ce9916a8bc2ab92719a4c0bbd9a0b1222b75bc4483f4f03203",
+              "char_start": 0,
+              "char_end": 73,
+              "text": "# Guide\n\nstorage retention behavior is documented in this current guide.\n",
+              "raw_document": "# Guide\n\nstorage retention behavior is documented in this current guide.\n",
+              "owner": {
+                "text": "# Guide\n",
+                "char_start": 0,
+                "char_end": 8,
+                "scope_start": 0,
+                "scope_end": 73,
+                "logical_id": "parent-388c23e8b4dd2ca774a8cbb6423459cd"
+              }
+            },
+            "_reference_root_plan": {
+              "question": "storage retention behavior. Also identify private production deployment configuration credentials owner selected runtime settings.",
+              "references": [],
+              "scope": {
+                "project_id": "local:cb9a242ac16e104e5974ef5a7993672d98a3528981d0b9a003e8e5f7efb1000c",
+                "version": "",
+                "snapshot_id": "gen-2c46e20dfd9e4bddbc57dcb16838199e"
+              },
+              "catalog_complete": true
+            },
+            "_reference_plans": {
+              "storage retention behavior. Also identify private production deployment configuration credentials owner selected runtime settings.": {
+                "question": "storage retention behavior. Also identify private production deployment configuration credentials owner selected runtime settings.",
+                "references": [],
+                "scope": {
+                  "project_id": "local:cb9a242ac16e104e5974ef5a7993672d98a3528981d0b9a003e8e5f7efb1000c",
+                  "version": "",
+                  "snapshot_id": "gen-2c46e20dfd9e4bddbc57dcb16838199e"
+                },
+                "catalog_complete": true
+              }
+            },
+            "_evidence_sets": [
+              {
+                "schema_version": "source-dependency-proposal-v1",
+                "set_id": "evidence-set:daab23dae997f2d9e9aec2beabd7beee1e211f4080e2bbb6680494443107a3cc",
+                "member_spans": [
+                  [
+                    0,
+                    7,
+                    "ca85e859db5c1f8ab39081106a1ccbe7e2a618fac858824eb09033b48ea7ce05"
+                  ],
+                  [
+                    9,
+                    72,
+                    "c3cf768666f0bd7a7bbef7338a6745138a7b7c0c1cd14fa0edfbae3d7e3897de"
+                  ]
+                ],
+                "edges": [
+                  [
+                    "heading",
+                    0,
+                    1,
+                    "markdown-owning-heading-v1"
+                  ]
+                ],
+                "proposed_need_ids": [
+                  "sentence-1"
+                ]
+              }
+            ],
+            "generation_id": "gen-2c46e20dfd9e4bddbc57dcb16838199e",
+            "resolved_version": "",
+            "_source_catalog_hash": "sha256:b9366e1658387043c943be7f03f91f44a6af9d611c90bb6ad473aa65b6e9b96f",
+            "char_start": 0,
+            "char_end": 73,
+            "line_start": 1,
+            "line_end": 3,
+            "source_class": "project_doc",
+            "source_type": "docs",
+            "source_kind": "docs",
+            "authority": "source_of_truth",
+            "risk_flags": [],
+            "doc_scope": "project",
+            "module_id": "",
+            "module_name": null,
+            "module_path": null,
+            "module_type": null,
+            "description": "Pinned documentation source",
+            "catalog_role": "other",
+            "lifecycle_status": "active",
+            "temporal_relevance": "current",
+            "index_freshness": "synchronized",
+            "impact_policy": "track",
+            "project_identity": "local:cb9a242ac16e104e5974ef5a7993672d98a3528981d0b9a003e8e5f7efb1000c",
+            "retrieval_query_ids": [],
+            "retrieval_query_matches": {},
+            "project_ranking": {},
+            "path": "docs/guide.md",
+            "url": null,
+            "title": "Guide",
+            "heading_path": "Guide",
+            "freshness": "current",
+            "why_selected": "selected because it matched repo-owned project documentation for the question",
+            "content": "# Guide\n\nstorage retention behavior is documented in this current guide.\n",
+            "display_text": "# Guide\n\nstorage retention behavior is documented in this current guide.\n",
+            "token_estimate": 18,
+            "source": {
+              "source_class": "project_doc",
+              "source_type": "docs",
+              "source_kind": "docs",
+              "authority": "source_of_truth",
+              "risk_flags": [],
+              "doc_scope": "project",
+              "module_id": "",
+              "module_name": null,
+              "module_path": null,
+              "module_type": null,
+              "description": "Pinned documentation source",
+              "lifecycle_status": "active",
+              "temporal_relevance": "current",
+              "index_freshness": "synchronized",
+              "impact_policy": "track",
+              "project_identity": "local:cb9a242ac16e104e5974ef5a7993672d98a3528981d0b9a003e8e5f7efb1000c",
+              "path": "docs/guide.md",
+              "url": null,
+              "title": "Guide"
+            },
+            "section": {
+              "title": "Guide",
+              "heading_path": "Guide",
+              "freshness": "current"
+            },
+            "snippet": "# Guide\n\nstorage retention behavior is documented in this current guide.\n",
+            "char_span": [
+              0,
+              73
+            ],
+            "origin_lane": "project",
+            "canonical_id": null,
+            "library_id": null,
+            "version": null,
+            "source_provenance": {
+              "owner": "configured_repository",
+              "origin_lane": "project"
+            },
+            "version_exactness": "not_applicable",
+            "repository_authority": "ordinary_repository_document",
+            "instruction_trust": "untrusted_data",
+            "content_boundary": {
+              "role": "cited_document_data",
+              "schema": "docmancer-document-data-v1",
+              "executable_policy": false
+            },
+            "document_data": {
+              "schema": "docmancer-document-data-v1",
+              "instruction_trust": "untrusted_data",
+              "content": "# Guide\n\nstorage retention behavior is documented in this current guide.\n"
+            },
+            "authority_root": null,
+            "policy_scope": null,
+            "scope_verified": false,
+            "instruction_risk_flags": []
+          }
+        ],
+        "lanes": {
+          "project": {
+            "status": "confirmation_required",
+            "source_count": 1,
+            "reason_code": "partial_navigational_context",
+            "next_action": null
+          },
+          "library": {
+            "status": "not_requested",
+            "source_count": 0,
+            "canonical_ids": [],
+            "next_action": null
+          },
+          "dependency": {
+            "status": "not_requested",
+            "source_count": 0,
+            "next_action": null
+          }
+        },
+        "source_summary": {
+          "project": 1,
+          "library": 0,
+          "dependency": 0,
+          "rejected": 0,
+          "risky": 0
+        },
+        "trust_contract": {
+          "schema_version": "trust-contract-1.2",
+          "sources": {
+            "selected": [
+              {
+                "source": {
+                  "source_class": "project_doc",
+                  "source_type": "docs",
+                  "source_kind": "docs",
+                  "authority": "source_of_truth",
+                  "risk_flags": [],
+                  "doc_scope": "project",
+                  "module_id": "",
+                  "module_name": null,
+                  "module_path": null,
+                  "module_type": null,
+                  "description": "Pinned documentation source",
+                  "lifecycle_status": "active",
+                  "temporal_relevance": "current",
+                  "index_freshness": "synchronized",
+                  "impact_policy": "track",
+                  "project_identity": "local:cb9a242ac16e104e5974ef5a7993672d98a3528981d0b9a003e8e5f7efb1000c",
+                  "path": "docs/guide.md",
+                  "url": null,
+                  "title": "Guide"
+                },
+                "doc_scope": "project",
+                "origin_lane": "project",
+                "why_selected": "selected because it matched repo-owned project documentation for the question",
+                "freshness": "current",
+                "version_binding": null,
+                "source_provenance": {
+                  "owner": "configured_repository",
+                  "origin_lane": "project"
+                },
+                "repository_authority": "ordinary_repository_document",
+                "instruction_trust": "untrusted_data",
+                "content_boundary": {
+                  "role": "cited_document_data",
+                  "schema": "docmancer-document-data-v1",
+                  "executable_policy": false
+                },
+                "risk_flags": []
+              }
+            ],
+            "rejected": [],
+            "risky": []
+          },
+          "source_dimensions": [
+            "source_provenance",
+            "version_exactness",
+            "repository_authority",
+            "instruction_trust"
+          ],
+          "policy": {
+            "document_content": "cited_data_never_lifecycle_instruction",
+            "typed_lifecycle_actions_only": true
+          }
+        },
+        "dependency_docs": {},
+        "exact_version": null,
+        "reason_code": "required_evidence_missing",
+        "message": null,
+        "required_one_of": [],
+        "examples": [],
+        "requires_confirmation": true,
+        "confirmation_reason": "repo_write",
+        "next_action": {
+          "action": "create_reviewable_project_doc",
+          "requires_confirmation": true,
+          "preferred_path": "ARCHITECTURE.md",
+          "suggested_paths": [
+            "ARCHITECTURE.md",
+            "README.md",
+            "docs/architecture.md"
+          ],
+          "reason": "Project docs exist, but no high-level architecture or overview document was discovered. Ask the user before creating a reviewable ARCHITECTURE.md file.",
+          "agent_guidance": "If the user approves, inspect the listed evidence, create ARCHITECTURE.md as a normal reviewable file, then use the returned public prepare_docs action before retrying get_docs_context.",
+          "documentation_gap": {
+            "suggested_path": "ARCHITECTURE.md",
+            "required_sections": [
+              {
+                "name": "purpose",
+                "state": "missing",
+                "evidence": [
+                  "manifests",
+                  "root entrypoints"
+                ],
+                "evidence_paths": [],
+                "facts": [],
+                "missing_evidence": [
+                  "manifests",
+                  "root entrypoints"
+                ],
+                "discovery_suggestions": [
+                  "Inspect repository files for manifests; keep the claim unknown if no evidence is found.",
+                  "Inspect repository files for root entrypoints; keep the claim unknown if no evidence is found."
+                ]
+              },
+              {
+                "name": "entrypoints",
+                "state": "missing",
+                "evidence": [
+                  "root entrypoints",
+                  "runtime configuration"
+                ],
+                "evidence_paths": [],
+                "facts": [],
+                "missing_evidence": [
+                  "root entrypoints",
+                  "runtime configuration"
+                ],
+                "discovery_suggestions": [
+                  "Inspect repository files for root entrypoints; keep the claim unknown if no evidence is found.",
+                  "Inspect repository files for runtime configuration; keep the claim unknown if no evidence is found."
+                ]
+              },
+              {
+                "name": "modules",
+                "state": "missing",
+                "evidence": [
+                  "module directories",
+                  "module imports"
+                ],
+                "evidence_paths": [],
+                "facts": [],
+                "missing_evidence": [
+                  "module directories",
+                  "module imports"
+                ],
+                "discovery_suggestions": [
+                  "Inspect repository files for module directories; keep the claim unknown if no evidence is found.",
+                  "Inspect repository files for module imports; keep the claim unknown if no evidence is found."
+                ]
+              },
+              {
+                "name": "runtime flow",
+                "state": "missing",
+                "evidence": [
+                  "entrypoints",
+                  "module imports",
+                  "runtime configuration"
+                ],
+                "evidence_paths": [],
+                "facts": [],
+                "missing_evidence": [
+                  "entrypoints",
+                  "module imports",
+                  "runtime configuration"
+                ],
+                "discovery_suggestions": [
+                  "Inspect repository files for entrypoints; keep the claim unknown if no evidence is found.",
+                  "Inspect repository files for module imports; keep the claim unknown if no evidence is found.",
+                  "Inspect repository files for runtime configuration; keep the claim unknown if no evidence is found."
+                ]
+              },
+              {
+                "name": "development commands",
+                "state": "missing",
+                "evidence": [
+                  "manifests",
+                  "test and build configuration"
+                ],
+                "evidence_paths": [],
+                "facts": [],
+                "missing_evidence": [
+                  "manifests",
+                  "test and build configuration"
+                ],
+                "discovery_suggestions": [
+                  "Inspect repository files for manifests; keep the claim unknown if no evidence is found.",
+                  "Inspect repository files for test and build configuration; keep the claim unknown if no evidence is found."
+                ]
+              }
+            ],
+            "evidence_to_collect": [],
+            "evidence_complete": false,
+            "rules": [
+              "do not invent unsupported facts",
+              "cite repository paths for factual claims",
+              "mark uncertain claims as unknown"
+            ],
+            "missing_evidence": [
+              "manifests",
+              "root entrypoints",
+              "runtime configuration",
+              "module directories",
+              "module imports",
+              "entrypoints",
+              "test and build configuration"
+            ],
+            "bounds": {
+              "max_serialized_bytes": 12288,
+              "serialized_bytes": 3908,
+              "truncated": false,
+              "omitted_counts": {}
+            }
+          },
+          "after_file_change": {
+            "tool": "prepare_docs",
+            "arguments_patch": {
+              "action": "sync_project_docs",
+              "project_path": "/home/viadmin/StudioProjects/hermes/docmancer/v2plan/artifacts/next07/grounded-first/diagnostic-bb81525d-20261004/corpus"
+            }
+          },
+          "after": [
+            {
+              "tool": "prepare_docs",
+              "requires_confirmation": false,
+              "arguments_patch": {
+                "action": "sync_project_docs",
+                "project_path": "/home/viadmin/StudioProjects/hermes/docmancer/v2plan/artifacts/next07/grounded-first/diagnostic-bb81525d-20261004/corpus"
+              }
+            },
+            {
+              "tool": "get_docs_context",
+              "requires_confirmation": false,
+              "arguments_patch": {
+                "project_path": "/home/viadmin/StudioProjects/hermes/docmancer/v2plan/artifacts/next07/grounded-first/diagnostic-bb81525d-20261004/corpus"
+              }
+            }
+          ]
+        },
+        "next_actions": [
+          {
+            "action": "create_reviewable_project_doc",
+            "requires_confirmation": true,
+            "preferred_path": "ARCHITECTURE.md",
+            "suggested_paths": [
+              "ARCHITECTURE.md",
+              "README.md",
+              "docs/architecture.md"
+            ],
+            "reason": "Project docs exist, but no high-level architecture or overview document was discovered. Ask the user before creating a reviewable ARCHITECTURE.md file.",
+            "agent_guidance": "If the user approves, inspect the listed evidence, create ARCHITECTURE.md as a normal reviewable file, then use the returned public prepare_docs action before retrying get_docs_context.",
+            "documentation_gap": {
+              "suggested_path": "ARCHITECTURE.md",
+              "required_sections": [
+                {
+                  "name": "purpose",
+                  "state": "missing",
+                  "evidence": [
+                    "manifests",
+                    "root entrypoints"
+                  ],
+                  "evidence_paths": [],
+                  "facts": [],
+                  "missing_evidence": [
+                    "manifests",
+                    "root entrypoints"
+                  ],
+                  "discovery_suggestions": [
+                    "Inspect repository files for manifests; keep the claim unknown if no evidence is found.",
+                    "Inspect repository files for root entrypoints; keep the claim unknown if no evidence is found."
+                  ]
+                },
+                {
+                  "name": "entrypoints",
+                  "state": "missing",
+                  "evidence": [
+                    "root entrypoints",
+                    "runtime configuration"
+                  ],
+                  "evidence_paths": [],
+                  "facts": [],
+                  "missing_evidence": [
+                    "root entrypoints",
+                    "runtime configuration"
+                  ],
+                  "discovery_suggestions": [
+                    "Inspect repository files for root entrypoints; keep the claim unknown if no evidence is found.",
+                    "Inspect repository files for runtime configuration; keep the claim unknown if no evidence is found."
+                  ]
+                },
+                {
+                  "name": "modules",
+                  "state": "missing",
+                  "evidence": [
+                    "module directories",
+                    "module imports"
+                  ],
+                  "evidence_paths": [],
+                  "facts": [],
+                  "missing_evidence": [
+                    "module directories",
+                    "module imports"
+                  ],
+                  "discovery_suggestions": [
+                    "Inspect repository files for module directories; keep the claim unknown if no evidence is found.",
+                    "Inspect repository files for module imports; keep the claim unknown if no evidence is found."
+                  ]
+                },
+                {
+                  "name": "runtime flow",
+                  "state": "missing",
+                  "evidence": [
+                    "entrypoints",
+                    "module imports",
+                    "runtime configuration"
+                  ],
+                  "evidence_paths": [],
+                  "facts": [],
+                  "missing_evidence": [
+                    "entrypoints",
+                    "module imports",
+                    "runtime configuration"
+                  ],
+                  "discovery_suggestions": [
+                    "Inspect repository files for entrypoints; keep the claim unknown if no evidence is found.",
+                    "Inspect repository files for module imports; keep the claim unknown if no evidence is found.",
+                    "Inspect repository files for runtime configuration; keep the claim unknown if no evidence is found."
+                  ]
+                },
+                {
+                  "name": "development commands",
+                  "state": "missing",
+                  "evidence": [
+                    "manifests",
+                    "test and build configuration"
+                  ],
+                  "evidence_paths": [],
+                  "facts": [],
+                  "missing_evidence": [
+                    "manifests",
+                    "test and build configuration"
+                  ],
+                  "discovery_suggestions": [
+                    "Inspect repository files for manifests; keep the claim unknown if no evidence is found.",
+                    "Inspect repository files for test and build configuration; keep the claim unknown if no evidence is found."
+                  ]
+                }
+              ],
+              "evidence_to_collect": [],
+              "evidence_complete": false,
+              "rules": [
+                "do not invent unsupported facts",
+                "cite repository paths for factual claims",
+                "mark uncertain claims as unknown"
+              ],
+              "missing_evidence": [
+                "manifests",
+                "root entrypoints",
+                "runtime configuration",
+                "module directories",
+                "module imports",
+                "entrypoints",
+                "test and build configuration"
+              ],
+              "bounds": {
+                "max_serialized_bytes": 12288,
+                "serialized_bytes": 3908,
+                "truncated": false,
+                "omitted_counts": {}
+              }
+            },
+            "after_file_change": {
+              "tool": "prepare_docs",
+              "arguments_patch": {
+                "action": "sync_project_docs",
+                "project_path": "/home/viadmin/StudioProjects/hermes/docmancer/v2plan/artifacts/next07/grounded-first/diagnostic-bb81525d-20261004/corpus"
+              }
+            },
+            "after": [
+              {
+                "tool": "prepare_docs",
+                "requires_confirmation": false,
+                "arguments_patch": {
+                  "action": "sync_project_docs",
+                  "project_path": "/home/viadmin/StudioProjects/hermes/docmancer/v2plan/artifacts/next07/grounded-first/diagnostic-bb81525d-20261004/corpus"
+                }
+              },
+              {
+                "tool": "get_docs_context",
+                "requires_confirmation": false,
+                "arguments_patch": {
+                  "project_path": "/home/viadmin/StudioProjects/hermes/docmancer/v2plan/artifacts/next07/grounded-first/diagnostic-bb81525d-20261004/corpus"
+                }
+              }
+            ]
+          },
+          {
+            "action": "search_project_sources",
+            "tool": "code_search",
+            "type": "search_local_source",
+            "handled_by": "coding_agent",
+            "requires_confirmation": false,
+            "repeat_docs_context": false,
+            "auto_execute": false,
+            "reason": "Selected docs are partial/navigational; exact story-specific terms are missing from source-backed snippets.",
+            "query_terms": [
+              "identify",
+              "private",
+              "production",
+              "deployment",
+              "configuration"
+            ],
+            "suggested_doc_paths": [
+              "docs/guide.md"
+            ],
+            "suggested_symbols": [
+              "docs/guide.md",
+              "guide.md"
+            ],
+            "suggested_layers": []
+          }
+        ],
+        "arguments_patch": {
+          "project_path": "/home/viadmin/StudioProjects/hermes/docmancer/v2plan/artifacts/next07/grounded-first/diagnostic-bb81525d-20261004/corpus"
+        },
+        "warnings": [],
+        "response_style": "evidence-first",
+        "primary_snippet": null,
+        "supporting_snippets": [],
+        "primary_snippets": [],
+        "primary_snippet_confidence": null,
+        "primary_snippet_selection_reason": null,
+        "primary_snippet_alternatives": [],
+        "snippet_metrics": {
+          "candidates_found": 0,
+          "usable_candidates": 0,
+          "primary_selected": false,
+          "supporting_selected": 0,
+          "duplicates_dropped": 0,
+          "noise_dropped": 0,
+          "truncations": 0,
+          "primary_language": null,
+          "primary_lane": null,
+          "primary_source_correct": null,
+          "primary_exact_version_match": null,
+          "primary_snippet_confidence": null,
+          "primary_snippet_alternatives": 0,
+          "snippet_first_applied": false,
+          "requested_response_style": "auto"
+        },
+        "presentation": {
+          "project_constraints_count": 1,
+          "primary_snippet_lane": null,
+          "project_evidence_primary": true
+        },
+        "metrics": {
+          "context_pack_items": 1,
+          "snippet_metrics": {
+            "candidates_found": 0,
+            "usable_candidates": 0,
+            "primary_selected": false,
+            "supporting_selected": 0,
+            "duplicates_dropped": 0,
+            "noise_dropped": 0,
+            "truncations": 0,
+            "primary_language": null,
+            "primary_lane": null,
+            "primary_source_correct": null,
+            "primary_exact_version_match": null,
+            "primary_snippet_confidence": null,
+            "primary_snippet_alternatives": 0,
+            "snippet_first_applied": false,
+            "requested_response_style": "auto"
+          }
+        },
+        "contamination": {
+          "detected": false,
+          "dropped_count": 0,
+          "reason_codes": []
+        },
+        "deduplication": {
+          "dropped_count": 0,
+          "reason_codes": []
+        },
+        "lane_details": {},
+        "ingestion_diagnostics": {
+          "project": {
+            "query_intent": "how_to",
+            "retrieval_routing": {
+              "schema_version": 2,
+              "intent": "docs",
+              "stages": {
+                "project_docs": {
+                  "status": "used",
+                  "reason": "selected project documentation mode",
+                  "item_count": 1,
+                  "budget_projection_bytes": 242,
+                  "estimated_tokens": 61,
+                  "observed_item_count": 1,
+                  "observed_budget_projection_bytes": 242,
+                  "budget_exceeded": false
+                },
+                "dependency_docs": {
+                  "status": "skipped",
+                  "reason": "dependency documentation not selected or not available",
+                  "item_count": 0,
+                  "budget_projection_bytes": 0,
+                  "estimated_tokens": 0,
+                  "observed_item_count": 0,
+                  "observed_budget_projection_bytes": 0,
+                  "budget_exceeded": false
+                },
+                "source_evidence": {
+                  "status": "skipped",
+                  "reason": "complete documentation/API intent does not require source evidence",
+                  "item_count": 0,
+                  "budget_projection_bytes": 0,
+                  "estimated_tokens": 0,
+                  "observed_item_count": 0,
+                  "observed_budget_projection_bytes": 0,
+                  "budget_exceeded": false
+                },
+                "repo_map": {
+                  "status": "insufficient",
+                  "reason": "missing project documentation requires bounded authoring evidence",
+                  "item_count": 0,
+                  "budget_projection_bytes": 0,
+                  "estimated_tokens": 0,
+                  "observed_item_count": 0,
+                  "observed_budget_projection_bytes": 0,
+                  "budget_exceeded": false
+                },
+                "code_graph": {
+                  "status": "insufficient",
+                  "reason": "missing project documentation requires bounded module evidence",
+                  "item_count": 0,
+                  "budget_projection_bytes": 0,
+                  "estimated_tokens": 0,
+                  "observed_item_count": 0,
+                  "observed_budget_projection_bytes": 0,
+                  "budget_exceeded": false
+                }
+              },
+              "budget_projection_bytes": 242,
+              "model_visible_bytes": 0
+            },
+            "same_call_pipeline": {
+              "planned_query_ids": [
+                "query-original"
+              ],
+              "retrieved_candidates": [
+                {
+                  "stable_chunk_id": "child-acd334d5a362efe40eae612ec149a5adfaaca3fc",
+                  "document_id": "/home/viadmin/StudioProjects/hermes/docmancer/v2plan/artifacts/next07/grounded-first/diagnostic-bb81525d-20261004/corpus/docs/guide.md",
+                  "parent_logical_id": "parent-388c23e8b4dd2ca774a8cbb6423459cd"
+                },
+                {
+                  "stable_chunk_id": "child-acd334d5a362efe40eae612ec149a5adfaaca3fc",
+                  "document_id": "/home/viadmin/StudioProjects/hermes/docmancer/v2plan/artifacts/next07/grounded-first/diagnostic-bb81525d-20261004/corpus/docs/guide.md",
+                  "parent_logical_id": "parent-388c23e8b4dd2ca774a8cbb6423459cd"
+                }
+              ],
+              "qualification_outcomes": [
+                {
+                  "stable_chunk_id": "child-acd334d5a362efe40eae612ec149a5adfaaca3fc",
+                  "document_id": "/home/viadmin/StudioProjects/hermes/docmancer/v2plan/artifacts/next07/grounded-first/diagnostic-bb81525d-20261004/corpus/docs/guide.md",
+                  "parent_logical_id": "parent-388c23e8b4dd2ca774a8cbb6423459cd",
+                  "query_id": "query-original",
+                  "outcome": "rejected",
+                  "reason": "insufficient_visible_match"
+                },
+                {
+                  "stable_chunk_id": "child-acd334d5a362efe40eae612ec149a5adfaaca3fc",
+                  "document_id": "/home/viadmin/StudioProjects/hermes/docmancer/v2plan/artifacts/next07/grounded-first/diagnostic-bb81525d-20261004/corpus/docs/guide.md",
+                  "parent_logical_id": "parent-388c23e8b4dd2ca774a8cbb6423459cd",
+                  "query_id": "query-original",
+                  "outcome": "rejected",
+                  "reason": "insufficient_visible_match"
+                }
+              ]
+            },
+            "active_index": {
+              "project_path": "/home/viadmin/StudioProjects/hermes/docmancer/v2plan/artifacts/next07/grounded-first/diagnostic-bb81525d-20261004/corpus",
+              "db_path": "/home/viadmin/StudioProjects/hermes/docmancer/v2plan/artifacts/next07/grounded-first/diagnostic-bb81525d-20261004/state/index.db",
+              "db_exists": true,
+              "index_state": "available",
+              "index_ownership": "project_owned",
+              "extracted_dir": "v2plan/artifacts/next07/grounded-first/diagnostic-bb81525d-20261004/state/extracted",
+              "config_source": "explicit",
+              "config_path": null,
+              "retrieval_mode": "lexical",
+              "docatlas_home": "v2plan/artifacts/next07/grounded-first/diagnostic-bb81525d-20261004/state/docatlas_home",
+              "index_counts": {
+                "sources": 1,
+                "sections": 1
+              },
+              "project_index_counts": {
+                "sources": 1,
+                "sections": 1
+              },
+              "shared_index_counts": {
+                "sources": 1,
+                "sections": 1
+              },
+              "warnings": [],
+              "vector_readiness": {
+                "status": "not_required",
+                "mode": "lexical"
+              },
+              "project_local_config": {
+                "present": false
+              }
+            },
+            "relevance_gate": {
+              "passed": true,
+              "reason": "weighted_relevance_sufficient",
+              "required_terms": [
+                "storage",
+                "retention",
+                "behavior",
+                "identify",
+                "private",
+                "production",
+                "deployment",
+                "configuration"
+              ],
+              "matched_terms": [
+                "storage",
+                "retention",
+                "behavior"
+              ],
+              "missing_terms": [
+                "identify",
+                "private",
+                "production",
+                "deployment",
+                "configuration"
+              ],
+              "matched_details": [
+                {
+                  "term": "storage",
+                  "weight": 3.0,
+                  "fields": [
+                    "content"
+                  ]
+                },
+                {
+                  "term": "retention",
+                  "weight": 3.0,
+                  "fields": [
+                    "content"
+                  ]
+                },
+                {
+                  "term": "behavior",
+                  "weight": 3.0,
+                  "fields": [
+                    "content"
+                  ]
+                }
+              ],
+              "weighted_score": 9.0,
+              "matched_term_count": 3,
+              "required_term_count": 8
+            },
+            "trust_decision": {
+              "answer_available": false,
+              "reason": "partial_navigational_context",
+              "confidence": "partial",
+              "passed_relevance_gate": true,
+              "max_project_score": 1.4,
+              "query_terms_matched": [
+                "storage",
+                "retention",
+                "behavior"
+              ],
+              "query_terms_missing": [
+                "identify",
+                "private",
+                "production",
+                "deployment",
+                "configuration"
+              ]
+            }
+          }
+        },
+        "retrieval_diagnostics": {},
+        "retrieval_routing": {
+          "schema_version": 2,
+          "intent": "docs",
+          "stages": {
+            "project_docs": {
+              "status": "used",
+              "reason": "selected project documentation mode",
+              "item_count": 1,
+              "budget_projection_bytes": 242,
+              "estimated_tokens": 61,
+              "observed_item_count": 1,
+              "observed_budget_projection_bytes": 242,
+              "budget_exceeded": false
+            },
+            "dependency_docs": {
+              "status": "skipped",
+              "reason": "dependency documentation not selected or not available",
+              "item_count": 0,
+              "budget_projection_bytes": 0,
+              "estimated_tokens": 0,
+              "observed_item_count": 0,
+              "observed_budget_projection_bytes": 0,
+              "budget_exceeded": false
+            },
+            "source_evidence": {
+              "status": "skipped",
+              "reason": "complete documentation/API intent does not require source evidence",
+              "item_count": 0,
+              "budget_projection_bytes": 0,
+              "estimated_tokens": 0,
+              "observed_item_count": 0,
+              "observed_budget_projection_bytes": 0,
+              "budget_exceeded": false
+            },
+            "repo_map": {
+              "status": "insufficient",
+              "reason": "missing project documentation requires bounded authoring evidence",
+              "item_count": 0,
+              "budget_projection_bytes": 0,
+              "estimated_tokens": 0,
+              "observed_item_count": 0,
+              "observed_budget_projection_bytes": 0,
+              "budget_exceeded": false
+            },
+            "code_graph": {
+              "status": "insufficient",
+              "reason": "missing project documentation requires bounded module evidence",
+              "item_count": 0,
+              "budget_projection_bytes": 0,
+              "estimated_tokens": 0,
+              "observed_item_count": 0,
+              "observed_budget_projection_bytes": 0,
+              "budget_exceeded": false
+            }
+          },
+          "budget_projection_bytes": 242,
+          "model_visible_bytes": 0
+        },
+        "requirements": {
+          "requirements": [],
+          "required_entities": [],
+          "required_facets": [],
+          "query_extraction_provenance": [],
+          "query_requirement_spans": [],
+          "retrieval_hints": [
+            "Also",
+            "storage",
+            "retention",
+            "behavior",
+            "identify",
+            "private",
+            "production",
+            "deployment",
+            "configuration",
+            "credentials",
+            "owner",
+            "selected",
+            "runtime",
+            "settings"
+          ],
+          "concept_queries": [],
+          "answer_contract_hash": "131395c05f6bf74505f4836962b7a8df09193f76be5f084a38e8799b5ebd10db",
+          "lifecycle_intent": "current",
+          "parse_trace": [
+            "fallback:generic_project_terms"
+          ],
+          "unresolved_parts": [
+            "unsupported_query:generic_free_form_relation"
+          ],
+          "component_scope_complete": false
+        },
+        "decision": "insufficient_evidence",
+        "evidence_coverage": 1.0,
+        "requirements_hash": "2a741d07657546a1b4275341875e1d02422222a8d7f2e04faa77196fd8a7e22b",
+        "selector_config_hash": "23cf8aa2f77c1b7e9b9d00819a1d05c14e198272ad91516b5a75c5f641963edd",
+        "eligibility_contract_hash": "9029235a905a4a9995b051224b705bb7a307a7d5894cce2b361a10da5b0ffbd8",
+        "candidate_trace_hash": "f7c77159a9a788b9798b9b3e2729c8d27f82a3a4336b507e7a6e0b8a38bbf1e7",
+        "selection_hash": "1eac41d7dc34a794383b5401d57e81e69e4f28f12142cb123212701a0faaf782",
+        "document_content_policy": {
+          "role": "cited_untrusted_document_data",
+          "actionable": false,
+          "actions_source": "typed_top_level_fields_only"
+        },
+        "documentation_supported": false,
+        "investigation_allowed": true,
+        "hard_stop": false,
+        "recovery_origin": "operational",
+        "recovery_reason_code": "operational_recovery_precedence",
+        "recovery_disposition": "use_operational_recovery",
+        "_source_continuation_project_root": "/home/viadmin/StudioProjects/hermes/docmancer/v2plan/artifacts/next07/grounded-first/diagnostic-bb81525d-20261004/corpus"
+      },
+      "projected_payload": {
+        "status": "ok",
+        "kind": "docs_context",
+        "context_status": "ready",
+        "context_available": true,
+        "answer_supported": false,
+        "answer_available": false,
+        "support_status": "retrieval_only",
+        "answer_policy": "cite_only",
+        "coverage_policy": "retrieval_attribution_only",
+        "query_coverage": "partial",
+        "retrieval_coverage": "partial",
+        "facet_coverage": "unverified",
+        "covered_query_ids": [],
+        "missing_query_ids": [],
+        "missing_facets": [],
+        "facets": [],
+        "sources": [
+          {
+            "evidence_id": "ev-075a79a2d19aaa70",
+            "path_or_url": "docs/guide.md",
+            "section": "Guide",
+            "snippet": "# Guide\n\nstorage retention behavior is documented in this current guide.\n",
+            "version_binding": "unversioned",
+            "content_sha256": "a8edf02d5f3d2f138ebc97b0855ff95bd906b370e08ac1e0dff2e62f382eac15",
+            "project_identity": "local:cb9a242ac16e104e5974ef5a7993672d98a3528981d0b9a003e8e5f7efb1000c",
+            "authority": "source_of_truth",
+            "scope": "project",
+            "line_start": 1,
+            "line_end": 3
+          }
+        ],
+        "context_quality": {
+          "status": "unverified",
+          "reasons": [
+            "coverage_unverified"
+          ]
+        },
+        "read_next": [],
+        "edit_ready": false,
+        "investigation_allowed": true,
+        "estimated_tokens": 262
+      },
+      "snapshot": {
+        "ev-075a79a2d19aaa70": {
+          "source": {
+            "stable_chunk_id": "child-acd334d5a362efe40eae612ec149a5adfaaca3fc",
+            "parent_logical_id": "parent-388c23e8b4dd2ca774a8cbb6423459cd",
+            "display_content_hash": "59f9d33995af39ce9916a8bc2ab92719a4c0bbd9a0b1222b75bc4483f4f03203",
+            "_source_snapshot_sha256": "sha256:59f9d33995af39ce9916a8bc2ab92719a4c0bbd9a0b1222b75bc4483f4f03203",
+            "_reference_evidence": {
+              "schema_version": 1,
+              "source": {
+                "document_id": "project_file:local:cb9a242ac16e104e5974ef5a7993672d98a3528981d0b9a003e8e5f7efb1000c:docs/guide.md",
+                "scope": {
+                  "project_id": "local:cb9a242ac16e104e5974ef5a7993672d98a3528981d0b9a003e8e5f7efb1000c",
+                  "version": "",
+                  "snapshot_id": "gen-2c46e20dfd9e4bddbc57dcb16838199e"
+                },
+                "canonical_path": "docs/guide.md",
+                "content_sha256": "59f9d33995af39ce9916a8bc2ab92719a4c0bbd9a0b1222b75bc4483f4f03203"
+              },
+              "project_doc_content_hash": "sha256:59f9d33995af39ce9916a8bc2ab92719a4c0bbd9a0b1222b75bc4483f4f03203",
+              "char_start": 0,
+              "char_end": 73,
+              "text": "# Guide\n\nstorage retention behavior is documented in this current guide.\n",
+              "raw_document": "# Guide\n\nstorage retention behavior is documented in this current guide.\n",
+              "owner": {
+                "text": "# Guide\n",
+                "char_start": 0,
+                "char_end": 8,
+                "scope_start": 0,
+                "scope_end": 73,
+                "logical_id": "parent-388c23e8b4dd2ca774a8cbb6423459cd"
+              }
+            },
+            "_reference_root_plan": {
+              "question": "storage retention behavior. Also identify private production deployment configuration credentials owner selected runtime settings.",
+              "references": [],
+              "scope": {
+                "project_id": "local:cb9a242ac16e104e5974ef5a7993672d98a3528981d0b9a003e8e5f7efb1000c",
+                "version": "",
+                "snapshot_id": "gen-2c46e20dfd9e4bddbc57dcb16838199e"
+              },
+              "catalog_complete": true
+            },
+            "_reference_plans": {
+              "storage retention behavior. Also identify private production deployment configuration credentials owner selected runtime settings.": {
+                "question": "storage retention behavior. Also identify private production deployment configuration credentials owner selected runtime settings.",
+                "references": [],
+                "scope": {
+                  "project_id": "local:cb9a242ac16e104e5974ef5a7993672d98a3528981d0b9a003e8e5f7efb1000c",
+                  "version": "",
+                  "snapshot_id": "gen-2c46e20dfd9e4bddbc57dcb16838199e"
+                },
+                "catalog_complete": true
+              }
+            },
+            "_evidence_sets": [
+              {
+                "schema_version": "source-dependency-proposal-v1",
+                "set_id": "evidence-set:daab23dae997f2d9e9aec2beabd7beee1e211f4080e2bbb6680494443107a3cc",
+                "member_spans": [
+                  [
+                    0,
+                    7,
+                    "ca85e859db5c1f8ab39081106a1ccbe7e2a618fac858824eb09033b48ea7ce05"
+                  ],
+                  [
+                    9,
+                    72,
+                    "c3cf768666f0bd7a7bbef7338a6745138a7b7c0c1cd14fa0edfbae3d7e3897de"
+                  ]
+                ],
+                "edges": [
+                  [
+                    "heading",
+                    0,
+                    1,
+                    "markdown-owning-heading-v1"
+                  ]
+                ],
+                "proposed_need_ids": [
+                  "sentence-1"
+                ]
+              }
+            ],
+            "generation_id": "gen-2c46e20dfd9e4bddbc57dcb16838199e",
+            "resolved_version": "",
+            "_source_catalog_hash": "sha256:b9366e1658387043c943be7f03f91f44a6af9d611c90bb6ad473aa65b6e9b96f",
+            "char_start": 0,
+            "char_end": 73,
+            "line_start": 1,
+            "line_end": 3,
+            "source_class": "project_doc",
+            "source_type": "docs",
+            "source_kind": "docs",
+            "authority": "source_of_truth",
+            "risk_flags": [],
+            "doc_scope": "project",
+            "module_id": "",
+            "module_name": null,
+            "module_path": null,
+            "module_type": null,
+            "description": "Pinned documentation source",
+            "catalog_role": "other",
+            "lifecycle_status": "active",
+            "temporal_relevance": "current",
+            "index_freshness": "synchronized",
+            "impact_policy": "track",
+            "project_identity": "local:cb9a242ac16e104e5974ef5a7993672d98a3528981d0b9a003e8e5f7efb1000c",
+            "retrieval_query_ids": [],
+            "retrieval_query_matches": {},
+            "project_ranking": {},
+            "path": "docs/guide.md",
+            "url": null,
+            "title": "Guide",
+            "heading_path": "Guide",
+            "freshness": "current",
+            "why_selected": "selected because it matched repo-owned project documentation for the question",
+            "content": "# Guide\n\nstorage retention behavior is documented in this current guide.\n",
+            "display_text": "# Guide\n\nstorage retention behavior is documented in this current guide.\n",
+            "token_estimate": 18,
+            "source": {
+              "source_class": "project_doc",
+              "source_type": "docs",
+              "source_kind": "docs",
+              "authority": "source_of_truth",
+              "risk_flags": [],
+              "doc_scope": "project",
+              "module_id": "",
+              "module_name": null,
+              "module_path": null,
+              "module_type": null,
+              "description": "Pinned documentation source",
+              "lifecycle_status": "active",
+              "temporal_relevance": "current",
+              "index_freshness": "synchronized",
+              "impact_policy": "track",
+              "project_identity": "local:cb9a242ac16e104e5974ef5a7993672d98a3528981d0b9a003e8e5f7efb1000c",
+              "path": "docs/guide.md",
+              "url": null,
+              "title": "Guide"
+            },
+            "section": {
+              "title": "Guide",
+              "heading_path": "Guide",
+              "freshness": "current"
+            },
+            "snippet": "# Guide\n\nstorage retention behavior is documented in this current guide.\n",
+            "char_span": [
+              0,
+              73
+            ],
+            "origin_lane": "project",
+            "canonical_id": null,
+            "library_id": null,
+            "version": null,
+            "source_provenance": {
+              "owner": "configured_repository",
+              "origin_lane": "project"
+            },
+            "version_exactness": "not_applicable",
+            "repository_authority": "ordinary_repository_document",
+            "instruction_trust": "untrusted_data",
+            "content_boundary": {
+              "role": "cited_document_data",
+              "schema": "docmancer-document-data-v1",
+              "executable_policy": false
+            },
+            "document_data": {
+              "schema": "docmancer-document-data-v1",
+              "instruction_trust": "untrusted_data",
+              "content": "# Guide\n\nstorage retention behavior is documented in this current guide.\n"
+            },
+            "authority_root": null,
+            "policy_scope": null,
+            "scope_verified": false,
+            "instruction_risk_flags": []
+          },
+          "projected_source": {
+            "evidence_id": "ev-075a79a2d19aaa70",
+            "path_or_url": "docs/guide.md",
+            "section": "Guide",
+            "snippet": "# Guide\n\nstorage retention behavior is documented in this current guide.\n",
+            "version_binding": "unversioned",
+            "content_sha256": "a8edf02d5f3d2f138ebc97b0855ff95bd906b370e08ac1e0dff2e62f382eac15",
+            "project_identity": "local:cb9a242ac16e104e5974ef5a7993672d98a3528981d0b9a003e8e5f7efb1000c",
+            "authority": "source_of_truth",
+            "scope": "project",
+            "line_start": 1,
+            "line_end": 3
+          },
+          "evidence_id": "ev-075a79a2d19aaa70",
+          "path_or_url": "docs/guide.md",
+          "section": "Guide",
+          "snippet": "# Guide\n\nstorage retention behavior is documented in this current guide.\n",
+          "version_binding": "unversioned",
+          "content_sha256": "a8edf02d5f3d2f138ebc97b0855ff95bd906b370e08ac1e0dff2e62f382eac15",
+          "project_identity": "local:cb9a242ac16e104e5974ef5a7993672d98a3528981d0b9a003e8e5f7efb1000c",
+          "authority": "source_of_truth",
+          "scope": "project",
+          "line_start": 1,
+          "line_end": 3
+        }
+      }
+    }
+  ]
+}

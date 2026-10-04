@@ -1,0 +1,39 @@
+{
+  "candidate_verdict": "REJECTED_N10_UNCHANGED",
+  "diagnostic_status": "STOP_INVALID",
+  "cases": [
+    {
+      "case": "working_positive",
+      "invalid": false,
+      "restored": true,
+      "sources": [
+        {
+          "evidence_id": "ev-075a79a2d19aaa70",
+          "path_or_url": "docs/guide.md",
+          "section": "Guide",
+          "snippet": "# Guide\n\nstorage retention behavior is documented in this current guide.\n",
+          "version_binding": "unversioned",
+          "content_sha256": "a8edf02d5f3d2f138ebc97b0855ff95bd906b370e08ac1e0dff2e62f382eac15",
+          "project_identity": "local:cb9a242ac16e104e5974ef5a7993672d98a3528981d0b9a003e8e5f7efb1000c",
+          "authority": "source_of_truth",
+          "scope": "project",
+          "line_start": 1,
+          "line_end": 3
+        }
+      ]
+    },
+    {
+      "case": "N1_module_request",
+      "invalid": true,
+      "restored": true,
+      "sources": []
+    }
+  ],
+  "immutable_hashes_verified": true,
+  "paired_80": "NOT_RUN_AFTER_TECHNICAL_STOP",
+  "historical_49": "NOT_RUN",
+  "partial_retention": "NOT_RUN",
+  "losses": "NOT_MEASURED_NOT_EMPTY_SET",
+  "remaining_controls": "NOT_RUN_AFTER_TECHNICAL_STOP"
+}
+

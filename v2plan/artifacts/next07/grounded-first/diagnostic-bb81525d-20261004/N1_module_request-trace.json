@@ -1,0 +1,10 @@
+{
+  "origins": {
+    "context": "<bound method LibraryDocsService.get_project_context of <docmancer.docs.service.LibraryDocsService object at 0x74c7033352b0>>",
+    "projection": "<function project_docs_context at 0x74c7055ae2a0>",
+    "unified": "<bound method _UnifiedDocsContextServicePart01.get_docs_context of <docmancer.docs.application.unified_context_service.UnifiedDocsContextService object at 0x74c7033370e0>>",
+    "validator": "<function validate_model_visible_projection at 0x74c7057289a0>",
+    "candidate_sha256": "5ac8e2600a12d216070087a50c9ddc64c8efaaff2f399d70e2b345db0bf71ff7"
+  },
+  "restored": true
+}

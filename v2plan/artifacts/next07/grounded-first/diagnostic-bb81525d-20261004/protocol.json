@@ -1,0 +1,289 @@
+{
+  "status": "DIAGNOSTIC_ONLY",
+  "candidate_verdict": "REJECTED_N10",
+  "head": "bb81525d3dc61f1388e7bf3c71b6848ebc5b0435",
+  "hashes": {
+    "v2plan/next07_grounded_candidate.py": "5ac8e2600a12d216070087a50c9ddc64c8efaaff2f399d70e2b345db0bf71ff7",
+    "v2plan/next07_grounded_public.py": "fe2c073e9abd15084cae90ddff15c5058b163f58d8c8daed2f1da79c6d65c529",
+    "v2plan/next07_grounded_final_run.py": "86fa8c403dbe03945ae38a9dae98bbfe1eb1456685a8c88aba52753ceef32b14",
+    "eval/evidence_quality_v2/cases.json": "4b01b66609f1a04a067062556c97de1e2fcccc41359ecabcb75ee1154fc0d67d",
+    "eval/evidence_quality_v2/protocol.json": "96a6c66e9061b3e40b5c2f01e1b69fb5eca5d88a4a542d5512246315fdb67de2",
+    "eval/evidence_quality_v2/source-manifest.json": "f0395dcc526161b51d9378ef3ac6d4c8a1a1bd2e323be0c4c6cff58f783b0985",
+    "v2plan/third_party/grounded-3.2.1/passage_splitter.py": "9cf1320784290243a038afd9adda7f737b8377bbc88fa1aabd7f896f463f7968",
+    "v2plan/third_party/grounded-3.2.1/fts_query.py": "854cbbf8b74a2655aef1bb0a2583a181749fc472c005582e2631306f8410f95a"
+  },
+  "corpus": {
+    "sources": [
+      {
+        "project": "fastapi",
+        "repository": "fastapi/fastapi",
+        "ref": "0.115.0",
+        "commit": "40e33e492dbf4af6172997f4e3238a32e56cbe26",
+        "path": "docs/en/docs/tutorial/background-tasks.md",
+        "sha256": "d59a2e7da8f947e53a509efda0acf74dee093799710878dfc7abf09e3e4de89a",
+        "bytes": 5704
+      },
+      {
+        "project": "fastapi",
+        "repository": "fastapi/fastapi",
+        "ref": "0.115.0",
+        "commit": "40e33e492dbf4af6172997f4e3238a32e56cbe26",
+        "path": "docs/en/docs/tutorial/cors.md",
+        "sha256": "8ef62d49193d8cce86697211badd2a71e720b3d56cdde6266c516f432c152b76",
+        "bytes": 5223
+      },
+      {
+        "project": "starlette",
+        "repository": "encode/starlette",
+        "ref": "0.39.2",
+        "commit": "0b50b9c4abd992a39d6e32148cc6f577ac3b1c44",
+        "path": "docs/background.md",
+        "sha256": "e2c622d46ad52bf7d90abe62fd75f355c1ff6f46a0b8a1d55d18e3875bbece63",
+        "bytes": 1961
+      },
+      {
+        "project": "starlette",
+        "repository": "encode/starlette",
+        "ref": "0.39.2",
+        "commit": "0b50b9c4abd992a39d6e32148cc6f577ac3b1c44",
+        "path": "docs/lifespan.md",
+        "sha256": "a9de5de995935cfbd676335fbbbee6f87c96086174aff3d17ecdf89b6220e788",
+        "bytes": 2366
+      },
+      {
+        "project": "typer",
+        "repository": "fastapi/typer",
+        "ref": "0.12.5",
+        "commit": "88aefd4492696bd1afa7bdb49477dec2c29d7e77",
+        "path": "docs/tutorial/parameter-types/bool.md",
+        "sha256": "c025b6f1d713e6e07925d2d724f8b97cf3f80cad86b363e5e89c4fc42d80821d",
+        "bytes": 4277
+      },
+      {
+        "project": "typer",
+        "repository": "fastapi/typer",
+        "ref": "0.12.5",
+        "commit": "88aefd4492696bd1afa7bdb49477dec2c29d7e77",
+        "path": "docs/tutorial/terminating.md",
+        "sha256": "efa52652496e4c6a872b340a8bb0fc884d4e48b05540569b687a1063677c6a09",
+        "bytes": 3024
+      },
+      {
+        "project": "pydantic",
+        "repository": "pydantic/pydantic",
+        "ref": "v2.9.2",
+        "commit": "7cedbfb03df82ac55c844c97e6f975359cb51bb9",
+        "path": "docs/concepts/strict_mode.md",
+        "sha256": "06e00a3e114c85ff31286640cb9842a99209d4112d5cb4812b47d4bf556f2b71",
+        "bytes": 14364
+      },
+      {
+        "project": "pydantic",
+        "repository": "pydantic/pydantic",
+        "ref": "v2.9.2",
+        "commit": "7cedbfb03df82ac55c844c97e6f975359cb51bb9",
+        "path": "docs/concepts/alias.md",
+        "sha256": "0c65c7fddc78232eb17b34def5383402e8c2df715da9935ba3d97a98277233e0",
+        "bytes": 6864
+      },
+      {
+        "project": "httpx",
+        "repository": "encode/httpx",
+        "ref": "0.28.1",
+        "commit": "26d48e0634e6ee9cdc0533996db289ce4b430177",
+        "path": "docs/advanced/timeouts.md",
+        "sha256": "48959a587ecc6430f9051ab1b1c76fcebc3f3e95ec01199281aab813a2dcfaa1",
+        "bytes": 2763
+      },
+      {
+        "project": "httpx",
+        "repository": "encode/httpx",
+        "ref": "0.28.1",
+        "commit": "26d48e0634e6ee9cdc0533996db289ce4b430177",
+        "path": "docs/environment_variables.md",
+        "sha256": "d0cdf4d740dc3ed8b21c4ee45735551e05d4e57d0fda05a2f18c4684197a27eb",
+        "bytes": 1967
+      },
+      {
+        "project": "mkdocs",
+        "repository": "mkdocs/mkdocs",
+        "ref": "1.6.1",
+        "commit": "bb7e8b62185b11d9f59bb7f50b13c15134f62f8a",
+        "path": "docs/user-guide/writing-your-docs.md",
+        "sha256": "a6b69d1318ae84455bae021b6655b71274f29c19ba43d021d872d100b7b38cba",
+        "bytes": 19342
+      },
+      {
+        "project": "ruff",
+        "repository": "astral-sh/ruff",
+        "ref": "0.6.8",
+        "commit": "ae39ce56c0cc1f8ac15f980c0b457b16b67c1f2a",
+        "path": "docs/preview.md",
+        "sha256": "cb4f7f28ec9856fa77493af0182794aa39265753d5ef7947aa36e7f9918a141d",
+        "bytes": 3967
+      },
+      {
+        "project": "ruff",
+        "repository": "astral-sh/ruff",
+        "ref": "0.6.8",
+        "commit": "ae39ce56c0cc1f8ac15f980c0b457b16b67c1f2a",
+        "path": "docs/configuration.md",
+        "sha256": "bf1f9a85b89c749f9a17d2fee5af4630cb894fdbbee134ec7a635e4a1bc3b9ad",
+        "bytes": 27472
+      },
+      {
+        "project": "uv",
+        "repository": "astral-sh/uv",
+        "ref": "0.4.20",
+        "commit": "0e1b25a536b727276cd4012ce2e2751f9dac141d",
+        "path": "docs/pip/compatibility.md",
+        "sha256": "193d4e4f575ae0975b66b76d4ea93b15aaede550b85de37989caef9f6f494923",
+        "bytes": 24743
+      }
+    ],
+    "licenses": [
+      "licenses/fastapi/LICENSE",
+      "licenses/starlette/LICENSE.md",
+      "licenses/typer/LICENSE",
+      "licenses/pydantic/LICENSE",
+      "licenses/httpx/LICENSE.md",
+      "licenses/mkdocs/LICENSE",
+      "licenses/ruff/LICENSE",
+      "licenses/uv/LICENSE-APACHE",
+      "licenses/uv/LICENSE-MIT"
+    ],
+    "source_transform": "NONE: exact full upstream Markdown files; external include directives not expanded",
+    "scope": "selected document snapshot, not every upstream document or rendered website"
+  },
+  "frozen_protocol": {
+    "schema_version": "evidence-quality-protocol-v2",
+    "baseline_code_sha": "e1daf4fa68f16f626068f2c58646e2ebfd4293f7",
+    "split_state": "frozen_development_benchmark; validation visible to implementing agent",
+    "unseen_validation": "NOT_MEASURED",
+    "case_count": 80,
+    "split_counts": {
+      "development": 40,
+      "frozen_validation_exposed": 40
+    },
+    "primary_outcome": "full approved evidence on within_budget cases; needs_review never PASS",
+    "secondary": "required fact coverage, separate literal score and non-full categories",
+    "variants": [
+      "A-current",
+      "B-no-canonical",
+      "C-lexical-replay",
+      "D-no-expansion-replay",
+      "L-explicit",
+      "L-duplicate",
+      "L-nearby"
+    ],
+    "grounded": {
+      "package": "@arabold/docs-mcp-server",
+      "version": "3.1.0",
+      "mode": "FTS-only",
+      "native_limits": [
+        1,
+        3,
+        5
+      ],
+      "controlled": "source-preserving adapter with 800 actual o200k_base tokens and <=3 blocks; reject unmappable reassembly, never invent contiguous ranges"
+    },
+    "tokenizer": {
+      "package": "tiktoken",
+      "version": "0.11.0",
+      "encoding": "o200k_base"
+    },
+    "promotion_thresholds": {
+      "observed_safety_violations": 0,
+      "p95_actual_tokens_ratio_max": 1.1,
+      "p95_query_latency_ratio_max": 1.25,
+      "primary_loss_max": 0
+    },
+    "bootstrap": {
+      "unit": "project_group",
+      "resamples": 2000,
+      "seed": 20260910,
+      "claim": "few groups; interval including zero is INCONCLUSIVE"
+    },
+    "host_control": {
+      "cases": [
+        "fastapi-04",
+        "starlette-03",
+        "typer-01",
+        "pydantic-02"
+      ],
+      "orders": [
+        "original",
+        "reverse",
+        "rotate_one"
+      ],
+      "repeats": 2,
+      "no_live_connection": "deterministic input assembly only; model outcomes and positional sensitivity NOT_MEASURED"
+    },
+    "safety": "unchanged production limits, authority, scope, version, support flags and frozen gates",
+    "source_sha256": "f0395dcc526161b51d9378ef3ac6d4c8a1a1bd2e323be0c4c6cff58f783b0985",
+    "cases_sha256": "4b01b66609f1a04a067062556c97de1e2fcccc41359ecabcb75ee1154fc0d67d",
+    "implementation_clarifications": [
+      {
+        "topic": "valid original duplicate",
+        "reason": "tools/list lookup_queries has uniqueItems=true; two identical array items are a validation-negative control, not a retrieval ablation",
+        "valid_L_duplicate": "one lookup equal to original question",
+        "algorithm_or_corpus_change": false
+      },
+      {
+        "topic": "Grounded incremental per-file ingest",
+        "reason": "CLI scrape defaults clean=true; use official --no-clean to retain the same selected document manifest",
+        "algorithm_or_corpus_change": false
+      }
+    ]
+  },
+  "corpus_source_hashes": {
+    "fastapi": {
+      "docs/en/docs/tutorial/background-tasks.md": "d59a2e7da8f947e53a509efda0acf74dee093799710878dfc7abf09e3e4de89a",
+      "docs/en/docs/tutorial/cors.md": "8ef62d49193d8cce86697211badd2a71e720b3d56cdde6266c516f432c152b76"
+    },
+    "httpx": {
+      "docs/advanced/timeouts.md": "48959a587ecc6430f9051ab1b1c76fcebc3f3e95ec01199281aab813a2dcfaa1",
+      "docs/environment_variables.md": "d0cdf4d740dc3ed8b21c4ee45735551e05d4e57d0fda05a2f18c4684197a27eb"
+    },
+    "mkdocs": {
+      "docs/user-guide/writing-your-docs.md": "a6b69d1318ae84455bae021b6655b71274f29c19ba43d021d872d100b7b38cba"
+    },
+    "pydantic": {
+      "docs/concepts/strict_mode.md": "06e00a3e114c85ff31286640cb9842a99209d4112d5cb4812b47d4bf556f2b71",
+      "docs/concepts/alias.md": "0c65c7fddc78232eb17b34def5383402e8c2df715da9935ba3d97a98277233e0"
+    },
+    "ruff": {
+      "docs/preview.md": "cb4f7f28ec9856fa77493af0182794aa39265753d5ef7947aa36e7f9918a141d",
+      "docs/configuration.md": "bf1f9a85b89c749f9a17d2fee5af4630cb894fdbbee134ec7a635e4a1bc3b9ad"
+    },
+    "starlette": {
+      "docs/background.md": "e2c622d46ad52bf7d90abe62fd75f355c1ff6f46a0b8a1d55d18e3875bbece63",
+      "docs/lifespan.md": "a9de5de995935cfbd676335fbbbee6f87c96086174aff3d17ecdf89b6220e788"
+    },
+    "typer": {
+      "docs/tutorial/parameter-types/bool.md": "c025b6f1d713e6e07925d2d724f8b97cf3f80cad86b363e5e89c4fc42d80821d",
+      "docs/tutorial/terminating.md": "efa52652496e4c6a872b340a8bb0fc884d4e48b05540569b687a1063677c6a09"
+    },
+    "uv": {
+      "docs/pip/compatibility.md": "193d4e4f575ae0975b66b76d4ea93b15aaede550b85de37989caef9f6f494923"
+    }
+  },
+  "controls_order": [
+    "working_positive",
+    "N1_module_request"
+  ],
+  "input": {
+    "documents": {
+      "docs/guide.md": "# Guide\n\nstorage retention behavior is documented in this current guide.\n"
+    },
+    "question": "storage retention behavior. Also identify private production deployment configuration credentials owner selected runtime settings."
+  },
+  "mutation": {
+    "module": "nonexistent-diagnostic-module"
+  },
+  "quality_failure": "record and continue",
+  "invalid_execution": "STOP",
+  "replay_scope": "all, unchanged from frozen run.py",
+  "I4": "REUSED_NOT_RERUN",
+  "G": "REUSED_NOT_RERUN"
+}

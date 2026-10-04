@@ -1,0 +1,23 @@
+{
+  "seconds": 0.01752619000035338,
+  "expected_paths": [
+    "docs/guide.md"
+  ],
+  "indexed_paths": [
+    "docs/guide.md"
+  ],
+  "excluded_or_failed_paths": [],
+  "unexpected_paths": [],
+  "rows": [
+    {
+      "stable_chunk_id": "child-acd334d5a362efe40eae612ec149a5adfaaca3fc",
+      "source_path": "docs/guide.md",
+      "display_text": "# Guide\n\nstorage retention behavior is documented in this current guide.\n",
+      "line_start": 1,
+      "line_end": 3
+    }
+  ],
+  "sqlite_version": "3.50.4",
+  "schema_sha256": "a1264818e6c23bfdd8032a7493a9be800bf2be8ee7d15f0a4506938756ba20c9",
+  "config_sha256": "7a46cb25ad796a4ce14945672ebc52a139fec835a87dd27b7d54023a39ce985c"
+}

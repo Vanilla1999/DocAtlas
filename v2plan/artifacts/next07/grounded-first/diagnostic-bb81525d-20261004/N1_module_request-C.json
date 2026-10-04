@@ -1,0 +1,27 @@
+{
+  "request": {
+    "project_path": "/home/viadmin/StudioProjects/hermes/docmancer/v2plan/artifacts/next07/grounded-first/diagnostic-bb81525d-20261004/corpus",
+    "scope": "project",
+    "question": "storage retention behavior. Also identify private production deployment configuration credentials owner selected runtime settings.",
+    "module": "nonexistent-diagnostic-module"
+  },
+  "public_payload": {
+    "status": "failed",
+    "error": {
+      "reason_code": "validation_error",
+      "message": "unknown field(s) for get_docs_context: module",
+      "exception_type": null,
+      "retryable": false,
+      "where": {
+        "tool": "get_docs_context",
+        "handler": null,
+        "phase": "validation"
+      },
+      "hints": [
+        "Fix the MCP tool arguments and retry."
+      ]
+    },
+    "warnings": []
+  },
+  "projection_attempts": []
+}
