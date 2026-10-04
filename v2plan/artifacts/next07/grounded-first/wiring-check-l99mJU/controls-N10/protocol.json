@@ -1,0 +1,10 @@
+{
+  "control": "N10",
+  "question": "storage retention behavior. Also identify private production deployment configuration credentials owner selected runtime settings.",
+  "positive": "storage retention behavior is documented in this current guide.",
+  "negative": "# storage retention behavior\n\nUnrelated network details.",
+  "expectation": "working positive returns context; frozen negative returns no sources",
+  "node": "tests/docs/test_read_context_admission_boundary.py::test_local_topic_witness_rejects_heading_echo_and_scattered_terms[# storage retention behavior\n\nUnrelated network details.]",
+  "classification": "exposed development/regression; not unseen",
+  "stop": "first substantive forbidden packet; no algorithm/expectation changes"
+}

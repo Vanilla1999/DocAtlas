@@ -1,0 +1,59 @@
+{
+  "verdict": "REJECTED",
+  "cases": [
+    {
+      "case": "positive",
+      "valid": true,
+      "passed": true,
+      "sources": [
+        {
+          "evidence_id": "ev-075a79a2d19aaa70",
+          "path_or_url": "docs/guide.md",
+          "section": "Guide",
+          "snippet": "# Guide\n\nstorage retention behavior is documented in this current guide.\n",
+          "version_binding": "unversioned",
+          "content_sha256": "a8edf02d5f3d2f138ebc97b0855ff95bd906b370e08ac1e0dff2e62f382eac15",
+          "project_identity": "local:b33cdd7f24f128f916bb7da190c7aa4a10e2f644cacc68453293d2bd2cad4351",
+          "authority": "source_of_truth",
+          "scope": "project",
+          "line_start": 1,
+          "line_end": 3
+        }
+      ],
+      "handler_validation": [
+        {
+          "errors": [],
+          "max_tokens": 800
+        }
+      ],
+      "restored": true
+    },
+    {
+      "case": "negative",
+      "valid": true,
+      "passed": false,
+      "sources": [
+        {
+          "evidence_id": "ev-70b8fe573e0798c2",
+          "path_or_url": "docs/guide.md",
+          "section": "storage retention behavior",
+          "snippet": "# Guide\n\n# storage retention behavior\n\nUnrelated network details.\n",
+          "version_binding": "unversioned",
+          "content_sha256": "5850248c925f00e35138b9c47a5bc804f785463bdf2268216a909d68ab0dee8c",
+          "project_identity": "local:be30dc4f5f34ba7d90e9a616d0e362b0c77b3cd701d142de7f019e74bee7d883",
+          "authority": "source_of_truth",
+          "scope": "project",
+          "line_start": 1,
+          "line_end": 5
+        }
+      ],
+      "handler_validation": [
+        {
+          "errors": [],
+          "max_tokens": 800
+        }
+      ],
+      "restored": true
+    }
+  ]
+}

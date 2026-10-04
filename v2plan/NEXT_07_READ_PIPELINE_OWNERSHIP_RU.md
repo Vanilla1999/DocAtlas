@@ -693,3 +693,27 @@ retry вернул AttributeError, также до projection. Точный ис
 Это **BLOCKED: invalid wiring, retry-limit исчерпан**, не algorithm REJECTED
 и не доказательство невозможности интеграции в allowed scope. I.4 не выполнена;
 I.5 retention/gates/full suite и часть II NOT_RUN. Rollout NOT_AUTHORIZED.
+
+## 10. ed3ec41b: I.4 PASS, substantive I.5 N10 REJECTED
+
+Отдельное разрешение пользователя на исправленный wiring: fast-forward до
+`ed3ec41b`, candidate `b6e890b6` byte-identical. Evidence и summary:
+`artifacts/next07/grounded-first/wiring-check-l99mJU/`.
+Новые wiring unit tests: 26 PASS. Настоящие root-only MCP P1/P2/P3:
+**VALIDATED_LOCAL_I4**, final cost 589/613/443, sources 3/3/2;
+handler validators чисты, answer_supported/answer_available/edit_ready False.
+Default, exception и expiration owner сохранены; partial не выдумал exception.
+G evidence переиспользовано после проверки reference hashes.
+
+В I.5 выполнен существующий frozen N10 с working positive из
+`test_read_context_admission_boundary.py`. Positive доставлен. Negative
+`# storage retention behavior\n\nUnrelated network details.` также доставлен
+в final sources, хотя неизменённое ожидание — empty. Этот node не входит
+в frozen policy-delta allowlist. Source bytes/validator сохранны; результат
+классифицирован как irrelevant context / frozen abstention-policy violation,
+не ложный proof и не harness exception. Negative действительно выполнен.
+
+**I.5 REJECTED; I.6 конечный verdict текущего замера REJECTED.**
+После содержательного failure algorithm/packer/guards/labels не менялись.
+Остальные public controls, paired 80/49-ID/partial retention, focused/gates/full
+NOT_RUN по STOP. Часть II NOT_RUN; rollout NOT_AUTHORIZED.

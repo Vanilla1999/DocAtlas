@@ -1,0 +1,4597 @@
+{
+  "origins": {
+    "context": "<bound method LibraryDocsService.get_project_context of <docmancer.docs.service.LibraryDocsService object at 0x7c09cc619450>>",
+    "projection": "<function project_docs_context at 0x7c09d0b6f880>",
+    "unified": "<bound method _UnifiedDocsContextServicePart01.get_docs_context of <docmancer.docs.application.unified_context_service.UnifiedDocsContextService object at 0x7c09cc61afd0>>",
+    "validator": "<function validate_model_visible_projection at 0x7c09d0b10400>",
+    "candidate_sha256": "5ac8e2600a12d216070087a50c9ddc64c8efaaff2f399d70e2b345db0bf71ff7"
+  },
+  "restored": true,
+  "input": [
+    {
+      "raw": "# LeaseClient\n\nThe default timeout is 17 seconds.\n",
+      "identity": "project_file:local:a3f6fef547e0bff86646cdbdd3762c658529200a2d6f5da35bd828142fa68612:default.md",
+      "canonical_path": "default.md",
+      "snapshot_id": "gen-9246454710a74dc186821bb2eab57701",
+      "url": "",
+      "title": "default"
+    },
+    {
+      "raw": "# Overview\n\nLeaseClient default timeout duration requests exception operation behavior documentation.\n",
+      "identity": "project_file:local:a3f6fef547e0bff86646cdbdd3762c658529200a2d6f5da35bd828142fa68612:overview.md",
+      "canonical_path": "overview.md",
+      "snapshot_id": "gen-9246454710a74dc186821bb2eab57701",
+      "url": "",
+      "title": "overview"
+    }
+  ],
+  "proposed": [
+    {
+      "raw": "# Overview\n\nLeaseClient default timeout duration requests exception operation behavior documentation.\n",
+      "identity": "project_file:local:a3f6fef547e0bff86646cdbdd3762c658529200a2d6f5da35bd828142fa68612:overview.md",
+      "canonical_path": "overview.md",
+      "snapshot_id": "gen-9246454710a74dc186821bb2eab57701",
+      "url": "",
+      "title": "overview",
+      "start": 0,
+      "end": 102,
+      "content": "# Overview\n\nLeaseClient default timeout duration requests exception operation behavior documentation.\n",
+      "path": "[\"Overview\"]",
+      "source_sha256": "5c648f5bbcff05d88435308f9cb2a3851fc5cee7a1bf66c1f96fe9670b988f76",
+      "owner_spans": [
+        [
+          0,
+          102
+        ]
+      ],
+      "dependency_spans": "NOT_PREPARED until scoped source preparation in I.3; not approval",
+      "byte_start": 0,
+      "byte_end": 102,
+      "bm25_order_score": -1.3593947036569986e-05,
+      "retrieval_order": 0
+    },
+    {
+      "raw": "# LeaseClient\n\nThe default timeout is 17 seconds.\n",
+      "identity": "project_file:local:a3f6fef547e0bff86646cdbdd3762c658529200a2d6f5da35bd828142fa68612:default.md",
+      "canonical_path": "default.md",
+      "snapshot_id": "gen-9246454710a74dc186821bb2eab57701",
+      "url": "",
+      "title": "default",
+      "start": 0,
+      "end": 50,
+      "content": "# LeaseClient\n\nThe default timeout is 17 seconds.\n",
+      "path": "[\"LeaseClient\"]",
+      "source_sha256": "50fc5ae5565ed3949aba18fba3617bdec0a9732f2aafe8ec04488ebf8c69814d",
+      "owner_spans": [
+        [
+          0,
+          50
+        ]
+      ],
+      "dependency_spans": "NOT_PREPARED until scoped source preparation in I.3; not approval",
+      "byte_start": 0,
+      "byte_end": 50,
+      "bm25_order_score": -9.970757778201947e-06,
+      "retrieval_order": 1
+    }
+  ],
+  "omissions": [],
+  "current_catalog_result": {
+    "project_path": "/home/viadmin/StudioProjects/hermes/docmancer/v2plan/artifacts/next07/grounded-first/wiring-check-l99mJU/native/partial/corpus",
+    "query": "What is LeaseClient default timeout duration for requests and which exception is raised when an operation expires?",
+    "status": "success",
+    "tool": "get_project_docs",
+    "reason_code": "project_docs_ready",
+    "resolved_evidence_path": null,
+    "next_action": {},
+    "requires_confirmation": false,
+    "confirmation_reason": null,
+    "arguments_patch": {},
+    "results": [
+      {
+        "title": "Overview",
+        "content": "# Overview\n\nLeaseClient default timeout duration requests exception operation behavior documentation.\n",
+        "source": "/home/viadmin/StudioProjects/hermes/docmancer/v2plan/artifacts/next07/grounded-first/wiring-check-l99mJU/native/partial/corpus/overview.md",
+        "url": null,
+        "metadata": {
+          "format": "markdown",
+          "title": "Overview",
+          "chunking_strategy": "heading",
+          "chunking_schema": "parent-child-v1",
+          "child_target_tokens": 160,
+          "child_hard_max_tokens": 512,
+          "chunk_size": 800,
+          "chunk_overlap": 100,
+          "docset_root": "/home/viadmin/StudioProjects/hermes/docmancer/v2plan/artifacts/next07/grounded-first/wiring-check-l99mJU/native/partial/corpus",
+          "source_path": "overview.md",
+          "content_hash": "5c648f5bbcff05d88435308f9cb2a3851fc5cee7a1bf66c1f96fe9670b988f76",
+          "project_path": "/home/viadmin/StudioProjects/hermes/docmancer/v2plan/artifacts/next07/grounded-first/wiring-check-l99mJU/native/partial/corpus",
+          "repository_identity": "local:a3f6fef547e0bff86646cdbdd3762c658529200a2d6f5da35bd828142fa68612",
+          "source_class": "project_file",
+          "project_docs": true,
+          "project_doc_path": "overview.md",
+          "project_doc_reason": "other",
+          "project_doc_content_hash": "sha256:5c648f5bbcff05d88435308f9cb2a3851fc5cee7a1bf66c1f96fe9670b988f76",
+          "project_doc_mtime_ns": 1791114511565001886,
+          "doc_scope": "project",
+          "module_id": "",
+          "module_name": null,
+          "module_path": null,
+          "module_type": null,
+          "project_doc_description": "Pinned documentation source",
+          "project_doc_authority": "source_of_truth",
+          "project_doc_lifecycle_status": "active",
+          "lifecycle_status": "active",
+          "temporal_relevance": "current",
+          "index_freshness": "synchronized",
+          "project_doc_impact_policy": "track",
+          "project_doc_catalog_entry_hash": "sha256:ce8bc442feb5ab88762b53c4745861baca9d292ffcb8e136157a6a1ca28abc61",
+          "project_doc_sections": [
+            {
+              "source_document_path": "overview.md",
+              "heading_path": [
+                "Overview"
+              ],
+              "mentioned_paths": [],
+              "mentioned_symbols": [],
+              "paths_truncated": false,
+              "symbols_truncated": false,
+              "fields_truncated": false,
+              "document_sections_truncated": false,
+              "content_hash": "sha256:12ce17224c7a69ec1a9e9297ad3bbb1fa044719bf3621cdc684e0c76ab7d7d82"
+            }
+          ],
+          "project_doc_sections_status": "parsed",
+          "project_doc_sections_reason": "section_metadata_parsed",
+          "project_doc_sections_schema": "project-sections-3",
+          "library_id": "",
+          "resolved_version": "",
+          "version_family": "",
+          "project_identity": "local:a3f6fef547e0bff86646cdbdd3762c658529200a2d6f5da35bd828142fa68612",
+          "authority": "source_of_truth",
+          "docs_snapshot_exact": null,
+          "section_title": "Overview",
+          "section_level": 1,
+          "document_title": "overview",
+          "document_title_hash": "fed758b7a842befd",
+          "anchor": "Overview",
+          "retrieval_content_hash": "93c1f64e188bdeb0e5906ce5380ded433c5d1647cc9e1944a16724abf5b375d6",
+          "context_schema_version": "deterministic-context-v2",
+          "context_config_hash": "3c6f50edf28b9ac18d1ba2ea8abb46296651397b744cd434d29135c04a2d3b07",
+          "context_content_hash": "b6819f02d76ed3f14936328ecc84222cf737d208e368f55945cda1176e2dfcb8",
+          "context_manifest": {
+            "schema_version": "deterministic-context-v2",
+            "config_hash": "3c6f50edf28b9ac18d1ba2ea8abb46296651397b744cd434d29135c04a2d3b07",
+            "content_hash": "b6819f02d76ed3f14936328ecc84222cf737d208e368f55945cda1176e2dfcb8",
+            "token_estimate": 49,
+            "truncated": false,
+            "fields": [
+              {
+                "name": "document_title",
+                "value": "overview",
+                "provenance": "source.metadata.title",
+                "priority": 10
+              },
+              {
+                "name": "canonical_location",
+                "value": "overview.md",
+                "provenance": "source.metadata.relative_path",
+                "priority": 20
+              },
+              {
+                "name": "heading_path",
+                "value": "Overview",
+                "provenance": "source.markdown.heading_path",
+                "priority": 30
+              },
+              {
+                "name": "project_scope",
+                "value": "project",
+                "provenance": "source.metadata.doc_scope",
+                "priority": 80
+              },
+              {
+                "name": "source_class",
+                "value": "project_file",
+                "provenance": "source.metadata.source_class",
+                "priority": 90
+              },
+              {
+                "name": "authority",
+                "value": "source_of_truth",
+                "provenance": "source.metadata.authority",
+                "priority": 100
+              },
+              {
+                "name": "catalog_description",
+                "value": "Pinned documentation source",
+                "provenance": "project.catalog.description",
+                "priority": 120
+              }
+            ]
+          },
+          "embedding_input_hash": "93c1f64e188bdeb0e5906ce5380ded433c5d1647cc9e1944a16724abf5b375d6",
+          "stable_chunk_id": "child-1d9d523fff67d74c4e3f8b2bd58fa86bde3bac2d",
+          "vector_id": "33fc12d8-e678-55c3-8302-5219c40ec613",
+          "parent_logical_id": "parent-b6e7daad7248a6969c833cd332a900b9",
+          "atom_type": "mixed",
+          "atom_id": "atom-7f0b2ab281759b475f997318069f96e7",
+          "source_identity": "project_file:local:a3f6fef547e0bff86646cdbdd3762c658529200a2d6f5da35bd828142fa68612:overview.md",
+          "source_content_hash": "5c648f5bbcff05d88435308f9cb2a3851fc5cee7a1bf66c1f96fe9670b988f76",
+          "heading_path": [
+            "Overview"
+          ],
+          "heading_levels": [
+            1
+          ],
+          "char_span": [
+            0,
+            102
+          ],
+          "byte_span": [
+            0,
+            102
+          ],
+          "line_span": [
+            1,
+            3
+          ],
+          "chunk_schema_version": "parent-child-v1",
+          "chunk_config_hash": "6b14dfe3522150abe6744c0691d312762bb749d9ec60afd9e73230b8f85a7823",
+          "token_estimator_version": "utf8-bytes-div4-v1",
+          "display_token_estimate": 26,
+          "retrieval_token_estimate": 82,
+          "generation_id": "gen-9246454710a74dc186821bb2eab57701",
+          "section_id": 4478815581901574425,
+          "token_estimate": 26,
+          "docmancer_tokens": 39,
+          "raw_tokens": 39,
+          "savings_percent": 0.0,
+          "runway_multiplier": 1.0,
+          "ranking": {
+            "stable_id": "child-1d9d523fff67d74c4e3f8b2bd58fa86bde3bac2d",
+            "section_id": 4478815581901574425,
+            "score_direction": "higher_is_better",
+            "raw_component_ranks": {
+              "fts5_bm25_cost": -1.364627e-06
+            },
+            "base_utility": 1.364627e-06,
+            "feature_contributions": {
+              "leading_exact_phrase_boost": 2.0
+            },
+            "final_utility": 2.000001364627,
+            "raw_rank": 2,
+            "final_rank": 2,
+            "rank_delta": 0,
+            "candidate_pool_size": 2
+          },
+          "lexical_match": {
+            "mode": "and",
+            "query_terms": [
+              "leaseclient"
+            ],
+            "matched_terms": [
+              "leaseclient"
+            ],
+            "exact_terms": [
+              "leaseclient"
+            ],
+            "missing_exact_terms": [],
+            "query_term_count": 1,
+            "matched_term_count": 1,
+            "match_ratio": 1.0,
+            "bm25_cost": -1.3646269907795476e-06,
+            "lexical_score": 1.3646269907795476e-06,
+            "field_matches": {
+              "title": [],
+              "body": [
+                "leaseclient"
+              ],
+              "retrieval_text": [
+                "leaseclient"
+              ]
+            }
+          },
+          "query_plan_hash": "65999447b61af08c301d51ab9b742cf8bccc1f21d3f169d916fe42fefa3cb012",
+          "fusion_config_hash": "12c4ba9de2ef41f9c62323363a7c3b24d15c9a08dfe969fb68348e5c537317e4",
+          "retrieval_trace": {
+            "requested_mode": "lexical",
+            "mode_used": "lexical",
+            "component_ranks": {
+              "lexical": 2
+            },
+            "pre_post_rank": 2,
+            "intent_boost": 0.0,
+            "supplemental_rank": null,
+            "final_rank": 2
+          },
+          "_reference_root_plan": {
+            "question": "What is LeaseClient default timeout duration for requests and which exception is raised when an operation expires?",
+            "references": [
+              {
+                "mention": {
+                  "mention_id": "588314f065e5cb15f6245d66edb81f0f3f03f5ee7f1d4c77d8250bbc1e8cd528:8:19",
+                  "start": 8,
+                  "end": 19,
+                  "text": "LeaseClient",
+                  "syntax_role": "semantic_subject",
+                  "explicit": true
+                },
+                "role": "semantic_subject",
+                "state": "resolved",
+                "source_ids": [],
+                "reason": "explicit_reference_role"
+              }
+            ],
+            "scope": {
+              "project_id": "local:a3f6fef547e0bff86646cdbdd3762c658529200a2d6f5da35bd828142fa68612",
+              "version": "",
+              "snapshot_id": "gen-9246454710a74dc186821bb2eab57701"
+            },
+            "catalog_complete": true
+          },
+          "_reference_plans": {
+            "What is LeaseClient default timeout duration for requests and which exception is raised when an operation expires?": {
+              "question": "What is LeaseClient default timeout duration for requests and which exception is raised when an operation expires?",
+              "references": [
+                {
+                  "mention": {
+                    "mention_id": "588314f065e5cb15f6245d66edb81f0f3f03f5ee7f1d4c77d8250bbc1e8cd528:8:19",
+                    "start": 8,
+                    "end": 19,
+                    "text": "LeaseClient",
+                    "syntax_role": "semantic_subject",
+                    "explicit": true
+                  },
+                  "role": "semantic_subject",
+                  "state": "resolved",
+                  "source_ids": [],
+                  "reason": "explicit_reference_role"
+                }
+              ],
+              "scope": {
+                "project_id": "local:a3f6fef547e0bff86646cdbdd3762c658529200a2d6f5da35bd828142fa68612",
+                "version": "",
+                "snapshot_id": "gen-9246454710a74dc186821bb2eab57701"
+              },
+              "catalog_complete": true
+            },
+            "LeaseClient": {
+              "question": "LeaseClient",
+              "references": [
+                {
+                  "mention": {
+                    "mention_id": "32e483d4c43cb0e9d5c96fd8add7aee6ae264acff99c7b5d27290b8d66cf45fe:0:11",
+                    "start": 0,
+                    "end": 11,
+                    "text": "LeaseClient",
+                    "syntax_role": "unresolved",
+                    "explicit": false
+                  },
+                  "role": "unresolved",
+                  "state": "unresolved",
+                  "source_ids": [],
+                  "reason": "unresolved_reference_role"
+                }
+              ],
+              "scope": {
+                "project_id": "local:a3f6fef547e0bff86646cdbdd3762c658529200a2d6f5da35bd828142fa68612",
+                "version": "",
+                "snapshot_id": "gen-9246454710a74dc186821bb2eab57701"
+              },
+              "catalog_complete": true
+            }
+          },
+          "_evidence_sets": [
+            {
+              "schema_version": "source-dependency-proposal-v1",
+              "set_id": "evidence-set:f1bd31fad660786fb726d6e00f30c1828ee0096f9b0e1940ceee16a5d04d9275",
+              "member_spans": [
+                [
+                  0,
+                  10,
+                  "e1cb7d861aecdf5efcbabedd31ee970857b02eec940d72c08574a7b1b3bdf580"
+                ],
+                [
+                  12,
+                  101,
+                  "ef33d4f65fce806b09029d5c373b5d3ed564bff206af61f6e05c5b2002ff6adb"
+                ]
+              ],
+              "edges": [
+                [
+                  "heading",
+                  0,
+                  1,
+                  "markdown-owning-heading-v1"
+                ]
+              ],
+              "proposed_need_ids": [
+                "sentence-1"
+              ]
+            }
+          ],
+          "_reference_evidence": {
+            "schema_version": 1,
+            "source": {
+              "document_id": "project_file:local:a3f6fef547e0bff86646cdbdd3762c658529200a2d6f5da35bd828142fa68612:overview.md",
+              "scope": {
+                "project_id": "local:a3f6fef547e0bff86646cdbdd3762c658529200a2d6f5da35bd828142fa68612",
+                "version": "",
+                "snapshot_id": "gen-9246454710a74dc186821bb2eab57701"
+              },
+              "canonical_path": "overview.md",
+              "content_sha256": "5c648f5bbcff05d88435308f9cb2a3851fc5cee7a1bf66c1f96fe9670b988f76"
+            },
+            "project_doc_content_hash": "sha256:5c648f5bbcff05d88435308f9cb2a3851fc5cee7a1bf66c1f96fe9670b988f76",
+            "char_start": 0,
+            "char_end": 102,
+            "text": "# Overview\n\nLeaseClient default timeout duration requests exception operation behavior documentation.\n",
+            "raw_document": "# Overview\n\nLeaseClient default timeout duration requests exception operation behavior documentation.\n",
+            "owner": {
+              "text": "# Overview\n",
+              "char_start": 0,
+              "char_end": 11,
+              "scope_start": 0,
+              "scope_end": 102,
+              "logical_id": "parent-b6e7daad7248a6969c833cd332a900b9"
+            }
+          },
+          "freshness": "current",
+          "risk_flags": [],
+          "score": 0.95
+        },
+        "stable_chunk_id": "child-1d9d523fff67d74c4e3f8b2bd58fa86bde3bac2d",
+        "parent_logical_id": "parent-b6e7daad7248a6969c833cd332a900b9",
+        "display_content_hash": "5c648f5bbcff05d88435308f9cb2a3851fc5cee7a1bf66c1f96fe9670b988f76",
+        "char_start": 0,
+        "char_end": 102,
+        "line_start": 1,
+        "line_end": 3,
+        "source_class": "project_file",
+        "path": "overview.md",
+        "heading_path": "Overview",
+        "content_hash": "sha256:5c648f5bbcff05d88435308f9cb2a3851fc5cee7a1bf66c1f96fe9670b988f76",
+        "mtime_ns": 1791114511565001886,
+        "stale": false,
+        "doc_scope": "project",
+        "module_id": "",
+        "module_name": null,
+        "module_path": null,
+        "module_type": null,
+        "description": "Pinned documentation source",
+        "authority": "source_of_truth",
+        "lifecycle_status": "active",
+        "impact_policy": "track",
+        "project_identity": "local:a3f6fef547e0bff86646cdbdd3762c658529200a2d6f5da35bd828142fa68612"
+      },
+      {
+        "title": "LeaseClient",
+        "content": "# LeaseClient\n\nThe default timeout is 17 seconds.\n",
+        "source": "/home/viadmin/StudioProjects/hermes/docmancer/v2plan/artifacts/next07/grounded-first/wiring-check-l99mJU/native/partial/corpus/default.md",
+        "url": null,
+        "metadata": {
+          "format": "markdown",
+          "title": "LeaseClient",
+          "chunking_strategy": "heading",
+          "chunking_schema": "parent-child-v1",
+          "child_target_tokens": 160,
+          "child_hard_max_tokens": 512,
+          "chunk_size": 800,
+          "chunk_overlap": 100,
+          "docset_root": "/home/viadmin/StudioProjects/hermes/docmancer/v2plan/artifacts/next07/grounded-first/wiring-check-l99mJU/native/partial/corpus",
+          "source_path": "default.md",
+          "content_hash": "50fc5ae5565ed3949aba18fba3617bdec0a9732f2aafe8ec04488ebf8c69814d",
+          "project_path": "/home/viadmin/StudioProjects/hermes/docmancer/v2plan/artifacts/next07/grounded-first/wiring-check-l99mJU/native/partial/corpus",
+          "repository_identity": "local:a3f6fef547e0bff86646cdbdd3762c658529200a2d6f5da35bd828142fa68612",
+          "source_class": "project_file",
+          "project_docs": true,
+          "project_doc_path": "default.md",
+          "project_doc_reason": "other",
+          "project_doc_content_hash": "sha256:50fc5ae5565ed3949aba18fba3617bdec0a9732f2aafe8ec04488ebf8c69814d",
+          "project_doc_mtime_ns": 1791114511564928419,
+          "doc_scope": "project",
+          "module_id": "",
+          "module_name": null,
+          "module_path": null,
+          "module_type": null,
+          "project_doc_description": "Pinned documentation source",
+          "project_doc_authority": "source_of_truth",
+          "project_doc_lifecycle_status": "active",
+          "lifecycle_status": "active",
+          "temporal_relevance": "current",
+          "index_freshness": "synchronized",
+          "project_doc_impact_policy": "track",
+          "project_doc_catalog_entry_hash": "sha256:8c66570be38c28f2a10bc03d2f7d9ce3d413c018441dfef710fcfa189895d3d6",
+          "project_doc_sections": [
+            {
+              "source_document_path": "default.md",
+              "heading_path": [
+                "LeaseClient"
+              ],
+              "mentioned_paths": [],
+              "mentioned_symbols": [],
+              "paths_truncated": false,
+              "symbols_truncated": false,
+              "fields_truncated": false,
+              "document_sections_truncated": false,
+              "content_hash": "sha256:343918dce0702d2ce6564e2e85a12d1b3d6ab2df9fc354644645b68517d56091"
+            }
+          ],
+          "project_doc_sections_status": "parsed",
+          "project_doc_sections_reason": "section_metadata_parsed",
+          "project_doc_sections_schema": "project-sections-3",
+          "library_id": "",
+          "resolved_version": "",
+          "version_family": "",
+          "project_identity": "local:a3f6fef547e0bff86646cdbdd3762c658529200a2d6f5da35bd828142fa68612",
+          "authority": "source_of_truth",
+          "docs_snapshot_exact": null,
+          "section_title": "LeaseClient",
+          "section_level": 1,
+          "document_title": "default",
+          "document_title_hash": "7505d64a54e061b7",
+          "anchor": "LeaseClient",
+          "retrieval_content_hash": "26855fdf570653e8c8a4e0441d95e898623e37a7af9380bba40b17dcef5ed804",
+          "context_schema_version": "deterministic-context-v2",
+          "context_config_hash": "3c6f50edf28b9ac18d1ba2ea8abb46296651397b744cd434d29135c04a2d3b07",
+          "context_content_hash": "945fd6e665d214e2f57ac0882d44c8b762781173e035f6b639321bb1916b2fe8",
+          "context_manifest": {
+            "schema_version": "deterministic-context-v2",
+            "config_hash": "3c6f50edf28b9ac18d1ba2ea8abb46296651397b744cd434d29135c04a2d3b07",
+            "content_hash": "945fd6e665d214e2f57ac0882d44c8b762781173e035f6b639321bb1916b2fe8",
+            "token_estimate": 49,
+            "truncated": false,
+            "fields": [
+              {
+                "name": "document_title",
+                "value": "default",
+                "provenance": "source.metadata.title",
+                "priority": 10
+              },
+              {
+                "name": "canonical_location",
+                "value": "default.md",
+                "provenance": "source.metadata.relative_path",
+                "priority": 20
+              },
+              {
+                "name": "heading_path",
+                "value": "LeaseClient",
+                "provenance": "source.markdown.heading_path",
+                "priority": 30
+              },
+              {
+                "name": "project_scope",
+                "value": "project",
+                "provenance": "source.metadata.doc_scope",
+                "priority": 80
+              },
+              {
+                "name": "source_class",
+                "value": "project_file",
+                "provenance": "source.metadata.source_class",
+                "priority": 90
+              },
+              {
+                "name": "authority",
+                "value": "source_of_truth",
+                "provenance": "source.metadata.authority",
+                "priority": 100
+              },
+              {
+                "name": "catalog_description",
+                "value": "Pinned documentation source",
+                "provenance": "project.catalog.description",
+                "priority": 120
+              }
+            ]
+          },
+          "embedding_input_hash": "26855fdf570653e8c8a4e0441d95e898623e37a7af9380bba40b17dcef5ed804",
+          "stable_chunk_id": "child-4e1b6f19f898b0a20008ae4eb9a4754ed33ec552",
+          "vector_id": "329561c9-231f-5818-8657-4d8cb789b615",
+          "parent_logical_id": "parent-9852d14c68a6776eb4f741ae1dd92484",
+          "atom_type": "mixed",
+          "atom_id": "atom-cf14f4883cf29007ba46c8574830c037",
+          "source_identity": "project_file:local:a3f6fef547e0bff86646cdbdd3762c658529200a2d6f5da35bd828142fa68612:default.md",
+          "source_content_hash": "50fc5ae5565ed3949aba18fba3617bdec0a9732f2aafe8ec04488ebf8c69814d",
+          "heading_path": [
+            "LeaseClient"
+          ],
+          "heading_levels": [
+            1
+          ],
+          "char_span": [
+            0,
+            50
+          ],
+          "byte_span": [
+            0,
+            50
+          ],
+          "line_span": [
+            1,
+            3
+          ],
+          "chunk_schema_version": "parent-child-v1",
+          "chunk_config_hash": "6b14dfe3522150abe6744c0691d312762bb749d9ec60afd9e73230b8f85a7823",
+          "token_estimator_version": "utf8-bytes-div4-v1",
+          "display_token_estimate": 13,
+          "retrieval_token_estimate": 69,
+          "generation_id": "gen-9246454710a74dc186821bb2eab57701",
+          "section_id": 3123092042114539480,
+          "token_estimate": 13,
+          "docmancer_tokens": 39,
+          "raw_tokens": 39,
+          "savings_percent": 0.0,
+          "runway_multiplier": 1.0,
+          "ranking": {
+            "stable_id": "child-4e1b6f19f898b0a20008ae4eb9a4754ed33ec552",
+            "section_id": 3123092042114539480,
+            "score_direction": "higher_is_better",
+            "raw_component_ranks": {
+              "fts5_bm25_cost": -1.968561e-06
+            },
+            "base_utility": 1.968561e-06,
+            "feature_contributions": {
+              "title_term_boost": 1.5,
+              "leading_exact_phrase_boost": 2.0
+            },
+            "final_utility": 3.500001968561,
+            "raw_rank": 1,
+            "final_rank": 1,
+            "rank_delta": 0,
+            "candidate_pool_size": 2
+          },
+          "lexical_match": {
+            "mode": "and",
+            "query_terms": [
+              "leaseclient"
+            ],
+            "matched_terms": [
+              "leaseclient"
+            ],
+            "exact_terms": [
+              "leaseclient"
+            ],
+            "missing_exact_terms": [],
+            "query_term_count": 1,
+            "matched_term_count": 1,
+            "match_ratio": 1.0,
+            "bm25_cost": -1.9685610640870617e-06,
+            "lexical_score": 1.9685610640870617e-06,
+            "field_matches": {
+              "title": [
+                "leaseclient"
+              ],
+              "body": [
+                "leaseclient"
+              ],
+              "retrieval_text": [
+                "leaseclient"
+              ]
+            }
+          },
+          "query_plan_hash": "65999447b61af08c301d51ab9b742cf8bccc1f21d3f169d916fe42fefa3cb012",
+          "fusion_config_hash": "12c4ba9de2ef41f9c62323363a7c3b24d15c9a08dfe969fb68348e5c537317e4",
+          "retrieval_trace": {
+            "requested_mode": "lexical",
+            "mode_used": "lexical",
+            "component_ranks": {
+              "lexical": 1
+            },
+            "pre_post_rank": 1,
+            "intent_boost": 0.0,
+            "supplemental_rank": null,
+            "final_rank": 1
+          },
+          "_reference_root_plan": {
+            "question": "What is LeaseClient default timeout duration for requests and which exception is raised when an operation expires?",
+            "references": [
+              {
+                "mention": {
+                  "mention_id": "588314f065e5cb15f6245d66edb81f0f3f03f5ee7f1d4c77d8250bbc1e8cd528:8:19",
+                  "start": 8,
+                  "end": 19,
+                  "text": "LeaseClient",
+                  "syntax_role": "semantic_subject",
+                  "explicit": true
+                },
+                "role": "semantic_subject",
+                "state": "resolved",
+                "source_ids": [],
+                "reason": "explicit_reference_role"
+              }
+            ],
+            "scope": {
+              "project_id": "local:a3f6fef547e0bff86646cdbdd3762c658529200a2d6f5da35bd828142fa68612",
+              "version": "",
+              "snapshot_id": "gen-9246454710a74dc186821bb2eab57701"
+            },
+            "catalog_complete": true
+          },
+          "_reference_plans": {
+            "What is LeaseClient default timeout duration for requests and which exception is raised when an operation expires?": {
+              "question": "What is LeaseClient default timeout duration for requests and which exception is raised when an operation expires?",
+              "references": [
+                {
+                  "mention": {
+                    "mention_id": "588314f065e5cb15f6245d66edb81f0f3f03f5ee7f1d4c77d8250bbc1e8cd528:8:19",
+                    "start": 8,
+                    "end": 19,
+                    "text": "LeaseClient",
+                    "syntax_role": "semantic_subject",
+                    "explicit": true
+                  },
+                  "role": "semantic_subject",
+                  "state": "resolved",
+                  "source_ids": [],
+                  "reason": "explicit_reference_role"
+                }
+              ],
+              "scope": {
+                "project_id": "local:a3f6fef547e0bff86646cdbdd3762c658529200a2d6f5da35bd828142fa68612",
+                "version": "",
+                "snapshot_id": "gen-9246454710a74dc186821bb2eab57701"
+              },
+              "catalog_complete": true
+            },
+            "LeaseClient": {
+              "question": "LeaseClient",
+              "references": [
+                {
+                  "mention": {
+                    "mention_id": "32e483d4c43cb0e9d5c96fd8add7aee6ae264acff99c7b5d27290b8d66cf45fe:0:11",
+                    "start": 0,
+                    "end": 11,
+                    "text": "LeaseClient",
+                    "syntax_role": "unresolved",
+                    "explicit": false
+                  },
+                  "role": "unresolved",
+                  "state": "unresolved",
+                  "source_ids": [],
+                  "reason": "unresolved_reference_role"
+                }
+              ],
+              "scope": {
+                "project_id": "local:a3f6fef547e0bff86646cdbdd3762c658529200a2d6f5da35bd828142fa68612",
+                "version": "",
+                "snapshot_id": "gen-9246454710a74dc186821bb2eab57701"
+              },
+              "catalog_complete": true
+            }
+          },
+          "_evidence_sets": [
+            {
+              "schema_version": "source-dependency-proposal-v1",
+              "set_id": "evidence-set:694055ea97829c05290ec715f4108378213ee0670efc6ad8c5ee31c6b70a9dbd",
+              "member_spans": [
+                [
+                  0,
+                  13,
+                  "1ec9d6586bb31572e21ae67e93a1f190d8f312b0e1c5f8a17bd9c075a0e95620"
+                ],
+                [
+                  15,
+                  49,
+                  "8982dafc4056ebe4227204e375e2763dfcd890e5b826d8f599d4e708d6750b85"
+                ]
+              ],
+              "edges": [
+                [
+                  "heading",
+                  0,
+                  1,
+                  "markdown-owning-heading-v1"
+                ]
+              ],
+              "proposed_need_ids": [
+                "sentence-1"
+              ]
+            }
+          ],
+          "_reference_evidence": {
+            "schema_version": 1,
+            "source": {
+              "document_id": "project_file:local:a3f6fef547e0bff86646cdbdd3762c658529200a2d6f5da35bd828142fa68612:default.md",
+              "scope": {
+                "project_id": "local:a3f6fef547e0bff86646cdbdd3762c658529200a2d6f5da35bd828142fa68612",
+                "version": "",
+                "snapshot_id": "gen-9246454710a74dc186821bb2eab57701"
+              },
+              "canonical_path": "default.md",
+              "content_sha256": "50fc5ae5565ed3949aba18fba3617bdec0a9732f2aafe8ec04488ebf8c69814d"
+            },
+            "project_doc_content_hash": "sha256:50fc5ae5565ed3949aba18fba3617bdec0a9732f2aafe8ec04488ebf8c69814d",
+            "char_start": 0,
+            "char_end": 50,
+            "text": "# LeaseClient\n\nThe default timeout is 17 seconds.\n",
+            "raw_document": "# LeaseClient\n\nThe default timeout is 17 seconds.\n",
+            "owner": {
+              "text": "# LeaseClient\n",
+              "char_start": 0,
+              "char_end": 14,
+              "scope_start": 0,
+              "scope_end": 50,
+              "logical_id": "parent-9852d14c68a6776eb4f741ae1dd92484"
+            }
+          },
+          "freshness": "current",
+          "risk_flags": [],
+          "score": 1.0
+        },
+        "stable_chunk_id": "child-4e1b6f19f898b0a20008ae4eb9a4754ed33ec552",
+        "parent_logical_id": "parent-9852d14c68a6776eb4f741ae1dd92484",
+        "display_content_hash": "50fc5ae5565ed3949aba18fba3617bdec0a9732f2aafe8ec04488ebf8c69814d",
+        "char_start": 0,
+        "char_end": 50,
+        "line_start": 1,
+        "line_end": 3,
+        "source_class": "project_file",
+        "path": "default.md",
+        "heading_path": "LeaseClient",
+        "content_hash": "sha256:50fc5ae5565ed3949aba18fba3617bdec0a9732f2aafe8ec04488ebf8c69814d",
+        "mtime_ns": 1791114511564928419,
+        "stale": false,
+        "doc_scope": "project",
+        "module_id": "",
+        "module_name": null,
+        "module_path": null,
+        "module_type": null,
+        "description": "Pinned documentation source",
+        "authority": "source_of_truth",
+        "lifecycle_status": "active",
+        "impact_policy": "track",
+        "project_identity": "local:a3f6fef547e0bff86646cdbdd3762c658529200a2d6f5da35bd828142fa68612"
+      }
+    ],
+    "warnings": [],
+    "candidate_sources": [
+      {
+        "path": "default.md",
+        "source_class": "project_file",
+        "reason": "other",
+        "size_bytes": 50,
+        "mtime_ns": 1791114511564928419,
+        "content_hash": "sha256:50fc5ae5565ed3949aba18fba3617bdec0a9732f2aafe8ec04488ebf8c69814d",
+        "doc_scope": "project",
+        "module_id": null,
+        "module_name": null,
+        "module_path": null,
+        "module_type": null,
+        "description": "Pinned documentation source",
+        "authority": "source_of_truth",
+        "lifecycle_status": "active",
+        "impact_policy": "track",
+        "catalog_entry_hash": "sha256:8c66570be38c28f2a10bc03d2f7d9ce3d413c018441dfef710fcfa189895d3d6"
+      },
+      {
+        "path": "overview.md",
+        "source_class": "project_file",
+        "reason": "other",
+        "size_bytes": 102,
+        "mtime_ns": 1791114511565001886,
+        "content_hash": "sha256:5c648f5bbcff05d88435308f9cb2a3851fc5cee7a1bf66c1f96fe9670b988f76",
+        "doc_scope": "project",
+        "module_id": null,
+        "module_name": null,
+        "module_path": null,
+        "module_type": null,
+        "description": "Pinned documentation source",
+        "authority": "source_of_truth",
+        "lifecycle_status": "active",
+        "impact_policy": "track",
+        "catalog_entry_hash": "sha256:ce8bc442feb5ab88762b53c4745861baca9d292ffcb8e136157a6a1ca28abc61"
+      }
+    ],
+    "indexed_sources": [
+      {
+        "source": "/home/viadmin/StudioProjects/hermes/docmancer/v2plan/artifacts/next07/grounded-first/wiring-check-l99mJU/native/partial/corpus/overview.md",
+        "path": "overview.md",
+        "source_class": "project_file",
+        "content_hash": "sha256:5c648f5bbcff05d88435308f9cb2a3851fc5cee7a1bf66c1f96fe9670b988f76",
+        "mtime_ns": 1791114511565001886,
+        "doc_scope": "project",
+        "module_id": "",
+        "module_name": null,
+        "module_path": null,
+        "module_type": null,
+        "description": "Pinned documentation source",
+        "authority": "source_of_truth",
+        "lifecycle_status": "active",
+        "impact_policy": "track"
+      },
+      {
+        "source": "/home/viadmin/StudioProjects/hermes/docmancer/v2plan/artifacts/next07/grounded-first/wiring-check-l99mJU/native/partial/corpus/default.md",
+        "path": "default.md",
+        "source_class": "project_file",
+        "content_hash": "sha256:50fc5ae5565ed3949aba18fba3617bdec0a9732f2aafe8ec04488ebf8c69814d",
+        "mtime_ns": 1791114511564928419,
+        "doc_scope": "project",
+        "module_id": "",
+        "module_name": null,
+        "module_path": null,
+        "module_type": null,
+        "description": "Pinned documentation source",
+        "authority": "source_of_truth",
+        "lifecycle_status": "active",
+        "impact_policy": "track"
+      }
+    ],
+    "stale_sources": [],
+    "ignored_sources": [],
+    "source_state_guidance": {
+      "stale_source": {
+        "meaning": "An indexed project-doc source differs from the current file on disk.",
+        "next_action": "Run prepare_docs(action=sync_project_docs), then retry get_docs_context."
+      },
+      "indexed_source_not_discovered": {
+        "meaning": "The source exists in the index, but the current discovery pass did not select it as a project-doc candidate. This does not by itself mean the file is deleted or invalid.",
+        "next_action": "Add or correct the file in docatlas.project-docs.yaml, or run sync_project_docs to remove obsolete index entries."
+      },
+      "ignored_generated_or_tooling_doc": {
+        "meaning": "Generated, build, dependency, or tooling docs are not treated as reviewable project-owned docs by default.",
+        "next_action": "Usually no action is required. If the file is official project documentation, add it to docatlas.project-docs.yaml."
+      },
+      "missing_expected_source": {
+        "meaning": "A document the user expected was not selected or cited.",
+        "next_action": "Check inspect_project_docs output, docatlas.project-docs.yaml entries, scope, and ingestion freshness."
+      }
+    },
+    "diagnostics": {},
+    "next_actions": [],
+    "answer_available": true,
+    "reason": null,
+    "message": "Returned 2 project docs result(s)."
+  },
+  "native_orchestration": {
+    "project_path": "/home/viadmin/StudioProjects/hermes/docmancer/v2plan/artifacts/next07/grounded-first/wiring-check-l99mJU/native/partial/corpus",
+    "question": "What is LeaseClient default timeout duration for requests and which exception is raised when an operation expires?",
+    "status": "success",
+    "tool": "get_docs_context",
+    "schema_version": "1.0-mvp",
+    "answer_available": false,
+    "answer_type": "partial_navigational",
+    "answer_completeness": {
+      "schema_version": "answer-completeness-1.0",
+      "status": "partial",
+      "answer_type": "partial_navigational",
+      "coverage_score": 0.0,
+      "matched_terms": [
+        "requests"
+      ],
+      "missing_terms": [],
+      "coverage_by_requirement": [
+        {
+          "term": "requests",
+          "matched": true,
+          "source_paths": [
+            "overview.md"
+          ]
+        }
+      ],
+      "source_search_required": true,
+      "source_search_status": "required",
+      "disposition": "search_local_source",
+      "edit_ready": false,
+      "reason_codes": [
+        "no_trusted_context",
+        "navigational_context_present"
+      ],
+      "canonical_support": {
+        "answer_supported": false,
+        "mandatory_requirement_ids": [
+          "unresolved:0:unresolved_question_clause:What is LeaseClient default timeout duration for requests",
+          "unresolved:1:unresolved_question_clause:which exception is raised when an operation expires"
+        ],
+        "assigned_requirement_ids": []
+      },
+      "legacy_diagnostics": {
+        "schema_version": "answer-completeness-1.0",
+        "status": "unavailable",
+        "answer_type": "unavailable",
+        "coverage_score": 1.0,
+        "matched_terms": [
+          "requests"
+        ],
+        "missing_terms": [],
+        "coverage_by_requirement": [
+          {
+            "term": "requests",
+            "matched": true,
+            "source_paths": [
+              "overview.md"
+            ]
+          }
+        ],
+        "source_search_required": false,
+        "source_search_status": "completed",
+        "disposition": "use_context",
+        "edit_ready": false,
+        "reason_codes": [
+          "no_trusted_context",
+          "navigational_context_present"
+        ]
+      }
+    },
+    "selection_profile": "project_docs_answer",
+    "requirements": {
+      "requirements": [
+        {
+          "requirement_id": "query_symbol:0:leaseclient",
+          "kind": "exact_term",
+          "value": "LeaseClient",
+          "mandatory": false,
+          "public_provenance": "query_exact_term",
+          "source_path": null,
+          "target_path": null,
+          "version_binding": null,
+          "query_extraction_kind": "identifier",
+          "query_span_start": 8,
+          "query_span_end": 19,
+          "query_span_text": "LeaseClient",
+          "proof_role": "generic_fact",
+          "qualifiers": [],
+          "obligation_kind": null,
+          "subject": null,
+          "attribute": null,
+          "relation": null,
+          "obligation_target": null,
+          "value_kind": null,
+          "expected_value": null,
+          "item_kind": null,
+          "cardinality": null,
+          "response_mode": "value",
+          "subject_kind": null,
+          "subject_aliases": [],
+          "context": null,
+          "lifecycle_intent": "current"
+        },
+        {
+          "requirement_id": "unresolved:0:unresolved_question_clause:What is LeaseClient default timeout duration for requests",
+          "kind": "unsupported_query",
+          "value": "unresolved_question_clause:What is LeaseClient default timeout duration for requests",
+          "mandatory": true,
+          "public_provenance": "query_exact_term",
+          "source_path": null,
+          "target_path": null,
+          "version_binding": null,
+          "query_extraction_kind": "unresolved_question_clause:What is LeaseClient default timeout duration for requests",
+          "query_span_start": null,
+          "query_span_end": null,
+          "query_span_text": null,
+          "proof_role": "generic_fact",
+          "qualifiers": [],
+          "obligation_kind": null,
+          "subject": null,
+          "attribute": null,
+          "relation": null,
+          "obligation_target": null,
+          "value_kind": null,
+          "expected_value": null,
+          "item_kind": null,
+          "cardinality": null,
+          "response_mode": "value",
+          "subject_kind": null,
+          "subject_aliases": [],
+          "context": null,
+          "lifecycle_intent": "current"
+        },
+        {
+          "requirement_id": "unresolved:1:unresolved_question_clause:which exception is raised when an operation expires",
+          "kind": "unsupported_query",
+          "value": "unresolved_question_clause:which exception is raised when an operation expires",
+          "mandatory": true,
+          "public_provenance": "query_exact_term",
+          "source_path": null,
+          "target_path": null,
+          "version_binding": null,
+          "query_extraction_kind": "unresolved_question_clause:which exception is raised when an operation expires",
+          "query_span_start": null,
+          "query_span_end": null,
+          "query_span_text": null,
+          "proof_role": "generic_fact",
+          "qualifiers": [],
+          "obligation_kind": null,
+          "subject": null,
+          "attribute": null,
+          "relation": null,
+          "obligation_target": null,
+          "value_kind": null,
+          "expected_value": null,
+          "item_kind": null,
+          "cardinality": null,
+          "response_mode": "value",
+          "subject_kind": null,
+          "subject_aliases": [],
+          "context": null,
+          "lifecycle_intent": "current"
+        }
+      ],
+      "required_entities": [],
+      "required_facets": [],
+      "query_extraction_provenance": [
+        [
+          "query_symbol:0:leaseclient",
+          "identifier",
+          "leaseclient"
+        ],
+        [
+          "unresolved:0:unresolved_question_clause:What is LeaseClient default timeout duration for requests",
+          "unresolved_question_clause:What is LeaseClient default timeout duration for requests",
+          "unresolved_question_clause:what is leaseclient default timeout duration for requests"
+        ],
+        [
+          "unresolved:1:unresolved_question_clause:which exception is raised when an operation expires",
+          "unresolved_question_clause:which exception is raised when an operation expires",
+          "unresolved_question_clause:which exception is raised when an operation expires"
+        ]
+      ],
+      "query_requirement_spans": [
+        [
+          "query_symbol:0:leaseclient",
+          8,
+          19,
+          "LeaseClient"
+        ]
+      ],
+      "retrieval_hints": [
+        "LeaseClient",
+        "default",
+        "timeout",
+        "duration",
+        "for",
+        "requests",
+        "and",
+        "exception",
+        "raised",
+        "operation",
+        "expires"
+      ],
+      "concept_queries": [
+        "an"
+      ],
+      "answer_contract_hash": "091f9b9961fa90d6382f16965beac5df4f5169da72caf68fea3d941a060dab77",
+      "lifecycle_intent": "current",
+      "parse_trace": [
+        "fail_closed:unresolved_compound"
+      ],
+      "unresolved_parts": [
+        "unresolved_question_clause:What is LeaseClient default timeout duration for requests",
+        "unresolved_question_clause:which exception is raised when an operation expires"
+      ],
+      "component_scope_complete": false
+    },
+    "selection_decision": {
+      "status": "insufficient_evidence",
+      "selected_candidates": [
+        {
+          "stable_id": "child-1d9d523fff67d74c4e3f8b2bd58fa86bde3bac2d",
+          "evidence_id": "",
+          "hydration_id": null,
+          "identity_kind": "stable_child",
+          "source_identity": "overview.md",
+          "identity_aliases": [
+            "overview.md",
+            "{'source_class': 'project_doc', 'source_type': 'project_doc', 'source_kind': 'project_doc', 'authority': 'source_of_truth', 'risk_flags': [], 'doc_scope': 'project', 'module_id': '', 'module_name': none, 'module_path': none, 'module_type': none, 'description': 'pinned documentation source', 'lifecycle_status': 'active', 'temporal_relevance': 'current', 'index_freshness': 'synchronized', 'impact_policy': 'track', 'project_identity': 'local:a3f6fef547e0bff86646cdbdd3762c658529200a2d6f5da35bd828142fa68612', 'path': 'overview.md', 'url': none, 'title': 'overview'}"
+          ],
+          "path_or_url": "overview.md",
+          "section": "Overview",
+          "parent_logical_id": "parent-b6e7daad7248a6969c833cd332a900b9",
+          "content_sha256": "5c648f5bbcff05d88435308f9cb2a3851fc5cee7a1bf66c1f96fe9670b988f76",
+          "display_text": "# Overview\n\nLeaseClient default timeout duration requests exception operation behavior documentation.\n",
+          "projected_text": "# Overview\n\nLeaseClient default timeout duration requests exception operation behavior documentation.\n",
+          "token_estimate": 23,
+          "fit_token_estimate": 107,
+          "reported_token_estimate": 25,
+          "char_start": 0,
+          "char_end": 102,
+          "line_start": 1,
+          "line_end": 3,
+          "retrieval_rank": 10000,
+          "component_ranks": [],
+          "relevance_millis": 0,
+          "authority": "canonical",
+          "source_class": "project_doc",
+          "version_binding": "not_applicable",
+          "resolved_version": "",
+          "docs_snapshot_exact": null,
+          "project_identity": "local:a3f6fef547e0bff86646cdbdd3762c658529200a2d6f5da35bd828142fa68612",
+          "module_id": "",
+          "doc_scope": "project",
+          "symbols": [],
+          "exact_terms": [],
+          "instruction_risk_flags": [],
+          "freshness": "current",
+          "navigation_only": false,
+          "answer_units": [
+            {
+              "unit_id": "unit-f55341904f68b4b7f33b",
+              "kind": "heading_context",
+              "text": "# Overview\n\nLeaseClient default timeout duration requests exception operation behavior documentation.",
+              "char_start": 0,
+              "char_end": 101,
+              "content_sha256": "12ce17224c7a69ec1a9e9297ad3bbb1fa044719bf3621cdc684e0c76ab7d7d82",
+              "proposition": true,
+              "source_field": null
+            },
+            {
+              "unit_id": "unit-804fed63e1c3261a3535",
+              "kind": "sentence",
+              "text": "LeaseClient default timeout duration requests exception operation behavior documentation.",
+              "char_start": 12,
+              "char_end": 101,
+              "content_sha256": "ef33d4f65fce806b09029d5c373b5d3ed564bff206af61f6e05c5b2002ff6adb",
+              "proposition": true,
+              "source_field": null
+            },
+            {
+              "unit_id": "unit-5cd34509a97e06a9f192",
+              "kind": "source_field",
+              "text": "overview.md",
+              "char_start": null,
+              "char_end": null,
+              "content_sha256": "7a7987404e86a043b133f56a86fd282421f207557d254dc43ac4bb0bae8e7915",
+              "proposition": true,
+              "source_field": "path_or_url"
+            },
+            {
+              "unit_id": "unit-d268e05ff0821a1ccd56",
+              "kind": "source_field",
+              "text": "Overview",
+              "char_start": null,
+              "char_end": null,
+              "content_sha256": "d4b1ea5708dd532930a85188b45aff6f0a3ed458500c7577e0127a538eb0d100",
+              "proposition": true,
+              "source_field": "section"
+            }
+          ],
+          "requirement_witnesses": [
+            {
+              "requirement_id": "query_symbol:0:leaseclient",
+              "unit_id": "unit-804fed63e1c3261a3535",
+              "unit_kind": "sentence",
+              "unit_text": "LeaseClient default timeout duration requests exception operation behavior documentation.",
+              "unit_char_start": 12,
+              "unit_char_end": 101,
+              "unit_content_hash": "ef33d4f65fce806b09029d5c373b5d3ed564bff206af61f6e05c5b2002ff6adb",
+              "subject_score": 1,
+              "relation_score": 1,
+              "value_score": 1,
+              "completeness_score": 3
+            }
+          ],
+          "covered_requirement_ids": "frozenset({'query_symbol:0:leaseclient'})",
+          "original": {
+            "stable_chunk_id": "child-1d9d523fff67d74c4e3f8b2bd58fa86bde3bac2d",
+            "parent_logical_id": "parent-b6e7daad7248a6969c833cd332a900b9",
+            "display_content_hash": "5c648f5bbcff05d88435308f9cb2a3851fc5cee7a1bf66c1f96fe9670b988f76",
+            "_source_snapshot_sha256": "sha256:5c648f5bbcff05d88435308f9cb2a3851fc5cee7a1bf66c1f96fe9670b988f76",
+            "_reference_evidence": {
+              "schema_version": 1,
+              "source": {
+                "document_id": "project_file:local:a3f6fef547e0bff86646cdbdd3762c658529200a2d6f5da35bd828142fa68612:overview.md",
+                "scope": {
+                  "project_id": "local:a3f6fef547e0bff86646cdbdd3762c658529200a2d6f5da35bd828142fa68612",
+                  "version": "",
+                  "snapshot_id": "gen-9246454710a74dc186821bb2eab57701"
+                },
+                "canonical_path": "overview.md",
+                "content_sha256": "5c648f5bbcff05d88435308f9cb2a3851fc5cee7a1bf66c1f96fe9670b988f76"
+              },
+              "project_doc_content_hash": "sha256:5c648f5bbcff05d88435308f9cb2a3851fc5cee7a1bf66c1f96fe9670b988f76",
+              "char_start": 0,
+              "char_end": 102,
+              "text": "# Overview\n\nLeaseClient default timeout duration requests exception operation behavior documentation.\n",
+              "raw_document": "# Overview\n\nLeaseClient default timeout duration requests exception operation behavior documentation.\n",
+              "owner": {
+                "text": "# Overview\n",
+                "char_start": 0,
+                "char_end": 11,
+                "scope_start": 0,
+                "scope_end": 102,
+                "logical_id": "parent-b6e7daad7248a6969c833cd332a900b9"
+              }
+            },
+            "_reference_root_plan": {
+              "question": "What is LeaseClient default timeout duration for requests and which exception is raised when an operation expires?",
+              "references": [
+                {
+                  "mention": {
+                    "mention_id": "588314f065e5cb15f6245d66edb81f0f3f03f5ee7f1d4c77d8250bbc1e8cd528:8:19",
+                    "start": 8,
+                    "end": 19,
+                    "text": "LeaseClient",
+                    "syntax_role": "semantic_subject",
+                    "explicit": true
+                  },
+                  "role": "semantic_subject",
+                  "state": "resolved",
+                  "source_ids": [],
+                  "reason": "explicit_reference_role"
+                }
+              ],
+              "scope": {
+                "project_id": "local:a3f6fef547e0bff86646cdbdd3762c658529200a2d6f5da35bd828142fa68612",
+                "version": "",
+                "snapshot_id": "gen-9246454710a74dc186821bb2eab57701"
+              },
+              "catalog_complete": true
+            },
+            "_reference_plans": {
+              "What is LeaseClient default timeout duration for requests and which exception is raised when an operation expires?": {
+                "question": "What is LeaseClient default timeout duration for requests and which exception is raised when an operation expires?",
+                "references": [
+                  {
+                    "mention": {
+                      "mention_id": "588314f065e5cb15f6245d66edb81f0f3f03f5ee7f1d4c77d8250bbc1e8cd528:8:19",
+                      "start": 8,
+                      "end": 19,
+                      "text": "LeaseClient",
+                      "syntax_role": "semantic_subject",
+                      "explicit": true
+                    },
+                    "role": "semantic_subject",
+                    "state": "resolved",
+                    "source_ids": [],
+                    "reason": "explicit_reference_role"
+                  }
+                ],
+                "scope": {
+                  "project_id": "local:a3f6fef547e0bff86646cdbdd3762c658529200a2d6f5da35bd828142fa68612",
+                  "version": "",
+                  "snapshot_id": "gen-9246454710a74dc186821bb2eab57701"
+                },
+                "catalog_complete": true
+              },
+              "LeaseClient": {
+                "question": "LeaseClient",
+                "references": [
+                  {
+                    "mention": {
+                      "mention_id": "32e483d4c43cb0e9d5c96fd8add7aee6ae264acff99c7b5d27290b8d66cf45fe:0:11",
+                      "start": 0,
+                      "end": 11,
+                      "text": "LeaseClient",
+                      "syntax_role": "unresolved",
+                      "explicit": false
+                    },
+                    "role": "unresolved",
+                    "state": "unresolved",
+                    "source_ids": [],
+                    "reason": "unresolved_reference_role"
+                  }
+                ],
+                "scope": {
+                  "project_id": "local:a3f6fef547e0bff86646cdbdd3762c658529200a2d6f5da35bd828142fa68612",
+                  "version": "",
+                  "snapshot_id": "gen-9246454710a74dc186821bb2eab57701"
+                },
+                "catalog_complete": true
+              }
+            },
+            "_evidence_sets": [
+              {
+                "schema_version": "source-dependency-proposal-v1",
+                "set_id": "evidence-set:f1bd31fad660786fb726d6e00f30c1828ee0096f9b0e1940ceee16a5d04d9275",
+                "member_spans": [
+                  [
+                    0,
+                    10,
+                    "e1cb7d861aecdf5efcbabedd31ee970857b02eec940d72c08574a7b1b3bdf580"
+                  ],
+                  [
+                    12,
+                    101,
+                    "ef33d4f65fce806b09029d5c373b5d3ed564bff206af61f6e05c5b2002ff6adb"
+                  ]
+                ],
+                "edges": [
+                  [
+                    "heading",
+                    0,
+                    1,
+                    "markdown-owning-heading-v1"
+                  ]
+                ],
+                "proposed_need_ids": [
+                  "sentence-1"
+                ]
+              }
+            ],
+            "generation_id": "gen-9246454710a74dc186821bb2eab57701",
+            "resolved_version": "",
+            "_source_catalog_hash": "sha256:ce8bc442feb5ab88762b53c4745861baca9d292ffcb8e136157a6a1ca28abc61",
+            "char_start": 0,
+            "char_end": 102,
+            "line_start": 1,
+            "line_end": 3,
+            "source_class": "project_doc",
+            "source_type": "project_doc",
+            "source_kind": "project_doc",
+            "authority": "source_of_truth",
+            "risk_flags": [],
+            "doc_scope": "project",
+            "module_id": "",
+            "module_name": null,
+            "module_path": null,
+            "module_type": null,
+            "description": "Pinned documentation source",
+            "catalog_role": "other",
+            "lifecycle_status": "active",
+            "temporal_relevance": "current",
+            "index_freshness": "synchronized",
+            "impact_policy": "track",
+            "project_identity": "local:a3f6fef547e0bff86646cdbdd3762c658529200a2d6f5da35bd828142fa68612",
+            "retrieval_query_ids": [
+              "query-anchor-1",
+              "query-original"
+            ],
+            "retrieval_query_matches": {
+              "query-anchor-1": {
+                "mode": "and",
+                "query_terms": [
+                  "leaseclient"
+                ],
+                "matched_terms": [
+                  "leaseclient"
+                ],
+                "exact_terms": [
+                  "leaseclient"
+                ],
+                "missing_exact_terms": [],
+                "query_term_count": 1,
+                "matched_term_count": 1,
+                "match_ratio": 1.0,
+                "bm25_cost": -1.3646269907795476e-06,
+                "lexical_score": 1.3646269907795476e-06,
+                "field_matches": {
+                  "title": [],
+                  "body": [
+                    "leaseclient"
+                  ],
+                  "retrieval_text": [
+                    "leaseclient"
+                  ]
+                },
+                "bound_subjects": [],
+                "retrieval_anchors": [
+                  "leaseclient"
+                ],
+                "query_text": "LeaseClient",
+                "query_origin": "exact_anchor",
+                "relation": "exact_anchor",
+                "public_parent_query_id": "query-original",
+                "preferred_catalog_roles": [],
+                "forbidden_catalog_roles": [],
+                "forbidden_evidence_terms": [],
+                "parent_exact_terms": [],
+                "need_subject": null,
+                "need_relation": null,
+                "need_context": null,
+                "reference_body_query": "LeaseClient",
+                "bound_subject_context": "# Overview\n",
+                "reference_bindings": [],
+                "reference_visible_span": [
+                  0,
+                  101
+                ],
+                "body_matched_terms": [
+                  "leaseclient"
+                ],
+                "heading_context_used": false,
+                "table_context_used": false,
+                "missing_parent_exact_terms": [],
+                "qualified": true,
+                "qualification_reason": "visible_fields",
+                "coverage_kinds": [
+                  "direct"
+                ]
+              },
+              "query-original": {
+                "mode": "or_fallback",
+                "query_terms": [
+                  "leaseclient",
+                  "default",
+                  "timeout",
+                  "duration",
+                  "requests",
+                  "exception",
+                  "raised",
+                  "when",
+                  "operation",
+                  "expires"
+                ],
+                "matched_terms": [
+                  "leaseclient",
+                  "default",
+                  "timeout",
+                  "duration",
+                  "requests",
+                  "exception",
+                  "operation"
+                ],
+                "exact_terms": [],
+                "missing_exact_terms": [],
+                "query_term_count": 10,
+                "matched_term_count": 7,
+                "match_ratio": 0.7,
+                "bm25_cost": -9.552388935456833e-06,
+                "lexical_score": 9.552388935456833e-06,
+                "field_matches": {
+                  "title": [],
+                  "body": [
+                    "leaseclient",
+                    "default",
+                    "timeout",
+                    "duration",
+                    "requests",
+                    "exception",
+                    "operation"
+                  ],
+                  "retrieval_text": [
+                    "leaseclient",
+                    "default",
+                    "timeout",
+                    "duration",
+                    "requests",
+                    "exception",
+                    "operation"
+                  ]
+                },
+                "bound_subjects": [
+                  "leaseclient"
+                ],
+                "retrieval_anchors": [
+                  "leaseclient"
+                ],
+                "query_text": "What is LeaseClient default timeout duration for requests and which exception is raised when an operation expires?",
+                "query_origin": "original",
+                "relation": "direct",
+                "public_parent_query_id": null,
+                "preferred_catalog_roles": [],
+                "forbidden_catalog_roles": [],
+                "forbidden_evidence_terms": [],
+                "parent_exact_terms": [],
+                "need_subject": null,
+                "need_relation": null,
+                "need_context": null,
+                "reference_body_query": "What is LeaseClient default timeout duration for requests and which exception is raised when an operation expires?",
+                "bound_subject_context": "# Overview\n",
+                "reference_bindings": [
+                  {
+                    "mention_id": "588314f065e5cb15f6245d66edb81f0f3f03f5ee7f1d4c77d8250bbc1e8cd528:8:19",
+                    "role": "semantic_subject",
+                    "field": "body",
+                    "document_id": "project_file:local:a3f6fef547e0bff86646cdbdd3762c658529200a2d6f5da35bd828142fa68612:overview.md",
+                    "scope": {
+                      "project_id": "local:a3f6fef547e0bff86646cdbdd3762c658529200a2d6f5da35bd828142fa68612",
+                      "version": "",
+                      "snapshot_id": "gen-9246454710a74dc186821bb2eab57701"
+                    },
+                    "canonical_path": "overview.md",
+                    "content_sha256": "5c648f5bbcff05d88435308f9cb2a3851fc5cee7a1bf66c1f96fe9670b988f76",
+                    "char_start": 12,
+                    "char_end": 23
+                  }
+                ],
+                "reference_visible_span": [
+                  0,
+                  101
+                ],
+                "body_matched_terms": [
+                  "leaseclient",
+                  "default",
+                  "timeout",
+                  "duration",
+                  "requests",
+                  "exception",
+                  "operation"
+                ],
+                "heading_context_used": false,
+                "table_context_used": false,
+                "missing_parent_exact_terms": [],
+                "qualified": true,
+                "qualification_reason": "visible_fields",
+                "coverage_kinds": [
+                  "direct"
+                ]
+              }
+            },
+            "project_ranking": {
+              "query_intent": "general",
+              "base_score": 0.95,
+              "final_score": 47.5,
+              "original_rank": 0,
+              "selected_rank": 1,
+              "source_weight_reason": "ranked by lexical/vector relevance with neutral source weighting",
+              "requirement_reason": null,
+              "selected_by": "ranking",
+              "diversity_relaxed": false,
+              "reasons": [
+                "ranked by lexical/vector relevance with neutral source weighting"
+              ]
+            },
+            "path": "overview.md",
+            "url": null,
+            "title": "Overview",
+            "heading_path": "Overview",
+            "freshness": "current",
+            "why_selected": "selected because it matched repo-owned project documentation for the question; ranked by lexical/vector relevance with neutral source weighting",
+            "content": "# Overview\n\nLeaseClient default timeout duration requests exception operation behavior documentation.\n",
+            "display_text": "# Overview\n\nLeaseClient default timeout duration requests exception operation behavior documentation.\n",
+            "token_estimate": 25,
+            "source": {
+              "source_class": "project_doc",
+              "source_type": "project_doc",
+              "source_kind": "project_doc",
+              "authority": "source_of_truth",
+              "risk_flags": [],
+              "doc_scope": "project",
+              "module_id": "",
+              "module_name": null,
+              "module_path": null,
+              "module_type": null,
+              "description": "Pinned documentation source",
+              "lifecycle_status": "active",
+              "temporal_relevance": "current",
+              "index_freshness": "synchronized",
+              "impact_policy": "track",
+              "project_identity": "local:a3f6fef547e0bff86646cdbdd3762c658529200a2d6f5da35bd828142fa68612",
+              "path": "overview.md",
+              "url": null,
+              "title": "Overview"
+            },
+            "section": {
+              "title": "Overview",
+              "heading_path": "Overview",
+              "freshness": "current"
+            },
+            "source_provenance": {
+              "owner": "configured_repository",
+              "origin_lane": null
+            },
+            "version_exactness": "not_applicable",
+            "repository_authority": "ordinary_repository_document",
+            "instruction_trust": "untrusted_data",
+            "content_boundary": {
+              "role": "cited_document_data",
+              "schema": "docmancer-document-data-v1",
+              "executable_policy": false
+            },
+            "document_data": {
+              "schema": "docmancer-document-data-v1",
+              "instruction_trust": "untrusted_data",
+              "content": "# Overview\n\nLeaseClient default timeout duration requests exception operation behavior documentation.\n"
+            },
+            "authority_root": null,
+            "policy_scope": null,
+            "scope_verified": false,
+            "instruction_risk_flags": []
+          }
+        }
+      ],
+      "omissions": [
+        {
+          "stable_id": "invalid:2",
+          "reason_code": "invalid_identity",
+          "representative_stable_id": null
+        }
+      ],
+      "missing_requirements": [
+        "unresolved:0:unresolved_question_clause:What is LeaseClient default timeout duration for requests",
+        "unresolved:1:unresolved_question_clause:which exception is raised when an operation expires"
+      ],
+      "unresolved_conflicts": [],
+      "metrics": {
+        "candidate_count": 1,
+        "eligible_count": 1,
+        "selected_count": 1,
+        "selected_sources": 1,
+        "selected_documents": 1,
+        "max_documents": 3,
+        "max_spans": 6,
+        "selected_tokens": 23,
+        "wrapper_reserve_tokens": 120,
+        "projected_total_tokens": 143,
+        "serialized_projected_tokens": 457,
+        "hard_tokens": 800,
+        "mandatory_requirements": 2,
+        "mandatory_covered": 0,
+        "mandatory_coverage_millis": 0,
+        "requirements_hash": "7d5654d33843843684b43654021d258c48b491005c2180253823f068dfdb2597",
+        "omission_counts": {
+          "invalid_identity": 1
+        },
+        "selected_parents": 1,
+        "selected_children": 1,
+        "required_facts_per_1000_tokens_millis": 43478,
+        "redundant_visible_token_ratio_millis": 0,
+        "cache": "disabled",
+        "selected_feature_trace": [
+          {
+            "stable_id": "child-1d9d523fff67d74c4e3f8b2bd58fa86bde3bac2d",
+            "retrieval_relevance": 0,
+            "exact_term_coverage": 1,
+            "mandatory_requirement_coverage": 0,
+            "authority": 1000,
+            "version_exactness": 0,
+            "usable_snippet": 1000,
+            "new_source_fact_terms": 10,
+            "new_module_coverage": 0,
+            "new_target_symbols": 0,
+            "new_source": 1,
+            "novelty_millis": 1000,
+            "token_cost": 23,
+            "expansion_cost": 0,
+            "stale_risk": 0,
+            "generic_source_penalty": 0,
+            "ambiguity_penalty": 0
+          }
+        ],
+        "candidate_to_selected_ratio_millis": 1000,
+        "reported_token_mismatches": 1
+      },
+      "selector_config_hash": "23cf8aa2f77c1b7e9b9d00819a1d05c14e198272ad91516b5a75c5f641963edd",
+      "eligibility_contract_hash": "547399965ada1cdd772dfef9694ee9fa9e8f66e08bde2408c2a9d2036f4da6a1",
+      "candidate_trace_hash": "e66e6b1404ea743154c89891a5a9549985222029c29bd74871f100d579ba58e5",
+      "selection_hash": "d40b48049b0430b18979ff08a1da7dd27875225ea76036440f7bc7e59b4068f7",
+      "assignments": [],
+      "support_decision": {
+        "answer_supported": false,
+        "support_status": "insufficient_evidence",
+        "reason_code": "required_evidence_missing",
+        "missing_requirement_ids": [
+          "unresolved:0:unresolved_question_clause:What is LeaseClient default timeout duration for requests",
+          "unresolved:1:unresolved_question_clause:which exception is raised when an operation expires"
+        ],
+        "satisfied_requirement_ids": [
+          "query_symbol:0:leaseclient"
+        ],
+        "mandatory_requirement_ids": [
+          "unresolved:0:unresolved_question_clause:What is LeaseClient default timeout duration for requests",
+          "unresolved:1:unresolved_question_clause:which exception is raised when an operation expires"
+        ],
+        "mandatory_coverage": 0.0,
+        "selected_evidence_ids": [],
+        "requirements_hash": "7d5654d33843843684b43654021d258c48b491005c2180253823f068dfdb2597",
+        "selector_config_hash": "23cf8aa2f77c1b7e9b9d00819a1d05c14e198272ad91516b5a75c5f641963edd",
+        "eligibility_contract_hash": "547399965ada1cdd772dfef9694ee9fa9e8f66e08bde2408c2a9d2036f4da6a1",
+        "candidate_trace_hash": "e66e6b1404ea743154c89891a5a9549985222029c29bd74871f100d579ba58e5",
+        "selection_hash": "d40b48049b0430b18979ff08a1da7dd27875225ea76036440f7bc7e59b4068f7",
+        "assignment_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "decision_hash": "ca88b78a99bf09713560a2229b6700813142cb4081d69d25148e939c3c461e7d",
+        "requirements": {
+          "requirements": [
+            {
+              "requirement_id": "query_symbol:0:leaseclient",
+              "kind": "exact_term",
+              "value": "LeaseClient",
+              "mandatory": false,
+              "public_provenance": "query_exact_term",
+              "source_path": null,
+              "target_path": null,
+              "version_binding": null,
+              "query_extraction_kind": "identifier",
+              "query_span_start": 8,
+              "query_span_end": 19,
+              "query_span_text": "LeaseClient",
+              "proof_role": "generic_fact",
+              "qualifiers": [],
+              "obligation_kind": null,
+              "subject": null,
+              "attribute": null,
+              "relation": null,
+              "obligation_target": null,
+              "value_kind": null,
+              "expected_value": null,
+              "item_kind": null,
+              "cardinality": null,
+              "response_mode": "value",
+              "subject_kind": null,
+              "subject_aliases": [],
+              "context": null,
+              "lifecycle_intent": "current"
+            },
+            {
+              "requirement_id": "unresolved:0:unresolved_question_clause:What is LeaseClient default timeout duration for requests",
+              "kind": "unsupported_query",
+              "value": "unresolved_question_clause:What is LeaseClient default timeout duration for requests",
+              "mandatory": true,
+              "public_provenance": "query_exact_term",
+              "source_path": null,
+              "target_path": null,
+              "version_binding": null,
+              "query_extraction_kind": "unresolved_question_clause:What is LeaseClient default timeout duration for requests",
+              "query_span_start": null,
+              "query_span_end": null,
+              "query_span_text": null,
+              "proof_role": "generic_fact",
+              "qualifiers": [],
+              "obligation_kind": null,
+              "subject": null,
+              "attribute": null,
+              "relation": null,
+              "obligation_target": null,
+              "value_kind": null,
+              "expected_value": null,
+              "item_kind": null,
+              "cardinality": null,
+              "response_mode": "value",
+              "subject_kind": null,
+              "subject_aliases": [],
+              "context": null,
+              "lifecycle_intent": "current"
+            },
+            {
+              "requirement_id": "unresolved:1:unresolved_question_clause:which exception is raised when an operation expires",
+              "kind": "unsupported_query",
+              "value": "unresolved_question_clause:which exception is raised when an operation expires",
+              "mandatory": true,
+              "public_provenance": "query_exact_term",
+              "source_path": null,
+              "target_path": null,
+              "version_binding": null,
+              "query_extraction_kind": "unresolved_question_clause:which exception is raised when an operation expires",
+              "query_span_start": null,
+              "query_span_end": null,
+              "query_span_text": null,
+              "proof_role": "generic_fact",
+              "qualifiers": [],
+              "obligation_kind": null,
+              "subject": null,
+              "attribute": null,
+              "relation": null,
+              "obligation_target": null,
+              "value_kind": null,
+              "expected_value": null,
+              "item_kind": null,
+              "cardinality": null,
+              "response_mode": "value",
+              "subject_kind": null,
+              "subject_aliases": [],
+              "context": null,
+              "lifecycle_intent": "current"
+            }
+          ],
+          "required_entities": [],
+          "required_facets": [],
+          "query_extraction_provenance": [
+            [
+              "query_symbol:0:leaseclient",
+              "identifier",
+              "leaseclient"
+            ],
+            [
+              "unresolved:0:unresolved_question_clause:What is LeaseClient default timeout duration for requests",
+              "unresolved_question_clause:What is LeaseClient default timeout duration for requests",
+              "unresolved_question_clause:what is leaseclient default timeout duration for requests"
+            ],
+            [
+              "unresolved:1:unresolved_question_clause:which exception is raised when an operation expires",
+              "unresolved_question_clause:which exception is raised when an operation expires",
+              "unresolved_question_clause:which exception is raised when an operation expires"
+            ]
+          ],
+          "query_requirement_spans": [
+            [
+              "query_symbol:0:leaseclient",
+              8,
+              19,
+              "LeaseClient"
+            ]
+          ],
+          "retrieval_hints": [
+            "LeaseClient",
+            "default",
+            "timeout",
+            "duration",
+            "for",
+            "requests",
+            "and",
+            "exception",
+            "raised",
+            "operation",
+            "expires"
+          ],
+          "concept_queries": [
+            "an"
+          ],
+          "answer_contract_hash": "091f9b9961fa90d6382f16965beac5df4f5169da72caf68fea3d941a060dab77",
+          "lifecycle_intent": "current",
+          "parse_trace": [
+            "fail_closed:unresolved_compound"
+          ],
+          "unresolved_parts": [
+            "unresolved_question_clause:What is LeaseClient default timeout duration for requests",
+            "unresolved_question_clause:which exception is raised when an operation expires"
+          ],
+          "component_scope_complete": false
+        }
+      },
+      "requirements": {
+        "requirements": [
+          {
+            "requirement_id": "query_symbol:0:leaseclient",
+            "kind": "exact_term",
+            "value": "LeaseClient",
+            "mandatory": false,
+            "public_provenance": "query_exact_term",
+            "source_path": null,
+            "target_path": null,
+            "version_binding": null,
+            "query_extraction_kind": "identifier",
+            "query_span_start": 8,
+            "query_span_end": 19,
+            "query_span_text": "LeaseClient",
+            "proof_role": "generic_fact",
+            "qualifiers": [],
+            "obligation_kind": null,
+            "subject": null,
+            "attribute": null,
+            "relation": null,
+            "obligation_target": null,
+            "value_kind": null,
+            "expected_value": null,
+            "item_kind": null,
+            "cardinality": null,
+            "response_mode": "value",
+            "subject_kind": null,
+            "subject_aliases": [],
+            "context": null,
+            "lifecycle_intent": "current"
+          },
+          {
+            "requirement_id": "unresolved:0:unresolved_question_clause:What is LeaseClient default timeout duration for requests",
+            "kind": "unsupported_query",
+            "value": "unresolved_question_clause:What is LeaseClient default timeout duration for requests",
+            "mandatory": true,
+            "public_provenance": "query_exact_term",
+            "source_path": null,
+            "target_path": null,
+            "version_binding": null,
+            "query_extraction_kind": "unresolved_question_clause:What is LeaseClient default timeout duration for requests",
+            "query_span_start": null,
+            "query_span_end": null,
+            "query_span_text": null,
+            "proof_role": "generic_fact",
+            "qualifiers": [],
+            "obligation_kind": null,
+            "subject": null,
+            "attribute": null,
+            "relation": null,
+            "obligation_target": null,
+            "value_kind": null,
+            "expected_value": null,
+            "item_kind": null,
+            "cardinality": null,
+            "response_mode": "value",
+            "subject_kind": null,
+            "subject_aliases": [],
+            "context": null,
+            "lifecycle_intent": "current"
+          },
+          {
+            "requirement_id": "unresolved:1:unresolved_question_clause:which exception is raised when an operation expires",
+            "kind": "unsupported_query",
+            "value": "unresolved_question_clause:which exception is raised when an operation expires",
+            "mandatory": true,
+            "public_provenance": "query_exact_term",
+            "source_path": null,
+            "target_path": null,
+            "version_binding": null,
+            "query_extraction_kind": "unresolved_question_clause:which exception is raised when an operation expires",
+            "query_span_start": null,
+            "query_span_end": null,
+            "query_span_text": null,
+            "proof_role": "generic_fact",
+            "qualifiers": [],
+            "obligation_kind": null,
+            "subject": null,
+            "attribute": null,
+            "relation": null,
+            "obligation_target": null,
+            "value_kind": null,
+            "expected_value": null,
+            "item_kind": null,
+            "cardinality": null,
+            "response_mode": "value",
+            "subject_kind": null,
+            "subject_aliases": [],
+            "context": null,
+            "lifecycle_intent": "current"
+          }
+        ],
+        "required_entities": [],
+        "required_facets": [],
+        "query_extraction_provenance": [
+          [
+            "query_symbol:0:leaseclient",
+            "identifier",
+            "leaseclient"
+          ],
+          [
+            "unresolved:0:unresolved_question_clause:What is LeaseClient default timeout duration for requests",
+            "unresolved_question_clause:What is LeaseClient default timeout duration for requests",
+            "unresolved_question_clause:what is leaseclient default timeout duration for requests"
+          ],
+          [
+            "unresolved:1:unresolved_question_clause:which exception is raised when an operation expires",
+            "unresolved_question_clause:which exception is raised when an operation expires",
+            "unresolved_question_clause:which exception is raised when an operation expires"
+          ]
+        ],
+        "query_requirement_spans": [
+          [
+            "query_symbol:0:leaseclient",
+            8,
+            19,
+            "LeaseClient"
+          ]
+        ],
+        "retrieval_hints": [
+          "LeaseClient",
+          "default",
+          "timeout",
+          "duration",
+          "for",
+          "requests",
+          "and",
+          "exception",
+          "raised",
+          "operation",
+          "expires"
+        ],
+        "concept_queries": [
+          "an"
+        ],
+        "answer_contract_hash": "091f9b9961fa90d6382f16965beac5df4f5169da72caf68fea3d941a060dab77",
+        "lifecycle_intent": "current",
+        "parse_trace": [
+          "fail_closed:unresolved_compound"
+        ],
+        "unresolved_parts": [
+          "unresolved_question_clause:What is LeaseClient default timeout duration for requests",
+          "unresolved_question_clause:which exception is raised when an operation expires"
+        ],
+        "component_scope_complete": false
+      }
+    },
+    "support_decision": {
+      "answer_supported": false,
+      "support_status": "insufficient_evidence",
+      "reason_code": "required_evidence_missing",
+      "missing_requirement_ids": [
+        "unresolved:0:unresolved_question_clause:What is LeaseClient default timeout duration for requests",
+        "unresolved:1:unresolved_question_clause:which exception is raised when an operation expires"
+      ],
+      "satisfied_requirement_ids": [
+        "query_symbol:0:leaseclient"
+      ],
+      "mandatory_requirement_ids": [
+        "unresolved:0:unresolved_question_clause:What is LeaseClient default timeout duration for requests",
+        "unresolved:1:unresolved_question_clause:which exception is raised when an operation expires"
+      ],
+      "mandatory_coverage": 0.0,
+      "selected_evidence_ids": [],
+      "requirements_hash": "7d5654d33843843684b43654021d258c48b491005c2180253823f068dfdb2597",
+      "selector_config_hash": "23cf8aa2f77c1b7e9b9d00819a1d05c14e198272ad91516b5a75c5f641963edd",
+      "eligibility_contract_hash": "547399965ada1cdd772dfef9694ee9fa9e8f66e08bde2408c2a9d2036f4da6a1",
+      "candidate_trace_hash": "e66e6b1404ea743154c89891a5a9549985222029c29bd74871f100d579ba58e5",
+      "selection_hash": "d40b48049b0430b18979ff08a1da7dd27875225ea76036440f7bc7e59b4068f7",
+      "assignment_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "decision_hash": "ca88b78a99bf09713560a2229b6700813142cb4081d69d25148e939c3c461e7d",
+      "requirements": {
+        "requirements": [
+          {
+            "requirement_id": "query_symbol:0:leaseclient",
+            "kind": "exact_term",
+            "value": "LeaseClient",
+            "mandatory": false,
+            "public_provenance": "query_exact_term",
+            "source_path": null,
+            "target_path": null,
+            "version_binding": null,
+            "query_extraction_kind": "identifier",
+            "query_span_start": 8,
+            "query_span_end": 19,
+            "query_span_text": "LeaseClient",
+            "proof_role": "generic_fact",
+            "qualifiers": [],
+            "obligation_kind": null,
+            "subject": null,
+            "attribute": null,
+            "relation": null,
+            "obligation_target": null,
+            "value_kind": null,
+            "expected_value": null,
+            "item_kind": null,
+            "cardinality": null,
+            "response_mode": "value",
+            "subject_kind": null,
+            "subject_aliases": [],
+            "context": null,
+            "lifecycle_intent": "current"
+          },
+          {
+            "requirement_id": "unresolved:0:unresolved_question_clause:What is LeaseClient default timeout duration for requests",
+            "kind": "unsupported_query",
+            "value": "unresolved_question_clause:What is LeaseClient default timeout duration for requests",
+            "mandatory": true,
+            "public_provenance": "query_exact_term",
+            "source_path": null,
+            "target_path": null,
+            "version_binding": null,
+            "query_extraction_kind": "unresolved_question_clause:What is LeaseClient default timeout duration for requests",
+            "query_span_start": null,
+            "query_span_end": null,
+            "query_span_text": null,
+            "proof_role": "generic_fact",
+            "qualifiers": [],
+            "obligation_kind": null,
+            "subject": null,
+            "attribute": null,
+            "relation": null,
+            "obligation_target": null,
+            "value_kind": null,
+            "expected_value": null,
+            "item_kind": null,
+            "cardinality": null,
+            "response_mode": "value",
+            "subject_kind": null,
+            "subject_aliases": [],
+            "context": null,
+            "lifecycle_intent": "current"
+          },
+          {
+            "requirement_id": "unresolved:1:unresolved_question_clause:which exception is raised when an operation expires",
+            "kind": "unsupported_query",
+            "value": "unresolved_question_clause:which exception is raised when an operation expires",
+            "mandatory": true,
+            "public_provenance": "query_exact_term",
+            "source_path": null,
+            "target_path": null,
+            "version_binding": null,
+            "query_extraction_kind": "unresolved_question_clause:which exception is raised when an operation expires",
+            "query_span_start": null,
+            "query_span_end": null,
+            "query_span_text": null,
+            "proof_role": "generic_fact",
+            "qualifiers": [],
+            "obligation_kind": null,
+            "subject": null,
+            "attribute": null,
+            "relation": null,
+            "obligation_target": null,
+            "value_kind": null,
+            "expected_value": null,
+            "item_kind": null,
+            "cardinality": null,
+            "response_mode": "value",
+            "subject_kind": null,
+            "subject_aliases": [],
+            "context": null,
+            "lifecycle_intent": "current"
+          }
+        ],
+        "required_entities": [],
+        "required_facets": [],
+        "query_extraction_provenance": [
+          [
+            "query_symbol:0:leaseclient",
+            "identifier",
+            "leaseclient"
+          ],
+          [
+            "unresolved:0:unresolved_question_clause:What is LeaseClient default timeout duration for requests",
+            "unresolved_question_clause:What is LeaseClient default timeout duration for requests",
+            "unresolved_question_clause:what is leaseclient default timeout duration for requests"
+          ],
+          [
+            "unresolved:1:unresolved_question_clause:which exception is raised when an operation expires",
+            "unresolved_question_clause:which exception is raised when an operation expires",
+            "unresolved_question_clause:which exception is raised when an operation expires"
+          ]
+        ],
+        "query_requirement_spans": [
+          [
+            "query_symbol:0:leaseclient",
+            8,
+            19,
+            "LeaseClient"
+          ]
+        ],
+        "retrieval_hints": [
+          "LeaseClient",
+          "default",
+          "timeout",
+          "duration",
+          "for",
+          "requests",
+          "and",
+          "exception",
+          "raised",
+          "operation",
+          "expires"
+        ],
+        "concept_queries": [
+          "an"
+        ],
+        "answer_contract_hash": "091f9b9961fa90d6382f16965beac5df4f5169da72caf68fea3d941a060dab77",
+        "lifecycle_intent": "current",
+        "parse_trace": [
+          "fail_closed:unresolved_compound"
+        ],
+        "unresolved_parts": [
+          "unresolved_question_clause:What is LeaseClient default timeout duration for requests",
+          "unresolved_question_clause:which exception is raised when an operation expires"
+        ],
+        "component_scope_complete": false
+      }
+    },
+    "delivery_decision": {
+      "deliverable": false,
+      "reason_code": "partial_navigational_context"
+    },
+    "mode": "auto",
+    "reason": "partial_navigational_context",
+    "documentation_query_plan": {
+      "schema_version": "documentation-query-plan-v2",
+      "original_question": "What is LeaseClient default timeout duration for requests and which exception is raised when an operation expires?",
+      "query_ids": [
+        "query-original",
+        "query-anchor-1"
+      ],
+      "required_query_ids": [
+        "query-original"
+      ],
+      "public_query_ids": [
+        "query-original",
+        "query-anchor-1"
+      ],
+      "queries": [
+        {
+          "query_id": "query-original",
+          "text": "What is LeaseClient default timeout duration for requests and which exception is raised when an operation expires?",
+          "origin": "original",
+          "coverage_required": true,
+          "facet_id": null,
+          "requirement_id": null,
+          "relation": "direct",
+          "public_parent_query_id": null,
+          "preferred_catalog_roles": [],
+          "forbidden_catalog_roles": [],
+          "forbidden_evidence_terms": [],
+          "parent_exact_terms": [],
+          "need_subject": null,
+          "need_relation": null,
+          "need_context": null
+        },
+        {
+          "query_id": "query-anchor-1",
+          "text": "LeaseClient",
+          "origin": "exact_anchor",
+          "coverage_required": false,
+          "facet_id": null,
+          "requirement_id": null,
+          "relation": "exact_anchor",
+          "public_parent_query_id": "query-original",
+          "preferred_catalog_roles": [],
+          "forbidden_catalog_roles": [],
+          "forbidden_evidence_terms": [],
+          "parent_exact_terms": [],
+          "need_subject": null,
+          "need_relation": null,
+          "need_context": null
+        }
+      ],
+      "explicit_paths": [],
+      "unresolved_parts": [
+        "semantic_scope_unverified"
+      ],
+      "_component_contract": [],
+      "component_scope_complete": false
+    },
+    "context_pack": [
+      {
+        "stable_chunk_id": "child-1d9d523fff67d74c4e3f8b2bd58fa86bde3bac2d",
+        "parent_logical_id": "parent-b6e7daad7248a6969c833cd332a900b9",
+        "display_content_hash": "5c648f5bbcff05d88435308f9cb2a3851fc5cee7a1bf66c1f96fe9670b988f76",
+        "_source_snapshot_sha256": "sha256:5c648f5bbcff05d88435308f9cb2a3851fc5cee7a1bf66c1f96fe9670b988f76",
+        "_reference_evidence": {
+          "schema_version": 1,
+          "source": {
+            "document_id": "project_file:local:a3f6fef547e0bff86646cdbdd3762c658529200a2d6f5da35bd828142fa68612:overview.md",
+            "scope": {
+              "project_id": "local:a3f6fef547e0bff86646cdbdd3762c658529200a2d6f5da35bd828142fa68612",
+              "version": "",
+              "snapshot_id": "gen-9246454710a74dc186821bb2eab57701"
+            },
+            "canonical_path": "overview.md",
+            "content_sha256": "5c648f5bbcff05d88435308f9cb2a3851fc5cee7a1bf66c1f96fe9670b988f76"
+          },
+          "project_doc_content_hash": "sha256:5c648f5bbcff05d88435308f9cb2a3851fc5cee7a1bf66c1f96fe9670b988f76",
+          "char_start": 0,
+          "char_end": 102,
+          "text": "# Overview\n\nLeaseClient default timeout duration requests exception operation behavior documentation.\n",
+          "raw_document": "# Overview\n\nLeaseClient default timeout duration requests exception operation behavior documentation.\n",
+          "owner": {
+            "text": "# Overview\n",
+            "char_start": 0,
+            "char_end": 11,
+            "scope_start": 0,
+            "scope_end": 102,
+            "logical_id": "parent-b6e7daad7248a6969c833cd332a900b9"
+          }
+        },
+        "_reference_root_plan": {
+          "question": "What is LeaseClient default timeout duration for requests and which exception is raised when an operation expires?",
+          "references": [
+            {
+              "mention": {
+                "mention_id": "588314f065e5cb15f6245d66edb81f0f3f03f5ee7f1d4c77d8250bbc1e8cd528:8:19",
+                "start": 8,
+                "end": 19,
+                "text": "LeaseClient",
+                "syntax_role": "semantic_subject",
+                "explicit": true
+              },
+              "role": "semantic_subject",
+              "state": "resolved",
+              "source_ids": [],
+              "reason": "explicit_reference_role"
+            }
+          ],
+          "scope": {
+            "project_id": "local:a3f6fef547e0bff86646cdbdd3762c658529200a2d6f5da35bd828142fa68612",
+            "version": "",
+            "snapshot_id": "gen-9246454710a74dc186821bb2eab57701"
+          },
+          "catalog_complete": true
+        },
+        "_reference_plans": {
+          "What is LeaseClient default timeout duration for requests and which exception is raised when an operation expires?": {
+            "question": "What is LeaseClient default timeout duration for requests and which exception is raised when an operation expires?",
+            "references": [
+              {
+                "mention": {
+                  "mention_id": "588314f065e5cb15f6245d66edb81f0f3f03f5ee7f1d4c77d8250bbc1e8cd528:8:19",
+                  "start": 8,
+                  "end": 19,
+                  "text": "LeaseClient",
+                  "syntax_role": "semantic_subject",
+                  "explicit": true
+                },
+                "role": "semantic_subject",
+                "state": "resolved",
+                "source_ids": [],
+                "reason": "explicit_reference_role"
+              }
+            ],
+            "scope": {
+              "project_id": "local:a3f6fef547e0bff86646cdbdd3762c658529200a2d6f5da35bd828142fa68612",
+              "version": "",
+              "snapshot_id": "gen-9246454710a74dc186821bb2eab57701"
+            },
+            "catalog_complete": true
+          },
+          "LeaseClient": {
+            "question": "LeaseClient",
+            "references": [
+              {
+                "mention": {
+                  "mention_id": "32e483d4c43cb0e9d5c96fd8add7aee6ae264acff99c7b5d27290b8d66cf45fe:0:11",
+                  "start": 0,
+                  "end": 11,
+                  "text": "LeaseClient",
+                  "syntax_role": "unresolved",
+                  "explicit": false
+                },
+                "role": "unresolved",
+                "state": "unresolved",
+                "source_ids": [],
+                "reason": "unresolved_reference_role"
+              }
+            ],
+            "scope": {
+              "project_id": "local:a3f6fef547e0bff86646cdbdd3762c658529200a2d6f5da35bd828142fa68612",
+              "version": "",
+              "snapshot_id": "gen-9246454710a74dc186821bb2eab57701"
+            },
+            "catalog_complete": true
+          }
+        },
+        "_evidence_sets": [
+          {
+            "schema_version": "source-dependency-proposal-v1",
+            "set_id": "evidence-set:f1bd31fad660786fb726d6e00f30c1828ee0096f9b0e1940ceee16a5d04d9275",
+            "member_spans": [
+              [
+                0,
+                10,
+                "e1cb7d861aecdf5efcbabedd31ee970857b02eec940d72c08574a7b1b3bdf580"
+              ],
+              [
+                12,
+                101,
+                "ef33d4f65fce806b09029d5c373b5d3ed564bff206af61f6e05c5b2002ff6adb"
+              ]
+            ],
+            "edges": [
+              [
+                "heading",
+                0,
+                1,
+                "markdown-owning-heading-v1"
+              ]
+            ],
+            "proposed_need_ids": [
+              "sentence-1"
+            ]
+          }
+        ],
+        "generation_id": "gen-9246454710a74dc186821bb2eab57701",
+        "resolved_version": "",
+        "_source_catalog_hash": "sha256:ce8bc442feb5ab88762b53c4745861baca9d292ffcb8e136157a6a1ca28abc61",
+        "char_start": 0,
+        "char_end": 102,
+        "line_start": 1,
+        "line_end": 3,
+        "source_class": "project_doc",
+        "source_type": "project_doc",
+        "source_kind": "project_doc",
+        "authority": "source_of_truth",
+        "risk_flags": [],
+        "doc_scope": "project",
+        "module_id": "",
+        "module_name": null,
+        "module_path": null,
+        "module_type": null,
+        "description": "Pinned documentation source",
+        "catalog_role": "other",
+        "lifecycle_status": "active",
+        "temporal_relevance": "current",
+        "index_freshness": "synchronized",
+        "impact_policy": "track",
+        "project_identity": "local:a3f6fef547e0bff86646cdbdd3762c658529200a2d6f5da35bd828142fa68612",
+        "retrieval_query_ids": [
+          "query-anchor-1",
+          "query-original"
+        ],
+        "retrieval_query_matches": {
+          "query-anchor-1": {
+            "mode": "and",
+            "query_terms": [
+              "leaseclient"
+            ],
+            "matched_terms": [
+              "leaseclient"
+            ],
+            "exact_terms": [
+              "leaseclient"
+            ],
+            "missing_exact_terms": [],
+            "query_term_count": 1,
+            "matched_term_count": 1,
+            "match_ratio": 1.0,
+            "bm25_cost": -1.3646269907795476e-06,
+            "lexical_score": 1.3646269907795476e-06,
+            "field_matches": {
+              "title": [],
+              "body": [
+                "leaseclient"
+              ],
+              "retrieval_text": [
+                "leaseclient"
+              ]
+            },
+            "bound_subjects": [],
+            "retrieval_anchors": [
+              "leaseclient"
+            ],
+            "query_text": "LeaseClient",
+            "query_origin": "exact_anchor",
+            "relation": "exact_anchor",
+            "public_parent_query_id": "query-original",
+            "preferred_catalog_roles": [],
+            "forbidden_catalog_roles": [],
+            "forbidden_evidence_terms": [],
+            "parent_exact_terms": [],
+            "need_subject": null,
+            "need_relation": null,
+            "need_context": null,
+            "reference_body_query": "LeaseClient",
+            "bound_subject_context": "# Overview\n",
+            "reference_bindings": [],
+            "reference_visible_span": [
+              0,
+              101
+            ],
+            "body_matched_terms": [
+              "leaseclient"
+            ],
+            "heading_context_used": false,
+            "table_context_used": false,
+            "missing_parent_exact_terms": [],
+            "qualified": true,
+            "qualification_reason": "visible_fields",
+            "coverage_kinds": [
+              "direct"
+            ]
+          },
+          "query-original": {
+            "mode": "or_fallback",
+            "query_terms": [
+              "leaseclient",
+              "default",
+              "timeout",
+              "duration",
+              "requests",
+              "exception",
+              "raised",
+              "when",
+              "operation",
+              "expires"
+            ],
+            "matched_terms": [
+              "leaseclient",
+              "default",
+              "timeout",
+              "duration",
+              "requests",
+              "exception",
+              "operation"
+            ],
+            "exact_terms": [],
+            "missing_exact_terms": [],
+            "query_term_count": 10,
+            "matched_term_count": 7,
+            "match_ratio": 0.7,
+            "bm25_cost": -9.552388935456833e-06,
+            "lexical_score": 9.552388935456833e-06,
+            "field_matches": {
+              "title": [],
+              "body": [
+                "leaseclient",
+                "default",
+                "timeout",
+                "duration",
+                "requests",
+                "exception",
+                "operation"
+              ],
+              "retrieval_text": [
+                "leaseclient",
+                "default",
+                "timeout",
+                "duration",
+                "requests",
+                "exception",
+                "operation"
+              ]
+            },
+            "bound_subjects": [
+              "leaseclient"
+            ],
+            "retrieval_anchors": [
+              "leaseclient"
+            ],
+            "query_text": "What is LeaseClient default timeout duration for requests and which exception is raised when an operation expires?",
+            "query_origin": "original",
+            "relation": "direct",
+            "public_parent_query_id": null,
+            "preferred_catalog_roles": [],
+            "forbidden_catalog_roles": [],
+            "forbidden_evidence_terms": [],
+            "parent_exact_terms": [],
+            "need_subject": null,
+            "need_relation": null,
+            "need_context": null,
+            "reference_body_query": "What is LeaseClient default timeout duration for requests and which exception is raised when an operation expires?",
+            "bound_subject_context": "# Overview\n",
+            "reference_bindings": [
+              {
+                "mention_id": "588314f065e5cb15f6245d66edb81f0f3f03f5ee7f1d4c77d8250bbc1e8cd528:8:19",
+                "role": "semantic_subject",
+                "field": "body",
+                "document_id": "project_file:local:a3f6fef547e0bff86646cdbdd3762c658529200a2d6f5da35bd828142fa68612:overview.md",
+                "scope": {
+                  "project_id": "local:a3f6fef547e0bff86646cdbdd3762c658529200a2d6f5da35bd828142fa68612",
+                  "version": "",
+                  "snapshot_id": "gen-9246454710a74dc186821bb2eab57701"
+                },
+                "canonical_path": "overview.md",
+                "content_sha256": "5c648f5bbcff05d88435308f9cb2a3851fc5cee7a1bf66c1f96fe9670b988f76",
+                "char_start": 12,
+                "char_end": 23
+              }
+            ],
+            "reference_visible_span": [
+              0,
+              101
+            ],
+            "body_matched_terms": [
+              "leaseclient",
+              "default",
+              "timeout",
+              "duration",
+              "requests",
+              "exception",
+              "operation"
+            ],
+            "heading_context_used": false,
+            "table_context_used": false,
+            "missing_parent_exact_terms": [],
+            "qualified": true,
+            "qualification_reason": "visible_fields",
+            "coverage_kinds": [
+              "direct"
+            ]
+          }
+        },
+        "project_ranking": {
+          "query_intent": "general",
+          "base_score": 0.95,
+          "final_score": 47.5,
+          "original_rank": 0,
+          "selected_rank": 1,
+          "source_weight_reason": "ranked by lexical/vector relevance with neutral source weighting",
+          "requirement_reason": null,
+          "selected_by": "ranking",
+          "diversity_relaxed": false,
+          "reasons": [
+            "ranked by lexical/vector relevance with neutral source weighting"
+          ]
+        },
+        "path": "overview.md",
+        "url": null,
+        "title": "Overview",
+        "heading_path": "Overview",
+        "freshness": "current",
+        "why_selected": "selected because it matched repo-owned project documentation for the question; ranked by lexical/vector relevance with neutral source weighting",
+        "content": "# Overview\n\nLeaseClient default timeout duration requests exception operation behavior documentation.\n",
+        "display_text": "# Overview\n\nLeaseClient default timeout duration requests exception operation behavior documentation.\n",
+        "token_estimate": 25,
+        "source": {
+          "source_class": "project_doc",
+          "source_type": "project_doc",
+          "source_kind": "project_doc",
+          "authority": "source_of_truth",
+          "risk_flags": [],
+          "doc_scope": "project",
+          "module_id": "",
+          "module_name": null,
+          "module_path": null,
+          "module_type": null,
+          "description": "Pinned documentation source",
+          "lifecycle_status": "active",
+          "temporal_relevance": "current",
+          "index_freshness": "synchronized",
+          "impact_policy": "track",
+          "project_identity": "local:a3f6fef547e0bff86646cdbdd3762c658529200a2d6f5da35bd828142fa68612",
+          "path": "overview.md",
+          "url": null,
+          "title": "Overview"
+        },
+        "section": {
+          "title": "Overview",
+          "heading_path": "Overview",
+          "freshness": "current"
+        },
+        "source_provenance": {
+          "owner": "configured_repository",
+          "origin_lane": null
+        },
+        "version_exactness": "not_applicable",
+        "repository_authority": "ordinary_repository_document",
+        "instruction_trust": "untrusted_data",
+        "content_boundary": {
+          "role": "cited_document_data",
+          "schema": "docmancer-document-data-v1",
+          "executable_policy": false
+        },
+        "document_data": {
+          "schema": "docmancer-document-data-v1",
+          "instruction_trust": "untrusted_data",
+          "content": "# Overview\n\nLeaseClient default timeout duration requests exception operation behavior documentation.\n"
+        },
+        "authority_root": null,
+        "policy_scope": null,
+        "scope_verified": false,
+        "instruction_risk_flags": []
+      },
+      {
+        "source_class": "source_evidence",
+        "evidence_class": "absent_in_source",
+        "match_type": null,
+        "confidence": "unknown",
+        "matched": false,
+        "matched_terms": [],
+        "missing_terms": [
+          "requests"
+        ],
+        "path": null,
+        "title": "Source evidence absent",
+        "freshness": "current",
+        "line_start": null,
+        "line_end": null,
+        "why_selected": "requirement term was searched in project source; absence is a search result, not proof of nonexistence",
+        "content": "absent_in_source: no concrete project source snippet matched this requirement term",
+        "token_estimate": 20,
+        "source": {
+          "source_class": "source_evidence",
+          "evidence_class": "absent_in_source",
+          "confidence": "unknown"
+        },
+        "section": {
+          "title": "Source evidence absent",
+          "heading_path": "source_evidence",
+          "freshness": "current"
+        },
+        "source_provenance": {
+          "owner": "external_source",
+          "origin_lane": null
+        },
+        "version_exactness": "not_applicable",
+        "repository_authority": "not_applicable",
+        "instruction_trust": "untrusted_data",
+        "content_boundary": {
+          "role": "cited_document_data",
+          "schema": "docmancer-document-data-v1",
+          "executable_policy": false
+        },
+        "document_data": {
+          "schema": "docmancer-document-data-v1",
+          "instruction_trust": "untrusted_data",
+          "content": "absent_in_source: no concrete project source snippet matched this requirement term"
+        },
+        "authority_root": null,
+        "policy_scope": null,
+        "scope_verified": false,
+        "instruction_risk_flags": []
+      }
+    ],
+    "project_docs": {
+      "project_path": "/home/viadmin/StudioProjects/hermes/docmancer/v2plan/artifacts/next07/grounded-first/wiring-check-l99mJU/native/partial/corpus",
+      "query": "What is LeaseClient default timeout duration for requests and which exception is raised when an operation expires?",
+      "status": "success",
+      "tool": "get_project_docs",
+      "reason_code": "project_docs_ready",
+      "resolved_evidence_path": null,
+      "next_action": {},
+      "requires_confirmation": false,
+      "confirmation_reason": null,
+      "arguments_patch": {},
+      "results": [
+        {
+          "title": "Overview",
+          "content": "# Overview\n\nLeaseClient default timeout duration requests exception operation behavior documentation.\n",
+          "source": "/home/viadmin/StudioProjects/hermes/docmancer/v2plan/artifacts/next07/grounded-first/wiring-check-l99mJU/native/partial/corpus/overview.md",
+          "url": null,
+          "metadata": {
+            "format": "markdown",
+            "title": "Overview",
+            "chunking_strategy": "heading",
+            "chunking_schema": "parent-child-v1",
+            "child_target_tokens": 160,
+            "child_hard_max_tokens": 512,
+            "chunk_size": 800,
+            "chunk_overlap": 100,
+            "docset_root": "/home/viadmin/StudioProjects/hermes/docmancer/v2plan/artifacts/next07/grounded-first/wiring-check-l99mJU/native/partial/corpus",
+            "source_path": "overview.md",
+            "content_hash": "5c648f5bbcff05d88435308f9cb2a3851fc5cee7a1bf66c1f96fe9670b988f76",
+            "project_path": "/home/viadmin/StudioProjects/hermes/docmancer/v2plan/artifacts/next07/grounded-first/wiring-check-l99mJU/native/partial/corpus",
+            "repository_identity": "local:a3f6fef547e0bff86646cdbdd3762c658529200a2d6f5da35bd828142fa68612",
+            "source_class": "project_file",
+            "project_docs": true,
+            "project_doc_path": "overview.md",
+            "project_doc_reason": "other",
+            "project_doc_content_hash": "sha256:5c648f5bbcff05d88435308f9cb2a3851fc5cee7a1bf66c1f96fe9670b988f76",
+            "project_doc_mtime_ns": 1791114511565001886,
+            "doc_scope": "project",
+            "module_id": "",
+            "module_name": null,
+            "module_path": null,
+            "module_type": null,
+            "project_doc_description": "Pinned documentation source",
+            "project_doc_authority": "source_of_truth",
+            "project_doc_lifecycle_status": "active",
+            "lifecycle_status": "active",
+            "temporal_relevance": "current",
+            "index_freshness": "synchronized",
+            "project_doc_impact_policy": "track",
+            "project_doc_catalog_entry_hash": "sha256:ce8bc442feb5ab88762b53c4745861baca9d292ffcb8e136157a6a1ca28abc61",
+            "project_doc_sections": [
+              {
+                "source_document_path": "overview.md",
+                "heading_path": [
+                  "Overview"
+                ],
+                "mentioned_paths": [],
+                "mentioned_symbols": [],
+                "paths_truncated": false,
+                "symbols_truncated": false,
+                "fields_truncated": false,
+                "document_sections_truncated": false,
+                "content_hash": "sha256:12ce17224c7a69ec1a9e9297ad3bbb1fa044719bf3621cdc684e0c76ab7d7d82"
+              }
+            ],
+            "project_doc_sections_status": "parsed",
+            "project_doc_sections_reason": "section_metadata_parsed",
+            "project_doc_sections_schema": "project-sections-3",
+            "library_id": "",
+            "resolved_version": "",
+            "version_family": "",
+            "project_identity": "local:a3f6fef547e0bff86646cdbdd3762c658529200a2d6f5da35bd828142fa68612",
+            "authority": "source_of_truth",
+            "docs_snapshot_exact": null,
+            "section_title": "Overview",
+            "section_level": 1,
+            "document_title": "overview",
+            "document_title_hash": "fed758b7a842befd",
+            "anchor": "Overview",
+            "retrieval_content_hash": "93c1f64e188bdeb0e5906ce5380ded433c5d1647cc9e1944a16724abf5b375d6",
+            "context_schema_version": "deterministic-context-v2",
+            "context_config_hash": "3c6f50edf28b9ac18d1ba2ea8abb46296651397b744cd434d29135c04a2d3b07",
+            "context_content_hash": "b6819f02d76ed3f14936328ecc84222cf737d208e368f55945cda1176e2dfcb8",
+            "context_manifest": {
+              "schema_version": "deterministic-context-v2",
+              "config_hash": "3c6f50edf28b9ac18d1ba2ea8abb46296651397b744cd434d29135c04a2d3b07",
+              "content_hash": "b6819f02d76ed3f14936328ecc84222cf737d208e368f55945cda1176e2dfcb8",
+              "token_estimate": 49,
+              "truncated": false,
+              "fields": [
+                {
+                  "name": "document_title",
+                  "value": "overview",
+                  "provenance": "source.metadata.title",
+                  "priority": 10
+                },
+                {
+                  "name": "canonical_location",
+                  "value": "overview.md",
+                  "provenance": "source.metadata.relative_path",
+                  "priority": 20
+                },
+                {
+                  "name": "heading_path",
+                  "value": "Overview",
+                  "provenance": "source.markdown.heading_path",
+                  "priority": 30
+                },
+                {
+                  "name": "project_scope",
+                  "value": "project",
+                  "provenance": "source.metadata.doc_scope",
+                  "priority": 80
+                },
+                {
+                  "name": "source_class",
+                  "value": "project_file",
+                  "provenance": "source.metadata.source_class",
+                  "priority": 90
+                },
+                {
+                  "name": "authority",
+                  "value": "source_of_truth",
+                  "provenance": "source.metadata.authority",
+                  "priority": 100
+                },
+                {
+                  "name": "catalog_description",
+                  "value": "Pinned documentation source",
+                  "provenance": "project.catalog.description",
+                  "priority": 120
+                }
+              ]
+            },
+            "embedding_input_hash": "93c1f64e188bdeb0e5906ce5380ded433c5d1647cc9e1944a16724abf5b375d6",
+            "stable_chunk_id": "child-1d9d523fff67d74c4e3f8b2bd58fa86bde3bac2d",
+            "vector_id": "33fc12d8-e678-55c3-8302-5219c40ec613",
+            "parent_logical_id": "parent-b6e7daad7248a6969c833cd332a900b9",
+            "atom_type": "mixed",
+            "atom_id": "atom-7f0b2ab281759b475f997318069f96e7",
+            "source_identity": "project_file:local:a3f6fef547e0bff86646cdbdd3762c658529200a2d6f5da35bd828142fa68612:overview.md",
+            "source_content_hash": "5c648f5bbcff05d88435308f9cb2a3851fc5cee7a1bf66c1f96fe9670b988f76",
+            "heading_path": [
+              "Overview"
+            ],
+            "heading_levels": [
+              1
+            ],
+            "char_span": [
+              0,
+              102
+            ],
+            "byte_span": [
+              0,
+              102
+            ],
+            "line_span": [
+              1,
+              3
+            ],
+            "chunk_schema_version": "parent-child-v1",
+            "chunk_config_hash": "6b14dfe3522150abe6744c0691d312762bb749d9ec60afd9e73230b8f85a7823",
+            "token_estimator_version": "utf8-bytes-div4-v1",
+            "display_token_estimate": 26,
+            "retrieval_token_estimate": 82,
+            "generation_id": "gen-9246454710a74dc186821bb2eab57701",
+            "section_id": 4478815581901574425,
+            "token_estimate": 26,
+            "docmancer_tokens": 39,
+            "raw_tokens": 39,
+            "savings_percent": 0.0,
+            "runway_multiplier": 1.0,
+            "ranking": {
+              "stable_id": "child-1d9d523fff67d74c4e3f8b2bd58fa86bde3bac2d",
+              "section_id": 4478815581901574425,
+              "score_direction": "higher_is_better",
+              "raw_component_ranks": {
+                "fts5_bm25_cost": -1.364627e-06
+              },
+              "base_utility": 1.364627e-06,
+              "feature_contributions": {
+                "leading_exact_phrase_boost": 2.0
+              },
+              "final_utility": 2.000001364627,
+              "raw_rank": 2,
+              "final_rank": 2,
+              "rank_delta": 0,
+              "candidate_pool_size": 2
+            },
+            "lexical_match": {
+              "mode": "and",
+              "query_terms": [
+                "leaseclient"
+              ],
+              "matched_terms": [
+                "leaseclient"
+              ],
+              "exact_terms": [
+                "leaseclient"
+              ],
+              "missing_exact_terms": [],
+              "query_term_count": 1,
+              "matched_term_count": 1,
+              "match_ratio": 1.0,
+              "bm25_cost": -1.3646269907795476e-06,
+              "lexical_score": 1.3646269907795476e-06,
+              "field_matches": {
+                "title": [],
+                "body": [
+                  "leaseclient"
+                ],
+                "retrieval_text": [
+                  "leaseclient"
+                ]
+              }
+            },
+            "query_plan_hash": "e2c9c78fdfb4e1815066316f3534f0c052779643d5766bca8955cedfb907730b",
+            "fusion_config_hash": "12c4ba9de2ef41f9c62323363a7c3b24d15c9a08dfe969fb68348e5c537317e4",
+            "retrieval_trace": {
+              "requested_mode": "lexical",
+              "mode_used": "lexical",
+              "component_ranks": {
+                "lexical": 2
+              },
+              "pre_post_rank": 2,
+              "intent_boost": 0.0,
+              "supplemental_rank": null,
+              "final_rank": 2
+            },
+            "_reference_root_plan": {
+              "question": "What is LeaseClient default timeout duration for requests and which exception is raised when an operation expires?",
+              "references": [
+                {
+                  "mention": {
+                    "mention_id": "588314f065e5cb15f6245d66edb81f0f3f03f5ee7f1d4c77d8250bbc1e8cd528:8:19",
+                    "start": 8,
+                    "end": 19,
+                    "text": "LeaseClient",
+                    "syntax_role": "semantic_subject",
+                    "explicit": true
+                  },
+                  "role": "semantic_subject",
+                  "state": "resolved",
+                  "source_ids": [],
+                  "reason": "explicit_reference_role"
+                }
+              ],
+              "scope": {
+                "project_id": "local:a3f6fef547e0bff86646cdbdd3762c658529200a2d6f5da35bd828142fa68612",
+                "version": "",
+                "snapshot_id": "gen-9246454710a74dc186821bb2eab57701"
+              },
+              "catalog_complete": true
+            },
+            "_reference_plans": {
+              "What is LeaseClient default timeout duration for requests and which exception is raised when an operation expires?": {
+                "question": "What is LeaseClient default timeout duration for requests and which exception is raised when an operation expires?",
+                "references": [
+                  {
+                    "mention": {
+                      "mention_id": "588314f065e5cb15f6245d66edb81f0f3f03f5ee7f1d4c77d8250bbc1e8cd528:8:19",
+                      "start": 8,
+                      "end": 19,
+                      "text": "LeaseClient",
+                      "syntax_role": "semantic_subject",
+                      "explicit": true
+                    },
+                    "role": "semantic_subject",
+                    "state": "resolved",
+                    "source_ids": [],
+                    "reason": "explicit_reference_role"
+                  }
+                ],
+                "scope": {
+                  "project_id": "local:a3f6fef547e0bff86646cdbdd3762c658529200a2d6f5da35bd828142fa68612",
+                  "version": "",
+                  "snapshot_id": "gen-9246454710a74dc186821bb2eab57701"
+                },
+                "catalog_complete": true
+              },
+              "LeaseClient": {
+                "question": "LeaseClient",
+                "references": [
+                  {
+                    "mention": {
+                      "mention_id": "32e483d4c43cb0e9d5c96fd8add7aee6ae264acff99c7b5d27290b8d66cf45fe:0:11",
+                      "start": 0,
+                      "end": 11,
+                      "text": "LeaseClient",
+                      "syntax_role": "unresolved",
+                      "explicit": false
+                    },
+                    "role": "unresolved",
+                    "state": "unresolved",
+                    "source_ids": [],
+                    "reason": "unresolved_reference_role"
+                  }
+                ],
+                "scope": {
+                  "project_id": "local:a3f6fef547e0bff86646cdbdd3762c658529200a2d6f5da35bd828142fa68612",
+                  "version": "",
+                  "snapshot_id": "gen-9246454710a74dc186821bb2eab57701"
+                },
+                "catalog_complete": true
+              }
+            },
+            "_reference_evidence": {
+              "schema_version": 1,
+              "source": {
+                "document_id": "project_file:local:a3f6fef547e0bff86646cdbdd3762c658529200a2d6f5da35bd828142fa68612:overview.md",
+                "scope": {
+                  "project_id": "local:a3f6fef547e0bff86646cdbdd3762c658529200a2d6f5da35bd828142fa68612",
+                  "version": "",
+                  "snapshot_id": "gen-9246454710a74dc186821bb2eab57701"
+                },
+                "canonical_path": "overview.md",
+                "content_sha256": "5c648f5bbcff05d88435308f9cb2a3851fc5cee7a1bf66c1f96fe9670b988f76"
+              },
+              "project_doc_content_hash": "sha256:5c648f5bbcff05d88435308f9cb2a3851fc5cee7a1bf66c1f96fe9670b988f76",
+              "char_start": 0,
+              "char_end": 102,
+              "text": "# Overview\n\nLeaseClient default timeout duration requests exception operation behavior documentation.\n",
+              "raw_document": "# Overview\n\nLeaseClient default timeout duration requests exception operation behavior documentation.\n",
+              "owner": {
+                "text": "# Overview\n",
+                "char_start": 0,
+                "char_end": 11,
+                "scope_start": 0,
+                "scope_end": 102,
+                "logical_id": "parent-b6e7daad7248a6969c833cd332a900b9"
+              }
+            },
+            "_evidence_sets": [
+              {
+                "schema_version": "source-dependency-proposal-v1",
+                "set_id": "evidence-set:f1bd31fad660786fb726d6e00f30c1828ee0096f9b0e1940ceee16a5d04d9275",
+                "member_spans": [
+                  [
+                    0,
+                    10,
+                    "e1cb7d861aecdf5efcbabedd31ee970857b02eec940d72c08574a7b1b3bdf580"
+                  ],
+                  [
+                    12,
+                    101,
+                    "ef33d4f65fce806b09029d5c373b5d3ed564bff206af61f6e05c5b2002ff6adb"
+                  ]
+                ],
+                "edges": [
+                  [
+                    "heading",
+                    0,
+                    1,
+                    "markdown-owning-heading-v1"
+                  ]
+                ],
+                "proposed_need_ids": [
+                  "sentence-1"
+                ]
+              }
+            ],
+            "retrieval_query_matches": {
+              "query-anchor-1": {
+                "mode": "and",
+                "query_terms": [
+                  "leaseclient"
+                ],
+                "matched_terms": [
+                  "leaseclient"
+                ],
+                "exact_terms": [
+                  "leaseclient"
+                ],
+                "missing_exact_terms": [],
+                "query_term_count": 1,
+                "matched_term_count": 1,
+                "match_ratio": 1.0,
+                "bm25_cost": -1.3646269907795476e-06,
+                "lexical_score": 1.3646269907795476e-06,
+                "field_matches": {
+                  "title": [],
+                  "body": [
+                    "leaseclient"
+                  ],
+                  "retrieval_text": [
+                    "leaseclient"
+                  ]
+                },
+                "bound_subjects": [],
+                "retrieval_anchors": [
+                  "leaseclient"
+                ],
+                "query_text": "LeaseClient",
+                "query_origin": "exact_anchor",
+                "relation": "exact_anchor",
+                "public_parent_query_id": "query-original",
+                "preferred_catalog_roles": [],
+                "forbidden_catalog_roles": [],
+                "forbidden_evidence_terms": [],
+                "parent_exact_terms": [],
+                "need_subject": null,
+                "need_relation": null,
+                "need_context": null,
+                "reference_body_query": "LeaseClient",
+                "bound_subject_context": "# Overview\n",
+                "reference_bindings": [],
+                "reference_visible_span": [
+                  0,
+                  101
+                ],
+                "body_matched_terms": [
+                  "leaseclient"
+                ],
+                "heading_context_used": false,
+                "table_context_used": false,
+                "missing_parent_exact_terms": [],
+                "qualified": true,
+                "qualification_reason": "visible_fields",
+                "coverage_kinds": [
+                  "direct"
+                ]
+              },
+              "query-original": {
+                "mode": "or_fallback",
+                "query_terms": [
+                  "leaseclient",
+                  "default",
+                  "timeout",
+                  "duration",
+                  "requests",
+                  "exception",
+                  "raised",
+                  "when",
+                  "operation",
+                  "expires"
+                ],
+                "matched_terms": [
+                  "leaseclient",
+                  "default",
+                  "timeout",
+                  "duration",
+                  "requests",
+                  "exception",
+                  "operation"
+                ],
+                "exact_terms": [],
+                "missing_exact_terms": [],
+                "query_term_count": 10,
+                "matched_term_count": 7,
+                "match_ratio": 0.7,
+                "bm25_cost": -9.552388935456833e-06,
+                "lexical_score": 9.552388935456833e-06,
+                "field_matches": {
+                  "title": [],
+                  "body": [
+                    "leaseclient",
+                    "default",
+                    "timeout",
+                    "duration",
+                    "requests",
+                    "exception",
+                    "operation"
+                  ],
+                  "retrieval_text": [
+                    "leaseclient",
+                    "default",
+                    "timeout",
+                    "duration",
+                    "requests",
+                    "exception",
+                    "operation"
+                  ]
+                },
+                "bound_subjects": [
+                  "leaseclient"
+                ],
+                "retrieval_anchors": [
+                  "leaseclient"
+                ],
+                "query_text": "What is LeaseClient default timeout duration for requests and which exception is raised when an operation expires?",
+                "query_origin": "original",
+                "relation": "direct",
+                "public_parent_query_id": null,
+                "preferred_catalog_roles": [],
+                "forbidden_catalog_roles": [],
+                "forbidden_evidence_terms": [],
+                "parent_exact_terms": [],
+                "need_subject": null,
+                "need_relation": null,
+                "need_context": null,
+                "reference_body_query": "What is LeaseClient default timeout duration for requests and which exception is raised when an operation expires?",
+                "bound_subject_context": "# Overview\n",
+                "reference_bindings": [
+                  {
+                    "mention_id": "588314f065e5cb15f6245d66edb81f0f3f03f5ee7f1d4c77d8250bbc1e8cd528:8:19",
+                    "role": "semantic_subject",
+                    "field": "body",
+                    "document_id": "project_file:local:a3f6fef547e0bff86646cdbdd3762c658529200a2d6f5da35bd828142fa68612:overview.md",
+                    "scope": {
+                      "project_id": "local:a3f6fef547e0bff86646cdbdd3762c658529200a2d6f5da35bd828142fa68612",
+                      "version": "",
+                      "snapshot_id": "gen-9246454710a74dc186821bb2eab57701"
+                    },
+                    "canonical_path": "overview.md",
+                    "content_sha256": "5c648f5bbcff05d88435308f9cb2a3851fc5cee7a1bf66c1f96fe9670b988f76",
+                    "char_start": 12,
+                    "char_end": 23
+                  }
+                ],
+                "reference_visible_span": [
+                  0,
+                  101
+                ],
+                "body_matched_terms": [
+                  "leaseclient",
+                  "default",
+                  "timeout",
+                  "duration",
+                  "requests",
+                  "exception",
+                  "operation"
+                ],
+                "heading_context_used": false,
+                "table_context_used": false,
+                "missing_parent_exact_terms": [],
+                "qualified": true,
+                "qualification_reason": "visible_fields",
+                "coverage_kinds": [
+                  "direct"
+                ]
+              }
+            },
+            "retrieval_query_ids": [
+              "query-anchor-1",
+              "query-original"
+            ],
+            "freshness": "current",
+            "risk_flags": [],
+            "score": 0.95,
+            "project_ranking": {
+              "query_intent": "general",
+              "base_score": 0.95,
+              "final_score": 47.5,
+              "original_rank": 0,
+              "selected_rank": 1,
+              "source_weight_reason": "ranked by lexical/vector relevance with neutral source weighting",
+              "requirement_reason": null,
+              "selected_by": "ranking",
+              "diversity_relaxed": false,
+              "reasons": [
+                "ranked by lexical/vector relevance with neutral source weighting"
+              ]
+            },
+            "project_source": {
+              "source_type": "project_doc",
+              "source_kind": "project_doc",
+              "authority": "supporting",
+              "risk_flags": []
+            },
+            "project_source_lane": "operational"
+          },
+          "stable_chunk_id": "child-1d9d523fff67d74c4e3f8b2bd58fa86bde3bac2d",
+          "parent_logical_id": "parent-b6e7daad7248a6969c833cd332a900b9",
+          "display_content_hash": "5c648f5bbcff05d88435308f9cb2a3851fc5cee7a1bf66c1f96fe9670b988f76",
+          "char_start": 0,
+          "char_end": 102,
+          "line_start": 1,
+          "line_end": 3,
+          "source_class": "project_file",
+          "path": "overview.md",
+          "heading_path": "Overview",
+          "content_hash": "sha256:5c648f5bbcff05d88435308f9cb2a3851fc5cee7a1bf66c1f96fe9670b988f76",
+          "mtime_ns": 1791114511565001886,
+          "stale": false,
+          "doc_scope": "project",
+          "module_id": "",
+          "module_name": null,
+          "module_path": null,
+          "module_type": null,
+          "description": "Pinned documentation source",
+          "authority": "source_of_truth",
+          "lifecycle_status": "active",
+          "impact_policy": "track",
+          "project_identity": "local:a3f6fef547e0bff86646cdbdd3762c658529200a2d6f5da35bd828142fa68612"
+        }
+      ],
+      "warnings": [],
+      "candidate_sources": [
+        {
+          "path": "default.md",
+          "source_class": "project_file",
+          "reason": "other",
+          "size_bytes": 50,
+          "mtime_ns": 1791114511564928419,
+          "content_hash": "sha256:50fc5ae5565ed3949aba18fba3617bdec0a9732f2aafe8ec04488ebf8c69814d",
+          "doc_scope": "project",
+          "module_id": null,
+          "module_name": null,
+          "module_path": null,
+          "module_type": null,
+          "description": "Pinned documentation source",
+          "authority": "source_of_truth",
+          "lifecycle_status": "active",
+          "impact_policy": "track",
+          "catalog_entry_hash": "sha256:8c66570be38c28f2a10bc03d2f7d9ce3d413c018441dfef710fcfa189895d3d6"
+        },
+        {
+          "path": "overview.md",
+          "source_class": "project_file",
+          "reason": "other",
+          "size_bytes": 102,
+          "mtime_ns": 1791114511565001886,
+          "content_hash": "sha256:5c648f5bbcff05d88435308f9cb2a3851fc5cee7a1bf66c1f96fe9670b988f76",
+          "doc_scope": "project",
+          "module_id": null,
+          "module_name": null,
+          "module_path": null,
+          "module_type": null,
+          "description": "Pinned documentation source",
+          "authority": "source_of_truth",
+          "lifecycle_status": "active",
+          "impact_policy": "track",
+          "catalog_entry_hash": "sha256:ce8bc442feb5ab88762b53c4745861baca9d292ffcb8e136157a6a1ca28abc61"
+        }
+      ],
+      "indexed_sources": [
+        {
+          "source": "/home/viadmin/StudioProjects/hermes/docmancer/v2plan/artifacts/next07/grounded-first/wiring-check-l99mJU/native/partial/corpus/overview.md",
+          "path": "overview.md",
+          "source_class": "project_file",
+          "content_hash": "sha256:5c648f5bbcff05d88435308f9cb2a3851fc5cee7a1bf66c1f96fe9670b988f76",
+          "mtime_ns": 1791114511565001886,
+          "doc_scope": "project",
+          "module_id": "",
+          "module_name": null,
+          "module_path": null,
+          "module_type": null,
+          "description": "Pinned documentation source",
+          "authority": "source_of_truth",
+          "lifecycle_status": "active",
+          "impact_policy": "track"
+        },
+        {
+          "source": "/home/viadmin/StudioProjects/hermes/docmancer/v2plan/artifacts/next07/grounded-first/wiring-check-l99mJU/native/partial/corpus/default.md",
+          "path": "default.md",
+          "source_class": "project_file",
+          "content_hash": "sha256:50fc5ae5565ed3949aba18fba3617bdec0a9732f2aafe8ec04488ebf8c69814d",
+          "mtime_ns": 1791114511564928419,
+          "doc_scope": "project",
+          "module_id": "",
+          "module_name": null,
+          "module_path": null,
+          "module_type": null,
+          "description": "Pinned documentation source",
+          "authority": "source_of_truth",
+          "lifecycle_status": "active",
+          "impact_policy": "track"
+        }
+      ],
+      "stale_sources": [],
+      "ignored_sources": [],
+      "source_state_guidance": {
+        "stale_source": {
+          "meaning": "An indexed project-doc source differs from the current file on disk.",
+          "next_action": "Run prepare_docs(action=sync_project_docs), then retry get_docs_context."
+        },
+        "indexed_source_not_discovered": {
+          "meaning": "The source exists in the index, but the current discovery pass did not select it as a project-doc candidate. This does not by itself mean the file is deleted or invalid.",
+          "next_action": "Add or correct the file in docatlas.project-docs.yaml, or run sync_project_docs to remove obsolete index entries."
+        },
+        "ignored_generated_or_tooling_doc": {
+          "meaning": "Generated, build, dependency, or tooling docs are not treated as reviewable project-owned docs by default.",
+          "next_action": "Usually no action is required. If the file is official project documentation, add it to docatlas.project-docs.yaml."
+        },
+        "missing_expected_source": {
+          "meaning": "A document the user expected was not selected or cited.",
+          "next_action": "Check inspect_project_docs output, docatlas.project-docs.yaml entries, scope, and ingestion freshness."
+        }
+      },
+      "diagnostics": {
+        "same_call_pipeline": {
+          "planned_query_ids": [
+            "query-original",
+            "query-anchor-1"
+          ],
+          "retrieved_candidates": [
+            {
+              "stable_chunk_id": "child-1d9d523fff67d74c4e3f8b2bd58fa86bde3bac2d",
+              "document_id": "/home/viadmin/StudioProjects/hermes/docmancer/v2plan/artifacts/next07/grounded-first/wiring-check-l99mJU/native/partial/corpus/overview.md",
+              "parent_logical_id": "parent-b6e7daad7248a6969c833cd332a900b9"
+            },
+            {
+              "stable_chunk_id": "child-1d9d523fff67d74c4e3f8b2bd58fa86bde3bac2d",
+              "document_id": "/home/viadmin/StudioProjects/hermes/docmancer/v2plan/artifacts/next07/grounded-first/wiring-check-l99mJU/native/partial/corpus/overview.md",
+              "parent_logical_id": "parent-b6e7daad7248a6969c833cd332a900b9"
+            },
+            {
+              "stable_chunk_id": "child-1d9d523fff67d74c4e3f8b2bd58fa86bde3bac2d",
+              "document_id": "/home/viadmin/StudioProjects/hermes/docmancer/v2plan/artifacts/next07/grounded-first/wiring-check-l99mJU/native/partial/corpus/overview.md",
+              "parent_logical_id": "parent-b6e7daad7248a6969c833cd332a900b9"
+            },
+            {
+              "stable_chunk_id": "child-4e1b6f19f898b0a20008ae4eb9a4754ed33ec552",
+              "document_id": "/home/viadmin/StudioProjects/hermes/docmancer/v2plan/artifacts/next07/grounded-first/wiring-check-l99mJU/native/partial/corpus/default.md",
+              "parent_logical_id": "parent-9852d14c68a6776eb4f741ae1dd92484"
+            },
+            {
+              "stable_chunk_id": "child-4e1b6f19f898b0a20008ae4eb9a4754ed33ec552",
+              "document_id": "/home/viadmin/StudioProjects/hermes/docmancer/v2plan/artifacts/next07/grounded-first/wiring-check-l99mJU/native/partial/corpus/default.md",
+              "parent_logical_id": "parent-9852d14c68a6776eb4f741ae1dd92484"
+            },
+            {
+              "stable_chunk_id": "child-4e1b6f19f898b0a20008ae4eb9a4754ed33ec552",
+              "document_id": "/home/viadmin/StudioProjects/hermes/docmancer/v2plan/artifacts/next07/grounded-first/wiring-check-l99mJU/native/partial/corpus/default.md",
+              "parent_logical_id": "parent-9852d14c68a6776eb4f741ae1dd92484"
+            }
+          ],
+          "qualification_outcomes": [
+            {
+              "stable_chunk_id": "child-1d9d523fff67d74c4e3f8b2bd58fa86bde3bac2d",
+              "document_id": "/home/viadmin/StudioProjects/hermes/docmancer/v2plan/artifacts/next07/grounded-first/wiring-check-l99mJU/native/partial/corpus/overview.md",
+              "parent_logical_id": "parent-b6e7daad7248a6969c833cd332a900b9",
+              "query_id": "query-anchor-1",
+              "outcome": "qualified",
+              "reason": "visible_fields"
+            },
+            {
+              "stable_chunk_id": "child-1d9d523fff67d74c4e3f8b2bd58fa86bde3bac2d",
+              "document_id": "/home/viadmin/StudioProjects/hermes/docmancer/v2plan/artifacts/next07/grounded-first/wiring-check-l99mJU/native/partial/corpus/overview.md",
+              "parent_logical_id": "parent-b6e7daad7248a6969c833cd332a900b9",
+              "query_id": "query-original",
+              "outcome": "qualified",
+              "reason": "visible_fields"
+            },
+            {
+              "stable_chunk_id": "child-1d9d523fff67d74c4e3f8b2bd58fa86bde3bac2d",
+              "document_id": "/home/viadmin/StudioProjects/hermes/docmancer/v2plan/artifacts/next07/grounded-first/wiring-check-l99mJU/native/partial/corpus/overview.md",
+              "parent_logical_id": "parent-b6e7daad7248a6969c833cd332a900b9",
+              "query_id": "query-original",
+              "outcome": "qualified",
+              "reason": "visible_fields"
+            },
+            {
+              "stable_chunk_id": "child-1d9d523fff67d74c4e3f8b2bd58fa86bde3bac2d",
+              "document_id": "/home/viadmin/StudioProjects/hermes/docmancer/v2plan/artifacts/next07/grounded-first/wiring-check-l99mJU/native/partial/corpus/overview.md",
+              "parent_logical_id": "parent-b6e7daad7248a6969c833cd332a900b9",
+              "query_id": "query-original",
+              "outcome": "qualified",
+              "reason": "visible_fields"
+            },
+            {
+              "stable_chunk_id": "child-4e1b6f19f898b0a20008ae4eb9a4754ed33ec552",
+              "document_id": "/home/viadmin/StudioProjects/hermes/docmancer/v2plan/artifacts/next07/grounded-first/wiring-check-l99mJU/native/partial/corpus/default.md",
+              "parent_logical_id": "parent-9852d14c68a6776eb4f741ae1dd92484",
+              "query_id": "query-anchor-1",
+              "outcome": "rejected",
+              "reason": "insufficient_visible_match"
+            },
+            {
+              "stable_chunk_id": "child-4e1b6f19f898b0a20008ae4eb9a4754ed33ec552",
+              "document_id": "/home/viadmin/StudioProjects/hermes/docmancer/v2plan/artifacts/next07/grounded-first/wiring-check-l99mJU/native/partial/corpus/default.md",
+              "parent_logical_id": "parent-9852d14c68a6776eb4f741ae1dd92484",
+              "query_id": "query-original",
+              "outcome": "rejected",
+              "reason": "insufficient_visible_match"
+            },
+            {
+              "stable_chunk_id": "child-4e1b6f19f898b0a20008ae4eb9a4754ed33ec552",
+              "document_id": "/home/viadmin/StudioProjects/hermes/docmancer/v2plan/artifacts/next07/grounded-first/wiring-check-l99mJU/native/partial/corpus/default.md",
+              "parent_logical_id": "parent-9852d14c68a6776eb4f741ae1dd92484",
+              "query_id": "query-original",
+              "outcome": "rejected",
+              "reason": "insufficient_visible_match"
+            },
+            {
+              "stable_chunk_id": "child-4e1b6f19f898b0a20008ae4eb9a4754ed33ec552",
+              "document_id": "/home/viadmin/StudioProjects/hermes/docmancer/v2plan/artifacts/next07/grounded-first/wiring-check-l99mJU/native/partial/corpus/default.md",
+              "parent_logical_id": "parent-9852d14c68a6776eb4f741ae1dd92484",
+              "query_id": "query-original",
+              "outcome": "rejected",
+              "reason": "insufficient_visible_match"
+            }
+          ]
+        }
+      },
+      "next_actions": [],
+      "answer_available": true,
+      "reason": null,
+      "message": "Returned 2 project docs result(s)."
+    },
+    "dependency_docs": null,
+    "trust_contract": {
+      "schema_version": "trust-contract-1.2",
+      "sources": {
+        "selected": [
+          {
+            "source_class": "project_file",
+            "source_type": "project_doc",
+            "source_kind": "project_doc",
+            "authority": "source_of_truth",
+            "risk_flags": [],
+            "path": "overview.md",
+            "source": "/home/viadmin/StudioProjects/hermes/docmancer/v2plan/artifacts/next07/grounded-first/wiring-check-l99mJU/native/partial/corpus/overview.md",
+            "doc_scope": "project",
+            "module_id": "",
+            "module_name": null,
+            "module_path": null,
+            "module_type": null,
+            "freshness": "current",
+            "reason": "repo-owned project docs matched the question",
+            "why_selected": "repo-owned project docs matched the question",
+            "provenance_confidence": "repository_configured",
+            "trust_level": "provenance_verified_non_instructional",
+            "source_provenance": {
+              "owner": "configured_repository"
+            },
+            "version_exactness": "not_applicable",
+            "repository_authority": "ordinary_repository_document",
+            "instruction_trust": "untrusted_data",
+            "authority_root": null,
+            "policy_scope": null,
+            "scope_verified": false
+          }
+        ],
+        "rejected": [],
+        "risky": []
+      },
+      "context_sources": {
+        "schema_version": "context-sources-1.0",
+        "source_evidence": [
+          {
+            "source_class": "source_evidence",
+            "evidence_class": "absent_in_source",
+            "role": "uncertainty_signal",
+            "proof_role": "not_proof_absence_signal",
+            "path": null,
+            "line_start": null,
+            "line_end": null,
+            "matched_terms": [],
+            "missing_terms": [
+              "requests"
+            ],
+            "title": "Source evidence absent",
+            "freshness": "current",
+            "reason": "requirement term was searched in project source; absence is a search result, not proof of nonexistence",
+            "why_selected": "requirement term was searched in project source; absence is a search result, not proof of nonexistence"
+          }
+        ],
+        "repo_map": [],
+        "policy": {
+          "source_evidence": "source_snippet entries are path-line backed; absent_in_source entries are uncertainty signals",
+          "repo_map": "navigation_only_not_story_claim_proof"
+        }
+      },
+      "warnings": [],
+      "next_actions": [],
+      "policy": {
+        "direct_webfetch": "forbidden",
+        "reason_code": "trusted_context_available",
+        "document_content": "cited_data_never_lifecycle_instruction",
+        "instruction_precedence": "system_user_tool_policy_over_scoped_repository_policy_over_document_data"
+      }
+    },
+    "warnings": [],
+    "next_actions": [],
+    "recommended_next_actions": [],
+    "next_action": {},
+    "requires_confirmation": false,
+    "confirmation_reason": null,
+    "arguments_patch": {},
+    "response_style": "evidence-first",
+    "primary_snippet": null,
+    "supporting_snippets": [],
+    "primary_snippets": [],
+    "primary_snippet_confidence": null,
+    "primary_snippet_selection_reason": null,
+    "primary_snippet_alternatives": [],
+    "snippet_metrics": {
+      "candidates_found": 0,
+      "usable_candidates": 0,
+      "primary_selected": false,
+      "supporting_selected": 0,
+      "duplicates_dropped": 0,
+      "noise_dropped": 0,
+      "truncations": 0,
+      "primary_language": null,
+      "primary_lane": null,
+      "primary_source_correct": null,
+      "primary_exact_version_match": null,
+      "primary_snippet_confidence": null,
+      "primary_snippet_alternatives": 0,
+      "snippet_first_applied": false,
+      "requested_response_style": "auto"
+    },
+    "metrics": {
+      "context_pack_items": 2,
+      "selected_source_count": 2,
+      "project_result_count": 1,
+      "dependency_result_count": 0,
+      "token_estimate": 45,
+      "source_classes": [
+        "project_doc",
+        "source_evidence"
+      ],
+      "quality": {
+        "query_intent": "general",
+        "changelog_items": 0,
+        "changelog_ratio": 0.0,
+        "unique_source_count": 1,
+        "max_items_from_single_source": 1,
+        "has_readme": false,
+        "has_architecture": false,
+        "has_contributing": false,
+        "has_docs_mcp_source": false,
+        "has_packs_mcp_source": false,
+        "relevance_coverage": 2.0,
+        "trivial_sections_filtered": 0,
+        "noise_sections_demoted": 0,
+        "warnings": []
+      },
+      "token_savings": {
+        "raw_docs_tokens": 39,
+        "context_pack_tokens": 45,
+        "savings_percent": 0.0,
+        "used_percent": 115.4,
+        "agentic_runway_multiplier": 0.87,
+        "meaning": "compression_vs_raw_docs_not_relevance_score"
+      },
+      "snippet_metrics": {
+        "candidates_found": 0,
+        "usable_candidates": 0,
+        "primary_selected": false,
+        "supporting_selected": 0,
+        "duplicates_dropped": 0,
+        "noise_dropped": 0,
+        "truncations": 0,
+        "primary_language": null,
+        "primary_lane": null,
+        "primary_source_correct": null,
+        "primary_exact_version_match": null,
+        "primary_snippet_confidence": null,
+        "primary_snippet_alternatives": 0,
+        "snippet_first_applied": false,
+        "requested_response_style": "auto"
+      },
+      "answer_completeness": {
+        "schema_version": "answer-completeness-1.0",
+        "status": "partial",
+        "answer_type": "partial_navigational",
+        "coverage_score": 0.0,
+        "matched_terms": [
+          "requests"
+        ],
+        "missing_terms": [],
+        "coverage_by_requirement": [
+          {
+            "term": "requests",
+            "matched": true,
+            "source_paths": [
+              "overview.md"
+            ]
+          }
+        ],
+        "source_search_required": true,
+        "source_search_status": "required",
+        "disposition": "search_local_source",
+        "edit_ready": false,
+        "reason_codes": [
+          "no_trusted_context",
+          "navigational_context_present"
+        ],
+        "canonical_support": {
+          "answer_supported": false,
+          "mandatory_requirement_ids": [
+            "unresolved:0:unresolved_question_clause:What is LeaseClient default timeout duration for requests",
+            "unresolved:1:unresolved_question_clause:which exception is raised when an operation expires"
+          ],
+          "assigned_requirement_ids": []
+        },
+        "legacy_diagnostics": {
+          "schema_version": "answer-completeness-1.0",
+          "status": "unavailable",
+          "answer_type": "unavailable",
+          "coverage_score": 1.0,
+          "matched_terms": [
+            "requests"
+          ],
+          "missing_terms": [],
+          "coverage_by_requirement": [
+            {
+              "term": "requests",
+              "matched": true,
+              "source_paths": [
+                "overview.md"
+              ]
+            }
+          ],
+          "source_search_required": false,
+          "source_search_status": "completed",
+          "disposition": "use_context",
+          "edit_ready": false,
+          "reason_codes": [
+            "no_trusted_context",
+            "navigational_context_present"
+          ]
+        }
+      }
+    },
+    "diagnostics": {
+      "query_intent": "general",
+      "retrieval_routing": {
+        "schema_version": 2,
+        "intent": "docs",
+        "stages": {
+          "project_docs": {
+            "status": "used",
+            "reason": "selected project documentation mode",
+            "item_count": 1,
+            "budget_projection_bytes": 272,
+            "estimated_tokens": 68,
+            "observed_item_count": 1,
+            "observed_budget_projection_bytes": 272,
+            "budget_exceeded": false
+          },
+          "dependency_docs": {
+            "status": "skipped",
+            "reason": "dependency documentation not selected or not available",
+            "item_count": 0,
+            "budget_projection_bytes": 0,
+            "estimated_tokens": 0,
+            "observed_item_count": 0,
+            "observed_budget_projection_bytes": 0,
+            "budget_exceeded": false
+          },
+          "source_evidence": {
+            "status": "used",
+            "reason": "project documentation names the requested source symbol",
+            "item_count": 1,
+            "budget_projection_bytes": 289,
+            "estimated_tokens": 73,
+            "observed_item_count": 1,
+            "observed_budget_projection_bytes": 289,
+            "budget_exceeded": false
+          },
+          "repo_map": {
+            "status": "skipped",
+            "reason": "documentation/API evidence does not require repository cartography",
+            "item_count": 0,
+            "budget_projection_bytes": 0,
+            "estimated_tokens": 0,
+            "observed_item_count": 0,
+            "observed_budget_projection_bytes": 0,
+            "budget_exceeded": false
+          },
+          "code_graph": {
+            "status": "skipped",
+            "reason": "documentation/API intent does not require connectivity evidence",
+            "item_count": 0,
+            "budget_projection_bytes": 0,
+            "estimated_tokens": 0,
+            "observed_item_count": 0,
+            "observed_budget_projection_bytes": 0,
+            "budget_exceeded": false
+          }
+        },
+        "budget_projection_bytes": 561,
+        "model_visible_bytes": 0
+      },
+      "same_call_pipeline": {
+        "planned_query_ids": [
+          "query-original",
+          "query-anchor-1"
+        ],
+        "retrieved_candidates": [
+          {
+            "stable_chunk_id": "child-1d9d523fff67d74c4e3f8b2bd58fa86bde3bac2d",
+            "document_id": "/home/viadmin/StudioProjects/hermes/docmancer/v2plan/artifacts/next07/grounded-first/wiring-check-l99mJU/native/partial/corpus/overview.md",
+            "parent_logical_id": "parent-b6e7daad7248a6969c833cd332a900b9"
+          },
+          {
+            "stable_chunk_id": "child-1d9d523fff67d74c4e3f8b2bd58fa86bde3bac2d",
+            "document_id": "/home/viadmin/StudioProjects/hermes/docmancer/v2plan/artifacts/next07/grounded-first/wiring-check-l99mJU/native/partial/corpus/overview.md",
+            "parent_logical_id": "parent-b6e7daad7248a6969c833cd332a900b9"
+          },
+          {
+            "stable_chunk_id": "child-1d9d523fff67d74c4e3f8b2bd58fa86bde3bac2d",
+            "document_id": "/home/viadmin/StudioProjects/hermes/docmancer/v2plan/artifacts/next07/grounded-first/wiring-check-l99mJU/native/partial/corpus/overview.md",
+            "parent_logical_id": "parent-b6e7daad7248a6969c833cd332a900b9"
+          },
+          {
+            "stable_chunk_id": "child-4e1b6f19f898b0a20008ae4eb9a4754ed33ec552",
+            "document_id": "/home/viadmin/StudioProjects/hermes/docmancer/v2plan/artifacts/next07/grounded-first/wiring-check-l99mJU/native/partial/corpus/default.md",
+            "parent_logical_id": "parent-9852d14c68a6776eb4f741ae1dd92484"
+          },
+          {
+            "stable_chunk_id": "child-4e1b6f19f898b0a20008ae4eb9a4754ed33ec552",
+            "document_id": "/home/viadmin/StudioProjects/hermes/docmancer/v2plan/artifacts/next07/grounded-first/wiring-check-l99mJU/native/partial/corpus/default.md",
+            "parent_logical_id": "parent-9852d14c68a6776eb4f741ae1dd92484"
+          },
+          {
+            "stable_chunk_id": "child-4e1b6f19f898b0a20008ae4eb9a4754ed33ec552",
+            "document_id": "/home/viadmin/StudioProjects/hermes/docmancer/v2plan/artifacts/next07/grounded-first/wiring-check-l99mJU/native/partial/corpus/default.md",
+            "parent_logical_id": "parent-9852d14c68a6776eb4f741ae1dd92484"
+          }
+        ],
+        "qualification_outcomes": [
+          {
+            "stable_chunk_id": "child-1d9d523fff67d74c4e3f8b2bd58fa86bde3bac2d",
+            "document_id": "/home/viadmin/StudioProjects/hermes/docmancer/v2plan/artifacts/next07/grounded-first/wiring-check-l99mJU/native/partial/corpus/overview.md",
+            "parent_logical_id": "parent-b6e7daad7248a6969c833cd332a900b9",
+            "query_id": "query-anchor-1",
+            "outcome": "qualified",
+            "reason": "visible_fields"
+          },
+          {
+            "stable_chunk_id": "child-1d9d523fff67d74c4e3f8b2bd58fa86bde3bac2d",
+            "document_id": "/home/viadmin/StudioProjects/hermes/docmancer/v2plan/artifacts/next07/grounded-first/wiring-check-l99mJU/native/partial/corpus/overview.md",
+            "parent_logical_id": "parent-b6e7daad7248a6969c833cd332a900b9",
+            "query_id": "query-original",
+            "outcome": "qualified",
+            "reason": "visible_fields"
+          },
+          {
+            "stable_chunk_id": "child-1d9d523fff67d74c4e3f8b2bd58fa86bde3bac2d",
+            "document_id": "/home/viadmin/StudioProjects/hermes/docmancer/v2plan/artifacts/next07/grounded-first/wiring-check-l99mJU/native/partial/corpus/overview.md",
+            "parent_logical_id": "parent-b6e7daad7248a6969c833cd332a900b9",
+            "query_id": "query-original",
+            "outcome": "qualified",
+            "reason": "visible_fields"
+          },
+          {
+            "stable_chunk_id": "child-1d9d523fff67d74c4e3f8b2bd58fa86bde3bac2d",
+            "document_id": "/home/viadmin/StudioProjects/hermes/docmancer/v2plan/artifacts/next07/grounded-first/wiring-check-l99mJU/native/partial/corpus/overview.md",
+            "parent_logical_id": "parent-b6e7daad7248a6969c833cd332a900b9",
+            "query_id": "query-original",
+            "outcome": "qualified",
+            "reason": "visible_fields"
+          },
+          {
+            "stable_chunk_id": "child-4e1b6f19f898b0a20008ae4eb9a4754ed33ec552",
+            "document_id": "/home/viadmin/StudioProjects/hermes/docmancer/v2plan/artifacts/next07/grounded-first/wiring-check-l99mJU/native/partial/corpus/default.md",
+            "parent_logical_id": "parent-9852d14c68a6776eb4f741ae1dd92484",
+            "query_id": "query-anchor-1",
+            "outcome": "rejected",
+            "reason": "insufficient_visible_match"
+          },
+          {
+            "stable_chunk_id": "child-4e1b6f19f898b0a20008ae4eb9a4754ed33ec552",
+            "document_id": "/home/viadmin/StudioProjects/hermes/docmancer/v2plan/artifacts/next07/grounded-first/wiring-check-l99mJU/native/partial/corpus/default.md",
+            "parent_logical_id": "parent-9852d14c68a6776eb4f741ae1dd92484",
+            "query_id": "query-original",
+            "outcome": "rejected",
+            "reason": "insufficient_visible_match"
+          },
+          {
+            "stable_chunk_id": "child-4e1b6f19f898b0a20008ae4eb9a4754ed33ec552",
+            "document_id": "/home/viadmin/StudioProjects/hermes/docmancer/v2plan/artifacts/next07/grounded-first/wiring-check-l99mJU/native/partial/corpus/default.md",
+            "parent_logical_id": "parent-9852d14c68a6776eb4f741ae1dd92484",
+            "query_id": "query-original",
+            "outcome": "rejected",
+            "reason": "insufficient_visible_match"
+          },
+          {
+            "stable_chunk_id": "child-4e1b6f19f898b0a20008ae4eb9a4754ed33ec552",
+            "document_id": "/home/viadmin/StudioProjects/hermes/docmancer/v2plan/artifacts/next07/grounded-first/wiring-check-l99mJU/native/partial/corpus/default.md",
+            "parent_logical_id": "parent-9852d14c68a6776eb4f741ae1dd92484",
+            "query_id": "query-original",
+            "outcome": "rejected",
+            "reason": "insufficient_visible_match"
+          }
+        ]
+      },
+      "source_evidence": {
+        "selected_items": 1,
+        "matched_terms": [],
+        "absent_terms": [
+          "requests"
+        ],
+        "paths": []
+      },
+      "active_index": {
+        "project_path": "/home/viadmin/StudioProjects/hermes/docmancer/v2plan/artifacts/next07/grounded-first/wiring-check-l99mJU/native/partial/corpus",
+        "db_path": "/home/viadmin/StudioProjects/hermes/docmancer/v2plan/artifacts/next07/grounded-first/wiring-check-l99mJU/native/partial/state/index.db",
+        "db_exists": true,
+        "index_state": "available",
+        "index_ownership": "project_owned",
+        "extracted_dir": "/home/viadmin/StudioProjects/hermes/docmancer/v2plan/artifacts/next07/grounded-first/wiring-check-l99mJU/native/partial/state/extracted",
+        "config_source": "explicit",
+        "config_path": null,
+        "retrieval_mode": "lexical",
+        "docatlas_home": "/home/viadmin/StudioProjects/hermes/docmancer/v2plan/artifacts/next07/grounded-first/wiring-check-l99mJU/native/partial/state/docatlas_home",
+        "index_counts": {
+          "sources": 2,
+          "sections": 2
+        },
+        "project_index_counts": {
+          "sources": 2,
+          "sections": 2
+        },
+        "shared_index_counts": {
+          "sources": 2,
+          "sections": 2
+        },
+        "warnings": [],
+        "vector_readiness": {
+          "status": "not_required",
+          "mode": "lexical"
+        },
+        "project_local_config": {
+          "present": false
+        }
+      },
+      "relevance_gate": {
+        "passed": true,
+        "reason": "no_high_signal_terms_required",
+        "required_terms": [],
+        "matched_terms": [],
+        "weighted_score": null,
+        "matched_term_count": 0,
+        "required_term_count": 0
+      },
+      "trust_decision": {
+        "answer_available": false,
+        "reason": "partial_navigational_context",
+        "confidence": "partial",
+        "passed_relevance_gate": true,
+        "max_project_score": 47.5,
+        "query_terms_matched": [],
+        "query_terms_missing": []
+      }
+    },
+    "answer_outline": {
+      "query_intent": "general",
+      "recommended_reading_order": [
+        {
+          "path": "overview.md",
+          "title": "Overview",
+          "heading_path": "Overview",
+          "source_class": "project_doc",
+          "freshness": "current",
+          "reason": "Selected because it matched the project-doc query."
+        }
+      ],
+      "coverage": {
+        "high_level_overview": true,
+        "architecture": false,
+        "project_structure": false,
+        "setup_or_commands": false,
+        "mcp_docs": false,
+        "mcp_packs": false,
+        "release_history": false
+      },
+      "warnings": [],
+      "answer_completeness": {
+        "schema_version": "answer-completeness-1.0",
+        "status": "partial",
+        "answer_type": "partial_navigational",
+        "coverage_score": 0.0,
+        "matched_terms": [
+          "requests"
+        ],
+        "missing_terms": [],
+        "coverage_by_requirement": [
+          {
+            "term": "requests",
+            "matched": true,
+            "source_paths": [
+              "overview.md"
+            ]
+          }
+        ],
+        "source_search_required": true,
+        "source_search_status": "required",
+        "disposition": "search_local_source",
+        "edit_ready": false,
+        "reason_codes": [
+          "no_trusted_context",
+          "navigational_context_present"
+        ],
+        "canonical_support": {
+          "answer_supported": false,
+          "mandatory_requirement_ids": [
+            "unresolved:0:unresolved_question_clause:What is LeaseClient default timeout duration for requests",
+            "unresolved:1:unresolved_question_clause:which exception is raised when an operation expires"
+          ],
+          "assigned_requirement_ids": []
+        },
+        "legacy_diagnostics": {
+          "schema_version": "answer-completeness-1.0",
+          "status": "unavailable",
+          "answer_type": "unavailable",
+          "coverage_score": 1.0,
+          "matched_terms": [
+            "requests"
+          ],
+          "missing_terms": [],
+          "coverage_by_requirement": [
+            {
+              "term": "requests",
+              "matched": true,
+              "source_paths": [
+                "overview.md"
+              ]
+            }
+          ],
+          "source_search_required": false,
+          "source_search_status": "completed",
+          "disposition": "use_context",
+          "edit_ready": false,
+          "reason_codes": [
+            "no_trusted_context",
+            "navigational_context_present"
+          ]
+        }
+      }
+    },
+    "message": "Returned 2 project docs result(s)."
+  },
+  "context_result_type": "ProjectContextResult",
+  "projection_calls": 1,
+  "projection_input": [
+    {
+      "stable_chunk_id": "child-1d9d523fff67d74c4e3f8b2bd58fa86bde3bac2d",
+      "parent_logical_id": "parent-b6e7daad7248a6969c833cd332a900b9",
+      "display_content_hash": "5c648f5bbcff05d88435308f9cb2a3851fc5cee7a1bf66c1f96fe9670b988f76",
+      "_source_snapshot_sha256": "sha256:5c648f5bbcff05d88435308f9cb2a3851fc5cee7a1bf66c1f96fe9670b988f76",
+      "_reference_evidence": {
+        "schema_version": 1,
+        "source": {
+          "document_id": "project_file:local:a3f6fef547e0bff86646cdbdd3762c658529200a2d6f5da35bd828142fa68612:overview.md",
+          "scope": {
+            "project_id": "local:a3f6fef547e0bff86646cdbdd3762c658529200a2d6f5da35bd828142fa68612",
+            "version": "",
+            "snapshot_id": "gen-9246454710a74dc186821bb2eab57701"
+          },
+          "canonical_path": "overview.md",
+          "content_sha256": "5c648f5bbcff05d88435308f9cb2a3851fc5cee7a1bf66c1f96fe9670b988f76"
+        },
+        "project_doc_content_hash": "sha256:5c648f5bbcff05d88435308f9cb2a3851fc5cee7a1bf66c1f96fe9670b988f76",
+        "char_start": 0,
+        "char_end": 102,
+        "text": "# Overview\n\nLeaseClient default timeout duration requests exception operation behavior documentation.\n",
+        "raw_document": "# Overview\n\nLeaseClient default timeout duration requests exception operation behavior documentation.\n",
+        "owner": {
+          "text": "# Overview\n",
+          "char_start": 0,
+          "char_end": 11,
+          "scope_start": 0,
+          "scope_end": 102,
+          "logical_id": "parent-b6e7daad7248a6969c833cd332a900b9"
+        }
+      },
+      "_reference_root_plan": {
+        "question": "What is LeaseClient default timeout duration for requests and which exception is raised when an operation expires?",
+        "references": [
+          {
+            "mention": {
+              "mention_id": "588314f065e5cb15f6245d66edb81f0f3f03f5ee7f1d4c77d8250bbc1e8cd528:8:19",
+              "start": 8,
+              "end": 19,
+              "text": "LeaseClient",
+              "syntax_role": "semantic_subject",
+              "explicit": true
+            },
+            "role": "semantic_subject",
+            "state": "resolved",
+            "source_ids": [],
+            "reason": "explicit_reference_role"
+          }
+        ],
+        "scope": {
+          "project_id": "local:a3f6fef547e0bff86646cdbdd3762c658529200a2d6f5da35bd828142fa68612",
+          "version": "",
+          "snapshot_id": "gen-9246454710a74dc186821bb2eab57701"
+        },
+        "catalog_complete": true
+      },
+      "_reference_plans": {
+        "What is LeaseClient default timeout duration for requests and which exception is raised when an operation expires?": {
+          "question": "What is LeaseClient default timeout duration for requests and which exception is raised when an operation expires?",
+          "references": [
+            {
+              "mention": {
+                "mention_id": "588314f065e5cb15f6245d66edb81f0f3f03f5ee7f1d4c77d8250bbc1e8cd528:8:19",
+                "start": 8,
+                "end": 19,
+                "text": "LeaseClient",
+                "syntax_role": "semantic_subject",
+                "explicit": true
+              },
+              "role": "semantic_subject",
+              "state": "resolved",
+              "source_ids": [],
+              "reason": "explicit_reference_role"
+            }
+          ],
+          "scope": {
+            "project_id": "local:a3f6fef547e0bff86646cdbdd3762c658529200a2d6f5da35bd828142fa68612",
+            "version": "",
+            "snapshot_id": "gen-9246454710a74dc186821bb2eab57701"
+          },
+          "catalog_complete": true
+        },
+        "LeaseClient": {
+          "question": "LeaseClient",
+          "references": [
+            {
+              "mention": {
+                "mention_id": "32e483d4c43cb0e9d5c96fd8add7aee6ae264acff99c7b5d27290b8d66cf45fe:0:11",
+                "start": 0,
+                "end": 11,
+                "text": "LeaseClient",
+                "syntax_role": "unresolved",
+                "explicit": false
+              },
+              "role": "unresolved",
+              "state": "unresolved",
+              "source_ids": [],
+              "reason": "unresolved_reference_role"
+            }
+          ],
+          "scope": {
+            "project_id": "local:a3f6fef547e0bff86646cdbdd3762c658529200a2d6f5da35bd828142fa68612",
+            "version": "",
+            "snapshot_id": "gen-9246454710a74dc186821bb2eab57701"
+          },
+          "catalog_complete": true
+        }
+      },
+      "_evidence_sets": [
+        {
+          "schema_version": "source-dependency-proposal-v1",
+          "set_id": "evidence-set:f1bd31fad660786fb726d6e00f30c1828ee0096f9b0e1940ceee16a5d04d9275",
+          "member_spans": [
+            [
+              0,
+              10,
+              "e1cb7d861aecdf5efcbabedd31ee970857b02eec940d72c08574a7b1b3bdf580"
+            ],
+            [
+              12,
+              101,
+              "ef33d4f65fce806b09029d5c373b5d3ed564bff206af61f6e05c5b2002ff6adb"
+            ]
+          ],
+          "edges": [
+            [
+              "heading",
+              0,
+              1,
+              "markdown-owning-heading-v1"
+            ]
+          ],
+          "proposed_need_ids": [
+            "sentence-1"
+          ]
+        }
+      ],
+      "generation_id": "gen-9246454710a74dc186821bb2eab57701",
+      "resolved_version": "",
+      "_source_catalog_hash": "sha256:ce8bc442feb5ab88762b53c4745861baca9d292ffcb8e136157a6a1ca28abc61",
+      "char_start": 0,
+      "char_end": 102,
+      "line_start": 1,
+      "line_end": 3,
+      "source_class": "project_doc",
+      "source_type": "project_doc",
+      "source_kind": "project_doc",
+      "authority": "source_of_truth",
+      "risk_flags": [],
+      "doc_scope": "project",
+      "module_id": "",
+      "module_name": null,
+      "module_path": null,
+      "module_type": null,
+      "description": "Pinned documentation source",
+      "catalog_role": "other",
+      "lifecycle_status": "active",
+      "temporal_relevance": "current",
+      "index_freshness": "synchronized",
+      "impact_policy": "track",
+      "project_identity": "local:a3f6fef547e0bff86646cdbdd3762c658529200a2d6f5da35bd828142fa68612",
+      "retrieval_query_ids": [],
+      "retrieval_query_matches": {},
+      "project_ranking": {},
+      "path": "overview.md",
+      "url": null,
+      "title": "Overview",
+      "heading_path": "Overview",
+      "freshness": "current",
+      "why_selected": "selected because it matched repo-owned project documentation for the question",
+      "content": "# Overview\n\nLeaseClient default timeout duration requests exception operation behavior documentation.\n",
+      "display_text": "# Overview\n\nLeaseClient default timeout duration requests exception operation behavior documentation.\n",
+      "token_estimate": 25,
+      "source": {
+        "source_class": "project_doc",
+        "source_type": "project_doc",
+        "source_kind": "project_doc",
+        "authority": "source_of_truth",
+        "risk_flags": [],
+        "doc_scope": "project",
+        "module_id": "",
+        "module_name": null,
+        "module_path": null,
+        "module_type": null,
+        "description": "Pinned documentation source",
+        "lifecycle_status": "active",
+        "temporal_relevance": "current",
+        "index_freshness": "synchronized",
+        "impact_policy": "track",
+        "project_identity": "local:a3f6fef547e0bff86646cdbdd3762c658529200a2d6f5da35bd828142fa68612",
+        "path": "overview.md",
+        "url": null,
+        "title": "Overview"
+      },
+      "section": {
+        "title": "Overview",
+        "heading_path": "Overview",
+        "freshness": "current"
+      },
+      "snippet": "# Overview\n\nLeaseClient default timeout duration requests exception operation behavior documentation.\n",
+      "char_span": [
+        0,
+        102
+      ],
+      "origin_lane": "project",
+      "canonical_id": null,
+      "library_id": null,
+      "version": null,
+      "source_provenance": {
+        "owner": "configured_repository",
+        "origin_lane": "project"
+      },
+      "version_exactness": "not_applicable",
+      "repository_authority": "ordinary_repository_document",
+      "instruction_trust": "untrusted_data",
+      "content_boundary": {
+        "role": "cited_document_data",
+        "schema": "docmancer-document-data-v1",
+        "executable_policy": false
+      },
+      "document_data": {
+        "schema": "docmancer-document-data-v1",
+        "instruction_trust": "untrusted_data",
+        "content": "# Overview\n\nLeaseClient default timeout duration requests exception operation behavior documentation.\n"
+      },
+      "authority_root": null,
+      "policy_scope": null,
+      "scope_verified": false,
+      "instruction_risk_flags": []
+    },
+    {
+      "stable_chunk_id": "child-4e1b6f19f898b0a20008ae4eb9a4754ed33ec552",
+      "parent_logical_id": "parent-9852d14c68a6776eb4f741ae1dd92484",
+      "display_content_hash": "50fc5ae5565ed3949aba18fba3617bdec0a9732f2aafe8ec04488ebf8c69814d",
+      "_source_snapshot_sha256": "sha256:50fc5ae5565ed3949aba18fba3617bdec0a9732f2aafe8ec04488ebf8c69814d",
+      "_reference_evidence": {
+        "schema_version": 1,
+        "source": {
+          "document_id": "project_file:local:a3f6fef547e0bff86646cdbdd3762c658529200a2d6f5da35bd828142fa68612:default.md",
+          "scope": {
+            "project_id": "local:a3f6fef547e0bff86646cdbdd3762c658529200a2d6f5da35bd828142fa68612",
+            "version": "",
+            "snapshot_id": "gen-9246454710a74dc186821bb2eab57701"
+          },
+          "canonical_path": "default.md",
+          "content_sha256": "50fc5ae5565ed3949aba18fba3617bdec0a9732f2aafe8ec04488ebf8c69814d"
+        },
+        "project_doc_content_hash": "sha256:50fc5ae5565ed3949aba18fba3617bdec0a9732f2aafe8ec04488ebf8c69814d",
+        "char_start": 0,
+        "char_end": 50,
+        "text": "# LeaseClient\n\nThe default timeout is 17 seconds.\n",
+        "raw_document": "# LeaseClient\n\nThe default timeout is 17 seconds.\n",
+        "owner": {
+          "text": "# LeaseClient\n",
+          "char_start": 0,
+          "char_end": 14,
+          "scope_start": 0,
+          "scope_end": 50,
+          "logical_id": "parent-9852d14c68a6776eb4f741ae1dd92484"
+        }
+      },
+      "_reference_root_plan": {
+        "question": "What is LeaseClient default timeout duration for requests and which exception is raised when an operation expires?",
+        "references": [
+          {
+            "mention": {
+              "mention_id": "588314f065e5cb15f6245d66edb81f0f3f03f5ee7f1d4c77d8250bbc1e8cd528:8:19",
+              "start": 8,
+              "end": 19,
+              "text": "LeaseClient",
+              "syntax_role": "semantic_subject",
+              "explicit": true
+            },
+            "role": "semantic_subject",
+            "state": "resolved",
+            "source_ids": [],
+            "reason": "explicit_reference_role"
+          }
+        ],
+        "scope": {
+          "project_id": "local:a3f6fef547e0bff86646cdbdd3762c658529200a2d6f5da35bd828142fa68612",
+          "version": "",
+          "snapshot_id": "gen-9246454710a74dc186821bb2eab57701"
+        },
+        "catalog_complete": true
+      },
+      "_reference_plans": {
+        "What is LeaseClient default timeout duration for requests and which exception is raised when an operation expires?": {
+          "question": "What is LeaseClient default timeout duration for requests and which exception is raised when an operation expires?",
+          "references": [
+            {
+              "mention": {
+                "mention_id": "588314f065e5cb15f6245d66edb81f0f3f03f5ee7f1d4c77d8250bbc1e8cd528:8:19",
+                "start": 8,
+                "end": 19,
+                "text": "LeaseClient",
+                "syntax_role": "semantic_subject",
+                "explicit": true
+              },
+              "role": "semantic_subject",
+              "state": "resolved",
+              "source_ids": [],
+              "reason": "explicit_reference_role"
+            }
+          ],
+          "scope": {
+            "project_id": "local:a3f6fef547e0bff86646cdbdd3762c658529200a2d6f5da35bd828142fa68612",
+            "version": "",
+            "snapshot_id": "gen-9246454710a74dc186821bb2eab57701"
+          },
+          "catalog_complete": true
+        },
+        "LeaseClient": {
+          "question": "LeaseClient",
+          "references": [
+            {
+              "mention": {
+                "mention_id": "32e483d4c43cb0e9d5c96fd8add7aee6ae264acff99c7b5d27290b8d66cf45fe:0:11",
+                "start": 0,
+                "end": 11,
+                "text": "LeaseClient",
+                "syntax_role": "unresolved",
+                "explicit": false
+              },
+              "role": "unresolved",
+              "state": "unresolved",
+              "source_ids": [],
+              "reason": "unresolved_reference_role"
+            }
+          ],
+          "scope": {
+            "project_id": "local:a3f6fef547e0bff86646cdbdd3762c658529200a2d6f5da35bd828142fa68612",
+            "version": "",
+            "snapshot_id": "gen-9246454710a74dc186821bb2eab57701"
+          },
+          "catalog_complete": true
+        }
+      },
+      "_evidence_sets": [
+        {
+          "schema_version": "source-dependency-proposal-v1",
+          "set_id": "evidence-set:694055ea97829c05290ec715f4108378213ee0670efc6ad8c5ee31c6b70a9dbd",
+          "member_spans": [
+            [
+              0,
+              13,
+              "1ec9d6586bb31572e21ae67e93a1f190d8f312b0e1c5f8a17bd9c075a0e95620"
+            ],
+            [
+              15,
+              49,
+              "8982dafc4056ebe4227204e375e2763dfcd890e5b826d8f599d4e708d6750b85"
+            ]
+          ],
+          "edges": [
+            [
+              "heading",
+              0,
+              1,
+              "markdown-owning-heading-v1"
+            ]
+          ],
+          "proposed_need_ids": [
+            "sentence-1"
+          ]
+        }
+      ],
+      "generation_id": "gen-9246454710a74dc186821bb2eab57701",
+      "resolved_version": "",
+      "_source_catalog_hash": "sha256:8c66570be38c28f2a10bc03d2f7d9ce3d413c018441dfef710fcfa189895d3d6",
+      "char_start": 0,
+      "char_end": 50,
+      "line_start": 1,
+      "line_end": 3,
+      "source_class": "project_doc",
+      "source_type": "project_doc",
+      "source_kind": "project_doc",
+      "authority": "source_of_truth",
+      "risk_flags": [],
+      "doc_scope": "project",
+      "module_id": "",
+      "module_name": null,
+      "module_path": null,
+      "module_type": null,
+      "description": "Pinned documentation source",
+      "catalog_role": "other",
+      "lifecycle_status": "active",
+      "temporal_relevance": "current",
+      "index_freshness": "synchronized",
+      "impact_policy": "track",
+      "project_identity": "local:a3f6fef547e0bff86646cdbdd3762c658529200a2d6f5da35bd828142fa68612",
+      "retrieval_query_ids": [],
+      "retrieval_query_matches": {},
+      "project_ranking": {},
+      "path": "default.md",
+      "url": null,
+      "title": "LeaseClient",
+      "heading_path": "LeaseClient",
+      "freshness": "current",
+      "why_selected": "selected because it matched repo-owned project documentation for the question",
+      "content": "# LeaseClient\n\nThe default timeout is 17 seconds.\n",
+      "display_text": "# LeaseClient\n\nThe default timeout is 17 seconds.\n",
+      "token_estimate": 12,
+      "source": {
+        "source_class": "project_doc",
+        "source_type": "project_doc",
+        "source_kind": "project_doc",
+        "authority": "source_of_truth",
+        "risk_flags": [],
+        "doc_scope": "project",
+        "module_id": "",
+        "module_name": null,
+        "module_path": null,
+        "module_type": null,
+        "description": "Pinned documentation source",
+        "lifecycle_status": "active",
+        "temporal_relevance": "current",
+        "index_freshness": "synchronized",
+        "impact_policy": "track",
+        "project_identity": "local:a3f6fef547e0bff86646cdbdd3762c658529200a2d6f5da35bd828142fa68612",
+        "path": "default.md",
+        "url": null,
+        "title": "LeaseClient"
+      },
+      "section": {
+        "title": "LeaseClient",
+        "heading_path": "LeaseClient",
+        "freshness": "current"
+      },
+      "snippet": "# LeaseClient\n\nThe default timeout is 17 seconds.\n",
+      "char_span": [
+        0,
+        50
+      ],
+      "origin_lane": "project",
+      "canonical_id": null,
+      "library_id": null,
+      "version": null,
+      "source_provenance": {
+        "owner": "configured_repository",
+        "origin_lane": "project"
+      },
+      "version_exactness": "not_applicable",
+      "repository_authority": "ordinary_repository_document",
+      "instruction_trust": "untrusted_data",
+      "content_boundary": {
+        "role": "cited_document_data",
+        "schema": "docmancer-document-data-v1",
+        "executable_policy": false
+      },
+      "document_data": {
+        "schema": "docmancer-document-data-v1",
+        "instruction_trust": "untrusted_data",
+        "content": "# LeaseClient\n\nThe default timeout is 17 seconds.\n"
+      },
+      "authority_root": null,
+      "policy_scope": null,
+      "scope_verified": false,
+      "instruction_risk_flags": []
+    }
+  ],
+  "decisions": [
+    {
+      "path": "overview.md",
+      "span": [
+        0,
+        102
+      ],
+      "allowed": true,
+      "reason": "source_bound_retrieval_only_unknown_applicability",
+      "whole_dto_cost": 289,
+      "stage": "selected"
+    },
+    {
+      "path": "default.md",
+      "span": [
+        0,
+        50
+      ],
+      "allowed": true,
+      "reason": "source_bound_retrieval_only_unknown_applicability",
+      "whole_dto_cost": 443,
+      "stage": "selected"
+    }
+  ],
+  "selected": [
+    {
+      "evidence_id": "ev-fd78478e1f7b6607",
+      "path_or_url": "overview.md",
+      "section": "Overview",
+      "snippet": "# Overview\n\nLeaseClient default timeout duration requests exception operation behavior documentation.\n",
+      "version_binding": "unversioned",
+      "content_sha256": "3c52ecab5fce425512415fd5dd286df590cd7208b9b3c4c318a22c1cd5dc85ee",
+      "project_identity": "local:a3f6fef547e0bff86646cdbdd3762c658529200a2d6f5da35bd828142fa68612",
+      "authority": "source_of_truth",
+      "scope": "project",
+      "line_start": 1,
+      "line_end": 3
+    },
+    {
+      "evidence_id": "ev-17e3ce471ed76776",
+      "path_or_url": "default.md",
+      "section": "LeaseClient",
+      "snippet": "# LeaseClient\n\nThe default timeout is 17 seconds.\n",
+      "version_binding": "unversioned",
+      "content_sha256": "0522cd2e7aea420cf7657b41c42b4e7bc13f13ef47a025d4393ce463f902a77e",
+      "project_identity": "local:a3f6fef547e0bff86646cdbdd3762c658529200a2d6f5da35bd828142fa68612",
+      "authority": "source_of_truth",
+      "scope": "project",
+      "line_start": 1,
+      "line_end": 3
+    }
+  ],
+  "validator": [],
+  "budget": 443,
+  "handler_validation": [
+    {
+      "errors": [],
+      "max_tokens": 800
+    }
+  ]
+}

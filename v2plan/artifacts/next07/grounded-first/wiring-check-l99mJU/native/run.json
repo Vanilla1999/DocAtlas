@@ -1,0 +1,18 @@
+{
+  "argv": [
+    "/home/viadmin/StudioProjects/hermes/docmancer/v2plan/next07_grounded_final_run.py",
+    "--out",
+    "v2plan/artifacts/next07/grounded-first/wiring-check-l99mJU/native"
+  ],
+  "python": "3.13.12 (main, Mar 24 2026, 22:49:35) [Clang 22.1.1 ]",
+  "executable": "/home/viadmin/StudioProjects/hermes/docmancer/.venv/bin/python",
+  "cwd": "/home/viadmin/StudioProjects/hermes/docmancer",
+  "DOCATLAS_OFFLINE": "1",
+  "code_sha256": {
+    "next07_grounded_candidate.py": "5ac8e2600a12d216070087a50c9ddc64c8efaaff2f399d70e2b345db0bf71ff7",
+    "next07_grounded_public.py": "fe2c073e9abd15084cae90ddff15c5058b163f58d8c8daed2f1da79c6d65c529",
+    "next07_grounded_final_run.py": "86fa8c403dbe03945ae38a9dae98bbfe1eb1456685a8c88aba52753ceef32b14"
+  },
+  "automatic_retries": 0,
+  "retention_and_full_suite": "NOT_RUN by this target-local runner"
+}

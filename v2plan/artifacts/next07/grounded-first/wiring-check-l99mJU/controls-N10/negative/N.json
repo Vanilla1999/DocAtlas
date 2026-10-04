@@ -1,0 +1,2407 @@
+{
+  "request": {
+    "project_path": "/home/viadmin/StudioProjects/hermes/docmancer/v2plan/artifacts/next07/grounded-first/wiring-check-l99mJU/controls-N10/negative/corpus",
+    "question": "storage retention behavior. Also identify private production deployment configuration credentials owner selected runtime settings.",
+    "scope": "project"
+  },
+  "public_payload": {
+    "status": "insufficient_evidence",
+    "kind": "docs_context",
+    "missing": [
+      "No safe, current, project-scoped documentation context was retrieved."
+    ],
+    "estimated_tokens": 261,
+    "context_quality": {
+      "status": "unavailable",
+      "reasons": [
+        "source_unavailable"
+      ]
+    },
+    "read_next": [],
+    "recommended_next_action": {
+      "tool": "code_search",
+      "type": "search_local_source",
+      "handled_by": "coding_agent",
+      "requires_confirmation": false,
+      "reason": "no_candidates",
+      "query_terms": [
+        "storage retention behavior. Also identify private production deployment configuration credentials owner selected runtime settings"
+      ],
+      "repeat_docs_context": false,
+      "auto_execute": false
+    },
+    "context_available": false,
+    "documentation_supported": false,
+    "investigation_allowed": true,
+    "hard_stop": false,
+    "recovery_origin": "retrieval",
+    "recovery_reason_code": "no_candidates",
+    "recovery_disposition": "search_local_source",
+    "disposition": "search_local_source",
+    "edit_ready": false,
+    "source_search_status": "required",
+    "requires_confirmation": false,
+    "answer_supported": false,
+    "answer_available": false,
+    "support_status": "insufficient_evidence"
+  },
+  "projection_attempts": [
+    {
+      "before_projection": {
+        "tool": "get_docs_context",
+        "status": "confirmation_required",
+        "question": "storage retention behavior. Also identify private production deployment configuration credentials owner selected runtime settings.",
+        "mode_requested": "auto",
+        "mode_selected": "project",
+        "routing": {
+          "reason_code": "project_context_auto",
+          "project_path_used": true,
+          "libraries_requested": [],
+          "dependency_detected": false,
+          "delegated_mode": "auto",
+          "evidence_scopes": []
+        },
+        "answer_available": false,
+        "context_available": false,
+        "answer_supported": false,
+        "support_status": "insufficient_evidence",
+        "missing_requirement_ids": [
+          "project_answer_requirement",
+          "unsupported_answer_authorization:unresolved_query"
+        ],
+        "satisfied_requirement_ids": [],
+        "mandatory_requirement_ids": [],
+        "mandatory_coverage": 0.0,
+        "selected_evidence_ids": [],
+        "decision_hash": "2918b4dd29febe22cd79c4b9c322c55cbbe328a6cfa007159fafdca3720b69b3",
+        "assignment_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "selection_decision": {
+          "status": "insufficient_evidence",
+          "selected_candidates": [],
+          "omissions": [],
+          "missing_requirements": [
+            "project_answer_requirement",
+            "unsupported_answer_authorization:unresolved_query"
+          ],
+          "unresolved_conflicts": [],
+          "metrics": {
+            "candidate_count": 0,
+            "eligible_count": 0,
+            "selected_count": 0,
+            "selected_sources": 0,
+            "selected_documents": 0,
+            "max_documents": 3,
+            "max_spans": 6,
+            "selected_tokens": 0,
+            "wrapper_reserve_tokens": 120,
+            "projected_total_tokens": 120,
+            "serialized_projected_tokens": 350,
+            "hard_tokens": 800,
+            "mandatory_requirements": 0,
+            "mandatory_covered": 0,
+            "mandatory_coverage_millis": 0,
+            "requirements_hash": "2a741d07657546a1b4275341875e1d02422222a8d7f2e04faa77196fd8a7e22b",
+            "omission_counts": {},
+            "selected_parents": 0,
+            "selected_children": 0,
+            "required_facts_per_1000_tokens_millis": 0,
+            "redundant_visible_token_ratio_millis": 0,
+            "cache": "disabled",
+            "selected_feature_trace": [],
+            "candidate_to_selected_ratio_millis": 0,
+            "reported_token_mismatches": 0
+          },
+          "selector_config_hash": "23cf8aa2f77c1b7e9b9d00819a1d05c14e198272ad91516b5a75c5f641963edd",
+          "eligibility_contract_hash": "eae274104ce4e7688863d3701d486160eb60a30f0cf5f1d8a2bef60f9815173f",
+          "candidate_trace_hash": "47333eea2b6f90f13c4cb48f5be94d66c1987429485b946aca6782d4de13f866",
+          "selection_hash": "24fc9b61faabfc91e006e1c7661c0b86752586c6ec9d2a9f2cbbedf45f3fb92a",
+          "assignments": [],
+          "support_decision": {
+            "answer_supported": false,
+            "support_status": "insufficient_evidence",
+            "reason_code": "required_evidence_missing",
+            "missing_requirement_ids": [
+              "project_answer_requirement",
+              "unsupported_answer_authorization:unresolved_query"
+            ],
+            "satisfied_requirement_ids": [],
+            "mandatory_requirement_ids": [],
+            "mandatory_coverage": 0.0,
+            "selected_evidence_ids": [],
+            "requirements_hash": "2a741d07657546a1b4275341875e1d02422222a8d7f2e04faa77196fd8a7e22b",
+            "selector_config_hash": "23cf8aa2f77c1b7e9b9d00819a1d05c14e198272ad91516b5a75c5f641963edd",
+            "eligibility_contract_hash": "eae274104ce4e7688863d3701d486160eb60a30f0cf5f1d8a2bef60f9815173f",
+            "candidate_trace_hash": "47333eea2b6f90f13c4cb48f5be94d66c1987429485b946aca6782d4de13f866",
+            "selection_hash": "24fc9b61faabfc91e006e1c7661c0b86752586c6ec9d2a9f2cbbedf45f3fb92a",
+            "assignment_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "decision_hash": "2918b4dd29febe22cd79c4b9c322c55cbbe328a6cfa007159fafdca3720b69b3",
+            "requirements": {
+              "requirements": [],
+              "required_entities": [],
+              "required_facets": [],
+              "query_extraction_provenance": [],
+              "query_requirement_spans": [],
+              "retrieval_hints": [
+                "Also",
+                "storage",
+                "retention",
+                "behavior",
+                "identify",
+                "private",
+                "production",
+                "deployment",
+                "configuration",
+                "credentials",
+                "owner",
+                "selected",
+                "runtime",
+                "settings"
+              ],
+              "concept_queries": [],
+              "answer_contract_hash": "131395c05f6bf74505f4836962b7a8df09193f76be5f084a38e8799b5ebd10db",
+              "lifecycle_intent": "current",
+              "parse_trace": [
+                "fallback:generic_project_terms"
+              ],
+              "unresolved_parts": [
+                "unsupported_query:generic_free_form_relation"
+              ],
+              "component_scope_complete": false
+            }
+          },
+          "requirements": {
+            "requirements": [],
+            "required_entities": [],
+            "required_facets": [],
+            "query_extraction_provenance": [],
+            "query_requirement_spans": [],
+            "retrieval_hints": [
+              "Also",
+              "storage",
+              "retention",
+              "behavior",
+              "identify",
+              "private",
+              "production",
+              "deployment",
+              "configuration",
+              "credentials",
+              "owner",
+              "selected",
+              "runtime",
+              "settings"
+            ],
+            "concept_queries": [],
+            "answer_contract_hash": "131395c05f6bf74505f4836962b7a8df09193f76be5f084a38e8799b5ebd10db",
+            "lifecycle_intent": "current",
+            "parse_trace": [
+              "fallback:generic_project_terms"
+            ],
+            "unresolved_parts": [
+              "unsupported_query:generic_free_form_relation"
+            ],
+            "component_scope_complete": false
+          }
+        },
+        "support_decision": {
+          "answer_supported": false,
+          "support_status": "insufficient_evidence",
+          "reason_code": "required_evidence_missing",
+          "missing_requirement_ids": [
+            "project_answer_requirement",
+            "unsupported_answer_authorization:unresolved_query"
+          ],
+          "satisfied_requirement_ids": [],
+          "mandatory_requirement_ids": [],
+          "mandatory_coverage": 0.0,
+          "selected_evidence_ids": [],
+          "requirements_hash": "2a741d07657546a1b4275341875e1d02422222a8d7f2e04faa77196fd8a7e22b",
+          "selector_config_hash": "23cf8aa2f77c1b7e9b9d00819a1d05c14e198272ad91516b5a75c5f641963edd",
+          "eligibility_contract_hash": "eae274104ce4e7688863d3701d486160eb60a30f0cf5f1d8a2bef60f9815173f",
+          "candidate_trace_hash": "47333eea2b6f90f13c4cb48f5be94d66c1987429485b946aca6782d4de13f866",
+          "selection_hash": "24fc9b61faabfc91e006e1c7661c0b86752586c6ec9d2a9f2cbbedf45f3fb92a",
+          "assignment_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+          "decision_hash": "2918b4dd29febe22cd79c4b9c322c55cbbe328a6cfa007159fafdca3720b69b3",
+          "requirements": {
+            "requirements": [],
+            "required_entities": [],
+            "required_facets": [],
+            "query_extraction_provenance": [],
+            "query_requirement_spans": [],
+            "retrieval_hints": [
+              "Also",
+              "storage",
+              "retention",
+              "behavior",
+              "identify",
+              "private",
+              "production",
+              "deployment",
+              "configuration",
+              "credentials",
+              "owner",
+              "selected",
+              "runtime",
+              "settings"
+            ],
+            "concept_queries": [],
+            "answer_contract_hash": "131395c05f6bf74505f4836962b7a8df09193f76be5f084a38e8799b5ebd10db",
+            "lifecycle_intent": "current",
+            "parse_trace": [
+              "fallback:generic_project_terms"
+            ],
+            "unresolved_parts": [
+              "unsupported_query:generic_free_form_relation"
+            ],
+            "component_scope_complete": false
+          }
+        },
+        "delivery_decision": {
+          "deliverable": false,
+          "reason_code": "required_evidence_missing"
+        },
+        "answer_type": "unavailable",
+        "answer_completeness": {
+          "schema_version": "answer-completeness-1.0",
+          "status": "unavailable",
+          "answer_type": "unavailable",
+          "coverage_score": 0.0,
+          "matched_terms": [],
+          "missing_terms": [
+            "storage",
+            "retention",
+            "behavior",
+            "identify",
+            "private",
+            "production",
+            "deployment",
+            "configuration"
+          ],
+          "coverage_by_requirement": [
+            {
+              "term": "storage",
+              "matched": false,
+              "source_paths": []
+            },
+            {
+              "term": "retention",
+              "matched": false,
+              "source_paths": []
+            },
+            {
+              "term": "behavior",
+              "matched": false,
+              "source_paths": []
+            },
+            {
+              "term": "identify",
+              "matched": false,
+              "source_paths": []
+            },
+            {
+              "term": "private",
+              "matched": false,
+              "source_paths": []
+            },
+            {
+              "term": "production",
+              "matched": false,
+              "source_paths": []
+            },
+            {
+              "term": "deployment",
+              "matched": false,
+              "source_paths": []
+            },
+            {
+              "term": "configuration",
+              "matched": false,
+              "source_paths": []
+            }
+          ],
+          "source_search_required": true,
+          "source_search_status": "required",
+          "disposition": "search_local_source",
+          "edit_ready": true,
+          "reason_codes": [
+            "no_trusted_context",
+            "story_terms_missing_from_source_evidence",
+            "high_signal_query_terms_missing_from_context"
+          ],
+          "canonical_support": {
+            "answer_supported": false,
+            "mandatory_requirement_ids": [],
+            "assigned_requirement_ids": []
+          },
+          "legacy_diagnostics": {
+            "schema_version": "answer-completeness-1.0",
+            "status": "unavailable",
+            "answer_type": "unavailable",
+            "coverage_score": 0.0,
+            "matched_terms": [],
+            "missing_terms": [
+              "storage",
+              "retention",
+              "behavior",
+              "identify",
+              "private",
+              "production",
+              "deployment",
+              "configuration"
+            ],
+            "coverage_by_requirement": [
+              {
+                "term": "storage",
+                "matched": false,
+                "source_paths": []
+              },
+              {
+                "term": "retention",
+                "matched": false,
+                "source_paths": []
+              },
+              {
+                "term": "behavior",
+                "matched": false,
+                "source_paths": []
+              },
+              {
+                "term": "identify",
+                "matched": false,
+                "source_paths": []
+              },
+              {
+                "term": "private",
+                "matched": false,
+                "source_paths": []
+              },
+              {
+                "term": "production",
+                "matched": false,
+                "source_paths": []
+              },
+              {
+                "term": "deployment",
+                "matched": false,
+                "source_paths": []
+              },
+              {
+                "term": "configuration",
+                "matched": false,
+                "source_paths": []
+              }
+            ],
+            "source_search_required": true,
+            "source_search_status": "required",
+            "disposition": "search_local_source",
+            "edit_ready": true,
+            "reason_codes": [
+              "no_trusted_context",
+              "story_terms_missing_from_source_evidence",
+              "high_signal_query_terms_missing_from_context"
+            ]
+          }
+        },
+        "disposition": "search_local_source",
+        "edit_ready": true,
+        "source_search_status": "required",
+        "documentation_query_plan": {
+          "schema_version": "documentation-query-plan-v2",
+          "original_question": "storage retention behavior. Also identify private production deployment configuration credentials owner selected runtime settings.",
+          "query_ids": [
+            "query-original"
+          ],
+          "required_query_ids": [
+            "query-original"
+          ],
+          "public_query_ids": [
+            "query-original"
+          ],
+          "queries": [
+            {
+              "query_id": "query-original",
+              "text": "storage retention behavior. Also identify private production deployment configuration credentials owner selected runtime settings.",
+              "origin": "original",
+              "coverage_required": true,
+              "facet_id": null,
+              "requirement_id": null,
+              "relation": "direct",
+              "public_parent_query_id": null,
+              "preferred_catalog_roles": [],
+              "forbidden_catalog_roles": [],
+              "forbidden_evidence_terms": [],
+              "parent_exact_terms": [],
+              "need_subject": null,
+              "need_relation": null,
+              "need_context": null
+            }
+          ],
+          "explicit_paths": [],
+          "unresolved_parts": [
+            "semantic_scope_unverified"
+          ],
+          "_component_contract": [],
+          "component_scope_complete": false
+        },
+        "context_pack": [],
+        "lanes": {
+          "project": {
+            "status": "confirmation_required",
+            "source_count": 0,
+            "reason_code": "no_reliable_context",
+            "next_action": null
+          },
+          "library": {
+            "status": "not_requested",
+            "source_count": 0,
+            "canonical_ids": [],
+            "next_action": null
+          },
+          "dependency": {
+            "status": "not_requested",
+            "source_count": 0,
+            "next_action": null
+          }
+        },
+        "source_summary": {
+          "project": 0,
+          "library": 0,
+          "dependency": 0,
+          "rejected": 0,
+          "risky": 0
+        },
+        "trust_contract": {
+          "schema_version": "trust-contract-1.2",
+          "sources": {
+            "selected": [],
+            "rejected": [],
+            "risky": []
+          },
+          "source_dimensions": [
+            "source_provenance",
+            "version_exactness",
+            "repository_authority",
+            "instruction_trust"
+          ],
+          "policy": {
+            "document_content": "cited_data_never_lifecycle_instruction",
+            "typed_lifecycle_actions_only": true
+          }
+        },
+        "dependency_docs": {},
+        "exact_version": null,
+        "reason_code": "required_evidence_missing",
+        "message": null,
+        "required_one_of": [],
+        "examples": [],
+        "requires_confirmation": true,
+        "confirmation_reason": "repo_write",
+        "next_action": {
+          "action": "create_reviewable_project_doc",
+          "requires_confirmation": true,
+          "preferred_path": "ARCHITECTURE.md",
+          "suggested_paths": [
+            "ARCHITECTURE.md",
+            "README.md",
+            "docs/architecture.md"
+          ],
+          "reason": "Project docs exist, but no high-level architecture or overview document was discovered. Ask the user before creating a reviewable ARCHITECTURE.md file.",
+          "agent_guidance": "If the user approves, inspect the listed evidence, create ARCHITECTURE.md as a normal reviewable file, then use the returned public prepare_docs action before retrying get_docs_context.",
+          "documentation_gap": {
+            "suggested_path": "ARCHITECTURE.md",
+            "required_sections": [
+              {
+                "name": "purpose",
+                "state": "missing",
+                "evidence": [
+                  "manifests",
+                  "root entrypoints"
+                ],
+                "evidence_paths": [],
+                "facts": [],
+                "missing_evidence": [
+                  "manifests",
+                  "root entrypoints"
+                ],
+                "discovery_suggestions": [
+                  "Inspect repository files for manifests; keep the claim unknown if no evidence is found.",
+                  "Inspect repository files for root entrypoints; keep the claim unknown if no evidence is found."
+                ]
+              },
+              {
+                "name": "entrypoints",
+                "state": "missing",
+                "evidence": [
+                  "root entrypoints",
+                  "runtime configuration"
+                ],
+                "evidence_paths": [],
+                "facts": [],
+                "missing_evidence": [
+                  "root entrypoints",
+                  "runtime configuration"
+                ],
+                "discovery_suggestions": [
+                  "Inspect repository files for root entrypoints; keep the claim unknown if no evidence is found.",
+                  "Inspect repository files for runtime configuration; keep the claim unknown if no evidence is found."
+                ]
+              },
+              {
+                "name": "modules",
+                "state": "missing",
+                "evidence": [
+                  "module directories",
+                  "module imports"
+                ],
+                "evidence_paths": [],
+                "facts": [],
+                "missing_evidence": [
+                  "module directories",
+                  "module imports"
+                ],
+                "discovery_suggestions": [
+                  "Inspect repository files for module directories; keep the claim unknown if no evidence is found.",
+                  "Inspect repository files for module imports; keep the claim unknown if no evidence is found."
+                ]
+              },
+              {
+                "name": "runtime flow",
+                "state": "missing",
+                "evidence": [
+                  "entrypoints",
+                  "module imports",
+                  "runtime configuration"
+                ],
+                "evidence_paths": [],
+                "facts": [],
+                "missing_evidence": [
+                  "entrypoints",
+                  "module imports",
+                  "runtime configuration"
+                ],
+                "discovery_suggestions": [
+                  "Inspect repository files for entrypoints; keep the claim unknown if no evidence is found.",
+                  "Inspect repository files for module imports; keep the claim unknown if no evidence is found.",
+                  "Inspect repository files for runtime configuration; keep the claim unknown if no evidence is found."
+                ]
+              },
+              {
+                "name": "development commands",
+                "state": "missing",
+                "evidence": [
+                  "manifests",
+                  "test and build configuration"
+                ],
+                "evidence_paths": [],
+                "facts": [],
+                "missing_evidence": [
+                  "manifests",
+                  "test and build configuration"
+                ],
+                "discovery_suggestions": [
+                  "Inspect repository files for manifests; keep the claim unknown if no evidence is found.",
+                  "Inspect repository files for test and build configuration; keep the claim unknown if no evidence is found."
+                ]
+              }
+            ],
+            "evidence_to_collect": [],
+            "evidence_complete": false,
+            "rules": [
+              "do not invent unsupported facts",
+              "cite repository paths for factual claims",
+              "mark uncertain claims as unknown"
+            ],
+            "missing_evidence": [
+              "manifests",
+              "root entrypoints",
+              "runtime configuration",
+              "module directories",
+              "module imports",
+              "entrypoints",
+              "test and build configuration"
+            ],
+            "bounds": {
+              "max_serialized_bytes": 12288,
+              "serialized_bytes": 3947,
+              "truncated": false,
+              "omitted_counts": {}
+            }
+          },
+          "after_file_change": {
+            "tool": "prepare_docs",
+            "arguments_patch": {
+              "action": "sync_project_docs",
+              "project_path": "/home/viadmin/StudioProjects/hermes/docmancer/v2plan/artifacts/next07/grounded-first/wiring-check-l99mJU/controls-N10/negative/corpus"
+            }
+          },
+          "after": [
+            {
+              "tool": "prepare_docs",
+              "requires_confirmation": false,
+              "arguments_patch": {
+                "action": "sync_project_docs",
+                "project_path": "/home/viadmin/StudioProjects/hermes/docmancer/v2plan/artifacts/next07/grounded-first/wiring-check-l99mJU/controls-N10/negative/corpus"
+              }
+            },
+            {
+              "tool": "get_docs_context",
+              "requires_confirmation": false,
+              "arguments_patch": {
+                "project_path": "/home/viadmin/StudioProjects/hermes/docmancer/v2plan/artifacts/next07/grounded-first/wiring-check-l99mJU/controls-N10/negative/corpus"
+              }
+            }
+          ]
+        },
+        "next_actions": [
+          {
+            "action": "create_reviewable_project_doc",
+            "requires_confirmation": true,
+            "preferred_path": "ARCHITECTURE.md",
+            "suggested_paths": [
+              "ARCHITECTURE.md",
+              "README.md",
+              "docs/architecture.md"
+            ],
+            "reason": "Project docs exist, but no high-level architecture or overview document was discovered. Ask the user before creating a reviewable ARCHITECTURE.md file.",
+            "agent_guidance": "If the user approves, inspect the listed evidence, create ARCHITECTURE.md as a normal reviewable file, then use the returned public prepare_docs action before retrying get_docs_context.",
+            "documentation_gap": {
+              "suggested_path": "ARCHITECTURE.md",
+              "required_sections": [
+                {
+                  "name": "purpose",
+                  "state": "missing",
+                  "evidence": [
+                    "manifests",
+                    "root entrypoints"
+                  ],
+                  "evidence_paths": [],
+                  "facts": [],
+                  "missing_evidence": [
+                    "manifests",
+                    "root entrypoints"
+                  ],
+                  "discovery_suggestions": [
+                    "Inspect repository files for manifests; keep the claim unknown if no evidence is found.",
+                    "Inspect repository files for root entrypoints; keep the claim unknown if no evidence is found."
+                  ]
+                },
+                {
+                  "name": "entrypoints",
+                  "state": "missing",
+                  "evidence": [
+                    "root entrypoints",
+                    "runtime configuration"
+                  ],
+                  "evidence_paths": [],
+                  "facts": [],
+                  "missing_evidence": [
+                    "root entrypoints",
+                    "runtime configuration"
+                  ],
+                  "discovery_suggestions": [
+                    "Inspect repository files for root entrypoints; keep the claim unknown if no evidence is found.",
+                    "Inspect repository files for runtime configuration; keep the claim unknown if no evidence is found."
+                  ]
+                },
+                {
+                  "name": "modules",
+                  "state": "missing",
+                  "evidence": [
+                    "module directories",
+                    "module imports"
+                  ],
+                  "evidence_paths": [],
+                  "facts": [],
+                  "missing_evidence": [
+                    "module directories",
+                    "module imports"
+                  ],
+                  "discovery_suggestions": [
+                    "Inspect repository files for module directories; keep the claim unknown if no evidence is found.",
+                    "Inspect repository files for module imports; keep the claim unknown if no evidence is found."
+                  ]
+                },
+                {
+                  "name": "runtime flow",
+                  "state": "missing",
+                  "evidence": [
+                    "entrypoints",
+                    "module imports",
+                    "runtime configuration"
+                  ],
+                  "evidence_paths": [],
+                  "facts": [],
+                  "missing_evidence": [
+                    "entrypoints",
+                    "module imports",
+                    "runtime configuration"
+                  ],
+                  "discovery_suggestions": [
+                    "Inspect repository files for entrypoints; keep the claim unknown if no evidence is found.",
+                    "Inspect repository files for module imports; keep the claim unknown if no evidence is found.",
+                    "Inspect repository files for runtime configuration; keep the claim unknown if no evidence is found."
+                  ]
+                },
+                {
+                  "name": "development commands",
+                  "state": "missing",
+                  "evidence": [
+                    "manifests",
+                    "test and build configuration"
+                  ],
+                  "evidence_paths": [],
+                  "facts": [],
+                  "missing_evidence": [
+                    "manifests",
+                    "test and build configuration"
+                  ],
+                  "discovery_suggestions": [
+                    "Inspect repository files for manifests; keep the claim unknown if no evidence is found.",
+                    "Inspect repository files for test and build configuration; keep the claim unknown if no evidence is found."
+                  ]
+                }
+              ],
+              "evidence_to_collect": [],
+              "evidence_complete": false,
+              "rules": [
+                "do not invent unsupported facts",
+                "cite repository paths for factual claims",
+                "mark uncertain claims as unknown"
+              ],
+              "missing_evidence": [
+                "manifests",
+                "root entrypoints",
+                "runtime configuration",
+                "module directories",
+                "module imports",
+                "entrypoints",
+                "test and build configuration"
+              ],
+              "bounds": {
+                "max_serialized_bytes": 12288,
+                "serialized_bytes": 3947,
+                "truncated": false,
+                "omitted_counts": {}
+              }
+            },
+            "after_file_change": {
+              "tool": "prepare_docs",
+              "arguments_patch": {
+                "action": "sync_project_docs",
+                "project_path": "/home/viadmin/StudioProjects/hermes/docmancer/v2plan/artifacts/next07/grounded-first/wiring-check-l99mJU/controls-N10/negative/corpus"
+              }
+            },
+            "after": [
+              {
+                "tool": "prepare_docs",
+                "requires_confirmation": false,
+                "arguments_patch": {
+                  "action": "sync_project_docs",
+                  "project_path": "/home/viadmin/StudioProjects/hermes/docmancer/v2plan/artifacts/next07/grounded-first/wiring-check-l99mJU/controls-N10/negative/corpus"
+                }
+              },
+              {
+                "tool": "get_docs_context",
+                "requires_confirmation": false,
+                "arguments_patch": {
+                  "project_path": "/home/viadmin/StudioProjects/hermes/docmancer/v2plan/artifacts/next07/grounded-first/wiring-check-l99mJU/controls-N10/negative/corpus"
+                }
+              }
+            ]
+          },
+          {
+            "tool": "code_search",
+            "reason": "No selected cited source contains high-signal query terms; search project docs/source before answering.",
+            "query_terms": [
+              "storage",
+              "retention",
+              "behavior",
+              "identify",
+              "private",
+              "production",
+              "deployment",
+              "configuration"
+            ]
+          },
+          {
+            "action": "search_project_sources",
+            "tool": "code_search",
+            "type": "search_local_source",
+            "handled_by": "coding_agent",
+            "requires_confirmation": false,
+            "repeat_docs_context": false,
+            "auto_execute": false,
+            "reason": "Selected docs are partial/navigational; exact story-specific terms are missing from source-backed snippets.",
+            "query_terms": [
+              "storage",
+              "retention",
+              "behavior",
+              "identify",
+              "private",
+              "production",
+              "deployment",
+              "configuration"
+            ],
+            "suggested_doc_paths": [],
+            "suggested_symbols": [],
+            "suggested_layers": []
+          }
+        ],
+        "arguments_patch": {
+          "project_path": "/home/viadmin/StudioProjects/hermes/docmancer/v2plan/artifacts/next07/grounded-first/wiring-check-l99mJU/controls-N10/negative/corpus"
+        },
+        "warnings": [],
+        "response_style": "evidence-first",
+        "primary_snippet": null,
+        "supporting_snippets": [],
+        "primary_snippets": [],
+        "primary_snippet_confidence": null,
+        "primary_snippet_selection_reason": null,
+        "primary_snippet_alternatives": [],
+        "snippet_metrics": {
+          "candidates_found": 0,
+          "usable_candidates": 0,
+          "primary_selected": false,
+          "supporting_selected": 0,
+          "duplicates_dropped": 0,
+          "noise_dropped": 0,
+          "truncations": 0,
+          "primary_language": null,
+          "primary_lane": null,
+          "primary_source_correct": null,
+          "primary_exact_version_match": null,
+          "primary_snippet_confidence": null,
+          "primary_snippet_alternatives": 0,
+          "snippet_first_applied": false,
+          "requested_response_style": "auto"
+        },
+        "presentation": {
+          "project_constraints_count": 0,
+          "primary_snippet_lane": null,
+          "project_evidence_primary": false
+        },
+        "metrics": {
+          "context_pack_items": 0,
+          "snippet_metrics": {
+            "candidates_found": 0,
+            "usable_candidates": 0,
+            "primary_selected": false,
+            "supporting_selected": 0,
+            "duplicates_dropped": 0,
+            "noise_dropped": 0,
+            "truncations": 0,
+            "primary_language": null,
+            "primary_lane": null,
+            "primary_source_correct": null,
+            "primary_exact_version_match": null,
+            "primary_snippet_confidence": null,
+            "primary_snippet_alternatives": 0,
+            "snippet_first_applied": false,
+            "requested_response_style": "auto"
+          }
+        },
+        "contamination": {
+          "detected": false,
+          "dropped_count": 0,
+          "reason_codes": []
+        },
+        "deduplication": {
+          "dropped_count": 0,
+          "reason_codes": []
+        },
+        "lane_details": {},
+        "ingestion_diagnostics": {
+          "project": {
+            "query_intent": "how_to",
+            "retrieval_routing": {
+              "schema_version": 2,
+              "intent": "docs",
+              "stages": {
+                "project_docs": {
+                  "status": "used",
+                  "reason": "selected project documentation mode",
+                  "item_count": 0,
+                  "budget_projection_bytes": 0,
+                  "estimated_tokens": 0,
+                  "observed_item_count": 0,
+                  "observed_budget_projection_bytes": 0,
+                  "budget_exceeded": false
+                },
+                "dependency_docs": {
+                  "status": "skipped",
+                  "reason": "dependency documentation not selected or not available",
+                  "item_count": 0,
+                  "budget_projection_bytes": 0,
+                  "estimated_tokens": 0,
+                  "observed_item_count": 0,
+                  "observed_budget_projection_bytes": 0,
+                  "budget_exceeded": false
+                },
+                "source_evidence": {
+                  "status": "skipped",
+                  "reason": "complete documentation/API intent does not require source evidence",
+                  "item_count": 0,
+                  "budget_projection_bytes": 0,
+                  "estimated_tokens": 0,
+                  "observed_item_count": 0,
+                  "observed_budget_projection_bytes": 0,
+                  "budget_exceeded": false
+                },
+                "repo_map": {
+                  "status": "insufficient",
+                  "reason": "missing project documentation requires bounded authoring evidence",
+                  "item_count": 0,
+                  "budget_projection_bytes": 0,
+                  "estimated_tokens": 0,
+                  "observed_item_count": 0,
+                  "observed_budget_projection_bytes": 0,
+                  "budget_exceeded": false
+                },
+                "code_graph": {
+                  "status": "insufficient",
+                  "reason": "missing project documentation requires bounded module evidence",
+                  "item_count": 0,
+                  "budget_projection_bytes": 0,
+                  "estimated_tokens": 0,
+                  "observed_item_count": 0,
+                  "observed_budget_projection_bytes": 0,
+                  "budget_exceeded": false
+                }
+              },
+              "budget_projection_bytes": 0,
+              "model_visible_bytes": 0
+            },
+            "same_call_pipeline": {
+              "planned_query_ids": [
+                "query-original"
+              ],
+              "retrieved_candidates": [
+                {
+                  "stable_chunk_id": "child-30cd0bd0bd67d1d59c0f487918dfdd1a01c9ed9e",
+                  "document_id": "/home/viadmin/StudioProjects/hermes/docmancer/v2plan/artifacts/next07/grounded-first/wiring-check-l99mJU/controls-N10/negative/corpus/docs/guide.md",
+                  "parent_logical_id": "parent-d5c7b5a4638c95f64228ed20029a0177"
+                },
+                {
+                  "stable_chunk_id": "child-30cd0bd0bd67d1d59c0f487918dfdd1a01c9ed9e",
+                  "document_id": "/home/viadmin/StudioProjects/hermes/docmancer/v2plan/artifacts/next07/grounded-first/wiring-check-l99mJU/controls-N10/negative/corpus/docs/guide.md",
+                  "parent_logical_id": "parent-d5c7b5a4638c95f64228ed20029a0177"
+                }
+              ],
+              "qualification_outcomes": [
+                {
+                  "stable_chunk_id": "child-30cd0bd0bd67d1d59c0f487918dfdd1a01c9ed9e",
+                  "document_id": "/home/viadmin/StudioProjects/hermes/docmancer/v2plan/artifacts/next07/grounded-first/wiring-check-l99mJU/controls-N10/negative/corpus/docs/guide.md",
+                  "parent_logical_id": "parent-d5c7b5a4638c95f64228ed20029a0177",
+                  "query_id": "query-original",
+                  "outcome": "rejected",
+                  "reason": "insufficient_visible_match"
+                },
+                {
+                  "stable_chunk_id": "child-30cd0bd0bd67d1d59c0f487918dfdd1a01c9ed9e",
+                  "document_id": "/home/viadmin/StudioProjects/hermes/docmancer/v2plan/artifacts/next07/grounded-first/wiring-check-l99mJU/controls-N10/negative/corpus/docs/guide.md",
+                  "parent_logical_id": "parent-d5c7b5a4638c95f64228ed20029a0177",
+                  "query_id": "query-original",
+                  "outcome": "rejected",
+                  "reason": "insufficient_visible_match"
+                }
+              ]
+            },
+            "active_index": {
+              "project_path": "/home/viadmin/StudioProjects/hermes/docmancer/v2plan/artifacts/next07/grounded-first/wiring-check-l99mJU/controls-N10/negative/corpus",
+              "db_path": "/home/viadmin/StudioProjects/hermes/docmancer/v2plan/artifacts/next07/grounded-first/wiring-check-l99mJU/controls-N10/negative/state/index.db",
+              "db_exists": true,
+              "index_state": "available",
+              "index_ownership": "project_owned",
+              "extracted_dir": "v2plan/artifacts/next07/grounded-first/wiring-check-l99mJU/controls-N10/negative/state/extracted",
+              "config_source": "explicit",
+              "config_path": null,
+              "retrieval_mode": "lexical",
+              "docatlas_home": "v2plan/artifacts/next07/grounded-first/wiring-check-l99mJU/controls-N10/negative/state/docatlas_home",
+              "index_counts": {
+                "sources": 1,
+                "sections": 2
+              },
+              "project_index_counts": {
+                "sources": 1,
+                "sections": 2
+              },
+              "shared_index_counts": {
+                "sources": 1,
+                "sections": 2
+              },
+              "warnings": [],
+              "vector_readiness": {
+                "status": "not_required",
+                "mode": "lexical"
+              },
+              "project_local_config": {
+                "present": false
+              }
+            },
+            "relevance_gate": {
+              "passed": false,
+              "reason": "insufficient_weighted_relevance",
+              "required_terms": [
+                "storage",
+                "retention",
+                "behavior",
+                "identify",
+                "private",
+                "production",
+                "deployment",
+                "configuration"
+              ],
+              "matched_terms": [],
+              "missing_terms": [
+                "storage",
+                "retention",
+                "behavior",
+                "identify",
+                "private",
+                "production",
+                "deployment",
+                "configuration"
+              ],
+              "matched_details": [],
+              "weighted_score": 0,
+              "matched_term_count": 0,
+              "required_term_count": 8
+            },
+            "trust_decision": {
+              "answer_available": false,
+              "reason": "no_reliable_context",
+              "confidence": "low",
+              "passed_relevance_gate": false,
+              "max_project_score": null,
+              "query_terms_matched": [],
+              "query_terms_missing": [
+                "storage",
+                "retention",
+                "behavior",
+                "identify",
+                "private",
+                "production",
+                "deployment",
+                "configuration"
+              ]
+            }
+          }
+        },
+        "retrieval_diagnostics": {},
+        "retrieval_routing": {
+          "schema_version": 2,
+          "intent": "docs",
+          "stages": {
+            "project_docs": {
+              "status": "used",
+              "reason": "selected project documentation mode",
+              "item_count": 0,
+              "budget_projection_bytes": 0,
+              "estimated_tokens": 0,
+              "observed_item_count": 0,
+              "observed_budget_projection_bytes": 0,
+              "budget_exceeded": false
+            },
+            "dependency_docs": {
+              "status": "skipped",
+              "reason": "dependency documentation not selected or not available",
+              "item_count": 0,
+              "budget_projection_bytes": 0,
+              "estimated_tokens": 0,
+              "observed_item_count": 0,
+              "observed_budget_projection_bytes": 0,
+              "budget_exceeded": false
+            },
+            "source_evidence": {
+              "status": "skipped",
+              "reason": "complete documentation/API intent does not require source evidence",
+              "item_count": 0,
+              "budget_projection_bytes": 0,
+              "estimated_tokens": 0,
+              "observed_item_count": 0,
+              "observed_budget_projection_bytes": 0,
+              "budget_exceeded": false
+            },
+            "repo_map": {
+              "status": "insufficient",
+              "reason": "missing project documentation requires bounded authoring evidence",
+              "item_count": 0,
+              "budget_projection_bytes": 0,
+              "estimated_tokens": 0,
+              "observed_item_count": 0,
+              "observed_budget_projection_bytes": 0,
+              "budget_exceeded": false
+            },
+            "code_graph": {
+              "status": "insufficient",
+              "reason": "missing project documentation requires bounded module evidence",
+              "item_count": 0,
+              "budget_projection_bytes": 0,
+              "estimated_tokens": 0,
+              "observed_item_count": 0,
+              "observed_budget_projection_bytes": 0,
+              "budget_exceeded": false
+            }
+          },
+          "budget_projection_bytes": 0,
+          "model_visible_bytes": 0
+        },
+        "requirements": {
+          "requirements": [],
+          "required_entities": [],
+          "required_facets": [],
+          "query_extraction_provenance": [],
+          "query_requirement_spans": [],
+          "retrieval_hints": [
+            "Also",
+            "storage",
+            "retention",
+            "behavior",
+            "identify",
+            "private",
+            "production",
+            "deployment",
+            "configuration",
+            "credentials",
+            "owner",
+            "selected",
+            "runtime",
+            "settings"
+          ],
+          "concept_queries": [],
+          "answer_contract_hash": "131395c05f6bf74505f4836962b7a8df09193f76be5f084a38e8799b5ebd10db",
+          "lifecycle_intent": "current",
+          "parse_trace": [
+            "fallback:generic_project_terms"
+          ],
+          "unresolved_parts": [
+            "unsupported_query:generic_free_form_relation"
+          ],
+          "component_scope_complete": false
+        },
+        "decision": "insufficient_evidence",
+        "evidence_coverage": 0.0,
+        "requirements_hash": "2a741d07657546a1b4275341875e1d02422222a8d7f2e04faa77196fd8a7e22b",
+        "selector_config_hash": "23cf8aa2f77c1b7e9b9d00819a1d05c14e198272ad91516b5a75c5f641963edd",
+        "eligibility_contract_hash": "eae274104ce4e7688863d3701d486160eb60a30f0cf5f1d8a2bef60f9815173f",
+        "candidate_trace_hash": "47333eea2b6f90f13c4cb48f5be94d66c1987429485b946aca6782d4de13f866",
+        "selection_hash": "24fc9b61faabfc91e006e1c7661c0b86752586c6ec9d2a9f2cbbedf45f3fb92a",
+        "document_content_policy": {
+          "role": "cited_untrusted_document_data",
+          "actionable": false,
+          "actions_source": "typed_top_level_fields_only"
+        },
+        "documentation_supported": false,
+        "investigation_allowed": true,
+        "hard_stop": false,
+        "recovery_origin": "operational",
+        "recovery_reason_code": "operational_recovery_precedence",
+        "recovery_disposition": "use_operational_recovery",
+        "_source_continuation_project_root": "/home/viadmin/StudioProjects/hermes/docmancer/v2plan/artifacts/next07/grounded-first/wiring-check-l99mJU/controls-N10/negative/corpus"
+      },
+      "after_projection": {
+        "tool": "get_docs_context",
+        "status": "confirmation_required",
+        "question": "storage retention behavior. Also identify private production deployment configuration credentials owner selected runtime settings.",
+        "mode_requested": "auto",
+        "mode_selected": "project",
+        "routing": {
+          "reason_code": "project_context_auto",
+          "project_path_used": true,
+          "libraries_requested": [],
+          "dependency_detected": false,
+          "delegated_mode": "auto",
+          "evidence_scopes": []
+        },
+        "answer_available": false,
+        "context_available": false,
+        "answer_supported": false,
+        "support_status": "insufficient_evidence",
+        "missing_requirement_ids": [
+          "project_answer_requirement",
+          "unsupported_answer_authorization:unresolved_query"
+        ],
+        "satisfied_requirement_ids": [],
+        "mandatory_requirement_ids": [],
+        "mandatory_coverage": 0.0,
+        "selected_evidence_ids": [],
+        "decision_hash": "2918b4dd29febe22cd79c4b9c322c55cbbe328a6cfa007159fafdca3720b69b3",
+        "assignment_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "selection_decision": {
+          "status": "insufficient_evidence",
+          "selected_candidates": [],
+          "omissions": [],
+          "missing_requirements": [
+            "project_answer_requirement",
+            "unsupported_answer_authorization:unresolved_query"
+          ],
+          "unresolved_conflicts": [],
+          "metrics": {
+            "candidate_count": 0,
+            "eligible_count": 0,
+            "selected_count": 0,
+            "selected_sources": 0,
+            "selected_documents": 0,
+            "max_documents": 3,
+            "max_spans": 6,
+            "selected_tokens": 0,
+            "wrapper_reserve_tokens": 120,
+            "projected_total_tokens": 120,
+            "serialized_projected_tokens": 350,
+            "hard_tokens": 800,
+            "mandatory_requirements": 0,
+            "mandatory_covered": 0,
+            "mandatory_coverage_millis": 0,
+            "requirements_hash": "2a741d07657546a1b4275341875e1d02422222a8d7f2e04faa77196fd8a7e22b",
+            "omission_counts": {},
+            "selected_parents": 0,
+            "selected_children": 0,
+            "required_facts_per_1000_tokens_millis": 0,
+            "redundant_visible_token_ratio_millis": 0,
+            "cache": "disabled",
+            "selected_feature_trace": [],
+            "candidate_to_selected_ratio_millis": 0,
+            "reported_token_mismatches": 0
+          },
+          "selector_config_hash": "23cf8aa2f77c1b7e9b9d00819a1d05c14e198272ad91516b5a75c5f641963edd",
+          "eligibility_contract_hash": "eae274104ce4e7688863d3701d486160eb60a30f0cf5f1d8a2bef60f9815173f",
+          "candidate_trace_hash": "47333eea2b6f90f13c4cb48f5be94d66c1987429485b946aca6782d4de13f866",
+          "selection_hash": "24fc9b61faabfc91e006e1c7661c0b86752586c6ec9d2a9f2cbbedf45f3fb92a",
+          "assignments": [],
+          "support_decision": {
+            "answer_supported": false,
+            "support_status": "insufficient_evidence",
+            "reason_code": "required_evidence_missing",
+            "missing_requirement_ids": [
+              "project_answer_requirement",
+              "unsupported_answer_authorization:unresolved_query"
+            ],
+            "satisfied_requirement_ids": [],
+            "mandatory_requirement_ids": [],
+            "mandatory_coverage": 0.0,
+            "selected_evidence_ids": [],
+            "requirements_hash": "2a741d07657546a1b4275341875e1d02422222a8d7f2e04faa77196fd8a7e22b",
+            "selector_config_hash": "23cf8aa2f77c1b7e9b9d00819a1d05c14e198272ad91516b5a75c5f641963edd",
+            "eligibility_contract_hash": "eae274104ce4e7688863d3701d486160eb60a30f0cf5f1d8a2bef60f9815173f",
+            "candidate_trace_hash": "47333eea2b6f90f13c4cb48f5be94d66c1987429485b946aca6782d4de13f866",
+            "selection_hash": "24fc9b61faabfc91e006e1c7661c0b86752586c6ec9d2a9f2cbbedf45f3fb92a",
+            "assignment_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "decision_hash": "2918b4dd29febe22cd79c4b9c322c55cbbe328a6cfa007159fafdca3720b69b3",
+            "requirements": {
+              "requirements": [],
+              "required_entities": [],
+              "required_facets": [],
+              "query_extraction_provenance": [],
+              "query_requirement_spans": [],
+              "retrieval_hints": [
+                "Also",
+                "storage",
+                "retention",
+                "behavior",
+                "identify",
+                "private",
+                "production",
+                "deployment",
+                "configuration",
+                "credentials",
+                "owner",
+                "selected",
+                "runtime",
+                "settings"
+              ],
+              "concept_queries": [],
+              "answer_contract_hash": "131395c05f6bf74505f4836962b7a8df09193f76be5f084a38e8799b5ebd10db",
+              "lifecycle_intent": "current",
+              "parse_trace": [
+                "fallback:generic_project_terms"
+              ],
+              "unresolved_parts": [
+                "unsupported_query:generic_free_form_relation"
+              ],
+              "component_scope_complete": false
+            }
+          },
+          "requirements": {
+            "requirements": [],
+            "required_entities": [],
+            "required_facets": [],
+            "query_extraction_provenance": [],
+            "query_requirement_spans": [],
+            "retrieval_hints": [
+              "Also",
+              "storage",
+              "retention",
+              "behavior",
+              "identify",
+              "private",
+              "production",
+              "deployment",
+              "configuration",
+              "credentials",
+              "owner",
+              "selected",
+              "runtime",
+              "settings"
+            ],
+            "concept_queries": [],
+            "answer_contract_hash": "131395c05f6bf74505f4836962b7a8df09193f76be5f084a38e8799b5ebd10db",
+            "lifecycle_intent": "current",
+            "parse_trace": [
+              "fallback:generic_project_terms"
+            ],
+            "unresolved_parts": [
+              "unsupported_query:generic_free_form_relation"
+            ],
+            "component_scope_complete": false
+          }
+        },
+        "support_decision": {
+          "answer_supported": false,
+          "support_status": "insufficient_evidence",
+          "reason_code": "required_evidence_missing",
+          "missing_requirement_ids": [
+            "project_answer_requirement",
+            "unsupported_answer_authorization:unresolved_query"
+          ],
+          "satisfied_requirement_ids": [],
+          "mandatory_requirement_ids": [],
+          "mandatory_coverage": 0.0,
+          "selected_evidence_ids": [],
+          "requirements_hash": "2a741d07657546a1b4275341875e1d02422222a8d7f2e04faa77196fd8a7e22b",
+          "selector_config_hash": "23cf8aa2f77c1b7e9b9d00819a1d05c14e198272ad91516b5a75c5f641963edd",
+          "eligibility_contract_hash": "eae274104ce4e7688863d3701d486160eb60a30f0cf5f1d8a2bef60f9815173f",
+          "candidate_trace_hash": "47333eea2b6f90f13c4cb48f5be94d66c1987429485b946aca6782d4de13f866",
+          "selection_hash": "24fc9b61faabfc91e006e1c7661c0b86752586c6ec9d2a9f2cbbedf45f3fb92a",
+          "assignment_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+          "decision_hash": "2918b4dd29febe22cd79c4b9c322c55cbbe328a6cfa007159fafdca3720b69b3",
+          "requirements": {
+            "requirements": [],
+            "required_entities": [],
+            "required_facets": [],
+            "query_extraction_provenance": [],
+            "query_requirement_spans": [],
+            "retrieval_hints": [
+              "Also",
+              "storage",
+              "retention",
+              "behavior",
+              "identify",
+              "private",
+              "production",
+              "deployment",
+              "configuration",
+              "credentials",
+              "owner",
+              "selected",
+              "runtime",
+              "settings"
+            ],
+            "concept_queries": [],
+            "answer_contract_hash": "131395c05f6bf74505f4836962b7a8df09193f76be5f084a38e8799b5ebd10db",
+            "lifecycle_intent": "current",
+            "parse_trace": [
+              "fallback:generic_project_terms"
+            ],
+            "unresolved_parts": [
+              "unsupported_query:generic_free_form_relation"
+            ],
+            "component_scope_complete": false
+          }
+        },
+        "delivery_decision": {
+          "deliverable": false,
+          "reason_code": "required_evidence_missing"
+        },
+        "answer_type": "unavailable",
+        "answer_completeness": {
+          "schema_version": "answer-completeness-1.0",
+          "status": "unavailable",
+          "answer_type": "unavailable",
+          "coverage_score": 0.0,
+          "matched_terms": [],
+          "missing_terms": [
+            "storage",
+            "retention",
+            "behavior",
+            "identify",
+            "private",
+            "production",
+            "deployment",
+            "configuration"
+          ],
+          "coverage_by_requirement": [
+            {
+              "term": "storage",
+              "matched": false,
+              "source_paths": []
+            },
+            {
+              "term": "retention",
+              "matched": false,
+              "source_paths": []
+            },
+            {
+              "term": "behavior",
+              "matched": false,
+              "source_paths": []
+            },
+            {
+              "term": "identify",
+              "matched": false,
+              "source_paths": []
+            },
+            {
+              "term": "private",
+              "matched": false,
+              "source_paths": []
+            },
+            {
+              "term": "production",
+              "matched": false,
+              "source_paths": []
+            },
+            {
+              "term": "deployment",
+              "matched": false,
+              "source_paths": []
+            },
+            {
+              "term": "configuration",
+              "matched": false,
+              "source_paths": []
+            }
+          ],
+          "source_search_required": true,
+          "source_search_status": "required",
+          "disposition": "search_local_source",
+          "edit_ready": true,
+          "reason_codes": [
+            "no_trusted_context",
+            "story_terms_missing_from_source_evidence",
+            "high_signal_query_terms_missing_from_context"
+          ],
+          "canonical_support": {
+            "answer_supported": false,
+            "mandatory_requirement_ids": [],
+            "assigned_requirement_ids": []
+          },
+          "legacy_diagnostics": {
+            "schema_version": "answer-completeness-1.0",
+            "status": "unavailable",
+            "answer_type": "unavailable",
+            "coverage_score": 0.0,
+            "matched_terms": [],
+            "missing_terms": [
+              "storage",
+              "retention",
+              "behavior",
+              "identify",
+              "private",
+              "production",
+              "deployment",
+              "configuration"
+            ],
+            "coverage_by_requirement": [
+              {
+                "term": "storage",
+                "matched": false,
+                "source_paths": []
+              },
+              {
+                "term": "retention",
+                "matched": false,
+                "source_paths": []
+              },
+              {
+                "term": "behavior",
+                "matched": false,
+                "source_paths": []
+              },
+              {
+                "term": "identify",
+                "matched": false,
+                "source_paths": []
+              },
+              {
+                "term": "private",
+                "matched": false,
+                "source_paths": []
+              },
+              {
+                "term": "production",
+                "matched": false,
+                "source_paths": []
+              },
+              {
+                "term": "deployment",
+                "matched": false,
+                "source_paths": []
+              },
+              {
+                "term": "configuration",
+                "matched": false,
+                "source_paths": []
+              }
+            ],
+            "source_search_required": true,
+            "source_search_status": "required",
+            "disposition": "search_local_source",
+            "edit_ready": true,
+            "reason_codes": [
+              "no_trusted_context",
+              "story_terms_missing_from_source_evidence",
+              "high_signal_query_terms_missing_from_context"
+            ]
+          }
+        },
+        "disposition": "search_local_source",
+        "edit_ready": true,
+        "source_search_status": "required",
+        "documentation_query_plan": {
+          "schema_version": "documentation-query-plan-v2",
+          "original_question": "storage retention behavior. Also identify private production deployment configuration credentials owner selected runtime settings.",
+          "query_ids": [
+            "query-original"
+          ],
+          "required_query_ids": [
+            "query-original"
+          ],
+          "public_query_ids": [
+            "query-original"
+          ],
+          "queries": [
+            {
+              "query_id": "query-original",
+              "text": "storage retention behavior. Also identify private production deployment configuration credentials owner selected runtime settings.",
+              "origin": "original",
+              "coverage_required": true,
+              "facet_id": null,
+              "requirement_id": null,
+              "relation": "direct",
+              "public_parent_query_id": null,
+              "preferred_catalog_roles": [],
+              "forbidden_catalog_roles": [],
+              "forbidden_evidence_terms": [],
+              "parent_exact_terms": [],
+              "need_subject": null,
+              "need_relation": null,
+              "need_context": null
+            }
+          ],
+          "explicit_paths": [],
+          "unresolved_parts": [
+            "semantic_scope_unverified"
+          ],
+          "_component_contract": [],
+          "component_scope_complete": false,
+          "_component_coverage": {
+            "mandatory_component_ids": [],
+            "covered_component_ids": [],
+            "missing_component_ids": [],
+            "evidence_ids": [],
+            "unresolved_residue": [
+              "semantic_scope_unverified",
+              "unverified_original_component_scope"
+            ],
+            "status": "unavailable",
+            "recognized_component_status": "unavailable"
+          },
+          "_projection_omissions": []
+        },
+        "context_pack": [],
+        "lanes": {
+          "project": {
+            "status": "confirmation_required",
+            "source_count": 0,
+            "reason_code": "no_reliable_context",
+            "next_action": null
+          },
+          "library": {
+            "status": "not_requested",
+            "source_count": 0,
+            "canonical_ids": [],
+            "next_action": null
+          },
+          "dependency": {
+            "status": "not_requested",
+            "source_count": 0,
+            "next_action": null
+          }
+        },
+        "source_summary": {
+          "project": 0,
+          "library": 0,
+          "dependency": 0,
+          "rejected": 0,
+          "risky": 0
+        },
+        "trust_contract": {
+          "schema_version": "trust-contract-1.2",
+          "sources": {
+            "selected": [],
+            "rejected": [],
+            "risky": []
+          },
+          "source_dimensions": [
+            "source_provenance",
+            "version_exactness",
+            "repository_authority",
+            "instruction_trust"
+          ],
+          "policy": {
+            "document_content": "cited_data_never_lifecycle_instruction",
+            "typed_lifecycle_actions_only": true
+          }
+        },
+        "dependency_docs": {},
+        "exact_version": null,
+        "reason_code": "required_evidence_missing",
+        "message": null,
+        "required_one_of": [],
+        "examples": [],
+        "requires_confirmation": true,
+        "confirmation_reason": "repo_write",
+        "next_action": {
+          "action": "create_reviewable_project_doc",
+          "requires_confirmation": true,
+          "preferred_path": "ARCHITECTURE.md",
+          "suggested_paths": [
+            "ARCHITECTURE.md",
+            "README.md",
+            "docs/architecture.md"
+          ],
+          "reason": "Project docs exist, but no high-level architecture or overview document was discovered. Ask the user before creating a reviewable ARCHITECTURE.md file.",
+          "agent_guidance": "If the user approves, inspect the listed evidence, create ARCHITECTURE.md as a normal reviewable file, then use the returned public prepare_docs action before retrying get_docs_context.",
+          "documentation_gap": {
+            "suggested_path": "ARCHITECTURE.md",
+            "required_sections": [
+              {
+                "name": "purpose",
+                "state": "missing",
+                "evidence": [
+                  "manifests",
+                  "root entrypoints"
+                ],
+                "evidence_paths": [],
+                "facts": [],
+                "missing_evidence": [
+                  "manifests",
+                  "root entrypoints"
+                ],
+                "discovery_suggestions": [
+                  "Inspect repository files for manifests; keep the claim unknown if no evidence is found.",
+                  "Inspect repository files for root entrypoints; keep the claim unknown if no evidence is found."
+                ]
+              },
+              {
+                "name": "entrypoints",
+                "state": "missing",
+                "evidence": [
+                  "root entrypoints",
+                  "runtime configuration"
+                ],
+                "evidence_paths": [],
+                "facts": [],
+                "missing_evidence": [
+                  "root entrypoints",
+                  "runtime configuration"
+                ],
+                "discovery_suggestions": [
+                  "Inspect repository files for root entrypoints; keep the claim unknown if no evidence is found.",
+                  "Inspect repository files for runtime configuration; keep the claim unknown if no evidence is found."
+                ]
+              },
+              {
+                "name": "modules",
+                "state": "missing",
+                "evidence": [
+                  "module directories",
+                  "module imports"
+                ],
+                "evidence_paths": [],
+                "facts": [],
+                "missing_evidence": [
+                  "module directories",
+                  "module imports"
+                ],
+                "discovery_suggestions": [
+                  "Inspect repository files for module directories; keep the claim unknown if no evidence is found.",
+                  "Inspect repository files for module imports; keep the claim unknown if no evidence is found."
+                ]
+              },
+              {
+                "name": "runtime flow",
+                "state": "missing",
+                "evidence": [
+                  "entrypoints",
+                  "module imports",
+                  "runtime configuration"
+                ],
+                "evidence_paths": [],
+                "facts": [],
+                "missing_evidence": [
+                  "entrypoints",
+                  "module imports",
+                  "runtime configuration"
+                ],
+                "discovery_suggestions": [
+                  "Inspect repository files for entrypoints; keep the claim unknown if no evidence is found.",
+                  "Inspect repository files for module imports; keep the claim unknown if no evidence is found.",
+                  "Inspect repository files for runtime configuration; keep the claim unknown if no evidence is found."
+                ]
+              },
+              {
+                "name": "development commands",
+                "state": "missing",
+                "evidence": [
+                  "manifests",
+                  "test and build configuration"
+                ],
+                "evidence_paths": [],
+                "facts": [],
+                "missing_evidence": [
+                  "manifests",
+                  "test and build configuration"
+                ],
+                "discovery_suggestions": [
+                  "Inspect repository files for manifests; keep the claim unknown if no evidence is found.",
+                  "Inspect repository files for test and build configuration; keep the claim unknown if no evidence is found."
+                ]
+              }
+            ],
+            "evidence_to_collect": [],
+            "evidence_complete": false,
+            "rules": [
+              "do not invent unsupported facts",
+              "cite repository paths for factual claims",
+              "mark uncertain claims as unknown"
+            ],
+            "missing_evidence": [
+              "manifests",
+              "root entrypoints",
+              "runtime configuration",
+              "module directories",
+              "module imports",
+              "entrypoints",
+              "test and build configuration"
+            ],
+            "bounds": {
+              "max_serialized_bytes": 12288,
+              "serialized_bytes": 3947,
+              "truncated": false,
+              "omitted_counts": {}
+            }
+          },
+          "after_file_change": {
+            "tool": "prepare_docs",
+            "arguments_patch": {
+              "action": "sync_project_docs",
+              "project_path": "/home/viadmin/StudioProjects/hermes/docmancer/v2plan/artifacts/next07/grounded-first/wiring-check-l99mJU/controls-N10/negative/corpus"
+            }
+          },
+          "after": [
+            {
+              "tool": "prepare_docs",
+              "requires_confirmation": false,
+              "arguments_patch": {
+                "action": "sync_project_docs",
+                "project_path": "/home/viadmin/StudioProjects/hermes/docmancer/v2plan/artifacts/next07/grounded-first/wiring-check-l99mJU/controls-N10/negative/corpus"
+              }
+            },
+            {
+              "tool": "get_docs_context",
+              "requires_confirmation": false,
+              "arguments_patch": {
+                "project_path": "/home/viadmin/StudioProjects/hermes/docmancer/v2plan/artifacts/next07/grounded-first/wiring-check-l99mJU/controls-N10/negative/corpus"
+              }
+            }
+          ]
+        },
+        "next_actions": [
+          {
+            "action": "create_reviewable_project_doc",
+            "requires_confirmation": true,
+            "preferred_path": "ARCHITECTURE.md",
+            "suggested_paths": [
+              "ARCHITECTURE.md",
+              "README.md",
+              "docs/architecture.md"
+            ],
+            "reason": "Project docs exist, but no high-level architecture or overview document was discovered. Ask the user before creating a reviewable ARCHITECTURE.md file.",
+            "agent_guidance": "If the user approves, inspect the listed evidence, create ARCHITECTURE.md as a normal reviewable file, then use the returned public prepare_docs action before retrying get_docs_context.",
+            "documentation_gap": {
+              "suggested_path": "ARCHITECTURE.md",
+              "required_sections": [
+                {
+                  "name": "purpose",
+                  "state": "missing",
+                  "evidence": [
+                    "manifests",
+                    "root entrypoints"
+                  ],
+                  "evidence_paths": [],
+                  "facts": [],
+                  "missing_evidence": [
+                    "manifests",
+                    "root entrypoints"
+                  ],
+                  "discovery_suggestions": [
+                    "Inspect repository files for manifests; keep the claim unknown if no evidence is found.",
+                    "Inspect repository files for root entrypoints; keep the claim unknown if no evidence is found."
+                  ]
+                },
+                {
+                  "name": "entrypoints",
+                  "state": "missing",
+                  "evidence": [
+                    "root entrypoints",
+                    "runtime configuration"
+                  ],
+                  "evidence_paths": [],
+                  "facts": [],
+                  "missing_evidence": [
+                    "root entrypoints",
+                    "runtime configuration"
+                  ],
+                  "discovery_suggestions": [
+                    "Inspect repository files for root entrypoints; keep the claim unknown if no evidence is found.",
+                    "Inspect repository files for runtime configuration; keep the claim unknown if no evidence is found."
+                  ]
+                },
+                {
+                  "name": "modules",
+                  "state": "missing",
+                  "evidence": [
+                    "module directories",
+                    "module imports"
+                  ],
+                  "evidence_paths": [],
+                  "facts": [],
+                  "missing_evidence": [
+                    "module directories",
+                    "module imports"
+                  ],
+                  "discovery_suggestions": [
+                    "Inspect repository files for module directories; keep the claim unknown if no evidence is found.",
+                    "Inspect repository files for module imports; keep the claim unknown if no evidence is found."
+                  ]
+                },
+                {
+                  "name": "runtime flow",
+                  "state": "missing",
+                  "evidence": [
+                    "entrypoints",
+                    "module imports",
+                    "runtime configuration"
+                  ],
+                  "evidence_paths": [],
+                  "facts": [],
+                  "missing_evidence": [
+                    "entrypoints",
+                    "module imports",
+                    "runtime configuration"
+                  ],
+                  "discovery_suggestions": [
+                    "Inspect repository files for entrypoints; keep the claim unknown if no evidence is found.",
+                    "Inspect repository files for module imports; keep the claim unknown if no evidence is found.",
+                    "Inspect repository files for runtime configuration; keep the claim unknown if no evidence is found."
+                  ]
+                },
+                {
+                  "name": "development commands",
+                  "state": "missing",
+                  "evidence": [
+                    "manifests",
+                    "test and build configuration"
+                  ],
+                  "evidence_paths": [],
+                  "facts": [],
+                  "missing_evidence": [
+                    "manifests",
+                    "test and build configuration"
+                  ],
+                  "discovery_suggestions": [
+                    "Inspect repository files for manifests; keep the claim unknown if no evidence is found.",
+                    "Inspect repository files for test and build configuration; keep the claim unknown if no evidence is found."
+                  ]
+                }
+              ],
+              "evidence_to_collect": [],
+              "evidence_complete": false,
+              "rules": [
+                "do not invent unsupported facts",
+                "cite repository paths for factual claims",
+                "mark uncertain claims as unknown"
+              ],
+              "missing_evidence": [
+                "manifests",
+                "root entrypoints",
+                "runtime configuration",
+                "module directories",
+                "module imports",
+                "entrypoints",
+                "test and build configuration"
+              ],
+              "bounds": {
+                "max_serialized_bytes": 12288,
+                "serialized_bytes": 3947,
+                "truncated": false,
+                "omitted_counts": {}
+              }
+            },
+            "after_file_change": {
+              "tool": "prepare_docs",
+              "arguments_patch": {
+                "action": "sync_project_docs",
+                "project_path": "/home/viadmin/StudioProjects/hermes/docmancer/v2plan/artifacts/next07/grounded-first/wiring-check-l99mJU/controls-N10/negative/corpus"
+              }
+            },
+            "after": [
+              {
+                "tool": "prepare_docs",
+                "requires_confirmation": false,
+                "arguments_patch": {
+                  "action": "sync_project_docs",
+                  "project_path": "/home/viadmin/StudioProjects/hermes/docmancer/v2plan/artifacts/next07/grounded-first/wiring-check-l99mJU/controls-N10/negative/corpus"
+                }
+              },
+              {
+                "tool": "get_docs_context",
+                "requires_confirmation": false,
+                "arguments_patch": {
+                  "project_path": "/home/viadmin/StudioProjects/hermes/docmancer/v2plan/artifacts/next07/grounded-first/wiring-check-l99mJU/controls-N10/negative/corpus"
+                }
+              }
+            ]
+          },
+          {
+            "tool": "code_search",
+            "reason": "No selected cited source contains high-signal query terms; search project docs/source before answering.",
+            "query_terms": [
+              "storage",
+              "retention",
+              "behavior",
+              "identify",
+              "private",
+              "production",
+              "deployment",
+              "configuration"
+            ]
+          },
+          {
+            "action": "search_project_sources",
+            "tool": "code_search",
+            "type": "search_local_source",
+            "handled_by": "coding_agent",
+            "requires_confirmation": false,
+            "repeat_docs_context": false,
+            "auto_execute": false,
+            "reason": "Selected docs are partial/navigational; exact story-specific terms are missing from source-backed snippets.",
+            "query_terms": [
+              "storage",
+              "retention",
+              "behavior",
+              "identify",
+              "private",
+              "production",
+              "deployment",
+              "configuration"
+            ],
+            "suggested_doc_paths": [],
+            "suggested_symbols": [],
+            "suggested_layers": []
+          }
+        ],
+        "arguments_patch": {
+          "project_path": "/home/viadmin/StudioProjects/hermes/docmancer/v2plan/artifacts/next07/grounded-first/wiring-check-l99mJU/controls-N10/negative/corpus"
+        },
+        "warnings": [],
+        "response_style": "evidence-first",
+        "primary_snippet": null,
+        "supporting_snippets": [],
+        "primary_snippets": [],
+        "primary_snippet_confidence": null,
+        "primary_snippet_selection_reason": null,
+        "primary_snippet_alternatives": [],
+        "snippet_metrics": {
+          "candidates_found": 0,
+          "usable_candidates": 0,
+          "primary_selected": false,
+          "supporting_selected": 0,
+          "duplicates_dropped": 0,
+          "noise_dropped": 0,
+          "truncations": 0,
+          "primary_language": null,
+          "primary_lane": null,
+          "primary_source_correct": null,
+          "primary_exact_version_match": null,
+          "primary_snippet_confidence": null,
+          "primary_snippet_alternatives": 0,
+          "snippet_first_applied": false,
+          "requested_response_style": "auto"
+        },
+        "presentation": {
+          "project_constraints_count": 0,
+          "primary_snippet_lane": null,
+          "project_evidence_primary": false
+        },
+        "metrics": {
+          "context_pack_items": 0,
+          "snippet_metrics": {
+            "candidates_found": 0,
+            "usable_candidates": 0,
+            "primary_selected": false,
+            "supporting_selected": 0,
+            "duplicates_dropped": 0,
+            "noise_dropped": 0,
+            "truncations": 0,
+            "primary_language": null,
+            "primary_lane": null,
+            "primary_source_correct": null,
+            "primary_exact_version_match": null,
+            "primary_snippet_confidence": null,
+            "primary_snippet_alternatives": 0,
+            "snippet_first_applied": false,
+            "requested_response_style": "auto"
+          }
+        },
+        "contamination": {
+          "detected": false,
+          "dropped_count": 0,
+          "reason_codes": []
+        },
+        "deduplication": {
+          "dropped_count": 0,
+          "reason_codes": []
+        },
+        "lane_details": {},
+        "ingestion_diagnostics": {
+          "project": {
+            "query_intent": "how_to",
+            "retrieval_routing": {
+              "schema_version": 2,
+              "intent": "docs",
+              "stages": {
+                "project_docs": {
+                  "status": "used",
+                  "reason": "selected project documentation mode",
+                  "item_count": 0,
+                  "budget_projection_bytes": 0,
+                  "estimated_tokens": 0,
+                  "observed_item_count": 0,
+                  "observed_budget_projection_bytes": 0,
+                  "budget_exceeded": false
+                },
+                "dependency_docs": {
+                  "status": "skipped",
+                  "reason": "dependency documentation not selected or not available",
+                  "item_count": 0,
+                  "budget_projection_bytes": 0,
+                  "estimated_tokens": 0,
+                  "observed_item_count": 0,
+                  "observed_budget_projection_bytes": 0,
+                  "budget_exceeded": false
+                },
+                "source_evidence": {
+                  "status": "skipped",
+                  "reason": "complete documentation/API intent does not require source evidence",
+                  "item_count": 0,
+                  "budget_projection_bytes": 0,
+                  "estimated_tokens": 0,
+                  "observed_item_count": 0,
+                  "observed_budget_projection_bytes": 0,
+                  "budget_exceeded": false
+                },
+                "repo_map": {
+                  "status": "insufficient",
+                  "reason": "missing project documentation requires bounded authoring evidence",
+                  "item_count": 0,
+                  "budget_projection_bytes": 0,
+                  "estimated_tokens": 0,
+                  "observed_item_count": 0,
+                  "observed_budget_projection_bytes": 0,
+                  "budget_exceeded": false
+                },
+                "code_graph": {
+                  "status": "insufficient",
+                  "reason": "missing project documentation requires bounded module evidence",
+                  "item_count": 0,
+                  "budget_projection_bytes": 0,
+                  "estimated_tokens": 0,
+                  "observed_item_count": 0,
+                  "observed_budget_projection_bytes": 0,
+                  "budget_exceeded": false
+                }
+              },
+              "budget_projection_bytes": 0,
+              "model_visible_bytes": 0
+            },
+            "same_call_pipeline": {
+              "planned_query_ids": [
+                "query-original"
+              ],
+              "retrieved_candidates": [
+                {
+                  "stable_chunk_id": "child-30cd0bd0bd67d1d59c0f487918dfdd1a01c9ed9e",
+                  "document_id": "/home/viadmin/StudioProjects/hermes/docmancer/v2plan/artifacts/next07/grounded-first/wiring-check-l99mJU/controls-N10/negative/corpus/docs/guide.md",
+                  "parent_logical_id": "parent-d5c7b5a4638c95f64228ed20029a0177"
+                },
+                {
+                  "stable_chunk_id": "child-30cd0bd0bd67d1d59c0f487918dfdd1a01c9ed9e",
+                  "document_id": "/home/viadmin/StudioProjects/hermes/docmancer/v2plan/artifacts/next07/grounded-first/wiring-check-l99mJU/controls-N10/negative/corpus/docs/guide.md",
+                  "parent_logical_id": "parent-d5c7b5a4638c95f64228ed20029a0177"
+                }
+              ],
+              "qualification_outcomes": [
+                {
+                  "stable_chunk_id": "child-30cd0bd0bd67d1d59c0f487918dfdd1a01c9ed9e",
+                  "document_id": "/home/viadmin/StudioProjects/hermes/docmancer/v2plan/artifacts/next07/grounded-first/wiring-check-l99mJU/controls-N10/negative/corpus/docs/guide.md",
+                  "parent_logical_id": "parent-d5c7b5a4638c95f64228ed20029a0177",
+                  "query_id": "query-original",
+                  "outcome": "rejected",
+                  "reason": "insufficient_visible_match"
+                },
+                {
+                  "stable_chunk_id": "child-30cd0bd0bd67d1d59c0f487918dfdd1a01c9ed9e",
+                  "document_id": "/home/viadmin/StudioProjects/hermes/docmancer/v2plan/artifacts/next07/grounded-first/wiring-check-l99mJU/controls-N10/negative/corpus/docs/guide.md",
+                  "parent_logical_id": "parent-d5c7b5a4638c95f64228ed20029a0177",
+                  "query_id": "query-original",
+                  "outcome": "rejected",
+                  "reason": "insufficient_visible_match"
+                }
+              ]
+            },
+            "active_index": {
+              "project_path": "/home/viadmin/StudioProjects/hermes/docmancer/v2plan/artifacts/next07/grounded-first/wiring-check-l99mJU/controls-N10/negative/corpus",
+              "db_path": "/home/viadmin/StudioProjects/hermes/docmancer/v2plan/artifacts/next07/grounded-first/wiring-check-l99mJU/controls-N10/negative/state/index.db",
+              "db_exists": true,
+              "index_state": "available",
+              "index_ownership": "project_owned",
+              "extracted_dir": "v2plan/artifacts/next07/grounded-first/wiring-check-l99mJU/controls-N10/negative/state/extracted",
+              "config_source": "explicit",
+              "config_path": null,
+              "retrieval_mode": "lexical",
+              "docatlas_home": "v2plan/artifacts/next07/grounded-first/wiring-check-l99mJU/controls-N10/negative/state/docatlas_home",
+              "index_counts": {
+                "sources": 1,
+                "sections": 2
+              },
+              "project_index_counts": {
+                "sources": 1,
+                "sections": 2
+              },
+              "shared_index_counts": {
+                "sources": 1,
+                "sections": 2
+              },
+              "warnings": [],
+              "vector_readiness": {
+                "status": "not_required",
+                "mode": "lexical"
+              },
+              "project_local_config": {
+                "present": false
+              }
+            },
+            "relevance_gate": {
+              "passed": false,
+              "reason": "insufficient_weighted_relevance",
+              "required_terms": [
+                "storage",
+                "retention",
+                "behavior",
+                "identify",
+                "private",
+                "production",
+                "deployment",
+                "configuration"
+              ],
+              "matched_terms": [],
+              "missing_terms": [
+                "storage",
+                "retention",
+                "behavior",
+                "identify",
+                "private",
+                "production",
+                "deployment",
+                "configuration"
+              ],
+              "matched_details": [],
+              "weighted_score": 0,
+              "matched_term_count": 0,
+              "required_term_count": 8
+            },
+            "trust_decision": {
+              "answer_available": false,
+              "reason": "no_reliable_context",
+              "confidence": "low",
+              "passed_relevance_gate": false,
+              "max_project_score": null,
+              "query_terms_matched": [],
+              "query_terms_missing": [
+                "storage",
+                "retention",
+                "behavior",
+                "identify",
+                "private",
+                "production",
+                "deployment",
+                "configuration"
+              ]
+            }
+          }
+        },
+        "retrieval_diagnostics": {
+          "docs_context_projection": {
+            "qualified_variants": 0,
+            "budget_rejections": 0,
+            "ranked_candidate_ids": [],
+            "considered_variants": [],
+            "projection_rejections": [],
+            "final_visible_evidence_ids": [],
+            "decision_trace": {
+              "schema_version": 1,
+              "events": [],
+              "counts": {},
+              "variant_attempts": 0,
+              "omitted_events": 0,
+              "selection_events_omitted": 0
+            }
+          }
+        },
+        "retrieval_routing": {
+          "schema_version": 2,
+          "intent": "docs",
+          "stages": {
+            "project_docs": {
+              "status": "used",
+              "reason": "selected project documentation mode",
+              "item_count": 0,
+              "budget_projection_bytes": 0,
+              "estimated_tokens": 0,
+              "observed_item_count": 0,
+              "observed_budget_projection_bytes": 0,
+              "budget_exceeded": false
+            },
+            "dependency_docs": {
+              "status": "skipped",
+              "reason": "dependency documentation not selected or not available",
+              "item_count": 0,
+              "budget_projection_bytes": 0,
+              "estimated_tokens": 0,
+              "observed_item_count": 0,
+              "observed_budget_projection_bytes": 0,
+              "budget_exceeded": false
+            },
+            "source_evidence": {
+              "status": "skipped",
+              "reason": "complete documentation/API intent does not require source evidence",
+              "item_count": 0,
+              "budget_projection_bytes": 0,
+              "estimated_tokens": 0,
+              "observed_item_count": 0,
+              "observed_budget_projection_bytes": 0,
+              "budget_exceeded": false
+            },
+            "repo_map": {
+              "status": "insufficient",
+              "reason": "missing project documentation requires bounded authoring evidence",
+              "item_count": 0,
+              "budget_projection_bytes": 0,
+              "estimated_tokens": 0,
+              "observed_item_count": 0,
+              "observed_budget_projection_bytes": 0,
+              "budget_exceeded": false
+            },
+            "code_graph": {
+              "status": "insufficient",
+              "reason": "missing project documentation requires bounded module evidence",
+              "item_count": 0,
+              "budget_projection_bytes": 0,
+              "estimated_tokens": 0,
+              "observed_item_count": 0,
+              "observed_budget_projection_bytes": 0,
+              "budget_exceeded": false
+            }
+          },
+          "budget_projection_bytes": 0,
+          "model_visible_bytes": 0
+        },
+        "requirements": {
+          "requirements": [],
+          "required_entities": [],
+          "required_facets": [],
+          "query_extraction_provenance": [],
+          "query_requirement_spans": [],
+          "retrieval_hints": [
+            "Also",
+            "storage",
+            "retention",
+            "behavior",
+            "identify",
+            "private",
+            "production",
+            "deployment",
+            "configuration",
+            "credentials",
+            "owner",
+            "selected",
+            "runtime",
+            "settings"
+          ],
+          "concept_queries": [],
+          "answer_contract_hash": "131395c05f6bf74505f4836962b7a8df09193f76be5f084a38e8799b5ebd10db",
+          "lifecycle_intent": "current",
+          "parse_trace": [
+            "fallback:generic_project_terms"
+          ],
+          "unresolved_parts": [
+            "unsupported_query:generic_free_form_relation"
+          ],
+          "component_scope_complete": false
+        },
+        "decision": "insufficient_evidence",
+        "evidence_coverage": 0.0,
+        "requirements_hash": "2a741d07657546a1b4275341875e1d02422222a8d7f2e04faa77196fd8a7e22b",
+        "selector_config_hash": "23cf8aa2f77c1b7e9b9d00819a1d05c14e198272ad91516b5a75c5f641963edd",
+        "eligibility_contract_hash": "eae274104ce4e7688863d3701d486160eb60a30f0cf5f1d8a2bef60f9815173f",
+        "candidate_trace_hash": "47333eea2b6f90f13c4cb48f5be94d66c1987429485b946aca6782d4de13f866",
+        "selection_hash": "24fc9b61faabfc91e006e1c7661c0b86752586c6ec9d2a9f2cbbedf45f3fb92a",
+        "document_content_policy": {
+          "role": "cited_untrusted_document_data",
+          "actionable": false,
+          "actions_source": "typed_top_level_fields_only"
+        },
+        "documentation_supported": false,
+        "investigation_allowed": true,
+        "hard_stop": false,
+        "recovery_origin": "operational",
+        "recovery_reason_code": "operational_recovery_precedence",
+        "recovery_disposition": "use_operational_recovery",
+        "_source_continuation_project_root": "/home/viadmin/StudioProjects/hermes/docmancer/v2plan/artifacts/next07/grounded-first/wiring-check-l99mJU/controls-N10/negative/corpus"
+      },
+      "projected_payload": {
+        "status": "insufficient_evidence",
+        "kind": "docs_context",
+        "missing": [
+          "No safe, current, project-scoped documentation context was retrieved."
+        ],
+        "estimated_tokens": 98,
+        "context_quality": {
+          "status": "unavailable",
+          "reasons": [
+            "source_unavailable"
+          ]
+        },
+        "read_next": [],
+        "answer_supported": false,
+        "answer_available": false,
+        "support_status": "insufficient_evidence",
+        "context_available": false,
+        "edit_ready": false
+      },
+      "snapshot": {}
+    }
+  ]
+}

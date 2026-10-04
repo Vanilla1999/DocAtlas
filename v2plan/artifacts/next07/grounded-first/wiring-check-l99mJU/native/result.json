@@ -1,0 +1,107 @@
+{
+  "verdict": "VALIDATED_LOCAL_I4",
+  "cases": [
+    {
+      "case": "0",
+      "valid": true,
+      "passed": true,
+      "checks": {
+        "returned_context": true,
+        "real_projection_called": true,
+        "handler_validator_reached": true,
+        "handler_validator_clean": true,
+        "packer_validator_clean": true,
+        "restored": true,
+        "no_handler_exception": true,
+        "whole_dto_800": true,
+        "source_cap_3": true,
+        "no_answer_or_edit_credit": true,
+        "retrieval_only": true,
+        "source_bytes": true,
+        "default_with_owner": true,
+        "exception_with_owner_and_condition": true
+      },
+      "snippets": "# LeaseClient\n\nAn expired operation raises `LeaseExpired`.\n\n# Overview\n\nLeaseClient default timeout duration requests exception operation behavior documentation.\n\n# LeaseClient\n\nThe default timeout is 17 seconds.\n",
+      "cost": 589,
+      "pre_handler_cost": 589,
+      "source_count": 3,
+      "validator": [
+        {
+          "errors": [],
+          "max_tokens": 800
+        }
+      ],
+      "restored": true,
+      "public_error": null
+    },
+    {
+      "case": "1",
+      "valid": true,
+      "passed": true,
+      "checks": {
+        "returned_context": true,
+        "real_projection_called": true,
+        "handler_validator_reached": true,
+        "handler_validator_clean": true,
+        "packer_validator_clean": true,
+        "restored": true,
+        "no_handler_exception": true,
+        "whole_dto_800": true,
+        "source_cap_3": true,
+        "no_answer_or_edit_credit": true,
+        "retrieval_only": true,
+        "source_bytes": true,
+        "default_with_owner": true,
+        "exception_with_owner_and_condition": true
+      },
+      "snippets": "# LeaseClient\n\nAn expired operation raises `WaitExpired`.\n\n# Overview\n\nLeaseClient default timeout duration requests exception operation behavior documentation.\n\n# LeaseClient\n\nThe default timeout is 29 seconds.\n",
+      "cost": 613,
+      "pre_handler_cost": 613,
+      "source_count": 3,
+      "validator": [
+        {
+          "errors": [],
+          "max_tokens": 800
+        }
+      ],
+      "restored": true,
+      "public_error": null
+    },
+    {
+      "case": "partial",
+      "valid": true,
+      "passed": true,
+      "checks": {
+        "returned_context": true,
+        "real_projection_called": true,
+        "handler_validator_reached": true,
+        "handler_validator_clean": true,
+        "packer_validator_clean": true,
+        "restored": true,
+        "no_handler_exception": true,
+        "whole_dto_800": true,
+        "source_cap_3": true,
+        "no_answer_or_edit_credit": true,
+        "retrieval_only": true,
+        "source_bytes": true,
+        "default_with_owner": true,
+        "missing_exception_not_fabricated": true
+      },
+      "snippets": "# Overview\n\nLeaseClient default timeout duration requests exception operation behavior documentation.\n\n# LeaseClient\n\nThe default timeout is 17 seconds.\n",
+      "cost": 443,
+      "pre_handler_cost": 443,
+      "source_count": 2,
+      "validator": [
+        {
+          "errors": [],
+          "max_tokens": 800
+        }
+      ],
+      "restored": true,
+      "public_error": null
+    }
+  ],
+  "I5": "NOT_RUN",
+  "I6": "NOT_RUN",
+  "rollout": "NOT_AUTHORIZED"
+}

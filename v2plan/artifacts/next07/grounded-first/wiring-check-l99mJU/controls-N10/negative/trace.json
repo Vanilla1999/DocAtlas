@@ -1,0 +1,2237 @@
+{
+  "origins": {
+    "context": "<bound method LibraryDocsService.get_project_context of <docmancer.docs.service.LibraryDocsService object at 0x7dfebccbbb10>>",
+    "projection": "<function project_docs_context at 0x7dfebf183c40>",
+    "unified": "<bound method _UnifiedDocsContextServicePart01.get_docs_context of <docmancer.docs.application.unified_context_service.UnifiedDocsContextService object at 0x7dfebbd1c910>>",
+    "validator": "<function validate_model_visible_projection at 0x7dfebf3e04a0>",
+    "candidate_sha256": "5ac8e2600a12d216070087a50c9ddc64c8efaaff2f399d70e2b345db0bf71ff7"
+  },
+  "restored": true,
+  "input": [
+    {
+      "raw": "# Guide\n\n# storage retention behavior\n\nUnrelated network details.\n",
+      "identity": "project_file:local:be30dc4f5f34ba7d90e9a616d0e362b0c77b3cd701d142de7f019e74bee7d883:docs/guide.md",
+      "canonical_path": "docs/guide.md",
+      "snapshot_id": "gen-a7c08180af014a4c94663011a1bbb0e9",
+      "url": "",
+      "title": "guide"
+    }
+  ],
+  "proposed": [
+    {
+      "raw": "# Guide\n\n# storage retention behavior\n\nUnrelated network details.\n",
+      "identity": "project_file:local:be30dc4f5f34ba7d90e9a616d0e362b0c77b3cd701d142de7f019e74bee7d883:docs/guide.md",
+      "canonical_path": "docs/guide.md",
+      "snapshot_id": "gen-a7c08180af014a4c94663011a1bbb0e9",
+      "url": "",
+      "title": "guide",
+      "start": 0,
+      "end": 66,
+      "content": "# Guide\n\n# storage retention behavior\n\nUnrelated network details.\n",
+      "path": "[\"storage retention behavior\"]",
+      "source_sha256": "94e31f509b11987fc2c466e5c490d9dc8b49308c738be866c23a312e5f7e2027",
+      "owner_spans": [
+        [
+          0,
+          9
+        ],
+        [
+          9,
+          66
+        ]
+      ],
+      "dependency_spans": "NOT_PREPARED until scoped source preparation in I.3; not approval",
+      "byte_start": 0,
+      "byte_end": 66,
+      "bm25_order_score": -5.950819672131148e-06,
+      "retrieval_order": 0
+    }
+  ],
+  "omissions": [],
+  "current_catalog_result": {
+    "project_path": "/home/viadmin/StudioProjects/hermes/docmancer/v2plan/artifacts/next07/grounded-first/wiring-check-l99mJU/controls-N10/negative/corpus",
+    "query": "storage retention behavior. Also identify private production deployment configuration credentials owner selected runtime settings.",
+    "status": "success",
+    "tool": "get_project_docs",
+    "reason_code": "project_docs_ready",
+    "resolved_evidence_path": null,
+    "next_action": {},
+    "requires_confirmation": false,
+    "confirmation_reason": null,
+    "arguments_patch": {},
+    "results": [
+      {
+        "title": "storage retention behavior",
+        "content": "# Guide\n\n# storage retention behavior\n\nUnrelated network details.\n",
+        "source": "/home/viadmin/StudioProjects/hermes/docmancer/v2plan/artifacts/next07/grounded-first/wiring-check-l99mJU/controls-N10/negative/corpus/docs/guide.md",
+        "url": null,
+        "metadata": {
+          "format": "markdown",
+          "title": "storage retention behavior",
+          "chunking_strategy": "heading",
+          "chunking_schema": "parent-child-v1",
+          "child_target_tokens": 160,
+          "child_hard_max_tokens": 512,
+          "chunk_size": 800,
+          "chunk_overlap": 100,
+          "docset_root": "/home/viadmin/StudioProjects/hermes/docmancer/v2plan/artifacts/next07/grounded-first/wiring-check-l99mJU/controls-N10/negative/corpus",
+          "source_path": "docs/guide.md",
+          "content_hash": "f293efba776eab908b0c7361b7e89d41c0cdee9e886cb2e3cc139ea24f5dddc4",
+          "project_path": "/home/viadmin/StudioProjects/hermes/docmancer/v2plan/artifacts/next07/grounded-first/wiring-check-l99mJU/controls-N10/negative/corpus",
+          "repository_identity": "local:be30dc4f5f34ba7d90e9a616d0e362b0c77b3cd701d142de7f019e74bee7d883",
+          "source_class": "project_file",
+          "project_docs": true,
+          "project_doc_path": "docs/guide.md",
+          "project_doc_reason": "other",
+          "project_doc_content_hash": "sha256:94e31f509b11987fc2c466e5c490d9dc8b49308c738be866c23a312e5f7e2027",
+          "project_doc_mtime_ns": 1791114587365840070,
+          "doc_scope": "project",
+          "module_id": "",
+          "module_name": null,
+          "module_path": null,
+          "module_type": null,
+          "project_doc_description": "Pinned documentation source",
+          "project_doc_authority": "source_of_truth",
+          "project_doc_lifecycle_status": "active",
+          "lifecycle_status": "active",
+          "temporal_relevance": "current",
+          "index_freshness": "synchronized",
+          "project_doc_impact_policy": "track",
+          "project_doc_catalog_entry_hash": "sha256:b9366e1658387043c943be7f03f91f44a6af9d611c90bb6ad473aa65b6e9b96f",
+          "project_doc_sections": [
+            {
+              "source_document_path": "docs/guide.md",
+              "heading_path": [
+                "Guide"
+              ],
+              "mentioned_paths": [],
+              "mentioned_symbols": [],
+              "paths_truncated": false,
+              "symbols_truncated": false,
+              "fields_truncated": false,
+              "document_sections_truncated": false,
+              "content_hash": "sha256:bc553ffe57e544498b12a9865dbf3abc2004c474e349c52c378eaa402287424b"
+            },
+            {
+              "source_document_path": "docs/guide.md",
+              "heading_path": [
+                "storage retention behavior"
+              ],
+              "mentioned_paths": [],
+              "mentioned_symbols": [],
+              "paths_truncated": false,
+              "symbols_truncated": false,
+              "fields_truncated": false,
+              "document_sections_truncated": false,
+              "content_hash": "sha256:62ea407f87363fd9549086ca5e64f14e28664dc2ae36ec6f2cf1b9a66b190113"
+            }
+          ],
+          "project_doc_sections_status": "parsed",
+          "project_doc_sections_reason": "section_metadata_parsed",
+          "project_doc_sections_schema": "project-sections-3",
+          "library_id": "",
+          "resolved_version": "",
+          "version_family": "",
+          "project_identity": "local:be30dc4f5f34ba7d90e9a616d0e362b0c77b3cd701d142de7f019e74bee7d883",
+          "authority": "source_of_truth",
+          "docs_snapshot_exact": null,
+          "section_title": "storage retention behavior",
+          "section_level": 1,
+          "document_title": "guide",
+          "document_title_hash": "4956faddb70fe7e0",
+          "anchor": "storage retention behavior",
+          "retrieval_content_hash": "8bb153f4d352fc20fa3f107bab69386d471a2f0eecb2edb79986614c8d2f0b04",
+          "context_schema_version": "deterministic-context-v2",
+          "context_config_hash": "3c6f50edf28b9ac18d1ba2ea8abb46296651397b744cd434d29135c04a2d3b07",
+          "context_content_hash": "17082d8bab997051e11918fc9d85f1db137d37469416b4f737e8a6ff5736c121",
+          "context_manifest": {
+            "schema_version": "deterministic-context-v2",
+            "config_hash": "3c6f50edf28b9ac18d1ba2ea8abb46296651397b744cd434d29135c04a2d3b07",
+            "content_hash": "17082d8bab997051e11918fc9d85f1db137d37469416b4f737e8a6ff5736c121",
+            "token_estimate": 53,
+            "truncated": false,
+            "fields": [
+              {
+                "name": "document_title",
+                "value": "guide",
+                "provenance": "source.metadata.title",
+                "priority": 10
+              },
+              {
+                "name": "canonical_location",
+                "value": "docs/guide.md",
+                "provenance": "source.metadata.relative_path",
+                "priority": 20
+              },
+              {
+                "name": "heading_path",
+                "value": "storage retention behavior",
+                "provenance": "source.markdown.heading_path",
+                "priority": 30
+              },
+              {
+                "name": "project_scope",
+                "value": "project",
+                "provenance": "source.metadata.doc_scope",
+                "priority": 80
+              },
+              {
+                "name": "source_class",
+                "value": "project_file",
+                "provenance": "source.metadata.source_class",
+                "priority": 90
+              },
+              {
+                "name": "authority",
+                "value": "source_of_truth",
+                "provenance": "source.metadata.authority",
+                "priority": 100
+              },
+              {
+                "name": "catalog_description",
+                "value": "Pinned documentation source",
+                "provenance": "project.catalog.description",
+                "priority": 120
+              }
+            ]
+          },
+          "embedding_input_hash": "8bb153f4d352fc20fa3f107bab69386d471a2f0eecb2edb79986614c8d2f0b04",
+          "stable_chunk_id": "child-30cd0bd0bd67d1d59c0f487918dfdd1a01c9ed9e",
+          "vector_id": "078b1604-6f28-55cf-9102-c62385bb1b8b",
+          "parent_logical_id": "parent-d5c7b5a4638c95f64228ed20029a0177",
+          "atom_type": "mixed",
+          "atom_id": "atom-eb8fded4186936ccca68557af98f0dba",
+          "source_identity": "project_file:local:be30dc4f5f34ba7d90e9a616d0e362b0c77b3cd701d142de7f019e74bee7d883:docs/guide.md",
+          "source_content_hash": "94e31f509b11987fc2c466e5c490d9dc8b49308c738be866c23a312e5f7e2027",
+          "heading_path": [
+            "storage retention behavior"
+          ],
+          "heading_levels": [
+            1
+          ],
+          "char_span": [
+            0,
+            66
+          ],
+          "byte_span": [
+            9,
+            66
+          ],
+          "line_span": [
+            1,
+            5
+          ],
+          "chunk_schema_version": "parent-child-v1",
+          "chunk_config_hash": "6b14dfe3522150abe6744c0691d312762bb749d9ec60afd9e73230b8f85a7823",
+          "token_estimator_version": "utf8-bytes-div4-v1",
+          "display_token_estimate": 15,
+          "retrieval_token_estimate": 75,
+          "generation_id": "gen-a7c08180af014a4c94663011a1bbb0e9",
+          "section_id": 6770266709009441862,
+          "token_estimate": 15,
+          "docmancer_tokens": 15,
+          "raw_tokens": 17,
+          "savings_percent": 11.8,
+          "runway_multiplier": 1.13,
+          "ranking": {
+            "stable_id": "child-30cd0bd0bd67d1d59c0f487918dfdd1a01c9ed9e",
+            "section_id": 6770266709009441862,
+            "score_direction": "higher_is_better",
+            "raw_component_ranks": {
+              "fts5_bm25_cost": -5.854711e-06
+            },
+            "base_utility": 5.854711e-06,
+            "feature_contributions": {
+              "title_term_boost": 4.5
+            },
+            "final_utility": 4.500005854711,
+            "raw_rank": 1,
+            "final_rank": 1,
+            "rank_delta": 0,
+            "candidate_pool_size": 1
+          },
+          "lexical_match": {
+            "mode": "or_fallback",
+            "query_terms": [
+              "storage",
+              "retention",
+              "behavior",
+              "also",
+              "identify",
+              "private",
+              "production",
+              "deployment",
+              "configuration",
+              "credentials",
+              "owner",
+              "selected",
+              "runtime",
+              "settings"
+            ],
+            "matched_terms": [
+              "storage",
+              "retention",
+              "behavior"
+            ],
+            "exact_terms": [
+              "behavior.",
+              "also",
+              "settings."
+            ],
+            "missing_exact_terms": [
+              "behavior.",
+              "also",
+              "settings."
+            ],
+            "query_term_count": 14,
+            "matched_term_count": 3,
+            "match_ratio": 0.2143,
+            "bm25_cost": -5.854711100455526e-06,
+            "lexical_score": 5.854711100455526e-06,
+            "field_matches": {
+              "title": [
+                "storage",
+                "retention",
+                "behavior"
+              ],
+              "body": [
+                "storage",
+                "retention",
+                "behavior"
+              ],
+              "retrieval_text": [
+                "storage",
+                "retention",
+                "behavior"
+              ]
+            }
+          },
+          "query_plan_hash": "bea84b669e0ce8c304e2a9c54686ade06921bf9070ee496974535352192f9d2e",
+          "fusion_config_hash": "5723a78e3b4e27cdc1275e01b3c9945e00cf99f4af129e6c5f95e3717d0239e2",
+          "retrieval_trace": {
+            "requested_mode": "lexical",
+            "mode_used": "lexical",
+            "component_ranks": {
+              "lexical": 1
+            },
+            "pre_post_rank": 1,
+            "intent_boost": 0.0,
+            "supplemental_rank": null,
+            "final_rank": 1
+          },
+          "_reference_root_plan": {
+            "question": "storage retention behavior. Also identify private production deployment configuration credentials owner selected runtime settings.",
+            "references": [],
+            "scope": {
+              "project_id": "local:be30dc4f5f34ba7d90e9a616d0e362b0c77b3cd701d142de7f019e74bee7d883",
+              "version": "",
+              "snapshot_id": "gen-a7c08180af014a4c94663011a1bbb0e9"
+            },
+            "catalog_complete": true
+          },
+          "_reference_plans": {
+            "storage retention behavior. Also identify private production deployment configuration credentials owner selected runtime settings.": {
+              "question": "storage retention behavior. Also identify private production deployment configuration credentials owner selected runtime settings.",
+              "references": [],
+              "scope": {
+                "project_id": "local:be30dc4f5f34ba7d90e9a616d0e362b0c77b3cd701d142de7f019e74bee7d883",
+                "version": "",
+                "snapshot_id": "gen-a7c08180af014a4c94663011a1bbb0e9"
+              },
+              "catalog_complete": true
+            }
+          },
+          "_evidence_sets": [
+            {
+              "schema_version": "source-dependency-proposal-v1",
+              "set_id": "evidence-set:1d66b12e3f42531623795e7eb26834b5b32fba9aa899b96b648432cec70842fe",
+              "member_spans": [
+                [
+                  9,
+                  37,
+                  "d11915c2be9207799187146965cd7dc704a4689488539db3b267237b0ab4b55e"
+                ],
+                [
+                  39,
+                  65,
+                  "3ba611b2762f696937c273f67402dd1ca2cf2d286a06b8ba1abc73c73946f5d0"
+                ]
+              ],
+              "edges": [
+                [
+                  "heading",
+                  0,
+                  1,
+                  "markdown-owning-heading-v1"
+                ]
+              ],
+              "proposed_need_ids": [
+                "sentence-1"
+              ]
+            }
+          ],
+          "_reference_evidence": {
+            "schema_version": 1,
+            "source": {
+              "document_id": "project_file:local:be30dc4f5f34ba7d90e9a616d0e362b0c77b3cd701d142de7f019e74bee7d883:docs/guide.md",
+              "scope": {
+                "project_id": "local:be30dc4f5f34ba7d90e9a616d0e362b0c77b3cd701d142de7f019e74bee7d883",
+                "version": "",
+                "snapshot_id": "gen-a7c08180af014a4c94663011a1bbb0e9"
+              },
+              "canonical_path": "docs/guide.md",
+              "content_sha256": "94e31f509b11987fc2c466e5c490d9dc8b49308c738be866c23a312e5f7e2027"
+            },
+            "project_doc_content_hash": "sha256:94e31f509b11987fc2c466e5c490d9dc8b49308c738be866c23a312e5f7e2027",
+            "char_start": 0,
+            "char_end": 66,
+            "text": "# Guide\n\n# storage retention behavior\n\nUnrelated network details.\n",
+            "raw_document": "# Guide\n\n# storage retention behavior\n\nUnrelated network details.\n",
+            "owner": null
+          },
+          "freshness": "current",
+          "risk_flags": [],
+          "score": 1.0
+        },
+        "stable_chunk_id": "child-30cd0bd0bd67d1d59c0f487918dfdd1a01c9ed9e",
+        "parent_logical_id": "parent-d5c7b5a4638c95f64228ed20029a0177",
+        "display_content_hash": "94e31f509b11987fc2c466e5c490d9dc8b49308c738be866c23a312e5f7e2027",
+        "char_start": 0,
+        "char_end": 66,
+        "line_start": 1,
+        "line_end": 5,
+        "source_class": "project_file",
+        "path": "docs/guide.md",
+        "heading_path": "storage retention behavior",
+        "content_hash": "sha256:94e31f509b11987fc2c466e5c490d9dc8b49308c738be866c23a312e5f7e2027",
+        "mtime_ns": 1791114587365840070,
+        "stale": false,
+        "doc_scope": "project",
+        "module_id": "",
+        "module_name": null,
+        "module_path": null,
+        "module_type": null,
+        "description": "Pinned documentation source",
+        "authority": "source_of_truth",
+        "lifecycle_status": "active",
+        "impact_policy": "track",
+        "project_identity": "local:be30dc4f5f34ba7d90e9a616d0e362b0c77b3cd701d142de7f019e74bee7d883"
+      }
+    ],
+    "warnings": [],
+    "candidate_sources": [
+      {
+        "path": "docs/guide.md",
+        "source_class": "project_file",
+        "reason": "other",
+        "size_bytes": 66,
+        "mtime_ns": 1791114587365840070,
+        "content_hash": "sha256:94e31f509b11987fc2c466e5c490d9dc8b49308c738be866c23a312e5f7e2027",
+        "doc_scope": "project",
+        "module_id": null,
+        "module_name": null,
+        "module_path": null,
+        "module_type": null,
+        "description": "Pinned documentation source",
+        "authority": "source_of_truth",
+        "lifecycle_status": "active",
+        "impact_policy": "track",
+        "catalog_entry_hash": "sha256:b9366e1658387043c943be7f03f91f44a6af9d611c90bb6ad473aa65b6e9b96f"
+      }
+    ],
+    "indexed_sources": [
+      {
+        "source": "/home/viadmin/StudioProjects/hermes/docmancer/v2plan/artifacts/next07/grounded-first/wiring-check-l99mJU/controls-N10/negative/corpus/docs/guide.md",
+        "path": "docs/guide.md",
+        "source_class": "project_file",
+        "content_hash": "sha256:94e31f509b11987fc2c466e5c490d9dc8b49308c738be866c23a312e5f7e2027",
+        "mtime_ns": 1791114587365840070,
+        "doc_scope": "project",
+        "module_id": "",
+        "module_name": null,
+        "module_path": null,
+        "module_type": null,
+        "description": "Pinned documentation source",
+        "authority": "source_of_truth",
+        "lifecycle_status": "active",
+        "impact_policy": "track"
+      }
+    ],
+    "stale_sources": [],
+    "ignored_sources": [],
+    "source_state_guidance": {
+      "stale_source": {
+        "meaning": "An indexed project-doc source differs from the current file on disk.",
+        "next_action": "Run prepare_docs(action=sync_project_docs), then retry get_docs_context."
+      },
+      "indexed_source_not_discovered": {
+        "meaning": "The source exists in the index, but the current discovery pass did not select it as a project-doc candidate. This does not by itself mean the file is deleted or invalid.",
+        "next_action": "Add or correct the file in docatlas.project-docs.yaml, or run sync_project_docs to remove obsolete index entries."
+      },
+      "ignored_generated_or_tooling_doc": {
+        "meaning": "Generated, build, dependency, or tooling docs are not treated as reviewable project-owned docs by default.",
+        "next_action": "Usually no action is required. If the file is official project documentation, add it to docatlas.project-docs.yaml."
+      },
+      "missing_expected_source": {
+        "meaning": "A document the user expected was not selected or cited.",
+        "next_action": "Check inspect_project_docs output, docatlas.project-docs.yaml entries, scope, and ingestion freshness."
+      }
+    },
+    "diagnostics": {},
+    "next_actions": [],
+    "answer_available": true,
+    "reason": null,
+    "message": "Returned 1 project docs result(s)."
+  },
+  "native_orchestration": {
+    "project_path": "/home/viadmin/StudioProjects/hermes/docmancer/v2plan/artifacts/next07/grounded-first/wiring-check-l99mJU/controls-N10/negative/corpus",
+    "question": "storage retention behavior. Also identify private production deployment configuration credentials owner selected runtime settings.",
+    "status": "confirmation_required",
+    "tool": "get_docs_context",
+    "schema_version": "1.0-mvp",
+    "answer_available": false,
+    "answer_type": "unavailable",
+    "answer_completeness": {
+      "schema_version": "answer-completeness-1.0",
+      "status": "unavailable",
+      "answer_type": "unavailable",
+      "coverage_score": 0.0,
+      "matched_terms": [],
+      "missing_terms": [
+        "storage",
+        "retention",
+        "behavior",
+        "identify",
+        "private",
+        "production",
+        "deployment",
+        "configuration"
+      ],
+      "coverage_by_requirement": [
+        {
+          "term": "storage",
+          "matched": false,
+          "source_paths": []
+        },
+        {
+          "term": "retention",
+          "matched": false,
+          "source_paths": []
+        },
+        {
+          "term": "behavior",
+          "matched": false,
+          "source_paths": []
+        },
+        {
+          "term": "identify",
+          "matched": false,
+          "source_paths": []
+        },
+        {
+          "term": "private",
+          "matched": false,
+          "source_paths": []
+        },
+        {
+          "term": "production",
+          "matched": false,
+          "source_paths": []
+        },
+        {
+          "term": "deployment",
+          "matched": false,
+          "source_paths": []
+        },
+        {
+          "term": "configuration",
+          "matched": false,
+          "source_paths": []
+        }
+      ],
+      "source_search_required": true,
+      "source_search_status": "required",
+      "disposition": "search_local_source",
+      "edit_ready": true,
+      "reason_codes": [
+        "no_trusted_context",
+        "story_terms_missing_from_source_evidence",
+        "high_signal_query_terms_missing_from_context"
+      ],
+      "canonical_support": {
+        "answer_supported": false,
+        "mandatory_requirement_ids": [],
+        "assigned_requirement_ids": []
+      },
+      "legacy_diagnostics": {
+        "schema_version": "answer-completeness-1.0",
+        "status": "unavailable",
+        "answer_type": "unavailable",
+        "coverage_score": 0.0,
+        "matched_terms": [],
+        "missing_terms": [
+          "storage",
+          "retention",
+          "behavior",
+          "identify",
+          "private",
+          "production",
+          "deployment",
+          "configuration"
+        ],
+        "coverage_by_requirement": [
+          {
+            "term": "storage",
+            "matched": false,
+            "source_paths": []
+          },
+          {
+            "term": "retention",
+            "matched": false,
+            "source_paths": []
+          },
+          {
+            "term": "behavior",
+            "matched": false,
+            "source_paths": []
+          },
+          {
+            "term": "identify",
+            "matched": false,
+            "source_paths": []
+          },
+          {
+            "term": "private",
+            "matched": false,
+            "source_paths": []
+          },
+          {
+            "term": "production",
+            "matched": false,
+            "source_paths": []
+          },
+          {
+            "term": "deployment",
+            "matched": false,
+            "source_paths": []
+          },
+          {
+            "term": "configuration",
+            "matched": false,
+            "source_paths": []
+          }
+        ],
+        "source_search_required": true,
+        "source_search_status": "required",
+        "disposition": "search_local_source",
+        "edit_ready": true,
+        "reason_codes": [
+          "no_trusted_context",
+          "story_terms_missing_from_source_evidence",
+          "high_signal_query_terms_missing_from_context"
+        ]
+      }
+    },
+    "selection_profile": "project_docs_answer",
+    "requirements": {
+      "requirements": [],
+      "required_entities": [],
+      "required_facets": [],
+      "query_extraction_provenance": [],
+      "query_requirement_spans": [],
+      "retrieval_hints": [
+        "Also",
+        "storage",
+        "retention",
+        "behavior",
+        "identify",
+        "private",
+        "production",
+        "deployment",
+        "configuration",
+        "credentials",
+        "owner",
+        "selected",
+        "runtime",
+        "settings"
+      ],
+      "concept_queries": [],
+      "answer_contract_hash": "131395c05f6bf74505f4836962b7a8df09193f76be5f084a38e8799b5ebd10db",
+      "lifecycle_intent": "current",
+      "parse_trace": [
+        "fallback:generic_project_terms"
+      ],
+      "unresolved_parts": [
+        "unsupported_query:generic_free_form_relation"
+      ],
+      "component_scope_complete": false
+    },
+    "selection_decision": {
+      "status": "insufficient_evidence",
+      "selected_candidates": [],
+      "omissions": [],
+      "missing_requirements": [
+        "project_answer_requirement",
+        "unsupported_answer_authorization:unresolved_query"
+      ],
+      "unresolved_conflicts": [],
+      "metrics": {
+        "candidate_count": 0,
+        "eligible_count": 0,
+        "selected_count": 0,
+        "selected_sources": 0,
+        "selected_documents": 0,
+        "max_documents": 3,
+        "max_spans": 6,
+        "selected_tokens": 0,
+        "wrapper_reserve_tokens": 120,
+        "projected_total_tokens": 120,
+        "serialized_projected_tokens": 350,
+        "hard_tokens": 800,
+        "mandatory_requirements": 0,
+        "mandatory_covered": 0,
+        "mandatory_coverage_millis": 0,
+        "requirements_hash": "2a741d07657546a1b4275341875e1d02422222a8d7f2e04faa77196fd8a7e22b",
+        "omission_counts": {},
+        "selected_parents": 0,
+        "selected_children": 0,
+        "required_facts_per_1000_tokens_millis": 0,
+        "redundant_visible_token_ratio_millis": 0,
+        "cache": "disabled",
+        "selected_feature_trace": [],
+        "candidate_to_selected_ratio_millis": 0,
+        "reported_token_mismatches": 0
+      },
+      "selector_config_hash": "23cf8aa2f77c1b7e9b9d00819a1d05c14e198272ad91516b5a75c5f641963edd",
+      "eligibility_contract_hash": "eae274104ce4e7688863d3701d486160eb60a30f0cf5f1d8a2bef60f9815173f",
+      "candidate_trace_hash": "47333eea2b6f90f13c4cb48f5be94d66c1987429485b946aca6782d4de13f866",
+      "selection_hash": "24fc9b61faabfc91e006e1c7661c0b86752586c6ec9d2a9f2cbbedf45f3fb92a",
+      "assignments": [],
+      "support_decision": {
+        "answer_supported": false,
+        "support_status": "insufficient_evidence",
+        "reason_code": "required_evidence_missing",
+        "missing_requirement_ids": [
+          "project_answer_requirement",
+          "unsupported_answer_authorization:unresolved_query"
+        ],
+        "satisfied_requirement_ids": [],
+        "mandatory_requirement_ids": [],
+        "mandatory_coverage": 0.0,
+        "selected_evidence_ids": [],
+        "requirements_hash": "2a741d07657546a1b4275341875e1d02422222a8d7f2e04faa77196fd8a7e22b",
+        "selector_config_hash": "23cf8aa2f77c1b7e9b9d00819a1d05c14e198272ad91516b5a75c5f641963edd",
+        "eligibility_contract_hash": "eae274104ce4e7688863d3701d486160eb60a30f0cf5f1d8a2bef60f9815173f",
+        "candidate_trace_hash": "47333eea2b6f90f13c4cb48f5be94d66c1987429485b946aca6782d4de13f866",
+        "selection_hash": "24fc9b61faabfc91e006e1c7661c0b86752586c6ec9d2a9f2cbbedf45f3fb92a",
+        "assignment_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "decision_hash": "2918b4dd29febe22cd79c4b9c322c55cbbe328a6cfa007159fafdca3720b69b3",
+        "requirements": {
+          "requirements": [],
+          "required_entities": [],
+          "required_facets": [],
+          "query_extraction_provenance": [],
+          "query_requirement_spans": [],
+          "retrieval_hints": [
+            "Also",
+            "storage",
+            "retention",
+            "behavior",
+            "identify",
+            "private",
+            "production",
+            "deployment",
+            "configuration",
+            "credentials",
+            "owner",
+            "selected",
+            "runtime",
+            "settings"
+          ],
+          "concept_queries": [],
+          "answer_contract_hash": "131395c05f6bf74505f4836962b7a8df09193f76be5f084a38e8799b5ebd10db",
+          "lifecycle_intent": "current",
+          "parse_trace": [
+            "fallback:generic_project_terms"
+          ],
+          "unresolved_parts": [
+            "unsupported_query:generic_free_form_relation"
+          ],
+          "component_scope_complete": false
+        }
+      },
+      "requirements": {
+        "requirements": [],
+        "required_entities": [],
+        "required_facets": [],
+        "query_extraction_provenance": [],
+        "query_requirement_spans": [],
+        "retrieval_hints": [
+          "Also",
+          "storage",
+          "retention",
+          "behavior",
+          "identify",
+          "private",
+          "production",
+          "deployment",
+          "configuration",
+          "credentials",
+          "owner",
+          "selected",
+          "runtime",
+          "settings"
+        ],
+        "concept_queries": [],
+        "answer_contract_hash": "131395c05f6bf74505f4836962b7a8df09193f76be5f084a38e8799b5ebd10db",
+        "lifecycle_intent": "current",
+        "parse_trace": [
+          "fallback:generic_project_terms"
+        ],
+        "unresolved_parts": [
+          "unsupported_query:generic_free_form_relation"
+        ],
+        "component_scope_complete": false
+      }
+    },
+    "support_decision": {
+      "answer_supported": false,
+      "support_status": "insufficient_evidence",
+      "reason_code": "required_evidence_missing",
+      "missing_requirement_ids": [
+        "project_answer_requirement",
+        "unsupported_answer_authorization:unresolved_query"
+      ],
+      "satisfied_requirement_ids": [],
+      "mandatory_requirement_ids": [],
+      "mandatory_coverage": 0.0,
+      "selected_evidence_ids": [],
+      "requirements_hash": "2a741d07657546a1b4275341875e1d02422222a8d7f2e04faa77196fd8a7e22b",
+      "selector_config_hash": "23cf8aa2f77c1b7e9b9d00819a1d05c14e198272ad91516b5a75c5f641963edd",
+      "eligibility_contract_hash": "eae274104ce4e7688863d3701d486160eb60a30f0cf5f1d8a2bef60f9815173f",
+      "candidate_trace_hash": "47333eea2b6f90f13c4cb48f5be94d66c1987429485b946aca6782d4de13f866",
+      "selection_hash": "24fc9b61faabfc91e006e1c7661c0b86752586c6ec9d2a9f2cbbedf45f3fb92a",
+      "assignment_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "decision_hash": "2918b4dd29febe22cd79c4b9c322c55cbbe328a6cfa007159fafdca3720b69b3",
+      "requirements": {
+        "requirements": [],
+        "required_entities": [],
+        "required_facets": [],
+        "query_extraction_provenance": [],
+        "query_requirement_spans": [],
+        "retrieval_hints": [
+          "Also",
+          "storage",
+          "retention",
+          "behavior",
+          "identify",
+          "private",
+          "production",
+          "deployment",
+          "configuration",
+          "credentials",
+          "owner",
+          "selected",
+          "runtime",
+          "settings"
+        ],
+        "concept_queries": [],
+        "answer_contract_hash": "131395c05f6bf74505f4836962b7a8df09193f76be5f084a38e8799b5ebd10db",
+        "lifecycle_intent": "current",
+        "parse_trace": [
+          "fallback:generic_project_terms"
+        ],
+        "unresolved_parts": [
+          "unsupported_query:generic_free_form_relation"
+        ],
+        "component_scope_complete": false
+      }
+    },
+    "delivery_decision": {
+      "deliverable": false,
+      "reason_code": "no_reliable_context"
+    },
+    "mode": "auto",
+    "reason": "no_reliable_context",
+    "documentation_query_plan": {
+      "schema_version": "documentation-query-plan-v2",
+      "original_question": "storage retention behavior. Also identify private production deployment configuration credentials owner selected runtime settings.",
+      "query_ids": [
+        "query-original"
+      ],
+      "required_query_ids": [
+        "query-original"
+      ],
+      "public_query_ids": [
+        "query-original"
+      ],
+      "queries": [
+        {
+          "query_id": "query-original",
+          "text": "storage retention behavior. Also identify private production deployment configuration credentials owner selected runtime settings.",
+          "origin": "original",
+          "coverage_required": true,
+          "facet_id": null,
+          "requirement_id": null,
+          "relation": "direct",
+          "public_parent_query_id": null,
+          "preferred_catalog_roles": [],
+          "forbidden_catalog_roles": [],
+          "forbidden_evidence_terms": [],
+          "parent_exact_terms": [],
+          "need_subject": null,
+          "need_relation": null,
+          "need_context": null
+        }
+      ],
+      "explicit_paths": [],
+      "unresolved_parts": [
+        "semantic_scope_unverified"
+      ],
+      "_component_contract": [],
+      "component_scope_complete": false
+    },
+    "context_pack": [],
+    "project_docs": {
+      "project_path": "/home/viadmin/StudioProjects/hermes/docmancer/v2plan/artifacts/next07/grounded-first/wiring-check-l99mJU/controls-N10/negative/corpus",
+      "query": "storage retention behavior. Also identify private production deployment configuration credentials owner selected runtime settings.",
+      "status": "success",
+      "tool": "get_project_docs",
+      "reason_code": "project_docs_ready",
+      "resolved_evidence_path": null,
+      "next_action": {},
+      "requires_confirmation": false,
+      "confirmation_reason": null,
+      "arguments_patch": {},
+      "results": [],
+      "warnings": [],
+      "candidate_sources": [
+        {
+          "path": "docs/guide.md",
+          "source_class": "project_file",
+          "reason": "other",
+          "size_bytes": 66,
+          "mtime_ns": 1791114587365840070,
+          "content_hash": "sha256:94e31f509b11987fc2c466e5c490d9dc8b49308c738be866c23a312e5f7e2027",
+          "doc_scope": "project",
+          "module_id": null,
+          "module_name": null,
+          "module_path": null,
+          "module_type": null,
+          "description": "Pinned documentation source",
+          "authority": "source_of_truth",
+          "lifecycle_status": "active",
+          "impact_policy": "track",
+          "catalog_entry_hash": "sha256:b9366e1658387043c943be7f03f91f44a6af9d611c90bb6ad473aa65b6e9b96f"
+        }
+      ],
+      "indexed_sources": [
+        {
+          "source": "/home/viadmin/StudioProjects/hermes/docmancer/v2plan/artifacts/next07/grounded-first/wiring-check-l99mJU/controls-N10/negative/corpus/docs/guide.md",
+          "path": "docs/guide.md",
+          "source_class": "project_file",
+          "content_hash": "sha256:94e31f509b11987fc2c466e5c490d9dc8b49308c738be866c23a312e5f7e2027",
+          "mtime_ns": 1791114587365840070,
+          "doc_scope": "project",
+          "module_id": "",
+          "module_name": null,
+          "module_path": null,
+          "module_type": null,
+          "description": "Pinned documentation source",
+          "authority": "source_of_truth",
+          "lifecycle_status": "active",
+          "impact_policy": "track"
+        }
+      ],
+      "stale_sources": [],
+      "ignored_sources": [],
+      "source_state_guidance": {
+        "stale_source": {
+          "meaning": "An indexed project-doc source differs from the current file on disk.",
+          "next_action": "Run prepare_docs(action=sync_project_docs), then retry get_docs_context."
+        },
+        "indexed_source_not_discovered": {
+          "meaning": "The source exists in the index, but the current discovery pass did not select it as a project-doc candidate. This does not by itself mean the file is deleted or invalid.",
+          "next_action": "Add or correct the file in docatlas.project-docs.yaml, or run sync_project_docs to remove obsolete index entries."
+        },
+        "ignored_generated_or_tooling_doc": {
+          "meaning": "Generated, build, dependency, or tooling docs are not treated as reviewable project-owned docs by default.",
+          "next_action": "Usually no action is required. If the file is official project documentation, add it to docatlas.project-docs.yaml."
+        },
+        "missing_expected_source": {
+          "meaning": "A document the user expected was not selected or cited.",
+          "next_action": "Check inspect_project_docs output, docatlas.project-docs.yaml entries, scope, and ingestion freshness."
+        }
+      },
+      "diagnostics": {
+        "same_call_pipeline": {
+          "planned_query_ids": [
+            "query-original"
+          ],
+          "retrieved_candidates": [
+            {
+              "stable_chunk_id": "child-30cd0bd0bd67d1d59c0f487918dfdd1a01c9ed9e",
+              "document_id": "/home/viadmin/StudioProjects/hermes/docmancer/v2plan/artifacts/next07/grounded-first/wiring-check-l99mJU/controls-N10/negative/corpus/docs/guide.md",
+              "parent_logical_id": "parent-d5c7b5a4638c95f64228ed20029a0177"
+            },
+            {
+              "stable_chunk_id": "child-30cd0bd0bd67d1d59c0f487918dfdd1a01c9ed9e",
+              "document_id": "/home/viadmin/StudioProjects/hermes/docmancer/v2plan/artifacts/next07/grounded-first/wiring-check-l99mJU/controls-N10/negative/corpus/docs/guide.md",
+              "parent_logical_id": "parent-d5c7b5a4638c95f64228ed20029a0177"
+            }
+          ],
+          "qualification_outcomes": [
+            {
+              "stable_chunk_id": "child-30cd0bd0bd67d1d59c0f487918dfdd1a01c9ed9e",
+              "document_id": "/home/viadmin/StudioProjects/hermes/docmancer/v2plan/artifacts/next07/grounded-first/wiring-check-l99mJU/controls-N10/negative/corpus/docs/guide.md",
+              "parent_logical_id": "parent-d5c7b5a4638c95f64228ed20029a0177",
+              "query_id": "query-original",
+              "outcome": "rejected",
+              "reason": "insufficient_visible_match"
+            },
+            {
+              "stable_chunk_id": "child-30cd0bd0bd67d1d59c0f487918dfdd1a01c9ed9e",
+              "document_id": "/home/viadmin/StudioProjects/hermes/docmancer/v2plan/artifacts/next07/grounded-first/wiring-check-l99mJU/controls-N10/negative/corpus/docs/guide.md",
+              "parent_logical_id": "parent-d5c7b5a4638c95f64228ed20029a0177",
+              "query_id": "query-original",
+              "outcome": "rejected",
+              "reason": "insufficient_visible_match"
+            }
+          ]
+        }
+      },
+      "next_actions": [],
+      "answer_available": true,
+      "reason": null,
+      "message": "Returned 1 project docs result(s)."
+    },
+    "dependency_docs": null,
+    "trust_contract": {
+      "schema_version": "trust-contract-1.2",
+      "sources": {
+        "selected": [
+          {
+            "source_class": "project_file",
+            "source_type": "docs",
+            "source_kind": "docs",
+            "authority": "source_of_truth",
+            "risk_flags": [],
+            "path": "docs/guide.md",
+            "source": "/home/viadmin/StudioProjects/hermes/docmancer/v2plan/artifacts/next07/grounded-first/wiring-check-l99mJU/controls-N10/negative/corpus/docs/guide.md",
+            "doc_scope": "project",
+            "module_id": "",
+            "module_name": null,
+            "module_path": null,
+            "module_type": null,
+            "freshness": "current",
+            "reason": "repo-owned project docs matched the question",
+            "why_selected": "repo-owned project docs matched the question",
+            "provenance_confidence": "repository_configured",
+            "trust_level": "provenance_verified_non_instructional",
+            "source_provenance": {
+              "owner": "configured_repository"
+            },
+            "version_exactness": "not_applicable",
+            "repository_authority": "ordinary_repository_document",
+            "instruction_trust": "untrusted_data",
+            "authority_root": null,
+            "policy_scope": null,
+            "scope_verified": false
+          }
+        ],
+        "rejected": [],
+        "risky": []
+      },
+      "context_sources": {
+        "schema_version": "context-sources-1.0",
+        "source_evidence": [],
+        "repo_map": [],
+        "policy": {
+          "source_evidence": "source_snippet entries are path-line backed; absent_in_source entries are uncertainty signals",
+          "repo_map": "navigation_only_not_story_claim_proof"
+        }
+      },
+      "warnings": [],
+      "next_actions": [],
+      "policy": {
+        "direct_webfetch": "forbidden",
+        "reason_code": "trusted_context_available",
+        "document_content": "cited_data_never_lifecycle_instruction",
+        "instruction_precedence": "system_user_tool_policy_over_scoped_repository_policy_over_document_data"
+      }
+    },
+    "warnings": [],
+    "next_actions": [
+      {
+        "action": "create_reviewable_project_doc",
+        "requires_confirmation": true,
+        "preferred_path": "ARCHITECTURE.md",
+        "suggested_paths": [
+          "ARCHITECTURE.md",
+          "README.md",
+          "docs/architecture.md"
+        ],
+        "reason": "Project docs exist, but no high-level architecture or overview document was discovered. Ask the user before creating a reviewable ARCHITECTURE.md file.",
+        "agent_guidance": "If the user approves, inspect the listed evidence, create ARCHITECTURE.md as a normal reviewable file, then use the returned public prepare_docs action before retrying get_docs_context.",
+        "documentation_gap": {
+          "suggested_path": "ARCHITECTURE.md",
+          "required_sections": [
+            {
+              "name": "purpose",
+              "state": "missing",
+              "evidence": [
+                "manifests",
+                "root entrypoints"
+              ],
+              "evidence_paths": [],
+              "facts": [],
+              "missing_evidence": [
+                "manifests",
+                "root entrypoints"
+              ],
+              "discovery_suggestions": [
+                "Inspect repository files for manifests; keep the claim unknown if no evidence is found.",
+                "Inspect repository files for root entrypoints; keep the claim unknown if no evidence is found."
+              ]
+            },
+            {
+              "name": "entrypoints",
+              "state": "missing",
+              "evidence": [
+                "root entrypoints",
+                "runtime configuration"
+              ],
+              "evidence_paths": [],
+              "facts": [],
+              "missing_evidence": [
+                "root entrypoints",
+                "runtime configuration"
+              ],
+              "discovery_suggestions": [
+                "Inspect repository files for root entrypoints; keep the claim unknown if no evidence is found.",
+                "Inspect repository files for runtime configuration; keep the claim unknown if no evidence is found."
+              ]
+            },
+            {
+              "name": "modules",
+              "state": "missing",
+              "evidence": [
+                "module directories",
+                "module imports"
+              ],
+              "evidence_paths": [],
+              "facts": [],
+              "missing_evidence": [
+                "module directories",
+                "module imports"
+              ],
+              "discovery_suggestions": [
+                "Inspect repository files for module directories; keep the claim unknown if no evidence is found.",
+                "Inspect repository files for module imports; keep the claim unknown if no evidence is found."
+              ]
+            },
+            {
+              "name": "runtime flow",
+              "state": "missing",
+              "evidence": [
+                "entrypoints",
+                "module imports",
+                "runtime configuration"
+              ],
+              "evidence_paths": [],
+              "facts": [],
+              "missing_evidence": [
+                "entrypoints",
+                "module imports",
+                "runtime configuration"
+              ],
+              "discovery_suggestions": [
+                "Inspect repository files for entrypoints; keep the claim unknown if no evidence is found.",
+                "Inspect repository files for module imports; keep the claim unknown if no evidence is found.",
+                "Inspect repository files for runtime configuration; keep the claim unknown if no evidence is found."
+              ]
+            },
+            {
+              "name": "development commands",
+              "state": "missing",
+              "evidence": [
+                "manifests",
+                "test and build configuration"
+              ],
+              "evidence_paths": [],
+              "facts": [],
+              "missing_evidence": [
+                "manifests",
+                "test and build configuration"
+              ],
+              "discovery_suggestions": [
+                "Inspect repository files for manifests; keep the claim unknown if no evidence is found.",
+                "Inspect repository files for test and build configuration; keep the claim unknown if no evidence is found."
+              ]
+            }
+          ],
+          "evidence_to_collect": [],
+          "evidence_complete": false,
+          "rules": [
+            "do not invent unsupported facts",
+            "cite repository paths for factual claims",
+            "mark uncertain claims as unknown"
+          ],
+          "missing_evidence": [
+            "manifests",
+            "root entrypoints",
+            "runtime configuration",
+            "module directories",
+            "module imports",
+            "entrypoints",
+            "test and build configuration"
+          ],
+          "bounds": {
+            "max_serialized_bytes": 12288,
+            "serialized_bytes": 3947,
+            "truncated": false,
+            "omitted_counts": {}
+          }
+        },
+        "after_file_change": {
+          "tool": "prepare_docs",
+          "arguments_patch": {
+            "action": "sync_project_docs",
+            "project_path": "/home/viadmin/StudioProjects/hermes/docmancer/v2plan/artifacts/next07/grounded-first/wiring-check-l99mJU/controls-N10/negative/corpus"
+          }
+        },
+        "after": [
+          {
+            "tool": "prepare_docs",
+            "requires_confirmation": false,
+            "arguments_patch": {
+              "action": "sync_project_docs",
+              "project_path": "/home/viadmin/StudioProjects/hermes/docmancer/v2plan/artifacts/next07/grounded-first/wiring-check-l99mJU/controls-N10/negative/corpus"
+            }
+          },
+          {
+            "tool": "get_docs_context",
+            "requires_confirmation": false,
+            "arguments_patch": {
+              "project_path": "/home/viadmin/StudioProjects/hermes/docmancer/v2plan/artifacts/next07/grounded-first/wiring-check-l99mJU/controls-N10/negative/corpus"
+            }
+          }
+        ]
+      },
+      {
+        "tool": "code_search",
+        "reason": "No selected cited source contains high-signal query terms; search project docs/source before answering.",
+        "query_terms": [
+          "storage",
+          "retention",
+          "behavior",
+          "identify",
+          "private",
+          "production",
+          "deployment",
+          "configuration"
+        ]
+      },
+      {
+        "action": "search_project_sources",
+        "tool": "code_search",
+        "type": "search_local_source",
+        "handled_by": "coding_agent",
+        "requires_confirmation": false,
+        "repeat_docs_context": false,
+        "auto_execute": false,
+        "reason": "Selected docs are partial/navigational; exact story-specific terms are missing from source-backed snippets.",
+        "query_terms": [
+          "storage",
+          "retention",
+          "behavior",
+          "identify",
+          "private",
+          "production",
+          "deployment",
+          "configuration"
+        ],
+        "suggested_doc_paths": [],
+        "suggested_symbols": [],
+        "suggested_layers": []
+      }
+    ],
+    "recommended_next_actions": [
+      {
+        "action": "search_project_sources",
+        "tool": "code_search",
+        "type": "search_local_source",
+        "handled_by": "coding_agent",
+        "requires_confirmation": false,
+        "repeat_docs_context": false,
+        "auto_execute": false,
+        "reason": "Selected docs are partial/navigational; exact story-specific terms are missing from source-backed snippets.",
+        "query_terms": [
+          "storage",
+          "retention",
+          "behavior",
+          "identify",
+          "private",
+          "production",
+          "deployment",
+          "configuration"
+        ],
+        "suggested_doc_paths": [],
+        "suggested_symbols": [],
+        "suggested_layers": []
+      }
+    ],
+    "next_action": {
+      "action": "create_reviewable_project_doc",
+      "requires_confirmation": true,
+      "preferred_path": "ARCHITECTURE.md",
+      "suggested_paths": [
+        "ARCHITECTURE.md",
+        "README.md",
+        "docs/architecture.md"
+      ],
+      "reason": "Project docs exist, but no high-level architecture or overview document was discovered. Ask the user before creating a reviewable ARCHITECTURE.md file.",
+      "agent_guidance": "If the user approves, inspect the listed evidence, create ARCHITECTURE.md as a normal reviewable file, then use the returned public prepare_docs action before retrying get_docs_context.",
+      "documentation_gap": {
+        "suggested_path": "ARCHITECTURE.md",
+        "required_sections": [
+          {
+            "name": "purpose",
+            "state": "missing",
+            "evidence": [
+              "manifests",
+              "root entrypoints"
+            ],
+            "evidence_paths": [],
+            "facts": [],
+            "missing_evidence": [
+              "manifests",
+              "root entrypoints"
+            ],
+            "discovery_suggestions": [
+              "Inspect repository files for manifests; keep the claim unknown if no evidence is found.",
+              "Inspect repository files for root entrypoints; keep the claim unknown if no evidence is found."
+            ]
+          },
+          {
+            "name": "entrypoints",
+            "state": "missing",
+            "evidence": [
+              "root entrypoints",
+              "runtime configuration"
+            ],
+            "evidence_paths": [],
+            "facts": [],
+            "missing_evidence": [
+              "root entrypoints",
+              "runtime configuration"
+            ],
+            "discovery_suggestions": [
+              "Inspect repository files for root entrypoints; keep the claim unknown if no evidence is found.",
+              "Inspect repository files for runtime configuration; keep the claim unknown if no evidence is found."
+            ]
+          },
+          {
+            "name": "modules",
+            "state": "missing",
+            "evidence": [
+              "module directories",
+              "module imports"
+            ],
+            "evidence_paths": [],
+            "facts": [],
+            "missing_evidence": [
+              "module directories",
+              "module imports"
+            ],
+            "discovery_suggestions": [
+              "Inspect repository files for module directories; keep the claim unknown if no evidence is found.",
+              "Inspect repository files for module imports; keep the claim unknown if no evidence is found."
+            ]
+          },
+          {
+            "name": "runtime flow",
+            "state": "missing",
+            "evidence": [
+              "entrypoints",
+              "module imports",
+              "runtime configuration"
+            ],
+            "evidence_paths": [],
+            "facts": [],
+            "missing_evidence": [
+              "entrypoints",
+              "module imports",
+              "runtime configuration"
+            ],
+            "discovery_suggestions": [
+              "Inspect repository files for entrypoints; keep the claim unknown if no evidence is found.",
+              "Inspect repository files for module imports; keep the claim unknown if no evidence is found.",
+              "Inspect repository files for runtime configuration; keep the claim unknown if no evidence is found."
+            ]
+          },
+          {
+            "name": "development commands",
+            "state": "missing",
+            "evidence": [
+              "manifests",
+              "test and build configuration"
+            ],
+            "evidence_paths": [],
+            "facts": [],
+            "missing_evidence": [
+              "manifests",
+              "test and build configuration"
+            ],
+            "discovery_suggestions": [
+              "Inspect repository files for manifests; keep the claim unknown if no evidence is found.",
+              "Inspect repository files for test and build configuration; keep the claim unknown if no evidence is found."
+            ]
+          }
+        ],
+        "evidence_to_collect": [],
+        "evidence_complete": false,
+        "rules": [
+          "do not invent unsupported facts",
+          "cite repository paths for factual claims",
+          "mark uncertain claims as unknown"
+        ],
+        "missing_evidence": [
+          "manifests",
+          "root entrypoints",
+          "runtime configuration",
+          "module directories",
+          "module imports",
+          "entrypoints",
+          "test and build configuration"
+        ],
+        "bounds": {
+          "max_serialized_bytes": 12288,
+          "serialized_bytes": 3947,
+          "truncated": false,
+          "omitted_counts": {}
+        }
+      },
+      "after_file_change": {
+        "tool": "prepare_docs",
+        "arguments_patch": {
+          "action": "sync_project_docs",
+          "project_path": "/home/viadmin/StudioProjects/hermes/docmancer/v2plan/artifacts/next07/grounded-first/wiring-check-l99mJU/controls-N10/negative/corpus"
+        }
+      },
+      "after": [
+        {
+          "tool": "prepare_docs",
+          "requires_confirmation": false,
+          "arguments_patch": {
+            "action": "sync_project_docs",
+            "project_path": "/home/viadmin/StudioProjects/hermes/docmancer/v2plan/artifacts/next07/grounded-first/wiring-check-l99mJU/controls-N10/negative/corpus"
+          }
+        },
+        {
+          "tool": "get_docs_context",
+          "requires_confirmation": false,
+          "arguments_patch": {
+            "project_path": "/home/viadmin/StudioProjects/hermes/docmancer/v2plan/artifacts/next07/grounded-first/wiring-check-l99mJU/controls-N10/negative/corpus"
+          }
+        }
+      ]
+    },
+    "requires_confirmation": true,
+    "confirmation_reason": "repo_write",
+    "arguments_patch": {
+      "project_path": "/home/viadmin/StudioProjects/hermes/docmancer/v2plan/artifacts/next07/grounded-first/wiring-check-l99mJU/controls-N10/negative/corpus"
+    },
+    "response_style": "evidence-first",
+    "primary_snippet": null,
+    "supporting_snippets": [],
+    "primary_snippets": [],
+    "primary_snippet_confidence": null,
+    "primary_snippet_selection_reason": null,
+    "primary_snippet_alternatives": [],
+    "snippet_metrics": {
+      "candidates_found": 0,
+      "usable_candidates": 0,
+      "primary_selected": false,
+      "supporting_selected": 0,
+      "duplicates_dropped": 0,
+      "noise_dropped": 0,
+      "truncations": 0,
+      "primary_language": null,
+      "primary_lane": null,
+      "primary_source_correct": null,
+      "primary_exact_version_match": null,
+      "primary_snippet_confidence": null,
+      "primary_snippet_alternatives": 0,
+      "snippet_first_applied": false,
+      "requested_response_style": "auto"
+    },
+    "metrics": {
+      "context_pack_items": 0,
+      "selected_source_count": 0,
+      "project_result_count": 0,
+      "dependency_result_count": 0,
+      "token_estimate": 0,
+      "source_classes": [],
+      "quality": {
+        "query_intent": "how_to",
+        "changelog_items": 0,
+        "changelog_ratio": 0.0,
+        "unique_source_count": 0,
+        "max_items_from_single_source": 0,
+        "has_readme": false,
+        "has_architecture": false,
+        "has_contributing": false,
+        "has_docs_mcp_source": false,
+        "has_packs_mcp_source": false,
+        "relevance_coverage": 0.0,
+        "trivial_sections_filtered": 0,
+        "noise_sections_demoted": 0,
+        "warnings": [
+          {
+            "code": "no_query_relevance_evidence",
+            "message": "Selected context does not contain high-signal terms from the question; do not treat the result as an exact trusted answer.",
+            "missing_terms": [
+              "storage",
+              "retention",
+              "behavior",
+              "identify",
+              "private",
+              "production",
+              "deployment",
+              "configuration"
+            ]
+          },
+          {
+            "code": "unavailable",
+            "message": "Selected context is partial/navigational for this story-specific question; search project source for missing source-backed terms."
+          }
+        ]
+      },
+      "token_savings": {
+        "raw_docs_tokens": 0,
+        "context_pack_tokens": 0,
+        "savings_percent": null,
+        "used_percent": null,
+        "agentic_runway_multiplier": null,
+        "meaning": "compression_vs_raw_docs_not_relevance_score"
+      },
+      "snippet_metrics": {
+        "candidates_found": 0,
+        "usable_candidates": 0,
+        "primary_selected": false,
+        "supporting_selected": 0,
+        "duplicates_dropped": 0,
+        "noise_dropped": 0,
+        "truncations": 0,
+        "primary_language": null,
+        "primary_lane": null,
+        "primary_source_correct": null,
+        "primary_exact_version_match": null,
+        "primary_snippet_confidence": null,
+        "primary_snippet_alternatives": 0,
+        "snippet_first_applied": false,
+        "requested_response_style": "auto"
+      },
+      "answer_completeness": {
+        "schema_version": "answer-completeness-1.0",
+        "status": "unavailable",
+        "answer_type": "unavailable",
+        "coverage_score": 0.0,
+        "matched_terms": [],
+        "missing_terms": [
+          "storage",
+          "retention",
+          "behavior",
+          "identify",
+          "private",
+          "production",
+          "deployment",
+          "configuration"
+        ],
+        "coverage_by_requirement": [
+          {
+            "term": "storage",
+            "matched": false,
+            "source_paths": []
+          },
+          {
+            "term": "retention",
+            "matched": false,
+            "source_paths": []
+          },
+          {
+            "term": "behavior",
+            "matched": false,
+            "source_paths": []
+          },
+          {
+            "term": "identify",
+            "matched": false,
+            "source_paths": []
+          },
+          {
+            "term": "private",
+            "matched": false,
+            "source_paths": []
+          },
+          {
+            "term": "production",
+            "matched": false,
+            "source_paths": []
+          },
+          {
+            "term": "deployment",
+            "matched": false,
+            "source_paths": []
+          },
+          {
+            "term": "configuration",
+            "matched": false,
+            "source_paths": []
+          }
+        ],
+        "source_search_required": true,
+        "source_search_status": "required",
+        "disposition": "search_local_source",
+        "edit_ready": true,
+        "reason_codes": [
+          "no_trusted_context",
+          "story_terms_missing_from_source_evidence",
+          "high_signal_query_terms_missing_from_context"
+        ],
+        "canonical_support": {
+          "answer_supported": false,
+          "mandatory_requirement_ids": [],
+          "assigned_requirement_ids": []
+        },
+        "legacy_diagnostics": {
+          "schema_version": "answer-completeness-1.0",
+          "status": "unavailable",
+          "answer_type": "unavailable",
+          "coverage_score": 0.0,
+          "matched_terms": [],
+          "missing_terms": [
+            "storage",
+            "retention",
+            "behavior",
+            "identify",
+            "private",
+            "production",
+            "deployment",
+            "configuration"
+          ],
+          "coverage_by_requirement": [
+            {
+              "term": "storage",
+              "matched": false,
+              "source_paths": []
+            },
+            {
+              "term": "retention",
+              "matched": false,
+              "source_paths": []
+            },
+            {
+              "term": "behavior",
+              "matched": false,
+              "source_paths": []
+            },
+            {
+              "term": "identify",
+              "matched": false,
+              "source_paths": []
+            },
+            {
+              "term": "private",
+              "matched": false,
+              "source_paths": []
+            },
+            {
+              "term": "production",
+              "matched": false,
+              "source_paths": []
+            },
+            {
+              "term": "deployment",
+              "matched": false,
+              "source_paths": []
+            },
+            {
+              "term": "configuration",
+              "matched": false,
+              "source_paths": []
+            }
+          ],
+          "source_search_required": true,
+          "source_search_status": "required",
+          "disposition": "search_local_source",
+          "edit_ready": true,
+          "reason_codes": [
+            "no_trusted_context",
+            "story_terms_missing_from_source_evidence",
+            "high_signal_query_terms_missing_from_context"
+          ]
+        }
+      }
+    },
+    "diagnostics": {
+      "query_intent": "how_to",
+      "retrieval_routing": {
+        "schema_version": 2,
+        "intent": "docs",
+        "stages": {
+          "project_docs": {
+            "status": "used",
+            "reason": "selected project documentation mode",
+            "item_count": 0,
+            "budget_projection_bytes": 0,
+            "estimated_tokens": 0,
+            "observed_item_count": 0,
+            "observed_budget_projection_bytes": 0,
+            "budget_exceeded": false
+          },
+          "dependency_docs": {
+            "status": "skipped",
+            "reason": "dependency documentation not selected or not available",
+            "item_count": 0,
+            "budget_projection_bytes": 0,
+            "estimated_tokens": 0,
+            "observed_item_count": 0,
+            "observed_budget_projection_bytes": 0,
+            "budget_exceeded": false
+          },
+          "source_evidence": {
+            "status": "skipped",
+            "reason": "complete documentation/API intent does not require source evidence",
+            "item_count": 0,
+            "budget_projection_bytes": 0,
+            "estimated_tokens": 0,
+            "observed_item_count": 0,
+            "observed_budget_projection_bytes": 0,
+            "budget_exceeded": false
+          },
+          "repo_map": {
+            "status": "insufficient",
+            "reason": "missing project documentation requires bounded authoring evidence",
+            "item_count": 0,
+            "budget_projection_bytes": 0,
+            "estimated_tokens": 0,
+            "observed_item_count": 0,
+            "observed_budget_projection_bytes": 0,
+            "budget_exceeded": false
+          },
+          "code_graph": {
+            "status": "insufficient",
+            "reason": "missing project documentation requires bounded module evidence",
+            "item_count": 0,
+            "budget_projection_bytes": 0,
+            "estimated_tokens": 0,
+            "observed_item_count": 0,
+            "observed_budget_projection_bytes": 0,
+            "budget_exceeded": false
+          }
+        },
+        "budget_projection_bytes": 0,
+        "model_visible_bytes": 0
+      },
+      "same_call_pipeline": {
+        "planned_query_ids": [
+          "query-original"
+        ],
+        "retrieved_candidates": [
+          {
+            "stable_chunk_id": "child-30cd0bd0bd67d1d59c0f487918dfdd1a01c9ed9e",
+            "document_id": "/home/viadmin/StudioProjects/hermes/docmancer/v2plan/artifacts/next07/grounded-first/wiring-check-l99mJU/controls-N10/negative/corpus/docs/guide.md",
+            "parent_logical_id": "parent-d5c7b5a4638c95f64228ed20029a0177"
+          },
+          {
+            "stable_chunk_id": "child-30cd0bd0bd67d1d59c0f487918dfdd1a01c9ed9e",
+            "document_id": "/home/viadmin/StudioProjects/hermes/docmancer/v2plan/artifacts/next07/grounded-first/wiring-check-l99mJU/controls-N10/negative/corpus/docs/guide.md",
+            "parent_logical_id": "parent-d5c7b5a4638c95f64228ed20029a0177"
+          }
+        ],
+        "qualification_outcomes": [
+          {
+            "stable_chunk_id": "child-30cd0bd0bd67d1d59c0f487918dfdd1a01c9ed9e",
+            "document_id": "/home/viadmin/StudioProjects/hermes/docmancer/v2plan/artifacts/next07/grounded-first/wiring-check-l99mJU/controls-N10/negative/corpus/docs/guide.md",
+            "parent_logical_id": "parent-d5c7b5a4638c95f64228ed20029a0177",
+            "query_id": "query-original",
+            "outcome": "rejected",
+            "reason": "insufficient_visible_match"
+          },
+          {
+            "stable_chunk_id": "child-30cd0bd0bd67d1d59c0f487918dfdd1a01c9ed9e",
+            "document_id": "/home/viadmin/StudioProjects/hermes/docmancer/v2plan/artifacts/next07/grounded-first/wiring-check-l99mJU/controls-N10/negative/corpus/docs/guide.md",
+            "parent_logical_id": "parent-d5c7b5a4638c95f64228ed20029a0177",
+            "query_id": "query-original",
+            "outcome": "rejected",
+            "reason": "insufficient_visible_match"
+          }
+        ]
+      },
+      "active_index": {
+        "project_path": "/home/viadmin/StudioProjects/hermes/docmancer/v2plan/artifacts/next07/grounded-first/wiring-check-l99mJU/controls-N10/negative/corpus",
+        "db_path": "/home/viadmin/StudioProjects/hermes/docmancer/v2plan/artifacts/next07/grounded-first/wiring-check-l99mJU/controls-N10/negative/state/index.db",
+        "db_exists": true,
+        "index_state": "available",
+        "index_ownership": "project_owned",
+        "extracted_dir": "v2plan/artifacts/next07/grounded-first/wiring-check-l99mJU/controls-N10/negative/state/extracted",
+        "config_source": "explicit",
+        "config_path": null,
+        "retrieval_mode": "lexical",
+        "docatlas_home": "v2plan/artifacts/next07/grounded-first/wiring-check-l99mJU/controls-N10/negative/state/docatlas_home",
+        "index_counts": {
+          "sources": 1,
+          "sections": 2
+        },
+        "project_index_counts": {
+          "sources": 1,
+          "sections": 2
+        },
+        "shared_index_counts": {
+          "sources": 1,
+          "sections": 2
+        },
+        "warnings": [],
+        "vector_readiness": {
+          "status": "not_required",
+          "mode": "lexical"
+        },
+        "project_local_config": {
+          "present": false
+        }
+      },
+      "relevance_gate": {
+        "passed": false,
+        "reason": "insufficient_weighted_relevance",
+        "required_terms": [
+          "storage",
+          "retention",
+          "behavior",
+          "identify",
+          "private",
+          "production",
+          "deployment",
+          "configuration"
+        ],
+        "matched_terms": [],
+        "missing_terms": [
+          "storage",
+          "retention",
+          "behavior",
+          "identify",
+          "private",
+          "production",
+          "deployment",
+          "configuration"
+        ],
+        "matched_details": [],
+        "weighted_score": 0,
+        "matched_term_count": 0,
+        "required_term_count": 8
+      },
+      "trust_decision": {
+        "answer_available": false,
+        "reason": "no_reliable_context",
+        "confidence": "low",
+        "passed_relevance_gate": false,
+        "max_project_score": null,
+        "query_terms_matched": [],
+        "query_terms_missing": [
+          "storage",
+          "retention",
+          "behavior",
+          "identify",
+          "private",
+          "production",
+          "deployment",
+          "configuration"
+        ]
+      }
+    },
+    "answer_outline": {
+      "query_intent": "how_to",
+      "recommended_reading_order": [],
+      "coverage": {
+        "high_level_overview": false,
+        "architecture": false,
+        "project_structure": false,
+        "setup_or_commands": false,
+        "mcp_docs": false,
+        "mcp_packs": false,
+        "release_history": false
+      },
+      "warnings": [
+        {
+          "code": "no_query_relevance_evidence",
+          "message": "Selected context does not contain high-signal terms from the question; do not treat the result as an exact trusted answer.",
+          "missing_terms": [
+            "storage",
+            "retention",
+            "behavior",
+            "identify",
+            "private",
+            "production",
+            "deployment",
+            "configuration"
+          ]
+        },
+        {
+          "code": "unavailable",
+          "message": "Selected context is partial/navigational for this story-specific question; search project source for missing source-backed terms."
+        }
+      ],
+      "answer_completeness": {
+        "schema_version": "answer-completeness-1.0",
+        "status": "unavailable",
+        "answer_type": "unavailable",
+        "coverage_score": 0.0,
+        "matched_terms": [],
+        "missing_terms": [
+          "storage",
+          "retention",
+          "behavior",
+          "identify",
+          "private",
+          "production",
+          "deployment",
+          "configuration"
+        ],
+        "coverage_by_requirement": [
+          {
+            "term": "storage",
+            "matched": false,
+            "source_paths": []
+          },
+          {
+            "term": "retention",
+            "matched": false,
+            "source_paths": []
+          },
+          {
+            "term": "behavior",
+            "matched": false,
+            "source_paths": []
+          },
+          {
+            "term": "identify",
+            "matched": false,
+            "source_paths": []
+          },
+          {
+            "term": "private",
+            "matched": false,
+            "source_paths": []
+          },
+          {
+            "term": "production",
+            "matched": false,
+            "source_paths": []
+          },
+          {
+            "term": "deployment",
+            "matched": false,
+            "source_paths": []
+          },
+          {
+            "term": "configuration",
+            "matched": false,
+            "source_paths": []
+          }
+        ],
+        "source_search_required": true,
+        "source_search_status": "required",
+        "disposition": "search_local_source",
+        "edit_ready": true,
+        "reason_codes": [
+          "no_trusted_context",
+          "story_terms_missing_from_source_evidence",
+          "high_signal_query_terms_missing_from_context"
+        ],
+        "canonical_support": {
+          "answer_supported": false,
+          "mandatory_requirement_ids": [],
+          "assigned_requirement_ids": []
+        },
+        "legacy_diagnostics": {
+          "schema_version": "answer-completeness-1.0",
+          "status": "unavailable",
+          "answer_type": "unavailable",
+          "coverage_score": 0.0,
+          "matched_terms": [],
+          "missing_terms": [
+            "storage",
+            "retention",
+            "behavior",
+            "identify",
+            "private",
+            "production",
+            "deployment",
+            "configuration"
+          ],
+          "coverage_by_requirement": [
+            {
+              "term": "storage",
+              "matched": false,
+              "source_paths": []
+            },
+            {
+              "term": "retention",
+              "matched": false,
+              "source_paths": []
+            },
+            {
+              "term": "behavior",
+              "matched": false,
+              "source_paths": []
+            },
+            {
+              "term": "identify",
+              "matched": false,
+              "source_paths": []
+            },
+            {
+              "term": "private",
+              "matched": false,
+              "source_paths": []
+            },
+            {
+              "term": "production",
+              "matched": false,
+              "source_paths": []
+            },
+            {
+              "term": "deployment",
+              "matched": false,
+              "source_paths": []
+            },
+            {
+              "term": "configuration",
+              "matched": false,
+              "source_paths": []
+            }
+          ],
+          "source_search_required": true,
+          "source_search_status": "required",
+          "disposition": "search_local_source",
+          "edit_ready": true,
+          "reason_codes": [
+            "no_trusted_context",
+            "story_terms_missing_from_source_evidence",
+            "high_signal_query_terms_missing_from_context"
+          ]
+        }
+      }
+    },
+    "message": "Returned 1 project docs result(s)."
+  },
+  "context_result_type": "ProjectContextResult",
+  "projection_calls": 1,
+  "projection_input": [
+    {
+      "stable_chunk_id": "child-30cd0bd0bd67d1d59c0f487918dfdd1a01c9ed9e",
+      "parent_logical_id": "parent-d5c7b5a4638c95f64228ed20029a0177",
+      "display_content_hash": "94e31f509b11987fc2c466e5c490d9dc8b49308c738be866c23a312e5f7e2027",
+      "_source_snapshot_sha256": "sha256:94e31f509b11987fc2c466e5c490d9dc8b49308c738be866c23a312e5f7e2027",
+      "_reference_evidence": {
+        "schema_version": 1,
+        "source": {
+          "document_id": "project_file:local:be30dc4f5f34ba7d90e9a616d0e362b0c77b3cd701d142de7f019e74bee7d883:docs/guide.md",
+          "scope": {
+            "project_id": "local:be30dc4f5f34ba7d90e9a616d0e362b0c77b3cd701d142de7f019e74bee7d883",
+            "version": "",
+            "snapshot_id": "gen-a7c08180af014a4c94663011a1bbb0e9"
+          },
+          "canonical_path": "docs/guide.md",
+          "content_sha256": "94e31f509b11987fc2c466e5c490d9dc8b49308c738be866c23a312e5f7e2027"
+        },
+        "project_doc_content_hash": "sha256:94e31f509b11987fc2c466e5c490d9dc8b49308c738be866c23a312e5f7e2027",
+        "char_start": 0,
+        "char_end": 66,
+        "text": "# Guide\n\n# storage retention behavior\n\nUnrelated network details.\n",
+        "raw_document": "# Guide\n\n# storage retention behavior\n\nUnrelated network details.\n",
+        "owner": null
+      },
+      "_reference_root_plan": {
+        "question": "storage retention behavior. Also identify private production deployment configuration credentials owner selected runtime settings.",
+        "references": [],
+        "scope": {
+          "project_id": "local:be30dc4f5f34ba7d90e9a616d0e362b0c77b3cd701d142de7f019e74bee7d883",
+          "version": "",
+          "snapshot_id": "gen-a7c08180af014a4c94663011a1bbb0e9"
+        },
+        "catalog_complete": true
+      },
+      "_reference_plans": {
+        "storage retention behavior. Also identify private production deployment configuration credentials owner selected runtime settings.": {
+          "question": "storage retention behavior. Also identify private production deployment configuration credentials owner selected runtime settings.",
+          "references": [],
+          "scope": {
+            "project_id": "local:be30dc4f5f34ba7d90e9a616d0e362b0c77b3cd701d142de7f019e74bee7d883",
+            "version": "",
+            "snapshot_id": "gen-a7c08180af014a4c94663011a1bbb0e9"
+          },
+          "catalog_complete": true
+        }
+      },
+      "_evidence_sets": [
+        {
+          "schema_version": "source-dependency-proposal-v1",
+          "set_id": "evidence-set:1d66b12e3f42531623795e7eb26834b5b32fba9aa899b96b648432cec70842fe",
+          "member_spans": [
+            [
+              9,
+              37,
+              "d11915c2be9207799187146965cd7dc704a4689488539db3b267237b0ab4b55e"
+            ],
+            [
+              39,
+              65,
+              "3ba611b2762f696937c273f67402dd1ca2cf2d286a06b8ba1abc73c73946f5d0"
+            ]
+          ],
+          "edges": [
+            [
+              "heading",
+              0,
+              1,
+              "markdown-owning-heading-v1"
+            ]
+          ],
+          "proposed_need_ids": [
+            "sentence-1"
+          ]
+        }
+      ],
+      "generation_id": "gen-a7c08180af014a4c94663011a1bbb0e9",
+      "resolved_version": "",
+      "_source_catalog_hash": "sha256:b9366e1658387043c943be7f03f91f44a6af9d611c90bb6ad473aa65b6e9b96f",
+      "char_start": 0,
+      "char_end": 66,
+      "line_start": 1,
+      "line_end": 5,
+      "source_class": "project_doc",
+      "source_type": "docs",
+      "source_kind": "docs",
+      "authority": "source_of_truth",
+      "risk_flags": [],
+      "doc_scope": "project",
+      "module_id": "",
+      "module_name": null,
+      "module_path": null,
+      "module_type": null,
+      "description": "Pinned documentation source",
+      "catalog_role": "other",
+      "lifecycle_status": "active",
+      "temporal_relevance": "current",
+      "index_freshness": "synchronized",
+      "impact_policy": "track",
+      "project_identity": "local:be30dc4f5f34ba7d90e9a616d0e362b0c77b3cd701d142de7f019e74bee7d883",
+      "retrieval_query_ids": [],
+      "retrieval_query_matches": {},
+      "project_ranking": {},
+      "path": "docs/guide.md",
+      "url": null,
+      "title": "storage retention behavior",
+      "heading_path": "storage retention behavior",
+      "freshness": "current",
+      "why_selected": "selected because it matched repo-owned project documentation for the question",
+      "content": "# Guide\n\n# storage retention behavior\n\nUnrelated network details.\n",
+      "display_text": "# Guide\n\n# storage retention behavior\n\nUnrelated network details.\n",
+      "token_estimate": 16,
+      "source": {
+        "source_class": "project_doc",
+        "source_type": "docs",
+        "source_kind": "docs",
+        "authority": "source_of_truth",
+        "risk_flags": [],
+        "doc_scope": "project",
+        "module_id": "",
+        "module_name": null,
+        "module_path": null,
+        "module_type": null,
+        "description": "Pinned documentation source",
+        "lifecycle_status": "active",
+        "temporal_relevance": "current",
+        "index_freshness": "synchronized",
+        "impact_policy": "track",
+        "project_identity": "local:be30dc4f5f34ba7d90e9a616d0e362b0c77b3cd701d142de7f019e74bee7d883",
+        "path": "docs/guide.md",
+        "url": null,
+        "title": "storage retention behavior"
+      },
+      "section": {
+        "title": "storage retention behavior",
+        "heading_path": "storage retention behavior",
+        "freshness": "current"
+      },
+      "snippet": "# Guide\n\n# storage retention behavior\n\nUnrelated network details.\n",
+      "char_span": [
+        0,
+        66
+      ],
+      "origin_lane": "project",
+      "canonical_id": null,
+      "library_id": null,
+      "version": null,
+      "source_provenance": {
+        "owner": "configured_repository",
+        "origin_lane": "project"
+      },
+      "version_exactness": "not_applicable",
+      "repository_authority": "ordinary_repository_document",
+      "instruction_trust": "untrusted_data",
+      "content_boundary": {
+        "role": "cited_document_data",
+        "schema": "docmancer-document-data-v1",
+        "executable_policy": false
+      },
+      "document_data": {
+        "schema": "docmancer-document-data-v1",
+        "instruction_trust": "untrusted_data",
+        "content": "# Guide\n\n# storage retention behavior\n\nUnrelated network details.\n"
+      },
+      "authority_root": null,
+      "policy_scope": null,
+      "scope_verified": false,
+      "instruction_risk_flags": []
+    }
+  ],
+  "decisions": [
+    {
+      "path": "docs/guide.md",
+      "span": [
+        0,
+        66
+      ],
+      "allowed": true,
+      "reason": "source_bound_retrieval_only_unknown_applicability",
+      "whole_dto_cost": 296,
+      "stage": "selected"
+    }
+  ],
+  "selected": [
+    {
+      "evidence_id": "ev-70b8fe573e0798c2",
+      "path_or_url": "docs/guide.md",
+      "section": "storage retention behavior",
+      "snippet": "# Guide\n\n# storage retention behavior\n\nUnrelated network details.\n",
+      "version_binding": "unversioned",
+      "content_sha256": "5850248c925f00e35138b9c47a5bc804f785463bdf2268216a909d68ab0dee8c",
+      "project_identity": "local:be30dc4f5f34ba7d90e9a616d0e362b0c77b3cd701d142de7f019e74bee7d883",
+      "authority": "source_of_truth",
+      "scope": "project",
+      "line_start": 1,
+      "line_end": 5
+    }
+  ],
+  "validator": [],
+  "budget": 296,
+  "handler_validation": [
+    {
+      "errors": [],
+      "max_tokens": 800
+    }
+  ]
+}
