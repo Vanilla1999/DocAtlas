@@ -1,0 +1,132 @@
+name: Next07 compact native evidence
+
+on:
+  push:
+    branches: [next07-feasibility-audit]
+    paths:
+      - '.github/workflows/next07-compact-native.yml'
+
+permissions:
+  contents: read
+
+env:
+  DOCATLAS_OFFLINE: "1"
+  DOCATLAS_AUTO_VECTORS: "0"
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
+
+jobs:
+  native-evidence:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: "3.12"
+
+      - name: Install project and test dependencies
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/next07-evidence"
+          python -m pip install -e ".[dev]" > "$RUNNER_TEMP/next07-evidence/pip-install.log" 2>&1
+          python -m pip freeze > "$RUNNER_TEMP/next07-evidence/pip-freeze.txt"
+          git rev-parse HEAD > "$RUNNER_TEMP/next07-evidence/head.txt"
+          git status --short > "$RUNNER_TEMP/next07-evidence/status-before.txt"
+
+      - name: Run wiring and native scope contracts
+        shell: bash
+        run: |
+          set +e
+          python -m pytest -q \
+            v2plan/test_next07_compact_delivery.py \
+            v2plan/test_next07_grounded_public_wiring.py \
+            v2plan/test_next07_scope_rebuild.py \
+            v2plan/test_next07_diagnostic_runner.py \
+            v2plan/test_next07_scope_native.py \
+            --junitxml="$RUNNER_TEMP/next07-evidence/contracts.xml" \
+            > "$RUNNER_TEMP/next07-evidence/contracts.log" 2>&1
+          rc=$?
+          echo "$rc" > "$RUNNER_TEMP/next07-evidence/contracts-exit.txt"
+          exit 0
+
+      - name: Run real compact LeaseClient target
+        shell: bash
+        run: |
+          set +e
+          python -m v2plan.next07_grounded_final_run \
+            --compact-read \
+            --out "$RUNNER_TEMP/next07-evidence/target" \
+            > "$RUNNER_TEMP/next07-evidence/target.log" 2>&1
+          rc=$?
+          echo "$rc" > "$RUNNER_TEMP/next07-evidence/target-exit.txt"
+          exit 0
+
+      - name: Run real paired 80-case N/C corpus diagnostics
+        shell: bash
+        run: |
+          set +e
+          python -m v2plan.next07_diagnostic_scope \
+            --compact-read \
+            --out "$RUNNER_TEMP/next07-evidence/corpus-replay" \
+            > "$RUNNER_TEMP/next07-evidence/corpus.log" 2>&1
+          rc=$?
+          echo "$rc" > "$RUNNER_TEMP/next07-evidence/corpus-exit.txt"
+          git status --short > "$RUNNER_TEMP/next07-evidence/status-after.txt"
+          exit 0
+
+      - name: Summarize machine-readable results
+        if: always()
+        shell: bash
+        run: |
+          python - <<'PY' > "$RUNNER_TEMP/next07-evidence/summary.json"
+          import json, os
+          from pathlib import Path
+          root = Path(os.environ["RUNNER_TEMP"]) / "next07-evidence"
+          def load(path):
+              p = root / path
+              if not p.exists():
+                  return None
+              try:
+                  return json.loads(p.read_text())
+              except Exception as exc:
+                  return {"read_error": type(exc).__name__ + ": " + str(exc)}
+          def exit_code(name):
+              p = root / name
+              return int(p.read_text().strip()) if p.exists() else None
+          result = {
+              "head": (root/"head.txt").read_text().strip() if (root/"head.txt").exists() else None,
+              "contracts_exit": exit_code("contracts-exit.txt"),
+              "target_exit": exit_code("target-exit.txt"),
+              "corpus_exit": exit_code("corpus-exit.txt"),
+              "target": load("target/result.json"),
+              "corpus": load("corpus-replay/result.json"),
+          }
+          print(json.dumps(result, ensure_ascii=False, indent=2))
+          PY
+
+      - name: Upload complete next07 evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: next07-compact-native-${{ github.sha }}
+          path: ${{ runner.temp }}/next07-evidence/
+          include-hidden-files: true
+          if-no-files-found: error
+          retention-days: 14
+
+      - name: Fail job if execution was technically invalid
+        if: always()
+        shell: bash
+        run: |
+          set -euo pipefail
+          contracts="$(cat "$RUNNER_TEMP/next07-evidence/contracts-exit.txt" 2>/dev/null || echo 99)"
+          target="$(cat "$RUNNER_TEMP/next07-evidence/target-exit.txt" 2>/dev/null || echo 99)"
+          corpus="$(cat "$RUNNER_TEMP/next07-evidence/corpus-exit.txt" 2>/dev/null || echo 99)"
+          echo "contracts=$contracts target=$target corpus=$corpus"
+          test "$contracts" -eq 0
+          test "$target" -ne 2
+          test "$corpus" -ne 2
