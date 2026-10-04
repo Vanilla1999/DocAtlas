@@ -679,3 +679,17 @@ required gates/full suite/unseen/reader NOT_RUN. Grounded evidence переис�
 Один следующий шаг — отдельное решение о новой версии candidate с явно
 названными обязанностями wrong-state и preservation; не добавлять regex/rescue
 или ослаблять negatives автоматически. Текущий замер завершён, rollout запрещён.
+
+## 9. Продолжение b6e890b6: invalid I.4 wiring
+
+53 PASS подтверждены JUnit и input hashes в
+`artifacts/next07/grounded-first/read-repair-JYWxAH/`; повтор не выполнялся.
+Пользователь разрешил I.4→I.6, не часть II. Evidence нового замера:
+`artifacts/next07/grounded-first/20261004-final-b6e890b6/SUMMARY_RU.md`.
+Research-only wiring, без изменения candidate/production: первый MCP capture
+вернул TypeError до projection. После исправления dataclass conversion один
+retry вернул AttributeError, также до projection. Точный источник второго
+исключения не установлен, scoped replacements восстановлены.
+Это **BLOCKED: invalid wiring, retry-limit исчерпан**, не algorithm REJECTED
+и не доказательство невозможности интеграции в allowed scope. I.4 не выполнена;
+I.5 retention/gates/full suite и часть II NOT_RUN. Rollout NOT_AUTHORIZED.

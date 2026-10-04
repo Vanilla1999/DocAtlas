@@ -1,0 +1,15 @@
+{
+  "verdict": "BLOCKED_INVALID",
+  "cases": [
+    {
+      "case": "0",
+      "valid": false,
+      "passed": false,
+      "snippets": "",
+      "cost": null,
+      "source_count": 0,
+      "validator": null,
+      "restored": true
+    }
+  ]
+}

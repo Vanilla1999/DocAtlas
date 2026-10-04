@@ -1,0 +1,8 @@
+{
+  "algorithm_unchanged": {
+    "v2plan/next07_grounded_candidate.py": true,
+    "v2plan/third_party/grounded-3.2.1/passage_splitter.py": true,
+    "v2plan/third_party/grounded-3.2.1/fts_query.py": true
+  },
+  "unrelated_tracked_patch_unchanged": true
+}

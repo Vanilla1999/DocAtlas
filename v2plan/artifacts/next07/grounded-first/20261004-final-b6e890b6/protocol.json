@@ -1,0 +1,29 @@
+{
+  "head": "b6e890b615fcb3ad0745510648ae2d2584878bd5",
+  "algorithm_hashes": {
+    "v2plan/next07_grounded_candidate.py": "5ac8e2600a12d216070087a50c9ddc64c8efaaff2f399d70e2b345db0bf71ff7",
+    "v2plan/third_party/grounded-3.2.1/passage_splitter.py": "9cf1320784290243a038afd9adda7f737b8377bbc88fa1aabd7f896f463f7968",
+    "v2plan/third_party/grounded-3.2.1/fts_query.py": "854cbbf8b74a2655aef1bb0a2583a181749fc472c005582e2631306f8410f95a"
+  },
+  "local_evidence": "v2plan/artifacts/next07/grounded-first/read-repair-JYWxAH",
+  "53_pass_verified": true,
+  "replacement": "read packet selection/projection, no N fallback; facade request orchestration remains; discarded N selections never participate in C order",
+  "allowed_files": [
+    "v2plan/next07_grounded_public.py",
+    "v2plan/NEXT_07_READ_PIPELINE_OWNERSHIP_RU.md",
+    "new artifacts"
+  ],
+  "activation": "scoped research facade get_project_context and imported projection caller; metadata cannot enable",
+  "controls": {
+    "P1/P2/P3": "original fixtures then default-only",
+    "P4/P5": "unsupported phrasing/admin request original source; no credit",
+    "N1/N2/N3": "working positive then identity/module/version/security/lifecycle/snapshot/hash/span mutations",
+    "N4": "disabled positive/enabled negative",
+    "N5": "negated source preserved",
+    "N6/N7": "restriction/owner dependencies preserved or rejected",
+    "N8": "other subject matching token rejected",
+    "N9": "whole oversized omitted, no clipping",
+    "N10": "heading/echo rejected; frozen scattered policy unchanged"
+  },
+  "stop": "first meaningful failure => REJECTED; no algorithm changes, no I.5 replay after I.4 failure"
+}

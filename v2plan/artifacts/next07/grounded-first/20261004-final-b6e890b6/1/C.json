@@ -1,0 +1,26 @@
+{
+  "request": {
+    "project_path": "/home/viadmin/StudioProjects/hermes/docmancer/v2plan/artifacts/next07/grounded-first/20261004-final-b6e890b6/1/corpus",
+    "scope": "project",
+    "question": "What is LeaseClient default timeout duration for requests and which exception is raised when an operation expires?"
+  },
+  "public_payload": {
+    "status": "failed",
+    "error": {
+      "reason_code": "handler_exception",
+      "message": "handler_exception: request failed",
+      "exception_type": "TypeError",
+      "retryable": false,
+      "where": {
+        "tool": "get_docs_context",
+        "handler": null,
+        "phase": "execution"
+      },
+      "hints": [
+        "Check diagnostics/logs; retry only after the underlying handler issue is fixed."
+      ]
+    },
+    "warnings": []
+  },
+  "projection_attempts": []
+}
