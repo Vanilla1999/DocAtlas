@@ -9,6 +9,7 @@ from pathlib import Path
 import sqlite3
 
 from docmancer.core.structured_chunking import parse_markdown_parents
+from v2plan.next07_owner_delivery import delivery_spans, materialize_hit
 
 
 PORTS = Path(__file__).parent / 'third_party/grounded-3.2.1'
@@ -58,7 +59,9 @@ def proposals(documents, question):
                 'owner_spans': [[p.char_start, p.char_end] for p in owners],
                 'dependency_spans': 'NOT_PREPARED until scoped source preparation in I.3; not approval',
                 'byte_start': len(raw[:start].encode()), 'byte_end': len(raw[:end].encode())})
-    return rank_rows(rows, question), omissions
+    # Ranking still sees the original search chunks. Materialization is a
+    # single pre-admission step, not a fallback after a window is rejected.
+    return [materialize_hit(row) for row in rank_rows(rows, question)], omissions
 
 
 def _source_state_witness(frame, question, observed_text, observed_state, body,
@@ -133,8 +136,8 @@ def read_decision(candidate, *, question, expected_project_identity, lifecycle_i
     raw, identity = evidence['raw_document'], evidence['source']
     start, end = candidate['char_span']
     indexed_spans, _ = structural_spans(raw, identity['document_id'])
-    if (start, end) not in indexed_spans:
-        return reject('not_whole_indexed_unit')
+    if (start, end) not in delivery_spans(raw, identity['document_id'], indexed_spans):
+        return reject('not_whole_owner_unit')
     roles = query_constraint_roles(question)
     trace, reason = prepare_source_probe({'query_text': question,
         'query_terms': list(documentation_query_terms(question)), 'exact_terms': list(roles.hard_exact),
