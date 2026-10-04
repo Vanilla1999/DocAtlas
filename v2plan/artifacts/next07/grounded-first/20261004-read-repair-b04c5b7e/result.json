@@ -1,0 +1,19 @@
+{
+  "base_commit": "b04c5b7ea1bfbdbbe9f439cefee2bab206c513e2",
+  "verdict": "RESEARCH_REPAIR_IMPLEMENTED; NATIVE_ACCEPTANCE_NOT_RUN",
+  "pure_definition_checks": {"count": 22, "failures": 0, "errors": 0, "elapsed_seconds_reported_by_pytest": 0.07},
+  "test_scope": "22 new pure helper/dispatch checks. Witness spies validate dispatch only; NOT the real default_local_witness, source guards, original 24 I.3 tests, or final C.",
+  "runtime": {"python": "3.13.5 (main, Jul 15 2026, 20:25:40) [GCC 14.2.0]", "platform": "Linux-6.18.44-x86_64-with-glibc2.41"},
+  "source_guard_and_exact_binding_block_unchanged": true,
+  "heading_echo_and_final_read_flag_block_unchanged": true,
+  "retrieval_functions_ast_unchanged": true,
+  "preexisting_test_blob_unchanged": "c8ce3ea1a0b2a37c490bbe3cb116acc03e5a5c7e",
+  "files": {
+    "next07_grounded_candidate.py": {"sha256": "5ac8e2600a12d216070087a50c9ddc64c8efaaff2f399d70e2b345db0bf71ff7", "git_blob": "d05bfd1232012059e63940cb91548b2ac979d8ee"},
+    "test_next07_grounded_read_repairs.py": {"sha256": "c0e4c2f72d562ffd09ec7f1be9820ea035ef3cdafa249f427662459fa1d5f40e", "git_blob": "66678a4e3b278a7d30b898dbd6ef4eef73d1915d"},
+    "pure-tests.xml.gz": {"sha256": "9ffe91b9902cfbc67445d200d17032b35eb973498c228d21f80057f4f89c113b"}
+  },
+  "not_run": ["7 new real-native-matcher checks", "24 existing authenticated I.3 checks", "remaining mandatory controls", "C final packet", "800/3 final validation", "49-claim/partial retention", "full suite/gates", "unseen/reader"],
+  "no_changes_to": ["runtime modules", "Grounded ports", "original fixtures", "frozen labels", "budgets", "source guards", "main", "historical artifacts"],
+  "important_limitation": "Requiring full parsed sections may lower recall. Failure of retention must reject this candidate; no threshold/grammar tuning or silent test migration."
+}

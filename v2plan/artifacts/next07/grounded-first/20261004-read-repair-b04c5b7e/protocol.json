@@ -1,0 +1,19 @@
+{
+  "base_commit": "b04c5b7ea1bfbdbbe9f439cefee2bab206c513e2",
+  "branch": "next07-feasibility-audit",
+  "authorization": "User requested direct assistance after b04c5b7e; new research revision, never rewrite rejected evidence.",
+  "scope": "I.3 read responsibility only; no runtime/default changes",
+  "stages": [
+    {"id": "R1", "replace": "opposite-state witness dispatch for already parsed default", "rule": "Reuse default_local_witness with source-observed state substituted only at parsed question state offsets. Other operators retain relation_local_witness. No new grammar, no applicability credit."},
+    {"id": "R2", "replace": "edge-only preservation decision", "rule": "Require complete parser-owned sections for any proposed read window, and retain existing dependency edge checks. Reject partial section with hidden_structural_dependency, never expand/read/clip/rescue."}
+  ],
+  "unchanged": ["proposals", "rank_rows", "ports", "source_window_eligibility", "prepare_source_probe", "source/exact/identity guards", "public flags", "800/3", "existing 24 test assertions", "runtime modules"],
+  "mandatory_positives": ["17/LeaseExpired", "29/WaitExpired", "default only", "unsupported question with full source", "full source with trailing restriction", "complete sections in multi-section document"],
+  "mandatory_negatives": ["disabled vs enabled default", "enabled vs disabled default", "same canonical state is not opposite", "different subject/property/entity cannot establish mismatch", "partial section with distant restriction", "hidden declared dependency", "no source guard bypass"],
+  "completion": "LOCAL_REPAIR_TESTED only for checks actually executed; 24 fixture harness and final packet must be labelled NOT_RUN if no full checkout. No native acceptance/rollout without real pipeline.",
+  "stop": "Do not change policy/thresholds/fixtures after semantic failure; retain all results. No further layers in this revision.",
+  "known_tradeoff": "Whole-section requirement may reduce recall/49-claim retention. Not a general semantic dependency certificate. Must be measured before integration.",
+  "execution_limitation": "Full checkout/dependencies unavailable locally (DNS lookup fails); connector remains read/write accessible.",
+  "preexisting_test_blob": "c8ce3ea1a0b2a37c490bbe3cb116acc03e5a5c7e",
+  "new_test_classification": "Additional development unit checks, not held-out. Existing acceptance inputs and assertions remain those frozen in b04c5b7e."
+}

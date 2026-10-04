@@ -61,15 +61,63 @@ def proposals(documents, question):
     return rank_rows(rows, question), omissions
 
 
+def _source_state_witness(frame, question, observed_text, observed_state, body,
+                          *, default_witness, relation_witness):
+    """Dispatch to existing witnesses; this counterfactual is never a lookup.
+
+    A default has a separate established matcher. Replace only the parsed state
+    occurrence for that matcher, so it can witness the source's *actual* state.
+    The original request, source bytes, and public applicability remain intact.
+    Unknown/absent witnesses never establish a condition mismatch.
+    """
+    from dataclasses import replace
+
+    if frame.operator == 'default':
+        state = next((slot for slot in frame.constraints if slot.role == 'condition_state'), None)
+        if state is None or question[state.start:state.end] != state.text:
+            return None, ()
+        source_question = question[:state.start] + observed_text + question[state.end:]
+        return default_witness({
+            'text': source_question, 'need_subject': frame.subject,
+            'query_id': 'read-source-condition',
+        }, body)
+    actual_constraints = tuple(
+        replace(slot, canonical=observed_state) if slot.role == 'condition_state' else slot
+        for slot in frame.constraints
+    )
+    return relation_witness(replace(frame, constraints=actual_constraints), body)
+
+
+def _hidden_structural_dependency(owners, edges, start, end):
+    """Reject cut Markdown owners as well as missing declared dependencies.
+
+    A whole greedy chunk may still be only a prefix of its source section.
+    Without a semantic restriction parser we cannot certify that its unseen
+    tail is irrelevant. Require each intersected parser-owned section in full;
+    do not expand the window, fetch a parent, or alter retrieval/packing limits.
+    This is a conservative structural check, not semantic completeness proof.
+    """
+    for owner in owners:
+        if owner.char_start < end and start < owner.char_end:
+            if not start <= owner.char_start < owner.char_end <= end:
+                return True
+    for edge in edges:
+        child, parent = edge.child, edge.parent
+        if child.start < end and start < child.end:
+            if not start <= parent.start < parent.end <= end:
+                return True
+    return False
+
+
 def read_decision(candidate, *, question, expected_project_identity, lifecycle_intent='current'):
     """I.3 single read owner. Never returns proof/applicability credit."""
-    from dataclasses import replace
     from docmancer.docs.domain.source_window_eligibility import source_window_eligibility, prepare_source_probe
     from docmancer.docs.domain.query_terms import query_constraint_roles, documentation_query_terms
     from docmancer.docs.domain.technical_tokens import technical_term_pattern
     from docmancer.docs.domain.evidence_set_types import ScopeKey, SourceKey
     from docmancer.docs.domain.source_dependency_graph import source_graph
     from docmancer.docs.domain.admission_grammar import parse_admission_frame, _STATES
+    from docmancer.docs.domain.admission_local_binding import default_local_witness
     from docmancer.docs.domain.admission_relations import _PREFIX_CONDITION, _phrase, relation_local_witness
     from docmancer.docs.application.read_context_admission import ReadContextAdmission
 
@@ -102,10 +150,9 @@ def read_decision(candidate, *, question, expected_project_identity, lifecycle_i
     scope = ScopeKey(**identity['scope'])
     key = SourceKey(scope, identity['document_id'], identity['canonical_path'], identity['content_sha256'])
     graph = source_graph(raw, key)
-    for edge in graph.edges:
-        child, parent = edge.child, edge.parent
-        if child.start < end and start < child.end and not start <= parent.start < parent.end <= end:
-            return reject('hidden_structural_dependency')
+    owners = parse_markdown_parents(raw, identity['document_id'])
+    if _hidden_structural_dependency(owners, graph.edges, start, end):
+        return reject('hidden_structural_dependency')
     # Reuse the existing supported grammar and relation-local witness, not mixed
     # False. Only a locally witnessed opposite canonical enabled/disabled clause
     # is a mismatch; unsupported language remains unknown.
@@ -117,10 +164,11 @@ def read_decision(candidate, *, question, expected_project_identity, lifecycle_i
             match = _PREFIX_CONDITION.match(normalized)
             if (match and re.fullmatch(_phrase(required['condition_subject'].text), match['entity'], re.I)
                     and _STATES[match['state'].casefold()] != required['condition_state'].canonical):
-                actual_constraints = tuple(replace(slot, canonical=_STATES[match['state'].casefold()])
-                    if slot.role == 'condition_state' else slot for slot in frame.constraints)
-                witnessed, _ = relation_local_witness(replace(frame, constraints=actual_constraints), normalized)
-                if witnessed:
+                witnessed, _ = _source_state_witness(
+                    frame, question, match['state'], _STATES[match['state'].casefold()], normalized,
+                    default_witness=default_local_witness, relation_witness=relation_local_witness,
+                )
+                if witnessed is True:
                     return reject('existing_local_condition_mismatch')
     # Keep the old heading-only/question-echo exclusion, without lexical floors.
     query_words = ' '.join(re.findall(r'\w+(?:[.-]\w+)*', question.casefold()))
