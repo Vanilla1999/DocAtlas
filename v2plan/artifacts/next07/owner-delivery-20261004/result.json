@@ -1,0 +1,52 @@
+{
+  "baseline": "ea7eef380eb2b0a11b0216063939b2b8ae1773de",
+  "reviewed_code_commit": "5f982a568ccfc8794062c7d35009190b213daa21",
+  "review_commit": "4dfd4e759cce5b0a6c3913d8b8c1b75978cdeaf4",
+  "executed_commit": "79534699f8221448a5e4a8f8432568046040219d",
+  "workflow_run": 37233045584,
+  "artifact_id": 11314577329,
+  "artifact_sha256": "96777481bdde68a8d7b6cff505bcb256d6a018708e8ca1bdb09402e7589b0f4d",
+  "tests": {"passed": 173, "failed": 0, "skipped": 0, "environment": "full project; actual native service and MCP handler"},
+  "target": {"verdict": "VALIDATED_LOCAL_COMPACT_TARGET", "cases": [
+    {"case": "P1", "passed": true, "cost": 611, "sources": 3, "audit_errors": []},
+    {"case": "P2", "passed": true, "cost": 601, "sources": 3, "audit_errors": []},
+    {"case": "P3", "passed": true, "cost": 439, "sources": 2, "audit_errors": []}
+  ]},
+  "corpus": {
+    "status": "CORPUS_DIAGNOSTICS_COMPLETE",
+    "executed_evaluated_pairs": 80,
+    "public_calls": {"N": 80, "C": 80},
+    "frozen_inputs_unchanged": true,
+    "fresh_assessor_only": {"retained": 46, "lost_recognized_support": 3, "gained": 6},
+    "fresh_retained_with_clean_audit_both_arms": 40,
+    "C_supported_with_clean_audit": 44,
+    "N_audit_failed_cases": [],
+    "C_audit_failed_cases": ["pydantic-01", "pydantic-07", "pydantic-08", "pydantic-10", "ruff-01", "ruff-03", "ruff-04", "ruff-05", "ruff-06", "ruff-07", "ruff-08", "ruff-09", "ruff-10", "uv-02", "uv-05", "uv-08", "uv-09"],
+    "historical_49": {"retained": 40, "lost": 0, "UNKNOWN": 9,
+      "UNKNOWN_ids": [["fastapi-02","required"],["pydantic-01","required"],["pydantic-07","required"],["ruff-01","required"],["ruff-03","required"],["ruff-04","required"],["ruff-06","required"],["ruff-07","required"],["uv-05","required"]]},
+    "C_vs_previous_C_assessor_only": {"retained": 26, "lost": 0, "gained": 26},
+    "previous_C_supported_now_in_audit_failed_packets": [["ruff-01","required"],["ruff-03","required"],["ruff-04","required"],["ruff-05","required"],["ruff-07","required"]],
+    "baseline_N_drift": {"lost_recognized_support": [["ruff-05","required"]], "cause": "UNOBSERVED"},
+    "remaining_lost_vs_same_run_N": [
+      {"id":["fastapi-02","required"],"observed_reason":"missing_visible_exact_or_subject","stage":"read_decision"},
+      {"id":["ruff-06","required"],"observed_reason":"selected source clipped by transport after handler validation","stage":"post_handler_compaction"},
+      {"id":["uv-05","required"],"observed_reason":"selected source clipped by transport after handler validation","stage":"post_handler_compaction"}
+    ],
+    "all_read_rejection_events": {"hidden_structural_dependency": 0, "missing_visible_exact_or_subject": 157},
+    "post_transport_size": {"C_median_tokens": 3240.5, "C_max_tokens": 8850, "C_max_sources": 17}
+  },
+  "transport_defect": {
+    "trigger_bytes": 32000,
+    "text_limit_chars": 900,
+    "list_limit": 8,
+    "changed_snippets": 115,
+    "function": "compact_mcp_payload",
+    "after_clean_handler_validator": true,
+    "transport_modified_in_this_trial": false
+  },
+  "initial_run": {"id":37232816139,"artifact_id":11313889328,"artifact_sha256":"9c97b4bc3e4dbd46f806302c79d02ed1ea4be65954e837d0c8cab083799e1f37","passed":172,"failed":1,"classification":"new test precondition invalid before tested call; corrected test data only; old outputs retained"},
+  "verdict": "REJECTED_SOURCE_INTEGRITY",
+  "N10": "EXCLUDED_BY_USER_NOT_RUN; historical REJECTED unchanged",
+  "rollout": "NOT_AUTHORIZED",
+  "not_run": ["N10", "historical_partial_ledger_retention", "complete_extra_context_review", "full_product_suite", "release_gates"]
+}
