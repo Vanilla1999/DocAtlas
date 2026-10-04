@@ -103,7 +103,7 @@ def test_consumer_recomputes_canonical_units_and_rejects_clipped_tail():
 
 
 def test_proposals_rank_search_text_before_materialization(monkeypatch):
-    raw = '# Owner\n\n' + ('Body sentence.\n\n' * 220) + 'Only when X.\n'
+    raw = '# Owner\n\n' + ('Body sentence.\n\n' * 400) + 'Only when X.\n'
     indexed, _ = candidate.structural_spans(raw, 'd')
     assert len(indexed) > 1
     observed = {}

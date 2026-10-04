@@ -39,7 +39,7 @@ jobs:
           expected = {
               'v2plan/next07_owner_delivery.py': '8950a4c4cc7d7f5b5e4a42c96825edd5dd57e124bbd40c04ebac4c1b3448fe63',
               'v2plan/next07_grounded_candidate.py': '19ba718c15da60a2dcdff42f1a3796136d50b6fa3d554407bc0cfdc94daf90d3',
-              'v2plan/test_next07_owner_delivery.py': 'f937d6b5192595c1bfc1f8d0cc0a43f7c34412ce4036872328b452e76f6a4690',
+              'v2plan/test_next07_owner_delivery.py': '20c672aee2693bce6d0339d99b033fd3b72f4ade4e6140f6c28759320d6be7f1',
           }
           for name, digest in expected.items():
               assert hashlib.sha256(Path(name).read_bytes()).hexdigest() == digest, name
