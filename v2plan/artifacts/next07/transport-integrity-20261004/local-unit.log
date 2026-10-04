@@ -1,0 +1,12 @@
+Command: PYTHONPATH=work python -m pytest -q work/v2plan/test_next07_transport_integrity.py -k unit --junitxml=unit.xml
+29 passed, 6 deselected in 0.10s
+Scope: exact transport/policy functions; no SDK or native service used by this selected subset.
+
+Old output_contract.py blob verified: 381325c8b8527d9a72d4509829e4bf7fa8abb2d0
+Fixed test packet: 12 original sources, each >900 chars, aggregate >32000 UTF-8 bytes.
+baseline status: ok sources: 8 same_payload: False
+baseline changed snippets: 8
+fixed default finite: status=failed reason_code=transport_size_limit, no sources
+fixed compact: ok sources: 12 same_payload: True
+
+This local result is NOT native acceptance. Full project execution follows review.

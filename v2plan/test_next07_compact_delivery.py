@@ -46,7 +46,7 @@ def test_invalid_line_coordinates(start, end):
         source_line_text('a\nb\n', start, end)
 
 
-@pytest.mark.parametrize('field', ['max_tokens', 'max_sources', 'max_snippet_chars'])
+@pytest.mark.parametrize('field', ['max_tokens', 'max_sources', 'max_snippet_chars', 'max_transport_bytes'])
 @pytest.mark.parametrize('bad', [0, -1, True, 1.5])
 def test_limits_are_positive_or_absent(field, bad):
     with pytest.raises(ValueError):
@@ -57,7 +57,7 @@ def test_limits_are_scoped_and_restore_on_exception():
     assert current_read_delivery_limits() is None
     with use_read_delivery_limits(COMPACT_READ_LIMITS):
         assert asdict(current_read_delivery_limits()) == dict(
-            max_tokens=None, max_sources=None, max_snippet_chars=None)
+            max_tokens=None, max_sources=None, max_snippet_chars=None, max_transport_bytes=None)
         with pytest.raises(RuntimeError):
             with use_read_delivery_limits(ReadDeliveryLimits(max_tokens=100)):
                 raise RuntimeError('scope canary')

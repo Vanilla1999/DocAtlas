@@ -18,15 +18,17 @@ class ReadDeliveryLimits:
     max_tokens: int | None = None
     max_sources: int | None = None
     max_snippet_chars: int | None = None
+    # Kept finite for custom/legacy policies unless the trusted caller opts out.
+    max_transport_bytes: int | None = 32_000
 
     def __post_init__(self) -> None:
-        for name in ('max_tokens', 'max_sources', 'max_snippet_chars'):
+        for name in ('max_tokens', 'max_sources', 'max_snippet_chars', 'max_transport_bytes'):
             value = getattr(self, name)
             if value is not None and (type(value) is not int or value < 1):
                 raise ValueError(f'{name} must be a positive integer or None')
 
 
-COMPACT_READ_LIMITS = ReadDeliveryLimits()
+COMPACT_READ_LIMITS = ReadDeliveryLimits(max_transport_bytes=None)
 _ACTIVE: ContextVar[ReadDeliveryLimits | None] = ContextVar(
     'docatlas_read_delivery_limits', default=None,
 )

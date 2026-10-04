@@ -4,6 +4,8 @@ from copy import deepcopy
 import json
 from typing import Any
 
+from docmancer.docs.domain.read_delivery_limits import current_read_delivery_limits
+
 DEFAULT_MCP_COMPACT_OUTPUT_MAX_BYTES = 32_000
 _TEXT_KEYS = {"content", "snippet", "text", "primary_snippet", "surrounding_context"}
 _SUMMARY_KEYS = (
@@ -170,12 +172,47 @@ def _fit_payload(payload: dict[str, Any], *, max_bytes: int) -> dict[str, Any]:
 def compact_mcp_payload(
     payload: dict[str, Any],
     *,
-    max_bytes: int = DEFAULT_MCP_COMPACT_OUTPUT_MAX_BYTES,
+    max_bytes: int | None = None,
     tool: str | None = None,
     page: int | None = None,
     page_size: int | None = None,
     include_sections: list[str] | None = None,
 ) -> dict[str, Any]:
+    """Finalize output without rewriting canonical citation/answer projections.
+
+    ``max_bytes=None`` selects the trusted caller's read transport policy, or
+    the legacy default when no policy is active. An explicit integer always
+    takes precedence. No payload field can select an unlimited policy.
+
+    A typed projection is an indivisible contract, not a bag of strings: its
+    citations, coordinates, estimates and support decisions must survive both
+    the dispatcher and SDK serialization unchanged. An actual finite limit
+    produces a standalone failure rather than partly retained evidence.
+    Other rich/administrative outputs keep the existing lossy compaction.
+    """
+    if max_bytes is not None and (type(max_bytes) is not int or max_bytes < 1):
+        raise ValueError("max_bytes must be a positive integer or None")
+    kind = payload.get("kind")
+    read_limits = current_read_delivery_limits() if kind == "docs_context" else None
+    byte_limit = (
+        max_bytes if max_bytes is not None else
+        read_limits.max_transport_bytes if read_limits is not None else
+        DEFAULT_MCP_COMPACT_OUTPUT_MAX_BYTES
+    )
+    if kind in ("docs_context", "docs_answer", "patch_context"):
+        if byte_limit is None or json_bytes(payload) <= byte_limit:
+            return payload
+        failure = {
+            "status": "failed",
+            "reason_code": "transport_size_limit",
+            "message": "MCP payload exceeded the transport size limit.",
+        }
+        if json_bytes(failure) > byte_limit:
+            raise ValueError("transport limit cannot fit the minimal error payload")
+        return failure
+
+    # No active read policy applies to untyped or administrative output.
+    max_bytes = max_bytes if max_bytes is not None else DEFAULT_MCP_COMPACT_OUTPUT_MAX_BYTES
     if json_bytes(payload) <= max_bytes:
         return payload
 
