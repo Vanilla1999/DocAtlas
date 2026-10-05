@@ -5,4 +5,5 @@ eval/evidence_quality_v2/run.py	mechanical source range audit	ALLOW
 tests/docs/test_empty_docs_context_payload.py	constructor regression	ALLOW
 tests/docs/test_finalized_mcp_output_integrity.py	terminal regression	ALLOW
 tests/docs/test_source_range_audit_integrity.py	range regression	ALLOW
+tests/diagnostic_labels.output_integrity.json	hash-bound registration of new tests only	ALLOW_TECHNICAL_AMENDMENT
 v2plan/main-pr1/*	documentation and evidence only	ALLOW
