@@ -1,0 +1,9 @@
+{
+  "v2plan/NEXT_07_READER_NAVIGATION_TEST_RU.md": "b98ed5c6147134135de5fd93c06a001e613f347165db1416f15fe3e72f29445a",
+  "v2plan/next07_reader_experiment/__init__.py": "539f2e55696abbf8870079a813db3cef7140f89b0925d93f0cbd16d1614ed667",
+  "v2plan/next07_reader_experiment/cases.py": "56085bec4dcd7b2afae4f443709fe02fe7098314c2fe8603d596894a973627fc",
+  "v2plan/next07_reader_experiment/host.py": "6435bcb69277a32823dcd232e63f67103523ace9db43690de270344065cfa23c",
+  "v2plan/next07_reader_experiment/model.py": "1981e8bbfd82335ab79e1ef42a85446571853bcf7863b219549cc7be953b094c",
+  "v2plan/next07_reader_experiment/run.py": "0591210d8e1f8adfe28469f41f28bbdbe87d64a62466c9874726812bd965a4ce",
+  "v2plan/test_next07_reader_experiment.py": "e9d54c69f9ccf32863ecd80b12b0d856173295248cc21fee15c2e4907e4c94fe"
+}
