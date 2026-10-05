@@ -1,0 +1,4 @@
+{
+  "original_sha256": "1db86d8bfcc089de5a5de07d96a73ce8c3671bb0f3d82e195ebbe7e39d80ef94",
+  "raw_text": "Agent Developer adversarial v2: 27/28 cases; v1=11 target-green; v1-max-tokens=757; v2-max-tokens=790; violations=3\n- module_scope_rejects_project_policy_detail: call 1: context projection 380>300 tokens\n- module_scope_rejects_project_policy_detail: call 1: status='ok' expected='insufficient_evidence'\n- module_scope_rejects_project_policy_detail: trajectory projection 380>300 tokens\nAgent Developer adversarial v2: FAIL\n"
+}

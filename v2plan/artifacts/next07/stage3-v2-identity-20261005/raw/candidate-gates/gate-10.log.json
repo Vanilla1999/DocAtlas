@@ -1,0 +1,4 @@
+{
+  "original_sha256": "bb650b1a1feecca4dffce33b90d94ff956a7b9243628808138950676c2843728",
+  "raw_text": "KILLED: normative_code_declaration_guard\nKILLED: active_task33_actionability_contract\nKILLED: github_models_host_turn_limit\nPASS: baseline green; 3 critical mutants killed\n"
+}

@@ -1,0 +1,5 @@
+{
+  "encoding": "raw_text UTF-8; restore without whitespace normalization",
+  "original_sha256": "6bb09e1fc31e2b0944163c65da248d80bf179ccca8de831e055bc6cc6ae875ba",
+  "raw_text": "* Creating isolated environment: venv+pip...\n* Installing packages in isolated environment:\n  - hatchling<1.27\n* Getting build dependencies for wheel...\n* Installed build dependency versions:\n  - hatchling==1.26.3\n* Building wheel...\nSuccessfully built doc_atlas-1.3.2-py3-none-any.whl\n"
+}

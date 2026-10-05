@@ -1,0 +1,5 @@
+{
+  "encoding": "raw_text UTF-8; restore without whitespace normalization",
+  "original_sha256": "18fd9cb8b074a293de9edc9452838304d1ca7ccc76ca578950a8c707c4dbe962",
+  "raw_text": "........................................................................ [ 65%]\n......................................                                   [100%]\n=============================== warnings summary ===============================\ntests/docs/test_finalized_mcp_output_integrity.py::test_dispatcher_and_sdk_use_the_same_terminal_contract[False-False]\n  /tmp/opencode/docatlas-stage3-candidate-env/lib/python3.12/site-packages/starlette/formparsers.py:12: PendingDeprecationWarning: Please use `import python_multipart` instead.\n    import multipart\n\n-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html\n110 passed, 1 warning in 2.56s\n"
+}

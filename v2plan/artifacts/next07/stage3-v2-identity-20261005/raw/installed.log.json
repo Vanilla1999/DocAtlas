@@ -1,0 +1,5 @@
+{
+  "encoding": "raw_text UTF-8; restore without whitespace normalization",
+  "original_sha256": "034673e78afe329011fd03bffd32a0873fccc9f253d4cefa9294520940d1b974",
+  "raw_text": "Installed MCP Agent benchmark: origin=reviewed-wheel; model=deterministic-script; 1/1 pass; false-supported=0; contamination=0; schema=21e396d97be40cceb44bac0dff7eefc82cecada47263ba28da400719c4a429b3\n"
+}

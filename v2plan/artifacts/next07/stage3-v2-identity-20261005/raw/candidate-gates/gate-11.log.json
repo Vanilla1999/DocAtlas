@@ -1,0 +1,4 @@
+{
+  "original_sha256": "839bcce577c4a45062262a936727d5ca729c6b4e972db286b6f3ecca3397c565",
+  "raw_text": "KILLED: agent_projection_budget_guard\nKILLED: agent_trajectory_budget_guard\nKILLED: agent_forbidden_source_guard\nKILLED: agent_exact_scope_guard\nKILLED: agent_retry_candidate_guard\nKILLED: agent_edit_readiness_guard\nKILLED: project_module_ambiguity_guard\nKILLED: project_status_module_projection_guard\nKILLED: module_recovery_reason_projection_guard\nPASS: Agent Developer adversarial baseline green; 9 critical mutants killed\n"
+}

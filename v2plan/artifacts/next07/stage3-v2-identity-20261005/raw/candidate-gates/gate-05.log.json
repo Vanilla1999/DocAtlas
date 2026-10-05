@@ -1,0 +1,4 @@
+{
+  "original_sha256": "82ecaa1cde57cd78635eccb15475cc3e81eeea6ededf3d9892a83728520844fc",
+  "raw_text": "Legacy lineage compatibility floor: FAIL\n- original query coverage below frozen floor: 11 < 12\n"
+}

@@ -1,0 +1,1396 @@
+{
+  "identity_only_byte_proof": "PASS",
+  "base": "d2ed5c4c73dc3b7d56276fc37591cba8a4ae123c",
+  "protocol_sha256": "a48010f3432327e996a37bcf92b2891b2ce324d3a81b87139c6b3db090d80477",
+  "documents": [
+    {
+      "path": "README.md",
+      "historical_commit": "be4e9c7e5aa2dfa3a99aabb06078ac7015f8a295",
+      "historical_blob": "1a1975b2ffaf587f3b752c1966acdb20e7a88468",
+      "expected_sha256": "4bc778b1dfaf72dcd1058427a8477841fea62e500b20913471ae05e74e9be2d9",
+      "current_sha256": "82975e09e63a5897c0f0867fbf370af4038360e489a3baa71d6378b98f2498bb",
+      "witness_checks": [
+        {
+          "obligation": {
+            "id": "install",
+            "accepted_authorities": [
+              "source_of_truth"
+            ],
+            "accepted_scopes": [
+              "project"
+            ],
+            "accepted_witnesses": [
+              {
+                "path": "README.md",
+                "text": "curl -LsSf https://raw.githubusercontent.com/Vanilla1999/DocAtlas/main/scripts/install.sh | sh"
+              }
+            ]
+          },
+          "frozen_statement_lines": [
+            "curl -LsSf https://raw.githubusercontent.com/Vanilla1999/DocAtlas/main/scripts/install.sh | sh",
+            "curl -LsSf https://raw.githubusercontent.com/Vanilla1999/DocAtlas/main/scripts/install.sh | sh",
+            "curl -LsSf https://raw.githubusercontent.com/Vanilla1999/DocAtlas/main/scripts/install.sh | sh -s -- claude-code opencode"
+          ],
+          "affected_cases": [
+            {
+              "id": "v2-natural-install-verify",
+              "migrated_from": "natural-install-verify",
+              "lane": "natural",
+              "question": "Я впервые ставлю DocAtlas на свой компьютер. Как его установить и убедиться, что установка исправна?",
+              "original_question": "Я впервые ставлю DocAtlas на свой компьютер. Как его установить и убедиться, что установка исправна?",
+              "scope": "project",
+              "expected_kind": "docs_context",
+              "lookup_queries": [
+                "How can I install the local documentation tool?",
+                "How can I check whether the installation is healthy?"
+              ],
+              "lookup_query_ids": [
+                "query-lookup-1",
+                "query-lookup-2"
+              ],
+              "expected_public_query_ids": [
+                "query-original",
+                "query-lookup-1",
+                "query-lookup-2"
+              ],
+              "obligations": [
+                {
+                  "obligation_id": "install",
+                  "lookup_query_ids": [
+                    "query-lookup-1"
+                  ]
+                },
+                {
+                  "obligation_id": "verify",
+                  "lookup_query_ids": [
+                    "query-lookup-2"
+                  ]
+                }
+              ]
+            }
+          ],
+          "statement_lines_unchanged": true
+        },
+        {
+          "obligation": {
+            "id": "verify",
+            "accepted_authorities": [
+              "source_of_truth"
+            ],
+            "accepted_scopes": [
+              "project"
+            ],
+            "accepted_witnesses": [
+              {
+                "path": "wiki/Commands.md",
+                "text": "doc-atlas doctor"
+              },
+              {
+                "path": "README.md",
+                "text": "doc-atlas --version"
+              }
+            ]
+          },
+          "frozen_statement_lines": [
+            "> It installs the latest published PyPI package, not unreleased code from `main`. Check `doc-atlas --version` before relying on a workflow newly documented on `main`; use a deliberately checked-out source installation for development changes that have not been released."
+          ],
+          "affected_cases": [
+            {
+              "id": "v2-natural-install-verify",
+              "migrated_from": "natural-install-verify",
+              "lane": "natural",
+              "question": "Я впервые ставлю DocAtlas на свой компьютер. Как его установить и убедиться, что установка исправна?",
+              "original_question": "Я впервые ставлю DocAtlas на свой компьютер. Как его установить и убедиться, что установка исправна?",
+              "scope": "project",
+              "expected_kind": "docs_context",
+              "lookup_queries": [
+                "How can I install the local documentation tool?",
+                "How can I check whether the installation is healthy?"
+              ],
+              "lookup_query_ids": [
+                "query-lookup-1",
+                "query-lookup-2"
+              ],
+              "expected_public_query_ids": [
+                "query-original",
+                "query-lookup-1",
+                "query-lookup-2"
+              ],
+              "obligations": [
+                {
+                  "obligation_id": "install",
+                  "lookup_query_ids": [
+                    "query-lookup-1"
+                  ]
+                },
+                {
+                  "obligation_id": "verify",
+                  "lookup_query_ids": [
+                    "query-lookup-2"
+                  ]
+                }
+              ]
+            }
+          ],
+          "statement_lines_unchanged": true
+        },
+        {
+          "obligation": {
+            "id": "purpose",
+            "accepted_authorities": [
+              "source_of_truth"
+            ],
+            "accepted_scopes": [
+              "project"
+            ],
+            "accepted_witnesses": [
+              {
+                "path": "README.md",
+                "text": "guessing from stale or generic documentation"
+              }
+            ]
+          },
+          "frozen_statement_lines": [
+            "Local-first documentation context remains the runtime foundation: DocAtlas solves the problem of coding agents guessing from stale or generic documentation. It turns reviewable project docs, lockfiles, and approved dependency documentation into compact, source-attributed evidence for coding agents. It keeps authority, scope, and version binding explicit and fails closed when mandatory evidence is unavailable. Its default MCP surface is deliberately small so agents select the correct operation reliably."
+          ],
+          "affected_cases": [
+            {
+              "id": "v2-natural-purpose-start",
+              "migrated_from": "natural-purpose-start",
+              "lane": "natural",
+              "question": "Что это за проект и какую проблему он решает?",
+              "original_question": "Что это за проект и какую проблему он решает?",
+              "scope": "project",
+              "expected_kind": "docs_context",
+              "lookup_queries": [
+                "What is this project and who is it for?",
+                "What problem does this documentation tool solve for a coding agent?"
+              ],
+              "lookup_query_ids": [
+                "query-lookup-1",
+                "query-lookup-2"
+              ],
+              "expected_public_query_ids": [
+                "query-original",
+                "query-lookup-1",
+                "query-lookup-2"
+              ],
+              "obligations": [
+                {
+                  "obligation_id": "product",
+                  "lookup_query_ids": [
+                    "query-lookup-1"
+                  ]
+                },
+                {
+                  "obligation_id": "purpose",
+                  "lookup_query_ids": [
+                    "query-lookup-2"
+                  ]
+                }
+              ]
+            }
+          ],
+          "statement_lines_unchanged": true
+        },
+        {
+          "obligation": {
+            "id": "product",
+            "accepted_authorities": [
+              "source_of_truth"
+            ],
+            "accepted_scopes": [
+              "project"
+            ],
+            "accepted_witnesses": [
+              {
+                "path": "docs/PROJECT_MAP.md",
+                "text": "DocAtlas is a local-first documentation and context runtime for coding agents"
+              },
+              {
+                "path": "README.md",
+                "text": "It turns reviewable project docs, lockfiles, and approved dependency documentation into compact, source-attributed evidence for coding agents"
+              }
+            ]
+          },
+          "frozen_statement_lines": [
+            "Local-first documentation context remains the runtime foundation: DocAtlas solves the problem of coding agents guessing from stale or generic documentation. It turns reviewable project docs, lockfiles, and approved dependency documentation into compact, source-attributed evidence for coding agents. It keeps authority, scope, and version binding explicit and fails closed when mandatory evidence is unavailable. Its default MCP surface is deliberately small so agents select the correct operation reliably."
+          ],
+          "affected_cases": [
+            {
+              "id": "v2-natural-purpose-start",
+              "migrated_from": "natural-purpose-start",
+              "lane": "natural",
+              "question": "Что это за проект и какую проблему он решает?",
+              "original_question": "Что это за проект и какую проблему он решает?",
+              "scope": "project",
+              "expected_kind": "docs_context",
+              "lookup_queries": [
+                "What is this project and who is it for?",
+                "What problem does this documentation tool solve for a coding agent?"
+              ],
+              "lookup_query_ids": [
+                "query-lookup-1",
+                "query-lookup-2"
+              ],
+              "expected_public_query_ids": [
+                "query-original",
+                "query-lookup-1",
+                "query-lookup-2"
+              ],
+              "obligations": [
+                {
+                  "obligation_id": "product",
+                  "lookup_query_ids": [
+                    "query-lookup-1"
+                  ]
+                },
+                {
+                  "obligation_id": "purpose",
+                  "lookup_query_ids": [
+                    "query-lookup-2"
+                  ]
+                }
+              ]
+            }
+          ],
+          "statement_lines_unchanged": true
+        },
+        {
+          "obligation": {
+            "id": "sync",
+            "accepted_authorities": [
+              "source_of_truth"
+            ],
+            "accepted_scopes": [
+              "project"
+            ],
+            "accepted_witnesses": [
+              {
+                "path": "docs/project-docs-mcp-workflow.md",
+                "text": "sync_project_docs"
+              },
+              {
+                "path": "README.md",
+                "text": "prepare_docs(action=\"sync_project_docs\")"
+              }
+            ]
+          },
+          "frozen_statement_lines": [
+            "`prepare_docs(action=\"sync_project_docs\")` replaces the old two-step `inspect → ingest` loop. It:",
+            "| Reconcile after file changes | `prepare_docs(action=\"sync_project_docs\")` |"
+          ],
+          "affected_cases": [
+            {
+              "id": "v2-natural-sync-renames",
+              "migrated_from": "natural-sync-renames",
+              "lane": "natural",
+              "question": "Я переписал один документ и удалил другой. Как обновить поиск, чтобы старые разделы и удалённый файл больше не выдавались?",
+              "original_question": "Я переписал один документ и удалил другой. Как обновить поиск, чтобы старые разделы и удалённый файл больше не выдавались?",
+              "scope": "project",
+              "expected_kind": "docs_context",
+              "lookup_queries": [
+                "How do I reconcile documentation after editing repository files?",
+                "What happens to indexed sections when their source file changes?",
+                "How are deleted documentation files removed from search?"
+              ],
+              "lookup_query_ids": [
+                "query-lookup-1",
+                "query-lookup-2",
+                "query-lookup-3"
+              ],
+              "expected_public_query_ids": [
+                "query-original",
+                "query-lookup-1",
+                "query-lookup-2",
+                "query-lookup-3"
+              ],
+              "obligations": [
+                {
+                  "obligation_id": "sync",
+                  "lookup_query_ids": [
+                    "query-lookup-1"
+                  ]
+                },
+                {
+                  "obligation_id": "stale",
+                  "lookup_query_ids": [
+                    "query-lookup-2"
+                  ]
+                },
+                {
+                  "obligation_id": "orphans",
+                  "lookup_query_ids": [
+                    "query-lookup-3"
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "v2-natural-stale-health",
+              "migrated_from": "natural-stale-health",
+              "lane": "natural",
+              "question": "Поиск показывает старую документацию. Как проверить её состояние и убрать устаревшие разделы после правки файлов?",
+              "original_question": "Поиск показывает старую документацию. Как проверить её состояние и убрать устаревшие разделы после правки файлов?",
+              "scope": "project",
+              "expected_kind": "docs_context",
+              "lookup_queries": [
+                "How do I inspect documentation freshness?",
+                "How can I reconcile stale indexed sections with edited files?"
+              ],
+              "lookup_query_ids": [
+                "query-lookup-1",
+                "query-lookup-2"
+              ],
+              "expected_public_query_ids": [
+                "query-original",
+                "query-lookup-1",
+                "query-lookup-2"
+              ],
+              "obligations": [
+                {
+                  "obligation_id": "health",
+                  "lookup_query_ids": [
+                    "query-lookup-1"
+                  ]
+                },
+                {
+                  "obligation_id": "sync",
+                  "lookup_query_ids": [
+                    "query-lookup-2"
+                  ]
+                },
+                {
+                  "obligation_id": "stale",
+                  "lookup_query_ids": [
+                    "query-lookup-2"
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "v2-paraphrase-reconcile-files",
+              "migrated_from": "paraphrase-reconcile-files",
+              "lane": "exposed_paraphrases",
+              "question": "The search cache still knows about a removed guide and an earlier revision. How do I bring both back in line with the working files?",
+              "original_question": "The search cache still knows about a removed guide and an earlier revision. How do I bring both back in line with the working files?",
+              "scope": "project",
+              "expected_kind": "docs_context",
+              "lookup_queries": [
+                "How do repository files and the documentation index get reconciled?",
+                "How are changed documentation sections replaced?",
+                "What removes orphaned documentation sources from the index?"
+              ],
+              "lookup_query_ids": [
+                "query-lookup-1",
+                "query-lookup-2",
+                "query-lookup-3"
+              ],
+              "expected_public_query_ids": [
+                "query-original",
+                "query-lookup-1",
+                "query-lookup-2",
+                "query-lookup-3"
+              ],
+              "obligations": [
+                {
+                  "obligation_id": "sync",
+                  "lookup_query_ids": [
+                    "query-lookup-1"
+                  ]
+                },
+                {
+                  "obligation_id": "stale",
+                  "lookup_query_ids": [
+                    "query-lookup-2"
+                  ]
+                },
+                {
+                  "obligation_id": "orphans",
+                  "lookup_query_ids": [
+                    "query-lookup-3"
+                  ]
+                }
+              ]
+            }
+          ],
+          "statement_lines_unchanged": true
+        },
+        {
+          "obligation": {
+            "id": "stale",
+            "accepted_authorities": [
+              "source_of_truth"
+            ],
+            "accepted_scopes": [
+              "project"
+            ],
+            "accepted_witnesses": [
+              {
+                "path": "docs/project-docs-mcp-workflow.md",
+                "text": "removes stale indexed sections"
+              },
+              {
+                "path": "README.md",
+                "text": "removes stale indexed sections"
+              }
+            ]
+          },
+          "frozen_statement_lines": [
+            "3. removes stale indexed sections (changed files);"
+          ],
+          "affected_cases": [
+            {
+              "id": "v2-natural-sync-renames",
+              "migrated_from": "natural-sync-renames",
+              "lane": "natural",
+              "question": "Я переписал один документ и удалил другой. Как обновить поиск, чтобы старые разделы и удалённый файл больше не выдавались?",
+              "original_question": "Я переписал один документ и удалил другой. Как обновить поиск, чтобы старые разделы и удалённый файл больше не выдавались?",
+              "scope": "project",
+              "expected_kind": "docs_context",
+              "lookup_queries": [
+                "How do I reconcile documentation after editing repository files?",
+                "What happens to indexed sections when their source file changes?",
+                "How are deleted documentation files removed from search?"
+              ],
+              "lookup_query_ids": [
+                "query-lookup-1",
+                "query-lookup-2",
+                "query-lookup-3"
+              ],
+              "expected_public_query_ids": [
+                "query-original",
+                "query-lookup-1",
+                "query-lookup-2",
+                "query-lookup-3"
+              ],
+              "obligations": [
+                {
+                  "obligation_id": "sync",
+                  "lookup_query_ids": [
+                    "query-lookup-1"
+                  ]
+                },
+                {
+                  "obligation_id": "stale",
+                  "lookup_query_ids": [
+                    "query-lookup-2"
+                  ]
+                },
+                {
+                  "obligation_id": "orphans",
+                  "lookup_query_ids": [
+                    "query-lookup-3"
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "v2-natural-stale-health",
+              "migrated_from": "natural-stale-health",
+              "lane": "natural",
+              "question": "Поиск показывает старую документацию. Как проверить её состояние и убрать устаревшие разделы после правки файлов?",
+              "original_question": "Поиск показывает старую документацию. Как проверить её состояние и убрать устаревшие разделы после правки файлов?",
+              "scope": "project",
+              "expected_kind": "docs_context",
+              "lookup_queries": [
+                "How do I inspect documentation freshness?",
+                "How can I reconcile stale indexed sections with edited files?"
+              ],
+              "lookup_query_ids": [
+                "query-lookup-1",
+                "query-lookup-2"
+              ],
+              "expected_public_query_ids": [
+                "query-original",
+                "query-lookup-1",
+                "query-lookup-2"
+              ],
+              "obligations": [
+                {
+                  "obligation_id": "health",
+                  "lookup_query_ids": [
+                    "query-lookup-1"
+                  ]
+                },
+                {
+                  "obligation_id": "sync",
+                  "lookup_query_ids": [
+                    "query-lookup-2"
+                  ]
+                },
+                {
+                  "obligation_id": "stale",
+                  "lookup_query_ids": [
+                    "query-lookup-2"
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "v2-paraphrase-reconcile-files",
+              "migrated_from": "paraphrase-reconcile-files",
+              "lane": "exposed_paraphrases",
+              "question": "The search cache still knows about a removed guide and an earlier revision. How do I bring both back in line with the working files?",
+              "original_question": "The search cache still knows about a removed guide and an earlier revision. How do I bring both back in line with the working files?",
+              "scope": "project",
+              "expected_kind": "docs_context",
+              "lookup_queries": [
+                "How do repository files and the documentation index get reconciled?",
+                "How are changed documentation sections replaced?",
+                "What removes orphaned documentation sources from the index?"
+              ],
+              "lookup_query_ids": [
+                "query-lookup-1",
+                "query-lookup-2",
+                "query-lookup-3"
+              ],
+              "expected_public_query_ids": [
+                "query-original",
+                "query-lookup-1",
+                "query-lookup-2",
+                "query-lookup-3"
+              ],
+              "obligations": [
+                {
+                  "obligation_id": "sync",
+                  "lookup_query_ids": [
+                    "query-lookup-1"
+                  ]
+                },
+                {
+                  "obligation_id": "stale",
+                  "lookup_query_ids": [
+                    "query-lookup-2"
+                  ]
+                },
+                {
+                  "obligation_id": "orphans",
+                  "lookup_query_ids": [
+                    "query-lookup-3"
+                  ]
+                }
+              ]
+            }
+          ],
+          "statement_lines_unchanged": true
+        },
+        {
+          "obligation": {
+            "id": "orphans",
+            "accepted_authorities": [
+              "source_of_truth"
+            ],
+            "accepted_scopes": [
+              "project"
+            ],
+            "accepted_witnesses": [
+              {
+                "path": "docs/project-docs-mcp-workflow.md",
+                "text": "prunes** orphaned indexed sources"
+              },
+              {
+                "path": "README.md",
+                "text": "prunes orphaned indexed sources"
+              }
+            ]
+          },
+          "frozen_statement_lines": [
+            "2. prunes orphaned indexed sources (deleted files);"
+          ],
+          "affected_cases": [
+            {
+              "id": "v2-natural-sync-renames",
+              "migrated_from": "natural-sync-renames",
+              "lane": "natural",
+              "question": "Я переписал один документ и удалил другой. Как обновить поиск, чтобы старые разделы и удалённый файл больше не выдавались?",
+              "original_question": "Я переписал один документ и удалил другой. Как обновить поиск, чтобы старые разделы и удалённый файл больше не выдавались?",
+              "scope": "project",
+              "expected_kind": "docs_context",
+              "lookup_queries": [
+                "How do I reconcile documentation after editing repository files?",
+                "What happens to indexed sections when their source file changes?",
+                "How are deleted documentation files removed from search?"
+              ],
+              "lookup_query_ids": [
+                "query-lookup-1",
+                "query-lookup-2",
+                "query-lookup-3"
+              ],
+              "expected_public_query_ids": [
+                "query-original",
+                "query-lookup-1",
+                "query-lookup-2",
+                "query-lookup-3"
+              ],
+              "obligations": [
+                {
+                  "obligation_id": "sync",
+                  "lookup_query_ids": [
+                    "query-lookup-1"
+                  ]
+                },
+                {
+                  "obligation_id": "stale",
+                  "lookup_query_ids": [
+                    "query-lookup-2"
+                  ]
+                },
+                {
+                  "obligation_id": "orphans",
+                  "lookup_query_ids": [
+                    "query-lookup-3"
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "v2-paraphrase-reconcile-files",
+              "migrated_from": "paraphrase-reconcile-files",
+              "lane": "exposed_paraphrases",
+              "question": "The search cache still knows about a removed guide and an earlier revision. How do I bring both back in line with the working files?",
+              "original_question": "The search cache still knows about a removed guide and an earlier revision. How do I bring both back in line with the working files?",
+              "scope": "project",
+              "expected_kind": "docs_context",
+              "lookup_queries": [
+                "How do repository files and the documentation index get reconciled?",
+                "How are changed documentation sections replaced?",
+                "What removes orphaned documentation sources from the index?"
+              ],
+              "lookup_query_ids": [
+                "query-lookup-1",
+                "query-lookup-2",
+                "query-lookup-3"
+              ],
+              "expected_public_query_ids": [
+                "query-original",
+                "query-lookup-1",
+                "query-lookup-2",
+                "query-lookup-3"
+              ],
+              "obligations": [
+                {
+                  "obligation_id": "sync",
+                  "lookup_query_ids": [
+                    "query-lookup-1"
+                  ]
+                },
+                {
+                  "obligation_id": "stale",
+                  "lookup_query_ids": [
+                    "query-lookup-2"
+                  ]
+                },
+                {
+                  "obligation_id": "orphans",
+                  "lookup_query_ids": [
+                    "query-lookup-3"
+                  ]
+                }
+              ]
+            }
+          ],
+          "statement_lines_unchanged": true
+        },
+        {
+          "obligation": {
+            "id": "health",
+            "accepted_authorities": [
+              "source_of_truth"
+            ],
+            "accepted_scopes": [
+              "project"
+            ],
+            "accepted_witnesses": [
+              {
+                "path": "README.md",
+                "text": "Explicit health, freshness, index, or background-job status requests only"
+              },
+              {
+                "path": "docs/PROJECT_MAP.md",
+                "text": "reserved for explicit health, freshness, index, and job"
+              }
+            ]
+          },
+          "frozen_statement_lines": [
+            "| `docs_status` | Explicit health, freshness, index, or background-job status requests only. It is not a discovery step. |"
+          ],
+          "affected_cases": [
+            {
+              "id": "v2-natural-stale-health",
+              "migrated_from": "natural-stale-health",
+              "lane": "natural",
+              "question": "Поиск показывает старую документацию. Как проверить её состояние и убрать устаревшие разделы после правки файлов?",
+              "original_question": "Поиск показывает старую документацию. Как проверить её состояние и убрать устаревшие разделы после правки файлов?",
+              "scope": "project",
+              "expected_kind": "docs_context",
+              "lookup_queries": [
+                "How do I inspect documentation freshness?",
+                "How can I reconcile stale indexed sections with edited files?"
+              ],
+              "lookup_query_ids": [
+                "query-lookup-1",
+                "query-lookup-2"
+              ],
+              "expected_public_query_ids": [
+                "query-original",
+                "query-lookup-1",
+                "query-lookup-2"
+              ],
+              "obligations": [
+                {
+                  "obligation_id": "health",
+                  "lookup_query_ids": [
+                    "query-lookup-1"
+                  ]
+                },
+                {
+                  "obligation_id": "sync",
+                  "lookup_query_ids": [
+                    "query-lookup-2"
+                  ]
+                },
+                {
+                  "obligation_id": "stale",
+                  "lookup_query_ids": [
+                    "query-lookup-2"
+                  ]
+                }
+              ]
+            }
+          ],
+          "statement_lines_unchanged": true
+        },
+        {
+          "obligation": {
+            "id": "tool_prepare",
+            "accepted_authorities": [
+              "source_of_truth"
+            ],
+            "accepted_scopes": [
+              "project"
+            ],
+            "accepted_witnesses": [
+              {
+                "path": "docs/mcp-docs-server.md",
+                "text": "`prepare_docs` | The exact lifecycle action returned by `get_docs_context`, or an explicit user-approved sync/refresh request"
+              },
+              {
+                "path": "README.md",
+                "text": "`prepare_docs` | Lifecycle work only: sync, refresh, index, or prefetch"
+              }
+            ]
+          },
+          "frozen_statement_lines": [
+            "| `prepare_docs` | Lifecycle work only: sync, refresh, index, or prefetch. Call it from bounded `recommended_next_action`, unbounded `next_action`, or an explicit user request. Network actions require approval. |"
+          ],
+          "affected_cases": [],
+          "statement_lines_unchanged": true
+        },
+        {
+          "obligation": {
+            "id": "tool_status",
+            "accepted_authorities": [
+              "source_of_truth"
+            ],
+            "accepted_scopes": [
+              "project"
+            ],
+            "accepted_witnesses": [
+              {
+                "path": "docs/mcp-docs-server.md",
+                "text": "`docs_status` | A returned job id, index health, freshness, or status request"
+              },
+              {
+                "path": "README.md",
+                "text": "`docs_status` | Explicit health, freshness, index, or background-job status requests only"
+              }
+            ]
+          },
+          "frozen_statement_lines": [
+            "| `docs_status` | Explicit health, freshness, index, or background-job status requests only. It is not a discovery step. |"
+          ],
+          "affected_cases": [],
+          "statement_lines_unchanged": true
+        }
+      ],
+      "note": "Statement checks accompany manual full-diff semantic review; substring equality alone does not certify semantics."
+    },
+    {
+      "path": "docs/project-docs-mcp-workflow.md",
+      "historical_commit": "2facdba3b84c1c5e4a396b4e0d06b2a5e32aacd4",
+      "historical_blob": "316a520a4df91ebb577da84c99d783c3583b035f",
+      "expected_sha256": "8900b87204a72862432f11f1f9433c6646d55663330c590044a947a5050c0f36",
+      "current_sha256": "4478411a57217bd30378f232641481a5b8773dadda37f555204f724753c6fafa",
+      "witness_checks": [
+        {
+          "obligation": {
+            "id": "sync",
+            "accepted_authorities": [
+              "source_of_truth"
+            ],
+            "accepted_scopes": [
+              "project"
+            ],
+            "accepted_witnesses": [
+              {
+                "path": "docs/project-docs-mcp-workflow.md",
+                "text": "sync_project_docs"
+              },
+              {
+                "path": "README.md",
+                "text": "prepare_docs(action=\"sync_project_docs\")"
+              }
+            ]
+          },
+          "frozen_statement_lines": [
+            "returned `prepare_docs(action=\"sync_project_docs\")` action. This is the canonical",
+            "`sync_project_docs` is the recommended lifecycle action. It replaces the old two-step `inspect → ingest` loop:",
+            "The default surface has exactly three tools: `get_docs_context`, `prepare_docs`, and `docs_status`. `get_docs_context` only inspects lifecycle state and never performs an implicit sync. For a clean committed Git snapshot it may return `prepare_docs(action=\"sync_project_docs\", plan_digest=...)`; preparation revalidates the whole worktree and `HEAD` before reconciling. Dirty or indeterminate state and semantic preflight risks require confirmation. An explicit user-requested sync remains available without the automatic-policy digest:",
+            "Agent instructions use `prepare_docs(action=\"sync_project_docs\")` because project docs are owned by the repository filesystem, and the index is only a cache of that current state.",
+            "| `project_docs_found_not_indexed` | Reviewable docs exist but are not indexed. | Call `prepare_docs(action=\"sync_project_docs\")`. |",
+            "| `project_docs_stale` | Indexed docs changed on disk, were deleted, or are no longer part of current discovery. | Call `prepare_docs(action=\"sync_project_docs\")`. |",
+            "| `no_project_docs_results` | Indexed docs did not answer the query. | Inspect docs and reconcile with `prepare_docs(action=\"sync_project_docs\")` before guessing. |",
+            "4. run its returned `prepare_docs(action=\"sync_project_docs\")` action when requested;",
+            "prepare_docs(action=\"sync_project_docs\", project_path=...)",
+            "   prepare_docs(action=\"sync_project_docs\", project_path=..., with_vectors=false)",
+            "    \"action\": \"sync_project_docs\",",
+            "    \"type\": \"sync_project_docs\",",
+            "    \"tool\": \"sync_project_docs\"",
+            "The agent should call `sync_project_docs` to reconcile."
+          ],
+          "affected_cases": [
+            {
+              "id": "v2-natural-sync-renames",
+              "migrated_from": "natural-sync-renames",
+              "lane": "natural",
+              "question": "Я переписал один документ и удалил другой. Как обновить поиск, чтобы старые разделы и удалённый файл больше не выдавались?",
+              "original_question": "Я переписал один документ и удалил другой. Как обновить поиск, чтобы старые разделы и удалённый файл больше не выдавались?",
+              "scope": "project",
+              "expected_kind": "docs_context",
+              "lookup_queries": [
+                "How do I reconcile documentation after editing repository files?",
+                "What happens to indexed sections when their source file changes?",
+                "How are deleted documentation files removed from search?"
+              ],
+              "lookup_query_ids": [
+                "query-lookup-1",
+                "query-lookup-2",
+                "query-lookup-3"
+              ],
+              "expected_public_query_ids": [
+                "query-original",
+                "query-lookup-1",
+                "query-lookup-2",
+                "query-lookup-3"
+              ],
+              "obligations": [
+                {
+                  "obligation_id": "sync",
+                  "lookup_query_ids": [
+                    "query-lookup-1"
+                  ]
+                },
+                {
+                  "obligation_id": "stale",
+                  "lookup_query_ids": [
+                    "query-lookup-2"
+                  ]
+                },
+                {
+                  "obligation_id": "orphans",
+                  "lookup_query_ids": [
+                    "query-lookup-3"
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "v2-natural-stale-health",
+              "migrated_from": "natural-stale-health",
+              "lane": "natural",
+              "question": "Поиск показывает старую документацию. Как проверить её состояние и убрать устаревшие разделы после правки файлов?",
+              "original_question": "Поиск показывает старую документацию. Как проверить её состояние и убрать устаревшие разделы после правки файлов?",
+              "scope": "project",
+              "expected_kind": "docs_context",
+              "lookup_queries": [
+                "How do I inspect documentation freshness?",
+                "How can I reconcile stale indexed sections with edited files?"
+              ],
+              "lookup_query_ids": [
+                "query-lookup-1",
+                "query-lookup-2"
+              ],
+              "expected_public_query_ids": [
+                "query-original",
+                "query-lookup-1",
+                "query-lookup-2"
+              ],
+              "obligations": [
+                {
+                  "obligation_id": "health",
+                  "lookup_query_ids": [
+                    "query-lookup-1"
+                  ]
+                },
+                {
+                  "obligation_id": "sync",
+                  "lookup_query_ids": [
+                    "query-lookup-2"
+                  ]
+                },
+                {
+                  "obligation_id": "stale",
+                  "lookup_query_ids": [
+                    "query-lookup-2"
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "v2-paraphrase-reconcile-files",
+              "migrated_from": "paraphrase-reconcile-files",
+              "lane": "exposed_paraphrases",
+              "question": "The search cache still knows about a removed guide and an earlier revision. How do I bring both back in line with the working files?",
+              "original_question": "The search cache still knows about a removed guide and an earlier revision. How do I bring both back in line with the working files?",
+              "scope": "project",
+              "expected_kind": "docs_context",
+              "lookup_queries": [
+                "How do repository files and the documentation index get reconciled?",
+                "How are changed documentation sections replaced?",
+                "What removes orphaned documentation sources from the index?"
+              ],
+              "lookup_query_ids": [
+                "query-lookup-1",
+                "query-lookup-2",
+                "query-lookup-3"
+              ],
+              "expected_public_query_ids": [
+                "query-original",
+                "query-lookup-1",
+                "query-lookup-2",
+                "query-lookup-3"
+              ],
+              "obligations": [
+                {
+                  "obligation_id": "sync",
+                  "lookup_query_ids": [
+                    "query-lookup-1"
+                  ]
+                },
+                {
+                  "obligation_id": "stale",
+                  "lookup_query_ids": [
+                    "query-lookup-2"
+                  ]
+                },
+                {
+                  "obligation_id": "orphans",
+                  "lookup_query_ids": [
+                    "query-lookup-3"
+                  ]
+                }
+              ]
+            }
+          ],
+          "statement_lines_unchanged": true
+        },
+        {
+          "obligation": {
+            "id": "stale",
+            "accepted_authorities": [
+              "source_of_truth"
+            ],
+            "accepted_scopes": [
+              "project"
+            ],
+            "accepted_witnesses": [
+              {
+                "path": "docs/project-docs-mcp-workflow.md",
+                "text": "removes stale indexed sections"
+              },
+              {
+                "path": "README.md",
+                "text": "removes stale indexed sections"
+              }
+            ]
+          },
+          "frozen_statement_lines": [
+            "- removes stale indexed sections for changed files;"
+          ],
+          "affected_cases": [
+            {
+              "id": "v2-natural-sync-renames",
+              "migrated_from": "natural-sync-renames",
+              "lane": "natural",
+              "question": "Я переписал один документ и удалил другой. Как обновить поиск, чтобы старые разделы и удалённый файл больше не выдавались?",
+              "original_question": "Я переписал один документ и удалил другой. Как обновить поиск, чтобы старые разделы и удалённый файл больше не выдавались?",
+              "scope": "project",
+              "expected_kind": "docs_context",
+              "lookup_queries": [
+                "How do I reconcile documentation after editing repository files?",
+                "What happens to indexed sections when their source file changes?",
+                "How are deleted documentation files removed from search?"
+              ],
+              "lookup_query_ids": [
+                "query-lookup-1",
+                "query-lookup-2",
+                "query-lookup-3"
+              ],
+              "expected_public_query_ids": [
+                "query-original",
+                "query-lookup-1",
+                "query-lookup-2",
+                "query-lookup-3"
+              ],
+              "obligations": [
+                {
+                  "obligation_id": "sync",
+                  "lookup_query_ids": [
+                    "query-lookup-1"
+                  ]
+                },
+                {
+                  "obligation_id": "stale",
+                  "lookup_query_ids": [
+                    "query-lookup-2"
+                  ]
+                },
+                {
+                  "obligation_id": "orphans",
+                  "lookup_query_ids": [
+                    "query-lookup-3"
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "v2-natural-stale-health",
+              "migrated_from": "natural-stale-health",
+              "lane": "natural",
+              "question": "Поиск показывает старую документацию. Как проверить её состояние и убрать устаревшие разделы после правки файлов?",
+              "original_question": "Поиск показывает старую документацию. Как проверить её состояние и убрать устаревшие разделы после правки файлов?",
+              "scope": "project",
+              "expected_kind": "docs_context",
+              "lookup_queries": [
+                "How do I inspect documentation freshness?",
+                "How can I reconcile stale indexed sections with edited files?"
+              ],
+              "lookup_query_ids": [
+                "query-lookup-1",
+                "query-lookup-2"
+              ],
+              "expected_public_query_ids": [
+                "query-original",
+                "query-lookup-1",
+                "query-lookup-2"
+              ],
+              "obligations": [
+                {
+                  "obligation_id": "health",
+                  "lookup_query_ids": [
+                    "query-lookup-1"
+                  ]
+                },
+                {
+                  "obligation_id": "sync",
+                  "lookup_query_ids": [
+                    "query-lookup-2"
+                  ]
+                },
+                {
+                  "obligation_id": "stale",
+                  "lookup_query_ids": [
+                    "query-lookup-2"
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "v2-paraphrase-reconcile-files",
+              "migrated_from": "paraphrase-reconcile-files",
+              "lane": "exposed_paraphrases",
+              "question": "The search cache still knows about a removed guide and an earlier revision. How do I bring both back in line with the working files?",
+              "original_question": "The search cache still knows about a removed guide and an earlier revision. How do I bring both back in line with the working files?",
+              "scope": "project",
+              "expected_kind": "docs_context",
+              "lookup_queries": [
+                "How do repository files and the documentation index get reconciled?",
+                "How are changed documentation sections replaced?",
+                "What removes orphaned documentation sources from the index?"
+              ],
+              "lookup_query_ids": [
+                "query-lookup-1",
+                "query-lookup-2",
+                "query-lookup-3"
+              ],
+              "expected_public_query_ids": [
+                "query-original",
+                "query-lookup-1",
+                "query-lookup-2",
+                "query-lookup-3"
+              ],
+              "obligations": [
+                {
+                  "obligation_id": "sync",
+                  "lookup_query_ids": [
+                    "query-lookup-1"
+                  ]
+                },
+                {
+                  "obligation_id": "stale",
+                  "lookup_query_ids": [
+                    "query-lookup-2"
+                  ]
+                },
+                {
+                  "obligation_id": "orphans",
+                  "lookup_query_ids": [
+                    "query-lookup-3"
+                  ]
+                }
+              ]
+            }
+          ],
+          "statement_lines_unchanged": true
+        },
+        {
+          "obligation": {
+            "id": "orphans",
+            "accepted_authorities": [
+              "source_of_truth"
+            ],
+            "accepted_scopes": [
+              "project"
+            ],
+            "accepted_witnesses": [
+              {
+                "path": "docs/project-docs-mcp-workflow.md",
+                "text": "prunes** orphaned indexed sources"
+              },
+              {
+                "path": "README.md",
+                "text": "prunes orphaned indexed sources"
+              }
+            ]
+          },
+          "frozen_statement_lines": [
+            "2. **prunes** orphaned indexed sources (files that no longer exist);"
+          ],
+          "affected_cases": [
+            {
+              "id": "v2-natural-sync-renames",
+              "migrated_from": "natural-sync-renames",
+              "lane": "natural",
+              "question": "Я переписал один документ и удалил другой. Как обновить поиск, чтобы старые разделы и удалённый файл больше не выдавались?",
+              "original_question": "Я переписал один документ и удалил другой. Как обновить поиск, чтобы старые разделы и удалённый файл больше не выдавались?",
+              "scope": "project",
+              "expected_kind": "docs_context",
+              "lookup_queries": [
+                "How do I reconcile documentation after editing repository files?",
+                "What happens to indexed sections when their source file changes?",
+                "How are deleted documentation files removed from search?"
+              ],
+              "lookup_query_ids": [
+                "query-lookup-1",
+                "query-lookup-2",
+                "query-lookup-3"
+              ],
+              "expected_public_query_ids": [
+                "query-original",
+                "query-lookup-1",
+                "query-lookup-2",
+                "query-lookup-3"
+              ],
+              "obligations": [
+                {
+                  "obligation_id": "sync",
+                  "lookup_query_ids": [
+                    "query-lookup-1"
+                  ]
+                },
+                {
+                  "obligation_id": "stale",
+                  "lookup_query_ids": [
+                    "query-lookup-2"
+                  ]
+                },
+                {
+                  "obligation_id": "orphans",
+                  "lookup_query_ids": [
+                    "query-lookup-3"
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "v2-paraphrase-reconcile-files",
+              "migrated_from": "paraphrase-reconcile-files",
+              "lane": "exposed_paraphrases",
+              "question": "The search cache still knows about a removed guide and an earlier revision. How do I bring both back in line with the working files?",
+              "original_question": "The search cache still knows about a removed guide and an earlier revision. How do I bring both back in line with the working files?",
+              "scope": "project",
+              "expected_kind": "docs_context",
+              "lookup_queries": [
+                "How do repository files and the documentation index get reconciled?",
+                "How are changed documentation sections replaced?",
+                "What removes orphaned documentation sources from the index?"
+              ],
+              "lookup_query_ids": [
+                "query-lookup-1",
+                "query-lookup-2",
+                "query-lookup-3"
+              ],
+              "expected_public_query_ids": [
+                "query-original",
+                "query-lookup-1",
+                "query-lookup-2",
+                "query-lookup-3"
+              ],
+              "obligations": [
+                {
+                  "obligation_id": "sync",
+                  "lookup_query_ids": [
+                    "query-lookup-1"
+                  ]
+                },
+                {
+                  "obligation_id": "stale",
+                  "lookup_query_ids": [
+                    "query-lookup-2"
+                  ]
+                },
+                {
+                  "obligation_id": "orphans",
+                  "lookup_query_ids": [
+                    "query-lookup-3"
+                  ]
+                }
+              ]
+            }
+          ],
+          "statement_lines_unchanged": true
+        },
+        {
+          "obligation": {
+            "id": "catalog",
+            "accepted_authorities": [
+              "source_of_truth"
+            ],
+            "accepted_scopes": [
+              "project"
+            ],
+            "accepted_witnesses": [
+              {
+                "path": "docs/project-docs-mcp-workflow.md",
+                "text": "keep a reviewable `docatlas.project-docs.yaml` catalog"
+              }
+            ]
+          },
+          "frozen_statement_lines": [
+            "For repositories with nonstandard documentation names or more than a few files, keep a reviewable `docatlas.project-docs.yaml` catalog. When it exists, DocAtlas indexes only validated catalog entries: exact documents and configured roots. Without it, common README/docs/module locations remain a cold-start fallback."
+          ],
+          "affected_cases": [
+            {
+              "id": "v2-natural-catalog",
+              "migrated_from": "natural-catalog",
+              "lane": "natural",
+              "question": "Документы лежат в нестандартных местах. Как явно задать состав документации и что произойдёт при ошибке в каталоге?",
+              "original_question": "Документы лежат в нестандартных местах. Как явно задать состав документации и что произойдёт при ошибке в каталоге?",
+              "scope": "project",
+              "expected_kind": "docs_context",
+              "lookup_queries": [
+                "How can a repository declare documentation in nonstandard locations?",
+                "Does an invalid documentation catalog remove existing indexed content?"
+              ],
+              "lookup_query_ids": [
+                "query-lookup-1",
+                "query-lookup-2"
+              ],
+              "expected_public_query_ids": [
+                "query-original",
+                "query-lookup-1",
+                "query-lookup-2"
+              ],
+              "obligations": [
+                {
+                  "obligation_id": "catalog",
+                  "lookup_query_ids": [
+                    "query-lookup-1"
+                  ]
+                },
+                {
+                  "obligation_id": "catalog_invalid",
+                  "lookup_query_ids": [
+                    "query-lookup-2"
+                  ]
+                }
+              ]
+            }
+          ],
+          "statement_lines_unchanged": true
+        },
+        {
+          "obligation": {
+            "id": "catalog_invalid",
+            "accepted_authorities": [
+              "source_of_truth"
+            ],
+            "accepted_scopes": [
+              "project"
+            ],
+            "accepted_witnesses": [
+              {
+                "path": "docs/project-docs-mcp-workflow.md",
+                "text": "without pruning the existing index"
+              }
+            ]
+          },
+          "frozen_statement_lines": [
+            "The host coding model may edit this normal Git file after inspecting the repository. DocAtlas only validates and consumes it. Invalid paths, root traversal, symlinked roots, duplicates, missing files, and unsupported formats fail closed with warnings. An invalid explicit catalog blocks retrieval, ingestion, and synchronization without pruning the existing index; fix the catalog and inspect again. Catalog paths and descriptions are untrusted routing metadata, not agent instructions. Use `status: completed` or `superseded` and `impact: search_only` for exact historical documents. Completed and superseded sources are excluded from ordinary retrieval and remain searchable only for explicit history or completed-roadmap questions."
+          ],
+          "affected_cases": [
+            {
+              "id": "v2-natural-catalog",
+              "migrated_from": "natural-catalog",
+              "lane": "natural",
+              "question": "Документы лежат в нестандартных местах. Как явно задать состав документации и что произойдёт при ошибке в каталоге?",
+              "original_question": "Документы лежат в нестандартных местах. Как явно задать состав документации и что произойдёт при ошибке в каталоге?",
+              "scope": "project",
+              "expected_kind": "docs_context",
+              "lookup_queries": [
+                "How can a repository declare documentation in nonstandard locations?",
+                "Does an invalid documentation catalog remove existing indexed content?"
+              ],
+              "lookup_query_ids": [
+                "query-lookup-1",
+                "query-lookup-2"
+              ],
+              "expected_public_query_ids": [
+                "query-original",
+                "query-lookup-1",
+                "query-lookup-2"
+              ],
+              "obligations": [
+                {
+                  "obligation_id": "catalog",
+                  "lookup_query_ids": [
+                    "query-lookup-1"
+                  ]
+                },
+                {
+                  "obligation_id": "catalog_invalid",
+                  "lookup_query_ids": [
+                    "query-lookup-2"
+                  ]
+                }
+              ]
+            }
+          ],
+          "statement_lines_unchanged": true
+        }
+      ],
+      "note": "Statement checks accompany manual full-diff semantic review; substring equality alone does not certify semantics."
+    }
+  ]
+}

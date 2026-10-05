@@ -1,0 +1,5 @@
+{
+  "encoding": "raw_text UTF-8; restore without whitespace normalization",
+  "original_sha256": "b4ef3d75e076b326e396edc7a339c681847f1fe7fe296aabc71157b2dbb3cd40",
+  "raw_text": "Installed MCP report verification: PASS\n{\n  \"artifact_origin\": \"reviewed-wheel\",\n  \"claim_boundary\": \"pre-public-installed-harness\",\n  \"model\": \"deterministic-script\",\n  \"pass_rate\": 1.0,\n  \"passed_tasks\": 1,\n  \"protocol\": \"installed-mcp-agent-v1\",\n  \"provider_id\": \"scripted\",\n  \"report_sha256\": \"ba6a5cfe8db8bad19e180193d3fe3cfdd370ab4514ab0acc984a9826cc222944\",\n  \"schema_failures\": 1,\n  \"schema_sha256\": \"21e396d97be40cceb44bac0dff7eefc82cecada47263ba28da400719c4a429b3\",\n  \"source_commit\": \"264694706ff3c521abaf616f366db02a014362ea\",\n  \"task_count\": 1,\n  \"tool_attempts\": 2,\n  \"version\": \"1.3.2\"\n}\n"
+}

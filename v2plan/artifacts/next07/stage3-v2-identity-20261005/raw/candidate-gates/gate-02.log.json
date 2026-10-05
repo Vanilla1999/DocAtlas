@@ -1,0 +1,4 @@
+{
+  "original_sha256": "52e92c6a944e138151aa89c7cf9530b905ed95e44c5dda35a2bc9a2387679d35",
+  "raw_text": "KILLED: rephrase-auto-executes\nKILLED: authoritative-conflict-does-not-stop\nKILLED: unbounded-rephrase-loop\nKILLED: rephrase-invents-domain-fact\nKILLED: eligibility-treated-as-retrieval\nKILLED: exact-document-fallback-disabled\nPASS: recoverable documentation failure mutation gate killed 6/6 mutants\n"
+}

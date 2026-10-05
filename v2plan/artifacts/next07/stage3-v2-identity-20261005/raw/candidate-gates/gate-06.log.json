@@ -1,0 +1,4 @@
+{
+  "original_sha256": "1c31e01463a87c451c6aa6501a561c23cbdc0a1598c93fced87467af95261370",
+  "raw_text": "V2 project-context acceptance: FAIL\n- natural.semantic_usefulness below acceptance: 9/15 < 15/15\n- natural.evaluator_verified_full_semantic_component_coverage below acceptance: 9/15 < 15/15\n- exposed_paraphrases.lookup_attribution below acceptance: 11/12 < 12/12\n"
+}

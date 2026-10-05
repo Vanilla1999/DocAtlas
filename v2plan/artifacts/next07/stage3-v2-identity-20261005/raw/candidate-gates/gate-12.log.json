@@ -1,0 +1,4 @@
+{
+  "original_sha256": "1fdd9798214ad568d85dca352fe96d326b47f6511c459347977ae9e8e66e8410",
+  "raw_text": "Lifecycle fixture readiness: 3 read-only storage checks; one MCP job-status call follows (not a model or latency measurement)\nInstalled lifecycle smoke: clean guard / confirmation / unchanged retry / ready stop / async status / terminal stop PASS (scripted, no live model)\nDocs MCP installed-artifact stdio smoke: PASS\n"
+}

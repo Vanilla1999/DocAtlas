@@ -1,0 +1,495 @@
+[
+  {
+    "command": [
+      "/tmp/opencode/docatlas-stage3-candidate-env/bin/python",
+      "-m",
+      "pytest",
+      "tests/",
+      "-m",
+      "advanced",
+      "-q"
+    ],
+    "cwd": "/tmp/opencode/docatlas-stage3-candidate",
+    "sha": "264694706ff3c521abaf616f366db02a014362ea",
+    "exit_code": 0,
+    "seconds": 35.97795820236206,
+    "log": "raw/candidate-gates/gate-00.log.json",
+    "source_changed": false,
+    "branch": "integration/stage3-v2-identity-pr1",
+    "branch_head": "264694706ff3c521abaf616f366db02a014362ea",
+    "checkout_sha": "264694706ff3c521abaf616f366db02a014362ea",
+    "run_id": "LOCAL",
+    "attempt": 1,
+    "job_id": "LOCAL"
+  },
+  {
+    "command": [
+      "/tmp/opencode/docatlas-stage3-candidate-env/bin/python",
+      "scripts/run_recovery_contract_gate.py"
+    ],
+    "cwd": "/tmp/opencode/docatlas-stage3-candidate",
+    "sha": "264694706ff3c521abaf616f366db02a014362ea",
+    "exit_code": 0,
+    "seconds": 1.3162415027618408,
+    "log": "raw/candidate-gates/gate-01.log.json",
+    "source_changed": false,
+    "branch": "integration/stage3-v2-identity-pr1",
+    "branch_head": "264694706ff3c521abaf616f366db02a014362ea",
+    "checkout_sha": "264694706ff3c521abaf616f366db02a014362ea",
+    "run_id": "LOCAL",
+    "attempt": 1,
+    "job_id": "LOCAL"
+  },
+  {
+    "command": [
+      "/tmp/opencode/docatlas-stage3-candidate-env/bin/python",
+      "scripts/run_recovery_mutation_gate.py"
+    ],
+    "cwd": "/tmp/opencode/docatlas-stage3-candidate",
+    "sha": "264694706ff3c521abaf616f366db02a014362ea",
+    "exit_code": 0,
+    "seconds": 5.973761558532715,
+    "log": "raw/candidate-gates/gate-02.log.json",
+    "source_changed": false,
+    "branch": "integration/stage3-v2-identity-pr1",
+    "branch_head": "264694706ff3c521abaf616f366db02a014362ea",
+    "checkout_sha": "264694706ff3c521abaf616f366db02a014362ea",
+    "run_id": "LOCAL",
+    "attempt": 1,
+    "job_id": "LOCAL"
+  },
+  {
+    "command": [
+      "/tmp/opencode/docatlas-stage3-candidate-env/bin/python",
+      "eval/project_context_quality_protocol.py"
+    ],
+    "cwd": "/tmp/opencode/docatlas-stage3-candidate",
+    "sha": "264694706ff3c521abaf616f366db02a014362ea",
+    "exit_code": 0,
+    "seconds": 0.21424317359924316,
+    "log": "raw/candidate-gates/gate-03.log.json",
+    "source_changed": false,
+    "branch": "integration/stage3-v2-identity-pr1",
+    "branch_head": "264694706ff3c521abaf616f366db02a014362ea",
+    "checkout_sha": "264694706ff3c521abaf616f366db02a014362ea",
+    "run_id": "LOCAL",
+    "attempt": 1,
+    "job_id": "LOCAL"
+  },
+  {
+    "command": [
+      "/tmp/opencode/docatlas-stage3-candidate-env/bin/python",
+      "eval/project_context_quality_protocol.py",
+      "--live",
+      "--report-only",
+      "--output",
+      "/tmp/opencode/stage3-evidence/candidate-gates/legacy.json"
+    ],
+    "cwd": "/tmp/opencode/docatlas-stage3-candidate",
+    "sha": "264694706ff3c521abaf616f366db02a014362ea",
+    "exit_code": 0,
+    "seconds": 25.26090168952942,
+    "log": "raw/candidate-gates/gate-04.log.json",
+    "source_changed": false,
+    "branch": "integration/stage3-v2-identity-pr1",
+    "branch_head": "264694706ff3c521abaf616f366db02a014362ea",
+    "checkout_sha": "264694706ff3c521abaf616f366db02a014362ea",
+    "run_id": "LOCAL",
+    "attempt": 1,
+    "job_id": "LOCAL"
+  },
+  {
+    "command": [
+      "/tmp/opencode/docatlas-stage3-candidate-env/bin/python",
+      "scripts/check_legacy_project_context_lineage.py",
+      "/tmp/opencode/stage3-evidence/candidate-gates/legacy.json"
+    ],
+    "cwd": "/tmp/opencode/docatlas-stage3-candidate",
+    "sha": "264694706ff3c521abaf616f366db02a014362ea",
+    "exit_code": 1,
+    "seconds": 0.06397700309753418,
+    "log": "raw/candidate-gates/gate-05.log.json",
+    "source_changed": false,
+    "branch": "integration/stage3-v2-identity-pr1",
+    "branch_head": "264694706ff3c521abaf616f366db02a014362ea",
+    "checkout_sha": "264694706ff3c521abaf616f366db02a014362ea",
+    "run_id": "LOCAL",
+    "attempt": 1,
+    "job_id": "LOCAL"
+  },
+  {
+    "command": [
+      "/tmp/opencode/docatlas-stage3-candidate-env/bin/python",
+      "scripts/run_project_context_quality_v2_gate.py",
+      "--output",
+      "/tmp/opencode/stage3-evidence/candidate-gates/v2.json"
+    ],
+    "cwd": "/tmp/opencode/docatlas-stage3-candidate",
+    "sha": "264694706ff3c521abaf616f366db02a014362ea",
+    "exit_code": 1,
+    "seconds": 55.762906074523926,
+    "log": "raw/candidate-gates/gate-06.log.json",
+    "source_changed": false,
+    "branch": "integration/stage3-v2-identity-pr1",
+    "branch_head": "264694706ff3c521abaf616f366db02a014362ea",
+    "checkout_sha": "264694706ff3c521abaf616f366db02a014362ea",
+    "run_id": "LOCAL",
+    "attempt": 1,
+    "job_id": "LOCAL"
+  },
+  {
+    "command": [
+      "/tmp/opencode/docatlas-stage3-candidate-env/bin/python",
+      "scripts/run_question_surface_gate.py"
+    ],
+    "cwd": "/tmp/opencode/docatlas-stage3-candidate",
+    "sha": "264694706ff3c521abaf616f366db02a014362ea",
+    "exit_code": 1,
+    "seconds": 0.16405224800109863,
+    "log": "raw/candidate-gates/gate-07.log.json",
+    "source_changed": false,
+    "branch": "integration/stage3-v2-identity-pr1",
+    "branch_head": "264694706ff3c521abaf616f366db02a014362ea",
+    "checkout_sha": "264694706ff3c521abaf616f366db02a014362ea",
+    "run_id": "LOCAL",
+    "attempt": 1,
+    "job_id": "LOCAL"
+  },
+  {
+    "command": [
+      "/tmp/opencode/docatlas-stage3-candidate-env/bin/python",
+      "scripts/run_agent_developer_gate.py"
+    ],
+    "cwd": "/tmp/opencode/docatlas-stage3-candidate",
+    "sha": "264694706ff3c521abaf616f366db02a014362ea",
+    "exit_code": 0,
+    "seconds": 2.5180156230926514,
+    "log": "raw/candidate-gates/gate-08.log.json",
+    "source_changed": false,
+    "branch": "integration/stage3-v2-identity-pr1",
+    "branch_head": "264694706ff3c521abaf616f366db02a014362ea",
+    "checkout_sha": "264694706ff3c521abaf616f366db02a014362ea",
+    "run_id": "LOCAL",
+    "attempt": 1,
+    "job_id": "LOCAL"
+  },
+  {
+    "command": [
+      "/tmp/opencode/docatlas-stage3-candidate-env/bin/python",
+      "scripts/run_agent_developer_adversarial_gate.py"
+    ],
+    "cwd": "/tmp/opencode/docatlas-stage3-candidate",
+    "sha": "264694706ff3c521abaf616f366db02a014362ea",
+    "exit_code": 1,
+    "seconds": 6.975627660751343,
+    "log": "raw/candidate-gates/gate-09.log.json",
+    "source_changed": false,
+    "branch": "integration/stage3-v2-identity-pr1",
+    "branch_head": "264694706ff3c521abaf616f366db02a014362ea",
+    "checkout_sha": "264694706ff3c521abaf616f366db02a014362ea",
+    "run_id": "LOCAL",
+    "attempt": 1,
+    "job_id": "LOCAL"
+  },
+  {
+    "command": [
+      "/tmp/opencode/docatlas-stage3-candidate-env/bin/python",
+      "scripts/run_critical_mutation_gate.py"
+    ],
+    "cwd": "/tmp/opencode/docatlas-stage3-candidate",
+    "sha": "264694706ff3c521abaf616f366db02a014362ea",
+    "exit_code": 0,
+    "seconds": 4.772732496261597,
+    "log": "raw/candidate-gates/gate-10.log.json",
+    "source_changed": false,
+    "branch": "integration/stage3-v2-identity-pr1",
+    "branch_head": "264694706ff3c521abaf616f366db02a014362ea",
+    "checkout_sha": "264694706ff3c521abaf616f366db02a014362ea",
+    "run_id": "LOCAL",
+    "attempt": 1,
+    "job_id": "LOCAL"
+  },
+  {
+    "command": [
+      "/tmp/opencode/docatlas-stage3-candidate-env/bin/python",
+      "scripts/run_agent_developer_adversarial_mutation_gate.py"
+    ],
+    "cwd": "/tmp/opencode/docatlas-stage3-candidate",
+    "sha": "264694706ff3c521abaf616f366db02a014362ea",
+    "exit_code": 0,
+    "seconds": 19.1967670917511,
+    "log": "raw/candidate-gates/gate-11.log.json",
+    "source_changed": false,
+    "branch": "integration/stage3-v2-identity-pr1",
+    "branch_head": "264694706ff3c521abaf616f366db02a014362ea",
+    "checkout_sha": "264694706ff3c521abaf616f366db02a014362ea",
+    "run_id": "LOCAL",
+    "attempt": 1,
+    "job_id": "LOCAL"
+  },
+  {
+    "command": [
+      "/tmp/opencode/docatlas-stage3-candidate-env/bin/python",
+      "scripts/docs_mcp_stdio_smoke.py"
+    ],
+    "cwd": "/tmp/opencode/docatlas-stage3-candidate",
+    "sha": "264694706ff3c521abaf616f366db02a014362ea",
+    "exit_code": 0,
+    "seconds": 2.9687821865081787,
+    "log": "raw/candidate-gates/gate-12.log.json",
+    "source_changed": false,
+    "branch": "integration/stage3-v2-identity-pr1",
+    "branch_head": "264694706ff3c521abaf616f366db02a014362ea",
+    "checkout_sha": "264694706ff3c521abaf616f366db02a014362ea",
+    "run_id": "LOCAL",
+    "attempt": 1,
+    "job_id": "LOCAL"
+  },
+  {
+    "command": [
+      "/tmp/opencode/docatlas-stage3-candidate-env/bin/python",
+      "scripts/installed_mcp_contract_self_test.py"
+    ],
+    "cwd": "/tmp/opencode/docatlas-stage3-candidate",
+    "sha": "264694706ff3c521abaf616f366db02a014362ea",
+    "exit_code": 0,
+    "seconds": 0.46465301513671875,
+    "log": "raw/candidate-gates/gate-13.log.json",
+    "source_changed": false,
+    "branch": "integration/stage3-v2-identity-pr1",
+    "branch_head": "264694706ff3c521abaf616f366db02a014362ea",
+    "checkout_sha": "264694706ff3c521abaf616f366db02a014362ea",
+    "run_id": "LOCAL",
+    "attempt": 1,
+    "job_id": "LOCAL"
+  },
+  {
+    "branch": "integration/stage3-v2-identity-pr1",
+    "branch_head": "264694706ff3c521abaf616f366db02a014362ea",
+    "checkout_sha": "264694706ff3c521abaf616f366db02a014362ea",
+    "run_id": "LOCAL",
+    "attempt": 1,
+    "job_id": "candidate-focused",
+    "command": [
+      "/tmp/opencode/docatlas-stage3-candidate-env/bin/python",
+      "-m",
+      "pytest",
+      "-q",
+      "tests/docs/test_empty_docs_context_payload.py",
+      "tests/docs/test_finalized_mcp_output_integrity.py",
+      "tests/docs/test_source_range_audit_integrity.py",
+      "tests/test_frozen_fastembed_dependency.py",
+      "tests/test_multilingual_retrieval_quality_protocol.py",
+      "tests/test_project_context_quality_v2_protocol.py"
+    ],
+    "cwd": "/tmp/opencode/docatlas-stage3-candidate",
+    "exit_code": 0,
+    "log": "raw/candidate-focused.log.json",
+    "environment": {
+      "DOCATLAS_OFFLINE": "1"
+    }
+  },
+  {
+    "branch": "integration/stage3-v2-identity-pr1",
+    "branch_head": "264694706ff3c521abaf616f366db02a014362ea",
+    "checkout_sha": "264694706ff3c521abaf616f366db02a014362ea",
+    "run_id": "LOCAL",
+    "attempt": 1,
+    "job_id": "candidate-core",
+    "command": [
+      "/tmp/opencode/docatlas-stage3-candidate-env/bin/python",
+      "-m",
+      "pytest",
+      "tests/",
+      "-m",
+      "not advanced and not live and not live_network",
+      "-q",
+      "--tb=long",
+      "--showlocals"
+    ],
+    "cwd": "/tmp/opencode/docatlas-stage3-candidate",
+    "exit_code": 1,
+    "log": "raw/candidate-core.log.json",
+    "environment": {
+      "DOCATLAS_OFFLINE": "1"
+    }
+  },
+  {
+    "branch": "integration/stage3-v2-identity-pr1",
+    "branch_head": "264694706ff3c521abaf616f366db02a014362ea",
+    "checkout_sha": "264694706ff3c521abaf616f366db02a014362ea",
+    "run_id": "LOCAL",
+    "attempt": 1,
+    "job_id": "related-positive-negative",
+    "command": [
+      "/tmp/opencode/docatlas-stage3-candidate-env/bin/python",
+      "-m",
+      "pytest",
+      "-q",
+      "tests/docs/test_component_coverage.py",
+      "tests/docs/test_context_projection_boundaries.py",
+      "tests/docs/test_generic_context_workflows.py",
+      "tests/docs/test_project_answer_contract_v3.py",
+      "tests/docs/test_question_plan_v4.py",
+      "tests/docs/test_request_flow_lineage.py",
+      "tests/docs/test_review_boundary_semantics.py",
+      "tests/evidence_quality_v2/test_readme_neutral_context.py",
+      "--tb=short"
+    ],
+    "cwd": "/tmp/opencode/docatlas-stage3-candidate",
+    "exit_code": 1,
+    "log": "raw/related-positive-negative.log.json",
+    "environment": {
+      "DOCATLAS_OFFLINE": "1"
+    }
+  },
+  {
+    "head": "264694706ff3c521abaf616f366db02a014362ea",
+    "command": [
+      "/tmp/opencode/docatlas-stage3-candidate-env/bin/python",
+      "-m",
+      "pytest",
+      "-p",
+      "failure_observer",
+      "-q",
+      "--tb=long",
+      "--showlocals",
+      "tests/docs/test_component_coverage.py::test_visible_component_novelty_follows_exact_constraints_before_public_queries[projection_clip]",
+      "tests/docs/test_context_projection_boundaries.py::test_frozen_request_flow_prefers_project_context_module_witnesses",
+      "tests/docs/test_direct_docatlas_questions_15.py::test_direct_docatlas_questions_15_visible_context_covers_all_required_facts",
+      "tests/docs/test_generic_context_workflows.py::test_stale_health_live_status_sync_and_removal",
+      "tests/docs/test_generic_context_workflows.py::test_first_session_live_query",
+      "tests/docs/test_generic_context_workflows.py::test_contributor_live_reading_and_tests",
+      "tests/docs/test_generic_context_workflows.py::test_remaining_live_workflow_witnesses[v2-natural-evidence-selection]",
+      "tests/docs/test_generic_context_workflows.py::test_remaining_live_workflow_witnesses[v2-natural-offline]",
+      "tests/docs/test_generic_context_workflows.py::test_remaining_live_workflow_witnesses[v2-paraphrase-local-trial]",
+      "tests/docs/test_generic_context_workflows.py::test_catalog_live_invalid_behavior",
+      "tests/docs/test_project_answer_contract_v3.py::test_v3_does_not_reclassify_frozen_v2_config_questions",
+      "tests/docs/test_question_plan_v4.py::test_question_plan_splits_compound_questions_into_mandatory_facets",
+      "tests/docs/test_request_flow_lineage.py::test_request_flow_public_contract_remains_four_fact_fail_safe",
+      "tests/docs/test_review_boundary_semantics.py::test_public_projection_prioritizes_public_queries_not_audited_alias_count[False-256-1]",
+      "tests/docs/test_review_boundary_semantics.py::test_public_projection_prioritizes_public_queries_not_audited_alias_count[False-256-2]",
+      "tests/docs/test_review_boundary_semantics.py::test_public_projection_prioritizes_public_queries_not_audited_alias_count[True-256-1]",
+      "tests/docs/test_review_boundary_semantics.py::test_public_projection_prioritizes_public_queries_not_audited_alias_count[True-256-2]",
+      "tests/evidence_quality_v2/test_readme_neutral_context.py::test_retrieved_safe_context_survives_unknown_question_class[What kind of interfaces does Pebble create, and how is it intended to compose them?-command line interfaces\\nin a composable way]",
+      "tests/evidence_quality_v2/test_readme_neutral_context.py::test_lookup_identical_to_original_is_not_a_new_requirement[What kind of interfaces does Pebble create, and how is it intended to compose them?-command line interfaces\\nin a composable way]",
+      "tests/test_docs_service_part02.py::test_query_project_docs_attributes_generic_retrieval_hints_without_covering_original",
+      "tests/test_docs_service_part03.py::test_project_query_does_not_return_non_project_docs_with_same_terms",
+      "tests/test_project_context_quality_v2_protocol.py::test_v2_inventory_lock_witnesses_and_report_only_lanes"
+    ],
+    "cwd": "/tmp/opencode/docatlas-stage3-candidate",
+    "exit": 1,
+    "instrumentation": "read-only pytest failure frames hook",
+    "branch_head": "264694706ff3c521abaf616f366db02a014362ea",
+    "checkout_sha": "264694706ff3c521abaf616f366db02a014362ea",
+    "run_id": "LOCAL",
+    "attempt": 1,
+    "job_id": "22-node-replay",
+    "log": "raw/remaining-replay.log.json"
+  },
+  {
+    "branch_head": "264694706ff3c521abaf616f366db02a014362ea",
+    "checkout_sha": "264694706ff3c521abaf616f366db02a014362ea",
+    "run_id": "LOCAL",
+    "attempt": 1,
+    "job_id": "scope-case",
+    "command": [
+      "/tmp/opencode/docatlas-stage3-candidate-env/bin/python",
+      "/tmp/opencode/stage3-continuation/observe_scope_case.py",
+      "/tmp/opencode/docatlas-stage3-candidate"
+    ],
+    "cwd": "/tmp/opencode/docatlas-stage3-candidate",
+    "exit_code": 1,
+    "log": "raw/scope-case.json"
+  },
+  {
+    "branch_head": "264694706ff3c521abaf616f366db02a014362ea",
+    "checkout_sha": "264694706ff3c521abaf616f366db02a014362ea",
+    "run_id": "LOCAL",
+    "attempt": 1,
+    "job_id": "wheel-build",
+    "command": [
+      "/tmp/opencode/docatlas-stage3-candidate-env/bin/python",
+      "-m",
+      "build",
+      "--wheel",
+      "--outdir",
+      "/tmp/opencode/stage3-continuation/wheel"
+    ],
+    "cwd": "/tmp/opencode/docatlas-stage3-candidate",
+    "exit_code": 0,
+    "log": "raw/wheel-build.log.json"
+  },
+  {
+    "branch_head": "264694706ff3c521abaf616f366db02a014362ea",
+    "checkout_sha": "264694706ff3c521abaf616f366db02a014362ea",
+    "run_id": "LOCAL",
+    "attempt": 1,
+    "job_id": "installed",
+    "command": [
+      "/tmp/opencode/docatlas-stage3-candidate-env/bin/python",
+      "scripts/run_installed_mcp_agent_benchmark.py",
+      "--wheel",
+      "/tmp/opencode/stage3-continuation/wheel/doc_atlas-1.3.2-py3-none-any.whl",
+      "--source-commit",
+      "264694706ff3c521abaf616f366db02a014362ea",
+      "--planner",
+      "scripted",
+      "--task",
+      "module_definition_supported",
+      "--max-schema-repairs",
+      "1",
+      "--min-pass-rate",
+      "1.0",
+      "--output",
+      "/tmp/opencode/stage3-continuation/installed.json"
+    ],
+    "cwd": "/tmp/opencode/docatlas-stage3-candidate",
+    "exit_code": 0,
+    "log": "raw/installed.json"
+  },
+  {
+    "branch_head": "264694706ff3c521abaf616f366db02a014362ea",
+    "checkout_sha": "264694706ff3c521abaf616f366db02a014362ea",
+    "run_id": "LOCAL",
+    "attempt": 1,
+    "job_id": "installed-verify",
+    "command": [
+      "/tmp/opencode/docatlas-stage3-candidate-env/bin/python",
+      "scripts/verify_installed_mcp_agent_report.py",
+      "/tmp/opencode/stage3-continuation/installed.json",
+      "--expected-origin",
+      "reviewed-wheel",
+      "--min-task-count",
+      "1",
+      "--min-pass-rate",
+      "1.0",
+      "--require-schema-repair"
+    ],
+    "cwd": "/tmp/opencode/docatlas-stage3-candidate",
+    "exit_code": 0,
+    "log": "raw/installed-verify.log.json"
+  },
+  {
+    "branch": "fix/stage3-v2-document-identity",
+    "branch_head": "aafe6a461013bb0de97c3097253c7cb81cacfca7",
+    "checkout_sha": "aafe6a461013bb0de97c3097253c7cb81cacfca7",
+    "run_id": "LOCAL",
+    "attempt": 1,
+    "job_id": "identity-final-focused",
+    "command": [
+      "/tmp/opencode/docatlas-stage3-env/bin/python",
+      "-m",
+      "pytest",
+      "-q",
+      "tests/test_project_context_quality_v2_protocol.py"
+    ],
+    "cwd": "/tmp/opencode/docatlas-stage3-identity",
+    "environment": {
+      "DOCATLAS_OFFLINE": "1",
+      "PYTHONPATH": "/tmp/opencode/docatlas-stage3-identity"
+    },
+    "exit_code": 0,
+    "log": "raw/identity-final-focused.log.json"
+  }
+]

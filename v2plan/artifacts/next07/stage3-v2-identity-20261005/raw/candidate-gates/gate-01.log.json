@@ -1,0 +1,4 @@
+{
+  "original_sha256": "bbe8d011e05893cef4b8a6d5045f4a2a8b3658433e12e7ef2589b3add617d798",
+  "raw_text": "PASS: parser/retrieval failures expose bounded non-automatic recovery; 100 unknown contract modifiers do not create hard stops; rephrase is limited to one retry; eligibility/documentation/conflict classes remain distinct; exact indexed documents recover bounded retrieval-only context; public context projection stays <=800 tokens\n"
+}

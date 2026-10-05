@@ -1,0 +1,1 @@
+/tmp/opencode/docatlas-stage3-candidate-env/bin/python: No module named pip

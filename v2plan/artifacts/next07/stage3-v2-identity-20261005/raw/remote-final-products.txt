@@ -1,0 +1,6 @@
+596eeb36b66a474b2b5d246fd6bd834b6dcbb5c6	refs/heads/fix/next07-pr1-output-integrity
+aafe6a461013bb0de97c3097253c7cb81cacfca7	refs/heads/fix/stage3-v2-document-identity
+462c769210cdd46c50b035d151d8b7f9d6450391	refs/heads/integration/stage3-fastembed-pr1
+264694706ff3c521abaf616f366db02a014362ea	refs/heads/integration/stage3-v2-identity-pr1
+d2ed5c4c73dc3b7d56276fc37591cba8a4ae123c	refs/heads/main
+2bf8cfdec9af9d0e4da09d8e754d09ee3fe1ca3c	refs/heads/next07-feasibility-audit

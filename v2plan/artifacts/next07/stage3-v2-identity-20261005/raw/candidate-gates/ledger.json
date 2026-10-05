@@ -1,0 +1,182 @@
+[
+  {
+    "command": [
+      "/tmp/opencode/docatlas-stage3-candidate-env/bin/python",
+      "-m",
+      "pytest",
+      "tests/",
+      "-m",
+      "advanced",
+      "-q"
+    ],
+    "cwd": "/tmp/opencode/docatlas-stage3-candidate",
+    "sha": "264694706ff3c521abaf616f366db02a014362ea",
+    "exit_code": 0,
+    "seconds": 35.97795820236206,
+    "log": "gate-00.log",
+    "source_changed": false
+  },
+  {
+    "command": [
+      "/tmp/opencode/docatlas-stage3-candidate-env/bin/python",
+      "scripts/run_recovery_contract_gate.py"
+    ],
+    "cwd": "/tmp/opencode/docatlas-stage3-candidate",
+    "sha": "264694706ff3c521abaf616f366db02a014362ea",
+    "exit_code": 0,
+    "seconds": 1.3162415027618408,
+    "log": "gate-01.log",
+    "source_changed": false
+  },
+  {
+    "command": [
+      "/tmp/opencode/docatlas-stage3-candidate-env/bin/python",
+      "scripts/run_recovery_mutation_gate.py"
+    ],
+    "cwd": "/tmp/opencode/docatlas-stage3-candidate",
+    "sha": "264694706ff3c521abaf616f366db02a014362ea",
+    "exit_code": 0,
+    "seconds": 5.973761558532715,
+    "log": "gate-02.log",
+    "source_changed": false
+  },
+  {
+    "command": [
+      "/tmp/opencode/docatlas-stage3-candidate-env/bin/python",
+      "eval/project_context_quality_protocol.py"
+    ],
+    "cwd": "/tmp/opencode/docatlas-stage3-candidate",
+    "sha": "264694706ff3c521abaf616f366db02a014362ea",
+    "exit_code": 0,
+    "seconds": 0.21424317359924316,
+    "log": "gate-03.log",
+    "source_changed": false
+  },
+  {
+    "command": [
+      "/tmp/opencode/docatlas-stage3-candidate-env/bin/python",
+      "eval/project_context_quality_protocol.py",
+      "--live",
+      "--report-only",
+      "--output",
+      "/tmp/opencode/stage3-evidence/candidate-gates/legacy.json"
+    ],
+    "cwd": "/tmp/opencode/docatlas-stage3-candidate",
+    "sha": "264694706ff3c521abaf616f366db02a014362ea",
+    "exit_code": 0,
+    "seconds": 25.26090168952942,
+    "log": "gate-04.log",
+    "source_changed": false
+  },
+  {
+    "command": [
+      "/tmp/opencode/docatlas-stage3-candidate-env/bin/python",
+      "scripts/check_legacy_project_context_lineage.py",
+      "/tmp/opencode/stage3-evidence/candidate-gates/legacy.json"
+    ],
+    "cwd": "/tmp/opencode/docatlas-stage3-candidate",
+    "sha": "264694706ff3c521abaf616f366db02a014362ea",
+    "exit_code": 1,
+    "seconds": 0.06397700309753418,
+    "log": "gate-05.log",
+    "source_changed": false
+  },
+  {
+    "command": [
+      "/tmp/opencode/docatlas-stage3-candidate-env/bin/python",
+      "scripts/run_project_context_quality_v2_gate.py",
+      "--output",
+      "/tmp/opencode/stage3-evidence/candidate-gates/v2.json"
+    ],
+    "cwd": "/tmp/opencode/docatlas-stage3-candidate",
+    "sha": "264694706ff3c521abaf616f366db02a014362ea",
+    "exit_code": 1,
+    "seconds": 55.762906074523926,
+    "log": "gate-06.log",
+    "source_changed": false
+  },
+  {
+    "command": [
+      "/tmp/opencode/docatlas-stage3-candidate-env/bin/python",
+      "scripts/run_question_surface_gate.py"
+    ],
+    "cwd": "/tmp/opencode/docatlas-stage3-candidate",
+    "sha": "264694706ff3c521abaf616f366db02a014362ea",
+    "exit_code": 1,
+    "seconds": 0.16405224800109863,
+    "log": "gate-07.log",
+    "source_changed": false
+  },
+  {
+    "command": [
+      "/tmp/opencode/docatlas-stage3-candidate-env/bin/python",
+      "scripts/run_agent_developer_gate.py"
+    ],
+    "cwd": "/tmp/opencode/docatlas-stage3-candidate",
+    "sha": "264694706ff3c521abaf616f366db02a014362ea",
+    "exit_code": 0,
+    "seconds": 2.5180156230926514,
+    "log": "gate-08.log",
+    "source_changed": false
+  },
+  {
+    "command": [
+      "/tmp/opencode/docatlas-stage3-candidate-env/bin/python",
+      "scripts/run_agent_developer_adversarial_gate.py"
+    ],
+    "cwd": "/tmp/opencode/docatlas-stage3-candidate",
+    "sha": "264694706ff3c521abaf616f366db02a014362ea",
+    "exit_code": 1,
+    "seconds": 6.975627660751343,
+    "log": "gate-09.log",
+    "source_changed": false
+  },
+  {
+    "command": [
+      "/tmp/opencode/docatlas-stage3-candidate-env/bin/python",
+      "scripts/run_critical_mutation_gate.py"
+    ],
+    "cwd": "/tmp/opencode/docatlas-stage3-candidate",
+    "sha": "264694706ff3c521abaf616f366db02a014362ea",
+    "exit_code": 0,
+    "seconds": 4.772732496261597,
+    "log": "gate-10.log",
+    "source_changed": false
+  },
+  {
+    "command": [
+      "/tmp/opencode/docatlas-stage3-candidate-env/bin/python",
+      "scripts/run_agent_developer_adversarial_mutation_gate.py"
+    ],
+    "cwd": "/tmp/opencode/docatlas-stage3-candidate",
+    "sha": "264694706ff3c521abaf616f366db02a014362ea",
+    "exit_code": 0,
+    "seconds": 19.1967670917511,
+    "log": "gate-11.log",
+    "source_changed": false
+  },
+  {
+    "command": [
+      "/tmp/opencode/docatlas-stage3-candidate-env/bin/python",
+      "scripts/docs_mcp_stdio_smoke.py"
+    ],
+    "cwd": "/tmp/opencode/docatlas-stage3-candidate",
+    "sha": "264694706ff3c521abaf616f366db02a014362ea",
+    "exit_code": 0,
+    "seconds": 2.9687821865081787,
+    "log": "gate-12.log",
+    "source_changed": false
+  },
+  {
+    "command": [
+      "/tmp/opencode/docatlas-stage3-candidate-env/bin/python",
+      "scripts/installed_mcp_contract_self_test.py"
+    ],
+    "cwd": "/tmp/opencode/docatlas-stage3-candidate",
+    "sha": "264694706ff3c521abaf616f366db02a014362ea",
+    "exit_code": 0,
+    "seconds": 0.46465301513671875,
+    "log": "gate-13.log",
+    "source_changed": false
+  }
+]

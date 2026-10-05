@@ -1,0 +1,108 @@
+{
+  "case": {
+    "id": "module_scope_rejects_project_policy_detail",
+    "class": "scope_isolation",
+    "fixture": "explicit_manifest_monorepo",
+    "working_path": "packages/orders/src/submission.py",
+    "max_get_docs_context_calls": 1,
+    "max_trajectory_tokens": 300,
+    "calls": [
+      {
+        "question": "How many retry attempts does ProjectRetryPolicy allow?",
+        "mode": "project",
+        "scope": "module",
+        "module_path": "packages/orders",
+        "packet_tokens": 300,
+        "max_projection_tokens": 300,
+        "target_expected_status": "insufficient_evidence",
+        "target_edit_ready": false,
+        "forbidden_sources": [
+          "ARCHITECTURE.md",
+          "packages/payments/README.md"
+        ]
+      }
+    ]
+  },
+  "observations": [
+    {
+      "request": {
+        "question": "How many retry attempts does ProjectRetryPolicy allow?",
+        "project_path": "/tmp/docatlas-agent-v2-module_scope_rejects_project_policy_detail-hgyeqkgj/project",
+        "mode": "project",
+        "scope": "module",
+        "module_path": "packages/orders"
+      },
+      "raw_response": {
+        "status": "ok",
+        "kind": "docs_context",
+        "context_status": "ready",
+        "context_available": true,
+        "answer_supported": false,
+        "answer_available": false,
+        "support_status": "retrieval_only",
+        "answer_policy": "cite_only",
+        "coverage_policy": "retrieval_attribution_only",
+        "query_coverage": "partial",
+        "retrieval_coverage": "partial",
+        "facet_coverage": "unverified",
+        "covered_query_ids": [],
+        "missing_query_ids": [
+          "query-original",
+          "query-anchor-1"
+        ],
+        "missing_facets": [],
+        "facets": [],
+        "sources": [
+          {
+            "evidence_id": "ev-b58bfa6dcdc93ad5",
+            "path_or_url": "packages/orders/README.md",
+            "section": "Orders module",
+            "snippet": "# Orders module\n\nOrdersModule is the module that prepares and submits customer orders.\nOrdersDraftStore is the module-local draft storage component.\nOrdersDraftStore stores draft orders as JSON records keyed by order id before upload.\nOrderSubmission validates a draft and delegates network retry decisions to ProjectRetryPolicy.\nOrderValidationContract requires a non-empty customer id, at least one line item, and a positive total.",
+            "version_binding": "unversioned",
+            "content_sha256": "1140b617bbbdc751fb20b3eaccbc3df996189090ce47320cdb172be34183bf92",
+            "line_start": 1,
+            "line_end": 7,
+            "project_identity": "local:410d76f11c350127a982145d380b383aff603179617662540a7c7a5601c1df42",
+            "authority": "source_of_truth",
+            "scope": "module",
+            "source_uri": "docatlas://source/dd5dfd7e0600991e7e290682"
+          }
+        ],
+        "context_quality": {
+          "status": "partial",
+          "reasons": [
+            "requested_part_missing"
+          ]
+        },
+        "read_next": [],
+        "edit_ready": false,
+        "investigation_allowed": true,
+        "estimated_tokens": 380
+      }
+    }
+  ],
+  "result": {
+    "case_id": "module_scope_rejects_project_policy_detail",
+    "class": "scope_isolation",
+    "passed": false,
+    "context_call_count": 1,
+    "trajectory_tokens": 380,
+    "trajectory_ceiling": 300,
+    "events": [
+      {
+        "kind": "context",
+        "tokens": 380,
+        "ceiling": 300,
+        "status": "ok",
+        "sources": [
+          "packages/orders/README.md"
+        ]
+      }
+    ],
+    "errors": [
+      "call 1: context projection 380>300 tokens",
+      "call 1: status='ok' expected='insufficient_evidence'",
+      "trajectory projection 380>300 tokens"
+    ]
+  }
+}

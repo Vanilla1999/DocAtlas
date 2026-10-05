@@ -1,0 +1,16 @@
+[
+  {
+    "path": "README.md",
+    "commit": "be4e9c7e5aa2dfa3a99aabb06078ac7015f8a295",
+    "blob": "1a1975b2ffaf587f3b752c1966acdb20e7a88468",
+    "expected": "4bc778b1dfaf72dcd1058427a8477841fea62e500b20913471ae05e74e9be2d9",
+    "current": "82975e09e63a5897c0f0867fbf370af4038360e489a3baa71d6378b98f2498bb"
+  },
+  {
+    "path": "docs/project-docs-mcp-workflow.md",
+    "commit": "2facdba3b84c1c5e4a396b4e0d06b2a5e32aacd4",
+    "blob": "316a520a4df91ebb577da84c99d783c3583b035f",
+    "expected": "8900b87204a72862432f11f1f9433c6646d55663330c590044a947a5050c0f36",
+    "current": "4478411a57217bd30378f232641481a5b8773dadda37f555204f724753c6fafa"
+  }
+]

@@ -1,0 +1,327 @@
+{
+  "artifact": {
+    "artifact_filename": "doc_atlas-1.3.2-py3-none-any.whl",
+    "artifact_sha256": "74638c337f432a146c4a6714f8cc84b5626d913ed2567eccec3aafa614b2b1f8",
+    "cli_sha256": "d18de7bc942533c17c61116cfc06e742b3bb3a5407209ff0ef2aa926d5c21f2f",
+    "distribution": "doc-atlas",
+    "origin": "reviewed-wheel",
+    "public_release_verified": false,
+    "python_version": "3.12.3",
+    "source_commit": "264694706ff3c521abaf616f366db02a014362ea",
+    "version": "1.3.2"
+  },
+  "claim_boundary": "pre-public-installed-harness",
+  "executed_task_count": 1,
+  "false_supported": 0,
+  "forbidden_source_contamination": 0,
+  "infrastructure_errors": [],
+  "limits": {
+    "max_schema_repairs": 1,
+    "public_task_count": 1
+  },
+  "mcp": {
+    "schema_digest_count": 1,
+    "schema_sha256": "21e396d97be40cceb44bac0dff7eefc82cecada47263ba28da400719c4a429b3",
+    "server": [
+      "doc-atlas",
+      "mcp",
+      "docs-serve"
+    ],
+    "tool_inventory": [
+      "docs_status",
+      "get_docs_context",
+      "prepare_docs"
+    ],
+    "transport": "stdio"
+  },
+  "pass_rate": 1.0,
+  "passed_tasks": 1,
+  "privacy": {
+    "absolute_project_paths_persisted": false,
+    "event_hash_chain": true,
+    "raw_prompts_persisted": false,
+    "raw_tool_results_persisted": false
+  },
+  "protocol": "installed-mcp-agent-v1",
+  "provider": {
+    "model": "deterministic-script",
+    "provider_id": "scripted",
+    "variant": null
+  },
+  "schema_version": 1,
+  "task_count": 1,
+  "tasks": [
+    {
+      "events": [
+        {
+          "event_sha256": "3c07c4168e8cdadf6799ce56345c5d7a40aab5f0504753afa87d1a9e4eba0635",
+          "kind": "server_start",
+          "payload": {
+            "args": [
+              "mcp",
+              "docs-serve"
+            ],
+            "artifact_sha256": "74638c337f432a146c4a6714f8cc84b5626d913ed2567eccec3aafa614b2b1f8",
+            "command": "doc-atlas",
+            "source_commit": "264694706ff3c521abaf616f366db02a014362ea"
+          },
+          "previous_event_sha256": null,
+          "seq": 1
+        },
+        {
+          "event_sha256": "81c99be71943ba1fcd6107e6ddef0005f1b03dda46fb5dd7f57487781fb07721",
+          "kind": "mcp_tools_list",
+          "payload": {
+            "schema_sha256": "21e396d97be40cceb44bac0dff7eefc82cecada47263ba28da400719c4a429b3",
+            "tool_count": 3,
+            "tool_names": [
+              "docs_status",
+              "get_docs_context",
+              "prepare_docs"
+            ]
+          },
+          "previous_event_sha256": "3c07c4168e8cdadf6799ce56345c5d7a40aab5f0504753afa87d1a9e4eba0635",
+          "seq": 2
+        },
+        {
+          "event_sha256": "1888db71e5e0d07b56c49889a3b67cf75ab639ad6c791880297abfd5ea661f87",
+          "kind": "host_bootstrap",
+          "payload": {
+            "arguments": {
+              "action": "sync_project_docs",
+              "project_path": "$PROJECT_PATH",
+              "with_vectors": false
+            },
+            "is_error": false,
+            "result_sha256": "32bd2aeb71431fd3fd54628461bb71da339763b6c3126f4e1882a494b243619e",
+            "summary": {
+              "sources": [],
+              "status": "success"
+            },
+            "tool_name": "prepare_docs"
+          },
+          "previous_event_sha256": "81c99be71943ba1fcd6107e6ddef0005f1b03dda46fb5dd7f57487781fb07721",
+          "seq": 3
+        },
+        {
+          "event_sha256": "f2758939bcc49f3f81710a7871053de300c2b773aa0930f1c6d53799959cc260",
+          "kind": "model_request",
+          "payload": {
+            "model": "deterministic-script",
+            "provider_id": "scripted",
+            "request_payload_sha256": "de9fc323a76ba0392eb84755b061f9ca2b5711a2b8f66d6022602712fb98eac9",
+            "tool_schema_sha256": "21e396d97be40cceb44bac0dff7eefc82cecada47263ba28da400719c4a429b3",
+            "turn": 1,
+            "variant": null
+          },
+          "previous_event_sha256": "1888db71e5e0d07b56c49889a3b67cf75ab639ad6c791880297abfd5ea661f87",
+          "seq": 4
+        },
+        {
+          "event_sha256": "90bb71236821bc860b5e8d58baa442152c680ed8a113abe742c5d8d58b679bf5",
+          "kind": "model_output",
+          "payload": {
+            "output_sha256": "e505bf5f922b9f01258615e25fbcb16b1d47a68a915b3c064a51e6ccd261dff2",
+            "turn": 1,
+            "usage": {
+              "input_tokens": 0,
+              "model": "deterministic-script",
+              "output_tokens": 0,
+              "reasoning_tokens": 0,
+              "request_id": "scripted-module_definition_supported-1",
+              "request_ids": {
+                "scripted": "module_definition_supported:1"
+              },
+              "request_payload_sha256": "0938e8865f7198bdf724261766b7b916944746342016df23815d826ed730db88",
+              "variant": null
+            }
+          },
+          "previous_event_sha256": "f2758939bcc49f3f81710a7871053de300c2b773aa0930f1c6d53799959cc260",
+          "seq": 5
+        },
+        {
+          "event_sha256": "bbc5c5e4a4f62c9ef95d20cac35bdab85d9b8d9bc0a732554b76ff7e68ae9a72",
+          "kind": "tool_attempt",
+          "payload": {
+            "arguments": {
+              "module_path": "packages/orders",
+              "project_path": "$PROJECT_PATH",
+              "scope": "module"
+            },
+            "arguments_sha256": "0dab86d354702f95154eb81a0976c430c4fc7200c3b06943d74f4d8f12ff5650",
+            "tool_name": "get_docs_context",
+            "turn": 1
+          },
+          "previous_event_sha256": "90bb71236821bc860b5e8d58baa442152c680ed8a113abe742c5d8d58b679bf5",
+          "seq": 6
+        },
+        {
+          "event_sha256": "6cd7e7ffb85c16776b3b76d45084d47d68d846c289fdd7beb7e3898029449bb9",
+          "kind": "mcp_schema_failure",
+          "payload": {
+            "error": "'question' is a required property",
+            "tool_name": "get_docs_context",
+            "turn": 1
+          },
+          "previous_event_sha256": "bbc5c5e4a4f62c9ef95d20cac35bdab85d9b8d9bc0a732554b76ff7e68ae9a72",
+          "seq": 7
+        },
+        {
+          "event_sha256": "05cc5f650dd7501de1568ba6f5dab74182d116e55f6f0d44d9f8ac86b0d24701",
+          "kind": "model_request",
+          "payload": {
+            "model": "deterministic-script",
+            "provider_id": "scripted",
+            "request_payload_sha256": "c9da7edc09780f774c47768b1d16504ec1cb86fc6ce92ba35397b66743223d39",
+            "tool_schema_sha256": "21e396d97be40cceb44bac0dff7eefc82cecada47263ba28da400719c4a429b3",
+            "turn": 2,
+            "variant": null
+          },
+          "previous_event_sha256": "6cd7e7ffb85c16776b3b76d45084d47d68d846c289fdd7beb7e3898029449bb9",
+          "seq": 8
+        },
+        {
+          "event_sha256": "002b995d95b1fe44421b9457ab4e14feee10a6df7763e4090c19861a427abd07",
+          "kind": "model_output",
+          "payload": {
+            "output_sha256": "ccccd2f60a5f6a6e211bbadf8ee9e8c216591439e24c7f337f37eb0fb390a311",
+            "turn": 2,
+            "usage": {
+              "input_tokens": 0,
+              "model": "deterministic-script",
+              "output_tokens": 0,
+              "reasoning_tokens": 0,
+              "request_id": "scripted-module_definition_supported-2",
+              "request_ids": {
+                "scripted": "module_definition_supported:2"
+              },
+              "request_payload_sha256": "ee3d0742abb3187619c60a9c8055af6aa65a5b3999855d029e6c1d9bb11da9c1",
+              "variant": null
+            }
+          },
+          "previous_event_sha256": "05cc5f650dd7501de1568ba6f5dab74182d116e55f6f0d44d9f8ac86b0d24701",
+          "seq": 9
+        },
+        {
+          "event_sha256": "5f0ed7034fd37c1a8107c679c9fd8d63673348ff509b07f6408530c5ec92ce15",
+          "kind": "tool_attempt",
+          "payload": {
+            "arguments": {
+              "module_path": "packages/orders",
+              "project_path": "$PROJECT_PATH",
+              "question": "What is OrdersDraftStore?",
+              "scope": "module"
+            },
+            "arguments_sha256": "0fae4198bc99342b2ac5568a148798c728748eb0221fb82a06d6c6205b4a6151",
+            "tool_name": "get_docs_context",
+            "turn": 2
+          },
+          "previous_event_sha256": "002b995d95b1fe44421b9457ab4e14feee10a6df7763e4090c19861a427abd07",
+          "seq": 10
+        },
+        {
+          "event_sha256": "2dbfcc420351307cdf137fde2bbabccb4e3afa028ebb2719c31e730b8bfc7cce",
+          "kind": "tool_result",
+          "payload": {
+            "is_error": false,
+            "payload_sha256": "af022cacd54e0ccee42e699f50693372cc42affecb1932e1f5518b770aa99041",
+            "summary": {
+              "answer_available": false,
+              "answer_supported": false,
+              "edit_ready": false,
+              "kind": "docs_context",
+              "sources": [
+                "packages/orders/README.md"
+              ],
+              "status": "ok",
+              "support_status": "retrieval_only"
+            },
+            "tool_name": "get_docs_context",
+            "turn": 2
+          },
+          "previous_event_sha256": "5f0ed7034fd37c1a8107c679c9fd8d63673348ff509b07f6408530c5ec92ce15",
+          "seq": 11
+        },
+        {
+          "event_sha256": "bdaaf6ff56ced10efad8cffa7f26d6be4675a49c53e743f73348670a4fdbc44b",
+          "kind": "task_complete",
+          "payload": {
+            "context_call_count": 1,
+            "failure_stages": [
+              "mcp_schema"
+            ],
+            "false_supported": 0,
+            "forbidden_source_contamination": 0,
+            "passed": true
+          },
+          "previous_event_sha256": "2dbfcc420351307cdf137fde2bbabccb4e3afa028ebb2719c31e730b8bfc7cce",
+          "seq": 12
+        }
+      ],
+      "failure_stages": [
+        "mcp_schema"
+      ],
+      "mcp_schema_sha256": "21e396d97be40cceb44bac0dff7eefc82cecada47263ba28da400719c4a429b3",
+      "passed": true,
+      "schema_repair_count": 1,
+      "score": {
+        "context_call_count": 1,
+        "direct_recovery_shortcut": false,
+        "errors": [],
+        "false_supported": 0,
+        "forbidden_source_contamination": 0,
+        "passed": true,
+        "recovery_contract_ok": true,
+        "scope_contract_ok": true
+      },
+      "task_id": "module_definition_supported",
+      "trajectory": [
+        {
+          "action": {
+            "action": "get_docs_context",
+            "module_path": "packages/orders",
+            "project_path": "$PROJECT_PATH",
+            "question": "What is OrdersDraftStore?",
+            "scope": "module"
+          },
+          "module_candidates": [],
+          "next_action_tool": null,
+          "operational_reason_code": null,
+          "sources": [
+            "packages/orders/README.md"
+          ],
+          "status": "ok",
+          "tool": "get_docs_context"
+        }
+      ],
+      "usage": [
+        {
+          "input_tokens": 0,
+          "model": "deterministic-script",
+          "output_tokens": 0,
+          "reasoning_tokens": 0,
+          "request_id": "scripted-module_definition_supported-1",
+          "request_ids": {
+            "scripted": "module_definition_supported:1"
+          },
+          "request_payload_sha256": "0938e8865f7198bdf724261766b7b916944746342016df23815d826ed730db88",
+          "turn": 1,
+          "variant": null
+        },
+        {
+          "input_tokens": 0,
+          "model": "deterministic-script",
+          "output_tokens": 0,
+          "reasoning_tokens": 0,
+          "request_id": "scripted-module_definition_supported-2",
+          "request_ids": {
+            "scripted": "module_definition_supported:2"
+          },
+          "request_payload_sha256": "ee3d0742abb3187619c60a9c8055af6aa65a5b3999855d029e6c1d9bb11da9c1",
+          "turn": 2,
+          "variant": null
+        }
+      ]
+    }
+  ]
+}
