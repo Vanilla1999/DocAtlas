@@ -1,0 +1,14 @@
+{
+  "schema_version": 1,
+  "module_labels": {
+    "tests/docs/test_empty_docs_context_payload.py": "behavioral",
+    "tests/docs/test_finalized_mcp_output_integrity.py": "serialization",
+    "tests/docs/test_source_range_audit_integrity.py": "behavioral"
+  },
+  "node_overrides": {},
+  "module_node_hashes": {
+    "tests/docs/test_empty_docs_context_payload.py": "640cbe8ca64e38ff4c4bee06321e65b9ccdd25412ad7523f00d9bd5cf27c32eb",
+    "tests/docs/test_finalized_mcp_output_integrity.py": "7beffdbb70e0f573e16a9907a35565b1a640dc3d6ad7370e7942214dc5363c7f",
+    "tests/docs/test_source_range_audit_integrity.py": "128862390ccd63b6560fbd57bf41049a5ee38a66ee4450e8bc10861d2d59cc6c"
+  }
+}
