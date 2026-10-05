@@ -58,7 +58,9 @@ def test_retrieved_safe_context_survives_unknown_question_class(tmp_path,monkeyp
 @pytest.mark.parametrize('change', ['project','stale','freshness','risk','lifecycle'])
 def test_hint_context_does_not_bypass_candidate_safety(tmp_path,monkeypatch,change):
     service,root=_named_document_service(tmp_path,monkeypatch,['README.md'],{'README.md':TEXT})
-    _,trace=capture(service,{'question':CASES[0][0],'project_path':root,'scope':'all'})
+    base,trace=capture(service,{'question':CASES[0][0],'project_path':root,'scope':'all',
+                              'lookup_queries':['interfaces']})
+    assert base['context_available'] is True
     frozen=deepcopy(trace['projector_call_inputs'][0])
     assert frozen['retrieval']['context_pack'], 'safety control requires nonempty candidates'
     for source in frozen['retrieval']['context_pack']:

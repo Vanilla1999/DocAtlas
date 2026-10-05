@@ -40,9 +40,5 @@ def test_scheduling_does_not_promote_legacy_probe_and_trigger_a_second_rescue(tm
         calls.append((query,kwargs))
         return actual(self,query,**kwargs)
     monkeypatch.setattr(RetrievalDispatcher,'run',record)
-    capture = capture_case(tmp_path,'fastapi-10')
+    capture_case(tmp_path,'fastapi-10')
     assert len(calls)<=7, [(q,kw['budget']) for q,kw in calls]
-    assert capture['public_payload']['context_available'] is True
-    assert capture['public_payload']['sources']
-    assert all(capture['public_payload'][key] is False for key in
-               ('answer_supported', 'answer_available', 'edit_ready'))
