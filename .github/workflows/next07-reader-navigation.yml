@@ -1,0 +1,104 @@
+name: Next07 external reader navigation pilot
+
+on:
+  push:
+    branches: [next07-feasibility-audit]
+    paths: ['.github/workflows/next07-reader-navigation.yml']
+  workflow_dispatch:
+    inputs:
+      model:
+        description: 'Explicit OpenAI reader model for this run; no automatic substitution'
+        required: true
+        default: 'gpt-4o-mini-2024-07-18'
+
+permissions:
+  contents: read
+
+env:
+  DOCATLAS_OFFLINE: '1'
+  DOCATLAS_AUTO_VECTORS: '0'
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: 'true'
+
+jobs:
+  reader-pilot:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1
+        with:
+          python-version: '3.12'
+      - name: Verify reviewed scope before execution
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/reader-pilot"
+          git rev-parse HEAD > "$RUNNER_TEMP/reader-pilot/head.txt"
+          git diff --exit-code 3195ff26090e71429feb4abf8e51d4fbbc4df994 HEAD -- docmancer eval tests v2plan/third_party 'v2plan/next07_grounded_*' v2plan/next07_owner_delivery.py v2plan/next07_diagnostic_scope.py
+          python - <<'PY'
+          import hashlib, json
+          from pathlib import Path
+          for name, expected in json.loads(Path('v2plan/artifacts/next07/reader-navigation-20261005/reviewed-hashes.json').read_text()).items():
+              assert hashlib.sha256(Path(name).read_bytes()).hexdigest() == expected, name
+          PY
+      - name: Install complete project environment
+        run: |
+          python -m pip install -e '.[dev]' > "$RUNNER_TEMP/reader-pilot/install.log" 2>&1
+          python -m pip freeze > "$RUNNER_TEMP/reader-pilot/pip-freeze.txt"
+      - name: Research host and unchanged initial-source contracts
+        run: |
+          set +e
+          python -m pytest -q v2plan/test_next07_reader_experiment.py v2plan/test_next07_grounded_first.py v2plan/test_next07_scope_native.py --junitxml="$RUNNER_TEMP/reader-pilot/tests.xml" > "$RUNNER_TEMP/reader-pilot/tests.log" 2>&1
+          rc=$?
+          echo "$rc" > "$RUNNER_TEMP/reader-pilot/tests-exit.txt"
+          exit "$rc"
+      - name: Native first packets and scripted reachability NOT model evidence
+        run: |
+          set +e
+          python -m v2plan.next07_reader_experiment.run --mode native --out "$RUNNER_TEMP/reader-pilot/native" > "$RUNNER_TEMP/reader-pilot/native.log" 2>&1
+          rc=$?
+          echo "$rc" > "$RUNNER_TEMP/reader-pilot/native-exit.txt"
+          exit "$rc"
+      - name: External model pilot or explicit provider blocker
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          PILOT_MODEL: ${{ inputs.model || 'gpt-4o-mini-2024-07-18' }}
+        run: |
+          set +e
+          python -m v2plan.next07_reader_experiment.run --mode live --model "$PILOT_MODEL" --out "$RUNNER_TEMP/reader-pilot/model" > "$RUNNER_TEMP/reader-pilot/model.log" 2>&1
+          rc=$?
+          echo "$rc" > "$RUNNER_TEMP/reader-pilot/model-exit.txt"
+          exit 0
+      - name: Record exact completion boundaries
+        if: always()
+        run: |
+          python - <<'PY'
+          import json, os
+          from pathlib import Path
+          root = Path(os.environ['RUNNER_TEMP']) / 'reader-pilot'
+          root.mkdir(parents=True, exist_ok=True)
+          result = {'N10': 'NOT_RUN_UNCHANGED', 'rollout': 'NOT_AUTHORIZED', 'automatic_quality_PASS': False}
+          for name in ('tests', 'native', 'model'):
+              p = root / (name + '-exit.txt')
+              result[name + '_exit'] = int(p.read_text()) if p.exists() else None
+              p = root / name / 'result.json'
+              item = json.loads(p.read_text()) if p.exists() else {}
+              result[name + '_status'] = item.get('status', 'NOT_RUN')
+              if name == 'model':
+                  result['completed_model_sessions'] = item.get('completed_model_sessions', item.get('model_sessions', 0))
+          (root / 'summary.json').write_text(json.dumps(result, indent=2) + '\n')
+          print(json.dumps(result, indent=2))
+          with open(os.environ['GITHUB_STEP_SUMMARY'], 'a') as stream:
+              stream.write('### Reader pilot: technical and model results are separate\n```json\n' + json.dumps(result, indent=2) + '\n```\n')
+          PY
+      - name: Preserve raw public traces and model-visible transcripts
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: next07-reader-pilot-${{ github.sha }}
+          path: ${{ runner.temp }}/reader-pilot/
+          include-hidden-files: true
+          if-no-files-found: error
+          retention-days: 14
