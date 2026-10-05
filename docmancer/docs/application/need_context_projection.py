@@ -17,7 +17,7 @@ from docmancer.docs.domain.evidence_set_types import SourceKey, SpanRef, Depende
 from docmancer.docs.domain.need_contracts import compile_need_contracts
 from docmancer.docs.domain.source_dependency_graph import source_graph
 from docmancer.docs.domain.query_terms import documentation_query_terms
-from docmancer.docs.domain.evidence_qualification import _visible_term_present
+from docmancer.docs.domain.evidence_qualification import _visible_term_present, evidence_policy_rejection_reason
 from docmancer.docs.domain.query_reference_binding import (
     QueryMention, ReferencePlan, ResolvedReference, ScopeKey,
 )
@@ -79,6 +79,10 @@ def iter_need_context_variants(
     outcomes = diagnostics.setdefault('need_context_fallback', [])
     for original in candidates[:24]:
         if not isinstance(original, Mapping) or original.get('source_class') != 'project_doc':
+            continue
+        if evidence_policy_rejection_reason({}, visible_text='', candidate=original,
+                expected_project_identity=expected_project_identity,
+                lifecycle_intent=original.get('_lifecycle_intent', 'current')) is not None:
             continue
         root = original.get('_reference_root_plan')
         evidence = original.get('_reference_evidence')

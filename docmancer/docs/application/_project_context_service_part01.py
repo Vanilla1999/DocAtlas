@@ -74,6 +74,7 @@ class _ProjectContextServicePart01:
             supplemental_queries=requirement_search_probes(canonical_requirements))
         metadata = self.facade.read_project_metadata(str(root))
         project_docs = None
+        context_only_rescue_excluded_ids = frozenset()
         if mode in {"auto", "project-only"}:
             candidate_limit = min(20, max(12, (limit or 4) * 3))
             project_docs_kwargs = {
@@ -100,16 +101,35 @@ class _ProjectContextServicePart01:
                             if normalize_doc_path(chunk.path) == normalized_evidence_path
                         ],
                     )
-                from .need_context_projection import set_context_variants
-                checked_sets = {
+                from .need_context_projection import iter_need_context_variants, set_context_variants
+                context_candidates = project_context_pack(
+                    question=question, project_docs=project_docs, dependency_docs=None)
+                context_kwargs = {
+                    'query_plan': documentation_query_plan.as_payload(),
+                    'expected_project_identity': ProjectDocsService._repository_identity(root),
+                    'max_tokens': 800, 'diagnostics': {},
+                }
+                rescue_checked_sets = {
                     original.get('stable_chunk_id')
                     for original, _, _ in set_context_variants(
-                        project_context_pack(question=question, project_docs=project_docs, dependency_docs=None),
-                        query_plan=documentation_query_plan.as_payload(),
-                        expected_project_identity=project_docs.results[0].project_identity,
-                        max_tokens=800, diagnostics={},
+                        context_candidates, **context_kwargs,
                     )
                 }
+                checked_sets = {
+                    original.get('stable_chunk_id')
+                    for original, _, _, _ in iter_need_context_variants(
+                        context_candidates, **context_kwargs,
+                    )
+                }
+                # New retrieval-only admission must not expand rescue authority.
+                # Preserve the existing qualified and checked-list seed routes.
+                context_only_rescue_excluded_ids = frozenset(
+                    chunk.stable_chunk_id for chunk in project_docs.results
+                    if chunk.stable_chunk_id in checked_sets - rescue_checked_sets
+                    and 'retrieval_query_matches' in (chunk.metadata or {})
+                    and not any(isinstance(trace, dict) and trace.get('qualified') is True
+                                for trace in chunk.metadata['retrieval_query_matches'].values())
+                )
                 context_candidate_ids = frozenset(id(chunk) for chunk in project_docs.results
                                                  if chunk.stable_chunk_id in checked_sets)
                 project_docs = replace(
@@ -428,7 +448,8 @@ class _ProjectContextServicePart01:
         for chunk in (project_docs.results if project_docs else ()):
             path = normalize_doc_path(chunk.path)
             if (
-                path not in admissible_paths or not chunk.content_hash
+                chunk.stable_chunk_id in context_only_rescue_excluded_ids
+                or path not in admissible_paths or not chunk.content_hash
                 or not str(chunk.content_hash).strip() or chunk.stale
                 or chunk.metadata.get("stale") or chunk.metadata.get("risk_flags")
                 or chunk.metadata.get("instruction_risk_flags")

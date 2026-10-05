@@ -60,6 +60,7 @@ def test_hint_context_does_not_bypass_candidate_safety(tmp_path,monkeypatch,chan
     service,root=_named_document_service(tmp_path,monkeypatch,['README.md'],{'README.md':TEXT})
     _,trace=capture(service,{'question':CASES[0][0],'project_path':root,'scope':'all'})
     frozen=deepcopy(trace['projector_call_inputs'][0])
+    assert frozen['retrieval']['context_pack'], 'safety control requires nonempty candidates'
     for source in frozen['retrieval']['context_pack']:
         if change=='project': source['project_identity']='other-project'
         elif change=='stale': source['stale']=True
